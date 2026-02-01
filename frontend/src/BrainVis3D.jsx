@@ -1,6 +1,5 @@
 import { Html } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 // --- Geometry Components ---
@@ -70,83 +69,55 @@ const Axon = ({ start, end, isActive }) => {
 
 // --- Main Visualization Component ---
 
-const BrainVis3D = ({ t, onStatusUpdate }) => {
-    const [data, setData] = useState(null);
-    const [frames, setFrames] = useState([]);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentStep, setCurrentStep] = useState(0);
-    const [activeNeurons, setActiveNeurons] = useState(new Set());
+// --- Main Visualization Component ---
+
+const BrainVis3D = ({ t, structure, activeSpikes }) => {
+    // If no structure, render placeholder or nothing
+    if (!structure) {
+        return (
+            <Html center>
+                <div style={{ color: '#aaa', fontSize: '12px' }}>
+                    {t ? t('snn.init_hint', 'Please initialize SNN') : 'Please initialize SNN'}
+                </div>
+            </Html>
+        );
+    }
+
+    const { neurons, connections } = structure;
+    console.log('[BrainVis3D] Rendering SNN', { neurons: neurons.length, connections: connections.length, activeSpikes });
     
-    // Fetch data
-    const runSimulation = async () => {
-        try {
-            const res = await fetch("http://127.0.0.1:8888/snn/run_simulation_3d", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ duration: 200 })
-            });
-            const json = await res.json();
-            setData(json.structure);
-            setFrames(json.frames);
-            setCurrentStep(0);
-            setIsPlaying(true);
-        } catch (e) {
-            console.error("Simulation failed", e);
-        }
-    };
-
-    // Animation Loop
-    useFrame((state, delta) => {
-        if (!isPlaying || frames.length === 0) return;
-
-        // Slow down animation 
-        // Simple counter based frame advance (approx 30fps -> 1sim step per 2 frames?)
-        // Let's just do simple speed control
-        if (state.clock.getElapsedTime() % 0.1 < 0.05) { // Update every ~0.1s
-            const frame = frames.find(f => f.time === currentStep);
-            
-            // Auto-decay active neurons
-            // Actually, we should just set active to what's in the frame
-            // But to make it look "flashy", we can keep them on for a bit?
-            // For now, simple: frame.fired are ON, others OFF (unless we want trails)
-            
-            if (frame) {
-                setActiveNeurons(new Set(frame.fired));
-            } else {
-                 setActiveNeurons(new Set());
-            }
-
-            if (currentStep < 200) {
-                 setCurrentStep(s => s + 1);
-            } else {
-                 setIsPlaying(false); // Stop at end
-            }
-            
-            // Report status to parent
-            if (onStatusUpdate) {
-                onStatusUpdate({
-                    step: currentStep,
-                    activeCount: frame ? frame.fired.length : 0,
-                    isPlaying: true,
-                    description: "Simulating Spiking Dynamics..."
-                });
-            }
-        }
-    });
-
-    const neurons = useMemo(() => data?.neurons || [], [data]);
-    const connections = useMemo(() => {
-        if (!data) return [];
-        // Map ID to pos
-        const posMap = {};
-        data.neurons.forEach(n => posMap[n.id] = n.pos);
+    // Create an "isActive" map
+    const activeMap = useMemo(() => {
+        const map = {}; // neuronId -> boolean
+        if (!activeSpikes) return map;
         
-        return data.connections.map(c => ({
+        // Helper to track indices per layer
+        const layerIndices = {}; 
+        
+        neurons.forEach(n => {
+            if (layerIndices[n.layer] === undefined) layerIndices[n.layer] = 0;
+            const idx = layerIndices[n.layer]++;
+            
+            // Check if this neuron's index is in the active list for its layer
+            if (activeSpikes[n.layer] && activeSpikes[n.layer].includes(idx)) {
+                map[n.id] = true;
+            }
+        });
+        return map;
+    }, [neurons, activeSpikes]);
+
+
+    // Parse connections for 3D lines
+    const processedConnections = useMemo(() => {
+        const posMap = {};
+        neurons.forEach(n => posMap[n.id] = n.pos);
+        
+        return connections.map(c => ({
             ...c,
             start: posMap[c.srcId],
             end: posMap[c.tgtId]
         })).filter(c => c.start && c.end);
-    }, [data]);
+    }, [neurons, connections]);
 
     return (
         <group>
@@ -156,41 +127,18 @@ const BrainVis3D = ({ t, onStatusUpdate }) => {
                     <Neuron 
                         key={n.id} 
                         {...n} 
-                        isFired={activeNeurons.has(n.id)} 
+                        isFired={activeMap[n.id]} 
                     />
                 ))}
-                {connections.map((c, i) => (
+                {processedConnections.map((c, i) => (
                     <Axon 
                         key={i} 
                         start={c.start} 
                         end={c.end} 
-                        isActive={activeNeurons.has(c.srcId)} 
+                        isActive={activeMap[c.srcId]} 
                     />
                 ))}
             </group>
-
-            {/* Controls (3D UI) */}
-             <Html position={[0, -5, 0]} center>
-                <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto' }}>
-                    <button 
-                        onClick={runSimulation}
-                        style={{
-                            background: '#4ecdc4',
-                            border: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '4px',
-                            color: '#1a1a2e',
-                            fontWeight: 'bold',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        {t ? t('snn.inject', 'Inject "Apple" Stimulus') : 'Inject "Apple" Stimulus'}
-                    </button>
-                    <div style={{ color: 'white', padding: '8px' }}>
-                        Time: {currentStep}ms
-                    </div>
-                </div>
-            </Html>
         </group>
     );
 };

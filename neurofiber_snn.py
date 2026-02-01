@@ -88,6 +88,26 @@ class NeuroFiberNetwork:
             
         self.neurons[name] = layer_neurons
 
+    def add_layer(self, name, size):
+        """Wrapper for add_layer_bundle with auto-positioning"""
+        # Auto-position along X axis based on existing layer count
+        x_pos = len(self.neurons) * 10.0
+        self.add_layer_bundle(name, size, center=(x_pos, 0, 0))
+
+    def connect_all_to_all(self, src_name, tgt_name, weight=0.5, delay=1.0):
+        """Connects every neuron in src to every neuron in tgt"""
+        srcs = self.neurons[src_name]
+        tgts = self.neurons[tgt_name]
+        
+        for s in srcs:
+            for t in tgts:
+                self.connections.append({
+                    "src": s,
+                    "tgt": t,
+                    "weight": weight,
+                    "delay": delay
+                })
+
     def connect_layers(self, src_name, tgt_name, probability=0.5, weight=0.5, delay=1.0):
         srcs = self.neurons[src_name]
         tgts = self.neurons[tgt_name]
@@ -124,15 +144,18 @@ class NeuroFiberNetwork:
 
     def step_simulation(self):
         self.time += 1.0
-        fired_info = [] # List of {neuron_id, layer_name}
+        fired_info = {} # Dict[str, List[int]]
         
         # Step neurons
         active_neurons = []
         for name, layer in self.neurons.items():
-            for neuron in layer:
+            fired_indices = []
+            for i, neuron in enumerate(layer):
                 if neuron.step(self.time):
-                    fired_info.append({"id": neuron.id, "layer": name})
+                    fired_indices.append(i)
                     active_neurons.append(neuron)
+            if fired_indices:
+                fired_info[name] = fired_indices
         
         # Propagate
         for conn in self.connections:

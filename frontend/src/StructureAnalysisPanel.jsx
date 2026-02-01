@@ -1,6 +1,7 @@
-import { Text } from '@react-three/drei';
+import { OrbitControls, Text } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
 import axios from 'axios';
-import { Brain, Network, RotateCcw, Settings, Sparkles } from 'lucide-react';
+import { Activity, Brain, Network, RotateCcw, Settings, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import BrainVis3D from './BrainVis3D';
@@ -8,6 +9,83 @@ import BrainVis3D from './BrainVis3D';
 const API_BASE = 'http://localhost:8888';
 
 // Layer Detail 3D Component - Shows internal structure of a layer
+// --- Validity Analysis Helper Components ---
+const getEntropyColor = (value) => {
+  const norm = Math.min(value / 6, 1.0);
+  const hue = 240 * (1 - norm);
+  return `hsl(${hue}, 80%, 50%)`;
+};
+
+function MetricCard({ title, value, unit, description, color = '#4488ff' }) {
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px',
+      borderLeft: `4px solid ${color}`, flex: 1, minWidth: '120px'
+    }}>
+      <div style={{ fontSize: '12px', color: '#aaa', marginBottom: '4px' }}>{title}</div>
+      <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+        {typeof value === 'number' ? value.toFixed(3) : value}
+        {unit && <span style={{ fontSize: '12px', color: '#888', marginLeft: '4px' }}>{unit}</span>}
+      </div>
+      {description && <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>{description}</div>}
+    </div>
+  );
+}
+
+function EntropyHeatmap({ text, entropyStats, t }) {
+  if (!entropyStats) return null;
+  return (
+    <div style={{ marginTop: '16px', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px' }}>
+        <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#ddd' }}>{t('validity.entropyStats')}</h4>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ fontSize: '12px', color: '#aaa' }}>{t('validity.min')}: {entropyStats.min_entropy?.toFixed(2)}</div>
+            <div style={{ flex: 1, height: '6px', background: '#333', borderRadius: '3px', position: 'relative' }}>
+                <div style={{ 
+                    position: 'absolute', left: '20%', right: '20%', top: 0, bottom: 0, 
+                    background: 'linear-gradient(90deg, #4488ff, #ff4444)', borderRadius: '3px', opacity: 0.5
+                }} />
+                <div style={{ position: 'absolute', left: '50%', top: '-4px', bottom: '-4px', width: '2px', background: '#fff' }} />
+            </div>
+            <div style={{ fontSize: '12px', color: '#aaa' }}>{t('validity.max')}: {entropyStats.max_entropy?.toFixed(2)}</div>
+        </div>
+        <div style={{ textAlign: 'center', fontSize: '11px', color: '#666', marginTop: '4px' }}>
+            {t('validity.mean')}: {entropyStats.mean_entropy?.toFixed(2)} | {t('validity.variance')}: {entropyStats.variance_entropy?.toFixed(2)}
+        </div>
+    </div>
+  );
+}
+
+function AnisotropyChart({ geometricStats, t }) {
+    if (!geometricStats) return null;
+    const data = Object.entries(geometricStats)
+        .map(([key, val]) => ({ layer: parseInt(key.split('_')[1]), value: val }))
+        .sort((a, b) => a.layer - b.layer);
+    const maxVal = Math.max(...data.map(d => d.value), 0.1);
+    
+    return (
+        <div style={{ marginTop: '16px' }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#ddd' }}>{t('validity.anisotropy')}</h4>
+            <div style={{ display: 'flex', alignItems: 'flex-end', height: '100px', gap: '4px', paddingBottom: '20px', borderBottom: '1px solid #333' }}>
+                {data.map((d) => (
+                    <div key={d.layer} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ 
+                            width: '80%', height: `${(d.value / maxVal) * 100}%`, 
+                            background: d.value > 0.9 ? '#ff4444' : '#4488ff',
+                            borderRadius: '2px 2px 0 0', transition: 'height 0.3s'
+                        }} title={`${t('validity.layer', { layer: d.layer })}: ${d.value.toFixed(3)}`} />
+                        <div style={{ fontSize: '10px', color: '#666', transform: 'rotate(-45deg)', transformOrigin: 'top left', marginTop: '4px' }}>
+                            {t('validity.l')}{d.layer}
+                        </div>
+                    </div>
+                ))}
+            </div>
+             <div style={{ fontSize: '10px', color: '#888', marginTop: '8px', textAlign: 'center' }}>
+                {t('validity.collapseWarning')}
+            </div>
+        </div>
+    );
+}
+
 export function LayerDetail3D({ layerIdx, layerInfo, onHeadClick, t }) {
   if (!layerInfo) return null;
 
@@ -549,14 +627,15 @@ export function FiberBundleVisualization3D({ result, t }) {
 }
 
 // 3D SNN Visualization
-export function SNNVisualization3D({ t }) {
+// 3D SNN Visualization
+export function SNNVisualization3D({ t, structure, activeSpikes }) {
     return (
         <group>
              <Text position={[0, 6, 0]} fontSize={0.6} color="#ff9f43" anchorX="center">
                 {t ? t('snn.title', 'Spiking Neural Network Activity') : 'Spiking Neural Network Activity'}
             </Text>
             
-            <BrainVis3D t={t} />
+            <BrainVis3D t={t} structure={structure} activeSpikes={activeSpikes} />
         </group>
     );
 }
@@ -840,38 +919,43 @@ function InfoPanel({ activeTab, t }) {
     const infoContent = {
         circuit: {
             title: t('structure.circuit.title'),
-            desc: t('structure.circuit.desc'),
-            tech: "Attribution Patching, Graph Theory"
+            desc: "就像寻找家里的电路故障一样，这个工具能帮我们找出 AI 完成特定任务时最核心的“神经回路”。",
+            tech: "Edge Attribution Patching"
         },
         features: {
             title: t('structure.features.title'),
-            desc: t('structure.features.desc'),
+            desc: "AI 的思维非常杂乱，我们通过这个工具将其拆解为一个个具体的、人能听懂的概念（特征）。",
             tech: "Sparse Autoencoders (SAE)"
         },
         causal: {
             title: t('structure.causal.title'),
-            desc: t('structure.causal.desc'),
-            tech: "Intervention, Ablation"
+            desc: "如果我们强制改变模型内部的一个信号，它的最终答案会变吗？这能帮我们确定谁才是真正的“幕后主使”。",
+            tech: "Activation Patching"
         },
         manifold: {
             title: t('structure.manifold.title'),
-            desc: t('structure.manifold.desc'),
-            tech: "PCA, Fractal Dimension"
+            desc: "分析 AI 思维世界的“地形地貌”，看看它的想法是井然有序的，还是已经乱成了一团。",
+            tech: "Intrinsic Dimensionality"
         },
         compositional: {
             title: t('structure.compositional.title'),
-            desc: t('structure.compositional.desc'),
+            desc: "测试 AI 是否懂得“1+1=2”的逻辑，比如它是否理解“黑色”+“猫”=“黑猫”这种组合概念。",
             tech: "Vector Arithmetic, OLS"
         },
         agi: {
-            title: "AGI Theory Verification",
-            desc: "Verifies the Base-Fiber bundle structure of the network representations according to the Unified Field Theory.",
+            title: "AGI 理论验证",
+            desc: "基于最新的统一场论，验证网络内部是否存在完美的数学纤维丛结构——这是通往通用人工智能的关键。",
             tech: "RSA, Differential Geometry"
         },
         snn: {
-            title: t('snn.title', 'Spiking Neural Network'),
-            desc: t('snn.desc', 'Simulate brain dynamics using 3D visualization. Inject stimuli to see feature binding via phase synchronization.'),
+            title: t('snn.title', '脉冲神经网络'),
+            desc: "开启仿生模式。您可以观察神经元像真实大脑一样，通过电脉冲的同步爆发来“绑定”不同的概念。",
             tech: "LIF Neurons, Phase Locking"
+        },
+        validity: {
+            title: t('validity.title', '语言有效性分析'),
+            desc: "检查 AI 是否在胡言乱语。如果它的思维空间缩成了一个点（坍缩），说明它已经失去了逻辑能力。",
+            tech: "Entropy, Anisotropy, PPL"
         }
     };
 
@@ -918,7 +1002,9 @@ export function StructureAnalysisControls({
   containerStyle, 
   t,
   // New Props
-  systemType, setSystemType
+  systemType, setSystemType,
+  // SNN Props
+  snnState, onInitializeSNN, onToggleSNNPlay, onStepSNN, onInjectStimulus
 }) {
   const [loading, setLoading] = useState(false);
   const [progressLogs, setProgressLogs] = useState([]);
@@ -933,12 +1019,16 @@ export function StructureAnalysisControls({
       concept_pair: "formal_casual"
   });
 
+  // Validity State
+  const [validityForm, setValidityForm] = useState({ prompt: "The quick brown fox jumps over the lazy dog." });
+  const [validityResult, setValidityResult] = useState(null);
+
   useEffect(() => {
     // When switching systems, default to a tab
     if (systemType === 'snn') {
-        if (activeTab !== 'snn') setActiveTab('snn');
+        if (activeTab !== 'snn' && activeTab !== 'validity') setActiveTab('snn');
     } else {
-        if (activeTab === 'snn') setActiveTab('circuit');
+        if (activeTab === 'snn' || activeTab === 'validity') setActiveTab('circuit');
     }
   }, [systemType]);
 
@@ -985,6 +1075,11 @@ export function StructureAnalysisControls({
       log(`📈 R²: ${data.r2_score?.toFixed(4)}`);
   });
 
+  const runValidityAnalysis = () => runAnalysis('Validity Analysis', 'analyze_validity', validityForm, (data, log) => {
+      log(`📉 Perplexity: ${data.perplexity?.toFixed(2)}`);
+      setValidityResult(data);
+  });
+
   const runAgiVerification = () => runAnalysis('AGI Theory Verification', 'verify_agi', {}, (data, log) => {
       const baseCount = data.rsa?.filter(l => l.type === 'Base').length;
       log(`📊 Systematic Layers: ${baseCount}`);
@@ -1025,25 +1120,7 @@ export function StructureAnalysisControls({
             🧠 {t('structure.title')}
           </h2>
 
-          <div style={{
-              display: 'flex', background: 'rgba(255,255,255,0.1)', 
-              borderRadius: '8px', padding: '4px'
-          }}>
-              {['dnn', 'snn'].map(type => (
-                  <button
-                      key={type}
-                      onClick={() => setSystemType(type)}
-                      style={{
-                          flex: 1, padding: '8px', border: 'none', borderRadius: '6px',
-                          background: systemType === type ? '#4488ff' : 'transparent',
-                          color: systemType === type ? '#fff' : '#888',
-                          fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
-                      }}
-                  >
-                      {type === 'dnn' ? 'Deep Neural Net' : 'Spiking NN'}
-                  </button>
-              ))}
-          </div>
+
       </div>
 
       {/* Middle Section: Algorithm Tabs & content */}
@@ -1062,7 +1139,8 @@ export function StructureAnalysisControls({
                  { id: 'compositional', icon: Network, label: 'Compos' },
                  { id: 'agi', icon: Sparkles, label: 'AGI Theory' }
               ] : [
-                 { id: 'snn', icon: Brain, label: 'Simulation' }
+                 { id: 'snn', icon: Brain, label: 'Simulation' },
+                 { id: 'validity', icon: Activity, label: 'Validity' }
               ]).map(tab => (
                  <button
                     key={tab.id}
@@ -1163,21 +1241,123 @@ export function StructureAnalysisControls({
                 </div>
             )}
 
-            {/* --- SNN Forms --- */}
             {activeTab === 'snn' && (
                 <div className="animate-fade-in">
-                    <div style={{ padding: '12px', background: 'rgba(78, 205, 196, 0.1)', borderRadius: '8px', border: '1px solid rgba(78, 205, 196, 0.2)' }}>
-                        <h4 style={{margin: '0 0 8px 0', fontSize: '13px', color: '#4ecdc4'}}>Experiment: Feature Binding</h4>
-                        <p style={{fontSize: '11px', color: '#ccc', margin: 0}}>
-                            Simulates the binding of "Red" and "Round" features into an "Apple" object via Neural Phase Locking.
-                        </p>
-                    </div>
-                    {/* Controls are in 3D view, but we could add param sliders here */}
+                    {!snnState?.initialized ? (
+                        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                            <div style={{ marginBottom: '12px', color: '#aaa', fontSize: '13px' }}>
+                                NeuroFiber Network not initialized
+                            </div>
+                            <ActionButton onClick={onInitializeSNN} loading={loading} icon={Brain}>
+                                Initialize SNN
+                            </ActionButton>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {/* Simulation Controls */}
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    onClick={onToggleSNNPlay}
+                                    style={{
+                                        flex: 1, padding: '8px',
+                                        background: snnState.isPlaying ? '#ff5252' : '#4ecdc4',
+                                        border: 'none', borderRadius: '6px',
+                                        color: '#000', fontWeight: 'bold', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                                    }}
+                                >
+                                    {snnState.isPlaying ? '⏹ Stop' : '▶ Run'}
+                                </button>
+                                <button
+                                    onClick={onStepSNN}
+                                    style={{
+                                        flex: 1, padding: '8px',
+                                        background: '#333', border: '1px solid #555', borderRadius: '6px',
+                                        color: '#fff', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                                    }}
+                                >
+                                    Step
+                                </button>
+                            </div>
+
+                            {/* Info Stats */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#aaa', padding: '0 4px' }}>
+                                <span>Time: {snnState.time.toFixed(1)}ms</span>
+                                <span>Layers: {snnState.layers.length}</span>
+                            </div>
+
+                            <div style={{margin: '8px 0', borderTop: '1px solid rgba(255,255,255,0.1)'}} />
+
+                            {/* Stimulus Injection */}
+                            <ControlGroup label="Stimulus Injection">
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <button
+                                        onClick={() => onInjectStimulus('Retina_Shape', 5)}
+                                        style={{
+                                            padding: '8px', background: 'rgba(255,107,107,0.1)',
+                                            border: '1px solid #ff6b6b', color: '#ff6b6b',
+                                            borderRadius: '6px', cursor: 'pointer', fontSize: '12px',
+                                            textAlign: 'left'
+                                        }}
+                                    >
+                                        🍎 Inject "Apple" (Shape)
+                                    </button>
+                                    <button
+                                        onClick={() => onInjectStimulus('Retina_Color', 5)}
+                                        style={{
+                                            padding: '8px', background: 'rgba(255,107,107,0.1)',
+                                            border: '1px solid #ff6b6b', color: '#ff6b6b',
+                                            borderRadius: '6px', cursor: 'pointer', fontSize: '12px',
+                                            textAlign: 'left'
+                                        }}
+                                    >
+                                        🔴 Inject "Red" (Color)
+                                    </button>
+                                </div>
+                            </ControlGroup>
+                        </div>
+                    )}
+                </div>
+            )}
+            
+            {activeTab === 'validity' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label={t('validity.prompt', 'Analysis Text')}>
+                        <StyledTextArea 
+                            rows={4} 
+                            value={validityForm.prompt} 
+                            onChange={e => setValidityForm({...validityForm, prompt: e.target.value})} 
+                        />
+                    </ControlGroup>
+                    <ActionButton onClick={runValidityAnalysis} loading={loading} icon={Activity}>
+                        {t('validity.analyze', 'Analyze Validity')}
+                    </ActionButton>
+                    
+                    {/* Inline Results for Validity */}
+                    {validityResult && (
+                        <div style={{ marginTop: '20px', className: 'fade-in' }}>
+                             <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                                <MetricCard 
+                                    title="PPL" 
+                                    value={validityResult.perplexity} 
+                                />
+                                <MetricCard 
+                                    title="Entropy"
+                                    value={validityResult.entropy_stats?.mean_entropy} 
+                                    color="#ffaa00"
+                                />
+                            </div>
+                            <EntropyHeatmap entropyStats={validityResult.entropy_stats} text={validityForm.prompt} t={t} />
+                            <AnisotropyChart geometricStats={validityResult.geometric_stats} t={t} />
+                        </div>
+                    )}
                 </div>
             )}
 
           </div>
       </div>
+
 
       {/* Bottom Section: Info Panel */}
       <InfoPanel activeTab={activeTab} t={t} />
@@ -1194,7 +1374,10 @@ export function StructureAnalysisControls({
 }
 // --- Main Panel Component ---
 
-export default function StructureAnalysisPanel({ t }) {
+export default function StructureAnalysisPanel({ 
+    t, 
+    snnState, onInitializeSNN, onToggleSNNPlay, onStepSNN, onInjectStimulus
+}) {
   const [activeTab, setActiveTab] = useState('circuit');
   const [systemType, setSystemType] = useState('dnn');
   
@@ -1232,6 +1415,7 @@ export default function StructureAnalysisPanel({ t }) {
                if (activeTab === 'circuit') items = { Nodes: analysisResult.nodes?.length, Edges: analysisResult.graph?.edges?.length };
                if (activeTab === 'features') items = { Features: analysisResult.top_features?.length, Error: analysisResult.reconstruction_error?.toFixed(4) };
                if (activeTab === 'causal') items = { Components: analysisResult.n_components_analyzed };
+               if (activeTab === 'validity') items = { PPL: analysisResult.perplexity, Entropy: analysisResult.entropy_stats?.mean_entropy?.toFixed(2) };
                
                setStatusData({
                    title: activeTab.toUpperCase() + " Analysis",
@@ -1241,6 +1425,14 @@ export default function StructureAnalysisPanel({ t }) {
           } else {
                setStatusData(null);
           }
+      }
+      // Also handle SNN validity updates if systemType is SNN but using the generic analysis result
+      if (systemType === 'snn' && activeTab === 'validity' && analysisResult) {
+           setStatusData({
+               title: "Validity Analysis",
+               items: { PPL: analysisResult.perplexity, Entropy: analysisResult.entropy_stats?.mean_entropy?.toFixed(2) },
+               description: "Representation validity analysis complete."
+           });
       }
   }, [analysisResult, activeTab, systemType]);
 
@@ -1264,6 +1456,12 @@ export default function StructureAnalysisPanel({ t }) {
             compForm={compForm} setCompForm={setCompForm}
             onResultUpdate={setAnalysisResult}
             t={tSafe}
+            // SNN Props
+            snnState={snnState}
+            onInitializeSNN={onInitializeSNN}
+            onToggleSNNPlay={onToggleSNNPlay}
+            onStepSNN={onStepSNN}
+            onInjectStimulus={onInjectStimulus}
          />
       </div>
 
@@ -1272,10 +1470,30 @@ export default function StructureAnalysisPanel({ t }) {
          
          {/* Render Logic */}
          <div style={{ width: '100%', height: '100%' }}>
-             {/* SNN View */}
-             {activeTab === 'snn' && (
-                 <SNNVisualization3D t={tSafe} onStatusUpdate={handleStatusUpdate} />
-             )}
+              {/* SNN View */}
+              {activeTab === 'snn' && (
+                  <Canvas camera={{ position: [20, 20, 20], fov: 50 }}>
+                     <ambientLight intensity={0.5} />
+                     <pointLight position={[10, 10, 10]} intensity={1} />
+                     <OrbitControls makeDefault />
+                     <SNNVisualization3D 
+                        t={tSafe} 
+                        onStatusUpdate={handleStatusUpdate} 
+                        structure={snnState?.structure}
+                        activeSpikes={snnState?.spikes}
+                     />
+                  </Canvas>
+              )}
+
+              {/* Validity View */}
+              {activeTab === 'validity' && (
+                   <Canvas camera={{ position: [10, 5, 10], fov: 50 }}>
+                      <ambientLight intensity={0.6} />
+                      <pointLight position={[10, 10, 10]} intensity={1} />
+                      <OrbitControls makeDefault />
+                      <ValidityVisualization3D result={analysisResult} t={tSafe} />
+                   </Canvas>
+              )}
              
              {/* DNN Views */}
              {systemType === 'dnn' && (

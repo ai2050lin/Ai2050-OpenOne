@@ -1,12 +1,10 @@
 import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
-import { Info, Loader2, RotateCcw, Search, Settings } from 'lucide-react';
+import { Brain, HelpCircle, Loader2, RotateCcw, Search, Settings, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
-import { HeadAnalysisPanel } from './HeadAnalysisPanel';
-import LanguageValidityPanel from './LanguageValidityPanel';
 import { SimplePanel } from './SimplePanel';
 import { CompositionalVisualization3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
 
@@ -397,6 +395,7 @@ export default function App() {
   const [loadingLayerData, setLoadingLayerData] = useState(false);
   const [isAnimationPlaying, setIsAnimationPlaying] = useState(true);
   const [showStructurePanel, setShowStructurePanel] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [layerNeuronState, setLayerNeuronState] = useState(null);
   const [loadingNeurons, setLoadingNeurons] = useState(false);
@@ -441,10 +440,14 @@ export default function App() {
     layer_idx: 0
   });
 
+  // System Type State for Structure Analysis
+  const [systemType, setSystemType] = useState('dnn');
+
   // SNN State
   const [snnState, setSnnState] = useState({
     initialized: false,
     layers: [],
+    structure: null, // [NEW] Store 3D structure
     time: 0,
     spikes: {},
     isPlaying: false
@@ -463,8 +466,13 @@ export default function App() {
           { src: "Retina_Color", tgt: "Object_Fiber", type: "one_to_one", weight: 0.8 }
         ]
       });
-      setSnnState(prev => ({ ...prev, initialized: true, layers: res.data.layers }));
-      alert("✅ SNN 初始化成功 (NeuroFiber Network)");
+      setSnnState(prev => ({ 
+          ...prev, 
+          initialized: true, 
+          layers: res.data.layers,
+          structure: res.data.structure
+      }));
+
     } catch (err) {
       console.error(err);
       if (err.message === 'Network Error') {
@@ -529,7 +537,7 @@ export default function App() {
   }, [hoveredInfo]);
   
   // UI Tabs State
-  const [inputPanelTab, setInputPanelTab] = useState('basic'); // 'basic' | 'structure'
+  const [inputPanelTab, setInputPanelTab] = useState('dnn'); // 'dnn' | 'snn'
 
   // Sync Auto Analysis Result (Single Step) to Main Result State
   // This ensures results show up even if StructureAnalysisControls is not mounted (Basic Tab)
@@ -564,7 +572,7 @@ export default function App() {
     structurePanel: true,
     neuronPanel: true,
     headPanel: true,
-    validityPanel: false
+
   });
 
   const togglePanelVisibility = (key) => {
@@ -959,570 +967,490 @@ export default function App() {
       {panelVisibility.inputPanel && (
       <div style={{
         position: 'absolute', top: 60, left: 20, zIndex: 10, // Moved down to avoid overlap with settings button
-        background: 'rgba(20, 20, 25, 0.8)', padding: '20px', borderRadius: '12px',
+        background: 'rgba(20, 20, 25, 0.9)', padding: '20px', borderRadius: '12px',
         backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)',
-        width: '350px'
+        width: '380px', maxHeight: '85vh', display: 'flex', flexDirection: 'column'
       }}>
-        <h1 style={{ margin: '0 0 20px 0', fontSize: '24px', fontWeight: 'bold', background: 'linear-gradient(45deg, #00d2ff, #3a7bd5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Transformer 透镜 3D
+        <h1 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold', background: 'linear-gradient(45deg, #00d2ff, #3a7bd5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Brain size={24} color="#00d2ff"/> AGI智能理论分析
         </h1>
         
-
-        
         {/* Tabs for Input Panel */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #333', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', padding: '2px' }}>
           <button
-             onClick={() => setInputPanelTab('basic')}
+             onClick={() => {
+                 setInputPanelTab('dnn');
+                 setSystemType('dnn');
+             }}
              style={{
-               flex: 1, padding: '8px', background: 'none', border: 'none',
-               borderBottom: inputPanelTab === 'basic' ? '2px solid #4488ff' : 'transparent',
-               color: inputPanelTab === 'basic' ? '#fff' : '#888',
-               cursor: 'pointer', fontWeight: inputPanelTab === 'basic' ? 'bold' : 'normal'
+               flex: 1, padding: '8px', background: inputPanelTab === 'dnn' ? '#3a7bd5' : 'transparent', border: 'none', borderRadius: '4px',
+               color: inputPanelTab === 'dnn' ? '#fff' : '#888',
+               cursor: 'pointer', fontWeight: '600', fontSize: '12px', transition: 'all 0.2s'
              }}
           >
-            基础/生成
+            深度神经网络 (DNN)
           </button>
           <button
-             onClick={() => setInputPanelTab('structure')}
+             onClick={() => {
+                 setInputPanelTab('snn'); 
+                 setSystemType('snn');
+             }}
              style={{
-               flex: 1, padding: '8px', background: 'none', border: 'none',
-               borderBottom: inputPanelTab === 'structure' ? '2px solid #4488ff' : 'transparent',
-               color: inputPanelTab === 'structure' ? '#fff' : '#888',
-               cursor: 'pointer', fontWeight: inputPanelTab === 'structure' ? 'bold' : 'normal'
+               flex: 1, padding: '8px', background: inputPanelTab === 'snn' ? '#4ecdc4' : 'transparent', border: 'none', borderRadius: '4px',
+               color: inputPanelTab === 'snn' ? '#000' : '#888',
+               cursor: 'pointer', fontWeight: '600', fontSize: '12px', transition: 'all 0.2s'
              }}
           >
-            结构分析
+            脉冲神经网络 (SNN)
           </button>
         </div>
 
-        {inputPanelTab === 'basic' ? (
-          <>
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-              <input
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="输入提示词..."
-                style={{
-                  flex: 1, background: '#1a1a1f', border: '1px solid #333',
-                  color: 'white', padding: '10px', borderRadius: '6px', outline: 'none'
-                }}
-              />
-              <button
-                onClick={analyze}
-                disabled={loading || !prompt}
-                style={{
-                  background: '#3a7bd5', border: 'none', color: 'white',
-                  padding: '10px 15px', borderRadius: '6px', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
-              </button>
-            </div>
-
-            <div style={{ fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Info size={14} />
-              <span>交互式 3D Logit 透镜 • 滚动缩放 • 拖动旋转</span>
-            </div>
-
-            <button
-              onClick={generateNext}
-              disabled={generating || !prompt}
-              style={{
-                marginTop: '8px',
-                background: generating ? '#888' : '#5ec962',
-                border: 'none',
-                color: 'white',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                cursor: generating || !prompt ? 'not-allowed' : 'pointer',
-                fontSize: '12px',
-                width: '100%',
-                opacity: generating || !prompt ? 0.5 : 1
-              }}
-            >
-              {generating ? '⏳ 生成中...' : '🔄 继续生成'}
-            </button>
-            
-            {/* Single Step Execution Controls (Added to Basic Tab) */}
-            <div style={{ 
-              marginTop: '12px', 
-              paddingTop: '12px', 
-              borderTop: '1px solid rgba(255,255,255,0.1)' 
-            }}>
-              <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', color: '#aaa', fontWeight: 'bold' }}>单步执行</span>
-                <select 
-                  value={stepAnalysisMode} 
-                  onChange={(e) => {
-                     setStepAnalysisMode(e.target.value);
-                     // Also sync the structure tab so the correct analysis view is shown side-by-side
-                     if (e.target.value !== 'none') {
-                        setStructureTab(e.target.value);
-                     }
-                  }}
-                  style={{ 
-                    background: '#1a1a1f', 
-                    color: 'white', 
-                    border: '1px solid #333', 
-                    borderRadius: '4px', 
-                    padding: '2px 4px',
-                    fontSize: '11px',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    maxWidth: '120px'
-                  }}
-                >
-                  <option value="none">无分析 (仅步进)</option>
-                  <option value="features">特征提取 (SAE)</option>
-                  <option value="circuit">回路发现 (Circuit)</option>
-                  <option value="causal">因果分析 (Causal)</option>
-                  <option value="manifold">流形分析 (Manifold)</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  onClick={stepToNextLayer}
-                  disabled={isAnimating || !data}
-                  style={{
-                    flex: 1,
-                    background: isAnimating || !data ? '#444' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    border: 'none',
-                    color: 'white',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    cursor: isAnimating || !data ? 'not-allowed' : 'pointer',
-                    fontSize: '12px',
-                    opacity: isAnimating || !data ? 0.5 : 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  {isAnimating ? <Loader2 className="animate-spin" size={14} /> : '▶️'} 
-                  单步执行 {activeLayer !== null && `(L${activeLayer})`}
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-             <StructureAnalysisControls
-               autoResult={autoAnalysisResult}
-               circuitForm={circuitForm} setCircuitForm={setCircuitForm}
-               featureForm={featureForm} setFeatureForm={setFeatureForm}
-               causalForm={causalForm} setCausalForm={setCausalForm}
-               manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
-               compForm={compForm} setCompForm={setCompForm}
-               onResultUpdate={setAnalysisResult}
-               activeTab={structureTab}
-               setActiveTab={setStructureTab}
-               t={t}
-               containerStyle={{ 
-                  background: 'transparent', 
-                  borderLeft: 'none', 
-                  backdropFilter: 'none',
-                  maxHeight: '400px', // Limit height within panel
-                  overflowY: 'auto'
-               }}
-             />
-             
-             {/* Integrated Step Execution */}
-             <div style={{ 
-               borderTop: '1px solid #333', 
-               paddingTop: '10px', 
-               marginTop: '5px'
-             }}>
-               <div style={{ fontSize: '12px', color: '#aaa', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                 <span>单步执行模式</span>
-                 <span style={{ 
-                   color: stepAnalysisMode === 'none' ? '#888' : '#4ecdc4',
-                   fontSize: '11px',
-                   padding: '2px 6px',
-                   background: '#111',
-                   borderRadius: '4px'
-                 }}>
-                   {stepAnalysisMode === 'none' ? '关闭' : `开启 (${structureTab})`}
-                 </span>
-               </div>
-               
-               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#ccc', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={stepAnalysisMode !== 'none'}
-                      onChange={(e) => {
-                        // If checked, sync with current structureTab. If unchecked, set to none.
-                        setStepAnalysisMode(e.target.checked ? structureTab : 'none');
+        {/* Content Container with Scroll */}
+        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
+        
+            {/* DNN Content: Generation + Structure Analysis */}
+            {inputPanelTab === 'dnn' && (
+              <div className="animate-fade-in">
+                {/* Generation Section */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ fontSize: '12px', color: '#aaa', marginBottom: '8px', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>文本生成与提示词</span>
+                        {generating && <span style={{color: '#5ec962'}}>Generating...</span>}
+                    </div>
+                    
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="输入提示词..."
+                      rows={3}
+                      style={{
+                        width: '100%', background: '#1a1a1f', border: '1px solid #333',
+                        color: 'white', padding: '10px', borderRadius: '6px', outline: 'none',
+                        resize: 'vertical', fontSize: '13px', fontFamily: 'sans-serif'
                       }}
-                      style={{ accentColor: '#4ecdc4' }}
                     />
-                    允许单步分析
-                  </label>
-                  
-                  <button
-                    onClick={stepToNextLayer}
-                    disabled={isAnimating || !data}
-                    style={{
-                      flex: 1,
-                      background: isAnimating || !data ? '#888' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      border: 'none',
-                      color: 'white',
-                      padding: '6px 12px',
-                      borderRadius: '6px',
-                      cursor: isAnimating || !data ? 'not-allowed' : 'pointer',
-                      fontSize: '11px',
-                      opacity: isAnimating || !data ? 0.5 : 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    ▶️ 单步执行 {activeLayer !== null && `(L${activeLayer})`}
-                  </button>
+                    
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                         <button
+                            onClick={analyze}
+                            disabled={loading || !prompt}
+                            style={{
+                              flex: 1, background: '#333', border: '1px solid #444', color: 'white',
+                              padding: '8px', borderRadius: '6px', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                              fontSize: '12px'
+                            }}
+                            title="仅分析当前提示词"
+                          >
+                            {loading ? <Loader2 className="animate-spin" size={14} /> : <Search size={14} />} 分析
+                          </button>
+                          
+                          <button
+                            onClick={generateNext}
+                            disabled={generating || !prompt}
+                            style={{
+                              flex: 2,
+                              background: generating ? '#888' : 'linear-gradient(45deg, #5ec962, #96c93d)',
+                              border: 'none',
+                              color: 'white',
+                              padding: '8px',
+                              borderRadius: '6px',
+                              cursor: generating || !prompt ? 'not-allowed' : 'pointer',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              opacity: generating || !prompt ? 0.7 : 1,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                            }}
+                          >
+                            {generating ? '生成中...' : 'Generate Next Token'}
+                          </button>
+                    </div>
+                </div>
+
+                {/* Structure Analysis Section */}
+                <div style={{ marginBottom: '10px' }}>
+                     {/* Pass systemType='dnn' expressly */}
+                     <StructureAnalysisControls
+                       autoResult={autoAnalysisResult}
+                       systemType={systemType} 
+                       setSystemType={setSystemType}
+                       circuitForm={circuitForm} setCircuitForm={setCircuitForm}
+                       featureForm={featureForm} setFeatureForm={setFeatureForm}
+                       causalForm={causalForm} setCausalForm={setCausalForm}
+                       manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
+                       compForm={compForm} setCompForm={setCompForm}
+                       onResultUpdate={setAnalysisResult}
+                       activeTab={structureTab}
+                       setActiveTab={setStructureTab}
+                       t={t}
+                       // SNN Props
+                       snnState={snnState}
+                       onInitializeSNN={initializeSNN}
+                       onToggleSNNPlay={() => setSnnState(s => ({...s, isPlaying: !s.isPlaying}))}
+                       onStepSNN={stepSNN}
+                       onInjectStimulus={injectSNNStimulus}
+                       containerStyle={{ 
+                          background: 'transparent', 
+                          borderLeft: 'none', 
+                          backdropFilter: 'none',
+                          padding: 0
+                       }}
+                     />
+                </div>
+                
+                {/* Step Execution Controls */}
+                <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 'bold' }}>单步调试 (Step-by-Step)</span>
+                         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: '#888', cursor: 'pointer' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={stepAnalysisMode !== 'none'}
+                              onChange={(e) => setStepAnalysisMode(e.target.checked ? structureTab : 'none')}
+                              style={{ accentColor: '#4ecdc4' }}
+                            />
+                            启用分析
+                          </label>
+                      </div>
+                      
+                      <button
+                        onClick={stepToNextLayer}
+                        disabled={isAnimating || !data}
+                        style={{
+                          width: '100%',
+                          background: isAnimating || !data ? '#444' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          border: 'none',
+                          color: 'white',
+                          padding: '8px',
+                          borderRadius: '6px',
+                          cursor: isAnimating || !data ? 'not-allowed' : 'pointer',
+                          fontSize: '12px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                          opacity: isAnimating || !data ? 0.6 : 1
+                        }}
+                      >
+                        {isAnimating ? <Loader2 className="animate-spin" size={14} /> : '▶️'} 
+                        执行单层步进 {activeLayer !== null ? `(当前: L${activeLayer})` : '(从 L0 开始)'}
+                      </button>
+                </div>
+              </div>
+            )}
+
+            {/* SNN Content */}
+            {inputPanelTab === 'snn' && (
+               <div className="animate-fade-in">
+                   <div style={{ padding: '12px', background: 'rgba(78, 205, 196, 0.1)', borderRadius: '8px', border: '1px solid rgba(78, 205, 196, 0.2)', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                            <Brain size={16} color="#4ecdc4" />
+                            <div>
+                                <h4 style={{margin: '0 0 4px 0', fontSize: '13px', color: '#4ecdc4'}}>NeuroFiber SNN 仿真</h4>
+                                <p style={{fontSize: '11px', color: '#bfd', margin: 0, lineHeight: '1.4'}}>
+                                    探索基于神经纤维丛理论的脉冲神经网络动力学。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Pass systemType='snn' expressly */}
+                    <StructureAnalysisControls
+                       autoResult={autoAnalysisResult}
+                       systemType="snn"
+                       setSystemType={setSystemType}
+                       circuitForm={circuitForm} setCircuitForm={setCircuitForm}
+                       featureForm={featureForm} setFeatureForm={setFeatureForm}
+                       causalForm={causalForm} setCausalForm={setCausalForm}
+                       manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
+                       compForm={compForm} setCompForm={setCompForm}
+                       onResultUpdate={setAnalysisResult}
+                       activeTab={structureTab}
+                       setActiveTab={setStructureTab}
+                       t={t}
+                       // SNN Props
+                       snnState={snnState}
+                       onInitializeSNN={initializeSNN}
+                       onToggleSNNPlay={() => setSnnState(s => ({...s, isPlaying: !s.isPlaying}))}
+                       onStepSNN={stepSNN}
+                       onInjectStimulus={injectSNNStimulus}
+                       containerStyle={{ 
+                          background: 'transparent', 
+                          borderLeft: 'none', 
+                          backdropFilter: 'none',
+                          padding: 0
+                       }}
+                     />
                </div>
-             </div>
-          </div>
-        )}
+            )}
+        
+        </div>
       </div>
       )}
 
       {/* Bottom-left Info Panel */}
-      {/* Bottom-left Info Panel */}
-      {/* Bottom-left Info Panel */}
+      {/* Model Info Panel (Top-Right) */}
       {panelVisibility.infoPanel && (
       <SimplePanel
-        title="模型信息"
-        icon={<Info />}
+        title={t('panels.modelInfo')}
         style={{
-          position: 'absolute', bottom: 20, left: 20, zIndex: 10,
+          position: 'absolute', top: 20, right: 20, zIndex: 100,
           minWidth: '320px', maxWidth: '400px',
           maxHeight: '80vh',
-          display: 'flex', flexDirection: 'column'
+          display: 'flex', flexDirection: 'column',
+          userSelect: 'text', // Explicitly allow text selection
+          cursor: 'auto'
         }}
-        headerStyle={{ marginBottom: '0' }}
+        headerStyle={{ marginBottom: '0', cursor: 'grab' }}
+        actions={
+           <button
+             onClick={() => setShowHelp(true)}
+             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'flex', transition: 'color 0.2s' }}
+             onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+             onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+             title="算法原理说明"
+           >
+             <HelpCircle size={16} />
+           </button>
+        }
       >
-        {/* Tab Headers */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', margin: '0 -16px 16px -16px' }}>
-          <button
-            onClick={() => setInfoPanelTab('model')}
-            style={{
-              flex: 1, padding: '10px', background: infoPanelTab === 'model' ? 'rgba(255,255,255,0.05)' : 'transparent',
-              border: 'none', color: infoPanelTab === 'model' ? '#fff' : '#888',
-              fontWeight: '500', fontSize: '12px', cursor: 'pointer',
-              borderBottom: infoPanelTab === 'model' ? '2px solid #4488ff' : '2px solid transparent',
-              transition: 'all 0.2s'
-            }}
-          >
-            配置参数
-          </button>
-          <button
-            onClick={() => setInfoPanelTab('detail')}
-            style={{
-              flex: 1, padding: '10px', background: infoPanelTab === 'detail' ? 'rgba(255,255,255,0.05)' : 'transparent',
-              border: 'none', color: infoPanelTab === 'detail' ? '#fff' : '#888',
-              fontWeight: '500', fontSize: '12px', cursor: 'pointer',
-              borderBottom: infoPanelTab === 'detail' ? '2px solid #4ecdc4' : '2px solid transparent',
-              transition: 'all 0.2s',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
-            }}
-          >
-            详细数据 {hoveredInfo && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ecdc4', display: 'inline-block' }}></span>}
-          </button>
-          <button
-            onClick={() => setInfoPanelTab('snn')}
-            style={{
-              flex: 1, padding: '10px', background: infoPanelTab === 'snn' ? 'rgba(255,255,255,0.05)' : 'transparent',
-              border: 'none', color: infoPanelTab === 'snn' ? '#fff' : '#888',
-              fontWeight: '500', fontSize: '12px', cursor: 'pointer',
-              borderBottom: infoPanelTab === 'snn' ? '2px solid #ff9f43' : '2px solid transparent',
-              transition: 'all 0.2s'
-            }}
-          >
-            SNN信息
-          </button>
-        </div>
+        {/* Content - Two Sections: Model Info & Structure Analysis Info */}
+        <div style={{ padding: '0', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-        {/* Tab Content */}
-        <div style={{ padding: '0' }}>
-          {infoPanelTab === 'model' && data?.model_config && (
-            <div style={{ fontSize: '13px', lineHeight: '1.6' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '6px', color: '#aaa' }}>
-                <span>模型:</span>
-                <span style={{ color: '#fff', fontWeight: '500' }}>{data.model_config.name}</span>
-                
-                <span>层数:</span>
-                <span style={{ color: '#fff' }}>{data.model_config.n_layers}</span>
-                
-                <span>隐藏维度:</span>
-                <span style={{ color: '#fff' }}>{data.model_config.d_model}</span>
-                
-                <span>注意力头数:</span>
-                <span style={{ color: '#fff' }}>{data.model_config.n_heads}</span>
-                
-                <span>参数量:</span>
-                <span style={{ color: '#fff' }}>{(data.model_config.total_params / 1e9).toFixed(2)}B</span>
-                
-                <span>词汇表大小:</span>
-                <span style={{ color: '#fff' }}>{data.model_config.vocab_size.toLocaleString()}</span>
+          {/* SECTION 1: Model / System Information */}
+          <div style={{ flex: '0 0 auto', marginBottom: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  {systemType === 'snn' ? 'SNN 网络状态' : '模型配置'}
               </div>
-            </div>
-          )}
 
-          {infoPanelTab === 'detail' && (
-             (displayInfo || hoveredInfo) ? (
-              (() => {
-                const info = hoveredInfo || displayInfo; // Prefer live info, fallback to persisted
-                return (
-                  <div>
-                    <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#ddd' }}>
-                      {info.type === 'feature' ? (
-                        /* Feature Extraction Hover Info */
-                        <div>
-                          <div><strong>特征索引:</strong> {info.featureId}</div>
-                          <div><strong>激活强度:</strong> <span style={{ color: '#4ecdc4' }}>{info.activation?.toFixed(4)}</span></div>
-                          <div><strong>激活频率:</strong> {((info.frequency || 0) * 100).toFixed(2)}%</div>
-                          <div style={{ marginTop: '8px', borderTop: '1px dashed #444', paddingTop: '8px' }}>
-                              <div style={{ fontSize: '11px', color: '#888', marginBottom: '4px' }}>计算说明:</div>
-                              <div style={{ fontSize: '10px', color: '#aaa' }}>
-                                  Features = ReLU(Act · W_enc + b_enc)
-                              </div>
-                              <div style={{ fontSize: '10px', color: '#aaa', marginTop: '2px' }}>
-                                  Top activating tokens reflect feature semantics.
-                              </div>
-                              
-                              <div style={{ marginTop: '6px' }}>
-                                <div style={{ fontSize: '11px', color: '#888', marginBottom: '2px' }}>计算示例 (Example):</div>
-                                <div style={{ fontSize: '10px', color: '#4ecdc4', fontFamily: 'monospace' }}>
-                                  v_in = [0.5, -0.2, ...]<br/>
-                                  pre_act = 0.5 * 0.8 + ... + 0.1 = 2.5<br/>
-                                  activation = ReLU(2.5) = 2.5
-                                </div>
-                              </div>
-                          </div>
-                        </div>
-                      ) : info.type === 'manifold' ? (
-                        /* Manifold Analysis Hover Info */
-                        <div>
-                          <div><strong>数据点:</strong> {info.index}</div>
-                          <div><strong>PC1:</strong> <span style={{ color: '#ff6b6b' }}>{info.pc1?.toFixed(3)}</span></div>
-                          <div><strong>PC2:</strong> <span style={{ color: '#4ecdc4' }}>{info.pc2?.toFixed(3)}</span></div>
-                          <div><strong>PC3:</strong> <span style={{ color: '#4488ff' }}>{info.pc3?.toFixed(3)}</span></div>
-                          <div style={{ marginTop: '8px', borderTop: '1px dashed #444', paddingTop: '8px' }}>
-                              <div style={{ fontSize: '11px', color: '#888', marginBottom: '4px' }}>计算说明:</div>
-                              <div style={{ fontSize: '10px', color: '#aaa' }}>
-                                  Points = PCA(HiddenStates - Mean)
-                              </div>
-                              <div style={{ fontSize: '10px', color: '#aaa', marginTop: '2px' }}>
-                                  Represents geometry of high-dim representations projected to 3D.
-                              </div>
+              {systemType === 'snn' ? (
+                 /* SNN System Info */
+                 <div style={{ fontSize: '12px', lineHeight: '1.6', background: 'rgba(255,255,255,0.03)', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '4px', color: '#aaa' }}>
+                        <span>状态:</span>
+                        <span style={{ color: snnState.initialized ? '#4ecdc4' : '#666', fontWeight: 'bold' }}>
+                            {snnState.initialized ? (snnState.isPlaying ? '运行中' : '就绪') : '未初始化'}
+                        </span>
 
-                              <div style={{ marginTop: '6px' }}>
-                                <div style={{ fontSize: '11px', color: '#888', marginBottom: '2px' }}>计算示例 (Example):</div>
-                                <div style={{ fontSize: '10px', color: '#4ecdc4', fontFamily: 'monospace' }}>
-                                  h = [1.2, 0.5, ... 4096 dims]<br/>
-                                  centered = h - mean<br/>
-                                  proj = centered · V_pca<br/>
-                                  &rArr; [2.1, -1.5, 0.3] (PC1-3)
-                                </div>
-                              </div>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Default Logit Lens Hover Info */
-                        <div>
-                          <div><strong>层:</strong> {info.layer}</div>
-                          <div><strong>位置:</strong> {info.posIndex}</div>
-                          <div><strong>当前词元:</strong> <code style={{ background: '#1a1a1f', padding: '2px 6px', borderRadius: '4px' }}>{info.actual}</code></div>
-                          <div><strong>预测:</strong> <code style={{ background: '#1a1a1f', padding: '2px 6px', borderRadius: '4px' }}>{info.label}</code></div>
-                          <div><strong>置信度:</strong> <span style={{ color: info.probability > 0.5 ? '#5ec962' : '#fde725' }}>{(info.probability * 100).toFixed(1)}%</span></div>
-                        </div>
-                      )}
+                        <span>仿真时间:</span>
+                        <span style={{ color: '#fff' }}>{snnState.time.toFixed(1)} ms</span>
+
+                        <span>神经元数:</span>
+                        <span style={{ color: '#fff' }}>{snnState.structure?.neurons?.length || 0}</span>
                     </div>
-                    
-                    {/* Layer Hyperparameters */}
-                    {info.type !== 'feature' && info.type !== 'manifold' && (
-                    <>
-                    <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px' }}>
-                        <div style={{ marginBottom: '6px', fontSize: '11px', fontWeight: 'bold', color: '#888' }}>
-                          层架构参数 (L{info.layer})
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px', color: '#aaa' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <span>Heads (头数):</span>
-                              <span style={{ color: '#fff' }}>{data.model_config.n_heads}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <span>d_model (维度):</span>
-                              <span style={{ color: '#fff' }}>{data.model_config.d_model}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <span>d_head (头维):</span>
-                              <span style={{ color: '#fff' }}>
-                                {data.model_config.d_model} / {data.model_config.n_heads} = {Math.round(data.model_config.d_model / data.model_config.n_heads)}
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <span>d_mlp (MLP维):</span>
-                              <span style={{ color: '#fff' }}>
-                                {data.model_config.d_model} × 4 = {data.model_config.d_model * 4}
-                              </span>
-                            </div>
-                        </div>
-                        
-                        {/* Forward Pass Formulas */}
-                        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
-                            <div style={{ marginBottom: '4px', fontSize: '10px', color: '#888' }}>前向计算过程 (Process):</div>
-                            
-                            {/* Attention */}
-                            <div style={{ marginBottom: '4px' }}>
-                              <div style={{ fontSize: '10px', color: '#4ecdc4', fontWeight: 'bold' }}>Attention:</div>
-                              <div style={{ fontFamily: 'monospace', fontSize: '9px', color: '#aaa', whiteSpace: 'nowrap' }}>
-                                 Q[1, {Math.round(data.model_config.d_model / data.model_config.n_heads)}] · Kᵀ[{Math.round(data.model_config.d_model / data.model_config.n_heads)}, Seq] 
-                                 → Attn[1, Seq]
-                              </div>
-                              <div style={{ fontFamily: 'monospace', fontSize: '9px', color: '#aaa', whiteSpace: 'nowrap' }}>
-                                 Attn[1, Seq] · V[Seq, {Math.round(data.model_config.d_model / data.model_config.n_heads)}] 
-                                 → Out[1, {Math.round(data.model_config.d_model / data.model_config.n_heads)}]
-                              </div>
-                            </div>
+                 </div>
+              ) : (
+                 /* DNN Model Info */
+                 data?.model_config ? (
+                    <div style={{ fontSize: '12px', lineHeight: '1.6', background: 'rgba(255,255,255,0.03)', padding: '8px', borderRadius: '6px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '4px', color: '#aaa' }}>
+                        <span>架构:</span>
+                        <span style={{ color: '#fff', fontWeight: 'bold' }}>{data.model_config.name}</span>
 
-                            {/* MLP */}
-                            <div>
-                              <div style={{ fontSize: '10px', color: '#5ec962', fontWeight: 'bold' }}>MLP:</div>
-                              <div style={{ fontFamily: 'monospace', fontSize: '9px', color: '#aaa', whiteSpace: 'nowrap' }}>
-                                 x[1, {data.model_config.d_model}] · W₁[{data.model_config.d_model}, {data.model_config.d_model * 4}] 
-                                 → Hidden[1, {data.model_config.d_model * 4}]
-                              </div>
-                              <div style={{ fontFamily: 'monospace', fontSize: '9px', color: '#aaa', whiteSpace: 'nowrap' }}>
-                                 Hidden[1, {data.model_config.d_model * 4}] · W₂[{data.model_config.d_model * 4}, {data.model_config.d_model}] 
-                                 → Out[1, {data.model_config.d_model}]
-                              </div>
-                            </div>
-                        </div>
+                        <span>层数:</span>
+                        <span style={{ color: '#fff' }}>{data.model_config.n_layers}</span>
+
+                        <span>模型维度:</span>
+                        <span style={{ color: '#fff' }}>{data.model_config.d_model} (H: {data.model_config.n_heads})</span>
+
+                        <span>参数量:</span>
+                        <span style={{ color: '#fff' }}>{(data.model_config.total_params / 1e9).toFixed(2)}B</span>
+                      </div>
                     </div>
-                    </>
-                    )}
-                  </div>
-                );
-              })()
-             ) : (
-                <div style={{ fontSize: '13px', color: '#888', fontStyle: 'italic', paddingTop: '20px', textAlign: 'center' }}>
-                    请选择或悬停在 <br/> 模型组件上 <br/> 以查看详情
-                </div>
-             )
-          )}
+                 ) : (
+                     <div style={{ color: '#666', fontStyle: 'italic', fontSize: '12px', padding: '8px' }}>未加载模型</div>
+                 )
+              )}
+          </div>
 
-          {infoPanelTab === 'snn' && (
-             <div style={{ padding: '12px', height: '100%', overflowY: 'auto' }}>
-                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                   <div style={{ fontSize: '13px', color: '#ff9f43', fontWeight: 'bold' }}>
-                      脉冲神经网络 (SNN) 动态
-                   </div>
-                   {!snnState.initialized ? (
-                      <button 
-                         onClick={initializeSNN}
-                         style={{ padding: '4px 8px', fontSize: '11px', background: '#ff9f43', border: 'none', borderRadius: '4px', cursor: 'pointer', color: '#000' }}
-                      >
-                         初始化网络
-                      </button>
-                   ) : (
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                          <button 
-                             onClick={() => setSnnState(s => ({...s, isPlaying: !s.isPlaying}))}
-                             style={{ padding: '4px 8px', fontSize: '11px', background: snnState.isPlaying ? '#ff5252' : '#4ecdc4', border: 'none', borderRadius: '4px', cursor: 'pointer', color: '#000' }}
-                          >
-                             {snnState.isPlaying ? '⏹ 停止' : '▶ 运行'}
-                          </button>
-                          <button 
-                             onClick={stepSNN}
-                             style={{ padding: '4px 8px', fontSize: '11px', background: '#333', border: '1px solid #555', borderRadius: '4px', cursor: 'pointer', color: '#fff' }}
-                          >
-                             单步
-                          </button>
-                      </div>
-                   )}
-                </div>
-                
-                {snnState.initialized ? (
-                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
-                      {/* Connection Status */}
-                      <div style={{ fontSize: '11px', color: '#aaa', display: 'flex', justifyContent: 'space-between' }}>
-                         <span>时间步: {snnState.time.toFixed(1)}ms</span>
-                         <span>层数: {snnState.layers.length}</span>
-                      </div>
+          {/* Divider */}
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', marginBottom: '12px' }} />
 
-                      {/* Stimulus Controls */}
-                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '6px' }}>
-                          <div style={{ fontSize: '11px', color: '#888', marginBottom: '6px' }}>信号注入</div>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                             <button
-                                onClick={() => injectSNNStimulus('Retina_Shape', 5)}
-                                style={{ flex: 1, padding: '6px', background: 'rgba(255,107,107,0.2)', border: '1px solid #ff6b6b', color: '#ff6b6b', borderRadius: '4px', cursor: 'pointer', fontSize: '10px' }}
-                             >
-                                🍎 注入 "苹果" (Shape)
-                             </button>
-                             <button
-                                onClick={() => injectSNNStimulus('Retina_Color', 5)}
-                                style={{ flex: 1, padding: '6px', background: 'rgba(255,107,107,0.2)', border: '1px solid #ff6b6b', color: '#ff6b6b', borderRadius: '4px', cursor: 'pointer', fontSize: '10px' }}
-                             >
-                                🔴 注入 "红色" (Color)
-                             </button>
-                          </div>
-                      </div>
+          {/* SECTION 2: Analysis / Detail Information */}
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  {systemType === 'snn' ? '实时动态' : '结构分析详情'}
+              </div>
 
-                      {/* Spiking Activity Visualization */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {systemType === 'snn' ? (
+                 /* SNN Live Details */
+                 <div style={{ fontSize: '12px' }}>
+                    <div style={{ marginBottom: '8px', color: '#aaa', fontSize: '11px' }}>
+                        实时脉冲活动 (STDP 已启用)
+                    </div>
+                    {/* Compact Spike Visualization */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           {snnState.layers.map(layer => {
                               const isActive = snnState.spikes[layer] && snnState.spikes[layer].length > 0;
-                              // Count spikes in recent history if available, else just show instantaneous
-                              const spikeCount = snnState.spikes[layer] ? snnState.spikes[layer].length : 0;
-                              
                               return (
-                                 <div key={layer} style={{ 
-                                    background: isActive ? 'rgba(255,159,67,0.2)' : 'rgba(0,0,0,0.2)', 
-                                    padding: '8px', 
-                                    borderRadius: '6px',
-                                    border: isActive ? '1px solid rgba(255,159,67,0.5)' : '1px solid #333',
-                                    transition: 'all 0.1s'
+                                 <div key={layer} style={{
+                                    padding: '6px',
+                                    borderRadius: '4px',
+                                    background: isActive ? 'rgba(255,159,67,0.15)' : 'transparent',
+                                    border: isActive ? '1px solid rgba(255,159,67,0.3)' : '1px solid rgba(255,255,255,0.05)',
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                                  }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                       <span style={{ color: isActive ? '#fff' : '#888', fontWeight: isActive ? 'bold' : 'normal' }}>{layer}</span>
-                                       <span style={{ fontSize: '10px', color: isActive ? '#ff9f43' : '#555' }}>
-                                          {isActive ? '⚡ SPIKING' : 'Idle'}
-                                       </span>
-                                    </div>
-                                    {/* Simple visualization of neurons */}
-                                    <div style={{ display: 'flex', gap: '2px', height: '6px' }}>
-                                       {Array.from({length: 20}).map((_, i) => {
-                                          const isFiring = snnState.spikes[layer] && snnState.spikes[layer].includes(i);
-                                          return (
-                                             <div key={i} style={{
-                                                flex: 1,
-                                                background: isFiring ? '#ff9f43' : '#222',
-                                                borderRadius: '1px'
-                                             }} />
-                                          );
-                                       })}
-                                    </div>
+                                    <span style={{ color: isActive ? '#fff' : '#888', fontSize: '11px' }}>{layer}</span>
+                                    {isActive && <span style={{ fontSize: '9px', color: '#ff9f43', fontWeight: 'bold' }}>活跃</span>}
                                  </div>
                               );
                           })}
-                      </div>
+                    </div>
+                    <div style={{ marginTop: '12px', fontSize: '11px', color: '#666' }}>
+                        使用左侧面板控制注入刺激信号。
+                    </div>
+                 </div>
+              ) : (
+                 /* DNN Analysis Details - Handles both Hover and Active Analysis */
+                 (displayInfo || hoveredInfo || analysisResult) ? (
+                    <div>
+                        {/* 2A. Hover/Selected Info (Highest Priority for immediate feedback) */}
+                        {(displayInfo || hoveredInfo) && (
+                           <div style={{ marginBottom: '16px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '6px', borderLeft: '3px solid #00d2ff' }}>
+                              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#00d2ff', marginBottom: '6px' }}>
+                                  选中信息
+                              </div>
+                              <div style={{ fontSize: '12px', lineHeight: '1.5', color: '#ddd' }}>
+                                  {(hoveredInfo || displayInfo).type === 'feature' ? (
+                                    <div>
+                                      <div>特证 <strong>#{(hoveredInfo || displayInfo).featureId}</strong></div>
+                                      <div>激活值: <span style={{ color: '#4ecdc4' }}>{(hoveredInfo || displayInfo).activation?.toFixed(4)}</span></div>
+                                      <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px' }}>
+                                          潜在表示单元。
+                                      </div>
+                                    </div>
+                                  ) : (hoveredInfo || displayInfo).type === 'manifold' ? (
+                                    <div>
+                                      <div>数据点: {(hoveredInfo || displayInfo).index}</div>
+                                      <div>PC1/2/3: {(hoveredInfo || displayInfo).pc1?.toFixed(2)}, {(hoveredInfo || displayInfo).pc2?.toFixed(2)}, {(hoveredInfo || displayInfo).pc3?.toFixed(2)}</div>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                       <div>词元: <strong>"{(hoveredInfo || displayInfo).label}"</strong></div>
+                                       <div>概率: <span style={{ color: getColor((hoveredInfo || displayInfo).probability) }}>{((hoveredInfo || displayInfo).probability * 100).toFixed(1)}%</span></div>
+                                       {(hoveredInfo || displayInfo).actual && <div>实际: "{(hoveredInfo || displayInfo).actual}"</div>}
+                                    </div>
+                                  )}
+                              </div>
+                           </div>
+                        )}
 
-                   </div>
-                ) : (
-                   <div style={{ marginTop: '20px', fontSize: '11px', color: '#666', fontStyle: 'italic', textAlign: 'center' }}>
-                      点击初始化以连接 NeuroFiber 仿真器
-                   </div>
-                )}
-             </div>
-          )}
+                        {/* 2B. Analysis Method Summary (Context) */}
+                        {analysisResult && !hoveredInfo && (
+                             <div style={{ fontSize: '12px', color: '#aaa' }}>
+                                 <div style={{ color: '#fff', marginBottom: '4px' }}>
+                                     当前分析方法: {structureTab.toUpperCase()}
+                                 </div>
+
+                                 {structureTab === 'circuit' && (
+                                     <div>
+                                         在因果图中发现 {analysisResult.nodes?.length} 个节点和 {analysisResult.graph?.edges?.length} 条边。
+                                     </div>
+                                 )}
+                                 {structureTab === 'features' && (
+                                     <div>
+                                         从第 {featureForm.layer_idx} 层提取了 {analysisResult.top_features?.length} 个稀疏特征。
+                                         <br/>重构误差: {analysisResult.reconstruction_error?.toFixed(5)}
+                                     </div>
+                                 )}
+                             </div>
+                        )}
+
+                        {!analysisResult && !hoveredInfo && !displayInfo && (
+                            <div style={{ color: '#666', fontStyle: 'italic', fontSize: '12px' }}>
+                                悬停在可视化元素上查看详情。
+                            </div>
+                        )}
+                    </div>
+                 ) : (
+                    <div style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', padding: '20px 0', textAlign: 'center' }}>
+                        与模型交互以查看分析详情。
+                    </div>
+                 )
+              )}
+          </div>
         </div>
       </SimplePanel>
+      )}
+
+      {/* Algo Explanation Modal */}
+      {showHelp && (
+          <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)',
+              zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center'
+          }} onClick={() => setShowHelp(false)}>
+              <div
+                 onClick={e => e.stopPropagation()}
+                 style={{
+                    background: '#1a1a1f', border: '1px solid #333', borderRadius: '12px',
+                    width: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
+                 }}
+              >
+                  <div style={{ padding: '16px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', margin: 0 }}>
+                          {systemType === 'snn' ? '脉冲神经网络 (SNN) 算法原理' : 'Transformer 模型架构说明'}
+                      </h2>
+                      <button onClick={() => setShowHelp(false)} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer' }}>
+                          <X size={20} />
+                      </button>
+                  </div>
+                  <div style={{ padding: '20px', overflowY: 'auto', lineHeight: '1.6', fontSize: '13px', color: '#ddd' }}>
+                       {systemType === 'snn' ? (
+                          <>
+                             <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 专业原理解析 (Professional)</div>
+                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>1. 核心模型：Leaky Integrate-and-Fire (LIF)</h3>
+                             <p>
+                                 SNN 模拟了生物神经元的电生理特性。每个神经元维护一个<strong>膜电位 (Membrane Potential, v)</strong>，遵循以下差分方程：
+                             </p>
+                             <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                 v[t] = v[t-1] × (1 - dt/τ) + Σ(I_ext + Σ w_ij ⋅ x_j)
+                             </div>
+                             <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                 <li><strong>积分与泄漏：</strong> 电位随输入增加，随时间常数 τ 衰减。</li>
+                                 <li><strong>发放与重置：</strong> 超过阈值时发放脉冲 (Spike) 并重置电位。</li>
+                                 <li><strong>STDP 学习：</strong> 时间相关的突触可塑性，根据脉冲因果调整权重。</li>
+                             </ul>
+
+                             <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '20px', marginBottom: '10px' }}>[B] 直观理解 (Simplified)</div>
+                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>模拟大脑的运作</h3>
+                             <p>
+                                 脉冲神经网络就像一群在跳舞的精灵：
+                             </p>
+                             <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                 <li><strong>蓄能：</strong> 精灵们像拿小杯子接水，接到一定程度就会大喊一声（发信号）。</li>
+                                 <li><strong>遗忘：</strong> 如果水接得太慢，杯子底部的洞会让水流掉（漏水机制）。</li>
+                                 <li><strong>同步：</strong> 当两个精灵经常一起喊叫，它们就会变得更有默契（学习过程）。</li>
+                             </ul>
+                          </>
+                      ) : (
+                          <>
+                             <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 专业架构解析 (Professional)</div>
+                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>1. Transformer 架构</h3>
+                             <p>
+                                 基于标准的 Decoder-only 架构。核心计算由<strong>多头自注意力 (MHA)</strong> 和<strong>前馈网络 (MLP)</strong> 构成，信息通过<strong>残差流 (Residual Stream)</strong> 传递。
+                             </p>
+                             <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                 x_{'{l+1}'} = x_{'{l}'} + MHA(LN(x_{'{l}'})) + MLP(LN(x_{'{l}'} + MHA(LN(x_{'{l}'}))))
+                             </div>
+                             <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                 <li><strong>Logit Lens：</strong> 将每一层残差流通过 unembedding 矩阵映射回词汇空间。</li>
+                                 <li><strong>激活分析：</strong> 观察神经元在处理特定的语义或语法任务时的响应方向。</li>
+                             </ul>
+
+                             <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '20px', marginBottom: '10px' }}>[B] 直观理解 (Simplified)</div>
+                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>AI 的“联想传送带”</h3>
+                             <p>
+                                 Transformer 就像一个超级高效的组装线：
+                             </p>
+                             <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                 <li><strong>传送带（残差流）：</strong> 信息像零件一样在传送带上走，每一层都会给它贴上新的标签。</li>
+                                 <li><strong>聚光灯（注意力）：</strong> 模型在读到某个词时，会把光投向前面相关的词，寻找线索。</li>
+                                 <li><strong>逻辑开关（MLP）：</strong> 内部有无数个小开关，负责识别“这是个地名”或者“这在表达赞美”。</li>
+                             </ul>
+                          </>
+                      )}
+                  </div>
+              </div>
+          </div>
       )}
 
       {/* Right-side Layer Detail Panel */}
@@ -1799,10 +1727,22 @@ export default function App() {
           </group>
         )}
 
+        {/* Debug Log for SNN Rendering Conditions */}
+        {(() => {
+             if (infoPanelTab === 'snn' || snnState.initialized) {
+                 console.log('[App] SNN Render Check:', { infoPanelTab, initialized: snnState.initialized, hasStructure: !!snnState.structure });
+             }
+             return null;
+        })()}
+
         {/* SNN Visualization - Independent of structure analysis result */}
-        {infoPanelTab === 'snn' && snnState.initialized && (
-           <group position={[-(data?.tokens?.length || 10) - 20, 0, 0]}>
-              <SNNVisualization3D snnState={snnState} t={t} />
+        {(infoPanelTab === 'snn' || systemType === 'snn') && snnState.initialized && (
+           <group position={(!data || systemType === 'snn') ? [0, 0, 0] : [-(data?.tokens?.length || 10) - 20, 0, 0]}>
+              <SNNVisualization3D 
+                  t={t} 
+                  structure={snnState.structure}
+                  activeSpikes={snnState.spikes}
+              />
            </group>
         )}
         
@@ -1858,15 +1798,6 @@ export default function App() {
             t={t}
           />
         </SimplePanel>
-      )}
-
-      {/* Language Validity Panel */}
-      {panelVisibility.validityPanel && (
-        <LanguageValidityPanel 
-          prompt={prompt}
-          onClose={() => togglePanelVisibility('validityPanel')}
-          t={t}
-        />
       )}
 
     </div>

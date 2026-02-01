@@ -8,7 +8,8 @@ export function SimplePanel({
   icon,
   style,
   headerStyle = {},
-  dragHandleProps // For draggable handle props
+  dragHandleProps, // For draggable handle props
+  actions // Optional header actions
 }) {
   return (
     <div 
@@ -51,26 +52,30 @@ export function SimplePanel({
           {icon && React.cloneElement(icon, { size: 18, color: '#00d2ff' })} 
           {title}
         </h2>
-        {onClose && (
-           <button 
-             onClick={onClose} 
-             style={{
-               background: 'transparent', 
-               border: 'none', 
-               color: '#888', 
-               cursor: 'pointer', 
-               padding: '4px',
-               display: 'flex',
-               alignItems: 'center',
-               justifyContent: 'center',
-               transition: 'color 0.2s'
-             }}
-             onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
-             onMouseOut={(e) => e.currentTarget.style.color = '#888'}
-           >
-             <X size={18} />
-           </button>
-        )}
+        {/* Actions & Close */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {actions}
+          {onClose && (
+             <button 
+               onClick={onClose} 
+               style={{
+                 background: 'transparent', 
+                 border: 'none', 
+                 color: '#888', 
+                 cursor: 'pointer', 
+                 padding: '4px',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 transition: 'color 0.2s'
+               }}
+               onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+               onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+             >
+               <X size={18} />
+             </button>
+          )}
+        </div>
       </div>
 
       {/* Content */}
