@@ -1,8 +1,8 @@
 import { OrbitControls, Text } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
 import { Activity, Brain, Network, RotateCcw, Settings, Sparkles } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import BrainVis3D from './BrainVis3D';
 
@@ -336,85 +336,157 @@ export function FeatureVisualization3D({ features, layerIdx, onLayerClick, selec
   );
 }
 
-// Graph visualization component for 3D network topology
-export function NetworkGraph3D({ graph }) {
+// 3D Glass Matrix Visualization for Network Architecture
+export function NetworkGraph3D({ graph, activeLayer = null }) {
   if (!graph || !graph.nodes || graph.nodes.length === 0) {
     return null;
   }
 
-  // Position nodes in a circular layout by layer
-  const positions = [];
-  const maxLayer = Math.max(...graph.nodes.map(n => n.layer || 0));
+  // 1. Pre-process nodes into layers for Grid Layout
+  const nodesByLayer = {};
+  let maxLayer = 0;
   
-  graph.nodes.forEach((node, i) => {
-    // Normalize node properties
-    const layer = node.layer !== undefined ? node.layer : (node.layer_idx !== undefined ? node.layer_idx : 0);
-    const type = node.type || node.component_type || 'unknown';
-    
-    // Count nodes in this layer for positioning
-    const nodesInLayer = graph.nodes.filter(n => {
-        const l = n.layer !== undefined ? n.layer : (n.layer_idx !== undefined ? n.layer_idx : 0);
-        return l === layer;
-    }).length;
+  graph.nodes.forEach(node => {
+      const l = node.layer !== undefined ? node.layer : (node.layer_idx !== undefined ? node.layer_idx : 0);
+      if (!nodesByLayer[l]) nodesByLayer[l] = [];
+      nodesByLayer[l].push(node);
+      if (l > maxLayer) maxLayer = l;
+  });
 
-    // Calculate index within layer
-    const indexInLayer = graph.nodes.filter((n, idx) => {
-        if (idx >= i) return false;
-        const l = n.layer !== undefined ? n.layer : (n.layer_idx !== undefined ? n.layer_idx : 0);
-        return l === layer;
-    }).length;
-    
-    const radius = 8;
-    // Spiral layout if too many nodes, or circle if few
-    const angle = (indexInLayer / Math.max(nodesInLayer, 1)) * Math.PI * 2;
-    
-    const x = Math.cos(angle) * radius;
-    const z = layer * 3 - (maxLayer * 1.5); 
-    const y = Math.sin(angle) * radius;
-    
-    // Store normalized node for easier access later
-    positions.push({ x, y, z, node: { ...node, layer, type } });
+  // 2. Calculate positions (Grid)
+  const positions = [];
+  const spacingX = 1.5;
+  const spacingY = 1.5; // Vertical stacking
+  
+  // Matrix dimensions per layer (e.g. 4 columns wide)
+  const COLS = 4;
+  
+  Object.keys(nodesByLayer).forEach(layerKey => {
+      const layerNodes = nodesByLayer[layerKey];
+      const l = parseInt(layerKey);
+      
+      layerNodes.forEach((node, i) => {
+          const col = i % COLS;
+          const row = Math.floor(i / COLS);
+          
+          const x = col * spacingX - ((COLS - 1) * spacingX / 2);
+          const y = l * 2.0 - (maxLayer * 1.0); // Vertical stack
+          const z = row * spacingX - (Math.ceil(layerNodes.length/COLS) * spacingX / 2);
+          
+          // Store pos
+          positions.push({ x, y, z, node, layer: l });
+      });
+  });
+
+  // Animation State
+  const groupRef = useRef();
+  useFrame((state) => {
+      if (groupRef.current) {
+          // Subtle float
+          groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
+      }
   });
 
   return (
-    <group>
-      {/* Draw edges */}
+    <group ref={groupRef}>
+      <Text position={[0, maxLayer * 1.5 + 4, 0]} fontSize={0.6} color="#fff" anchorX="center">
+          Deep Neural Network: Glass Matrix
+      </Text>
+
+      {/* Draw edges - with flow animation */}
       {graph.edges && graph.edges.map((edge, i) => {
         const sourcePos = positions.find(p => p.node.id === edge.source);
         const targetPos = positions.find(p => p.node.id === edge.target);
-        
         if (!sourcePos || !targetPos) return null;
-        
-        const start = new THREE.Vector3(sourcePos.x, sourcePos.y, sourcePos.z);
-        const end = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
-        const curve = new THREE.LineCurve3(start, end);
-        const points = curve.getPoints(50);
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        // Animate edge if source is in active layer
+        const isActiveFlow = activeLayer !== null && sourcePos.layer === activeLayer;
+
+        const points = [
+            new THREE.Vector3(sourcePos.x, sourcePos.y, sourcePos.z),
+            new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z)
+        ];
         
         return (
-          <line key={i} geometry={geometry}>
-            <lineBasicMaterial
-              attach="material"
-              color="#4488ff"
-              linewidth={2}
-              opacity={0.6}
-              transparent
-            />
+          <line key={i}>
+             <bufferGeometry setFromPoints={points} />
+             <lineBasicMaterial
+               color={isActiveFlow ? "#ffffff" : "#4ecdc4"}
+               opacity={isActiveFlow ? 0.8 : 0.15}
+               transparent
+               linewidth={isActiveFlow ? 2 : 1}
+             />
           </line>
         );
       })}
       
-      {/* Draw nodes */}
-      {positions.map((pos, i) => (
-        <mesh key={i} position={[pos.x, pos.y, pos.z]}>
-          <sphereGeometry args={[0.3, 16, 16]} />
-          <meshStandardMaterial
-            color={pos.node.type === 'attention' ? '#ff6b6b' : '#4ecdc4'}
-            emissive={pos.node.type === 'attention' ? '#ff6b6b' : '#4ecdc4'}
-            emissiveIntensity={0.3}
-          />
-        </mesh>
-      ))}
+      {/* Draw Glass Nodes */}
+      {positions.map((pos, i) => {
+         // Color: Attention = Red/Orange, MLP = Blue/Cyan
+         const isAttn = pos.node.type === 'attention' || pos.node.component_type === 'attention';
+         const baseColor = isAttn ? '#ff4444' : '#4488ff';
+         const emissiveColor = isAttn ? '#ff2222' : '#002244';
+         
+         const isActive = activeLayer !== null && pos.layer === activeLayer;
+         
+         return (
+            <group key={i} position={[pos.x, pos.y, pos.z]}>
+                <mesh receiveShadow castShadow scale={isActive ? 1.2 : 1}>
+                  <sphereGeometry args={[0.3, 32, 32]} />
+                  <meshPhysicalMaterial
+                    color={isActive ? '#ffffff' : baseColor}
+                    emissive={isActive ? '#ffffff' : emissiveColor}
+                    emissiveIntensity={isActive ? 2.0 : 0.5}
+                    metalness={0.1}
+                    roughness={0.1}
+                    transmission={0.9} // Glass
+                    thickness={1.0}
+                    transparent
+                    opacity={0.7}
+                  />
+                </mesh>
+            </group>
+         );
+      })}
+
+      {/* Softmax / Output Layer Visualization */}
+      <group position={[0, maxLayer * 2.0 + 2.5, 0]}>
+          {/* Glowing Ring */}
+          <mesh rotation={[Math.PI/2, 0, 0]}>
+              <torusGeometry args={[3, 0.1, 16, 50]} />
+              <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1.5} />
+          </mesh>
+          <mesh rotation={[Math.PI/2, 0, 0]}>
+              <torusGeometry args={[2.5, 0.05, 16, 50]} />
+              <meshStandardMaterial color="#4ecdc4" emissive="#4ecdc4" emissiveIntensity={0.8} />
+          </mesh>
+
+          {/* Connection Lines from Last Layer */}
+          {positions.filter(p => p.layer === maxLayer).map((p, i) => (
+             <line key={`link-${i}`}>
+                 <bufferGeometry setFromPoints={[
+                     new THREE.Vector3(p.x, p.y - (maxLayer * 2.0 + 2.5), p.z), // Relative pos
+                     new THREE.Vector3(0, 0, 0)
+                 ]} />
+                 <lineBasicMaterial color="#ffffff" transparent opacity={0.2} />
+             </line>
+          ))}
+
+          {/* Label */}
+          <group position={[3.5, 0, 0]}>
+              <mesh>
+                  <boxGeometry args={[3.2, 0.8, 0.1]} />
+                  <meshBasicMaterial color="#000" transparent opacity={0.6} side={THREE.DoubleSide} />
+                  <lineSegments>
+                      <edgesGeometry args={[new THREE.BoxGeometry(3.2, 0.8, 0.1)]} />
+                      <lineBasicMaterial color="#bb88ff" />
+                  </lineSegments>
+              </mesh>
+              <Text position={[0, 0, 0.1]} fontSize={0.3} color="#fff" anchorX="center" anchorY="middle">
+                  SOFTMAX OUTPUT
+              </Text>
+          </group>
+      </group>
     </group>
   );
 }
@@ -522,104 +594,153 @@ export function CompositionalVisualization3D({ result, t }) {
   );
 }
 
-// 3D Fiber Bundle Visualization
+// 3D Glass Matrix Visualization (Fiber Bundle)
 export function FiberBundleVisualization3D({ result, t }) {
   if (!result || (!result.rsa && !result.steering)) return null;
 
-  // Render dummy RSA structure if missing but steering exists
   const rsaData = result.rsa || Array.from({length: 32}).map((_, i) => ({
       sem_score: 0.5,
       type: "Base"
   }));
+  
+  // Attractor position (Concept Center)
+  const ATTRACTOR_POS = [8, 0, 0]; 
 
   return (
     <group>
-        <Text position={[0, 6, 0]} fontSize={0.6} color="#fff" anchorX="center">
-            {t ? t('structure.fiber.title') : 'Neural Fiber Bundle Structure'}
+        <Text position={[0, 7, 0]} fontSize={0.6} color="#fff" anchorX="center">
+            {t ? t('structure.fiber.title') : 'Neural Fiber Bundle: Glass Matrix'}
         </Text>
         
-        {/* Base Manifold Representation (Grid) */}
-        <mesh rotation={[-Math.PI/2, 0, 0]} position={[0, -2, 0]}>
-            <planeGeometry args={[12, 12, 24, 24]} />
-            <meshStandardMaterial color="#335588" wireframe opacity={0.3} transparent />
-        </mesh>
-        
-        {/* Render Layers as fibers rising from manifold */}
-        {rsaData.map((layerStats, i) => {
-            const x = (i - rsaData.length/2) * 0.8;
-            const height = layerStats.sem_score * 8; // Height prop to semantic score
-            
-            // Fiber color based on dominance type
-            let color = "#aaaaaa";
-            if (layerStats.type === "Base") color = "#4488ff"; // Blue for logic
-            if (layerStats.type === "Fiber") color = "#ff6b6b"; // Red for content
-            if (layerStats.type === "Mixed") color = "#bb88ff"; // Purple mixed
+        {/* Render Layers as a 4x8 Grid of Glass Spheres */}
+        <group position={[-4, -3, 0]}>
+            {rsaData.map((layerStats, i) => {
+                // 8 columns, 4 rows layout
+                const col = i % 8;
+                const row = Math.floor(i / 8);
+                const x = col * 1.2;
+                const y = row * 1.5;
+                
+                // Color logic
+                let baseColor = "#ffffff";
+                let emissiveColor = "#000000";
+                let intensity = 0;
+                
+                // Semantic layers glow red/orange
+                if (layerStats.type === "Fiber") {
+                     baseColor = "#ff4444";
+                     emissiveColor = "#ff2222";
+                     intensity = layerStats.sem_score * 2;
+                } else if (layerStats.type === "Mixed") {
+                     baseColor = "#aa44ff";
+                     emissiveColor = "#8822ff";
+                     intensity = 0.5;
+                } else {
+                     baseColor = "#4488ff"; // Logic/Base is blue
+                     emissiveColor = "#002244";
+                     intensity = 0.2;
+                }
+                
+                const isDominant = layerStats.sem_score > 0.6; // Threshold for connection
 
-            return (
-                <group key={i} position={[x, -2, 0]}>
-                    {/* The fiber line */}
-                    <mesh position={[0, height/2, 0]}>
-                        <cylinderGeometry args={[0.08, 0.08, height, 8]} />
-                        <meshStandardMaterial color={color} opacity={0.8} transparent />
-                    </mesh>
-
-                    {/* Node on top */}
-                    <mesh position={[0, height, 0]}>
-                        <sphereGeometry args={[0.25]} />
-                        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
-                    </mesh>
-                    
-                    {/* Layer Index on base */}
-                    <Text position={[0, 0.2, 0.5]} fontSize={0.25} color="#aaa">L{i}</Text>
-                </group>
-            );
-        })}
-
-        {/* Legend */}
-        <group position={[5, 4, 0]}>
-            <mesh position={[0, 0.5, 0]}>
-                <sphereGeometry args={[0.2]} />
-                <meshStandardMaterial color="#4488ff" />
-            </mesh>
-            <Text position={[0.5, 0.5, 0]} fontSize={0.3} color="#aaa" anchorX="left">Base (Logic)</Text>
-            
-            <mesh position={[0, 0, 0]}>
-                <sphereGeometry args={[0.2]} />
-                <meshStandardMaterial color="#ff6b6b" />
-            </mesh>
-            <Text position={[0.5, 0, 0]} fontSize={0.3} color="#aaa" anchorX="left">Fiber (Fact)</Text>
+                return (
+                    <group key={i} position={[x, y, 0]}>
+                        {/* The Glass Sphere Node */}
+                        <mesh receiveShadow castShadow>
+                            <sphereGeometry args={[0.4, 32, 32]} />
+                            <meshPhysicalMaterial 
+                                color={baseColor}
+                                emissive={emissiveColor}
+                                emissiveIntensity={intensity}
+                                metalness={0.1}
+                                roughness={0.05}
+                                transmission={0.9} // Glass effect
+                                thickness={1.5}
+                                transparent
+                                opacity={0.6}
+                            />
+                        </mesh>
+                        
+                        {/* Layer Index inside */}
+                        <Text position={[0, 0, 0]} fontSize={0.2} color="white" anchorX="center" anchorY="middle">
+                            {i}
+                        </Text>
+                        
+                        {/* Connection Line to Attractor if dominant */}
+                        {isDominant && (
+                            <line>
+                                <bufferGeometry>
+                                    <float32BufferAttribute 
+                                        attach="attributes-position" 
+                                        count={2} 
+                                        array={new Float32Array([0, 0, 0, ...ATTRACTOR_POS.map((v, k) => v - [x, y, 0][k])])} 
+                                        itemSize={3} 
+                                    />
+                                </bufferGeometry>
+                                <lineBasicMaterial 
+                                    color={baseColor} 
+                                    transparent 
+                                    opacity={0.4} 
+                                    linewidth={1} 
+                                />
+                            </line>
+                        )}
+                        
+                        {/* Basis Arrows on top of dominant nodes */}
+                        {result.fiber_basis && result.fiber_basis.layer_idx === i && (
+                             <group position={[0, 0.6, 0]}>
+                                 {result.fiber_basis.basis_vectors?.slice(0, 3).map((vec, k) => {
+                                     const v = new THREE.Vector3(vec[0], vec[1], vec[2]||0).normalize();
+                                     const c = k===0 ? '#ff0000' : (k===1 ? '#00ff00' : '#0000ff');
+                                     return <arrowHelper key={k} args={[v, new THREE.Vector3(0,0,0), 1.2, c, 0.3, 0.2]} />;
+                                 })}
+                             </group>
+                        )}
+                    </group>
+                );
+            })}
         </group>
 
-        {/* Concept Steering Visualization */}
+        {/* Central Attractor / Concept Node */}
+        <group position={[4, -0.5, 0]}> {/* Adjusted to match loop coordinate offset */}
+            {/* The Black Hole / Attractor Ring */}
+            <mesh rotation={[0, Math.PI/6, 0]}>
+                <torusGeometry args={[1.5, 0.1, 16, 50]} />
+                <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={2} />
+            </mesh>
+            <mesh rotation={[0, -Math.PI/6, 0]}>
+                <torusGeometry args={[1.2, 0.05, 16, 50]} />
+                <meshStandardMaterial color="#4ecdc4" emissive="#4ecdc4" emissiveIntensity={1} />
+            </mesh>
+            
+            {/* Label box */}
+            <group position={[2.5, 0, 0]}>
+                <mesh>
+                    <boxGeometry args={[3, 1, 0.1]} />
+                    <meshBasicMaterial color="#000" transparent opacity={0.6} side={THREE.DoubleSide} />
+                    <lineSegments>
+                        <edgesGeometry args={[new THREE.BoxGeometry(3, 1, 0.1)]} />
+                        <lineBasicMaterial color="#bb88ff" />
+                    </lineSegments>
+                </mesh>
+                <Text position={[0, 0.15, 0.1]} fontSize={0.25} color="#fff" anchorX="center">
+                    CONCEPT ATTRACTOR
+                </Text>
+                <Text position={[0, -0.15, 0.1]} fontSize={0.2} color="#aaa" anchorX="center">
+                    Softmax Norm Layer
+                </Text>
+            </group>
+        </group>
+
+        {/* Steering Vector Visualization (Updated for Matrix) */}
         {result.steering && (
-            <group>
-                {(() => {
-                    const layerIdx = result.steering.layer_idx || 15;
-                    const x = (layerIdx - rsaData.length/2) * 0.8;
-                    const height = (rsaData[layerIdx]?.sem_score || 0.5) * 8;
-                    const y = -2 + height;
-                    
-                    return (
-                        <group position={[x, y + 1.5, 0]}>
-                            {/* Steering Vector Arrow */}
-                            <arrowHelper 
-                                args={[new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 2, 0xffff00, 0.5, 0.3]} 
-                            />
-                            <Text position={[0, 2.5, 0]} fontSize={0.4} color="#ffff00" anchorX="center">
-                                Steering
-                            </Text>
-                            <Text position={[0, 3.0, 0]} fontSize={0.3} color="#aaa" anchorX="center">
-                                ε={result.steering.strength || 1.0}
-                            </Text>
-                            
-                            {/* Pulse Effect Ring */}
-                            <mesh rotation={[Math.PI/2, 0, 0]}>
-                                <ringGeometry args={[0.5, 0.6, 32]} />
-                                <meshBasicMaterial color="#ffff00" transparent opacity={0.5} side={THREE.DoubleSide} />
-                            </mesh>
-                        </group>
-                    );
-                })()}
+            <group position={[4, 2, 0]}> 
+                <Text position={[0, 0.5, 0]} fontSize={0.4} color="#ffff00" anchorX="center">
+                     Parallel Transport
+                </Text>
+                <arrowHelper 
+                    args={[new THREE.Vector3(-1, 0, 0), new THREE.Vector3(1, 0, 0), 2, 0xffff00, 0.5, 0.3]} 
+                />
             </group>
         )}
     </group>
@@ -1003,6 +1124,8 @@ export function StructureAnalysisControls({
   t,
   // New Props
   systemType, setSystemType,
+  // AGI Form
+  agiForm, setAgiForm,
   // SNN Props
   snnState, onInitializeSNN, onToggleSNNPlay, onStepSNN, onInjectStimulus
 }) {
@@ -1080,9 +1203,10 @@ export function StructureAnalysisControls({
       setValidityResult(data);
   });
 
-  const runAgiVerification = () => runAnalysis('AGI Theory Verification', 'verify_agi', {}, (data, log) => {
+  const runAgiVerification = () => runAnalysis('Fiber Bundle Reconstruction', 'fiber_bundle_analysis', { prompt: agiForm.prompt }, (data, log) => {
       const baseCount = data.rsa?.filter(l => l.type === 'Base').length;
       log(`📊 Systematic Layers: ${baseCount}`);
+      log(`🧬 Fiber Basis Identified`);
   });
 
   const runConceptSteering = async () => {
@@ -1132,15 +1256,15 @@ export function StructureAnalysisControls({
               padding: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)'
           }}>
               {(systemType === 'dnn' ? [
-                 { id: 'circuit', icon: Network, label: 'Circuit' },
-                 { id: 'features', icon: Sparkles, label: 'Features' },
-                 { id: 'causal', icon: Brain, label: 'Causal' },
-                 { id: 'manifold', icon: Network, label: 'Manifold' },
-                 { id: 'compositional', icon: Network, label: 'Compos' },
-                 { id: 'agi', icon: Sparkles, label: 'AGI Theory' }
+                 { id: 'circuit', icon: Network, label: '回路 (Circuit)' },
+                 { id: 'features', icon: Sparkles, label: '特征 (Features)' },
+                 { id: 'causal', icon: Brain, label: '因果 (Causal)' },
+                 { id: 'manifold', icon: Network, label: '流形 (Manifold)' },
+                 { id: 'compositional', icon: Network, label: '组合 (Compos)' },
+                 { id: 'agi', icon: Sparkles, label: 'AGI 理论' }
               ] : [
-                 { id: 'snn', icon: Brain, label: 'Simulation' },
-                 { id: 'validity', icon: Activity, label: 'Validity' }
+                 { id: 'snn', icon: Brain, label: 'SNN 仿真' },
+                 { id: 'validity', icon: Activity, label: '有效性 (Valid)' }
               ]).map(tab => (
                  <button
                     key={tab.id}
@@ -1229,7 +1353,15 @@ export function StructureAnalysisControls({
 
             {activeTab === 'agi' && (
                 <div className="animate-fade-in">
-                    <ActionButton onClick={runAgiVerification} loading={loading} icon={Sparkles}>Verify AGI Theory</ActionButton>
+                    <ControlGroup label="Analysis Prompt">
+                         <StyledTextArea 
+                             rows={3} 
+                             value={agiForm.prompt} 
+                             onChange={e => setAgiForm({...agiForm, prompt: e.target.value})} 
+                             placeholder="Enter text to analyze structure..."
+                         />
+                    </ControlGroup>
+                    <ActionButton onClick={runAgiVerification} loading={loading} icon={Sparkles}>Reconstruct Fiber Bundle</ActionButton>
                     <div style={{margin: '20px 0', borderTop: '1px solid rgba(255,255,255,0.1)'}} />
                     <ControlGroup label="Concept Steering">
                          <StyledTextArea rows={2} value={steeringForm.prompt} onChange={e => setSteeringForm({...steeringForm, prompt: e.target.value})} />
@@ -1387,6 +1519,7 @@ export default function StructureAnalysisPanel({
   const [causalForm, setCausalForm] = useState({ prompt: "The Eiffel Tower is in Paris", target_token_pos: -1, importance_threshold: 0.01 });
   const [manifoldForm, setManifoldForm] = useState({ prompt: "Mathematics is the language of the universe.", layer_idx: 15 });
   const [compForm, setCompForm] = useState({ layer_idx: 15, raw_phrases: "", phrases: [] });
+  const [agiForm, setAgiForm] = useState({ prompt: "The quick brown fox jumps over the lazy dog." });
   
   const [analysisResult, setAnalysisResult] = useState(null);
   
@@ -1454,6 +1587,7 @@ export default function StructureAnalysisPanel({
             causalForm={causalForm} setCausalForm={setCausalForm}
             manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
             compForm={compForm} setCompForm={setCompForm}
+            agiForm={agiForm} setAgiForm={setAgiForm}
             onResultUpdate={setAnalysisResult}
             t={tSafe}
             // SNN Props

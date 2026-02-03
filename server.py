@@ -766,6 +766,42 @@ async def analyze_compositionality(request: CompositionalAnalysisRequest):
 
 
 
+
+# ============ Fiber Bundle Reconstruction Endpoint ============
+
+from transformer_lens.neural_fiber_recovery import NeuralFiberRecovery
+
+
+class FiberAnalysisRequest(BaseModel):
+    prompt: str = "The quick brown fox"
+
+@app.post("/fiber_bundle_analysis")
+async def fiber_bundle_analysis(request: FiberAnalysisRequest):
+    """
+    Run the Neural Fiber Bundle Reconstruction Algorithm (NFB-RA).
+    Returns the Manifold Topology (RSA), Fiber Basis (PCA), and Connection Dynamics.
+    """
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded yet")
+        
+    try:
+        recovery = NeuralFiberRecovery(model)
+        result = recovery.run_full_analysis(request.prompt)
+        
+        # Cache
+        analysis_id = f"fiber_{len(analysis_cache)}"
+        analysis_cache[analysis_id] = result
+        
+        return {
+            "analysis_id": analysis_id,
+            **result
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 class ValidityRequest(BaseModel):
     prompt: str
     target_layers: Optional[List[int]] = None

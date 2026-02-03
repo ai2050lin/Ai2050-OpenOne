@@ -15,16 +15,19 @@ const API_BASE = 'http://localhost:8888';
 
 
 
-// 3D Bar Component
-function Bar({ position, height, color, label, actual, probability, layer, posIndex, onHover, isActiveLayer }) {
+// 3D Glass Node for Logit Lens
+function GlassNode({ position, probability, color, label, actual, layer, posIndex, onHover, isActiveLayer }) {
   const mesh = useRef();
-  const [hovered, setHover] = useState(false);
-
-  // Smooth animation for height
+  
+  // Size based on probability (0.0 - 1.0)
+  const baseSize = 0.3 + (probability * 0.5); 
+  
   useFrame((state) => {
     if (mesh.current) {
-      mesh.current.scale.y = THREE.MathUtils.lerp(mesh.current.scale.y, height, 0.1);
-      mesh.current.position.y = mesh.current.scale.y / 2;
+       // Gentle pulse for high prob nodes
+       if (probability > 0.5) {
+           mesh.current.scale.setScalar(baseSize + Math.sin(state.clock.elapsedTime * 2) * 0.05);
+       }
     }
   });
 
@@ -34,23 +37,35 @@ function Bar({ position, height, color, label, actual, probability, layer, posIn
         ref={mesh}
         onPointerOver={(e) => {
           e.stopPropagation();
-          setHover(true);
           onHover({ label, actual, probability, layer, posIndex });
+          document.body.style.cursor = 'pointer';
         }}
         onPointerOut={() => {
-          setHover(false);
           onHover(null);
+          document.body.style.cursor = 'default';
         }}
+        scale={[baseSize, baseSize, baseSize]}
       >
-        <boxGeometry args={[0.8, 1, 0.8]} />
-        <meshStandardMaterial 
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshPhysicalMaterial 
           color={color} 
-          emissive={color} 
-          emissiveIntensity={isActiveLayer ? 1.5 : (hovered ? 0.5 : 0.1)}
+          emissive={color}
+          emissiveIntensity={isActiveLayer ? 2.0 : (probability > 0.5 ? 0.8 : 0.2)}
+          metalness={0.1}
+          roughness={0.05}
+          transmission={0.95} // Glassy
+          thickness={1.5}
           transparent
           opacity={0.8}
         />
       </mesh>
+      
+      {/* Label for high prob nodes or active layer */}
+      {(probability > 0.3 || isActiveLayer) && (
+          <Text position={[0, 1.2, 0]} fontSize={0.6} color="white" anchorX="center" anchorY="bottom">
+              {label}
+          </Text>
+      )}
     </group>
   );
 }
@@ -58,13 +73,13 @@ function Bar({ position, height, color, label, actual, probability, layer, posIn
 // Probability to Color mapping (Viridis-like)
 const getColor = (prob) => {
   const colors = [
-    '#440154', // dark purple
-    '#3b528b', // blue
+    '#440154', // dark purple (low)
+    '#4488ff', // blue
     '#21918c', // teal
-    '#5ec962', // green
-    '#fde725'  // yellow
+    '#ff9f43', // orange
+    '#ff4444'  // red (high)
   ];
-  const idx = Math.min(Math.floor(prob * colors.length), colors.length - 1);
+  const idx = Math.min(Math.floor(prob * (colors.length - 1) * 1.5), colors.length - 1); // Boost index
   return colors[idx];
 };
 
@@ -75,25 +90,48 @@ function Visualization({ data, hoveredInfo, setHoveredInfo, activeLayer }) {
   const nLayers = logit_lens.length;
   const seqLen = tokens.length;
 
+  // Calculate highest probability path (for connections)
+  const paths = [];
+  if (logit_lens.length > 0) {
+      for (let pos = 0; pos < seqLen; pos++) {
+          const path = [];
+          for (let l = 0; l < nLayers; l++) {
+               const layerData = logit_lens[l][pos];
+               // Find position coordinates
+               const x = pos * 2.5; // Spacing
+               const z = l * 2.0;
+               path.push(new THREE.Vector3(x, 0, z));
+          }
+          paths.push(path);
+      }
+  }
+
   return (
     <>
-      <group position={[-seqLen / 2, 0, -nLayers / 2]}>
+      <group position={[-seqLen, 0, -nLayers]}> {/* Center roughly */}
         {logit_lens.map((layerData, layerIdx) => (
           layerData.map((posData, posIdx) => (
-            <Bar
+            <GlassNode
               key={`${layerIdx}-${posIdx}`}
-              position={[posIdx * 1.2, 0, layerIdx * 1.2]}
-              height={posData.prob * 5 + 0.1}
+              position={[posIdx * 2.5, 0, layerIdx * 2.0]}
+              probability={posData.prob}
               color={getColor(posData.prob)}
               label={posData.token}
               actual={posData.actual_token}
-              probability={posData.prob}
               layer={layerIdx}
               posIndex={posIdx}
               onHover={setHoveredInfo}
               isActiveLayer={layerIdx === activeLayer}
             />
           ))
+        ))}
+
+        {/* Draw Connections (Trajectory) */}
+        {tokens.map((_, i) => (
+           <line key={`path-${i}`}>
+              <bufferGeometry setFromPoints={paths[i]} />
+              <lineBasicMaterial color="#ffffff" opacity={0.15} transparent linewidth={1} />
+           </line>
         ))}
 
         {/* Axis Labels */}
@@ -563,6 +601,9 @@ export default function App() {
     layer_idx: 0,
     raw_phrases: "black, cat, black cat\nParis, France, Paris France\nking, man, king",
     phrases: [["black", "cat", "black cat"], ["Paris", "France", "Paris France"], ["king", "man", "king"]]
+  });
+  const [agiForm, setAgiForm] = useState({
+    prompt: "The quick brown fox jumps over the lazy dog."
   });
 
   const [panelVisibility, setPanelVisibility] = useState({
@@ -1079,6 +1120,7 @@ export default function App() {
                        causalForm={causalForm} setCausalForm={setCausalForm}
                        manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
                        compForm={compForm} setCompForm={setCompForm}
+                       agiForm={agiForm} setAgiForm={setAgiForm}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -1161,6 +1203,7 @@ export default function App() {
                        causalForm={causalForm} setCausalForm={setCausalForm}
                        manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
                        compForm={compForm} setCompForm={setCompForm}
+                       agiForm={agiForm} setAgiForm={setAgiForm}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -1423,28 +1466,154 @@ export default function App() {
                           </>
                       ) : (
                           <>
-                             <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 专业架构解析 (Professional)</div>
-                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>1. Transformer 架构</h3>
+                             <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 当前分析算法解析 (Algorithm: {structureTab.toUpperCase()})</div>
+                             
+                             {structureTab === 'circuit' && (
+                                 <div>
+                                     <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Edge Attribution Patching (EAP)</h3>
+                                     <p>一种快速定位对特定任务有贡献的电路（子网络）的方法。</p>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         Attribution(e) = ∇_e Loss * Activation(e)
+                                     </div>
+                                     <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                         <li><strong>原理：</strong> 线性近似。通过梯度和激活值的逐元素乘积，估算每条边被切断后对损失函数的影响。</li>
+                                         <li><strong>计算：</strong> 前向传播一次获取激活，反向传播一次获取梯度，无需多次运行模型。</li>
+                                     </ul>
+                                     
+                                     <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
+                                     <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>节点 (Spheres):</strong> 模型组件（注意力头或MLP神经元）。大小代表该组件的重要性或激活强度。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>连线 (Lines):</strong> 因果归因路径。
+                                             <br/><span style={{fontSize:'10px', color:'#888'}}>· 红色 = 正向贡献 (Excitation)</span>
+                                             <br/><span style={{fontSize:'10px', color:'#888'}}>· 蓝色 = 负向抑制 (Inhibition)</span>
+                                             <br/><span style={{fontSize:'10px', color:'#888'}}>· 粗细 = 归因值大小 (Gradient * Activation)</span>
+                                         </li>
+                                     </ul>
+                                 </div>
+                             )}
+
+                             {structureTab === 'features' && (
+                                 <div>
+                                     <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Sparse Autoencoders (SAE)</h3>
+                                     <p>将稠密的神经网络激活分解为稀疏的、可解释的“特征”。</p>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         Min ||x - W_dec(ReLU(W_enc(x) + b))||² + λ||f||₁
+                                     </div>
+                                     <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                         <li><strong>编码器：</strong> 将激活 x 映射到高维稀疏特征 f。</li>
+                                         <li><strong>解码器：</strong> 尝试从 f 重构原始激活 x。</li>
+                                         <li><strong>L1 正则化：</strong> 强制绝大多数特征 f 为 0，确保稀疏性（可解释性的关键）。</li>
+                                     </ul>
+                                     
+                                     <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
+                                     <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>特征点 (Points/Voxels):</strong> 活跃的稀疏特征。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>坐标 (Position):</strong> 如果使用了降维（如 t-SNE），代表特征间的语义相似度。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>颜色/大小:</strong> 代表特征的激活强度 (Activation Magnitude)。更亮或更大的点表示该特征对当前输入的响应更强烈。
+                                         </li>
+                                     </ul>
+                                 </div>
+                             )}
+
+                             {structureTab === 'manifold' && (
+                                 <div>
+                                     <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Intrinsic Dimensionality (ID)</h3>
+                                     <p>测量数据云在高维空间中的实际形状复杂度和有效自由度。</p>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         PR = (Σ λ_i)² / Σ (λ_i²)
+                                     </div>
+                                     <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
+                                         <li><strong>PCA：</strong> 主成分分析，通过协方差矩阵特征分解寻找主方向。</li>
+                                         <li><strong>参与率 (PR)：</strong> 数值越低，表示激活主要集中在少数几个方向上（流形坍缩/低维结构）。</li>
+                                     </ul>
+
+                                     <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
+                                     <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>散点 (Scatter Points):</strong> 输入序列中的每个 Token 的激活向量。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>空间轴 (XYZ Axes):</strong> 前三个主成分 (PC1, PC2, PC3)。这三个方向保留了数据方差最大的信息。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>聚类 (Clusters):</strong> 空间中相邻的点往往代表语义或语法功能相似的 Token。
+                                         </li>
+                                     </ul>
+                                 </div>
+                             )}
+
+                             {structureTab === 'agi' && (
+                                 <div>
+                                     <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Neural Fiber Bundle Reconstruction (NFB-RA)</h3>
+                                     <p>基于“AGI 统一场论”，逆向还原大模型内部的数学几何结构。</p>
+                                     
+                                     <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 1: RSA 流形分离 (Manifold Extraction)</h4>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         Score = RSA(Syn) / (RSA(Sem) + ε)
+                                     </div>
+                                     <p style={{fontSize:'12px', color:'#aaa'}}>比较层对“同句法异义”和“同义异句法”的敏感度。高分层为底流形 M（逻辑），低分层为纤维 F（语义）。</p>
+
+                                     <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 2: 纤维基底提取 (Fiber Basis)</h4>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         Basis = PCA(Perturb(Meaning))
+                                     </div>
+                                     <p style={{fontSize:'12px', color:'#aaa'}}>在语义层引入微扰，通过局部 PCA 提取出表达该概念的切空间基底向量 F_p。</p>
+
+                                     <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 3: 联络动力学 (Connection Dynamics)</h4>
+                                     <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         ∇_X Y ≈ (v_B - v_A) / ||A-B||
+                                     </div>
+                                     <p style={{fontSize:'12px', color:'#aaa'}}>计算概念间的平行移动向量（Steering Vector），揭示模型如何在流形上进行推理。</p>
+
+                                     <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
+                                     <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>玻璃矩阵 (Glass Matrix):</strong> 32个层级节点组成的 4x8 阵列。每个球体代表一个Transformer层。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>节点颜色 (Node Color):</strong>
+                                             <br/><span style={{fontSize:'10px', color:'#888'}}>· 红色/橙色发光 = 语义活跃层 (High Semantic Score)</span>
+                                             <br/><span style={{fontSize:'10px', color:'#888'}}>· 蓝色透明 = 句法/逻辑基础层 (Base Logic)</span>
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>连接线 (Glowing Links):</strong> 能量流。从活跃的语义节点汇聚到中心的“概念吸引子” (Concept Attractor)，模拟信息流向 Softmax 的过程。
+                                         </li>
+                                         <li style={{marginBottom: '6px'}}>
+                                             <strong>RGB 箭头:</strong> 局部纤维基底 (Fiber Geometry)。显示主语义层内部的几何方向。
+                                         </li>
+                                     </ul>
+                                 </div>
+                             )}
+                             
+                             {structureTab === 'compositional' && (
+                                 <div>
+                                      <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Compositionality (OLS)</h3>
+                                      <p>验证简单的线性加和是否能表示复杂的组合概念。</p>
+                                      <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
+                                         v_composite ≈ α * v_A + β * v_B
+                                     </div>
+                                 </div>
+                             )}
+                             
+                             <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '20px', marginBottom: '10px' }}>[B] 通用架构 (General)</div>
+                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Transformer 基础</h3>
                              <p>
-                                 基于标准的 Decoder-only 架构。核心计算由<strong>多头自注意力 (MHA)</strong> 和<strong>前馈网络 (MLP)</strong> 构成，信息通过<strong>残差流 (Residual Stream)</strong> 传递。
+                                 核心计算由<strong>多头自注意力 (MHA)</strong> 和<strong>前馈网络 (MLP)</strong> 构成，信息通过<strong>残差流</strong>传递。
                              </p>
                              <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                 x_{'{l+1}'} = x_{'{l}'} + MHA(LN(x_{'{l}'})) + MLP(LN(x_{'{l}'} + MHA(LN(x_{'{l}'}))))
+                                 x_{'{l+1}'} = x_{'{l}'} + Attention(x_{'{l}'}) + MLP(x_{'{l}'})
                              </div>
                              <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
                                  <li><strong>Logit Lens：</strong> 将每一层残差流通过 unembedding 矩阵映射回词汇空间。</li>
                                  <li><strong>激活分析：</strong> 观察神经元在处理特定的语义或语法任务时的响应方向。</li>
-                             </ul>
-
-                             <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '20px', marginBottom: '10px' }}>[B] 直观理解 (Simplified)</div>
-                             <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>AI 的“联想传送带”</h3>
-                             <p>
-                                 Transformer 就像一个超级高效的组装线：
-                             </p>
-                             <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                 <li><strong>传送带（残差流）：</strong> 信息像零件一样在传送带上走，每一层都会给它贴上新的标签。</li>
-                                 <li><strong>聚光灯（注意力）：</strong> 模型在读到某个词时，会把光投向前面相关的词，寻找线索。</li>
-                                 <li><strong>逻辑开关（MLP）：</strong> 内部有无数个小开关，负责识别“这是个地名”或者“这在表达赞美”。</li>
                              </ul>
                           </>
                       )}
@@ -1716,9 +1885,9 @@ export default function App() {
                 {structureTab === 'compositional' && t('structure.compositional.title')}
              </Text>
              
-             {structureTab === 'circuit' && <NetworkGraph3D graph={analysisResult.graph || analysisResult} />}
+             {structureTab === 'circuit' && <NetworkGraph3D graph={analysisResult.graph || analysisResult} activeLayer={activeLayer} />}
              {structureTab === 'features' && <FeatureVisualization3D features={analysisResult.top_features} layerIdx={analysisResult.layer_idx} onLayerClick={setSelectedLayer} selectedLayer={selectedLayer} onHover={setHoveredInfo} />}
-             {structureTab === 'causal' && <NetworkGraph3D graph={analysisResult.causal_graph} />}
+             {structureTab === 'causal' && <NetworkGraph3D graph={analysisResult.causal_graph} activeLayer={activeLayer} />}
              {structureTab === 'manifold' && <ManifoldVisualization3D pcaData={analysisResult.pca || analysisResult} onHover={setHoveredInfo} />}
              {structureTab === 'compositional' && <CompositionalVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'agi' && <FiberBundleVisualization3D result={analysisResult} t={t} />}

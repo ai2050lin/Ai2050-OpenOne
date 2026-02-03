@@ -53,7 +53,10 @@ export const locales = {
         features: '特征',
         causal: '因果',
         manifold: '流形',
-        compositional: '组合性'
+        compositional: '组合性',
+        agi: 'AGI验证',
+        snn: '脉冲仿真',
+        validity: '有效性'
       },
       circuit: {
         title: '回路发现',
@@ -180,7 +183,10 @@ export const locales = {
         features: 'Features',
         causal: 'Causal',
         manifold: 'Manifold',
-        compositional: 'Compositional'
+        compositional: 'Compositional',
+        agi: 'AGI Verify',
+        snn: 'SNN Sim',
+        validity: 'Validity'
       },
       circuit: {
         title: 'Circuit Discovery',
