@@ -4,6 +4,8 @@ import os
 os.environ["HF_HOME"] = r"D:\develop\model"
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
+import os
+import sys
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -13,6 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import transformer_lens
+
+sys.path.append(os.getcwd()) # Ensure root directory is in path for scripts import
+
 from agi_verification_api import run_agi_verification, run_concept_steering
 from neurofiber_snn import NeuroFiberNetwork
 from structure_analyzer import (
