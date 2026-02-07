@@ -1307,6 +1307,7 @@ export function StructureAnalysisControls({
                  { id: 'manifold', icon: Network, label: '流形 (Manifold)' },
                  { id: 'compositional', icon: Network, label: '组合 (Compos)' },
                  { id: 'agi', icon: Sparkles, label: '神经纤维丛 (Fiber)' },
+                 { id: 'fibernet_v2', icon: Network, label: 'FiberNet V2 (Demo)' },
                  { id: 'glass_matrix', icon: Network, label: '玻璃矩阵 (Glass)' }
               ] : [
                  { id: 'snn', icon: Brain, label: 'SNN 仿真' },
@@ -1395,6 +1396,14 @@ export function StructureAnalysisControls({
                   </ControlGroup>
                   <ActionButton onClick={runCompositionalAnalysis} loading={loading} icon={Network}>{t('structure.compositional.run')}</ActionButton>
                </div>
+            )}
+
+            {activeTab === 'fibernet_v2' && (
+                <div style={{ width: '100%', padding: '20px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                    3D 演示已在主屏幕背景中显示。
+                    <br/><br/>
+                    请使用主屏幕交互。
+                </div>
             )}
 
             {activeTab === 'agi' && (

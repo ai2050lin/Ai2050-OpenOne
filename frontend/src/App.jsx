@@ -8,6 +8,7 @@ import ErrorBoundary from './ErrorBoundary';
 import GlassMatrix3D from './GlassMatrix3D';
 import { SimplePanel } from './SimplePanel';
 import { CompositionalVisualization3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
+import FiberNetV2Demo from './components/FiberNetV2Demo';
 
 import { locales } from './locales';
 
@@ -1942,7 +1943,12 @@ export default function App() {
       </SimplePanel>
       )}
 
-      {/* 3D Canvas */}
+      {/* 3D Canvas - Conditionally Render FiberNetV2Demo */}
+      {structureTab === 'fibernet_v2' ? (
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+           <FiberNetV2Demo t={t} />
+        </div>
+      ) : (
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[15, 15, 15]} fov={50} />
         <OrbitControls makeDefault />
@@ -2030,6 +2036,7 @@ export default function App() {
         <ContactShadows resolution={1024} scale={20} blur={2} opacity={0.35} far={10} color="#000000" />
         <gridHelper args={[100, 50, '#222', '#111']} position={[0, -0.6, 0]} />
       </Canvas>
+      )}
 
       {/* Head Analysis Panel - Draggable */}
       {panelVisibility.headPanel && headPanel.isOpen && (

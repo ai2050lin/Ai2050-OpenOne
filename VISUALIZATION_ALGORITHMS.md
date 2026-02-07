@@ -13,6 +13,7 @@
 | **SNN Activity (脉冲网络)** | **Leaky Integrate-and-Fire (LIF)**<br>仿生神经元模型。模拟膜电位累积、阈值触发脉冲（Spike）及 STDP 学习机制。 | `SNNVisualization3D.jsx`<br>(Tab: `snn`) | - **神经元**: 3D 空间中的球体阵列。<br>- **脉冲**: 发光闪烁效果 (Flash)，代表 Action Potential。<br>- **连接**: 突触连接强度可视化。 |
 | **Validity Analysis (语言有效性)** | **Anisotropy & Entropy**<br>分析表征空间的各向异性（Anisotropy）和 Softmax 分布的熵，检测模型是否退化（Model Collapse）。 | `ValidityVisualization3D.jsx`<br>(Tab: `validity`) | - **点云形态**: <br>  - **球形**: 健康分布 (低各向异性)。<br>  - **针状/线状**: 表征坍缩 (高各向异性)。<br>- **颜色**: 警示色 (红=坍缩，蓝=健康)。 |
 | **Layer Detail (层级详情)** | **Micro-Architecture Inspection**<br>展示 Transformer 单层的微观结构：Multi-Head Attention (Q,K,V) 和 MLP 模块。 | `LayerDetail3D.jsx`<br>(Contextual Panel) | - **Attention Heads**: 网格排列的 Q/K/V 矩阵块。<br>- **MLP**: 输入/隐藏/输出层的神经元连接示意。<br>- **交互**: 点击可查看具体 Head 的注意力热图。 |
+| **Real World NFB (真实纤维丛)** | **Geometry of Concepts**<br>验证 "Everything is a Fiber Bundle"。从真实模型 (GPT-2) 中提取流形和概念纤维。<br>- **高维流形**: PCA 降维后的残差流。<br>- **概念簇**: "King", "Queen" 等词向量在流形上的聚类。<br>- **联想路径**: 基于几何邻近度的概念传输。 | `FiberNetV2Demo.jsx`<br>(Mode: `Real Data`) | - **点云**: 灰色背景点 vs <span style="color:orange">黄色概念点</span>。<br>- **标签**: 关键概念的文本标注。<br>- **成簇**: 语义相似的点自动聚集。 |
 
 ---
 

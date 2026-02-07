@@ -161,3 +161,92 @@ class FiberNet(nn.Module):
         logits = F.linear(active_fiber, self.fiber_stream.fiber_memory.weight)
         
         return logits, active_fiber, m_states
+
+
+# -----------------------------------------------------------------------------------------
+# FiberNet V2 Implementation
+# -----------------------------------------------------------------------------------------
+
+class ManifoldConstraint(nn.Module):
+    def __init__(self, high_dim, low_dim):
+        super().__init__()
+        self.compress = nn.Linear(high_dim, low_dim)
+        self.expand = nn.Linear(low_dim, high_dim)
+        self.layer_norm = nn.LayerNorm(low_dim)
+        
+    def forward(self, x):
+        manifold_point = self.compress(x)
+        manifold_point = self.layer_norm(manifold_point)
+        control_signal = self.expand(manifold_point)
+        return control_signal
+
+class AffineTransport(nn.Module):
+    def __init__(self, d_manifold, d_fiber, n_heads=4):
+        super().__init__()
+        self.n_heads = n_heads
+        self.d_head = d_fiber // n_heads
+        
+        self.W_Q = nn.Linear(d_manifold, d_fiber)
+        self.W_K = nn.Linear(d_fiber, d_fiber)
+        self.W_V = nn.Linear(d_fiber, d_fiber)
+        self.W_Shift = nn.Linear(d_manifold, d_fiber)
+        self.out = nn.Linear(d_fiber, d_fiber)
+        self.scale = self.d_head ** -0.5
+        
+    def forward(self, manifold_state, pos_embed, fiber_content):
+        b, s, _ = manifold_state.shape
+        
+        Q = self.W_Q(manifold_state).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
+        K = self.W_K(pos_embed).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
+        V = self.W_V(fiber_content).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
+        
+        scores = torch.matmul(Q, K.transpose(-2, -1)) * self.scale
+        attn = F.softmax(scores, dim=-1)
+        
+        transported = torch.matmul(attn, V).transpose(1, 2).contiguous().view(b, s, -1)
+        shift = self.W_Shift(manifold_state)
+        
+        return self.out(transported + shift)
+
+class FiberNetV2(nn.Module):
+    def __init__(self, s_vocab, c_vocab, d_manifold=64, d_fiber=512, max_len=512):
+        super().__init__()
+        self.d_fiber = d_fiber
+        self.fiber_mem = nn.Embedding(c_vocab, d_fiber)
+        
+        self.d_manifold = d_manifold
+        self.manifold_embed = nn.Embedding(s_vocab, d_manifold)
+        self.manifold_rnn = nn.LSTM(d_manifold, d_manifold, batch_first=True, bidirectional=True)
+        self.manifold_proj = nn.Linear(d_manifold*2, d_manifold)
+        
+        self.constraint = ManifoldConstraint(d_manifold, 8) # Low-Dim Precision
+        self.transport = AffineTransport(d_manifold, d_fiber) # Complex Connectivity
+        
+        self.pos_embed = nn.Parameter(torch.randn(1, max_len, d_fiber))
+        
+    def forward(self, structure, content):
+        m_emb = self.manifold_embed(structure)
+        m_out, _ = self.manifold_rnn(m_emb)
+        m_state = self.manifold_proj(m_out)
+        
+        m_refined = self.constraint(m_state)
+        
+        f_content = self.fiber_mem(content)
+        seq_len = structure.size(1)
+        f_pos = self.pos_embed[:, :seq_len, :]
+        
+        f_out = self.transport(m_refined, f_pos, f_content)
+        
+        logits = F.linear(f_out, self.fiber_mem.weight)
+        return logits, f_out, m_refined
+
+    def inject_knowledge(self, concept_id, concept_vector):
+        with torch.no_grad():
+             self.fiber_mem.weight[concept_id] = concept_vector
+
+    def fast_associate(self, query_vector, k=5):
+        with torch.no_grad():
+            scores = torch.matmul(self.fiber_mem.weight, query_vector)
+            vals, inds = torch.topk(scores, k)
+            return inds, vals
+

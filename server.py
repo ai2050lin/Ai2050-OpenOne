@@ -954,6 +954,147 @@ async def step_snn(request: SNNStepRequest):
 
 
 
+# ============ FiberNet V2 Demo Endpoint ============
+
+from models.fiber_net import FiberNetV2
+
+
+@app.get("/fibernet_v2/demo")
+async def fibernet_v2_demo():
+    """
+    Returns data for the 3D visualization of FiberNet V2 Capabilities.
+    Simulates:
+    1. Manifold Grid (Low-Dim Precision)
+    2. Fiber Vectors (High-Dim Abstraction)
+    3. Affine Transport (Complex Connectivity)
+    """
+    try:
+        # 1. Generate Manifold Grid (4x4)
+        # Represents the "Low-Dim Precision" constraint
+        grid_size = 4
+        manifold_nodes = []
+        for x in range(grid_size):
+            for z in range(grid_size):
+                # Normalized coordinates centered at 0
+                nx = (x - grid_size/2) * 2.0
+                nz = (z - grid_size/2) * 2.0
+                manifold_nodes.append({
+                    "id": f"m_{x}_{z}",
+                    "pos": [nx, 0, nz],
+                    "type": "manifold_node"
+                })
+        
+        # 2. Generate Fiber Vectors attached to Manifold nodes
+        # Represents "High-Dim Abstraction"
+        fibers = []
+        for node in manifold_nodes:
+            # Simulate a fiber vector (just visual height/color)
+            height = 1.0 + float(np.random.rand()) # Random height
+            fibers.append({
+                "parent_id": node["id"],
+                "height": height,
+                "color_intensity": float(np.random.rand()) # Map to color later
+            })
+            
+        # 3. Generate Transport Connections
+        # Represents "Complex Connectivity"
+        # Connect diagonal or distant nodes to show non-local connection
+        connections = []
+        # Connect m_0_0 to m_3_3 (Long range transport)
+        connections.append({
+            "source": "m_0_0",
+            "target": f"m_{grid_size-1}_{grid_size-1}",
+            "type": "affine_transport",
+            "strength": 0.9
+        })
+        # Connect m_0_3 to m_3_0
+        connections.append({
+            "source": f"m_0_{grid_size-1}",
+            "target": f"m_{grid_size-1}_0",
+            "type": "affine_transport",
+            "strength": 0.5
+        })
+        
+        return {
+            "manifold_nodes": manifold_nodes,
+            "fibers": fibers,
+            "connections": connections
+        }
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/nfb_ra/data")
+async def nfb_ra_data():
+    """
+    Returns the real extracted NFB-RA data from the pre-trained model.
+    """
+    import os
+    try:
+        CACHE_DIR = "nfb_data"
+        if not os.path.exists(os.path.join(CACHE_DIR, "manifold_coords.npy")):
+             return {"error": "No NFB-RA data found. Run experiments first."}
+             
+        # Load raw data
+        # manifold_coords = np.load(os.path.join(CACHE_DIR, "manifold_coords.npy")) # [N, 2]
+        centers = np.load(os.path.join(CACHE_DIR, "cluster_centers.npy")) # [K, 2]
+        # fiber_bases = np.load(os.path.join(CACHE_DIR, "fiber_bases.npy")) # [K, dim, D]
+        # transport_maps = np.load(os.path.join(CACHE_DIR, "transport_maps.npy"), allow_pickle=True).item()
+        
+        # Format for Frontend (simulated for speed if files large, or real)
+        # We start with Cluster Centers as the "Manifold Nodes"
+        manifold_nodes = []
+        for i, center in enumerate(centers):
+            # UMAP is 2D, we map to 3D (x, 0, z)
+            # Normalize or Scale?
+            # Assuming raw PCA/UMAP is roughly standard normal, might be small. Scale up for viz.
+            scale = 5.0
+            x, z = center[0] * scale, center[1] * scale
+            
+            manifold_nodes.append({
+                "id": f"c_{i}",
+                "pos": [float(x), 0, float(z)],
+                "type": "cluster_node"
+            })
+            
+        # Connections (Transport)
+        connections = []
+        # If transport_maps exists, we visualize significant
+        connections = []
+        if os.path.exists(os.path.join(CACHE_DIR, "transport_maps.npy")):
+            transport_maps = np.load(os.path.join(CACHE_DIR, "transport_maps.npy"), allow_pickle=True).item()
+            for key, val in transport_maps.items():
+                c_from, c_to = key.split('_')
+                if val.get("score", 0) > 0.5: # Only show strong connections
+                    connections.append({
+                        "source": f"c_{c_from}",
+                        "target": f"c_{c_to}",
+                        "type": "affine_transport",
+                        "strength": val.get("score", 0)
+                    })
+        
+        # [NEW] Load Point Cloud Data
+        manifold_points = []
+        if os.path.exists(os.path.join(CACHE_DIR, "manifold_points.json")):
+            with open(os.path.join(CACHE_DIR, "manifold_points.json"), "r") as f:
+                manifold_points = json.load(f)
+
+        return {
+            "manifold_nodes": manifold_nodes,
+            "manifold_points": manifold_points, # New field
+            "fibers": [], # Populate if we want to visualize basis vectors later
+            "connections": connections
+        }
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8888)
