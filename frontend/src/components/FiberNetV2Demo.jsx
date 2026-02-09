@@ -1,12 +1,16 @@
 
 import { Line, OrbitControls, Text } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { Network, Scissors } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { SimplePanel } from '../SimplePanel';
 
 const FiberNetV2Demo = ({ t }) => {
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  /* Animation State */
   const [animState, setAnimState] = useState({
       injecting: false,
       transporting: false,
@@ -19,12 +23,11 @@ const FiberNetV2Demo = ({ t }) => {
   const fetchData = (mode = dataMode) => {
       setLoading(true);
       const endpoint = mode === 'real' ? '/nfb_ra/data' : '/fibernet_v2/demo';
-      fetch(`http://localhost:8888${endpoint}`)
+      fetch(`http://localhost:5000${endpoint}`)
           .then(res => res.json())
           .then(d => {
               if (d.error || d.detail) {
                   console.warn("Backend Error:", d.error || d.detail);
-                  // alert("Error: " + (d.error || d.detail)); // Optional: alert user
                   setDataMode('mock'); // Auto-revert
                   return;
               }
@@ -42,6 +45,82 @@ const FiberNetV2Demo = ({ t }) => {
       fetchData(dataMode);
   }, [dataMode]);
 
+  /* Surgery State */
+  const [surgeryMode, setSurgeryMode] = useState(false);
+  const [surgeryTool, setSurgeryTool] = useState('graft'); // 'graft' | 'ablate'
+  const [selection, setSelection] = useState([]); // [source_id, target_id]
+
+  /* Surgery Handlers */
+  const handleSurgeryClick = (nodeId) => {
+      if (!surgeryMode) return;
+
+      if (surgeryTool === 'ablate') {
+          // Immediate Ablation Confirmation
+          if (confirm(`Confirm Ablation of Concept Node ${nodeId}?`)) {
+              performSurgery('ablate', nodeId);
+          }
+      } else if (surgeryTool === 'graft') {
+          // Source-Target Selection
+          if (selection.length === 0) {
+              setSelection([nodeId]);
+          } else if (selection.length === 1) {
+              if (selection[0] === nodeId) return; // Ignore self-select
+              if (confirm(`Graft connection from ${selection[0]} to ${nodeId}?`)) {
+                  performSurgery('graft', selection[0], nodeId);
+              }
+              setSelection([]); // Reset
+          }
+      }
+  };
+
+  const performSurgery = (action, src, tgt = null) => {
+      // Validation: Mock Mode
+      if (dataMode === 'mock') {
+          alert("Simulation Mode: Surgery is visual-only. Please switch to Real Data (NFB-RA) to apply actual hooks.");
+          return;
+      }
+
+      // Parse IDs safely
+      const s_id = parseInt(src);
+      const t_id = tgt ? parseInt(tgt) : null;
+
+      // Validation: Invalid IDs
+      if (isNaN(s_id) || (action === 'graft' && isNaN(t_id))) {
+          console.error("Invalid Node IDs for Surgery:", { src, tgt, s_id, t_id });
+          alert("Error: Invalid Node IDs. Cannot perform surgery on this selection.");
+          return;
+      }
+      
+      const payload = {
+          action: action,
+          source_id: action === 'graft' ? s_id : null,
+          target_id: action === 'graft' ? t_id : s_id, // For ablate, target is src
+          layer: 6,
+          strength: 1.5
+      };
+
+      console.log("Sending Surgery Payload:", payload);
+
+      fetch('http://localhost:5000/nfb_ra/surgery', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+      })
+      .then(async res => {
+          const d = await res.json();
+          if (!res.ok) throw new Error(d.detail || res.statusText);
+          return d;
+      })
+      .then(d => {
+          alert(`Surgery Success: ${d.message}`);
+          fetchData(); 
+      })
+      .catch(err => {
+          console.error("Surgery Error:", err);
+          alert("Surgery Failed: " + err.message);
+      });
+  };
+
   // Controls
   const handleInject = () => {
       setAnimState(prev => ({ ...prev, injecting: true }));
@@ -49,6 +128,7 @@ const FiberNetV2Demo = ({ t }) => {
       if (dataMode === 'mock') fetchData(); 
   };
 
+  // ... (keep other handlers) ...
   const handleTransport = () => {
       setAnimState(prev => ({ ...prev, transporting: true }));
       setTimeout(() => setAnimState(prev => ({ ...prev, transporting: false })), 3000);
@@ -63,37 +143,110 @@ const FiberNetV2Demo = ({ t }) => {
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-        {/* Control Toolbar */}
-        <div style={{ 
-            position: 'absolute', top: 10, left: 10, zIndex: 10, 
-            display: 'flex', gap: '10px', background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '8px' 
-        }}>
-            <button
-                onClick={() => setDataMode(prev => prev === 'mock' ? 'real' : 'mock')}
-                style={{ background: '#666', color: 'white', border: '1px solid #999', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px', fontWeight: 'bold' }}
-            >
-                {dataMode === 'mock' ? '🔄 Switch to Real Data (NFB-RA)' : '🔄 Switch to Mock Demo'}
-            </button>
-            <div style={{width: 1, background: '#555', margin: '0 5px'}}></div>
-            <button 
-                onClick={handleInject}
-                style={{ background: animState.injecting ? '#44ff44' : '#333', color: 'white', border: '1px solid #666', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px' }}
-            >
-                1. {t ? t('fibernet.inject', 'Inject Knowledge') : 'Inject Knowledge'} (Efficiency)
-            </button>
-            <button 
-                onClick={handleTransport}
-                style={{ background: animState.transporting ? '#4488ff' : '#333', color: 'white', border: '1px solid #666', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px' }}
-            >
-                2. {t ? t('fibernet.transport', 'Affine Transport') : 'Affine Transport'} (Connectivity)
-            </button>
-            <button 
-                onClick={handleConstraint}
-                style={{ background: animState.constraining ? '#ff4444' : '#333', color: 'white', border: '1px solid #666', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px' }}
-            >
-                3. {t ? t('fibernet.constraint', 'Manifold Constraint') : 'Manifold Constraint'} (Low-Dim)
-            </button>
-        </div>
+        {/* Control Window - Moved to SimplePanel for better Z-Index/Layout */}
+        <SimplePanel
+            title="Neural Fiber Controls"
+            style={{
+                position: 'fixed', bottom: 120, right: 20, zIndex: 1000,
+                width: '300px', pointerEvents: 'auto', maxHeight: '600px',
+                background: 'rgba(20, 20, 25, 0.9)'
+            }}
+            headerStyle={{ cursor: 'move' }}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                
+                {/* Data Source Switch */}
+                <button
+                    onClick={() => setDataMode(prev => prev === 'mock' ? 'real' : 'mock')}
+                    style={{ 
+                        background: '#333', color: 'white', border: '1px solid #555', 
+                        padding: '8px', cursor: 'pointer', borderRadius: '4px', 
+                        fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                    }}
+                >
+                    <Network size={14} />
+                    {dataMode === 'mock' ? 'Switch to Real Data (NFB-RA)' : 'Switch to Mock Demo'}
+                </button>
+
+                {/* Validation Modes */}
+                <div style={{ fontSize: '12px', color: '#aaa', fontWeight: 'bold' }}>Animation Modes</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
+                    <button onClick={handleInject} style={{ background: animState.injecting ? '#44ff44' : '#333', color: animState.injecting ? '#000' : 'white', border: '1px solid #555', padding: '6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>
+                        Inject
+                    </button>
+                    <button onClick={handleTransport} style={{ background: animState.transporting ? '#4488ff' : '#333', color: 'white', border: '1px solid #555', padding: '6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>
+                        Transport
+                    </button>
+                    <button onClick={handleConstraint} style={{ background: animState.constraining ? '#ff4444' : '#333', color: 'white', border: '1px solid #555', padding: '6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>
+                        Manifold
+                    </button>
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '4px 0' }} />
+
+                {/* Surgery Toolkit */}
+                <div style={{ fontSize: '12px', color: '#ff6b6b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Scissors size={14} /> Manifold Surgery
+                </div>
+                
+                <button 
+                    onClick={() => setSurgeryMode(!surgeryMode)}
+                    style={{ 
+                        background: surgeryMode ? '#ff4444' : '#333', 
+                        color: 'white', 
+                        border: '1px solid #ff4444', 
+                        padding: '8px', 
+                        borderRadius: '4px', 
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                    }}
+                >
+                    {surgeryMode ? 'DISABLE SURGERY MODE' : 'ENABLE SURGERY MODE'}
+                </button>
+                
+                {surgeryMode && (
+                    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,0,0,0.1)', padding: '8px', borderRadius: '6px' }}>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            <button 
+                                onClick={() => setSurgeryTool('graft')}
+                                style={{ 
+                                    flex: 1,
+                                    background: surgeryTool === 'graft' ? '#4488ff' : '#222', 
+                                    color: 'white', border: '1px solid #4488ff', 
+                                    padding: '6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' 
+                                }}
+                            >
+                                Graft (Connect)
+                            </button>
+                            <button 
+                                onClick={() => setSurgeryTool('ablate')}
+                                style={{ 
+                                    flex: 1,
+                                    background: surgeryTool === 'ablate' ? '#ff4444' : '#222', 
+                                    color: 'white', border: '1px solid #ff4444', 
+                                    padding: '6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' 
+                                }}
+                            >
+                                Ablate (Cut)
+                            </button>
+                        </div>
+                        
+                        <button 
+                            onClick={() => performSurgery('clear', 0)}
+                            style={{ background: '#222', color: '#aaa', border: '1px solid #444', padding: '4px', borderRadius: '4px', fontSize: '10px', cursor: 'pointer' }}
+                        >
+                            Reset All Hooks
+                        </button>
+
+                        <div style={{ fontSize: '11px', color: '#aaa', fontStyle: 'italic', textAlign: 'center' }}>
+                            {surgeryTool === 'graft' && (selection.length === 0 ? "Select Source Node..." : "Select Target Node...")}
+                            {surgeryTool === 'ablate' && "Click a node to remove it."}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </SimplePanel>
 
         {/* 3D Scene */}
         <div style={{ flex: 1 }}>
@@ -132,13 +285,36 @@ const FiberNetV2Demo = ({ t }) => {
                         ))}
 
                         {/* Manifold Nodes (The Grid Points) */}
-                        {data.manifold_nodes?.map((node, i) => (
-                            <mesh key={node.id} position={node.pos}>
-                                <sphereGeometry args={[0.1, 16, 16]} />
-                                <meshStandardMaterial color={animState.constraining ? "#ff0000" : "#00ffff"} emissive={animState.constraining ? "#ff0000" : "#0044aa"} />
-                                <Text position={[0, -0.3, 0]} fontSize={0.2} color="#aaa">{node.id}</Text>
-                            </mesh>
-                        ))}
+                        {data.manifold_nodes?.map((node, i) => {
+                            const isSelected = selection.includes(node.id);
+                            const isSource = selection[0] === node.id;
+                            
+                            return (
+                                <mesh 
+                                    key={node.id} 
+                                    position={node.pos}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSurgeryClick(node.id);
+                                    }}
+                                    onPointerOver={(e) => {
+                                        e.stopPropagation();
+                                        if (surgeryMode) document.body.style.cursor = 'crosshair';
+                                    }}
+                                    onPointerOut={(e) => {
+                                        document.body.style.cursor = 'default';
+                                    }}
+                                >
+                                    <sphereGeometry args={[isSelected ? 0.15 : 0.1, 16, 16]} />
+                                    <meshStandardMaterial 
+                                        color={isSelected ? (isSource ? "#44ff44" : "#ffaa00") : (animState.constraining ? "#ff0000" : "#00ffff")} 
+                                        emissive={isSelected ? (isSource ? "#44ff44" : "#ffaa00") : (animState.constraining ? "#ff0000" : "#0044aa")}
+                                        emissiveIntensity={isSelected ? 1.0 : 0.5}
+                                    />
+                                    <Text position={[0, -0.3, 0]} fontSize={0.2} color="#aaa">{node.id}</Text>
+                                </mesh>
+                            );
+                        })}
 
                         {/* Fibers (Vertical Vectors) */}
                         {data.fibers?.map((fiber, i) => {

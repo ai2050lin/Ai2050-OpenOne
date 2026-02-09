@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import BrainVis3D from './BrainVis3D';
 
-const API_BASE = 'http://localhost:8888';
+const API_BASE = 'http://localhost:5000';
 
 // Layer Detail 3D Component - Shows internal structure of a layer
 // --- Validity Analysis Helper Components ---
@@ -740,6 +740,104 @@ export function FiberBundleVisualization3D({ result, t }) {
   );
 }
 
+// 3D Glass Matrix Visualization (NFB-RA Manifold + Fibers)
+export function GlassMatrix3D() {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(`${API_BASE}/nfb_ra/data`);
+                setData(res.data);
+            } catch (error) {
+                console.error("Glass Matrix Data Error:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) return <Text position={[0,0,0]} fontSize={1} color="white">Loading Matrix...</Text>;
+    if (!data || !data.manifold_nodes) return <Text position={[0,0,0]} fontSize={1} color="orange">No Manifold Data. Run NFB-RA Analysis.</Text>;
+
+    const { manifold_nodes, fibers, connections } = data;
+
+    return (
+        <group>
+             <Text position={[0, 10, 0]} fontSize={1} color="#00ffff" anchorX="center">
+                Glass Matrix: Neural Fiber Bundle
+            </Text>
+
+            {/* Manifold Nodes (Base Space) */}
+            {manifold_nodes.map((node, i) => (
+                <group key={node.id} position={node.pos}>
+                    {/* Node Sphere */}
+                    <mesh>
+                        <sphereGeometry args={[0.3, 16, 16]} />
+                        <meshStandardMaterial color="#00ffff" emissive="#0044aa" emissiveIntensity={0.5} />
+                    </mesh>
+                    
+                    {/* Base Grid/Plane connection - Visualizes the chart */}
+                    <mesh position={[0, -0.5, 0]} rotation={[-Math.PI/2, 0, 0]}>
+                        <planeGeometry args={[1.5, 1.5]} />
+                        <meshBasicMaterial color="#00ffff" transparent opacity={0.1} side={THREE.DoubleSide} />
+                    </mesh>
+                </group>
+            ))}
+
+            {/* Fibers (Vector Space) */}
+            {fibers && fibers.map((fiber, i) => {
+                // Find parent position
+                const parent = manifold_nodes.find(n => n.id === fiber.parent_id);
+                if (!parent) return null;
+                
+                return (
+                    <group key={i} position={parent.pos}>
+                        {/* Fiber Line */}
+                        <mesh position={[0, fiber.height/2, 0]}>
+                            <cylinderGeometry args={[0.05, 0.05, fiber.height, 8]} />
+                            <meshStandardMaterial color="#ff4444" emissive="#ff0000" emissiveIntensity={fiber.color_intensity} />
+                        </mesh>
+                        {/* Fiber Tip (Semantic Value) */}
+                        <mesh position={[0, fiber.height, 0]}>
+                            <sphereGeometry args={[0.15, 8, 8]} />
+                            <meshBasicMaterial color="#ffffff" />
+                        </mesh>
+                    </group>
+                );
+            })}
+
+            {/* Transport Connections (Parallel Transport) */}
+            {connections && connections.map((conn, i) => {
+                const source = manifold_nodes.find(n => n.id === conn.source);
+                const target = manifold_nodes.find(n => n.id === conn.target);
+                if (!source || !target) return null;
+
+                const points = [
+                    new THREE.Vector3(...source.pos),
+                    new THREE.Vector3(...source.pos).add(new THREE.Vector3(0, 2, 0)), // Control point 1
+                    new THREE.Vector3(...target.pos).add(new THREE.Vector3(0, 2, 0)), // Control point 2
+                    new THREE.Vector3(...target.pos)
+                ];
+                const curve = new THREE.CubicBezierCurve3(...points);
+                
+                return (
+                    <group key={i}>
+                        <mesh>
+                            <tubeGeometry args={[curve, 20, 0.05, 8, false]} />
+                            <meshBasicMaterial color="#ffff00" transparent opacity={0.4} />
+                        </mesh>
+                    </group>
+                );
+            })}
+            
+            <gridHelper args={[20, 20, 0x222222, 0x111111]} />
+        </group>
+    );
+}
+
 function AnimatedStreamParticles({ curve, count }) {
     const pointsRef = useRef();
     
@@ -1122,6 +1220,11 @@ function InfoPanel({ activeTab, t }) {
             title: "玻璃矩阵 (Glass Matrix)",
             desc: "以3D方式可视化神经纤维丛的拓扑结构。观察流形（Manifold）作为基础空间，以及附着其上的纤维（Fibers）作为语义空间。",
             tech: "NFB-RA, React Three Fiber"
+        },
+        flow_tubes: {
+            title: "深度动力学 (Deep Dynamics)",
+            desc: "可视化 Token 在深层网络中的演化轨迹。流管 (Flow Tubes) 显示了不同概念（如性别、情感）在层级间的几何变换路径。",
+            tech: "Neural ODE, Flow Tubes"
         }
     };
 
@@ -1304,11 +1407,12 @@ export function StructureAnalysisControls({
                  { id: 'circuit', icon: Network, label: '回路 (Circuit)' },
                  { id: 'features', icon: Sparkles, label: '特征 (Features)' },
                  { id: 'causal', icon: Brain, label: '因果 (Causal)' },
-                 { id: 'manifold', icon: Network, label: '流形 (Manifold)' },
                  { id: 'compositional', icon: Network, label: '组合 (Compos)' },
                  { id: 'agi', icon: Sparkles, label: '神经纤维丛 (Fiber)' },
+                 { id: 'tda', icon: Activity, label: '拓扑 (Topology)' },
                  { id: 'fibernet_v2', icon: Network, label: 'FiberNet V2 (Demo)' },
-                 { id: 'glass_matrix', icon: Network, label: '玻璃矩阵 (Glass)' }
+                 { id: 'glass_matrix', icon: Network, label: '玻璃矩阵 (Glass)' },
+                 { id: 'flow_tubes', icon: Activity, label: '动力学 (Dynamics)' }
               ] : [
                  { id: 'snn', icon: Brain, label: 'SNN 仿真' },
                  { id: 'validity', icon: Activity, label: '有效性 (Valid)' }
@@ -1335,6 +1439,43 @@ export function StructureAnalysisControls({
           <div style={{ padding: '16px', flex: 1 }}>
               
             {/* --- DNN Forms --- */}
+            {activeTab === 'tda' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="Topological Data Analysis (PH)">
+                        <div style={{color: '#aaa', fontSize: '13px', lineHeight: '1.5', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '12px'}}>
+                            <p style={{marginTop:0}}><strong>Persistent Homology</strong></p>
+                            <p>计算流形的贝蒂数 (Betti Numbers)，揭示拓扑孔洞结构。</p>
+                        </div>
+                    </ControlGroup>
+                    
+                    <ActionButton onClick={() => {
+                        setLoading(true);
+                        axios.get(`${API_BASE}/nfb_ra/tda`)
+                            .then(res => {
+                                onResultUpdate(res.data);
+                                setLoading(false);
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                setLoading(false);
+                                alert("Failed to fetch TDA results");
+                            });
+                    }} loading={loading} icon={Activity}>
+                        获取拓扑特征 (Get Betti Numbers)
+                    </ActionButton>
+                    
+                    {/* Inline Results for TDA (since it's simple) */}
+                    {activeTab === 'tda' && autoResult && autoResult.ph_0d && (
+                        <div style={{ mt: 2, padding: '10px', background: '#222', borderRadius: '6px', fontSize: '12px', color: '#ddd' }}>
+                            <div><strong>0-dim (Components):</strong> {autoResult.ph_0d.length} (Connected)</div>
+                            <div><strong>1-dim (Loops):</strong> {autoResult.ph_1d.length} (Holes found)</div>
+                            <div style={{ marginTop: '8px', fontSize: '10px', color: '#888' }}>
+                                TDA results loaded from backend.
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
             {activeTab === 'circuit' && (
               <div className="animate-fade-in">
                 <ControlGroup label={t('structure.circuit.cleanPrompt')}>
@@ -1448,6 +1589,26 @@ export function StructureAnalysisControls({
                     <div style={{marginTop: '12px', fontSize: '11px', color: '#666', textAlign: 'center'}}>
                         提示: 如需生成新数据，请运行 backend 脚本 experiments/nfb_ra_qwen.py
                     </div>
+                </div>
+            )}
+
+            {activeTab === 'flow_tubes' && (
+                <div className="animate-fade-in">
+                     <ControlGroup label="Deep Dynamics Visualization">
+                        <div style={{color: '#aaa', fontSize: '13px', lineHeight: '1.5', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '12px'}}>
+                            <p style={{marginTop:0}}><strong>Deep Dynamics Flow Tubes</strong></p>
+                            <p>展示 Transformer 内部的几何动力学轨迹。</p>
+                            <ul style={{paddingLeft: '20px', margin: '10px 0'}}>
+                                <li style={{marginBottom:'4px'}}><strong style={{color:'#3498db'}}>Male (Blue):</strong> 男性概念子空间演化</li>
+                                <li style={{marginBottom:'4px'}}><strong style={{color:'#e74c3c'}}>Female (Red):</strong> 女性概念子空间演化</li>
+                                <li><strong style={{color:'#2ecc71'}}>Positive (Green):</strong> 情感极性演化</li>
+                            </ul>
+                        </div>
+                    </ControlGroup>
+                    
+                    <ActionButton onClick={() => window.location.reload()} loading={loading} icon={RotateCcw}>
+                        刷新数据 (Refresh Data)
+                    </ActionButton>
                 </div>
             )}
 

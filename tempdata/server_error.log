@@ -1,0 +1,41 @@
+Error in analyze_text: The size of tensor a (2048) must match the size of tensor b (0) at non-singleton dimension 3
+Traceback (most recent call last):
+  File "D:\develop\TransformerLens-main/server.py", line 304, in analyze_text
+    logits, cache = model.run_with_cache(request.prompt)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\HookedTransformer.py", line 702, in run_with_cache
+    out, cache_dict = super().run_with_cache(
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\hook_points.py", line 560, in run_with_cache
+    model_out = self(*model_args, **model_kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\HookedTransformer.py", line 620, in forward
+    residual = block(
+               ^^^^^^
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\components\transformer_block.py", line 160, in forward
+    self.attn(
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\develop\TransformerLens-main\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\components\abstract_attention.py", line 266, in forward
+    attn_scores = self.apply_causal_mask(
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\develop\TransformerLens-main\transformer_lens\components\abstract_attention.py", line 516, in apply_causal_mask
+    return torch.where(final_mask, attn_scores, self.IGNORE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: The size of tensor a (2048) must match the size of tensor b (0) at non-singleton dimension 3

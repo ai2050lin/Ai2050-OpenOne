@@ -1,0 +1,23 @@
+Loading gpt2...
+Loaded pretrained model gpt2 into HookedTransformer
+
+--- Analyzing Riemannian Orthogonalization (Layer 6) ---
+Extracting vectors...
+Entanglement (Gender vs Profession): 0.4396
+
+Baseline:
+  P('she'): 0.045826
+  P('nurse'): 0.000031
+
+Naive Steering (+Gender):
+  P('she'): 0.068623
+  P('nurse'): 0.000035
+
+Riemannian Steering (+Orthogonal Gender):
+  P('she'): 0.064357
+  P('nurse'): 0.000033
+
+--- Conclusion ---
+Hallucination (Naive): 0.000004
+Hallucination (Riemann): 0.000002
+SUCCESS: Riemannian Orthogonalization reduced hallucination.

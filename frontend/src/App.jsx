@@ -5,14 +5,16 @@ import { Brain, HelpCircle, Loader2, RotateCcw, Search, Settings, X } from 'luci
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
+import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
 import { SimplePanel } from './SimplePanel';
 import { CompositionalVisualization3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
+import TDAVisualization3D from './TDAVisualization3D';
 import FiberNetV2Demo from './components/FiberNetV2Demo';
 
 import { locales } from './locales';
 
-const API_BASE = 'http://localhost:8888';
+const API_BASE = 'http://localhost:5000';
 
 
 
@@ -408,8 +410,273 @@ function GlobalConfigPanel({ visibility, onToggle, onClose, onReset, lang, onSet
   );
 }
 
+const ALGO_DOCS = {
+    // --- Architecture ---
+    'architect': {
+        title: 'Transformer 架构 (Architecture)',
+        simple: {
+            title: 'Transformer 就像一个超级工厂',
+            desc: '想象你在读一本书，你的大脑在做两件事：',
+            points: [
+                '👀 注意力机制 (Attention): 当你读到“它”这个字时，你会回头看前面的句子，找找“它”指代的是“小猫”还是“桌子”。在界面中：这就好比那些连接线，显示了 AI 在关注哪些词。',
+                '🧠 记忆网络 (MLP): 这就像个巨大的知识库。读到“巴黎”，你会立刻联想到“法国”、“埃菲尔铁塔”。在界面中：这就好比每一层里面密密麻麻的神经元被激活了。'
+            ]
+        },
+        pro: {
+            title: 'Transformer Blocks',
+            desc: 'Transformer 由多个堆叠的 Block 组成，每个 Block 包含两个主要子层：',
+            points: [
+                'Multi-Head Self-Attention (MHSA): 允许模型关注不同位置的 token，捕捉长距离依赖。',
+                'Feed-Forward Network (MLP): 逐位置处理信息，通常被认为存储了事实性知识 (Knowledge Storage)。',
+                'Residual Connections & LayerNorm: 缓解梯度消失，稳定训练。'
+            ],
+            formula: 'Block(x) = x + MHSA(LN1(x)) + MLP(LN2(x + MHSA(...)))'
+        }
+    },
+    // --- Circuit ---
+    'circuit': {
+        title: '回路发现 (Circuit Discovery)',
+        simple: {
+            title: '寻找 AI 的“电路图”',
+            desc: '就像拆开收音机看电路板一样，我们试图找出 AI 大脑里具体是哪几根线在负责“把英语翻译成中文”或者“做加法”。',
+            points: [
+                '节点 (Node): 就像电路板上的元件（电容、电阻），这里指某个特定的注意力头。',
+                '连线 (Edge): 就像导线，显示了信息是如何从一个元件流向另一个元件的。红色线表示促进，蓝色线表示抑制。'
+            ]
+        },
+        pro: {
+            title: 'Edge Attribution Patching (EAP)',
+            desc: 'EAP 是一种快速定位对特定任务有贡献的子网络（Circuit）的方法。它基于线性近似，无需多次运行模型。',
+            points: [
+                '原理: 通过计算梯度 (Gradient) 和激活值 (Activation) 的逐元素乘积，估算每条边被切断后对损失函数的影响。',
+                '优势: 计算成本低（只需一次前向+反向传播），适合大规模分析。'
+            ],
+            formula: 'Attribution(e) = ∇_e Loss * Activation(e)'
+        }
+    },
+    // --- Features ---
+    'features': {
+        title: '稀疏特征 (Sparse Features)',
+        simple: {
+            title: '破译 AI 的“脑电波”',
+            desc: 'AI 内部有成千上万个神经元同时在闪烁，很难看懂。我们用一种特殊的解码器（SAE），把这些乱闪的信号翻译成人类能懂的概念。',
+            points: [
+                '特征 (Feature): 比如“检测到法语”、“发现代码错误”、“感受到愤怒情绪”。',
+                '稀疏性 (Sparsity): 大脑在某一时刻只有少数几个概念是活跃的（比如你现在在想“苹果”，就不会同时想“打篮球”）。'
+            ]
+        },
+        pro: {
+            title: 'Sparse Autoencoders (SAE)',
+            desc: 'SAE 是一种无监督学习技术，用于将稠密的 MLP 激活分解为稀疏的、可解释的过完备基 (Overcomplete Basis)。',
+            points: [
+                'Encoder: 将激活 x 映射到高维稀疏特征 f。',
+                'Decoder: 尝试从 f 重构原始激活 x。',
+                'L1 Penalty: 强制绝大多数特征 f 为 0，确保稀疏性。'
+            ],
+            formula: 'L = ||x - W_dec(f)||^2 + λ||f||_1, where f = ReLU(W_enc(x) + b)'
+        }
+    },
+    // --- Causal ---
+    'causal': {
+        title: '因果分析 (Causal Analysis)',
+        simple: {
+            title: '谁是真正的幕后推手？',
+            desc: '为了搞清楚 AI 到底是怎么通过“巴黎”联想到“法国”的，我们像做手术一样，尝试阻断或修改某些神经元的信号，看看结果会不会变。',
+            points: [
+                '干预 (Intervention): 如果我们把“巴黎”这个信号屏蔽掉，AI 还能说出“法国”吗？如果不能，说明这个信号很关键。',
+                '因果链 (Causal Chain): 像侦探一样，一步步追踪信息流动的路径。'
+            ]
+        },
+        pro: {
+            title: 'Causal Mediation Analysis',
+            desc: '通过干预（Intervention）技术，测量特定组件对模型输出的因果效应。',
+            points: [
+                'Ablation (消融): 将某组件的输出置零或替换为平均值，观察 Logits 变化。',
+                'Activation Patching (激活修补): 将组件在“干净输入”下的激活值替换为“受损输入”下的值，观察能否恢复错误输出，或反之。'
+            ],
+            formula: 'Do-Calculus: P(Y | do(X=x))'
+        }
+    },
+    // --- Manifold ---
+    'manifold': {
+        title: '流形几何 (Manifold Geometry)',
+        simple: {
+            title: '思维的形状',
+            desc: '如果把每个词都看作空间里的一个点，那么所有合理的句子就会形成一个特定的形状（流形）。',
+            points: [
+                '数据云: 看起来像一团乱麻的点阵。',
+                '主成分 (PCA): 找出这团乱麻的主要延伸方向（比如长、宽、高），帮我们在 3D 屏幕上画出来。',
+                '聚类:意思相近的词（如“猫”、“狗”）会聚在一起。'
+            ]
+        },
+        pro: {
+            title: 'Activation Manifold & ID',
+            desc: '分析激活向量空间 (Activation Space) 的几何拓扑性质。',
+            points: [
+                'Intrinsic Dimensionality (ID): 测量数据流形的有效自由度。Transformer 的深层往往表现出低维流形结构（流形坍缩）。',
+                'PCA Projection: 将高维激活 (d_model) 投影到 3D 空间以进行可视化。',
+                'Trajectory: Token 在层与层之间的演化路径。'
+            ],
+            formula: 'PCA: minimize ||X - X_k||_F^2'
+        }
+    },
+    // --- Compositional ---
+    'compositional': {
+        title: '组合泛化 (Compositionality)',
+        simple: {
+            title: '乐高积木式的思维',
+            desc: 'AI 没见过的句子它也能懂，因为它学会了“拼积木”。',
+            points: [
+                '原子概念: 像乐高积木块（"红色的"、"圆的"、"球"）。',
+                '组合规则: 怎么拼在一起（"红色的球" vs "圆的红色"）。',
+                '泛化: 只要学会了规则，就能拼出从未见过的形状。'
+            ]
+        },
+        pro: {
+            title: 'Compositional Generalization',
+            desc: '评估模型将已知组件（原语）组合成新颖结构的能力。',
+            points: [
+                'Systematicity: 理解句法结构独立于语义内容（如 "John loves Mary" vs "Mary loves John"）。',
+                'Subspace Alignment: 检查表示不同属性（如颜色、形状）的子空间是否正交。'
+            ]
+        }
+    },
+    // --- AGI / Fiber / Glass ---
+    'agi': {
+        title: '神经纤维丛 (Neural Fiber Bundle)',
+        simple: {
+            title: 'AGI 的数学蓝图',
+            desc: '这是我们提出的一个全新理论：大模型不仅仅是在预测下一个词，它实际上是在构建一个复杂的几何结构——纤维丛。',
+            points: [
+                '底流形 (Base Manifold): 代表逻辑和语法骨架（深蓝色网格）。',
+                '纤维 (Fiber): 代表附着在骨架上的丰富语义（红色向量）。',
+                '平行移动: 推理过程就是把语义沿着逻辑骨架移动。'
+            ]
+        },
+        pro: {
+            title: 'Neural Fiber Bundle Theory (NFB)',
+            desc: '将 LLM 的表示空间建模为数学纤维丛 (Fiber Bundle) E -> M。',
+            points: [
+                'Base Space M: 句法/逻辑流形，捕捉结构信息。',
+                'Fiber F: 语义向量空间，捕捉具体内容。',
+                'Connection (Transport): 注意力机制充当联络 (Connection)，定义了纤维之间的平行移动 (Parallel Transport)，即推理过程。'
+            ],
+            formula: 'E = M × F (Locally Trivial)'
+        }
+    },
+    'glass_matrix': {
+        title: '玻璃矩阵 (Glass Matrix)',
+        simple: {
+            title: '透明的大脑',
+            desc: '这是纤维丛理论的直观展示。我们把复杂的数学结构变成了一个像玻璃一样透明、有序的矩阵。',
+            points: [
+                '青色球体: 逻辑节点。',
+                '红色短棍: 每一根棍子代表一种含义。',
+                '黄色连线: 它们之间的推理关系。'
+            ]
+        },
+        pro: {
+            title: 'Glass Matrix Visualization',
+            desc: 'NFB 理论的静态结构可视化。',
+            points: [
+                'Manifold Nodes: 显示拓扑结构 (Topology)。',
+                'Vector Fibers: 显示局部切空间 (Tangent Space) 的语义方向。',
+                'Geodesic Paths: 显示潜在的推理路径。'
+            ]
+        }
+    },
+    'flow_tubes': {
+        title: '深度动力学 (Deep Dynamics)',
+        simple: {
+            title: '思维的过山车',
+            desc: '这就好比给 AI 的思考过程拍了一段录像。',
+            points: [
+                '流管 (Tube): 每一根管子代表一句话的思考轨迹。',
+                '颜色: 代表不同的语义类别（比如男性/女性）。',
+                '收敛: 不管你开始怎么想，最后的结论往往会汇聚到同一个地方。'
+            ]
+        },
+        pro: {
+            title: 'Deep Dynamics & Trajectories',
+            desc: '将层间变换视为动力系统 (Dynamical System) 的演化轨迹。',
+            points: [
+                'Trajectory: h_{l+1} = h_l + f(h_l)，视为离散时间的动力系统。',
+                'Attractor: 观察轨迹是否收敛到特定的不动点或极限环。',
+                'Flow Tubes: 相似输入的轨迹束。'
+            ],
+            formula: 'dh/dt = F(h, θ)'
+        }
+    },
+    // --- SNN ---
+    'snn': {
+        title: '脉冲神经网络 (SNN)',
+        simple: {
+            title: '仿生大脑',
+            desc: '模仿生物大脑“放电”的机制。',
+            points: [
+                '脉冲 (Spike): 神经元只有积攒了足够的电量，才会“哔”地发一次信号。更节能，更像人脑。',
+                'STDP: “早起的鸟儿有虫吃”——如果 A 经常在 B 之前叫，A 对 B 的影响就会变大。'
+            ]
+        },
+        pro: {
+            title: 'Spiking Neural Networks',
+            desc: '第三代神经网络，使用离散脉冲进行通信。',
+            points: [
+                'LIF Neuron: Leaky Integrate-and-Fire 模型。包含膜电位积分、泄漏和阈值发放。',
+                'STDP: Spike-Timing-Dependent Plasticity，基于脉冲时序的无监督学习规则。',
+                'Energy Efficiency: 具有极高的理论能效比。'
+            ],
+            formula: 'τ * dv/dt = -(v - v_rest) + R * I(t)'
+        }
+    },
+    'validity': {
+        title: '有效性验证 (Validity)',
+        simple: {
+            title: '这真的靠谱吗？',
+            desc: '我们用各种数学指标来给 AI 的“健康状况”打分。',
+            points: [
+                '困惑度 (PPL): AI 对自己说的话有多大把握？越低越好。',
+                '熵 (Entropy): AI 的思维有多发散？'
+            ]
+        },
+        pro: {
+            title: 'Validity Metrics',
+            desc: '评估模型表示质量和一致性的定量指标。',
+            points: [
+                'Perplexity: exp(CrossEntropy)。衡量预测的确定性。',
+                'Cluster Validity: Silhouette Score 等，衡量表示空间的聚类质量。',
+                'Smoothness: 轨迹的光滑程度。'
+            ]
+        }
+    },
+    // --- TDA ---
+    'tda': {
+        title: '拓扑数据分析 (Topological Data Analysis)',
+        simple: {
+            title: 'AI 思维的"孔洞"和"连通"',
+            desc: '如果把 AI 的思维空间想象成一块橡皮泥捏成的形状，拓扑学就是研究这个形状有多少个洞、有几块碎片的科学。',
+            points: [
+                '🔵 连通分量 (β₀): 这团橡皮泥是一整块还是碎成了好几块？数字越大，说明 AI 的"概念簇"越分散。',
+                '🔴 环/孔洞 (β₁): 形状里有没有像甜甜圈一样的洞？这代表了语义关系中的"循环依赖"，比如 A→B→C→A。',
+                '📊 条形码 (Barcode): 每根横条代表一个特征的"寿命"——什么时候出现，什么时候消失。越长的条越稳定、越重要。'
+            ]
+        },
+        pro: {
+            title: 'Persistent Homology (持久同调)',
+            desc: '通过代数拓扑工具分析激活空间的全局结构，揭示传统几何方法无法捕捉的拓扑不变量。',
+            points: [
+                'Betti Numbers (贝蒂数): β₀ 计算连通分量数，β₁ 计算 1 维环数，β₂ 计算空腔数。',
+                'Persistence Diagram: 记录每个拓扑特征的诞生和消亡时间，持久性高的特征代表鲁棒结构。',
+                'Rips Complex: 基于点云距离构建的单纯复形，用于近似流形拓扑。'
+            ],
+            formula: 'Hₖ(X) = ker(∂ₖ) / im(∂ₖ₊₁), βₖ = dim(Hₖ)'
+        }
+    }
+};
+
 export default function App() {
   const [lang, setLang] = useState('zh');
+  const [helpTab, setHelpTab] = useState('architect'); // Selected tab in Help Modal
   const t = (key, params = {}) => {
     const keys = key.split('.');
     let val = locales[lang];
@@ -1427,285 +1694,135 @@ export default function App() {
                  onClick={e => e.stopPropagation()}
                  style={{
                     background: '#1a1a1f', border: '1px solid #333', borderRadius: '12px',
-                    width: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                    width: '900px', height: '80vh', display: 'flex', overflow: 'hidden',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
                  }}
               >
-                  <div style={{ padding: '16px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                          <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff', margin: 0 }}>
-                              {systemType === 'snn' ? 'SNN 原理说明' : '模型架构说明'}
+                  {/* LEFT SIDEBAR */}
+                  <div style={{ width: '220px', background: 'rgba(0,0,0,0.3)', borderRight: '1px solid #333', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ padding: '20px', borderBottom: '1px solid #333', fontWeight: 'bold', color: '#fff', fontSize: '16px' }}>
+                          📚 算法指南
+                      </div>
+                      <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+                          {[
+                              { id: 'architect', label: '模型架构 (Architecture)', icon: '🏗️' },
+                              { type: 'sep' },
+                              { id: 'circuit', label: '回路发现 (Circuit)', icon: '🔌' },
+                              { id: 'features', label: '稀疏特征 (SAE)', icon: '💎' },
+                              { id: 'causal', label: '因果分析 (Causal)', icon: '🎯' },
+                              { id: 'manifold', label: '流形几何 (Manifold)', icon: '🗺️' },
+                              { id: 'compositional', label: '组合泛化 (Compos)', icon: '🧩' },
+                              { type: 'sep' },
+                              { id: 'agi', label: '神经纤维丛 (Fiber)', icon: '🌌' },
+                              { id: 'glass_matrix', label: '玻璃矩阵 (Glass)', icon: '🧊' },
+                              { id: 'flow_tubes', label: '动力学 (Dynamics)', icon: '🌊' },
+                              { type: 'sep' },
+                              { id: 'snn', label: '脉冲网络 (SNN)', icon: '🧠' },
+                              { id: 'validity', label: '有效性 (Validity)', icon: '📉' },
+                          ].map((item, idx) => (
+                              item.type === 'sep' ? 
+                                <div key={idx} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 0' }} /> :
+                                <button
+                                  key={item.id}
+                                  onClick={() => setHelpTab(item.id)}
+                                  style={{
+                                      width: '100%', textAlign: 'left', padding: '10px',
+                                      background: helpTab === item.id ? 'rgba(68, 136, 255, 0.2)' : 'transparent',
+                                      color: helpTab === item.id ? '#fff' : '#888',
+                                      border: 'none', borderRadius: '6px', cursor: 'pointer',
+                                      fontSize: '13px', marginBottom: '2px',
+                                      fontWeight: helpTab === item.id ? '600' : '400',
+                                      transition: 'all 0.2s',
+                                      display: 'flex', alignItems: 'center'
+                                  }}
+                                >
+                                    <span style={{ marginRight: '8px' }}>{item.icon}</span>
+                                    {item.label}
+                                </button>
+                          ))}
+                      </div>
+                  </div>
+
+                  {/* RIGHT CONTENT */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Header */}
+                      <div style={{ padding: '16px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#fff', margin: 0 }}>
+                              {ALGO_DOCS[helpTab]?.title || '算法说明'}
                           </h2>
-                          <div style={{ display: 'flex', background: '#000', borderRadius: '6px', padding: '2px', border: '1px solid #333' }}>
-                              <button 
-                                onClick={() => setHelpMode('pro')}
-                                style={{ 
-                                    padding: '4px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold',
-                                    background: helpMode === 'pro' ? '#764ba2' : 'transparent', color: helpMode === 'pro' ? '#fff' : '#888', transition: 'all 0.2s'
-                                }}
-                              >
-                                🟣 专业版 (Pro)
-                              </button>
-                              <button 
-                                onClick={() => setHelpMode('simple')}
-                                style={{ 
-                                    padding: '4px 12px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold',
-                                    background: helpMode === 'simple' ? '#4488ff' : 'transparent', color: helpMode === 'simple' ? '#fff' : '#888', transition: 'all 0.2s'
-                                }}
-                              >
-                                🟢 通俗版 (General)
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                              <div style={{ display: 'flex', background: '#000', borderRadius: '6px', padding: '2px', border: '1px solid #333' }}>
+                                  <button 
+                                    onClick={() => setHelpMode('simple')}
+                                    style={{ 
+                                        padding: '6px 16px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold',
+                                        background: helpMode === 'simple' ? '#4488ff' : 'transparent', color: helpMode === 'simple' ? '#fff' : '#888', transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    🟢 通俗版
+                                  </button>
+                                  <button 
+                                    onClick={() => setHelpMode('pro')}
+                                    style={{ 
+                                        padding: '6px 16px', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold',
+                                        background: helpMode === 'pro' ? '#764ba2' : 'transparent', color: helpMode === 'pro' ? '#fff' : '#888', transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    🟣 专业版
+                                  </button>
+                              </div>
+                              <button onClick={() => setShowHelp(false)} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px' }}>
+                                  <X size={24} />
                               </button>
                           </div>
                       </div>
-                      <button onClick={() => setShowHelp(false)} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer' }}>
-                          <X size={20} />
-                      </button>
-                  </div>
-                  <div style={{ padding: '20px', overflowY: 'auto', lineHeight: '1.6', fontSize: '13px', color: '#ddd' }}>
-                       {helpMode === 'simple' ? (
-                           // ================== SIMPLIFIED VIEW ==================
-                           systemType === 'snn' ? (
-                              <>
-                                 <h3 style={{fontSize: '18px', marginTop: 0, color: '#4ecdc4'}}>就像大脑在“跳舞”</h3>
-                                 <p>脉冲神经网络 (SNN) 模仿了真实生物大脑的工作方式。想象一下：</p>
-                                 <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '13px', lineHeight: '1.8' }}>
-                                     <li><strong>蓄水杯 (神经元)：</strong> 每个神经元像一个小杯子。外界的信息像水一样滴进去。</li>
-                                     <li><strong>溢出 (发射脉冲)：</strong> 当水装满时，杯子就会“哗”地一下倒空（发射电信号），并通知下游的杯子。</li>
-                                     <li><strong>遗忘 (泄漏)：</strong> 如果水滴得太慢，杯底的小洞会让水慢慢漏光。这意味着只有<strong>强烈且频繁</strong>的信号才能被记住。</li>
-                                     <li><strong>默契 (STDP 学习)：</strong> 如果两个神经元经常先后“倒水”，它们之间的管道就会变粗（连接变强）。这就是“熟能生巧”的原理。</li>
-                                 </ul>
-                              </>
-                           ) : (
-                              <>
-                                 {(structureTab === 'agi' || structureTab === 'fiber') ? (
-                                    <>
-                                        <h3 style={{fontSize: '18px', marginTop: 0, color: '#00d2ff'}}>看见思维的“形状”</h3>
-                                        <p>我们通常觉得 AI 是个黑盒，但这个 3D 模型试图把 AI 思考的过程画出来。</p>
-                                        
-                                        <div style={{ background: 'rgba(0, 210, 255, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid rgba(0, 210, 255, 0.3)', marginBottom: '20px' }}>
-                                            <h4 style={{ margin: '0 0 10px 0', color: '#fff' }}>🔵 青色管道 (思维滑梯)</h4>
-                                            <p style={{ margin: 0, fontSize: '13px', color: '#ccc' }}>
-                                                这就是**思维流动的路径**。当你输入一句话，它就像坐滑梯一样，沿着这个管道一路滑下去，最后变成生成的回复。管道弯弯曲曲，代表 AI 在不断调整和加工这句话的意思。
-                                            </p>
-                                        </div>
+                      {/* Scrollable Content */}
+                      <div style={{ padding: '30px', overflowY: 'auto', flex: 1, lineHeight: '1.8', fontSize: '14px', color: '#ddd' }}>
+                           {(() => {
+                               const doc = ALGO_DOCS[helpTab];
+                               if (!doc) return <div style={{color:'#666', fontStyle:'italic'}}>暂无说明文档</div>;
 
-                                        <div style={{ background: 'rgba(255, 68, 68, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid rgba(255, 68, 68, 0.3)', marginBottom: '20px' }}>
-                                            <h4 style={{ margin: '0 0 10px 0', color: '#fff' }}>🔴 红色光环 (含义的丰富度)</h4>
-                                            <p style={{ margin: 0, fontSize: '13px', color: '#ccc' }}>
-                                                你可以把它看作**“弦外之音”**。
-                                                <br/>
-                                                有些词很简单（如“桌子”），光环就很小。
-                                                <br/>
-                                                有些词很复杂（如“苹果”可能指水果，也可能指公司），光环就会很大、很红。这代表 AI 在这里犹豫了一下，考虑了多种可能性。
-                                            </p>
-                                        </div>
+                               const content = helpMode === 'simple' ? doc.simple : doc.pro;
+                               return (
+                                   <div className="animate-fade-in">
+                                       <h3 style={{ fontSize: '20px', color: helpMode === 'simple' ? '#4ecdc4' : '#a29bfe', marginTop: 0, marginBottom: '20px' }}>
+                                           {content.title}
+                                       </h3>
+                                       
+                                       <div style={{ marginBottom: '24px' }}>
+                                           {content.desc}
+                                       </div>
 
-                                        <div style={{ background: 'rgba(68, 136, 255, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid rgba(68, 136, 255, 0.3)' }}>
-                                            <h4 style={{ margin: '0 0 10px 0', color: '#fff' }}>🟦 蓝色方块 (语法骨架)</h4>
-                                            <p style={{ margin: 0, fontSize: '13px', color: '#ccc' }}>
-                                                这是句子的**骨架**。无论你说什么内容，都需要主语、谓语、宾语这些结构来支撑。蓝色方块确保了 AI 说的人话是通顺的，合乎语法的。
-                                            </p>
-                                        </div>
-                                    </>
-                                 ) : (
-                                    <>
-                                        <h3 style={{fontSize: '18px', marginTop: 0, color: '#fff'}}>Transformer 就像一个超级工厂</h3>
-                                        <p>想象你在读一本书，你的大脑在做两件事：</p>
-                                        <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '13px', lineHeight: '1.8' }}>
-                                            <li style={{marginBottom:'10px'}}>
-                                                <strong>👀 注意力机制 (Attention)：</strong> 
-                                                <br/>
-                                                当你读到“它”这个字时，你会回头看前面的句子，找找“它”指代的是“小猫”还是“桌子”。
-                                                <br/>
-                                                <span style={{color:'#00d2ff'}}>在界面中：这就好比那些连接线，显示了 AI 在关注哪些词。</span>
-                                            </li>
-                                            <li>
-                                                <strong>🧠 记忆网络 (MLP)：</strong>
-                                                <br/>
-                                                这就像个巨大的知识库。读到“巴黎”，你会立刻联想到“法国”、“埃菲尔铁塔”。
-                                                <br/>
-                                                <span style={{color:'#5ec962'}}>在界面中：这就好比每一层里面密密麻麻的神经元被激活了。</span>
-                                            </li>
-                                        </ul>
-                                    </>
-                                 )}
-                              </>
-                           )
+                                       {content.points && (
+                                           <ul style={{ paddingLeft: '20px', color: '#ccc', marginBottom: '24px' }}>
+                                               {content.points.map((p, i) => (
+                                                   <li key={i} style={{ marginBottom: '10px' }}>{p}</li>
+                                               ))}
+                                           </ul>
+                                       )}
 
-                       ) : (
-                           // ================== PROFESSIONAL VIEW ==================
-                           systemType === 'snn' ? (
-                              <>
-                                 <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 专业原理解析 (Professional)</div>
-                                 <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>1. 核心模型：Leaky Integrate-and-Fire (LIF)</h3>
-                                 <p>
-                                     SNN 模拟了生物神经元的电生理特性。每个神经元维护一个<strong>膜电位 (Membrane Potential, v)</strong>，遵循以下差分方程：
-                                 </p>
-                                 <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                     v[t] = v[t-1] × (1 - dt/τ) + Σ(I_ext + Σ w_ij ⋅ x_j)
-                                 </div>
-                                 <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                     <li><strong>积分与泄漏：</strong> 电位随输入增加，随时间常数 τ 衰减。</li>
-                                     <li><strong>发放与重置：</strong> 超过阈值时发放脉冲 (Spike) 并重置电位。</li>
-                                     <li><strong>STDP 学习：</strong> 时间相关的突触可塑性，根据脉冲因果调整权重。</li>
-                                 </ul>
-                              </>
-                           ) : (
-                              <>
-                                 <div style={{ color: '#4ecdc4', fontWeight: 'bold', borderBottom: '1px solid rgba(78, 205, 196, 0.2)', paddingBottom: '4px', marginBottom: '10px' }}>[A] 当前分析算法解析 (Algorithm: {structureTab.toUpperCase()})</div>
-                                 
-                                 {structureTab === 'circuit' && (
-                                     <div>
-                                         <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Edge Attribution Patching (EAP)</h3>
-                                         <p>一种快速定位对特定任务有贡献的电路（子网络）的方法。</p>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             Attribution(e) = ∇_e Loss * Activation(e)
-                                         </div>
-                                         <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                             <li><strong>原理：</strong> 线性近似。通过梯度和激活值的逐元素乘积，估算每条边被切断后对损失函数的影响。</li>
-                                             <li><strong>计算：</strong> 前向传播一次获取激活，反向传播一次获取梯度，无需多次运行模型。</li>
-                                         </ul>
-                                         
-                                         <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
-                                         <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>节点 (Spheres):</strong> 模型组件（注意力头或MLP神经元）。大小代表该组件的重要性或激活强度。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>连线 (Lines):</strong> 因果归因路径。
-                                                 <br/><span style={{fontSize:'10px', color:'#888'}}>· 红色 = 正向贡献 (Excitation)</span>
-                                                 <br/><span style={{fontSize:'10px', color:'#888'}}>· 蓝色 = 负向抑制 (Inhibition)</span>
-                                                 <br/><span style={{fontSize:'10px', color:'#888'}}>· 粗细 = 归因值大小 (Gradient * Activation)</span>
-                                             </li>
-                                         </ul>
-                                     </div>
-                                 )}
-
-                                 {structureTab === 'features' && (
-                                     <div>
-                                         <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Sparse Autoencoders (SAE)</h3>
-                                         <p>将稠密的神经网络激活分解为稀疏的、可解释的“特征”。</p>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             Min ||x - W_dec(ReLU(W_enc(x) + b))||² + λ||f||₁
-                                         </div>
-                                         <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                             <li><strong>编码器：</strong> 将激活 x 映射到高维稀疏特征 f。</li>
-                                             <li><strong>解码器：</strong> 尝试从 f 重构原始激活 x。</li>
-                                             <li><strong>L1 正则化：</strong> 强制绝大多数特征 f 为 0，确保稀疏性（可解释性的关键）。</li>
-                                         </ul>
-                                         
-                                         <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
-                                         <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>特征点 (Points/Voxels):</strong> 活跃的稀疏特征。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>坐标 (Position):</strong> 如果使用了降维（如 t-SNE），代表特征间的语义相似度。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>颜色/大小:</strong> 代表特征的激活强度 (Activation Magnitude)。更亮或更大的点表示该特征对当前输入的响应更强烈。
-                                             </li>
-                                         </ul>
-                                     </div>
-                                 )}
-
-                                 {structureTab === 'manifold' && (
-                                     <div>
-                                         <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Intrinsic Dimensionality (ID)</h3>
-                                         <p>测量数据云在高维空间中的实际形状复杂度和有效自由度。</p>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             PR = (Σ λ_i)² / Σ (λ_i²)
-                                         </div>
-                                         <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                             <li><strong>PCA：</strong> 主成分分析，通过协方差矩阵特征分解寻找主方向。</li>
-                                             <li><strong>参与率 (PR)：</strong> 数值越低，表示激活主要集中在少数几个方向上（流形坍缩/低维结构）。</li>
-                                         </ul>
-
-                                         <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping)</div>
-                                         <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>散点 (Scatter Points):</strong> 输入序列中的每个 Token 的激活向量。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>空间轴 (XYZ Axes):</strong> 前三个主成分 (PC1, PC2, PC3)。这三个方向保留了数据方差最大的信息。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>聚类 (Clusters):</strong> 空间中相邻的点往往代表语义或语法功能相似的 Token。
-                                             </li>
-                                         </ul>
-                                     </div>
-                                 )}
-
-                                 {(structureTab === 'agi' || structureTab === 'fiber') && (
-                                     <div>
-                                         <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Neural Fiber Bundle Reconstruction (NFB-RA)</h3>
-                                         <p>基于“AGI 统一场论”，逆向还原大模型内部的数学几何结构。</p>
-                                         
-                                         <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 1: RSA 流形分离 (Manifold Extraction)</h4>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             Score = RSA(Syn) / (RSA(Sem) + ε)
-                                         </div>
-                                         <p style={{fontSize:'12px', color:'#aaa'}}>比较层对“同句法异义”和“同义异句法”的敏感度。高分层为底流形 M（逻辑），低分层为纤维 F（语义）。</p>
-
-                                         <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 2: 纤维基底提取 (Fiber Basis)</h4>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             Basis = PCA(Perturb(Meaning))
-                                         </div>
-                                         <p style={{fontSize:'12px', color:'#aaa'}}>在语义层引入微扰，通过局部 PCA 提取出表达该概念的切空间基底向量 F_p。</p>
-
-                                         <h4 style={{fontSize: '13px', color: '#4ecdc4'}}>Phase 3: 联络动力学 (Connection Dynamics)</h4>
-                                         <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             ∇_X Y ≈ (v_B - v_A) / ||A-B||
-                                         </div>
-                                         <p style={{fontSize:'12px', color:'#aaa'}}>计算概念间的平行移动向量（Steering Vector），揭示模型如何在流形上进行推理。</p>
-
-                                         <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '15px', marginBottom: '10px' }}>[C] 3D 可视化映射 (Visual Mapping: Fiber Stream)</div>
-                                         <ul style={{ paddingLeft: '20px', color: '#ddd', fontSize: '12px' }}>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>流形管道 (Manifold Stream):</strong> 青色的半透明玻璃管道。代表模型计算过程的拓扑流形 $M$。管道的弯曲反映了信息处理的非线性变换。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>纤维丛 (Fiber Bundles):</strong> 环绕管道的粒子环或方块。
-                                                 <br/><span style={{fontSize:'10px', color:'#888'}}>· 🟦 蓝色立方体 = 基础空间 (Base Space): 代表句法或逻辑功能单元。</span>
-                                                 <br/><span style={{fontSize:'10px', color:'#888'}}>· 🟥 红色粒子环 = 纤维空间 (Fiber Space): 代表该位置的语义丰富度或多义性 (Polysemy)。</span>
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>思维流 (Thought Flow):</strong> 沿管道流动的发光粒子，模拟 Transformer 残差流中的信息传递方向。
-                                             </li>
-                                             <li style={{marginBottom: '6px'}}>
-                                                 <strong>空间几何:</strong> 整个结构是高维几何的低维投影 (t-SNE/PCA)，保留了原有计算路径的拓扑特征。
-                                             </li>
-                                         </ul>
-                                     </div>
-                                 )}
-                                 
-                                 {structureTab === 'compositional' && (
-                                     <div>
-                                          <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Compositionality (OLS)</h3>
-                                          <p>验证简单的线性加和是否能表示复杂的组合概念。</p>
-                                          <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                             v_composite ≈ α * v_A + β * v_B
-                                         </div>
-                                     </div>
-                                 )}
-                                 
-                                 <div style={{ color: '#ff9f43', fontWeight: 'bold', borderBottom: '1px solid rgba(255, 159, 67, 0.2)', paddingBottom: '4px', marginTop: '20px', marginBottom: '10px' }}>[B] 通用架构 (General)</div>
-                                 <h3 style={{fontSize: '14px', marginTop: 0, color: '#fff'}}>Transformer 基础</h3>
-                                 <p>
-                                     核心计算由<strong>多头自注意力 (MHA)</strong> 和<strong>前馈网络 (MLP)</strong> 构成，信息通过<strong>残差流</strong>传递。
-                                 </p>
-                                 <div style={{ background: '#000', padding: '10px', borderRadius: '6px', fontFamily: 'monospace', marginBottom: '10px', fontSize: '11px' }}>
-                                     x_{'{l+1}'} = x_{'{l}'} + Attention(x_{'{l}'}) + MLP(x_{'{l}'})
-                                 </div>
-                                 <ul style={{ paddingLeft: '20px', color: '#aaa', fontSize: '12px' }}>
-                                     <li><strong>Logit Lens：</strong> 将每一层残差流通过 unembedding 矩阵映射回词汇空间。</li>
-                                     <li><strong>激活分析：</strong> 观察神经元在处理特定的语义或语法任务时的响应方向。</li>
-                                 </ul>
-                              </>
-                           )
-                       )}
-                  </div>
+                                       {content.blocks && content.blocks.map((b, i) => (
+                                           <div key={i} style={{ 
+                                               background: `rgba(${b.color || '255,255,255'}, 0.05)`, 
+                                               border: `1px solid rgba(${b.color || '255,255,255'}, 0.2)`, 
+                                               borderRadius: '8px', padding: '16px', marginBottom: '16px' 
+                                           }}>
+                                               <h4 style={{ margin: '0 0 8px 0', color: `rgb(${b.color || '255,255,255'})` }}>{b.title}</h4>
+                                               <p style={{ margin: 0, fontSize: '13px', color: '#bbb' }}>{b.text}</p>
+                                           </div>
+                                       ))}
+                                       
+                                       {content.formula && (
+                                            <div style={{ background: '#000', padding: '16px', borderRadius: '8px', border: '1px solid #333', fontFamily: 'monospace', margin: '20px 0', color: '#ffe66d' }}>
+                                                {content.formula}
+                                            </div>
+                                       )}
+                                   </div>
+                               );
+                           })()}
+                      </div>
               </div>
+          </div>
           </div>
       )}
 
@@ -1886,60 +2003,161 @@ export default function App() {
         </SimplePanel>
       )}
 
-      {/* Bottom-right Layers Panel */}
+      {/* Model Info Panel (Renamed from Layers Panel) */}
       {panelVisibility.layersPanel && (
       <SimplePanel 
-        title="层信息"
+        title="模型信息"
         style={{
-          position: 'absolute', bottom: 20, right: 20, zIndex: 10,
-          maxWidth: '300px', maxHeight: '400px'
+          position: 'absolute', top: '50%', right: 20, zIndex: 10,
+          transform: 'translateY(-50%)',
+          maxWidth: '300px', maxHeight: '600px',
+          display: 'flex', flexDirection: 'column'
         }}
       >
         
-        {data?.logit_lens && (
-          <div style={{ fontSize: '12px' }}>
-            {data.logit_lens.map((layerData, layerIdx) => {
-              // Calculate average confidence for this layer
-              const avgConfidence = layerData.reduce((sum, pos) => sum + pos.prob, 0) / layerData.length;
-              const isHovered = hoveredInfo?.layer === layerIdx;
-              const isSelected = selectedLayer === layerIdx;
-              
-              return (
-                <div 
-                  key={layerIdx}
-                  onClick={() => {
-                    setSelectedLayer(layerIdx);
-                    loadLayerDetails(layerIdx);
-                  }}
-                  style={{
-                    padding: '8px',
-                    marginBottom: '6px',
-                    background: isSelected ? 'rgba(0, 210, 255, 0.2)' : isHovered ? 'rgba(0, 210, 255, 0.1)' : 'rgba(255,255,255,0.05)',
-                    border: isSelected ? '2px solid rgba(0, 210, 255, 0.8)' : isHovered ? '1px solid rgba(0, 210, 255, 0.5)' : '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    transition: 'all 0.2s',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <div style={{ fontWeight: 'bold', color: '#fff', marginBottom: '4px' }}>
-                    {t('validity.layer', { layer: layerIdx })}
-                  </div>
-                  <div style={{ color: '#aaa', fontSize: '11px' }}>
-                    平均置信度: <span style={{ color: avgConfidence > 0.5 ? '#5ec962' : '#fde725' }}>
-                      {(avgConfidence * 100).toFixed(1)}%
-                    </span>
-                  </div>
+        {/* Dynamic Content based on structureTab */}
+        <div style={{ padding: '4px' }}>
+            
+            {/* 1. Logit Lens Mode (Default) */}
+            {(!structureTab || structureTab === 'logit_lens') && data?.logit_lens && (
+              <div style={{ fontSize: '12px' }}>
+                <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#aaa' }}>
+                   Logit Lens Analysis
                 </div>
-              );
-            })}
-          </div>
-        )}
-        
-        {!data && (
-          <div style={{ fontSize: '13px', color: '#888', fontStyle: 'italic' }}>
-            暂无数据。运行分析以查看层信息。
-          </div>
-        )}
+                {data.logit_lens.map((layerData, layerIdx) => {
+                  const avgConfidence = layerData.reduce((sum, pos) => sum + pos.prob, 0) / layerData.length;
+                  const isHovered = hoveredInfo?.layer === layerIdx;
+                  const isSelected = selectedLayer === layerIdx;
+                  
+                  return (
+                    <div 
+                      key={layerIdx}
+                      onClick={() => {
+                        setSelectedLayer(layerIdx);
+                        loadLayerDetails(layerIdx);
+                      }}
+                      style={{
+                        padding: '8px',
+                        marginBottom: '6px',
+                        background: isSelected ? 'rgba(0, 210, 255, 0.2)' : isHovered ? 'rgba(0, 210, 255, 0.1)' : 'rgba(255,255,255,0.05)',
+                        border: isSelected ? '2px solid rgba(0, 210, 255, 0.8)' : isHovered ? '1px solid rgba(0, 210, 255, 0.5)' : '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '6px',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ fontWeight: 'bold', color: '#fff', marginBottom: '4px' }}>
+                        {t('validity.layer', { layer: layerIdx })}
+                      </div>
+                      <div style={{ color: '#aaa', fontSize: '11px' }}>
+                        平均置信度: <span style={{ color: avgConfidence > 0.5 ? '#5ec962' : '#fde725' }}>
+                          {(avgConfidence * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* 2. FiberNet V2 Mode */}
+            {structureTab === 'fibernet_v2' && (
+                <div style={{ fontSize: '12px', color: '#ddd' }}>
+                    <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#4ecdc4', fontWeight: 'bold' }}>
+                       FiberNet V2 Topology
+                    </div>
+                    <p><strong>Base Manifold:</strong> 4D Grid (Low-Rank)</p>
+                    <p><strong>Fiber Space:</strong> 1024D (High-Precision)</p>
+                    <p><strong>Transport:</strong> Affine Connection</p>
+                    
+                    <div style={{ marginTop: '12px', borderTop: '1px solid #444', paddingTop: '8px' }}>
+                        <div style={{ fontWeight: 'bold', color: '#fff', marginBottom: '4px' }}>📚 观察指南</div>
+                        <ul style={{ paddingLeft: '16px', margin: '4px 0', color: '#aaa' }}>
+                            <li><strong>底流形 (Grid)</strong>: 蓝色网格，代表句法逻辑骨架。</li>
+                            <li><strong>纤维 (Columns)</strong>: 垂直柱体，代表具体语义概念 (如 King)。</li>
+                            <li><strong>平行四边形</strong>: 观察 "King-Man" 与 "Queen-Woman" 的几何平行性。</li>
+                        </ul>
+                    </div>
+
+                    <div style={{ marginTop: '12px', borderTop: '1px solid #444', paddingTop: '8px' }}>
+                         <div style={{ fontWeight: 'bold', color: '#fff', marginBottom: '4px' }}>🎮 操作指南</div>
+                         <ul style={{ paddingLeft: '16px', margin: '4px 0', color: '#aaa' }}>
+                            <li><strong>视角</strong>: 左键旋转，右键平移，滚轮缩放。</li>
+                            <li><strong>手术 (Surgery)</strong>: 点击右下角开启。
+                                <ul style={{ paddingLeft: '12px', marginTop: '2px' }}>
+                                    <li><strong>Graft</strong>: 选源点+终点，建立连接。</li>
+                                    <li><strong>Ablate</strong>: 选点，切除概念。</li>
+                                </ul>
+                            </li>
+                            <li><strong>动画</strong>: 右下角控制 Inject/Transport 演示。</li>
+                         </ul>
+                    </div>
+                </div>
+            )}
+
+            {/* 3. Circuit Discovery Mode */}
+            {structureTab === 'circuit' && analysisResult && (
+                <div style={{ fontSize: '12px', color: '#ddd' }}>
+                    <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#ff6b6b', fontWeight: 'bold' }}>
+                       Circuit Statistics
+                    </div>
+                    <p><strong>Nodes:</strong> {analysisResult.nodes?.length || 0}</p>
+                    <p><strong>Edges:</strong> {analysisResult.graph?.links?.length || 0}</p>
+                    <p><strong>Metric:</strong> Logit Difference</p>
+                </div>
+            )}
+
+            {/* 4. Feature Extraction Mode */}
+            {structureTab === 'features' && analysisResult && (
+                <div style={{ fontSize: '12px', color: '#ddd' }}>
+                    <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#ffd93d', fontWeight: 'bold' }}>
+                       SAE Features
+                    </div>
+                    <p><strong>Layer:</strong> {analysisResult.layer_idx}</p>
+                    <p><strong>Features Found:</strong> {analysisResult.n_features}</p>
+                    <p><strong>Sparsity:</strong> {analysisResult.sparsity?.toFixed(4) || 'N/A'}</p>
+                </div>
+            )}
+             
+             {/* 5. Causal Analysis Mode */}
+             {structureTab === 'causal' && analysisResult && (
+                <div style={{ fontSize: '12px', color: '#ddd' }}>
+                     <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#6c5ce7', fontWeight: 'bold' }}>
+                       Causal Mediation
+                    </div>
+                    <p><strong>Analyzed:</strong> {analysisResult.n_components_analyzed}</p>
+                    <p><strong>Important:</strong> {analysisResult.n_important_components}</p>
+                </div>
+             )}
+
+             {/* 6. TDA Mode */}
+             {structureTab === 'tda' && (
+                <div style={{ fontSize: '12px', color: '#ddd' }}>
+                    <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#e056fd', fontWeight: 'bold' }}>
+                       Topological Features
+                    </div>
+                    <p><strong>Method:</strong> Persistent Homology</p>
+                    <div style={{ marginTop: '8px', background: '#222', padding: '8px', borderRadius: '4px' }}>
+                         <div style={{fontWeight:'bold', marginBottom:'4px'}}>Betti Numbers ($\beta_k$):</div>
+                         <ul style={{paddingLeft:'16px', margin:0, color:'#aaa'}}>
+                             <li>$\beta_0$: 连通分量 (Connected Components)</li>
+                             <li>$\beta_1$: 环/孔 (Loops/Holes)</li>
+                             <li>$\beta_2$: 空腔 (Cavities)</li>
+                         </ul>
+                    </div>
+                    <p style={{marginTop:'8px', fontSize:'11px', color:'#888'}}>
+                        Use the "Structure Analysis" panel to compute barcodes.
+                    </p>
+                </div>
+             )}
+
+            {/* Fallback for No Data */}
+            {!data && structureTab !== 'fibernet_v2' && (
+              <div style={{ fontSize: '13px', color: '#888', fontStyle: 'italic' }}>
+                暂无数据。运行分析以查看模型信息。
+              </div>
+            )}
+        </div>
       </SimplePanel>
       )}
 
@@ -1965,8 +2183,9 @@ export default function App() {
         )}
         <Visualization data={data} hoveredInfo={hoveredInfo} setHoveredInfo={setHoveredInfo} activeLayer={activeLayer} />
 
+
         {/* Analysis Results - Rendered side-by-side if available */}
-        {analysisResult && (
+        {analysisResult && structureTab !== 'glass_matrix' && structureTab !== 'flow_tubes' && (
           <group position={[-(data?.tokens?.length || 10) - 20, 0, 0]}>
              {/* Add a label or visual separator */}
              <Text position={[0, 10, 0]} fontSize={1} color="#4ecdc4" anchorX="center">
@@ -1985,8 +2204,26 @@ export default function App() {
              {structureTab === 'agi' && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'fiber' && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'validity' && <ValidityVisualization3D result={analysisResult} t={t} />}
-             {structureTab === 'glass_matrix' && <GlassMatrix3D />}
           </group>
+        )}
+
+        {/* Independent Visualizations (No Analysis Result Needed) */}
+        {structureTab === 'glass_matrix' && (
+            <group position={[0, 0, 0]}>
+                <GlassMatrix3D />
+            </group>
+        )}
+
+        {structureTab === 'flow_tubes' && (
+            <group position={[0, -5, 0]}>
+                <FlowTubesVisualizer />
+            </group>
+        )}
+
+        {structureTab === 'tda' && (
+            <group position={[0, 0, 0]}>
+                <TDAVisualization3D result={analysisResult} t={t} />
+            </group>
         )}
 
         {/* Debug Log for SNN Rendering Conditions */}
@@ -1996,6 +2233,7 @@ export default function App() {
              }
              return null;
         })()}
+
 
         {/* SNN Visualization - Independent of structure analysis result */}
         {(infoPanelTab === 'snn' || systemType === 'snn') && snnState.initialized && (

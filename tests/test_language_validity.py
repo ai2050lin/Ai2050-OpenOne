@@ -6,8 +6,9 @@ import unittest
 import torch
 import torch.nn as nn
 
-# Add parent directory to path to import structure_analyzer
+# Add parent directory to path to import structure_analyzer (now in server/)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "server"))
 
 from structure_analyzer import LanguageValidity
 
