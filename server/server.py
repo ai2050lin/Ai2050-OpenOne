@@ -22,6 +22,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fiber_memory import FiberMemory
 from neurofiber_snn import NeuroFiberNetwork
 from pydantic import BaseModel
+from scipy.linalg import orthogonal_procrustes
+from sklearn.decomposition import PCA
 from structure_analyzer import (
     CausalMediation,
     CircuitDiscovery,
@@ -1016,10 +1018,14 @@ async def perform_rpt_analysis(request: RPTAnalysisRequest):
         tgt_coords = vis_coords[len(src_acts):].tolist()
 
         # 计算切空间基底 (n_components)
-        pca_basis = PCA(n_components=request.n_components)
+        n_basis = min(request.n_components, len(src_acts), len(tgt_acts))
+        if n_basis < 1:
+            n_basis = 1
+        pca_basis = PCA(n_components=n_basis)
         pca_basis.fit(src_acts)
         basis_src = pca_basis.components_
         
+        pca_basis = PCA(n_components=n_basis)
         pca_basis.fit(tgt_acts)
         basis_tgt = pca_basis.components_
 

@@ -1274,6 +1274,8 @@ export function StructureAnalysisControls({
   systemType, setSystemType,
   // AGI Form
   agiForm, setAgiForm,
+  // RPT Form
+  rptForm, setRptForm,
   // SNN Props
   snnState, onInitializeSNN, onToggleSNNPlay, onStepSNN, onInjectStimulus
 }) {
@@ -1351,6 +1353,11 @@ export function StructureAnalysisControls({
       setValidityResult(data);
   });
 
+  const runRptAnalysis = () => runAnalysis('RPT Analysis', 'nfb_ra/rpt', rptForm, (data, log) => {
+      log(`🧬 Transport Matrix Calculated`);
+      log(`📏 Source Center: [${data.source?.center?.map(v=>v.toFixed(2)).join(', ')}]`);
+  });
+
   const runAgiVerification = () => runAnalysis('Fiber Bundle Reconstruction', 'fiber_bundle_analysis', { prompt: agiForm.prompt }, (data, log) => {
       const baseCount = data.rsa?.filter(l => l.type === 'Base').length;
       log(`📊 Systematic Layers: ${baseCount}`);
@@ -1412,7 +1419,8 @@ export function StructureAnalysisControls({
                  { id: 'tda', icon: Activity, label: '拓扑 (Topology)' },
                  { id: 'fibernet_v2', icon: Network, label: 'FiberNet V2 (Demo)' },
                  { id: 'glass_matrix', icon: Network, label: '玻璃矩阵 (Glass)' },
-                 { id: 'flow_tubes', icon: Activity, label: '动力学 (Dynamics)' }
+                 { id: 'flow_tubes', icon: Activity, label: '动力学 (Dynamics)' },
+                 { id: 'rpt', icon: Activity, label: 'RPT 分析' }
               ] : [
                  { id: 'snn', icon: Brain, label: 'SNN 仿真' },
                  { id: 'validity', icon: Activity, label: '有效性 (Valid)' }
@@ -1444,7 +1452,7 @@ export function StructureAnalysisControls({
                     <ControlGroup label="Topological Data Analysis (PH)">
                         <div style={{color: '#aaa', fontSize: '13px', lineHeight: '1.5', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '12px'}}>
                             <p style={{marginTop:0}}><strong>Persistent Homology</strong></p>
-                            <p>计算流形的贝蒂数 (Betti Numbers)，揭示拓扑孔洞结构。</p>
+                            <p>展示 Transformer 内部的几何动力学轨迹。</p>
                         </div>
                     </ControlGroup>
                     
@@ -1612,6 +1620,48 @@ export function StructureAnalysisControls({
                 </div>
             )}
 
+            {activeTab === 'rpt' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="RPT 源语境 (Source Contexts)">
+                         <div style={{fontSize: '11px', color: '#888', marginBottom: '8px'}}>每行一个 Prompt:</div>
+                         <StyledTextArea 
+                             rows={4} 
+                             value={rptForm?.source_prompts?.join('\n') || ''} 
+                             onChange={e => setRptForm({...rptForm, source_prompts: e.target.value.split('\n').filter(s=>s.trim())})} 
+                             placeholder="He is a doctor&#10;He is an engineer&#10;He works as a pilot"
+                         />
+                    </ControlGroup>
+                    
+                    <ControlGroup label="RPT 目标语境 (Target Contexts)">
+                         <div style={{fontSize: '11px', color: '#888', marginBottom: '8px'}}>每行一个 Prompt:</div>
+                         <StyledTextArea 
+                             rows={4} 
+                             value={rptForm?.target_prompts?.join('\n') || ''} 
+                             onChange={e => setRptForm({...rptForm, target_prompts: e.target.value.split('\n').filter(s=>s.trim())})} 
+                             placeholder="She is a doctor&#10;She is an engineer&#10;She works as a pilot"
+                         />
+                    </ControlGroup>
+                    
+                    <ControlGroup label={`分析层 Layer (L${rptForm?.layer_idx || 6})`}>
+                         <input 
+                            type="range" min="0" max="12" step="1" 
+                            value={rptForm?.layer_idx || 6} 
+                            onChange={e => setRptForm({...rptForm, layer_idx: parseInt(e.target.value)})} 
+                            style={{ width: '100%', accentColor: '#4488ff' }} 
+                         />
+                    </ControlGroup>
+
+                    <ActionButton onClick={runRptAnalysis} loading={loading} icon={Activity}>
+                        执行 RPT 传输 (Run RPT)
+                    </ActionButton>
+                    
+                    <div style={{marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '11px', color: '#777', lineHeight: '1.5'}}>
+                        <strong style={{color: '#aaa'}}>原理说明：</strong><br/>
+                        本分析将计算两个语境集之间的<strong style={{color:'#4488ff'}}>黎曼平行移动矩阵 R</strong>，验证语义纤维在不同背景下的可迁移性。
+                    </div>
+                </div>
+            )}
+
             {activeTab === 'snn' && (
                 <div className="animate-fade-in">
                     {!snnState?.initialized ? (
@@ -1759,6 +1809,11 @@ export default function StructureAnalysisPanel({
   const [manifoldForm, setManifoldForm] = useState({ prompt: "Mathematics is the language of the universe.", layer_idx: 15 });
   const [compForm, setCompForm] = useState({ layer_idx: 15, raw_phrases: "", phrases: [] });
   const [agiForm, setAgiForm] = useState({ prompt: "The quick brown fox jumps over the lazy dog." });
+  const [rptForm, setRptForm] = useState({
+    source_prompts: ['He is a doctor', 'He is an engineer', 'He works as a pilot'],
+    target_prompts: ['She is a doctor', 'She is an engineer', 'She works as a pilot'],
+    layer_idx: 6
+  });
   
   const [analysisResult, setAnalysisResult] = useState(null);
   
@@ -1827,6 +1882,7 @@ export default function StructureAnalysisPanel({
             manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
             compForm={compForm} setCompForm={setCompForm}
             agiForm={agiForm} setAgiForm={setAgiForm}
+            rptForm={rptForm} setRptForm={setRptForm}
             onResultUpdate={setAnalysisResult}
             t={tSafe}
             // SNN Props
@@ -1884,6 +1940,11 @@ export default function StructureAnalysisPanel({
                     {activeTab === 'circuit' && analysisResult && <NetworkGraph3D graph={analysisResult.graph} />}
                     {activeTab === 'features' && analysisResult && <FeatureVisualization3D features={analysisResult.top_features} layerIdx={featureForm.layer_idx} />}
                     {activeTab === 'manifold' && analysisResult && <ManifoldVisualization3D pcaData={analysisResult.pca} />}
+                    {activeTab === 'rpt' && analysisResult && (
+                        <group position={[0, 0, 0]}>
+                            <RPTVisualization3D data={analysisResult} t={tSafe} />
+                        </group>
+                    )}
                     
                     {/* AGI Theory / Fiber Bundle View */}
                     {activeTab === 'agi' && (

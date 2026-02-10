@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
+import RPTVisualization3D from './RPTVisualization3D';
 import { SimplePanel } from './SimplePanel';
 import { CompositionalVisualization3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
 import TDAVisualization3D from './TDAVisualization3D';
@@ -748,6 +749,12 @@ export default function App() {
     layer_idx: 0
   });
 
+  const [rptForm, setRptForm] = useState({
+    source_prompts: ['He is a doctor', 'He is an engineer', 'He works as a pilot'],
+    target_prompts: ['She is a doctor', 'She is an engineer', 'She works as a pilot'],
+    layer_idx: 6
+  });
+
   // System Type State for Structure Analysis
   const [systemType, setSystemType] = useState('dnn');
 
@@ -1391,6 +1398,7 @@ export default function App() {
                        manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
                        compForm={compForm} setCompForm={setCompForm}
                        agiForm={agiForm} setAgiForm={setAgiForm}
+                       rptForm={rptForm} setRptForm={setRptForm}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -1474,6 +1482,7 @@ export default function App() {
                        manifoldForm={manifoldForm} setManifoldForm={setManifoldForm}
                        compForm={compForm} setCompForm={setCompForm}
                        agiForm={agiForm} setAgiForm={setAgiForm}
+                       rptForm={rptForm} setRptForm={setRptForm}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -2006,11 +2015,10 @@ export default function App() {
       {/* Model Info Panel (Renamed from Layers Panel) */}
       {panelVisibility.layersPanel && (
       <SimplePanel 
-        title="模型信息"
+        title="操作面板"
         style={{
-          position: 'absolute', top: '50%', right: 20, zIndex: 10,
-          transform: 'translateY(-50%)',
-          maxWidth: '300px', maxHeight: '600px',
+          position: 'absolute', bottom: 20, right: 20, zIndex: 10,
+          minWidth: '320px', maxWidth: '400px', maxHeight: '60vh',
           display: 'flex', flexDirection: 'column'
         }}
       >
@@ -2199,9 +2207,10 @@ export default function App() {
              {structureTab === 'circuit' && <NetworkGraph3D graph={analysisResult.graph || analysisResult} activeLayer={activeLayer} />}
              {structureTab === 'features' && <FeatureVisualization3D features={analysisResult.top_features} layerIdx={analysisResult.layer_idx} onLayerClick={setSelectedLayer} selectedLayer={selectedLayer} onHover={setHoveredInfo} />}
              {structureTab === 'causal' && <NetworkGraph3D graph={analysisResult.causal_graph} activeLayer={activeLayer} />}
-             {structureTab === 'manifold' && <ManifoldVisualization3D pcaData={analysisResult.pca || analysisResult} onHover={setHoveredInfo} />}
-             {structureTab === 'compositional' && <CompositionalVisualization3D result={analysisResult} t={t} />}
-             {structureTab === 'agi' && <FiberBundleVisualization3D result={analysisResult} t={t} />}
+              {structureTab === 'manifold' && analysisResult && <ManifoldVisualization3D pcaData={analysisResult.pca} onHover={setHoveredInfo} />}
+              {structureTab === 'compositional' && analysisResult && <CompositionalVisualization3D result={analysisResult} t={t} />}
+              {structureTab === 'rpt' && analysisResult && <RPTVisualization3D data={analysisResult} t={t} />}
+              {structureTab === 'agi' && analysisResult && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'fiber' && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'validity' && <ValidityVisualization3D result={analysisResult} t={t} />}
           </group>
