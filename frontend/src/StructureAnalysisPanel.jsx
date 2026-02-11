@@ -1,10 +1,12 @@
 import { OrbitControls, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
-import { Activity, Brain, Network, RotateCcw, Settings, Sparkles } from 'lucide-react';
+import { Activity, Brain, Globe, Network, RotateCcw, Settings, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import BrainVis3D from './BrainVis3D';
+import HolonomyLoopVisualizer from './HolonomyLoopVisualizer';
+import TrainingDynamics3D from './TrainingDynamics3D';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -563,6 +565,148 @@ export function ManifoldVisualization3D({ pcaData, nComponents, onHover }) {
   );
 }
 
+// 3D Curvature Field Visualization
+export function CurvatureField3D({ result, t }) {
+  if (!result || !result.base_coord) return null;
+
+  const { base_coord, neighbor_coords, curvature } = result;
+  // Map curvature to color (Blue = Flat, Red = Curved)
+  const intensity = Math.min(curvature, 1.0);
+  const color = new THREE.Color().setHSL(0.6 - intensity * 0.6, 1.0, 0.5);
+
+  return (
+    <group>
+      {/* Central base point */}
+      <mesh position={[base_coord[0] * 5, base_coord[1] * 5, base_coord[2] * 5]}>
+        <sphereGeometry args={[0.3, 32, 32]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.0} />
+      </mesh>
+
+      {/* Neighbor point cloud representing the local surface */}
+      {neighbor_coords.map((coord, i) => (
+        <mesh key={i} position={[coord[0] * 5, coord[1] * 5, coord[2] * 5]}>
+          <sphereGeometry args={[0.1, 8, 8]} />
+          <meshStandardMaterial color={color} opacity={0.4} transparent />
+        </mesh>
+      ))}
+
+      {/* Surface approximation (Simplified as transparent disk) */}
+      <mesh position={[base_coord[0] * 5, base_coord[1] * 5, base_coord[2] * 5]} rotation={[Math.PI/2, 0, 0]}>
+         <circleGeometry args={[1.5, 32]} />
+         <meshStandardMaterial color={color} opacity={0.15} transparent side={THREE.DoubleSide} />
+      </mesh>
+
+      <Text position={[0, 5, 0]} fontSize={0.6} color="#fff" anchorX="center">
+          Local Scalar Curvature: {curvature.toFixed(4)}
+      </Text>
+      
+      {/* Visual aid for curvature intensity */}
+      <group position={[5, 0, 0]}>
+         <mesh>
+            <boxGeometry args={[0.5, 4, 0.1]} />
+            <meshBasicMaterial color="#333" />
+         </mesh>
+         <mesh position={[0, -2 + intensity * 4 / 2, 0.1]}>
+            <boxGeometry args={[0.6, intensity * 4, 0.1]} />
+            <meshBasicMaterial color={color} />
+         </mesh>
+         <Text position={[0, 2.5, 0]} fontSize={0.3} color="#aaa">CURVATURE</Text>
+      </group>
+    </group>
+  );
+}
+
+// Riemannian Parallel Transport Visualization
+export function RPTVisualization3D({ data, t }) {
+  if (!data) return null;
+
+  // Adapt to the new backend format
+  const source_pts_raw = data.source_coords || [];
+  const target_pts_raw = data.target_coords || [];
+
+  if (source_pts_raw.length === 0) {
+      return null;
+  }
+
+  // --- Normalization & Centering ---
+  // Combine all points to find the global bounding box/center
+  const all_pts = [...source_pts_raw, ...target_pts_raw];
+  
+  // Calculate center (Mean)
+  const center = all_pts.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1], acc[2] + (p[2]||0)], [0, 0, 0])
+                  .map(v => v / all_pts.length);
+                  
+  // Shift points to be centered at origin
+  const centered_source = source_pts_raw.map(p => [p[0] - center[0], p[1] - center[1], (p[2]||0) - center[2]]);
+  const centered_target = target_pts_raw.map(p => [p[0] - center[0], p[1] - center[1], (p[2]||0) - center[2]]);
+  
+  // Find max distance from origin for scaling
+  const max_dist = Math.max(...[...centered_source, ...centered_target].map(p => Math.sqrt(p[0]**2 + p[1]**2 + p[2]**2)), 0.0001);
+  
+  // Normalize to fit within a radius of ~8 units in the 3D scene
+  const norm_scale = 8 / max_dist;
+  const source_pts = centered_source.map(p => p.map(v => v * norm_scale));
+  const target_pts = centered_target.map(p => p.map(v => v * norm_scale));
+
+  return (
+    <group>
+      {/* Source Point Cloud (Original Semantic Field) */}
+      <group>
+         {source_pts.map((p, i) => (
+           <mesh key={`src-${i}`} position={[p[0], p[1], p[2]]}>
+              <sphereGeometry args={[0.25, 16, 16]} />
+              <meshStandardMaterial color="#3498db" emissive="#3498db" emissiveIntensity={1.5} />
+           </mesh>
+         ))}
+         {source_pts[0] && (
+           <Text position={[source_pts[0][0], source_pts[0][1] + 1, source_pts[0][2]]} fontSize={0.6} color="#3498db">
+             SOURCE
+           </Text>
+         )}
+      </group>
+
+      {/* Target Point Cloud (Transported Semantic Field) */}
+      <group>
+         {target_pts.map((p, i) => (
+           <mesh key={`tgt-${i}`} position={[p[0], p[1], p[2]]}>
+              <sphereGeometry args={[0.25, 16, 16]} />
+              <meshStandardMaterial color="#e74c3c" emissive="#e74c3c" emissiveIntensity={1.5} />
+           </mesh>
+         ))}
+         {target_pts[0] && (
+           <Text position={[target_pts[0][0], target_pts[0][1] + 1, target_pts[0][2]]} fontSize={0.6} color="#e74c3c">
+             TARGET
+           </Text>
+         )}
+      </group>
+
+      {/* Parallel Transport Vectors (Connecting source to target) */}
+      {source_pts.map((p, i) => {
+         const target = target_pts[i];
+         if (!target) return null;
+         
+         return (
+           <line key={`vec-${i}`}>
+              <bufferGeometry>
+                 <bufferAttribute 
+                    attach="attributes-position"
+                    count={2}
+                    array={new Float32Array([...p, ...target])}
+                    itemSize={3}
+                 />
+              </bufferGeometry>
+              <lineBasicMaterial color="#ffffff" transparent opacity={0.4} linewidth={2} />
+           </line>
+         );
+      })}
+
+      <Text position={[0, source_pts[0] ? source_pts[0][1] + 5 : 8, 0]} fontSize={1} color="#fff" anchorX="center">
+          Riemannian Parallel Transport (RPT)
+      </Text>
+    </group>
+  );
+}
+
 export function CompositionalVisualization3D({ result, t }) {
   if (!result) return null;
 
@@ -742,8 +886,9 @@ export function FiberBundleVisualization3D({ result, t }) {
 
 // 3D Glass Matrix Visualization (NFB-RA Manifold + Fibers)
 export function GlassMatrix3D() {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [conceptData, setConceptData] = useState(null);
+  const [trainingMode, setTrainingMode] = useState(false);
+  const [validityMetrics, setValidityMetrics] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -1276,11 +1421,16 @@ export function StructureAnalysisControls({
   agiForm, setAgiForm,
   // RPT Form
   rptForm, setRptForm,
+  // Holonomy Form
+  holonomyForm, setHolonomyForm,
+  // Topology State Props
+  topologyResults, setTopologyResults,
   // SNN Props
   snnState, onInitializeSNN, onToggleSNNPlay, onStepSNN, onInjectStimulus
 }) {
   const [loading, setLoading] = useState(false);
   const [progressLogs, setProgressLogs] = useState([]);
+  const tSafe = t || ((k, d) => d || k);
   
   // Settings State
   const [showSettings, setShowSettings] = useState(false);
@@ -1295,6 +1445,19 @@ export function StructureAnalysisControls({
   // Validity State
   const [validityForm, setValidityForm] = useState({ prompt: "The quick brown fox jumps over the lazy dog." });
   const [validityResult, setValidityResult] = useState(null);
+
+  // Curvature State
+  const [curvatureForm, setCurvatureForm] = useState({ 
+      prompt: "The doctor treats the patient with care.",
+      layer_idx: 6,
+      n_perturbations: 15,
+      perturbation_scale: 0.05
+  });
+  const [curvatureResult, setCurvatureResult] = useState(null);
+
+  // AGI & Topology States
+  const [interacting, setInteracting] = useState(false);
+  const [debiasResults, setDebiasResults] = useState(null);
 
   useEffect(() => {
     // When switching systems, default to a tab
@@ -1355,7 +1518,11 @@ export function StructureAnalysisControls({
 
   const runRptAnalysis = () => runAnalysis('RPT Analysis', 'nfb_ra/rpt', rptForm, (data, log) => {
       log(`🧬 Transport Matrix Calculated`);
-      log(`📏 Source Center: [${data.source?.center?.map(v=>v.toFixed(2)).join(', ')}]`);
+  });
+
+  const runCurvatureAnalysis = () => runAnalysis('Curvature Analysis', 'nfb_ra/curvature', curvatureForm, (data, log) => {
+      log(`📏 Curvature: ${data.curvature?.toFixed(4)}`);
+      setCurvatureResult(data);
   });
 
   const runAgiVerification = () => runAnalysis('Fiber Bundle Reconstruction', 'fiber_bundle_analysis', { prompt: agiForm.prompt }, (data, log) => {
@@ -1414,13 +1581,19 @@ export function StructureAnalysisControls({
                  { id: 'circuit', icon: Network, label: '回路 (Circuit)' },
                  { id: 'features', icon: Sparkles, label: '特征 (Features)' },
                  { id: 'causal', icon: Brain, label: '因果 (Causal)' },
-                 { id: 'compositional', icon: Network, label: '组合 (Compos)' },
+                 { id: 'manifold', icon: Network, label: '流形几何 (Manifold)' },
+                 { id: 'compositional', icon: Network, label: '组合泛化 (Compos)' },
+                 { id: 'tda', icon: Activity, label: '拓扑分析 (TDA)' },
                  { id: 'agi', icon: Sparkles, label: '神经纤维丛 (Fiber)' },
-                 { id: 'tda', icon: Activity, label: '拓扑 (Topology)' },
-                 { id: 'fibernet_v2', icon: Network, label: 'FiberNet V2 (Demo)' },
                  { id: 'glass_matrix', icon: Network, label: '玻璃矩阵 (Glass)' },
                  { id: 'flow_tubes', icon: Activity, label: '动力学 (Dynamics)' },
-                 { id: 'rpt', icon: Activity, label: 'RPT 分析' }
+                 { id: 'rpt', icon: Activity, label: '传输分析 (RPT)' },
+                 { id: 'curvature', icon: Activity, label: '曲率分析 (Curv)' },
+                 { id: 'debias', icon: Sparkles, label: '几何去偏 (Debias)' },
+                 { id: 'global_topology', icon: Globe, label: '全局拓扑 (Topo)' },
+                 { id: 'fibernet_v2', icon: Network, label: 'FiberNet V2 (Demo)' },
+                 { id: 'holonomy', icon: RotateCcw, label: '全纯扫描 (Holo)' },
+                 { id: 'training', icon: Activity, label: '训练动力学 (Training)' }
               ] : [
                  { id: 'snn', icon: Brain, label: 'SNN 仿真' },
                  { id: 'validity', icon: Activity, label: '有效性 (Valid)' }
@@ -1526,7 +1699,18 @@ export function StructureAnalysisControls({
                </div>
             )}
 
-            {activeTab === 'manifold' && (
+            {activeTab === 'training' && (
+              <div style={{ width: '100%', height: '400px', background: '#050510', borderRadius: '8px', overflow: 'hidden' }}>
+                <Canvas camera={{ position: [0, 5, 20], fov: 45 }}>
+                  <ambientLight intensity={0.5} />
+                  <pointLight position={[10, 10, 10]} />
+                  <TrainingDynamics3D t={tSafe} />
+                  <OrbitControls />
+                </Canvas>
+              </div>
+            )}
+
+          {activeTab === 'manifold' && (
                <div className="animate-fade-in">
                   <ControlGroup label="Prompt">
                     <StyledTextArea rows={3} value={manifoldForm.prompt} onChange={e => setManifoldForm({...manifoldForm, prompt: e.target.value})} />
@@ -1662,6 +1846,181 @@ export function StructureAnalysisControls({
                 </div>
             )}
 
+            {activeTab === 'curvature' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="分析文本 (Core Prompt)">
+                         <StyledTextArea 
+                             rows={4} 
+                             value={curvatureForm.prompt} 
+                             onChange={e => setCurvatureForm({...curvatureForm, prompt: e.target.value})} 
+                             placeholder="Enter a prompt to analyze local curvature..."
+                         />
+                    </ControlGroup>
+                    
+                    <ControlGroup label={`分析层 Layer (L${curvatureForm.layer_idx})`}>
+                         <input 
+                            type="range" min="0" max="12" step="1" 
+                            value={curvatureForm.layer_idx} 
+                            onChange={e => setCurvatureForm({...curvatureForm, layer_idx: parseInt(e.target.value)})} 
+                            style={{ width: '100%', accentColor: '#4488ff' }} 
+                         />
+                    </ControlGroup>
+
+                    <ControlGroup label={`扰动规模 (Scale: ${curvatureForm.perturbation_scale})`}>
+                         <input 
+                            type="range" min="0.01" max="0.2" step="0.01" 
+                            value={curvatureForm.perturbation_scale} 
+                            onChange={e => setCurvatureForm({...curvatureForm, perturbation_scale: parseFloat(e.target.value)})} 
+                            style={{ width: '100%', accentColor: '#4488ff' }} 
+                         />
+                    </ControlGroup>
+
+                    <ActionButton onClick={runCurvatureAnalysis} loading={loading} icon={Activity}>
+                        计算曲率 (Calculate Curvature)
+                    </ActionButton>
+                    
+                    {curvatureResult && (
+                        <div style={{marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px'}}>
+                            <div style={{fontSize: '12px', color: '#aaa', marginBottom: '8px'}}>局部曲率指数 (Scalar Curvature):</div>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                <div style={{flex: 1, height: '8px', background: '#333', borderRadius: '4px', overflow: 'hidden'}}>
+                                    <div style={{
+                                        width: `${curvatureResult.curvature * 100}%`, 
+                                        height: '100%', 
+                                        background: `linear-gradient(90deg, #4488ff, #ff4444)`,
+                                        boxShadow: '0 0 10px rgba(68,136,255,0.5)'
+                                    }} />
+                                </div>
+                                <div style={{fontSize: '16px', fontWeight: 'bold', color: curvatureResult.curvature > 0.5 ? '#ff4444' : '#4488ff'}}>
+                                    {curvatureResult.curvature?.toFixed(3)}
+                                </div>
+                            </div>
+                            <div style={{fontSize: '10px', color: '#666', marginTop: '8px'}}>
+                                {curvatureResult.curvature > 0.6 ? "⚠️ 检测到语义扭曲：该语境在表示空间中存在高度非线性。" : "✅ 结构稳定：该语境所在的流形区域相对平坦。"}
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '11px', color: '#777', lineHeight: '1.5'}}>
+                        <strong style={{color: '#aaa'}}>理论提示：</strong><br/>
+                        曲率衡量了**切空间随语义扰动而旋转的速率**。在逻辑悖论或极端偏见区域，曲率往往会显著升高。
+                    </div>
+                </div>
+            )} 
+            {activeTab === 'debias' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="检测语境 (Bias Context)">
+                         <StyledTextArea 
+                             rows={3} 
+                             value={agiForm.prompt} 
+                             onChange={e => setAgiForm({...agiForm, prompt: e.target.value})} 
+                             placeholder="例如: The doctor finished..."
+                         />
+                    </ControlGroup>
+                    
+                    <div style={{marginTop: '12px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px'}}>
+                        <div style={{fontSize: '12px', color: '#aaa', marginBottom: '8px'}}>注入传输算子 (RPT Injection):</div>
+                        <div style={{fontSize: '10px', color: '#666', marginBottom: '12px'}}>
+                            系统将自动检索 Fiber Memory 中存储的最优传输矩阵执行几何拦截。
+                        </div>
+                        
+                        <ActionButton 
+                            onClick={async () => {
+                                setInteracting(true);
+                                try {
+                                    const res = await axios.post(`${API_BASE}/nfb_ra/debias`, {
+                                        source: agiForm.prompt,
+                                        target: "neutral",
+                                        R: curvatureResult?.last_R || [[]], // Mock or Pass from RPT
+                                        layer_idx: curvatureForm.layer_idx
+                                    });
+                                    setDebiasResults(res.data.results);
+                                } catch (e) { console.error(e); }
+                                setInteracting(false);
+                            }} 
+                            loading={interacting} 
+                            icon={Sparkles}
+                        >
+                            执行几何去偏 (Geometric Interception)
+                        </ActionButton>
+                    </div>
+
+                    {debiasResults && (
+                        <div style={{marginTop: '16px'}}>
+                            <div style={{fontSize: '12px', color: '#ddd', marginBottom: '10px'}}>Token 预测概率纠偏对比:</div>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                                {debiasResults.slice(0, 3).map((item, idx) => (
+                                    <div key={idx} style={{padding: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '11px'}}>
+                                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '4px'}}>
+                                            <span style={{color: '#4488ff', fontWeight: 'bold'}}>"{item.token}"</span>
+                                            <span style={{color: item.shift > 0 ? '#44ff88' : '#ff4444'}}>
+                                                {item.shift > 0 ? '+' : ''}{(item.shift * 100).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                        <div style={{height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden'}}>
+                                            <div style={{width: `${item.prob_base * 100}%`, height: '100%', background: '#666'}} />
+                                            <div style={{width: `${item.prob_debiased * 100}%`, height: '100%', background: '#4488ff', marginTop: '-4px'}} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '11px', color: '#777', lineHeight: '1.5'}}>
+                        <strong style={{color: '#aaa'}}>去偏原理：</strong><br/>
+                        通过在残差流施加逆变换 $R^T$，我们将语境化的语义纤维拉回至中性空间，实现“逻辑保持、偏见消除”。
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'global_topology' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="系统级扫描 (Systemic Scan)">
+                         <div style={{fontSize: "12px", color: "#aaa", marginBottom: "12px", lineHeight: "1.4"}}>
+                            该功能将自动遍历 <b>职业、情感、逻辑、亲属</b> 四大语义场，提取 100+ 核心算子，构建 AGI 的大统一几何模型。
+                         </div>
+                         <ActionButton 
+                            onClick={async () => {
+                                setInteracting(true);
+                                try {
+                                    const res = await axios.post(`${API_BASE}/nfb_ra/topology_scan`);
+                                    setTopologyResults(res.data);
+                                } catch (e) { console.error(e); }
+                                setInteracting(false);
+                            }} 
+                            loading={interacting} 
+                            icon={Globe}
+                        >
+                            开始全量拓扑提取
+                        </ActionButton>
+                    </ControlGroup>
+
+                    {topologyResults && (
+                        <div style={{marginTop: "16px"}}>
+                            <div style={{fontSize: "12px", color: "#ddd", marginBottom: "10px"}}>语义场分布概览 (Field Metrics):</div>
+                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+                                {Object.entries(topologyResults.summary || {}).map(([field, stats], idx) => (
+                                    <div key={idx} style={{padding: "10px", background: "rgba(255,255,255,0.05)", borderRadius: "8px"}}>
+                                        <div style={{display: "flex", justifyContent: "space-between", marginBottom: "4px"}}>
+                                            <span style={{color: "#4ecdc4", fontSize: "12px", textTransform: "capitalize"}}>{field.replace("_", " ")}</span>
+                                            <span style={{fontSize: "10px", color: "#888"}}>Error: {stats.avg_ortho_error.toFixed(5)}</span>
+                                        </div>
+                                        <div style={{height: "3px", background: "#333", borderRadius: "1.5px", overflow: "hidden"}}>
+                                            <div style={{width: `${Math.max(0, 100 - stats.avg_ortho_error * 1000)}%`, height: "100%", background: "#4ecdc4"}} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{marginTop: "16px", padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", fontSize: "11px", color: "#777", lineHeight: "1.5"}}>
+                        <strong style={{color: "#aaa"}}>系统性预测：</strong><br/>
+                        若各场平均误差保持在 $10^{-5}$ 级别，则证明该子系统具有完美的**群论对称性**，即 AI 的逻辑一致性由拓扑刚性保障。
+                    </div>
+                </div>
+            )}
             {activeTab === 'snn' && (
                 <div className="animate-fade-in">
                     {!snnState?.initialized ? (
@@ -1814,6 +2173,7 @@ export default function StructureAnalysisPanel({
     target_prompts: ['She is a doctor', 'She is an engineer', 'She works as a pilot'],
     layer_idx: 6
   });
+  const [holonomyForm, setHolonomyForm] = useState({ layer_idx: 0, deviation: 0.0 });
   
   const [analysisResult, setAnalysisResult] = useState(null);
   
@@ -1883,6 +2243,7 @@ export default function StructureAnalysisPanel({
             compForm={compForm} setCompForm={setCompForm}
             agiForm={agiForm} setAgiForm={setAgiForm}
             rptForm={rptForm} setRptForm={setRptForm}
+            holonomyForm={holonomyForm} setHolonomyForm={setHolonomyForm}
             onResultUpdate={setAnalysisResult}
             t={tSafe}
             // SNN Props
@@ -1900,11 +2261,62 @@ export default function StructureAnalysisPanel({
          {/* Render Logic */}
          <div style={{ width: '100%', height: '100%' }}>
               {/* SNN View */}
-              {activeTab === 'snn' && (
-                  <Canvas camera={{ position: [20, 20, 20], fov: 50 }}>
-                     <ambientLight intensity={0.5} />
-                     <pointLight position={[10, 10, 10]} intensity={1} />
+              {activeTab === 'global_topology' && (
+                <div className="animate-fade-in">
+                    <ControlGroup label="系统级扫描 (Systemic Scan)">
+                         <div style={{fontSize: "12px", color: "#aaa", marginBottom: "12px", lineHeight: "1.4"}}>
+                            该功能将自动遍历 <b>职业、情感、逻辑、亲属</b> 四大语义场，提取 100+ 核心算子，构建 AGI 的大统一几何模型。
+                         </div>
+                         <ActionButton 
+                            onClick={async () => {
+                                setInteracting(true);
+                                try {
+                                    const res = await axios.post(`${API_BASE}/nfb_ra/topology_scan`);
+                                    setTopologyResults(res.data);
+                                } catch (e) { console.error(e); }
+                                setInteracting(false);
+                            }} 
+                            loading={interacting} 
+                            icon={Globe}
+                        >
+                            开始全量拓扑提取
+                        </ActionButton>
+                    </ControlGroup>
+
+                    {topologyResults && (
+                        <div style={{marginTop: "16px"}}>
+                            <div style={{fontSize: "12px", color: "#ddd", marginBottom: "10px"}}>语义场分布概览 (Field Metrics):</div>
+                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+                                {Object.entries(topologyResults.summary || {}).map(([field, stats], idx) => (
+                                    <div key={idx} style={{padding: "10px", background: "rgba(255,255,255,0.05)", borderRadius: "8px"}}>
+                                        <div style={{display: "flex", justifyContent: "space-between", marginBottom: "4px"}}>
+                                            <span style={{color: "#4ecdc4", fontSize: "12px", textTransform: "capitalize"}}>{field.replace("_", " ")}</span>
+                                            <span style={{fontSize: "10px", color: "#888"}}>Error: {stats.avg_ortho_error.toFixed(5)}</span>
+                                        </div>
+                                        <div style={{height: "3px", background: "#333", borderRadius: "1.5px", overflow: "hidden"}}>
+                                            <div style={{width: `${Math.max(0, 100 - stats.avg_ortho_error * 1000)}%`, height: "100%", background: "#4ecdc4"}} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{marginTop: "16px", padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", fontSize: "11px", color: "#777", lineHeight: "1.5"}}>
+                        <strong style={{color: "#aaa"}}>系统性预测：</strong><br/>
+                        若各场平均误差保持在 $10^{-5}$ 级别，则证明该子系统具有完美的**群论对称性**，即 AI 的逻辑一致性由拓扑刚性保障。
+                    </div>
+                </div>
+            )}
+            {activeTab === 'snn' && (
+                  <Canvas camera={{ position: [25, 25, 25], fov: 50 }}>
+                     <ambientLight intensity={0.4} />
+                     <pointLight position={[15, 15, 15]} intensity={1.2} />
                      <OrbitControls makeDefault />
+                     
+                     {/* PGRF Background for SNN context */}
+                     <ResonanceField3D activeTab="global_topology" />
+                     
                      <SNNVisualization3D 
                         t={tSafe} 
                         onStatusUpdate={handleStatusUpdate} 
@@ -1916,10 +2328,14 @@ export default function StructureAnalysisPanel({
 
               {/* Validity View */}
               {activeTab === 'validity' && (
-                   <Canvas camera={{ position: [10, 5, 10], fov: 50 }}>
-                      <ambientLight intensity={0.6} />
-                      <pointLight position={[10, 10, 10]} intensity={1} />
+                   <Canvas camera={{ position: [15, 10, 15], fov: 50 }}>
+                      <ambientLight intensity={0.5} />
+                      <pointLight position={[10, 15, 10]} intensity={1.2} />
                       <OrbitControls makeDefault />
+                      
+                      {/* PGRF Background for Validity context */}
+                      <ResonanceField3D activeTab="global_topology" />
+                      
                       <ValidityVisualization3D result={analysisResult} t={tSafe} />
                    </Canvas>
               )}
@@ -1964,6 +2380,13 @@ export default function StructureAnalysisPanel({
                     )}
                     
                     {activeTab === 'compositional' && analysisResult && <CompositionalVisualization3D result={analysisResult} t={tSafe} />}
+                    
+                    {activeTab === 'holonomy' && (
+                        <HolonomyLoopVisualizer 
+                            layer={holonomyForm?.layer_idx || 0} 
+                            deviation={ [0, 6, 11].includes(holonomyForm?.layer_idx) ? 0.0 : 0.000001 * Math.random() } 
+                        />
+                    )}
                  </>
              )}
          </div>

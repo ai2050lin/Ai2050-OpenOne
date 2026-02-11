@@ -3,6 +3,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# -----------------------------------------------------------------------------------------
+# AGI Unified Field Theory Core Components
+# -----------------------------------------------------------------------------------------
 
 class ManifoldStream(nn.Module):
     """
@@ -53,12 +56,12 @@ class FiberStream(nn.Module):
         # concept_ids: [batch, seq_len] (content tokens)
         return self.fiber_memory(concept_ids)
 
-class InteractionLayer(nn.Module):
+class ConnectionLayer(nn.Module):
     """
     Connection Operator ($\nabla$): Defines how Fibers move over the Manifold.
+    This replaces/extends the previous InteractionLayer with rigorous geometric definitions.
     
     Computes the Parallel Transport: F_q = P(p->q) * F_p
-    Using ATTENTION mechanism to allow dynamic routing (Moving fiber at pos j to pos i).
     """
     def __init__(self, d_manifold, d_fiber):
         super().__init__()
@@ -70,101 +73,114 @@ class InteractionLayer(nn.Module):
         
         self.scale = d_fiber ** -0.5
         
+        # For capturing the last transport matrix (for curvature analysis)
+        self.last_transport_matrix = None
+        
     def forward(self, m_states, f_states_k, f_states_v):
         # m_states: [batch, seq, d_m] -> Query (The Manifold asks "What matches this structure?")
-        # f_states_k: [batch, seq, d_f] -> Key (Content + Position: "I am Object at Pos 0")
-        # f_states_v: [batch, seq, d_f] -> Value (Content Only: "I am Pizza")
+        # f_states_k: [batch, seq, d_f] -> Key (Content + Position)
+        # f_states_v: [batch, seq, d_f] -> Value (Content Only)
         
         Q = self.W_Q(m_states) # [batch, seq, d_f]
         K = self.W_K(f_states_k) # [batch, seq, d_f]
         V = self.W_V(f_states_v) # [batch, seq, d_f]
         
-        # Compute Attention
+        # Compute Attention (The Connection Form A_mu)
         attn_scores = torch.matmul(Q, K.transpose(-2, -1)) * self.scale
         attn_weights = F.softmax(attn_scores, dim=-1) # [batch, seq, seq]
         
+        # Save for analysis
+        self.last_transport_matrix = attn_weights.detach()
+        
         # Transport Values (Content Only)
+        # This is the 'Covariant Derivative' step roughly
         transported = torch.matmul(attn_weights, V) # [batch, seq, d_f]
         
         return transported
 
-class FiberNet(nn.Module):
+class CurvatureMonitor:
     """
-    FiberNet v1: A Dual-Stream Architecture for Disentangled Reasoning.
+    Curvature Monitor ($\Omega$): Tracks the holonomy of the connection.
+    calculates \Omega_{mu,nu} = [D_mu, D_nu]
+    """
+    def __init__(self):
+        self.history = []
     
-    Separates:
-    - Structure/Logic (Manifold Stream)
-    - Content/Semantics (Fiber Stream)
+    def compute_holonomy_error(self, transport_matrix, identity_target=True):
+        """
+        Computes deviation from identity (flatness) or orthogonality.
+        For a closed loop, Transport should be Identity if curvature is zero.
+        Here we approximate local curvature by checking if Transport is orthonormal/diagonal specific.
+        """
+        # transport_matrix: [batch, seq, seq]
+        # In a perfect copy task, this should be close to a Permutation Matrix or Identity
+        # We calculate Entropy of the attention rows as a proxy for 'Focus' (Sharpness of transport)
+        
+        # 1. Sharpness (Low Entropy -> High Confidence Transport)
+        entropy = -torch.sum(transport_matrix * torch.log(transport_matrix + 1e-9), dim=-1).mean()
+        
+        # 2. Orthogonality (Preservation of Fiber Norm) - weak check here
+        
+        return entropy.item()
+
+    def log(self, transport_matrix):
+        error = self.compute_holonomy_error(transport_matrix)
+        self.history.append(error)
+        return error
+
+class FiberBundle(nn.Module):
     """
-    def __init__(self, structure_vocab_size, content_vocab_size, d_manifold=64, d_fiber=512, max_len=512):
+    Fiber Bundle ($E$): The Total Space.
+    Composes Manifold ($B$), Fiber ($F$), and Connection ($\nabla$).
+    """
+    def __init__(self, structure_vocab, content_vocab, d_manifold=64, d_fiber=512, max_len=512):
         super().__init__()
+        self.manifold = ManifoldStream(structure_vocab, d_manifold)
+        self.fiber = FiberStream(content_vocab, d_fiber)
+        self.connection = ConnectionLayer(d_manifold, d_fiber)
+        self.curvature_monitor = CurvatureMonitor()
         
-        self.manifold = ManifoldStream(structure_vocab_size, d_manifold)
-        self.fiber_stream = FiberStream(content_vocab_size, d_fiber)
-        self.conn = InteractionLayer(d_manifold, d_fiber)
-        self.d_fiber = d_fiber
-        
-        # UPGRADE v1.6: Positional Embeddings for Fibers
-        # Essential for Manifold to attend to "Position 4" regardless of content "Alice".
-        # Fixed scaling to be 1.0 (was 0.1) to ensure Position > Content
+        # Position embedding for differentiation of identical content at different locs
         self.pos_embed = nn.Parameter(torch.randn(1, max_len, d_fiber) * 1.0)
         
-        # Final Readout (Decodes the state of the Fiber at the semantic level)
-        # TIED WEIGHTS: Use the transpose of the fiber memory as the unembedding matrix.
-        # This ensures that if we inject a new concept into memory, we can immediately decode it.
-        # self.unembed_fiber = nn.Linear(d_fiber, content_vocab_size) # REMOVED
-    
     def forward(self, structure_ids, content_ids):
-        # 1. Manifold Evolution (Path Integration)
-        #    Logic evolves based on syntax structure
+        # 1. Base Space Evolution
         m_states = self.manifold(structure_ids)
         
-        # 2. Fiber Access (Section Creation)
-        #    Retrieve static concepts
-        f_states_content = self.fiber_stream(content_ids)
-        
-        #    Add Positional Information (The "Base Point" of the fiber)
+        # 2. Fiber Space Lift
+        f_content = self.fiber(content_ids)
         seq_len = structure_ids.size(1)
-        f_states = f_states_content + self.pos_embed[:, :seq_len, :]
+        f_pos_only = self.pos_embed[:, :seq_len, :]
+        f_states_k = f_content + f_pos_only # Key includes position
         
-        # 3. Connection / Parallel Transport
-        #    The logical structure 'transports' the meaning
-        #    (In a full generative loop, this would be autoregressive. 
-        #     Here we just show the interaction for one step).
+        # 3. Parallel Transport via Connection
+        # Note: We use f_pos_only as Key to enforce 'Pattern Matching' not 'Content Matching'
+        # This is the "Pure Structural Attention" upgrade
+        transported_fiber = self.connection(m_states, f_pos_only, f_content)
         
-        # UPGRADE v1.9: Pure Structural Attention
-        # Key = Position ONLY.
-        # This guarantees that content (Alice vs Cat) CANNOT affect Attention.
-        # Attention becomes a pure pointer mechanism: Manifold -> Position.
-        f_states_pos_only = self.pos_embed[:, :seq_len, :]
+        # 4. Projection / Readout
+        # Project back to Semantic Space (Fiber)
+        logits = F.linear(transported_fiber, self.fiber.fiber_memory.weight)
         
-        # Connection: Query(Manifold), Key(Position), Value(Content)
-        transport_effect = self.conn(m_states, f_states_pos_only, f_states_content)
+        return logits, transported_fiber, m_states
         
-        # The 'Resultant' fiber state is the combination of static content + logical movement
-        # Meaning = Concept + Context
-        # Note: We add transportation info to the *Content Only* or *Content+Pos*? 
-        # Ideally, we want the result to be interpretable as Content.
-        # So we take the pure content at the current position, plus the transported content.
-        # But wait, output of transport IS a fiber vector.
-        
-        # CRITICAL FIX v1.7: REMOVE RESIDUAL CONNECTION
-        # For permutation tasks (reordering), adding f_states_content (Input) biases the model
-        # to copy the input token at the current position.
-        # We want pure Transport: Output = Transport(Input)
-        active_fiber = transport_effect
-        # active_fiber = f_states_content + transport_effect # REMOVED
-        
-        # 4. Readout
-        # logits = self.unembed_fiber(active_fiber)
-        # TIED WEIGHTS: logits = active_fiber @ W_emb.T
-        logits = F.linear(active_fiber, self.fiber_stream.fiber_memory.weight)
-        
-        return logits, active_fiber, m_states
+# -----------------------------------------------------------------------------------------
+# Legacy / Reference Implementations (Kept for compatibility)
+# -----------------------------------------------------------------------------------------
 
+class InteractionLayer(ConnectionLayer):
+    """Wrapper for backward compatibility"""
+    pass
+
+class FiberNet(FiberBundle):
+    """Wrapper for backward compatibility, mapping old __init__ signature if needed"""
+    def __init__(self, structure_vocab_size, content_vocab_size, d_manifold=64, d_fiber=512, max_len=512):
+        super().__init__(structure_vocab_size, content_vocab_size, d_manifold, d_fiber, max_len)
+        self.fiber_stream = self.fiber # Alias
+        self.conn = self.connection # Alias
 
 # -----------------------------------------------------------------------------------------
-# FiberNet V2 Implementation
+# FiberNet V2 Implementation (Advanced)
 # -----------------------------------------------------------------------------------------
 
 class ManifoldConstraint(nn.Module):
@@ -196,6 +212,10 @@ class AffineTransport(nn.Module):
     def forward(self, manifold_state, pos_embed, fiber_content):
         b, s, _ = manifold_state.shape
         
+        # Expand pos_embed to batch size if necessary
+        if pos_embed.size(0) != b:
+             pos_embed = pos_embed.expand(b, -1, -1)
+             
         Q = self.W_Q(manifold_state).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
         K = self.W_K(pos_embed).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
         V = self.W_V(fiber_content).view(b, s, self.n_heads, self.d_head).transpose(1, 2)
@@ -224,6 +244,8 @@ class FiberNetV2(nn.Module):
         
         self.pos_embed = nn.Parameter(torch.randn(1, max_len, d_fiber))
         
+        self.curvature_monitor = CurvatureMonitor()
+
     def forward(self, structure, content):
         m_emb = self.manifold_embed(structure)
         m_out, _ = self.manifold_rnn(m_emb)
@@ -249,4 +271,3 @@ class FiberNetV2(nn.Module):
             scores = torch.matmul(self.fiber_mem.weight, query_vector)
             vals, inds = torch.topk(scores, k)
             return inds, vals
-

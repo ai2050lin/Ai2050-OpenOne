@@ -7,9 +7,10 @@ import * as THREE from 'three';
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
-import RPTVisualization3D from './RPTVisualization3D';
+import { GlobalTopologyDashboard } from './GlobalTopologyDashboard';
+import ResonanceField3D from './ResonanceField3D';
 import { SimplePanel } from './SimplePanel';
-import { CompositionalVisualization3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
+import { CompositionalVisualization3D, CurvatureField3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, RPTVisualization3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
 import TDAVisualization3D from './TDAVisualization3D';
 import FiberNetV2Demo from './components/FiberNetV2Demo';
 
@@ -542,6 +543,29 @@ const ALGO_DOCS = {
             ]
         }
     },
+    // --- TDA ---
+    'tda': {
+        title: '拓扑分析 (Topology/TDA)',
+        simple: {
+            title: '思维地图的“坑洞”',
+            desc: '有时候研究 AI 的思维形状还不够，我们还得看看这个形状里有没有“洞”。',
+            points: [
+                '持久同调 (Persistent Homology): 就像用不同大小的筛子去筛沙子，看看哪些形状是真正稳定的。',
+                'Betti 数: 0 维代表有多少个孤立的概念点，1 维代表有多少个环形逻辑。',
+                '逻辑回路: 如果一个概念绕了一圈又回来了（比如递归逻辑），拓扑分析就能抓到它。'
+            ]
+        },
+        pro: {
+            title: 'Topological Data Analysis (TDA)',
+            desc: '利用代数拓扑方法研究高维点云的内在几何结构。',
+            points: [
+                'Vietoris-Rips Filtration: 构建单纯复形序列。',
+                'Persistence Diagram: 记录拓扑特征（孔洞）的出生与消亡。',
+                'Betti Numbers (β0, β1): 描述流形的连通分量和环的数量，表征语义特征的复杂度和稳定性。'
+            ],
+            formula: 'H_k(K) = Z_k(K) / B_k(K)'
+        }
+    },
     // --- AGI / Fiber / Glass ---
     'agi': {
         title: '神经纤维丛 (Neural Fiber Bundle)',
@@ -586,6 +610,50 @@ const ALGO_DOCS = {
             ]
         }
     },
+    'model_generation': {
+        title: '3D 模型生成说明 (3D Generation)',
+        simple: {
+            title: '如何变出 3D 的 AI 思维？',
+            desc: 'AI 的思维原本是几千个维度的数字，我们通过数学魔法（降维）把它们变成了你能看到的 3D 形状。',
+            points: [
+                '降维映射: 就像把地球仪压扁变成地图，我们将几千维的空间投影到我们的 3D 屏幕上。',
+                '实时渲染: 每一个点的位置都是根据 AI 此时此刻的激活状态动态计算出来的，不是写死的动画。',
+                '几何投影: 通过 LLE 算法，我们尽量保证在 3D 空间里离得近的点，在 AI 的原始脑回路里也是意思相近的。'
+            ]
+        },
+        pro: {
+            title: 'Model Generation Logic',
+            desc: '基于高维流形投影技术实现的实时 3D 结构渲染系统。',
+            points: [
+                'Projection Algorithm: 使用 Locally Linear Embedding (LLE) 或主成分分析 (PCA) 实现从 d_model 维到 3 维空间的保结构降维。',
+                'Dynamic Remapping: 每一层残差流激活向量通过投影矩阵 W_proj 映射到场景坐标系空间。',
+                'Topology Preservation: 通过最小化测地距离损失，确保 3D 可视化拓扑与高维流形拓扑的一致性。'
+            ],
+            formula: 'x_3d = proj(v_high_dim, method="LLE")'
+        }
+    },
+    'gut_relationship': {
+        title: '大统一智能理论 (GUT Mapping)',
+        simple: {
+            title: '智能的“物理公式”',
+            desc: '宇宙有相对论，智能也有自己的大统一理论。我们看到的 3D 结构就是这个理论的具体表现。',
+            points: [
+                '结构即逻辑: 你看到的蓝色网格（底流形）就是 AGI 的逻辑骨架（就像重力场）。',
+                '概念即纤维: 红色的小棍（纤维）就是附着在逻辑上的各种知识，它们遵循几何对称性。',
+                '推理即平移: AI 思考的过程，就是把语义在逻辑网上按照特定的轨迹进行“平行移动”。'
+            ]
+        },
+        pro: {
+            title: 'Grand Unified Theory of Intelligence (GUT)',
+            desc: '建立在微分几何与对称群基础上的通用智能理论架构。',
+            points: [
+                'Geometric Foundations: AGI 的智能源于高维流形的对称性破缺与守恒律映射。',
+                'Connection & Transport: 将注意力机制定义为黎曼联络 (Connection)，将推理定义为在纤维丛上的平行移动 (Parallel Transport)。',
+                'Unification: 通过几何拓扑将因果性、组合性、稀疏性统一在同一个纤维丛数学框架下。'
+            ],
+            formula: 'Intelligence ≡ ∫ Connectivity · Symmetry d(Manifold)'
+        }
+    },
     'flow_tubes': {
         title: '深度动力学 (Deep Dynamics)',
         simple: {
@@ -606,6 +674,92 @@ const ALGO_DOCS = {
                 'Flow Tubes: 相似输入的轨迹束。'
             ],
             formula: 'dh/dt = F(h, θ)'
+        }
+    },
+    // --- New AGI Modules ---
+    'rpt': {
+        title: '传输分析 (RPT Analysis)',
+        simple: {
+            title: '语义的“搬运工”',
+            desc: 'RPT 就像是一个精准的导航系统，它能告诉我们一个概念（比如“皇室”）是如何从一个底座（男人）平移到另一个底座（女人）上的。',
+            points: [
+                '传输矩阵 R: 一张旋转地图，把 A 的状态变换到 B 的状态。',
+                '迁移性: 只要 R 是正交的（不扭曲），说明这个逻辑在全宇宙通用。',
+                '平行移动: 像在滑梯上滑行一样，保持姿势不变，只换位置。'
+            ]
+        },
+        pro: {
+            title: 'Riemannian Parallel Transport',
+            desc: '在黎曼流形上定义切空间的线性同构变换。',
+            points: [
+                'Orthogonal Matrix: 提取的正交传输矩阵 R 捕捉了纯粹的语义旋转。',
+                'Isometry: 验证嵌入空间中不同语义族群的几何等距性。',
+                'Error Matrix: 衡量传输后的残差，评估线性假设的有效边界。'
+            ],
+            formula: 'v_target ≈ R * v_source'
+        }
+    },
+    'curvature': {
+        title: '曲率分析 (Curvature)',
+        simple: {
+            title: '思维的“颠簸程度”',
+            desc: '如果思维过程很丝滑，说明它在走直线（平坦空间）；如果突然剧烈闪避，说明它碰到了“大坑”（高曲率）。',
+            points: [
+                '平坦区: 逻辑非常顺畅，没什么好争议的。',
+                '高曲率区: 往往是由于偏见、冲突或极其复杂的逻辑导致流形发生了扭曲。',
+                '警示灯: 红色代表这里逻辑很绕，AI 可能在这里产生幻觉或偏见。'
+            ]
+        },
+        pro: {
+            title: 'Scalar Curvature Analysis',
+            desc: '计算表示流形的局部曲率张量，识别高维空间中的非线性奇点。',
+            points: [
+                'Deviation: 测量激活向量在受到扰动后的局部偏移率。',
+                'Geometric Bias: 偏见和刻板印象往往在几何上体现为极高的局部曲率。',
+                'Metric Tensor: 通过探测相邻切空间的变换速率来估算局部黎曼度量。'
+            ]
+        }
+    },
+    'debias': {
+        title: '几何去偏 (Debiasing)',
+        simple: {
+            title: '给 AI 做“正骨手术”',
+            desc: '既然偏见是一个方向性的扭曲，那我们直接用几何方法把它“掰回来”。',
+            points: [
+                '几何拦截: 识别偏见的方向（比如性别方向）。',
+                '逆变换: 把偏移的语义强制旋转回中置轴。',
+                '非概率性: 我们不是在调概率，而是在修复 AI 的底层逻辑形状。'
+            ]
+        },
+        pro: {
+            title: 'Geometric Interception Method',
+            desc: '利用 RPT 提取的传输矩阵的逆算子（R^T）对残差流实施介入。',
+            points: [
+                'Decoupling: 解耦偏见成分与核心语义。',
+                'Residual Hook: 在 Hook 层面将偏见方向投影并消除。',
+                'Validation: 观察去偏后模型输出概率分布的对称化回归。'
+            ]
+        }
+    },
+    'topology': {
+        title: '全局拓扑 (Global Topology)',
+        simple: {
+            title: 'AGI 的全景地图',
+            desc: '不再只看一句话，而是扫描 AI 大脑里所有的逻辑连接点。',
+            points: [
+                '全域扫描: 扫描职业、情感、逻辑、亲属等所有领域的几何对齐情况。',
+                '大统一模型: 试图构建一个包含所有人类知识逻辑的完整 3D 地图。',
+                '稳定性: 观察不同模型（如 GPT-2 vs Qwen）底层的几何拓扑是否一致。'
+            ]
+        },
+        pro: {
+            title: 'Systemic Manifold Scanning',
+            desc: '自动化的、跨语义场的拓扑结构提取与对齐分析。',
+            points: [
+                'Field Matrix: 构建语义场到几何块的映射表。',
+                'Topological Invariants: 提取不同层级间的同调性质。',
+                'Global Consistency: 评估全量知识在几何上的闭合性。'
+            ]
         }
     },
     // --- SNN ---
@@ -671,6 +825,29 @@ const ALGO_DOCS = {
                 'Rips Complex: 基于点云距离构建的单纯复形，用于近似流形拓扑。'
             ],
             formula: 'Hₖ(X) = ker(∂ₖ) / im(∂ₖ₊₁), βₖ = dim(Hₖ)'
+        }
+    },
+    // --- FiberNet V2 ---
+    'fibernet_v2': {
+        title: 'FiberNet V2 (即时学习)',
+        simple: {
+            title: '思维的“插件系统”',
+            desc: '传统的 AI 需要通过长时间的训练才能记住新知识，而 FiberNet V2 就像插拔式硬盘，能让 AI 秒懂。',
+            points: [
+                '慢逻辑 (Manifold): 负责理解句法和逻辑规则，这是“出厂配置”。',
+                '快记忆 (Fast Weights): 直接在“纤维空间”写入新事实，实现即时记忆升级。',
+                '解耦: 逻辑和内容是分开的。学会了说话方式（逻辑），就能随时换上各种“知识芯片”。'
+            ]
+        },
+        pro: {
+            title: 'FiberNet Architecture',
+            desc: '通过解耦底流形 (Base Manifold) 与语义纤维 (Fibers)，实现非梯度更新的单次学习 (One-shot Learning)。',
+            points: [
+                'Slow Weights: 处理逻辑骨架 $M$，捕获通用的推理模式。',
+                'Fast Weights: 直接作用于纤维空间 $F$，通过动态权重注入实现即时介入。',
+                'Linear Injection: 相比 RAG，FiberNet 直接在激活层介入，实现更深层的“理解”。'
+            ],
+            formula: 'y = SlowLogic(x) + \\sum \\alpha_i \\cdot FastContent(k_i)'
         }
     }
 };
@@ -842,6 +1019,7 @@ export default function App() {
 
   const [infoPanelTab, setInfoPanelTab] = useState('model'); // 'model' | 'detail'
   const [displayInfo, setDisplayInfo] = useState(null); // Persisted hover info
+  const [topologyResults, setTopologyResults] = useState(null); // Global Scan Data
 
   // Auto-switch Info Panel tab on hover and persist info
   useEffect(() => {
@@ -1399,6 +1577,8 @@ export default function App() {
                        compForm={compForm} setCompForm={setCompForm}
                        agiForm={agiForm} setAgiForm={setAgiForm}
                        rptForm={rptForm} setRptForm={setRptForm}
+                       topologyResults={topologyResults}
+                       setTopologyResults={setTopologyResults}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -1483,6 +1663,8 @@ export default function App() {
                        compForm={compForm} setCompForm={setCompForm}
                        agiForm={agiForm} setAgiForm={setAgiForm}
                        rptForm={rptForm} setRptForm={setRptForm}
+                       topologyResults={topologyResults}
+                       setTopologyResults={setTopologyResults}
                        onResultUpdate={setAnalysisResult}
                        activeTab={structureTab}
                        setActiveTab={setStructureTab}
@@ -1721,11 +1903,18 @@ export default function App() {
                               { id: 'causal', label: '因果分析 (Causal)', icon: '🎯' },
                               { id: 'manifold', label: '流形几何 (Manifold)', icon: '🗺️' },
                               { id: 'compositional', label: '组合泛化 (Compos)', icon: '🧩' },
+                              { id: 'tda', label: '拓扑分析 (TDA)', icon: '📊' },
                               { type: 'sep' },
                               { id: 'agi', label: '神经纤维丛 (Fiber)', icon: '🌌' },
                               { id: 'glass_matrix', label: '玻璃矩阵 (Glass)', icon: '🧊' },
                               { id: 'flow_tubes', label: '动力学 (Dynamics)', icon: '🌊' },
                               { type: 'sep' },
+                              { id: 'rpt', label: '传输分析 (RPT)', icon: '↔️' },
+                              { id: 'curvature', label: '曲率分析 (Curv)', icon: '📈' },
+                              { id: 'debias', label: '几何去偏 (Debias)', icon: '⚖️' },
+                              { id: 'topology', label: '全局拓扑 (Topo)', icon: '🌐' },
+                              { type: 'sep' },
+                              { id: 'fibernet_v2', label: 'FiberNet V2 (Demo)', icon: '🚀' },
                               { id: 'snn', label: '脉冲网络 (SNN)', icon: '🧠' },
                               { id: 'validity', label: '有效性 (Validity)', icon: '📉' },
                           ].map((item, idx) => (
@@ -2069,6 +2258,7 @@ export default function App() {
             )}
 
             {/* 2. FiberNet V2 Mode */}
+            {structureTab === 'global_topology' && <GlobalTopologyDashboard results={topologyResults} />}
             {structureTab === 'fibernet_v2' && (
                 <div style={{ fontSize: '12px', color: '#ddd' }}>
                     <div style={{ paddingBottom: '8px', borderBottom: '1px solid #333', marginBottom: '8px', color: '#4ecdc4', fontWeight: 'bold' }}>
@@ -2176,8 +2366,8 @@ export default function App() {
         </div>
       ) : (
       <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[15, 15, 15]} fov={50} />
-        <OrbitControls makeDefault />
+        <PerspectiveCamera makeDefault position={[20, 20, 20]} fov={50} />
+        <OrbitControls makeDefault target={structureTab === 'rpt' ? [0, 0, 0] : [0, 0, 0]} />
         
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} castShadow />
@@ -2185,32 +2375,56 @@ export default function App() {
         
         {/* Standard LogitLens Visualization - Always visible if data exists */}
         {data && (
-          <Text position={[0, 12, -5]} fontSize={1} color="#ffffff" anchorX="center" anchorY="bottom">
+          <Text position={[0, 15, -5]} fontSize={1} color="#ffffff" anchorX="center" anchorY="bottom">
             Logit Lens (Token Probabilities)
           </Text>
         )}
         <Visualization data={data} hoveredInfo={hoveredInfo} setHoveredInfo={setHoveredInfo} activeLayer={activeLayer} />
 
+        {/* PGRF: Pan-Geometric Resonance Field - 全局大一统背景 */}
+        <ResonanceField3D 
+           topologyResults={topologyResults} 
+           activeTab={structureTab} 
+        />
 
-        {/* Analysis Results - Rendered side-by-side if available */}
+        {/* Analysis Overlays - 模态观测图层叠加 */}
         {analysisResult && structureTab !== 'glass_matrix' && structureTab !== 'flow_tubes' && (
-          <group position={[-(data?.tokens?.length || 10) - 20, 0, 0]}>
-             {/* Add a label or visual separator */}
-             <Text position={[0, 10, 0]} fontSize={1} color="#4ecdc4" anchorX="center">
-                {structureTab === 'circuit' && '回路分析结果'}
-                {structureTab === 'features' && '特征提取结果'}
-                {structureTab === 'causal' && '因果分析结果'}
-                {structureTab === 'manifold' && '流形分析结果'}
+          <group position={data ? [-data.tokens.length, 0, -data.logit_lens.length] : [0, 0, 0]}>
+             {/* 场景标签 - 动态显示当前观测模态 */}
+             <Text position={[0, 14, 0]} fontSize={1} color="#4ecdc4" anchorX="center">
+                {structureTab === 'circuit' && '回路观测 (Circuit Overlay)'}
+                {structureTab === 'features' && '特征观测 (Feature Overlay)'}
+                {structureTab === 'causal' && '因果深度观测 (Causal Overlay)'}
+                {structureTab === 'manifold' && '流形拓扑观测 (Manifold Overlay)'}
                 {structureTab === 'compositional' && t('structure.compositional.title')}
+                {structureTab === 'rpt' && '语义传输轨迹 (Riemannian Parallel Transport)'}
+                {structureTab === 'curvature' && '流形曲率云 (Curvature Field)'}
              </Text>
              
+             {/* 具体分析图层 - 以叠加模式呈现 */}
              {structureTab === 'circuit' && <NetworkGraph3D graph={analysisResult.graph || analysisResult} activeLayer={activeLayer} />}
              {structureTab === 'features' && <FeatureVisualization3D features={analysisResult.top_features} layerIdx={analysisResult.layer_idx} onLayerClick={setSelectedLayer} selectedLayer={selectedLayer} onHover={setHoveredInfo} />}
              {structureTab === 'causal' && <NetworkGraph3D graph={analysisResult.causal_graph} activeLayer={activeLayer} />}
-              {structureTab === 'manifold' && analysisResult && <ManifoldVisualization3D pcaData={analysisResult.pca} onHover={setHoveredInfo} />}
-              {structureTab === 'compositional' && analysisResult && <CompositionalVisualization3D result={analysisResult} t={t} />}
-              {structureTab === 'rpt' && analysisResult && <RPTVisualization3D data={analysisResult} t={t} />}
-              {structureTab === 'agi' && analysisResult && <FiberBundleVisualization3D result={analysisResult} t={t} />}
+             {structureTab === 'manifold' && analysisResult && <ManifoldVisualization3D pcaData={analysisResult.pca} onHover={setHoveredInfo} />}
+             {structureTab === 'compositional' && analysisResult && <CompositionalVisualization3D result={analysisResult} t={t} />}
+             {structureTab === 'rpt' && analysisResult && (
+                <RPTVisualization3D data={analysisResult} t={t} />
+             )}
+             {structureTab === 'curvature' && analysisResult && <CurvatureField3D result={analysisResult} t={t} />}
+             {structureTab === 'debias' && analysisResult && (
+                <group>
+                   <Text position={[0, 8, 0]} fontSize={0.6} color="#bb88ff">Geometric Interception (Debias)</Text>
+                   <mesh rotation={[Math.PI/2, 0, 0]}>
+                      <torusGeometry args={[4, 0.05, 16, 100]} />
+                      <meshStandardMaterial color="#bb88ff" emissive="#bb88ff" emissiveIntensity={2} />
+                   </mesh>
+                   <mesh position={[0, 0, 0]}>
+                      <sphereGeometry args={[3.8, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                      <meshStandardMaterial color="#bb88ff" transparent opacity={0.1} side={THREE.DoubleSide} />
+                   </mesh>
+                </group>
+             )}
+             {structureTab === 'agi' && analysisResult && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'fiber' && <FiberBundleVisualization3D result={analysisResult} t={t} />}
              {structureTab === 'validity' && <ValidityVisualization3D result={analysisResult} t={t} />}
           </group>

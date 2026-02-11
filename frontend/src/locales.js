@@ -56,7 +56,9 @@ export const locales = {
         compositional: '组合性',
         agi: 'AGI验证',
         snn: '脉冲仿真',
-        validity: '有效性'
+        validity: '有效性',
+        model_generation: '3D模型生成',
+        gut_relationship: 'GUT理论关系'
       },
       circuit: {
         title: '回路发现',
