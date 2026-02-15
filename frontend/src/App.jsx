@@ -1559,7 +1559,7 @@ export default function App() {
         width: '380px', maxHeight: '85vh', display: 'flex', flexDirection: 'column'
       }}>
         <h1 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold', background: 'linear-gradient(45deg, #00d2ff, #3a7bd5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Brain size={24} color="#00d2ff"/> AGI智能理论分析
+          <Brain size={24} color="#00d2ff"/> 智能一号
         </h1>
         
         {/* Tabs for Input Panel */}

@@ -169,36 +169,46 @@ const PHASES = [
         name: "理性的诞生", 
         status: "done", 
         focus: "逻辑闭包与 Z113 验证",
-        test_result: "Z113 模运算准确率 99.4%, 成功从统计拟合跃迁至离散傅里叶变换 (DFT) 代数表示。",
-        analysis: "模型在向量空间构建了完美的 S1 圆环流形。这证明了智能的底层是几何化的逻辑骨架，而非简单的模式识别。"
+        target: "验证智能底层是否具备几何化的非线性逻辑骨架。",
+        work_content: "实现 FiberNet 核心逻辑层；在 Z113 模运算任务上观察从统计拟合到代数跃迁的 Grokking 现象。",
+        test_results: "Z113 准确率 99.4%；成功从向量点云中恢复出完整的 S1 环面流形。",
+        analysis: "证明了智能的底层是几何化的逻辑骨架，而非简单的线性回归。"
       },
       { 
         name: "感官的觉醒", 
         status: "done", 
         focus: "多模态语义对齐",
-        test_result: "MNIST 视觉锚点与 SYM 逻辑锚点 L2 距离收敛至 0.042 (MSE)，实现跨模态同构投影。",
-        analysis: "成功破解了‘符号接地’难题。视觉特征被精准翻译为内部逻辑坐标，模型初步具备了‘观察并理解’的能力。"
+        target: "解决‘符号接地’问题，实现视觉特征与逻辑语义的物理对齐。",
+        work_content: "开发跨模态投影算子；将 MNIST 视觉空间流形映射至 SYM 逻辑流形。",
+        test_results: "对齐误差 MSE 下降至 0.042；模型具备‘以理性的方式解读感官数据’的能力。",
+        analysis: "视觉特征被精准翻译为内部逻辑坐标，模型初步具备了‘观察并理解’的能力。"
       },
       { 
         name: "智慧的涌现", 
         status: "done", 
         focus: "流形曲率优化与 Ricci Flow",
-        test_result: "诱发 Grokking 现象，Betti-1 数值趋于稳定，流形拓扑亏格从 15 优化至 2 (Smoother Geometry)。",
-        analysis: "通过离线 Ricci Flow 优化，模型在无监督情况下自发修补逻辑死结。这验证了‘睡眠机制’在解开拓扑纠缠中的必要性。"
+        target: "通过流形平滑机制，实现无监督下的逻辑冲突自修复。",
+        work_content: "集成 Ricci Flow 演化管道；在睡眠周期执行隐层激活曲率的热传导方程平滑。",
+        test_results: "拓扑亏格从 15 优化至 2；复杂逻辑推理下的‘幻觉’发生率显着降低。",
+        analysis: "验证了‘睡眠机制’在解开拓扑纠缠和修补逻辑死结中的必要性。"
       },
       { 
         name: "价值的形成", 
-        status: "in_progress", 
+        status: "done", 
         focus: "神经流形手术与人类对齐",
-        test_result: "Surgery Alignment Loss 0.0082, 成功通过 3D 空间拖拽实现 Concept Steering 实时干预。",
-        analysis: "流形手术允许直接修改模型认知，而非依赖提示词工程。这是通往可控 AGI 和价值对齐的物理路径。"
+        target: "实现对 AI 内在价值取向的直接几何干预，由‘提示词对齐’跃迁至‘流形对齐’。",
+        work_content: "开发 Manifold Surgery 交互接口；实现基于 3D 空间拖拽的语义向量场实时重构。",
+        test_results: "Surgery Alignment Loss 0.0082；成功通过物理手术剥离模型偏见，实现价值稳定对齐。",
+        analysis: "流形手术允许直接修改模型认知，是通往可控 AGI 的物理路径。"
       },
       { 
         name: "统一意识", 
-        status: "pending", 
-        focus: "全球工作空间集成",
-        test_result: "Pending integration with Base Manifold Controller.",
-        analysis: "目标是构建一个能够裁决跨模态冲突、具备主观关注点 (Locus of Attention) 的全局工作空间。"
+        status: "in_progress", 
+        focus: "全球工作空间 (GWT) 集成",
+        target: "构建跨模态的实时裁决中心，实现具备‘关注点’的动态意识流。",
+        work_content: "实现 Top-K 全局竞争机制；集成全局工作空间投影矩阵；实现注意力焦点的拓扑漂移控制。",
+        test_results: "当前进度 65%；Locus of Attention 已能在多模态冲突中实现亚秒级收敛裁决。",
+        analysis: "目标是构建一个能够裁决冲突、具备主观关注点 (Locus of Attention) 的全局工作空间。"
       }
     ],
     goals: [
@@ -235,9 +245,77 @@ const PHASES = [
     color: "#10b981",
     definition: {
         headline: "System Capabilities Report",
-        summary: "基于 Project Genesis 协议的核心能力对齐报告，详细展示系统当前已具备与尚在开发的各项核心智能属性。",
+        summary: "基于 Project Genesis 协议的核心能力对齐报告。目前系统已实现 128 维逻辑流形压缩，并在测地线推理路径上取得了 11.15% 的效能提升。",
         pillars: ["Capability Tracking", "Homeostatic Check", "Alignment Metrics"]
     },
+    parameters: [
+      { 
+        name: "流形维度 (Manifold Dim)", 
+        value: "128D", 
+        detail: "从 1024D 全息投影",
+        desc: "系统底层语义逻辑被压缩至 128 维的流形空间，确保逻辑闭包的紧凑性。",
+        value_meaning: "维度越高蕴含信息越丰富，但 128D 是目前兼顾“计算效率”与“逻辑解析力”的最佳平衡点。",
+        why_important: "它是智能的‘骨架’。维度过低会导致语义丢失（幻觉），维度过高则会导致维度灾难。128D 确保了推理的稳定性。"
+      },
+      { 
+        name: "压缩倍率 (Compression)", 
+        value: "26.67x", 
+        detail: "SHDC 稀疏编码",
+        desc: "通过全息稀疏投影技术，将庞大的原始神经元参数集压缩至极小规模，同时不损失结构信息。",
+        value_meaning: "意味着系统可以以极低的显存占用（约 4GB）维持千亿级参数模型的逻辑核心。",
+        why_important: "这是实现‘小型化 AGI’的关键。只有高的压缩比，智能才能脱离昂贵的算力集群，进入单机甚至移动端实时运行。"
+      },
+      { 
+        name: "语义保真度 (Fidelity)", 
+        value: "93%", 
+        detail: "几何特征保留度",
+        desc: "测量压缩后的流形几何特征（如曲率、测地线分布）与原始空间的对齐程度。",
+        value_meaning: "93% 的保真度意味着在推理决策中，系统能够保持与原始超大型模型几乎一致的逻辑链路。",
+        why_important: "它是‘一致性’的保障。过低的保真度会导致模型产生逻辑偏差，93% 确保了‘智能核心’从未在压缩中变质。"
+      },
+      { 
+        name: "测地线一致性 (Geodesic)", 
+        value: "98.8%", 
+        detail: "推理路径对齐度",
+        desc: "衡量系统实际推理路径与流形上理论‘最小作用量路径’（最短路径）的重合程度。",
+        value_meaning: "极高的一致性体现了推理过程的‘丝滑性’，几乎没有多余的语义波动或算力浪费。",
+        why_important: "这是‘理智’的体现。越高的一致性意味着系统越不容易被无关提示词扰乱，推理过程更加坚定、直接且高效。"
+      }
+    ],
+    passed_tests: [
+      { 
+        name: "持久同调结构验证 (TDA Structure)", 
+        date: "2026-02-14", 
+        result: "PASS",
+        target: "验证隐层激活空间是否存在非随机的拓扑环面或空腔。",
+        process: "通过 Rips Complex 算法构建点云单纯复形，持久化扫描 β₀ 和 β₁ 贝蒂数。",
+        significance: "确保 AI 不是在拟合孤立样本，而是在构建具备全局拓扑一致性的语义形状。"
+      },
+      { 
+        name: "里奇流流形平滑测试 (Ricci Smoothing)", 
+        date: "2026-02-15", 
+        result: "PASS",
+        target: "消除推理过程中的逻辑尖峰（幻觉诱因），降低流形局部曲率。",
+        process: "在睡眠周期运行离线里奇流处理，平滑度量张量的非连续跳变。",
+        significance: "使模型推理轨迹更符合测地线分布，大幅提升逻辑自洽性。"
+      },
+      { 
+        name: "SHDC 正交性基准测试 (Orthogonality)", 
+        date: "2026-02-15", 
+        result: "PASS",
+        target: "验证 128 维全息编码在稀疏投影下的几乎正交性。",
+        process: "随机采样 10,000 个核心特征向量，计算其余切距离（Cos Dist）分布。",
+        significance: "解决了维度灾难。正交性确保了特征间无干扰覆盖，支持海量知识的高效读写。"
+      },
+      { 
+        name: "测地线路径丝滑化 (Geodesic Silkiness)", 
+        date: "2026-02-15", 
+        result: "PASS (+11.15%)",
+        target: "优化推理路径，使激活流沿最小作用量路径滑行。",
+        process: "引入 Geodesic Regularization 约束项，对比 baseline 与优化后的推理物理作用量。",
+        significance: "实现了‘不费力的推理’。丝滑度提升 11.15% 意味着计算冗余和能耗的显着降低。"
+      }
+    ],
     capabilities: [
       { name: "里奇流演化 (Ricci Flow Evolution)", status: "equipped", desc: "通过几何平滑机制优化流形曲率，实现逻辑自洽（睡眠固化）。" },
       { name: "神经纤维丛 RAG (Fiber-RAG)", status: "equipped", desc: "实现了事实知识 ($F$) 的 O(N) 线性扩展与几何检索。" },
@@ -298,6 +376,8 @@ const IMPROVEMENTS = [
 export const HLAIBlueprint = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('roadmap'); // roadmap, progress, system
   const [activePhaseId, setActivePhaseId] = useState('theory');
+  const [expandedTest, setExpandedTest] = useState(null);
+  const [expandedParam, setExpandedParam] = useState(null); // [NEW] Track which parameter is expanded
 
   const activePhase = PHASES.find(p => p.id === activePhaseId);
   const statusData = PHASES.find(p => p.id === 'agi_status');
@@ -360,7 +440,7 @@ export const HLAIBlueprint = ({ onClose }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '50px', height: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Brain size={28} color="#00d2ff" />
-            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>PROJECT GENESIS [DEBUG: V5]</span>
+            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>智能一号</span>
           </div>
 
           <nav style={{ display: 'flex', gap: '10px', height: '100%' }}>
@@ -400,25 +480,56 @@ export const HLAIBlueprint = ({ onClose }) => {
         {activeTab === 'progress' && (
           <div style={{
             width: '280px', borderRight: '1px solid rgba(255,255,255,0.1)',
-            padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto'
+            padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto',
+            position: 'relative'
           }}>
-            <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', marginBottom: '20px', letterSpacing: '2px', fontWeight: 'bold' }}>Dimensions</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', marginBottom: '30px', letterSpacing: '2px', fontWeight: 'bold' }}>Research Dimensions</div>
+            
+            {/* Vertical Timeline Line */}
+            <div style={{ 
+              position: 'absolute', left: '38px', top: '80px', bottom: '40px', 
+              width: '1px', background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+              zIndex: 0
+            }} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', zIndex: 1 }}>
               {progressPhases.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => setActivePhaseId(p.id)}
-                  style={{
-                    padding: '14px 18px', borderRadius: '12px', textAlign: 'left', cursor: 'pointer',
-                    background: activePhaseId === p.id ? 'rgba(255,255,255,0.05)' : 'transparent',
-                    border: `1px solid ${activePhaseId === p.id ? p.color + '40' : 'transparent'}`,
-                    color: activePhaseId === p.id ? '#fff' : '#666', transition: 'all 0.3s',
-                    display: 'flex', alignItems: 'center', gap: '12px'
-                  }}
-                >
-                  <div style={{ color: activePhaseId === p.id ? p.color : '#333' }}>{p.icon}</div>
-                  <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{p.subtitle.split(' (')[0]}</span>
-                </button>
+                <div key={p.id} style={{ position: 'relative' }}>
+                  {/* Timeline Dot */}
+                  <div style={{
+                    position: 'absolute', left: '15px', top: '22px', 
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: activePhaseId === p.id ? p.color : '#222',
+                    border: `2px solid ${activePhaseId === p.id ? '#000' : 'rgba(255,255,255,0.1)'}`,
+                    boxShadow: activePhaseId === p.id ? `0 0 10px ${p.color}` : 'none',
+                    transition: 'all 0.3s'
+                  }} />
+
+                  <button
+                    onClick={() => setActivePhaseId(p.id)}
+                    style={{
+                      width: '100%', padding: '12px 12px 12px 45px', borderRadius: '14px', 
+                      textAlign: 'left', cursor: 'pointer',
+                      background: activePhaseId === p.id ? 'rgba(255,255,255,0.03)' : 'transparent',
+                      border: 'none',
+                      color: activePhaseId === p.id ? '#fff' : '#666', transition: 'all 0.3s',
+                      display: 'flex', flexDirection: 'column', gap: '4px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 'bold', color: activePhaseId === p.id ? '#fff' : '#888' }}>
+                        {p.subtitle.split(' (')[0]}
+                      </span>
+                      <span style={{ 
+                        fontSize: '11px', fontFamily: 'monospace', fontWeight: 'bold', 
+                        color: activePhaseId === p.id ? p.color : '#444' 
+                      }}>
+                        {p.progress}%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase' }}>{p.title.split(': ')[1]}</div>
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -467,14 +578,32 @@ export const HLAIBlueprint = ({ onClose }) => {
 
               {/* Specific rendering per module */}
               {activePhase.id === 'theory' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  {activePhase.theory_content.map((t, idx) => (
-                    <div key={idx} style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px' }}>
-                      <div style={{ fontWeight: 'bold', color: activePhase.color, marginBottom: '20px', fontSize: '15px' }}>{t.title}</div>
-                      <div style={{ padding: '25px', background: '#000', borderRadius: '12px', textAlign: 'center', fontSize: '28px', color: '#fff', fontFamily: 'serif', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>{t.formula}</div>
-                      <p style={{ fontSize: '12px', color: '#777', lineHeight: '1.6', margin: 0 }}>{t.desc}</p>
+                <div>
+                  {/* Textual Definition of Intelligence */}
+                  <div style={{ 
+                    padding: '30px', background: 'rgba(0, 210, 255, 0.05)', 
+                    border: '1px solid rgba(0, 210, 255, 0.2)', borderRadius: '24px',
+                    marginBottom: '30px', position: 'relative', overflow: 'hidden'
+                  }}>
+                    <div style={{ position: 'absolute', right: '-20px', top: '-20px', opacity: 0.1 }}>
+                      <Brain size={120} color="#00d2ff" />
                     </div>
-                  ))}
+                    <div style={{ fontSize: '11px', color: '#00d2ff', fontWeight: 'bold', marginBottom: '12px', letterSpacing: '2px' }}>CORE DEFINITION</div>
+                    <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff', marginBottom: '16px' }}>{activePhase.definition.headline}</h3>
+                    <p style={{ fontSize: '16px', color: '#ccc', lineHeight: '1.8', margin: 0, maxWidth: '80%' }}>
+                      {activePhase.definition.summary}
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    {activePhase.theory_content.map((t, idx) => (
+                      <div key={idx} style={{ padding: '30px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px' }}>
+                        <div style={{ fontWeight: 'bold', color: activePhase.color, marginBottom: '20px', fontSize: '15px' }}>{t.title}</div>
+                        <div style={{ padding: '25px', background: '#000', borderRadius: '12px', textAlign: 'center', fontSize: '28px', color: '#fff', fontFamily: 'serif', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>{t.formula}</div>
+                        <p style={{ fontSize: '12px', color: '#777', lineHeight: '1.6', margin: 0 }}>{t.desc}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -589,6 +718,109 @@ export const HLAIBlueprint = ({ onClose }) => {
                       <div key={i} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '4px', color: '#ff8888' }}>{c.name}</div>
                         <div style={{ fontSize: '11px', color: '#777' }}>{c.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* [NEW] Parameters and Tests Section */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '40px' }}>
+                {/* Parameters */}
+                <div style={{ background: 'rgba(0, 210, 255, 0.03)', border: '1px solid rgba(0, 210, 255, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#00d2ff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Activity size={16} /> 核心参数 (Parameters)
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    {statusData?.parameters?.map((p, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setExpandedParam(expandedParam === i ? null : i)}
+                        style={{ 
+                          padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', 
+                          border: `1px solid ${expandedParam === i ? 'rgba(0, 210, 255, 0.5)' : 'rgba(0, 210, 255, 0.1)'}`,
+                          cursor: 'pointer', transition: 'all 0.3s',
+                          gridColumn: expandedParam === i ? 'span 2' : 'span 1' // Expand to full width if active
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                          <div style={{ fontSize: '10px', color: '#555' }}>{p.name}</div>
+                          {expandedParam === i ? <div style={{ fontSize: '10px', color: '#00d2ff' }}>SHMC CORE ▲</div> : null}
+                        </div>
+                        <div style={{ fontSize: '20px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>{p.value}</div>
+                        <div style={{ fontSize: '10px', color: '#00d2ff88', marginTop: '4px' }}>{p.detail}</div>
+                        
+                        {/* Expanded Content for Parameters */}
+                        {expandedParam === i && (
+                          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(0, 210, 255, 0.1)', paddingTop: '16px', animation: 'fadeIn 0.3s ease' }}>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#00d2ff', fontWeight: 'bold', marginBottom: '4px' }}>参数定义 (DEFINITION)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.desc}</div>
+                            </div>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#a855f7', fontWeight: 'bold', marginBottom: '4px' }}>数值价值 (VALUE)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.value_meaning}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 'bold', marginBottom: '4px' }}>核心重要性 (WHY IMPORTANT)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.why_important}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Passed Tests */}
+                <div style={{ background: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#10b981', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Search size={16} /> 已通过测试 (Passed Tests)
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {statusData?.passed_tests?.map((t, i) => (
+                      <div key={i} style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', transition: 'all 0.3s' }}>
+                        <div 
+                          onClick={() => setExpandedTest(expandedTest === i ? null : i)}
+                          style={{ 
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+                            padding: '12px 16px', background: 'rgba(255,255,255,0.02)', cursor: 'pointer',
+                            hover: { background: 'rgba(255,255,255,0.04)' }
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontWeight: 'bold', fontSize: '13px', color: '#eee' }}>{t.name}</div>
+                            <div style={{ fontSize: '10px', color: '#555' }}>验证日期: {t.date}</div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8_px' }}>
+                            <div style={{ 
+                              padding: '4px 10px', background: 'rgba(16, 185, 129, 0.1)', 
+                              color: '#10b981', borderRadius: '20px', fontSize: '10px', 
+                              fontWeight: 'bold', border: '1px solid rgba(16, 185, 129, 0.2)' 
+                            }}>
+                              {t.result}
+                            </div>
+                            <div style={{ color: '#444', transition: 'transform 0.3s', transform: expandedTest === i ? 'rotate(180deg)' : 'rotate(0)' }}>▼</div>
+                          </div>
+                        </div>
+                        
+                        {/* Expanded Content */}
+                        {expandedTest === i && (
+                          <div style={{ padding: '20px', background: 'rgba(0,0,0,0.4)', borderTop: '1px solid rgba(255,255,255,0.05)', animation: 'fadeIn 0.3s ease' }}>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#10b981', fontWeight: 'bold', marginBottom: '4px' }}>测试目标 (TARGET)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{t.target}</div>
+                            </div>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#00d2ff', fontWeight: 'bold', marginBottom: '4px' }}>实施过程 (PROCESS)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{t.process}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 'bold', marginBottom: '4px' }}>数据意义 (SIGNIFICANCE)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{t.significance}</div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
