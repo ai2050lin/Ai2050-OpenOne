@@ -2572,7 +2572,7 @@ export default function App() {
 
 
         {/* SNN Visualization - Independent of structure analysis result */}
-        {(infoPanelTab === 'snn' || systemType === 'snn') && snnState.initialized && (
+        {(infoPanelTab === 'snn' || systemType === 'snn') && snnState.initialized && snnState.structure && (
            <group position={(!data || systemType === 'snn') ? [0, 0, 0] : [-(data?.tokens?.length || 10) - 20, 0, 0]}>
               <SNNVisualization3D 
                   t={t} 
@@ -2585,16 +2585,15 @@ export default function App() {
         {/* Magnified Layer Visualization during generation */}
         {activeLayer !== null && activeLayerInfo && (
           <group position={[30, 0, 0]}>
-            {/* Phase indicator */}
             <Text
               position={[0, 8, 0]}
               fontSize={0.5}
               color="#00d2ff"
               anchorX="center"
             >
-              {computationPhase === 'attention' && t('app.computingAttention')}
-              {computationPhase === 'mlp' && t('app.processingMlp')}
-              {computationPhase === 'output' && t('app.generatingOutput')}
+              {computationPhase === 'attention' ? (t('app.computingAttention') || 'Computing Attention') : 
+               computationPhase === 'mlp' ? (t('app.processingMlp') || 'Processing MLP') : 
+               computationPhase === 'output' ? (t('app.generatingOutput') || 'Generating Output') : ''}
             </Text>
             
             <LayerDetail3D 
