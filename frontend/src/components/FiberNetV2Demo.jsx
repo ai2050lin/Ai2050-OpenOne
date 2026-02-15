@@ -23,7 +23,7 @@ const FiberNetV2Demo = ({ t }) => {
   const fetchData = (mode = dataMode) => {
       setLoading(true);
       const endpoint = mode === 'real' ? '/nfb_ra/data' : '/fibernet_v2/demo';
-      fetch(`http://localhost:5000${endpoint}`)
+      fetch(`http://localhost:5002${endpoint}`)
           .then(res => res.json())
           .then(d => {
               if (d.error || d.detail) {
@@ -147,7 +147,7 @@ const FiberNetV2Demo = ({ t }) => {
         <SimplePanel
             title="Neural Fiber Controls"
             style={{
-                position: 'fixed', bottom: 120, right: 20, zIndex: 1000,
+                position: 'absolute', bottom: 80, right: 20, zIndex: 1000,
                 width: '300px', pointerEvents: 'auto', maxHeight: '600px',
                 background: 'rgba(20, 20, 25, 0.9)'
             }}

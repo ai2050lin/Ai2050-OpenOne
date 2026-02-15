@@ -8,80 +8,12 @@ import BrainVis3D from './BrainVis3D';
 import HolonomyLoopVisualizer from './HolonomyLoopVisualizer';
 import TrainingDynamics3D from './TrainingDynamics3D';
 
-import TrainingMonitor from './TrainingMonitor';
+
+const API_BASE = 'http://localhost:5002';
 
 // ... existing imports
 
-export default function StructureAnalysisPanel({ 
-  modelInfo, 
-  analysisState, 
-  setAnalysisState, 
-  onRunAnalysis, 
-  isAnalyzing, 
-  progress,
-  serverStatus
-}) {
-  const [activeTab, setActiveTab] = useState('glass_matrix'); // Default tab
-  
-  // ... existing code ...
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'glass_matrix':
-        return (
-           <div className="h-full w-full relative">
-             <Canvas camera={{ position: [0, 5, 10], fov: 60 }}>
-               <color attach="background" args={['#050510']} />
-               <ambientLight intensity={0.5} />
-               <pointLight position={[10, 10, 10]} intensity={1.5} />
-               <OrbitControls makeDefault minDistance={2} maxDistance={50} />
-               <NetworkGraph3D graph={analysisState.glassMatrixGraph} />
-               <gridHelper args={[20, 20, 0x222222, 0x111111]} position={[0, -2, 0]} />
-             </Canvas>
-             <div className="absolute top-4 left-4 pointer-events-none">
-                <h3 className="text-white text-lg font-bold drop-shadow-md">Glass Matrix: Deep Neural Network</h3>
-                <p className="text-gray-400 text-xs"> Interactive 3D Visualization of Model Architecture </p>
-             </div>
-           </div>
-        );
-      case 'training':
-        return (
-          <div className="h-full w-full p-4 overflow-y-auto bg-slate-900">
-            <TrainingMonitor />
-          </div>
-        );
-      // ... existing cases ...
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-full bg-[#0f111a] text-white">
-      {/* Tab Header */}
-      <div className="flex border-b border-gray-800 bg-[#161b22]">
-        <button 
-          className={`px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'glass_matrix' ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-400/10' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-          onClick={() => setActiveTab('glass_matrix')}
-        >
-          <Network className="w-4 h-4 inline-block mr-2" />
-          Glass Matrix
-        </button>
-        <button 
-          className={`px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'training' ? 'text-green-400 border-b-2 border-green-400 bg-green-400/10' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-          onClick={() => setActiveTab('training')}
-        >
-          <Activity className="w-4 h-4 inline-block mr-2" />
-          Training Monitor
-        </button>
-        {/* ... other tabs ... */}
-      </div>
-      
-      {/* Content Area */}
-      <div className="flex-1 relative overflow-hidden">
-        {renderContent()}
-      </div>
-    </div>
-  );
-}
 const getEntropyColor = (value) => {
   const norm = Math.min(value / 6, 1.0);
   const hue = 240 * (1 - norm);

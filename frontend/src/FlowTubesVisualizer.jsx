@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'http://localhost:5002';
 
 function TubePath({ path, color, label, metrics, radius = 0.5, onHover }) {
   const curve = useMemo(() => {

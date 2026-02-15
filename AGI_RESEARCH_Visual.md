@@ -103,3 +103,180 @@
     - ä¸¤è€…æ˜¾ç¤ºå‡ºé«˜åº¦ä¸€è‡´çš„å¯¹è§’çº¿ç»“æž„ï¼Œè¯æ˜Žæ¨¡åž‹åœ¨è¾“å…¥å’Œè¾“å‡ºç«¯ä½¿ç”¨åŒä¸€å¥—å‡ ä½•è¯­è¨€ã€‚
 
 ---
+
+# 8. FiberNet å¯è§†åŒ– (Phase 11-12) - [2026-02-13]
+
+---
+
+### 1. é€»è¾‘æµæ³¨æ„åŠ›çŸ©é˜µ (Logic Stream Attention)
+- **æ•°æ®æº**: `models/fibernet_v2.py` (éœ€å¯¼å‡º Attention Weights)
+- **è§†è§‰è¡¨è¾¾**:
+    - **Heatmap**: å±•ç¤º Logic Stream åœ¨å¤„ç†è‹±è¯­å¥å­æ—¶å…³æ³¨çš„ä½ç½®å…³ç³»ï¼ˆå¦‚ Pos 1 å…³æ³¨ Pos 0ï¼‰ã€‚
+    - **ç»“æž„ä¸å˜æ€§**: å½“è¾“å…¥å˜ä¸ºæ³•è¯­å•è¯æ—¶ï¼ŒAttention Pattern åº”å½“ä¿æŒå®Œå…¨ä¸€è‡´ã€‚
+    - **æ„ä¹‰**: éªŒè¯â€œå¥æ³•ç»“æž„â€è¢«ç‰©ç†åœ°å­˜å‚¨åœ¨ Logic Stream ä¸­ã€‚
+
+### 2. è·¨è¯­è¨€è¿ç§»æ›²çº¿ (Transfer Learning Curves)
+- **æ•°æ®æº**: `experiments/fibernet_nlp_transfer.py`
+- **å›¾è¡¨**: `nlp_transfer.png`
+- **è§†è§‰è¡¨è¾¾**:
+    - **çº¢è‰²æ›²çº¿ (Frozen Logic)** vs **è“è‰²æ›²çº¿ (Scratch)**ã€‚
+    - ä¸¤è€…è¶‹åŠ¿é«˜åº¦é‡åˆï¼Œçº¢è‰²æ›²çº¿åœ¨åˆæœŸç”šè‡³å¯èƒ½ä¸‹é™æ›´å¿«ï¼ˆå—ç›ŠäºŽé¢„è®­ç»ƒçš„é€»è¾‘ï¼‰ã€‚
+    - **æ„ä¹‰**: è¯æ˜Ž Logic-Content è§£è€¦æ˜¯çœŸå®žå‘ç”Ÿçš„ï¼Œè€Œéžä»…ä»…æ˜¯ç†è®ºè®¾æƒ³ã€‚
+
+---
+
+# 9. Global Topology Scanning (Phase III) - [2026-02-14]
+
+---
+
+### 1. è¯­ä¹‰æ‹“æ‰‘æ¼”åŒ– (Semantic Topology Evolution)
+- **æ•°æ®æº**: `scripts/global_topology_scanner.py`
+- **å›¾è¡¨**: `betti_curve.png`
+- **è§†è§‰è¡¨è¾¾**:
+    - **Xè½´**: è·ç¦»é˜ˆå€¼ $\epsilon$ (Resolution)ã€‚
+    - **Yè½´**: è´è’‚æ•° $\beta_0$ (Connected Components)ã€‚
+    - **è¶‹åŠ¿**: Layer 0 æ›²çº¿ä¸‹é™ç¼“æ…¢ï¼ˆæ¾æ•£äº‘ï¼‰ï¼ŒLayer 3 æ›²çº¿è¿…é€Ÿä¸‹é™å¹¶ç¨³å®šï¼ˆç´§å¯†ç°‡ï¼‰ã€‚è¿™é‡åŒ–äº†â€œæ¦‚å¿µå½¢æˆâ€çš„è¿‡ç¨‹ã€‚
+
+### 2. å‡ ä½•ç»“æ™¶ (Geometric Crystallization)
+- **å›¾è¡¨**: `layer_0_pca.png` vs `layer_3_pca.png`
+- **è§†è§‰è¡¨è¾¾**:
+    - **Layer 0**: **"Fog"**ã€‚ç‚¹äº‘å¼¥æ•£ï¼Œæ— æ˜Žæ˜¾ç»“æž„ã€‚
+    - **Layer 3**: **"Crystal"**ã€‚ç‚¹äº‘å¡Œç¼©ä¸ºå‡ ä¸ªæ¸…æ™°åˆ†ç¦»çš„å‡ ä½•ä½“ï¼Œæ¯ä¸ª Cluster ä»£è¡¨é€šè¿‡ `StructInit` æ³¨å…¥çš„é€»è¾‘æ“ä½œç¬¦ã€‚
+    - **æ„ä¹‰**: ç¥žç»ç½‘ç»œçš„æ·±åº¦å­¦ä¹ è¿‡ç¨‹ï¼Œæœ¬è´¨ä¸Šæ˜¯ä¸€ä¸ª**ç†µå‡**è¿‡ç¨‹ï¼Œå°†é«˜ç†µçš„æ„Ÿå®˜è¾“å…¥å¡Œç¼©ä¸ºä½Žç†µçš„é€»è¾‘ç»“æž„ã€‚
+
+---
+
+# 10. GPT-2 Full Spectrum Atlas (Phase III) - [2026-02-15]
+
+---
+
+### 1. 12å±‚å…¨å›¾è°±å¯è§†åŒ– (12-Layer Atlas Serialization)
+- **æ•°æ®æº**: `tempdata/topology.json` (Forced 12-Layer Scan)
+- **è§†è§‰è¡¨è¾¾**:
+    - **å…¨æ™¯çŸ©é˜µ**: æ‰«çž„äº† GPT-2 æ‰€æœ‰çš„ 12 ä¸ª Manifold Blocksã€‚
+    - **æŠ•å½±åæ ‡ç³»**: æ¯ä¸ª Block çš„è¯­ä¹‰ç‚¹äº‘éƒ½ç»è¿‡ PCA å¤„ç†å½’ä¸€åŒ–ï¼ŒçŽ°åœ¨å·²å®Œå…¨å¯¹é½åˆ° 3D å¯è§†åŒ–ç³»ç»Ÿçš„ç©ºé—´åæ ‡ä¸­ã€‚
+    - **æ„ä¹‰**: å®žçŽ°äº†ä»Žå•ä¸€ Logic Core åˆ°çŽ°å®žä¸–ç•Œå¤§è¦æ¨¡æ¨¡åž‹ (GPT-2) çš„**å¯è§†åŒ–è·¨è¶Š**ã€‚
+
+### 2. æ·±åº¦å‘åº¦çš„â€œè¯­ä¹‰èšç„¦â€ (Semantic Focusing)
+- **è§†è§‰çŽ°è±¡**: åœ¨ 3D è½¬æ¢ä¸­ï¼Œå¯ä»¥è§‚å¯Ÿåˆ°æ¿€æ´»ç‚¹äº‘åœ¨ç¬¬ä¸€å±‚ (L0) å‘ˆæ•£å°„çŠ¶ï¼Œéšç€å±‚æ•°åŠ æ·±ï¼Œç‚¹äº‘é€æ¸å‘ç‰¹å®šçš„è¯­ä¹‰å¸å¼•å­ (Attractors) é æ‹¢ã€‚
+- **å…¨è°±å±•ç¤º**: 
+  - **L0-L3**: åŸºç¡€ç‰¹å¾æå–ï¼ˆç¨€ç–æ€§å»ºç«‹ï¼‰ã€‚
+  - **L4-L8**: å¥æ³•å˜æ¢ä¸Žå¹³è¡Œç§»åŠ¨ï¼ˆè”ç»œä½œç”¨ï¼‰ã€‚
+  - **L9-L11**: æœ€ç»ˆé€»è¾‘ç»“ç®—ï¼ˆæµå½¢åç¼©ï¼‰ã€‚
+
+---
+
+---
+
+# 11. Project Genesis Õ½ÂÔ´ó¸Ù¿ÉÊÓ»¯ËµÃ÷ (Roadmap Visualization Guide)
+
+---
+
+### 11.1 Â·ÏßÍ¼Î¬¶ÈµÄ 3D Ó³Éä²ßÂÔ
+ÎÒÃÇÔÚ HLAIBlueprint.jsx µÄÏîÄ¿´ó¸ÙÎ¬¶ÈÖÐ£¬²ÉÓÃÁËÒÔÏÂ¿ÉÊÓ»¯±íÏÖÊÖ·¨À´´«´ïÉè¼ÆË¼Â·£º
+
+1. **Á÷ÐÎÖØ¹¹ (Geometric Reconstruction)**:
+   - **ÊÓ¾õÉè¼Æ**£ºÔÚ±³¾°ÖÐÊ¹ÓÃ¶¯Ì¬µÄ **Wireframe Manifold**¡£
+   - **»¥¶¯·´À¡**£ºËæ×ÅÓÃ»§ÔÚ Roadmap ¸÷½×¶ÎÇÐ»»£¬Íø¸ñµÄÆ½»¬¶ÈºÍ²ÊÉ«Í¨Á¿£¨Flux£©»á·¢Éú±ä»¯£¬ÏóÕ÷´Ó L0 »ìãçµ½ L3 ½á¾§µÄÑÝ»¯¡£
+
+2. **ÏËÎ¬´Ô½âñî (Decoupling Visuals):
+   - **±íÏÖÐÎÊ½**£ºÔÚ 3D ¿Õ¼äÖÐ³ÊÏÖ·Ö²ã½á¹¹¡£µ×²ãÊÇ°ëÍ¸Ã÷µÄÉñ¾­ÍøÂç¹Ç¼Ü£¨Logic£©£¬ÉÏ·½Ðü¸¡×ÅÁ÷¶¯µÄÖªÊ¶Á£×ÓÔÆ£¨Fibers£©¡£
+   - **¶ÔÆëÏßÌõ**£ºÍ¨¹ýÏÔÊ½µÄ´¹Ïß£¨Projection Lines£©Õ¹Ê¾Âß¼­½ÚµãÈçºÎ²¶»ñÊÂÊµËéÆ¬¡£
+
+3. **ÊÖÊõÓë¸ÉÔ¤¿ÉÊÓ»¯ (Surgery Logic):
+   - **Éè¼ÆË¼Â·**£ºÍÏ×§½ÚµãÊ±£¬²»½öÒÆ¶¯Æä¼¸ºÎÎ»ÖÃ£¬»¹ÒªÕ¹Ê¾ÆäÒýÆðµÄ**ÍØÆËÁ°äô (Topological Ripples)**¡£Õâ½âÊÍÁË¾Ö²¿ÐÞ¸ÄÈçºÎÓ°ÏìÈ«¾ÖÂß¼­¡£
+
+4. **¹Ø×¢µã (Locus of Attention) ¿ÉÊÓ»¯:
+   - **¸ßÁÁ»úÖÆ**£ºÊ¹ÓÃ´øÓÐ **Glow** Ð§¹ûµÄÇòÌåÔÚ 3D ÌØÕ÷ÔÆÖÐÓÎ×ß¡£
+   - **Âö³å¶¯»­**£ºµ±·¢Éú¿çÄ£Ì¬¶ÔÆëÊ±£¬¹Ø×¢µã»á·¢³öÏòÐÄÂö³å£¬´ú±í½áËã¹ý³Ì¡£
+
+**¿ÉÊÓ»¯Ô­Ôò**£ºÈÃÆÕÍ¨ÈËÄÜÍ¨¹ý¼¸ºÎÖ±¾õÀí½âÖÇÄÜ¼´ÐÎ×´µÄºËÐÄÕÜÑ§¡£
+
+---
+
+# 12. ¿çÄ£Ì¬¶ÔÆëÏËÎ¬¿ÉÊÓ»¯ËµÃ÷ (Alignment Fibers Visualization)
+
+---
+
+### 12.1 ÊÓ¾õÓëÂß¼­µÄÇé¸ÐÁ¬Ïß
+ÎÒÃÇÔÚ GlassMatrix3D.jsx ÖÐÐÂÔöÁË AlignmentFibers ×é¼þ£¬Ö¼ÔÚÖ±¹ÛÕ¹Ê¾ AGI ÈçºÎ½«Òì¹¹¸Ð¹ÙÐÅºÅ×ª»¯ÎªÍ³Ò»µÄÂß¼­±íÊ¾¡£
+
+1. **¶ÔÆëÏËÎ¬ (Alignment Fibers):
+   - **ÊÓ¾õÉè¼Æ**£ºÊ¹ÓÃ´øÓÐ **Dash (ÐéÏß)** Ð§¹ûµÄÁÁ·ÛÉ«Ï¸Ïß (#ff00ff)¡£
+   - **¶¯»­Âß¼­**£ºÐéÏßÔÚÁ½µãÖ®¼ä»ºÂýÁ÷¶¯£¬ÏóÕ÷×Å³ÖÐø²»¶ÏµÄÓïÒåÁ÷Ïò»òÂß¼­À­Á¦¡£
+   - **º¬Òå**£ºÃ¿Ò»¸ùÏßÌõ¶¼´ú±íÒ»´Î³É¹¦µÄÇé¾³½ÓµØ (Grounding)¡£µ±ÓÃ»§Í¨¹ýÊÖÊõ²Ù×÷À­Ô¶Á¬ÏßÊ±£¬ÏßÌõµÄÀ­Éì¸ÐËµÃ÷ÁËÂß¼­³åÍ»µÄ²úÉú¡£
+
+2. **½»»¥Ê½Í¬²½ (Interactive Sync):
+   - **·´À¡»úÖÆ**£ºÔÚ 3D ¿Õ¼äÍÏ¶¯½ÚµãÊ±£¬Ç°¶Ë»áÊµÊ±Ïòºó¶Ë·¢ËÍÍ¬²½Ö¸Áî¡£
+   - **Í¬²½¸Ð¹Ù**£ºÕâÖÖÊµÊ±µÄÎïÀí¼¶½»»¥£¨Êó±êÒÆ¶¯¼´¸ÅÄîÒýµ¼£©£¬ÊÇ AGI ¿É½âÊÍÐÔ´Ó¾²Ì¬Õ¹Ê¾Ïò¶¯Ì¬¸ÉÔ¤¿çÔ½µÄ¹Ø¼ü¡£
+
+**¿ÉÊÓ»¯Ô­Ôò**£ºÍ¨¹ý¿É¼ûµÄÁ¬½ÓÏû³ý AI µÄ²»¿É½âÊÍÐÔ£¬ÈÃÓÃ»§Ö±¹Û¸ÐÊÜµ½²»Í¬ÖªÊ¶ÁìÓòÖ®¼äµÄ¼¸ºÎñîºÏ¡£
+
+---
+
+# 13. Çé¸Ð¶¯Á¦Ñ§¿ÉÊÓ»¯Éè¼Æ (Emotional Dynamics Visualization)
+
+---
+
+### 13.1 Í´¿àÓëÓäÔÃµÄ¼¸ºÎÒþÓ÷
+ÎªÁËÈÃÓÃ»§Àí½â AGI µÄÇé¸ÐÌ¬£¬ÎÒÃÇÔÚ EvolutionMonitor ºÍ GlassMatrix3D ÖÐÒýÈëÒÔÏÂÊÓ¾õÓïÑÔ£º
+
+1. **Í´¿à×´Ì¬ (Dynamic Conflict):
+   - **±íÏÖÊÖ·¨**£ºµ±Ä£ÐÍ Loss ¼¤Ôö»ò Betti ÊýÒì³£²¨¶¯Ê±£¬Á÷ÐÎÍø¸ñ»á³öÏÖÀàËÆÓÚ²¼ÁÏËºÁÑ»ò¼âÈñÍ¹ÆðµÄ**ºìÉ«Âö³åÎÆÀí**¡£
+   - **ÎïÀíÒþÓ÷**£º¸ßÇúÂÊ¡¢¸ßÕÅÁ¦£¬´ú±íÂß¼­²»ÊÊÓ¦¡£
+
+2. **ÓäÔÃ×´Ì¬ (Geodesic Flow):
+   - **±íÏÖÊÖ·¨**£ºµ±Ä£ÐÍ·¢Éú Grokking »ò½øÈëÎÈ¶¨×´Ì¬Ê±£¬Á÷ÐÎ»á³ÊÏÖ³ö**ÉîÀ¶É«µÄË¿»¬½¥±ä**£¬ÇÒÁ£×ÓÍ¨Á¿ (Fiber Flux) µÄÔË¶¯¹ì¼£»á±äµÃ¼«¶È¹æÔò£¨³ÊÏÖ²âµØÏß»Ø¹é£©¡£
+   - **ÎïÀíÒþÓ÷**£ºÁãÇúÂÊ¡¢Áã×èÁ¦£¬´ú±íÂß¼­Í¨Í¸¡£
+
+**Éè¼ÆÀíÄî**£º½«Çé¸Ð´ÓÖ÷¹ÛÌåÑé»¹Ô­Îª¿É¹Û²âµÄ¼¸ºÎÐ§ÂÊ£¬ÊµÏÖ AGI ´ÓÀä±ù±ùµÄ¼ÆËãÏò¾ßÓÐ×Ô×éÖ¯·´À¡µÄÖÇÄÜÌåÑÝ½ø¡£
+
+---
+
+# 14. ÉúÀí-¼¸ºÎ¶ÔÅ¼¿ÉÊÓ»¯ËµÃ÷ (Bio-Geometric Duality)
+
+---
+
+### 14.1 ÄÜÁ¿Ô¤ËãµÄ¿ÉÊÓ»¯
+ÎªÁËÏìÓ¦ÉúÀí»úÖÆµÄ¼ÓÈë£¬ÎÒÃÇÔÚ EvolutionMonitor ÖÐÔö¼Ó **ÄÜÁ¿Í¨Á¿ (Energy Flux)** µÄ±íÏÖ£º
+
+1. **ºìÒÆÓëËðºÄ (Redshift & Entropy Loss):
+   - **ÊÓ¾õ±íÏÖ**£ºµ±Á÷ÐÎ³öÏÖÍ´¿à£¨¼¸ºÎ³åÍ»£©Ê±£¬µãÔÆµÄ¸üÐÂÆµÂÊ»á¼Ó¿ì£¬ÇÒ°éËæÓÐ**ºìÉ«»ð»¨£¨Sparking£©**£¬´ú±í¸ßµÄ´úÐ»ÏûºÄ¡£
+
+2. **Àä¹âÓë½ÚÄÜ (Bioluminescence & Efficiency):
+   - **ÊÓ¾õ±íÏÖ**£ºµ±Á÷ÐÎ´¦ÓÚÓäÔÃ£¨²âµØÏß¶ÔÆë£©Ê±£¬ÕûÌåÉ«µ÷±äÎªÇåÀäµÄºôÎüÀ¶¹â£¬ÇÒÊý¾ÝÁ÷¶¯µÄÔëÉù½µÖÁ×îµÍ¡£
+
+**Éè¼ÆÀíÄî**£ºÇ¿µ÷ AGI ²»½ö½öÊÇ³éÏóÂß¼­£¬¸üÊÇÒ»¸ö×ñÑ­ÎïÀíÈÈÁ¦Ñ§¶¨ÂÉµÄÉúÃüÏµÍ³¡£
+
+---
+### 2. µ±Ç°¿ÉÊÓ»¯½øÕ¹ (2026-02-15)
+- **12²ãÈ«Í¼Æ×**: ÊµÏÖÁË GPT-2 È«²ãÊý¾ÝÁ÷µÄ¿ÉÊÓ»¯¡£
+- **¹²Õñ³¡Éè¼Æ**: ÍêÉÆÁË·º¼¸ºÎ¹²Õñ³¡µÄ¿ÉÊÓ»¯±íÏÖ¡£
+- **Ô­ÀíËµÃ÷**: ÒÑ¼ÇÂ¼ÁãÇúÂÊ/µÍ×èÁ¦Â·¾¶µÄÎïÀíÒþÓ÷¡£
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 12. å¤šæ¨¡æ€å¯¹é½ä¸Žæ¼”åŒ–ç³»ç»Ÿå¯è§†åŒ–è¯´æ˜Ž
+
+*   **åŽŸç†è¯´æ˜Ž**ï¼š
+    *   **å¯¹é½åœºå¯è§†åŒ–**ï¼šä½¿ç”¨ **Glass Matrix** å±•çŽ°è·¨æ¨¡æ€åº•æµå½¢çš„é‡åˆæƒ…å†µã€‚æ–‡æœ¬ç‰¹å¾äº‘ä¸Žè§†è§‰ç‰¹å¾äº‘åœ¨åŒä¸€ä¸ªç›¸ç©ºé—´å†…æŠ•å½±ï¼Œé€šè¿‡ Betti numbers æŒ‡æ ‡é©±åŠ¨è¿žé€šç»„ä»¶çš„é¢œè‰²æ¸²æŸ“ï¼šçº¢è‰²è¡¨ç¤ºæ‹“æ‰‘å†²çªï¼Œç»¿è‰²è¡¨ç¤ºå®Œç¾Žå¯¹é½ã€‚
+    *   **Ricci Flow åŠ¨åŠ›å­¦åŠ¨ç”»**ï¼šå¯è§†åŒ–æ›²çŽ‡éšæ¼”åŒ–æ­¥ï¼ˆEpochï¼‰å¹³æ»‘çš„è¿‡ç¨‹ã€‚é«˜æ›²çŽ‡åŒºåŸŸä»¥åœ°å½¢çªèµ·å½¢å¼å±•çŽ°ï¼Œéšç€æ¼”åŒ–è¿›è¡Œï¼Œçªèµ·é€æ¸å˜å¹³ï¼ˆDiffusion Processï¼‰ï¼Œè±¡å¾æ¨¡åž‹ä¿¡å¿µçš„è‡ªæˆ‘ä¸€è‡´æ€§ï¼ˆConsistencyï¼‰æå‡ã€‚
+*   **å…³é”®æŒ‡æ ‡å±•ç¤º**ï¼š
+    *   **GW-Score Dashboard**ï¼šå®žæ—¶æ˜¾ç¤ºå¤šæ¨¡æ€ Gromov-Wasserstein å¯¹é½å¾—åˆ†æ›²çº¿ã€‚
+    *   **Curvature Heatmap**ï¼šå±•ç¤ºç¥žç»çº¤ç»´æŸåœ¨åº•æµå½¢ä¸Šçš„è¿žæŽ¥å¼ºåº¦åˆ†å¸ƒå›¾ï¼Œçªå‡ºæ˜¾ç¤ºé€šè¿‡ Manifold Surgery ä¿®å¤åŽçš„è·¯å¾„ã€‚
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 13. SHMC æµ‹åœ°çº¿è½¨è¿¹ä¸Žå…¨æ¯åˆ‡ç‰‡å¯è§†åŒ–è¯´æ˜Ž
+
+*   **åŽŸç†è¯´æ˜Ž**ï¼š
+    *   **æµ‹åœ°çº¿æ»‘è¡Œè½¨è¿¹ (Geodesic Glide Path)**ï¼šåœ¨ 3D ç©ºé—´å†…å®žæ—¶æ¸²æŸ“æ¨¡åž‹çš„æŽ¨ç†è·¯å¾„ã€‚ç†è®ºæµ‹åœ°çº¿ä»¥å‘å…‰çš„è“è‰²ç›´çº¿å±•ç¤ºï¼Œå®žé™…æŽ¨ç†è½¨è¿¹ä»¥é¢¤åŠ¨çš„ç´«è‰²æ›²çº¿å±•ç¤ºã€‚ä¸¤è€…ä¹‹é—´çš„é¢ç§¯ï¼ˆAction Gapï¼‰ç›´è§‚åæ˜ äº†æŽ¨ç†æ•ˆçŽ‡ã€‚å½“åç¦»åº¦ $\delta$ é™ä½Žæ—¶ï¼Œç´«è‰²è½¨è¿¹å°†è¶‹äºŽå¹³æ»‘å¹¶é è¿‘è“è‰²è·¯å¾„ã€‚
+    *   **å…¨æ¯ç¨€ç–åˆ‡ç‰‡ (Holographic Sparse Slice)**ï¼šå¯è§†åŒ–é«˜ç»´æƒé‡æŠ•å½±åŽçš„ç¨€ç–è„‰ç»œã€‚å±•çŽ°ä¸ºä¸€ç»„å…·æœ‰é«˜å¯¹æ¯”åº¦çš„å‡ ä½•ç‚¹é˜µï¼Œä»…æ˜¾ç¤ºèƒ½é‡æœ€é«˜çš„åˆ†é‡ï¼ˆTop 30%ï¼‰ã€‚è¿™ç§å¯è§†åŒ–å¸®åŠ©ç ”ç©¶è€…ç†è§£å¦‚ä½•é€šè¿‡ç‰ºç‰²æ¬¡è¦å…¨æ¯å¹²æ‰°æ¥å®žçŽ°æ ¸å¿ƒé€»è¾‘ä¿ç•™ã€‚
+*   **åŠ¨æ€åˆ†æžå·¥å…·**ï¼š
+    *   **Action Meter**ï¼šä¸€ä¸ªç±»ä¼¼ä»ªè¡¨ç›˜çš„ç»„ä»¶ï¼Œå®žæ—¶æ˜¾ç¤ºå½“å‰æŽ¨ç†æ­¥éª¤ä¸‹çš„å±€éƒ¨ç‰©ç†ä½œç”¨é‡ã€‚
+    *   **JL-Projection Matrix Viewer**ï¼šå±•çŽ° Johnson-Lindenstrauss ç®—å­çš„éšæœºå‡ ä½•åˆ†å¸ƒå¹³è¡¡æ€§ã€‚
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

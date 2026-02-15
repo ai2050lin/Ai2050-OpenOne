@@ -150,16 +150,29 @@ class DecoupledFiberNet(nn.Module):
         
         self.head = nn.Linear(self.d_memory, vocab_size, bias=False)
         
-    def forward(self, input_ids):
-        batch, seq = input_ids.shape
-        device = input_ids.device
+    def forward(self, input_ids=None, memory_embeds=None):
+        """
+        Args:
+            input_ids: [Batch, Seq] - Standard token inputs
+            memory_embeds: [Batch, Seq, D_Memory] - Optional override for memory stream (e.g. from Vision)
+        """
+        device = input_ids.device if input_ids is not None else memory_embeds.device
+        
+        # Determine Batch and Seq
+        if input_ids is not None:
+            batch, seq = input_ids.shape
+        else:
+            batch, seq, _ = memory_embeds.shape
         
         # Init Logic (Pos only)
         positions = torch.arange(seq, device=device).unsqueeze(0).expand(batch, -1)
         curr_logic = self.pos_embed(positions)
         
-        # Init Memory (Content only)
-        curr_memory = self.content_embed(input_ids)
+        # Init Memory
+        if memory_embeds is not None:
+            curr_memory = memory_embeds
+        else:
+            curr_memory = self.content_embed(input_ids)
         
         # Evolve
         for layer in self.layers:

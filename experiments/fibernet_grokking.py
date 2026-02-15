@@ -123,6 +123,8 @@ def run_experiment(model, name):
                 for bx, by in test_loader:
                     bx, by = bx.to(device), by.to(device)
                     logits = model(bx)
+                    if len(logits.shape) == 3:
+                        logits = logits.mean(dim=1)
                     preds = logits.argmax(dim=-1)
                     test_correct += (preds == by).sum().item()
                     test_total += by.size(0)

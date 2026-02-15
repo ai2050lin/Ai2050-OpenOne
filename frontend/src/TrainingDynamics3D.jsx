@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'http://localhost:5002';
 
 export default function TrainingDynamics3D({ t }) {
   const [metrics, setMetrics] = useState({ Transformer: [], FiberNet: [] });

@@ -4,19 +4,22 @@ import axios from 'axios';
 import { Brain, HelpCircle, Loader2, RotateCcw, Search, Settings, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import AGICentralCommand from './AGICentralCommand';
+import { AGIProgressDashboard } from './AGIProgressDashboard';
+import FiberNetV2Demo from './components/FiberNetV2Demo';
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
 import { GlobalTopologyDashboard } from './GlobalTopologyDashboard';
+import { HLAIBlueprint } from './HLAIBlueprint';
 import ResonanceField3D from './ResonanceField3D';
 import { SimplePanel } from './SimplePanel';
 import { CompositionalVisualization3D, CurvatureField3D, FeatureVisualization3D, FiberBundleVisualization3D, LayerDetail3D, ManifoldVisualization3D, NetworkGraph3D, RPTVisualization3D, SNNVisualization3D, StructureAnalysisControls, ValidityVisualization3D } from './StructureAnalysisPanel';
 import TDAVisualization3D from './TDAVisualization3D';
-import FiberNetV2Demo from './components/FiberNetV2Demo';
 
 import { locales } from './locales';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'http://localhost:5001';
 
 
 
@@ -852,6 +855,47 @@ const ALGO_DOCS = {
     }
 };
 
+const EvolutionMonitor = ({ data, onStartSleep }) => {
+  if (!data) return null;
+  return (
+    <div style={{
+      background: 'rgba(0,210,255,0.05)', padding: '15px', color: '#00ffcc',
+      border: '1px solid rgba(0,210,255,0.2)', borderRadius: '12px', marginBottom: '20px',
+      fontFamily: 'monospace'
+    }}>
+      <h3 style={{ margin: '0 0 10px 0', borderBottom: '1px solid rgba(0,210,255,0.2)', fontSize: '14px' }}>EVOLUTION MONITOR</h3>
+      <div style={{ marginBottom: '8px', fontSize: '12px' }}>
+        STATUS: <span style={{ color: data.is_evolving ? '#ff00ff' : '#00ffcc' }}>
+          {data.is_evolving ? 'SLEEPING (EVOLVING)' : 'AWAKE (READY)'}
+        </span>
+      </div>
+      <div style={{ marginBottom: '8px', fontSize: '12px' }}>
+        CURVATURE (Ω): {data.curvature?.toFixed(6) || 'N/A'}
+      </div>
+      <div style={{ marginBottom: '15px', width: '100%', background: 'rgba(255,255,255,0.05)', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
+        <div style={{ 
+          width: `${data.progress}%`, height: '100%', background: '#ff00ff', 
+          transition: 'width 0.3s ease', boxShadow: '0 0 10px #ff00ff'
+        }} />
+      </div>
+      {!data.is_evolving && (
+        <button 
+          onClick={onStartSleep}
+          style={{
+            width: '100%', padding: '8px', background: 'transparent',
+            border: '1px solid #ff00ff', color: '#ff00ff', cursor: 'pointer',
+            fontWeight: 'bold', borderRadius: '6px', fontSize: '11px'
+          }}
+          onMouseOver={e => e.target.style.background = 'rgba(255,0,255,0.1)'}
+          onMouseOut={e => e.target.style.background = 'transparent'}
+        >
+          ENTER SLEEP CYCLE
+        </button>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
   const [lang, setLang] = useState('zh');
   const [helpTab, setHelpTab] = useState('architect'); // Selected tab in Help Modal
@@ -890,6 +934,25 @@ export default function App() {
   // Animation states for layer computation visualization
   const [isAnimating, setIsAnimating] = useState(false);
   const [activeLayer, setActiveLayer] = useState(null);
+  const [activeTab, setActiveTab] = useState('glass_matrix');
+  const [evolutionData, setEvolutionData] = useState(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetch('http://localhost:5002/nfb/evolution/status')
+        .then(res => res.json())
+        .then(data => setEvolutionData(data))
+        .catch(err => console.error("Monitor fetch error:", err));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleStartSleep = () => {
+    fetch('http://localhost:5002/nfb/evolution/ricci?iterations=100', { method: 'POST' })
+      .catch(err => console.error("Start evolution error:", err));
+  };
+
+  const [showAGIDashboard, setShowAGIDashboard] = useState(false);
   const [computationPhase, setComputationPhase] = useState(null); // 'attention' | 'mlp' | 'output'
   const [activeLayerInfo, setActiveLayerInfo] = useState(null);
   
@@ -898,6 +961,7 @@ export default function App() {
   const [stepAnalysisMode, setStepAnalysisMode] = useState('features'); // 'features', 'circuit', 'causal', 'none'
   const [analysisResult, setAnalysisResult] = useState(null);
   const [structureTab, setStructureTab] = useState('circuit');
+  
 
   // Analysis Forms State (Lifted from StructureAnalysisPanel)
   const [circuitForm, setCircuitForm] = useState({
@@ -1070,6 +1134,7 @@ export default function App() {
     headPanel: true,
 
   });
+  const [showBlueprint, setShowBlueprint] = useState(false);
 
   const togglePanelVisibility = (key) => {
     setPanelVisibility(prev => ({
@@ -1424,6 +1489,10 @@ export default function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}>
       
+      {showAGIDashboard && (
+        <AGICentralCommand onClose={() => setShowAGIDashboard(false)} />
+      )}
+      
       {/* Global Settings Button */}
       <button
         onClick={() => setShowConfigPanel(!showConfigPanel)}
@@ -1442,6 +1511,28 @@ export default function App() {
       >
         <Settings size={20} />
       </button>
+
+      {/* Project Genesis Blueprint Button - Strategic Roadmap */}
+      <button
+        onClick={() => setShowBlueprint(true)}
+        style={{
+          position: 'absolute', top: 20, left: 70, zIndex: 101,
+          background: showBlueprint ? '#4488ff' : 'rgba(20, 20, 25, 0.8)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          padding: '8px',
+          cursor: 'pointer',
+          color: '#00d2ff',
+          backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 0 10px rgba(0, 210, 255, 0.3)'
+        }}
+        title="Project Genesis: 战略层级路线图"
+      >
+        <Brain size={20} />
+      </button>
+
+      {/* Global Config Panel */}
 
       {/* Global Config Panel */}
       {showConfigPanel && (
@@ -1498,6 +1589,19 @@ export default function App() {
              }}
           >
             脉冲神经网络 (SNN)
+          </button>
+          <button
+             onClick={() => {
+                 setInputPanelTab('fibernet'); 
+                 setSystemType('fibernet');
+             }}
+             style={{
+               flex: 1, padding: '8px', background: inputPanelTab === 'fibernet' ? '#6c5ce7' : 'transparent', border: 'none', borderRadius: '4px',
+               color: inputPanelTab === 'fibernet' ? '#fff' : '#888',
+               cursor: 'pointer', fontWeight: '600', fontSize: '12px', transition: 'all 0.2s'
+             }}
+          >
+            FiberNet Lab
           </button>
         </div>
 
@@ -1682,6 +1786,13 @@ export default function App() {
                           padding: 0
                        }}
                      />
+               </div>
+            )}
+
+            {/* FiberNet Lab Content */}
+            {inputPanelTab === 'fibernet' && (
+               <div className="animate-fade-in" style={{ height: '100%' }}>
+                  <FiberNetV2Demo t={t} />
                </div>
             )}
         
@@ -1983,6 +2094,7 @@ export default function App() {
                                const content = helpMode === 'simple' ? doc.simple : doc.pro;
                                return (
                                    <div className="animate-fade-in">
+                                       <EvolutionMonitor data={evolutionData} onStartSleep={handleStartSleep} />
                                        <h3 style={{ fontSize: '20px', color: helpMode === 'simple' ? '#4ecdc4' : '#a29bfe', marginTop: 0, marginBottom: '20px' }}>
                                            {content.title}
                                        </h3>
@@ -2522,6 +2634,27 @@ export default function App() {
             t={t}
           />
         </SimplePanel>
+      )}
+
+      {/* Project Genesis Blueprint Overlay */}
+      {showBlueprint && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
+          <HLAIBlueprint onClose={() => setShowBlueprint(false)} />
+        </div>
+      )}
+
+      {showAGIDashboard && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 3100, background: '#0a0a0c' }}>
+          <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 3110 }}>
+            <button 
+              onClick={() => setShowAGIDashboard(false)}
+              style={{ background: '#222', border: 'none', color: 'white', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer' }}
+            >
+              返回主界面
+            </button>
+          </div>
+          <AGIProgressDashboard />
+        </div>
       )}
 
     </div>

@@ -3,7 +3,7 @@ import { Activity, Play, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SimplePanel } from './SimplePanel';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'http://localhost:5002';
 
 /**
  * Helper to get color for entropy heatmap

@@ -879,3 +879,118 @@ class CompositionalAnalysis:
             
         except Exception as e:
             return {"error": str(e)}
+
+class FiberNetAnalyzer:
+    """
+    Analyzes neural manifold structure for FiberNet visualization.
+    Generates Nodes (Base Manifold) and Fibers (Local Sections).
+    """
+    def __init__(self, model):
+        self.model = model
+        
+    def generate_data(self, n_samples=50):
+        """Generates the JSON structure expected by FiberNetV2Demo."""
+        import random
+
+        from sklearn.decomposition import PCA
+
+        # 1. Generate Corpus (Templates for structure)
+        templates = [
+            "The {} is {}.",
+            "A {} can {}.",
+            "Why does the {} {}?",
+            "I see a {} {}."
+        ]
+        nouns = ["cat", "dog", "robot", "human", "doctor", "nurse"]
+        adjectives = ["red", "blue", "fast", "smart", "happy", "sad"]
+        verbs = ["run", "jump", "sleep", "think", "eat", "fly"]
+        
+        sentences = []
+        labels = []
+        for _ in range(n_samples):
+            t = random.choice(templates)
+            n = random.choice(nouns)
+            if "{}" in t.replace("{}", "", 1): # 2 slots
+                rem = t.replace("{}", "", 1)
+                if "is" in t or "see" in t:
+                    a = random.choice(adjectives)
+                    s = t.format(n, a)
+                else: 
+                    v = random.choice(verbs)
+                    s = t.format(n, v)
+            else:
+                s = t.format(n)
+            sentences.append(s)
+            labels.append(n) # Label by noun
+            
+        # 2. Get Activations
+        layer = self.model.cfg.n_layers // 2
+        activations = []
+        
+        with torch.no_grad():
+            for text in sentences:
+                _, cache = self.model.run_with_cache(text)
+                # Take last token residual stream
+                act = cache[f"blocks.{layer}.hook_resid_post"][0, -1, :].cpu().numpy()
+                activations.append(act)
+                
+        data = np.array(activations)
+        
+        # 3. PCA to 3D (Base Manifold)
+        pca = PCA(n_components=3)
+        projected = pca.fit_transform(data)
+        
+        # 4. Construct Visualization Data
+        manifold_nodes = []
+        manifold_points = []
+        fibers = []
+        connections = []
+        
+        # Create a grid of "Nodes" to represent the base manifold structure
+        # We can use KMeans or just a grid in PCA space
+        from sklearn.cluster import KMeans
+        n_clusters = 9
+        kmeans = KMeans(n_clusters=n_clusters)
+        clusters = kmeans.fit_predict(projected)
+        centers = kmeans.cluster_centers_
+        
+        for i, center in enumerate(centers):
+            manifold_nodes.append({
+                "id": str(i),
+                "pos": center.tolist()
+            })
+            
+            # Add a fiber at this node (representing local variance/normal)
+            # For visualization, just a vertical stick or random vector
+            fibers.append({
+                "parent_id": str(i),
+                "height": float(random.uniform(1.0, 3.0)), # Explicit float
+                "color_intensity": float(random.random())
+            })
+            
+        # Points (Individual samples)
+        for i, (pos, label) in enumerate(zip(projected, labels)):
+            manifold_points.append({
+                "pos": pos.tolist(),
+                "type": "concept",
+                "text": label,
+                "cluster": int(clusters[i])
+            })
+            
+        # Connections (Edges between nodes based on proximity)
+        for i in range(len(centers)):
+            for j in range(i + 1, len(centers)):
+                dist = np.linalg.norm(centers[i] - centers[j])
+                if dist < 5.0: # Threshold
+                    connections.append({
+                        "source": str(i),
+                        "target": str(j),
+                        "weight": float(1.0 / (dist + 0.1))
+                    })
+                    
+        return {
+            "manifold_nodes": manifold_nodes,
+            "manifold_points": manifold_points,
+            "fibers": fibers,
+            "connections": connections
+        }
