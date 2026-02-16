@@ -377,7 +377,8 @@ export const HLAIBlueprint = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('roadmap'); // roadmap, progress, system
   const [activePhaseId, setActivePhaseId] = useState('theory');
   const [expandedTest, setExpandedTest] = useState(null);
-  const [expandedParam, setExpandedParam] = useState(null); // [NEW] Track which parameter is expanded
+  const [expandedParam, setExpandedParam] = useState(null);
+  const [expandedEngPhase, setExpandedEngPhase] = useState(null); // [FIX] Added missing state
 
   const activePhase = PHASES.find(p => p.id === activePhaseId);
   const statusData = PHASES.find(p => p.id === 'agi_status');
