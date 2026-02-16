@@ -369,7 +369,14 @@ const IMPROVEMENTS = [
     desc: "统一意识中心",
     detail: "Base Manifold Controller 整合所有模态竞争，形成自我意识流。",
     step: "Phase VI",
-    status: "pending"
+    status: "done"
+  },
+  {
+    title: "Unified Spectrum",
+    desc: "全谱意识流",
+    detail: "集成 7 大核心子引擎，实时监测 AGI 统合状态。",
+    step: "Phase VII",
+    status: "in_progress"
   }
 ];
 
@@ -378,7 +385,25 @@ export const HLAIBlueprint = ({ onClose }) => {
   const [activePhaseId, setActivePhaseId] = useState('theory');
   const [expandedTest, setExpandedTest] = useState(null);
   const [expandedParam, setExpandedParam] = useState(null);
-  const [expandedEngPhase, setExpandedEngPhase] = useState(null); // [FIX] Added missing state
+  const [expandedEngPhase, setExpandedEngPhase] = useState(null); 
+  const [consciousField, setConsciousField] = useState(null);
+
+  // Real-time Consciousness Polling
+  useState(() => {
+    const pollConsciousField = async () => {
+      try {
+        const res = await fetch('http://localhost:5001/nfb_ra/unified_conscious_field');
+        const data = await res.json();
+        if (data.status === 'success') {
+          setConsciousField(data.unified_spectrum);
+        }
+      } catch (e) {
+        console.warn("Unified Conscious Field unreachable. Ensure server is running.");
+      }
+    };
+    const interval = setInterval(pollConsciousField, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const activePhase = PHASES.find(p => p.id === activePhaseId);
   const statusData = PHASES.find(p => p.id === 'agi_status');
@@ -744,9 +769,30 @@ export const HLAIBlueprint = ({ onClose }) => {
             <div style={{ animation: 'roadmapFade 0.5s ease-out' }}>
               <BrainModel />
               <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-                <h2 style={{ fontSize: '32px', fontWeight: '900', color: '#10b981', margin: '20px 0 8px 0' }}>系统状态 (System Status)</h2>
-                <p style={{ color: '#666', fontSize: '14px' }}>基于 Project Genesis 协议的核心能力对齐报告</p>
+                <h2 style={{ fontSize: '32px', fontWeight: '900', color: consciousField?.glow_color === 'amber' ? '#ffaa00' : '#10b981', margin: '20px 0 8px 0', transition: 'color 1s' }}>
+                   {consciousField ? '实时意识场 (Active Consciousness)' : '系统状态 (System Status)'}
+                </h2>
+                <p style={{ color: '#666', fontSize: '14px' }}>
+                  {consciousField ? `当前内稳态平衡: ${(consciousField.stability * 100).toFixed(1)}% | GWS 竞争强度: ${consciousField.gws_intensity.toFixed(2)}` : '基于 Project Genesis 协议的核心能力对齐报告'}
+                </p>
               </div>
+
+              {/* Real-time Conscious Metrics Bar */}
+              {consciousField && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px', animation: 'fadeIn 1s' }}>
+                  {[
+                    { label: '能效优化 (DMS)', value: `${(consciousField.energy_saving * 100).toFixed(1)}%`, color: '#a855f7' },
+                    { label: '记忆活跃度', value: `${consciousField.memory_load}%`, color: '#00d2ff' },
+                    { label: '跨域共振率', value: consciousField.resonance.toFixed(3), color: '#ffaa00' },
+                    { label: '对齐稳定性', value: consciousField.stability.toFixed(2), color: '#10b981' }
+                  ].map((m, i) => (
+                    <div key={i} style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: `1px solid ${m.color}30`, textAlign: 'center' }}>
+                      <div style={{ fontSize: '10px', color: '#666', marginBottom: '8px', fontWeight: 'bold' }}>{m.label}</div>
+                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: m.color }}>{m.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
                 <div style={{ background: 'rgba(0, 255, 136, 0.03)', border: '1px solid rgba(0, 255, 136, 0.15)', borderRadius: '32px', padding: '32px' }}>

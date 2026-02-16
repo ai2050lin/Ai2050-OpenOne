@@ -10,8 +10,10 @@ import json
 import os
 import sys
 
-# 添加父目录到路径，以便导入根目录的模块
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 添加路径，以便导入根目录及 scripts 目录的模块
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, root_dir)
+sys.path.insert(0, os.path.join(root_dir, "scripts"))
 
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
@@ -40,7 +42,11 @@ from structure_analyzer import (
 )
 
 from experiments.surgery_hooks import ManifoldSurgeon
+
+# --- AGI Core Components ---
+from scripts.agi_core_engine import AGICoreEngine
 from scripts.global_topology_scanner import TopologyScanner
+from scripts.rlmf_manager import RLMFManager
 from server.cross_bundle_service import cross_bundle_aligner
 from server.fibernet_service import fibernet_service
 from server.global_workspace_service import global_workspace_controller
@@ -55,6 +61,8 @@ interceptor = None
 analysis_cache = {}
 fiber_memory = FiberMemory()
 snn_instance = None
+agi_core = None
+rlmf_node = None
 
 # --- Lifespan and App Definition ---
 
@@ -138,6 +146,15 @@ async def lifespan(app: FastAPI):
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+        # 4. Initialize AGI Core Engine
+        global agi_core, rlmf_node
+        try:
+            agi_core = AGICoreEngine(manifold_dim=32)
+            rlmf_node = RLMFManager(agi_core)
+            print("✓ AGI Core Engine and RLMF Provider initialized.")
+        except Exception as agi_err:
+            print(f"✗ Error initializing AGI Core: {agi_err}")
 
     yield
     # Shutdown logic
@@ -792,7 +809,44 @@ async def rpt_analysis_api(request: Dict[str, Any]):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/steer_concept")
+# --- Unified AGI Core API ---
+
+@app.get("/nfb_ra/unified_conscious_field")
+async def get_unified_conscious_field():
+    """获取 AGI 统合意识全息场数据"""
+    if agi_core is None:
+        raise HTTPException(status_code=503, detail="AGI Core not initialized")
+    
+    # 运行一个简化的意识周期以获取实时状态
+    signal = np.random.randn(32)
+    report = agi_core.run_conscious_step(0, signal)
+    
+    # 注入 GWS 状态数据
+    report["gws_state"] = agi_core.gws.state.tolist()
+    # 注入情感色彩场
+    report["glow_color"] = "amber" if agi_core.emotion.stability > 0.6 else "indigo"
+    
+    return {
+        "status": "success",
+        "timestamp": time.time(),
+        "unified_spectrum": report,
+        "active_modules": list(agi_core.gws.modules.keys())
+    }
+
+@app.post("/nfb_ra/inject_feedback")
+async def inject_human_feedback(rating: int):
+    """注入人类反馈 (RLMF 对齐)"""
+    if rlmf_node is None:
+        raise HTTPException(status_code=503, detail="RLMF Provider not initialized")
+    
+    result = rlmf_node.receive_feedback(rating)
+    return {
+        "status": "success",
+        "updated_alignment": result,
+        "message": "Human value resonance established" if rating > 0 else "Correction energy applied"
+    }
+
+@app.get("/steer_concept")
 async def steer_concept_api(request: Dict[str, Any]):
     """Concept steering endpoint"""
     if model is None: raise HTTPException(status_code=503, detail="Model not loaded yet")
