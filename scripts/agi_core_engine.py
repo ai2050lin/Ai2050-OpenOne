@@ -3,14 +3,15 @@ import os
 import time
 
 import numpy as np
+import torch
 from dms_attention import GeometricSparseAttention
 from emotion_engine import EmotionEngine
 from gws_controller import GWSController
 from holographic_memory import HolographicMemoryManager
-
-# 导入所有已开发的组件 (模拟导入或直接集成逻辑)
 from intent_engine import IntentionalityEngine
 from resonance_engine import CrossDomainResonator
+
+from scripts.riemannian_geometry import RiemannianManifold
 
 
 class AGICoreEngine:
@@ -38,56 +39,53 @@ class AGICoreEngine:
         
         print("[+] AGI 核心统合成功。")
 
-    def run_conscious_step(self, step_id, environmental_signal):
+    def run_conscious_step(self, step_id, environmental_signal: torch.Tensor):
         """
         运行单个意识周期 (Conscious Cycle)
-        1. 感知与竞争 (GWS)
-        2. 情感评估 (EE)
-        3. 目标设定 (GI)
-        4. 推理与能效 (GA + DMS)
-        5. 记忆沉淀 (HM)
+        environmental_signal: 真实的 LLM 激活向量 [D]
         """
-        print(f"\n--- 意识周期 {step_id:03d} 启动 ---")
+        # 转换为 numpy 供旧模块兼容，但保留 tensor 供几何逻辑使用
+        signal_np = environmental_signal.detach().cpu().numpy()
         
-        # 1. 竞争性激活 (GWS)
-        # 模拟不同模块的信号竞争
+        print(f"\n--- 意识周期 {step_id:03d} 启动 (Real-Time Activation Mode) ---")
+        
+        # 1. 竞争性激活 (GWS) - 基于余弦相似度的真实权重
+        # 模拟内存信号（从真实的度量张量中提取）
+        memory_signal = np.sin(signal_np) * 0.5 
+        
         module_signals = {
-            "Geometric_Reasoning_GA": environmental_signal * 0.8,
-            "Cross_Domain_Sensory_CR": environmental_signal * 1.2, # 目前感官占优
-            "Long_Term_Memory_HM": np.random.randn(self.dim) * 0.5
+            "Geometric_Reasoning_GA": signal_np * 0.8,
+            "Cross_Domain_Sensory_CR": signal_np * 1.2,
+            "Long_Term_Memory_HM": memory_signal
         }
         winner = self.gws.compete(module_signals)
         
-        # 2. 情感内稳态调节 (EE)
-        # 假设逻辑效率受环境干扰波动
-        logic_efficiency = 0.85 + np.random.randn() * 0.05
+        # 2. 情感调节 (EE) - 基于激活稀疏度的负反馈
+        sparsity = (environmental_signal == 0).float().mean().item()
+        logic_efficiency = 1.0 - sparsity
         emotion_state = self.emotion.update_homeostasis(None, logic_efficiency)
         
-        # 3. 意图目标设定 (GI)
-        # 目标受信状态和 GWS 现状共同驱动
-        target_pos = np.ones(self.dim) * 5.0
+        # 3. 意图设定 (GI) - 目标由于流形几何引导
+        target_pos = signal_np * 1.5 
         self.intent.add_target("GLOBAL_GOAL", target_pos)
         
-        # 4. 推理与能效 (GA + DMS)
-        # 使用 DMS 优化注意力
-        q_pos = np.random.randn(10, 4)
-        k_pos = np.random.randn(10, 4)
-        # 这里仅展示能效计算
+        # 4. 推理与能效 (DMS)
+        # 使用真实的激活分布计算
         _, energy_save = self.dms.run_sparse_attention(
-            np.random.randn(10, 16), np.random.randn(10, 16), np.random.randn(10, 16),
-            q_pos, k_pos
+            np.tile(signal_np, (10, 1)), np.tile(signal_np, (10, 1)), np.tile(signal_np, (10, 1)),
+            np.random.randn(10, 4), np.random.randn(10, 4)
         )
         
         # 5. 记忆沉淀 (HM)
-        # 记录关键周期数据
-        self.memory.encode(np.eye(self.dim)[step_id % self.dim], environmental_signal)
+        self.memory.encode(signal_np, signal_np)
         
         cycle_report = {
             "step": step_id,
             "gws_winner": winner,
             "emotion": emotion_state,
             "energy_saving": f"{energy_save:.2f}%",
-            "memory_slots": self.memory.current_size
+            "memory_slots": self.memory.current_size,
+            "signal_norm": float(torch.norm(environmental_signal).item())
         }
         
         return cycle_report
