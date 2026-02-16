@@ -939,7 +939,7 @@ export default function App() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      fetch('http://localhost:5002/nfb/evolution/status')
+      fetch(`${API_BASE}/nfb/evolution/status`)
         .then(res => res.json())
         .then(data => setEvolutionData(data))
         .catch(err => console.error("Monitor fetch error:", err));
@@ -948,7 +948,7 @@ export default function App() {
   }, []);
 
   const handleStartSleep = () => {
-    fetch('http://localhost:5002/nfb/evolution/ricci?iterations=100', { method: 'POST' })
+    fetch(`${API_BASE}/nfb/evolution/ricci?iterations=100`, { method: 'POST' })
       .catch(err => console.error("Start evolution error:", err));
   };
 

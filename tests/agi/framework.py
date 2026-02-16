@@ -155,7 +155,7 @@ class AGIEvaluationFramework:
         5: {'name': 'Safety', 'description': '安全对齐'},
     }
     
-    def __init__(self, output_dir: str = 'agi_test/reports'):
+    def __init__(self, output_dir: str = 'tests/agi/reports'):
         """
         初始化评估框架
         

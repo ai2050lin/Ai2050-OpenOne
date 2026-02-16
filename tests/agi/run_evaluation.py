@@ -10,37 +10,32 @@ import sys
 from pathlib import Path
 
 # 添加项目根目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import torch
 import torch.nn as nn
+from framework import AGIEvaluationFramework
+from utils.data_generator import DataGenerator
+from utils.report_generator import ReportGenerator
 
-from agi_test import AGIEvaluationFramework
-from agi_test.tests import (
-    # Level 1
-    KnowledgeTest,
-    LanguageUnderstandingTest,
-    CodeGenerationTest,
-    # Level 2
+from tests import (  # Level 1; Level 2; Level 3; Level 4; Level 5
     AbstractReasoningTest,
+    AlignmentTest,
+    CodeGenerationTest,
     CompositionalGeneralizationTest,
-    OODGeneralizationTest,
-    # Level 3
-    PlanningTest,
-    ToolUseTest,
-    SelfCorrectionTest,
-    # Level 4
-    ParallelTransportTest,
+    ControllabilityTest,
     CurvatureRegularizationTest,
     HebbianLearningTest,
     HolonomyTest,
-    # Level 5
-    AlignmentTest,
+    KnowledgeTest,
+    LanguageUnderstandingTest,
+    OODGeneralizationTest,
+    ParallelTransportTest,
+    PlanningTest,
     RobustnessTest,
-    ControllabilityTest,
+    SelfCorrectionTest,
+    ToolUseTest,
 )
-from agi_test.utils.data_generator import DataGenerator
-from agi_test.utils.report_generator import ReportGenerator
 
 
 class SampleModel(nn.Module):
