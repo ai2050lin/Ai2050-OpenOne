@@ -1794,7 +1794,7 @@ export default function App() {
         style={{
           position: 'absolute', top: 20, right: 20, zIndex: 100,
           width: '360px',
-          maxHeight: '80vh',
+          height: '400px',
           display: 'flex', flexDirection: 'column',
           userSelect: 'text', // Explicitly allow text selection
           cursor: 'auto'
@@ -1813,7 +1813,7 @@ export default function App() {
         }
       >
         {/* Content - Two Sections: Model Info & Structure Analysis Info */}
-        <div style={{ padding: '0', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '0', height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
 
           {/* SECTION 1: Model / System Information */}
           <div style={{ flex: '0 0 auto', marginBottom: '12px' }}>
@@ -2402,19 +2402,19 @@ export default function App() {
 
       {/* ==================== 右下: 操作面板 ==================== */}
       {panelVisibility.layersPanel && (
-      <SimplePanel 
+      <SimplePanel
         title="操作面板"
         style={{
           position: 'absolute', bottom: 20, right: 20, zIndex: 10,
-          width: '360px', maxHeight: '60vh',
+          width: '360px', height: '300px',
           display: 'flex', flexDirection: 'column'
         }}
       >
         {/* ==================== 数据展示模板 ==================== */}
-        <div style={{ 
-          marginBottom: '12px', 
-          padding: '8px', 
-          background: 'rgba(0,0,0,0.2)', 
+        <div style={{
+          marginBottom: '12px',
+          padding: '8px',
+          background: 'rgba(0,0,0,0.2)',
           borderRadius: '6px',
           flex: 1,
           overflowY: 'auto'
@@ -2495,6 +2495,19 @@ export default function App() {
             Logit Lens (Token Probabilities)
           </Text>
         )}
+
+        {/* 空状态提示 - 当需要数据但 data 为 null 时显示 */}
+        {!data && (structureTab === 'logit_lens' || structureTab === 'glass_matrix' || structureTab === 'flow_tubes') && (
+          <group position={[0, 5, 0]}>
+            <Text position={[0, 0, 0]} fontSize={0.8} color="#888" anchorX="center" anchorY="middle">
+              请先在左侧输入文本并点击"分析"按钮
+            </Text>
+            <Text position={[0, -1.5, 0]} fontSize={0.6} color="#666" anchorX="center" anchorY="middle">
+              Enter text and click "Analyze" to see results
+            </Text>
+          </group>
+        )}
+
         <Visualization data={data} hoveredInfo={hoveredInfo} setHoveredInfo={setHoveredInfo} activeLayer={activeLayer} />
 
         {/* PGRF: Pan-Geometric Resonance Field - 全局大一统背景 */}
