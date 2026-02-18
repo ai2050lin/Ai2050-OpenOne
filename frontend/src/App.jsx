@@ -1,11 +1,13 @@
 import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
-import { Brain, HelpCircle, Loader2, RotateCcw, Search, Settings, X } from 'lucide-react';
+import {
+  Activity, ArrowRightLeft, BarChart, BarChart2, Brain, CheckCircle, GitBranch, Globe, Globe2,
+  Grid3x3, HelpCircle, Layers, Loader2, Maximize2, Minimize2, Network, RefreshCw, RotateCcw,
+  Scale, Search, Settings, Share2, Sparkles, Target, TrendingUp, X
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import AGICentralCommand from './AGICentralCommand';
-import { AGIProgressDashboard } from './AGIProgressDashboard';
 import FiberNetV2Demo from './components/FiberNetV2Demo';
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
@@ -23,7 +25,7 @@ import { AnalysisDataDisplay, MetricsRow, MetricCard } from './components/shared
 import { OperationHistoryPanel, useOperationHistory } from './components/shared/OperationHistory';
 import { DataComparisonView } from './components/shared/DataComparisonView';
 
-const API_BASE = 'http://localhost:5001';
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 
 
@@ -551,7 +553,7 @@ const ALGO_DOCS = {
         }
     },
     // --- TDA ---
-    'tda': {
+    'tda_legacy': {
         title: '拓扑分析 (Topology/TDA)',
         simple: {
             title: '思维地图的“坑洞”',
@@ -859,6 +861,466 @@ const ALGO_DOCS = {
     }
 };
 
+const GUIDE_SECTION_DEFAULT = {
+  pro: {
+    goal: '明确该方法想解释什么、能回答什么问题。',
+    approach: ['定义任务与样本', '运行分析并提取关键统计量', '结合3D可视化形成可解释结论'],
+    model3d: '将高维激活映射到三维空间，颜色/尺寸/轨迹分别表示强度、重要性和动态变化。',
+    algorithm: '根据当前方法计算结构信号，再做稳定性检查（跨层、跨样本、跨提示词）。',
+    metricRanges: ['强信号：显著高于随机基线', '中信号：接近阈值边界', '弱信号：与随机结果难区分']
+  },
+  simple: {
+    goal: '看懂这个分析到底想回答什么。',
+    approach: ['先跑一次分析', '看关键数字', '再看3D图确认是否一致'],
+    model3d: '3D图就是把看不见的内部状态画成能直观看懂的形状和颜色。',
+    algorithm: '算法负责找规律，图形负责让你快速确认规律是否真实稳定。',
+    metricRanges: ['明显更好/更差：结论更可信', '差别不大：先别下结论', '多次重复一致：可信度提高']
+  }
+};
+
+const GUIDE_ICON_MAP = {
+  Settings,
+  Brain,
+  BarChart2,
+  Grid3x3,
+  GitBranch,
+  Share2,
+  Sparkles,
+  Target,
+  Globe2,
+  Layers,
+  Network,
+  ArrowRightLeft,
+  TrendingUp,
+  BarChart,
+  Globe,
+  RefreshCw,
+  Scale,
+  CheckCircle,
+  Activity
+};
+
+const GUIDE_STRUCTURED = {
+  architect: {
+    pro: {
+      goal: '理解模型容量与层级结构是否支持后续可解释分析。',
+      approach: ['读取模型配置', '确认层数/头数/维度', '评估可分析粒度与成本'],
+      model3d: '层深代表计算阶段，节点密度代表表示容量，轨迹代表跨层信息变换。',
+      algorithm: '结构解析 + 配置统计，不涉及训练，仅做架构可解释性评估。',
+      metricRanges: ['n_layers: 24-80常见', 'n_heads: 8-64常见', '参数规模越大，分析成本越高']
+    },
+    simple: {
+      goal: '先看清这个模型有多大、分几层。',
+      approach: ['看层数', '看头数', '看参数量'],
+      model3d: '层越深，表示处理步骤越多。',
+      algorithm: '先做体检再做分析。',
+      metricRanges: ['层数多=表达更强', '参数大=可能更强也更难解释', '头数多=注意力模式更丰富']
+    }
+  },
+  logit_lens: {
+    pro: {
+      goal: '观察 token 概率在各层的演化路径，定位何时形成最终预测。',
+      approach: ['按层解码logits', '跟踪top token概率', '识别概率跃迁层'],
+      model3d: 'X=位置，Z=层，节点颜色/大小=概率，连线=跨层演化路径。',
+      algorithm: 'Layer-wise unembedding，对每层残差流直接映射到词表概率分布。',
+      metricRanges: ['prob∈[0,1]', '平均prob > 0.35通常信息较稳定', '高置信比例(>0.5)越高，结论越明确']
+    },
+    simple: {
+      goal: '看模型是在哪一层“想明白”的。',
+      approach: ['看每层最可能词', '找概率突然变高的层', '对比前后层变化'],
+      model3d: '点越大越亮，说明模型越确定。',
+      algorithm: '每一层都提前“猜答案”，看猜测怎么变化。',
+      metricRanges: ['0.5以上通常较有把握', '0.2以下通常不稳定', '连续升高比单点升高更可信']
+    }
+  },
+  glass_matrix: {
+    pro: {
+      goal: '揭示激活强度在层-位置网格中的几何分布与聚集结构。',
+      approach: ['提取层/位置激活', '做几何映射', '分析高响应区域与流向'],
+      model3d: '玻璃球体代表激活单元，透明度与发光强度对应响应幅度。',
+      algorithm: '激活张量降维投影 + 强度映射渲染（emissive/opacity）。',
+      metricRanges: ['激活归一化后常在[0,1]', '高激活占比 10%-30%常见', '层间聚集中心漂移越小越稳定']
+    },
+    simple: {
+      goal: '看哪些位置最“亮”，也就是最重要。',
+      approach: ['先看最亮区域', '再看亮点是否跨层连续', '最后对照文本含义'],
+      model3d: '亮、红、大通常表示更强激活。',
+      algorithm: '把隐藏层信号变成可见“玻璃矩阵”。',
+      metricRanges: ['亮点太少可能欠拟合', '亮点太多可能噪声大', '连续亮带通常更有意义']
+    }
+  },
+  flow_tubes: {
+    pro: {
+      goal: '分析语义向量在层间传播轨迹与流形偏转。',
+      approach: ['构建层间向量场', '拟合主流管线', '评估流向一致性'],
+      model3d: '管道粗细代表流强，弯曲代表语义转向，颜色代表阶段状态。',
+      algorithm: '向量场积分 + 轨迹拟合（streamline/tube rendering）。',
+      metricRanges: ['轨迹长度越短通常越直接', '分叉率过高可能表示冲突语义', '跨层方向一致性>0.6通常较稳定']
+    },
+    simple: {
+      goal: '看信息在模型里是怎么“流动”的。',
+      approach: ['看主干流', '看有没有异常分叉', '看终点是否收敛'],
+      model3d: '像水流一样，粗管代表主通路。',
+      algorithm: '把每层变化连成流线。',
+      metricRanges: ['主流清晰=结论清晰', '分叉太多=不稳定', '终点收敛=结果可信']
+    }
+  },
+  circuit: {
+    pro: {
+      goal: '定位对目标输出有因果贡献的子回路。',
+      approach: ['clean/corrupted对比', '计算边归因', '阈值筛选并重建子图'],
+      model3d: '节点=组件，边=因果贡献，边颜色区分促进/抑制。',
+      algorithm: 'Edge Attribution Patching / activation patching。',
+      metricRanges: ['|attribution| > 0.1常作强边', '关键边占比5%-20%常见', '跨提示重合率>0.6更稳健']
+    },
+    simple: {
+      goal: '找出真正“起作用”的内部电路。',
+      approach: ['先找关键线', '再看这些线是否重复出现', '最后判断是否稳定'],
+      model3d: '粗线就是关键因果路径。',
+      algorithm: '把可疑线路关掉或替换，看结果怎么变。',
+      metricRanges: ['变化大=关键', '变化小=次要', '多次都关键=高置信']
+    }
+  },
+  features: {
+    pro: {
+      goal: '将稠密激活分解为可解释稀疏特征。',
+      approach: ['训练/载入SAE', '抽取top features', '评估重建误差与稀疏度'],
+      model3d: '特征点簇显示语义主题，强激活特征在局部形成高密度区域。',
+      algorithm: 'Sparse Autoencoder + L1正则。',
+      metricRanges: ['reconstruction_error < 0.02优秀', '0.02-0.08可用', '>0.08需谨慎']
+    },
+    simple: {
+      goal: '把“看不懂的神经元闪烁”翻译成可命名特征。',
+      approach: ['抽特征', '看最强特征', '检查误差是否够低'],
+      model3d: '相近特征会聚在一起。',
+      algorithm: '用解码器把复杂信号拆成少量“概念开关”。',
+      metricRanges: ['误差越低越可信', '太高说明解释不到位', '稳定重复出现更可信']
+    }
+  },
+  causal: {
+    pro: {
+      goal: '识别组件对输出的真实因果效应，而非相关性。',
+      approach: ['对关键组件干预', '测量输出变化', '估计重要组件比例'],
+      model3d: '高因果组件在图中形成核心团簇，颜色强度对应因果贡献。',
+      algorithm: 'Intervention / ablation / activation patching。',
+      metricRanges: ['重要组件占比>20%常见强因果', '10%-20%中等', '<10%偏弱']
+    },
+    simple: {
+      goal: '验证“谁导致了结果”。',
+      approach: ['关掉一个部件', '看结果是否改变', '重复验证'],
+      model3d: '最关键组件会在图中最突出。',
+      algorithm: '像做实验一样做对照组。',
+      metricRanges: ['一关就变=关键', '怎么关都不变=影响小', '重复一致=可信']
+    }
+  },
+  manifold: {
+    pro: {
+      goal: '刻画表示空间的内在维度与几何结构。',
+      approach: ['降维投影', '估计内在维度', '分析轨迹平滑与聚类结构'],
+      model3d: '点云形态展示语义几何，轨迹展示token随层演化。',
+      algorithm: 'PCA/UMAP/LLE + intrinsic dimensionality estimation。',
+      metricRanges: ['participation_ratio常见2-20', '维度突降可能对应语义压缩', '簇间分离更好可解释性更强']
+    },
+    simple: {
+      goal: '看语义在空间里是散的还是成团的。',
+      approach: ['看点云', '看轨迹', '看是否分群'],
+      model3d: '团块越清晰越容易解释。',
+      algorithm: '把高维空间压到3D来看形状。',
+      metricRanges: ['分群清晰=结构好', '全糊在一起=难解释', '轨迹平滑=稳定']
+    }
+  },
+  compositional: {
+    pro: {
+      goal: '评估模型的组合泛化能力。',
+      approach: ['构造组合样本', '回归拟合组合关系', '评估泛化误差'],
+      model3d: '组合方向在空间中表现为可加性位移向量。',
+      algorithm: 'compositional probing / linear decomposition。',
+      metricRanges: ['R² > 0.8强', '0.5-0.8中', '<0.5弱']
+    },
+    simple: {
+      goal: '看模型会不会“拼积木式”举一反三。',
+      approach: ['给新组合', '看是否仍能理解', '看评分'],
+      model3d: '可组合关系在图里像可叠加的位移。',
+      algorithm: '检验旧知识能否组合成新能力。',
+      metricRanges: ['R²越高越好', '中等说明部分可组合', '低分说明泛化不足']
+    }
+  },
+  fibernet_v2: {
+    pro: {
+      goal: '评估慢逻辑与快记忆解耦后的即时学习效果。',
+      approach: ['固定慢权重', '注入快权重', '测单次学习后性能变化'],
+      model3d: '底流形表示逻辑骨架，纤维方向表示快速知识写入。',
+      algorithm: 'base manifold + fiber injection。',
+      metricRanges: ['写入后收益>5%通常有效', '遗忘率越低越好', '跨任务迁移越高越好']
+    },
+    simple: {
+      goal: '看模型能不能“即学即用”。',
+      approach: ['写入新知识', '马上测试', '看是否影响旧知识'],
+      model3d: '主干不变，旁路快速更新。',
+      algorithm: '把新知识写到纤维空间，不重训主模型。',
+      metricRanges: ['新任务提升明显=有效', '旧任务不掉=稳定', '多轮都有效=可靠']
+    }
+  },
+  rpt: {
+    pro: {
+      goal: '分析表示之间的传输效率与保真度。',
+      approach: ['构建层间传输映射', '估计损耗与失真', '识别瓶颈层'],
+      model3d: '层间桥接边展示信息通过率与损耗热点。',
+      algorithm: 'representation transport metrics / alignment analysis。',
+      metricRanges: ['传输效率接近1更好', '失真越低越好', '瓶颈层需重点检查']
+    },
+    simple: {
+      goal: '看信息在层与层之间“传得好不好”。',
+      approach: ['看通过率', '看失真', '找堵点'],
+      model3d: '哪里变细哪里就是瓶颈。',
+      algorithm: '衡量传输过程有没有丢信息。',
+      metricRanges: ['通过率高=好', '失真高=差', '连续堵点=结构问题']
+    }
+  },
+  curvature: {
+    pro: {
+      goal: '用曲率刻画表示流形的弯曲复杂度。',
+      approach: ['估计局部几何', '汇总全局曲率', '定位异常弯曲区域'],
+      model3d: '颜色梯度显示曲率大小，热点表示几何突变。',
+      algorithm: 'discrete curvature estimation on embedding manifold。',
+      metricRanges: ['|curvature| < 0.1平缓', '0.1-0.5中等', '>0.5可能存在异常几何']
+    },
+    simple: {
+      goal: '看语义空间有没有“急转弯”。',
+      approach: ['看高曲率点', '检查是否集中', '结合语义解释'],
+      model3d: '越红越弯，越蓝越平。',
+      algorithm: '测每个区域弯曲程度。',
+      metricRanges: ['弯太大要警惕', '平滑通常更稳定', '局部极端值需复核']
+    }
+  },
+  tda: {
+    pro: {
+      goal: '提取表示空间拓扑不变量（连通分量、环等）。',
+      approach: ['构建复形', '计算持久同调', '筛选高持久性特征'],
+      model3d: '点云与条形码共同展示“连通/孔洞”结构。',
+      algorithm: 'Persistent Homology / Rips complex。',
+      metricRanges: ['β0越大表示簇越分散', 'β1越大表示环结构越多', '长寿命条形码更可信']
+    },
+    simple: {
+      goal: '看语义空间有几块、有没有“洞”。',
+      approach: ['看连通块', '看环数量', '看特征寿命'],
+      model3d: '长条特征比短条更重要。',
+      algorithm: '拓扑方法找几何方法看不到的结构。',
+      metricRanges: ['碎片多=分散', '环多=循环关系强', '寿命长=稳定']
+    }
+  },
+  global_topology: {
+    pro: {
+      goal: '从全局层面评估语义几何的一致性与闭合性。',
+      approach: ['跨语义场采样', '统一拓扑指标', '比较场间一致性'],
+      model3d: '多语义场拓扑图并置，观察全局结构同构关系。',
+      algorithm: 'field-level topology scanning + invariant matching。',
+      metricRanges: ['场间一致性高=全局稳定', '差异大=局部策略化', '闭合性高=迁移潜力强']
+    },
+    simple: {
+      goal: '看整体知识结构是不是一张连贯的大网。',
+      approach: ['分场扫描', '全局对比', '找断裂区域'],
+      model3d: '如果图形风格相近，说明全局更一致。',
+      algorithm: '把各个语义区域放在一起做总体验收。',
+      metricRanges: ['一致性高=结构健康', '断裂多=需修复', '闭合好=泛化更稳']
+    }
+  },
+  holonomy: {
+    pro: {
+      goal: '测量闭环语义路径的几何回旋偏差。',
+      approach: ['构造闭环路径', '计算回旋误差', '定位非保守变换区域'],
+      model3d: '闭环轨迹偏离起点的距离直接显示holonomy强度。',
+      algorithm: 'parallel transport / loop deviation analysis。',
+      metricRanges: ['偏差接近0更一致', '小偏差可接受', '大偏差提示表示不稳定']
+    },
+    simple: {
+      goal: '绕一圈回来，看有没有“走形”。',
+      approach: ['走闭环', '看回到原点差多少', '比较不同层'],
+      model3d: '回不去原点说明有几何扭曲。',
+      algorithm: '闭环误差测试。',
+      metricRanges: ['误差小=稳定', '误差大=扭曲强', '跨层一致更可信']
+    }
+  },
+  agi: {
+    pro: {
+      goal: '评估跨任务统一表示与泛化能力的几何基础。',
+      approach: ['多任务联合观测', '比较共享子空间', '测一致性与迁移性'],
+      model3d: '不同任务轨迹是否共享主流形决定统一智能程度。',
+      algorithm: 'multi-task representation alignment。',
+      metricRanges: ['共享子空间占比越高越好', '任务间偏移越小越好', '迁移收益越大越好']
+    },
+    simple: {
+      goal: '看模型能否用一套思路解决多种任务。',
+      approach: ['多任务对比', '看是否共用结构', '看迁移效果'],
+      model3d: '多任务轨迹重叠越多越像“通用智能”。',
+      algorithm: '检查不同任务是否复用同一内部结构。',
+      metricRanges: ['重叠多=更通用', '重叠少=更专用', '迁移强=更好']
+    }
+  },
+  debias: {
+    pro: {
+      goal: '识别并削弱表示空间中的偏置方向。',
+      approach: ['估计偏置子空间', '做投影去偏', '评估性能-公平权衡'],
+      model3d: '偏置方向在空间中表现为系统性位移向量。',
+      algorithm: 'subspace projection / counterfactual comparison。',
+      metricRanges: ['偏置分数下降越多越好', '主任务性能下降应尽量小', '跨群体差距越小越好']
+    },
+    simple: {
+      goal: '减少模型“先入为主”的偏见。',
+      approach: ['找偏见方向', '削弱它', '确认能力不明显下降'],
+      model3d: '去偏后不同群体点云分布更均衡。',
+      algorithm: '把偏见方向从表示里减掉。',
+      metricRanges: ['偏见降得多=好', '准确率掉太多=需权衡', '群体差距小=更公平']
+    }
+  },
+  validity: {
+    pro: {
+      goal: '量化分析结论是否稳定、可靠、可复现。',
+      approach: ['计算PPL/熵/聚类质量', '评估平滑性与一致性', '形成有效性结论'],
+      model3d: '有效性高时轨迹更平滑、簇结构更清晰。',
+      algorithm: 'validity metrics aggregation。',
+      metricRanges: ['PPL越低越好', 'Entropy过高可能不稳定', 'Silhouette越高聚类越清晰']
+    },
+    simple: {
+      goal: '判断结果靠不靠谱。',
+      approach: ['看困惑度', '看熵', '看聚类分离'],
+      model3d: '好结果通常形状更清晰、更连续。',
+      algorithm: '用几组分数做质量验收。',
+      metricRanges: ['低困惑度更好', '过高熵需谨慎', '聚类清晰更可信']
+    }
+  },
+  training: {
+    pro: {
+      goal: '观察训练过程中的表示演化与收敛行为。',
+      approach: ['按训练步采样', '追踪关键指标曲线', '识别阶段性拐点'],
+      model3d: '时间轴上的轨迹收敛形态反映学习阶段。',
+      algorithm: 'trajectory over checkpoints + phase segmentation。',
+      metricRanges: ['loss稳定下降为正向', '剧烈震荡提示学习率/数据问题', '后期收敛应趋平缓']
+    },
+    simple: {
+      goal: '看模型是否在“越学越稳”。',
+      approach: ['看趋势', '看波动', '看是否收敛'],
+      model3d: '轨迹从乱到稳是正常学习过程。',
+      algorithm: '把训练过程当成时间演化问题来观察。',
+      metricRanges: ['持续下降=好', '反复震荡=风险', '后期平稳=收敛']
+    }
+  }
+};
+
+const formatGuideValue = (value, digits = 4) => {
+  if (typeof value !== 'number' || Number.isNaN(value) || !Number.isFinite(value)) return 'N/A';
+  return value.toFixed(digits);
+};
+
+const buildGuideConclusion = ({ tab, activeTab, analysisResult, topologyResults, data }) => {
+  const isDirectDataTab = tab === 'architect' || tab === 'logit_lens' || tab === 'glass_matrix' || tab === 'flow_tubes';
+  const result = tab === 'global_topology'
+    ? (topologyResults || (tab === activeTab ? analysisResult : null))
+    : (tab === activeTab ? analysisResult : null);
+
+  const make = (available, title, lines, metrics = []) => ({ available, title, lines, metrics });
+
+  if (tab === 'architect') {
+    if (!data?.model_config) return make(false, '当前结论', ['尚未加载模型配置，请先执行一次 analyze。']);
+    return make(true, '当前结论', [
+      `模型 ${data.model_config.name} 已加载，可进行分层解释。`,
+      `当前配置支持按层、按头、按特征的结构化分析。`
+    ], [
+      { label: '层数', value: `${data.model_config.n_layers}` },
+      { label: '头数', value: `${data.model_config.n_heads}` },
+      { label: '参数规模', value: `${formatGuideValue((data.model_config.total_params || 0) / 1e9, 2)}B` }
+    ]);
+  }
+
+  if (tab === 'logit_lens' || tab === 'glass_matrix' || tab === 'flow_tubes') {
+    if (!data?.logit_lens?.length) return make(false, '当前结论', ['尚无token概率轨迹，请先运行 analyze。']);
+    const probs = data.logit_lens.flatMap(layer => layer.map(item => item.prob)).filter(v => typeof v === 'number');
+    if (!probs.length) return make(false, '当前结论', ['当前结果缺少概率信息。']);
+    const avgProb = probs.reduce((a, b) => a + b, 0) / probs.length;
+    const highRatio = probs.filter(v => v > 0.5).length / probs.length;
+    return make(true, '当前结论', [
+      `跨层平均置信度为 ${formatGuideValue(avgProb, 3)}，模型已有可解释的预测趋势。`,
+      `高置信节点占比 ${formatGuideValue(highRatio * 100, 1)}%，可用于定位关键层/关键位置。`
+    ], [
+      { label: '层数', value: `${data.logit_lens.length}` },
+      { label: '序列长度', value: `${data.tokens?.length || 0}` },
+      { label: '高置信占比', value: `${formatGuideValue(highRatio * 100, 1)}%` }
+    ]);
+  }
+
+  if (!isDirectDataTab && !result) {
+    return make(false, '当前结论', [`当前未运行 ${tab.toUpperCase()} 分析，请切换到对应分析后执行。`]);
+  }
+
+  switch (tab) {
+    case 'circuit':
+      return make(true, '当前结论', [
+        `检测到 ${result.nodes?.length || 0} 个候选组件，${result.graph?.edges?.length || 0} 条候选边。`,
+        '可优先关注高归因边形成的主子图，并做跨提示词复验。'
+      ], [
+        { label: '节点数', value: `${result.nodes?.length || 0}` },
+        { label: '边数', value: `${result.graph?.edges?.length || 0}` }
+      ]);
+    case 'features':
+      return make(true, '当前结论', [
+        `已提取 ${result.top_features?.length || 0} 个高响应特征。`,
+        `重建误差 ${formatGuideValue(result.reconstruction_error, 5)}，可据此判断可解释性强弱。`
+      ], [
+        { label: 'Top Features', value: `${result.top_features?.length || 0}` },
+        { label: '重建误差', value: formatGuideValue(result.reconstruction_error, 5) }
+      ]);
+    case 'causal':
+      return make(true, '当前结论', [
+        `共评估 ${result.n_components_analyzed || 0} 个组件，其中关键组件 ${result.n_important_components || 0} 个。`,
+        '若关键组件占比高，说明输出受少量核心机制主导。'
+      ], [
+        { label: '评估组件', value: `${result.n_components_analyzed || 0}` },
+        { label: '关键组件', value: `${result.n_important_components || 0}` }
+      ]);
+    case 'manifold':
+      return make(true, '当前结论', [
+        `估计内在维度（PR）为 ${formatGuideValue(result.intrinsic_dimensionality?.participation_ratio, 3)}。`,
+        '维度越低且簇结构越清晰，通常表示语义组织更紧凑。'
+      ], [
+        { label: 'Participation Ratio', value: formatGuideValue(result.intrinsic_dimensionality?.participation_ratio, 3) }
+      ]);
+    case 'compositional':
+      return make(true, '当前结论', [
+        `组合泛化 R² = ${formatGuideValue(result.r2_score, 4)}。`,
+        'R²越高，说明模型越能把已学能力组合到新任务。'
+      ], [{ label: 'R²', value: formatGuideValue(result.r2_score, 4) }]);
+    case 'tda':
+      return make(true, '当前结论', [
+        `拓扑特征统计：β0候选 ${result.ph_0d?.length || 0}，β1候选 ${result.ph_1d?.length || 0}。`,
+        '建议重点关注寿命更长的拓扑特征以减少噪声结论。'
+      ], [
+        { label: 'β0 / ph_0d', value: `${result.ph_0d?.length || 0}` },
+        { label: 'β1 / ph_1d', value: `${result.ph_1d?.length || 0}` }
+      ]);
+    case 'curvature':
+      return make(true, '当前结论', [
+        `当前曲率指标为 ${formatGuideValue(result.curvature, 4)}。`,
+        '高绝对曲率通常对应语义变化快或局部几何不稳定区域。'
+      ], [{ label: 'Curvature', value: formatGuideValue(result.curvature, 4) }]);
+    case 'global_topology': {
+      const keys = Object.keys(result || {});
+      return make(true, '当前结论', [
+        `已生成全局拓扑结果，共包含 ${keys.length} 个结果字段。`,
+        '可对比不同语义场的一致性与闭合性，形成全局结构结论。'
+      ], [{ label: '结果字段数', value: `${keys.length}` }]);
+    }
+    default: {
+      const numeric = Object.entries(result || {})
+        .filter(([, v]) => typeof v === 'number' && Number.isFinite(v))
+        .slice(0, 5);
+      return make(true, '当前结论', [
+        '该分析已产出结果，可结合下列关键数值与3D模式综合判读。',
+        '建议进行至少两次重复运行，检查结论稳定性。'
+      ], numeric.map(([k, v]) => ({ label: k, value: formatGuideValue(v, 4) })));
+    }
+  }
+};
+
 const EvolutionMonitor = ({ data, onStartSleep }) => {
   if (!data) return null;
   return (
@@ -902,7 +1364,7 @@ const EvolutionMonitor = ({ data, onStartSleep }) => {
 
 export default function App() {
   const [lang, setLang] = useState('zh');
-  const [helpTab, setHelpTab] = useState('architect'); // Selected tab in Help Modal
+  const [helpTab, setHelpTab] = useState('outline'); // Selected tab in Help Modal
   const t = (key, params = {}) => {
     const keys = key.split('.');
     let val = locales[lang];
@@ -942,13 +1404,36 @@ export default function App() {
   const [evolutionData, setEvolutionData] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      fetch(`${API_BASE}/nfb/evolution/status`)
-        .then(res => res.json())
-        .then(data => setEvolutionData(data))
-        .catch(err => console.error("Monitor fetch error:", err));
-    }, 1000);
-    return () => clearInterval(timer);
+    let isUnmounted = false;
+    let hasLoggedDisconnected = false;
+
+    const pollEvolutionStatus = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/nfb/evolution/status`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const status = await res.json();
+        if (!isUnmounted) {
+          setEvolutionData(status);
+        }
+        hasLoggedDisconnected = false;
+      } catch {
+        // Avoid flooding console when backend is down/restarting.
+        if (!hasLoggedDisconnected) {
+          console.warn(`Evolution monitor unavailable: ${API_BASE}/nfb/evolution/status`);
+          hasLoggedDisconnected = true;
+        }
+      }
+    };
+
+    pollEvolutionStatus();
+    const timer = setInterval(pollEvolutionStatus, 1000);
+
+    return () => {
+      isUnmounted = true;
+      clearInterval(timer);
+    };
   }, []);
 
   const handleStartSleep = () => {
@@ -956,7 +1441,6 @@ export default function App() {
       .catch(err => console.error("Start evolution error:", err));
   };
 
-  const [showAGIDashboard, setShowAGIDashboard] = useState(false);
   const [computationPhase, setComputationPhase] = useState(null); // 'attention' | 'mlp' | 'output'
   const [activeLayerInfo, setActiveLayerInfo] = useState(null);
   
@@ -1141,7 +1625,10 @@ export default function App() {
     headPanel: true,
 
   });
+  const [isInfoPanelMinimized, setIsInfoPanelMinimized] = useState(false);
+  const [isLayersPanelMinimized, setIsLayersPanelMinimized] = useState(false);
   const [showBlueprint, setShowBlueprint] = useState(false);
+  const [blueprintInitialTab, setBlueprintInitialTab] = useState('roadmap');
 
   const togglePanelVisibility = (key) => {
     setPanelVisibility(prev => ({
@@ -1212,6 +1699,7 @@ export default function App() {
   const neuronPanel = useDraggable('neuronStatePanel', { x: 20, y: window.innerHeight - 600 });
   const layerInfoPanel = useDraggable('layerInfoPanel', { x: 400, y: window.innerHeight - 450 });
   const layerDetailPanel = useDraggable('layerDetailPanel', { x: window.innerWidth - 850, y: 20 });
+  const helpGuidePanel = useDraggable('helpGuidePanel', { x: Math.max(20, window.innerWidth - 960), y: 40 });
 
   const resetConfiguration = () => {
     // Clear all localStorage
@@ -1220,6 +1708,7 @@ export default function App() {
     localStorage.removeItem('neuronStatePanel');
     localStorage.removeItem('layerInfoPanel');
     localStorage.removeItem('layerDetailPanel');
+    localStorage.removeItem('helpGuidePanel');
     
     // Reset panel positions
     structurePanel.setPosition({ x: window.innerWidth - 400, y: 20 });
@@ -1227,6 +1716,7 @@ export default function App() {
     neuronPanel.setPosition({ x: 20, y: window.innerHeight - 600 });
     layerInfoPanel.setPosition({ x: 400, y: window.innerHeight - 450 });
     layerDetailPanel.setPosition({ x: window.innerWidth - 850, y: 20 });
+    helpGuidePanel.setPosition({ x: Math.max(20, window.innerWidth - 960), y: 40 });
     
     // Clear states
     setPrompt('');
@@ -1493,12 +1983,108 @@ export default function App() {
     }
   };
 
+  const rightPanelMaxHeight = 'calc((100vh - 56px) / 2)';
+  const helpWindowWidth = Math.min(920, Math.max(320, window.innerWidth - 40));
+  const helpWindowHeight = Math.min(Math.floor(window.innerHeight * 0.82), window.innerHeight - 40);
+  const helpWindowMaxLeft = Math.max(10, window.innerWidth - helpWindowWidth - 10);
+  const helpWindowMaxTop = Math.max(10, window.innerHeight - helpWindowHeight - 10);
+  const helpWindowLeft = Math.max(10, Math.min(helpGuidePanel.position.x, helpWindowMaxLeft));
+  const helpWindowTop = Math.max(10, Math.min(helpGuidePanel.position.y, helpWindowMaxTop));
+
+  const structureTabUI = {
+    circuit: { name: '回路发现', category: 'graph', focus: '关注关键节点与边的因果通路' },
+    features: { name: '稀疏特征', category: 'feature', focus: '关注特征数量与重构误差' },
+    causal: { name: '因果分析', category: 'graph', focus: '关注关键组件占比与干预效果' },
+    manifold: { name: '流形几何', category: 'geometry', focus: '关注内在维度与轨迹分布' },
+    compositional: { name: '组合泛化', category: 'feature', focus: '关注组合关系与R²得分' },
+    tda: { name: '拓扑分析', category: 'topology', focus: '关注连通分量与环结构' },
+    agi: { name: '神经纤维丛', category: 'system', focus: '关注层间传输与纤维结构' },
+    rpt: { name: '传输分析', category: 'geometry', focus: '关注传输路径与几何偏移' },
+    curvature: { name: '曲率分析', category: 'geometry', focus: '关注曲率热点与异常区域' },
+    glass_matrix: { name: '玻璃矩阵', category: 'observation', focus: '关注激活强度分布与亮点聚集' },
+    flow_tubes: { name: '信息流', category: 'observation', focus: '关注语义流动轨迹与分叉' },
+    global_topology: { name: '全局拓扑', category: 'topology', focus: '关注语义场之间的一致性' },
+    fibernet_v2: { name: 'FiberNet V2', category: 'system', focus: '关注即时学习与快慢权重协作' },
+    holonomy: { name: '全纯扫描', category: 'topology', focus: '关注闭环偏差与几何扭转' },
+    debias: { name: '几何去偏', category: 'system', focus: '关注偏置方向与去偏效果' },
+    validity: { name: '有效性检验', category: 'system', focus: '关注指标稳定性与可复现性' },
+    training: { name: '训练动力学', category: 'system', focus: '关注训练阶段变化与收敛趋势' }
+  };
+  const currentStructureUI = structureTabUI[structureTab] || { name: structureTab, category: 'analysis', focus: '关注当前分析结果与关键指标' };
+  const isObservationMode = currentStructureUI.category === 'observation';
+
+  const probValues = data?.logit_lens
+    ? data.logit_lens.flatMap(layer => layer.map(item => item.prob)).filter(v => typeof v === 'number')
+    : [];
+  const avgProb = probValues.length ? probValues.reduce((sum, v) => sum + v, 0) / probValues.length : null;
+  const highProbRatio = probValues.length ? probValues.filter(v => v > 0.5).length / probValues.length : null;
+
+  const operationMetrics = (() => {
+    switch (structureTab) {
+      case 'features':
+        return [
+          { label: '特征数', value: `${analysisResult?.top_features?.length || 0}`, color: COLORS.primary },
+          { label: '重构误差', value: analysisResult?.reconstruction_error?.toFixed?.(5) || '-', color: COLORS.warning },
+          { label: '当前层', value: selectedLayer !== null ? `L${selectedLayer}` : '-', color: COLORS.success }
+        ];
+      case 'circuit':
+      case 'causal':
+        return [
+          { label: '节点/组件', value: `${analysisResult?.nodes?.length || analysisResult?.n_components_analyzed || 0}`, color: COLORS.primary },
+          { label: '边/关键', value: `${analysisResult?.graph?.edges?.length || analysisResult?.n_important_components || 0}`, color: COLORS.warning },
+          { label: '历史', value: `${history.length}条`, color: COLORS.purple }
+        ];
+      case 'manifold':
+      case 'rpt':
+      case 'curvature':
+        return [
+          { label: '当前层', value: selectedLayer !== null ? `L${selectedLayer}` : '-', color: COLORS.primary },
+          { label: '几何指标', value: analysisResult?.curvature?.toFixed?.(4) || analysisResult?.intrinsic_dimensionality?.participation_ratio?.toFixed?.(2) || '-', color: COLORS.warning },
+          { label: '状态', value: loading ? '计算中...' : '就绪', color: loading ? COLORS.warning : COLORS.success }
+        ];
+      case 'tda':
+      case 'global_topology':
+      case 'holonomy':
+        return [
+          { label: 'β0', value: `${analysisResult?.ph_0d?.length || 0}`, color: COLORS.primary },
+          { label: 'β1', value: `${analysisResult?.ph_1d?.length || 0}`, color: COLORS.warning },
+          { label: '历史', value: `${history.length}条`, color: COLORS.purple }
+        ];
+      case 'glass_matrix':
+      case 'flow_tubes':
+        return [
+          { label: '平均概率', value: avgProb !== null ? `${(avgProb * 100).toFixed(1)}%` : '-', color: COLORS.primary },
+          { label: '高置信占比', value: highProbRatio !== null ? `${(highProbRatio * 100).toFixed(1)}%` : '-', color: COLORS.warning },
+          { label: '当前层', value: activeLayer !== null ? `L${activeLayer}` : '-', color: COLORS.success }
+        ];
+      default:
+        return [
+          { label: '当前层', value: selectedLayer !== null ? `L${selectedLayer}` : '-', color: COLORS.primary },
+          { label: '计算状态', value: loading ? '计算中...' : '就绪', color: loading ? COLORS.warning : COLORS.success },
+          { label: '历史', value: `${history.length}条`, color: COLORS.purple }
+        ];
+    }
+  })();
+
+  const structureGuideItems = STRUCTURE_TABS_V2.groups.flatMap((group, groupIdx) => ([
+    ...(groupIdx === 0 ? [] : [{ type: 'sep' }]),
+    ...group.items.map(item => ({
+      id: item.id,
+      label: item.label,
+      iconName: item.icon
+    }))
+  ]));
+
+  const guideMenuItems = [
+    { id: 'outline', label: '大纲 (Overview)', iconName: 'Settings' },
+    { type: 'sep' },
+    { id: 'architect', label: '模型架构 (Architecture)', iconName: 'Settings' },
+    { type: 'sep' },
+    ...structureGuideItems
+  ];
+
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}>
-      
-      {showAGIDashboard && (
-        <AGICentralCommand onClose={() => setShowAGIDashboard(false)} />
-      )}
       
       {/* Global Settings Button */}
       <button
@@ -1521,7 +2107,10 @@ export default function App() {
 
       {/* Project Genesis Blueprint Button - Strategic Roadmap */}
       <button
-        onClick={() => setShowBlueprint(true)}
+        onClick={() => {
+          setBlueprintInitialTab('roadmap');
+          setShowBlueprint(true);
+        }}
         style={{
           position: 'absolute', top: 20, left: 70, zIndex: 101,
           background: showBlueprint ? '#4488ff' : 'rgba(20, 20, 25, 0.8)',
@@ -1794,26 +2383,38 @@ export default function App() {
         style={{
           position: 'absolute', top: 20, right: 20, zIndex: 100,
           width: '360px',
-          height: '400px',
+          maxHeight: isInfoPanelMinimized ? 'none' : rightPanelMaxHeight,
           display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
           userSelect: 'text', // Explicitly allow text selection
           cursor: 'auto'
         }}
         headerStyle={{ marginBottom: '0', cursor: 'grab' }}
         actions={
-           <button
-             onClick={() => setShowHelp(true)}
-             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'flex', transition: 'color 0.2s' }}
-             onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
-             onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+          <>
+            <button
+              onClick={() => { setHelpTab('outline'); setShowHelp(true); }}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'flex', transition: 'color 0.2s' }}
+              onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+              onMouseOut={(e) => e.currentTarget.style.color = '#888'}
              title="算法原理说明"
-           >
-             <HelpCircle size={16} />
-           </button>
+            >
+              <HelpCircle size={16} />
+            </button>
+            <button
+              onClick={() => setIsInfoPanelMinimized(prev => !prev)}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'flex', transition: 'color 0.2s' }}
+              onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+              onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+              title={isInfoPanelMinimized ? 'Maximize panel' : 'Minimize panel'}
+            >
+              {isInfoPanelMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+            </button>
+          </>
         }
       >
-        {/* Content - Two Sections: Model Info & Structure Analysis Info */}
-        <div style={{ padding: '0', height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+        {!isInfoPanelMinimized && (
+        <div style={{ padding: '0', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
           {/* SECTION 1: Model / System Information */}
           <div style={{ flex: '0 0 auto', marginBottom: '12px' }}>
@@ -1869,7 +2470,7 @@ export default function App() {
           {/* SECTION 2: Analysis / Detail Information */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
               <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>
-                  {systemType === 'snn' ? '实时动态' : '结构分析详情'}
+                  {systemType === 'snn' ? '实时动态' : `${currentStructureUI.name}详情`}
               </div>
 
               {systemType === 'snn' ? (
@@ -1901,9 +2502,23 @@ export default function App() {
                     </div>
                  </div>
               ) : (
-                 /* DNN Analysis Details - Handles both Hover and Active Analysis */
-                 (displayInfo || hoveredInfo || analysisResult) ? (
+                  /* DNN Analysis Details - Handles both Hover and Active Analysis */
+                  (
                     <div>
+                        <div style={{
+                          marginBottom: '12px',
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '6px',
+                          padding: '8px',
+                          fontSize: '11px',
+                          color: '#bbb'
+                        }}>
+                          <div style={{ color: '#fff', fontWeight: '600', marginBottom: '4px' }}>
+                            当前模式: {currentStructureUI.name}
+                          </div>
+                          <div>分析重点: {currentStructureUI.focus}</div>
+                        </div>
                         {/* 2A. Hover/Selected Info (Highest Priority for immediate feedback) */}
                         {(displayInfo || hoveredInfo) && (
                            <div style={{ marginBottom: '16px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '6px', borderLeft: '3px solid #00d2ff' }}>
@@ -2043,100 +2658,116 @@ export default function App() {
                             </div>
                         )}
                     </div>
-                 ) : (
-                    <div style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', padding: '20px 0', textAlign: 'center' }}>
-                        与模型交互以查看分析详情。
-                    </div>
-                 )
+                  )
               )}
-              
+               
               {/* ==================== 数据对比视图 ==================== */}
-              <div style={{ 
-                marginTop: '12px', 
-                paddingTop: '12px', 
-                borderTop: '1px solid rgba(255,255,255,0.1)' 
-              }}>
-                <DataComparisonView 
-                  currentData={data}
-                  analysisResult={analysisResult}
-                  mode={structureTab}
-                />
-              </div>
+              {!isObservationMode ? (
+                <div style={{ 
+                  marginTop: '12px', 
+                  paddingTop: '12px', 
+                  borderTop: '1px solid rgba(255,255,255,0.1)' 
+                }}>
+                  <DataComparisonView 
+                    currentData={data}
+                    analysisResult={analysisResult}
+                    mode={structureTab}
+                  />
+                </div>
+              ) : (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '10px',
+                  borderTop: '1px solid rgba(255,255,255,0.1)',
+                  color: '#888',
+                  fontSize: '11px'
+                }}>
+                  当前为观测模式，优先查看 3D 画布中的实时变化。
+                </div>
+              )}
           </div>
         </div>
+        )}
       </SimplePanel>
       )}
 
       {/* Algo Explanation Modal */}
       {showHelp && (
           <div style={{
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)',
-              zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center'
-          }} onClick={() => setShowHelp(false)}>
+              position: 'fixed',
+              left: `${helpWindowLeft}px`,
+              top: `${helpWindowTop}px`,
+              zIndex: 1000,
+              background: '#1a1a1f',
+              border: '1px solid #333',
+              borderRadius: '12px',
+              width: `${helpWindowWidth}px`,
+              height: `${helpWindowHeight}px`,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
+          }}>
               <div
-                 onClick={e => e.stopPropagation()}
-                 style={{
-                    background: '#1a1a1f', border: '1px solid #333', borderRadius: '12px',
-                    width: '900px', height: '80vh', display: 'flex', overflow: 'hidden',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
-                 }}
+                onMouseDown={helpGuidePanel.handleMouseDown}
+                style={{
+                  padding: '10px 14px',
+                  borderBottom: '1px solid #333',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'grab',
+                  userSelect: 'none',
+                  background: 'rgba(0,0,0,0.35)'
+                }}
               >
+                <span style={{ color: '#fff', fontSize: '13px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Settings size={14} />
+                  算法指南（可拖动）
+                </span>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                  title="关闭"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                   {/* LEFT SIDEBAR */}
                   <div style={{ width: '220px', background: 'rgba(0,0,0,0.3)', borderRight: '1px solid #333', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ padding: '20px', borderBottom: '1px solid #333', fontWeight: 'bold', color: '#fff', fontSize: '16px' }}>
-                          📚 算法指南
+                      <div style={{ padding: '20px', borderBottom: '1px solid #333', fontWeight: 'bold', color: '#fff', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Settings size={16} />
+                          分析目录
                       </div>
                       <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
-                          {[
-                              { id: 'architect', label: '模型架构 (Architecture)', icon: '🏗️' },
-                              { type: 'sep' },
-                              // 观测
-                              { id: 'logit_lens', label: '预测演化 (Logit)', icon: '📊' },
-                              { id: 'glass_matrix', label: '玻璃矩阵 (Glass)', icon: '🔮' },
-                              { id: 'flow_tubes', label: '信息流 (Flow)', icon: '🌊' },
-                              { type: 'sep' },
-                              // 分析
-                              { id: 'circuit', label: '回路发现 (Circuit)', icon: '🔌' },
-                              { id: 'features', label: '稀疏特征 (SAE)', icon: '💎' },
-                              { id: 'causal', label: '因果分析 (Causal)', icon: '🎯' },
-                              { id: 'manifold', label: '流形几何 (Manifold)', icon: '🗺️' },
-                              { id: 'compositional', label: '组合泛化 (Compos)', icon: '🧩' },
-                              { type: 'sep' },
-                              // 几何
-                              { id: 'fibernet_v2', label: '纤维丛 (Fiber)', icon: '🧬' },
-                              { id: 'rpt', label: '传输分析 (RPT)', icon: '↔️' },
-                              { id: 'curvature', label: '曲率分析 (Curv)', icon: '📈' },
-                              { id: 'tda', label: '拓扑分析 (TDA)', icon: '📊' },
-                              { id: 'global_topology', label: '全局拓扑 (Topo)', icon: '🌐' },
-                              { id: 'holonomy', label: '全纯扫描 (Holo)', icon: '🔄' },
-                              { type: 'sep' },
-                              // 高级
-                              { id: 'agi', label: '神经纤维丛 (AGI)', icon: '🤖' },
-                              { id: 'debias', label: '几何去偏 (Debias)', icon: '⚖️' },
-                              { id: 'validity', label: '有效性 (Validity)', icon: '📉' },
-                              { id: 'training', label: '训练动力学 (Training)', icon: '📈' },
-                          ].map((item, idx) => (
-                              item.type === 'sep' ? 
-                                <div key={idx} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 0' }} /> :
-                                <button
-                                  key={item.id}
-                                  onClick={() => setHelpTab(item.id)}
-                                  style={{
-                                      width: '100%', textAlign: 'left', padding: '10px',
-                                      background: helpTab === item.id ? 'rgba(68, 136, 255, 0.2)' : 'transparent',
-                                      color: helpTab === item.id ? '#fff' : '#888',
-                                      border: 'none', borderRadius: '6px', cursor: 'pointer',
-                                      fontSize: '13px', marginBottom: '2px',
-                                      fontWeight: helpTab === item.id ? '600' : '400',
-                                      transition: 'all 0.2s',
-                                      display: 'flex', alignItems: 'center'
-                                  }}
-                                >
-                                    <span style={{ marginRight: '8px' }}>{item.icon}</span>
-                                    {item.label}
-                                </button>
-                          ))}
+                          {guideMenuItems.map((item, idx) => {
+                            if (item.type === 'sep') {
+                              return <div key={idx} style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '8px 0' }} />;
+                            }
+                            const MenuIcon = GUIDE_ICON_MAP[item.iconName] || Settings;
+                            return (
+                              <button
+                                key={item.id}
+                                onClick={() => setHelpTab(item.id)}
+                                style={{
+                                  width: '100%', textAlign: 'left', padding: '10px',
+                                  background: helpTab === item.id ? 'rgba(68, 136, 255, 0.2)' : 'transparent',
+                                  color: helpTab === item.id ? '#fff' : '#888',
+                                  border: 'none', borderRadius: '6px', cursor: 'pointer',
+                                  fontSize: '13px', marginBottom: '2px',
+                                  fontWeight: helpTab === item.id ? '600' : '400',
+                                  transition: 'all 0.2s',
+                                  display: 'flex', alignItems: 'center'
+                                }}
+                              >
+                                <span style={{ marginRight: '8px', display: 'inline-flex', alignItems: 'center' }}>
+                                  <MenuIcon size={14} />
+                                </span>
+                                {item.label}
+                              </button>
+                            );
+                          })}
                       </div>
                   </div>
 
@@ -2145,7 +2776,7 @@ export default function App() {
                       {/* Header */}
                       <div style={{ padding: '16px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#fff', margin: 0 }}>
-                              {ALGO_DOCS[helpTab]?.title || '算法说明'}
+                              {helpTab === 'outline' ? '算法指南大纲' : (ALGO_DOCS[helpTab]?.title || '算法说明')}
                           </h2>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                               <div style={{ display: 'flex', background: '#000', borderRadius: '6px', padding: '2px', border: '1px solid #333' }}>
@@ -2176,25 +2807,167 @@ export default function App() {
                       {/* Scrollable Content */}
                       <div style={{ padding: '30px', overflowY: 'auto', flex: 1, lineHeight: '1.8', fontSize: '14px', color: '#ddd' }}>
                            {(() => {
-                               const doc = ALGO_DOCS[helpTab];
-                               if (!doc) return <div style={{color:'#666', fontStyle:'italic'}}>暂无说明文档</div>;
+                                if (helpTab === 'outline') {
+                                  const outlineItems = guideMenuItems.filter(item => item.id && item.id !== 'outline');
+                                  return (
+                                    <div className="animate-fade-in">
+                                      <h3 style={{ fontSize: '20px', color: '#4ecdc4', marginTop: 0, marginBottom: '10px' }}>
+                                        结构分析功能总览
+                                      </h3>
+                                      <div style={{ marginBottom: '20px', color: '#a1a1aa', fontSize: '13px' }}>
+                                        先在这里快速了解每个结构分析功能，再从左侧点击进入详细算法说明。
+                                      </div>
+                                      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                                        {outlineItems.map(item => {
+                                          const doc = ALGO_DOCS[item.id];
+                                          const content = helpMode === 'simple' ? doc?.simple : doc?.pro;
+                                          const structured = GUIDE_STRUCTURED[item.id]?.[helpMode] || GUIDE_SECTION_DEFAULT[helpMode];
+                                          const tabMeta = structureTabUI[item.id];
+                                          const OutlineIcon = GUIDE_ICON_MAP[item.iconName] || Settings;
+                                          return (
+                                            <button
+                                              key={`outline-${item.id}`}
+                                              onClick={() => setHelpTab(item.id)}
+                                              style={{
+                                                textAlign: 'left',
+                                                border: '1px solid rgba(255,255,255,0.12)',
+                                                background: 'rgba(255,255,255,0.02)',
+                                                borderRadius: '10px',
+                                                padding: '12px',
+                                                cursor: 'pointer',
+                                                color: '#ddd',
+                                                transition: 'all 0.2s'
+                                              }}
+                                              onMouseOver={(e) => {
+                                                e.currentTarget.style.background = 'rgba(68,136,255,0.12)';
+                                                e.currentTarget.style.borderColor = 'rgba(68,136,255,0.35)';
+                                              }}
+                                              onMouseOut={(e) => {
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+                                              }}
+                                            >
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                                  <OutlineIcon size={14} />
+                                                </span>
+                                                <span style={{ color: '#fff', fontWeight: 600, fontSize: '14px' }}>{tabMeta?.name || item.label}</span>
+                                              </div>
+                                              <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                                                目标: {structured.goal}
+                                              </div>
+                                              <div style={{ fontSize: '12px', color: '#cbd5e1' }}>
+                                                {content?.desc || tabMeta?.focus || '查看该功能的详细说明。'}
+                                              </div>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  );
+                                }
 
-                               const content = helpMode === 'simple' ? doc.simple : doc.pro;
-                               return (
-                                   <div className="animate-fade-in">
-                                       <h3 style={{ fontSize: '20px', color: helpMode === 'simple' ? '#4ecdc4' : '#a29bfe', marginTop: 0, marginBottom: '20px' }}>
-                                           {content.title}
-                                       </h3>
+                                const doc = ALGO_DOCS[helpTab];
+                                if (!doc) return <div style={{color:'#666', fontStyle:'italic'}}>暂无说明文档</div>;
+
+                                const content = helpMode === 'simple' ? doc.simple : doc.pro;
+                                const structured = GUIDE_STRUCTURED[helpTab]?.[helpMode] || GUIDE_SECTION_DEFAULT[helpMode];
+                                const conclusion = buildGuideConclusion({
+                                  tab: helpTab,
+                                  activeTab: structureTab,
+                                  analysisResult,
+                                  topologyResults,
+                                  data
+                                });
+                                return (
+                                    <div className="animate-fade-in">
+                                        <h3 style={{ fontSize: '20px', color: helpMode === 'simple' ? '#4ecdc4' : '#a29bfe', marginTop: 0, marginBottom: '20px' }}>
+                                            {content.title}
+                                        </h3>
                                        
-                                       <div style={{ marginBottom: '24px' }}>
-                                           {content.desc}
-                                       </div>
+                                        <div style={{ marginBottom: '24px' }}>
+                                            {content.desc}
+                                        </div>
 
-                                       {content.points && (
-                                           <ul style={{ paddingLeft: '20px', color: '#ccc', marginBottom: '24px' }}>
-                                               {content.points.map((p, i) => (
-                                                   <li key={i} style={{ marginBottom: '10px' }}>{p}</li>
-                                               ))}
+                                        <div style={{ marginBottom: '22px', padding: '14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}>
+                                            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#fff', marginBottom: '12px' }}>
+                                                结构化说明
+                                            </div>
+                                            <div style={{ marginBottom: '10px' }}>
+                                                <div style={{ color: '#7dd3fc', fontWeight: '600', fontSize: '12px' }}>1. 目标</div>
+                                                <div style={{ color: '#d1d5db', fontSize: '13px' }}>{structured.goal}</div>
+                                            </div>
+                                            <div style={{ marginBottom: '10px' }}>
+                                                <div style={{ color: '#7dd3fc', fontWeight: '600', fontSize: '12px' }}>2. 思路</div>
+                                                <ul style={{ paddingLeft: '18px', margin: '4px 0 0 0', color: '#d1d5db', fontSize: '13px' }}>
+                                                    {structured.approach.map((item, idx) => (
+                                                        <li key={`approach-${idx}`} style={{ marginBottom: '4px' }}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div style={{ marginBottom: '10px' }}>
+                                                <div style={{ color: '#7dd3fc', fontWeight: '600', fontSize: '12px' }}>3. 3D模型原理</div>
+                                                <div style={{ color: '#d1d5db', fontSize: '13px' }}>{structured.model3d}</div>
+                                            </div>
+                                            <div style={{ marginBottom: '10px' }}>
+                                                <div style={{ color: '#7dd3fc', fontWeight: '600', fontSize: '12px' }}>4. 算法说明</div>
+                                                <div style={{ color: '#d1d5db', fontSize: '13px' }}>{structured.algorithm}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ color: '#7dd3fc', fontWeight: '600', fontSize: '12px' }}>5. 指标范围</div>
+                                                <ul style={{ paddingLeft: '18px', margin: '4px 0 0 0', color: '#d1d5db', fontSize: '13px' }}>
+                                                    {structured.metricRanges.map((item, idx) => (
+                                                        <li key={`range-${idx}`} style={{ marginBottom: '4px' }}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div style={{
+                                            marginBottom: '24px',
+                                            padding: '14px',
+                                            borderRadius: '10px',
+                                            border: conclusion.available ? '1px solid rgba(94, 201, 98, 0.35)' : '1px solid rgba(255,159,67,0.35)',
+                                            background: conclusion.available ? 'rgba(94, 201, 98, 0.08)' : 'rgba(255,159,67,0.08)'
+                                        }}>
+                                            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#fff', marginBottom: '8px' }}>
+                                                {conclusion.title}
+                                            </div>
+                                            <ul style={{ paddingLeft: '18px', margin: '0 0 10px 0', color: '#d1d5db', fontSize: '13px' }}>
+                                                {conclusion.lines.map((line, idx) => (
+                                                    <li key={`conclusion-${idx}`} style={{ marginBottom: '4px' }}>{line}</li>
+                                                ))}
+                                            </ul>
+                                            {conclusion.metrics?.length > 0 && (
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                    {conclusion.metrics.map((metric, idx) => (
+                                                        <div
+                                                            key={`metric-${idx}`}
+                                                            style={{
+                                                                padding: '4px 8px',
+                                                                borderRadius: '6px',
+                                                                border: '1px solid rgba(255,255,255,0.18)',
+                                                                background: 'rgba(0,0,0,0.2)',
+                                                                color: '#e5e7eb',
+                                                                fontSize: '12px'
+                                                            }}
+                                                        >
+                                                            {metric.label}: <span style={{ color: '#fff', fontWeight: 600 }}>{metric.value}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '14px' }}>
+                                        <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#a1a1aa', fontWeight: 'bold', letterSpacing: '0.02em' }}>
+                                            补充算法说明
+                                        </h4>
+                                        {content.points && (
+                                            <ul style={{ paddingLeft: '20px', color: '#ccc', marginBottom: '24px' }}>
+                                                {content.points.map((p, i) => (
+                                                    <li key={i} style={{ marginBottom: '10px' }}>{p}</li>
+                                                ))}
                                            </ul>
                                        )}
 
@@ -2210,13 +2983,14 @@ export default function App() {
                                        ))}
                                        
                                        {content.formula && (
-                                            <div style={{ background: '#000', padding: '16px', borderRadius: '8px', border: '1px solid #333', fontFamily: 'monospace', margin: '20px 0', color: '#ffe66d' }}>
-                                                {content.formula}
-                                            </div>
-                                       )}
-                                   </div>
-                               );
-                           })()}
+                                             <div style={{ background: '#000', padding: '16px', borderRadius: '8px', border: '1px solid #333', fontFamily: 'monospace', margin: '20px 0', color: '#ffe66d' }}>
+                                                 {content.formula}
+                                             </div>
+                                        )}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                       </div>
               </div>
           </div>
@@ -2402,35 +3176,81 @@ export default function App() {
 
       {/* ==================== 右下: 操作面板 ==================== */}
       {panelVisibility.layersPanel && (
-      <SimplePanel
-        title="操作面板"
+      <SimplePanel 
+        title={`操作面板 · ${currentStructureUI.name}`}
         style={{
           position: 'absolute', bottom: 20, right: 20, zIndex: 10,
-          width: '360px', height: '300px',
-          display: 'flex', flexDirection: 'column'
+          width: '360px',
+          maxHeight: isLayersPanelMinimized ? 'none' : rightPanelMaxHeight,
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden'
         }}
+        actions={
+          <button
+            onClick={() => setIsLayersPanelMinimized(prev => !prev)}
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'flex', transition: 'color 0.2s' }}
+            onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+            onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+            title={isLayersPanelMinimized ? 'Maximize panel' : 'Minimize panel'}
+          >
+            {isLayersPanelMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+          </button>
+        }
       >
-        {/* ==================== 数据展示模板 ==================== */}
+        {!isLayersPanelMinimized && (
+        <>
         <div style={{
-          marginBottom: '12px',
+          marginBottom: '10px',
           padding: '8px',
-          background: 'rgba(0,0,0,0.2)',
           borderRadius: '6px',
-          flex: 1,
-          overflowY: 'auto'
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          fontSize: '11px',
+          color: '#bbb'
         }}>
-          <AnalysisDataDisplay 
-            mode={structureTab}
-            data={data}
-            analysisResult={analysisResult}
-            selectedLayer={selectedLayer}
-            onLayerSelect={(layerIdx) => {
-              setSelectedLayer(layerIdx);
-              loadLayerDetails(layerIdx);
-            }}
-            hoveredInfo={hoveredInfo}
-          />
+          <div style={{ color: '#fff', fontWeight: '600', marginBottom: '2px' }}>
+            当前结构分析: {currentStructureUI.name}
+          </div>
+          <div>{currentStructureUI.focus}</div>
         </div>
+        {/* ==================== 数据展示模板 ==================== */}
+        {!isObservationMode ? (
+          <div style={{ 
+            marginBottom: '12px', 
+            padding: '8px', 
+            background: 'rgba(0,0,0,0.2)', 
+            borderRadius: '6px',
+            flex: 1,
+            overflowY: 'auto'
+          }}>
+            <AnalysisDataDisplay 
+              mode={structureTab}
+              data={data}
+              analysisResult={analysisResult}
+              selectedLayer={selectedLayer}
+              onLayerSelect={(layerIdx) => {
+                setSelectedLayer(layerIdx);
+                loadLayerDetails(layerIdx);
+              }}
+              hoveredInfo={hoveredInfo}
+            />
+          </div>
+        ) : (
+          <div style={{
+            marginBottom: '12px',
+            padding: '10px',
+            background: 'rgba(0,0,0,0.2)',
+            borderRadius: '6px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            fontSize: '12px',
+            color: '#bbb'
+          }}>
+            <div style={{ color: '#fff', marginBottom: '6px', fontWeight: '600' }}>观测模式面板</div>
+            <div>实时层: {activeLayer !== null ? `L${activeLayer}` : '-'}</div>
+            <div>悬停词元: {(hoveredInfo || displayInfo)?.label || '-'}</div>
+            <div>置信度: {(hoveredInfo || displayInfo)?.probability ? `${((hoveredInfo || displayInfo).probability * 100).toFixed(1)}%` : '-'}</div>
+          </div>
+        )}
         
         {/* ==================== 快速指标栏 ==================== */}
         <div style={{ 
@@ -2441,9 +3261,9 @@ export default function App() {
           background: 'rgba(255,255,255,0.03)',
           borderRadius: '6px'
         }}>
-          <MetricCard label="当前层" value={selectedLayer !== null ? `L${selectedLayer}` : '-'} color={COLORS.primary} />
-          <MetricCard label="计算状态" value={loading ? '计算中...' : '就绪'} color={loading ? COLORS.warning : COLORS.success} />
-          <MetricCard label="历史" value={`${history.length}条`} color={COLORS.purple} />
+          {operationMetrics.map((metric, idx) => (
+            <MetricCard key={`${metric.label}-${idx}`} label={metric.label} value={metric.value} color={metric.color} />
+          ))}
         </div>
         
         {/* ==================== 操作历史 ==================== */}
@@ -2472,6 +3292,8 @@ export default function App() {
             maxVisible={3}
           />
         </div>
+        </>
+        )}
       </SimplePanel>
       )}
 
@@ -2495,19 +3317,6 @@ export default function App() {
             Logit Lens (Token Probabilities)
           </Text>
         )}
-
-        {/* 空状态提示 - 当需要数据但 data 为 null 时显示 */}
-        {!data && (structureTab === 'logit_lens' || structureTab === 'glass_matrix' || structureTab === 'flow_tubes') && (
-          <group position={[0, 5, 0]}>
-            <Text position={[0, 0, 0]} fontSize={0.8} color="#888" anchorX="center" anchorY="middle">
-              请先在左侧输入文本并点击"分析"按钮
-            </Text>
-            <Text position={[0, -1.5, 0]} fontSize={0.6} color="#666" anchorX="center" anchorY="middle">
-              Enter text and click "Analyze" to see results
-            </Text>
-          </group>
-        )}
-
         <Visualization data={data} hoveredInfo={hoveredInfo} setHoveredInfo={setHoveredInfo} activeLayer={activeLayer} />
 
         {/* PGRF: Pan-Geometric Resonance Field - 全局大一统背景 */}
@@ -2658,21 +3467,13 @@ export default function App() {
       {/* Project Genesis Blueprint Overlay */}
       {showBlueprint && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
-          <HLAIBlueprint onClose={() => setShowBlueprint(false)} />
-        </div>
-      )}
-
-      {showAGIDashboard && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 3100, background: '#0a0a0c' }}>
-          <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 3110 }}>
-            <button 
-              onClick={() => setShowAGIDashboard(false)}
-              style={{ background: '#222', border: 'none', color: 'white', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer' }}
-            >
-              返回主界面
-            </button>
-          </div>
-          <AGIProgressDashboard />
+          <HLAIBlueprint
+            initialTab={blueprintInitialTab}
+            onClose={() => {
+              setShowBlueprint(false);
+              setBlueprintInitialTab('roadmap');
+            }}
+          />
         </div>
       )}
 

@@ -1,0 +1,1972 @@
+﻿import { Activity, Brain, CheckCircle, Search, Target, X, Zap } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { pollRuntimeWithFallback } from './utils/runtimeClient';
+
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+
+const toFiniteNumber = (value, fallback = 0) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+};
+
+const parsePercentToRatio = (raw) => {
+  if (raw == null) return 0;
+  if (typeof raw === 'number') return raw > 1 ? raw / 100 : raw;
+  const text = String(raw).trim();
+  const normalized = text.endsWith('%') ? text.slice(0, -1) : text;
+  const numeric = Number(normalized);
+  if (!Number.isFinite(numeric)) return 0;
+  return numeric / 100;
+};
+
+const mapLegacyConsciousField = (payload) => {
+  const spectrum = payload?.unified_spectrum || payload || {};
+  const emotion = spectrum?.emotion || {};
+  const stability = toFiniteNumber(emotion?.stability ?? spectrum?.stability, 0);
+  const signalNorm = toFiniteNumber(spectrum?.signal_norm ?? spectrum?.gws_intensity, 0);
+  const memorySlots = toFiniteNumber(spectrum?.memory_slots ?? spectrum?.memory_load, 0);
+  const energySaving = parsePercentToRatio(spectrum?.energy_saving);
+  const resonance = toFiniteNumber(spectrum?.resonance ?? emotion?.energy, 0);
+  const resonanceRate = resonance > 1 ? resonance / 100 : resonance;
+
+  return {
+    ...spectrum,
+    stability,
+    gws_intensity: signalNorm,
+    memory_load: memorySlots,
+    energy_saving: energySaving,
+    resonance: resonanceRate,
+    glow_color: spectrum?.glow_color || (stability > 0.6 ? 'amber' : 'indigo'),
+  };
+};
+
+const mapRuntimeConsciousField = (events) => {
+  const activation = events.find((e) => e?.event_type === 'ActivationSnapshot');
+  const alignment = events.find((e) => e?.event_type === 'AlignmentSignal');
+  if (!activation || !alignment) return null;
+
+  const emotion = alignment?.payload?.emotion || {};
+  const stability = toFiniteNumber(emotion?.stability, 0);
+  const signalNorm = toFiniteNumber(activation?.payload?.signal_norm, 0);
+  const memorySlots = toFiniteNumber(activation?.payload?.memory_slots, 0);
+  const energySavingPct = toFiniteNumber(alignment?.payload?.energy_saving_pct, 0);
+  const resonance = toFiniteNumber(emotion?.energy, 0);
+
+  return {
+    stability,
+    gws_intensity: signalNorm,
+    memory_load: memorySlots,
+    energy_saving: energySavingPct / 100,
+    resonance: resonance > 1 ? resonance / 100 : resonance,
+    glow_color: stability > 0.6 ? 'amber' : 'indigo',
+    winner_module: alignment?.payload?.winner_module || null,
+    source: 'runtime-v1',
+  };
+};
+
+// Design Constants
+const PHASES = [
+  {
+    id: 'roadmap',
+    title: "Dimension 0: Strategy",
+    subtitle: "椤圭洰澶х翰 (Roadmap)",
+    icon: <Activity size={24} />,
+    status: "done",
+    progress: 100,
+    color: "#ffaa00",
+    definition: {
+      headline: "Project Genesis: From Fitting to Geometry",
+      summary: "AGI 鐮斿彂鐨勫畯瑙傛垬鐣ヨ矾寰勫浘銆傛垜浠嫆缁濈畝鍗曠殑缁熻鎷熷悎锛岃浆鑰屾瀯寤哄熀浜庨珮缁存祦褰㈡嫇鎵戙€佺氦缁翠笡瑙ｈ€︿互鍙婇噷濂囨祦婕斿寲鐨勭涓€鎬у師鐞嗕汉宸ユ櫤鑳界郴缁熴€?",
+      pillars: ["Differential Geometry", "Fiber Bundle Decoupling", "Ricci Flow Evolution"]
+    },
+    theory_content: [], // Not used for roadmap but needed for structure
+    analysis_sections: [], // Not used for roadmap but needed for structure
+    sub_phases: [],
+    goals: [
+      "鏋勫缓鍩轰簬寰垎鍑犱綍鐨勯珮缁磋涔夋祦褰?(High-Dim Manifold)",
+      "瀹炵幇 Logic-Memory 瑙ｈ€︾殑绾ょ淮涓涙灦鏋?(Fiber Bundle)",
+      "寤虹珛鍩轰簬閲屽娴佺殑鑷彂閫昏緫浼樺寲鏈哄埗 (Ricci Flow)"
+    ],
+    metrics: {
+      "Design Philosophy": "Geometric Reconstruction",
+      "Core Pillars": "3/3",
+      "Evolution Goal": "Conscious Workspace"
+    },
+    roadmap_outline: [
+      {
+        title: "1. 缁撴瀯鍖栧垵濮嬪寲涓庤氨鍥捐 (Spectral Init)",
+        desc: "鏁板鍘熺悊锛氭櫤鑳介潪闅忔満銆傚埄鐢ㄦ媺鏅媺鏂畻瀛?螖 娉ㄥ叆甯歌瘑鍑犱綍銆傚彲瑙嗗寲锛氬睍绀虹偣浜戜粠娣锋矊鍚戠粨鏅跺潔缂╋紝閲忓寲鈥樺嚭鐢熷嵆鎳備笘鐣屸€欑殑楠ㄦ灦銆?"
+      },
+      {
+        title: "2. 閲屽娴佷笌鏅鸿兘-鐢熺悊鍙岄噸鏈哄埗 (Dual Dynamics)",
+        desc: "鏍稿績鍘熺悊锛氭櫤鑳斤紙淇℃伅搴忥級涓庣敓鐞嗭紙鐢熷瓨鑳斤級鐨勮€﹀悎銆傗€樼棝鑻︹€欐槸璁ょ煡澶辫皟寮曡捣鐨勭敓鐞嗛伩瀹冲搷搴旓紙楂樿兘鑰楁姤閿欙級锛屸€樻剦鎮︹€欐槸璁ょ煡浼樺寲杈炬垚鐨勪唬璋㈣妭鑳藉鍔憋紙娴嬪湴绾垮榻愶級銆傚彲瑙嗗寲锛氬睍鐜版祦褰㈠湪鍐茬獊鏃剁殑鈥樹氦浜掗樆鍔涒€欎笌杈炬垚鍏辨尟鏃剁殑鈥橀噺瀛愭偓娴€欍€?"
+      },
+      {
+        title: "3. 绾ょ淮涓涜В鑰︿笌璺ㄦ潫鍚屾 (Cross-Bundle Sync)",
+        desc: "鏍稿績鏋舵瀯锛歀ogic-Memory 鐗╃悊鍒嗙銆傝法鏉熷榻愶細骞查鎰熷畼妯℃€佹椂浜х敓鐗╃悊鎷夊姏鍚屾寮曞閫昏緫鑺傜偣銆傚彲瑙嗗寲锛氫寒绮夎壊铏氱嚎 (Alignment Fibers) 缁戝畾瑙嗚涓庨€昏緫銆?"
+      },
+      {
+        title: "4. 鍏ㄥ眬宸ヤ綔绌洪棿涓庢剰璇嗚鍐?(GWT)",
+        desc: "缁堟瀬褰㈡€侊細鎰忚瘑鐨勭墿鐞嗚浇浣撱€傚疄鐜?Locus of Attention (鍏虫敞鐐? 绔炰簤瑁佸喅锛岃拷姹傛渶楂樹俊鎭鐩婁笌鏈€浣庝唬璋㈡垚鏈殑骞宠　銆傚彲瑙嗗寲锛氱悆浣撹剦鍐叉父璧帮紝瀹炵幇鍙屽悜鏈€浼樿矾寰勭粨绠椼€?"
+      },
+      {
+        title: "5. 楂樼淮鍏ㄦ伅缂栫爜 (SHDC Encoding)",
+        desc: "鏍稿績鍘熺悊锛氬埄鐢ㄩ珮缁寸┖闂存浜ゆ€цВ鍐崇淮搴︾伨闅俱€傞€氳繃浠ｆ暟鍙犲姞褰㈡垚澶嶆潅鍏宠仈锛屽疄鐜版瀬鑷撮珮鏁堢殑鐗╃悊绾т俊鎭鍐欎笌淇敼銆傚彲瑙嗗寲锛氬睍绀洪珮缁村悜閲忛棿鐨勫共娑変笌鍧嶇缉杩囩▼銆?"
+      }
+    ]
+  },
+  {
+    id: 'theory',
+    title: "Dimension I: Theory",
+    subtitle: "鏅鸿兘鐞嗚 (Theory)",
+    icon: <Brain size={24} />,
+    status: "done",
+    progress: 100,
+    color: "#00d2ff",
+    definition: {
+      headline: "Intelligence = Geometry + Physics",
+      summary: "鏅鸿兘鏄瀬楂樼淮绌洪棿涓殑绋€鐤忓叏鍍忔祦褰㈡紨鍖栫郴缁熴€傚畠閫氳繃浠ｆ暟骞叉秹鍜岄潪绾挎€у潔缂╋紝鍦ㄦ渶灏忓寲鍑犱綍浣滅敤閲忕殑杩囩▼涓疄鐜板眬閮ㄧ喌鍑忎笌棰勬祴鑳藉姏銆?",
+      pillars: ["Structure (绋€鐤忓叏鎭祦褰?", "Dynamics (娴嬪湴绾挎祦鎺ㄧ悊)", "Purpose (灞€閮ㄧ喌鍑?鐢熷瓨)"]
+    },
+    theory_content: [
+      {
+        title: "绁炵粡绾ょ淮涓涘師鍒?(NFB Principle)",
+        formula: "唯(x) = 蠁_M 鈯?蠁_F",
+        desc: "缁撴瀯涓庡唴瀹硅В鑰︼細鏅鸿兘鏄簳娴佸舰 (Logic) 涓庣氦缁寸┖闂?(Knowledge) 鐨勫紶閲忕Н銆傞€昏緫楠ㄦ灦淇濇寔绋冲畾锛岃€岃涔夊唴瀹瑰彲鏃犻檺鎵╁睍銆?"
+      },
+      {
+        title: "鍏ㄥ眬宸ヤ綔绌洪棿 (Global Workspace)",
+        formula: "惟_G = 鈭i P_i d渭",
+        desc: "鎰忚瘑瑁佸喅鏈哄埗锛氭剰璇嗘槸楂樼淮娴佸舰涓婄殑鍏ㄥ眬鐘舵€併€傞€氳繃 Locus of Attention (鍏虫敞鐐? 鐨?Top-K 绔炰簤鏈哄埗锛屽疄鐜板妯℃€佷俊鎭殑瑁佸喅涓庢暣鍚堛€?"
+      },
+      {
+        title: "楂樼淮鍏ㄦ伅缂栫爜 (SHDC Encoding)",
+        formula: "鉄╲_i, v_j鉄?鈮?未_ij",
+        desc: "瑙ｅ喅缁村害鐏鹃毦锛氬埄鐢ㄩ珮缁寸┖闂寸殑鍑犱箮姝ｄ氦鎬у疄鐜版捣閲忕壒寰佹彁鍙栥€傞€氳繃鍚戦噺浠ｆ暟鍙犲姞褰㈡垚澶嶆潅鍏宠仈锛屽疄鐜版瀬鑷撮珮鏁堢殑鐗╃悊绾ц鍐欍€?"
+      },
+      {
+        title: "鑱旂粶涓庢帹鐞?(Connection Equation)",
+        formula: "鈭嘷X s = 0",
+        desc: "鎺ㄧ悊鍗冲钩琛岀Щ鍔細绫绘瘮鎺ㄧ悊鏈川涓婃槸鍚戦噺鍦ㄨ涔夋祦褰笂鐨勬祴鍦扮嚎骞崇Щ銆傞€氳繃鑱旂粶淇濇寔鎺ㄧ悊杩囩▼涓涔夌粨鏋勭殑涓€鑷存€с€?"
+      },
+      {
+        title: "閲屽娴佹紨鍖?(Evolution)",
+        formula: "鈭俖t g = -2R",
+        desc: "瀛︿範鍗虫祦褰㈡澗寮涳細绁炵粡缃戠粶鐨?Grokking 杩囩▼鏈川涓婃槸閲屽娴侀┍鍔ㄧ殑娴佸舰骞虫粦鍖栵紝閫氳繃鍑忓皯鍐呴儴寮犲姏瀹炵幇鍏ㄥ眬閫昏緫鑷唇銆?"
+      }
+    ],
+    goals: [
+      "鍩轰簬 Neural Fiber Bundle (NFB) 鐞嗚瀹氫箟鏅鸿兘搴曟祦褰?",
+      "寤虹珛寰垎鍑犱綍涓庤涔夌┖闂寸殑鏄犲皠妯″瀷",
+      "楠岃瘉璺ㄦā鎬佸悓鏋勬姇褰辨暟瀛︿弗璋ㄦ€?"
+    ],
+    metrics: {
+      "Mathematical Rigor": "High",
+      "NFB Alignment": "98%"
+    }
+  },
+  {
+    id: 'analysis',
+    title: "Dimension II: Analysis",
+    subtitle: "娣卞害绁炵粡缃戠粶 (Neural Network)",
+    icon: <Search size={24} />,
+    status: "done",
+    progress: 100,
+    color: "#a855f7",
+    analysis_sections: [
+      {
+        title: "鏈夋晥鎬у垎鏋?(Why it works)",
+        content: "娣卞害绁炵粡缃戠粶鎴愬姛鎻愬彇浜嗘櫤鑳界殑鈥樼壒娈婃暟瀛︾粨鏋勨€欍€傞€氳繃楂樼淮鍙犲姞鍋囪 (Superposition)锛岀綉缁滆兘鍦ㄦ湁闄愬弬鏁板唴骞惰澶勭悊杩戜箮鏃犻檺鐨勬蹇点€傚叾鏍稿績绔炰簤鍔涘湪浜庝粠缁熻鐩稿叧鎬т腑鑷彂璇卞彂鈥樻祴鍦扮嚎娴佲€欙紝鍗虫部鐫€鑳介噺鏈€浣庣殑閫昏緫璺緞杩涜鎺ㄧ悊銆?",
+        tags: ["High-Dim Abstraction", "Low-Dim Precision", "Johnson-Lindenstrauss"]
+      },
+      {
+        title: "鏍稿績缁勪欢 (Strategic Components)",
+        content: "1. 娈嬪樊娴?(Residual Stream): 浣滀负鈥樺叏鎭湅鏉库€欐壙杞芥墍鏈夎绠楃姸鎬併€?2. 娉ㄦ剰鍔涘ご (Attention Heads): 鎵ц娴佸舰涓婄殑鈥樿仈缁滅畻瀛愨€欍€?3. MLP 灞? 璐熻矗闈炵嚎鎬ф祦褰㈡姇褰变笌鐗瑰緛瑙ｈ€︺€?",
+        tags: ["Residual Stream", "Attention Mechanism", "Manifold Projection"]
+      },
+      {
+        title: "鍐呴儴缁撴瀯婕斿寲 (Internal Structure)",
+        content: "瑙傛祴鍒扳€樺嚑浣曠粨鏅垛€欒繃绋嬶細娴呭眰鎵ц娣锋矊鐨勭壒寰佹彁鍙栵紝娣卞眰锛圠ayer 9-11锛夊垯鍧嶇缉涓洪珮浠ｆ暟涓€鑷存€х殑绾ょ淮涓涚粨鏋勩€傛ā鍨嬫繁灞傞€氳繃 Ricci 婕斿寲鑷彂娑堥櫎閫昏緫鐭涚浘锛屽舰鎴愮ǔ瀹氱殑鍚稿紩瀛愮┖闂淬€?",
+        tags: ["Topological Smoothing", "Geometric Crystallization", "Attractors"]
+      },
+      {
+        title: "鐮旂┒宸ュ叿涓庢垚鏋?(Research & Tools)",
+        content: "鍒╃敤 Logit Lens 涓?TDA (鎷撴墤鏁版嵁鍒嗘瀽) 鎴愬姛娴嬬粯浜?GPT-2 鐨勫叏璋辨嫇鎵戝浘銆傜洰鍓嶅凡璇佸疄 $Z_{113}$ 绛夌鏁ｇ兢璁虹粨鏋勫彲鍦ㄨ繛缁悜閲忕┖闂翠腑閫氳繃 DFT (绂绘暎鍌呴噷鍙跺彉鎹? 瀹岀編閲嶆瀯锛屽噯纭巼 >99%銆?",
+        tags: ["Logit Lens", "TDA Scanner", "Z113 Group Results"]
+      }
+    ],
+    goals: [
+      "瀹炵幇鍏ㄨ氨 12 灞?Logit Lens 鎺㈡祴",
+      "鎻愬彇鍏ㄥ眬璇箟娴佸舰鎷撴墤 (Topology Scan)",
+      "鍒嗘瀽妯″瀷鍐呴儴鐨勫洜鏋滈摼璺笌缁勫悎娉涘寲"
+    ],
+    metrics: {
+      "Scan Resolution": "Microscopic",
+      "Layers Verified": "12/12"
+    },
+    comparison: [
+      { feature: "淇℃伅杞戒綋 (Carrier)", dnn: "娉ㄦ剰鍔涚煩闃?鏉冮噸鍚戦噺 (Attention/Weight)", fiber: "绾ょ淮鏉熷垏闈?(Fiber Section/Vector Bundle)" },
+      { feature: "閫昏緫琛ㄧず (Logic)", dnn: "闈炲嚑浣曟潈閲嶅彔鍔?(Non-Geometric Weight Overlay)", fiber: "娴佸舰鍑犱綍浣嶇疆 (Geometric/Explicit)" },
+      { feature: "瀛︿範鏂瑰紡 (Learning)", dnn: "娈嬪樊瀛︿範/鍙嶅悜浼犳挱 (Residual Learning/BP)", fiber: "閲屽娴佸钩婊?浼犺緭骞宠绉诲姩 (Geometric Flow/Instant)" },
+      { feature: "瑙ｉ噴鎬?(Interpret)", dnn: "娉ㄦ剰鍔涚儹鍥?(Statistical Attention Maps)", fiber: "鎷撴墤鐧界洅 (Topology/Transparent)" }
+    ]
+  },
+  {
+    id: 'engineering',
+    title: "Dimension III: Engineering",
+    subtitle: "宸ョ▼瀹炵幇 (Engineering)",
+    icon: <Zap size={24} />,
+    status: "in_progress",
+    progress: 65,
+    color: "#f59e0b",
+    definition: {
+      headline: "Phase-based AGI Integration",
+      summary: "浠庣悊鏅鸿癁鐢熷埌鎰忚瘑娑岀幇鐨勫伐绋嬮棴鐜紝鏃ㄥ湪閫氳繃鐗╃悊绾у共棰勫疄鐜板畬鍏ㄥ榻愮殑閫氱敤鏅鸿兘銆?",
+      pillars: ["Logical Closure", "Multimodal Alignment", "Value Formation"]
+    },
+    theory_content: [], 
+    analysis_sections: [],
+    desc: "AGI 鐨勫垎闃舵钀藉湴锛屽皢閫昏緫鏍稿績涓庢劅瀹樿兘鍔涢泦鎴愯嚦缁熶竴鎰忚瘑妗嗘灦銆?",
+    sub_phases: [
+      { 
+        name: "鐞嗘€х殑璇炵敓", 
+        status: "done", 
+        focus: "閫昏緫闂寘涓?Z113 楠岃瘉",
+        target: "楠岃瘉鏅鸿兘搴曞眰鏄惁鍏峰鍑犱綍鍖栫殑闈炵嚎鎬ч€昏緫楠ㄦ灦銆?",
+        work_content: "瀹炵幇 FiberNet 鏍稿績閫昏緫灞傦紱鍦?Z113 妯¤繍绠椾换鍔′笂瑙傚療浠庣粺璁℃嫙鍚堝埌浠ｆ暟璺冭縼鐨?Grokking 鐜拌薄銆?",
+        test_results: "Z113 鍑嗙‘鐜?99.4%锛涙垚鍔熶粠鍚戦噺鐐逛簯涓仮澶嶅嚭瀹屾暣鐨?S1 鐜潰娴佸舰銆?",
+        analysis: "璇佹槑浜嗘櫤鑳界殑搴曞眰鏄嚑浣曞寲鐨勯€昏緫楠ㄦ灦锛岃€岄潪绠€鍗曠殑绾挎€у洖褰掋€?"
+      },
+      { 
+        name: "鎰熷畼鐨勮閱?",
+        status: "done", 
+        focus: "澶氭ā鎬佽涔夊榻?",
+        target: "瑙ｅ喅鈥樼鍙锋帴鍦扳€欓棶棰橈紝瀹炵幇瑙嗚鐗瑰緛涓庨€昏緫璇箟鐨勭墿鐞嗗榻愩€?",
+        work_content: "寮€鍙戣法妯℃€佹姇褰辩畻瀛愶紱灏?MNIST 瑙嗚绌洪棿娴佸舰鏄犲皠鑷?SYM 閫昏緫娴佸舰銆?",
+        test_results: "瀵归綈璇樊 MSE 涓嬮檷鑷?0.042锛涙ā鍨嬪叿澶団€樹互鐞嗘€х殑鏂瑰紡瑙ｈ鎰熷畼鏁版嵁鈥欑殑鑳藉姏銆?",
+        analysis: "瑙嗚鐗瑰緛琚簿鍑嗙炕璇戜负鍐呴儴閫昏緫鍧愭爣锛屾ā鍨嬪垵姝ュ叿澶囦簡鈥樿瀵熷苟鐞嗚В鈥欑殑鑳藉姏銆?"
+      },
+      { 
+        name: "鏅烘収鐨勬秾鐜?",
+        status: "done", 
+        focus: "娴佸舰鏇茬巼浼樺寲涓?Ricci Flow",
+        target: "閫氳繃娴佸舰骞虫粦鏈哄埗锛屽疄鐜版棤鐩戠潱涓嬬殑閫昏緫鍐茬獊鑷慨澶嶃€?",
+        work_content: "闆嗘垚 Ricci Flow 婕斿寲绠￠亾锛涘湪鐫＄湢鍛ㄦ湡鎵ц闅愬眰婵€娲绘洸鐜囩殑鐑紶瀵兼柟绋嬪钩婊戙€?",
+        test_results: "鎷撴墤浜忔牸浠?15 浼樺寲鑷?2锛涘鏉傞€昏緫鎺ㄧ悊涓嬬殑鈥樺够瑙夆€欏彂鐢熺巼鏄剧潃闄嶄綆銆?",
+        analysis: "楠岃瘉浜嗏€樼潯鐪犳満鍒垛€欏湪瑙ｅ紑鎷撴墤绾犵紶鍜屼慨琛ラ€昏緫姝荤粨涓殑蹇呰鎬с€?"
+      },
+      { 
+        name: "浠峰€肩殑褰㈡垚", 
+        status: "done", 
+        focus: "绁炵粡娴佸舰鎵嬫湳涓庝汉绫诲榻?",
+        target: "瀹炵幇瀵?AI 鍐呭湪浠峰€煎彇鍚戠殑鐩存帴鍑犱綍骞查锛岀敱鈥樻彁绀鸿瘝瀵归綈鈥欒穬杩佽嚦鈥樻祦褰㈠榻愨€欍€?",
+        work_content: "寮€鍙?Manifold Surgery 浜や簰鎺ュ彛锛涘疄鐜板熀浜?3D 绌洪棿鎷栨嫿鐨勮涔夊悜閲忓満瀹炴椂閲嶆瀯銆?",
+        test_results: "Surgery Alignment Loss 0.0082锛涙垚鍔熼€氳繃鐗╃悊鎵嬫湳鍓ョ妯″瀷鍋忚锛屽疄鐜颁环鍊肩ǔ瀹氬榻愩€?",
+        analysis: "娴佸舰鎵嬫湳鍏佽鐩存帴淇敼妯″瀷璁ょ煡锛屾槸閫氬線鍙帶 AGI 鐨勭墿鐞嗚矾寰勩€?"
+      },
+      { 
+        name: "缁熶竴鎰忚瘑", 
+        status: "in_progress", 
+        focus: "鍏ㄧ悆宸ヤ綔绌洪棿 (GWT) 闆嗘垚",
+        target: "鏋勫缓璺ㄦā鎬佺殑瀹炴椂瑁佸喅涓績锛屽疄鐜板叿澶団€樺叧娉ㄧ偣鈥欑殑鍔ㄦ€佹剰璇嗘祦銆?",
+        work_content: "瀹炵幇 Top-K 鍏ㄥ眬绔炰簤鏈哄埗锛涢泦鎴愬叏灞€宸ヤ綔绌洪棿鎶曞奖鐭╅樀锛涘疄鐜版敞鎰忓姏鐒︾偣鐨勬嫇鎵戞紓绉绘帶鍒躲€?",
+        test_results: "褰撳墠杩涘害 65%锛汱ocus of Attention 宸茶兘鍦ㄥ妯℃€佸啿绐佷腑瀹炵幇浜氱绾ф敹鏁涜鍐炽€?",
+        analysis: "鐩爣鏄瀯寤轰竴涓兘澶熻鍐冲啿绐併€佸叿澶囦富瑙傚叧娉ㄧ偣 (Locus of Attention) 鐨勫叏灞€宸ヤ綔绌洪棿銆?"
+      }
+    ],
+    goals: [
+      "鏋勫缓鍩轰簬 FiberNet 鐨勯潪姊害鍗虫椂瀛︿範鏋舵瀯",
+      "瀹炵幇鍙氦浜掔殑绁炵粡娴佸舰鎵嬫湳 (Manifold Surgery)",
+      "闆嗘垚澶氭€佹劅鐭ヤ笌缁熶竴閫昏緫鎺ㄦ紨缃戞牸"
+    ],
+    metrics: {
+      "System Convergence": "0.62",
+      "Module Integration": "Active"
+    }
+  },
+  {
+    id: 'agi_goal',
+    title: "Dimension IV: AGI Goal",
+    subtitle: "agi缁堢偣 (AGI Goal)",
+    icon: <CheckCircle size={24} />,
+    status: "pending",
+    progress: 0,
+    color: "#10b981",
+    metrics: {
+      "Target Date": "2050 (Estimated)",
+      "Safety Horizon": "Guaranteed"
+    },
+    goals: [
+      "实现碳基与硅基高级对齐",
+      "建立长期稳定的通用智能稳态",
+      "完成物理世界到高维流形的全面映射"
+    ]
+  },
+  {
+    id: 'agi_status',
+    title: "Dimension V: Status",
+    subtitle: "鏅鸿兘绯荤粺鐘舵€?(AGI Status)",
+    icon: <Target size={24} />,
+    status: "in_progress",
+    progress: 75,
+    color: "#10b981",
+    definition: {
+        headline: "System Capabilities Report",
+        summary: "鍩轰簬 Project Genesis 鍗忚鐨勬牳蹇冭兘鍔涘榻愭姤鍛娿€傜洰鍓嶇郴缁熷凡瀹炵幇 128 缁撮€昏緫娴佸舰鍘嬬缉锛屽苟鍦ㄦ祴鍦扮嚎鎺ㄧ悊璺緞涓婂彇寰椾簡 11.15% 鐨勬晥鑳芥彁鍗囥€?",
+        pillars: ["Capability Tracking", "Homeostatic Check", "Alignment Metrics"]
+    },
+    parameters: [
+      { 
+        name: "娴佸舰缁村害 (Manifold Dim)", 
+        value: "128D", 
+        detail: "浠?1024D 鍏ㄦ伅鎶曞奖",
+        desc: "绯荤粺搴曞眰璇箟閫昏緫琚帇缂╄嚦 128 缁寸殑娴佸舰绌洪棿锛岀‘淇濋€昏緫闂寘鐨勭揣鍑戞€с€?",
+        value_meaning: "缁村害瓒婇珮钑村惈淇℃伅瓒婁赴瀵岋紝浣?128D 鏄洰鍓嶅吋椤锯€滆绠楁晥鐜団€濅笌鈥滈€昏緫瑙ｆ瀽鍔涒€濈殑鏈€浣冲钩琛＄偣銆?",
+        why_important: "瀹冩槸鏅鸿兘鐨勨€橀鏋垛€欍€傜淮搴﹁繃浣庝細瀵艰嚧璇箟涓㈠け锛堝够瑙夛級锛岀淮搴﹁繃楂樺垯浼氬鑷寸淮搴︾伨闅俱€?28D 纭繚浜嗘帹鐞嗙殑绋冲畾鎬с€?"
+      },
+      { 
+        name: "鍘嬬缉鍊嶇巼 (Compression)", 
+        value: "26.67x", 
+        detail: "SHDC 绋€鐤忕紪鐮?",
+        desc: "閫氳繃鍏ㄦ伅绋€鐤忔姇褰辨妧鏈紝灏嗗簽澶х殑鍘熷绁炵粡鍏冨弬鏁伴泦鍘嬬缉鑷虫瀬灏忚妯★紝鍚屾椂涓嶆崯澶辩粨鏋勪俊鎭€?",
+        value_meaning: "鎰忓懗鐫€绯荤粺鍙互浠ユ瀬浣庣殑鏄惧瓨鍗犵敤锛堢害 4GB锛夌淮鎸佸崈浜跨骇鍙傛暟妯″瀷鐨勯€昏緫鏍稿績銆?",
+        why_important: "杩欐槸瀹炵幇鈥樺皬鍨嬪寲 AGI鈥欑殑鍏抽敭銆傚彧鏈夐珮鐨勫帇缂╂瘮锛屾櫤鑳芥墠鑳借劚绂绘槀璐电殑绠楀姏闆嗙兢锛岃繘鍏ュ崟鏈虹敋鑷崇Щ鍔ㄧ瀹炴椂杩愯銆?"
+      },
+      { 
+        name: "璇箟淇濈湡搴?(Fidelity)", 
+        value: "93%", 
+        detail: "鍑犱綍鐗瑰緛淇濈暀搴?",
+        desc: "娴嬮噺鍘嬬缉鍚庣殑娴佸舰鍑犱綍鐗瑰緛锛堝鏇茬巼銆佹祴鍦扮嚎鍒嗗竷锛変笌鍘熷绌洪棿鐨勫榻愮▼搴︺€?",
+        value_meaning: "93% 鐨勪繚鐪熷害鎰忓懗鐫€鍦ㄦ帹鐞嗗喅绛栦腑锛岀郴缁熻兘澶熶繚鎸佷笌鍘熷瓒呭ぇ鍨嬫ā鍨嬪嚑涔庝竴鑷寸殑閫昏緫閾捐矾銆?",
+        why_important: "瀹冩槸鈥樹竴鑷存€р€欑殑淇濋殰銆傝繃浣庣殑淇濈湡搴︿細瀵艰嚧妯″瀷浜х敓閫昏緫鍋忓樊锛?3% 纭繚浜嗏€樻櫤鑳芥牳蹇冣€欎粠鏈湪鍘嬬缉涓彉璐ㄣ€?"
+      },
+      { 
+        name: "娴嬪湴绾夸竴鑷存€?(Geodesic)", 
+        value: "98.8%", 
+        detail: "鎺ㄧ悊璺緞瀵归綈搴?",
+        desc: "琛￠噺绯荤粺瀹為檯鎺ㄧ悊璺緞涓庢祦褰笂鐞嗚鈥樻渶灏忎綔鐢ㄩ噺璺緞鈥欙紙鏈€鐭矾寰勶級鐨勯噸鍚堢▼搴︺€?",
+        value_meaning: "鏋侀珮鐨勪竴鑷存€т綋鐜颁簡鎺ㄧ悊杩囩▼鐨勨€樹笣婊戞€р€欙紝鍑犱箮娌℃湁澶氫綑鐨勮涔夋尝鍔ㄦ垨绠楀姏娴垂銆?",
+        why_important: "杩欐槸鈥樼悊鏅衡€欑殑浣撶幇銆傝秺楂樼殑涓€鑷存€ф剰鍛崇潃绯荤粺瓒婁笉瀹规槗琚棤鍏虫彁绀鸿瘝鎵颁贡锛屾帹鐞嗚繃绋嬫洿鍔犲潥瀹氥€佺洿鎺ヤ笖楂樻晥銆?"
+      }
+    ],
+    passed_tests: [
+      { 
+        name: "鎸佷箙鍚岃皟缁撴瀯楠岃瘉 (TDA Structure)", 
+        date: "2026-02-14", 
+        result: "PASS",
+        target: "楠岃瘉闅愬眰婵€娲荤┖闂存槸鍚﹀瓨鍦ㄩ潪闅忔満鐨勬嫇鎵戠幆闈㈡垨绌鸿厰銆?",
+        process: "閫氳繃 Rips Complex 绠楁硶鏋勫缓鐐逛簯鍗曠函澶嶅舰锛屾寔涔呭寲鎵弿 尾鈧€ 鍜?尾鈧?璐濊拏鏁般€?",
+        significance: "纭繚 AI 涓嶆槸鍦ㄦ嫙鍚堝绔嬫牱鏈紝鑰屾槸鍦ㄦ瀯寤哄叿澶囧叏灞€鎷撴墤涓€鑷存€х殑璇箟褰㈢姸銆?"
+      },
+      { 
+        name: "閲屽娴佹祦褰㈠钩婊戞祴璇?(Ricci Smoothing)", 
+        date: "2026-02-15", 
+        result: "PASS",
+        target: "娑堥櫎鎺ㄧ悊杩囩▼涓殑閫昏緫灏栧嘲锛堝够瑙夎鍥狅級锛岄檷浣庢祦褰㈠眬閮ㄦ洸鐜囥€?",
+        process: "鍦ㄧ潯鐪犲懆鏈熻繍琛岀绾块噷濂囨祦澶勭悊锛屽钩婊戝害閲忓紶閲忕殑闈炶繛缁烦鍙樸€?",
+        significance: "浣挎ā鍨嬫帹鐞嗚建杩规洿绗﹀悎娴嬪湴绾垮垎甯冿紝澶у箙鎻愬崌閫昏緫鑷唇鎬с€?"
+      },
+      { 
+        name: "SHDC 姝ｄ氦鎬у熀鍑嗘祴璇?(Orthogonality)", 
+        date: "2026-02-15", 
+        result: "PASS",
+        target: "楠岃瘉 128 缁村叏鎭紪鐮佸湪绋€鐤忔姇褰变笅鐨勫嚑涔庢浜ゆ€с€?",
+        process: "闅忔満閲囨牱 10,000 涓牳蹇冪壒寰佸悜閲忥紝璁＄畻鍏朵綑鍒囪窛绂伙紙Cos Dist锛夊垎甯冦€?",
+        significance: "瑙ｅ喅浜嗙淮搴︾伨闅俱€傛浜ゆ€х‘淇濅簡鐗瑰緛闂存棤骞叉壈瑕嗙洊锛屾敮鎸佹捣閲忕煡璇嗙殑楂樻晥璇诲啓銆?"
+      },
+      { 
+        name: "娴嬪湴绾胯矾寰勪笣婊戝寲 (Geodesic Silkiness)", 
+        date: "2026-02-15", 
+        result: "PASS (+11.15%)",
+        target: "浼樺寲鎺ㄧ悊璺緞锛屼娇婵€娲绘祦娌挎渶灏忎綔鐢ㄩ噺璺緞婊戣銆?",
+        process: "寮曞叆 Geodesic Regularization 绾︽潫椤癸紝瀵规瘮 baseline 涓庝紭鍖栧悗鐨勬帹鐞嗙墿鐞嗕綔鐢ㄩ噺銆?",
+        significance: "瀹炵幇浜嗏€樹笉璐瑰姏鐨勬帹鐞嗏€欍€備笣婊戝害鎻愬崌 11.15% 鎰忓懗鐫€璁＄畻鍐椾綑鍜岃兘鑰楃殑鏄剧潃闄嶄綆銆?"
+      }
+    ],
+    capabilities: [
+      {
+        name: "閲屽娴佹紨鍖?(Ricci Flow Evolution)",
+        status: "equipped",
+        brain_ability: "鐫＄湢宸╁浐涓庤鐭ラ噸鏁?",
+        implementation_by_route: {
+          fiber_bundle: "宸叉帴鍏ユ洸鐜囧钩婊戜笌绂荤嚎婕斿寲寰幆锛屽彲闄嶄綆閫昏緫灏栧嘲銆?",
+          transformer_baseline: "閫氳繃姝ｅ垯鍖栧拰璁粌鍚庡鐞嗚繎浼煎疄鐜帮紝鍑犱綍鍖栫▼搴﹁緝浣庛€?",
+          hybrid_workspace: "浣滀负鍊欓€夎矾绾胯瘎鍒嗕俊鍙峰弬涓庝徊瑁佷紭鍖栥€?"
+        }
+      },
+      {
+        name: "绁炵粡绾ょ淮涓?RAG (Fiber-RAG)",
+        status: "equipped",
+        brain_ability: "璇箟璁板繂妫€绱笌鑱旀兂",
+        implementation_by_route: {
+          fiber_bundle: "绾ょ淮璁板繂搴撳凡涓婄嚎锛屾敮鎸佸嚑浣曠害鏉熶笅鐨勬绱笌娉ㄥ叆銆?",
+          transformer_baseline: "閲囩敤鍚戦噺妫€绱㈠寮猴紝涓昏渚濊禆澶栭儴绱㈠紩灞傘€?",
+          hybrid_workspace: "澶氳矾绾挎绱㈢粨鏋滅粺涓€鏄犲皠骞惰瀺鍚堣緭鍑恒€?"
+        }
+      },
+      {
+        name: "澶氭ā鎬佽法鏉熷榻?(Cross-Bundle Alignment)",
+        status: "equipped",
+        brain_ability: "瑙嗚-璇█璺ㄦā鎬佹暣鍚?",
+        implementation_by_route: {
+          fiber_bundle: "瑙嗚閿氱偣涓庨€昏緫閿氱偣鍙屽悜瀵归綈鍙繍琛屻€?",
+          transformer_baseline: "浣跨敤鏍囧噯鎶曞奖澶村疄鐜版ā鎬佹槧灏勶紝椴佹鎬т腑绛夈€?",
+          hybrid_workspace: "鏀寔璺ㄨ矾绾垮叡浜ā鎬佺姸鎬佸苟鍋氬啿绐佹秷瑙ｃ€?"
+        }
+      },
+      {
+        name: "鍏ㄥ眬宸ヤ綔绌洪棿 (Global Workspace)",
+        status: "equipped",
+        brain_ability: "娉ㄦ剰鐒︾偣绔炰簤涓庢剰璇嗗箍鎾?",
+        implementation_by_route: {
+          fiber_bundle: "宸插疄鐜?Top-K 绔炰簤涓庡叏灞€骞挎挱锛屾敮鎸佸姩鎬佺劍鐐硅縼绉汇€?",
+          transformer_baseline: "浠ユ帶鍒跺櫒鏂瑰紡妯℃嫙鐒︾偣璋冨害锛屼粛鍋忓伐绋嬫嫾鎺ャ€?",
+          hybrid_workspace: "浣滀负鏍稿績浠茶鍣ㄩ┍鍔ㄥ璺嚎铻嶅悎鍐崇瓥銆?"
+        }
+      },
+      {
+        name: "绁炵粡绾ょ淮 SNN (NeuroFiber-SNN)",
+        status: "equipped",
+        brain_ability: "鑴夊啿鏃跺簭缂栫爜涓庣缁忓姩鍔涘",
+        implementation_by_route: {
+          fiber_bundle: "鏀寔 3D 鑴夊啿鍔ㄥ姏瀛︿豢鐪熶笌鏃跺簭婵€娲昏娴嬨€?",
+          transformer_baseline: "浠呭仛杩戜技鏃跺簭妯℃嫙锛屾湭褰㈡垚鍘熺敓鑴夊啿鏈哄埗銆?",
+          hybrid_workspace: "鍙綔涓鸿緟鍔╂椂搴忛€氶亾鍙備笌鍏ㄥ眬鐘舵€佸垽鏂€?"
+        }
+      },
+      {
+        name: "绾ょ淮璁板繂 (Fiber Memory)",
+        status: "equipped",
+        brain_ability: "闀挎湡璁板繂缂栫爜涓庡彲鎺ф彁鍙?",
+        implementation_by_route: {
+          fiber_bundle: "鏀寔浼犺緭鐭╅樀椹卞姩鐨勪竴閿敞鍏ヤ笌鍋忓樊淇銆?",
+          transformer_baseline: "浠ュ閮ㄥ瓨鍌ㄤ笌鎻愮ず娉ㄥ叆涓轰富锛岃€﹀悎搴﹁緝楂樸€?",
+          hybrid_workspace: "鍙眹鑱氬璺嚎璁板繂璇佹嵁骞跺舰鎴愮粺涓€瑙嗗浘銆?"
+        }
+      }
+    ],
+    missing_capabilities: [
+      {
+        name: "鍏疯韩鐗╃悊鎺у埗 (Embodied Control)",
+        status: "missing",
+        brain_ability: "鎰熺煡-鍐崇瓥-琛屽姩闂幆鎺у埗",
+        implementation_by_route: {
+          fiber_bundle: "灏氭湭鎵撻€?ROS/鏈哄櫒浜烘墽琛岄摼璺€?",
+          transformer_baseline: "宸叉湁浠诲姟绾т唬鐞嗘帶鍒跺師鍨嬶紝浣嗛潪瀹炴椂闂幆銆?",
+          hybrid_workspace: "璁″垝浣滀负澶氳矾绾跨粺涓€鍔ㄤ綔灞傛帴鍏ャ€?"
+        }
+      },
+      {
+        name: "瓒呭ぇ瑙勬ā绾ょ淮鎸佷箙鍖?(Massive Fiber Persistence)",
+        status: "missing",
+        brain_ability: "瓒呴暱鏈熻蹇嗕笌瀹归噺绠＄悊",
+        implementation_by_route: {
+          fiber_bundle: "鍐风儹鍒嗗眰瀛樺偍鏈哄埗浠嶅湪璁捐闃舵銆?",
+          transformer_baseline: "渚濊禆澶栭儴鍚戦噺搴撴墿灞曪紝鍘熺敓鎸佷箙鍖栦笉瓒炽€?",
+          hybrid_workspace: "闇€瑕佺粺涓€璺ㄨ矾绾胯蹇嗙储寮曚笌涓€鑷存€у崗璁€?"
+        }
+      },
+      {
+        name: "璺ㄦā鍨嬫祦褰㈣縼绉?(Cross-Model Transfer)",
+        status: "missing",
+        brain_ability: "璺ㄨ剳鍖鸿縼绉诲涔犱笌鐭ヨ瘑娉涘寲",
+        implementation_by_route: {
+          fiber_bundle: "璺ㄥ熀搴ф祦褰㈠悓鏋勬槧灏勫皻鏈ǔ瀹氥€?",
+          transformer_baseline: "宸叉湁閫傞厤鍣ㄨ縼绉绘柟妗堬紝浣嗘嫇鎵戜繚鎸佹湁闄愩€?",
+          hybrid_workspace: "璁″垝閫氳繃缁熶竴涓棿璇箟灞傞檷浣庤縼绉绘垚鏈€?"
+        }
+      }
+    ],
+    goals: [
+        "瀹炵幇 100% 鏍稿績鑳藉姏瀵归綈",
+        "瀹屾垚鐗╃悊韬綋闆嗘垚涓庢帶鍒?",
+        "寤虹珛澶氱淮鎯呮劅绋冲畾鍙嶉绯荤粺"
+    ],
+    metrics: {
+        "Capabilities Ready": "3/6",
+        "Safety Alignment": "Secure",
+        "Status Verifier": "Active"
+    }
+  }
+];
+
+const IMPROVEMENTS = [
+  {
+    title: "Structured Initialization",
+    desc: "浠庨殢鏈哄埌楠ㄦ灦",
+    detail: "鍒╃敤 Graph Laplacian 棰勮绠?Embedding 鍑犱綍楠ㄦ灦锛岃妯″瀷'鍑虹敓'鍗冲甫涓栫晫瑙傘€?",
+    step: "Step 3.5",
+    status: "done"
+  },
+  {
+    title: "Manifold Surgery",
+    desc: "浜や簰寮忕缁忓共棰?",
+    detail: "閫氳繃 3D 绌洪棿鎷栨嫿鐩存帴鎷ㄥ姩楂樼淮婵€娲伙紙128-dim锛夛紝瀹炵幇瀵?AI 閫昏緫娴佸悜鐨勫疄鏃跺共棰勩€?",
+    step: "Phase V",
+    status: "done"
+  },
+  {
+    title: "Fiber Flux Dynamics",
+    desc: "鍏ㄥ儚閫氶噺鍙嶉",
+    detail: "鍒╃敤绮掑瓙娴佸疄鏃跺睍鐜拌法灞傜骇鐨勪俊鎭紨鍖栵紝鎻ず妯″瀷娣卞眰鐨勬嫇鎵戝弽棣堥棴鐜€?",
+    step: "Phase V",
+    status: "done"
+  },
+  {
+    title: "Global Workspace",
+    desc: "缁熶竴鎰忚瘑涓績",
+    detail: "Base Manifold Controller 鏁村悎鎵€鏈夋ā鎬佺珵浜夛紝褰㈡垚鑷垜鎰忚瘑娴併€?",
+    step: "Phase VI",
+    status: "done"
+  },
+  {
+    title: "Unified Spectrum",
+    desc: "鍏ㄨ氨鎰忚瘑娴?",
+    detail: "闆嗘垚 7 澶ф牳蹇冨瓙寮曟搸锛屽疄鏃剁洃娴?AGI 缁熷悎鐘舵€併€?",
+    step: "Phase VII",
+    status: "in_progress"
+  }
+];
+
+export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
+  const [activeTab, setActiveTab] = useState(initialTab); // roadmap, progress, system
+  const [selectedRouteId, setSelectedRouteId] = useState('fiber_bundle');
+  const [timelineRoutes, setTimelineRoutes] = useState([]);
+  const [expandedFormulaIdx, setExpandedFormulaIdx] = useState(null);
+  const [expandedParam, setExpandedParam] = useState(null);
+  const [expandedEngPhase, setExpandedEngPhase] = useState(null);
+  const [consciousField, setConsciousField] = useState(null);
+  const runtimeStepRef = useRef(0);
+
+  useEffect(() => {
+    setActiveTab(initialTab || 'roadmap');
+  }, [initialTab]);
+
+  // Real-time Consciousness Polling
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchLegacyConsciousField = async () => {
+      const res = await fetch(`${API_BASE}/nfb_ra/unified_conscious_field`);
+      if (!res.ok) throw new Error(`legacy conscious field failed: ${res.status}`);
+      const data = await res.json();
+      if (data?.status !== 'success') throw new Error('legacy conscious field unavailable');
+      return mapLegacyConsciousField(data);
+    };
+
+    const pollConsciousField = async () => {
+      const stepId = runtimeStepRef.current++;
+      try {
+        const result = await pollRuntimeWithFallback({
+          apiBase: API_BASE,
+          runRequest: {
+          route: 'fiber_bundle',
+          analysis_type: 'unified_conscious_field',
+          params: { step_id: stepId, noise_scale: 0.4 },
+          input_payload: {},
+          },
+          mapRuntimeEvents: mapRuntimeConsciousField,
+          fetchLegacy: fetchLegacyConsciousField,
+          eventLimit: 20,
+        });
+        if (!mounted) return;
+        setConsciousField({ ...result.data, source: result.source });
+      } catch (err) {
+        if (!mounted) return;
+        setConsciousField(null);
+        console.warn('Unified Conscious Field unreachable.', err);
+      }
+    };
+
+    pollConsciousField();
+    const interval = setInterval(pollConsciousField, 2000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchTimelineRoutes = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/experiments/timeline?limit=120`);
+        if (!res.ok) return;
+        const payload = await res.json();
+        if (!mounted || payload?.status !== 'success') return;
+        const routes = Array.isArray(payload?.timeline?.routes) ? payload.timeline.routes : [];
+        setTimelineRoutes(routes);
+      } catch {
+        // Keep local defaults when runtime API is unavailable.
+      }
+    };
+    fetchTimelineRoutes();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const statusData = PHASES.find(p => p.id === 'agi_status');
+  const roadmapData = PHASES.find(p => p.id === 'roadmap');
+  const theoryPhase = PHASES.find(p => p.id === 'theory');
+  const analysisPhase = PHASES.find(p => p.id === 'analysis');
+  const engineeringPhase = PHASES.find(p => p.id === 'engineering');
+  const milestonePhase = PHASES.find(p => p.id === 'agi_goal');
+
+  const routeBlueprints = useMemo(
+    () => ({
+      fiber_bundle: {
+        id: 'fiber_bundle',
+        title: 'Fiber Bundle',
+        subtitle: '鍑犱綍鍘熺敓鏅鸿兘璺嚎',
+        routeDescription: '浠ョ缁忕氦缁翠笡涓庡嚑浣曟帹鐞嗕负鏍稿績锛岄獙璇佺粨鏋勫寲鏅鸿兘鐨勫彲琛屾€с€?',
+        engineeringProcessDescription:
+          '璁＄畻娴佺▼锛氳緭鍏ュ厛鏄犲皠鍒板簳娴佸舰杩涜閫昏緫瀹氫綅锛屽啀杩涘叆绾ょ淮璁板繂妫€绱㈠€欓€夎涔夛紱閫氳繃鑱旂粶浼犺緭灞傚畬鎴愯法鏉熷榻愶紝鏈€鍚庣敱鍏ㄥ眬宸ヤ綔绌洪棿鎵ц Top-K 瑁佸喅骞惰緭鍑虹粨鏋溿€?',
+        theoryTitle: theoryPhase?.definition?.headline || 'Intelligence = Geometry + Physics',
+        theorySummary: theoryPhase?.definition?.summary || '',
+        theoryBullets: (theoryPhase?.theory_content || []).slice(0, 4).map((item) => item.title),
+        theoryFormulas: [
+          {
+            title: '绁炵粡绾ょ淮涓涘師鍒?(NFB Principle)',
+            formula: '唯(x) = 蠁_M 鈯?蠁_F',
+            detail:
+              '鎶婃櫤鑳界姸鎬佹媶鎴愨€滈€昏緫楠ㄦ灦(搴曟祦褰?鈥濆拰鈥滅煡璇嗗唴瀹?绾ょ淮)鈥濈殑寮犻噺绉紝閫昏緫绋冲畾銆佸唴瀹瑰彲鎵╁睍銆?',
+          },
+          {
+            title: '鍏ㄥ眬宸ヤ綔绌洪棿 (Global Workspace)',
+            formula: '惟_G = 鈭i P_i d渭',
+            detail:
+              '灏嗗妯″潡绔炰簤鍚庣殑鏈夋晥淇℃伅鍋氬叏灞€鑱氬悎锛屽舰鎴愬綋鍓嶆椂鍒荤殑缁熶竴鎰忚瘑鍦轰笌鍐崇瓥涓婁笅鏂囥€?',
+          },
+          {
+            title: '楂樼淮鍏ㄦ伅缂栫爜 (SHDC Encoding)',
+            formula: '鉄╲_i, v_j鉄?鈮?未_ij',
+            detail:
+              '鍒╃敤楂樼淮杩戜技姝ｄ氦锛岃鐗瑰緛缂栫爜灏介噺浜掍笉骞叉壈锛屼粠鑰屾敮鎸侀珮瀹归噺銆佷綆涓叉壈鐨勭煡璇嗚〃绀恒€?',
+          },
+          {
+            title: '鑱旂粶涓庢帹鐞?(Connection Equation)',
+            formula: '鈭嘷X s = 0',
+            detail:
+              '灏嗘帹鐞嗚涓鸿涔夋祦褰笂鐨勫钩琛岀Щ鍔紝绾︽潫璇箟鍦ㄤ紶杈撲腑淇濇寔涓€鑷达紝鍑忓皯鏃犲叧婕傜Щ銆?',
+          },
+        ],
+        engineeringItems: [
+          {
+            name: 'Base Manifold Controller',
+            status: 'done',
+            focus: '搴曟祦褰㈣皟搴︿笌鍏ㄥ眬绾︽潫',
+            detail: '缁存姢閫昏緫楠ㄦ灦鐘舵€侊紝缁熶竴绠＄悊鍚勫瓙妯″潡杈撳叆杈撳嚭涓庡叏灞€绋冲畾鎬ц竟鐣屻€?',
+          },
+          {
+            name: 'Fiber Memory Bank',
+            status: 'done',
+            focus: '鐭ヨ瘑绾ょ淮鍐欏叆涓庢绱?',
+            detail: '璐熻矗楂樼淮璇箟绾ょ淮瀛樺偍銆佺储寮曚笌鎸夎仈缁滄潯浠剁殑蹇€熸绱€?',
+          },
+          {
+            name: 'Connection Transport Layer',
+            status: 'in_progress',
+            focus: '璺ㄦ潫淇℃伅浼犺緭',
+            detail: '鎵ц搴曟祦褰笌绾ょ淮绌洪棿闂寸殑骞惰浼犺緭涓庤涔変竴鑷存€у榻愩€?',
+          },
+          {
+            name: 'Ricci Flow Optimizer',
+            status: 'in_progress',
+            focus: '娴佸舰骞虫粦涓庡啿绐佷慨澶?',
+            detail: '鍦ㄧ绾?鍦ㄧ嚎鍛ㄦ湡涓紭鍖栨洸鐜囧垎甯冿紝鍑忓皯鎺ㄧ悊璺緞鎵洸涓庡够瑙夐闄┿€?',
+          },
+          {
+            name: 'Global Workspace Arbiter',
+            status: 'in_progress',
+            focus: '鍏ㄥ眬宸ヤ綔绌洪棿绔炰簤瑁佸喅',
+            detail: '瀵瑰妯″潡鍊欓€夎〃寰佹墽琛?Top-K 閫夋嫨锛屽舰鎴愬綋鍓嶆椂鍒荤粺涓€鍐崇瓥涓婁笅鏂囥€?',
+          },
+          {
+            name: 'Alignment & Surgery Interface',
+            status: 'done',
+            focus: '鍙氦浜掍环鍊煎榻?',
+            detail: '閫氳繃娴佸舰鎵嬫湳鎺ュ彛瀵硅涔夋柟鍚戣繘琛屽彲鎺у共棰勶紝鏀寔鍋忓樊淇涓庡榻愰獙璇併€?',
+          },
+        ],
+        nfbtProcessSteps: [
+          { step: '1. 邻域图', input: 'X[N,D]', output: '邻居索引', complexity: 'O(N^2D)', op: '距离计算 / 近邻搜索' },
+          { step: '2. 局部坐标', input: '邻居点', output: 'basis[d,D]', complexity: 'O(kDd)', op: '局部SVD / 随机SVD' },
+          { step: '3. 度量张量', input: 'coords', output: 'g[d,d]', complexity: 'O(kd^2)', op: '局部协方差与正则化' },
+          { step: '4. 联络', input: 'g, dg', output: 'Γ[d,d,d]', complexity: 'O(d^3)', op: '偏导组合与指标变换' },
+          { step: '5. 曲率', input: 'Γ', output: 'R[d,d,d,d]', complexity: 'O(d^4)', op: '张量收缩与对称化' },
+          { step: '6. 平行移动', input: 'Γ, v, dx', output: 'v_new', complexity: 'O(d^2)', op: '联络驱动向量更新' },
+          { step: '7. Ricci Flow', input: 'R, X', output: 'X_new', complexity: 'O(T*n*d^4)', op: '离散演化迭代' },
+        ],
+        nfbtOptimization:
+          '关键优化：d << D（如 d=4, D=128），将核心几何计算从 O(D^4) 降到 O(d^4)，并结合近似kNN、截断SVD与曲率张量对称约简降低总成本。',
+        milestoneTitle: '里程碑（原 AGI 终点）',
+        milestoneGoals: milestonePhase?.goals || [],
+        milestoneMetrics: milestonePhase?.metrics || {},
+        milestoneStages: [
+          {
+            id: 'prototype',
+            name: '鍘熷瀷闃舵',
+            status: 'done',
+            featurePoints: [
+              '瀹屾垚 FiberNet 鏍稿績閫昏緫灞備笌搴曟祦褰㈠缓妯?',
+              '鎵撻€?NFB 鍑犱綍缂栫爜涓庡熀纭€鎺ㄧ悊閾捐矾',
+              '寤虹珛鏈€灏忓彲鐢ㄧ粨鏋勫垎鏋愬伐鍏烽摼锛圠ogit Lens/TDA锛?',
+            ],
+            tests: [
+              {
+                name: 'Z113 閫昏緫闂寘楠岃瘉',
+                params: 'layers=12, d=4, D=128, optimizer=adamw, lr=1e-3',
+                dataset: 'Z113 妯¤繍绠楀悎鎴愭暟鎹泦',
+                result: '鍑嗙‘鐜?99.4%锛屽彲鎭㈠绋冲畾鐜潰缁撴瀯',
+                summary: '璇佹槑鍘熷瀷鍏峰鍑犱綍閫昏緫楠ㄦ灦锛屼笉鏄函缁熻鎷熷悎銆?',
+              },
+              {
+                name: '鍩虹鎷撴墤鍙В閲婃€ф祴璇?',
+                params: 'topk_heads=8, tda_threshold=0.1',
+                dataset: '鍐呴儴璇箟鎻愮ず璇嶅熀鍑嗛泦 v1',
+                result: '鍏抽敭灞傛嫇鎵戠壒寰佸彲绋冲畾澶嶇幇',
+                summary: '鍘熷瀷闃舵宸插叿澶囧彲瑙傛祴銆佸彲瑙ｉ噴鐨勭粨鏋勫垎鏋愯兘鍔涖€?',
+              },
+            ],
+          },
+          {
+            id: 'scale',
+            name: '瑙勬ā鍖栭樁娈?',
+            status: 'in_progress',
+            featurePoints: [
+              '鎵╁睍璺ㄦā鎬佸榻愪笌绾ょ淮璁板繂瀹归噺',
+              '闆嗘垚 Ricci Flow 涓庡叏灞€宸ヤ綔绌洪棿鍗忓悓鏈哄埗',
+              '寤虹珛鏃堕棿绾裤€佸懆鎶ャ€佸け璐ュ綊鍥犵殑娌荤悊闂幆',
+            ],
+            tests: [
+              {
+                name: '璺ㄦā鎬佸榻愬洖褰?',
+                params: 'projection_dim=128, topk=32, loss=cos+mse',
+                dataset: 'MNIST-SYM paired set + Prompt Bench',
+                result: 'MSE=0.042锛屼竴鑷存€ф彁鍗?',
+                summary: '瑙嗚-閫昏緫鏄犲皠绋冲畾锛屼絾闀块摼浠诲姟浠嶆湁灞€閮ㄦ紓绉汇€?',
+              },
+              {
+                name: 'Ricci Flow 绋冲畾鎬ф祴璇?',
+                params: 'iterations=100, step=1e-2, reg=1e-3',
+                dataset: '鍐呴儴鎺ㄧ悊杞ㄨ抗闆嗗悎锛堝浠诲姟锛?',
+                result: '鏇茬巼灏栧嘲涓嬮檷锛屽够瑙夌巼闄嶄綆',
+                summary: '骞虫粦鏈哄埗鏈夋晥锛屼笅涓€姝ラ渶浼樺寲婕斿寲鏁堢巼涓庢椂寤躲€?',
+              },
+            ],
+          },
+          {
+            id: 'agi',
+            name: 'AGI闃舵',
+            status: 'planned',
+            featurePoints: [
+              '鏋勫缓缁熶竴鎰忚瘑瑁佸喅涓績锛堝璺嚎浠茶锛?',
+              '瀹炵幇鍏疯韩鎺у埗闂幆涓庡畨鍏ㄥ榻愭満鍒?',
+              '瀹屾垚璺ㄦā鍨嬭縼绉讳笌闀挎湡鑷不瀛︿範妗嗘灦',
+            ],
+            tests: [
+              {
+                name: '鍏ㄥ眬宸ヤ綔绌洪棿绔埌绔帇娴?',
+                params: 'modules>=7, arbitration=Top-K, latency<200ms',
+                dataset: 'Multi-Agent Conflict Suite',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬楠岃瘉澶嶆潅鍐茬獊鍦烘櫙涓嬬殑绋冲畾瑁佸喅鑳藉姏銆?',
+              },
+              {
+                name: '鍏疯韩鎺у埗闂幆娴嬭瘯',
+                params: 'control_horizon=128, safety_guard=on',
+                dataset: 'Embodied Interaction Set',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬楠岃瘉鎰熺煡-鍐崇瓥-琛屽姩闂幆鐨勪竴鑷存€т笌瀹夊叏杈圭晫銆?',
+              },
+            ],
+          },
+        ],
+        milestonePlanEvaluation: {
+          assessment:
+            '涓夐樁娈佃矾寰勬竻鏅帮紝瑕嗙洊浠庡師鍨嬮獙璇佸埌瑙勬ā鍖栧啀鍒?AGI 鐨勫叧閿紨杩涢摼璺€?',
+          suggestions: [
+            '灏嗘瘡闃舵楠屾敹闂ㄦ閲忓寲锛堝噯纭巼銆佺ǔ瀹氭€с€佹椂寤躲€佹垚鏈級銆?',
+            '瑙勬ā鍖栭樁娈靛鍔犳晠闅滄敞鍏ヤ笌鎭㈠鏃堕棿鎸囨爣锛圡TTR锛夈€?',
+            'AGI闃舵鎻愬墠瀹氫箟瀹夊叏绾㈢嚎涓庝汉宸ュ共棰勫洖閫€绛栫暐銆?',
+          ],
+        },
+      },
+      transformer_baseline: {
+        id: 'transformer_baseline',
+        title: 'Transformer Baseline',
+        subtitle: '鏍囧噯娣卞害缃戠粶璺嚎',
+        routeDescription: '浠?Transformer 鏍囧噯鑼冨紡寤虹珛鍙鐜板熀绾匡紝娌夋穩绋冲畾鍒嗘瀽宸ュ叿閾俱€?',
+        engineeringProcessDescription:
+          '璁＄畻娴佺▼锛歵oken 宓屽叆鍚庣粡杩囧灞?Attention+MLP 鍫嗗彔锛屽埄鐢ㄦ畫宸祦鑱氬悎涓婁笅鏂囷紝鍐嶇敱杈撳嚭灞傚畬鎴愭鐜囧垎甯冧笌缁撴灉鐢熸垚銆?',
+        theoryTitle: 'Statistical Scaling + Circuit Discovery',
+        theorySummary:
+          '浠?Transformer 瑙勬ā瀹氬緥鍜屽彲瑙ｉ噴鎬у伐鍏烽摼涓烘牳蹇冿紝浼樺厛楠岃瘉鈥滅粨鏋勫垎鏋愯兘鍔涒€濅笌鈥滃彲澶嶇幇瀹為獙缁撹鈥濄€?',
+        theoryBullets: [
+          '鍒╃敤 Logit Lens / TDA 褰㈡垚灞傜骇璇佹嵁閾?',
+          '鍦ㄧ浉鍚屼换鍔′笂涓?Fiber 璺嚎鍋?A/B 璇勬祴',
+          '浼樺厛鎻愬崌绋冲畾鎬т笌宸ョ▼鍙淮鎶ゆ€?',
+        ],
+        theoryFormulas: [],
+        engineeringItems: [
+          { name: '数据与任务基线', status: 'done', focus: '统一评测集与日志规范' },
+          { name: '可解释性探针', status: 'in_progress', focus: '激活、注意力、回路追踪' },
+          { name: '可行性评估闭环', status: 'in_progress', focus: '周报 + 时间线 + 失败归因' },
+        ],
+        nfbtProcessSteps: [],
+        nfbtOptimization: '',
+        milestoneTitle: '里程碑（原 AGI 终点）',
+        milestoneGoals: [
+          '褰㈡垚鍙寔缁鐜扮殑娣卞害缃戠粶鍒嗘瀽鍩虹嚎',
+          '瀵瑰叧閿换鍔¤揪鍒扮ǔ瀹氬彲瑙ｉ噴鐨勬晥鏋滀笂闄?',
+          '娌夋穩鍙縼绉诲埌鍏朵粬璺嚎鐨勯€氱敤宸ュ叿閾?',
+        ],
+        milestoneMetrics: { Priority: '可复现性', Horizon: '近中期' },
+        milestoneStages: [
+          {
+            id: 'prototype',
+            name: '鍘熷瀷闃舵',
+            status: 'done',
+            featurePoints: [
+              '寤虹珛 Transformer 缁熶竴瀹為獙鍏ュ彛涓庢帹鐞嗘棩蹇楁牸寮?',
+              '瀹屾垚鍩虹 attention/mlp/topology 鍒嗘瀽鑱旈€?',
+              '鎼缓鍙鐜板熀鍑嗕换鍔′笌鐗堟湰鍖栨暟鎹鐞?',
+            ],
+            tests: [
+              {
+                name: '鍩虹鎺ㄧ悊閾捐矾杩為€氭祴璇?',
+                params: 'model=gpt2-small, max_len=128, seed=42',
+                dataset: 'Prompt Regression Set v1',
+                result: '鏍稿績鎺ュ彛閫氳繃锛岃緭鍑虹ǔ瀹?',
+                summary: '纭鍩虹嚎绯荤粺鍙寔缁鐜板疄楠屾祦绋嬨€?',
+              },
+              {
+                name: '娉ㄦ剰鍔涚粨鏋勫彲瑙ｉ噴鎬ф祴璇?',
+                params: 'heads=all, layer_range=0-11',
+                dataset: 'Interpretability Probe Set',
+                result: '鍏抽敭澶撮儴婵€娲诲彲瑙嗗寲鍙鐜?',
+                summary: '涓哄悗缁法璺嚎瀵圭収鎻愪緵缁熶竴瑙ｉ噴鍩虹嚎銆?',
+              },
+            ],
+          },
+          {
+            id: 'scale',
+            name: '瑙勬ā鍖栭樁娈?',
+            status: 'in_progress',
+            featurePoints: [
+              '鎵╁睍澶氫换鍔¤瘎娴嬬煩闃典笌澶辫触褰掑洜缁熻',
+              '鎺ュ叆鏃堕棿绾?鍛ㄦ姤娌荤悊涓庤嚜鍔ㄥ鍑?',
+              '浼樺寲闀垮簭鍒楁椂寤跺拰鏄惧瓨鍗犵敤',
+            ],
+            tests: [
+              {
+                name: '澶氫换鍔″洖褰掑帇娴?',
+                params: 'tasks=12, batch=16, seq_len=512',
+                dataset: 'Mixed Reasoning Benchmark',
+                result: '浠诲姟闂存€ц兘鏈夋尝鍔紝鏁翠綋鍙帶',
+                summary: '瑙勬ā鍖栧彲琛岋紝浣嗛渶缁х画鏀舵暃绋冲畾鎬ф寚鏍囥€?',
+              },
+              {
+                name: '澶辫触妯″紡鑱氬悎娴嬭瘯',
+                params: 'window=30d, top_failures=8',
+                dataset: 'Experiment Timeline JSON',
+                result: '鍙ǔ瀹氭彁鍙栭珮棰戝け璐ュ師鍥?',
+                summary: '娌荤悊闂幆鏈夋晥锛屾敮鎸佸悗缁拡瀵规€т慨澶嶃€?',
+              },
+            ],
+          },
+          {
+            id: 'agi',
+            name: 'AGI闃舵',
+            status: 'planned',
+            featurePoints: [
+              '涓庡嚑浣曡矾绾垮舰鎴愰暱鏈熷崗鍚屽熀绾?',
+              '鏀寔璺ㄦā鍨嬭縼绉昏瘎娴嬩笌绛栫暐鍒囨崲',
+              '瀹屽杽瀹夊叏瀵归綈鍜屽洖閫€鎺у埗绛栫暐',
+            ],
+            tests: [
+              {
+                name: '璺ㄦā鍨嬭縼绉婚獙璇?',
+                params: 'source=gpt2, target=qwen, adapter=on',
+                dataset: 'Cross-Model Transfer Set',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬璇勪及鍩虹嚎鑳藉姏鐨勫彲杩佺Щ涓婇檺銆?',
+              },
+              {
+                name: '瀹夊叏绾︽潫鍥為€€娴嬭瘯',
+                params: 'safety_guard=strict, rollback=enabled',
+                dataset: 'Safety Red Team Set',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬楠岃瘉寮傚父鍦烘櫙涓嬬殑鍙帶涓庡彲鎭㈠鎬с€?',
+              },
+            ],
+          },
+        ],
+        milestonePlanEvaluation: {
+          assessment:
+            '璺嚎瀹氫綅娓呮櫚锛岄€傚悎浣滀负鍙鐜板疄楠屽熀绾夸笌瀵圭収缁勩€?',
+          suggestions: [
+            '澧炲姞缁熶竴鏃跺欢/鎴愭湰鎸囨爣锛岄伩鍏嶄粎鐪嬪噯纭巼銆?',
+            '瀵瑰け璐ュ師鍥犺缃紭鍏堢骇骞跺缓绔嬩慨澶峉LA銆?',
+            '鎻愬墠瀹氫箟璺ㄦā鍨嬭縼绉荤殑楠屾敹闃堝€笺€?',
+          ],
+        },
+      },
+      hybrid_workspace: {
+        id: 'hybrid_workspace',
+        title: 'Hybrid Workspace',
+        subtitle: '鍏ㄥ眬宸ヤ綔绌洪棿娣峰悎璺嚎',
+        routeDescription: '浠ュ叏灞€宸ヤ綔绌洪棿鏁村悎澶氳矾绾胯緭鍑猴紝鎻愬崌璺ㄦā鍧楀崗鍚屼笌椴佹鎬с€?',
+        engineeringProcessDescription:
+          '璁＄畻娴佺▼锛氫笉鍚岃矾绾垮苟琛屼骇鍑哄€欓€夎〃寰侊紝缁熶竴鏄犲皠鍒板叡浜伐浣滅┖闂村悗鎵ц鍐茬獊娑堣В涓庝紭鍏堢骇浠茶锛屾渶缁堣緭鍑鸿瀺鍚堢粨鏋滃苟鍥炲啓璺嚎鐘舵€併€?',
+        theoryTitle: 'Global Workspace + Route Ensemble',
+        theorySummary:
+          '灏嗗璺嚎杈撳嚭鏄犲皠鍒扮粺涓€宸ヤ綔绌洪棿锛岄€氳繃绔炰簤涓庝徊瑁佹満鍒跺湪绋冲畾鎬у拰娉涘寲鑳藉姏涔嬮棿瀵绘壘鏈€浼樺钩琛°€?',
+        theoryBullets: [
+          '璺ㄨ矾绾垮叡浜姸鎬佺┖闂翠笌鎸囨爣鍗忚',
+          'Top-K 绔炰簤瑁佸喅涓嶅悓妯″潡鍊欓€夎緭鍑?',
+          '缁撳悎澶辫触妯″紡瀹炵幇鍔ㄦ€佽矾鐢辫皟搴?',
+        ],
+        theoryFormulas: [],
+        engineeringItems: [
+          { name: '缁熶竴璺敱鍗忚', status: 'done', focus: 'route + analysis_type + summary' },
+          { name: '全局仲裁器', status: 'in_progress', focus: '冲突管理与优先级决策' },
+          { name: '鍦ㄧ嚎鑷€傚簲璋冨害', status: 'pending', focus: '鍩轰簬鍘嗗彶鍙鎬ц嚜鍔ㄩ€夎矾' },
+        ],
+        nfbtProcessSteps: [],
+        nfbtOptimization: '',
+        milestoneTitle: '里程碑（原 AGI 终点）',
+        milestoneGoals: [
+          '瀹炵幇澶氳矾绾垮崗鍚屼笅鐨勭ǔ瀹氭帹鐞嗚緭鍑?',
+          '灏嗗け璐ユ仮澶嶆椂闂撮檷浣庡埌鍒嗛挓绾?',
+          '瀹屾垚闈㈠悜闀挎湡 AGI 鐮旂┒鐨勭粺涓€瀹為獙鎿嶄綔绯荤粺',
+        ],
+        milestoneMetrics: { Priority: '协同能力', Horizon: '中长期' },
+        milestoneStages: [
+          {
+            id: 'prototype',
+            name: '鍘熷瀷闃舵',
+            status: 'done',
+            featurePoints: [
+              '瀹屾垚澶氳矾绾跨粺涓€鍗忚涓庝簨浠舵祦鏍囧噯鍖?',
+              '瀹炵幇鍩虹浠茶鍣ㄤ笌缁撴灉铻嶅悎鎺ュ彛',
+              '寤虹珛璺嚎鐘舵€佷笌璇勫垎鏄犲皠鏈哄埗',
+            ],
+            tests: [
+              {
+                name: '鍙岃矾绾夸徊瑁佽繛閫氭祴璇?',
+                params: 'routes=2, arbitration=topk(1), timeout=2s',
+                dataset: 'Route Arbitration Smoke Set',
+                result: '浠茶閾捐矾鍙ǔ瀹氭墽琛?',
+                summary: '纭娣峰悎璺敱鍘熷瀷鍙敤銆?',
+              },
+              {
+                name: '铻嶅悎杈撳嚭涓€鑷存€ф祴璇?',
+                params: 'fusion=weighted, weights=static',
+                dataset: 'Consistency Benchmark v1',
+                result: '涓€鑷存€т紭浜庡崟璺嚎骞冲潎鍊?',
+                summary: '铻嶅悎绛栫暐鏈夋晥锛屼絾鍔ㄦ€佹潈閲嶄粛闇€浼樺寲銆?',
+              },
+            ],
+          },
+          {
+            id: 'scale',
+            name: '瑙勬ā鍖栭樁娈?',
+            status: 'in_progress',
+            featurePoints: [
+              '鎵╁睍鍒板璺嚎骞惰璋冨害',
+              '寮曞叆澶辫触蹇€熸仮澶嶄笌鑷姩闄嶇骇绛栫暐',
+              '寤虹珛璺ㄨ矾绾胯秼鍔垮垎鏋愪笌鍛ㄦ姤娌荤悊',
+            ],
+            tests: [
+              {
+                name: '澶氳矾绾垮苟鍙戝帇娴?',
+                params: 'routes=5, concurrent_runs=20',
+                dataset: 'Concurrent Routing Stress Set',
+                result: '楂樺苟鍙戜笅瀛樺湪灏惧欢杩?',
+                summary: '闇€浼樺寲闃熷垪璋冨害涓庤祫婧愰殧绂汇€?',
+              },
+              {
+                name: '鏁呴殰娉ㄥ叆鎭㈠娴嬭瘯',
+                params: 'failure_rate=0.2, fallback=enabled',
+                dataset: 'Failure Injection Set',
+                result: '澶ч儴鍒嗗満鏅彲鑷姩鎭㈠',
+                summary: '鎭㈠鏈哄埗鏈夋晥锛岄渶杩涗竴姝ョ缉鐭?MTTR銆?',
+              },
+            ],
+          },
+          {
+            id: 'agi',
+            name: 'AGI闃舵',
+            status: 'planned',
+            featurePoints: [
+              '褰㈡垚鍏峰鑷€傚簲閫夎矾鑳藉姏鐨勭粺涓€宸ヤ綔绌洪棿',
+              '鏀寔闀挎湡浠诲姟涓嬬殑绛栫暐婕斿寲涓庤蹇嗘暣鍚?',
+              '寤虹珛鍙璁＄殑瀹夊叏娌荤悊涓庝汉宸ユ帴绠℃満鍒?',
+            ],
+            tests: [
+              {
+                name: '鑷€傚簲閫夎矾绛栫暐楠岃瘉',
+                params: 'policy=bandit, reward=feasibility_score',
+                dataset: 'Long-Horizon Route Selection Set',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬楠岃瘉闀挎湡浠诲姟涓殑閫夎矾鏀舵暃鑳藉姏銆?',
+              },
+              {
+                name: '鍏ㄩ摼璺畨鍏ㄥ璁℃祴璇?',
+                params: 'audit=full, intervention=manual+auto',
+                dataset: 'Governance Compliance Set',
+                result: '寰呮墽琛?',
+                summary: '鐢ㄤ簬璇勪及鍙璁℃€т笌鍙帶鎬ф槸鍚﹁揪鏍囥€?',
+              },
+            ],
+          },
+        ],
+        milestonePlanEvaluation: {
+          assessment:
+            '鍏峰鎴愪负鈥滆矾绾挎搷浣滅郴缁熲€濈殑娼滃姏锛屽叧閿湪浜庣ǔ瀹氳皟搴︿笌娌荤悊鍙帶鎬с€?',
+          suggestions: [
+            '浼樺厛浼樺寲骞跺彂鍦烘櫙涓嬪熬寤惰繜涓庤祫婧愮珵浜夐棶棰樸€?',
+            '灏哅TTR绾冲叆鏍稿績KPI骞跺懆搴﹁窡韪€?',
+            '鎻愬墠瀹氫箟浜哄伐鎺ョ瑙﹀彂鏉′欢涓庡洖閫€绛栫暐銆?',
+          ],
+        },
+      },
+    }),
+    [engineeringPhase?.sub_phases, milestonePhase?.goals, milestonePhase?.metrics, theoryPhase?.definition?.headline, theoryPhase?.definition?.summary, theoryPhase?.theory_content]
+  );
+
+  const routeList = useMemo(() => {
+    const runtimeIds = timelineRoutes
+      .map((item) => item?.route)
+      .filter((id) => typeof id === 'string' && id.length > 0);
+    const baseIds = Object.keys(routeBlueprints);
+    const allIds = Array.from(new Set([...baseIds, ...runtimeIds]));
+
+    return allIds.map((id) => {
+      const base = routeBlueprints[id] || {
+        id,
+        title: id,
+        subtitle: '瀹為獙璺嚎',
+        routeDescription: '璇ヨ矾绾挎鍦ㄦ瀯寤轰腑锛屾弿杩颁俊鎭緟琛ュ厖銆?',
+        engineeringProcessDescription: '璁＄畻娴佺▼璇存槑寰呰ˉ鍏呫€?',
+        theoryTitle: '寰呰ˉ鍏呯悊璁?',
+        theorySummary: '璇ヨ矾绾垮皻鏈厤缃缁嗙悊璁烘弿杩般€?',
+        theoryBullets: [],
+        theoryFormulas: [],
+        engineeringItems: [],
+        nfbtProcessSteps: [],
+        nfbtOptimization: '',
+        milestoneTitle: '閲岀▼纰戠洰鏍囷紙鍘?AGI 缁堢偣锛?',
+        milestoneGoals: [],
+        milestoneMetrics: {},
+        milestoneStages: [],
+        milestonePlanEvaluation: null,
+      };
+      const runtime = timelineRoutes.find((item) => item?.route === id);
+      const stats = runtime?.stats || {};
+      const totalRuns = Number(stats.total_runs || 0);
+      const completedRuns = Number(stats.completed_runs || 0);
+      const avgScore = Number(stats.avg_score || 0);
+      const routeProgress =
+        totalRuns > 0
+          ? Math.max(
+              0,
+              Math.min(100, Math.round((completedRuns / Math.max(1, totalRuns)) * 60 + avgScore * 40))
+            )
+          : 0;
+      return {
+        ...base,
+        stats: {
+          totalRuns,
+          completedRuns,
+          failedRuns: Number(stats.failed_runs || 0),
+          avgScore,
+          routeProgress,
+        },
+      };
+    });
+  }, [routeBlueprints, timelineRoutes]);
+
+  useEffect(() => {
+    if (routeList.length === 0) return;
+    if (!routeList.some((item) => item.id === selectedRouteId)) {
+      setSelectedRouteId(routeList[0].id);
+    }
+  }, [routeList, selectedRouteId]);
+
+  useEffect(() => {
+    setExpandedFormulaIdx(null);
+    setExpandedEngPhase(null);
+    setExpandedParam(null);
+  }, [selectedRouteId]);
+
+  const selectedRoute = routeList.find((item) => item.id === selectedRouteId) || routeList[0];
+  const systemRouteOptions = routeList.filter((item) =>
+    ['fiber_bundle', 'transformer_baseline', 'hybrid_workspace'].includes(item.id)
+  );
+
+  const getRouteImpl = (capability) => {
+    const map = capability?.implementation_by_route || {};
+    return (
+      map[selectedRouteId] ||
+      map[selectedRoute?.id] ||
+      capability?.desc ||
+      '璇ヨ矾绾垮疄鐜版弿杩板緟琛ュ厖銆?'
+    );
+  };
+
+  const systemProfiles = useMemo(
+    () => ({
+      fiber_bundle: {
+        metricCards: [
+          {
+            label: '鍐呯ǔ鎬佽皟鑺?',
+            brain_ability: '绋虫€佺淮鎸佷笌璧勬簮鍒嗛厤',
+            value: consciousField ? `${((consciousField.stability || 0) * 100).toFixed(1)}%` : '92.0%',
+            color: '#10b981',
+          },
+          {
+            label: '宸ヤ綔璁板繂璐熻浇',
+            brain_ability: '鐭椂璁板繂涓庝笂涓嬫枃淇濇寔',
+            value: consciousField ? `${consciousField.memory_load || 0}%` : '68%',
+            color: '#00d2ff',
+          },
+          {
+            label: '璺ㄥ煙鍏辨尟',
+            brain_ability: '璺ㄦā鎬佽仈鎯虫暣鍚?',
+            value: consciousField ? (consciousField.resonance || 0).toFixed(3) : '0.742',
+            color: '#ffaa00',
+          },
+          {
+            label: '鎰忚瘑绔炰簤寮哄害',
+            brain_ability: '娉ㄦ剰鐒︾偣绔炰簤涓庡箍鎾?',
+            value: consciousField ? (consciousField.gws_intensity || 0).toFixed(2) : '0.81',
+            color: '#a855f7',
+          },
+        ],
+        parameterCards: [
+          {
+            name: '鍑犱綍娼滅┖闂撮厤缃?',
+            brain_ability: '鎶借薄缁撴瀯寤烘ā',
+            route_param: 'd=4, D=128, manifold=riemannian',
+            detail: '浣庣淮鍑犱綍鏍?+ 楂樼淮璇箟澶栧３',
+            desc: '閫氳繃 d<<D 闄嶄綆鏍稿績鍑犱綍璁＄畻澶嶆潅搴︼紝鍚屾椂淇濇寔璇箟琛ㄨ揪瀹归噺銆?',
+            value_meaning: '鍏奸【鍙В閲婃€с€佺ǔ瀹氭€т笌璁＄畻鎴愭湰銆?',
+            why_important: '鍐冲畾鍑犱綍鎺ㄧ悊鏄惁鍙寔缁墿灞曘€?',
+          },
+          {
+            name: '鑱旂粶涓庡钩琛岀Щ鍔?',
+            brain_ability: '鎺ㄧ悊璺緞淇濇寔',
+            route_param: 'transport=connection_based, step=adaptive',
+            detail: '螕 椹卞姩璇箟骞崇Щ',
+            desc: '娌挎祦褰㈡墽琛屽钩琛岀Щ鍔紝鍑忓皯璇箟婕傜Щ銆?',
+            value_meaning: '鎺ㄧ悊閾炬洿绋冲畾锛屾姉鎵板姩鑳藉姏鏇村己銆?',
+            why_important: '鏄粠鈥滄嫙鍚堚€濊蛋鍚戔€滅粨鏋勬帹鐞嗏€濈殑鍏抽敭銆?'
+          },
+          {
+            name: 'Ricci Flow 婕斿寲',
+            brain_ability: '鐫＄湢閲嶆暣涓庡啿绐佷慨澶?',
+            route_param: 'iterations=100, reg=1e-3',
+            detail: '绂荤嚎鏇茬巼骞虫粦',
+            desc: '閫氳繃娴佸舰骞虫粦闄嶄綆閫昏緫灏栧嘲涓庡够瑙夐闄┿€?',
+            value_meaning: '鎻愬崌闀挎湡绋冲畾鎬т笌涓€鑷存€с€?',
+            why_important: '鏀寔绯荤粺鎸佺画鑷垜淇銆?'
+          },
+          {
+            name: '鍏ㄥ眬宸ヤ綔绌洪棿',
+            brain_ability: '鎰忚瘑绔炰簤瑁佸喅',
+            route_param: 'top_k=8, arbitration=winner_take_all',
+            detail: '澶氭ā鍧楃珵浜夊箍鎾?',
+            desc: '鍦ㄥ啿绐佸€欓€変腑閫夊彇鏈€浼樿〃绀哄苟骞挎挱銆?',
+            value_meaning: '淇濊瘉瀹炴椂鍐崇瓥鑱氱劍鏈夋晥淇℃伅銆?',
+            why_important: '鐩存帴褰卞搷绯荤粺鍝嶅簲璐ㄩ噺涓庢椂寤躲€?'
+          },
+        ],
+        validationRecords: (statusData?.passed_tests || []).map((t) => ({
+          ...t,
+          brain_ability: t.brain_ability || '缁撴瀯鎺ㄧ悊绋冲畾涓庤蹇嗛噸鏁?',
+          route_param_focus: t.route_param_focus || 'manifold_dim=4, top_k=8, ricci_iterations=100',
+        })),
+      },
+      transformer_baseline: {
+        metricCards: [
+          { label: '上下文保持', brain_ability: '工作记忆', value: '74%', color: '#10b981' },
+          { label: '模式泛化', brain_ability: '经验迁移', value: '0.69', color: '#00d2ff' },
+          { label: '可解释覆盖', brain_ability: '自我监控', value: '83%', color: '#ffaa00' },
+          { label: '推理稳定性', brain_ability: '执行控制', value: '0.71', color: '#a855f7' },
+        ],
+        parameterCards: [
+          {
+            name: '妯″瀷涓庡簭鍒楅厤缃?',
+            brain_ability: '璇█宸ヤ綔璁板繂',
+            route_param: 'model=gpt2-small, seq_len=512, batch=16',
+            detail: '鏍囧噯 Transformer 涓诲共',
+            desc: '閫氳繃鏍囧噯娉ㄦ剰鍔涙満鍒跺缓妯′笂涓嬫枃渚濊禆銆?',
+            value_meaning: '鏄撳鐜般€佺敓鎬佹垚鐔熴€?',
+            why_important: '鏄鐓ц矾绾跨殑鍩虹鑳藉姏閿氱偣銆?',
+          },
+          {
+            name: '鍙В閲婃€ф帰閽?',
+            brain_ability: '鍐呯渷涓庤嚜妫€',
+            route_param: 'logit_lens=on, tda=on, head_probe=full',
+            detail: '澶氭帰閽堝苟琛?',
+            desc: '杈撳嚭灞傚埌涓棿灞傜殑瑙ｉ噴閾捐矾鍙拷韪€?',
+            value_meaning: '渚夸簬瀹氫綅閿欒鏉ユ簮銆?',
+            why_important: '鏀拺瀹為獙鍙В閲婁笌鍥炲綊鍒嗘瀽銆?',
+          },
+          {
+            name: '璁粌绋冲畾鎬х瓥鐣?',
+            brain_ability: '鎵ц鎺у埗涓庢姂鍒?',
+            route_param: 'lr=1e-4, warmup=2k, clip=1.0',
+            detail: '鏍囧噯浼樺寲绠＄嚎',
+            desc: '鎺у埗姊害闇囪崱涓庤缁冨彂鏁ｉ闄┿€?',
+            value_meaning: '鎻愬崌璁粌涓€鑷存€с€?',
+            why_important: '褰卞搷瑙勬ā鍖栭樁娈靛彲鎸佺画鎬с€?',
+          },
+          {
+            name: 'RAG 鎵╁睍',
+            brain_ability: '闀挎湡鐭ヨ瘑鎻愬彇',
+            route_param: 'retriever=faiss, topk=5, rerank=on',
+            detail: '澶栭儴鐭ヨ瘑澧炲己',
+            desc: '閫氳繃妫€绱㈣ˉ鍋垮弬鏁板唴鐭ヨ瘑涓嶈冻銆?',
+            value_meaning: '鎻愰珮浜嬪疄涓€鑷存€с€?',
+            why_important: '闄嶄綆鐭ヨ瘑鏃舵晥琛板噺銆?'
+          },
+        ],
+        validationRecords: [
+          {
+            name: '澶氫换鍔″熀绾垮洖褰?',
+            date: '2026-02-16',
+            result: 'PASS',
+            brain_ability: '工作记忆稳定与任务切换',
+            route_param_focus: 'seq_len=512, batch=16, clip=1.0',
+            target: '楠岃瘉鏍囧噯璺嚎鍦ㄥ浠诲姟涓婄殑绋冲畾鎬ц兘銆?',
+            process: '缁熶竴浠诲姟闆嗘壒閲忓洖褰?+ 璇樊鏇茬嚎瀵归綈銆?',
+            significance: '纭鍩虹嚎鍙綔涓洪暱鏈熷鐓у弬鐓х郴銆?'
+          },
+          {
+            name: '瑙ｉ噴閾惧畬鏁存€ф祴璇?',
+            date: '2026-02-16',
+            result: 'PASS',
+            brain_ability: '内省监控与因果追踪',
+            route_param_focus: 'logit_lens=on, tda=on, head_probe=full',
+            target: '楠岃瘉浠庢縺娲诲埌杈撳嚭鐨勫彲杩芥函鎬с€?',
+            process: 'Logit Lens + 澶撮儴褰掑洜鑱斿悎楠岃瘉銆?',
+            significance: '纭繚鍒嗘瀽缁撹鍏峰鍙妫€鎬с€?'
+          },
+        ],
+      },
+      hybrid_workspace: {
+        metricCards: [
+          { label: '跨路线一致性', brain_ability: '跨脑区整合', value: '0.76', color: '#10b981' },
+          { label: '浠茶鏀舵暃閫熷害', brain_ability: '娉ㄦ剰绔炰簤璋冨害', value: '148ms', color: '#00d2ff' },
+          { label: '故障恢复能力', brain_ability: '稳态恢复', value: 'MTTR 2.6m', color: '#ffaa00' },
+          { label: '铻嶅悎鏀剁泭', brain_ability: '澶氶€氶亾鍗忓悓', value: '+8.9%', color: '#a855f7' },
+        ],
+        parameterCards: [
+          {
+            name: '浠茶鍣ㄥ弬鏁?',
+            brain_ability: '鍐茬獊鍐崇瓥',
+            route_param: 'routes=5, top_k=2, timeout=200ms',
+            detail: '澶氳矾绾跨珵浜夋鏋?',
+            desc: '鍩轰簬璇勫垎鍜岀ǔ瀹氭€ц繘琛屽€欓€夌瓫閫夈€?',
+            value_meaning: '骞宠　璐ㄩ噺涓庢椂寤躲€?',
+            why_important: '鍐冲畾铻嶅悎杈撳嚭鍙敤鎬с€?',
+          },
+          {
+            name: '铻嶅悎绛栫暐鍙傛暟',
+            brain_ability: '澶氭簮淇℃伅鏁村悎',
+            route_param: 'fusion=weighted, dynamic_weight=on',
+            detail: '鍔ㄦ€佹潈閲嶈瀺鍚?',
+            desc: '鏍规嵁璺嚎鍙潬搴﹀姩鎬佽皟鑺傝础鐚€?',
+            value_meaning: '鍑忓皯鍗曡矾绾垮け鏁堝奖鍝嶃€?',
+            why_important: '鎻愰珮椴佹鎬т笌杩炵画鎬с€?',
+          },
+          {
+            name: '鎭㈠涓庨檷绾?',
+            brain_ability: '寮傚父澶勭悊',
+            route_param: 'fallback=enabled, retry=2, degrade=graceful',
+            detail: '鏁呴殰瀹归敊鏈哄埗',
+            desc: '鍑虹幇寮傚父鏃惰嚜鍔ㄥ垏鎹㈠埌瀹夊叏璺緞銆?',
+            value_meaning: '閬垮厤鍏ㄩ摼璺腑鏂€?',
+            why_important: '淇濋殰绯荤粺绋冲畾杩愯銆?'
+          },
+          {
+            name: '娌荤悊杩借釜鍙傛暟',
+            brain_ability: '闀挎湡鑷垜鐩戠潱',
+            route_param: 'timeline=on, weekly_report=on',
+            detail: '鍏ㄩ摼璺彲瀹¤',
+            desc: '鎸佺画璁板綍鍐崇瓥璇佹嵁涓庡け璐ュ綊鍥犮€?',
+            value_meaning: '鏀寔杩唬鏀硅繘闂幆銆?',
+            why_important: '鎻愬崌宸ョ▼娌荤悊鏁堢巼銆?'
+          },
+        ],
+        validationRecords: [
+          {
+            name: '澶氳矾绾垮苟鍙戜徊瑁佹祴璇?',
+            date: '2026-02-17',
+            result: 'PASS',
+            brain_ability: '冲突决策与全局调度',
+            route_param_focus: 'routes=5, top_k=2, timeout=200ms',
+            target: '楠岃瘉澶氳矾绾垮苟鍙戜笅浠茶绋冲畾鎬с€?',
+            process: '鏋勯€犲啿绐佷换鍔★紝缁熻鏀舵暃鏃堕棿涓庝竴鑷存€с€?',
+            significance: '纭浠茶鏈哄埗鍦ㄥ鏉傚満鏅彲鐢ㄣ€?'
+          },
+          {
+            name: '鏁呴殰娉ㄥ叆鎭㈠娴嬭瘯',
+            date: '2026-02-17',
+            result: 'PASS',
+            brain_ability: '稳态恢复与容错控制',
+            route_param_focus: 'fallback=enabled, retry=2, degrade=graceful',
+            target: '楠岃瘉璺敱澶辫触鏃惰嚜鍔ㄩ檷绾ц兘鍔涖€?',
+            process: '娉ㄥ叆闅忔満澶辫触锛岃娴?MTTR 涓庡洖閫€璐ㄩ噺銆?',
+            significance: '璇佹槑娣峰悎璺嚎鍏峰宸ョ▼绾у閿欒兘鍔涖€?'
+          },
+        ],
+      },
+    }),
+    [consciousField, selectedRouteId, statusData?.passed_tests]
+  );
+
+  const activeSystemProfile = systemProfiles[selectedRouteId] || systemProfiles.fiber_bundle;
+  const mergedMilestoneStages = useMemo(() => {
+    const baseStages = selectedRoute?.milestoneStages || [];
+    const routeTests = activeSystemProfile?.validationRecords || [];
+    if (!routeTests.length) return baseStages;
+
+    const routeValidationStage = {
+      id: 'route_validation',
+      name: '路线测试记录',
+      status: routeTests.every((t) => String(t?.result || '').toUpperCase().includes('PASS')) ? 'done' : 'in_progress',
+      featurePoints: [
+        `来源：系统状态 / ${selectedRoute?.title || selectedRouteId}`,
+        `测试数量：${routeTests.length}`,
+        '作为里程碑验收证据沉淀到研发进展',
+      ],
+      tests: routeTests.map((t) => ({
+        name: t.name || '未命名测试',
+        params: t.route_param_focus || t.params || '-',
+        dataset: t.dataset || (t.date ? `验证日期: ${t.date}` : '-'),
+        result: t.result || '-',
+        summary: t.significance || t.summary || '-',
+      })),
+    };
+
+    return [...baseStages, routeValidationStage];
+  }, [selectedRoute, selectedRouteId, activeSystemProfile]);
+
+  // Brain Model Component
+  const BrainModel = () => (
+    <div style={{
+      width: '320px', height: '320px', margin: '0 auto', position: 'relative',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, transparent 70%)',
+      borderRadius: '50%', animation: 'brainPulse 4s infinite alternate'
+    }}>
+      <div style={{
+        position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0, 210, 255, 0.2)',
+        borderRadius: '50%', animation: 'brainRotate 20s linear infinite'
+      }} />
+      <div style={{
+        position: 'absolute', width: '85%', height: '85%', border: '1px dashed rgba(168, 85, 247, 0.3)',
+        borderRadius: '50%', animation: 'brainRotateReverse 15s linear infinite'
+      }} />
+      <Brain size={180} color="#00d2ff" style={{ 
+        filter: 'drop-shadow(0 0 30px rgba(0, 210, 255, 0.4))',
+        zIndex: 2 
+      }} />
+      {/* Dynamic Synaptic Nodes */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute', width: '6px', height: '6px', background: '#00ff88', borderRadius: '50%',
+          boxShadow: '0 0 10px #00ff88', transform: `rotate(${i * 45}deg) translateY(-130px)`,
+          animation: 'synapsePulse 2s infinite', animationDelay: `${i * 0.2}s`
+        }} />
+      ))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      backgroundColor: 'rgba(5, 5, 10, 0.98)', backdropFilter: 'blur(30px)', zIndex: 2000,
+      display: 'flex', flexDirection: 'column', color: '#fff',
+      fontFamily: '"SF Mono", "Roboto Mono", monospace', overflow: 'hidden'
+    }}>
+      {/* Custom Keyframes */}
+      <style>{`
+        @keyframes roadmapFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes brainPulse { from { scale: 0.95; opacity: 0.8; } to { scale: 1.05; opacity: 1; } }
+        @keyframes brainRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes brainRotateReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes synapsePulse { 0%, 100% { opacity: 0.3; scale: 0.8; } 50% { opacity: 1; scale: 1.2; } }
+      `}</style>
+
+      {/* Top Header / Navigation */}
+      <div style={{
+        padding: '0 40px', height: '80px', display: 'flex', justifyContent: 'space-between', 
+        alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '50px', height: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Brain size={28} color="#00d2ff" />
+            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>智能一号</span>
+          </div>
+
+          <nav style={{ display: 'flex', gap: '10px', height: '100%' }}>
+            {[
+              { id: 'roadmap', label: '椤圭洰澶х翰' },
+              { id: 'progress', label: '鐮斿彂杩涘睍' },
+              { id: 'system', label: '系统状态' }
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                style={{
+                  background: 'transparent', border: 'none', color: activeTab === t.id ? '#00d2ff' : '#666',
+                  fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', padding: '0 25px',
+                  borderBottom: activeTab === t.id ? '3px solid #00d2ff' : '3px solid transparent',
+                  transition: 'all 0.3s', height: '100%'
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <button onClick={onClose} style={{
+          background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', cursor: 'pointer',
+          width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,100,100,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+          <X size={22} />
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        
+        {/* Sub-Sidebar for Research Progress */}
+        {activeTab === 'progress' && (
+          <div style={{
+            width: '280px', borderRight: '1px solid rgba(255,255,255,0.1)',
+            padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto',
+            position: 'relative'
+          }}>
+            <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', marginBottom: '30px', letterSpacing: '2px', fontWeight: 'bold' }}>Research Routes</div>
+            
+            {/* Vertical Timeline Line */}
+            <div style={{ 
+              position: 'absolute', left: '38px', top: '80px', bottom: '40px', 
+              width: '1px', background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+              zIndex: 0
+            }} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', zIndex: 1 }}>
+              {routeList.map((routeItem) => (
+                <div key={routeItem.id} style={{ position: 'relative' }}>
+                  {/* Timeline Dot */}
+                  <div style={{
+                    position: 'absolute', left: '15px', top: '22px', 
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: selectedRoute?.id === routeItem.id ? '#00d2ff' : '#222',
+                    border: `2px solid ${selectedRoute?.id === routeItem.id ? '#000' : 'rgba(255,255,255,0.1)'}`,
+                    boxShadow: selectedRoute?.id === routeItem.id ? '0 0 10px #00d2ff' : 'none',
+                    transition: 'all 0.3s'
+                  }} />
+
+                  <button
+                    onClick={() => setSelectedRouteId(routeItem.id)}
+                    style={{
+                      width: '100%', padding: '12px 12px 12px 45px', borderRadius: '14px', 
+                      textAlign: 'left', cursor: 'pointer',
+                      background: selectedRoute?.id === routeItem.id ? 'rgba(255,255,255,0.03)' : 'transparent',
+                      border: 'none',
+                      color: selectedRoute?.id === routeItem.id ? '#fff' : '#666', transition: 'all 0.3s',
+                      display: 'flex', flexDirection: 'column', gap: '4px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 'bold', color: selectedRoute?.id === routeItem.id ? '#fff' : '#888' }}>
+                        {routeItem.title}
+                      </span>
+                      <span style={{ 
+                        fontSize: '11px', fontFamily: 'monospace', fontWeight: 'bold', 
+                        color: selectedRoute?.id === routeItem.id ? '#00d2ff' : '#444' 
+                      }}>
+                        {routeItem.stats.routeProgress}%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#444' }}>
+                      run {routeItem.stats.totalRuns} | success {routeItem.stats.completedRuns} | avg {(routeItem.stats.avgScore * 100).toFixed(1)}%
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Content Details */}
+        <div style={{ 
+          flex: 1, padding: '50px 80px', overflowY: 'auto',
+          background: 'radial-gradient(circle at 50% 10%, rgba(0, 100, 200, 0.05) 0%, transparent 70%)'
+        }}>
+          
+          {/* TAB: Project Roadmap */}
+          {activeTab === 'roadmap' && (
+            <div style={{ animation: 'roadmapFade 0.6s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ marginBottom: '34px' }}>
+                <h2 style={{ fontSize: '30px', fontWeight: '900', color: '#ffaa00', marginBottom: '10px' }}>椤圭洰澶х翰</h2>
+                <div style={{ color: '#777', fontSize: '14px' }}>{roadmapData.definition.summary}</div>
+              </div>
+
+              {/* 涓婏細椤圭洰鏍稿績鎬濊矾 */}
+              <div style={{
+                padding: '30px',
+                background: 'linear-gradient(135deg, rgba(255,170,0,0.12) 0%, rgba(255,170,0,0.03) 100%)',
+                border: '1px solid rgba(255,170,0,0.24)',
+                borderRadius: '24px',
+                marginBottom: '28px'
+              }}>
+                <div style={{ color: '#ffaa00', fontWeight: 'bold', fontSize: '18px', marginBottom: '16px' }}>椤圭洰鏍稿績鎬濊矾</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                  {[
+                    '1锛屽ぇ鑴戞湁闈炲父鐗规畩鐨勬暟瀛︾粨鏋勶紝浜х敓浜嗘櫤鑳?',
+                    '2锛屾繁搴︾缁忕綉缁滈儴鍒嗚繕鍘熶簡杩欎釜缁撴瀯锛屼骇鐢熶簡璇█鑳藉姏',
+                    '3锛岄€氳繃鍒嗘瀽娣卞害绁炵粡缃戠粶锛岀爺绌惰繖涓暟瀛︾粨鏋勶紝瀹屾垚鏅鸿兘鐞嗚',
+                  ].map((line, idx) => (
+                    <div key={idx} style={{ padding: '14px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#f4e4c1', fontSize: '14px', lineHeight: '1.6' }}>
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 涓細DNN缁撴瀯鍒嗘瀽 */}
+              <div style={{
+                padding: '30px',
+                borderRadius: '24px',
+                border: '1px solid rgba(168, 85, 247, 0.25)',
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.09) 0%, rgba(168, 85, 247, 0.02) 100%)',
+                marginBottom: '28px'
+              }}>
+                <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '18px', marginBottom: '18px' }}>
+                  瀵规繁搴︾缁忕綉缁滄牳蹇冪粨鏋勭殑鍒嗘瀽
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  {(analysisPhase?.analysis_sections || []).map((item, idx) => (
+                    <div key={idx} style={{ padding: '18px', borderRadius: '14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontWeight: 'bold', color: '#e9d5ff', marginBottom: '8px', fontSize: '14px' }}>{item.title}</div>
+                      <div style={{ fontSize: '12px', color: '#aaa', lineHeight: '1.65', marginBottom: '10px' }}>{item.content}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {(item.tags || []).map((tag, tagIdx) => (
+                          <span key={tagIdx} style={{ fontSize: '10px', color: '#c4b5fd', border: '1px solid rgba(196,181,253,0.35)', borderRadius: '999px', padding: '2px 8px' }}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 涓嬶細鍒嗘瀽鎴愭灉鍒楄〃 */}
+                <div style={{
+                  padding: '30px',
+                  borderRadius: '24px',
+                  border: '1px solid rgba(16,185,129,0.24)',
+                  background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)'
+                }}>
+                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>
+                  鍒嗘瀽鎴愭灉
+                </div>
+                <div style={{ color: '#9ca3af', fontSize: '13px', lineHeight: '1.7', marginBottom: '16px' }}>
+                  涓嬮潰鏄綋鍓嶉」鐩浜庢繁搴︾缁忕綉缁滅殑鍒嗘瀽鏂规锛屼互鍙婂搴旂殑缁撴灉鏁版嵁
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                  {IMPROVEMENTS.map((item, idx) => (
+                    <div key={idx} style={{ padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
+                        <div style={{ color: '#dcfce7', fontWeight: 'bold', fontSize: '14px' }}>{item.title}</div>
+                        <div style={{ fontSize: '10px', color: item.status === 'done' ? '#10b981' : '#f59e0b' }}>{String(item.status).toUpperCase()}</div>
+                      </div>
+                      <div style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}>{item.desc} | {item.step}</div>
+                      <div style={{ color: '#a7f3d0', fontSize: '12px', lineHeight: '1.6' }}>{item.detail}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Research Progress (Route-Centric Command) */}
+          {activeTab === 'progress' && selectedRoute && (
+            <div style={{ animation: 'roadmapFade 0.5s ease-out' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '34px' }}>
+                <div>
+                  <h2 style={{ fontSize: '34px', fontWeight: '900', color: '#fff', margin: '0 0 8px 0' }}>
+                    {selectedRoute.title} - {selectedRoute.subtitle}
+                  </h2>
+                  <div style={{ marginTop: '8px', color: '#666', fontSize: '13px' }}>
+                    {selectedRoute.routeDescription || selectedRoute.theorySummary}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '30px', fontWeight: '900', color: '#00d2ff', fontFamily: 'monospace' }}>
+                    {selectedRoute.stats.routeProgress}%
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#444' }}>ROUTE READINESS</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '22px' }}>
+                <div style={{ padding: '28px', background: 'rgba(0, 210, 255, 0.06)', border: '1px solid rgba(0, 210, 255, 0.25)', borderRadius: '22px' }}>
+                  <div style={{ fontSize: '12px', color: '#00d2ff', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '10px' }}>鏅鸿兘鐞嗚</div>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff', marginBottom: '10px' }}>{selectedRoute.theoryTitle}</div>
+                  <div style={{ fontSize: '14px', color: '#bbb', lineHeight: '1.8', marginBottom: '14px' }}>{selectedRoute.theorySummary}</div>
+                  {(selectedRoute.theoryFormulas || []).length === 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      {(selectedRoute.theoryBullets || []).map((item, idx) => (
+                        <div key={idx} style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', color: '#ddd', fontSize: '12px' }}>
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {(selectedRoute.theoryFormulas || []).length > 0 ? (
+                    <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      {selectedRoute.theoryFormulas.map((item, idx) => {
+                        const expanded = expandedFormulaIdx === idx;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => setExpandedFormulaIdx(expanded ? null : idx)}
+                            style={{
+                              padding: '12px 14px',
+                              borderRadius: '12px',
+                              border: expanded ? '1px solid rgba(103, 232, 249, 0.65)' : '1px solid rgba(0,210,255,0.35)',
+                              background: expanded ? 'rgba(0, 210, 255, 0.12)' : 'rgba(0,0,0,0.3)',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            <div style={{ fontSize: '11px', color: '#67e8f9', marginBottom: '6px', fontWeight: 'bold' }}>
+                              {item.title}
+                            </div>
+                            <div style={{ fontSize: '18px', color: '#e0f2fe', fontFamily: 'serif' }}>{item.formula}</div>
+                            {expanded ? (
+                              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.12)', fontSize: '12px', color: '#cffafe', lineHeight: '1.65' }}>
+                                {item.detail || '鏆傛棤璇︾粏璇存槑'}
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: '8px', fontSize: '10px', color: '#7dd3fc' }}>鐐瑰嚮灞曞紑璇︾粏璇存槑</div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+
+                <div style={{ padding: '28px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.22)', borderRadius: '22px' }}>
+                  <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '14px' }}>宸ョ▼瀹炵幇</div>
+                  <div style={{ marginBottom: '12px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f8d7a6', lineHeight: '1.65' }}>
+                    璁＄畻杩囩▼璇存槑锛歿{selectedRoute.engineeringProcessDescription || '璇ヨ矾绾胯绠楄繃绋嬭鏄庡緟琛ュ厖銆?'}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {(selectedRoute.engineeringItems || []).map((item, idx) => (
+                      <div key={idx} style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+                        <div
+                          onClick={() => setExpandedEngPhase(expandedEngPhase === idx ? null : idx)}
+                          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}
+                        >
+                          <div>
+                            <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>{item.name}</div>
+                            <div style={{ color: '#777', fontSize: '11px', marginTop: '3px' }}>{item.focus}</div>
+                          </div>
+                          <div style={{ fontSize: '10px', color: item.status === 'done' ? '#10b981' : item.status === 'in_progress' ? '#f59e0b' : '#666' }}>
+                            {String(item.status || 'pending').toUpperCase()}
+                          </div>
+                        </div>
+                        {expandedEngPhase === idx && (
+                          <div style={{ padding: '0 16px 14px 16px', color: '#aaa', fontSize: '12px', lineHeight: '1.6', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                            {item.detail || item.analysis || item.work_content || item.target || '璇ョ粨鏋勯儴浠舵鍦ㄦ瀯寤轰腑銆?'}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {(selectedRoute.nfbtProcessSteps || []).length > 0 ? (
+                    <div style={{ marginTop: '14px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.25)' }}>
+                      <div style={{ padding: '10px 12px', fontSize: '12px', color: '#fbbf24', fontWeight: 'bold', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                        NFBT 璁＄畻杩囩▼
+                      </div>
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '760px' }}>
+                          <thead>
+                            <tr style={{ background: 'rgba(255,255,255,0.04)' }}>
+                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>姝ラ</th>
+                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>杈撳叆</th>
+                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>杈撳嚭</th>
+                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>复杂度</th>
+                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>鏍稿績鎿嶄綔</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(selectedRoute.nfbtProcessSteps || []).map((row, idx) => (
+                              <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#fff' }}>{row.step}</td>
+                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#cbd5e1', fontFamily: 'monospace' }}>{row.input}</td>
+                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#cbd5e1', fontFamily: 'monospace' }}>{row.output}</td>
+                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#93c5fd', fontFamily: 'monospace' }}>{row.complexity}</td>
+                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#a7f3d0' }}>{row.op}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#fde68a', lineHeight: '1.65' }}>
+                        {selectedRoute.nfbtOptimization}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div style={{ padding: '28px', background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.22)', borderRadius: '22px' }}>
+                  <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '12px' }}>
+                    里程碑（原 AGI 终点）
+                  </div>
+                  <div style={{ fontSize: '18px', color: '#fff', fontWeight: 'bold', marginBottom: '12px' }}>{selectedRoute.milestoneTitle}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px' }}>
+                    {mergedMilestoneStages.map((stage) => (
+                      <div key={stage.id || stage.name} style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', padding: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <div style={{ color: '#ecfdf5', fontWeight: 'bold', fontSize: '14px' }}>{stage.name}</div>
+                          <div style={{ fontSize: '10px', color: stage.status === 'done' ? '#10b981' : stage.status === 'in_progress' ? '#f59e0b' : '#60a5fa' }}>
+                            {String(stage.status || 'planned').toUpperCase()}
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '8px' }}>
+                          <div style={{ fontSize: '11px', color: '#6ee7b7', marginBottom: '4px', fontWeight: 'bold' }}>功能点</div>
+                          {(stage.featurePoints || []).map((point, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '8px', color: '#d1fae5', fontSize: '12px', marginBottom: '4px' }}>
+                              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', marginTop: '7px' }} />
+                              {point}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div>
+                          <div style={{ fontSize: '11px', color: '#7dd3fc', marginBottom: '6px', fontWeight: 'bold' }}>测试记录</div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                            {(stage.tests || []).map((test, idx) => (
+                              <div key={idx} style={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px', background: 'rgba(0,0,0,0.25)' }}>
+                                <div style={{ color: '#fff', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px' }}>{test.name}</div>
+                                <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.6' }}>
+                                  <div><span style={{ color: '#fcd34d' }}>参数配置：</span>{test.params || '-'}</div>
+                                  <div><span style={{ color: '#fcd34d' }}>鏁版嵁闆嗭細</span>{test.dataset || '-'}</div>
+                                  <div><span style={{ color: '#fcd34d' }}>测试结果：</span>{test.result || '-'}</div>
+                                  <div><span style={{ color: '#fcd34d' }}>分析总结：</span>{test.summary || '-'}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {selectedRoute.milestonePlanEvaluation ? (
+                    <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px' }}>
+                      <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 'bold', marginBottom: '6px' }}>
+                        方案评估与修改建议
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#d1fae5', marginBottom: '8px', lineHeight: '1.65' }}>
+                        评估：{selectedRoute.milestonePlanEvaluation.assessment}
+                      </div>
+                      <div>
+                        {(selectedRoute.milestonePlanEvaluation.suggestions || []).map((item, idx) => (
+                          <div key={idx} style={{ fontSize: '12px', color: '#bae6fd', lineHeight: '1.6', marginBottom: '4px' }}>
+                            {idx + 1}. {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: AGI System Status */}
+          {activeTab === 'system' && (
+            <div style={{ animation: 'roadmapFade 0.5s ease-out' }}>
+              <BrainModel />
+              <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+                <h2 style={{ fontSize: '32px', fontWeight: '900', color: consciousField?.glow_color === 'amber' ? '#ffaa00' : '#10b981', margin: '20px 0 8px 0', transition: 'color 1s' }}>
+                   {consciousField ? '实时意识场 (Active Consciousness)' : '系统状态 (System Status)'}
+                </h2>
+                <p style={{ color: '#666', fontSize: '14px' }}>
+                  {consciousField
+                    ? `当前内稳态平衡: ${((consciousField.stability || 0) * 100).toFixed(1)}% | GWS 竞争强度: ${(consciousField.gws_intensity || 0).toFixed(2)}`
+                    : '基于 Project Genesis 协议的核心能力对齐报告'}
+                </p>
+                <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {(systemRouteOptions.length > 0 ? systemRouteOptions : routeList).map((route) => (
+                    <button
+                      key={route.id}
+                      onClick={() => setSelectedRouteId(route.id)}
+                      style={{
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        background: selectedRouteId === route.id ? 'rgba(0, 210, 255, 0.2)' : 'rgba(255,255,255,0.03)',
+                        color: selectedRouteId === route.id ? '#67e8f9' : '#94a3b8',
+                        borderRadius: '999px',
+                        fontSize: '11px',
+                        padding: '6px 10px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {route.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Real-time Conscious Metrics Bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px', animation: 'fadeIn 1s' }}>
+                {(activeSystemProfile?.metricCards || []).map((m, i) => (
+                  <div key={i} style={{ padding: '18px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: `1px solid ${m.color}30`, textAlign: 'center' }}>
+                    <div style={{ fontSize: '10px', color: '#666', marginBottom: '6px', fontWeight: 'bold' }}>{m.label}</div>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: m.color, marginBottom: '6px' }}>{m.value}</div>
+                    <div style={{ fontSize: '10px', color: '#9ca3af' }}>{m.brain_ability}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                <div style={{ background: 'rgba(0, 255, 136, 0.03)', border: '1px solid rgba(0, 255, 136, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#00ff88', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle size={16} /> 宸插叿澶囪兘鍔?(Equipped)
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    {statusData.capabilities.map((c, i) => (
+                      <div key={i} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px' }}>{c.name}</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '10px' }}>
+                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
+                            <div style={{ fontSize: '10px', color: '#86efac', marginBottom: '4px' }}>浜鸿剳鑳藉姏</div>
+                            <div style={{ fontSize: '11px', color: '#dcfce7', lineHeight: '1.55' }}>{c.brain_ability || '-'}</div>
+                          </div>
+                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)' }}>
+                            <div style={{ fontSize: '10px', color: '#7dd3fc', marginBottom: '4px' }}>
+                              当前实现（{selectedRoute?.title || selectedRouteId}）
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#e0f2fe', lineHeight: '1.55' }}>{getRouteImpl(c)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(255, 68, 68, 0.03)', border: '1px solid rgba(255, 68, 68, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#ff4444', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <X size={16} /> 鐮斿彂涓?缂哄け (Missing)
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    {statusData?.missing_capabilities?.map((c, i) => (
+                      <div key={i} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', color: '#ff8888' }}>{c.name}</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '10px' }}>
+                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.22)' }}>
+                            <div style={{ fontSize: '10px', color: '#fca5a5', marginBottom: '4px' }}>浜鸿剳鑳藉姏</div>
+                            <div style={{ fontSize: '11px', color: '#fee2e2', lineHeight: '1.55' }}>{c.brain_ability || '-'}</div>
+                          </div>
+                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.22)' }}>
+                            <div style={{ fontSize: '10px', color: '#fcd34d', marginBottom: '4px' }}>
+                              当前实现（{selectedRoute?.title || selectedRouteId}）
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#fef3c7', lineHeight: '1.55' }}>{getRouteImpl(c)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* [NEW] Parameters and Tests Section */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '40px' }}>
+                {/* Parameters */}
+                <div style={{ background: 'rgba(0, 210, 255, 0.03)', border: '1px solid rgba(0, 210, 255, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#00d2ff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Activity size={16} /> 鏍稿績鍙傛暟 (Route Parameters)
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    {(activeSystemProfile?.parameterCards || []).map((p, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setExpandedParam(expandedParam === i ? null : i)}
+                        style={{ 
+                          padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px', 
+                          border: `1px solid ${expandedParam === i ? 'rgba(0, 210, 255, 0.5)' : 'rgba(0, 210, 255, 0.1)'}`,
+                          cursor: 'pointer', transition: 'all 0.3s',
+                          gridColumn: expandedParam === i ? 'span 2' : 'span 1' // Expand to full width if active
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                          <div style={{ fontSize: '10px', color: '#555' }}>{p.name}</div>
+                          {expandedParam === i ? <div style={{ fontSize: '10px', color: '#00d2ff' }}>SHMC CORE ▲</div> : null}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#7dd3fc', marginBottom: '4px' }}>人脑能力：{p.brain_ability || '-'}</div>
+                        <div style={{ fontSize: '18px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>{p.route_param}</div>
+                        <div style={{ fontSize: '10px', color: '#00d2ff88', marginTop: '4px' }}>{p.detail}</div>
+                        
+                        {/* Expanded Content for Parameters */}
+                        {expandedParam === i && (
+                          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(0, 210, 255, 0.1)', paddingTop: '16px', animation: 'fadeIn 0.3s ease' }}>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#00d2ff', fontWeight: 'bold', marginBottom: '4px' }}>鍙傛暟瀹氫箟 (DEFINITION)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.desc}</div>
+                            </div>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '10px', color: '#a855f7', fontWeight: 'bold', marginBottom: '4px' }}>鏁板€间环鍊?(VALUE)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.value_meaning}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 'bold', marginBottom: '4px' }}>鏍稿績閲嶈鎬?(WHY IMPORTANT)</div>
+                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.why_important}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.15)', borderRadius: '32px', padding: '32px' }}>
+                  <div style={{ fontSize: '12px', color: '#10b981', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Search size={16} /> 测试记录迁移
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#d1fae5', lineHeight: '1.7' }}>
+                    系统状态中的路线测试记录已整合到“研发进展 → 里程碑 → 路线测试记录”阶段。
+                  </div>
+                  <div style={{ marginTop: '10px', fontSize: '12px', color: '#86efac' }}>
+                    当前路线测试数：{(activeSystemProfile?.validationRecords || []).length}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+};
+

@@ -1,11 +1,35 @@
 
 import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import axios from 'axios';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { pollRuntimeWithFallback } from './utils/runtimeClient';
 
-const API_BASE = 'http://localhost:5001';
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+
+function normalizeTube(tube, idx) {
+  if (!tube || typeof tube !== 'object') return null;
+  const rawPath = Array.isArray(tube.path) ? tube.path : Array.isArray(tube.points) ? tube.points : [];
+  const path = rawPath
+    .filter((p) => Array.isArray(p) && p.length >= 3)
+    .map((p) => [Number(p[0]) || 0, Number(p[1]) || 0, Number(p[2]) || 0]);
+  if (path.length < 2) return null;
+
+  return {
+    id: tube.id || `tube_${idx}`,
+    label: tube.label || tube.id || `Tube ${idx + 1}`,
+    color: tube.color || '#00d2ff',
+    radius: Number(tube.radius) > 0 ? Number(tube.radius) : 0.2,
+    metrics: typeof tube.metrics === 'object' && tube.metrics ? tube.metrics : {},
+    path,
+  };
+}
+
+function normalizeFlowPayload(payload) {
+  const rawTubes = Array.isArray(payload?.tubes) ? payload.tubes : [];
+  const tubes = rawTubes.map((tube, idx) => normalizeTube(tube, idx)).filter(Boolean);
+  return { ...payload, tubes };
+}
 
 function TubePath({ path, color, label, metrics, radius = 0.5, onHover }) {
   const curve = useMemo(() => {
@@ -120,19 +144,37 @@ export default function FlowTubesVisualizer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hovered, setHovered] = useState(null);
+  const [monitorSource, setMonitorSource] = useState('legacy');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/nfb_flow_tubes`);
-        console.log("Loaded Flow Tubes:", res.data); // Debug log
-        
-        // Transform incoming data if needed
-        // The API returns { tubes: [...], layers: 13 }
-        // The paths are raw coordinates. We might need to center/scale them.
-        // Assuming coordinates are already reasonable, but maybe dividing by 10 as I did before is good to keep scene manageable.
-        
-        setData(res.data);
+        const result = await pollRuntimeWithFallback({
+          apiBase: API_BASE,
+          runRequest: {
+            route: 'fiber_bundle',
+            analysis_type: 'flow_tubes_snapshot',
+            params: {},
+            input_payload: {},
+          },
+          mapRuntimeEvents: (events) => {
+            const flowEvent = events.find((e) => e?.event_type === 'FlowTubeSignal');
+            if (!flowEvent?.payload) return null;
+            return normalizeFlowPayload(flowEvent.payload);
+          },
+          fetchLegacy: async () => {
+            const res = await fetch(`${API_BASE}/nfb_flow_tubes`);
+            if (!res.ok) throw new Error(`legacy flow tubes failed: ${res.status}`);
+            const payload = await res.json();
+            if (payload?.status && payload.status !== 'success') {
+              throw new Error(payload?.message || 'Flow tube payload unavailable');
+            }
+            return normalizeFlowPayload(payload);
+          },
+          eventLimit: 20,
+        });
+        setMonitorSource(result.source);
+        setData(result.data);
       } catch (err) {
         console.error("Error fetching flow tubes:", err);
         setError(err.message);
@@ -175,6 +217,10 @@ export default function FlowTubesVisualizer() {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#4488ff" />
+
+        <Text position={[0, 8, 0]} fontSize={0.8} color="#8899aa" anchorX="center" anchorY="middle">
+          {`FLOW SOURCE: ${monitorSource.toUpperCase()}`}
+        </Text>
         
         {data.tubes.map((tube, idx) => (
             <TubePath 

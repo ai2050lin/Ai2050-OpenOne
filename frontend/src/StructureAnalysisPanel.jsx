@@ -1,4 +1,4 @@
-import { OrbitControls, Text } from '@react-three/drei';
+﻿import { OrbitControls, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
 import { 
@@ -13,6 +13,7 @@ import BrainVis3D from './BrainVis3D';
 import HolonomyLoopVisualizer from './HolonomyLoopVisualizer';
 import TrainingDynamics3D from './TrainingDynamics3D';
 import { STRUCTURE_TABS_V2, COLORS } from './config/panels';
+import { pollRuntimeWithFallback } from './utils/runtimeClient';
 
 // 图标名称到组件的映射
 const ICON_MAP = {
@@ -23,7 +24,7 @@ const ICON_MAP = {
 };
 
 
-const API_BASE = 'http://localhost:5001';
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 // ... existing imports
 
@@ -1562,6 +1563,230 @@ export function StructureAnalysisControls({
       setLoading(false);
   };
 
+  const runTdaSnapshot = async () => {
+      setLoading(true);
+      setProgressLogs(p => [...p, '🚀 Loading TDA snapshot...']);
+      try {
+          const result = await pollRuntimeWithFallback({
+              apiBase: API_BASE,
+              runRequest: {
+                  route: 'fiber_bundle',
+                  analysis_type: 'tda_snapshot',
+                  params: {},
+                  input_payload: {}
+              },
+              mapRuntimeEvents: (events) => {
+                  const event = events.find((e) => e?.event_type === 'TDASignal');
+                  if (!event?.payload) return null;
+                  return event.payload;
+              },
+              fetchLegacy: async () => {
+                  const res = await fetch(`${API_BASE}/nfb_ra/tda`);
+                  if (!res.ok) throw new Error(`legacy tda failed: ${res.status}`);
+                  return res.json();
+              },
+              eventLimit: 20
+          });
+          onResultUpdate(result.data);
+          setProgressLogs(p => [...p, `✅ TDA loaded (${result.source})`]);
+      } catch (err) {
+          console.error(err);
+          setProgressLogs(p => [...p, `❌ TDA failed: ${err.message}`]);
+          alert('Failed to fetch TDA results');
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const runTopologySnapshot = async () => {
+      setLoading(true);
+      setProgressLogs(p => [...p, '🚀 Loading topology data...']);
+      try {
+          const result = await pollRuntimeWithFallback({
+              apiBase: API_BASE,
+              runRequest: {
+                  route: 'fiber_bundle',
+                  analysis_type: 'topology_snapshot',
+                  params: {},
+                  input_payload: {}
+              },
+              mapRuntimeEvents: (events) => {
+                  const event = events.find((e) => e?.event_type === 'TopologySignal');
+                  if (!event?.payload) return null;
+                  return event.payload;
+              },
+              fetchLegacy: async () => {
+                  const res = await axios.post(`${API_BASE}/nfb/topology/generate`);
+                  return res.data;
+              },
+              eventLimit: 20
+          });
+          const runtimeLayers = result.data?.layers;
+          const layerCount = runtimeLayers && typeof runtimeLayers === 'object'
+              ? Object.keys(runtimeLayers).length
+              : (Array.isArray(runtimeLayers) ? runtimeLayers.length : (result.data?.layers?.length || 0));
+          alert(`✅ 拓扑数据可用！\n来源: ${result.source}\n分析了 ${layerCount} 个层`);
+          setProgressLogs(p => [...p, `✅ Topology ready (${result.source})`]);
+      } catch (err) {
+          console.error(err);
+          alert(`❌ 生成失败: ${err.response?.data?.detail || err.message}`);
+          setProgressLogs(p => [...p, `❌ Topology failed: ${err.message}`]);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const runFlowTubesSnapshot = async () => {
+      setLoading(true);
+      setProgressLogs(p => [...p, '🚀 Loading flow tube data...']);
+      try {
+          const result = await pollRuntimeWithFallback({
+              apiBase: API_BASE,
+              runRequest: {
+                  route: 'fiber_bundle',
+                  analysis_type: 'flow_tubes_snapshot',
+                  params: {},
+                  input_payload: {}
+              },
+              mapRuntimeEvents: (events) => {
+                  const event = events.find((e) => e?.event_type === 'FlowTubeSignal');
+                  if (!event?.payload) return null;
+                  return event.payload;
+              },
+              fetchLegacy: async () => {
+                  const res = await axios.post(`${API_BASE}/nfb/flow_tubes/generate`);
+                  return res.data;
+              },
+              eventLimit: 20
+          });
+          const tubeCount = Array.isArray(result.data?.tubes) ? result.data.tubes.length : 0;
+          alert(`✅ 流管数据可用！\n来源: ${result.source}\n生成了 ${tubeCount} 条轨迹`);
+          setProgressLogs(p => [...p, `✅ Flow tubes ready (${result.source})`]);
+      } catch (err) {
+          console.error(err);
+          alert(`❌ 生成失败: ${err.response?.data?.detail || err.message}`);
+          setProgressLogs(p => [...p, `❌ Flow tubes failed: ${err.message}`]);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const estimateOrthoError = (components) => {
+      if (!Array.isArray(components) || components.length === 0) return 0;
+      let total = 0;
+      let count = 0;
+      for (let i = 0; i < components.length; i++) {
+          const rowI = Array.isArray(components[i]) ? components[i] : [];
+          for (let j = 0; j < components.length; j++) {
+              const rowJ = Array.isArray(components[j]) ? components[j] : [];
+              const dim = Math.min(rowI.length, rowJ.length);
+              let dot = 0;
+              for (let k = 0; k < dim; k++) {
+                  dot += (Number(rowI[k]) || 0) * (Number(rowJ[k]) || 0);
+              }
+              const target = i === j ? 1 : 0;
+              total += Math.abs(dot - target);
+              count += 1;
+          }
+      }
+      return count > 0 ? total / count : 0;
+  };
+
+  const normalizeTopologyScanPayload = (payload) => {
+      if (!payload || typeof payload !== 'object') return { summary: {} };
+      if (payload.summary && typeof payload.summary === 'object') return payload;
+
+      const rawResults = payload.results;
+      if (!rawResults || typeof rawResults !== 'object') {
+          return { ...payload, summary: {} };
+      }
+
+      const summary = {};
+      Object.entries(rawResults).forEach(([layerKey, stats]) => {
+          if (!stats || typeof stats !== 'object') return;
+          const pca = Array.isArray(stats.pca) ? stats.pca : [];
+          const betti = Array.isArray(stats.betti) ? stats.betti : [];
+          summary[`layer_${layerKey}`] = {
+              avg_ortho_error: estimateOrthoError(stats.pca_components),
+              point_count: pca.length,
+              betti_count: betti.length,
+          };
+      });
+      return { ...payload, summary };
+  };
+
+  const runDebiasSnapshot = async () => {
+      setInteracting(true);
+      try {
+          const result = await pollRuntimeWithFallback({
+              apiBase: API_BASE,
+              runRequest: {
+                  route: 'fiber_bundle',
+                  analysis_type: 'debias_snapshot',
+                  params: {
+                      layer_idx: curvatureForm.layer_idx,
+                      top_k: 5,
+                      R: curvatureResult?.last_R || [[]],
+                  },
+                  input_payload: {
+                      source: agiForm.prompt,
+                      target: 'neutral',
+                  },
+              },
+              mapRuntimeEvents: (events) => {
+                  const event = events.find((e) => e?.event_type === 'DebiasSignal');
+                  if (!event?.payload) return null;
+                  return event.payload;
+              },
+              fetchLegacy: async () => {
+                  const res = await axios.post(`${API_BASE}/nfb_ra/debias`, {
+                      source: agiForm.prompt,
+                      target: 'neutral',
+                      R: curvatureResult?.last_R || [[]],
+                      layer_idx: curvatureForm.layer_idx,
+                  });
+                  return res.data;
+              },
+              eventLimit: 20,
+          });
+          setDebiasResults(Array.isArray(result.data?.results) ? result.data.results : []);
+      } catch (e) {
+          console.error(e);
+      } finally {
+          setInteracting(false);
+      }
+  };
+
+  const runGlobalTopologySnapshot = async () => {
+      setInteracting(true);
+      try {
+          const result = await pollRuntimeWithFallback({
+              apiBase: API_BASE,
+              runRequest: {
+                  route: 'fiber_bundle',
+                  analysis_type: 'topology_scan_snapshot',
+                  params: {},
+                  input_payload: {},
+              },
+              mapRuntimeEvents: (events) => {
+                  const event = events.find((e) => e?.event_type === 'TopologyScanSignal');
+                  if (!event?.payload) return null;
+                  return normalizeTopologyScanPayload(event.payload);
+              },
+              fetchLegacy: async () => {
+                  const res = await axios.post(`${API_BASE}/nfb_ra/topology_scan`);
+                  return normalizeTopologyScanPayload(res.data);
+              },
+              eventLimit: 20,
+          });
+          setTopologyResults(result.data);
+      } catch (e) {
+          console.error(e);
+      } finally {
+          setInteracting(false);
+      }
+  };
+
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', height: '100%',
@@ -1693,19 +1918,7 @@ export function StructureAnalysisControls({
                         </div>
                     </ControlGroup>
                     
-                    <ActionButton onClick={() => {
-                        setLoading(true);
-                        axios.get(`${API_BASE}/nfb_ra/tda`)
-                            .then(res => {
-                                onResultUpdate(res.data);
-                                setLoading(false);
-                            })
-                            .catch(err => {
-                                console.error(err);
-                                setLoading(false);
-                                alert("Failed to fetch TDA results");
-                            });
-                    }} loading={loading} icon={Activity}>
+                    <ActionButton onClick={runTdaSnapshot} loading={loading} icon={Activity}>
                         获取拓扑特征 (Get Betti Numbers)
                     </ActionButton>
                     
@@ -1840,16 +2053,7 @@ export function StructureAnalysisControls({
                     
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <ActionButton 
-                            onClick={async () => {
-                                setLoading(true);
-                                try {
-                                    const res = await axios.post(`${API_BASE}/nfb/topology/generate`);
-                                    alert(`✅ 拓扑数据生成成功！\n分析了 ${res.data.layers?.length || 0} 个层`);
-                                } catch (err) {
-                                    alert(`❌ 生成失败: ${err.response?.data?.detail || err.message}`);
-                                }
-                                setLoading(false);
-                            }} 
+                            onClick={runTopologySnapshot} 
                             loading={loading} 
                             icon={RotateCcw}
                         >
@@ -1882,16 +2086,7 @@ export function StructureAnalysisControls({
                     
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <ActionButton 
-                            onClick={async () => {
-                                setLoading(true);
-                                try {
-                                    const res = await axios.post(`${API_BASE}/nfb/flow_tubes/generate`);
-                                    alert(`✅ 流管数据生成成功！\n生成了 ${res.data.tubes?.length || 0} 条轨迹`);
-                                } catch (err) {
-                                    alert(`❌ 生成失败: ${err.response?.data?.detail || err.message}`);
-                                }
-                                setLoading(false);
-                            }} 
+                            onClick={runFlowTubesSnapshot} 
                             loading={loading} 
                             icon={RotateCcw}
                         >
@@ -2029,19 +2224,7 @@ export function StructureAnalysisControls({
                         </div>
                         
                         <ActionButton 
-                            onClick={async () => {
-                                setInteracting(true);
-                                try {
-                                    const res = await axios.post(`${API_BASE}/nfb_ra/debias`, {
-                                        source: agiForm.prompt,
-                                        target: "neutral",
-                                        R: curvatureResult?.last_R || [[]], // Mock or Pass from RPT
-                                        layer_idx: curvatureForm.layer_idx
-                                    });
-                                    setDebiasResults(res.data.results);
-                                } catch (e) { console.error(e); }
-                                setInteracting(false);
-                            }} 
+                            onClick={runDebiasSnapshot}
                             loading={interacting} 
                             icon={Sparkles}
                         >
@@ -2085,14 +2268,7 @@ export function StructureAnalysisControls({
                             该功能将自动遍历 <b>职业、情感、逻辑、亲属</b> 四大语义场，提取 100+ 核心算子，构建 AGI 的大统一几何模型。
                          </div>
                          <ActionButton 
-                            onClick={async () => {
-                                setInteracting(true);
-                                try {
-                                    const res = await axios.post(`${API_BASE}/nfb_ra/topology_scan`);
-                                    setTopologyResults(res.data);
-                                } catch (e) { console.error(e); }
-                                setInteracting(false);
-                            }} 
+                            onClick={runGlobalTopologySnapshot}
                             loading={interacting} 
                             icon={Globe}
                         >
@@ -2280,6 +2456,7 @@ export default function StructureAnalysisPanel({
   const [holonomyForm, setHolonomyForm] = useState({ layer_idx: 0, deviation: 0.0 });
   
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [topologyResults, setTopologyResults] = useState(null);
   
   // Status Overlay State
   const [statusData, setStatusData] = useState(null);
@@ -2348,6 +2525,8 @@ export default function StructureAnalysisPanel({
             agiForm={agiForm} setAgiForm={setAgiForm}
             rptForm={rptForm} setRptForm={setRptForm}
             holonomyForm={holonomyForm} setHolonomyForm={setHolonomyForm}
+            topologyResults={topologyResults}
+            setTopologyResults={setTopologyResults}
             onResultUpdate={setAnalysisResult}
             t={tSafe}
             // SNN Props
@@ -2365,53 +2544,6 @@ export default function StructureAnalysisPanel({
          {/* Render Logic */}
          <div style={{ width: '100%', height: '100%' }}>
               {/* SNN View */}
-              {activeTab === 'global_topology' && (
-                <div className="animate-fade-in">
-                    <ControlGroup label="系统级扫描 (Systemic Scan)">
-                         <div style={{fontSize: "12px", color: "#aaa", marginBottom: "12px", lineHeight: "1.4"}}>
-                            该功能将自动遍历 <b>职业、情感、逻辑、亲属</b> 四大语义场，提取 100+ 核心算子，构建 AGI 的大统一几何模型。
-                         </div>
-                         <ActionButton 
-                            onClick={async () => {
-                                setInteracting(true);
-                                try {
-                                    const res = await axios.post(`${API_BASE}/nfb_ra/topology_scan`);
-                                    setTopologyResults(res.data);
-                                } catch (e) { console.error(e); }
-                                setInteracting(false);
-                            }} 
-                            loading={interacting} 
-                            icon={Globe}
-                        >
-                            开始全量拓扑提取
-                        </ActionButton>
-                    </ControlGroup>
-
-                    {topologyResults && (
-                        <div style={{marginTop: "16px"}}>
-                            <div style={{fontSize: "12px", color: "#ddd", marginBottom: "10px"}}>语义场分布概览 (Field Metrics):</div>
-                            <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
-                                {Object.entries(topologyResults.summary || {}).map(([field, stats], idx) => (
-                                    <div key={idx} style={{padding: "10px", background: "rgba(255,255,255,0.05)", borderRadius: "8px"}}>
-                                        <div style={{display: "flex", justifyContent: "space-between", marginBottom: "4px"}}>
-                                            <span style={{color: "#4ecdc4", fontSize: "12px", textTransform: "capitalize"}}>{field.replace("_", " ")}</span>
-                                            <span style={{fontSize: "10px", color: "#888"}}>Error: {stats.avg_ortho_error.toFixed(5)}</span>
-                                        </div>
-                                        <div style={{height: "3px", background: "#333", borderRadius: "1.5px", overflow: "hidden"}}>
-                                            <div style={{width: `${Math.max(0, 100 - stats.avg_ortho_error * 1000)}%`, height: "100%", background: "#4ecdc4"}} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    <div style={{marginTop: "16px", padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", fontSize: "11px", color: "#777", lineHeight: "1.5"}}>
-                        <strong style={{color: "#aaa"}}>系统性预测：</strong><br/>
-                        若各场平均误差保持在 $10^{-5}$ 级别，则证明该子系统具有完美的**群论对称性**，即 AI 的逻辑一致性由拓扑刚性保障。
-                    </div>
-                </div>
-            )}
             {activeTab === 'snn' && (
                   <Canvas camera={{ position: [25, 25, 25], fov: 50 }}>
                      <ambientLight intensity={0.4} />

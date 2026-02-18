@@ -132,7 +132,7 @@ export default function HolonomyLoopVisualizer({ layer = 0, deviation = 0.0 }) {
         padding: '10px',
         border: '1px solid #0f0'
       }}>
-        <div>Running Cycle: Man -> King -> Queen -> Woman</div>
+        <div>Running Cycle: Man -&gt; King -&gt; Queen -&gt; Woman</div>
         <div>Layer: {layer}</div>
         <div>Holonomy Deviation: <span style={{color: deviation > 0.001 ? 'red' : '#0f0'}}>{deviation.toFixed(6)}</span></div>
         <div style={{fontSize: '0.8em', color: '#888'}}>

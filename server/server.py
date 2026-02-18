@@ -48,11 +48,13 @@ from experiments.surgery_hooks import ManifoldSurgeon
 from scripts.agi_core_engine import AGICoreEngine
 from scripts.global_topology_scanner import TopologyScanner
 from scripts.rlmf_manager import RLMFManager
+from server.api_v1_runs import create_runs_router
 from server.cross_bundle_service import cross_bundle_aligner
 from server.fibernet_service import fibernet_service
 from server.global_workspace_service import global_workspace_controller
 from server.rag_fiber_service import rag_fiber_manager
 from server.ricci_flow_service import ricci_flow_service
+from server.runtime.run_service import RunService
 from server.vision_service import vision_service
 
 # --- Global Model State ---
@@ -162,6 +164,11 @@ async def lifespan(app: FastAPI):
     print("Shutting down...")
 
 app = FastAPI(title="TransformerLens 3D API", lifespan=lifespan)
+run_service = RunService(
+    agi_core_provider=lambda: agi_core,
+    model_provider=lambda: model,
+)
+app.include_router(create_runs_router(run_service))
 
 # --- Fiber Memory API ---
 
@@ -819,7 +826,7 @@ async def get_unified_conscious_field():
         raise HTTPException(status_code=503, detail="AGI Core not initialized")
     
     # 运行一个简化的意识周期以获取实时状态
-    signal = np.random.randn(32)
+    signal = torch.randn(32)
     report = agi_core.run_conscious_step(0, signal)
     
     # 注入 GWS 状态数据
@@ -895,26 +902,78 @@ async def topology_scan_api(request: Optional[Dict[str, Any]] = None):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+def _normalize_topology_model_name(model_name: Optional[str]) -> str:
+    raw = (model_name or "gpt2").strip().lower()
+    if "qwen" in raw:
+        return "qwen3"
+    if "gpt2" in raw:
+        return "gpt2"
+    aliases = {
+        "gpt2-small": "gpt2",
+        "gpt-2": "gpt2",
+        "qwen": "qwen3",
+        "qwen3-4b": "qwen3",
+    }
+    return aliases.get(raw, raw or "gpt2")
+
+def _topology_path_candidates(model_name: Optional[str]) -> List[str]:
+    normalized = _normalize_topology_model_name(model_name)
+    if normalized == "gpt2":
+        return [
+            "tempdata/topology.json",
+            "tempdata/topology_generated.json",
+        ]
+    return [
+        f"tempdata/topology_{normalized}.json",
+        f"tempdata/topology_generated_{normalized}.json",
+    ]
+
+def _resolve_topology_path(model_name: Optional[str]) -> Optional[str]:
+    for path in _topology_path_candidates(model_name):
+        if os.path.exists(path):
+            return path
+    return None
+
+def _normalize_topology_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    if "layers" in payload and isinstance(payload["layers"], dict):
+        return payload
+    nested = payload.get("data")
+    if isinstance(nested, dict) and "layers" in nested and isinstance(nested["layers"], dict):
+        return nested
+    return {"layers": {}}
+
 @app.get("/nfb/topology")
 async def get_nfb_topology(model: str = "gpt2"):
     """Serves the pre-computed topology analysis for 3D visualization"""
     global surgeon
     try:
-        file_path = "tempdata/topology.json" if model == "gpt2" else f"tempdata/topology_{model}.json"
+        file_path = _resolve_topology_path(model)
+        if not file_path:
+            return {
+                "status": "error",
+                "message": f"Topology data for {model} not found. Run scan first.",
+                "searched": _topology_path_candidates(model),
+            }
+
+        with open(file_path, "r") as f:
+            raw_data = json.load(f)
+        data = _normalize_topology_payload(raw_data)
         
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                data = json.load(f)
-            
-            # Load PCA info into Surgeon for later intervention
-            if surgeon:
-                for l_idx, info in data['layers'].items():
-                    if 'pca_components' in info:
-                        surgeon.set_pca_info(int(l_idx), info['pca_components'], info['pca_mean'])
-            
-            return {"status": "success", "data": data}
-        else:
-            return {"status": "error", "message": f"Topology data for {model} not found. Run scan first."}
+        # Load PCA info into Surgeon for later intervention
+        if surgeon:
+            for l_idx, info in data["layers"].items():
+                components = info.get("pca_components")
+                pca_mean = info.get("pca_mean", [])
+                if components:
+                    surgeon.set_pca_info(int(l_idx), components, pca_mean)
+        
+        return {
+            "status": "success",
+            "model": _normalize_topology_model_name(model),
+            "path": file_path,
+            "layers": data["layers"],
+            "data": data,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1030,21 +1089,28 @@ async def get_nfb_alignment():
 async def get_nfb_flux(model: str = "gpt2"):
     """Calculates transport vectors (flux) between sequential layers"""
     try:
-        file_path = "tempdata/topology.json" if model == "gpt2" else f"tempdata/topology_{model}.json"
+        file_path = _resolve_topology_path(model)
+        if not file_path:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Topology data for {model} missing. Searched: {_topology_path_candidates(model)}",
+            )
         
-        if not os.path.exists(file_path):
-             raise HTTPException(status_code=404, detail=f"Topology data for {model} missing")
-             
         with open(file_path, "r") as f:
-            data = json.load(f)
-            
-        layers = sorted([int(k) for k in data['layers'].keys()])
+            raw_data = json.load(f)
+        data = _normalize_topology_payload(raw_data)
+        
+        layers = sorted([int(k) for k in data["layers"].keys()])
         flux_data = []
         
         for i in range(len(layers) - 1):
             l1, l2 = str(layers[i]), str(layers[i+1])
-            p1 = np.array(data['layers'][l1]['pca'])
-            p2 = np.array(data['layers'][l2]['pca'])
+            p1_raw = data["layers"][l1].get("pca") or data["layers"][l1].get("projections") or []
+            p2_raw = data["layers"][l2].get("pca") or data["layers"][l2].get("projections") or []
+            p1 = np.array(p1_raw)
+            p2 = np.array(p2_raw)
+            if p1.size == 0 or p2.size == 0:
+                continue
             
             # Calculate simple displacement vectors (simplified flux)
             min_len = min(len(p1), len(p2))
@@ -1278,7 +1344,7 @@ async def flow_tubes_api():
     }
 
 @app.post("/nfb/topology/generate")
-async def generate_nfb_topology():
+async def generate_nfb_topology(model_name: Optional[str] = None):
     """Generate topology data by running model analysis"""
     global model, surgeon
     if model is None:
@@ -1288,29 +1354,68 @@ async def generate_nfb_topology():
         from structure_analyzer import ManifoldAnalysis
         
         topology_data = {"layers": {}}
+        analyzer = ManifoldAnalysis(model)
+        loaded_model_name = _normalize_topology_model_name(getattr(model.cfg, "model_name", "gpt2"))
+        requested_model_name = _normalize_topology_model_name(model_name) if model_name else loaded_model_name
+        normalized_model_name = loaded_model_name
+        if requested_model_name != loaded_model_name:
+            print(
+                f"[WARN] Requested topology model '{requested_model_name}' "
+                f"does not match loaded model '{loaded_model_name}'. Using loaded model name."
+            )
         
         # 分析每个层
         for layer_idx in range(model.cfg.n_layers):
-            analyzer = ManifoldAnalysis(model)
             # 使用默认提示词生成激活
             prompt = "The quick brown fox jumps over the lazy dog"
             tokens = model.to_tokens(prompt)
             acts = analyzer.get_layer_activations(tokens, layer_idx)
             pca_result = analyzer.compute_pca(acts, n_components=3)
+
+            pca_points = pca_result.get("projections") or pca_result.get("points") or []
+            if not pca_points:
+                fallback_n = int(acts.shape[0]) if hasattr(acts, "shape") else 10
+                pca_points = [[0.0, 0.0, 0.0] for _ in range(fallback_n)]
+            pca_components = pca_result.get("components") or []
+            pca_mean = pca_result.get("mean")
+            if pca_mean is None and hasattr(acts, "mean"):
+                pca_mean = acts.mean(dim=0).cpu().numpy().tolist()
             
             topology_data["layers"][str(layer_idx)] = {
-                "pca": pca_result.get("points", [[0, 0, 0] for _ in range(10)]).tolist() if hasattr(pca_result.get("points", []), 'tolist') else pca_result.get("points", []),
-                "pca_components": pca_result.get("components", []).tolist() if hasattr(pca_result.get("components", []), 'tolist') else pca_result.get("components", []),
-                "pca_mean": pca_result.get("mean", []).tolist() if hasattr(pca_result.get("mean", []), 'tolist') else pca_result.get("mean", []),
+                "pca": pca_points.tolist() if hasattr(pca_points, "tolist") else pca_points,
+                "pca_components": pca_components.tolist() if hasattr(pca_components, "tolist") else pca_components,
+                "pca_mean": pca_mean.tolist() if hasattr(pca_mean, "tolist") else (pca_mean or []),
                 "intrinsic_dim": pca_result.get("intrinsic_dim", 3)
             }
         
         # 保存到文件
-        output_path = "tempdata/topology_generated.json"
-        with open(output_path, "w") as f:
-            json.dump(topology_data, f)
+        os.makedirs("tempdata", exist_ok=True)
+        canonical_output_path = (
+            "tempdata/topology.json"
+            if normalized_model_name == "gpt2"
+            else f"tempdata/topology_{normalized_model_name}.json"
+        )
+        compatibility_output_path = (
+            "tempdata/topology_generated.json"
+            if normalized_model_name == "gpt2"
+            else f"tempdata/topology_generated_{normalized_model_name}.json"
+        )
+        for output_path in {canonical_output_path, compatibility_output_path}:
+            with open(output_path, "w") as f:
+                json.dump(topology_data, f)
+
+        if surgeon:
+            for l_idx, info in topology_data["layers"].items():
+                if info.get("pca_components"):
+                    surgeon.set_pca_info(int(l_idx), info["pca_components"], info.get("pca_mean", []))
         
-        return {"status": "success", "message": "Topology data generated", "path": output_path, "layers": list(topology_data["layers"].keys())}
+        return {
+            "status": "success",
+            "message": "Topology data generated",
+            "model": normalized_model_name,
+            "paths": [canonical_output_path, compatibility_output_path],
+            "layers": list(topology_data["layers"].keys()),
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

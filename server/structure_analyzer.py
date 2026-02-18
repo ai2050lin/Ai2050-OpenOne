@@ -589,7 +589,9 @@ class ManifoldAnalysis:
             
             return {
                 "projections": projected.cpu().numpy().tolist(),
+                "points": projected.cpu().numpy().tolist(),
                 "components": V[:, :n_components].cpu().numpy().tolist(),
+                "mean": mean.cpu().numpy().tolist(),
                 "explained_variance": explained_variance.cpu().numpy().tolist(),
                 "explained_variance_ratio": explained_variance_ratio.cpu().numpy().tolist()
             }
