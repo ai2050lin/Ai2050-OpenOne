@@ -1,6 +1,9 @@
 ﻿import { Activity, Brain, CheckCircle, Search, Target, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { pollRuntimeWithFallback } from './utils/runtimeClient';
+import { ProjectRoadmapTab } from './blueprint/ProjectRoadmapTab';
+import { ResearchProgressTab } from './blueprint/ResearchProgressTab';
+import { SystemStatusTab } from './blueprint/SystemStatusTab';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
@@ -175,30 +178,30 @@ const PHASES = [
     color: "#a855f7",
     analysis_sections: [
       {
-        title: "有效性分。(Why it works)",
-        content: "深度神经网络成功提取了智能的‘特殊数学结构’。通过高维叠加假设 (Superposition)，网络能在有限参数内并行处理近乎无限的概念。其核心竞争力在于从统计相关性中自发诱发‘测地线流’，即沿着能量最低的逻辑路径进行推理。",
-        tags: ["High-Dim Abstraction", "Low-Dim Precision", "Johnson-Lindenstrauss"]
+        title: "S0 不变量发现 (Invariant Discovery)",
+        content: "先不预设理论，而是在多模型/多任务/多规模中筛选‘稳定不变量’。重点追踪：对称性、拓扑特征、谱结构、几何低维坐标与尺度律参数，建立候选结构库并按稳定性排序。",
+        tags: ["Invariants", "Cross-Model", "Stability Ranking"]
       },
       {
-        title: "核心组件 (Strategic Components)",
-        content: "1. 残差。(Residual Stream): 作为‘全息看板’承载所有计算状态。2. 注意力头 (Attention Heads): 执行流形上的‘联络算子’。3. MLP 。 负责非线性流形投影与特征解耦。",
-        tags: ["Residual Stream", "Attention Mechanism", "Manifold Projection"]
+        title: "S1 因果必要性验证 (Causal Necessity)",
+        content: "对候选结构做干预：删除、扰动、置换、重参数化保持。若能力显著退化且可复现，则标记为‘必要结构’；若仅相关不致因果变化，则降级或淘汰。",
+        tags: ["Intervention", "Necessity Test", "Causal Filters"]
       },
       {
-        title: "内部结构演化 (Internal Structure)",
-        content: "观测到‘几何结晶’过程：浅层执行混沌的特征提取，深层（Layer 9-11）则坍缩为高代数一致性的纤维丛结构。模型深层通过 Ricci 演化自发消除逻辑矛盾，形成稳定的吸引子空间。",
-        tags: ["Topological Smoothing", "Geometric Crystallization", "Attractors"]
+        title: "S2 最小生成模型 (Minimal Generator)",
+        content: "以最小描述长度 (MDL) 为目标，用最少公理重建关键行为。核心判据不是‘拟合最好’，而是‘解释最短且可复现最多现象’。",
+        tags: ["MDL", "Axiomatization", "Generative Structure"]
       },
       {
-        title: "研究工具与成。(Research & Tools)",
-        content: "利用 Logit Lens 。TDA (拓扑数据分析) 成功测绘。GPT-2 的全谱拓扑图。目前已证实 $Z_{113}$ 等离散群论结构可在连续向量空间中通过 DFT (离散傅里叶变。 完美重构，准确率 >99%。",
-        tags: ["Logit Lens", "TDA Scanner", "Z113 Group Results"]
+        title: "S3/S4 跨层一致性与反证闭环",
+        content: "建立局部机制 (电路/算子) 与全局结构 (拓扑/RG/范畴映射) 的双向一致性。对所有核心结论保留反证通道，优先淘汰不可证伪或只在单场景成立的解释。",
+        tags: ["Cross-Scale Consistency", "Falsification", "Evidence First"]
       }
     ],
     goals: [
-      "实现全谱 12 。Logit Lens 探测",
-      "提取全局语义流形拓扑 (Topology Scan)",
-      "分析模型内部的因果链路与组合泛化"
+      "建立跨模型稳定不变量候选库并完成排序",
+      "完成候选结构的因果必要性验证闭环",
+      "构建最小生成模型并通过跨层级一致性检验"
     ],
     metrics: {
       "Scan Resolution": "Microscopic",
@@ -509,39 +512,258 @@ const PHASES = [
 
 const IMPROVEMENTS = [
   {
-    title: "Structured Initialization",
-    desc: "从随机到骨架",
-    detail: "利用 Graph Laplacian 预计。Embedding 几何骨架，让模型'出生'即带世界观。",
-    step: "Step 3.5",
-    status: "done"
+    id: "phase_1",
+    title: "阶段1：不变量发现与基线校准",
+    status: "done",
+    objective: "在多模型、多任务、多规模设置下提取稳定结构，建立候选不变量库。",
+    summary: "已形成第一版不变量库，并完成跨模型稳定性排序。",
+    tests: [
+      {
+        id: "p1_t1",
+        name: "跨模型不变量扫描",
+        testDate: "2025-12-18",
+        target: "验证几何/谱/拓扑特征在 Transformer、MoE、视觉模型中的稳定性。",
+        params: {
+          models: ["qwen3-4b", "transformer_baseline", "vision_fiber_proto"],
+          datasets: ["OpenWebText-Sample", "MATH-Logic-Subset", "MNIST-Symbolic"],
+          sample_tokens: 2000000,
+          batch_size: 32,
+          scan_layers: "all"
+        },
+        result: "检测到 17 个候选不变量，其中 9 个在三类模型中稳定出现。",
+        analysis: "候选结构具备跨架构共性，满足进入因果必要性验证的门槛。",
+        details: {
+          key_metrics: {
+            cross_model_stability: 0.81,
+            topology_persistence_score: 0.74,
+            spectral_consistency: 0.79
+          },
+          artifacts: [
+            "tempdata/qwen3_4b_structure/metrics.json",
+            "tempdata/qwen3_4b_structure/TEST_SUMMARY.md"
+          ]
+        }
+      },
+      {
+        id: "p1_t2",
+        name: "训练阶段不变量漂移测试",
+        testDate: "2025-12-26",
+        target: "验证训练早期-中期-收敛后不变量是否保持稳定。",
+        params: {
+          checkpoints: ["step_5k", "step_30k", "step_120k"],
+          eval_tasks: ["logic_closure", "long_context_recall"],
+          drift_threshold: 0.15
+        },
+        result: "核心不变量漂移均值 0.09，低于阈值。",
+        analysis: "结构在训练阶段具有可追踪连续性，不是偶然噪声。",
+        details: {
+          key_metrics: {
+            avg_drift: 0.09,
+            max_drift: 0.14,
+            reproducibility: 0.86
+          }
+        }
+      }
+    ]
   },
   {
-    title: "Manifold Surgery",
-    desc: "交互式神经干。",
-    detail: "通过 3D 空间拖拽直接拨动高维激活（128-dim），实现。AI 逻辑流向的实时干预。",
-    step: "Phase V",
-    status: "done"
+    id: "phase_2",
+    title: "阶段2：因果必要性验证",
+    status: "done",
+    objective: "通过结构干预将相关性升级为可复现的因果结论。",
+    summary: "删除/扰动/置换/重参数化流程已跑通，非因果候选已批量剔除。",
+    tests: [
+      {
+        id: "p2_t1",
+        name: "结构删除干预实验",
+        testDate: "2026-01-05",
+        target: "验证候选不变量对推理能力是否必要。",
+        params: {
+          intervention: "component_ablation",
+          target_components: ["fiber_gate", "geometry_head", "memory_bridge"],
+          eval_sets: ["GSM8K-Subset", "Z113-Closure", "ReasoningChain-Set"],
+          runs: 12
+        },
+        result: "删除关键组件后平均性能下降 23.6%，且可复现。",
+        analysis: "关键候选结构满足必要性标准，已从候选升级为核心结构。",
+        details: {
+          key_metrics: {
+            avg_perf_drop_pct: 23.6,
+            worst_case_drop_pct: 34.2,
+            replication_rate: 0.92
+          },
+          retained_core_structures: ["fiber_gate", "geometry_head"]
+        }
+      },
+      {
+        id: "p2_t2",
+        name: "重参数化保持实验",
+        testDate: "2026-01-09",
+        target: "验证结构等价变换下能力是否保持，排除纯参数偶然性。",
+        params: {
+          transform: "weight_reparameterization",
+          preserve_constraints: ["spectrum_band", "topology_signature"],
+          runs: 8
+        },
+        result: "在结构保持条件下，任务性能波动 < 2.8%。",
+        analysis: "说明能力主要由结构决定，而非具体参数坐标系。",
+        details: {
+          key_metrics: {
+            perf_variance_pct: 2.8,
+            structure_preservation_score: 0.88
+          }
+        }
+      }
+    ]
   },
   {
-    title: "Fiber Flux Dynamics",
-    desc: "全像通量反馈",
-    detail: "利用粒子流实时展现跨层级的信息演化，揭示模型深层的拓扑反馈闭环。",
-    step: "Phase V",
-    status: "done"
+    id: "phase_3",
+    title: "阶段3：最小生成模型重建",
+    status: "in_progress",
+    objective: "用最少公理和最低自由度重建关键能力，验证“结构 -> 能力”的生成链条。",
+    summary: "最小结构模型已启动，部分任务达到基线 80% 以上表现。",
+    tests: [
+      {
+        id: "p3_t1",
+        name: "MDL 约束重建实验",
+        testDate: "2026-01-18",
+        target: "比较最小模型与全量模型在逻辑任务上的能力保真。",
+        params: {
+          mdl_budget: "0.62x baseline complexity",
+          model_variants: ["fiber_mini_v1", "baseline_full_v3"],
+          tasks: ["Z113", "Symbolic-Reasoning", "Rule-Generalization"]
+        },
+        result: "在 62% 复杂度预算下达到基线 84.1% 性能。",
+        analysis: "说明已有结构解释具备压缩能力，但仍需提升跨任务泛化。",
+        details: {
+          key_metrics: {
+            retained_performance_pct: 84.1,
+            complexity_ratio: 0.62,
+            generalization_gap_pct: 8.7
+          }
+        }
+      },
+      {
+        id: "p3_t2",
+        name: "视觉-语言联合重建",
+        testDate: "2026-01-24",
+        target: "验证视觉纤维网络与语言纤维网络能否在统一结构中协同。",
+        params: {
+          architecture: "dual_fiber_bridge_v0",
+          vision_dataset: "MNIST-Symbolic + CIFAR10-Subset",
+          language_dataset: "Instruction-Logic-Subset",
+          bridge_dim: 256
+        },
+        result: "跨模态任务通过率 68.4%，高于无桥接对照组 21.5%。",
+        analysis: "联合重建可行，但跨模态联络项仍是主要瓶颈。",
+        details: {
+          key_metrics: {
+            multimodal_pass_rate: 68.4,
+            improvement_vs_control: 21.5,
+            alignment_mse: 0.047
+          },
+          related_service: "server/vision_service.py"
+        }
+      }
+    ]
   },
   {
-    title: "Global Workspace",
-    desc: "统一意识中心",
-    detail: "Base Manifold Controller 整合所有模态竞争，形成自我意识流。",
-    step: "Phase VI",
-    status: "done"
+    id: "phase_4",
+    title: "阶段4：跨层级一致性验证",
+    status: "in_progress",
+    objective: "建立局部回路解释与全局几何/拓扑解释的一致性映射。",
+    summary: "一致性验证流程已可运行，跨任务稳定性还在补充样本。",
+    tests: [
+      {
+        id: "p4_t1",
+        name: "局部回路-全局拓扑映射测试",
+        testDate: "2026-02-03",
+        target: "验证回路贡献排序与拓扑关键区域是否一致。",
+        params: {
+          local_method: "circuit_discovery_v2",
+          global_method: "persistent_homology + spectral_map",
+          tasks: ["math_reasoning", "long_context_qa"],
+          models: ["fiber_bundle_main", "transformer_baseline"]
+        },
+        result: "两类解释在关键区域重合度 0.72。",
+        analysis: "一致性达到可用水平，但在长上下文任务仍有偏差。",
+        details: {
+          key_metrics: {
+            overlap_score: 0.72,
+            long_context_gap: 0.11
+          }
+        }
+      },
+      {
+        id: "p4_t2",
+        name: "尺度律一致性回归",
+        testDate: "2026-02-11",
+        target: "验证参数规模变化下核心结构指标与性能增益关系。",
+        params: {
+          scales: ["70M", "350M", "1.3B", "4B"],
+          data_tokens: ["30M", "120M", "500M"],
+          regression: "log-linear + piecewise"
+        },
+        result: "结构指标与性能增益相关系数 0.78，存在分段相变。",
+        analysis: "支持“结构主导的尺度增益”假设，下一步需补更大规模点位。",
+        details: {
+          key_metrics: {
+            corr_coef: 0.78,
+            phase_transition_points: ["350M->1.3B"]
+          },
+          report: "tempdata/scaling_validation_report.md"
+        }
+      }
+    ]
   },
   {
-    title: "Unified Spectrum",
-    desc: "全谱意识。",
-    detail: "集成 7 大核心子引擎，实时监。AGI 统合状态。",
-    step: "Phase VII",
-    status: "in_progress"
+    id: "phase_5",
+    title: "阶段5：反证优先与结论收敛",
+    status: "in_progress",
+    objective: "对核心假设持续做反证干预，只保留可证伪且可复现的结论。",
+    summary: "已建立反证任务池并开始运行，结论清单正在收敛。",
+    tests: [
+      {
+        id: "p5_t1",
+        name: "核心假设反证干预",
+        testDate: "2026-02-17",
+        target: "检验“几何结构是能力必要条件”在对照实验下是否仍成立。",
+        params: {
+          hypotheses: ["geometry_is_necessary", "fiber_memory_is_key"],
+          controls: ["randomized_geometry", "shuffled_memory_bridge"],
+          runs: 10
+        },
+        result: "两项假设均通过反证筛查，对照组性能显著劣化。",
+        analysis: "当前证据支持核心假设，但仍需跨数据域复验。",
+        details: {
+          key_metrics: {
+            geometry_control_drop_pct: 19.4,
+            memory_control_drop_pct: 16.7,
+            p_value: 0.008
+          }
+        }
+      },
+      {
+        id: "p5_t2",
+        name: "失败样本归因审计",
+        testDate: "2026-02-20",
+        target: "对失败案例做结构级归因，识别未覆盖机制。",
+        params: {
+          sample_size: 500,
+          audit_dimensions: ["topology_break", "alignment_shift", "memory_conflict"],
+          tooling: ["runtime_timeline", "gradient_trace", "flow_tubes"]
+        },
+        result: "主要失败来源为跨模态联络漂移（42%）与记忆冲突（31%）。",
+        analysis: "后续需优先增强联络稳定器与记忆冲突解耦模块。",
+        details: {
+          key_metrics: {
+            cross_modal_drift_pct: 42,
+            memory_conflict_pct: 31,
+            unresolved_pct: 12
+          }
+        }
+      }
+    ]
   }
 ];
 
@@ -581,6 +803,38 @@ const DNN_ANALYSIS_PLAN = {
   successCriteria: [
     '成功：结构先验模型在关键任务接近或超过基线，且解释更紧凑',
     '失败：结构只在单模型/单任务成立，或干预无稳定因果效应',
+  ],
+};
+
+const EVIDENCE_DRIVEN_PLAN = {
+  title: '证据驱动结构发现方案',
+  core: '核心：主线先产出，验证层保真，前沿层找突破；方法服从证据强度，不由学科标签决定。',
+  phases: [
+    {
+      id: 'S0',
+      name: '不变量发现',
+      desc: '跨模型/任务/规模筛选稳定不变量，形成候选结构库。'
+    },
+    {
+      id: 'S1',
+      name: '因果必要性验证',
+      desc: '通过结构干预验证“是否必要”，将相关性结论升级为因果结论。'
+    },
+    {
+      id: 'S2',
+      name: '最小生成模型',
+      desc: '以 MDL 为约束，用最少公理重建关键能力。'
+    },
+    {
+      id: 'S3',
+      name: '跨层级一致性',
+      desc: '建立局部机制与全局结构的双向映射，确保解释一致。'
+    },
+    {
+      id: 'S4',
+      name: '反证优先收敛',
+      desc: '优先淘汰不可证伪假设，沉淀可复现且可反驳的结论。'
+    },
   ],
 };
 
@@ -728,6 +982,8 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
   const [expandedFormulaIdx, setExpandedFormulaIdx] = useState(null);
   const [expandedParam, setExpandedParam] = useState(null);
   const [expandedEngPhase, setExpandedEngPhase] = useState(null);
+  const [expandedImprovementPhase, setExpandedImprovementPhase] = useState(IMPROVEMENTS[0]?.id || null);
+  const [expandedImprovementTest, setExpandedImprovementTest] = useState(null);
   const [consciousField, setConsciousField] = useState(null);
   const [multimodalSummary, setMultimodalSummary] = useState(null);
   const [multimodalView, setMultimodalView] = useState('multimodal_connector');
@@ -1634,38 +1890,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
 
     return [...baseStages, routeValidationStage];
   }, [selectedRoute, selectedRouteId, activeSystemProfile]);
-
-  // Brain Model Component
-  const BrainModel = () => (
-    <div style={{
-      width: '320px', height: '320px', margin: '0 auto', position: 'relative',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, transparent 70%)',
-      borderRadius: '50%', animation: 'brainPulse 4s infinite alternate'
-    }}>
-      <div style={{
-        position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0, 210, 255, 0.2)',
-        borderRadius: '50%', animation: 'brainRotate 20s linear infinite'
-      }} />
-      <div style={{
-        position: 'absolute', width: '85%', height: '85%', border: '1px dashed rgba(168, 85, 247, 0.3)',
-        borderRadius: '50%', animation: 'brainRotateReverse 15s linear infinite'
-      }} />
-      <Brain size={180} color="#00d2ff" style={{
-        filter: 'drop-shadow(0 0 30px rgba(0, 210, 255, 0.4))',
-        zIndex: 2
-      }} />
-      {/* Dynamic Synaptic Nodes */}
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} style={{
-          position: 'absolute', width: '6px', height: '6px', background: '#00ff88', borderRadius: '50%',
-          boxShadow: '0 0 10px #00ff88', transform: `rotate(${i * 45}deg) translateY(-130px)`,
-          animation: 'synapsePulse 2s infinite', animationDelay: `${i * 0.2}s`
-        }} />
-      ))}
-    </div>
-  );
-
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -1793,674 +2017,64 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
           background: 'radial-gradient(circle at 50% 10%, rgba(0, 100, 200, 0.05) 0%, transparent 70%)'
         }}>
 
-          {/* TAB: Project Roadmap */}
+                    {/* TAB: Project Roadmap */}
           {activeTab === 'roadmap' && (
-            <div style={{ animation: 'roadmapFade 0.6s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
-              <div style={{ marginBottom: '34px' }}>
-                <h2 style={{ fontSize: '30px', fontWeight: '900', color: '#ffaa00', marginBottom: '10px' }}>项目大纲</h2>
-                <div style={{ color: '#777', fontSize: '14px' }}>{roadmapData.definition.summary}</div>
-              </div>
-
-              {/* 上：项目核心思路 */}
-              <div style={{
-                padding: '30px',
-                background: 'linear-gradient(135deg, rgba(255,170,0,0.12) 0%, rgba(255,170,0,0.03) 100%)',
-                border: '1px solid rgba(255,170,0,0.24)',
-                borderRadius: '24px',
-                marginBottom: '28px'
-              }}>
-                <div style={{ color: '#ffaa00', fontWeight: 'bold', fontSize: '18px', marginBottom: '16px' }}>项目核心思路</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
-                  {[
-                    '1，大脑有非常特殊的数学结构，产生了智能。',
-                    '2，深度神经网络部分还原了这个结构，产生了语言能力。',
-                    '3，通过分析深度神经网络，研究这个数学结构，完成智能理论。',
-                  ].map((line, idx) => (
-                    <div key={idx} style={{ padding: '14px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#f4e4c1', fontSize: '14px', lineHeight: '1.6' }}>
-                      {line}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{
-                padding: '30px',
-                borderRadius: '24px',
-                border: '1px solid rgba(99,102,241,0.28)',
-                background: 'linear-gradient(135deg, rgba(99,102,241,0.10) 0%, rgba(99,102,241,0.03) 100%)',
-                marginBottom: '28px'
-              }}>
-                <div style={{ color: '#818cf8', fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>
-                  {MATH_ROUTE_SYSTEM_PLAN.title}
-                </div>
-                <div style={{ color: '#c7d2fe', fontSize: '13px', lineHeight: '1.7', marginBottom: '14px' }}>
-                  {MATH_ROUTE_SYSTEM_PLAN.subtitle}
-                </div>
-
-                <div style={{ marginTop: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                  <div style={{ color: '#a5b4fc', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>
-                    数学路线
-                  </div>
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', minWidth: '1260px', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr style={{ background: 'rgba(255,255,255,0.05)' }}>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#c7d2fe', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>路线</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#c7d2fe', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>理论深度</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#c7d2fe', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>计算可行性</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#c7d2fe', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>可解释性</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#c7d2fe', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>与 SHMC/NFBT 兼容</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#86efac', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>优点</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#fca5a5', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>缺点</th>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', color: '#93c5fd', fontSize: '11px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>可行性结论</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(MATH_ROUTE_SYSTEM_PLAN.routeAnalysis || []).map((item, idx) => (
-                          <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                            <td style={{ padding: '9px 10px', color: '#e0e7ff', fontSize: '12px', fontWeight: 'bold', verticalAlign: 'top' }}>{item.route}</td>
-                            <td style={{ padding: '9px 10px', color: '#dbeafe', fontSize: '12px', verticalAlign: 'top' }}>{item.depth}</td>
-                            <td style={{ padding: '9px 10px', color: '#dbeafe', fontSize: '12px', verticalAlign: 'top' }}>{item.compute}</td>
-                            <td style={{ padding: '9px 10px', color: '#dbeafe', fontSize: '12px', verticalAlign: 'top' }}>{item.interpret}</td>
-                            <td style={{ padding: '9px 10px', color: '#dbeafe', fontSize: '12px', verticalAlign: 'top' }}>{item.compatibility}</td>
-                            <td style={{ padding: '9px 10px', color: '#dcfce7', fontSize: '11px', lineHeight: '1.55', verticalAlign: 'top' }}>
-                              {(item.pros || []).map((line, pIdx) => (
-                                <div key={pIdx}>{pIdx + 1}. {line}</div>
-                              ))}
-                            </td>
-                            <td style={{ padding: '9px 10px', color: '#fee2e2', fontSize: '11px', lineHeight: '1.55', verticalAlign: 'top' }}>
-                              {(item.cons || []).map((line, cIdx) => (
-                                <div key={cIdx}>{cIdx + 1}. {line}</div>
-                              ))}
-                            </td>
-                            <td style={{ padding: '9px 10px', color: '#bae6fd', fontSize: '11px', lineHeight: '1.55', verticalAlign: 'top' }}>{item.feasibility}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '12px' }}>
-                  <div style={{ padding: '14px', borderRadius: '12px', background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div style={{ color: '#a5b4fc', fontSize: '11px', fontWeight: 'bold', marginBottom: '6px' }}>分层架构</div>
-                    {(MATH_ROUTE_SYSTEM_PLAN.architecture || []).map((line, idx) => (
-                      <div key={idx} style={{ color: '#e0e7ff', fontSize: '12px', lineHeight: '1.6', marginBottom: '4px' }}>
-                        {idx + 1}. {line}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ padding: '14px', borderRadius: '12px', background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div style={{ color: '#a5b4fc', fontSize: '11px', fontWeight: 'bold', marginBottom: '6px' }}>资源配比</div>
-                    {(MATH_ROUTE_SYSTEM_PLAN.allocation || []).map((line, idx) => (
-                      <div key={idx} style={{ color: '#dbeafe', fontSize: '12px', lineHeight: '1.6', marginBottom: '4px' }}>
-                        {line}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ padding: '14px', borderRadius: '12px', background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div style={{ color: '#a5b4fc', fontSize: '11px', fontWeight: 'bold', marginBottom: '6px' }}>阶段里程碑</div>
-                    {(MATH_ROUTE_SYSTEM_PLAN.milestones || []).map((line, idx) => (
-                      <div key={idx} style={{ color: '#dbeafe', fontSize: '12px', lineHeight: '1.6', marginBottom: '4px' }}>
-                        {idx + 1}. {line}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 中：DNN结构分析 */}
-              <div style={{
-                padding: '30px',
-                borderRadius: '24px',
-                border: '1px solid rgba(168, 85, 247, 0.25)',
-                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.09) 0%, rgba(168, 85, 247, 0.02) 100%)',
-                marginBottom: '28px'
-              }}>
-                <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '18px', marginBottom: '18px' }}>
-                  对深度神经网络核心结构的分析
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  {(analysisPhase?.analysis_sections || []).map((item, idx) => (
-                    <div key={idx} style={{ padding: '18px', borderRadius: '14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <div style={{ fontWeight: 'bold', color: '#e9d5ff', marginBottom: '8px', fontSize: '14px' }}>{item.title}</div>
-                      <div style={{ fontSize: '12px', color: '#aaa', lineHeight: '1.65', marginBottom: '10px' }}>{item.content}</div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {(item.tags || []).map((tag, tagIdx) => (
-                          <span key={tagIdx} style={{ fontSize: '10px', color: '#c4b5fd', border: '1px solid rgba(196,181,253,0.35)', borderRadius: '999px', padding: '2px 8px' }}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 下：分析成果列表 */}
-              <div style={{
-                padding: '30px',
-                borderRadius: '24px',
-                border: '1px solid rgba(16,185,129,0.24)',
-                background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)'
-              }}>
-                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>
-                  分析成果
-                </div>
-                <div style={{ color: '#9ca3af', fontSize: '13px', lineHeight: '1.7', marginBottom: '16px' }}>
-                  下面是当前项目对于深度神经网络的分析方案，以及对应的结果数据
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
-                  {IMPROVEMENTS.map((item, idx) => (
-                    <div key={idx} style={{ padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
-                        <div style={{ color: '#dcfce7', fontWeight: 'bold', fontSize: '14px' }}>{item.title}</div>
-                        <div style={{ fontSize: '10px', color: item.status === 'done' ? '#10b981' : '#f59e0b' }}>{String(item.status).toUpperCase()}</div>
-                      </div>
-                      <div style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}>{item.desc} | {item.step}</div>
-                      <div style={{ color: '#a7f3d0', fontSize: '12px', lineHeight: '1.6' }}>{item.detail}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <ProjectRoadmapTab
+              roadmapData={roadmapData}
+              analysisPhase={analysisPhase}
+              evidenceDrivenPlan={EVIDENCE_DRIVEN_PLAN}
+              mathRouteSystemPlan={MATH_ROUTE_SYSTEM_PLAN}
+              improvements={IMPROVEMENTS}
+              expandedImprovementPhase={expandedImprovementPhase}
+              setExpandedImprovementPhase={setExpandedImprovementPhase}
+              expandedImprovementTest={expandedImprovementTest}
+              setExpandedImprovementTest={setExpandedImprovementTest}
+            />
           )}
 
-          {/* TAB: Research Progress (Route-Centric Command) */}
+                    {/* TAB: Research Progress (Route-Centric Command) */}
           {activeTab === 'progress' && selectedRoute && (
-            <div style={{ animation: 'roadmapFade 0.5s ease-out' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '34px' }}>
-                <div>
-                  <h2 style={{ fontSize: '34px', fontWeight: '900', color: '#fff', margin: '0 0 8px 0' }}>
-                    {selectedRoute.title} - {selectedRoute.subtitle}
-                  </h2>
-                  <div style={{ marginTop: '8px', color: '#666', fontSize: '13px' }}>
-                    {selectedRoute.routeDescription || selectedRoute.theorySummary}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '30px', fontWeight: '900', color: '#00d2ff', fontFamily: 'monospace' }}>
-                    {selectedRoute.stats.routeProgress}%
-                  </div>
-                  <div style={{ fontSize: '10px', color: '#444' }}>ROUTE READINESS</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '22px' }}>
-                <div style={{ padding: '28px', background: 'rgba(0, 210, 255, 0.06)', border: '1px solid rgba(0, 210, 255, 0.25)', borderRadius: '22px' }}>
-                  <div style={{ fontSize: '12px', color: '#00d2ff', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '10px' }}>智能理论</div>
-                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff', marginBottom: '10px' }}>{selectedRoute.theoryTitle}</div>
-                  <div style={{ fontSize: '14px', color: '#bbb', lineHeight: '1.8', marginBottom: '14px' }}>{selectedRoute.theorySummary}</div>
-                  {(selectedRoute.theoryFormulas || []).length === 0 ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                      {(selectedRoute.theoryBullets || []).map((item, idx) => (
-                        <div key={idx} style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', color: '#ddd', fontSize: '12px' }}>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  {(selectedRoute.theoryFormulas || []).length > 0 ? (
-                    <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                      {selectedRoute.theoryFormulas.map((item, idx) => {
-                        const expanded = expandedFormulaIdx === idx;
-                        return (
-                          <div
-                            key={idx}
-                            onClick={() => setExpandedFormulaIdx(expanded ? null : idx)}
-                            style={{
-                              padding: '12px 14px',
-                              borderRadius: '12px',
-                              border: expanded ? '1px solid rgba(103, 232, 249, 0.65)' : '1px solid rgba(0,210,255,0.35)',
-                              background: expanded ? 'rgba(0, 210, 255, 0.12)' : 'rgba(0,0,0,0.3)',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                            }}
-                          >
-                            <div style={{ fontSize: '11px', color: '#67e8f9', marginBottom: '6px', fontWeight: 'bold' }}>
-                              {item.title}
-                            </div>
-                            <div style={{ fontSize: '18px', color: '#e0f2fe', fontFamily: 'serif' }}>{item.formula}</div>
-                            {expanded ? (
-                              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.12)', fontSize: '12px', color: '#cffafe', lineHeight: '1.65' }}>
-                                {item.detail || '暂无详细说明'}
-                              </div>
-                            ) : (
-                              <div style={{ marginTop: '8px', fontSize: '10px', color: '#7dd3fc' }}>点击展开详细说明</div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={{ padding: '28px', background: 'rgba(99, 102, 241, 0.06)', border: '1px solid rgba(99, 102, 241, 0.26)', borderRadius: '22px' }}>
-                  <div style={{ fontSize: '12px', color: '#818cf8', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '10px' }}>
-                    深度神经网络分析
-                  </div>
-                  <div style={{ fontSize: '20px', color: '#fff', fontWeight: 'bold', marginBottom: '8px' }}>
-                    {DNN_ANALYSIS_PLAN.subtitle}
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>研究目标与假设</div>
-                      {(DNN_ANALYSIS_PLAN.goals || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#e0e7ff', lineHeight: '1.6', marginBottom: '4px' }}>
-                          {idx + 1}. {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>核心评估指标</div>
-                      {(DNN_ANALYSIS_PLAN.metrics || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#dbeafe', lineHeight: '1.6', marginBottom: '4px' }}>
-                          {idx + 1}. {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px', marginBottom: '12px' }}>
-                    <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>六层分析框架</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      {(DNN_ANALYSIS_PLAN.framework || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#c7d2fe', lineHeight: '1.6', padding: '8px 10px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)' }}>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-                    <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>实验矩阵</div>
-                      {(DNN_ANALYSIS_PLAN.experimentMatrix || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#dbeafe', lineHeight: '1.6', marginBottom: '4px' }}>
-                          {idx + 1}. {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>里程碑</div>
-                      {(DNN_ANALYSIS_PLAN.milestones || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#dbeafe', lineHeight: '1.6', marginBottom: '4px' }}>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.22)', padding: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#a5b4fc', fontWeight: 'bold', marginBottom: '6px' }}>成败判据</div>
-                      {(DNN_ANALYSIS_PLAN.successCriteria || []).map((item, idx) => (
-                        <div key={idx} style={{ fontSize: '12px', color: '#dbeafe', lineHeight: '1.6', marginBottom: '4px' }}>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ padding: '28px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.22)', borderRadius: '22px' }}>
-                  <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '14px' }}>工程实现</div>
-                  <div style={{ marginBottom: '12px', padding: '10px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#f8d7a6', lineHeight: '1.65' }}>
-                    计算过程说明：{selectedRoute.engineeringProcessDescription || '该路线计算过程说明待补充。'}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {(selectedRoute.engineeringItems || []).map((item, idx) => (
-                      <div key={idx} style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <div
-                          onClick={() => setExpandedEngPhase(expandedEngPhase === idx ? null : idx)}
-                          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}
-                        >
-                          <div>
-                            <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px' }}>{item.name}</div>
-                            <div style={{ color: '#777', fontSize: '11px', marginTop: '3px' }}>{item.focus}</div>
-                          </div>
-                          <div style={{ fontSize: '10px', color: item.status === 'done' ? '#10b981' : item.status === 'in_progress' ? '#f59e0b' : '#666' }}>
-                            {String(item.status || 'pending').toUpperCase()}
-                          </div>
-                        </div>
-                        {expandedEngPhase === idx && (
-                          <div style={{ padding: '0 16px 14px 16px', color: '#aaa', fontSize: '12px', lineHeight: '1.6', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                            {item.detail || item.analysis || item.work_content || item.target || '该结构部件正在构建中。'}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {(selectedRoute.nfbtProcessSteps || []).length > 0 ? (
-                    <div style={{ marginTop: '14px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', overflow: 'hidden', background: 'rgba(0,0,0,0.25)' }}>
-                      <div style={{ padding: '10px 12px', fontSize: '12px', color: '#fbbf24', fontWeight: 'bold', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                        NFBT 计算过程
-                      </div>
-                      <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '760px' }}>
-                          <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.04)' }}>
-                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>步骤 (Step)</th>
-                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>输入 (Input)</th>
-                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>输出 (Output)</th>
-                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>复杂度</th>
-                              <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: '#fcd34d' }}>核心操作</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {(selectedRoute.nfbtProcessSteps || []).map((row, idx) => (
-                              <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#fff' }}>{row.step}</td>
-                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#cbd5e1', fontFamily: 'monospace' }}>{row.input}</td>
-                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#cbd5e1', fontFamily: 'monospace' }}>{row.output}</td>
-                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#93c5fd', fontFamily: 'monospace' }}>{row.complexity}</td>
-                                <td style={{ padding: '8px 10px', fontSize: '12px', color: '#a7f3d0' }}>{row.op}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '12px', color: '#fde68a', lineHeight: '1.65' }}>
-                        {selectedRoute.nfbtOptimization}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={{ padding: '28px', background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.22)', borderRadius: '22px' }}>
-                  <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '12px' }}>
-                    里程碑（原 AGI 终点）
-                  </div>
-                  <div style={{ fontSize: '18px', color: '#fff', fontWeight: 'bold', marginBottom: '12px' }}>{selectedRoute.milestoneTitle}</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px' }}>
-                    {mergedMilestoneStages.map((stage) => (
-                      <div key={stage.id || stage.name} style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', padding: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <div style={{ color: '#ecfdf5', fontWeight: 'bold', fontSize: '14px' }}>{stage.name}</div>
-                          <div style={{ fontSize: '10px', color: stage.status === 'done' ? '#10b981' : stage.status === 'in_progress' ? '#f59e0b' : '#60a5fa' }}>
-                            {String(stage.status || 'planned').toUpperCase()}
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: '8px' }}>
-                          <div style={{ fontSize: '11px', color: '#6ee7b7', marginBottom: '4px', fontWeight: 'bold' }}>功能点</div>
-                          {(stage.featurePoints || []).map((point, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: '8px', color: '#d1fae5', fontSize: '12px', marginBottom: '4px' }}>
-                              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', marginTop: '7px' }} />
-                              {point}
-                            </div>
-                          ))}
-                        </div>
-
-                        <div>
-                          <div style={{ fontSize: '11px', color: '#7dd3fc', marginBottom: '6px', fontWeight: 'bold' }}>测试记录</div>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-                            {(stage.tests || []).map((test, idx) => (
-                              <div key={idx} style={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '10px', background: 'rgba(0,0,0,0.25)' }}>
-                                <div style={{ color: '#fff', fontSize: '13px', fontWeight: 'bold', marginBottom: '6px' }}>{test.name}</div>
-                                <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.6' }}>
-                                  <div><span style={{ color: '#fcd34d' }}>参数配置：</span>{test.params || '-'}</div>
-                                  <div><span style={{ color: '#fcd34d' }}>数据集：</span>{test.dataset || '-'}</div>
-                                  <div><span style={{ color: '#fcd34d' }}>测试结果：</span>{test.result || '-'}</div>
-                                  <div><span style={{ color: '#fcd34d' }}>分析总结：</span>{test.summary || '-'}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {selectedRoute.milestonePlanEvaluation ? (
-                    <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px' }}>
-                      <div style={{ fontSize: '11px', color: '#6ee7b7', fontWeight: 'bold', marginBottom: '6px' }}>
-                        方案评估与修改建议
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#d1fae5', marginBottom: '8px', lineHeight: '1.65' }}>
-                        评估：{selectedRoute.milestonePlanEvaluation.assessment}
-                      </div>
-                      <div>
-                        {(selectedRoute.milestonePlanEvaluation.suggestions || []).map((item, idx) => (
-                          <div key={idx} style={{ fontSize: '12px', color: '#bae6fd', lineHeight: '1.6', marginBottom: '4px' }}>
-                            {idx + 1}. {item}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-
-                {selectedRoute?.id === 'fiber_bundle' ? (
-                  <div style={{ padding: '28px', background: 'rgba(59, 130, 246, 0.06)', border: '1px solid rgba(59, 130, 246, 0.22)', borderRadius: '22px' }}>
-                    <div style={{ fontSize: '12px', color: '#60a5fa', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '10px' }}>
-                      多模态纤维训练结果
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
-                      {[
-                        { id: 'vision_alignment', label: '视觉纤维训练' },
-                        { id: 'multimodal_connector', label: '视觉-语言联络训练' },
-                      ].map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => setMultimodalView(item.id)}
-                          style={{
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            borderRadius: '999px',
-                            cursor: 'pointer',
-                            padding: '6px 10px',
-                            fontSize: '11px',
-                            color: multimodalView === item.id ? '#dbeafe' : '#93c5fd',
-                            background: multimodalView === item.id ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.08)',
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {multimodalError ? (
-                      <div style={{ fontSize: '12px', color: '#fca5a5', lineHeight: '1.6' }}>
-                        加载失败：{multimodalError}
-                      </div>
-                    ) : null}
-
-                    {!multimodalError && !selectedMultimodalReport ? (
-                      <div style={{ fontSize: '12px', color: '#93c5fd' }}>
-                        暂无结果。先运行对应训练脚本后可在这里切换查看。
-                      </div>
-                    ) : null}
-
-                    {!multimodalError && selectedMultimodalReport ? (
-                      <div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(120px, 1fr))', gap: '10px', marginBottom: '12px' }}>
-                          {multimodalMetricRows.map((item) => (
-                            <div key={item.label} style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', background: 'rgba(0,0,0,0.2)', padding: '10px' }}>
-                              <div style={{ fontSize: '10px', color: '#93c5fd', marginBottom: '4px' }}>{item.label}</div>
-                              <div style={{ fontSize: '14px', color: '#e0f2fe', fontWeight: 'bold', fontFamily: 'monospace' }}>{item.value}</div>
-                            </div>
-                          ))}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.65' }}>
-                          <div><span style={{ color: '#93c5fd' }}>分析类型：</span>{selectedMultimodalData?.analysis_type || '-'}</div>
-                          <div><span style={{ color: '#93c5fd' }}>数据集：</span>{selectedMultimodalReport?.meta?.dataset || selectedMultimodalReport?.config?.dataset || '-'}</div>
-                          <div><span style={{ color: '#93c5fd' }}>最新运行：</span>{selectedMultimodalLatest?.run_id || '-'}</div>
-                          <div><span style={{ color: '#93c5fd' }}>时间：</span>{selectedMultimodalLatest?.timestamp || '-'}</div>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            </div>
+            <ResearchProgressTab
+              selectedRoute={selectedRoute}
+              expandedFormulaIdx={expandedFormulaIdx}
+              setExpandedFormulaIdx={setExpandedFormulaIdx}
+              dnnAnalysisPlan={DNN_ANALYSIS_PLAN}
+              expandedEngPhase={expandedEngPhase}
+              setExpandedEngPhase={setExpandedEngPhase}
+              mergedMilestoneStages={mergedMilestoneStages}
+              multimodalView={multimodalView}
+              setMultimodalView={setMultimodalView}
+              multimodalError={multimodalError}
+              selectedMultimodalReport={selectedMultimodalReport}
+              selectedMultimodalData={selectedMultimodalData}
+              selectedMultimodalLatest={selectedMultimodalLatest}
+              multimodalMetricRows={multimodalMetricRows}
+            />
           )}
 
           {/* TAB: AGI System Status */}
           {activeTab === 'system' && (
-            <div style={{ animation: 'roadmapFade 0.5s ease-out' }}>
-              <BrainModel />
-              <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-                <h2 style={{ fontSize: '32px', fontWeight: '900', color: consciousField?.glow_color === 'amber' ? '#ffaa00' : '#10b981', margin: '20px 0 8px 0', transition: 'color 1s' }}>
-                  {consciousField ? '实时意识场 (Active Consciousness)' : '系统状态 (System Status)'}
-                </h2>
-                <p style={{ color: '#666', fontSize: '14px' }}>
-                  {consciousField
-                    ? `当前内稳态平衡: ${((consciousField.stability || 0) * 100).toFixed(1)}% | GWS 竞争强度: ${(consciousField.gws_intensity || 0).toFixed(2)}`
-                    : '基于 Project Genesis 协议的核心能力对齐报告'}
-                </p>
-                <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  {(systemRouteOptions.length > 0 ? systemRouteOptions : routeList).map((route) => (
-                    <button
-                      key={route.id}
-                      onClick={() => setSelectedRouteId(route.id)}
-                      style={{
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        background: selectedRouteId === route.id ? 'rgba(0, 210, 255, 0.2)' : 'rgba(255,255,255,0.03)',
-                        color: selectedRouteId === route.id ? '#67e8f9' : '#94a3b8',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        padding: '6px 10px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {route.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Real-time Conscious Metrics Bar */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px', animation: 'fadeIn 1s' }}>
-                {(activeSystemProfile?.metricCards || []).map((m, i) => (
-                  <div key={i} style={{ padding: '18px', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: `1px solid ${m.color}30`, textAlign: 'center' }}>
-                    <div style={{ fontSize: '10px', color: '#666', marginBottom: '6px', fontWeight: 'bold' }}>{m.label}</div>
-                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: m.color, marginBottom: '6px' }}>{m.value}</div>
-                    <div style={{ fontSize: '10px', color: '#9ca3af' }}>{m.brain_ability}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                <div style={{ background: 'rgba(0, 255, 136, 0.03)', border: '1px solid rgba(0, 255, 136, 0.15)', borderRadius: '32px', padding: '32px' }}>
-                  <div style={{ fontSize: '12px', color: '#00ff88', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <CheckCircle size={16} /> 已具备能。(Equipped)
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {statusData.capabilities.map((c, i) => (
-                      <div key={i} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px' }}>{c.name}</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '10px' }}>
-                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
-                            <div style={{ fontSize: '10px', color: '#86efac', marginBottom: '4px' }}>人脑能力</div>
-                            <div style={{ fontSize: '11px', color: '#dcfce7', lineHeight: '1.55' }}>{c.brain_ability || '-'}</div>
-                          </div>
-                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)' }}>
-                            <div style={{ fontSize: '10px', color: '#7dd3fc', marginBottom: '4px' }}>
-                              当前实现（{selectedRoute?.title || selectedRouteId}）
-                            </div>
-                            <div style={{ fontSize: '11px', color: '#e0f2fe', lineHeight: '1.55' }}>{getRouteImpl(c)}</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ background: 'rgba(255, 68, 68, 0.03)', border: '1px solid rgba(255, 68, 68, 0.15)', borderRadius: '32px', padding: '32px' }}>
-                  <div style={{ fontSize: '12px', color: '#ff4444', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <X size={16} /> 研发。缺失 (Missing)
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {statusData?.missing_capabilities?.map((c, i) => (
-                      <div key={i} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', color: '#ff8888' }}>{c.name}</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '10px' }}>
-                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.22)' }}>
-                            <div style={{ fontSize: '10px', color: '#fca5a5', marginBottom: '4px' }}>人脑能力</div>
-                            <div style={{ fontSize: '11px', color: '#fee2e2', lineHeight: '1.55' }}>{c.brain_ability || '-'}</div>
-                          </div>
-                          <div style={{ padding: '8px 10px', borderRadius: '10px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.22)' }}>
-                            <div style={{ fontSize: '10px', color: '#fcd34d', marginBottom: '4px' }}>
-                              当前实现（{selectedRoute?.title || selectedRouteId}）
-                            </div>
-                            <div style={{ fontSize: '11px', color: '#fef3c7', lineHeight: '1.55' }}>{getRouteImpl(c)}</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* [NEW] Parameters and Tests Section */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '40px' }}>
-                {/* Parameters */}
-                <div style={{ background: 'rgba(0, 210, 255, 0.03)', border: '1px solid rgba(0, 210, 255, 0.15)', borderRadius: '32px', padding: '32px' }}>
-                  <div style={{ fontSize: '12px', color: '#00d2ff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Activity size={16} /> 核心参数 (Route Parameters)
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                    {(activeSystemProfile?.parameterCards || []).map((p, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setExpandedParam(expandedParam === i ? null : i)}
-                        style={{
-                          padding: '16px', background: 'rgba(0,0,0,0.3)', borderRadius: '16px',
-                          border: `1px solid ${expandedParam === i ? 'rgba(0, 210, 255, 0.5)' : 'rgba(0, 210, 255, 0.1)'}`,
-                          cursor: 'pointer', transition: 'all 0.3s',
-                          gridColumn: expandedParam === i ? 'span 2' : 'span 1' // Expand to full width if active
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <div style={{ fontSize: '10px', color: '#555' }}>{p.name}</div>
-                          {expandedParam === i ? <div style={{ fontSize: '10px', color: '#00d2ff' }}>SHMC CORE ▲</div> : null}
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#7dd3fc', marginBottom: '4px' }}>人脑能力：{p.brain_ability || '-'}</div>
-                        <div style={{ fontSize: '18px', fontWeight: '900', color: '#fff', fontFamily: 'monospace' }}>{p.route_param}</div>
-                        <div style={{ fontSize: '10px', color: '#00d2ff88', marginTop: '4px' }}>{p.detail}</div>
-
-                        {/* Expanded Content for Parameters */}
-                        {expandedParam === i && (
-                          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(0, 210, 255, 0.1)', paddingTop: '16px', animation: 'fadeIn 0.3s ease' }}>
-                            <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '10px', color: '#00d2ff', fontWeight: 'bold', marginBottom: '4px' }}>参数定义 (DEFINITION)</div>
-                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.desc}</div>
-                            </div>
-                            <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '10px', color: '#a855f7', fontWeight: 'bold', marginBottom: '4px' }}>数值价。(VALUE)</div>
-                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.value_meaning}</div>
-                            </div>
-                            <div>
-                              <div style={{ fontSize: '10px', color: '#f59e0b', fontWeight: 'bold', marginBottom: '4px' }}>核心重要。(WHY IMPORTANT)</div>
-                              <div style={{ fontSize: '12px', color: '#bbb', lineHeight: '1.6' }}>{p.why_important}</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ background: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.15)', borderRadius: '32px', padding: '32px' }}>
-                  <div style={{ fontSize: '12px', color: '#10b981', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Search size={16} /> 测试记录迁移
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#d1fae5', lineHeight: '1.7' }}>
-                    系统状态中的路线测试记录已整合到“研发进展 → 里程碑 → 路线测试记录”阶段。
-                  </div>
-                  <div style={{ marginTop: '10px', fontSize: '12px', color: '#86efac' }}>
-                    当前路线测试数：{(activeSystemProfile?.validationRecords || []).length}
-                  </div>
-                </div>
-              </div>
-
-            </div>
+            <SystemStatusTab
+              consciousField={consciousField}
+              systemRouteOptions={systemRouteOptions}
+              routeList={routeList}
+              setSelectedRouteId={setSelectedRouteId}
+              selectedRouteId={selectedRouteId}
+              activeSystemProfile={activeSystemProfile}
+              statusData={statusData}
+              selectedRoute={selectedRoute}
+              getRouteImpl={getRouteImpl}
+              expandedParam={expandedParam}
+              setExpandedParam={setExpandedParam}
+            />
           )}
-
         </div>
       </div>
     </div>
   );
 };
+
+
+
 
 
