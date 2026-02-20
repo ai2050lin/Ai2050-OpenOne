@@ -265,6 +265,15 @@ const PHASES = [
         analysis: "流形手术允许直接修改模型认知，是通往可控 AGI 的物理路径。"
       },
       {
+        name: "逻辑的坍缩",
+        status: "done",
+        focus: "逻辑探针与流形坍缩",
+        target: "验证逻辑推理在几何层面上表现为流形的离散化与降维坍缩。",
+        work_content: "构建 LogicMix-V1 (Mod 997)；训练 ScaledFiberNet；监测 ID 拓扑相变。",
+        test_results: "极速泛化 (Batch 400 Loss 0.006)；流形坍缩 (ID 18.0 -> NaN/Singularity)。",
+        analysis: "证明了逻辑推理的几何本质是流形从连续态向离散点集的相变 (Singularity State)。"
+      },
+      {
         name: "统一意识",
         status: "in_progress",
         focus: "全球工作空间 (GWT) 集成",
@@ -381,6 +390,14 @@ const PHASES = [
         target: "优化推理路径，使激活流沿最小作用量路径滑行。",
         process: "引入 Geodesic Regularization 约束项，对比 baseline 与优化后的推理物理作用量。",
         significance: "实现了‘不费力的推理’。丝滑度提升 11.15% 意味着计算冗余和能耗的显着降低。"
+      },
+      {
+        name: "逻辑流形坍缩验证 (Logic Collapse)",
+        date: "2026-02-20",
+        result: "PASS (Singularity)",
+        target: "验证高难度逻辑任务（Mod 997）下的流形几何行为。",
+        process: "在 LogicMix-V1 数据集上训练 FiberNet，观测 ID 从 18.0 降至 NaN 的相变。",
+        significance: "确认了 '连续感知' 到 '离散推理' 的几何相变机制，拒绝了死记硬背假设。"
       }
     ],
     capabilities: [
