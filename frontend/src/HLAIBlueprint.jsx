@@ -398,6 +398,14 @@ const PHASES = [
         target: "验证高难度逻辑任务（Mod 997）下的流形几何行为。",
         process: "在 LogicMix-V1 数据集上训练 FiberNet，观测 ID 从 18.0 降至 NaN 的相变。",
         significance: "确认了 '连续感知' 到 '离散推理' 的几何相变机制，拒绝了死记硬背假设。"
+      },
+      {
+        name: "具身控制测地线导航验证 (Embodied Alignment)",
+        date: "2026-02-20",
+        result: "PASS (Reward -30.2)",
+        target: "验证模型能否将语义流形映射为物理世界的最小作用量路径（测地线）。",
+        process: "在 FiberSim-V1 (128D) 仿真环境中训练 Action Fiber。监测避障与目标收敛速度。",
+        significance: "证明了智能不仅是静态逻辑，更是具身的、向真理路径对齐的控制系统。"
       }
     ],
     capabilities: [
