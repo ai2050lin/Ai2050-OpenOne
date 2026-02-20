@@ -839,26 +839,26 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
         theoryBullets: (theoryPhase?.theory_content || []).slice(0, 4).map((item) => item.title),
         theoryFormulas: [
           {
-            title: '神经纤维丛原。(NFB Principle)',
-            formula: '唯(x) = 蠁_M 鈯?蠁_F',
+            title: '神经纤维丛原理 (NFB Principle)',
+            formula: '\\phi(x) = \\mathcal{M} \\times \\mathcal{F}',
             detail:
-              '把智能状态拆成“逻辑骨架(底流。”和“知识内。纤维)”的张量积，逻辑稳定、内容可扩展。',
+              '把智能状态拆成“逻辑骨架 (底流形)”和“知识内容 (纤维)”的张量积，逻辑稳定、内容可扩展。',
           },
           {
             title: '全局工作空间 (Global Workspace)',
-            formula: '惟_G = 鈭i P_i d渭',
+            formula: '\\mathcal{W}_G = \\int w_i P_i d\\mu',
             detail:
               '将多模块竞争后的有效信息做全局聚合，形成当前时刻的统一意识场与决策上下文。',
           },
           {
             title: '高维全息编码 (SHDC Encoding)',
-            formula: '鉄╲_i, v_j鉄?鈮?未_ij',
+            formula: '\\|v_i, v_j\\| \\approx \\delta_{ij}',
             detail:
               '利用高维近似正交，让特征编码尽量互不干扰，从而支持高容量、低串扰的知识表示。',
           },
           {
-            title: '联络与推。(Connection Equation)',
-            formula: '鈭嘷X s = 0',
+            title: '联络与推理 (Connection Equation)',
+            formula: '\\nabla_X s = 0',
             detail:
               '将推理视为语义流形上的平行移动，约束语义在传输中保持一致，减少无关漂移。',
           },
