@@ -28,26 +28,21 @@ from debias_engine import GeometricInterceptor
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fiber_memory import FiberMemory
-from neurofiber_snn import NeuroFiberNetwork
 from pydantic import BaseModel
 from scipy.linalg import orthogonal_procrustes
-from sklearn.decomposition import PCA
 from structure_analyzer import (
     CausalMediation,
     CircuitDiscovery,
-    CompositionalAnalysis,
     FiberNetAnalyzer,
     LanguageValidity,
     ManifoldAnalysis,
     SparseAutoEncoder,
-    export_graph_to_json,
 )
 
 from experiments.surgery_hooks import ManifoldSurgeon
 
 # --- AGI Core Components ---
 from scripts.agi_core_engine import AGICoreEngine
-from scripts.global_topology_scanner import TopologyScanner
 from scripts.rlmf_manager import RLMFManager
 from server.api_v1_runs import create_runs_router
 from server.cross_bundle_service import cross_bundle_aligner
@@ -57,8 +52,10 @@ from server.rag_fiber_service import rag_fiber_manager
 from server.ricci_flow_service import ricci_flow_service
 from server.runtime.run_service import RunService
 from server.vision_service import vision_service
+from server.agi_chat_service import agi_chat_engine
 
 # --- Global Model State ---
+from server.mother_engine_service import mother_engine_service
 model = None
 surgeon = None 
 interceptor = None 
@@ -160,6 +157,13 @@ async def lifespan(app: FastAPI):
         except Exception as agi_err:
             print(f"[ERROR] Error initializing AGI Core: {agi_err}")
 
+        # 5. Start AGI Chat Engine Initialization (Async)
+        try:
+            agi_chat_engine.initialize_async()
+            print("[OK] AGI Chat Engine initialization started in background.")
+        except Exception as chat_err:
+            print(f"[ERROR] Error starting AGI Chat Engine: {chat_err}")
+
     yield
     # Shutdown logic
     print("Shutting down...")
@@ -170,6 +174,32 @@ run_service = RunService(
     model_provider=lambda: model,
 )
 app.include_router(create_runs_router(run_service))
+
+# --- AGI Chat Engine API ---
+
+class AGIChatRequest(BaseModel):
+    prompt: str
+    max_new_tokens: int = 20
+    mem_decay: float = 0.8
+
+@app.get("/api/agi_chat/status")
+async def get_agi_chat_status():
+    return {"is_ready": agi_chat_engine.is_ready, "status_msg": agi_chat_engine.status_msg}
+
+@app.post("/api/agi_chat/generate")
+async def generate_agi_chat(request: AGIChatRequest):
+    return agi_chat_engine.generate(request.prompt, request.max_new_tokens, request.mem_decay)
+
+@app.post("/api/agi_chat/reset")
+async def reset_agi_chat():
+    return agi_chat_engine.reset_memory()
+
+class WashRequest(BaseModel):
+    max_files: int = 1
+
+@app.post("/api/agi_chat/wash")
+async def start_agi_wash(request: WashRequest):
+    return agi_chat_engine.start_background_wash(request.max_files)
 
 # --- Fiber Memory API ---
 
@@ -1771,6 +1801,34 @@ async def get_multimodal_summary():
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/agi_chat/status")
+async def process_agi_chat_status():
+    # Assuming agi_chat_engine is imported
+    st = agi_chat_engine.get_status()
+    return {"status": "success", "engine_status": st}
+
+# ==============================================================================
+# 物理宇宙：Mother Engine (Phase XXX) 端点挂载
+# ==============================================================================
+class MotherEngineRequest(BaseModel):
+    prompt: str = "The artificial"
+    steps: int = 15
+
+@app.post("/api/mother-engine/generate")
+async def generate_from_mother_engine(req: MotherEngineRequest):
+    """
+    纯物理态的图谱势能冲刷推导
+    完全放弃矩阵乘加，只执行自然法则 4 计算流
+    """
+    try:
+        report = mother_engine_service.generate_energy_spikes(req.prompt, req.steps)
+        if "error" in report:
+             raise HTTPException(status_code=500, detail=report["error"])
+        return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5001)
+    # 修改日志级别，以避免过多干扰输出
+    uvicorn.run("server.server:app", host="0.0.0.0", port=5001, reload=True, log_level="warning")
