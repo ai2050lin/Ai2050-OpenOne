@@ -128,7 +128,7 @@ export const SystemStatusTab = ({
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
       <div style={{ background: 'rgba(0, 255, 136, 0.03)', border: '1px solid rgba(0, 255, 136, 0.15)', borderRadius: '32px', padding: '32px' }}>
         <div style={{ fontSize: '12px', color: '#00ff88', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '24px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <CheckCircle size={16} /> 已具备能。(Equipped)
+          <CheckCircle size={16} /> 已具备能力(Equipped)
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {statusData.capabilities.map((c, i) => (

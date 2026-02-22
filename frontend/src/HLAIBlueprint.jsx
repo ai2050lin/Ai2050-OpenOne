@@ -173,39 +173,45 @@ const PHASES = [
     title: "Dimension II: Analysis",
     subtitle: "深度神经网络 (Neural Network)",
     icon: <Search size={24} />,
-    status: "done",
-    progress: 100,
+    status: "in_progress",
+    progress: 88,
     color: "#a855f7",
     analysis_sections: [
       {
         title: "S0 不变量发现 (Invariant Discovery)",
-        content: "先不预设理论，而是在多模型/多任务/多规模中筛选‘稳定不变量’。重点追踪：对称性、拓扑特征、谱结构、几何低维坐标与尺度律参数，建立候选结构库并按稳定性排序。",
-        tags: ["Invariants", "Cross-Model", "Stability Ranking"]
+        content: "目标：在多模型/多任务/多规模中筛选稳定结构，不先预设结论。进度：已形成第一版候选库（19 个候选），稳定性评分约 0.84，训练阶段漂移可控。问题：跨架构与真实任务覆盖仍不足，不变量外推边界尚未封口。",
+        tags: ["Invariant Library", "Candidate=19", "Stability~0.84"]
       },
       {
         title: "S1 因果必要性验证 (Causal Necessity)",
-        content: "对候选结构做干预：删除、扰动、置换、重参数化保持。若能力显著退化且可复现，则标记为‘必要结构’；若仅相关不致因果变化，则降级或淘汰。",
-        tags: ["Intervention", "Necessity Test", "Causal Filters"]
+        content: "目标：把“相关”升级为“必要”，通过删除/扰动/置换/重参数化做反事实检验。进度：整层热核干预信号偏弱，但特征级干预出现稳定正向；特征级 uplift 显著高于整层（约 0.0646 vs 0.0166）。问题：整层证据仍不足，严格 holdout 下支持下限尚未稳定到 2。",
+        tags: ["Causal Probe", "Feature>Layer", "Strict Holdout"]
       },
       {
         title: "S2 最小生成模型 (Minimal Generator)",
-        content: "以最小描述长度 (MDL) 为目标，用最少公理重建关键行为。核心判据不是‘拟合最好’，而是‘解释最短且可复现最多现象’。",
-        tags: ["MDL", "Axiomatization", "Generative Structure"]
+        content: "目标：用最少自由度复现关键能力，验证“结构 -> 能力”链条。进度：最小重建阶段已达到 best_val_acc 约 0.8486，说明结构约束可保留主要行为。问题：跨任务泛化与跨模态联络项仍有缺口，尚未形成统一最小公理系统。",
+        tags: ["Minimal Rebuild", "best_val_acc=0.8486", "Structure->Ability"]
       },
       {
-        title: "S3/S4 跨层一致性与反证闭环",
-        content: "建立局部机制 (电路/算子) 与全局结构 (拓扑/RG/范畴映射) 的双向一致性。对所有核心结论保留反证通道，优先淘汰不可证伪或只在单场景成立的解释。",
-        tags: ["Cross-Scale Consistency", "Falsification", "Evidence First"]
+        title: "S3 跨层级一致性 (Cross-Scale Consistency)",
+        content: "目标：打通局部电路解释与全局几何解释。进度：流程可运行，规模化 tuned 配置在 2M/4M/6M 点位稳定收敛（多组 val_acc=1.0），说明“结构信号可放大”。问题：长上下文与真实数据域一致性仍需补证，避免 synthetic 偏乐观。",
+        tags: ["Cross-Scale Mapping", "Scaled Validation", "Tuned Stable"]
+      },
+      {
+        title: "S4 反证优先与结论收敛 (Falsification First)",
+        content: "目标：只保留可证伪、可复现结论。进度：strict holdout 已累计 40 轮，当前处于 near-support 稳定改进区间；v31+v32 六种子 support_models 均值约 1.6667，且 falsify_models_max=0。问题：support floor 仍为 1，尚未达到“所有新种子块稳定 >=2”的升级门槛。",
+        tags: ["40 Strict Runs", "support_avg=1.6667", "falsify_max=0"]
       }
     ],
     goals: [
-      "建立跨模型稳定不变量候选库并完成排序",
-      "完成候选结构的因果必要性验证闭环",
-      "构建最小生成模型并通过跨层级一致性检验"
+      "形成跨模型稳定不变量库，并明确可迁移边界",
+      "将因果证据从“特征级有效”推进到“严格门槛稳定通过”",
+      "把最小重建、规模化一致性与反证闭环合并为统一验证链"
     ],
     metrics: {
-      "Scan Resolution": "Microscopic",
-      "Layers Verified": "12/12"
+      "Invariant Candidates": "19",
+      "Strict Holdout Runs": "40",
+      "Current Verdict": "Near-Support (Pending Floor)"
     },
     comparison: [
       { feature: "信息载体 (Carrier)", dnn: "注意力矩。权重向量 (Attention/Weight)", fiber: "纤维束切。(Fiber Section/Vector Bundle)" },
@@ -588,6 +594,10 @@ const IMPROVEMENTS = [
     status: "done",
     objective: "在多模型、多任务、多规模设置下提取稳定结构，建立候选不变量库。",
     summary: "已形成第一版不变量库，并完成跨模型稳定性排序。",
+    issues: [
+      "跨架构覆盖仍偏窄，需引入更多非 Transformer 基座做一致性复验。",
+      "不变量稳定性在长上下文与复杂多模态任务上的外推证据仍不足。"
+    ],
     tests: [
       {
         id: "p1_t1",
@@ -640,9 +650,14 @@ const IMPROVEMENTS = [
   {
     id: "phase_2",
     title: "阶段2：因果必要性验证",
-    status: "done",
+    status: "in_progress",
     objective: "通过结构干预将相关性升级为可复现的因果结论。",
-    summary: "删除/扰动/置换/重参数化流程已跑通，非因果候选已批量剔除。",
+    summary: "删除/扰动/置换/重参数化流程已跑通；整层干预证据偏弱，但特征级干预已出现跨模型正向信号，阶段继续补证。",
+    issues: [
+      "整层热核干预的因果效应偏弱，尚不足以单独支撑强结论。",
+      "目前强信号集中在特征级子空间，仍需验证其跨任务稳定性与必要性边界。",
+      "严格 holdout 下支持覆盖仍有波动（support floor 未稳定到 2）。"
+    ],
     tests: [
       {
         id: "p2_t1",
@@ -684,6 +699,166 @@ const IMPROVEMENTS = [
             structure_preservation_score: 0.88
           }
         }
+      },
+      {
+        id: "p2_t3",
+        name: "几何干预单样本验证（GPT-2）",
+        testDate: "2026-02-20",
+        target: "验证在固定提示词下，几何干预是否可导致输出变化。",
+        params: {
+          script: "scripts/geometric_intervention_simple.py",
+          model: "gpt2",
+          intervention_type: "heat_kernel",
+          intervention_layer: 6,
+          reference_prompts: ["The capital of France is", "2 + 2 equals"],
+          generation_prompt: "The meaning of life is"
+        },
+        result: "干预后输出文本发生变化（single-case changed=1）。",
+        analysis: "在单样本场景已观察到结构干预 -> 行为变化，具备因果方向信号，但证据强度仍偏低。",
+        details: {
+          key_metrics: {
+            output_changed: 1.0,
+            layer6_mean_curvature: 527.8999,
+            layer6_pca_top3_variance: 0.9479
+          },
+          reports: [
+            "tempdata/geometric_intervention_results.json"
+          ],
+          timeline_analysis_type: "causal_intervention"
+        }
+      },
+      {
+        id: "p2_t4",
+        name: "几何干预批量验证（5 prompts + 随机对照）",
+        testDate: "2026-02-20",
+        target: "验证几何参考干预相对随机参考对照是否具有更强行为影响。",
+        params: {
+          script: "scripts/geometric_intervention_batch.py",
+          model: "gpt2",
+          intervention_type: "heat_kernel",
+          intervention_layer: 6,
+          alpha: 0.15,
+          total_prompts: 5,
+          control: "random_reference"
+        },
+        result: "treatment/control 均为 3/5（0.60），当前 uplift=0.00。",
+        analysis: "首轮对照未观察到几何参考的额外提升，说明当前证据强度不足；需扩展样本规模与层扫描后再做因果结论。",
+        details: {
+          key_metrics: {
+            total_prompts: 5,
+            treatment_changed_outputs: 3,
+            treatment_changed_rate: 0.6,
+            control_changed_outputs: 3,
+            control_changed_rate: 0.6,
+            causal_uplift: 0.0,
+            elapsed_seconds: 7.39
+          },
+          reports: [
+            "tempdata/geometric_intervention_batch_results_20260220.json"
+          ],
+          timeline_analysis_type: "causal_intervention_batch"
+        }
+      },
+      {
+        id: "p2_t5",
+        name: "几何干预多层扫描（n=60，L3/L6/L9）",
+        testDate: "2026-02-20",
+        target: "识别几何干预在不同层位上的因果敏感性差异。",
+        params: {
+          script: "scripts/geometric_intervention_batch.py",
+          model: "gpt2",
+          prompt_count: 60,
+          scanned_layers: [3, 6, 9],
+          controls: ["random_reference", "shuffled_reference"],
+          intervention_type: "heat_kernel"
+        },
+        result: "layer_3 对随机对照仅有微弱 uplift(+0.0167)，layer_6/layer_9 为 0。",
+        analysis: "当前层扫描未形成稳定正 uplift，说明 S1 因果证据仍不足；需扩大样本并做跨模型复验。",
+        details: {
+          key_metrics: {
+            layer3_treatment_rate: 0.4667,
+            layer3_control_random_rate: 0.45,
+            layer3_uplift_random: 0.0167,
+            layer6_uplift_random: 0.0,
+            layer9_uplift_random: 0.0
+          },
+          reports: [
+            "tempdata/geometric_intervention_batch_results_20260220_n60_l3.json",
+            "tempdata/geometric_intervention_batch_results_20260220_n60_l6.json",
+            "tempdata/geometric_intervention_batch_results_20260220_n60_l9.json",
+            "tempdata/geometric_intervention_layer_scan_20260220.json",
+            "tempdata/geometric_intervention_layer_scan_20260220.md"
+          ],
+          timeline_analysis_type: "causal_intervention_layer_scan"
+        }
+      },
+      {
+        id: "p2_t6",
+        name: "几何干预大样本矩阵（n=240，跨模型/跨强度）",
+        testDate: "2026-02-20",
+        target: "验证在更大样本下，几何参考干预是否稳定优于随机/置换对照，并检查跨模型一致性。",
+        params: {
+          script: "scripts/geometric_intervention_batch.py",
+          matrix: [
+            { model: "gpt2", layer: 3, alpha: 0.15, n: 240 },
+            { model: "gpt2", layer: 3, alpha: 0.35, n: 240 },
+            { model: "distilgpt2", layer: 3, alpha: 0.15, n: 240 },
+            { model: "distilgpt2", layer: 3, alpha: 0.35, n: 240 }
+          ],
+          controls: ["random_reference", "shuffled_reference"],
+          metric: "output_changed_rate + two_proportion_pvalue"
+        },
+        result: "4 组实验均未达到显著 uplift（最大 +0.0166，最小 p=0.6937）。",
+        analysis: "S1 目前仍是弱信号/无信号状态；下一步应从“整层平滑干预”转向“特征级选择性干预 + 任务指标变化”来提高因果分辨率。",
+        details: {
+          key_metrics: {
+            runs: 4,
+            prompt_count_each: 240,
+            avg_uplift_random: 0.0021,
+            max_uplift_random: 0.0166,
+            min_pvalue_random: 0.69366
+          },
+          reports: [
+            "tempdata/geometric_intervention_batch_results_20260220_gpt2_n240_l3_a0.15.json",
+            "tempdata/geometric_intervention_batch_results_20260220_gpt2_n240_l3_a0.35.json",
+            "tempdata/geometric_intervention_batch_results_20260220_distilgpt2_n240_l3_a0.15.json",
+            "tempdata/geometric_intervention_batch_results_20260220_distilgpt2_n240_l3_a0.35.json",
+            "tempdata/geometric_intervention_large_scale_matrix_20260220.json",
+            "tempdata/geometric_intervention_large_scale_matrix_20260220.md"
+          ],
+          timeline_analysis_type: "causal_intervention_batch_large_scale"
+        }
+      },
+      {
+        id: "p2_t7",
+        name: "特征级干预探针（n=240，前向指标）",
+        testDate: "2026-02-20",
+        target: "验证 top-k 特征选择性干预是否比随机特征对照产生更强行为偏移。",
+        params: {
+          script: "scripts/feature_selective_intervention_probe.py",
+          models: ["gpt2", "distilgpt2"],
+          layer: 3,
+          top_k_features: 32,
+          alpha: 0.35,
+          metric: ["top1_change_rate", "kl_uplift"],
+          control: "random_feature_set"
+        },
+        result: "两模型均出现正向 uplift：gpt2(top1 +0.0542, kl +0.075862)，distilgpt2(top1 +0.0750, kl +0.065312)。",
+        analysis: "与整层热核平滑相比，特征级干预显著提升因果分辨率，说明“特定子空间”比“整层整体”更接近候选必要结构。",
+        details: {
+          key_metrics: {
+            avg_top1_uplift: 0.0646,
+            avg_kl_uplift: 0.070587,
+            models_count: 2
+          },
+          reports: [
+            "tempdata/feature_selective_probe_20260220_gpt2_n240_l3_k32_a0.35.json",
+            "tempdata/feature_selective_probe_20260220_distilgpt2_n240_l3_k32_a0.35.json",
+            "tempdata/feature_selective_probe_matrix_20260220.json",
+            "tempdata/feature_selective_probe_matrix_20260220.md"
+          ],
+          timeline_analysis_type: "causal_intervention_feature_probe"
+        }
       }
     ]
   },
@@ -693,6 +868,10 @@ const IMPROVEMENTS = [
     status: "in_progress",
     objective: "用最少公理和最低自由度重建关键能力，验证“结构 -> 能力”的生成链条。",
     summary: "最小结构模型已启动，部分任务达到基线 80% 以上表现。",
+    issues: [
+      "最小模型在跨任务泛化上仍存在性能缺口，尚未达到全面替代基线。",
+      "跨模态联络项仍是主要瓶颈，结构约束与表达能力需要进一步平衡。"
+    ],
     tests: [
       {
         id: "p3_t1",
@@ -744,6 +923,11 @@ const IMPROVEMENTS = [
     status: "in_progress",
     objective: "建立局部回路解释与全局几何/拓扑解释的一致性映射。",
     summary: "一致性验证流程已可运行，跨任务稳定性还在补充样本。",
+    issues: [
+      "长上下文任务下局部-全局解释一致性仍有偏差。",
+      "尺度律的一致性样本点仍需继续扩展，避免分段相变误判。",
+      "真实数据域证据仍少于 synthetic 证据，外推风险需要收敛。"
+    ],
     tests: [
       {
         id: "p4_t1",
@@ -784,6 +968,139 @@ const IMPROVEMENTS = [
           },
           report: "tempdata/scaling_validation_report.md"
         }
+      },
+      {
+        id: "p4_t3",
+        name: "大规模压力测试（2M/3M）",
+        testDate: "2026-02-20",
+        target: "验证 m_8.5m 在 2M/3M 数据规模下的稳定扩展表现。",
+        params: {
+          script: "scripts/scaling_validation_matrix.py",
+          model_filter: "m_8.5m",
+          custom_data_sizes: [2000000, 3000000],
+          epochs: 12,
+          lr: 0.001,
+          weight_decay: 0.1,
+          warmup_ratio: 0.0,
+          device: "cuda"
+        },
+        result: "2M/3M 两个点 best_val_acc 均约 0.0089，接近随机水平。",
+        analysis: "在默认优化参数下，大模型在该任务出现训练失效，需做超参诊断而非直接否定结构路线。",
+        details: {
+          key_metrics: {
+            d2000k_best_val_acc: 0.0089,
+            d3000k_best_val_acc: 0.0089,
+            avg_samples_per_second: 6127.8
+          },
+          reports: [
+            "tempdata/scaling_validation_report_m85_2m_3m_20260220.json",
+            "tempdata/scaling_validation_report_m85_2m_3m_20260220.md"
+          ],
+          timeline_analysis_type: "scaling_validation"
+        }
+      },
+      {
+        id: "p4_t4",
+        name: "超参诊断对照（2M tuned）",
+        testDate: "2026-02-20",
+        target: "验证大规模低分是否由优化超参导致。",
+        params: {
+          script: "scripts/scaling_validation_matrix.py",
+          model_filter: "m_8.5m",
+          custom_data_sizes: [2000000],
+          epochs: 20,
+          lr: 0.0003,
+          weight_decay: 0.01,
+          warmup_ratio: 0.03,
+          min_lr_scale: 0.1,
+          device: "cuda"
+        },
+        result: "同规模条件下 best_val_acc=1.0000，最终 val_acc=1.0000。",
+        analysis: "确认主要瓶颈是优化配置而非模型结构；后续应将大规模默认配置切换到 tuned 区间。",
+        details: {
+          key_metrics: {
+            d2000k_best_val_acc: 1.0,
+            d2000k_final_val_acc: 1.0,
+            samples_per_second: 6164.65
+          },
+          reports: [
+            "tempdata/scaling_validation_report_m85_2m_tuned_20260220.json",
+            "tempdata/scaling_validation_report_m85_2m_tuned_20260220.md"
+          ],
+          timeline_analysis_type: "scaling_validation"
+        }
+      },
+      {
+        id: "p4_t5",
+        name: "3-seed 复现稳定性验证（2M tuned）",
+        testDate: "2026-02-20",
+        target: "验证 tuned 参数在大规模点位下是否具备多种子稳定性。",
+        params: {
+          script: "scripts/scaling_validation_matrix.py",
+          model_filter: "m_8.5m",
+          custom_data_sizes: [2000000],
+          seeds: [10001, 20002, 30003],
+          epochs: 20,
+          lr: 0.0003,
+          weight_decay: 0.01,
+          warmup_ratio: 0.03,
+          min_lr_scale: 0.1,
+          device: "cuda"
+        },
+        result: "三次运行 best/final val_acc 全部为 1.0000，复现稳定。",
+        analysis: "确认 tuned 区间具备高稳定性；下一步可扩展到 4M/6M 并保持相同验证流程。",
+        details: {
+          key_metrics: {
+            best_val_acc_mean: 1.0,
+            best_val_acc_std: 0.0,
+            final_val_acc_mean: 1.0,
+            final_val_acc_std: 0.0
+          },
+          reports: [
+            "tempdata/scaling_validation_report_m85_2m_tuned_seed10001_20260220.json",
+            "tempdata/scaling_validation_report_m85_2m_tuned_seed20002_20260220.json",
+            "tempdata/scaling_validation_report_m85_2m_tuned_seed30003_20260220.json",
+            "tempdata/scaling_validation_m85_2m_tuned_multiseed_20260220.json",
+            "tempdata/scaling_validation_m85_2m_tuned_multiseed_20260220.md",
+            "tempdata/scaling_validation_m85_2m_tuned_multiseed_summary_20260220.json"
+          ],
+          timeline_analysis_type: "scaling_validation_multiseed"
+        }
+      },
+      {
+        id: "p4_t6",
+        name: "扩展点位验证（4M/6M tuned）",
+        testDate: "2026-02-20",
+        target: "在更大训练规模点位上验证 tuned 配置的可扩展稳定性。",
+        params: {
+          script: "scripts/scaling_validation_matrix.py",
+          model_filter: "m_8.5m",
+          custom_data_sizes: [4000000, 6000000],
+          epochs: 12,
+          lr: 0.0003,
+          weight_decay: 0.01,
+          warmup_ratio: 0.03,
+          min_lr_scale: 0.1,
+          seed: 42024,
+          device: "cuda"
+        },
+        result: "d_4000k 与 d_6000k 两点均达到 best/final val_acc=1.0000。",
+        analysis: "tuned 配置在 4M/6M 继续稳定，支持将下一阶段重心转向 S1 因果干预与 S3 一致性补证。",
+        details: {
+          key_metrics: {
+            d4000k_best_val_acc: 1.0,
+            d6000k_best_val_acc: 1.0,
+            samples_per_second_d4000k: 5959.57,
+            samples_per_second_d6000k: 5443.99
+          },
+          reports: [
+            "tempdata/scaling_validation_report_m85_4m_6m_tuned_20260220.json",
+            "tempdata/scaling_validation_report_m85_4m_6m_tuned_20260220.md",
+            "tempdata/scaling_validation_m85_4m_6m_tuned_summary_20260220.json",
+            "tempdata/scaling_validation_m85_4m_6m_tuned_summary_20260220.md"
+          ],
+          timeline_analysis_type: "scaling_validation"
+        }
       }
     ]
   },
@@ -793,6 +1110,10 @@ const IMPROVEMENTS = [
     status: "in_progress",
     objective: "对核心假设持续做反证干预，只保留可证伪且可复现的结论。",
     summary: "已建立反证任务池并开始运行，结论清单正在收敛。",
+    issues: [
+      "跨数据域、跨模型的反证覆盖仍不均衡，结论边界尚未完全封口。",
+      "失败归因中跨模态联络漂移与记忆冲突占比高，需进入专项修复。"
+    ],
     tests: [
       {
         id: "p5_t1",
@@ -878,43 +1199,146 @@ const DNN_ANALYSIS_PLAN = {
 };
 
 const EVIDENCE_DRIVEN_PLAN = {
-  title: '证据驱动结构发现方案',
+  title: '研究方案',
   core: '核心：主线先产出，验证层保真，前沿层找突破；方法服从证据强度，不由学科标签决定。',
+  overview: [
+    '研究对象：深度神经网络中可复现、可干预、可重建的数学结构。',
+    '研究路径：不变量发现 -> 因果筛选 -> 最小重建 -> 跨层一致性 -> 反证收敛。',
+    '研究判据：结论必须可重复、可证伪，并能进入统一时间线。',
+  ],
   phases: [
     {
       id: 'S0',
       name: '不变量发现',
-      desc: '跨模型/任务/规模筛选稳定不变量，形成候选结构库。'
+      desc: '跨模型/任务/规模筛选稳定不变量，形成候选结构库。',
+      goal: '找到跨架构仍稳定存在的结构信号，建立候选结构池。',
+      method: '多模型多任务对齐分析 + 统计稳定性筛选 + 噪声鲁棒性评估。',
+      evidence: '候选在不同 seed、任务、规模下保持方向一致且显著。',
+      outputs: '候选结构库 JSON、稳定性排名、失效样本清单。',
+      gate: '至少 5 个候选结构在 >=3 类模型上稳定复现。',
     },
     {
       id: 'S1',
       name: '因果必要性验证',
-      desc: '通过结构干预验证“是否必要”，将相关性结论升级为因果结论。'
+      desc: '通过结构干预验证“是否必要”，将相关性结论升级为因果结论。',
+      goal: '确认哪些结构是能力形成的必要条件，而非伴随相关。',
+      method: '特征级干预、路径阻断、对照实验、反事实比较。',
+      evidence: '干预目标结构后任务性能显著下降，且对照组无同等变化。',
+      outputs: '必要结构白名单、无效候选淘汰列表、因果证据包。',
+      gate: '主任务出现稳定退化且可重复，效应方向一致。',
     },
     {
       id: 'S2',
       name: '最小生成模型',
-      desc: '以 MDL 为约束，用最少公理重建关键能力。'
+      desc: '以 MDL 为约束，用最少公理重建关键能力。',
+      goal: '以更低复杂度复现关键能力，验证“结构决定能力”的可构造性。',
+      method: '最小公理化建模 + 结构先验注入 + 压缩-性能联合评估。',
+      evidence: '在明显压缩条件下保持关键能力，不依赖原始大模型冗余。',
+      outputs: '最小结构模型、复杂度对照报告、重建误差分析。',
+      gate: '以更低参数/自由度达到可接受性能阈值。',
     },
     {
       id: 'S3',
       name: '跨层级一致性',
-      desc: '建立局部机制与全局结构的双向映射，确保解释一致。'
+      desc: '建立局部机制与全局结构的双向映射，确保解释一致。',
+      goal: '打通局部神经机制与全局数学结构的统一解释链。',
+      method: '局部子回路解释 + 全局几何/拓扑映射 + 多任务一致性评估。',
+      evidence: '局部解释与全局解释在方向、结论、预测上不冲突。',
+      outputs: '跨层映射图谱、统一解释文档、冲突项修正记录。',
+      gate: '关键任务上局部-全局结论一致，冲突率降到可控阈值。',
     },
     {
       id: 'S4',
       name: '反证优先收敛',
-      desc: '优先淘汰不可证伪假设，沉淀可复现且可反驳的结论。'
+      desc: '优先淘汰不可证伪假设，沉淀可复现且可反驳的结论。',
+      goal: '建立可证伪结论集，避免“不可验证理论”的路径依赖。',
+      method: '强对照反证、跨域复验、失败边界测试、负结果入库。',
+      evidence: '结论在新数据和新模型下仍成立，或明确给出失效边界。',
+      outputs: '可证伪结论集、失败边界手册、后续优先级建议。',
+      gate: '保留结论都具备可复验流程与明确反证条件。',
+    },
+  ],
+};
+
+const EXECUTION_PLAYBOOK = {
+  title: '执行版方案（S0-S4）',
+  subtitle: '目标、准出标准与证据产物统一化，确保每阶段都可复现、可证伪、可入时间线。',
+  principles: [
+    '证据优先：结论必须来自可复现实验',
+    '因果优先：相关性不直接升格为结构结论',
+    '反证优先：优先淘汰错误结构',
+    '跨尺度一致：局部机制与全局结构必须可映射',
+  ],
+  stageChecklist: [
+    {
+      stage: 'S0',
+      objective: '跨模型发现稳定不变量',
+      exitCriteria: '>=5 个候选结构在 >=3 类模型稳定复现',
+      outputs: '候选库 JSON + 稳定性排序报告',
+    },
+    {
+      stage: 'S1',
+      objective: '干预验证结构必要性',
+      exitCriteria: '干预导致显著且可复现退化；对照组无同等效应',
+      outputs: '必要结构清单 + 反事实证据包',
+    },
+    {
+      stage: 'S2',
+      objective: '最小结构复现关键能力',
+      exitCriteria: '压缩复杂度下保持 >=80% 基线性能',
+      outputs: '最小生成模型定义 + 复现实验 JSON',
+    },
+    {
+      stage: 'S3',
+      objective: '局部-全局解释一致性',
+      exitCriteria: '关键区重合度 >0.7，结构指标与能力增益稳定相关',
+      outputs: '跨层映射表 + 一致性偏差分析',
+    },
+    {
+      stage: 'S4',
+      objective: '反证收敛与结论固化',
+      exitCriteria: '核心结论通过反证筛查并明确失效边界',
+      outputs: '可保留结论清单 + 失效模式档案',
+    },
+  ],
+  sprintPlan: {
+    week1: [
+      '固化大规模 tuned 参数模板（m_8.5m）',
+      '执行 3-seed 重复试验验证稳定性',
+      '批量化 S1 干预实验（删除/扰动/置换）',
+    ],
+    week2: [
+      '建立 S3 局部-全局一致性基线',
+      '完成 S4 反证任务池最小版本',
+      '输出“可保留结论 + 失效边界”首版',
+    ],
+  },
+  riskStopLoss: [
+    {
+      risk: '计算失控',
+      signal: '耗时/显存超阈值',
+      action: '降维采样 + 局部估计 + 子任务拆分',
+    },
+    {
+      risk: '结论漂移',
+      signal: '不同 seed 方向相反',
+      action: '暂停结论发布，先补重复试验',
+    },
+    {
+      risk: '解释断裂',
+      signal: '局部解释与全局解释冲突',
+      action: '标记未收敛，回退 S0/S1',
     },
   ],
 };
 
 const MATH_ROUTE_SYSTEM_PLAN = {
-  title: '数学路线系统方案',
+  title: '数学路线',
   subtitle: '多路线分层组合：主线产出 + 验证保真 + 前沿突破',
   routeAnalysis: [
     {
       route: '流形几何',
+      routeSummary: '把智能看作高维流形上的几何结构学习，核心是学到可泛化的“语义形状”和稳定测地路径。',
       depth: '⭐⭐⭐⭐',
       compute: '⭐⭐⭐',
       interpret: '⭐⭐⭐⭐',
@@ -931,6 +1355,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '代数拓扑',
+      routeSummary: '把智能看作跨任务不变量的保持，核心是提取在扰动下仍稳定的全局结构并作为能力骨架。',
       depth: '⭐⭐⭐⭐⭐',
       compute: '⭐⭐',
       interpret: '⭐⭐⭐',
@@ -947,6 +1372,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '动力系统',
+      routeSummary: '把智能看作状态演化与吸引子组织，核心是形成可控、可切换、可稳定收敛的认知动力学。',
       depth: '⭐⭐⭐⭐',
       compute: '⭐⭐⭐',
       interpret: '⭐⭐⭐⭐',
@@ -963,6 +1389,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '信息瓶颈',
+      routeSummary: '把智能看作压缩与预测的最优平衡，核心是在最小信息代价下保留对任务最关键的因果特征。',
       depth: '⭐⭐⭐⭐',
       compute: '⭐⭐⭐',
       interpret: '⭐⭐⭐⭐',
@@ -979,6 +1406,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '张量分解',
+      routeSummary: '把智能看作可组合的低秩模块，核心是把复杂能力拆解为可复用、可重组的结构部件。',
       depth: '⭐⭐⭐',
       compute: '⭐⭐⭐⭐⭐',
       interpret: '⭐⭐⭐⭐',
@@ -995,6 +1423,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '范畴论',
+      routeSummary: '把智能看作跨模块映射与组合律，核心是建立统一的“对象-态射”体系以实现可迁移的系统级组合。',
       depth: '⭐⭐⭐⭐⭐',
       compute: '⭐',
       interpret: '⭐⭐',
@@ -1011,6 +1440,7 @@ const MATH_ROUTE_SYSTEM_PLAN = {
     },
     {
       route: '统计物理/重整化群',
+      routeSummary: '把智能看作多尺度涌现过程，核心是通过粗粒化与尺度变换揭示从局部特征到全局能力的生成机制。',
       depth: '⭐⭐⭐⭐',
       compute: '⭐⭐⭐',
       interpret: '⭐⭐⭐',
@@ -2094,6 +2524,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
               roadmapData={roadmapData}
               analysisPhase={analysisPhase}
               evidenceDrivenPlan={EVIDENCE_DRIVEN_PLAN}
+              executionPlaybook={EXECUTION_PLAYBOOK}
               mathRouteSystemPlan={MATH_ROUTE_SYSTEM_PLAN}
               improvements={IMPROVEMENTS}
               expandedImprovementPhase={expandedImprovementPhase}

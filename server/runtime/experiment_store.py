@@ -48,9 +48,15 @@ class ExperimentTimelineStore:
         self,
         path: str = DEFAULT_TIMELINE_PATH,
         max_tests_per_route: int = 500,
+        max_tests_per_analysis_type: Optional[Dict[str, int]] = None,
     ) -> None:
         self.path = path
         self.max_tests_per_route = max_tests_per_route
+        # Retain high-frequency runtime signals separately to avoid crowding out
+        # research-grade experiment records (e.g., scaling/causal tests).
+        self.max_tests_per_analysis_type = max_tests_per_analysis_type or {
+            "unified_conscious_field": 200
+        }
         self._lock = threading.Lock()
         self._ensure_file()
 
@@ -243,6 +249,53 @@ class ExperimentTimelineStore:
             "top_failure_reasons": top_failure_reasons,
         }
 
+    def _apply_retention_policy(self, tests: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Apply route-level and analysis-type-level retention in ascending time order."""
+        if not tests:
+            return tests
+
+        tests = sorted(tests, key=lambda t: _safe_float(t.get("created_at"), 0.0))
+
+        type_limits = self.max_tests_per_analysis_type or {}
+        if type_limits:
+            keep_run_ids = set()
+            grouped: Dict[str, List[Dict[str, Any]]] = {}
+            for test in tests:
+                analysis_type = _safe_text(test.get("analysis_type"))
+                grouped.setdefault(analysis_type, []).append(test)
+
+            for analysis_type, limit in type_limits.items():
+                safe_limit = int(limit) if limit is not None else 0
+                if safe_limit <= 0:
+                    continue
+                for item in grouped.get(analysis_type, [])[-safe_limit:]:
+                    run_id = _safe_text(item.get("run_id"))
+                    if run_id:
+                        keep_run_ids.add(run_id)
+
+            filtered: List[Dict[str, Any]] = []
+            for test in tests:
+                analysis_type = _safe_text(test.get("analysis_type"))
+                if analysis_type in type_limits:
+                    if _safe_text(test.get("run_id")) in keep_run_ids:
+                        filtered.append(test)
+                else:
+                    filtered.append(test)
+            tests = filtered
+
+        if len(tests) <= self.max_tests_per_route:
+            return tests
+
+        high_volume_types = set(type_limits.keys())
+        non_high = [t for t in tests if _safe_text(t.get("analysis_type")) not in high_volume_types]
+        high = [t for t in tests if _safe_text(t.get("analysis_type")) in high_volume_types]
+
+        if len(non_high) >= self.max_tests_per_route:
+            return non_high[-self.max_tests_per_route :]
+
+        remaining = self.max_tests_per_route - len(non_high)
+        return non_high + high[-remaining:]
+
     def append_run(self, run_record: Any) -> Dict[str, Any]:
         record_dict = _model_to_dict(run_record)
         spec = record_dict.get("spec") or {}
@@ -260,9 +313,7 @@ class ExperimentTimelineStore:
 
             tests = [t for t in tests if t.get("run_id") != entry["run_id"]]
             tests.append(entry)
-            tests.sort(key=lambda t: _safe_float(t.get("created_at"), 0.0))
-            if len(tests) > self.max_tests_per_route:
-                tests = tests[-self.max_tests_per_route :]
+            tests = self._apply_retention_policy(tests)
 
             route_bucket["tests"] = tests
             route_bucket["latest_test_id"] = tests[-1]["test_id"] if tests else None

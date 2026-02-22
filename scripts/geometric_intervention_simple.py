@@ -188,7 +188,9 @@ def test_geometric_intervention():
     
     analysis = {}
     for layer_name, acts in all_activations.items():
-        combined = torch.cat(acts, dim=0)
+        # 不同 prompt 的序列长度可能不同，先展开到 token 维再拼接
+        token_blocks = [act.reshape(-1, act.size(-1)) for act in acts]
+        combined = torch.cat(token_blocks, dim=0).unsqueeze(0)  # (1, total_tokens, hidden)
         curvature = curvature_analyzer.compute_curvature(combined)
         
         # PCA
@@ -212,8 +214,11 @@ def test_geometric_intervention():
     print("\n[4] 测试热核扩散...")
     
     if "layer_6" in all_activations:
-        reference = torch.cat(all_activations["layer_6"], dim=0)
-        flat_ref = reference.reshape(-1, reference.size(-1))[:50]
+        reference_tokens = torch.cat(
+            [act.reshape(-1, act.size(-1)) for act in all_activations["layer_6"]],
+            dim=0,
+        )
+        flat_ref = reference_tokens[:50]
         
         test_act = all_activations["layer_6"][0]
         diffused = heat_diffuser.diffuse(test_act, flat_ref)
