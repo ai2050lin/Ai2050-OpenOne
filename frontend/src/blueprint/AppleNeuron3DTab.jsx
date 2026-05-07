@@ -2,6 +2,7 @@ import { Html, Line, OrbitControls, PerspectiveCamera, Text } from '@react-three
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Activity, ArrowRightLeft, BarChart2, Brain, CheckCircle, GitBranch, Network, Scale, Search, Sparkles, Target } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { ANIMATION_SCENARIOS, DIMENSION_VIEWS } from '../config/panels';
 import { AUDIT_3D_FOCUS_EVENT, readPersistedAudit3DFocus } from './audit3dBridge';
 import LanguageResearchControlPanel from '../components/LanguageResearchControlPanel';
 import { LAYER_PARAMETER_STATE_ORDER, LAYER_PARAMETER_STATE_OVERLAY } from './data/layer_parameter_state_overlay_persisted_v1';
@@ -4063,6 +4064,11 @@ export function AppleNeuronSceneContent({
   onBasicStart = () => {},
   onBasicStop = () => {},
   onBasicReplay = () => {},
+  showDNNLayers = true,
+  visibleComponents = ['attention', 'ffn', 'layer_norm'],
+  animProgress = 1,
+  activeScenario = null,
+  activeSubView = null,
 }) {
   const activationMap = prediction?.activationMap || {};
   const focusNodeIds = prediction?.focusNodeIds || [];
@@ -4104,8 +4110,10 @@ export function AppleNeuronSceneContent({
       && (showAlgorithmConceptCore || !(node.nodeGroup === 'concept_core' || String(node.id || '').startsWith('apple-core-')))
       && (showAlgorithmStaticEncoding || !['style', 'logic', 'syntax'].includes(node.role))
       && isNodeVisibleByDisplayLevels(node, displayLevels)
+      && (showDNNLayers || !['query', 'route', 'unifiedDecode', 'style', 'logic', 'syntax', 'background'].includes(node.role))
+      && (visibleComponents.includes(node.role) || !['attention', 'ffn', 'layer_norm', 'residual'].includes(node.role))
     )),
-    [combinedNodeEmphasis, displayLevels, nodes, showAlgorithmConceptCore, showAlgorithmStaticEncoding]
+    [combinedNodeEmphasis, displayLevels, nodes, showAlgorithmConceptCore, showAlgorithmStaticEncoding, showDNNLayers, visibleComponents]
   );
   const visibleNodeIdSet = useMemo(() => new Set(visibleNodes.map((n) => n.id)), [visibleNodes]);
   const visibleLinks = useMemo(
@@ -4227,8 +4235,75 @@ export function AppleNeuronSceneContent({
           scanMechanismData={scanMechanismData}
         />
       ) : null}
+
       {showAdvancedOverlays ? <TokenPredictionCarrier prediction={prediction} mode={mode} /> : null}
       {showAdvancedOverlays ? <LayerEffectiveNeuronOverlay prediction={prediction} mode={mode} /> : null}
+
+      {/* 动画场景进度叠加 (始终显示，不依赖 showAdvancedOverlays) */}
+      {activeScenario && ANIMATION_SCENARIOS[activeScenario] && (() => {
+        const scenario = ANIMATION_SCENARIOS[activeScenario];
+        const phase = scenario.phases.find(p => animProgress >= p.start && animProgress < p.end) || scenario.phases[scenario.phases.length - 1];
+        if (!phase) return null;
+        const layerMin = phase.layerRange[0];
+        const layerMax = phase.layerRange[1];
+        // 过滤在该层范围内的节点
+        const highlightNodes = visibleNodes.filter(n => {
+          const layer = n.layer ?? n.position?.[1];
+          return layer !== undefined && layer >= layerMin && layer <= layerMax;
+        });
+        return (
+          <group>
+            <Text
+              position={[0, 12, 0]}
+              fontSize={0.8}
+              color={modeStyle.accent}
+              anchorX="center"
+              anchorY="middle"
+            >
+              {scenario.icon} {phase.label} (L{layerMin}-L{layerMax})
+            </Text>
+            {highlightNodes.slice(0, 60).map(node => (
+              <mesh key={`anim-hl-${node.id}`} position={node.position}>
+                <ringGeometry args={[0.55, 0.7, 24]} />
+                <meshBasicMaterial color={modeStyle.accent} transparent opacity={0.35} side={2} />
+              </mesh>
+            ))}
+            {/* 进度条可视化 */}
+            <group position={[-8, 11, 0]}>
+              <mesh>
+                <boxGeometry args={[16, 0.15, 0.05]} />
+                <meshBasicMaterial color="#333" transparent opacity={0.5} />
+              </mesh>
+              <mesh position={[animProgress * 8 - 8, 0, 0.01]}>
+                <boxGeometry args={[16 * animProgress, 0.15, 0.05]} />
+                <meshBasicMaterial color={modeStyle.accent} transparent opacity={0.8} />
+              </mesh>
+              {/* 阶段分段线 */}
+              {scenario.phases.map((p, i) => (
+                <mesh key={`phase-line-${i}`} position={[p.end * 16 - 8, 0, 0.02]}>
+                  <boxGeometry args={[0.03, 0.25, 0.05]} />
+                  <meshBasicMaterial color="#888" transparent opacity={0.6} />
+                </mesh>
+              ))}
+            </group>
+          </group>
+        );
+      })()}
+
+      {/* 维度视角标签叠加 (始终显示) */}
+      {activeDimension && DIMENSION_VIEWS[activeDimension] && !activeScenario && (
+        <Text
+          position={[0, 13, 0]}
+          fontSize={0.6}
+          color={DIMENSION_VIEWS[activeDimension].color}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {DIMENSION_VIEWS[activeDimension].icon} {DIMENSION_VIEWS[activeDimension].label}
+          {activeSubView && ` → ${DIMENSION_VIEWS[activeDimension].subViews[activeSubView]?.label || ''}`}
+        </Text>
+      )}
+
       {shouldRenderParameterStateOverlay ? (
         <LayerParameterStateOverlay
           languageFocus={languageFocus}

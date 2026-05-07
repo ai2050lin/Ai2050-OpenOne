@@ -14626,6 +14626,265 @@ KN=#3b82f6, LG=#f59e0b, GR=#10b981, MG=#a855f7, SE=#ef4444, WE=#6366f1, TD=#ec48
 ### 构建验证
 
 ✅ `vite build` 成功, 生成 `neural-vis-CwGEM6hG.js` (80KB)
+✅ 2026-05-04 22:05 重新构建验证通过, dev server运行正常, 页面预览已确认
+
+---
+
+## 主界面3D可视化 v3.0 修改 [2026-05-05 12:42]
+
+### 修改概要
+
+将neural-vis.html的维度/渲染器/动画三Tab设计和拼图/详情双Tab设计应用到主界面(App.jsx)。
+
+### 左侧控制面板 — 三Tab设计
+
+原设计: DNN/SNN/ICSPB三标签(平铺) → 各自内部内容
+新设计: DNN/SNN/ICSPB仍为顶级Tab, DNN模式下新增子Tab:
+
+**DNN模式 → 三个子Tab:**
+1. **🔬 维度** — 5大维度视角(语义/语法/逻辑/计算/理论) × 3子视角 = 15种观察角度
+   - 每个子视角关联: 描述/拼图格子/结构分析标签
+   - 选中维度自动切换structureTab
+2. **🎨 渲染器** — 层功能分区图例 + 可视化模式分组按钮 + LanguageResearchControlPanel
+3. **🎬 动画** — 5个预设场景 + 播放/暂停/停止 + 进度条 + 阶段指示
+
+### 右侧数据面板 — 拼图/详情双Tab
+
+原设计: 直接显示LanguageResearchDataPanel或ReverseEngineeringDataPanel
+新设计: 顶部双Tab切换:
+
+1. **🧩 拼图** — 原有的数据面板内容(LanguageResearchDataPanel/ReverseEngineeringDataPanel)
+2. **📋 详情** — 维度信息 + 悬停对象详情 + 动画状态 + 模型信息
+
+### 顶部状态栏
+
+- 激活维度时显示: `🧠 语义 Semantic → 属性子空间`
+- 激活动画时显示: `▶ 前向传播 — 65%`
+
+### 修改文件
+
+| 文件 | 变更 |
+|------|------|
+| `config/panels.js` | +DIMENSION_VIEWS(5维度×3子视角) +ANIMATION_SCENARIOS(5场景) +LAYER_FUNCTIONS(6分区) +layerToFuncColor/Label |
+| `App.jsx` | +import新常量 +维度/动画状态 +动画系统useEffect +左侧三Tab +右侧拼图/详情Tab +顶部状态栏 |
+
+### 构建验证
+
+✅ `vite build` 成功, 生成6个JS文件(总计6.2MB), 零linter错误
+
+
+## Phase CCVIII: 控制面板UI风格回退 (2026-05-05 12:46)
+
+> 将v3.0引入的Tailwind风格控制面板UI回退为LanguageResearchControlPanel的原有风格,
+> 保持内容结构(维度/渲染器/动画 + 拼图/详情)完全不变。
+
+### 风格变化摘要
+
+| 属性 | v3.0 (Tailwind) | 回退后 (原风格) |
+|------|-----------------|----------------|
+| Tab按钮 | 底部border线 `2px solid #60a5fa` | 药丸形 `borderRadius: 999px`, 蓝色半透明背景 |
+| 卡片圆角 | `4px` 锐角 | `10px` 圆角 |
+| 按钮形状 | 方形 `borderRadius: 4` | 药丸形 `borderRadius: 999px` |
+| 主色 | `#60a5fa` / `#3b82f6` | `#4facfe` / `rgba(79,172,254,...)` |
+| 文字色 | `#94a3b8` / `#64748b` | `#dfe8ff` / `#7f95bb` / `#dbeafe` |
+| 区块背景 | `rgba(0,0,0,0.2)` / `rgba(255,255,255,0.03)` | `rgba(255,255,255,0.04)` + 圆角10px边框 |
+| 渲染器/动画区块 | 无卡片包裹 | 独立卡片包裹 + 图标标题栏 |
+
+### 修改文件
+
+- `frontend/src/App.jsx`: 左面板Tab栏、维度树、渲染器区块、动画区块、右侧拼图/详情Tab及内容区
+
+### 构建验证
+
+✅ `vite build` 成功, 零新增linter错误
+
+## Phase CCIX: 维度视角菜单重构 — 对齐拼图框架 (2026-05-05 14:00)
+
+> 将DIMENSION_VIEWS的5大维度菜单从旧结构重构，严格对齐PUZZLE_FRAMEWORK的7大语言能力类别(KN/GR/LG/MG/SE/WE/TD)。
+
+### 重构内容
+
+| 维度 | 旧子视角 | 新子视角 | 对齐拼图 |
+|------|---------|---------|---------|
+| **语义** | 概念流形/属性子空间/暗物质转导 | 概念编码/属性绑定/抽象链/知识拓扑 | KN-1~KN-4 |
+| **语法** | W_U⊥子空间/语法操控/容量与泄露 | 词性编码/句式模板/层次结构 | GR-1~GR-3 |
+| **逻辑** | 逻辑信号/组合代数/因果推理 | 条件推理/深度思考/翻译转换/逻辑-知识交互 | LG-1~LG-4 |
+| **计算** | FFN机制/Attention通道/层间动力学 | 生成控制/全局选择/系统效率/词嵌入数学 | MG/SE/WE |
+| **理论** | (不变) | (描述微调) | 4层框架 |
+
+### 维度菜单UI增强
+
+- 维度按钮左侧添加颜色指示线 (`borderLeft: 2px solid ${dim.color}`)
+- 激活时背景微亮 (`${dim.color}11`)
+- 子视角显示emoji图标 + 拼图格子数标签
+- 子视角描述区用维度色做左边框 + 微亮背景
+- 展开维度时显示总描述
+
+### 修改文件
+
+- `frontend/src/config/panels.js`: DIMENSION_VIEWS全部5维度重构
+- `frontend/src/App.jsx`: 维度视角Tab渲染逻辑重写
+
+## Phase CCX: 控制面板功能完善 — 参考neural-vis实现 (2026-05-05 14:20)
+
+> 参考neural-vis.html中的功能设计，完成控制面板中维度/渲染器/动画三Tab的按钮功能，
+> 不修改主3D空间的DNN模型结构，基于现有模型完成功能演示。
+
+### 功能实现
+
+#### 渲染器Tab (参考neural-vis DNN层开关)
+- **DNN层结构开关** (ON/OFF): 控制3D场景中DNN层节点的显示/隐藏
+- **组件可见性切换**: attention / FFN / LayerNorm / 残差连接，独立开关
+- 新增 `showDNNLayers` 和 `visibleComponents` 状态
+- AppleNeuronSceneContent 的 visibleNodes 过滤逻辑增加组件类型过滤
+
+#### 动画Tab (参考neural-vis动画场景系统)
+- **预设场景**: 前向传播/子空间分化/力线增长/暗物质转导/属性编码，点击直接播放
+- **播放控制**: 播放/暂停/停止按钮
+- **可点击进度条**: 点击进度条跳转到任意位置
+- **DNN场景动画模式**: 集成 APPLE_ANIMATION_OPTIONS (Family成形/实例偏移/属性纤维等14种)
+- **3D场景叠加**: 动画播放时在3D场景中显示阶段指示文字、层范围高亮环、进度条
+
+#### 维度Tab (参考neural-vis维度视角)
+- **子视角renderer标签**: 显示每个子视角关联的渲染器类型
+- **维度→3D场景联动**: activeDimension/activeSubView 传入 AppleNeuronSceneContent
+- **3D场景维度标签**: 维度激活时在3D场景顶部显示当前维度名称
+
+### 技术实现
+
+| 文件 | 修改 |
+|------|------|
+| `panels.js` | 新增 COMPONENT_TYPES 常量 + DIMENSION_VIEWS 添加 renderers 字段 |
+| `App.jsx` | 导入 COMPONENT_TYPES + 新增 showDNNLayers/visibleComponents 状态 + 渲染器Tab增加DNN层开关 + 动画Tab增加DNN场景动画 + 可点击进度条 |
+| `AppleNeuron3DTab.jsx` | 导入 ANIMATION_SCENARIOS/DIMENSION_VIEWS + 新增 props(showDNNLayers/visibleComponents/animProgress/activeScenario/activeSubView) + visibleNodes过滤增加组件类型 + 动画场景3D叠加 + 维度标签3D叠加 |
+
+### 构建验证
+✅ `vite build` 成功, 零新增linter错误
+
+
+## Phase CCXI: neural-vis完整功能集成到主界面 (2026-05-05 14:33)
+
+> 在主界面基础上，不改变风格，将neural-vis.html中的所有功能集成到主界面。
+> 包括: 10个3D可视化渲染器、数据加载系统、98格拼图面板、渲染器模式切换、
+> 增强悬停详情、颜色图例、加载/错误/空状态覆盖层。
+
+### 功能集成清单
+
+1. **10个3D可视化渲染器** — TrajectoryRenderer/PointCloudRenderer/Heatmap3DRenderer/FlowRenderer/LayerStackRenderer/SubspaceRenderer/ForceLineRenderer/GrammarRoleMatrixRenderer/CausalChainRenderer/DarkMatterFlowRenderer
+2. **DNN层结构渲染器** — NeuralNetworkRenderer(层圆盘+组件+神经元+连接+粒子+标注)
+3. **数据加载系统** — useVisData hook, manifest.json加载, 本地JSON上传, v1.0/v2.0支持
+4. **渲染器模式切换** — RENDERER_MODES 10种模式, 维度自动过滤, 数量徽章
+5. **98格拼图面板** — PuzzlePanel 8大分类, 3内部Tab(拼图/规律/理论)
+6. **增强悬停详情** — delta_cos/cos_with_wu/subspace/growth_rate/kl_divergence等字段+颜色编码
+7. **颜色图例** — δ_cos梯度条 + 子空间颜色标注
+8. **数据摘要** — Schema/模型/层数/维度/对象数
+9. **状态覆盖** — 加载中/错误/空数据提示
+
+### 修改文件
+
+| 文件 | 变更 |
+|------|------|
+| `config/panels.js` | +RENDERER_MODES +CATEGORY_COLORS +SUBSPACE_COLORS +GRAMMAR_ROLE_COLORS +CAUSAL_COLORS +LAYER_GAP/PLANE_SIZE等 +deltaCosToColor/cosWuToColor/ratioToColor |
+| `App.jsx` | +12个neural_vis组件导入 +useVisData +viewMode/highlightedLayer +byType分类 +filterByMode +数据源UI +渲染器模式按钮 +颜色图例 +数据摘要 +10个渲染器集成 +PuzzlePanel +增强悬停详情 +状态覆盖层 |
+
+### 构建验证
+✅ `vite build` 成功, 6.47s, 零构建错误
+
+### 技术亮点
+1. 零侵入集成: neural_vis渲染器直接从原目录导入
+2. 维度-渲染器联动: 选中维度子视角自动过滤关联渲染器
+3. 双DNN渲染: AppleNeuronSceneContent + NeuralNetworkRenderer共存
+4. 完整数据管道: useVisData → byType → filterByMode → 10渲染器
+5. 统一悬停系统: 所有渲染器通过onHoverToken回调统一到setHoveredInfo
+
+
+## Phase CCXII: 控制面板UI简化和大气化改造 (2026-05-05 15:40)
+
+### 变更概述
+对控制面板进行UI简化，去掉左侧logo，增大菜单项间距，使整体更大气简洁。
+
+### 具体修改
+1. **SimplePanel组件** (`frontend/src/SimplePanel.jsx`)
+   - 新增 `hideTitle` prop: 当为true时隐藏渐变标题，只保留操作按钮
+   - header marginBottom 从16px减至12px
+   - 当hideTitle时，actions区域居中显示且占满宽度
+
+2. **控制面板** (`frontend/src/App.jsx`)
+   - 移除左侧"控制面板"渐变Logo标题，设置 `hideTitle`
+   - DNN/SNN/ICSPB 三Tab按钮: padding从6px 10px增至10px 14px, fontSize从11px增至13px, borderRadius从4px增至8px, flex:1等分宽度, 增加字间距letterSpacing
+   - 数据源区域: padding从10px增至14px, borderRadius从10增至12, marginBottom从12增至16
+   - 维度/渲染器/动画子Tab: padding从7px 8px增至9px 10px, fontSize从11增至12, borderRadius从999px增至10px, gap从6增至8, marginBottom从12增至16
+   - 维度视角菜单项: padding从6px 8px增至10px 12px, fontSize从12增至13, borderLeft从2px增至3px, borderRadius从4增至6, icon从14增至16
+   - 子视角菜单项: padding从4px 8px 4px 28px增至7px 12px 7px 36px, fontSize从11增至12, borderRadius从4增至6, icon从12增至14
+   - 所有卡片区域: padding从12px增至14px, borderRadius从10增至12, marginBottom从12增至16, 标题fontSize从13增至14
+   - DNN层结构开关按钮: padding从3px 10px增至5px 14px
+   - 组件类型/结构分析/渲染器模式pill按钮: padding统一增至5-6px 10px, fontSize从9-10增至11
+   - 动画场景项: padding从7px 10px增至10px 12px, fontSize从11增至12, icon从14增至16
+   - DNN场景动画按钮: padding从5px 10px增至8px 12px, fontSize从10增至12, borderRadius从6增至8
+   - 播放控制按钮: padding从7px 12px增至9px 14px, fontSize从11增至12
+
+### 设计理念
+- 去Logo化: 标题占据空间但不传递信息，去掉后Tab按钮获得完整宽度
+- 等分Tab: 三个主Tab等分宽度，视觉更平衡
+- 呼吸感: 所有间距、字号、圆角统一增大，减少视觉密度
+- 层次感: 卡片区域borderRadius从10增至12，与按钮圆角形成层级差异
+
+### 构建验证
+✅ `vite build` 成功, 14.94s, 零构建错误
+
+
+## Phase CCXIII: 数据源下拉框改造 (2026-05-05 15:45)
+
+### 变更概述
+将数据源区域的文件加载方式从按钮+列表改为下拉框选择，更简洁直观。
+
+### 具体修改
+1. **useVisData Hook** (`frontend/src/neural_vis/hooks/useVisData.js`)
+   - 导出 `setActiveData` 和 `setError`，允许外部直接设置数据
+
+2. **数据源区域** (`frontend/src/App.jsx`)
+   - 原有: "加载JSON文件"按钮 + 文件列表按钮 + 加载/错误提示
+   - 改为: `<select>` 下拉框，包含:
+     - 默认占位项: "-- 选择数据文件 --"
+     - `<optgroup label="预设数据">`: 预置的公共数据文件(language_analysis_puzzle.json等)
+     - `<optgroup label="Manifest 文件">`: 从manifest.json加载的文件列表
+     - "📂 从本地加载 JSON..."选项: 触发隐藏的file input
+   - 自定义下拉样式: 去除原生外观(appearance:none)，自定义SVG箭头，深色背景
+   - 加载成功后显示信息卡片: schema版本、token数、layer数
+   - value="__active__"保持已加载数据的选中状态
+
+### 设计理念
+- 下拉框比按钮列表更紧凑，同时支持更多文件
+- optgroup分组使文件来源清晰
+- "从本地加载"作为最后一个选项，保持功能完整性
+- 加载后的信息卡片提供即时反馈
+
+
+## Phase CCXIV: 深度神经网络逆向工程系统性整理 (2026-05-06 15:37)
+
+### 变更概述
+基于190+ Phases的研究数据，对深度神经网络各组件(Attention/MLP/残差流/LayerNorm)的功能和逆向工程程度进行系统性整理，产出完整文档。
+
+### 核心发现汇总
+
+1. **Attention**: 信息路由器 + 因果汇聚器 (末层94.7%), 中层对概念几乎无贡献
+2. **MLP/FFN**: 因果效应主贡献者(60-80%), 门控分解Δg⊙Δu, 门控Hamming距离编码语义距离(r=0.94-0.96)
+3. **残差流**: 95%+信息直通, 暗物质占77-85%且贡献75-87%steering效果
+4. **LayerNorm**: 断裂层放大器(Qwen3 Dim4 LN weight暴增11.6x→norm暴增116x)
+5. **断裂层**: 相变点, Qwen3=L6→L7, GLM4=L2→L3, DS7B=L7→L8
+
+### 研究程度
+- Attention: 85%, MLP: 80%, 残差流: 90%, LayerNorm: 70%, Embedding: 60%
+- P1因果导航99%, P2几何定位98%, P3 SAE逆向70%, P4电路逆向99%, P5代数/拓扑85%
+
+### 产出文件
+- `research/glm5/docs/DNN_REVERSE_ENGINEERING.md` — 完整系统性整理文档
+
+
+
+
+
+
 
 
 

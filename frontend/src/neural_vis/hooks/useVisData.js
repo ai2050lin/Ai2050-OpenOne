@@ -55,5 +55,5 @@ export default function useVisData() {
     reader.readAsText(file);
   }, []);
 
-  return { dataFiles, activeData, loading, error, loadDataManifest, loadDataFile, loadLocalFile };
+  return { dataFiles, activeData, loading, error, loadDataManifest, loadDataFile, loadLocalFile, setActiveData, setError };
 }

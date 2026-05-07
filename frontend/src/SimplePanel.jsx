@@ -9,7 +9,8 @@ export function SimplePanel({
   style,
   headerStyle = {},
   dragHandleProps, // For draggable handle props
-  actions // Optional header actions
+  actions, // Optional header actions
+  hideTitle = false, // When true, only show actions in header bar (no logo/title text)
 }) {
   return (
     <div 
@@ -30,30 +31,32 @@ export function SimplePanel({
         {...dragHandleProps}
         style={{
           display: 'flex', 
-          justifyContent: 'space-between', 
+          justifyContent: hideTitle ? 'center' : 'space-between', 
           alignItems: 'center', 
-          marginBottom: '16px',
+          marginBottom: '12px',
           cursor: dragHandleProps ? 'move' : 'default',
           userSelect: 'none',
           ...headerStyle
         }}
       >
-        <h2 style={{ 
-          margin: 0, 
-          fontSize: '18px', 
-          fontWeight: 'bold', 
-          background: 'linear-gradient(45deg, #00d2ff, #3a7bd5)', 
-          WebkitBackgroundClip: 'text', 
-          WebkitTextFillColor: 'transparent',
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '8px' 
-        }}>
-          {icon && React.cloneElement(icon, { size: 18, color: '#00d2ff' })} 
-          {title}
-        </h2>
+        {!hideTitle && (
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: '18px', 
+            fontWeight: 'bold', 
+            background: 'linear-gradient(45deg, #00d2ff, #3a7bd5)', 
+            WebkitBackgroundClip: 'text', 
+            WebkitTextFillColor: 'transparent',
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px' 
+          }}>
+            {icon && React.cloneElement(icon, { size: 18, color: '#00d2ff' })} 
+            {title}
+          </h2>
+        )}
         {/* Actions & Close */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', ...(hideTitle ? { width: '100%' } : {}) }}>
           {actions}
           {onClose && (
              <button 

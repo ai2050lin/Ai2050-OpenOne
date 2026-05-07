@@ -10,7 +10,7 @@ import {
   Scale,
   Settings, Share2, Sparkles, Target, TrendingUp, X
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { AGIChatPanel } from './AGIChatPanel';
 import { AppleNeuronGeneratedConceptSetsPanel, AppleNeuronMultidimSettingsPanel } from './blueprint/appleNeuronInfoPanelsBridge';
@@ -35,8 +35,24 @@ import TDAVisualization3D from './TDAVisualization3D';
 import { DataComparisonView } from './components/shared/DataComparisonView';
 import { AnalysisDataDisplay, MetricCard } from './components/shared/DataDisplayTemplates';
 import { OperationHistoryPanel, useOperationHistory } from './components/shared/OperationHistory';
-import { COLORS, INPUT_PANEL_TABS, STRUCTURE_TABS_V2 } from './config/panels';
+import { COLORS, INPUT_PANEL_TABS, STRUCTURE_TABS_V2, DIMENSION_VIEWS, ANIMATION_SCENARIOS, LAYER_FUNCTIONS, COMPONENT_TYPES, RENDERER_MODES, CATEGORY_COLORS, SUBSPACE_COLORS, layerToFuncColor, layerToFuncLabel, deltaCosToColor, cosWuToColor } from './config/panels';
 import { locales } from './locales';
+
+// neural_vis 可视化渲染器
+import TrajectoryRenderer from './neural_vis/renderers/TrajectoryRenderer';
+import PointCloudRenderer from './neural_vis/renderers/PointCloudRenderer';
+import LayerStackRenderer from './neural_vis/renderers/LayerStackRenderer';
+import Heatmap3DRenderer from './neural_vis/renderers/Heatmap3DRenderer';
+import FlowRenderer from './neural_vis/renderers/FlowRenderer';
+import SubspaceRenderer from './neural_vis/renderers/SubspaceRenderer';
+import ForceLineRenderer from './neural_vis/renderers/ForceLineRenderer';
+import GrammarRoleMatrixRenderer from './neural_vis/renderers/GrammarRoleMatrixRenderer';
+import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
+import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
+import NeuralNetworkRenderer from './neural_vis/renderers/NeuralNetworkRenderer';
+import SceneHelpers from './neural_vis/components/SceneHelpers';
+import PuzzlePanel from './neural_vis/components/PuzzlePanel';
+import useVisData from './neural_vis/hooks/useVisData';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
@@ -1818,8 +1834,126 @@ export default function App() {
 
   // UI Tabs State
   const [inputPanelTab, setInputPanelTab] = useState('main'); // 'main' | 'snn' | 'icspb'
+  const [leftPanelTab, setLeftPanelTab] = useState('dimension'); // 'dimension' | 'renderer' | 'animation'
+  const [activeDimension, setActiveDimension] = useState(null);
+  const [activeSubView, setActiveSubView] = useState(null);
+  const [activeScenario, setActiveScenario] = useState(null);
+  const [animProgress, setAnimProgress] = useState(1);
+  const [animPlaying, setAnimPlaying] = useState(false);
+  const animStartTimeRef = useRef(null);
+  const animFrameRef = useRef(null);
+
+  // DNN层可视化状态
+  const [showDNNLayers, setShowDNNLayers] = useState(true);
+  const [visibleComponents, setVisibleComponents] = useState(['attention', 'ffn', 'layer_norm']);
   const appleNeuronWorkspace = useAppleNeuronWorkspace();
   const isAppleMainView = inputPanelTab === 'main';
+
+  // ---- 可视化数据系统 (neural-vis) ----
+  const { dataFiles, activeData: visData, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect } = useVisData();
+  const visFileInputRef = useRef();
+  const [viewMode, setViewMode] = useState('all'); // 渲染器模式
+  const [highlightedLayer, setHighlightedLayer] = useState(null);
+
+  // 可视化数据分类
+  const visualizations = visData?.visualizations || [];
+  const byType = {
+    trajectory: visualizations.filter(v => v.type === 'trajectory'),
+    point_cloud: visualizations.filter(v => v.type === 'point_cloud'),
+    heatmap_3d: visualizations.filter(v => v.type === 'heatmap_3d'),
+    flow: visualizations.filter(v => v.type === 'flow'),
+    layer_stack: visualizations.filter(v => v.type === 'layer_stack'),
+    subspace_decomposition: visualizations.filter(v => v.type === 'subspace_decomposition'),
+    force_line: visualizations.filter(v => v.type === 'force_line'),
+    grammar_role_matrix: visualizations.filter(v => v.type === 'grammar_role_matrix'),
+    causal_chain: visualizations.filter(v => v.type === 'causal_chain'),
+    dark_matter_flow: visualizations.filter(v => v.type === 'dark_matter_flow'),
+    puzzle_progress: visualizations.filter(v => v.type === 'puzzle_progress'),
+  };
+  const nLayers = visData?.model_info?.n_layers || 36;
+
+  // 维度视角过滤渲染器
+  const getActiveRenderers = useCallback(() => {
+    if (!activeDimension || !activeSubView) return null;
+    const dim = DIMENSION_VIEWS[activeDimension];
+    const sub = dim?.subViews[activeSubView];
+    return sub?.renderers || null;
+  }, [activeDimension, activeSubView]);
+
+  const filterByMode = useCallback((type) => {
+    if (activeDimension && activeSubView) {
+      const activeRenderers = getActiveRenderers();
+      if (activeRenderers) return activeRenderers.includes(type);
+    }
+    return viewMode === 'all' || viewMode === type;
+  }, [activeDimension, activeSubView, viewMode, getActiveRenderers]);
+
+  const getVisCount = useCallback((key) => {
+    if (key === 'all') return visualizations.length;
+    if (key === 'heatmap') return byType.heatmap_3d.length;
+    if (key === 'subspace') return byType.subspace_decomposition.length;
+    if (key === 'force_line') return byType.force_line.length;
+    if (key === 'grammar') return byType.grammar_role_matrix.length;
+    if (key === 'causal') return byType.causal_chain.length;
+    if (key === 'dark_matter') return byType.dark_matter_flow.length;
+    return byType[key]?.length || 0;
+  }, [visualizations, byType]);
+
+  useEffect(() => { loadDataManifest(); }, [loadDataManifest]);
+
+  // ---- 动画场景系统 ----
+  const startScenario = useCallback((scenarioKey) => {
+    const scenario = ANIMATION_SCENARIOS[scenarioKey];
+    if (!scenario) return;
+    setActiveScenario(scenarioKey);
+    setAnimProgress(0);
+    setAnimPlaying(true);
+    animStartTimeRef.current = Date.now();
+  }, []);
+
+  const stopScenario = useCallback(() => {
+    setAnimPlaying(false);
+    setActiveScenario(null);
+    setAnimProgress(1);
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!animPlaying || !activeScenario) return;
+    const scenario = ANIMATION_SCENARIOS[activeScenario];
+    if (!scenario) return;
+    const duration = scenario.duration * 1000;
+    const tick = () => {
+      const elapsed = Date.now() - animStartTimeRef.current;
+      const progress = Math.min(1, elapsed / duration);
+      setAnimProgress(progress);
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        setAnimPlaying(false);
+      }
+    };
+    animFrameRef.current = requestAnimationFrame(tick);
+    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
+  }, [animPlaying, activeScenario]);
+
+  const getCurrentAnimPhase = () => {
+    if (!activeScenario) return null;
+    const scenario = ANIMATION_SCENARIOS[activeScenario];
+    return scenario.phases.find(p => animProgress >= p.start && animProgress < p.end) || scenario.phases[scenario.phases.length - 1];
+  };
+
+  // 维度视角切换时自动切换structureTab
+  useEffect(() => {
+    if (activeDimension && activeSubView) {
+      const dim = DIMENSION_VIEWS[activeDimension];
+      const sub = dim?.subViews[activeSubView];
+      if (sub?.structureTabs?.length > 0 && !sub.structureTabs.includes(structureTab)) {
+        setStructureTab(sub.structureTabs[0]);
+      }
+    }
+  }, [activeDimension, activeSubView]);
+
   const functionTypePanelMap = {
     main: { label: 'DNN', hasInfo: true, hasOperation: true },
     snn: { label: 'SNN', hasInfo: true, hasOperation: true },
@@ -2637,17 +2771,18 @@ export default function App() {
         />
       )}
 
-      {/* ==================== 左上: 控制面板 ==================== */}
+      {/* ==================== 左上: 控制面板 (v3.0 三Tab设计) ==================== */}
       {panelVisibility.inputPanel && (
         <SimplePanel
           title="控制面板"
+          hideTitle
           style={{
             position: 'absolute', top: 60, left: 20, zIndex: 10,
             width: '360px', maxHeight: '85vh',
             display: 'flex', flexDirection: 'column'
           }}
           actions={
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '6px', flex: 1 }}>
               {INPUT_PANEL_TABS.map(tab => (
                 <button
                   key={tab.id}
@@ -2656,15 +2791,16 @@ export default function App() {
                     setSystemType(tab.id === 'main' ? 'dnn' : tab.id);
                   }}
                   style={{
-                    padding: '6px 10px',
-                    background: inputPanelTab === tab.id ? tab.color : 'transparent',
-                    border: inputPanelTab === tab.id ? 'none' : '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '4px',
-                    color: inputPanelTab === tab.id ? '#fff' : '#888',
+                    flex: 1, padding: '10px 14px',
+                    background: inputPanelTab === tab.id ? tab.color : 'rgba(255,255,255,0.04)',
+                    border: inputPanelTab === tab.id ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '8px',
+                    color: inputPanelTab === tab.id ? '#fff' : '#8ea5c5',
                     cursor: 'pointer',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s'
+                    fontSize: '13px',
+                    fontWeight: inputPanelTab === tab.id ? '700' : '500',
+                    transition: 'all 0.25s',
+                    letterSpacing: '0.5px',
                   }}
                 >
                   {tab.label}
@@ -2675,17 +2811,9 @@ export default function App() {
         >
 
           {/* Content Container with Scroll */}
-          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
-            {/* Main Content: Apple Neuron control cards */}
-            {inputPanelTab === 'main' && (
-              <LanguageResearchControlPanel
-                workspace={appleNeuronWorkspace}
-                structureTab={structureTab}
-                setStructureTab={setStructureTab}
-              />
-            )}
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', paddingTop: '4px' }}>
 
-            {/* SNN Content */}
+            {/* ===== SNN Content (非main模式) ===== */}
             {inputPanelTab === 'snn' && (
               <div className="animate-fade-in">
                 <div style={{ padding: '12px', background: 'rgba(78, 205, 196, 0.1)', borderRadius: '8px', border: '1px solid rgba(78, 205, 196, 0.2)', marginBottom: '16px' }}>
@@ -2699,8 +2827,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-
-                {/* Pass systemType='snn' expressly */}
                 <StructureAnalysisControls
                   autoResult={autoAnalysisResult}
                   systemType="snn"
@@ -2718,27 +2844,512 @@ export default function App() {
                   activeTab={structureTab}
                   setActiveTab={setStructureTab}
                   t={t}
-                  // SNN Props
                   snnState={snnState}
                   onInitializeSNN={initializeSNN}
                   onToggleSNNPlay={() => setSnnState(s => ({ ...s, isPlaying: !s.isPlaying }))}
                   onStepSNN={stepSNN}
                   onInjectStimulus={injectSNNStimulus}
-                  containerStyle={{
-                    background: 'transparent',
-                    borderLeft: 'none',
-                    backdropFilter: 'none',
-                    padding: 0
-                  }}
+                  containerStyle={{ background: 'transparent', borderLeft: 'none', backdropFilter: 'none', padding: 0 }}
                 />
               </div>
             )}
 
-            {/* ICSPB Lab Content - Phase XXXIV Unified Lab */}
+            {/* ===== ICSPB Lab Content ===== */}
             {inputPanelTab === 'icspb' && (
               <div className="animate-fade-in" style={{ height: '100%', overflowY: 'auto' }}>
                 <ICSPBPanel lang={lang} />
               </div>
+            )}
+
+            {/* ===== Main模式: 三Tab设计(维度/渲染器/动画) ===== */}
+            {inputPanelTab === 'main' && (
+              <>
+                {/* ---- 数据源区域 ---- */}
+                <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
+                    <Layers size={14} color="#4facfe" />
+                    数据源
+                  </div>
+                  <select
+                    value={visData ? '__active__' : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || val === '__active__') return;
+                      if (val === '__local__') { visFileInputRef.current?.click(); return; }
+                      if (val.startsWith('__preset__')) {
+                        const path = val.replace('__preset__', '');
+                        fetch(path).then(r => r.json()).then(data => {
+                          const version = data.schema_version || '1.0';
+                          if (version !== '1.0' && version !== '2.0') { /* allow non-schema files too */ }
+                          setActiveDataDirect(data);
+                        }).catch(err => setErrorDirect(err.message));
+                        return;
+                      }
+                      loadDataFile(val);
+                    }}
+                    style={{
+                      width: '100%', padding: '10px 12px',
+                      background: 'rgba(79,172,254,0.08)',
+                      border: '1px solid rgba(79,172,254,0.25)',
+                      borderRadius: 10, color: visData ? '#e7f4ff' : '#7f95bb',
+                      cursor: 'pointer', fontSize: 12, fontWeight: 500,
+                      outline: 'none', transition: 'all 0.2s',
+                      appearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%237f95bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 12px center',
+                    }}
+                  >
+                    <option value="">-- 选择数据文件 --</option>
+                    <optgroup label="预设数据">
+                      <option value="__preset__/data/language_analysis_puzzle.json">🧩 语言分析拼图</option>
+                    </optgroup>
+                    {dataFiles.length > 0 && (
+                      <optgroup label="Manifest 文件">
+                        {dataFiles.map((f, i) => (
+                          <option key={f.filename || i} value={f.filename}>{f.label || f.filename}</option>
+                        ))}
+                      </optgroup>
+                    )}
+                    <option value="__local__">📂 从本地加载 JSON...</option>
+                  </select>
+                  <input ref={visFileInputRef} type="file" accept=".json" style={{ display: 'none' }}
+                    onChange={(e) => e.target.files[0] && loadLocalFile(e.target.files[0])} />
+                  {visData && (
+                    <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(79,172,254,0.06)', borderRadius: 8, border: '1px solid rgba(79,172,254,0.15)' }}>
+                      <div style={{ fontSize: 11, color: '#4facfe', fontWeight: 600, marginBottom: 2 }}>✓ 已加载</div>
+                      <div style={{ fontSize: 10, color: '#7f95bb' }}>
+                        {visData.schema_version ? `Schema v${visData.schema_version}` : '自定义格式'}
+                        {visData.tokens?.length ? ` · ${visData.tokens.length} tokens` : ''}
+                        {visData.layers?.length ? ` · ${visData.layers.length} layers` : ''}
+                      </div>
+                    </div>
+                  )}
+                  {visLoading && <div style={{ fontSize: 11, color: '#4facfe', marginTop: 8 }}>⏳ 加载中...</div>}
+                  {visError && <div style={{ fontSize: 11, color: '#ff6b6b', marginTop: 8 }}>⚠ {visError}</div>}
+                </div>
+
+                {/* ---- 左面板子Tab切换 ---- */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: 16 }}>
+                  {[{ key: 'dimension', label: '🔬 维度' },
+                    { key: 'renderer', label: '🎨 渲染器' },
+                    { key: 'animation', label: '🎬 动画' },
+                  ].map(t => (
+                    <button key={t.key} onClick={() => setLeftPanelTab(t.key)}
+                      style={{
+                        flex: 1, padding: '9px 10px',
+                        background: leftPanelTab === t.key ? 'rgba(79, 172, 254, 0.12)' : 'rgba(255,255,255,0.04)',
+                        border: leftPanelTab === t.key ? '1px solid rgba(79, 172, 254, 0.35)' : '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: '10px',
+                        color: leftPanelTab === t.key ? '#e7f4ff' : '#9aa4b4',
+                        cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                        transition: 'all 0.25s',
+                        letterSpacing: '0.3px',
+                      }}>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* ========== Tab 1: 维度视角 ========== */}
+                {leftPanelTab === 'dimension' && (
+                  <div>
+                    {Object.entries(DIMENSION_VIEWS).map(([dimKey, dim]) => {
+                      const isActive = activeDimension === dimKey;
+                      return (
+                        <div key={dimKey} style={{
+                          marginBottom: 4,
+                          borderLeft: isActive ? `3px solid ${dim.color}` : '3px solid transparent',
+                          borderRadius: 6,
+                          transition: 'border-color 0.2s',
+                        }}>
+                          <button
+                            onClick={() => {
+                              if (isActive) { setActiveDimension(null); setActiveSubView(null); }
+                              else { setActiveDimension(dimKey); setActiveSubView(null); }
+                            }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 12px',
+                              background: isActive ? `${dim.color}11` : 'transparent',
+                              border: 'none',
+                              color: isActive ? dim.color : '#8ea5c5',
+                              cursor: 'pointer', textAlign: 'left', fontSize: 13,
+                              fontWeight: isActive ? 700 : 400,
+                              transition: 'all 0.2s',
+                              borderRadius: 6,
+                            }}
+                          >
+                            <span style={{ fontSize: 16 }}>{dim.icon}</span>
+                            <span>{dim.label}</span>
+                            <span style={{ marginLeft: 'auto', fontSize: 10, color: isActive ? dim.color : '#555' }}>{isActive ? '−' : '+'}</span>
+                          </button>
+
+                          {isActive && (
+                            <div style={{ padding: '4px 0 6px 0' }}>
+                              <div style={{ padding: '0 12px 6px 36px', fontSize: 11, color: '#556', lineHeight: 1.5 }}>
+                                {dim.description}
+                              </div>
+                              {Object.entries(dim.subViews).map(([subKey, sub]) => {
+                                const isSubActive = activeSubView === subKey;
+                                return (
+                                  <div key={subKey}>
+                                    <button
+                                      onClick={() => setActiveSubView(isSubActive ? null : subKey)}
+                                      style={{
+                                        display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+                                        padding: '7px 12px 7px 36px',
+                                        background: isSubActive ? `${dim.color}0a` : 'transparent',
+                                        border: 'none',
+                                        color: isSubActive ? dim.color : '#7f95bb',
+                                        cursor: 'pointer', textAlign: 'left', fontSize: 12,
+                                        transition: 'all 0.2s',
+                                        borderRadius: 6,
+                                      }}
+                                    >
+                                      <span style={{ fontSize: 14 }}>{sub.icon}</span>
+                                      <span>{sub.label}</span>
+                                      {sub.puzzleCells && (
+                                        <span style={{
+                                          marginLeft: 'auto', fontSize: 8, padding: '1px 4px',
+                                          borderRadius: 3,
+                                          background: isSubActive ? `${dim.color}22` : 'rgba(255,255,255,0.04)',
+                                          color: isSubActive ? dim.color : '#556',
+                                        }}>
+                                          {sub.puzzleCells.length}格
+                                        </span>
+                                      )}
+                                    </button>
+                                    {isSubActive && (
+                                      <div style={{
+                                        marginLeft: 36, padding: '6px 10px', fontSize: 11,
+                                        color: '#778', lineHeight: 1.5,
+                                        borderLeft: `2px solid ${dim.color}44`,
+                                        background: `${dim.color}06`,
+                                        borderRadius: '0 6px 6px 0',
+                                      }}>
+                                        {sub.description}
+                                        {sub.renderers && sub.renderers.length > 0 && (
+                                          <div style={{ marginTop: 3, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                                            {sub.renderers.map(r => (
+                                              <span key={r} style={{
+                                                padding: '1px 5px', borderRadius: 3, fontSize: 8,
+                                                background: `${dim.color}15`, color: dim.color,
+                                              }}>
+                                                {r}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {activeDimension && (
+                      <button onClick={() => { setActiveDimension(null); setActiveSubView(null); }}
+                        style={{ marginTop: 4, padding: '4px 10px', background: 'transparent', border: 'none', color: '#667', cursor: 'pointer', fontSize: 10 }}>
+                        清除选择
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* ========== Tab 2: 渲染器选择 ========== */}
+                {leftPanelTab === 'renderer' && (
+                  <div>
+                    {/* DNN层可视化开关 */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ fontSize: 14, color: '#dfe8ff', fontWeight: 700 }}>🧱 DNN层结构</span>
+                        <button onClick={() => setShowDNNLayers(!showDNNLayers)}
+                          style={{
+                            padding: '5px 14px', borderRadius: '999px', fontSize: 11, fontWeight: 700,
+                            background: showDNNLayers ? 'rgba(79,172,254,0.15)' : 'rgba(255,255,255,0.04)',
+                            border: showDNNLayers ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                            color: showDNNLayers ? '#4facfe' : '#7f95bb',
+                            cursor: 'pointer', transition: 'all 0.2s',
+                          }}>
+                          {showDNNLayers ? 'ON' : 'OFF'}
+                        </button>
+                      </div>
+                      {showDNNLayers && (
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {Object.entries(COMPONENT_TYPES).map(([key, comp]) => {
+                            const isVisible = visibleComponents.includes(key);
+                            return (
+                              <button key={key} onClick={() => {
+                                setVisibleComponents(prev =>
+                                  isVisible ? prev.filter(k => k !== key) : [...prev, key]
+                                );
+                              }}
+                                style={{
+                                  padding: '5px 10px', borderRadius: '999px', fontSize: 11, fontWeight: 600,
+                                  background: isVisible ? `${comp.color}1a` : 'rgba(255,255,255,0.04)',
+                                  border: isVisible ? `1px solid ${comp.color}55` : '1px solid rgba(255,255,255,0.1)',
+                                  color: isVisible ? comp.color : '#7f95bb',
+                                  cursor: 'pointer', transition: 'all 0.15s',
+                                }}>
+                                {comp.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 层功能图例 */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        <Layers size={14} color="#4facfe" />
+                        层功能分区
+                      </div>
+                      {Object.entries(LAYER_FUNCTIONS).map(([key, func]) => (
+                        <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: 4, fontSize: 10 }}>
+                          <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: func.color, marginRight: 6 }} />
+                          <span style={{ color: func.color, width: 60, flexShrink: 0 }}>{func.label}</span>
+                          <span style={{ color: '#7f95bb' }}>L{func.range[0]}-L{func.range[1]}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 结构分析标签（分组） */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        <Target size={14} color="#4facfe" />
+                        可视化模式
+                      </div>
+                      {STRUCTURE_TABS_V2.groups.map(group => (
+                        <div key={group.id} style={{ marginBottom: 8 }}>
+                          <div style={{ fontSize: 10, color: group.color, marginBottom: 4, fontWeight: 600 }}>{group.label}</div>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            {group.items.map(item => (
+                              <button key={item.id} onClick={() => setStructureTab(item.id)}
+                                style={{
+                                  padding: '6px 10px', borderRadius: '999px', fontSize: 11, fontWeight: 600,
+                                  background: structureTab === item.id ? `${group.color}1a` : 'rgba(255,255,255,0.04)',
+                                  border: structureTab === item.id ? `1px solid ${group.color}55` : '1px solid rgba(255,255,255,0.1)',
+                                  color: structureTab === item.id ? group.color : '#7f95bb',
+                                  cursor: 'pointer', transition: 'all 0.15s',
+                                }}>
+                                {item.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 渲染器模式 (neural-vis) */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        <Sparkles size={14} color="#4facfe" />
+                        渲染器模式
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {RENDERER_MODES.map(mode => {
+                          const count = getVisCount(mode.key);
+                          const isActive = viewMode === mode.key && !activeDimension;
+                          return (
+                            <button key={mode.key}
+                              onClick={() => { setViewMode(mode.key); setActiveDimension(null); setActiveSubView(null); }}
+                              style={{
+                                padding: '6px 10px', borderRadius: '999px', fontSize: 11, fontWeight: 600,
+                                background: isActive ? 'rgba(79,172,254,0.12)' : 'rgba(255,255,255,0.04)',
+                                border: isActive ? '1px solid rgba(79,172,254,0.35)' : '1px solid rgba(255,255,255,0.1)',
+                                color: isActive ? '#e7f4ff' : '#7f95bb',
+                                cursor: 'pointer', transition: 'all 0.15s',
+                                display: 'flex', alignItems: 'center', gap: 3,
+                              }}>
+                              {mode.label}
+                              <span style={{ fontSize: 8, color: isActive ? '#4facfe' : '#556', marginLeft: 2 }}>{count}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 颜色图例 */}
+                    <div style={{ marginBottom: 12, padding: '12px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
+                        🎨 图例
+                      </div>
+                      {/* delta_cos 颜色梯度 */}
+                      <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 4 }}>δ_cos</div>
+                      <div style={{ display: 'flex', gap: 3, marginBottom: 8 }}>
+                        {[1, 0.75, 0.5, 0.25, 0].map(v => (
+                          <div key={v} style={{ textAlign: 'center' }}>
+                            <div style={{ width: 24, height: 8, background: deltaCosToColor(v), borderRadius: 2 }} />
+                            <div style={{ fontSize: 8, color: '#556' }}>{v.toFixed(1)}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* 子空间颜色标注 */}
+                      <div style={{ fontSize: 9, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <span><span style={{ color: SUBSPACE_COLORS.w_u }}>■</span> W_U</span>
+                        <span><span style={{ color: SUBSPACE_COLORS.w_u_perp }}>■</span> W_U⊥</span>
+                        <span><span style={{ color: SUBSPACE_COLORS.logic }}>■</span> 逻辑</span>
+                        <span><span style={{ color: SUBSPACE_COLORS.dark_matter }}>■</span> 暗物质</span>
+                      </div>
+                    </div>
+
+                    {/* 数据摘要 */}
+                    {visData && (
+                      <div style={{ marginBottom: 12, padding: '12px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
+                          📊 数据摘要
+                        </div>
+                        <div style={{ fontSize: 10, lineHeight: 1.6, color: '#7f95bb' }}>
+                          <div>Schema: <span style={{ color: '#4facfe' }}>v{visData.schema_version || '1.0'}</span></div>
+                          <div>Model: <span style={{ color: '#4ecdc4' }}>{visData.model || '-'}</span></div>
+                          <div>Layers: {visData.model_info?.n_layers || '-'} | d_model: {visData.model_info?.d_model || '-'}</div>
+                          <div>可视化对象: <span style={{ color: '#ffe66d' }}>{visualizations.length}</span></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 原有的LanguageResearchControlPanel(精简版) */}
+                    <LanguageResearchControlPanel
+                      workspace={appleNeuronWorkspace}
+                      structureTab={structureTab}
+                      setStructureTab={setStructureTab}
+                    />
+                  </div>
+                )}
+
+                {/* ========== Tab 3: 动画场景 ========== */}
+                {leftPanelTab === 'animation' && (
+                  <div>
+                    {/* 场景列表 */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        🎬 预设场景
+                      </div>
+                      {Object.entries(ANIMATION_SCENARIOS).map(([key, scenario]) => (
+                        <div key={key} style={{ marginBottom: 6 }}>
+                          <button
+                            onClick={() => startScenario(key)}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+                              padding: '10px 12px',
+                              background: activeScenario === key ? 'rgba(79, 172, 254, 0.12)' : 'rgba(255,255,255,0.03)',
+                              border: activeScenario === key ? '1px solid rgba(79, 172, 254, 0.35)' : '1px solid rgba(255,255,255,0.08)',
+                              borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', textAlign: 'left', fontSize: 12,
+                              transition: 'all 0.2s',
+                            }}
+                          >
+                            <span style={{ fontSize: 16 }}>{scenario.icon}</span>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 'bold', fontSize: 12 }}>{scenario.label}</div>
+                              <div style={{ fontSize: 10, color: '#7f95bb' }}>{scenario.description}</div>
+                            </div>
+                            <span style={{ fontSize: 9, color: '#7f95bb' }}>{scenario.duration}s</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 播放控制 */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        播放控制
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+                        <button onClick={() => { if (activeScenario) { setAnimProgress(0); animStartTimeRef.current = Date.now(); setAnimPlaying(true); } }}
+                          style={{ flex: 1, padding: '9px 14px', background: 'rgba(79, 172, 254, 0.12)', border: '1px solid rgba(79, 172, 254, 0.35)', borderRadius: '999px', color: '#e7f4ff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                          ▶ 播放
+                        </button>
+                        <button onClick={() => setAnimPlaying(false)}
+                          style={{ flex: 1, padding: '9px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '999px', color: '#d8e6ff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                          ⏸ 暂停
+                        </button>
+                        <button onClick={stopScenario}
+                          style={{ flex: 1, padding: '9px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '999px', color: '#d8e6ff', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                          ⏹ 停止
+                        </button>
+                      </div>
+
+                      {/* 进度条 */}
+                      <div
+                        onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const x = e.clientX - rect.left;
+                          const newProgress = Math.max(0, Math.min(1, x / rect.width));
+                          setAnimProgress(newProgress);
+                          setAnimPlaying(false);
+                        }}
+                        style={{ width: '100%', height: 12, background: 'rgba(255,255,255,0.08)', borderRadius: 6, overflow: 'hidden', cursor: 'pointer', position: 'relative' }}
+                      >
+                        <div style={{ width: `${animProgress * 100}%`, height: '100%', background: activeScenario ? '#a855f7' : '#4facfe', borderRadius: 6, transition: animPlaying ? 'width 0.3s' : 'none' }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: '#7f95bb', marginTop: 4, display: 'flex', justifyContent: 'space-between' }}>
+                        <span>{(animProgress * 100).toFixed(0)}%</span>
+                        {activeScenario && <span>{ANIMATION_SCENARIOS[activeScenario].duration}s</span>}
+                      </div>
+                    </div>
+
+                    {/* 当前动画阶段 */}
+                    {activeScenario && (() => {
+                      const phase = getCurrentAnimPhase();
+                      if (!phase) return null;
+                      const scenario = ANIMATION_SCENARIOS[activeScenario];
+                      return (
+                        <div style={{ padding: 12, background: 'rgba(168,85,247,0.08)', borderRadius: 10, border: '1px solid rgba(168,85,247,0.25)' }}>
+                          <div style={{ fontSize: 12, color: '#c084fc', fontWeight: 'bold', marginBottom: 6 }}>
+                            {scenario.icon} {scenario.label}
+                          </div>
+                          <div style={{ fontSize: 11, color: '#dfe8ff', marginBottom: 4 }}>
+                            当前阶段: <span style={{ color: '#4facfe' }}>{phase.label}</span>
+                          </div>
+                          <div style={{ fontSize: 10, color: '#7f95bb' }}>
+                            层范围: L{phase.layerRange[0]} → L{phase.layerRange[1]}
+                          </div>
+                          <div style={{ display: 'flex', gap: 3, marginTop: 8 }}>
+                            {scenario.phases.map((p, i) => {
+                              const isCurrent = p === phase;
+                              const isPast = animProgress >= p.end;
+                              return (
+                                <div key={i} style={{
+                                  flex: 1, height: 3, borderRadius: 2,
+                                  background: isCurrent ? '#a855f7' : isPast ? '#4facfe' : 'rgba(255,255,255,0.08)',
+                                }} />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* DNN场景动画模式 */}
+                    <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 14, fontWeight: 700 }}>
+                        🧠 DNN场景动画
+                      </div>
+                      <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 8 }}>选择动画直接驱动3D神经网络模型</div>
+                      {appleNeuronWorkspace.animationModes.filter(o => o.id !== 'none').map(opt => (
+                        <button key={opt.id}
+                          onClick={() => appleNeuronWorkspace.setAnimationMode(opt.id === appleNeuronWorkspace.animationMode ? 'none' : opt.id)}
+                          style={{
+                            display: 'block', width: '100%', padding: '8px 12px', marginBottom: 4,
+                            background: appleNeuronWorkspace.animationMode === opt.id ? 'rgba(78,205,196,0.12)' : 'rgba(255,255,255,0.03)',
+                            border: appleNeuronWorkspace.animationMode === opt.id ? '1px solid rgba(78,205,196,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: 8, color: appleNeuronWorkspace.animationMode === opt.id ? '#4ecdc4' : '#7f95bb',
+                            cursor: 'pointer', textAlign: 'left', fontSize: 12, transition: 'all 0.2s',
+                          }}
+                        >
+                          {opt.label}
+                          <span style={{ float: 'right', fontSize: 9, color: '#556' }}>{opt.desc?.slice(0, 15) || ''}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
           </div>
@@ -2887,28 +3498,154 @@ export default function App() {
                     </div>
                   </div>
                 ) : isAppleMainView ? (
-                  appleNeuronWorkspace.analysisMode === 'reverse_engineering' ? (
-                    <ReverseEngineeringDataPanel
-                      workspace={appleNeuronWorkspace}
-                      hoveredInfo={hoveredInfo}
-                      displayInfo={displayInfo}
-                    />
-                  ) : (
-                  <LanguageResearchDataPanel
-                    workspace={appleNeuronWorkspace}
-                    hoveredInfo={hoveredInfo}
-                    displayInfo={displayInfo}
-                    infoPanelTab={infoPanelTab}
-                    setInfoPanelTab={setInfoPanelTab}
-                    showAppleCategoryCompare={showAppleCategoryCompare}
-                    showAppleEncodingInfo={showAppleEncodingInfo}
-                    showAppleResearchAsset={showAppleResearchAsset}
-                    showAppleLegend={showAppleLegend}
-                    currentAlgorithmName={currentAlgorithmInfo.name}
-                    currentAlgorithmFocus={currentAlgorithmInfo.focus}
-                    structureTab={structureTab}
-                  />
-                  )
+                  <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    {/* 右侧面板Tab: 拼图 / 详情 */}
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: 10, flexShrink: 0 }}>
+                      {[
+                        { key: 'puzzle', label: '🧩 拼图' },
+                        { key: 'detail', label: '📋 详情' },
+                      ].map(t => (
+                        <button key={t.key} onClick={() => setInfoPanelTab(t.key)}
+                          style={{
+                            flex: 1, padding: '7px 8px',
+                            background: infoPanelTab === t.key ? 'rgba(79, 172, 254, 0.12)' : 'rgba(255,255,255,0.04)',
+                            border: infoPanelTab === t.key ? '1px solid rgba(79, 172, 254, 0.35)' : '1px solid rgba(255,255,255,0.12)',
+                            borderRadius: '999px',
+                            color: infoPanelTab === t.key ? '#e7f4ff' : '#9aa4b4',
+                            cursor: 'pointer', fontSize: 11, fontWeight: 700,
+                            transition: 'all 0.2s',
+                          }}>
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* 拼图Tab内容 */}
+                    {infoPanelTab === 'puzzle' && (
+                      <>
+                        {appleNeuronWorkspace.analysisMode === 'reverse_engineering' ? (
+                          <ReverseEngineeringDataPanel
+                            workspace={appleNeuronWorkspace}
+                            hoveredInfo={hoveredInfo}
+                            displayInfo={displayInfo}
+                          />
+                        ) : (
+                          <LanguageResearchDataPanel
+                            workspace={appleNeuronWorkspace}
+                            hoveredInfo={hoveredInfo}
+                            displayInfo={displayInfo}
+                            infoPanelTab={infoPanelTab}
+                            setInfoPanelTab={setInfoPanelTab}
+                            showAppleCategoryCompare={showAppleCategoryCompare}
+                            showAppleEncodingInfo={showAppleEncodingInfo}
+                            showAppleResearchAsset={showAppleResearchAsset}
+                            showAppleLegend={showAppleLegend}
+                            currentAlgorithmName={currentAlgorithmInfo.name}
+                            currentAlgorithmFocus={currentAlgorithmInfo.focus}
+                            structureTab={structureTab}
+                          />
+                        )}
+                        {/* neural-vis 拼图面板 (98格研究框架) */}
+                        <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 12 }}>
+                          <div style={{ fontSize: 12, color: '#dfe8ff', fontWeight: 700, marginBottom: 8 }}>
+                            🧩 研究拼图框架 (98格)
+                          </div>
+                          <PuzzlePanel puzzleData={byType.puzzle_progress?.[0]} />
+                        </div>
+                      </>
+                    )}
+
+                    {/* 详情Tab内容 */}
+                    {infoPanelTab === 'detail' && (
+                      <div style={{ fontSize: 12, lineHeight: 1.6, overflowY: 'auto' }}>
+                        {/* 维度信息 */}
+                        {activeDimension && (
+                          <div style={{ marginBottom: 10, padding: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: `1px solid ${DIMENSION_VIEWS[activeDimension].color}33` }}>
+                            <div style={{ color: DIMENSION_VIEWS[activeDimension].color, fontWeight: 'bold', marginBottom: 4 }}>
+                              {DIMENSION_VIEWS[activeDimension].icon} {DIMENSION_VIEWS[activeDimension].label}
+                              {activeSubView && ` → ${DIMENSION_VIEWS[activeDimension].subViews[activeSubView]?.label}`}
+                            </div>
+                            {activeSubView && <div style={{ color: '#7f95bb', fontSize: 10 }}>{DIMENSION_VIEWS[activeDimension].subViews[activeSubView]?.description}</div>}
+                          </div>
+                        )}
+
+                        {/* 悬停对象详情 */}
+                        {(hoveredInfo || displayInfo) ? (() => {
+                          const info = hoveredInfo || displayInfo;
+                          return (
+                          <div style={{ background: 'rgba(255,255,255,0.04)', padding: 10, borderRadius: 10, borderLeft: '3px solid #4facfe', border: '1px solid rgba(255,255,255,0.08)', borderLeftWidth: 3, borderLeftColor: '#4facfe' }}>
+                            <div style={{ fontSize: 11, fontWeight: 'bold', color: '#4facfe', marginBottom: 6 }}>当前选中对象</div>
+                            <div style={{ lineHeight: 1.5, color: '#dbeafe' }}>
+                              {info.token && <div style={{ color: '#60a5fa', fontWeight: 'bold', fontSize: 14 }}>{info.token}</div>}
+                              {info.label && !info.token && <div>名称: <strong>{info.label}</strong></div>}
+                              {info.source && <div><span style={{ color: '#7f95bb' }}>from:</span> {info.source}</div>}
+                              {info.type && <div>类型: <span style={{ color: '#4ecdc4' }}>{info.type}</span></div>}
+                              {info.layer !== undefined && (
+                                <div>层: <span style={{ color: layerToFuncColor(info.layer) }}>L{info.layer}</span>{' '}
+                                  <span style={{ fontSize: 10, color: '#7f95bb' }}>({layerToFuncLabel(info.layer)})</span>
+                                </div>
+                              )}
+                              {info.delta_cos !== undefined && (
+                                <div>δ_cos: <span style={{ color: deltaCosToColor(info.delta_cos) }}>{info.delta_cos.toFixed(4)}</span></div>
+                              )}
+                              {info.cos_with_target !== undefined && <div>cos(target): {info.cos_with_target.toFixed(4)}</div>}
+                              {info.cos_with_wu !== undefined && (
+                                <div>cos(W_U): <span style={{ color: cosWuToColor(info.cos_with_wu) }}>{info.cos_with_wu.toFixed(4)}</span></div>
+                              )}
+                              {info.norm !== undefined && <div>范数: <span style={{ color: '#4ecdc4' }}>{info.norm.toFixed(1)}</span></div>}
+                              {info.probability !== undefined && (
+                                <div>概率: <span style={{ color: '#4ecdc4' }}>{(info.probability * 100).toFixed(1)}%</span></div>
+                              )}
+                              {info.activation !== undefined && (
+                                <div>激活: <span style={{ color: '#4ecdc4' }}>{info.activation?.toFixed(4)}</span></div>
+                              )}
+                              {info.category && <div>类别: <span style={{ color: CATEGORY_COLORS[info.category] || '#ffe66d' }}>{info.category}</span></div>}
+                              {info.subspace && (
+                                <div>子空间: <span style={{ color: SUBSPACE_COLORS[info.subspace] || '#888' }}>{info.subspace === 'w_u' ? 'W_U' : info.subspace === 'w_u_perp' ? 'W_U⊥' : info.subspace}</span></div>
+                              )}
+                              {info.isCorrection && <div style={{ color: '#fbbf24', fontWeight: 'bold' }}>⚡ 纠正层</div>}
+                              {info.growth_rate !== undefined && <div>growth_rate: {info.growth_rate.toFixed(3)}</div>}
+                              {info.role_pair && <div>角色对: <span style={{ color: '#ffe66d' }}>{info.role_pair}</span></div>}
+                              {info.cosine !== undefined && <div>cosine: {info.cosine.toFixed(4)}</div>}
+                              {info.kl_divergence !== undefined && <div>KL散度: <span style={{ color: '#4ecdc4' }}>{info.kl_divergence.toFixed(2)}</span></div>}
+                              {info.classification_flip !== undefined && <div>翻转率: <span style={{ color: '#ffe66d' }}>{(info.classification_flip * 100).toFixed(1)}%</span></div>}
+                              {info.w_u_signal !== undefined && <div><span style={{ color: SUBSPACE_COLORS.w_u }}>W_U:</span> {(info.w_u_signal * 100).toFixed(0)}%</div>}
+                              {info.w_u_perp_signal !== undefined && <div><span style={{ color: SUBSPACE_COLORS.w_u_perp }}>W_U⊥:</span> {(info.w_u_perp_signal * 100).toFixed(0)}%</div>}
+                              {info.role && <div>角色: <span style={{ color: '#ffe66d' }}>{info.role}</span></div>}
+                              {info.score !== undefined && <div>分数: <span style={{ color: '#4ecdc4' }}>{info.score.toFixed(4)}</span></div>}
+                              {info.gain !== undefined && <div>增益: <span style={{ color: '#ffd166' }}>{info.gain.toFixed(4)}</span></div>}
+                            </div>
+                          </div>
+                          );
+                        })() : (
+                          <div style={{ color: '#7f95bb', fontSize: 12, fontStyle: 'italic' }}>悬停3D对象查看详情</div>
+                        )}
+
+                        {/* 动画状态 */}
+                        {activeScenario && (
+                          <div style={{ marginTop: 10, padding: 10, background: 'rgba(168,85,247,0.08)', borderRadius: 10, border: '1px solid rgba(168,85,247,0.2)' }}>
+                            <div style={{ color: '#c084fc', fontWeight: 'bold', fontSize: 11, marginBottom: 4 }}>🎬 动画状态</div>
+                            <div style={{ fontSize: 10, color: '#9ea7b7' }}>
+                              {ANIMATION_SCENARIOS[activeScenario].icon} {ANIMATION_SCENARIOS[activeScenario].label} — {(animProgress * 100).toFixed(0)}%
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 模型信息 */}
+                        {data?.model_config && (
+                          <div style={{ marginTop: 10, padding: 10, background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                            <div style={{ fontSize: 11, color: '#dfe8ff', marginBottom: 6, fontWeight: 700 }}>模型信息</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '3px', fontSize: 10, color: '#7f95bb' }}>
+                              <span>架构</span><span style={{ color: '#eef7ff' }}>{data.model_config.name}</span>
+                              <span>层数</span><span style={{ color: '#eef7ff' }}>{data.model_config.n_layers}</span>
+                              <span>维度</span><span style={{ color: '#eef7ff' }}>{data.model_config.d_model}</span>
+                              <span>参数</span><span style={{ color: '#eef7ff' }}>{(data.model_config.total_params / 1e9).toFixed(2)}B</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
@@ -3825,6 +4562,51 @@ export default function App() {
         </SimplePanel>
       )}
 
+      {/* ===== 顶部维度/动画状态栏 (参考neural-vis) ===== */}
+      {isAppleMainView && (activeDimension || activeScenario) && (
+        <div style={{ position: 'absolute', top: 70, left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', gap: 8 }}>
+          {activeDimension && (
+            <div style={{
+              padding: '4px 12px', borderRadius: 6,
+              background: `${DIMENSION_VIEWS[activeDimension].color}22`,
+              border: `1px solid ${DIMENSION_VIEWS[activeDimension].color}`,
+              color: DIMENSION_VIEWS[activeDimension].color,
+              fontSize: 11, backdropFilter: 'blur(8px)',
+            }}>
+              {DIMENSION_VIEWS[activeDimension].icon} {DIMENSION_VIEWS[activeDimension].label}
+              {activeSubView && ` → ${DIMENSION_VIEWS[activeDimension].subViews[activeSubView]?.label}`}
+            </div>
+          )}
+          {activeScenario && (
+            <div style={{
+              padding: '4px 12px', borderRadius: 6,
+              background: 'rgba(30,64,175,0.5)', border: '1px solid #3b82f6',
+              color: '#bfdbfe', fontSize: 11, backdropFilter: 'blur(8px)',
+            }}>
+              ▶ {ANIMATION_SCENARIOS[activeScenario].label} — {(animProgress * 100).toFixed(0)}%
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== neural-vis 加载/错误/空状态覆盖层 ===== */}
+      {isAppleMainView && visLoading && (
+        <div style={{ position: 'absolute', top: 90, left: 400, zIndex: 10, background: 'rgba(20,20,25,0.9)', padding: '8px 16px', borderRadius: 8, fontSize: 13, color: '#4facfe', backdropFilter: 'blur(8px)' }}>
+          加载中...
+        </div>
+      )}
+      {isAppleMainView && visError && (
+        <div style={{ position: 'absolute', top: 90, left: 400, zIndex: 10, background: 'rgba(127,29,29,0.9)', padding: '8px 16px', borderRadius: 8, fontSize: 13, color: '#ff6b6b', backdropFilter: 'blur(8px)' }}>
+          错误: {visError}
+        </div>
+      )}
+      {isAppleMainView && !visData && !showDNNLayers && (
+        <div style={{ position: 'absolute', top: '50%', left: '55%', transform: 'translate(-50%, -50%)', zIndex: 10, textAlign: 'center', color: '#556' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🧠</div>
+          <div style={{ fontSize: 14 }}>请加载可视化数据或开启DNN层结构</div>
+        </div>
+      )}
+
         <Canvas shadows>
           {isAppleMainView && <color attach="background" args={['#090b15']} />}
           {isAppleMainView && <fog attach="fog" args={['#090b15', 14, 42]} />}
@@ -3873,12 +4655,17 @@ export default function App() {
                 mode={appleNeuronWorkspace.analysisMode}
                 theoryObjectMeta={appleNeuronWorkspace.currentTheoryObject}
                 dimensionLayerProfile={appleNeuronWorkspace.multidimLayerProfile}
-                activeDimension={appleNeuronWorkspace.multidimActiveDimension}
+                activeDimension={activeDimension || appleNeuronWorkspace.multidimActiveDimension}
                 dimensionCausal={appleNeuronWorkspace.multidimCausalData}
                 nodeDisplayEmphasis={appleNeuronWorkspace.nodeDisplayEmphasis}
-                animationMode={appleNeuronWorkspace.animationMode}
+                animationMode={activeScenario ? 'forward_pass' : appleNeuronWorkspace.animationMode}
                 scanMechanismData={appleNeuronWorkspace.scanMechanismData}
                 languageFocus={appleNeuronWorkspace.languageFocus}
+                showDNNLayers={showDNNLayers}
+                visibleComponents={visibleComponents}
+                animProgress={animProgress}
+                activeScenario={activeScenario}
+                activeSubView={activeSubView}
               />
               {/* Reverse Engineering 3D Overlay */}
               {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
@@ -3890,6 +4677,96 @@ export default function App() {
                   nodes={appleNeuronWorkspace.nodes}
                   links={appleNeuronWorkspace.links}
                 />
+              )}
+
+              {/* ===== neural_vis 3D可视化渲染器 ===== */}
+              {visData && (
+                <>
+                  {/* 场景辅助 (地面网格 + 层号标尺) */}
+                  <SceneHelpers nLayers={nLayers} />
+
+                  {/* DNN层结构渲染器 (neural-vis版，与AppleNeuronSceneContent互补) */}
+                  {showDNNLayers && !isEncoding3DTab && (
+                    <NeuralNetworkRenderer
+                      nLayers={nLayers}
+                      dModel={visData?.model_info?.d_model}
+                      activeLayerRange={activeScenario ? getCurrentAnimPhase()?.layerRange : null}
+                      highlightedLayer={highlightedLayer}
+                      visibleComponents={visibleComponents}
+                      animProgress={animProgress}
+                      activeScenario={activeScenario}
+                      onHoverLayer={setHighlightedLayer}
+                    />
+                  )}
+
+                  {/* v1.0 渲染器 */}
+                  {byType.layer_stack.filter(() => filterByMode('all')).map(ls => (
+                    <LayerStackRenderer key={ls.id} layerStack={ls} selectedLayers={null} />
+                  ))}
+                  {byType.trajectory.filter(() => filterByMode('trajectory')).map(traj => (
+                    <TrajectoryRenderer
+                      key={traj.id}
+                      trajectory={traj}
+                      animated={animProgress < 1}
+                      animationProgress={animProgress}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                  {byType.point_cloud.filter(() => filterByMode('point_cloud')).map(pc => (
+                    <PointCloudRenderer key={pc.id} pointCloud={pc} onHoverToken={setHoveredInfo} />
+                  ))}
+                  {byType.heatmap_3d.filter(() => filterByMode('heatmap')).map(hm => (
+                    <Heatmap3DRenderer key={hm.id} heatmap={hm} />
+                  ))}
+                  {byType.flow.filter(() => filterByMode('flow')).map(fl => (
+                    <FlowRenderer key={fl.id} flow={fl} animated={animProgress < 1} animationProgress={animProgress} />
+                  ))}
+
+                  {/* v2.0 渲染器 */}
+                  {byType.subspace_decomposition.filter(() => filterByMode('subspace')).map(sd => (
+                    <SubspaceRenderer
+                      key={sd.id}
+                      subspaceDecomp={sd}
+                      animated={animProgress < 1}
+                      animationProgress={animProgress}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                  {byType.force_line.filter(() => filterByMode('force_line')).map(fl => (
+                    <ForceLineRenderer
+                      key={fl.id}
+                      forceLine={fl}
+                      animated={animProgress < 1}
+                      animationProgress={animProgress}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                  {byType.grammar_role_matrix.filter(() => filterByMode('grammar')).map(gm => (
+                    <GrammarRoleMatrixRenderer
+                      key={gm.id}
+                      grammarMatrix={gm}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                  {byType.causal_chain.filter(() => filterByMode('causal')).map(cc => (
+                    <CausalChainRenderer
+                      key={cc.id}
+                      causalChain={cc}
+                      animated={animProgress < 1}
+                      animationProgress={animProgress}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                  {byType.dark_matter_flow.filter(() => filterByMode('dark_matter')).map(dmf => (
+                    <DarkMatterFlowRenderer
+                      key={dmf.id}
+                      darkMatterFlow={dmf}
+                      animated={animProgress < 1}
+                      animationProgress={animProgress}
+                      onHoverToken={setHoveredInfo}
+                    />
+                  ))}
+                </>
               )}
             </>
           ) : (
