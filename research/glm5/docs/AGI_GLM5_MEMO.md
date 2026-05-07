@@ -53912,3 +53912,214 @@ code       47.2%        17.0%
 
 [Phase 77完成时间标记: 2026年05月07日14时31分]
 
+## Phase 78: Computation Unfolding — 语言计算动力学 [2026-05-07 16:23]
+
+### 范式转变: 从"找feature"到"computation unfolding"
+
+用户提出了8条逆向工程路线的完整图谱:
+1. 统计几何派 → 高维幻觉, correlation ≠ mechanism
+2. Mechanistic Interpretability → 局部circuit无法解释全局
+3. **动力系统派 → 我们正在进入**
+4. **信息论派 → 压缩结构**
+5. **程序归纳派 → 隐式程序执行**
+6. **生成递归派 → self-conditioning (核心!)**
+7. 神经符号派 → 变量绑定与组合
+8. 生物脑派 → 离散近似
+
+统一方向: **动力系统 + 信息论 + 程序归纳 + generation rollout**
+
+用户给出的4层框架:
+1. 表示层(Representation) — 知识如何编码
+2. 计算层(Computation) — 信息如何变换
+3. **递归层(Rollout Dynamics)** — 为什么generation形成高级能力
+4. 信息压缩层(Compression) — 为什么这些结构自然出现
+
+最可能的统一理论:
+- 语义 = 世界状态压缩
+- 语法 = 递归组合规则
+- 推理 = rollout中的状态迭代
+- CoT = 隐式计算外显化
+- 翻译 = 保持潜在语义轨迹不变，改变输出映射坐标系
+- **Transformer = 高维递归条件计算机**
+
+---
+
+### 实验A: 相对偏移分析 ★★★★★ (Phase 77关键遗留问题)
+
+**问题**: Phase 77发现offset_norm随层增长8-15x，但这可能是residual norm自然增长的伴生现象
+
+**方法**: 计算相对偏移 = offset_norm / residual_norm
+
+**结果** (最后shared token位置):
+
+| 模式 | L0相对偏移 | L8相对偏移 | L11相对偏移 | 早→晚增长比 |
+|------|-----------|-----------|------------|------------|
+| translate_fr | 0.0835 | 0.1507 | 0.1897 | **1.99x** |
+| summarize | 0.0776 | 0.1199 | 0.1258 | **1.53x** |
+| continue | 0.0671 | 0.0804 | 0.0870 | **1.37x** |
+
+**核心发现: 相对偏移确实在增长!** 
+
+这意味着模式偏移**不仅仅是residual norm增长的伴生**，存在真实的层间信号放大。
+
+但增长幅度有限(1.4-2.0x)，不是指数级爆发。模式信息的层间放大是**温和的**。
+
+**分层特征**:
+- L0-L3: 相对偏移0.06-0.10，微小
+- L4-L7: 开始上升，0.08-0.15
+- L8-L9: 加速上升
+- L10-L11: 趋于饱和
+
+**各shared content位置的相对偏移**:
+- 首个content token: 相对偏移0.96-1.24 (巨大! 接近residual norm)
+- 中间content token: 0.08-0.20
+- 最后content token: 0.08-0.19
+
+→ **模式偏移是边界效应**: prefix边界处偏移最大，后续快速衰减。
+→ 但衰减后仍有残留信号(0.08-0.19)，且这个残余在深层被放大。
+
+---
+
+### 实验B: CoT计算展开
+
+**方法**: 同一问题，CoT prompt vs 直答prompt，比较生成轨迹
+
+**8个任务**:
+- geography: "The capital of France is" vs "Let me think. The capital of France is"
+- addition: "2 + 3 =" vs "Let me add these numbers. 2 + 3 ="
+- antonym: "The opposite of hot is" vs "Think about opposites. The opposite of hot is"
+- causal: "If it rains, the ground gets" vs "Let me reason about this. If it rains, the ground gets"
+
+**逐步KL (CoT vs Direct, vs neutral baseline)**:
+
+geography: CoT/Direct比值从0.76(早期)→0.99(晚期)，几乎无差异
+addition: CoT/Direct比值从0.70(早期)→0.87(晚期)，CoT略弱
+antonym: CoT/Direct比值变化不稳定
+
+**CoT vs Direct的hidden state对比** (生成10步后):
+
+| Task | Layer | CosSim(D,C) | 含义 |
+|------|-------|-------------|------|
+| geography | L0 | 0.996 | 极相似 |
+| geography | L6 | 0.984 | 很相似 |
+| geography | L11 | 0.997 | 极相似 |
+| addition | L0 | 0.845 | 有差异 |
+| addition | L6 | 0.626 | **显著差异** |
+| addition | L11 | 0.899 | 有差异但收敛 |
+| antonym | L0 | 0.669 | 大差异 |
+| antonym | L6 | 0.513 | **最大差异** |
+| antonym | L11 | 0.882 | 收敛 |
+| causal | L0 | 0.996 | 极相似 |
+| causal | L6 | 0.991 | 很相似 |
+| causal | L11 | 0.997 | 极相似 |
+
+**关键发现**:
+1. **CoT与Direct的差异在中层(L5-L8)最大，浅层和深层都收敛**
+   - 这符合"中层做语义整合"的理解
+   - CoT prefix改变了中层的语义整合方式
+2. **不同任务差异程度不同**: 简单任务(geography/causal)CoT几乎无影响；需要"计算"的任务(addition)差异更大
+3. **但GPT-2的CoT能力极差**: 加法给出4.5，不翻译法语等
+   - CoT在GPT-2中基本无效，无法观察到真正的"计算展开"
+
+---
+
+### 实验C: 自稳定递归动力学
+
+**方法**: 3个不同prompt指向同一模式，生成25步，看轨迹是否收敛
+
+**结果 — 轨迹发散而非收敛!**
+
+french模式 (3个不同prompt):
+- L6: 早期cos=0.62-0.98, 晚期cos=0.50-0.52 (**下降!**)
+- L11: 早期cos=0.88-0.99, 晚期cos=0.44-0.65 (**显著下降!**)
+
+code模式:
+- L6: 早期cos=0.61-0.99, 晚期cos=0.48-0.52 (下降)
+- L11: 早期cos=0.83-0.99, 晚期cos=0.77-0.89 (轻微下降)
+
+reasoning模式:
+- L6: 早期cos=0.91, 晚期cos=0.57-0.60 (**大幅下降!**)
+- L11: 早期cos=0.97-0.98, 晚期cos=0.79-0.86 (下降)
+
+**关键发现: 轨迹不收敛，反而发散!**
+
+这**否定了**"模式切换 = attractor basin收敛"的假说。
+
+实际发生的是: 不同prompt → 不同内容 → 不同hidden state → 越走越远。
+
+**轨迹收缩率** (相邻步cosine similarity):
+- 大部分在0.57-0.94范围
+- 没有明显的"加速收缩"趋势
+- 生成过程更像随机漫步而非吸引子收敛
+
+---
+
+### 实验D: 信息累积率
+
+**方法**: 逐步生成中，entropy和top-1 probability的演化
+
+**CoT vs Direct对比**:
+
+| Task | Direct conf趋势 | CoT conf趋势 | CoT>Direct? |
+|------|-----------------|-------------|-------------|
+| addition | +0.043 | +0.002 | No |
+| capital | +0.012 | +0.036 | Yes |
+| opposite | +0.020 | +0.013 | No |
+
+**关键发现**: GPT-2中CoT **没有系统性提升**信息累积率。只有capital任务CoT略优。
+
+**Direct生成的特征**:
+- 加法: "2+3=4...2+3=5...2+3=6" — 循环
+- 反义词: 直接给出"cold"然后重复
+- 首都: 生成无关文本
+
+**CoT生成的特征**:
+- 加法: "4.5" — 错误，然后发散到无关内容
+- 反义词: "cold."然后也发散
+- 所有CoT prompt都更快发散到无关文本
+
+→ **GPT-2的CoT prefix不但没有帮助，反而干扰了简单任务的正确回答**
+
+---
+
+### Phase 78核心结论
+
+1. **相对偏移确实增长(1.4-2.0x)** — 模式偏移不是纯norm伴生，存在真实层间放大
+   - 但增长温和，不是指数级
+   - 偏移集中在prefix边界，content部分衰减到8-19%相对偏移
+
+2. **CoT在GPT-2中基本无效** — 无法观察到真正的"计算展开"
+   - CoT prompt在简单任务上反而干扰
+   - 中层hidden state差异最大(L5-L8)，但这是prefix内容差异，不是计算机制差异
+   - GPT-2没有足够的能力来利用CoT展开计算
+
+3. **生成轨迹发散而非收敛** — 否定attractor basin假说
+   - 不同prompt生成不同内容 → 轨迹越走越远
+   - 没有观察到"模式吸引子"效应
+   - 生成过程更接近随机漫步
+
+4. **GPT-2是根本瓶颈** — 所有"语言能力"相关发现都可能是假象
+   - 没有翻译能力 → "翻译模式"只是prompt统计效应
+   - 没有推理能力 → "推理模式"只是风格模仿
+   - 没有CoT能力 → 无法研究计算展开
+
+### 严格审视: 当前的根本困境
+
+**困境**: 我们试图研究"语言的计算动力学"，但我们的实验对象(GPT-2)没有任何真正的语言计算能力。
+
+这就像:
+- 试图研究"飞行力学"，但用一辆不会飞的车做实验
+- 车在路上走的方向与飞机飞行方向偶然相似
+- 但空气动力学完全不存在
+
+**必须转向有能力的模型**。Qwen3-4B是目前唯一可用的本地模型。
+
+### 下一步: 在Qwen3上验证(关键转折点)
+
+1. 在Qwen3上重复实验A(相对偏移) — 确认放大效应
+2. 在Qwen3上做真正的CoT实验 — 这次模型真的能推理
+3. 在Qwen3上做generation trajectory — 研究真正的自稳定动力学
+4. 如果Qwen3证实了self-conditioning → 这才是真正的突破
+
+[Phase 78完成时间标记: 2026年05月07日16时23分]
+
