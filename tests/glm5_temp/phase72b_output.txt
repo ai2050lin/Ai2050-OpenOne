@@ -1,0 +1,72 @@
+﻿[Phase72] Loading GPT-2 Small float32...
+[Phase72] GPT-2 loaded: 12 layers, d_model=768
+
+======================================================================
+Experiment B: Cross-Layer Consistency of g_spec
+======================================================================
+  5/15 done
+  10/15 done
+  15/15 done
+
+--- g_spec Cross-Layer Cosine Similarity ---
+        L 0  L 1  L 2  L 3  L 4  L 5  L 6  L 7  L 8  L 9  L10  L11
+  L 0  1.00  0.84  0.73  0.65  0.60  0.54  0.46  0.41  0.37  0.31  0.28  0.10
+  L 1  0.84  1.00  0.83  0.74  0.67  0.59  0.50  0.44  0.38  0.31  0.29  0.09
+  L 2  0.73  0.83  1.00  0.88  0.79  0.69  0.58  0.50  0.43  0.35  0.32  0.13
+  L 3  0.65  0.74  0.88  1.00  0.87  0.78  0.66  0.57  0.49  0.42  0.39  0.11
+  L 4  0.60  0.67  0.79  0.87  1.00  0.89  0.79  0.69  0.58  0.48  0.37  0.10
+  L 5  0.54  0.59  0.69  0.78  0.89  1.00  0.89  0.79  0.67  0.56  0.38  0.07
+  L 6  0.46  0.50  0.58  0.66  0.79  0.89  1.00  0.90  0.78  0.66  0.45  0.09
+  L 7  0.41  0.44  0.50  0.57  0.69  0.79  0.90  1.00  0.90  0.80  0.55  0.11
+  L 8  0.37  0.38  0.43  0.49  0.58  0.67  0.78  0.90  1.00  0.90  0.66  0.16
+  L 9  0.31  0.31  0.35  0.42  0.48  0.56  0.66  0.80  0.90  1.00  0.70  0.05
+  L10  0.28  0.29  0.32  0.39  0.37  0.38  0.45  0.55  0.66  0.70  1.00  0.14
+  L11  0.10  0.09  0.13  0.11  0.10  0.07  0.09  0.11  0.16  0.05  0.14  1.00
+
+--- g_spec Cross-Layer CKA ---
+  CKA(L0, L8) = 0.1249
+  CKA(L0, L9) = 0.0908
+  CKA(L0, L10) = 0.0682
+  CKA(L0, L11) = 0.0146
+  CKA(L1, L8) = 0.1452
+  CKA(L1, L9) = 0.1004
+  CKA(L1, L10) = 0.0802
+  CKA(L1, L11) = 0.0143
+  CKA(L2, L8) = 0.1786
+  CKA(L2, L9) = 0.1227
+  CKA(L2, L10) = 0.0992
+  CKA(L2, L11) = 0.0190
+  CKA(L3, L8) = 0.2414
+  CKA(L3, L9) = 0.1773
+  CKA(L3, L10) = 0.1452
+  CKA(L3, L11) = 0.0165
+
+--- g_spec vs v_mean (Representation Direction) ---
+  L 0: cos(v_mean, g_spec) = -0.0002, ||v_mean||=12.82, ||g_spec||=0.2925
+  L 1: cos(v_mean, g_spec) = 0.0168, ||v_mean||=14.69, ||g_spec||=0.4070
+  L 2: cos(v_mean, g_spec) = 0.0205, ||v_mean||=17.16, ||g_spec||=0.4593
+  L 3: cos(v_mean, g_spec) = -0.0333, ||v_mean||=21.32, ||g_spec||=0.4691
+  L 4: cos(v_mean, g_spec) = -0.0443, ||v_mean||=22.91, ||g_spec||=0.5097
+  L 5: cos(v_mean, g_spec) = -0.0611, ||v_mean||=25.45, ||g_spec||=0.5256
+  L 6: cos(v_mean, g_spec) = -0.1376, ||v_mean||=29.15, ||g_spec||=0.5860
+  L 7: cos(v_mean, g_spec) = -0.0914, ||v_mean||=35.52, ||g_spec||=0.5455
+  L 8: cos(v_mean, g_spec) = -0.0834, ||v_mean||=40.80, ||g_spec||=0.4762
+  L 9: cos(v_mean, g_spec) = -0.1603, ||v_mean||=51.97, ||g_spec||=0.4176
+  L10: cos(v_mean, g_spec) = -0.0171, ||v_mean||=67.89, ||g_spec||=0.2522
+  L11: cos(v_mean, g_spec) = 0.4051, ||v_mean||=116.82, ||g_spec||=0.0409
+
+--- g_spec vs g_univ ---
+  L 0: cos(g_spec, g_univ) = 0.0125, ||g_spec||/||g_univ|| = 1.8940
+  L 1: cos(g_spec, g_univ) = -0.0608, ||g_spec||/||g_univ|| = 2.1499
+  L 2: cos(g_spec, g_univ) = -0.0434, ||g_spec||/||g_univ|| = 2.3553
+  L 3: cos(g_spec, g_univ) = -0.0378, ||g_spec||/||g_univ|| = 2.3728
+  L 4: cos(g_spec, g_univ) = -0.0332, ||g_spec||/||g_univ|| = 2.4056
+  L 5: cos(g_spec, g_univ) = -0.1061, ||g_spec||/||g_univ|| = 2.2856
+  L 6: cos(g_spec, g_univ) = -0.1684, ||g_spec||/||g_univ|| = 2.3385
+  L 7: cos(g_spec, g_univ) = -0.0500, ||g_spec||/||g_univ|| = 2.3180
+  L 8: cos(g_spec, g_univ) = 0.0227, ||g_spec||/||g_univ|| = 2.1109
+  L 9: cos(g_spec, g_univ) = -0.0797, ||g_spec||/||g_univ|| = 1.8162
+  L10: cos(g_spec, g_univ) = 0.0532, ||g_spec||/||g_univ|| = 1.0487
+  L11: cos(g_spec, g_univ) = 0.9224, ||g_spec||/||g_univ|| = 0.1654
+
+[Phase72] Done. GPU memory released.

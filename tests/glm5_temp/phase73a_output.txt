@@ -1,0 +1,146 @@
+﻿[Phase73] Loading GPT-2 Small float32...
+[Phase73] GPT-2: 12 layers, d=768, device=cuda:0
+
+======================================================================
+Experiment A: Full Layer Jacobian SVD + Random Matrix Baseline
+======================================================================
+
+--- Layer 0 → Layer 1 ---
+    Jacobian row 200/768 (0.2s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  Jacobian computed in 0.8s, shape=(768, 768)
+  ||J||_F = 21.6563, ||J||_2 = 3.2178
+  stable_rank = 45.29, eff_rank = 649.73, participation_ratio = 321.77
+  S[:10] = [3.2178 2.4491 2.1173 2.0711 2.0283 1.8919 1.861  1.8501 1.7781 1.762 ]
+  S[-5:] = [0.010032 0.009497 0.005509 0.003335 0.000945]
+  S/S[0][:10] = [1.     0.7611 0.658  0.6436 0.6303 0.5879 0.5783 0.575  0.5526 0.5476]
+  Marchenko-Pastur bounds: [0.0000, 0.0564]
+  Actual S[0:5] vs Random S[0:5] (mean±std):
+    S[0]: actual=3.2178, random=1.5598±0.0082, z=203.1
+    S[1]: actual=2.4491, random=1.5437±0.0047, z=194.0
+    S[2]: actual=2.1173, random=1.5354±0.0049, z=118.4
+    S[3]: actual=2.0711, random=1.5273±0.0037, z=145.5
+    S[4]: actual=2.0283, random=1.5188±0.0029, z=173.0
+  Largest spectral gap: S[0]/S[1] = 1.31
+  (Random baseline largest gap: 1.01)
+  Condition number: 3403.4
+  Cumulative energy top-1: 2.2%
+  Cumulative energy top-5: 6.2%
+  Cumulative energy top-10: 9.8%
+  Cumulative energy top-20: 15.1%
+  Cumulative energy top-50: 26.3%
+
+--- Layer 3 → Layer 4 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.4s)
+  Jacobian computed in 0.6s, shape=(768, 768)
+  ||J||_F = 26.9424, ||J||_2 = 4.1684
+  stable_rank = 41.78, eff_rank = 708.22, participation_ratio = 421.65
+  S[:10] = [4.1684 2.2721 2.0673 2.0045 1.8894 1.8344 1.7954 1.7707 1.7259 1.7074]
+  S[-5:] = [0.058672 0.03983  0.029762 0.023575 0.005454]
+  S/S[0][:10] = [1.     0.5451 0.4959 0.4809 0.4533 0.4401 0.4307 0.4248 0.414  0.4096]
+  Marchenko-Pastur bounds: [0.0000, 0.0702]
+  Actual S[0:5] vs Random S[0:5] (mean±std):
+    S[0]: actual=4.1684, random=1.9331±0.0079, z=282.8
+    S[1]: actual=2.2721, random=1.9169±0.0057, z=62.2
+    S[2]: actual=2.0673, random=1.9094±0.0064, z=24.9
+    S[3]: actual=2.0045, random=1.8983±0.0066, z=16.2
+    S[4]: actual=1.8894, random=1.8903±0.0044, z=-0.2
+  Largest spectral gap: S[0]/S[1] = 1.83
+  (Random baseline largest gap: 1.01)
+  Condition number: 764.3
+  Cumulative energy top-1: 2.4%
+  Cumulative energy top-5: 4.7%
+  Cumulative energy top-10: 6.9%
+  Cumulative energy top-20: 10.5%
+  Cumulative energy top-50: 19.2%
+
+--- Layer 6 → Layer 7 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.4s)
+  Jacobian computed in 0.6s, shape=(768, 768)
+  ||J||_F = 27.9869, ||J||_2 = 4.2642
+  stable_rank = 43.08, eff_rank = 724.24, participation_ratio = 434.78
+  S[:10] = [4.2642 2.7447 2.2722 1.9795 1.9659 1.8269 1.7917 1.7668 1.7345 1.6964]
+  S[-5:] = [0.187007 0.164296 0.131705 0.082219 0.006675]
+  S/S[0][:10] = [1.     0.6437 0.5329 0.4642 0.461  0.4284 0.4202 0.4143 0.4068 0.3978]
+  Marchenko-Pastur bounds: [0.0000, 0.0729]
+  Actual S[0:5] vs Random S[0:5] (mean±std):
+    S[0]: actual=4.2642, random=2.0192±0.0130, z=172.7
+    S[1]: actual=2.7447, random=1.9962±0.0058, z=129.6
+    S[2]: actual=2.2722, random=1.9798±0.0045, z=65.0
+    S[3]: actual=1.9795, random=1.9716±0.0058, z=1.4
+    S[4]: actual=1.9659, random=1.9643±0.0052, z=0.3
+  Largest spectral gap: S[0]/S[1] = 1.55
+  (Random baseline largest gap: 1.01)
+  Condition number: 638.9
+  Cumulative energy top-1: 2.3%
+  Cumulative energy top-5: 4.9%
+  Cumulative energy top-10: 6.9%
+  Cumulative energy top-20: 10.3%
+  Cumulative energy top-50: 18.8%
+
+--- Layer 9 → Layer 10 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  Jacobian computed in 0.6s, shape=(768, 768)
+  ||J||_F = 29.7046, ||J||_2 = 6.4601
+  stable_rank = 21.14, eff_rank = 724.56, participation_ratio = 259.57
+  S[:10] = [6.4601 2.2919 2.2091 2.1033 1.9027 1.873  1.847  1.7978 1.7791 1.7767]
+  S[-5:] = [0.255288 0.219158 0.207898 0.10293  0.013161]
+  S/S[0][:10] = [1.     0.3548 0.342  0.3256 0.2945 0.2899 0.2859 0.2783 0.2754 0.275 ]
+  Marchenko-Pastur bounds: [0.0000, 0.0774]
+  Actual S[0:5] vs Random S[0:5] (mean±std):
+    S[0]: actual=6.4601, random=2.1362±0.0087, z=496.3
+    S[1]: actual=2.2919, random=2.1224±0.0078, z=21.8
+    S[2]: actual=2.2091, random=2.1063±0.0079, z=13.0
+    S[3]: actual=2.1033, random=2.0977±0.0079, z=0.7
+    S[4]: actual=1.9027, random=2.0855±0.0041, z=-44.4
+  Largest spectral gap: S[0]/S[1] = 2.82
+  (Random baseline largest gap: 1.01)
+  Condition number: 490.9
+  Cumulative energy top-1: 4.7%
+  Cumulative energy top-5: 6.8%
+  Cumulative energy top-10: 8.7%
+  Cumulative energy top-20: 12.0%
+  Cumulative energy top-50: 20.3%
+
+--- Layer 11 → Layer LN_f ---
+    Jacobian row 200/768 (0.0s)
+    Jacobian row 400/768 (0.1s)
+    Jacobian row 600/768 (0.2s)
+  Jacobian computed in 0.2s, shape=(768, 768)
+  ||J||_F = 4.9994, ||J||_2 = 1.5164
+  stable_rank = 10.87, eff_rank = 638.81, participation_ratio = 31.04
+  S[:10] = [1.5164 1.4471 1.3541 1.2055 1.0809 1.0787 0.9316 0.8334 0.7957 0.6491]
+  S[-5:] = [0.000733 0.000561 0.000447 0.       0.      ]
+  S/S[0][:10] = [1.     0.9543 0.893  0.795  0.7128 0.7114 0.6143 0.5496 0.5247 0.4281]
+  Marchenko-Pastur bounds: [0.0000, 0.0130]
+  Actual S[0:5] vs Random S[0:5] (mean±std):
+    S[0]: actual=1.5164, random=0.3587±0.0023, z=495.2
+    S[1]: actual=1.4471, random=0.3565±0.0019, z=567.4
+    S[2]: actual=1.3541, random=0.3538±0.0013, z=789.7
+    S[3]: actual=1.2055, random=0.3523±0.0011, z=745.6
+    S[4]: actual=1.0809, random=0.3507±0.0010, z=695.8
+  Largest spectral gap: S[10]/S[11] = 1.42
+  (Random baseline largest gap: 1.01)
+  Condition number: 169965584384.0
+  Cumulative energy top-1: 9.2%
+  Cumulative energy top-5: 35.4%
+  Cumulative energy top-10: 50.5%
+  Cumulative energy top-20: 56.2%
+  Cumulative energy top-50: 62.3%
+
+--- Cross-Layer Comparison ---
+  Layer  ||J||_F  ||J||_2  s_rank  e_rank     PR     cond    E@5   E@20
+  L   0    21.66   3.2178   45.29  649.73 321.77   3403.4   6.2%  15.1%
+  L   3    26.94   4.1684   41.78  708.22 421.65    764.3   4.7%  10.5%
+  L   6    27.99   4.2642   43.08  724.24 434.78    638.9   4.9%  10.3%
+  L   9    29.70   6.4601   21.14  724.56 259.57    490.9   6.8%  12.0%
+  L  11     5.00   1.5164   10.87  638.81  31.04 169965584384.0  35.4%  56.2%
+
+[Phase73] Done. GPU memory released.

@@ -1,0 +1,138 @@
+﻿[Phase73] Loading GPT-2 Small float32...
+[Phase73] GPT-2: 12 layers, d=768, device=cuda:0
+
+======================================================================
+Experiment B: Scalar Gradient vs Full Jacobian
+======================================================================
+
+--- Layer 0 ---
+    Jacobian row 200/768 (0.2s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  ||g_l|| = 0.2746
+  g_l energy distribution on J's right singular vectors:
+    Top-1 SVs capture: 0.0% of g_l energy
+    Top-5 SVs capture: 11.0% of g_l energy
+    Top-10 SVs capture: 14.8% of g_l energy
+    Top-20 SVs capture: 17.5% of g_l energy
+    Top-50 SVs capture: 31.3% of g_l energy
+    Top-100 SVs capture: 47.7% of g_l energy
+  Top-10 SV indices by g_l energy: [  3  23   4 104   1  38  25  55 138  85]
+  Their singular values: [2.0711 1.4183 2.0283 1.0608 2.4491 1.2903 1.4047 1.1923 1.0036 1.1013]
+  Their energy fractions: [6.1 3.8 2.9 2.3 2.  1.7 1.7 1.5 1.4 1.4]%
+  g_l cum energy vs random baseline:
+    Top-1: g_l=0.0%, random=0.1%
+    Top-5: g_l=11.0%, random=0.6%
+    Top-10: g_l=14.8%, random=1.3%
+    Top-20: g_l=17.5%, random=2.5%
+    Top-50: g_l=31.3%, random=6.4%
+  SVs needed for 90% energy: g_l=426, random=693, ratio=1.63x
+
+--- Layer 3 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  ||g_l|| = 0.3580
+  g_l energy distribution on J's right singular vectors:
+    Top-1 SVs capture: 0.0% of g_l energy
+    Top-5 SVs capture: 3.1% of g_l energy
+    Top-10 SVs capture: 4.3% of g_l energy
+    Top-20 SVs capture: 9.5% of g_l energy
+    Top-50 SVs capture: 18.8% of g_l energy
+    Top-100 SVs capture: 29.9% of g_l energy
+  Top-10 SV indices by g_l energy: [ 11 127   4 357  40 386   2  46  10  77]
+  Their singular values: [1.6808 1.1723 1.8894 0.9621 1.4188 0.9389 2.0673 1.3833 1.7022 1.2773]
+  Their energy fractions: [2.  1.9 1.5 1.2 1.1 1.1 1.1 1.  1.  1. ]%
+  g_l cum energy vs random baseline:
+    Top-1: g_l=0.0%, random=0.1%
+    Top-5: g_l=3.1%, random=0.7%
+    Top-10: g_l=4.3%, random=1.3%
+    Top-20: g_l=9.5%, random=2.6%
+    Top-50: g_l=18.8%, random=6.6%
+  SVs needed for 90% energy: g_l=562, random=691, ratio=1.23x
+
+--- Layer 6 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  ||g_l|| = 0.3990
+  g_l energy distribution on J's right singular vectors:
+    Top-1 SVs capture: 1.2% of g_l energy
+    Top-5 SVs capture: 18.0% of g_l energy
+    Top-10 SVs capture: 20.9% of g_l energy
+    Top-20 SVs capture: 25.0% of g_l energy
+    Top-50 SVs capture: 31.0% of g_l energy
+    Top-100 SVs capture: 42.2% of g_l energy
+  Top-10 SV indices by g_l energy: [  4   3  19  88 196   0   5   1  95  46]
+  Their singular values: [1.9659 1.9795 1.5879 1.2848 1.1103 4.2642 1.8269 2.7447 1.265  1.4239]
+  Their energy fractions: [7.9 6.9 1.9 1.9 1.3 1.2 1.2 1.2 1.1 1. ]%
+  g_l cum energy vs random baseline:
+    Top-1: g_l=1.2%, random=0.1%
+    Top-5: g_l=18.0%, random=0.8%
+    Top-10: g_l=20.9%, random=1.5%
+    Top-20: g_l=25.0%, random=2.7%
+    Top-50: g_l=31.0%, random=6.6%
+  SVs needed for 90% energy: g_l=565, random=692, ratio=1.22x
+
+--- Layer 9 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  ||g_l|| = 0.3380
+  g_l energy distribution on J's right singular vectors:
+    Top-1 SVs capture: 0.8% of g_l energy
+    Top-5 SVs capture: 5.1% of g_l energy
+    Top-10 SVs capture: 12.2% of g_l energy
+    Top-20 SVs capture: 22.8% of g_l energy
+    Top-50 SVs capture: 33.5% of g_l energy
+    Top-100 SVs capture: 45.5% of g_l energy
+  Top-10 SV indices by g_l energy: [19  3  7 13  9 42 12  8  2 20]
+  Their singular values: [1.6609 2.1033 1.7978 1.7179 1.7767 1.5219 1.7235 1.7791 2.2091 1.654 ]
+  Their energy fractions: [3.8 2.7 2.5 2.3 2.2 2.1 2.  1.7 1.6 1.5]%
+  g_l cum energy vs random baseline:
+    Top-1: g_l=0.8%, random=0.1%
+    Top-5: g_l=5.1%, random=0.6%
+    Top-10: g_l=12.2%, random=1.3%
+    Top-20: g_l=22.8%, random=2.7%
+    Top-50: g_l=33.5%, random=6.7%
+  SVs needed for 90% energy: g_l=569, random=690, ratio=1.21x
+
+--- Layer 11 ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.1s)
+    Jacobian row 600/768 (0.2s)
+  ||g_l|| = 0.2966
+  g_l energy distribution on J's right singular vectors:
+    Top-1 SVs capture: 0.0% of g_l energy
+    Top-5 SVs capture: 0.1% of g_l energy
+    Top-10 SVs capture: 4.0% of g_l energy
+    Top-20 SVs capture: 6.5% of g_l energy
+    Top-50 SVs capture: 15.1% of g_l energy
+    Top-100 SVs capture: 34.6% of g_l energy
+  Top-10 SV indices by g_l energy: [ 65  51   7  21  69 166 175 739  17  88]
+  Their singular values: [0.1654 0.1883 0.8334 0.279  0.1637 0.1266 0.126  0.0935 0.3185 0.1435]
+  Their energy fractions: [4.9 3.4 3.3 3.2 1.8 1.7 1.5 1.4 1.3 1.2]%
+  g_l cum energy vs random baseline:
+    Top-1: g_l=0.0%, random=0.1%
+    Top-5: g_l=0.1%, random=0.6%
+    Top-10: g_l=4.0%, random=1.3%
+    Top-20: g_l=6.5%, random=2.6%
+    Top-50: g_l=15.1%, random=6.5%
+  SVs needed for 90% energy: g_l=636, random=692, ratio=1.09x
+
+--- Multi-Input Verification ---
+    Jacobian row 200/768 (0.1s)
+    Jacobian row 400/768 (0.3s)
+    Jacobian row 600/768 (0.5s)
+  The cat         (sing): 90%@565 SVs, top3 SVs=[4,3,19], S=[1.97,1.98,1.59]
+  The cats        (plur): 90%@667 SVs, top3 SVs=[4,2,482], S=[1.97,2.27,0.88]
+  The dog         (sing): 90%@600 SVs, top3 SVs=[3,4,0], S=[1.98,1.97,4.26]
+  The dogs        (plur): 90%@698 SVs, top3 SVs=[4,1,42], S=[1.97,2.74,1.45]
+  The bird        (sing): 90%@608 SVs, top3 SVs=[3,1,4], S=[1.98,2.74,1.97]
+  The birds       (plur): 90%@686 SVs, top3 SVs=[4,42,14], S=[1.97,1.45,1.64]
+  The girl        (sing): 90%@613 SVs, top3 SVs=[3,43,262], S=[1.98,1.44,1.05]
+  The girls       (plur): 90%@657 SVs, top3 SVs=[4,1,24], S=[1.97,2.74,1.55]
+  The boy         (sing): 90%@617 SVs, top3 SVs=[3,43,4], S=[1.98,1.44,1.97]
+  The boys        (plur): 90%@667 SVs, top3 SVs=[4,1,188], S=[1.97,2.74,1.12]
+
+[Phase73] Done. GPU memory released.

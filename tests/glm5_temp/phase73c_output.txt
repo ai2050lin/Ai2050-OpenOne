@@ -1,0 +1,92 @@
+﻿[Phase73] Loading GPT-2 Small float32...
+[Phase73] GPT-2: 12 layers, d=768, device=cuda:0
+
+======================================================================
+Experiment C: CCA-Based Orthogonality with Random Baseline
+======================================================================
+
+--- Layer 0 ---
+  cos(g_spec_num, g_spec_tense) = -0.0562
+  Random baseline: E[cos]=0, std=1/√d=0.0361
+  Actual random sample: mean=0.1833, std=0.2100
+  Z-score of observed cos: 1.56σ
+  CCA(number, tense) top-5: [0.9998 0.9998 0.9998 0.9997 0.9997]
+  CCA random baseline top-5: [0.9998 0.9998 0.9998 0.9998 0.9997]
+  CCA ratio (num_ten / random): [1. 1. 1. 1. 1.]
+  → CCA接近随机基线 — 正交性可能是高维随机效应
+
+  CKA Split-Half Reliability Test:
+    CKA(sing_A, sing_B) = 0.1013
+    CKA(plur_A, plur_B) = 0.0268
+    CKA(sing, plur)     = 0.0631
+    CKA<0.5说明sing子空间的内部一致性低
+  12/15 inputs done
+
+--- Layer 3 ---
+  cos(g_spec_num, g_spec_tense) = 0.0249
+  Random baseline: E[cos]=0, std=1/√d=0.0361
+  Actual random sample: mean=0.2061, std=0.3534
+  Z-score of observed cos: 0.69σ
+  CCA(number, tense) top-5: [0.9999 0.9998 0.9998 0.9998 0.9998]
+  CCA random baseline top-5: [0.9999 0.9998 0.9998 0.9998 0.9998]
+  CCA ratio (num_ten / random): [1. 1. 1. 1. 1.]
+  → CCA接近随机基线 — 正交性可能是高维随机效应
+
+  CKA Split-Half Reliability Test:
+    CKA(sing_A, sing_B) = 0.0962
+    CKA(plur_A, plur_B) = 0.0492
+    CKA(sing, plur)     = 0.0677
+    CKA<0.5说明sing子空间的内部一致性低
+  12/15 inputs done
+
+--- Layer 6 ---
+  cos(g_spec_num, g_spec_tense) = 0.0507
+  Random baseline: E[cos]=0, std=1/√d=0.0361
+  Actual random sample: mean=0.2670, std=0.4652
+  Z-score of observed cos: 1.40σ
+  CCA(number, tense) top-5: [0.9999 0.9997 0.9997 0.9997 0.9996]
+  CCA random baseline top-5: [0.9998 0.9998 0.9997 0.9997 0.9997]
+  CCA ratio (num_ten / random): [1.     0.9999 1.     1.     0.9999]
+  → CCA接近随机基线 — 正交性可能是高维随机效应
+
+  CKA Split-Half Reliability Test:
+    CKA(sing_A, sing_B) = 0.0946
+    CKA(plur_A, plur_B) = 0.0840
+    CKA(sing, plur)     = 0.0946
+    CKA<0.5说明sing子空间的内部一致性低
+  12/15 inputs done
+
+--- Layer 9 ---
+  cos(g_spec_num, g_spec_tense) = 0.0284
+  Random baseline: E[cos]=0, std=1/√d=0.0361
+  Actual random sample: mean=0.4400, std=0.4127
+  Z-score of observed cos: 0.79σ
+  CCA(number, tense) top-5: [0.9995 0.999  0.9989 0.9989 0.9987]
+  CCA random baseline top-5: [0.9994 0.9992 0.9991 0.9989 0.9988]
+  CCA ratio (num_ten / random): [1.     0.9998 0.9998 0.9999 0.9999]
+  → CCA接近随机基线 — 正交性可能是高维随机效应
+
+  CKA Split-Half Reliability Test:
+    CKA(sing_A, sing_B) = 0.0274
+    CKA(plur_A, plur_B) = 0.0644
+    CKA(sing, plur)     = 0.2140
+    CKA<0.5说明sing子空间的内部一致性低
+  12/15 inputs done
+
+--- Layer 11 ---
+  cos(g_spec_num, g_spec_tense) = 0.4135
+  Random baseline: E[cos]=0, std=1/√d=0.0361
+  Actual random sample: mean=0.9988, std=0.0012
+  Z-score of observed cos: 11.46σ
+  CCA(number, tense) top-5: [0.7052 0.2817 0.1233 0.0998 0.0886]
+  CCA random baseline top-5: [0.573  0.4399 0.3303 0.2428 0.1896]
+  CCA ratio (num_ten / random): [1.2308 0.6404 0.3733 0.4111 0.4674]
+  → CCA部分低于随机基线 — 需要更多分析
+
+  CKA Split-Half Reliability Test:
+    CKA(sing_A, sing_B) = 0.9833
+    CKA(plur_A, plur_B) = 0.9906
+    CKA(sing, plur)     = 0.9919
+  12/15 inputs done
+
+[Phase73] Done. GPU memory released.

@@ -1,0 +1,58 @@
+﻿[Phase71] Loading GPT-2 Small float32...
+[Phase71] GPT-2 loaded: 12 layers, d_model=768, dtype=float32, device=cuda:0
+
+======================================================================
+Experiment C: Universal vs Specific Decomposition
+======================================================================
+  sing: 5/15 done
+  sing: 10/15 done
+  sing: 15/15 done
+  plur: 5/15 done
+  plur: 10/15 done
+  plur: 15/15 done
+
+--- Universal Component Ratio ---
+  Layer ||g_univ|| ||g_spec_s|| ||g_spec_p||  ratio_univ  cos(univ,SV0)
+  L 0       0.1544       0.3269       0.2752      0.4565      -0.846389
+  L 1       0.1893       0.4106       0.3425      0.4492       0.089663
+  L 2       0.1950       0.4096       0.3575      0.4536       0.041156
+  L 3       0.1977       0.3813       0.3356      0.4830       0.098521
+  L 4       0.2119       0.3901       0.3457      0.4996       0.083451
+  L 5       0.2300       0.3797       0.3365      0.5403       0.354508
+  L 6       0.2506       0.3931       0.3471      0.5607       0.471656
+  L 7       0.2353       0.3556       0.3139      0.5747       0.191829
+  L 8       0.2256       0.3039       0.2723      0.6168      -0.094116
+  L 9       0.2300       0.2596       0.2321      0.6825      -0.912136
+  L10       0.2405       0.1636       0.1461      0.8418      -0.999787
+  L11       0.2470       0.0277       0.0233      0.9994      -0.999997
+
+--- Specific Component: Sing vs Plur Direction ---
+  Layer   cos(spec_s,spec_p)   Δgap(univ)   Δgap(spec_s)   Δgap(spec_p)
+  L 0                -1.0000       0.3050         0.3062        -0.3074
+  L 1                -1.0000       0.3610         0.3916        -0.3982
+  L 2                -1.0000       0.3800         0.4543        -0.4794
+  L 3                -1.0000       0.3832         0.4721        -0.5010
+  L 4                -1.0000       0.4096         0.5230        -0.5620
+  L 5                -1.0000       0.4038         0.5167        -0.5413
+  L 6                -1.0000       0.4071         0.5741        -0.5836
+  L 7                -1.0000       0.4534         0.5805        -0.5739
+  L 8                -1.0000       0.4789         0.5306        -0.5355
+  L 9                -1.0000       0.4219         0.4277        -0.4163
+  L10                -1.0000       0.4891         0.2926        -0.2996
+  L11                -1.0000       0.5153         0.4812        -0.4829
+
+--- Universal Gradient vs Mean Difference Direction ---
+  L 0: cos(v_mean, g_universal) = 0.0658, ||v_mean||=12.8231, ||g_univ||=0.1544
+  L 1: cos(v_mean, g_universal) = 0.0569, ||v_mean||=14.6857, ||g_univ||=0.1893
+  L 2: cos(v_mean, g_universal) = 0.0702, ||v_mean||=17.1582, ||g_univ||=0.1950
+  L 3: cos(v_mean, g_universal) = 0.1340, ||v_mean||=21.3171, ||g_univ||=0.1977
+  L 4: cos(v_mean, g_universal) = 0.1317, ||v_mean||=22.9099, ||g_univ||=0.2119
+  L 5: cos(v_mean, g_universal) = 0.1765, ||v_mean||=25.4489, ||g_univ||=0.2300
+  L 6: cos(v_mean, g_universal) = 0.2702, ||v_mean||=29.1459, ||g_univ||=0.2506
+  L 7: cos(v_mean, g_universal) = 0.2445, ||v_mean||=35.5151, ||g_univ||=0.2353
+  L 8: cos(v_mean, g_universal) = 0.2399, ||v_mean||=40.7979, ||g_univ||=0.2256
+  L 9: cos(v_mean, g_universal) = 0.2449, ||v_mean||=51.9659, ||g_univ||=0.2300
+  L10: cos(v_mean, g_universal) = 0.2737, ||v_mean||=67.8886, ||g_univ||=0.2405
+  L11: cos(v_mean, g_universal) = 0.2401, ||v_mean||=116.8151, ||g_univ||=0.2470
+
+[Phase71] Done. GPU memory released.

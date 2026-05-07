@@ -1,0 +1,103 @@
+﻿Loading GPT-2 Small (fp32)...
+Loaded pretrained model gpt2-small into HookedTransformer
+Model loaded: 12 layers, 12 heads, d_model=768
+======================================================================
+ʵ��C: ����ͼ���� �� Token��Ӱ��ṹ
+======================================================================
+
+--- OV PathӰ����: ��head������logit�Ĺ��� ---
+ʹ��activation patching: ��ĳhead������㣬����logit�仯
+  Prompt: Translate to French: The cat sat on the mat.
+  Tokens: ['<|endoftext|>', 'Trans', 'late', ' to', ' French', ':', ' The', ' cat', ' sat', ' on', ' the', ' mat', '.']
+
+  ��head������logit��Ӱ���� (KLɢ��):
+   Layer    Head          KL                    top3_influenced_tokens
+
+  Top-20 ����Ҫheads (��translateģʽ):
+    Rank   Layer    Head          KL
+       1  L   0  H  10      0.2307
+       2  L   0  H   3      0.0460
+       3  L   0  H   7      0.0437
+       4  L   0  H   8      0.0422
+       5  L   0  H   9      0.0383
+       6  L   5  H   5      0.0357
+       7  L  11  H   0      0.0223
+       8  L   0  H   4      0.0144
+       9  L   5  H   1      0.0138
+      10  L   3  H   9      0.0135
+      11  L   0  H   1      0.0113
+      12  L   6  H   3      0.0108
+      13  L   5  H   9      0.0103
+      14  L   3  H   5      0.0095
+      15  L   3  H   0      0.0084
+      16  L  11  H   8      0.0081
+      17  L   3  H   4      0.0076
+      18  L   5  H   3      0.0073
+      19  L   5  H   8      0.0072
+      20  L   7  H   4      0.0060
+
+--- Token��Influence Graph (via attention) ---
+��tokenλ�ñ�����λ��attend��ǿ�� (translateģʽ)
+
+  ��tokenλ�õı�attendǿ�� (top-3 source positions):
+  pos 0(<|endoftext|>): �� pos0(<|endoftext|>)=1.000, pos1(Trans)=0.917, pos2(late)=0.800
+  pos 1(       Trans): �� pos2(late)=0.106, pos1(Trans)=0.083, pos3( to)=0.058
+  pos 2(        late): �� pos3( to)=0.143, pos2(late)=0.094, pos4( French)=0.087
+  pos 3(          to): �� pos4( French)=0.138, pos3( to)=0.110, pos5(:)=0.070
+  pos 4(      French): �� pos5(:)=0.136, pos4( French)=0.107, pos6( The)=0.077
+  pos 5(           :): �� pos6( The)=0.106, pos5(:)=0.091, pos7( cat)=0.057
+  pos 6(         The): �� pos7( cat)=0.096, pos6( The)=0.092, pos8( sat)=0.063
+  pos 7(         cat): �� pos8( sat)=0.112, pos7( cat)=0.093, pos9( on)=0.082
+  pos 8(         sat): �� pos9( on)=0.133, pos8( sat)=0.093, pos10( the)=0.092
+  pos 9(          on): �� pos10( the)=0.110, pos11( mat)=0.092, pos9( on)=0.083
+  pos10(         the): �� pos11( mat)=0.079, pos10( the)=0.068, pos12(.)=0.042
+  pos11(         mat): �� pos11( mat)=0.082, pos12(.)=0.065, pos10( the)=0.000
+  pos12(           .): �� pos12(.)=0.100, pos11( mat)=0.000, pos10( the)=0.000
+
+--- ��ģʽInfluence Graph���� ---
+�Ƚ�chat vs translate vs code��influence pattern
+
+  chat:
+    Last token total received attention: 1.0000
+    From first token (mode instruction): 0.5118 (51.2%)
+    From recent 3 tokens:               0.1907 (19.1%)
+
+  translate:
+    Last token total received attention: 1.0000
+    From first token (mode instruction): 0.4659 (46.6%)
+    From recent 3 tokens:               0.1482 (14.8%)
+
+  code:
+    Last token total received attention: 1.0000
+    From first token (mode instruction): 0.4725 (47.2%)
+    From recent 3 tokens:               0.1704 (17.0%)
+
+--- ��Ϣƿ��: ��Щtokenλ���ǹؼ�·�ɽڵ�? ---
+
+  translate �� ��λ�õ�routing strength:
+    pos 0(  <|endoftext|>): 8.546 ������������������������������������������������������������������������������������
+    pos 1(          Trans): 0.448 ����
+    pos 2(           late): 0.575 ����
+    pos 3(             to): 0.478 ����
+    pos 4(         French): 0.463 ����
+    pos 5(              :): 0.425 ����
+    pos 6(            The): 0.410 ����
+    pos 7(            cat): 0.452 ����
+    pos 8(            sat): 0.441 ����
+    pos 9(             on): 0.327 ��
+    pos10(            the): 0.190 
+    pos11(            mat): 0.147 
+    pos12(              .): 0.100 
+
+  code �� ��λ�õ�routing strength:
+    pos 0(  <|endoftext|>): 7.312 ������������������������������������������������������������������������
+    pos 1(          Write): 0.613 ������
+    pos 2(         Python): 0.559 ����
+    pos 3(           code): 0.346 ��
+    pos 4(              :): 0.368 ��
+    pos 5(            def): 0.590 ����
+    pos 6(           fact): 0.387 ��
+    pos 7(          orial): 0.258 ��
+    pos 8(              (): 0.303 ��
+    pos 9(              n): 0.150 
+    pos10(             ):): 0.113 

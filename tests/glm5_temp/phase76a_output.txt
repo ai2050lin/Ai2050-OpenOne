@@ -1,0 +1,155 @@
+﻿Loading GPT-2 Small (fp32)...
+Loaded pretrained model gpt2-small into HookedTransformer
+Model loaded: 12 layers, 12 heads, d_model=768
+======================================================================
+ʵ��A: Head Ablation �� �رյ���head�����ЧӦ
+======================================================================
+
+--- ����logit�ֲ� (��ablation) ---
+
+  chat: top-5 = [(' I', '0.170'), ('\n', '0.149'), (' The', '0.069'), (' It', '0.050'), (' As', '0.028')]
+
+  translate: top-5 = [('\n', '0.227'), (' The', '0.131'), (' It', '0.048'), (' I', '0.039'), (' He', '0.025')]
+
+  reason: top-5 = [(' If', '0.221'), ('\n', '0.152'), (' But', '0.054'), (' And', '0.039'), (' The', '0.032')]
+
+  code: top-5 = [(' return', '0.567'), (' if', '0.072'), (' for', '0.056'), (' #', '0.043'), (' print', '0.025')]
+
+  summarize: top-5 = [('\n', '0.321'), (' The', '0.129'), (' It', '0.048'), (' He', '0.035'), (' "', '0.020')]
+
+--- ���Head Ablation (Phase 75���ֵ�ģʽ·��heads) ---
+
+  === Ablating L5H7 ===
+    chat: KL=0.001, top-1= I(0.172) [same]
+    translate: KL=0.006, top-1=
+(0.236) [same]
+    reason: KL=0.004, top-1= If(0.191) [same]
+    code: KL=0.001, top-1= return(0.581) [same]
+    summarize: KL=0.009, top-1=
+(0.356) [same]
+
+  === Ablating L6H9 ===
+    chat: KL=0.000, top-1= I(0.169) [same]
+    translate: KL=0.001, top-1=
+(0.222) [same]
+    reason: KL=0.001, top-1= If(0.233) [same]
+    code: KL=0.000, top-1= return(0.556) [same]
+    summarize: KL=0.001, top-1=
+(0.312) [same]
+
+  === Ablating L9H10 ===
+    chat: KL=0.000, top-1= I(0.172) [same]
+    translate: KL=0.000, top-1=
+(0.224) [same]
+    reason: KL=0.000, top-1= If(0.221) [same]
+    code: KL=0.001, top-1= return(0.565) [same]
+    summarize: KL=0.000, top-1=
+(0.321) [same]
+
+  === Ablating L5H0 ===
+    chat: KL=0.003, top-1= I(0.186) [same]
+    translate: KL=0.005, top-1=
+(0.244) [same]
+    reason: KL=0.007, top-1= If(0.207) [same]
+    code: KL=0.002, top-1= return(0.570) [same]
+    summarize: KL=0.007, top-1=
+(0.340) [same]
+
+  === Ablating L11H8 ===
+    chat: KL=0.004, top-1= I(0.162) [same]
+    translate: KL=0.008, top-1=
+(0.187) [same]
+    reason: KL=0.004, top-1= If(0.215) [same]
+    code: KL=0.009, top-1= return(0.525) [same]
+    summarize: KL=0.008, top-1=
+(0.272) [same]
+
+--- ���Head Ablation (������) ---
+
+  === Ablating L1H5 ===
+    chat: KL=0.001, top-1= I(0.169) [same]
+    translate: KL=0.021, top-1=
+(0.253) [same]
+    reason: KL=0.005, top-1= If(0.196) [same]
+    code: KL=0.003, top-1= return(0.555) [same]
+    summarize: KL=0.034, top-1=
+(0.358) [same]
+
+  === Ablating L3H2 ===
+    chat: KL=0.000, top-1= I(0.172) [same]
+    translate: KL=0.001, top-1=
+(0.219) [same]
+    reason: KL=0.003, top-1= If(0.247) [same]
+    code: KL=0.001, top-1= return(0.567) [same]
+    summarize: KL=0.001, top-1=
+(0.314) [same]
+
+  === Ablating L7H8 ===
+    chat: KL=0.000, top-1= I(0.167) [same]
+    translate: KL=0.001, top-1=
+(0.230) [same]
+    reason: KL=0.000, top-1= If(0.220) [same]
+    code: KL=0.000, top-1= return(0.574) [same]
+    summarize: KL=0.001, top-1=
+(0.319) [same]
+
+  === Ablating L10H1 ===
+    chat: KL=0.000, top-1= I(0.171) [same]
+    translate: KL=0.001, top-1=
+(0.226) [same]
+    reason: KL=0.001, top-1= If(0.228) [same]
+    code: KL=0.001, top-1= return(0.581) [same]
+    summarize: KL=0.001, top-1=
+(0.325) [same]
+
+  === Ablating L4H6 ===
+    chat: KL=0.005, top-1=
+(0.176) [CHANGED]
+    translate: KL=0.002, top-1=
+(0.223) [same]
+    reason: KL=0.005, top-1= If(0.233) [same]
+    code: KL=0.011, top-1= return(0.501) [same]
+    summarize: KL=0.001, top-1=
+(0.312) [same]
+
+
+--- ����: ���heads vs ���heads��ƽ��KLɢ�� ---
+      Head        Type      MeanKL
+L1H  5      random      0.0129
+L11H  8   SENSITIVE      0.0066
+L4H  6      random      0.0048
+L5H  0   SENSITIVE      0.0046
+L5H  7   SENSITIVE      0.0043
+L3H  2      random      0.0012
+L10H  1      random      0.0007
+L6H  9   SENSITIVE      0.0006
+L7H  8      random      0.0005
+L9H 10   SENSITIVE      0.0003
+
+--- ȫheadɨ��: ÿ��head ablation���ƽ��KLɢ�� ---
+  L 0: strongest H10 (KL=0.0851), top3=[H10(KL=0.085), H7(KL=0.033), H1(KL=0.030)]
+  L 1: strongest H3 (KL=0.0220), top3=[H3(KL=0.022), H10(KL=0.019), H5(KL=0.013)]
+  L 2: strongest H8 (KL=0.0167), top3=[H8(KL=0.017), H0(KL=0.013), H9(KL=0.010)]
+  L 3: strongest H5 (KL=0.0105), top3=[H5(KL=0.011), H9(KL=0.007), H0(KL=0.004)]
+  L 4: strongest H9 (KL=0.0087), top3=[H9(KL=0.009), H2(KL=0.007), H6(KL=0.005)]
+  L 5: strongest H1 (KL=0.0217), top3=[H1(KL=0.022), H5(KL=0.017), H9(KL=0.014)]
+  L 6: strongest H7 (KL=0.0090), top3=[H7(KL=0.009), H3(KL=0.008), H5(KL=0.008)]
+  L 7: strongest H4 (KL=0.0035), top3=[H4(KL=0.003), H11(KL=0.003), H6(KL=0.003)]
+  L 8: strongest H10 (KL=0.0124), top3=[H10(KL=0.012), H9(KL=0.009), H1(KL=0.008)]
+  L 9: strongest H1 (KL=0.0054), top3=[H1(KL=0.005), H4(KL=0.005), H2(KL=0.004)]
+  L10: strongest H3 (KL=0.0047), top3=[H3(KL=0.005), H4(KL=0.003), H0(KL=0.002)]
+  L11: strongest H0 (KL=0.0279), top3=[H0(KL=0.028), H8(KL=0.007), H5(KL=0.005)]
+
+--- �����ƽ��ablationЧӦ ---
+  L 0: mean=0.0206, max=0.0851, std=0.0226
+  L 1: mean=0.0074, max=0.0220, std=0.0065
+  L 2: mean=0.0070, max=0.0167, std=0.0045
+  L 3: mean=0.0036, max=0.0105, std=0.0025
+  L 4: mean=0.0035, max=0.0087, std=0.0022
+  L 5: mean=0.0075, max=0.0217, std=0.0064
+  L 6: mean=0.0045, max=0.0090, std=0.0029
+  L 7: mean=0.0014, max=0.0035, std=0.0011
+  L 8: mean=0.0047, max=0.0124, std=0.0037
+  L 9: mean=0.0021, max=0.0054, std=0.0017
+  L10: mean=0.0017, max=0.0047, std=0.0011
+  L11: mean=0.0045, max=0.0279, std=0.0073

@@ -1,0 +1,56 @@
+﻿Loading GPT-2 Small (fp32)...
+Loaded pretrained model gpt2-small into HookedTransformer
+Model loaded: 12 layers, 12 heads, d_model=768
+======================================================================
+ʵ��B: Activation Patching �� ��ģʽ��Ԥ
+======================================================================
+
+--- �ռ���ģʽ��activation cache ---
+  chat: 13 tokens
+  translate: 13 tokens
+  reason: 16 tokens
+  code: 11 tokens
+  summarize: 15 tokens
+
+--- Residual Stream Patching: ��translate��h patch��chat ---
+����: patch��chat��logit�ֲ��Ƿ���translateƫ��?
+  Baseline KL(chat, translate) = 0.9017
+
+  Patching resid_post from translate to chat:
+   Layer     KL(chat_patched, translate)    KL_reduction%
+  L   0                          0.9074            -0.6%
+  L   1                          0.8995             0.2%
+  L   2                          0.8741             3.1%
+  L   3                          0.8516             5.6%
+  L   4                          0.7830            13.2%
+  L   5                          0.6637            26.4%
+  L   6                          0.4199            53.4%
+  L   7                          0.3268            63.8%
+  L   8                          0.1546            82.9%
+  L   9                          0.0581            93.6%
+  L  10                          0.0105            98.8%
+  L  11                          0.0000           100.0%
+
+--- Attention Output Patching: ��translate��attn output patch��chat ---
+�ҳ�: ��Щ��+heads��attn output��Ӱ��ģʽ��Ϊ
+  L0: KL=0.9074, reduction=-0.6%
+  L3: KL=0.9043, reduction=-0.3%
+  L5: KL=0.8774, reduction=2.7%
+  L6: KL=0.7971, reduction=11.6%
+  L7: KL=0.8047, reduction=10.8%
+  L9: KL=0.7510, reduction=16.7%
+  L11: KL=0.7103, reduction=21.2%
+
+--- ����Patching: ��chat��h patch��translate ---
+  L0: KL=0.7824, reduction=2.9%
+  L1: KL=0.7449, reduction=7.6%
+  L2: KL=0.6888, reduction=14.5%
+  L3: KL=0.6690, reduction=17.0%
+  L4: KL=0.6491, reduction=19.5%
+  L5: KL=0.4586, reduction=43.1%
+  L6: KL=0.2103, reduction=73.9%
+  L7: KL=0.1607, reduction=80.1%
+  L8: KL=0.0865, reduction=89.3%
+  L9: KL=0.0325, reduction=96.0%
+  L10: KL=0.0077, reduction=99.0%
+  L11: KL=0.0000, reduction=100.0%

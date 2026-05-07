@@ -1,0 +1,41 @@
+﻿[Phase72] Loading GPT-2 Small float32...
+[Phase72] GPT-2 loaded: 12 layers, d_model=768
+
+======================================================================
+Experiment A: LayerNorm+Unembed Gradient Analysis
+======================================================================
+  Unembed matrix shape: (50257, 768)
+  sv_id=4539 (' runs'), pv_id=1057 (' run')
+  ||W[pv]-W[sv]|| = 2.3508
+
+--- Autograd Gradient at L11 vs W[pv]-W[sv] ---
+  cos(grad, W[pv]-W[sv]):
+    sing: mean=0.944979, std=0.000861
+    plur: mean=0.936770, std=0.000608
+
+--- LayerNorm Effect on Gradient ---
+  LayerNorm eps=1e-05, weight_norm=56.8354
+
+  Input: 'The cat'
+  ||h_11|| = 313.0584
+  h_11 mean = 0.1176, std = 11.2959
+  ||grad_actual|| = 0.2966
+  cos(grad, W_diff) = 0.945464
+  Simple theory (γ/σ · W_diff): cos=0.999431
+  Centered theory (γ/σ · (W_diff-mean)): cos=0.999492
+
+--- cos(grad, W_diff) Across All Layers ---
+  L 0: cos(grad, W_diff) = 0.1065±0.0372
+  L 1: cos(grad, W_diff) = 0.1176±0.0455
+  L 2: cos(grad, W_diff) = 0.1380±0.0635
+  L 3: cos(grad, W_diff) = 0.1786±0.0707
+  L 4: cos(grad, W_diff) = 0.1914±0.0508
+  L 5: cos(grad, W_diff) = 0.2459±0.0427
+  L 6: cos(grad, W_diff) = 0.2596±0.0639
+  L 7: cos(grad, W_diff) = 0.2893±0.0690
+  L 8: cos(grad, W_diff) = 0.3948±0.0964
+  L 9: cos(grad, W_diff) = 0.4986±0.0483
+  L10: cos(grad, W_diff) = 0.6876±0.0546
+  L11: cos(grad, W_diff) = 0.9408±0.0045
+
+[Phase72] Done. GPU memory released.
