@@ -1,0 +1,31 @@
+﻿[Phase72] Loading GPT-2 Small float32...
+[Phase72] GPT-2 loaded: 12 layers, d_model=768
+
+======================================================================
+Experiment C: Tense Feature Gradient Analysis
+======================================================================
+  past_id=6807 (' walked'), pres_id=11114 (' walks')
+  4/12 done
+  8/12 done
+  12/12 done
+
+--- Tense Gradient Analysis ---
+  L 0: eff_rank=20.87, CKA(past,pres)=0.4355, ratio_univ=0.5044, ||g_spec||=0.1244
+  L 3: eff_rank=20.05, CKA(past,pres)=0.3750, ratio_univ=0.5989, ||g_spec||=0.1804
+  L 6: eff_rank=18.62, CKA(past,pres)=0.5173, ratio_univ=0.6834, ||g_spec||=0.1632
+  L 9: eff_rank=13.74, CKA(past,pres)=0.7110, ratio_univ=0.8793, ||g_spec||=0.0759
+  L11: eff_rank=1.14, CKA(past,pres)=0.9987, ratio_univ=0.9999, ||g_spec||=0.0052
+
+--- Number g_spec vs Tense g_spec ---
+  L 0: cos(g_spec_number, g_spec_tense) = 0.0547, ||g_spec_num||=0.3280, ||g_spec_tense||=0.1244
+  L 3: cos(g_spec_number, g_spec_tense) = -0.0256, ||g_spec_num||=0.5123, ||g_spec_tense||=0.1804
+  L 6: cos(g_spec_number, g_spec_tense) = -0.0545, ||g_spec_num||=0.6364, ||g_spec_tense||=0.1632
+  L 9: cos(g_spec_number, g_spec_tense) = -0.0118, ||g_spec_num||=0.4424, ||g_spec_tense||=0.0759
+  L11: cos(g_spec_number, g_spec_tense) = -0.4154, ||g_spec_num||=0.0382, ||g_spec_tense||=0.0052
+
+--- Combined Number+Tense Gradient SVD ---
+  L 0: eff_rank=30.94, S[:8]=[0.863 0.635 0.588 0.5   0.46  0.412 0.37  0.354]
+  L 6: eff_rank=26.06, S[:8]=[1.216 1.108 0.86  0.461 0.448 0.43  0.393 0.367]
+  L11: eff_rank=2.32, S[:8]=[1.22  0.734 0.032 0.004 0.003 0.002 0.002 0.002]
+
+[Phase72] Done. GPU memory released.

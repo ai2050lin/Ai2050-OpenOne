@@ -1,0 +1,252 @@
+﻿Loading GPT-2 Small (fp32)...
+Loaded pretrained model gpt2-small into HookedTransformer
+Model loaded: 12 layers, 12 heads, d_model=768
+======================================================================
+ʵ��B: ע����·������ �� 'Translate:'�ı�����Щheads?
+======================================================================
+  chat: collected attention for 12 layers
+  translate: collected attention for 12 layers
+  summarize: collected attention for 12 layers
+  reason: collected attention for 12 layers
+  code: collected attention for 12 layers
+
+--- Attention Entropy�仯 (chat vs ����ģʽ) ---
+��entropy = ��ɢattention; ��entropy = ����attention
+
+ Layer    Head     translate_��ent     summarize_��ent        reason_��ent          code_��ent
+L   2  H   1        -0.184        -0.194        -0.508        -0.432
+L   6  H   3        -0.350        -0.429        -0.533        -0.537
+L   6  H   4        -0.189        -0.268        -0.453        -0.606
+L   6  H   7        -0.311        -0.447        -0.454        -0.574
+
+�� 4 ��head�ڲ�ͬģʽ��entropy�仯>0.5
+
+--- Attention�ֲ�KLɢ�� (vs chat) ---
+KL>0: ��ģʽattentionƫ��chatģʽ
+
+ Layer   translate_maxKL   translate_meanKL   summarize_maxKL   summarize_meanKL      reason_maxKL      reason_meanKL        code_maxKL        code_meanKL
+L   0       0.952       0.228       0.364       0.043       0.095      -0.110       0.209      -0.069
+L   1       1.140       0.045       1.301       0.075       0.210      -0.135       0.637      -0.102
+L   2       1.394       0.145       1.078       0.134       0.266      -0.163       0.611      -0.095
+L   3       1.321       0.191       1.153       0.121       0.234      -0.021       0.205      -0.059
+L   4       0.744       0.191       0.507       0.094       0.242       0.032       1.160       0.174
+L   5       3.239       0.634       2.211       0.506       1.018       0.214       2.085       0.431
+L   6       2.353       0.423       1.326       0.373       1.043       0.196       1.474       0.258
+L   7       0.830       0.240       0.771       0.240       0.287       0.030       0.588       0.181
+L   8       1.151       0.396       1.127       0.439       0.294       0.103       1.072       0.173
+L   9       1.772       0.327       1.988       0.385       1.113       0.216       0.530       0.172
+L  10       0.897       0.336       1.042       0.400       0.873       0.181       1.061       0.279
+L  11       1.487       0.385       1.923       0.495       0.658       0.150       0.218       0.038
+
+--- Attention�ض���: ��Щtoken������/����attend ---
+
+  Mode: translate (vs chat)
+   Layer    Head                        TopAttended_Change
+  L   0  H   0  pos 15:  -0.353
+  L   0  H   1  pos 16:  +0.998
+  L   0  H   2  pos  0:  +0.229
+  L   0  H   3  pos 16:  +0.963
+  L   0  H   4  pos 16:  +0.804
+  L   0  H   5  pos 16:  +0.996
+  L   0  H   6  pos 16:  +0.158
+  L   0  H   7  pos 13:  +0.190
+  L   0  H   8  pos 14:  -0.173
+  L   0  H   9  pos  0:  +0.134
+  L   0  H  10  pos 16:  +0.150
+  L   0  H  11  pos 16:  +0.052
+  L   3  H   0  pos 16:  +0.090
+  L   3  H   1  pos  5:  +0.136
+  L   3  H   2  pos 15:  +0.655
+  L   3  H   3  pos  0:  -0.203
+  L   3  H   4  pos  0:  +0.056
+  L   3  H   5  pos  0:  +0.106
+  L   3  H   6  pos 16:  +0.208
+  L   3  H   7  pos 15:  +0.180
+  L   3  H   8  pos 14:  +0.475
+  L   3  H   9  pos  0:  +0.428
+  L   3  H  10  pos 16:  +0.170
+  L   3  H  11  pos 12:  +0.190
+  L   6  H   0  pos  0:  -0.370
+  L   6  H   1  pos  0:  +0.143
+  L   6  H   2  pos  0:  +0.113
+  L   6  H   3  pos 15:  -0.104
+  L   6  H   4  pos  0:  +0.181
+  L   6  H   5  pos  0:  +0.091
+  L   6  H   6  pos  0:  +0.143
+  L   6  H   7  pos  0:  +0.308
+  L   6  H   8  pos  0:  -0.180
+  L   6  H   9  pos  0:  +0.257
+  L   6  H  10  pos  0:  +0.179
+  L   6  H  11  pos  0:  -0.349
+  L   9  H   0  pos  0:  +0.165
+  L   9  H   1  pos  0:  -0.105
+  L   9  H   2  pos  0:  +0.149
+  L   9  H   3  pos  0:  -0.195
+  L   9  H   4  pos  0:  +0.155
+  L   9  H   5  pos  2:  -0.081
+  L   9  H   6  pos  0:  +0.094
+  L   9  H   7  pos  0:  +0.087
+  L   9  H  10  pos  0:  -0.672
+  L   9  H  11  pos  3:  -0.086
+  L  11  H   0  pos  2:  -0.163
+  L  11  H   1  pos  0:  +0.301
+  L  11  H   2  pos  0:  +0.076
+  L  11  H   3  pos 13:  +0.166
+  L  11  H   5  pos  0:  +0.518
+  L  11  H   7  pos  0:  +0.313
+  L  11  H   8  pos  9:  +0.356
+  L  11  H  10  pos  1:  -0.133
+  L  11  H  11  pos  0:  -0.248
+
+  Mode: reason (vs chat)
+   Layer    Head                        TopAttended_Change
+  L   0  H   0  pos  6:  +0.297
+  L   0  H   1  pos 14:  +0.979
+  L   0  H   2  pos  7:  +0.121
+  L   0  H   3  pos 14:  +0.926
+  L   0  H   4  pos 14:  +0.190
+  L   0  H   5  pos 14:  +0.915
+  L   0  H   6  pos  0:  +0.094
+  L   0  H   7  pos 14:  +0.295
+  L   0  H   8  pos 14:  -0.132
+  L   0  H   9  pos  0:  +0.068
+  L   0  H  10  pos 14:  +0.146
+  L   0  H  11  pos 14:  +0.060
+  L   3  H   1  pos  5:  +0.391
+  L   3  H   2  pos  7:  +0.189
+  L   3  H   3  pos  0:  +0.143
+  L   3  H   5  pos  0:  -0.218
+  L   3  H   6  pos  9:  +0.212
+  L   3  H   7  pos 13:  +0.276
+  L   3  H   8  pos 14:  +0.377
+  L   3  H   9  pos  6:  +0.437
+  L   3  H  10  pos  6:  +0.282
+  L   3  H  11  pos  6:  +0.495
+  L   6  H   0  pos  0:  -0.213
+  L   6  H   1  pos  6:  +0.432
+  L   6  H   2  pos  5:  +0.099
+  L   6  H   3  pos  0:  -0.293
+  L   6  H   4  pos  0:  +0.197
+  L   6  H   5  pos  5:  +0.116
+  L   6  H   6  pos 14:  +0.062
+  L   6  H   7  pos 10:  +0.211
+  L   6  H   8  pos  6:  +0.116
+  L   6  H   9  pos  0:  +0.197
+  L   6  H  10  pos  0:  +0.181
+  L   6  H  11  pos  5:  +0.077
+  L   9  H   0  pos  0:  -0.099
+  L   9  H   1  pos  0:  -0.127
+  L   9  H   2  pos  0:  -0.570
+  L   9  H   3  pos  4:  +0.123
+  L   9  H   4  pos  0:  -0.175
+  L   9  H   5  pos  5:  +0.080
+  L   9  H   6  pos  0:  -0.071
+  L   9  H   7  pos  0:  -0.104
+  L   9  H   9  pos  0:  -0.074
+  L   9  H  10  pos  0:  -0.298
+  L   9  H  11  pos  0:  +0.184
+  L  11  H   0  pos  5:  +0.235
+  L  11  H   1  pos  0:  +0.055
+  L  11  H   2  pos  0:  +0.076
+  L  11  H   3  pos  0:  +0.092
+  L  11  H   4  pos  5:  +0.094
+  L  11  H   5  pos  1:  +0.135
+  L  11  H   7  pos  0:  +0.162
+  L  11  H   8  pos 14:  +0.274
+  L  11  H   9  pos  0:  -0.108
+  L  11  H  10  pos  0:  +0.113
+  L  11  H  11  pos  0:  +0.077
+
+  Mode: code (vs chat)
+   Layer    Head                        TopAttended_Change
+  L   0  H   0  pos  0:  +0.087
+  L   0  H   1  pos 12:  +0.997
+  L   0  H   2  pos  0:  +0.165
+  L   0  H   3  pos 12:  +0.988
+  L   0  H   4  pos 12:  +0.883
+  L   0  H   5  pos 12:  +0.992
+  L   0  H   6  pos  0:  +0.161
+  L   0  H   7  pos 11:  +0.360
+  L   0  H   8  pos  0:  +0.261
+  L   0  H   9  pos  0:  +0.123
+  L   0  H  10  pos 12:  +0.251
+  L   0  H  11  pos  7:  +0.075
+  L   3  H   0  pos 12:  +0.137
+  L   3  H   1  pos  9:  +0.139
+  L   3  H   2  pos 11:  +0.373
+  L   3  H   3  pos  0:  +0.184
+  L   3  H   5  pos 10:  +0.183
+  L   3  H   6  pos 10:  +0.405
+  L   3  H   7  pos 10:  +0.709
+  L   3  H   8  pos 11:  +0.343
+  L   3  H   9  pos  0:  +0.453
+  L   3  H  10  pos  0:  +0.177
+  L   3  H  11  pos  0:  +0.296
+  L   6  H   0  pos  0:  -0.540
+  L   6  H   1  pos  0:  +0.184
+  L   6  H   2  pos  1:  -0.058
+  L   6  H   3  pos  0:  +0.318
+  L   6  H   4  pos  0:  +0.404
+  L   6  H   5  pos  0:  +0.104
+  L   6  H   6  pos  0:  +0.198
+  L   6  H   7  pos  0:  +0.344
+  L   6  H   8  pos  9:  +0.126
+  L   6  H   9  pos  0:  +0.198
+  L   6  H  10  pos  0:  +0.277
+  L   6  H  11  pos  0:  -0.352
+  L   9  H   0  pos 10:  +0.137
+  L   9  H   1  pos  0:  -0.052
+  L   9  H   2  pos  0:  +0.096
+  L   9  H   3  pos 11:  +0.156
+  L   9  H   4  pos  4:  +0.112
+  L   9  H   5  pos  0:  +0.101
+  L   9  H   6  pos 12:  +0.056
+  L   9  H   9  pos  0:  -0.058
+  L   9  H  10  pos  0:  -0.416
+  L   9  H  11  pos  0:  +0.138
+  L  11  H   0  pos  4:  +0.178
+  L  11  H   1  pos  0:  +0.192
+  L  11  H   3  pos  8:  +0.164
+  L  11  H   4  pos  4:  +0.060
+  L  11  H   5  pos  0:  +0.294
+  L  11  H   7  pos  4:  +0.069
+  L  11  H   8  pos  8:  +0.171
+  L  11  H   9  pos  0:  -0.081
+  L  11  H  10  pos  0:  -0.155
+  L  11  H  11  pos  0:  -0.245
+
+--- ģʽ��ж���ߵ�heads (��KLɢ���ܺ�����) ---
+  Rank   Layer    Head     TotalKL
+     1  L   5  H   7       8.554
+     2  L   6  H   9       6.196
+     3  L   9  H  10       4.577
+     4  L   5  H   0       4.434
+     5  L  11  H   8       4.244
+     6  L   8  H   5       3.510
+     7  L   1  H  11       3.208
+     8  L   5  H   5       2.884
+     9  L  10  H   4       2.812
+    10  L  10  H   7       2.654
+    11  L  10  H   5       2.632
+    12  L   3  H   9       2.413
+    13  L   5  H   3       2.298
+    14  L   8  H   7       2.270
+    15  L   6  H   0       2.208
+    16  L   7  H   4       2.200
+    17  L   2  H   1       2.016
+    18  L   4  H   0       1.890
+    19  L   7  H   0       1.812
+    20  L   9  H   2       1.720
+
+--- ģʽ���heads�Ĳ㼶�ֲ� ---
+  L 1: �� (1)
+  L 2: �� (1)
+  L 3: �� (1)
+  L 4: �� (1)
+  L 5: �������� (4)
+  L 6: ���� (2)
+  L 7: ���� (2)
+  L 8: ���� (2)
+  L 9: ���� (2)
+  L10: ������ (3)
+  L11: �� (1)
