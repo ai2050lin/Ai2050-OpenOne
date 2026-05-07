@@ -13,9 +13,10 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { AGIChatPanel } from './AGIChatPanel';
-import { AppleNeuronGeneratedConceptSetsPanel, AppleNeuronMultidimSettingsPanel } from './blueprint/appleNeuronInfoPanelsBridge';
 import { AppleNeuronSceneContent } from './blueprint/appleNeuronSceneBridge';
+import { AppleNeuronGeneratedConceptSetsPanel, AppleNeuronMultidimSettingsPanel } from './blueprint/appleNeuronInfoPanelsBridge';
 import { useAppleNeuronWorkspace } from './blueprint/appleNeuronWorkspaceBridge';
+import { MODEL_CONFIGS } from './blueprint/appleNeuron/constants';
 import ICSPBPanel from './components/FiberNetPanel';
 import LanguageResearchControlPanel from './components/LanguageResearchControlPanel';
 import LanguageResearchDataPanel from './components/LanguageResearchDataPanel';
@@ -49,7 +50,7 @@ import ForceLineRenderer from './neural_vis/renderers/ForceLineRenderer';
 import GrammarRoleMatrixRenderer from './neural_vis/renderers/GrammarRoleMatrixRenderer';
 import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
-import NeuralNetworkRenderer from './neural_vis/renderers/NeuralNetworkRenderer';
+import NeuralNetworkRenderer, { activationToColor } from './neural_vis/renderers/NeuralNetworkRenderer';
 import SceneHelpers from './neural_vis/components/SceneHelpers';
 import PuzzlePanel from './neural_vis/components/PuzzlePanel';
 import useVisData from './neural_vis/hooks/useVisData';
@@ -1849,6 +1850,44 @@ export default function App() {
   const appleNeuronWorkspace = useAppleNeuronWorkspace();
   const isAppleMainView = inputPanelTab === 'main';
 
+  // ---- Forward Pass 动画状态 ----
+  const [fpMode, setFpMode] = useState('demo');  // 'generate' | 'demo'
+  const [fpModel, setFpModel] = useState('qwen3-4b');
+  const [fpSentence, setFpSentence] = useState('s1');
+  const [fpInputText, setFpInputText] = useState('The cat sat on the mat');
+  const [fpColorFile, setFpColorFile] = useState('/data/forward_pass_demo.json');
+  const [fpPlaying, setFpPlaying] = useState(false);
+  const [fpCurrentLayer, setFpCurrentLayer] = useState(null);  // null=未开始, 0~nLayers-1
+  const [fpData, setFpData] = useState(null);  // forward pass数据
+  const [fpSpeed, setFpSpeed] = useState(800);  // ms per layer
+  const fpTimerRef = useRef(null);
+  const [useActivationColor, setUseActivationColor] = useState(true);
+
+  // Layer 内部动画进度 (0~1 循环)
+  const [layerAnimProgress, setLayerAnimProgress] = useState(0);
+  const layerAnimRef = useRef(null);
+  const layerAnimStartRef = useRef(null);
+
+  useEffect(() => {
+    if (!fpPlaying || fpCurrentLayer == null) {
+      setLayerAnimProgress(0);
+      layerAnimStartRef.current = null;
+      return;
+    }
+    layerAnimStartRef.current = performance.now();
+    const animate = (now) => {
+      if (!layerAnimStartRef.current) layerAnimStartRef.current = now;
+      const elapsed = now - layerAnimStartRef.current;
+      const progress = (elapsed % fpSpeed) / fpSpeed;
+      setLayerAnimProgress(progress);
+      layerAnimRef.current = requestAnimationFrame(animate);
+    };
+    layerAnimRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (layerAnimRef.current) cancelAnimationFrame(layerAnimRef.current);
+    };
+  }, [fpPlaying, fpCurrentLayer, fpSpeed]);
+
   // ---- 可视化数据系统 (neural-vis) ----
   const { dataFiles, activeData: visData, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect } = useVisData();
   const visFileInputRef = useRef();
@@ -1917,6 +1956,53 @@ export default function App() {
     setAnimProgress(1);
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
   }, []);
+
+  // ---- Forward Pass 动画 ----
+  const startForwardPass = useCallback(() => {
+    // 加载forward pass数据 (根据颜色模式下拉框选择)
+    fetch(fpColorFile)
+      .then(r => r.json())
+      .then(data => {
+        setFpData(data);
+        setFpCurrentLayer(0);
+        setFpPlaying(true);
+        setShowDNNLayers(true);
+      })
+      .catch(err => {
+        console.error('[ForwardPass] Failed to load data:', err);
+        setErrorDirect('无法加载forward pass数据');
+      });
+  }, [setErrorDirect, fpColorFile]);
+
+  const stopForwardPass = useCallback(() => {
+    setFpPlaying(false);
+    if (fpTimerRef.current) clearInterval(fpTimerRef.current);
+    fpTimerRef.current = null;
+  }, []);
+
+  const resetForwardPass = useCallback(() => {
+    setFpPlaying(false);
+    setFpCurrentLayer(null);
+    setFpData(null);
+    if (fpTimerRef.current) clearInterval(fpTimerRef.current);
+    fpTimerRef.current = null;
+  }, []);
+
+  // Forward pass逐层推进定时器
+  useEffect(() => {
+    if (!fpPlaying || fpCurrentLayer == null) return;
+    const nLayers = fpData?.model_info?.n_layers || 36;
+    fpTimerRef.current = setInterval(() => {
+      setFpCurrentLayer(prev => {
+        if (prev == null || prev >= nLayers - 1) {
+          setFpPlaying(false);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, fpSpeed);
+    return () => { if (fpTimerRef.current) clearInterval(fpTimerRef.current); };
+  }, [fpPlaying, fpCurrentLayer, fpData, fpSpeed]);
 
   useEffect(() => {
     if (!animPlaying || !activeScenario) return;
@@ -2864,8 +2950,267 @@ export default function App() {
             {/* ===== Main模式: 三Tab设计(维度/渲染器/动画) ===== */}
             {inputPanelTab === 'main' && (
               <>
-                {/* ---- 数据源区域 ---- */}
+                {/* ---- 模式切换: 生成模式 / 演示模式 ---- */}
                 <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
+                    <Network size={14} color="#4facfe" />
+                    运行模式
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button onClick={() => { setFpMode('generate'); resetForwardPass(); }}
+                      style={{
+                        flex: 1, padding: '9px 12px',
+                        background: fpMode === 'generate' ? 'rgba(79,172,254,0.15)' : 'rgba(255,255,255,0.04)',
+                        border: fpMode === 'generate' ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 8, color: fpMode === 'generate' ? '#4facfe' : '#7f95bb',
+                        cursor: 'pointer', fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
+                      }}>
+                      🔄 生成模式
+                    </button>
+                    <button onClick={() => { setFpMode('demo'); resetForwardPass(); }}
+                      style={{
+                        flex: 1, padding: '9px 12px',
+                        background: fpMode === 'demo' ? 'rgba(168,85,247,0.15)' : 'rgba(255,255,255,0.04)',
+                        border: fpMode === 'demo' ? '1px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 8, color: fpMode === 'demo' ? '#a855f7' : '#7f95bb',
+                        cursor: 'pointer', fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
+                      }}>
+                      👁 演示模式
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 10, color: '#7f95bb', marginTop: 6 }}>
+                    {fpMode === 'generate' ? '根据DNN运行记录的JSON数据，逐层播放前向传播' : '加载JSON数据文件，在3D空间中展示'}
+                  </div>
+                </div>
+
+                {/* ---- 生成模式: 输入框/模型选择/颜色模式 + 生成按钮 ---- */}
+                {fpMode === 'generate' && (
+                  <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(79,172,254,0.06)', border: '1px solid rgba(79,172,254,0.2)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#4facfe', fontSize: 13, fontWeight: 700 }}>
+                      <Bot size={14} color="#4facfe" />
+                      前向传播配置
+                    </div>
+
+                    {/* 模型选择 */}
+                    <div style={{ marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>模型</div>
+                      <select value={fpModel} onChange={(e) => setFpModel(e.target.value)}
+                        style={{
+                          width: '100%', padding: '8px 10px',
+                          background: 'rgba(79,172,254,0.08)', border: '1px solid rgba(79,172,254,0.25)',
+                          borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', fontSize: 12,
+                          outline: 'none', appearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%237f95bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+                        }}>
+                        <option value="qwen3-4b">Qwen3-4B (36L, d=2560)</option>
+                        <option value="glm4-9b">GLM4-9B-Chat (40L, d=4096)</option>
+                        <option value="ds7b">DeepSeek-R1-7B (28L, d=3584)</option>
+                      </select>
+                    </div>
+
+                    {/* 输入文字 */}
+                    <div style={{ marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>输入语句</div>
+                      <input type="text" value={fpInputText} onChange={(e) => setFpInputText(e.target.value)}
+                        placeholder="输入要分析的语句..."
+                        style={{
+                          width: '100%', padding: '8px 10px',
+                          background: 'rgba(79,172,254,0.08)', border: '1px solid rgba(79,172,254,0.25)',
+                          borderRadius: 8, color: '#e7f4ff', fontSize: 12,
+                          outline: 'none', fontFamily: 'inherit',
+                        }}
+                      />
+                      {/* 快捷语句 */}
+                      <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
+                        {['The cat sat on the mat', "She didn't like the movie", 'The students have been studying'].map((s, i) => (
+                          <button key={i} onClick={() => setFpInputText(s)}
+                            style={{
+                              padding: '3px 8px', borderRadius: 5, fontSize: 9,
+                              background: fpInputText === s ? 'rgba(79,172,254,0.2)' : 'rgba(255,255,255,0.04)',
+                              border: fpInputText === s ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                              color: fpInputText === s ? '#4facfe' : '#7f95bb', cursor: 'pointer',
+                            }}
+                          >
+                            {s.length > 20 ? s.slice(0, 18) + '...' : s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 颜色模式(选择生成模式的JSON文件) */}
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>颜色模式 (数据文件)</div>
+                      <select value={fpColorFile} onChange={(e) => setFpColorFile(e.target.value)}
+                        style={{
+                          width: '100%', padding: '8px 10px',
+                          background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
+                          borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', fontSize: 12,
+                          outline: 'none', appearance: 'none',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%237f95bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+                        }}>
+                        <optgroup label="🔥 激活值着色">
+                          <option value="/data/forward_pass_demo.json">Qwen3-4B 前向传播 (36L)</option>
+                        </optgroup>
+                        <optgroup label="🧩 分析数据">
+                          <option value="/data/language_analysis_puzzle.json">语言分析拼图</option>
+                        </optgroup>
+                      </select>
+                      <div style={{ fontSize: 9, color: '#7f95bb', marginTop: 3 }}>
+                        选择不同数据文件查看神经元着色效果
+                      </div>
+                    </div>
+
+                    {/* 速度控制 */}
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>
+                        <span>播放速度</span>
+                        <span style={{ color: '#4facfe' }}>{fpSpeed}ms/层</span>
+                      </div>
+                      <input type="range" min={200} max={2000} step={100} value={fpSpeed}
+                        onChange={(e) => setFpSpeed(Number(e.target.value))}
+                        style={{ width: '100%', accentColor: '#4facfe' }} />
+                    </div>
+
+                    {/* 生成按钮 */}
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={startForwardPass} disabled={fpPlaying}
+                        style={{
+                          flex: 2, padding: '10px 14px',
+                          background: fpPlaying ? 'rgba(79,172,254,0.1)' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                          border: fpPlaying ? '1px solid rgba(79,172,254,0.2)' : 'none',
+                          borderRadius: 8, color: '#fff', cursor: fpPlaying ? 'not-allowed' : 'pointer',
+                          fontSize: 13, fontWeight: 700, transition: 'all 0.2s',
+                          opacity: fpPlaying ? 0.5 : 1,
+                        }}>
+                        ▶ 生成
+                      </button>
+                      <button onClick={() => { if (fpCurrentLayer != null) setFpPlaying(!fpPlaying); }} disabled={fpCurrentLayer == null}
+                        style={{
+                          flex: 1, padding: '10px 14px',
+                          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
+                          borderRadius: 8, color: '#d8e6ff', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 700,
+                        }}>
+                        {fpPlaying ? '⏸' : '▶'}
+                      </button>
+                      <button onClick={resetForwardPass} disabled={fpCurrentLayer == null}
+                        style={{
+                          flex: 1, padding: '10px 14px',
+                          background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)',
+                          borderRadius: 8, color: '#ff6b6b', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 700,
+                        }}>
+                        ⏹
+                      </button>
+                    </div>
+
+                    {/* Forward Pass 进度 */}
+                    {fpCurrentLayer != null && (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                          <span style={{ color: '#4facfe', fontWeight: 700 }}>L{fpCurrentLayer}</span>
+                          <span style={{ color: '#7f95bb' }}>{((fpCurrentLayer + 1) / (fpData?.model_info?.n_layers || 36) * 100).toFixed(0)}%</span>
+                        </div>
+                        <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{
+                            width: `${((fpCurrentLayer + 1) / (fpData?.model_info?.n_layers || 36)) * 100}%`,
+                            height: '100%', background: 'linear-gradient(90deg, #4facfe, #00f2fe)', borderRadius: 3,
+                            transition: 'width 0.3s',
+                          }} />
+                        </div>
+                        {/* 当前层信息 */}
+                        {fpData?.layers?.find(l => l.layer === fpCurrentLayer) && (() => {
+                          const layerInfo = fpData.layers.find(l => l.layer === fpCurrentLayer);
+                          return (
+                            <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(79,172,254,0.06)', borderRadius: 6, border: '1px solid rgba(79,172,254,0.15)' }}>
+                              <div style={{ fontSize: 11, color: '#4facfe', fontWeight: 700, marginBottom: 4 }}>
+                                L{fpCurrentLayer}: {layerInfo.label}
+                              </div>
+                              <div style={{ fontSize: 10, color: '#7f95bb', lineHeight: 1.6 }}>
+                                <div>Attn norm: <span style={{ color: '#4ecdc4' }}>{layerInfo.attention?.norm?.toFixed(1) || '-'}</span></div>
+                                <div>FFN gate: <span style={{ color: activationToColor(layerInfo.ffn?.gate_activation || 0) }}>{layerInfo.ffn?.gate_activation?.toFixed(2) || '-'}</span></div>
+                                <div>FFN norm: <span style={{ color: '#f97316' }}>{layerInfo.ffn?.norm?.toFixed(1) || '-'}</span></div>
+                                <div>Residual norm: <span style={{ color: '#60a5fa' }}>{layerInfo.residual_norm?.toFixed(1) || '-'}</span></div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+
+                    {/* 着色模式 */}
+                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 11, color: '#7f95bb' }}>着色:</span>
+                      <button onClick={() => setUseActivationColor(true)}
+                        style={{
+                          padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                          background: useActivationColor ? 'rgba(79,172,254,0.15)' : 'rgba(255,255,255,0.04)',
+                          border: useActivationColor ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                          color: useActivationColor ? '#4facfe' : '#7f95bb', cursor: 'pointer',
+                        }}>
+                        🔥 激活值
+                      </button>
+                      <button onClick={() => setUseActivationColor(false)}
+                        style={{
+                          padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                          background: !useActivationColor ? 'rgba(168,85,247,0.15)' : 'rgba(255,255,255,0.04)',
+                          border: !useActivationColor ? '1px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                          color: !useActivationColor ? '#a855f7' : '#7f95bb', cursor: 'pointer',
+                        }}>
+                        🧬 子空间
+                      </button>
+                    </div>
+
+                    {/* 激活值颜色图例 */}
+                    {useActivationColor && (
+                      <div style={{ marginTop: 8, display: 'flex', gap: 8, fontSize: 9, color: '#7f95bb' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#ff4444', display: 'inline-block' }} />
+                          &gt;0.8
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#ffcc00', display: 'inline-block' }} />
+                          &gt;0.5
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#22c55e', display: 'inline-block' }} />
+                          &gt;0.3
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#3b82f6', display: 'inline-block' }} />
+                          &lt;0.3
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ---- 演示模式: 模型选择 + 数据源选择 ---- */}
+                {fpMode === 'demo' && (
+                <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  {/* 模型选择 */}
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
+                      <Brain size={14} color="#a855f7" />
+                      模型
+                    </div>
+                    <select value={fpModel} onChange={(e) => setFpModel(e.target.value)}
+                      style={{
+                        width: '100%', padding: '8px 10px',
+                        background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
+                        borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', fontSize: 12,
+                        outline: 'none', appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%237f95bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+                      }}>
+                      <option value="qwen3-4b">Qwen3-4B (36L, d=2560)</option>
+                      <option value="glm4-9b">GLM4-9B-Chat (40L, d=4096)</option>
+                      <option value="ds7b">DeepSeek-R1-7B (28L, d=3584)</option>
+                    </select>
+                  </div>
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
                     <Layers size={14} color="#4facfe" />
                     数据源
@@ -2903,6 +3248,7 @@ export default function App() {
                     <option value="">-- 选择数据文件 --</option>
                     <optgroup label="预设数据">
                       <option value="__preset__/data/language_analysis_puzzle.json">🧩 语言分析拼图</option>
+                      <option value="__preset__/data/forward_pass_demo.json">🧠 前向传播演示</option>
                     </optgroup>
                     {dataFiles.length > 0 && (
                       <optgroup label="Manifest 文件">
@@ -2928,6 +3274,7 @@ export default function App() {
                   {visLoading && <div style={{ fontSize: 11, color: '#4facfe', marginTop: 8 }}>⏳ 加载中...</div>}
                   {visError && <div style={{ fontSize: 11, color: '#ff6b6b', marginTop: 8 }}>⚠ {visError}</div>}
                 </div>
+                )} {/* end fpMode === 'demo' */}
 
                 {/* ---- 左面板子Tab切换 ---- */}
                 <div style={{ display: 'flex', gap: '8px', marginBottom: 16 }}>
@@ -3523,6 +3870,33 @@ export default function App() {
                     {/* 拼图Tab内容 */}
                     {infoPanelTab === 'puzzle' && (
                       <>
+                        {/* 模型信息卡片 - 拼图Tab顶部 */}
+                        {(() => {
+                          const mc = MODEL_CONFIGS[fpModel];
+                          if (!mc) return null;
+                          return (
+                            <div style={{ marginBottom: 10, padding: '8px 10px', background: `rgba(8, 12, 24, 0.6)`, borderRadius: 8, border: `1px solid ${mc.color}33`, flexShrink: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: mc.color, boxShadow: `0 0 5px ${mc.color}` }} />
+                                <span style={{ fontWeight: 700, fontSize: 12, color: mc.color }}>{mc.name}</span>
+                                <span style={{ fontSize: 9, color: '#7f95bb', marginLeft: 4 }}>{mc.layers}L · d{mc.dModel} · {mc.nHeads}H</span>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                {Array.from({ length: mc.layers }, (_, i) => {
+                                  const isCurrent = fpCurrentLayer === i;
+                                  return (
+                                    <div key={i} style={{
+                                      width: 12, height: 8, borderRadius: 2,
+                                      background: isCurrent ? mc.color : i < (fpCurrentLayer ?? -1) ? `${mc.color}88` : 'rgba(255,255,255,0.08)',
+                                      border: isCurrent ? `1px solid ${mc.color}` : 'none',
+                                      transition: 'background 0.2s',
+                                    }} title={`Layer ${i}`} />
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })()}
                         {appleNeuronWorkspace.analysisMode === 'reverse_engineering' ? (
                           <ReverseEngineeringDataPanel
                             workspace={appleNeuronWorkspace}
@@ -3631,18 +4005,54 @@ export default function App() {
                           </div>
                         )}
 
-                        {/* 模型信息 */}
-                        {data?.model_config && (
-                          <div style={{ marginTop: 10, padding: 10, background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <div style={{ fontSize: 11, color: '#dfe8ff', marginBottom: 6, fontWeight: 700 }}>模型信息</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '3px', fontSize: 10, color: '#7f95bb' }}>
-                              <span>架构</span><span style={{ color: '#eef7ff' }}>{data.model_config.name}</span>
-                              <span>层数</span><span style={{ color: '#eef7ff' }}>{data.model_config.n_layers}</span>
-                              <span>维度</span><span style={{ color: '#eef7ff' }}>{data.model_config.d_model}</span>
-                              <span>参数</span><span style={{ color: '#eef7ff' }}>{(data.model_config.total_params / 1e9).toFixed(2)}B</span>
+                        {/* 模型信息 - 从右上角迁移 */}
+                        {(() => {
+                          const mc = MODEL_CONFIGS[fpModel];
+                          if (!mc) return data?.model_config ? (
+                            <div style={{ marginTop: 10, padding: 10, background: 'rgba(255,255,255,0.04)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                              <div style={{ fontSize: 11, color: '#dfe8ff', marginBottom: 6, fontWeight: 700 }}>模型信息</div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '3px', fontSize: 10, color: '#7f95bb' }}>
+                                <span>架构</span><span style={{ color: '#eef7ff' }}>{data.model_config.name}</span>
+                                <span>层数</span><span style={{ color: '#eef7ff' }}>{data.model_config.n_layers}</span>
+                                <span>维度</span><span style={{ color: '#eef7ff' }}>{data.model_config.d_model}</span>
+                                <span>参数</span><span style={{ color: '#eef7ff' }}>{(data.model_config.total_params / 1e9).toFixed(2)}B</span>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          ) : null;
+                          return (
+                            <div style={{ marginTop: 10, padding: 10, background: `rgba(8, 12, 24, 0.6)`, borderRadius: 10, border: `1px solid ${mc.color}33` }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: mc.color, boxShadow: `0 0 6px ${mc.color}` }} />
+                                <span style={{ fontWeight: 700, fontSize: 13, color: mc.color }}>{mc.name}</span>
+                              </div>
+                              <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 6 }}>{mc.type}</div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 12px', fontSize: 11 }}>
+                                <span style={{ color: '#7f95bb' }}>Layers</span><span style={{ color: '#fff', fontWeight: 600 }}>{mc.layers}</span>
+                                <span style={{ color: '#7f95bb' }}>d_model</span><span style={{ color: '#fff' }}>{mc.dModel}</span>
+                                <span style={{ color: '#7f95bb' }}>Heads</span><span style={{ color: '#fff' }}>{mc.nHeads}</span>
+                                <span style={{ color: '#7f95bb' }}>Head Dim</span><span style={{ color: '#fff' }}>{mc.headDim}</span>
+                                <span style={{ color: '#7f95bb' }}>MLP Dim</span><span style={{ color: '#fff' }}>{mc.mlpDim?.toLocaleString()}</span>
+                                <span style={{ color: '#7f95bb' }}>Vocab</span><span style={{ color: '#fff' }}>{mc.vocabSize?.toLocaleString()}</span>
+                              </div>
+                              <div style={{ marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 6 }}>
+                                <div style={{ fontSize: 9, color: '#7f95bb', marginBottom: 3 }}>Layer 结构</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                  {Array.from({ length: mc.layers }, (_, i) => {
+                                    const isCurrent = fpCurrentLayer === i;
+                                    return (
+                                      <div key={i} style={{
+                                        width: 14, height: 10, borderRadius: 2,
+                                        background: isCurrent ? mc.color : i < (fpCurrentLayer ?? -1) ? `${mc.color}88` : 'rgba(255,255,255,0.08)',
+                                        border: isCurrent ? `1px solid ${mc.color}` : 'none',
+                                        transition: 'background 0.2s',
+                                      }} title={`Layer ${i}`} />
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
@@ -4609,12 +5019,12 @@ export default function App() {
 
         <Canvas shadows>
           {isAppleMainView && <color attach="background" args={['#090b15']} />}
-          {isAppleMainView && <fog attach="fog" args={['#090b15', 14, 42]} />}
+          {isAppleMainView && <fog attach="fog" args={['#090b15', 18, fpCurrentLayer != null ? 200 : 80]} />}
 
           <PerspectiveCamera
             makeDefault
-            position={isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [16, 12, 26] : [20, 20, 20]}
-            fov={isEncoding3DTab ? 46 : isAppleMainView ? 42 : 50}
+            position={isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
+            fov={isEncoding3DTab ? 46 : isAppleMainView ? 50 : 50}
           />
           <OrbitControls
             makeDefault
@@ -4666,6 +5076,11 @@ export default function App() {
                 animProgress={animProgress}
                 activeScenario={activeScenario}
                 activeSubView={activeSubView}
+                forwardPassLayer={fpCurrentLayer}
+                forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
+                modelKey={fpModel}
+                layerAnimProgress={layerAnimProgress}
+                fpSpeed={fpSpeed}
               />
               {/* Reverse Engineering 3D Overlay */}
               {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
@@ -4679,25 +5094,10 @@ export default function App() {
                 />
               )}
 
-              {/* ===== neural_vis 3D可视化渲染器 ===== */}
               {visData && (
                 <>
                   {/* 场景辅助 (地面网格 + 层号标尺) */}
                   <SceneHelpers nLayers={nLayers} />
-
-                  {/* DNN层结构渲染器 (neural-vis版，与AppleNeuronSceneContent互补) */}
-                  {showDNNLayers && !isEncoding3DTab && (
-                    <NeuralNetworkRenderer
-                      nLayers={nLayers}
-                      dModel={visData?.model_info?.d_model}
-                      activeLayerRange={activeScenario ? getCurrentAnimPhase()?.layerRange : null}
-                      highlightedLayer={highlightedLayer}
-                      visibleComponents={visibleComponents}
-                      animProgress={animProgress}
-                      activeScenario={activeScenario}
-                      onHoverLayer={setHighlightedLayer}
-                    />
-                  )}
 
                   {/* v1.0 渲染器 */}
                   {byType.layer_stack.filter(() => filterByMode('all')).map(ls => (
@@ -4905,6 +5305,10 @@ export default function App() {
             </>
           )}
         </Canvas>
+
+      {/* 模型信息面板 - 已迁移到数据面板 */}
+
+      {/* Layer Detail View - 已迁移到3D空间中的 LayerExplodedView3D */}
 
       {/* GlassMatrix3D - Has its own Canvas, must be rendered outside main Canvas */}
       {!isAppleMainView && structureTab === 'glass_matrix' && (

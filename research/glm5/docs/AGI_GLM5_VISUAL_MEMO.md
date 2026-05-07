@@ -2,6 +2,136 @@
 
 > 本文档记录AGI研究的进展、问题分析和下一步行动
 
+## Phase CCXIII: Layer 3D模型神经元激活值可视化 (2026-05-08 00:30)
+
+**神经元激活值颜色编码**：
+- `>0.8` → 红色 `#ef4444`（高激活）
+- `>0.5` → 黄色 `#fbbf24`（中高激活）
+- `>0.3` → 绿色 `#22c55e`（中激活）
+- `≤0.3` → 蓝色 `#60a5fa`（低激活）
+
+统一函数 `activationColor(val)` 用于所有组件。
+
+**Attention Head 激活可视化**：
+- `AttentionHeadGrid3D` 新增 `headActivations` 参数
+- 每个头球体颜色反映其激活值（取代之前的简单活跃/非活跃二态）
+- 激活值 `>0.3` 的头旁边显示数值标签
+- 注意力分数块下方显示摘要：`max= avg=` 和 `>0.8: N/M heads`
+
+**FFN 神经元激活可视化**：
+- `FFNNeuronBars3D` 柱体颜色改为 `activationColor()` 统一编码
+- 激活值 `>0.3` 的神经元旁显示数值标签
+- W_up 块下方显示摘要：`max= avg=` 和 `>0.8: N/M neurons`
+
+**SiLU gate 值**：块体颜色根据 gate 值动态变化
+
+**模拟数据**：当 `layerData` 不可用时（默认显示/动画播放中），生成模拟激活值：
+- Head 激活：`[0.85, 0.62, 0.45, 0.73, 0.28, 0.55, 0.91, 0.38, 0.67, 0.15, 0.50, 0.80]`
+- FFN 神经元：`[0.88, 0.65, 0.42, 0.78, 0.35, 0.55, 0.92, 0.20]`
+- SiLU gate：`0.72`
+
+**数学洞察**：激活值颜色编码本质上是一个 **分段线性映射 f: ℝ → Color**，将连续的标量激活值映射到离散的颜色空间。这个映射的非对称性（红色阈值0.8 > 黄色0.5 > 绿色0.3）反映了对 **异常高激活** 的敏感度——在 Transformer 中，少数高激活神经元通常携带最重要的语义信息（稀疏编码假设）。
+
+## Phase CCXII: Layer 3D模型Z轴布局+放在DNN旁边 (2026-05-07 23:12)
+
+**关键修改**：Layer 内部结构的展开方向从 X轴横向 改为 **Z轴竖向**，与 DNN 整体模型的层排列方向完全一致。位置从 `[22,0,0]` 改为 `[8,0,0]`，紧贴DNN模型右侧。
+
+**Z轴布局设计**：
+- 块体参数：BW=3.8, BH=2.8, BD=0.55（每个块在Z方向薄，XY方向宽高）
+- 12个子阶段沿 Z 轴从底到顶排列，间距 GAP_Z=1.2
+- LayerNorm/Sigmoid 薄层 THIN_D=0.28，FFN W_up 宽块 WIDE_D=0.8
+- Q/K/V 三列并排在同一Z坐标
+- 标签放在块体右侧（anchorX=left）
+- 残差旁路弧线在左侧（-X方向），"skip" 标签沿Z轴旋转显示
+- Attention/FFN 区域边框为3D长方体线框，沿Z轴包围对应组件
+
+**与DNN模型的空间对齐**：
+- DNN 层排列：`z = (layer - (nLayers-1)/2) * 0.92`，沿Z轴
+- Layer 展开模型同样沿Z轴，position=[8,0,0]，X偏移8单位到DNN旁边
+- 两个模型的数据流方向一致（Z轴=深度方向），视觉上形成"整体→解剖"的空间对比
+
+## Phase CCXI: Layer内部结构3D展开模型 (2026-05-07 22:50)
+
+**新增 `LayerExplodedView3D.jsx`**：将 Transformer Layer 的内部结构从 HTML overlay 迁移到 3D 空间中渲染，放在 DNN 整体模型的右侧（x=16）。这是"可交互3D解剖"方向的关键一步。
+
+**3D组件架构**：
+1. **Block3D** - 通用3D块体组件，支持 `active` 状态切换发光强度、标签/子标签文字、外框线条
+2. **ResidualRing3D** - 残差连接环（旋转的 Torus），⊕ +x 标记
+3. **AttentionHeadGrid3D** - 注意力头网格（最多12个小球体排列），基于 `attention.pattern` 对角线值决定哪些 head 激活
+4. **FFNNeuronBars3D** - FFN 神经元柱状条（垂直 box），从 `ffn.top_neurons` 数据映射高度和颜色
+5. **ConnectorLine** - 连接线，根据子阶段活跃度改变亮度和颜色
+
+**垂直布局（Y轴从底到顶）**：
+Input → LayerNorm1 → [Q, K, V 三列并排] → Q·Kᵀ/√d (附 Head Grid) → Softmax → Attn·V→Wₒ → ⊕Residual① → LayerNorm2 → W_up (附 Neuron Bars) → SiLU → W_down → ⊕Residual② → Output
+
+**残差连接旁路**：用折线从 Input 旁绕到 Residual①、从 Residual① 旁绕到 Residual②，直观展示跳跃连接的数学含义 `y = x + f(LayerNorm(x))`
+
+**动画同步**：`layerAnimProgress` 状态在 App.jsx 中通过 `requestAnimationFrame` 驱动，每 `fpSpeed` ms 完成一个 0→1 循环。12个子阶段的边界由 `PHASE_DURATIONS` 定义，与 Forward Pass 逐层推进同步。
+
+**关键数学洞察**：将 Transformer Layer 的12步计算流在3D空间中展开为垂直堆叠的3D块体，使得 Pre-Norm 架构的信息流方向（自底向上）与残差旁路（左侧折线）的空间布局完全对齐。这种"展开"可视化揭示了：**残差连接不仅是数值上的加法，更是拓扑上的短接**——梯度信号可以沿着旁路直通底层，这正是深层网络可训练的根本原因。从范畴论视角看，残差连接使得 `F(x) = x + f(x)` 中的 `f` 成为一个"增量函子"(increment functor)，而整个网络可视为增量函子的复合。
+
+## Phase CCX: 主流工程方案表格添加 (2026-05-07 22:30)
+
+**3D可视化客户端更新**：
+1. 在"项目大纲"页面的"核心思路"和"数学路线"模块之间，添加了"主流工程方案"模块
+2. 包含8条逆向工程路线的完整对比表格：统计几何派、Mechanistic Interpretability、动力系统派、信息论派、程序归纳派、生成递归派、神经符号派、生物脑派
+3. 表格列：#、路线、核心思想、关键方法/研究对象、代表工作、优点、缺点
+4. 底部补充"路线关系"和"关键洞察"两个信息卡片
+
+**逆向工程路线理论要点**：
+- 语言能力本质更像 computation unfolding 而非静态编码（动力系统派）
+- 自回归训练逼迫系统建立最优压缩结构（信息论派）
+- Transformer 内部是大量可组合微程序而非知识图谱（程序归纳派）
+- CoT/推理本质是自条件递归的思维链形成机制（生成递归派）
+
+## Phase CCX: Layer 内部结构详细视图 (2026-05-07 22:35)
+
+**新增 LayerDetailView 组件**：在 3D DNN 模型旁边添加独立的 Layer 内部结构面板，详细展示 Transformer Layer 的完整计算流程：
+
+1. **Attention 块**：
+   - Q/K/V 线性投影（显示 head 数量和 head 维度）
+   - 注意力分数 Q·Kᵀ/√d（显示 Head Grid，活跃 head 高亮）
+   - Softmax 归一化
+   - 注意力输出 Attn·V → Wₒ 投影
+2. **残差连接**：两处残差 +x（⊕符号标记）
+3. **FFN 块**：
+   - 上投影 W_up（d_model → mlpDim，附 Top Neuron 激活柱状图）
+   - SiLU 激活函数（SVG 曲线可视化）
+   - 下投影 W_down（mlpDim → d_model）
+4. **动画同步**：当 Forward Pass 逐层动画播放时，LayerDetailView 内部使用 requestAnimationFrame 循环切换 12 个子阶段（input → ln1 → qkv → attn_score → softmax → attn_out → residual1 → ln2 → ffn_up → ffn_act → ffn_down → residual2），每个阶段高亮对应模块
+5. **数据驱动**：从 `forward_pass_demo.json` 的层信息获取 attention.pattern、ffn.top_neurons、ffn.gate_activation、residual_norm 等实时数据
+
+**关键数学洞察**：Transformer 层的 12 步子阶段动画揭示了 pre-norm 架构的计算流：每个子步骤的相对耗时（duration 权重）反映了注意力计算(QKV投影12%、注意力分数10%)和FFN(上投影10%、激活8%、下投影8%)的计算量分布。残差连接作为恒等映射的数值稳定性保证，使得深层网络可以表达为浅层函数的增量组合——这是 ResNet → Transformer 架构统一性的核心数学原理。
+
+## Phase CCIX: 模型选择动态Layer + 信息面板 (2026-05-07 22:01)
+
+**可视化功能增强**：
+1. **模型选择上移**：控制面板中模型选择器移至输入语句上方，先选模型再输入
+2. **动态Layer数量**：选择模型后3D场景层引导线(LayerGuides)动态变化，与模型实际层数一致
+   - Qwen3-4B: 36层 / GLM4-9B: 40层 / DeepSeek-R1-7B: 28层
+   - `MODEL_CONFIGS` 常量表统一管理模型参数（layers, d_model, heads, MLP dim, vocab等）
+   - `AppleNeuronSceneContent` 接收 `modelKey` prop → `layerCount` 动态计算
+3. **右上角模型信息面板**：显示完整模型参数 + 层结构条形图（已通过层高亮标记）
+4. **utils.js export修复**：为所有函数添加统一 `export {}` 块，补6个缺失占位函数
+
+**关键数学洞察**：不同模型的层数差异（28/36/40）映射到同一3D空间时，需保持 z 轴间距一致（0.92），通过 `(layer - (layerCount-1)/2) * 0.92` 公式归一化。层数越多，3D空间中z轴总长度越长——这反映了模型深度与表示能力的几何对应关系。
+
+## Phase CCVIII: 主流逆向工程路线图谱整理 + 动画圆形移除 (2026-05-07 20:54)
+
+**理论整理**：将8条主流逆向工程路线整理为完整表格，插入系统方案大纲第二节：
+1. 统计几何派 (PCA/SVD/CKA → 几何结构=语言编码)
+2. Mechanistic Interpretability (可分解计算图 → 因果分析)
+3. 动力系统派 (递归动力系统 → state演化而非静态编码)
+4. 信息论派 (压缩系统 → 自回归训练逼出最优压缩结构)
+5. 程序归纳派 (隐式程序执行 → 可组合微程序)
+6. 生成递归派 (自条件递归 → CoT/推理本质)
+7. 神经符号派 (分布式表示中的变量/规则/绑定)
+8. 生物脑派 (大脑编码机制的离散近似)
+
+**关键洞察**：路线3(动力系统)和路线6(生成递归)是当前最接近正确方向的突破点，路线4(信息论)和路线5(程序归纳)提供深层理论基础。
+
+**代码清理**：移除 AppleNeuron3D 动画效果中所有圆形元素（WaveRing、ringGeometry、circleGeometry），涉及 SceneComponents.jsx 和 InfoPanels.jsx 两个文件。
+
 ## Phase CXCV: GPT5五个核心测试的数学公式深度拆解 (2026-04-20 11:02)
 
 > 注: 这些测试脚本由codex 5.4生成，不是用户手写。这改变了对问题的定性——
@@ -14879,6 +15009,153 @@ KN=#3b82f6, LG=#f59e0b, GR=#10b981, MG=#a855f7, SE=#ef4444, WE=#6366f1, TD=#ec48
 
 ### 产出文件
 - `research/glm5/docs/DNN_REVERSE_ENGINEERING.md` — 完整系统性整理文档
+
+
+## Phase CCXV: 3D主界面Forward Pass动画 + 生成/演示模式 (2026-05-07 19:25)
+
+### 变更概述
+对3D空间主界面进行大范围重构，添加两种模式（生成模式/演示模式），实现深度神经网络逐层前向传播动画，神经元按激活值着色。
+
+### 核心功能
+
+1. **模式切换**: 左侧控制面板新增"生成模式"和"演示模式"
+   - 生成模式: 根据DNN运行记录JSON数据，逐层播放前向传播动画
+   - 演示模式: 加载JSON数据文件，在3D空间中展示（原有数据源功能）
+
+2. **前向传播动画**:
+   - 下拉框选择语句（3条预设语句）和模型（Qwen3-4B/GLM4-9B/DS7B）
+   - 点击"生成"按钮后，3D空间中DNN从L0逐层高亮
+   - 每层显示: 白色光环高亮、Attention/FFN组件激活值、神经元球体着色
+   - 可调节播放速度(200-2000ms/层)
+
+3. **神经元激活值着色** (>0.8红, >0.5黄, >0.3绿, <0.3蓝):
+   - 可切换"激活值着色"和"子空间着色"两种模式
+   - 颜色图例显示在控制面板中
+
+4. **层信息面板**: 播放过程中显示当前层的Attn norm、FFN gate、FFN norm、Residual norm
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `frontend/src/neural_vis/renderers/NeuralNetworkRenderer.jsx` | v4.0: 新增forwardPassLayer/forwardPassData/useActivationColor props, 激活值着色函数, 逐层高亮光环, 层间连接线动态亮度 |
+| `frontend/src/App.jsx` | 新增fpMode/fpModel/fpSentence/fpPlaying/fpCurrentLayer/fpData等状态, 生成/演示模式UI, 前向传播定时器, 导入activationToColor |
+| `frontend/public/data/forward_pass_demo.json` | 新增: 前向传播演示数据(Qwen3-4B, 8个关键层, 含神经元激活值) |
+
+### 关键设计决策
+- 不改变UI风格和3D神经网络模型
+- 神经元着色新增激活值模式(红黄绿蓝), 保留原有子空间模式
+- Forward Pass使用setInterval逐层推进, 非requestAnimationFrame
+- 演示模式保留原有数据源下拉框功能
+
+
+## Phase CCXVI: Forward Pass逐层神经元着色增强 (2026-05-07 19:40)
+
+### 变更概述
+增强前向传播动画的神经元可视化：扩展JSON数据覆盖全部36层，渲染器升级v5.0，实现逐层生长动画和更明显的激活值着色。
+
+### 核心改进
+
+1. **完整36层数据**: forward_pass_demo.json从8层扩展到36层
+   - 每层7个神经元, 含激活值和子空间归属
+   - 激活值按层功能区域变化:
+     - L0-1: 嵌入层, 低激活(0.1-0.5)
+     - L2-5: 词法加工, 逐渐增强(0.3-0.8)
+     - L6: 断裂层, 语法方向暴增(0.6-0.95)
+     - L7-11: 语法加工, 语法方向主导(0.5-0.9)
+     - L12-17: 语义+语法混合, 双方向激活
+     - L18-23: 语义提取, w_u增强(0.5-0.95)
+     - L24-29: 逻辑注入, logic增强(0.3-0.9)
+     - L30-35: 输出决策, w_u极高(0.7-0.99)
+
+2. **渲染器v5.0增强**:
+   - `NeuronSphere`组件: 独立状态管理, 层到达时从0生长到1
+   - 激活值→大小映射: >0.8=0.55, >0.5=0.40, >0.3=0.30, <0.3=0.20
+   - 激活值→发光强度: >0.8=2.5x, >0.5=1.5x, >0.3=0.8x, <0.3=0.3x
+   - 当前层神经元1.6倍放大, 2倍发光
+   - 未到达层神经元不显示(scale=0)
+   - 当前层圆盘白色+蓝色脉冲光环
+   - 3D场景内激活值颜色图例
+   - `ActivationLegend`组件: 前向传播时显示红/黄/绿/蓝图例
+
+3. **着色规则**(>0.8红, >0.5黄, >0.3绿, <0.3蓝):
+   - 红色(#ff4444): 强激活神经元, 如断裂层L6的语法方向
+   - 黄色(#ffcc00): 中激活, 如语义提取层的w_u方向
+   - 绿色(#22c55e): 弱激活, 如逻辑注入层的logic方向
+   - 蓝色(#3b82f6): 微弱激活, 如低层的dark_matter方向
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `frontend/public/data/forward_pass_demo.json` | 扩展: 8层→36层, 每层7个神经元+激活值+子空间 |
+| `frontend/src/neural_vis/renderers/NeuralNetworkRenderer.jsx` | v4.0→v5.0: NeuronSphere生长动画, 激活值着色增强, ActivationLegend, 脉冲光环 |
+| `tests/glm5_temp/gen_forward_pass_json.py` | 生成脚本: 36层数据生成器 |
+
+
+## Phase CCXVII: 生成模式输入框 + 颜色模式下拉框 (2026-05-07 19:50)
+
+### 变更概述
+生成模式UI增强: 语句选择改为文字输入框+快捷按钮, 新增颜色模式下拉框选择不同JSON数据文件。
+
+### 核心改进
+
+1. **语句输入框**: 替换原来的下拉框为`<input>`文本框
+   - 用户可自由输入要分析的语句
+   - 3个快捷语句按钮, 点击即填充
+
+2. **颜色模式下拉框**: 选择不同JSON数据文件
+   - 🔥 激活值着色分组: Qwen3-4B前向传播(36L)
+   - 🧩 分析数据分组: 语言分析拼图
+   - 选择不同文件可查看不同着色效果
+   - `startForwardPass`根据选择的文件加载数据
+
+### 新增状态
+- `fpInputText`: 输入框文字 (默认 "The cat sat on the mat")
+- `fpColorFile`: 颜色模式选择的JSON文件路径
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `frontend/src/App.jsx` | 语句下拉→输入框+快捷按钮, 新增颜色模式下拉框(fpColorFile), startForwardPass使用fpColorFile |
+
+
+## Phase CCXVIII: 3D渲染器清理重构 (2026-05-07 20:00)
+
+### 变更概述
+NeuralNetworkRenderer从v5.0(585行)重构为v6.0 Clean(210行), 去除所有冗余, 保留核心框架+逐层动画, 使用useFrame驱动实时动画。
+
+### 删除的冗余组件
+- `LayerComponents` (4组件球体+门控值/norm标签) — 过于复杂, 与神经元可视化重复
+- `NeuronSphere` (独立生长动画) — useState+setTimeout实现不佳, 改为直接渲染
+- `SignalParticles` (12个浮动粒子) — 无实际意义, 删除
+- `FunctionRegionLabels` (侧边功能区域标注) — 冗余, 当前层标签已足够
+
+### 保留的核心组件
+1. **LayerDisk**: 层圆盘+边缘环+层号标签+功能标签
+2. **NeuronSpheres**: 神经元球体(激活值着色+大小)
+3. **InterLayerConnections**: 层间连接线
+4. **ForwardPassSignalBall**: useFrame驱动的脉冲信号球
+5. **ActivationLegend**: 激活值颜色图例
+
+### 关键改进: useFrame实时动画
+- `LayerDisk`中的脉冲光环: `opacity = 0.4 + 0.3 * sin(t * 4)`, `scale`微振
+- `ForwardPassSignalBall`: y轴浮动 `0.5 * sin(t * 5)`, opacity脉冲
+- 前版本使用`useState`+`setTimeout`模拟动画, 无法产生平滑效果
+
+### 前向传播动画流程
+1. App.jsx: `startForwardPass()` → 加载JSON → `fpCurrentLayer=0` → 定时器每800ms递增
+2. 渲染器接收 `forwardPassLayer` → 当前层圆盘白色+脉冲光环+功能标签
+3. 已通过层: 神经元球体显示(激活值着色), 连接线亮蓝
+4. 未到达层: 圆盘极暗(opacity 0.03), 无神经元
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `NeuralNetworkRenderer.jsx` | v5.0→v6.0: 585→210行, 删除4个冗余组件, useFrame驱动动画 |
+| `App.jsx` | NeuralNetworkRenderer调用: 删除5个废弃props(dModel, highlightedLayer, visibleComponents, animProgress, activeScenario, onHoverLayer) |
 
 
 

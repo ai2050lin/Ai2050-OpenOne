@@ -1422,7 +1422,7 @@ export const EXECUTION_PLAYBOOK = {
 };
 
 export const MATH_ROUTE_SYSTEM_PLAN = {
-  title: '数学路线',
+  title: '数学理论',
   subtitle: '多路线分层组合：主线产出 + 验证保真 + 前沿突破',
   routeAnalysis: [
     {
