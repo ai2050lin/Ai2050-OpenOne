@@ -1,0 +1,268 @@
+﻿======================================================================
+EXPERIMENT A: Attention Routing Graph — Actual Information Flow
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Collecting routing graphs ---
+  (addition, L0): done
+  (addition, L2): done
+  (addition, L4): done
+  (addition, L6): done
+  (addition, L8): done
+  (addition, L10): done
+  (subtraction, L0): done
+  (subtraction, L2): done
+  (subtraction, L4): done
+  (subtraction, L6): done
+  (subtraction, L8): done
+  (subtraction, L10): done
+  (multiplication, L0): done
+  (multiplication, L2): done
+  (multiplication, L4): done
+  (multiplication, L6): done
+  (multiplication, L8): done
+  (multiplication, L10): done
+  (antonym, L0): done
+  (antonym, L2): done
+  (antonym, L4): done
+  (antonym, L6): done
+  (antonym, L8): done
+  (antonym, L10): done
+  (synonym, L0): done
+  (synonym, L2): done
+  (synonym, L4): done
+  (synonym, L6): done
+  (synonym, L8): done
+  (synonym, L10): done
+  (past_tense, L0): done
+  (past_tense, L2): done
+  (past_tense, L4): done
+  (past_tense, L6): done
+  (past_tense, L8): done
+  (past_tense, L10): done
+  (plural, L0): done
+  (plural, L2): done
+  (plural, L4): done
+  (plural, L6): done
+  (plural, L8): done
+  (plural, L10): done
+  (capital, L0): done
+  (capital, L2): done
+  (capital, L4): done
+  (capital, L6): done
+  (capital, L8): done
+  (capital, L10): done
+  (country, L0): done
+  (country, L2): done
+  (country, L4): done
+  (country, L6): done
+  (country, L8): done
+  (country, L10): done
+  (translate_fr, L0): done
+  (translate_fr, L2): done
+  (translate_fr, L4): done
+  (translate_fr, L6): done
+  (translate_fr, L8): done
+  (translate_fr, L10): done
+  (translate_es, L0): done
+  (translate_es, L2): done
+  (translate_es, L4): done
+  (translate_es, L6): done
+  (translate_es, L8): done
+  (translate_es, L10): done
+  (animal_sound, L0): done
+  (animal_sound, L2): done
+  (animal_sound, L4): done
+  (animal_sound, L6): done
+  (animal_sound, L8): done
+  (animal_sound, L10): done
+
+============================================================
+ANALYSIS 1: Routing Entropy Distribution
+  Low entropy = focused routing (specific token selected)
+  High entropy = diffuse routing (averaging many tokens)
+============================================================
+
+  Layer 0:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                1.033    0.456       25.7        0.0
+  subtraction             1.008    0.494       33.3        0.0
+  multiplication          1.043    0.489       25.0        0.0
+  antonym                 1.256    0.491       25.0        0.0
+  synonym                 1.242    0.510       25.0        0.0
+  past_tense              1.326    0.556       25.0        0.0
+  plural                  1.229    0.491       25.0        0.0
+  capital                 1.215    0.492       25.0        0.0
+  country                 1.219    0.503       25.0        0.0
+  translate_fr            1.310    0.567       25.0        0.0
+  translate_es            1.310    0.569       25.0        0.0
+  animal_sound            1.371    0.489       25.0        0.0
+
+  Layer 2:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                1.206    0.333       24.3        0.0
+  subtraction             1.219    0.303       24.8        0.0
+  multiplication          1.220    0.320       25.0        0.0
+  antonym                 1.446    0.220        1.3        0.0
+  synonym                 1.421    0.224        2.5        0.0
+  past_tense              1.560    0.222        0.0        0.0
+  plural                  1.443    0.191        0.8        0.0
+  capital                 1.460    0.192        0.0        0.0
+  country                 1.449    0.197        0.0        0.0
+  translate_fr            1.551    0.207        0.0        0.0
+  translate_es            1.553    0.204        0.0        0.0
+  animal_sound            1.417    0.256        6.8        0.0
+
+  Layer 4:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                0.870    0.421       62.5        0.0
+  subtraction             0.851    0.414       64.3        0.0
+  multiplication          0.868    0.389       65.3        0.0
+  antonym                 0.953    0.473       43.3        0.0
+  synonym                 0.838    0.457       57.2        0.0
+  past_tense              0.975    0.525       49.5        0.0
+  plural                  0.926    0.385       43.5        0.0
+  capital                 0.912    0.434       53.3        0.0
+  country                 0.929    0.405       48.8        0.0
+  translate_fr            0.962    0.463       48.3        0.0
+  translate_es            0.982    0.451       48.5        0.0
+  animal_sound            0.848    0.468       66.7        0.0
+
+  Layer 6:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                0.872    0.416       60.2        0.0
+  subtraction             0.846    0.446       60.0        0.0
+  multiplication          0.811    0.425       66.7        0.0
+  antonym                 0.903    0.460       51.8        0.0
+  synonym                 0.869    0.459       51.3        0.0
+  past_tense              1.052    0.536       40.2        0.0
+  plural                  0.992    0.471       35.2        0.0
+  capital                 0.898    0.448       51.0        0.0
+  country                 0.908    0.429       50.8        0.0
+  translate_fr            1.077    0.467       30.8        0.0
+  translate_es            1.076    0.466       33.5        0.0
+  animal_sound            1.034    0.472       35.5        0.0
+
+  Layer 8:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                0.844    0.387       67.5        0.0
+  subtraction             0.765    0.318       72.7        0.0
+  multiplication          0.777    0.373       68.7        0.0
+  antonym                 0.922    0.302       53.0        0.0
+  synonym                 0.945    0.211       61.7        0.0
+  past_tense              1.019    0.395       51.0        0.0
+  plural                  1.081    0.255       46.8        0.0
+  capital                 0.809    0.360       72.3        0.0
+  country                 0.747    0.388       71.2        0.0
+  translate_fr            0.987    0.272       49.2        0.0
+  translate_es            1.005    0.219       51.0        0.0
+  animal_sound            1.083    0.421       44.2        0.0
+
+  Layer 10:
+  Task                   Mean_H    Std_H   %Focused   %Diffuse
+  ----------------------------------------------------------
+  addition                0.623    0.262       88.3        0.0
+  subtraction             0.651    0.211       94.5        0.0
+  multiplication          0.648    0.308       82.8        0.0
+  antonym                 0.848    0.340       69.0        0.0
+  synonym                 0.859    0.280       72.7        0.0
+  past_tense              0.695    0.382       70.5        0.0
+  plural                  0.913    0.275       71.0        0.0
+  capital                 0.587    0.237       98.2        0.0
+  country                 0.507    0.231      100.0        0.0
+  translate_fr            0.980    0.270       54.7        0.0
+  translate_es            0.994    0.307       56.2        0.0
+  animal_sound            0.695    0.394       81.3        0.0
+
+============================================================
+ANALYSIS 2: Task-Conditioned Routing Divergence
+  Do different tasks produce different routing graphs?
+============================================================
+
+  Layer 2: Cross-task routing divergence
+
+  Cross-task routing pattern similarity (cosine):
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.7983     0.7863     0.6323     0.6363     0.6372
+  antonym                  0.7983     1.0000     0.9931     0.7078     0.7222     0.6494
+  capital                  0.7863     0.9931     1.0000     0.7506     0.7671     0.6840
+  translate_fr             0.6323     0.7078     0.7506     1.0000     0.9981     0.9716
+  past_tense               0.6363     0.7222     0.7671     0.9981     1.0000     0.9697
+  animal_sound             0.6372     0.6494     0.6840     0.9716     0.9697     1.0000
+
+  Layer 6: Cross-task routing divergence
+
+  Cross-task routing pattern similarity (cosine):
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.9688     0.9626     0.9440     0.9401     0.9504
+  antonym                  0.9688     1.0000     0.9977     0.9254     0.9360     0.9442
+  capital                  0.9626     0.9977     1.0000     0.9307     0.9408     0.9504
+  translate_fr             0.9440     0.9254     0.9307     1.0000     0.9923     0.9831
+  past_tense               0.9401     0.9360     0.9408     0.9923     1.0000     0.9948
+  animal_sound             0.9504     0.9442     0.9504     0.9831     0.9948     1.0000
+
+  Layer 10: Cross-task routing divergence
+
+  Cross-task routing pattern similarity (cosine):
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.9742     0.9957     0.9044     0.9951     0.9934
+  antonym                  0.9742     1.0000     0.9848     0.8739     0.9596     0.9635
+  capital                  0.9957     0.9848     1.0000     0.8969     0.9876     0.9909
+  translate_fr             0.9044     0.8739     0.8969     1.0000     0.9263     0.9290
+  past_tense               0.9951     0.9596     0.9876     0.9263     1.0000     0.9963
+  animal_sound             0.9934     0.9635     0.9909     0.9290     0.9963     1.0000
+
+============================================================
+ANALYSIS 3: Head-Level Routing Specificity
+  Which heads are task-specific? Which are universal?
+============================================================
+
+  Layer 2:
+  Head classification (variance threshold = 0.0197):
+    Universal heads (low cross-task variance): [0, 4, 5, 9, 11]
+    Task-specific heads (high cross-task variance): [1, 2, 3, 6, 7, 8, 10]
+    Fraction task-specific: 7/12
+
+    Task-specific head details:
+      Head 1: mean_H=1.083, addition=0.42, subtract=0.59, multipli=0.52, antonym=1.08, synonym=1.23, past_ten=1.40, plural=1.35, capital=1.22, country=1.23, translat=1.51, translat=1.46, animal_s=0.98
+      Head 2: mean_H=1.284, addition=0.84, subtract=0.79, multipli=0.78, antonym=1.36, synonym=1.12, past_ten=1.44, plural=1.58, capital=1.67, country=1.57, translat=1.44, translat=1.46, animal_s=1.35
+      Head 3: mean_H=1.520, addition=1.35, subtract=1.37, multipli=1.33, antonym=1.64, synonym=1.55, past_ten=1.77, plural=1.41, capital=1.45, country=1.48, translat=1.66, translat=1.66, animal_s=1.58
+      Head 6: mean_H=1.453, addition=1.09, subtract=1.14, multipli=1.19, antonym=1.52, synonym=1.48, past_ten=1.65, plural=1.43, capital=1.53, country=1.56, translat=1.66, translat=1.65, animal_s=1.53
+      Head 7: mean_H=1.636, addition=1.41, subtract=1.43, multipli=1.44, antonym=1.63, synonym=1.67, past_ten=1.76, plural=1.63, capital=1.66, country=1.68, translat=1.81, translat=1.82, animal_s=1.69
+
+  Layer 6:
+  Head classification (variance threshold = 0.0287):
+    Universal heads (low cross-task variance): [0, 7, 9, 10, 11]
+    Task-specific heads (high cross-task variance): [1, 2, 3, 4, 5, 6, 8]
+    Fraction task-specific: 7/12
+
+    Task-specific head details:
+      Head 1: mean_H=1.105, addition=0.82, subtract=0.97, multipli=0.67, antonym=1.46, synonym=1.17, past_ten=1.47, plural=0.89, capital=1.26, country=1.03, translat=1.17, translat=1.12, animal_s=1.23
+      Head 2: mean_H=0.484, addition=0.26, subtract=0.27, multipli=0.30, antonym=0.49, synonym=0.48, past_ten=0.46, plural=0.52, capital=0.49, country=0.45, translat=0.78, translat=0.78, animal_s=0.53
+      Head 3: mean_H=1.054, addition=0.88, subtract=0.62, multipli=0.84, antonym=0.90, synonym=0.90, past_ten=1.39, plural=1.09, capital=1.07, country=1.09, translat=1.26, translat=1.26, animal_s=1.36
+      Head 4: mean_H=1.019, addition=0.94, subtract=0.86, multipli=0.70, antonym=0.75, synonym=0.71, past_ten=0.85, plural=1.10, capital=1.05, country=1.27, translat=1.40, translat=1.51, animal_s=1.07
+      Head 5: mean_H=1.242, addition=1.10, subtract=1.23, multipli=1.20, antonym=1.24, synonym=1.50, past_ten=1.41, plural=1.26, capital=0.86, country=0.96, translat=1.44, translat=1.41, animal_s=1.31
+
+  Layer 10:
+  Head classification (variance threshold = 0.0665):
+    Universal heads (low cross-task variance): [0, 5, 6, 7, 11]
+    Task-specific heads (high cross-task variance): [1, 2, 3, 4, 8, 9, 10]
+    Fraction task-specific: 7/12
+
+    Task-specific head details:
+      Head 1: mean_H=0.671, addition=0.86, subtract=0.61, multipli=0.53, antonym=1.11, synonym=0.83, past_ten=0.43, plural=0.85, capital=0.35, country=0.30, translat=0.91, translat=0.88, animal_s=0.38
+      Head 2: mean_H=0.681, addition=0.85, subtract=0.82, multipli=0.81, antonym=0.53, synonym=0.67, past_ten=0.49, plural=0.86, capital=0.30, country=0.25, translat=1.07, translat=0.97, animal_s=0.54
+      Head 3: mean_H=0.743, addition=0.36, subtract=0.61, multipli=0.36, antonym=0.98, synonym=0.81, past_ten=1.07, plural=0.94, capital=0.69, country=0.78, translat=1.00, translat=0.94, animal_s=0.37
+      Head 4: mean_H=1.279, addition=1.14, subtract=0.98, multipli=1.27, antonym=1.55, synonym=1.33, past_ten=1.40, plural=1.49, capital=0.85, country=0.84, translat=1.52, translat=1.53, animal_s=1.44
+      Head 8: mean_H=0.482, addition=0.41, subtract=0.50, multipli=0.39, antonym=0.58, synonym=0.97, past_ten=0.19, plural=0.38, capital=0.13, country=0.15, translat=0.92, translat=0.93, animal_s=0.23
+
+======================================================================
+EXPERIMENT A COMPLETE
+======================================================================
+
+Total time: 125.4s

@@ -1,0 +1,106 @@
+﻿======================================================================
+EXPERIMENT B: Head Specialization & Task-Conditioned Routing
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Part 1: Head Activation Profiles ---
+  For each head, compute its 'routing fingerprint' across tasks
+
+  Layer 2:
+
+  Layer 6:
+
+  Layer 10:
+
+--- Part 2: Head Clustering ---
+  Do heads form functional groups?
+
+  Layer 2: Routing pattern SVD
+  Singular values: [5.1834, 2.436, 2.2131, 1.8412, 1.3545, 1.1842, 0.9243, 0.6046, 0.4705, 0.0]
+  Cumulative variance explained:
+    k=1: 0.5870
+    k=2: 0.7167
+    k=3: 0.8237
+    k=5: 0.9379
+    k=8: 0.9952
+  Number of significant routing patterns (SV > 10% of max): 8
+  2D projection range: x=[-0.82, -0.15], y=[-0.66, 0.33]
+
+  Layer 6: Routing pattern SVD
+  Singular values: [8.3273, 1.7969, 1.4358, 1.2008, 0.9142, 0.7179, 0.5768, 0.4723, 0.4319, 0.0]
+  Cumulative variance explained:
+    k=1: 0.8871
+    k=2: 0.9284
+    k=3: 0.9548
+    k=5: 0.9839
+    k=8: 0.9976
+  Number of significant routing patterns (SV > 10% of max): 5
+  2D projection range: x=[-0.98, -0.12], y=[-0.78, 0.11]
+
+  Layer 10: Routing pattern SVD
+  Singular values: [9.3097, 1.4852, 1.337, 0.6274, 0.5287, 0.4555, 0.3873, 0.2971, 0.2179, 0.0]
+  Cumulative variance explained:
+    k=1: 0.9438
+    k=2: 0.9678
+    k=3: 0.9873
+    k=5: 0.9946
+    k=8: 0.9995
+  Number of significant routing patterns (SV > 10% of max): 3
+  2D projection range: x=[-0.97, -0.23], y=[-0.32, 0.58]
+
+--- Part 3: TRUE Operator Dimensionality (12 tasks) ---
+  With 12 tasks, the pseudo-low-rank concern from Phase 83 is addressed.
+  If we still find low effective rank, it's real, not an artifact of n=4.
+
+  Layer 2: Task-Routing Matrix SVD
+  Shape: (12, 120)
+  Singular values: [5.972, 2.2558, 1.7936, 1.0529, 0.5956, 0.3298, 0.2668, 0.2393, 0.1836, 0.1755, 0.1381, 0.1162]
+  Cumulative variance:
+    k=1: 0.7792
+    k=2: 0.8904
+    k=3: 0.9607
+    k=4: 0.9849
+    k=6: 0.9951
+    k=8: 0.9979
+    k=12: 1.0000
+  Components needed: 90%=3, 95%=3, 99%=5
+  *** LOW RANK CONFIRMED with 12 tasks! ***
+
+  Layer 6: Task-Routing Matrix SVD
+  Shape: (12, 120)
+  Singular values: [8.4406, 1.6862, 1.3762, 0.837, 0.6937, 0.594, 0.5229, 0.3525, 0.3231, 0.3046, 0.2135, 0.1187]
+  Cumulative variance:
+    k=1: 0.9114
+    k=2: 0.9478
+    k=3: 0.9720
+    k=4: 0.9810
+    k=6: 0.9916
+    k=8: 0.9967
+    k=12: 1.0000
+  Components needed: 90%=1, 95%=3, 99%=6
+  *** LOW RANK CONFIRMED with 12 tasks! ***
+
+  Layer 10: Task-Routing Matrix SVD
+  Shape: (12, 120)
+  Singular values: [9.2699, 1.6529, 1.2902, 0.7008, 0.5551, 0.479, 0.4295, 0.3839, 0.2489, 0.1987, 0.1598, 0.1292]
+  Cumulative variance:
+    k=1: 0.9357
+    k=2: 0.9655
+    k=3: 0.9836
+    k=4: 0.9890
+    k=6: 0.9948
+    k=8: 0.9984
+    k=12: 1.0000
+  Components needed: 90%=1, 95%=2, 99%=5
+  *** LOW RANK CONFIRMED with 12 tasks! ***
+
+--- Part 4: Task-Specificity vs Layer Depth ---
+  Layer 2: routing specificity = 0.5251
+  Layer 6: routing specificity = 0.3123
+  Layer 10: routing specificity = 0.2697
+
+======================================================================
+EXPERIMENT B COMPLETE
+======================================================================
+
+Total time: 29.7s

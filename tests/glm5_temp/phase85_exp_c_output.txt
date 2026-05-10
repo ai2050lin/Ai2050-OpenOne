@@ -1,0 +1,105 @@
+======================================================================
+EXPERIMENT C: Causal Intervention — Correlation vs Causation
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Part 1: OV Circuit Ablation ---
+  Remove VALUE transport (zero z) while keeping attention routing intact.
+  This tests: is the VALUE more important than the ROUTING?
+
+  Task: addition
+    Baseline: [' 1', ' 1', ' 1', ' 1', ' 1']
+    Ablate VALUE (L4, H11): [' 1', ' 1', ' 8', ' 1', ' 1'] (1/5 changed)
+    Ablate VALUE (L5, H1): [' 1', ' 1', ' 1', ' 1', ' 1'] (0/5 changed)
+    Ablate VALUE (L7, H2): [' 1', ' 1', ' 1', ' 1', ' 1'] (0/5 changed)
+    Ablate ROUTING (L4, H11): [' 0', ' 1', ' 8', ' 1', ' 1'] (2/5 changed)
+
+  Task: antonym
+    Baseline: [' cold', ' the', ' the', ' the', ' the']
+    Ablate VALUE (L4, H11): [' cold', ' the', ' the', ' the', ' the'] (0/5 changed)
+    Ablate VALUE (L5, H1): [' cold', ' the', ' the', ' the', ' the'] (0/5 changed)
+    Ablate VALUE (L7, H2): [' cold', ' the', ' the', ' the', ' the'] (0/5 changed)
+    Ablate ROUTING (L4, H11): [' cold', ' the', ' the', ' the', ' the'] (0/5 changed)
+
+  Task: capital
+    Baseline: [' now', ' now', ' home', ' the', ' now']
+    Ablate VALUE (L4, H11): [' now', ' now', ' home', ' a', ' now'] (1/5 changed)
+    Ablate VALUE (L5, H1): [' now', ' now', ' home', ' the', ' the'] (1/5 changed)
+    Ablate VALUE (L7, H2): [' now', ' now', ' home', ' the', ' now'] (0/5 changed)
+    Ablate ROUTING (L4, H11): [' now', ' now', ' home', ' the', ' now'] (0/5 changed)
+
+  Task: translate_fr
+    Baseline: [' cat', ' "', ' house', ' "', ' book']
+    Ablate VALUE (L4, H11): [' cat', ' "', ' house', ' water', ' book'] (1/5 changed)
+    Ablate VALUE (L5, H1): [' cat', ' "', ' house', ' water', ' book'] (1/5 changed)
+    Ablate VALUE (L7, H2): [' cat', ' "', ' house', ' water', ' book'] (1/5 changed)
+    Ablate ROUTING (L4, H11): [' cat', ' "', ' house', ' water', ' book'] (1/5 changed)
+
+  Task: past_tense
+    Baseline: [' a', ' a', ' a', ' a', ' a']
+    Ablate VALUE (L4, H11): [' a', ' a', ' a', ' a', ' a'] (0/5 changed)
+    Ablate VALUE (L5, H1): [' a', ' a', ' a', ' a', ' a'] (0/5 changed)
+    Ablate VALUE (L7, H2): [' a', ' a', ' a', ' a', ' a'] (0/5 changed)
+    Ablate ROUTING (L4, H11): [' a', ' a', ' a', ' a', ' a'] (0/5 changed)
+
+  Task: animal_sound
+    Baseline: [' the', ' the', ' the', ' the', ' the']
+    Ablate VALUE (L4, H11): [' the', ' the', ' the', ' a', ' the'] (1/5 changed)
+    Ablate VALUE (L5, H1): [' the', ' the', ' the', ' the', ' the'] (0/5 changed)
+    Ablate VALUE (L7, H2): [' the', ' the', ' the', ' the', ' the'] (0/5 changed)
+    Ablate ROUTING (L4, H11): [' the', ' the', ' the', ' the', ' the'] (0/5 changed)
+
+--- Part 2: Full Ablation vs Value-Only Ablation ---
+  Systematic comparison across all (layer, head) pairs.
+
+  Task: capital
+  Ablation impact on logit for correct answer:
+     (L,H)    Baseline    Ablate_z   Ablate_attn    z_impact   attn_impact
+  (4, 0)    -105.943    -107.254      -106.400       1.311         0.457
+  (4, 2)    -105.943    -105.586      -106.926      -0.356         0.983
+  (4, 3)    -105.943    -105.111      -106.488      -0.832         0.545
+  (4, 4)    -105.943    -106.829      -104.630       0.886        -1.313
+  (4, 5)    -105.943    -104.432      -105.719      -1.511        -0.224
+  (4, 6)    -105.943    -105.349      -105.061      -0.594        -0.882
+  (4, 9)    -105.943    -106.620      -107.000       0.677         1.057
+  (4,10)    -105.943    -105.659      -107.192      -0.284         1.249
+  (5, 0)    -105.943    -105.775      -100.997      -0.168        -4.946
+  (5, 1)    -105.943    -104.665       -89.819      -1.278       -16.124
+  (5, 2)    -105.943    -105.395      -105.454      -0.548        -0.489
+  (5, 5)    -105.943    -106.612      -104.727       0.669        -1.216
+  (5, 7)    -105.943    -106.983      -106.268       1.040         0.325
+  (5, 8)    -105.943    -107.088      -105.042       1.146        -0.901
+  (5, 9)    -105.943    -104.402      -105.838      -1.541        -0.105
+  (5,10)    -105.943    -105.118      -106.861      -0.825         0.918
+  (6, 0)    -105.943    -104.181      -105.978      -1.761         0.035
+  (6, 1)    -105.943    -106.692      -105.273       0.749        -0.669
+  (6, 2)    -105.943    -105.657      -107.084      -0.286         1.141
+  (6, 4)    -105.943    -105.905      -106.541      -0.038         0.598
+  (6, 6)    -105.943    -106.256      -110.309       0.313         4.366
+  (6, 7)    -105.943    -105.438      -105.339      -0.505        -0.604
+  (6, 8)    -105.943    -106.599      -105.793       0.656        -0.150
+  (6, 9)    -105.943    -105.520      -103.727      -0.423        -2.216
+  (6,10)    -105.943    -106.037      -102.350       0.094        -3.593
+  (6,11)    -105.943    -106.393      -105.204       0.450        -0.739
+  (7, 0)    -105.943    -105.964      -105.162       0.021        -0.781
+  (7, 1)    -105.943    -106.294      -104.652       0.351        -1.291
+  (7, 2)    -105.943    -105.916      -102.678      -0.027        -3.265
+  (7, 3)    -105.943    -104.942      -106.941      -1.001         0.998
+  (7, 4)    -105.943    -107.342      -103.892       1.399        -2.051
+  (7, 6)    -105.943    -106.044      -105.197       0.101        -0.746
+  (7, 7)    -105.943    -106.030      -103.319       0.088        -2.624
+  (7, 8)    -105.943    -107.291      -105.579       1.348        -0.364
+  (7, 9)    -105.943    -106.214      -104.408       0.271        -1.535
+  (7,10)    -105.943    -105.757      -104.349      -0.186        -1.594
+  (7,11)    -105.943    -106.022      -105.370       0.079        -0.573
+
+--- Part 3: Perturbation Recovery (Attractor Test) ---
+  Phase 84 claimed 'fixed-point attractor' without proper evidence.
+  Real attractor: perturb state → system returns to same state.
+  Noise level 0.01: recovery rate = 1.00 (strong attractor)
+  Noise level 0.1: recovery rate = 0.90 (strong attractor)
+  Noise level 1.0: recovery rate = 0.70 (weak attractor)
+
+======================================================================
+EXPERIMENT C COMPLETE
+======================================================================

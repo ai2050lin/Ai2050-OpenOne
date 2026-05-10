@@ -1,0 +1,67 @@
+======================================================================
+EXPERIMENT B: Representation Trajectory Field
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Part 1: Representation Trajectory Across Layers ---
+
+  Task: addition
+    Total trajectory length: 542.75
+    Per-step distances: [55.99, 15.68, 17.25, 17.38, 20.29, 19.86, 27.39, 28.73, 31.86, 45.10, 121.11, 391.58]
+
+  Task: antonym
+    Total trajectory length: 463.24
+    Per-step distances: [57.95, 12.52, 11.36, 16.74, 20.63, 20.53, 24.17, 35.12, 52.68, 51.81, 130.30, 284.69]
+
+  Task: capital
+    Total trajectory length: 452.77
+    Per-step distances: [59.18, 12.15, 11.00, 14.38, 17.72, 17.42, 28.75, 26.71, 40.81, 57.73, 143.78, 256.29]
+
+  Task: translate_fr
+    Total trajectory length: 588.48
+    Per-step distances: [58.36, 12.20, 11.25, 12.18, 20.23, 24.47, 28.46, 47.84, 42.17, 53.37, 154.05, 420.13]
+
+  Task: past_tense
+    Total trajectory length: 442.87
+    Per-step distances: [57.42, 12.25, 10.81, 12.21, 16.56, 18.44, 23.01, 32.34, 35.12, 56.85, 102.90, 287.84]
+
+  Task: animal_sound
+    Total trajectory length: 449.33
+    Per-step distances: [56.40, 13.31, 12.27, 13.50, 20.99, 20.44, 23.39, 35.56, 40.24, 57.36, 115.31, 276.05]
+
+--- Part 2: Cross-Task Representation Divergence ---
+  Does the representation trajectory bifurcate by task?
+
+  Cross-task representation cosine by layer:
+   Layer    Mean_cos     Min_cos     Std_cos    Divergence
+       0      0.9448      0.8399      0.0725        0.0552
+       2      0.8922      0.7211      0.1150        0.1078
+       4      0.8318      0.6651      0.1089        0.1682
+       6      0.7677      0.6123      0.0975        0.2323
+       8      0.7257      0.5566      0.0864        0.2743
+      10      0.8625      0.8065      0.0328        0.1375
+
+--- Part 3: Representation Compression ---
+  Does the representation compress into a lower-dimensional subspace?
+  addition        L 0: eff_rank_90=1, eff_rank_99=1, participation_ratio=1.0, top-5 SVs=[0.0, 0.0, 0.0, 0.0, 0.0]
+  addition        L 6: eff_rank_90=12, eff_rank_99=23, participation_ratio=16.6, top-5 SVs=[32.31, 18.12, 17.46, 14.91, 12.81]
+  addition        L11: eff_rank_90=14, eff_rank_99=24, participation_ratio=19.8, top-5 SVs=[54.65, 43.74, 35.8, 31.75, 30.92]
+  antonym         L 0: eff_rank_90=1, eff_rank_99=1, participation_ratio=1.0, top-5 SVs=[0.0, 0.0, 0.0, 0.0, 0.0]
+  antonym         L 6: eff_rank_90=11, eff_rank_99=17, participation_ratio=14.2, top-5 SVs=[40.55, 31.66, 27.28, 23.66, 22.85]
+  antonym         L11: eff_rank_90=13, eff_rank_99=18, participation_ratio=16.0, top-5 SVs=[138.35, 113.14, 109.79, 107.22, 100.04]
+  capital         L 0: eff_rank_90=1, eff_rank_99=1, participation_ratio=1.0, top-5 SVs=[0.0, 0.0, 0.0, 0.0, 0.0]
+  capital         L 6: eff_rank_90=13, eff_rank_99=18, participation_ratio=15.3, top-5 SVs=[13.79, 12.86, 8.46, 8.11, 7.75]
+  capital         L11: eff_rank_90=12, eff_rank_99=18, participation_ratio=15.4, top-5 SVs=[97.09, 80.4, 71.32, 66.27, 54.24]
+
+--- Part 4: Incremental Rewriting Δh = h^(l+1) - h^(l) ---
+  How much does each layer rewrite the representation?
+  addition       : L0=10.718, L2=0.301, L4=0.305, L6=0.345, L8=0.308, L10=0.821
+  antonym        : L0=11.854, L2=0.203, L4=0.324, L6=0.314, L8=0.526, L10=0.749
+  capital        : L0=12.132, L2=0.189, L4=0.279, L6=0.399, L8=0.411, L10=0.851
+  translate_fr   : L0=12.118, L2=0.196, L4=0.330, L6=0.356, L8=0.379, L10=1.035
+  past_tense     : L0=11.909, L2=0.196, L4=0.259, L6=0.315, L8=0.341, L10=0.621
+  animal_sound   : L0=11.713, L2=0.224, L4=0.370, L6=0.317, L8=0.393, L10=0.682
+
+======================================================================
+EXPERIMENT B COMPLETE
+======================================================================

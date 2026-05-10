@@ -1,0 +1,165 @@
+======================================================================
+EXPERIMENT D: Recursive Representation Rewriting
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Part 1: Attention vs MLP Contribution to Δh ---
+  Decompose: h^(l+1) - h^(l) = Δh_attn + Δh_mlp
+
+  Task: addition
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        26.753        34.808        55.574      48.1      62.6
+       2         9.009        14.464        17.251      52.2      83.8
+       4         8.875        17.756        20.290      43.7      87.5
+       6        13.503        22.669        27.388      49.3      82.8
+       8        14.324        27.462        31.865      45.0      86.2
+      10        19.268       107.627       121.115      15.9      88.9
+
+  Task: antonym
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        26.412        35.772        57.571      45.9      62.1
+       2         8.433         9.121        11.362      74.2      80.3
+       4        11.707        18.875        20.630      56.7      91.5
+       6        12.873        21.897        24.170      53.3      90.6
+       8        30.241        33.867        52.675      57.4      64.3
+      10        41.615       100.174       130.298      31.9      76.9
+
+  Task: capital
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        26.453        37.169        58.806      45.0      63.2
+       2         7.979         9.235        10.997      72.6      84.0
+       4        11.534        14.495        17.716      65.1      81.8
+       6        13.406        23.944        28.746      46.6      83.3
+       8         8.984        37.721        40.806      22.0      92.4
+      10        15.367       134.619       143.776      10.7      93.6
+
+  Task: translate_fr
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        27.139        35.499        58.010      46.8      61.2
+       2        10.459         8.864        11.250      93.0      78.8
+       4        12.854        15.574        20.230      63.5      77.0
+       6        19.092        24.599        28.457      67.1      86.4
+       8        23.291        35.974        42.174      55.2      85.3
+      10        50.507       123.324       154.052      32.8      80.1
+
+  Task: past_tense
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        27.217        34.606        57.073      47.7      60.6
+       2         8.768         8.424        10.812      81.1      77.9
+       4         9.365        14.021        16.557      56.6      84.7
+       6        14.189        18.817        23.006      61.7      81.8
+       8        14.674        29.302        35.125      41.8      83.4
+      10        29.608        85.085       102.900      28.8      82.7
+
+  Task: animal_sound
+   Layer    ||Δ_attn||     ||Δ_mlp||   ||Δ_total||     Attn%      MLP%
+       0        27.477        33.447        56.042      49.0      59.7
+       2         9.972         9.537        12.269      81.3      77.7
+       4        11.281        16.799        20.992      53.7      80.0
+       6        15.931        19.299        23.392      68.1      82.5
+       8        17.936        33.561        40.237      44.6      83.4
+      10        25.354        98.485       115.307      22.0      85.4
+
+--- Part 2: Representation Rewriting Direction ---
+  Not just HOW MUCH is rewritten, but IN WHICH DIRECTION.
+  Key question: does Δh point in a consistent direction across samples?
+  addition        L4: attn_direction_consistency=0.9373, mlp_direction_consistency=0.9722
+  addition        L6: attn_direction_consistency=0.9505, mlp_direction_consistency=0.9774
+  addition        L8: attn_direction_consistency=0.9083, mlp_direction_consistency=0.9765
+  antonym         L4: attn_direction_consistency=0.9262, mlp_direction_consistency=0.9387
+  antonym         L6: attn_direction_consistency=0.8740, mlp_direction_consistency=0.9173
+  antonym         L8: attn_direction_consistency=0.8715, mlp_direction_consistency=0.9023
+  capital         L4: attn_direction_consistency=0.9724, mlp_direction_consistency=0.9839
+  capital         L6: attn_direction_consistency=0.9540, mlp_direction_consistency=0.9848
+  capital         L8: attn_direction_consistency=0.9003, mlp_direction_consistency=0.9910
+
+--- Part 3: Cross-Task Rewriting Direction Divergence ---
+  Do different tasks rewrite the representation in different directions?
+
+  Layer 2: Cross-task Δh_attn direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.2869     0.2288     0.1940     0.1858     0.1661
+  antonym                  0.2869     1.0000     0.5627     0.5827     0.7021     0.4277
+  capital                  0.2288     0.5627     1.0000     0.6447     0.5722     0.3129
+  translate_fr             0.1940     0.5827     0.6447     1.0000     0.7119     0.4206
+  past_tense               0.1858     0.7021     0.5722     0.7119     1.0000     0.4716
+  animal_sound             0.1661     0.4277     0.3129     0.4206     0.4716     1.0000
+
+  Layer 2: Cross-task Δh_mlp direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.0700     0.0784     0.0655     0.0738     0.0287
+  antonym                  0.0700     1.0000     0.5126     0.7055     0.7697     0.5786
+  capital                  0.0784     0.5126     1.0000     0.6510     0.5557     0.3253
+  translate_fr             0.0655     0.7055     0.6510     1.0000     0.7888     0.5895
+  past_tense               0.0738     0.7697     0.5557     0.7888     1.0000     0.6293
+  animal_sound             0.0287     0.5786     0.3253     0.5895     0.6293     1.0000
+
+  Layer 6: Cross-task Δh_attn direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.0497     0.1951     0.0458     0.1945     0.0606
+  antonym                  0.0497     1.0000     0.2620     0.2905     0.3885     0.2516
+  capital                  0.1951     0.2620     1.0000     0.3560     0.3286     0.1976
+  translate_fr             0.0458     0.2905     0.3560     1.0000     0.2979     0.3612
+  past_tense               0.1945     0.3885     0.3286     0.2979     1.0000     0.3139
+  animal_sound             0.0606     0.2516     0.1976     0.3612     0.3139     1.0000
+
+  Layer 6: Cross-task Δh_mlp direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.1846     0.3583     0.1171     0.3154     0.2859
+  antonym                  0.1846     1.0000     0.2183     0.2910     0.3875     0.2283
+  capital                  0.3583     0.2183     1.0000     0.2859     0.3967     0.3451
+  translate_fr             0.1171     0.2910     0.2859     1.0000     0.3360     0.3021
+  past_tense               0.3154     0.3875     0.3967     0.3360     1.0000     0.4812
+  animal_sound             0.2859     0.2283     0.3451     0.3021     0.4812     1.0000
+
+  Layer 10: Cross-task Δh_attn direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.7703     0.6665     0.6559     0.7807     0.7189
+  antonym                  0.7703     1.0000     0.7225     0.7562     0.8597     0.7971
+  capital                  0.6665     0.7225     1.0000     0.6396     0.7267     0.7087
+  translate_fr             0.6559     0.7562     0.6396     1.0000     0.7628     0.7189
+  past_tense               0.7807     0.8597     0.7267     0.7628     1.0000     0.8213
+  animal_sound             0.7189     0.7971     0.7087     0.7189     0.8213     1.0000
+
+  Layer 10: Cross-task Δh_mlp direction cosine
+                         addition    antonym    capital translate_ past_tense animal_sou
+  addition                 1.0000     0.9128     0.9053     0.8686     0.8153     0.8754
+  antonym                  0.9128     1.0000     0.9250     0.8971     0.8443     0.8829
+  capital                  0.9053     0.9250     1.0000     0.8827     0.8255     0.8615
+  translate_fr             0.8686     0.8971     0.8827     1.0000     0.7249     0.8092
+  past_tense               0.8153     0.8443     0.8255     0.7249     1.0000     0.8691
+  animal_sound             0.8754     0.8829     0.8615     0.8092     0.8691     1.0000
+
+--- Part 4: Subspace Analysis of Representation Rewriting ---
+  In which subspaces does rewriting occur?
+
+  Layer 4:
+    Attention Δh SVD top-5: [37.22, 32.63, 30.01, 27.36, 20.77]
+    MLP Δh SVD top-5: [47.53, 41.21, 37.82, 31.97, 26.74]
+    Participation ratio: attn=18.8, mlp=18.9
+    Variance explained by k=1: attn=0.2657, mlp=0.2723
+    Variance explained by k=3: attn=0.6427, mlp=0.6494
+    Variance explained by k=5: attn=0.8691, mlp=0.8588
+    Variance explained by k=10: attn=0.9146, mlp=0.9188
+
+  Layer 6:
+    Attention Δh SVD top-5: [50.87, 42.96, 37.44, 33.26, 30.86]
+    MLP Δh SVD top-5: [69.94, 60.23, 55.25, 52.87, 39.76]
+    Participation ratio: attn=20.7, mlp=17.8
+    Variance explained by k=1: attn=0.2773, mlp=0.2711
+    Variance explained by k=3: attn=0.6253, mlp=0.6414
+    Variance explained by k=5: attn=0.8459, mlp=0.8840
+    Variance explained by k=10: attn=0.9000, mlp=0.9281
+
+  Layer 8:
+    Attention Δh SVD top-5: [82.04, 56.45, 47.39, 37.99, 29.93]
+    MLP Δh SVD top-5: [110.33, 83.8, 81.8, 73.63, 59.5]
+    Participation ratio: attn=19.1, mlp=16.2
+    Variance explained by k=1: attn=0.3782, mlp=0.3133
+    Variance explained by k=3: attn=0.6834, mlp=0.6662
+    Variance explained by k=5: attn=0.8149, mlp=0.8968
+    Variance explained by k=10: attn=0.9158, mlp=0.9423
+
+======================================================================
+EXPERIMENT D COMPLETE
+======================================================================

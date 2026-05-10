@@ -1,0 +1,125 @@
+﻿======================================================================
+EXPERIMENT D: Recursive Rollout — Graph Evolution During Generation
+======================================================================
+Loaded pretrained model gpt2-small into HookedTransformer
+
+--- Part 1: Graph Evolution During Generation ---
+
+  Task: addition
+    Graph stability (cosine between consecutive steps): 0.9843 ± 0.0110
+    Drift from initial (step 1): 0.9659
+    Drift from initial (step 2): 0.9592
+    Drift from initial (step 3): 0.9628
+    Drift from initial (step 4): 0.9743
+    Drift from initial (step 5): 0.9772
+
+  Task: antonym
+    Graph stability (cosine between consecutive steps): 0.9837 ± 0.0107
+    Drift from initial (step 1): 0.9812
+    Drift from initial (step 2): 0.9658
+    Drift from initial (step 3): 0.9691
+    Drift from initial (step 4): 0.9758
+    Drift from initial (step 5): 0.9727
+
+  Task: capital
+    Graph stability (cosine between consecutive steps): 0.9936 ± 0.0030
+    Drift from initial (step 1): 0.9940
+    Drift from initial (step 2): 0.9848
+    Drift from initial (step 3): 0.9812
+    Drift from initial (step 4): 0.9800
+    Drift from initial (step 5): 0.9795
+
+  Task: translate_fr
+    Graph stability (cosine between consecutive steps): 0.9887 ± 0.0060
+    Drift from initial (step 1): 0.9809
+    Drift from initial (step 2): 0.9686
+    Drift from initial (step 3): 0.9623
+    Drift from initial (step 4): 0.9639
+    Drift from initial (step 5): 0.9615
+
+  Task: past_tense
+    Graph stability (cosine between consecutive steps): 0.9909 ± 0.0055
+    Drift from initial (step 1): 0.9871
+    Drift from initial (step 2): 0.9774
+    Drift from initial (step 3): 0.9559
+    Drift from initial (step 4): 0.9576
+    Drift from initial (step 5): 0.9650
+
+  Task: animal_sound
+    Graph stability (cosine between consecutive steps): 0.9928 ± 0.0021
+    Drift from initial (step 1): 0.9911
+    Drift from initial (step 2): 0.9729
+    Drift from initial (step 3): 0.9728
+    Drift from initial (step 4): 0.9729
+    Drift from initial (step 5): 0.9738
+
+--- Part 2: Routing Entropy Dynamics During Generation ---
+
+  Task: addition
+  Entropy trajectory: step0=0.878±0.016  step1=0.979±0.013  step2=1.009±0.024  step3=1.142±0.019  step4=1.054±0.088  step5=1.111±0.094  
+
+  Task: antonym
+  Entropy trajectory: step0=0.899±0.045  step1=0.964±0.049  step2=1.221±0.077  step3=1.219±0.218  step4=1.136±0.091  step5=1.354±0.096  
+
+  Task: capital
+  Entropy trajectory: step0=0.894±0.015  step1=0.867±0.127  step2=0.965±0.122  step3=1.073±0.061  step4=1.095±0.147  step5=0.988±0.142  
+
+  Task: translate_fr
+  Entropy trajectory: step0=1.083±0.029  step1=0.944±0.051  step2=0.999±0.175  step3=1.247±0.159  step4=1.289±0.084  step5=1.239±0.103  
+
+  Task: past_tense
+  Entropy trajectory: step0=1.055±0.029  step1=0.914±0.040  step2=0.990±0.036  step3=1.109±0.070  step4=1.177±0.046  step5=1.201±0.106  
+
+  Task: animal_sound
+  Entropy trajectory: step0=1.035±0.010  step1=1.070±0.016  step2=1.096±0.024  step3=1.175±0.019  step4=1.169±0.047  step5=1.152±0.069  
+
+--- Part 3: Information Path Persistence ---
+  Does the same (layer, head) stay dominant across generation steps?
+  Task: addition             avg dominant-head changes per step: 0.79
+  Task: antonym              avg dominant-head changes per step: 1.31
+  Task: capital              avg dominant-head changes per step: 0.15
+  Task: translate_fr         avg dominant-head changes per step: 0.76
+  Task: past_tense           avg dominant-head changes per step: 0.21
+  Task: animal_sound         avg dominant-head changes per step: 0.99
+
+--- Part 4: Recursive Graph Evolution Rules ---
+  KEY QUESTION: Is there a finite set of graph transition rules?
+
+  Task: addition
+    Unique states: 9
+    Unique transitions: 13
+    Total state visits: 90
+    Top-5 transitions:
+      (11, 9, 1) → (11, 9, 1): 40
+      (11, 2, 1) → (11, 9, 1): 9
+      (11, 9, 1) → (10, 2, 4): 9
+      (11, 9, 1) → (11, 9, 11): 3
+      (11, 9, 11) → (11, 9, 1): 3
+
+  Task: antonym
+    Unique states: 18
+    Unique transitions: 35
+    Total state visits: 90
+    Top-5 transitions:
+      (11, 10, 2) → (11, 10, 11): 6
+      (11, 10, 11) → (11, 10, 11): 5
+      (11, 9, 1) → (5, 9, 1): 5
+      (11, 10, 11) → (11, 10, 4): 5
+      (5, 9, 1) → (5, 10, 6): 4
+
+  Task: capital
+    Unique states: 5
+    Unique transitions: 10
+    Total state visits: 90
+    Top-5 transitions:
+      (11, 9, 1) → (11, 9, 1): 64
+      (11, 9, 1) → (11, 10, 1): 2
+      (11, 10, 1) → (11, 9, 1): 2
+      (11, 9, 1) → (11, 9, 6): 1
+      (11, 9, 6) → (11, 9, 1): 1
+
+======================================================================
+EXPERIMENT D COMPLETE
+======================================================================
+
+Total time: 96.5s
