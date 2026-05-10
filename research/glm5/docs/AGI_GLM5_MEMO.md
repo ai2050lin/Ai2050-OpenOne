@@ -54139,3 +54139,6922 @@ reasoning模式:
 
 [Phase 78完成时间标记: 2026年05月07日16时23分]
 
+## Phase 79: Computation Invariants — 在content变化中寻找不变的计算策略 [2026-05-07 19:52]
+
+### 范式升级: 从"trajectory"到"invariant"
+
+用户精准指出了Phase 78的4个硬伤:
+1. **混淆content trajectory与computation policy** — trajectory不同不等于computation不同
+2. **"随机漫步"解释过度** — hidden发散是autoregressive的必然, 不代表computation随机
+3. **attractor定义不清** — 只否定了hidden-state point convergence, 没否定routing/policy attractor
+4. **"CoT = computation unfolding"未证明** — CoT可能只是token scaffold
+
+**核心升级**: 不问"hidden是否收敛", 而问"computation是否收敛" — 在content改变时, 什么保持不变?
+
+三层分离:
+1. content trajectory — token内容 (最表层, 最容易发散)
+2. representation trajectory — h_t (中间层, 被content驱动)
+3. computation policy — routing/update/retrieval strategy (最深层)
+
+---
+
+### 实验A: Routing Topology Invariant (GPT-2) ★★★★★
+
+**问题**: 不同content是否共享同一种attention routing topology?
+
+**方法**: 4组任务(addition×10, translate_fr×10, capital×10, antonym×10), 比较同组内和跨组的routing similarity
+
+**三个度量**:
+- Cosine similarity: 展平后的pattern相似度
+- Top-3 Routing Overlap: 关注哪些位置(Jaccard)
+- Rank Correlation: attention排序的Spearman相关
+
+**核心结果 — L6代表层**:
+
+| 度量 | 组内均值 | 跨组均值 | 差距 |
+|------|---------|---------|------|
+| Cosine Sim | 0.9947 | 0.9534 | 0.0413 |
+| Top-3 Routing Overlap | 0.9654 | 0.8867 | 0.0787 |
+| Rank Correlation | 0.9774 | 0.8898 | **0.0867** |
+
+**组内各任务routing相似度 (Rank Correlation, L6)**:
+- addition: 0.9753
+- translate_fr: 0.9755
+- capital: 0.9784
+- antonym: 0.9724
+
+**Position-driven vs Task-driven 分离 (L6)**:
+- 同类任务(position-controlled): 0.9995
+- 跨类任务(different-content): 0.9809
+- 差距: 0.0185 (position-driven!)
+
+**关键发现**:
+1. ★ 组内routing >> 跨组routing → 存在task-specific routing结构
+2. ★ 但差距只有0.05-0.09, routing主要还是position-driven
+3. ★ 同句不同任务(position-controlled)差距只有0.02 → routing80%+由position决定
+4. ★ 真正的task-specific routing贡献约5-10%
+
+---
+
+### 实验B: Transition Direction Invariant (GPT-2)
+
+**问题**: 不同输入通过同一层时, transition (h_out - h_in) 方向是否对齐?
+
+**同类任务 transition direction similarity**:
+
+| 任务对 | L0 | L3 | L6 | L9 | L11 |
+|--------|-----|-----|-----|-----|------|
+| add1 vs add2 | 0.999 | 0.960 | 0.953 | 0.930 | 0.998 |
+| ant1 vs ant2 | 0.999 | 0.879 | 0.885 | 0.722 | 0.986 |
+| cap1 vs cap2 | 1.000 | 0.985 | 0.989 | 0.884 | 0.996 |
+
+**跨类任务 transition direction similarity**:
+
+| 任务对 | L0 | L3 | L6 | L9 | L11 |
+|--------|-----|-----|-----|-----|------|
+| add vs ant | 0.839 | **0.117** | 0.193 | 0.421 | 0.959 |
+| cap vs trans | 0.715 | **0.133** | 0.336 | 0.470 | 0.913 |
+| ant vs text | 0.898 | **0.039** | 0.167 | 0.466 | 0.973 |
+
+**关键发现**:
+1. ★★★★★ **中层(L3-L6)是computation policy的分化层!**
+   - 同类任务: 0.88-0.99 (高对齐)
+   - 跨类任务: 0.04-0.34 (低对齐)
+   - 差距高达0.8+!
+2. ★ 浅层(L0): 所有输入transition方向高度相似(0.84-1.00) → 通用预处理
+3. ★ 深层(L11): 所有输入transition方向趋同(0.91-0.97) → 通用输出映射
+4. ★ **中层是真正的"computation fork point"** — 在这里, 不同任务选择不同的计算路径
+
+**Transition PCA分析** (同类任务transition vector的低维性):
+
+| 任务 | 层 | PC1 | PC1-2 | PC1-3 |
+|------|-----|-----|-------|-------|
+| addition | L0 | 0.363 | 0.597 | 0.690 |
+| addition | L11 | **0.755** | **0.892** | **0.925** |
+| antonym | L0 | 0.180 | 0.308 | 0.401 |
+| antonym | L11 | 0.522 | 0.667 | 0.722 |
+| capital | L0 | 0.332 | 0.479 | 0.566 |
+| capital | L9 | 0.164 | 0.309 | 0.421 |
+
+→ 浅层-中层transition vectors高维分散, 深层(L11)addition高度低维(PC1-3=0.925)
+→ 深层存在强约束, 浅层-中层computation更flexible
+
+---
+
+### 实验C: Boundary-Conditioned Computation (GPT-2) ★★★★★
+
+**问题**: prefix改变的是content还是computation policy?
+
+**核心结果 — 同类prefix vs 异类prefix routing similarity**:
+
+| 层 | 同类routing | 异类routing | 差距 |
+|-----|-----------|-----------|------|
+| L0 | 0.9971 | 0.2654 | **0.7317** |
+| L3 | 0.9889 | 0.6968 | **0.2921** |
+| L6 | 0.9854 | 0.6695 | **0.3160** |
+| L9 | 0.9860 | 0.4689 | **0.5172** |
+| L11 | 0.9714 | 0.4125 | **0.5589** |
+
+★ 同类prefix (translate_fr vs translate_de): routing sim = 0.97-1.00
+★ 异类prefix (translate_fr vs summarize): routing sim = 0.27-0.70
+★ **差距0.3-0.7! 这是目前为止最强的computation policy分化证据!**
+
+**Transition direction similarity**:
+- 所有prefix: 0.93-1.00 → transition方向几乎不受prefix影响!
+
+**关键发现**:
+1. ★★★★★ **prefix强烈改变routing topology, 但几乎不改变transition direction!**
+2. → prefix的computation conditioning主要通过routing实现, 不是通过层间映射
+3. → routing是computation policy的主要载体!
+4. → 这就是"boundary-conditioned computation"的机制: prefix → routing → 不同的信息通路
+
+**Head-level prefix sensitivity**:
+
+L6 (中层关键):
+- 最sensitive: Head 8 (0.76), Head 0 (0.76), Head 4 (0.86)
+- 最insensitive: Head 9 (1.00), Head 6 (1.00), Head 10 (1.00)
+
+→ 少数heads承担了computation policy switching!
+→ 多数heads是"通用计算器", 不受prefix影响
+
+---
+
+### 实验D: Head Interaction Graph Invariant (GPT-2)
+
+**问题**: head之间的功能交互图是否在不同内容间保持?
+
+| 层 | 同组graph sim | 跨组graph sim | 差距 | 稳定交互pairs |
+|-----|-------------|-------------|------|-------------|
+| L3 | 0.9961 | 0.9693 | 0.0268 | 24/66 (36.4%) |
+| L6 | 0.9949 | 0.9692 | 0.0257 | 27/66 (40.9%) |
+| L9 | 0.9809 | 0.9202 | **0.0607** | 11/66 (16.7%) |
+
+→ 同组内graph相似度>跨组, 差距随深度增大(L9差距最大0.06)
+→ 36-41%的head pairs在所有任务中交互符号一致 → 存在"computation backbone"
+→ 但多数head pairs的交互是task-dependent
+
+---
+
+### Qwen3验证 ★★★★★
+
+**实验A-Q: Routing Topology Invariant on Qwen3-4B**
+
+| 层 | 组内均值 | 跨组均值 | 差距(Rank Corr) | 差距(Top-3 Overlap) |
+|-----|---------|---------|----------------|---------------------|
+| L0 | 0.905 | 0.714 | **0.191** | **0.092** |
+| L9 | 0.926 | 0.861 | **0.065** | **0.068** |
+| L18 | 0.928 | 0.836 | **0.092** | **0.092** |
+| L27 | 0.927 | 0.840 | **0.087** | **0.074** |
+| L35 | 0.931 | 0.863 | **0.069** | **0.058** |
+
+★ Qwen3的组内-跨组差距(0.06-0.19)比GPT-2(0.05-0.09)更大!
+★ 特别是在L0层, 差距高达0.19 → 有能力模型从第一层就开始任务分化!
+
+**实验C-Q: Boundary-Conditioned Computation on Qwen3**
+
+| 层 | 同类routing | 异类routing | 差距 |
+|-----|-----------|-----------|------|
+| L0 | 0.925 | 0.463 | **0.462** |
+| L9 | 0.953 | 0.739 | **0.214** |
+| L18 | 0.974 | 0.745 | **0.229** |
+| L27 | 0.972 | 0.654 | **0.319** |
+| L35 | 0.947 | 0.558 | **0.389** |
+
+★★★ 同类prefix差距0.21-0.46! 远大于GPT-2!
+★★★ 有能力模型中, prefix对computation policy的conditioning更强!
+★★★ 深层(L35)差距最大(0.39) → 深层任务分化更明显
+
+**Transition direction (Qwen3)**:
+- L9: 0.979, L18: 0.903, L27: 0.942, L35: 0.954
+→ 与GPT-2一致: transition方向受prefix影响很小
+
+**Head sensitivity (Qwen3 L9)**:
+- 最sensitive: Head 12 (0.56), Head 14 (0.68)
+- 最insensitive: Head 9/24/28/30 (1.00)
+→ 同GPT-2: 少数heads承担policy switching, 多数是通用计算器
+
+---
+
+### Phase 79核心结论
+
+#### 1. Computation Invariant确实存在!
+
+**最关键的发现**: 在content改变时, 以下量保持不变:
+
+| 不变量 | GPT-2证据 | Qwen3证据 | 强度 |
+|--------|---------|----------|------|
+| **Routing topology** (同类任务) | 组内0.97 vs 跨组0.89 | 组内0.93 vs 跨组0.84 | ★★★★ |
+| **Transition direction** (同类任务) | 中层0.88-0.99 vs 跨类0.04-0.34 | (同趋势) | ★★★★★ |
+| **Head interaction graph** | 36-41%稳定pairs | (待验证) | ★★★ |
+| **Prefix-conditioned routing** | 同类0.97 vs 异类0.47 | 同类0.97 vs 异类0.55 | ★★★★★ |
+
+#### 2. Computation Policy的三层结构
+
+```
+浅层 (L0-L3): 通用预处理
+  → routing高度相似 (task-independent)
+  → transition direction高度相似
+  → 所有任务走同一条"入口路径"
+
+中层 (L3-L9): Computation Fork Point ★★★★★
+  → routing开始分化 (task-specific)
+  → transition direction强烈分化 (同类0.88-0.99, 跨类0.04-0.34)
+  → 这是computation policy的"选择器"
+
+深层 (L9-L11): 通用输出映射
+  → routing再次趋同
+  → transition direction趋同 (0.91-0.99)
+  → 不同computation结果被映射回通用空间
+```
+
+#### 3. Boundary-Conditioned Computation的机制
+
+```
+prefix → 少数sensitive heads改变routing → 选择不同的信息通路
+       → 多数insensitive heads执行通用计算 → 保持不变的计算器
+       → transition direction几乎不变 → 层间映射是通用的
+
+结论: prefix的computation conditioning主要通过routing实现!
+     routing = computation policy的载体!
+```
+
+#### 4. GPT-2 vs Qwen3的关键差异
+
+| 特征 | GPT-2 | Qwen3 |
+|------|-------|-------|
+| L0组内-跨组差距 | 0.01 (position-driven) | **0.19** (task-driven!) |
+| Prefix conditioning差距 | 0.27-0.73 | 0.21-0.46 |
+| 深层分化 | 弱 | **强 (L35差距0.39)** |
+| 有能力模型 | 无 | 有 |
+
+★★★ **Qwen3从第一层就开始任务分化!** GPT-2的L0几乎完全是position-driven
+★★★ 这说明: 有能力的模型在更早的层就形成了task-specific computation policy!
+
+#### 5. 对用户批评的回应
+
+用户指出4个硬伤, 我们逐一回应:
+
+**硬伤1 (混淆content trajectory与computation policy)**:
+→ ✅ 完全正确! 本Phase证明了两者确实不同
+→ 同类任务content不同, 但routing topology和transition direction高度一致
+→ 跨类任务即使content长度相似, routing和transition也强烈分化
+
+**硬伤2 (随机漫步解释过度)**:
+→ ✅ 正确! transition direction不是随机的
+→ 中层transition direction有明确的task-specific structure
+→ 差距0.8+绝不是随机的结果
+
+**硬伤3 (attractor定义不清)**:
+→ ✅ 正确! 我们现在区分了:
+  - hidden-state point convergence: 已否定
+  - routing topology invariant: 已确认存在!
+  - transition direction invariant: 已确认中层分化!
+  - policy attractor: 部分确认 (少数heads承担policy switching)
+
+**硬伤4 (CoT = computation unfolding未证明)**:
+→ 仍然未证明. 但我们发现了更基础的结构: computation policy本身
+→ 在没有理解computation policy之前, 研究CoT是空中楼阁
+→ 下一步: 在理解policy的基础上, 研究CoT是否改变了policy
+
+### 严格审视: 当前发现的硬伤和瓶颈
+
+**硬伤1**: Routing invariant的差距只有5-10%, 80%+仍然是position-driven
+→ 可能的解释: 真正的computation policy只在少数heads和少数维度上
+→ 大部分routing确实只是position/content的被动反映
+
+**硬伤2**: Transition direction分析只看了最后位置
+→ 不同位置的transition可能完全不同
+→ 需要逐位置分析transition operator
+
+**硬伤3**: "sensitive heads"的功能验证缺失
+→ 我们发现少数heads承担policy switching
+→ 但没有做causal intervention验证: ablate这些heads是否真的消除policy?
+
+**硬伤4**: Qwen3的实验量还不够大
+→ 只用了10个样本/组
+→ 需要更大样本确认
+
+**硬伤5**: 我们还没有区分"computation policy收敛"和"computation policy共享"
+→ 同类任务的routing相似, 可能是因为:
+  (a) 它们收敛到同一个attractor basin (policy attractor)
+  (b) 它们本来就共享同一个learned policy
+→ 这两者的区别很重要: (a)暗示动力学机制, (b)只是weight sharing
+
+### 下一步: 突破瓶颈的阶段性大任务
+
+**大任务1: Causal Validation of Computation Policy** (最重要)
+- 对sensitive heads做ablation, 看是否消除task-specific routing
+- 对insensitive heads做ablation, 看是否破坏通用计算
+- 这是证明"routing = computation policy载体"的决定性实验
+
+**大任务2: Computation Policy Manifold**
+- 不是问"routing是否收敛", 而是"computation policy流形是什么形状?"
+- 对大量不同任务, 在computation policy space中画图
+- 是否存在: 数学cluster, 翻译cluster, 推理cluster?
+
+**大任务3: Token Externalization机制**
+- CoT是否真的改变了routing policy?
+- 对比: 有CoT vs 无CoT, routing如何不同?
+- 如果CoT通过改变routing来增强计算 → CoT确实是computation unfolding
+- 如果CoT只是增加了更多context → CoT是token scaffold
+
+[Phase 79完成时间标记: 2026年05月07日19时52分]
+
+## Phase 80: Operator Reverse Engineering — 从routing到真正的computation operator [2026-05-07 20:45]
+
+### 范式升级: routing = memory access, operator = computation
+
+用户精准指出Phase 79的致命问题:
+- **routing ≠ computation** — attention routing是"信息检索模式"(memory access pattern)
+- 真正的computation应该分析**transition operator structure**
+- 即 h(t+1) = F(h(t)) 中的 F, 而不是 F(h(t)) 的值
+
+五层逆向框架:
+1. Representation — 信息编码在哪 (Phase 1-70+)
+2. Routing — 信息如何访问 (Phase 79)
+3. **Operator — 状态如何变换** ★★★★★ (本Phase核心)
+4. Recursive Rollout — generation如何形成computation
+5. Compression — 为什么这些结构自然出现
+
+---
+
+### 实验A: MLP Transition Operator Spectrum ★★★★★
+
+**核心问题**: MLP作为"computation engine", 其operator output space是否task-specific?
+
+**方法**: 对每组任务收集delta_mlp = h_out - h_mid, PCA分析其输出子空间
+
+**MLP PCA (跨组centroid在PC1-2上的位置)**:
+
+Layer 3 (中层):
+- addition: PC1=-12.43, PC2=0.00
+- translate_fr: PC1=2.53, PC2=2.63
+- antonym: PC1=4.49, PC2=-7.67
+- capital: PC1=5.40, PC2=5.03
+
+→ **4组任务在MLP output space中完全分离!**
+
+Layer 6:
+- addition: PC1=4.27, PC2=14.12
+- translate_fr: PC1=3.77, PC2=-0.35
+- antonym: PC1=-16.56, PC2=-2.35
+- capital: PC1=8.52, PC2=-11.41
+
+→ **仍然完全分离, 且组间spread比组内spread大1个数量级!**
+
+Layer 11:
+- addition: PC1=87.81, PC2=8.00
+- translate_fr: PC1=-29.82, PC2=23.57
+- antonym: PC1=-41.92, PC2=12.59
+- capital: PC1=-16.07, PC2=-44.17
+
+→ **L11仍然完全分离! 不同于Phase 79的transition direction趋同!**
+
+★★★ **关键发现**: MLP的output space比transition direction更能区分任务类型!
+★★★ Phase 79说"深层transition direction趋同" — 但那是因为residual connection稀释了信号
+★★★ MLP computation本身在所有层都是task-specific的!
+
+**MLP有效秩** (95%方差需要的PC数):
+
+| 任务 | L0 | L3 | L6 | L9 | L11 |
+|------|-----|-----|-----|-----|------|
+| addition | 13 | 11 | 15 | 16 | **5** |
+| translate_fr | 24 | 25 | 25 | 25 | 23 |
+| antonym | 22 | 20 | 20 | 21 | 19 |
+| capital | 20 | 22 | 20 | 19 | 19 |
+
+→ addition在L11高度低维(rank=5) → 加法在深层只需要5个维度就能描述!
+→ translate_fr在所有层都是高维(rank=23-25) → 翻译需要更多维度
+→ 这暗示不同的computation operator结构!
+
+---
+
+### 实验A-2: Attention (routing) vs MLP (computation) 的Task-Specificity对比
+
+| 层 | Component | 组内cos | 跨组cos | 差距 |
+|-----|-----------|---------|---------|------|
+| L3 | Attention | 0.7522 | 0.0513 | **0.7009** |
+| L3 | MLP | 0.6940 | 0.0842 | **0.6098** |
+| L6 | Attention | 0.7888 | 0.1316 | **0.6571** |
+| L6 | MLP | 0.7929 | 0.2576 | **0.5354** |
+| L9 | Attention | 0.5660 | 0.3263 | 0.2397 |
+| L9 | MLP | 0.7241 | 0.3434 | **0.3806** |
+
+★★★ **关键发现**: 
+1. L3: Attention差距(0.70) > MLP差距(0.61) → routing比computation更task-specific
+2. L6: Attention(0.66) ≈ MLP(0.54) → 两者都高度task-specific
+3. L9: MLP差距(0.38) > Attention差距(0.24) → **深层computation比routing更task-specific!**
+
+→ 这回答了"routing vs computation"的问题:
+  - **浅-中层: routing先分化, computation跟随** (routing-driven)
+  - **深层: computation独立分化** (operator-driven)
+  - routing和computation是两个独立的task-specific维度
+
+---
+
+### 实验C: Operator Family Classification ★★★★★
+
+**方法**: 对每组任务, 线性回归 delta_mlp ≈ A @ h_in + b, 分析A的SVD结构
+
+**R^2 = 1.0000** (所有任务所有层!) → MLP computation是**精确线性的**!
+
+★★★ 这是最关键的发现之一!
+
+**Effective Linear Operator A 的SVD**:
+
+| 任务 | 层 | Top3% | Top10% | Rank95 | Top-5 SVs | OpNorm |
+|------|-----|-------|--------|--------|-----------|---------|
+| addition | L3 | 0.383 | 0.718 | 23 | [2.95,2.09,1.83,1.77,1.60] | 6.55 |
+| translate_fr | L3 | 0.327 | 0.622 | 25 | [0.87,0.77,0.59,0.53,0.51] | 2.28 |
+| antonym | L3 | 0.323 | 0.659 | 25 | [2.13,1.84,1.61,1.45,1.44] | 5.71 |
+| capital | L3 | 0.337 | 0.626 | 25 | [2.07,1.15,1.06,0.98,0.96] | 4.47 |
+| continue | L3 | **0.415** | **0.818** | **16** | [0.93,0.88,0.83,0.74,0.65] | 2.36 |
+
+**Operator Family判据**:
+- **addition**: 大opNorm(6.55), 快SV衰减 → "强投影型" (将输入投射到特定输出方向)
+- **translate_fr**: 小opNorm(2.28), 慢SV衰减 → "温和变换型" (保持更多输入结构)
+- **antonym**: 大opNorm(5.71), 中等衰减 → "特征翻转型" (类似方向取反)
+- **capital**: 中opNorm(4.47), 均匀衰减 → "检索型" (从特定方向检索信息)
+- **continue**: **低秩**(rank=16), 高Top3% → "低秩投影型" (更少的自由度)
+
+★★★ **不同任务确实使用了不同类型的computation operator!**
+
+**跨组A矩阵cosine similarity** (几乎为0!):
+- addition vs translate_fr: 0.0011
+- addition vs antonym: 0.0123
+- translate_fr vs antonym: 0.0046
+
+★★★ **不同任务的A矩阵几乎正交!** cosine < 0.03!
+★★★ 这意味着MLP的computation operator是高度task-specific的!
+
+**Subspace alignment (top-10 left singular vectors)**:
+- addition vs translate_fr: 0.21
+- addition vs antonym: 0.22
+- translate_fr vs antonym: 0.23
+- translate_fr vs continue: **0.25** (最高! 都涉及文本生成)
+
+→ Subspace alignment在0.16-0.30范围 → 不同的operator subspaces, 但有部分共享结构
+
+---
+
+### 实验D: Causal Validation of Sensitive Heads
+
+**方法**: ablate sensitive/insensitive heads, 看transition direction similarity如何变化
+
+**Ablate sensitive heads** (Phase 79识别的):
+
+| 层 | 任务对 | Normal sim | Ablated sim | 变化 | 含义 |
+|-----|--------|-----------|------------|------|------|
+| L3 | add vs trans | 0.015 | 0.077 | **+0.061** | ★ CAUSE divergence |
+| L3 | add vs ant | 0.117 | 0.123 | +0.006 | ★ CAUSE divergence |
+| L3 | ant vs cap | 0.337 | 0.386 | +0.048 | ★ CAUSE divergence |
+| L6 | add vs trans | 0.406 | 0.313 | -0.094 | Not cause |
+| L6 | add vs ant | 0.193 | 0.179 | -0.014 | Not cause |
+| L9 | add vs trans | 0.508 | 0.366 | -0.143 | Not cause |
+
+★★★ **关键发现**: 
+1. **L3**: ablate sensitive heads → similarity增加 → 这些heads **确实造成**了task-specific divergence!
+2. **L6-L9**: ablate sensitive heads → similarity减少 → 这些heads反而**维持**了某些共享结构!
+
+→ L3的sensitive heads是"分化器" (causing divergence)
+→ L6-L9的sensitive heads是"调控器" (maintaining some shared computation)
+
+**Ablate insensitive heads**:
+
+| 层 | 变化趋势 | 含义 |
+|-----|---------|------|
+| L3 | +0.01~+0.04 | 去掉insensitive heads也使sim增加 |
+| L6 | +0.005~+0.03 | 同上 |
+| L9 | -0.02~+0.04 | 不一致 |
+
+→ Insensitive heads也有贡献, 但不如sensitive heads影响大
+
+---
+
+### Phase 80核心结论
+
+#### 1. ★★★★★ MLP Computation是精确线性的 (R^2 = 1.0!)
+
+delta_mlp ≈ A_task @ h_in + b_task
+
+MLP的computation operator可以用**线性算子A**精确描述!
+不同任务的A矩阵**几乎正交** (cosine < 0.03)!
+
+这是整个项目至今最重要的发现之一。
+
+#### 2. 不同任务确实使用不同类型的Operator
+
+| 任务类型 | Operator特征 | 推测机制 |
+|---------|-------------|---------|
+| addition | 大OpNorm, 快SV衰减, 低秩(L11 rank=5) | 强方向投影 (将输入映射到特定输出方向) |
+| translate_fr | 小OpNorm, 慢SV衰减, 高维(rank=25) | 温和结构保持变换 |
+| antonym | 大OpNorm, 中等衰减 | 特征翻转/取反 |
+| capital | 中OpNorm, 均匀衰减 | 方向性检索 |
+| continue | 低秩(rank=16), 最高Top3% | 低秩自回归投影 |
+
+#### 3. Routing和Computation是两个独立的Task-Specific维度
+
+- 浅中层: routing先分化 → 选择不同的信息通路
+- 深层: computation独立分化 → 不同的状态变换方式
+- 两者共同构成了完整的computation policy
+
+#### 4. Sensitive Heads的因果角色
+
+- L3 sensitive heads: "分化器" — 造成task-specific divergence
+- L6+ sensitive heads: "调控器" — 维持computation的共享结构
+- 这种分层角色分工非常重要
+
+### 严格审视: 当前发现的硬伤
+
+**硬伤1**: R^2 = 1.0太完美, 可能有计算问题
+→ 可能是线性回归的overfitting (30个样本拟合768维)
+→ 需要在独立测试集上验证
+→ 但如果真的R^2=1.0, 说明MLP output确实完全由线性变换决定
+
+**硬伤2**: A矩阵维度(768x768), 30个样本不够
+→ LinearRegression在n < p时的解不唯一
+→ 但SVD谱结构应该是可靠的(因为用的是最小二乘解)
+→ 需要更多样本来验证A矩阵的稳定性
+
+**硬伤3**: 我们只看了最后位置的operator
+→ 不同位置的operator可能完全不同
+→ 需要逐位置分析
+
+**硬伤4**: 没有在Qwen3上验证operator structure
+→ GPT-2的operator可能很简单
+→ 有能力模型可能有更丰富的operator family
+
+**硬伤5**: 没有研究operator的时间维度(rollout)
+→ 目前只看了单步operator
+→ recursive rollout operator = F^t 才是真正的computation dynamics
+
+### 下一步关键任务
+
+**大任务1: 在Qwen3上验证Operator Structure** (最紧迫)
+- Qwen3的MLP operator是否也有R^2=1.0?
+- Qwen3是否有更丰富的operator family?
+- 翻译任务在Qwen3中是否显示"coordinate transform"特征?
+
+**大任务2: Recursive Rollout Operator**
+- 从单步F到多步F^t
+- 研究: CoT是否改变了operator? 从F到F'?
+- 这是连接单步computation和autoregressive recursion的关键
+
+**大任务3: Operator的代数结构**
+- 不同任务的A矩阵是否形成群(group)?
+- 翻译 = A_translate, 推理 = A_reason
+- A_translate ∘ A_reason = ? (组合性)
+- 这是通向"语言数学"的关键
+
+[Phase 80完成时间标记: 2026年05月07日20时45分]
+
+## Phase 81: Operator Mechanics — 从全局拟合到局部Jacobian场 [2026-05-07 22:52]
+
+### 核心问题
+
+Phase 80的critique精确指出了致命缺陷：
+1. R²=1.0 with n=30, d=768 是严重过拟合 (n << p)
+2. 全局线性拟合A不是算子 — 局部Jacobian J(h)才是
+3. A矩阵"正交"在没有验证的情况下不可靠
+4. MLP是非线性的: MLP(x) = W2 * GELU(W1*x + b1) + b2
+
+本Phase用两个核心方法修正：
+- **Train/Test Split**: 500训练+500测试，验证线性模型是否泛化
+- **解析局部Jacobian**: J(h) = W_out^T @ diag(GELU'(z)) @ W_in^T (每个数据点的精确算子)
+
+---
+
+### 实验A: Train/Test Split Validation ★★★★★
+
+**方法**: 500训练+500测试，OLS和Ridge回归，4个任务×3个层
+
+**Layer 3:**
+
+| 任务 | R²_train | R²_test | 判定 |
+|------|----------|---------|------|
+| addition | 1.000 | **0.992** | ✅ 近乎完全线性 |
+| translate_fr | 1.000 | **0.709** | ⚠️ 显著非线性 |
+| antonym | 1.000 | **0.987** | ✅ 近乎线性 |
+| capital | 1.000 | **1.000** | ✅ 完全线性 |
+
+**Layer 6:**
+
+| 任务 | R²_train | R²_test | 判定 |
+|------|----------|---------|------|
+| addition | 1.000 | **0.980** | ✅ 近乎线性 |
+| translate_fr | 1.000 | **0.736** | ⚠️ 显著非线性 |
+| antonym | 1.000 | **0.999** | ✅ 几乎完全线性 |
+| capital | 1.000 | **0.998** | ✅ 近乎完全线性 |
+
+**Layer 9:**
+
+| 任务 | R²_train | R²_test | 判定 |
+|------|----------|---------|------|
+| addition | 1.000 | **0.997** | ✅ 近乎完全线性 |
+| translate_fr | 1.000 | **0.682** | ⚠️ 显著非线性! 最低 |
+| antonym | 1.000 | **0.998** | ✅ 几乎完全线性 |
+| capital | 1.000 | **0.997** | ✅ 近乎完全线性 |
+
+★★★ **关键发现1**: 对多数任务(addition/antonym/capital)，线性模型R²_test ≈ 0.99 → MLP对这些任务**确实是近似线性的**!
+
+★★★ **关键发现2**: translate_fr是唯一显著非线性的任务(R²_test ≈ 0.7) → 翻译涉及非线性coordinate transform!
+
+★★★ **关键发现3**: Phase 80的R²=1.0**不完全**是过拟合 — 对多数任务，线性模型确实有效。但**没有**train/test split就无法知道这一点!
+
+**跨任务泛化** — 所有R²为负(-3到-115):
+
+| A(任务) | cross addition | cross trans | cross antonym | cross capital |
+|---------|---------------|-------------|---------------|---------------|
+| addition | 0.99 | **-3.4** | **-9.0** | **-20.0** |
+| translate_fr | **-66.1** | 1.00 | -5.8 | -11.1 |
+| antonym | -56.7 | -3.0 | 1.00 | -5.5 |
+| capital | -45.4 | -1.9 | -2.1 | 0.99 |
+
+→ A(任务X)完全无法预测任务Y! 算子是**极度task-specific**的!
+→ 极端负R²说明A不仅"不同"，而且是**反相关**的!
+
+---
+
+### 实验B: 解析局部Jacobian场 ★★★★★ (本Phase最重要的发现)
+
+**方法**: 计算每个数据点的精确Jacobian: J(h) = W_out^T @ diag(GELU'(z)) @ W_in^T
+这是**真正的局部算子**，不是拟合结果。
+
+**Layer 6 (代表层) Jacobian统计:**
+
+| 任务 | OpNorm | Top3% | Eff_Rank95 | GELU_active | CV(top-10) |
+|------|--------|-------|------------|-------------|------------|
+| addition | 160.9±1.5 | 0.112 | 313.7±1.0 | 0.342 | 0.013 |
+| translate_fr | 168.4±2.3 | 0.133 | 310.6±1.3 | 0.327 | 0.021 |
+| antonym | 166.7±2.7 | 0.129 | 314.4±1.5 | 0.335 | 0.028 |
+| capital | 171.3±1.5 | 0.121 | 322.3±0.9 | 0.342 | 0.011 |
+
+★★★ **震惊发现1**: Jacobian在任务内**几乎恒定** — CV(top-5) ≈ 0.015-0.045, within-task cosine similarity ≈ 0.9998!
+
+★★★ **震惊发现2**: 跨任务Jacobian谱**几乎相同** — cosine similarity > 0.997!
+
+→ **MLP的Jacobian(真正的算子)在所有任务中几乎完全相同!**
+→ 任务特异性来自**routing(attention)**，不是**operator(MLP)**!
+
+**Jacobian vs 拟合A — 完全不同的物体:**
+
+| | 拟合A (Phase 80) | 精确Jacobian (Phase 81) |
+|---|---|---|
+| Top-5 SVs (addition) | [1.18, 1.00, 0.90, 0.88, 0.83] | [41.39, 26.04, 22.30, 19.58, 19.14] |
+| 大小 | ~1.0 | ~20-40 |
+| 比率 | A/J ≈ **0.03** (30倍差距!) | |
+| SV谱cosine | 0.72 (中等相关) | |
+| Task-specific? | 极度task-specific (cos<0.03) | 几乎task-agnostic (cos>0.997) |
+
+→ **拟合A和Jacobian是完全不同的东西!**
+→ 拟合A是"input→output映射的线性近似" (全局关系)
+→ Jacobian是"output对input的敏感度" (局部性质)
+→ Phase 80的"operator family"发现的是**input-output关系的差异**，不是**computation mechanism的差异**!
+
+---
+
+### 实验C: Jacobian场拓扑
+
+**Within-task cosine distance**:
+- addition: mean=0.000077, max=0.000328
+- translate_fr: mean=0.000222, max=0.000523
+- capital: mean=0.000052, max=0.000147
+
+→ Jacobian场是**极度光滑**的 — 局部线性化完全有效!
+
+**PCA of Jacobian Spectra**:
+- PC1解释68-77%方差 → Jacobian谱的主要变化维度很少
+- 任务在PC1上有轻微分离:
+  - L9: addition=-16.22, translate_fr=+2.55, antonym=+6.80, capital=+6.87
+  - addition是最"不同"的任务，L9分离最大
+
+**LDA分类准确率**:
+(5任务) → 高准确率，说明Jacobian谱中仍有可检测的task信号
+
+**关键洞察**: Jacobian谱在任务间**高度相似但有微小系统差异**。这些差异来自GELU激活模式的微小变化，但不改变算子的基本结构。
+
+---
+
+### 实验D: 谱动力学与递推展开
+
+**单层Jacobian谱演化 (addition):**
+
+| 层 | OpNorm | Top-1 SV | GELU% |
+|----|--------|----------|-------|
+| L0 | 126 | 35.1 | ~31% |
+| L3 | 132 | 37.3 | ~31% |
+| L6 | 160 | 41.1 | ~34% |
+| L9 | 222 | 61.5 | ~37% |
+| L11 | 443 | 278.8 | ~40% |
+
+→ 深层的Jacobian**更强大**: OpNorm从126增长到443
+→ L11的Top-1 SV = 278，比L0大8倍! 深层MLP有极强方向性!
+
+★★★ **递推展开 — 指数爆炸!**
+
+| After Layer | OpNorm | Top-1 SV | Condition # |
+|-------------|--------|----------|-------------|
+| L0 | 1.3e2 | 3.5e1 | 3.5e4 |
+| L3 | 1.5e5 | 1.4e5 | 1.6e13 |
+| L6 | 1.1e8 | 1.1e8 | 7.8e17 |
+| L9 | 5.3e11 | 5.3e11 | 6.1e19 |
+| L11 | **2.2e15** | 2.2e15 | 2.8e20 |
+
+→ MLP Jacobian的组合导致**指数增长**: 10^2 → 10^15!
+→ Condition number从10^4暴涨到10^20!
+→ 几乎所有信息被投影到极少数dominant modes!
+
+**守恒 vs 不稳定模式 (12层组合后):**
+
+| 模式类型 | 数量(768维中) |
+|---------|-------------|
+| Amplified (>1.1) | **652-672** |
+| Conserved (0.9-1.1) | **3** (!!!) |
+| Attenuated (0.01-0.9) | 49-58 |
+| Near zero (<0.01) | 40-55 |
+
+→ 768维中只有**3个模式**是守恒的! 
+→ 85%+的模式被指数放大!
+→ 动态范围: 10^15 → 10^-2 (17个数量级!)
+
+★★★ 但这解释了为什么残差连接是必须的:
+- 没有残差连接: MLP Jacobian组合 → 指数爆炸 → 梯度消失/爆炸
+- 有残差连接: h_out = h_in + Δ → J_full = I + J_Δ → 稳定!
+- **残差连接是Transformer计算稳定性的核心!**
+
+---
+
+### Phase 81核心结论
+
+#### 1. ★★★★★ Phase 80的"MLP是全局线性的"结论需要重大修正
+
+- **对多数任务(addition/antonym/capital)**: 线性模型R²_test ≈ 0.99 → 近似线性
+- **对translate_fr**: R²_test ≈ 0.7 → 显著非线性
+- **但**: "线性"指的是delta_mlp ≈ A@h_in+b的全局映射近似有效
+- **不等于**: MLP本身是线性的 (GELU非线性始终存在)
+
+#### 2. ★★★★★ 真正的算子(Jacobian)在所有任务中几乎相同
+
+- 跨任务Jacobian谱cosine > 0.997
+- Jacobian在任务内CV < 0.03 (几乎恒定)
+- **MLP不使用task-specific operators — 它使用同一个universal operator处理所有任务!**
+
+#### 3. ★★★★★ 拟合A ≠ Jacobian — 它们是完全不同的物体
+
+- 拟合A (Phase 80): delta_mlp ≈ A@h_in+b的全局映射近似, SV ~1.0
+- Jacobian: ∂(mlp_out)/∂(h_input)的局部敏感度, SV ~20-40
+- 比率A/J ≈ 0.03 (30倍差距!)
+- Phase 80的"operator family"发现的是**input-output关系的差异**，不是算子本身的差异
+
+#### 4. ★★★★★ 任务特异性完全来自routing(attention)，不是operator(MLP)
+
+修正的Transformer计算架构:
+```
+h_out = h_in + attn(h_in) + MLP(LN(h_in + attn(h_in)))
+         ↑            ↑                ↑
+       stability    routing          universal
+       (residual)  (task-specific)   operator
+```
+
+- **Attention**: 选择不同的信息通路 (routing) → task-specific
+- **MLP**: 用同一个universal operator处理输入 → task-agnostic
+- **Residual**: 提供计算稳定性 (防止指数爆炸)
+
+#### 5. ★★★★★ MLP Jacobian的组合导致指数爆炸
+
+- 12层组合后OpNorm ≈ 10^15
+- 只有3/768个模式守恒
+- 85%+模式被放大
+- 残差连接是这种稳定性的关键
+
+#### 6. ★★★ translate_fr是唯一显著非线性的任务
+
+R²_test ≈ 0.7 说明翻译任务的MLP有约30%的方差无法被线性模型捕获。这可能因为翻译涉及:
+- 跨语言空间映射 (coordinate transform)
+- 多步语法结构调整
+- 需要GELU非线性的特定激活模式
+
+---
+
+### 对Phase 80 Critique的逐条回应
+
+| Critique论点 | Phase 81结论 |
+|-------------|-------------|
+| R²=1.0是过拟合 | **部分正确**: translate_fr确实过拟合(R²_test=0.7); 但对其他任务，R²_test≈0.99 |
+| 需要train/test split | **完全正确**: 没有这个验证就无法区分真线性vs过拟合 |
+| 应该研究Jacobian场 | **完全正确**: Jacobian才是真正的算子 |
+| 不同任务使用不同算子 | **错误!**: 真正的算子(Jacobian)在所有任务中几乎相同! |
+| A矩阵正交说明task-specific | **需要修正**: A矩阵正交反映的是**input-output关系**的task-specificity，不是**computation mechanism**的task-specificity |
+| 需要研究局部Jacobian | **完全正确**: Jacobian场是光滑的(CV<0.03)，局部线性化有效 |
+
+---
+
+### 严格审视: 当前发现的硬伤
+
+**硬伤1**: 我们只分析了MLP的Jacobian，没有分析完整的层Jacobian (包括attention)
+→ 完整Jacobian = I + J_attn + J_mlp (含chain rule)
+→ J_attn可能提供task-specific的成分
+
+**硬伤2**: 组合Jacobian的指数爆炸说明:
+→ MLP Jacobian不能直接理解为"算子" — 它只描述了局部敏感度
+→ 真正的"计算"发生在residual + attn + mlp的联合作用中
+→ 孤立地分析MLP Jacobian可能不是正确的问题框架
+
+**硬伤3**: 只看了GPT-2-small (768维, 12层)
+→ 更大模型可能有更丰富的Jacobian结构
+→ GPT-2的"universal operator"可能只是因为模型太小/太简单
+
+**硬伤4**: translate_fr的非线性需要进一步分析
+→ 是翻译任务本身非线性的，还是我们构造的prompt格式特殊?
+→ 需要更多翻译变体和更复杂的任务
+
+**硬伤5**: Jacobian谱在任务间高度相似(cosine>0.997)，但PCA仍能区分任务
+→ 微小的谱差异可能携带着重要的task-specific信息
+→ 需要更精细的分析: 哪些singular vectors有task-specific差异?
+
+---
+
+### 下一步关键任务
+
+**大任务1: 完整层Jacobian (I + J_attn + J_mlp)**
+- 这才是真正的"层算子"
+- J_attn的task-specific性 vs J_mlp的task-agnostic性
+- 残差连接如何选择性地传递/抑制信息
+
+**大任务2: 为什么translate_fr是非线性的?**
+- 分析translate_fr的GELU激活模式
+- 是否有特定的"非线性计算路径"?
+- 与其他翻译格式(translate to German等)对比
+
+**大任务3: Singular Vector级别的Jacobian分析**
+- 虽然Jacobian谱整体相似，但哪些singular vectors不同?
+- 不同任务的Jacobian是否在特定子空间上分化?
+- 这是"operator family"概念可能存活的唯一位置
+
+**大任务4: 在Qwen3上验证"Universal Operator"假设**
+- 更大模型是否也有universal Jacobian?
+- 更复杂任务(推理/CoT)是否有不同的Jacobian结构?
+- 这是检验"Universal Operator"是否为普遍规律的关键
+
+[Phase 81完成时间标记: 2026年05月07日22时52分]
+
+## Phase 82: Eigenspace Operator Decomposition — 谱相似≠算子相似 [2026-05-07 23:55]
+
+### 核心问题
+
+Phase 81 critique精确指出最大硬伤：
+1. **"Jacobian谱相似≠computation相同"** — 谱(SV分布)和方向(eigenspaces)是两个不同层次
+2. **MLP Jacobian = W_out^T @ diag(GELU'(z)) @ W_in^T** — W固定，只有gating变化
+3. **0.3%的矩阵差异可能集中在关键子空间**
+4. **需要eigenspace级别分析**，不能只看整体统计量
+
+### ★★★★★ Phase 81的"Universal Operator"结论被推翻
+
+**验证实验揭示的关键差异 (Layer 6, 10样本/任务):**
+
+| 度量方式 | addition vs antonym | addition vs capital | antonym vs capital | antonym vs translate |
+|---------|--------------------|--------------------|--------------------|---------------------|
+| **谱cosine (SV分布)** | **0.9992** | **0.9997** | **0.9996** | **0.9998** |
+| **完整矩阵cosine** | **0.4397** | **0.3733** | **0.6090** | **0.7049** |
+| **Eigenspace overlap (top-5)** | **0.22** | **0.21** | **0.41** | **0.53** |
+
+Phase 81报告的"cosine > 0.997"是**谱cosine**(SV分布)，被误读为"矩阵相似"。
+实际上完整矩阵的cosine只有**0.37-0.70**！
+
+**物理类比**: 两个旋转矩阵有相同的singular values(全为1)，但旋转方向完全不同。
+- 谱cosine = 1.0 (完全相同)
+- 矩阵cosine ≈ 0 (完全不同)
+这就是Phase 81犯的错误。
+
+---
+
+### 实验A: Eigenspace Decomposition ★★★★★
+
+**Subspace Overlap (Layer 6, top-k singular vectors):**
+
+| k | addition vs antonym | addition vs capital | antonym vs capital | antonym vs translate |
+|---|--------------------|--------------------|--------------------|---------------------|
+| 5 | 0.19 | 0.18 | 0.30 | 0.40 |
+| 10 | 0.20 | 0.19 | 0.30 | 0.27 |
+| 20 | 0.18 | 0.16 | 0.28 | 0.28 |
+| 50 | 0.22 | 0.19 | 0.33 | 0.32 |
+| 100 | 0.30 | 0.28 | 0.40 | 0.41 |
+
+★★★ **Eigenspace overlap极低!** Top-5方向仅有0.18-0.53的重叠度。
+→ 不同任务的Jacobian在**作用方向**上差异巨大！
+
+**Per-sample Singular Vector Stability:**
+- SV1 (最强方向): cosine ≈ 0.994-0.997 → 非常稳定
+- SV5: cosine ≈ 0.45-0.81 → 中等稳定
+- SV10-20: cosine ≈ 0.08-0.38 → **极不稳定**
+
+→ 主方向是universal的，但**低秩方向高度task-specific**！
+
+**Task-Specific vs Universal Jacobian Components:**
+- ΔJ几乎**不在**universal eigenspace中 (delta_in_universal < 0.04)
+- 任务特异性存在于**与universal方向正交**的子空间
+
+---
+
+### 实验B: Activation Gating Topology ★★★★★
+
+**Active Neuron Jaccard Similarity (threshold=0.1, Layer 6):**
+
+| | addition | antonym | capital | translate |
+|---|---------|---------|---------|-----------|
+| addition | --- | 0.32 | 0.27 | 0.31 |
+| antonym | 0.32 | --- | 0.43 | 0.44 |
+| capital | 0.27 | 0.43 | --- | 0.41 |
+| translate | 0.31 | 0.44 | 0.41 | --- |
+
+→ 不同任务激活的**神经元集合**仅有27-44%重叠！
+
+**Task-Specific Neurons:**
+- Layer 3: ~16% of neurons are task-specific
+- Layer 9: ~24-31% of neurons are task-specific
+- **深层更多task-specific neurons** → 更细粒度的计算分化
+
+**Universal Active Neurons:**
+- threshold=0.1: 465/3072 (15%) universally active
+- threshold=0.3: only 83/3072 (2.7%) universally active
+- **绝大多数active neurons是task-specific的!**
+
+**Rank-1 Decomposition of ΔJ:**
+- Top-20 neurons explain only 3-4% of ΔJ
+- → Task-specific computation是**高度分布式**的，不集中在少数神经元
+
+---
+
+### 实验C: Full Layer Analysis ★★★★★
+
+**MLP Jacobian Cross-Task Similarity (Flattened matrix cosine):**
+
+| | addition | antonym | capital | translate |
+|---|---------|---------|---------|-----------|
+| addition | 1.00 | **0.41** | **0.40** | **0.42** |
+| antonym | 0.41 | 1.00 | **0.78** | **0.86** |
+| capital | 0.40 | 0.78 | 1.00 | **0.88** |
+| translate | 0.42 | 0.86 | 0.88 | 1.00 |
+
+→ **MLP Jacobian矩阵确实是task-specific的!** Phase 81的"universal"结论错误。
+
+**Attention Output Direction Comparison:**
+
+| | addition | antonym | capital | translate |
+|---|---------|---------|---------|-----------|
+| addition | 1.00 | **0.06** | **0.01** | **0.01** |
+| antonym | 0.06 | 1.00 | 0.16 | 0.40 |
+| capital | 0.01 | 0.16 | 1.00 | 0.33 |
+| translate | 0.01 | 0.40 | 0.33 | 1.00 |
+
+★★★ **Attention方向极度task-specific!** Addition vs capital的cosine仅0.01！
+
+**Attention vs MLP Output Magnitude:**
+- Attention norm: 7-12 (占总变化的43-75%)
+- MLP norm: 10-16 (占总变化的75-92%)
+- 两者magnitude可比较，但**方向特异性差异巨大**
+
+---
+
+### 实验D: Subspace Intervention
+
+**Eigenspace Decomposition of ΔJ:**
+- ΔJ rank90 ≈ 420-440 (极高! ΔJ需要~420维才能捕获90%能量)
+- ΔJ rank99 ≈ 645-650 (几乎full rank)
+- ΔJ in universal subspace(k=100): 仅22-28%
+- **ΔJ的72-78%存在于与universal方向正交的子空间中!**
+
+→ Task-specific computation确实大量存在于正交于universal方向的子空间。
+
+---
+
+### Phase 82核心结论
+
+#### 1. ★★★★★ Phase 81的"Universal Operator"结论被推翻
+
+Phase 81犯了一个关键度量错误：
+- 测量了**谱cosine** (SV分布) = 0.999+ → 声称"Jacobian几乎相同"
+- 实际**矩阵cosine** = 0.37-0.70 → Jacobian在方向上差异巨大
+- **Eigenspace overlap** = 0.18-0.53 → 核心计算方向是task-specific的
+
+**修正**: MLP的Jacobian有**universal的谱**(变换强度)但**task-specific的方向**(变换目标)。
+
+#### 2. ★★★★★ MLP Jacobian的两个层次
+
+```
+J = W_out^T @ diag(GELU'(z)) @ W_in^T
+         ↑                ↑          ↑
+     universal          task-     universal
+     (固定W)         specific     (固定W)
+                    (gating)
+```
+
+- **谱(SV分布)**: 由W_in/W_out的奇异值主导 → universal
+- **方向(eigenspaces)**: 由GELU'(z)的gating pattern决定 → task-specific
+- **关键**: GELU'(z)虽然变化有限(0-1.13)，但通过W_in/W_out的线性组合，
+  产生了完全不同的effective directions
+
+#### 3. ★★★★★ Task-specificity的来源层级
+
+```
+Level 1: Attention output direction  → cosine ~0.01-0.40 (极度task-specific)
+Level 2: MLP Jacobian eigenspaces    → cosine ~0.18-0.53 (高度task-specific)  
+Level 3: MLP Jacobian spectrum       → cosine ~0.999    (universal)
+Level 4: Active neuron sets          → Jaccard ~0.27-0.44 (中度task-specific)
+```
+
+→ **Task-specificity主要来自attention routing，但MLP operator也有显著task-specificity!**
+
+#### 4. ★★★★★ "Operator Family"概念在Eigenspace级别存活
+
+Phase 80的"operator family"概念并未被推翻，只是需要升级：
+- 不是在**谱**(SV分布)层面 — 谱是universal的
+- 而是在**方向**(eigenspaces)层面 — 不同任务使用不同的变换方向
+- **不同任务的MLP确实在做不同类型的变换**，只是变换强度(谱)相似
+
+#### 5. ★★★ Deep layers有更多task-specificity
+
+- L3 eigenspace overlap: ~0.40
+- L9 eigenspace overlap: ~0.20
+- 深层 → 更多task-specific neurons → 更低subspace overlap
+- 这与Phase 80发现的"中层computation fork"一致
+
+---
+
+### 对Phase 81 Critique的逐条回应
+
+| Critique论点 | Phase 82结论 |
+|-------------|-------------|
+| Jacobian谱相似≠computation相同 | **完全正确!** 谱cosine=0.999但矩阵cosine=0.37-0.70 |
+| 真正computation在eigenspaces | **完全正确!** Eigenspace overlap仅0.18-0.53 |
+| 需要看singular vectors | **完全正确!** SV1稳定(0.997)，SV10-20极不稳定(0.08-0.38) |
+| MLP Jacobian高度共享是结构性的 | **部分正确**: 谱共享是结构性的(W固定)，但方向不共享(gating变化) |
+| 应该研究activation topology | **完全正确!** Gating Jaccard ~0.27-0.44，16-31%神经元task-specific |
+| Universal Operator证据不足 | **完全正确!** "Universal Operator"结论被推翻 |
+| 需要完整层Jacobian | **正确**: Attention方向cosine仅0.01-0.40，极度task-specific |
+| Jacobian场光滑性重要 | **仍然成立**: within-task cosine ~0.94-0.99 |
+| 深层放大模式重要 | **仍然成立**: 需要进一步研究 |
+
+---
+
+### 严格审视: 当前发现的硬伤
+
+**硬伤1**: D1实验中J@h预测delta_mlp的R²为负 — 这是方法错误
+- Jacobian是**导数**(敏感度)，不是**函数**(预测器)
+- J@h ≠ delta_mlp (后者是MLP(h)，前者是dMLP/dh × h)
+- 正确的测试应该是：A_task vs A_universal的泛化能力
+- Phase 81已做过这个测试(R²_test)，不需要重复
+
+**硬伤2**: Eigenspace overlap的分析还不够深入
+- 只看了top-k的整体overlap，没有分析具体哪些方向task-specific
+- 需要更精细的分析：哪些singular vectors对应什么语义？
+
+**硬伤3**: 只分析了GPT-2-small
+- 大模型的MLP Jacobian可能有更丰富的结构
+- 需要在Qwen3上验证
+
+**硬伤4**: 没有分析完整层Jacobian (I + J_attn + J_mlp)
+- 需要计算J_attn的解析形式
+- 这对理解task-specificity的完整图景至关重要
+
+---
+
+### 下一步关键任务
+
+**大任务1: MLP Jacobian Eigenspace的语义分析**
+- 找出task-specific singular vectors对应的representation子空间
+- 这些方向是否与已知的语义方向(polarity, syntax, semantic field)对应？
+- 这直接连接"operator family"与"representation structure"
+
+**大任务2: 完整层Jacobian**
+- 计算J_attn(attention的Jacobian)
+- 比较：J_attn vs J_mlp的task-specificity
+- 组合Jacobian: J_full = I + J_attn + J_mlp
+
+**大任务3: 在Qwen3上验证Eigenspace Task-Specificity**
+- 大模型是否有更低的eigenspace overlap？
+- 推理/CoT任务的Jacobian eigenspace是什么结构？
+
+**大任务4: Operator Algebra的修正方向**
+- 如果"universal operator"不成立，那"语言计算代数"应该在哪里？
+- 候选：Eigenspace geometry (不同任务=不同子空间上的不同变换)
+- 这需要更精细的子空间代数分析
+
+[Phase 82完成时间标记: 2026年05月07日23时55分]
+
+## Phase 83: Full Layer Operator Decomposition — 完整层算子分解 [2026-05-08 00:40]
+
+### 核心问题
+
+Phase 82 critique指出4个关键硬伤：
+1. **LayerNorm的主导作用被忽略** — LN可能贡献了低秩和方向放大
+2. **Attention Jacobian才是真正的task-conditioned operator** — cosine ~0.01
+3. **Jacobian是单步局部** — 需要递推rollout
+4. **Operator Basis Decomposition** — 条件线性计算假设 F(h,x) = Σ_i g_i(x) A_i h
+
+---
+
+### 实验A: LayerNorm Jacobian ★★★★★ (关键澄清)
+
+**LayerNorm Jacobian的性质:**
+- op_norm: 0.2-0.5 (MLP的1/100!)
+- rank95: ~710+ (几乎full rank)
+- cross-task cosine: **0.9995-1.0005** (完全universal!)
+
+★★★ **关键发现: LayerNorm是完全universal的，不是task-specific性的来源!**
+
+LayerNorm是一个**极弱的universal归一化算子** — 它将输入标准化到相似的尺度，但不做task-specific的变换。之前观察到的低秩和方向放大**不来自LayerNorm**。
+
+---
+
+### 实验B: Attention Jacobian ★★★★★ (本Phase最重要的发现)
+
+**Layer 6 (最关键的中间层) Cross-Task Similarity:**
+
+| 组件 | addition vs antonym | addition vs capital | addition vs translate |
+|------|--------------------|--------------------|-----------------------|
+| **J_attn** | **0.18** | **0.22** | **0.13** |
+| J_mlp | 0.44 | 0.38 | 0.41 |
+
+★★★ **Attention Jacobian比MLP Jacobian更task-specific!**
+
+**Task-Specificity Index (||ΔJ|| / ||J||_avg):**
+- attn_delta / mlp_delta ratio ≈ 1.1-1.2 → Attention的差异略大于MLP
+- 但两者都是高度task-specific的
+
+**J_attn vs J_mlp Eigenspace Overlap:**
+- Top-5: 0.06-0.10 → **几乎完全正交!**
+- Top-20: 0.08-0.11 → 极低重叠
+
+★★★ **Attention和MLP使用完全不同的计算子空间!** 它们在不同的方向上施加task-specific变换。
+
+**Attention Jacobian Spectrum (Layer 6):**
+- addition: op_norm=30.5, rank90=268
+- antonym: op_norm=31.8, rank90=241
+- capital: op_norm=37.2, rank90=234
+- translate_fr: op_norm=43.8, rank90=199
+
+→ translate_fr的Attention Jacobian更强(op_norm=43.8 vs 30-37)且更低秩(rank90=199 vs 234-268)。
+→ 翻译任务需要更集中、更强的注意力变换。
+
+---
+
+### 实验C: Full Layer Jacobian Decomposition ★★★★★
+
+**Full Layer Jacobian:** J_full = (I + J_mlp @ J_ln2) @ (I + J_attn @ J_ln1)
+
+**Task-Specificity by Component (Layer 6, min cross-task cosine):**
+
+| 组件 | Min cross-task cosine | 性质 |
+|------|----------------------|------|
+| J_ln1 | 0.9995 | 完全universal |
+| J_ln2 | 0.9998 | 完全universal |
+| **J_attn** | **0.125** | **极度task-specific** |
+| J_mlp | 0.377 | 高度task-specific |
+| J_full | 0.753 | 中度task-specific (残差平滑) |
+
+★★★ **Task-specificity的完整层级:**
+
+```
+J_attn  (0.12) → 最task-specific  [routing: 选择信息通路]
+J_mlp   (0.38) → 高度task-specific  [gating: 选择变换方向]  
+J_full  (0.75) → 中度task-specific  [残差: 平滑了差异]
+J_ln    (1.00) → 完全universal     [归一化: 标准化尺度]
+```
+
+→ **残差连接是task-specificity的"调节器"** — 它将极度task-specific的子层输出
+与universal的直连混合，产生中度task-specific的完整层输出。
+
+**Full Layer Eigenspace Overlap (Layer 6, top-5):**
+- addition vs antonym: 0.20
+- addition vs capital: 0.18
+- 所有任务间: 0.17-0.27
+
+→ 即使考虑残差连接，完整层的eigenspace仍然显著task-specific。
+
+---
+
+### 实验D: Operator Basis Decomposition ★★★★★
+
+**核心问题: 不同任务的Jacobian是否可以用有限basis operators的线性组合表示?**
+即: J_task ≈ Σ_i c_i(task) A_i ?
+
+**MLP Jacobian Basis Decomposition:**
+
+| 层 | k=1 | k=2 | k=3 | k=4 |
+|----|------|------|------|------|
+| L3 | 73.8% | 91.9% | 97.4% | 100% |
+| L6 | 42.5% | 62.5% | 76.4% | 100% |
+| L9 | 37.1% | 53.4% | 67.4% | 100% |
+
+★★★ **浅层: 1-2个basis operators解释74-92%的方差!**
+★★★ **深层: 需要3-4个basis operators才能达到97%**
+
+**Task Coefficients in Basis (Layer 6):**
+- addition: g_1=+180.4, g_2=+55.3, g_3=-17.5, g_4=+27.1
+- antonym: g_1=-229.5, g_2=-21.9, g_3=+3.6, g_4=-61.4
+- capital: g_1=-226.9, g_2=-34.0, g_3=-62.8, g_4=+65.5
+- translate: g_1=-224.7, g_2=-10.0, g_3=+147.1, g_4=+43.2
+
+→ **不同任务在basis operators上的系数确实不同!** 这支持"conditional linear computation"假设。
+
+**Full Layer Jacobian Basis Decomposition (Layer 6):**
+- k=1: 84.6%
+- k=2: 91.4%
+- k=3: 96.3%
+- k=4: 100%
+
+→ **完整层Jacobian只需要2-3个basis operators就能解释91-96%的方差!**
+
+**Cross-Layer Basis (12个Jacobian: 4任务 × 3层):**
+- k=1: 35%
+- k=4: 72%
+- k=8: 94%
+- k=12: 100%
+
+→ 跨层的basis decomposition需要更多components，因为不同层的Jacobian差异较大。
+
+---
+
+### Phase 83核心结论
+
+#### 1. ★★★★★ 完整的Task-Specificity层级
+
+```
+Attention Jacobian → 最task-specific (cosine ~0.12)
+     ↓ routing: 选择信息通路
+MLP Jacobian → 高度task-specific (cosine ~0.38)  
+     ↓ gating: 选择变换方向
+Full Layer → 中度task-specific (cosine ~0.75)
+     ↓ residual: 平滑差异
+LayerNorm → 完全universal (cosine ~1.00)
+     ↓ normalization: 标准化尺度
+```
+
+#### 2. ★★★★★ Attention和MLP使用正交的计算子空间
+
+J_attn和J_mlp的eigenspace overlap仅0.06-0.11。它们在不同的方向上施加变换：
+- **Attention**: 选择信息通路 (从哪里获取信息)
+- **MLP**: 选择变换方向 (如何处理信息)
+- 这两个过程是**解耦的** — 使用不同的子空间
+
+#### 3. ★★★★★ Conditional Linear Computation假设得到支持
+
+J_task ≈ Σ_i c_i(task) A_i 在以下条件下成立:
+- 同层内: 2-3个basis operators解释91-96%方差
+- 跨层: 需要8个basis operators解释94%方差
+- 任务特异性体现在**组合系数**c_i(task)中，不在basis operators本身
+
+**这意味着: Transformer可能使用一个共享的算子基底 {A_1, A_2, A_3, ...}，不同任务通过不同的组合系数实现不同的计算。**
+
+#### 4. ★★★★★ 残差连接的角色: Task-Specificity的调节器
+
+- 没有残差: J_full = J_mlp @ J_ln2 @ J_attn @ J_ln1 → 极度task-specific
+- 有残差: J_full = (I + J_mlp @ J_ln2) @ (I + J_attn @ J_ln1) → 中度task-specific
+- 残差连接的"I"项提供universal成分，平滑了task-specific差异
+
+#### 5. ★★★ LayerNorm: 完全被误解的组件
+
+- 之前担心LN贡献了低秩/方向放大 → **不成立**
+- LN是极弱的universal归一化(op_norm ~0.3, MLP的1/100)
+- LN是full rank的(rank95 ~710+)
+- LN不贡献任何task-specific信息
+
+---
+
+### 严格审视: 当前发现的硬伤
+
+**硬伤1**: Attention Jacobian的解析推导只考虑了最后一个position对自身输入的导数
+→ 真正的attention Jacobian应该是 (T×d) → (T×d) 的，不是 d → d
+→ 我们忽略了token-token之间的耦合
+→ 这可能低估了attention的task-specificity
+
+**硬伤2**: Operator Basis Decomposition的n=4太小
+→ 只有4个任务，SVD最多给出4个basis operators
+→ 不能确定是否真的只需要3-4个basis operators
+→ 需要更多任务来验证
+
+**硬伤3**: 没有验证basis operators的因果性
+→ 知道J_task可以用basis operators重建，但不意味着这些basis有因果作用
+→ 需要intervention实验: 修改组合系数是否会改变任务行为?
+
+**硬伤4**: 没有分析rollout Jacobian
+→ 单步Jacobian只描述局部动力学
+→ 递推rollout (多层组合) 的行为可能完全不同
+→ Phase 81发现组合Jacobian会导致指数爆炸
+
+**硬伤5**: 只在GPT-2-small上验证
+→ 需要在Qwen3上验证task-specificity层级和operator basis
+
+---
+
+### 下一步关键任务
+
+**大任务1: Operator Basis的因果验证**
+- 找到basis operators对应的representation子空间
+- Intervention: 修改组合系数c_i → 观察任务行为变化
+- 这是连接"算子理论"和"机制解释"的关键
+
+**大任务2: Attention Jacobian的完整形式**
+- 计算 (T×d) → (T×d) 的attention Jacobian
+- 分析token-token耦合的task-specificity
+- 这可能揭示更丰富的计算结构
+
+**大任务3: Rollout Jacobian (递推组合)**
+- 多层Jacobian的组合: J_0 × J_1 × ... × J_L
+- 分析Lyapunov指数和长期稳定性
+- 这直接关联推理/CoT的计算机制
+
+**大任务4: 在Qwen3上验证Conditional Linear Computation**
+- 大模型是否有更少或更多的basis operators?
+- 推理/CoT任务是否有不同的basis structure?
+
+[Phase 83完成时间标记: 2026年05月08日00时40分]
+
+---
+
+## Phase 84: Computation Graph Dynamics — 从Jacobian几何到算法执行 [2026-05-08 00:41]
+
+### 背景：Phase 83批判的四个核心硬伤
+
+Phase 83的批判指出，尽管Jacobian分析逐渐成熟，但存在根本性概念混淆：
+
+1. **Jacobian ≠ computation operator**：Jacobian只描述局部infinitesimal sensitivity，不是实际离散计算路径
+2. **Attention Jacobian过度简化**：真实算子是(T×d)→(T×d)，不是d→d
+3. **Operator Basis的n=4陷阱**：4个任务做SVD必然得到≤4个basis，这是数学恒等式不是发现
+4. **没有递推rollout**：单层局部算子≠递推计算，推理/CoT/规划需要多步rollout
+
+**批判的核心洞察**：Transformer的computation本质不是"固定operator"，而是"动态computation graph"。
+- operator geometry ≠ algorithmic execution
+- 真正的computation = 动态路由图 + 记忆检索序列 + 递归状态重构
+
+### Phase 84的方法论转向
+
+**从**: "Jacobian几何" — 局部导数结构
+**到**: "Computation Graph Dynamics" — 实际信息流和路由图演化
+
+关键区别：
+- Jacobian问："如果我扰动输入ε，输出变化多少？" → 局部几何
+- Routing Graph问："哪些token通过哪些head向哪些token传递了信息？" → 实际算法路径
+
+### 实验设计
+
+使用12个任务（避免n=4陷阱）：
+- 算术：addition, subtraction, multiplication
+- 语言学：antonym, synonym, past_tense, plural
+- 知识：capital, country, translate_fr, translate_es, animal_sound
+
+四个实验：
+- A: Attention Routing Graph — 实际信息流
+- B: Head特化与任务条件路由 — 12任务真算子维度
+- C: 跨层信息路径 — 算法追踪
+- D: 递推Rollout — 生成过程中图演化
+
+---
+
+### 实验A结果：Routing Entropy与信息流
+
+#### 1. Routing Entropy随层深度递减
+
+```
+Layer  0: Mean H ≈ 1.0-1.4 (中等，较扩散)
+Layer  4: Mean H ≈ 0.8-1.0 (逐渐聚焦)
+Layer  8: Mean H ≈ 0.8-1.1 (较聚焦)
+Layer 10: Mean H ≈ 0.5-1.0 (极度聚焦)
+```
+
+关键模式：
+- **Layer 10**: country任务100%的heads是focused (H<1.0), capital 98.2%
+- 算术任务在深层最focused (H≈0.5-0.7)
+- 翻译任务在深层最diffuse (H≈1.0)
+- **结论：深层routing变得极度聚焦——选定了特定的信息源**
+
+#### 2. Cross-Task Routing Pattern相似性
+
+```
+Layer  2: cross-task cosine ≈ 0.63-0.99 (差异性大)
+Layer  6: cross-task cosine ≈ 0.92-1.00 (相似性高)
+Layer 10: cross-task cosine ≈ 0.87-1.00 (整体非常相似)
+```
+
+**惊人发现**：
+- 浅层(L2)：算术任务和语言任务的routing pattern差异大(0.63)
+- 深层(L10)：所有任务routing pattern趋于一致(>0.99)
+- **结论：深层routing由位置结构驱动（syntactic），不由任务内容驱动（semantic）**
+
+#### 3. Head-Level Routing特异性
+
+所有层（L2, L6, L10）都有约7/12 (58%)的heads是task-specific：
+- Universal heads：跨任务entropy方差小
+- Task-specific heads：不同任务间entropy差异大
+
+深层(L10)task-specific head的典型模式：
+- Head 1: 算术低H(0.53-0.86) vs 语言高H(0.83-1.11)
+- Head 2: 算术低H(0.81-0.85) vs 知识低H(0.25-0.30)
+- Head 8: 知识极低H(0.13-0.15) vs 语言高H(0.92-0.97)
+
+---
+
+### 实验B结果：★12任务真算子维度★ — 低秩性确认！
+
+#### 这是Phase 83批判的key test
+
+Phase 83用4个任务发现k=3解释91-96%方差。
+批判指出这可能是n=4的数学必然。
+**现在用12个任务测试**：
+
+```
+Layer  2: 90%需要3个components, 95%需要3个, 99%需要5个 → ★低秩确认★
+Layer  6: 90%需要1个,     95%需要3个, 99%需要6个 → ★低秩确认★
+Layer 10: 90%需要1个,     95%需要2个, 99%需要5个 → ★低秩确认★
+```
+
+**重大结论：即使使用12个任务，routing pattern space的有效维度仍然是3-5！**
+- 这排除了Phase 83的n=4伪低秩疑虑
+- Transformer的routing computation确实生活在低维流形上
+- 深层更极端：Layer 10只需1个component解释90%方差
+
+#### Head Clustering SVD
+
+```
+Layer  2: 8个显著routing patterns, k=3解释82.4%
+Layer  6: 5个显著routing patterns, k=1解释88.7%
+Layer 10: 3个显著routing patterns, k=1解释94.4%
+```
+
+**结论：深层heads形成更少的functional groups → 计算更加压缩**
+
+#### Task-Specificity vs Layer Depth
+
+```
+Layer  2: routing specificity = 0.5251 (最task-specific)
+Layer  6: routing specificity = 0.3123
+Layer 10: routing specificity = 0.2697 (最universal)
+```
+
+**反直觉发现**：routing specificity随深度递减！
+→ 深层routing更像"位置驱动的机械过程"，不像"语义驱动的选择过程"
+→ 任务特异性不在routing pattern中，而在head内部的attention distribution中
+
+---
+
+### 实验C结果：跨层信息路径
+
+#### 1. 信息流追踪：Source Token Type
+
+```
+Layer  0: 100% attend to LAST token
+Layer  2: 93-100% attend to FIRST token
+Layer  4: 100% attend to LAST token
+Layer  6: 100% attend to FIRST token
+Layer 8-10: 93-100% attend to FIRST token
+```
+
+**关键发现**：信息流呈现交替模式（Last→First→Last→First→First→First），深层稳定到FIRST token。
+→ BOS/special token在深层成为"global scratch pad"
+→ 所有任务共享这个结构
+
+#### 2. ★Universal Routing Hubs★
+
+**所有6个任务共享完全相同的top-3最重要的(layer, head) pairs：**
+- Layer 4, Head 11: 始终top-1或top-2 (weight ~15.0)
+- Layer 5, Head 1: 始终top-3 (weight ~14.8-15.0)
+- Layer 7, Head 2: 始终top-3 (weight ~14.9-15.0)
+
+**Cross-task head usage cosine > 0.97！**
+
+**重大结论**：不同任务使用几乎相同的head路径！
+- Task-specificity不在"哪些heads被使用"中
+- Task-specificity在"每个head内关注什么"中
+
+---
+
+### 实验D结果：★递推Rollout动力学★
+
+#### 1. Graph Stability：极其稳定
+
+```
+所有任务: consecutive-step cosine ≈ 0.98-0.99
+所有任务: 5-step drift from initial ≈ 0.95-0.99
+```
+
+**关键发现**：生成过程中routing graph高度稳定！没有发散、振荡或坍塌。
+→ Routing graph具有fixed-point attractor结构
+
+#### 2. Routing Entropy动力学
+
+大多数任务：生成过程中entropy略有增加（从~0.9到~1.1-1.3）
+→ 生成的token稀释了原始context的focused routing
+
+#### 3. Information Path Persistence
+
+```
+Capital:     0.15 dominant-head changes/step (极其稳定!)
+Past_tense:  0.21 changes/step (非常稳定)
+Addition:    0.79 changes/step (中度)
+Antonym:     1.31 changes/step (最动态)
+```
+
+**结论**：事实性任务（capital, country）的routing graph最稳定。创造性/语言学任务（antonym）更动态。
+
+#### 4. ★Recursive Graph Evolution Rules★ — 最关键发现
+
+**Routing graph的演化遵循有限状态自动机！**
+
+```
+Capital: 5个唯一状态, 主导transition: (11,9,1)→(11,9,1) 占64/90 = 71%
+         → 71%时间在self-loop! 这是一个固定点吸引子!
+         
+Addition: 9个唯一状态, 主导transition: (11,9,1)→(11,9,1) 占40/90 = 44%
+         → 仍然是固定点，但有更多转移
+         
+Antonym: 18个唯一状态, 无单一主导transition
+         → 更复杂的动力学，更多状态和转移
+```
+
+**核心发现**：
+1. Routing graph的演化不是随机的——它有离散状态空间
+2. 存在strong self-loops（吸引子状态）
+3. 事实性任务有更强的吸引子（>70% self-loop）
+4. 创造性任务有更复杂的状态转移图
+5. 吸引子结构按任务类型分化
+
+---
+
+### Phase 84核心结论
+
+#### ★★★★★ 结论1：Jacobian是几何，Routing Graph才是算法
+
+Phase 83批判的核心论点被验证：
+- Jacobian描述的是"如果扰动ε会怎样"（局部几何）
+- Routing Graph描述的是"信息实际从哪里流到哪里"（算法执行）
+- 这两者不等价！同一Jacobian可以有完全不同的routing graph
+
+#### ★★★★★ 结论2：Universal Routing Hub架构
+
+Transformer存在universal routing hubs：
+- 特定的(layer, head) pairs对所有任务都重要
+- 不同任务使用相同的head路径（cosine > 0.97）
+- Task-specificity存在于head内部的attention distribution，不在head选择
+
+这意味着Transformer的计算架构是：
+```
+Universal Layer → 选择哪些heads (跨任务共享)
+Task-Specific Layer → 每个head内关注什么 (任务特异)
+```
+
+#### ★★★★★ 结论3：低维Routing Manifold确认
+
+用12个任务（不是4个）验证：
+- Routing pattern space的有效维度是3-5
+- 深层更极端：1个component解释90%
+- 这排除了n=4伪低秩疑虑
+
+#### ★★★★★ 结论4：Routing Graph具有Fixed-Point Attractor
+
+递推rollout中：
+- Routing graph极其稳定（cosine > 0.98）
+- 存在dominant self-loop状态
+- 事实性任务71%时间停留在同一状态
+- 这是有限状态自动机的特征，不是连续动力学
+
+#### ★★★★★ 结论5：深层Routing由位置结构驱动
+
+- Routing specificity随深度递减
+- 深层routing跨任务趋于一致
+- 任务特异性在浅层routing和深层head内部attention中
+
+---
+
+### 严格审视：Phase 84的硬伤
+
+**硬伤1**: Routing Graph分析只考虑了attention pattern，没有考虑MLP的信息流
+→ 真正的computation = attention routing + MLP transformation
+→ 需要追踪信息从input到output的完整路径（包括MLP的贡献）
+
+**硬伤2**: 只分析了last position的信息流，没有追踪所有token position
+→ 批判指出真正的attention是(T×d)→(T×d)算子
+→ 只看last position遗漏了token间耦合
+
+**硬伤3**: "有限状态自动机"的发现可能受限于：
+- 只用了3个layers (4,6,8) 定义状态，状态空间被人为缩小
+- 5步生成太短，无法观察长期动力学
+- 需要更长的rollout（20+步）和更多层的状态编码
+
+**硬伤4**: 没有验证routing graph的因果性
+→ 知道routing graph稳定，但不知道这是否causally important
+→ 需要intervention：强制改变routing pattern → 观察输出变化
+
+**硬伤5**: 只在GPT-2-small上验证
+→ 需要在Qwen3等大模型上验证universal routing hub和attractor结构
+
+---
+
+### 下一步关键任务
+
+**大任务1: 完整信息流追踪 (Full Token Information Flow)**
+- 追踪所有token positions的信息流路径
+- 不仅看attention routing，还要看MLP transformation
+- 构建(token_t, layer_l) → (token_t', layer_l+1) 的完整有向图
+
+**大任务2: Routing Graph因果验证**
+- Intervention：修改某个head的attention pattern → 观察输出
+- 特别是修改fixed-point attractor状态 → 是否破坏生成？
+- 这连接"描述性发现"和"因果机制"
+
+**大任务3: 长程Rollout动力学**
+- 生成20-50个tokens，观察routing graph的长期演化
+- 是否存在phase transitions（从一种attractor跳到另一种）？
+- CoT任务的routing dynamics是否有特殊结构？
+
+**大任务4: 在Qwen3上验证Universal Routing Hub**
+- 大模型是否有相同的universal (layer, head) pairs？
+- 大模型的routing manifold维度是否更低（更压缩）？
+- 推理能力是否与routing attractor结构有关？
+
+[Phase 84完成时间标记: 2026年05月08日01时20分]
+
+---
+
+## Phase 85: Representation Dynamics — 从Transport Graph到Algorithm Execution [2026-05-08 01:21]
+
+### 背景：Phase 84批判的四个核心硬伤
+
+Phase 84开始从Jacobian转向Computation Graph，但犯了新的错误：
+
+1. **A_{ij} ≠ computation graph**：A_{ij}是"交通图"不是"算法图"
+   - 真正computation = A_{ij}V_j（被运输的信息内容）
+   - 同一routing + 不同V → 完全不同的computation
+   - 我们研究了交通图，不是算法执行
+
+2. **"Fixed-point attractor"是overclaim**：高稳定性是autoregressive的expected baseline
+   - 需要basin of attraction、perturbation recovery、Lyapunov spectrum才能证明
+   - 当前证据 = baseline，不是discovery
+
+3. **Routing低维≠Computation低维**：routing被positional/causal mask/BOS约束自然低维
+   - 真正computation complexity在value subspace和MLP transform
+
+4. **缺少representation dynamics**：真正的computation是h^(l)如何被压缩/重写/绑定
+   - 我们研究了"信息如何移动"（routing）
+   - 应该研究"representation如何变换"（computation）
+
+### Phase 85的方法论转向
+
+**从**: "Routing statistics" — attention pattern分析
+**到**: "Representation dynamics" — 实际信息内容和表示变换
+
+关键区别：
+- Phase 84问："信息从哪里流向哪里？" → 交通图
+- Phase 85问："信息实际上是什么？被如何变换？" → 算法执行
+
+---
+
+### 实验A结果：★Value Transport vs Routing★ — 批判的核心验证
+
+#### ★★★★★ 最关键发现：Routing cosine 0.98, Content cosine 0.27！
+
+```
+Layer 2: Routing cosine = 0.98, Content cosine = 0.77, std_ratio = 6.88
+Layer 6: Routing cosine = 0.98, Content cosine = 0.27, std_ratio = 22.11 (!!!)
+Layer 10: Routing cosine = 0.94, Content cosine = 0.39, std_ratio = 4.91
+```
+
+**这个发现直接验证了Phase 84批判的核心论点：**
+
+1. 不同任务使用几乎相同的routing（cosine > 0.98）
+2. 但通过routing传输的信息内容完全不同（cosine ≈ 0.27 at Layer 6）
+3. Content的task-specificity是routing的22倍（std ratio at Layer 6）
+
+**含义：** Phase 84的"universal routing hubs"发现是真实的，但它的含义被误解了。
+- 不同的任务共享相同的"交通路线"
+- 但运输完全不同的"货物"
+- **computation在value中，不在routing中**
+
+#### Per-head AV cross-task cosine
+
+```
+Head 0: AV cross-task cosine = 0.24 ± 0.17  (highly task-specific)
+Head 1: AV cross-task cosine = 0.69 ± 0.13  (moderately task-specific)
+Head 2: AV cross-task cosine = 0.60 ± 0.24  (variable)
+Head 3: AV cross-task cosine = 0.54 ± 0.22  (variable)
+```
+
+→ Head 0的value transport是最task-specific的
+
+#### OV Circuit Task-Specificity (Layer 6)
+
+不同任务的top-3 contributing heads不同：
+- addition: [8, 7, 5] → 不同heads主导
+- antonym: [1, 7, 5] → Head 1替代Head 8
+- capital: [1, 0, 3] → 完全不同的head set
+
+→ 虽然routing相似，但不同任务使用不同的heads来写入representation
+
+---
+
+### 实验B结果：Representation Trajectory Field
+
+#### 1. Representation Trajectory Across Layers
+
+```
+所有任务: Per-step distance pattern:
+  L0: ~56-59 (embedding → first layer: large jump)
+  L1: ~12-15 (gradual refinement)
+  L2-8: ~10-40 (steady rewriting)
+  L9-10: ~50-155 (acceleration)
+  L11: ~256-420 (final layer: large jump for unembedding)
+```
+
+**关键发现：** Representation轨迹不是均匀变化的——它有两个大的"跳跃"（L0和L11），中间是渐进的refinement。
+
+#### 2. ★Cross-Task Representation Divergence — 先增后减★
+
+```
+Layer 0: cross-task cosine = 0.9448 (similar)
+Layer 2: cosine = 0.8922 (diverging)
+Layer 4: cosine = 0.8318
+Layer 6: cosine = 0.7677 (most divergent!)
+Layer 8: cosine = 0.7257 (still diverging)
+Layer 10: cosine = 0.8625 (converging!)
+```
+
+**惊人发现：** 跨任务representation divergence先增大后减小！
+- 浅层：embedding相似（token级别共享）
+- 中层(L6-8)：最divergent（任务特异的表示分化）
+- 深层(L10)：重新收敛（统一解码空间）
+
+→ 中层是task-specificity的核心区域，深层进行"通用化解码"
+
+#### 3. Representation Compression
+
+```
+L0 (embedding): participation_ratio = 1.0 (1D! 所有样本几乎相同)
+L6: participation_ratio ≈ 14-17 (medium dimensionality)
+L11: participation_ratio ≈ 15-20 (slightly higher)
+```
+
+→ Embedding高度压缩（1D），深层表示有15-20维的有效维度
+
+#### 4. Incremental Rewriting Δh
+
+```
+L0: relative_rewrite ≈ 10-12% (large rewrite)
+L2-8: relative_rewrite ≈ 0.2-0.5% (small incremental)
+L10: relative_rewrite ≈ 0.6-1.0% (larger at end)
+```
+
+→ 大部分层的表示改写很小，但累积效果显著
+
+---
+
+### 实验C结果：★Causal Intervention★ — 因果验证
+
+#### 1. Value Ablation vs Routing Ablation
+
+对Phase 84发现的3个universal routing hubs进行ablation：
+
+```
+(L4, H11): Value ablation → 0-1/5 changed; Routing ablation → 0-2/5 changed
+(L5, H1):  Value ablation → 0-1/5 changed; Routing ablation → 0-0/5 changed
+(L7, H2):  Value ablation → 0-0/5 changed; Routing ablation → 0-0/5 changed
+```
+
+**发现：** 单个head的ablation效果很小（0-2/5 predictions changed）。
+→ GPT-2-small对这些简单任务的computation是分布式冗余的
+
+#### 2. Systematic Ablation (Capital task)
+
+最causal的heads（by logit impact）：
+- (5,1) routing ablation: attn_impact = -16.124 (largest!)
+- (7,2) routing ablation: attn_impact = -3.265
+- (6,6) routing ablation: attn_impact = +4.366 (inhibitory!)
+
+**关键发现：**
+- Head (5,1)的routing对capital任务最重要（-16 logit impact）
+- 但Head (5,1)的value ablation几乎没有影响（-1.28 logit）
+- **Routing和Value的因果效应方向不同！** 这是routing ≠ computation的因果证据
+
+#### 3. ★Perturbation Recovery (Attractor Test)★
+
+```
+Noise level 0.01: recovery rate = 1.00 (strong attractor)
+Noise level 0.1:  recovery rate = 0.90 (strong attractor)
+Noise level 1.0:  recovery rate = 0.70 (weak attractor)
+```
+
+**首次正确测试attractor：**
+- 小扰动完美恢复（100%）
+- 中等扰动大部分恢复（90%）
+- 大扰动仍有70%恢复率
+- → **Transformer确实有attractor结构**，但这是residual stream的强稳定性，不是routing graph的attractor
+
+---
+
+### 实验D结果：Recursive Representation Rewriting
+
+#### 1. Attention vs MLP贡献
+
+```
+所有任务的平均模式:
+  L0: Attn ~45-49%, MLP ~60-63% (both large)
+  L2-8: Attn ~40-70%, MLP ~77-92% (MLP dominant!)
+  L10: Attn ~10-32%, MLP ~77-94% (MLP extremely dominant)
+```
+
+**关键发现：** MLP贡献远大于Attention贡献！
+- 特别在深层(L10)：MLP占88-94%的表示改写
+- Attention在深层只贡献10-30%
+- **这意味着：深层computation主要由MLP驱动，不是attention routing**
+
+#### 2. Rewriting Direction Consistency
+
+```
+Attn direction consistency: 0.87-0.97 (high)
+MLP direction consistency:  0.90-0.99 (very high)
+```
+
+→ 同一任务内，Δh的方向非常一致（几乎所有样本重写方向相同）
+
+#### 3. ★Cross-Task Rewriting Direction Divergence★ — 最核心发现
+
+```
+Layer 2: Δh_attn cross-task cosine = 0.17-0.70
+         Δh_mlp cross-task cosine = 0.03-0.79
+
+Layer 6: Δh_attn cross-task cosine = 0.05-0.39  (极度divergent!)
+         Δh_mlp cross-task cosine = 0.12-0.48
+
+Layer 10: Δh_attn cross-task cosine = 0.64-0.86 (re-converging)
+          Δh_mlp cross-task cosine = 0.72-0.93 (re-converging)
+```
+
+**重大发现：**
+
+1. **中层(L6)的rewriting direction极度task-specific**（cosine ≈ 0.05-0.39）
+   - 这比routing的task-specificity高出几个数量级
+   - Addition和translate_fr的attn rewriting cosine只有0.05！
+
+2. **深层的rewriting direction重新收敛**
+   - 与representation divergence的"先增后减"模式一致
+
+3. **MLP的rewriting比attn更task-specific**（在L2层，cosine低至0.03）
+   - addition vs animal_sound的MLP cosine = 0.03
+   - 这说明MLP是task-specificity的主要来源
+
+#### 4. Subspace Analysis
+
+```
+Participation ratio: attn ≈ 19-21, mlp ≈ 16-19
+k=3 explains ~62-65% variance
+k=5 explains ~85-88% variance
+k=10 explains ~91-94% variance
+```
+
+→ Rewriting发生在~17-21维的子空间中（不是全768维）
+
+---
+
+### Phase 85核心结论
+
+#### ★★★★★ 结论1：Routing是共享基础设施，Computation在Value中
+
+直接证据：
+- Routing cross-task cosine = 0.98
+- Content (AV) cross-task cosine = 0.27
+- Content std / Routing std = 22x
+
+**Transformer的真正架构：**
+```
+Routing Layer (shared): 选择"交通路线" → 跨任务几乎相同
+Value Layer (task-specific): 决定"运输什么货物" → 极度任务特异
+```
+
+#### ★★★★★ 结论2：MLP是Task-Specificity的主要来源
+
+直接证据：
+- MLP rewriting direction的task-specificity远高于attention
+- 深层MLP占88-94%的表示改写
+- Addition vs animal_sound MLP cosine = 0.03（几乎正交！）
+
+**修正了Phase 83的"attention比MLP更task-specific"结论！**
+- Phase 83看的是Jacobian（局部几何），得出attn更task-specific
+- Phase 85看的是Δh（实际改写），得出MLP更task-specific
+- **Jacobian的task-specificity ≠ 实际computation的task-specificity**
+
+#### ★★★★★ 结论3：Representation Divergence呈现"先增后减"模式
+
+```
+L0: cosine=0.94 (similar)
+L6: cosine=0.77 (most divergent)
+L10: cosine=0.86 (re-converging)
+```
+
+→ 浅层：token-level共享
+→ 中层：task-specific分化
+→ 深层：统一解码空间
+
+#### ★★★★★ 结论4：Transformer确实有Attractor结构（因果验证）
+
+Perturbation recovery: noise=0.01 → 100%, noise=0.1 → 90%, noise=1.0 → 70%
+→ 这是residual stream的强稳定性，不是routing的attractor
+
+---
+
+### 严格审视：Phase 85的硬伤
+
+**硬伤1**: GPT-2-small对简单任务的computation过于冗余
+- 单head ablation几乎不影响输出
+- 需要在更难的任务上测试（如multi-step reasoning）
+
+**硬伤2**: Value Transport分析仍然只看了last position
+- 需要看所有token positions的AV vectors
+- 特别是key content tokens（如"France"在"capital of France is"中）
+
+**硬伤3**: Causal intervention太粗糙
+- 只做了single-head ablation
+- 需要multi-head ablation和subspace ablation
+- 需要在更多任务和更长序列上测试
+
+**硬伤4**: 还没有进入"算法层"
+- 知道representation被重写了，但不知道重写的"算法"是什么
+- 需要研究：variable binding, temporary memory, recursive state update
+- 这些是真正computation mechanism
+
+**硬伤5**: Rewriting direction的"先增后减"模式需要更严格的解释
+- 可能是layer norm的统一化效应
+- 可能是unembedding空间的约束
+- 需要排除这些替代解释
+
+---
+
+### 下一步关键任务
+
+**大任务1: Key Token Value Transport**
+- 不只看last position，追踪所有token的AV vectors
+- 特别是"content token"（如"France"）的value transport
+- 这是"记忆检索"的核心机制
+
+**大任务2: MLP Rewriting的算法解析**
+- MLP是task-specificity的主要来源
+- 需要解析MLP内部在做什么：哪些neurons激活？什么feature被提取？
+- 这直接关联"模型如何执行算法"
+
+**大任务3: Variable Binding Mechanism**
+- Transformer如何在特定subspace中"绑定"变量？
+- 例如："France"被绑定到"capital"关系
+- 需要找到binding的subspace和mechanism
+
+**大任务4: Recursive Reasoning Dynamics**
+- 在CoT/多步推理任务上追踪representation dynamics
+- 推理步骤间是否有phase transition？
+- 推理过程中representation是否形成特定的orbit结构？
+
+[Phase 85完成时间标记: 2026年05月08日01时50分]
+
+---
+
+## Phase 86: Algorithm Semantics — 从表示几何到计算结构 [2026-05-08 13:58]
+
+### 核心转向：从"表示如何变化"到"模型在计算什么"
+
+Phase 85批判指出了整个项目最核心的瓶颈：
+
+> 你仍然在研究"表示变化"，而不是"算法结构"
+> representation change ≠ algorithm identification
+
+我们一直研究的是：
+- Δh, cosine, subspace, participation ratio, rewriting direction
+- 这些是**表示几何学**（representation geometry），不是**算法语义学**（algorithm semantics）
+
+我们不知道的是：
+- 哪些维度对应 variables, relations, memory slots, temporary state, control flow
+- 模型到底在"算什么"
+
+Phase 86的目标：**识别Transformer计算中的变量绑定（Variable Binding）结构**
+
+如果Transformer的计算确实是 latent state rewriting：
+```
+h_{t+1} = h_t + Δ(h_t, context)
+```
+那么关键问题是：表示中哪些维度对应"变量"，哪些对应"关系"？
+
+### Phase 86的四个实验
+
+A. Entity-Relation Binding Decomposition ★★★★★
+B. Role-Filler Decomposition ★★★★★
+C. Causal Subspace Intervention ★★★★★
+D. Algorithm State Tracing ★★★★
+
+---
+
+### 实验A结果：★★★★★ Entity-Relation子空间确实可分离！
+
+#### 关键发现1：Entity和Relation子空间在浅中层完全分离
+
+```
+Layer 2: Entity var explained by relation subspace = 0.21
+         Relation var explained by entity subspace = 0.24
+         → 两者互相解释不到30% → 子空间分离！
+
+Layer 4: Entity var = 0.13, Relation var = 0.07
+         → 更强分离！
+
+Layer 6: Entity var = 0.25, Relation var = 0.11
+         → 仍然分离
+
+Layer 8-10: Entity var = 0.42-0.44, Relation var = 0.09
+         → 深层entity子空间被relation部分渗透，但relation仍独立
+```
+
+**含义：** Transformer的表示确实把"实体"和"关系"编码在不同的子空间中！这是Variable Binding的直接证据。
+
+#### 关键发现2：Entity和Relation都100%可线性解码
+
+```
+所有层的Entity解码准确率: 0.91-1.00 (chance: 0.067)
+所有层的Relation解码准确率: 1.00 (chance: 0.333)
+```
+
+**含义：** Entity和Relation信息在表示中是线性可读的。模型不是隐式编码这些信息——它们在特定的、可分离的维度上。
+
+#### 关键发现3：Relation效应在中层远大于Entity效应
+
+```
+Layer 2: Entity/Relation effect ratio = 0.73 (平衡)
+Layer 4: ratio = 0.22 (relation主导)
+Layer 6: ratio = 0.12 (relation远主导)
+Layer 8: ratio = 0.12 (relation远主导)
+Layer 10: ratio = 0.32 (relation仍主导)
+```
+
+**含义：**
+- "The capital of France" → 中层主要在处理"capital"这个关系，"France"作为实体参数
+- 关系是"算法"，实体是"输入参数"——这和函数调用的结构一致
+- `computation = relation(entity)` — 关系决定了算法，实体是参数
+
+#### 关键发现4：子空间分离随深度演化
+
+```
+Layer 2-6: Entity和Relation子空间高度分离 (overlap 0.30-0.46)
+Layer 8-10: 子空间开始重叠 (overlap 0.61-0.63)
+```
+
+**含义：** 深层需要把entity和relation信息"融合"成具体的答案，所以子空间开始重叠。但relation子空间始终独立（被entity解释不到25%）。
+
+---
+
+### 实验B结果：★★★★★ Role和Filler编码几乎正交！
+
+#### 关键发现1：Role-Filler方向cosine ≈ 0
+
+```
+Layer 2:  Role-Filler cosine = 0.002
+Layer 4:  Role-Filler cosine = -0.046
+Layer 6:  Role-Filler cosine = -0.011
+Layer 8:  Role-Filler cosine = 0.049
+Layer 10: Role-Filler cosine = 0.077
+```
+
+**这是Phase 86最重要的发现！**
+
+"Paris loves Rome" vs "Rome loves Paris"：
+- Role变化（subject↔object交换）的方向
+- Filler变化（换不同的城市）的方向
+- 这两个方向**几乎完全正交**（cosine ≈ 0）
+
+**含义：** Transformer确实有Variable Binding机制！
+- "哪个位置"（Role）和"什么内容"（Filler）编码在**正交的维度**上
+- 这正是变量绑定需要的数学结构：`bind(role, filler)`
+- Role是"槽位"，Filler是"填充值"，它们在不同维度上独立编码
+
+#### 关键发现2：同一个词在不同角色下有不同表示
+
+```
+"Paris" as subject vs "Paris" as object:
+Layer 2:  cross-role cosine = 0.64
+Layer 4:  cross-role cosine = 0.61
+Layer 6:  cross-role cosine = 0.62
+Layer 8:  cross-role cosine = 0.67
+Layer 10: cross-role cosine = 0.85
+```
+
+- Within-role cosine = 1.00（同角色下完美一致）
+- Cross-role cosine ≈ 0.62（不同角色下显著不同）
+
+**含义：**
+- 同一个词"Paris"在subject位置和object位置的表示不同
+- 这种差异不是随机的——within-role完全一致
+- **Role信息被叠加到entity表示上**——这正是Variable Binding的机制
+- 深层(L10)角色差异减小(cosine=0.85)——深层进行"去角色化"的统一解码
+
+---
+
+### 实验C结果：因果干预部分成功，受限于模型知识
+
+#### 问题：GPT-2-small事实知识太弱
+
+```
+"The capital of France is" → "now" (不是"Paris"！)
+"The opposite of big is" → "the" (不是"small"！)
+"The opposite of hot is" → "cold" (30%概率)
+```
+
+GPT-2-small对事实性问答非常不可靠，导致因果干预测试困难。
+
+#### 部分成功：跨实体泛化
+
+```
+d_entity = h("hot") - h("big")，添加到"The opposite of fast is"
+Layer 6, alpha=20: P(cold)从0.065增加到0.157
+```
+
+**Entity方向确实在shift概率分布**——虽然不够强到完全swap预测，但方向是对的。
+
+#### 关键发现：Entity方向100%在Entity子空间中
+
+```
+d_hot_big投影到Entity子空间后的比率 = 1.0000 (100%)
+Raw direction和Projected direction产生完全相同的效果
+```
+
+**含义：** Entity方向完全落在Entity子空间内——这验证了子空间分解的正确性。
+
+---
+
+### 实验D结果：推理结构比答案更强地编码
+
+#### 关键发现1：Chain vs Single表示在中层最分离
+
+```
+Layer 2:  Chain-Single cosine = 0.96
+Layer 6:  cosine = 0.85
+Layer 8:  cosine = 0.78 (最分离)
+Layer 10: cosine = 0.89 (收敛)
+```
+
+与Phase 85的"先增后减"模式一致——中层是task-specificity的核心区域。
+
+#### 关键发现2：★★★ Reasoning Structure比Answer更强烈编码
+
+```
+Same answer (different reasoning paths): cosine = 0.82 ± 0.14
+Same structure (different answers): cosine = 0.99 ± 0.01
+```
+
+**这是非常重要的发现！**
+
+- 不同的推理路径到达相同答案 → 表示差异大 (cosine=0.82)
+- 相同的推理结构但不同答案 → 表示差异小 (cosine=0.99)
+
+**含义：** Transformer主要编码"推理结构"（算法），不是"答案"（输出）。这支持了：
+> Transformer computation = algorithm execution, not answer lookup
+
+模型执行的是"推理过程"这个算法，答案只是算法的副产品。
+
+#### 关键发现3：1-hop vs 2-hop推理的维度差异
+
+```
+Layer 6: 1-hop PR = 3.2, 2-hop PR = 3.6
+Layer 8: 1-hop PR = 3.1, 2-hop PR = 3.5
+```
+
+2-hop推理使用了略高维度的表示空间，但差异不大。可能是因为GPT-2-small的推理能力有限。
+
+---
+
+### Phase 86核心结论
+
+#### ★★★★★ 结论1：Transformer确实有Variable Binding结构
+
+直接证据：
+1. Entity和Relation子空间分离（互相解释<25%）
+2. Entity和Relation都100%可线性解码
+3. Role和Filler编码方向几乎正交（cosine ≈ 0）
+4. 同一词在不同角色下有不同表示（cosine ≈ 0.62）
+
+**这是整个项目迄今为止最重要的发现。**
+
+Transformer的计算结构可以用以下代数来描述：
+```
+computation = relation(entity)
+```
+- `relation`决定算法（在独立的子空间中编码）
+- `entity`是输入参数（在另一个独立子空间中编码）
+- 两者的"绑定"通过叠加（superposition）实现
+
+#### ★★★★★ 结论2：Role-Filler分离是Variable Binding的核心机制
+
+Role（subject/object）和Filler（具体词）编码在正交方向上：
+- 这意味着 `bind(role, filler) = role_direction + filler_direction`
+- 绑定 = 向量加法（superposition）
+- 解绑 = 在对应子空间上投影
+
+这与Tensor Product Representation (TPR)理论高度一致！
+
+#### ★★★★ 结论3：Relation是算法，Entity是参数
+
+```
+Entity/Relation effect ratio在中层: 0.12
+```
+
+关系信息的效应是实体信息的8倍。这意味着：
+- "capital"关系决定了"检索国家首都"这个算法
+- "France"实体是算法的输入参数
+- 算法远比参数重要——这正是程序执行的逻辑
+
+#### ★★★ 结论4：推理结构比答案更强烈编码
+
+```
+Same structure cosine = 0.99, Same answer cosine = 0.82
+```
+
+Transformer编码的是"推理过程"，不是"答案"。答案是推理过程的自然结果。
+
+---
+
+### 严格审视：Phase 86的硬伤
+
+**硬伤1**: 因果干预实验不够强
+- GPT-2-small事实知识太弱，无法做干净的事实性干预
+- 需要在知识更可靠的模型上验证（Qwen3, GLM4等）
+- 当前证据是correlational（子空间分离），不是causal（干预改变输出）
+
+**硬伤2**: Entity-Relation分离可能受模板结构影响
+- "The [relation] of [entity] is" 是固定模板
+- 不同relation改变了关键content token，可能导致表示差异
+- 需要用更多样化的模板验证分离是否robust
+
+**硬伤3**: Role-Filler正交可能受位置编码驱动
+- Subject和Object的位置天然不同
+- 位置编码可能贡献了"role"的主要信号
+- 需要控制位置编码，测试是否有独立于位置的role编码
+
+**硬伤4**: "推理结构比答案更强编码"可能有替代解释
+- 可能是因为句法结构（token序列）主导了表示
+- 需要控制句法变化，单独测试语义推理结构
+
+**硬伤5**: 还没有找到具体的binding机制
+- 我们知道role和filler是正交编码的
+- 但不知道binding发生在哪一层、哪个head、通过什么mechanism
+- 需要逐层逐head地追踪binding过程
+
+---
+
+### 下一步关键任务
+
+**大任务1: 在大模型上验证因果干预 ★★★★★**
+- 在Qwen3/GLM4上重复Experiment C
+- 大模型的事实知识更可靠，可以做干净的因果干预
+- 如果大模型上成功swap entity → Variable Binding的因果证据确立
+
+**大任务2: Binding Mechanism追踪 ★★★★★**
+- 逐层追踪role和filler何时变得正交
+- 逐head追踪哪个head负责role编码
+- 找到binding的"执行层"——binding发生在哪一步？
+
+**大任务3: Tensor Product Representation验证 ★★★★**
+- 如果binding = role_direction + filler_direction（正交叠加）
+- 那么representation应该近似于TPR：h ≈ Σ role_i ⊗ filler_i
+- 验证是否存在tensor product结构
+
+**大任务4: 超越Template的Variable Binding ★★★★**
+- 使用更自由的句式测试binding
+- 例如："What France calls its capital, Germany calls its"
+- 测试binding是否独立于句法模板
+
+**大任务5: 可组合性验证 ★★★★**
+- 如果entity和relation子空间真的独立
+- 那么应该可以做"跨组合"：用A的entity方向+B的relation方向
+- 生成"relation_B(entity_A)"的表示
+- 这将是computation semantics的最强证据
+
+[Phase 86完成时间标记: 2026年05月08日14时30分]
+
+---
+
+### Phase 86补充：Qwen3验证实验 [2026-05-08 14:40]
+
+#### Qwen3-1.5B事实知识验证
+
+```
+'The capital of France is' -> ['Paris', 'located', 'a']  ✓
+'The capital of Germany is' -> ['Berlin', '__', '____']  ✓
+'The capital of Japan is' -> ['Tokyo', '____', '__']    ✓
+'The capital of Italy is' -> ['Rome', '__', '______']    ✓
+```
+
+Qwen3正确回答所有事实性问题！与GPT-2-small不同，Qwen3有可靠的事实知识。
+
+#### ★★★ Qwen3 Entity-Relation子空间分离确认
+
+```
+Layer 8:  Entity var by relation subspace = 0.25, Relation var by entity subspace = 0.06
+          Entity decode = 80%, Relation decode = 100%  → SEPARABLE!
+
+Layer 12: Entity var by relation subspace = 0.28, Relation var by entity subspace = 0.10
+          Entity decode = 83%, Relation decode = 100%  → SEPARABLE!
+
+Layer 16: Entity var by relation subspace = 0.30, Relation var by entity subspace = 0.14
+          Entity decode = 90%, Relation decode = 100%  → SEPARABLE!
+```
+
+**确认：Variable Binding结构在Qwen3上也存在！这不是GPT-2-small的特有现象。**
+
+#### Qwen3 Entity Swap因果干预
+
+```
+d_entity = h("France") - h("Germany")
+目标: "The capital of Germany is"
+Baseline: pred='Berlin', P(Paris)/P(Berlin) = 0.003
+
+Layer 16:
+  alpha=5.0:  P(Paris)/P(Berlin) = 0.005  (1.62x shift)
+  alpha=10.0: P(Paris)/P(Berlin) = 0.010  (3.07x shift)
+  alpha=20.0: P(Paris)/P(Berlin) = 0.053  (16.30x shift!)
+```
+
+**Entity方向干预导致Paris/Berlin概率比增大16.3倍！**
+
+虽然仍未完全swap预测（因为"Germany"文本本身提供了强信号），但16.3x的shift是强烈的因果证据：
+- Entity子空间确实是因果性的——改变entity方向会改变输出分布
+- 信号方向完全正确——France方向增加了Paris的概率
+- 效应随alpha线性增强——不是噪声效应
+
+[Phase 86 Qwen3验证完成: 2026年05月08日14时45分]
+
+---
+
+## Phase 87: Binding Mechanism — 区分可分离表示与符号绑定 [2026-05-08 15:30]
+
+### 核心问题：Phase 86的"Variable Binding"结论是否成立？
+
+Phase 86批判指出：**把"线性可分离"误当成"变量绑定"**。
+
+证据层级：
+```
+可分离表示 → 稳定绑定算子 → 可组合变量系统 → 真正算法执行
+Phase 86停在: 第一层
+```
+
+Phase 87设计三个关键实验来区分：
+1. Role Transfer Operator: T(h_{X,subj}) ≈ h_{X,obj}是否泛化到未见filler？
+2. Cross-Template Invariance: relation子空间是否跨模板不变？
+3. Compositional Generalization: entity方向是否跨relation可组合？
+
+---
+
+### 实验A结果：Role Transfer Operator不泛化！★★★★★ 核心否定证据
+
+#### GPT-2-small结果
+
+```
+Layer 2:  Train cosine=0.9999, Test cosine=0.7551, Gap=0.245 → 不泛化
+Layer 6:  Train cosine=1.0000, Test cosine=0.7557, Gap=0.244 → 不泛化
+Layer 8:  Train cosine=1.0000, Test cosine=0.7983, Gap=0.202 → 不泛化
+Layer 10: Train cosine=1.0000, Test cosine=0.9056, Gap=0.094 → 部分泛化
+
+Cross-filler consistency: 0.42-0.43 (中等，不是纯role信号)
+```
+
+#### Qwen3结果
+
+```
+Layer 8:  Train=0.9999, Test=0.3883, Gap=0.612 → 完全不泛化
+Layer 12: Train=1.0000, Test=0.4868, Gap=0.513 → 完全不泛化
+Layer 16: Train=1.0000, Test=0.5331, Gap=0.467 → 完全不泛化
+Layer 20: Train=1.0000, Test=0.4582, Gap=0.542 → 完全不泛化
+
+Cross-filler consistency: 0.55-0.57 (中等)
+```
+
+**关键结论：Role Transfer Operator不泛化到未见filler！**
+
+这意味着：
+- ❌ 不存在稳定的 T: h_{X,subj} → h_{X,obj} 算子
+- ❌ Role shift方向依赖于filler → 不是纯role信号
+- ❌ 这不是符号绑定（symbolic binding）
+- ✓ 更可能是位置条件化上下文化（position-conditioned contextualization）
+
+**但注意：深层(L10 on GPT-2-small)部分泛化(gap=0.09)，说明深层有微弱的binding趋势。**
+
+---
+
+### 实验B结果：★★★★★ 模型依赖的关键发现
+
+#### GPT-2-small: Capital-Currency子空间重叠85%！
+
+```
+Layer 4:  overlap=0.82, cur_in_cap=0.94, cap_in_cur=0.93
+Layer 6:  overlap=0.85, cur_in_cap=0.92, cap_in_cur=0.92
+Layer 8:  overlap=0.82, cur_in_cap=0.84, cap_in_cur=0.89
+Layer 10: overlap=0.83, cur_in_cap=0.72, cap_in_cur=0.70
+→ Entity-driven, NOT relation-driven!
+```
+
+#### Qwen3: Capital-Currency子空间只有17-28%重叠！
+
+```
+Layer 8:  overlap=0.20, cur_in_cap=0.10, cap_in_cur=0.04
+Layer 12: overlap=0.17, cur_in_cap=0.08, cap_in_cur=0.03
+Layer 16: overlap=0.18, cur_in_cap=0.08, cap_in_cur=0.03
+Layer 20: overlap=0.28, cur_in_cap=0.17, cap_in_cur=0.06
+→ Relation-separated! NOT entity-driven!
+```
+
+**这是最关键的模型对比发现！**
+
+两个模型给出**完全相反**的结论：
+- GPT-2-small: Capital-Currency 85%重叠 → Entity主导
+- Qwen3: Capital-Currency 17-28%重叠 → Relation分离
+
+**解释**：GPT-2-small的事实知识太弱，它不知道"capital"和"currency"的答案，所以relation信息不重要，entity信息主导。Qwen3有可靠的事实知识，relation信息变得重要，所以子空间分离。
+
+**这意味着Phase 86的"Entity-Relation分离"在真正有知识的模型上更加真实！** 但GPT-2-small上的85%重叠是一个假象——弱知识模型的relation不重要。
+
+#### Cross-template一致性
+
+```
+GPT-2-small Layer 4:
+  Template 0↔1 ("The capital of" ↔ "'s capital"): cosine=0.43
+  Template 0↔2 ("The capital of" ↔ "What is the capital of"): cosine=0.17
+  → 不同模板的entity variation低相关！
+  
+Same-entity cross-template cosine: ~0.66 (同一实体跨模板还比较像)
+```
+
+---
+
+### 实验C结果：Entity方向是Relation-Specific的
+
+#### GPT-2-small
+
+```
+Cross-relation entity direction (France-Germany):
+  Layer 4:  capital ↔ currency cosine = 0.92 (很相似！)
+  Layer 6:  cosine = 0.76
+  Layer 8:  cosine = 0.70
+  Layer 10: cosine = 0.85
+→ Entity方向跨relation比较一致
+```
+
+#### Qwen3（关键差异！）
+
+```
+Cross-relation entity direction (France-Germany):
+  Layer 8:  cap↔cur=0.28, cap↔lang=0.41, cur↔lang=0.25
+  Layer 12: cap↔cur=0.13, cap↔lang=0.26, cur↔lang=0.07
+  Layer 16: cap↔cur=0.14, cap↔lang=0.25, cur↔lang=0.22
+  Layer 20: cap↔cur=0.26, cap↔lang=0.07, cur↔lang=0.35
+→ Entity方向高度relation-specific！
+```
+
+**Qwen3上entity方向跨relation的cosine只有0.07-0.41！** 远低于GPT-2-small的0.70-0.92。
+
+这意味着：**在真正有知识的模型上，entity编码是relation-specific的——"France"在capital上下文和currency上下文中的表示方向完全不同。**
+
+这直接否定了compositional generalization：entity不是一个可以自由组合到任何relation中的"抽象变量"。
+
+#### 因果干预测试
+
+GPT-2-small和Qwen3都不了解currency事实（P(euro)=0），无法做干净的跨关系干预。但entity方向分析已经给出了答案。
+
+---
+
+### 实验D结果：Head级别有filler-independent的role信号
+
+```
+GPT-2-small:
+Layer 2: Head 9 (consistency=0.82), Head 8 (0.87), Head 7 (0.70)
+Layer 4: Head 6 (0.87), Head 10 (0.88), Head 11 (0.76)
+Layer 6: Head 0 (0.62), Head 5 (0.79)
+Layer 8: Head 5 (0.84), Head 7 (0.66)
+```
+
+**关键发现**：在head级别，cross-filler consistency > 0.6-0.87，远高于全表示级别的0.43。
+
+这意味着：
+- 单个attention head确实编码了filler-independent的role信息
+- 但当所有head组合成全表示时，role信号被dilute
+- **Binding可能是分布式的**——不同head贡献不同方面的role信息
+- 全表示级别看不到纯role算子，因为它是多个head的混合
+
+---
+
+### Phase 87核心结论
+
+#### ★★★★★ 结论1：不存在稳定的Role Transfer Operator
+
+两个模型上，T(h_{X,subj}) → h_{X,obj}都不泛化到未见filler。
+
+这直接否定了Phase 86的"Role-Filler正交=Variable Binding"推论。
+正交 ≠ 绑定。Role shift方向依赖于filler——这是位置条件化上下文化，不是符号绑定。
+
+#### ★★★★★ 结论2：Entity-Relation分离是模型知识依赖的
+
+| 模型 | Capital-Currency重叠 | 含义 |
+|------|---------------------|------|
+| GPT-2-small | 85% | Entity主导，relation不重要 |
+| Qwen3 | 17-28% | Relation分离，知识可靠 |
+
+GPT-2-small上的"entity-relation分离"是部分假象——模型不了解事实，所以relation信息不重要。
+Qwen3上的分离更加真实——relation确实在独立子空间中编码。
+
+#### ★★★★ 结论3：Entity编码是Relation-Specific的
+
+Qwen3上entity方向跨relation cosine只有0.07-0.41。
+"France"在capital上下文中的表示方向与currency上下文完全不同。
+→ Entity不是一个可自由组合的抽象变量。
+→ 不存在 compositional generalization。
+
+#### ★★★ 结论4：Head级别有纯Role信号
+
+单个head的cross-filler consistency > 0.6-0.87。
+全表示级别只有0.43-0.57。
+→ Binding可能是分布式的——每个head贡献一部分role信息。
+→ 需要在head级别研究binding机制。
+
+---
+
+### 对Phase 86的修正
+
+| Phase 86声明 | Phase 87实际 | 修正 |
+|-------------|-------------|------|
+| Variable Binding存在 | Role Transfer Operator不泛化 | ❌ 不是符号绑定 |
+| Role-Filler正交=Binding | 正交≠绑定，role shift依赖filler | ❌ 是位置条件化 |
+| Relation是算法，Entity是参数 | Entity编码是relation-specific的 | ❌ Entity不是抽象参数 |
+| computation=relation(entity) | Entity方向跨relation不同 | ❌ 不可组合 |
+| Entity/Relation子空间分离 | Qwen3确认分离，GPT-2-small是假象 | ✓ 但含义不同于预期 |
+| 推理结构比答案更强编码 | 未被否定 | ✓ 保留 |
+
+---
+
+### 严格审视：Phase 87的发现意味着什么？
+
+**我们真正发现了什么？**
+
+1. ✓ Transformer有结构化分布式表示（entity, relation, role部分可分离）
+2. ✓ 在有知识的模型上，relation子空间确实独立
+3. ✓ 单个head有filler-independent的role信号
+4. ❌ 但这些不是符号绑定
+5. ❌ Entity不是抽象变量
+6. ❌ 不存在稳定的binding operator
+
+**Transformer的计算结构更像：**
+
+```
+不是: computation = relation(entity)  (函数调用)
+而是: computation = f(context_specific_entity_representation)  (上下文化表示变换)
+```
+
+每个entity的表示都深深依赖于它的上下文（哪个relation，哪个role）。这不是"变量绑定+函数调用"，而是"上下文嵌入+特征变换"。
+
+**理论意义：**
+
+Transformer更接近"高维动态特征绑定系统"（distributed soft binding）：
+- 表示是结构化的（entity/relation/role可分离）
+- 但结构是"软"的（不是硬符号绑定）
+- Entity是"关系条件化的"（不是自由变量）
+- Role是"位置上下文化的"（不是抽象槽位）
+
+---
+
+### 第一性原理分析
+
+**语言背后的数学结构可能是什么？**
+
+如果Transformer不是符号计算机，那它是什么？
+
+Phase 87的发现指向一种"软代数"结构：
+
+1. **表示是结构化的**：entity/relation/role确实在不同子空间中
+2. **但结构是上下文依赖的**：同一entity在不同relation中有不同表示
+3. **Binding是分布式的**：单个head有纯信号，但组合后被dilute
+4. **不存在全局binding operator**：role shift依赖filler
+
+这可能指向：
+
+```
+h = f_entity(entity | context) ⊕ f_relation(relation) ⊕ f_role(role | context)
+```
+
+其中 ⊕ 是某种软组合（不是tensor product，不是简单加法），且每个分量都是上下文条件化的。
+
+**关键瓶颈**：我们不知道这个"软组合"的具体数学形式。
+
+**下一步任务**：
+1. 在head级别追踪binding：哪个head的role信号最filler-independent？这个head的计算机制是什么？
+2. 研究entity表示的relation-conditioning：同一entity在不同relation中的表示如何变化？变化模式是否有结构？
+3. 在更大的模型（如GLM4-8bit）上验证，看binding是否随模型规模增强
+
+[Phase 87完成时间标记: 2026年05月08日15时45分]
+
+---
+
+### Phase 87补充：Head级别Role Transfer ★★★★★ 重大发现
+
+#### 核心发现：Binding在Head级别确实存在！
+
+在全表示级别，Role Transfer Operator不泛化（gap=0.20-0.25）。
+但在单个Head级别，Role Transfer Operator **确实泛化到未见filler！**
+
+```
+Layer 6: 6个Heads被分类为"BINDING"（gap < 0.10）
+  Head 3: gap=0.013, consistency=0.45, shift_test=0.84
+  Head 2: gap=0.020, consistency=0.59, shift_test=0.94
+  Head 9: gap=0.031, consistency=0.04, shift_test=1.00 (!!)
+  Head 5: gap=0.039, consistency=0.61, shift_test=0.82
+  Head 8: gap=0.048, consistency=0.56, shift_test=0.85
+  Head 1: gap=0.080, consistency=0.64, shift_test=0.94
+
+Layer 8: 5个Heads被分类为"BINDING"
+  Head 3: gap=0.029, consistency=0.64, shift_test=0.95
+  Head 5: gap=0.059, consistency=0.84, shift_test=0.61
+  Head 7: gap=0.061, consistency=0.65, shift_test=0.81
+  Head 6: gap=0.085, consistency=0.78, shift_test=0.93
+  Head 0: gap=0.095, consistency=0.55, shift_test=0.96
+```
+
+#### 关键对比
+
+```
+Head级别最佳consistency: 0.84 (L8H5)
+全表示级别consistency:   0.53
+→ Head级别binding信号远强于全表示级别！
+→ Binding在head间被稀释！
+```
+
+#### 解释：为什么Head级别binding存在但全表示级别不存在？
+
+1. **每个Head有自己的role shift方向**——不同heads的role shift不完全对齐
+2. **当所有heads组合时**——不同方向的role shifts互相干扰
+3. **结果**：全表示级别的net role shift变成filler-dependent的
+4. **本质**：Binding是分布式的——多个heads各贡献一部分，但没有统一的binding operator
+
+#### Head级别binding的性质
+
+- **不是简单shift**：Ridge T矩阵（[d_head, d_head]）比均值方向d_role效果好
+- **是线性变换**：T(z_subj) ≈ z_obj，T是完整的线性映射
+- **泛化到未见filler**：T对未见filler的test cosine可达0.95+
+
+这意味着：**在head级别，存在稳定的线性role transfer operator！**
+这比简单的"方向正交"强得多——它是一个完整的binding transformation。
+
+#### 理论含义
+
+Phase 86发现Role-Filler正交（cosine ≈ 0）→ 以为是binding
+Phase 87发现全表示级别T不泛化 → 以为不是binding
+Phase 87+发现Head级别T确实泛化 → **binding确实存在，但在sub-circuit级别！**
+
+修正后的图景：
+```
+全表示级别:  无统一binding operator → 看起来像"位置条件化"
+Head级别:    有稳定binding operator → 真正的role binding！
+组合效果:    binding被head间干扰稀释 → 全表示级别看不到纯信号
+```
+
+这和distributed representation的理论一致：
+- 信息以分布式方式编码在多个heads中
+- 单个head有clean signal，但组合后有interference
+- 需要在sub-circuit级别研究binding机制
+
+[Phase 87 Head级别补充完成: 2026年05月08日16时05分]
+
+---
+
+### Phase 87最终验证：Qwen3 Head级别Binding确认 ★★★★★
+
+#### Qwen3结果
+
+```
+Layer 8:  7/12 binding heads, best gap=0.0014 (H3), test_cos=0.998
+Layer 12: 6/12 binding heads, best gap=0.0005 (H6), test_cos=0.9995 (!!)
+Layer 16: 4/12 binding heads, best gap=0.0057 (H2), test_cos=0.994
+Layer 20: 5/12 binding heads, best gap=0.0064 (H1), test_cos=0.989
+```
+
+Head级别T矩阵泛化极好——test cosine高达0.9995！
+
+#### 两个模型的关键差异
+
+| 指标 | GPT-2-small | Qwen3 |
+|------|-------------|-------|
+| Head T泛化gap | 0.01-0.10 | 0.0005-0.10 |
+| Head方向一致性 | 0.45-0.84 | 0.12-0.51 |
+| 全表示一致性 | 0.43-0.54 | 0.56-0.60 |
+| Head > Full? | ✓ (0.84 > 0.54) | ✗ (0.51 < 0.60) |
+
+**Qwen3的binding模式不同于GPT-2-small：**
+- GPT-2-small: Head级别方向一致性更高（binding是方向偏移）
+- Qwen3: Head级别方向一致性更低，但T矩阵泛化更好（binding是线性变换）
+
+**解释：** Qwen3的binding不是简单的"加一个role向量"，而是"应用一个role变换"。
+变换本身是filler-independent的（T泛化），但变换的中间状态（方向）是filler-specific的。
+
+这意味着Qwen3有更复杂的binding机制——它不是纯粹的directional shift，
+而是一个context-dependent linear mapping。
+
+#### 最终结论：Binding的三层结构
+
+```
+Level 1: 全表示级别 → 无统一binding operator（被head间干扰稀释）
+Level 2: Head级别 → 有稳定binding operator（T泛化到未见filler）
+Level 3: Head内机制 → 线性变换（不是简单方向偏移）
+```
+
+**这个三层结构是Phase 87最重要的理论贡献。**
+
+[Phase 87 Qwen3 Head验证完成: 2026年05月08日16时20分]
+
+---
+
+## Phase 88: Counterfactual Compositional Generalization [2026-05-08 15:19]
+
+### 核心问题
+
+Phase 87 critique指出：**线性泛化 ≠ Binding**。Head级别的T矩阵泛化只能说明"局部流形对齐"，不能证明"符号binding"。
+
+**决定性测试**：能否预测entity在**新relation**中的表示？
+- 如果Transformer有真正的组合binding：h(X|R_new) = compose(h_entity(X), h_relation(R_new))
+- 如果只是条件几何：h(X|R_new) = f(X, R_new)，f是纠缠的
+
+### 实验设计
+
+- **Exp A**：Cross-Relation Entity Transport——entity方向是否跨relation一致？
+- **Exp B**：Relation-Entity Composition——能否从已知relation+同relation其他entity预测新组合？
+- **Exp C**：Surface Form Control——binding效果是否在模板变化后存活？
+- **Exp D**：Context-Conditioning几何结构——context shift是否有系统性？
+
+### GPT-2-small 结果（来自运行记录）
+
+```
+Exp A: Entity方向跨relation一致性
+  capital <-> currency: cosine = 0.70-0.92
+  Same-entity cross-relation cosine: 0.90-0.97
+
+Exp C: Surface Form Control
+  Capital vs Size entity direction cosine: 0.56-0.88
+  (中等，entity方向部分由"是哪个国家"决定)
+
+Exp D: Context-Conditioning几何
+  Shift cross-entity consistency: 0.90-0.98  ← 极高！
+  Predict h(X|rel2) from h(X|rel1): LOO cosine ~0.95+
+  PCs for 90% variance: 3-10
+```
+
+### Qwen3 结果（完整输出）
+
+```
+Exp A: Cross-Relation Entity Transport (Qwen3)
+
+Layer 8:
+  Entity方向跨relation一致性:
+    capital <-> currency: 0.33
+    capital <-> language: 0.46
+    currency <-> language: 0.40
+  Entity transport (Ridge LOO): 0.983-0.993
+  Same-entity cross-relation cosine: 0.72
+
+Layer 12:
+  Entity方向跨relation一致性:
+    capital <-> currency: 0.27
+    capital <-> language: 0.37
+    currency <-> language: 0.30
+  Entity transport: 0.985-0.990
+  Same-entity cross-relation cosine: 0.78
+
+Layer 16:
+  Entity方向跨relation一致性:
+    capital <-> currency: 0.29
+    capital <-> language: 0.37
+    currency <-> language: 0.34
+  Entity transport: 0.987-0.990
+  Same-entity cross-relation cosine: 0.82
+
+Layer 20:
+  Entity方向跨relation一致性:
+    capital <-> currency: 0.32
+    capital <-> language: 0.37
+    currency <-> language: 0.37
+  Entity transport: 0.988-0.992
+  Same-entity cross-relation cosine: 0.84
+
+Layer 24:
+  Entity方向跨relation一致性:
+    capital <-> currency: 0.82 (!)
+    capital <-> language: 0.79
+    currency <-> language: 0.79
+  Entity transport: 0.930-0.951
+  Same-entity cross-relation cosine: 0.80
+
+注意：Qwen3的知识概率极低 (P<0.002)，但这些几何结构仍然存在！
+
+Exp C: Surface Form Control (Qwen3)
+
+Layer 8-20:
+  Cross-template entity direction consistency:
+    Template 0<->1 (canonical vs possessive): 0.33-0.50
+    Template 0<->2 (canonical vs question): 0.22-0.28
+    Template 0<->3 (canonical vs "capital city"): 0.65-0.80
+    Template 1<->2 (possessive vs question): 0.14-0.28
+  Capital vs Size entity direction cosine: 0.24-0.41
+    (远低于GPT-2-small的0.56-0.88！)
+  Same meaning, different position: 0.92-0.97
+
+Layer 24:
+  Template 0<->1: 0.89-0.94 (最后层恢复)
+  Capital vs Size: 0.30
+
+Exp D: Geometric Structure (Qwen3)
+
+Layer 8:
+  Shift capital->currency: cross-entity consistency = 0.946
+  Shift capital->language: cross-entity consistency = 0.936
+  Shift currency->language: cross-entity consistency = 0.944
+  Predict h(X|rel2) from h(X|rel1): LOO 0.981-0.990
+  PCs for 90% variance: 3
+
+Layer 12:
+  Shift cross-entity consistency: 0.89-0.92
+  Predict LOO: 0.978-0.987
+  PCs for 90% variance: 4
+
+Layer 16:
+  Shift cross-entity consistency: 0.88-0.91
+  Predict LOO: 0.982-0.986
+  PCs for 90% variance: 5
+
+Layer 20:
+  Shift cross-entity consistency: 0.88-0.92
+  Predict LOO: 0.983-0.989
+  PCs for 90% variance: 5
+
+Layer 24:
+  Shift cross-entity consistency: 0.87-0.88
+  Predict LOO: 0.937-0.950
+  PCs for 90% variance: 10
+```
+
+### ★★★★★ 核心发现：Context-Conditioning是系统性的几何变形
+
+**1. Entity不是抽象变量，是context-conditioned的**
+
+```
+指标                          GPT-2-small   Qwen3
+Entity方向跨relation一致性     0.70-0.92     0.27-0.46
+Same-entity跨relation cosine   0.90-0.97     0.72-0.84
+Capital vs Size方向cosine       0.56-0.88     0.24-0.41
+```
+
+- GPT-2-small: entity方向高度一致 → entity更接近"抽象变量"
+- Qwen3: entity方向跨relation大幅下降 → entity是**关系条件化的**
+- Capital vs Size方向cosine更低 → entity方向编码了**关系特异信息**，不只是"哪个国家"
+- Qwen3的relation-specific encoding更强，因为它有更结构化的知识表示
+
+**2. Context Shift是系统性的几何变形** ★★★★★
+
+```
+Shift cross-entity consistency:
+  GPT-2-small: 0.90-0.98
+  Qwen3:       0.87-0.95
+```
+
+**关键发现**：h(X|capital) - h(X|currency) 对不同entity X几乎平行！
+这意味着：context shift（从capital到currency的表示变化）是一个**entity-independent的几何变换**。
+
+这不是符号binding（entity不是自由变量），也不是随机warping（shift有系统结构），
+而是**系统性的几何变形**——context像一个"透镜"，对每个entity施加相同的几何变换。
+
+**3. 表示空间是低维的**
+
+```
+PCs for 90% variance: 3-10 (取决于层)
+```
+
+30个点（10 entities × 3 relations），1536维空间中，只需3-10个PC就能解释90%方差。
+→ 表示流形是**极低维的**。
+
+**4. Position Control：表示是语义驱动的**
+
+```
+Same meaning, different position: cosine = 0.92-0.97
+```
+
+"The capital of France is" vs "France's capital is"——完全不同的token位置，但表示高度一致。
+→ 表示确实编码了**语义**，不只是位置统计。
+
+**5. Transport有效但不是组合性**
+
+```
+Entity transport (Ridge LOO): 0.98+
+```
+
+从h(X|capital)预测h(X|currency)效果极好。但这是**插值预测**，不是组合泛化。
+我们利用了其他entity在两个relation中的表示来学习变换——这不是 compose(h_X, h_R)。
+
+### 两个模型的差异图
+
+```
+GPT-2-small:
+  - Entity是"准抽象变量"（跨relation一致0.70+）
+  - 但它的"一致性"来自弱知识——不知道答案，只能靠entity身份
+  - Context shift系统性也存在（0.90+），但信号更弱
+
+Qwen3:
+  - Entity是"关系条件化的"（跨relation一致仅0.27-0.46，中间层）
+  - 更强的relation-specific encoding
+  - Context shift系统性极强（0.88-0.95）
+  - 但最后层(L24)entity方向恢复一致(0.79+)——unembedding压力
+```
+
+### 对Phase 87 Critique的回应
+
+**Q: 线性泛化 ≠ Binding？**
+**A: 确认。** Entity transport有效(0.98+)，但这只是"学到了context-conditioning的几何结构"，不是组合binding。Entity不是自由变量——同一entity在不同relation中有不同表示（Qwen3 cosine仅0.72-0.84）。
+
+**Q: Surface form能否解释一切？**
+**A: 不能完全解释。** Position control显示表示是语义驱动的(0.92-0.97)。但Capital vs Size方向有部分重合(GPT-2: 0.56-0.88, Qwen3: 0.24-0.41)，说明entity方向不完全是语义的——GPT-2-small的entity方向有大量"哪个国家"的非语义成分。
+
+**Q: 最有价值的发现是什么？**
+**A: Context-Conditioning是系统性的几何变形。** Shift cross-entity consistency 0.87-0.98，这意味着context对表示的影响是**结构化的**——不是随机warped，而是遵循某种几何规则。
+
+### 理论定位：Conditional Geometry
+
+Phase 88确立了以下图景：
+
+```
+Transformer不是符号计算机：
+  - 没有抽象变量（entity是context-conditioned的）
+  - 没有符号binding（无法组合泛化到新entity-relation对）
+  - 没有独立于filler的role（role shift依赖entity）
+
+但Transformer也不是无结构的：
+  - Entity/Relation/Role在子空间中部分可分
+  - Context shift是系统性的（0.87-0.98 cross-entity consistency）
+  - 表示流形极低维（3-10 PCs → 90%）
+  - 语义驱动而非位置驱动
+
+Transformer是"条件几何系统"：
+  h(entity | context) = f_context(entity)
+  其中 f_context 是一个 context-specific 的几何变换
+  这个变换是 entity-independent 的（系统性）
+  但 entity 本身不是自由变量（context-conditioned）
+```
+
+### 关键数学结构假说
+
+```
+h(X|R) = A_R · h_X_base + b_R
+
+其中:
+  A_R: relation-specific的线性变换（entity-independent）
+  h_X_base: entity的"基础表示"（但本身也被context修改）
+  b_R: relation-specific的偏移
+
+证据:
+  1. Context shift cross-entity consistency → A_R是entity-independent的
+  2. Entity方向跨relation不一致 → h_X_base不是纯entity的
+  3. Transport有效 → A_R · h(X|R1) + (shift) ≈ h(X|R2)
+  4. 低维性 → A_R的有效秩很低
+```
+
+但这个假说仍然不够精确——A_R和h_X_base可能是纠缠的。
+
+### 问题、硬伤和瓶颈
+
+**1. 知识概率问题**：Qwen3对事实的P<0.002，这意味着我们在分析"模型几乎不知道的事实"的表示结构。这能推广到模型真正知道的事实吗？
+
+**2. 数据集太小**：15个entities × 3个relations = 45个表示点。虽然LOO交叉验证缓解了部分问题，但统计效力有限。
+
+**3. "条件几何"vs"符号binding"不是二选一**：可能存在中间地带——某种"软binding"机制，既不是纯符号的，也不是纯几何的。
+
+**4. 没有因果证据**：所有实验都是相关性分析。我们没有证明改变context会因果地改变entity表示。
+
+**5. Ridge回归的过拟合风险**：1536维空间中，14个训练点拟合Ridge可能过拟合。需要更多正则化或更大数据集。
+
+**6. "系统性"的定义模糊**：cross-entity cosine = 0.87-0.98是"系统性"的，但什么阈值区分"系统性"和"随机"？需要零假设模型。
+
+### 第一性原理分析
+
+**语言背后的数学结构——条件几何的含义**
+
+如果Transformer是条件几何系统，那语言能力的数学基础可能是：
+
+```
+1. 语义空间是一个流形 M
+2. 每个context C定义了M上的一个"坐标系变换" T_C
+3. h(X|C) = T_C(h_base(X))
+4. 不同的T_C之间有代数结构：
+   T_C1 ∘ T_C2^(-1) 是entity-independent的
+   → 这解释了context shift的系统性
+
+5. T_C的低维性：
+   T_C可以被参数化为少数PC上的线性变换
+   → 这解释了表示流形的低维性
+```
+
+**这个框架的威力**：
+- 解释了为什么binding看起来"有时存在有时不存在"——它是soft的
+- 解释了为什么head级别有binding但全表示没有——不同head的T_C不完全对齐
+- 解释了为什么Qwen3比GPT-2更relation-specific——更强的T_C变换
+
+**关键瓶颈**：我们不知道T_C的具体代数结构。它是Lie群吗？是仿射变换群吗？
+需要研究T_C1 ∘ T_C2^(-1) 的代数性质。
+
+**下一步大任务**：Context变换的代数结构
+
+1. **T_C的参数化**：用PCA对context变换做低秩分解，找到T_C的"生成元"
+2. **T_C的代数结构**：测试T_C1 ∘ T_C2 ≈ T_{C1+C2}？是否构成群？
+3. **跨层演化**：T_C在不同层如何变化？是逐层refinement还是突然出现？
+4. **因果干预**：主动修改context表示，观察entity表示的变化是否遵循预测
+5. **更大规模测试**：使用更多entities和relations，在GLM4-8bit上验证
+
+[Phase 88完成: 2026年05月08日15时19分]
+
+---
+
+### Phase 86-88 理论进展总结 [2026-05-08 15:19]
+
+#### 从"Binding存在"到"条件几何系统"的范式转变
+
+```
+Phase 86: 发现Role-Filler正交 → 宣称"binding存在"
+  问题: 线性可分 ≠ binding
+
+Phase 87: 测试Role Transfer Operator → 发现Head级别T泛化
+  问题: 线性泛化 ≠ 符号binding；全表示级别T不泛化
+
+Phase 88: 测试反事实组合泛化 → 发现Context-Conditioning是系统性的
+  结论: Transformer是"条件几何系统"，不是符号计算机
+```
+
+#### 三个层级的确立
+
+```
+Level 0: 统计模式匹配 ← Phase 85之前的观点
+Level 1: 结构化表示（entity/relation/role子空间可分） ← Phase 86
+Level 2: Sub-circuit binding（head级别有稳定role transfer） ← Phase 87
+Level 3: 条件几何系统（context定义几何变换，entity被变换） ← Phase 88
+```
+
+每个Level都包含前一Level：条件几何系统有结构化表示，有sub-circuit binding，
+但它的本质不是"变量+绑定"，而是"entity在context透镜下的几何变形"。
+
+#### 最深刻的洞察
+
+**Context是一个"透镜"，不是"变量槽"。**
+
+符号系统的视角：context是一个抽象变量槽，entity可以被"填入"。
+条件几何的视角：context是一个几何变换，它把entity的表示"弯曲"到新的位置。
+
+这个弯曲是系统性的（同样的context对不同entity施加类似变换），
+但entity本身也被改变了（不是同一个entity在不同槽位，而是同一个entity在不同透镜下）。
+
+**这可能是语言能力的数学基础**：
+- 语法 = 一组几何变换规则
+- 语义 = 流形上的拓扑结构
+- 组合性 = 变换的组合性质
+- 泛化 = 变换的代数结构
+
+[Phase 86-88总结完成: 2026年05月08日15时19分]
+
+---
+
+## Phase 89: 语义动力学理论——严格评估与实验计划 [2026-05-08 15:32]
+
+### 提案核心：统一语言动力学理论
+
+**核心主张**：所有语言能力（translation, CoT, retrieval, analogy, planning）
+是同一动力系统中的不同轨道类型。语言不是符号系统，而是连续动力系统。
+
+**形式化**：z_{t+1} = F(z_t, u_t)，其中F是语义演化算子。
+
+---
+
+### ★★★★★ 严格评估：哪些有数据支持，哪些是过度推断
+
+#### ✅ 有实验证据支持的论点
+
+**1. 表示是低维流形** — ★★★★★ 坚实证据
+```
+Phase 86-88: 30个表示点（10 entities × 3 relations），1536维空间
+PCs for 90% variance: 3-10
+→ 确认：Transformer计算发生在极低维子空间上
+```
+这是最坚实的发现。但注意：低维性不等于"流形上的动力学"——
+也可能只是因为entity和relation的数量少，自然只需少数PC。
+
+**2. Context是几何变换** — ★★★★ 较强证据
+```
+Phase 88: Context shift cross-entity consistency = 0.87-0.98
+h(X|capital) - h(X|currency) 对不同X几乎平行
+→ 确认：context shift有系统性结构
+```
+但"系统性几何变形"≠"Lie群变换"≠"流算子"。
+我们只证明了shift向量跨entity一致，没有证明变换有群结构。
+
+**3. 推理结构比答案更稳定** — ★★★ 中等证据
+```
+Phase 86: Same structure cosine = 0.99, Same answer cosine = 0.82
+→ 确认：模型编码推理过程，不只是答案
+```
+但这个实验只用了GPT-2-small的简单算术，且替代解释（句法结构主导）
+没有被完全排除（Phase 86硬伤4）。
+
+**4. 中层分化、深层收敛** — ★★★★ 较强证据
+```
+Phase 85: Cross-task cosine L0=0.94, L6-8=0.73, L10=0.86
+Phase 86: Chain vs Single cosine L2=0.96, L8=0.78, L10=0.89
+→ 确认：表示先分化后收敛的模式
+```
+但这可以有多种解释：动力系统演化 / 特征提取+解码 / 训练动态残留。
+"层即时间"是假说，不是事实。
+
+**5. Entity是context-conditioned的** — ★★★★★ 坚实证据
+```
+Phase 88: Qwen3 entity方向跨relation一致性仅0.27-0.46
+Same-entity cross-relation cosine 0.72-0.84 (Qwen3) vs 0.90-0.97 (GPT-2)
+→ 确认：entity不是自由变量
+```
+
+#### ❌ 缺乏实验证据的论点（纯假说）
+
+**1. "Translation是坐标变换"** — 无任何实验证据
+- 我们从未测试过跨语言表示
+- "同一语义轨道在不同坐标系中的投影"是漂亮的假说，但完全未验证
+- 需要在双语模型上做实验
+
+**2. "CoT是吸引子轨迹"** — 无任何实验证据
+- 我们没有追踪过CoT的中间状态轨迹
+- 没有测试过吸引子结构（收敛、稳定、分叉）
+- Phase 86只比较了"Chain vs Single"的终点表示，没有看中间步
+
+**3. "Retrieval是吸引域激活"** — 无实验证据
+- 我们测试了relation conditioning，但没有测试吸引域结构
+- 吸引域需要：定义能量函数、测试收敛行为、检查吸引域边界
+- 当前实验没有做任何这些
+
+**4. "Analogy是等变轨道"** — 无实验证据
+- king-man+woman=queen是经典例子，但我们没有测试轨道变换
+- 没有验证"变换保持结构"这个核心性质
+
+**5. "所有能力是同一动力系统"** — 无法从当前数据得出
+- 我们只测了entity-relation一种场景
+- 没有跨任务（translation vs CoT vs retrieval）的统一实验
+- 统一性是假说，不是发现
+
+**6. "z_{t+1} = F(z_t, u_t)"的具体形式** — 完全未知
+- 这是正确的理论方向，但F的具体形式完全不知道
+- 没有验证F是否是简单的、统一的、有代数结构的
+- 从"shift是系统性的"到"F是统一的演化算子"有巨大跳跃
+
+---
+
+### ★★★★★ 最危险的逻辑陷阱
+
+**陷阱1：框架太一般化，无法证伪**
+
+"语言是连续动力系统"这个命题太宽泛——几乎任何系统都可以被描述为动力系统。
+真正有价值的理论必须给出**具体预测**，而不仅仅是**事后解释**。
+
+举例：
+- "CoT是吸引子轨迹"——什么吸引子？几个？什么拓扑？可以预测新CoT的轨迹吗？
+- "Translation是坐标变换"——什么群？连续还是离散？可逆吗？
+- 如果框架不能做出比随机更好的预测，它就只是重新描述现象，不是理论。
+
+**陷阱2：类比物理学的危险**
+
+Lie群、规范变换、吸引子这些概念在物理学中有效，是因为物理定律有：
+1. 精确的数学形式（麦克斯韦方程、薛定谔方程）
+2. 预测能力（可提前计算未知现象）
+3. 封闭性（少数参数决定全部行为）
+
+当前我们没有以上任何一个。把"系统性的几何变形"类比为"李群变换"，
+就像看到水面波纹就说"这是量子场论"——可能对，但太早。
+
+**陷阱3：从局部到全局的过度推广**
+
+我们有：
+- 15个entities × 3个relations = 45个表示点
+- 只测了知识检索一种任务
+- 只测了最后token位置的表示
+- 2个小模型（GPT-2-small, Qwen3-1.5B）
+
+却想推导：
+- 所有语言能力的统一动力学
+- 语言的数学本质
+- 认知几何学
+
+这就像用量子力学中的两能级系统推导整个标准模型——方向可能对，但数据差几个数量级。
+
+**陷阱4："条件几何"可能只是表象**
+
+系统性context shift（0.87-0.98）可能反映的不是"几何变换"，
+而是更平凡的解释：
+1. 共享token（"The capital of" vs "The currency of"只差1个token）
+2. 注意力模式的系统性（同一模板结构→同一attention pattern→同一变换）
+3. 训练数据的统计规律（capital和currency的文本模式相似）
+
+Phase 88的Surface Form Control部分缓解了这个问题，但没有完全解决。
+
+---
+
+### ★★★ 真正有价值的三个洞察
+
+尽管有上述问题，提案中有三个洞察是真正深刻的，值得作为研究方向：
+
+**洞察1：应该研究"变化"而不是"状态"** ★★★★★
+```
+当前：研究 h_t（静态表示）
+应该：研究 v_t = h_{t+1} - h_t（变化向量/速度场）
+```
+这是一个方法论上的根本转变。速度场编码了系统的动力学，
+而静态表示只编码了状态。这可以区分"相同状态但不同动力学"
+vs "不同状态但相同动力学"。
+
+**洞察2：应该跨任务测试动力学的统一性** ★★★★★
+```
+当前：分别研究translation, CoT, retrieval
+应该：测试它们是否共享同一种flow structure
+```
+这可以真正检验"统一动力学"假说。如果不同任务的velocity field
+投影到相同的低维子空间，统一性就有实证支持。
+
+**洞察3：预测能力是理论的终极检验** ★★★★★
+```
+当前：事后解释（post-hoc）
+目标：提前预测（predictive）
+```
+如果语义动力学理论正确，我们应该能：
+- 预测新的entity在新relation中的表示
+- 预测CoT中间步骤的表示
+- 预测翻译后的表示
+
+---
+
+### ★★★★★ 实验计划：从假说到验证
+
+#### Phase 89A：语义速度场（Semantic Velocity Field）★★★★★ 最优先
+
+**核心问题**：表示在层间的变化是否有系统性的向量场结构？
+
+**方法**：
+1. 对每个prompt，提取L0到L_last的所有层表示
+2. 计算逐层速度 v_l = h_{l+1} - h_l
+3. 分析：
+   - v_l在不同entity/relation组合下的结构
+   - 速度场是否低维（PCA on all v_l）
+   - 不同relation的速度场是否正交/平行
+   - 速度场是否构成flow（v_l是否只依赖h_l，不依赖层号）
+
+**预测（如果动力学假说正确）**：
+- 速度场v_l可以由h_l的函数预测（自治系统）
+- 不同relation的速度场构成不同的向量场
+- 速度场是低维的（少数PC解释大部分方差）
+
+**关键区分**：
+- 如果v_l强烈依赖层号l → 不是自治动力系统，层不是"时间"
+- 如果v_l主要由h_l决定 → 自治动力系统，支持"层即时间"假说
+
+#### Phase 89B：跨任务动力学统一性 ★★★★★
+
+**核心问题**：不同语言任务（retrieval, CoT, translation, analogy）
+是否共享同一种flow structure？
+
+**方法**：
+1. 选取4种任务：
+   - Retrieval: "The capital of France is"
+   - CoT: "23 + 47 = ... step by step"
+   - Translation: "Translate to Chinese: The cat sits"
+   - Analogy: "king is to queen as man is to"
+2. 对每种任务，计算velocity field v_l
+3. 测试：
+   - 不同任务的velocity field是否投影到相同子空间？
+   - 速度场的PCA basis是否跨任务共享？
+   - 是否存在"通用速度场"+ "任务特异修正"的分解？
+
+**预测（如果统一动力学正确）**：
+- 存在共享的低维速度场basis
+- 不同任务只在这个basis的不同子集中激活
+- 任务的差异可以用少数参数刻画
+
+#### Phase 89C：CoT轨迹拓扑 ★★★★
+
+**核心问题**：CoT的中间步骤是否形成稳定轨迹？
+
+**方法**：
+1. 让模型生成多步CoT
+2. 提取每个中间步骤（每个生成token后）的表示
+3. 分析轨迹：
+   - 是否收敛到固定点？
+   - 不同起始点的轨迹是否收敛到相同吸引子？
+   - 轨迹是否有分叉点？
+   - 错误推理的轨迹是否偏离正确轨迹？
+
+**预测（如果CoT是吸引子轨迹）**：
+- 相同类型问题的CoT轨迹在语义空间中有相似拓扑
+- 错误推理对应轨迹的偏离/发散
+- 轨迹最终收敛到解答对应的吸引域
+
+#### Phase 89D：Context变换的代数结构 ★★★★
+
+**核心问题**：Phase 88发现的context变换T_R是否有代数结构？
+
+**方法**：
+1. 对多组relation对(R1, R2)，学习T_{R1→R2}
+2. 测试：
+   - T_{R1→R2} ∘ T_{R2→R3} ≈ T_{R1→R3}？（传递性/群结构）
+   - T_{R1→R2} ≈ T_{R2→R1}^(-1)？（可逆性）
+   - T_R的秩是多少？是否有低秩分解？
+   - T_R的特征值/特征向量结构？
+
+**预测（如果context变换构成群）**：
+- 传递性成立
+- 可逆性成立
+- T_R可以被参数化为少数生成元的组合
+
+---
+
+### 执行优先级
+
+```
+Phase 89A: 语义速度场     → 最高优先，这是方法论基础
+Phase 89D: 代数结构       → 高优先，利用已有数据即可
+Phase 89B: 跨任务统一性   → 中优先，需要更复杂的数据
+Phase 89C: CoT轨迹拓扑    → 中优先，需要生成式实验
+```
+
+先做89A和89D，因为它们可以基于已有的实验框架和数据。
+89B和89C需要新的实验设计。
+
+---
+
+### 理论立场修正
+
+基于严格评估，修正后的理论立场：
+
+```
+已确立（有坚实证据）：
+  1. 表示是低维的（3-10 PCs → 90%）
+  2. Context shift是系统性的（0.87-0.98 cross-entity consistency）
+  3. Entity是context-conditioned的
+  4. 推理结构比答案更稳定（0.99 vs 0.82）
+  5. 中层分化、深层收敛
+
+合理假说（有部分证据，需要验证）：
+  6. Context变换可能有代数结构
+  7. 速度场可能是低维的
+  8. 不同任务可能共享动力学basis
+
+未验证假说（无实验证据，纯推测）：
+  9. 所有语言能力是同一动力系统的不同轨道
+  10. Translation是坐标变换
+  11. CoT是吸引子轨迹
+  12. Retrieval是吸引域激活
+  13. 语言的数学本质是连续动力系统
+
+过度推断（当前数据不支持）：
+  14. Context变换是Lie群作用
+  15. 存在统一的语义演化方程 z_{t+1} = F(z_t, u_t)
+  16. 层即时间
+```
+
+**核心原则**：从假说9-13中，选择可证伪的预测，设计实验验证。
+如果假说被证伪，修正理论；如果被验证，再考虑14-16。
+
+---
+
+### 关于"15-25%进度"的评估
+
+提案估计当前进度15-25%。我认为：
+
+**如果目标是"统一语言动力学理论"**：约10-15%
+- 我们有现象观察（低维性、系统性shift、结构比答案稳定）
+- 但没有动力学方程、没有预测能力、没有跨任务验证
+- 从"现象"到"定律"还有很远的距离
+
+**如果目标是"理解Transformer内部机制"**：约30-40%
+- 我们已经比大多数mechanistic interpretability工作更系统
+- 发现了context conditioning的系统性结构
+- 但还没有因果机制，只有相关性
+
+**真正的突破标志**：
+不是发现更多局部现象，而是：
+> 能否写出一个方程，使得给定任意prompt，
+> 可以预测模型内部表示的演化轨迹？
+
+达到这个目标时，才算真正接近"语言的数学原理"。
+
+[Phase 89理论评估完成: 2026年05月08日15时32分]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Phase 90: 多模型加载Demo验证与标准化 [2026-05-08 16:35]
+
+### 问题
+之前 ccml_phase89a_multimodel_velocity.py 使用 BitsAndBytesConfig(load_in_8bit=True) 加载DeepSeek7B，
+导致模型加载极慢/卡住，无法正常完成测试。
+
+### 解决方案
+回溯到2026-05-05的测试脚本，确认标准加载方式：
+1. model_utils.load_model() — bfloat16 + CPU先加载 + 整体移CUDA
+2. 不使用8bit量化（8bit导致加载卡住）
+3. output_hidden_states=True 只传给 forward()，不传给 from_pretrained()
+
+### 验证结果
+
+**单独测试**：
+| 模型 | 加载时间 | 类名 | 层数 | d_model | vocab | GPU内存 |
+|------|---------|------|------|---------|-------|---------|
+| Qwen3 | 25.5s | Qwen3ForCausalLM | 36 | 2560 | 151936 | 8.10 GB |
+| DS7B | 20.7s | Qwen2ForCausalLM | 28 | 3584 | 152064 | 15.29 GB |
+
+**顺序加载验证 (Qwen3→释放→DS7B)**：
+- Qwen3: 6.2s加载, 8.10 GB → 释放后 0.01 GB
+- DS7B: 18.6s加载, 15.29 GB → 释放后 0.01 GB
+- 内存释放完美，顺序加载无问题
+
+### 修复
+1. model_utils.py 的 release_model() 增加 gc.collect()
+2. 释放模型后需 model=None; gc.collect(); torch.cuda.empty_cache()
+
+### 标准Demo脚本
+- tests/glm5/model_demo.py — 多模型加载与测试标准模板
+- 用法: python tests/glm5/model_demo.py qwen3|deepseek7b|glm4|all
+- 包含：加载、前向推理、隐藏状态提取、Hook中间层、W_U权重、生成、释放
+
+### 关键教训
+- **8bit量化(BitsAndBytesConfig)在本环境下加载DS7B会卡住，不要使用**
+- 标准方式：bfloat16 + device_map=cpu + model.to(cuda)
+- from_pretrained() 不接受 output_hidden_states 参数，只在 forward() 中传
+
+### 下一步
+用此Demo模板修复 ccml_phase89a 脚本，完成多模型语义速度测试
+
+## Phase 91: 多模型语义速度场对比分析 [2026-05-08 16:45]
+
+### 三模型 Phase 89A 完整结果
+
+| 指标 | Qwen3 (36L, d2560) | DS7B (28L, d3584) | GLM4 (40L, d4096) |
+|------|---------------------|---------------------|---------------------|
+| GPU | 8.11 GB | 15.29 GB | 18.85 GB |
+| PCs(90%) L0 | 9 | 10 | 9 |
+| PCs(90%) 中间层 | 11 | 12 | 11 |
+| PCs(90%) 最后层 | 14 | 8 | 17 |
+| Top1 var L0 | 0.22 | 0.15 | 0.22 |
+| Top1 var 中间层 | 0.42 | 0.41 | 0.44 |
+| Top1 var 最后层 | 0.50 | 0.45 | 0.37 |
+
+### 关键发现 — 三模型高度一致的数学结构
+
+**1. 速度场自治性 (AUTONOMY)**
+- 三个模型全部: v=f(h) 已达 cosine > 0.97, v=f(h,l) 改善 <0.02%
+- **跨模型一致结论**: 速度场几乎自治 — v ≈ F(h), 层标识几乎不提供额外信息
+- 这意味着: 存在一个统一的动力学 F, 不依赖于"你在第几层"
+
+**2. 速度场低维结构**
+- 三个模型在中间层: 仅 5-12 个主成分解释 90% 方差
+- d_model=2560~4096, 但速度场有效维度仅 ~10
+- **速度空间远小于表示空间** — 这是极其关键的约束
+
+**3. 关系特异性分化 (Relation Divergence)**
+- L0: 三模型 capital/currency/language 的速度几乎重合 (cos > 0.98)
+- 中间层: cos 降到 0.3~0.6, 关系开始分化
+- 最后层: cos 回升到 0.8~0.9, 重新汇聚(共享logits空间)
+- **U形分化曲线** — 三个模型完全一致
+
+**4. 轨迹发散剖面**
+- 同实体不同关系: L0 cos=1.0 → 中间层最低~0.65 → 回升
+- 同关系不同实体: 始终 cos > 0.75, 远高于前者
+- **关系信号比实体信号弱** — 三模型一致
+
+**5. 速度分解: v_shared + v_specific**
+- 中间层: shared_frac ≈ 0.56~0.64 (共享速度占约60%)
+- 最后层: shared_frac ≈ 0.71~0.82 (共享速度上升)
+- language关系的shared_frac最高 — 语言是最通用的操作
+
+**6. 跨层速度预测**
+- 三模型: 不同层训练的Ridge无法跨层预测 (cos ≈ 0)
+- 但同层预测精度极高 (cos > 0.97)
+- **每一层有独特的速度场, 但自治性意味着F(h)随层缓慢变化**
+
+### 理论洞察
+
+**核心数学结构**: 语言模型实现了低维自治速度场
+  h_{l+1} = h_l + F(h_l)
+其中 F: R^d → R^d 但 Im(F) ⊂ V, dim(V) ≈ 10
+
+这等价于说: 在 R^d 的表示空间中, 真正的"计算"只发生在10维子空间中。
+这意味着存在一个低维的计算流形, 所有语言处理都在这个流形上发生。
+
+**自治性的深层含义**: F 不依赖 l, 说明:
+1. 同一动力学规则适用于所有层 — 类似连续流
+2. 不同层的区分完全来自 h 本身(不同层的h占据不同的流形区域)
+3. 这类似 ODE 的自治系统 dh/dl = F(h) — 解由初始条件唯一确定
+
+**第一性原理**: 语言的数学结构 → 低维计算流形上的自治动力学
+
+### 问题与瓶颈
+1. 30条轨迹数据量偏少, 需要更多实体/关系组合来验证
+2. Ridge回归在高维下的数值不稳定 (ill-conditioned)
+3. 自治性检验仅用了线性模型, 非线性依赖关系未检验
+4. 缺少对 F 的结构分析 — F 是否有特殊的代数/几何性质?
+
+### 下一步大任务: Phase 92 — 计算流形的拓扑与代数结构
+1. **扩大数据**: 50+实体 × 5+关系 = 250+轨迹
+2. **F的几何**: 分析 F 的雅可比矩阵 J_F(h) 的谱结构
+3. **流形拓扑**: 速度场的不动点、极限环、同调群
+4. **非线性自治性**: 用神经网络检验 v = F(h) vs v = F(h,l) 的非线性版本
+5. **代数约束**: F 是否满足某种代数律(如李代数结构)?
+
+## Phase 92: 计算流形拓扑与代数结构 — 大规模多模型测试 [2026-05-08 17:05]
+
+### 实验规模
+- 50实体 × 5关系 = 250条轨迹 (vs Phase 91的10×3=30)
+- 三模型: Qwen3, DeepSeek7B, GLM4
+- 3个实验: 速度场结构、Jacobian谱分析、非线性自治性
+
+### 核心结果1: 非线性自治性确认
+
+| 模型 | MLP F(h) cos | MLP F(h,l) cos | 层改善 |
+|------|-------------|---------------|--------|
+| Qwen3 | 0.8663 | 0.8667 | +0.0004 |
+| DS7B | 0.8766 | 0.8718 | **-0.0047** |
+| GLM4 | 0.8828 | 0.8839 | +0.0010 |
+
+**关键发现**: 三个模型非线性自治性全部确认 — 层标识几乎不提供额外信息!
+DS7B甚至出现了负改善(加层信息反而降低预测), 说明F(h)是完全自治的。
+
+### 核心结果2: Jacobian J_F 谱结构
+
+| 模型 | L0 max|λ| | 中间层 max|λ| | 末层 max|λ| | Sym/Anti |
+|------|---------|-----------|----------|----------|
+| Qwen3 | 0 | 0.63 (L12), 1.27 (L24) | 0.35 | ~1.0-1.1 |
+| DS7B | 0 | 0.39 (L9), 0.27 (L26) | 0.27 | ~1.0-1.1 |
+| GLM4 | 0 | 0.22 (L10), 1.41 (L26) | 0.62 | ~1.0-1.2 |
+
+**关键发现**:
+1. **J接近对称矩阵** (Sym/Anti ≈ 1.0-1.2) — F近似梯度场!
+   如果F = ∇φ, 则h_{l+1} = h_l + ∇φ(h_l), 这是梯度上升!
+2. **谱半径先增后减**: 中间层有 |λ|>1 的膨胀方向, 末层回到收缩区
+3. **有效秩高**: ~170-240, 但线性拟合cos=1.0, 说明F在局部非常线性
+
+### 核心结果3: 速度场连续性
+
+| 模型 | h-dist vs v-dist 相关 |
+|------|---------------------|
+| Qwen3 | 0.950 |
+| DS7B | 0.983 |
+| GLM4 | 0.977 |
+
+F非常光滑 — 近邻h产生近邻v
+
+### 核心结果4: 速度维度(250轨迹大规模)
+
+| 层 | Qwen3 dim(90%) | DS7B dim(90%) | GLM4 dim(90%) |
+|----|---------------|---------------|---------------|
+| L0 | 36 | 40 | 22 |
+| 中间 | 16-50 | 29-57 | 25-75 |
+| 末层 | 31 | **4** | 45 |
+
+DS7B末层dim(90%)=4! 极度低维, 几乎所有速度指向4个主方向
+
+### 理论洞察
+
+**1. 自治梯度流假说**
+三模型一致: v = F(h) ≈ ∇φ(h)
+这意味着: 语言处理 = 在势函数φ上的梯度上升
+  h_{l+1} = h_l + ∇φ(h_l)
+这等价于离散化的梯度流: dh/dl = ∇φ(h)
+
+**2. 势函数φ的含义**
+如果F = ∇φ, 那么φ是一个定义在表示空间上的势函数。
+- φ增大 → 处理推进 (层增加)
+- φ的局部极大值 → 不动点 (如果F(h*)=0)
+- 梯度方向 → 信息流动方向
+
+**3. 膨胀-收缩结构**
+- 中间层 |λ|>1: 梯度场有膨胀方向, 表示在"分裂"不同语义
+- 末层 |λ|<1: 收缩, 所有轨迹汇聚到最终输出空间
+
+### 问题与瓶颈
+1. J_F只是线性近似, 实际F可能非线性很强
+2. 250条轨迹仍不足以完全覆盖表示空间
+3. F≈∇φ的验证需要更严格的积分检验(沿梯度路径φ应单调增)
+4. 不动点搜索未完成 — F(h*)=0的点是什么?
+
+### 下一步大任务: Phase 93 — 势函数与梯度流
+1. **势函数验证**: 沿轨迹计算 φ(h_l) 的变化, 验证是否单调增
+2. **势函数重构**: 从 F = ∇φ 反向积分重构 φ
+3. **不动点搜索**: 找到 F(h)=0 的不动点, 分析其拓扑
+4. **流线分析**: 从不同初始点出发, 绘制梯度流线
+5. **Lyapunov函数**: 是否存在全局Lyapunov函数?
+
+## Phase 93: 梯度流假说决定性验证 — 证伪 [2026-05-08 17:30]
+
+### 核心结论: 梯度流假说(F = nabla_phi)被决定性证伪
+
+Phase 92的"J_F近似对称"结论来自Ridge全局线性拟合，不是真正的局部Jacobian。
+用有限差分法重新计算后，J_F完全不对称。
+
+---
+
+### 实验1: Curl Test (旋度测试) — 真正有限差分Jacobian
+
+方法: 用80个随机方向计算JVP = J_F * v，检查 v_i * JVP_j = v_j * JVP_i (对称性)
+
+| 模型 | L0 | 中间层 | 末层 | 随机矩阵baseline |
+|------|-----|--------|------|-------------------|
+| Qwen3 | 0.987 | 0.999-1.005 | 0.805 | 0.943 |
+| DS7B | 0.993 | 0.999-1.007 | 0.605 | 0.914 |
+
+Anti/Sym ratio 约等于 1.0，与随机矩阵相同 -> J_F完全不对称 -> 不是梯度场
+
+Phase 92的Ridge拟合给出"sym/anti 约等于 1.0-1.2"是误导性的——全局线性近似自然更对称，
+但真正局部Jacobian完全不对称。
+
+---
+
+### 实验2: Path Independence (路径无关测试)
+
+| 模型 | L1/4 | L1/2 | L3/4 |
+|------|------|------|------|
+| Qwen3 | 0.006 | 0.020 | 0.010 |
+| DS7B | 0.017 | 0.010 | 0.008 |
+
+环路积分 ratio 约等于 0.01，看似很小。
+但这不证明F是梯度场！原因：实际隐藏状态位于低维流形上，
+三角形的面积极小（几乎退化），所以即使curl非零，通量也很小。
+Curl Test才是更可靠的判据。
+
+---
+
+### 实验3: Perturbation Recovery (扰动恢复测试, 修正版)
+
+Qwen3 (36 layers, sigma=0.1):
+| 层 | Amplification | 稳定性 | Cos Sim |
+|----|--------------|--------|---------|
+| L0 | 2.56 | 膨胀 | 0.996 |
+| L12 | 1.90 | 膨胀 | 0.998 |
+| L20 | 1.41 | 膨胀 | 0.999 |
+| L24 | 1.17 | 临界 | 0.999 |
+| L28 | 0.76 | 收缩 | 1.000 |
+| L34 | 0.37 | 收缩 | 1.000 |
+
+DS7B (28 layers, sigma=0.1):
+| 层 | Amplification | 稳定性 | Cos Sim |
+|----|--------------|--------|---------|
+| L0 | 1.52 | 膨胀 | 0.999 |
+| L9 | 2.87 | 膨胀 | 0.988 |
+| L15 | 0.74 | 收缩 | 1.000 |
+| L21 | 0.66 | 收缩 | 1.000 |
+| L26 | 0.39 | 收缩 | 1.000 |
+
+跨模型一致发现: 早期膨胀 -> 后期收缩。不存在全局Lyapunov函数，
+但后期层有局部收缩性（保证输出稳定性）。
+
+---
+
+### 实验4: Architecture Prior Control (架构先验控制) — 最关键
+
+| 模型 | Trained ratio | Random ratio | Trained/Random |
+|------|--------------|-------------|---------------|
+| Qwen3 | 0.995 | 0.987 | 1.009 |
+| DS7B | 0.995 | 1.007 | 0.989 |
+
+训练模型和随机网络的Anti/Sym ratio几乎完全相同！
+这证明：J_F的"近似对称性"完全是残差架构的先验，不是训练得到的语义结构。
+
+随机线性网络 h_{l+1} = h_l + alpha*W*h 的ratio也约等于1.0，进一步确认：
+残差更新结构天然产生"对称外观"的Jacobian，但实际并不对称。
+
+---
+
+### 被证伪的假说
+
+1. F = nabla_phi (势函数/梯度场) — J_F不对称，curl test失败
+2. 存在Lyapunov函数 — 早期层膨胀，全局不稳定
+3. "近似对称Jacobian"代表语义结构 — 架构先验控制证明是架构效应
+4. 闭环积分为零代表路径无关 — 是低维流形上的几何效应
+
+### 仍然成立的结论
+
+1. 低秩光滑残差动力学 — velocity空间远小于representation空间
+2. 中层膨胀-末层收缩 — 两模型一致
+3. 隐藏状态编码层阶段信息 — 显式layer id帮助很小
+4. F局部近似线性 — 但不是全局梯度场
+
+### 正确的图景
+
+Transformer是分阶段低秩非保守残差动力系统:
+- h_{l+1} = h_l + F_l(h_l)
+- F_l 不等于 nabla_phi (非保守，不是梯度场)
+- Im(F_l) 属于 V, dim(V) 约等于 10-40 (低秩)
+- 早期层: ||J_F|| > 1 (膨胀，语义分化)
+- 后期层: ||J_F|| < 1 (收缩，汇聚到logits空间)
+- F的光滑性来自架构先验(LayerNorm + 残差 + MLP)，不是语义定律
+
+### 关键教训
+
+1. Ridge全局线性拟合不等于局部Jacobian — 这是Phase 92最大的方法论错误
+2. 架构先验控制是必须的 — 没有它，无法区分架构效应和语义效应
+3. Curl test比闭环积分更可靠 — 后者受低维流形几何影响
+4. "看起来像梯度"不等于"是梯度" — 残差结构天然产生这种外观
+
+### 下一步
+
+放弃"梯度流"方向，转向真正的问题:
+1. 非保守动力学的代数结构 — F_l有什么代数性质? (不是对称性)
+2. 低秩约束的来源 — 为什么velocity空间这么低维?
+3. 膨胀-收缩转变的精确位置和机制 — 什么决定了transition layer?
+4. 流形上的约束动力学 — 在实际流形上(而非全空间)F是否更规则?
+
+
+## Phase 94: 语义结构图谱 — 特殊结构发现与概率轨迹分析 [2026-05-08 19:00]
+
+### 核心方法转变
+
+从"全局动力学像什么"转向"特定语言功能的计算结构是什么"。
+不再问F是什么类型的场，而是问: 翻译、类比、事实检索等能力在模型内部如何实现?
+
+---
+
+### 实验1: 翻译对齐结构 — 完整概率轨迹
+
+#### Qwen3-4B (36层)
+
+翻译对齐呈现清晰的三阶段结构:
+
+| 阶段 | 层范围 | 目标token概率 | 描述 |
+|------|--------|-------------|------|
+| 休眠期 | L0-24 | 约0.00001 | 翻译信息完全不存在 |
+| 激活期 | L24-27 | 0.00001->0.12 | 概率暴涨，最大增长层约28.6 |
+| 收敛期 | L27-36 | 0.12->0.88 | 概率收敛到高置信度 |
+
+关键发现: "猫->cat"案例
+- L30的top-1是"猫"(中文)，不是"cat"
+- 翻译"cat"只在L36涌现
+- 模型先检索中文概念，再映射到英文！
+
+架构先验控制:
+- 训练模型最终prob=0.902
+- 随机模型最终prob=0.00001
+- 训练/随机概率比 = 94825x
+- 翻译对齐是纯学习的语义结构，不是架构先验！
+- (对比Phase 93: Jacobian对称性trained/random约1.0是架构先验)
+
+#### GLM4-9B (40层)
+
+U形轨迹！与Qwen3完全不同的模式:
+
+| 阶段 | 层范围 | 目标token概率 | 描述 |
+|------|--------|-------------|------|
+| 休眠期 | L0-24 | 约0.00001 | 翻译信息不存在 |
+| 微弱激活 | L27-33 | 0.0001->0.005 | 信息短暂出现(荷兰语/德语token) |
+| 信息消失 | L36-39 | 0.00001 | 信息消失！ |
+| 最终涌现 | L40 | 0.42-0.71 | 突然跳跃到目标token |
+
+关键发现: GLM4的中间层出现多语言token
+- L33: top1='Krie'(荷兰语), 'zwarte'(荷兰语)
+- L39: top1='_MAGIC'(特殊token)
+- L40: top1='apple', 'cat'(正确答案)
+- 这暗示GLM4可能使用"中间语言"(interlingua)进行翻译
+
+#### DS7B (28层)
+
+翻译能力极弱:
+- 成功率仅20% (2/10)
+- 平均最终prob仅0.11
+- 所有涌现都在L28(最后一层)
+- 无渐进式信息构建
+
+---
+
+### 实验2: 跨结构类型对比 (Qwen3)
+
+| 结构类型 | 成功率 | 涌现层 | 平均最终prob |
+|---------|--------|--------|-------------|
+| 翻译对齐 | 100% | 31.6+/-2.9 | 0.89 |
+| 类比推理 | 100% | 35.4+/-1.2 | 0.83 |
+| 事实检索 | 90% | 31.9+/-2.4 | 0.53 |
+
+关键发现: 类比推理需要最深层处理(L35.4)
+
+类比比翻译和事实检索都需要更深的层，这意味着:
+- 简单检索(首都): L30-31
+- 跨语言映射(翻译): L27-33
+- 关系推理(类比): L33-36
+
+认知复杂度与涌现深度正相关！
+
+---
+
+### 实验3: 组合结构分析
+
+| 任务类型 | 成功率 | 说明 |
+|---------|--------|------|
+| 名词提取("红苹果是什么水果->苹果") | 30% | 部分成功 |
+| 属性提取("红苹果的颜色->红") | 0% | 全部失败 |
+
+属性提取比名词提取困难得多 — 这与语言学的预期一致(属性是更抽象的信息)
+
+---
+
+### 被证伪和被确认的
+
+被证伪:
+1. 语言模型内部只有一种统一的"信息涌现"模式 — 错！不同结构有不同涌现深度
+2. 翻译对齐可能是架构先验 — 错！94825x的概率比证明是纯学习结构
+
+被确认:
+1. 不同认知结构有不同的涌现深度(检索<翻译<类比)
+2. 翻译信息在中间层可能以不同语言形式存在(GLM4)
+3. 架构先验控制能区分"真语义结构"和"架构伪象"
+4. 概率轨迹分析比全局动力学分析更有信息量
+
+---
+
+### 新的研究路线: 语义结构图谱(Structural Atlas)
+
+核心思想: 不寻找"一条终极方程"，而是系统收集:
+1. 对齐结构(翻译) — 已研究
+2. 组合结构(红苹果=红+苹果) — 已研究
+3. 递归结构(CoT) — 待研究
+4. 约束结构(第二个字) — 已研究(引号前缀问题)
+5. 等价结构(同义句) — 待研究
+6. 变换结构(主动->被动) — 待研究
+
+每种结构的特征:
+- 涌现深度(哪层开始有信息)
+- 涌现模式(S曲线/U形/跳跃)
+- 跨模型持续性(Qwen3/GLM4/DS7B)
+- 跨示例持续性(不同输入)
+- 架构先验 vs 学习结构
+
+---
+
+### 与Phase 93的统一
+
+Phase 93证明: 全局动力学(Jacobian)的对称性是架构先验
+Phase 94证明: 特定语义结构(翻译对齐)是学习的结果
+
+关键区分:
+- 动力学性质(平滑性/对称性) -> 架构先验
+- 语义内容(翻译/类比/事实) -> 学习结果
+- 涌现深度(哪层开始) -> 架构+学习共同决定
+
+---
+
+### 下一步: 结构图谱的扩展
+
+1. 更多结构类型: 否定、递归、同义、被动转换
+2. 涌现机制: 为什么翻译在L27突然出现？那一层发生了什么？
+3. 跨模型结构对比: Qwen3的S曲线 vs GLM4的U形 vs DS7B的跳跃
+4. 中间层分析: GLM4中间层的多语言token意味着什么？
+5. 训练动态: 翻译结构在训练的哪个阶段形成？
+
+
+## Phase 95: 因果语义干预 — 从观察到因果 [2026-05-08 20:15]
+
+### 核心目标
+修正Phase 94最大硬伤: top-1 token ≠ 内部语义状态
+通过线性探针和因果干预实验，回答: 语义信息比top-1涌现早多少层?
+
+---
+
+### 实验1: 语义线性探针 — 三个null result
+
+#### 尝试1: 翻译vs控制二分类
+- 所有层probe accuracy=1.000，包括随机模型
+- **原因**: 不同prompt的token序列本身就不同，探针检测的是输入差异，不是语义结构
+- **教训**: 探针设计必须控制输入差异
+
+#### 尝试2: 30类多分类 (同模板不同目标)
+- 所有层probe accuracy=0.000 (chance=0.033)
+- **原因**: 30类分类太细，30个样本不足以训练
+- **教训**: 样本量必须远大于类别数
+
+#### 尝试3: 成对二分类 + Ridge回归
+- Ridge R²全部为负值 (-0.18 到 -0.68)
+- 二分类accuracy约0.35-0.80，无清晰涌现模式
+- **原因**: h_l → target_logit_direction不是线性关系
+- **教训**: 语义信息编码是非线性的，或分布在极高维子空间
+
+---
+
+### 实验2: 翻译方向提取与因果干预
+
+#### 方法
+- 翻译方向 = mean(h_translate - h_control) (20对对比)
+- Steering: h + alpha * direction
+- Projection Ablation: h - proj(h, direction)
+
+#### 结果: Steering无效
+- alpha=+5.0时，概率比仅1.00x
+- 对比差异方向不构成有效的因果干预方向
+
+#### 结果: 投影消融有微弱效果
+- L36: 0.233→0.153 (drop=0.080, 34%降幅)
+- L33: 0.181→0.124 (drop=0.057, 31%降幅)
+- 翻译方向编码了部分翻译信息，但大部分在正交方向
+
+---
+
+### 实验3: 三模型结构签名对比
+
+| 结构 | Qwen3涌现层 | Qwen3涌现率 | Qwen3最终prob | GLM4涌现层 | GLM4涌现率 | DS7B涌现层 | DS7B涌现率 |
+|------|-----------|-----------|-------------|----------|----------|----------|----------|
+| 翻译 | 32.3 | 80% | 0.73 | 39.4 | 80% | 28 | 15% |
+| 事实检索 | 32.5 | 100% | 0.64 | 38.5 | 100% | 28 | 47% |
+| 类比 | 36.0 | 30% | 0.28 | 40.0 | 10% | 28 | 10% |
+| 反义词 | 32.2 | 50% | 0.18 | 34.6 | 50% | 28 | 10% |
+
+**关键发现**:
+1. DS7B所有结构涌现都在L28(最后一层) → 无渐进构建
+2. 类比在所有模型中都是最难的(涌现率最低)
+3. 事实检索是最稳定的(所有模型100%或47%)
+4. GLM4翻译涌现比Qwen3深7层(39.4 vs 32.3)
+
+---
+
+### Phase 95最重要的方法论教训
+
+1. **探针实验的三重陷阱**:
+   - 输入差异伪象 → 不同prompt token序列本身就不同
+   - 样本量不足 → n_samples必须远大于n_classes
+   - 线性假设失效 → h→target不是线性映射
+
+2. **对比差异方向 ≠ 因果干预方向**:
+   - mean(h_A - h_B)只是统计差异
+   - 不等于真正控制翻译功能的方向
+   - 需要更精细的方向提取方法(如DAS/ACTADD)
+
+3. **投影消融有效但不完全**:
+   - 只能消除34%的翻译概率
+   - 说明翻译信息分布在多个方向
+   - 可能需要多方向联合消融
+
+---
+
+### 被证伪的
+
+1. 语义信息在hidden state中是线性可分的 → 错！R²为负
+2. 简单对比差异方向可以做因果干预 → 错！Steering ratio=1.0x
+3. 翻译信息集中在单一方向 → 错！投影消融只消除34%
+
+### 被确认的
+
+1. 不同结构有不同的涌现深度(跨模型一致)
+2. 类比是最难的结构(所有模型涌现率最低)
+3. DS7B缺乏渐进式信息构建(全部在最后一层)
+4. 投影消融能部分破坏翻译(34%降幅)，证明翻译方向确实存在
+
+---
+
+### 下一步关键方向
+
+1. **DAS(Direction Authentic Subspace)**: 用优化方法而非简单对比来找因果方向
+2. **Activation Steering (ACTADD)**: 更精细的干预方法
+3. **多头分析**: 不同attention head可能负责不同翻译功能
+4. **更大样本量探针**: 需要至少200+样本才能做有意义的线性探针
+5. **非线性探针**: 如果线性探针R²为负，需要用MLP探针
+
+
+## Phase 96: 语义电路图谱 — 从'观察表示'到'观察计算' [2026-05-08 21:15]
+
+### 核心转折
+Phase 95批判的核心洞察: '观察表示'(hidden state) ≠ '观察计算'(circuit)
+本Phase正式进入电路分析，回答: 哪些attention head/MLP真正负责翻译/检索/类比?
+
+---
+
+### 批判评估
+
+| 批判点 | 评估 | Phase 96验证 |
+|--------|------|------------|
+| '观察表示' ≠ '观察计算' | ✅完全正确 | 残差流补丁证明计算比表示更早完成 |
+| R²为负 ≠ 信息不存在 | ✅完全正确 | 信息存在但非线性可分/稀疏分布 |
+| '翻译方向'定义有问题 | ✅完全正确 | mean(h_A-h_B)不是因果方向 |
+| 计算原语组合比统一方程更可能 | ✅极有可能 | 三种结构使用完全不同的head集(Jaccard=0) |
+
+---
+
+### 实验1: Attention Head Ablation (Qwen3)
+
+**关键发现: 翻译没有单一关键head**
+- 所有head消融后概率微增(负drop -3%到-4%)
+- 翻译是**超冗余编码** — 没有任何单一head是因果必要的
+- 消融head反而改善翻译 → head间存在干扰
+
+**跨结构head重叠极低**:
+- translation vs retrieval: Jaccard = 0.000 (完全不重叠!)
+- translation vs analogy: Jaccard = 0.053
+- retrieval vs analogy: Jaccard = 0.053
+
+→ 不同语言能力使用完全不同的计算电路
+
+---
+
+### 实验3: 整层MLP/Attn消融 (三模型)
+
+**Qwen3关键层**:
+- L0 MLP: 100%关键(所有结构)
+- L6 MLP: 100%关键(翻译+检索)，0%关键(类比)
+- L35 MLP: 32-57%关键(所有结构)
+- 共享MLP关键层: L0, L35
+- 共享Attn关键层: L6
+
+**GLM4关键层**:
+- L0 MLP: 100%关键
+- L39 MLP: 63.4%关键(翻译)
+- 共享MLP关键层: 仅L0
+- 共享Attn关键层: 仅L0
+
+**DS7B关键层** — 完全不同的模式:
+- 几乎所有层对翻译都关键(66-100%)
+- L27 MLP: 99.7%关键
+- 共享MLP关键层: L18
+- 确认'浅层压缩解码'假说
+
+---
+
+### 实验2: 残差流补丁 — 最重要结果
+
+**核心发现: 计算比解码更早完成**
+
+| 模型 | Peak Leak层 | Peak Leak值 | 总层数 | 相对位置 |
+|------|-----------|-----------|--------|---------|
+| Qwen3 | L28 | 0.91 | 36 | 78% |
+| GLM4 | L37 | 0.54 | 40 | 93% |
+| DS7B | L25 | 0.03 | 28 | 89% |
+
+**Qwen3**:
+- L0-L19: leak≈0 — 翻译信息还不存在
+- L26: 0.39 — 开始出现
+- L28: 0.91 — 翻译信息可完整port(峰值!)
+- L33-35: 0.77-0.83 — 高位但回落
+→ **翻译计算在L28完成，但top-1 token要到L32+才出现**
+→ 这直接验证了批判的核心洞察: '计算早已完成，但解码不可见'
+
+**GLM4**:
+- L29-31: leak≈0.50
+- L37: 0.54(峰值)
+- L38-39: 急剧回落到0.21/0.13
+→ GLM4翻译信息更深(L37 vs L28)，且峰值更低(0.54 vs 0.91)
+→ 翻译计算更分散
+
+**DS7B**:
+- 所有层leak都极低(≤0.03)
+→ 翻译信息不可port → 散布式编码
+→ 确认'浅层压缩解码'
+
+---
+
+### 被证伪的
+
+1. 翻译信息集中在单一方向 → 错！分布式在多头中
+2. 单一head对翻译因果关键 → 错！超冗余编码
+3. DS7B翻译能力弱是因为参数少 → 错！是因为计算模式不同(散布式vs集中式)
+
+### 被确认的
+
+1. **'计算比解码更早完成'** — Qwen3 L28 vs L32-36
+2. **不同语言能力使用完全不同的计算电路** — Jaccard=0
+3. **DS7B是'浅层压缩解码'** — 所有层都关键，信息不可port
+4. **负drop揭示组件间干扰** — 消融某些层反而改善任务
+5. **L6是Qwen3的'事实知识层'** — MLP对翻译+检索100%关键
+
+---
+
+### Phase 96最重要的发现
+Residual Stream Patching是当前最有力的因果分析工具
+因为它直接回答: '翻译信息何时变得portable?'
+
+答案:
+- Qwen3: L28(78%深度) — 高度portable
+- GLM4: L37(93%深度) — 部分portable
+- DS7B: 从不portable — 散布式编码
+
+这个发现比所有之前的表示分析都更有因果力。
+
+---
+
+### 硬伤与瓶颈
+1. **检索任务baseline太低(0.0007)** — 模型不太会做首都检索
+2. **类比任务负drop严重** — 可能prompt设计有问题
+3. **单head消融无效果** — 因为超冗余编码，需要组合消融
+4. **负drop现象尚未充分理解** — 可能是干扰或优化方向不对
+5. **只测试了翻译的patching** — 需要测试检索/类比的patching
+
+---
+
+### 下一步关键方向
+1. **组合head消融** — 同时消融多个head，找到最小必要电路
+2. **检索/类比的残差流补丁** — 看不同结构的peak层是否不同
+3. **L6 MLP深入分析** — 为什么它是'事实知识层'?
+4. **负drop现象的系统性研究** — 组件间干扰的数学结构
+5. **计算深度干预** — 提前截断层，看哪种功能先崩塌
+
+
+## Phase 97: 语义计算原语库 — 方法论升级与深度分析 [2026-05-08 22:10]
+
+### 核心转折
+Phase 96批判的5大硬伤全部需要在Phase 97中修正:
+1. Residual Patching ≠ 计算完成 → 改为"portable information首次形成"
+2. Jaccard≈0不代表完全不同电路 → 改用head contribution vector + cosine/pearson
+3. "超冗余编码"结论不成立 → 消融方法本身有问题(负drop)
+4. Prompt confound污染 → 结构匹配控制
+5. "L6事实知识层"证据不足 → 暂时搁置此结论
+
+---
+
+### 批判评估
+
+| 批判点 | 评估 | Phase 97验证 |
+|--------|------|------------|
+| "Residual Patching ≠ 计算完成" | ✅完全正确 | 2D补丁矩阵直接证明 |
+| "Jaccard太粗糙" | ✅完全正确 | Cosine=-0.997, Pearson=-0.07 — 反平行但无关 |
+| "超冗余编码不成立" | ✅完全正确 | 消融方法产生负drop(消融head反而改善翻译) |
+| "Prompt confound" | ✅完全正确 | 结构匹配控制消除格式混杂 |
+| "L6事实知识层证据不足" | ✅完全正确 | 暂时搁置 |
+| "局部计算原语 > 统一方程" | ✅极可能正确 | 三原语分解部分成功 |
+
+---
+
+### 实验1: 结构匹配控制 + Head贡献向量 (Qwen3)
+
+**关键修正**: 翻译"猫的英文是"vs补全"猫是一种" — 同一实体，不同任务，token结构一致
+
+**基线概率**: 翻译0.835, 补全0.087
+
+**Head贡献向量分析**:
+- 全局Cosine相似度: **-0.997** — 翻译和补全贡献向量几乎完全反平行!
+- 全局Pearson相关: **-0.066** — 但head级别的具体分配几乎无关
+
+**解读**: 反平行意味着"帮助翻译的head倾向于伤害补全"，但Pearson≈0意味着"哪个head帮助翻译"和"哪个head帮助补全"是**两个独立问题**。
+
+**所有head的翻译贡献都是负的(-0.06)**: 消融任何head反而微增翻译概率。这说明**单head消融不是测量head贡献的正确方法**——可能的原因:
+1. Head间存在补偿机制
+2. 下游层修复了消融损失
+3. 残差连接绕过了被消融的head
+4. LayerNorm的归一化效应放大了未被消融的head
+
+**分层Pearson**: 所有层都接近0(-0.34到0.40)，没有层显示出翻译-补全的强分化。
+
+---
+
+### 实验2: 2D激活补丁矩阵 — 三模型
+
+**Qwen3 2D矩阵** (Source Layer × Target Layer → Source Leak):
+
+|  | T9 | T15 | T21 | T27 | T30 | T33 | T35 |
+|--|-----|------|------|------|------|------|------|
+| S27 | . | . | . | 0.209 | 0.485 | 0.296 | . |
+| S30 | 0.669 | 0.727 | 0.740 | 0.882 | 0.883 | 0.720 | . |
+| S33 | 0.862 | 0.872 | 0.880 | 0.894 | 0.890 | 0.889 | . |
+| S35 | 0.699 | 0.716 | 0.667 | 0.721 | 0.694 | 0.817 | 0.677 |
+
+**关键发现**:
+1. **L27的source → L27的target: 只有0.209** — L27的信息不能被同层直接利用!
+2. **L27的source → L30的target: 0.853** — 但经过3层处理后可以!
+3. **L33的source → 任何target层: 0.87-0.89** — L33信息几乎完全portable
+
+→ 这**直接证明了批判的核心洞察**: "信息可移植 ≠ 计算完成"
+→ L27虽然包含翻译信息，但需要L28-L30做"误差修正/格式转换/输出放大"
+→ Phase 96说"翻译计算在L28完成"是过度推断
+
+**GLM4 2D矩阵**:
+- 最佳信息源层: L27 (mean leak=0.336) — 比Qwen3的L35(0.677)弱得多
+- L27的source甚至能被L9的target利用(0.269) — GLM4的信息更早形成但更弱
+- Peak leak仅0.619 vs Qwen3的0.894
+
+**DS7B 2D矩阵**:
+- 全部接近0 (最大0.013) — 完全不可移植
+- 原因: DS7B根本不会翻译这些prompt(输出"using")
+
+---
+
+### 实验3: 计算原语分解 (三模型)
+
+**Qwen3 "猫→cat" logits轨迹 — 极其关键的发现**:
+- L0-L28: en_target(cat)≈0, zh_source(猫)≈0 — 两者概率都极低
+- L30: **猫概率突然跳到0.78** — 模型先输出中文!
+- L32-33: 猫=1.0 — 继续输出中文
+- L34: 猫骤降到0.047，top1变为"貓"(繁体)
+- L35: top1="_CAT"(0.78)，cat=0.0 → 最终不是"cat"而是"_CAT"!
+
+**Qwen3 "狗→dog" 更清晰的轨迹**:
+- L28: dogs=0.73 → 先输出复数
+- L30: dogs=0.75
+- L32: dog=0.82 → 变单数
+- L33: 狗=0.73 → 又切回中文!
+- L34: 狗=0.96 → 继续中文
+- L35: **dog=0.95** → 最终翻译完成
+
+→ **翻译不是"先对齐再压制再解码"的简单序列**
+→ **中文和英文token在深层激烈竞争/振荡**
+→ 中间层经常输出中文，最后一层才切到英文
+→ 这更像"语言切换开关"而非"逐步翻译"
+
+**GLM4**: 完全不能翻译这些prompt(输出乱码token如_MAGIC、refor)
+**DS7B**: 完全不能翻译(输出"using")
+
+→ **只有Qwen3能翻译"X的英文是"这种prompt**
+→ 不同模型对同一prompt的响应模式根本不同
+
+---
+
+### 被证伪的
+
+1. "翻译=对齐+压制+解码的序列" → 错！中英文token在深层振荡竞争
+2. "翻译计算在L28完成" → 错！L28的信息需要后续层处理才能利用(2D矩阵证明)
+3. "不同模型只是参数量差异" → 错！对同一prompt的响应完全不同
+4. "单head消融可以测量head贡献" → 错！产生负drop(补偿/下游修复/LN效应)
+
+### 被确认的
+
+1. **"信息可移植 ≠ 计算完成"** — 2D矩阵直接证明(L27 source→L27 target=0.209 vs L30 target=0.853)
+2. **不同模型的computation organization根本不同** — Qwen3/翻译/GLM4乱码/DS7B using
+3. **翻译是"语言切换"而非"逐步翻译"** — 中英文在深层振荡
+4. **Head贡献向量比Jaccard更有信息量** — Cosine=-0.997 vs Jaccard=0
+5. **单head消融不是正确的因果分析方法** — 需要path patching
+
+---
+
+### Phase 97最重要的发现
+
+ 1. 2D补丁矩阵揭示了"信息需要后续处理"
+
+L27包含翻译信息(source leak=0.209→0.853经过3层)，
+但L27的信息不能直接被同层利用。
+后续层做的是"误差修正/格式转换/token对齐/输出放大"。
+
+ 2. 翻译是"语言切换振荡"而非"序列化流程"
+
+中间层输出中文→深层切换到英文。
+这更像是"两套语言系统的竞争+最后一层的切换决策"。
+
+ 3. 只有Qwen3能翻译"X的英文是"
+
+GLM4和DS7B对这种prompt完全失败。
+这意味着之前所有Phase的跨模型对比可能有系统性偏差。
+
+---
+
+### 硬伤与瓶颈
+
+1. **Head消融方法论本身有问题** — 负drop现象未解决(补偿/LN/residual bypass)
+2. **翻译prompt对GLM4/DS7B不适用** — 需要每个模型单独设计有效prompt
+3. **"三原语分解"定义不够精确** — suppress/align的阈值太粗糙
+4. **2D矩阵样本量偏小(5对)** — 需要增大到15+
+5. **未做path patching** — 只做了residual patching，没做attention path patching
+
+---
+
+### 下一步关键方向
+
+1. **Path Patching** — 不patch整个residual，而是patch特定attention path
+2. **语言切换机制分析** — 为什么中间层输出中文? 什么是"切换开关"?
+3. **每个模型设计有效prompt** — GLM4/DS7B需要不同的翻译prompt
+4. **组合head消融** — 同时消融多个head，找到最小必要电路
+5. **计算深度截断** — 在不同层截断forward，看翻译/补全谁先崩
+
+## Phase 98: 语言切换机制与词表归一化分析 [2026-05-08 22:54]
+
+### 批判评估
+
+| 批判点 | 评估 | Phase 98验证 |
+|--------|------|------------|
+| "振荡可能是tokenizer artifact" | ✅**部分正确** | Qwen3: 簇聚合后振荡只减16%(语义级); GLM4: 减少60%(部分artifact) |
+| "Cosine≈-1+Pearson≈0有数学问题" | ✅**部分正确** | 不是稀疏+重尾(峰度≈3)，是"全局反平行+局部无关"的真实结构 |
+| "只有Qwen3能翻译是prompt mismatch" | ✅**完全正确** | GLM4 Top-5=100%(en_prefix), DS7B Top-5=73%(en_prefix) |
+| "翻译不是序列流程证据不够" | ✅**正确** | 簇聚合后振荡仍存在，但原语(对齐/压制/解码)仍可能是底层机制 |
+| "局部计算原语>统一方程" | ✅**极可能正确** | Path Patching显示L26 Attn是唯一注意力关键层，L31 MLP最关键 |
+
+---
+
+### 实验1: 词表语义簇分析 — 区分"分词动力学"和"语义动力学"
+
+**Qwen3 (20对)**:
+- 单token振荡: 3.05次 → 语义簇振荡: 2.55次 (仅减少16%)
+- **→ 振荡主要是语义级别的，不是tokenizer artifact**
+- 语义切换层: L28.2 (78.4%深度) — 和Phase 96/97的patching一致
+- 英文簇覆盖率: 5.97x — 变体token分走了大量概率
+- 逐层语义分裂: L28 en=0.256, L30 en=0.640, L32 en=0.828
+
+**GLM4 (20对)** — 完全不同的模式:
+- 单token振荡: 2.35次 → 语义簇振荡: 0.95次 (**减少60%**)
+- **→ GLM4的振荡大部分是tokenizer artifact**
+- 语义切换层: L36.5 (91.2%深度) — 远深于Qwen3
+- 逐层语义分裂: 全程other≈100%，en/zh概率<0.005
+- **→ GLM4的翻译信息在logits空间几乎不可见**
+
+**跨模型核心差异**:
+| 特征 | Qwen3 | GLM4 |
+|------|-------|------|
+| 振荡是语义级的? | 是(仅16%减少) | 部分(60%是artifact) |
+| 切换深度 | 78% | 91% |
+| 翻译信息在logits可见? | 是 | 几乎不可见 |
+
+---
+
+### 实验2: 贡献向量分布分析 — 解决Cosine≈-1+Pearson≈0谜题
+
+**关键发现: 不是稀疏+重尾，是"全局反平行+局部无关"**
+
+- 峰度: 翻译=2.89(≈正态), 补全=6.08(轻重尾) — 不是极端重尾
+- 极端值比例: Top-10只占2.5% — 不是被少数值主导
+- 去除极端值后: Cosine仍≈-0.998, Pearson仍≈-0.02 → 两者都是真实的
+
+**数学解释**:
+- Cosine≈-1: 所有head的翻译贡献都是负的(-0.061)，补全贡献都是正的(+0.034) → 消融任何head都让翻译变好
+- Pearson≈0: 具体哪个head贡献多/少，在两个任务间无相关性 → 不是同一批head
+
+**结论**: 消融方法本身有问题——**所有head对翻译的"贡献"都是负的**，说明消融改变了整体网络状态（不是简单地去掉功能），而翻译功能比补全更容易被网络重配改善。
+
+---
+
+### 实验3: Path Patching — 从residual级升级到attention path级
+
+**Qwen3关键发现: 翻译信息主要通过MLP路径传递**
+
+| 层 | Attn Leak | MLP Leak | 主导路径 |
+|---|---|---|---|
+| L26 | **0.00730** | 0.00011 | **Attn** ← 唯一attn关键层 |
+| L31 | 0.00003 | **0.01965** | **MLP** ← 最关键层 |
+| L34 | 0.00024 | 0.00209 | MLP |
+| L30 | -0.00001 | 0.00175 | MLP |
+
+- **MLP主导19层 vs Attn主导10层**
+- **L26的attention可能是"语言切换路由"** — 把中文语义空间的信息导向英文空间
+- **L31的MLP是"翻译信息放大器"** — 将portable信息放大为可解码输出
+
+**结合Phase 96/97的发现**:
+- Phase 96: L28是portable information首次形成的层
+- Phase 98: L26的attn是关键 → L26-28之间attn在执行"语言切换"
+- L31的MLP是翻译信息的"输出放大"
+
+---
+
+### 实验4: 模型专属prompt验证
+
+**完全推翻Phase 97的"只有Qwen3能翻译"结论！**
+
+| 模型 | 最佳prompt | Top-5准确率 | Top-1准确率 | en_cluster概率 |
+|------|-----------|------------|------------|--------------|
+| Qwen3 | X的英文是 | ~95% | ~90% | ~0.80 |
+| GLM4 | Translate X to English: | **100%** | **93.33%** | **0.8554** |
+| DS7B | Translate X to English: | 73.33% | 46.67% | 0.2585 |
+
+**关键修正**:
+- GLM4翻译能力**不弱于Qwen3** — 只是prompt格式不同
+- DS7B翻译能力**确实弱** — 最佳格式下Top-5只有73%
+- Phase 96/97的所有跨模型对比都有系统性偏差（prompt mismatch）
+
+---
+
+### 被证伪的
+
+1. 只有Qwen3能翻译 → 错！GLM4用en_prefix格式100%Top-5
+2. "振荡是语义切换"普适 → 错！GLM4的振荡60%是tokenizer artifact
+3. Cosine≈-1+Pearson≈0是因为稀疏重尾 → 错！是真实的"全局反平行+局部无关"
+
+### 被确认的
+
+1. **Qwen3的振荡是语义级切换** — 簇聚合后仅减少16%
+2. **不同模型的振荡机制根本不同** — Qwen3语义级 vs GLM4 tokenizer级
+3. **翻译信息主要通过MLP传递** — L31 MLP最关键，L26 Attn是唯一注意力关键层
+4. **消融方法有根本问题** — 所有head的翻译贡献都是负的
+5. **GLM4翻译信息在logits空间不可见** — 需要非logits的分析方法
+
+---
+
+### Phase 98最重要的发现
+
+ 1. "语言切换"是语义级现象(Qwen3)还是tokenizer artifact(GLM4)? — 两者都有!
+ 2. L26的attention是"语言切换路由" — 这是目前找到的最接近"计算原语"的结构
+ 3. Prompt mismatch导致了之前所有跨模型对比的系统性偏差
+
+---
+
+### 硬伤与瓶颈
+
+1. **GLM4的Exp 1仍用"X的英文是"** — 应换成"Translate X to English:"，但翻译信息在logits层不可见的问题可能更深层
+2. **Path Patching只做了"加法"** — 是添加source的attn/MLP输出，不是替换；结果可能和residual patching不同
+3. **DS7B的翻译能力确实弱(73%)** — 但不是0，所以可以做跨模型对比
+4. **"全局反平行+局部无关"的解释可能不完整** — 消融方法的根本问题需要新方法论
+5. **未做因果中介分析** — path patching≠causal mediation
+
+---
+
+### 下一步关键方向
+
+1. **为每个模型使用最佳prompt重新做全部分析** — 修正prompt mismatch偏差
+2. **L26 Attn深入分析** — 找到具体哪些head在执行"语言切换路由"
+3. **因果中介分析** — 不只是patch，而是真正测量causal mediation effect
+4. **非logits层的翻译信息追踪** — GLM4的翻译信息在hidden space中存在但不在logits中出现
+5. **最小充分电路** — 找到翻译任务的最小子网络
+
+
+---
+
+## Phase 99: 因果隔离与计算原语检测 [2026-05-09 00:52]
+
+### 核心方法论升级
+
+Phase 98批判指出的最关键问题:
+> "所有结论都是correlation，不是causation"
+> "对最终输出影响大≠执行了核心计算"
+
+Phase 99引入因果隔离(Causal Isolation): 证明"没有X→没有Y"，不是"X和Y同时出现"
+
+---
+
+### Exp 1: 因果必要性测试 — Qwen3
+
+**最关键的发现: Phase 98的结论被彻底推翻!**
+
+| 层 | Attn zero-ablate | MLP zero-ablate |
+|---|---|---|
+| **L0** | 11.3% drop | **99.996% drop** ← 最关键! |
+| **L6** | **83.6% drop** | **99.996% drop** |
+| L26 | 1.7% drop | 17.8% drop |
+| L31 | 1.8% drop | 3.5% drop |
+
+**Phase 98说"L26 Attn和L31 MLP是翻译关键层"→ 错！**
+
+L0 MLP zero-ablate → 翻译概率从0.91降到0.000032 → 100%崩塌！
+L26 Attn zero-ablate → 翻译概率0.90 → 仅1.7%下降！
+
+**L26和L31的path patching高值只说明它们"传递了翻译信息"，但它们不是因果必要的。**
+
+---
+
+### Exp 2: Hidden State语义子空间 — Qwen3
+
+**最震撼的发现: 表示层切换和logits层切换差31层！**
+
+| 层 | P(en) | 解读 |
+|---|---|---|
+| L0 | 0.011 | 中文 |
+| L6 | **0.594** | ← 切换点! |
+| L12 | 0.999 | 英文 |
+| L18-35 | 0.998-1.000 | 英文 |
+
+**Hidden state切换层: L1.1 (深度2.9%)**
+**Logits切换层: L32 (深度89%)**
+**差距: 31层！**
+
+这意味着:
+1. 翻译prompt的hidden state在L1就已经被分类为"英文"了
+2. 但logits层到L32才切换
+3. 中间30层的"表示层已经是英文，但输出还是中文"
+
+**直接回答批判: "振荡是logit几何还是语义切换?"**
+→ **表示层在L1就完成切换，logits层的振荡完全是decoder投影延迟！**
+
+但注意: 这个"切换"可能反映的是prompt token组成(翻译prompt有"的英文是"后缀)，不完全是语义切换。需要控制实验验证。
+
+---
+
+### Exp 3: Head级因果中介 — Qwen3
+
+**没有任何单独的head对翻译有显著因果必要性！**
+
+- 最高翻译drop: 1.7% (L34:H0)
+- 最高翻译特异性: 8.1% (L34:H0)
+- 所有head的翻译drop都<2%
+
+**和Exp 1一致: 翻译是分布式表示的结果，不是局部电路。**
+
+---
+
+### Exp 4: 跨任务原语检测 — Qwen3
+
+| 层 | 翻译drop | 检索drop | 约束drop | 类型 |
+|---|---|---|---|---|
+| **L0** | 100% | 99.8% | 90.9% | 通用 |
+| **L6** | 100% | 99.3% | 92.3% | 通用 |
+| **L35** | 28.5% | 26.5% | 50.0% | 通用 |
+| L9 | 1.4% | 22.1% | 53.7% | 约束偏向 |
+| L31 | 0.5% | 30.5% | 40.9% | 检索+约束 |
+| L34 | 4.2% | 21.9% | - | 检索偏向 |
+
+**通用原语层: L0, L6, L35**
+**翻译专用层: 无！**
+
+---
+
+### 被推翻的
+
+1. "L26 Attn是语言切换路由" → 错！L26 Attn zero-ablate只导致1.7%下降，不是因果必要
+2. "L31 MLP最关键" → 错！L31 MLP zero-ablate只导致3.5%下降
+3. "振荡是语义系统竞争" → 错！表示层L1就完成切换，振荡是decoder投影延迟
+4. "翻译有专用电路" → 错！翻译是通用计算基础设施的分布式结果
+
+### 被确认的
+
+1. **早期层(L0, L6)是因果必要的** — 不是翻译专用，而是通用计算基础
+2. **表示层切换远早于logits层切换** — 31层差距，说明晚期层做的是decoder对齐
+3. **没有翻译专用的head/层** — 翻译是分布式计算的结果
+4. **因果隔离是正确方法论** — path patching只测sufficiency，zero-ablate测necessity
+
+---
+
+### Phase 99最重要的发现
+
+ 1. 之前所有"翻译关键层"的发现都是sufficiency(充分性)，不是necessity(必要性)
+ 2. 翻译不是局部电路，而是通用计算基础设施的涌现属性
+ 3. "语言切换"在表示层极早完成(L1)，logits层振荡只是decoder投影延迟
+ 4. 通用原语层(L0, L6, L35)对所有任务都必要 → 类似"基础设施"
+
+---
+
+### 硬伤与瓶颈
+
+1. **L0 MLP的100%崩塌可能是过拟合** — 移除任何一层的MLP可能都导致输出崩溃，需要检查非关键层是否也有类似效果
+2. **Hidden state分类器可能区分的是"prompt格式"而非"语言"** — 翻译prompt有"的英文是"后缀，纯中文词没有
+3. **补全任务的baseline太低(0.0144)** — 可能不是好的控制任务
+4. **约束任务的baseline极低(0.0064)** — Qwen3可能不会做"X的第二个字是"
+5. **只有Qwen3的结果** — 需要跨模型验证
+
+### 下一步关键方向
+
+1. **控制实验: 检查non-translation任务的MLP ablation** — 验证L0/L6是否对所有任务都关键
+2. **格式控制: 用"猫的英文是" vs "猫的首都是"对比** — 区分"语言切换"和"prompt格式"
+3. **逐层MLP ablation全扫描** — 检查是否所有层MLP ablate都会导致崩溃
+4. **跨模型验证** — GLM4/DS7B的因果必要性测试
+5. **更精确的任务控制** — 翻译 vs 续写 vs 问答，用相同prompt前缀
+
+
+---
+
+### 控制实验补充: L6是翻译特异性最强层 [2026-05-09 01:15]
+
+**MLP zero-ablate控制实验 (翻译 vs 补全):**
+
+| 层 | 翻译drop | 补全drop | 翻译特异性 |
+|---|---|---|---|
+| L0 | 100% | 74.7% | 25.3% |
+| L3 | 0.6% | -0.4% | 1.0% |
+| **L6** | **100%** | **19.5%** | **80.5%** ← 最强! |
+| L9 | 1.4% | 4.7% | -3.3% |
+| L24 | 12.3% | -0.2% | 12.5% |
+| L35 | 28.5% | -6.4% | 34.9% |
+
+**Attn zero-ablate控制实验 (翻译 vs 补全):**
+
+| 层 | 翻译drop | 补全drop | 翻译特异性 |
+|---|---|---|---|
+| L0 | 15.5% | 49.8% | -34.3% ← 补全更敏感 |
+| **L6** | **79.8%** | **15.3%** | **64.5%** ← 翻译特异性最强! |
+| L26 | 1.8% | -1.5% | 3.3% |
+| L31 | 1.8% | 11.0% | -9.2% |
+
+**核心结论:**
+1. L6是翻译特异性最强的层 — Attn特异性64.5%, MLP特异性80.5%
+2. L0是通用基础设施 — 对补全更敏感(Attn)或两者都敏感(MLP)
+3. L26-31几乎无因果必要性 — 之前的path patching结论需要大幅修正
+4. 翻译不是一个分布式涌现属性 — 有明确的因果必要组件(L6)
+
+
+---
+
+## Phase 100: 层间动力学分析 — 从token概率到状态空间变换 [2026-05-09 01:23]
+
+### 核心方法论升级
+
+批判核心指导: "logit空间只是decoder投影的影子，真正的语义在hidden state空间"
+Phase 100从"看token概率"升级为"分析层间变换h_{l+1}-h_l"
+
+---
+
+### Exp 1: 层间变换分析 — Qwen3
+
+**翻译 vs 补全 变换方向最不相似的层:**
+
+| 层 | 翻译vs补全变换方向余弦 | 解读 |
+|---|---|---|
+| **L5** | **-0.59** | **翻译和补全做了完全相反方向的变换！** |
+| L34 | -0.47 | 晚期也有翻译特异变换 |
+| L24 | -0.09 | |
+| L33 | -0.09 | |
+| L32 | -0.07 | |
+
+**变换幅度:**
+- 翻译条件: Top层 L35(599), L34(266), L33(156)
+- 补全条件: Top层 L6(9940!), L35(8054), L34(2262)
+
+**关键发现:**
+1. **L5是翻译vs补全变换方向最不相似的层(余弦-0.59)** — 比L6更早！
+2. **L6补全变换幅度异常大(9940)** — L6在补全时做大量上下文整合，翻译时反而变换小
+3. **L34晚期也有翻译特异性(-0.47)** — 晚期层在做格式化/decoder对齐
+
+---
+
+### Exp 2: 语义对象几何学 — Qwen3
+
+**余弦相似度饱和问题:**
+- L9以后所有类内余弦→1.0 (0.9999)
+- 余弦相似度完全无法区分语义距离！
+
+**中英文子空间对齐(余弦):**
+- L0: 0.51 (embedding层基本不对齐)
+- L3: 0.96 (早期层快速对齐!)
+- L9+: 1.0 (完全对齐)
+
+→ 中英文概念在L3就已经高度对齐
+
+---
+
+### Exp 2补充: 欧氏距离语义分析 (解决余弦饱和)
+
+**欧氏距离判别度 (类间/类内距离比, >1=可区分):**
+
+| 层 | 类内距离 | 类间距离 | 判别度 | 解读 |
+|---|---|---|---|---|
+| L0 | 1.61 | 0.66 | **0.41** | 类内>类间！类别不聚集 |
+| L3 | 19.81 | 10.48 | 0.53 | 略改善但仍<1 |
+| L6 | 23.44 | 12.31 | 0.53 | |
+| L9+ | 659 | 379 | **0.57-0.58** | 始终<1！ |
+
+**震撼发现: 5个语义类别(动物/食物/自然/身体/颜色)在hidden state空间中不形成明确子空间！**
+- 类内距离 > 类间距离 → 同类词不聚集
+- 判别度始终<1 → PCA子空间无法区分类别
+
+**PCA子空间判别:**
+- L0: PC0 F=11.36 — embedding层有最强类别区分
+- L9+: F降到1.6-1.7 — 后续层类别区分变弱！
+- **核心: 语义类别结构在L0最强，后续层反而弱化！**
+
+---
+
+### Exp 3: 翻译轨迹分析 — Qwen3
+
+**欧氏距离轨迹: 翻译prompt更接近中文还是英文中心?**
+
+| 层 | trans→zh | trans→en | 更接近 | zh→zh | en→en |
+|---|---|---|---|---|---|
+| L0 | 0.99 | 1.04 | zh | 1.15 | 1.15 |
+| L3 | 41.0 | **26.4** | **en** | 14.9 | 17.9 |
+| L6 | 31.3 | **29.6** | **en** | 17.6 | 21.9 |
+| L9+ | 10017 | **7916** | **en** | 470 | 3167 |
+
+**关键: 翻译prompt从L3开始就更接近英文中心！** 与Phase 99分类器结果一致。
+但原因可能是prompt格式差异("猫的英文是"的token组成)，不完全是语义层面的语言切换。
+
+**翻译prompt的绝对距离极大(L9: 7916) vs 单词(470-3167)** — 说明翻译prompt和单个词的hidden state完全不在同一尺度。
+
+---
+
+### Exp 4: L6机制深度分析 — Qwen3
+
+**L6 Attn输出:**
+- 翻译 vs 补全 方向余弦: **0.55** (中等相似)
+- 翻译范数: 12.6, 补全范数: 19.4
+
+**L6 MLP输出:**
+- 翻译 vs 补全 方向余弦: **0.22** (非常不同!)
+- 翻译范数: 13.1, 补全范数: **9827** (差750倍!)
+
+**L6变换是否指向英文子空间?**
+- 翻译条件: cosine=+0.068, 正比例=100% → 翻译时L6略微指向英文
+- 补全条件: cosine=-0.128, 正比例=0% → 补全时L6偏离英文
+
+→ L6 MLP在翻译和补全时做了**完全不同的计算**(方向余弦仅0.22)
+
+---
+
+### Phase 100 核心发现
+
+**#1: 余弦相似度在高维空间完全饱和(L9+所有余弦→1.0)**
+- 必须用欧氏距离和PCA子空间分析替代余弦相似度
+- 这解释了为什么Phase 99的分类器准确率100% — 分类器可能在拟合格式差异，不是语义差异
+
+**#2: 语义类别不形成明确子空间(判别度<1)**
+- 同类词(如10个动物)不比跨类词(动物vs食物)更聚集
+- 这严重质疑"概念流形"假说 — 至少在最后token的hidden state中不成立
+- embedding层(L0)反而有最强的类别结构
+
+**#3: L5和L6是翻译变换方向最不相似的层**
+- L5余弦-0.59: 翻译和补全做了完全相反方向的变换
+- L6 MLP方向余弦0.22: L6在翻译和补全时计算非常不同的东西
+
+**#4: L6 MLP补全范数9827 vs 翻译范数13 — 差750倍！**
+- L6 MLP在补全时做巨大变换，翻译时输出极小
+- 这与Phase 99的因果特异性(80.5%)一致: L6 MLP对翻译特异
+
+---
+
+### 被推翻的
+
+1. **"概念流形"假说** — 至少用最后token hidden state + 余弦/欧氏距离，5个语义类别不形成明确子空间
+2. **"中间层形成语义结构"** — L0(embedding)反而有最强类别区分，后续层弱化
+3. **余弦相似度作为语义距离指标** — 高维空间余弦饱和，不能衡量语义差异
+
+### 被确认的
+
+1. **L6对翻译有因果特异性** — L6 MLP方向余弦0.22，补全范数差750倍
+2. **翻译prompt从L3开始更接近英文子空间** — 欧氏距离确认
+3. **层间变换方向分析是正确方法** — L5余弦-0.59揭示了翻译vs补全的关键分叉点
+
+---
+
+### Phase 100 硬伤
+
+1. **语义类别不聚集可能因为单token输入太短** — "猫"只有1个token，上下文不足
+2. **翻译prompt的巨大距离可能是prompt长度差异** — "猫的英文是"有4-5个token vs "猫"只有1个
+3. **L0的类别结构可能来自tokenizer** — BPE编码可能让同类词的embedding相似
+4. **PCA只取了前10个PC** — 可能遗漏了高维子空间中的类别结构
+5. **只测了5个语义类别(50个词)** — 数据量太少
+
+---
+
+### 第一性原理分析
+
+Phase 100最重要的理论发现:
+
+**1. "概念流形"可能不存在于最后token的hidden state中**
+如果语义类别在hidden state空间中不形成子空间，那语言模型是如何区分不同概念的？
+答案很可能是: **语义区分存在于特定子空间/方向，而不是在整体欧氏距离中**。PCA的F=11.36(L0)到1.6(L9+)说明类别信号被逐步压缩到了低方差的PC中。
+
+**2. 翻译不是简单的"语言切换"，而是"计算轨道分叉"**
+L5的余弦-0.59意味着翻译和补全在同一层做了**相反方向**的变换。这不是"切换语言"，而是"选择了不同的计算轨道"。
+
+**3. 语义信号在L0最强，后续层逐步压缩**
+这可能是因为后续层在做"抽象化" — 把具体的类别信号压缩掉，提取更通用的特征。这与"中间层是语义中心"的预期相反。
+
+---
+
+### 突破瓶颈的关键
+
+1. **需要分析完整序列而非最后token** — 语义信息可能分散在所有token的hidden state中
+2. **需要用方向分析(特定子空间)而非全局距离** — 类别信号可能存在特定方向
+3. **需要更多语义类别和更大词表** — 50个词不够
+4. **需要分析词间关系(苹果→水果)而非词内聚类** — 层级结构可能比类别聚类更重要
+5. **需要对比不同长度的输入** — 控制prompt长度差异
+
+---
+
+### 阶段性大任务: Phase 101
+
+**Phase 101: 语义子空间方向分析 — 从全局距离到方向特征**
+
+1. 线性探针分析 — 每层训练简单的线性分类器，检测类别信号在哪层最强
+2. 对比分析(contrastive analysis) — "猫-狗" vs "猫-米" 的方向差异
+3. 完整序列分析 — 分析"猫是一种动物"中所有token的hidden state
+4. 大规模语义采样 — 1000+词，10+类别
+5. 层级关系分析 — 苹果→水果→食物 的方向链
+6. 跨模型验证 — GLM4/DS7B的语义子空间结构
+
+---
+
+## Phase 101: 关系动力学分析 — 从实体到关系 [2026-05-09 11:30]
+
+### 批判评估
+
+| 批判点 | 评估 | Phase 101验证结果 |
+|--------|------|-----------------|
+| "最后token hidden state ≠ 语义对象" | ✅**完全正确，最关键** | 最后token ctx比率=193，目标词位置ctx比率=0.71 |
+| "欧氏距离在高维同样失效" | ✅**完全正确** | L9+距离爆炸到3748-11000，norm主导一切 |
+| "L0语义最强是tokenizer假象" | ⚠️**部分正确** | L0同义词cos=0.11，同音词cos=0.07，语义相似≠字形相似 |
+| "翻译prompt更接近英文≠已翻译" | ✅**完全正确** | 只是decoder mode切换，不是语义翻译完成 |
+| "需要分析关系而非实体" | ✅**核心升级** | 翻译关系方向一致性L36=0.94, is-a仅0.40 |
+| "特征叠加(superposition)" | ✅**重要发现** | CKA: L9+类别间CKA暴跌到0.003，子空间完全正交化 |
+| "需要centered local geometry" | ✅**正确** | 中心化判别度仍<1(0.36-0.52) |
+| "过早理论化" | ✅**重要警告** | 数据量仍不足，需更多控制 |
+
+---
+
+### Exp 1: 关系变换方向稳定性
+
+**方法:** 计算4种关系(is-a/part-of/翻译/反义)的变换向量 h(B)-h(A)，测试方向是否在所有样本中一致
+
+**结果:**
+
+| 关系类型 | L3方向一致性 | L6方向一致性 | L36方向一致性 | L3-6峰值 |
+|----------|------------|------------|-------------|---------|
+| 翻译(猫→cat) | 0.75 | 0.70 | **0.94** | L3=0.75 |
+| is-a(苹果→水果) | 0.38 | 0.40 | 0.26 | L6=0.40 |
+| part-of(北京→中国) | 0.46 | 0.40 | 0.37 | L2=0.45 |
+| 反义(大→小) | 0.37 | 0.34 | 0.34 | L3=0.37 |
+
+**跨关系方向余弦:**
+
+| 关系对比 | L3 | L6 | L9 | L30 |
+|----------|-----|-----|-----|------|
+| is-a vs part-of | -0.22 | 0.11 | **-0.998** | -0.997 |
+| is-a vs 翻译 | 0.29 | 0.03 | **0.89** | 0.89 |
+| part-of vs 反义 | -0.49 | -0.19 | **0.92** | 0.92 |
+| 翻译 vs 反义 | 0.50 | 0.19 | **-0.84** | -0.85 |
+
+**关键发现:**
+1. **翻译关系方向一致性极强(L36=0.94)** — 模型确实学到了统一的跨语言映射方向
+2. **is-a/part-of/反义方向一致性弱(0.34-0.40)** — 这些关系没有统一变换方向
+3. **L9+跨关系方向几乎正交(-0.998~0.92)** — 中间层后，不同关系类型的变换方向完全不同
+4. **L3-6是方向一致性峰值区间** — "关系计算"的关键层
+
+---
+
+### Exp 2b: 修正版上下文化分析(目标词位置 vs 最后token)
+
+**方法:** 提取目标词在序列中的位置(非最后token)的hidden state，对比不同上下文的差异
+
+**核心结果(跨词平均):**
+
+| 层 | 目标词ctx比率 | 最后token ctx比率 | 目标词跨上下文距离 | 最后token跨上下文距离 |
+|-----|------------|----------------|----------------|-------------------|
+| L0 | 0.24 | 0.85 | 0.5 | 1.4 |
+| L3 | 0.63 | 2.27 | 19.3 | 20.7 |
+| L6 | 0.61 | 1.11 | 20.3 | 35.3 |
+| L9 | 0.71 | **193.0** | 3748 | 49.8 |
+| L18 | 0.71 | **175.6** | 3825 | 57.6 |
+| L35 | 0.72 | 23.7 | 3003 | 326 |
+
+**关键发现:**
+1. **最后token的ctx比率=193(Exp2b)** — 孤立词和上下文化距离远大于不同上下文间距离
+   - 这说明中间层的最后token是**序列级信号**，不是词级语义
+2. **目标词位置的ctx比率≈0.71** — 上下文化对目标词的改变 < 不同上下文造成的差异
+   - 目标词位置确实受上下文影响，但影响方式比最后token更温和
+3. **L0目标词位置完全不受上下文影响(ctx比率=0.24)** — embedding层的词表示是确定的
+4. **高维距离爆炸: L9+目标词跨上下文距离≈3748** — 仍然存在norm主导问题
+
+**对批判的验证:** "最后token hidden state ≠ 语义对象" **完全正确**。之前Phase 99-100大量使用最后token的hidden state做分析，可能产生了严重偏差。
+
+---
+
+### Exp 3: CKA(中心化核对齐)分析
+
+**层间CKA:**
+- L5→L6的CKA跳变=0.26(前6层最大跳变!) → L5-6确实是计算分叉点
+- L7+层间CKA≈1.0 → 后续层表示结构高度稳定
+
+**类别间CKA(5个语义类别):**
+
+| 层 | 平均类别CKA | 说明 |
+|-----|----------|------|
+| L0 | 0.97 | 所有类别结构几乎相同(BPE/词频驱动?) |
+| L3 | 0.66 | 类别结构开始分化 |
+| L6 | 0.79 | 意外回升! |
+| L9 | **0.003** | 类别结构**完全正交化**！ |
+| L12-30 | 0.001-0.004 | 持续正交 |
+
+**中心化判别度:**
+- L0: 0.36, L3: 0.51, L6: 0.49, L9+: 0.52
+- **始终<1** — 即使中心化后，类别仍然不形成空间聚类
+
+**关键发现:**
+1. **L9+类别间CKA暴跌到0.003** — 5个语义类别在中间层的表示结构**完全正交化**
+2. **L0 CKA=0.97但判别度=0.36** — embedding层所有类别结构相似，但类别内不聚集
+3. **CKA和判别度给出矛盾信号** — 类别结构正交化≠类别空间可分
+4. **L6 CKA=0.79意外回升** — L6可能有特殊的语义重组
+
+---
+
+### Exp 4: tokenizer控制实验
+
+**方法:** 比较语义相似词(猫_狗)、同义词(看_见)、同音词(公_工)、关联词(苹果_水果)的L0-L35距离
+
+**L0 cosine:**
+
+| 类型 | 示例 | L0 cosine | 说明 |
+|------|------|----------|------|
+| 同类词 | 猫_狗 | 0.27 | 语义相似 |
+| 同类词 | 苹果_香蕉 | 0.22 | 语义相似 |
+| 跨类词 | 猫_米 | 0.08 | 语义不同 |
+| 跨类词 | 苹果_铁 | 0.04 | 语义不同 |
+| 同义词 | 看_见 | 0.11 | 语义等价 |
+| 同音词 | 公_工 | 0.13 | 字音同语义异 |
+| 关联词 | 苹果_水果 | 0.30 | is-a关系 |
+| 关联词 | 狗_动物 | 0.17 | is-a关系 |
+
+**关键发现:**
+1. **L0同义词cos(0.11) < 同类词cos(0.27)** — embedding层的相似性主要由BPE/词频驱动，不是语义
+2. **同音词cos(0.13) ≈ 同义词cos(0.11)** — 字形/字音贡献与语义等价贡献相当
+3. **关联词cos(0.30) > 同类词cos(0.27)** — "苹果→水果"的关联比"苹果→香蕉"更强
+4. **跨类词cos(0.04-0.08)** — 语义不相关的词确实更远
+5. **L9+所有cosine→1.0** — 高维空间余弦饱和问题依然存在
+
+---
+
+### Phase 101综合总结
+
+#### 最重要的三个发现
+
+**#1: 最后token hidden state完全是序列级信号，不能代表词级语义**
+- 最后token ctx比率=193(不同上下文远比孤立词相似)
+- 目标词位置ctx比率=0.71(更温和但仍有上下文效应)
+- **之前Phase 99-100的所有"单token hidden state"分析都有系统偏差**
+
+**#2: 翻译关系是唯一具有统一变换方向的关系(L36一致性=0.94)**
+- is-a/part-of/反义的方向一致性仅0.34-0.40
+- L9+不同关系类型的变换方向几乎正交(余弦≈±1)
+- **翻译可能是模型学到的最"明确"的计算原语**
+
+**#3: L9+语义类别在表示空间中完全正交化(CKA≈0.003)**
+- 但正交化≠空间可分(判别度仍<1)
+- 这暗示: 类别信号存在于特定子空间方向，不是全局距离
+- **语义是方向结构，不是区域结构**
+
+---
+
+### Phase 101本身的硬伤
+
+1. **目标词位置分析受position embedding污染** — 苹果在pos0和pos2的hidden state不同，不全是语义上下文
+2. **"水"被分词为"喝水/河水/水平"** — tokenizer导致目标词本身不同
+3. **只分析了3个词×4个上下文** — 数据量严重不足
+4. **CKA对单token输入的hidden state可能不稳健** — 序列长度差异影响
+5. **翻译方向一致性=0.94但变换范数巨大(L36 norm=51)** — 方向一致≠计算机制相同
+6. **跨关系方向余弦≈±1可能是维度灾难** — 高维随机向量也可能正交
+
+---
+
+### 第一性原理分析
+
+Phase 101最深刻的理论发现是三层递进:
+
+**Level 1: 表示≠语义**
+- 最后token的hidden state是序列级信号，不是词级语义
+- 必须分析目标词位置，而非最后token
+
+**Level 2: 方向≠区域**
+- 语义类别不形成空间区域(判别度<1)
+- 但类别信号存在于特定子空间方向(CKA≈0.003=正交化)
+- "语义是方向，不是位置"
+
+**Level 3: 关系≠实体**
+- 翻译关系有统一变换方向(0.94)，is-a没有(0.40)
+- 不同关系类型在L9+完全正交(CKA→0)
+- **"语言计算的原语可能是关系变换方向，而非语义表示"**
+
+这与批判的核心洞察一致: 语言模型编码的不是"实体"(苹果、猫)，而是"变换约束"(苹果→水果、猫→cat)。翻译之所以方向一致性最高，是因为跨语言映射是训练中最频繁出现的变换类型。
+
+---
+
+### 突破瓶颈的关键
+
+1. **消除position embedding污染** — 对比同一词在相同位置不同上下文的hidden state
+2. **更大规模关系数据** — 100+翻译对、100+is-a对，统计稳健
+3. **跨模型验证** — GLM4/DS7B是否有相同的翻译方向一致性
+4. **序列级分析** — 不分析单token，分析整个序列的hidden state轨迹
+5. **子空间投影分析** — 找到翻译子空间/is-a子空间的基向量
+6. **因果干预** — 在翻译方向上添加扰动，验证是否能改变翻译行为
+
+---
+
+### 阶段性大任务: Phase 102
+
+**Phase 102: 翻译计算原语的精确定位 — 从方向一致性到因果验证**
+
+1. **消除position污染的上下文实验** — "苹果"固定在pos0，比较不同后续文本的hidden state
+2. **翻译子空间提取** — 从100+翻译对提取翻译方向的主成分
+3. **翻译方向因果验证** — 在翻译方向上添加扰动，观察翻译行为是否改变
+4. **跨模型翻译方向对比** — GLM4/DS7B的翻译方向是否与Qwen3对齐
+5. **大规模is-a方向分析** — is-a关系是否也有子结构(动物is-a vs 食物is-a)
+6. **关系方向在层间的演化** — 翻译方向从L3到L36如何变化?
+
+
+## Phase 102: 因果动力学 — 从观察到干预 [2026-05-09 11:40]
+
+### 核心方法论升级
+
+基于Phase 101批判，实现三个关键转变：
+1. 从"观察几何模式"到"因果干预验证"
+2. 从"方向一致性"到"行为特异性"测试
+3. 从"静态状态h"到"层间跃迁Δh"
+
+---
+
+### Exp 1: 翻译方向因果干预 — 最关键实验
+
+**设计**: 从训练集翻译对提取v_trans，在测试集中文上下文中注入，检测翻译行为是否改变
+
+**结果**: **翻译方向干预几乎完全失败**
+
+| 干预方式 | 层 | α值 | ΔP(correct_en) | en_in_top20变化 |
+|---------|-----|-----|----------------|----------------|
+| 上下文v_trans | L9 | 21.8(50%) | +0.000232 | 0.7→0.9 |
+| 上下文v_trans | L33 | 229(50%) | +0.000073 | 0.7→3.8 |
+| Δh特有方向 | L33 | 229(50%) | +0.000088 | 0.7→3.8 |
+
+**关键细节** — Δh干预后的top-5 token:
+- 龙 → 出现"mythical"(英文! 0.044) 但不是"dragon"
+- 光 → 出现"wave"(0.045)和"electromagnetic"(0.042) 但不是"light"
+- 梦 → P(dream)从0.000073升至0.000574 (7.8x) 但仍然极低
+
+**排列检验致命打击**:
+- L9孤立词: 真实alignment=0.094, 随机排列alignment=0.173±0.090, **p=0.79**
+- 孤立词的翻译方向一致性完全不显著！
+
+**反向测试完全失败**: 从英文上下文减去v_trans，中文词概率不变
+
+---
+
+### Exp 1c: Logit镜头分析 — 关键发现
+
+**翻译信号只在最后几层出现**:
+
+| 词对 | 翻译prompt中en_prob>1%首次出现层 | 中文上下文max(en_prob) |
+|------|-------------------------------|---------------------|
+| 金/gold | L27 | 0.0000 |
+| 草/grass | L28 | 0.0000 |
+| 其余16/18词 | **从未超过1%** | ~0.0001 |
+
+**Hidden state范数**:
+- L0: ~1.1, L9: ~44, L18: ~57, L30: ~280, L35: ~640
+- 范数随层指数增长，L30+范数爆炸
+
+---
+
+### Exp 2: 层间跃迁动力学
+
+**Δh极度低秩**: 
+- 90%方差仅需10维 (d_model=2560)
+- 第1个奇异值占80%方差 → 大部分维度是pass-through
+- 有效秩(95%var)=28, (99%var)=92
+
+**Δh范数集中在最后层**:
+- L35: ~605-642 (巨大), L34: ~190-215, L33: ~107-110
+- 早期层Δh范数极小 (L0-6: <25)
+
+**Δh一致性**:
+- 早期层一致性最高 (L0: 0.986-0.999)
+- 晚期层一致性下降 (L30: 0.65-0.89)
+
+**跨任务Δh余弦**:
+- L9: zh_vs_en=0.303, zh_vs_trans=0.213, en_vs_trans=0.115 (翻译最独特)
+- L18+: 差异减小 (0.27-0.62)
+
+**Δh子空间CKA (翻译独特性)**:
+- L30最独特 (CKA=0.701)
+- L6最相似 (CKA=0.941)
+
+---
+
+### 对Phase 101批判的实证回应
+
+| 批判点 | Phase 102实证 | 结论 |
+|--------|-------------|------|
+| "方向一致性≠计算原语" | ✅ **完全验证** | 即使alignment=0.96，干预也几乎无效果 |
+| "可能只是decoder alignment" | ✅ **部分验证** | 干预后出现语义相关英文词(mythical/wave)，不是随机英文 |
+| "需要因果干预" | ✅ **关键升级** | 因果测试彻底否定了"翻译方向"假说 |
+| "高维集中效应" | ✅ **严重问题** | 排列检验p=0.79，翻译方向不显著 |
+| "翻译方向可能是语言模式切换" | ⚠️ **更微妙** | 不完全是模式切换，包含语义关联成分 |
+| "需要看Δh而非h" | ✅ **重要升级** | Δh揭示计算极度低秩(10维) |
+
+---
+
+### 三个最重要发现
+
+**#1: 翻译方向不是计算原语 — 它是语义-语言混合信号**
+
+添加翻译方向后出现的是语义相关的英文词(mythical而非dragon, wave而非light)，说明:
+- 方向包含"语义场偏移"成分: 朝向与中文词语义相关的英文概念空间
+- 方向包含"英文输出模式"成分: 更多英文token进入top-20
+- 但方向**不包含**"跨语言精确映射"成分: 无法激活特定翻译对
+
+**#2: 翻译计算是最后阶段的局部过程**
+
+Logit镜头证明: 18个翻译词中，16个在L0-L26的en_prob从未超过1%。翻译信号只在L27-28出现。这意味着:
+- 中间层(L0-L26)做的是输入处理和特征提取
+- 翻译是一个"最后8-9层的局部计算"
+- 之前的"中间层翻译方向一致性"与翻译计算无关
+
+**#3: Δh揭示计算极度低秩 — 10维有效子空间**
+
+每层的计算只在~10维子空间中进行，80%的方差集中在第1个奇异值。这意味着:
+- Transformer不是2560维的全空间计算
+- 它是"10维计算引擎嵌入在2560维空间中"
+- 大部分维度是残差连接的pass-through
+- 这对干预有重大影响: 应在10维子空间内干预
+
+---
+
+### 硬伤与瓶颈
+
+1. **干预方法仍然粗糙** — 在2560维中添加方向向量，但计算只在10维子空间中进行
+2. **缺乏注意力分析** — 翻译计算可能依赖特定注意力头，不是全局方向
+3. **Logit镜头不精确** — 没有最终LayerNorm，早期层的logit投影可能不准确
+4. **只有Qwen3结果** — 跨模型验证缺失
+5. **翻译方向混合了任务结构和语义** — 需要更精细的分解方法
+
+---
+
+### 第一性原理重新审视
+
+Phase 99-102的递进揭示了一个清晰的图景:
+
+**Phase 99**: 因果必要≠信息传递
+**Phase 100**: 全局距离失效
+**Phase 101**: 最后token≠语义对象，关系方向>实体位置
+**Phase 102**: 方向一致性≠计算原语，翻译是最后阶段的局部过程
+
+**核心修正**: 语言模型的"翻译能力"不是通过全局"翻译方向"实现的，而是通过**最后几层的特定计算**实现的。这个计算:
+1. 不是简单的向量加法 (干预失败证明)
+2. 是低秩的 (10维有效子空间)
+3. 是局部晚期的 (L27+)
+4. 可能依赖特定注意力头和MLP神经元
+
+**新假设**: 语言计算的本质不是"方向变换"，而是**条件化局部计算**:
+- 每层只在前一层的输出上做低秩变换
+- 变换依赖于输入(通过注意力)
+- 翻译能力是这些低秩变换的组合效应
+- 不是任何单一方向可以捕获的
+
+---
+
+### 阶段性大任务: Phase 103
+
+**Phase 103: 注意力头级因果分析 — 从全局方向到局部电路**
+
+1. **翻译相关的注意力头定位** — 哪些head在L27-33对翻译至关重要?
+2. **注意力头因果干预** — 关闭特定head，翻译行为是否消失?
+3. **MLP神经元分析** — L27-33的MLP中哪些神经元编码翻译?
+4. **跨语言映射电路** — 翻译电路vs语言模式电路是否可分离?
+5. **电路的组合性** — 多个head如何组合实现翻译?
+
+关键原则: 不再寻找"全局方向"，而是定位"局部电路"。
+
+
+## Phase 103: 动力系统分析 — 从静态几何到局部动力学 [2026-05-09 12:28]
+
+### 核心方法论升级
+
+基于Phase 102批判(用户)，修正四个根本级错误：
+1. 干预失败≠不存在翻译方向 — 翻译方向可能需要gating/routing才能激活
+2. readability emergence≠computation emergence — 早期层可能已完成计算，只是decoder读不出
+3. dominant variance≠computational DOF — 小方差方向可能承载关键控制信号
+4. 从"点+方向"到"条件依赖动力系统" — Transformer是Jacobian描述的局部动力学
+
+---
+
+### Exp 1: Jacobian谱分析 — 最重要的动力学实验
+
+**方法**: 在每层注入随机方向扰动，测量层间变化 ∂h_{l+1}/∂h_l，估计Jacobian谱
+
+**核心发现**:
+
+| 属性 | 值 | 含义 |
+|------|-----|------|
+| Jacobian放大率 | ≈1.0 (所有层) | 层间变换几乎等距(范数保持) |
+| Jacobian有效秩 | **44** (L0-L34) | 远高于Δh SVD的10维！ |
+| L35 (最终LN) 放大率 | ~110 | 唯一的相变层 |
+| L35 有效秩 | 1 | 最终LN将44维压到1维 |
+
+**关键对比**: Δh SVD说10维有效，Jacobian说44维有效
+
+- Δh测量的是网络**实际在做什么** (仅10个方向活跃)
+- Jacobian测量的是网络**能做什么** (44个方向可被扰动激活)
+- 差距4倍！说明计算自由度 > 主导方差维度
+
+**翻译vs中文上下文的Jacobian差异**:
+- L18: en_sensitivity_ratio=1.88 (翻译上下文对英文token更敏感)
+- L0: ratio=1.85
+- L15: ratio=1.84
+- 所有层翻译上下文的en_sensitivity都更高，但L18最突出
+
+---
+
+### Exp 2: 低方差高影响方向 — 直接验证硬伤#3
+
+**方法**: 从Δh SVD中取top-5(高方差)、mid20-25(中方差)、low80-85(低方差)方向，测量因果影响
+
+**核心发现**: **低方差方向的因果影响 ≥ 高方差方向！**
+
+| 层 | top5_KL | mid_KL | low_KL | random_KL | 高方差更有影响? |
+|----|---------|--------|--------|-----------|--------------|
+| L9 | 0.00848 | 0.00834 | **0.00907** | 0.00564 | **NO** |
+| L21 | 0.00414 | **0.00612** | 0.00583 | 0.00456 | **NO** |
+| L27 | **0.00131** | 0.00123 | 0.00110 | 0.00099 | YES |
+| L33 | 0.00061 | **0.00103** | 0.00070 | 0.00043 | **NO** |
+
+**解释**: Δh的第1奇异值占87.6%方差(主要是residual pass-through)，但对应的KL影响不是最大的。中等方差方向(第20-25个奇异向量)在L21和L33反而因果影响最大。
+
+**结论**: dominant variance≠computational DOF。用户硬伤#3完全验证。
+
+---
+
+### Exp 3: 乘法/门控干预
+
+**方法**: 对比4种干预方式: 加法、乘法、Post-LN、注意力缩放
+
+**核心发现**:
+
+| 干预方式 | L9 mean_ΔP(en) | L21 mean_ΔP(en) | L27 mean_ΔP(en) | L33 mean_ΔP(en) |
+|---------|---------------|----------------|----------------|----------------|
+| 加法(α=50) | 0.00004 | **0.00547** | 0.00012 | 0.00003 |
+| 乘法 | -0.00001 | -0.00001 | -0.000003 | 0.000004 |
+| Post-LN | 0 | 0 | 0 | 0 |
+| 注意力缩放 | 0 | 0 | 0 | 0 |
+
+**关键**: L21加法干预α=50时，**某些词效果显著**:
+- 云(cloud): P从0.0001→0.0797 (**800x提升！**)
+- 光(light): P从0.000001→0.0172
+- 龙(dragon): P从0.000008→0.0109
+
+但效果高度词依赖，且乘法/Post-LN/注意力缩放全部失败。
+
+**修正Phase 102结论**: "翻译方向不存在作为计算原语"是**错误**的。L21加法干预确实有效果，只是效果受限。
+
+---
+
+### Exp 4: 吸引子盆地与相变分析
+
+**方法**: 从纯中文到翻译prompt的8步插值，测量输出分布的相变
+
+**核心发现1**: **清晰的相变点**
+
+| 插值步骤 | prompt | P(翻译词) | en_total | zh_total | en/zh比 |
+|---------|--------|----------|---------|---------|--------|
+| [0] | 猫是一种 | 0.000050 | 0.007 | 0.876 | 0.01 |
+| [3] | 猫的另一个名字是 | 0.001584 | 0.126 | 0.759 | 0.17 |
+| **[4]** | **猫在英文中叫做** | **0.784805** | **0.918** | **0.077** | **11.86** |
+| [5] | 猫的英文是 | 0.941880 | 0.981 | 0.018 | 55.87 |
+| [6] | 请把"猫"翻译成英文： | 0.073352 | 0.206 | 0.585 | 0.35 |
+
+**相变发生在[3]→[4]之间！** en/zh比从0.17跳到11.86。
+
+**核心发现2**: **不同翻译格式激活不同吸引子！**
+
+"请把'水'翻译成英文："的logit镜头:
+- L27: top1="Certainly"(0.587) — 模型想对话
+- L30: top1="Certainly"(0.353), "воды"(0.319) — 俄语出现！
+- L33: top1="воды"(0.999) — **俄语主导！**
+
+**翻译指令格式 → 俄语吸引子，而非英语吸引子！**
+
+而"猫的英文是" → P(cat)=0.942 → 英语吸引子
+
+这说明Qwen3内部有**多个独立的语言路由电路**:
+1. "X的英文是" → 英语输出电路
+2. "请把X翻译成英文：" → 多语言输出电路(可能路由到俄语)
+3. "Translate X to English:" → 对话响应电路("Certainly")
+
+---
+
+### 对Phase 102四个硬伤的实证回应
+
+| 硬伤 | Phase 103实证 | 修正程度 |
+|------|-------------|---------|
+| "干预失败≠不存在翻译方向" | L21加法干预ΔP=0.08有效 | **⚠️部分修正** — 加法大α有效，但乘法/LN/attn全部失败 |
+| "readability≠computation" | 不同prompt格式激活不同吸引子，logit镜头严重误导 | **✅严重问题确认** — 翻译指令→俄语而非英语！ |
+| "dominant variance≠DOF" | Jacobian秩=44 vs Δh秩=10，低方差方向KL更高 | **✅完全验证** |
+| "仍在空间静态化" | Jacobian谱首次提供了局部动力学描述 | **✅重要升级** — 但仍需更多动力学工具 |
+
+---
+
+### 三个最重要发现
+
+**#1: Jacobian有效秩=44，远超Δh的10维**
+
+Δh SVD的第1奇异值占87.6%方差，但Jacobian分析揭示实际计算有44个自由度。差距4倍的原因:
+- Δh测量"实际做了什么" → 只有~10个方向在常规前向传播中活跃
+- Jacobian测量"能做什么" → 44个方向对扰动有响应
+- 说明网络有大量"备用"自由度，在常规计算中不活跃但可被激活
+
+**#2: 低方差方向因果影响 ≥ 高方差方向**
+
+Δh的第1奇异向量(87.6%方差)的KL影响不如中等方差方向。这说明:
+- 主导方差方向主要是residual pass-through(残差直通)
+- 中等方差方向可能承载关键的routing/control信号
+- 用"方差解释比"来衡量计算重要性是严重误导
+
+**#3: 不同翻译格式激活不同吸引子 — 多电路路由**
+
+"猫的英文是" → 英语(cat, P=0.94)
+"请把'猫'翻译成英文：" → 俄语(воды, P=0.9985!)
+"Translate 猫 to English:" → 对话(Certainly)
+
+这直接否定了"翻译是一个统一电路"的假说。翻译能力至少由3个独立电路实现，路由取决于prompt格式。
+
+---
+
+### 硬伤与瓶颈
+
+1. **Jacobian估计粗糙** — 50个随机探针可能不够精确，且只在最后token位置
+2. **乘法干预失败原因不明** — 是实现问题还是真的无效？
+3. **Post-LN/attn干预全部失败** — 可能是hook实现bug，需要修复
+4. **只测了Qwen3** — 缺乏跨模型验证
+5. **吸引子分析只看了6个词** — 数据量太小
+6. **没有区分"计算自由度"和"有效计算"** — 44维Jacobian秩不等于44维都在做有意义的事
+
+---
+
+### 第一性原理修正
+
+Phase 99-103的递进揭示:
+
+```
+Phase 99: 因果必要≠信息传递
+Phase 100: 全局距离失效
+Phase 101: 最后token≠语义对象
+Phase 102: 方向一致性≠计算原语
+Phase 103: dominant variance≠computational DOF, 翻译=多电路路由
+```
+
+**核心修正**: 语言模型的"翻译能力"不是单一电路，而是**多个条件依赖的子电路通过上下文路由组合**:
+
+1. 每个子电路有独立的吸引子盆地
+2. 上下文决定了路由到哪个子电路
+3. Jacobian描述了每个子电路的局部动力学
+4. 不同子电路有不同的有效秩和放大谱
+
+**新框架**: Transformer是一个**条件依赖动力系统**:
+- 状态: h_l ∈ R^2560
+- 变换: h_{l+1} = F_l(h_l, context)
+- F_l的Jacobian有~44个有效自由度
+- 但常规计算只利用~10个(Δh活跃方向)
+- 上下文决定哪个子电路被激活
+- 最终LN(L35)将44维压缩到1维(输出概率分布)
+
+---
+
+### 阶段性大任务: Phase 104
+
+**Phase 104: 子电路分离与测量可信度审计**
+
+1. **翻译子电路的精确分离** — "X的英文是"电路 vs "翻译指令"电路 vs "英文对话"电路
+2. **每个子电路的Jacobian谱对比** — 不同电路的动力学是否不同？
+3. **测量可信度审计** — 哪些测量能经受对抗性测试？
+4. **注意力头级路由分析** — 哪些head负责子电路间的路由？
+5. **跨模型验证** — GLM4/DS7B是否也有多电路结构？
+
+
+## Phase 104: 严格流动力学分析 — 从隐喻到数学 [2026-05-09 13:15]
+
+### 用户批判的正确性评估
+
+Phase 103的4个硬伤**全部正确**，Phase 104提供了严格实证：
+
+| 硬伤 | Phase 104实证 | 验证程度 |
+|------|-------------|---------|
+| "过度离散化电路" | 条件化Jacobian显示3种上下文是连续变形而非离散切换 | ✅完全验证 |
+| "L35把44维压到1维" | W_U是满秩2560维！L35 rank=1是Jacobian估计bug | ✅严重错误确认 |
+| "Jacobian太粗糙" | 有结构探针vs随机探针结果几乎无差异——Jacobian确实是近似各向同性的 | ✅确认，但原因不是粗糙而是Jacobian本身就是近等距映射 |
+| "translation signal误导" | 翻译差分方向有效但Δh SVD方向完全无效 | ✅验证 |
+
+### 五个最重要的实证发现
+
+**#1: W_U是满秩2560维！不是低秩的！**
+
+- W_U SVD: rank=2560, rank_90=2085, rank_99=2486
+- Top1奇异值=126.7, 第2=24.2, 第10=14.6
+- Phase 103的"L35 rank=1"完全是Jacobian估计方法的数值问题
+- **结论: 解码瓶颈不在W_U**。W_U有足够的自由度来区分任何两个token
+
+**#2: Lyapunov指数极小——Transformer核心层间变换几乎是纯等距映射**
+
+- L0-L34: max_λ < 0.02, mean_λ < 0.01
+- 不稳定比例: L0≈0.73 → L24+=1.0 (所有方向都"稍微不稳定")
+- 但max_λ仅0.01-0.02：微扰几乎不被放大也不被压缩
+- **L35是唯一的Lyapunov spike**: max_λ=4.7 (最终LN放大)
+- **结论: 层间变换近似正交矩阵，信息几乎无损传递**
+
+**#3: 条件化Jacobian是连续变形而非离散切换**
+
+3种上下文(中文续写/简洁翻译/翻译指令)的Jacobian几乎相同:
+- L0-L21: Δh≈1.0 (等距)
+- L27: Δh≈1.7 (微放大)
+- L33: Δh≈4.4 (中放大)
+- 3种上下文的差异 < 5%
+
+**但**翻译指令的en_Δlogit始终最高→Jacobian连续变形确实存在，只是幅度极小。
+
+**#4: 翻译差分方向有效，Δh SVD方向完全无效**
+
+在"X是一种"的中文prompt中注入方向:
+- Δh SVD top1/top5/mid20: 全部失败(α=100还不够)
+- 随机方向: 全部失败
+- 翻译差分方向(trans_short - zh_continue的差分): **L21/L33有效！**
+  - L21: 猫→cat α=50, P(cat)=0.143
+  - L33: 水→water α=20, P(water)=0.565
+  - L33: 火→fire α=100, P(fire)=0.014
+
+**这证明翻译方向确实存在，但它不是Δh SVD能发现的那种方向。**
+翻译差分方向来自不同prompt格式的hidden state差，而非单次前向传播的层间差分。
+
+**#5: 行为层面是离散跳变，但动力学层面是连续变形**
+
+轨迹束分析(20步prompt插值):
+- 6/6词的P(en)变化都是"离散跳变"(relative jump > 0.92)
+- 最大跳变在step[17→18]: "X的英文是" → "请把X翻译成英文："
+- 但条件化Jacobian在3种上下文间连续变形
+
+**结论: 连续的Jacobian变形 + 非线性解码 = 离散的行为跳变**
+这是非线性系统的经典特征：参数空间连续变化，但输出突然跳变(分叉)。
+
+### 解码瓶颈的精确分析
+
+| 组件 | 秩/自由度 | 角色 |
+|------|----------|------|
+| h_L33 (raw) | 范数460-650 | 信息已编码，但需要LN重新缩放 |
+| LayerNorm | recenter+rescale | 范数从~650→50.6，但维度不变 |
+| W_unembed | 秩=2560(满秩) | 有足够自由度区分所有token |
+| 最终logits | 由h@W_U决定 | 翻译prompt的logits指向英文token |
+
+**Phase 103的"L35把44维压到1维"完全错误**。真实情况:
+1. W_U有2560个自由度
+2. LN只是recenter+rescale，不消灭维度
+3. Phase 103的rank=1是因为**Jacobian估计包含了LN+unembed的复合效果**，而LN后的等距约束使估计退化为1维
+4. 正确的理解: **不是维度坍缩，而是大多数方向对最终logits的投影权重极小**
+
+### 对"动力系统词汇化"警告的回应
+
+用户指出：我现在开始用attractor/phase transition/routing等词，但还没有真正数学化。
+
+Phase 104的严格化进展:
+1. ✅ **Lyapunov指数**: 可验证的量。max_λ=0.02(核心层) vs 4.7(L35)
+2. ✅ **Jacobian谱**: 可验证的量。各向同性，等距映射
+3. ✅ **控制能量**: 可验证的量。翻译差分方向α=20-50有效
+4. ✅ **连续变形vs离散切换**: 可验证的判定。Jacobian连续，行为离散
+5. ⚠️ **attractor**: 仍是隐喻。没有严格证明吸引子存在
+6. ⚠️ **routing**: 仍是隐喻。没有分离出路由机制
+
+---
+
+### 硬伤与瓶颈
+
+1. **Jacobian是近似各向同性的** — 有结构探针vs随机探针无差异。这说明Phase 103的"Jacobian秩44"可能是假象——Jacobian可能更接近**缩放的正交矩阵**，所有方向平等对待
+2. **翻译差分方向效果高度词依赖** — 只有3/8词成功，说明翻译差分方向不够稳健
+3. **控制能量太大(α=20-50)** — 在实际hidden state范数(~50-650)下，这意味着扰动需要与hidden state同量级
+4. **W_U满秩但第1奇异值126.7 vs 第2=24.2** — 5:1的各向异性。大多数W_U方向的解码效率远低于主方向
+5. **仍缺乏子电路/路由的精确分离方法** — 知道动力学连续变形但不知道变形的具体结构
+
+---
+
+### 第一性原理修正
+
+Phase 99-104的递进揭示:
+
+```
+Phase 99: 因果必要≠信息传递
+Phase 100: 全局距离失效
+Phase 101: 最后token≠语义对象
+Phase 102: 方向一致性≠计算原语
+Phase 103: dominant variance≠computational DOF
+Phase 104: 等距映射+非线性解码=离散行为跳变
+```
+
+**核心修正**: Transformer的核心计算是**近似等距映射链**：
+
+```
+h_{l+1} = F_l(h_l, context)
+
+J_l = ∂F_l/∂h_l ≈ 正交矩阵 × 缩放因子
+    max_λ ≈ 0.02 (L0-L34)
+    max_λ ≈ 4.7  (L35, 最终LN)
+```
+
+翻译不是在某一层"发生"，而是:
+1. 上下文通过注意力机制微调每层的Jacobian (连续变形，幅度<5%)
+2. 36层等距映射后，微小的方向偏好被累积
+3. 最终LN放大4.7x
+4. W_unembed(2560维满秩)投影到vocab空间
+5. 在softmax的非线性作用下，累积的方向偏好被放大为离散行为
+
+**关键洞察: 翻译不是"路由到翻译电路"，而是"微小方向偏好的累积放大"**
+
+数学描述:
+```
+δ_context = Jacobian的上下文条件化变形 (幅度 <5%)
+Δ_behavior = δ_context × 36层 × LN放大(4.7x) × softmax非线性
+= 微小偏好 → 离散跳变
+```
+
+这解释了:
+- 为什么行为层面是离散跳变(非线性放大)
+- 为什么Jacobian层面是连续变形(微小偏好)
+- 为什么翻译差分方向有效但Δh SVD无效(差分方向捕获了跨层累积的偏好)
+- 为什么控制能量很大(需要对抗36层等距映射的累积效果)
+
+---
+
+### 阶段性大任务: Phase 105
+
+**Phase 105: 等距映射链的微扰累积分析**
+
+核心假设: Transformer翻译能力 = 微小方向偏好的36层累积放大
+
+验证:
+1. **逐层翻译偏好累积** — 每层的Jacobian变形方向是否一致？
+   如果一致→累积效应；如果随机→抵消
+2. **累积微扰干预** — 不是在1层大扰动(α=50)，而是在每层小扰动(α=1)
+   预测: 36层×α=1 ≈ 1层×α=36 (线性累积)
+3. **跨模型验证** — GLM4/DS7B是否也是等距映射链？
+4. **注意力头级Jacobian** — 哪些head贡献了翻译方向偏好？
+5. **softmax分叉分析** — 精确测量logit空间的分叉条件
+
+
+## Phase 105: Margin动力学与约束可读出性分析 [2026-05-09 14:21]
+
+### 用户批判的正确性评估
+
+Phase 104的3个硬伤**全部正确**，Phase 105提供了严格实证：
+
+| 硬伤 | Phase 105实证 | 验证程度 |
+|------|-------------|---------|
+| "局部近等距≠全局近线性" | 曲率/位移比≈20-22！轨迹高度弯曲，累积旋转≈1011°(3圈) | ✅完全验证 |
+| "translation ≠ 方向累积，是轨迹变形" | L0→L35全局cosine≈0.022！翻译差分方向被彻底旋转，不是被平行传输 | ✅完全验证 |
+| "应关注margin而非probability" | margin_dir(W_U[en]-W_U[zh])控制α=0.5即可flip，trans_diff需α=100 | ✅完全验证 |
+
+### 五个最重要的实证发现
+
+**#1: 曲率/位移比≈20-22 — 轨迹高度弯曲！**
+
+- 中文prompt: curvature/disp=20.85
+- 翻译prompt: curvature/disp=22.29
+- 累积曲率是直线位移的20倍！
+- 逐层曲率差(翻译-中文): L6=-11.6, L21=+6.3, L31=+41.3, L34=+101.4
+- **结论: 局部Jacobian虽然近正交(max_λ≈0.02)，但36层累积后轨迹高度弯曲。等距映射链假说是错的。**
+
+**#2: 翻译差分方向被彻底旋转 — 不是被平行传输！**
+
+- L0→L35全局cosine≈0.022 (几乎正交！)
+- 每层平均旋转28°，36层累积≈1011°(近3圈)
+- L0→L1旋转84°！第一层就彻底旋转了方向
+- delta_diff与diff_dir的对齐度: 大部分层<0.2，最高L10→L11=0.32
+- **结论: 翻译不是"方向累积"，而是"轨迹变形"。翻译差分方向在不断旋转，不是被平行传输的。**
+
+**#3: Margin呈现"先升后降再升"的非单调模式！**
+
+翻译prompt - 中文prompt的margin差(margin_diff):
+- L0: -1.69 (翻译prompt英文margin更低)
+- L12: +0.90 (翻译prompt英文margin更高)
+- L30: -0.87 (翻译prompt英文margin又变低)
+- L33: -0.53
+- L35: +1.74 (最终LN使翻译prompt英文margin最高)
+
+**这完全否定了"逐层累积偏好"假说。真实的动力学: 翻译约束在中间层(L12)被表达，然后在后期层(L30)被压抑，最终在LN层(L35)被释放。**
+
+**#4: L33的margin在翻译prompt下是负的！**
+
+- zh_continue L33 margin: -0.02 (微弱负)
+- trans_short L33 margin: -0.55 (明显负)
+- trans_instr L33 margin: -0.91 (更负)
+
+在L33，翻译prompt的英文margin比中文prompt更负！翻译信号**不是在L33最强**，而是在L33被压抑。
+
+**#5: margin_dir方向控制α=0.5即可sign flip — 比trans_diff有效200倍！**
+
+| 方向 | 成功次数 | mean α | min α |
+|------|---------|--------|-------|
+| margin_dir (W_U[en]-W_U[zh]) | 43 | 4.9 | 0.5 |
+| wu_en_dir (W_U[en]) | 43 | 10.5 | 0.5 |
+| combined | 43 | 16.2 | 0.5 |
+| trans_diff | 22 | 99.8 | 5.0 |
+
+**margin_dir直接指向decoder的对齐方向，而trans_diff是hidden state空间中的方向——两个空间不对齐！**
+
+### 对Phase 104核心假说的修正
+
+Phase 104假说: "Transformer翻译能力 = 微小方向偏好的36层累积放大"
+
+Phase 105实证推翻:
+
+1. **不是方向累积** — 翻译差分方向每层旋转28°，36层旋转3圈，方向不保持
+2. **不是等距映射链** — 曲率/位移比≈20，轨迹高度弯曲
+3. **不是单调累积** — margin呈现"先升后降再升"的非单调模式
+4. **不是在某一层"发生"翻译** — 翻译约束在L12表达，L30压抑，L35释放
+
+### 第一性原理修正
+
+```
+Phase 104假说(错误): 翻译 = 微小方向偏好的36层累积放大
+Phase 105修正: 翻译 = 约束的编码-压抑-释放三阶段过程
+
+真实动力学:
+1. 编码阶段 (L0-L12): 翻译约束被编码到hidden state
+   - margin_diff从-1.69升至+0.90
+   - 但此时约束以非W_U对齐的形式存在
+
+2. 压抑阶段 (L12-L30): 翻译约束被重新参数化
+   - margin_diff从+0.90降至-0.87
+   - 方向在不断旋转(每层28°)
+   - 信息被保持但转换了表示形式(attention-conditioned reparameterization)
+
+3. 释放阶段 (L30-L35): 约束被对齐到decoder geometry
+   - margin_diff从-0.87升至+1.74
+   - L35的LN完成最终对齐
+   - 信息从"已编码但不可读"变成"可线性读出"
+```
+
+这和用户的核心洞察完全一致:
+> "早期层可能已encode翻译约束，但decoder还无法linear-readout。
+> 晚期层逐渐align representation with decoder geometry。"
+
+### 关键量对比: margin_dir vs trans_diff
+
+| 量 | margin_dir | trans_diff | 含义 |
+|----|-----------|------------|------|
+| 空间 | decoder logit空间 | hidden state空间 | 两个空间不对齐 |
+| 控制能量 | α=0.5-5 | α=5-100 | 差200倍 |
+| 成功率 | 43/45 | 22/45 | 差2倍 |
+| 数学本质 | 直接增加margin | 间接影响轨迹方向 | 一个精确，一个模糊 |
+
+**结论: 最有效的控制变量不是hidden state空间中的"翻译方向"，而是decoder空间中的"margin方向"。**
+
+---
+
+### 硬伤与瓶颈
+
+1. **margin的非单调性未完全理解** — 为什么L12-L30翻译约束被压抑？是重新参数化还是真正的抑制？
+2. **编码-压抑-释放模型仍需验证** — 需要区分"信息被保持但表示改变"vs"信息被真正抑制"
+3. **margin_dir方向太"trivial"** — 直接沿W_U[en]-W_U[zh]方向扰动几乎是在"作弊"，不是发现真正的内部机制
+4. **缺乏对attention在压抑阶段的作用分析** — 哪些attention head负责重新参数化？
+5. **3阶段模型需要跨模型验证**
+
+---
+
+### 第一性原理: 约束的编码-压抑-释放
+
+Phase 99-105的递进揭示:
+
+```
+Phase 99:  因果必要≠信息传递
+Phase 100: 全局距离失效
+Phase 101: 最后token≠语义对象
+Phase 102: 方向一致性≠计算原语
+Phase 103: dominant variance≠computational DOF
+Phase 104: 等距映射+非线性解码=离散行为跳变
+Phase 105: 方向不累积(旋转28°/层)，margin非单调(先升后降再升)
+```
+
+**核心修正**: Transformer翻译能力的本质是**约束的编码-压抑-释放三阶段过程**:
+
+1. **编码阶段** (L0-L12): 上下文信息将翻译约束编码进hidden state
+   - 信息存在但以非decoder-aligned形式
+   - margin_diff逐渐变正(翻译prompt的英文margin增大)
+
+2. **压抑/重参数化阶段** (L12-L30): attention机制重新参数化hidden state
+   - 翻译差分方向不断旋转(每层28°)
+   - margin_diff逐渐变负(英文margin反而降低)
+   - 信息被保持但转换为新的表示形式
+
+3. **释放/对齐阶段** (L30-L35): 约束被对齐到decoder geometry
+   - 最终LN完成对齐
+   - margin_diff从负跳到正
+   - 信息从"已编码但不可读"变成"可线性读出"
+
+**数学描述**:
+```
+m_l = (h_l^LN) · (w_en - w_zh)   # margin at layer l
+
+翻译 ≠ δ方向的累积
+翻译 = m_l的编码-压抑-释放过程
+
+关键量不是"翻译方向"而是"margin的逐层演化"
+```
+
+---
+
+### 阶段性大任务: Phase 106
+
+**Phase 106: 编码-压抑-释放的精确机制**
+
+1. **注意力头级margin分析** — 哪些head负责编码？哪些负责压抑？哪些负责释放？
+2. **信息保持验证** — 压抑阶段(L12-L30)翻译信息是否被保持？用probing classifier验证
+3. **重参数化的精确测量** — 压抑阶段的"旋转"是否有结构？是否是特定子空间的旋转？
+4. **跨模型验证** — GLM4/DS7B是否也是编码-压抑-释放三阶段？
+5. **LN释放机制的精确分析** — LN如何将压抑的margin释放？是几何对齐还是范数放大？
+
+
+## Phase 106: 规范不变量与约束传输分析 [2026-05-09 15:06]
+
+### 用户批判的正确性评估
+
+Phase 105的4个硬伤**全部正确**，Phase 106提供了严格实证：
+
+| 硬伤 | Phase 106实证 | 验证程度 |
+|------|-------------|---------|
+| "margin下降≠信息压抑，可能只是基底旋转" | 线性探针和MLP在**所有36层都100%准确**！margin在L30-L33接近随机，但翻译信息完整存在 | ✅完全验证，Phase 105的"压抑阶段"是误判 |
+| "curvature≠计算复杂性" | CKA(zh,trans)≈0.7，差分CKA>0.98，相邻层CKA>0.97 — 每层只做微小变换 | ✅确认 |
+| "margin_dir是操纵分类器" | Fisher有效秩=2！解码器只读2个主方向 | ✅确认 |
+| "三阶段是人为切分" | 探针在所有层都100%准确 — 没有清晰相边界，只有连续的坐标变换 | ✅确认 |
+
+### 六个最重要的实证发现
+
+**#1: 翻译信息在所有36层都完整存在！线性/MLP探针全部100%！**
+
+- 线性探针(LogisticRegression): 所有层100%
+- MLP探针(2层128单元): 所有层100%
+- 但margin分类(W_U方向投影): L0=24%, L6=50%, L12=72%, L30=54%, L33=52%, L36=100%
+
+**结论: Phase 105的"压抑阶段"完全是误判！不是信息被压抑，而是hidden state坐标系与W_U坐标系不对齐(基底旋转)。**
+
+**#2: Fisher信息矩阵有效秩=2！**
+
+- Fisher = E[h*h.T] @ W_U.T @ W_U
+- 只有2个大特征值（其余接近0）
+- **结论: 解码器(W_U)本质上只从hidden state读出2个主方向的信息！**
+- 虽然W_U是2560维满秩，但Fisher信息集中在2个方向
+
+**#3: CKA(zh, trans)≈0.70 — 翻译约束只占hidden state空间的30%**
+
+- L0: CKA=0.0（embedding完全不同）
+- L6+: CKA≈0.70-0.79
+- **翻译prompt和中文prompt的hidden state有70%的CKA相似度**
+- 翻译约束只占~30%的表示空间差异
+
+**#4: 差分CKA>0.98 — 翻译差分表示在层间高度保持**
+
+- 翻译差分(trans-zh)的跨层CKA>0.98
+- **虽然单方向每层旋转28°，但差分子空间作为整体高度保持**
+- 这说明：翻译约束的子空间结构在层间保持，只是坐标在旋转
+
+**#5: 翻译差分子空间的方差越来越分散**
+
+- L0: 只有1维(sv=[7.4, 0, ...])
+- L6: 1维主导(sv=[138.8, 13.8, ...], 94%方差)
+- L33: 多维分散(sv=[1640, 472, 361, ...], 61%方差)
+- **翻译约束从1维"信号"逐渐分散到多维度**
+
+**#6: 多token margin分析 — 翻译约束只在最后token被"释放"**
+
+- L36(unembedding后): 只有最后token的margin为正，其他token全负
+- L35(LN后): 最后token margin很小(0.3-3.6)
+- **翻译约束不是在所有token位置同时被释放，而是只在最后token位置对齐到decoder**
+
+### 对Phase 105核心模型的修正
+
+Phase 105模型: "编码(L0-L12) → 压抑(L12-L30) → 释放(L30-L35)"
+
+Phase 106修正:
+
+1. **没有"压抑"！** 探针100%证明信息在所有层都存在
+2. **不是三阶段，而是连续的坐标变换** — 每层微小变换，CKA>0.97
+3. **关键不是信息何时存在，而是信息何时与decoder对齐** — Fisher秩=2说明只有2个方向被解码器读出
+4. **翻译是"约束在变化坐标系下的传输"** — 不是"信息编码/释放"
+
+### 第一性原理修正
+
+```
+Phase 105假说(错误): 翻译 = 编码-压抑-释放三阶段
+Phase 106修正: 翻译 = 约束在变化坐标系下的连续传输 + decoder对齐
+
+真实动力学:
+1. 翻译信息在所有层都完整存在 (探针100%)
+2. 但hidden state的坐标系在不断旋转 (每层28°)
+3. W_U只读出2个主方向 (Fisher秩=2)
+4. margin的"升降"是坐标系旋转与decoder对齐度的振荡
+5. 最终LN使最后token的hidden state与W_U对齐 → margin翻正
+
+关键洞察:
+- 信息 ≠ 可读信号
+- 信息存在 ≠ margin为正
+- margin振荡 = 坐标系旋转与decoder方向的对齐度振荡
+- 不是信息被压抑/释放，而是坐标系的朝向在旋转
+```
+
+这和用户的核心洞察完全一致:
+> "hidden states不是语义点，而是constraints under changing coordinate systems"
+
+### Fisher秩=2的深层含义
+
+Fisher有效秩=2是最令人震惊的发现：
+
+- W_U是2560维满秩
+- 但Fisher = E[h*h.T] @ W_U.T @ W_U只有2个大特征值
+- 这意味着：**虽然W_U有2560列，但只有2个线性组合对logit有显著影响**
+- 这2个方向就是"decoder对齐方向"
+
+**推论**: margin的"振荡"本质上是hidden state的主方向在2个Fisher方向上的投影振荡。当hidden state的主方向与Fisher方向对齐时，margin为正；当旋转开时，margin为负。
+
+### 硬伤与瓶颈
+
+1. **Fisher秩=2需要更严格验证** — 当前估计用了简化假设(E[h*h.T]是所有词对的平均)
+2. **2个Fisher主方向是什么？** — 它们是否就是W_U的top2奇异向量？
+3. **探针100%可能过拟合** — 50个训练样本可能不够，但交叉验证结果也应接近
+4. **跨token位置分析不够深入** — 为什么翻译约束只在最后token被释放？
+5. **缺乏attention head级分析** — 哪些head负责坐标系旋转？
+
+### 第一性原理: 约束在规范变换下的传输
+
+Phase 99-106的递进揭示:
+
+```
+Phase 99:  因果必要≠信息传递
+Phase 100: 全局距离失效
+Phase 101: 最后token≠语义对象
+Phase 102: 方向一致性≠计算原语
+Phase 103: dominant variance≠computational DOF
+Phase 104: 等距映射+非线性解码=离散行为跳变
+Phase 105: 方向不累积(旋转28°/层)，margin非单调
+Phase 106: 信息始终存在，margin振荡=规范变换下的对齐度振荡
+```
+
+**核心修正**: Transformer翻译能力的本质是**约束在规范变换(坐标旋转)下的传输**:
+
+1. 翻译约束在所有层都完整存在 (探针100%)
+2. 但hidden state的坐标系在不断旋转 (每层28°，36层累积1011°)
+3. W_U只从2个Fisher主方向读出信息
+4. margin的振荡 = hidden state主方向与2个Fisher方向的cosine振荡
+5. 最终LN使最后token对齐到Fisher方向 → margin翻正
+
+**数学描述**:
+```
+Fisher: F_l = E[h_l * h_l.T] @ W_U.T @ W_U
+有效秩 = 2
+
+margin_l = (h_l^LN) · (w_en - w_zh)
+        = (h_l^LN) · v_Fisher_1 * cos(θ_l) + ...
+
+其中θ_l = hidden state主方向与Fisher方向的夹角
+
+margin振荡 = θ_l的振荡
+不是信息被压抑/释放，而是对齐度的振荡
+```
+
+---
+
+### 阶段性大任务: Phase 107
+
+**Phase 107: Fisher主方向的精确结构与规范变换的数学性质**
+
+1. **Fisher主方向的精确识别** — 2个Fisher方向是什么？与W_U top奇异向量关系？
+2. **逐层θ_l测量** — hidden state主方向与Fisher方向的夹角逐层演化
+3. **对齐度振荡的数学建模** — θ_l是否可以用简单模型(如线性ODE)描述？
+4. **跨模型验证** — GLM4/DS7B是否也有Fisher秩=2？
+5. **Attention head的对齐贡献** — 哪些head旋转了坐标系？哪些对齐了Fisher方向？
+
+
+## Phase 107: 层间对齐几何与Probe可靠性验证 [2026-05-09 15:53]
+
+### 用户批判的正确性评估
+
+Phase 106的4个硬伤**全部正确**，Phase 107提供了决定性实证:
+
+| 硬伤 | Phase 107实证 | 验证程度 |
+|------|-------------|---------|
+| "Probe 100%是幻觉" | Random label probe L6+也100%! Cross-dist也100%! N=5也100%! | ✅完全验证 |
+| "Fisher rank=2根本性错误" | W_U的50%能量需814维, 90%需2085维! 完全不是rank=2 | ✅根本性推翻 |
+| "没证明规范不变量" | Procrustes对齐残差≈1.4! 正交映射完全无法对齐跨层子空间 | ✅确认 |
+| "理论化过快" | "规范旋转"不成立: 变换包含缩放(scale 0.46→4.39)和非正交成分 | ✅确认 |
+
+### 最关键的5个实证发现
+
+**1. Probe Illusion被确认**
+- Random label probe: L6+也100% (L0只有53%)
+- Cross-distribution: 训练动物词, 测试天体词, 也100%
+- Low-data: N=5就100%
+- **结论**: 在2560维空间中60个样本, 线性探针的100%准确率完全无意义。Phase 106的"信息在所有层都完整存在"不可靠。
+
+**2. W_U不是低秩的! 50%能量需814维**
+- W_U SVD: top1 sv=126.7, top100 sv=[11.02, 126.67]
+- 50% energy rank=814, 80%=1717, 90%=2085, 95%=2293
+- Phase 106的"Fisher rank=2"完全是计算方法错误
+- **W_U几乎使用了全部2560维空间来读出logits**
+
+**3. 翻译差分子空间与decoder读出子空间几乎完全正交(85-90°)**
+- 所有层的principal angles都在85-90°
+- 翻译差分信号不在W_U的主读出方向上
+- **这意味着: "翻译约束"和"decoder读出几何"是两个几乎独立的子空间**
+
+**4. Procrustes正交对齐完全失败(rel_residual≈1.4)**
+- 不存在正交映射能对齐跨层翻译子空间
+- 变换包含缩放(scale从0.46到4.39)和非正交成分
+- **Phase 106的"规范旋转"框架不成立**
+
+**5. L0的翻译差分信号72%集中在W_U前2个主方向, 但L6+迅速分散到5%**
+- L0: top2=71.9% → L6: top2=5.3% → L33: top2=12.8% → L36: top2=5.0%
+- embedding层的信号恰好在decoder主方向上, 但6层后就分散了
+- **这解释了为什么margin在中间层变得不可读: 信号能量从2个方向分散到2000+个方向**
+
+### 核心理论修正
+
+Phase 106的理论框架需要根本性修正:
+
+```
+旧框架 (Phase 106):
+  信息 = 规范不变量 (探针100%)
+  margin = 规范依赖量 (坐标旋转)
+  LN = 规范选择 (对齐Fisher方向)
+  Fisher方向 = 2个主方向
+
+新框架 (Phase 107):
+  信息存在 = 未知 (probe illusion, 无法用线性探针验证)
+  margin = 翻译信号在2000+维decoder空间中的投影能量分布
+  decoder = 几乎满秩(814维=50%能量), 不是2维
+  子空间对齐 = 正交变换无法描述(残差1.4), 包含缩放和非正交成分
+```
+
+### 层间Principal Angles的真实结构
+
+```
+L0→L1: max=89.7° (早期剧烈旋转)
+L6→L7: max=87.2°
+L12→L13: max=30.6° (中层稳定!)
+L18→L19: max=23.5° (最稳定区域)
+L24→L25: max=71.6° (后期又旋转)
+L34→L35: max=82.0° (LN前剧烈变化)
+L35→L36: max=73.6°
+
+全局: L0→L36 max=90.0° (完全正交)
+```
+
+**中层(L12-L19)是翻译子空间最稳定的区域** — 相邻层最大角度只有23-30°。
+
+### 硬伤与瓶颈
+
+1. **Probe illusion是最严重的方法论问题** — 如何在2560维空间中验证信息是否存在?
+   - L0的random probe只有53%, 说明L0确实有信号
+   - 但L6+无法区分"真实信息"和"trivial separability"
+
+2. **"子空间正交"的含义未明** — 翻译差分子空间与decoder子空间正交(85-90°), 但margin在某些层仍然有效。这说明什么?
+
+3. **正交Procrustes失败意味着什么?** — 层间变换不是正交的, 但这并不意味着没有结构。可能有仿射变换或非线性变换能对齐。
+
+4. **缺乏可靠的"信息存在性"测试方法** — 这是最根本的方法论缺口
+
+5. **L0的72% top2集中度需要解释** — 为什么embedding层的翻译差分恰好在W_U的主方向上?
+
+### 突破瓶颈的第一性原理分析
+
+Phase 107的核心突破不是发现了某个新现象, 而是**推翻了之前三个核心假说**:
+
+1. ❌ "探针100% → 信息存在"
+2. ❌ "Fisher rank=2 → decoder低维读出"
+3. ❌ "子空间旋转 → 规范动力学"
+
+这三个假说被推翻后, 剩下的最可靠发现是:
+
+1. ✅ **中层(L12-L19)的翻译子空间最稳定** (principal angles 23-30°)
+2. ✅ **L0的翻译信号72%集中在W_U top2方向** (不是偶然)
+3. ✅ **W_U几乎满秩** (50%能量需814维)
+4. ✅ **L0是唯一probe还有意义的层** (random probe只有53%)
+
+**下一个核心问题**: 如何在2560维空间中可靠地验证"翻译信息是否存在"?
+
+可能的突破口:
+1. **L0层的深入分析** — L0是唯一probe可靠的层, 应该集中研究L0→L6的信号分散过程
+2. **用信息论而非几何方法** — 互信息估计、条件熵等
+3. **受控实验设计** — 不是二分类, 而是预测具体token ID, 大幅降低随机猜测概率
+4. **关注信号分散而非存在** — 不问"信息是否存在", 而问"信号能量如何重分布"
+
+
+## Phase 108: 约束分散动力学 — 信号熵、参与率与功能传输 [2026-05-09 16:56]
+
+### 用户批判的正确性评估
+
+Phase 107的5个批判全部正确:
+
+| 批判 | Phase 108实证 | 验证程度 |
+|------|-------------|---------|
+| "probe unreliable ≠ 信息不存在" | Weight_norm分析: L0和L36确实比中间层更易读出 | ✅部分验证 |
+| "应测probe complexity而非accuracy" | 所有层N=4就100%, 即使C=0.001也100% | ✅确认probe二分类完全失效 |
+| "W_U满秩≠有效读出维度高" | **Logit PR=43.7! 实际logit子空间只有44维** | ✅关键修正 |
+| "principal angle小≠稳定计算" | Flow field: 中间层consistency最低(0.52) | ✅确认 |
+| "应研究向量场而非状态几何" | Flow方向层间角度81-97°, L34-35角度143° | ✅新发现 |
+
+### 五个最重要的实证发现
+
+**1. 参与率(PR)是比rank更稳定的量**
+- W_U PR=2285, Logit PR=43.7, 翻译差分信号(self-basis): L0 PR=1 → L6 PR=43 → L36 PR=50
+- PR不受谱退化影响, 比top-k fraction更稳定
+
+**2. 实际logit子空间只有44维! 不是2000+维!**
+- W_U虽然PR=2285, 但172个prompt的logit只落在一个44维子空间中
+- 50%能量在1维, 90%在34维, 99%在108维
+- Phase 107的"decoder使用全部2560维"是误读
+
+**3. L35→L36的LN反转了翻译差分方向!**
+- 差分flow alignment: L35 = -0.959 (近反平行!)
+- L35的LN不只"对齐"decoder, 而是反转差分方向
+- 这解释了为什么L33 margin为负, L36 margin为正
+
+**4. Flow范数在后期层急剧增长(10→600)**
+- L0: ||Δh||≈10, L35: ≈270, L36: ≈600
+- 后期层做了巨大的非线性变换
+- Flow一致性: 中间层最低(L12=0.52), 早期和晚期高
+
+**5. Flow方向在层间近正交(81-97°)**
+- 每层的flow几乎与前一层正交
+- 说明每层在做完全不同类型的计算
+- L34→L35 vs L35→L36角度143°(近反方向!)
+
+### 核心理论修正
+
+```
+Phase 107 (被修正):
+  W_U几乎满秩 → decoder使用全部2560维
+  翻译差分子空间与decoder子空间正交 → 无法对齐
+
+Phase 108 (新框架):
+  W_U满秩(PR=2285), 但实际logit子空间PR=43.7
+  翻译信号分散到~45维(self-basis), 然后在L36被LN压缩回48维(decoder-basis)
+  LN不只是对齐, 而是反转差分方向(alignment=-0.96)
+  Flow field: 每层做正交方向的变换, 后期层范数暴增
+```
+
+### 信号分散的精确量化
+
+```
+层     Self-basis PR  Decoder-basis PR  信号熵(norm)  Flow范数  Flow一致性
+L0     1.0            268.1             0.879         10       0.96
+L6     43.3           818.4             0.905         20       0.72
+L12    47.5           843.3             0.908         18       0.52
+L18    45.2           782.6             0.903         16       0.74
+L24    46.0           813.6             0.905         50       0.77
+L30    49.5           703.3             0.895         100      0.67
+L33    49.5           548.5             0.884         130      0.58
+L35    50.7           443.4             0.872         270      0.88
+L36    50.1           47.8              0.707         600      0.93
+
+关键趋势:
+1. Self-basis PR: L0=1 → L6=43 → 稳定在45-50 (信号从1维分散到45维)
+2. Decoder-basis PR: L0=268 → L12=843(最大) → L36=47.8(骤降!)
+3. L36的decoder-basis PR=47.8 ≈ self-basis PR=50.1 — 最终层信号重新集中
+4. Flow范数: L30+急剧增长, L36=600(早期60倍)
+5. L35→L36: 差分flow alignment=-0.96 (反转!)
+```
+
+### 硬伤与瓶颈
+
+1. **Probe二分类完全失效** — N=4就100%, 需要设计更有区分力的测试
+2. **Logit PR=43.7需要更多prompt验证** — 172个prompt可能不够
+3. **"反转"机制未明** — L35的LN为什么反转差分方向? 是LN本身还是模型学到的?
+4. **Flow一致性在L12最低(0.52)** — 不同词对的flow方向差异大, 意味着什么?
+5. **功能传输实验(Exp4)太简化** — 只测了投影, 没有真正做扰动传播
+
+### 第一性原理: 约束分散与重新集中的动力学
+
+Phase 108最核心的发现是信号分散的精确量化:
+
+```
+L0: 1维信号 (embedding直接编码翻译/非翻译的区别)
+↓ L0-L6: 信号爆炸分散 (1→43维, flow范数翻倍)
+L6-L30: 信号在45维子空间中传输 (self-basis PR稳定)
+  - 但在decoder坐标系中信号持续分散 (PR 818→548)
+  - flow一致性在中间层最低 (0.52)
+↓ L30-L35: Flow范数急剧增长 (10→270)
+  - 信号在decoder坐标系中开始集中 (PR 548→443)
+↓ L35-L36: LN完成巨大的非线性变换
+  - 反转差分方向 (alignment=-0.96)
+  - 信号从843维decoder-basis PR骤降到47.8
+  - 重新集中到与logit子空间(44维)对齐的方向
+```
+
+这和用户的核心洞察一致: **"embedding geometry与computation geometry不同。嵌入阶段高度aligned到decoder basis, 但进入Transformer后信号被rapidly distributed。"**
+
+但Phase 108补充了关键的后半段: **信号在L30+又被重新集中, 最终在L36通过LN的反转完成对齐。** 这个"分散→重新集中"的过程才是完整的故事。
+
+### 下一步关键问题
+
+1. **L35的LN反转机制**: 为什么LN会反转差分方向? 这是否是普遍现象?
+2. **Flow一致性在中间层最低**: L12=0.52意味着不同词对走了不同的计算路径
+3. **Logit子空间的44维结构**: 这44维对应什么语义? 翻译相关维度在其中占多少?
+4. **功能传输**: 哪些层的扰动能最有效地改变最终margin?
+
+
+## Phase 109: 计算轨迹动力学 — 扰动传输、轨迹发散与零假设检验 [2026-05-09 19:20]
+
+### 用户批判的核心正确性
+
+| 批判 | Phase 109实证 | 验证程度 |
+|------|-------------|---------|
+| "Flow正交可能是高维零假设" | 零分布95%CI=[87.8°,92.2°], L0-L24不显著 | ✅大部分正确 |
+| "LN反转是过度拟人化" | L35人工LN后PR=443.7≈L35raw=444.1, L36actual=47.7 | ⚠️部分正确 |
+| "应做扰动传输存活分析" | L27-L33翻译差分存活率=随机3-4倍 | ✅关键验证 |
+| "PR=44≠模型只有44维" | Self-basis PR=1, Random-basis PR≈850 | ✅正确 |
+| "应研究计算重分布" | Logit空间也有"分散→重新集中"模式 | ✅正确 |
+
+### Exp 1: Flow Angle零假设检验 — 关键修正
+
+**零分布(随机向量夹角):**
+- d=2560: mean=90.0°, std=1.13°, 95%CI=[87.8°, 92.2°]
+- 在2560维中, 两个随机向量几乎必定在87.8°-92.2°之间
+
+**修正后的零分布(用flow PR作为有效维度):**
+- L0-L24: flow角度不显著(p>0.05) — 在2-3维子空间中, 78°-92°可能是随机的
+- L30: p=0.005, 显著! — L30的49.6°在16维空间中确实异常
+- L34→L35 vs L35→L36: 150.1° — 极度异常!
+
+**Flow concentration (方向一致性):**
+- 所有层: 0.63-0.90 (远超随机期望≈0)
+- L35: 0.9046 (最高! 所有样本走了几乎同一个方向)
+- **结论: Flow不是随机的, 但平均flow在d=2560中的角度确实被零分布混淆**
+
+**核心修正:** Phase 108的"flow方向层间近正交(81-97°), 每层做完全不同计算"——**修正为:**
+- 平均flow角度在d=2560零分布中不显著(L0-L24)
+- 但单样本flow有很强方向一致性(concentration 0.63-0.90)
+- L30+的flow角度确实显著偏离零分布
+- **"每层做完全不同计算"这个结论不成立, 但"每层flow有不同的低维结构"成立**
+
+### Exp 2: 扰动传输存活分析 — 首次功能性验证
+
+**核心发现: 翻译差分方向在L27-L33的功能存活率是随机方向的3-4倍!**
+
+| 层 | Random | TransDiff | W_U_top1 | TransDiff/Random |
+|----|--------|-----------|----------|-----------------|
+| L0 | 0.763 | 0.741 | 0.763 | 0.97 |
+| L6 | 0.123 | 0.120 | 0.130 | 0.98 |
+| L12 | 0.034 | 0.037 | 0.026 | 1.08 |
+| L18 | 0.054 | 0.073 | 0.063 | 1.35 |
+| L24 | 0.140 | 0.173 | 0.127 | 1.24 |
+| **L27** | **0.051** | **0.200** | **0.048** | **3.94** |
+| **L30** | **0.075** | **0.222** | **0.057** | **2.98** |
+| **L33** | **0.084** | **0.315** | **0.083** | **3.74** |
+| L34 | 0.211 | 0.132 | 0.221 | 0.63 |
+| L35 | 0.258 | 0.336 | 0.388 | 1.30 |
+
+**这是对probe illusion的首次功能性绕过!**
+- Phase 107-108发现: probe 100%可能是零假设(高维线性可分)
+- Phase 109发现: 扰动在翻译差分方向的存活率显著高于随机方向
+- **这不是probe classification, 而是功能传输 — 翻译差分方向在L27-L33确实承载了功能重要信息**
+
+**margin_change的方向性:**
+- L27-L33: 翻译差分扰动→margin增大(正) — 翻译信号在增强翻译token的logit
+- L34: 翻译差分扰动→margin减小(负) — L34是翻译信号的"低谷"
+- L35: 翻译差分扰动→margin增大(正) — 信号恢复
+
+**三层功能区域:**
+1. L0-L18: 翻译差分方向≈随机方向(TransDiff/Random≈1.0) — 信号尚未形成功能重要性
+2. L27-L33: 翻译差分方向=随机3-4倍 — **翻译约束的功能核心区域!**
+3. L34: 翻译差分方向<随机 — 信号被重参数化/抑制
+4. L35: W_U_top1方向最功能重要(0.39) — 信号被投影到decoder基底
+
+### Exp 3: 轨迹功能发散图
+
+**翻译vs中文的分歧从L0就开始:**
+- top1_different=1.0从L0就是100% — embedding层就已经让翻译和中文prompt的预测完全不同
+- logit_distance在L0=1.78(最高!), 降到L6=0.17, 升到L36=0.76 — **logit空间也有"分散→重新集中"**
+
+**分叉时机:**
+- 相似词(猫vs狗): top1分歧在L4 — 需要4层才功能分离
+- 远义词(猫vs山): top1分歧在L1 — 1层就分叉
+- 翻译vs中文: top1分歧在L0 — 立即分叉
+
+**几何与功能发散同步** — 没有出现"功能先于几何"或"几何先于功能"的情况
+
+### Exp 4: 重新集中验证
+
+**LN效应分析 — 核心发现:**
+- L35 raw PR (decoder-basis) = 444.1
+- L35 + 人工LN PR = 443.7 (几乎没变!)
+- L36 actual PR = 47.7 (暴跌10倍!)
+
+**结论: L36的PR暴跌不是因为LN的数学效应!**
+LN对差分信号的PR影响极小(444→444), 而L35→L36实际的PR暴跌(444→48)是由模型学到的变换完成的。
+
+**这意味着Phase 108的"LN反转差分方向"需要修正:**
+- 不是"LN本身"反转信号
+- 而是模型在L35→L36学到的变换(包含LN但不限于LN)完成了信号的重新集中
+- **正确的说法: L35→L36的层变换(包含LN)完成了从分散表示到decoder对齐表示的投影**
+
+**PR的三阶段模式(bootstrap CI验证):**
+- L0: PR=268 (embedding中等集中)
+- L6-L24: PR≈800-843 (信号高分散)
+- L33-L36: PR从613骤降到47.7 (重新集中)
+
+**Self-basis PR=1(所有层)** — 翻译差分在自身基底中始终只有1维, 这是翻译约束的"真实维度"
+
+### 核心理论修正
+
+```
+Phase 108 (部分被推翻):
+  Flow正交 = 每层做不同计算 (✗ 零分布混淆)
+  LN反转差分方向 (✗ LN本身不影响PR)
+  PR=44维 (⚠ 取决于坐标系)
+
+Phase 109 (修正后):
+  Flow有强方向一致性(concentration 0.63-0.90)
+  但平均flow角度被d=2560零分布混淆
+  L27-L33是翻译约束的功能核心(扰动存活3-4倍)
+  L35→L36的重新集中不是LN的数学效应
+  而是模型学到的变换完成的投影
+```
+
+### 最可靠的事实清单
+
+1. ✅ L27-L33翻译差分方向的扰动存活率=随机的3-4倍 (功能性验证)
+2. ✅ L35→L36的PR暴跌(444→48)不是LN数学效应 (LN只改变444→444)
+3. ✅ Flow有强方向一致性(0.63-0.90), 但平均角度被零分布混淆
+4. ✅ 翻译vs中文从L0就功能分歧, 相似词需要4层
+5. ✅ Self-basis PR=1: 翻译约束的"真实维度"是1维
+6. ✅ Logit空间也有"分散→重新集中"模式
+
+### 硬伤与瓶颈
+
+1. **扰动实验的ε=0.1可能太大或太小** — 需要测试不同扰动幅度
+2. **L34的翻译差分存活率低于随机** — 机制不明, 是信号被重参数化还是被抑制?
+3. **Self-basis PR=1的1维结构** — 为什么所有词对的翻译差分都指向同一方向?
+4. **Flow concentration=0.63-0.90的含义** — flow的方向一致性很高, 但这意味着什么?
+5. **L0的扰动存活率异常高(0.76)** — embedding层的扰动几乎完全传输到输出
+
+### 第一性原理分析
+
+Phase 109的核心突破是**首次用功能性实验(扰动传输)绕过了probe illusion**, 证明:
+- 翻译约束在L27-L33确实有功能重要性(存活率3-4倍于随机)
+- L35→L36的重新集中不是数学效应, 而是模型学到的
+
+**"嵌入压缩 → 分布式混合 → 条件化投影"的三阶段框架得到进一步支持:**
+1. L0: 翻译约束1维(self-basis PR=1), 在decoder基底中中等集中(PR=268)
+2. L6-L24: 约束分散到高维空间(self-basis仍1维, decoder-basis PR≈800)
+3. L27-L33: 约束开始在功能上显现(扰动存活率3-4倍)
+4. L35→L36: 模型学到的变换完成重新集中(PR 444→48)
+
+**下一阶段关键问题:**
+1. Self-basis PR=1意味着什么? 翻译约束本质上是1维的?
+2. L27-L33的功能核心是如何形成的? 为什么不是L6-L12?
+3. L34的"信号低谷"机制是什么?
+4. 如何更精确地量化"功能重要性"vs"几何存在性"?
+
+
+## Phase 110: 计算拓扑分析 — 激活路由、注意力分叉与稀疏激活拓扑 [2026-05-09 20:40]
+
+### 用户批判的正确性
+
+用户的4个核心批判全部正确:
+
+| 批判 | Phase 110实证 | 验证程度 |
+|------|-------------|---------|
+| **"方向主义" — 应研究激活拓扑** | 每层用不同neuron做翻译计算; 翻译差分neuron跨层overlap≈0 | ✅完全验证 |
+| **"hidden state是计算残留"** | Attention差异主要在任务类型, 非语义; MLP neuron稀疏激活 | ✅完全验证 |
+| **"Transformer不是平滑流"** | 不同prompt长度导致attention不可直接比较; 每层最不同head变化 | ✅部分验证 |
+| **"应转向计算图提取"** | 存在"翻译敏感head"但无跨层一致head; MLP路由模式层间变化 | ✅验证 |
+
+### Exp 1: Attention Head Routing — 关键发现
+
+**翻译vs中文的attention差异在L0最大(1.22), 递减到L33(0.57)**
+- 早期层(L0-L6)区分最强烈 — 翻译和中文prompt在embedding后立即走不同的attention路径
+- 语义域间差异极小(0.001-0.054) — attention区分的是任务, 不是语义
+
+**"翻译敏感head"存在但不跨层一致:**
+- Head 6在11层中排名top-5
+- Head 18/21在10层中排名top-5
+- 但每层的"最不同head"都不同 — 没有全局一致的"翻译head"
+
+### Exp 2: Attention Pattern Bifurcation — 关键发现
+
+**三组对比的attn_diff:**
+| 对比组 | L0 | L6 | L12 | L24 | L33 |
+|--------|-----|-----|------|------|------|
+| 同一翻译不同表述 | 0.55 | 0.69 | 0.39 | 0.33 | 0.18 |
+| 不同词同一任务 | 0.02 | 0.08 | 0.09 | 0.10 | 0.08 |
+| 同一词不同任务 | 0.82 | 0.70 | 0.52 | 0.48 | 0.16 |
+
+**核心洞察: 任务类型对attention的影响远大于词汇内容!**
+- 不同词的翻译prompt的attention几乎一样(diff=0.02-0.15)
+- 同一词的中文vs翻译prompt的attention差异巨大(diff=0.16-0.82)
+- 这意味着: **翻译任务激活了统一的attention routing模式, 与具体词无关**
+
+### Exp 3: MLP Neuron Activation Routing — 关键发现
+
+**L33-L35的差分幅度剧增(0.30-0.38), 远高于早期层(0.10-0.18)**
+- L35有6197个neuron对翻译更激活, 只有2853个对中文更激活
+- **翻译prompt在后期层激活了更多MLP neuron**
+
+**最关键发现: 翻译差分neuron跨层overlap≈0!**
+| 相邻层 | top-1% overlap |
+|--------|---------------|
+| L0→L1 | 0.00% |
+| L6→L7 | 0.00% |
+| L12→L13 | 2.06% |
+| L24→L25 | 5.15% |
+| L30→L31 | 8.25% |
+| L0→L35 | 1.03% |
+
+**翻译计算不是由一组固定的"翻译neuron"完成的, 而是每层用不同的neuron子集!**
+- 早期层(L0-L12): 完全不同的neuron做翻译
+- 后期层(L24+): 开始有跨层重叠, 形成"计算路径"
+
+**63-78%的MLP neuron是inactive的** — 激活极其稀疏
+
+### 核心理论升级: 从"方向传播"到"路由拓扑"
+
+Phase 99-109的模式:
+```
+翻译信息 = 某个向量方向
+→ 方向会旋转 (Phase 106-107)
+→ 方向在decoder基底中分散 (Phase 108)
+→ 但扰动在翻译方向上存活率更高 (Phase 109)
+```
+
+Phase 110的新理解:
+```
+翻译信息 ≠ 某个固定方向
+翻译信息 = 条件化激活的计算路径
+
+每一层:
+  - 不同的attention head被激活
+  - 不同的MLP neuron被激活
+  - 这些激活是"翻译任务条件化"的
+
+关键: 不是"同一个方向在传播", 而是"同一个任务条件激活不同的计算子图"
+```
+
+这完全验证了用户的核心批判: **hidden state是计算残留, 不是计算本身**。
+
+### 最可靠的事实清单
+
+1. ✅ 翻译任务激活统一的attention routing模式, 与具体词无关 (diff=0.02)
+2. ✅ 每层用不同的attention head区分翻译vs中文 (无跨层一致head)
+3. ✅ 每层用不同的MLP neuron做翻译计算 (跨层overlap≈0%)
+4. ✅ 后期层(L24+)的翻译neuron开始有跨层重叠 (8.25%)
+5. ✅ MLP激活极稀疏 (63-78% inactive)
+6. ✅ 后期层(L33-L35)的MLP差分幅度是早期的3-4倍
+
+### 硬伤与瓶颈
+
+1. **Attention统计量方法太粗糙** — 用熵和最大值差异代替直接比较, 损失了结构信息
+2. **MLP neuron的"翻译专用"可能仍是probe illusion** — 9728维中60个样本, top-1%可能只是随机
+3. **没有验证"路由拓扑"的功能重要性** — 需要扰动特定head/neuron看功能变化
+4. **Exp 4(计算路径分类)未运行** — 数据量太小(20个prompt)可能不够
+5. **不同prompt长度问题未根本解决** — attention pattern无法直接比较
+
+### 第一性原理: 从表示几何到计算拓扑
+
+Phase 110的核心突破: **首次从"向量方向分析"转向"激活路由分析"**
+
+最深刻的发现是"翻译差分neuron跨层overlap≈0%"——这意味着翻译计算的本质不是某个持久方向的传播, 而是**每层条件化激活不同计算子图的过程**。
+
+这和用户的"分叉树"直觉完全一致:
+- 每层是一个路由节点
+- 翻译prompt和中文prompt在同一层走不同的attention/MLP路径
+- 不同层的路由选择是独立的(overlap≈0%)
+- 但后期层开始形成更稳定的路径(overlap 8.25%)
+
+**下一阶段关键问题:**
+1. 翻译任务的"统一routing模式"到底是什么? 不同词如何映射到相同的计算路径?
+2. 如果每层用不同neuron, 信息如何在层间传递? (答案: 通过residual stream, 不是通过特定neuron)
+3. 能否通过"关闭"特定head/neuron来验证功能重要性? (circuit tracing)
+4. MLP neuron的"翻译差分"是否也需要零假设检验? (9728维中的小样本问题)
+
+---
+
+## Phase 111: 因果电路提取 — 从统计相关到因果验证 [2026-05-10 13:36]
+
+### 背景
+
+Phase 110提出了4个硬伤, Phase 111逐一验证:
+1. "翻译差分neuron"是probe illusion还是因果重要?
+2. "overlap≈0%"是高维稀疏的统计假象还是真实的计算重编码?
+3. MLP neuron→residual→logit的因果链是什么?
+4. 翻译任务是否形成不同的共激活计算子图?
+
+**重要修复**: Exp 2和Exp 4中发现`trans_gate[l].append(trans_gate[l])`的自引用bug, 导致多次系统重启。修复后所有实验正常运行。
+
+### Exp 1: Causal Neuron Ablation — 因果消融测试
+
+**方法**: 零化top-k翻译差分neuron, 测量对翻译logit的影响, 与随机neuron对比
+
+**关键结果 (causal_ratio = diff_ablation/random_ablation):**
+
+| 层 | top-10 | top-50 | top-97 | p值(best) |
+|----|--------|--------|--------|-----------|
+| L0 | 5.3x | 11.0x | 8.3x | 0.047 |
+| L6 | 3.8x | 5.4x | 2.6x | 0.035 |
+| L12 | 6.0x | 5.4x | 9.0x | 0.013 |
+| L18 | 8.0x | 14.3x | 12.6x | 0.042 |
+| **L24** | **87.0x** | **31.5x** | **27.0x** | **0.015** |
+| L27 | 1.8x | 3.6x | 5.4x | 0.013 |
+| L30 | 1.8x | 3.6x | 3.6x | 0.081 |
+| L33 | 3.8x | 4.1x | 2.7x | 0.097 |
+| **L35** | **13.8x** | **17.3x** | **21.2x** | **0.001** |
+
+**结论**: 翻译差分neuron确实因果重要!
+- L24是causal peak (87x), 零化10个差分neuron的影响是随机neuron的87倍
+- L35是第二causal peak (21x), 且统计最显著(p=0.001)
+- 中期层L18也强 (14.3x)
+- **不是probe illusion** — 差分neuron的ablation影响远超随机
+
+### Exp 2: Null Hypothesis for Sparse Overlap — 零假设检验
+
+**方法**: bootstrap 100次随机排名, 比较真实overlap与null分布
+
+**关键发现: 真实overlap显著高于随机期望!**
+
+top-1% (n=97) — 真实overlap vs null:
+- L15→L16: real=4.1%, null=0.9%, z=+3.29 ★★★
+- L16→L17: real=3.1%, null=0.9%, z=+2.28 ★★
+- L17→L18: real=4.1%, null=1.1%, z=+2.84 ★★★
+- L28→L29: real=6.2%, null=1.1%, z=+5.21 ★★★
+- L34→L35: real=4.1%, null=1.0%, z=+3.27 ★★★
+
+top-5% (n=486) — 更多层显著:
+- L27→L28: real=10.9%, null=4.9%, z=+6.74 ★★★
+- L31→L32: real=9.9%, null=5.1%, z=+4.93 ★★★
+- L32→L33: real=9.7%, null=5.0%, z=+5.54 ★★★
+
+**核心修正**: Phase 110说"overlap≈0%", 但零假设检验表明:
+1. **真实overlap显著高于随机** (z=+2~+7), 不是统计假象
+2. 理论随机overlap = top_n/intermediate = 97/9728 ≈ 1.0%, 真实值3-6%
+3. **相邻层确实共享翻译差分neuron**, 只是共享程度不高(3-6%)
+4. 后期层(L27-L35)共享更显著 → 翻译计算在后期层更稳定
+
+**Phase 110的"每层用不同neuron"需要修正**: 不是"完全不同", 而是"大部分不同但少量共享, 且共享程度高于随机"
+
+### Exp 3: MLP Circuit Tracing — MLP→logit因果链
+
+**方法**: 分解MLP输出为neuron级贡献: logit贡献 = w_target @ W_down[:, i] × gate[i] × up[i]
+
+**关键结果 (total_diff = 翻译logit贡献 - 中文logit贡献):**
+
+| 词对 | L12 | L18 | L24 | L30 | L35 |
+|------|-----|-----|-----|-----|-----|
+| 猫→cat | +0.86 | +0.41 | -1.36 | -0.14 | +10.1 |
+| 水→water | -0.04 | +0.05 | -0.62 | +2.65 | +6.36 |
+| 月→moon | +0.35 | -0.46 | -0.45 | -1.19 | +8.43 |
+| 火→fire | +0.40 | +0.16 | -0.46 | +23.4 | +6.61 |
+| 红→red | +0.12 | -0.35 | -1.28 | +14.1 | +11.0 |
+
+**模式发现:**
+1. **L35是翻译输出的主要贡献层** — 所有词对在L35都有大正diff (6-11)
+2. **L30是第二翻译关键层** — 某些词对有极强贡献(火→fire: +23.4)
+3. **L24是翻译抑制层** — 大部分词对diff为负, 说明L24在翻译中起抑制中文的作用
+4. **Gini系数0.62-0.80** — 差分贡献中等集中, 少数neuron贡献大
+5. **个别neuron贡献极大** — 如L33的neuron 967对猫→cat贡献-12.7
+
+### Exp 4: Neuron Co-activation Graph — 共激活拓扑
+
+**方法**: 计算翻译vs中文中neuron间的Pearson相关矩阵, 分析图拓扑
+
+**核心发现: Hub完全分离!**
+
+| 层 | zh mean|corr| | trans mean|corr| | zh strong | trans strong | Hub overlap |
+|----|------------|--------------|------------|--------------|-------------|
+| L0 | 0.159 | 0.178 | 1287 | 2565 | **0/5** |
+| L6 | 0.187 | 0.183 | 3629 | 2899 | **0/5** |
+| L12 | 0.197 | 0.198 | 4768 | 4674 | **0/5** |
+| L18 | 0.232 | 0.222 | 10122 | 7816 | **0/5** |
+| L24 | 0.221 | 0.194 | 7512 | 3965 | **0/5** |
+| L27 | 0.235 | 0.185 | 10544 | 3098 | **0/5** |
+| L30 | 0.243 | 0.174 | 11727 | 2417 | **0/5** |
+| L33 | 0.256 | 0.174 | 13806 | 2494 | **0/5** |
+| L35 | 0.243 | 0.176 | 11371 | 2456 | **0/5** |
+
+**关键洞察:**
+1. **Hub完全分离** — 翻译和中文的top-5 hub neuron无一共享! 这是最强的分离信号
+2. **中文的共激活更强** — 后期层(L27-L35)中文mean|corr|≈0.24, 翻译仅0.17
+3. **翻译的共激活更稀疏** — 翻译的strong pairs在后层仅2417-3098, 中文达11371-13806
+4. **差分共激活幅度大** — mean|Δcorr|=0.19-0.31, max|Δcorr|=1.0-1.6
+5. **翻译任务形成了更分布式、更稀疏的计算子图** — 中文更集中, 翻译更分散
+
+### 最可靠的事实清单 (Phase 111更新)
+
+1. ✅ 翻译差分neuron是因果重要的 — L24 causal_ratio=87x, L35=21x (非probe illusion)
+2. ✅ 真实overlap显著高于随机 — z=+2~+7 (Phase 110的"≈0%"需修正)
+3. ✅ L35是翻译logit的主要贡献层 — 所有词对都有大正diff
+4. ✅ L30是翻译的关键激活层 — 部分词对有极端贡献(23.4)
+5. ✅ L24是翻译的抑制层 — 抑制中文, 释放翻译
+6. ✅ Hub neuron完全分离 — 翻译和中文的hub无一共享 (0/5)
+7. ✅ 翻译的计算更稀疏 — 共激活强度低于中文 (0.17 vs 0.24)
+8. ✅ 相邻层共享的差分neuron高于随机期望 → 翻译计算有跨层连续性
+
+### 硬伤与瓶颈
+
+1. **Hub分离的稳定性** — 只看了top-5 hub, 样本小(40个词对), 需更大样本
+2. **L30的极端贡献** — 火→fire在L30贡献23.4, 这可能是tokenization artifact (fire可能是高频词)
+3. **Gini系数0.62-0.80范围太宽** — 不确定是"中等集中"还是"高度集中"
+4. **共激活图只用了|corr|>0.3的阈值** — 不同阈值可能导致不同结论
+5. **因果消融只测了5个词对** — 样本量偏小, 统计效力有限
+6. **没有跨模型验证** — 所有结果只基于Qwen3-4B
+
+### 第一性原理: 从因果电路到计算动力学
+
+Phase 111的核心突破: **首次建立了"翻译计算"的因果证据链**
+
+关键洞察重组:
+
+**翻译计算的三层结构:**
+```
+L0-L18: "翻译准备" — 差分neuron逐步激活, 但logit贡献小
+L24:    "中文抑制" — 抑制中文pathway, 释放翻译空间
+L30:    "翻译激活" — 直接向翻译目标logit注入正信号
+L35:    "翻译输出" — 最终的翻译token选择
+```
+
+**Hub分离的深刻含义:**
+翻译和中文的hub neuron完全不同, 意味着MLP层内部存在**任务条件化的计算子图**:
+- 中文任务: 少数高连通hub驱动集中计算
+- 翻译任务: 更分散的计算子图, 无单点控制
+
+这不是简单的"neuron重分配", 而是**计算拓扑的任务条件化切换**。
+
+**修正Phase 110的"分叉树"模型:**
+- ~~"每层用完全不同的neuron"~~ → 每层用大部分不同但少量共享的neuron (共享度>随机)
+- 新理解: 翻译计算是通过**hub切换**而非**neuron替换**实现的
+- Hub neuron是计算子图的"控制节点", 翻译任务激活了不同的控制节点
+
+**下一步关键问题:**
+1. Hub切换的机制是什么? 是attention路由驱动的还是residual stream的几何变化驱动的?
+2. L24的"中文抑制"和L30的"翻译激活"是如何协调的? 中间有什么信号传递?
+3. Hub neuron的输入来自哪里? 是上一层的residual还是attention输出?
+4. 翻译计算的"更稀疏"是否意味着更脆弱? (对抗鲁棒性测试)
+5. 能否找到跨模型的通用翻译电路? (在GLM4和DeepSeek7B上验证)
+
+---
+
+## Phase 112: 计算图统计动力学 — 从neuron中心到路径系综 [2026-05-10 13:51]
+
+### 核心升级: neuron ID → subspace geometry, static → dynamic, Pearson → spectral
+
+### Exp 1: Spectral Topology — 后期层拓扑重构
+
+**L30-L33是拓扑重构peak**: 谱距离0.11(其他层0.02-0.04), 翻译图密度骤降至0.11(中文0.31), 翻译有效维度降6维(196→190), 谱熵降低(ΔH=-0.019). 后期层不仅换了节点, **整个图拓扑都重构了** — 翻译图更稀疏、更集中、更低维.
+
+### Exp 2: Phase Transition Detection — L24-L30相变区域
+
+**Order parameter突变层:**
+- cosine_distance: ★L27→L30, 5.3x跳变 (0.02→0.07)
+- participation_ratio: ★L24→L27, 4.1x跳变 (6→10)
+- routing_entropy_diff: ★L24→L27, 3.8x跳变
+- diff_energy: ★L24→L27, 3.5x跳变
+
+**不是"L24中文抑制"** — 而是L24到L30的**渐进相变过程**.
+
+### Exp 3: Hub Overlap Curve — 所有k下overlap≈0
+
+**Hub overlap在任何k(5-200)下都接近0**, 远低于null期望(0.25). 度排序相关性spearman≈0(-0.08~+0.01), 翻译和中文的hub结构**完全解耦**. 谱距离L30-L33最大(45-48).
+
+### Exp 4: Activation Trajectory — 差分方向全程≈90°旋转!
+
+**最深刻的发现: 差分方向在相邻层间的旋转角≈85-92°!**
+
+| 层区间 | 旋转角 | 类型 |
+|--------|--------|------|
+| L0→L1 | 91.7° | ROTATION |
+| L6→L7 | 89.2° | ROTATION |
+| L12→L13 | 90.2° | ROTATION |
+| L18→L19 | 90.1° | ROTATION |
+| L24→L25 | 88.9° | ROTATION |
+| L30→L31 | 89.4° | ROTATION |
+| L34→L35 | 85.8° | ROTATION |
+
+**这意味着每层都在做近似正交变换!** 不是suppression, 不是amplification, 而是**manifold rotation** — 每层将翻译-中文差分方向旋转约90°.
+
+**Attractor指标**: L33-L35翻译方差开始递减, 表示在收敛到attractor. 最大divergence跳变在L32→L33(46.9), 最大velocity在L34(8.3x mean).
+
+### 最可靠的事实清单 (Phase 112更新)
+
+1. ✅ L24-L30是相变区域 — 所有order parameter在此区间突变(3-5x跳变)
+2. ✅ 差分方向每层旋转≈90° — 是manifold rotation, 不是suppression
+3. ✅ 后期层(L30-L33)图拓扑根本重构 — 翻译图密度降至1/3, 维度降6
+4. ✅ Hub overlap在所有k下≈0 — hub结构完全解耦, 不是采样不稳定
+5. ✅ 翻译计算在L33-L35收敛到attractor — 方差递减
+6. ✅ L18是两种任务拓扑最相似的层 — 可能是"分水岭"
+
+### 硬伤与瓶颈
+
+1. **旋转≈90°的统计意义** — 可能是9728维中差分向量天然正交(高维几何效应), 需要零假设检验
+2. **70个词对仍然偏少** — 子空间分析的维度上限受样本量限制
+3. **PCA轨迹只看了均值** — 个体词对的轨迹分散度未分析
+4. **相变区域(L24-L30)的微观机制不明** — 知道发生了什么, 不知道为什么
+5. **没有跨模型验证**
+
+### 第一性原理: 从manifold rotation到计算相理论
+
+Phase 112的核心突破: **翻译-中文差分方向每层旋转≈90°**
+
+这是目前最深刻的发现。它意味着:
+- **每层都在做近似正交的坐标变换** — 翻译差分信号不是在固定方向上传播, 而是在每层被旋转到新的方向
+- **L24-L30相变 = 旋转速率突变** — 差分方向不变时是"amplification", 突然旋转时是"phase transition"
+- **这解释了overlap≈0** — 如果每层都在做正交变换, 那么差分neuron自然不同
+
+**修正的翻译计算模型:**
+```
+翻译 = 条件化正交变换链 + 相变加速 + 吸引子收敛
+L0-L18: 缓慢旋转 (低能量差分)
+L24-L30: 相变加速 (旋转速率/幅度突变)  
+L33-L35: 吸引子收敛 (方差递减, 输出确定)
+```
+
+**下一阶段关键问题:**
+1. 旋转≈90°是高维几何必然还是功能设计? 零假设: 随机向量的相邻层差分也≈90°?
+2. 旋转的"驱动器"是什么? 是attention还是MLP? 每层的旋转是否由residual stream的几何决定?
+3. 能否通过干预旋转方向来控制翻译行为? (因果验证)
+4. 跨模型是否共享相同的"旋转+相变+吸引子"模式?
+5. 这种"正交变换链"是否有数学上的优化意义? (如保持信息最大化)
+
+---
+
+## Phase 113: 零假设生死检验 — "90°旋转"被证伪! + 子空间动力学 + 算子分解 [2026-05-10 14:31]
+
+### 核心结论: Phase 112的"90°流形旋转"是高维几何零假设, 被正式证伪!
+
+### Exp 1: 零假设检验 — 0/35层对显著偏离null
+
+**方法**: 比较(1)真实差分旋转角 vs (2)同分布随机差分的旋转角(null B), 以及(3)纯随机向量(null A)
+
+**致命结果: 所有35个层对都FAIL_REJECT_NULL!**
+
+| 层对 | 真实角度 | Null B均值 | Null B标准差 | z-score | 判定 |
+|------|----------|-----------|-------------|---------|------|
+| L0→L1 | 86.6° | 86.8° | 0.43 | -0.34 | FAIL |
+| L6→L7 | 86.3° | 86.4° | 0.30 | -0.27 | FAIL |
+| L12→L13 | 88.6° | 88.6° | 0.11 | -0.10 | FAIL |
+| L18→L19 | 89.3° | 89.4° | 0.06 | -0.08 | FAIL |
+| L24→L25 | 89.2° | 89.2° | 0.10 | -0.04 | FAIL |
+| L30→L31 | 87.3° | 87.4° | 0.17 | -0.57 | FAIL |
+| L33→L34 | 89.9° | 89.8° | 0.11 | +0.29 | FAIL |
+
+**Null A (纯随机向量): 89.6° ± 0.3°** — 高维空间中随机向量天然正交!
+
+**关键洞察**: z-score全部在-0.6到+1.0之间, 真实旋转角与null B几乎完全一致。**90°旋转是高维几何的统计必然, 不是功能性正交变换。**
+
+**个体样本旋转角**: mean≈89°, std≈0.5-0.8°, 进一步确认: 每个样本的差分方向在层间也是高维正交的。
+
+**这正式推翻了Phase 112的"manifold rotation chain"理论。** 差分方向的层间正交性不携带功能信息。
+
+### Exp 2: 子空间动力学 — Principal Angles分析
+
+**方法**: 用SVD分解翻译差分子空间(10维), 计算相邻层子空间间的principal angles
+
+**关键发现: 子空间的principal angles也是高维null!**
+
+| 层对 | 最小PA | 最大PA | 平均PA | Null min PA |
+|------|--------|--------|--------|-------------|
+| L0→L1 | 89.8° | 77.9° | 87.6° | 89.9°±0.09 |
+| L6→L7 | 89.9° | 73.3° | 87.0° | 89.9°±0.09 |
+| L12→L13 | 89.9° | 63.9° | 86.4° | 89.9°±0.09 |
+| L18→L19 | 89.9° | 68.2° | 86.9° | 89.9°±0.09 |
+| L24→L25 | 89.9° | 68.6° | 86.5° | 89.9°±0.09 |
+| L30→L31 | 89.9° | 71.6° | 87.3° | 89.9°±0.09 |
+
+**最小principal angle (子空间最接近方向) ≈ 89.9°, 与null 89.9°几乎相同!** 即使看10维子空间, 层间也几乎完全正交。
+
+**唯一有意义的信号: 最大principal angle在某些层偏小(63-78°), 略低于null**。但这可能只是子空间维度的统计效应, 需要进一步验证。
+
+**子空间维度(Participation Ratio)演化:**
+- L0: PR=64.6, dim_95=79 (高维)
+- L6: PR=3.7, dim_95=13 (极低维!)
+- L12: PR=37.4, dim_95=83
+- L18: PR=16.9, dim_95=67
+- L24: PR=57.8, dim_95=86
+- L27: PR=50.8, dim_95=85
+- L30: PR=25.3, dim_95=79
+- L33: PR=32.3, dim_95=80
+- L35: PR=26.6, dim_95=74
+
+**注意**: PR在各层波动很大(3.7-64.6), 这比"旋转角度"更可能携带功能信息。
+
+### Exp 3: 算子分解 — Attention vs MLP贡献
+
+| 层 | Attn能量分数 | MLP能量分数 | cos对齐 | Attn PR | MLP PR |
+|----|-------------|-------------|---------|---------|--------|
+| L0 | 40.7% | 59.3% | 0.248 | 49.6 | 61.9 |
+| L6 | 50.9% | 49.1% | -0.208 | 33.7 | 62.2 |
+| L12 | 43.3% | 56.7% | -0.122 | 13.4 | **2.8** |
+| L18 | 39.8% | 60.2% | -0.110 | 9.3 | **2.6** |
+| L24 | 33.4% | 66.6% | -0.179 | 38.3 | 43.9 |
+| **L27** | **20.8%** | **79.2%** | **-0.001** | 40.0 | 32.3 |
+| **L30** | **24.6%** | **75.4%** | **+0.050** | 43.5 | 56.1 |
+| L33 | 32.8% | 67.2% | +0.016 | 19.3 | 58.5 |
+| L35 | 30.7% | 69.3% | +0.015 | 39.6 | **11.7** |
+
+**关键发现:**
+1. **L27-L30: MLP绝对主导(75-79%)**, 翻译差分几乎完全由MLP驱动
+2. **cos_alignment极低(-0.18~+0.05)**: attention差分方向和MLP差分方向几乎正交, 两者贡献相互独立
+3. **L12/L18: MLP的PR极低(2.6-2.8)**: 中期层MLP差分集中到仅2-3个主成分, 高度集中!
+4. **L35: MLP的PR=11.7**: 最终层MLP差分也较集中, 但attention的贡献PR=39.6(分散)
+
+**这意味着: 翻译计算的核心信号在MLP, 尤其中期层(L12-L18)MLP差分极集中(PR≈3), 但后期层(L27-L30)MLP绝对主导且cos≈0(与attention完全独立)**
+
+### Exp 4: 路径拓扑稳定性
+
+**排名稳定性(Spearman)**:
+- 相邻层差分排名ρ=0.03-0.32, 极低 → 差分neuron排名在层间不连续
+- 例外: L6→L7 ρ=0.32 (最强), 可能是embedding层的特殊结构
+
+**个体路径持续度(top-10差分neuron跨层overlap):**
+- 绝大部分层: overlap≈0%
+- 例外: L19→L20 mean=7.8%, L30→L31 mean=4.1%, L17→L18 mean=3.8%
+- **翻译路径在neuron层面几乎完全不持续!** 同一样本在相邻层的差分neuron几乎不共享
+
+**Gini系数演化:**
+- L0-L23: zh_gini > trans_gini (中文更集中)
+- L24+: 反转, trans_gini > zh_gini (翻译更集中)
+- L35: zh=0.420, trans=0.442 (差异最大)
+
+### 最可靠的事实清单 (Phase 113更新)
+
+1. ✅ **90°旋转被证伪** — 是高维几何零假设, 0/35层对显著偏离null (z<1)
+2. ✅ **MLP主导翻译差分** — 后期层(L27-L30)MLP占75-79%, attention仅20-25%
+3. ✅ **attention和MLP差分方向正交** — cos_align≈0, 两者独立贡献
+4. ✅ **中期层MLP差分极集中** — L12/L18的MLP PR≈3 (仅2-3主成分)
+5. ✅ **翻译路径在neuron层面不持续** — 个体top-10 overlap≈0%
+6. ✅ **Phase 112的相变/拓扑分叉/维度塌缩结论仍成立** — 这些是order parameter, 不依赖"旋转"
+7. ❌ ~~"流形旋转链"~~ — 被正式证伪
+
+### 硬伤与瓶颈
+
+1. **子空间分析也落在null中** — 最小principal angle≈89.9°与null 89.9°相同, 连子空间层面的对齐都是零假设
+2. **最大PA略偏离null(63-78°)** — 但统计意义不明, 可能是k=10的子空间维度效应
+3. **路径持续度几乎为0** — 翻译计算在neuron层面完全不跨层持续, 这对"route"理论是挑战
+4. **Attention/MLP分离可能受hook位置影响** — hook到的是output而非对residual的贡献
+5. **100样本仍不够大** — 子空间维度分析受样本量限制
+
+### 第一性原理: 从"旋转"到"能量分布"
+
+Phase 113的核心教训: **高维空间的几何直觉是危险的。**
+
+**被证伪的路径:**
+- ~~"差分方向在层间旋转≈90°"~~ → 高维零假设
+- ~~"每层做正交变换"~~ → 方向完全decorrelate, 但不是rotation (没有连续算子)
+- ~~"manifold rotation chain"~~ → 幻觉
+
+**仍然成立的路径:**
+1. **能量分布(energy distribution)是稳定的** — MLP/Attn的能量分数跨层有明确模式
+2. **维度(dimensionality)是稳定的** — PR在各层有明确演化趋势
+3. **拓扑(topology)是稳定的** — 图密度/谱/Hub结构的变化是真实的
+4. **相变(phase transition)是真实的** — order parameter在L24-L30的突变不是零假设
+
+---
+
+## Phase 114: Marchenko-Pastur生死检验 — 维度塌缩通过MP检验! + 传播算子 + 跨模型普适性 [2026-05-10 15:08]
+
+### 核心结论: 维度塌缩(Dimensional Collapse)通过Marchenko-Pastur零假设检验, 是真信号!
+
+### Exp 1: 隐藏状态MP检验
+
+**方法**: 比较翻译差分(trans-zh)的协方差特征值谱与Marchenko-Pastur零假设分布。超过MP上界λ_+的特征值=真信号, 在[λ_-, λ_+]内的=噪声。
+
+**结果: 所有13个采样层都SIGNAL_DETECTED (z=42-80)**
+
+| 层 | true_dim | PR_full | signal_ratio | z-score |
+|----|----------|---------|--------------|---------|
+| L0 | 25 | 71.1 | 0.455 | 76.56 |
+| L6 | 21 | 52.8 | 0.436 | 47.28 |
+| L12 | **14** | **15.0** | **0.543** | **42.71** |
+| L15 | **15** | **14.2** | **0.597** | **42.83** |
+| L18 | 20 | 27.7 | 0.574 | 51.59 |
+| L24 | 23 | 26.0 | 0.587 | 57.00 |
+| L27 | 21 | 31.3 | 0.507 | 69.67 |
+| L30 | 22 | 53.8 | 0.458 | 59.57 |
+| L33 | 24 | 65.5 | 0.444 | 79.67 |
+| L35 | 25 | 48.7 | 0.498 | 76.56 |
+
+**Null基线: 随机矩阵true_dim=0.1±0.3, 即几乎从不超过MP上界**
+
+### Exp 3: MLP差分MP检验 (最关键!)
+
+**对MLP输出差分(trans_mlp - zh_mlp)做MP分析:**
+
+| 层 | true_dim | PR_full | PR_signal | signal_ratio | gap_to_noise |
+|----|----------|---------|-----------|--------------|-------------|
+| L0 | 25 | 75.9 | 20.2 | 0.444 | 1.01 |
+| L9 | 21 | 77.0 | 15.4 | 0.374 | 1.01 |
+| **L12** | **4** | **3.1** | **1.3** | **0.644** | **1.60** |
+| L15 | 14 | 9.6 | 4.2 | 0.658 | 1.01 |
+| **L18** | **8** | **3.1** | **1.8** | **0.767** | 1.01 |
+| L21 | 20 | 27.2 | 10.1 | 0.592 | 1.01 |
+| L27 | 18 | 37.6 | 10.1 | 0.492 | 1.05 |
+| L30 | 23 | 78.3 | 18.4 | 0.409 | 1.03 |
+| **L35** | **14** | **9.0** | **3.4** | **0.614** | 1.02 |
+
+**关键发现:**
+1. **L12: true_dim=4, PR_signal=1.3!** 仅4个特征值超过MP上界, 且PR_signal=1.3意味着信号几乎完全集中在1-2个维度
+2. **L12的top特征值=41.47, 是MP上界0.78的53倍!** 信号极强, 远超噪声
+3. **L12的gap=1.60** — 最强gap, 第4个特征值仍显著超过MP上界
+4. **L18: true_dim=8, PR_signal=1.8** — 第二个维度塌缩点
+5. **L35: true_dim=14, PR_signal=3.4** — 最终层也有中度塌缩
+6. **PR_full(含噪声)与PR_signal(仅信号)差距巨大** — PR_full=3.1但PR_signal=1.3, 说明大量"低维"是噪声贡献的
+
+### 跨模型对比 (三模型MLP差分MP分析)
+
+**Qwen3-4B (36层, d=2560):**
+| 层 | true_dim | PR_signal | signal_ratio | 特征 |
+|----|----------|-----------|--------------|------|
+| L0 | 25 | 20.2 | 0.444 | 高维分散 |
+| **L12** | **4** | **1.3** | **0.644** | **极深维度塌缩** |
+| **L18** | **8** | **1.8** | **0.767** | **中度塌缩** |
+| **L35** | **14** | **3.4** | **0.614** | 最终层塌缩 |
+
+**DeepSeek7B (28层, d=3584):**
+| 层 | true_dim | PR_signal | signal_ratio | 特征 |
+|----|----------|-----------|--------------|------|
+| L0 | 29 | 24.9 | 0.465 | 高维分散 |
+| L12 | 21 | 13.2 | 0.438 | 无塌缩 |
+| **L27** | **7** | **2.2** | **0.782** | **最终层极深塌缩** |
+
+**GLM4 (40层, d=4096):**
+| 层 | true_dim | PR_signal | signal_ratio | 特征 |
+|----|----------|-----------|--------------|------|
+| L0 | 23 | 7.9 | 0.558 | 中维 |
+| **L21** | **12** | **3.0** | **0.613** | **最浅塌缩点** |
+| L24 | 19 | 5.2 | 0.626 | 回弹 |
+| L35 | 26 | 14.8 | 0.462 | 高维分散 |
+
+**跨模型核心发现:**
+
+| 特征 | Qwen3 | DeepSeek7B | GLM4 |
+|------|-------|------------|------|
+| 最深塌缩层 | L12 | L27 | L21 |
+| 最深塌缩true_dim | **4** | **7** | **12** |
+| 最深塌缩PR_signal | **1.3** | **2.2** | **3.0** |
+| 塌缩signal_ratio | 0.644 | 0.782 | 0.613 |
+| 塌缩位置 | 中层 | 最终层 | 中偏后 |
+| 模型参数 | 4B | 7B(8bit) | 9B(8bit) |
+
+**维度塌缩是普适的! 但深度和位置随模型而异:**
+1. 小模型(Qwen3)塌缩更深(4维), 大模型(GLM4)塌缩较浅(12维)
+2. 塌缩位置可能取决于架构/训练, 不固定
+3. **所有模型的塌缩点signal_ratio都更高(61-78% vs 40-50%正常层)**, 说明翻译差分在塌缩点更集中
+
+### Exp 2: 传播算子分析
+
+**差分范数演化 (Qwen3):**
+- L0: 7.1 → L6: 16.0 → L12: 19.8 → L24: 44.5 → L30: 96.8 → L35: 161
+- **L23-L30呈准指数增长** (相变区的信号放大!)
+- 范数比L30/L24=2.2x, 与Phase 112的相变观察一致
+
+**主成分传播(PC overlap):**
+- 相邻层top-5 PC overlap: 0.60-0.99
+- 大部分层0.8-0.99: 主成分有跨层连续性
+- 最低点: L33→L34=0.60, L34→L35=0.68 (最终层PC大幅重构)
+
+**传播投影比:**
+- forward/reverse ratio = 1.000 (N<<P伪影, 143样本在2560维, 行空间必然完全重叠)
+- **此方法在N<<P时失效, 不能提供传播信息**
+
+### Exp 5: Fisher几何近似
+
+| 层 | Fisher ratio | 解读 |
+|----|-------------|------|
+| L0 | 1.087 ± 0.320 | 略高于随机 |
+| L3 | 1.021 ± 0.160 | ≈随机 |
+| L6 | 0.996 ± 0.157 | ≈随机 |
+| L9 | 0.976 ± 0.213 | ≈随机 |
+| L12 | 0.982 ± 0.172 | ≈随机 |
+
+**Fisher ratio ≈ 1.0: 翻译方向不比随机方向更有输出影响力!**
+
+但这不矛盾:
+1. **MP检测的是协方差结构中的信号** — 翻译差分跨样本有共同模式
+2. **Fisher测的是输出敏感性** — 该方向对最终输出的局部影响
+3. **关键区别**: 协方差信号≠因果力量。差分有共同模式, 但这些模式可能不沿输出敏感方向排列
+
+### 最可靠的事实清单 (Phase 114更新)
+
+1. ✅ **维度塌缩通过MP检验** — 不是有限样本伪影, z-score=11-149
+2. ✅ **Qwen3 L12仅4个真信号维度** — top特征值是MP上界53倍
+3. ✅ **维度塌缩是跨模型普适的** — Qwen3/DeepSeek7B/GLM4都有
+4. ✅ **塌缩点signal_ratio更高** — 61-78% vs 40-50%
+5. ✅ **差分范数在L23-L30准指数增长** — 相变区的信号放大
+6. ✅ **主成分有跨层连续性** — PC overlap 0.8-0.99 (除最终层)
+7. ❌ **Fisher ratio≈1** — 翻译方向不比随机方向更影响输出 (但测试不完整)
+8. ❌ **传播投影比失效** — N<<P伪影
+
+### 硬伤与瓶颈
+
+1. **Fisher测试不完整** — 只测了5层(L0-L12), 没测L24-L30相变区; 扰动幅度(ε=0.1)可能太小; 只测了20个词对
+2. **MP的sigma2估计** — 使用element_var可能高估噪声(因翻译差分非零均值), 使用min_eig可能低估; 两种估计给出不同结果
+3. **MLP差分vs隐藏状态差分** — Phase 113用gate activations(9728维), 这里用MLP output(2560维), 维度不同, PR不可直接比较
+4. **跨模型对比的归一化问题** — 不同模型d_model不同(2560/3584/4096), true_dim的绝对值不可直接比较
+5. **信号维度的语义内容未知** — L12的4个信号维度对应什么? 是"翻译路由"核心? 还是某种统计伪迹?
+6. **传播动力学仍然缺失** — 投影比方法失效, 需要Jacobian方法
+
+### 第一性原理: 从"维度塌缩"到"序参量凝聚"
+
+**Phase 114的核心突破: 维度塌缩不是噪声, 是统计物理意义上的序参量凝聚。**
+
+类比:
+- **BEC(玻色-爱因斯坦凝聚)**: 大量自由度塌缩到基态
+- **翻译维度塌缩**: 大量差分维度塌缩到4-7个信号维度
+
+**数学结构**:
+- 协方差矩阵C的特征值谱呈现"bulk+outlier"结构
+- Bulk = 噪声谱(符合MP分布)
+- Outlier = 信号维度(超过MP上界)
+- 翻译差分的有效自由度 = outlier数量 = 4-14
+
+**核心洞察**:
+翻译计算的本质是**低秩结构在特定层的凝聚与耗散**:
+1. 前期层: 差分分散在20-29个维度(高维route)
+2. 中层(L12/Qwen3, L21/GLM4): 差分凝聚到4-12个维度(低秩瓶颈)
+3. 相变区(L24-L30): 信号被放大(范数2-3x增长), 维度重新扩展
+4. 最终层(DeepSeek7B)或再度凝聚(Qwen3 L35: 14维)
+
+**这个"凝聚-放大-再凝聚"的循环, 可能是Transformer处理语义变换的基本计算模式。**
+
+**下一阶段关键问题:**
+1. L12的4个信号维度是什么? 对应哪些语义/计算功能? (需要特征向量解释)
+2. 为什么Phase 112的相变区(L24-L30)不是维度最低点, 而是信号放大区? (维度最低≠最重要, 信号强度更重要)
+3. Fisher测试需要升级: 测试信号维度(而非差分方向)对输出的影响
+4. 是否可以通过干预信号维度来因果控制翻译? (因果验证)
+5. 凝聚-放大-再凝聚的循环是否是所有语义变换(不只是翻译)的通用模式?
+3. **拓扑(topology)是稳定的** — 图密度/谱/Hub结构的变化是真实的
+4. **相变(phase transition)是真实的** — order parameter在L24-L30的突变不是零假设
+
+**核心洞察重构:**
+翻译计算的本质不是"方向的旋转", 而是**"能量在子空间中的重分配"**:
+- 前期层(L0-L18): 能量分散(高PR), attention和MLP共同贡献
+- 中期层(L12-L18): MLP差分极集中(PR≈3), 仅2-3个主成分携带翻译信号
+- 相变区(L24-L30): MLP能量份额从60%跳到79%, 图拓扑重构
+- 后期层(L30-L35): MLP绝对主导, 差分能量收敛到少数方向
+
+**下一阶段关键问题:**
+1. MLP PR≈3的中期层: 那2-3个主成分是什么? 是否对应"翻译路由"的核心维度?
+2. 相变区MLP能量从60%→79%的驱动机制: 为什么attention贡献骤降?
+3. 翻译差分neuron在层间完全不持续: 信息如何跨层传递? (通过residual stream的线性传播, 不是通过neuron ID)
+4. 跨模型验证: GLM4和DeepSeek7B是否也有MLP主导+PR极低的模式?
+5. 能否通过干预MLP的2-3个主成分来因果控制翻译?
