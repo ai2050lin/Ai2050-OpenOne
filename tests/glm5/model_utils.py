@@ -251,8 +251,9 @@ def get_W_U(model) -> np.ndarray:
 def release_model(model):
     """释放模型GPU内存"""
     del model
+    import gc; gc.collect()
     torch.cuda.empty_cache()
-    print("[model_utils] GPU memory released")
+    print(f"[model_utils] GPU memory released, allocated={torch.cuda.memory_allocated()/1e9:.2f} GB")
 
 
 def get_sample_layers(n_layers: int, n_samples: int = 10) -> List[int]:
