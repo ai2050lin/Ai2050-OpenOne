@@ -1,0 +1,1526 @@
+{
+  "model": "glm4",
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096,
+    "intermediate_size": 13696
+  },
+  "timestamp": "2026-05-11 21:57:03",
+  "exp1_activation_patching": {
+    "summary": {
+      "swap_pairs": {
+        "n": 13,
+        "avg_early": 0.2485,
+        "avg_middle": 0.7436,
+        "avg_late": 0.6311
+      },
+      "passive_pairs": {
+        "n": 2,
+        "avg_early": 0.133,
+        "avg_middle": 0.682,
+        "avg_late": 0.6566
+      },
+      "negation_pairs": {
+        "n": 2,
+        "avg_early": 0.0548,
+        "avg_middle": 0.3773,
+        "avg_late": 0.5017
+      },
+      "tense_pairs": {
+        "n": 2,
+        "avg_early": 0.0504,
+        "avg_middle": 0.3971,
+        "avg_late": 0.5264
+      }
+    },
+    "pair_results": [
+      {
+        "pair": [
+          "The dog bites the man",
+          "The man bites the dog"
+        ],
+        "baseline_kl": 0.3165,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.751,
+        "effects_by_region": {
+          "early": 0,
+          "middle": 0.5680666666666666,
+          "late": 0.4780666666666667
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 1.134564,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.571414,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.361321,
+            "causal_effect": 0
+          },
+          "15": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.140808,
+            "causal_effect": 0.5551
+          },
+          "20": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.10553,
+            "causal_effect": 0.6666
+          },
+          "25": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.16378,
+            "causal_effect": 0.4825
+          },
+          "30": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.078811,
+            "causal_effect": 0.751
+          },
+          "35": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 0.100261,
+            "causal_effect": 0.6832
+          },
+          "39": {
+            "baseline_kl": 0.316488,
+            "patched_kl": 1.031673,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat chases the mouse",
+          "The mouse chases the cat"
+        ],
+        "baseline_kl": 0.142,
+        "max_causal_layer": 20,
+        "max_causal_effect": 0.7442,
+        "effects_by_region": {
+          "early": 0.15213333333333331,
+          "middle": 0.5967333333333333,
+          "late": 0.4209333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.607319,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 1.140843,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.077191,
+            "causal_effect": 0.4564
+          },
+          "15": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.078588,
+            "causal_effect": 0.4466
+          },
+          "20": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.036326,
+            "causal_effect": 0.7442
+          },
+          "25": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.05688,
+            "causal_effect": 0.5994
+          },
+          "30": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.040892,
+            "causal_effect": 0.712
+          },
+          "35": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.06379,
+            "causal_effect": 0.5508
+          },
+          "39": {
+            "baseline_kl": 0.142003,
+            "patched_kl": 0.528868,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The teacher praises the student",
+          "The student praises the teacher"
+        ],
+        "baseline_kl": 0.3484,
+        "max_causal_layer": 35,
+        "max_causal_effect": 0.9113,
+        "effects_by_region": {
+          "early": 0.13396666666666665,
+          "middle": 0.6580666666666667,
+          "late": 0.5962666666666666
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 1.277409,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 1.371451,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.208406,
+            "causal_effect": 0.4019
+          },
+          "15": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.136979,
+            "causal_effect": 0.6069
+          },
+          "20": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.16971,
+            "causal_effect": 0.5129
+          },
+          "25": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.050731,
+            "causal_effect": 0.8544
+          },
+          "30": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.042679,
+            "causal_effect": 0.8775
+          },
+          "35": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.03092,
+            "causal_effect": 0.9113
+          },
+          "39": {
+            "baseline_kl": 0.348438,
+            "patched_kl": 0.457781,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The doctor helps the patient",
+          "The patient helps the doctor"
+        ],
+        "baseline_kl": 0.9658,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.9542,
+        "effects_by_region": {
+          "early": 0.4054333333333333,
+          "middle": 0.8868,
+          "late": 0.6532333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 1.708799,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.544207,
+            "causal_effect": 0.4365
+          },
+          "10": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.212612,
+            "causal_effect": 0.7798
+          },
+          "15": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.181167,
+            "causal_effect": 0.8124
+          },
+          "20": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.067711,
+            "causal_effect": 0.9299
+          },
+          "25": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.079111,
+            "causal_effect": 0.9181
+          },
+          "30": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.044216,
+            "causal_effect": 0.9542
+          },
+          "35": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.094058,
+            "causal_effect": 0.9026
+          },
+          "39": {
+            "baseline_kl": 0.96576,
+            "patched_kl": 0.866372,
+            "causal_effect": 0.1029
+          }
+        }
+      },
+      {
+        "pair": [
+          "The police arrests the criminal",
+          "The criminal arrests the police"
+        ],
+        "baseline_kl": 1.9026,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.9621,
+        "effects_by_region": {
+          "early": 0.4934,
+          "middle": 0.8832666666666666,
+          "late": 0.8676666666666666
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 4.447819,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.516195,
+            "causal_effect": 0.7287
+          },
+          "10": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.472749,
+            "causal_effect": 0.7515
+          },
+          "15": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.361057,
+            "causal_effect": 0.8102
+          },
+          "20": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.155928,
+            "causal_effect": 0.918
+          },
+          "25": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.149124,
+            "causal_effect": 0.9216
+          },
+          "30": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.072021,
+            "causal_effect": 0.9621
+          },
+          "35": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.104478,
+            "causal_effect": 0.9451
+          },
+          "39": {
+            "baseline_kl": 1.902556,
+            "patched_kl": 0.57876,
+            "causal_effect": 0.6958
+          }
+        }
+      },
+      {
+        "pair": [
+          "The king rules the kingdom",
+          "The kingdom rules the king"
+        ],
+        "baseline_kl": 0.9265,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.959,
+        "effects_by_region": {
+          "early": 0.28863333333333335,
+          "middle": 0.9252000000000001,
+          "late": 0.7436333333333334
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 1.358444,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 1.771503,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.124203,
+            "causal_effect": 0.8659
+          },
+          "15": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.112091,
+            "causal_effect": 0.879
+          },
+          "20": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.05554,
+            "causal_effect": 0.9401
+          },
+          "25": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.040291,
+            "causal_effect": 0.9565
+          },
+          "30": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.037997,
+            "causal_effect": 0.959
+          },
+          "35": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.070056,
+            "causal_effect": 0.9244
+          },
+          "39": {
+            "baseline_kl": 0.926491,
+            "patched_kl": 0.60454,
+            "causal_effect": 0.3475
+          }
+        }
+      },
+      {
+        "pair": [
+          "The hunter shoots the bear",
+          "The bear shoots the hunter"
+        ],
+        "baseline_kl": 0.5681,
+        "max_causal_layer": 25,
+        "max_causal_effect": 0.909,
+        "effects_by_region": {
+          "early": 0.35369999999999996,
+          "middle": 0.8238666666666669,
+          "late": 0.6967666666666666
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 2.962462,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.412114,
+            "causal_effect": 0.2745
+          },
+          "10": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.121202,
+            "causal_effect": 0.7866
+          },
+          "15": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.132522,
+            "causal_effect": 0.7667
+          },
+          "20": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.115919,
+            "causal_effect": 0.7959
+          },
+          "25": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.051668,
+            "causal_effect": 0.909
+          },
+          "30": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.057904,
+            "causal_effect": 0.8981
+          },
+          "35": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.07962,
+            "causal_effect": 0.8598
+          },
+          "39": {
+            "baseline_kl": 0.56808,
+            "patched_kl": 0.379265,
+            "causal_effect": 0.3324
+          }
+        }
+      },
+      {
+        "pair": [
+          "The mother feeds the child",
+          "The child feeds the mother"
+        ],
+        "baseline_kl": 0.5817,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.9399,
+        "effects_by_region": {
+          "early": 0.42910000000000004,
+          "middle": 0.8657666666666666,
+          "late": 0.6400333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.716042,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.285494,
+            "causal_effect": 0.5092
+          },
+          "10": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.129113,
+            "causal_effect": 0.7781
+          },
+          "15": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.079721,
+            "causal_effect": 0.863
+          },
+          "20": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.064318,
+            "causal_effect": 0.8894
+          },
+          "25": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.090213,
+            "causal_effect": 0.8449
+          },
+          "30": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.034973,
+            "causal_effect": 0.9399
+          },
+          "35": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.075572,
+            "causal_effect": 0.8701
+          },
+          "39": {
+            "baseline_kl": 0.58173,
+            "patched_kl": 0.517658,
+            "causal_effect": 0.1101
+          }
+        }
+      },
+      {
+        "pair": [
+          "The boss fires the worker",
+          "The worker fires the boss"
+        ],
+        "baseline_kl": 0.7809,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.9725,
+        "effects_by_region": {
+          "early": 0.39233333333333337,
+          "middle": 0.9008666666666666,
+          "late": 0.6780666666666666
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 5.537543,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.371882,
+            "causal_effect": 0.5238
+          },
+          "10": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.270851,
+            "causal_effect": 0.6532
+          },
+          "15": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.115759,
+            "causal_effect": 0.8518
+          },
+          "20": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.071678,
+            "causal_effect": 0.9082
+          },
+          "25": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.044819,
+            "causal_effect": 0.9426
+          },
+          "30": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.021448,
+            "causal_effect": 0.9725
+          },
+          "35": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.056289,
+            "causal_effect": 0.9279
+          },
+          "39": {
+            "baseline_kl": 0.780946,
+            "patched_kl": 0.676465,
+            "causal_effect": 0.1338
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat eats the fish",
+          "The fish eats the cat"
+        ],
+        "baseline_kl": 0.5786,
+        "max_causal_layer": 25,
+        "max_causal_effect": 0.9119,
+        "effects_by_region": {
+          "early": 0.20666666666666667,
+          "middle": 0.7885,
+          "late": 0.5890666666666666
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.720109,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.526099,
+            "causal_effect": 0.0908
+          },
+          "10": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.27243,
+            "causal_effect": 0.5292
+          },
+          "15": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.216113,
+            "causal_effect": 0.6265
+          },
+          "20": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.100028,
+            "causal_effect": 0.8271
+          },
+          "25": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.050963,
+            "causal_effect": 0.9119
+          },
+          "30": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.069573,
+            "causal_effect": 0.8798
+          },
+          "35": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.065147,
+            "causal_effect": 0.8874
+          },
+          "39": {
+            "baseline_kl": 0.578636,
+            "patched_kl": 0.870929,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The dog bites the man",
+          "The man is bitten by the dog"
+        ],
+        "baseline_kl": 1.1104,
+        "max_causal_layer": 35,
+        "max_causal_effect": 0.8837,
+        "effects_by_region": {
+          "early": 0.18743333333333334,
+          "middle": 0.6575666666666666,
+          "late": 0.7414333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.896717,
+            "causal_effect": 0.1924
+          },
+          "5": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 1.138807,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.699663,
+            "causal_effect": 0.3699
+          },
+          "15": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.529665,
+            "causal_effect": 0.523
+          },
+          "20": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.391714,
+            "causal_effect": 0.6472
+          },
+          "25": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.219261,
+            "causal_effect": 0.8025
+          },
+          "30": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.140356,
+            "causal_effect": 0.8736
+          },
+          "35": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.129141,
+            "causal_effect": 0.8837
+          },
+          "39": {
+            "baseline_kl": 1.110379,
+            "patched_kl": 0.59181,
+            "causal_effect": 0.467
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat chases the mouse",
+          "The mouse is chased by the cat"
+        ],
+        "baseline_kl": 0.4419,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.8578,
+        "effects_by_region": {
+          "early": 0.07856666666666666,
+          "middle": 0.7064666666666667,
+          "late": 0.5717333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.7686,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 1.275665,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.337762,
+            "causal_effect": 0.2357
+          },
+          "15": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.185457,
+            "causal_effect": 0.5803
+          },
+          "20": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.126545,
+            "causal_effect": 0.7136
+          },
+          "25": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.077116,
+            "causal_effect": 0.8255
+          },
+          "30": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.062827,
+            "causal_effect": 0.8578
+          },
+          "35": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.115077,
+            "causal_effect": 0.7396
+          },
+          "39": {
+            "baseline_kl": 0.441895,
+            "patched_kl": 0.38983,
+            "causal_effect": 0.1178
+          }
+        }
+      },
+      {
+        "pair": [
+          "The dog bites the man",
+          "The dog does not bite the man"
+        ],
+        "baseline_kl": 0.5778,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.8616,
+        "effects_by_region": {
+          "early": 0.10959999999999999,
+          "middle": 0.40503333333333336,
+          "late": 0.5272666666666667
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.871734,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.447986,
+            "causal_effect": 0.2247
+          },
+          "10": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.517654,
+            "causal_effect": 0.1041
+          },
+          "15": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.569856,
+            "causal_effect": 0.0138
+          },
+          "20": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.292087,
+            "causal_effect": 0.4945
+          },
+          "25": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.1694,
+            "causal_effect": 0.7068
+          },
+          "30": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.079989,
+            "causal_effect": 0.8616
+          },
+          "35": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.161673,
+            "causal_effect": 0.7202
+          },
+          "39": {
+            "baseline_kl": 0.577816,
+            "patched_kl": 0.713573,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat likes the fish",
+          "The cat does not like the fish"
+        ],
+        "baseline_kl": 0.4444,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.7883,
+        "effects_by_region": {
+          "early": 0,
+          "middle": 0.3496666666666666,
+          "late": 0.47606666666666664
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 1.117286,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.583865,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.606752,
+            "causal_effect": 0
+          },
+          "15": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.626146,
+            "causal_effect": 0
+          },
+          "20": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.276536,
+            "causal_effect": 0.3777
+          },
+          "25": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.146059,
+            "causal_effect": 0.6713
+          },
+          "30": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.094067,
+            "causal_effect": 0.7883
+          },
+          "35": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.160028,
+            "causal_effect": 0.6399
+          },
+          "39": {
+            "baseline_kl": 0.444409,
+            "patched_kl": 0.88453,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The dog bit the man",
+          "The dog will bite the man"
+        ],
+        "baseline_kl": 0.8256,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.8718,
+        "effects_by_region": {
+          "early": 0.0708,
+          "middle": 0.42419999999999997,
+          "late": 0.5716333333333333
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 1.128933,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.892021,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.650221,
+            "causal_effect": 0.2124
+          },
+          "15": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.634982,
+            "causal_effect": 0.2309
+          },
+          "20": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.463088,
+            "causal_effect": 0.4391
+          },
+          "25": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.328129,
+            "causal_effect": 0.6026
+          },
+          "30": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.10584,
+            "causal_effect": 0.8718
+          },
+          "35": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.129559,
+            "causal_effect": 0.8431
+          },
+          "39": {
+            "baseline_kl": 0.825591,
+            "patched_kl": 0.963157,
+            "causal_effect": 0
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat caught the mouse",
+          "The cat will catch the mouse"
+        ],
+        "baseline_kl": 0.2738,
+        "max_causal_layer": 30,
+        "max_causal_effect": 0.8519,
+        "effects_by_region": {
+          "early": 0.030100000000000002,
+          "middle": 0.3699333333333333,
+          "late": 0.4811666666666667
+        },
+        "patch_effects": {
+          "0": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 1.298591,
+            "causal_effect": 0
+          },
+          "5": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.297014,
+            "causal_effect": 0
+          },
+          "10": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.249087,
+            "causal_effect": 0.0903
+          },
+          "15": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.209079,
+            "causal_effect": 0.2364
+          },
+          "20": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.18553,
+            "causal_effect": 0.3224
+          },
+          "25": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.122939,
+            "causal_effect": 0.551
+          },
+          "30": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.040555,
+            "causal_effect": 0.8519
+          },
+          "35": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 0.111814,
+            "causal_effect": 0.5916
+          },
+          "39": {
+            "baseline_kl": 0.273804,
+            "patched_kl": 1.220021,
+            "causal_effect": 0
+          }
+        }
+      }
+    ]
+  },
+  "exp2_propagation_flow": {
+    "pair_results": {
+      "The cat sat quietly|||The dog ran quickly": {
+        "0": {
+          "cos_delta": 0.3691,
+          "directional_correlation": 0.0796
+        },
+        "10": {
+          "cos_delta": 0.332,
+          "directional_correlation": 0.1902
+        },
+        "20": {
+          "cos_delta": 0.6079,
+          "directional_correlation": 0.6279
+        },
+        "30": {
+          "cos_delta": 0.4786,
+          "directional_correlation": 0.2435
+        }
+      },
+      "The cat sat quietly|||The apple fell down": {
+        "0": {
+          "cos_delta": 0.1473,
+          "directional_correlation": 0.2016
+        },
+        "10": {
+          "cos_delta": 0.165,
+          "directional_correlation": -0.0413
+        },
+        "20": {
+          "cos_delta": 0.3253,
+          "directional_correlation": 0.4067
+        },
+        "30": {
+          "cos_delta": 0.3651,
+          "directional_correlation": -0.1038
+        }
+      },
+      "The king rules|||The slave obeys": {
+        "0": {
+          "cos_delta": 0.3846,
+          "directional_correlation": 0.3987
+        },
+        "10": {
+          "cos_delta": 0.2034,
+          "directional_correlation": 0.0987
+        },
+        "20": {
+          "cos_delta": 0.4077,
+          "directional_correlation": 0.4564
+        },
+        "30": {
+          "cos_delta": 0.3806,
+          "directional_correlation": 0.2894
+        }
+      },
+      "The dog bites the man|||The man bites the dog": {
+        "0": {
+          "cos_delta": 0.4141,
+          "directional_correlation": 0.3206
+        },
+        "10": {
+          "cos_delta": 0.474,
+          "directional_correlation": 0.2232
+        },
+        "20": {
+          "cos_delta": 0.6333,
+          "directional_correlation": 0.5947
+        },
+        "30": {
+          "cos_delta": 0.5917,
+          "directional_correlation": 0.5561
+        }
+      },
+      "The red apple|||The green apple": {
+        "0": {
+          "cos_delta": 0.6445,
+          "directional_correlation": 0.6231
+        },
+        "10": {
+          "cos_delta": 0.4541,
+          "directional_correlation": 0.4228
+        },
+        "20": {
+          "cos_delta": 0.7433,
+          "directional_correlation": 0.6718
+        },
+        "30": {
+          "cos_delta": 0.7791,
+          "directional_correlation": 0.6715
+        }
+      },
+      "The big city|||The small village": {
+        "0": {
+          "cos_delta": 0.3918,
+          "directional_correlation": 0.4536
+        },
+        "10": {
+          "cos_delta": 0.238,
+          "directional_correlation": 0.0785
+        },
+        "20": {
+          "cos_delta": 0.5203,
+          "directional_correlation": 0.4788
+        },
+        "30": {
+          "cos_delta": 0.3877,
+          "directional_correlation": 0.1262
+        }
+      }
+    }
+  },
+  "exp3_causal_tracing": {
+    "n_words": 16,
+    "category_summary": {
+      "animal": {
+        "mean_layer": 35.0,
+        "std_layer": 0.0
+      },
+      "fruit": {
+        "mean_layer": 35.0,
+        "std_layer": 0.0
+      },
+      "place": {
+        "mean_layer": 22.5,
+        "std_layer": 13.0
+      },
+      "tool": {
+        "mean_layer": 35.0,
+        "std_layer": 0.0
+      }
+    },
+    "word_results": {
+      "cat": {
+        "category": "animal",
+        "contrast": "tool",
+        "max_causal_layer": 35,
+        "max_effect": 3.2728
+      },
+      "dog": {
+        "category": "animal",
+        "contrast": "tool",
+        "max_causal_layer": 35,
+        "max_effect": 2.5061
+      },
+      "horse": {
+        "category": "animal",
+        "contrast": "place",
+        "max_causal_layer": 35,
+        "max_effect": 3.6722
+      },
+      "lion": {
+        "category": "animal",
+        "contrast": "fruit",
+        "max_causal_layer": 35,
+        "max_effect": 6.3659
+      },
+      "apple": {
+        "category": "fruit",
+        "contrast": "animal",
+        "max_causal_layer": 35,
+        "max_effect": 4.5615
+      },
+      "banana": {
+        "category": "fruit",
+        "contrast": "tool",
+        "max_causal_layer": 35,
+        "max_effect": 7.5712
+      },
+      "orange": {
+        "category": "fruit",
+        "contrast": "place",
+        "max_causal_layer": 35,
+        "max_effect": 8.0263
+      },
+      "mango": {
+        "category": "fruit",
+        "contrast": "animal",
+        "max_causal_layer": 35,
+        "max_effect": 4.9727
+      },
+      "city": {
+        "category": "place",
+        "contrast": "animal",
+        "max_causal_layer": 0,
+        "max_effect": 3.0216
+      },
+      "mountain": {
+        "category": "place",
+        "contrast": "fruit",
+        "max_causal_layer": 30,
+        "max_effect": 4.04
+      },
+      "river": {
+        "category": "place",
+        "contrast": "tool",
+        "max_causal_layer": 30,
+        "max_effect": 3.9044
+      },
+      "forest": {
+        "category": "place",
+        "contrast": "animal",
+        "max_causal_layer": 30,
+        "max_effect": 3.0644
+      },
+      "hammer": {
+        "category": "tool",
+        "contrast": "animal",
+        "max_causal_layer": 35,
+        "max_effect": 5.4857
+      },
+      "knife": {
+        "category": "tool",
+        "contrast": "fruit",
+        "max_causal_layer": 35,
+        "max_effect": 4.3223
+      },
+      "drill": {
+        "category": "tool",
+        "contrast": "place",
+        "max_causal_layer": 35,
+        "max_effect": 5.3279
+      },
+      "wrench": {
+        "category": "tool",
+        "contrast": "animal",
+        "max_causal_layer": 35,
+        "max_effect": 5.4289
+      }
+    }
+  },
+  "exp4_position_causal": {
+    "n_pairs": 3,
+    "pair_results": [
+      {
+        "pair": [
+          "The dog bites the man",
+          "The man bites the dog"
+        ],
+        "position_effects": {
+          "1": {
+            "token": "<sop>",
+            "max_effect_layer": 0,
+            "max_effect": 0,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "2": {
+            "token": "The",
+            "max_effect_layer": 0,
+            "max_effect": 0,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "3": {
+            "token": " dog",
+            "max_effect_layer": 0,
+            "max_effect": 0,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "4": {
+            "token": " bites",
+            "max_effect_layer": 30,
+            "max_effect": 0.007,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0.007,
+              "39": 0
+            }
+          },
+          "5": {
+            "token": " the",
+            "max_effect_layer": 0,
+            "max_effect": 0,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          }
+        }
+      },
+      {
+        "pair": [
+          "The cat chases the mouse",
+          "The mouse chases the cat"
+        ],
+        "position_effects": {
+          "1": {
+            "token": "<sop>",
+            "max_effect_layer": 10,
+            "max_effect": 0.0237,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.0237,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "2": {
+            "token": "The",
+            "max_effect_layer": 30,
+            "max_effect": 0.0302,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0,
+              "30": 0.0302,
+              "39": 0
+            }
+          },
+          "3": {
+            "token": " cat",
+            "max_effect_layer": 10,
+            "max_effect": 0.0279,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.0279,
+              "20": 0,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "4": {
+            "token": " ch",
+            "max_effect_layer": 10,
+            "max_effect": 0.1145,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.1145,
+              "20": 0.0564,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "5": {
+            "token": "ases",
+            "max_effect_layer": 20,
+            "max_effect": 0.0792,
+            "layer_effects": {
+              "0": 0,
+              "10": 0,
+              "20": 0.0792,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "6": {
+            "token": " the",
+            "max_effect_layer": 20,
+            "max_effect": 0.1432,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.0405,
+              "20": 0.1432,
+              "30": 0,
+              "39": 0
+            }
+          }
+        }
+      },
+      {
+        "pair": [
+          "The teacher praises the student",
+          "The student praises the teacher"
+        ],
+        "position_effects": {
+          "1": {
+            "token": "<sop>",
+            "max_effect_layer": 20,
+            "max_effect": 0.057,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.0538,
+              "20": 0.057,
+              "30": 0.0025,
+              "39": 0
+            }
+          },
+          "2": {
+            "token": "The",
+            "max_effect_layer": 0,
+            "max_effect": 0.6037,
+            "layer_effects": {
+              "0": 0.6037,
+              "10": 0,
+              "20": 0.0668,
+              "30": 0,
+              "39": 0
+            }
+          },
+          "3": {
+            "token": " teacher",
+            "max_effect_layer": 10,
+            "max_effect": 0.1676,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.1676,
+              "20": 0.039,
+              "30": 0.0067,
+              "39": 0
+            }
+          },
+          "4": {
+            "token": " praises",
+            "max_effect_layer": 10,
+            "max_effect": 0.4922,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.4922,
+              "20": 0.3025,
+              "30": 0.0534,
+              "39": 0
+            }
+          },
+          "5": {
+            "token": " the",
+            "max_effect_layer": 10,
+            "max_effect": 0.292,
+            "layer_effects": {
+              "0": 0,
+              "10": 0.292,
+              "20": 0.1646,
+              "30": 0.0206,
+              "39": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "exp5_compositional_causal": {
+    "n_triples": 10,
+    "avg_base_mod_kl": 1.2063,
+    "avg_base_diff_kl": 2.3439,
+    "avg_mod_diff_kl": 1.2084,
+    "triple_results": {
+      "the apple|||the red apple": {
+        "base_mod_kl": 0.9232,
+        "base_diff_kl": 4.8568,
+        "mod_diff_kl": 2.0031
+      },
+      "the apple|||the green apple": {
+        "base_mod_kl": 0.8899,
+        "base_diff_kl": 3.4405,
+        "mod_diff_kl": 1.7714
+      },
+      "the apple|||the big apple": {
+        "base_mod_kl": 3.1476,
+        "base_diff_kl": 3.7404,
+        "mod_diff_kl": 0.9159
+      },
+      "the apple|||the rotten apple": {
+        "base_mod_kl": 2.1569,
+        "base_diff_kl": 3.5023,
+        "mod_diff_kl": 1.587
+      },
+      "the dog|||the big dog": {
+        "base_mod_kl": 1.041,
+        "base_diff_kl": 1.6238,
+        "mod_diff_kl": 1.0244
+      },
+      "the dog|||the fierce dog": {
+        "base_mod_kl": 0.8314,
+        "base_diff_kl": 1.6689,
+        "mod_diff_kl": 1.3254
+      },
+      "the dog|||the friendly dog": {
+        "base_mod_kl": 0.6093,
+        "base_diff_kl": 1.3401,
+        "mod_diff_kl": 0.5641
+      },
+      "the city|||the ancient city": {
+        "base_mod_kl": 1.0502,
+        "base_diff_kl": 1.0204,
+        "mod_diff_kl": 0.7522
+      },
+      "the city|||the modern city": {
+        "base_mod_kl": 0.6988,
+        "base_diff_kl": 1.3817,
+        "mod_diff_kl": 1.3745
+      },
+      "the knife|||the sharp knife": {
+        "base_mod_kl": 0.715,
+        "base_diff_kl": 0.8646,
+        "mod_diff_kl": 0.7661
+      }
+    }
+  }
+}

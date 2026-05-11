@@ -1,0 +1,93 @@
+﻿============================================================
+Phase 133: 严格算子几何 — glm4
+============================================================
+[model_utils] Loading glm4... (8bit=True)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase133_rigorous_operator.py glm4 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|������       | 1/4 [00:02<00:07,  2.60s/it]
+Loading checkpoint shards:  50%|����������     | 2/4 [00:05<00:05,  2.53s/it]
+Loading checkpoint shards:  75%|����������������  | 3/4 [00:07<00:02,  2.53s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.63s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.60s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+Model: GlmForCausalLM, layers=40, d=4096
+
+========================================
+Exp 1: 满秩标度律 (Full-Rank Scaling Law)
+========================================
+  [1/3] The dog bites the man
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [2/3] The cat chases the mouse
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [3/3] The teacher helps the student
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  Exp 1 done in 293.5s
+  L0: k=16:r=16.0, k=32:r=32.0, k=48:r=48.0, k=64:r=64.0, k=128:r=127.0, k=256:r=252.0
+  L10: k=16:r=15.0, k=32:r=30.0, k=48:r=46.0, k=64:r=61.0, k=128:r=123.0, k=256:r=243.0
+  L20: k=16:r=15.0, k=32:r=30.3, k=48:r=45.7, k=64:r=60.7, k=128:r=121.7, k=256:r=239.0
+  L30: k=16:r=15.0, k=32:r=30.3, k=48:r=45.0, k=64:r=60.3, k=128:r=120.7, k=256:r=237.7
+  L38: k=16:r=15.0, k=32:r=29.7, k=48:r=45.0, k=64:r=59.7, k=128:r=120.3, k=256:r=236.0
+
+========================================
+Exp 2: ε收敛测试 (Epsilon Convergence)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 2 done in 280.2s
+  The dog bites the man... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=1.0000, rel_err=0.0021
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.9986, rel_err=0.0205
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.8786, rel_err=0.2013
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.1768, rel_err=0.8512
+  The dog bites the man... L20:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.3437, rel_err=0.9377
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.3569, rel_err=0.9582
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.3481, rel_err=0.9600
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.2899, rel_err=0.9622
+  The cat chases the mouse... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=1.0000, rel_err=0.0022
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.9985, rel_err=0.0219
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.8233, rel_err=0.2122
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.1446, rel_err=0.8518
+  The cat chases the mouse... L20:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.1876, rel_err=0.9517
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.1905, rel_err=0.9559
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.1846, rel_err=0.9563
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.1756, rel_err=0.9580
+
+========================================
+Exp 3: 模块分解 (Module Decomposition)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 3 done in 107.0s
+  L0:
+    ln1: eff_rank=58.0±0.0
+    attn: eff_rank=51.5±1.5
+    ln2: eff_rank=52.0±1.0
+    mlp: eff_rank=61.0±1.0
+  L20:
+    ln1: eff_rank=61.5±0.5
+    attn: eff_rank=58.0±1.0
+    ln2: eff_rank=61.5±0.5
+    mlp: eff_rank=61.5±0.5
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase133_glm4_rigorous_operator.json
+[model_utils] GPU memory released, allocated=9.43 GB
+Total time: 695.4s

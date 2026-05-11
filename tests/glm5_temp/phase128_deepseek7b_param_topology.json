@@ -1,0 +1,539 @@
+{
+  "model": "deepseek7b",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584,
+    "intermediate_size": 18944
+  },
+  "timestamp": "2026-05-11 21:29:03",
+  "exp1_dim_controlled": {
+    "n_words": 91,
+    "best_single_layer": 22,
+    "best_single_sil": 0.0874,
+    "traj_sil_same_dim": 0.0797,
+    "fourier_sil": 0.0598,
+    "delta_sil": 0.0617,
+    "concat_pca10_sil": 0.3142,
+    "dim_comparison": {
+      "10": {
+        "single_layer_sil": 0.3191,
+        "trajectory_sil": 0.3344,
+        "trajectory_advantage": 1.05
+      },
+      "20": {
+        "single_layer_sil": 0.2075,
+        "trajectory_sil": 0.2138,
+        "trajectory_advantage": 1.03
+      },
+      "50": {
+        "single_layer_sil": 0.1149,
+        "trajectory_sil": 0.1142,
+        "trajectory_advantage": 0.99
+      },
+      "100": {
+        "single_layer_sil": 0.0874,
+        "trajectory_sil": 0.0797,
+        "trajectory_advantage": 0.91
+      },
+      "200": {
+        "single_layer_sil": 0.0874,
+        "trajectory_sil": 0.0797,
+        "trajectory_advantage": 0.91
+      }
+    },
+    "single_layer_sils_top5": {
+      "22": 0.08744359016418457,
+      "23": 0.08693229407072067,
+      "21": 0.08634950965642929,
+      "20": 0.08629066497087479,
+      "19": 0.07975569367408752
+    }
+  },
+  "exp2_activation_graph": {
+    "n_graphs": 112,
+    "target_layers": [
+      0,
+      3,
+      6,
+      7,
+      9,
+      12,
+      14,
+      15,
+      18,
+      21,
+      24,
+      27
+    ],
+    "avg_attn_entries": 336.0,
+    "avg_mlp_entries": 2366.1,
+    "avg_residual_entries": 600.0
+  },
+  "exp3_topology_adjacency": {
+    "n_same_cat_pairs": 369,
+    "n_diff_cat_pairs": 1631,
+    "jaccard_attn": {
+      "same_cat_mean": 1.0,
+      "diff_cat_mean": 1.0,
+      "discrimination": 0.0
+    },
+    "jaccard_mlp": {
+      "same_cat_mean": 0.1546,
+      "diff_cat_mean": 0.1206,
+      "discrimination": 0.034
+    },
+    "jaccard_combined": {
+      "same_cat_mean": 0.2186,
+      "diff_cat_mean": 0.1854,
+      "discrimination": 0.0332
+    },
+    "cosine_mid_layer": {
+      "same_cat_mean": 0.5773,
+      "diff_cat_mean": 0.4824,
+      "discrimination": 0.0949
+    },
+    "category_intra_overlap": {
+      "animal": 1.0,
+      "fruit": 1.0,
+      "place": 1.0,
+      "tool": 1.0,
+      "abstract": 1.0
+    }
+  },
+  "exp4_compositional": {
+    "apple": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.3164,
+      "attn_overlap_mean": 0.6103,
+      "cosine_sim_mean": 0.6665
+    },
+    "dog": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.1096,
+      "attn_overlap_mean": 0.6929,
+      "cosine_sim_mean": 0.6521
+    },
+    "city": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.3761,
+      "attn_overlap_mean": 0.7167,
+      "cosine_sim_mean": 0.7975
+    },
+    "cross_noun": {
+      "red": {
+        "n_phrases": 3,
+        "mlp_overlap_mean": 0.8378,
+        "cosine_sim_mean": 0.999
+      },
+      "big": {
+        "n_phrases": 4,
+        "mlp_overlap_mean": 0.3265,
+        "cosine_sim_mean": 0.717
+      },
+      "small": {
+        "n_phrases": 2,
+        "mlp_overlap_mean": 0.0223,
+        "cosine_sim_mean": 0.5054
+      }
+    }
+  },
+  "exp5_syntactic": {
+    "n_pairs": 12,
+    "avg_mlp_overlap": 0.2112,
+    "avg_attn_change_ratio": 0.4935,
+    "avg_mid_layer_cosine": 0.7242,
+    "pair_details": [
+      {
+        "pair": [
+          "dog bites man",
+          "man bites dog"
+        ],
+        "mlp_overlap": {
+          "0": 0.1461,
+          "7": 0.1236,
+          "14": 0.1396,
+          "21": 0.1696,
+          "27": 0.0
+        },
+        "attn_change_ratio": {
+          "0": 0.2857,
+          "7": 0.25,
+          "14": 0.2143,
+          "21": 0.2857,
+          "27": 0.1429
+        },
+        "layer_cosine": {
+          "0": 0.1216,
+          "7": 0.6154,
+          "14": 0.6929,
+          "21": 0.7772,
+          "27": 0.8924
+        },
+        "delta_cosine": {
+          "L0_L7": 0.6164,
+          "L7_L14": 0.6712,
+          "L14_L21": 0.7075,
+          "L21_L27": 0.886
+        }
+      },
+      {
+        "pair": [
+          "cat chases mouse",
+          "mouse chases cat"
+        ],
+        "mlp_overlap": {
+          "0": 0.0989,
+          "7": 0.2085,
+          "14": 0.2085,
+          "21": 0.2461,
+          "27": 0.0076
+        },
+        "attn_change_ratio": {
+          "0": 0.2143,
+          "7": 0.25,
+          "14": 0.25,
+          "21": 0.2857,
+          "27": 0.3214
+        },
+        "layer_cosine": {
+          "0": 0.0834,
+          "7": 0.5515,
+          "14": 0.6981,
+          "21": 0.8245,
+          "27": 0.9122
+        },
+        "delta_cosine": {
+          "L0_L7": 0.5524,
+          "L7_L14": 0.6911,
+          "L14_L21": 0.8263,
+          "L21_L27": 0.9068
+        }
+      },
+      {
+        "pair": [
+          "teacher praises student",
+          "student praises teacher"
+        ],
+        "mlp_overlap": {
+          "0": 0.1869,
+          "7": 0.3333,
+          "14": 0.3245,
+          "21": 0.3158
+        },
+        "attn_change_ratio": {
+          "0": 0.1786,
+          "7": 0.25,
+          "14": 0.2143,
+          "21": 0.25,
+          "27": 0.2143
+        },
+        "layer_cosine": {
+          "0": 0.161,
+          "7": 0.7721,
+          "14": 0.8514,
+          "21": 0.9097,
+          "27": 0.9403
+        },
+        "delta_cosine": {
+          "L0_L7": 0.773,
+          "L7_L14": 0.8552,
+          "L14_L21": 0.8954,
+          "L21_L27": 0.9317
+        }
+      },
+      {
+        "pair": [
+          "doctor helps patient",
+          "patient helps doctor"
+        ],
+        "mlp_overlap": {
+          "0": 0.1111,
+          "7": 0.1429,
+          "14": 0.2346,
+          "21": 0.2308
+        },
+        "attn_change_ratio": {
+          "0": 0.1429,
+          "7": 0.3571,
+          "14": 0.3571,
+          "21": 0.2857,
+          "27": 0.25
+        },
+        "layer_cosine": {
+          "0": 0.0656,
+          "7": 0.5614,
+          "14": 0.7132,
+          "21": 0.8345,
+          "27": 0.89
+        },
+        "delta_cosine": {
+          "L0_L7": 0.5623,
+          "L7_L14": 0.701,
+          "L14_L21": 0.8124,
+          "L21_L27": 0.8723
+        }
+      },
+      {
+        "pair": [
+          "police arrests criminal",
+          "criminal arrests police"
+        ],
+        "mlp_overlap": {
+          "0": 0.1173,
+          "7": 0.1019,
+          "14": 0.108,
+          "21": 0.1494
+        },
+        "attn_change_ratio": {
+          "0": 0.7857,
+          "7": 0.6786,
+          "14": 0.5357,
+          "21": 0.8571,
+          "27": 0.3571
+        },
+        "layer_cosine": {
+          "0": 0.1114,
+          "7": 0.4959,
+          "14": 0.6324,
+          "21": 0.7283,
+          "27": 0.8285
+        },
+        "delta_cosine": {
+          "L0_L7": 0.4967,
+          "L7_L14": 0.5855,
+          "L14_L21": 0.6978,
+          "L21_L27": 0.801
+        }
+      },
+      {
+        "pair": [
+          "dog bites man",
+          "man is bitten by dog"
+        ],
+        "mlp_overlap": {
+          "0": 0.084,
+          "7": 0.1019,
+          "14": 0.0724,
+          "21": 0.1173,
+          "27": 0.3333
+        },
+        "attn_change_ratio": {
+          "0": 0.8929,
+          "7": 0.7143,
+          "14": 0.6429,
+          "21": 0.8214,
+          "27": 0.3214
+        },
+        "layer_cosine": {
+          "0": 0.1216,
+          "7": 0.3848,
+          "14": 0.5589,
+          "21": 0.6957,
+          "27": 0.8564
+        },
+        "delta_cosine": {
+          "L0_L7": 0.3851,
+          "L7_L14": 0.4954,
+          "L14_L21": 0.6098,
+          "L21_L27": 0.8473
+        }
+      },
+      {
+        "pair": [
+          "cat chases mouse",
+          "mouse is chased by cat"
+        ],
+        "mlp_overlap": {
+          "0": 0.061,
+          "7": 0.1364,
+          "14": 0.1204,
+          "21": 0.1494,
+          "27": 0.0076
+        },
+        "attn_change_ratio": {
+          "0": 0.6429,
+          "7": 0.6071,
+          "14": 0.5357,
+          "21": 0.7857,
+          "27": 0.25
+        },
+        "layer_cosine": {
+          "0": 0.0834,
+          "7": 0.4354,
+          "14": 0.5788,
+          "21": 0.7513,
+          "27": 0.8931
+        },
+        "delta_cosine": {
+          "L0_L7": 0.4359,
+          "L7_L14": 0.5201,
+          "L14_L21": 0.7449,
+          "L21_L27": 0.8908
+        }
+      },
+      {
+        "pair": [
+          "dog bites man",
+          "dog does not bite man"
+        ],
+        "mlp_overlap": {
+          "0": 0.2384,
+          "7": 0.2085,
+          "14": 0.1834,
+          "21": 0.1905
+        },
+        "attn_change_ratio": {
+          "0": 0.75,
+          "7": 0.6786,
+          "14": 0.6071,
+          "21": 0.75,
+          "27": 0.25
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "7": 0.7892,
+          "14": 0.7803,
+          "21": 0.8364,
+          "27": 0.8956
+        },
+        "delta_cosine": {
+          "L0_L7": 0.7887,
+          "L7_L14": 0.6815,
+          "L14_L21": 0.745,
+          "L21_L27": 0.8774
+        }
+      },
+      {
+        "pair": [
+          "cat likes fish",
+          "cat does not like fish"
+        ],
+        "mlp_overlap": {
+          "0": 0.2945,
+          "7": 0.2739,
+          "14": 0.1905,
+          "21": 0.25,
+          "27": 0.487
+        },
+        "attn_change_ratio": {
+          "0": 0.6786,
+          "7": 0.6071,
+          "14": 0.6071,
+          "21": 0.6786,
+          "27": 0.2143
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "7": 0.8433,
+          "14": 0.8588,
+          "21": 0.9015,
+          "27": 0.9564
+        },
+        "delta_cosine": {
+          "L0_L7": 0.843,
+          "L7_L14": 0.7897,
+          "L14_L21": 0.8352,
+          "L21_L27": 0.9471
+        }
+      },
+      {
+        "pair": [
+          "if it rains, I stay home",
+          "it rains and I stay home"
+        ],
+        "mlp_overlap": {
+          "0": 0.7094,
+          "7": 0.4925,
+          "14": 0.3072,
+          "21": 0.2987
+        },
+        "attn_change_ratio": {
+          "0": 0.9643,
+          "7": 0.6786,
+          "14": 0.8214,
+          "21": 0.8929,
+          "27": 0.2857
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "7": 0.9569,
+          "14": 0.9112,
+          "21": 0.8892,
+          "27": 0.9365
+        },
+        "delta_cosine": {
+          "L0_L7": 0.9568,
+          "L7_L14": 0.874,
+          "L14_L21": 0.8105,
+          "L21_L27": 0.9235
+        }
+      },
+      {
+        "pair": [
+          "dog bit man",
+          "dog will bite man"
+        ],
+        "mlp_overlap": {
+          "0": 0.2739,
+          "7": 0.0695,
+          "14": 0.0582,
+          "21": 0.0811,
+          "27": 0.2658
+        },
+        "attn_change_ratio": {
+          "0": 0.6786,
+          "7": 0.75,
+          "14": 0.5,
+          "21": 0.8214,
+          "27": 0.25
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "7": 0.5979,
+          "14": 0.5208,
+          "21": 0.6463,
+          "27": 0.7923
+        },
+        "delta_cosine": {
+          "L0_L7": 0.5972,
+          "L7_L14": 0.4141,
+          "L14_L21": 0.5258,
+          "L21_L27": 0.7467
+        }
+      },
+      {
+        "pair": [
+          "cat caught mouse",
+          "cat will catch mouse"
+        ],
+        "mlp_overlap": {
+          "0": 0.3289,
+          "7": 0.2579,
+          "14": 0.3245,
+          "21": 0.4184
+        },
+        "attn_change_ratio": {
+          "0": 0.6429,
+          "7": 0.5714,
+          "14": 0.5714,
+          "21": 0.7143,
+          "27": 0.2143
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "7": 0.8217,
+          "14": 0.8932,
+          "21": 0.9406,
+          "27": 0.9735
+        },
+        "delta_cosine": {
+          "L0_L7": 0.8212,
+          "L7_L14": 0.8473,
+          "L14_L21": 0.9115,
+          "L21_L27": 0.9699
+        }
+      }
+    ]
+  }
+}

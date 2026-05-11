@@ -1,0 +1,161 @@
+﻿============================================================
+Phase 134: 条件激活边界分析 — glm4
+============================================================
+[model_utils] Loading glm4... (8bit=True)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase134_activation_boundary.py gl ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|������       | 1/4 [00:02<00:08,  2.85s/it]
+Loading checkpoint shards:  50%|����������     | 2/4 [00:05<00:05,  2.63s/it]
+Loading checkpoint shards:  75%|����������������  | 3/4 [00:07<00:02,  2.56s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.65s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.65s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+Model: GlmForCausalLM, layers=40, d=4096
+
+========================================
+Exp 1: SwiGLU激活稀疏性
+========================================
+  [1/8 base] The dog bites the man
+  [1/8 negation] The dog does not bite the man
+  [1/8 past] The dog bit the man
+  [2/8 base] The cat chases the mouse
+  [2/8 negation] The cat does not chase the mouse
+  [2/8 past] The cat chased the mouse
+  [3/8 base] The teacher helps the student
+  [3/8 negation] The teacher does not help the student
+  [3/8 past] The teacher helped the student
+  [4/8 base] The doctor treats the patient
+  [4/8 negation] The doctor does not treat the patient
+  [4/8 past] The doctor treated the patient
+  [5/8 base] The chef cooks the meal
+  [5/8 negation] The chef does not cook the meal
+  [5/8 past] The chef cooked the meal
+  [6/8 base] The writer writes the book
+  [6/8 negation] The writer does not write the book
+  [6/8 past] The writer wrote the book
+  [7/8 base] The child plays the game
+  [7/8 negation] The child does not play the game
+  [7/8 past] The child played the game
+  [8/8 base] The farmer grows the crop
+  [8/8 negation] The farmer does not grow the crop
+  [8/8 past] The farmer grew the crop
+  Exp 1 done in 12.6s
+  L0:
+    base: ratio=0.0005, gini=0.4419
+    negation: ratio=0.0005, gini=0.4423
+    past: ratio=0.0005, gini=0.4433
+  L10:
+    base: ratio=0.0439, gini=0.4201
+    negation: ratio=0.0500, gini=0.4168
+    past: ratio=0.0397, gini=0.4203
+  L20:
+    base: ratio=0.2963, gini=0.4200
+    negation: ratio=0.2947, gini=0.4216
+    past: ratio=0.2896, gini=0.4231
+  L30:
+    base: ratio=0.7214, gini=0.4192
+    negation: ratio=0.7110, gini=0.4197
+    past: ratio=0.7324, gini=0.4213
+  L38:
+    base: ratio=0.9658, gini=0.4490
+    negation: ratio=0.9684, gini=0.4504
+    past: ratio=0.9672, gini=0.4462
+
+========================================
+Exp 2: Attention Head激活模式
+========================================
+  [1/10 base] The dog bites the man
+  [1/10 negation] The dog does not bite the man
+  [1/10 past] The dog bit the man
+  [2/10 base] The cat chases the mouse
+  [2/10 negation] The cat does not chase the mouse
+  [2/10 past] The cat chased the mouse
+  [3/10 base] The teacher helps the student
+  [3/10 negation] The teacher does not help the student
+  [3/10 past] The teacher helped the student
+  [4/10 base] The doctor treats the patient
+  [4/10 negation] The doctor does not treat the patient
+  [4/10 past] The doctor treated the patient
+  [5/10 base] The chef cooks the meal
+  [5/10 negation] The chef does not cook the meal
+  [5/10 past] The chef cooked the meal
+  [6/10 base] The writer writes the book
+  [6/10 negation] The writer does not write the book
+  [6/10 past] The writer wrote the book
+  [7/10 base] The child plays the game
+  [7/10 negation] The child does not play the game
+  [7/10 past] The child played the game
+  [8/10 base] The farmer grows the crop
+  [8/10 negation] The farmer does not grow the crop
+  [8/10 past] The farmer grew the crop
+  [9/10 base] The artist paints the picture
+  [9/10 negation] The artist does not paint the picture
+  [9/10 past] The artist painted the picture
+  [10/10 base] The driver drives the car
+  [10/10 negation] The driver does not drive the car
+  [10/10 past] The driver drove the car
+  Exp 2 done in 14.8s
+  L0: base_entropy=1.4864, neg_entropy=1.6070, past_entropy=1.4723
+  L10: base_entropy=1.2087, neg_entropy=1.2918, past_entropy=1.2156
+  L20: base_entropy=1.2621, neg_entropy=1.3745, past_entropy=1.2564
+  L30: base_entropy=1.3267, neg_entropy=1.3856, past_entropy=1.3174
+  L38: base_entropy=1.1962, neg_entropy=1.3326, past_entropy=1.2133
+
+========================================
+Exp 3: 约束激活边界
+========================================
+  [1/15] dog/bites/man
+  [2/15] cat/chases/mouse
+  [3/15] teacher/helps/student
+  [4/15] doctor/treats/patient
+  [5/15] chef/cooks/meal
+  [6/15] writer/writes/book
+  [7/15] child/plays/game
+  [8/15] farmer/grows/crop
+  [9/15] artist/paints/picture
+  [10/15] driver/drives/car
+  [11/15] bird/flies/nest
+  [12/15] fish/swims/river
+  [13/15] soldier/guards/fort
+  [14/15] nurse/cares/elder
+  [15/15] scientist/studies/atom
+  Collecting delta vectors for subspace analysis...
+  Exp 3 done in 38.3s
+  L1: cos(neg,past)=0.4384, rel_neg=0.2117, rel_past=0.1863, dim_overlap=0.1067
+  L20: cos(neg,past)=0.1979, rel_neg=0.4422, rel_past=0.3399, dim_overlap=0.0933
+
+========================================
+Exp 4: 约束投影稳定性
+========================================
+  [1/8] dog/bites/man
+  [2/8] cat/chases/mouse
+  [3/8] teacher/helps/student
+  [4/8] doctor/treats/patient
+  [5/8] chef/cooks/meal
+  [6/8] writer/writes/book
+  [7/8] child/plays/game
+  [8/8] farmer/grows/crop
+  Exp 4 done in 587.2s
+  L10_neg_eps_0.010: quality=0.0818±0.0168, alpha_rank=34.0
+  L10_neg_eps_0.050: quality=0.1031±0.0201, alpha_rank=36.9
+  L10_neg_eps_0.100: quality=0.1169±0.0192, alpha_rank=37.4
+  L10_past_eps_0.010: quality=0.1129±0.0523, alpha_rank=36.1
+  L10_past_eps_0.050: quality=0.1419±0.0571, alpha_rank=35.8
+  L10_past_eps_0.100: quality=0.1489±0.0757, alpha_rank=35.1
+  L1_neg_eps_0.010: quality=0.1598±0.0484, alpha_rank=35.5
+  L1_neg_eps_0.050: quality=0.1553±0.0522, alpha_rank=34.9
+  L1_neg_eps_0.100: quality=0.1210±0.0544, alpha_rank=34.8
+  L1_past_eps_0.010: quality=0.1370±0.0225, alpha_rank=36.2
+  L1_past_eps_0.050: quality=0.1442±0.0205, alpha_rank=36.0
+  L1_past_eps_0.100: quality=0.1106±0.0250, alpha_rank=34.6
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase134_glm4_activation_boundary.json
+[model_utils] GPU memory released, allocated=9.43 GB
+Total time: 667.6s

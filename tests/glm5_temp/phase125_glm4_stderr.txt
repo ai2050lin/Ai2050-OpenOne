@@ -1,0 +1,15 @@
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|¨€¨€¨„       | 1/4 [00:02<00:07,  2.61s/it]Loading checkpoint shards:  50%|¨€¨€¨€¨€¨€     | 2/4 [00:05<00:05,  2.52s/it]Loading checkpoint shards:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 3/4 [00:07<00:02,  2.52s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 4/4 [00:10<00:00,  2.66s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 4/4 [00:10<00:00,  2.62s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+Traceback (most recent call last):
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\ccml_phase125_fisher_geometry.py", line 887, in <module>
+    main()
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\ccml_phase125_fisher_geometry.py", line 813, in main
+    wu_results = w_u_alignment_analysis(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\ccml_phase125_fisher_geometry.py", line 399, in w_u_alignment_analysis
+    W_U = get_W_U(model)  # (vocab_size, d_model)
+          ^^^^^^^^^^^^^^
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\..\..\tests\glm5\model_utils.py", line 273, in get_W_U
+    w = model.lm_head.weight.detach().cpu()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NotImplementedError: Cannot copy out of meta tensor; no data!

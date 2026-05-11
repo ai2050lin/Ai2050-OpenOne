@@ -1,0 +1,546 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "class": "Qwen3ForCausalLM",
+    "n_layers": 36,
+    "d_model": 2560,
+    "intermediate_size": 9728
+  },
+  "timestamp": "2026-05-11 21:27:48",
+  "exp1_dim_controlled": {
+    "n_words": 112,
+    "best_single_layer": 36,
+    "best_single_sil": 0.1152,
+    "traj_sil_same_dim": 0.1046,
+    "fourier_sil": 0.076,
+    "delta_sil": 0.0874,
+    "concat_pca10_sil": 0.3644,
+    "dim_comparison": {
+      "10": {
+        "single_layer_sil": 0.36,
+        "trajectory_sil": 0.3819,
+        "trajectory_advantage": 1.06
+      },
+      "20": {
+        "single_layer_sil": 0.2595,
+        "trajectory_sil": 0.2615,
+        "trajectory_advantage": 1.01
+      },
+      "50": {
+        "single_layer_sil": 0.1643,
+        "trajectory_sil": 0.1519,
+        "trajectory_advantage": 0.92
+      },
+      "100": {
+        "single_layer_sil": 0.1152,
+        "trajectory_sil": 0.1046,
+        "trajectory_advantage": 0.91
+      },
+      "200": {
+        "single_layer_sil": 0.1125,
+        "trajectory_sil": 0.1008,
+        "trajectory_advantage": 0.9
+      }
+    },
+    "single_layer_sils_top5": {
+      "36": 0.11518359184265137,
+      "35": 0.10585570335388184,
+      "32": 0.10421498864889145,
+      "31": 0.1036112979054451,
+      "26": 0.10264229029417038
+    }
+  },
+  "exp2_activation_graph": {
+    "n_graphs": 112,
+    "target_layers": [
+      0,
+      4,
+      8,
+      9,
+      12,
+      16,
+      18,
+      20,
+      24,
+      27,
+      28,
+      32,
+      35
+    ],
+    "avg_attn_entries": 416.0,
+    "avg_mlp_entries": 2600.0,
+    "avg_residual_entries": 650.0
+  },
+  "exp3_topology_adjacency": {
+    "n_same_cat_pairs": 369,
+    "n_diff_cat_pairs": 1631,
+    "jaccard_attn": {
+      "same_cat_mean": 1.0,
+      "diff_cat_mean": 1.0,
+      "discrimination": 0.0
+    },
+    "jaccard_mlp": {
+      "same_cat_mean": 0.1698,
+      "diff_cat_mean": 0.1244,
+      "discrimination": 0.0454
+    },
+    "jaccard_combined": {
+      "same_cat_mean": 0.2407,
+      "diff_cat_mean": 0.1966,
+      "discrimination": 0.0441
+    },
+    "cosine_mid_layer": {
+      "same_cat_mean": 0.6847,
+      "diff_cat_mean": 0.5861,
+      "discrimination": 0.0986
+    },
+    "category_intra_overlap": {
+      "animal": 1.0,
+      "fruit": 1.0,
+      "place": 1.0,
+      "tool": 1.0,
+      "abstract": 1.0
+    }
+  },
+  "exp4_compositional": {
+    "apple": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.2108,
+      "attn_overlap_mean": 0.6472,
+      "cosine_sim_mean": 0.8203
+    },
+    "dog": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.2071,
+      "attn_overlap_mean": 0.741,
+      "cosine_sim_mean": 0.8388
+    },
+    "city": {
+      "n_phrases": 6,
+      "mlp_overlap_mean": 0.2301,
+      "attn_overlap_mean": 0.7389,
+      "cosine_sim_mean": 0.848
+    },
+    "cross_noun": {
+      "red": {
+        "n_phrases": 3,
+        "mlp_overlap_mean": 0.1656,
+        "cosine_sim_mean": 0.7928
+      },
+      "big": {
+        "n_phrases": 4,
+        "mlp_overlap_mean": 0.1465,
+        "cosine_sim_mean": 0.7475
+      },
+      "small": {
+        "n_phrases": 2,
+        "mlp_overlap_mean": 0.206,
+        "cosine_sim_mean": 0.7971
+      }
+    }
+  },
+  "exp5_syntactic": {
+    "n_pairs": 12,
+    "avg_mlp_overlap": 0.3181,
+    "avg_attn_change_ratio": 0.4188,
+    "avg_mid_layer_cosine": 0.7729,
+    "pair_details": [
+      {
+        "pair": [
+          "dog bites man",
+          "man bites dog"
+        ],
+        "mlp_overlap": {
+          "0": 0.1299,
+          "9": 0.084,
+          "18": 0.1396,
+          "27": 0.1869,
+          "35": 0.5504
+        },
+        "attn_change_ratio": {
+          "0": 0.3438,
+          "9": 0.1562,
+          "18": 0.1562,
+          "27": 0.0312,
+          "35": 0.1875
+        },
+        "layer_cosine": {
+          "0": 0.0749,
+          "9": 0.4451,
+          "18": 0.6715,
+          "27": 0.7747,
+          "35": 0.9207
+        },
+        "delta_cosine": {
+          "L0_L9": 0.4447,
+          "L9_L18": 0.5453,
+          "L18_L27": 0.7194,
+          "L27_L35": 0.9208
+        }
+      },
+      {
+        "pair": [
+          "cat chases mouse",
+          "mouse chases cat"
+        ],
+        "mlp_overlap": {
+          "0": 0.105,
+          "9": 0.1561,
+          "18": 0.25,
+          "27": 0.3699,
+          "35": 0.6393
+        },
+        "attn_change_ratio": {
+          "0": 0.375,
+          "9": 0.3125,
+          "18": 0.2188,
+          "27": 0.0938,
+          "35": 0.1875
+        },
+        "layer_cosine": {
+          "0": 0.125,
+          "9": 0.5583,
+          "18": 0.7582,
+          "27": 0.8325,
+          "35": 0.9511
+        },
+        "delta_cosine": {
+          "L0_L9": 0.5582,
+          "L9_L18": 0.6808,
+          "L18_L27": 0.8082,
+          "L27_L35": 0.9505
+        }
+      },
+      {
+        "pair": [
+          "teacher praises student",
+          "student praises teacher"
+        ],
+        "mlp_overlap": {
+          "0": 0.1834,
+          "9": 0.1765,
+          "18": 0.2048,
+          "27": 0.3423,
+          "35": 0.6807
+        },
+        "attn_change_ratio": {
+          "0": 0.375,
+          "9": 0.2188,
+          "18": 0.0938,
+          "27": 0.0,
+          "35": 0.125
+        },
+        "layer_cosine": {
+          "0": 0.3091,
+          "9": 0.7254,
+          "18": 0.8117,
+          "27": 0.8765,
+          "35": 0.9603
+        },
+        "delta_cosine": {
+          "L0_L9": 0.7258,
+          "L9_L18": 0.719,
+          "L18_L27": 0.8606,
+          "L27_L35": 0.961
+        }
+      },
+      {
+        "pair": [
+          "doctor helps patient",
+          "patient helps doctor"
+        ],
+        "mlp_overlap": {
+          "0": 0.1396,
+          "9": 0.1869,
+          "18": 0.2903,
+          "27": 0.3333,
+          "35": 0.7391
+        },
+        "attn_change_ratio": {
+          "0": 0.25,
+          "9": 0.25,
+          "18": 0.1875,
+          "27": 0.125,
+          "35": 0.0312
+        },
+        "layer_cosine": {
+          "0": 0.1863,
+          "9": 0.6824,
+          "18": 0.8122,
+          "27": 0.869,
+          "35": 0.9664
+        },
+        "delta_cosine": {
+          "L0_L9": 0.6823,
+          "L9_L18": 0.7043,
+          "L18_L27": 0.8545,
+          "L27_L35": 0.9694
+        }
+      },
+      {
+        "pair": [
+          "police arrests criminal",
+          "criminal arrests police"
+        ],
+        "mlp_overlap": {
+          "0": 0.173,
+          "9": 0.1594,
+          "18": 0.1594,
+          "27": 0.1799,
+          "35": 0.4925
+        },
+        "attn_change_ratio": {
+          "0": 0.875,
+          "9": 0.8125,
+          "18": 0.4062,
+          "27": 0.25,
+          "35": 0.375
+        },
+        "layer_cosine": {
+          "0": 0.2091,
+          "9": 0.5044,
+          "18": 0.6448,
+          "27": 0.6741,
+          "35": 0.87
+        },
+        "delta_cosine": {
+          "L0_L9": 0.5047,
+          "L9_L18": 0.5334,
+          "L18_L27": 0.6202,
+          "L27_L35": 0.8665
+        }
+      },
+      {
+        "pair": [
+          "dog bites man",
+          "man is bitten by dog"
+        ],
+        "mlp_overlap": {
+          "0": 0.0554,
+          "9": 0.0724,
+          "18": 0.0929,
+          "27": 0.2821,
+          "35": 0.5625
+        },
+        "attn_change_ratio": {
+          "0": 0.9688,
+          "9": 0.8438,
+          "18": 0.25,
+          "27": 0.1562,
+          "35": 0.3438
+        },
+        "layer_cosine": {
+          "0": 0.0749,
+          "9": 0.3887,
+          "18": 0.6316,
+          "27": 0.7539,
+          "35": 0.9254
+        },
+        "delta_cosine": {
+          "L0_L9": 0.3888,
+          "L9_L18": 0.497,
+          "L18_L27": 0.705,
+          "L27_L35": 0.9261
+        }
+      },
+      {
+        "pair": [
+          "cat chases mouse",
+          "mouse is chased by cat"
+        ],
+        "mlp_overlap": {
+          "0": 0.0638,
+          "9": 0.1204,
+          "18": 0.1429,
+          "27": 0.2698,
+          "35": 0.5444
+        },
+        "attn_change_ratio": {
+          "0": 0.7812,
+          "9": 0.75,
+          "18": 0.375,
+          "27": 0.1875,
+          "35": 0.5
+        },
+        "layer_cosine": {
+          "0": 0.125,
+          "9": 0.4866,
+          "18": 0.6632,
+          "27": 0.7742,
+          "35": 0.9221
+        },
+        "delta_cosine": {
+          "L0_L9": 0.4865,
+          "L9_L18": 0.5453,
+          "L18_L27": 0.7341,
+          "L27_L35": 0.9182
+        }
+      },
+      {
+        "pair": [
+          "dog bites man",
+          "dog does not bite man"
+        ],
+        "mlp_overlap": {
+          "0": 0.3937,
+          "9": 0.1799,
+          "18": 0.1594,
+          "27": 0.173,
+          "35": 0.4599
+        },
+        "attn_change_ratio": {
+          "0": 0.8125,
+          "9": 0.8125,
+          "18": 0.25,
+          "27": 0.1875,
+          "35": 0.2188
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "9": 0.7975,
+          "18": 0.8034,
+          "27": 0.8011,
+          "35": 0.9165
+        },
+        "delta_cosine": {
+          "L0_L9": 0.7972,
+          "L9_L18": 0.6663,
+          "L18_L27": 0.7232,
+          "L27_L35": 0.9089
+        }
+      },
+      {
+        "pair": [
+          "cat likes fish",
+          "cat does not like fish"
+        ],
+        "mlp_overlap": {
+          "0": 0.3793,
+          "9": 0.3468,
+          "18": 0.2121,
+          "27": 0.444,
+          "35": 0.6064
+        },
+        "attn_change_ratio": {
+          "0": 0.9375,
+          "9": 0.8438,
+          "18": 0.3125,
+          "27": 0.125,
+          "35": 0.2188
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "9": 0.8882,
+          "18": 0.8308,
+          "27": 0.9222,
+          "35": 0.9595
+        },
+        "delta_cosine": {
+          "L0_L9": 0.8879,
+          "L9_L18": 0.7617,
+          "L18_L27": 0.8883,
+          "L27_L35": 0.9536
+        }
+      },
+      {
+        "pair": [
+          "if it rains, I stay home",
+          "it rains and I stay home"
+        ],
+        "mlp_overlap": {
+          "0": 0.8018,
+          "9": 0.5686,
+          "18": 0.3841,
+          "27": 0.4981,
+          "35": 0.4981
+        },
+        "attn_change_ratio": {
+          "0": 1.0,
+          "9": 0.8438,
+          "18": 0.7188,
+          "27": 0.8438,
+          "35": 0.9375
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "9": 0.9727,
+          "18": 0.9492,
+          "27": 0.9362,
+          "35": 0.9476
+        },
+        "delta_cosine": {
+          "L0_L9": 0.9726,
+          "L9_L18": 0.9354,
+          "L18_L27": 0.9072,
+          "L27_L35": 0.9365
+        }
+      },
+      {
+        "pair": [
+          "dog bit man",
+          "dog will bite man"
+        ],
+        "mlp_overlap": {
+          "0": 0.3115,
+          "9": 0.1331,
+          "18": 0.2085,
+          "27": 0.3559,
+          "35": 0.5748
+        },
+        "attn_change_ratio": {
+          "0": 0.75,
+          "9": 0.6562,
+          "18": 0.375,
+          "27": 0.1875,
+          "35": 0.3438
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "9": 0.6719,
+          "18": 0.837,
+          "27": 0.9071,
+          "35": 0.9459
+        },
+        "delta_cosine": {
+          "L0_L9": 0.671,
+          "L9_L18": 0.6584,
+          "L18_L27": 0.8706,
+          "L27_L35": 0.9367
+        }
+      },
+      {
+        "pair": [
+          "cat caught mouse",
+          "cat will catch mouse"
+        ],
+        "mlp_overlap": {
+          "0": 0.4545,
+          "9": 0.2862,
+          "18": 0.2422,
+          "27": 0.4545,
+          "35": 0.7021
+        },
+        "attn_change_ratio": {
+          "0": 0.8125,
+          "9": 0.625,
+          "18": 0.3125,
+          "27": 0.125,
+          "35": 0.2812
+        },
+        "layer_cosine": {
+          "0": 1.0,
+          "9": 0.8931,
+          "18": 0.8617,
+          "27": 0.9302,
+          "35": 0.9635
+        },
+        "delta_cosine": {
+          "L0_L9": 0.8928,
+          "L9_L18": 0.8192,
+          "L18_L27": 0.9058,
+          "L27_L35": 0.9572
+        }
+      }
+    ]
+  }
+}

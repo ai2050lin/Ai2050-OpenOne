@@ -69,15 +69,18 @@ class LayerWeights:
     post_attn_layernorm_weight: Optional[np.ndarray] = None
 
 
-def load_model(model_name: str, dtype=torch.bfloat16) -> Tuple:
+def load_model(model_name: str, dtype=torch.bfloat16, use_8bit=None) -> Tuple:
     """
     加载模型和tokenizer (CUDA优先)
     
-    策略: 先CPU加载(避免显存碎片), 再整体移到CUDA(避免device_map分散)
+    策略:
+    - Qwen3: bfloat16 + device_map=cpu → model.to("cuda")
+    - DS7B/GLM4: 8bit量化 + device_map="auto" (显存不足时必须8bit)
     
     Args:
         model_name: "qwen3", "glm4", or "deepseek7b"
-        dtype: 模型数据类型, 默认float16
+        dtype: 模型数据类型, 默认bfloat16
+        use_8bit: 是否使用8bit量化, None=自动判断(大模型8bit)
     
     Returns:
         (model, tokenizer, device) — device=cuda:0 如果可用
@@ -85,7 +88,16 @@ def load_model(model_name: str, dtype=torch.bfloat16) -> Tuple:
     cfg = MODEL_CONFIGS[model_name]
     from transformers import AutoModelForCausalLM, AutoTokenizer
     
-    print(f"[model_utils] Loading {model_name}...")
+    # 自动判断是否需要8bit: GPU显存<16GB时大模型必须8bit
+    if use_8bit is None:
+        if torch.cuda.is_available():
+            gpu_mem_gb = torch.cuda.get_device_properties(0).total_memory / 1e9
+            # DS7B需要~15GB(bf16), GLM4需要~18GB(bf16), 8bit减半
+            use_8bit = model_name in ("deepseek7b", "glm4") and gpu_mem_gb < 16
+        else:
+            use_8bit = False
+    
+    print(f"[model_utils] Loading {model_name}... (8bit={use_8bit})")
     tokenizer = AutoTokenizer.from_pretrained(
         cfg["path"],
         trust_remote_code=True,
@@ -95,22 +107,40 @@ def load_model(model_name: str, dtype=torch.bfloat16) -> Tuple:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # 先加载到CPU, 再整体移到CUDA (比device_map="auto"更快更稳定)
-    model = AutoModelForCausalLM.from_pretrained(
-        cfg["path"],
-        torch_dtype=dtype,
-        device_map="cpu",  # 先加载到CPU
-        trust_remote_code=True,
-        local_files_only=True,
-        low_cpu_mem_usage=True,
-    )
-    # 整体移到CUDA (比device_map="auto"更快, 避免设备分散)
-    if torch.cuda.is_available():
-        model = model.to("cuda")
+    if use_8bit:
+        # 8bit量化加载: 显存占用减半, device_map="auto"自动分配GPU/CPU
+        from transformers import BitsAndBytesConfig
+        bnb_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+            llm_int8_enable_fp32_cpu_offload=True,  # CPU offload兼容
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            cfg["path"],
+            quantization_config=bnb_config,
+            device_map="auto",
+            trust_remote_code=True,
+            local_files_only=True,
+            attn_implementation="eager",  # 支持output_attentions
+        )
+    else:
+        # bfloat16: 先CPU加载, 再整体移到CUDA
+        model = AutoModelForCausalLM.from_pretrained(
+            cfg["path"],
+            torch_dtype=dtype,
+            device_map="cpu",
+            trust_remote_code=True,
+            local_files_only=True,
+            low_cpu_mem_usage=True,
+            attn_implementation="eager",  # 支持output_attentions
+        )
+        if torch.cuda.is_available():
+            model = model.to("cuda")
+    
     model.eval()
     device = next(model.parameters()).device
+    gpu_mem = torch.cuda.memory_allocated() / 1e9 if torch.cuda.is_available() else 0
     print(f"[model_utils] {model_name} loaded, device={device}, "
-          f"class={type(model).__name__}")
+          f"class={type(model).__name__}, GPU={gpu_mem:.2f}GB")
     return model, tokenizer, device
 
 
@@ -234,17 +264,44 @@ def get_layer_weights(layer, d_model: int, mlp_type: str) -> LayerWeights:
     )
 
 
-def get_W_U(model) -> np.ndarray:
+def get_W_U(model, model_name: str = None) -> np.ndarray:
     """
     获取lm_head权重矩阵(即W_U)
+    
+    8bit量化模型的lm_head可能在meta device上，此时从safetensors直接加载。
+    
+    Args:
+        model: 模型对象
+        model_name: 模型名称(用于查找safetensors路径)
     
     Returns:
         W_U: [vocab_size, d_model] numpy数组 (float32)
     """
     if hasattr(model, "lm_head"):
-        w = model.lm_head.weight.detach().cpu()
-        # 优先用float16节省内存, SVD时再cast到float32
-        return w.float().numpy()
+        w = model.lm_head.weight
+        if not w.is_meta:
+            return w.detach().cpu().float().numpy()
+        
+        # lm_head在meta device上(8bit量化offload)，从safetensors直接加载
+        print("[model_utils] lm_head is on meta device, loading from safetensors...")
+        model_path = None
+        if model_name and model_name in MODEL_CONFIGS:
+            model_path = MODEL_CONFIGS[model_name]["path"]
+        elif hasattr(model, 'config') and hasattr(model.config, '_name_or_path'):
+            model_path = model.config._name_or_path
+        
+        if model_path:
+            import glob, os
+            from safetensors import safe_open
+            sf_files = glob.glob(os.path.join(model_path, '*.safetensors'))
+            for sf_file in sf_files:
+                with safe_open(sf_file, framework='pt', device='cpu') as sf:
+                    if 'lm_head.weight' in sf.keys():
+                        w = sf.get_tensor('lm_head.weight')
+                        print(f"[model_utils] Loaded lm_head from {os.path.basename(sf_file)}, shape={w.shape}")
+                        return w.float().numpy()
+        
+        raise ValueError(f"Cannot load lm_head from meta device or safetensors for {model_name}")
     raise ValueError(f"Cannot find lm_head in {type(model).__name__}")
 
 

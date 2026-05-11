@@ -1,0 +1,88 @@
+﻿============================================================
+Phase 133: 严格算子几何 — qwen3
+============================================================
+[model_utils] Loading qwen3... (8bit=False)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase133_rigorous_operator.py qwen ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards: 100%|��������������������| 3/3 [00:00<00:00, 150.75it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+Model: Qwen3ForCausalLM, layers=36, d=2560
+
+========================================
+Exp 1: 满秩标度律 (Full-Rank Scaling Law)
+========================================
+  [1/3] The dog bites the man
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [2/3] The cat chases the mouse
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [3/3] The teacher helps the student
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  Exp 1 done in 34.3s
+  L0: k=16:r=16.0, k=32:r=32.0, k=48:r=48.0, k=64:r=63.0, k=128:r=123.7, k=256:r=169.7
+  L18: k=16:r=15.3, k=32:r=30.0, k=48:r=44.7, k=64:r=59.3, k=128:r=115.3, k=256:r=210.3
+  L27: k=16:r=15.3, k=32:r=30.0, k=48:r=45.0, k=64:r=59.3, k=128:r=117.0, k=256:r=216.3
+  L34: k=16:r=15.0, k=32:r=30.0, k=48:r=44.7, k=64:r=59.3, k=128:r=117.0, k=256:r=221.7
+  L9: k=16:r=15.0, k=32:r=29.7, k=48:r=44.3, k=64:r=58.7, k=128:r=116.0, k=256:r=220.7
+
+========================================
+Exp 2: ε收敛测试 (Epsilon Convergence)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 2 done in 38.9s
+  The dog bites the man... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.8981, rel_err=0.1843
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.1987, rel_err=0.8303
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.0483, rel_err=0.9680
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0942, rel_err=0.9756
+  The dog bites the man... L18:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.3219, rel_err=0.9475
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.3850, rel_err=0.9463
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.3727, rel_err=0.9476
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.1753, rel_err=0.9458
+  The cat chases the mouse... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.8810, rel_err=0.1635
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.2324, rel_err=0.8007
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.0434, rel_err=0.9708
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0700, rel_err=0.9773
+  The cat chases the mouse... L18:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.3816, rel_err=0.9484
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.3910, rel_err=0.9475
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.3973, rel_err=0.9494
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.1369, rel_err=0.9537
+
+========================================
+Exp 3: 模块分解 (Module Decomposition)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 3 done in 15.3s
+  L0:
+    ln1: eff_rank=61.0±0.0
+    attn: eff_rank=39.5±4.5
+    ln2: eff_rank=48.5±1.5
+    mlp: eff_rank=60.0±0.0
+  L18:
+    ln1: eff_rank=58.5±0.5
+    attn: eff_rank=45.0±2.0
+    ln2: eff_rank=59.0±0.0
+    mlp: eff_rank=57.5±0.5
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase133_qwen3_rigorous_operator.json
+[model_utils] GPU memory released, allocated=8.11 GB
+Total time: 95.2s

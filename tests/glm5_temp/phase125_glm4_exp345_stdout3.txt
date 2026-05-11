@@ -1,0 +1,92 @@
+加载已保存的Exp 1-2结果...
+
+加载模型...
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+  class=GlmForCausalLM, n_layers=40, d_model=4096
+  目标层: [0, 13, 26, 39]
+
+[数据收集] 收集激活并计算PCA...
+  收集: 10/10 prompts
+  Layer 0: eff_rank(95%)=9, top10方差比=0.9523
+  Layer 13: eff_rank(95%)=1, top10方差比=0.9977
+  Layer 26: eff_rank(95%)=40, top10方差比=0.9120
+  Layer 39: eff_rank(95%)=131, top10方差比=0.5050
+  数据收集+PCA耗时: 5.1s
+
+==================================================
+Exp 3: W_U行空间与信号子空间的对齐
+==================================================
+
+[Exp 3] W_U行空间与信号子空间的对齐
+[model_utils] lm_head is on meta device, loading from safetensors...
+[model_utils] Loaded lm_head from model-00004-of-00004.safetensors, shape=torch.Size([151552, 4096])
+  W_U shape: (151552, 4096)
+  W_U SVD: k=200, top-5奇异值=[66.48661041259766, 16.16206169128418, 12.513185501098633, 10.62916374206543, 10.040508270263672]
+  Layer 0:
+    PCA top-10 W_U投影: 0.0930
+    PCA top-50 W_U投影: 0.0685
+    PCA top-100 W_U投影: 0.0619
+    PCA bottom W_U投影: 0.0528
+    Fisher top-5 W_U投影: 0.0523
+    PCA top-5 W_U投影: 0.1197
+    信号子空间(低能高Fisher) W_U投影: 0.0563
+    >>> W_U对齐模式需要进一步分析
+  Layer 13:
+    PCA top-10 W_U投影: 0.1289
+    PCA top-50 W_U投影: 0.0811
+    PCA top-100 W_U投影: 0.0701
+    PCA bottom W_U投影: 0.0543
+    Fisher top-5 W_U投影: 0.0556
+    PCA top-5 W_U投影: 0.1879
+    信号子空间(低能高Fisher) W_U投影: 0.0580
+    >>> W_U对齐模式需要进一步分析
+  Layer 26:
+    PCA top-10 W_U投影: 0.1183
+    PCA top-50 W_U投影: 0.0781
+    PCA top-100 W_U投影: 0.0660
+    PCA bottom W_U投影: 0.0512
+    Fisher top-5 W_U投影: 0.0653
+    PCA top-5 W_U投影: 0.1509
+    信号子空间(低能高Fisher) W_U投影: 0.0548
+    >>> W_U对齐模式需要进一步分析
+  Layer 39:
+    PCA top-10 W_U投影: 0.0493
+    PCA top-50 W_U投影: 0.0442
+    PCA top-100 W_U投影: 0.0433
+    PCA bottom W_U投影: 0.0416
+    Fisher top-5 W_U投影: 0.0375
+    PCA top-5 W_U投影: 0.0484
+    信号子空间(低能高Fisher) W_U投影: 0.0428
+    >>> W_U对齐模式需要进一步分析
+  W_U对齐分析耗时: 166.0s
+Exp 3 结果已保存
+
+==================================================
+Exp 4: 定向消融实验
+==================================================
+
+[Exp 4] 定向消融实验
+  Layer 0...
+    high_energy_low_fisher (n=25): KL=6.311±1.397, top1=0.00, cos=0.6674
+    low_energy_high_fisher (n=42): KL=0.056±0.047, top1=0.92, cos=0.9949
+    random (n=50): KL=1.278±1.040, top1=0.52, cos=0.9001
+  Layer 13...
+    high_energy_low_fisher (n=25): KL=4.496±2.036, top1=0.12, cos=0.7810
+    low_energy_high_fisher (n=39): KL=0.041±0.039, top1=0.92, cos=0.9956
+    random (n=50): KL=0.247±0.135, top1=0.76, cos=0.9783
+  Layer 26...
+    high_energy_low_fisher (n=25): KL=0.847±0.728, top1=0.52, cos=0.9312
+    low_energy_high_fisher (n=42): KL=0.043±0.018, top1=0.84, cos=0.9932
+    random (n=50): KL=1.476±1.338, top1=0.44, cos=0.9252
+  Layer 39...
+    high_energy_low_fisher (n=25): KL=2.354±0.709, top1=0.36, cos=0.8756
+    low_energy_high_fisher (n=16): KL=0.016±0.010, top1=0.92, cos=0.9974
+    random (n=50): KL=2.995±0.756, top1=0.24, cos=0.8113
+  消融实验耗时: 233.4s
+Exp 4 结果已保存
+
+Exp 5 已在之前完成, 跳过
+
+GLM4 Exp 3-4 完成!
+[model_utils] GPU memory released, allocated=9.42 GB

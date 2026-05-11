@@ -1,0 +1,91 @@
+﻿============================================================
+Phase 133: 严格算子几何 — deepseek7b
+============================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+python : Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase133_rigorous_operator.py deep ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Sliding Window ...be encountered.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|����������     | 1/2 [00:11<00:11, 11.94s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00,  9.89s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00, 10.20s/it]
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+Model: Qwen2ForCausalLM, layers=28, d=3584
+
+========================================
+Exp 1: 满秩标度律 (Full-Rank Scaling Law)
+========================================
+  [1/3] The dog bites the man
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [2/3] The cat chases the mouse
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  [3/3] The teacher helps the student
+    perturbation 64/256 done
+    perturbation 128/256 done
+    perturbation 192/256 done
+    perturbation 256/256 done
+  Exp 1 done in 102.6s
+  L0: k=16:r=16.0, k=32:r=32.0, k=48:r=48.0, k=64:r=64.0, k=128:r=127.0, k=256:r=249.3
+  L14: k=16:r=15.0, k=32:r=30.3, k=48:r=45.7, k=64:r=60.7, k=128:r=111.3, k=256:r=142.7
+  L21: k=16:r=15.3, k=32:r=30.3, k=48:r=45.7, k=64:r=60.7, k=128:r=115.0, k=256:r=153.3
+  L26: k=16:r=15.7, k=32:r=30.3, k=48:r=45.3, k=64:r=60.3, k=128:r=114.7, k=256:r=154.0
+  L7: k=16:r=15.0, k=32:r=30.0, k=48:r=45.0, k=64:r=59.7, k=128:r=104.3, k=256:r=122.3
+
+========================================
+Exp 2: ε收敛测试 (Epsilon Convergence)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 2 done in 111.2s
+  The dog bites the man... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.9972, rel_err=0.0320
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.7694, rel_err=0.3012
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.1125, rel_err=0.9000
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0395, rel_err=0.9764
+  The dog bites the man... L14:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.2023, rel_err=0.9569
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.1957, rel_err=0.9549
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.1558, rel_err=0.9565
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0042, rel_err=-1.0000
+  The cat chases the mouse... L0:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.9976, rel_err=0.0299
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.7915, rel_err=0.2843
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.1112, rel_err=0.8999
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0441, rel_err=0.9707
+  The cat chases the mouse... L14:
+    eps_1e-01_vs_eps_1e-02: cos_top16=0.1945, rel_err=0.9543
+    eps_1e-02_vs_eps_1e-03: cos_top16=0.1974, rel_err=0.9536
+    eps_1e-03_vs_eps_1e-04: cos_top16=0.1619, rel_err=0.9535
+    eps_1e-04_vs_eps_1e-05: cos_top16=0.0040, rel_err=-1.0000
+
+========================================
+Exp 3: 模块分解 (Module Decomposition)
+========================================
+  [1/2] The dog bites the man
+  [2/2] The cat chases the mouse
+  Exp 3 done in 41.1s
+  L0:
+    ln1: eff_rank=63.0±0.0
+    attn: eff_rank=28.5±1.5
+    ln2: eff_rank=28.5±1.5
+    mlp: eff_rank=37.0±0.0
+  L14:
+    ln1: eff_rank=52.0±2.0
+    attn: eff_rank=50.0±2.0
+    ln2: eff_rank=52.0±2.0
+    mlp: eff_rank=52.5±2.5
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase133_deepseek7b_rigorous_operator.json
+[model_utils] GPU memory released, allocated=8.72 GB
+Total time: 280.2s

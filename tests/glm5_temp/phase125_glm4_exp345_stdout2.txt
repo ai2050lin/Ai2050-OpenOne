@@ -1,0 +1,25 @@
+加载已保存的Exp 1-2结果...
+
+加载模型...
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+  class=GlmForCausalLM, n_layers=40, d_model=4096
+  目标层: [0, 13, 26, 39]
+
+[数据收集] 收集激活并计算PCA...
+  收集: 10/10 prompts
+  Layer 0: eff_rank(95%)=9, top10方差比=0.9523
+  Layer 13: eff_rank(95%)=1, top10方差比=0.9977
+  Layer 26: eff_rank(95%)=40, top10方差比=0.9120
+  Layer 39: eff_rank(95%)=131, top10方差比=0.5050
+  数据收集+PCA耗时: 5.1s
+
+==================================================
+Exp 3: W_U行空间与信号子空间的对齐
+==================================================
+
+[Exp 3] W_U行空间与信号子空间的对齐
+[model_utils] lm_head is on meta device, loading from safetensors...
+[model_utils] Loaded lm_head from model-00004-of-00004.safetensors, shape=torch.Size([151552, 4096])
+  W_U shape: (151552, 4096)
+  W_U SVD: k=200, top-5奇异值=[66.48661041259766, 16.162059783935547, 12.51318073272705, 10.629155158996582, 10.040506362915039]

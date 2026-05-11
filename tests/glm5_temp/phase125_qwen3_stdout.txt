@@ -1,0 +1,211 @@
+======================================================================
+Phase 125: Fisher Geometry — Probability Modulation Theory
+Model: qwen3
+======================================================================
+
+==================================================
+加载模型
+==================================================
+[model_utils] Loading qwen3... (8bit=False)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+  class=Qwen3ForCausalLM, n_layers=36, d_model=2560, vocab=151936
+  目标层: [0, 12, 24, 35]
+
+[数据收集] 收集激活并计算PCA...
+  收集: 10/25 prompts
+  收集: 20/25 prompts
+  Layer 0: eff_rank(95%)=114, top10方差比=0.4991
+  Layer 12: eff_rank(95%)=1, top10方差比=0.9997
+  Layer 24: eff_rank(95%)=1, top10方差比=0.9983
+  Layer 35: eff_rank(95%)=104, top10方差比=0.6116
+  数据收集+PCA耗时: 2.3s
+
+==================================================
+Exp 1: Fisher谱估计 + Fisher主方向提取
+==================================================
+
+[Exp 1] Fisher谱估计 (ε=0.01)
+  Layer 0...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=0.7603, max=1.0645
+    Random Fisher: mean=0.7833, max=1.0649
+    Top-5 Fisher dirs的均值: 1.0413
+    Fisher集中度(top5/all): 1.349
+  Layer 12...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=0.7047, max=0.9960
+    Random Fisher: mean=0.6976, max=1.0825
+    Top-5 Fisher dirs的均值: 0.9805
+    Fisher集中度(top5/all): 1.398
+  Layer 24...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=0.5980, max=0.8581
+    Random Fisher: mean=0.5942, max=0.8492
+    Top-5 Fisher dirs的均值: 0.7991
+    Fisher集中度(top5/all): 1.340
+  Layer 35...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=0.0000, max=0.0001
+    Random Fisher: mean=0.0000, max=0.0000
+    Top-5 Fisher dirs的均值: 0.0000
+    Fisher集中度(top5/all): 18.648
+  Fisher谱估计耗时: 826.6s
+  Exp 1 结果已保存
+
+==================================================
+Exp 2: Fisher vs PCA主方向对齐度
+==================================================
+
+[Exp 2] Fisher vs PCA主方向对齐度
+  Layer 0:
+    cos(PCA-1, Fisher-1) = 0.0283
+    PCA-1的max Fisher对齐 = 1.0000
+    Fisher-1的max PCA对齐 = 0.0407
+    cos矩阵均值 = 0.0186, max = 1.0000
+    对角线均值 = 0.0088
+    >>> PCA主方向与Fisher主方向近正交! 能量≠信息!
+  Layer 12:
+    cos(PCA-1, Fisher-1) = 0.0067
+    PCA-1的max Fisher对齐 = 0.0320
+    Fisher-1的max PCA对齐 = 0.0469
+    cos矩阵均值 = 0.0171, max = 1.0000
+    对角线均值 = 0.0049
+    >>> PCA主方向与Fisher主方向近正交! 能量≠信息!
+  Layer 24:
+    cos(PCA-1, Fisher-1) = 0.0000
+    PCA-1的max Fisher对齐 = 0.0453
+    Fisher-1的max PCA对齐 = 1.0000
+    cos矩阵均值 = 0.0194, max = 1.0000
+    对角线均值 = 0.0066
+    >>> PCA主方向与Fisher主方向近正交! 能量≠信息!
+  Layer 35:
+    cos(PCA-1, Fisher-1) = 0.0000
+    PCA-1的max Fisher对齐 = 0.0457
+    Fisher-1的max PCA对齐 = 1.0000
+    cos矩阵均值 = 0.0189, max = 1.0000
+    对角线均值 = 0.0423
+    >>> PCA主方向与Fisher主方向近正交! 能量≠信息!
+  对齐度分析耗时: 0.0s
+  Exp 2 结果已保存
+
+==================================================
+Exp 3: W_U行空间与信号子空间的对齐
+==================================================
+
+[Exp 3] W_U行空间与信号子空间的对齐
+  W_U shape: (151936, 2560)
+  W_U SVD: k=200, top-5奇异值=[126.6711654663086, 24.20531463623047, 20.911556243896484, 20.527942657470703, 18.53592300415039]
+  Layer 0:
+    PCA top-10 W_U投影: 0.0925
+    PCA top-50 W_U投影: 0.0806
+    PCA top-100 W_U投影: 0.0788
+    PCA bottom W_U投影: 0.0861
+    Fisher top-5 W_U投影: 0.0736
+    PCA top-5 W_U投影: 0.1026
+    信号子空间(低能高Fisher) W_U投影: 0.0779
+    >>> W_U对齐模式需要进一步分析
+  Layer 12:
+    PCA top-10 W_U投影: 0.1185
+    PCA top-50 W_U投影: 0.0986
+    PCA top-100 W_U投影: 0.0911
+    PCA bottom W_U投影: 0.0904
+    Fisher top-5 W_U投影: 0.0787
+    PCA top-5 W_U投影: 0.1266
+    信号子空间(低能高Fisher) W_U投影: 0.0840
+    >>> W_U对齐模式需要进一步分析
+  Layer 24:
+    PCA top-10 W_U投影: 0.1358
+    PCA top-50 W_U投影: 0.1076
+    PCA top-100 W_U投影: 0.0979
+    PCA bottom W_U投影: 0.0901
+    Fisher top-5 W_U投影: 0.0789
+    PCA top-5 W_U投影: 0.1418
+    信号子空间(低能高Fisher) W_U投影: 0.0858
+    >>> W_U对齐模式需要进一步分析
+  Layer 35:
+    PCA top-10 W_U投影: 0.1791
+    PCA top-50 W_U投影: 0.1510
+    PCA top-100 W_U投影: 0.1282
+    PCA bottom W_U投影: 0.0959
+    Fisher top-5 W_U投影: 0.1264
+    PCA top-5 W_U投影: 0.1524
+    信号子空间(低能高Fisher) W_U投影: 0.1057
+    >>> W_U对齐模式需要进一步分析
+  W_U对齐分析耗时: 91.8s
+  Exp 3 结果已保存
+
+==================================================
+Exp 4: 定向消融实验
+==================================================
+
+[Exp 4] 定向消融实验
+  Layer 0...
+    high_energy_low_fisher (n=25): KL=0.683±1.081, top1=0.64, cos=0.8676
+    low_energy_high_fisher (n=50): KL=0.110±0.141, top1=0.68, cos=0.9847
+    random (n=50): KL=5.266±2.649, top1=0.12, cos=0.2143
+  Layer 12...
+    high_energy_low_fisher (n=25): KL=4.302±1.539, top1=0.04, cos=0.4889
+    low_energy_high_fisher (n=46): KL=0.060±0.034, top1=0.76, cos=0.9907
+    random (n=50): KL=0.738±0.570, top1=0.48, cos=0.8911
+  Layer 24...
+    high_energy_low_fisher (n=25): KL=2.468±1.290, top1=0.24, cos=0.4001
+    low_energy_high_fisher (n=41): KL=0.115±0.062, top1=0.60, cos=0.9788
+    random (n=50): KL=1.178±0.947, top1=0.48, cos=0.8284
+  Layer 35...
+    high_energy_low_fisher (n=25): KL=1.651±0.916, top1=0.16, cos=0.7717
+    low_energy_high_fisher (n=29): KL=0.176±0.133, top1=0.72, cos=0.9744
+    random (n=50): KL=1.444±0.893, top1=0.40, cos=0.8057
+  消融实验耗时: 25.3s
+  Exp 4 结果已保存
+
+==================================================
+Exp 5: ε稳定性检验
+==================================================
+
+[Exp 5] ε稳定性检验
+  ε=0.001...
+    mean=260.677724, max=438.659970, 排名前5=[5, 16, 12, 3, 6]
+  ε=0.005...
+    mean=10.513428, max=13.007711, 排名前5=[18, 15, 3, 10, 4]
+  ε=0.01...
+    mean=2.544356, max=3.916473, 排名前5=[16, 8, 6, 9, 11]
+  ε=0.05...
+    mean=0.098278, max=0.145736, 排名前5=[10, 5, 3, 12, 4]
+  ε=0.1...
+    mean=0.027080, max=0.043849, 排名前5=[11, 14, 17, 1, 5]
+    ε=0.001: Kendall τ vs ref = -0.063 (p=0.7246)
+    ε=0.005: Kendall τ vs ref = -0.095 (p=0.5859)
+    ε=0.01: Kendall τ vs ref = 1.000 (p=0.0000)
+    ε=0.05: Kendall τ vs ref = 0.221 (p=0.1859)
+    ε=0.1: Kendall τ vs ref = -0.189 (p=0.2598)
+  ε稳定性检验耗时: 86.5s
+  Exp 5 结果已保存
+
+======================================================================
+Phase 125 汇总
+======================================================================
+
+[结论1] Fisher vs PCA对齐度:
+
+[结论2] W_U对齐:
+
+[结论3] 定向消融:
+[model_utils] GPU memory released, allocated=8.11 GB
+
+Phase 125 完成!
