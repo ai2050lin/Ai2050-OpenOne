@@ -1,0 +1,52 @@
+======================================================================
+Phase 125: Fisher Geometry — Probability Modulation Theory
+Model: deepseek7b
+======================================================================
+
+==================================================
+加载模型
+==================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+  class=Qwen2ForCausalLM, n_layers=28, d_model=3584, vocab=152064
+  目标层: [0, 9, 18, 27]
+
+[数据收集] 收集激活并计算PCA...
+  收集: 10/25 prompts
+  收集: 20/25 prompts
+  Layer 0: eff_rank(95%)=95, top10方差比=0.7524
+  Layer 9: eff_rank(95%)=1, top10方差比=0.9999
+  Layer 18: eff_rank(95%)=1, top10方差比=0.9999
+  Layer 27: eff_rank(95%)=40, top10方差比=0.8619
+  数据收集+PCA耗时: 4.9s
+
+==================================================
+Exp 1: Fisher谱估计 + Fisher主方向提取
+==================================================
+
+[Exp 1] Fisher谱估计 (ε=0.01)
+  Layer 0...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=75.3540, max=114.9028
+    Random Fisher: mean=77.5601, max=121.5834
+    Top-5 Fisher dirs的均值: 115.5462
+    Fisher集中度(top5/all): 1.511
+  Layer 9...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
+    Prompt 25/25
+    PCA Fisher: mean=52.0676, max=109.0795
+    Random Fisher: mean=55.8013, max=96.7645
+    Top-5 Fisher dirs的均值: 90.7063
+    Fisher集中度(top5/all): 1.682
+  Layer 18...
+    Prompt 5/25
+    Prompt 10/25
+    Prompt 15/25
+    Prompt 20/25
