@@ -1,26 +1,43 @@
-"""Quick test: Load DeepSeek7B and extract a few residuals."""
+"""DS7B加载测试"""
+import sys, time
+sys.stdout.reconfigure(encoding='utf-8')
+sys.path.insert(0, 'tests/glm5')
+
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import gc
 
-model_name = 'D:/develop/model/hub/modelscope_cache/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B'
-print(f"Loading {model_name}...")
+print(f"CUDA: {torch.cuda.is_available()}, GPU: {torch.cuda.get_device_properties(0).total_memory/1e9:.1f}GB", flush=True)
 
-tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-bnb_config = BitsAndBytesConfig(load_in_8bit=True, llm_int8_enable_fp32_cpu_offload=True)
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    quantization_config=bnb_config,
-    device_map="auto",
-    trust_remote_code=True,
-)
-model.eval()
-print("Model loaded successfully!")
+from model_utils import load_model, get_model_info, release_model
 
-# Quick test
-text = "将以下中文翻译成英文：猫"
-inputs = tokenizer(text, return_tensors="pt").to(model.device)
-with torch.no_grad():
-    outputs = model(**inputs, output_hidden_states=True)
-    h = outputs.hidden_states[13][0, -1, :].cpu().float().numpy()
-print(f"Hidden state at L12: shape={h.shape}, norm={sum(x**2 for x in h)**0.5:.4f}")
-print("DeepSeek7B works!")
+print("Loading DS7B...", flush=True)
+t0 = time.time()
+try:
+    model, tokenizer, device = load_model('deepseek7b')
+    t1 = time.time()
+    print(f"DS7B loaded in {t1-t0:.1f}s, device={device}", flush=True)
+    
+    info = get_model_info(model, 'deepseek7b')
+    print(f"Info: {info.model_class}, {info.n_layers}L, d={info.d_model}", flush=True)
+    
+    # 简单forward测试
+    prompt = "The cat sat on the"
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=32)
+    input_device = next(model.parameters()).device
+    input_ids = inputs["input_ids"].to(input_device)
+    attn_mask = inputs["attention_mask"].to(input_device)
+    
+    with torch.no_grad():
+        out = model(input_ids=input_ids, attention_mask=attn_mask, output_hidden_states=True)
+    
+    print(f"Forward OK: {len(out.hidden_states)} layers, last norm={out.hidden_states[-1].float().norm():.2f}", flush=True)
+    
+    release_model(model)
+    gc.collect()
+    torch.cuda.empty_cache()
+    print("DS7B test PASSED!", flush=True)
+    
+except Exception as e:
+    print(f"ERROR: {e}", flush=True)
+    import traceback
+    traceback.print_exc()

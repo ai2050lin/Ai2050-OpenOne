@@ -1,0 +1,458 @@
+﻿
+======================================================================
+Phase 139: Jacobian Geometry Analysis — qwen3
+======================================================================
+[model_utils] Loading qwen3... (8bit=False)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase139_jacobian_geometry.py qwen ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards: 100%|��������������������| 3/3 [00:00<00:00, 144.89it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+Model: Qwen3ForCausalLM, 36 layers, d_model=2560
+
+======================================================================
+Exp 1: Jacobian Singular Value Spectrum
+======================================================================
+
+  Sentence 1/15: 'The dog always bites the man'
+    Computing Jacobian spectrum at L0...
+      σ_max=32.101, σ_min=2.680, σ_med=4.154, eff_rank=90.5, frac_amp=1.000, non_norm=0.3737
+    Computing Jacobian spectrum at L5...
+      σ_max=7.293, σ_min=0.846, σ_med=1.046, eff_rank=100.4, frac_amp=0.625, non_norm=0.3560
+    Computing Jacobian spectrum at L10...
+      σ_max=5.481, σ_min=0.706, σ_med=0.924, eff_rank=106.6, frac_amp=0.336, non_norm=0.2877
+    Computing Jacobian spectrum at L15...
+      σ_max=4.967, σ_min=0.837, σ_med=1.063, eff_rank=113.4, frac_amp=0.648, non_norm=0.2049
+    Computing Jacobian spectrum at L20...
+      σ_max=4.293, σ_min=0.857, σ_med=1.048, eff_rank=117.4, frac_amp=0.648, non_norm=0.1682
+    Computing Jacobian spectrum at L25...
+      σ_max=6.297, σ_min=0.946, σ_med=1.145, eff_rank=109.5, frac_amp=0.906, non_norm=0.2574
+    Computing Jacobian spectrum at L30...
+      σ_max=5.192, σ_min=1.007, σ_med=1.236, eff_rank=116.7, frac_amp=1.000, non_norm=0.1743
+    Computing Jacobian spectrum at L35...
+      σ_max=1402.480, σ_min=0.931, σ_med=1.064, eff_rank=1.2, frac_amp=0.789, non_norm=1.4140
+
+  Sentence 2/15: 'The cat never chases the mouse'
+    Computing Jacobian spectrum at L0...
+      σ_max=44.604, σ_min=2.972, σ_med=4.766, eff_rank=81.3, frac_amp=1.000, non_norm=0.4524
+    Computing Jacobian spectrum at L5...
+      σ_max=4.785, σ_min=0.865, σ_med=1.082, eff_rank=112.4, frac_amp=0.703, non_norm=0.1955
+    Computing Jacobian spectrum at L10...
+      σ_max=5.014, σ_min=0.740, σ_med=0.969, eff_rank=110.8, frac_amp=0.430, non_norm=0.2382
+    Computing Jacobian spectrum at L15...
+      σ_max=5.980, σ_min=0.813, σ_med=1.044, eff_rank=104.3, frac_amp=0.602, non_norm=0.2638
+    Computing Jacobian spectrum at L20...
+      σ_max=3.880, σ_min=0.824, σ_med=0.998, eff_rank=117.5, frac_amp=0.492, non_norm=0.1572
+    Computing Jacobian spectrum at L25...
+      σ_max=3.476, σ_min=0.911, σ_med=1.060, eff_rank=121.4, frac_amp=0.727, non_norm=0.1201
+    Computing Jacobian spectrum at L30...
+      σ_max=3.516, σ_min=0.957, σ_med=1.091, eff_rank=122.4, frac_amp=0.883, non_norm=0.1106
+    Computing Jacobian spectrum at L35...
+      σ_max=1053.457, σ_min=0.956, σ_med=1.074, eff_rank=1.3, frac_amp=0.844, non_norm=1.4140
+
+  Sentence 3/15: 'The sun rises early every morning'
+    Computing Jacobian spectrum at L0...
+      σ_max=52.262, σ_min=3.361, σ_med=5.274, eff_rank=79.5, frac_amp=1.000, non_norm=0.4761
+    Computing Jacobian spectrum at L5...
+      σ_max=5.487, σ_min=0.854, σ_med=1.059, eff_rank=111.8, frac_amp=0.648, non_norm=0.2383
+    Computing Jacobian spectrum at L10...
+      σ_max=4.869, σ_min=0.695, σ_med=0.886, eff_rank=109.6, frac_amp=0.234, non_norm=0.2591
+    Computing Jacobian spectrum at L15...
+      σ_max=7.060, σ_min=0.841, σ_med=1.056, eff_rank=102.6, frac_amp=0.641, non_norm=0.3385
+    Computing Jacobian spectrum at L20...
+      σ_max=4.218, σ_min=0.847, σ_med=1.030, eff_rank=118.1, frac_amp=0.586, non_norm=0.1689
+    Computing Jacobian spectrum at L25...
+      σ_max=5.835, σ_min=0.916, σ_med=1.061, eff_rank=110.8, frac_amp=0.734, non_norm=0.2596
+    Computing Jacobian spectrum at L30...
+      σ_max=4.417, σ_min=0.950, σ_med=1.084, eff_rank=117.4, frac_amp=0.867, non_norm=0.1618
+    Computing Jacobian spectrum at L35...
+      σ_max=1159.167, σ_min=0.942, σ_med=1.053, eff_rank=1.3, frac_amp=0.781, non_norm=1.4139
+
+  Sentence 4/15: 'The children play happily outside'
+    Computing Jacobian spectrum at L0...
+      σ_max=37.107, σ_min=2.937, σ_med=4.711, eff_rank=90.1, frac_amp=1.000, non_norm=0.3799
+    Computing Jacobian spectrum at L5...
+      σ_max=5.718, σ_min=0.860, σ_med=1.090, eff_rank=109.0, frac_amp=0.703, non_norm=0.2377
+    Computing Jacobian spectrum at L10...
+      σ_max=6.319, σ_min=0.724, σ_med=0.946, eff_rank=101.3, frac_amp=0.375, non_norm=0.3352
+    Computing Jacobian spectrum at L15...
+      σ_max=7.154, σ_min=0.847, σ_med=1.075, eff_rank=103.2, frac_amp=0.680, non_norm=0.3438
+    Computing Jacobian spectrum at L20...
+      σ_max=5.016, σ_min=0.897, σ_med=1.114, eff_rank=115.0, frac_amp=0.797, non_norm=0.1953
+    Computing Jacobian spectrum at L25...
+      σ_max=6.933, σ_min=0.992, σ_med=1.238, eff_rank=107.4, frac_amp=0.992, non_norm=0.2602
+    Computing Jacobian spectrum at L30...
+      σ_max=8.036, σ_min=1.030, σ_med=1.269, eff_rank=103.2, frac_amp=1.000, non_norm=0.3097
+    Computing Jacobian spectrum at L35...
+      σ_max=577.789, σ_min=0.920, σ_med=1.071, eff_rank=1.6, frac_amp=0.773, non_norm=1.4133
+
+  Sentence 5/15: 'The birds fly south for winter'
+    Computing Jacobian spectrum at L0...
+      σ_max=53.396, σ_min=3.308, σ_med=5.293, eff_rank=74.5, frac_amp=1.000, non_norm=0.4596
+    Computing Jacobian spectrum at L5...
+      σ_max=5.482, σ_min=0.839, σ_med=1.035, eff_rank=110.9, frac_amp=0.609, non_norm=0.2453
+    Computing Jacobian spectrum at L10...
+      σ_max=6.327, σ_min=0.678, σ_med=0.881, eff_rank=97.1, frac_amp=0.242, non_norm=0.3606
+    Computing Jacobian spectrum at L15...
+      σ_max=5.458, σ_min=0.822, σ_med=1.059, eff_rank=109.8, frac_amp=0.641, non_norm=0.2302
+    Computing Jacobian spectrum at L20...
+      σ_max=5.706, σ_min=0.850, σ_med=1.042, eff_rank=109.2, frac_amp=0.617, non_norm=0.2520
+    Computing Jacobian spectrum at L25...
+      σ_max=4.120, σ_min=0.914, σ_med=1.074, eff_rank=119.7, frac_amp=0.766, non_norm=0.1487
+    Computing Jacobian spectrum at L30...
+      σ_max=5.855, σ_min=0.954, σ_med=1.111, eff_rank=111.6, frac_amp=0.906, non_norm=0.2400
+    Computing Jacobian spectrum at L35...
+      σ_max=889.220, σ_min=0.932, σ_med=1.051, eff_rank=1.3, frac_amp=0.758, non_norm=1.4137
+
+  Sentence 6/15: 'The river flows into the ocean'
+    Computing Jacobian spectrum at L0...
+      σ_max=51.029, σ_min=3.829, σ_med=6.077, eff_rank=87.0, frac_amp=1.000, non_norm=0.4074
+    Computing Jacobian spectrum at L5...
+      σ_max=6.600, σ_min=0.871, σ_med=1.059, eff_rank=106.4, frac_amp=0.664, non_norm=0.3207
+    Computing Jacobian spectrum at L10...
+      σ_max=4.097, σ_min=0.723, σ_med=0.935, eff_rank=115.7, frac_amp=0.336, non_norm=0.1887
+    Computing Jacobian spectrum at L15...
+      σ_max=4.393, σ_min=0.836, σ_med=1.065, eff_rank=116.2, frac_amp=0.664, non_norm=0.1739
+    Computing Jacobian spectrum at L20...
+      σ_max=5.032, σ_min=0.834, σ_med=1.008, eff_rank=112.8, frac_amp=0.523, non_norm=0.2246
+    Computing Jacobian spectrum at L25...
+      σ_max=3.392, σ_min=0.918, σ_med=1.061, eff_rank=122.6, frac_amp=0.742, non_norm=0.1123
+    Computing Jacobian spectrum at L30...
+      σ_max=4.688, σ_min=0.953, σ_med=1.095, eff_rank=117.8, frac_amp=0.891, non_norm=0.1751
+    Computing Jacobian spectrum at L35...
+      σ_max=980.973, σ_min=0.962, σ_med=1.074, eff_rank=1.3, frac_amp=0.883, non_norm=1.4140
+
+  Sentence 7/15: 'The wind blows hard today'
+    Computing Jacobian spectrum at L0...
+      σ_max=40.895, σ_min=3.192, σ_med=5.020, eff_rank=88.0, frac_amp=1.000, non_norm=0.3857
+    Computing Jacobian spectrum at L5...
+      σ_max=4.733, σ_min=0.859, σ_med=1.068, eff_rank=112.7, frac_amp=0.688, non_norm=0.1939
+    Computing Jacobian spectrum at L10...
+      σ_max=5.029, σ_min=0.684, σ_med=0.890, eff_rank=107.1, frac_amp=0.258, non_norm=0.2687
+    Computing Jacobian spectrum at L15...
+      σ_max=5.280, σ_min=0.816, σ_med=1.030, eff_rank=110.9, frac_amp=0.570, non_norm=0.2325
+    Computing Jacobian spectrum at L20...
+      σ_max=3.575, σ_min=0.838, σ_med=1.014, eff_rank=120.4, frac_amp=0.539, non_norm=0.1371
+    Computing Jacobian spectrum at L25...
+      σ_max=3.289, σ_min=0.917, σ_med=1.060, eff_rank=122.8, frac_amp=0.734, non_norm=0.1083
+    Computing Jacobian spectrum at L30...
+      σ_max=3.460, σ_min=0.961, σ_med=1.095, eff_rank=122.7, frac_amp=0.898, non_norm=0.1089
+    Computing Jacobian spectrum at L35...
+      σ_max=1150.207, σ_min=0.956, σ_med=1.073, eff_rank=1.3, frac_amp=0.859, non_norm=1.4137
+
+  Sentence 8/15: 'The teacher reads books quietly'
+    Computing Jacobian spectrum at L0...
+      σ_max=79.467, σ_min=5.046, σ_med=8.344, eff_rank=81.5, frac_amp=1.000, non_norm=0.4815
+    Computing Jacobian spectrum at L5...
+      σ_max=5.998, σ_min=0.895, σ_med=1.136, eff_rank=110.2, frac_amp=0.805, non_norm=0.2443
+    Computing Jacobian spectrum at L10...
+      σ_max=4.064, σ_min=0.731, σ_med=0.948, eff_rank=115.2, frac_amp=0.391, non_norm=0.1837
+    Computing Jacobian spectrum at L15...
+      σ_max=4.740, σ_min=0.797, σ_med=1.001, eff_rank=114.0, frac_amp=0.500, non_norm=0.2087
+    Computing Jacobian spectrum at L20...
+      σ_max=3.550, σ_min=0.827, σ_med=0.999, eff_rank=120.0, frac_amp=0.492, non_norm=0.1373
+    Computing Jacobian spectrum at L25...
+      σ_max=3.993, σ_min=0.918, σ_med=1.063, eff_rank=119.7, frac_amp=0.734, non_norm=0.1437
+    Computing Jacobian spectrum at L30...
+      σ_max=3.173, σ_min=0.955, σ_med=1.085, eff_rank=123.4, frac_amp=0.875, non_norm=0.0965
+    Computing Jacobian spectrum at L35...
+      σ_max=1169.966, σ_min=0.954, σ_med=1.061, eff_rank=1.2, frac_amp=0.828, non_norm=1.4138
+
+  Sentence 9/15: 'The soldier fights bravely always'
+    Computing Jacobian spectrum at L0...
+      σ_max=44.764, σ_min=3.247, σ_med=5.024, eff_rank=84.2, frac_amp=1.000, non_norm=0.4352
+    Computing Jacobian spectrum at L5...
+      σ_max=5.533, σ_min=0.879, σ_med=1.113, eff_rank=112.3, frac_amp=0.766, non_norm=0.2219
+    Computing Jacobian spectrum at L10...
+      σ_max=4.841, σ_min=0.714, σ_med=0.913, eff_rank=109.6, frac_amp=0.289, non_norm=0.2475
+    Computing Jacobian spectrum at L15...
+      σ_max=4.233, σ_min=0.780, σ_med=0.966, eff_rank=115.9, frac_amp=0.398, non_norm=0.1870
+    Computing Jacobian spectrum at L20...
+      σ_max=4.022, σ_min=0.832, σ_med=1.010, eff_rank=118.2, frac_amp=0.523, non_norm=0.1631
+    Computing Jacobian spectrum at L25...
+      σ_max=4.131, σ_min=0.914, σ_med=1.067, eff_rank=119.2, frac_amp=0.750, non_norm=0.1513
+    Computing Jacobian spectrum at L30...
+      σ_max=3.656, σ_min=0.959, σ_med=1.089, eff_rank=120.3, frac_amp=0.883, non_norm=0.1233
+    Computing Jacobian spectrum at L35...
+      σ_max=1229.657, σ_min=0.956, σ_med=1.070, eff_rank=1.2, frac_amp=0.875, non_norm=1.4139
+
+  Sentence 10/15: 'The farmer grows crops every year'
+    Computing Jacobian spectrum at L0...
+      σ_max=36.270, σ_min=2.789, σ_med=4.226, eff_rank=85.7, frac_amp=1.000, non_norm=0.4011
+    Computing Jacobian spectrum at L5...
+      σ_max=5.504, σ_min=0.855, σ_med=1.081, eff_rank=111.5, frac_amp=0.703, non_norm=0.2307
+    Computing Jacobian spectrum at L10...
+      σ_max=4.285, σ_min=0.721, σ_med=0.930, eff_rank=113.4, frac_amp=0.344, non_norm=0.2030
+    Computing Jacobian spectrum at L15...
+      σ_max=6.185, σ_min=0.820, σ_med=1.042, eff_rank=107.2, frac_amp=0.609, non_norm=0.2878
+    Computing Jacobian spectrum at L20...
+      σ_max=5.170, σ_min=0.864, σ_med=1.072, eff_rank=112.5, frac_amp=0.680, non_norm=0.2117
+    Computing Jacobian spectrum at L25...
+      σ_max=4.734, σ_min=0.929, σ_med=1.105, eff_rank=116.8, frac_amp=0.836, non_norm=0.1766
+    Computing Jacobian spectrum at L30...
+      σ_max=4.215, σ_min=0.977, σ_med=1.131, eff_rank=118.8, frac_amp=0.938, non_norm=0.1433
+    Computing Jacobian spectrum at L35...
+      σ_max=906.832, σ_min=0.945, σ_med=1.069, eff_rank=1.3, frac_amp=0.820, non_norm=1.4138
+
+  Sentence 11/15: 'The artist paints beautiful pictures'
+    Computing Jacobian spectrum at L0...
+      σ_max=44.680, σ_min=3.213, σ_med=5.054, eff_rank=84.7, frac_amp=1.000, non_norm=0.4157
+    Computing Jacobian spectrum at L5...
+      σ_max=4.783, σ_min=0.856, σ_med=1.053, eff_rank=115.4, frac_amp=0.648, non_norm=0.1948
+    Computing Jacobian spectrum at L10...
+      σ_max=5.837, σ_min=0.747, σ_med=0.974, eff_rank=104.4, frac_amp=0.453, non_norm=0.2855
+    Computing Jacobian spectrum at L15...
+      σ_max=5.506, σ_min=0.836, σ_med=1.071, eff_rank=110.5, frac_amp=0.672, non_norm=0.2320
+    Computing Jacobian spectrum at L20...
+      σ_max=5.294, σ_min=0.836, σ_med=1.009, eff_rank=111.8, frac_amp=0.531, non_norm=0.2425
+    Computing Jacobian spectrum at L25...
+      σ_max=3.708, σ_min=0.912, σ_med=1.054, eff_rank=120.8, frac_amp=0.711, non_norm=0.1319
+    Computing Jacobian spectrum at L30...
+      σ_max=3.394, σ_min=0.960, σ_med=1.085, eff_rank=122.7, frac_amp=0.883, non_norm=0.1074
+    Computing Jacobian spectrum at L35...
+      σ_max=1102.353, σ_min=0.961, σ_med=1.079, eff_rank=1.3, frac_amp=0.883, non_norm=1.4139
+
+  Sentence 12/15: 'The doctor helps sick patients'
+    Computing Jacobian spectrum at L0...
+      σ_max=45.194, σ_min=3.228, σ_med=5.204, eff_rank=85.7, frac_amp=1.000, non_norm=0.4159
+    Computing Jacobian spectrum at L5...
+      σ_max=5.767, σ_min=0.855, σ_med=1.057, eff_rank=108.7, frac_amp=0.648, non_norm=0.2539
+    Computing Jacobian spectrum at L10...
+      σ_max=4.458, σ_min=0.711, σ_med=0.928, eff_rank=111.9, frac_amp=0.336, non_norm=0.2141
+    Computing Jacobian spectrum at L15...
+      σ_max=5.208, σ_min=0.828, σ_med=1.054, eff_rank=111.3, frac_amp=0.625, non_norm=0.2179
+    Computing Jacobian spectrum at L20...
+      σ_max=6.325, σ_min=0.846, σ_med=1.032, eff_rank=105.7, frac_amp=0.594, non_norm=0.2944
+    Computing Jacobian spectrum at L25...
+      σ_max=3.694, σ_min=0.916, σ_med=1.072, eff_rank=121.1, frac_amp=0.758, non_norm=0.1281
+    Computing Jacobian spectrum at L30...
+      σ_max=4.096, σ_min=0.963, σ_med=1.097, eff_rank=119.7, frac_amp=0.891, non_norm=0.1416
+    Computing Jacobian spectrum at L35...
+      σ_max=1021.095, σ_min=0.950, σ_med=1.061, eff_rank=1.3, frac_amp=0.820, non_norm=1.4139
+
+  Sentence 13/15: 'The fire burns hot and bright'
+    Computing Jacobian spectrum at L0...
+      σ_max=44.212, σ_min=3.582, σ_med=5.536, eff_rank=89.5, frac_amp=1.000, non_norm=0.3949
+    Computing Jacobian spectrum at L5...
+      σ_max=4.755, σ_min=0.837, σ_med=1.045, eff_rank=113.4, frac_amp=0.625, non_norm=0.1987
+    Computing Jacobian spectrum at L10...
+      σ_max=4.266, σ_min=0.719, σ_med=0.922, eff_rank=113.6, frac_amp=0.328, non_norm=0.2062
+    Computing Jacobian spectrum at L15...
+      σ_max=4.885, σ_min=0.795, σ_med=1.017, eff_rank=112.3, frac_amp=0.539, non_norm=0.2120
+    Computing Jacobian spectrum at L20...
+      σ_max=3.520, σ_min=0.825, σ_med=1.004, eff_rank=120.5, frac_amp=0.516, non_norm=0.1365
+    Computing Jacobian spectrum at L25...
+      σ_max=3.503, σ_min=0.913, σ_med=1.056, eff_rank=121.5, frac_amp=0.719, non_norm=0.1206
+    Computing Jacobian spectrum at L30...
+      σ_max=3.176, σ_min=0.946, σ_med=1.070, eff_rank=123.6, frac_amp=0.836, non_norm=0.0970
+    Computing Jacobian spectrum at L35...
+      σ_max=1200.651, σ_min=0.949, σ_med=1.066, eff_rank=1.2, frac_amp=0.828, non_norm=1.4138
+
+  Sentence 14/15: 'The student studies hard for exams'
+    Computing Jacobian spectrum at L0...
+      σ_max=71.983, σ_min=3.291, σ_med=5.340, eff_rank=63.6, frac_amp=1.000, non_norm=0.6243
+    Computing Jacobian spectrum at L5...
+      σ_max=3.777, σ_min=0.841, σ_med=1.040, eff_rank=119.5, frac_amp=0.609, non_norm=0.1461
+    Computing Jacobian spectrum at L10...
+      σ_max=3.993, σ_min=0.677, σ_med=0.864, eff_rank=113.8, frac_amp=0.203, non_norm=0.2047
+    Computing Jacobian spectrum at L15...
+      σ_max=5.126, σ_min=0.832, σ_med=1.068, eff_rank=112.1, frac_amp=0.656, non_norm=0.2128
+    Computing Jacobian spectrum at L20...
+      σ_max=4.581, σ_min=0.853, σ_med=1.055, eff_rank=115.0, frac_amp=0.656, non_norm=0.1803
+    Computing Jacobian spectrum at L25...
+      σ_max=4.601, σ_min=0.918, σ_med=1.088, eff_rank=116.6, frac_amp=0.797, non_norm=0.1715
+    Computing Jacobian spectrum at L30...
+      σ_max=4.761, σ_min=0.958, σ_med=1.119, eff_rank=115.8, frac_amp=0.922, non_norm=0.1741
+    Computing Jacobian spectrum at L35...
+      σ_max=1210.104, σ_min=0.950, σ_med=1.079, eff_rank=1.2, frac_amp=0.844, non_norm=1.4138
+
+  Sentence 15/15: 'The singer sings softly and clearly'
+    Computing Jacobian spectrum at L0...
+      σ_max=46.127, σ_min=3.460, σ_med=5.492, eff_rank=83.3, frac_amp=1.000, non_norm=0.4055
+    Computing Jacobian spectrum at L5...
+      σ_max=6.152, σ_min=0.874, σ_med=1.092, eff_rank=102.2, frac_amp=0.727, non_norm=0.2841
+    Computing Jacobian spectrum at L10...
+      σ_max=4.810, σ_min=0.695, σ_med=0.887, eff_rank=109.8, frac_amp=0.250, non_norm=0.2567
+    Computing Jacobian spectrum at L15...
+      σ_max=4.183, σ_min=0.787, σ_med=0.995, eff_rank=116.7, frac_amp=0.484, non_norm=0.1763
+    Computing Jacobian spectrum at L20...
+      σ_max=3.290, σ_min=0.834, σ_med=0.992, eff_rank=121.3, frac_amp=0.477, non_norm=0.1257
+    Computing Jacobian spectrum at L25...
+      σ_max=3.775, σ_min=0.909, σ_med=1.049, eff_rank=120.8, frac_amp=0.711, non_norm=0.1339
+    Computing Jacobian spectrum at L30...
+      σ_max=4.107, σ_min=0.955, σ_med=1.076, eff_rank=120.1, frac_amp=0.852, non_norm=0.1448
+    Computing Jacobian spectrum at L35...
+      σ_max=1192.953, σ_min=0.946, σ_med=1.064, eff_rank=1.2, frac_amp=0.828, non_norm=1.4134
+Exp 1 done in 620.3s
+
+======================================================================
+Exp 2: Semantic vs Random Perturbation
+======================================================================
+
+  Negation pair 1/8: 'The dog always bites the man' → 'The dog never bites the man'
+
+  Negation pair 2/8: 'The cat always chases the mouse' → 'The cat never chases the mouse'
+
+  Negation pair 3/8: 'The sun always rises early' → 'The sun never rises early'
+
+  Negation pair 4/8: 'The river always flows south' → 'The river never flows south'
+
+  Negation pair 5/8: 'The wind always blows hard' → 'The wind never blows hard'
+
+  Negation pair 6/8: 'The bird always sings loud' → 'The bird never sings loud'
+
+  Negation pair 7/8: 'The fire always burns hot' → 'The fire never burns hot'
+
+  Negation pair 8/8: 'The doctor always helps patients' → 'The doctor never helps patients'
+
+  Tense pair 1/8: 'The dog bites the man' → 'The dog bit the man'
+
+  Tense pair 2/8: 'The cat chases the mouse' → 'The cat chased the mouse'
+    SKIP: token数不同
+
+  Tense pair 3/8: 'The sun rises early' → 'The sun rose early'
+
+  Tense pair 4/8: 'The river flows south' → 'The river flowed south'
+
+  Tense pair 5/8: 'The wind blows hard' → 'The wind blew hard'
+
+  Tense pair 6/8: 'The bird sings loud' → 'The bird sang loud'
+
+  Tense pair 7/8: 'The fire burns hot' → 'The fire burnt hot'
+
+  Tense pair 8/8: 'The doctor helps patients' → 'The doctor helped patients'
+Exp 2 done in 58.4s
+
+======================================================================
+Exp 3: Layer-to-Output Sensitivity
+======================================================================
+
+  Sentence 1/8: 'The dog always bites the man'
+    L0: σ_max=133657.978, σ_min=55.008, eff_rank=1.4
+    L5: σ_max=3486.969, σ_min=7.659, eff_rank=2.3
+    L10: σ_max=1855.213, σ_min=4.810, eff_rank=2.3
+    L15: σ_max=709.579, σ_min=4.381, eff_rank=3.6
+    L20: σ_max=544.641, σ_min=3.839, eff_rank=3.7
+    L25: σ_max=488.794, σ_min=4.054, eff_rank=3.7
+    L30: σ_max=278.742, σ_min=1.892, eff_rank=2.7
+    L35: σ_max=780.647, σ_min=1.632, eff_rank=1.3
+
+  Sentence 2/8: 'The cat never chases the mouse'
+    L0: σ_max=156439.859, σ_min=66.892, eff_rank=1.2
+    L5: σ_max=1853.528, σ_min=6.914, eff_rank=2.5
+    L10: σ_max=1290.962, σ_min=4.552, eff_rank=2.3
+    L15: σ_max=1484.001, σ_min=4.356, eff_rank=1.8
+    L20: σ_max=275.258, σ_min=3.115, eff_rank=5.1
+    L25: σ_max=265.746, σ_min=2.744, eff_rank=4.1
+    L30: σ_max=196.330, σ_min=2.501, eff_rank=4.4
+    L35: σ_max=828.616, σ_min=1.719, eff_rank=1.3
+
+  Sentence 3/8: 'The sun rises early every morning'
+    L0: σ_max=191574.792, σ_min=77.665, eff_rank=1.2
+    L5: σ_max=1660.293, σ_min=5.681, eff_rank=2.4
+    L10: σ_max=683.472, σ_min=3.176, eff_rank=2.9
+    L15: σ_max=531.977, σ_min=2.646, eff_rank=2.4
+    L20: σ_max=437.278, σ_min=2.293, eff_rank=2.6
+    L25: σ_max=263.855, σ_min=2.060, eff_rank=3.1
+    L30: σ_max=139.305, σ_min=1.891, eff_rank=4.8
+    L35: σ_max=841.696, σ_min=1.559, eff_rank=1.3
+
+  Sentence 4/8: 'The children play happily outside'
+    L0: σ_max=282826.725, σ_min=43.916, eff_rank=1.1
+    L5: σ_max=17573.786, σ_min=8.618, eff_rank=1.2
+    L10: σ_max=10297.945, σ_min=5.985, eff_rank=1.2
+    L15: σ_max=4799.868, σ_min=8.361, eff_rank=1.7
+    L20: σ_max=1769.209, σ_min=13.127, eff_rank=4.5
+    L25: σ_max=1303.407, σ_min=9.562, eff_rank=3.7
+    L30: σ_max=768.283, σ_min=5.868, eff_rank=3.0
+    L35: σ_max=404.827, σ_min=2.315, eff_rank=2.1
+
+  Sentence 5/8: 'The birds fly south for winter'
+    L0: σ_max=245784.256, σ_min=59.976, eff_rank=1.1
+    L5: σ_max=3349.844, σ_min=6.680, eff_rank=1.7
+    L10: σ_max=2154.152, σ_min=4.335, eff_rank=1.7
+    L15: σ_max=985.849, σ_min=4.471, eff_rank=2.7
+    L20: σ_max=1075.576, σ_min=4.678, eff_rank=2.5
+    L25: σ_max=475.141, σ_min=3.708, eff_rank=3.3
+    L30: σ_max=296.015, σ_min=3.281, eff_rank=4.0
+    L35: σ_max=735.341, σ_min=1.714, eff_rank=1.4
+
+  Sentence 6/8: 'The river flows into the ocean'
+    L0: σ_max=146311.529, σ_min=49.416, eff_rank=1.5
+    L5: σ_max=1442.422, σ_min=5.701, eff_rank=2.4
+    L10: σ_max=621.882, σ_min=3.297, eff_rank=3.0
+    L15: σ_max=361.055, σ_min=3.421, eff_rank=4.6
+    L20: σ_max=379.005, σ_min=2.633, eff_rank=3.0
+    L25: σ_max=255.563, σ_min=2.618, eff_rank=4.0
+    L30: σ_max=204.713, σ_min=2.456, eff_rank=4.0
+    L35: σ_max=741.735, σ_min=1.604, eff_rank=1.3
+
+  Sentence 7/8: 'The wind blows hard today'
+    L0: σ_max=239512.240, σ_min=51.187, eff_rank=1.3
+    L5: σ_max=2203.382, σ_min=5.206, eff_rank=1.7
+    L10: σ_max=1123.875, σ_min=3.318, eff_rank=1.9
+    L15: σ_max=395.339, σ_min=2.775, eff_rank=3.4
+    L20: σ_max=337.212, σ_min=2.447, eff_rank=3.2
+    L25: σ_max=152.637, σ_min=2.403, eff_rank=6.2
+    L30: σ_max=107.838, σ_min=2.086, eff_rank=7.1
+    L35: σ_max=952.081, σ_min=1.588, eff_rank=1.3
+
+  Sentence 8/8: 'The teacher reads books quietly'
+    L0: σ_max=152241.093, σ_min=43.188, eff_rank=1.3
+    L5: σ_max=1569.735, σ_min=5.381, eff_rank=2.4
+    L10: σ_max=828.266, σ_min=3.814, eff_rank=3.0
+    L15: σ_max=408.737, σ_min=2.665, eff_rank=3.4
+    L20: σ_max=236.579, σ_min=2.433, eff_rank=4.7
+    L25: σ_max=177.155, σ_min=2.175, eff_rank=4.9
+    L30: σ_max=165.341, σ_min=1.901, eff_rank=3.9
+    L35: σ_max=794.297, σ_min=1.452, eff_rank=1.3
+Exp 3 done in 186.7s
+
+======================================================================
+Phase 139 结果摘要: qwen3
+======================================================================
+
+--- Exp 1: Jacobian Singular Value Spectrum ---
+Layer       σ_max    σ_min    σ_med   eff_rank   frac_amp   non_norm
+----------------------------------------------------------------------
+L0         48.273    3.342    5.301       83.3      1.000     0.4339
+L10         4.913    0.711    0.920      109.3      0.320     0.2493
+L15         5.357    0.819    1.040      110.7      0.595     0.2348
+L20         4.498    0.844    1.028      115.7      0.578     0.1863
+L25         4.365    0.923    1.084      118.1      0.774     0.1616
+L30         4.383    0.966    1.115      118.4      0.902     0.1539
+L35      1083.127    0.947    1.067        1.3      0.828     1.4138
+L5          5.491    0.859    1.070      110.4      0.678     0.2375
+
+谱形判断:
+  → 混合模式: σ_max范围 [4.37, 1083.13], frac_amp范围 [0.320, 1.000]
+
+--- Exp 2: Semantic vs Random Perturbation ---
+
+  NEGATION:
+    Semantic: prop_ratio=12678.525±34982.899, dir_preserve=0.027±0.075
+    Random:   prop_ratio=12515.377±34185.596, dir_preserve=0.005±0.011
+    Semantic/Random ratio: 1.013, dir_diff: 0.022
+
+  TENSE:
+    Semantic: prop_ratio=13172.373±36783.283, dir_preserve=-0.021±0.080
+    Random:   prop_ratio=13063.623±36259.991, dir_preserve=0.005±0.011
+    Semantic/Random ratio: 1.008, dir_diff: -0.026
+
+--- Exp 3: Layer-to-Output Sensitivity ---
+  L0: σ_max=193543.559, σ_min=55.906, eff_rank=1.3
+  L10: σ_max=2356.971, σ_min=4.161, eff_rank=2.3
+  L15: σ_max=1209.551, σ_min=4.135, eff_rank=2.9
+  L20: σ_max=631.845, σ_min=4.321, eff_rank=3.6
+  L25: σ_max=422.787, σ_min=3.665, eff_rank=4.1
+  L30: σ_max=269.571, σ_min=2.734, eff_rank=4.2
+  L35: σ_max=759.905, σ_min=1.698, eff_rank=1.4
+  L5: σ_max=4142.495, σ_min=6.480, eff_rank=2.1
+
+Saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase139_qwen3_jacobian_geometry.json
+[model_utils] GPU memory released, allocated=8.11 GB

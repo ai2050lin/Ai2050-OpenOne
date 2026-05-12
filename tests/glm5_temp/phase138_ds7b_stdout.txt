@@ -1,0 +1,471 @@
+﻿
+======================================================================
+Phase 138: 状态稳定性实验 — deepseek7b
+======================================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+python : Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase138_state_stability.py deepse ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Sliding Window ...be encountered.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|����������     | 1/2 [00:12<00:12, 12.18s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00,  9.93s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00, 10.27s/it]
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+Model: Qwen2ForCausalLM, 28 layers, d_model=3584
+
+======================================================================
+Exp 1: Deep State Relaxation
+======================================================================
+
+  Sentence 1/5: 'The dog always bites the man'
+    Perturb at L0...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L4...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L8...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L12...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L16...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L20...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L24...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L25...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+
+  Sentence 2/5: 'The cat never chases the mouse'
+    Perturb at L0...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L4...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L8...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L12...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L16...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L20...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L24...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L25...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+
+  Sentence 3/5: 'The sun rises early every morning'
+    Perturb at L0...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L4...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L8...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L12...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L16...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L20...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L24...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L25...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+
+  Sentence 4/5: 'The children play happily outside'
+    Perturb at L0...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L4...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L8...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L12...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L16...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L20...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L24...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L25...
+      eps=0.01: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+
+  Sentence 5/5: 'The birds fly south for winter'
+    Perturb at L0...
+      eps=0.01: logit_shift=776.7357, entropy_Δ=0.2825, final_prop_ratio=1019.0380, final_dir_preserve=-0.0083
+      eps=0.05: logit_shift=1101.6916, entropy_Δ=0.3948, final_prop_ratio=228.3523, final_dir_preserve=-0.0081
+      eps=0.1: logit_shift=836.3698, entropy_Δ=0.5278, final_prop_ratio=107.9769, final_dir_preserve=-0.0036
+      eps=0.2: logit_shift=1323.1039, entropy_Δ=0.9784, final_prop_ratio=65.2108, final_dir_preserve=-0.0082
+    Perturb at L4...
+      eps=0.01: logit_shift=667.7056, entropy_Δ=0.0231, final_prop_ratio=12.2807, final_dir_preserve=0.0160
+      eps=0.05: logit_shift=1189.9522, entropy_Δ=1.9307, final_prop_ratio=2.6400, final_dir_preserve=0.1833
+      eps=0.1: logit_shift=1722.8952, entropy_Δ=3.4889, final_prop_ratio=1.6101, final_dir_preserve=0.5021
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.4609
+    Perturb at L8...
+      eps=0.01: logit_shift=853.4987, entropy_Δ=0.9581, final_prop_ratio=13.7437, final_dir_preserve=0.0035
+      eps=0.05: logit_shift=1391.0140, entropy_Δ=1.6018, final_prop_ratio=2.6721, final_dir_preserve=0.2863
+      eps=0.1: logit_shift=1346.9506, entropy_Δ=4.2658, final_prop_ratio=2.4030, final_dir_preserve=0.4759
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.5295
+    Perturb at L12...
+      eps=0.01: logit_shift=846.3549, entropy_Δ=0.5853, final_prop_ratio=10.0473, final_dir_preserve=0.0363
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.3008
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.4015
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L16...
+      eps=0.01: logit_shift=1492.6249, entropy_Δ=0.6448, final_prop_ratio=12.1955, final_dir_preserve=0.0581
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.3401
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.4686
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.2823
+    Perturb at L20...
+      eps=0.01: logit_shift=1120.0579, entropy_Δ=0.2666, final_prop_ratio=11.4305, final_dir_preserve=0.0851
+      eps=0.05: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.3160
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.2275
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L24...
+      eps=0.01: logit_shift=433.1687, entropy_Δ=0.2828, final_prop_ratio=10.8988, final_dir_preserve=0.0904
+      eps=0.05: logit_shift=1216.2198, entropy_Δ=1.4050, final_prop_ratio=2.6873, final_dir_preserve=0.3872
+      eps=0.1: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.2078
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.0000
+    Perturb at L25...
+      eps=0.01: logit_shift=1127.7202, entropy_Δ=0.3329, final_prop_ratio=12.7790, final_dir_preserve=0.0675
+      eps=0.05: logit_shift=598.5854, entropy_Δ=0.1475, final_prop_ratio=2.1163, final_dir_preserve=0.4490
+      eps=0.1: logit_shift=1157.5664, entropy_Δ=1.2189, final_prop_ratio=1.4544, final_dir_preserve=0.6682
+      eps=0.2: logit_shift=nan, entropy_Δ=nan, final_prop_ratio=nan, final_dir_preserve=0.5436
+Exp 1 done in 62.2s
+
+======================================================================
+Exp 2: Inconsistency Sensitivity
+======================================================================
+
+  Pair 1/12: 'The dogs bark loudly in the park' vs 'The dogs barks loudly in the park'
+    L0: entropy(C)=11.515 vs entropy(I)=11.519, cos(C)=0.385 vs cos(I)=0.409
+    L14: entropy(C)=0.445 vs entropy(I)=0.569, cos(C)=0.424 vs cos(I)=0.438
+    L27: entropy(C)=nan vs entropy(I)=nan, cos(C)=nan vs cos(I)=nan
+
+  Pair 2/12: 'The children play happily outside' vs 'The children plays happily outside'
+    L0: entropy(C)=11.611 vs entropy(I)=11.609, cos(C)=0.357 vs cos(I)=0.351
+    L14: entropy(C)=1.070 vs entropy(I)=0.828, cos(C)=0.333 vs cos(I)=0.334
+    L27: entropy(C)=nan vs entropy(I)=1.923, cos(C)=nan vs cos(I)=0.445
+
+  Pair 3/12: 'The birds fly south for winter' vs 'The birds flies south for winter'
+    L0: entropy(C)=11.639 vs entropy(I)=11.633, cos(C)=0.384 vs cos(I)=0.404
+    L14: entropy(C)=5.086 vs entropy(I)=6.451, cos(C)=0.352 vs cos(I)=0.357
+    L27: entropy(C)=1.493 vs entropy(I)=2.763, cos(C)=nan vs cos(I)=nan
+
+  Pair 4/12: 'The rivers flow into the ocean' vs 'The rivers flows into the ocean'
+    L0: entropy(C)=11.424 vs entropy(I)=11.429, cos(C)=0.448 vs cos(I)=0.444
+    L14: entropy(C)=2.366 vs entropy(I)=3.738, cos(C)=0.431 vs cos(I)=0.428
+    L27: entropy(C)=1.236 vs entropy(I)=nan, cos(C)=nan vs cos(I)=nan
+
+  Pair 5/12: 'The stars shine bright at night' vs 'The stars shines bright at night'
+    L0: entropy(C)=11.560 vs entropy(I)=11.577, cos(C)=0.414 vs cos(I)=0.412
+    L14: entropy(C)=0.470 vs entropy(I)=0.495, cos(C)=0.353 vs cos(I)=0.379
+    L27: entropy(C)=0.824 vs entropy(I)=1.099, cos(C)=nan vs cos(I)=nan
+
+  Pair 6/12: 'The leaves fall from the trees' vs 'The leaves falls from the trees'
+    L0: entropy(C)=11.396 vs entropy(I)=11.390, cos(C)=0.480 vs cos(I)=0.498
+    L14: entropy(C)=2.327 vs entropy(I)=2.818, cos(C)=0.457 vs cos(I)=0.483
+    L27: entropy(C)=2.045 vs entropy(I)=2.486, cos(C)=nan vs cos(I)=nan
+
+  Pair 7/12: 'The waves crash on the shore' vs 'The waves crashes on the shore'
+    L0: entropy(C)=11.634 vs entropy(I)=11.657, cos(C)=0.410 vs cos(I)=0.411
+    L14: entropy(C)=4.043 vs entropy(I)=1.878, cos(C)=0.399 vs cos(I)=0.417
+    L27: entropy(C)=nan vs entropy(I)=nan, cos(C)=nan vs cos(I)=nan
+
+  Pair 8/12: 'The clouds drift across the sky' vs 'The clouds drifts across the sky'
+    L0: entropy(C)=11.498 vs entropy(I)=11.499, cos(C)=0.412 vs cos(I)=0.409
+    L14: entropy(C)=7.087 vs entropy(I)=6.615, cos(C)=0.413 vs cos(I)=0.416
+    L27: entropy(C)=0.984 vs entropy(I)=0.838, cos(C)=nan vs cos(I)=nan
+
+  Pair 9/12: 'The flowers bloom in spring' vs 'The flowers blooms in spring'
+    L0: entropy(C)=11.610 vs entropy(I)=11.622, cos(C)=0.419 vs cos(I)=0.418
+    L14: entropy(C)=1.741 vs entropy(I)=0.838, cos(C)=0.411 vs cos(I)=0.434
+    L27: entropy(C)=3.652 vs entropy(I)=1.700, cos(C)=nan vs cos(I)=nan
+
+  Pair 10/12: 'The students study hard for exams' vs 'The students studies hard for exams'
+    L0: entropy(C)=11.558 vs entropy(I)=11.551, cos(C)=0.411 vs cos(I)=0.411
+    L14: entropy(C)=1.111 vs entropy(I)=1.587, cos(C)=0.421 vs cos(I)=0.443
+    L27: entropy(C)=1.159 vs entropy(I)=nan, cos(C)=nan vs cos(I)=nan
+
+  Pair 11/12: 'The horses run fast on the track' vs 'The horses runs fast on the track'
+    L0: entropy(C)=11.390 vs entropy(I)=11.396, cos(C)=0.453 vs cos(I)=0.450
+    L14: entropy(C)=0.747 vs entropy(I)=0.701, cos(C)=0.408 vs cos(I)=0.418
+    L27: entropy(C)=2.191 vs entropy(I)=3.615, cos(C)=0.562 vs cos(I)=nan
+
+  Pair 12/12: 'The wolves hunt in the forest' vs 'The wolves hunts in the forest'
+    L0: entropy(C)=11.576 vs entropy(I)=11.554, cos(C)=0.392 vs cos(I)=0.384
+    L14: entropy(C)=6.178 vs entropy(I)=4.224, cos(C)=0.398 vs cos(I)=0.409
+    L27: entropy(C)=nan vs entropy(I)=1.465, cos(C)=nan vs cos(I)=nan
+Exp 2 done in 15.4s
+
+======================================================================
+Exp 3: Multi-layer Joint Patching
+======================================================================
+
+  Pair 1/12: 'The dog always bites the man' → 'The dog never bites the man'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 2/12: 'The cat always chases the mouse' → 'The cat never chases the mouse'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 3/12: 'The sun always rises early' → 'The sun never rises early'
+    Single: L0=0.894, L12=-0.615, L15=-0.605, L18=0.787, L21=0.369
+    2-Layer superlinear: L0+L3_superlinear=-0.894, L3+L6_superlinear=-0.884, L6+L9_superlinear=-0.344
+
+  Pair 4/12: 'The river always flows south' → 'The river never flows south'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 5/12: 'The wind always blows hard' → 'The wind never blows hard'
+    Single: L0=0.970, L12=0.876, L15=0.872, L18=0.842, L21=0.721
+    2-Layer superlinear: L0+L3_superlinear=-0.970, L3+L6_superlinear=-0.870, L6+L9_superlinear=-0.573
+
+  Pair 6/12: 'The bird always sings loud' → 'The bird never sings loud'
+    Single: L0=0.979, L12=0.706, L15=0.000, L18=-0.338, L21=-0.378
+    2-Layer superlinear: L0+L3_superlinear=-0.979, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 7/12: 'The fire always burns hot' → 'The fire never burns hot'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 8/12: 'The child always plays hard' → 'The child never plays hard'
+    Single: L0=0.952, L12=0.510, L15=0.479, L18=0.478, L21=-0.203
+    2-Layer superlinear: L0+L3_superlinear=-0.952, L3+L6_superlinear=-0.724, L6+L9_superlinear=0.007
+
+  Pair 9/12: 'The doctor always helps patients' → 'The doctor never helps patients'
+    Single: L0=0.999, L12=0.903, L15=0.860, L18=0.972, L21=0.680
+    2-Layer superlinear: L0+L3_superlinear=-0.999, L3+L6_superlinear=-0.994, L6+L9_superlinear=-0.993
+
+  Pair 10/12: 'The teacher always reads books' → 'The teacher never reads books'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+
+  Pair 11/12: 'The soldier always fights hard' → 'The soldier never fights hard'
+    Single: L0=0.993, L12=0.929, L15=0.925, L18=0.922, L21=0.952
+    2-Layer superlinear: L0+L3_superlinear=-0.993, L3+L6_superlinear=-0.981, L6+L9_superlinear=-0.947
+
+  Pair 12/12: 'The farmer always grows crops' → 'The farmer never grows crops'
+    Single: L0=0.000, L12=0.000, L15=0.000, L18=0.000, L21=0.000
+    2-Layer superlinear: L0+L3_superlinear=0.000, L3+L6_superlinear=0.000, L6+L9_superlinear=0.000
+Exp 3 done in 34.0s
+
+======================================================================
+Phase 138 结果摘要: deepseek7b
+======================================================================
+
+--- Exp 1: Deep State Relaxation ---
+  Perturb at L0:
+    logit_shift = nan
+    entropy_change = nan
+      L12: prop_ratio=2.4026, dir_preserve=0.1240
+      L16: prop_ratio=3.2813, dir_preserve=0.0722
+      L20: prop_ratio=4.5689, dir_preserve=0.0492
+      L24: prop_ratio=7.6435, dir_preserve=0.0339
+      L27: prop_ratio=nan, dir_preserve=-0.0016
+      L4: prop_ratio=1.2691, dir_preserve=0.6953
+      L8: prop_ratio=1.8403, dir_preserve=0.2805
+  Perturb at L12:
+    logit_shift = nan
+    entropy_change = nan
+      L14: prop_ratio=1.1019, dir_preserve=0.9427
+      L16: prop_ratio=1.2083, dir_preserve=0.8823
+      L18: prop_ratio=1.2756, dir_preserve=0.8243
+      L20: prop_ratio=1.3652, dir_preserve=0.7530
+      L22: prop_ratio=1.5564, dir_preserve=0.6540
+      L24: prop_ratio=1.8020, dir_preserve=0.5592
+      L26: prop_ratio=2.0898, dir_preserve=0.4896
+      L27: prop_ratio=nan, dir_preserve=0.0602
+  Perturb at L16:
+    logit_shift = nan
+    entropy_change = nan
+      L18: prop_ratio=1.1229, dir_preserve=0.9196
+      L20: prop_ratio=1.2533, dir_preserve=0.8338
+      L22: prop_ratio=1.4973, dir_preserve=0.7096
+      L24: prop_ratio=1.8121, dir_preserve=0.5887
+      L26: prop_ratio=2.1695, dir_preserve=0.4899
+      L27: prop_ratio=nan, dir_preserve=0.0680
+  Perturb at L20:
+    logit_shift = nan
+    entropy_change = nan
+      L21: prop_ratio=1.0842, dir_preserve=0.9269
+      L22: prop_ratio=1.1966, dir_preserve=0.8459
+      L23: prop_ratio=1.3344, dir_preserve=0.7644
+      L24: prop_ratio=1.4719, dir_preserve=0.6888
+      L25: prop_ratio=1.5692, dir_preserve=0.6457
+      L26: prop_ratio=1.7365, dir_preserve=0.5866
+      L27: prop_ratio=nan, dir_preserve=0.0632
+  Perturb at L24:
+    logit_shift = nan
+    entropy_change = nan
+      L25: prop_ratio=1.1214, dir_preserve=0.8965
+      L26: prop_ratio=1.2526, dir_preserve=0.8035
+      L27: prop_ratio=nan, dir_preserve=0.0774
+  Perturb at L25:
+    logit_shift = nan
+    entropy_change = nan
+      L26: prop_ratio=1.1020, dir_preserve=0.9165
+      L27: prop_ratio=nan, dir_preserve=0.0898
+  Perturb at L4:
+    logit_shift = nan
+    entropy_change = nan
+      L12: prop_ratio=0.8943, dir_preserve=0.7526
+      L16: prop_ratio=0.9471, dir_preserve=0.6171
+      L20: prop_ratio=1.0778, dir_preserve=0.4650
+      L24: prop_ratio=1.5214, dir_preserve=0.3323
+      L27: prop_ratio=nan, dir_preserve=0.0367
+      L8: prop_ratio=0.9624, dir_preserve=0.9068
+  Perturb at L8:
+    logit_shift = nan
+    entropy_change = nan
+      L11: prop_ratio=1.0404, dir_preserve=0.8948
+      L14: prop_ratio=1.0820, dir_preserve=0.8192
+      L17: prop_ratio=1.1755, dir_preserve=0.7326
+      L20: prop_ratio=1.3127, dir_preserve=0.6040
+      L23: prop_ratio=1.6346, dir_preserve=0.4747
+      L26: prop_ratio=2.1211, dir_preserve=0.3785
+      L27: prop_ratio=nan, dir_preserve=0.0573
+
+--- Exp 2: Inconsistency Sensitivity ---
+  L0: entropy_diff(Incongruent - Congruent) = 0.0021 ± 0.0118
+  L10: entropy_diff(Incongruent - Congruent) = 0.1836 ± 0.6105
+  L12: entropy_diff(Incongruent - Congruent) = -0.0135 ± 0.3588
+  L14: entropy_diff(Incongruent - Congruent) = -0.1605 ± 1.0614
+  L16: entropy_diff(Incongruent - Congruent) = -0.1034 ± 0.1471
+  L18: entropy_diff(Incongruent - Congruent) = -0.0668 ± 0.1604
+  L2: entropy_diff(Incongruent - Congruent) = 0.0047 ± 0.0324
+  L20: entropy_diff(Incongruent - Congruent) = -0.0175 ± 0.1217
+  L22: entropy_diff(Incongruent - Congruent) = 0.0029 ± 0.0598
+  L24: entropy_diff(Incongruent - Congruent) = -0.0000 ± 0.0016
+  L26: entropy_diff(Incongruent - Congruent) = 0.0000 ± 0.0000
+  L27: entropy_diff(Incongruent - Congruent) = nan ± nan
+  L4: entropy_diff(Incongruent - Congruent) = 0.0339 ± 0.0681
+  L6: entropy_diff(Incongruent - Congruent) = -0.0296 ± 0.1133
+  L8: entropy_diff(Incongruent - Congruent) = 0.1860 ± 0.6183
+
+--- Exp 3: Multi-layer Joint Patching ---
+  Single layer:
+    L0: recovery = 0.4822 ± 0.4828
+    L12: recovery = 0.2758 ± 0.4717
+    L15: recovery = 0.2109 ± 0.4488
+    L18: recovery = 0.3052 ± 0.4423
+    L21: recovery = 0.1784 ± 0.3902
+    L24: recovery = 0.1227 ± 0.4664
+    L27: recovery = -0.2186 ± 0.4888
+    L3: recovery = 0.3711 ± 0.4435
+    L6: recovery = 0.2375 ± 0.3711
+    L9: recovery = 0.3268 ± 0.4040
+  2-Layer superlinear (joint - sum_of_singles):
+    L0+L3_superlinear: -0.4822 ± 0.4828
+    L12+L15_superlinear: -0.2758 ± 0.4717
+    L15+L18_superlinear: -0.2109 ± 0.4488
+    L18+L21_superlinear: -0.3052 ± 0.4423
+    L21+L24_superlinear: -0.1784 ± 0.3902
+    L24+L27_superlinear: -0.1227 ± 0.4664
+    L3+L6_superlinear: -0.3711 ± 0.4435
+    L6+L9_superlinear: -0.2375 ± 0.3711
+    L9+L12_superlinear: -0.3268 ± 0.4040
+
+Saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase138_deepseek7b_state_stability.json
+[model_utils] GPU memory released, allocated=8.72 GB

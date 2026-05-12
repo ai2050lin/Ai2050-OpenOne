@@ -1,0 +1,310 @@
+﻿============================================================
+Phase 137: 因果贡献分析
+Model: glm4
+============================================================
+[model_utils] Loading glm4... (8bit=True)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase137_causal_contribution.py gl ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|������       | 1/4 [00:02<00:07,  2.56s/it]
+Loading checkpoint shards:  50%|����������     | 2/4 [00:05<00:04,  2.50s/it]
+Loading checkpoint shards:  75%|����������������  | 3/4 [00:07<00:02,  2.49s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.61s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.57s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+Model info: 40 layers, d_model=4096, intermediate=13696, mlp_type=merged_gate_up
+
+============================================================
+Exp 1: Activation Patching — 因果追踪
+============================================================
+
+=== Exp 1: negation Activation Patching ===
+  Pair 1/20: 'The dog always bites the man' → 'The dog never bites the man'
+    L0: recovery=0.948, directed=441.60  L21: recovery=0.149, directed=10.42  L39: recovery=-0.396, directed=-132.63  
+  Pair 2/20: 'The cat always chases the mouse' → 'The cat never chases the mouse'
+    L0: recovery=0.962, directed=305.24  L21: recovery=0.329, directed=26.15  L39: recovery=-0.461, directed=-146.00  
+  Pair 3/20: 'The sun always rises early' → 'The sun never rises early'
+    L0: recovery=0.986, directed=334.94  L21: recovery=0.420, directed=18.21  L39: recovery=-0.589, directed=-361.39  
+  Pair 4/20: 'The river always flows south' → 'The river never flows south'
+    L0: recovery=0.981, directed=224.54  L21: recovery=0.297, directed=13.26  L39: recovery=-0.008, directed=-2.59  
+  Pair 5/20: 'The wind always blows hard' → 'The wind never blows hard'
+    L0: recovery=0.777, directed=255.14  L21: recovery=0.127, directed=6.03  L39: recovery=-0.228, directed=-80.43  
+  Pair 6/20: 'The bird always sings loud' → 'The bird never sings loud'
+    L0: recovery=0.964, directed=235.98  L21: recovery=0.444, directed=30.93  L39: recovery=-0.196, directed=-41.41  
+  Pair 7/20: 'The fire always burns hot' → 'The fire never burns hot'
+    L0: recovery=0.947, directed=255.17  L21: recovery=0.253, directed=14.59  L39: recovery=-0.095, directed=-35.76  
+  Pair 8/20: 'The child always plays hard' → 'The child never plays hard'
+    L0: recovery=0.960, directed=254.26  L21: recovery=0.139, directed=7.14  L39: recovery=0.116, directed=27.81  
+  Pair 9/20: 'The doctor always helps patients' → 'The doctor never helps patients'
+    L0: recovery=0.955, directed=291.07  L21: recovery=0.215, directed=9.85  L39: recovery=-0.083, directed=-19.68  
+  Pair 10/20: 'The teacher always reads books' → 'The teacher never reads books'
+    L0: recovery=0.991, directed=400.29  L21: recovery=0.107, directed=6.11  L39: recovery=-0.163, directed=-39.16  
+  Pair 11/20: 'The soldier always fights hard' → 'The soldier never fights hard'
+    L0: recovery=0.970, directed=377.21  L21: recovery=0.196, directed=13.30  L39: recovery=-0.152, directed=-34.99  
+  Pair 12/20: 'The farmer always grows crops' → 'The farmer never grows crops'
+    L0: recovery=0.983, directed=420.86  L21: recovery=0.512, directed=36.71  L39: recovery=-0.488, directed=-183.94  
+  Pair 13/20: 'The artist always paints well' → 'The artist never paints well'
+    L0: recovery=0.975, directed=462.68  L21: recovery=0.645, directed=139.73  L39: recovery=-0.347, directed=-77.00  
+  Pair 14/20: 'The writer always writes fast' → 'The writer never writes fast'
+    L0: recovery=0.986, directed=296.57  L21: recovery=0.337, directed=14.44  L39: recovery=-0.014, directed=-2.51  
+  Pair 15/20: 'The driver always drives safe' → 'The driver never drives safe'
+    L0: recovery=0.955, directed=229.60  L21: recovery=0.247, directed=11.71  L39: recovery=-0.475, directed=-210.13  
+  Pair 16/20: 'The bear always catches fish' → 'The bear never catches fish'
+    L0: recovery=0.981, directed=265.29  L21: recovery=0.563, directed=42.40  L39: recovery=-0.147, directed=-35.31  
+  Pair 17/20: 'The wolf always hunts deer' → 'The wolf never hunts deer'
+    L0: recovery=0.968, directed=379.84  L21: recovery=0.734, directed=84.58  L39: recovery=-0.591, directed=-217.86  
+  Pair 18/20: 'The fox always tricks crows' → 'The fox never tricks crows'
+    L0: recovery=0.965, directed=269.83  L21: recovery=0.430, directed=31.92  L39: recovery=-0.114, directed=-44.01  
+  Pair 19/20: 'The king always rules wisely' → 'The king never rules wisely'
+    L0: recovery=0.990, directed=335.90  L21: recovery=0.404, directed=22.16  L39: recovery=-0.537, directed=-307.51  
+  Pair 20/20: 'The queen always leads armies' → 'The queen never leads armies'
+    L0: recovery=0.990, directed=308.98  L21: recovery=0.414, directed=37.27  L39: recovery=-0.142, directed=-48.69  
+
+=== Exp 1: tense Activation Patching ===
+  Pair 1/20: 'The dog bites the man today' → 'The dog bit the man today'
+    L0: recovery=0.990, directed=440.46  L21: recovery=0.132, directed=7.91  L39: recovery=0.383, directed=133.23  
+  Pair 2/20: 'The cat chases the mouse now' → 'The cat chased the mouse now'
+    SKIP: token数不同 (7 vs 6)
+  Pair 3/20: 'The teacher helps the student now' → 'The teacher helped the student now'
+    L0: recovery=0.965, directed=375.49  L21: recovery=0.319, directed=17.36  L39: recovery=0.136, directed=29.32  
+  Pair 4/20: 'The doctor treats the patient now' → 'The doctor treated the patient now'
+    L0: recovery=0.968, directed=365.16  L21: recovery=0.368, directed=19.88  L39: recovery=0.163, directed=41.94  
+  Pair 5/20: 'The chef cooks the meal today' → 'The chef cooked the meal today'
+    L0: recovery=0.967, directed=181.94  L21: recovery=0.156, directed=5.13  L39: recovery=-0.022, directed=-10.33  
+  Pair 6/20: 'The writer writes the book now' → 'The writer wrote the book now'
+    L0: recovery=0.966, directed=334.61  L21: recovery=0.329, directed=33.94  L39: recovery=-0.418, directed=-119.96  
+  Pair 7/20: 'The child plays the game today' → 'The child played the game today'
+    L0: recovery=0.990, directed=299.07  L21: recovery=0.224, directed=9.51  L39: recovery=-0.147, directed=-87.51  
+  Pair 8/20: 'The farmer grows the crop now' → 'The farmer grew the crop now'
+    L0: recovery=0.955, directed=418.72  L21: recovery=0.257, directed=15.43  L39: recovery=-0.124, directed=-26.79  
+  Pair 9/20: 'The artist paints the picture now' → 'The artist painted the picture now'
+    L0: recovery=0.991, directed=403.92  L21: recovery=0.331, directed=15.15  L39: recovery=-0.149, directed=-35.82  
+  Pair 10/20: 'The driver drives the car today' → 'The driver drove the car today'
+    L0: recovery=0.989, directed=417.40  L21: recovery=0.500, directed=26.80  L39: recovery=0.092, directed=29.05  
+  Pair 11/20: 'The bird flies to the nest now' → 'The bird flew to the nest now'
+    L0: recovery=0.964, directed=286.44  L21: recovery=0.157, directed=6.46  L39: recovery=0.148, directed=31.49  
+  Pair 12/20: 'The fish swims in the river today' → 'The fish swam in the river today'
+    SKIP: token数不同 (7 vs 8)
+  Pair 13/20: 'The soldier guards the fort now' → 'The soldier guarded the fort now'
+    L0: recovery=0.964, directed=203.72  L21: recovery=0.240, directed=11.78  L39: recovery=0.174, directed=37.59  
+  Pair 14/20: 'The nurse cares for the elder today' → 'The nurse cared for the elder today'
+    L0: recovery=0.976, directed=246.03  L21: recovery=0.408, directed=25.82  L39: recovery=0.107, directed=45.33  
+  Pair 15/20: 'The scientist studies the atom now' → 'The scientist studied the atom now'
+    L0: recovery=0.924, directed=316.90  L21: recovery=0.184, directed=10.73  L39: recovery=0.139, directed=40.05  
+  Pair 16/20: 'The bear catches the fish today' → 'The bear caught the fish today'
+    L0: recovery=0.978, directed=243.41  L21: recovery=0.156, directed=7.26  L39: recovery=0.000, directed=0.03  
+  Pair 17/20: 'The wolf hunts the deer now' → 'The wolf hunted the deer now'
+    L0: recovery=0.997, directed=547.13  L21: recovery=0.359, directed=24.29  L39: recovery=0.147, directed=41.10  
+  Pair 18/20: 'The king rules the kingdom today' → 'The king ruled the kingdom today'
+    L0: recovery=0.980, directed=293.12  L21: recovery=0.599, directed=39.81  L39: recovery=0.496, directed=233.22  
+  Pair 19/20: 'The fire burns the forest now' → 'The fire burned the forest now'
+    L0: recovery=0.991, directed=393.97  L21: recovery=0.192, directed=11.83  L39: recovery=0.144, directed=32.92  
+  Pair 20/20: 'The wind blows the leaves today' → 'The wind blew the leaves today'
+    L0: recovery=0.981, directed=257.31  L21: recovery=0.364, directed=16.16  L39: recovery=0.163, directed=61.13  
+
+=== Exp 1: semantic Activation Patching ===
+  Pair 1/10: 'The dog bites the man' → 'The cat bites the man'
+    L0: recovery=0.527, directed=135.75  L21: recovery=0.291, directed=33.19  L39: recovery=-0.046, directed=-11.54  
+  Pair 2/10: 'The teacher helps the student' → 'The doctor helps the student'
+    L0: recovery=0.989, directed=287.07  L21: recovery=0.544, directed=54.06  L39: recovery=-0.061, directed=-16.04  
+  Pair 3/10: 'The chef cooks the meal' → 'The writer cooks the meal'
+    L0: recovery=0.946, directed=251.53  L21: recovery=0.434, directed=33.82  L39: recovery=-0.114, directed=-49.81  
+  Pair 4/10: 'The child plays the game' → 'The bird plays the game'
+    L0: recovery=0.897, directed=562.50  L21: recovery=0.369, directed=35.63  L39: recovery=-0.441, directed=-271.16  
+  Pair 5/10: 'The soldier fights the enemy' → 'The farmer fights the enemy'
+    L0: recovery=0.996, directed=643.23  L21: recovery=0.167, directed=23.17  L39: recovery=-0.129, directed=-29.92  
+  Pair 6/10: 'The fire burns the forest' → 'The water burns the forest'
+    L0: recovery=0.966, directed=269.90  L21: recovery=0.382, directed=26.09  L39: recovery=-0.291, directed=-93.43  
+  Pair 7/10: 'The sun warms the earth' → 'The moon warms the earth'
+    L0: recovery=0.982, directed=350.95  L21: recovery=0.572, directed=75.36  L39: recovery=-0.190, directed=-43.95  
+  Pair 8/10: 'The river carries the boat' → 'The wind carries the boat'
+    L0: recovery=0.989, directed=499.04  L21: recovery=0.139, directed=19.56  L39: recovery=-0.327, directed=-154.20  
+  Pair 9/10: 'The king rules the kingdom' → 'The queen rules the kingdom'
+    L0: recovery=0.893, directed=265.13  L21: recovery=0.371, directed=38.35  L39: recovery=-0.225, directed=-94.78  
+  Pair 10/10: 'The bear catches the fish' → 'The wolf catches the fish'
+    L0: recovery=0.974, directed=550.28  L21: recovery=0.268, directed=33.67  L39: recovery=-0.130, directed=-37.65  
+
+============================================================
+Exp 2: Logit Lens — 每层知道了什么
+============================================================
+[model_utils] lm_head is on meta device, loading from safetensors...
+[model_utils] Loaded lm_head from model-00004-of-00004.safetensors, shape=torch.Size([151552, 4096])
+  W_U shape: (151552, 4096)
+
+  --- negation Logit Lens ---
+
+  --- tense Logit Lens ---
+
+  --- semantic Logit Lens ---
+
+============================================================
+Exp 3: Weighted Contribution — 加权贡献分析
+============================================================
+[model_utils] lm_head is on meta device, loading from safetensors...
+[model_utils] Loaded lm_head from model-00004-of-00004.safetensors, shape=torch.Size([151552, 4096])
+
+  --- negation Weighted Contribution ---
+
+  --- tense Weighted Contribution ---
+
+  --- semantic Weighted Contribution ---
+
+结果已保存: tests/glm5_temp/phase137_glm4_causal_contribution.json
+
+============================================================
+Phase 137 关键结果
+============================================================
+
+--- negation Patching 因果效应 (diff-pos only) ---
+  L0: directed=317.2493±71.8515, cosine_recovery=0.9617±0.0445, relative_recovery=0.9698
+  L12: directed=88.2859±59.7691, cosine_recovery=0.5955±0.1624, relative_recovery=0.4067
+  L15: directed=65.4207±46.5743, cosine_recovery=0.5227±0.1694, relative_recovery=0.3423
+  L18: directed=43.2386±40.1666, cosine_recovery=0.4408±0.1527, relative_recovery=0.2551
+  L21: directed=28.8461±31.0611, cosine_recovery=0.3482±0.1720, relative_recovery=0.2083
+  L24: directed=22.4265±25.6359, cosine_recovery=0.3156±0.1536, relative_recovery=0.1781
+  L27: directed=11.1654±23.0155, cosine_recovery=0.1797±0.1717, relative_recovery=0.1209
+  L3: directed=291.1221±69.8276, cosine_recovery=0.9315±0.0884, relative_recovery=0.9275
+  L30: directed=10.0719±22.8511, cosine_recovery=0.1773±0.1801, relative_recovery=0.0997
+  L33: directed=7.2459±23.6842, cosine_recovery=0.1041±0.1621, relative_recovery=0.0846
+  L36: directed=6.6004±21.2238, cosine_recovery=0.1313±0.1566, relative_recovery=0.0631
+  L39: directed=-99.6593±103.8659, cosine_recovery=-0.2554±0.2070, relative_recovery=1.0134
+  L6: directed=155.0861±86.8394, cosine_recovery=0.7220±0.1598, relative_recovery=0.6050
+  L9: directed=95.1962±65.3124, cosine_recovery=0.5949±0.1915, relative_recovery=0.4354
+  → 最大因果效应层: L0 (cosine_recovery=0.9617)
+
+--- tense Patching 因果效应 (diff-pos only) ---
+  L0: directed=334.7123±91.1132, cosine_recovery=0.9742±0.0171, relative_recovery=0.9965
+  L12: directed=48.2407±28.5523, cosine_recovery=0.4504±0.2334, relative_recovery=0.3212
+  L15: directed=36.1860±20.2806, cosine_recovery=0.3969±0.1836, relative_recovery=0.2745
+  L18: directed=26.7365±10.7480, cosine_recovery=0.3759±0.1058, relative_recovery=0.2119
+  L21: directed=16.9579±9.5102, cosine_recovery=0.2931±0.1250, relative_recovery=0.1683
+  L24: directed=10.9957±7.4641, cosine_recovery=0.2220±0.1093, relative_recovery=0.1386
+  L27: directed=7.2754±7.4373, cosine_recovery=0.1663±0.1015, relative_recovery=0.1096
+  L3: directed=260.0662±93.7948, cosine_recovery=0.8470±0.2213, relative_recovery=0.8772
+  L30: directed=2.7151±2.4546, cosine_recovery=0.1028±0.0781, relative_recovery=0.0733
+  L33: directed=1.0517±1.9877, cosine_recovery=0.0563±0.1135, relative_recovery=0.0503
+  L36: directed=0.4062±1.3862, cosine_recovery=0.0351±0.1300, relative_recovery=0.0346
+  L39: directed=26.4442±74.4407, cosine_recovery=0.0796±0.1998, relative_recovery=1.0742
+  L6: directed=90.3817±60.8032, cosine_recovery=0.5200±0.3255, relative_recovery=0.5179
+  L9: directed=63.5174±37.8449, cosine_recovery=0.4922±0.2840, relative_recovery=0.3869
+  → 最大因果效应层: L0 (cosine_recovery=0.9742)
+
+--- semantic Patching 因果效应 (diff-pos only) ---
+  L0: directed=381.5372±160.2197, cosine_recovery=0.9160±0.1343, relative_recovery=1.0398
+  L12: directed=53.6244±30.3848, cosine_recovery=0.4069±0.2025, relative_recovery=0.3616
+  L15: directed=49.4886±23.5774, cosine_recovery=0.3940±0.1632, relative_recovery=0.3436
+  L18: directed=42.4128±19.5857, cosine_recovery=0.3711±0.1510, relative_recovery=0.3157
+  L21: directed=37.2899±15.5419, cosine_recovery=0.3537±0.1356, relative_recovery=0.2936
+  L24: directed=15.0411±5.4839, cosine_recovery=0.2368±0.1019, relative_recovery=0.1813
+  L27: directed=8.8368±3.9364, cosine_recovery=0.1810±0.0834, relative_recovery=0.1391
+  L3: directed=238.5031±147.8957, cosine_recovery=0.7289±0.2900, relative_recovery=0.7882
+  L30: directed=7.3137±2.3739, cosine_recovery=0.1789±0.0746, relative_recovery=0.1189
+  L33: directed=3.3412±2.4286, cosine_recovery=0.1153±0.0750, relative_recovery=0.0855
+  L36: directed=0.9591±2.4685, cosine_recovery=0.0604±0.1048, relative_recovery=0.0483
+  L39: directed=-80.2493±75.9831, cosine_recovery=-0.1954±0.1198, relative_recovery=1.0022
+  L6: directed=225.1967±158.3321, cosine_recovery=0.7075±0.2459, relative_recovery=0.7436
+  L9: directed=74.3165±39.3925, cosine_recovery=0.4545±0.1762, relative_recovery=0.4225
+  → 最大因果效应层: L0 (cosine_recovery=0.9160)
+
+--- negation Logit Lens ---
+  L0: diff_logit_diff=2.1555, last_logit_diff=0.5219, diff_kl=0.0000
+  L12: diff_logit_diff=12.2745, last_logit_diff=11.5374, diff_kl=0.0004
+  L15: diff_logit_diff=15.9058, last_logit_diff=15.8462, diff_kl=0.0008
+  L18: diff_logit_diff=25.2416, last_logit_diff=25.2515, diff_kl=0.0019
+  L21: diff_logit_diff=45.5623, last_logit_diff=37.6944, diff_kl=0.0056
+  L24: diff_logit_diff=107.4155, last_logit_diff=75.5609, diff_kl=0.0354
+  L27: diff_logit_diff=208.9501, last_logit_diff=151.7383, diff_kl=0.1269
+  L3: diff_logit_diff=5.1409, last_logit_diff=1.9185, diff_kl=0.0001
+  L30: diff_logit_diff=289.3168, last_logit_diff=205.8868, diff_kl=0.2673
+  L33: diff_logit_diff=346.9586, last_logit_diff=253.2958, diff_kl=0.4289
+  L36: diff_logit_diff=437.8760, last_logit_diff=304.3690, diff_kl=0.7024
+  L39: diff_logit_diff=459.0623, last_logit_diff=338.2594, diff_kl=2.3518
+  L6: diff_logit_diff=7.3570, last_logit_diff=4.9073, diff_kl=0.0002
+  L9: diff_logit_diff=10.9633, last_logit_diff=7.6365, diff_kl=0.0004
+
+--- tense Logit Lens ---
+  L0: diff_logit_diff=2.9669, last_logit_diff=0.3119, diff_kl=0.0000
+  L12: diff_logit_diff=13.6598, last_logit_diff=12.9097, diff_kl=0.0005
+  L15: diff_logit_diff=17.2693, last_logit_diff=16.8521, diff_kl=0.0008
+  L18: diff_logit_diff=23.1514, last_logit_diff=25.8558, diff_kl=0.0016
+  L21: diff_logit_diff=37.9476, last_logit_diff=44.8608, diff_kl=0.0042
+  L24: diff_logit_diff=68.3567, last_logit_diff=75.9300, diff_kl=0.0142
+  L27: diff_logit_diff=119.3407, last_logit_diff=117.0439, diff_kl=0.0430
+  L3: diff_logit_diff=4.8908, last_logit_diff=1.9458, diff_kl=0.0001
+  L30: diff_logit_diff=175.7229, last_logit_diff=157.6214, diff_kl=0.1044
+  L33: diff_logit_diff=227.0037, last_logit_diff=190.6918, diff_kl=0.1780
+  L36: diff_logit_diff=284.7493, last_logit_diff=242.6819, diff_kl=0.2420
+  L39: diff_logit_diff=295.4381, last_logit_diff=372.6748, diff_kl=0.6887
+  L6: diff_logit_diff=7.1852, last_logit_diff=5.2948, diff_kl=0.0001
+  L9: diff_logit_diff=10.7391, last_logit_diff=10.4641, diff_kl=0.0003
+
+--- semantic Logit Lens ---
+  L0: diff_logit_diff=3.7935, last_logit_diff=0.6427, diff_kl=0.0000
+  L12: diff_logit_diff=22.5152, last_logit_diff=13.8960, diff_kl=0.0013
+  L15: diff_logit_diff=25.1796, last_logit_diff=17.7068, diff_kl=0.0017
+  L18: diff_logit_diff=31.6812, last_logit_diff=25.4749, diff_kl=0.0030
+  L21: diff_logit_diff=47.7798, last_logit_diff=36.3775, diff_kl=0.0069
+  L24: diff_logit_diff=106.7955, last_logit_diff=68.4279, diff_kl=0.0361
+  L27: diff_logit_diff=192.1252, last_logit_diff=158.5158, diff_kl=0.1171
+  L3: diff_logit_diff=7.4292, last_logit_diff=2.6688, diff_kl=0.0002
+  L30: diff_logit_diff=297.5558, last_logit_diff=243.1672, diff_kl=0.2881
+  L33: diff_logit_diff=351.6360, last_logit_diff=315.6336, diff_kl=0.4247
+  L36: diff_logit_diff=419.9799, last_logit_diff=310.0476, diff_kl=0.5586
+  L39: diff_logit_diff=569.4724, last_logit_diff=386.8406, diff_kl=1.3928
+  L6: diff_logit_diff=12.7516, last_logit_diff=5.0237, diff_kl=0.0004
+  L9: diff_logit_diff=23.0703, last_logit_diff=9.5100, diff_kl=0.0012
+
+--- negation Weighted Contribution ---
+  L0: w_jac=0.4581, b_jac=1.0000, delta_norm=0.1133, logit_contrib=0.5651, efficiency=5.0623, proj_ratio=1.0000
+  L12: w_jac=0.5823, b_jac=0.3927, delta_norm=2.3821, logit_contrib=11.7429, efficiency=4.8985, proj_ratio=1.0000
+  L15: w_jac=0.5706, b_jac=0.3872, delta_norm=3.2827, logit_contrib=15.7214, efficiency=4.7647, proj_ratio=1.0000
+  L18: w_jac=0.5478, b_jac=0.3969, delta_norm=5.3648, logit_contrib=25.4952, efficiency=4.7549, proj_ratio=1.0000
+  L21: w_jac=0.5412, b_jac=0.5053, delta_norm=8.3100, logit_contrib=38.2070, efficiency=4.5979, proj_ratio=1.0000
+  L24: w_jac=0.5064, b_jac=0.6883, delta_norm=15.0595, logit_contrib=71.6778, efficiency=4.8142, proj_ratio=1.0000
+  L27: w_jac=0.4964, b_jac=0.8025, delta_norm=26.0552, logit_contrib=141.3915, efficiency=5.2816, proj_ratio=1.0000
+  L3: w_jac=0.5002, b_jac=0.3969, delta_norm=0.3677, logit_contrib=2.0652, efficiency=5.5092, proj_ratio=1.0000
+  L30: w_jac=0.4966, b_jac=0.8481, delta_norm=36.2033, logit_contrib=200.1992, efficiency=5.3943, proj_ratio=1.0000
+  L33: w_jac=0.4993, b_jac=0.8780, delta_norm=43.7553, logit_contrib=250.5584, efficiency=5.5514, proj_ratio=1.0000
+  L36: w_jac=0.5043, b_jac=0.9032, delta_norm=52.9454, logit_contrib=283.0558, efficiency=5.1870, proj_ratio=1.0000
+  L39: w_jac=0.5483, b_jac=0.9314, delta_norm=88.6395, logit_contrib=345.7348, efficiency=3.9307, proj_ratio=1.0000
+  L6: w_jac=0.5292, b_jac=0.4029, delta_norm=0.9876, logit_contrib=5.1628, efficiency=5.1357, proj_ratio=1.0000
+  L9: w_jac=0.5703, b_jac=0.3784, delta_norm=1.8136, logit_contrib=8.1988, efficiency=4.5087, proj_ratio=1.0000
+
+--- tense Weighted Contribution ---
+  L0: w_jac=0.4607, b_jac=0.8889, delta_norm=0.0667, logit_contrib=0.3119, efficiency=4.7720, proj_ratio=1.0000
+  L12: w_jac=0.5871, b_jac=0.4143, delta_norm=2.5697, logit_contrib=12.9097, efficiency=4.9768, proj_ratio=1.0000
+  L15: w_jac=0.5725, b_jac=0.3838, delta_norm=3.5781, logit_contrib=16.8521, efficiency=4.6731, proj_ratio=1.0000
+  L18: w_jac=0.5754, b_jac=0.4418, delta_norm=5.4172, logit_contrib=25.8558, efficiency=4.7497, proj_ratio=1.0000
+  L21: w_jac=0.5711, b_jac=0.5203, delta_norm=8.8938, logit_contrib=44.8608, efficiency=5.0043, proj_ratio=1.0000
+  L24: w_jac=0.6019, b_jac=0.7013, delta_norm=16.3605, logit_contrib=75.9300, efficiency=4.6348, proj_ratio=1.0000
+  L27: w_jac=0.6106, b_jac=0.7996, delta_norm=26.1049, logit_contrib=117.0439, efficiency=4.4827, proj_ratio=1.0000
+  L3: w_jac=0.5534, b_jac=0.5307, delta_norm=0.4179, logit_contrib=1.9458, efficiency=4.6392, proj_ratio=1.0000
+  L30: w_jac=0.6162, b_jac=0.8532, delta_norm=35.7357, logit_contrib=157.6214, efficiency=4.4194, proj_ratio=1.0000
+  L33: w_jac=0.6210, b_jac=0.8774, delta_norm=42.0313, logit_contrib=190.6918, efficiency=4.5713, proj_ratio=1.0000
+  L36: w_jac=0.6201, b_jac=0.8991, delta_norm=49.5867, logit_contrib=242.6819, efficiency=4.8769, proj_ratio=1.0000
+  L39: w_jac=0.6483, b_jac=0.9260, delta_norm=104.4118, logit_contrib=372.6748, efficiency=3.5790, proj_ratio=1.0000
+  L6: w_jac=0.5858, b_jac=0.5096, delta_norm=1.0310, logit_contrib=5.2948, efficiency=5.1369, proj_ratio=1.0000
+  L9: w_jac=0.6004, b_jac=0.4244, delta_norm=2.0177, logit_contrib=10.4641, efficiency=5.1849, proj_ratio=1.0000
+
+--- semantic Weighted Contribution ---
+  L0: w_jac=0.4371, b_jac=0.8667, delta_norm=0.1395, logit_contrib=0.6427, efficiency=4.5750, proj_ratio=1.0000
+  L12: w_jac=0.4732, b_jac=0.2627, delta_norm=2.8414, logit_contrib=13.8960, efficiency=4.8680, proj_ratio=1.0000
+  L15: w_jac=0.5019, b_jac=0.2898, delta_norm=3.8209, logit_contrib=17.7068, efficiency=4.6485, proj_ratio=1.0000
+  L18: w_jac=0.5186, b_jac=0.3519, delta_norm=5.6480, logit_contrib=25.4749, efficiency=4.5256, proj_ratio=1.0000
+  L21: w_jac=0.5211, b_jac=0.4684, delta_norm=8.1449, logit_contrib=36.3775, efficiency=4.4902, proj_ratio=1.0000
+  L24: w_jac=0.4925, b_jac=0.6642, delta_norm=15.0404, logit_contrib=68.4279, efficiency=4.5747, proj_ratio=1.0000
+  L27: w_jac=0.4829, b_jac=0.7873, delta_norm=26.0630, logit_contrib=158.5158, efficiency=5.6679, proj_ratio=1.0000
+  L3: w_jac=0.4454, b_jac=0.4260, delta_norm=0.5841, logit_contrib=2.6688, efficiency=4.5824, proj_ratio=1.0000
+  L30: w_jac=0.4693, b_jac=0.8479, delta_norm=37.4291, logit_contrib=243.1672, efficiency=5.7284, proj_ratio=1.0000
+  L33: w_jac=0.4700, b_jac=0.8722, delta_norm=47.6584, logit_contrib=315.6336, efficiency=5.7450, proj_ratio=1.0000
+  L36: w_jac=0.4755, b_jac=0.8884, delta_norm=57.5452, logit_contrib=310.0476, efficiency=5.0691, proj_ratio=1.0000
+  L39: w_jac=0.5141, b_jac=0.9336, delta_norm=106.2741, logit_contrib=386.8406, efficiency=3.5697, proj_ratio=1.0000
+  L6: w_jac=0.4592, b_jac=0.3147, delta_norm=1.1458, logit_contrib=5.0237, efficiency=4.3841, proj_ratio=1.0000
+  L9: w_jac=0.4564, b_jac=0.2371, delta_norm=2.0319, logit_contrib=9.5100, efficiency=4.7092, proj_ratio=1.0000
+[model_utils] GPU memory released, allocated=9.42 GB

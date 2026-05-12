@@ -1,0 +1,213 @@
+﻿============================================================
+Phase 136: 激活边界分析
+Model: deepseek7b
+============================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+python : Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase136_activation_boundary.py de ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Sliding Window ...be encountered.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|����������     | 1/2 [00:11<00:11, 11.85s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00,  9.94s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00, 10.23s/it]
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+Model info: 28 layers, d_model=3584, intermediate=18944, mlp_type=split_gate_up
+
+============================================================
+Exp 1: 输入插值路径 — 激活翻转率
+============================================================
+
+=== Exp 1a: 语义插值 (good→bad, tall→short, etc.) ===
+  Pair 1/15: 'The weather is good' → 'The weather is bad'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.03749208152294159, spikiness=2.4381243078330166
+  Pair 2/15: 'The man is tall' → 'The man is short'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.04084406793117523, spikiness=2.5195786994695375
+  Pair 3/15: 'The cat is alive' → 'The cat is dead'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.0224741343408823, spikiness=1.4827262028520558
+  Pair 4/15: 'The door is open' → 'The door is closed'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.020930109545588493, spikiness=1.3386903286643268
+  Pair 5/15: 'The water is hot' → 'The water is cold'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.021523965522646904, spikiness=1.386126842204729
+  Pair 6/15: 'The light is bright' → 'The light is dark'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.022685283794999123, spikiness=1.3592371727424095
+  Pair 7/15: 'The road is wide' → 'The road is narrow'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.02110166847705841, spikiness=1.2672372875772362
+  Pair 8/15: 'The food is sweet' → 'The food is bitter'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.023265941068530083, spikiness=1.5505989193659382
+  Pair 9/15: 'The bird can fly' → 'The bird can swim'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.02256651222705841, spikiness=1.5880091677643633
+  Pair 10/15: 'The ice is solid' → 'The ice is liquid'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.021457981318235397, spikiness=1.3764263570419801
+  Pair 11/15: 'The king is rich' → 'The king is poor'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.02528505027294159, spikiness=1.6251335759725003
+  Pair 12/15: 'The car is fast' → 'The car is slow'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.027106206864118576, spikiness=1.639684473366712
+  Pair 13/15: 'The room is clean' → 'The room is dirty'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.023965371772646904, spikiness=1.4784661825352778
+  Pair 14/15: 'The fire is strong' → 'The fire is weak'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.025720544159412384, spikiness=1.8143058856533822
+  Pair 15/15: 'The tree is young' → 'The tree is old'
+    差异token位置: [3]
+    完成. MLP flip rates (L_mid, t0.0): max=0.021919868886470795, spikiness=1.5835033349420766
+
+  聚合结果...
+
+=== Exp 1b: 否定插值 (always→never) ===
+  Pair 1/15: 'The dog always bites the man' → 'The dog never bites the man'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.028276322409510612, spikiness=1.2919667757127162
+  Pair 2/15: 'The cat always chases the mouse' → 'The cat never chases the mouse'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.031069016084074974, spikiness=1.375295446858575
+  Pair 3/15: 'The sun always rises early' → 'The sun never rises early'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.029043497517704964, spikiness=1.4813897867170365
+  Pair 4/15: 'The river always flows south' → 'The river never flows south'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.030405405908823013, spikiness=1.582713282784432
+  Pair 5/15: 'The wind always blows hard' → 'The wind never blows hard'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.024873310700058937, spikiness=1.2996326037027055
+  Pair 6/15: 'The bird always sings loud' → 'The bird never sings loud'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.027470439672470093, spikiness=1.2859797770139032
+  Pair 7/15: 'The fire always burns hot' → 'The fire never burns hot'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.026805320754647255, spikiness=1.3417108729771314
+  Pair 8/15: 'The child always plays hard' → 'The child never plays hard'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.030690455809235573, spikiness=1.356408284669991
+  Pair 9/15: 'The doctor always helps patients' → 'The doctor never helps patients'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.03251689299941063, spikiness=1.5337118338601279
+  Pair 10/15: 'The teacher always reads books' → 'The teacher never reads books'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.024081503972411156, spikiness=1.2527185552624822
+  Pair 11/15: 'The soldier always fights hard' → 'The soldier never fights hard'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.03172508627176285, spikiness=1.4803248186079585
+  Pair 12/15: 'The farmer always grows crops' → 'The farmer never grows crops'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.02528505027294159, spikiness=1.3070575394316433
+  Pair 13/15: 'The artist always paints well' → 'The artist never paints well'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.030331503599882126, spikiness=1.38939937781031
+  Pair 14/15: 'The writer always writes fast' → 'The writer never writes fast'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.02645692601799965, spikiness=1.3801991681462924
+  Pair 15/15: 'The driver always drives safe' → 'The driver never drives safe'
+    差异token位置: [2]
+    完成. MLP flip rates (L_mid, t0.0): max=0.025464527308940887, spikiness=1.3582610756580953
+
+  聚合结果...
+
+============================================================
+Exp 2: 边界密度 — 微扰敏感性
+============================================================
+
+  句子 1: 'The weather is good'
+    eps=0.01: MLP boundary density = ['L0:0.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.600']
+    eps=0.05: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.500']
+    eps=0.1: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.550']
+    eps=0.5: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.950']
+    eps=1.0: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:1.000']
+
+  句子 2: 'The dog always bites the man'
+    eps=0.01: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.100']
+    eps=0.05: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.150']
+    eps=0.1: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.050']
+    eps=0.5: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.050']
+    eps=1.0: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.150']
+
+  句子 3: 'The man is tall and strong'
+    eps=0.01: MLP boundary density = ['L0:0.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.500']
+    eps=0.05: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.150']
+    eps=0.1: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.250']
+    eps=0.5: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.900']
+    eps=1.0: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:1.000']
+
+  句子 4: 'She reads the book today'
+    eps=0.01: MLP boundary density = ['L0:0.150', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.05: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.1: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.5: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=1.0: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.150']
+
+  句子 5: 'The fire burns the forest'
+    eps=0.01: MLP boundary density = ['L0:0.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.05: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.1: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.000']
+    eps=0.5: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.550']
+    eps=1.0: MLP boundary density = ['L0:1.000', 'L7:1.000', 'L14:1.000', 'L21:1.000', 'L27:0.800']
+
+结果已保存: tests/glm5_temp/phase136_deepseek7b_activation_boundary.json
+
+============================================================
+Phase 136 关键结果
+============================================================
+
+--- semantic 插值 ---
+  句子对数: 15
+  L0: max_flip=0.0028, mean_flip=0.0022, spikiness=1.26, spikes=0, diff_max=0.0112, attn_switch=0.0310
+  L12: max_flip=0.0219, mean_flip=0.0139, spikiness=1.57, spikes=1, diff_max=0.0375, attn_switch=0.0625
+  L15: max_flip=0.0252, mean_flip=0.0155, spikiness=1.63, spikes=2, diff_max=0.0465, attn_switch=0.0635
+  L18: max_flip=0.0258, mean_flip=0.0160, spikiness=1.62, spikes=2, diff_max=0.0478, attn_switch=0.0675
+  L21: max_flip=0.0189, mean_flip=0.0119, spikiness=1.59, spikes=4, diff_max=0.0351, attn_switch=0.0714
+  L24: max_flip=0.0169, mean_flip=0.0108, spikiness=1.58, spikes=5, diff_max=0.0288, attn_switch=0.0704
+  L27: max_flip=0.0229, mean_flip=0.0069, spikiness=3.24, spikes=8, diff_max=0.0572, attn_switch=0.0684
+  L3: max_flip=0.0001, mean_flip=0.0000, spikiness=5.54, spikes=14, diff_max=0.0002, attn_switch=0.0365
+  L6: max_flip=0.0080, mean_flip=0.0038, spikiness=2.12, spikes=1, diff_max=0.0142, attn_switch=0.0402
+  L9: max_flip=0.0042, mean_flip=0.0020, spikiness=2.11, spikes=0, diff_max=0.0058, attn_switch=0.0468
+
+--- negation 插值 ---
+  句子对数: 15
+  L0: max_flip=0.0049, mean_flip=0.0040, spikiness=1.22, spikes=3, diff_max=0.0098, attn_switch=0.0286
+  L12: max_flip=0.0248, mean_flip=0.0187, spikiness=1.33, spikes=7, diff_max=0.0338, attn_switch=0.0371
+  L15: max_flip=0.0283, mean_flip=0.0205, spikiness=1.38, spikes=15, diff_max=0.0379, attn_switch=0.0490
+  L18: max_flip=0.0298, mean_flip=0.0204, spikiness=1.46, spikes=23, diff_max=0.0372, attn_switch=0.0474
+  L21: max_flip=0.0255, mean_flip=0.0154, spikiness=1.66, spikes=26, diff_max=0.0366, attn_switch=0.0633
+  L24: max_flip=0.0218, mean_flip=0.0129, spikiness=1.70, spikes=26, diff_max=0.0352, attn_switch=0.0683
+  L27: max_flip=0.0635, mean_flip=0.0153, spikiness=4.41, spikes=12, diff_max=0.1098, attn_switch=0.0582
+  L3: max_flip=0.0001, mean_flip=0.0001, spikiness=2.91, spikes=9, diff_max=0.0002, attn_switch=0.0484
+  L6: max_flip=0.0083, mean_flip=0.0059, spikiness=1.41, spikes=2, diff_max=0.0123, attn_switch=0.0492
+  L9: max_flip=0.0049, mean_flip=0.0033, spikiness=1.48, spikes=2, diff_max=0.0056, attn_switch=0.0331
+
+--- 边界密度 ---
+  eps=0.01:
+    L0: MLP=0.2300, Attn=0.0
+    L14: MLP=1.0000, Attn=0.0
+    L21: MLP=1.0000, Attn=0.0
+    L27: MLP=0.2400, Attn=0.05
+    L7: MLP=1.0000, Attn=0.0
+  eps=0.1:
+    L0: MLP=1.0000, Attn=0.0
+    L14: MLP=1.0000, Attn=0.0
+    L21: MLP=1.0000, Attn=0.01
+    L27: MLP=0.1700, Attn=0.02
+    L7: MLP=1.0000, Attn=0.01
+  eps=1.0:
+    L0: MLP=1.0000, Attn=0.8800000000000001
+    L14: MLP=1.0000, Attn=0.22999999999999998
+    L21: MLP=1.0000, Attn=0.15
+    L27: MLP=0.6200, Attn=0.12000000000000002
+    L7: MLP=1.0000, Attn=0.3
+[model_utils] GPU memory released, allocated=8.72 GB

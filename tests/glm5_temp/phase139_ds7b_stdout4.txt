@@ -1,0 +1,205 @@
+
+======================================================================
+Phase 139: Jacobian Geometry — deepseek7b
+======================================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+
+模型信息: class=Qwen2ForCausalLM, n_layers=28, d_model=3584
+
+==================================================
+Exp A: 奇异值谱分析 (扰动传播推断)
+==================================================
+
+  扰动层 L0...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+
+  扰动层 L5...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+
+  扰动层 L10...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+
+  扰动层 L15...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+
+  扰动层 L20...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+
+  扰动层 L25...
+    句子 1/10: 'The cat sat on the mat...'
+    句子 2/10: 'Dogs are playing in the park...'
+    句子 3/10: 'She is reading a book...'
+    句子 4/10: 'The sun rises in the east...'
+    句子 5/10: 'Birds fly south for winter...'
+    句子 6/10: 'The river flows to the sea...'
+    句子 7/10: 'He walks to work every day...'
+    句子 8/10: 'The children sing happily...'
+    句子 9/10: 'Stars shine bright at night...'
+    句子 10/10: 'The wind blows from the north...'
+Exp A 完成 (438.1s)
+
+==================================================
+Exp B: 语义方向 vs 随机方向扰动
+==================================================
+
+  否定算子分析...
+
+  时态算子分析...
+Exp B 完成 (44.8s)
+
+==================================================
+Exp C: 归一化传播比与有效秩
+==================================================
+
+  扰动层 L0...
+
+  扰动层 L7...
+
+  扰动层 L14...
+
+  扰动层 L21...
+
+  扰动层 L25...
+Exp C 完成 (14.2s)
+[model_utils] GPU memory released, allocated=8.72 GB
+
+结果已保存: tests/glm5_temp/phase139_deepseek7b_jacobian_geometry_20260512_1440.json
+
+============================================================
+Phase 139 结果摘要: deepseek7b
+============================================================
+
+--- Exp A: 奇异值谱分析 ---
+  L0:
+    有效秩比例: 0.428 (±0.446)
+    L6: mean_prop=11.09, median=11.22, pct>1=1.00
+    L12: mean_prop=29.08, median=28.58, pct>1=1.00
+    L18: mean_prop=48.52, median=49.63, pct>1=1.00
+    L24: mean_prop=104.85, median=103.55, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.43
+  L5:
+    有效秩比例: 0.436 (±0.451)
+    L10: mean_prop=8.19, median=8.07, pct>1=1.00
+    L15: mean_prop=14.19, median=13.94, pct>1=1.00
+    L20: mean_prop=22.63, median=22.43, pct>1=1.00
+    L25: mean_prop=45.65, median=45.80, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.44
+  L10:
+    有效秩比例: 0.486 (±0.488)
+    L14: mean_prop=4.60, median=4.54, pct>1=1.00
+    L18: mean_prop=7.76, median=7.75, pct>1=1.00
+    L22: mean_prop=13.67, median=13.53, pct>1=1.00
+    L26: mean_prop=24.63, median=24.68, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.49
+  L15:
+    有效秩比例: 0.492 (±0.493)
+    L18: mean_prop=3.26, median=3.31, pct>1=1.00
+    L21: mean_prop=5.96, median=6.02, pct>1=1.00
+    L24: mean_prop=10.00, median=10.04, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.49
+  L20:
+    有效秩比例: 0.500 (±0.500)
+    L21: mean_prop=1.72, median=1.70, pct>1=1.00
+    L22: mean_prop=2.44, median=2.40, pct>1=1.00
+    L23: mean_prop=3.14, median=3.09, pct>1=1.00
+    L24: mean_prop=3.87, median=3.81, pct>1=1.00
+    L25: mean_prop=4.76, median=4.70, pct>1=1.00
+    L26: mean_prop=5.82, median=5.79, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.50
+  L25:
+    有效秩比例: 0.500 (±0.500)
+    L26: mean_prop=1.37, median=1.37, pct>1=1.00
+    L27: mean_prop=nan, median=nan, pct>1=0.50
+
+--- Exp B: 语义 vs 随机扰动 ---
+  negation_analysis:
+    L0: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L5: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L10: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L15: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L20: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L25: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L27: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+  tense_analysis:
+    L0: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L5: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L10: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L15: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L20: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L25: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+    L27: 语义logit偏移=nan, 随机logit偏移=nan, 比值=nan
+
+--- Exp C: 归一化传播比与有效秩 ---
+  扰动@L0:
+    →L12: norm_ratio=1.253, dir_preserve=0.049, top10%_energy=0.468
+    →L18: norm_ratio=1.340, dir_preserve=0.028, top10%_energy=0.471
+    →L24: norm_ratio=1.202, dir_preserve=0.014, top10%_energy=0.462
+    →L27: norm_ratio=nan, dir_preserve=nan, top10%_energy=0.813
+    →L6: norm_ratio=0.934, dir_preserve=0.279, top10%_energy=0.454
+  扰动@L7:
+    →L12: norm_ratio=1.218, dir_preserve=0.256, top10%_energy=0.459
+    →L17: norm_ratio=1.359, dir_preserve=0.128, top10%_energy=0.466
+    →L22: norm_ratio=1.247, dir_preserve=0.063, top10%_energy=0.460
+    →L27: norm_ratio=nan, dir_preserve=nan, top10%_energy=0.806
+  扰动@L14:
+    →L17: norm_ratio=1.083, dir_preserve=0.562, top10%_energy=0.451
+    →L20: norm_ratio=1.011, dir_preserve=0.336, top10%_energy=0.459
+    →L23: norm_ratio=0.961, dir_preserve=0.202, top10%_energy=0.453
+    →L26: norm_ratio=0.775, dir_preserve=0.139, top10%_energy=0.448
+    →L27: norm_ratio=nan, dir_preserve=nan, top10%_energy=0.792
+  扰动@L21:
+    →L22: norm_ratio=0.993, dir_preserve=0.847, top10%_energy=0.442
+    →L23: norm_ratio=0.902, dir_preserve=0.732, top10%_energy=0.447
+    →L24: norm_ratio=0.857, dir_preserve=0.641, top10%_energy=0.440
+    →L25: norm_ratio=0.796, dir_preserve=0.563, top10%_energy=0.443
+    →L26: norm_ratio=0.704, dir_preserve=0.496, top10%_energy=0.442
+    →L27: norm_ratio=nan, dir_preserve=nan, top10%_energy=0.790
+  扰动@L25:
+    →L26: norm_ratio=0.856, dir_preserve=0.896, top10%_energy=0.440
+    →L27: norm_ratio=nan, dir_preserve=nan, top10%_energy=0.814

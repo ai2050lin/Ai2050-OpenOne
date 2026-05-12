@@ -1,0 +1,88 @@
+﻿============================================================
+Phase 135: 激活重叠分析 — 修正统计塌缩错误 — glm4
+============================================================
+[model_utils] Loading glm4... (8bit=True)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase135_activation_overlap.py glm ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|������       | 1/4 [00:02<00:08,  2.79s/it]
+Loading checkpoint shards:  50%|����������     | 2/4 [00:05<00:05,  2.58s/it]
+Loading checkpoint shards:  75%|����������������  | 3/4 [00:07<00:02,  2.54s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.64s/it]
+Loading checkpoint shards: 100%|��������������������| 4/4 [00:10<00:00,  2.63s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+Model: GlmForCausalLM, layers=40, d=4096, intermediate=13696
+
+========================================
+Exp 1: MLP中间层激活重叠 (base vs neg/past)
+========================================
+  Computing random sentence baseline...
+  Exp 1 done in 31.8s
+
+  MLP激活重叠汇总:
+    L0_t0.0: J(base,neg)=0.8698±0.0489, J(base,past)=0.8862, neg_only=0.0603, past_only=0.0618
+    L13_t0.0: J(base,neg)=0.6237±0.0426, J(base,past)=0.7143, neg_only=0.2216, past_only=0.1510
+    L20_t0.0: J(base,neg)=0.6688±0.0343, J(base,past)=0.7616, neg_only=0.1977, past_only=0.1301
+    L26_t0.0: J(base,neg)=0.6625±0.0458, J(base,past)=0.7554, neg_only=0.1915, past_only=0.1337
+    L38_t0.0: J(base,neg)=0.9382±0.0084, J(base,past)=0.9542, neg_only=0.0296, past_only=0.0213
+    L6_t0.0: J(base,neg)=0.6632±0.0315, J(base,past)=0.7407, neg_only=0.1756, past_only=0.1454
+  随机基线: expected_random_jac=0.2195
+
+========================================
+Exp 2: Attention Head路由重叠
+========================================
+  Exp 2 done in 22.8s
+
+  Head路由重叠汇总:
+    L0: cos(neg)=0.8135, cos(past)=0.9772, min_cos(neg)=0.2117, neg_pos_change=0.3875
+    L10: cos(neg)=0.9165, cos(past)=0.9845, min_cos(neg)=0.2855, neg_pos_change=0.1958
+    L20: cos(neg)=0.8959, cos(past)=0.9789, min_cos(neg)=0.2374, neg_pos_change=0.3187
+    L30: cos(neg)=0.8975, cos(past)=0.9718, min_cos(neg)=0.2094, neg_pos_change=0.2750
+    L38: cos(neg)=0.7943, cos(past)=0.9418, min_cos(neg)=0.1709, neg_pos_change=0.3688
+
+========================================
+Exp 3: Attention Edge持久性
+========================================
+  Exp 3 done in 23.3s
+
+  Edge持久性汇总:
+    L0: J(base,neg)=1.0000, J(base,past)=1.0000, neg_new=0.0, neg_lost=0.0, head_J(neg)=0.8303
+    L10: J(base,neg)=0.9595, J(base,past)=0.9831, neg_new=0.7, neg_lost=0.5, head_J(neg)=0.8943
+    L20: J(base,neg)=0.9546, J(base,past)=0.9752, neg_new=1.0, neg_lost=0.3, head_J(neg)=0.9033
+    L30: J(base,neg)=0.9944, J(base,past)=0.9929, neg_new=0.2, neg_lost=0.0, head_J(neg)=0.8413
+    L38: J(base,neg)=1.0000, J(base,past)=1.0000, neg_new=0.0, neg_lost=0.0, head_J(neg)=0.7790
+
+========================================
+Exp 4: 语义vs语法对比
+========================================
+  [1/15] The dog bites the man vs The cat chases the mouse
+  [2/15] The teacher helps the student vs The doctor treats the patient
+  [3/15] The chef cooks the meal vs The writer writes the book
+  [4/15] The child plays the game vs The farmer grows the crop
+  [5/15] The artist paints the picture vs The driver drives the car
+  [6/15] The bird flies to the nest vs The fish swims in the river
+  [7/15] The soldier guards the fort vs The nurse cares for the elder
+  [8/15] The scientist studies the atom vs The student reads the paper
+  [9/15] The king rules the kingdom vs The queen leads the army
+  [10/15] The fire burns the forest vs The water floods the valley
+  [11/15] The wolf hunts the deer vs The bear catches the fish
+  [12/15] The fox tricks the crow vs The horse pulls the cart
+  [13/15] The sun warms the earth vs The moon lights the night
+  [14/15] The river carries the boat vs The mountain blocks the path
+  [15/15] The cloud covers the sky vs The eagle spots the prey
+  Exp 4 done in 15.1s
+
+  语义vs语法汇总:
+    L10: 语义Jaccard=0.3186±0.0525, 语义entropy_diff=0.0400
+    L20: 语义Jaccard=0.4771±0.0517, 语义entropy_diff=0.0657
+    L30: 语义Jaccard=0.3164±0.0348, 语义entropy_diff=0.0577
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase135_glm4_activation_overlap.json
+[model_utils] GPU memory released, allocated=9.42 GB
+Total time: 107.7s

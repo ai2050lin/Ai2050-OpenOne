@@ -1,0 +1,86 @@
+﻿============================================================
+Phase 135: 激活重叠分析 — 修正统计塌缩错误 — deepseek7b
+============================================================
+[model_utils] Loading deepseek7b... (8bit=True)
+python : Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase135_activation_overlap.py dee ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Sliding Window ...be encountered.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
+Loading checkpoint shards:  50%|����������     | 1/2 [00:11<00:11, 11.85s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00,  9.89s/it]
+Loading checkpoint shards: 100%|��������������������| 2/2 [00:20<00:00, 10.18s/it]
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+Model: Qwen2ForCausalLM, layers=28, d=3584, intermediate=18944
+
+========================================
+Exp 1: MLP中间层激活重叠 (base vs neg/past)
+========================================
+  Computing random sentence baseline...
+  Exp 1 done in 16.3s
+
+  MLP激活重叠汇总:
+    L0_t0.0: J(base,neg)=0.6711±0.0488, J(base,past)=0.6842, neg_only=0.1794, past_only=0.1818
+    L14_t0.0: J(base,neg)=0.4974±0.0692, J(base,past)=0.6423, neg_only=0.3001, past_only=0.2039
+    L18_t0.0: J(base,neg)=0.4808±0.0595, J(base,past)=0.6473, neg_only=0.3015, past_only=0.2156
+    L26_t0.0: J(base,neg)=0.5450±0.0747, J(base,past)=0.6744, neg_only=0.2453, past_only=0.1739
+    L4_t0.0: J(base,neg)=0.6178±0.0546, J(base,past)=0.6699, neg_only=0.2751, past_only=0.1907
+    L9_t0.0: J(base,neg)=0.4746±0.0717, J(base,past)=0.5849, neg_only=0.4085, past_only=0.2505
+  随机基线: expected_random_jac=0.1460
+
+========================================
+Exp 2: Attention Head路由重叠
+========================================
+  Exp 2 done in 11.2s
+
+  Head路由重叠汇总:
+    L0: cos(neg)=0.5702, cos(past)=0.9459, min_cos(neg)=0.0000, neg_pos_change=0.7833
+    L14: cos(neg)=0.9571, cos(past)=0.9883, min_cos(neg)=0.6626, neg_pos_change=0.1000
+    L21: cos(neg)=0.8970, cos(past)=0.9729, min_cos(neg)=0.2029, neg_pos_change=0.2881
+    L26: cos(neg)=0.9234, cos(past)=0.9827, min_cos(neg)=0.3803, neg_pos_change=0.1786
+    L7: cos(neg)=0.9099, cos(past)=0.9812, min_cos(neg)=0.2476, neg_pos_change=0.1643
+
+========================================
+Exp 3: Attention Edge持久性
+========================================
+  Exp 3 done in 11.5s
+
+  Edge持久性汇总:
+    L0: J(base,neg)=0.9773, J(base,past)=0.9795, neg_new=0.4, neg_lost=0.1, head_J(neg)=0.7832
+    L14: J(base,neg)=0.9405, J(base,past)=0.9836, neg_new=0.8, neg_lost=0.5, head_J(neg)=0.9304
+    L21: J(base,neg)=1.0000, J(base,past)=0.9968, neg_new=0.0, neg_lost=0.0, head_J(neg)=0.8989
+    L26: J(base,neg)=0.9501, J(base,past)=0.9775, neg_new=0.5, neg_lost=0.5, head_J(neg)=0.8993
+    L7: J(base,neg)=0.9730, J(base,past)=0.9937, neg_new=0.1, neg_lost=0.5, head_J(neg)=0.8921
+
+========================================
+Exp 4: 语义vs语法对比
+========================================
+  [1/15] The dog bites the man vs The cat chases the mouse
+  [2/15] The teacher helps the student vs The doctor treats the patient
+  [3/15] The chef cooks the meal vs The writer writes the book
+  [4/15] The child plays the game vs The farmer grows the crop
+  [5/15] The artist paints the picture vs The driver drives the car
+  [6/15] The bird flies to the nest vs The fish swims in the river
+  [7/15] The soldier guards the fort vs The nurse cares for the elder
+  [8/15] The scientist studies the atom vs The student reads the paper
+  [9/15] The king rules the kingdom vs The queen leads the army
+  [10/15] The fire burns the forest vs The water floods the valley
+  [11/15] The wolf hunts the deer vs The bear catches the fish
+  [12/15] The fox tricks the crow vs The horse pulls the cart
+  [13/15] The sun warms the earth vs The moon lights the night
+  [14/15] The river carries the boat vs The mountain blocks the path
+  [15/15] The cloud covers the sky vs The eagle spots the prey
+  Exp 4 done in 7.3s
+
+  语义vs语法汇总:
+    L14: 语义Jaccard=0.2667±0.0321, 语义entropy_diff=0.0849
+    L21: 语义Jaccard=0.3024±0.0378, 语义entropy_diff=0.0841
+    L7: 语义Jaccard=0.2744±0.0313, 语义entropy_diff=0.0419
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase135_deepseek7b_activation_overlap.json
+[model_utils] GPU memory released, allocated=8.72 GB
+Total time: 74.5s

@@ -1,0 +1,83 @@
+﻿============================================================
+Phase 135: 激活重叠分析 — 修正统计塌缩错误 — qwen3
+============================================================
+[model_utils] Loading qwen3... (8bit=False)
+python : 
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/ccml_phase135_activation_overlap.py qwe ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading checkpoint shards: 100%|��������������������| 3/3 [00:00<00:00, 148.83it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+Model: Qwen3ForCausalLM, layers=36, d=2560, intermediate=9728
+
+========================================
+Exp 1: MLP中间层激活重叠 (base vs neg/past)
+========================================
+  Computing random sentence baseline...
+  Exp 1 done in 8.5s
+
+  MLP激活重叠汇总:
+    L0_t0.0: J(base,neg)=0.8339±0.0354, J(base,past)=0.8455, neg_only=0.0850, past_only=0.0835
+    L12_t0.0: J(base,neg)=0.5958±0.0596, J(base,past)=0.6607, neg_only=0.2219, past_only=0.1851
+    L18_t0.0: J(base,neg)=0.5955±0.0516, J(base,past)=0.6624, neg_only=0.2302, past_only=0.2094
+    L24_t0.0: J(base,neg)=0.6236±0.0473, J(base,past)=0.7017, neg_only=0.2288, past_only=0.1695
+    L34_t0.0: J(base,neg)=0.6769±0.0666, J(base,past)=0.7477, neg_only=0.1451, past_only=0.1312
+    L6_t0.0: J(base,neg)=0.7346±0.0414, J(base,past)=0.7748, neg_only=0.1363, past_only=0.1263
+  随机基线: expected_random_jac=0.1730
+
+========================================
+Exp 2: Attention Head路由重叠
+========================================
+  Exp 2 done in 5.9s
+
+  Head路由重叠汇总:
+    L0: cos(neg)=0.6884, cos(past)=0.9472, min_cos(neg)=0.0625, neg_pos_change=0.5354
+    L18: cos(neg)=0.9142, cos(past)=0.9664, min_cos(neg)=0.4891, neg_pos_change=0.1542
+    L27: cos(neg)=0.9675, cos(past)=0.9928, min_cos(neg)=0.5424, neg_pos_change=0.0354
+    L34: cos(neg)=0.9580, cos(past)=0.9876, min_cos(neg)=0.6607, neg_pos_change=0.0750
+    L9: cos(neg)=0.9455, cos(past)=0.9855, min_cos(neg)=0.3651, neg_pos_change=0.0688
+
+========================================
+Exp 3: Attention Edge持久性
+========================================
+  Exp 3 done in 5.9s
+
+  Edge持久性汇总:
+    L0: J(base,neg)=1.0000, J(base,past)=1.0000, neg_new=0.0, neg_lost=0.0, head_J(neg)=0.7035
+    L18: J(base,neg)=1.0000, J(base,past)=1.0000, neg_new=0.0, neg_lost=0.0, head_J(neg)=0.7388
+    L27: J(base,neg)=0.9251, J(base,past)=0.9454, neg_new=0.6, neg_lost=0.6, head_J(neg)=0.8566
+    L34: J(base,neg)=0.9520, J(base,past)=0.9537, neg_new=0.4, neg_lost=0.3, head_J(neg)=0.8985
+    L9: J(base,neg)=0.9416, J(base,past)=0.9778, neg_new=0.4, neg_lost=0.5, head_J(neg)=0.8738
+
+========================================
+Exp 4: 语义vs语法对比
+========================================
+  [1/15] The dog bites the man vs The cat chases the mouse
+  [2/15] The teacher helps the student vs The doctor treats the patient
+  [3/15] The chef cooks the meal vs The writer writes the book
+  [4/15] The child plays the game vs The farmer grows the crop
+  [5/15] The artist paints the picture vs The driver drives the car
+  [6/15] The bird flies to the nest vs The fish swims in the river
+  [7/15] The soldier guards the fort vs The nurse cares for the elder
+  [8/15] The scientist studies the atom vs The student reads the paper
+  [9/15] The king rules the kingdom vs The queen leads the army
+  [10/15] The fire burns the forest vs The water floods the valley
+  [11/15] The wolf hunts the deer vs The bear catches the fish
+  [12/15] The fox tricks the crow vs The horse pulls the cart
+  [13/15] The sun warms the earth vs The moon lights the night
+  [14/15] The river carries the boat vs The mountain blocks the path
+  [15/15] The cloud covers the sky vs The eagle spots the prey
+  Exp 4 done in 4.0s
+
+  语义vs语法汇总:
+    L18: 语义Jaccard=0.3998±0.0336, 语义entropy_diff=0.0894
+    L27: 语义Jaccard=0.3335±0.0598, 语义entropy_diff=0.0469
+    L9: 语义Jaccard=0.2148±0.0335, 语义entropy_diff=0.0529
+
+Results saved to D:\Ai2050\TransformerLens-Project\tests\glm5\..\glm5_temp\phase135_qwen3_activation_overlap.json
+[model_utils] GPU memory released, allocated=8.11 GB
+Total time: 31.0s

@@ -1,0 +1,12 @@
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  67%|¨€¨€¨€¨€¨€¨€¨ƒ   | 2/3 [00:00<00:00, 18.87it/s]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 3/3 [00:00<00:00, 27.29it/s]
+Traceback (most recent call last):
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase140_operator_mechanics.py", line 828, in <module>
+    results = run_all_experiments(model_name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase140_operator_mechanics.py", line 792, in run_all_experiments
+    all_results["expA"] = expA_perturbation_intensity_scan(model, tokenizer, device, model_info, model_name)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase140_operator_mechanics.py", line 424, in expA_perturbation_intensity_scan
+    print(f"    {eps_label}: sem_logit={layer_data[eps_label]['semantic_logit_shift_mean']:.2f if layer_data[eps_label]['semantic_logit_shift_mean'] else 'N/A'}, "
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Invalid format specifier '.2f if layer_data[eps_label]['semantic_logit_shift_mean'] else 'N/A'' for object of type 'float'

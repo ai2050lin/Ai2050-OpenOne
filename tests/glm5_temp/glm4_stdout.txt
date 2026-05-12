@@ -1,4 +1,147 @@
-=== GLM4 Load Test Start ===
-Loading tokenizer...
-Tokenizer loaded in 0.4s, vocab=151343
-Loading model (bfloat16, device_map=auto)...
+
+============================================================
+Phase 141: Jacobian Geometry & Language Manifold — glm4
+============================================================
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=8.59GB
+
+模型信息: GlmForCausalLM, 40层, d=4096
+
+========================================
+Exp A: 层Jacobian谱分析
+========================================
+  采样层: [0, 5, 10, 15, 20, 25, 30, 35, 39]
+
+  句子 1/5: 'The cat can swim across the river...'
+
+  句子 2/5: 'She has finished her homework...'
+
+  句子 3/5: 'They should leave the building...'
+
+  句子 4/5: 'The bird will fly south this winter...'
+
+  句子 5/5: 'He could answer the question...'
+
+  === Jacobian谱分析汇总 ===
+    L5: random_JVP=135.43±158.23, NOT/random=0.98x, PAST/random=1.69x
+    L10: random_JVP=67.53±176.66, NOT/random=1.09x, PAST/random=0.55x
+    L15: random_JVP=116.92±275.24, NOT/random=0.01x, PAST/random=0.00x
+    L20: random_JVP=26.47±102.97, NOT/random=0.03x, PAST/random=2.79x
+    L25: random_JVP=0.88±0.61, NOT/random=0.47x, PAST/random=0.84x
+    L30: random_JVP=0.41±0.62, NOT/random=0.76x, PAST/random=0.30x
+    L35: random_JVP=0.34±0.74, NOT/random=1.16x, PAST/random=0.36x
+    L39: random_JVP=2138659.50±80698.15, NOT/random=1.00x, PAST/random=1.00x
+Exp A 完成: 494.6s
+
+========================================
+Exp B: 语言流形内在维数
+========================================
+  使用 188 个句子估计流形维数
+  收集hidden states...
+    进度: 0/188
+    进度: 50/188
+    进度: 100/188
+    进度: 150/188
+
+  === 流形维数估计 ===
+    L0: PR=114/4096 (2.8%), 90%var=123 (3.0%), 95%var=135 (3.3%), SVD=0.2s
+    L4: PR=77/4096 (1.9%), 90%var=125 (3.1%), 95%var=146 (3.6%), SVD=0.2s
+    L8: PR=68/4096 (1.7%), 90%var=121 (3.0%), 95%var=144 (3.5%), SVD=0.2s
+    L12: PR=73/4096 (1.8%), 90%var=125 (3.1%), 95%var=148 (3.6%), SVD=0.2s
+    L16: PR=74/4096 (1.8%), 90%var=127 (3.1%), 95%var=150 (3.7%), SVD=0.2s
+    L20: PR=67/4096 (1.6%), 90%var=123 (3.0%), 95%var=147 (3.6%), SVD=0.2s
+    L24: PR=71/4096 (1.7%), 90%var=120 (2.9%), 95%var=144 (3.5%), SVD=0.2s
+    L28: PR=76/4096 (1.9%), 90%var=121 (3.0%), 95%var=145 (3.5%), SVD=0.2s
+    L32: PR=78/4096 (1.9%), 90%var=121 (3.0%), 95%var=145 (3.5%), SVD=0.2s
+    L36: PR=75/4096 (1.8%), 90%var=122 (3.0%), 95%var=146 (3.6%), SVD=0.2s
+    L39: PR=56/4096 (1.4%), 90%var=115 (2.8%), 95%var=142 (3.5%), SVD=0.2s
+
+  汇总: 平均PR = 75/4096 (1.8%)
+Exp B 完成: 75.5s
+
+========================================
+Exp C: 语义向量场一致性
+========================================
+  使用 15 个NOT句对, 采样 9 层
+    进度: 0/15
+    进度: 5/15
+    进度: 10/15
+
+  === 语义向量场一致性 ===
+    L5: consistency=0.400, norm=0.47±0.17 (CV=0.37), h_corr=0.304, pairwise_cos=0.110±0.067, type=nonlinear_operator
+    L10: consistency=0.410, norm=1.46±0.31 (CV=0.21), h_corr=0.352, pairwise_cos=0.111±0.071, type=nonlinear_operator
+    L15: consistency=0.387, norm=2.58±0.56 (CV=0.22), h_corr=0.367, pairwise_cos=0.092±0.072, type=nonlinear_operator
+    L20: consistency=0.399, norm=5.33±0.96 (CV=0.18), h_corr=0.385, pairwise_cos=0.101±0.070, type=nonlinear_operator
+    L25: consistency=0.455, norm=13.41±2.14 (CV=0.16), h_corr=0.420, pairwise_cos=0.152±0.071, type=nonlinear_operator
+    L30: consistency=0.463, norm=29.63±6.23 (CV=0.21), h_corr=0.411, pairwise_cos=0.161±0.079, type=nonlinear_operator
+    L35: consistency=0.446, norm=40.48±8.50 (CV=0.21), h_corr=0.424, pairwise_cos=0.145±0.079, type=nonlinear_operator
+    L39: consistency=0.447, norm=100.24±17.77 (CV=0.18), h_corr=0.428, pairwise_cos=0.145±0.105, type=nonlinear_operator
+
+  汇总: 平均一致性=0.426, 平均h相关性=0.386
+Exp C 完成: 11.7s
+
+========================================
+Exp D: 真正的算子交换子
+========================================
+
+  交换子类型: ALL_NOT — 量词-否定交换: 'not all'(部分否定) vs 'all not'(全部否定)
+    对 1: AB='not all students passed the exam...' BA='all students did not pass the exam...'
+    对 2: AB='not all birds can fly...' BA='all birds can not fly...'
+    对 3: AB='not all cats like water...' BA='all cats do not like water...'
+    对 4: AB='not all doctors work hard...' BA='all doctors do not work hard...'
+    对 5: AB='not all rich people are happy...' BA='all rich people are not happy...'
+    对 6: AB='not all students like math...' BA='all students do not like math...'
+    对 7: AB='not all animals can swim...' BA='all animals can not swim...'
+    对 8: AB='not all flowers bloom in winter...' BA='all flowers do not bloom in winter...'
+    对 9: AB='not all players are tall...' BA='all players are not tall...'
+    对 10: AB='not all buildings are safe...' BA='all buildings are not safe...'
+      L0: [A,B]=0.00, relative=N/A, cos(AB,BA)=0.000, noncommutative=no
+      L5: [A,B]=0.91, relative=0.840, cos(AB,BA)=0.662, noncommutative=YES
+      L10: [A,B]=1.57, relative=0.669, cos(AB,BA)=0.766, noncommutative=YES
+      L15: [A,B]=2.22, relative=0.618, cos(AB,BA)=0.801, noncommutative=YES
+      L20: [A,B]=3.78, relative=0.564, cos(AB,BA)=0.826, noncommutative=YES
+      L25: [A,B]=8.59, relative=0.545, cos(AB,BA)=0.834, noncommutative=YES
+      L30: [A,B]=18.02, relative=0.538, cos(AB,BA)=0.839, noncommutative=YES
+      L35: [A,B]=26.78, relative=0.562, cos(AB,BA)=0.826, noncommutative=YES
+      L39: [A,B]=69.85, relative=0.598, cos(AB,BA)=0.804, noncommutative=YES
+
+  交换子类型: ALWAYS_NOT — 频率-否定交换: 'not always'(有时不) vs 'always not'(总是不)
+    对 1: AB='the train does not always arrive on time...' BA='the train always does not arrive on time...'
+    对 2: AB='she does not always eat breakfast...' BA='she always does not eat breakfast...'
+    对 3: AB='he does not always come home early...' BA='he always does not come home early...'
+    对 4: AB='they do not always win the game...' BA='they always do not win the game...'
+    对 5: AB='the dog does not always bark at night...' BA='the dog always does not bark at night...'
+    对 6: AB='she does not always read the newspaper...' BA='she always does not read the newspaper...'
+    对 7: AB='he does not always drive carefully...' BA='he always does not drive carefully...'
+    对 8: AB='they do not always attend the meeting...' BA='they always do not attend the meeting...'
+      L0: [A,B]=0.00, relative=N/A, cos(AB,BA)=0.000, noncommutative=no
+      L5: [A,B]=0.48, relative=0.582, cos(AB,BA)=0.823, noncommutative=YES
+      L10: [A,B]=1.44, relative=0.634, cos(AB,BA)=0.797, noncommutative=YES
+      L15: [A,B]=2.52, relative=0.673, cos(AB,BA)=0.775, noncommutative=YES
+      L20: [A,B]=5.45, relative=0.751, cos(AB,BA)=0.715, noncommutative=YES
+      L25: [A,B]=12.79, relative=0.740, cos(AB,BA)=0.721, noncommutative=YES
+      L30: [A,B]=27.51, relative=0.750, cos(AB,BA)=0.708, noncommutative=YES
+      L35: [A,B]=39.22, relative=0.756, cos(AB,BA)=0.701, noncommutative=YES
+      L39: [A,B]=104.68, relative=0.816, cos(AB,BA)=0.661, noncommutative=YES
+
+  交换子类型: SOME_NOT — 存在量词-否定交换: 'not some'(没有) vs 'some not'(有些不)
+    对 1: AB='not some students passed the exam...' BA='some students did not pass the exam...'
+    对 2: AB='not some birds can sing...' BA='some birds can not sing...'
+    对 3: AB='not some flowers are red...' BA='some flowers are not red...'
+    对 4: AB='not some people like coffee...' BA='some people do not like coffee...'
+    对 5: AB='not some books are interesting...' BA='some books are not interesting...'
+      L0: [A,B]=0.00, relative=N/A, cos(AB,BA)=0.000, noncommutative=no
+      L5: [A,B]=0.93, relative=1.217, cos(AB,BA)=0.322, noncommutative=YES
+      L10: [A,B]=1.83, relative=1.136, cos(AB,BA)=0.382, noncommutative=YES
+      L15: [A,B]=2.78, relative=1.158, cos(AB,BA)=0.367, noncommutative=YES
+      L20: [A,B]=5.06, relative=1.050, cos(AB,BA)=0.486, noncommutative=YES
+      L25: [A,B]=12.31, relative=0.929, cos(AB,BA)=0.579, noncommutative=YES
+      L30: [A,B]=25.19, relative=0.868, cos(AB,BA)=0.619, noncommutative=YES
+      L35: [A,B]=36.30, relative=0.859, cos(AB,BA)=0.622, noncommutative=YES
+      L39: [A,B]=85.24, relative=0.851, cos(AB,BA)=0.620, noncommutative=YES
+
+  汇总: 平均相对交换子=0.779, 非交换比例=24/24
+Exp D 完成: 27.3s
+[model_utils] GPU memory released, allocated=9.42 GB
+
+结果已保存: tests/glm5_temp/phase141_glm4_jacobian_manifold_20260512_1732.json
