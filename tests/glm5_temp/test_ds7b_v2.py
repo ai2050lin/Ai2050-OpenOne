@@ -1,82 +1,68 @@
-# -*- coding: utf-8 -*-
-"""DeepSeek7B 最小化加载测试 v2 - 写文件代替print"""
-import torch, sys, time, gc
+"""DS7B加载测试 — 用CPU加载+手动移动到GPU"""
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+sys.path.insert(0, 'tests/glm5')
 
-log_file = r"D:\develop\TransformerLens-main\tests\glm5_temp\ds7b_minimal_log.txt"
+import time
+import gc
+import torch
+from model_utils import MODEL_CONFIGS
 
-def log(msg):
-    with open(log_file, 'a', encoding='utf-8') as f:
-        f.write(f"{time.strftime('%H:%M:%S')} {msg}\n")
+print(f"CUDA: {torch.cuda.is_available()}")
+print(f"GPU: {torch.cuda.get_device_properties(0).total_memory/1e9:.1f}GB")
 
-# 清空日志
-with open(log_file, 'w', encoding='utf-8') as f:
-    f.write("=== DeepSeek7B Minimal Test v2 ===\n")
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-log("[1] Starting...")
-log(f"  Python: {sys.version}")
-log(f"  CUDA: {torch.cuda.is_available()}")
+cfg = MODEL_CONFIGS["deepseek7b"]
 
-if torch.cuda.is_available():
-    log(f"  GPU: {torch.cuda.get_device_name(0)}")
-    log(f"  VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
-
+# 方法: 先CPU加载, 再8bit量化到GPU
+print("\n方法: CPU加载 → 8bit量化移动到GPU...")
+t0 = time.time()
 try:
-    log("[2] Loading tokenizer...")
-    from transformers import AutoTokenizer
-    model_path = r"D:\develop\model\hub\models--deepseek-ai--DeepSeek-R1-Distill-Qwen-7B\snapshots\916b56a44061fd5cd7d6a8fb632557ed4f724f60"
-    t0 = time.time()
-    tok = AutoTokenizer.from_pretrained(
-        model_path, trust_remote_code=True,
-        local_files_only=True, use_fast=False
+    tokenizer = AutoTokenizer.from_pretrained(
+        cfg["path"], trust_remote_code=True, local_files_only=True, use_fast=False
     )
-    if tok.pad_token is None:
-        tok.pad_token = tok.eos_token
-    log(f"  Tokenizer OK! vocab={tok.vocab_size}, time={time.time()-t0:.1f}s")
-except Exception as e:
-    log(f"  Tokenizer FAILED: {e}")
-    sys.exit(1)
-
-try:
-    log("[3] Loading model to CPU (low_cpu_mem_usage=True)...")
-    from transformers import AutoModelForCausalLM
-    torch.cuda.empty_cache()
-    gc.collect()
-    t0 = time.time()
-    mdl = AutoModelForCausalLM.from_pretrained(
-        model_path, dtype=torch.bfloat16, trust_remote_code=True,
-        local_files_only=True, low_cpu_mem_usage=True,
-        attn_implementation="eager", device_map="cpu"
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    
+    # 先CPU加载
+    print("CPU加载中...")
+    model = AutoModelForCausalLM.from_pretrained(
+        cfg["path"],
+        torch_dtype=torch.bfloat16,
+        device_map="cpu",
+        trust_remote_code=True,
+        local_files_only=True,
+        low_cpu_mem_usage=True,
     )
-    log(f"  CPU load OK! time={time.time()-t0:.1f}s")
-except Exception as e:
-    log(f"  CPU load FAILED: {e}")
-    import traceback
-    log(traceback.format_exc())
-    sys.exit(1)
-
-try:
-    log("[4] Moving to GPU...")
     t1 = time.time()
-    mdl = mdl.to("cuda")
-    mdl.eval()
-    log(f"  GPU move OK! time={time.time()-t1:.1f}s")
-    log(f"  GPU mem: {torch.cuda.memory_allocated(0)/1e9:.2f} GB")
-except Exception as e:
-    log(f"  GPU move FAILED: {e}")
-    sys.exit(1)
-
-try:
-    log("[5] Inference test...")
-    inp = tok("Hello", return_tensors="pt").to("cuda")
+    print(f"CPU加载耗时: {t1-t0:.1f}s")
+    
+    # 移到CUDA
+    print("移动到CUDA...")
+    model = model.to("cuda")
+    t2 = time.time()
+    print(f"CUDA移动耗时: {t2-t1:.1f}s")
+    model.eval()
+    
+    print(f"device: {next(model.parameters()).device}")
+    print(f"GPU mem: {torch.cuda.memory_allocated()/1e9:.2f}GB")
+    
+    # 简单推理
+    inputs = tokenizer("Hello world", return_tensors="pt", truncation=True, max_length=32)
+    input_ids = inputs["input_ids"].to("cuda")
+    attn_mask = inputs["attention_mask"].to("cuda")
+    
     with torch.no_grad():
-        out = mdl(**inp, output_hidden_states=True)
-    log(f"  Inference OK! n_layers={len(out.hidden_states)}")
+        out = model(input_ids=input_ids, attention_mask=attn_mask, output_hidden_states=True)
+    
+    print(f"推理成功! {len(out.hidden_states)}层, last_norm={out.hidden_states[-1].float().norm():.2f}")
+    
+    del model, out
+    gc.collect()
+    torch.cuda.empty_cache()
+    print("完成!")
+    
 except Exception as e:
-    log(f"  Inference FAILED: {e}")
-    sys.exit(1)
-
-log("[6] Cleanup")
-del mdl, out
-torch.cuda.empty_cache()
-gc.collect()
-log("ALL DONE!")
+    print(f"失败: {e}")
+    import traceback; traceback.print_exc()
