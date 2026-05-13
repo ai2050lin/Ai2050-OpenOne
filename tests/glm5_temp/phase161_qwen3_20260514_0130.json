@@ -1,0 +1,41 @@
+{
+  "model_name": "qwen3",
+  "model_info": {
+    "class": "Qwen3ForCausalLM",
+    "n_layers": 36,
+    "d_model": 2560,
+    "vocab_size": 151936
+  },
+  "n_successful_prompts": 600,
+  "total_tokens": 4800,
+  "exp1_predictive_equivalence": {
+    "error": "expected mat1 and mat2 to have the same dtype, but got: float != struct c10::BFloat16"
+  },
+  "exp2_causal_perturbation": {
+    "error": "expected mat1 and mat2 to have the same dtype, but got: float != struct c10::BFloat16"
+  },
+  "exp3_information_bottleneck": {
+    "error": "matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 200 is different from 2)"
+  },
+  "exp4_self_conditioning": {
+    "total_positions": 2800,
+    "correct_predictions": 290,
+    "correct_pct": 10.357142857142858,
+    "mean_delta_h_correct": 72.12353515625,
+    "mean_delta_h_incorrect": 98.72129821777344,
+    "markov_analysis": {
+      "correct": {
+        "n_samples": 290,
+        "r2_h_alone": 0.6669989824295044,
+        "r2_h_with_emb": 0.6672571698824564,
+        "delta_r2": 0.00025818745295203005
+      },
+      "incorrect": {
+        "n_samples": 2510,
+        "r2_h_alone": 0.3681068519751231,
+        "r2_h_with_emb": 0.6561164657274882,
+        "delta_r2": 0.28800961375236506
+      }
+    }
+  }
+}
