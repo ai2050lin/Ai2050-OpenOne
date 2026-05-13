@@ -1,0 +1,61 @@
+Phase 153 Fast: deepseek7b, 20260513_1914
+  Loading deepseek7b (8bit=True)...
+Model: Qwen2ForCausalLM, 28L, d=3584, load=25.7s
+
+============================================================
+Exp 1: Logit Boundary Propagation (Fast)
+============================================================
+  L 0: margin_chg=0.1737, stay=0.915
+  L 1: margin_chg=0.1587, stay=0.935
+  L 2: margin_chg=0.1579, stay=0.948
+  L 3: margin_chg=0.1644, stay=0.935
+  L 7: margin_chg=0.1665, stay=0.927
+  L14: margin_chg=0.1346, stay=0.935
+  L21: margin_chg=0.0943, stay=0.922
+  L26: margin_chg=0.0200, stay=0.995
+  L27: margin_chg=0.0024, stay=1.000
+
+============================================================
+Exp 2: CCA (sklearn)
+============================================================
+  hs[  0]: CCA_1=1.0000, CCA_mean=0.8741
+  hs[  1]: CCA_1=1.0000, CCA_mean=1.0000
+  hs[  2]: CCA_1=1.0000, CCA_mean=0.9972
+  hs[  3]: CCA_1=1.0000, CCA_mean=0.9934
+  hs[  4]: CCA_1=1.0000, CCA_mean=0.9923
+  hs[  5]: CCA_1=1.0000, CCA_mean=0.8840
+  hs[  8]: CCA_1=1.0000, CCA_mean=0.8880
+  hs[ 11]: CCA_1=1.0000, CCA_mean=0.8978
+  hs[ 14]: CCA_1=1.0000, CCA_mean=0.8639
+  hs[ 17]: CCA_1=1.0000, CCA_mean=0.8330
+  hs[ 20]: CCA_1=1.0000, CCA_mean=0.8824
+  hs[ 23]: CCA_1=1.0000, CCA_mean=0.8837
+  hs[ 24]: CCA_1=1.0000, CCA_mean=0.8865
+  hs[ 25]: CCA_1=1.0000, CCA_mean=0.8858
+  hs[ 26]: CCA_1=1.0000, CCA_mean=0.8875
+  hs[ 27]: CCA_1=1.0000, CCA_mean=0.8955
+  hs[ 28]: CCA_1=1.0000, CCA_mean=0.8036
+
+============================================================
+Exp 3: Attention Routing (Fast)
+============================================================
+  L0: focused=3, diffuse=14, CV=0.394
+  L1: focused=0, diffuse=23, CV=0.118
+  L7: focused=0, diffuse=10, CV=0.164
+  L14: focused=0, diffuse=6, CV=0.167
+  L21: focused=0, diffuse=11, CV=0.181
+  L26: focused=0, diffuse=7, CV=0.144
+  L27: focused=1, diffuse=15, CV=0.145
+
+============================================================
+Exp 4: Boundary Crossing (Fast)
+============================================================
+  L0: switch_rate=40.0%, narrow_sr=68.8%, wide_sr=14.3%, corr=0.471
+  L7: switch_rate=17.5%, narrow_sr=37.5%, wide_sr=0.0%, corr=0.151
+  L14: switch_rate=20.0%, narrow_sr=43.8%, wide_sr=0.0%, corr=-0.052
+  L21: switch_rate=10.0%, narrow_sr=25.0%, wide_sr=0.0%, corr=-0.439
+  L26: switch_rate=10.0%, narrow_sr=25.0%, wide_sr=0.0%, corr=0.119
+
+Saved: tests\glm5_temp\phase153_deepseek7b_20260513_1914.json
+[model_utils] GPU memory released, allocated=8.72 GB
+Done.
