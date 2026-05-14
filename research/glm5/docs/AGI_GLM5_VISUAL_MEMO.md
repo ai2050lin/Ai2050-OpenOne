@@ -2,6 +2,145 @@
 
 > 本文档记录AGI研究的进展、问题分析和下一步行动
 
+## Phase CCXXVI: 数据面板拼图内容清理 (2026-05-11 11:20)
+
+从数据面板中清理所有拼图(🧩)相关内容:
+- **App.jsx**: 移除右侧面板的「拼图」Tab按钮、拼图Tab内容(含模型信息卡片+98格研究框架PuzzlePanel)、PuzzlePanel导入、puzzle_progress分类
+- **neural_vis/index.jsx**: 移除右侧面板的「拼图」Tab按钮和PuzzlePanel渲染、PuzzlePanel导入、puzzle_progress分类、左面板维度详情中的"关联格子: puzzleCells"引用、废弃的rightPanel状态
+- 右侧面板现在只保留「📋 详情」Tab，默认直接展示
+
+## Phase CCXXV: Layer运行时参数状态可视化增强 (2026-05-10 20:30)
+
+**NeuronParamGrid → LayerRuntimeParamPanel 升级**, 从简单的激活值网格升级为组件类型特定的运行时参数面板:
+
+### LN 运行时参数面板 (`LNRuntimeParams`)
+- **γ/β 每维分布**: 12维柱状图, 动态脉冲发光
+- **归一化前后对比**: Pre-Norm不均匀 vs Post-Norm均匀
+- **统计卡片**: μ/σ²/ε 三个核心统计值
+- **泄漏率条**: ParamBar可视化
+
+### Attention 运行时参数面板 (`AttentionRuntimeParams`)
+- **注意力头激活状态**: 8个3D球体, 激活/非激活态, 动态脉冲
+- **QK/OV 回路指标**: 每个活跃头的 cos(Q,K) 和 OV Score 参数条
+- **汇总统计**: cos(Q,K)/OV/熵卡片 + 强度条
+
+### FFN 运行时参数面板 (`FFNRuntimeParams`)
+- **神经元激活状态**: 16个3D方块, 激活/非激活色, 动态脉冲
+- **Gate/Up/Down 投影参数**: 每个活跃神经元的 gate/W↑/W↓ 三行参数条
+- **汇总统计**: gain/gate/act% 卡片 + d_model 条
+
+### Residual 运行时参数面板 (`ResidualRuntimeParams`)
+- **Skip vs Residual 贡献**: 每维度的 Skip(蓝紫) 和 Residual(绿) 双柱对比
+- **维度范数**: 每维度的 ‖r‖ 参数条, 颜色阈值
+- **汇总统计**: retention/skip/‖r‖ 卡片 + 流方向标签
+
+### 通用组件
+- `ParamBar`: 单参数指标条(标签+填充条+数值)
+- `MicroHeatGrid`: 紧凑参数矩阵可视化
+- `StatCard`: 数值+标签卡片
+- `LayerRuntimeParamPanel`: 统一入口, 根据组件类型分发
+
+### 理论意义
+- 运行时参数面板让每一层的内部计算状态**可观测**, 这是理解Transformer计算机制的关键
+- 每维度的γ/β分布揭示了LN对不同特征维度的差异化缩放策略
+- 注意力头的QK/OV指标揭示了**信息路由机制**: QK决定"看哪里", OV决定"带什么回来"
+- FFN的稀疏激活+投影参数揭示了**知识存储的稀疏编码**模式
+- Residual的Skip/Residual贡献分解揭示了**残差流的信息保留与更新平衡**
+
+## Phase CCXXII: 组件3D模型详细化增强 (2026-05-09 14:00)
+
+**4大组件3D模型全面升级**, 从简单几何体变为详细功能可视化:
+
+### LN 3D模型增强
+- 顶部公式: `y = γ·(x-μ)/√(σ²+ε) + β`
+- 左侧: 输入分布(10根不均匀柱状图 + 均值线μ + 方差标注σ²)
+- 中间: 三步变换过程 (x-μ → /√(σ²+ε) → γ·+β)
+  - ε稳定环(青色)
+  - γ缩放环(紫色, 显示具体值)
+  - β偏移球(淡紫色, 显示具体值)
+- 右侧: 归一化输出(均匀柱状图 + Leakage指标)
+- 底部: 三个仪表盘(μ/σ²/ε) + 指针动画
+
+### Attention 3D模型增强
+- 顶部: 当前阶段公式 (Q=X·Wq / Score=Q·Kᵀ/√d_k / Attn=softmax(Score) / Out=Attn·V·Wo)
+- Q/K/V分离矩阵: 蓝/粉/绿三色矩阵 + 内部行向量
+- 注意力热力图: 5×5矩阵网格, 对角线高亮, 行列标签t0~t4
+- 6个注意力头: 活跃头内嵌小热力图
+- Softmax分布: 5个柱状(峰值在中间) + 统计面板(cos(Q,K)/Entropy/OV Score)
+- 底部: Pattern + nHeads×headDim
+
+### FFN 3D模型增强
+- 顶部: 阶段公式 (W_up·x+b_up / SiLU(x)·x_up / W_down·gate+b_down)
+- 输入层→W_up投影层→隐藏层→W_down投影层→输出层
+- W_up/W_down权重条可视化(4列权重方向)
+- 隐藏层7个神经元: 激活节点大+发光环+神经元标签(N42/N187/N512等)
+- SiLU门控曲线: 12个点拟合x·σ(x)曲线 + 公式标注 + gate值
+- 6个信号粒子(三阶段动画: 输入→隐藏→输出)
+- 底部: Active Ratio / d_model→mlp_dim / Direction / Top Neurons / Gain
+
+### Residual 3D模型增强
+- 顶部: 公式 output = x + F(x)
+- 主路径管道: x→x+F(x), 管道内流线
+- F(x)子模块: 外壳+内部微结构(3个色块) + 内部流动粒子
+- 跳跃连接弧: 6个流动粒子沿弧线运动(大小+透明度随位置变化)
+- 加法节点⊕: 发光球+光环
+- 右侧: 残差流分解(lexical/semantic/decision三方向, 当前方向高亮)
+- 左侧: 范数增长指示条(‖r‖=3~10刻度+当前值填充)
+- 底部: Skip Weight / Retention / Stream / ‖r‖
+
+## Phase CCXXI: 组件模型动画联动 + Layer→Component连接光束 (2026-05-09 13:25)
+
+**3D场景动画联动增强**: Layer内部高亮组件 → 组件模型实时切换
+- Layer动画运行到LN → 组件模型切换为LN 3D模型 + LN参数
+- Layer动画运行到Attention → 组件模型切换为Attention 3D模型 + Attention参数
+- Layer动画运行到FFN → 组件模型切换为FFN 3D模型 + FFN参数
+- Layer动画运行到Residual → 组件模型切换为Residual 3D模型 + Residual参数
+- 新增 `LayerToComponentBeam`: Layer模型→组件模型的动态连接光束
+  - 光束颜色随当前高亮组件变色(LN紫/Attn蓝/FFN橙/Residual紫)
+  - 流动粒子动画(从Layer流向Component)
+  - 箭头指向组件面板
+  - 浮动组件类型标签(ATTENTION/LAYER NORM/FFN/RESIDUAL ⊕)
+- 新增 `ComponentTypeIndicator`: 顶部浮动组件类型标识
+  - 大字标题(LAYER NORM / ATTENTION / FFN / RESIDUAL ⊕)
+  - 子阶段描述(Pre-Attention / Q·Kᵀ/√d Scoring 等)
+  - 两侧发光指示点
+  - 轻微浮动动画
+
+## Phase CCXX: 组件面板分离 3D模型+信息区 (2026-05-08 19:25)
+
+**ComponentDetailPanel3D 布局重构**: 上方信息参数 + 下方3D几何模型
+- 信息区(上方): 参数行 + 信号条形图，与之前逻辑相同
+- 3D模型区(下方): 每个组件有独立的3D几何可视化
+  - **LN**: 输入分布→归一化输出的柱状变换 + γ参数环
+  - **Attention**: 多头环状结构 + Q/K/V中心矩阵 + 注意力连线
+  - **FFN**: 三层神经网络投影(d_model→mlp_dim→d_model) + 激活球 + 信号粒子
+  - **Residual**: 跳跃连接弧线 + ⊕加法节点 + 流动粒子动画
+- 分隔线标注"3D Model"区分信息与模型区
+- 面板高度 = infoH + modelH + padding 自适应
+
+## Phase CCXIV: 层组件详情3D模型 + 缩放限制移除 (2026-05-08 14:33)
+
+**ComponentDetailRenderer** — 层旁边独立的3D详情模型:
+- 位于主层栈右侧 (x偏移 `PLANE_SIZE/2 + 5`)
+- 动画运行时自动展示当前层对应的内部组件
+- 组件模块: LN (β值, 泄露率), W_U (信号%, cos值), W_U⊥ (信号%), Attn (强度, head模式), FFN (增益, 方向), Residual (保留率), DarkMatter (占比), Logic (逻辑信号倍数)
+- W_U/W_U⊥ 3D条形图信号对比
+- 激活时脉冲发光动画, 连接线从主层栈指向详情面板
+- 无动画时悬停层也可触发显示
+
+**缩放限制移除**: 移除3D场景 `maxDistance` 限制:
+- `neural_vis/index.jsx`: 移除 `maxDistance={150}`
+- `blueprint/appleNeuron/SceneComponents.jsx`: 移除 `maxDistance={44}`
+- `App.jsx`: 移除 `maxDistance={isAppleMainView ? 44 : undefined}`
+
+**组件参数数据生成** `getLayerComponentData(layer, nLayers)`:
+- LN β值: 0.98~1.0, 泄露率随层变化 (0.02→0.15)
+- W_U信号: 5%→95% 随层增长
+- W_U⊥信号: 15%→40%→5% 先升后降
+- 残差保留: 62-71% 波动
+- 暗物质: 86-92%
+- 逻辑信号: L18峰值 2.7x
+
 ## Phase CCXIII: Layer 3D模型神经元激活值可视化 (2026-05-08 00:30)
 
 **神经元激活值颜色编码**：
@@ -15121,6 +15260,32 @@ KN=#3b82f6, LG=#f59e0b, GR=#10b981, MG=#a855f7, SE=#ef4444, WE=#6366f1, TD=#ec48
 | `frontend/src/App.jsx` | 语句下拉→输入框+快捷按钮, 新增颜色模式下拉框(fpColorFile), startForwardPass使用fpColorFile |
 
 
+## Phase CCXIX: 下一步按钮 + 组件详情面板动画同步 + 删除菜单 (2026-05-08 18:30)
+
+**下一步按钮**: 生成按钮下方添加"⏭ 下一步"按钮
+- 点击后暂停自动播放，推进到 layer 内部下一个子阶段
+- 12个子阶段: Input→LN₁→Q/K/V→Attn Score→Softmax→Attn Out→⊕Res₁→LN₂→W_up→SiLU→W_down→⊕Res₂
+- 当前层所有子阶段完成自动推进到下一层
+- 子阶段进度条：彩色段显示已完成/当前/未完成
+- `fpSubPhase` 状态跟踪当前子阶段索引
+- 暂停时 `layerAnimProgress` 精确设置到子阶段中心位置
+
+## Phase CCXIX: 组件详情面板动画同步 + 删除菜单 (2026-05-08 18:20)
+
+**ComponentDetailPanel3D 动画同步改造**: 只显示当前动画阶段高亮的组件
+- 与 LayerExplodedView3D 完全同步的 PHASES 定义
+- 动画运行到 LN → 只显示 LN 详情 (β, γ, ε, μ, σ², Leakage)
+- 动画运行到 Attention → 只显示 Attention 详情 (strength, pattern, heads, entropy, cos(Q,K), OV score)
+- 动画运行到 FFN → 只显示 FFN 详情 (gain, projection, SiLU gate, direction, top neurons)
+- 动画运行到 Residual → 只显示 Residual 详情 (retention, skip weight, stream dir, norm)
+- 无动画时显示占位提示 "Run animation to see details"
+- 每个组件面板有独立的参数行 + 信号条形图
+
+**删除菜单**: 从 HLAIBlueprint.jsx 删除 Transformer Baseline 和 Hybrid Workspace 两个左侧菜单
+- 删除 routeBlueprints 中的数据块
+- 删除 systemProfiles 中的数据块
+- systemRouteOptions 仅保留 fiber_bundle
+
 ## Phase CCXVIII: 3D渲染器清理重构 (2026-05-07 20:00)
 
 ### 变更概述
@@ -15156,6 +15321,54 @@ NeuralNetworkRenderer从v5.0(585行)重构为v6.0 Clean(210行), 去除所有冗
 |------|----------|
 | `NeuralNetworkRenderer.jsx` | v5.0→v6.0: 585→210行, 删除4个冗余组件, useFrame驱动动画 |
 | `App.jsx` | NeuralNetworkRenderer调用: 删除5个废弃props(dModel, highlightedLayer, visibleComponents, animProgress, activeScenario, onHoverLayer) |
+
+---
+
+## Phase CCXXIII: 3D模型去除旋转动画与圆圈 (2026-05-09)
+
+### 修改内容
+
+移除 `ComponentDetailPanel3D.jsx` 中所有3D模型的旋转动画和圆圈(torus)元素:
+
+1. **旋转动画移除**:
+   - LNModel3D: 移除 `groupRef.current.rotation.y = elapsedTime * 0.25`
+   - AttentionModel3D: 移除 `groupRef.current.rotation.y = elapsedTime * 0.2`
+   - FFNModel3D: 移除 `groupRef.current.rotation.y = elapsedTime * 0.18`
+   - ResidualModel3D: 移除 `groupRef.current.rotation.y = elapsedTime * 0.18`
+
+2. **圆圈(torusGeometry)移除**:
+   - LNModel3D: ε稳定环、γ渐变环、3个仪表盘半圆弧
+   - AttentionModel3D: 6个注意力头torus环→替换为sphere球体
+   - FFNModel3D: 激活神经元发光环(torus)
+   - ResidualModel3D: 跳跃连接弧(torus)、加法节点光环(torus)
+   - PulseRing组件: 整体删除(torusGeometry大环)
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `ComponentDetailPanel3D.jsx` | 移除4个模型的rotation.y旋转动画; 移除所有torusGeometry圆圈(ε环/γ环/仪表盘弧/注意力头环/FFN发光环/跳跃连接弧/加法光环/PulseRing); 注意力头从torus改为sphere |
+
+## Phase CCXXIV: 运行时神经元参数网格可视化 (2026-05-10 16:30)
+
+**新增神经元参数网格(NeuronParamGrid)**, 在组件3D模型中显示运行时内部神经元激活参数:
+
+### 功能
+- **颜色阈值**: 红色 > 0.8 | 黄色 > 0.5 | 绿色 > 0.3 | 暗灰 ≤ 0.3
+- 每个组件模型(LN/Attention/FFN/Residual)底部显示神经元参数网格
+- LN: 24个神经元, 基于归一化分布+泄漏率生成
+- Attention: 32个神经元, 基于注意力强度和头数生成
+- FFN: 32个神经元, 基于激活率和增益生成(稀疏激活)
+- Residual: 24个神经元, 基于保留率和流方向生成
+- 高激活值神经元带发光边框和数值标注
+- 颜色图例自动显示在网格右侧
+
+### 修改的文件
+
+| 文件 | 修改内容 |
+|------|----------|
+| `ComponentDetailPanel3D.jsx` | 新增`NeuronParamGrid`组件、`getNeuronColor`/`getNeuronEmissive`颜色函数、`generateNeuronValues`模拟数据生成; 4个模型组件添加神经元网格 |
+| `locales.js` | 新增`neuronParams`翻译键(zh: 神经元参数, en: Neuron Params) |
 
 
 

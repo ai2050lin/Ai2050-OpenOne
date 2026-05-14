@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { AGIChatPanel } from './AGIChatPanel';
+
 import { AppleNeuronSceneContent } from './blueprint/appleNeuronSceneBridge';
 import { AppleNeuronGeneratedConceptSetsPanel, AppleNeuronMultidimSettingsPanel } from './blueprint/appleNeuronInfoPanelsBridge';
 import { useAppleNeuronWorkspace } from './blueprint/appleNeuronWorkspaceBridge';
@@ -21,7 +21,7 @@ import ICSPBPanel from './components/FiberNetPanel';
 import LanguageResearchControlPanel from './components/LanguageResearchControlPanel';
 import LanguageResearchDataPanel from './components/LanguageResearchDataPanel';
 import ReverseEngineeringDataPanel from './components/reverse/ReverseEngineeringDataPanel';
-import ReverseEngineeringOperationPanel from './components/reverse/ReverseEngineeringOperationPanel';
+
 import ReverseEngineeringOverlay from './components/reverse/ReverseEngineeringOverlay';
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
@@ -52,7 +52,6 @@ import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
 import NeuralNetworkRenderer, { activationToColor } from './neural_vis/renderers/NeuralNetworkRenderer';
 import SceneHelpers from './neural_vis/components/SceneHelpers';
-import PuzzlePanel from './neural_vis/components/PuzzlePanel';
 import useVisData from './neural_vis/hooks/useVisData';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
@@ -509,8 +508,8 @@ const ALGO_DOCS = {
       title: 'Transformer 就像一个超级工厂',
       desc: '想象你在读一本书，你的大脑在做两件事：',
       points: [
-        '👀 注意力机制 (Attention): 当你读到“它”这个字时，你会回头看前面的句子，找找“它”指代的是“小猫”还是“桌子”。在界面中：这就好比那些连接线，显示了 AI 在关注哪些词。',
-        '🧠 记忆网络 (MLP): 这就像个巨大的知识库。读到“巴黎”，你会立刻联想到“法国”、“埃菲尔铁塔”。在界面中：这就好比每一层里面密密麻麻的神经元被激活了。'
+        '👀 注意力机制 (Attention): 当你读到"它"这个字时，你会回头看前面的句子，找找"它"指代的是"小猫"还是"桌子"。在界面中：这就好比那些连接线，显示了 AI 在关注哪些词。',
+        '🧠 记忆网络 (MLP): 这就像个巨大的知识库。读到"巴黎"，你会立刻联想到"法国"、"埃菲尔铁塔"。在界面中：这就好比每一层里面密密麻麻的神经元被激活了。'
       ]
     },
     pro: {
@@ -527,11 +526,11 @@ const ALGO_DOCS = {
   'main_workspace': {
     title: 'DNN 控制面板',
     simple: {
-      title: '如何用 DNN 主工作台做“编码拼图”',
+      title: '如何用 DNN 主工作台做"编码拼图"',
       desc: '这个 DNN 主工作台不是单一图表，而是一条从宏观到微观的证据链。',
       points: [
         '拼图管理器：设置实验标签、样本规模、稳定性探针，保存当前证据快照。',
-        '层级编码签名：看每层“编码变化强度”和“稀疏度”，再看层间 Drift。',
+        '层级编码签名：看每层"编码变化强度"和"稀疏度"，再看层间 Drift。',
         '编码机制指标：看 FS（稳定度）、PI（可塑性）、HI（稳态）和跨任务一致性。',
         '影响神经元：查看 Top-K Δ 神经元，并在 3D 中聚焦高影响节点。',
         'Selected Neuron：把宏观结论落到单神经元的 current / baseline / delta。'
@@ -539,13 +538,13 @@ const ALGO_DOCS = {
     },
     pro: {
       title: 'DNN 主工作台作为证据链管线',
-      desc: '这个 DNN 主工作台将机制分析拆成“版本化证据管理 + 层级结构指标 + 机制指标 + 微观差分定位”。',
+      desc: '这个 DNN 主工作台将机制分析拆成"版本化证据管理 + 层级结构指标 + 机制指标 + 微观差分定位"。',
       points: [
         'Evidence Versioning: 通过 experimentTag / sampleScale / stabilityProbeCount 固化实验上下文并可回放对比。',
         'Layer Signature: 以 meanAbsDelta / sparsity / drift 衡量编码在层内与层间的重排强度。',
         'Mechanism Metrics: 通过 feature stability、task consistency、PI/HI 捕捉稳定-可塑平衡。',
         'Neuron-Level Causality Proxy: 以 Δ=current-baseline 排序定位高影响神经元并联动 3D 聚焦。',
-        'Closed Loop: 形成“全局统计 -> 层级迁移 -> 单神经元验证”的闭环解释流程。'
+        'Closed Loop: 形成"全局统计 -> 层级迁移 -> 单神经元验证"的闭环解释流程。'
       ],
       formula: 'Evidence = {FS, PI, HI, Drift, Δ-neuron map}'
     }
@@ -553,7 +552,7 @@ const ALGO_DOCS = {
   'main_system': {
     title: 'DNN 主工作台定位',
     simple: {
-      title: 'DNN 主工作台是“编码还原主工作台”',
+      title: 'DNN 主工作台是"编码还原主工作台"',
       desc: '目标是沿着证据链还原语言能力背后的数学结构。',
       points: [
         '先观测：看层间和神经元随时间如何变化。',
@@ -576,7 +575,7 @@ const ALGO_DOCS = {
   'dnn_system': {
     title: 'DNN 模块定位',
     simple: {
-      title: 'DNN 是“多算法观察台”',
+      title: 'DNN 是"多算法观察台"',
       desc: '用于从不同角度观察深度网络行为，不直接替代 DNN 主工作台的编码还原主线。',
       points: [
         '可切换回路、特征、因果、流形、拓扑等算法。',
@@ -588,9 +587,9 @@ const ALGO_DOCS = {
       title: 'DNN = 结构分析与观测工具集',
       desc: '以多算法横向观察构建候选假设，再进入 DNN 主工作台做纵向验证。',
       points: [
-        '结构分析强调“多视角覆盖率”。',
-        '参数面板强调“可控实验变量”。',
-        '结果面板强调“可解释指标与可视化一致性”。'
+        '结构分析强调"多视角覆盖率"。',
+        '参数面板强调"可控实验变量"。',
+        '结果面板强调"可解释指标与可视化一致性"。'
       ],
       formula: 'Hypothesis Space H = {circuit, feature, causal, manifold, topology, ...}'
     }
@@ -598,7 +597,7 @@ const ALGO_DOCS = {
   'snn_system': {
     title: 'SNN 模块定位',
     simple: {
-      title: 'SNN 是“脉冲动力学分析台”',
+      title: 'SNN 是"脉冲动力学分析台"',
       desc: '关注放电时序、刺激响应和可塑性，不是静态特征图。',
       points: [
         '看神经元什么时候放电。',
@@ -620,7 +619,7 @@ const ALGO_DOCS = {
   'icspb_system': {
     title: 'ICSPB 模块定位',
     simple: {
-      title: 'ICSPB 是“当前模型工作台”',
+      title: 'ICSPB 是"当前模型工作台"',
       desc: '核心是把语言主干与快速写入分支解耦，提高效率、稳定性与可控性。',
       points: [
         '语言主干负责稳定语义压缩。',
@@ -634,7 +633,7 @@ const ALGO_DOCS = {
       points: [
         '慢权重保持全局一致性。',
         '快权重承载局部任务适配。',
-        '可用于研究“局部可塑、全局稳态”的工程实现。'
+        '可用于研究"局部可塑、全局稳态"的工程实现。'
       ],
       formula: 'h = h_base + U_fiber z_fast'
     }
@@ -643,8 +642,8 @@ const ALGO_DOCS = {
   'circuit': {
     title: '回路发现 (Circuit Discovery)',
     simple: {
-      title: '寻找 AI 的“电路图”',
-      desc: '就像拆开收音机看电路板一样，我们试图找出 AI 大脑里具体是哪几根线在负责“把英语翻译成中文”或者“做加法”。',
+      title: '寻找 AI 的"电路图"',
+      desc: '就像拆开收音机看电路板一样，我们试图找出 AI 大脑里具体是哪几根线在负责"把英语翻译成中文"或者"做加法"。',
       points: [
         '节点 (Node): 就像电路板上的元件（电容、电阻），这里指某个特定的注意力头。',
         '连线 (Edge): 就像导线，显示了信息是如何从一个元件流向另一个元件的。红色线表示促进，蓝色线表示抑制。'
@@ -664,11 +663,11 @@ const ALGO_DOCS = {
   'features': {
     title: '稀疏特征 (Sparse Features)',
     simple: {
-      title: '破译 AI 的“脑电波”',
+      title: '破译 AI 的"脑电波"',
       desc: 'AI 内部有成千上万个神经元同时在闪烁，很难看懂。我们用一种特殊的解码器（SAE），把这些乱闪的信号翻译成人类能懂的概念。',
       points: [
-        '特征 (Feature): 比如“检测到法语”、“发现代码错误”、“感受到愤怒情绪”。',
-        '稀疏性 (Sparsity): 大脑在某一时刻只有少数几个概念是活跃的（比如你现在在想“苹果”，就不会同时想“打篮球”）。'
+        '特征 (Feature): 比如"检测到法语"、"发现代码错误"、"感受到愤怒情绪"。',
+        '稀疏性 (Sparsity): 大脑在某一时刻只有少数几个概念是活跃的（比如你现在在想"苹果"，就不会同时想"打篮球"）。'
       ]
     },
     pro: {
@@ -687,9 +686,9 @@ const ALGO_DOCS = {
     title: '因果分析 (Causal Analysis)',
     simple: {
       title: '谁是真正的幕后推手？',
-      desc: '为了搞清楚 AI 到底是怎么通过“巴黎”联想到“法国”的，我们像做手术一样，尝试阻断或修改某些神经元的信号，看看结果会不会变。',
+      desc: '为了搞清楚 AI 到底是怎么通过"巴黎"联想到"法国"的，我们像做手术一样，尝试阻断或修改某些神经元的信号，看看结果会不会变。',
       points: [
-        '干预 (Intervention): 如果我们把“巴黎”这个信号屏蔽掉，AI 还能说出“法国”吗？如果不能，说明这个信号很关键。',
+        '干预 (Intervention): 如果我们把"巴黎"这个信号屏蔽掉，AI 还能说出"法国"吗？如果不能，说明这个信号很关键。',
         '因果链 (Causal Chain): 像侦探一样，一步步追踪信息流动的路径。'
       ]
     },
@@ -698,7 +697,7 @@ const ALGO_DOCS = {
       desc: '通过干预（Intervention）技术，测量特定组件对模型输出的因果效应。',
       points: [
         'Ablation (消融): 将某组件的输出置零或替换为平均值，观察 Logits 变化。',
-        'Activation Patching (激活修补): 将组件在“干净输入”下的激活值替换为“受损输入”下的值，观察能否恢复错误输出，或反之。'
+        'Activation Patching (激活修补): 将组件在"干净输入"下的激活值替换为"受损输入"下的值，观察能否恢复错误输出，或反之。'
       ],
       formula: 'Do-Calculus: P(Y | do(X=x))'
     }
@@ -712,7 +711,7 @@ const ALGO_DOCS = {
       points: [
         '数据云: 看起来像一团乱麻的点阵。',
         '主成分 (PCA): 找出这团乱麻的主要延伸方向（比如长、宽、高），帮我们在 3D 屏幕上画出来。',
-        '聚类:意思相近的词（如“猫”、“狗”）会聚在一起。'
+        '聚类:意思相近的词（如"猫"、"狗"）会聚在一起。'
       ]
     },
     pro: {
@@ -731,7 +730,7 @@ const ALGO_DOCS = {
     title: '组合泛化 (Compositionality)',
     simple: {
       title: '乐高积木式的思维',
-      desc: 'AI 没见过的句子它也能懂，因为它学会了“拼积木”。',
+      desc: 'AI 没见过的句子它也能懂，因为它学会了"拼积木"。',
       points: [
         '原子概念: 像乐高积木块（"红色的"、"圆的"、"球"）。',
         '组合规则: 怎么拼在一起（"红色的球" vs "圆的红色"）。',
@@ -751,8 +750,8 @@ const ALGO_DOCS = {
   'tda_legacy': {
     title: '拓扑分析 (Topology/TDA)',
     simple: {
-      title: '思维地图的“坑洞”',
-      desc: '有时候研究 AI 的思维形状还不够，我们还得看看这个形状里有没有“洞”。',
+      title: '思维地图的"坑洞"',
+      desc: '有时候研究 AI 的思维形状还不够，我们还得看看这个形状里有没有"洞"。',
       points: [
         '持久同调 (Persistent Homology): 就像用不同大小的筛子去筛沙子，看看哪些形状是真正稳定的。',
         'Betti 数: 0 维代表有多少个孤立的概念点，1 维代表有多少个环形逻辑。',
@@ -839,12 +838,12 @@ const ALGO_DOCS = {
   'gut_relationship': {
     title: '大统一智能理论 (GUT Mapping)',
     simple: {
-      title: '智能的“物理公式”',
+      title: '智能的"物理公式"',
       desc: '宇宙有相对论，智能也有自己的大统一理论。我们看到的 3D 结构就是这个理论的具体表现。',
       points: [
         '结构即逻辑: 你看到的蓝色网格（底流形）就是 AGI 的逻辑骨架（就像重力场）。',
         '概念即纤维: 红色的小棍（纤维）就是附着在逻辑上的各种知识，它们遵循几何对称性。',
-        '推理即平移: AI 思考的过程，就是把语义在逻辑网上按照特定的轨迹进行“平行移动”。'
+        '推理即平移: AI 思考的过程，就是把语义在逻辑网上按照特定的轨迹进行"平行移动"。'
       ]
     },
     pro: {
@@ -884,8 +883,8 @@ const ALGO_DOCS = {
   'rpt': {
     title: '传输分析 (RPT Analysis)',
     simple: {
-      title: '语义的“搬运工”',
-      desc: 'RPT 就像是一个精准的导航系统，它能告诉我们一个概念（比如“皇室”）是如何从一个底座（男人）平移到另一个底座（女人）上的。',
+      title: '语义的"搬运工"',
+      desc: 'RPT 就像是一个精准的导航系统，它能告诉我们一个概念（比如"皇室"）是如何从一个底座（男人）平移到另一个底座（女人）上的。',
       points: [
         '传输矩阵 R: 一张旋转地图，把 A 的状态变换到 B 的状态。',
         '迁移性: 只要 R 是正交的（不扭曲），说明这个逻辑在全宇宙通用。',
@@ -906,8 +905,8 @@ const ALGO_DOCS = {
   'curvature': {
     title: '曲率分析 (Curvature)',
     simple: {
-      title: '思维的“颠簸程度”',
-      desc: '如果思维过程很丝滑，说明它在走直线（平坦空间）；如果突然剧烈闪避，说明它碰到了“大坑”（高曲率）。',
+      title: '思维的"颠簸程度"',
+      desc: '如果思维过程很丝滑，说明它在走直线（平坦空间）；如果突然剧烈闪避，说明它碰到了"大坑"（高曲率）。',
       points: [
         '平坦区: 逻辑非常顺畅，没什么好争议的。',
         '高曲率区: 往往是由于偏见、冲突或极其复杂的逻辑导致流形发生了扭曲。',
@@ -927,8 +926,8 @@ const ALGO_DOCS = {
   'debias': {
     title: '几何去偏 (Debiasing)',
     simple: {
-      title: '给 AI 做“正骨手术”',
-      desc: '既然偏见是一个方向性的扭曲，那我们直接用几何方法把它“掰回来”。',
+      title: '给 AI 做"正骨手术"',
+      desc: '既然偏见是一个方向性的扭曲，那我们直接用几何方法把它"掰回来"。',
       points: [
         '几何拦截: 识别偏见的方向（比如性别方向）。',
         '逆变换: 把偏移的语义强制旋转回中置轴。',
@@ -971,10 +970,10 @@ const ALGO_DOCS = {
     title: '脉冲神经网络 (SNN)',
     simple: {
       title: '仿生大脑',
-      desc: '模仿生物大脑“放电”的机制。',
+      desc: '模仿生物大脑"放电"的机制。',
       points: [
-        '脉冲 (Spike): 神经元只有积攒了足够的电量，才会“哔”地发一次信号。更节能，更像人脑。',
-        'STDP: “早起的鸟儿有虫吃”——如果 A 经常在 B 之前叫，A 对 B 的影响就会变大。'
+        '脉冲 (Spike): 神经元只有积攒了足够的电量，才会"哔"地发一次信号。更节能，更像人脑。',
+        'STDP: "早起的鸟儿有虫吃"——如果 A 经常在 B 之前叫，A 对 B 的影响就会变大。'
       ]
     },
     pro: {
@@ -992,7 +991,7 @@ const ALGO_DOCS = {
     title: '有效性验证 (Validity)',
     simple: {
       title: '这真的靠谱吗？',
-      desc: '我们用各种数学指标来给 AI 的“健康状况”打分。',
+      desc: '我们用各种数学指标来给 AI 的"健康状况"打分。',
       points: [
         '困惑度 (PPL): AI 对自己说的话有多大把握？越低越好。',
         '熵 (Entropy): AI 的思维有多发散？'
@@ -1121,7 +1120,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['FS 越高越稳定', 'PI 高表示局部可塑', 'HI 高表示全局稳态', 'Drift 高表示层间重排强']
     },
     simple: {
-      goal: '把“看起来像规律”变成“可复盘的证据”。',
+      goal: '把"看起来像规律"变成"可复盘的证据"。',
       approach: ['先打标签并保存快照', '看层级变化', '看关键神经元是不是反复出现'],
       model3d: '左边看指标，右边看 3D 变化，两边要互相印证。',
       algorithm: '先看全局，再看层，再看单点，避免只凭直觉判断。',
@@ -1130,14 +1129,14 @@ const GUIDE_STRUCTURED = {
   },
   main_system: {
     pro: {
-      goal: '将 DNN 主工作台明确为“语言编码数学结构还原”的主流程。',
+      goal: '将 DNN 主工作台明确为"语言编码数学结构还原"的主流程。',
       approach: ['按四阶段推进实验', '建立指标与3D联动证据', '沉淀可复现结论'],
       model3d: '通过层级与节点联动展示编码形成过程，支持从宏观到微观追踪。',
       algorithm: '四阶段流程管理 + 多尺度指标（层、机制、神经元）统一。',
       metricRanges: ['FS高=稳定', 'PI高=可塑', 'HI高=稳态', 'Δ稳定重现=高可信']
     },
     simple: {
-      goal: '把 DNN 主工作台当作“还原语言机制”的主战场。',
+      goal: '把 DNN 主工作台当作"还原语言机制"的主战场。',
       approach: ['先观察', '再提取', '再验证', '最后总结规律'],
       model3d: '3D里看到的变化要和指标同步变化。',
       algorithm: '用同一条证据链反复验证，不靠直觉下结论。',
@@ -1146,7 +1145,7 @@ const GUIDE_STRUCTURED = {
   },
   dnn_system: {
     pro: {
-      goal: '将 DNN 定位为“多算法观测工具箱”。',
+      goal: '将 DNN 定位为"多算法观测工具箱"。',
       approach: ['横向跑多算法', '提取候选规律', '回流 DNN 主工作台做系统验证'],
       model3d: '不同分析图层并置对照，突出结构与行为差异。',
       algorithm: '以结构分析算法族构建候选假设空间。',
@@ -1162,14 +1161,14 @@ const GUIDE_STRUCTURED = {
   },
   snn_system: {
     pro: {
-      goal: '将 SNN 定位为“时序脉冲动力学分析工具”。',
+      goal: '将 SNN 定位为"时序脉冲动力学分析工具"。',
       approach: ['刺激-响应实验', '时序放电追踪', '稳定性与有效性检验'],
       model3d: '以时间维展示放电传播路径和活跃区迁移。',
       algorithm: '事件驱动神经动力学 + 可塑性规则观测。',
       metricRanges: ['放电模式可重复=可靠', '噪声主导=需调参', '响应延迟稳定=结构健康']
     },
     simple: {
-      goal: '看脉冲网络“什么时候、在哪里、为什么放电”。',
+      goal: '看脉冲网络"什么时候、在哪里、为什么放电"。',
       approach: ['注入刺激', '逐步播放', '观察是否稳定复现'],
       model3d: '亮起的节点就是当前在放电的区域。',
       algorithm: '按时间看神经活动而不是只看静态分布。',
@@ -1178,14 +1177,14 @@ const GUIDE_STRUCTURED = {
   },
   icspb_system: {
     pro: {
-      goal: '将 ICSPB 定位为“当前模型的语言与在线学习工作台”。',
+      goal: '将 ICSPB 定位为"当前模型的语言与在线学习工作台"。',
       approach: ['分离底流形与纤维更新', '比较注入前后性能', '验证全局稳态'],
       model3d: '底流形与纤维轨迹分层渲染，展示结构稳定与快速适配并存。',
       algorithm: 'Base manifold + fiber injection + fast/slow coupling。',
       metricRanges: ['快速收益高且旧能力不退化=理想', '漂移过大=全局稳态风险']
     },
     simple: {
-      goal: '看模型能不能“快学新知识又不忘旧知识”。',
+      goal: '看模型能不能"快学新知识又不忘旧知识"。',
       approach: ['先注入', '再测试新旧任务', '观察是否稳定'],
       model3d: '主干保持稳定，纤维局部变化代表快速学习。',
       algorithm: '把新知识尽量写到纤维，不破坏主干。',
@@ -1201,10 +1200,10 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['prob∈[0,1]', '平均prob > 0.35通常信息较稳定', '高置信比例(>0.5)越高，结论越明确']
     },
     simple: {
-      goal: '看模型是在哪一层“想明白”的。',
+      goal: '看模型是在哪一层"想明白"的。',
       approach: ['看每层最可能词', '找概率突然变高的层', '对比前后层变化'],
       model3d: '点越大越亮，说明模型越确定。',
-      algorithm: '每一层都提前“猜答案”，看猜测怎么变化。',
+      algorithm: '每一层都提前"猜答案"，看猜测怎么变化。',
       metricRanges: ['0.5以上通常较有把握', '0.2以下通常不稳定', '连续升高比单点升高更可信']
     }
   },
@@ -1217,10 +1216,10 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['激活归一化后常在[0,1]', '高激活占比 10%-30%常见', '层间聚集中心漂移越小越稳定']
     },
     simple: {
-      goal: '看哪些位置最“亮”，也就是最重要。',
+      goal: '看哪些位置最"亮"，也就是最重要。',
       approach: ['先看最亮区域', '再看亮点是否跨层连续', '最后对照文本含义'],
       model3d: '亮、红、大通常表示更强激活。',
-      algorithm: '把隐藏层信号变成可见“玻璃矩阵”。',
+      algorithm: '把隐藏层信号变成可见"玻璃矩阵"。',
       metricRanges: ['亮点太少可能欠拟合', '亮点太多可能噪声大', '连续亮带通常更有意义']
     }
   },
@@ -1233,7 +1232,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['轨迹长度越短通常越直接', '分叉率过高可能表示冲突语义', '跨层方向一致性>0.6通常较稳定']
     },
     simple: {
-      goal: '看信息在模型里是怎么“流动”的。',
+      goal: '看信息在模型里是怎么"流动"的。',
       approach: ['看主干流', '看有没有异常分叉', '看终点是否收敛'],
       model3d: '像水流一样，粗管代表主通路。',
       algorithm: '把每层变化连成流线。',
@@ -1249,7 +1248,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['|attribution| > 0.1常作强边', '关键边占比5%-20%常见', '跨提示重合率>0.6更稳健']
     },
     simple: {
-      goal: '找出真正“起作用”的内部电路。',
+      goal: '找出真正"起作用"的内部电路。',
       approach: ['先找关键线', '再看这些线是否重复出现', '最后判断是否稳定'],
       model3d: '粗线就是关键因果路径。',
       algorithm: '把可疑线路关掉或替换，看结果怎么变。',
@@ -1265,10 +1264,10 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['reconstruction_error < 0.02优秀', '0.02-0.08可用', '>0.08需谨慎']
     },
     simple: {
-      goal: '把“看不懂的神经元闪烁”翻译成可命名特征。',
+      goal: '把"看不懂的神经元闪烁"翻译成可命名特征。',
       approach: ['抽特征', '看最强特征', '检查误差是否够低'],
       model3d: '相近特征会聚在一起。',
-      algorithm: '用解码器把复杂信号拆成少量“概念开关”。',
+      algorithm: '用解码器把复杂信号拆成少量"概念开关"。',
       metricRanges: ['误差越低越可信', '太高说明解释不到位', '稳定重复出现更可信']
     }
   },
@@ -1281,7 +1280,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['重要组件占比>20%常见强因果', '10%-20%中等', '<10%偏弱']
     },
     simple: {
-      goal: '验证“谁导致了结果”。',
+      goal: '验证"谁导致了结果"。',
       approach: ['关掉一个部件', '看结果是否改变', '重复验证'],
       model3d: '最关键组件会在图中最突出。',
       algorithm: '像做实验一样做对照组。',
@@ -1313,7 +1312,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['R² > 0.8强', '0.5-0.8中', '<0.5弱']
     },
     simple: {
-      goal: '看模型会不会“拼积木式”举一反三。',
+      goal: '看模型会不会"拼积木式"举一反三。',
       approach: ['给新组合', '看是否仍能理解', '看评分'],
       model3d: '可组合关系在图里像可叠加的位移。',
       algorithm: '检验旧知识能否组合成新能力。',
@@ -1329,7 +1328,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['写入后收益>5%通常有效', '遗忘率越低越好', '跨任务迁移越高越好']
     },
     simple: {
-      goal: '看模型能不能“即学即用”。',
+      goal: '看模型能不能"即学即用"。',
       approach: ['写入新知识', '马上测试', '看是否影响旧知识'],
       model3d: '主干不变，旁路快速更新。',
       algorithm: '把新知识写到纤维空间，不重训主模型。',
@@ -1345,7 +1344,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['传输效率接近1更好', '失真越低越好', '瓶颈层需重点检查']
     },
     simple: {
-      goal: '看信息在层与层之间“传得好不好”。',
+      goal: '看信息在层与层之间"传得好不好"。',
       approach: ['看通过率', '看失真', '找堵点'],
       model3d: '哪里变细哪里就是瓶颈。',
       algorithm: '衡量传输过程有没有丢信息。',
@@ -1361,7 +1360,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['|curvature| < 0.1平缓', '0.1-0.5中等', '>0.5可能存在异常几何']
     },
     simple: {
-      goal: '看语义空间有没有“急转弯”。',
+      goal: '看语义空间有没有"急转弯"。',
       approach: ['看高曲率点', '检查是否集中', '结合语义解释'],
       model3d: '越红越弯，越蓝越平。',
       algorithm: '测每个区域弯曲程度。',
@@ -1372,12 +1371,12 @@ const GUIDE_STRUCTURED = {
     pro: {
       goal: '提取表示空间拓扑不变量（连通分量、环等）。',
       approach: ['构建复形', '计算持久同调', '筛选高持久性特征'],
-      model3d: '点云与条形码共同展示“连通/孔洞”结构。',
+      model3d: '点云与条形码共同展示"连通/孔洞"结构。',
       algorithm: 'Persistent Homology / Rips complex。',
       metricRanges: ['β0越大表示簇越分散', 'β1越大表示环结构越多', '长寿命条形码更可信']
     },
     simple: {
-      goal: '看语义空间有几块、有没有“洞”。',
+      goal: '看语义空间有几块、有没有"洞"。',
       approach: ['看连通块', '看环数量', '看特征寿命'],
       model3d: '长条特征比短条更重要。',
       algorithm: '拓扑方法找几何方法看不到的结构。',
@@ -1409,7 +1408,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['偏差接近0更一致', '小偏差可接受', '大偏差提示表示不稳定']
     },
     simple: {
-      goal: '绕一圈回来，看有没有“走形”。',
+      goal: '绕一圈回来，看有没有"走形"。',
       approach: ['走闭环', '看回到原点差多少', '比较不同层'],
       model3d: '回不去原点说明有几何扭曲。',
       algorithm: '闭环误差测试。',
@@ -1427,7 +1426,7 @@ const GUIDE_STRUCTURED = {
     simple: {
       goal: '看模型能否用一套思路解决多种任务。',
       approach: ['多任务对比', '看是否共用结构', '看迁移效果'],
-      model3d: '多任务轨迹重叠越多越像“通用智能”。',
+      model3d: '多任务轨迹重叠越多越像"通用智能"。',
       algorithm: '检查不同任务是否复用同一内部结构。',
       metricRanges: ['重叠多=更通用', '重叠少=更专用', '迁移强=更好']
     }
@@ -1441,7 +1440,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['偏置分数下降越多越好', '主任务性能下降应尽量小', '跨群体差距越小越好']
     },
     simple: {
-      goal: '减少模型“先入为主”的偏见。',
+      goal: '减少模型"先入为主"的偏见。',
       approach: ['找偏见方向', '削弱它', '确认能力不明显下降'],
       model3d: '去偏后不同群体点云分布更均衡。',
       algorithm: '把偏见方向从表示里减掉。',
@@ -1473,7 +1472,7 @@ const GUIDE_STRUCTURED = {
       metricRanges: ['loss稳定下降为正向', '剧烈震荡提示学习率/数据问题', '后期收敛应趋平缓']
     },
     simple: {
-      goal: '看模型是否在“越学越稳”。',
+      goal: '看模型是否在"越学越稳"。',
       approach: ['看趋势', '看波动', '看是否收敛'],
       model3d: '轨迹从乱到稳是正常学习过程。',
       algorithm: '把训练过程当成时间演化问题来观察。',
@@ -1509,7 +1508,7 @@ const buildGuideConclusion = ({ tab, activeTab, analysisResult, topologyResults,
 
   if (tab === 'main_workspace') {
     return make(true, '当前结论', [
-      'DNN 主工作台用于做“编码证据链”管理：先存证，再看层级，再看微观节点。',
+      'DNN 主工作台用于做"编码证据链"管理：先存证，再看层级，再看微观节点。',
       '建议每次切换分析类型后保存快照，比较 FS/PI/HI 与 Top-K 神经元是否稳定。'
     ], [
       { label: '工作流', value: '拼图 -> 层级 -> 机制 -> 神经元' },
@@ -1522,7 +1521,7 @@ const buildGuideConclusion = ({ tab, activeTab, analysisResult, topologyResults,
       main_system: {
         title: 'DNN 主工作台结论',
         lines: [
-          'DNN 主工作台应作为“编码结构还原主线”统一入口，强调证据链闭环。',
+          'DNN 主工作台应作为"编码结构还原主线"统一入口，强调证据链闭环。',
           '建议将 SNN/ICSPB 结果回流到 DNN 主工作台做统一验证。',
         ],
         metrics: [
@@ -1556,7 +1555,7 @@ const buildGuideConclusion = ({ tab, activeTab, analysisResult, topologyResults,
         title: 'ICSPB 模块结论',
         lines: [
           'ICSPB 当前用于语言主干、在线写读、回放与固化的联合验证。',
-          '重点验证“快速收益是否伴随旧能力退化”。'
+          '重点验证"快速收益是否伴随旧能力退化"。'
         ],
         metrics: [
           { label: '定位', value: '当前模型工作台' },
@@ -1851,7 +1850,13 @@ export default function App() {
   const isAppleMainView = inputPanelTab === 'main';
 
   // ---- Forward Pass 动画状态 ----
-  const [fpMode, setFpMode] = useState('demo');  // 'generate' | 'demo'
+  const [fpMode, setFpModeRaw] = useState(() => {
+    try { return localStorage.getItem('fpMode') || 'demo'; } catch { return 'demo'; }
+  });
+  const setFpMode = (mode) => {
+    setFpModeRaw(mode);
+    try { localStorage.setItem('fpMode', mode); } catch {}
+  };
   const [fpModel, setFpModel] = useState('qwen3-4b');
   const [fpSentence, setFpSentence] = useState('s1');
   const [fpInputText, setFpInputText] = useState('The cat sat on the mat');
@@ -1868,10 +1873,62 @@ export default function App() {
   const layerAnimRef = useRef(null);
   const layerAnimStartRef = useRef(null);
 
+  // Layer 内部子阶段步进 (0~11, 对应 LayerExplodedView3D 的12个子阶段)
+  const [fpSubPhase, setFpSubPhase] = useState(0);
+  const FP_SUB_PHASES = [
+    { id: 'input', label: 'Input', color: '#94a3b8' },
+    { id: 'ln1', label: 'LN₁', color: '#818cf8' },
+    { id: 'qkv', label: 'Q/K/V', color: '#60a5fa' },
+    { id: 'attn_score', label: 'Attn Score', color: '#38bdf8' },
+    { id: 'softmax', label: 'Softmax', color: '#22d3ee' },
+    { id: 'attn_out', label: 'Attn Out', color: '#2dd4bf' },
+    { id: 'residual1', label: '⊕ Res₁', color: '#a78bfa' },
+    { id: 'ln2', label: 'LN₂', color: '#818cf8' },
+    { id: 'ffn_up', label: 'W_up', color: '#f59e0b' },
+    { id: 'ffn_act', label: 'SiLU', color: '#fb923c' },
+    { id: 'ffn_down', label: 'W_down', color: '#f97316' },
+    { id: 'residual2', label: '⊕ Res₂', color: '#a78bfa' },
+  ];
+  const FP_PHASE_DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
+  const FP_TOTAL_DUR = FP_PHASE_DURATIONS.reduce((s, d) => s + d, 0);
+
+  // 步进到下一个子阶段
+  const stepNextSubPhase = useCallback(() => {
+    const nextPhase = fpSubPhase + 1;
+    if (nextPhase >= FP_SUB_PHASES.length) {
+      // 当前层所有子阶段完成，推进到下一层
+      const nLayers = fpData?.model_info?.n_layers || 36;
+      if (fpCurrentLayer != null && fpCurrentLayer < nLayers - 1) {
+        setFpCurrentLayer(prev => prev + 1);
+        setFpSubPhase(0);
+      } else {
+        // 所有层完成
+        setFpPlaying(false);
+      }
+    } else {
+      setFpSubPhase(nextPhase);
+    }
+  }, [fpSubPhase, fpCurrentLayer, fpData]);
+
+  // 计算当前子阶段对应的 animProgress 中心位置
+  const getSubPhaseProgress = useCallback((phaseIdx) => {
+    let cum = 0;
+    for (let i = 0; i < phaseIdx; i++) cum += FP_PHASE_DURATIONS[i];
+    const start = cum / FP_TOTAL_DUR;
+    cum += FP_PHASE_DURATIONS[phaseIdx];
+    const end = cum / FP_TOTAL_DUR;
+    return (start + end) / 2; // 子阶段中心
+  }, []);
+
   useEffect(() => {
-    if (!fpPlaying || fpCurrentLayer == null) {
+    if (fpCurrentLayer == null) {
       setLayerAnimProgress(0);
       layerAnimStartRef.current = null;
+      return;
+    }
+    if (!fpPlaying) {
+      // 暂停/步进模式：设置到当前子阶段中心位置
+      setLayerAnimProgress(getSubPhaseProgress(fpSubPhase));
       return;
     }
     layerAnimStartRef.current = performance.now();
@@ -1886,7 +1943,7 @@ export default function App() {
     return () => {
       if (layerAnimRef.current) cancelAnimationFrame(layerAnimRef.current);
     };
-  }, [fpPlaying, fpCurrentLayer, fpSpeed]);
+  }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseProgress]);
 
   // ---- 可视化数据系统 (neural-vis) ----
   const { dataFiles, activeData: visData, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect } = useVisData();
@@ -1907,7 +1964,6 @@ export default function App() {
     grammar_role_matrix: visualizations.filter(v => v.type === 'grammar_role_matrix'),
     causal_chain: visualizations.filter(v => v.type === 'causal_chain'),
     dark_matter_flow: visualizations.filter(v => v.type === 'dark_matter_flow'),
-    puzzle_progress: visualizations.filter(v => v.type === 'puzzle_progress'),
   };
   const nLayers = visData?.model_info?.n_layers || 36;
 
@@ -1965,6 +2021,7 @@ export default function App() {
       .then(data => {
         setFpData(data);
         setFpCurrentLayer(0);
+        setFpSubPhase(0);
         setFpPlaying(true);
         setShowDNNLayers(true);
       })
@@ -1984,6 +2041,7 @@ export default function App() {
     setFpPlaying(false);
     setFpCurrentLayer(null);
     setFpData(null);
+    setFpSubPhase(0);
     if (fpTimerRef.current) clearInterval(fpTimerRef.current);
     fpTimerRef.current = null;
   }, []);
@@ -1998,6 +2056,7 @@ export default function App() {
           setFpPlaying(false);
           return prev;
         }
+        setFpSubPhase(0); // 新层重置子阶段
         return prev + 1;
       });
     }, fpSpeed);
@@ -2056,7 +2115,7 @@ export default function App() {
   const isICSPBFunctionType = inputPanelTab === 'icspb';
 
   // Auto-switch Info Panel tab on hover and persist info
-  // Main 视图下保留“编码焦点”阅读，不强制跳到“细节”。
+  // Main 视图下保留"编码焦点"阅读，不强制跳到"细节"。
   useEffect(() => {
     if (hoveredInfo) {
       setDisplayInfo(hoveredInfo);
@@ -2066,7 +2125,7 @@ export default function App() {
     }
   }, [hoveredInfo, isAppleMainView]);
 
-  // 切换到 DNN 主工作台时，默认进入“当前焦点”页签，便于先看正在观察的数据对象。
+  // 切换到 DNN 主工作台时，默认进入"当前焦点"页签，便于先看正在观察的数据对象。
   useEffect(() => {
     if (inputPanelTab === 'main') {
       setInfoPanelTab('focus');
@@ -2109,7 +2168,6 @@ export default function App() {
     structurePanel: true,
     neuronPanel: true,
     headPanel: true,
-    agiChatPanel: false,
     motherEnginePanel: false,
   });
   const [isInfoPanelMinimized, setIsInfoPanelMinimized] = useState(false);
@@ -2656,7 +2714,7 @@ export default function App() {
 
   const analysisSummaryText = (() => {
     if (isAppleMainView) {
-      return `DNN 主工作台当前处于“${currentAlgorithmInfo.name}”：${currentAlgorithmInfo.focus}`;
+      return `DNN 主工作台当前处于"${currentAlgorithmInfo.name}"：${currentAlgorithmInfo.focus}`;
     }
     if (isICSPBFunctionType) {
       return `ICSPB 当前聚焦：${currentPanelBlueprint.operationFocus}`;
@@ -2823,20 +2881,6 @@ export default function App() {
         title="Project Genesis: 战略层级路线图"
       >
         <Brain size={20} />
-      </button>
-
-      {/* Language Capability Test Window Button */}
-      <button
-        onClick={() => togglePanelVisibility('agiChatPanel')}
-        style={{
-          ...navButtonStyle(panelVisibility.agiChatPanel, '#10b981'),
-          left: 120,
-          color: panelVisibility.agiChatPanel ? 'white' : '#9ef7cf',
-          boxShadow: panelVisibility.agiChatPanel ? '0 0 12px rgba(16, 185, 129, 0.35)' : 'none'
-        }}
-        title="语言能力测试"
-      >
-        <Bot size={20} />
       </button>
 
       {/* Global Config Panel */}
@@ -3105,6 +3149,42 @@ export default function App() {
                         ⏹
                       </button>
                     </div>
+
+                    {/* 下一步按钮 - 逐步执行layer内部组件 */}
+                    {fpCurrentLayer != null && (
+                      <div style={{ marginTop: 8 }}>
+                        <button
+                          onClick={() => {
+                            if (fpPlaying) setFpPlaying(false); // 暂停自动播放
+                            stepNextSubPhase();
+                          }}
+                          style={{
+                            width: '100%', padding: '10px 14px',
+                            background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+                            border: 'none', borderRadius: 8, color: '#fff',
+                            cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                            transition: 'all 0.2s',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                          }}
+                        >
+                          ⏭ 下一步: {FP_SUB_PHASES[Math.min(fpSubPhase + 1, FP_SUB_PHASES.length - 1)]?.label || '完成'}
+                        </button>
+                        {/* 子阶段进度条 */}
+                        <div style={{ marginTop: 6, display: 'flex', gap: 2 }}>
+                          {FP_SUB_PHASES.map((phase, i) => (
+                            <div key={phase.id} style={{
+                              flex: 1, height: 4, borderRadius: 2,
+                              background: i < fpSubPhase ? phase.color : i === fpSubPhase ? '#a855f7' : 'rgba(255,255,255,0.08)',
+                              transition: 'background 0.2s',
+                            }} />
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3, fontSize: 9, color: '#7f95bb' }}>
+                          <span>当前: {FP_SUB_PHASES[fpSubPhase]?.label}</span>
+                          <span>{fpSubPhase + 1}/{FP_SUB_PHASES.length}</span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Forward Pass 进度 */}
                     {fpCurrentLayer != null && (
@@ -3846,89 +3926,6 @@ export default function App() {
                   </div>
                 ) : isAppleMainView ? (
                   <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    {/* 右侧面板Tab: 拼图 / 详情 */}
-                    <div style={{ display: 'flex', gap: '6px', marginBottom: 10, flexShrink: 0 }}>
-                      {[
-                        { key: 'puzzle', label: '🧩 拼图' },
-                        { key: 'detail', label: '📋 详情' },
-                      ].map(t => (
-                        <button key={t.key} onClick={() => setInfoPanelTab(t.key)}
-                          style={{
-                            flex: 1, padding: '7px 8px',
-                            background: infoPanelTab === t.key ? 'rgba(79, 172, 254, 0.12)' : 'rgba(255,255,255,0.04)',
-                            border: infoPanelTab === t.key ? '1px solid rgba(79, 172, 254, 0.35)' : '1px solid rgba(255,255,255,0.12)',
-                            borderRadius: '999px',
-                            color: infoPanelTab === t.key ? '#e7f4ff' : '#9aa4b4',
-                            cursor: 'pointer', fontSize: 11, fontWeight: 700,
-                            transition: 'all 0.2s',
-                          }}>
-                          {t.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* 拼图Tab内容 */}
-                    {infoPanelTab === 'puzzle' && (
-                      <>
-                        {/* 模型信息卡片 - 拼图Tab顶部 */}
-                        {(() => {
-                          const mc = MODEL_CONFIGS[fpModel];
-                          if (!mc) return null;
-                          return (
-                            <div style={{ marginBottom: 10, padding: '8px 10px', background: `rgba(8, 12, 24, 0.6)`, borderRadius: 8, border: `1px solid ${mc.color}33`, flexShrink: 0 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-                                <div style={{ width: 7, height: 7, borderRadius: '50%', background: mc.color, boxShadow: `0 0 5px ${mc.color}` }} />
-                                <span style={{ fontWeight: 700, fontSize: 12, color: mc.color }}>{mc.name}</span>
-                                <span style={{ fontSize: 9, color: '#7f95bb', marginLeft: 4 }}>{mc.layers}L · d{mc.dModel} · {mc.nHeads}H</span>
-                              </div>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                                {Array.from({ length: mc.layers }, (_, i) => {
-                                  const isCurrent = fpCurrentLayer === i;
-                                  return (
-                                    <div key={i} style={{
-                                      width: 12, height: 8, borderRadius: 2,
-                                      background: isCurrent ? mc.color : i < (fpCurrentLayer ?? -1) ? `${mc.color}88` : 'rgba(255,255,255,0.08)',
-                                      border: isCurrent ? `1px solid ${mc.color}` : 'none',
-                                      transition: 'background 0.2s',
-                                    }} title={`Layer ${i}`} />
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })()}
-                        {appleNeuronWorkspace.analysisMode === 'reverse_engineering' ? (
-                          <ReverseEngineeringDataPanel
-                            workspace={appleNeuronWorkspace}
-                            hoveredInfo={hoveredInfo}
-                            displayInfo={displayInfo}
-                          />
-                        ) : (
-                          <LanguageResearchDataPanel
-                            workspace={appleNeuronWorkspace}
-                            hoveredInfo={hoveredInfo}
-                            displayInfo={displayInfo}
-                            infoPanelTab={infoPanelTab}
-                            setInfoPanelTab={setInfoPanelTab}
-                            showAppleCategoryCompare={showAppleCategoryCompare}
-                            showAppleEncodingInfo={showAppleEncodingInfo}
-                            showAppleResearchAsset={showAppleResearchAsset}
-                            showAppleLegend={showAppleLegend}
-                            currentAlgorithmName={currentAlgorithmInfo.name}
-                            currentAlgorithmFocus={currentAlgorithmInfo.focus}
-                            structureTab={structureTab}
-                          />
-                        )}
-                        {/* neural-vis 拼图面板 (98格研究框架) */}
-                        <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 12 }}>
-                          <div style={{ fontSize: 12, color: '#dfe8ff', fontWeight: 700, marginBottom: 8 }}>
-                            🧩 研究拼图框架 (98格)
-                          </div>
-                          <PuzzlePanel puzzleData={byType.puzzle_progress?.[0]} />
-                        </div>
-                      </>
-                    )}
-
                     {/* 详情Tab内容 */}
                     {infoPanelTab === 'detail' && (
                       <div style={{ fontSize: 12, lineHeight: 1.6, overflowY: 'auto' }}>
@@ -4711,9 +4708,6 @@ export default function App() {
           {!isLayersPanelMinimized && (
             hasOperationPanelContent ? (
               isAppleMainView ? (
-                appleNeuronWorkspace.analysisMode === 'reverse_engineering' ? (
-                  <ReverseEngineeringOperationPanel workspace={appleNeuronWorkspace} />
-                ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {showAppleConceptSets && <AppleNeuronGeneratedConceptSetsPanel workspace={appleNeuronWorkspace} compact />}
                   {showAppleMultidimSettings && <AppleNeuronMultidimSettingsPanel workspace={appleNeuronWorkspace} compact />}
@@ -4732,7 +4726,6 @@ export default function App() {
                     </div>
                   )}
                 </div>
-                )
               ) : isICSPBFunctionType ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{
@@ -4960,7 +4953,7 @@ export default function App() {
 
               {!showOperationData && !showOperationCompare && !showOperationHistory && (
                 <div style={{ color: '#777', fontSize: '11px', fontStyle: 'italic', padding: '4px 2px' }}>
-                  已折叠高级区。可按上方按钮展开“数据模板 / 结果对比 / 操作历史”。
+                  已折叠高级区。可按上方按钮展开"数据模板 / 结果对比 / 操作历史"。
                 </div>
               )}
               </>
@@ -5032,7 +5025,6 @@ export default function App() {
             enablePan
             enableZoom
             minDistance={isAppleMainView ? 10 : undefined}
-            maxDistance={isAppleMainView ? 44 : undefined}
           />
 
           <ambientLight intensity={0.5} />
@@ -5081,6 +5073,7 @@ export default function App() {
                 modelKey={fpModel}
                 layerAnimProgress={layerAnimProgress}
                 fpSpeed={fpSpeed}
+                lang={lang}
               />
               {/* Reverse Engineering 3D Overlay */}
               {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
@@ -5340,11 +5333,6 @@ export default function App() {
             t={t}
           />
         </SimplePanel>
-      )}
-
-      {/* AGIChatPanel Terminal */}
-      {panelVisibility.agiChatPanel && (
-        <AGIChatPanel onClose={() => setPanelVisibility(prev => ({ ...prev, agiChatPanel: false }))} t={t} />
       )}
 
       {/* Project Genesis Blueprint Overlay */}

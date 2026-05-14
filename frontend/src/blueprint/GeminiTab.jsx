@@ -163,8 +163,8 @@ export const GeminiTab = () => {
                     testDate: '2026-02-26',
                     evidence_chain: ['层级方差深/浅比压缩至 0.18x', '浅层 L0 增量达 3.25，深层增量约 0.60', '整体结构呈显著沙漏形（Hourglass）'],
                     result: '浅层负责巨量方差生成与特征扩张，深层进行微小方差平滑与收敛刻画。',
-                    agi_significance: '揭示了 AGI 网络提取语义规律的“浅层大开大合，深层收敛定调”的拓扑雕刻过程。',
-                    analysis: '对偶验证了理论中“特征在浅层生成干涉波谷，在深层滑向低维能量稳态流形”的抽象步骤。',
+                    agi_significance: '揭示了 AGI 网络提取语义规律的"浅层大开大合，深层收敛定调"的拓扑雕刻过程。',
+                    analysis: '对偶验证了理论中"特征在浅层生成干涉波谷，在深层滑向低维能量稳态流形"的抽象步骤。',
                     current_gap: '尚未在超大规模网络（如千亿参数）上独立证实此流形收敛轨迹，需要算力进一步验证。',
                     params: { method: "SVD", target: "Residual Stream", metric: "L0 Norm Increment, Variance Ratio" },
                     details: { deep_shallow_ratio: 0.18, shallow_delta_mean: 3.25, deep_delta_mean: 0.60, shape: "Hourglass" }
@@ -175,8 +175,8 @@ export const GeminiTab = () => {
             id: 'phase_2',
             title: '阶段二：功能组件算力维度压缩与角色分离',
             status: 'done',
-            objective: '剥离注意力机制非必要参数，区分不同网络结构的“知识容器”与“逻辑骨架”定位。',
-            summary: '确认 Attention 组件工作在极低维度空间且行为单调，确立了“满秩纤维存记忆，低秩流形走逻辑”的资源分配准则。',
+            objective: '剥离注意力机制非必要参数，区分不同网络结构的"知识容器"与"逻辑骨架"定位。',
+            summary: '确认 Attention 组件工作在极低维度空间且行为单调，确立了"满秩纤维存记忆，低秩流形走逻辑"的资源分配准则。',
             tests: [
                 {
                     id: 'E3',
@@ -194,12 +194,12 @@ export const GeminiTab = () => {
                 {
                     id: 'E4',
                     name: '权重矩阵低秩分析',
-                    target: '区分参数矩阵中“知识容器”与“逻辑骨架”的数学身份，为下一代 FiberNet 资源分配提供物理依据。',
+                    target: '区分参数矩阵中"知识容器"与"逻辑骨架"的数学身份，为下一代 FiberNet 资源分配提供物理依据。',
                     testDate: '2026-02-27',
                     evidence_chain: ['MLP 权重满秩维度(Rank 95)均值约 600（占比约 75%）', 'Attention QK 矩阵满秩维度均值仅 52（占比 6.8%）'],
-                    result: '出现了极具视觉冲击力的对比：MLP 是“极满秩”的信息黑洞，而 Attention 是极罕见的“极度低秩”拓扑算子。',
+                    result: '出现了极具视觉冲击力的对比：MLP 是"极满秩"的信息黑洞，而 Attention 是极罕见的"极度低秩"拓扑算子。',
                     agi_significance: '清晰定义了 AGI 模型规模扩展法则（Scaling Law）：用满秩的纤维存记忆，用低秩的底流形走逻辑。',
-                    analysis: '终结了传统网络“参数即能力”的粗糙论断，指出网络必然包含着更细分、结构化的高效功能分工。',
+                    analysis: '终结了传统网络"参数即能力"的粗糙论断，指出网络必然包含着更细分、结构化的高效功能分工。',
                     current_gap: '逻辑算子和记忆容器的物理硬件隔离尚处于图纸阶段，软件抽象模拟会带来一定开销。',
                     params: { target_1: "MLP Weights", target_2: "Attention QK", metric: "Rank at 95% Variance" },
                     details: { mlp_avg_rank_95: "~600", mlp_ratio: "~75%", qk_avg_rank_95: 52.0, qk_ratio: "6.8%" }
@@ -216,11 +216,11 @@ export const GeminiTab = () => {
                 {
                     id: 'E5',
                     name: 'Z113 结构相变追踪',
-                    target: '捕捉从“死记硬背”到“规律泛化”（Grokking）的临界点几何相变，破译泛化能力的涌现密码。',
+                    target: '捕捉从"死记硬背"到"规律泛化"（Grokking）的临界点几何相变，破译泛化能力的涌现密码。',
                     testDate: '2026-02-27',
                     evidence_chain: ['网络空间表示拓扑圆度（Circularity）从 0.515 稳定跃升至 0.536', '随后泛化准确率开始从 0 突变并爬升'],
                     result: 'Grokking 不是盲目的性能突变，而是底层几何表征从记忆乱码重排形成了完美圆环状（代数群结构）。',
-                    agi_significance: '首次将“泛化理解能力”具象化为一个可测量的黎曼流形指标，奠定几何优化智能实验的基础。',
+                    agi_significance: '首次将"泛化理解能力"具象化为一个可测量的黎曼流形指标，奠定几何优化智能实验的基础。',
                     analysis: '说明掌握规律必经拓扑重组期。验证了离线演化（睡眠）时施加 Ricci Flow 平滑处理可诱导网络物理结构的顿悟。',
                     current_gap: '主动诱导 Grokking 提前发生的方法论由于收敛机制非常微妙，尚未实现 100% 稳定再现。',
                     params: { dataset: "Z113 Modulo", tracking_metric: "Topological Circularity" },
@@ -232,9 +232,9 @@ export const GeminiTab = () => {
                     target: '无 BP 条件下，验证纯局部的物理竞争法则能否激发出类似人类大脑的底层稀疏编码格式。',
                     testDate: '2026-02-27',
                     evidence_chain: ['仅用 5000 步的纯局部侧抑制结合 Hebbian 更新', '特征激活峰度激增，自发从随机的 2.70 爆升至 19.75'],
-                    result: '无全局梯度下，成功爆发高度稀疏系统底座，但在更复杂维度下“专家化分工”程度稍显不足。',
+                    result: '无全局梯度下，成功爆发高度稀疏系统底座，但在更复杂维度下"专家化分工"程度稍显不足。',
                     agi_significance: '证实摈弃 BP 后只要引入物理互斥抑制机制，极效系统的基础编码底座同样也会自发稳健建立。',
-                    analysis: '实验是一场惊险跳跃，成功证明稀疏结构不依赖全局梯度。但“专家化分工”的缺陷确立了下阶段构建预测编码（Predictive Coding）机制的高优地位。',
+                    analysis: '实验是一场惊险跳跃，成功证明稀疏结构不依赖全局梯度。但"专家化分工"的缺陷确立了下阶段构建预测编码（Predictive Coding）机制的高优地位。',
                     current_gap: '缺乏全局监督和精确向下的误差分摊机制（信用分配危机），导致在复杂数据集上聚类粒度太粗糙。',
                     params: { algorithm: "Lateral Inhibition + Hebbian", steps: 5000, constraint: "No BP Gradient" },
                     details: { initial_kurtosis: 2.70, final_kurtosis: 19.75, expert_specialization: "Insufficient for hard tasks" }
@@ -245,13 +245,13 @@ export const GeminiTab = () => {
             id: 'phase_4',
             title: '阶段四：编码机制还原与六大特性验证',
             status: 'done',
-            objective: '从第一性原理出发，确立“连接可塑性+脉冲”作为一切特征编码基底，并剥离出智能的六大自然延展特性。',
-            summary: '彻底纠正“由架构设计智能”的倒置因果链。用5组精简实验在纯物理底层成功证实：多层结构、高维模式匹配推理、规模化扩张与极端锁焦选择均为基础规则数据的冲刷涌现副产物。',
+            objective: '从第一性原理出发，确立"连接可塑性+脉冲"作为一切特征编码基底，并剥离出智能的六大自然延展特性。',
+            summary: '彻底纠正"由架构设计智能"的倒置因果链。用5组精简实验在纯物理底层成功证实：多层结构、高维模式匹配推理、规模化扩张与极端锁焦选择均为基础规则数据的冲刷涌现副产物。',
             tests: [
                 {
                     id: 'E7',
                     name: '编码自发涌现与推理深度映射',
-                    target: '验证无需设计的多层结构能否自发成型，与推理即为单纯的“高维模式匹配扩散深度”属性。',
+                    target: '验证无需设计的多层结构能否自发成型，与推理即为单纯的"高维模式匹配扩散深度"属性。',
                     testDate: '2026-03-05',
                     evidence_chain: ['纯耗散系统冲刷下爆发初始稀疏(4.5%)与结构正交(0.5%)', '模式激活链中，5步到达全集，验证扩散深度的绝对正相关'],
                     result: '连接空间重构为一组自然散布的正交流形字典，证实推理没有任何特殊的逻辑门或黑盒，仅仅是脉冲在高维编码图案上的链形游走步数变长（对应 DeepSeek 的 token 放量）。',
@@ -264,12 +264,12 @@ export const GeminiTab = () => {
                 {
                     id: 'E8',
                     name: '极致可塑性效率与宏观竞争放大器',
-                    target: '寻找大规模人工神经网络最缺失的致命一环：“一次性全息学习”（One-Shot Learning）与海量噪音中对“关键要素”的极端锁焦能力。',
+                    target: '寻找大规模人工神经网络最缺失的致命一环："一次性全息学习"（One-Shot Learning）与海量噪音中对"关键要素"的极端锁焦能力。',
                     testDate: '2026-03-05',
                     evidence_chain: ['携带多巴胺情绪标签的冲击使关键联结固化比纯梯度迭代快200倍(SNR: 2.66 vs 1.20)', '强局部侧边竞争将背景弱势信号的衰减比值暴增到可怕的 917,273 倍！(5/50存活)'],
                     result: '利用全局情绪奖惩和亚阈值预备态背景托底，成功模拟了生物只需单次接触（如：看见老虎印记）就能暴力固化神经连接的极端高效机制；并利用横向绞杀网络实现了 O(1) 替代 Attention O(N²) 的算力降维。',
                     agi_significance: '此阶段直击目前 LLM（百万次喂饱）与人类（瞬间启悟）在根源上的绝对鸿沟；提供了跳出纯梯度的规模诅咒的关键解方。',
-                    analysis: '侧抑制不仅提供稀疏能力，它其实是一组无形切割刀，粗暴掐断不具焦点的关联，使注意力始终保持尖锐分化。但目前也揭露其存在可能形成“幸存者偏差”（认知盲区）的风险。',
+                    analysis: '侧抑制不仅提供稀疏能力，它其实是一组无形切割刀，粗暴掐断不具焦点的关联，使注意力始终保持尖锐分化。但目前也揭露其存在可能形成"幸存者偏差"（认知盲区）的风险。',
                     current_gap: '现行硅基硬件对极度稀疏的脉冲并行处理极端不友善；全全局的情绪强力投影如果掌控失误，极易引发致命的网络权重污染（如数字空间的 PTSD 退化）。',
                     params: { test_1: "Dopamine Hebbian vs GD", test_2: "Wild Signal Masking", constraint: "O(1) Attention Substitute" },
                     details: { dnn_iteration_cost: 200, biological_cost: 1, signal_amplification_ratio: "917,273x", surviving_nodes: "5/50 (Dense Killer)" }
@@ -280,18 +280,18 @@ export const GeminiTab = () => {
             id: 'phase_5',
             title: '阶段五：局部幸存者偏差的终结论与预测体系（Predictive Coding）坍塌探索',
             status: 'done',
-            objective: '直面纯凭局部物理竞争和单薄的 Hebbian 学习所陷入的“局部死锁与盲目特征黏连”污染。构建向下覆写幻觉以消除上行真实感官残差的宏观热力学框架。',
+            objective: '直面纯凭局部物理竞争和单薄的 Hebbian 学习所陷入的"局部死锁与盲目特征黏连"污染。构建向下覆写幻觉以消除上行真实感官残差的宏观热力学框架。',
             summary: '实验确立了以预测按灭局部误差为动力的智能流形结构，成功斩获极强抗噪与省电效应；但也从最痛的失败（0%正交解绑率）中，揭露了跨越单维度智能必须引入非线性或独立张量分离支架以对抗混叠的概念灾难。',
             tests: [
                 {
                     id: 'E9',
                     name: '残差对冲抵御局部盲目聚类（局部噪声自愈稳态隔离）',
-                    target: '探测宏大网络如何不在海量无关紧要的噪点刺激下，保持其核心概念流形提取区的纯净度（对抗“幸存者偏差”和“赢家通吃”效应的毒化）。',
+                    target: '探测宏大网络如何不在海量无关紧要的噪点刺激下，保持其核心概念流形提取区的纯净度（对抗"幸存者偏差"和"赢家通吃"效应的毒化）。',
                     testDate: '2026-03-05',
                     evidence_chain: ['无先验下的纯盲目局部竞争污染率高达 39.3%（高频截杀稳态）', '引入预测误差对冲后由于不可测噪音被视为下放残差抛掷，污染迅速降至 0.0%'],
-                    result: '利用高层慢变量积分进行幻觉投射压制，彻底让可塑性网络学会了甄别特征的“驻留性”而非“瞬间爆发性”。',
+                    result: '利用高层慢变量积分进行幻觉投射压制，彻底让可塑性网络学会了甄别特征的"驻留性"而非"瞬间爆发性"。',
                     agi_significance: '解答大脑为何能在每秒百万比特的无效视觉刺激下保持概念焦距：不再是依靠昂贵的全网梯度惩罚，而是让不可预期之事自动失联。',
-                    analysis: '该机制确立了“局部规则要向全局涌现跃迁，就必定产生上打下的预期”这一强物理演化结论。',
+                    analysis: '该机制确立了"局部规则要向全局涌现跃迁，就必定产生上打下的预期"这一强物理演化结论。',
                     current_gap: '依靠单纯减法去切掉不符合期望的噪声信号非常精妙，但在缺乏外部强制力干预（如奖赏情绪）时，它极容易滑入一个自大的局部死渊（比如：只要闭着眼睛什么都不感知，误差也就是零了）。',
                     params: { focus: "Residual Error Cancellation", metric: "Noise Capture Ratio" },
                     details: { hebb_noise_contamination_percent: 39.3, predictive_coding_contamination_percent: 0.0, suppression_effect: "Absolute Isolation" }
@@ -304,8 +304,8 @@ export const GeminiTab = () => {
                     evidence_chain: ['知识收敛极值化境(Grokking)时的激发电报燃烧总额从初期的 100 悬崖抛投至 38', '色/形概念切分离子化代数正交率为致命的 0.00%（极端混合黏连重叠，未能解绑！）'],
                     result: '我们观察到了认知收敛（顿悟）最完美的物理征兆——为了解释规律所挥霍的总网络微观脉冲消耗直接滑落成只有原先的 38.0%！然而极小化误差的努力在应对连体结构分离时迎来了纯线性的悲惨极限。',
                     agi_significance: '以血泪硬伤标定了 AGI 下限门槛：证明从纯感知向更高级的人性抽象组合能力（如语言指代）演化，缺了一块无法通过残差生长的非线性拼图。',
-                    analysis: '单纯一味极小化误差可能只让人脑变成了完美匹配模板的机械相机。系统为了少出错反而向妥协投降，强求所有节点承担“四不像”中庸职责而不敢分裂。这为后来提出非线性张量积机制埋下坚实的反例伏笔。',
-                    current_gap: '本阶段推演的失败宣告：要在庞大的 3D 脉冲网中诱发多模态符号剥离，上层空间不仅要预测，还需要利用极度严苛的侧层“资源节衣缩食”互相抢位来逼迫节点走上高度特化单干道路，而非和光同尘。',
+                    analysis: '单纯一味极小化误差可能只让人脑变成了完美匹配模板的机械相机。系统为了少出错反而向妥协投降，强求所有节点承担"四不像"中庸职责而不敢分裂。这为后来提出非线性张量积机制埋下坚实的反例伏笔。',
+                    current_gap: '本阶段推演的失败宣告：要在庞大的 3D 脉冲网中诱发多模态符号剥离，上层空间不仅要预测，还需要利用极度严苛的侧层"资源节衣缩食"互相抢位来逼迫节点走上高度特化单干道路，而非和光同尘。',
                     params: { tests: ["Grokking Burn Rate", "Feature Axis Disentanglement"], metric: "Energy Drop, Orthogonal Separation" },
                     details: { initial_firing_energy: 100.0, grokking_settlement_energy: 38.0, energy_saving_ratio: "Collapse to 38%", orthogonal_disentanglement_percent: 0.00, conclusion: "Catastrophic Confounding Failure" }
                 }
@@ -315,8 +315,8 @@ export const GeminiTab = () => {
             id: 'phase_6',
             title: '阶段六：路线 B 转轨——深度神经网络（DNN）隐结构逆向萃取与流形代数',
             status: 'done',
-            objective: '全盘放弃生物突触物理学那极易陷入死锁的微观实验，转而将成熟庞大的大模型视为“化石”。用线性代数解剖刀（SVD、激活块投影），强行切出在庞大参数中能完成推理、语言、逻辑并行不悖的“纯粹几何组件”，为组装可控 AGI 做积木储备。',
-            summary: '在第一轮“盲拆词汇表与结构头”的手术中，我们不靠一次梯度训练，纯凭欧几里得测距与 SVD，成功捕获了 91.7% 纯度的抽象“性别单唯轴”并发动了跨模态词义修改（如把王子强掰成公主）；更通过注入惊天的1W倍高维风暴污染，验证了由BP训练出的 Attention 正交投影阵列能达成 0.0 漏报差的完美处理互不干涉隔离。',
+            objective: '全盘放弃生物突触物理学那极易陷入死锁的微观实验，转而将成熟庞大的大模型视为"化石"。用线性代数解剖刀（SVD、激活块投影），强行切出在庞大参数中能完成推理、语言、逻辑并行不悖的"纯粹几何组件"，为组装可控 AGI 做积木储备。',
+            summary: '在第一轮"盲拆词汇表与结构头"的手术中，我们不靠一次梯度训练，纯凭欧几里得测距与 SVD，成功捕获了 91.7% 纯度的抽象"性别单唯轴"并发动了跨模态词义修改（如把王子强掰成公主）；更通过注入惊天的1W倍高维风暴污染，验证了由BP训练出的 Attention 正交投影阵列能达成 0.0 漏报差的完美处理互不干涉隔离。',
             tests: [
                 {
                     id: 'E11',
@@ -325,7 +325,7 @@ export const GeminiTab = () => {
                     testDate: '2026-03-05',
                     evidence_chain: ['由肮脏偏差对向量进行纯粹无监督 SVD 第一主成分提取', '被提取的纯净轴与真理绝对方向拟合高达 91.77%'],
                     result: '证明大模型之所以强大，是因为它的核心常识库不存在混乱摸索的非线性泥潭，而是形成了最纯粹极简的高维线性加减代数，实现了类似 (King - Man + Woman = Queen) 的空间平移定律。',
-                    agi_significance: '我们终于找对了工具，我们可以直接“提纯出负责逻辑的主成分线条”，当做未来白盒 AGI 引擎的神经骨架，不用再等漫长的人造突触进化。',
+                    agi_significance: '我们终于找对了工具，我们可以直接"提纯出负责逻辑的主成分线条"，当做未来白盒 AGI 引擎的神经骨架，不用再等漫长的人造突触进化。',
                     analysis: '完全打通了符号主义与连结主义间的沟壑：连结主义在无穷高维度深处所涌现收敛的，就是一组极其硬核粗暴的符号算数几何极值。',
                     current_gap: '手工模拟 SVD 只是理论沙盘验证，要在千亿参数里实时拆解这种算子矩阵依旧面临巨幅算力考验。',
                     params: { operator: "Unsupervised SVD", intervention: "Hard Algebraic Translation" },
@@ -334,12 +334,12 @@ export const GeminiTab = () => {
                 {
                     id: 'E12',
                     name: '注意力维度投影多维属性绝缘测试',
-                    target: '探索当“符合逻辑但语法错误且风格诡异”的信息输入时，网络是如何同时切三刀而不串线的绝招。',
+                    target: '探索当"符合逻辑但语法错误且风格诡异"的信息输入时，网络是如何同时切三刀而不串线的绝招。',
                     testDate: '2026-03-05',
                     evidence_chain: ['通过子空间（语法、逻辑、全局）专精切片干预生成', '输入处强行塞入高达 10000 强度的无序狂暴因子风暴'],
-                    result: '惊人发现：主控“就近语法”的核心节点在受到其它维度万倍核聚变级狂暴污染后，由于多头中 W_Q/W_K/W_V 投影矩阵的正交性屏蔽，其计算差值纹丝不动，残差严格为 0.000000。',
-                    agi_significance: '解答了大模型一“脑”多用的算力物理架构原理。为接下来的终极阶段——提取这些“专职器官”，组装纯代数版的 AGI Mother Engine V2 破清了所有障碍。',
-                    analysis: '原来大脑那套侧抑制的生理机制，在硅基算法中被极其优雅的“正矩阵投影阻隔”完全跨界实现了，这才是工程最强解法。',
+                    result: '惊人发现：主控"就近语法"的核心节点在受到其它维度万倍核聚变级狂暴污染后，由于多头中 W_Q/W_K/W_V 投影矩阵的正交性屏蔽，其计算差值纹丝不动，残差严格为 0.000000。',
+                    agi_significance: '解答了大模型一"脑"多用的算力物理架构原理。为接下来的终极阶段——提取这些"专职器官"，组装纯代数版的 AGI Mother Engine V2 破清了所有障碍。',
+                    analysis: '原来大脑那套侧抑制的生理机制，在硅基算法中被极其优雅的"正矩阵投影阻隔"完全跨界实现了，这才是工程最强解法。',
                     current_gap: '我们还未在真刀真枪的百亿 Transformer 图层里做活体解剖，下一步需引入 TransformerLens 工具包进行深海打捞。',
                     params: { tests: "Orthogonal Matrix Cutting, Extreme Noise Injection", noise_intensity: 10000 },
                     details: { syntax_head_target: "Local Diagonal [0, 0, 1, 2, 3]", logic_head_target: "Global Subject Hold [0, 0, 0, 0, 0]", syntax_pollution_residual: 0.000000, conclusion: "Absolute Dimension Isolation" }
@@ -383,7 +383,7 @@ export const GeminiTab = () => {
             id: 'phase_8',
             title: '阶段八：深度分析——AGI 语言编码机制破译',
             status: 'done',
-            objective: '破译语言背后的几何编码机制，验证“分层控制系统”假说。',
+            objective: '破译语言背后的几何编码机制，验证"分层控制系统"假说。',
             summary: '确认了残差流的螺旋几何（Emergent Spiral）为架构级不变量，并量化了语法、逻辑、风格的三层耦合控制。',
             tests: [
                 {
@@ -391,9 +391,9 @@ export const GeminiTab = () => {
                     name: '残差流螺旋几何（Emergent Spiral）验证',
                     target: '探测模 113 加法任务中从记忆到泛化的隐藏状态轨迹演变。',
                     result: '在 Epoch 5000 观测到剧烈相变，有效秩从 35.7 坍缩至 7.57（压缩率达 78%）。',
-                    analysis: '证实了泛化不是简单的平滑，而是底层流形的剧烈坍缩。这种低维紧致结构是“螺旋吸引子”的稳态物理特征。',
-                    agi_significance: '将“泛化理解”具象化为几何坍缩指标，为 AGI 预警提供先验。',
-                    current_gap: '秩坍缩领先于准确率跃升约 2000 个 Epoch，需建立精确的“坍缩-性能”耦合方程。',
+                    analysis: '证实了泛化不是简单的平滑，而是底层流形的剧烈坍缩。这种低维紧致结构是"螺旋吸引子"的稳态物理特征。',
+                    agi_significance: '将"泛化理解"具象化为几何坍缩指标，为 AGI 预警提供先验。',
+                    current_gap: '秩坍缩领先于准确率跃升约 2000 个 Epoch，需建立精确的"坍缩-性能"耦合方程。',
                     testDate: '2026-04-05',
                     params: { trajectory: 'hidden_state_dynamics', attractor: 'spiral' },
                     details: { effective_rank_compression: 0.85, cross_model_consistency: 'High' }
@@ -468,15 +468,6 @@ export const GeminiTab = () => {
             >
                 <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '20px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Brain size={24} /> Project Genesis: 第一性原理 AGI 研究全景报告
-                </div>
-
-                {/* 1. 整体研究框架与进展 */}
-                <div style={{ marginBottom: '28px' }}>
-                    <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#e9d5ff', marginBottom: '12px', borderBottom: '1px solid rgba(168,85,247,0.3)', paddingBottom: '8px' }}>一、分析框架</div>
-                    <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7' }}>
-                        构建基于微分几何、神经纤维丛拓扑（NFBT）和纯代数演化的智能引擎（Mother Engine），抛弃传统 BP 黑盒与堆叠算力路线。<br />
-                        <span style={{ color: '#a855f7', fontWeight: 'bold' }}>进展突破: </span>建立“极效三定律”（侧抑制正交、引力雕刻、能量坍塌）；通过解剖 DNN 证实大脑的激活稀疏性编码方式；发现 Attention 的极低秩关联拓扑；在无 BP 下利用局部规则实现空白网络自发涌现稀疏特征（峰度激增至 19.7）。
-                    </div>
                 </div>
 
                 {/* S1-S7 原理与硬伤总结 */}
@@ -595,7 +586,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#f472b6', marginBottom: '12px', borderBottom: '1px solid rgba(244,114,182,0.28)', paddingBottom: '8px' }}>二点九、统一更新律到 D 桥接</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        对比“桥接里学到的小律”和“D 上重新拟合的小律”，直接观察统一结构一进入接地闭环后，主导项是否从 routing 切到 stabilization。
+                        对比"桥接里学到的小律"和"D 上重新拟合的小律"，直接观察统一结构一进入接地闭环后，主导项是否从 routing 切到 stabilization。
                     </div>
                     <UnifiedUpdateLawDBridgeDashboard />
                 </div>
@@ -603,7 +594,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#22c55e', marginBottom: '12px', borderBottom: '1px solid rgba(34,197,94,0.28)', paddingBottom: '8px' }}>二点十、相位门控统一律</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        用一条带相位门控的小律联合覆盖内部桥接和 `D`，直接看“阶段依赖”是否已经成为必要结构，以及它现在解决的是排序还是标定。
+                        用一条带相位门控的小律联合覆盖内部桥接和 `D`，直接看"阶段依赖"是否已经成为必要结构，以及它现在解决的是排序还是标定。
                     </div>
                     <PhaseGatedUnifiedLawDashboard />
                 </div>
@@ -619,7 +610,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#a855f7', marginBottom: '12px', borderBottom: '1px solid rgba(168,85,247,0.28)', paddingBottom: '8px' }}>二点十二、双层统一律</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把统一律正式拆成“排序层 + 标定层”，直接判断这条主线是真进步，还是只是在当前样本上过拟合。
+                        把统一律正式拆成"排序层 + 标定层"，直接判断这条主线是真进步，还是只是在当前样本上过拟合。
                     </div>
                     <TwoLayerUnifiedLawDashboard />
                 </div>
@@ -627,7 +618,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#10b981', marginBottom: '12px', borderBottom: '1px solid rgba(16,185,129,0.28)', paddingBottom: '8px' }}>二点十三、可学习双层统一律</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        用带正则的可学习标定层替代解析拟合，直接检查双层统一律是不是已经从“原型”进入“可训练方向”。
+                        用带正则的可学习标定层替代解析拟合，直接检查双层统一律是不是已经从"原型"进入"可训练方向"。
                     </div>
                     <LearnableTwoLayerUnifiedLawDashboard />
                 </div>
@@ -635,7 +626,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#60a5fa', marginBottom: '12px', borderBottom: '1px solid rgba(96,165,250,0.28)', paddingBottom: '8px' }}>二点十四、可学习排序层双层统一律</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把排序层也推进到可学习版本，直接比较“只学习标定层”和“排序层 + 标定层都学习”哪条路更稳、更适合进入真实任务闭环。
+                        把排序层也推进到可学习版本，直接比较"只学习标定层"和"排序层 + 标定层都学习"哪条路更稳、更适合进入真实任务闭环。
                     </div>
                     <LearnableRankingTwoLayerUnifiedLawDashboard />
                 </div>
@@ -675,7 +666,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#10b981', marginBottom: '12px', borderBottom: '1px solid rgba(16,185,129,0.28)', paddingBottom: '8px' }}>二点十九、跨模态共享机制参数化实验</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接比较“完全共享”“共享机制加模态参数”“模态独立拟合”，测试视觉、触觉、语言是否更像同一机制的不同参数区。
+                        直接比较"完全共享""共享机制加模态参数""模态独立拟合"，测试视觉、触觉、语言是否更像同一机制的不同参数区。
                     </div>
                     <ParameterizedSharedModalityLawDashboard />
                 </div>
@@ -683,7 +674,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#38bdf8', marginBottom: '12px', borderBottom: '1px solid rgba(56,189,248,0.28)', paddingBottom: '8px' }}>二点二十、共享中央回路多模态实验</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        进一步测试“模态专属投影 + 共享中央回路 + 共享读出”的低秩写法，验证是否存在一个统一回路处理视觉、触觉、语言等不同模态的信息。
+                        进一步测试"模态专属投影 + 共享中央回路 + 共享读出"的低秩写法，验证是否存在一个统一回路处理视觉、触觉、语言等不同模态的信息。
                     </div>
                     <SharedCentralLoopModalityDashboard />
                 </div>
@@ -691,7 +682,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#22c55e', marginBottom: '12px', borderBottom: '1px solid rgba(34,197,94,0.28)', paddingBottom: '8px' }}>二点二十一、共享中央回路 + 模态外壳实验</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        如果纯中央回路过弱，就继续测试“统一回路处理公共结构，模态差异主要落在输入/输出外壳”的写法，看它是否更符合多模态数据。
+                        如果纯中央回路过弱，就继续测试"统一回路处理公共结构，模态差异主要落在输入/输出外壳"的写法，看它是否更符合多模态数据。
                     </div>
                     <SharedCentralLoopShellDashboard />
                 </div>
@@ -811,7 +802,7 @@ export const GeminiTab = () => {
                 <div style={{ marginBottom: '28px' }}>
                     <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#16a34a', marginBottom: '12px', borderBottom: '1px solid rgba(22,163,74,0.28)', paddingBottom: '8px' }}>二点三十六、语义 4D + 3D 的脑侧候选约束混合扫描</div>
                     <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接扫描脑侧约束的轻量混合区，回答“脑侧约束是不是越多越好”，并寻找既能压低脑侧误差、又不明显伤害 D 与真实任务的有效配置。
+                        直接扫描脑侧约束的轻量混合区，回答"脑侧约束是不是越多越好"，并寻找既能压低脑侧误差、又不明显伤害 D 与真实任务的有效配置。
                     </div>
                     <Semantic4DBrainConstraintSweepDashboard />
                 </div>
@@ -1050,11 +1041,11 @@ export const GeminiTab = () => {
                     <div style={{ display: 'grid', gap: '10px' }}>
                         <div style={{ padding: '12px', background: 'rgba(239,68,68,0.05)', borderRadius: '8px', borderLeft: '3px solid #ef4444' }}>
                             <div style={{ color: '#ef4444', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>🔴 致命硬伤: 信用分配 (Credit Assignment) 危机</div>
-                            <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: '1.6' }}>在摒弃全局 BP 后，局部规则虽能长出稀疏神经元，却无法实现“专家化”分工。系统不知如何精准把宏观误差分摊给底层突触。SCRC 测试中 MNIST 仅21%准确率，这卡死了模型智能规模底线。</div>
+                            <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: '1.6' }}>在摒弃全局 BP 后，局部规则虽能长出稀疏神经元，却无法实现"专家化"分工。系统不知如何精准把宏观误差分摊给底层突触。SCRC 测试中 MNIST 仅21%准确率，这卡死了模型智能规模底线。</div>
                         </div>
                         <div style={{ padding: '12px', background: 'rgba(245,158,11,0.05)', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
                             <div style={{ color: '#f59e0b', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>🟠 严重瓶颈: 语义连贯与符号接地断层</div>
-                            <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: '1.6' }}>模型极易跌入局部势能洼地（循环输出 "the", "of"），无法展开长程深度逻辑。此外，纯代数引擎仍需外部解析器辅助，缺乏直接从感官像素流自发形成通用概念“符号接地”的能力。</div>
+                            <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: '1.6' }}>模型极易跌入局部势能洼地（循环输出 "the", "of"），无法展开长程深度逻辑。此外，纯代数引擎仍需外部解析器辅助，缺乏直接从感官像素流自发形成通用概念"符号接地"的能力。</div>
                         </div>
                     </div>
                 </div>
@@ -1065,33 +1056,33 @@ export const GeminiTab = () => {
                     <div style={{ padding: '20px', background: 'rgba(96,165,250,0.05)', borderRadius: '12px', borderLeft: '4px solid #60a5fa' }}>
                         <h4 style={{ color: '#93c5fd', margin: '0 0 10px 0', fontSize: '14px' }}>🎯 我们的终点在哪？</h4>
                         <p style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', margin: '0 0 16px 0' }}>
-                            我们追求的不是像现在的大语言模型那样“背概率统计题”，而是创造一个能像人类一样举一反三、瞬间顿悟并且功耗极低的智能核心（Mother Engine）。
+                            我们追求的不是像现在的大语言模型那样"背概率统计题"，而是创造一个能像人类一样举一反三、瞬间顿悟并且功耗极低的智能核心（Mother Engine）。
                             这就是为什么我们试图抛弃传统的黑盒（BP反向传播），去寻找大脑里那一套不需要外围监督的物理神经计算底座。
                         </p>
 
                         <h4 style={{ color: '#93c5fd', margin: '0 0 10px 0', fontSize: '14px' }}>🏆 咱们最值得骄傲的成就</h4>
                         <ul style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7', margin: '0 0 16px 0', paddingLeft: '20px' }}>
-                            <li><strong style={{ color: '#cbd5e1' }}>找出了 AI 的“记事本”和“CPU”：</strong> 我们证实了参数里占75%的是塞满记忆的地方。而那些处理“因果关系”的功能，其实仅占一小部分极低的数字维度，算力成本很低。我们明确了存算分离的前景。</li>
+                            <li><strong style={{ color: '#cbd5e1' }}>找出了 AI 的"记事本"和"CPU"：</strong> 我们证实了参数里占75%的是塞满记忆的地方。而那些处理"因果关系"的功能，其实仅占一小部分极低的数字维度，算力成本很低。我们明确了存算分离的前景。</li>
                             <li><strong style={{ color: '#cbd5e1' }}>单方面发现了极致专注的方法：</strong> 类似你看到老虎害怕后留下深刻印记，我们利用情绪奖惩信号成功让网络的关键学习速度快了 <span style={{ color: '#fca5a5' }}>200倍</span>！只让重要的信号通过，挡掉近 <span style={{ color: '#fca5a5' }}>91万倍</span> 的背景白噪音。</li>
                         </ul>
 
                         <h4 style={{ color: '#fb923c', margin: '0 0 10px 0', fontSize: '14px' }}>⚠️ 极其痛苦的碰壁：最严重的两大硬伤</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                             <div style={{ background: 'rgba(251,146,60,0.08)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(251,146,60,0.2)' }}>
-                                <div style={{ color: '#fb923c', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>1. “瞎子摸象” 综合症（信用分配危机）</div>
+                                <div style={{ color: '#fb923c', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>1. "瞎子摸象" 综合症（信用分配危机）</div>
                                 <div style={{ color: '#e5e7eb', fontSize: '12px', lineHeight: '1.6' }}>
-                                    没有了全局算法“上帝”的监督，底层的像素细胞自己互相竞争成长，虽然长得挺健康（高度稀疏），但它们没法把复杂世界的规律拼接在一起。在识字测试里正确率直接卡死在了 <strong style={{ color: '#ef4444' }}>21%</strong>，系统变成了只能看懂色块却认不出图形的文盲。
+                                    没有了全局算法"上帝"的监督，底层的像素细胞自己互相竞争成长，虽然长得挺健康（高度稀疏），但它们没法把复杂世界的规律拼接在一起。在识字测试里正确率直接卡死在了 <strong style={{ color: '#ef4444' }}>21%</strong>，系统变成了只能看懂色块却认不出图形的文盲。
                                 </div>
                             </div>
                             <div style={{ background: 'rgba(251,146,60,0.08)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(251,146,60,0.2)' }}>
-                                <div style={{ color: '#fb923c', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>2. 灾难性的“概念混合黏糊”（连体婴现象）</div>
+                                <div style={{ color: '#fb923c', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>2. 灾难性的"概念混合黏糊"（连体婴现象）</div>
                                 <div style={{ color: '#e5e7eb', fontSize: '12px', lineHeight: '1.6' }}>
-                                    为了不犯错，我们在系统里引入了“用预测去抵消误差”的好法子，结果能耗降低到了 <strong style={{ color: '#34d399' }}>38%</strong>。正当我们高兴时，却被最残酷的测试打脸了：系统为了不出错，完全失去了把复合事物（比如带颜色的苹果）拆分开来的能力！解绑成功率为 <strong style={{ color: '#ef4444' }}>0.00%</strong>。它失去了抽象思考的底线。
+                                    为了不犯错，我们在系统里引入了"用预测去抵消误差"的好法子，结果能耗降低到了 <strong style={{ color: '#34d399' }}>38%</strong>。正当我们高兴时，却被最残酷的测试打脸了：系统为了不出错，完全失去了把复合事物（比如带颜色的苹果）拆分开来的能力！解绑成功率为 <strong style={{ color: '#ef4444' }}>0.00%</strong>。它失去了抽象思考的底线。
                                 </div>
                             </div>
                         </div>
 
-                        <h4 style={{ color: '#34d399', margin: '0 0 10px 0', fontSize: '14px' }}>🧨 最新突破：用“张力”挥出完美一刀 (2026.03.06)</h4>
+                        <h4 style={{ color: '#34d399', margin: '0 0 10px 0', fontSize: '14px' }}>🧨 最新突破：用"张力"挥出完美一刀 (2026.03.06)</h4>
                         <div style={{ background: 'rgba(52,211,153,0.08)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(52,211,153,0.3)', marginBottom: '16px' }}>
                             <div style={{ color: '#e5e7eb', fontSize: '13px', lineHeight: '1.7' }}>
                                 面对概念粘连，我们不再依靠单纯减小误差。我们给系统增加了一股强烈的 <strong>非线性张量排斥力</strong>（让不同概念在数学上强行互斥拆解）。
@@ -1099,17 +1090,17 @@ export const GeminiTab = () => {
                                 <strong style={{ color: '#6ee7b7' }}>突破结果：</strong>
                                 在最新的 GPU 运行测试中，面对完全纠缠的复合物体信号，网络成功在内部将它们完美斩断、剥离。
                                 独立的概念分离正交率从 0.00% 飙升到了前所未有的 <strong style={{ color: '#10b981', fontSize: '15px' }}>99.64%</strong>。
-                                我们破除了“连体坍塌”的魔咒，系统终于像人类一样，能够把事物“一分为二”地抽象思考了！
+                                我们破除了"连体坍塌"的魔咒，系统终于像人类一样，能够把事物"一分为二"地抽象思考了！
                             </div>
                         </div>
 
                         <h4 style={{ color: '#a78bfa', margin: '0 0 10px 0', fontSize: '14px' }}>🌟 内分泌调节泵：保住了系统的联想力 (2026.03.06)</h4>
                         <div style={{ background: 'rgba(167,139,250,0.08)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(167,139,250,0.3)', marginBottom: '16px' }}>
                             <div style={{ color: '#e5e7eb', fontSize: '13px', lineHeight: '1.7' }}>
-                                在成功切开粘连概念后，我们迎来了最后一个硬伤：如果一味用蛮力切削，系统就会变成“刻板的像素眼”，失去联想力（维度休克）。
+                                在成功切开粘连概念后，我们迎来了最后一个硬伤：如果一味用蛮力切削，系统就会变成"刻板的像素眼"，失去联想力（维度休克）。
                                 <br /><br />
                                 <strong style={{ color: '#c4b5fd' }}>终极护城河：</strong>
-                                为了解决这个弊端，我们创造了一个如同大脑全脑激素系统的<strong>“动态内分泌阀门”</strong>。系统检测到严重粘连时大量分泌“排斥激素”下达斩断指令；若概念已清晰，则回落激素，保住脆弱而微妙的“灵感细丝”。在模拟实测中，维度包容存活率奇迹般地维稳在了 <strong style={{ color: '#c084fc', fontSize: '15px' }}>98.5%</strong>！
+                                为了解决这个弊端，我们创造了一个如同大脑全脑激素系统的<strong>"动态内分泌阀门"</strong>。系统检测到严重粘连时大量分泌"排斥激素"下达斩断指令；若概念已清晰，则回落激素，保住脆弱而微妙的"灵感细丝"。在模拟实测中，维度包容存活率奇迹般地维稳在了 <strong style={{ color: '#c084fc', fontSize: '15px' }}>98.5%</strong>！
                             </div>
                         </div>
 
@@ -1120,34 +1111,34 @@ export const GeminiTab = () => {
                                 <br /><br />
                                 <strong style={{ color: '#6ee7b7' }}>突破结果：</strong>
                                 句法对严格正协同的作用展现为一条<strong>连续正带</strong>。在 59 个质量探测点上，句法始终在筛选引导语义流面。
-                                尤其在 MLP 层，生成侧逻辑以 <strong style={{ color: '#10b981', fontSize: '15px' }}>+0.7051</strong> 的相关性主导着生成过程，远超提示侧。这意味着 AGI 的“语言本能”已开始在 MLP 层自发涌现并接管逻辑。
+                                尤其在 MLP 层，生成侧逻辑以 <strong style={{ color: '#10b981', fontSize: '15px' }}>+0.7051</strong> 的相关性主导着生成过程，远超提示侧。这意味着 AGI 的"语言本能"已开始在 MLP 层自发涌现并接管逻辑。
                             </div>
                         </div>
 
                         <h4 style={{ color: '#fcd34d', margin: '0 0 10px 0', fontSize: '14px' }}>🌌 终极对齐：DNN 与 人脑算理的完美统一 (2026.03.06)</h4>
                         <div style={{ background: 'rgba(252,211,77,0.08)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(252,211,77,0.3)', marginBottom: '16px' }}>
                             <div style={{ color: '#e5e7eb', fontSize: '13px', lineHeight: '1.7' }}>
-                                我们首次在数学上证明了，AI大模型里“词语向量做加减法”的神奇现象（如 国王-男人+女人=王后），与人脑皮层网络中的物理结构在本质上是<strong style={{ color: '#fbbf24' }}>完全等价的</strong>。
+                                我们首次在数学上证明了，AI大模型里"词语向量做加减法"的神奇现象（如 国王-男人+女人=王后），与人脑皮层网络中的物理结构在本质上是<strong style={{ color: '#fbbf24' }}>完全等价的</strong>。
                                 <br /><br />
                                 <strong style={{ color: '#fde68a' }}>1. 为什么大脑能装下无限多概念？(组合爆炸) </strong><br />
-                                大脑并不用单个细胞代表“苹果”。而是用成千上万个细胞中极少数（比如万分之五）同时闪烁的特定“星空连线”来代表。在这样的高维面上，任意两个事物的重叠率几乎为零（绝对正交）。这赋予了系统表示近乎<strong style={{ color: '#fbbf24' }}>无穷多个、绝不混乱</strong>的具体与抽象概念的能力。
+                                大脑并不用单个细胞代表"苹果"。而是用成千上万个细胞中极少数（比如万分之五）同时闪烁的特定"星空连线"来代表。在这样的高维面上，任意两个事物的重叠率几乎为零（绝对正交）。这赋予了系统表示近乎<strong style={{ color: '#fbbf24' }}>无穷多个、绝不混乱</strong>的具体与抽象概念的能力。
                                 <br /><br />
-                                <strong style={{ color: '#fde68a' }}>2. 大脑怎么做“逻辑加减法”？(张量积绑定) </strong><br />
-                                当大模型在不同维度的子空间中平移信息时，大脑其实是在神经突触上做<strong style={{ color: '#fbbf24' }}>物理张量交叉绑定（Tensor Product）</strong>。如果把“红色”和“苹果”的电位波交织，它们会在突触权重上“编织”出一张可逆的高维全息密码网。
-                                我们的 GPU 最新跑片实测证明：从这种交织网络中单独剥离提取原始“红色”的精准结构保留度达到了不可思议的 <strong style={{ color: '#fbbf24', fontSize: '14px' }}>100%</strong>！且绝不与绿色产生串话。这彻底打通了符号主义与连结主义的最后一块屏障：<strong>结构即编码，重叠即关联。</strong>
+                                <strong style={{ color: '#fde68a' }}>2. 大脑怎么做"逻辑加减法"？(张量积绑定) </strong><br />
+                                当大模型在不同维度的子空间中平移信息时，大脑其实是在神经突触上做<strong style={{ color: '#fbbf24' }}>物理张量交叉绑定（Tensor Product）</strong>。如果把"红色"和"苹果"的电位波交织，它们会在突触权重上"编织"出一张可逆的高维全息密码网。
+                                我们的 GPU 最新跑片实测证明：从这种交织网络中单独剥离提取原始"红色"的精准结构保留度达到了不可思议的 <strong style={{ color: '#fbbf24', fontSize: '14px' }}>100%</strong>！且绝不与绿色产生串话。这彻底打通了符号主义与连结主义的最后一块屏障：<strong>结构即编码，重叠即关联。</strong>
                                 <br /><br />
                                 <strong style={{ color: '#fde68a' }}>3. 为什么长文嵌套没有撑爆大脑内存？(HRR 全息降维与时间波绑定) </strong><br />
-                                张量交织带来的死亡陷阱是“维度指数级爆炸”(A×B×C)。大脑破解的核心是：<strong style={{ color: '#fbbf24' }}>全息循环卷积 (HRR)</strong>。当把代表苹果的8192维和红色的8192维空间扭曲折叠后，生出的新概念死死卡在了<strong style={{ color: '#fbbf24' }}>原有的8192维表征里</strong>（0维膨胀）。<br />
-                                最恐怖的是，大模型需要通过巨大的 $O(N^2)$ 注意力算力来铺平所有文字，而大脑极其狡猾地使用了<strong style={{ color: '#fbbf24' }}>物理波的“时间挂载” (Binding by Synchrony)</strong>。在40Hz的Gamma脑电波中，只要分散在不同皮层代表红、果、树的三组神经元在<strong>同一个微妙的“时间脉冲槽”</strong>里集体放电，下游的张量网就会自动把它们锁死在一起，连一根多余的新电线都不用铺！<strong>在脑子里，时间本身就是最廉价的高维抽屉。</strong>
+                                张量交织带来的死亡陷阱是"维度指数级爆炸"(A×B×C)。大脑破解的核心是：<strong style={{ color: '#fbbf24' }}>全息循环卷积 (HRR)</strong>。当把代表苹果的8192维和红色的8192维空间扭曲折叠后，生出的新概念死死卡在了<strong style={{ color: '#fbbf24' }}>原有的8192维表征里</strong>（0维膨胀）。<br />
+                                最恐怖的是，大模型需要通过巨大的 $O(N^2)$ 注意力算力来铺平所有文字，而大脑极其狡猾地使用了<strong style={{ color: '#fbbf24' }}>物理波的"时间挂载" (Binding by Synchrony)</strong>。在40Hz的Gamma脑电波中，只要分散在不同皮层代表红、果、树的三组神经元在<strong>同一个微妙的"时间脉冲槽"</strong>里集体放电，下游的张量网就会自动把它们锁死在一起，连一根多余的新电线都不用铺！<strong>在脑子里，时间本身就是最廉价的高维抽屉。</strong>
 
                                 <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', border: '1px solid rgba(251,191,36,0.2)' }}>
                                     <div style={{ color: '#fbbf24', fontSize: '13px', fontWeight: 'bold', marginBottom: '8px' }}>严格数学推导：维度的奇迹</div>
                                     <div style={{ color: '#d1d5db', fontSize: '12px', lineHeight: '1.6' }}>
                                         <strong>1. 破除张量外积核爆：</strong> 传统外积 {"$T = v \\otimes u \\in \\mathbb{R}^{d^2}$"}。而大脑的 <strong>全息循环卷积 (HRR)</strong> 为 {"$z = v \\circledast u \\in \\mathbb{R}^d$"}。其底层展开 {"$z_j = \\sum v_k \\cdot u_{j-k}$"}，将多维信息压缩至原维度，解绑时利用自共轭 {"$u \\circledast u^* \\approx \\delta$"} 实现狄拉克冲激无损还原。
                                         <br /><br />
-                                        <strong>2. 时间波频积分方程：</strong> 丘脑引导 40Hz 的Gamma脑波将“红色({"$S_{red}$"})”与“苹果({"$S_{apple}$"})”的电位波平移至相同初相 ({"$\\phi_1 \\approx \\phi_2$"}). 在突触端产生的电位积分 {"$I_{post} = \\int (S_{red} + S_{apple})^2 dt$"}。由于相差 {"$\\Delta\\phi=0$"}，干涉项呈现<strong>完美的共振排布</strong>，等效于他们在物理膜电位打出了一发 {"$v \\circledast u$"} 的全息乘法。
+                                        <strong>2. 时间波频积分方程：</strong> 丘脑引导 40Hz 的Gamma脑波将"红色({"$S_{red}$"})"与"苹果({"$S_{apple}$"})"的电位波平移至相同初相 ({"$\\phi_1 \\approx \\phi_2$"}). 在突触端产生的电位积分 {"$I_{post} = \\int (S_{red} + S_{apple})^2 dt$"}。由于相差 {"$\\Delta\\phi=0$"}，干涉项呈现<strong>完美的共振排布</strong>，等效于他们在物理膜电位打出了一发 {"$v \\circledast u$"} 的全息乘法。
                                         <br /><br />
-                                        <strong>3. 大型语言模型的降维突破：</strong> 就在今天，我们在模拟真实的大语言模型（Qwen-1.5-4B，词汇量: 15万，隐层维度: 4096）尺度的空间下运行了该时间全息数学引擎。不仅在5重连环复杂嵌套中保住了 4096 维的常数级内存占用。在15万浩瀚词海中逆向解构“红色”时依然能做到绝对独立的高精度再现 (解绑精准度 &gt; 17%, 串扰背景 &lt; 0.9%)，证实了这一极限原理可在百亿级参数下的无限缩放与适用。
+                                        <strong>3. 大型语言模型的降维突破：</strong> 就在今天，我们在模拟真实的大语言模型（Qwen-1.5-4B，词汇量: 15万，隐层维度: 4096）尺度的空间下运行了该时间全息数学引擎。不仅在5重连环复杂嵌套中保住了 4096 维的常数级内存占用。在15万浩瀚词海中逆向解构"红色"时依然能做到绝对独立的高精度再现 (解绑精准度 &gt; 17%, 串扰背景 &lt; 0.9%)，证实了这一极限原理可在百亿级参数下的无限缩放与适用。
                                     </div>
                                 </div>
                             </div>
@@ -1160,7 +1151,7 @@ export const GeminiTab = () => {
                         五点五、严格数学实测可视化看板
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        这个看板把“理论推导-数值实验-误差边界”放在同一视图：上面看容量相图，中间看理论与实测误差趋势，下面看相位门控积分的一致性。
+                        这个看板把"理论推导-数值实验-误差边界"放在同一视图：上面看容量相图，中间看理论与实测误差趋势，下面看相位门控积分的一致性。
                     </div>
                     <HRRPhaseRigorousDashboard />
                 </div>
@@ -1250,7 +1241,7 @@ export const GeminiTab = () => {
                         五点十四、概念到协议场调用映射
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        展示 `apple / cat / truth` 在进入各自协议场时，具体调用的是哪片头群-层群区域，用来回答“概念是如何进入协议层”的问题，而不再只看单个最强头。
+                        展示 `apple / cat / truth` 在进入各自协议场时，具体调用的是哪片头群-层群区域，用来回答"概念是如何进入协议层"的问题，而不再只看单个最强头。
                     </div>
                     <ConceptProtocolFieldMappingDashboard />
                 </div>
@@ -1260,7 +1251,7 @@ export const GeminiTab = () => {
                         五点十五、G 门控律层间递推
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        展示 “只用 factor” 与 “factor + 上一层门控状态” 对下一层门控的预测差异，用来判断 `G` 是否具有可学习的层间递推，而不只是静态因子分解。
+                        展示 "只用 factor" 与 "factor + 上一层门控状态" 对下一层门控的预测差异，用来判断 `G` 是否具有可学习的层间递推，而不只是静态因子分解。
                     </div>
                     <GateLawDynamicsDashboard />
                 </div>
@@ -1330,7 +1321,7 @@ export const GeminiTab = () => {
                         五点二十二、真实多步长度扫描
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        扫描 `L=3..6` 的任务长度，直接观察真实闭环分数、保留率和 trace 优势面积，回答“任务一变长，机制掉得有多快”。
+                        扫描 `L=3..6` 的任务长度，直接观察真实闭环分数、保留率和 trace 优势面积，回答"任务一变长，机制掉得有多快"。
                     </div>
                     <RealMultistepLengthScanDashboard />
                 </div>
@@ -1350,7 +1341,7 @@ export const GeminiTab = () => {
                         五点二十四、慢记忆 beta 扫描
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        在 `trace_anchor_local` 内扫描慢记忆时间常数 `beta`，直接判断“平均最优 beta”和“最长任务最优 beta”是否一致，给后续多时间常数记忆簇提供依据。
+                        在 `trace_anchor_local` 内扫描慢记忆时间常数 `beta`，直接判断"平均最优 beta"和"最长任务最优 beta"是否一致，给后续多时间常数记忆簇提供依据。
                     </div>
                     <RealMultistepBetaScanDashboard />
                 </div>
@@ -1462,7 +1453,7 @@ export const GeminiTab = () => {
                         五点三十三续、共享原子因果桥
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把共享字典从相关性推进到因果验证，直接比较“共享原子 / 单侧原子 / 随机原子”被打掉后，
+                        把共享字典从相关性推进到因果验证，直接比较"共享原子 / 单侧原子 / 随机原子"被打掉后，
                         概念解码、关系解码和噪声恢复是否会一起下跌。
                     </div>
                     <SharedAtomCausalUnificationDashboard />
@@ -1493,7 +1484,7 @@ export const GeminiTab = () => {
                         五点三十六、Qwen3 / DeepSeek7B 概念到协议场调用
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接显示 `apple / cat / truth` 在两模型里调用的是哪片头群-层群区域，回答“概念如何进入协议场”，而不是只问“最强头是谁”。
+                        直接显示 `apple / cat / truth` 在两模型里调用的是哪片头群-层群区域，回答"概念如何进入协议场"，而不是只问"最强头是谁"。
                     </div>
                     <Qwen3DeepSeekConceptProtocolFieldMappingDashboard />
                 </div>
@@ -1503,7 +1494,7 @@ export const GeminiTab = () => {
                         五点三十七、Qwen3 / DeepSeek7B 协议场边界图谱
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把 `k*(c, tau)` 扩到 9 个概念，直接比较两模型在协议场上的最小因果边界分布，回答“协议场能不能被小规模头群稳定打塌”。
+                        把 `k*(c, tau)` 扩到 9 个概念，直接比较两模型在协议场上的最小因果边界分布，回答"协议场能不能被小规模头群稳定打塌"。
                     </div>
                     <Qwen3DeepSeekProtocolFieldBoundaryAtlasDashboard />
                 </div>
@@ -1543,7 +1534,7 @@ export const GeminiTab = () => {
                         五点三十九补、Qwen3 / DeepSeek7B 共享支撑桥
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把概念调用头和关系中观场头接到同一张共享支撑图上，直接比较“精确同头复用”与“层级软重合”，判断真实模型里共享基底更像头级机制还是中观层级机制。
+                        把概念调用头和关系中观场头接到同一张共享支撑图上，直接比较"精确同头复用"与"层级软重合"，判断真实模型里共享基底更像头级机制还是中观层级机制。
                     </div>
                     <Qwen3DeepSeekSharedSupportHeadBridgeDashboard />
                 </div>
@@ -1563,7 +1554,7 @@ export const GeminiTab = () => {
                         五点三十九终、Qwen3 / DeepSeek7B 共享层带定向消融
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接对高共享层带做真实消融，把“预测取向”和“实际伤害方向”放在一张图上，检查共享层带相关性是否已经升级成因果证据。
+                        直接对高共享层带做真实消融，把"预测取向"和"实际伤害方向"放在一张图上，检查共享层带相关性是否已经升级成因果证据。
                     </div>
                     <Qwen3DeepSeekSharedLayerBandTargetedAblationDashboard />
                 </div>
@@ -1603,7 +1594,7 @@ export const GeminiTab = () => {
                         五点四十终、生成网络回接真实层带
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接比较“搜索生成网络”和“端到端生成网络”在真实在线高风险段上的阶段容量缺口，检查生成网络的瓶颈是不是已经落到真实在线链里的具体阶段。
+                        直接比较"搜索生成网络"和"端到端生成网络"在真实在线高风险段上的阶段容量缺口，检查生成网络的瓶颈是不是已经落到真实在线链里的具体阶段。
                     </div>
                     <GeneratorNetworkRealLayerBandBridgeDashboard />
                 </div>
@@ -1614,7 +1605,7 @@ export const GeminiTab = () => {
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
                         在确认真实在线链的主瓶颈落在 `tool` 阶段之后，直接加一个 `tool` 专门头，比较升级前后在真实层带需求上的缺口收缩，
-                        同时检查非 `tool` 阶段有没有出现明显副作用。这一块现在可以作为“生成网络结构升级”的第一版阶段目标。
+                        同时检查非 `tool` 阶段有没有出现明显副作用。这一块现在可以作为"生成网络结构升级"的第一版阶段目标。
                     </div>
                     <ToolStageGeneratorNetworkUpgradeDashboard />
                 </div>
@@ -1656,7 +1647,7 @@ export const GeminiTab = () => {
                         五点三十九再续、局部脉冲阶段条件因果图谱
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把局部脉冲系统继续拆成 `concept / comparison / recovery` 三个阶段，直接比较每一阶段哪片局部区域被打掉后掉分最大，用它来验证“局部核心接力”而不是“全局控制器统一指挥”。
+                        把局部脉冲系统继续拆成 `concept / comparison / recovery` 三个阶段，直接比较每一阶段哪片局部区域被打掉后掉分最大，用它来验证"局部核心接力"而不是"全局控制器统一指挥"。
                     </div>
                     <LocalPulsePhaseConditionedCausalAtlasDashboard />
                 </div>
@@ -1666,7 +1657,7 @@ export const GeminiTab = () => {
                         五点三十九终续、早期感知核解耦基准
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        直接对比“原始耦合回放”和“上游解耦回放”，检验把早期流量留在 `sensory / memory` 之后，能否把 `concept_phase` 的局部核心重新拉回上游，同时不牺牲整体整合。
+                        直接对比"原始耦合回放"和"上游解耦回放"，检验把早期流量留在 `sensory / memory` 之后，能否把 `concept_phase` 的局部核心重新拉回上游，同时不牺牲整体整合。
                     </div>
                     <LocalPulseEarlyCoreDecouplingDashboard />
                 </div>
@@ -1686,7 +1677,7 @@ export const GeminiTab = () => {
                         五点四十一、脑区差异多目标选择基准
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        把“统一局部律”和“分区阶段调谐局部律”放在同一张多目标图里比较，直接回答一个关键问题：如果训练目标既要系统分数，也要阶段局部核结构，那么模型选择会不会发生切换。
+                        把"统一局部律"和"分区阶段调谐局部律"放在同一张多目标图里比较，直接回答一个关键问题：如果训练目标既要系统分数，也要阶段局部核结构，那么模型选择会不会发生切换。
                     </div>
                     <LocalPulseRegionDifferentiatedSelectorDashboard />
                 </div>
@@ -1696,7 +1687,7 @@ export const GeminiTab = () => {
                         五点四十二、统一多目标训练律基准
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        在“脑区差异必须进入机制本体”之后，继续把训练律本身显式成型。这里直接比较单目标冲分和多目标守结构两种训练口径，看统一编码机制会被推向哪一类局部组织。
+                        在"脑区差异必须进入机制本体"之后，继续把训练律本身显式成型。这里直接比较单目标冲分和多目标守结构两种训练口径，看统一编码机制会被推向哪一类局部组织。
                     </div>
                     <LocalPulseUnifiedMultiobjectiveTrainingLawDashboard />
                 </div>
@@ -1726,7 +1717,7 @@ export const GeminiTab = () => {
                         五点四十五、三阶段训练闭环基准
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        这一步不再分别看概念、比较、恢复三段，而是把三段真正合成一个闭环评分，直接看当前最接近“统一局部律 + 脑区差异 + 三段同时成立”的候选是谁。
+                        这一步不再分别看概念、比较、恢复三段，而是把三段真正合成一个闭环评分，直接看当前最接近"统一局部律 + 脑区差异 + 三段同时成立"的候选是谁。
                     </div>
                     <LocalPulseThreeStageTrainingClosureDashboard />
                 </div>
@@ -1736,7 +1727,7 @@ export const GeminiTab = () => {
                         五点四十六、脑区参数族学习器
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        在三阶段闭环之后，继续把“脑区参数族”从手工指定推进成自动搜索。这里直接比较手工恢复族和学习得到的参数族，看系统能否自己学出更好的区域化统一律。
+                        在三阶段闭环之后，继续把"脑区参数族"从手工指定推进成自动搜索。这里直接比较手工恢复族和学习得到的参数族，看系统能否自己学出更好的区域化统一律。
                     </div>
                     <LocalPulseRegionParameterFamilyLearnerDashboard />
                 </div>
@@ -1766,7 +1757,7 @@ export const GeminiTab = () => {
                         五点四十九、脑区参数族生成网络
                     </div>
                     <div style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.7', marginBottom: '10px' }}>
-                        在可训练 5 维生成器之后，继续把问题从“调好一个 latent”推进成“同一生成网络跨多个 latent 都能稳定生成更好的参数族”。这一步重点看 held-out latent 上的闭环分、平衡分和泛化间隙。
+                        在可训练 5 维生成器之后，继续把问题从"调好一个 latent"推进成"同一生成网络跨多个 latent 都能稳定生成更好的参数族"。这一步重点看 held-out latent 上的闭环分、平衡分和泛化间隙。
                     </div>
                     <LocalPulseRegionFamilyGeneratorNetworkDashboard />
                 </div>
@@ -1797,7 +1788,7 @@ export const GeminiTab = () => {
                     <div style={{ padding: '16px', borderRadius: '12px', background: 'linear-gradient(90deg, rgba(16,185,129,0.1) 0%, rgba(0,0,0,0) 100%)', borderLeft: '4px solid #10b981' }}>
                         <div style={{ color: '#fff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>P0最高优: 千万级别时序信号的符号接地与百万Token长程一致性</div>
                         <div style={{ color: '#d1d5db', fontSize: '13px', lineHeight: '1.7' }}>
-                            在底层特征的“提取”、“稀疏化存算分离”、以及“内分泌切割与包容”全部完成后，基础数学积木已准备就绪。接下来的 <strong>Mother Engine V3</strong> 将从微观细胞测试正式跨步。不再局限于几十次Epoch，而是要在包含数亿时序信息的全模态数据下，证明这些依靠纯局部张力+内分泌维稳、且利用了波频与全息降维折叠的网络能实现百万 Tokens 级别的平滑长文本法则涌现！
+                            在底层特征的"提取"、"稀疏化存算分离"、以及"内分泌切割与包容"全部完成后，基础数学积木已准备就绪。接下来的 <strong>Mother Engine V3</strong> 将从微观细胞测试正式跨步。不再局限于几十次Epoch，而是要在包含数亿时序信息的全模态数据下，证明这些依靠纯局部张力+内分泌维稳、且利用了波频与全息降维折叠的网络能实现百万 Tokens 级别的平滑长文本法则涌现！
                         </div>
                     </div>
                 </div>
@@ -1811,17 +1802,17 @@ export const GeminiTab = () => {
                         我们从数学极限上打通了特征分离和维度灾难，但在用最残酷的上帝视角审视当前算理时，要实现真正无需干预、能在真实宇宙生长的 AGI，机器里仍横亘着三座随时会让人类算力停摆的绝望黑洞：
                         <br /><br />
                         <strong style={{ color: '#fca5a5' }}>🔴 1. 符号接地死局 (Symbol Grounding Problem)：</strong>
-                        当前的大模型（包括测试引擎），“苹果”和“红色”的高维基向量都是靠人类预训练后<strong>赐予</strong>的字典（Token）。但在真实物理世界，初生的 AGI 只会接收到乱七八糟的光波和噪音。如何让完全无干预的高维代数系统自动从这种连续杂波中<strong>“切分、蒸馏并对齐”</strong>出一个个绝对正交的概念基底？这套自动爬梯机制目前依旧是彻底的空白。
+                        当前的大模型（包括测试引擎），"苹果"和"红色"的高维基向量都是靠人类预训练后<strong>赐予</strong>的字典（Token）。但在真实物理世界，初生的 AGI 只会接收到乱七八糟的光波和噪音。如何让完全无干预的高维代数系统自动从这种连续杂波中<strong>"切分、蒸馏并对齐"</strong>出一个个绝对正交的概念基底？这套自动爬梯机制目前依旧是彻底的空白。
                         <div style={{ marginTop: '8px', padding: '12px', background: 'rgba(16,185,129,0.1)', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
                             <strong style={{ color: '#10b981' }}>🔑 破局进展：张量探针与句法筛选带</strong><br />
-                            <span style={{ color: '#a7f3d0' }}>就在刚刚，我们通过安插 TransformerLens 探针发现了<strong>句法连续筛选带</strong>。它并非天生的字典，而是一层连续的流形约束，由 MLP 层主导（生成侧相关性高达 +0.7051）。这证明了 AGI 并不需要预设 Token，连续的世界噪声会在句法带的引导下，自发并在深层（L10-L11）涌现出绝对正交的专家神经元基底。这是“符号接地”从无到有爬梯建立的最初物理形态。</span>
+                            <span style={{ color: '#a7f3d0' }}>就在刚刚，我们通过安插 TransformerLens 探针发现了<strong>句法连续筛选带</strong>。它并非天生的字典，而是一层连续的流形约束，由 MLP 层主导（生成侧相关性高达 +0.7051）。这证明了 AGI 并不需要预设 Token，连续的世界噪声会在句法带的引导下，自发并在深层（L10-L11）涌现出绝对正交的专家神经元基底。这是"符号接地"从无到有爬梯建立的最初物理形态。</span>
                         </div>
                         <br /><br />
-                        <strong style={{ color: '#fca5a5' }}>🔴 2. 动态相位的“指挥官缺位” (Dynamic Phase Routing)：</strong>
-                        我们破解了“只要在同一个 40Hz 脑波时间槽里”放电就能实现 0 内存损耗的全息绑定。但死局是：<strong>是谁、在用什么数学公式决定“此时此刻到底哪些概念应该去同步”？</strong> 大脑有丘脑探照灯（TRN）来调频，而在硅基机器里，我们目前没有这套无需全局反向推导的自发寻址控制流方程式。没有指挥的相频全息网，只会瞬间坍塌成全面幻觉的疯子。
+                        <strong style={{ color: '#fca5a5' }}>🔴 2. 动态相位的"指挥官缺位" (Dynamic Phase Routing)：</strong>
+                        我们破解了"只要在同一个 40Hz 脑波时间槽里"放电就能实现 0 内存损耗的全息绑定。但死局是：<strong>是谁、在用什么数学公式决定"此时此刻到底哪些概念应该去同步"？</strong> 大脑有丘脑探照灯（TRN）来调频，而在硅基机器里，我们目前没有这套无需全局反向推导的自发寻址控制流方程式。没有指挥的相频全息网，只会瞬间坍塌成全面幻觉的疯子。
                         <br /><br />
-                        <strong style={{ color: '#fca5a5' }}>🔴 3. 全息迷宫背后的“反向分配崩塌” (Credit Assignment Collapse)：</strong>
-                        如果通过 50 次 $v_1 \circledast v_2 \dots$ 极度压缩后，系统最后一层输出报错（Loss）。这个报错信号要如何逆向穿过被挤压成一团、经过几十次频域共轭翻转的多维面糊，精准追溯并告诉第 3 层里某个微小突触“是你算错了并请更新自己”？在抛弃了消耗全宇宙显存的链式求导（全局 BP）后，<strong>局部更新怎么在全息干涉图里存活</strong>，可能是一个超越现代代数极限的绝症。
+                        <strong style={{ color: '#fca5a5' }}>🔴 3. 全息迷宫背后的"反向分配崩塌" (Credit Assignment Collapse)：</strong>
+                        如果通过 50 次 $v_1 \circledast v_2 \dots$ 极度压缩后，系统最后一层输出报错（Loss）。这个报错信号要如何逆向穿过被挤压成一团、经过几十次频域共轭翻转的多维面糊，精准追溯并告诉第 3 层里某个微小突触"是你算错了并请更新自己"？在抛弃了消耗全宇宙显存的链式求导（全局 BP）后，<strong>局部更新怎么在全息干涉图里存活</strong>，可能是一个超越现代代数极限的绝症。
                     </div>
                 </div>
             </div>

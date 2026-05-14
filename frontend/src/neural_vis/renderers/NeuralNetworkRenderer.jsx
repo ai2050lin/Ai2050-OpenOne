@@ -54,7 +54,7 @@ function activationToSize(value) {
 }
 
 // ==================== 层圆盘 + 脉冲光环 (useFrame动画) ====================
-function LayerDisk({ layer, nLayers, y, forwardPassActive, forwardPassReached }) {
+function LayerDisk({ layer, nLayers, y, forwardPassActive, forwardPassReached, onHover }) {
   const ringRef = useRef();
   const color = layerToFuncColor(layer, nLayers);
   const label = layerToFuncLabel(layer, nLayers);
@@ -71,7 +71,10 @@ function LayerDisk({ layer, nLayers, y, forwardPassActive, forwardPassReached })
   const dimFactor = forwardPassReached === false ? 0.15 : 1.0;
 
   return (
-    <group position={[0, y, 0]}>
+    <group position={[0, y, 0]}
+      onPointerOver={(e) => { e.stopPropagation(); onHover?.(layer); }}
+      onPointerOut={() => onHover?.(null)}
+    >
       {/* 圆盘主体 */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[PLANE_SIZE / 2, 64]} />
@@ -240,6 +243,7 @@ export default function NeuralNetworkRenderer({
   forwardPassLayer = null,
   forwardPassData = null,
   useActivationColor = true,
+  onHoverLayer = null,
 }) {
   const groupRef = useRef();
 
@@ -272,6 +276,7 @@ export default function NeuralNetworkRenderer({
           y={l * LAYER_GAP}
           forwardPassActive={isFpActive(l)}
           forwardPassReached={isFpReached(l)}
+          onHover={onHoverLayer}
         />
       ))}
 

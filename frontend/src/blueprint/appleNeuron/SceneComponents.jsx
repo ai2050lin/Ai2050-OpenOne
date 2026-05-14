@@ -22,6 +22,7 @@ import {
 } from './utils';
 
 import LayerExplodedView3D from './LayerExplodedView3D';
+import ComponentDetailPanel3D from './ComponentDetailPanel3D';
 
 function PulsingNeuron({
   node,
@@ -1448,6 +1449,101 @@ function ConceptAssociationOverlay({ conceptAssociationState = null }) {
 }
 
 
+/** Layer模型 → 组件模型 连接光束 */
+function LayerToComponentBeam({ animProgress = 0 }) {
+  const ref = useRef(null);
+  const beamRef = useRef(null);
+
+  // 与 LayerExplodedView3D / ComponentDetailPanel3D 同步的动画阶段
+  const PHASES = [
+    { id: 'input',      color: '#94a3b8', component: 'input' },
+    { id: 'ln1',        color: '#818cf8', component: 'ln' },
+    { id: 'qkv',        color: '#60a5fa', component: 'attention' },
+    { id: 'attn_score', color: '#38bdf8', component: 'attention' },
+    { id: 'softmax',    color: '#22d3ee', component: 'attention' },
+    { id: 'attn_out',   color: '#2dd4bf', component: 'attention' },
+    { id: 'residual1',  color: '#a78bfa', component: 'residual' },
+    { id: 'ln2',        color: '#818cf8', component: 'ln' },
+    { id: 'ffn_up',     color: '#f59e0b', component: 'ffn' },
+    { id: 'ffn_act',    color: '#fb923c', component: 'ffn' },
+    { id: 'ffn_down',   color: '#f97316', component: 'ffn' },
+    { id: 'residual2',  color: '#a78bfa', component: 'residual' },
+  ];
+  const DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
+  const TOTAL = DURATIONS.reduce((s, d) => s + d, 0);
+
+  const currentPhase = useMemo(() => {
+    let cum = 0;
+    for (let i = 0; i < PHASES.length; i++) {
+      const start = cum / TOTAL;
+      cum += DURATIONS[i];
+      const end = cum / TOTAL;
+      if (animProgress >= start && animProgress < end) return PHASES[i];
+    }
+    return PHASES[PHASES.length - 1];
+  }, [animProgress]);
+
+  const beamColor = currentPhase?.color || '#475569';
+  // Layer 模型右边缘 → 组件面板左边缘
+  const fromX = 23;  // LayerExplodedView3D at [20,0,0], scale 1.5, half width ~3
+  const toX = 28;    // ComponentDetailPanel3D at [32,0,0], half width ~4
+
+  useFrame((state) => {
+    if (beamRef.current) {
+      beamRef.current.material.opacity = 0.3 + 0.2 * Math.sin(state.clock.elapsedTime * 3);
+    }
+  });
+
+  return (
+    <group>
+      {/* 连接光束 */}
+      <mesh ref={beamRef} position={[(fromX + toX) / 2, 0, 0]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[toX - fromX, 0.12, 0.12]} />
+        <meshBasicMaterial color={beamColor} transparent opacity={0.35} />
+      </mesh>
+      {/* 箭头指向组件面板 */}
+      <mesh position={[toX - 0.3, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+        <coneGeometry args={[0.3, 0.8, 6]} />
+        <meshStandardMaterial color={beamColor} emissive={beamColor} emissiveIntensity={0.6} transparent opacity={0.7} />
+      </mesh>
+      {/* 当前组件标签 */}
+      <Text
+        position={[(fromX + toX) / 2, 1.2, 0]}
+        fontSize={0.4}
+        color={beamColor}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor="#0a1022"
+      >
+        {currentPhase?.component === 'attention' ? 'Attention' :
+         currentPhase?.component === 'ffn' ? 'FFN' :
+         currentPhase?.component === 'ln' ? 'LayerNorm' :
+         currentPhase?.component === 'residual' ? 'Residual ⊕' : ''}
+      </Text>
+      {/* 流动粒子 */}
+      <LayerToComponentParticle color={beamColor} fromX={fromX} toX={toX} />
+    </group>
+  );
+}
+
+function LayerToComponentParticle({ color, fromX, toX }) {
+  const ref = useRef(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = (state.clock.elapsedTime * 0.8) % 1;
+    ref.current.position.x = fromX + t * (toX - fromX);
+    ref.current.material.opacity = 0.5 + 0.3 * Math.sin(t * Math.PI);
+  });
+  return (
+    <mesh ref={ref} position={[fromX, 0, 0]}>
+      <sphereGeometry args={[0.18, 8, 8]} />
+      <meshBasicMaterial color={color} transparent opacity={0.7} />
+    </mesh>
+  );
+}
+
+
 export function AppleNeuronSceneContent({
   nodes,
   links,
@@ -1484,6 +1580,7 @@ export function AppleNeuronSceneContent({
   modelKey = null,
   layerAnimProgress = 0,
   fpSpeed = 800,
+  lang = 'en',
 }) {
   const layerCount = MODEL_CONFIGS[modelKey]?.layers || LAYER_COUNT;
   const activationMap = prediction?.activationMap || {};
@@ -1637,6 +1734,20 @@ export function AppleNeuronSceneContent({
         animProgress={layerAnimProgress}
         position={[20, 0, 0]}
       />
+
+      {/* 组件详情3D模型 - Layer旁边, 显示组件参数细节 */}
+      <ComponentDetailPanel3D
+        layerIdx={forwardPassLayer ?? 0}
+        modelKey={modelKey}
+        layerData={forwardPassData?.[forwardPassLayer ?? 0] || null}
+        isActive={forwardPassLayer != null}
+        animProgress={layerAnimProgress}
+        position={[32, 0, 0]}
+        lang={lang}
+      />
+
+      {/* Layer模型 → 组件模型 连接光束 (动画运行时显示) */}
+      {forwardPassLayer != null && <LayerToComponentBeam animProgress={layerAnimProgress} />}
 
       {displayLevels?.mechanism_chain !== false && visibleLinks.map((link) => (
         <Line
@@ -1875,7 +1986,7 @@ function AppleNeuronScene({
       <pointLight position={[-14, -8, -15]} intensity={30} color="#ff9e6b" />
 
       <PerspectiveCamera makeDefault position={[16, 12, 26]} fov={42} />
-      <OrbitControls enablePan enableZoom minDistance={10} maxDistance={44} />
+      <OrbitControls enablePan enableZoom minDistance={10} />
 
       <AppleNeuronSceneContent
         nodes={nodes}
