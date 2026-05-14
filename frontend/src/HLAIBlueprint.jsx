@@ -207,7 +207,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
             title: '神经纤维丛原理 (NFB Principle)',
             formula: 'φ(x) = M ⊗ F',
             detail:
-              '把智能状态拆成“逻辑骨架 (底流形)”和“知识内容 (纤维)”的张量积，逻辑稳定、内容可扩展。',
+              '把智能状态拆成"逻辑骨架 (底流形)"和"知识内容 (纤维)"的张量积，逻辑稳定、内容可扩展。',
           },
           {
             title: '全局工作空间 (Global Workspace)',
@@ -323,7 +323,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
                 params: 'preset=full, epochs=12, batch=256, eval_batch=2048, device=cuda',
                 dataset: 'Modular Addition 合成集：d_100k/d_300k/d_700k/d_1200k',
                 result: '总耗时 18.15 分钟；m_0.4m/m_1.4m/m_3.2m 在中大数据规模可收敛；m_8.5m 在默认超参下失稳（~0.009）。',
-                summary: '验证了“参数放大后训练策略敏感性显著增加”，大模型不可直接复用小模型超参。',
+                summary: '验证了"参数放大后训练策略敏感性显著增加"，大模型不可直接复用小模型超参。',
               },
               {
                 name: 'm_8.5m 专项调参测试（4 runs）',
@@ -384,7 +384,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
         ],
         milestonePlanEvaluation: {
           assessment:
-            '里程碑已从“功能演示”升级为“规模化证据链”：完成 full 矩阵、专项调参与多 seed 复现，证明大模型可训练性与稳定性。',
+            '里程碑已从"功能演示"升级为"规模化证据链"：完成 full 矩阵、专项调参与多 seed 复现，证明大模型可训练性与稳定性。',
           suggestions: [
 
             '将每阶段验收门槛量化（准确率、稳定性、时延、成本）。',
@@ -397,246 +397,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
           ],
         },
       },
-      transformer_baseline: {
-        id: 'transformer_baseline',
-        title: 'Transformer Baseline',
-        subtitle: '标准深度网络路线',
-        routeDescription: '。Transformer 标准范式建立可复现基线，沉淀稳定分析工具链。',
-        engineeringProcessDescription:
-          '计算流程：token 嵌入后经过多。Attention+MLP 堆叠，利用残差流聚合上下文，再由输出层完成概率分布与结果生成。',
-        theoryTitle: 'Statistical Scaling + Circuit Discovery',
-        theorySummary:
-          '。Transformer 规模定律和可解释性工具链为核心，优先验证“结构分析能力”与“可复现实验结论”。',
-        theoryBullets: [
-          '利用 Logit Lens / TDA 形成层级证据。',
-          '在相同任务上。Fiber 路线。A/B 评测',
-          '优先提升稳定性与工程可维护。',
-        ],
-        theoryFormulas: [],
-        engineeringItems: [
-          { name: '数据与任务基线', status: 'done', focus: '统一评测集与日志规范' },
-          { name: '可解释性探针', status: 'in_progress', focus: '激活、注意力、回路追踪' },
-          { name: '可行性评估闭环', status: 'in_progress', focus: '周报 + 时间线 + 失败归因' },
-        ],
-        nfbtProcessSteps: [],
-        nfbtOptimization: '',
-        milestoneTitle: '里程碑（原 AGI 终点）',
-        milestoneGoals: [
-          '形成可持续复现的深度网络分析基线',
-          '对关键任务达到稳定可解释的效果上。',
-          '沉淀可迁移到其他路线的通用工具。',
-        ],
-        milestoneMetrics: { Priority: '可复现性', Horizon: '近中期' },
-        milestoneStages: [
-          {
-            id: 'prototype',
-            name: '原型阶段',
-            status: 'done',
-            featurePoints: [
-              '建立 Transformer 统一实验入口与推理日志格。',
-              '完成基础 attention/mlp/topology 分析联。',
-              '搭建可复现基准任务与版本化数据管。',
-            ],
-            tests: [
-              {
-                name: '基础推理链路连通测。',
-                params: 'model=gpt2-small, max_len=128, seed=42',
-                dataset: 'Prompt Regression Set v1',
-                result: '核心接口通过，输出稳。',
-                summary: '确认基线系统可持续复现实验流程。',
-              },
-              {
-                name: '注意力结构可解释性测。',
-                params: 'heads=all, layer_range=0-11',
-                dataset: 'Interpretability Probe Set',
-                result: '关键头部激活可视化可复。',
-                summary: '为后续跨路线对照提供统一解释基线。',
-              },
-            ],
-          },
-          {
-            id: 'scale',
-            name: '规模化阶。',
-            status: 'in_progress',
-            featurePoints: [
-              '扩展多任务评测矩阵与失败归因统计',
-              '接入时间。周报治理与自动导。',
-              '优化长序列时延和显存占用',
-            ],
-            tests: [
-              {
-                name: '多任务回归压。',
-                params: 'tasks=12, batch=16, seq_len=512',
-                dataset: 'Mixed Reasoning Benchmark',
-                result: '任务间性能有波动，整体可控',
-                summary: '规模化可行，但需继续收敛稳定性指标。',
-              },
-              {
-                name: '失败模式聚合测试',
-                params: 'window=30d, top_failures=8',
-                dataset: 'Experiment Timeline JSON',
-                result: '可稳定提取高频失败原。',
-                summary: '治理闭环有效，支持后续针对性修复。',
-              },
-            ],
-          },
-          {
-            id: 'agi',
-            name: 'AGI阶段',
-            status: 'planned',
-            featurePoints: [
-              '与几何路线形成长期协同基。',
-              '支持跨模型迁移评测与策略切换',
-              '完善安全对齐和回退控制策略',
-            ],
-            tests: [
-              {
-                name: '跨模型迁移验。',
-                params: 'source=gpt2, target=qwen, adapter=on',
-                dataset: 'Cross-Model Transfer Set',
-                result: '待执行',
-                summary: '用于评估基线能力的可迁移上限。',
-              },
-              {
-                name: '安全约束回退测试',
-                params: 'safety_guard=strict, rollback=enabled',
-                dataset: 'Safety Red Team Set',
-                result: '待执行',
-                summary: '用于验证异常场景下的可控与可恢复性。',
-              },
-            ],
-          },
-        ],
-        milestonePlanEvaluation: {
-          assessment:
-            '路线定位清晰，适合作为可复现实验基线与对照组。',
-          suggestions: [
-            '增加统一时延/成本指标，避免仅看准确率。',
-            '对失败原因设置优先级并建立修复SLA。',
-            '提前定义跨模型迁移的验收阈值。',
-          ],
-        },
-      },
-      hybrid_workspace: {
-        id: 'hybrid_workspace',
-        title: 'Hybrid Workspace',
-        subtitle: '全局工作空间混合路线',
-        routeDescription: '以全局工作空间整合多路线输出，提升跨模块协同与鲁棒性。',
-        engineeringProcessDescription:
-          '计算流程：不同路线并行产出候选表征，统一映射到共享工作空间后执行冲突消解与优先级仲裁，最终输出融合结果并回写路线状态。',
-        theoryTitle: 'Global Workspace + Route Ensemble',
-        theorySummary:
-          '将多路线输出映射到统一工作空间，通过竞争与仲裁机制在稳定性和泛化能力之间寻找最优平衡。',
-        theoryBullets: [
-          '跨路线共享状态空间与指标协议',
-          'Top-K 竞争裁决不同模块候选输。',
-          '结合失败模式实现动态路由调。',
-        ],
-        theoryFormulas: [],
-        engineeringItems: [
-          { name: '统一路由协议', status: 'done', focus: 'route + analysis_type + summary' },
-          { name: '全局仲裁器', status: 'in_progress', focus: '冲突管理与优先级决策' },
-          { name: '在线自适应调度', status: 'pending', focus: '基于历史可行性自动选路' },
-        ],
-        nfbtProcessSteps: [],
-        nfbtOptimization: '',
-        milestoneTitle: '里程碑（原 AGI 终点）',
-        milestoneGoals: [
-          '实现多路线协同下的稳定推理输。',
-          '将失败恢复时间降低到分钟。',
-          '完成面向长期 AGI 研究的统一实验操作系统',
-        ],
-        milestoneMetrics: { Priority: '协同能力', Horizon: '中长期' },
-        milestoneStages: [
-          {
-            id: 'prototype',
-            name: '原型阶段',
-            status: 'done',
-            featurePoints: [
-              '完成多路线统一协议与事件流标准。',
-              '实现基础仲裁器与结果融合接口',
-              '建立路线状态与评分映射机制',
-            ],
-            tests: [
-              {
-                name: '双路线仲裁连通测。',
-                params: 'routes=2, arbitration=topk(1), timeout=2s',
-                dataset: 'Route Arbitration Smoke Set',
-                result: '仲裁链路可稳定执。',
-                summary: '确认混合路由原型可用。',
-              },
-              {
-                name: '融合输出一致性测。',
-                params: 'fusion=weighted, weights=static',
-                dataset: 'Consistency Benchmark v1',
-                result: '一致性优于单路线平均。',
-                summary: '融合策略有效，但动态权重仍需优化。',
-              },
-            ],
-          },
-          {
-            id: 'scale',
-            name: '规模化阶。',
-            status: 'in_progress',
-            featurePoints: [
-              '扩展到多路线并行调度',
-              '引入失败快速恢复与自动降级策略',
-              '建立跨路线趋势分析与周报治理',
-            ],
-            tests: [
-              {
-                name: '多路线并发压。',
-                params: 'routes=5, concurrent_runs=20',
-                dataset: 'Concurrent Routing Stress Set',
-                result: '高并发下存在尾延。',
-                summary: '需优化队列调度与资源隔离。',
-              },
-              {
-                name: '故障注入恢复测试',
-                params: 'failure_rate=0.2, fallback=enabled',
-                dataset: 'Failure Injection Set',
-                result: '大部分场景可自动恢复',
-                summary: '恢复机制有效，需进一步缩。MTTR。',
-              },
-            ],
-          },
-          {
-            id: 'agi',
-            name: 'AGI阶段',
-            status: 'planned',
-            featurePoints: [
-              '形成具备自适应选路能力的统一工作空间',
-              '支持长期任务下的策略演化与记忆整。',
-              '建立可审计的安全治理与人工接管机。',
-            ],
-            tests: [
-              {
-                name: '自适应选路策略验证',
-                params: 'policy=bandit, reward=feasibility_score',
-                dataset: 'Long-Horizon Route Selection Set',
-                result: '待执行',
-                summary: '用于验证长期任务中的选路收敛能力。',
-              },
-              {
-                name: '全链路安全审计测。',
-                params: 'audit=full, intervention=manual+auto',
-                dataset: 'Governance Compliance Set',
-                result: '待执行',
-                summary: '用于评估可审计性与可控性是否达标。',
-              },
-            ],
-          },
-        ],
-        milestonePlanEvaluation: {
-          assessment:
-            '具备成为“路线操作系统”的潜力，关键在于稳定调度与治理可控性。',
-          suggestions: [
-            '优先优化并发场景下尾延迟与资源竞争问题。',
-            '将MTTR纳入核心KPI并周度跟踪。',
-            '提前定义人工接管触发条件与回退策略。',
-          ],
-        },
-      },
+
     }),
     [engineeringPhase?.sub_phases, milestonePhase?.goals, milestonePhase?.metrics, theoryPhase?.definition?.headline, theoryPhase?.definition?.summary, theoryPhase?.theory_content]
   );
@@ -708,7 +469,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
 
   const selectedRoute = routeList.find((item) => item.id === selectedRouteId) || routeList[0];
   const systemRouteOptions = routeList.filter((item) =>
-    ['fiber_bundle', 'transformer_baseline', 'hybrid_workspace'].includes(item.id)
+    ['fiber_bundle'].includes(item.id)
   );
   const selectedMultimodalData = multimodalSummary?.views?.[multimodalView] || null;
   const selectedMultimodalReport = selectedMultimodalData?.report || null;
@@ -789,7 +550,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
             detail: 'Γ 驱动语义平移',
             desc: '沿流形执行平行移动，减少语义漂移。',
             value_meaning: '推理链更稳定，抗扰动能力更强。',
-            why_important: '是从“拟合”走向“结构推理”的关键。'
+            why_important: '是从"拟合"走向"结构推理"的关键。'
           },
           {
             name: 'Ricci Flow 婕斿寲',
@@ -815,142 +576,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
           brain_ability: t.brain_ability || '结构推理稳定与记忆重。',
           route_param_focus: t.route_param_focus || 'manifold_dim=4, top_k=8, ricci_iterations=100',
         })),
-      },
-      transformer_baseline: {
-        metricCards: [
-          { label: '上下文保持', brain_ability: '工作记忆', value: '74%', color: '#10b981' },
-          { label: '模式泛化', brain_ability: '经验迁移', value: '0.69', color: '#00d2ff' },
-          { label: '可解释覆盖', brain_ability: '自我监控', value: '83%', color: '#ffaa00' },
-          { label: '推理稳定性', brain_ability: '执行控制', value: '0.71', color: '#a855f7' },
-        ],
-        parameterCards: [
-          {
-            name: '模型与序列配。',
-            brain_ability: '语言工作记忆',
-            route_param: 'model=gpt2-small, seq_len=512, batch=16',
-            detail: '标准 Transformer 主干',
-            desc: '通过标准注意力机制建模上下文依赖。',
-            value_meaning: '易复现、生态成熟。',
-            why_important: '是对照路线的基础能力锚点。',
-          },
-          {
-            name: '可解释性探。',
-            brain_ability: '内省与自检',
-            route_param: 'logit_lens=on, tda=on, head_probe=full',
-            detail: '多探针并。',
-            desc: '输出层到中间层的解释链路可追踪。',
-            value_meaning: '便于定位错误来源。',
-            why_important: '支撑实验可解释与回归分析。',
-          },
-          {
-            name: '训练稳定性策。',
-            brain_ability: '执行控制与抑。',
-            route_param: 'lr=1e-4, warmup=2k, clip=1.0',
-            detail: '标准优化管线',
-            desc: '控制梯度震荡与训练发散风险。',
-            value_meaning: '提升训练一致性。',
-            why_important: '影响规模化阶段可持续性。',
-          },
-          {
-            name: 'RAG 鎵╁睍',
-            brain_ability: '长期知识提取',
-            route_param: 'retriever=faiss, topk=5, rerank=on',
-            detail: '外部知识增强',
-            desc: '通过检索补偿参数内知识不足。',
-            value_meaning: '提高事实一致性。',
-            why_important: '降低知识时效衰减。'
-          },
-        ],
-        validationRecords: [
-          {
-            name: '多任务基线回。',
-            date: '2026-02-16',
-            result: 'PASS',
-            brain_ability: '工作记忆稳定与任务切换',
-            route_param_focus: 'seq_len=512, batch=16, clip=1.0',
-            target: '验证标准路线在多任务上的稳定性能。',
-            process: '统一任务集批量回。+ 误差曲线对齐。',
-            significance: '确认基线可作为长期对照参照系。'
-          },
-          {
-            name: '解释链完整性测。',
-            date: '2026-02-16',
-            result: 'PASS',
-            brain_ability: '内省监控与因果追踪',
-            route_param_focus: 'logit_lens=on, tda=on, head_probe=full',
-            target: '验证从激活到输出的可追溯性。',
-            process: 'Logit Lens + 头部归因联合验证。',
-            significance: '确保分析结论具备可复检性。'
-          },
-        ],
-      },
-      hybrid_workspace: {
-        metricCards: [
-          { label: '跨路线一致性', brain_ability: '跨脑区整合', value: '0.76', color: '#10b981' },
-          { label: '仲裁收敛速度', brain_ability: '注意竞争调度', value: '148ms', color: '#00d2ff' },
-          { label: '故障恢复能力', brain_ability: '稳态恢复', value: 'MTTR 2.6m', color: '#ffaa00' },
-          { label: '融合收益', brain_ability: '多通道协同', value: '+8.9%', color: '#a855f7' },
-        ],
-        parameterCards: [
-          {
-            name: '仲裁器参。',
-            brain_ability: '鍐茬獊鍐崇瓥',
-            route_param: 'routes=5, top_k=2, timeout=200ms',
-            detail: '多路线竞争框。',
-            desc: '基于评分和稳定性进行候选筛选。',
-            value_meaning: '平衡质量与时延。',
-            why_important: '决定融合输出可用性。',
-          },
-          {
-            name: '融合策略参数',
-            brain_ability: '多源信息整合',
-            route_param: 'fusion=weighted, dynamic_weight=on',
-            detail: '动态权重融。',
-            desc: '根据路线可靠度动态调节贡献。',
-            value_meaning: '减少单路线失效影响。',
-            why_important: '提高鲁棒性与连续性。',
-          },
-          {
-            name: '鎭㈠涓庨檷绾?',
-            brain_ability: '异常处理',
-            route_param: 'fallback=enabled, retry=2, degrade=graceful',
-            detail: '故障容错机制',
-            desc: '出现异常时自动切换到安全路径。',
-            value_meaning: '避免全链路中断。',
-            why_important: '保障系统稳定运行。'
-          },
-          {
-            name: '治理追踪参数',
-            brain_ability: '长期自我监督',
-            route_param: 'timeline=on, weekly_report=on',
-            detail: '全链路可审计',
-            desc: '持续记录决策证据与失败归因。',
-            value_meaning: '支持迭代改进闭环。',
-            why_important: '提升工程治理效率。'
-          },
-        ],
-        validationRecords: [
-          {
-            name: '多路线并发仲裁测。',
-            date: '2026-02-17',
-            result: 'PASS',
-            brain_ability: '冲突决策与全局调度',
-            route_param_focus: 'routes=5, top_k=2, timeout=200ms',
-            target: '验证多路线并发下仲裁稳定性。',
-            process: '构造冲突任务，统计收敛时间与一致性。',
-            significance: '确认仲裁机制在复杂场景可用。'
-          },
-          {
-            name: '故障注入恢复测试',
-            date: '2026-02-17',
-            result: 'PASS',
-            brain_ability: '稳态恢复与容错控制',
-            route_param_focus: 'fallback=enabled, retry=2, degrade=graceful',
-            target: '验证路由失败时自动降级能力。',
-            process: '注入随机失败，观。MTTR 与回退质量。',
-            significance: '证明混合路线具备工程级容错能力。'
-          },
-        ],
       },
     }),
     [consciousField, selectedRouteId, statusData?.passed_tests]

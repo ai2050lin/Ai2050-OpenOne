@@ -24,9 +24,9 @@ import GrammarRoleMatrixRenderer from './renderers/GrammarRoleMatrixRenderer';
 import CausalChainRenderer from './renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './renderers/DarkMatterFlowRenderer';
 import NeuralNetworkRenderer from './renderers/NeuralNetworkRenderer';
+import ComponentDetailRenderer from './renderers/ComponentDetailRenderer';
 import SceneHelpers from './components/SceneHelpers';
 import HoverTooltip from './components/HoverTooltip';
-import PuzzlePanel from './components/PuzzlePanel';
 import useVisData from './hooks/useVisData';
 import {
   CATEGORY_COLORS, deltaCosToColor, cosWuToColor, SUBSPACE_COLORS,
@@ -89,7 +89,6 @@ export default function NeuralVis3DApp() {
   const [hoveredInfo, setHoveredInfo] = useState(null);
   const [selectedLayers, setSelectedLayers] = useState(null);
   const [highlightedLayer, setHighlightedLayer] = useState(null);
-  const [rightPanel, setRightPanel] = useState('puzzle');
   const [leftPanelTab, setLeftPanelTab] = useState('dimension'); // dimension | renderer | animation
 
   useEffect(() => { loadDataManifest(); }, [loadDataManifest]);
@@ -110,7 +109,6 @@ export default function NeuralVis3DApp() {
     grammar_role_matrix: visualizations.filter(v => v.type === 'grammar_role_matrix'),
     causal_chain: visualizations.filter(v => v.type === 'causal_chain'),
     dark_matter_flow: visualizations.filter(v => v.type === 'dark_matter_flow'),
-    puzzle_progress: visualizations.filter(v => v.type === 'puzzle_progress'),
   };
 
   // ---- 维度视角过滤 ----
@@ -326,9 +324,6 @@ export default function NeuralVis3DApp() {
                       {dim.subViews[activeSubView].renderers.map(r => (
                         <span key={r} style={S.tag(`${dim.color}33`, dim.color)}>{r}</span>
                       ))}
-                    </div>
-                    <div style={{ marginTop: 4 }}>
-                      关联格子: {dim.subViews[activeSubView].puzzleCells.join(', ')}
                     </div>
                   </div>
                 )}
@@ -601,7 +596,7 @@ export default function NeuralVis3DApp() {
           style={{ background: '#0f172a' }}
         >
           <PerspectiveCamera makeDefault position={[25, 30, 25]} fov={50} />
-          <OrbitControls enableDamping dampingFactor={0.1} minDistance={5} maxDistance={150} />
+          <OrbitControls enableDamping dampingFactor={0.1} minDistance={5} />
 
           {/* 灯光 */}
           <ambientLight intensity={0.5} />
@@ -625,6 +620,17 @@ export default function NeuralVis3DApp() {
               animProgress={animProgress}
               activeScenario={activeScenario}
               onHoverLayer={setHighlightedLayer}
+            />
+          )}
+
+          {/* ===== 层组件详情3D模型 ===== */}
+          {showDNNLayers && (
+            <ComponentDetailRenderer
+              nLayers={nLayers}
+              activeLayerRange={activeScenario ? getCurrentPhase()?.layerRange : null}
+              highlightedLayer={highlightedLayer}
+              animProgress={animProgress}
+              activeScenario={activeScenario}
             />
           )}
 
@@ -700,33 +706,12 @@ export default function NeuralVis3DApp() {
 
       {/* ==================== 右侧面板 ==================== */}
       <div style={{ width: 320, borderLeft: '1px solid #1e293b', overflowY: 'auto', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', borderBottom: '1px solid #1e293b', flexShrink: 0 }}>
-          {[
-            { key: 'puzzle', label: '🧩 拼图' },
-            { key: 'detail', label: '📋 详情' },
-          ].map(t => (
-            <button key={t.key} onClick={() => setRightPanel(t.key)}
-              style={{
-                flex: 1, padding: '8px 4px',
-                background: rightPanel === t.key ? 'rgba(96, 165, 250, 0.1)' : 'transparent',
-                border: 'none', borderBottom: rightPanel === t.key ? '2px solid #60a5fa' : '2px solid transparent',
-                color: rightPanel === t.key ? '#60a5fa' : '#64748b',
-                cursor: 'pointer', fontSize: 11, fontWeight: 'bold',
-              }}>
-              {t.label}
-            </button>
-          ))}
+        <div style={{ padding: '8px 4px', background: 'rgba(96, 165, 250, 0.1)', borderBottom: '2px solid #60a5fa', color: '#60a5fa', fontSize: 11, fontWeight: 'bold', textAlign: 'center' }}>
+          📋 详情
         </div>
 
-        {rightPanel === 'puzzle' && (
-          <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
-            <PuzzlePanel puzzleData={byType.puzzle_progress?.[0]} />
-          </div>
-        )}
-
-        {rightPanel === 'detail' && (
-          <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-            <h3 style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>详情</h3>
+        <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+          <h3 style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>详情</h3>
             {hoveredInfo ? (
               <div style={{ fontSize: 12, lineHeight: 1.8 }}>
                 {hoveredInfo.token && <div style={{ color: '#60a5fa', fontWeight: 'bold', fontSize: 14 }}>{hoveredInfo.token}</div>}
@@ -781,7 +766,6 @@ export default function NeuralVis3DApp() {
               </div>
             )}
           </div>
-        )}
       </div>
     </div>
   );
