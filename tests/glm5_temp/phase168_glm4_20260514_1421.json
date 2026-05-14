@@ -1,0 +1,1032 @@
+{
+  "model": "glm4",
+  "model_class": "GlmForCausalLM",
+  "n_layers": 40,
+  "d_model": 4096,
+  "vocab_size": 151552,
+  "use_8bit": true,
+  "timestamp": "2026-05-14 14:12",
+  "n_concepts_total": 50,
+  "exp1_local_vs_global": {
+    "global_pca": {
+      "rank_50": 2,
+      "rank_90": 26,
+      "top1_ratio": 0.4029,
+      "top3_ratio": 0.5791,
+      "top5_ratio": 0.6671
+    },
+    "local_pca": {
+      "animal": {
+        "n_concepts": 10,
+        "rank_50": 1,
+        "rank_90": 6,
+        "top1_ratio": 0.6974,
+        "local_var_ratio": 0.8162999749183655,
+        "global_var_ratio": 0.7057,
+        "local_advantage": 1.1567,
+        "alignment_l0_g0": 0.7911,
+        "alignment_l0_g1": 0.4884,
+        "sv_top5": [
+          27.1476,
+          8.3411,
+          7.484,
+          6.4327,
+          5.9532
+        ]
+      },
+      "vehicle": {
+        "n_concepts": 10,
+        "rank_50": 1,
+        "rank_90": 5,
+        "top1_ratio": 0.705,
+        "local_var_ratio": 0.8432000279426575,
+        "global_var_ratio": 0.7075,
+        "local_advantage": 1.1917,
+        "alignment_l0_g0": 0.7866,
+        "alignment_l0_g1": 0.3163,
+        "sv_top5": [
+          25.03,
+          8.2499,
+          7.3943,
+          6.4351,
+          5.1756
+        ]
+      },
+      "color": {
+        "n_concepts": 10,
+        "rank_50": 1,
+        "rank_90": 6,
+        "top1_ratio": 0.6708,
+        "local_var_ratio": 0.8158000111579895,
+        "global_var_ratio": 0.6853,
+        "local_advantage": 1.1905,
+        "alignment_l0_g0": 0.7737,
+        "alignment_l0_g1": 0.0885,
+        "sv_top5": [
+          24.4088,
+          8.7484,
+          7.2297,
+          5.6738,
+          5.5993
+        ]
+      },
+      "abstract": {
+        "n_concepts": 10,
+        "rank_50": 1,
+        "rank_90": 8,
+        "top1_ratio": 0.5268,
+        "local_var_ratio": 0.6877999901771545,
+        "global_var_ratio": 0.5612,
+        "local_advantage": 1.2256,
+        "alignment_l0_g0": 0.7662,
+        "alignment_l0_g1": 0.4575,
+        "sv_top5": [
+          21.4347,
+          8.8821,
+          7.8488,
+          7.2335,
+          6.9979
+        ]
+      },
+      "emotion": {
+        "n_concepts": 10,
+        "rank_50": 1,
+        "rank_90": 6,
+        "top1_ratio": 0.6568,
+        "local_var_ratio": 0.7835000157356262,
+        "global_var_ratio": 0.6664,
+        "local_advantage": 1.1757,
+        "alignment_l0_g0": 0.7953,
+        "alignment_l0_g1": 0.5014,
+        "sv_top5": [
+          24.608,
+          8.1899,
+          7.053,
+          6.5724,
+          5.9857
+        ]
+      }
+    },
+    "transport": {
+      "animal": {
+        "global_tss": 0.521,
+        "random_tss": 0.3682,
+        "tss_advantage": 1.41
+      },
+      "vehicle": {
+        "global_tss": 0.5605,
+        "random_tss": 0.4343,
+        "tss_advantage": 1.29
+      },
+      "color": {
+        "global_tss": 0.5519,
+        "random_tss": 0.5413,
+        "tss_advantage": 1.02
+      },
+      "abstract": {
+        "global_tss": 0.4641,
+        "random_tss": 0.2772,
+        "tss_advantage": 1.67
+      },
+      "emotion": {
+        "global_tss": 0.4887,
+        "random_tss": 0.3648,
+        "tss_advantage": 1.34
+      }
+    }
+  },
+  "exp2_trajectory": {
+    "n_concepts": 50,
+    "n_layers": 40,
+    "d_model": 4096,
+    "family_separation": {
+      "intra_avg": 14.4782,
+      "inter_avg": 52.7203,
+      "ratio": 3.64
+    },
+    "top_bending_layers": [
+      [
+        9,
+        1.7856
+      ],
+      [
+        4,
+        1.7107
+      ],
+      [
+        7,
+        1.7107
+      ],
+      [
+        10,
+        1.6873
+      ],
+      [
+        12,
+        1.6775
+      ]
+    ],
+    "avg_bending_per_layer": {
+      "0": 1.58,
+      "1": 1.5078,
+      "2": 1.6266,
+      "3": 1.644,
+      "4": 1.7107,
+      "5": 1.6561,
+      "6": 1.6653,
+      "7": 1.7107,
+      "8": 1.5897,
+      "9": 1.7856,
+      "10": 1.6873,
+      "11": 1.653,
+      "12": 1.6775,
+      "13": 1.6611,
+      "14": 1.6297,
+      "15": 1.6605,
+      "16": 1.6244,
+      "17": 1.6425,
+      "18": 1.5979,
+      "19": 1.607,
+      "20": 1.6146,
+      "21": 1.5996,
+      "22": 1.4604,
+      "23": 1.4046,
+      "24": 1.4024,
+      "25": 1.4388,
+      "26": 1.4299,
+      "27": 1.4242,
+      "28": 1.4235,
+      "29": 1.4347,
+      "30": 1.395,
+      "31": 1.4625,
+      "32": 1.5167,
+      "33": 1.5123,
+      "34": 1.4823,
+      "35": 1.4816,
+      "36": 1.278,
+      "37": 1.5218,
+      "38": 1.546
+    },
+    "family_avg_bending": {
+      "animal": {
+        "0": 1.5821,
+        "1": 1.5041,
+        "2": 1.6196,
+        "3": 1.6408,
+        "4": 1.6928,
+        "5": 1.6537,
+        "6": 1.6824,
+        "7": 1.6992,
+        "8": 1.5371,
+        "9": 1.8001,
+        "10": 1.6898,
+        "11": 1.6529,
+        "12": 1.6558,
+        "13": 1.6698,
+        "14": 1.6446,
+        "15": 1.6844,
+        "16": 1.6063,
+        "17": 1.6239,
+        "18": 1.5919,
+        "19": 1.6172,
+        "20": 1.6138,
+        "21": 1.5978,
+        "22": 1.4626,
+        "23": 1.3533,
+        "24": 1.3825,
+        "25": 1.4459,
+        "26": 1.4483,
+        "27": 1.4397,
+        "28": 1.4633,
+        "29": 1.3904,
+        "30": 1.3643,
+        "31": 1.425,
+        "32": 1.5025,
+        "33": 1.5411,
+        "34": 1.5261,
+        "35": 1.5334,
+        "36": 1.3022,
+        "37": 1.539,
+        "38": 1.6181
+      },
+      "vehicle": {
+        "0": 1.5813,
+        "1": 1.4941,
+        "2": 1.6412,
+        "3": 1.6483,
+        "4": 1.7053,
+        "5": 1.6509,
+        "6": 1.6752,
+        "7": 1.7166,
+        "8": 1.5663,
+        "9": 1.8196,
+        "10": 1.6955,
+        "11": 1.6693,
+        "12": 1.6493,
+        "13": 1.6704,
+        "14": 1.6324,
+        "15": 1.6928,
+        "16": 1.6139,
+        "17": 1.6428,
+        "18": 1.6084,
+        "19": 1.609,
+        "20": 1.6332,
+        "21": 1.5981,
+        "22": 1.4843,
+        "23": 1.3673,
+        "24": 1.4103,
+        "25": 1.444,
+        "26": 1.3814,
+        "27": 1.3953,
+        "28": 1.4049,
+        "29": 1.463,
+        "30": 1.3948,
+        "31": 1.4633,
+        "32": 1.5184,
+        "33": 1.5263,
+        "34": 1.5242,
+        "35": 1.5233,
+        "36": 1.349,
+        "37": 1.4703,
+        "38": 1.5561
+      },
+      "color": {
+        "0": 1.604,
+        "1": 1.5002,
+        "2": 1.6189,
+        "3": 1.6452,
+        "4": 1.7149,
+        "5": 1.6556,
+        "6": 1.6592,
+        "7": 1.6925,
+        "8": 1.615,
+        "9": 1.7906,
+        "10": 1.6715,
+        "11": 1.6607,
+        "12": 1.6752,
+        "13": 1.6682,
+        "14": 1.6044,
+        "15": 1.658,
+        "16": 1.6104,
+        "17": 1.6655,
+        "18": 1.5856,
+        "19": 1.5948,
+        "20": 1.6129,
+        "21": 1.6291,
+        "22": 1.4807,
+        "23": 1.4164,
+        "24": 1.3864,
+        "25": 1.498,
+        "26": 1.4686,
+        "27": 1.4514,
+        "28": 1.4463,
+        "29": 1.4563,
+        "30": 1.388,
+        "31": 1.466,
+        "32": 1.5164,
+        "33": 1.5324,
+        "34": 1.4542,
+        "35": 1.431,
+        "36": 1.2338,
+        "37": 1.52,
+        "38": 1.5686
+      },
+      "abstract": {
+        "0": 1.56,
+        "1": 1.5213,
+        "2": 1.6388,
+        "3": 1.6519,
+        "4": 1.7139,
+        "5": 1.6637,
+        "6": 1.6531,
+        "7": 1.725,
+        "8": 1.6252,
+        "9": 1.7618,
+        "10": 1.692,
+        "11": 1.6435,
+        "12": 1.7138,
+        "13": 1.6515,
+        "14": 1.6371,
+        "15": 1.6413,
+        "16": 1.6378,
+        "17": 1.6455,
+        "18": 1.5906,
+        "19": 1.6059,
+        "20": 1.6216,
+        "21": 1.5791,
+        "22": 1.4559,
+        "23": 1.439,
+        "24": 1.4293,
+        "25": 1.4023,
+        "26": 1.4271,
+        "27": 1.4127,
+        "28": 1.4036,
+        "29": 1.4319,
+        "30": 1.4083,
+        "31": 1.4781,
+        "32": 1.5209,
+        "33": 1.5066,
+        "34": 1.4631,
+        "35": 1.4757,
+        "36": 1.2593,
+        "37": 1.504,
+        "38": 1.4748
+      },
+      "emotion": {
+        "0": 1.5727,
+        "1": 1.5192,
+        "2": 1.6142,
+        "3": 1.6337,
+        "4": 1.7265,
+        "5": 1.6565,
+        "6": 1.6566,
+        "7": 1.7206,
+        "8": 1.6049,
+        "9": 1.7559,
+        "10": 1.6878,
+        "11": 1.6386,
+        "12": 1.6933,
+        "13": 1.6455,
+        "14": 1.6299,
+        "15": 1.6264,
+        "16": 1.6537,
+        "17": 1.6349,
+        "18": 1.613,
+        "19": 1.6081,
+        "20": 1.5915,
+        "21": 1.5937,
+        "22": 1.4186,
+        "23": 1.4472,
+        "24": 1.4037,
+        "25": 1.404,
+        "26": 1.4243,
+        "27": 1.4219,
+        "28": 1.3992,
+        "29": 1.4321,
+        "30": 1.4195,
+        "31": 1.4799,
+        "32": 1.5254,
+        "33": 1.4549,
+        "34": 1.4438,
+        "35": 1.4447,
+        "36": 1.2458,
+        "37": 1.5757,
+        "38": 1.5121
+      }
+    },
+    "trajectory_divergence": {
+      "0": 0.0,
+      "6": 0.2064,
+      "12": 1.0416,
+      "18": 1.8871,
+      "24": 5.5509,
+      "30": 21.8522,
+      "36": 39.9932
+    },
+    "max_divergence_layer": 36,
+    "velocity_consistency": {
+      "0": {
+        "top1_var": 0.5456,
+        "top3_var": 0.6909
+      },
+      "6": {
+        "top1_var": 0.7487,
+        "top3_var": 0.855
+      },
+      "12": {
+        "top1_var": 0.5505,
+        "top3_var": 0.7231
+      },
+      "18": {
+        "top1_var": 0.6521,
+        "top3_var": 0.7929
+      },
+      "24": {
+        "top1_var": 0.4681,
+        "top3_var": 0.6344
+      },
+      "30": {
+        "top1_var": 0.3414,
+        "top3_var": 0.5014
+      },
+      "36": {
+        "top1_var": 0.4254,
+        "top3_var": 0.5528
+      }
+    },
+    "per_concept_summary": {
+      "cat": {
+        "family": "animal",
+        "final_delta_norm": 76.3994,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5637
+      },
+      "dog": {
+        "family": "animal",
+        "final_delta_norm": 77.6547,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5583
+      },
+      "tiger": {
+        "family": "animal",
+        "final_delta_norm": 80.3293,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5551
+      },
+      "lion": {
+        "family": "animal",
+        "final_delta_norm": 80.1006,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5581
+      },
+      "horse": {
+        "family": "animal",
+        "final_delta_norm": 76.7669,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5564
+      },
+      "elephant": {
+        "family": "animal",
+        "final_delta_norm": 78.3263,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5618
+      },
+      "eagle": {
+        "family": "animal",
+        "final_delta_norm": 78.6723,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5611
+      },
+      "whale": {
+        "family": "animal",
+        "final_delta_norm": 80.5528,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5595
+      },
+      "bear": {
+        "family": "animal",
+        "final_delta_norm": 72.8263,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5541
+      },
+      "snake": {
+        "family": "animal",
+        "final_delta_norm": 73.6627,
+        "max_vel_layer": 38,
+        "avg_bending": 1.561
+      },
+      "car": {
+        "family": "vehicle",
+        "final_delta_norm": 73.4718,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5621
+      },
+      "truck": {
+        "family": "vehicle",
+        "final_delta_norm": 82.1169,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5565
+      },
+      "bus": {
+        "family": "vehicle",
+        "final_delta_norm": 74.1407,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5561
+      },
+      "train": {
+        "family": "vehicle",
+        "final_delta_norm": 68.114,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5658
+      },
+      "bicycle": {
+        "family": "vehicle",
+        "final_delta_norm": 79.9842,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5642
+      },
+      "airplane": {
+        "family": "vehicle",
+        "final_delta_norm": 73.8897,
+        "max_vel_layer": 38,
+        "avg_bending": 1.568
+      },
+      "boat": {
+        "family": "vehicle",
+        "final_delta_norm": 71.3023,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5594
+      },
+      "motorcycle": {
+        "family": "vehicle",
+        "final_delta_norm": 82.7427,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5589
+      },
+      "ship": {
+        "family": "vehicle",
+        "final_delta_norm": 76.4931,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5574
+      },
+      "helicopter": {
+        "family": "vehicle",
+        "final_delta_norm": 82.5326,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5645
+      },
+      "red": {
+        "family": "color",
+        "final_delta_norm": 57.2028,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5633
+      },
+      "blue": {
+        "family": "color",
+        "final_delta_norm": 63.6623,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5564
+      },
+      "green": {
+        "family": "color",
+        "final_delta_norm": 60.6503,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5636
+      },
+      "white": {
+        "family": "color",
+        "final_delta_norm": 62.0381,
+        "max_vel_layer": 38,
+        "avg_bending": 1.566
+      },
+      "black": {
+        "family": "color",
+        "final_delta_norm": 58.8537,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5602
+      },
+      "yellow": {
+        "family": "color",
+        "final_delta_norm": 65.2017,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5565
+      },
+      "purple": {
+        "family": "color",
+        "final_delta_norm": 69.626,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5574
+      },
+      "orange": {
+        "family": "color",
+        "final_delta_norm": 73.7033,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5643
+      },
+      "pink": {
+        "family": "color",
+        "final_delta_norm": 70.514,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5533
+      },
+      "brown": {
+        "family": "color",
+        "final_delta_norm": 64.2919,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5608
+      },
+      "democracy": {
+        "family": "abstract",
+        "final_delta_norm": 89.4857,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5507
+      },
+      "freedom": {
+        "family": "abstract",
+        "final_delta_norm": 68.9177,
+        "max_vel_layer": 39,
+        "avg_bending": 1.558
+      },
+      "justice": {
+        "family": "abstract",
+        "final_delta_norm": 80.7085,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5503
+      },
+      "power": {
+        "family": "abstract",
+        "final_delta_norm": 61.7983,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5555
+      },
+      "truth": {
+        "family": "abstract",
+        "final_delta_norm": 59.0808,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5598
+      },
+      "beauty": {
+        "family": "abstract",
+        "final_delta_norm": 63.2853,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5545
+      },
+      "wisdom": {
+        "family": "abstract",
+        "final_delta_norm": 68.2228,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5491
+      },
+      "courage": {
+        "family": "abstract",
+        "final_delta_norm": 74.3202,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5565
+      },
+      "equality": {
+        "family": "abstract",
+        "final_delta_norm": 57.8909,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5686
+      },
+      "peace": {
+        "family": "abstract",
+        "final_delta_norm": 77.6329,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5524
+      },
+      "love": {
+        "family": "emotion",
+        "final_delta_norm": 70.978,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5528
+      },
+      "anger": {
+        "family": "emotion",
+        "final_delta_norm": 82.9628,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5511
+      },
+      "fear": {
+        "family": "emotion",
+        "final_delta_norm": 71.2951,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5521
+      },
+      "joy": {
+        "family": "emotion",
+        "final_delta_norm": 67.4674,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5559
+      },
+      "sadness": {
+        "family": "emotion",
+        "final_delta_norm": 73.2495,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5509
+      },
+      "hope": {
+        "family": "emotion",
+        "final_delta_norm": 64.3833,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5525
+      },
+      "pride": {
+        "family": "emotion",
+        "final_delta_norm": 73.8612,
+        "max_vel_layer": 38,
+        "avg_bending": 1.5558
+      },
+      "shame": {
+        "family": "emotion",
+        "final_delta_norm": 82.6324,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5452
+      },
+      "guilt": {
+        "family": "emotion",
+        "final_delta_norm": 86.0792,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5495
+      },
+      "surprise": {
+        "family": "emotion",
+        "final_delta_norm": 63.5671,
+        "max_vel_layer": 39,
+        "avg_bending": 1.5547
+      }
+    }
+  },
+  "exp3_routing": {
+    "n_concepts": 50,
+    "top_k": 50,
+    "sample_layers": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36,
+      39
+    ],
+    "layer_overlap": {
+      "0": {
+        "same_family": 0.9122,
+        "diff_family": 0.8971,
+        "advantage": 1.02
+      },
+      "6": {
+        "same_family": 0.5658,
+        "diff_family": 0.432,
+        "advantage": 1.31
+      },
+      "12": {
+        "same_family": 0.2951,
+        "diff_family": 0.1452,
+        "advantage": 2.03
+      },
+      "18": {
+        "same_family": 0.4681,
+        "diff_family": 0.3506,
+        "advantage": 1.34
+      },
+      "24": {
+        "same_family": 0.4394,
+        "diff_family": 0.3144,
+        "advantage": 1.4
+      },
+      "30": {
+        "same_family": 0.2226,
+        "diff_family": 0.151,
+        "advantage": 1.47
+      },
+      "36": {
+        "same_family": 0.2506,
+        "diff_family": 0.173,
+        "advantage": 1.45
+      },
+      "39": {
+        "same_family": 0.6814,
+        "diff_family": 0.5366,
+        "advantage": 1.27
+      }
+    },
+    "routing_sparsity": {
+      "0": {
+        "n_unique_neurons": 63,
+        "routing_capacity": 0.0252,
+        "avg_unique_fraction": 0.0016,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.9649,
+          "animal_vs_color": 0.9464,
+          "animal_vs_abstract": 0.9167,
+          "animal_vs_emotion": 0.9167,
+          "vehicle_vs_color": 0.9474,
+          "vehicle_vs_abstract": 0.918,
+          "vehicle_vs_emotion": 0.918,
+          "color_vs_abstract": 0.9,
+          "color_vs_emotion": 0.9,
+          "abstract_vs_emotion": 0.9355
+        }
+      },
+      "6": {
+        "n_unique_neurons": 174,
+        "routing_capacity": 0.0696,
+        "avg_unique_fraction": 0.0148,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.6606,
+          "animal_vs_color": 0.5285,
+          "animal_vs_abstract": 0.4526,
+          "animal_vs_emotion": 0.4317,
+          "vehicle_vs_color": 0.5528,
+          "vehicle_vs_abstract": 0.4963,
+          "vehicle_vs_emotion": 0.4963,
+          "color_vs_abstract": 0.5145,
+          "color_vs_emotion": 0.5036,
+          "abstract_vs_emotion": 0.6541
+        }
+      },
+      "12": {
+        "n_unique_neurons": 504,
+        "routing_capacity": 0.2016,
+        "avg_unique_fraction": 0.0748,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.2394,
+          "animal_vs_color": 0.272,
+          "animal_vs_abstract": 0.1695,
+          "animal_vs_emotion": 0.1785,
+          "vehicle_vs_color": 0.2266,
+          "vehicle_vs_abstract": 0.1933,
+          "vehicle_vs_emotion": 0.1812,
+          "color_vs_abstract": 0.2551,
+          "color_vs_emotion": 0.25,
+          "abstract_vs_emotion": 0.3816
+        }
+      },
+      "18": {
+        "n_unique_neurons": 270,
+        "routing_capacity": 0.108,
+        "avg_unique_fraction": 0.0272,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.4813,
+          "animal_vs_color": 0.4268,
+          "animal_vs_abstract": 0.3776,
+          "animal_vs_emotion": 0.3462,
+          "vehicle_vs_color": 0.3713,
+          "vehicle_vs_abstract": 0.3384,
+          "vehicle_vs_emotion": 0.3483,
+          "color_vs_abstract": 0.3646,
+          "color_vs_emotion": 0.339,
+          "abstract_vs_emotion": 0.4677
+        }
+      },
+      "24": {
+        "n_unique_neurons": 339,
+        "routing_capacity": 0.1356,
+        "avg_unique_fraction": 0.0492,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.3229,
+          "animal_vs_color": 0.305,
+          "animal_vs_abstract": 0.2419,
+          "animal_vs_emotion": 0.2655,
+          "vehicle_vs_color": 0.3333,
+          "vehicle_vs_abstract": 0.2944,
+          "vehicle_vs_emotion": 0.3066,
+          "color_vs_abstract": 0.325,
+          "color_vs_emotion": 0.3729,
+          "abstract_vs_emotion": 0.45
+        }
+      },
+      "30": {
+        "n_unique_neurons": 627,
+        "routing_capacity": 0.2508,
+        "avg_unique_fraction": 0.1108,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.2167,
+          "animal_vs_color": 0.2529,
+          "animal_vs_abstract": 0.173,
+          "animal_vs_emotion": 0.1937,
+          "vehicle_vs_color": 0.2071,
+          "vehicle_vs_abstract": 0.2137,
+          "vehicle_vs_emotion": 0.2167,
+          "color_vs_abstract": 0.2385,
+          "color_vs_emotion": 0.2456,
+          "abstract_vs_emotion": 0.3097
+        }
+      },
+      "36": {
+        "n_unique_neurons": 520,
+        "routing_capacity": 0.208,
+        "avg_unique_fraction": 0.0932,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.2695,
+          "animal_vs_color": 0.2776,
+          "animal_vs_abstract": 0.2515,
+          "animal_vs_emotion": 0.25,
+          "vehicle_vs_color": 0.2894,
+          "vehicle_vs_abstract": 0.2764,
+          "vehicle_vs_emotion": 0.2365,
+          "color_vs_abstract": 0.2979,
+          "color_vs_emotion": 0.2658,
+          "abstract_vs_emotion": 0.3707
+        }
+      },
+      "39": {
+        "n_unique_neurons": 113,
+        "routing_capacity": 0.0452,
+        "avg_unique_fraction": 0.0044,
+        "family_overlap": {
+          "animal_vs_vehicle": 0.6465,
+          "animal_vs_color": 0.7333,
+          "animal_vs_abstract": 0.6598,
+          "animal_vs_emotion": 0.6632,
+          "vehicle_vs_color": 0.7065,
+          "vehicle_vs_abstract": 0.6531,
+          "vehicle_vs_emotion": 0.6224,
+          "color_vs_abstract": 0.6667,
+          "color_vs_emotion": 0.6344,
+          "abstract_vs_emotion": 0.869
+        }
+      }
+    }
+  },
+  "exp4_curvature": {
+    "n_concepts": 20,
+    "target_layer": 26,
+    "alpha": 3.0,
+    "interaction_results": {
+      "PC0_PC1": {
+        "interaction_norm": 46.0246,
+        "dual_effect_norm": 74.4104,
+        "linear_sum_norm": 88.1957,
+        "relative_interaction": 0.6185,
+        "cos_interaction_linear": -0.537
+      },
+      "PC0_PC2": {
+        "interaction_norm": 46.8097,
+        "dual_effect_norm": 74.1713,
+        "linear_sum_norm": 89.3056,
+        "relative_interaction": 0.6311,
+        "cos_interaction_linear": -0.558
+      },
+      "PC1_PC0": {
+        "interaction_norm": 47.7743,
+        "dual_effect_norm": 76.9643,
+        "linear_sum_norm": 93.6033,
+        "relative_interaction": 0.6207,
+        "cos_interaction_linear": -0.5725
+      },
+      "PC1_PC2": {
+        "interaction_norm": 47.0521,
+        "dual_effect_norm": 83.0735,
+        "linear_sum_norm": 95.4566,
+        "relative_interaction": 0.5664,
+        "cos_interaction_linear": -0.4926
+      },
+      "PC2_PC0": {
+        "interaction_norm": 49.4096,
+        "dual_effect_norm": 73.6844,
+        "linear_sum_norm": 94.2814,
+        "relative_interaction": 0.6706,
+        "cos_interaction_linear": -0.6334
+      },
+      "PC2_PC1": {
+        "interaction_norm": 46.1094,
+        "dual_effect_norm": 82.3047,
+        "linear_sum_norm": 97.2332,
+        "relative_interaction": 0.5602,
+        "cos_interaction_linear": -0.536
+      }
+    },
+    "dose_curvature": {
+      "alpha_1.0": {
+        "interaction_norm": 40.755,
+        "dual_norm": 40.6128,
+        "relative_interaction": 1.0035
+      },
+      "alpha_2.0": {
+        "interaction_norm": 47.6262,
+        "dual_norm": 55.7793,
+        "relative_interaction": 0.8538
+      },
+      "alpha_3.0": {
+        "interaction_norm": 46.0246,
+        "dual_norm": 74.4104,
+        "relative_interaction": 0.6185
+      },
+      "alpha_5.0": {
+        "interaction_norm": 55.231,
+        "dual_norm": 118.3755,
+        "relative_interaction": 0.4666
+      }
+    },
+    "scaling_ratios": [
+      0.5843,
+      0.6442,
+      0.72
+    ],
+    "avg_scaling": 0.6495,
+    "curvature_verdict": "approximately_linear"
+  }
+}
