@@ -1,0 +1,68 @@
+[Phase 198b] Lite mode transition â€” deepseek7b
+[Phase 198b] Time: 2026-05-16 22:34:22.606663
+[bf16] Loading deepseek7b (bfloat16 + device_map=auto)...
+Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|¨€¨€¨€¨€¨€     | 1/2 [00:09<00:09,  9.51s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 2/2 [00:09<00:00,  4.17s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 2/2 [00:09<00:00,  4.97s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[bf16] deepseek7b loaded: GPU=0 components, CPU=14 components, class=Qwen2ForCausalLM, GPU mem=9.01GB
+[load] deepseek7b: Qwen2ForCausalLM, 28L, d=3584
+Config: 5 sent, 6 steps, 10 samples
+
+====== Exp1: Semantic vs Random KL =====
+  S1/5 done, GPU=9.03GB, t=35s
+  S2/5 done, GPU=9.03GB, t=50s
+  S3/5 done, GPU=9.03GB, t=65s
+  S4/5 done, GPU=9.03GB, t=79s
+  S5/5 done, GPU=9.03GB, t=94s
+
+--- KL Profile ---
+Step | negation question rand_tok
+   0 |    1.754   12.487    2.091
+   1 |    4.675    7.980    4.816
+   2 |    5.129    7.313    7.040
+   3 |    4.985    5.831    5.343
+   4 |   10.691   13.372    9.159
+   5 |   11.129   11.108    5.412
+
+--- KL Slope ---
+  negation     slope=1.8508 (INC), KL[0]=1.754, KL[-1]=11.129
+  question     slope=0.2228 (INC), KL[0]=12.487, KL[-1]=11.108
+  rand_token   slope=0.7982 (INC), KL[0]=2.091, KL[-1]=5.412
+
+  Semantic mean slope: 1.0368
+  Random slope:       0.7982
+  Ratio: 1.30x
+  >>> WARNING: KL increase may be autoregressive tautology
+
+====== Exp2: Conditional Delay =====
+  'The cat chases the dog' vs 'If the cat chases the dog'
+    KL: 0.811 -> 10.572, slope=2.7760
+  'The ground is dry' vs 'If it rains, the ground'
+    KL: 13.488 -> 13.381, slope=-0.4962
+  'The student studies hard' vs 'If the student studies hard'
+    KL: 0.246 -> 10.506, slope=2.5292
+
+====== Exp3: Mode Attractor Basin =====
+  cot:
+    Base:    [('2', 10)]
+    Trigger: [('.', 10)]
+  translation:
+    Base:    [('9', 4), ('8', 2), ('2', 2), ('1', 1), ('4', 1)]
+    Trigger: [('9', 4), ('6', 3), ('8', 2), ('5', 1)]
+
+====== Exp4: Constraint Delay Spectrum =====
+  negation     KL[0]=1.879, slope=2.1904 (MODERATE)
+  question     KL[0]=14.209, slope=0.3069 (IMMEDIATE)
+  conditional  KL[0]=1.847, slope=2.1653 (MODERATE)
+  rand_token   KL[0]=1.492, slope=0.4405 (MODERATE)
+
+[Phase 198b] COMPLETE in 230.5s (deepseek7b)
+
+=== SUMMARY ===
+1. Sem/Rand KL slope ratio: 1.30x
+2. Delay spectrum:
+   negation: MODERATE (KL[0]=1.88, slope=2.1904)
+   question: IMMEDIATE (KL[0]=14.21, slope=0.3069)
+   conditional: MODERATE (KL[0]=1.85, slope=2.1653)
+   rand_token: MODERATE (KL[0]=1.49, slope=0.4405)
+[model_utils] GPU memory released, allocated=9.04 GB
