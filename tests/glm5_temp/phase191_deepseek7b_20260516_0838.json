@@ -1,0 +1,372 @@
+{
+  "model": "deepseek7b",
+  "model_info": {
+    "n_layers": 28,
+    "d_model": 3584,
+    "vocab_size": 152064,
+    "model_class": "Qwen2ForCausalLM"
+  },
+  "timestamp": "2026-05-16 08:35:18",
+  "exp1": {
+    "orthogonality": {
+      "NOT_vs_PAST": {
+        "mean_cos": 0.21365506201982498,
+        "std_cos": 0.11438220683783837,
+        "individual": [
+          0.10122416168451309,
+          0.06014072895050049,
+          0.24097846448421478,
+          0.3710213303565979,
+          0.3444471061229706,
+          0.19362960755825043,
+          0.10065770894289017,
+          0.33046528697013855,
+          0.29401472210884094,
+          0.1578163355588913,
+          0.3372257351875305,
+          0.0975608080625534,
+          0.10458743572235107,
+          0.37594693899154663,
+          0.09510955959558487
+        ]
+      },
+      "NOT_vs_PLURAL": {
+        "mean_cos": 0.31749474902947744,
+        "std_cos": 0.11889058177054711,
+        "individual": [
+          0.21676556766033173,
+          0.5582454204559326,
+          0.40715035796165466,
+          0.3598235845565796,
+          0.37567174434661865,
+          0.3127923607826233,
+          0.22452408075332642,
+          0.5455366969108582,
+          0.407247394323349,
+          0.28924834728240967,
+          0.25176361203193665,
+          0.2249726951122284,
+          0.1438317596912384,
+          0.2280798852443695,
+          0.21676772832870483
+        ]
+      },
+      "PAST_vs_PLURAL": {
+        "mean_cos": 0.29782959769169487,
+        "std_cos": 0.16460499263785208,
+        "individual": [
+          0.16236381232738495,
+          0.09073531627655029,
+          0.3746052384376526,
+          0.41248440742492676,
+          0.34874439239501953,
+          0.48098665475845337,
+          0.31719690561294556,
+          0.2324094921350479,
+          0.24803473055362701,
+          0.0918269231915474,
+          0.3608683943748474,
+          0.13669900596141815,
+          0.732487678527832,
+          0.15342555940151215,
+          0.3245754539966583
+        ]
+      }
+    },
+    "stability": {
+      "NOT": {
+        "mean_cos_across_bases": 0.27746438554355074,
+        "n_pairs": 105
+      },
+      "PAST": {
+        "mean_cos_across_bases": 0.18947351883564675,
+        "n_pairs": 105
+      },
+      "PLURAL": {
+        "mean_cos_across_bases": 0.11211029000835315,
+        "n_pairs": 105
+      }
+    },
+    "additivity": {
+      "NOT+PAST": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8548362215360006,
+        "mean_residual_ratio": "0.68687665",
+        "n_samples": 15
+      },
+      "NOT+PLURAL": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8831249952316285,
+        "mean_residual_ratio": "0.6449784",
+        "n_samples": 15
+      },
+      "PAST+PLURAL": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8118346412976583,
+        "mean_residual_ratio": "0.8285433",
+        "n_samples": 15
+      }
+    },
+    "commutativity": {
+      "NOT_on_PAST_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.7382696032524109,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.39266040722529094,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      },
+      "NOT_on_PLURAL_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.7532762885093689,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.3982028345266978,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      },
+      "PAST_on_PLURAL_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.5175915280977885,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.4509825199842453,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      }
+    },
+    "triple_cos_mean": 0.81279483238856,
+    "triple_residual_mean": 1.0115299224853516
+  },
+  "exp2": {
+    "role_diff_by_layer_key": {
+      "L0": 1.9369451999664307,
+      "L7": 100.7906723022461,
+      "L14": 164.96311950683594,
+      "L21": 239.0961456298828,
+      "L28": 131.97225952148438
+    },
+    "role_direction_consistency": 0.018809621138988358,
+    "active_passive_cos": 0.8815067827701568,
+    "active_reversed_cos": 0.8487916082143784,
+    "top_role_sensitive_heads": [
+      {
+        "layer": 27,
+        "head": 12,
+        "sensitivity": 0.49466413259506226
+      },
+      {
+        "layer": 8,
+        "head": 15,
+        "sensitivity": 0.4212324619293213
+      },
+      {
+        "layer": 27,
+        "head": 7,
+        "sensitivity": 0.4009532332420349
+      },
+      {
+        "layer": 27,
+        "head": 11,
+        "sensitivity": 0.37848350405693054
+      },
+      {
+        "layer": 12,
+        "head": 18,
+        "sensitivity": 0.3761589229106903
+      },
+      {
+        "layer": 27,
+        "head": 13,
+        "sensitivity": 0.37592753767967224
+      },
+      {
+        "layer": 0,
+        "head": 20,
+        "sensitivity": 0.37340247631073
+      },
+      {
+        "layer": 0,
+        "head": 2,
+        "sensitivity": 0.34533974528312683
+      },
+      {
+        "layer": 22,
+        "head": 11,
+        "sensitivity": 0.3393458127975464
+      },
+      {
+        "layer": 19,
+        "head": 9,
+        "sensitivity": 0.3273930251598358
+      }
+    ],
+    "content_role_orthogonality": 0.0834870043268893
+  },
+  "exp3": {
+    "routing_by_type": {
+      "simple_declarative": {
+        "mean_attn_entropy": 1.2478865385055542,
+        "first_token_attn_ratio": 0.3473608195781708,
+        "early_layer_attn_mean": 0.15713843703269958,
+        "late_layer_attn_mean": 0.15714474022388458
+      },
+      "negation": {
+        "mean_attn_entropy": 1.4131635427474976,
+        "first_token_attn_ratio": 0.32497259974479675,
+        "early_layer_attn_mean": 0.11944220960140228,
+        "late_layer_attn_mean": 0.1194487065076828
+      },
+      "question": {
+        "mean_attn_entropy": 1.488161563873291,
+        "first_token_attn_ratio": 0.28840214014053345,
+        "early_layer_attn_mean": 0.11944053322076797,
+        "late_layer_attn_mean": 0.11944518238306046
+      },
+      "conditional": {
+        "mean_attn_entropy": 1.5737826824188232,
+        "first_token_attn_ratio": 0.29611438512802124,
+        "early_layer_attn_mean": 0.09151605516672134,
+        "late_layer_attn_mean": 0.0915137231349945
+      },
+      "causal": {
+        "mean_attn_entropy": 1.6566475629806519,
+        "first_token_attn_ratio": 0.27659153938293457,
+        "early_layer_attn_mean": 0.08841630071401596,
+        "late_layer_attn_mean": 0.08841590583324432
+      }
+    },
+    "cross_type_diff": {
+      "simple_declarative_vs_negation": {
+        "entropy_diff": 0.16527700424194336,
+        "first_token_diff": 0.022388219833374023
+      },
+      "simple_declarative_vs_question": {
+        "entropy_diff": 0.24027502536773682,
+        "first_token_diff": 0.05895867943763733
+      },
+      "simple_declarative_vs_conditional": {
+        "entropy_diff": 0.32589614391326904,
+        "first_token_diff": 0.051246434450149536
+      },
+      "simple_declarative_vs_causal": {
+        "entropy_diff": 0.40876102447509766,
+        "first_token_diff": 0.0707692801952362
+      },
+      "negation_vs_question": {
+        "entropy_diff": 0.07499802112579346,
+        "first_token_diff": 0.036570459604263306
+      },
+      "negation_vs_conditional": {
+        "entropy_diff": 0.16061913967132568,
+        "first_token_diff": 0.028858214616775513
+      },
+      "negation_vs_causal": {
+        "entropy_diff": 0.2434840202331543,
+        "first_token_diff": 0.04838106036186218
+      },
+      "question_vs_conditional": {
+        "entropy_diff": 0.08562111854553223,
+        "first_token_diff": 0.007712244987487793
+      },
+      "question_vs_causal": {
+        "entropy_diff": 0.16848599910736084,
+        "first_token_diff": 0.011810600757598877
+      },
+      "conditional_vs_causal": {
+        "entropy_diff": 0.08286488056182861,
+        "first_token_diff": 0.01952284574508667
+      }
+    }
+  },
+  "exp4": {
+    "discrimination_summary": {
+      "negation": {
+        "L0": {
+          "mean_diff_norm": 0.0,
+          "mean_cosine": 1.0000000238418578
+        },
+        "L7": {
+          "mean_diff_norm": 51.50432586669922,
+          "mean_cosine": 0.8667935132980347
+        },
+        "L14": {
+          "mean_diff_norm": 108.65016174316406,
+          "mean_cosine": 0.8340730547904969
+        },
+        "L21": {
+          "mean_diff_norm": 175.9840545654297,
+          "mean_cosine": 0.8780110955238343
+        },
+        "L28": {
+          "mean_diff_norm": 66.8880386352539,
+          "mean_cosine": 0.9573584914207458
+        }
+      },
+      "tense": {
+        "L0": {
+          "mean_diff_norm": 0.32353779673576355,
+          "mean_cosine": 0.8272426575422287
+        },
+        "L7": {
+          "mean_diff_norm": 40.8473014831543,
+          "mean_cosine": 0.9267289519309998
+        },
+        "L14": {
+          "mean_diff_norm": 76.7018051147461,
+          "mean_cosine": 0.9227222919464111
+        },
+        "L21": {
+          "mean_diff_norm": 133.33840942382812,
+          "mean_cosine": 0.9330421566963196
+        },
+        "L28": {
+          "mean_diff_norm": 83.00016021728516,
+          "mean_cosine": 0.9243249297142029
+        }
+      },
+      "role_binding": {
+        "L0": {
+          "mean_diff_norm": 1.935117483139038,
+          "mean_cosine": 0.12940779477357864
+        },
+        "L7": {
+          "mean_diff_norm": 88.67568969726562,
+          "mean_cosine": 0.5977681696414947
+        },
+        "L14": {
+          "mean_diff_norm": 150.18931579589844,
+          "mean_cosine": 0.6882781863212586
+        },
+        "L21": {
+          "mean_diff_norm": 216.60482788085938,
+          "mean_cosine": 0.802038848400116
+        },
+        "L28": {
+          "mean_diff_norm": 100.29745483398438,
+          "mean_cosine": 0.9131813287734986
+        }
+      }
+    },
+    "peak_layers": {
+      "negation": {
+        "peak_layer": 27,
+        "peak_diff": 349.0396728515625
+      },
+      "tense": {
+        "peak_layer": 27,
+        "peak_diff": 300.3103332519531
+      },
+      "role_binding": {
+        "peak_layer": 27,
+        "peak_diff": 438.3750915527344
+      }
+    },
+    "curve_shapes": {
+      "negation": {
+        "shape": "monotone_increasing",
+        "early_mean": 29.32376480102539,
+        "mid_mean": 104.17253112792969,
+        "late_mean": 216.96066284179688
+      },
+      "tense": {
+        "shape": "monotone_increasing",
+        "early_mean": 28.104448318481445,
+        "mid_mean": 75.99763488769531,
+        "late_mean": 176.22964477539062
+      },
+      "role_binding": {
+        "shape": "monotone_increasing",
+        "early_mean": 60.96656799316406,
+        "mid_mean": 147.1236114501953,
+        "late_mean": 276.3464050292969
+      }
+    }
+  }
+}

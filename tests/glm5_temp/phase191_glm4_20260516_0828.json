@@ -1,0 +1,372 @@
+{
+  "model": "glm4",
+  "model_info": {
+    "n_layers": 40,
+    "d_model": 4096,
+    "vocab_size": 151552,
+    "model_class": "GlmForCausalLM"
+  },
+  "timestamp": "2026-05-16 08:23:22",
+  "exp1": {
+    "orthogonality": {
+      "NOT_vs_PAST": {
+        "mean_cos": 0.16421688391516606,
+        "std_cos": 0.11595475553971438,
+        "individual": [
+          0.11723863333463669,
+          0.1537085771560669,
+          0.05980256199836731,
+          0.04133937507867813,
+          0.4159576892852783,
+          0.4261135756969452,
+          0.17478473484516144,
+          0.18871310353279114,
+          0.1552903652191162,
+          0.11228296905755997,
+          0.20836256444454193,
+          0.18048767745494843,
+          -0.004018024541437626,
+          0.07878074795007706,
+          0.15440870821475983
+        ]
+      },
+      "NOT_vs_PLURAL": {
+        "mean_cos": 0.25345748861630757,
+        "std_cos": 0.08611571546825396,
+        "individual": [
+          0.29442110657691956,
+          0.2994482219219208,
+          0.2757732570171356,
+          0.15699145197868347,
+          0.3385377526283264,
+          0.450403094291687,
+          0.17884531617164612,
+          0.23592659831047058,
+          0.10313552618026733,
+          0.31641361117362976,
+          0.30171582102775574,
+          0.2378043532371521,
+          0.16127777099609375,
+          0.28283965587615967,
+          0.16832879185676575
+        ]
+      },
+      "PAST_vs_PLURAL": {
+        "mean_cos": 0.22379421641429265,
+        "std_cos": 0.17647470098691193,
+        "individual": [
+          0.1610618531703949,
+          0.37665435671806335,
+          0.14425013959407806,
+          0.12378071993589401,
+          0.36471083760261536,
+          0.6732707619667053,
+          0.07503078132867813,
+          0.10053405910730362,
+          0.12685389816761017,
+          0.06523104757070541,
+          0.4201009273529053,
+          0.4319491386413574,
+          0.10304991900920868,
+          0.08380895853042603,
+          0.10662584751844406
+        ]
+      }
+    },
+    "stability": {
+      "NOT": {
+        "mean_cos_across_bases": 0.2625744367639224,
+        "n_pairs": 105
+      },
+      "PAST": {
+        "mean_cos_across_bases": 0.2522117114492825,
+        "n_pairs": 105
+      },
+      "PLURAL": {
+        "mean_cos_across_bases": 0.0914056722329752,
+        "n_pairs": 105
+      }
+    },
+    "additivity": {
+      "NOT+PAST": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8746237357457479,
+        "mean_residual_ratio": "0.59490263",
+        "n_samples": 15
+      },
+      "NOT+PLURAL": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8833375374476115,
+        "mean_residual_ratio": "0.59747857",
+        "n_samples": 15
+      },
+      "PAST+PLURAL": {
+        "mean_cos_d_combined_vs_d1_plus_d2": 0.8489492972691853,
+        "mean_residual_ratio": "0.68201196",
+        "n_samples": 15
+      }
+    },
+    "commutativity": {
+      "NOT_on_PAST_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.7987638195355733,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.4591771761576335,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      },
+      "NOT_on_PLURAL_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.7873853047688802,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.4160927802324295,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      },
+      "PAST_on_PLURAL_base": {
+        "cos_d_op1_base_vs_d_op1_op2base": 0.632967738310496,
+        "cos_d_op2_base_vs_d_op2_op1base": 0.5633343517780304,
+        "interpretation": "If ≈1.0, operator effect is context-independent (commutative)"
+      }
+    },
+    "triple_cos_mean": 0.8257875601450603,
+    "triple_residual_mean": 0.875396192073822
+  },
+  "exp2": {
+    "role_diff_by_layer_key": {
+      "L0": 0.1408253014087677,
+      "L10": 3.6896004676818848,
+      "L20": 8.339338302612305,
+      "L30": 37.44786071777344,
+      "L40": 132.5839385986328
+    },
+    "role_direction_consistency": 0.093660220462449,
+    "active_passive_cos": 0.7165842175483703,
+    "active_reversed_cos": 0.7470313340425492,
+    "top_role_sensitive_heads": [
+      {
+        "layer": 37,
+        "head": 11,
+        "sensitivity": 0.494306743144989
+      },
+      {
+        "layer": 22,
+        "head": 5,
+        "sensitivity": 0.4925817847251892
+      },
+      {
+        "layer": 37,
+        "head": 31,
+        "sensitivity": 0.4808878004550934
+      },
+      {
+        "layer": 16,
+        "head": 3,
+        "sensitivity": 0.4758501648902893
+      },
+      {
+        "layer": 15,
+        "head": 2,
+        "sensitivity": 0.45941075682640076
+      },
+      {
+        "layer": 23,
+        "head": 23,
+        "sensitivity": 0.4464283585548401
+      },
+      {
+        "layer": 15,
+        "head": 12,
+        "sensitivity": 0.41662508249282837
+      },
+      {
+        "layer": 21,
+        "head": 18,
+        "sensitivity": 0.41618937253952026
+      },
+      {
+        "layer": 25,
+        "head": 14,
+        "sensitivity": 0.4109717905521393
+      },
+      {
+        "layer": 13,
+        "head": 15,
+        "sensitivity": 0.4067460894584656
+      }
+    ],
+    "content_role_orthogonality": 0.06807344560511411
+  },
+  "exp3": {
+    "routing_by_type": {
+      "simple_declarative": {
+        "mean_attn_entropy": 1.222266674041748,
+        "first_token_attn_ratio": 0.3248957395553589,
+        "early_layer_attn_mean": 0.135711207985878,
+        "late_layer_attn_mean": 0.13571500778198242
+      },
+      "negation": {
+        "mean_attn_entropy": 1.3025729656219482,
+        "first_token_attn_ratio": 0.3129996061325073,
+        "early_layer_attn_mean": 0.10666871070861816,
+        "late_layer_attn_mean": 0.10666736215353012
+      },
+      "question": {
+        "mean_attn_entropy": 1.3107671737670898,
+        "first_token_attn_ratio": 0.3118664026260376,
+        "early_layer_attn_mean": 0.10666660219430923,
+        "late_layer_attn_mean": 0.10666446387767792
+      },
+      "conditional": {
+        "mean_attn_entropy": 1.3932735919952393,
+        "first_token_attn_ratio": 0.2955881357192993,
+        "early_layer_attn_mean": 0.0837978646159172,
+        "late_layer_attn_mean": 0.08379916846752167
+      },
+      "causal": {
+        "mean_attn_entropy": 1.3944989442825317,
+        "first_token_attn_ratio": 0.30084165930747986,
+        "early_layer_attn_mean": 0.08118405938148499,
+        "late_layer_attn_mean": 0.08118493854999542
+      }
+    },
+    "cross_type_diff": {
+      "simple_declarative_vs_negation": {
+        "entropy_diff": 0.0803062915802002,
+        "first_token_diff": 0.011896133422851562
+      },
+      "simple_declarative_vs_question": {
+        "entropy_diff": 0.0885004997253418,
+        "first_token_diff": 0.013029336929321289
+      },
+      "simple_declarative_vs_conditional": {
+        "entropy_diff": 0.1710069179534912,
+        "first_token_diff": 0.02930760383605957
+      },
+      "simple_declarative_vs_causal": {
+        "entropy_diff": 0.1722322702407837,
+        "first_token_diff": 0.02405408024787903
+      },
+      "negation_vs_question": {
+        "entropy_diff": 0.008194208145141602,
+        "first_token_diff": 0.0011332035064697266
+      },
+      "negation_vs_conditional": {
+        "entropy_diff": 0.09070062637329102,
+        "first_token_diff": 0.017411470413208008
+      },
+      "negation_vs_causal": {
+        "entropy_diff": 0.0919259786605835,
+        "first_token_diff": 0.012157946825027466
+      },
+      "question_vs_conditional": {
+        "entropy_diff": 0.08250641822814941,
+        "first_token_diff": 0.01627826690673828
+      },
+      "question_vs_causal": {
+        "entropy_diff": 0.0837317705154419,
+        "first_token_diff": 0.01102474331855774
+      },
+      "conditional_vs_causal": {
+        "entropy_diff": 0.0012253522872924805,
+        "first_token_diff": 0.005253523588180542
+      }
+    }
+  },
+  "exp4": {
+    "discrimination_summary": {
+      "negation": {
+        "L0": {
+          "mean_diff_norm": 0.0,
+          "mean_cosine": 0.9999999761581421
+        },
+        "L10": {
+          "mean_diff_norm": 1.7624400854110718,
+          "mean_cosine": 0.8922669768333436
+        },
+        "L20": {
+          "mean_diff_norm": 4.975555419921875,
+          "mean_cosine": 0.8846163988113404
+        },
+        "L30": {
+          "mean_diff_norm": 19.075519561767578,
+          "mean_cosine": 0.937878680229187
+        },
+        "L40": {
+          "mean_diff_norm": 72.8086166381836,
+          "mean_cosine": 0.9162304878234864
+        }
+      },
+      "tense": {
+        "L0": {
+          "mean_diff_norm": 0.026044240221381187,
+          "mean_cosine": 0.839433467388153
+        },
+        "L10": {
+          "mean_diff_norm": 1.3123788833618164,
+          "mean_cosine": 0.9456479549407959
+        },
+        "L20": {
+          "mean_diff_norm": 3.2104687690734863,
+          "mean_cosine": 0.95533127784729
+        },
+        "L30": {
+          "mean_diff_norm": 13.85877799987793,
+          "mean_cosine": 0.9712611675262451
+        },
+        "L40": {
+          "mean_diff_norm": 54.026695251464844,
+          "mean_cosine": 0.9593497037887573
+        }
+      },
+      "role_binding": {
+        "L0": {
+          "mean_diff_norm": 0.13616254925727844,
+          "mean_cosine": 0.14264410957694054
+        },
+        "L10": {
+          "mean_diff_norm": 3.1684768199920654,
+          "mean_cosine": 0.6562200307846069
+        },
+        "L20": {
+          "mean_diff_norm": 6.911506652832031,
+          "mean_cosine": 0.766365361213684
+        },
+        "L30": {
+          "mean_diff_norm": 31.29610252380371,
+          "mean_cosine": 0.8160263895988464
+        },
+        "L40": {
+          "mean_diff_norm": 99.56211853027344,
+          "mean_cosine": 0.8480611443519592
+        }
+      }
+    },
+    "peak_layers": {
+      "negation": {
+        "peak_layer": 40,
+        "peak_diff": 72.8086166381836
+      },
+      "tense": {
+        "peak_layer": 40,
+        "peak_diff": 54.026695251464844
+      },
+      "role_binding": {
+        "peak_layer": 40,
+        "peak_diff": 99.56211853027344
+      }
+    },
+    "curve_shapes": {
+      "negation": {
+        "shape": "monotone_increasing",
+        "early_mean": 0.9582316875457764,
+        "mid_mean": 5.500861167907715,
+        "late_mean": 29.843585968017578
+      },
+      "tense": {
+        "shape": "monotone_increasing",
+        "early_mean": 0.7832392454147339,
+        "mid_mean": 3.6883773803710938,
+        "late_mean": 22.067440032958984
+      },
+      "role_binding": {
+        "shape": "monotone_increasing",
+        "early_mean": 1.9223353862762451,
+        "mid_mean": 8.46550464630127,
+        "late_mean": 44.4484977722168
+      }
+    }
+  }
+}
