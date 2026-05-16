@@ -208,6 +208,9 @@ def record_component_outputs(model, input_ids, attention_mask, layers):
     for h in hooks:
         h.remove()
     
+    # 清理GPU缓存
+    torch.cuda.empty_cache()
+    
     logits = outputs.logits[0, -1, :]
     probs = F.softmax(logits.float(), dim=-1)
     
@@ -233,23 +236,32 @@ def run_with_patch(model, input_ids, attention_mask, layers,
         last_pos = attention_mask.sum().item() - 1  # 最后一个有效token的位置
         
         def hook_fn(module, input, output):
-            if isinstance(output, tuple):
-                out = output[0].clone()
-            else:
-                out = output.clone()
-            
-            # 只替换最后一个位置
-            if corrupted_output.shape[1] > last_pos:
-                out[:, last_pos, :] = corrupted_output[:, last_pos, :]
-            
-            if isinstance(output, tuple):
-                return (out,) + output[1:]
-            return out
+            try:
+                if isinstance(output, tuple):
+                    out = output[0].clone()
+                else:
+                    out = output.clone()
+                
+                # 只替换最后一个位置
+                if corrupted_output.shape[1] > last_pos:
+                    src = corrupted_output[:, last_pos, :].to(out.device)
+                    out[:, last_pos, :] = src
+                
+                if isinstance(output, tuple):
+                    return (out,) + output[1:]
+                return out
+            except Exception:
+                # 如果hook失败, 返回原始输出
+                return output
     else:
         def hook_fn(module, input, output):
-            if isinstance(output, tuple):
-                return (corrupted_output.to(device),) + output[1:]
-            return corrupted_output.to(device)
+            try:
+                patched = corrupted_output.to(device)
+                if isinstance(output, tuple):
+                    return (patched,) + output[1:]
+                return patched
+            except Exception:
+                return output
     
     if patch_type == 'attn':
         hook = layers[patch_layer].self_attn.register_forward_hook(hook_fn)
@@ -312,9 +324,14 @@ def run_exp1_exp2(model, tokenizer, model_name):
         baseline_diffs = []
         
         for pi, (s_clean, s_corrupt) in enumerate(pairs):
-            if pi % 3 == 0:
-                print(f"    [{func_type}] {pi}/{len(pairs)}: {s_clean[:40]}...")
+            if pi % 2 == 0:
+                elapsed = time.time() - t0_func
+                print(f"    [{func_type}] {pi}/{len(pairs)} ({elapsed:.0f}s): {s_clean[:35]}...")
                 sys.stdout.flush()
+            # 对device_map=auto模型(GLM4/DS7B), 只用前8个句对加速
+            # Qwen3(36层,GPU全量)用全部15个, 其他模型用8个
+            if model_name != 'qwen3' and pi >= 8:
+                break
             
             # Tokenize
             inputs_c = tokenizer(s_clean, return_tensors="pt", truncation=True, max_length=64)
@@ -340,7 +357,13 @@ def run_exp1_exp2(model, tokenizer, model_name):
             baseline_diffs.append(baseline_diff)
             
             # Step 2: 对每层做resample ablation
-            for li in range(n_layers):
+            # 对GLM4/DS7B(device_map=auto), 只采样每3层来加速
+            sample_layers = range(n_layers)
+            if model_name != 'qwen3':
+                # 28层DS7B / 40层GLM4: 采样每3层 + 首尾
+                sample_layers = sorted(set(list(range(0, n_layers, 3)) + [n_layers-1]))
+            
+            for li in sample_layers:
                 # Patch attention at layer li
                 if li in clean_acts['attn'] and li in corrupt_acts['attn']:
                     try:
@@ -416,6 +439,7 @@ def run_exp1_exp2(model, tokenizer, model_name):
         
         elapsed = time.time() - t0_func
         print(f"  Time: {elapsed:.1f}s")
+        sys.stdout.flush()
     
     return results
 

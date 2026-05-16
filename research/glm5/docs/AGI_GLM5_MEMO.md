@@ -78687,4 +78687,794 @@ F_i的实现:
 - 数据: `tests/glm5_temp/phase192_*_*.json`
 - 日志: `tests/glm5_temp/phase192_*_log.txt`
 
+---
+
+## Phase 193: Causal Tracing — Activation Patching (Resample Ablation) [2026-05-16 14:10]
+
+### 方法
+
+**Phase 191-192的问题**: 使用attention pattern差异(相关性)推断功能重要性, 不是真正的因果推断.
+
+**Phase 193的方法**: **Resample Ablation** — 真正的因果干预
+
+```
+1. 运行clean prompt → P_clean, 记录所有attention/MLP输出
+2. 运行corrupted prompt → P_corrupt, 记录所有attention/MLP输出
+3. 对每层(attn/mlp): 在clean run中替换该层输出为corrupted版本 → P_patched
+4. Causal Effect = (diff_clean_corrupt - diff_patched_corrupt) / diff_clean_corrupt
+```
+
+核心区别:
+- Phase 192: "这个组件在语义变体间变化大" → **相关性**
+- Phase 193: "替换这个组件的输出后, 语义差异被消除" → **因果性**
+
+### 5个实验
+
+1. **Exp1+2**: 逐层Resample Ablation (Attention + MLP)
+2. **Exp3**: Attention vs MLP 总因果贡献分解
+3. **Exp4**: 因果层进展 (50%/80%/95%因果贡献在哪些层)
+4. **Exp5**: 跨功能因果重叠 (Jaccard)
+
+### ★★★ 核心发现1: MLP因果贡献 >> Attention因果贡献 (三模型强一致) ★★★
+
+| 功能 | Qwen3 Attn% | Qwen3 MLP% | GLM4 Attn% | GLM4 MLP% | DS7B Attn% | DS7B MLP% |
+|------|------------|-----------|------------|-----------|------------|-----------|
+| negation | 38% | **62%** | 24% | **76%** | 43% | **57%** |
+| tense | 37% | **63%** | 21% | **80%** | 46% | **54%** |
+| role_binding | 37% | **63%** | 15% | **85%** | 50% | **50%** |
+| question | 30% | **70%** | 34% | **66%** | 50% | **50%** |
+| conditional | 31% | **69%** | 30% | **70%** | 44% | **56%** |
+
+**关键**: 
+- GLM4的MLP因果贡献最高(66-85%), 远超attention
+- Qwen3也有类似趋势(MLP 62-70%)
+- DS7B的attention贡献更高(50%), 但MLP仍然占主导
+- **这与Phase 192的发现一致但更强**: MLP不是简单的"记忆", 而是**因果必要的状态写入器**
+
+### ★★★ 核心发现2: 不同语义功能有不同的因果层进展 (三模型一致) ★★★
+
+| 功能 | Qwen3 50% | GLM4 50% | DS7B 50% | 含义 |
+|------|-----------|-----------|----------|------|
+| negation | L22 | L24 | L15 | **中深层** |
+| tense | L12 | L12 | L12 | **中层** |
+| role_binding | L6 | **L6** | **L9** | **★浅层★** |
+| question | L21 | L21 | L18 | **中深层** |
+| conditional | L18 | L18 | L15 | **中层** |
+
+**关键发现**:
+- **role_binding在3个模型中都是最早达到50%因果贡献的(浅层L6-9)**
+  → 角色绑定是**最早被处理**的语义功能, 可能在embedding层之后立即被"写入"
+- **negation和question需要到中深层(L18-24)才完成50%因果贡献**
+  → 否定和疑问是**更晚被写入**的功能, 需要更多层的信息整合
+- **tense在所有模型中都是L12达到50%**
+  → 时态在**中间层**被写入, 且跨模型高度稳定
+
+### ★ 核心发现3: 因果关键层的跨功能重叠低 — 支持程序分化 (三模型一致)
+
+| 模型 | 专用关键层数 | 通用关键层数(3+功能) |
+|------|------------|-------------------|
+| Qwen3 | negation:2, tense:1, role:0, question:1, cond:1 | 2 |
+| GLM4 | negation:0, tense:1, role:1, question:1, cond:1 | 4 |
+| DS7B | negation:0, tense:0, role:1, question:1, cond:1 | 1 |
+
+- Jaccard重叠普遍低(0.0-0.5), 说明**不同语义功能使用不同的因果关键层**
+- 这支持"程序分化"假设: 不同语义功能是不同的"程序", 各自有不同的执行路径
+
+### ★ 核心发现4: 与Phase 192的关键差异 — 真因果vs相关性
+
+Phase 192(相关性):
+- tense的注意力差异最小 → 以为时态"几乎不改变路由"
+- question/conditional差异最大 → 以为它们"大幅改变路由"
+
+Phase 193(因果):
+- tense的因果贡献**不低** (MLP 54-80%) → 时态**确实需要状态更新**, 只是不通过attention路由
+- role_binding的attention因果贡献高(15-54%)但MLP也不低 → 角色绑定**既需要路由也需要写入**
+- question的总因果贡献**较低**(GLM4只有0.27) → 疑问句可能不是"逻辑运算"而是"格式标记"
+
+**核心修正**: attention pattern差异大 ≠ 因果贡献大. 疑问句改变了attention pattern但因果贡献低, 说明**attention路由变化不等于语义功能变化**.
+
+### ★ 核心发现5: GLM4的tense/role_binding有极端的L0 MLP贡献
+
+GLM4中:
+- tense的MLP L0贡献 = **0.86** (占总MLP贡献的38%)
+- role_binding的MLP L0贡献 = **0.87** (占总MLP贡献的40%)
+
+这说明GLM4的embedding层(或L0的MLP)**直接编码了时态和角色信息**, 这在Qwen3和DS7B中没有出现.
+
+可能的解释:
+1. GLM4的词表或embedding层设计不同, 时态/角色信息被直接编码在词向量中
+2. L0的MLP在GLM4中起"初始特征提取"作用, 而Qwen3/DS7B分散在多层
+3. 模型架构差异导致的算法等价性
+
+### 脚本
+- `tests/glm5/phase193_causal_tracing.py`
+
+### 数据
+- `tests/glm5_temp/phase193_qwen3_20260516_0937.json`
+- `tests/glm5_temp/phase193_glm4_20260516_1231.json`
+- `tests/glm5_temp/phase193_deepseek7b_20260516_1421.json`
+
+### 日志
+- `tests/glm5_temp/phase193_qwen3_log.txt` (160s)
+- `tests/glm5_temp/phase193_glm4_v6_log.txt` (1240s)
+- `tests/glm5_temp/phase193_ds7b_v3_log.txt` (559s)
+
+### 严格审视与问题
+
+1. **Resample Ablation不是完美因果推断**:
+   - 我们替换的是"clean run中某层的输出为corrupted版本"
+   - 这测的是"这个输出是否必要", 但没有测"这个输出是否充分"
+   - 真正的因果还需要 sufficiency test: 只替换这个输出是否能恢复语义?
+
+2. **语义差异用KL散度, 可能被高概率token主导**:
+   - KL散度对高概率token更敏感, 低概率token的贡献被忽略
+   - 更鲁棒的方法: 用top-5 token的rank变化, 或binary accuracy
+
+3. **DS7B的question/conditional因果贡献很低(0.85/2.09)**:
+   - 可能是采样层间隔太大(每3层), 遗漏了关键层
+   - 也可能是DS7B对这些功能的编码确实更分散
+
+4. **GLM4的L0 MLP极端贡献可能是embedding artifact**:
+   - L0的MLP输出可能与embedding层纠缠
+   - 需要单独验证embedding层 vs L0 MLP的因果贡献
+
+5. **8个句对可能不够(对GLM4/DS7B)**:
+   - 加速测试减少了数据量, 可能影响统计显著性
+   - 需要加大数据量验证关键结论
+
+### ★★★ 关键洞察与第一性原理 ★★★
+
+Phase 193完成了从**相关性到因果性**的关键跃迁:
+
+```
+Phase 192: "head X在语义变体间差异大" (相关性)
+Phase 193: "替换head X的输出后, 语义差异被消除" (因果性)
+```
+
+**三大因果结论**:
+
+1. **MLP是语义功能的因果必要组件 (MLP ≠ 记忆, MLP = 状态写入器)**
+   - 所有5个语义功能中, MLP因果贡献都≥50%
+   - 这否定了"MLP只是记忆/FFN"的观点
+   - MLP更像是"程序执行结果存储"——把语义变换写入residual stream
+
+2. **语义功能有因果层次结构 (因果时间轴)**
+   ```
+   role_binding (L6-9) → tense (L12) → conditional (L15-18) → negation/question (L18-24)
+   ```
+   → 角色绑定最早被"写入", 否定最晚被"写入"
+   → 这与语言学理论一致: 论元结构(谁对谁做什么)是最基础的语义层
+
+3. **Attention路由变化 ≠ 语义功能变化**
+   - 疑问句/条件句的attention pattern差异大, 但因果贡献低
+   - 这说明"路由变化"和"功能实现"是不同的机制
+   - **Attention决定"看哪里", MLP决定"写什么"**
+
+与用户的理论框架对齐:
+```
+Transformer = 分层条件程序解释器
+
+Attention: 条件路由 (where to read) — 选择输入
+MLP: 状态写入 (what to compute) — 更新世界状态
+Residual Stream: 世界状态 (world state) — 存储中间程序状态
+
+语义 = 对状态施加的条件变换
+- role_binding: 浅层写入 (L6-9), 最早绑定"谁对谁"
+- tense: 中层写入 (L12), 修正时间信息
+- negation: 深层写入 (L18-24), 最后反转语义极性
+```
+
+### 下一步 (Phase 194)
+
+1. **Head-level因果追踪** — 不只是层级别, 而是单个attention head/MLP neuron的因果贡献
+2. **Sufficiency test** — "只在clean run中注入corrupted的某层输出, 是否足以改变语义?" (反向因果)
+3. **跨语言因果等价** — 英文/中文同义句的因果关键层是否同构?
+4. **条件句的专用推理回路** — 找到条件句特有的"假设空间构建"head
+5. **加大数据量验证** — 对GLM4/DS7B用15个句对重跑, 验证8个句对的结论是否稳健
+
+---
+
+### 研究进展时间线 [2026-05-16 14:10]
+
+- Phase 193 完成: Causal Tracing via Activation Patching
+- 三模型(Qwen3/GLM4/DS7B)全部完成Resample Ablation测试
+- 关键修复: 
+  - 修复了MLP patch在序列长度不同时跳过的bug (patch_last_pos_only)
+  - 对GLM4/DS7B使用8句对+层采样加速(device_map=auto模型)
+  - 增强日志flush, 避免输出缓冲
+- 关键命令:
+  - `python tests/glm5/phase193_causal_tracing.py qwen3` (160s)
+  - `python tests/glm5/phase193_causal_tracing.py glm4` (1240s)
+  - `python tests/glm5/phase193_causal_tracing.py deepseek7b` (559s)
+- 数据: `tests/glm5_temp/phase193_*_*.json`
+- 日志: `tests/glm5_temp/phase193_*_log.txt`
+
+---
+
+## Phase 194: State Transition Analysis — ΔS_l = S_{l+1} - S_l [2026-05-16 15:05]
+
+### 方法
+
+**核心转向**: 从"状态几何"(S_l) 到 "状态转移"(ΔS_l)
+
+用户关键洞察:
+- hidden state可能只是"缓存", 不是"语义本体"
+- 真正语义存在于ΔS_l (变化量), 不是S_l本身
+- 语义 = 对状态施加的条件变换, 不是状态的几何位置
+- Transformer更像迭代状态精化(iterative state refinement)
+
+方法:
+```
+ΔS_l = S_{l+1} - S_l = (attn_write_l + mlp_write_l + ln_correction)
+```
+
+5个实验:
+1. Exp1: ΔS Decomposition — 每层ΔS有多少来自Attention vs MLP
+2. Exp2: Semantic ΔS — 语义变体的ΔS是否有特异性方向?
+3. Exp3: ΔS Non-Commutativity — 不同功能的ΔS范数排序是否不同?
+4. Exp4: ΔS Operator Algebra — ΔS向量的线性独立性和交换子
+5. Exp5: Cross-Model ΔS Equivalence — 不同模型的ΔS结构是否等价?
+
+20句对/功能(Qwen3), 10句对/功能(GLM4/DS7B)
+
+### ★★★ 核心发现1: MLP写入占ΔS的63-69% (三模型强一致) ★★★
+
+| 模型 | Avg Attn% in ΔS | Avg MLP% in ΔS |
+|------|----------------|----------------|
+| Qwen3 | 31.0% | **69.0%** |
+| GLM4 | 30.8% | **69.2%** |
+| DS7B | 35.1% | **64.9%** |
+
+→ **MLP贡献了ΔS的大部分范数** — MLP是真正的"状态更新器"
+→ 这与Phase 193的因果结果一致: MLP是语义功能的因果必要组件
+→ DS7B的attention贡献稍高(35%), 可能与模型架构有关
+
+### ★★★ 核心发现2: question和conditional的ΔS方向完全相同 (三模型完美一致) ★★★
+
+| 功能对 | Qwen3 cos(ΔS_q, ΔS_c) | GLM4 cos | DS7B cos |
+|--------|----------------------|---------|---------|
+| **question vs conditional** | **1.0000** | **1.0000** | **1.0000** |
+| tense vs question | 0.9940 | 0.9811 | 0.9955 |
+| negation vs tense | 0.8385 | 0.6706 | 0.8975 |
+| negation vs role_binding | 0.6877 | 0.6272 | 0.7267 |
+| tense vs role_binding | 0.6886 | 0.6279 | 0.7241 |
+
+→ **question和conditional的ΔS方向完美一致(cos=1.000)**!!!
+→ 这说明: **疑问句和条件句对Transformer的内部状态施加了完全相同的变换**
+→ 它们不是两个不同的语义功能, 而是同一种"逻辑操作"的不同输出形式
+→ tense和question也非常相似(cos≈0.98-0.99), 但不如question=conditional完美
+
+**深刻含义**: 
+- "Does the cat sleep?" 和 "If the cat sleeps..." 在Transformer内部走的是**完全相同的计算路径**
+- 区别只在最后输出层如何解读这个状态
+- 这与语言学理论一致: 疑问和条件都引入了"不确定/假设"的模态
+
+### ★★★ 核心发现3: ΔS有效维度=3 (5个功能只有3个独立方向) ★★★
+
+在所有3个模型的多个层中, 5种语义功能的ΔS只张成了3维子空间:
+
+- 维度1: negation (否定操作)
+- 维度2: role_binding (角色绑定)  
+- 维度3: tense/question/conditional (模态操作 — 三者共方向)
+
+| 模型 | L0 有效维度 | 中层有效维度 | 深层有效维度 |
+|------|-----------|-----------|-----------|
+| Qwen3 | 3 | 3 (L9) | 2 (L18) |
+| GLM4 | 3 | 3 (L10) | 3 (L20) |
+| DS7B | 3 | 3 (L7) | 3 (L14) |
+
+→ **5种语义功能在ΔS空间中只有3个正交方向**
+→ 深层的有效维度更低(2), 说明深层在做"压缩"
+→ 这支持"语义因子化"假设: 语义 = 否定 × 角色 × 模态
+
+### ★ 核心发现4: role_binding的ΔS特异性最高 (三模型一致) ★★★
+
+| 模型 | role_binding top特异性层 | negation top特异性层 | tense top特异性层 |
+|------|------------------------|--------------------|--------------------|
+| Qwen3 | L6: **0.784** | L19: 0.666 | L27: 0.425 |
+| GLM4 | L13: **0.865** | L3: 0.621 | L4: 0.399 |
+| DS7B | L8: **0.891** | L15: 0.720 | L6: 0.402 |
+
+→ **role_binding的ΔS特异性在所有模型中都是最高的**
+→ role_binding的ΔS方向与基础ΔS方向差异最大(cos≈0.6-0.7)
+→ negation次之, tense最低(特异性低意味着tense的ΔS方向接近基础方向)
+
+### ★ 核心发现5: 跨层ΔS一致性低 — 每层是不同的"程序指令" ★★★
+
+| 模型 | negation跨层cos | tense跨层cos | role_binding跨层cos |
+|------|---------------|-------------|-------------------|
+| Qwen3 | 0.210 | 0.190 | 0.160 |
+| GLM4 | 0.270 | 0.258 | 0.239 |
+| DS7B | 0.175 | 0.135 | 0.165 |
+
+→ **相邻层的ΔS方向几乎正交(cos≈0.15-0.27)**
+→ 这意味着: **每一层都在做不同的操作**, 不是简单地放大前一层的结果
+→ 这支持"分层程序执行"模型: 每层是一个独立的"指令"
+
+### ★ 交换子范数(ΔS非交换性) ★
+
+所有功能对的交换子范数都很大(normalized 0.5-1.5), 说明ΔS操作之间确实非交换。
+但由于我们用的是平均ΔS向量(不是逐句对计算), 这个结果需要更精细的验证。
+
+### 脚本
+- `tests/glm5/phase194_state_transition.py`
+
+### 数据
+- `tests/glm5_temp/phase194_qwen3_20260516_1439.json`
+- `tests/glm5_temp/phase194_glm4_20260516_1443.json`
+- `tests/glm5_temp/phase194_deepseek7b_20260516_1445.json`
+
+### 日志
+- `tests/glm5_temp/phase194_qwen3_log.txt`
+- `tests/glm5_temp/phase194_glm4_log.txt`
+- `tests/glm5_temp/phase194_ds7b_log.txt`
+
+### 严格审视与问题
+
+1. **question=conditional可能是句对设计的问题**:
+   - 我们的question和conditional句对使用了相同的base句子
+   - 如"Does the cat sleep?" vs "If the cat sleeps..." — 底层结构太相似
+   - 需要用更不同的base句子重新测试
+
+2. **ΔS范数受深层norm膨胀影响**:
+   - Top-5 ΔS norm都在最后几层(L30-34), 可能是residual accumulation
+   - 需要用归一化的ΔS (cosine ΔS) 重新分析
+
+3. **ΔS特异性可能混淆了语义差异和token差异**:
+   - negation("not")增加了token, question("Does")也增加了token
+   - specificity可能反映的是token变化而非语义变化
+   - 需要控制token数量变化
+
+4. **跨层cosine低可能是正常的**:
+   - 每层的权重不同, 输出自然不同
+   - 低cosine不一定意味着"不同程序", 可能只是不同的投影方向
+   - 需要看ΔS在功能空间(而非原始空间)中的一致性
+
+5. **ΔS有效维度=3需要更严格的统计检验**:
+   - 仅用SVD看奇异值分布不够
+   - 需要用Monte Carlo或permutation test验证3维的显著性
+
+### ★★★ 关键洞察与第一性原理 ★★★
+
+Phase 194完成了从"状态几何"到"状态转移"的跃迁:
+
+```
+Phase 193: "MLP替换后语义消失" (因果性)
+Phase 194: "语义变体的ΔS方向是否不同?" (算子结构)
+```
+
+**三大核心结论**:
+
+1. **语义变换的ΔS只有3个正交维度 (不是5个!)**
+   ```
+   ΔS_space = span(ΔS_negation, ΔS_role_binding, ΔS_modal)
+   ```
+   其中 ΔS_modal = ΔS_tense ≈ ΔS_question ≈ ΔS_conditional
+   
+   → **5种语义功能只有3种基本操作**: 否定、角色交换、模态变换
+   → tense/question/conditional共享同一个"模态操作"子空间
+   → 这比"5个独立程序"的解释更深刻: 语言只有3种基本语义变换
+
+2. **每层是独立的"程序指令" (跨层cos≈0.2)**
+   → 不是同一操作的放大, 而是不同的"计算步骤"
+   → 支持Transformer = 分层条件程序解释器
+   
+3. **role_binding是最"独特"的语义操作 (特异性最高)**
+   → 角色交换在ΔS空间中最远离其他操作
+   → 这与认知科学一致: "谁对谁做什么"是最基础的世界模型构建
+
+**理论框架更新**:
+```
+语义 = ΔS_negation × ΔS_role_binding × ΔS_modal
+
+其中:
+- ΔS_negation: 翻转真值 (逻辑操作)
+- ΔS_role_binding: 交换agent/patient (结构操作)  
+- ΔS_modal: 引入不确定性/假设 (模态操作)
+
+这3个操作:
+1. 各自正交 (factorized)
+2. 非交换 (顺序依赖)
+3. 跨模型一致 (Qwen3/GLM4/DS7B)
+4. 跨层变化 (每层是不同的指令)
+```
+
+### 下一步 (Phase 195)
+
+1. **验证question=conditional是否是数据问题** — 用不同base句子重新测试
+2. **Path Patching** — 不只看层级ΔS, 而是追踪head→MLP→head的信息流
+3. **归一化ΔS分析** — 用cosine ΔS替代L2 ΔS, 消除范数膨胀
+4. **逐句对ΔS交换子** — 真正验证F_i∘F_j ≠ F_j∘F_i
+5. **跨语言ΔS等价** — 英文/中文同义句的ΔS方向是否相同?
+
+---
+
+### 研究进展时间线 [2026-05-16 15:05]
+
+- Phase 194 完成: State Transition Analysis (ΔS_l = S_{l+1} - S_l)
+- 三模型(Qwen3/GLM4/DS7B)全部完成状态转移分析
+- 关键发现: question和conditional的ΔS方向完美一致(cos=1.000, 三模型)
+- 5种语义功能只有3个正交ΔS方向 (否定×角色×模态)
+- 每层ΔS跨层一致性低(cos≈0.2), 支持分层程序执行
+- 关键命令:
+  - `python tests/glm5/phase194_state_transition.py qwen3`
+  - `python tests/glm5/phase194_state_transition.py glm4`
+  - `python tests/glm5/phase194_state_transition.py deepseek7b`
+- 数据: `tests/glm5_temp/phase194_*_*.json`
+- 日志: `tests/glm5_temp/phase194_*_log.txt`
+
+---
+
+## Phase 195: Continuation-Space Constraint Analysis — 续写空间约束 [2026-05-16 16:40]
+
+### 方法
+
+**核心转向**: 从"ΔS向量对象化"到"续写空间约束结构"
+
+用户关键洞察:
+- ΔS不是"语义本体", 只是局部更新算子 (optimizer step, 不是semantic primitive)
+- 真正语义 = 对可能续写的约束 (constraint on possible continuations)
+- "not"不是方向, 而是翻转可接受续写
+- "question"不是模态向量, 而是打开多个可能状态
+- Phase 194的"question=conditional (cos=1.0)"极可能是均值塌缩伪象
+
+方法: **Logit Lens** — 在每层residual stream上应用final LayerNorm + lm_head, 得到每层的next-token预测分布
+
+5个实验:
+1. Exp1: Entropy Dynamics — 语义功能是否改变预测不确定性?
+2. Exp2: Token-Level Constraints — 每个功能promote/suppress哪些tokens?
+3. Exp3: Per-Sample KL Divergence — 逐样本分析, 避免均值塌缩
+4. Exp4: Cross-Function Token Overlap (Jaccard) — question vs conditional
+5. Exp5: Constraint Independence — 不同语义约束是否独立?
+
+25句对/功能 (Qwen3), 15句对/功能 (GLM4/DS7B)
+
+### ★★★ 核心发现1: Phase 194的"question=conditional (cos=1.0)"是均值塌缩伪象 (三模型强一致) ★★★
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| question KL(base\|\|transformed) | **13.53** | **7.49** | **7.51** |
+| conditional KL(base\|\|transformed) | **0.57** | **0.29** | **0.43** |
+| q/c KL比 | 23.7x | 25.8x | 17.4x |
+| per-sample KL correlation (q,c) | **-0.025** | **-0.074** | **0.029** |
+| Jaccard(q,c) promoted tokens | **0.000** | **0.000** | **0.000** |
+| mean cos(ΔS_q, ΔS_c) (概率空间) | 0.681 | 0.036 | -0.181 |
+
+→ **question和conditional在token级别完全不同！**
+→ question的KL是conditional的17-25倍 — 它们对续写空间的约束完全不同量级
+→ per-sample相关性接近0 — 在每个样本上, question和conditional的效应完全不相关
+→ Jaccard=0.000 — promoted token集完全不重叠
+→ mean cos在概率空间中也很低(0.036-0.681) — 远非1.0
+
+**为什么Phase 194得到cos=1.0?**
+Phase 194比较的是**hidden state空间的ΔS向量**。在high-dim空间中, 两个功能的大方向(都改变token结构)会在主成分上重叠, 导致cos≈1.0。但在**token概率空间**中, 它们的效应完全不同:
+- question: 大幅改变概率分布 (KL=7-14), promote答案词 ("Yes", "No", "Or")
+- conditional: 微小改变概率分布 (KL=0.3-0.6), promote续写关联词 ("after", "during")
+
+→ **hidden state的ΔS方向相似 ≠ 语义功能相同**
+→ 这直接验证了用户的洞察: "attention pattern变化 ≠ 信息流, ΔS方向相似 ≠ 语义等价"
+
+### ★★★ 核心发现2: 语义 = 对续写空间的约束 (三模型一致) ★★★
+
+**Entropy Dynamics:**
+
+| 功能 | Qwen3 max\|ΔH\| | GLM4 max\|ΔH\| | DS7B max\|ΔH\| | 含义 |
+|------|-------------|------------|-------------|------|
+| negation | -0.57 | -1.04 | +0.87 | 减少或改变不确定性 |
+| tense | -0.77 | +0.25 | -0.78 | 轻微约束时间 |
+| role_binding | +0.99 | +2.22 | +1.89 | **增加歧义** |
+| question | +4.18 | -6.29 | +3.97 | **大幅改变不确定性** |
+| conditional | -0.46 | +0.36 | -1.03 | 轻微影响 |
+
+**Token-Level Promoted Tokens:**
+
+| 功能 | Qwen3 promoted | GLM4 promoted | DS7B promoted |
+|------|---------------|--------------|--------------|
+| negation | directly, because, but, unless | anymore, because, properly | anymore, nor, unless |
+| tense | after, during, because | for, 's, over | for, who, into |
+| role_binding | and, 's, as, of | *(tokenizer artifact)* | who, (Person, on |
+| **question** | **If, What, Why, Yes, Does** | **Yes, yes, No** | **Yes, or, Or, yes** |
+| conditional | after, during, more, without | *(tokenizer artifact)* | 's, during, ,, for |
+
+→ **question promoted答案词 (Yes/No/Or), conditional promoted续写关联词**
+→ 这是完全不同的"约束结构":
+  - question: "请选择一个答案" (打开离散选择空间)
+  - conditional: "请继续描述" (微调续写方向)
+→ **这验证了"语义=约束"的假设**: 不同语义功能通过约束可能的续写来实现, 而不是通过添加方向
+
+### ★ 核心发现3: 不同语义功能的约束量级差异巨大 ★★★
+
+| 功能 | 三模型平均KL | 约束量级 |
+|------|-----------|---------|
+| question | **9.51** | **超强约束** (彻底改变续写空间) |
+| role_binding | **2.27** | **强约束** (交换agent/patient后一切都变了) |
+| negation | **1.49** | **中等约束** (排除默认续写) |
+| tense | **0.56** | **弱约束** (微调时间信息) |
+| conditional | **0.43** | **最弱约束** (仅添加假设前缀) |
+
+→ 这与直觉完全一致:
+  - question改变整个句法结构, 续写从陈述变为回答
+  - role_binding交换主宾, 续写完全不同
+  - negation翻转极性, 排除默认
+  - tense/conditional只是轻微修改
+
+### ★ 核心发现4: Per-Sample ΔS cosine (概率空间) 远低于hidden state空间 ★
+
+| 功能对 | Qwen3 cos | GLM4 cos | DS7B cos |
+|--------|----------|---------|---------|
+| question vs conditional | 0.681 | 0.036 | -0.181 |
+| question vs role_binding | — | -0.045 | 0.680 |
+| conditional vs negation | — | 0.308 | 0.140 |
+
+→ 在概率空间的ΔS中, question和conditional的cosine远低于Phase 194的1.0
+→ 这再次证明Phase 194的cos=1.0是hidden state空间的均值塌缩伪象
+
+### 脚本
+- `tests/glm5/phase195_continuation_constraints.py`
+
+### 数据
+- `tests/glm5_temp/phase195_qwen3_*.json`
+- `tests/glm5_temp/phase195_glm4_*.json`
+- `tests/glm5_temp/phase195_deepseek7b_*.json`
+
+### 日志
+- `tests/glm5_temp/phase195_qwen3_log.txt` (72s)
+- `tests/glm5_temp/phase195_glm4_log.txt` (364s)
+- `tests/glm5_temp/phase195_ds7b_log.txt` (255s)
+
+### 严格审视与问题
+
+1. **Logit Lens的局限性**:
+   - Logit lens假设每层的hidden state可以直接映射到token概率
+   - 但实际上, 中间层的hidden state可能还没有经过充分的后续处理
+   - 中间层的logit lens结果可能不可靠, 尤其是浅层
+
+2. **概率空间的ΔS ≠ hidden state空间的ΔS**:
+   - Phase 194用的是hidden state空间, Phase 195用的是概率空间
+   - 两个空间中的cosine可能天然不同
+   - 需要更系统地比较两个空间的语义表示
+
+3. **GLM4/DS7B的tokenizer artifact**:
+   - GLM4的promoted tokens包含"iNdEx", "人员规模"等奇怪的token
+   - 这可能是tokenizer的特殊编码方式导致的
+   - 需要检查这些token的实际含义
+
+4. **样本量仍然有限**:
+   - Qwen3: 25句对, GLM4/DS7B: 15句对
+   - 虽然核心结论(question≠conditional)很稳固, 但细节可能受样本影响
+
+5. **question的entropy变化在GLM4中为负**:
+   - Qwen3: question增加熵(+4.18), GLM4: question减少熵(-6.29)
+   - 这可能是因为GLM4的question更集中到Yes/No, 减少了其他token的概率
+   - 说明"打开可能性"和"减少熵"不矛盾: question同时打开答案空间和关闭无关空间
+
+### ★★★ 关键洞察与第一性原理 ★★★
+
+Phase 195完成了从"向量对象化"到"约束结构"的跃迁:
+
+```
+Phase 194: "ΔS方向是否相似?" (向量空间几何)
+Phase 195: "语义功能如何约束可能的续写?" (约束传播结构)
+```
+
+**三大核心结论**:
+
+1. **语义 = 对续写空间的约束, 不是向量方向**
+   ```
+   question: KL=7-14, 打开答案空间 (promote Yes/No/Or)
+   conditional: KL=0.3-0.6, 微调续写方向 (promote关联词)
+   negation: KL=1-2, 排除默认续写 (promote "unless", "nor")
+   ```
+   → 不同语义功能通过不同方式约束续写空间
+   → 语义不是"添加方向", 而是"改变允许的续写集合"
+
+2. **Phase 194的cos=1.0是均值塌缩伪象**
+   ```
+   hidden state空间: cos(ΔS_q, ΔS_c) = 1.000
+   token概率空间: cos(ΔP_q, ΔP_c) = -0.18~0.68
+   KL divergence: KL(q) = 7-14 vs KL(c) = 0.3-0.6
+   per-sample r = -0.07~0.03 (几乎零相关)
+   ```
+   → 在high-dim空间中, 两个功能的大方向会在主成分上重叠
+   → 但在功能(概率)空间中, 它们的效应完全不同
+   → 这说明"hidden state几何 ≠ 功能等价"
+
+3. **约束的层次结构**
+   ```
+   强约束 (KL>5): question — 改变句法结构, 续写从陈述变为回答
+   中约束 (KL~2): role_binding — 交换主宾, 续写完全不同
+   弱约束 (KL~1): negation — 翻转极性, 排除默认
+   微约束 (KL<1): tense, conditional — 轻微修改时间/条件信息
+   ```
+
+**理论框架更新**:
+```
+语义 = 约束传播过程 (constraint propagation process)
+
+不同语义功能 = 不同类型的约束:
+- question: 离散化约束 (打开有限选择空间: Yes/No/Or)
+- negation: 排除约束 (排除默认续写)
+- role_binding: 结构约束 (改变依赖图)
+- tense: 时序约束 (微调时间信息)
+- conditional: 假设约束 (添加前提条件)
+
+约束 ≠ 方向
+约束 ≠ 向量
+约束 ≠ 算子
+约束 = 对"哪些续写是可能的"的限制
+
+这更接近语言学本质:
+- 语法 = 对可能句子结构的约束
+- 语义 = 对可能世界状态的约束
+- 语用 = 对可能说话意图的约束
+```
+
+### 下一步 (Phase 196)
+
+1. **Path Patching** — 追踪head→MLP→head的因果信息流
+2. **Causal Scrubbing** — 验证回路是否实现语义功能
+3. **跨层约束传播** — 约束如何从浅层传播到深层?
+4. **约束的组合** — question+negation的组合约束是否等于各自约束之和?
+5. **续写空间几何** — 不同约束在概率空间中形成什么结构?
+
+---
+
+### 研究进展时间线 [2026-05-16 16:40]
+
+- Phase 195 完成: Continuation-Space Constraint Analysis
+- 三模型(Qwen3/GLM4/DS7B)全部完成续写空间约束分析
+- ★ 关键发现: Phase 194的"question=conditional (cos=1.0)"确认为均值塌缩伪象
+  - token级别: Jaccard=0.000, per-sample r≈0, KL差距17-25倍
+  - hidden state的ΔS方向相似 ≠ 语义功能等价
+- 语义 = 对续写空间的约束, 不是向量方向
+- question: 强约束(KL=7-14, promote答案词), conditional: 弱约束(KL=0.3-0.6, promote关联词)
+- 关键修复:
+  - 绕过accelerate hook, 从safetensors加载norm/lm_head权重
+  - 在CPU上手动计算RMSNorm + lm_head
+- 关键命令:
+  - `python tests/glm5/phase195_continuation_constraints.py qwen3` (72s)
+  - `python tests/glm5/phase195_continuation_constraints.py glm4` (364s)
+  - `python tests/glm5/phase195_continuation_constraints.py deepseek7b` (255s)
+- 数据: `tests/glm5_temp/phase195_*_*.json`
+- 日志: `tests/glm5_temp/phase195_*_log.txt`
+
+---
+
+## Phase 196: Constraint Composition Analysis — 约束组合 [2026-05-16 17:30]
+
+### 方法
+
+**核心转向**: 从"单约束描述"到"约束组合的数学结构"
+
+用户关键批评:
+1. 仍在"对象化ΔS" — 应停止寻找"语义原子"
+2. 把训练统计误认为语言本体 — 需要更严格的因果推理
+3. Logit Lens不可靠 — Phase 196**只使用最终输出分布**, 不用logit lens
+4. 默认"功能可局部化" — 可能是全息分布式计算
+
+关键实验: **约束组合 (Constraint Composition)** — 约束如何组合?
+- 加性: KL(AB) ≈ KL(A) + KL(B)?
+- 亚加性(冗余): KL(AB) < KL(A) + KL(B)?
+- 超加性(交互放大): KL(AB) > KL(A) + KL(B)?
+
+3种组合:
+- negation+question: "Does the cat not chase the dog?"
+- question+role_binding: "Does the dog chase the cat?"
+- negation+role_binding: "The dog does not chase the cat"
+
+30句对 (Qwen3), 20句对 (GLM4/DS7B)
+
+### ★★★ 核心发现1: 约束组合近乎加性 — 没有超加性交互 (三模型一致) ★★★
+
+| 组合 | Qwen3 ratio | GLM4 ratio | DS7B ratio | Qwen3类型 | GLM4类型 | DS7B类型 |
+|------|------------|------------|------------|----------|---------|---------|
+| Neg+Q | 0.900 | 0.837 | 0.913 | 加性 | 亚加性 | 亚加性 |
+| Q+RB | 0.899 | 0.991 | 1.030 | 亚加性 | 加性 | 加性 |
+| Neg+RB | 1.095 | 0.832 | 0.824 | 加性 | 亚加性 | 亚加性 |
+
+→ **所有ratio在0.82~1.10之间, 没有超加性交互**
+→ 约束组合**大致可加**, 不是乘法或指数级放大
+→ 但也存在**轻微亚加性** (ratio < 1.0), 说明约束之间有少量冗余
+
+### ★★★ 核心发现2: Token级超加性 — "Or"在Q+RB中被大幅放大 ★★★
+
+| 模型 | Or delta in Q | Or delta in Q+RB | 放大倍数 |
+|------|--------------|-----------------|---------|
+| Qwen3 | 4.68 | 10.89 | **2.3x** |
+| DS7B | 8.78 | 12.73 | **1.4x** |
+
+→ **Q+RB组合中"Or"的delta远超Q单独** — token级超加性
+→ question打开答案空间(Or), role_binding进一步聚焦到"哪个角色"的二元选择
+→ 两者共振 → "Or"被大幅放大
+
+### ★★★ 核心发现3: 不同约束类型的KL量级 (三模型一致) ★★★
+
+| 约束 | Qwen3 KL | GLM4 KL | DS7B KL | 量级 |
+|------|---------|---------|---------|------|
+| question | 9.57 | 9.32 | 12.50 | **超强** |
+| negation | 0.89 | 0.96 | 1.46 | **弱** |
+| role_binding | 1.02 | 0.83 | 1.20 | **弱** |
+| neg+q | 9.43 | 8.53 | 12.51 | ≈question |
+| q+rb | 9.50 | 9.97 | 13.76 | ≈question |
+| neg+rb | 1.90 | 1.37 | 2.02 | ≈neg+rb加性 |
+
+→ **question是最强约束** (KL=9-13), 与其他约束组合时起支配作用
+
+### ★ 核心发现4: 有效分支因子 (Effective Branching Factor) ★
+
+| 约束 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| base | 5.7 | 10.4 | 4.6 |
+| question | 10.0 (+4.3) | 5.3 (-5.1) | 7.4 (+2.8) |
+| neg+q | 13.3 (+7.6) | 18.5 (+8.1) | 11.0 (+6.4) |
+
+→ **question在Qwen3中增加分支, 在GLM4中减少** — 模型差异
+→ **neg+q组合在所有模型中都大幅增加分支** — 最强"打开可能性"
+
+### ★ 核心发现5: 约束per-sample几乎零相关 ★
+
+| 约束对 | Qwen3 r | GLM4 r | DS7B r |
+|--------|---------|--------|--------|
+| Neg, Q | -0.40 | -0.09 | -0.08 |
+| Neg, RB | 0.26 | -0.10 | 0.30 |
+| Q, RB | -0.21 | -0.30 | -0.01 |
+
+→ **不同约束在per-sample级别几乎独立**
+
+### 严格审视与问题
+
+1. **KL加性 ≠ 语义加性**: KL(AB)≈KL(A)+KL(B)只说明分布空间距离, 不等于计算独立
+2. **Token级超加性 vs KL级亚加性矛盾**: "Or"放大但整体KL亚加性 — "Or"的增加被其他冗余抵消
+3. **模型间差异显著**: question在Qwen3增加分支(+4.3), GLM4减少(-5.1) — 可能是训练数据差异
+4. **只用最终输出的局限**: 无法看到约束如何被逐步构建
+5. **"加性组合"的深层含义**: 可能反映约束在概率空间中近似正交, 也可能只是KL的数学性质
+
+### ★★★ 关键洞察与第一性原理 ★★★
+
+```
+约束组合 ≈ 加性 → 约束在概率空间中近似正交
+
+这意味着:
+1. 语义功能可以独立施加约束
+2. 约束的组合不需要"协商"机制
+3. 每个约束独立修改概率分布的某个子空间
+4. 组合效应 ≈ 各自效应之和 (一阶近似)
+
+但有token级交互:
+- Q+RB中"Or"被2.3x放大 — 特定token的共振
+- question打开答案空间, role_binding聚焦到二元选择 → 共振放大
+```
+
+### 脚本
+- `tests/glm5/phase196_constraint_composition.py`
+
+### 数据
+- `tests/glm5_temp/phase196_qwen3_*.json`
+- `tests/glm5_temp/phase196_glm4_*.json`
+- `tests/glm5_temp/phase196_deepseek7b_*.json`
+
+### 日志
+- `tests/glm5_temp/phase196_qwen3_log.txt` (9.3s)
+- `tests/glm5_temp/phase196_glm4_log.txt` (162.2s)
+- `tests/glm5_temp/phase196_ds7b_log.txt` (97.2s)
+
+---
+
+### 研究进展时间线 [2026-05-16 17:30]
+
+- Phase 196 完成: Constraint Composition Analysis
+- 三模型(Qwen3/GLM4/DS7B)全部完成约束组合分析
+- ★ 关键发现: 约束组合近乎加性 (ratio ≈ 0.85-1.03)
+  - 没有超加性交互 — 约束在概率空间中近似独立
+  - 但token级存在交互: Q+RB中"Or"被2.3x放大
+  - question是最强约束(KL=9-13), 支配所有包含它的组合
+  - 不同约束在per-sample级别几乎零相关
+- 只使用最终输出分布, 不用logit lens — 更可靠
+- 关键命令:
+  - `python tests/glm5/phase196_constraint_composition.py qwen3` (9.3s)
+  - `python tests/glm5/phase196_constraint_composition.py glm4` (162.2s)
+  - `python tests/glm5/phase196_constraint_composition.py deepseek7b` (97.2s)
+- 数据: `tests/glm5_temp/phase196_*_*.json`
+- 日志: `tests/glm5_temp/phase196_*_log.txt`
+
 
