@@ -1,0 +1,412 @@
+
+======================================================================
+Phase 206: Residual Covariance Geometry — qwen3
+======================================================================
+[load] Loading qwen3 (bfloat16 + device_map=auto)...
+[load] qwen3 loaded: GPU=0 components, CPU=0 components, GPU mem=8.04GB
+  n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+  Sample layers: [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36]
+
+--- Collecting normal hidden states ---
+    Collecting sentence 1/15...
+    Collecting sentence 11/15...
+  Collected 15 sentences, avg seq_len=5.2
+
+--- Collecting cot hidden states ---
+    Collecting sentence 1/15...
+    Collecting sentence 11/15...
+  Collected 15 sentences, avg seq_len=12.2
+
+--- Collecting translation hidden states ---
+    Collecting sentence 1/15...
+    Collecting sentence 11/15...
+  Collected 15 sentences, avg seq_len=7.8
+
+Model released.
+
+======================================================================
+Exp1: Global Mode Decomposition
+======================================================================
+
+--- normal ---
+   Layer    d_eff(raw)  d_eff(resid)   var_ratio   top1_raw%   top1_resid%
+  ------------------------------------------------------------------------
+       0         20.75         20.75      1.0000        16.3%          16.3%
+       3          1.14          1.14      1.0000        93.5%          93.5%
+       6          1.79          1.79      1.0000        74.5%          74.5%
+       9          1.00          1.00      1.0000       100.0%         100.0%
+      12          1.00          1.00      1.0000       100.0%         100.0%
+      15          1.00          1.00      1.0000        99.9%          99.9%
+      18          1.00          1.00      1.0000       100.0%         100.0%
+      21          1.00          1.00      1.0000       100.0%         100.0%
+      24          1.00          1.00      1.0000        99.9%          99.9%
+      27          1.00          1.00      1.0000        99.8%          99.8%
+      30          1.01          1.01      1.0000        99.4%          99.4%
+      33          1.03          1.03      1.0000        98.7%          98.7%
+      36          8.10          8.10      1.0000        30.6%          30.6%
+
+--- cot ---
+   Layer    d_eff(raw)  d_eff(resid)   var_ratio   top1_raw%   top1_resid%
+  ------------------------------------------------------------------------
+       0         12.83         12.83      1.0000        19.1%          19.1%
+       3          1.29          1.29      1.0000        87.8%          87.8%
+       6          2.91          2.91      1.0000        57.6%          57.6%
+       9          1.00          1.00      1.0000       100.0%         100.0%
+      12          1.00          1.00      1.0000       100.0%         100.0%
+      15          1.00          1.00      1.0000       100.0%         100.0%
+      18          1.00          1.00      1.0000       100.0%         100.0%
+      21          1.00          1.00      1.0000       100.0%         100.0%
+      24          1.00          1.00      1.0000        99.9%          99.9%
+      27          1.00          1.00      1.0000        99.8%          99.8%
+      30          1.01          1.01      1.0000        99.5%          99.5%
+      33          1.02          1.02      1.0000        98.9%          98.9%
+      36          7.10          7.10      1.0000        30.4%          30.4%
+
+--- translation ---
+   Layer    d_eff(raw)  d_eff(resid)   var_ratio   top1_raw%   top1_resid%
+  ------------------------------------------------------------------------
+       0         46.63         46.63      1.0000         8.6%           8.6%
+       3          1.42          1.42      1.0000        83.9%          83.9%
+       6          6.06          6.06      1.0000        39.7%          39.7%
+       9          1.00          1.00      1.0000       100.0%         100.0%
+      12          1.00          1.00      1.0000       100.0%         100.0%
+      15          1.00          1.00      1.0000       100.0%         100.0%
+      18          1.00          1.00      1.0000       100.0%         100.0%
+      21          1.00          1.00      1.0000       100.0%         100.0%
+      24          1.00          1.00      1.0000        99.9%          99.9%
+      27          1.01          1.01      1.0000        99.7%          99.7%
+      30          1.01          1.01      1.0000        99.3%          99.3%
+      33          1.04          1.04      1.0000        97.9%          97.9%
+      36         12.57         12.57      1.0000        21.8%          21.8%
+
+======================================================================
+Exp2: Normalized Covariance Alignment (L2-normalized hidden states)
+======================================================================
+
+--- normal ---
+  L0: d_eff(normalized)=12.10
+  L18: d_eff(normalized)=7.48
+  L36: d_eff(normalized)=9.07
+
+    Layer->Layer    Norm_Align   d_eff(from)     d_eff(to)    Preservation
+  ------------------------------------------------------------------------
+      0->3            0.0388         12.10         10.21            NONE
+      3->6            0.4785         10.21         13.78        MODERATE
+      6->9            0.3862         13.78         11.66            WEAK
+      9->12           0.4146         11.66         10.58        MODERATE
+     12->15           0.5044         10.58          8.14        MODERATE
+     15->18           0.6798          8.14          7.48       MODERATE+
+     18->21           0.6366          7.48          8.70       MODERATE+
+     21->24           0.5423          8.70          9.60        MODERATE
+     24->27           0.5974          9.60         10.78        MODERATE
+     27->30           0.6214         10.78         12.70       MODERATE+
+     30->33           0.6438         12.70         10.78       MODERATE+
+     33->36           0.5716         10.78          9.07        MODERATE
+
+  normal SUMMARY: avg_alignment=0.5096, STRONG=0, moderate+=4/12
+
+--- cot ---
+  L0: d_eff(normalized)=12.61
+  L18: d_eff(normalized)=8.79
+  L36: d_eff(normalized)=10.33
+
+    Layer->Layer    Norm_Align   d_eff(from)     d_eff(to)    Preservation
+  ------------------------------------------------------------------------
+      0->3            0.0397         12.61         10.52            NONE
+      3->6            0.4668         10.52         12.36        MODERATE
+      6->9            0.3962         12.36         12.75            WEAK
+      9->12           0.4440         12.75         11.34        MODERATE
+     12->15           0.5410         11.34          9.51        MODERATE
+     15->18           0.6870          9.51          8.79       MODERATE+
+     18->21           0.6638          8.79         10.69       MODERATE+
+     21->24           0.5551         10.69         10.84        MODERATE
+     24->27           0.6093         10.84         11.03       MODERATE+
+     27->30           0.6223         11.03         11.23       MODERATE+
+     30->33           0.6415         11.23         11.75       MODERATE+
+     33->36           0.5608         11.75         10.33        MODERATE
+
+  cot SUMMARY: avg_alignment=0.5190, STRONG=0, moderate+=5/12
+
+--- translation ---
+  L0: d_eff(normalized)=38.12
+  L18: d_eff(normalized)=10.73
+  L36: d_eff(normalized)=13.18
+
+    Layer->Layer    Norm_Align   d_eff(from)     d_eff(to)    Preservation
+  ------------------------------------------------------------------------
+      0->3            0.0315         38.12         28.97            NONE
+      3->6            0.3171         28.97         30.49            WEAK
+      6->9            0.3670         30.49         20.49            WEAK
+      9->12           0.4738         20.49         16.48        MODERATE
+     12->15           0.5750         16.48         11.74        MODERATE
+     15->18           0.7365         11.74         10.73       MODERATE+
+     18->21           0.7048         10.73         13.28       MODERATE+
+     21->24           0.5638         13.28         16.09        MODERATE
+     24->27           0.5566         16.09         20.01        MODERATE
+     27->30           0.5691         20.01         24.58        MODERATE
+     30->33           0.5049         24.58         21.00        MODERATE
+     33->36           0.3601         21.00         13.18            WEAK
+
+  translation SUMMARY: avg_alignment=0.4800, STRONG=0, moderate+=2/12
+
+======================================================================
+Exp3: Token-Pair Relation Transport
+======================================================================
+
+--- normal ---
+   Layer       d=1       d=2       d=3       d=4       d=5    d=1->5 drift
+  ------------------------------------------------------------------------
+       0   -0.0251   -0.0093    0.1760    0.0313    0.0278          0.0530
+       3    0.3910    0.3769    0.6064    0.4098    0.3920          0.0010
+       6    0.4953    0.4661    0.6291    0.4703    0.4754          0.0199
+       9    0.3935    0.2919    0.2333    0.1196    0.1613          0.2322
+      12    0.4757    0.3961    0.3341    0.2067    0.2487          0.2269
+      15    0.3647    0.3428    0.3211    0.2567    0.2655          0.0991
+      18    0.3898    0.3761    0.3575    0.3094    0.3133          0.0765
+      21    0.5802    0.5120    0.5016    0.3824    0.4122          0.1680
+      24    0.6103    0.5360    0.5278    0.4431    0.4705          0.1399
+      27    0.6133    0.5523    0.5431    0.4494    0.4738          0.1394
+      30    0.6246    0.5686    0.5489    0.4592    0.4767          0.1479
+      33    0.6558    0.6114    0.5856    0.4916    0.5368          0.1189
+      36    0.6224    0.5907    0.5935    0.4120    0.3775          0.2449
+
+--- cot ---
+   Layer       d=1       d=2       d=3       d=4       d=5    d=1->5 drift
+  ------------------------------------------------------------------------
+       0    0.0270    0.1153    0.0633    0.0393    0.0369          0.0099
+       3    0.4946    0.4729    0.4928    0.4903    0.4199          0.0747
+       6    0.5854    0.5642    0.5865    0.5802    0.5212          0.0642
+       9    0.4539    0.3648    0.3986    0.3215    0.2666          0.1873
+      12    0.5185    0.4433    0.4872    0.4138    0.3449          0.1736
+      15    0.4880    0.4713    0.4652    0.4243    0.3217          0.1664
+      18    0.5083    0.5021    0.4819    0.4696    0.3578          0.1505
+      21    0.6186    0.5551    0.5847    0.5441    0.4738          0.1448
+      24    0.6142    0.5521    0.5705    0.5408    0.4775          0.1367
+      27    0.6047    0.5630    0.5725    0.5494    0.4819          0.1228
+      30    0.5880    0.5592    0.5621    0.5444    0.4845          0.1035
+      33    0.6310    0.6047    0.6111    0.5944    0.5499          0.0811
+      36    0.5929    0.5514    0.5813    0.5064    0.5231          0.0698
+
+--- translation ---
+   Layer       d=1       d=2       d=3       d=4       d=5    d=1->5 drift
+  ------------------------------------------------------------------------
+       0    0.0137    0.0128    0.0160    0.0382    0.0275          0.0138
+       3    0.4332    0.3628    0.3657    0.3657    0.3935          0.0397
+       6    0.4467    0.3395    0.3394    0.3492    0.3746          0.0722
+       9    0.4410    0.3283    0.2956    0.2694    0.2369          0.2041
+      12    0.5419    0.4541    0.4224    0.3841    0.3543          0.1877
+      15    0.5052    0.4634    0.4272    0.3879    0.3612          0.1440
+      18    0.5298    0.5013    0.4690    0.4240    0.3948          0.1350
+      21    0.6558    0.5981    0.5776    0.5518    0.5296          0.1262
+      24    0.6271    0.5664    0.5492    0.5287    0.5131          0.1140
+      27    0.5762    0.5121    0.4930    0.4743    0.4532          0.1230
+      30    0.4861    0.4269    0.4098    0.4008    0.3878          0.0984
+      33    0.5072    0.4557    0.4369    0.4268    0.4121          0.0951
+      36    0.4062    0.3834    0.3787    0.3486    0.3179          0.0882
+
+======================================================================
+Exp4: Relational Invariants — Position/Syntax/Semantic
+======================================================================
+
+--- normal ---
+  Layer 0:
+           adjacent: -0.0251 ± 0.0970 (n=63)
+         distance_2: -0.0093 ± 0.0849 (n=48)
+         distance_3: 0.1760 ± 0.1401 (n=33)
+         distance_4: 0.0313 ± 0.1250 (n=18)
+       subject_verb: 0.0983 ± 0.0975 (n=15)
+        verb_object: 0.0881 ± 0.0715 (n=15)
+           det_noun: -0.0525 ± 0.0400 (n=30)
+      long_distance: -0.0329 ± 0.0266 (n=15)
+  Layer 9:
+           adjacent: 0.3935 ± 0.2108 (n=63)
+         distance_2: 0.2919 ± 0.1665 (n=48)
+         distance_3: 0.2333 ± 0.1596 (n=33)
+         distance_4: 0.1196 ± 0.1349 (n=18)
+       subject_verb: 0.4358 ± 0.0633 (n=15)
+        verb_object: 0.3885 ± 0.0719 (n=15)
+           det_noun: 0.2597 ± 0.2126 (n=30)
+      long_distance: 0.0608 ± 0.0161 (n=15)
+  Layer 18:
+           adjacent: 0.3898 ± 0.2061 (n=63)
+         distance_2: 0.3761 ± 0.2015 (n=48)
+         distance_3: 0.3575 ± 0.2332 (n=33)
+         distance_4: 0.3094 ± 0.1035 (n=18)
+       subject_verb: 0.5907 ± 0.1218 (n=15)
+        verb_object: 0.5579 ± 0.1345 (n=15)
+           det_noun: 0.2964 ± 0.1715 (n=30)
+      long_distance: 0.2663 ± 0.0501 (n=15)
+  Layer 27:
+           adjacent: 0.6133 ± 0.1706 (n=63)
+         distance_2: 0.5523 ± 0.1321 (n=48)
+         distance_3: 0.5431 ± 0.0832 (n=33)
+         distance_4: 0.4494 ± 0.0678 (n=18)
+       subject_verb: 0.6052 ± 0.0747 (n=15)
+        verb_object: 0.6362 ± 0.0798 (n=15)
+           det_noun: 0.5425 ± 0.1981 (n=30)
+      long_distance: 0.4297 ± 0.0408 (n=15)
+  Layer 35:
+           adjacent: 0.7260 ± 0.1811 (n=63)
+         distance_2: 0.6943 ± 0.1798 (n=48)
+         distance_3: 0.6617 ± 0.1406 (n=33)
+         distance_4: 0.5686 ± 0.0617 (n=18)
+       subject_verb: 0.7171 ± 0.1782 (n=15)
+        verb_object: 0.7809 ± 0.1696 (n=15)
+           det_noun: 0.6845 ± 0.1814 (n=30)
+      long_distance: 0.5595 ± 0.0242 (n=15)
+
+--- cot ---
+  Layer 0:
+           adjacent: 0.0270 ± 0.0861 (n=168)
+         distance_2: 0.1153 ± 0.3054 (n=153)
+         distance_3: 0.0633 ± 0.1137 (n=138)
+         distance_4: 0.0393 ± 0.1169 (n=123)
+       subject_verb: 0.0019 ± 0.0000 (n=15)
+        verb_object: 0.0146 ± 0.0000 (n=15)
+           det_noun: 0.0333 ± 0.0250 (n=30)
+      long_distance: 0.0167 ± 0.0311 (n=15)
+  Layer 9:
+           adjacent: 0.4539 ± 0.1575 (n=168)
+         distance_2: 0.3648 ± 0.1589 (n=153)
+         distance_3: 0.3986 ± 0.1993 (n=138)
+         distance_4: 0.3215 ± 0.1476 (n=123)
+       subject_verb: 0.4692 ± 0.0000 (n=15)
+        verb_object: 0.3250 ± 0.0000 (n=15)
+           det_noun: 0.3593 ± 0.2803 (n=30)
+      long_distance: 0.0755 ± 0.0143 (n=15)
+  Layer 18:
+           adjacent: 0.5083 ± 0.2421 (n=168)
+         distance_2: 0.5021 ± 0.1612 (n=153)
+         distance_3: 0.4819 ± 0.2396 (n=138)
+         distance_4: 0.4696 ± 0.1959 (n=123)
+       subject_verb: 0.1312 ± 0.0000 (n=15)
+        verb_object: 0.5250 ± 0.0000 (n=15)
+           det_noun: 0.3306 ± 0.3209 (n=30)
+      long_distance: 0.2897 ± 0.0348 (n=15)
+  Layer 27:
+           adjacent: 0.6047 ± 0.1560 (n=168)
+         distance_2: 0.5630 ± 0.1535 (n=153)
+         distance_3: 0.5725 ± 0.1469 (n=138)
+         distance_4: 0.5494 ± 0.0913 (n=123)
+       subject_verb: 0.4499 ± 0.0000 (n=15)
+        verb_object: 0.4501 ± 0.0000 (n=15)
+           det_noun: 0.4224 ± 0.1640 (n=30)
+      long_distance: 0.4397 ± 0.0297 (n=15)
+  Layer 35:
+           adjacent: 0.7521 ± 0.1190 (n=168)
+         distance_2: 0.7222 ± 0.1186 (n=153)
+         distance_3: 0.7191 ± 0.1313 (n=138)
+         distance_4: 0.6909 ± 0.1311 (n=123)
+       subject_verb: 0.7078 ± 0.0000 (n=15)
+        verb_object: 0.6434 ± 0.0000 (n=15)
+           det_noun: 0.6213 ± 0.0848 (n=30)
+      long_distance: 0.5726 ± 0.0186 (n=15)
+
+--- translation ---
+  Layer 0:
+           adjacent: 0.0137 ± 0.0524 (n=102)
+         distance_2: 0.0128 ± 0.0514 (n=87)
+         distance_3: 0.0160 ± 0.0750 (n=72)
+         distance_4: 0.0382 ± 0.1023 (n=57)
+       subject_verb: 0.0401 ± 0.0426 (n=15)
+        verb_object: 0.0318 ± 0.0456 (n=15)
+           det_noun: 0.0171 ± 0.0520 (n=30)
+      long_distance: -0.0104 ± 0.0418 (n=15)
+  Layer 9:
+           adjacent: 0.4410 ± 0.1792 (n=102)
+         distance_2: 0.3283 ± 0.1538 (n=87)
+         distance_3: 0.2956 ± 0.1404 (n=72)
+         distance_4: 0.2694 ± 0.1364 (n=57)
+       subject_verb: 0.5078 ± 0.0859 (n=15)
+        verb_object: 0.3930 ± 0.0736 (n=15)
+           det_noun: 0.3064 ± 0.2298 (n=30)
+      long_distance: 0.0760 ± 0.0226 (n=15)
+  Layer 18:
+           adjacent: 0.5298 ± 0.2373 (n=102)
+         distance_2: 0.5013 ± 0.1757 (n=87)
+         distance_3: 0.4690 ± 0.1945 (n=72)
+         distance_4: 0.4240 ± 0.1946 (n=57)
+       subject_verb: 0.3550 ± 0.1830 (n=15)
+        verb_object: 0.5755 ± 0.1415 (n=15)
+           det_noun: 0.3819 ± 0.2747 (n=30)
+      long_distance: 0.3055 ± 0.0206 (n=15)
+  Layer 27:
+           adjacent: 0.5762 ± 0.1443 (n=102)
+         distance_2: 0.5121 ± 0.1285 (n=87)
+         distance_3: 0.4930 ± 0.1302 (n=72)
+         distance_4: 0.4743 ± 0.1134 (n=57)
+       subject_verb: 0.5559 ± 0.0742 (n=15)
+        verb_object: 0.5602 ± 0.1027 (n=15)
+           det_noun: 0.4752 ± 0.1905 (n=30)
+      long_distance: 0.4199 ± 0.0204 (n=15)
+  Layer 35:
+           adjacent: 0.5750 ± 0.1182 (n=102)
+         distance_2: 0.5446 ± 0.1464 (n=87)
+         distance_3: 0.5382 ± 0.1556 (n=72)
+         distance_4: 0.5323 ± 0.1457 (n=57)
+       subject_verb: 0.6310 ± 0.1051 (n=15)
+        verb_object: 0.5954 ± 0.1363 (n=15)
+           det_noun: 0.5398 ± 0.1093 (n=30)
+      long_distance: 0.5216 ± 0.0199 (n=15)
+
+======================================================================
+Exp5: Cross-task Normalized Covariance Overlap
+======================================================================
+
+--- Target layer: 18 ---
+  normal-translation: overlap=0.3853, random=0.0195, enrichment=19.7x
+  cot-normal: overlap=0.6513, random=0.0196, enrichment=33.3x
+  cot-translation: overlap=0.3673, random=0.0195, enrichment=18.8x
+
+--- Target layer: 27 ---
+  normal-translation: overlap=0.3067, random=0.0196, enrichment=15.6x
+  cot-normal: overlap=0.7142, random=0.0195, enrichment=36.6x
+  cot-translation: overlap=0.2885, random=0.0195, enrichment=14.8x
+
+======================================================================
+PHASE 206 SUMMARY
+======================================================================
+
+--- d_eff: Raw vs Residual ---
+  normal: raw_d_eff=3.14 → resid_d_eff=3.14 (change: -0.00)
+  cot: raw_d_eff=2.55 → resid_d_eff=2.55 (change: +0.00)
+  translation: raw_d_eff=5.83 → resid_d_eff=5.83 (change: -0.00)
+
+--- Residual Covariance Alignment Summary ---
+  normal: avg=0.5096, STRONG=0, moderate+=4/12
+  cot: avg=0.5190, STRONG=0, moderate+=5/12
+  translation: avg=0.4800, STRONG=0, moderate+=2/12
+
+--- Token-Pair Relation Summary ---
+  normal: d=1 avg=0.4763, d=4 avg=0.3417
+  cot: d=1 avg=0.5173, d=4 avg=0.4629
+  translation: d=1 avg=0.4746, d=4 avg=0.3807
+
+--- Relational Invariants Summary ---
+  normal L0: adjacent=-0.0251, subject_verb=0.0983, long_dist=-0.0329
+  normal L9: adjacent=0.3935, subject_verb=0.4358, long_dist=0.0608
+  normal L18: adjacent=0.3898, subject_verb=0.5907, long_dist=0.2663
+  normal L27: adjacent=0.6133, subject_verb=0.6052, long_dist=0.4297
+  normal L35: adjacent=0.7260, subject_verb=0.7171, long_dist=0.5595
+  cot L0: adjacent=0.0270, subject_verb=0.0019, long_dist=0.0167
+  cot L9: adjacent=0.4539, subject_verb=0.4692, long_dist=0.0755
+  cot L18: adjacent=0.5083, subject_verb=0.1312, long_dist=0.2897
+  cot L27: adjacent=0.6047, subject_verb=0.4499, long_dist=0.4397
+  cot L35: adjacent=0.7521, subject_verb=0.7078, long_dist=0.5726
+  translation L0: adjacent=0.0137, subject_verb=0.0401, long_dist=-0.0104
+  translation L9: adjacent=0.4410, subject_verb=0.5078, long_dist=0.0760
+  translation L18: adjacent=0.5298, subject_verb=0.3550, long_dist=0.3055
+  translation L27: adjacent=0.5762, subject_verb=0.5559, long_dist=0.4199
+  translation L35: adjacent=0.5750, subject_verb=0.6310, long_dist=0.5216
+
+--- Cross-task Normalized Covariance Overlap ---
+  L18 normal-translation: overlap=0.3853 (19.7x random)
+  L18 cot-normal: overlap=0.6513 (33.3x random)
+  L18 cot-translation: overlap=0.3673 (18.8x random)
+  L27 normal-translation: overlap=0.3067 (15.6x random)
+  L27 cot-normal: overlap=0.7142 (36.6x random)
+  L27 cot-translation: overlap=0.2885 (14.8x random)
+
+Saved to D:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase206_qwen3_results.json
+
+Total time: 32.0s (0.5min)
