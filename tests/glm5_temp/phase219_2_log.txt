@@ -1,0 +1,110 @@
+﻿======================================================================
+Phase 219-2: MLPԼ������������֤
+======================================================================
+ִ��ʱ��: 2026-05-17 20:39
+�豸: cuda
+
+����Qwen2.5-1.5Bģ��...
+python : Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+所在位置 行:1 字符: 202
++ ... ns-Project; python tests/glm5/phase219_2_mlp_mechanism.py 2>&1 | Out- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Sliding Window ...be encountered.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING:root:You are not using LayerNorm, so the writing weights can't be centered! Skipping
+Loaded pretrained model Qwen/Qwen2.5-1.5B into HookedTransformer
+ģ��: 28��, d_model=1536
+
+=== ʵ��1: ����MLP Ablation ===
+  L 0: KL_baseline=0.4842, KL_ablated=0.2244, reduction=53.6%
+  L 2: KL_baseline=0.8611, KL_ablated=0.7353, reduction=14.6%
+  L 4: KL_baseline=1.2672, KL_ablated=1.1136, reduction=12.1%
+  L 6: KL_baseline=1.1516, KL_ablated=1.2763, reduction=-10.8%
+  L 8: KL_baseline=1.9793, KL_ablated=2.2410, reduction=-13.2%
+  L10: KL_baseline=2.6342, KL_ablated=2.3544, reduction=10.6%
+  L12: KL_baseline=2.2403, KL_ablated=2.6818, reduction=-19.7%
+  L14: KL_baseline=3.8577, KL_ablated=3.2691, reduction=15.3%
+  L16: KL_baseline=2.9859, KL_ablated=3.9408, reduction=-32.0%
+  L18: KL_baseline=3.6650, KL_ablated=3.0395, reduction=17.1%
+  L20: KL_baseline=4.8814, KL_ablated=4.4178, reduction=9.5%
+  L22: KL_baseline=5.8259, KL_ablated=4.8509, reduction=16.7%
+  L24: KL_baseline=7.0513, KL_ablated=8.0340, reduction=-13.9%
+  L26: KL_baseline=10.5953, KL_ablated=10.2186, reduction=3.6%
+  L27: KL_baseline=6.4290, KL_ablated=9.0100, reduction=-40.1%
+
+=== ʵ��2: GLU�ſ�ģʽ ===
+
+ Layer |  Gate_rel_diff |  Up_rel_diff |  Gate_cos_sim
+-------------------------------------------------------
+L   0  |       0.551762 |     0.668730 |      0.837364
+L   2  |       0.579828 |     0.515108 |      0.842916
+L   4  |       0.573398 |     0.448951 |      0.846765
+L   6  |       0.555679 |     0.471587 |      0.838982
+L   8  |       0.642105 |     0.548176 |      0.792814
+L  10  |       0.603831 |     0.585679 |      0.809599
+L  12  |       0.532082 |     0.563109 |      0.848336
+L  14  |       0.682448 |     0.662583 |      0.764413
+L  16  |       0.579315 |     0.647700 |      0.823977
+L  18  |       0.464971 |     0.561163 |      0.884125
+L  20  |       0.461434 |     0.515275 |      0.887433
+L  22  |       0.446899 |     0.484354 |      0.897878
+L  24  |       0.447561 |     0.466369 |      0.896919
+L  26  |       0.446084 |     0.447048 |      0.897070
+L  27  |       0.325575 |     0.406382 |      0.947737
+
+=== ʵ��3: MLPȨ������ֵ�ṹ ===
+D:\Ai2050\TransformerLens-Project\tests\glm5\phase219_2_mlp_mechanism.py:233: UserWarning: Converting a tensor with req
+uires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\cs
+rc\autograd\generated\python_variable_methods.cpp:837.)
+  "max": float(S_gate[0]),
+
+ Layer |  Gate_cond | W_in_cond |  Gate_top1 | W_in_top1
+-------------------------------------------------------
+L   0  |  2001748.0 |  834515.6 |      5.329 |     2.280
+L   4  |  2630284.5 |  729604.9 |     20.385 |     3.861
+L   8  |   241569.7 |  143087.1 |     10.320 |     4.251
+L  12  |   869135.3 |  646871.6 |      9.035 |     4.926
+L  16  |   524308.4 |  468960.6 |      8.583 |     5.754
+L  20  |   545901.4 |  417699.8 |     10.198 |     5.697
+L  24  |   857584.8 |  606632.6 |     14.698 |     8.175
+L  27  |  3288621.2 | 3604949.0 |     30.414 |    27.324
+
+=== ʵ��4: MLP�в��������� ===
+
+ Layer |  High(%) |   Low(%) |  Angle_to_prev
+---------------------------------------------
+L   0  |   24.72% |   25.02% |       0.000000
+L   2  |   24.95% |   28.94% |      -0.186667
+L   4  |   25.17% |   25.50% |      -0.217634
+L   6  |   26.29% |   25.09% |      -0.276286
+L   8  |   24.94% |   24.63% |      -0.278095
+L  10  |   26.30% |   27.80% |      -0.265284
+L  12  |   25.26% |   30.02% |      -0.274504
+L  14  |   25.35% |   28.43% |      -0.177750
+L  16  |   25.50% |   28.98% |      -0.247106
+L  18  |   26.17% |   31.21% |      -0.059189
+L  20  |   25.10% |   28.81% |      -0.023269
+L  22  |   25.03% |   28.58% |       0.038781
+L  24  |   25.59% |   23.13% |       0.078180
+L  26  |   26.09% |   29.72% |       0.072165
+L  27  |   39.70% |   61.08% |       0.058829
+
+======================================================================
+�ۺϷ���
+======================================================================
+
+�ؼ���(MLP ablation����KL���Ĳ�):
+  L0: reduction=53.6%
+  L23: reduction=35.9%
+  L1: reduction=24.4%
+  L25: reduction=23.3%
+  L18: reduction=17.1%
+
+�ſ�vs��ͶӰ�Ĳ���(�������Ĳ�):
+  L1: gate/up ratio=1.861
+  L5: gate/up ratio=1.299
+  L4: gate/up ratio=1.277
+
+����ѱ��浽: d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase219_2_results.json
