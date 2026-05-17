@@ -1,4 +1,4 @@
-$fs = [System.IO.FileStream]::new('d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase198b_glm4_log.txt', [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+$fs = [System.IO.FileStream]::new('d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase199_glm4_log.txt', [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
 $sr = [System.IO.StreamReader]::new($fs)
 $content = $sr.ReadToEnd()
 $sr.Close()

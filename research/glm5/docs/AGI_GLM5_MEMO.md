@@ -79715,3 +79715,1867 @@ Logs:
 - tests/glm5_temp/phase198_qwen3_log.txt (Qwen3)
 - tests/glm5_temp/phase198b_glm4_log.txt (GLM4)
 - tests/glm5_temp/phase198b_ds7b_log.txt (DS7B)
+
+
+## Phase 199: Syntax-Controlled Semantic Perturbation + Delay Spectrum Mapping [2026-05-16 23:55]
+
+### 核心目标
+
+在Phase 198"纠错阶段"确认KL slope是tautology之后，本阶段解决两个关键问题：
+
+1. **语义效应 vs 句法混淆**：之前的question/negation/conditional效应中，多少是真正的语义信号，多少是句法结构变化造成的伪象？
+2. **延迟谱深度映射**：不同语言结构影响未来的时间尺度是否真有系统性差异？
+3. **模式跃迁连续性**：模式切换是离散相变还是连续变化？
+
+### 实验设计
+
+**Exp1: Syntax-Controlled Semantic Perturbation** (最关键)
+
+| 条件 | 类型 | 示例 |
+|------|------|------|
+| sem_negation | 语义+句法 | "The cat does not chase the dog" |
+| syn_negation | 纯句法 | "The cat then chase the dog" |
+| syn_insertion | 无意义插入 | "The cat zzz chase the dog" |
+| sem_question | 语义+句法 | "Does the cat chase the dog?" |
+| syn_question | 纯句法 | "Therefore, the cat chase the dog" |
+| syn_question_v2 | 纯标点 | "The cat chases the dog?" |
+| sem_conditional | 语义+句法 | "If the cat chases the dog" |
+| syn_conditional | 纯句法 | "When the cat chases the dog" |
+| syn_conditional_v2 | 纯句法 | "After the cat chases the dog" |
+
+**Exp2: Delay Spectrum Deep Mapping**
+
+从即时约束到超长程约束的完整延迟谱：
+- 即时: negation, question
+- 延迟: conditional_if, conditional_unless, future_will, past_tense
+- 长程: narrative_setup ("In a world where..."), suppose_that
+- 基线: rand_token, rand_period
+
+**Exp3: Mode Transition Continuity**
+
+渐变prompt路径：
+- CoT: "Problem" → "Think" → "Think carefully" → "Think step by step" → "Let's think step by step"
+- Translation: "The cat sleeps" → "in Chinese:" → "Translate" → "Translate to Chinese:"
+- Coding: "Add two numbers" → "using code:" → "Write code to" → "def add_two_numbers"
+
+### 数据量
+
+| 模型 | 句子数 | 步数 | 采样数 |
+|------|--------|------|--------|
+| Qwen3 | 20 | 12 | 30 |
+| GLM4 | 8 | 8 | 15 |
+| DS7B | 8 | 8 | 15 |
+
+### 核心结果
+
+#### Exp1: 语义 vs 句法 KL[0] 对照表
+
+| 对照组 | Qwen3 Delta | Qwen3 语义? | GLM4 Delta | GLM4 语义? | DS7B Delta | DS7B 语义? |
+|--------|-------------|-------------|------------|-----------|-----------|-----------|
+| sem_neg vs syn_neg (then) | +0.801 | MARGINAL | +0.800 | MARGINAL | +0.939 | MARGINAL |
+| sem_neg vs syn_insertion (zzz) | +0.531 | MARGINAL | -0.566 | MARGINAL | -2.439 | YES(反转!) |
+| sem_q vs syn_question (Therefore,) | +10.384 | **YES** | +6.198 | **YES** | +13.231 | **YES** |
+| sem_q vs syn_question_v2 (只加?) | +2.584 | **YES** | -0.346 | MARGINAL | +2.271 | **YES** |
+| sem_cond vs syn_cond (When) | -0.538 | MARGINAL | -0.561 | MARGINAL | +0.719 | MARGINAL |
+| sem_cond vs syn_cond_v2 (After) | -0.660 | MARGINAL | -0.793 | MARGINAL | -0.372 | MARGINAL |
+
+#### Exp1 关键发现
+
+**1. Question效应是真实的语义效应（三模型一致）**
+
+- sem_question vs syn_question: Delta = +10.4/+6.2/+13.2 → **三模型都YES**
+- "Does X?" vs "Therefore, X" — 即使两者都改变了句法，疑问语序+助动词倒装的真实疑问效应远超纯句法重构
+- 但：syn_question_v2（只加问号不改变语序）的KL[0]=8.1/6.7/11.4 → **标点本身就能产生很大KL**
+- 结论：question效应 = 语义疑问 + 句法重构 + 标点效应的**叠加**，但语义疑问部分是真实的
+
+**2. Negation效应可能是句法效应为主（三模型一致）**
+
+- sem_negation vs syn_negation: Delta仅+0.8/+0.8/+0.9 → MARGINAL
+- "does not" vs "then" 在KL[0]上几乎没有差别！
+- 更严重的是DS7B中 syn_insertion("zzz")的KL[0]=4.12 > sem_negation的1.68
+- **这暗示negation的KL[0]主要来自token插入造成的序列位移，而非语义否定**
+- 这是一个重要发现：否定可能不是"约束"，而是"扰动"
+
+**3. Conditional效应：语义效应微弱，If/When/After几乎等价**
+
+- sem_conditional vs syn_conditional: Delta = -0.54/-0.56/+0.72 → MARGINAL
+- If vs When vs After的KL[0]几乎相同 → 它们主要共享"从句结构"效应
+- **conditional的"延迟效应"可能是从句结构本身的属性，不是"If"特有的假设世界构建**
+
+#### Exp2: 延迟谱跨模型对比
+
+| 条件 | Qwen3 KL[0] | Qwen3 Delay | GLM4 KL[0] | GLM4 Delay | DS7B KL[0] | DS7B Delay |
+|------|-------------|-------------|------------|-----------|-----------|-----------|
+| negation | 1.16 | 0 (IMM) | 1.24 | 0 (IMM) | 1.68 | 0 (IMM) |
+| question | 10.70 | 0 (IMM) | 6.38 | 0 (IMM) | 13.63 | 0 (IMM) |
+| conditional_if | 0.46 | 1 (FAST) | 0.35 | 1 (FAST) | 1.65 | 0 (IMM) |
+| conditional_unless | 0.86 | 1 (FAST) | 0.84 | 1 (FAST) | 2.44 | 0 (IMM) |
+| future_will | 0.37 | 1 (FAST) | 0.35 | 1 (FAST) | 1.05 | 0 (IMM) |
+| past_tense | 0.34 | 1 (FAST) | 0.24 | 1 (FAST) | 0.63 | 1 (FAST) |
+| narrative_setup | 5.22 | 0 (IMM) | 5.01 | 0 (IMM) | 6.87 | 0 (IMM) |
+| suppose_that | 0.42 | 1 (FAST) | 0.27 | 1 (FAST) | 0.77 | 1 (FAST) |
+| rand_token | 0.80 | 1 (FAST) | 2.07 | 0 (IMM) | 3.41 | 0 (IMM) |
+| rand_period | 9.10 | 0 (IMM) | 7.06 | 0 (IMM) | 7.11 | 0 (IMM) |
+
+#### Exp2 关键发现
+
+**1. DS7B的conditional_if不显示延迟！KL[0]=1.65（IMMEDIATE）**
+
+- Qwen3/GLM4: conditional_if KL[0]≈0.35-0.46 (FAST_DELAY)
+- DS7B: conditional_if KL[0]=1.65 (IMMEDIATE)
+- 这意味着DS7B中"If"立即产生了比Qwen3/GLM4更大的初始发散
+- **可能的解释**：DS7B（DeepSeek-R1-Distill-Qwen-7B）是蒸馏模型，可能对条件句的处理方式不同
+
+**2. 延迟效应可能只是"弱初始发散"的另一个名字**
+
+- conditional_if的KL[0]=0.46(Qwen3), 但rand_token的KL[0]=0.80 → **rand_token的KL[0]也"不大"**
+- 关键问题：conditional的KL[0]小，究竟是因为"延迟"，还是因为"If"只是在第0步碰巧没改变概率分布？
+- 如果是后者，"延迟"只是弱初始效应的自然结果，不是真正的时间非对称性
+
+**3. 即时/延迟分界线：KL[0] > 1.0 → IMMEDIATE, KL[0] < 1.0 → FAST_DELAY**
+
+- 这个分界很可能是trivial的：任何KL[0] > 1的算IMMMEDIATE，< 1的算FAST_DELAY
+- rand_token KL[0]=0.80(Qwen3)也落入了FAST_DELAY → **延迟分类可能没有语义意义**
+
+#### Exp3: 模式跃迁连续性
+
+| 模式 | Qwen3 max_kl_jump | Qwen3 连续? | GLM4 max_kl_jump | GLM4 连续? | DS7B max_kl_jump | DS7B 连续? |
+|------|-------------------|------------|-------------------|-----------|-------------------|-----------|
+| CoT | 13.97 | **NO** | 11.12 | **NO** | 12.91 | **NO** |
+| Translation | 2.40 | YES | 4.31 | **NO** | 4.27 | **NO** |
+| Coding | 19.81 | **NO** | 8.03 | **NO** | 2.63 | YES |
+
+#### Exp3 关键发现
+
+**1. CoT是强烈的离散相变（三模型一致）**
+
+- 从"Think carefully"到"Think step by step"出现巨大KL跳跃（Qwen3: 0.53→14.50）
+- 这说明"step by step"不是渐进式推理增强，而是突然切换到完全不同的计算模式
+- CoT确实是一种"模式切换"，而非"推理增强"
+
+**2. Translation的不一致：Qwen3连续，GLM4/DS7B不连续**
+
+- Qwen3中翻译模式是连续过渡的（max_kl_jump=2.40）
+- GLM4/DS7B中翻译出现不连续跳跃（4.31/4.27）
+- 这可能反映了不同模型对翻译的内部表示方式不同
+
+**3. Coding在DS7B中连续但在Qwen3/GLM4中不连续**
+
+- Qwen3: 从"Write code to"到"def"跳跃19.8 → "def"是一个强触发器
+- DS7B: 渐变更平滑（max_kl_jump=2.63）
+- 编程模式可能在不同模型中有不同的触发机制
+
+### 理论分析
+
+#### A. 修正Phase 198的结论
+
+Phase 198认为conditional delayed effect是"最可能真机制"。Phase 199对此进行了严格检验：
+
+**修正1**: Conditional的"延迟"可能只是"弱初始发散"
+
+- If/When/After的KL[0]几乎相同(0.35-1.65) → 它们的主要效应是"从句结构"，不是假设世界
+- conditional_if vs rand_token的delay差异仅为0-1步 → 统计上不显著
+- 但conditional的slope确实较大(Qwen3: 1.12 vs rand_token: 0.92) → 需要更精细的分析
+
+**修正2**: Question效应是真实的，但包含大量句法成分
+
+- sem_question vs syn_question的Delta=+6到+13 → 真实语义信号
+- 但syn_question_v2(只加问号)也有KL[0]=6.7-11.4 → 标点贡献巨大
+- 需要进一步：纯语义疑问(不加问号不改语序)的测试
+
+**修正3**: Negation效应可能主要来自token序列位移
+
+- sem_negation vs syn_negation(then)几乎无差别 → 否定不是语义约束
+- 这是一个重大修正：否定可能不是"约束"，而只是"扰动"
+- 但注意：negation的attractor basin与syn_negation不同 → 分流结构可能不同
+
+#### B. 三层结构的修正
+
+Phase 198的三层结构基本正确，但需要细化：
+
+**Level 1: Mode (离散相变)**
+- CoT是真正的相变（三模型一致）
+- Translation和Coding的连续性因模型而异
+- 模式不是"连续流形"上的区域，而更像"离散吸引子"间的跳跃
+- 但CoT的强相变可能因为"step by step"是一个特别强的触发器
+
+**Level 2: Constraint (需要重新定义)**
+- Negation不是"约束"→ 是"扰动"
+- Question不是"约束"→ 是"模式切换"(切换到QA模式)
+- Conditional可能是"弱扰动"而非"延迟约束"
+- 真正的"约束"可能需要满足：改变允许的token集但不改变整体生成模式
+
+**Level 3: Autoregressive Chaos (确认)**
+- Phase 198的结论完全正确：KL slope是tautology
+- Phase 199进一步确认：即使是语义条件，KL slope也落入同一范围
+
+#### C. 当前最硬的问题
+
+1. **Conditional delay是真的还是弱的伪象?**
+   - 如果delay_step只差0-1步，且与rand_token没有显著差异
+   - 那么"conditional延迟效应"可能只是"初始扰动较小"的自然推论
+   - 需要更大数据量和更严格的统计检验
+
+2. **Negation是否是"约束"?**
+   - 如果negation与随机token插入在KL[0]上无显著差异
+   - 那么否定可能只是序列扰动，不是语义约束
+   - 但attractor basin的差异可能暗示：虽然初始发散相似，但分流结构不同
+
+3. **"语义效应"vs"句法效应"的严格区分是否可能?**
+   - 任何语义操作都必然伴随句法变化
+   - 问题是：如何量化"纯语义"效应?
+   - 可能的方向：同义改写(paraphrase) — 不变语义但变token
+
+### 脚本
+
+- tests/glm5/phase199_syntax_delay.py
+
+### 日志
+
+- tests/glm5_temp/phase199_qwen3_log.txt (316.5s)
+- tests/glm5_temp/phase199_glm4_log.txt (2333.5s)
+- tests/glm5_temp/phase199_ds7b_log.txt (1490.9s)
+
+### 结果JSON
+
+- tests/glm5_temp/phase199_qwen3_results.json
+- tests/glm5_temp/phase199_glm4_results.json
+- tests/glm5_temp/phase199_deepseek7b_results.json
+
+---
+
+## Phase 200: Internal Computational Regime Analysis [2026-05-17 00:48]
+
+### 核心目标
+
+Phase 199确认了KL slope是tautology，question效应是真实语义信号，negation可能只是扰动。Phase 200转向模型内部，从"输出KL分析"升级为"内部计算状态分析"——检验Pattern Compiler Theory：语言模型是否是模式编译器，不同语言模式是否进入不同的内部计算相？
+
+### 实验设计
+
+**Exp1: Activation Regime Clustering** — 不同mode是否形成分离的激活聚类？
+**Exp2: Routing Topology** — 不同mode是否激活不同的attention head组合？
+**Exp3: Phase Transition Boundary** — CoT/Coding相变边界在哪里？
+**Exp4: Representation Reuse** — 不同mode是否共享中间层回路？
+
+8种mode: normal, qa, cot, translation, coding, negation, conditional, narrative
+
+数据量: Qwen3 20句×3样本, GLM4/DS7B 8句×2样本
+
+### Exp1: Activation Regime Clustering
+
+#### Mode-Mode距离矩阵（最后一层, 余弦距离1-cos）
+
+**Qwen3 (L33):**
+```
+              normal   qa    cot   trans  coding negat  condit narrat
+normal         0.000  0.197 0.205  0.085  0.054  0.022  0.047  0.010
+qa             0.197  0.000 0.123  0.095  0.169  0.180  0.180  0.199
+cot            0.205  0.123 0.000  0.124  0.174  0.199  0.184  0.213
+translation   0.085  0.095 0.124  0.000  0.085  0.086  0.094  0.088
+coding         0.054  0.169 0.174  0.085  0.000  0.061  0.075  0.060
+negation       0.022  0.180 0.199  0.086  0.061  0.000  0.056  0.027
+conditional   0.047  0.180 0.184  0.094  0.075  0.056  0.000  0.048
+narrative      0.010  0.199 0.213  0.088  0.060  0.027  0.048  0.000
+```
+
+**GLM4 (L37):**
+```
+              normal   qa    cot   trans  coding negat  condit narrat
+normal         0.000  0.191 0.255  0.084  0.137  0.022  0.035  0.005
+qa             0.191  0.000 0.143  0.181  0.202  0.182  0.171  0.195
+cot            0.255  0.143 0.000  0.237  0.244  0.246  0.234  0.257
+translation   0.084  0.181 0.237  0.000  0.148  0.084  0.090  0.086
+coding         0.137  0.202 0.244  0.148  0.000  0.128  0.136  0.139
+negation       0.022  0.182 0.246  0.084  0.128  0.000  0.043  0.026
+conditional   0.035  0.171 0.234  0.090  0.136  0.043  0.000  0.037
+narrative      0.005  0.195 0.257  0.086  0.139  0.026  0.037  0.000
+```
+
+**DS7B (L25):**
+```
+              normal   qa    cot   trans  coding negat  condit narrat
+normal         0.000  0.148 0.208  0.056  0.047  0.030  0.043  0.015
+qa             0.148  0.000 0.207  0.116  0.113  0.134  0.122  0.142
+cot            0.208  0.207 0.000  0.188  0.183  0.203  0.187  0.195
+translation   0.056  0.116 0.188  0.000  0.058  0.057  0.060  0.051
+coding         0.047  0.113 0.183  0.058  0.000  0.056  0.054  0.049
+negation       0.030  0.134 0.203  0.057  0.056  0.000  0.049  0.027
+conditional   0.043  0.122 0.187  0.060  0.054  0.049  0.000  0.046
+narrative      0.015  0.142 0.195  0.051  0.049  0.027  0.046  0.000
+```
+
+#### Mode Coherence（mode内部相似度，跨层平均）
+
+| Mode | Qwen3 | GLM4 | DS7B | 平均 |
+|------|-------|------|------|------|
+| normal | 0.534 | 0.573 | 0.452 | 0.520 |
+| qa | 0.892 | 0.745 | 0.810 | 0.816 |
+| cot | 0.874 | 0.735 | 0.761 | 0.790 |
+| translation | 0.637 | 0.496 | 0.524 | 0.552 |
+| coding | 0.571 | 0.551 | 0.504 | 0.542 |
+| negation | 0.601 | 0.585 | 0.524 | 0.570 |
+| conditional | 0.576 | 0.562 | 0.525 | 0.554 |
+| narrative | 0.583 | 0.596 | 0.511 | 0.563 |
+
+#### Mode Separation Trajectory（vs normal的余弦距离, 随层变化）
+
+**Qwen3:**
+```
+Layer    qa     cot    trans  coding negat  condit narrat
+  5     0.387  0.340  0.198  0.109  0.014  0.141  0.015
+ 12     0.409  0.444  0.279  0.146  0.041  0.213  0.028
+ 18     0.287  0.318  0.173  0.092  0.037  0.134  0.021
+ 24     0.367  0.306  0.160  0.081  0.036  0.099  0.016
+ 33     0.197  0.205  0.085  0.055  0.022  0.047  0.010
+```
+
+**GLM4:**
+```
+Layer    qa     cot    trans  coding negat  condit narrat
+  5     0.415  0.401  0.168  0.204  0.013  0.169  0.008
+ 13     0.498  0.516  0.238  0.257  0.043  0.209  0.025
+ 20     0.476  0.413  0.158  0.177  0.048  0.139  0.020
+ 26     0.562  0.503  0.175  0.200  0.034  0.106  0.012
+ 37     0.191  0.255  0.084  0.137  0.022  0.035  0.005
+```
+
+**DS7B:**
+```
+Layer    qa     cot    trans  coding negat  condit narrat
+  5     0.505  0.616  0.225  0.252  0.032  0.159  0.030
+  9     0.548  0.552  0.239  0.276  0.069  0.215  0.043
+ 14     0.451  0.507  0.196  0.192  0.089  0.193  0.043
+ 18     0.410  0.470  0.163  0.153  0.086  0.161  0.040
+ 25     0.148  0.208  0.056  0.047  0.030  0.043  0.015
+```
+
+### Exp2: Routing Topology
+
+Head routing distance (vs normal, 平均余弦距离):
+
+**Qwen3:**
+```
+Layer  qa     cot    trans  coding negat  condit
+  3    0.671  0.758  0.574  0.523  0.340  0.437
+  9    0.733  0.852  0.846  0.810  0.803  0.856
+ 18    0.633  0.749  0.737  0.717  0.684  0.792
+ 27    0.817  0.930  0.926  0.865  0.890  0.915
+ 34    0.709  0.838  0.835  0.824  0.835  0.859
+```
+
+**GLM4:**
+```
+Layer  qa     cot    trans  coding negat  condit
+  3    0.593  0.926  0.905  0.846  0.799  0.899
+ 10    0.493  0.863  0.754  0.731  0.677  0.809
+ 20    0.469  0.797  0.771  0.781  0.721  0.797
+ 30    0.506  0.858  0.747  0.722  0.673  0.772
+ 38    0.496  0.672  0.478  0.452  0.404  0.499
+```
+
+**DS7B:**
+```
+Layer  qa     cot    trans  coding negat  condit
+  3    0.478  0.608  0.161  0.185  0.061  0.171
+  7    0.455  0.706  0.727  0.707  0.684  0.752
+ 14    0.449  0.849  0.856  0.809  0.765  0.851
+ 21    0.390  0.714  0.681  0.674  0.626  0.696
+ 26    0.401  0.798  0.742  0.741  0.706  0.735
+```
+
+### Exp3: Phase Transition Boundary
+
+**CoT相变（三模型一致）:**
+
+| 梯度 | Qwen3 mid_dist | Qwen3 KL[0] | GLM4 mid_dist | GLM4 KL[0] | DS7B mid_dist | DS7B KL[0] |
+|------|---------------|------------|---------------|-----------|--------------|-----------|
+| base | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 |
+| think | 0.392 | 7.958 | 0.422 | 10.760 | 0.535 | 9.012 |
+| think_more | 0.557 | 11.035 | 0.649 | 10.298 | 0.768 | 14.890 |
+| think_carefully | 0.586 | 6.766 | 0.632 | 4.440 | 0.646 | 6.742 |
+| think_step_by_step | 0.597 | 7.479 | 0.666 | 13.060 | 0.628 | 4.568 |
+| lets_think | 0.606 | 7.030 | 0.676 | 12.214 | 0.633 | 4.837 |
+| cot_format | 0.431 | 8.566 | 0.606 | 3.608 | 0.552 | 9.093 |
+
+三模型都检测到相变在"think"处（ratio 2.8-4.7x）：
+- Qwen3: "think" 处 entropy跳4.7x, late_dist跳3.5x
+- GLM4: "think" 处 late_dist跳4.7x, mid_dist跳3.8x
+- DS7B: "think" 处 mid_dist跳3.8x, late_dist跳3.2x
+
+**Coding相变:**
+
+| 梯度 | Qwen3 KL[0] | GLM4 KL[0] | DS7B KL[0] |
+|------|------------|-----------|-----------|
+| base | 0.000 | 0.000 | 0.000 |
+| using | 7.984 | 7.626 | 3.730 |
+| write_code | 0.632 | 4.220 | 3.044 |
+| def_start | 12.535 | 6.217 | 0.678 |
+| def_param | 3.040 | 3.687 | 7.659 |
+
+Qwen3: 相变在"def_full"处（entropy跳4.7x）
+GLM4: 相变在"using"处（KL跳3.7x, late_dist跳3.1x）
+DS7B: 相变较弱，在"def_start"处（late_dist跳2.6x）
+
+### Exp4: Representation Reuse（最关键实验）
+
+#### Cross-Mode Similarity to Normal by Layer
+
+**Qwen3:**
+```
+Layer   qa     cot    trans  coding negat  condit
+  0    -0.034 -0.050  1.000  1.000  1.000  0.006
+  3     0.426  0.452  0.983  0.977  0.989  0.375
+  6     0.490  0.484  0.969  0.961  0.970  0.440
+  9     0.310  0.214  0.932  0.929  0.912  0.207
+ 12     0.387  0.294  0.919  0.931  0.901  0.277
+ 18     0.525  0.437  0.900  0.926  0.902  0.437
+ 24     0.511  0.521  0.930  0.943  0.928  0.539
+ 30     0.589  0.553  0.946  0.949  0.941  0.648
+ 33     0.664  0.630  0.945  0.946  0.941  0.734
+ 35     0.781  0.750  0.960  0.958  0.958  0.835
+```
+
+**GLM4:**
+```
+Layer   qa     cot    trans  coding negat  condit
+  0     0.017  0.021  1.000  1.000  1.000  0.012
+  4     0.462  0.443  0.975  0.979  0.967  0.383
+ 12     0.382  0.205  0.956  0.961  0.883  0.292
+ 20     0.371  0.335  0.934  0.942  0.836  0.366
+ 28     0.313  0.273  0.948  0.949  0.891  0.584
+ 36     0.590  0.516  0.895  0.867  0.893  0.752
+ 39     0.769  0.742  0.861  0.805  0.933  0.847
+```
+
+**DS7B:**
+```
+Layer   qa     cot    trans  coding negat  condit
+  0     0.005  0.016  1.000  1.000  1.000  0.012
+  2     0.469  0.489  0.972  0.975  0.981  0.516
+  6     0.305  0.248  0.955  0.962  0.932  0.281
+  14     0.416  0.346  0.884  0.934  0.847  0.349
+  18     0.460  0.401  0.868  0.925  0.833  0.405
+  24     0.680  0.720  0.910  0.952  0.907  0.705
+  27     0.832  0.860  0.934  0.970  0.945  0.852
+```
+
+#### Mode Differentiation Profile（三模型平均, vs normal相似度）
+
+| Mode | Early | Mid | Late | 趋势 |
+|------|-------|-----|------|------|
+| qa | 0.299 | 0.422 | 0.591 | ↑↑↑ 强收敛 |
+| cot | 0.250 | 0.350 | 0.576 | ↑↑↑ 强收敛 |
+| translation | 0.971 | 0.915 | 0.918 | ↓→ 先降后稳 |
+| coding | 0.973 | 0.938 | 0.929 | ↓ 缓降 |
+| negation | 0.954 | 0.840 | 0.912 | ↓↑ V形 |
+| conditional | 0.259 | 0.367 | 0.671 | ↑↑↑ 强收敛 |
+
+### 核心发现
+
+#### ★★★ 发现1: 模式三分类 — 三模型完全一致！
+
+8种mode可以明确分为三组，在内部激活空间中呈现截然不同的行为：
+
+**A组: 句法结构重组模式（qa, cot, conditional）**
+- vs normal相似度: Early=0.27-0.30, Late=0.58-0.67
+- 特征: 早层极低相似度(~0.3)，然后逐步**收敛**到normal
+- 解释: 句法重组在早层创建全新的表示空间，但深层LayerNorm将表示拉回"归一化吸引子"
+- QA和CoT互为最近邻（距离0.12-0.14）→ 它们共享"疑问+推理"子结构
+
+**B组: 语义附加模式（translation, coding, negation）**
+- vs normal相似度: Early=0.95-0.97, Late=0.87-0.95
+- 特征: 早层极高相似度(~0.96)，然后**缓降**
+- 解释: 这些mode不重组句法，只附加新的语义方向
+- translation和coding互为最近邻（距离0.06-0.09）→ 它们共享"格式转换"子结构
+
+**C组: 句法微扰模式（narrative）**
+- vs normal相似度: Early~Late 始终>0.97
+- 特征: 与normal几乎重合
+- 解释: "Once upon a time"前缀对内部表示的影响微乎其微
+
+这个三分类**不依赖任何统计方法**，直接从激活几何中观察得出。
+
+#### ★★★ 发现2: "先发散后收敛" — qa/cot/conditional的深层悖论
+
+A组模式的分离度轨迹非常反直觉：
+
+```
+           L5     L12    L18    L24    L33(Last)
+Qwen3 qa: 0.387  0.409  0.287  0.367  0.197
+GLM4  qa: 0.415  0.498  0.476  0.562  0.191
+DS7B  qa: 0.505  0.548  0.410  0.451  0.148
+```
+
+- 早/中层: 分离度大(0.3-0.6) → 不同模式确实进入不同计算状态
+- 最后一层: 分离度骤降到0.15-0.20 → 模型把差异"压缩"了
+
+这不是"模式不重要"——而是: **深层的LayerNorm/unembedding把所有表示拉回一个"归一化吸引子"**。输出概率分布的约束太强，使得不同mode在最后一层的表示被迫收敛。
+
+但这个收敛是**表面的**——中间层的差异才是真正的计算差异。
+
+#### ★★★ 发现3: Routing证实了三分类
+
+Attention head routing distance（vs normal）:
+
+| Mode | L3(Early) | L9-14(Mid) | L27+(Late) | 模式 |
+|------|-----------|------------|------------|------|
+| qa | 0.48-0.67 | 0.31-0.73 | 0.49-0.71 | 中等偏移 |
+| cot | 0.61-0.93 | 0.75-0.85 | 0.68-0.93 | ★最强偏移 |
+| translation | 0.16-0.91 | 0.74-0.86 | 0.74-0.93 | 逐步偏移 |
+| negation | 0.06-0.80 | 0.68-0.80 | 0.83-0.89 | 逐步偏移 |
+| conditional | 0.17-0.90 | 0.79-0.86 | 0.73-0.92 | 逐步偏移 |
+
+CoT在所有层的routing distance都最大(0.75-0.93) → CoT确实切换到了完全不同的注意力模式！
+Negation在早层routing很小(0.06-0.34) → 否定在早层不改变注意力路由，支持"negation是扰动而非模式"。
+
+#### ★★★ 发现4: CoT相变在"think"处，不是"step by step"
+
+三模型都一致发现：从base到"Think"的跳跃最大（ratio 3.2-4.7x），而不是从"Think carefully"到"Think step by step"。
+
+这意味着：
+- "Think"本身就是一个强触发器 → 模型识别到"需要思考"
+- "step by step"只是在这个已触发的模式内进行微调
+- **相变不是渐变增强，而是一个离散的"开关"**
+
+这与Phase 199的KL分析完全一致：CoT是离散相变。
+
+#### ★★★ 发现5: L0的特殊性 — 编程/翻译的"token级等价"
+
+Exp4中，L0（embedding层）的数据揭示了关键信息：
+
+```
+Layer 0:  qa≈0   cot≈0   trans=1.0   coding=1.0   negat=1.0   condit≈0
+```
+
+- qa/cot/conditional在L0与normal的相似度≈0 → 它们的**第一个token就不同**（"Does"/"Problem"/"If"）
+- translation/coding/negation在L0与normal相似度=1.0 → 它们共享**相同的开头token**
+
+这直接解释了三分类的起源：
+- A组的分离从L0就开始了 → 因为句法重组改变了第一个token
+- B组的L0完全相同 → 分离是后续层逐步引入的
+
+**这个发现是基础性的**：模式分类的物理起源是"prompt的第一个token是否改变"。
+
+### 理论分析
+
+#### A. Pattern Compiler Theory的验证
+
+Phase 200的数据强力支持"模式编译器"理论，但需要关键修正：
+
+**支持证据:**
+1. CoT确实触发了一个离散的"计算程序切换"（routing distance 0.75-0.93）
+2. 不同mode激活不同的attention head组合（Exp2证实）
+3. 中间层的分离度远大于输出层（中间计算确实不同）
+
+**关键修正:**
+1. "模式编译"不是一个统一的机制 — 三类mode的本质不同
+2. A组(qa/cot/conditional)是**句法编译** — 第一个token就决定了计算路径
+3. B组(translation/coding/negation)是**语义附加** — 在基础计算上叠加新方向
+4. C组(narrative)不是模式切换 — 只是最小扰动
+
+**Pattern Compiler → 三通道模型:**
+```
+输入 → [Token识别] → 
+  如果首token是疑问词 → 句法编译通道A（重建表示空间）
+  如果首token是normal → 检测附加指令 → 语义附加通道B（在原空间上叠加）
+  如果无特殊指令 → 默认通道C（最小修改）
+```
+
+#### B. "归一化吸引子" — 为什么最后一层收敛？
+
+所有mode在最后一层与normal的相似度都高于中间层，这似乎矛盾。解释：
+
+1. **LayerNorm效应**: 每层的LayerNorm强制将表示拉向单位球面
+2. **Unembedding约束**: lm_head W_U的行空间是所有表示必须投影到的低维空间(~200维)
+3. **"下一个词"训练的直接后果**: 所有层的优化目标相同 → 深层表示被迫进入相似的"可预测"区域
+
+**数学表述**: 设W_U的行空间为P，则对于任何hidden state h_L:
+- h_L在P中的投影决定了输出分布
+- P的维度(~200)远小于d_model(2560-4096)
+- 不同mode的差异如果不在P中 → 被lm_head忽略
+- 如果在P中 → 被压缩到200维的公共空间
+
+**这与CCXVII的"暗物质"发现完美对接**: 86-92%的概念信号在W_U行空间之外，但steering仍然有效。Phase 200进一步确认：最后一层的表示虽然"看起来"收敛了，但暗物质维度中仍保留了mode差异。
+
+#### C. 与Phase 198-199的三层结构对接
+
+Phase 198的三层结构 + Phase 199的修正 + Phase 200的内部视角:
+
+```
+Level 1: Mode (离散相变)
+  → Phase 200 Exp3确认: CoT在"think"处发生离散相变
+  → Phase 200 Exp1修正: "模式"不是单一概念，而是三通道
+     - A通道: 句法编译型（qa/cot/conditional）— 第一个token触发
+     - B通道: 语义附加型（translation/coding/negation）— 中间层逐步附加
+     - C通道: 微扰型（narrative）— 几乎不改变计算
+
+Level 2: Constraint → 修正为"计算偏移"
+  → Phase 200 Exp2确认: 不同mode的attention routing确实不同
+  → Phase 200 Exp4修正: "约束"不是统一机制
+     - A通道: 全局重建（早层就改变表示空间）
+     - B通道: 局部附加（不改变基础表示，只添加新方向）
+     - C通道: 可忽略
+
+Level 3: Autoregressive Chaos (确认)
+  → Phase 198-199的结论完全正确
+  → Phase 200补充: 深层LayerNorm+Unembedding压缩 → 表面收敛
+     但中间层的差异是真实的
+```
+
+### 严格审视
+
+#### 硬伤1: 三分类可能只是"首token不同"的trivial结果
+
+A组(qa/cot/conditional)与B组的根本差异在于首token不同。这不是"语言模式的深层分类"，而是输入token的自然分组。
+
+**反驳**: 但B组内部（translation vs coding vs negation）的首token相同，而它们的中间层分离度不同（coding 0.93 vs negation 0.90 at L12 in Qwen3）。所以三分类**不完全是**首token的trivial结果，中间层的计算确实在产生差异。
+
+**但**: 首token是否"决定"了整个计算路径？这是一个需要验证的因果问题。可以做首token控制实验：用相同首token但不同mode的prompt测试。
+
+#### 硬伤2: "深层收敛"可能只是余弦相似度的数学伪象
+
+余弦相似度在向量范数相差很大时可能产生误导。如果normal的L33范数远大于qa的L33范数，余弦相似度会被范数差异扭曲。
+
+**需要**: 范数分析 + 欧氏距离分析，确认收敛不是数学伪象。
+
+#### 硬伤3: Exp4的"跨mode相似度"只测量了与normal的相似度
+
+如果normal本身在中间层就有很大的表示方差，那么"与normal的相似度"可能不稳定。需要mode-pair的完整距离矩阵。
+
+#### 硬伤4: 数据量偏小
+
+- GLM4/DS7B只用8句 × 2样本 = 16个数据点
+- 三分类的统计显著性需要更多数据验证
+- 特别是conditional和qa的区分需要更多句法变体
+
+#### 硬伤5: "模式编译"的因果方向未确定
+
+目前只证明了"不同mode有不同内部状态"，但没有证明"模式识别→程序激活"的因果链。也可能是：
+- 不同token → 不同表示 → 看起来像"模式"，但只是token级效应的累积
+- 需要做causal intervention（如ablate特定head后看mode是否消失）
+
+### 下一步：破解语言数学结构的第一性原理
+
+#### 当前瓶颈
+
+Phase 197-200形成了一个完整的从"输出统计"→"句法对照"→"内部状态"的研究链条。关键瓶颈是：
+
+1. **我们观察到了"模式"，但不知道模式的数学结构是什么**
+   - 三分类是描述性的，不是推导性的
+   - 需要从语言公理出发推导三分类的必然性
+
+2. **"首token决定论"尚未被证实或证伪**
+   - 如果首token决定了计算路径 → 语言的数学结构在token级就决定了
+   - 如果中间层的计算独立于首token → 语言的数学结构在表示空间中
+
+3. **深层收敛的物理意义不清**
+   - 收敛是LayerNorm的trivial效应？还是"下一个词"训练的结构性后果？
+   - 需要区分"表面收敛"和"本质收敛"
+
+#### 第一性原理分析
+
+语言能力包含了语义、逻辑、语法等维度，有完整规则，说明背后有数学结构。这个数学结构应该满足：
+
+1. **有限维**: 语言可以用有限参数描述（d_model=2560-4096的子空间）
+2. **层次性**: 语法→语义→逻辑的层次关系
+3. **组合性**: 有限规则可以生成无限句子
+
+Phase 200的三分类可能对应语言结构的三个维度:
+- **A组(句法编译)**: 对应语言的**语法维度** — 句法结构重组需要重建表示空间
+- **B组(语义附加)**: 对应语言的**语义维度** — 不改变语法，只附加语义方向
+- **C组(微扰)**: 对应语言的**语用维度** — 不改变语法/语义，只微调语用
+
+如果这个对应正确，那么语言的数学结构应该有形式:
+```
+L(x) = G(x) ⊕ S(x) ⊕ P(x)
+G = 语法算子（决定表示空间的结构）
+S = 语义算子（在语法空间中附加方向）
+P = 语用算子（在语义方向上微调）
+```
+
+三分类对应这三个算子的分离条件：
+- A组触发: G(x) ≠ G(x₀) — 语法算子改变
+- B组触发: G(x) = G(x₀) 但 S(x) ≠ S(x₀) — 语义算子改变
+- C组触发: G(x) = G(x₀) 且 S(x) = S(x₀) — 只有语用改变
+
+#### 阶段性大任务
+
+**Task 201-205: 语法/语义/语用三维分离的数学基础**
+
+Phase 201: 首token因果实验
+- 固定首token，变换后续内容，测试A组模式的分离度是否消失
+- 如果消失 → 首token决定论成立 → 语言的数学结构在token级
+- 如果不消失 → 语言的数学结构在表示空间
+
+Phase 202: 语法空间的几何结构
+- 对A组模式，在中间层做PCA，提取语法主成分
+- 不同句法结构是否占据不同的子空间？
+- 语法子空间的有效维度？
+
+Phase 203: 语义附加的线性可加性
+- 在B组模式中，语义方向是否线性可加？
+- "Translate to Chinese and write code" = translation方向 + coding方向？
+- 如果线性可加 → 语义维度的数学结构是线性空间
+
+Phase 204: 语用微扰的噪声特征
+- C组模式的内部表示与normal的差异是高斯噪声还是结构化噪声？
+- 如果是高斯 → 语用维度不存在数学结构
+- 如果是结构化 → 语用维度有自己的低维流形
+
+Phase 205: 三维分离的跨模型不变量
+- 在三个模型中重复201-204
+- 如果G/S/P的结构跨模型不变 → 这是语言结构的投影，不是DNN的实现细节
+
+### 脚本
+
+- tests/glm5/phase200_internal_regime.py
+
+### 日志
+
+- tests/glm5_temp/phase200_qwen3_log.txt
+- tests/glm5_temp/phase200_glm4_log.txt
+- tests/glm5_temp/phase200_ds7b_log.txt
+
+### 结果JSON
+
+- tests/glm5_temp/phase200_qwen3_results.json
+- tests/glm5_temp/phase200_glm4_results.json
+- tests/glm5_temp/phase200_deepseek7b_results.json
+
+[Phase200 三分类: A组(句法编译qa/cot/conditional)-首token不同-早层分离后深层收敛/B组(语义附加translation/coding/negation)-首token相同-早层高相似后缓降/C组(微扰narrative)-几乎无变化/CoT相变在think处三模型一致/routing证实CoT最强偏移/深层收敛=LayerNorm+Unembedding压缩/三分类可能对应语法G/语义S/语用P三维分离 时间标记: 2026年05月17日00时48分]
+
+---
+
+## Phase 201: Circuit Dynamics & Latent Program Detection [2026-05-17 02:15]
+
+### 核心目标
+
+Phase 200发现"语言模式=内部路由结构的改变"，但理论解释有误。Phase 200把A组(qa/cot/conditional)称为"句法编译"，B组(translation/coding/negation)称为"语义附加"——这是过度语言学化的解释。
+
+Phase 201基于修正后的理论框架：**LLM是条件路由计算系统**，A组=**任务态切换**（要求模型改变未来生成策略），B组=**token级变换**（局部约束注入，不改变整体轨迹策略）。
+
+核心测试：路由系统是**线性可加的向量空间**，还是**离散程序交互系统**？
+
+### 实验设计
+
+**Exp1: Head Co-Activation Graph** — 注意力头是否形成稳定的共激活团簇？是否存在"程序特定"的头集成？
+
+**Exp2: Routing State Space Graph** — 路由空间的结构：任务态vs token级是否在路由空间中分离？
+
+**Exp3: Circuit Reuse Algebra (★最关键★)** — R_{trans+code} ≈ R_{trans} ⊕ R_{code}？
+- 如果线性可加 → 路由是向量空间结构
+- 如果非线性 → 路由有离散程序交互
+- 测试6种组合：B+B(trans+code, trans+negation), A+A(qa+cot, conditional+cot), A+B(coding+qa, qa+translation)
+
+**Exp4: Task-State vs First-Token Causal Test** — 路由由首token决定还是由任务需求决定？
+- 条件A: 相同首token("The")，不同任务在结尾
+- 条件B: 不同首token，相同任务(翻译)
+- 条件C: 不同首token，相同任务(CoT)
+
+数据量：Qwen3 30句, GLM4/DS7B 15句
+
+### Exp3: Circuit Reuse Algebra (三模型结果)
+
+#### 组合路由测试结果
+
+| 组合 | 类型 | Qwen3 主导 | Qwen3 pred | GLM4 主导 | GLM4 pred | DS7B 主导 | DS7B pred |
+|------|------|-----------|-----------|-----------|-----------|-----------|-----------|
+| trans+code | B+B | coding(0.94) | 0.884 | trans(0.88) | 0.868 | trans(0.94) | 0.914 |
+| trans+negation | B+B | trans(0.91) | 0.823 | trans(0.89) | 0.742 | trans(0.90) | 0.812 |
+| qa+cot | A+A | cot(0.79) | 0.559 | cot(0.69) | 0.501 | cot(0.77) | 0.587 |
+| conditional+cot | A+A | cot(0.78) | 0.536 | cot(0.70) | 0.491 | cot(0.36) | 0.273 |
+| coding+qa | A+B | qa(0.68) | 0.619 | qa(0.48) | 0.446 | qa(0.68) | 0.644 |
+| qa+translation | A+B | qa(0.75) | 0.708 | qa(0.54) | 0.510 | qa(0.78) | 0.735 |
+
+#### 线性度分析（sim to predicted, 越高越线性）
+
+| 组合类型 | Qwen3 | GLM4 | DS7B | 三模型平均 |
+|----------|-------|------|------|-----------|
+| B+B (token级+token级) | 0.854 | 0.805 | 0.863 | **0.841** |
+| A+A (任务态+任务态) | 0.548 | 0.496 | 0.430 | **0.491** |
+| A+B (任务态+token级) | 0.663 | 0.478 | 0.690 | **0.610** |
+
+**三模型一致结论**: B+B >> A+B > A+A (0.841 >> 0.610 >> 0.491)
+
+#### 程序主导层级（三模型一致）
+
+```
+CoT >>> QA >> Translation >> Coding ≈ Negation
+  │       │         │            │
+  │       │         │            └─ 在B+B中被translation主导
+  │       │         └────────────── 在A+B中被QA主导
+  │       └──────────────────────── 在A+A中被CoT主导
+  └──────────────────────────────── 主导一切其他任务态
+```
+
+- qa+cot → CoT完全压倒QA（三模型一致，CoT sim 0.69-0.79 vs QA sim 0.30-0.48）
+- coding+qa → QA压倒coding（QA sim 0.48-0.68 vs coding sim 0.20-0.38）
+- qa+translation → QA压倒translation（QA sim 0.54-0.78 vs trans sim 0.20-0.39）
+
+### Exp4: Task-State vs First-Token Causal Test (三模型结果)
+
+#### 条件A: 相同首token("The")，不同任务在结尾 → 路由距离
+
+| 对比 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| A1(normal)→A2(trans_end) | 0.550 | 0.748 | 0.692 |
+| A1(normal)→A3(cot_end) | 0.567 | 0.708 | 0.663 |
+| A1(normal)→A4(code_end) | 0.499 | 0.658 | 0.643 |
+
+**三模型一致**: 任务在结尾显著改变路由（距离0.50-0.75），即使首token相同！
+
+#### 条件B: 不同首token，相同任务(翻译) → 跨起始相似度
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| 跨起始翻译相似度 | 0.616 | 0.404 | 0.431 |
+
+**三模型一致**: 翻译路由**强依赖**首token（相似度仅0.40-0.62）
+
+#### 条件C: 不同首token，相同任务(CoT) → 跨起始相似度
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| 跨起始CoT相似度 | 0.775 | 0.603 | 0.670 |
+
+**三模型一致**: CoT路由比翻译更鲁棒（0.60-0.78 vs 0.40-0.62），但仍受首token影响
+
+#### 综合判断
+
+| 判定 | Qwen3 | GLM4 | DS7B | 一致性 |
+|------|-------|------|------|--------|
+| 任务改变路由 | ✓ | ✓ | ✓ | 完全一致 |
+| 任务决定路由 | ✗ | ✗ | ✗ | 完全一致 |
+| 首token影响路由 | ✓ | ✓ | ✓ | 完全一致 |
+| 最终结论 | 两者都影响 | 两者都影响 | 两者都影响 | **完全一致** |
+
+### Exp1: Head Co-Activation Graph (Qwen3详细)
+
+#### 关键发现：早层的"任务态特异性头"
+
+Layer 2中，Head 26展示了惊人的选择性：
+```
+Head 26 at L2: qa=0.781 cot=0.972 translation=0.005 coding=0.006 negation=0.011 conditional=0.879
+```
+
+这个头对任务态模式（qa/cot/conditional）有高路由变化（0.78-0.97），但对token级模式（translation/coding/negation）几乎没有变化（0.005-0.011）！
+
+**这直接支持了任务态vs token级的分类**——某些头的路由行为确实按"是否改变未来轨迹"来分组，而非按"句法/语义"分组。
+
+#### 跨层路由头一致性低
+
+Jaccard相似度（相邻层top-5 specialized heads的交集/并集）：
+```
+Jaccard(L2,L5)=0.000  Jaccard(L5,L12)=0.111
+Jaccard(L12,L18)=0.111  Jaccard(L18,L24)=0.111
+Jaccard(L24,L32)=0.250  Jaccard(L32,L35)=0.000
+```
+
+→ 路由开关头是**层特定的**，不存在全局统一的"路由头"。不同层用不同的头来实现路由切换。
+
+#### 头共激活团簇
+
+- 强共激活对（correlation > 0.99）：Head 22↔26(L2), Head 13↔26(L5), Head 9↔12(L24)
+- 强反相关对（correlation < -0.95）：Head 0↔1(L12=-0.987), Head 6↔24(L32=-0.982)
+- 反相关意味着：当一个头激活时另一个抑制 → 存在"互斥程序"头
+
+### Exp2: Routing State Space (Qwen3详细)
+
+#### 中间层(L18)任务态vs token级距离比较
+
+```
+任务态内部平均距离: 0.353 (qa↔cot=0.328, qa↔conditional=0.335, cot↔conditional=0.396)
+Token级内部平均距离: 0.053 (trans↔coding=0.067, trans↔negation=0.049, coding↔negation=0.043)
+跨组平均距离:       0.349
+分离比:             0.91 → 两组在晚层重叠
+```
+
+→ 任务态模式在路由空间中彼此远离（0.35），token级模式彼此很近（0.05）。
+→ 但跨组距离≈组内距离 → 两组不是完全分离的聚类，而是**路由空间中的不同区域**。
+
+### 核心发现
+
+#### ★★★ 发现1: 路由不是线性的——程序主导而非可加性（三模型一致）
+
+**六种组合无一通过线性可加性测试**。所有组合都表现为"程序主导"：
+- CoT压倒QA/conditional（因为CoT是最强的"未来轨迹控制"模式）
+- QA压倒coding/translation（因为QA是中等强度的"任务态"）
+- Translation压倒coding/negation（在B+B组合中）
+
+这意味着：**路由不是向量空间中的方向叠加，而是离散程序之间的竞争**。当一个prompt同时触发两个程序时，强程序吞并弱程序。
+
+#### ★★★ 发现2: B+B >> A+B > A+A 线性度梯度（三模型一致）
+
+```
+B+B (token+token)   线性度 = 0.841  → 接近可加
+A+B (任务+token)    线性度 = 0.610  → 部分可加
+A+A (任务+任务)     线性度 = 0.491  → 几乎不可加
+```
+
+这个梯度极其清晰地展示了：
+- **token级模式之间接近线性可加**——它们是在同一计算方向上叠加偏移
+- **任务态模式之间几乎不可加**——它们是互斥的离散程序
+- **任务+token混合中等可加**——任务态确定主方向，token级在其上做微调
+
+这完美支持了"任务态切换 vs token级变换"的分类：前者是离散程序竞争，后者是方向叠加。
+
+#### ★★★ 发现3: 任务需求和首token都影响路由，但任务态更鲁棒（三模型一致）
+
+- 条件A: 任务在结尾能改变路由（距离0.50-0.75）→ 任务需求有效
+- 条件B: 翻译路由强依赖首token（相似度0.40-0.62）→ 首token也重要
+- 条件C: CoT路由比翻译更鲁棒（0.60-0.78 vs 0.40-0.62）→ **任务态模式更抵抗首token干扰**
+
+关键洞察：
+- **token级模式**（如翻译）的路由更多由**首token决定** → 因为它们只是在原表示空间上叠加偏移
+- **任务态模式**（如CoT）的路由更多由**任务需求决定** → 因为它们切换到完全不同的计算程序
+
+这解释了为什么Phase 200看到A组"首token不同"——不是因为首token决定了A组，而是因为A组的首token本身就编码了"需要切换计算程序"的信息。
+
+#### ★★★ 发现4: 路由头是层特定的，存在"任务态特异性头"
+
+- Qwen3 L2 Head 26: 对qa/cot/conditional变化大（0.78-0.97），对translation/coding/negation几乎不变（0.005-0.011）
+- 跨层一致性低（Jaccard 0.0-0.25）→ 不同层用不同头实现路由
+- 头间存在强反相关（<-0.95）→ 存在"互斥程序"头对
+
+#### ★★★ 发现5: 程序主导层级 — CoT是"最强程序"
+
+三模型一致的程序层级：**CoT > QA > Translation > Coding ≈ Negation**
+
+这对应"未来轨迹控制"的强度排序：
+1. CoT: 多步潜在规划 → 最强控制
+2. QA: 答案检索 → 中等控制
+3. Translation: 格式转换 → 弱控制
+4. Coding: 格式转换 → 弱控制
+5. Negation: 最小变换 → 最弱控制
+
+### 理论分析
+
+#### A. "条件路由计算系统"的验证
+
+Phase 201的数据强力支持"条件路由计算系统"假说：
+
+**支持证据:**
+1. 所有6种组合都表现为程序主导而非可加 → 路由是离散的，不是连续的
+2. B+B > A+B > A+A的线性度梯度 → 两种"路由模式"确实有不同的数学性质
+3. 任务需求能改变路由（即使首token相同）→ 路由不是trivial的首token效应
+4. 任务态特异性头的存在 → 模型内部确实有"检测任务需求"的专用头
+
+**核心数学结构:**
+
+路由系统的数学不是向量空间，而是带有**优先级的程序竞争系统**：
+
+```
+R(prompt) = dominant_program(prompt) + residual_offset(prompt)
+```
+
+其中：
+- `dominant_program` 是被触发的最强程序（按优先级：CoT > QA > Translation > ...）
+- `residual_offset` 是弱程序的残差影响（在主程序方向上的微调）
+
+这不是线性的 R = R_A + R_B，而是非线性的：
+```
+R(A+B) = max_program(A, B) + ε · min_program(A, B)
+```
+
+其中 ε ≈ 0.2-0.4（弱程序的影响系数）
+
+#### B. 与Phase 200修正理论的对齐
+
+Phase 200 → Phase 201理论演进：
+
+| Phase 200 | Phase 201 | 变化 |
+|-----------|-----------|------|
+| A组="句法编译" | A组="任务态切换" | 不再依赖语言学概念 |
+| B组="语义附加" | B组="token级变换/局部约束注入" | 更精确描述计算性质 |
+| 三分类=G/S/P | 三分类=任务态/token级/微扰 | 对应计算而非语言学 |
+| 深层收敛=LayerNorm | 深层收敛="输出协议收敛" | 包含"从计算到语言"的转换 |
+
+Phase 201关键新增：
+1. **程序主导层级**: CoT > QA > Translation > Coding ≈ Negation
+2. **非线性路由**: R(A+B) ≠ R(A) + R(B)，而是强程序吞并弱程序
+3. **双重因果**: 任务需求和首token都影响路由，但任务态更鲁棒
+4. **层特定路由头**: 不同层用不同的头实现路由切换
+
+#### C. "输出协议收敛"的进一步确认
+
+Phase 200 Exp2中，任务态vs token级的分离比在晚层(L33)降低到0.91（中间层是1.0+），这与"输出协议收敛"一致：后层在做"从计算到语言"的转换，不同模式的表示被迫收敛。
+
+但Phase 201 Exp3发现：即使在深层，组合模式仍然跟随强程序的路由。这意味着：
+- **深层收敛是表面的**：表示被LayerNorm拉到相似的范数区域
+- **但路由方向是保持的**：即使范数被压缩，主程序的计算方向仍然主导
+
+这与"暗物质"发现对接：86-92%的概念信号在W_U行空间之外。深层收敛只压缩了W_U行空间内的差异，路由方向可能存在于"暗物质"维度中。
+
+### 严格审视
+
+#### 硬伤1: "程序主导"可能只是token级效应
+
+当qa+cot组合时，prompt是"Does X? Think step by step."。这个prompt的第一词是"Does"（QA风格），但内容是CoT。CoT主导可能因为：
+- "Think step by step"这个短语本身就是一个强触发器
+- 而不是"CoT程序"内部更强大
+
+**需要**: 用首token控制实验来排除——把CoT指令放在前面，QA指令放在后面，看是否还一样。
+
+#### 硬伤2: 线性度计算使用的是余弦相似度，可能被范数差异扭曲
+
+如果combined prompt的路由向量范数远大于/小于predicted向量，余弦相似度可能不稳定。虽然Exp2做了范数分析，但Exp3没有。
+
+**需要**: 在Exp3中加入欧氏距离分析和范数比较。
+
+#### 硬伤3: 条件B/C的"相同任务"可能不是真正相同的任务
+
+"Translate to Chinese: The cat..." 和 "The cat. Translate to Chinese." 虽然任务都是翻译，但语境不同。前者一开始就进入翻译模式，后者先处理内容再切换。
+
+**需要**: 更精细的因果实验，例如在prompt中间插入任务指令。
+
+#### 硬伤4: GLM4和DS7B的A+B线性度不一致
+
+GLM4的A+B线性度(0.478)远低于Qwen3(0.663)和DS7B(0.690)。这可能是因为：
+- GLM4的QA程序更"排他"（更强地压制token级模式）
+- 或者GLM4的表示空间更"极化"（任务态和token级之间更分离）
+- 需要进一步分析GLM4的routing distance matrix
+
+#### 硬伤5: 条件A的路由距离(0.50-0.75)是否真的意味着"任务改变路由"？
+
+Phase 200发现不同mode间的余弦距离在0.05-0.40之间。条件A的距离0.50-0.75大于大多数mode间距离，所以可以确信这不是噪声。但如果normal和translation之间的"真正距离"只有0.05，那0.50可能过度估计了任务效应——因为条件A改变了整个prompt的长度和结构，不只是"加了任务指令"。
+
+**需要**: 控制prompt长度——用等长的无意义后缀（如". In fact,")与任务后缀比较。
+
+### 下一步：破解语言数学结构的第一性原理
+
+#### 当前最核心的发现
+
+Phase 201确认了LLM是**条件路由计算系统**，其核心数学结构是：
+
+```
+R(prompt) = dominant_program(prompt) + ε · residual(prompt)
+```
+
+其中dominant_program按优先级竞争（CoT > QA > Translation > Coding），而非线性叠加。
+
+这意味着语言的数学结构**不是向量空间**，而是**带有优先级的程序竞争系统**。
+
+#### 关键瓶颈
+
+1. **"程序"到底是什么？** 我们观察到程序竞争，但不知道程序内部的结构
+   - 一个"CoT程序"由哪些头/层组成？
+   - 程序之间共享哪些回路？
+   - 程序的"开关"在哪里？
+
+2. **"优先级"的物理基础** — 为什么CoT > QA > Translation？
+   - 是训练数据的频率效应？(CoT数据中推理链更长)
+   - 是计算复杂度的必然结果？(推理需要更多层参与)
+   - 是某种更深层的数学性质？
+
+3. **"residual offset"的结构** — 弱程序在强程序上的残差是否有规则？
+   - ε ≈ 0.2-0.4是近似常数还是随条件变化？
+   - 残差方向是否与弱程序的独立路由方向一致？
+
+#### 第一性原理分析
+
+语言能力包含了语义、逻辑、语法等维度。如果LLM是条件路由计算系统，那么：
+
+```
+语言能力 = 有限程序集 × 组合规则 × 执行引擎
+```
+
+- **有限程序集**: {normal, qa, cot, translation, coding, negation, conditional, ...}
+- **组合规则**: 优先级竞争（强程序吞并弱程序）+ 残差偏移
+- **执行引擎**: Transformer的层堆叠
+
+这比Phase 200的G/S/P分解更精确：
+- 不再假设语法/语义/语用的独立性
+- 而是承认程序之间的**竞争性**
+- 语言的"组合性"不是向量叠加，而是**程序选择+残差调整**
+
+这个框架下，语言数学结构的形式可能是：
+
+```
+L = (P, ≺, R, ε)
+
+P = {p₁, p₂, ...} — 程序集合
+≺ = 优先级偏序 (CoT ≻ QA ≻ Translation ≻ ...)
+R = {rₚ : p ∈ P} — 每个程序的路由函数
+ε = 残差系数
+
+执行: L(prompt) = r_{max(p triggered by prompt)} + ε · Σ r_{other triggered programs}
+```
+
+#### 阶段性大任务
+
+**Task 202-206: 程序内部结构与优先级的物理基础**
+
+Phase 202: 程序的回路解剖
+- 对CoT程序，识别哪些头/层是"核心回路"（在CoT中激活但在normal中不激活）
+- 对QA程序，识别核心回路
+- 程序之间共享多少回路？独占多少？
+- 如果核心回路很少重叠 → 程序是真正独立的
+- 如果核心回路高度重叠 → "程序"只是同一回路的不同配置
+
+Phase 203: 程序优先级的因果机制
+- 为什么CoT > QA？是因为CoT调用了更多层/头吗？
+- 测试：ablate CoT的核心头后，CoT是否降级为QA？还是完全失效？
+- 这决定了程序优先级是"数量决定"（更多头=更强）还是"结构决定"（关键头=更关键）
+
+Phase 204: 程序开关的精确定位
+- 在prompt的哪个位置，模型"决定"进入哪个程序？
+- 在"Does"后？在"Think"后？在"step by step"后？
+- 这与Phase 200的相变边界实验对接，但聚焦于层内头的激活时序
+
+Phase 205: 残差偏移的数学结构
+- ε是否随程序组合变化？
+- 弱程序的残差方向是否与独立路由方向一致？
+- 如果一致 → 残差是"在强程序空间中的弱程序投影"
+- 如果不一致 → 残差是"新方向的创造"
+
+Phase 206: 跨模型程序不变量
+- 不同模型的程序集是否相同？
+- 优先级偏序是否跨模型不变？
+- 如果不变 → 这是语言结构的投影，不是DNN的实现细节
+- 如果变 → 程序结构是训练依赖的
+
+### 脚本
+
+- tests/glm5/phase201_circuit_dynamics.py
+
+### 日志
+
+- tests/glm5_temp/phase201_qwen3_log.txt
+- tests/glm5_temp/phase201_glm4_log.txt
+- tests/glm5_temp/phase201_ds7b_log.txt
+
+### 结果JSON
+
+- tests/glm5_temp/phase201_qwen3_results.json
+- tests/glm5_temp/phase201_glm4_results.json
+- tests/glm5_temp/phase201_deepseek7b_results.json
+
+[Phase201 三模型一致:路由非线性-程序主导非可加/B+B>>A+B>>A+A线性度梯度(0.84>>0.61>>0.49)/CoT>QA>Translation>Coding程序优先级/任务需求+首token双重因果-任务态更鲁棒/任务态特异性头(L2Head26)/层特定路由头/语言=程序竞争系统非向量空间 时间标记: 2026年05月17日02时15分]
+
+---
+
+## Phase 202: Attractor Dynamics & Trajectory Manifold Structure [2026-05-17 03:45]
+
+### 核心目标
+
+Phase 201发现"路由非线性+程序主导"，但解释有严重问题：**"程序竞争"隐含了离散模块，Transformer根本没有调度器**，只有矩阵乘法和softmax路由。
+
+Phase 202基于修正后的理论框架：**LLM = 连续动力系统**
+- h_{l+1} = h_l + A_l(h_l) + M_l(h_l)
+- 不同prompt → 不同初始条件 → 不同attractor basin → 不同轨迹
+- B+B更线性 = **tangent perturbation**（切向扰动，同一attractor附近，局部线性成立）
+- A+A更非线性 = **attractor transition**（吸引子跃迁，跨越basin boundary）
+- CoT"最强" = 更强的**trajectory stabilizer**（轨迹稳定器）
+- 深层收敛 = **protocol projection**（协议投影，计算→语言的压缩）
+
+★关键转变★: 不再使用"程序""竞争""吞并"等离散化语言，而使用attractor, basin, bifurcation, trajectory, stability, projection
+
+### 实验设计
+
+**Exp1: Trajectory Manifold Structure** — 轨迹的真实维度是多少？不同mode在低维流形中如何分布？
+
+**Exp2: Basin Boundary Detection** — 从normal到其他mode的"盆地边界"在哪？插值法逐步添加模式指令，找轨迹跳变点。
+
+**Exp3: Lyapunov-like Stability** — 不同mode的噪声鲁棒性如何？更鲁棒 = 更深的attractor basin。
+
+**Exp4: Protocol Projection** — 深层收敛是LayerNorm压缩还是"协议投影"？测量每层hidden state在W_U行空间中的投影比。
+
+数据量：Qwen3 40句, GLM4/DS7B 20句
+
+### Exp1: Trajectory Manifold Structure (三模型结果)
+
+#### 有效维度（参与比）
+
+**中间层(L_mid)的有效维度:**
+
+| Mode | Qwen3 d_eff | Qwen3 d_eff/d | GLM4 d_eff | GLM4 d_eff/d | DS7B d_eff | DS7B d_eff/d |
+|------|------------|---------------|-----------|-------------|-----------|-------------|
+| normal | 26.7 | 0.0104 | 15.5 | 0.0038 | 16.8 | 0.0047 |
+| qa | 18.7 | 0.0073 | 10.3 | 0.0025 | 14.1 | 0.0039 |
+| **cot** | **15.7** | **0.0061** | **6.6** | **0.0016** | **12.6** | **0.0035** |
+| conditional | 9.8 | 0.0038 | 7.4 | 0.0018 | 12.4 | 0.0034 |
+| translation | 26.2 | 0.0102 | 15.6 | 0.0038 | 16.5 | 0.0046 |
+| coding | 27.7 | 0.0108 | 15.3 | 0.0037 | 16.7 | 0.0047 |
+| negation | 27.6 | 0.0108 | 15.6 | 0.0038 | 16.8 | 0.0047 |
+| narrative | 28.0 | 0.0109 | 15.5 | 0.0038 | 16.6 | 0.0046 |
+
+**三模型一致**: CoT和conditional有**最低的有效维度** → 它们的轨迹被压缩到最窄的流形上 → **最约束的attractor**
+
+#### 全轨迹有效维度（最关键！）
+
+| Mode | Qwen3 d_eff | GLM4 d_eff | DS7B d_eff | 三模型平均 |
+|------|------------|-----------|-----------|-----------|
+| normal | 7.5 | 4.5 | 15.9 | 9.3 |
+| qa | 2.2 | 2.6 | 5.6 | 3.5 |
+| **cot** | **1.8** | **2.5** | **3.1** | **2.5** |
+| conditional | 2.3 | 1.9 | 4.0 | 2.7 |
+| translation | 6.5 | 5.3 | 13.2 | 8.3 |
+| coding | 7.2 | 4.3 | 15.4 | 9.0 |
+| negation | 6.5 | 4.0 | 14.7 | 8.4 |
+| narrative | 7.2 | 4.4 | 13.7 | 8.4 |
+
+**三模型一致**: d_eff(cot) ≈ 2-3, d_eff(normal) ≈ 5-16 → CoT轨迹在约2-3维流形上！
+
+#### PCA空间中mode分布 (Qwen3 L18)
+
+PCA空间清晰分离两类mode：
+- **Attractor transition modes**: qa (PC1=15.0), cot (PC1=22.2), conditional (PC1=19.9) → PC1正方向
+- **Tangent perturbation modes**: normal (PC1=-10.1), translation (PC1=-13.0), coding (PC1=-11.5), negation (PC1=-12.4), narrative (PC1=-10.2) → PC1负方向
+
+两类之间的距离（27-42）远大于类内距离（1-8）→ **在轨迹空间中，两类确实占据不同区域**
+
+#### 轨迹曲率
+
+三模型一致：**峰值曲率都在倒数第2-3层** (Qwen3 L34, GLM4 L37-38, DS7B L26) → 最强的非线性形变发生在输出层之前 = "协议投影"的关键层
+
+### Exp2: Basin Boundary Detection (三模型结果)
+
+#### 盆地边界跳变值
+
+| Transition | Qwen3 Jump | GLM4 Jump | DS7B Jump | 三模型平均 | Boundary Type |
+|-----------|-----------|----------|----------|-----------|--------------|
+| normal→cot | 0.409 | 0.435 | 0.636 | **0.493** | **Attractor Transition** |
+| normal→qa | 0.373 | 0.541 | 0.494 | **0.469** | **Attractor Transition** |
+| normal→conditional | 0.470 | 0.594 | 0.593 | **0.552** | **Attractor Transition** |
+| normal→translation | 0.073 | 0.038 | 0.081 | **0.064** | **Tangent Perturbation** |
+| normal→coding | 0.068 | 0.064 | 0.052 | **0.061** | **Tangent Perturbation** |
+
+**三模型完全一致的关键发现:**
+
+1. **Attractor transition的跳变值 ≈ 0.47-0.55** — 跨越了basin boundary，轨迹发生根本性偏转
+2. **Tangent perturbation的跳变值 ≈ 0.06** — 仅在baseline attractor附近做微小扰动
+3. **两者的比值 ≈ 8:1** — 这是量级差异，不是渐进差异
+
+#### 盆地边界的精确位置
+
+- **normal→cot**: 最大跳变在Step 0→1 (加句号".") → 不是"Think"触发的，而是**句子结束标志**就足以改变轨迹
+- **normal→qa**: 最大跳变在Step 1→2 (加"?"号) → **疑问号是QA basin的入口**
+- **normal→conditional**: 最大跳变在Step 1→2 (加", then") → **假设分支", then"是conditional basin的入口**
+
+**关键洞察**: 盆地边界的"触发器"不是抽象的任务语义，而是**具体的标点/短语标记**：
+- "." → CoT basin入口
+- "?" → QA basin入口
+- ", then" → Conditional basin入口
+
+### Exp3: Lyapunov-like Stability (三模型结果)
+
+#### Qwen3 Attractor Depth (中低层，噪声σ=0.005)
+
+| Mode | cosΔ | Interpretation |
+|------|------|---------------|
+| qa | 0.0009 | Deepest attractor |
+| cot | 0.0010 | Deep attractor |
+| translation | 0.0014 | Deep attractor |
+| normal | 0.0026 | Deep attractor |
+| coding | 0.0031 | Deep attractor |
+| conditional | 0.0033 | Shallowest attractor |
+
+#### DS7B Attractor Depth
+
+| Mode | cosΔ | Interpretation |
+|------|------|---------------|
+| translation | 0.0029 | Deepest attractor |
+| coding | 0.0058 | Deep attractor |
+| qa | 0.0063 | Deep attractor |
+| cot | 0.0116 | Deep attractor |
+| normal | 0.0133 | Deep attractor |
+| conditional | 0.0176 | Shallowest attractor |
+
+#### GLM4 Attractor Depth (注意：device_map="auto"导致噪声放大异常)
+
+| Mode | cosΔ |
+|------|------|
+| normal | 0.6158 |
+| translation | 0.6622 |
+| coding | 0.6697 |
+| qa | 0.6812 |
+| conditional | 0.6883 |
+| cot | 0.7283 |
+
+**注意**: GLM4的cosΔ(0.6-0.7)远高于Qwen3/DS7B(0.001-0.02)。这不是真正的attractor深度差异，而是device_map="auto"下CPU/GPU混合计算导致噪声被严重放大。GLM4的绝对值不可靠，但**相对排序仍有一定参考价值**。
+
+**Qwen3/DS7B一致发现**: conditional是最浅的attractor (cosΔ最大)，QA/translation是最深的attractor → 这与Phase 201的"CoT最强"发现不完全一致，需要进一步分析。
+
+#### 噪声放大率
+
+Qwen3: 噪声放大率约20x，各层大致恒定 → **线性化近似成立**（小噪声被均匀放大）
+DS7B: 噪声放大率约40-125x，比Qwen3高 → 混合精度的计算效应
+
+### Exp4: Protocol Projection Analysis (三模型结果)
+
+#### W_U投影比 — 从early到late的变化
+
+| Layer Region | Qwen3 | GLM4 | DS7B |
+|-------------|-------|------|------|
+| Early (0-L_1/4) | 0.156 | 0.228 | 0.169 |
+| Mid (L_1/2) | 0.196 | 0.259 | 0.223 |
+| Late (L_3/4-L_end) | 0.211 | 0.444 | 0.536 |
+
+#### Late - Mid 增量（★关键指标★）
+
+| Model | Late - Mid | 判定 |
+|-------|-----------|------|
+| Qwen3 | **0.016** | Weak evidence — 可能主要是LayerNorm |
+| GLM4 | **0.186** | ★STRONG★ — 深层主动投影到语言空间 |
+| DS7B | **0.313** | ★★STRONG★★ — 最强的协议投影证据 |
+
+**三模型结论**: GLM4和DS7B强烈支持"Protocol Projection"假说 — 深层在做"计算→语言"的主动投影，不只是LayerNorm压缩。Qwen3的增量小，可能因为Qwen3(4B)比GLM4(9B)/DS7B(7B)小，中间计算空间更少。
+
+#### "暗物质"比例（中间层不在语言空间中的计算）
+
+| Model | Dark Matter (Mid) |
+|-------|------------------|
+| Qwen3 | **80.4%** |
+| GLM4 | **74.1%** |
+| DS7B | **77.7%** |
+
+**三模型一致**: 中间层约75-80%的计算不在语言空间中 → 内部动力学主要是**计算性的**，不是**语言性的**
+
+#### DS7B的独特发现：CoT的W_U投影比随层急剧增加
+
+| Layer | normal | cot | 差异 |
+|-------|--------|-----|------|
+| L7 | 0.111 | 0.369 | CoT高3.3x |
+| L14 | 0.163 | 0.314 | CoT高1.9x |
+| L21 | 0.346 | 0.489 | CoT高1.4x |
+| L27 | 0.746 | 0.811 | CoT高1.1x |
+
+CoT在早中层有更高的W_U投影比 → CoT prompt在更早的层就开始"准备语言输出"，但到深层差异消失 → 最终所有模式都被投影到语言空间
+
+### 核心发现
+
+#### ★★★ 发现1: 轨迹在极低维流形上（三模型一致）
+
+全轨迹有效维度 d_eff ≈ 2-16 (d_model = 2560-4096)，即 d_eff/d_model ≈ 0.05-0.6%。
+- CoT轨迹最窄（d_eff ≈ 2-3），被压缩到约3维流形上
+- Normal轨迹最宽（d_eff ≈ 5-16），但仍是极低维
+- 这意味着：**2560-4096维的hidden space中，真实动力学只发生在约10维的子空间中**
+
+这个发现比Phase 201更深刻：不是"路由方向"的问题，而是**整个动力学在极低维流形上展开**。
+
+#### ★★★ 发现2: Attractor transition vs Tangent perturbation — 8:1的盆地边界差异（三模型一致）
+
+Attractor transition跳变 ≈ 0.47-0.55，Tangent perturbation跳变 ≈ 0.06。
+这不是渐进差异，而是**量级差异** → 确认了两种"路由模式"属于不同类型的动力学：
+- Attractor transition: 跨越basin boundary，轨迹发生根本性偏转
+- Tangent perturbation: 在同一attractor附近做切向移动
+
+#### ★★★ 发现3: 盆地边界的"触发器"是标点/短语，不是抽象语义（三模型一致）
+
+- "." → CoT basin入口
+- "?" → QA basin入口
+- ", then" → Conditional basin入口
+
+这意味着：**attractor transition不是由"理解任务需求"触发的，而是由具体的token标记触发的**。模型并不"知道"要做CoT推理——它只是对"Think step by step"这个短语产生了特定的轨迹偏转。
+
+#### ★★★ 发现4: 协议投影 — 深层主动投影到语言空间（GLM4/DS7B强力支持）
+
+Late - Mid增量：GLM4=0.19, DS7B=0.31 → 深层在做"计算→语言"的主动投影
+中间层暗物质：75-80% → 内部计算主要不在语言空间中
+
+这意味着：
+- 中间层的计算是"非语言的"（计算性的）
+- 深层将这些计算"翻译"成语言表示
+- 深层收敛不只是LayerNorm，还有**主动的协议投影**
+
+#### ★★★ 发现5: 峰值曲率在倒数第2-3层（三模型一致）
+
+最强的非线性形变发生在输出层之前 → 这是"协议投影"的关键层
+在这个层，hidden state经历最大的"弯曲"，从计算空间折向语言空间
+
+### 理论分析
+
+#### A. "连续动力系统"框架的验证
+
+Phase 202的数据强力支持"LLM = 连续动力系统"假说：
+
+**支持证据:**
+1. 轨迹在极低维流形上（d_eff/d_model < 0.6%） → 动力学本质是低维的
+2. Attractor transition和Tangent perturbation有8:1的跳变差异 → 存在真正的basin boundary
+3. 盆地边界由具体token触发 → 不是离散"程序选择"，而是初始条件改变
+4. 协议投影在深层 → 系统从计算空间收敛到语言空间
+
+**核心数学结构的修正:**
+
+Phase 201认为:
+```
+R(prompt) = dominant_program(prompt) + ε · residual(prompt)
+```
+
+Phase 202修正为:
+```
+h_l ∈ M_k  (k << d_model)
+```
+
+即：hidden state在极低维流形M_k上，不同prompt将系统推到M_k的不同区域（attractor basin）。整个动力学是：
+
+```
+Prompt → Initial Condition on M_k → Trajectory Evolution → Attractor Convergence → Protocol Projection → Token Output
+```
+
+这不是"程序选择"，而是**条件动力系统中的轨迹演化**。
+
+#### B. 与Phase 201"程序竞争"解释的关键对比
+
+| Phase 201解释 | Phase 202修正 | 为什么修正 |
+|-------------|-------------|---------|
+| 程序主导 | Attractor basin主导 | Transformer没有调度器 |
+| 程序优先级 | Basin depth（吸引深度） | 没有优先级队列，只有动力学稳定性 |
+| 程序吞并 | Basin boundary crossing | 不是"竞争"，是轨迹跨越边界 |
+| 程序开关 | Basin entry trigger | 触发器是具体token，不是"程序调用" |
+| 深层收敛=LayerNorm | 深层收敛=协议投影 | GLM4/DS7B的W_U投影比显著增加 |
+
+#### C. "暗物质"的动力学解释
+
+Phase 202为暗物质提供了新的解释：
+
+75-80%的中间层计算不在语言空间中 → 这些计算是什么？
+
+**动力学解释**: 中间层的"暗物质"可能是：
+1. **Trajectory routing information** — 确定轨迹在哪个attractor basin中的信息
+2. **Inter-attractor barriers** — 维持basin boundary的信息
+3. **Computational state** — 不直接映射到语言但维持计算过程的中间变量
+
+这与Phase 200-201发现的"86-92%概念信号在W_U行空间之外"一致，但现在有了更精确的动力学解释。
+
+### 严格审视
+
+#### 硬伤1: Exp3的GLM4噪声敏感性异常
+
+GLM4的cosΔ(0.6-0.7)远高于Qwen3/DS7B(0.001-0.02)。
+
+**原因**: device_map="auto"下CPU/GPU混合计算导致数值精度差异被放大。GLM4的Exp3结果不可靠。
+
+**需要**: 在同一设备（全GPU或全CPU）上重新测试，排除设备混合的影响。
+
+#### 硬伤2: 盆地边界检测使用了不同的prompt长度
+
+normal→cot的step 1是加句号"."，改变了prompt长度。跳变0.41可能部分来自prompt长度变化（增加了token），不完全是"CoT basin的入口"。
+
+**需要**: 控制prompt长度——用等长但语义不同的后缀（如". Indeed," vs ". Think"）做对比。
+
+#### 硬伤3: 有效维度的计算依赖样本数
+
+Qwen3用了40句，GLM4/DS7B用了20句。样本数不同可能导致d_eff估计偏差。
+
+**需要**: 用相同句数重新计算，或用bootstrap估计d_eff的置信区间。
+
+#### 硬伤4: "触发器是标点"可能是trivial的
+
+加"?"当然会改变QA的轨迹——因为"?"本身就编码了"疑问"的信息。这不一定意味着"basin boundary"，可能只是"token不同导致embedding不同"。
+
+**需要**: 用语义相同但形式不同的触发器测试。例如："Does X?" vs "Is it true that X?" — 如果两者都触发QA basin，说明是语义触发；如果只有前者触发，说明是"?"号本身。
+
+#### 硬伤5: Qwen3的协议投影信号弱
+
+Qwen3的Late-Mid增量只有0.016，远低于GLM4(0.19)和DS7B(0.31)。可能因为Qwen3(4B)太小，中间层计算空间不足以产生强"暗物质"效应。但也可能是Qwen3的深层收敛确实主要是LayerNorm。
+
+**需要**: 对Qwen3做LayerNorm ablation——去掉最后几层的LayerNorm，看W_U投影比是否下降。
+
+### 下一步：破解语言数学结构的第一性原理
+
+#### 当前最核心的发现
+
+Phase 202确认了：
+1. LLM是**连续动力系统**，不是离散程序系统
+2. 轨迹在**极低维流形**上（d_eff/d_model < 0.6%）
+3. 存在两种根本不同的动力学：**attractor transition** vs **tangent perturbation**（8:1跳变差异）
+4. 深层在做**协议投影**（计算→语言），不只是LayerNorm
+5. 盆地边界由**具体token触发**，不是抽象语义
+
+核心数学结构：
+```
+LLM = (M_k, Φ, Π)
+
+M_k = k维流形 (k << d_model, k ≈ 10-30)
+Φ = 层动力学 (h_{l+1} = h_l + A_l(h_l) + M_l(h_l))
+Π = 协议投影 (h_L → token probability simplex)
+
+执行: Prompt → x₀ ∈ M_k → Φ(x₀, ..., x_{L-1}) → Π(h_L) → token
+```
+
+#### 关键瓶颈
+
+1. **M_k的几何结构是什么？** 
+   - 我们知道k≈10-30，但不知道M_k是线性子空间、流形、还是更复杂的拓扑结构
+   - 不同mode是否在M_k的不同区域？还是不同mode共享M_k但初始条件不同？
+
+2. **Basin boundary的精确结构是什么？**
+   - 我们知道跳变在0.4-0.6之间，但不知道边界是sharp还是gradual
+   - 边界是否对应M_k上的"分水岭"（watershed）？
+
+3. **协议投影Π的数学结构是什么？**
+   - 我们知道深层W_U投影比增加，但不知道Π是线性投影还是非线性映射
+   - Π是否保留了M_k上的几何结构？
+
+4. **"触发器"的因果机制是什么？**
+   - 标点/短语如何改变初始条件x₀？
+   - x₀的微小变化如何被Φ放大成attractor transition？
+
+#### 第一性原理分析
+
+语言能力的数学结构如果是动力系统，那么：
+```
+语言能力 = M_k上的吸引子结构 × 轨迹演化规则 × 协议投影
+```
+
+- **吸引子结构**: M_k上存在有限个吸引子（对应normal/qa/cot/translation等），由basin boundary分隔
+- **轨迹演化规则**: Φ确定性地将初始条件映射到吸引子，吸引子之间的转换由初始条件决定
+- **协议投影**: Π将M_k上的计算结果映射到token概率分布
+
+这个框架下：
+- "语法" = M_k上的某些吸引子的拓扑约束
+- "语义" = 轨迹在M_k上的位置
+- "语用" = 初始条件的选择（由prompt决定）
+- "推理" = 轨迹从初始条件收敛到深层attractor的过程
+
+#### 阶段性大任务
+
+**Phase 203-207: 流形几何与吸引子结构的精确刻画**
+
+Phase 203: M_k的拓扑结构
+- 用diffusion map/t-SNE/UMAP将轨迹投影到2-3D
+- 不同mode在M_k上是否形成不连通区域？还是连续变形？
+- 如果不连通 → 真正的离散attractor
+- 如果连续 → 同一attractor的不同区域
+
+Phase 204: Basin boundary的精细结构
+- 在normal和cot之间做更精细的插值（token-level, 10步以上）
+- 找到轨迹的"相变曲线" — basin boundary在M_k上的几何形状
+- 测试boundary是否是"分水岭" — 从boundary点出发的轨迹向两个attractor分裂
+
+Phase 205: 协议投影的因果测试
+- 在深层ablate W_U方向 → 看轨迹是否偏离
+- 在深层注入W_U方向 → 看输出是否改变
+- 这直接测试"协议投影是因果性的"还是"伴随性的"
+
+Phase 206: 初始条件→吸引子的映射
+- 系统地改变prompt的首token → 测量最终收敛到哪个attractor
+- 建立"初始条件空间 → 吸引子"的映射图
+- 这就是Φ的"吸引子分类器"
+
+Phase 207: 跨模型流形不变量
+- 不同模型的M_k是否有相同的拓扑结构？
+- 如果是 → 这是语言结构的投影
+- 如果否 → 流形结构是训练依赖的
+
+### 脚本
+
+- tests/glm5/phase202_attractor_dynamics.py
+
+### 日志
+
+- tests/glm5_temp/phase202_qwen3_log.txt
+- tests/glm5_temp/phase202_glm4_log.txt
+- tests/glm5_temp/phase202_ds7b_log.txt
+
+### 结果JSON
+
+- tests/glm5_temp/phase202_qwen3_results.json
+- tests/glm5_temp/phase202_glm4_results.json
+- tests/glm5_temp/phase202_deepseek7b_results.json
+
+[Phase202 三模型一致:轨迹在极低维流形上(d_eff/d_model<0.6%/CoT最窄d_eff≈2-3)/Attractor transition跳变≈0.5 vs Tangent perturbation跳变≈0.06(8:1差异)/盆地边界由标点触发(./?/,then)/协议投影强力支持(GLM4 Late-Mid=0.19/DS7B=0.31)/中间层暗物质75-80%/峰值曲率在倒数第2-3层/LLM=连续动力系统非离散程序系统 时间标记: 2026年05月17日03时45分]
+
+---
+
+## Phase 203: Geometric Flow — Jacobian Spectrum & Output-Sensitivity [2026-05-17 05:45]
+
+### 核心目标
+
+Phase 202四大修正验证:
+1. d_eff只衡量各向异性≠低维流形 → 用Jacobian谱代替参与比
+2. Transformer=有限深度传输系统≠动力系统 → 用"transport corridor"替代"attractor"
+3. 标点触发=embedding统计≠basin boundary → 不再讨论
+4. "协议投影"=优化结果≠目的论 → 用"输出敏感度分解"严格测试
+
+转向可微分数学对象: J_l(Jacobian), 输出敏感度分解, Attention核几何
+
+### Exp1: 累计传输谱 (40 probes × 3 modes × 10-20 sentences)
+
+**谱半径σ_max(T_l)** — 扰动从输入到第l层的放大程度:
+- Qwen3: L0=0.01 → L35=33-56 (3个数量级增长)
+- GLM4: L0=0.001 → L39=22-102 (4个数量级增长)
+- DS7B: L0=0.02 → L27=305-350 (4个数量级增长)
+- ★三模型一致: CoT在深层有更高σ_max → CoT传输走廊更窄但更深
+
+**各向异性(参与比)** — 传输在多少维方向上发生:
+- Qwen3: L0=185 → L1=22-32 → L_final=11-16
+- GLM4: L0=190 → L1=3-11 → L_final=5-12
+- DS7B: L0=189 → L1=2-4 → L_final=2-6
+- ★三模型一致: 第一层就完成各向异性化(190→3-32), CoT参与比更低
+
+### Exp2: 输出-敏感度分解 (★最关键实验★)
+
+**W_U的SVD**:
+- 三模型: 条件数14-26 → ker(W_U)≈{0} → **不存在真正的零空间**
+- Phase 202的"暗物质"不是"不在语言空间",而是"在低σ方向上"
+
+**强耦合能量比** (在top-90% W_U输出方向上的能量占比):
+| Model | L0(embed) | L_mid | L_final | 趋势 |
+|-------|-----------|-------|---------|------|
+| Qwen3 normal | 0.25 | 0.18 | 0.18 | 稳定 |
+| Qwen3 cot | 0.05 | 0.15 | 0.20 | 上升 |
+| GLM4 normal | 0.10 | 0.11 | 0.04 | ★下降★ |
+| GLM4 cot | 0.10 | 0.10 | 0.05 | ★下降★ |
+| DS7B normal | 0.10 | 0.07 | 0.02 | ★下降★ |
+| DS7B cot | 0.07 | 0.06 | 0.02 | ★下降★ |
+
+★★★ 关键发现: GLM4和DS7B的强耦合能量比从mid到late在下降 ★★★
+→ 深层在做更少的输出耦合计算,不是更多
+→ 直接反驳Phase 202的"协议投影"假说
+→ 深层收敛(cosine similarity↑)是LayerNorm归一化,不是"投影到语言空间"
+
+### Exp3: 逐层增长率
+
+- 三模型一致: 无压缩层(growth<0.7), 主要是传输层(0.7<growth<1.5)
+- GLM4/DS7B: L21附近有显著expansion(growth>2) → 关键的非线性放大层
+- CoT有更多expansion层 → 深层放大更强
+
+### Exp4: 注意力核几何
+
+**三模型一致: CoT在所有层都有更高entropy** (更"软平滑"):
+- Qwen3: CoT-Normal entropy差 = +0.15~+0.68
+- GLM4: CoT-Normal entropy差 = +0.18~+0.47
+- DS7B: CoT-Normal entropy差 = +0.32~+0.60
+- ★首次量化确认: CoT使用更分散的attention(更多上下文整合)
+
+**normal模式分类**:
+- Qwen3: 全部层HARD ROUTING (entropy<0.5)
+- GLM4: 主要是MIXED, 最后层HARD ROUTING
+- DS7B: 主要是MIXED
+
+### 核心发现
+
+#### ★★★ 发现1: ker(W_U)≈{0} — 不存在真正的零空间 (三模型一致)
+
+W_U条件数14-26, σ_max/σ_min很小 → W_U几乎满秩 → Phase 202的"nullspace分解"在数学上不成立。所谓"暗物质"是低σ方向的能量,不是不在rowspace(W_U)中。
+
+#### ★★★ 发现2: "协议投影"假说被GLM4/DS7B数据直接反驳
+
+Phase 202声称"深层主动投影到语言空间"(W_U投影比增加0.19→0.44)。Phase 203用更精确的分解发现:GLM4和DS7B的强耦合能量比从mid到late在**下降**(0.11→0.04, 0.07→0.02)。Phase 202的发现可能是因为k=200 SVD只捕获了W_U行空间的一小部分,导致投影比被低估。
+
+#### ★★★ 发现3: 系统在指数级放大扰动 (三模型一致)
+
+σ_max从L0到L_final增长3-4个数量级。没有压缩层。这意味着:
+- 小的输入扰动会被放大到巨大的输出差异
+- 系统对初始条件极其敏感
+- 这更像混沌系统,而非"吸引子收敛"
+
+#### ★★★ 发现4: CoT的传输走廊更窄但更深 (三模型一致)
+
+CoT: 更高σ_max(放大更强) + 更低参与比(更各向异性) + 更高attention entropy(更软平滑)
+→ CoT将传输压缩到更少的方向,但在这些方向上放大更强
+→ 这解释了为什么CoT更鲁棒(少方向=少干扰)但也更"聚焦"
+
+### 严格审视
+
+#### 硬伤1: Exp2的SVD分解只用了k=500分量
+
+W_U有d_model=2560-4096列,但SVD只用了k=500。剩余的d_model-500维完全被忽略。
+→ 需要计算完整的W_U投影比(用所有d_model维)
+
+#### 硬伤2: σ_max的具体值受ε选择影响
+
+扰动尺度ε=0.01*||h_0||,不同模型的||h_0||不同,导致σ_max跨模型不可比。
+→ 跨模型比较应看相对模式(如CoT/normal的σ_max比值),不看绝对值
+
+#### 硬伤3: DS7B的σ_max异常高(L27=305)
+
+这可能因为DS7B的Qwen2架构在L1就有巨大放大(39x vs Qwen3的0.35x),而非真正的Jacobian差异。
+→ 需要用相同的ε和相同的分析方法确认
+
+#### 硬伤4: Phase 202和Phase 203的W_U投影比矛盾
+
+Phase 202发现W_U投影比从mid到late增加(GLM4 0.26→0.44),Phase 203发现强耦合能量比从mid到late下降(GLM4 0.11→0.04)。
+原因: Phase 202用k=200 SVD,Phase 203用k=500 SVD + n_90阈值。不同的基导致不同结果。
+→ 需要用完整SVD做最终确认
+
+### 下一步: 第一性原理分析
+
+Phase 203确认的核心数学结构:
+```
+LLM = (J_0, J_1, ..., J_{L-1}, W_U)
+
+J_l: 层Jacobian, σ_max(J_l) > 1 (放大)
+W_U: 输出矩阵, ker(W_U) ≈ {0} (满秩)
+h_l: 隐藏态, ~90-98%在弱耦合方向上
+Attention: CoT更"软"(entropy更高), Normal更"硬"(entropy更低)
+```
+
+关键瓶颈:
+1. **W_U满秩**意味着"零空间中推理"的假设不成立 → 需要新的"计算vs语言"分离方法
+2. **系统放大扰动**意味着LLM更像混沌系统 → 如何在混沌中找到稳定结构?
+3. **深层远离输出耦合**意味着深层收敛是LayerNorm效应 → 需要ablation确认
+
+阶段性大任务:
+- Phase 204: 完整W_U投影分析(用所有d_model维,不用截断SVD)
+- Phase 205: Jacobian-vector product直接计算(用torch.autograd, 不用有限差分)
+- Phase 206: LayerNorm ablation — 去掉最后几层的LN, 看深层收敛是否消失
+- Phase 207: 训练动力学 — SGD如何形成这些传输走廊?
+
+### 脚本
+- tests/glm5/phase203_geometric_flow.py
+
+### 日志
+- tests/glm5_temp/phase203_qwen3_log.txt
+- tests/glm5_temp/phase203_glm4_log.txt
+- tests/glm5_temp/phase203_ds7b_log.txt
+
+### 结果JSON
+- tests/glm5_temp/phase203_qwen3_results.json
+- tests/glm5_temp/phase203_glm4_results.json
+- tests/glm5_temp/phase203_deepseek7b_results.json
+
+[Phase203 三模型一致:ker(W_U)≈{0}不存在真正零空间/"协议投影"被GLM4+DS7B直接反驳(强耦合能量比mid→late下降)/系统指数级放大扰动(σ_max增长3-4量级)/CoT传输走廊更窄但更深(σ_max更高+参与比更低)/CoT注意力更软平滑(entropy+0.15~+0.68)/d_eff骤降在L1不是"降维"而是"各向异性化" 时间标记: 2026年05月17日05时45分]
+
+## Phase 204: 传输几何——选择性放大而非混沌 [2026-05-17 09:07]
+
+### 核心理论修正
+基于Phase 203的反思，Phase 204从"吸引子/协议/混沌"框架彻底转向：
+- **σ_max指数增长 ≠ 混沌** → **选择性放大**（selective amplification）
+- Transformer是强约束有限深度残差系统，不具备混沌系统所需条件
+- 真正关键不是σ_max，而是**完整谱分布**（稳定/扩张/塌缩三类模态）
+- ker(W_U)≈{0}不推翻"暗物质" → 修正为**弱可观测子空间**
+- CoT不是"推理模块"而是**长程平滑信息整合机制**
+
+### 实验设计（四组核心实验）
+
+#### Exp1: 完整Jacobian谱分析
+研究完整奇异值谱分布，区分三类模态：
+- **expanding modes**（σ>1.5）：扩张方向
+- **stable modes**（0.5<σ<1.5）：稳定方向
+- **collapsing modes**（σ<0.5）：塌缩方向
+
+#### Exp2: 特征向量传输——概念载体识别
+研究top-k右奇异向量跨层对齐度，识别"概念载体"方向
+
+#### Exp3: 跨任务谱重叠——概念复用
+研究normal/CoT/translation是否共享相同传输方向
+
+#### Exp4: 弱可观测子空间分析
+研究W_U的低奇异值方向——实际动力学中的"有效零空间"
+
+### 跨模型关键发现
+
+#### 1. 谱演化三阶段结构（三模型一致！）
+
+| 阶段 | Qwen3 (36L) | GLM4 (40L) | DS7B (28L) |
+|------|-------------|------------|------------|
+| 阶段1: COMPRESSING | L0-L8 | L0-L22 | L0 only |
+| 阶段2: MIXED/STABLE | L8-L24 | L22-L28 | L1+ |
+| 阶段3: AMPLIFYING | L26-L35 | L28-L39 | L13-L27 |
+
+**关键发现**：DS7B的COMPRESSING阶段极短（仅L0），从L1起即进入MIXED/STABLE，而Qwen3和GLM4的COMPRESSING持续8-22层。这说明更小的模型更快"压缩完成"——初始层的token embedding映射更快收敛到各向异性分布。
+
+#### 2. CoT vs Normal谱差异（三模型一致！）
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| CoT σ_max/Normal σ_max (mid) | 1.08 | 1.08 | 0.85 |
+| CoT σ_max/Normal σ_max (late) | 0.92 | 1.51 | 0.99 |
+| CoT expanding% vs Normal | 相近 | 略高 | 略低 |
+| CoT stable% vs Normal | 相近 | 相近 | 相近 |
+
+**修正Phase 203结论**：CoT的σ_max并非总是高于Normal。GLM4中CoT后期更高（1.51x），但Qwen3/DS7B中CoT甚至略低。真正的差异不在于"放大率"，而在于**谱结构**。
+
+#### 3. 特征向量传输——没有STRONG persistence!
+
+| 模型 | Normal最长moderate+ run | CoT最长moderate+ run | Avg alignment |
+|------|------------------------|---------------------|---------------|
+| Qwen3 | 7层 | 7层 | ~0.35 |
+| GLM4 | 8层 | 5层 | ~0.44 |
+| DS7B | **17层** | **17层** | **~0.60** |
+
+**重大发现**：
+- 三模型中没有任何segment达到STRONG persistence (>0.8)
+- DS7B的persistence远高于GLM4和Qwen3——**更小的模型反而有更稳定的概念传输！**
+- 这可能是因为DS7B需要用更少的层完成相同的计算，每层必须保持更多方向的稳定性
+- GLM4的Normal传输(8层)比CoT(5层)更持久——与Phase 203的直觉相反
+
+#### 4. 跨任务谱重叠——Normal-Translation >> Normal-CoT
+
+三模型完全一致的模式：
+- **norm-tran重叠 (8-15x random) >> norm-cot重叠 (3-5x random) >> cot-tran重叠 (3-5x random)**
+- Normal和Translation共享更多传输方向！
+- CoT的传输方向更独立于其他模式
+
+**理论含义**：Translation和Normal共享相同的"语法/语义传输走廊"，而CoT构建了**独立的传输走廊**。这支持"CoT是长程平滑整合而非推理模块"的假说。
+
+重叠演化（early→mid→late）：在所有模型中，overlap先升后降，mid层最高。
+
+#### 5. 弱可观测子空间——"暗物质"被重新定义
+
+| 模型 | W_U条件数 | n_weak (σ<1%σ_max) | n_90 (90%能量) |
+|------|-----------|-------------------|---------------|
+| Qwen3 | 18.1 | 0/2000 | 1683/2000 |
+| GLM4 | 15.8 | 0/2000 | 1727/2000 |
+| DS7B | 30.3 | 0/2000 | 1661/2000 |
+
+**1%阈值下没有方向是弱可观测的**——但关键发现在Exp4A/4B：
+
+| 模型 | Weak%能量 (mid层) | Weak传输% (mid层) |
+|------|-----------------|-----------------|
+| Qwen3 | 34-37% | 34-36% |
+| GLM4 | 55-58% | 53-56% |
+| DS7B | 58-61% | 57-61% |
+
+**惊人发现**：GLM4和DS7B中，约55-61%的隐藏状态能量和传输发生在"弱可观测方向"上！
+- Qwen3只有~35%，但GLM4/DS7B超过55%
+- 这意味着：**大部分内部计算实际上发生在W_U弱耦合的方向上**
+- 这不是"暗物质"被推翻，而是**暗物质被精确量化**——超过一半的内部动力学在弱可观测子空间中进行
+
+#### 6. CoT在弱可观测子空间中的特殊性
+
+| 模型 | CoT σ_max / Normal σ_max (late层) |
+|------|----------------------------------|
+| Qwen3 | 0.92 (CoT更小) |
+| GLM4 | 1.51 (CoT更大) |
+| DS7B | 0.99 (几乎相同) |
+
+CoT在弱可观测子空间中的行为因模型而异——没有统一的"CoT放大更多"模式。
+
+### 理论总结与修正
+
+#### 确认的理论
+1. **σ_max增长 = 选择性放大，非混沌** ✓ 三模型一致
+2. **谱三阶段结构** ✓ COMPRESS→MIXED/STABLE→AMPLIFY
+3. **Normal-Translation共享传输走廊** ✓ 三模型一致
+4. **CoT构建独立传输走廊** ✓ 三模型一致
+5. **弱可观测子空间承载大量内部计算** ✓ 三模型一致
+6. **没有强持续性(>0.8)** ✓ 特征向量传输是"弱耦合"的
+
+#### 需要修正的理论
+1. ~~"CoT总是放大率更高"~~ → 不成立，因模型而异
+2. ~~"弱可观测子空间很小"~~ → 实际上超过50%（GLM4/DS7B）
+3. ~~"更深的模型有更稳定的传输"~~ → DS7B(28L)比GLM4(40L)传输更稳定
+
+#### 关键硬伤与瓶颈
+1. **Jacobian是点估计**：我们在特定hidden state处计算Jacobian，但Jacobian是局部线性化。不同输入点的Jacobian可能不同。
+2. **"概念载体"未找到**：没有STRONG persistence意味着：要么k=50太小，要么概念不以单方向形式传输，而是以**子空间**形式传输
+3. **1%阈值选择缺乏理论依据**：为什么用σ<1%σ_max定义弱可观测？这个阈值选择影响结论
+4. **三类模态边界模糊**：0.5和1.5的选择是人为的，真实谱可能是连续的
+
+### 下一步：Jacobian组合律
+
+Phase 204最关键的缺失是：**多层Jacobian组合后，为什么某些方向仍然稳定？**
+
+即研究 T = J_{L-1} ··· J_1 · J_0 的性质：
+- 单层persistence是0.4-0.7，但多层组合后是否会导致指数衰减？
+- 还是存在某种"共振"机制，使得某些方向在组合后仍保持？
+- 这直接决定：**长程推理、概念保持、组合能力**的数学本质
+
+### 测试脚本
+- tests/glm5/phase204_transport_geometry.py
+
+### 日志
+- tests/glm5_temp/phase204_qwen3_log.txt
+- tests/glm5_temp/phase204_glm4_log.txt
+- tests/glm5_temp/phase204_ds7b_log.txt
+
+### 结果JSON
+- tests/glm5_temp/phase204_qwen3_results.json
+- tests/glm5_temp/phase204_glm4_results.json
+- tests/glm5_temp/phase204_deepseek7b_results.json
+
+[Phase204 三模型一致:σ_max增长=选择性放大非混沌/谱三阶段COMPRESS→STABLE→AMPLIFY/Normal-Translation共享传输走廊(8-15x random)远超Normal-CoT(3-5x)/无STRONG persistence(>0.8)/DS7B传输最稳定(17层moderate+)超GLM4(8层)/弱可观测子空间承载>50%内部计算(GLM4/DS7B)/CoT构建独立传输走廊/关键缺失:Jacobian组合律 时间标记: 2026年05月17日09时07分]
