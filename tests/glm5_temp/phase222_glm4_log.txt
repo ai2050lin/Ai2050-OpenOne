@@ -1,0 +1,108 @@
+[04:46:18] GPU=0.0GB | ============================================================
+[04:46:18] GPU=0.0GB | Phase 222: Constraint Direction Stability - glm4
+[04:46:18] GPU=0.0GB | ============================================================
+[04:46:19] GPU=0.0GB | Loading glm4 (bf16 + auto + sdpa)...
+[04:46:30] GPU=9.0GB |   Loaded: device=cuda:0, GPU=9.0GB
+[04:46:30] GPU=9.0GB | Model: GlmForCausalLM, layers=40, d_model=4096, mlp_type=merged_gate_up
+[04:46:30] GPU=9.0GB | 
+========================================
+[04:46:30] GPU=9.0GB | Exp 1: Constraint Direction Stability (P0)
+[04:46:30] GPU=9.0GB | ========================================
+[04:46:30] GPU=9.0GB | [Stability] n_layers=40, d_model=4096, n_pairs=500
+[04:46:30] GPU=9.0GB | [Stability] Generated 500 number constraint pairs
+[04:46:30] GPU=9.0GB | [Stability] Key layers: [6, 12, 18, 24, 30, 36]
+[04:48:20] GPU=9.0GB | [Stability] Processing pair 51/500
+[04:49:59] GPU=9.0GB | [Stability] Processing pair 101/500
+[04:51:38] GPU=9.0GB | [Stability] Processing pair 151/500
+[04:53:17] GPU=9.0GB | [Stability] Processing pair 201/500
+[04:54:56] GPU=9.0GB | [Stability] Processing pair 251/500
+[04:56:37] GPU=9.0GB | [Stability] Processing pair 301/500
+[04:58:18] GPU=9.0GB | [Stability] Processing pair 351/500
+[04:59:59] GPU=9.0GB | [Stability] Processing pair 401/500
+[05:01:39] GPU=9.0GB | [Stability] Processing pair 451/500
+[05:03:18] GPU=9.0GB | [Stability] Collected 500 valid pairs
+[05:03:18] GPU=9.0GB | [Stability] Analyzing L6, n=500 directions...
+[05:03:18] GPU=9.0GB |   L6: |cos|_mean=0.248, |cos|_median=0.209, PC1=12.6%, cos_mean_dir=0.499, stability=MODERATE
+[05:03:18] GPU=9.0GB | [Stability] Analyzing L12, n=500 directions...
+[05:03:19] GPU=9.0GB |   L12: |cos|_mean=0.175, |cos|_median=0.161, PC1=4.9%, cos_mean_dir=0.419, stability=UNSTABLE
+[05:03:19] GPU=9.0GB | [Stability] Analyzing L18, n=500 directions...
+[05:03:20] GPU=9.0GB |   L18: |cos|_mean=0.152, |cos|_median=0.142, PC1=5.5%, cos_mean_dir=0.389, stability=UNSTABLE
+[05:03:20] GPU=9.0GB | [Stability] Analyzing L24, n=500 directions...
+[05:03:20] GPU=9.0GB |   L24: |cos|_mean=0.240, |cos|_median=0.231, PC1=8.6%, cos_mean_dir=0.491, stability=MODERATE
+[05:03:20] GPU=9.0GB | [Stability] Analyzing L30, n=500 directions...
+[05:03:21] GPU=9.0GB |   L30: |cos|_mean=0.214, |cos|_median=0.194, PC1=9.9%, cos_mean_dir=0.462, stability=MODERATE
+[05:03:21] GPU=9.0GB | [Stability] Analyzing L36, n=500 directions...
+[05:03:22] GPU=9.0GB |   L36: |cos|_mean=0.187, |cos|_median=0.161, PC1=10.1%, cos_mean_dir=0.429, stability=UNSTABLE
+[05:03:22] GPU=9.0GB | [Stability] OVERALL: |cos|=0.203, PC1=8.6%, cos_mean_dir=0.448, verdict=MODERATE
+[05:03:27] GPU=9.0GB | 
+========================================
+[05:03:27] GPU=9.0GB | Exp 2: Constraint Type Stability (P1)
+[05:03:27] GPU=9.0GB | ========================================
+[05:03:27] GPU=9.0GB | [TypeStability] Starting multi-constraint-type analysis
+[05:03:27] GPU=9.0GB | [TypeStability] Processing number: 50 pairs
+[05:03:49] GPU=9.0GB | [TypeStability] number pair 12/50
+[05:04:09] GPU=9.0GB | [TypeStability] number pair 22/50
+[05:04:29] GPU=9.0GB | [TypeStability] number pair 32/50
+[05:04:49] GPU=9.0GB | [TypeStability] number pair 42/50
+[05:05:08] GPU=9.0GB |   number: |cos|=0.287, PC1=14.4%, cos_mean_dir=0.544, stability=MODERATE
+[05:05:08] GPU=9.0GB | [TypeStability] Processing tense: 49 pairs
+[05:05:28] GPU=9.0GB | [TypeStability] tense pair 11/49
+[05:05:49] GPU=9.0GB | [TypeStability] tense pair 21/49
+[05:06:09] GPU=9.0GB | [TypeStability] tense pair 31/49
+[05:06:30] GPU=9.0GB | [TypeStability] tense pair 41/49
+[05:06:48] GPU=9.0GB |   tense: |cos|=0.300, PC1=7.7%, cos_mean_dir=0.558, stability=MODERATE
+[05:06:48] GPU=9.0GB | [TypeStability] Processing voice: 30 pairs
+[05:07:09] GPU=9.0GB | [TypeStability] voice pair 11/30
+[05:07:29] GPU=9.0GB | [TypeStability] voice pair 21/30
+[05:07:49] GPU=9.0GB |   voice: |cos|=0.157, PC1=9.6%, cos_mean_dir=0.430, stability=UNSTABLE
+[05:07:54] GPU=9.0GB | 
+========================================
+[05:07:54] GPU=9.0GB | Exp 3: Constraint-W_U Alignment (P2)
+[05:07:54] GPU=9.0GB | ========================================
+[05:07:54] GPU=9.0GB | [WUAlign] n_layers=40, d_model=4096, n_pairs=100
+[model_utils] lm_head is on meta device, loading from safetensors...
+[model_utils] Loaded lm_head from model-00004-of-00004.safetensors, shape=torch.Size([151552, 4096])
+[05:07:55] GPU=9.0GB | [WUAlign] W_U shape: (151552, 4096)
+[05:09:04] GPU=9.0GB | [WUAlign] W_U SVD: top-100 singular values, first 5: [66.48663  16.16206  12.513186 10.629163 10.040502]
+[05:09:25] GPU=9.0GB | [WUAlign] pair 11/100
+[05:09:46] GPU=9.0GB | [WUAlign] pair 21/100
+[05:10:08] GPU=9.0GB | [WUAlign] pair 32/100
+[05:10:28] GPU=9.0GB | [WUAlign] pair 42/100
+[05:10:48] GPU=9.0GB | [WUAlign] pair 52/100
+[05:11:09] GPU=9.0GB | [WUAlign] pair 62/100
+[05:11:29] GPU=9.0GB | [WUAlign] pair 72/100
+[05:11:50] GPU=9.0GB | [WUAlign] pair 82/100
+[05:12:10] GPU=9.0GB | [WUAlign] pair 92/100
+[05:12:29] GPU=9.0GB | [WUAlign] Collected 100 directions
+[05:12:30] GPU=9.0GB | [WUAlign] proj_ratio: mean=0.199, random=0.156, SNR=3.9σ
+[05:12:30] GPU=9.0GB | [WUAlign] PC alignment top10=0.221, subspace_overlap=0.095
+[05:12:35] GPU=9.0GB | 
+========================================
+[05:12:35] GPU=9.0GB | Exp 4: Constraint Decomposition (P3)
+[05:12:35] GPU=9.0GB | ========================================
+[05:12:35] GPU=9.0GB | [Decompose] n_layers=40, d_model=4096
+[05:12:59] GPU=9.0GB | [Decompose] dog/runs (5)
+[05:13:23] GPU=9.0GB | [Decompose] bird/sings (9)
+[05:13:47] GPU=9.0GB | [Decompose] boy/chases (13)
+[05:14:11] GPU=9.0GB | [Decompose] tree/runs (17)
+[05:14:35] GPU=9.0GB | [Decompose] car/sings (21)
+[05:14:59] GPU=9.0GB | [Decompose] man/chases (25)
+[05:15:23] GPU=9.0GB | [Decompose] woman/runs (29)
+[05:15:47] GPU=9.0GB | [Decompose] fish/sings (33)
+[05:16:11] GPU=9.0GB | [Decompose] student/chases (37)
+[05:16:35] GPU=9.0GB | [Decompose] teacher/runs (41)
+[05:17:00] GPU=9.0GB | [Decompose] flower/sings (45)
+[05:17:24] GPU=9.0GB | [Decompose] star/chases (49)
+[05:17:48] GPU=9.0GB | [Decompose] moon/runs (53)
+[05:18:12] GPU=9.0GB | [Decompose] sun/sings (57)
+[05:18:37] GPU=9.0GB | [Decompose] wind/chases (61)
+[05:19:01] GPU=9.0GB | [Decompose] rain/runs (65)
+[05:19:25] GPU=9.0GB | [Decompose] snow/sings (69)
+[05:19:49] GPU=9.0GB | [Decompose] light/chases (73)
+[05:20:13] GPU=9.0GB | [Decompose] sound/runs (77)
+[05:20:37] GPU=9.0GB | [Decompose] Collected 80 triplets
+[05:20:37] GPU=9.0GB | [Decompose] cos(sva,verb)=0.399, cos(sva,noun)=0.340, cos(verb,noun)=0.392
+[05:20:37] GPU=9.0GB | [Decompose] α=0.228, β=0.216, residual=0.846
+[05:20:37] GPU=9.0GB | Results saved to d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase222_glm4_results.json
+[model_utils] GPU memory released, allocated=9.00 GB
+[05:20:37] GPU=9.0GB | Phase 222 complete!

@@ -1,0 +1,83 @@
+[01:29:38] GPU=0.0GB | ============================================================
+[01:29:38] GPU=0.0GB | Phase 221: Jacobian Dynamics - qwen3
+[01:29:38] GPU=0.0GB | ============================================================
+[01:29:52] GPU=0.0GB | Loading qwen3 (bf16 + auto + sdpa)...
+[01:30:03] GPU=8.0GB |   Loaded: device=cuda:0, GPU=8.0GB
+[01:30:03] GPU=8.0GB | Model: Qwen3ForCausalLM, layers=36, d_model=2560, mlp_type=split_gate_up
+[01:30:03] GPU=8.0GB | 
+========================================
+[01:30:03] GPU=8.0GB | Exp 1: Direction Injection Patching (P0)
+[01:30:03] GPU=8.0GB | ========================================
+[01:30:03] GPU=8.0GB | [DirPatching] n_layers=36, n_test=40
+[01:30:03] GPU=8.0GB | [DirPatching] Sampling layers: [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 35]
+[01:30:09] GPU=8.1GB |   L0: MLP_inject_KL=0.5784, Attn_inject_KL=0.6523, ratio=0.89, n=40
+[01:30:14] GPU=8.1GB |   L3: MLP_inject_KL=0.7089, Attn_inject_KL=0.6848, ratio=1.04, n=40
+[01:30:19] GPU=8.1GB |   L6: MLP_inject_KL=0.6376, Attn_inject_KL=0.6532, ratio=0.98, n=40
+[01:30:24] GPU=8.1GB |   L9: MLP_inject_KL=0.5431, Attn_inject_KL=0.6835, ratio=0.79, n=40
+[01:30:30] GPU=8.1GB |   L12: MLP_inject_KL=0.6457, Attn_inject_KL=0.6571, ratio=0.98, n=40
+[01:30:35] GPU=8.1GB |   L15: MLP_inject_KL=0.6790, Attn_inject_KL=0.7248, ratio=0.94, n=40
+[01:30:40] GPU=8.1GB |   L18: MLP_inject_KL=0.6223, Attn_inject_KL=0.7278, ratio=0.86, n=40
+[01:30:45] GPU=8.1GB |   L21: MLP_inject_KL=0.6274, Attn_inject_KL=0.7171, ratio=0.87, n=40
+[01:30:51] GPU=8.1GB |   L24: MLP_inject_KL=0.5319, Attn_inject_KL=0.6874, ratio=0.77, n=40
+[01:30:57] GPU=8.1GB |   L27: MLP_inject_KL=0.5582, Attn_inject_KL=0.6772, ratio=0.82, n=40
+[01:31:02] GPU=8.1GB |   L30: MLP_inject_KL=0.5153, Attn_inject_KL=0.6066, ratio=0.85, n=40
+[01:31:08] GPU=8.1GB |   L33: MLP_inject_KL=0.6020, Attn_inject_KL=0.7098, ratio=0.85, n=40
+[01:31:13] GPU=8.1GB |   L35: MLP_inject_KL=0.9200, Attn_inject_KL=0.6984, ratio=1.32, n=40
+[01:31:13] GPU=8.1GB | [DirPatching] Overall: MLP_causal=47.9%, ratio=0.92, dominant=Attn
+[01:31:13] GPU=8.1GB | 
+========================================
+[01:31:13] GPU=8.1GB | Exp 2: Jacobian Spectrum (P1)
+[01:31:13] GPU=8.1GB | ========================================
+[01:31:13] GPU=8.1GB | [JacobianSpectrum] n_layers=36, d_model=2560, n_test=30
+[01:31:20] GPU=8.1GB |   L0: eff_rank=3/2560 (0.1%), ρ=2175762.750, rank_90%=3, amplifying=29, complex_eig=22, neg_real=4
+[01:31:23] GPU=8.1GB |   L3: eff_rank=29/2560 (1.1%), ρ=1.430, rank_90%=26, amplifying=26, complex_eig=0, neg_real=0
+[01:31:27] GPU=8.1GB |   L6: eff_rank=29/2560 (1.1%), ρ=1.687, rank_90%=25, amplifying=28, complex_eig=2, neg_real=0
+[01:31:31] GPU=8.1GB |   L9: eff_rank=29/2560 (1.1%), ρ=1.249, rank_90%=26, amplifying=20, complex_eig=0, neg_real=0
+[01:31:35] GPU=8.1GB |   L12: eff_rank=29/2560 (1.1%), ρ=1.250, rank_90%=26, amplifying=22, complex_eig=0, neg_real=0
+[01:31:38] GPU=8.1GB |   L15: eff_rank=29/2560 (1.1%), ρ=1.213, rank_90%=26, amplifying=18, complex_eig=0, neg_real=0
+[01:31:42] GPU=8.1GB |   L18: eff_rank=29/2560 (1.1%), ρ=1.191, rank_90%=26, amplifying=23, complex_eig=0, neg_real=0
+[01:31:46] GPU=8.1GB |   L21: eff_rank=29/2560 (1.1%), ρ=1.369, rank_90%=26, amplifying=22, complex_eig=0, neg_real=0
+[01:31:50] GPU=8.1GB |   L24: eff_rank=29/2560 (1.1%), ρ=1.411, rank_90%=26, amplifying=29, complex_eig=0, neg_real=0
+[01:31:53] GPU=8.1GB |   L27: eff_rank=29/2560 (1.1%), ρ=1.290, rank_90%=26, amplifying=28, complex_eig=0, neg_real=0
+[01:31:57] GPU=8.1GB |   L30: eff_rank=29/2560 (1.1%), ρ=1.349, rank_90%=26, amplifying=29, complex_eig=0, neg_real=0
+[01:32:01] GPU=8.1GB |   L33: eff_rank=29/2560 (1.1%), ρ=1.272, rank_90%=26, amplifying=28, complex_eig=0, neg_real=0
+[01:32:05] GPU=8.1GB |   L35: eff_rank=28/2560 (1.1%), ρ=0.406, rank_90%=24, amplifying=0, complex_eig=0, neg_real=0
+[01:32:05] GPU=8.1GB | [Jacobian] Computing Green Function G(l1→l2)...
+[01:32:08] GPU=8.1GB |   G(0→3): strength=2175762.7856, eff_rank=3/2560
+[01:32:12] GPU=8.1GB |   G(0→6): strength=1672247.4960, eff_rank=3/2560
+[01:32:17] GPU=8.1GB |   G(0→18): strength=327642.6803, eff_rank=3/2560
+[01:32:22] GPU=8.1GB |   G(0→33): strength=222430.2288, eff_rank=3/2560
+[01:32:27] GPU=8.1GB |   G(0→35): strength=215471.9740, eff_rank=3/2560
+[01:32:31] GPU=8.1GB |   G(3→6): strength=1.4295, eff_rank=29/2560
+[01:32:35] GPU=8.1GB |   G(3→18): strength=0.7225, eff_rank=22/2560
+[01:32:40] GPU=8.1GB |   G(3→33): strength=0.6499, eff_rank=18/2560
+[01:32:45] GPU=8.1GB |   G(3→35): strength=0.6415, eff_rank=17/2560
+[01:32:50] GPU=8.1GB |   G(6→18): strength=0.7881, eff_rank=24/2560
+[01:32:54] GPU=8.1GB |   G(6→33): strength=0.7084, eff_rank=20/2560
+[01:32:59] GPU=8.1GB |   G(6→35): strength=0.6992, eff_rank=20/2560
+[01:33:04] GPU=8.1GB |   G(18→33): strength=1.2655, eff_rank=28/2560
+[01:33:08] GPU=8.1GB |   G(18→35): strength=1.2556, eff_rank=28/2560
+[01:33:12] GPU=8.1GB |   G(33→35): strength=1.2715, eff_rank=29/2560
+[01:33:12] GPU=8.1GB | [Jacobian] Overall: eff_rank=27/2560 (1.0%), ρ=167367.528, rank_90%=24
+[01:33:12] GPU=8.1GB | 
+========================================
+[01:33:12] GPU=8.1GB | Exp 3: Constraint Subspace Dimension (P2)
+[01:33:12] GPU=8.1GB | ========================================
+[01:33:12] GPU=8.1GB | [SubspaceDim] n_layers=36, d_model=2560, n_test=40
+[01:33:15] GPU=8.1GB |   L0: eff_dim=29.6/2560 (1.2%), 90%var=24 PCs, 1st_pc=9.3%, top10=58.0%
+[01:33:15] GPU=8.1GB |   L3: eff_dim=36.2/2560 (1.4%), 90%var=27 PCs, 1st_pc=10.8%, top10=54.1%
+[01:33:15] GPU=8.1GB |   L6: eff_dim=36.7/2560 (1.4%), 90%var=29 PCs, 1st_pc=8.9%, top10=52.5%
+[01:33:15] GPU=8.1GB |   L9: eff_dim=37.5/2560 (1.5%), 90%var=31 PCs, 1st_pc=9.5%, top10=47.6%
+[01:33:15] GPU=8.1GB |   L12: eff_dim=37.7/2560 (1.5%), 90%var=31 PCs, 1st_pc=7.4%, top10=45.6%
+[01:33:15] GPU=8.1GB |   L15: eff_dim=37.7/2560 (1.5%), 90%var=31 PCs, 1st_pc=7.4%, top10=44.8%
+[01:33:15] GPU=8.1GB |   L18: eff_dim=37.6/2560 (1.5%), 90%var=31 PCs, 1st_pc=6.9%, top10=46.3%
+[01:33:15] GPU=8.1GB |   L21: eff_dim=37.5/2560 (1.5%), 90%var=30 PCs, 1st_pc=6.9%, top10=47.7%
+[01:33:15] GPU=8.1GB |   L24: eff_dim=37.0/2560 (1.4%), 90%var=29 PCs, 1st_pc=8.3%, top10=51.5%
+[01:33:15] GPU=8.1GB |   L27: eff_dim=36.8/2560 (1.4%), 90%var=29 PCs, 1st_pc=11.2%, top10=53.5%
+[01:33:15] GPU=8.1GB |   L30: eff_dim=36.8/2560 (1.4%), 90%var=29 PCs, 1st_pc=11.7%, top10=53.0%
+[01:33:15] GPU=8.1GB |   L33: eff_dim=36.6/2560 (1.4%), 90%var=29 PCs, 1st_pc=12.3%, top10=54.1%
+[01:33:15] GPU=8.1GB |   L35: eff_dim=36.6/2560 (1.4%), 90%var=29 PCs, 1st_pc=12.2%, top10=54.1%
+[01:33:15] GPU=8.1GB | [SubspaceDim] Overall: eff_dim=36.5/2560 (1.4%), 90%var=29 PCs, 1st_pc=9.4%, top10=51.0%
+[01:33:15] GPU=8.1GB | Results saved to d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase221_qwen3_results.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[01:33:15] GPU=0.0GB | Phase 221 complete!

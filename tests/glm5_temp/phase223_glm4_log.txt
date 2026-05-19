@@ -1,0 +1,638 @@
+[09:19:33] GPU=0.0GB | === Phase 223: Jacobian Field Stability (glm4) ===
+[09:19:46] GPU=0.0GB | Loading glm4 (bf16 + auto + sdpa)...
+[09:19:55] GPU=9.0GB |   Loaded: device=cuda:0, GPU=9.0GB
+[09:19:55] GPU=9.0GB |   Model: GlmForCausalLM, n_layers=40, d_model=4096
+[09:19:55] GPU=9.0GB |   Generated 30 sentences
+[09:19:55] GPU=9.0GB |   Sample layers: [0, 8, 16, 24, 32, 39]
+[09:19:55] GPU=9.0GB |   Shared random vectors: (40, 4096)
+[09:19:55] GPU=9.0GB | === Experiment 1+2: Jacobian Spectral Stability + JVP Consistency ===
+[09:19:55] GPU=9.0GB |   Sentence 1/30: 'The cat chases...'
+[09:20:00] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:20:32] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[09:20:46] GPU=9.0GB |     L0: eff_rank=35, top1_sv=4.731, top5_ratio=0.222, entropy=0.979, eps=0.10
+[09:20:46] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:21:17] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[09:21:31] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.313, top5_ratio=0.172, entropy=0.996, eps=0.10
+[09:21:31] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:22:01] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[09:22:15] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.533, top5_ratio=0.167, entropy=0.996, eps=0.10
+[09:22:15] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:22:48] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[09:22:59] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.789, top5_ratio=0.302, entropy=0.937, eps=0.21
+[09:22:59] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:23:31] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.76)
+[09:23:42] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.754, top5_ratio=0.409, entropy=0.865, eps=0.76
+[09:23:42] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:24:15] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.69)
+[09:24:25] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.621, top5_ratio=0.638, entropy=0.706, eps=2.69
+[09:24:25] GPU=9.0GB |   Sentence 2/30: 'The dog runs...'
+[09:24:27] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:24:59] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:25:10] GPU=9.0GB |     L0: eff_rank=34, top1_sv=5.133, top5_ratio=0.278, entropy=0.955, eps=0.10
+[09:25:10] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:25:42] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:25:53] GPU=9.0GB |     L8: eff_rank=35, top1_sv=1.614, top5_ratio=0.189, entropy=0.992, eps=0.10
+[09:25:53] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:26:25] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:26:35] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.436, top5_ratio=0.162, entropy=0.997, eps=0.10
+[09:26:35] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:27:08] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.22)
+[09:27:18] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.321, top5_ratio=0.242, entropy=0.965, eps=0.22
+[09:27:18] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:27:51] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.78)
+[09:28:01] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.863, top5_ratio=0.467, entropy=0.814, eps=0.78
+[09:28:01] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:28:33] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.87)
+[09:28:44] GPU=9.0GB |     L39: eff_rank=22, top1_sv=0.692, top5_ratio=0.742, entropy=0.603, eps=2.87
+[09:28:44] GPU=9.0GB |   Sentence 3/30: 'The bird sings...'
+[09:28:46] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:29:18] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:29:29] GPU=9.0GB |     L0: eff_rank=32, top1_sv=13.646, top5_ratio=0.415, entropy=0.843, eps=0.10
+[09:29:29] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:30:01] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:30:12] GPU=9.0GB |     L8: eff_rank=35, top1_sv=1.626, top5_ratio=0.190, entropy=0.992, eps=0.10
+[09:30:12] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:30:44] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:30:55] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.515, top5_ratio=0.170, entropy=0.996, eps=0.10
+[09:30:55] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:31:27] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.23)
+[09:31:38] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.425, top5_ratio=0.262, entropy=0.956, eps=0.23
+[09:31:38] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:32:10] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.81)
+[09:32:21] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.764, top5_ratio=0.428, entropy=0.845, eps=0.81
+[09:32:21] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:32:53] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.15)
+[09:33:03] GPU=9.0GB |     L39: eff_rank=14, top1_sv=1.107, top5_ratio=0.834, entropy=0.467, eps=3.15
+[09:33:03] GPU=9.0GB |   Sentence 4/30: 'The girl reads...'
+[09:33:05] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:33:38] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:33:48] GPU=9.0GB |     L0: eff_rank=33, top1_sv=8.588, top5_ratio=0.331, entropy=0.915, eps=0.10
+[09:33:48] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:34:21] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:34:31] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.365, top5_ratio=0.163, entropy=0.997, eps=0.10
+[09:34:31] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:35:03] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:35:14] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.448, top5_ratio=0.171, entropy=0.996, eps=0.10
+[09:35:14] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:35:46] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.22)
+[09:35:56] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.510, top5_ratio=0.301, entropy=0.945, eps=0.22
+[09:35:56] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:36:29] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.74)
+[09:36:39] GPU=9.0GB |     L32: eff_rank=34, top1_sv=0.725, top5_ratio=0.383, entropy=0.878, eps=0.74
+[09:36:39] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:37:11] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.67)
+[09:37:22] GPU=9.0GB |     L39: eff_rank=29, top1_sv=0.601, top5_ratio=0.570, entropy=0.732, eps=2.67
+[09:37:22] GPU=9.0GB |   Sentence 5/30: 'The boy walks...'
+[09:37:24] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:37:56] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:38:06] GPU=9.0GB |     L0: eff_rank=33, top1_sv=8.647, top5_ratio=0.362, entropy=0.892, eps=0.10
+[09:38:06] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:38:39] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:38:50] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.238, top5_ratio=0.160, entropy=0.998, eps=0.10
+[09:38:50] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:39:22] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:39:32] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.598, top5_ratio=0.170, entropy=0.995, eps=0.10
+[09:39:32] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:40:05] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[09:40:15] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.540, top5_ratio=0.310, entropy=0.946, eps=0.21
+[09:40:15] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:40:47] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.77)
+[09:40:58] GPU=9.0GB |     L32: eff_rank=29, top1_sv=1.206, top5_ratio=0.634, entropy=0.657, eps=0.77
+[09:40:58] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:41:30] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.90)
+[09:41:41] GPU=9.0GB |     L39: eff_rank=28, top1_sv=0.521, top5_ratio=0.575, entropy=0.726, eps=2.90
+[09:41:41] GPU=9.0GB |   Sentence 6/30: 'The tree falls...'
+[09:41:43] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:42:15] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:42:25] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.699, top5_ratio=0.305, entropy=0.935, eps=0.10
+[09:42:25] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:42:58] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:43:08] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.237, top5_ratio=0.159, entropy=0.998, eps=0.10
+[09:43:08] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:43:41] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:43:51] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.594, top5_ratio=0.166, entropy=0.995, eps=0.10
+[09:43:51] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:44:24] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[09:44:34] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.751, top5_ratio=0.289, entropy=0.941, eps=0.21
+[09:44:34] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:45:07] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.70)
+[09:45:17] GPU=9.0GB |     L32: eff_rank=30, top1_sv=1.170, top5_ratio=0.603, entropy=0.721, eps=0.70
+[09:45:17] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:45:50] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.99)
+[09:46:01] GPU=9.0GB |     L39: eff_rank=26, top1_sv=0.630, top5_ratio=0.636, entropy=0.687, eps=2.99
+[09:46:01] GPU=9.0GB |   Sentence 7/30: 'The car moves...'
+[09:46:03] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:46:35] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:46:45] GPU=9.0GB |     L0: eff_rank=34, top1_sv=5.891, top5_ratio=0.289, entropy=0.946, eps=0.10
+[09:46:45] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:47:18] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:47:28] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.519, top5_ratio=0.182, entropy=0.994, eps=0.10
+[09:47:28] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:48:01] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:48:11] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.527, top5_ratio=0.163, entropy=0.996, eps=0.10
+[09:48:11] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:48:44] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[09:48:54] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.424, top5_ratio=0.247, entropy=0.962, eps=0.21
+[09:48:54] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:49:27] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.71)
+[09:49:37] GPU=9.0GB |     L32: eff_rank=34, top1_sv=0.721, top5_ratio=0.354, entropy=0.891, eps=0.71
+[09:49:37] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:50:10] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.82)
+[09:50:21] GPU=9.0GB |     L39: eff_rank=1, top1_sv=2.211, top5_ratio=0.946, entropy=0.144, eps=2.82
+[09:50:21] GPU=9.0GB |   Sentence 8/30: 'The child plays...'
+[09:50:23] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:50:53] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[09:51:07] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.740, top5_ratio=0.297, entropy=0.947, eps=0.10
+[09:51:07] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:51:39] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:51:50] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.229, top5_ratio=0.158, entropy=0.998, eps=0.10
+[09:51:50] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:52:23] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:52:34] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.455, top5_ratio=0.166, entropy=0.996, eps=0.10
+[09:52:34] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:53:06] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.22)
+[09:53:17] GPU=9.0GB |     L24: eff_rank=34, top1_sv=1.803, top5_ratio=0.348, entropy=0.922, eps=0.22
+[09:53:17] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:53:47] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.88)
+[09:54:01] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.706, top5_ratio=0.446, entropy=0.840, eps=0.88
+[09:54:01] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:54:33] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.19)
+[09:54:43] GPU=9.0GB |     L39: eff_rank=22, top1_sv=0.775, top5_ratio=0.741, entropy=0.569, eps=3.19
+[09:54:43] GPU=9.0GB |   Sentence 9/30: 'The man works...'
+[09:54:46] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:55:18] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:55:29] GPU=9.0GB |     L0: eff_rank=33, top1_sv=6.192, top5_ratio=0.327, entropy=0.926, eps=0.10
+[09:55:29] GPU=9.0GB |     Layer 8: computing JVPs...
+[09:56:02] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:56:13] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.350, top5_ratio=0.166, entropy=0.997, eps=0.10
+[09:56:13] GPU=9.0GB |     Layer 16: computing JVPs...
+[09:56:45] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:56:56] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.437, top5_ratio=0.166, entropy=0.997, eps=0.10
+[09:56:56] GPU=9.0GB |     Layer 24: computing JVPs...
+[09:57:29] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[09:57:40] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.637, top5_ratio=0.310, entropy=0.944, eps=0.21
+[09:57:40] GPU=9.0GB |     Layer 32: computing JVPs...
+[09:58:13] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.79)
+[09:58:23] GPU=9.0GB |     L32: eff_rank=34, top1_sv=0.641, top5_ratio=0.376, entropy=0.889, eps=0.79
+[09:58:23] GPU=9.0GB |     Layer 39: computing JVPs...
+[09:58:54] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.01)
+[09:59:08] GPU=9.0GB |     L39: eff_rank=15, top1_sv=1.016, top5_ratio=0.835, entropy=0.469, eps=3.01
+[09:59:08] GPU=9.0GB |   Sentence 10/30: 'The woman dances...'
+[09:59:10] GPU=9.0GB |     Layer 0: computing JVPs...
+[09:59:43] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[09:59:54] GPU=9.0GB |     L0: eff_rank=32, top1_sv=16.129, top5_ratio=0.459, entropy=0.801, eps=0.10
+[09:59:54] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:00:25] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:00:39] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.310, top5_ratio=0.166, entropy=0.997, eps=0.10
+[10:00:39] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:01:12] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:01:23] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.526, top5_ratio=0.168, entropy=0.996, eps=0.10
+[10:01:23] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:01:53] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.22)
+[10:02:07] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.365, top5_ratio=0.257, entropy=0.961, eps=0.22
+[10:02:07] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:02:40] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.79)
+[10:02:51] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.712, top5_ratio=0.404, entropy=0.862, eps=0.79
+[10:02:51] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:03:21] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.03)
+[10:03:35] GPU=9.0GB |     L39: eff_rank=25, top1_sv=0.729, top5_ratio=0.682, entropy=0.621, eps=3.03
+[10:03:35] GPU=9.0GB |   Sentence 11/30: 'The fish swims...'
+[10:03:37] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:04:10] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:04:21] GPU=9.0GB |     L0: eff_rank=32, top1_sv=20.273, top5_ratio=0.471, entropy=0.793, eps=0.10
+[10:04:21] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:04:53] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:05:04] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.618, top5_ratio=0.190, entropy=0.992, eps=0.10
+[10:05:04] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:05:38] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:05:48] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.539, top5_ratio=0.167, entropy=0.995, eps=0.10
+[10:05:48] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:06:21] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.22)
+[10:06:32] GPU=9.0GB |     L24: eff_rank=34, top1_sv=1.882, top5_ratio=0.348, entropy=0.912, eps=0.22
+[10:06:32] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:07:02] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.82)
+[10:07:16] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.717, top5_ratio=0.418, entropy=0.857, eps=0.82
+[10:07:16] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:07:49] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.27)
+[10:08:00] GPU=9.0GB |     L39: eff_rank=26, top1_sv=0.575, top5_ratio=0.632, entropy=0.682, eps=3.27
+[10:08:00] GPU=9.0GB |   Sentence 12/30: 'The horse sleeps...'
+[10:08:02] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:08:32] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:08:46] GPU=9.0GB |     L0: eff_rank=31, top1_sv=21.189, top5_ratio=0.491, entropy=0.772, eps=0.10
+[10:08:46] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:09:19] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:09:30] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.323, top5_ratio=0.171, entropy=0.996, eps=0.10
+[10:09:30] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:10:00] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:10:14] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.549, top5_ratio=0.171, entropy=0.995, eps=0.10
+[10:10:14] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:10:47] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[10:10:58] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.870, top5_ratio=0.314, entropy=0.931, eps=0.21
+[10:10:58] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:11:29] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.84)
+[10:11:42] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.751, top5_ratio=0.421, entropy=0.840, eps=0.84
+[10:11:42] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:12:15] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.37)
+[10:12:26] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.541, top5_ratio=0.626, entropy=0.684, eps=3.37
+[10:12:26] GPU=9.0GB |   Sentence 13/30: 'The student barks...'
+[10:12:28] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:12:58] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:13:12] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.545, top5_ratio=0.291, entropy=0.941, eps=0.10
+[10:13:13] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:13:43] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:13:57] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.395, top5_ratio=0.167, entropy=0.997, eps=0.10
+[10:13:57] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:14:27] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:14:41] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.532, top5_ratio=0.169, entropy=0.996, eps=0.10
+[10:14:41] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:15:11] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.20)
+[10:15:26] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.709, top5_ratio=0.269, entropy=0.953, eps=0.20
+[10:15:26] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:15:59] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.77)
+[10:16:09] GPU=9.0GB |     L32: eff_rank=34, top1_sv=0.672, top5_ratio=0.369, entropy=0.886, eps=0.77
+[10:16:09] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:16:40] GPU=9.0GB |   JVP batch 24-27/40 done (eps=2.83)
+[10:16:54] GPU=9.0GB |     L39: eff_rank=28, top1_sv=0.552, top5_ratio=0.580, entropy=0.722, eps=2.83
+[10:16:54] GPU=9.0GB |   Sentence 14/30: 'The teacher flies...'
+[10:16:56] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:17:26] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:17:41] GPU=9.0GB |     L0: eff_rank=33, top1_sv=8.919, top5_ratio=0.339, entropy=0.909, eps=0.10
+[10:17:41] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:18:11] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:18:25] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.266, top5_ratio=0.161, entropy=0.997, eps=0.10
+[10:18:25] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:18:55] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:19:09] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.475, top5_ratio=0.165, entropy=0.996, eps=0.10
+[10:19:09] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:19:43] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[10:19:53] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.811, top5_ratio=0.300, entropy=0.936, eps=0.21
+[10:19:53] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:20:24] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.83)
+[10:20:38] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.702, top5_ratio=0.424, entropy=0.857, eps=0.83
+[10:20:38] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:21:11] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.06)
+[10:21:22] GPU=9.0GB |     L39: eff_rank=30, top1_sv=0.453, top5_ratio=0.540, entropy=0.756, eps=3.06
+[10:21:22] GPU=9.0GB |   Sentence 15/30: 'The flower grows...'
+[10:21:24] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:21:54] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:22:08] GPU=9.0GB |     L0: eff_rank=34, top1_sv=8.133, top5_ratio=0.322, entropy=0.920, eps=0.10
+[10:22:08] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:22:39] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:22:53] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.317, top5_ratio=0.164, entropy=0.997, eps=0.10
+[10:22:53] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:23:26] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:23:37] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.526, top5_ratio=0.168, entropy=0.996, eps=0.10
+[10:23:37] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:24:10] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.22)
+[10:24:21] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.522, top5_ratio=0.269, entropy=0.951, eps=0.22
+[10:24:21] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:24:53] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.79)
+[10:25:04] GPU=9.0GB |     L32: eff_rank=34, top1_sv=0.666, top5_ratio=0.376, entropy=0.884, eps=0.79
+[10:25:04] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:25:37] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.08)
+[10:25:48] GPU=9.0GB |     L39: eff_rank=26, top1_sv=0.584, top5_ratio=0.678, entropy=0.680, eps=3.08
+[10:25:48] GPU=9.0GB |   Sentence 16/30: 'The river blooms...'
+[10:25:50] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:26:23] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:26:33] GPU=9.0GB |     L0: eff_rank=32, top1_sv=19.160, top5_ratio=0.475, entropy=0.789, eps=0.10
+[10:26:33] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:27:04] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:27:17] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.446, top5_ratio=0.176, entropy=0.995, eps=0.10
+[10:27:17] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:27:51] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:28:02] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.576, top5_ratio=0.170, entropy=0.995, eps=0.10
+[10:28:02] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:28:33] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.21)
+[10:28:47] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.566, top5_ratio=0.261, entropy=0.955, eps=0.21
+[10:28:47] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:29:18] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.64)
+[10:29:32] GPU=9.0GB |     L32: eff_rank=32, top1_sv=1.043, top5_ratio=0.543, entropy=0.781, eps=0.64
+[10:29:32] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:30:02] GPU=9.0GB |   JVP batch 24-27/40 done (eps=2.72)
+[10:30:17] GPU=9.0GB |     L39: eff_rank=29, top1_sv=0.548, top5_ratio=0.554, entropy=0.734, eps=2.72
+[10:30:17] GPU=9.0GB |   Sentence 17/30: 'The star flows...'
+[10:30:19] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:30:49] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:31:04] GPU=9.0GB |     L0: eff_rank=34, top1_sv=7.334, top5_ratio=0.264, entropy=0.960, eps=0.10
+[10:31:04] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:31:34] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:31:48] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.468, top5_ratio=0.175, entropy=0.995, eps=0.10
+[10:31:48] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:32:21] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:32:32] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.447, top5_ratio=0.162, entropy=0.997, eps=0.10
+[10:32:32] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:33:03] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.20)
+[10:33:17] GPU=9.0GB |     L24: eff_rank=34, top1_sv=2.420, top5_ratio=0.381, entropy=0.876, eps=0.20
+[10:33:17] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:33:50] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.81)
+[10:34:01] GPU=9.0GB |     L32: eff_rank=29, top1_sv=1.219, top5_ratio=0.657, entropy=0.640, eps=0.81
+[10:34:01] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:34:31] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.28)
+[10:34:45] GPU=9.0GB |     L39: eff_rank=19, top1_sv=0.814, top5_ratio=0.742, entropy=0.593, eps=3.28
+[10:34:45] GPU=9.0GB |   Sentence 18/30: 'The moon shines...'
+[10:34:47] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:35:17] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:35:31] GPU=9.0GB |     L0: eff_rank=32, top1_sv=22.001, top5_ratio=0.457, entropy=0.803, eps=0.10
+[10:35:31] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:36:05] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:36:15] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.244, top5_ratio=0.160, entropy=0.998, eps=0.10
+[10:36:15] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:36:46] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:36:59] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.541, top5_ratio=0.166, entropy=0.996, eps=0.10
+[10:36:59] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:37:33] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[10:37:43] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.669, top5_ratio=0.277, entropy=0.947, eps=0.21
+[10:37:43] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:38:13] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.82)
+[10:38:27] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.771, top5_ratio=0.422, entropy=0.843, eps=0.82
+[10:38:27] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:39:01] GPU=9.0GB |   JVP batch 27-30/40 done (eps=3.22)
+[10:39:11] GPU=9.0GB |     L39: eff_rank=28, top1_sv=0.544, top5_ratio=0.593, entropy=0.692, eps=3.22
+[10:39:11] GPU=9.0GB |   Sentence 19/30: 'The sun rises...'
+[10:39:14] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:39:47] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:39:57] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.930, top5_ratio=0.257, entropy=0.962, eps=0.10
+[10:39:57] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:40:28] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:40:41] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.305, top5_ratio=0.165, entropy=0.997, eps=0.10
+[10:40:41] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:41:14] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:41:25] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.726, top5_ratio=0.179, entropy=0.992, eps=0.10
+[10:41:25] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:41:55] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.22)
+[10:42:09] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.548, top5_ratio=0.279, entropy=0.950, eps=0.22
+[10:42:09] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:42:43] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.75)
+[10:42:53] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.847, top5_ratio=0.423, entropy=0.842, eps=0.75
+[10:42:53] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:43:23] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.09)
+[10:43:37] GPU=9.0GB |     L39: eff_rank=29, top1_sv=0.476, top5_ratio=0.550, entropy=0.749, eps=3.09
+[10:43:37] GPU=9.0GB |   Sentence 20/30: 'The cloud sets...'
+[10:43:39] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:44:09] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:44:23] GPU=9.0GB |     L0: eff_rank=34, top1_sv=4.868, top5_ratio=0.234, entropy=0.977, eps=0.10
+[10:44:23] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:44:56] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[10:45:07] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.460, top5_ratio=0.176, entropy=0.995, eps=0.10
+[10:45:07] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:45:37] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:45:52] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.530, top5_ratio=0.165, entropy=0.996, eps=0.10
+[10:45:52] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:46:25] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.19)
+[10:46:35] GPU=9.0GB |     L24: eff_rank=35, top1_sv=2.091, top5_ratio=0.326, entropy=0.927, eps=0.19
+[10:46:35] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:47:06] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.76)
+[10:47:20] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.787, top5_ratio=0.409, entropy=0.855, eps=0.76
+[10:47:20] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:47:53] GPU=9.0GB |   JVP batch 27-30/40 done (eps=2.86)
+[10:48:03] GPU=9.0GB |     L39: eff_rank=25, top1_sv=0.729, top5_ratio=0.708, entropy=0.585, eps=2.86
+[10:48:03] GPU=9.0GB |   Sentence 21/30: 'The wind blows...'
+[10:48:05] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:48:36] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:48:50] GPU=9.0GB |     L0: eff_rank=33, top1_sv=13.073, top5_ratio=0.324, entropy=0.919, eps=0.10
+[10:48:50] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:49:20] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:49:34] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.286, top5_ratio=0.155, entropy=0.998, eps=0.10
+[10:49:34] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:50:05] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:50:19] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.534, top5_ratio=0.167, entropy=0.996, eps=0.10
+[10:50:19] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:50:50] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.22)
+[10:51:05] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.420, top5_ratio=0.257, entropy=0.961, eps=0.22
+[10:51:05] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:51:36] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.80)
+[10:51:50] GPU=9.0GB |     L32: eff_rank=20, top1_sv=2.029, top5_ratio=0.809, entropy=0.381, eps=0.80
+[10:51:50] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:52:21] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.05)
+[10:52:36] GPU=9.0GB |     L39: eff_rank=3, top1_sv=1.814, top5_ratio=0.921, entropy=0.227, eps=3.05
+[10:52:36] GPU=9.0GB |   Sentence 22/30: 'The rain melts...'
+[10:52:38] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:53:10] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:53:24] GPU=9.0GB |     L0: eff_rank=31, top1_sv=19.311, top5_ratio=0.483, entropy=0.777, eps=0.10
+[10:53:24] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:53:56] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:54:10] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.300, top5_ratio=0.163, entropy=0.997, eps=0.10
+[10:54:10] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:54:42] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:54:56] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.578, top5_ratio=0.167, entropy=0.995, eps=0.10
+[10:54:56] GPU=9.0GB |     Layer 24: computing JVPs...
+[10:55:27] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.21)
+[10:55:41] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.513, top5_ratio=0.265, entropy=0.957, eps=0.21
+[10:55:41] GPU=9.0GB |     Layer 32: computing JVPs...
+[10:56:13] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.80)
+[10:56:27] GPU=9.0GB |     L32: eff_rank=23, top1_sv=1.808, top5_ratio=0.772, entropy=0.453, eps=0.80
+[10:56:27] GPU=9.0GB |     Layer 39: computing JVPs...
+[10:56:59] GPU=9.0GB |   JVP batch 24-27/40 done (eps=2.85)
+[10:57:13] GPU=9.0GB |     L39: eff_rank=28, top1_sv=0.549, top5_ratio=0.599, entropy=0.693, eps=2.85
+[10:57:13] GPU=9.0GB |   Sentence 23/30: 'The fire burns...'
+[10:57:15] GPU=9.0GB |     Layer 0: computing JVPs...
+[10:57:46] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:58:01] GPU=9.0GB |     L0: eff_rank=33, top1_sv=12.517, top5_ratio=0.350, entropy=0.901, eps=0.10
+[10:58:01] GPU=9.0GB |     Layer 8: computing JVPs...
+[10:58:32] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:58:47] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.275, top5_ratio=0.158, entropy=0.998, eps=0.10
+[10:58:47] GPU=9.0GB |     Layer 16: computing JVPs...
+[10:59:18] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[10:59:33] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.443, top5_ratio=0.161, entropy=0.997, eps=0.10
+[10:59:33] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:00:04] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.23)
+[11:00:18] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.476, top5_ratio=0.300, entropy=0.945, eps=0.23
+[11:00:18] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:00:49] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.84)
+[11:01:03] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.705, top5_ratio=0.424, entropy=0.848, eps=0.84
+[11:01:03] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:01:35] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.35)
+[11:01:49] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.590, top5_ratio=0.624, entropy=0.649, eps=3.35
+[11:01:49] GPU=9.0GB |   Sentence 24/30: 'The light opens...'
+[11:01:51] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:02:22] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:02:37] GPU=9.0GB |     L0: eff_rank=34, top1_sv=7.302, top5_ratio=0.293, entropy=0.942, eps=0.10
+[11:02:37] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:03:08] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:03:22] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.389, top5_ratio=0.168, entropy=0.996, eps=0.10
+[11:03:22] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:03:54] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:04:08] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.397, top5_ratio=0.159, entropy=0.997, eps=0.10
+[11:04:08] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:04:38] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.19)
+[11:04:52] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.943, top5_ratio=0.320, entropy=0.932, eps=0.19
+[11:04:52] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:05:23] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.82)
+[11:05:38] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.634, top5_ratio=0.414, entropy=0.875, eps=0.82
+[11:05:38] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:06:08] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.11)
+[11:06:23] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.519, top5_ratio=0.623, entropy=0.699, eps=3.11
+[11:06:23] GPU=9.0GB |   Sentence 25/30: 'The sound breaks...'
+[11:06:25] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:06:56] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:07:10] GPU=9.0GB |     L0: eff_rank=34, top1_sv=5.878, top5_ratio=0.243, entropy=0.970, eps=0.10
+[11:07:10] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:07:42] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:07:56] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.310, top5_ratio=0.161, entropy=0.997, eps=0.10
+[11:07:56] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:08:26] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:08:41] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.478, top5_ratio=0.167, entropy=0.996, eps=0.10
+[11:08:41] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:09:11] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.21)
+[11:09:25] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.589, top5_ratio=0.267, entropy=0.954, eps=0.21
+[11:09:25] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:09:56] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.84)
+[11:10:10] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.661, top5_ratio=0.403, entropy=0.862, eps=0.84
+[11:10:10] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:10:40] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.21)
+[11:10:54] GPU=9.0GB |     L39: eff_rank=24, top1_sv=0.577, top5_ratio=0.708, entropy=0.635, eps=3.21
+[11:10:54] GPU=9.0GB |   Sentence 26/30: 'The door rings...'
+[11:10:57] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:11:27] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:11:41] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.606, top5_ratio=0.330, entropy=0.919, eps=0.10
+[11:11:41] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:12:12] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:12:26] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.276, top5_ratio=0.168, entropy=0.997, eps=0.10
+[11:12:26] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:12:57] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:13:11] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.736, top5_ratio=0.175, entropy=0.993, eps=0.10
+[11:13:11] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:13:42] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.21)
+[11:13:56] GPU=9.0GB |     L24: eff_rank=34, top1_sv=2.040, top5_ratio=0.355, entropy=0.913, eps=0.21
+[11:13:56] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:14:26] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.76)
+[11:14:41] GPU=9.0GB |     L32: eff_rank=31, top1_sv=1.112, top5_ratio=0.544, entropy=0.739, eps=0.76
+[11:14:41] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:15:12] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.02)
+[11:15:26] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.664, top5_ratio=0.635, entropy=0.656, eps=3.02
+[11:15:26] GPU=9.0GB |   Sentence 27/30: 'The window stops...'
+[11:15:28] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:15:59] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:16:13] GPU=9.0GB |     L0: eff_rank=33, top1_sv=7.255, top5_ratio=0.279, entropy=0.953, eps=0.10
+[11:16:13] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:16:45] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:16:59] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.540, top5_ratio=0.179, entropy=0.994, eps=0.10
+[11:16:59] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:17:31] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:17:44] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.481, top5_ratio=0.164, entropy=0.996, eps=0.10
+[11:17:44] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:18:18] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.21)
+[11:18:28] GPU=9.0GB |     L24: eff_rank=34, top1_sv=1.982, top5_ratio=0.336, entropy=0.917, eps=0.21
+[11:18:28] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:19:01] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.84)
+[11:19:12] GPU=9.0GB |     L32: eff_rank=29, top1_sv=1.125, top5_ratio=0.645, entropy=0.656, eps=0.84
+[11:19:12] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:19:42] GPU=9.0GB |   JVP batch 24-27/40 done (eps=2.96)
+[11:19:56] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.619, top5_ratio=0.637, entropy=0.692, eps=2.96
+[11:19:56] GPU=9.0GB |   Sentence 28/30: 'The book sails...'
+[11:19:58] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:20:28] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:20:42] GPU=9.0GB |     L0: eff_rank=32, top1_sv=18.690, top5_ratio=0.474, entropy=0.792, eps=0.10
+[11:20:42] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:21:13] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:21:27] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.243, top5_ratio=0.159, entropy=0.998, eps=0.10
+[11:21:27] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:22:00] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.10)
+[11:22:10] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.444, top5_ratio=0.162, entropy=0.997, eps=0.10
+[11:22:10] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:22:41] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.21)
+[11:22:56] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.704, top5_ratio=0.279, entropy=0.947, eps=0.21
+[11:22:56] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:23:26] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.85)
+[11:23:40] GPU=9.0GB |     L32: eff_rank=29, top1_sv=1.146, top5_ratio=0.637, entropy=0.670, eps=0.85
+[11:23:40] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:24:11] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.14)
+[11:24:25] GPU=9.0GB |     L39: eff_rank=26, top1_sv=0.599, top5_ratio=0.646, entropy=0.689, eps=3.14
+[11:24:25] GPU=9.0GB |   Sentence 29/30: 'The pen stands...'
+[11:24:27] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:24:58] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:25:12] GPU=9.0GB |     L0: eff_rank=34, top1_sv=6.287, top5_ratio=0.293, entropy=0.947, eps=0.10
+[11:25:12] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:25:42] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:25:56] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.358, top5_ratio=0.168, entropy=0.996, eps=0.10
+[11:25:56] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:26:27] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:26:41] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.472, top5_ratio=0.169, entropy=0.996, eps=0.10
+[11:26:41] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:27:14] GPU=9.0GB |   JVP batch 27-30/40 done (eps=0.20)
+[11:27:25] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.779, top5_ratio=0.278, entropy=0.945, eps=0.20
+[11:27:25] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:27:56] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.83)
+[11:28:10] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.723, top5_ratio=0.412, entropy=0.848, eps=0.83
+[11:28:10] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:28:41] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.07)
+[11:28:55] GPU=9.0GB |     L39: eff_rank=25, top1_sv=0.710, top5_ratio=0.690, entropy=0.630, eps=3.07
+[11:28:55] GPU=9.0GB |   Sentence 30/30: 'The phone sits...'
+[11:28:57] GPU=9.0GB |     Layer 0: computing JVPs...
+[11:29:29] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:29:43] GPU=9.0GB |     L0: eff_rank=34, top1_sv=8.357, top5_ratio=0.305, entropy=0.935, eps=0.10
+[11:29:43] GPU=9.0GB |     Layer 8: computing JVPs...
+[11:30:14] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:30:29] GPU=9.0GB |     L8: eff_rank=36, top1_sv=1.273, top5_ratio=0.161, entropy=0.997, eps=0.10
+[11:30:29] GPU=9.0GB |     Layer 16: computing JVPs...
+[11:31:00] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.10)
+[11:31:15] GPU=9.0GB |     L16: eff_rank=36, top1_sv=1.376, top5_ratio=0.160, entropy=0.997, eps=0.10
+[11:31:15] GPU=9.0GB |     Layer 24: computing JVPs...
+[11:31:46] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.20)
+[11:32:01] GPU=9.0GB |     L24: eff_rank=35, top1_sv=1.838, top5_ratio=0.301, entropy=0.941, eps=0.20
+[11:32:01] GPU=9.0GB |     Layer 32: computing JVPs...
+[11:32:31] GPU=9.0GB |   JVP batch 24-27/40 done (eps=0.96)
+[11:32:46] GPU=9.0GB |     L32: eff_rank=33, top1_sv=0.686, top5_ratio=0.447, entropy=0.824, eps=0.96
+[11:32:46] GPU=9.0GB |     Layer 39: computing JVPs...
+[11:33:17] GPU=9.0GB |   JVP batch 24-27/40 done (eps=3.43)
+[11:33:31] GPU=9.0GB |     L39: eff_rank=27, top1_sv=0.539, top5_ratio=0.620, entropy=0.689, eps=3.43
+[11:33:31] GPU=9.0GB |   All sentences processed. Analyzing results...
+[11:33:31] GPU=9.0GB | === Analyzing Experiment 1: Spectral Stability ===
+[11:33:31] GPU=9.0GB |   L0: pearson=0.981, spearman=1.000, rank=33.2±1.0, entropy_diff=0.0782
+[11:33:31] GPU=9.0GB |   L8: pearson=0.987, spearman=1.000, rank=35.9±0.2, entropy_diff=0.0017
+[11:33:32] GPU=9.0GB |   L16: pearson=0.992, spearman=1.000, rank=36.0±0.0, entropy_diff=0.0010
+[11:33:32] GPU=9.0GB |   L24: pearson=0.978, spearman=1.000, rank=34.8±0.4, entropy_diff=0.0210
+[11:33:32] GPU=9.0GB |   L32: pearson=0.974, spearman=1.000, rank=31.7±3.2, entropy_diff=0.1259
+[11:33:32] GPU=9.0GB |   L39: pearson=0.979, spearman=1.000, rank=23.9±6.9, entropy_diff=0.1372
+[11:33:32] GPU=9.0GB | === Analyzing Experiment 2: JVP Consistency vs Δh Consistency ===
+[11:33:32] GPU=9.0GB |   L0: JVP|cos|=0.408 vs Δh|cos|=0.113 → J_STABLE, norm_cv=0.314
+[11:33:33] GPU=9.0GB |   L8: JVP|cos|=0.768 vs Δh|cos|=0.279 → J_STABLE, norm_cv=0.019
+[11:33:33] GPU=9.0GB |   L16: JVP|cos|=0.838 vs Δh|cos|=0.179 → J_STABLE, norm_cv=0.013
+[11:33:34] GPU=9.0GB |   L24: JVP|cos|=0.570 vs Δh|cos|=0.309 → J_STABLE, norm_cv=0.072
+[11:33:34] GPU=9.0GB |   L32: JVP|cos|=0.229 vs Δh|cos|=0.233 → SIMILAR, norm_cv=0.169
+[11:33:35] GPU=9.0GB |   L39: JVP|cos|=0.011 vs Δh|cos|=0.189 → DH_STABLE, norm_cv=0.323
+[11:33:35] GPU=9.0GB | === Analyzing Experiment 3: Jacobian-corrected Constraint Alignment ===
+[11:33:36] GPU=9.0GB |   L0: raw|cos|=0.127, corrected|cos|=0.000, improvement=-0.127 → NO_IMPROVEMENT
+[11:33:37] GPU=9.0GB |   L8: raw|cos|=0.314, corrected|cos|=0.000, improvement=-0.314 → NO_IMPROVEMENT
+[11:33:39] GPU=9.0GB |   L16: raw|cos|=0.195, corrected|cos|=0.000, improvement=-0.195 → NO_IMPROVEMENT
+[11:33:40] GPU=9.0GB |   L24: raw|cos|=0.356, corrected|cos|=0.000, improvement=-0.356 → NO_IMPROVEMENT
+[11:33:41] GPU=9.0GB |   L32: raw|cos|=0.267, corrected|cos|=0.000, improvement=-0.267 → NO_IMPROVEMENT
+[11:33:43] GPU=9.0GB |   L39: raw|cos|=0.235, corrected|cos|=0.000, improvement=-0.235 → NO_IMPROVEMENT
+[11:33:43] GPU=9.0GB | === Extra: J vs Identity (how much does J deviate from I?) ===
+[11:33:43] GPU=9.0GB |   L0: cos(J·v, v)=0.386, ||J·v||=3.36, ||v||=1.00
+[11:33:43] GPU=9.0GB |   L8: cos(J·v, v)=0.788, ||J·v||=1.03, ||v||=1.00
+[11:33:43] GPU=9.0GB |   L16: cos(J·v, v)=0.855, ||J·v||=1.05, ||v||=1.00
+[11:33:43] GPU=9.0GB |   L24: cos(J·v, v)=0.719, ||J·v||=0.65, ||v||=1.00
+[11:33:43] GPU=9.0GB |   L32: cos(J·v, v)=0.431, ||J·v||=0.23, ||v||=1.00
+[11:33:43] GPU=9.0GB |   L39: cos(J·v, v)=0.095, ||J·v||=0.15, ||v||=1.00
+[11:33:43] GPU=9.0GB |   Results saved to d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase223_glm4_results.json
+[model_utils] GPU memory released, allocated=9.00 GB
+[11:33:45] GPU=0.0GB | 
+============================================================
+[11:33:45] GPU=0.0GB | Phase 223 Summary (glm4)
+[11:33:45] GPU=0.0GB | ============================================================
+[11:33:45] GPU=0.0GB | 
+--- Experiment 1: Spectral Stability ---
+[11:33:45] GPU=0.0GB |   L0: pearson=0.981, spearman=1.000, rank=33.2±1.0
+[11:33:45] GPU=0.0GB |   L8: pearson=0.987, spearman=1.000, rank=35.9±0.2
+[11:33:45] GPU=0.0GB |   L16: pearson=0.992, spearman=1.000, rank=36.0±0.0
+[11:33:45] GPU=0.0GB |   L24: pearson=0.978, spearman=1.000, rank=34.8±0.4
+[11:33:45] GPU=0.0GB |   L32: pearson=0.974, spearman=1.000, rank=31.7±3.2
+[11:33:45] GPU=0.0GB |   L39: pearson=0.979, spearman=1.000, rank=23.9±6.9
+[11:33:45] GPU=0.0GB | 
+--- Experiment 2: JVP vs Δh Consistency ---
+[11:33:45] GPU=0.0GB |   L0: |JVP_cos|=0.408, |Δh_cos|=0.115, ratio=3.54x
+[11:33:45] GPU=0.0GB |   L8: |JVP_cos|=0.768, |Δh_cos|=0.279, ratio=2.75x
+[11:33:45] GPU=0.0GB |   L16: |JVP_cos|=0.838, |Δh_cos|=0.179, ratio=4.69x
+[11:33:45] GPU=0.0GB |   L24: |JVP_cos|=0.570, |Δh_cos|=0.309, ratio=1.84x
+[11:33:45] GPU=0.0GB |   L32: |JVP_cos|=0.229, |Δh_cos|=0.235, ratio=0.97x
+[11:33:45] GPU=0.0GB |   L39: |JVP_cos|=0.031, |Δh_cos|=0.208, ratio=0.15x
+[11:33:45] GPU=0.0GB | 
+--- Experiment 3: Transport Correction ---
+[11:33:45] GPU=0.0GB |   L0: raw|cos|=0.127, corrected|cos|=0.000, improvement=-0.127
+[11:33:45] GPU=0.0GB |   L8: raw|cos|=0.314, corrected|cos|=0.000, improvement=-0.314
+[11:33:45] GPU=0.0GB |   L16: raw|cos|=0.195, corrected|cos|=0.000, improvement=-0.195
+[11:33:45] GPU=0.0GB |   L24: raw|cos|=0.356, corrected|cos|=0.000, improvement=-0.356
+[11:33:45] GPU=0.0GB |   L32: raw|cos|=0.267, corrected|cos|=0.000, improvement=-0.267
+[11:33:45] GPU=0.0GB |   L39: raw|cos|=0.235, corrected|cos|=0.000, improvement=-0.235
+[11:33:45] GPU=0.0GB | Phase 223 complete!

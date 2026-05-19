@@ -1,0 +1,57 @@
+[04:37:35] GPU=0.0GB | ============================================================
+[04:37:35] GPU=0.0GB | Phase 222: Constraint Direction Stability - qwen3
+[04:37:35] GPU=0.0GB | ============================================================
+[04:37:37] GPU=0.0GB | Loading qwen3 (bf16 + auto + sdpa)...
+[04:37:49] GPU=8.0GB |   Loaded: device=cuda:0, GPU=8.0GB
+[04:37:49] GPU=8.0GB | Model: Qwen3ForCausalLM, layers=36, d_model=2560, mlp_type=split_gate_up
+[04:37:49] GPU=8.0GB | 
+========================================
+[04:37:49] GPU=8.0GB | Exp 1: Constraint Direction Stability (P0)
+[04:37:49] GPU=8.0GB | ========================================
+[04:37:49] GPU=8.0GB | [Stability] n_layers=36, d_model=2560, n_pairs=500
+[04:37:49] GPU=8.0GB | [Stability] Generated 500 number constraint pairs
+[04:37:49] GPU=8.0GB | [Stability] Key layers: [6, 12, 18, 24, 30]
+[04:38:10] GPU=8.1GB | [Stability] Processing pair 301/500
+[04:38:25] GPU=8.1GB | [Stability] Collected 500 valid pairs
+[04:38:25] GPU=8.1GB | [Stability] Analyzing L6, n=500 directions...
+[04:38:26] GPU=8.1GB |   L6: |cos|_mean=0.379, |cos|_median=0.341, PC1=19.1%, cos_mean_dir=0.618, stability=MODERATE
+[04:38:26] GPU=8.1GB | [Stability] Analyzing L12, n=500 directions...
+[04:38:26] GPU=8.1GB |   L12: |cos|_mean=0.190, |cos|_median=0.181, PC1=5.2%, cos_mean_dir=0.436, stability=UNSTABLE
+[04:38:26] GPU=8.1GB | [Stability] Analyzing L18, n=500 directions...
+[04:38:27] GPU=8.1GB |   L18: |cos|_mean=0.179, |cos|_median=0.174, PC1=5.7%, cos_mean_dir=0.425, stability=UNSTABLE
+[04:38:27] GPU=8.1GB | [Stability] Analyzing L24, n=500 directions...
+[04:38:27] GPU=8.1GB |   L24: |cos|_mean=0.353, |cos|_median=0.350, PC1=7.8%, cos_mean_dir=0.598, stability=MODERATE
+[04:38:27] GPU=8.1GB | [Stability] Analyzing L30, n=500 directions...
+[04:38:28] GPU=8.1GB |   L30: |cos|_mean=0.259, |cos|_median=0.240, PC1=11.5%, cos_mean_dir=0.510, stability=MODERATE
+[04:38:28] GPU=8.1GB | [Stability] OVERALL: |cos|=0.272, PC1=9.9%, cos_mean_dir=0.517, verdict=MODERATE
+[04:38:33] GPU=8.1GB | 
+========================================
+[04:38:33] GPU=8.1GB | Exp 2: Constraint Type Stability (P1)
+[04:38:33] GPU=8.1GB | ========================================
+[04:38:33] GPU=8.1GB | [TypeStability] Starting multi-constraint-type analysis
+[04:38:33] GPU=8.1GB | [TypeStability] Processing number: 50 pairs
+[04:38:36] GPU=8.1GB |   number: |cos|=0.263, PC1=12.2%, cos_mean_dir=0.522, stability=MODERATE
+[04:38:36] GPU=8.1GB | [TypeStability] Processing tense: 49 pairs
+[04:38:40] GPU=8.1GB |   tense: |cos|=0.319, PC1=6.0%, cos_mean_dir=0.574, stability=MODERATE
+[04:38:40] GPU=8.1GB | [TypeStability] Processing voice: 30 pairs
+[04:38:42] GPU=8.1GB |   voice: |cos|=0.112, PC1=9.5%, cos_mean_dir=0.371, stability=UNSTABLE
+[04:38:47] GPU=8.1GB | 
+========================================
+[04:38:47] GPU=8.1GB | Exp 3: Constraint-W_U Alignment (P2)
+[04:38:47] GPU=8.1GB | ========================================
+[04:38:47] GPU=8.1GB | [WUAlign] n_layers=36, d_model=2560, n_pairs=100
+[04:38:48] GPU=8.1GB | [WUAlign] W_U shape: (151936, 2560)
+[04:39:33] GPU=8.1GB | [WUAlign] W_U SVD: top-100 singular values, first 5: [126.67122   24.205292  20.911549  20.527925  18.53592 ]
+[04:39:40] GPU=8.1GB | [WUAlign] Collected 100 directions
+[04:39:40] GPU=8.1GB | [WUAlign] Error: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 100 is different from 2560)
+[04:39:45] GPU=8.1GB | 
+========================================
+[04:39:45] GPU=8.1GB | Exp 4: Constraint Decomposition (P3)
+[04:39:45] GPU=8.1GB | ========================================
+[04:39:45] GPU=8.1GB | [Decompose] n_layers=36, d_model=2560
+[04:40:04] GPU=8.1GB | [Decompose] Collected 80 triplets
+[04:40:04] GPU=8.1GB | [Decompose] cos(sva,verb)=0.435, cos(sva,noun)=0.408, cos(verb,noun)=0.342
+[04:40:04] GPU=8.1GB | [Decompose] α=0.239, β=0.296, residual=0.806
+[04:40:04] GPU=8.1GB | Results saved to d:\Ai2050\TransformerLens-Project\tests\glm5_temp\phase222_qwen3_results.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[04:40:04] GPU=0.0GB | Phase 222 complete!
