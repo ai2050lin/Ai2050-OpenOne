@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本拼接工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            padding: 30px;
+            background-color: #f5f7fa;
+        }
+        /* 横向布局容器 */
+        .box-item {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        textarea {
+            flex: 1; /* 文本框自动占满剩余宽度 */
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: none;
+        }
+        /* 按钮组垂直排列在右侧 */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #409eff;
+            color: #fff;
+            white-space: nowrap;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .clear-btn {
+            background: #f56c6c;
+        }
+        .paste-btn {
+            background: #67c23a;
+        }
+        .gen-btn {
+            background: #e6a23c;
+            margin: 15px 0;
+            padding: 10px 25px;
+            font-size: 15px;
+        }
+        .copy-btn {
+            background: #9c88ff;
+        }
+        /* 状态提示文字 */
+        .tip-text {
+            margin-top: 8px;
+            color: #666;
+            font-size: 13px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一个输入框 -->
+    <div class="box-item">
+        <textarea id="txt1" placeholder="请输入第一段内容"></textarea>
+        <div class="btn-group">
+            <button class="clear-btn" onclick="clearTxt('txt1')">清空</button>
+            <button class="paste-btn" onclick="pasteTxt('txt1')">粘贴</button>
+        </div>
+    </div>
+
+    <!-- 第二个输入框 -->
+    <div class="box-item">
+        <textarea id="txt2" placeholder="请输入第二段内容"></textarea>
+        <div class="btn-group">
+            <button class="clear-btn" onclick="clearTxt('txt2')">清空</button>
+            <button class="paste-btn" onclick="pasteTxt('txt2')">粘贴</button>
+        </div>
+    </div>
+
+    <!-- 第三个输入框 -->
+    <div class="box-item">
+        <textarea id="txt3" placeholder="请输入第三段内容">
+分析以上的分析一和分析二是否正确，综合正确的部分和当前进展，继续完成任务。
+如果要进行模型测试，请编写跨模型的高性能脚本，然后依次使用qwen3，GLM4和DS7B 三个模型进行测试。 
+GLM4和DS7B 使用 device_map="auto" 方式加载，不要使用bf8的方式。
+模型运行中，请定时输出日志，同时开启flash，避免出现占用过多内存导致卡死的情况。
+如果加载模型出现错误，请参考 tests\model_demo_bf16.py 文件中的写法。
+测试分为三次：第一次运行一遍脚本，保证测试产生的数据是正确的，避免执行部分才发现有错误，浪费测试时间。
+第二次是主要测试，不要数据太少导致结果无效，不要数据太多导致时间过长。
+第三次，如果测试较为重要，评估需要增加数据确认的话，可以增加测试数据验证，否则就跳过。
+</textarea>
+        <div class="btn-group">
+            <button class="clear-btn" onclick="clearTxt('txt3')">清空</button>
+            <button class="paste-btn" onclick="pasteTxt('txt3')">粘贴</button>
+        </div>
+    </div>
+
+    <!-- 生成按钮 -->
+    <button class="gen-btn" onclick="mergeText()">一键拼接生成</button>
+
+    <!-- 结果输出框 -->
+    <div class="box-item">
+        <textarea id="resultTxt" placeholder="拼接结果将显示在这里"></textarea>
+        <div class="btn-group">
+			<button class="clear-btn" onclick="clearTxt('resultTxt')">清空</button>
+            <button class="copy-btn" onclick="copyResult()">复制结果</button>
+        </div>
+    </div>
+    <!-- 状态提示标签 -->
+    <div class="tip-text" id="tipLabel"></div>
+
+    <script>
+        // 清空指定文本框
+        function clearTxt(id) {
+            document.getElementById(id).value = "";
+        }
+
+        // 粘贴剪贴板内容到指定文本框
+        async function pasteTxt(id) {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById(id).value = text;
+            } catch (err) {
+                alert("粘贴失败，请手动粘贴！");
+            }
+        }
+
+        // 拼接三个文本内容
+        function mergeText() {
+            let t1 = document.getElementById("txt1").value;
+            let t2 = document.getElementById("txt2").value;
+            let t3 = document.getElementById("txt3").value;
+            let allText = "分析一：\n" + t1 + "\n\n\n分析二：\n" + t2 + "\n\n\n" + t3;
+            document.getElementById("resultTxt").value = allText;
+            document.getElementById("tipLabel").innerText = "";
+        }
+
+        // 获取当前格式化时间
+        function getNowTime() {
+            const now = new Date();
+            return now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // 复制结果文本
+        function copyResult() {
+            const resDom = document.getElementById("resultTxt");
+            resDom.select();
+            document.execCommand("copy");
+            // 下方标签显示+时间
+            document.getElementById("tipLabel").innerText = `✅ 已成功复制内容 | ${getNowTime()}`;
+        }
+    </script>
+</body>
+</html>

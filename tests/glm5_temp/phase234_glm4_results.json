@@ -1,0 +1,97 @@
+{
+  "model": "glm4",
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "expA": {
+    "error": "Cannot copy out of meta tensor; no data!"
+  },
+  "expB": {
+    "value_stability": {
+      "L0_H0": {
+        "mean_cosine": 1.0,
+        "std_cosine": 0.0,
+        "verdict": "STABLE"
+      },
+      "L0_H1": {
+        "mean_cosine": 1.0,
+        "std_cosine": 0.0,
+        "verdict": "STABLE"
+      },
+      "L1_H0": {
+        "mean_cosine": 0.9381515498344715,
+        "std_cosine": 0.08231286625022853,
+        "verdict": "STABLE"
+      },
+      "L1_H1": {
+        "mean_cosine": 0.9102123579481146,
+        "std_cosine": 0.08615943143110251,
+        "verdict": "STABLE"
+      },
+      "L2_H0": {
+        "mean_cosine": 0.9181079962751367,
+        "std_cosine": 0.07454060309960676,
+        "verdict": "STABLE"
+      },
+      "L2_H1": {
+        "mean_cosine": 0.7699087150804289,
+        "std_cosine": 0.19666543829053823,
+        "verdict": "MODERATE"
+      },
+      "L8_H0": {
+        "mean_cosine": 0.7934824151324702,
+        "std_cosine": 0.10324350688576922,
+        "verdict": "MODERATE"
+      },
+      "L8_H1": {
+        "mean_cosine": 0.6589492724819498,
+        "std_cosine": 0.15143607777296939,
+        "verdict": "MODERATE"
+      },
+      "L16_H0": {
+        "mean_cosine": 0.7162174716755584,
+        "std_cosine": 0.12982431800925825,
+        "verdict": "MODERATE"
+      },
+      "L16_H1": {
+        "mean_cosine": 0.8015238917790927,
+        "std_cosine": 0.08845420815009765,
+        "verdict": "STABLE"
+      },
+      "L39_H0": {
+        "mean_cosine": 0.6847972504712723,
+        "std_cosine": 0.0848807659683254,
+        "verdict": "MODERATE"
+      },
+      "L39_H1": {
+        "mean_cosine": 0.6511570179200434,
+        "std_cosine": 0.19265555668912807,
+        "verdict": "MODERATE"
+      }
+    },
+    "l0_stable_heads": 2,
+    "l0_total_heads": 2,
+    "l0_mean_cosine": 1.0,
+    "l0_verdict": "NOT有固定语义核心: L0的value向量跨上下文稳定,不稳定来自前层上下文处理",
+    "target_layers": [
+      0,
+      1,
+      2,
+      8,
+      16,
+      39
+    ],
+    "n_pairs": 40
+  },
+  "expC": {
+    "error": "Cannot copy out of meta tensor; no data!"
+  },
+  "expD": {
+    "error": "Cannot copy out of meta tensor; no data!"
+  },
+  "expE": {
+    "error": "Cannot copy out of meta tensor; no data!"
+  }
+}
