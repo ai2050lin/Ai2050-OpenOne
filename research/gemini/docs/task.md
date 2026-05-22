@@ -1,18 +1,19 @@
-# Phase 266: Shift to Causal Physics & Empirical Hypotheses
+# Phase 269 & 270: Scientific Falsification & Baseline Verification
 
 ## 任务分解
 
-- [ ] **1. 理论文档的全面降级与修正**
-  - [ ] 修正 `llm_first_principles_mathematics.md`，将“公理”降级为“经验假说”，增加维度诅咒和缺乏预测性的免责声明。
-  - [ ] 修正 `neuron_attribute_mapping.md`，标注 DS7B 低维的退化可能，以及“架构免疫”的局限性。
-  - [ ] 同步更新到用户的 `docs` 目录。
-- [ ] **2. 开发因果切除 (Ablation) 测试脚本**
-  - [ ] 编写 `tests/claude/266_causal_ablation.py`。
-  - [ ] 目标：在 Qwen3-4B 的 L35 切除已知的“动词神经元”或“名词神经元”。
-  - [ ] 测试语料：`I need to book a flight` vs `I read a book`。
-  - [ ] 观察切除后输出概率分布（Logits）的崩塌情况，建立严格的因果链。
-- [ ] **3. 执行与分析**
-  - [ ] 运行脚本并收集对比数据。
-  - [ ] 验证因果干预是否符合理论预期。
-- [ ] **4. 制作结案汇报展示**
-  - [ ] 产出 `walkthrough.md`。
+- [x] **1. 高维诅咒基线测试 (Orthogonality Falsification)**
+  - [x] 编写并运行 `tests/claude/269_high_dim_orthogonality_baseline.py`。
+  - [x] 随机采样十万组 3584 维向量，计算其余弦相似度。
+  - [x] 若观察值 0.0162 落在随机噪声标准差（$\approx 0.0167$）内，则彻底推翻正交叠加假说。
+- [x] **2. 随机网络拓扑测试 (Omega Falsification)**
+  - [x] 编写并运行 `tests/claude/270_untrained_omega_baseline.py`。
+  - [x] 实例化无预训练权重的乱码网络，执行 SVD 并计算 $\Omega$ 压缩比。
+  - [x] 验证低秩坍缩到底是“推理逻辑”的产物，还是架构（如 LayerNorm/Residual）的天然属性。
+- [x] **3. 文献档案自洽手术**
+  - [x] 修改 `coding_mechanism_puzzle_ledger.md`：记录两组证伪实验的发现。
+  - [x] 修改 `neuron_attribute_mapping.md`：抹除具体的单点坐标（如 Neuron #2596），替换为子空间概念，修正各层深度百分比一致性假说。
+  - [x] 修改 `llm_first_principles_mathematics.md`：整合并修正六大假说，删除伪装的现象学描述，直面高维高斯噪声和架构平凡属性。
+  - [x] 将更新同步至 `docs` 目录。
+- [x] **4. 制作证伪汇报**
+  - [x] 产出 `walkthrough.md`。
