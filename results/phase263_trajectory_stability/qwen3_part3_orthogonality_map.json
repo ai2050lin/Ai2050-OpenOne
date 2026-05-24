@@ -1,0 +1,138 @@
+{
+  "model": "qwen3",
+  "features_tested": [
+    "number",
+    "animacy",
+    "tense",
+    "concreteness",
+    "frequency"
+  ],
+  "probe_accuracies": {
+    "embed": {
+      "number": 0.9875,
+      "animacy": 0.9125,
+      "tense": 1.0,
+      "concreteness": 0.9667,
+      "frequency": 0.9
+    },
+    "L0_attn_out": {
+      "number": 0.975,
+      "animacy": 0.9375,
+      "tense": 1.0,
+      "concreteness": 0.9833,
+      "frequency": 0.94
+    },
+    "L0_mlp_out": {
+      "number": 0.9875,
+      "animacy": 1.0,
+      "tense": 1.0,
+      "concreteness": 0.9833,
+      "frequency": 0.96
+    },
+    "L1_mlp_out": {
+      "number": 0.9875,
+      "animacy": 0.9875,
+      "tense": 1.0,
+      "concreteness": 0.9833,
+      "frequency": 0.96
+    }
+  },
+  "orthogonality_map": {
+    "embed": {
+      "pairwise_cosine": {
+        "number_vs_animacy": 0.1452,
+        "number_vs_tense": -0.0793,
+        "number_vs_concreteness": 0.1423,
+        "number_vs_frequency": 0.0348,
+        "animacy_vs_tense": 0.0111,
+        "animacy_vs_concreteness": -0.2412,
+        "animacy_vs_frequency": -0.0822,
+        "tense_vs_concreteness": 0.0115,
+        "tense_vs_frequency": -0.0594,
+        "concreteness_vs_frequency": -0.018
+      },
+      "mean_abs_cosine": 0.0825,
+      "n_features": 5
+    },
+    "L0_attn_out": {
+      "pairwise_cosine": {
+        "number_vs_animacy": 0.0492,
+        "number_vs_tense": -0.2966,
+        "number_vs_concreteness": 0.1576,
+        "number_vs_frequency": -0.0457,
+        "animacy_vs_tense": -0.0305,
+        "animacy_vs_concreteness": -0.2326,
+        "animacy_vs_frequency": -0.0983,
+        "tense_vs_concreteness": 0.0027,
+        "tense_vs_frequency": -0.0016,
+        "concreteness_vs_frequency": -0.1258
+      },
+      "mean_abs_cosine": 0.1041,
+      "n_features": 5
+    },
+    "L0_mlp_out": {
+      "pairwise_cosine": {
+        "number_vs_animacy": 0.0383,
+        "number_vs_tense": -0.3167,
+        "number_vs_concreteness": 0.1224,
+        "number_vs_frequency": -0.0345,
+        "animacy_vs_tense": -0.0104,
+        "animacy_vs_concreteness": -0.1908,
+        "animacy_vs_frequency": -0.0521,
+        "tense_vs_concreteness": 0.0056,
+        "tense_vs_frequency": -0.0171,
+        "concreteness_vs_frequency": -0.0741
+      },
+      "mean_abs_cosine": 0.0862,
+      "n_features": 5
+    },
+    "L1_mlp_out": {
+      "pairwise_cosine": {
+        "number_vs_animacy": 0.0247,
+        "number_vs_tense": -0.3746,
+        "number_vs_concreteness": 0.1115,
+        "number_vs_frequency": -0.021,
+        "animacy_vs_tense": -0.0021,
+        "animacy_vs_concreteness": -0.2079,
+        "animacy_vs_frequency": -0.064,
+        "tense_vs_concreteness": -0.0061,
+        "tense_vs_frequency": -0.0052,
+        "concreteness_vs_frequency": -0.0948
+      },
+      "mean_abs_cosine": 0.0912,
+      "n_features": 5
+    }
+  },
+  "type_analysis": {
+    "grammar_grammar_mean_abs_cos": 0.3167,
+    "semantic_semantic_mean_abs_cos": 0.1908,
+    "grammar_semantic_mean_abs_cos": 0.0443
+  },
+  "two_systems_consistency": {
+    "number": {
+      "embed_vs_L0_mlp": 0.1407,
+      "L0_mlp_vs_L1_mlp": 0.9785,
+      "follows_two_system_pattern": true
+    },
+    "animacy": {
+      "embed_vs_L0_mlp": 0.171,
+      "L0_mlp_vs_L1_mlp": 0.9545,
+      "follows_two_system_pattern": true
+    },
+    "tense": {
+      "embed_vs_L0_mlp": 0.2086,
+      "L0_mlp_vs_L1_mlp": 0.9617,
+      "follows_two_system_pattern": true
+    },
+    "concreteness": {
+      "embed_vs_L0_mlp": 0.1027,
+      "L0_mlp_vs_L1_mlp": 0.9521,
+      "follows_two_system_pattern": true
+    },
+    "frequency": {
+      "embed_vs_L0_mlp": 0.1382,
+      "L0_mlp_vs_L1_mlp": 0.9408,
+      "follows_two_system_pattern": true
+    }
+  }
+}

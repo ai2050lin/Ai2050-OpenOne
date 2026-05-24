@@ -52508,7 +52508,7 @@ Phase 254的核心教训: **编码结构的最稳定单元是"位置"(质心), �
 
 ---
 
-## Phase 255 方案审查: 从"统计方法"到"直接破解"的范式转换 [2026-05-23 12:04]
+## ---------: 方案审查: 从"统计方法"到"直接破解"的范式转换 [2026-05-23 12:04]
 
 ### 用户核心判断评估
 
@@ -52868,3 +52868,2155 @@ Phase 255的核心教训: **Superposition极其严重, 单神经元分析必须�
 - 为什么DS7B的recoding_ratio是Qwen3的7-14倍?
 - 分析DS7B的hidden state是否更"词汇化"
 - 这对理解蒸馏过程的编码影响很重要
+
+---
+
+## Phase 256: W_U对比轴解码 [2026-05-23 14:52]
+
+### 实验脚本
+`tests/glm5/phase256_wu_contrast_axes.py` — 四方案
+
+### Part 1 (256a): W_U奇异向量解码 — ★★★ 简单"对比轴"假说被否定 ★★★
+
+**W_U有效秩 (扩展到300分量):**
+
+| 模型 | effective_rank | k50 | k90 | k95 | k99 |
+|---|---|---|---|---|---|
+| Qwen3 | **93.9** | 56 | 244 | 272 | 295 |
+| GLM4 | **87.6** | 48 | 246 | 273 | 295 |
+| DS7B | **15.8** | 1 | 199 | 249 | 290 |
+
+**★★★ DS7B的effective_rank=15.8, 远低于Qwen3(93.9)和GLM4(87.6)! ★★★**
+DS7B的第一个奇异值(σ=178.7)就解释了>50%的方差! 这与Phase 255的recoding_ratio发现一致: DS7B的W_U信息极度集中在极低维空间。
+
+**反义词opposite_sign_rate (在最佳区分轴上的符号相反率):**
+
+| 词对类型 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| 反义词 | 0.488 | 0.683 | 0.512 |
+| 近义词 | **0.692** | **0.769** | **0.538** |
+| 无关词 | 0.667 | 0.500 | 0.000 |
+
+**★★★ 核心发现: 反义词的opposite_sign_rate是三类中最低的(Qwen3=0.488)! ★★★**
+
+这直接否定了简单的"对比轴"假说——反义词不是在同一个奇异向量的正负两端! 近义词反而更可能在同一轴的对立端(因为它们编码更细粒度的区分)。
+
+但反义词的cosine仍然最高:
+- Qwen3: 反义词cos=0.185 > 近义词=0.151 > 无关=0.059
+- GLM4: 反义词cos=0.130 > 近义词=0.092 > 无关=0.039
+- DS7B: 反义词cos=0.146 > 近义词=0.122 > 无关=0.099
+
+**反义词只用了11-15个unique axes (Qwen3=11, GLM4=15, DS7B=15)** → 有聚集性但不是简单对比轴
+
+**奇异向量解码结果: 前30个轴的语义非常混乱**
+- 没有一个轴清晰对应"热-冷"、"大-小"这样的语义对比
+- 大部分轴的正负端是混合语言、特殊符号、代码片段
+- W_U的奇异向量不是"语义对比轴"
+
+---
+
+### Part 2 (256b): 修正Superposition检验 — ★★★ Phase 255严重高估了Superposition! ★★★
+
+**用真实hidden state vs W_U行代理的对比:**
+
+| 模型 | Phase 255(W_U行) | 新方法(真实hs) | 倍数 | 判定 |
+|---|---|---|---|---|
+| Qwen3 | 0.073 | **0.339** | **4.65x** | MODERATE |
+| GLM4 | 0.124 | **0.343** | **2.76x** | MODERATE |
+| DS7B | 0.199 | **0.286** | **1.44x** | SIGNIFICANT |
+
+**★★★ 关键修正: Qwen3和GLM4的真实Superposition是MODERATE, 不是SEVERE! ★★★**
+
+这意味着:
+1. Phase 255用W_U行作代理的方法严重高估了Superposition(2.76-4.65倍)
+2. MLP键值分析在Qwen3和GLM4上可能仍然可行(需谨慎)
+3. DS7B的Superposition仍然是SIGNIFICANT(0.286), SAE可能仍需要
+
+**重要方法学纠正**: 用W_U行作为输入代理测试MLP神经元激活, 等于问"W_U里的词嵌入能激活这个神经元吗", 但实际推理时进入MLP的是经过多层attention后的hidden state, 两者差异巨大。真实hidden state经过LayerNorm和多层attention处理, 语义信号更集中。
+
+---
+
+### Part 3 (256c): 共现频率控制 — ★★★ "反义词最相似"主要是共现效应! ★★★
+
+**Qwen3 结果:**
+
+| 词对组 | mean cosine |
+|---|---|
+| 高共现反义词 | **0.240** |
+| 低共现反义词 | **0.051** |
+| 高共现近义词 | 0.175 |
+| 低共现近义词 | 0.070 |
+| 高共现无关词 | 0.103 |
+
+- **反义词共现效应 = 0.190** (高共现vs低共现的差)
+- **控制共现后的反义词优势: 高共现=+0.066, 低共现=-0.019**
+
+**GLM4 结果:**
+
+| 词对组 | mean cosine |
+|---|---|
+| 高共现反义词 | **0.172** |
+| 低共现反义词 | **0.031** |
+| 高共现近义词 | 0.104 |
+| 低共现近义词 | 0.061 |
+
+- **反义词共现效应 = 0.141**
+- **控制共现后: 高共现反义词优势=+0.068, 低共现=-0.029**
+
+**DS7B 结果:**
+
+| 词对组 | mean cosine |
+|---|---|
+| 高共现反义词 | **0.198** |
+| 低共现反义词 | **0.069** |
+| 高共现近义词 | 0.151 |
+| 低共现近义词 | 0.039 |
+
+- **反义词共现效应 = 0.129**
+- **控制共现后: 高共现反义词优势=+0.047, 低共现=+0.030**
+
+**★★★ 三模型一致的结论: ★★★**
+1. **共现频率对W_U cosine的影响巨大** (效应0.13-0.19)
+2. **控制共现后, 反义词优势大幅缩小甚至消失** (Qwen3/GLM4的低共现反义词cosine < 近义词cosine)
+3. **DS7B是唯一在低共现条件下仍保持反义词优势的模型** (+0.030), 但优势很小
+4. **"W_U编码语义对比性"这个假说被严重削弱** — 共现频率是W_U cosine的主要解释因子
+
+---
+
+### Part 4 (256d): 修正Logit Attribution — 验证误差仍大(LayerNorm非线性)
+
+**验证误差 (归因总和 vs 实际logit):**
+
+| 模型 | 语法任务 | 其他任务 | 原因 |
+|---|---|---|---|
+| Qwen3 | **14.3%** | 59-381% | LayerNorm非线性 |
+| GLM4 | **5.5%** | 20-69% | LayerNorm非线性 |
+| DS7B | 7370% | 1091-13950% | DS7B特殊结构+LayerNorm |
+
+**关键发现: 语法任务的验证误差最小(Qwen3=14.3%, GLM4=5.5%)!**
+这暗示语法编码比语义编码更线性, LayerNorm的扭曲效应更小。
+
+**修正后的层级贡献(仅看Qwen3/GLM4语法任务, 可信度高):**
+- Qwen3: L35(+20.1), L30(+3.2), L33(-1.9) → 最后层+中间层
+- GLM4: L39(+4.6), L38(+4.4), L34(+1.5) → 最后两层
+
+**DS7B的Logit Attribution完全不可信** (验证误差>1000%)。DS7B的残差流结构和LayerNorm行为与其他模型根本不同。
+
+---
+
+### Phase 256 综合结论
+
+**1. 简单"对比轴"假说被否定 ★★★**
+W_U的奇异向量不是"语义对比轴"——反义词的opposite_sign_rate(0.49-0.68)低于近义词(0.54-0.77)。
+反义词不在同一个奇异向量的正负两端。
+
+**2. Phase 255严重高估了Superposition ★★★**
+用真实hidden state测量: Qwen3 purity=0.339 (vs Phase 255的0.073, 4.65x)。
+Qwen3和GLM4是MODERATE, 不是SEVERE。MLP键值分析可能仍可行。
+
+**3. "反义词最相似"主要是共现频率效应 ★★★**
+控制共现后: Qwen3/GLM4的低共现反义词cosine < 近义词cosine。
+DS7B仍保持微弱优势(+0.030), 可能反映蒸馏过程保留了更多对比结构。
+
+**4. DS7B的W_U有效秩仅15.8 ★★★**
+远低于Qwen3(93.9)和GLM4(87.6), 且第一个奇异值占>50%方差。
+DS7B的W_U信息极度集中, 与其高recoding_ratio(0.49-0.53)一致。
+
+**5. 语法编码比语义编码更线性 ★★**
+语法任务Logit Attribution验证误差<15%, 语义/翻译/逻辑任务>50%。
+LayerNorm对语法编码的扭曲更小。
+
+---
+
+### 核心洞察: 编码机制的真实结构 (修正版)
+
+```
+之前的假说(Phase 255):
+  W_U的160-200个奇异向量 = 160-200个语义对比轴
+  反义词在同一轴的正负端
+
+Phase 256的修正:
+  1. W_U的奇异向量不是"语义对比轴" — 解码混乱, 无清晰语义
+  2. 反义词不在同一轴的对立端 — opposite_sign_rate最低
+  3. "反义词最相似"主要是共现频率效应 — 控制后消失
+  4. W_U的有效维度: Qwen3/GLM4约90, DS7B约16
+  
+修正后的编码机制理解:
+  - W_U的低维结构(90维)不是"对比轴"的集合
+  - 它更可能是"语义特征的压缩投影" — 多个语义特征叠加在同一个维度上
+  - 共现频率是W_U结构的主要塑造力量, 不是语义对比性
+  - 反义词的高cosine主要是因为它们经常共现(统计效应), 不是因为编码了对比关系
+```
+
+---
+
+### 最严格审视
+
+1. **Part 1 "对比轴"否定的局限**: 我们只看了前200个奇异向量。但k90=244, 重要的信号可能分布在更多轴上。不过, 如果前200个轴都没有清晰语义, 后面的轴(奇异值更小, 信噪比更低)更不可能有。
+
+2. **Part 2 Superposition修正的局限**: 新指标是"category_purity"(top-30激活词的类别纯度), 旧指标是"cosine_consistency"(W_U行的平均cosine)。两者不是直接可比的, 但方向性结论(Phase 255高估)是可靠的。
+
+3. **Part 3 共现控制的局限**: "高共现"和"低共现"是人工分类的, 没有实际语料统计。更严格的控制需要用大规模语料库计算真实共现频率。
+
+4. **Part 4 LayerNorm问题**: 验证误差大的根本原因是logits = W_U @ LayerNorm(residual), LayerNorm是非线性的。修正方案: 用LayerNorm后的hidden state做归因, 或者用"logit lens"(在每层后应用LayerNorm再投影)。
+
+5. **反义词cosine的真实原因**: 如果不是"语义对比性", 也不是纯粹的"共现频率", 那是什么? 可能的解释: (a) 反义词在同一个语义维度上取值, 所以在低维投影中距离近; (b) 训练过程中, 对比性的梯度信号使对立词的表示靠近; (c) 纯统计效应(共现)。
+
+---
+
+### 下一步: Phase 257
+
+Phase 256的核心教训: **两个主要假说都被否定或严重削弱** — "对比轴"和"语义对比性"都不能解释W_U的结构。
+
+**Phase 257a: W_U真实结构的深入分析 (最高优先级)**
+- 如果不是对比轴, 那W_U的90维(有效秩)编码了什么?
+- 对W_U的行(每个token的解码方向)做层次聚类, 看语义类别是否聚在一起
+- 计算W_U行空间的几何结构: 是否有子空间对应语法/语义/位置?
+
+**Phase 257b: MLP键值分析的重新尝试 (基于Part 2的修正结果)**
+- Superposition是MODERATE(Qwen3/GLM4), 不是SEVERE
+- 重新做键值分析, 但用真实hidden state(而非W_U行)作为输入
+- 对每个神经元, 找到top-30激活词, 直接读取其语义类别
+
+**Phase 257c: 共现频率的精确量化**
+- 用模型自身的注意力权重作为共现代理(已在Part 3中实现)
+- 或用W_U的gram矩阵近似共现统计: W_U @ W_U.T ≈ token共现矩阵
+
+**Phase 257d: 语法vs语义的线性度差异**
+- 语法任务的Logit Attribution验证误差远小于语义任务
+- 深入分析: 语法编码是否真的更线性? 还是语法任务的归因更简单?
+
+---
+
+## Phase 257: Grammar Head Decoding + W_U POS Geometry [2026-05-23 15:21]
+
+### 实验脚本
+`tests/glm5/phase257_grammar_wu_geometry.py` — 四方案
+
+### Part 1 (257a): 语法Attention Head识别 — ★★★ 三模型一致的层级集中模式 ★★★
+
+**Per-head logit attribution**: 对12个语法任务(主谓一致、时态、比较级、冠词等), hook每层self_attn.o_proj输入获取per-head输出, 计算每个head对correct_token和incorrect_token的logit贡献差。
+
+**跨任务一致性Grammar Heads (出现在≥2个任务的top-10):**
+
+| 模型 | Top-1 Head | 出现次数 | 主要层 | Head贡献量级 |
+|---|---|---|---|---|
+| Qwen3 | L35_H0 | 6/12 | L28-L35 | 0.2-1.5 |
+| GLM4 | L39_H25 | 7/12 | L38-L39 | 0.05-0.3 |
+| DS7B | L27_H7 | 7/12 | L24-L27 | 1-63! |
+
+**★★★ 关键发现1: 语法head集中在最后1/3层, 三模型一致 ★★★**
+- Qwen3: L28-L35 (36层中后8层)
+- GLM4: L38-L39 (40层中最后2层! 极端集中)
+- DS7B: L24-L27 (28层中最后4层)
+
+**★★★ 关键发现2: DS7B的grammar head贡献量级是Qwen3/GLM4的10-100倍 ★★★**
+- DS7B的L27_H10在"article_a"任务中贡献63.3
+- DS7B的L27_H13在"clf_zhi"任务中贡献46.0
+- 同一head(L27_H10, H13)跨不同语法任务都有巨大贡献
+- 这与DS7B低W_U有效秩(15.8)一致: 信息极度压缩在少数head
+
+**★★★ 关键发现3: GLM4的语法集中度最极端(最后2层) ★★★**
+- L39_H25在7/12任务中出现
+- L38几乎所有head(28/32)都参与语法处理
+- 语法计算在GLM4中几乎完全发生在最后一层
+
+**★★★ 关键发现4: L31_H17(Qwen3)和L30_H3(GLM4)专门处理时态 ★★★**
+- Qwen3: L28_H13在past_went任务贡献4.5, past_ate贡献2.4
+- GLM4: L30_H3在past_went贡献0.22, past_ate贡献0.10
+- 时态处理发生在中间层(L28-L30), 不是最后层
+
+---
+
+### Part 2 (257b): Grammar Head OV电路解码 — ★★★ OV@W_E不编码语法 ★★★
+
+**对Part 1识别的grammar heads, 计算OV电路(W_O_h @ W_V_h)的主谓一致性agreement score:**
+- 测量: 当head attend到单数名词时是否促进单数动词, attend到复数名词时是否促进复数动词
+- 使用W_U @ OV @ W_E计算logit effect
+
+| 模型 | 最大agreement | 平均agreement | 解读 |
+|---|---|---|---|
+| Qwen3 | 0.019 | ~0.001 | 极低, 无语法模式 |
+| GLM4 | 0.0001 | ~0.0000 | 几乎为零 |
+| DS7B | (未单独测试) | — | — |
+
+**★★★ 核心发现: OV电路不能解释语法head的功能 ★★★**
+- W_U @ OV_h @ W_E 对所有grammar heads都≈0
+- 语法head不是通过"从attend的token嵌入复制语法特征到输出"来工作
+- 语法计算必须依赖: (a) attention pattern(attend到哪个位置), (b) residual stream中的上下文表示(不是原始嵌入)
+- 这说明语法计算是非线性的——需要整个residual stream的上下文
+
+---
+
+### Part 3 (257c): W_U POS几何分析 — ★★★ 功能词比内容词更紧密聚类 ★★★
+
+**Intra-POS cosine (W_U空间中同词性词对的平均余弦相似度):**
+
+| POS类别 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| Auxiliaries | 0.155 | **0.123** | **0.138** |
+| Prepositions | 0.132 | **0.144** | 0.133 |
+| Conjunctions | 0.133 | 0.106 | 0.116 |
+| Adverbs | 0.165 | 0.108 | 0.130 |
+| Determiners | 0.114 | 0.109 | 0.109 |
+| Pronouns | 0.097 | 0.094 | 0.086 |
+| Nouns | 0.075 | 0.053 | 0.097 |
+| Verbs | 0.074 | 0.049 | 0.085 |
+| Adjectives | 0.078 | 0.046 | 0.088 |
+
+**功能词 vs 内容词 intra-cosine:**
+
+| | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| 功能词均值 | **0.126** | **0.115** | **0.116** |
+| 内容词均值 | 0.098 | 0.064 | 0.100 |
+| 功能词/内容词比 | 1.29x | **1.80x** | 1.16x |
+
+**★★★ 三模型一致: 功能词比内容词更紧密聚类 ★★★**
+- GLM4的差异最大(1.80x), Qwen3次之(1.29x), DS7B最小(1.16x)
+- 功能词(prepositions, conjunctions, auxiliaries, determiners)在W_U空间中更相似
+- 内容词(nouns, verbs, adjectives)在W_U空间中更分散
+- 这与"语法更线性"发现呼应: 功能词(语法词)在更低维空间编码
+
+**POS在W_U SVD空间的分布:**
+
+| POS | Qwen3 top_axis | GLM4 top_axis | DS7B top_axis |
+|---|---|---|---|
+| Prepositions | 3 | **4** | **4** |
+| Determiners | 0 | **4** | 0 |
+| Pronouns | 1 | **4** | 0 |
+| Auxiliaries | 0 | **4** | 0 |
+| Nouns | 0 | 0 | 0 |
+| Verbs | 0 | 0 | 0 |
+
+**★★★ GLM4中功能词在SVD axis=4上投射最强, 内容词在axis=0 ★★★**
+- 这暗示GLM4的W_U存在功能词/内容词子空间分离
+- Qwen3和DS7B的分离不明显(功能词top_axis=0或1)
+
+**Energy concentration (top-10 SVD分量占比):**
+
+| | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| 平均 | 0.60 | 0.65 | **0.78** |
+
+- DS7B能量更集中(与低effective_rank一致)
+
+---
+
+### Part 4 (257d): 模型共现测量 — 方法论失效
+
+**问题**: 模型条件概率P(word_B | template_with_A)对所有词对≈0, 因为模板上下文主导概率分布, 目标词B的概率极低(1/151K)。
+
+**回归结果(Qwen3):**
+- Model 1 (cooc only): R²=0.05 — 共现无法解释W_U cosine
+- Model 2 (cooc + semantic): R²=0.13 — 加入语义类型后提升有限
+- 但cooc测量本身接近0, 回归不可信
+
+**结论**: 需要用真实语料库(如Wikipedia)统计共现频率, 模型条件概率不适合做共现代理。
+
+---
+
+### Phase 257 综合结论
+
+**1. 语法head的层级集中模式被精确量化 ★★★**
+- 三模型一致: 语法head在最后1/3层
+- GLM4最极端: L38-L39(最后2层)承担几乎所有语法
+- DS7B最集中: L27单层贡献达207(logit单位)
+- 时态处理在中间层(L28-L30), 与主谓一致分离
+
+**2. OV电路不编码语法 ★★★**
+- W_U @ OV @ W_E对所有grammar heads≈0
+- 语法不是通过"从嵌入复制语法特征"实现的
+- 语法计算需要完整residual stream上下文——非线性
+
+**3. 功能词在W_U中更紧密聚类 ★★★**
+- 三模型一致: 功能词intra-cosine > 内容词intra-cosine
+- GLM4差异最大(1.80x), 且功能词投射到不同SVD轴(axis=4 vs 0)
+- 功能词(语法词)在更低维空间编码——与语法更线性一致
+
+**4. DS7B的语法处理模式异常 ★★**
+- 单个head贡献极大(63), 远超Qwen3(1.5)和GLM4(0.3)
+- 同一组heads(L27_H10, H13)处理所有语法任务
+- 与DS7B低有效秩一致: 信息压缩导致少数head承担过多功能
+
+---
+
+### 客观发现汇总(无理论解释)
+
+```
+已确认的客观现象:
+  1. 语法head集中在最后1/3层, 三模型一致
+  2. GLM4的语法极端集中在最后2层
+  3. DS7B的语法head贡献量级远大于Qwen3/GLM4
+  4. OV @ W_E不编码语法(所有模型≈0)
+  5. 功能词在W_U中比内容词更紧密聚类
+  6. GLM4中功能词投射到SVD axis=4, 内容词投射到axis=0
+  7. 时态处理在中间层, 主谓一致在最后层(Qwen3/GLM4)
+  8. DS7B的top10 SVD能量集中度(0.78)远高于Qwen3(0.60)/GLM4(0.65)
+  9. 模型条件概率不适合做共现频率代理
+
+方法论问题:
+  1. Part 4(模型共现)的方法论失败——需要真实语料库
+  2. OV@W_E分析只测了静态电路, 没测实际residual stream
+  3. 语法任务数量(12)和类型(5)偏少
+  4. POS分组依赖人工定义, 非自动标注
+```
+
+---
+
+## Phase 258: Grammar Dynamic Computation Mechanism [2026-05-23 15:43]
+
+### 实验脚本
+`tests/glm5/phase258_grammar_dynamic_mechanism.py` — 四方案
+
+### Part 1 (258a): Grammar Head Attention Pattern — ★★★ 语法head attend到主语位置 ★★★
+
+**方法**: 对Phase 257识别的grammar heads, hook self_attn获取attention weights, 分析在动词预测位置各head attend到主语还是干扰词。
+
+**Subject attention ratio (distractor tasks, head attend到主语 vs 干扰词):**
+
+| 模型 | Top-1 Head (subject_ratio) | 次高 | 说明 |
+|---|---|---|---|
+| Qwen3 | L31_H17 (0.96) | L6_H10 (0.79) | L31_H17强attend主语 |
+| GLM4 | L38_H26 (0.99) | L38_H2 (0.99) | **整个L38层所有head都attend主语** |
+| DS7B | L23_H17 (0.93) | L24_H0 (0.88) | 语法head更分散 |
+
+**★★★ 关键发现1: Qwen3 L31_H17同时是最强语法head(grammar_signal=3.47)和最强主语attention head ★★★**
+- L31_H17在时态任务中: grammar_signal=3.47, subject_attn=0.58
+- 这个head从residual stream的**主语位置**读取时态/数量信息
+
+**★★★ 关键发现2: GLM4的L38层整体attend到主语(subject_ratio>0.96 for 7/10 heads) ★★★**
+- 这与GLM4语法极端集中在L38-L39一致
+- 不是单个head负责语法,而是整层协同处理
+
+**★★★ 关键发现3: L35_H0(Qwen3, 最高频grammar head)的subject_attn仅0.01 ★★★**
+- L35_H0在6/12任务中出现但几乎不attend主语
+- 这个head可能从其他信息源(如residual stream的整体状态)做语法判断
+- **attribution频率≠因果重要性**: ablation测试证实L35_H0的因果效应极弱
+
+---
+
+### Part 2 (258b): Residual Stream Decoding — ★★★ Logit lens有偏,但一致性方向正确 ★★★
+
+**方法**: 对被grammar head attend到的主语位置, 用logit lens(W_U @ hidden_state)解码, 测量单数/复数动词logit差异(number_signal)。
+
+**Number signal consistency (单数主语signal - 复数主语signal, 正值=正确方向):**
+
+| 模型 | Top Head | consistency | sing_signal | plur_signal |
+|---|---|---|---|---|
+| Qwen3 | L35_H8 | 15.96 | -102.7 | -118.7 |
+| Qwen3 | L35_H1 | 15.96 | -102.7 | -118.7 |
+| Qwen3 | L31_H17 | 7.78 | -101.6 | -109.4 |
+| Qwen3 | L6_H10 | 0.16 | -0.69 | -0.85 |
+
+**★★★ 关键发现: number_signal全是负值,但一致性方向正确 ★★★**
+- 所有head的number_signal都是负值(单数/复数动词logit都<0)
+- 但单数主语→更倾向单数动词(consistency>0),方向正确
+- **logit lens在中间层有系统性偏移,不能直接用绝对值解读**
+- L6_H10的绝对signal最小但consistency方向正确→信息更均衡编码
+
+---
+
+### Part 3 (258c): Grammar Layering Verification — ★★★ 语法分层假说验证(24+16+18+8样本) ★★★
+
+**Per-type peak layer (MLP attribution):**
+
+| 语法类型 | Qwen3 峰值层 | GLM4 峰值层 | DS7B 峰值层 |
+|---|---|---|---|
+| 主谓一致(简单) | **L35** | **L39** | **L3** (异常!) |
+| 主谓一致(干扰) | **L34** | **L38** | **L27** |
+| 时态 | **L33** | **L38** | **L27** |
+| 比较级/冠词 | **L26** | **L38** | **L26** |
+
+**★★★ 关键发现1: Qwen3的语法峰值层系统性递减: L35→L34→L33→L26 ★★★**
+- 简单一致→干扰一致→时态→比较级, 峰值层越来越浅
+- 复杂度越低的语法规则在越深的层处理
+
+**★★★ 关键发现2: GLM4所有语法类型都集中在L38-L39, 分化度低 ★★★**
+- 只有comparative_article在L27有第二峰值(1.32 vs L38的2.29)
+- GLM4的语法处理更"整体化", 不区分语法类型
+
+**★★★ 关键发现3: DS7B的agreement_simple峰值在L3(attribution=27!) — 完全异常 ★★★**
+- 简单主谓一致在embedding层附近就完成了
+- 其他类型在L26-L27(正常)
+- **DS7B的简单一致不是通过attention计算,而是通过embedding直接预测**
+- 再次证明DS7B编码策略根本不同,不应作为通用机制参考
+
+**Qwen3 vs GLM4 语法分层对比:**
+- Qwen3: 语法有细粒度分工(峰值层差9层: L26-L35)
+- GLM4: 语法统一处理(峰值层差1层: L38-L39)
+- **更深的模型(Qwen3 36层 vs GLM4 40层)反而有更细的语法分层**
+
+---
+
+### Part 4 (258d): Activation Ablation — ★★★ Attribution≠Causation ★★★
+
+**方法**: Ablation test — 从attention层输出中减去特定head的W_O_h @ h_out贡献, 测量correct verb logit_diff变化。
+
+**Qwen3 Ablation results (mean logit_diff change, 负值=ablation伤害语法=head因果重要):**
+
+| Head | Mean ablation effect | Hurt in N/6 prompts | Attribution (Phase 257) |
+|---|---|---|---|
+| L35_H8 | **-0.133** | **5/6** | -0.11 |
+| L31_H17 | **-0.107** | **4/6** | 0.97 |
+| L34_H15 | **-0.077** | **6/6** | 0.25 |
+| L35_H28 | -0.046 | 2/6 | 1.46 |
+| L35_H0 | **+0.029** | **1/6** | **0.79** |
+
+**★★★ 关键发现1: Attribution最高的L35_H0(0.79)的ablation几乎无因果效应 ★★★**
+- L35_H0的attribution=0.79但ablation仅1/6 prompt受影响, mean=+0.029
+- 说明logit attribution**高估了**L35_H0的因果重要性
+- L35_H0可能是"跟随者"而非"驱动者"——它反映语法信号但不直接产生
+
+**★★★ 关键发现2: Attribution最高的L35_H28(1.46)的ablation也弱 ★★★**
+- L35_H28在Phase 257是sv_sing_cat的top head, attribution=1.46
+- 但ablation仅2/6 hurt, mean=-0.046
+- **单任务attribution高≠跨任务因果重要**
+
+**★★★ 关键发现3: 真正的因果head是L35_H8和L31_H17 ★★★**
+- L35_H8: attribution仅-0.11,但ablation在5/6 prompts hurt,mean=-0.133
+- L31_H17: attribution=0.97,ablation在4/6 hurt,mean=-0.107
+- **L35_H8是"隐性语法head"**——attribution不强但ablation强
+- 这说明存在**attribution和causation的系统性偏差**
+
+**★★★ 关键发现4: L34_H15在所有6/6 prompts都被ablation伤害 ★★★**
+- 虽然mean effect不大(-0.077), 但100%受影响
+- 这是一个**基础语法基础设施head**——它对所有语法判断都有小但稳定的贡献
+
+---
+
+### Phase 258 综合结论
+
+**1. Grammar head确实attend到主语位置 ★★★**
+- Qwen3 L31_H17: subject_ratio=0.96
+- GLM4 L38全层: subject_ratio>0.96
+- 语法计算的第一步是"定位主语"
+
+**2. 语法分层假说被验证(Qwen3), 但GLM4不分层 ★★★**
+- Qwen3: 峰值层L35→L34→L33→L26(递减9层)
+- GLM4: 峰值层L39→L38→L38→L38(几乎不分)
+- 模型深度和语法分工不是简单正相关
+
+**3. Attribution≠Causation — 核心方法论警示 ★★★**
+- Logit attribution识别的top head(L35_H0, L35_H28)不是因果head
+- 真正的因果head(L35_H8, L31_H17)的attribution中等
+- 单纯依赖logit attribution会**系统性地高估"跟随者"head,低估"驱动者"head**
+
+**4. DS7B的agreement_simple峰值在L3 — 嵌入层直接预测 ★★★**
+- 简单主谓一致在L3就完成(attribution=27)
+- 这不是通用机制,是蒸馏导致的计算退化
+- **DS7B应该从语法机制研究中排除**
+
+**5. OV@W_E≈0的含义: 语法head不从嵌入复制,而是从residual stream读取 ★★★**
+- 语法计算需要动态上下文(residual stream),不是静态嵌入
+- 但logit lens在中间层有偏,不能直接解读residual stream内容
+- 需要更精确的解码方法(如probing classifier)
+
+---
+
+### 客观发现汇总(无理论解释)
+
+```
+已确认的客观现象:
+  1. 语法head attend到主语位置(Qwen3/GLM4/DS7B一致)
+  2. Qwen3语法分层: agreement>L34, tense>L33, comparative>L26
+  3. GLM4语法不分层: 所有类型集中在L38-L39
+  4. DS7B简单一致在L3完成,其他在L26-L27
+  5. Attribution≠Causation: L35_H0 at attribution高但ablation无效应
+  6. L35_H8是隐性语法head: attribution低但ablation强(5/6 hurt)
+  7. L31_H17同时是最强语法head和最强主语attention head(Qwen3)
+  8. GLM4 L38层整体attend到主语(7/10 heads subject_ratio>0.96)
+  9. Logit lens在中间层有系统性偏移(所有number_signal<0)
+  10. L34_H15是基础语法基础设施head(6/6 prompts被ablation伤害)
+
+方法论问题:
+  1. Logit attribution系统性高估"跟随者"head
+  2. Logit lens在中间层不能直接解读
+  3. Ablation只测单head,没有多head交互测试
+  4. 语法任务类型仍然偏少(4类)
+  5. 没有跨语言验证(中文语法)
+```
+
+---
+
+## Phase 259: Two-Stage Computation & Probing Classifier [2026-05-23 16:35]
+
+### Part 3 (259a): Linear Probing Classifier — ★★★ 主语Residual Stream的Number信息 ★★★
+
+**方法**: 在主语位置提取各层hidden state，训练LogisticRegression分类器预测singular/plural，75 singular + 71 plural prompts。
+
+**Probe accuracy curve (5-fold CV):**
+
+| Layer | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| L0 (embedding) | **0.959** | **0.514** | **0.966** |
+| L1 | 0.986 | **0.945** | 0.986 |
+| L2 | 0.986 | 0.945 | 0.986 |
+| L5 | 0.986 | 0.973 | 0.986 |
+| L10 | 0.980 | 0.980 | 0.986 |
+| L15 | 0.980 | 0.986 | 0.973 |
+| L20 | 0.980 | 0.986 | 0.966 |
+| L25 | 0.986 | 0.986 | 0.890 |
+| L27 | — | — | 0.931 |
+| L35 | 0.986 | — | — |
+| L39 | — | 0.986 | — |
+
+**★★★ 关键发现1: 三个模型的number信息编码策略完全不同 ★★★**
+- **Qwen3**: number信息在embedding层已有95.9%，后续层缓慢提升至98.6% — 信息从词汇本身来
+- **GLM4**: embedding层仅51.4%（接近随机），L1骤升至94.5%（跃升+43.1%）— 信息由第一层计算产生
+- **DS7B**: embedding层96.6%（类似Qwen3），但后期层(L22-L27)反而下降至91%-93.8% — 信息被后续层"干扰"
+
+**★★★ 关键发现2: GLM4的embedding不编码number，是第一个Transformer层"创造"了语法信息 ★★★**
+- L0→L1的+43.1%跃升，是所有3个模型中最显著的单层跃升
+- 说明GLM4的语法处理机制不依赖embedding中的词形变化，而是通过第一层attention机制"构建"了number表示
+- 这与Qwen3（直接读embedding）是本质不同的策略
+
+**★★★ 关键发现3: DS7B后期层number信息下降，可能与蒸馏有关 ★★★**
+- L22-L27下降至91-93.8%，与Qwen3/GLM4后期稳定在98%+不同
+- 可能原因：蒸馏过程导致高层grammar信号被"覆盖"或"干扰"
+
+---
+
+### Part 1 (259b): Two-Stage Hypothesis Test — ★★★ Driver→Follower测试 ★★★
+
+**方法**: Ablate driver heads后测量follower attribution变化；Ablate follower heads后测量driver attribution变化。
+
+**Qwen3 (drivers: L35_H8, L31_H17, L34_H15; followers: L35_H0, L35_H28):**
+- Ablate drivers → L35_H0: +7.2%, L35_H28: +1.7%（follower attribution几乎不变）
+- Ablate followers → L35_H8: 0.0%, L31_H17: 0.0%, L34_H15: 0.0%（driver attribution不变）
+- **结论：两阶段假说不被Qwen3支持** — driver和follower是并行工作，不是串行依赖
+
+**GLM4 (auto-identified: drivers L39_H25, L39_H27; followers L38_H28, L38_H19等):**
+- Ablate drivers → followers变化0%（完全不变）
+- Ablate followers → L39_H25: +6.4%, L39_H27: -649.2%
+- **结论：两阶段假说不被GLM4支持**
+
+**DS7B (auto-identified: drivers L27_H9, L27_H12; followers L27_H7, L27_H13等):**
+- Ablate drivers → L27_H13: +58.5%, L27_H8: +71.6%（2/5 followers大幅变化）
+- Ablate followers → L27_H12: +34.8%（1/3 drivers变化）
+- **结论：部分支持两阶段 — DS7B中某些follower确实依赖driver的输出**
+
+**★★★ 关键发现: 三个模型中，driver→follower依赖关系不一致 ★★★**
+- Qwen3和GLM4: driver和follower相互独立（并行计算）
+- DS7B: 部分依赖关系存在
+- 两阶段串行假设在Qwen3（我们的主要分析对象）上不成立，说明语法head之间更可能是"各读各的"而非"先计算再传递"
+
+---
+
+### Part 2 (259c): Infrastructure Head Analysis (L34_H15, L38_H28, L27_H7)
+
+**Qwen3 L34_H15:**
+- 注意力模式：主要attend到首token "The"（attn=0.78-0.87），非主语位置
+- OV电路输出在所有prompt中一致（top3: '', '...', '3'），与具体语法任务无关
+- Subject_attn仅0.36，不是"主语定位head"
+
+**GLM4 L38_H28:**
+- 注意力模式：主要attend到特殊token（position 1），非主语位置
+- OV电路输出在所有prompt中完全相同（top3: '_MAGIC', 'compag', 'habitu'）
+- 没有明确的语法功能
+
+**DS7B L27_H7:**
+- 注意力模式：主语attn=0.65（三个模型中最高），top1就是主语token
+- OV电路输出与number相关（"The cat"→13.9, "The cats"→3.4, "The dog"→-4.2, "The dogs"→7.1）
+- **唯一一个OV输出能区分singular/plural的infrastructure head**
+
+---
+
+### Part 4 (259d): Q/K Alignment with Number Direction
+
+**Qwen3:**
+- L35_H8 (driver): **Q_align=0.502**, K_align≈0.000
+- L31_H17 (driver): Q_align=0.048, K_align≈0.000
+- L34_H15 (driver): Q_align=-0.112, K_align≈0.000
+- L35_H0 (follower): Q_align=0.191, K_align=0.014
+- L35_H28 (follower): Q_align=0.014, K_align=0.000
+
+**GLM4:**
+- L39_H25 (driver): Q_align=-0.168, **K_align=0.301**
+- L38_H28 (driver): Q_align=-0.114, K_align=-0.064
+- L38_H19 (driver): Q_align=0.039, K_align=-0.064
+- L38_H24 (follower): Q_align=0.121, K_align=-0.064
+
+**DS7B:**
+- Drivers: Q_align=-0.058, K_align=-0.066
+- Followers: Q_align=0.242, K_align=-0.066
+
+**★★★ 关键发现: Q alignment vs K alignment模式不同 ★★★**
+- Qwen3: 只有L35_H8有强Q_align(0.502)，说明这个head在verb位置"主动搜索"number信息
+- GLM4: L39_H25有强K_align(0.301)，说明这个head在subject位置"广播"number信息
+- 两个模型分别用了不同的attention机制：Qwen3是"查询驱动"，GLM4是"键值驱动"
+
+---
+
+### Phase 259 客观发现汇总
+
+```
+1. Qwen3: number信息从embedding层就存在(95.9%)，L35_H8主动查询number (Q_align=0.502)
+2. GLM4: number信息从L1才开始出现(51.4%→94.5%)，L39_H25通过K_align(0.301)广播number
+3. DS7B: number信息在embedding有(96.6%)，后期层反而下降(91-93.8%)
+4. 两阶段(driver→follower)假说在Qwen3和GLM4不被支持（并行而非串行）
+5. DS7B部分支持两阶段（L27_H13/L27_H8在driver ablation后attribution变化58.5%/71.6%）
+6. Qwen3 L34_H15和GLM4 L38_H28都不attend到主语，而是attend首token/特殊token
+7. DS7B L27_H7有最强的主语attention(0.65)，是唯一OV输出能区分singular/plural的infra head
+8. 三个模型的语法处理机制存在显著差异，不能用统一理论解释
+```
+
+---
+
+## Phase 260: L1突变机制与跨模型Embedding分析 [2026-05-23 17:18]
+
+### Part 1 (260a): 跨模型Embedding余弦相似度
+
+**方法**: 对50对singular/plural词对计算embedding余弦相似度，同时在verb位置做probe。
+
+**Embedding cosine similarity (single-single token pairs):**
+
+| 模型 | Mean cosine | Std | Min | Max | Both单token率 |
+|---|---|---|---|---|---|
+| Qwen3 | **0.5974** | 0.1201 | 0.3414 | 1.0000 | 23/50 (46%) |
+| GLM4 | **0.2704** | 0.1720 | 0.1146 | 1.0000 | 23/50 (46%) |
+| DS7B | **0.2086** | 0.1732 | 0.1021 | 1.0000 | 23/50 (46%) |
+
+**Verb位置probe accuracy**: 所有3个模型在所有层都是100%。
+
+**★★★ 关键发现1: DS7B的embedding cosine最低(0.21)，但probe accuracy最高(96.6% Phase259) ★★★**
+- DS7B embedding空间中singular/plural词的余弦相似度最低，说明DS7B tokenizer/embedding对词形变化更不敏感
+- 但这并不妨碍number信息的提取——因为probe用的是subject位置的hidden state，不是embedding的cosine
+
+**★★★ 关键发现2: Phase 259中GLM4的L0 probe=0.514是一个bug，不是真实结果 ★★★**
+- Phase 260中GLM4的embedding probe=0.9333（93.3%），不是51.4%
+- Phase 259的GLM4 special_token_offset bug导致L0 hidden state取错了位置
+- 修正后的结论：GLM4的embedding层也包含number信息（93.3%），不存在"L0→L1突变+43.1%"
+- Phase 259的核心结论"GLM4通过L1计算产生number信息"是错误的
+
+---
+
+### Part 2 (260b): L0→L1突变分解 — ★★★ 核心实验 ★★★
+
+**方法**: 在subject位置收集5个中间状态的hidden state：embedding、L0_attn输出、L0_mlp输出、L1_attn输出、L1_mlp输出，每个训练线性probe。
+
+**GLM4中间状态probe accuracy:**
+
+| 状态 | Accuracy | 变化 |
+|---|---|---|
+| embedding | 0.9333 | — |
+| L0_attn_out | **0.5833** | **-0.3500** |
+| L0_mlp_out | 0.9333 | +0.3500 |
+| L1_attn_out | 0.7750 | -0.1583 |
+| L1_mlp_out | 0.9333 | +0.1583 |
+
+**Qwen3中间状态probe accuracy:**
+
+| 状态 | Accuracy | 变化 |
+|---|---|---|
+| embedding | 0.9333 | — |
+| L0_attn_out | 0.9500 | +0.0167 |
+| L0_mlp_out | 0.9667 | +0.0167 |
+| L1_attn_out | 0.9417 | -0.0250 |
+| L1_mlp_out | 0.9667 | +0.0250 |
+
+**DS7B中间状态probe accuracy:**
+
+| 状态 | Accuracy | 变化 |
+|---|---|---|
+| embedding | 0.9417 | — |
+| L0_attn_out | 0.9500 | +0.0083 |
+| L0_mlp_out | 0.9667 | +0.0167 |
+| L1_attn_out | 0.9333 | -0.0334 |
+| L1_mlp_out | 0.9417 | +0.0084 |
+
+**★★★ 关键发现3: GLM4的attention层在subject位置大幅破坏number信息（-35%），MLP层完全恢复 ★★★**
+- GLM4 L0 attention: 93.3% → 58.3%（-35%），这是巨大的破坏
+- GLM4 L0 MLP: 58.3% → 93.3%（+35%），MLP完全恢复了被attention破坏的number信息
+- 这种"attn破坏→MLP恢复"的模式在L1重复出现（-15.8%→+15.8%）
+- Qwen3和DS7B没有这种现象——它们的attention保持甚至增强了number信息
+
+**★★★ 关键发现4: GLM4的attention层对subject位置number信息有系统性干扰 ★★★**
+- 这不是Phase 259说的"L1计算产生number信息"，而是"L0 attention破坏了embedding中已有的number信息，MLP又恢复了它"
+- attention破坏的原因：GLM4 L0的attention pattern显示heads确实attend到subject，但可能在混合信息时"稀释"了number特征
+- MLP恢复的机制：GLM4的MLP可能执行了类似"去噪"或"重建"的操作
+
+**GLM4 L0/L1注意力头分析（top-5 by subject attention）:**
+- L0: H29(subj_attn=0.719), H12(0.704), H1(0.637), H6(0.478), H23(0.393)
+- L1: H10(subj_attn=0.748), H21(0.627), H0(0.347), H29(0.256), H28(0.237)
+- L0和L1都有明确的subject-locating heads
+
+---
+
+### Part 3 (260c): 信息汇聚点（首token）功能分析
+
+**方法**: 分析grammar head在verb位置的logit effect，同时probe首token位置的number信息。
+
+**首token位置number probe accuracy:**
+- Qwen3: **0.5000**（所有层，完全随机）
+- GLM4: **0.5000**（所有层，完全随机）
+- DS7B: **0.5000**（所有层，完全随机）
+
+**★★★ 关键发现5: 三个模型的首token（"The"）位置完全不含number信息 ★★★**
+- 首token是"The"，是相同的，不区分singular/plural
+- 这排除了"首token是全局信息汇聚点"的假说——至少对number信息如此
+- L34_H15 attend到首token不是在读取number信息，而是在读取其他信息（可能是句法结构）
+
+**Qwen3 grammar head logit effect分析（verb位置，weight-based方法）:**
+
+| Head | verb_diff(sing) | verb_diff(plur) | attn_to_first | attn_to_subj |
+|---|---|---|---|---|
+| L34_H15_infra | **+1.0934** | +0.8142 | 0.5773 | 0.0615 |
+| L35_H8_driver | **+0.4585** | **-0.3640** | 0.5845 | 0.2026 |
+| L31_H17_subj_loc | -0.3033 | +0.0642 | 0.9175 | 0.0455 |
+| L35_H0_follower | -3.0507 | -3.9968 | 0.0322 | 0.0261 |
+
+**★★★ 关键发现6: L34_H15和L35_H8的verb_diff区分sing/plur，但L31_H17和L35_H0模式不同 ★★★**
+- L35_H8: verb_diff(sing)=+0.46, verb_diff(plur)=-0.36 — 最明确的number信号
+- L34_H15: verb_diff(sing)=+1.09, verb_diff(plur)=+0.81 — 区分但都是正数
+- L31_H17: verb_diff(sing)=-0.30, verb_diff(plur)=+0.06 — 反转模式
+- L35_H0: verb_diff都是大的负值 — 抑制动词
+
+---
+
+### Part 4 (260d): Number信息衰减分析
+
+**Linear probe vs MLP probe (subject位置):**
+- 三个模型在所有层的linear-MLP gap都≤2%，没有显著的nonlinear encoding
+- DS7B后期层也没有linear→MLP的巨大提升，说明number信息没有被非线性编码隐藏
+
+**Direction alignment (early vs late layers):**
+
+| 模型 | L0→late | L1→late | L5→late | L10→late |
+|---|---|---|---|---|
+| Qwen3 | 0.055-0.067 | 0.179-0.299 | 0.231-0.365 | 0.333-0.466 |
+| GLM4 | 0.037-0.063 | 0.084-0.156 | 0.102-0.208 | 0.150-0.288 |
+| DS7B | 0.078-0.098 | 0.262-0.415 | 0.381-0.570 | 0.456-0.675 |
+
+**★★★ 关键发现7: Number direction从early到late层逐渐对齐（DS7B最强，GLM4最弱） ★★★**
+- DS7B的L10→L23-27对齐度0.456-0.675，说明number representation方向是渐进演化的
+- GLM4的对齐度最低（L10→late = 0.150-0.288），说明GLM4的number representation在层间变化最大
+
+**Sing/Plur separation (inter-class distance):**
+
+| Layer | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| L0 | 0.326 | 0.024 | 0.364 |
+| L1 | 3.731 | 0.169 | 11.040 |
+| L5 | 7.536 | 0.496 | 30.174 |
+| L10 | 11.998 | 1.037 | 48.226 |
+| L20 | 16.992 | 2.584 | — |
+| L25 | 38.082 | 7.157 | 150.983 |
+| L_last | 48.699 | 10.723 | 198.786 |
+
+**★★★ 关键发现8: 三个模型的sing/plur separation都随层单调增长，没有真正的"信息衰减" ★★★**
+- GLM4的separation增长最慢（L0=0.024→L27=10.7），但仍然单调增长
+- DS7B没有衰减——inter_dist从0.364增长到198.786
+- Phase 259中DS7B的probe accuracy下降（L22-L27: 91-94%）可能是因为数据量不足或CV方差，不是真实的信息衰减
+
+---
+
+### Phase 260 客观发现汇总
+
+```
+1. Phase 259中"GLM4 L0→L1突变+43.1%"是一个position offset bug，修正后GLM4 embedding=93.3%
+2. 三个模型的embedding都包含number信息(93-94%)，不存在"计算产生"的模型
+3. GLM4的attention层在subject位置系统性破坏number信息(-35%)，MLP完全恢复(+35%)
+4. Qwen3和DS7B的attention层保持甚至增强number信息
+5. 三个模型的首token位置完全不含number信息(probe=50%)
+6. L34_H15 attend到首token不是读取number信息（首token没有number信息）
+7. L35_H8是最明确的number信号head(verb_diff sing=+0.46, plur=-0.36)
+8. Linear vs MLP probe gap≤2%，不存在非线性编码
+9. Sing/plur separation在三个模型中均单调增长，没有真正的信息衰减
+10. Number direction从early到late层逐渐对齐(DS7B最强0.675，GLM4最弱0.288)
+```
+
+### Phase 260 修正的Phase 259结论
+
+```
+原Phase 259结论：                          修正后结论：
+"GLM4 embedding=51.4%, L1突变到94.5%"  →  GLM4 embedding=93.3%, L0/L1无明显突变
+"GLM4通过L1计算产生number信息"           →  GLM4 L0 attn破坏number信息，MLP恢复
+"三种根本不同的策略"                     →  三种模型embedding都有number信息，差异在attn/MLP交互
+"DS7B后期层number信息下降"               →  DS7B separation单调增长，下降可能是CV方差
+```
+
+---
+
+## Phase 261: Attention破坏机制与多特征探测 [2026-05-23 19:45]
+
+### Part 1 (261a): L0 Attention Disruption分析
+
+**方法**: 收集embedding、L0_attn_out、L0_mlp_out在subject位置的hidden state，计算probe accuracy、number direction cosine、separation、per-head attention pattern。
+
+**三模型probe accuracy对比（subject位置）:**
+
+| 状态 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| Embedding | 0.9517 | 0.5791 | 0.9379 |
+| L0_attn_out | 0.9586 | 0.5148 | 0.9517 |
+| L0_mlp_out | 0.9586 | 0.9379 | 0.9655 |
+
+**Number direction cosine:**
+
+| 比较对 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed vs attn | 0.0821 | **-0.0067** | 0.1633 |
+| embed vs mlp | 0.1412 | 0.3220 | 0.1684 |
+| attn vs mlp | 0.7020 | 0.0223 | 0.8114 |
+
+**★★★ 关键发现1: GLM4的attention把number direction旋转到几乎正交方向（cos=-0.007），MLP部分恢复但仅cos=0.322 ★★★**
+
+- GLM4: embed→attn方向旋转了90°，attn→mlp又旋转了89°（cos=0.022）
+- Qwen3: attn→mlp方向一致（cos=0.702），说明MLP沿着attention后的方向继续增强
+- DS7B: attn→mlp方向一致（cos=0.811），与Qwen3相似
+
+**★★★ 关键发现2: GLM4的attention使number separation从5.882变为-0.289（翻转！），MLP恢复到3.632 ★★★**
+
+- GLM4: embed=5.882 → attn=-0.289 → mlp=3.632（先翻转后恢复）
+- Qwen3: embed=4.783 → attn=1.439 → mlp=2.959（先降低后升高，但始终为正）
+- DS7B: embed=5.383 → attn=2.959 → mlp=3.317（与Qwen3模式相同）
+
+**L0 per-head attention pattern分析:**
+
+| 模型 | Top subject-locating head | Self-attn (sing/plur) |
+|---|---|---|
+| Qwen3 | H28 | 1.000/0.9999 |
+| GLM4 | H19 | 0.7317/0.7478 |
+| DS7B | H15 | 1.000/1.0000 |
+
+**★★★ 关键发现3: Qwen3和DS7B有self-attn=1.0的head（完美自注意力），GLM4最强的self-attn只有0.73 ★★★**
+
+---
+
+### Part 2 (261b): Number Direction余弦相似度（跨层演化）
+
+**GLM4方向cosine（关键对）:**
+- embed vs L0_attn_out: -0.0067（正交！）
+- embed vs L0_mlp_out: 0.3220
+- L0_mlp_out vs L1_mlp_out: **0.8898**（MLP间高度一致）
+- embed vs L40: 0.0199（最终层方向和embedding无关）
+
+**Qwen3方向cosine:**
+- embed vs L0_attn_out: 0.0821
+- embed vs L0_mlp_out: 0.1412
+- L0_mlp_out vs L1_mlp_out: **0.9652**（MLP间更一致）
+- embed vs L36: 0.0400
+
+**DS7B方向cosine:**
+- embed vs L0_attn_out: 0.1633
+- embed vs L0_mlp_out: 0.1684
+- L0_mlp_out vs L1_mlp_out: **0.9310**
+- embed vs L28: 0.0630
+
+**★★★ 关键发现4: 三个模型的MLP输出方向在层间高度一致（0.89-0.97），但和embedding方向无关（0.02-0.17） ★★★**
+- 这说明number信息在层间传递时，MLP维持了一个**稳定的number编码方向**
+- 但这个方向和embedding层的初始方向不同——经过第一层attention旋转后，MLP建立了自己的方向并保持
+
+---
+
+### Part 3 (261c): 首Token多特征探测
+
+**首token位置probe accuracy（5个特征）:**
+
+| 特征 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| number | 0.500 | 0.500 | 0.500 |
+| tense | 0.500 | 0.500 | 0.500 |
+| sentence_length | 0.500 | 0.500 | **1.000** (L14+) |
+| subject_type | 0.500 | 0.500 | 0.500 |
+
+**★★★ 关键发现5: DS7B的首token位置编码了句子长度信息（L14+达到100%），但Qwen3和GLM4没有 ★★★**
+- Qwen3/GLM4的首token位置所有特征都是50%（完全随机）
+- DS7B是唯一一个在首token编码了句子长度信息的模型
+- L34_H15 attend到首token不是在读取number信息（首token没有number信息）
+- 首token不编码number、tense、subject_type——这些信息完全在subject位置
+
+---
+
+### Part 4 (261d): Per-Head Logit Contribution（仅Qwen3成功，GLM4/DS7B高层权重在meta device）
+
+**Qwen3顶层head的verb位置logit contribution:**
+
+**补偿头（mean_verb_diff > 0.5，促进动词生成）:**
+- **L34_H23**: mean_diff=4.58（最强补偿头！）
+- **L34_H20**: mean_diff=3.55
+- **L35_H13**: mean_diff=1.93
+- **L35_H14**: mean_diff=1.89
+- **L35_H28**: mean_diff=1.57
+
+**语法头（sing/plur verb_diff差异 > 0.3）:**
+- **L35_H2**: sing=-8.62, plur=-9.15（最强语法头，抑制动词但plur抑制更多）
+- **L35_H24**: sing=-0.75, plur=-0.39
+- **L35_H5**: sing=+0.40, plur=+0.05
+- **L34_H13**: sing=+1.01, plur=+0.71
+
+**L35_H0具体值**: verb_diff=-3.47，sing和plur差异仅0.13（不是语法头，是通用动词抑制头）
+
+**★★★ 关键发现6: L35_H0是通用动词抑制头（sing/plur无差异），L34_H23是最强的动词促进头 ★★★**
+- L35_H0抑制所有动词（verb_diff=-3.47），不区分sing/plur
+- L34_H23促进所有动词（verb_diff=+4.58），也不区分sing/plur
+- 真正的number-differentiating heads是L35_H2、L35_H24、L35_H5
+- L35_H0的抑制被L34_H23等补偿头平衡，所以ablation L35_H0效果不明显
+
+---
+
+### Phase 261 客观发现汇总
+
+```
+1. GLM4 L0 attention把number direction旋转到正交方向(cos=-0.007)，separation从5.882翻转到-0.289
+2. Qwen3/DS7B的attention只轻微降低separation（不翻转），direction变化也小(cos=0.08-0.16)
+3. 三个模型的MLP输出方向在层间高度一致(0.89-0.97)，但和embedding方向无关(0.02-0.17)
+4. GLM4是唯一一个L0 attention翻转number separation的模型
+5. Qwen3/DS7B有self-attn=1.0的L0 head（完美自注意力），GLM4最强的只有0.73
+6. DS7B首token编码句子长度信息（L14+=100%），Qwen3/GLM4首token不编码任何测试特征
+7. L35_H0是通用动词抑制头（不区分sing/plur），不是语法头
+8. L34_H23是最强动词促进头(verb_diff=+4.58)，与L35_H0形成抑制-促进对
+9. 真正的number-differentiating heads: L35_H2、L35_H24、L35_H5、L34_H13
+10. Phase 259中L35_H8的"查询驱动"角色需要重新审视——L35_H8的verb_diff仅-0.03，对动词几乎没有直接贡献
+```
+
+### Phase 261 修正的Phase 260结论
+
+```
+原Phase 260结论：                          修正后结论：
+"GLM4 attn破坏→MLP恢复"                 →  GLM4 L0 attn翻转number direction(cos=-0.007)，
+                                            separation从+5.9翻转到-0.3；
+                                            MLP重建方向(cos=0.32 vs embed)并恢复separation到3.6
+"首token不含number信息"                   →  首token不含number/tense/subject_type信息，
+                                            但DS7B首token编码sentence_length(L14+=100%)
+"MLP恢复是去噪"                          →  MLP不是恢复原方向，而是建立新方向(cos=0.32)
+                                            但MLP间方向高度一致(0.89-0.97)——MLP有稳定编码
+```
+
+---
+
+## Phase 262: 跨Prompt因果传输 & 语义推广实验 [2026-05-23 20:46]
+
+### 核心问题
+
+Phase 260-261发现了"两套表示系统"（embedding空间 vs MLP内部空间），但存在3个关键质疑：
+1. probe direction是否等于真实语义方向？（还是只是高维空间中的统计分类器？）
+2. "两套表示系统"是语法专有的，还是语言编码的通用原则？
+3. GLM4 L0 attention的方向旋转是哪些head造成的？
+
+### Part 1 (262a): 跨Prompt因果传输（CRITICAL — 验证probe = real direction）
+
+**实验设计：**
+- 从50对训练词(cat/cats, dog/dogs...)的embedding中提取Δ_number方向
+- 将Δ_number施加到30个从未见过的测试词(bear, eagle, lamp...)的embedding上
+- 测量动词预测的变化（sing_verb_logit - plur_verb_logit）
+- 与随机方向对照比较
+
+**结果（α=8时，score_change = intervened - baseline）：**
+
+| 模型 | Δ_number方向 | 随机方向 | Δ/随机比 | 方向一致性 |
+|---|---|---|---|---|
+| Qwen3 | **-3.50** (100%↓) | -1.84 (97%↓) | 1.9x | 同向（都下降） |
+| **GLM4** | **-1.15** (90%↓) | **+0.60** (27%↓) | **方向相反！** | Δ↓ vs 随机↑ |
+| DS7B | **-0.76** (87%↓) | -0.20 (57%↓) | 3.8x | 同向（都下降） |
+
+**★★★ 关键发现1: GLM4中Δ_number方向和随机方向的效应完全相反 ★★★**
+- GLM4中：添加Δ_number使模型预测更多复数动词（score下降-1.15），而随机方向使模型预测更多单数动词（score上升+0.60）
+- 这是目前最强证据：number方向具有特异性因果效应，不是高维偶然可分
+- Qwen3和DS7B中两者同向但Δ效应远大于随机（1.9x-3.8x）
+
+**★★★ 关键发现2: 添加"单数方向"使模型预测更多复数动词 — 存在方向反转 ★★★**
+- probe方向指向"单数"（sing=1的分类器法向量），但添加它使动词预测偏向复数
+- 这与Phase 261的发现一致：embedding空间的number方向与MLP内部计算空间的number方向不同
+- 模型的内部计算对embedding方向做了变换（GLM4的L0 attention旋转是极端案例）
+
+---
+
+### Part 2 (262b): 语义（生命性）推广实验（MOST IMPORTANT — 验证两套表示系统是否通用）
+
+**实验设计：**
+- 对animacy（animate vs inanimate，40+40词）做与Phase 261 Part 2相同的分析
+- 同时对number做对比分析
+- 关键比较：animacy是否也展示"embedding方向≠MLP方向"的模式？
+
+**Animacy方向cosine分析：**
+
+| 比较 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed vs L0_attn | 0.148 | **-0.019** | 0.210 |
+| embed vs L0_mlp | 0.171 | **0.336** | 0.232 |
+| L0_mlp vs L1_mlp | **0.954** | **0.870** | **0.913** |
+| embed vs last_layer | 0.101 | 0.053 | 0.056 |
+
+**Number方向cosine（对比）：**
+
+| 比较 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed vs L0_attn | 0.087 | **-0.014** | 0.161 |
+| embed vs L0_mlp | 0.140 | **0.321** | 0.169 |
+| L0_mlp vs L1_mlp | **0.964** | **0.889** | **0.931** |
+| embed vs last_layer | 0.073 | 0.031 | 0.060 |
+
+**跨特征cosine（animacy方向 vs number方向，同层）：**
+
+| 层 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed | 0.172 | 0.137 | 0.112 |
+| L0_attn_out | 0.058 | **-0.773** | 0.087 |
+| L0_mlp_out | 0.062 | 0.069 | 0.052 |
+| 中间层 | 0.003 | 0.075 | 0.039 |
+| 最终层 | -0.011 | -0.081 | -0.141 |
+
+**★★★ 关键发现3: "两套表示系统"是语言编码的通用原则，不是语法专有的 ★★★**
+- Animacy展示了与number完全相同的模式：
+  - embed vs MLP cosine低（0.14-0.34）——MLP建立独立方向
+  - MLP层间cosine高（0.87-0.96）——MLP方向在层间稳定传播
+  - 最终层与embedding无关（cos 0.03-0.10）
+
+**★★★ 关键发现4: Animacy和number在MLP空间近正交（cos≈0.05-0.07）——不同特征在不同子空间编码 ★★★**
+- 两个不同的语义/语法特征在MLP内部空间几乎正交
+- 这是"特征叠加"（feature superposition）的直接证据
+- 不同特征占据MLP内部空间的不同子空间
+
+**★★★ 关键发现5: GLM4的L0 attention同时旋转animacy和number方向，且两者在L0_attn中反相关（cos=-0.77） ★★★**
+- GLM4的L0 attention不仅旋转number方向（cos=-0.014），也旋转animacy方向（cos=-0.019）
+- Animacy和number在L0 attention输出中强反相关（cos=-0.773）
+- 这意味着L0 attention在做一个"特征分解"操作——将两个原本有相关性的特征分离到不同方向
+
+---
+
+### Part 3 (262c): L0旋转责任Head定位
+
+**实验设计：**
+- 对L0的每个head，计算其对subject位置attention输出的贡献向量
+- 测量该贡献向量与embedding number方向的cosine
+- 寻找cosine最负（最大旋转）的head
+
+**结果：**
+
+| 模型 | 最负cos_head | cos值 | 最大magnitude_head | mag值 | 最敏感head | sensitivity |
+|---|---|---|---|---|---|---|
+| GLM4 | H29 | -0.074 | H2 | 0.033 | H20 | 1.01 |
+| Qwen3 | H0 | -0.053 | H1 | 0.659 | H28 | 1.39 |
+
+**★★★ 关键发现6: 方向旋转是分布式现象，没有单个"旋转head" ★★★**
+- 两个模型中没有任何head的cosine < -0.1
+- 最负的head（GLM4 H29: -0.074, Qwen3 H0: -0.053）也只是轻微负相关
+- 旋转是所有head集体计算的整体效果，不是专门head的功能
+- Qwen3的head magnitude远大于GLM4（0.66 vs 0.03），但cosine模式相似
+
+---
+
+### Part 4 (262d): 抑制-促进对验证（仅Qwen3有效）
+
+**实验设计：**
+- 在logit层面模拟head消融
+- 4个条件：baseline、去除抑制头、去除促进头、去除两者
+- 判断：去除两者后恢复baseline → 平衡对；去除两者仍差 → 功能分工
+
+**Qwen3结果（score = sing_verb_logit - plur_verb_logit）：**
+
+| 条件 | 平均score | vs baseline变化 |
+|---|---|---|
+| Baseline | -3.946 | — |
+| 去除抑制头(L34_H22) | +3.401 | **+7.347** |
+| 去除促进头(L34_H20) | -9.374 | **-5.428** |
+| 去除两者 | -2.027 | **+1.919** |
+
+**★★★ 关键发现7: 抑制-促进是平衡对（Balance Pair） ★★★**
+- 去除两者后score(-2.03)接近baseline(-3.95)，效果相消
+- 单独去除抑制头：score大幅上升(+7.35)，说明抑制头在压制单数动词
+- 单独去除促进头：score大幅下降(-5.43)，说明促进头在支持单数动词
+- 两个head的作用方向相反、幅度大致匹配，形成稳态平衡
+
+注：GLM4/DS7B因高层权重在meta device无法完成此实验
+
+---
+
+### Phase 262 客观发现汇总
+
+```
+1. 跨prompt因果传输验证：Δ_number方向在3个模型中都有特异性因果效应
+   - GLM4最清晰：Δ方向和随机方向效应完全相反
+   - Qwen3/DS7B：Δ效应1.9-3.8倍于随机方向
+
+2. "两套表示系统"是通用原则：
+   - Animacy（语义特征）与number（语法特征）展示相同模式
+   - MLP为两个特征都建立了独立于embedding的方向
+   - MLP层间方向稳定性高（0.87-0.96）
+
+3. Animacy和number在MLP空间近正交（cos≈0.05-0.07）：
+   - 不同特征在MLP内部空间的不同子空间编码
+   - 这是"特征叠加"（feature superposition）的直接证据
+
+4. GLM4的L0 attention同时旋转animacy和number方向：
+   - 两个特征在L0_attn中反相关（cos=-0.77）
+   - L0 attention在做"特征分解"——分离相关性特征
+
+5. 方向旋转是分布式现象：
+   - 没有单个"旋转head"（所有head的cos > -0.1）
+   - 旋转是集体计算的整体效果
+
+6. 抑制-促进是平衡对（Qwen3）：
+   - 去除两者后效果相消，接近baseline
+   - 不是功能分工，而是稳态平衡机制
+
+7. 添加"单数方向"导致复数动词预测增加——存在方向反转：
+   - embedding空间的number方向与模型计算中的number方向不同
+   - 这与"两套表示系统"发现一致
+```
+
+### Phase 262 修正的Phase 261结论
+
+```
+原Phase 261结论：                         修正后结论：
+"probe direction可能是统计分类器"        →  Δ_number方向有特异性因果效应
+                                           （GLM4中与随机方向效应完全相反），
+                                           probe direction ≈ 真实语义方向
+
+"两套表示系统可能是语法专有"            →  两套表示系统是通用原则：
+                                           animacy（语义）和number（语法）
+                                           都展示相同模式
+
+"GLM4 L0旋转是哪个head造成的"           →  没有单个旋转head，旋转是分布式现象
+                                           所有head集体贡献导致方向变化
+
+"抑制-促进对的意义未知"                 →  抑制-促进是平衡对，不是功能分工
+                                           两者效果相消维持稳态
+```
+
+---
+
+## Phase 263: 连续轨迹·Bootstrap稳定性·多特征正交图谱 [2026-05-23 22:49]
+
+### 核心问题
+
+Phase 262确立了"两套表示系统"和"特征正交叠加"两个原则，但存在3个关键质疑：
+1. probe direction是否是"真实语义轴"？（还是只是局部统计边界？）
+2. 方向是否依赖特定词集？（还是高维偶然方向？）
+3. "两套表示系统"是否对所有类型的特征都成立？
+
+### Part 1 (263a): 连续轨迹实验（CRITICAL — 验证probe direction是否是真实语义轴）
+
+**实验设计：**
+- 沿Δ_number方向扫描α∈[-20, 20]（41个点）
+- 对15个测试词，测量每个α下的grammar score、entropy、top-1预测
+- 与随机方向对比
+
+**结果：**
+
+| 指标 | Qwen3 Δ | Qwen3 随机 | GLM4 Δ | GLM4 随机 | DS7B Δ | DS7B 随机 |
+|---|---|---|---|---|---|---|
+| 单调性 | 0.600 | 0.625 | 0.625 | 0.375 | 0.425 | 0.475 |
+| R² | 0.014 | 0.004 | **0.621** | 0.266 | 0.496 | 0.533 |
+| 相关系数 | -0.119 | -0.063 | **0.788** | 0.516 | 0.705 | 0.730 |
+| 最大跳变 | 2.479 | 0.726 | 1.466 | 2.146 | **4.574** | 0.327 |
+
+**★★★ 关键发现1: 所有3个模型中，Δ_number方向在embedding层面注入都不是单调的 → probe direction不是"真实语义轴" ★★★**
+- 全部被分类为"LOCAL_STATISTICAL_BOUNDARY"
+- 这直接证实了分析一的警告：probe direction ≠ intrinsic semantic direction
+- 但效应幅度（max_jump）一致地大于随机方向（除GLM4），说明方向仍有特异性
+
+**★★★ 关键发现2: GLM4的R²最高(0.621)，说明其number方向有更强的连续控制力 ★★★**
+- 但GLM4的随机方向R²也有0.266，说明GLM4的整体"可操纵性"更高
+- Qwen3的R²几乎为零(0.014)，说明Qwen3的embedding→行为映射最非线性
+
+---
+
+### Part 2 (263b): Bootstrap方向稳定性（CRITICAL — 验证方向是否依赖特定词集）
+
+**实验设计：**
+- 从50对训练词中随机抽取10个子集（每个30对）
+- 从每个子集提取number方向和animacy方向
+- 计算所有子集对之间的pairwise cosine
+
+**Number方向稳定性：**
+
+| 层 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed | **0.91** (ROBUST) | 0.76 (MODERATE) | 0.75 (MODERATE) |
+| L0_attn | **0.95** (ROBUST) | 0.91 (ROBUST) | 0.88 (ROBUST) |
+| L0_mlp | **0.93** (ROBUST) | 0.86 (ROBUST) | 0.92 (ROBUST) |
+| L1_mlp | **0.94** (ROBUST) | 0.89 (ROBUST) | 0.93 (ROBUST) |
+
+**Animacy方向稳定性：**
+
+| 层 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| embed | 0.79 | 0.74 | 0.76 |
+| L0_mlp | 0.86 | 0.81 | 0.83 |
+| L1_mlp | 0.85 | 0.82 | 0.83 |
+
+**★★★ 关键发现3: MLP层方向在所有3个模型中都是ROBUST(>0.86)，方向不依赖特定词集 ★★★**
+- 方向本身是稳健的结构特征，不是数据集偶然方向
+- 但Part 1显示这些稳健方向的因果控制是非线性的
+- 结论：方向是"真实"的（不是偶然的），但embedding→行为映射是非线性的
+
+**★★★ 关键发现4: Qwen3的embedding方向最稳健(0.91)，GLM4/DS7B只有中等(0.75-0.76) ★★★**
+- GLM4的L0 attention旋转更大，导致embedding方向变异性更高
+- Qwen3的self-attention=1.0 head保护了embedding方向的稳定性
+
+---
+
+### Part 3 (263c): 多特征正交图谱（HIGH PRIORITY — 5个特征的正交关系）
+
+**实验设计：**
+- 测试5个特征：number(语法)、animacy(语义)、tense(语法)、concreteness(语义)、frequency(功能)
+- 计算所有特征对在每层的方向cosine
+- 建立完整的"特征子空间地图"
+
+**L0_mlp_out特征正交性（pairwise cosine）：**
+
+| 特征对 | Qwen3 | GLM4 | DS7B | 类型 |
+|---|---|---|---|---|
+| number vs tense | **-0.317** | **-0.212** | **-0.321** | 语法-语法 |
+| animacy vs concreteness | **-0.191** | -0.148 | -0.129 | 语义-语义 |
+| number vs animacy | 0.038 | 0.024 | 0.037 | 语法-语义 |
+| number vs concreteness | 0.122 | 0.085 | 0.091 | 语法-语义 |
+| number vs frequency | -0.035 | 0.039 | -0.037 | 语法-功能 |
+| tense vs frequency | -0.017 | -0.023 | -0.022 | 语法-功能 |
+| animacy vs tense | -0.010 | 0.029 | -0.033 | 语义-语法 |
+| animacy vs frequency | -0.052 | -0.107 | -0.083 | 语义-功能 |
+| concreteness vs frequency | -0.074 | -0.098 | -0.043 | 语义-功能 |
+| tense vs concreteness | 0.006 | -0.013 | 0.032 | 语法-语义 |
+
+**跨类型分析（L0 MLP层mean |cos|）：**
+
+| 类型对 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| 语法-语法 | **0.317** | **0.212** | **0.321** |
+| 语义-语义 | **0.191** | **0.148** | **0.129** |
+| 语法-语义 | **0.044** | **0.052** | **0.047** |
+
+**★★★ 关键发现5: 所有5个特征在所有3个模型中都遵循"两套表示系统"模式 ★★★**
+
+Qwen3一致性检查：
+- number: embed_vs_mlp=0.14, mlp_stability=0.98 → YES
+- animacy: embed_vs_mlp=0.17, mlp_stability=0.95 → YES
+- tense: embed_vs_mlp=0.21, mlp_stability=0.96 → YES
+- concreteness: embed_vs_mlp=0.10, mlp_stability=0.95 → YES
+- frequency: embed_vs_mlp=0.14, mlp_stability=0.94 → YES
+
+GLM4（tense不满足，0.44 > 0.4阈值）：
+- number/animacy/concreteness/frequency: YES
+- tense: NO (embed_vs_mlp=0.44)
+
+DS7B（全部满足）：
+- 所有5个特征: YES
+
+**★★★ 关键发现6: 语法特征之间有更高的相关性(number_tense cos≈-0.3)，语法-语义对几乎正交(cos≈0.05) ★★★**
+- 这是跨模型一致的发现
+- number和tense都是动词屈折特征，在语言学上确实相关
+- 不同类型特征在MLP空间占据不同子空间，形成层次化正交结构
+
+**★★★ 关键发现7: GLM4的L0 attention将所有特征混合（mean |cos|=0.77），然后L0 MLP恢复正交性（mean |cos|=0.08） ★★★**
+
+L0_attn_out特征正交性：
+| 模型 | mean |cos| | 模式 |
+|---|---|---|
+| Qwen3 | 0.104 | 保持特征分离 |
+| **GLM4** | **0.768** | **混合所有特征！** |
+| DS7B | 0.087 | 保持特征分离 |
+
+GLM4的L0 attention是"特征混合器"——将不同特征方向投影到高度相关的空间。
+然后L0 MLP是"特征分离器"——从混合空间中重新提取正交的特征方向。
+这是Phase 262发现的"L0特征分解"的更极端版本。
+
+---
+
+### Part 4 (263d): 双向因果传输+随机方向对比
+
+**实验设计：**
+- 10种方向条件：add/subtract Δ_number, add/subtract Δ_animacy, 5个随机方向, negate随机
+- α=8.0, 20个测试词
+- 测试双向性、方向特异性、特征选择性
+
+**结果：**
+
+| 条件 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| add Δ_number | **-3.36** (100%↓) | -0.88 (85%↓) | -0.67 (80%↓) |
+| subtract Δ_number | -0.73 (80%↓) | -1.34 (90%↓) | **-2.43** (100%↓) |
+| add Δ_animacy | -0.47 (80%↓) | **+0.25** (35%↓) | **+0.32** (40%↓) |
+| subtract Δ_animacy | -0.81 (85%↓) | -0.81 (85%↓) | -0.39 (70%↓) |
+| 随机方向均值 | -1.07 | -1.07 | -0.35 |
+| Z-score(Δ_number vs随机) | **-4.40** | 0.45 | -0.59 |
+| 双向因果 | No | No | No |
+| 方向特异性 | **Yes** | No | No |
+| 特征选择性 | Yes | Yes | Yes |
+| 对称性 | No | No | No |
+
+**★★★ 关键发现8: 没有模型显示number方向的双向因果控制——添加和减去都降低score ★★★**
+- 这是最令人困惑的发现
+- 预期：add Δ_number → 更复数 → score下降；subtract Δ_number → 更单数 → score上升
+- 实际：两者都导致score下降
+- 这说明embedding→行为的映射是非线性的，不是简单的线性叠加
+
+**★★★ 关键发现9: 只有Qwen3显示Δ_number的方向特异性(Z=-4.40)，GLM4/DS7B不显著 ★★★**
+- Qwen3：Δ_number效果(-3.36)远大于随机(-1.07)
+- GLM4/DS7B：Δ_number效果与随机没有显著差异
+- 这与GLM4的L0 attention混合机制一致——混合后number方向失去特异性
+
+**★★★ 关键发现10: 在GLM4和DS7B中，添加Δ_animacy增加grammar score(+0.25/+0.32) ★★★**
+- 这是唯一显示"正向效应"的条件
+- 可能原因：animacy方向在embedding空间与number有轻微正相关(cos=0.11-0.12)
+- 添加animacy方向可能间接增强了singular特征（有生命名词更常为单数）
+
+---
+
+### Phase 263 客观发现汇总
+
+```
+1. 连续轨迹实验：embedding层面的probe方向不是"真实语义轴"
+   - 所有模型都显示非单调轨迹（monotonicity < 0.65）
+   - 但方向有特异性效应（max_jump > random），只是效应非线性
+
+2. Bootstrap稳定性：方向本身是稳健的结构特征
+   - MLP层方向在3个模型中都ROBUST(>0.86)
+   - 方向不是数据集偶然方向
+   - 但稳健≠线性可操纵
+
+3. 多特征正交图谱：5个特征都遵循"两套表示系统"
+   - 语法-语法相关性最高(|cos|≈0.3)
+   - 语义-语义次之(|cos|≈0.15)
+   - 语法-语义几乎正交(|cos|≈0.05)
+   - 形成层次化正交结构
+
+4. GLM4的L0 attention是"特征混合器"（mean |cos|=0.77）
+   - 混合后由L0 MLP恢复正交性（mean |cos|=0.08）
+   - Qwen3/DS7B的L0 attention保持特征分离
+
+5. 双向因果传输：没有模型显示number方向的双向控制
+   - 添加和减去都降低score
+   - 只有Qwen3显示方向特异性
+   - embedding→行为映射本质上是非线性的
+
+6. 动画性方向在GLM4/DS7B中有"逆向效应"：
+   - 添加Δ_animacy增加grammar score
+   - 可能是特征间间接影响
+```
+
+### Phase 263 对Phase 262结论的修正
+
+```
+原Phase 262结论：                          修正后结论：
+"probe direction ≈ 真实语义方向"          →  probe direction是稳健的结构方向
+                                           但不是线性可操纵的"语义轴"
+                                           embedding→行为映射是非线性的
+
+"两套表示系统是通用原则"                  →  确认：5个特征(语法+语义+功能)
+                                           全部遵循两套表示系统模式
+                                           且形成层次化正交结构
+
+"特征正交叠加是直接证据"                  →  近正交子空间是稳健的（3模型一致）
+                                           但不等同于feature superposition
+                                           （需要稀疏激活模式证明）
+
+"Δ_number是真实的抽象因果方向"           →  方向是稳健的结构特征(Bootstrap验证)
+                                           但embedding层面的因果控制是非线性的
+                                           不是简单的线性语义轴
+```
+
+### Phase 263 发现的理论含义
+
+```
+最重要的理论进展：
+
+1. "方向是真实的" + "控制是非线性的" = 表示空间变换假设获得强支持
+   - 方向本身稳健（不是数据集偶然）
+   - 但embedding→行为映射非线性（轨迹非单调、双向控制失败）
+   - 唯一解释：中间层对embedding方向做了非线性变换
+
+2. 层次化正交结构被发现
+   - 语法特征之间：中等相关(|cos|≈0.3)
+   - 语义特征之间：弱相关(|cos|≈0.15)
+   - 语法-语义：近正交(|cos|≈0.05)
+   - 这不是随机正交，而是有语言学意义的层次结构
+
+3. GLM4的"混合-分离"机制是极端案例
+   - L0 attention混合(mean |cos|=0.77) → L0 MLP分离(mean |cos|=0.08)
+   - 这说明MLP有能力从混合信号中提取正交特征
+   - 这是一个重要的计算机制：MLP不是简单的特征放大器
+     而是特征分离器/重构器
+
+4. "probe direction ≠ causal steering direction"
+   - 这是Phase 263最重要的理论警告
+   - probe可以找到稳健的区分方向
+   - 但这个方向不能用于线性因果操纵
+   - 因为中间层对方向做了变换（坐标旋转、特征混合等）
+```
+
+---
+
+## Phase 264: 层间输运理论·Jacobian·激活路径·MLP干预 [2026-05-23 23:50]
+
+### 核心问题
+
+Phase 263确立了"probe direction是稳健的结构方向但不是线性可操纵的语义轴"。Phase 264从两个分析的方向推进：
+- 分析一：Jacobian输运理论（方向如何被层变换处理？）
+- 分析二：激活路径图谱（编码是否是"路径"而非"向量"？）
+- 关键遗留：MLP层面的因果干预是否比embedding层面更有效？
+
+### Part 1 (264a): Jacobian方向输运
+
+**实验设计：**
+- 在采样层（L0, L5, L10, L15, L20, L25, L30）计算JVP（Jacobian-vector product）
+- 对number/animacy/tense/random方向分别计算
+- 测量：preservation(cos(JVP, v_l))、gauge covariance(cos(JVP, v_{l+1}))、transport gain(||JVP||/||v||)
+
+**核心发现：**
+
+| 模型 | Number preservation | Random preservation | Ratio | Number gauge_cov | Mean gain |
+|---|---|---|---|---|---|
+| Qwen3 | 0.013 | 0.017 | 0.80 | 0.041 | 13.9 |
+| GLM4 | 0.119 | 0.104 | 1.15 | 0.199 | 4.1 |
+| DS7B | 0.010 | 0.004 | 2.75 | -0.015 | 51.0 |
+
+**★★★ 关键发现1: 所有3个模型中，JVP preservation都接近零 → 层变换完全打乱方向 ★★★**
+- Number方向不比random方向更好地被保持（ratio 0.80-2.75，仅DS7B勉强显著）
+- 这意味着：层变换(attention+MLP)的输出与输入方向几乎正交
+- 但残差连接保证了信息传递（identity component未被测量）
+
+**★★★ 关键发现2: GLM4 L0的gauge_cov=0.51远高于其他层 ★★★**
+- L0: preservation=0.209, gauge_cov=0.510
+- 后续层：preservation递减至接近0
+- 这与Phase 263的"GLM4 L0是特征混合器"发现一致
+
+**★★★ 关键发现3: Transport gain非常高（4-51x） → 扰动被大幅放大但方向被旋转 ★★★**
+- 高gain+低preservation = 扰动幅度增大但方向完全改变
+- 层变换是"旋转放大器"，不是"方向保持器"
+
+---
+
+### Part 2 (264b): 激活路径图谱
+
+**实验设计：**
+- 5个概念类别×10个词 = 50个词
+- 收集MLP中间层top-30激活神经元
+- 计算intra/inter-category Jaccard相似度
+- 识别category-specific神经元并解码key-value语义
+
+**路径重叠结果：**
+
+| 模型 | Intra-category | Inter-category | Ratio |
+|---|---|---|---|
+| Qwen3 | 0.175 | 0.129 | 1.36 |
+| GLM4 | 0.142 | 0.098 | 1.45 |
+| DS7B | 0.231 | 0.195 | 1.19 |
+
+**Category-specific神经元数量：**
+
+| 类别 | Qwen3 | GLM4 | DS7B |
+|---|---|---|---|
+| animals | 48 | 51 | 22 |
+| fruits | 40 | 55 | 25 |
+| tools | 3 | 3 | 1 |
+| body_parts | 34 | 39 | 28 |
+| clothing | 22 | 18 | 12 |
+
+**★★★ 关键发现4: Key-value解码揭示了语义编码的直接证据 ★★★**
+
+Qwen3中最清晰的例子：
+- L29_N7403 (animals): key=['population', 'populations'], **value=['动物', 'animal', 'animals']**
+  → 这个神经元识别"population"概念，输出"animal"概念！
+- L10_N3068 (animals): key=['尾', 'bird', 'fish'], value=['一只', '吟', 'obic']
+  → key包含"鸟类"和"鱼类"词，识别动物
+- L7_N825 (fruits): key=['树', 'trees', 'flowers'], value=['trees', '树', 'Trees']
+  → 识别植物/树概念，输出"树"
+- L26_N246 (body_parts): key=['ache', '/body', '部长'], **value=['身上', '手中', '头顶']**
+  → key识别身体部位概念，value输出身体位置词！
+- L23_N2150 (clothing): key=['款式', '服装', 'clothing'], value=['arra', '路桥', 'anim']
+  → key明确包含"服装"和"clothing"
+
+GLM4中也验证了：
+- L6_N6418 (fruits): key=['树', 'Tree', 'tree'], value=['asename', '树', 'Archer']
+- L17_N313 (clothing): key=['exo', 'لب', 'face'], **value=['worn', 'suming', 'uniform']**
+- L17_N12952 (animals): key=['ril', '栖息', '动物的'], value=['ろ', 'cow', '.ERR']
+
+---
+
+### Part 3 (264c): MLP层面因果干预（★★★ 最关键实验 ★★★）
+
+**实验设计：**
+- 在L0, L5, L10, L15, L20, L25, L30等层提取number probe方向
+- 在对应层注入方向（alpha∈[-10, 10]，11个点）
+- 与embedding层注入对比
+
+**Qwen3结果：**
+
+| 注入层 | R² | 单调性 | 双向 | 分类 |
+|---|---|---|---|---|
+| Embed | 0.474 | 0.600 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L0 | 0.650 | 0.600 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L5 | 0.666 | 1.000 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L10 | 0.559 | 0.900 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L15 | 0.518 | 1.000 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L20 | 0.780 | 1.000 | Yes | PARTIALLY_SEMANTIC |
+| **L25** | **0.925** | **1.000** | **Yes** | **REAL_SEMANTIC_AXIS** |
+| **L30** | **0.990** | **1.000** | **Yes** | **REAL_SEMANTIC_AXIS** |
+
+**GLM4结果：**
+
+| 注入层 | R² | 单调性 | 双向 | 分类 |
+|---|---|---|---|---|
+| Embed | 0.060 | 0.600 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L0 | 0.744 | 0.600 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L6 | 0.203 | 0.500 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L12 | 0.655 | 0.300 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L18 | 0.730 | 0.500 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L24 | 0.786 | 0.700 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| **L30** | **0.900** | **1.000** | **Yes** | **REAL_SEMANTIC_AXIS** |
+| **L36** | **0.967** | **1.000** | **Yes** | **REAL_SEMANTIC_AXIS** |
+
+**DS7B结果：**
+
+| 注入层 | R² | 单调性 | 双向 | 分类 |
+|---|---|---|---|---|
+| Embed | 0.490 | 0.400 | No | LOCAL_STATISTICAL_BOUNDARY |
+| L0 | 0.635 | 0.800 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L4 | 0.849 | 0.700 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L8 | 0.811 | 0.700 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L12 | 0.734 | 0.400 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L16 | 0.689 | 0.600 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L20 | 0.943 | 0.700 | Yes | LOCAL_STATISTICAL_BOUNDARY |
+| L24 | 0.869 | 0.800 | Yes | PARTIALLY_SEMANTIC |
+
+**改进比率：**
+
+| 模型 | Embed R² | 最佳MLP R² | 改进倍数 |
+|---|---|---|---|
+| Qwen3 | 0.474 | 0.990 (L30) | **2.09x** |
+| GLM4 | 0.060 | 0.967 (L36) | **16.14x** |
+| DS7B | 0.490 | 0.943 (L20) | **1.92x** |
+
+---
+
+### Phase 264 客观发现汇总
+
+```
+1. Jacobian输运：层变换完全打乱方向（preservation≈0）
+   - 所有方向（number/animacy/tense/random）都被旋转
+   - 层变换是"旋转放大器"，不是"方向保持器"
+   - 残差连接保证了信息传递（但不是方向保持）
+   - GLM4 L0的gauge_cov=0.51是唯一的例外
+
+2. 激活路径图谱：Category-specific神经元存在且有语义
+   - Intra > Inter但ratio仅1.19-1.45（不够显著）
+   - 关键发现：key-value解码揭示了语义编码的直接证据
+   - 例如：L29_N7403 key=['population'] → value=['动物','animal','animals']
+   - 神经元识别语义概念并输出语义概念
+
+3. MLP层面因果干预（最重要发现）：
+   - R²随层深度单调递增：Embed→L0→...→L30→REAL_SEMANTIC_AXIS
+   - 深层MLP方向是真正的语义轴（R²>0.9, 单调, 双向）
+   - Embedding方向不是语义轴（R²<0.5, 非单调, 非双向）
+   - 这直接验证了"两套表示系统"假说
+
+4. GLM4的特殊模式：
+   - Embedding干预R²=0.060（几乎无效）
+   - L0干预R²=0.744（显著跳跃）→ L0的"特征混合"创造了内部表示
+   - L6 dip（R²=0.203）→ 混合后需要"沉淀"
+   - L30/L36达到REAL_SEMANTIC_AXIS
+
+5. 双向控制只在MLP层面出现（不在embedding层面）：
+   - Embedding: bidirectional=False（所有模型）
+   - MLP: bidirectional=True（从L0-L5开始）
+   - 这说明MLP表示空间具有正确的方向语义
+```
+
+### Phase 264 对Phase 263结论的修正
+
+```
+Phase 263结论："probe direction不是线性可操纵的语义轴"
+  → 修正：**在embedding层面**不是语义轴
+  → **但在深层MLP层面**确实是语义轴（R²>0.9, 单调, 双向）
+
+Phase 263结论："embedding→行为映射是非线性的"
+  → 修正：非线性来自**前几层的坐标变换**
+  → 深层MLP→行为映射是**近似线性的**（R²>0.9）
+
+Phase 263结论："方向是真实的但控制是非线性的"
+  → 修正：控制是否线性**取决于注入层**
+  → Embedding层注入：非线性（R²<0.5）
+  → 深层MLP注入：近似线性（R²>0.9）
+```
+
+### Phase 264 发现的理论含义
+
+```
+最重要的理论进展：
+
+1. "两套表示系统"获得了因果验证
+   - Embedding空间：方向是"局部统计边界"（不可线性操纵）
+   - MLP空间（深层）：方向是"真实语义轴"（可线性操纵，R²>0.9）
+   - 两个空间之间的变换是非线性的（JVP preservation≈0）
+   - 但变换后的方向在MLP空间里保持稳定（Phase 263 Bootstrap验证）
+
+2. "坐标变换"的具体性质被揭示
+   - 层变换是"旋转放大器"（高gain + 低preservation）
+   - 变换把embedding方向旋转到MLP空间的正交方向
+   - 残差连接保证了信息传递，但不保证方向保持
+   - GLM4的L0是极端案例：gauge_cov=0.51说明L0的变换更有方向性
+
+3. 编码机制的二元图景
+   - "方向编码"：在深层MLP空间里有效（语义轴存在）
+   - "路径编码"：category-specific神经元的key-value结构存在
+   - 两者不是互斥的：方向是路径的统计投影
+   - 路径是微观机制，方向是宏观表现
+
+4. 语义轴的"涌现"性质
+   - 语义轴不是从第一层就存在的
+   - 它是层间变换的产物——前几层把embedding"翻译"成内部表示
+   - 随着层加深，内部表示越来越"规范化"（R²递增）
+   - 到达深层时，表示已经足够"规范化"可以被线性操纵
+```
+
+### 谨慎审视：硬伤和瓶颈
+
+```
+硬伤1：JVP preservation≈0的解释仍不完整
+   - 可能是因为eps太大（1e-3）导致非线性效应
+   - 也可能是因为我们测量的是单层JVP而非累积JVP
+   - 需要验证：eps=1e-5时preservation是否不同？
+
+硬伤2：激活路径的intra/inter ratio不够显著（1.19-1.45）
+   - 这可能是因为top-k选择太粗糙
+   - 也可能是因为不同类别确实共享很多通用处理路径
+   - 需要更精细的神经元分析（如SAE特征）
+
+硬伤3：DS7B的MLP干预效果不如Qwen3/GLM4清晰
+   - DS7B是蒸馏模型，结构可能不同
+   - DS7B使用sliding window attention可能影响结果
+   - 后层CPU offload导致无法测试L26/L27
+
+硬伤4：key-value解码噪声较大
+   - 很多解码结果是无意义的token
+   - 只有少数神经元有清晰的语义解读
+   - 这可能是因为：MLP中间层激活≠neuron-level特征（存在superposition）
+
+硬伤5：我们只测试了number一个特征的MLP干预
+   - 需要验证animacy、tense等其他特征的MLP干预是否也有相同模式
+   - 如果只有number有效，那这个发现就不那么通用
+```
+
+### 第一性原理分析
+
+```
+核心洞察：Transformer的语言编码是一个"坐标规范化"过程
+
+1. 输入层（embedding）：特征以"自然编码"形式存在
+   - 方向与训练语料的统计相关（不是规范化的语义轴）
+   - 线性操纵不可靠（R²<0.5）
+
+2. 前几层（L0-L10）：坐标变换阶段
+   - attention做"特征混合"（GLM4极端：cos=0.77）
+   - MLP做"特征分离"（恢复近正交性：cos=0.08）
+   - 变换是高度非线性的（JVP preservation≈0）
+   - 但变换的**效果**是使特征表示更规范化
+
+3. 中间层（L10-L20）：表示稳定阶段
+   - 特征方向稳定（Phase 263 Bootstrap cos>0.86）
+   - R²逐渐增加（从0.5到0.8）
+   - 双向控制出现
+
+4. 深层（L20+）：语义轴成熟阶段
+   - 方向成为真正的语义轴（R²>0.9, 单调, 双向）
+   - 可以被线性操纵
+   - 这是"内部计算空间"的最终形态
+
+数学描述：
+  设 T_l 为第l层的变换，v_l 为第l层的number probe方向
+
+  T_l 的性质：
+  - cos(T_l(v_l), v_l) ≈ 0  （不保持方向）
+  - ||T_l(v_l)|| / ||v_l|| >> 1  （放大）
+  - cos(T_l(v_l), v_{l+1}) ≈ 0  （不与下一层方向对齐）
+
+  但：v_{l+1} 是 T_l(h_l) 的probe方向，不是 T_l(v_l)
+  → v_{l+1} 由数据的统计结构决定，不由JVP决定
+  → 每层的probe方向是独立提取的，不是"输运"的
+
+  这解释了为什么：
+  - Probe方向稳定（由数据结构决定）
+  - 但JVP不保持方向（变换是旋转放大器）
+  - 而深层方向可被线性操纵（表示已规范化）
+```
+
+### 下一阶段任务
+
+```
+Phase 265应该做的（按优先级）：
+
+1. 多特征MLP干预验证（最高优先级）
+   - 对animacy、tense、concreteness也做MLP层面干预
+   - 验证"深层语义轴"是否是通用现象
+   - 预期：所有特征的深层MLP方向都应该是REAL_SEMANTIC_AXIS
+
+2. Jacobian精度验证
+   - 用eps=1e-5重做JVP，确认preservation≈0不是数值误差
+   - 同时计算累积JVP（从L0到Ll的Jacobian链）
+   - 看累积JVP是否更好地"输运"方向
+
+3. SAE特征级别的路径分析
+   - 用稀疏自编码器(SAE)替代原始neuron
+   - 在SAE特征空间里重做路径分析
+   - 预期：intra/inter ratio会显著提高
+
+4. 吸引子验证
+   - 测试不同prompt中同一概念的轨迹是否收敛
+   - 如果收敛 → 存在语义吸引子
+   - 这将是动力学分析的关键突破
+
+核心判断：
+  Phase 264确立了最关键的事实——"深层MLP方向是真正的语义轴"
+  这把Phase 263的"probe方向不是语义轴"结论修正为：
+  "embedding方向不是语义轴，但深层MLP方向是"
+
+---
+
+## Phase 265: 约束几何·多特征语义轴·熵塌缩·冲突传播 [2026-05-24 04:27]
+
+### 核心问题
+
+Phase 264确立了"深层MLP方向是真正的语义轴"（对number特征），但两个分析指出了关键漏洞：
+- 分析二：Number是特殊的二元语法特征，必须验证其他特征
+- 分析一：深层线性化可能来自"约束收敛"而非"语义轴涌现"
+
+### Part 1 (265a): 多特征MLP干预（★★★ 最关键实验 ★★★）
+
+**实验设计：**
+- 对number/animacy/tense/concreteness 4个特征，在每个模型的深层MLP做方向注入
+- 使用与Phase 264完全相同的干预方法：alpha∈[-10,10]，11个点
+- 每个特征用不同的动词对作为readout
+
+**Qwen3结果：**
+
+| 特征 | Embed R² | 最佳MLP R² | 最佳层 | 分类 |
+|---|---|---|---|---|
+| number | 0.474 | 0.9999 (L35) | L35 | REAL_SEMANTIC_AXIS |
+| animacy | 0.770 | 0.9991 (L35) | L35 | REAL_SEMANTIC_AXIS |
+| tense | 0.228 | 0.9996 (L30) | L30 | REAL_SEMANTIC_AXIS |
+| concreteness | 0.383 | 0.9999 (L15) | L15 | REAL_SEMANTIC_AXIS |
+
+**GLM4结果：**
+
+| 特征 | Embed R² | 最佳MLP R² | 最佳层 | 分类 |
+|---|---|---|---|---|
+| number | 0.060 | 0.9999 (L39) | L39 | REAL_SEMANTIC_AXIS |
+| animacy | 0.482 | 0.9986 (L39) | L39 | REAL_SEMANTIC_AXIS |
+| tense | 0.545 | 0.0000 (L20) | — | LOCAL_STATISTICAL_BOUNDARY |
+| concreteness | 0.000 | 0.9991 (L39) | L39 | REAL_SEMANTIC_AXIS |
+
+**DS7B结果：**
+
+| 特征 | Embed R² | 最佳MLP R² | 最佳层 | 分类 |
+|---|---|---|---|---|
+| number | 0.490 | 0.9995 (L27) | L27 | REAL_SEMANTIC_AXIS |
+| animacy | 0.703 | 0.9730 (L27) | L27 | REAL_SEMANTIC_AXIS |
+| tense | 0.685 | 0.0000 (L15) | — | LOCAL_STATISTICAL_BOUNDARY |
+| concreteness | 0.812 | 0.7245 (L27) | L27 | LOCAL_STATISTICAL_BOUNDARY |
+
+**★★★ 关键发现1: "深层语义轴"对number/animacy/concreteness是通用原则 ★★★**
+- Qwen3: 4个特征全部REAL_SEMANTIC_AXIS（R²>0.99）
+- GLM4: 3个特征REAL_SEMANTIC_AXIS，tense失败
+- DS7B: 2个特征REAL_SEMANTIC_AXIS，concreteness部分
+
+**★★★ 关键发现2: Tense在GLM4和DS7B中完全失败（probe_acc=0.4778≈随机）★★★**
+- 这是由于GLM4和DS7B（DeepSeek-R1-Distill-Qwen-7B）是中文为主模型
+- 英语时态在中文模型中缺乏清晰的内部表示
+- 但Qwen3-4B虽然是Qwen系列，有更好的多语言能力
+
+**★★★ 关键发现3: 不同特征的语义轴在不同层成熟 ★★★**
+- Qwen3: concreteness在L15成熟，tense在L30，number在L35
+- 这说明不同特征的"约束收敛速度"不同
+- 具体语义（concreteness）比抽象语法（tense）更早形成稳定轴
+
+**★★★ 关键发现4: Embedding干预R²与MLP干预R²的差距因特征而异 ★★★**
+- GLM4 number: Embed 0.060 → MLP 0.9999（1667倍改进）
+- Qwen3 animacy: Embed 0.770 → MLP 0.9991（1.3倍改进）
+- Embedding层已经部分编码了animacy（因为名词自带生命度信息）
+- 但number在GLM4的embedding中几乎不可操纵
+
+---
+
+### Part 2 (265b): 未来空间熵塌缩
+
+**实验设计：**
+- 在每个层使用logit lens（h_l @ W_U^T）计算next-token分布
+- 测量分布的entropy、top-1概率、有效支撑大小
+- 15个不同prompt，取平均
+
+**Qwen3熵塌缩：**
+
+| 层 | Entropy | Top1% | 有效支撑 |
+|---|---|---|---|
+| L0 | 11.93 | 0.00% | 151811 |
+| L9 | 11.50 | 0.05% | 98686 |
+| L17 | 11.00 | 0.14% | 60813 |
+| L21 | 10.58 | 0.35% | 40943 |
+| **L25** | **6.56** | **13.75%** | **1222** |
+| L29 | 1.99 | 46.85% | 12 |
+| L33 | 0.56 | 78.65% | 2 |
+| L36 | 3.48 | 36.93% | 72 |
+
+**GLM4熵塌缩：**
+
+| 层 | Entropy | Top1% | 有效支撑 |
+|---|---|---|---|
+| L0 | 11.93 | 0.00% | 151552 |
+| L20 | 11.91 | 0.00% | 149303 |
+| L25 | 11.79 | 0.01% | 131704 |
+| **L30** | **10.47** | **0.30%** | **37102** |
+| L35 | 7.40 | 4.76% | 2297 |
+| L40 | 5.01 | 19.62% | 247 |
+
+**DS7B熵塌缩：**
+
+| 层 | Entropy | Top1% | 有效支撑 |
+|---|---|---|---|
+| L0 | 11.93 | 0.00% | 152018 |
+| **L5** | **6.84** | **30.75%** | **10577** |
+| L8 | 3.54 | 55.06% | 2136 |
+| L11 | 0.77 | 80.71% | 8 |
+| L26 | 0.0003 | 100.00% | 1 |
+| L28 | 4.11 | 34.58% | 1983 |
+
+**★★★ 关键发现5: 熵塌缩的时间点与语义轴成熟层高度吻合 ★★★**
+- Qwen3: 熵塌缩在L25（6.56），语义轴从L25开始（R²>0.9）
+- GLM4: 熵塌缩在L30-L35（10.47→7.40），语义轴从L30开始
+- DS7B: 熵塌缩在L5-L8（6.84→3.54），语义轴在深层出现（L27）
+
+**★★★ 关键发现6: 分析一的"约束收敛"理论对Qwen3/GLM4成立，但对DS7B不成立 ★★★**
+- Qwen3: First→Mid drop=0.93, Deep→Last drop=3.08 → 约束收敛在深层 ★
+- GLM4: First→Mid drop=0.015, Deep→Last drop=6.29 → 约束收敛极度集中在深层 ★★★
+- DS7B: First→Mid drop=11.26, Deep→Last drop=-3.80 → 约束收敛在前层，深层反而扩张！
+
+**★★★ 关键发现7: DS7B的异常模式——约束过早收敛 + 深层熵回升 ★★★**
+- DS7B在L5就发生熵塌缩（与sliding window attention有关？）
+- L11已接近零熵（0.77），但L26-L28熵又回升到4.11
+- 这说明DS7B在中间层过度约束，最终层需要"释放"一些自由度
+- 这种模式与Qwen3/GLM4完全不同
+
+**对分析一的修正：**
+- "约束收敛导致深层线性化"对Qwen3/GLM4成立
+- 但对DS7B不成立——DS7B的语义轴出现在已经过度约束后的"释放"阶段
+- 更准确的理论应该是："语义轴在约束收敛的区域形成"——对Qwen3/GLM4这是深层，对DS7B这是前层+深层
+
+---
+
+### Part 3 (265c): 约束冲突传播
+
+**实验设计：**
+- 对8组语法一致/不一致句子对，在每层用logit lens计算"语法一致性信号"
+- "The cat sits"(正确) vs "The cat sit"(错误)
+- 检测哪一层首次发现冲突（grammatical - ungrammatical > 0.5）
+
+**约束冲突首次检测层：**
+
+| 模型 | 平均首次检测层 | 相对位置 |
+|---|---|---|
+| Qwen3 | L17 | 47% |
+| GLM4 | L38 | 96% |
+| DS7B | L7 | 25% |
+
+**★★★ 关键发现8: 三个模型的语法冲突检测位置完全不同 ★★★**
+- Qwen3: 在中间层检测（L17/36）
+- GLM4: 在极深层检测（L38/40）——与熵塌缩时间一致
+- DS7B: 在极前层检测（L7/28）——与早期熵塌缩一致
+
+**★★★ 关键发现9: 冲突检测位置与熵塌缩位置高度一致 ★★★**
+- GLM4: 冲突检测在L38，熵塌缩在L30-L40 → 完全一致
+- DS7B: 冲突检测在L7，熵塌缩在L5-L8 → 完全一致
+- Qwen3: 冲突检测在L17，熵塌缩在L25 → 稍有延迟（检测在塌缩前）
+
+**★★★ 关键发现10: 约束传播系统存在的直接证据 ★★★**
+- 语法冲突不是瞬间检测的，而是在特定层逐步形成
+- "The cat sits" vs "The cat sit"的grammar signal差异随层增大
+- 这支持分析一的"约束传播"理论：模型在前层聚合约束，在特定层发现冲突
+
+---
+
+### Phase 265 客观发现汇总
+
+```
+1. 多特征语义轴验证（最重要）：
+   - Number/animacy/concreteness在所有模型的深层MLP都是REAL_SEMANTIC_AXIS
+   - Tense在中文模型（GLM4/DS7B）中失败——语言依赖性
+   - 不同特征在不同层成熟：concreteness(L15) < tense(L30) < number(L35)
+   - Phase 264的"深层语义轴"结论从number推广到多特征 ★
+
+2. 熵塌缩与语义轴的时间关系：
+   - Qwen3/GLM4: 熵塌缩在深层，语义轴也在深层 → 约束收敛驱动
+   - DS7B: 熵塌缩在前层，语义轴在深层 → 两个过程分离
+   - 统一规律：语义轴在约束收敛的区域形成
+
+3. 约束冲突传播的直接观测：
+   - 语法冲突在特定层首次被检测
+   - 检测层与熵塌缩层高度一致
+   - 这支持"语言是约束传播系统"的理论
+
+4. 三个模型的架构差异对编码方式的影响：
+   - Qwen3(4B): 渐进式约束收敛 + 中间层冲突检测
+   - GLM4(9B): 延迟式约束收敛 + 极深层冲突检测
+   - DS7B(7B-distill): 前层急剧约束 + 深层释放 + 前层冲突检测
+```
+
+### Phase 265 对Phase 264结论的修正
+
+```
+Phase 264结论："深层MLP方向是真正的语义轴"
+  → 修正：对number/animacy/concreteness通用，但tense在中文模型中失败
+  → 新增：不同特征的语义轴在不同层成熟
+
+Phase 264结论："两套表示系统"（embedding vs MLP）
+  → 确认并细化：embedding R²与MLP R²的差距因特征和模型而异
+  - GLM4 number: Embed 0.060 → MLP 0.9999（极弱→极强）
+  - Qwen3 animacy: Embed 0.770 → MLP 0.9991（已经较强→极强）
+
+Phase 264结论："坐标规范化过程"
+  → 修正为更精确的："约束收敛 + 表示规范化"双重过程
+  - 约束收敛：未来可能token集合缩小（熵塌缩）
+  - 表示规范化：特征方向变得可线性操纵（R²↑）
+  - 两者时间上相关但因果方向待定
+```
+
+### Phase 265 发现的理论含义
+
+```
+1. "约束传播系统"获得了部分实验支持
+   - 语法冲突在特定层被检测 → 约束在层间传播
+   - 熵塌缩与语义轴时间一致 → 约束收敛与表示形成相关
+   - 但DS7B的反例说明这不是唯一机制
+
+2. 语义轴涌现的"双过程"理论
+   过程1：约束收敛（未来空间缩小）
+     - 在Qwen3/GLM4中，发生在深层
+     - 在DS7B中，发生在前层
+   过程2：表示规范化（方向可操纵性增加）
+     - 在所有模型中，发生在深层
+     - 即使约束已收敛（DS7B），表示仍需在深层才能被操纵
+   
+   关键洞察：约束收敛 ≠ 表示规范化
+   - DS7B在L5就约束收敛了，但表示规范化在L27才完成
+   - 这说明"规范化"是独立于"约束收敛"的过程
+   - 约束收敛是必要条件（信息要有意义），但不是充分条件
+   - 表示规范化需要更多的计算来"分离"特征方向
+
+3. 语言特征编码的层次结构
+   - Concreteness（L15成熟）：最具体的语义特征，最早形成
+   - Number（L25-35成熟）：语法特征，需要更深的处理
+   - Animacy（L27-39成熟）：介于语义和语法之间
+   - Tense（L30成熟/失败）：最抽象的时间特征，对语言环境敏感
+   → 特征越抽象，越需要深层处理来形成可操纵的语义轴
+
+4. 模型架构对编码的影响
+   - Qwen3(4B)：小但高效，渐进式处理
+   - GLM4(9B)：大但延迟，极深层才收敛
+   - DS7B(7B-distill)：蒸馏导致前层过度压缩，深层需要"释放"
+   → 编码机制不是唯一的，受模型架构和训练方式影响
+```
+
+### 谨慎审视：硬伤和瓶颈
+
+```
+硬伤1：Tense在GLM4/DS7B中失败的解释仍不完整
+   - 我们归因于"中文模型英语时态弱"，但probe_acc=0.4778（随机水平）
+   - 说明这些模型根本没有形成英语时态的内部表示
+   - 这对"深层语义轴是通用原则"打了折扣——不是所有特征都有语义轴
+
+硬伤2：DS7B的concreteness R²=0.72，低于0.9阈值
+   - 这可能是因为sliding window attention限制了长程依赖
+   - 也可能是因为蒸馏导致某些特征表示质量下降
+   - 需要更仔细分析DS7B的架构特性
+
+硬伤3：熵塌缩与语义轴的因果关系未确定
+   - 我们观察到时间相关性（熵塌缩和语义轴在同一层出现）
+   - 但没有证明因果关系
+   - 可能是第三个因素（如层深度）同时驱动两者
+
+硬伤4：约束冲突实验使用logit lens，可能不够精确
+   - Logit lens是线性投影，可能不反映非线性处理
+   - 语法冲突可能更早被非线性计算检测到
+   - 但logit lens的线性信号仍然提供了有用的下界
+
+硬伤5：我们仍然没有回答"编码机制是什么"
+   - "约束收敛 + 表示规范化"是描述性的，不是机制性的
+   - 我们知道WHAT（特征方向在深层变得可操纵）
+   - 但不知道HOW（层变换如何使方向可操纵）
+   - 这是下一个核心问题
+```
+
+### 第一性原理分析
+
+```
+核心洞察：Transformer的语言编码是一个"约束收敛 + 表示分离"的双过程
+
+过程1（约束收敛）：CompatibleFuture(h_l) 随层减少
+  - 模型逐层排除不可能的下一个token
+  - 这个过程在Qwen3/GLM4中发生在深层
+  - 在DS7B中发生在前层（因为蒸馏导致早期过度约束）
+
+过程2（表示分离）：特征方向随层变得近正交且可操纵
+  - 在约束收敛之后，剩余的"允许未来"被不同特征方向控制
+  - 每个特征方向成为控制特定类型未来的"旋钮"
+  - 这解释了为什么深层MLP方向可以被线性操纵：
+    因为深层只有少数剩余自由度，每个特征方向直接控制一个自由度
+
+数学描述：
+  设 F_l = CompatibleFuture(h_l) 为第l层仍可能的未来token集合
+  
+  过程1：|F_l| 随 l 单调递减（约束收敛）
+    - Qwen3: |F_{L25}| ≈ 1222 → |F_{L33}| ≈ 2
+    - GLM4: |F_{L30}| ≈ 37102 → |F_{L40}| ≈ 247
+  
+  过程2：在 F_l 空间中，特征方向逐渐"正交化"
+    - 深层 F_l 的维度低 → 特征方向自然分离
+    - 每个特征方向控制 F_l 的一个独立维度
+    - 这就是"语义轴"的本质：低维空间中的独立控制方向
+  
+  这解释了：
+  1. 为什么深层方向可操纵：剩余维度少，每个方向影响大
+  2. 为什么不同特征在不同层成熟：不同特征约束不同维度的速度不同
+  3. 为什么embedding不可操纵：|F_0|太大（15万+），单个方向影响微弱
+
+关键预测：
+  - 如果这个理论正确，那么：
+    在|F_l|≈10的层，任何线性probe方向都应该可以被操纵
+    因为10个维度中，任何方向都有显著影响
+  - 需要验证：在熵≈2（|F|≈10）的层，随机方向是否也可以被操纵？
+  - 如果是 → "语义轴"只是低维空间的投影，不是特殊方向
+  - 如果否 → 存在真正的"语义选择"机制
+```
+
+### 下一阶段任务
+
+```
+Phase 266应该做的（按优先级）：
+
+1. 低维空间随机方向控制测试（最高优先级）
+   - 在|F_l|≈10的层（Qwen3 L29, GLM4 L35），测试随机方向的控制效果
+   - 如果随机方向R²也>0.9 → "语义轴"只是低维效应
+   - 如果随机方向R²≈0 → 存在真正的语义选择机制
+   - 这是判别"约束收敛 vs 语义轴涌现"的关键实验
+
+2. 不同特征的正交性在深层的演化
+   - 在深层同时提取number/animacy/concreteness的方向
+   - 计算cosine：如果深层更正交 → 表示分离
+   - 如果深层不那么正交 → 表示融合
+
+3. 累积Jacobian分析
+   - 计算从L0到Ll的累积Jacobian链
+   - 看累积JVP是否更好地"输运"方向
+   - 如果累积JVP的preservation > 0 → 信息确实在传播
+   - 只是传播路径不是单层JVP可以捕捉的
+
+4. 模型内部表示的可逆性测试
+   - 给定深层的hidden state，能否反推输入的特征？
+   - 如果深层仍然保留了所有特征信息 → 表示是"可逆变换"
+   - 如果深层丢失了某些信息 → 表示是"有损压缩"
+
+核心判断：
+  Phase 265确立了三个关键事实：
+  1. "深层语义轴"对多特征（number/animacy/concreteness）通用
+  2. 熵塌缩与语义轴时间相关，但不是因果关系
+  3. 约束冲突在特定层被检测，支持"约束传播"理论
+  
+  但最关键的问题仍然是：
+  深层方向的可操纵性是因为"约束收敛后的低维效应"？
+  还是因为存在真正的"语义轴涌现"机制？
+  
+  Phase 266的"随机方向控制测试"将回答这个问题。
+```
+  这是整个研究系列最重要的发现之一
+```

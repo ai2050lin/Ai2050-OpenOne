@@ -1,0 +1,1565 @@
+{
+  "model": "deepseek7b",
+  "n_layers": 28,
+  "n_heads": 28,
+  "head_dim": 128,
+  "intermediate_probing": {
+    "embed": {
+      "accuracy": 0.9417,
+      "std": 0.0773,
+      "n_sing": 60,
+      "n_plur": 60
+    },
+    "L0_attn_out": {
+      "accuracy": 0.95,
+      "std": 0.0612,
+      "n_sing": 60,
+      "n_plur": 60
+    },
+    "L0_mlp_out": {
+      "accuracy": 0.9667,
+      "std": 0.0312,
+      "n_sing": 60,
+      "n_plur": 60
+    },
+    "L1_attn_out": {
+      "accuracy": 0.9333,
+      "std": 0.0425,
+      "n_sing": 60,
+      "n_plur": 60
+    },
+    "L1_mlp_out": {
+      "accuracy": 0.9417,
+      "std": 0.0773,
+      "n_sing": 60,
+      "n_plur": 60
+    }
+  },
+  "incremental_changes": {
+    "embed_to_L0_attn": 0.0083,
+    "L0_attn_to_L0_mlp": 0.0167,
+    "L0_mlp_to_L1_attn": -0.0334,
+    "L1_attn_to_L1_mlp": 0.0084,
+    "total_L0_change": 0.025,
+    "total_L1_change": -0.025
+  },
+  "attn_analysis": {
+    "L0": {
+      "H0": {
+        "avg_subj_attn_from_verb": 0.2072,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.7109
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1582
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1235
+            }
+          ],
+          "attn_to_subj": 0.1582,
+          "attn_to_verb_itself": 0.7109
+        }
+      },
+      "H1": {
+        "avg_subj_attn_from_verb": 0.0802,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8359
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0688
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.0688
+            }
+          ],
+          "attn_to_subj": 0.0688,
+          "attn_to_verb_itself": 0.0253
+        }
+      },
+      "H2": {
+        "avg_subj_attn_from_verb": 0.1217,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.8398
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1138
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0417
+            }
+          ],
+          "attn_to_subj": 0.0417,
+          "attn_to_verb_itself": 0.8398
+        }
+      },
+      "H3": {
+        "avg_subj_attn_from_verb": 0.0001,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 1.0
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0
+            }
+          ],
+          "attn_to_subj": 0.0,
+          "attn_to_verb_itself": 1.0
+        }
+      },
+      "H4": {
+        "avg_subj_attn_from_verb": 0.2292,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.7773
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1738
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0388
+            }
+          ],
+          "attn_to_subj": 0.1738,
+          "attn_to_verb_itself": 0.0388
+        }
+      },
+      "H5": {
+        "avg_subj_attn_from_verb": 0.0752,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8242
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0869
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.0679
+            }
+          ],
+          "attn_to_subj": 0.0869,
+          "attn_to_verb_itself": 0.0194
+        }
+      },
+      "H6": {
+        "avg_subj_attn_from_verb": 0.8249,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.7812
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1357
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0825
+            }
+          ],
+          "attn_to_subj": 0.7812,
+          "attn_to_verb_itself": 0.1357
+        }
+      },
+      "H7": {
+        "avg_subj_attn_from_verb": 0.4958,
+        "avg_top1_is_subj": 0.6667,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5078
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2734
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2119
+            }
+          ],
+          "attn_to_subj": 0.2734,
+          "attn_to_verb_itself": 0.2119
+        }
+      },
+      "H8": {
+        "avg_subj_attn_from_verb": 0.1461,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.8516
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0791
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0698
+            }
+          ],
+          "attn_to_subj": 0.0791,
+          "attn_to_verb_itself": 0.8516
+        }
+      },
+      "H9": {
+        "avg_subj_attn_from_verb": 0.0842,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8711
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0718
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0435
+            }
+          ],
+          "attn_to_subj": 0.0718,
+          "attn_to_verb_itself": 0.0435
+        }
+      },
+      "H10": {
+        "avg_subj_attn_from_verb": 0.0003,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 1.0
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0003
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0
+            }
+          ],
+          "attn_to_subj": 0.0003,
+          "attn_to_verb_itself": 1.0
+        }
+      },
+      "H11": {
+        "avg_subj_attn_from_verb": 0.1862,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5352
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2383
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1396
+            }
+          ],
+          "attn_to_subj": 0.2383,
+          "attn_to_verb_itself": 0.1396
+        }
+      },
+      "H12": {
+        "avg_subj_attn_from_verb": 0.2141,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.7852
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1001
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.0645
+            }
+          ],
+          "attn_to_subj": 0.1001,
+          "attn_to_verb_itself": 0.0503
+        }
+      },
+      "H13": {
+        "avg_subj_attn_from_verb": 0.1357,
+        "avg_top1_is_subj": 0.1667,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8477
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0613
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0542
+            }
+          ],
+          "attn_to_subj": 0.0613,
+          "attn_to_verb_itself": 0.0542
+        }
+      },
+      "H14": {
+        "avg_subj_attn_from_verb": 0.1907,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.875
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0718
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0435
+            }
+          ],
+          "attn_to_subj": 0.0435,
+          "attn_to_verb_itself": 0.0718
+        }
+      },
+      "H15": {
+        "avg_subj_attn_from_verb": 0.0,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 1.0
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0
+            }
+          ],
+          "attn_to_subj": 0.0,
+          "attn_to_verb_itself": 1.0
+        }
+      },
+      "H16": {
+        "avg_subj_attn_from_verb": 0.7187,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.5859
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2158
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1484
+            }
+          ],
+          "attn_to_subj": 0.5859,
+          "attn_to_verb_itself": 0.1484
+        }
+      },
+      "H17": {
+        "avg_subj_attn_from_verb": 0.0809,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.9023
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0449
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0449
+            }
+          ],
+          "attn_to_subj": 0.0449,
+          "attn_to_verb_itself": 0.0449
+        }
+      },
+      "H18": {
+        "avg_subj_attn_from_verb": 0.1462,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.6094
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2246
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1357
+            }
+          ],
+          "attn_to_subj": 0.1357,
+          "attn_to_verb_itself": 0.6094
+        }
+      },
+      "H19": {
+        "avg_subj_attn_from_verb": 0.4549,
+        "avg_top1_is_subj": 0.5,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.4355
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2637
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2334
+            }
+          ],
+          "attn_to_subj": 0.2637,
+          "attn_to_verb_itself": 0.2334
+        }
+      },
+      "H20": {
+        "avg_subj_attn_from_verb": 0.1195,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.9258
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0461
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.028
+            }
+          ],
+          "attn_to_subj": 0.0461,
+          "attn_to_verb_itself": 0.9258
+        }
+      },
+      "H21": {
+        "avg_subj_attn_from_verb": 0.0681,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.9727
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0139
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0139
+            }
+          ],
+          "attn_to_subj": 0.0139,
+          "attn_to_verb_itself": 0.9727
+        }
+      },
+      "H22": {
+        "avg_subj_attn_from_verb": 0.0652,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.7266
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1621
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0767
+            }
+          ],
+          "attn_to_subj": 0.0767,
+          "attn_to_verb_itself": 0.1621
+        }
+      },
+      "H23": {
+        "avg_subj_attn_from_verb": 0.4531,
+        "avg_top1_is_subj": 0.3333,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5469
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.4258
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0211
+            }
+          ],
+          "attn_to_subj": 0.4258,
+          "attn_to_verb_itself": 0.0211
+        }
+      },
+      "H24": {
+        "avg_subj_attn_from_verb": 0.3574,
+        "avg_top1_is_subj": 0.1667,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.7031
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2578
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0212
+            }
+          ],
+          "attn_to_subj": 0.2578,
+          "attn_to_verb_itself": 0.0212
+        }
+      },
+      "H25": {
+        "avg_subj_attn_from_verb": 0.0354,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8672
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.0806
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0381
+            }
+          ],
+          "attn_to_subj": 0.0381,
+          "attn_to_verb_itself": 0.0159
+        }
+      },
+      "H26": {
+        "avg_subj_attn_from_verb": 0.4134,
+        "avg_top1_is_subj": 0.3333,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5977
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.3613
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0232
+            }
+          ],
+          "attn_to_subj": 0.3613,
+          "attn_to_verb_itself": 0.0232
+        }
+      },
+      "H27": {
+        "avg_subj_attn_from_verb": 0.037,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.8594
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.1025
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0229
+            }
+          ],
+          "attn_to_subj": 0.0229,
+          "attn_to_verb_itself": 0.0139
+        }
+      }
+    },
+    "L1": {
+      "H0": {
+        "avg_subj_attn_from_verb": 0.0727,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.582
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2754
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0791
+            }
+          ],
+          "attn_to_subj": 0.0615,
+          "attn_to_verb_itself": 0.0791
+        }
+      },
+      "H1": {
+        "avg_subj_attn_from_verb": 0.1997,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.4844
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2021
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1572
+            }
+          ],
+          "attn_to_subj": 0.2021,
+          "attn_to_verb_itself": 0.4844
+        }
+      },
+      "H2": {
+        "avg_subj_attn_from_verb": 0.1395,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.25
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.25
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.25
+            }
+          ],
+          "attn_to_subj": 0.25,
+          "attn_to_verb_itself": 0.25
+        }
+      },
+      "H3": {
+        "avg_subj_attn_from_verb": 0.4652,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.4434
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.3926
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0874
+            }
+          ],
+          "attn_to_subj": 0.4434,
+          "attn_to_verb_itself": 0.0874
+        }
+      },
+      "H4": {
+        "avg_subj_attn_from_verb": 0.033,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.707
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2598
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0273
+            }
+          ],
+          "attn_to_subj": 0.0273,
+          "attn_to_verb_itself": 0.0078
+        }
+      },
+      "H5": {
+        "avg_subj_attn_from_verb": 0.1751,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.3555
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2148
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2148
+            }
+          ],
+          "attn_to_subj": 0.2148,
+          "attn_to_verb_itself": 0.2148
+        }
+      },
+      "H6": {
+        "avg_subj_attn_from_verb": 0.0663,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.3984
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.375
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1562
+            }
+          ],
+          "attn_to_subj": 0.0693,
+          "attn_to_verb_itself": 0.3984
+        }
+      },
+      "H7": {
+        "avg_subj_attn_from_verb": 0.159,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.4043
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2949
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.1689
+            }
+          ],
+          "attn_to_subj": 0.1309,
+          "attn_to_verb_itself": 0.2949
+        }
+      },
+      "H8": {
+        "avg_subj_attn_from_verb": 0.2243,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.332
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.3105
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2012
+            }
+          ],
+          "attn_to_subj": 0.2012,
+          "attn_to_verb_itself": 0.332
+        }
+      },
+      "H9": {
+        "avg_subj_attn_from_verb": 0.1093,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.3867
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.293
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1689
+            }
+          ],
+          "attn_to_subj": 0.1514,
+          "attn_to_verb_itself": 0.1689
+        }
+      },
+      "H10": {
+        "avg_subj_attn_from_verb": 0.1743,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.5352
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1973
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1973
+            }
+          ],
+          "attn_to_subj": 0.1973,
+          "attn_to_verb_itself": 0.5352
+        }
+      },
+      "H11": {
+        "avg_subj_attn_from_verb": 0.6074,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.582
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2578
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1387
+            }
+          ],
+          "attn_to_subj": 0.582,
+          "attn_to_verb_itself": 0.2578
+        }
+      },
+      "H12": {
+        "avg_subj_attn_from_verb": 0.3978,
+        "avg_top1_is_subj": 0.3333,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.4434
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2852
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.1533
+            }
+          ],
+          "attn_to_subj": 0.2852,
+          "attn_to_verb_itself": 0.1191
+        }
+      },
+      "H13": {
+        "avg_subj_attn_from_verb": 0.2334,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.3594
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2314
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2041
+            }
+          ],
+          "attn_to_subj": 0.2041,
+          "attn_to_verb_itself": 0.2314
+        }
+      },
+      "H14": {
+        "avg_subj_attn_from_verb": 0.3805,
+        "avg_top1_is_subj": 0.3333,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.4316
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.4062
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.1406
+            }
+          ],
+          "attn_to_subj": 0.4316,
+          "attn_to_verb_itself": 0.4062
+        }
+      },
+      "H15": {
+        "avg_subj_attn_from_verb": 0.9466,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.9531
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0288
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0175
+            }
+          ],
+          "attn_to_subj": 0.9531,
+          "attn_to_verb_itself": 0.0175
+        }
+      },
+      "H16": {
+        "avg_subj_attn_from_verb": 0.1724,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5703
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2539
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.1631
+            }
+          ],
+          "attn_to_subj": 0.2539,
+          "attn_to_verb_itself": 0.0134
+        }
+      },
+      "H17": {
+        "avg_subj_attn_from_verb": 0.3174,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.4629
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.3184
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1699
+            }
+          ],
+          "attn_to_subj": 0.3184,
+          "attn_to_verb_itself": 0.1699
+        }
+      },
+      "H18": {
+        "avg_subj_attn_from_verb": 0.2391,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.3203
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.3203
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2197
+            }
+          ],
+          "attn_to_subj": 0.3203,
+          "attn_to_verb_itself": 0.3203
+        }
+      },
+      "H19": {
+        "avg_subj_attn_from_verb": 0.6334,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.8359
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.0996
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.0605
+            }
+          ],
+          "attn_to_subj": 0.8359,
+          "attn_to_verb_itself": 0.0605
+        }
+      },
+      "H20": {
+        "avg_subj_attn_from_verb": 0.0579,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.5508
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.3574
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.0581
+            }
+          ],
+          "attn_to_subj": 0.0581,
+          "attn_to_verb_itself": 0.0332
+        }
+      },
+      "H21": {
+        "avg_subj_attn_from_verb": 0.1117,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.377
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.377
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1309
+            }
+          ],
+          "attn_to_subj": 0.1152,
+          "attn_to_verb_itself": 0.1309
+        }
+      },
+      "H22": {
+        "avg_subj_attn_from_verb": 0.2274,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.4102
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.2578
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.207
+            }
+          ],
+          "attn_to_subj": 0.2578,
+          "attn_to_verb_itself": 0.125
+        }
+      },
+      "H23": {
+        "avg_subj_attn_from_verb": 0.1454,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.5781
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2559
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.1553
+            }
+          ],
+          "attn_to_subj": 0.1553,
+          "attn_to_verb_itself": 0.5781
+        }
+      },
+      "H24": {
+        "avg_subj_attn_from_verb": 0.3646,
+        "avg_top1_is_subj": 0.5,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.4004
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.293
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.2578
+            }
+          ],
+          "attn_to_subj": 0.4004,
+          "attn_to_verb_itself": 0.2578
+        }
+      },
+      "H25": {
+        "avg_subj_attn_from_verb": 0.3789,
+        "avg_top1_is_subj": 1.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.3379
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2988
+            },
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.2178
+            }
+          ],
+          "attn_to_subj": 0.3379,
+          "attn_to_verb_itself": 0.1455
+        }
+      },
+      "H26": {
+        "avg_subj_attn_from_verb": 0.1808,
+        "avg_top1_is_subj": 0.0,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 0,
+              "token": "<｜begin▁of▁sentence｜>",
+              "weight": 0.3906
+            },
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.2363
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1895
+            }
+          ],
+          "attn_to_subj": 0.1836,
+          "attn_to_verb_itself": 0.1895
+        }
+      },
+      "H27": {
+        "avg_subj_attn_from_verb": 0.3099,
+        "avg_top1_is_subj": 0.1667,
+        "n_prompts": 6,
+        "sample_prompt": {
+          "prompt": "The cat sits",
+          "top3_from_verb": [
+            {
+              "pos": 1,
+              "token": "The",
+              "weight": 0.377
+            },
+            {
+              "pos": 2,
+              "token": "cat",
+              "weight": 0.3535
+            },
+            {
+              "pos": 3,
+              "token": "sits",
+              "weight": 0.1475
+            }
+          ],
+          "attn_to_subj": 0.3535,
+          "attn_to_verb_itself": 0.1475
+        }
+      }
+    }
+  },
+  "layer_probe_at_subject": {}
+}
