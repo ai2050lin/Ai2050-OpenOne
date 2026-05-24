@@ -365,11 +365,29 @@ def main():
     n_layers = info.n_layers
     d_model = info.d_model
 
-    # Try multiple layers
-    if model_name == "deepseek7b":
-        layer_candidates = [27, 26, 25, 20, 15]
+    # Layer to test: can specify as second argument, or default to deep layer
+    # For medium-entropy test: python phase266_glm4_fast.py glm4 medium
+    test_mode = sys.argv[2] if len(sys.argv) > 2 else "deep"
+    
+    if test_mode == "medium":
+        if model_name == "glm4":
+            layer_candidates = [30, 25, 20, 15]
+        elif model_name == "deepseek7b":
+            layer_candidates = [5, 10, 15]
+        else:
+            layer_candidates = [25, 20, 15]
+    elif test_mode == "early":
+        if model_name == "glm4":
+            layer_candidates = [10, 8, 5]
+        elif model_name == "deepseek7b":
+            layer_candidates = [0, 2, 5]
+        else:
+            layer_candidates = [9, 5, 3]
     else:
-        layer_candidates = [n_layers - 2, n_layers - 3, n_layers - 5, n_layers - 8, n_layers // 2]
+        if model_name == "deepseek7b":
+            layer_candidates = [27, 26, 25, 20, 15]
+        else:
+            layer_candidates = [n_layers - 2, n_layers - 3, n_layers - 5, n_layers - 8, n_layers // 2]
     n_random = 15
     alpha_values = list(np.arange(-10, 10.5, 4.0))  # 6 points
 
