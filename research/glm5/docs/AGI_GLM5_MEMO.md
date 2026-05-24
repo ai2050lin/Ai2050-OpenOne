@@ -55128,6 +55128,20 @@ Phase 266应该做的（按优先级）：
   - 原因：accelerate的dispatch机制
   - 修复：使用output_hidden_states=True替代hook提取激活
 
+## Phase 267: Hidden-State内禀维度实验（初始版本，被Phase 268替代） [2026-05-24 ~19:30]
+
+### 说明
+
+Phase 267是"内禀维度 vs Logit-Lens熵"决定性实验的初始版本（`tests/glm5/phase267_intrinsic_dimension.py`）。
+该版本在开发过程中遇到了以下问题：
+- 神经元消融实验的hook设计过于复杂（尝试在MLP中间层做ablation，但intermediate_size远大于d_model）
+- 需要同时做因果验证和内禀维度测量，导致脚本过于臃肿
+
+因此重写为精简版 `phase268_intrinsic_dim.py`，只专注于决定性实验（PR/eff_support/W_U对齐），删除了因果验证部分。
+Phase 267脚本保留但**未成功运行**，无结果输出。
+
+Phase 267的核心实验设计被完整继承到Phase 268中。
+
 ## Phase 268: 决定性实验 — Hidden-State内禀维度 vs Logit-Lens熵 [2026-05-24 20:25]
 
 ### 实验动机
@@ -55256,7 +55270,7 @@ python tests/glm5/phase268_intrinsic_dim.py deepseek7b
 - `results/phase268_intrinsic_dim/*_summary.json`
 - `results/phase268_intrinsic_dim/*_hidden_states.npz`
 
-### 深度分析：Phase 268的完整含义
+## 深度分析：Phase 268的完整含义
 
 #### 一、分析一的正确部分
 
@@ -55367,3 +55381,262 @@ Phase 269的核心假设：
 
 验证方法：在W_U不可见子空间中做语义特征probing。
 如果准确率远高于W_U可见空间 → 假设正确，语义编码确实在"暗"区。
+
+## Phase 269: Transformer计算暗物质 — W_U不可见空间的语义编码探测 [2026-05-24 20:54]
+
+### 实验设计
+
+将hidden state空间分解为：
+- **W_U可见空间 (V_vis)**: W_U的前200个右奇异向量张成（8-14%的方差）
+- **W_U不可见空间 (V_inv)**: 正交补空间（86-92%的方差）
+
+在每个子空间中分别做logistic regression probing，测试4种语义特征：
+1. **number** (singular/plural): 主谓一致，语法特征
+2. **animacy** (animate/inanimate): 语义特征
+3. **tense** (past/present/future): 语法+语义特征
+4. **category** (animal/tool/clothing/body): 语义分类特征
+
+### 核心结果
+
+#### 跨模型对比（Number特征 — 最重要的区分特征）
+
+| 模型 | 层 | V_vis准确率 | V_inv准确率 | 优势 | 解读 |
+|------|-----|-----------|-----------|------|------|
+| Qwen3 | L1 | 0.753 | 0.947 | **+0.194** | 早期层暗物质强优势 |
+| Qwen3 | L9 | 0.867 | 0.964 | **+0.097** | 中层仍有优势 |
+| Qwen3 | L18 | 0.957 | 0.984 | +0.026 | 深层差距缩小 |
+| Qwen3 | L36 | 0.948 | 0.993 | +0.046 | 最终层仍有优势 |
+| GLM4 | L1 | 0.840 | 0.964 | **+0.124** | 早期层暗物质强优势 |
+| GLM4 | L10 | 0.920 | 0.980 | **+0.060** | 中层仍有优势 |
+| GLM4 | L40 | 0.951 | 0.980 | +0.030 | 最终层仍有优势 |
+| DS7B | L1 | 0.900 | 0.977 | +0.077 | 早期层有优势 |
+| DS7B | L14 | 0.974 | 0.993 | +0.020 | 中层差距小 |
+| DS7B | L28 | 0.951 | 0.993 | +0.043 | 最终层有优势 |
+
+#### 其他特征
+
+| 特征 | V_vis | V_inv | 结论 |
+|------|-------|-------|------|
+| animacy | 1.000 | 1.000 | 冗余编码，两个空间都完美 |
+| tense | 0.997-1.000 | 1.000 | 冗余编码，两个空间都完美 |
+| category | 1.000 | 1.000 | 冗余编码，两个空间都完美 |
+
+### 关键发现
+
+#### 发现1：Number特征在W_U不可见空间中一致更优
+
+**跨所有模型和所有层，W_U不可见空间在number特征上始终优于可见空间。** 优势在早期层最大（8-20%），深层逐渐缩小（3-5%）。
+
+这强烈暗示：**主谓一致（语法计算）主要在W_U不可见方向上编码。**
+
+#### 发现2：语义特征在两个空间中冗余编码
+
+animacy、tense、category在两个空间都达到~1.000准确率。这说明：
+- 这些语义特征被冗余地编码在两个子空间中
+- 即使只有W_U可见的8-14%方差，也足以完美分类这些特征
+- 这些特征对维度要求不高（200维就足够了）
+
+#### 发现3：语法 vs 语义的二分法
+
+Phase 269揭示了一个关键二分法：
+
+| 特征类型 | 代表 | W_U可见空间 | W_U不可见空间 | 理解 |
+|---------|------|-----------|------------|------|
+| 语义 | animacy, category | 完美 | 完美 | 冗余编码 |
+| 语法 | number agreement | 不完美 | 更好 | **暗物质关键** |
+
+**Transformer的"计算暗物质"主要是语法计算，而非语义计算。**
+
+这是对Phase 268发现的精确化：86-96%的W_U不可见计算不是"随机的"或"无意义的"，而是**承载了语法结构信息**——主谓一致、句法分析等。
+
+#### 发现4：早期层暗物质优势最大
+
+Qwen3 L1: 暗物质优势19.4%
+GLM4 L1: 暗物质优势12.4%
+DS7B L1: 暗物质优势7.7%
+
+早期层W_U对齐最低（5-8%），同时暗物质优势最大。这说明：
+- 语法计算在早期层就开始了（主谓一致需要从输入开始追踪）
+- 早期层的计算大部分在W_U不可见方向上
+- 随着层加深，更多计算被"转移"到W_U可见方向（准备输出）
+
+### 理论修正
+
+#### 对分析一的修正
+
+分析一说的"Transformer不是语义坐标系统，而是未来约束收敛系统"是正确的，但现在可以更精确：
+
+**Transformer是"双轨计算系统"：**
+1. **语义轨道**（W_U可见）：承载animacy、category等语义特征，冗余编码，对token预测直接可见
+2. **语法轨道**（W_U不可见）：承载number agreement等语法特征，需要更多维度，对token预测间接可见
+
+#### 对分析二的修正
+
+分析二说"语义清晰神经元的因果验证"是最干净的路径。Phase 269表明：
+- 这些语义神经元很可能在W_U可见空间（14%的方差中）
+- 它们对token预测有直接因果效应
+- 但它们只反映了语义轨道，完全忽略了语法轨道
+
+### 命令记录
+
+```bash
+python tests/glm5/phase269_dark_matter_probing.py qwen3
+python tests/glm5/phase269_dark_matter_probing.py glm4
+python tests/glm5/phase269_dark_matter_probing.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase269_dark_matter_probing/qwen3_dark_matter_probing.json`
+- `results/phase269_dark_matter_probing/glm4_dark_matter_probing.json`
+- `results/phase269_dark_matter_probing/deepseek7b_dark_matter_probing.json`
+
+## Phase 270: 子空间输运分析 — V_inv是否被旋转进V_vis？ [2026-05-24 22:01]
+
+### 实验动机
+
+Phase 268发现86-96%的hidden state方差存在于W_U不可见方向（V_inv）。但批判指出：**"W_U不可见"≠"不参与token预测"**，因为残差流在层间旋转——V_inv(l)可能通过attention/MLP在后续层被旋转进V_vis(l+1)。
+
+这是Phase 268最重要的逻辑漏洞。Phase 270用实证回答：
+
+> "V_inv中的信息是否最终被旋转进V_vis？"
+
+### 实验设计
+
+**核心测量**：对于每对层(l, l+1)和(l, L_final)：
+1. 分解 h_l = h_l_vis + h_l_inv（W_U可见/不可见分量）
+2. 分解 h_{l+1}_vis = V_vis方向的分量
+3. 用Ridge回归测量：
+   - **Persistence R²**: h_l_vis → h_{l+1}_vis（可见→可见）
+   - **Transport R²**: h_l_inv → h_{l+1}_vis（不可见→可见！）
+   - **Combined R²**: h_l → h_{l+1}_vis
+
+1000个多样化提示词，V_vis由W_U前200个右奇异向量张成。
+
+### 核心结果
+
+#### 跨模型对比：Cumulative Transport（L{l} → Final Layer）
+
+| 模型 | L0 Transport R² | L_{mid} Transport R² | L_{late} Transport R² | L_final Transport R² |
+|------|----------------|---------------------|----------------------|---------------------|
+| Qwen3 | 0.649 | 1.000 | 1.000 | 1.000 |
+| GLM4 | 0.291 | 0.996 | 1.000 | 1.000 |
+| DS7B | 0.517 | 1.000 | 1.000 | 1.000 |
+
+#### Adjacent Transport（层间增量分析）
+
+| 模型 | L0→L1 Transport R² | L_mid→L_mid+1 Transport R² | Δh in V_inv |
+|------|--------------------|---------------------------|------------|
+| Qwen3 | 0.958 | 1.000 | 88-92% |
+| GLM4 | 0.417 | 0.997 | 86-94% |
+| DS7B | 0.888 | 1.000 | 92-94% |
+
+#### 方差分解（V_vis vs V_inv的比例）
+
+| 模型 | L0 vis_frac | L_mid vis_frac | L_final vis_frac |
+|------|------------|---------------|-----------------|
+| Qwen3 | 14.6% | 9.7% | 14.2% |
+| GLM4 | 4.9% | 7.2% | 3.9% |
+| DS7B | 5.6% | 6.5% | 6.1% |
+
+### 决定性发现
+
+#### 发现1：V_inv → V_vis的Transport R²在中后期层接近1.0
+
+**所有三个模型**在中后期层的Transport R²都接近1.000。这意味着：
+
+> **W_U不可见空间（V_inv）中的信息，几乎完全决定了最终层的W_U可见空间（V_vis）的内容。**
+
+这是对Phase 268的核心修正。
+
+#### 发现2：V_inv不是"暗物质"，而是"延迟可见计算"
+
+Transport R²≈1.0说明：V_inv中的方差通过层间变换最终几乎全部进入了V_vis。这与批判的预测完全一致：
+
+- V_inv中的计算不是"与token预测无关"
+- 它是"正在进行的内部计算，最终会被旋转到可解码空间"
+- Phase 268的"86-96%计算暗物质"表述需要修正为"86-96%的中间表示暂时不在logit-readable子空间中"
+
+#### 发现3：每层增量（Δh）主要在V_inv方向
+
+层间增量Δh = h_{l+1} - h_l中，88-94%在V_inv方向，只有6-14%在V_vis方向。
+
+这说明：
+- Attention和MLP的输出主要添加到V_inv方向
+- V_vis方向的变化很小（6-14%）
+- 但V_inv中的信息逐步被"旋转"到V_vis
+
+#### 发现4：GLM4 L0的Transport R²只有0.291
+
+GLM4第一层的V_inv对最终层V_vis的预测力较弱（R²=0.291），而Qwen3（0.649）和DS7B（0.517）更强。这可能反映了GLM4更长的"信息预处理"阶段。
+
+#### 发现5：DS7B最后一层异常
+
+DS7B L27→L28的persist R²=0.692（远低于其他层的0.96+），而Transport R²仍然=1.0。这与Phase 268发现的DS7B最后一层PR骤降（从38降到5.4）一致。DS7B最后一层做了特殊的维度压缩。
+
+#### 发现6：PR critique的谱分析数据
+
+| 模型 | 层 | PR | n50 | n90 | n99 | tail>1% |
+|------|-----|-----|-----|------|------|---------|
+| Qwen3 | L0 | 19.8 | 8 | 28 | 39 | 0.49% |
+| Qwen3 | L18 | 33.8 | 12 | 154 | 610 | 1.00% |
+| Qwen3 | L36 | 22.1 | 9 | 95 | 464 | 1.00% |
+| GLM4 | L20 | 35.3 | 13 | 166 | 649 | 1.00% |
+| DS7B | L28 | 5.4 | 2 | 35 | 370 | 1.00% |
+
+PR=20-30但n99=300-650。这说明：
+- 50%的方差由8-14个主成分解释
+- 90%的方差由28-166个主成分解释
+- 99%的方差需要300-650个主成分
+- PR低是因为前几个成分方差巨大，不是数据真的低维
+
+**这验证了批判的PR担忧：PR不是内禀维度，只是谱集中度指标。hidden state的完整描述可能需要300-650维。**
+
+### 对Phase 268-269的修正
+
+| Phase 268/269结论 | Phase 270修正 |
+|------------------|--------------|
+| 86-96%计算在"暗物质"中 | V_inv不是暗物质，而是"延迟可见计算" |
+| W_U看不到86-96%的计算 | V_inv中的信息通过层间旋转最终几乎完全进入V_vis |
+| 语法轨道在W_U不可见空间 | V_inv承载的信息最终可被W_U读取，只是时间延迟 |
+| logit lens严重失真 | logit lens在当前层失真，但跨层看信息是完整的 |
+| PR=20-30说明hidden state低维 | PR只是谱集中度，n99=300-650说明需要更多维度描述 |
+
+### 客观事实总结（Phase 268-270联合）
+
+1. **方差分布**：86-96%的hidden state方差在V_inv方向（Phase 268，已验证）
+2. **层间增量**：88-94%的Δh在V_inv方向（Phase 270新发现）
+3. **输运机制**：V_inv → V_vis的Transport R²在中后期层≈1.0（Phase 270新发现）
+4. **PR解释**：PR=20-30是谱集中度，n99=300-650（Phase 270新发现）
+5. **Number probing**：V_inv在number特征上比V_vis更优3-20%（Phase 269，已验证）
+
+**最准确的描述**：Transformer通过V_inv方向进行中间计算，然后通过层间旋转将结果传递到V_vis方向供最终解码。这不是"暗物质"，而是"信息传输通道"。
+
+### 命令记录
+
+```bash
+python tests/glm5/phase270_subspace_transport.py qwen3
+python tests/glm5/phase270_subspace_transport.py glm4
+python tests/glm5/phase270_subspace_transport.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase270_subspace_transport/qwen3_subspace_transport.json`
+- `results/phase270_subspace_transport/glm4_subspace_transport.json`
+- `results/phase270_subspace_transport/deepseek7b_subspace_transport.json`
+- `results/phase270_subspace_transport/*_hidden_states.npz`
+
+### 下一步方向
+
+Phase 268-269建立了完整的理论框架：
+
+**Phase 270应解决的核心问题：**
+
+1. **语法轨道的精确结构**：W_U不可见空间中语法特征的子空间几何
+2. **层间信息流**：语法信息如何在层间传递？是否通过W_U不可见方向？
+3. **双轨交互机制**：语义轨道和语法轨道如何协同工作？
+4. **Jacobian输运分析**：W_U不可见方向的计算如何影响最终输出？
+
+最关键的是：**W_U不可见空间的子空间结构**——
+这86-96%的"暗物质"中，是否存在类似"语法子空间"的结构？
