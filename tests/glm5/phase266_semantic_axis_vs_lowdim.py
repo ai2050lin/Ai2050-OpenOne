@@ -428,7 +428,7 @@ def compute_entropy_at_layer(model, tokenizer, info, input_device, prompt, targe
 # Part 1: Random Direction Control Test (THE DECISIVE EXPERIMENT)
 # ============================================================
 
-def run_part1(model_name):
+def run_part1(model_name, n_random=None, fast=False):
     """
     THE DECISIVE EXPERIMENT: Random Direction Control Test
     
@@ -442,14 +442,19 @@ def run_part1(model_name):
     - matched layer (same layer as semantic axis)
     - same readout (same verb pairs)
     - same alpha range
-    - 30 random directions for statistical power
+    - 30 random directions for statistical power (15 for large models)
     - Also test at MULTIPLE layers with different entropy levels
     """
     import torch
     from model_utils import get_layers, release_model
 
+    # Adjust parameters for large models
+    if n_random is None:
+        n_random = 15 if model_name in ("glm4", "deepseek7b") else 30
+    
     log_time(f"=== Part 1: Random Direction Control Test for {model_name} ===")
     log_time(f"  THIS IS THE DECISIVE EXPERIMENT")
+    log_time(f"  n_random={n_random}, fast={fast}")
 
     model, tokenizer, info = load_model_bf16(model_name)
     layers = get_layers(model)
@@ -495,7 +500,9 @@ def run_part1(model_name):
     animacy_verb_b = [v for v in animacy_verb_b if v is not None]
 
     alpha_values = list(np.arange(-10, 10.5, 2.0))  # 11 points
-    n_random = 30  # 30 random directions for statistical power
+    if fast:
+        alpha_values = list(np.arange(-10, 10.5, 4.0))  # 6 points in fast mode
+    n_random = n_random  # adjusted above based on model
 
     results = {}
 
@@ -546,25 +553,28 @@ def run_part1(model_name):
                  f"mono: {sem_result['monotonicity']:.4f}, "
                  f"bidir: {sem_result['bidirectional']}")
 
-        # Step 4: Extract SEMANTIC direction for animacy
-        log_time(f"  Extracting animacy semantic direction at L{target_layer}...")
-        probe_acc_anim, sem_direction_anim = extract_probe_direction(
-            model, tokenizer, info, input_device,
-            ANIMATE, INANIMATE, "The {} thinks", "The {} sits",
-            target_layer, lambda p, off: 1 + off, n_train=25
-        )
+        # Step 4: Extract SEMANTIC direction for animacy (skip in fast mode)
         sem_result_anim = None
-        if sem_direction_anim is not None:
-            log_time(f"  Animacy probe_acc: {probe_acc_anim}")
-            log_time(f"  Measuring R² for SEMANTIC (animacy) direction...")
-            sem_result_anim = measure_intervention_r2(
+        if not fast:
+            log_time(f"  Extracting animacy semantic direction at L{target_layer}...")
+            probe_acc_anim, sem_direction_anim = extract_probe_direction(
                 model, tokenizer, info, input_device,
-                sem_direction_anim, target_layer,
-                ANIMATE_TEST + INANIMATE_TEST,
-                animacy_verb_a, animacy_verb_b, alpha_values,
-                lambda p, off: 1 + off
+                ANIMATE, INANIMATE, "The {} thinks", "The {} sits",
+                target_layer, lambda p, off: 1 + off, n_train=25
             )
-            log_time(f"  ANIMACY SEMANTIC R²: {sem_result_anim['r_squared']:.4f}")
+            if sem_direction_anim is not None:
+                log_time(f"  Animacy probe_acc: {probe_acc_anim}")
+                log_time(f"  Measuring R² for SEMANTIC (animacy) direction...")
+                sem_result_anim = measure_intervention_r2(
+                    model, tokenizer, info, input_device,
+                    sem_direction_anim, target_layer,
+                    ANIMATE_TEST + INANIMATE_TEST,
+                    animacy_verb_a, animacy_verb_b, alpha_values,
+                    lambda p, off: 1 + off
+                )
+                log_time(f"  ANIMACY SEMANTIC R²: {sem_result_anim['r_squared']:.4f}")
+        else:
+            log_time(f"  FAST MODE: Skipping animacy direction test")
 
         # Step 5: Generate RANDOM directions and measure R²
         log_time(f"  Generating {n_random} random directions and measuring R²...")
@@ -589,37 +599,57 @@ def run_part1(model_name):
                 log_time(f"    {i+1}/{n_random} random directions done, "
                          f"mean R²={np.mean(random_r2_values):.4f}")
 
+            # Aggressive memory management for large models
             torch.cuda.empty_cache()
+            gc.collect()
+            
+            # Save intermediate results after each direction
+            if (i + 1) % 5 == 0:
+                interim = {
+                    "entropy_level": entropy_level,
+                    "layer": int(target_layer),
+                    "semantic_r2": round(float(sem_result['r_squared']), 4),
+                    "random_r2_so_far": [round(float(x), 4) for x in random_r2_values],
+                    "random_r2_mean_so_far": round(float(np.mean(random_r2_values)), 4),
+                    "n_completed": i + 1,
+                    "n_total": n_random,
+                }
+                interim_file = RESULT_DIR / f"part1_{model_name}_interim.json"
+                with open(interim_file, "w", encoding="utf-8") as f:
+                    json.dump(interim, f, indent=2, ensure_ascii=False)
 
-        # Step 6: Also test SUBSPACE-MATCHED random directions
+        # Step 6: Also test SUBSPACE-MATCHED random directions (skip in fast mode)
         # These are random directions in the SAME subspace as the semantic direction
         # Generate random directions orthogonal to the semantic direction
-        log_time(f"  Generating {n_random//2} orthogonal random directions...")
         ortho_r2_values = []
+        if not fast:
+            log_time(f"  Generating {n_random//2} orthogonal random directions...")
+            for i in range(n_random // 2):
+                random_dir = np.random.randn(d_model).astype(np.float32)
+                # Remove projection onto semantic direction
+                proj = np.dot(random_dir, sem_direction) * sem_direction
+                random_dir = random_dir - proj
+                norm = np.linalg.norm(random_dir)
+                if norm < 1e-10:
+                    continue
+                random_dir = random_dir / norm
 
-        for i in range(n_random // 2):
-            random_dir = np.random.randn(d_model).astype(np.float32)
-            # Remove projection onto semantic direction
-            proj = np.dot(random_dir, sem_direction) * sem_direction
-            random_dir = random_dir - proj
-            norm = np.linalg.norm(random_dir)
-            if norm < 1e-10:
-                continue
-            random_dir = random_dir / norm
+                ortho_result = measure_intervention_r2(
+                    model, tokenizer, info, input_device,
+                    random_dir, target_layer, NUMBER_TEST,
+                    verb_ids_sing, verb_ids_plur, alpha_values,
+                    lambda p, off: 1 + off
+                )
+                ortho_r2_values.append(ortho_result['r_squared'])
 
-            ortho_result = measure_intervention_r2(
-                model, tokenizer, info, input_device,
-                random_dir, target_layer, NUMBER_TEST,
-                verb_ids_sing, verb_ids_plur, alpha_values,
-                lambda p, off: 1 + off
-            )
-            ortho_r2_values.append(ortho_result['r_squared'])
+                if (i + 1) % 5 == 0:
+                    log_time(f"    {i+1}/{n_random//2} orthogonal directions done, "
+                             f"mean R²={np.mean(ortho_r2_values):.4f}")
 
-            if (i + 1) % 5 == 0:
-                log_time(f"    {i+1}/{n_random//2} orthogonal directions done, "
-                         f"mean R²={np.mean(ortho_r2_values):.4f}")
-
-            torch.cuda.empty_cache()
+                torch.cuda.empty_cache()
+                gc.collect()
+        else:
+            log_time(f"  FAST MODE: Skipping orthogonal direction test")
 
         # Step 7: Statistical test
         random_r2_mean = np.mean(random_r2_values)
@@ -726,7 +756,7 @@ def run_part1(model_name):
 # Part 2: Multi-Layer Entropy-Matched Control
 # ============================================================
 
-def run_part2(model_name):
+def run_part2(model_name, fast=False):
     """
     Test at ALL layers from 0 to n-1, measuring both:
     1. Entropy at each layer
@@ -1332,15 +1362,19 @@ def main():
     parser.add_argument("--part", type=int, required=True,
                        choices=[1, 2, 3, 4],
                        help="Part number (1=random control, 2=full-layer, 3=joint, 4=dimension)")
+    parser.add_argument("--n_random", type=int, default=None,
+                       help="Number of random directions (default: 30 for qwen3, 15 for glm4/deepseek7b)")
+    parser.add_argument("--fast", action="store_true",
+                       help="Fast mode: fewer alpha points, fewer test prompts, skip animacy")
     args = parser.parse_args()
 
     log_time(f"Phase 266: {args.model} Part {args.part}")
     log_time(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     if args.part == 1:
-        run_part1(args.model)
+        run_part1(args.model, n_random=args.n_random, fast=args.fast)
     elif args.part == 2:
-        run_part2(args.model)
+        run_part2(args.model, fast=args.fast)
     elif args.part == 3:
         run_part3(args.model)
     elif args.part == 4:
