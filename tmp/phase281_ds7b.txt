@@ -1,0 +1,114 @@
+[2026-05-25 22:59:28] ============================================================
+[2026-05-25 22:59:28] Phase 281: Routing-Content Separation â€” deepseek7b
+[2026-05-25 22:59:28] ============================================================
+[2026-05-25 22:59:30] Loading deepseek7b (bf16 + flash_attention_2)...
+[2026-05-25 22:59:30]   flash_attn not found, using eager
+Sliding Window Attention is enabled but not implemented for `eager`; unexpected results may be encountered.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|¨€¨€¨€¨€¨€     | 1/2 [00:10<00:10, 10.12s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 2/2 [00:10<00:00,  4.42s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 2/2 [00:10<00:00,  5.27s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[2026-05-25 22:59:42]   deepseek7b loaded: device=cuda:0, GPU=9.01GB, attn=eager
+[2026-05-25 22:59:42] Model: Qwen2ForCausalLM, L=28, d=3584, mlp=split_gate_up
+[2026-05-25 22:59:42] 
+==================================================
+[2026-05-25 22:59:42] Block A: Component Delta Decomposition
+[2026-05-25 22:59:42]   Layers: [0, 3, 6, 9, 12, 15, 18, 21, 24, 27], Pairs: 8
+[2026-05-25 22:59:42]   Processing: dog_cat_chase ...
+[2026-05-25 22:59:50]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:59:50]   Processing: man_woman_love ...
+[2026-05-25 22:59:53]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:59:53]   Processing: king_city_rule ...
+[2026-05-25 22:59:56]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:59:56]   Processing: child_apple_eat ...
+[2026-05-25 22:59:59]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:59:59]   Processing: boy_girl_call ...
+[2026-05-25 23:00:01]     boy_girl_call: 10 layers analyzed
+[2026-05-25 23:00:01]   Processing: teacher_student_teach ...
+[2026-05-25 23:00:04]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 23:00:04]   Processing: wolf_sheep_hunt ...
+[2026-05-25 23:00:06]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 23:00:06]   Processing: mother_child_hold ...
+[2026-05-25 23:00:09]     mother_child_hold: 10 layers analyzed
+[2026-05-25 23:00:09] 
+  Summary (agg across 8 pairs):
+[2026-05-25 23:00:09]   L0: cos(dh,attn)=0.145, cos(dh,mlp)=0.066, attn_ratio=9.06, mlp_ratio=11.15, cos(attn,mlp)=0.279
+[2026-05-25 23:00:09]   L3: cos(dh,attn)=0.116, cos(dh,mlp)=0.088, attn_ratio=0.31, mlp_ratio=0.23, cos(attn,mlp)=-0.011
+[2026-05-25 23:00:09]   L6: cos(dh,attn)=-0.010, cos(dh,mlp)=-0.018, attn_ratio=0.16, mlp_ratio=0.53, cos(attn,mlp)=-0.046
+[2026-05-25 23:00:09]   L9: cos(dh,attn)=-0.155, cos(dh,mlp)=-0.168, attn_ratio=0.20, mlp_ratio=0.51, cos(attn,mlp)=-0.058
+[2026-05-25 23:00:09]   L12: cos(dh,attn)=-0.026, cos(dh,mlp)=-0.019, attn_ratio=0.15, mlp_ratio=0.38, cos(attn,mlp)=-0.028
+[2026-05-25 23:00:09]   L15: cos(dh,attn)=-0.005, cos(dh,mlp)=-0.059, attn_ratio=0.11, mlp_ratio=0.31, cos(attn,mlp)=-0.048
+[2026-05-25 23:00:09]   L18: cos(dh,attn)=-0.142, cos(dh,mlp)=0.005, attn_ratio=0.16, mlp_ratio=0.34, cos(attn,mlp)=-0.019
+[2026-05-25 23:00:09]   L21: cos(dh,attn)=-0.064, cos(dh,mlp)=0.151, attn_ratio=0.15, mlp_ratio=0.45, cos(attn,mlp)=-0.002
+[2026-05-25 23:00:09]   L24: cos(dh,attn)=0.042, cos(dh,mlp)=0.064, attn_ratio=0.10, mlp_ratio=0.37, cos(attn,mlp)=0.020
+[2026-05-25 23:00:09]   L27: cos(dh,attn)=-0.044, cos(dh,mlp)=0.003, attn_ratio=1.58, mlp_ratio=1.61, cos(attn,mlp)=-0.059
+[2026-05-25 23:00:09] Block A done in 26.9s
+[2026-05-25 23:00:09] 
+==================================================
+[2026-05-25 23:00:09] Block B: Value vs Attention Causal Swap
+[2026-05-25 23:00:09]   Layers: [0, 7, 14, 21, 27], Pairs: 8
+[2026-05-25 23:00:09]   Running warm-up forward pass to materialize weights...
+[2026-05-25 23:00:10]   L0: Q_heads=28, KV_heads=4, d_head=128, gqa_group=7, Q_dim=3584, K_dim=512
+[2026-05-25 23:00:10]   L7: Q_heads=28, KV_heads=4, d_head=128, gqa_group=7, Q_dim=3584, K_dim=512
+[2026-05-25 23:00:10]   L14: Q_heads=28, KV_heads=4, d_head=128, gqa_group=7, Q_dim=3584, K_dim=512
+[2026-05-25 23:00:10]   L21: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:10]   L27: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:10]   Processing: dog_cat_chase ...
+[2026-05-25 23:00:12]     dog_cat_chase: done
+[2026-05-25 23:00:12]   Processing: man_woman_love ...
+[2026-05-25 23:00:14]     man_woman_love: done
+[2026-05-25 23:00:14]   Processing: king_city_rule ...
+[2026-05-25 23:00:16]     king_city_rule: done
+[2026-05-25 23:00:16]   Processing: child_apple_eat ...
+[2026-05-25 23:00:18]     child_apple_eat: done
+[2026-05-25 23:00:18]   Processing: boy_girl_call ...
+[2026-05-25 23:00:21]     boy_girl_call: done
+[2026-05-25 23:00:21]   Processing: teacher_student_teach ...
+[2026-05-25 23:00:23]     teacher_student_teach: done
+[2026-05-25 23:00:23]   Processing: wolf_sheep_hunt ...
+[2026-05-25 23:00:25]     wolf_sheep_hunt: done
+[2026-05-25 23:00:25]   Processing: mother_child_hold ...
+[2026-05-25 23:00:27]     mother_child_hold: done
+[2026-05-25 23:00:27] 
+  Summary (higher effect = component matters more, 8 pairs):
+[2026-05-25 23:00:27]   routing_effect: how much changing attention weights changes output
+[2026-05-25 23:00:27]   content_effect: how much changing value vectors changes output
+[2026-05-25 23:00:27]   L0: routing_eff=0.680 | content_eff=0.888 | lt_winner=CONTENT>>routing | content_dom%=1.00
+[2026-05-25 23:00:27]   L7: routing_eff=0.587 | content_eff=0.915 | lt_winner=CONTENT>>routing | content_dom%=1.00
+[2026-05-25 23:00:27]   L14: routing_eff=0.670 | content_eff=0.862 | lt_winner=CONTENT>>routing | content_dom%=1.00
+[2026-05-25 23:00:27] Block B done in 17.5s
+[2026-05-25 23:00:27] 
+==================================================
+[2026-05-25 23:00:27] Block C: Head-Level Specialization Map
+[2026-05-25 23:00:27]   Layers: [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+[2026-05-25 23:00:27]   Testing 16 sentences across 10 layers
+[2026-05-25 23:00:27]   L0: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L3: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L6: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L9: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L12: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L15: Q=28 KV=4 d_head=128 gqa=7
+[2026-05-25 23:00:27]   L18: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:27]   L21: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:27]   L24: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:27]   L27: weight access failed (Cannot copy out of meta tensor; no data!), skipping
+[2026-05-25 23:00:27]   L0: computing head specialization...
+[2026-05-25 23:00:38]     L0: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:00:38]   L3: computing head specialization...
+[2026-05-25 23:00:49]     L3: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:00:49]   L6: computing head specialization...
+[2026-05-25 23:00:59]     L6: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:00:59]   L9: computing head specialization...
+[2026-05-25 23:01:10]     L9: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:01:10]   L12: computing head specialization...
+[2026-05-25 23:01:21]     L12: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:01:21]   L15: computing head specialization...
+[2026-05-25 23:01:32]     L15: heads=28, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L0: pos_sens=-0.002, content_sens=0.412, value_var=0.751, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L3: pos_sens=0.047, content_sens=0.536, value_var=0.528, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L6: pos_sens=-0.185, content_sens=0.506, value_var=0.550, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L9: pos_sens=-0.001, content_sens=0.523, value_var=0.706, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L12: pos_sens=0.331, content_sens=0.644, value_var=0.600, types={'content_sensitive': 28}
+[2026-05-25 23:01:32]   L15: pos_sens=0.328, content_sens=0.616, value_var=0.480, types={'content_sensitive': 28}
+[2026-05-25 23:01:32] Block C done in 64.9s
+[2026-05-25 23:01:32] 
+Phase 281 complete for deepseek7b: A=27s, B=17s, C=65s, total=109s
+[model_utils] GPU memory released, allocated=9.02 GB
