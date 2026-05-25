@@ -1,0 +1,132 @@
+[2026-05-26 06:17:29] ============================================================
+[2026-05-26 06:17:29] Phase 285: Real Forward Activation Patching — glm4
+[2026-05-26 06:17:29] ============================================================
+[2026-05-26 06:17:29] Dataset: 28 sampled pairs from 14 categories
+[2026-05-26 06:17:29]   abstract: 2
+[2026-05-26 06:17:29]   animal: 2
+[2026-05-26 06:17:29]   comparative: 2
+[2026-05-26 06:17:29]   conditional: 2
+[2026-05-26 06:17:29]   human: 2
+[2026-05-26 06:17:29]   human_object: 2
+[2026-05-26 06:17:29]   logical: 2
+[2026-05-26 06:17:29]   negation: 2
+[2026-05-26 06:17:29]   passive: 2
+[2026-05-26 06:17:29]   place: 2
+[2026-05-26 06:17:29]   quantifier: 2
+[2026-05-26 06:17:29]   recursive: 2
+[2026-05-26 06:17:29]   temporal: 2
+[2026-05-26 06:17:29]   translation: 2
+[2026-05-26 06:17:31] Loading glm4 (bf16 + flash_attn_2 + device_map='auto')...
+[2026-05-26 06:17:31]   flash_attn not found, using eager (slower)
+[2026-05-26 06:17:41]   glm4 loaded: device=cuda:0, GPU=8.99GB, attn=eager
+[2026-05-26 06:17:41] Model: GlmForCausalLM, L=40, d=4096, mlp_type=merged_gate_up
+[2026-05-26 06:17:41] Testing 15 layers: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
+[2026-05-26 06:17:41] Global warmup...
+[2026-05-26 06:17:51] Warmup done, GPU=9.0GB
+[2026-05-26 06:17:51] Hook verification...
+[2026-05-26 06:17:53]   self_attn hook: FIRED
+[2026-05-26 06:17:53]   mlp hook:      FIRED
+[2026-05-26 06:17:53]   Components to patch: ['attn', 'mlp', 'resid']
+[2026-05-26 06:17:53] Patching plan: 28 pairs × 15 layers × 3 comps = 1260 forwards
+[2026-05-26 06:18:42]   [1/28] abs_justice_corruption         49s elapsed, ~74 pair/h, ETA=22min, errors=0
+[2026-05-26 06:21:53]   [5/28] comp_bigger_than               240s elapsed, ~75 pair/h, ETA=18min, errors=0
+[2026-05-26 06:25:51]   [10/28] svo_father_son                 478s elapsed, ~75 pair/h, ETA=14min, errors=0
+[2026-05-26 06:29:47]   [15/28] neg_happy                      714s elapsed, ~76 pair/h, ETA=10min, errors=0
+[2026-05-26 06:33:43]   [20/28] svo_guard_prison               950s elapsed, ~76 pair/h, ETA=6min, errors=0
+[2026-05-26 06:37:47]   [25/28] temp_before_after              1194s elapsed, ~75 pair/h, ETA=2min, errors=0
+[2026-05-26 06:40:15] 
+Patching complete: 28/28 pairs, 0 errors, 1342s (22.4min)
+[2026-05-26 06:40:15] 
+============================================================
+[2026-05-26 06:40:15] AGGREGATION: Per-Component, Per-Layer Effects
+[2026-05-26 06:40:15] ============================================================
+[2026-05-26 06:40:15] 
+  Component: ATTN
+[2026-05-26 06:40:15]      L mean_eff  std_eff  n_valid    condensed
+[2026-05-26 06:40:15]   L  0    0.062    0.200       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L  2    0.068    0.250       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L  4    0.130    0.192       28         WEAK
+[2026-05-26 06:40:15]   L  6    0.042    0.074       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L  8    0.060    0.106       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 10    0.014    0.020       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 12    0.021    0.029       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 14    0.011    0.015       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 16    0.019    0.029       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 18    0.028    0.045       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 20    0.008    0.010       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 22    0.027    0.035       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 24    0.007    0.010       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 26    0.006    0.009       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 28    0.008    0.018       28   NEGLIGIBLE
+[2026-05-26 06:40:15] 
+  Component: MLP
+[2026-05-26 06:40:15]      L mean_eff  std_eff  n_valid    condensed
+[2026-05-26 06:40:15]   L  0    0.991    0.143       28     DOMINANT
+[2026-05-26 06:40:15]   L  2    0.606    0.721       28       STRONG
+[2026-05-26 06:40:15]   L  4    0.263    0.509       28         WEAK
+[2026-05-26 06:40:15]   L  6    0.186    0.293       28         WEAK
+[2026-05-26 06:40:15]   L  8    0.104    0.132       28         WEAK
+[2026-05-26 06:40:15]   L 10    0.073    0.090       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 12    0.055    0.076       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 14    0.053    0.066       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 16    0.061    0.085       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 18    0.046    0.058       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 20    0.044    0.046       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 22    0.059    0.068       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 24    0.049    0.050       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 26    0.045    0.048       28   NEGLIGIBLE
+[2026-05-26 06:40:15]   L 28    0.044    0.046       28   NEGLIGIBLE
+[2026-05-26 06:40:15] 
+  Component: RESID
+[2026-05-26 06:40:15]      L mean_eff  std_eff  n_valid    condensed
+[2026-05-26 06:40:15]   L  0    1.017    0.085       28     DOMINANT
+[2026-05-26 06:40:15]   L  2    1.010    0.075       28     DOMINANT
+[2026-05-26 06:40:15]   L  4    1.013    0.064       28     DOMINANT
+[2026-05-26 06:40:15]   L  6    1.004    0.056       28     DOMINANT
+[2026-05-26 06:40:15]   L  8    1.001    0.068       28     DOMINANT
+[2026-05-26 06:40:15]   L 10    0.990    0.063       28     DOMINANT
+[2026-05-26 06:40:15]   L 12    0.987    0.058       28     DOMINANT
+[2026-05-26 06:40:15]   L 14    0.993    0.062       28     DOMINANT
+[2026-05-26 06:40:15]   L 16    0.986    0.056       28     DOMINANT
+[2026-05-26 06:40:15]   L 18    0.988    0.050       28     DOMINANT
+[2026-05-26 06:40:15]   L 20    0.984    0.045       28     DOMINANT
+[2026-05-26 06:40:15]   L 22    0.980    0.041       28     DOMINANT
+[2026-05-26 06:40:15]   L 24    0.984    0.036       28     DOMINANT
+[2026-05-26 06:40:15]   L 26    0.986    0.033       28     DOMINANT
+[2026-05-26 06:40:15]   L 28    0.983    0.039       28     DOMINANT
+[2026-05-26 06:40:15] 
+  Cross-Component Comparison (All Pairs):
+[2026-05-26 06:40:15]      L         attn          mlp        resid       LEADER
+[2026-05-26 06:40:15]   L  0        0.062        0.991        1.017        resid
+[2026-05-26 06:40:15]   L  2        0.068        0.606        1.010        resid
+[2026-05-26 06:40:15]   L  4        0.130        0.263        1.013        resid
+[2026-05-26 06:40:15]   L  6        0.042        0.186        1.004        resid
+[2026-05-26 06:40:15]   L  8        0.060        0.104        1.001        resid
+[2026-05-26 06:40:15]   L 10        0.014        0.073        0.990        resid
+[2026-05-26 06:40:15]   L 12        0.021        0.055        0.987        resid
+[2026-05-26 06:40:15]   L 14        0.011        0.053        0.993        resid
+[2026-05-26 06:40:15]   L 16        0.019        0.061        0.986        resid
+[2026-05-26 06:40:15]   L 18        0.028        0.046        0.988        resid
+[2026-05-26 06:40:15]   L 20        0.008        0.044        0.984        resid
+[2026-05-26 06:40:15]   L 22        0.027        0.059        0.980        resid
+[2026-05-26 06:40:15]   L 24        0.007        0.049        0.984        resid
+[2026-05-26 06:40:15]   L 26        0.006        0.045        0.986        resid
+[2026-05-26 06:40:15]   L 28        0.008        0.044        0.983        resid
+[2026-05-26 06:40:15] 
+  Per-Category Component Dominance:
+[2026-05-26 06:40:15]     abstract          : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     animal            : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     comparative       : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     conditional       : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     human             : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     human_object      : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     logical           : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     negation          : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     passive           : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     place             : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     quantifier        : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     recursive         : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     temporal          : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15]     translation       : attn=30, mlp=30, resid=30
+[2026-05-26 06:40:15] 
+Results saved to results\phase285_real_patching\glm4_real_patching.json

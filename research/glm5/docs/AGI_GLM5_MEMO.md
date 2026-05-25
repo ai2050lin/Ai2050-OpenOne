@@ -58390,3 +58390,192 @@ python tests/glm5/phase284_calibrated_full_matrix.py deepseek7b # 17.9min
 - `results/phase284_calibrated_matrix/{model}_block1_full_matrix.json`（完整功能矩阵）
 - `tmp/phase284_{model}.txt`（完整日志）
 - `tests/glm5/phase284_calibrated_full_matrix.py`（测试脚本）
+
+---
+
+## Phase 285: 真实Forward Activation Patching — 消除Manual Gap [2026-05-26 06:54]
+
+### 实验动机
+
+Phase 282-284的核心硬伤：manual attention patching（手动注意力替换）和真实forward有不可量化的gap。
+Phase 285用**真实forward activation patching**（真实前向激活替换）彻底取代manual RoPE计算：
+- 不需要手动Q/K/V投影
+- 不需要手写RoPE
+- 不需要从safetensors读权重
+- 直接用模型自身的attention/MLP机制
+- 方法本质：forward→cache→hook-replace→forward→measure
+
+### 方法
+
+```
+对于每对句子(A, B):
+1. Forward A → cache每层: attn_out, mlp_out, resid (真实激活)
+2. Forward B → cache同上
+3. 对每层L和组件C (attn, mlp, resid):
+   Forward B, 但hook替换C_{L}为A的cached值
+4. 测量输出logit分布的KL散度偏移:
+   effect = KL(P_patched || P_B) / KL(P_A || P_B)
+   0 = 无效果, 1 = 完全转换, >1 = 过度转换
+```
+
+**组件定义**：
+- **attn**: self_attn模块输出（经过W_o投影的attention输出）
+- **mlp**: MLP模块输出
+- **resid**: 整层输出（residual stream delta = attn+mlp+prev_resid）
+
+### Hook验证
+
+三个模型self_attn和mlp的forward hook全部正常触发（eager模式）。之前Phase 284 Block 0校准失败是因为flash_attn_2未安装，本Phase使用eager attention。
+
+### ⚠️⚠️ 核心结果（28对×15层×3组件=1260次替换/模型）
+
+#### Qwen3 (50s, 28对, L=36, 测试15层)
+
+| 层 | attn_eff | mlp_eff | resid_eff | 特征 |
+|----|----------|---------|-----------|------|
+| L0 | **1.375** | **1.110** | 1.253 | 两者>1, 过度转换 |
+| L2 | 0.053 | 0.095 | 1.161 | 骤降 |
+| L6 | 0.143 | 0.184 | 1.134 | |
+| L10 | 0.044 | 0.162 | 1.005 | |
+| L16 | 0.038 | 0.128 | 0.998 | |
+| L18 | 0.014 | 0.097 | 1.076 | |
+| L22 | 0.067 | 0.084 | 1.108 | |
+| L28 | 0.018 | 0.053 | 1.031 | |
+| **AVG** | **0.131** | **0.168** | **1.089** | |
+
+**Qwen3特点**：L0后attn/mlp效应骤降至~0.01-0.18。单个组件替换几乎不改变输出——模型对组件级扰动极度robust。这直接印证了Phase 284"全流水线路由型"的结论：信息高度分布式编码，任何单一组件的变化都被残差流稀释。
+
+#### GLM4 (22.4min, 28对, L=40, 测试15层)
+
+| 层 | attn_eff | mlp_eff | resid_eff | 特征 |
+|----|----------|---------|-----------|------|
+| L0 | 0.062 | **0.991** | 1.017 | **MLP近乎完全转换！** |
+| L2 | 0.068 | **0.606** | 1.010 | MLP仍极高 |
+| L4 | 0.130 | 0.263 | 1.013 | |
+| L6 | 0.042 | 0.186 | 1.004 | |
+| L10 | 0.014 | 0.073 | 0.990 | |
+| L16 | 0.019 | 0.061 | 0.986 | |
+| L22 | 0.027 | 0.059 | 0.980 | |
+| L28 | 0.008 | 0.044 | 0.983 | |
+| **AVG** | **0.034** | **0.179** | **0.994** | |
+
+**GLM4特点**：L0 MLP效应=0.991（几乎1.0）！这意味着**仅替换GLM4第0层MLP输出，就能把B句的logit分布几乎完全变成A句的**。L2 MLP仍有0.606。但attn效应始终极小（AVG=0.034）。
+
+**关键解释**：GLM4使用merged_gate_up MLP（门控+升维合并），L0 MLP可能在早期就完成了"句子整体语义编码"。L0 MLP单独承载了几乎整个句子差异的信息。这是GLM4架构的特殊性——早期MLP是信息瓶颈。
+
+#### DS7B (13.6min, 28对, L=28, 测试15层)
+
+| 层 | attn_eff | mlp_eff | resid_eff | 特征 |
+|----|----------|---------|-----------|------|
+| L0 | **0.966** | **0.947** | 1.233 | **两者都近乎完全转换！** |
+| L2 | 0.334 | 0.787 | 1.165 | |
+| L4 | 0.369 | 0.648 | 1.157 | |
+| L6 | 0.364 | 0.531 | 1.128 | |
+| L10 | 0.448 | 0.530 | 1.174 | |
+| L14 | 0.355 | 0.488 | 1.168 | |
+| L18 | 0.319 | 0.385 | 1.261 | |
+| L22 | 0.423 | 0.411 | 1.240 | |
+| L26 | 0.232 | 0.738 | 1.182 | |
+| L27 | 0.441 | 0.427 | 1.000 | |
+| **AVG** | **0.377** | **0.551** | **1.155** | |
+
+**DS7B特点**：与Qwen3/GLM4形成剧烈对比：
+- 单组件效应系数（attn/残差=0.327, mlp/残差=0.477）远高于Qwen3(0.12/0.15)和GLM4(0.03/0.18)
+- L0处attn和mlp都近乎1.0 — **任一组件的L0替换都能几乎完全转换输出**
+- 全层组件效应维持在0.2-0.8，不像Qwen3那样骤降
+- DS7B的组件更加"brittle/causally decisive"（因果决定性更强）
+
+### ⚠️⚠️ 跨模型核心对比
+
+```
+组件因果决定性（attn/残差比）:
+  Qwen3: 0.120  ← 极低，信息高度分布式
+  GLM4:  0.034  ← 极低，attn几乎无单独因果力
+  DS7B:  0.327  ← 3-10倍于Qwen3/GLM4
+
+组件因果决定性（mlp/残差比）:
+  Qwen3: 0.154
+  GLM4:  0.180  (但L0=0.974, 极度集中)
+  DS7B:  0.477  ← 2.6-3倍于Qwen3/GLM4
+```
+
+**三种截然不同的"信息编码哲学"通过真实forward patching得到验证：**
+
+```text
+Qwen3 — "分布式编码型"
+  组件级效应极小(0.01-0.18)，信息分散在残差流中。
+  替换单一组件几乎不影响输出 — 极致鲁棒。
+  与Phase 284 "全流水线路由型"完全一致。
+
+GLM4 — "L0 MLP瓶颈型"
+  L0 MLP单独承载几乎全部句子差异。
+  attn效应可以忽略 — attention不是因果主路径。
+  与Phase 284 "分阶段交替型"一致，但揭示了更极端的分工：
+  MLP在L0就完成了"语义压缩"，后续层只做细节加工。
+
+DS7B — "组件因果决定型"
+  全层组件效应维持在0.2-0.8 — 每个组件都有实质因果力。
+  L0 attn和mlp都近乎完全决定输出。
+  Sliding Window架构使组件间缺乏"残差流平滑"，
+  单个组件变化更易传播。与Phase 284 "悬崖式分叉型"一致。
+```
+
+### Phase 282/283/284/285 联合校正
+
+Phase 285与Phase 284的核心分歧：
+
+| Phase 284 (Manual) | Phase 285 (Real Forward) |
+|---|---|
+| Qwen3全层WEIGHT主导 | Qwen3全层RESID主导，attn/mlp极弱 |
+| GLM4 L0 WEIGHT(44.6%) | GLM4 L0 MLP单独=0.991（几乎完全） |
+| DS7B L17起全VALUE | DS7B全层attn+mlp效应高水平维持 |
+
+**关键修正**：
+1. Manual attention的"WEIGHT主导"结论需要重新审视。真实forward patching显示attn单独效应极小——这与"WEIGHT主导"矛盾。
+2. 解释：Phase 284测量的"weight effect"是attn_weight变化，而Phase 285测量的是attn_OUTPUT变化。两者不同：attn_weight是QK路由，attn_output是路由+内容的合并。Manual measurement可能放大了weight的变化。
+3. GLM4的真实机制是MLP在L0起决定性作用，而非attention。
+
+### 新增客观事实拼图（15条）
+
+1. 真实forward activation patching在所有三个模型成功运行（Phase 285）
+2. self_attn和mlp的forward hook在eager模式下全部正常触发（Phase 285 hook验证）
+3. Qwen3 L2+组件级效应0.01-0.18 — 单组件替换几乎不影响输出（Phase 285）
+4. GLM4 L0 MLP单独效应=0.991 — 仅替换L0 MLP就能几乎完全转换A↔B差异（Phase 285）
+5. GLM4 L2 MLP效应=0.606 — 仍极高，随后骤降（Phase 285）
+6. DS7B L0 attn=0.966, mlp=0.947 — 任一组件L0替换都能几乎完全转换输出（Phase 285）
+7. DS7B全层组件效应0.2-0.8 — 远高于Qwen3(0.01-0.18)和GLM4(0.01-0.26)（Phase 285）
+8. Qwen3 L0 attn=1.375 >1.0 — 单一组件替换"过度转换"（Phase 285）
+9. 三模型在real forward patching下呈现三种截然不同的组件因果结构（Phase 285）
+10. Manual attention的WEIGHT/VALUE分解与真实forward的attn/mlp/resid分解不是同一维度（Phase 285 vs Phase 284）
+11. GLM4 attn效应极低(AVG=0.034) — attention不是GLM4的因果主路径（Phase 285）
+12. DS7B attn/残差比(0.327)是Qwen3(0.12)的2.7倍 — Sliding Window架构的因果特征（Phase 285）
+13. DS7B Sliding Window+eager警告仍然存在，但hook正常工作（Phase 285）
+14. 所有14类功能在real forward patching下组件效应模式相同（Phase 285 per-category）
+15. GLM4 merged_gate_up MLP架构可能解释了L0 MLP的极端因果力（Phase 285）
+
+### 硬伤
+
+1. **effect>1问题**：Qwen3 L0 attn=1.375 >1.0表示单一组件替换"过度转换"输出。这可能反映：当残差流中大部分信息还是B时，仅替换attn创造了一个不一致的hybrid state，模型输出比A和B都更极端。这是single-component patching的方法学局限。
+
+2. **DS7B Sliding Window+eager**：警告持续存在。深层效应数据信任度降低。
+
+3. **L0集中效应**：所有模型L0的组件效应都显著高于后续层，这可能部分来自"首层残差积累最少"的架构artifact，而非真正的因果集中。
+
+4. **resid effect始终~1.0**：这不是发现而是预期——k个残差流是信息的full state，替换它当然会完全转换输出。resid只能作为baseline。
+
+5. **测试集限制**：28对（14类×2对），每类仅2对。需要更多pair验证per-category的稳定性。
+
+### 命令记录
+
+```bash
+python tests/glm5/phase285_real_forward_patching.py qwen3    # 50s
+python tests/glm5/phase285_real_forward_patching.py glm4      # 22.4min
+python tests/glm5/phase285_real_forward_patching.py deepseek7b # 13.6min
+```
+
+### 数据文件
+
+- `results/phase285_real_patching/{model}_real_patching.json`
+- `tmp/phase285_{model}.txt`（完整日志）
+- `tests/glm5/phase285_real_forward_patching.py`（测试脚本）
+- `tests/glm5_temp/phase285_read_results.py`（结果读取脚本）
