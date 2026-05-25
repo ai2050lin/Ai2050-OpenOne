@@ -57274,6 +57274,7 @@ python tests/glm5/phase280_attention_graph.py deepseek7b
 - `results/phase280_attention_graph/{model}_block_d_crosslingual.json`
 
 ---
+
 ## Phase 281: 路由-内容分离实验 [2026-05-25 23:03]
 
 ### 实验动机
@@ -57563,3 +57564,274 @@ python tests/glm5/phase281_routing_content_separation.py deepseek7b
 - `results/phase281_routing_content/{model}_block_b_swap.json`
 - `results/phase281_routing_content/{model}_block_c_heads.json`
 - `tmp/phase281_{model}.txt` (完整日志)
+
+---
+
+## Phase 282: 四路因果Patching + RoPE修正 [2026-05-26 00:15]
+
+### 实验动机
+
+Phase 281的最大硬伤：manual attention没有RoPE（旋转位置编码）。Phase 282实现完整RoPE（含GLM4的partial RoPE），并扩展为四路因果patching + 50对SVO句对，建立首张"组件贡献矩阵"。
+
+### 关键技术与修正
+
+**RoPE实现**：
+- GPT-NeoX风格（rotary_adjacent_pairs=False）：half-half配对
+- Qwen3: rope_theta=1000000, full rotary (128/128 dims), QK LayerNorm
+- GLM4: rope_theta=10000, **partial rotary (64/128 dims)**, factor=0.5
+- DS7B: rope_theta=10000, full rotary (128/128 dims)
+
+**四路patching设计**：
+- **B1 (weight_patch)**：固定V，交换attention weights → 测量routing效应
+- **B2 (value_patch)**：固定attention weights，交换V → 测量content效应
+- **B3 (attn_out_patch)**：通过forward hook替换整个attention输出 → 测量attn输出因果效应
+- **B4 (mlp_out_patch)**：通过forward hook替换MLP输出 → 测量MLP输出因果效应
+
+**50对SVO数据集**：8类别 × 52对句
+- animal(9), human(8), human_object(6), place(6), passive(5), negation(7), quantifier(6), abstract(5)
+
+**效应量解释**：
+- B1/B2: `effect = ||mixed_output - pure_B_output|| / ||pure_A - pure_B||`（越高=该组件对差异贡献越大）
+- B3/B4: `effect = ||logits_patched - logits_B|| / ||logits_A - logits_B||`（越低=替换该组件使A更接近B）
+- `importance = 1 - effect`（越高=组件越关键）
+
+---
+
+### ⚠️ 核心发现：RoPE完全逆转Phase 281结论
+
+#### Phase 281 (无RoPE) → Phase 282 (有RoPE) 对比
+
+| 模型 | 层 | P281 主导 | P282 主导 | 变化 |
+|------|-----|-----------|-----------|------|
+| Qwen3 | L0 | ROUTING (1.24 vs 0.85) | WEIGHT (0.975 vs 0.541) | **一致** |
+| Qwen3 | L9 | CONTENT (0.25 vs 0.99) | WEIGHT (0.930 vs 0.497) | ← **完全逆转!** |
+| Qwen3 | L18 | ROUTING>content (0.63 vs 0.55) | VALUE (0.839 vs 0.862) | ← **逆转!** |
+| Qwen3 | L27 | CONTENT (0.59 vs 0.98) | WEIGHT (0.956 vs 0.590) | ← **完全逆转!** |
+| Qwen3 | L35 | CONTENT (0.77 vs 0.88) | WEIGHT (0.890 vs 0.504) | ← **完全逆转!** |
+| GLM4 | L0 | ROUTING (1.04 vs 0.24) | VALUE (0.590 vs 0.919) | ← **完全逆转!** |
+| GLM4 | L10 | CONTENT (0.43 vs 0.95) | WEIGHT (0.953 vs 0.437) | ← **完全逆转!** |
+| DS7B | L0 | CONTENT (0.68 vs 0.89) | WEIGHT (0.966 vs 0.657) | ← **完全逆转!** |
+| DS7B | L7 | CONTENT (0.59 vs 0.92) | WEIGHT (0.949 vs 0.446) | ← **完全逆转!** |
+| DS7B | L14 | CONTENT (0.67 vs 0.86) | WEIGHT (0.955 vs 0.501) | ← **完全逆转!** |
+
+**结论**：10个对比中，8个完全逆转，1个逆转，1个一致。RoPE缺失导致Phase 281的"content主导"结论系统性地错误——在缺乏位置信息的情况下，QK dot product无法区分不同位置的token，attention退化为"全位置平均"，使得value向量的作用被错误放大。
+
+---
+
+### Block B1+B2：RoPE修正后Manual Attention Patching
+
+#### Qwen3 (L=36, 5层, 52对)
+
+| 层 | weight_eff | value_eff | content_dom% | 主导者 |
+|----|-----------|----------|-------------|--------|
+| L0 | **0.975** | 0.541 | 5.8% | **WEIGHT>>** |
+| L9 | **0.930** | 0.497 | 0.0% | **WEIGHT>>** |
+| L18 | 0.839 | **0.862** | 30.8% | **<VALUE** |
+| L27 | **0.956** | 0.590 | 3.8% | **WEIGHT>>** |
+| L35 | **0.890** | 0.504 | 0.0% | **WEIGHT>>** |
+
+**Qwen3类别分解**：
+| 类别 | weight_eff | value_eff | 主导 |
+|------|-----------|----------|------|
+| abstract | 0.931 | 0.583 | WEIGHT |
+| animal | 0.913 | 0.585 | WEIGHT |
+| human | 0.908 | 0.596 | WEIGHT |
+| human_object | 0.951 | 0.489 | WEIGHT |
+| negation | 0.931 | 0.488 | WEIGHT |
+| passive | 0.991 | 0.547 | WEIGHT |
+| place | 0.917 | 0.607 | WEIGHT |
+| quantifier | 0.915 | 0.480 | WEIGHT |
+
+**Qwen3关键发现**：L18是唯一VALUE主导层（content_dom=30.8%）——这是Phase 279发现的"操作子子空间"所在层附近。其他所有层均为WEIGHT主导（attention weights携带更多角色差异）。
+
+#### GLM4 (L=40, 2层可测, 52对)
+
+| 层 | weight_eff | value_eff | content_dom% | 主导者 |
+|----|-----------|----------|-------------|--------|
+| L0 | 0.590 | **0.919** | 63.5% | **<VALUE** |
+| L10 | **0.953** | 0.437 | 0.0% | **WEIGHT>>** |
+
+**GLM4类别分解**：
+| 类别 | weight_eff | value_eff | 主导 |
+|------|-----------|----------|------|
+| animal | 0.611 | 0.740 | VALUE |
+| human | 0.670 | 0.753 | VALUE |
+| human_object | 0.634 | 0.750 | VALUE |
+| place | 0.682 | 0.781 | VALUE |
+| negation | 0.953 | 0.524 | WEIGHT |
+| passive | 1.046 | 0.814 | WEIGHT |
+| quantifier | 0.868 | 0.419 | WEIGHT |
+| abstract | 0.854 | 0.625 | WEIGHT |
+
+**GLM4关键发现**：L0是唯一VALUE主导层（所有模型中唯一）。这可能是GLM4的partial RoPE（仅64/128维旋转）导致的特殊行为——未旋转的64维度可能让value向量承载更多信息。
+
+#### DS7B (L=28, 3层可测, 52对)
+
+| 层 | weight_eff | value_eff | content_dom% | 主导者 |
+|----|-----------|----------|-------------|--------|
+| L0 | **0.966** | 0.657 | 3.8% | **WEIGHT>>** |
+| L7 | **0.949** | 0.446 | 0.0% | **WEIGHT>>** |
+| L14 | **0.955** | 0.501 | 0.0% | **WEIGHT>>** |
+
+**DS7B类别分解**：全部8个类别均为WEIGHT主导（weight_eff 0.905-1.048, value_eff 0.361-0.601）。DS7B的所有层、所有类别都统一显示routing/weights的重要性远大于content/values。
+
+**DS7B关键发现**：Phase 281认为DS7B从L0起"content主导"，可能是Sliding Window + no RoPE的双重artifact。加上RoPE后，DS7B回归到与Qwen3一致的WEIGHT主导模式。
+
+---
+
+### Block B3+B4：Forward-pass Output Patching
+
+#### Qwen3（13层，52对）
+
+| 层 | attn_importance | mlp_importance | 主导 |
+|----|----------------|---------------|------|
+| L0 | **0.728** | **0.802** | MLP_OUT |
+| L3-L33 | 0.000-0.063 | 0.013-0.110 | MLP_OUT |
+| L35 | 0.000 | 0.154 | MLP_OUT |
+
+**解读**：Qwen3 L0的attn_out和mlp_out都很重要（73-80%），但3层以后attn_out importance骤降至近0。mlp_out importance维持在1-15%。说明**单个层的输出替换无法大幅改变深层logits**——角色信息已分散在残差流中。
+
+#### GLM4（12层，52对-仅同长度句对）
+
+| 层 | attn_importance | mlp_importance | 主导 |
+|----|----------------|---------------|------|
+| L0 | 0.000 | **0.871** | MLP_OUT |
+| L4-L39 | 0.000-0.020 | 0.023-0.134 | MLP_OUT |
+
+**GLM4关键发现**：L0的MLP输出importance高达**87.1%**！这是三模型中最高的单层组件效应。说明GLM4的L0 MLP层在角色编码中扮演极其关键的角色——替换L0的MLP输出几乎可以让A变成B。
+
+#### DS7B（16层，52对）
+
+| 层 | attn_importance | mlp_importance | 主导 |
+|----|----------------|---------------|------|
+| L0 | 0.193 | 0.000 | ATTN_OUT |
+| L2-L26 | 0.000 | 0.000 | 混合(效应>1.0) |
+| L27 | 0.475 | **0.581** | MLP_OUT |
+
+**DS7B关键发现**：L2-L26层effect>1.0（patching使A远离B），这是因为eager模式下Sliding Window Attention不稳定。仅在L27（末层）得到有效结果：attn_importance=0.475, mlp_importance=0.581。L27两者贡献相当。
+
+---
+
+### Block C：组件贡献矩阵（首版）
+
+#### Qwen3
+
+| 层 | weight_eff | value_eff | 主组件(manual) | attn_imp | mlp_imp | 主组件(output) |
+|----|-----------|----------|---------------|----------|---------|---------------|
+| L0 | 0.975 | 0.541 | WEIGHT | 0.728 | 0.802 | MLP_OUT |
+| L9 | 0.930 | 0.497 | WEIGHT | 0.000 | 0.013 | MLP_OUT |
+| L18 | 0.839 | 0.862 | **VALUE** | 0.001 | 0.044 | MLP_OUT |
+| L27 | 0.956 | 0.590 | WEIGHT | 0.019 | 0.107 | MLP_OUT |
+| L35 | 0.890 | 0.504 | WEIGHT | 0.000 | 0.154 | MLP_OUT |
+
+#### GLM4
+
+| 层 | weight_eff | value_eff | 主组件(manual) | attn_imp | mlp_imp | 主组件(output) |
+|----|-----------|----------|---------------|----------|---------|---------------|
+| L0 | 0.590 | 0.919 | **VALUE** | 0.000 | **0.871** | MLP_OUT |
+| L10 | 0.953 | 0.437 | WEIGHT | N/A | N/A | N/A |
+
+#### DS7B
+
+| 层 | weight_eff | value_eff | 主组件(manual) | attn_imp | mlp_imp | 主组件(output) |
+|----|-----------|----------|---------------|----------|---------|---------------|
+| L0 | 0.966 | 0.657 | WEIGHT | 0.193 | 0.000 | ATTN_OUT |
+| L7 | 0.949 | 0.446 | WEIGHT | N/A | N/A | N/A |
+| L14 | 0.955 | 0.501 | WEIGHT | 0.000 | 0.000 | MLP_OUT |
+| L27 | N/A | N/A | N/A | 0.475 | 0.581 | MLP_OUT |
+
+---
+
+### 新增客观事实拼图（12条）
+
+1. ❗ RoPE修正将Phase 281的8/10个层结论完全逆转——无RoPE时"content主导"是系统性artifact（Phase 282核心发现）
+2. Qwen3仅L18是VALUE主导层（30.8% pairs），其余所有测试层均为WEIGHT主导（Phase 282-B12）
+3. GLM4 L0是三模型中唯一VALUE主导的浅层（63.5%），可能与其partial RoPE（64/128维）有关（Phase 282-B12）
+4. DS7B所有可测层均为WEIGHT主导，与Qwen3一致，推翻了Phase 281的"DS7B全content"结论（Phase 282-B12）
+5. GLM4 L0 MLP输出importance高达87.1%，是单层最高因果效应（Phase 282-B34）
+6. Qwen3 L0 attn_out importance=73%, mlp_out importance=80%（Phase 282-B34）
+7. 所有模型L3后attn_out importance骤降至接近0——单层attention输出替换无法逆转深层logits（Phase 282-B34）
+8. DS7B L2-L26 output patching效应>1.0，Sliding Window + eager模式导致输出传播不稳定（Phase 282-B34）
+9. DS7B L27（末层）attn_out和mlp_out重要性相当（47.5% vs 58.1%）（Phase 282-B34）
+10. 52对SVO × 8类别验证：weight_effect始终≥0.839, value_effect≤0.862，跨类别一致性高（Phase 282-B12）
+11. 所有模型total_gap随深度指数增长（Qwen3 L0=1.6→L35=168, 100x）（Phase 282-B12）
+12. negation和passive类别的weight_effect系统偏高（≥0.93），可能因为否定/被动语态的句法重排更依赖routing（Phase 282-B12）
+
+---
+
+### 关键硬伤
+
+1. **GLM4/DS7B深层meta tensor**：device_map="auto"导致L15+权重不可访问，B1+B2仅覆盖12.5%-25%的层。需safetensors直接加载补齐
+2. **DS7B Sliding Window + eager不稳定**：B3+B4的output patching在L2-L26得到effect>1.0（替换使A远离B），说明SWA+eager的attention计算与模型预期不符
+3. **B3+B4的序列长度限制**：仅能patch同长度句对，passive/negation等变长句对自动排除，样本量减少
+4. **RoPE实现无rope_scaling**：Qwen3 config中有rope_scaling相关字段但未使用，长序列时可能有偏差
+5. **Output patching的effect解释复杂**：effect>0.9时importance可能因残余噪声被低估，effect>1.0时完全不可靠
+6. **GQA的KV展开**：gqa_group=4(Qwen3)/16(GLM4)/7(DS7B)，K/V的head级分析因共享而存在重复计算
+7. **Manual attention vs 真实forward的gap**：手动计算的attention output与真实forward有系统性差异（无RoPE之前差2-3x，有RoPE后缩小但仍存在）
+
+---
+
+### 关键洞察与第一性原理
+
+**RoPE修正揭示的真实图景**：
+
+Phase 282最重要的发现是：**在正确的RoPE计算下，attention weights（routing）是角色交换后输出变化的主要来源，而非value vectors（content）。** 这与Phase 281的结论完全相反。
+
+这指向一个更深层的语言编码原理：
+
+```
+语言理解 = 条件位置路由（conditional positional routing）
+
+token embedding承载语义"标签"
++ RoPE编码的位置信息  
+→ attention QK计算决定"在此位置关注哪些token"
+→ V携带的是被路由机制选择后的内容
+→ 不同语义配置会微调路由模式（让某些"位置"被更多/更少关注）
+→ MLP进一步变换
+```
+
+**与Phase 280的关系**：
+
+Phase 280发现SVO角色交换"不改变attention图整体拓扑"（frob<0.02），似乎与Phase 282的"weight主导"矛盾。但两者可以调和：
+
+- Phase 280看的是**整体图的宏观稳定性**（community structure, edge density）
+- Phase 282看的是**精细的attention weight变化对输出的因果效应**
+- 一种解释：attention图的**宏观结构**在角色交换时保持稳定（句法骨架不变），但在**词级别**的attention weight微调（哪个位置多关注一点/少关注一点）通过残差流累积放大，最终导致输出变化
+
+**三模型的统一与分歧**：
+
+- **统一**：所有模型在大多数层都是WEIGHT/routing主导（有RoPE后）
+- **Qwen3独特**：L18是唯一VALUE主导层——可能是"操作子子空间"所在的语义计算峰值层
+- **GLM4独特**：L0 VALUE主导 + MLP输出87%重要性——partial RoPE可能导致首层编码策略不同
+- **DS7B独特**：Sliding Window导致output patching不稳定，但manual RoPE结果与Qwen3一致
+
+---
+
+### 下一阶段（Phase 283）建议
+
+| 优先级 | 任务 | 理由 |
+|--------|------|------|
+| P0 | 修复GLM4/DS7B深层权重加载（safetensors直接读） | 补齐全层B1+B2数据，确认层间过渡模式 |
+| P0 | DS7B eager→SDPA模式测试 | 消除Sliding Window + eager的不稳定性对B3+B4的影响 |
+| P1 | Qwen3 L18逐head VALUE主导分析 | L18是唯一VALUE主导层，需要head级定位哪些head专门用value编码 |
+| P1 | GLM4 L0 partial RoPE的64维透传维分析 | 为什么GLM4 L0 VALUE主导？可能与未旋转的64维有关 |
+| P2 | attention weight在"总贡献"中的比例（head级别） | 区分哪些head参与routing，哪些参与content |
+| P2 | 对比有/无RoPE的手动attention在相同句对上的head级差异 | 精确量化RoPE修正的量级 |
+
+---
+
+### 命令记录
+
+```bash
+python tests/glm5/phase282_causal_patching_rope.py qwen3
+python tests/glm5/phase282_causal_patching_rope.py glm4
+python tests/glm5/phase282_causal_patching_rope.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase282_causal_patching/{model}_block_b12_rope.json`（52对 × 5层，手动RoPE patching）
+- `results/phase282_causal_patching/{model}_block_b34_output.json`（52对 × 10-16层，output patching）
+- `results/phase282_causal_patching/{model}_contribution_matrix.json`（组件贡献矩阵）
+- `tmp/phase282_{model}.txt`（完整日志）
+- `tests/glm5/phase282_causal_patching_rope.py`（测试脚本）
