@@ -1,0 +1,93 @@
+[2026-05-25 12:16:24] Phase 277: Conditional Dynamics Atlas
+[2026-05-25 12:16:24] Model: glm4, Tokens: 53
+[2026-05-25 12:16:37] Loading glm4 (bfloat16 + device_map=auto)...
+[2026-05-25 12:16:38]   flash_attn not available, using eager
+[2026-05-25 12:16:48] glm4 loaded: device=cuda:0, GPU=8.99GB, attn=eager
+[2026-05-25 12:16:48] Model info: n_layers=40, d_model=4096, class=GlmForCausalLM
+[2026-05-25 12:16:48] ============================================================
+[2026-05-25 12:16:48] Collecting trajectories: 53 tokens, 40 layers, d=4096
+[2026-05-25 12:17:09]   Progress: 10/53, elapsed=20.9s, ETA=89.9s, GPU=9.00GB
+[2026-05-25 12:17:20]   Progress: 20/53, elapsed=31.8s, ETA=52.4s, GPU=9.00GB
+[2026-05-25 12:17:31]   Progress: 30/53, elapsed=42.5s, ETA=32.6s, GPU=9.00GB
+[2026-05-25 12:17:42]   Progress: 40/53, elapsed=53.3s, ETA=17.3s, GPU=9.00GB
+[2026-05-25 12:17:52]   Progress: 50/53, elapsed=63.9s, ETA=3.8s, GPU=9.00GB
+[2026-05-25 12:17:56]   Progress: 53/53, elapsed=67.2s, ETA=0.0s, GPU=9.00GB
+[2026-05-25 12:17:56] Trajectories collected: 53/53 tokens
+[2026-05-25 12:17:56] ============================================================
+[2026-05-25 12:17:56] === Exp A: Universal Direction Test ===
+[2026-05-25 12:17:57]   Global var_top1: mean=0.4470 ± 0.1906
+[2026-05-25 12:17:57]   Global mean pairwise cos: 0.4383
+[2026-05-25 12:17:57]   Per-layer var_top1 range: [0.2121, 0.9541]
+[2026-05-25 12:17:57]     L0: var_top1=0.9421, var_top3=0.9686, mean_cos=0.9383, neg_frac=0.000
+[2026-05-25 12:17:57]     L10: var_top1=0.2250, var_top3=0.3558, mean_cos=0.1961, neg_frac=1.000
+[2026-05-25 12:17:57]     L20: var_top1=0.4964, var_top3=0.6108, mean_cos=0.4844, neg_frac=0.000
+[2026-05-25 12:17:57]     L30: var_top1=0.4053, var_top3=0.4943, mean_cos=0.3992, neg_frac=1.000
+[2026-05-25 12:17:57]     L39: var_top1=0.9541, var_top3=0.9735, mean_cos=0.9504, neg_frac=0.000
+[2026-05-25 12:17:57] ============================================================
+[2026-05-25 12:17:57] === Exp B: Scalar Profile Atlas ===
+[2026-05-25 12:17:59]   Scalar profile clustering: broad ARI=0.4921, fine ARI=0.2155
+[2026-05-25 12:17:59]   Within-dim scalar corr: 0.9912592429091714
+[2026-05-25 12:17:59]   Between-dim scalar corr: 0.9880563087039118
+[2026-05-25 12:17:59]   Delta: 0.0032029342052596332
+[2026-05-25 12:17:59] ============================================================
+[2026-05-25 12:17:59] === Exp C: Trajectory Topology ===
+[2026-05-25 12:17:59]   Max curvature at L38: 126.6°
+[2026-05-25 12:17:59]   Distance within: early=0.28, late=82.26, ratio=296.648
+[2026-05-25 12:17:59]   Distance between: early=0.29, late=104.54, ratio=355.582
+[2026-05-25 12:17:59] ============================================================
+[2026-05-25 12:17:59] === Exp D: DMD Mode Analysis ===
+[2026-05-25 12:18:00]   DMD mode correlation: within=0.8359608556710038, between=0.7883518784771145, delta=0.047608977193889235
+[2026-05-25 12:18:00]     'dog': top1_mag=0.954, top1_energy=0.624, growing=5, decaying=5
+[2026-05-25 12:18:00]     'think': top1_mag=0.978, top1_energy=0.632, growing=2, decaying=8
+[2026-05-25 12:18:00]     'and': top1_mag=0.872, top1_energy=0.224, growing=4, decaying=6
+[2026-05-25 12:18:00]     'not': top1_mag=0.990, top1_energy=0.302, growing=1, decaying=9
+[2026-05-25 12:18:00]     'good': top1_mag=1.025, top1_energy=0.643, growing=6, decaying=4
+[2026-05-25 12:18:00]     'bad': top1_mag=0.989, top1_energy=0.602, growing=4, decaying=6
+[2026-05-25 12:18:00]     'go': top1_mag=1.031, top1_energy=0.501, growing=6, decaying=4
+[2026-05-25 12:18:00]     'went': top1_mag=1.006, top1_energy=0.620, growing=3, decaying=7
+[2026-05-25 12:18:00] ============================================================
+[2026-05-25 12:18:00] === Exp E: Language Dimension Signatures ===
+[2026-05-25 12:18:00]   Negation pairs: avg opposite fraction=0.0, avg pearson_r=0.9988683405073463
+[2026-05-25 12:18:00]     good/bad: pearson=1.000, opposite_frac=0.000
+[2026-05-25 12:18:00]     happy/sad: pearson=1.000, opposite_frac=0.000
+[2026-05-25 12:18:00]     alive/dead: pearson=1.000, opposite_frac=0.000
+[2026-05-25 12:18:00]     open/closed: pearson=0.996, opposite_frac=0.000
+[2026-05-25 12:18:00]     light/dark: pearson=0.999, opposite_frac=0.000
+[2026-05-25 12:18:00]   Tense group ('go', 'went', 'going', 'gone'): mean corr=0.9989300500560566
+[2026-05-25 12:18:00]   Logic within-scalar corr: 0.9995165167006487
+[2026-05-25 12:18:00]   Content within-scalar corr: 0.9994520127341685
+[2026-05-25 12:18:00]   Dimension mean scalars:
+[2026-05-25 12:18:00]     entities_animal: mean=2.5163748750090598, std=0.08488858793487863, n=5
+[2026-05-25 12:18:00]     entities_tool: mean=2.9039383633434777, std=0.09665527902446729, n=5
+[2026-05-25 12:18:00]     entities_place: mean=2.6623521246016026, std=0.17811917372214628, n=5
+[2026-05-25 12:18:00]     actions_physical: mean=3.040474204868078, std=0.5304874232222081, n=5
+[2026-05-25 12:18:00]     actions_mental: mean=2.6923006738722326, std=0.2493823411934787, n=5
+[2026-05-25 12:18:00]     abstractions: mean=2.8615882647037507, std=0.26223737648201195, n=5
+[2026-05-25 12:18:00]     logic: mean=2.6441709832102065, std=0.13011211247084226, n=5
+[2026-05-25 12:18:00]     tense: mean=2.9788640771061186, std=0.3319611906172933, n=4
+[2026-05-25 12:18:00]     reference: mean=2.7893065135926007, std=0.2660145446279585, n=4
+[2026-05-25 12:18:00]     negation_pos: mean=2.579560048878193, std=0.4058185441384033, n=5
+[2026-05-25 12:18:00]     negation_neg: mean=2.499343276172876, std=0.39547056161583144, n=5
+[2026-05-25 12:18:00] ============================================================
+[2026-05-25 12:18:00] FINAL SUMMARY
+[2026-05-25 12:18:00] ============================================================
+[2026-05-25 12:18:00] Exp A — Universal Direction:
+[2026-05-25 12:18:00]   var_top1 (mean): 0.4470
+[2026-05-25 12:18:00]   mean pairwise cos: 0.4383
+[2026-05-25 12:18:00] Exp B — Scalar Profile:
+[2026-05-25 12:18:00]   within-dim corr: 0.9912592429091714
+[2026-05-25 12:18:00]   between-dim corr: 0.9880563087039118
+[2026-05-25 12:18:00]   delta: 0.0032029342052596332
+[2026-05-25 12:18:00]   broad ARI: 0.49211912883560177
+[2026-05-25 12:18:00]   fine ARI: 0.2154708964735873
+[2026-05-25 12:18:00] Exp C — Topology:
+[2026-05-25 12:18:00]   distance within ratio (late/early): 296.64815415749655
+[2026-05-25 12:18:00]   distance between ratio (late/early): 355.5818902518242
+[2026-05-25 12:18:00]   max curvature layer: 38
+[2026-05-25 12:18:00] Exp D — DMD:
+[2026-05-25 12:18:00]   mode corr within: 0.8359608556710038
+[2026-05-25 12:18:00]   mode corr between: 0.7883518784771145
+[2026-05-25 12:18:00] Exp E — Negation:
+[2026-05-25 12:18:00]   avg opposite fraction: 0.0
+[2026-05-25 12:18:00]   avg pearson_r: 0.9988683405073463
+[2026-05-25 12:18:01] Model released. Phase 277 complete.

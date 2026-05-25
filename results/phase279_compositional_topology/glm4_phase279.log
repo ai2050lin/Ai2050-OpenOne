@@ -1,0 +1,125 @@
+[2026-05-25 13:41:39] Phase 279: Compositional Computational Topology
+[2026-05-25 13:41:39] Model: glm4
+[2026-05-25 13:41:40] Loading glm4 (bfloat16 + device_map=auto)...
+[2026-05-25 13:41:41]   flash_attn not available, using eager
+[2026-05-25 13:41:51] glm4 loaded: device=cuda:0, GPU=8.99GB, attn=eager
+[2026-05-25 13:41:51] Model info: n_layers=40, d_model=4096, class=GlmForCausalLM
+[2026-05-25 13:41:51] ============================================================
+[2026-05-25 13:41:51] === Block A: Relation Dynamics ===
+[2026-05-25 13:41:51]   Extracting 8 SVO trajectories...
+[2026-05-25 13:42:07]     SVO progress: 4/8, elapsed=16.3s
+[2026-05-25 13:42:11]     SVO progress: 8/8, elapsed=20.6s
+[2026-05-25 13:42:11]   Extracting 6 control trajectories...
+[2026-05-25 13:42:18]   Analysis 1: Relation swap (S→O reversal)
+[2026-05-25 13:42:18]   Analysis 2: Relation type (same S/O, different R)
+[2026-05-25 13:42:18]   Analysis 3: SVO vs entity-only
+[2026-05-25 13:42:18]   Analysis 4: Subspace structure (SVO deltas vs entity deltas)
+[2026-05-25 13:42:18]   SVO trajectories: 8
+[2026-05-25 13:42:18]   Swap pairs analyzed: 2
+[2026-05-25 13:42:18]   Relation type pairs: 3
+[2026-05-25 13:42:18]   SVO vs entity: 8
+[2026-05-25 13:42:18]   Swap 'dog_chases_cat_vs_cat_chases_dog': min_cos=0.2232, mid_cos=0.8550, last_cos=0.8790
+[2026-05-25 13:42:18]   Swap 'man_loves_woman_vs_woman_loves_man': min_cos=0.2846, mid_cos=0.8843, last_cos=0.8001
+[2026-05-25 13:42:18]   Subspace overlap L0: 0.8689
+[2026-05-25 13:42:18]   Subspace overlap L1: 0.5945
+[2026-05-25 13:42:18]   Subspace overlap L2: 0.6534
+[2026-05-25 13:42:18]   Subspace overlap L3: 0.4080
+[2026-05-25 13:42:18]   Subspace overlap L4: 0.2213
+[2026-05-25 13:42:18] ============================================================
+[2026-05-25 13:42:18] === Block B: Composition Test ===
+[2026-05-25 13:42:18]   Extracting compound trajectories...
+[2026-05-25 13:42:25]     Compound progress: 6/14, elapsed=6.9s
+[2026-05-25 13:42:31]     Compound progress: 12/14, elapsed=13.4s
+[2026-05-25 13:42:34]   Extracting modifier trajectories...
+[2026-05-25 13:42:49]   Extracting noun trajectories...
+[2026-05-25 13:43:04]   Analysis 1: Composition linearity
+[2026-05-25 13:43:04]   Analysis 2: Nonlinearity profile
+[2026-05-25 13:43:04]   Analysis 3: Nonlinearity direction structure
+[2026-05-25 13:43:04]   Compounds: 14, Linearity pairs: 14
+[2026-05-25 13:43:04]   Nonlinearity: early=0.8581, mid=0.7095, late=0.5289
+[2026-05-25 13:43:04] ============================================================
+[2026-05-25 13:43:04] === Block C: Operator Dynamics ===
+[2026-05-25 13:43:04]   Extracting operator+operand trajectories...
+[2026-05-25 13:43:11]     Op+Operand progress: 6/27, elapsed=6.5s
+[2026-05-25 13:43:17]     Op+Operand progress: 12/27, elapsed=13.1s
+[2026-05-25 13:43:24]     Op+Operand progress: 18/27, elapsed=19.6s
+[2026-05-25 13:43:31]     Op+Operand progress: 24/27, elapsed=26.3s
+[2026-05-25 13:43:34]   Extracting operand-alone trajectories...
+[2026-05-25 13:44:01]   Extracting operator-alone trajectories...
+[2026-05-25 13:44:11]   Analysis 1: Operator effect
+[2026-05-25 13:44:11]   Analysis 2: Operator type signatures
+[2026-05-25 13:44:11]   Analysis 3: Negation-as-inversion test
+[2026-05-25 13:44:11]   Analysis 4: Operator delta subspace
+[2026-05-25 13:44:11]   Operator effects: 27
+[2026-05-25 13:44:11]   Operator types: ['not', 'if', 'because', 'every', 'some', 'no', 'will', 'can', 'must']
+[2026-05-25 13:44:11]   Negation tests: 0
+[2026-05-25 13:44:11]   Operator overlaps: 36
+[2026-05-25 13:44:11]   because mid-layer rel_diff: 0.6081
+[2026-05-25 13:44:11]   can mid-layer rel_diff: 0.7070
+[2026-05-25 13:44:11]   every mid-layer rel_diff: 0.6917
+[2026-05-25 13:44:11]   if mid-layer rel_diff: 0.6462
+[2026-05-25 13:44:11]   must mid-layer rel_diff: 0.8683
+[2026-05-25 13:44:11]   no mid-layer rel_diff: 0.7831
+[2026-05-25 13:44:11]   not mid-layer rel_diff: 0.8163
+[2026-05-25 13:44:11]   some mid-layer rel_diff: 0.6517
+[2026-05-25 13:44:11]   will mid-layer rel_diff: 0.8558
+[2026-05-25 13:44:11] ============================================================
+[2026-05-25 13:44:11] === Block D: Recursive Closure ===
+[2026-05-25 13:44:11]   Extracting 12 recursive trajectories...
+[2026-05-25 13:44:14]     Recursive progress: 3/12, elapsed=3.2s
+[2026-05-25 13:44:18]     Recursive progress: 6/12, elapsed=6.5s
+[2026-05-25 13:44:21]     Recursive progress: 9/12, elapsed=9.8s
+[2026-05-25 13:44:24]     Recursive progress: 12/12, elapsed=13.0s
+[2026-05-25 13:44:24]   Analysis 1: Trajectory divergence vs recursion depth
+[2026-05-25 13:44:24]   Analysis 2: Increment dimension vs depth
+[2026-05-25 13:44:24]   Analysis 3: Consecutive depth delta
+[2026-05-25 13:44:24]   Analysis 4: Trajectory curvature
+[2026-05-25 13:44:24]   Sentences: 12
+[2026-05-25 13:44:24]   Curvature 'relative_d0': mean=0.8274, max=1.5917
+[2026-05-25 13:44:24]   Curvature 'relative_d1': mean=0.8946, max=1.6549
+[2026-05-25 13:44:24]   Curvature 'relative_d2': mean=0.9169, max=1.6234
+[2026-05-25 13:44:24]   Curvature 'relative_d3': mean=0.9081, max=1.6353
+[2026-05-25 13:44:24]   Curvature 'prepositional_d0': mean=0.8272, max=1.6376
+[2026-05-25 13:44:24]   Curvature 'prepositional_d1': mean=0.8581, max=1.6304
+[2026-05-25 13:44:24]   Curvature 'prepositional_d2': mean=0.8973, max=1.6446
+[2026-05-25 13:44:24]   Curvature 'prepositional_d3': mean=0.9070, max=1.6183
+[2026-05-25 13:44:24]   Curvature 'complement_d0': mean=0.7864, max=1.6527
+[2026-05-25 13:44:24]   Curvature 'complement_d1': mean=0.8451, max=1.7187
+[2026-05-25 13:44:24]   Curvature 'complement_d2': mean=0.8640, max=1.6486
+[2026-05-25 13:44:24]   Curvature 'complement_d3': mean=0.8809, max=1.6014
+[2026-05-25 13:44:24] ============================================================
+[2026-05-25 13:44:24] PHASE 279 OBJECTIVE RESULTS
+[2026-05-25 13:44:24] ============================================================
+[2026-05-25 13:44:24] Block A — Relation:
+[2026-05-25 13:44:24]   Swap 'dog_chases_cat_vs_cat_chases_dog': range=[0.2232, 0.9518]
+[2026-05-25 13:44:24]   Swap 'man_loves_woman_vs_woman_loves_man': range=[0.2846, 0.9266]
+[2026-05-25 13:44:24] Block B — Composition:
+[2026-05-25 13:44:24]   L0: mean_rel_delta=0.8608
+[2026-05-25 13:44:24]   L10: mean_rel_delta=0.8513
+[2026-05-25 13:44:24]   L20: mean_rel_delta=0.7050
+[2026-05-25 13:44:24]   L30: mean_rel_delta=0.6200
+[2026-05-25 13:44:24]   L40: mean_rel_delta=0.8277
+[2026-05-25 13:44:24] Block C — Operator:
+[2026-05-25 13:44:24]   because mid rel_diff: 0.6081
+[2026-05-25 13:44:24]   can mid rel_diff: 0.7070
+[2026-05-25 13:44:24]   every mid rel_diff: 0.6917
+[2026-05-25 13:44:24]   if mid rel_diff: 0.6462
+[2026-05-25 13:44:24]   must mid rel_diff: 0.8683
+[2026-05-25 13:44:24]   no mid rel_diff: 0.7831
+[2026-05-25 13:44:24]   not mid rel_diff: 0.8163
+[2026-05-25 13:44:24]   some mid rel_diff: 0.6517
+[2026-05-25 13:44:24]   will mid rel_diff: 0.8558
+[2026-05-25 13:44:24] Block D — Recursion:
+[2026-05-25 13:44:24]   relative_d0: curvature=0.8274
+[2026-05-25 13:44:24]   relative_d1: curvature=0.8946
+[2026-05-25 13:44:24]   relative_d2: curvature=0.9169
+[2026-05-25 13:44:24]   relative_d3: curvature=0.9081
+[2026-05-25 13:44:24]   prepositional_d0: curvature=0.8272
+[2026-05-25 13:44:24]   prepositional_d1: curvature=0.8581
+[2026-05-25 13:44:24]   prepositional_d2: curvature=0.8973
+[2026-05-25 13:44:24]   prepositional_d3: curvature=0.9070
+[2026-05-25 13:44:24]   complement_d0: curvature=0.7864
+[2026-05-25 13:44:24]   complement_d1: curvature=0.8451
+[2026-05-25 13:44:24]   complement_d2: curvature=0.8640
+[2026-05-25 13:44:24]   complement_d3: curvature=0.8809
+[2026-05-25 13:44:26] Model released. Phase 279 complete.

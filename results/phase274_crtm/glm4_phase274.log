@@ -1,0 +1,56 @@
+[2026-05-25 03:58:39] === Phase 274: CRTM — glm4 ===
+[2026-05-25 03:58:40] Loading glm4 (bfloat16 + device_map=auto)...
+[2026-05-25 03:58:51] glm4 loaded: device=cuda:0, GPU=8.99GB
+[2026-05-25 03:58:51] Model: GlmForCausalLM, layers=40, d_model=4096
+[2026-05-25 03:58:51] --- Experiment A: Routing Activation Maps ---
+[2026-05-25 03:58:51] Exp A: Routing Activation Maps, 30 words × 40 layers
+[2026-05-25 03:59:21]   [10/30] routing maps done, GPU=9.00GB
+[2026-05-25 03:59:41]   [20/30] routing maps done, GPU=9.00GB
+[2026-05-25 04:00:01]   [30/30] routing maps done, GPU=9.00GB
+[2026-05-25 04:00:02]   Within: spearman=nan, cosine=0.8985, jaccard=0.5848
+[2026-05-25 04:00:02]   Between: spearman=nan, cosine=0.7260, jaccard=0.4017
+[2026-05-25 04:00:02] --- Experiment B: Activation Resampling (Patching) ---
+[2026-05-25 04:00:02] Exp B: Activation Resampling (Patching)
+[2026-05-25 04:00:02]   Within pair (1/12): apple↔banana
+[2026-05-25 04:00:20]   Within pair (2/12): apple↔orange
+[2026-05-25 04:00:38]   Within pair (3/12): banana↔grape
+[2026-05-25 04:00:56]   Within pair (4/12): dog↔cat
+[2026-05-25 04:01:14]   Within pair (5/12): lion↔tiger
+[2026-05-25 04:01:32]   Within pair (6/12): wolf↔fox
+[2026-05-25 04:01:50]   Within pair (7/12): car↔bus
+[2026-05-25 04:02:08]   Within pair (8/12): train↔plane
+[2026-05-25 04:02:26]   Within pair (9/12): bike↔truck
+[2026-05-25 04:02:44]   Within pair (10/12): peach↔cherry
+[2026-05-25 04:03:02]   Within pair (11/12): bear↔wolf
+[2026-05-25 04:03:20]   Within pair (12/12): boat↔ship
+[2026-05-25 04:03:39]   Between pair (1/12): apple↔dog
+[2026-05-25 04:03:57]   Between pair (2/12): banana↔car
+[2026-05-25 04:04:15]   Between pair (3/12): orange↔lion
+[2026-05-25 04:04:33]   Between pair (4/12): grape↔train
+[2026-05-25 04:04:52]   Between pair (5/12): mango↔bike
+[2026-05-25 04:05:10]   Between pair (6/12): peach↔wolf
+[2026-05-25 04:05:29]   Between pair (7/12): cherry↔fox
+[2026-05-25 04:05:47]   Between pair (8/12): lemon↔bus
+[2026-05-25 04:06:06]   Between pair (9/12): pear↔tiger
+[2026-05-25 04:06:24]   Between pair (10/12): lime↔ship
+[2026-05-25 04:06:43]   Between pair (11/12): apple↔car
+[2026-05-25 04:07:01]   Between pair (12/12): dog↔bus
+[2026-05-25 04:07:20]   Within peak shift: 8.4904 at mean layer 27.0
+[2026-05-25 04:07:20]   Between peak shift: 11.3292 at mean layer 17.2
+[2026-05-25 04:07:20] --- Experiment C: Path Reuse Ratio ---
+[2026-05-25 04:07:20] Exp C: Path Reuse Ratio, 25 words, K=50
+[2026-05-25 04:07:40]   [10/25] done, GPU=9.00GB
+[2026-05-25 04:08:01]   [20/25] done, GPU=9.00GB
+[2026-05-25 04:08:11]   Within jaccard: 0.5848, weighted_reuse: 0.6928
+[2026-05-25 04:08:11]   Between jaccard: 0.4017, weighted_reuse: 0.5367
+[2026-05-25 04:08:11] --- Experiment D: Conditional Routing for Ambiguous Words ---
+[2026-05-25 04:08:11] Exp D: Conditional Routing for Ambiguous Words
+[2026-05-25 04:08:11]   Pair 1: 'The fish sat on the river bank...' vs 'She deposited money in the bank...'
+[2026-05-25 04:08:13]   Pair 2: 'The light from the sun was bright...' vs 'The box was very light to carry...'
+[2026-05-25 04:08:16]   Pair 3: 'He likes to play football...' vs 'She wants to play the piano...'
+[2026-05-25 04:08:18]   Pair 4: 'The bark of the dog was loud...' vs 'The bark of the tree was rough...'
+[2026-05-25 04:08:20]   Pair 5: 'The spring season brings flowers...' vs 'The metal spring broke under pressure...'
+[2026-05-25 04:08:22]   Pair 6: 'The bat flew in the cave...' vs 'He swung the baseball bat...'
+[2026-05-25 04:08:24]   Pair 7: 'She broke the glass window...' vs 'He drank from a glass...'
+[2026-05-25 04:08:26]   Pair 8: 'A fast runner won the race...' vs 'The human race spread globally...'
+[2026-05-25 04:08:28] === Phase 274 Complete: glm4 ===

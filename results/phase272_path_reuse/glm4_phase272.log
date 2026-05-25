@@ -1,0 +1,104 @@
+[2026-05-24 22:56:30] Phase 272: Path Reuse & Divergence - glm4
+[2026-05-24 22:56:30] Log: results\phase272_path_reuse\glm4_phase272.log
+[2026-05-24 22:56:32] Loading glm4 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:56:33]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:56:42]   Loaded with attn_implementation=eager
+[2026-05-24 22:56:42]   class=GlmForCausalLM, layers=40, d_model=4096, vocab=151552, GPU=8.99GB
+[2026-05-24 22:56:42] 
+Starting Experiment A: Path Overlap Matrix
+[2026-05-24 22:56:42] ============================================================
+[2026-05-24 22:56:42] Experiment A: Path Overlap Matrix
+[2026-05-24 22:56:42] ============================================================
+[2026-05-24 22:56:42]   Extracting computation profiles for 50 words...
+[2026-05-24 22:57:03]   10/50 profiles extracted, GPU=9.0GB
+[2026-05-24 22:57:16]   20/50 profiles extracted, GPU=9.0GB
+[2026-05-24 22:57:28]   30/50 profiles extracted, GPU=9.0GB
+[2026-05-24 22:57:40]   40/50 profiles extracted, GPU=9.0GB
+[2026-05-24 22:57:53]   50/50 profiles extracted, GPU=9.0GB
+[2026-05-24 22:57:53]   Computing overlaps at layers [0, 10, 20, 30, 39]...
+[2026-05-24 22:57:54]   L0: Within vs Between:
+[2026-05-24 22:57:54]     Head Imp Corr:   0.9188 vs 0.9219 (Δ=-0.0031)
+[2026-05-24 22:57:54]     Head Jaccard:    0.8077 vs 0.7904 (Δ=+0.0173)
+[2026-05-24 22:57:54]     Attn Pat Corr:   0.8943 vs 0.9864 (Δ=-0.0922)
+[2026-05-24 22:57:54]     Delta Cosine:    0.9842 vs 0.9832 (Δ=+0.0010)
+[2026-05-24 22:57:54]     Top-Dim Jaccard: 0.7141 vs 0.6944 (Δ=+0.0197)
+[2026-05-24 22:57:54]   L10: Within vs Between:
+[2026-05-24 22:57:54]     Head Imp Corr:   0.7504 vs 0.6254 (Δ=+0.1250)
+[2026-05-24 22:57:54]     Head Jaccard:    0.6626 vs 0.5498 (Δ=+0.1127)
+[2026-05-24 22:57:54]     Attn Pat Corr:   0.8641 vs 0.9226 (Δ=-0.0585)
+[2026-05-24 22:57:54]     Delta Cosine:    0.5802 vs 0.3286 (Δ=+0.2516)
+[2026-05-24 22:57:54]     Top-Dim Jaccard: 0.1098 vs 0.0505 (Δ=+0.0592)
+[2026-05-24 22:57:54]   L20: Within vs Between:
+[2026-05-24 22:57:54]     Head Imp Corr:   0.8755 vs 0.8237 (Δ=+0.0517)
+[2026-05-24 22:57:54]     Head Jaccard:    0.7824 vs 0.7631 (Δ=+0.0193)
+[2026-05-24 22:57:54]     Attn Pat Corr:   0.8770 vs 0.9497 (Δ=-0.0727)
+[2026-05-24 22:57:54]     Delta Cosine:    0.7926 vs 0.6522 (Δ=+0.1404)
+[2026-05-24 22:57:54]     Top-Dim Jaccard: 0.2552 vs 0.1362 (Δ=+0.1190)
+[2026-05-24 22:57:54]   L30: Within vs Between:
+[2026-05-24 22:57:54]     Head Imp Corr:   0.7410 vs 0.6404 (Δ=+0.1006)
+[2026-05-24 22:57:54]     Head Jaccard:    0.6712 vs 0.6052 (Δ=+0.0660)
+[2026-05-24 22:57:54]     Attn Pat Corr:   0.8557 vs 0.9178 (Δ=-0.0622)
+[2026-05-24 22:57:54]     Delta Cosine:    0.6631 vs 0.4500 (Δ=+0.2131)
+[2026-05-24 22:57:54]     Top-Dim Jaccard: 0.1476 vs 0.0744 (Δ=+0.0732)
+[2026-05-24 22:57:54]   L39: Within vs Between:
+[2026-05-24 22:57:54]     Head Imp Corr:   0.7142 vs 0.6481 (Δ=+0.0661)
+[2026-05-24 22:57:54]     Head Jaccard:    0.6115 vs 0.5799 (Δ=+0.0316)
+[2026-05-24 22:57:54]     Attn Pat Corr:   0.8664 vs 0.9362 (Δ=-0.0698)
+[2026-05-24 22:57:54]     Delta Cosine:    0.9836 vs 0.9729 (Δ=+0.0106)
+[2026-05-24 22:57:54]     Top-Dim Jaccard: 0.6571 vs 0.5528 (Δ=+0.1044)
+[2026-05-24 22:57:54] Experiment A completed in 72s
+[2026-05-24 22:57:54] Saved: glm4_path_overlap.json
+[2026-05-24 22:57:56] Model released, reloading for Experiment B...
+[2026-05-24 22:57:56] Loading glm4 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:57:56]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:58:01]   Loaded with attn_implementation=eager
+[2026-05-24 22:58:01]   class=GlmForCausalLM, layers=40, d_model=4096, vocab=151552, GPU=9.00GB
+[2026-05-24 22:58:01] 
+Starting Experiment B: Divergence Layer Detection
+[2026-05-24 22:58:01] ============================================================
+[2026-05-24 22:58:01] Experiment B: Divergence Layer Detection
+[2026-05-24 22:58:01] ============================================================
+[2026-05-24 22:58:01]   Processing 35 pairs...
+[2026-05-24 22:58:27]   10/35 pairs processed
+[2026-05-24 22:58:51]   20/35 pairs processed
+[2026-05-24 22:59:14]   30/35 pairs processed
+[2026-05-24 22:59:26]   L0: cos_dist W=0.0000 B=0.0000 Δ=0.0000 | head_corr W=0.9318 B=0.9219 | delta_cos W=0.9873 B=0.9832
+[2026-05-24 22:59:26]   L10: cos_dist W=0.1769 B=0.3712 Δ=0.1944 | head_corr W=0.7484 B=0.6254 | delta_cos W=0.6132 B=0.3286
+[2026-05-24 22:59:26]   L20: cos_dist W=0.1342 B=0.2443 Δ=0.1101 | head_corr W=0.8852 B=0.8237 | delta_cos W=0.8055 B=0.6522
+[2026-05-24 22:59:26]   L30: cos_dist W=0.1305 B=0.2558 Δ=0.1253 | head_corr W=0.7721 B=0.6404 | delta_cos W=0.6890 B=0.4500
+[2026-05-24 22:59:26]   L40: cos_dist W=0.1189 B=0.2437 Δ=0.1248 | head_corr W=0.0000 B=0.0000 | delta_cos W=0.0000 B=0.0000
+[2026-05-24 22:59:26] Experiment B completed in 85s
+[2026-05-24 22:59:26] Saved: glm4_divergence.json
+[2026-05-24 22:59:28] Model released, reloading for Experiment C...
+[2026-05-24 22:59:28] Loading glm4 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:59:28]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:59:32]   Loaded with attn_implementation=eager
+[2026-05-24 22:59:32]   class=GlmForCausalLM, layers=40, d_model=4096, vocab=151552, GPU=9.00GB
+[2026-05-24 22:59:32] 
+Starting Experiment C: Context-Conditional Routing
+[2026-05-24 22:59:32] ============================================================
+[2026-05-24 22:59:32] Experiment C: Context-Conditional Routing
+[2026-05-24 22:59:32] ============================================================
+[2026-05-24 22:59:32]   Processing 10 context pairs...
+[2026-05-24 22:59:38]   Pair 1: emb_div=0.0000, final_div=0.4916, mid_head_corr=0.7086, mid_delta_cos=0.4353
+[2026-05-24 22:59:40]   Pair 2: emb_div=0.9708, final_div=0.4556, mid_head_corr=0.7661, mid_delta_cos=0.1873
+[2026-05-24 22:59:42]   Pair 3: emb_div=0.9682, final_div=0.3235, mid_head_corr=0.7595, mid_delta_cos=0.4192
+[2026-05-24 22:59:45]   Pair 4: emb_div=0.9143, final_div=0.2982, mid_head_corr=0.7647, mid_delta_cos=0.4391
+[2026-05-24 22:59:47]   Pair 5: emb_div=0.9883, final_div=0.4229, mid_head_corr=0.5561, mid_delta_cos=0.3825
+[2026-05-24 22:59:50]   Pair 6: emb_div=0.9797, final_div=0.5611, mid_head_corr=0.4150, mid_delta_cos=0.1402
+[2026-05-24 22:59:52]   Pair 7: emb_div=0.9693, final_div=0.3927, mid_head_corr=0.6653, mid_delta_cos=0.3901
+[2026-05-24 22:59:54]   Pair 8: emb_div=0.9080, final_div=0.4711, mid_head_corr=0.7210, mid_delta_cos=0.3418
+[2026-05-24 22:59:57]   Pair 9: emb_div=0.9374, final_div=0.4349, mid_head_corr=0.4062, mid_delta_cos=0.3568
+[2026-05-24 22:59:59]   Pair 10: emb_div=1.0025, final_div=0.3565, mid_head_corr=0.5909, mid_delta_cos=0.3546
+[2026-05-24 22:59:59]   L0: cos_dist=0.8639, head_corr=0.7584, delta_cos=0.3229, top_jaccard=0.2180
+[2026-05-24 22:59:59]   L10: cos_dist=0.6837, head_corr=0.6741, delta_cos=0.1449, top_jaccard=0.0185
+[2026-05-24 22:59:59]   L20: cos_dist=0.4821, head_corr=0.6353, delta_cos=0.3447, top_jaccard=0.0606
+[2026-05-24 22:59:59]   L30: cos_dist=0.3916, head_corr=0.6155, delta_cos=0.3842, top_jaccard=0.0550
+[2026-05-24 22:59:59]   L40: cos_dist=0.4208, head_corr=0.0000, delta_cos=0.0000, top_jaccard=0.0000
+[2026-05-24 22:59:59] Experiment C completed in 27s
+[2026-05-24 22:59:59] Saved: glm4_context_routing.json
+[2026-05-24 23:00:01] 
+Phase 272 complete for glm4!
+[2026-05-24 23:00:01]   Exp A (Path Overlap): 72s
+[2026-05-24 23:00:01]   Exp B (Divergence): 85s
+[2026-05-24 23:00:01]   Exp C (Context Routing): 27s

@@ -1,0 +1,104 @@
+[2026-05-24 23:00:10] Phase 272: Path Reuse & Divergence - deepseek7b
+[2026-05-24 23:00:10] Log: results\phase272_path_reuse\deepseek7b_phase272.log
+[2026-05-24 23:00:11] Loading deepseek7b (BF16 + device_map=auto + flash)...
+[2026-05-24 23:00:13]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 23:00:23]   Loaded with attn_implementation=eager
+[2026-05-24 23:00:23]   class=Qwen2ForCausalLM, layers=28, d_model=3584, vocab=152064, GPU=9.01GB
+[2026-05-24 23:00:23] 
+Starting Experiment A: Path Overlap Matrix
+[2026-05-24 23:00:23] ============================================================
+[2026-05-24 23:00:23] Experiment A: Path Overlap Matrix
+[2026-05-24 23:00:23] ============================================================
+[2026-05-24 23:00:23]   Extracting computation profiles for 50 words...
+[2026-05-24 23:00:37]   10/50 profiles extracted, GPU=9.0GB
+[2026-05-24 23:00:45]   20/50 profiles extracted, GPU=9.0GB
+[2026-05-24 23:00:53]   30/50 profiles extracted, GPU=9.0GB
+[2026-05-24 23:01:01]   40/50 profiles extracted, GPU=9.0GB
+[2026-05-24 23:01:08]   50/50 profiles extracted, GPU=9.0GB
+[2026-05-24 23:01:08]   Computing overlaps at layers [0, 7, 14, 21, 27]...
+[2026-05-24 23:01:09]   L0: Within vs Between:
+[2026-05-24 23:01:09]     Head Imp Corr:   0.8999 vs 0.9121 (Δ=-0.0121)
+[2026-05-24 23:01:09]     Head Jaccard:    0.7894 vs 0.7997 (Δ=-0.0104)
+[2026-05-24 23:01:09]     Attn Pat Corr:   0.8896 vs 0.9789 (Δ=-0.0893)
+[2026-05-24 23:01:09]     Delta Cosine:    0.8542 vs 0.8329 (Δ=+0.0213)
+[2026-05-24 23:01:09]     Top-Dim Jaccard: 0.6114 vs 0.5753 (Δ=+0.0362)
+[2026-05-24 23:01:09]   L7: Within vs Between:
+[2026-05-24 23:01:09]     Head Imp Corr:   0.6423 vs 0.5473 (Δ=+0.0949)
+[2026-05-24 23:01:09]     Head Jaccard:    0.6458 vs 0.5900 (Δ=+0.0559)
+[2026-05-24 23:01:09]     Attn Pat Corr:   0.8492 vs 0.9238 (Δ=-0.0746)
+[2026-05-24 23:01:09]     Delta Cosine:    0.5125 vs 0.3530 (Δ=+0.1595)
+[2026-05-24 23:01:09]     Top-Dim Jaccard: 0.1617 vs 0.1159 (Δ=+0.0458)
+[2026-05-24 23:01:09]   L14: Within vs Between:
+[2026-05-24 23:01:09]     Head Imp Corr:   0.7886 vs 0.7269 (Δ=+0.0617)
+[2026-05-24 23:01:09]     Head Jaccard:    0.6526 vs 0.5530 (Δ=+0.0996)
+[2026-05-24 23:01:09]     Attn Pat Corr:   0.8580 vs 0.9254 (Δ=-0.0674)
+[2026-05-24 23:01:09]     Delta Cosine:    0.5399 vs 0.4608 (Δ=+0.0791)
+[2026-05-24 23:01:09]     Top-Dim Jaccard: 0.1356 vs 0.1021 (Δ=+0.0335)
+[2026-05-24 23:01:09]   L21: Within vs Between:
+[2026-05-24 23:01:09]     Head Imp Corr:   0.8643 vs 0.8280 (Δ=+0.0364)
+[2026-05-24 23:01:09]     Head Jaccard:    0.7696 vs 0.7216 (Δ=+0.0479)
+[2026-05-24 23:01:09]     Attn Pat Corr:   0.8718 vs 0.9364 (Δ=-0.0646)
+[2026-05-24 23:01:09]     Delta Cosine:    0.7398 vs 0.6617 (Δ=+0.0781)
+[2026-05-24 23:01:09]     Top-Dim Jaccard: 0.2435 vs 0.1868 (Δ=+0.0568)
+[2026-05-24 23:01:09]   L27: Within vs Between:
+[2026-05-24 23:01:09]     Head Imp Corr:   0.5208 vs 0.5105 (Δ=+0.0103)
+[2026-05-24 23:01:09]     Head Jaccard:    0.6030 vs 0.6546 (Δ=-0.0516)
+[2026-05-24 23:01:09]     Attn Pat Corr:   0.8084 vs 0.8817 (Δ=-0.0733)
+[2026-05-24 23:01:09]     Delta Cosine:    0.9537 vs 0.9340 (Δ=+0.0198)
+[2026-05-24 23:01:09]     Top-Dim Jaccard: 0.4642 vs 0.4029 (Δ=+0.0614)
+[2026-05-24 23:01:10] Experiment A completed in 47s
+[2026-05-24 23:01:10] Saved: deepseek7b_path_overlap.json
+[2026-05-24 23:01:11] Model released, reloading for Experiment B...
+[2026-05-24 23:01:11] Loading deepseek7b (BF16 + device_map=auto + flash)...
+[2026-05-24 23:01:11]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 23:01:16]   Loaded with attn_implementation=eager
+[2026-05-24 23:01:16]   class=Qwen2ForCausalLM, layers=28, d_model=3584, vocab=152064, GPU=9.02GB
+[2026-05-24 23:01:16] 
+Starting Experiment B: Divergence Layer Detection
+[2026-05-24 23:01:16] ============================================================
+[2026-05-24 23:01:16] Experiment B: Divergence Layer Detection
+[2026-05-24 23:01:16] ============================================================
+[2026-05-24 23:01:16]   Processing 35 pairs...
+[2026-05-24 23:01:33]   10/35 pairs processed
+[2026-05-24 23:01:48]   20/35 pairs processed
+[2026-05-24 23:02:03]   30/35 pairs processed
+[2026-05-24 23:02:10]   L0: cos_dist W=0.0000 B=0.0000 Δ=0.0000 | head_corr W=0.9191 B=0.9121 | delta_cos W=0.8667 B=0.8329
+[2026-05-24 23:02:10]   L7: cos_dist W=0.2427 B=0.3154 Δ=0.0727 | head_corr W=0.6791 B=0.5473 | delta_cos W=0.5209 B=0.3530
+[2026-05-24 23:02:10]   L14: cos_dist W=0.2111 B=0.2858 Δ=0.0747 | head_corr W=0.7952 B=0.7269 | delta_cos W=0.5425 B=0.4608
+[2026-05-24 23:02:10]   L21: cos_dist W=0.1132 B=0.1496 Δ=0.0364 | head_corr W=0.8758 B=0.8280 | delta_cos W=0.7387 B=0.6617
+[2026-05-24 23:02:10]   L28: cos_dist W=0.0681 B=0.1011 Δ=0.0330 | head_corr W=0.0000 B=0.0000 | delta_cos W=0.0000 B=0.0000
+[2026-05-24 23:02:10] Experiment B completed in 54s
+[2026-05-24 23:02:10] Saved: deepseek7b_divergence.json
+[2026-05-24 23:02:11] Model released, reloading for Experiment C...
+[2026-05-24 23:02:11] Loading deepseek7b (BF16 + device_map=auto + flash)...
+[2026-05-24 23:02:11]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 23:02:16]   Loaded with attn_implementation=eager
+[2026-05-24 23:02:16]   class=Qwen2ForCausalLM, layers=28, d_model=3584, vocab=152064, GPU=9.02GB
+[2026-05-24 23:02:16] 
+Starting Experiment C: Context-Conditional Routing
+[2026-05-24 23:02:16] ============================================================
+[2026-05-24 23:02:16] Experiment C: Context-Conditional Routing
+[2026-05-24 23:02:16] ============================================================
+[2026-05-24 23:02:16]   Processing 10 context pairs...
+[2026-05-24 23:02:19]   Pair 1: emb_div=0.0000, final_div=0.3240, mid_head_corr=0.7630, mid_delta_cos=0.2000
+[2026-05-24 23:02:21]   Pair 2: emb_div=0.9978, final_div=0.1190, mid_head_corr=0.8221, mid_delta_cos=0.2029
+[2026-05-24 23:02:22]   Pair 3: emb_div=0.9622, final_div=0.3606, mid_head_corr=0.7871, mid_delta_cos=0.3594
+[2026-05-24 23:02:24]   Pair 4: emb_div=0.8666, final_div=0.0907, mid_head_corr=0.8949, mid_delta_cos=0.4923
+[2026-05-24 23:02:25]   Pair 5: emb_div=0.9654, final_div=0.1864, mid_head_corr=0.6136, mid_delta_cos=0.2194
+[2026-05-24 23:02:27]   Pair 6: emb_div=0.9417, final_div=0.1450, mid_head_corr=0.8659, mid_delta_cos=0.1820
+[2026-05-24 23:02:28]   Pair 7: emb_div=0.9499, final_div=0.2110, mid_head_corr=0.8911, mid_delta_cos=0.2406
+[2026-05-24 23:02:30]   Pair 8: emb_div=0.8874, final_div=0.2384, mid_head_corr=0.8232, mid_delta_cos=0.1448
+[2026-05-24 23:02:31]   Pair 9: emb_div=0.9028, final_div=0.3366, mid_head_corr=0.7920, mid_delta_cos=0.1560
+[2026-05-24 23:02:33]   Pair 10: emb_div=0.9890, final_div=0.1271, mid_head_corr=0.5911, mid_delta_cos=0.2254
+[2026-05-24 23:02:33]   L0: cos_dist=0.8463, head_corr=0.7715, delta_cos=0.4402, top_jaccard=0.2963
+[2026-05-24 23:02:33]   L7: cos_dist=0.7095, head_corr=0.5334, delta_cos=0.1775, top_jaccard=0.0633
+[2026-05-24 23:02:33]   L14: cos_dist=0.5732, head_corr=0.7844, delta_cos=0.2423, top_jaccard=0.0724
+[2026-05-24 23:02:33]   L21: cos_dist=0.3476, head_corr=0.7042, delta_cos=0.3529, top_jaccard=0.1194
+[2026-05-24 23:02:33]   L28: cos_dist=0.2139, head_corr=0.0000, delta_cos=0.0000, top_jaccard=0.0000
+[2026-05-24 23:02:33] Experiment C completed in 17s
+[2026-05-24 23:02:33] Saved: deepseek7b_context_routing.json
+[2026-05-24 23:02:34] 
+Phase 272 complete for deepseek7b!
+[2026-05-24 23:02:34]   Exp A (Path Overlap): 47s
+[2026-05-24 23:02:34]   Exp B (Divergence): 54s
+[2026-05-24 23:02:34]   Exp C (Context Routing): 17s

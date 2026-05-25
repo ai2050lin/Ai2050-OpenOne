@@ -1,0 +1,118 @@
+[2026-05-24 22:51:10] Phase 272: Path Reuse & Divergence — qwen3
+[2026-05-24 22:51:10] Log: results\phase272_path_reuse\qwen3_phase272.log
+[2026-05-24 22:51:12] Loading qwen3 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:51:13]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:51:23]   Loaded with attn_implementation=eager
+[2026-05-24 22:51:23]   class=Qwen3ForCausalLM, layers=36, d_model=2560, vocab=151936, GPU=8.04GB
+[2026-05-24 22:51:23] 
+============================================================
+[2026-05-24 22:51:23] Starting Experiment A: Path Overlap Matrix
+[2026-05-24 22:51:23] ============================================================
+[2026-05-24 22:51:23] Experiment A: Path Overlap Matrix
+[2026-05-24 22:51:23] ============================================================
+[2026-05-24 22:51:23]   n_heads=1, d_head=4096, intermediate_size=9728
+[2026-05-24 22:51:23]   Processing 50 words across 36 layers...
+[2026-05-24 22:54:49] Phase 272: Path Reuse & Divergence - qwen3
+[2026-05-24 22:54:49] Log: results\phase272_path_reuse\qwen3_phase272.log
+[2026-05-24 22:54:50] Loading qwen3 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:54:51]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:54:56]   Loaded with attn_implementation=eager
+[2026-05-24 22:54:56]   class=Qwen3ForCausalLM, layers=36, d_model=2560, vocab=151936, GPU=8.04GB
+[2026-05-24 22:54:56] 
+Starting Experiment A: Path Overlap Matrix
+[2026-05-24 22:54:56] ============================================================
+[2026-05-24 22:54:56] Experiment A: Path Overlap Matrix
+[2026-05-24 22:54:56] ============================================================
+[2026-05-24 22:54:56]   Extracting computation profiles for 50 words...
+[2026-05-24 22:54:58]   10/50 profiles extracted, GPU=8.1GB
+[2026-05-24 22:54:59]   20/50 profiles extracted, GPU=8.1GB
+[2026-05-24 22:55:01]   30/50 profiles extracted, GPU=8.1GB
+[2026-05-24 22:55:02]   40/50 profiles extracted, GPU=8.1GB
+[2026-05-24 22:55:04]   50/50 profiles extracted, GPU=8.1GB
+[2026-05-24 22:55:04]   Computing overlaps at layers [0, 9, 18, 27, 35]...
+[2026-05-24 22:55:04]   L0: Within vs Between:
+[2026-05-24 22:55:04]     Head Imp Corr:   0.8539 vs 0.8508 (Δ=+0.0031)
+[2026-05-24 22:55:04]     Head Jaccard:    0.7268 vs 0.7340 (Δ=-0.0071)
+[2026-05-24 22:55:04]     Attn Pat Corr:   0.8486 vs 0.9235 (Δ=-0.0750)
+[2026-05-24 22:55:04]     Delta Cosine:    0.9813 vs 0.9774 (Δ=+0.0039)
+[2026-05-24 22:55:04]     Top-Dim Jaccard: 0.8617 vs 0.8530 (Δ=+0.0087)
+[2026-05-24 22:55:04]   L9: Within vs Between:
+[2026-05-24 22:55:04]     Head Imp Corr:   0.8955 vs 0.8933 (Δ=+0.0023)
+[2026-05-24 22:55:04]     Head Jaccard:    0.7724 vs 0.7706 (Δ=+0.0018)
+[2026-05-24 22:55:04]     Attn Pat Corr:   0.8735 vs 0.9620 (Δ=-0.0885)
+[2026-05-24 22:55:04]     Delta Cosine:    0.5552 vs 0.3463 (Δ=+0.2089)
+[2026-05-24 22:55:04]     Top-Dim Jaccard: 0.1181 vs 0.0412 (Δ=+0.0769)
+[2026-05-24 22:55:04]   L18: Within vs Between:
+[2026-05-24 22:55:04]     Head Imp Corr:   0.8180 vs 0.8107 (Δ=+0.0072)
+[2026-05-24 22:55:04]     Head Jaccard:    0.6791 vs 0.6582 (Δ=+0.0209)
+[2026-05-24 22:55:04]     Attn Pat Corr:   0.8242 vs 0.9029 (Δ=-0.0787)
+[2026-05-24 22:55:04]     Delta Cosine:    0.6254 vs 0.5692 (Δ=+0.0562)
+[2026-05-24 22:55:04]     Top-Dim Jaccard: 0.1978 vs 0.1479 (Δ=+0.0499)
+[2026-05-24 22:55:04]   L27: Within vs Between:
+[2026-05-24 22:55:04]     Head Imp Corr:   0.8908 vs 0.8547 (Δ=+0.0361)
+[2026-05-24 22:55:04]     Head Jaccard:    0.7853 vs 0.7162 (Δ=+0.0691)
+[2026-05-24 22:55:04]     Attn Pat Corr:   0.8688 vs 0.9502 (Δ=-0.0814)
+[2026-05-24 22:55:04]     Delta Cosine:    0.7473 vs 0.6224 (Δ=+0.1250)
+[2026-05-24 22:55:04]     Top-Dim Jaccard: 0.2357 vs 0.1569 (Δ=+0.0788)
+[2026-05-24 22:55:04]   L35: Within vs Between:
+[2026-05-24 22:55:04]     Head Imp Corr:   0.8504 vs 0.7933 (Δ=+0.0572)
+[2026-05-24 22:55:04]     Head Jaccard:    0.7135 vs 0.6372 (Δ=+0.0764)
+[2026-05-24 22:55:04]     Attn Pat Corr:   0.8662 vs 0.9447 (Δ=-0.0785)
+[2026-05-24 22:55:04]     Delta Cosine:    0.9466 vs 0.9079 (Δ=+0.0387)
+[2026-05-24 22:55:04]     Top-Dim Jaccard: 0.4701 vs 0.3500 (Δ=+0.1201)
+[2026-05-24 22:55:05] Experiment A completed in 9s
+[2026-05-24 22:55:05] Saved: qwen3_path_overlap.json
+[2026-05-24 22:55:05] Model released, reloading for Experiment B...
+[2026-05-24 22:55:05] Loading qwen3 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:55:05]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:55:06]   Loaded with attn_implementation=eager
+[2026-05-24 22:55:06]   class=Qwen3ForCausalLM, layers=36, d_model=2560, vocab=151936, GPU=2.00GB
+[2026-05-24 22:55:06] 
+Starting Experiment B: Divergence Layer Detection
+[2026-05-24 22:55:06] ============================================================
+[2026-05-24 22:55:06] Experiment B: Divergence Layer Detection
+[2026-05-24 22:55:06] ============================================================
+[2026-05-24 22:55:06]   Processing 35 pairs...
+[2026-05-24 22:55:24]   10/35 pairs processed
+[2026-05-24 22:55:38]   20/35 pairs processed
+[2026-05-24 22:55:53]   30/35 pairs processed
+[2026-05-24 22:56:01]   L0: cos_dist W=0.0000 B=0.0000 Δ=0.0000 | head_corr W=0.8618 B=0.8508 | delta_cos W=0.9826 B=0.9774
+[2026-05-24 22:56:01]   L9: cos_dist W=0.1871 B=0.3105 Δ=0.1234 | head_corr W=0.8977 B=0.8933 | delta_cos W=0.5784 B=0.3463
+[2026-05-24 22:56:01]   L18: cos_dist W=0.1883 B=0.2233 Δ=0.0350 | head_corr W=0.8056 B=0.8107 | delta_cos W=0.5976 B=0.5692
+[2026-05-24 22:56:01]   L27: cos_dist W=0.1193 B=0.1766 Δ=0.0573 | head_corr W=0.8794 B=0.8547 | delta_cos W=0.7252 B=0.6224
+[2026-05-24 22:56:01]   L36: cos_dist W=0.0909 B=0.1429 Δ=0.0520 | head_corr W=0.0000 B=0.0000 | delta_cos W=0.0000 B=0.0000
+[2026-05-24 22:56:01] Experiment B completed in 55s
+[2026-05-24 22:56:01] Saved: qwen3_divergence.json
+[2026-05-24 22:56:02] Model released, reloading for Experiment C...
+[2026-05-24 22:56:02] Loading qwen3 (BF16 + device_map=auto + flash)...
+[2026-05-24 22:56:02]   flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b, trying next...
+[2026-05-24 22:56:03]   Loaded with attn_implementation=eager
+[2026-05-24 22:56:03]   class=Qwen3ForCausalLM, layers=36, d_model=2560, vocab=151936, GPU=2.00GB
+[2026-05-24 22:56:03] 
+Starting Experiment C: Context-Conditional Routing
+[2026-05-24 22:56:03] ============================================================
+[2026-05-24 22:56:03] Experiment C: Context-Conditional Routing
+[2026-05-24 22:56:03] ============================================================
+[2026-05-24 22:56:03]   Processing 10 context pairs...
+[2026-05-24 22:56:06]   Pair 1: emb_div=0.0000, final_div=0.2919, mid_head_corr=0.3680, mid_delta_cos=0.1976
+[2026-05-24 22:56:08]   Pair 2: emb_div=1.0012, final_div=0.2013, mid_head_corr=0.2181, mid_delta_cos=0.1241
+[2026-05-24 22:56:10]   Pair 3: emb_div=0.8449, final_div=0.2244, mid_head_corr=0.7060, mid_delta_cos=0.4779
+[2026-05-24 22:56:11]   Pair 4: emb_div=0.8480, final_div=0.1620, mid_head_corr=0.7460, mid_delta_cos=0.3974
+[2026-05-24 22:56:13]   Pair 5: emb_div=0.9721, final_div=0.2187, mid_head_corr=0.5345, mid_delta_cos=0.1174
+[2026-05-24 22:56:14]   Pair 6: emb_div=0.9478, final_div=0.2345, mid_head_corr=0.3273, mid_delta_cos=0.2284
+[2026-05-24 22:56:16]   Pair 7: emb_div=0.9430, final_div=0.4278, mid_head_corr=0.5718, mid_delta_cos=0.2511
+[2026-05-24 22:56:17]   Pair 8: emb_div=0.8523, final_div=0.2933, mid_head_corr=0.6063, mid_delta_cos=0.2807
+[2026-05-24 22:56:19]   Pair 9: emb_div=0.9862, final_div=0.2547, mid_head_corr=0.3728, mid_delta_cos=0.1039
+[2026-05-24 22:56:20]   Pair 10: emb_div=1.0064, final_div=0.1574, mid_head_corr=0.6738, mid_delta_cos=0.3406
+[2026-05-24 22:56:20]   L0: cos_dist=0.8402, head_corr=0.7882, delta_cos=0.4429, top_jaccard=0.3440
+[2026-05-24 22:56:20]   L9: cos_dist=0.7044, head_corr=0.8030, delta_cos=0.1324, top_jaccard=0.0247
+[2026-05-24 22:56:20]   L18: cos_dist=0.4836, head_corr=0.5125, delta_cos=0.2519, top_jaccard=0.0680
+[2026-05-24 22:56:20]   L27: cos_dist=0.3651, head_corr=0.7845, delta_cos=0.2610, top_jaccard=0.0688
+[2026-05-24 22:56:20]   L36: cos_dist=0.2466, head_corr=0.0000, delta_cos=0.0000, top_jaccard=0.0000
+[2026-05-24 22:56:20] Experiment C completed in 18s
+[2026-05-24 22:56:20] Saved: qwen3_context_routing.json
+[2026-05-24 22:56:21] 
+Phase 272 complete for qwen3!
+[2026-05-24 22:56:21]   Exp A (Path Overlap): 9s
+[2026-05-24 22:56:21]   Exp B (Divergence): 55s
+[2026-05-24 22:56:21]   Exp C (Context Routing): 18s
