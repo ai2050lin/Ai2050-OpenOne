@@ -1,0 +1,705 @@
+[2026-05-25 22:39:42] ============================================================
+[2026-05-25 22:39:42] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:39:42] ============================================================
+[2026-05-25 22:39:43] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:39:43]   flash_attn not found, using eager
+[2026-05-25 22:39:55]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:39:55] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:39:55] 
+==================================================
+[2026-05-25 22:39:55] Block A: Component Delta Decomposition
+[2026-05-25 22:39:55]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:39:55]   Processing: dog_cat_chase ...
+[2026-05-25 22:39:55]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:39:55]   Processing: man_woman_love ...
+[2026-05-25 22:39:55]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:39:55]   Processing: king_city_rule ...
+[2026-05-25 22:39:56]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:39:56]   Processing: child_apple_eat ...
+[2026-05-25 22:39:56]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:39:56]   Processing: boy_girl_call ...
+[2026-05-25 22:39:56]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:39:56]   Processing: teacher_student_teach ...
+[2026-05-25 22:39:56]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:39:56]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:39:57]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:39:57]   Processing: mother_child_hold ...
+[2026-05-25 22:39:57]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:39:57] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:39:57]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:39:57]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:39:57]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:39:57]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:39:57]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:39:57]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:39:57]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:39:57]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:39:57]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:39:57]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:39:57] Block A done in 2.1s
+[2026-05-25 22:39:57] 
+==================================================
+[2026-05-25 22:39:57] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:39:57]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:39:57]   L0: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:39:57]   L9: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:39:57]   L18: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:39:57]   L27: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:39:57]   L35: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:39:57]   Processing: dog_cat_chase ...
+[2026-05-25 22:40:06] ============================================================
+[2026-05-25 22:40:06] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:40:06] ============================================================
+[2026-05-25 22:40:08] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:40:08]   flash_attn not found, using eager
+[2026-05-25 22:40:13]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:40:13] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:40:13] 
+==================================================
+[2026-05-25 22:40:13] Block A: Component Delta Decomposition
+[2026-05-25 22:40:13]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:40:13]   Processing: dog_cat_chase ...
+[2026-05-25 22:40:13]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:40:13]   Processing: man_woman_love ...
+[2026-05-25 22:40:14]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:40:14]   Processing: king_city_rule ...
+[2026-05-25 22:40:14]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:40:14]   Processing: child_apple_eat ...
+[2026-05-25 22:40:14]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:40:14]   Processing: boy_girl_call ...
+[2026-05-25 22:40:14]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:40:14]   Processing: teacher_student_teach ...
+[2026-05-25 22:40:15]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:40:15]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:40:15]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:40:15]   Processing: mother_child_hold ...
+[2026-05-25 22:40:15]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:40:15] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:40:15]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:40:15]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:40:15]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:40:15]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:40:15]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:40:15]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:40:15]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:40:15]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:40:15]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:40:15]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:40:15] Block A done in 2.0s
+[2026-05-25 22:40:15] 
+==================================================
+[2026-05-25 22:40:15] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:40:15]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:40:15]   L0: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:40:15]   L9: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:40:15]   L18: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:40:15]   L27: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:40:15]   L35: n_heads=32, d_head=80, W_q shape=(4096, 2560)
+[2026-05-25 22:40:15]   Processing: dog_cat_chase ...
+[2026-05-25 22:41:40] ============================================================
+[2026-05-25 22:41:40] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:41:40] ============================================================
+[2026-05-25 22:41:41] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:41:41]   flash_attn not found, using eager
+[2026-05-25 22:41:47]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:41:47] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:41:47] 
+==================================================
+[2026-05-25 22:41:47] Block A: Component Delta Decomposition
+[2026-05-25 22:41:47]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:41:47]   Processing: dog_cat_chase ...
+[2026-05-25 22:41:47]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:41:47]   Processing: man_woman_love ...
+[2026-05-25 22:41:47]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:41:47]   Processing: king_city_rule ...
+[2026-05-25 22:41:48]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:41:48]   Processing: child_apple_eat ...
+[2026-05-25 22:41:48]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:41:48]   Processing: boy_girl_call ...
+[2026-05-25 22:41:48]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:41:48]   Processing: teacher_student_teach ...
+[2026-05-25 22:41:48]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:41:48]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:41:48]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:41:48]   Processing: mother_child_hold ...
+[2026-05-25 22:41:49]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:41:49] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:41:49]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:41:49]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:41:49]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:41:49]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:41:49]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:41:49]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:41:49]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:41:49]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:41:49]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:41:49]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:41:49] Block A done in 2.1s
+[2026-05-25 22:41:49] 
+==================================================
+[2026-05-25 22:41:49] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:41:49]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:41:49]   L0: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:41:49]   L9: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:41:49]   L18: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:41:49]   L27: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:41:49]   L35: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:41:49]   Processing: dog_cat_chase ...
+[2026-05-25 22:41:59] ============================================================
+[2026-05-25 22:41:59] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:41:59] ============================================================
+[2026-05-25 22:42:00] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:42:00]   flash_attn not found, using eager
+[2026-05-25 22:42:05]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:42:05] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:42:05] 
+==================================================
+[2026-05-25 22:42:05] Block A: Component Delta Decomposition
+[2026-05-25 22:42:05]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:42:05]   Processing: dog_cat_chase ...
+[2026-05-25 22:42:06]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:42:06]   Processing: man_woman_love ...
+[2026-05-25 22:42:06]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:42:06]   Processing: king_city_rule ...
+[2026-05-25 22:42:06]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:42:06]   Processing: child_apple_eat ...
+[2026-05-25 22:42:07]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:42:07]   Processing: boy_girl_call ...
+[2026-05-25 22:42:07]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:42:07]   Processing: teacher_student_teach ...
+[2026-05-25 22:42:07]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:42:07]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:42:07]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:42:07]   Processing: mother_child_hold ...
+[2026-05-25 22:42:08]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:42:08] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:42:08]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:42:08]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:42:08]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:42:08]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:42:08]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:42:08]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:42:08]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:42:08]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:42:08]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:42:08]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:42:08] Block A done in 2.1s
+[2026-05-25 22:42:08] 
+==================================================
+[2026-05-25 22:42:08] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:42:08]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:42:08]   L0: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:08]   L9: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:08]   L18: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:08]   L27: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:08]   L35: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:08]   Processing: dog_cat_chase ...
+[2026-05-25 22:42:13] ============================================================
+[2026-05-25 22:42:13] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:42:13] ============================================================
+[2026-05-25 22:42:15] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:42:15]   flash_attn not found, using eager
+[2026-05-25 22:42:20]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:42:20] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:42:20] 
+==================================================
+[2026-05-25 22:42:20] Block A: Component Delta Decomposition
+[2026-05-25 22:42:20]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:42:20]   Processing: dog_cat_chase ...
+[2026-05-25 22:42:21]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:42:21]   Processing: man_woman_love ...
+[2026-05-25 22:42:21]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:42:21]   Processing: king_city_rule ...
+[2026-05-25 22:42:21]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:42:21]   Processing: child_apple_eat ...
+[2026-05-25 22:42:21]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:42:21]   Processing: boy_girl_call ...
+[2026-05-25 22:42:21]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:42:21]   Processing: teacher_student_teach ...
+[2026-05-25 22:42:22]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:42:22]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:42:22]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:42:22]   Processing: mother_child_hold ...
+[2026-05-25 22:42:22]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:42:22] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:42:22]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:42:22]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:42:22]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:42:22]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:42:22]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:42:22]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:42:22]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:42:22]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:42:22]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:42:22]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:42:22] Block A done in 2.0s
+[2026-05-25 22:42:22] 
+==================================================
+[2026-05-25 22:42:22] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:42:22]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:42:22]   L0: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:22]   L9: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:22]   L18: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:22]   L27: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:22]   L35: n_heads=32, d_head=128, d_model=2560, W_q[0]=4096
+[2026-05-25 22:42:22]   Processing: dog_cat_chase ...
+[2026-05-25 22:44:53] ============================================================
+[2026-05-25 22:44:53] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:44:53] ============================================================
+[2026-05-25 22:44:55] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:44:55]   flash_attn not found, using eager
+[2026-05-25 22:45:00]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:45:00] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:45:00] 
+==================================================
+[2026-05-25 22:45:00] Block A: Component Delta Decomposition
+[2026-05-25 22:45:00]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:45:00]   Processing: dog_cat_chase ...
+[2026-05-25 22:45:01]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:45:01]   Processing: man_woman_love ...
+[2026-05-25 22:45:01]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:45:01]   Processing: king_city_rule ...
+[2026-05-25 22:45:01]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:45:01]   Processing: child_apple_eat ...
+[2026-05-25 22:45:01]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:45:01]   Processing: boy_girl_call ...
+[2026-05-25 22:45:02]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:45:02]   Processing: teacher_student_teach ...
+[2026-05-25 22:45:02]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:45:02]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:45:02]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:45:02]   Processing: mother_child_hold ...
+[2026-05-25 22:45:02]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:45:02] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:45:02]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:45:02]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:45:02]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:45:02]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:45:02]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:45:02]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:45:02]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:45:02]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:45:02]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:45:02]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:45:02] Block A done in 2.2s
+[2026-05-25 22:45:02] 
+==================================================
+[2026-05-25 22:45:02] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:45:02]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:45:02]   L0: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:02]   L9: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:02]   L18: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:02]   L27: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:02]   L35: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:02]   Processing: dog_cat_chase ...
+[2026-05-25 22:45:04]     dog_cat_chase: done
+[2026-05-25 22:45:04]   Processing: man_woman_love ...
+[2026-05-25 22:45:05]     man_woman_love: done
+[2026-05-25 22:45:05]   Processing: king_city_rule ...
+[2026-05-25 22:45:07]     king_city_rule: done
+[2026-05-25 22:45:07]   Processing: child_apple_eat ...
+[2026-05-25 22:45:08]     child_apple_eat: done
+[2026-05-25 22:45:08]   Processing: boy_girl_call ...
+[2026-05-25 22:45:09]     boy_girl_call: done
+[2026-05-25 22:45:09]   Processing: teacher_student_teach ...
+[2026-05-25 22:45:11]     teacher_student_teach: done
+[2026-05-25 22:45:11]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:45:12]     wolf_sheep_hunt: done
+[2026-05-25 22:45:12]   Processing: mother_child_hold ...
+[2026-05-25 22:45:14]     mother_child_hold: done
+[2026-05-25 22:45:14] 
+  Summary (higher effect = component matters more, 8 pairs):
+[2026-05-25 22:45:14]   routing_effect: how much changing attention weights changes output
+[2026-05-25 22:45:14]   content_effect: how much changing value vectors changes output
+[2026-05-25 22:45:14]   L0: routing_eff=0.914 | content_eff=0.504 | lt_winner=ROUTING>>content | content_dom%=0.12
+[2026-05-25 22:45:14]   L9: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:45:14]   L18: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:45:14]   L27: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:45:14]   L35: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:45:14] Block B done in 11.6s
+[2026-05-25 22:45:14] 
+==================================================
+[2026-05-25 22:45:14] Block C: Head-Level Specialization Map
+[2026-05-25 22:45:14]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35]
+[2026-05-25 22:45:14]   Testing 16 sentences across 10 layers
+[2026-05-25 22:45:14]   L0: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L4: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L8: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L12: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L16: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L20: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L24: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L28: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L32: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L35: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:45:14]   L0: computing head specialization...
+[2026-05-25 22:45:46] ============================================================
+[2026-05-25 22:45:46] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:45:46] ============================================================
+[2026-05-25 22:45:48] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:45:48]   flash_attn not found, using eager
+[2026-05-25 22:45:53]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:45:53] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:45:53] 
+==================================================
+[2026-05-25 22:45:53] Block A: Component Delta Decomposition
+[2026-05-25 22:45:53]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:45:53]   Processing: dog_cat_chase ...
+[2026-05-25 22:45:54]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:45:54]   Processing: man_woman_love ...
+[2026-05-25 22:45:54]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:45:54]   Processing: king_city_rule ...
+[2026-05-25 22:45:54]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:45:54]   Processing: child_apple_eat ...
+[2026-05-25 22:45:55]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:45:55]   Processing: boy_girl_call ...
+[2026-05-25 22:45:55]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:45:55]   Processing: teacher_student_teach ...
+[2026-05-25 22:45:55]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:45:55]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:45:55]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:45:55]   Processing: mother_child_hold ...
+[2026-05-25 22:45:56]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:45:56] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:45:56]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:45:56]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:45:56]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:45:56]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:45:56]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:45:56]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:45:56]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:45:56]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:45:56]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:45:56]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:45:56] Block A done in 2.2s
+[2026-05-25 22:45:56] 
+==================================================
+[2026-05-25 22:45:56] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:45:56]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:45:56]   L0: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:56]   L9: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:56]   L18: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:56]   L27: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:56]   L35: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:45:56]   Processing: dog_cat_chase ...
+[2026-05-25 22:45:57]     dog_cat_chase: done
+[2026-05-25 22:45:57]   Processing: man_woman_love ...
+[2026-05-25 22:45:58]     man_woman_love: done
+[2026-05-25 22:45:58]   Processing: king_city_rule ...
+[2026-05-25 22:46:00]     king_city_rule: done
+[2026-05-25 22:46:00]   Processing: child_apple_eat ...
+[2026-05-25 22:46:01]     child_apple_eat: done
+[2026-05-25 22:46:01]   Processing: boy_girl_call ...
+[2026-05-25 22:46:03]     boy_girl_call: done
+[2026-05-25 22:46:03]   Processing: teacher_student_teach ...
+[2026-05-25 22:46:04]     teacher_student_teach: done
+[2026-05-25 22:46:04]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:46:05]     wolf_sheep_hunt: done
+[2026-05-25 22:46:05]   Processing: mother_child_hold ...
+[2026-05-25 22:46:07]     mother_child_hold: done
+[2026-05-25 22:46:07] 
+  Summary (higher effect = component matters more, 8 pairs):
+[2026-05-25 22:46:07]   routing_effect: how much changing attention weights changes output
+[2026-05-25 22:46:07]   content_effect: how much changing value vectors changes output
+[2026-05-25 22:46:07]   L0: routing_eff=0.914 | content_eff=0.504 | lt_winner=ROUTING>>content | content_dom%=0.12
+[2026-05-25 22:46:07]   L9: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:46:07]   L18: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:46:07]   L27: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:46:07]   L35: routing_eff=0.000 | content_eff=0.000 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:46:07] Block B done in 11.1s
+[2026-05-25 22:46:07] 
+==================================================
+[2026-05-25 22:46:07] Block C: Head-Level Specialization Map
+[2026-05-25 22:46:07]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35]
+[2026-05-25 22:46:07]   Testing 16 sentences across 10 layers
+[2026-05-25 22:46:07]   L0: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L4: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L8: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L12: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L16: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L20: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L24: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L28: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L32: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L35: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:46:07]   L0: computing head specialization...
+[2026-05-25 22:46:08]     L0: heads=32, types={'value_dynamic': 24, 'positional': 8}
+[2026-05-25 22:46:08]   L4: computing head specialization...
+[2026-05-25 22:46:09]     L4: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:46:09]   L8: computing head specialization...
+[2026-05-25 22:46:10]     L8: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:10]   L12: computing head specialization...
+[2026-05-25 22:46:10]     L12: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:10]   L16: computing head specialization...
+[2026-05-25 22:46:11]     L16: heads=32, types={'content_sensitive': 8, 'value_dynamic': 24}
+[2026-05-25 22:46:11]   L20: computing head specialization...
+[2026-05-25 22:46:12]     L20: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:12]   L24: computing head specialization...
+[2026-05-25 22:46:12]     L24: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:12]   L28: computing head specialization...
+[2026-05-25 22:46:13]     L28: heads=32, types={'value_dynamic': 31, 'content_sensitive': 1}
+[2026-05-25 22:46:13]   L32: computing head specialization...
+[2026-05-25 22:46:13]     L32: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:13]   L35: computing head specialization...
+[2026-05-25 22:46:14]     L35: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L0: pos_sens=0.159, content_sens=0.040, value_var=0.802, types={'value_dynamic': 24, 'positional': 8}
+[2026-05-25 22:46:14]   L4: pos_sens=-0.058, content_sens=0.722, value_var=0.539, types={'content_sensitive': 32}
+[2026-05-25 22:46:14]   L8: pos_sens=-0.073, content_sens=0.000, value_var=0.585, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L12: pos_sens=-0.073, content_sens=0.000, value_var=0.610, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L16: pos_sens=-0.048, content_sens=0.238, value_var=0.540, types={'content_sensitive': 8, 'value_dynamic': 24}
+[2026-05-25 22:46:14]   L20: pos_sens=-0.073, content_sens=0.000, value_var=0.492, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L24: pos_sens=-0.073, content_sens=0.000, value_var=0.643, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L28: pos_sens=-0.072, content_sens=0.011, value_var=0.595, types={'value_dynamic': 31, 'content_sensitive': 1}
+[2026-05-25 22:46:14]   L32: pos_sens=-0.073, content_sens=0.000, value_var=0.601, types={'value_dynamic': 32}
+[2026-05-25 22:46:14]   L35: pos_sens=-0.073, content_sens=0.000, value_var=0.525, types={'value_dynamic': 32}
+[2026-05-25 22:46:14] Block C done in 7.4s
+[2026-05-25 22:46:14] 
+Phase 281 complete for qwen3: A=2s, B=11s, C=7s, total=21s
+[2026-05-25 22:48:20] ============================================================
+[2026-05-25 22:48:20] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:48:20] ============================================================
+[2026-05-25 22:48:21] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:48:21]   flash_attn not found, using eager
+[2026-05-25 22:48:27]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:48:27] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:48:27] 
+==================================================
+[2026-05-25 22:48:27] Block A: Component Delta Decomposition
+[2026-05-25 22:48:27]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:48:27]   Processing: dog_cat_chase ...
+[2026-05-25 22:48:27]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:48:27]   Processing: man_woman_love ...
+[2026-05-25 22:48:28]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:48:28]   Processing: king_city_rule ...
+[2026-05-25 22:48:28]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:48:28]   Processing: child_apple_eat ...
+[2026-05-25 22:48:28]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:48:28]   Processing: boy_girl_call ...
+[2026-05-25 22:48:28]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:48:28]   Processing: teacher_student_teach ...
+[2026-05-25 22:48:28]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:48:28]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:48:29]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:48:29]   Processing: mother_child_hold ...
+[2026-05-25 22:48:29]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:48:29] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:48:29]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:48:29]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:48:29]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:48:29]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:48:29]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:48:29]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:48:29]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:48:29]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:48:29]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:48:29]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:48:29] Block A done in 2.1s
+[2026-05-25 22:48:29] 
+==================================================
+[2026-05-25 22:48:29] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:48:29]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:48:29]   L0: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:48:29]   L9: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:48:29]   L18: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:48:29]   L27: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:48:29]   L35: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:48:29]   Processing: dog_cat_chase ...
+[2026-05-25 22:48:29]     dog_cat_chase: done
+[2026-05-25 22:48:29]   Processing: man_woman_love ...
+[2026-05-25 22:48:29]     man_woman_love: done
+[2026-05-25 22:48:29]   Processing: king_city_rule ...
+[2026-05-25 22:48:29]     king_city_rule: done
+[2026-05-25 22:48:29]   Processing: child_apple_eat ...
+[2026-05-25 22:48:29]     child_apple_eat: done
+[2026-05-25 22:48:29]   Processing: boy_girl_call ...
+[2026-05-25 22:48:29]     boy_girl_call: done
+[2026-05-25 22:48:29]   Processing: teacher_student_teach ...
+[2026-05-25 22:48:30]     teacher_student_teach: done
+[2026-05-25 22:48:30]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:48:30]     wolf_sheep_hunt: done
+[2026-05-25 22:48:30]   Processing: mother_child_hold ...
+[2026-05-25 22:48:30]     mother_child_hold: done
+[2026-05-25 22:48:30] 
+  Summary (higher effect = component matters more, 8 pairs):
+[2026-05-25 22:48:30]   routing_effect: how much changing attention weights changes output
+[2026-05-25 22:48:30]   content_effect: how much changing value vectors changes output
+[2026-05-25 22:48:30] Block B done in 0.9s
+[2026-05-25 22:48:30] 
+==================================================
+[2026-05-25 22:48:30] Block C: Head-Level Specialization Map
+[2026-05-25 22:48:30]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35]
+[2026-05-25 22:48:30]   Testing 16 sentences across 10 layers
+[2026-05-25 22:48:30]   L0: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L4: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L8: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L12: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L16: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L20: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L24: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L28: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L32: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L35: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:48:30]   L0: computing head specialization...
+[2026-05-25 22:48:31]     L0: heads=32, types={}
+[2026-05-25 22:48:31]   L4: computing head specialization...
+[2026-05-25 22:48:31]     L4: heads=32, types={}
+[2026-05-25 22:48:31]   L8: computing head specialization...
+[2026-05-25 22:48:32]     L8: heads=32, types={}
+[2026-05-25 22:48:32]   L12: computing head specialization...
+[2026-05-25 22:48:33]     L12: heads=32, types={}
+[2026-05-25 22:48:33]   L16: computing head specialization...
+[2026-05-25 22:48:34]     L16: heads=32, types={}
+[2026-05-25 22:48:34]   L20: computing head specialization...
+[2026-05-25 22:48:35]     L20: heads=32, types={}
+[2026-05-25 22:48:35]   L24: computing head specialization...
+[2026-05-25 22:48:35]     L24: heads=32, types={}
+[2026-05-25 22:48:35]   L28: computing head specialization...
+[2026-05-25 22:48:36]     L28: heads=32, types={}
+[2026-05-25 22:48:36]   L32: computing head specialization...
+[2026-05-25 22:48:37]     L32: heads=32, types={}
+[2026-05-25 22:48:37]   L35: computing head specialization...
+[2026-05-25 22:48:38]     L35: heads=32, types={}
+[2026-05-25 22:48:38]   L0: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L4: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L8: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L12: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L16: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L20: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L24: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L28: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L32: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38]   L35: pos_sens=nan, content_sens=nan, value_var=nan, types={}
+[2026-05-25 22:48:38] Block C done in 7.9s
+[2026-05-25 22:48:38] 
+Phase 281 complete for qwen3: A=2s, B=1s, C=8s, total=11s
+[2026-05-25 22:50:26] ============================================================
+[2026-05-25 22:50:26] Phase 281: Routing-Content Separation — qwen3
+[2026-05-25 22:50:26] ============================================================
+[2026-05-25 22:50:27] Loading qwen3 (bf16 + flash_attention_2)...
+[2026-05-25 22:50:27]   flash_attn not found, using eager
+[2026-05-25 22:50:33]   qwen3 loaded: device=cuda:0, GPU=8.04GB, attn=eager
+[2026-05-25 22:50:33] Model: Qwen3ForCausalLM, L=36, d=2560, mlp=split_gate_up
+[2026-05-25 22:50:33] 
+==================================================
+[2026-05-25 22:50:33] Block A: Component Delta Decomposition
+[2026-05-25 22:50:33]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35], Pairs: 8
+[2026-05-25 22:50:33]   Processing: dog_cat_chase ...
+[2026-05-25 22:50:34]     dog_cat_chase: 10 layers analyzed
+[2026-05-25 22:50:34]   Processing: man_woman_love ...
+[2026-05-25 22:50:34]     man_woman_love: 10 layers analyzed
+[2026-05-25 22:50:34]   Processing: king_city_rule ...
+[2026-05-25 22:50:34]     king_city_rule: 10 layers analyzed
+[2026-05-25 22:50:34]   Processing: child_apple_eat ...
+[2026-05-25 22:50:34]     child_apple_eat: 10 layers analyzed
+[2026-05-25 22:50:34]   Processing: boy_girl_call ...
+[2026-05-25 22:50:35]     boy_girl_call: 10 layers analyzed
+[2026-05-25 22:50:35]   Processing: teacher_student_teach ...
+[2026-05-25 22:50:35]     teacher_student_teach: 10 layers analyzed
+[2026-05-25 22:50:35]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:50:35]     wolf_sheep_hunt: 10 layers analyzed
+[2026-05-25 22:50:35]   Processing: mother_child_hold ...
+[2026-05-25 22:50:35]     mother_child_hold: 10 layers analyzed
+[2026-05-25 22:50:35] 
+  Summary (agg across 8 pairs):
+[2026-05-25 22:50:35]   L0: cos(dh,attn)=0.105, cos(dh,mlp)=0.037, attn_ratio=1.54, mlp_ratio=5.80, cos(attn,mlp)=0.436
+[2026-05-25 22:50:35]   L4: cos(dh,attn)=-0.025, cos(dh,mlp)=0.176, attn_ratio=0.20, mlp_ratio=0.57, cos(attn,mlp)=-0.019
+[2026-05-25 22:50:35]   L8: cos(dh,attn)=-0.136, cos(dh,mlp)=-0.096, attn_ratio=0.22, mlp_ratio=0.66, cos(attn,mlp)=-0.053
+[2026-05-25 22:50:35]   L12: cos(dh,attn)=-0.091, cos(dh,mlp)=-0.184, attn_ratio=0.19, mlp_ratio=0.50, cos(attn,mlp)=-0.039
+[2026-05-25 22:50:35]   L16: cos(dh,attn)=-0.109, cos(dh,mlp)=-0.201, attn_ratio=0.16, mlp_ratio=0.37, cos(attn,mlp)=-0.053
+[2026-05-25 22:50:35]   L20: cos(dh,attn)=0.002, cos(dh,mlp)=-0.079, attn_ratio=0.12, mlp_ratio=0.34, cos(attn,mlp)=-0.063
+[2026-05-25 22:50:35]   L24: cos(dh,attn)=0.284, cos(dh,mlp)=0.093, attn_ratio=0.19, mlp_ratio=0.42, cos(attn,mlp)=0.038
+[2026-05-25 22:50:35]   L28: cos(dh,attn)=0.008, cos(dh,mlp)=0.159, attn_ratio=0.13, mlp_ratio=0.43, cos(attn,mlp)=-0.002
+[2026-05-25 22:50:35]   L32: cos(dh,attn)=0.034, cos(dh,mlp)=0.084, attn_ratio=0.09, mlp_ratio=0.32, cos(attn,mlp)=0.014
+[2026-05-25 22:50:35]   L35: cos(dh,attn)=-0.196, cos(dh,mlp)=0.057, attn_ratio=0.29, mlp_ratio=0.41, cos(attn,mlp)=-0.029
+[2026-05-25 22:50:35] Block A done in 2.1s
+[2026-05-25 22:50:35] 
+==================================================
+[2026-05-25 22:50:35] Block B: Value vs Attention Causal Swap
+[2026-05-25 22:50:35]   Layers: [0, 9, 18, 27, 35], Pairs: 8
+[2026-05-25 22:50:35]   L0: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:50:35]   L9: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:50:35]   L18: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:50:35]   L27: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:50:35]   L35: Q_heads=32, KV_heads=8, d_head=128, gqa_group=4, Q_dim=4096, K_dim=1024
+[2026-05-25 22:50:35]   Processing: dog_cat_chase ...
+[2026-05-25 22:50:37]     dog_cat_chase: done
+[2026-05-25 22:50:37]   Processing: man_woman_love ...
+[2026-05-25 22:50:38]     man_woman_love: done
+[2026-05-25 22:50:38]   Processing: king_city_rule ...
+[2026-05-25 22:50:39]     king_city_rule: done
+[2026-05-25 22:50:39]   Processing: child_apple_eat ...
+[2026-05-25 22:50:41]     child_apple_eat: done
+[2026-05-25 22:50:41]   Processing: boy_girl_call ...
+[2026-05-25 22:50:42]     boy_girl_call: done
+[2026-05-25 22:50:42]   Processing: teacher_student_teach ...
+[2026-05-25 22:50:43]     teacher_student_teach: done
+[2026-05-25 22:50:43]   Processing: wolf_sheep_hunt ...
+[2026-05-25 22:50:45]     wolf_sheep_hunt: done
+[2026-05-25 22:50:45]   Processing: mother_child_hold ...
+[2026-05-25 22:50:46]     mother_child_hold: done
+[2026-05-25 22:50:46] 
+  Summary (higher effect = component matters more, 8 pairs):
+[2026-05-25 22:50:46]   routing_effect: how much changing attention weights changes output
+[2026-05-25 22:50:46]   content_effect: how much changing value vectors changes output
+[2026-05-25 22:50:46]   L0: routing_eff=1.238 | content_eff=0.850 | lt_winner=ROUTING>>content | content_dom%=0.00
+[2026-05-25 22:50:46]   L9: routing_eff=0.249 | content_eff=0.994 | lt_winner=CONTENT>>routing | content_dom%=1.00
+[2026-05-25 22:50:46]   L18: routing_eff=0.633 | content_eff=0.552 | lt_winner=ROUTING>>content | content_dom%=0.75
+[2026-05-25 22:50:46]   L27: routing_eff=0.586 | content_eff=0.975 | lt_winner=CONTENT>>routing | content_dom%=1.00
+[2026-05-25 22:50:46]   L35: routing_eff=0.771 | content_eff=0.878 | lt_winner=CONTENT>>routing | content_dom%=0.75
+[2026-05-25 22:50:46] Block B done in 10.8s
+[2026-05-25 22:50:46] 
+==================================================
+[2026-05-25 22:50:46] Block C: Head-Level Specialization Map
+[2026-05-25 22:50:46]   Layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 35]
+[2026-05-25 22:50:46]   Testing 16 sentences across 10 layers
+[2026-05-25 22:50:46]   L0: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L4: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L8: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L12: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L16: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L20: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L24: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L28: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L32: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L35: Q=32 KV=8 d_head=128 gqa=4
+[2026-05-25 22:50:46]   L0: computing head specialization...
+[2026-05-25 22:50:47]     L0: heads=32, types={'value_dynamic': 30, 'positional': 2}
+[2026-05-25 22:50:47]   L4: computing head specialization...
+[2026-05-25 22:50:48]     L4: heads=32, types={'value_dynamic': 32}
+[2026-05-25 22:50:48]   L8: computing head specialization...
+[2026-05-25 22:50:49]     L8: heads=32, types={'content_sensitive': 30, 'value_dynamic': 2}
+[2026-05-25 22:50:49]   L12: computing head specialization...
+[2026-05-25 22:50:50]     L12: heads=32, types={'content_sensitive': 26, 'value_dynamic': 6}
+[2026-05-25 22:50:50]   L16: computing head specialization...
+[2026-05-25 22:50:50]     L16: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:50:50]   L20: computing head specialization...
+[2026-05-25 22:50:51]     L20: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:50:51]   L24: computing head specialization...
+[2026-05-25 22:50:52]     L24: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:50:52]   L28: computing head specialization...
+[2026-05-25 22:50:53]     L28: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:50:53]   L32: computing head specialization...
+[2026-05-25 22:50:53]     L32: heads=32, types={'content_sensitive': 32}
+[2026-05-25 22:50:53]   L35: computing head specialization...
+[2026-05-25 22:50:54]     L35: heads=32, types={'content_sensitive': 27, 'value_dynamic': 5}
+[2026-05-25 22:50:54]   L0: pos_sens=0.081, content_sens=0.041, value_var=0.659, types={'value_dynamic': 30, 'positional': 2}
+[2026-05-25 22:50:54]   L4: pos_sens=-0.022, content_sens=0.063, value_var=0.549, types={'value_dynamic': 32}
+[2026-05-25 22:50:54]   L8: pos_sens=0.035, content_sens=0.225, value_var=0.596, types={'content_sensitive': 30, 'value_dynamic': 2}
+[2026-05-25 22:50:54]   L12: pos_sens=0.147, content_sens=0.216, value_var=0.611, types={'content_sensitive': 26, 'value_dynamic': 6}
+[2026-05-25 22:50:54]   L16: pos_sens=0.053, content_sens=0.898, value_var=0.604, types={'content_sensitive': 32}
+[2026-05-25 22:50:54]   L20: pos_sens=0.181, content_sens=0.418, value_var=0.459, types={'content_sensitive': 32}
+[2026-05-25 22:50:54]   L24: pos_sens=0.100, content_sens=1.170, value_var=0.611, types={'content_sensitive': 32}
+[2026-05-25 22:50:54]   L28: pos_sens=0.170, content_sens=1.333, value_var=0.523, types={'content_sensitive': 32}
+[2026-05-25 22:50:54]   L32: pos_sens=0.095, content_sens=1.793, value_var=0.578, types={'content_sensitive': 32}
+[2026-05-25 22:50:54]   L35: pos_sens=0.119, content_sens=1.140, value_var=0.543, types={'content_sensitive': 27, 'value_dynamic': 5}
+[2026-05-25 22:50:54] Block C done in 8.0s
+[2026-05-25 22:50:54] 
+Phase 281 complete for qwen3: A=2s, B=11s, C=8s, total=21s
