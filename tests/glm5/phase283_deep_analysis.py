@@ -447,20 +447,19 @@ def block_a_deep_layer_weights(model, tokenizer, device, model_info, model_name,
             else:
                 weight_effect = value_effect = 0.0
             
-            # Per-head breakdown
+            # Per-head breakdown (use head-specific W_o slice)
             per_head_weight = []
             per_head_value = []
             for h in range(n_q):
-                pw_o = flatten_mha(pure_AB_VB[h:h+1], 1, min_seq, d_head_local).reshape(min_seq, d_head_local) @ W_o.T
+                # Extract this head's portion of W_o: [d_model, d_head]
+                W_o_h = W_o[:, h*d_head_local:(h+1)*d_head_local]
+                # Single head output projected through its W_o slice
+                pw_o = flatten_mha(pure_AB_VB[h:h+1], 1, min_seq, d_head_local) @ W_o_h.T
                 if total_gap > 1e-10:
-                    wh = float(np.linalg.norm(
-                        flatten_mha(mixed_BW_AV[h:h+1], 1, min_seq, d_head_local).reshape(min_seq, d_head_local) @ W_o.T
-                        - pw_o
-                    )) / total_gap
-                    vh = float(np.linalg.norm(
-                        flatten_mha(mixed_AW_BV[h:h+1], 1, min_seq, d_head_local).reshape(min_seq, d_head_local) @ W_o.T
-                        - pw_o
-                    )) / total_gap
+                    bw_mix = flatten_mha(mixed_BW_AV[h:h+1], 1, min_seq, d_head_local) @ W_o_h.T
+                    aw_mix = flatten_mha(mixed_AW_BV[h:h+1], 1, min_seq, d_head_local) @ W_o_h.T
+                    wh = float(np.linalg.norm(bw_mix - pw_o)) / total_gap
+                    vh = float(np.linalg.norm(aw_mix - pw_o)) / total_gap
                 else:
                     wh = vh = 0.0
                 per_head_weight.append(wh)
