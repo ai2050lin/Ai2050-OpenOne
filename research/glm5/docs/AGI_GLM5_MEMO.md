@@ -55640,3 +55640,1486 @@ Phase 268-269建立了完整的理论框架：
 
 最关键的是：**W_U不可见空间的子空间结构**——
 这86-96%的"暗物质"中，是否存在类似"语法子空间"的结构？
+
+## Phase 271: Transport R²统计假象验证 + 关系拓扑跨层保持 [2026-05-24 22:45]
+
+### 实验动机
+
+Phase 270的Transport R²≈1.0受到两个层面的批判：
+1. **统计假象批判**：Ridge从高维(2360+)到低维(200)的回归容易产生高R²，可能是过拟合
+2. **V_inv特殊性批判**：V_inv是否特殊？还是任何同维子空间都给出相同R²？
+
+同时，两个分析提出核心假设：
+- **相对编码假设**：概念之间的关系结构跨层保持，即使坐标旋转
+- **复用假设**：类内概念（apple↔banana）比类间概念（apple↔car）更好地保持拓扑
+
+### 实验设计
+
+**三组实验**：
+- A. Transport R²置换检验 + 随机子空间控制
+- B. 跨层拓扑保持（Mantel检验）
+- C. V_vis/V_inv跨空间拓扑一致性
+
+**数据**：
+- Transport R²检验：1000个多样化提示词（同Phase 270）
+- 拓扑分析：5个语义类别×15个词 = 75个词，模板"The {word} is"
+- 三个模型：Qwen3-4B, GLM4-9B, DS7B
+
+### 核心结果
+
+#### 结果A：Transport R²是统计假象——随机子空间给出相同R²
+
+| 模型 | 层 | Transport R² | Shuffled R² | Random Subspace R² |
+|------|-----|------------|-------------|-------------------|
+| Qwen3 | L0 | 0.9225 | 0.5746 | **0.9223** |
+| Qwen3 | L9 | 0.9999 | 0.9988 | **0.9999** |
+| GLM4 | L0 | 0.5379 | 0.0529 | **0.5385** |
+| GLM4 | L20 | 0.9968 | 0.9564 | **0.9969** |
+| DS7B | L0 | 0.9783 | 0.9302 | **0.9781** |
+| DS7B | L7 | 1.0000 | 1.0000 | **1.0000** |
+
+**关键发现**：Random Subspace R² ≈ Transport R² 在所有层所有模型！
+
+这意味着：
+- ❌ V_inv对"输运"不特殊——任何同维随机子空间都给出相同R²
+- ❌ Phase 270的Transport R²≈1.0在高维→低维回归中是统计假象
+- ✅ 但在L0，置换检验显示Transport R²(0.92) >> Shuffled R²(0.57)，说明映射本身是真实的
+- ❌ 映射虽然真实，但不特定于V_inv——它只是"任何高维子空间都能预测低维目标"
+
+**根本原因**：V_inv占92-95%的总空间。2360/2560维的子空间自然包含几乎全部信息。Ridge回归可以轻松利用这种高维性。
+
+#### 结果B：关系拓扑跨层保持——支持相对编码
+
+| 模型 | 层 | Mantel Full | Mantel V_vis | Mantel V_inv |
+|------|-----|------------|-------------|-------------|
+| Qwen3 | L9 | 0.360 | 0.330 | 0.364 |
+| Qwen3 | L18 | 0.560 | 0.505 | 0.566 |
+| Qwen3 | L27 | 0.785 | 0.791 | 0.779 |
+| GLM4 | L10 | 0.515 | 0.364 | 0.561 |
+| GLM4 | L20 | 0.552 | 0.487 | 0.601 |
+| GLM4 | L30 | 0.848 | 0.819 | 0.868 |
+| DS7B | L7 | 0.049 | -0.005 | 0.069 |
+| DS7B | L14 | 0.190 | 0.161 | 0.198 |
+| DS7B | L21 | 0.228 | 0.224 | 0.241 |
+
+**关键发现**：
+- ✅ 拓扑结构确实跨层保持（Mantel r单调递增）
+- ✅ V_inv拓扑保持略优于V_vis
+- ⚠️ DS7B的拓扑保持远低于其他模型（L21仅0.23 vs Qwen3的0.78）
+- ✅ 支持"相对编码"：即使坐标旋转，概念间距离结构被保持
+
+#### 结果B续：类内 > 类间拓扑保持——支持复用假设
+
+| 模型 | 层 | Within (full) | Between (full) | 差值 |
+|------|-----|--------------|---------------|------|
+| Qwen3 | L18 | 0.594 | 0.492 | **0.103** |
+| Qwen3 | L27 | 0.835 | 0.717 | **0.118** |
+| GLM4 | L10 | 0.576 | 0.290 | **0.286** |
+| GLM4 | L20 | 0.698 | 0.358 | **0.340** |
+| GLM4 | L30 | 0.925 | 0.752 | **0.173** |
+| DS7B | L14 | 0.228 | 0.110 | **0.118** |
+| DS7B | L21 | 0.270 | 0.151 | **0.119** |
+
+**关键发现**：
+- ✅ 类内拓扑保持 > 类间拓扑保持——所有模型所有层一致
+- ✅ GLM4差异最大（0.34），说明GLM4的分类结构最强
+- ✅ 支持"复用"假设：同类概念共享更多计算路径，关系更稳定
+
+#### 结果C：V_inv与Full空间拓扑几乎完全一致
+
+| 模型 | 层 | Full↔V_inv | Full↔V_vis | V_vis↔V_inv |
+|------|-----|-----------|-----------|------------|
+| Qwen3 | L9 | **0.9993** | 0.9731 | 0.9645 |
+| Qwen3 | L18 | **0.9995** | 0.9719 | 0.9648 |
+| GLM4 | L10 | **0.9925** | 0.9337 | 0.8897 |
+| GLM4 | L20 | **0.9923** | 0.9639 | 0.9346 |
+| DS7B | L7 | **0.9948** | 0.9311 | 0.8968 |
+| DS7B | L14 | **0.9948** | 0.9602 | 0.9371 |
+
+**关键发现**：
+- ✅ V_inv拓扑与Full空间拓扑几乎完全一致（Spearman r=0.99+）
+- ✅ V_vis拓扑也一致但稍弱（r=0.93-0.97）
+- ✅ V_inv不是"暗物质"——它包含与Full空间相同的关系结构
+- ✅ "不可读"只意味着W_U无法直接投影，不意味着信息缺失
+
+### 对Phase 270的根本修正
+
+| Phase 270结论 | Phase 271修正 |
+|--------------|-------------|
+| Transport R²≈1.0说明V_inv信息被输运到V_vis | ❌ Transport R²是高维回归假象，随机子空间给出相同R² |
+| V_inv不是暗物质，是"延迟可见计算" | ⚠️ 部分修正：V_inv确实不是暗物质，但原因不是"延迟输运" |
+| 88-94%的Δh在V_inv方向 | ✅ 仍成立 |
+| V_inv承载的信息最终可被W_U读取 | ❌ 不能用Transport R²论证此结论 |
+
+### 对两个分析的回应
+
+**分析一（复用与差异化）**：
+- ✅ 类内 > 类间拓扑保持——直接支持"同类概念共享更多计算"
+- ✅ V_inv与Full空间拓扑一致——V_inv不是独立通道，而是完整计算的一部分
+- ⚠️ 但"神经元级复用"尚未验证——当前是概念级拓扑分析
+
+**分析二（相对编码/关系拓扑）**：
+- ✅ 拓扑结构确实跨层保持——支持"含义=相对几何"
+- ✅ V_inv拓扑与Full一致——信息不在固定方向而在关系结构中
+- ✅ Transport R²批判被验证——高维回归确实是假象
+- ⚠️ 但DS7B的拓扑保持远低于预期——模型间差异大
+
+### 目前最精确的客观事实拼图
+
+1. **方差分布**：86-96%的hidden state方差在V_inv方向（Phase 268）
+2. **层间增量**：88-94%的Δh在V_inv方向（Phase 270）
+3. **Transport R²是假象**：随机子空间给出相同R²，V_inv不特殊（Phase 271新发现）
+4. **拓扑跨层保持**：Mantel r从0.04→0.85单调递增（Phase 271新发现）
+5. **类内 > 类间保持**：差值0.10-0.34，所有模型一致（Phase 271新发现）
+6. **V_inv拓扑=Full拓扑**：Spearman r=0.99+（Phase 271新发现）
+7. **V_inv不是暗物质**：它包含与Full空间相同的关系结构，只是W_U无法直接投影
+
+### 命令记录
+
+```bash
+python tests/glm5/phase271_topology_preservation.py qwen3
+python tests/glm5/phase271_topology_preservation.py glm4
+python tests/glm5/phase271_topology_preservation.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase271_topology_preservation/qwen3_transport_sanity.json`
+- `results/phase271_topology_preservation/glm4_transport_sanity.json`
+- `results/phase271_topology_preservation/deepseek7b_transport_sanity.json`
+- `results/phase271_topology_preservation/qwen3_topology_preservation.json`
+- `results/phase271_topology_preservation/glm4_topology_preservation.json`
+- `results/phase271_topology_preservation/deepseek7b_topology_preservation.json`
+
+## Phase 272: 计算路径复用与分叉 [2026-05-24 23:05]
+
+### 实验动机
+
+Phase 271验证了Transport R²是统计假象，但拓扑保持实验支持相对编码。现在从"表示分析"转向"计算结构分析"，直接测量：
+1. 不同概念共享多少计算路径？
+2. 相似概念在哪里开始分化？
+3. 同一词在不同上下文中路径如何变化？
+
+### 实验设计
+
+**三组实验**：
+- A. 路径重叠矩阵：5类×10词=50词，模板"The {word} is"，测量within-category vs between-category的计算路径重叠
+- B. 分叉层检测：25对类内+10对类间，逐层追踪cosine distance和head importance correlation
+- C. 上下文条件路由：10对歧义词上下文，测量路径差异
+
+**核心指标**：
+- `head_importance_corr`：Spearman相关——两个词激活的attention head重要性排名是否一致
+- `delta_cosine`：cosine相似度——两个词在某一层的残差变化（layer delta）方向是否一致
+- `top_dim_jaccard`：Jaccard重叠——top-50最活跃残差维度的重叠比例
+- `attn_pattern_corr`：attention权重的Spearman相关
+
+### 核心结果
+
+#### 结果A：Delta Cosine是区分类内/类间的最强指标
+
+| 模型 | 层 | Within delta_cos | Between delta_cos | Δ |
+|------|-----|-----------------|------------------|---|
+| Qwen3 | L9 | 0.555 | 0.346 | **+0.209** |
+| Qwen3 | L27 | 0.747 | 0.622 | **+0.125** |
+| GLM4 | L10 | 0.580 | 0.329 | **+0.252** |
+| GLM4 | L30 | 0.663 | 0.450 | **+0.213** |
+| DS7B | L7 | 0.513 | 0.353 | **+0.160** |
+| DS7B | L21 | 0.740 | 0.662 | **+0.078** |
+
+**关键发现**：
+- ✅ 类内词对的layer delta方向更一致（delta_cosine高0.08-0.25）
+- ✅ 效应在中间层最强（L7-L10），深层和浅层差异缩小
+- ✅ 跨模型一致——GLM4差异最大(0.25)，Qwen3次之(0.21)，DS7B最小(0.16)
+
+#### 结果A续：Top-Dim Jaccard也一致——类内共享更多残差维度
+
+| 模型 | 层 | Within top_jacc | Between top_jacc | Δ |
+|------|-----|-----------------|------------------|---|
+| Qwen3 | L9 | 0.118 | 0.041 | **+0.077** |
+| GLM4 | L10 | 0.110 | 0.050 | **+0.059** |
+| GLM4 | L20 | 0.255 | 0.136 | **+0.119** |
+| DS7B | L7 | 0.162 | 0.116 | **+0.046** |
+
+**关键发现**：
+- ✅ 类内词对共享更多top-50活跃残差维度
+- ✅ 中间层top_dim_jaccard极低(0.04-0.12)——说明中间层对输入高度特异化
+
+#### 结果A续：Attn Pattern Correlation反直觉——Between > Within
+
+| 模型 | 层 | Within attn_corr | Between attn_corr | Δ |
+|------|-----|-----------------|------------------|---|
+| Qwen3 | L9 | 0.874 | 0.962 | **-0.089** |
+| GLM4 | L10 | 0.864 | 0.923 | **-0.059** |
+| DS7B | L7 | 0.849 | 0.924 | **-0.075** |
+
+**关键发现**：
+- ❗ Between-category的attention模式比within-category更相关！
+- 这说明：attention pattern主要由模板"The X is"决定，不是由X本身决定
+- 差异化的核心在MLP/残差变化方向，不在attention pattern
+
+#### 结果B：Between-category cosine distance > Within-category（所有层一致）
+
+| 模型 | 层 | Within cos_dist | Between cos_dist | Δ |
+|------|-----|-----------------|------------------|---|
+| Qwen3 | L9 | 0.187 | 0.311 | **+0.123** |
+| Qwen3 | L36 | 0.091 | 0.143 | **+0.052** |
+| GLM4 | L10 | 0.177 | 0.371 | **+0.194** |
+| GLM4 | L40 | 0.119 | 0.244 | **+0.125** |
+| DS7B | L7 | 0.243 | 0.315 | **+0.073** |
+| DS7B | L28 | 0.068 | 0.101 | **+0.033** |
+
+**关键发现**：
+- ✅ 类间词对始终比类内词对距离更远——所有层所有模型一致
+- ✅ 中间层差异最大（GLM4 L10: 0.194），浅层和深层差异缩小
+- ✅ 残差流整体收敛（cosine distance从0.3→0.1），但within/between差异保持
+
+#### 结果B续：Head Importance Correlation——Within > Between（中间层）
+
+| 模型 | 层 | Within head_corr | Between head_corr | Δ |
+|------|-----|------------------|-------------------|---|
+| GLM4 | L10 | 0.748 | 0.625 | **+0.123** |
+| GLM4 | L30 | 0.772 | 0.640 | **+0.132** |
+| DS7B | L7 | 0.679 | 0.547 | **+0.132** |
+| Qwen3 | L27 | 0.879 | 0.855 | **+0.025** |
+
+**关键发现**：
+- ✅ 类内词对更一致地使用相同的attention head
+- ✅ GLM4和DS7B差异最大(0.13)，Qwen3较小(0.02)
+- ⚠️ 但head_importance_corr在所有情况下都>0.5——head使用有大量基线重叠
+
+#### 结果B续：Divergence Layer——没有显著差异
+
+| 模型 | Within mean | Between mean |
+|------|------------|-------------|
+| Qwen3 | 2.32 | 1.6 |
+| GLM4 | 2.04 | 1.9 |
+| DS7B | 1.0 | 1.0 |
+
+**关键发现**：
+- ❗ Divergence layer（首次cosine distance>2×初始值）几乎都在L1-L2
+- ❗ 这意味着几乎所有词对在第一层就开始分化——divergence point不是有用的区分指标
+
+#### 结果C：上下文条件路由——歧义词路径显著不同
+
+| 模型 | 层 | cos_dist | head_corr | delta_cos | top_jaccard |
+|------|-----|---------|----------|----------|------------|
+| Qwen3 | L0 | 0.840 | 0.788 | 0.443 | 0.344 |
+| Qwen3 | L18 | 0.484 | 0.513 | 0.252 | 0.068 |
+| Qwen3 | L27 | 0.365 | 0.785 | 0.261 | 0.069 |
+| GLM4 | L0 | 0.864 | 0.758 | 0.323 | 0.218 |
+| GLM4 | L20 | 0.482 | 0.635 | 0.345 | 0.061 |
+| GLM4 | L30 | 0.392 | 0.616 | 0.384 | 0.055 |
+| DS7B | L0 | 0.846 | 0.772 | 0.440 | 0.296 |
+| DS7B | L14 | 0.573 | 0.784 | 0.242 | 0.072 |
+| DS7B | L21 | 0.348 | 0.704 | 0.353 | 0.119 |
+
+**关键发现**：
+- ✅ 歧义词在不同上下文中cosine distance从0.84→0.25递减——模型在深层逐渐区分歧义
+- ✅ head_corr在中间层下降（0.51-0.63），然后回升——中间层路由分化
+- ✅ delta_cos在中间层最低（0.13-0.18），说明中间层对上下文最敏感
+- ✅ top_jaccard极低（0.02-0.07）——中间层几乎不共享top维度
+- ⚠️ 最后一层的head_corr和delta_cos为0——可能是output_attentions不包含最后一层
+
+### 跨模型对比总结
+
+| 现象 | Qwen3 | GLM4 | DS7B | 一致性 |
+|------|-------|------|------|--------|
+| Within > Between delta_cos | ✅ Δ=0.21 | ✅ Δ=0.25 | ✅ Δ=0.16 | 全一致 |
+| Between > Within attn_corr | ✅ Δ=-0.09 | ✅ Δ=-0.06 | ✅ Δ=-0.07 | 全一致(反直觉) |
+| Within > Between cos_dist | ✅ | ✅ | ✅ | 全一致 |
+| 中间层差异化最强 | ✅ L9 | ✅ L10 | ✅ L7 | 全一致 |
+| 上下文路由分化 | ✅ | ✅ | ✅ | 全一致 |
+
+### 对两个分析的回应
+
+**分析一（复用与差异化）**：
+- ✅ "复用"被直接证实：类内词对共享更多残差变化方向（delta_cosine高0.08-0.25）
+- ✅ "差异化"被直接证实：类间词对使用更不同的残差维度（top_dim_jaccard差0.05-0.12）
+- ✅ 中间层是差异化焦点——top_dim_jaccard最低（0.04-0.12），说明高度特异化
+- ⚠️ 但"head-level复用"差异较小——head_importance_corr差异0.02-0.13，不如delta_cosine显著
+- ❗ Attention pattern不是差异化的主要来源——between > within，说明attn主要由模板决定
+
+**分析二（条件计算图/动态路径）**：
+- ✅ 上下文条件路由被证实：歧义词在不同上下文中head_corr从0.79→0.51→0.78（U型）
+- ✅ 中间层对上下文最敏感——delta_cos最低（0.13），说明中间层在"做决策"
+- ✅ 支持"条件瞬态联盟"：同一词在不同上下文激活不同路径
+- ❗ 但"分叉层"检测失败——几乎所有词对都在L1-L2就开始分化
+
+### 目前最精确的客观事实拼图（更新）
+
+1. **方差分布**：86-96%方差在V_inv方向（Phase 268）
+2. **Transport R²是假象**：随机子空间给出相同R²（Phase 271）
+3. **拓扑跨层保持**：Mantel r单调递增0.04→0.85（Phase 271）
+4. **类内>类间拓扑保持**：差值0.10-0.34（Phase 271）
+5. **类内>类间计算路径重叠**：delta_cosine差0.08-0.25（Phase 272新发现）
+6. **类内>类间残差维度共享**：top_dim_jaccard差0.05-0.12（Phase 272新发现）
+7. **Attention pattern不由概念决定**：between > within attn_corr（Phase 272新发现）
+8. **中间层是差异化焦点**：top_dim_jaccard最低0.04-0.12（Phase 272新发现）
+9. **上下文路由分化在中间层最显著**：delta_cos最低0.13（Phase 272新发现）
+10. **歧义词head_corr呈U型**：0.79→0.51→0.78，中间层路由分化（Phase 272新发现）
+
+### 命令记录
+
+```bash
+python tests/glm5/phase272_path_reuse.py qwen3
+python tests/glm5/phase272_path_reuse.py glm4
+python tests/glm5/phase272_path_reuse.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase272_path_reuse/qwen3_path_overlap.json`
+- `results/phase272_path_reuse/qwen3_divergence.json`
+- `results/phase272_path_reuse/qwen3_context_routing.json`
+- `results/phase272_path_reuse/glm4_path_overlap.json`
+- `results/phase272_path_reuse/glm4_divergence.json`
+- `results/phase272_path_reuse/glm4_context_routing.json`
+- `results/phase272_path_reuse/deepseek7b_path_overlap.json`
+- `results/phase272_path_reuse/deepseek7b_divergence.json`
+- `results/phase272_path_reuse/deepseek7b_context_routing.json`
+
+## Phase 273: 因果路径分解 [2026-05-25 03:55]
+
+### 实验动机
+
+Phase 272发现delta_cosine是最强信号，但仍然是统计观察。现在转向**因果分析**：直接对残差流注入噪声，测量对目标token logit的因果影响，构建"因果重要性图谱"。
+
+核心问题：哪些(层, 位置)对是因果必要的？相似概念是否共享因果路径？
+
+### 实验设计
+
+**四组实验**：
+- A. 因果重要性图谱：30词 × ~19层，噪声残差→测目标token logit变化
+- B. MLP因果追踪：10词 × ~19层，噪声MLP输出→测logit变化
+- C. 跨概念因果重叠：比较within/between词对的因果图谱相关性
+- D. 因果分叉点：对一对(A,B)，在某层噪声→分别测A的token和B的token的logit变化，找差分最大层
+
+**噪声方法**：Gaussian noise std=3.0，3次试验取平均
+
+### 核心结果
+
+#### 结果A：因果重要性图谱——L0和最后一层冲击最大，中间层U型曲线
+
+| 模型 | L0 impact | 中间层均值 | 最后层impact | shallow/deep |
+|------|-----------|-----------|-------------|-------------|
+| Qwen3 | 10.69 | 2.5-3.8 | 6.48 | 1.6-2.2 |
+| GLM4 | 6.5-7.5 | 3.5-5.5 | 4.7 | 1.5-1.8 |
+| DS7B | 15.3-16.4 | 1.5-3.5 | 7.2-9.3 | 1.2-1.4 |
+
+**关键发现**：
+- ✅ L0（embedding层）和最后一层因果冲击最大——这是"瓶颈层"
+- ✅ 中间层呈U型曲线：L0高→中间低→最后层反弹
+- ✅ Qwen3的U型最明显（L0=10.7, L28=0.97, L35=6.5）
+- ✅ DS7B的L0冲击极大(15-20)但中间层衰减快→shallow/deep比最低
+
+#### 结果B：MLP因果 vs 残差因果——MLP在各层贡献不同
+
+| 模型 | MLP/Residual平均比 | MLP peak层 | Residual peak层 |
+|------|-------------------|-----------|----------------|
+| Qwen3 | 0.5-1.0 | L8-L16 | L0 |
+| GLM4 | 0.7-1.1 | L0-L20（分散） | L0 |
+| DS7B | 0.4-0.8 | L0-L11 | L0 |
+
+**关键发现**：
+- ✅ GLM4的MLP/Residual比最高（0.7-1.1）→MLP在GLM4中因果贡献更大
+- ✅ DS7B的MLP/Residual比最低（0.4-0.8）→DS7B更依赖残差流/attention
+- ✅ MLP peak层与Residual peak层不同→MLP在中间层有独立的因果贡献
+
+#### 结果C：因果图谱重叠——Within vs Between **不一致**
+
+| 模型 | Within Spearman | Between Spearman | Δ | Within Jaccard | Between Jaccard | Δ |
+|------|-----------------|------------------|---|---------------|-----------------|---|
+| Qwen3 | 0.425 | 0.530 | **-0.104** | 0.361 | 0.417 | **-0.056** |
+| GLM4 | 0.232 | 0.247 | **-0.015** | 0.261 | 0.249 | **+0.012** |
+| DS7B | 0.378 | 0.275 | **+0.103** | 0.350 | 0.306 | **+0.044** |
+
+**关键发现**：
+- ❗ 三个模型方向不一致！Qwen3: Between > Within，GLM4: 无显著差异，DS7B: Within > Between
+- ❗ 这与Phase 272的delta_cosine结果（Within > Between，跨模型一致）形成鲜明对比
+- ❗ 因果重要性图谱的相关性（spearman 0.23-0.53）远低于Phase 272的delta_cosine差异
+- ⚠️ 这说明**噪声方法的因果图谱不如delta_cosine区分力强**
+
+#### 结果C续：Impact profile correlation更精确的测量
+
+| 模型 | Within impact profile corr | Between impact profile corr | Δ |
+|------|--------------------------|---------------------------|---|
+| Qwen3 | 0.323 ± 0.181 | 0.497 ± 0.133 | **-0.174** |
+| GLM4 | 0.232 ± (未详) | 0.247 ± (未详) | **-0.015** |
+| DS7B | 0.378 ± (未详) | 0.275 ± (未详) | **+0.103** |
+
+#### 结果D：因果分叉点——Within分叉在更深层，Between在更浅层
+
+| 模型 | Within mean divergence layer | Between mean divergence layer |
+|------|----------------------------|----------------------------|
+| Qwen3 | 8.0 ± 6.1 | 3.6 ± 5.4 |
+| GLM4 | 15.2 ± 11.3 | 10.0 ± 2.2 |
+| DS7B | 0.2 ± 0.4 | 4.6 ± 7.3 |
+
+**关键发现**：
+- ✅ Qwen3和GLM4：Within-category词对的因果分叉层更深（8-15），Between-category更浅（3-10）
+- ✅ 这符合预期：相似概念共享更多浅层路径，在中间层才分叉
+- ❗ 但DS7B方向反转——Within分叉在L0，Between在L4.6→不稳定
+- ⚠️ 方差极大（±6-11），分叉层检测不够稳定
+
+### 对Noise-based Causal Tracing方法的批判性分析
+
+**核心问题：噪声方法的局限**
+
+1. **噪声是"破坏性"而非"恢复性"**
+   - 当前方法：在L层加噪声→测logit变化
+   - 问题：噪声破坏了所有信息，不只是目标概念
+   - 结果：L0和最后层总是冲击最大（因为它们是信息瓶颈）
+   - 这不是"因果路径"，而是"脆弱度图谱"
+
+2. **Within/Between差异消失的原因**
+   - Phase 272的delta_cosine测量的是"两个词走多相似的方向"→细粒度
+   - Phase 273的noise impact测量的是"噪声在某层的破坏力"→粗粒度
+   - 前者区分概念差异，后者只区分信息依赖度
+
+3. **GLM4的U型曲线更平坦**
+   - GLM4各层impact都在3-8之间→更均匀的信息依赖
+   - Qwen3/DS7B中间层impact低→信息更集中在浅层和深层
+
+### 目前最精确的客观事实拼图（更新）
+
+1. **方差分布**：86-96%方差在V_inv方向（Phase 268）
+2. **Transport R²是假象**：随机子空间给出相同R²（Phase 271）
+3. **拓扑跨层保持**：Mantel r单调递增0.04→0.85（Phase 271）
+4. **类内>类间delta_cosine**：差0.08-0.25（Phase 272）——**目前最强分类信号**
+5. **Attention pattern不由概念决定**：between > within（Phase 272）
+6. **中间层是差异化焦点**：top_dim_jaccard最低0.04-0.12（Phase 272）
+7. **因果重要性图谱呈U型**：L0和最后层冲击最大（Phase 273新发现）
+8. **噪声因果图谱无法区分within/between**：spearman方向跨模型不一致（Phase 273新发现）
+9. **MLP因果贡献**：GLM4最大(MLP/Residual=0.7-1.1)，DS7B最小(0.4-0.8)（Phase 273新发现）
+10. **因果分叉层**：Within比Between在更深层分叉（Qwen3:8 vs 3.6, GLM4:15 vs 10）（Phase 273新发现）
+
+### 关键硬伤
+
+1. **噪声方法测的是"脆弱度"不是"因果路径"**：加噪声→测破坏力，只能说明"该层包含对输出重要的信息"，不能说明"该层在做什么计算"
+2. **Within/Between差异消失**：噪声方法无法复现Phase 272的delta_cosine优势，说明噪声对信息的破坏是全量的，不是概念特异的
+3. **需要"恢复性"因果追踪**：正确的方法应该是resampling（用另一个概念的激活替换），而非noising（加噪声破坏）
+4. **L0总是最重要**：因为L0是embedding层的入口，任何噪声都会传播到所有后续层→这不是因果发现而是tautology
+
+### 命令记录
+
+```bash
+python tests/glm5/phase273_causal_path.py qwen3
+python tests/glm5/phase273_causal_path.py glm4
+python tests/glm5/phase273_causal_path.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase273_causal_path/qwen3_exp_a.json` (因果重要性图谱)
+- `results/phase273_causal_path/qwen3_exp_b.json` (MLP因果追踪)
+- `results/phase273_causal_path/qwen3_exp_c.json` (跨概念因果重叠)
+- `results/phase273_causal_path/qwen3_exp_d.json` (因果分叉点)
+- `results/phase273_causal_path/glm4_exp_a/b/c/d.json`
+- `results/phase273_causal_path/deepseek7b_exp_a/b/c/d.json`
+
+## Phase 274: CRTM — 条件路由拓扑映射 [2026-05-25 04:15]
+
+### 实验动机
+
+Phase 273的噪声方法失败（Within/Between方向跨模型不一致），因为噪声是破坏性的——摧毁所有信息而非概念特异信息。现在转向**替换性**方法：CRTM（Conditional Routing Topology Mapping）。
+
+核心理论转向：
+- 词嵌入不是"语义向量"，而是"条件钥匙"——它们控制路由，不存储含义
+- 真正的编码机制 = token如何改变整个网络的计算拓扑
+- Δ(W, L) = h_L("The W is") - h_L("The thing is") → 这是词W的"路由指纹"
+
+### 实验设计
+
+**四组实验**：
+- A. 路由激活图谱：30词，测量Δ(W,L)的within/between重叠
+- B. 激活替换（Patching）：24对，在每层用B的残差替换A的，测概念偏移
+- C. 路径复用率：比较Δ(W,L)的top-50维度Jaccard重叠 + 加权复用率
+- D. 条件路由（歧义词）：8对歧义词上下文，逐层追踪路由差异
+
+**核心方法差异**：
+- Phase 273: 噪声（破坏性）→ 测脆弱度 → 无法区分概念
+- Phase 274: 替换（构造性）→ 测概念偏移 → 精准捕捉概念差异
+
+### 核心结果
+
+#### 结果A：路由激活图谱——Within > Between（跨模型一致！）
+
+| 模型 | Within Cosine | Between Cosine | Δ Cos | Within Jaccard | Between Jaccard | Δ Jac |
+|------|-------------|---------------|-------|---------------|----------------|-------|
+| Qwen3 | 0.883 | 0.798 | **+0.085** | 0.577 | 0.463 | **+0.113** |
+| GLM4 | 0.899 | 0.726 | **+0.173** | 0.585 | 0.402 | **+0.183** |
+| DS7B | 0.845 | 0.758 | **+0.087** | 0.463 | 0.369 | **+0.093** |
+
+**关键发现**：
+- ✅ **跨模型一致**：Within-category路由指纹重叠 > Between-category
+- ✅ CRTM路由重叠信号比Phase 273的噪声因果图谱**更可靠**（方向跨模型一致）
+- ✅ GLM4差异最大（cosine Δ=0.17, jaccard Δ=0.18），Qwen3和DS7B较小但方向一致
+- ✅ 这证实了"条件钥匙"假说：同类概念确实打开更相似的路由路径
+
+#### 结果A续：逐层分析——深层差异最大
+
+| 模型 | 峰值差异层 | 峰值Δ Jaccard | 平均Δ Jaccard |
+|------|----------|-------------|-------------|
+| Qwen3 | L33 | +0.165 | +0.113 |
+| GLM4 | L36 | +0.257 | +0.183 |
+| DS7B | L27 | +0.170 | +0.093 |
+
+**关键发现**：
+- ✅ 路由差异在**深层最大**（L27-L36），不是中间层
+- ❗ 这与Phase 272发现"中间层是差异化焦点"不同——Phase 272测的是delta方向一致性，Phase 274测的是路由维度重叠
+- 可能解释：中间层的路由方向分化最大（delta_cosine低），但深层的路由路径完全不重叠（jaccard低）
+
+#### 结果B：激活替换（Patching）——Between概念偏移更大，Within偏移在更深层
+
+| 模型 | Within peak shift | Between peak shift | Within peak层 | Between peak层 |
+|------|------------------|-------------------|-------------|--------------|
+| Qwen3 | 10.15 | 14.19 | L20.3 | L14.0 |
+| GLM4 | 8.49 | 11.33 | L27.0 | L17.2 |
+| DS7B | 7.61 | 10.91 | L12.3 | L12.3 |
+
+**关键发现**：
+- ✅ Between-category的peak concept shift更大（14.2 vs 10.2）——替换不同类概念的影响更大
+- ✅ Within-category的peak shift在更深层（Qwen3: L20 vs L14, GLM4: L27 vs L17）——同类概念的区分需要更深层的处理
+- ❗ DS7B的Within/Between peak层相同（L12.3）——DS7B的分层特化可能不如Qwen3/GLM4明显
+- ⚠️ 这说明：**Between概念在浅层就已经分化，Within概念在深层才分化**——这与"钥匙-锁"模型一致
+
+#### 结果B续：逐对分析——patching效果在不同层截然不同
+
+Qwen3示例：
+- apple↔banana: peak_shift=L6(+10.53), clean_A=11.0, clean_B_in_A=7.0
+- apple↔dog: peak_shift=L6(+11.91), clean_A=11.0, clean_B_in_A=6.3
+- orange↔lion: peak_shift=L6(+17.03), clean_A=13.8, clean_B_in_A=5.0
+
+**关键发现**：
+- ❗ L6是Qwen3中大多数词对的peak patching层——这可能是"概念注入点"
+- ❗ Between-category的peak shift更大（17.03 vs 10.53）——因为B概念在A的上下文中激活更低，patching效果更强
+
+#### 结果C：路径复用率——Within > Between（跨模型一致）
+
+| 模型 | Within Jaccard | Between Jaccard | Δ | Within Weighted | Between Weighted | Δ |
+|------|---------------|----------------|---|---------------|-----------------|---|
+| Qwen3 | 0.577 | 0.463 | **+0.113** | 0.686 | 0.591 | **+0.094** |
+| GLM4 | 0.585 | 0.402 | **+0.183** | 0.693 | 0.537 | **+0.156** |
+| DS7B | 0.463 | 0.369 | **+0.093** | 0.601 | 0.503 | **+0.098** |
+
+**关键发现**：
+- ✅ 路径复用率跨模型一致：Within > Between
+- ✅ 加权复用率（考虑激活强度）比简单Jaccard更能区分概念
+- ✅ GLM4的路径复用差异最大（Δ=0.18）——GLM4的概念分化最显著
+
+#### 结果D：条件路由（歧义词）——深层逐渐区分歧义
+
+歧义词在不同上下文中的cosine distance随层变化：
+- Qwen3 "river bank" vs "bank account": L0=0.69 → L35=0.21
+- GLM4 "river bank" vs "bank account": L0=0.71 → L39=0.19
+- DS7B "river bank" vs "bank account": L0=0.49 → L6=0.62 → L27=0.15
+
+**关键发现**：
+- ✅ 歧义词在不同上下文中，cosine distance从浅层到深层递减（0.7→0.2）
+- ✅ 模型在深层逐渐区分歧义——深层才是语义消歧的地方
+- ❗ 但这与Exp A发现"深层jaccard差异最大"矛盾——可能是因为Exp A测的是绝对差异，Exp D测的是相对距离
+
+### 跨Phase对比：CRTM vs 之前的方法
+
+| 方法 | 测量对象 | Within > Between | 跨模型一致 | 区分力 |
+|------|---------|-----------------|----------|-------|
+| Phase 272 delta_cosine | 残差变化方向一致性 | ✅ Δ=+0.08~0.25 | ✅ 全一致 | 中等 |
+| Phase 273 noise causal | 噪声脆弱度 | ❌ 不一致 | ❌ 方向不同 | 弱 |
+| Phase 274 CRTM routing | 路由指纹重叠 | ✅ Δ=+0.09~0.18 | ✅ 全一致 | **强** |
+
+**CRTM为什么比噪声方法强**：
+1. 路由指纹Δ(W,L)是**构造性的**——测量词W相对基线"增加了什么"，而非"破坏了什么"
+2. 同类词增加相似的路由（共享路径），异类词增加不同的路由（分化路径）
+3. 噪声摧毁所有信息（包括模板、语法），无法区分概念特异部分
+
+### 目前最精确的客观事实拼图（更新）
+
+1. **方差分布**：86-96%方差在V_inv方向（Phase 268）
+2. **Transport R²是假象**：随机子空间给出相同R²（Phase 271）
+3. **拓扑跨层保持**：Mantel r单调递增（Phase 271）
+4. **类内>类间delta_cosine**：差0.08-0.25（Phase 272）
+5. **Attention pattern不由概念决定**：between > within（Phase 272）
+6. **CRTM路由重叠 Within > Between**：cosine差0.09-0.17, jaccard差0.09-0.18（Phase 274新发现）
+7. **CRTM路径复用 Within > Between**：加权复用差0.10-0.16（Phase 274新发现）
+8. **Patching: Between偏移更大但Within偏移在更深层**（Phase 274新发现）
+9. **路由差异在深层最大**：L27-L36（Phase 274新发现）
+10. **噪声方法无法区分概念**（Phase 273）
+11. **MLP因果贡献**：GLM4最大，DS7B最小（Phase 273）
+
+### 命令记录
+
+```bash
+python tests/glm5/phase274_crtm.py qwen3
+python tests/glm5/phase274_crtm.py glm4
+python tests/glm5/phase274_crtm.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase274_crtm/qwen3_exp_a/b/c/d.json`
+- `results/phase274_crtm/glm4_exp_a/b/c/d.json`
+- `results/phase274_crtm/deepseek7b_exp_a/b/c/d.json`
+
+## Phase 275: CDRE — 条件动力学逆向 [2026-05-25 07:10]
+
+### 实验动机
+
+Phase 274证实了CRTM路由指纹的重叠效应（Within > Between），但这仍是"空间几何"层面的发现。现在转向**条件动力学**层面：直接测量token如何配置网络在每层的局部计算规则。
+
+核心理论转向：
+- 不是"hidden state长什么样"（表征统计学）
+- 而是"token如何改变网络的局部动力学"（条件动力学）
+- Jacobian J_l^(t) = ∂h_{l+1}/∂h_l 才是真正的"计算规则"
+- 同类token应该有更相似的Jacobian → 它们配置了更相似的局部动力学
+
+### 实验设计
+
+**三组实验**：
+- A. 条件Jacobian相似性：对每层l注入相同的随机扰动向量，测量h_{l+1}的响应方向。12个扰动向量 × 7个采样层 × 15词。同类token的Jacobian响应应更相似。
+- B. 吸引子收敛：在embedding层注入8个扰动，测量深层hidden state的收敛度。如果网络有吸引子动力学，扰动应在深层被吸收。
+- C. Logit响应指纹：收集每个(token, layer)的logit变化模式，比较within/between。
+
+**核心方法**：register_forward_pre_hook在层l注入扰动h_l → h_l + εv，register_forward_hook捕获h_{l+1}。Jv ≈ (h_{l+1}(h_l + εv) - h_{l+1}(h_l)) / ε 直接估计Jacobian-向量乘积。
+
+### 核心结果
+
+#### 结果A：条件Jacobian相似性——Within > Between（跨模型一致！）
+
+| 模型 | Within Jacobian Cos | Between Jacobian Cos | Δ |
+|------|-------------------|---------------------|---|
+| Qwen3 | 0.679 | 0.558 | **+0.120** |
+| GLM4 | 0.825 | 0.626 | **+0.199** |
+| DS7B | 0.705 | 0.595 | **+0.110** |
+
+**关键发现**：
+- ✅ **跨模型一致**：Within-category的Jacobian响应比Between-category更相似
+- ✅ GLM4差异最大（+0.199），与Phase 274 CRTM结果一致（GLM4概念分化最显著）
+- ✅ Jacobian delta (+0.11~0.20) 与CRTM delta (+0.09~0.18) 量级相当，且方向一致
+
+#### 结果A续：逐层Jacobian差异——深层差异最大
+
+| 模型 | 浅层Delta | 中层Delta | 深层Delta | 峰值层 |
+|------|----------|----------|----------|--------|
+| Qwen3 | L5:+0.167 | L15:+0.001 | L30:+0.217 | L30 |
+| GLM4 | L6:+0.150 | L18:+0.166 | L30:+0.330 | L30 |
+| DS7B | L4:+0.019 | L12:+0.144 | L24:+0.113 | L8 |
+
+**关键发现**：
+- ✅ **Jacobian差异随深度增长**：浅层共享动力学（小delta），深层分化动力学（大delta）
+- ✅ GLM4的深层分化最剧烈（L30 delta=+0.33）
+- ❗ Qwen3在L15出现一个极低点（+0.001）→ 这可能是"概念汇聚层"——所有概念在此共享几乎相同的局部动力学
+- ❗ DS7B的峰值在L8而非最深层→ DS7B的动力学分化在更早层完成
+
+#### 结果B：吸引子收敛——确认但非概念特异
+
+**收敛到baseline的cosine随层变化**：
+
+| 模型 | L0 | L12-16 | L24-28 | L35 | 最后层 |
+|------|-----|--------|--------|-----|--------|
+| Qwen3 | 0.718 | 0.766-0.801 | 0.827-0.848 | 0.882 | L35: 0.920 |
+| GLM4 | 0.090 | 0.450-0.476 | — | 0.721 | L39: 0.474 ⚠️ |
+| DS7B | 0.875 | 0.937 | 0.979 | — | L27: 0.916 ⚠️ |
+
+**关键发现**：
+- ✅ **吸引子动力学确认**：Qwen3和DS7B的深层收敛度高（0.92-0.98）
+- ✅ Qwen3和DS7B：L0→L24单调递增→网络逐步吸收扰动
+- ❗ **GLM4和DS7B最后一层DROP**：L35=0.721→L39=0.474（GLM4），L24=0.979→L27=0.916（DS7B）
+- ❗ 最后一层不是"收敛"，而是"输出压缩"——它重新放大了某些方向的扰动
+- ❗ GLM4的L0收敛极低（0.090）→ embedding扰动对GLM4影响巨大，说明GLM4的embedding层更敏感
+
+#### 结果B续：吸引子盆形状——跨概念通用
+
+| 模型 | Within Cross-Attractor | Between Cross-Attractor | Δ |
+|------|----------------------|------------------------|---|
+| Qwen3 | 0.9962 | 0.9987 | -0.0025 |
+| GLM4 | 0.9993 | 0.9979 | +0.0014 |
+| DS7B | 0.9995 | 0.9994 | +0.0001 |
+
+**关键发现**：
+- ❗ 吸引子收敛曲线的形状对within/between几乎完全相同（delta≈0.001）
+- ❗ 这说明：**吸引子盆的形状是通用的，不是概念特异的**
+- ❗ 吸引子动力学决定了"扰动如何被吸收"（通用），Jacobian决定了"概念如何分化"（特异）
+
+#### 结果C：Logit响应指纹——跨模型不一致
+
+| 模型 | Within | Between | Δ |
+|------|--------|---------|---|
+| Qwen3 | -0.039 | 0.037 | -0.076 |
+| GLM4 | 0.423 | 0.241 | +0.183 |
+| DS7B | 0.106 | 0.175 | -0.069 |
+
+**关键发现**：
+- ❗ Logit指纹跨模型不一致（Qwen3和DS7B方向反转）
+- ❗ 可能原因：logit空间维度极高（~150K），12个扰动不足以精确估计高维Jacobian的logit投影
+- ❗ GLM4是唯一正向的，可能因为GLM4的logit空间结构更线性
+
+### 跨方法对比：Jacobian vs CRTM vs Noise
+
+| 方法 | 测量对象 | Qwen3 Δ | GLM4 Δ | DS7B Δ | 跨模型一致? |
+|------|---------|---------|--------|--------|------------|
+| Phase 273 Noise | 噪声脆弱度 | -0.174 | -0.015 | +0.103 | ❌ |
+| Phase 274 CRTM | 路由指纹重叠 | +0.113 | +0.183 | +0.093 | ✅ |
+| Phase 275 Jacobian | 条件Jacobian相似性 | +0.120 | +0.199 | +0.110 | ✅ |
+
+**关键对比**：
+- CRTM和Jacobian方向一致、量级相当
+- 但Jacobian是**动力学层面的测量**（计算规则），CRTM是**空间层面的测量**（路由方向）
+- 两者一致说明：概念分化同时体现在"路由方向"和"局部动力学"上
+
+### 目前最精确的客观事实拼图（更新）
+
+1. **方差分布**：86-96%方差在V_inv方向（Phase 268）
+2. **Transport R²是假象**：随机子空间给出相同R²（Phase 271）
+3. **拓扑跨层保持**：Mantel r单调递增（Phase 271）
+4. **类内>类间delta_cosine**：差0.08-0.25（Phase 272）
+5. **Attention pattern不由概念决定**：between > within（Phase 272）
+6. **CRTM路由重叠 Within > Between**：cosine差0.09-0.17（Phase 274）
+7. **条件Jacobian相似性 Within > Between**：delta +0.11-0.20（Phase 275新发现）
+8. **Jacobian差异随深度增长**：深层动力学分化最大（Phase 275新发现）
+9. **吸引子动力学确认**：深层收敛度高（0.92-0.98）（Phase 275新发现）
+10. **最后一层"输出压缩"**：GLM4/DS7B最后层收敛度反而下降（Phase 275新发现）
+11. **吸引子盆形状通用**：within/between几乎无差异（Phase 275新发现）
+12. **GLM4 embedding更敏感**：L0收敛0.090（vs Qwen3 0.718, DS7B 0.875）（Phase 275新发现）
+
+### 关键硬伤
+
+1. **Jacobian仅估计了Jv（Jacobian-向量乘积），不是完整Jacobian**：12个随机向量只捕捉了Jacobian的部分信息，可能遗漏了某些重要方向
+2. **Qwen3 L15的极低delta（+0.001）需要验证**：可能是概念汇聚层，也可能是采样噪声
+3. **Logit指纹跨模型不一致**：可能需要更多扰动向量或更好的logit投影方法
+4. **GLM4的L0收敛极低（0.090）很异常**：可能是因为GLM4使用RMSNorm导致embedding层输出范数小，扰动相对影响大
+5. **最后一层DROP需要深入分析**：这是"输出压缩"还是"扰动放大"？对理解编码机制很关键
+
+### 命令记录
+
+```bash
+python tests/glm5/phase275_cdre.py qwen3
+python tests/glm5/phase275_cdre.py glm4
+python tests/glm5/phase275_cdre.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase275_cdre/qwen3_exp_a.json` (Jacobian响应原始数据)
+- `results/phase275_cdre/qwen3_exp_a_summary.json` (Jacobian分析摘要)
+- `results/phase275_cdre/qwen3_exp_b.json` (吸引子收敛原始数据)
+- `results/phase275_cdre/qwen3_exp_b_summary.json` (吸引子分析摘要)
+- 同理 glm4, deepseek7b
+
+## Phase 276: Jacobian谱与条件算子分析 [2026-05-25 09:15]
+
+### 实验动机
+
+Phase 275证实了条件Jacobian相似性 Within > Between（delta +0.11~0.20），但仅测量了Jv向量的余弦相似度（标量）。现在升级到完整谱结构分析：Jacobian的奇异值分布、有效秩、条件数、稳定/不稳定维度比。
+
+核心问题升级：
+- Phase 275: "同类token的Jacobian响应方向更相似吗？" → 是
+- Phase 276: "同类token的Jacobian谱结构更相似吗？" → 否！
+- Phase 276: "同类token的Jacobian子空间更重叠吗？" → 是！
+
+### 实验设计
+
+**四组实验**：
+- A. Jacobian谱分析：32个扰动向量（Phase 275仅12个），对每个(token, layer)估计JV矩阵 [d_model, 32]，SVD分解提取奇异值谱、有效秩、条件数、谱熵、稳定/不稳定维度比
+- B. 条件算子距离：JV矩阵间的Frobenius距离、子空间余弦（U_A^T * JV_B投影比）、主角度余弦
+- C. 动力学聚类：基于谱特征 vs 嵌入聚类，比较ARI
+- D. 临界层搜索：相邻层谱特征变化量，找动力学相变层
+
+**优化**：统一数据采集（Exp A/B共享JV矩阵），15词 × 9层 × 32扰动 = 4320次forward pass
+
+### 核心结果
+
+#### 结果A：谱结构几乎完全通用！——最重要的发现
+
+| 模型 | Spectral Feature Δ | SV Cosine Δ |
+|------|-------------------|-------------|
+| Qwen3 | -6.3e-08 | +9.7e-08 |
+| GLM4 | -4.0e-04 | -4.6e-05 |
+| DS7B | +3.1e-08 | +1.1e-06 |
+
+**关键发现**：
+- ❗ **奇异值谱结构几乎完全通用**：不同token的Jacobian有几乎相同的奇异值分布
+- ❗ **有效秩=1.0**（Qwen3和DS7B所有层）：Jacobian本质上是RANK-1的
+- ❗ GLM4早期层有效秩更高（L4=32），但深层也降到1.0
+- ❗ 这意味着：每层的Jacobian本质上只沿**一个方向**操作
+
+#### 结果A续：深层全部不稳定 + 谱熵递减
+
+**逐层谱特征（Qwen3）**：
+
+| 层 | 有效秩 | 谱熵 | Top-1奇异值 | 不稳定% | 稳定% |
+|----|--------|------|-----------|---------|-------|
+| L4 | 1.0 | 0.539 | 57.5 | 49% | 51% |
+| L12 | 1.0 | 0.428 | 83.1 | 33% | 67% |
+| L20 | 1.0 | 0.345 | 125.0 | 54% | 46% |
+| L28 | 1.0 | 0.155 | 457.3 | **100%** | 0% |
+| L32 | 1.0 | 0.121 | 709.0 | **100%** | 0% |
+
+**关键发现**：
+- ✅ **谱熵单调递减**：深层越来越被单个奇异值主导
+- ✅ **深层100%不稳定**：L28+所有奇异值>1（扰动被放大而非压缩）
+- ✅ **Top-1奇异值指数增长**：L4=57.5 → L32=709.0（12倍增长）
+- ❗ 这与Phase 275的"吸引子收敛"看似矛盾，实际上说明：**Jacobian的增益结构使扰动放大，但输出被后续层归一化，整体仍是吸引子**
+
+#### 结果B：子空间方向概念特异——与谱结构通用形成对比
+
+| 模型 | Frobenius Dist Δ | Subspace Cos Δ | Principal Angle Δ |
+|------|-----------------|----------------|-------------------|
+| Qwen3 | **-0.165** | **+0.125** | +146.4 (L32) |
+| GLM4 | **-0.261** | **+0.174** | +24.2 (L32) |
+| DS7B | **-0.140** | **+0.113** | +207.7 (L24) |
+
+**关键发现**：
+- ✅ **Frobenius距离：类内更近**（delta为负=within < between）——同类token的算子更相似
+- ✅ **子空间余弦：类内更高**（delta为正=within > between）——同类token的Jacobian子空间更重叠
+- ✅ **跨模型一致**：三个模型方向完全一致
+- ❗ **GLM4差异最大**（Frobenius delta=-0.261），与Phase 274/275一致
+
+#### 结果B续：深层子空间差异最大
+
+**逐层子空间余弦delta（Qwen3）**：
+
+| 层 | Subspace Δ | Frobenius Δ |
+|----|-----------|-------------|
+| L4 | +0.031 | -0.074 |
+| L12 | +0.125 | -0.161 |
+| L20 | +0.037 | -0.081 |
+| L28 | **+0.267** | **-0.296** |
+| L32 | **+0.220** | **-0.281** |
+
+**关键发现**：
+- ✅ **深层子空间分化最大**：L28/L32的subspace delta是浅层的3-8倍
+- ✅ 与Phase 275的"深层Jacobian delta最大"完全一致
+- ❗ L12有一个局部高峰（+0.125），可能是Qwen3的"语义分化层"
+
+#### 结果C：动力学聚类——可以恢复类别结构
+
+| 模型 | Spectral ARI | Embedding ARI | 最佳单层ARI |
+|------|-------------|--------------|------------|
+| Qwen3 | 0.417 | 0.517 | L20: 0.292 |
+| GLM4 | 0.294 | 0.479 | L36: 0.333 |
+| DS7B | 0.196 | 1.000 | L24: 0.298 |
+
+**关键发现**：
+- ✅ **谱特征聚类ARI > 0**：即使奇异值谱几乎通用，组合特征仍可区分概念
+- ❗ 但embedding聚类明显更强（DS7B甚至完美ARI=1.0）
+- ❗ 这说明：**当前7个谱特征维度不足以完全捕获概念差异**，需要更多维度
+
+#### 结果D：临界层——最深2层有最大谱变化
+
+| 模型 | 最大transition | 量级 |
+|------|--------------|------|
+| Qwen3 | L28→L32 | 299,464 |
+| GLM4 | L32→L36 | 53,361 |
+| DS7B | L21→L24 | 1,434,353 |
+
+| 模型 | Transition Profile Δ |
+|------|---------------------|
+| Qwen3 | +0.028 |
+| GLM4 | +0.003 |
+| DS7B | +0.012 |
+
+**关键发现**：
+- ✅ **最深层谱变化最大**：输出前的最后2-4层有指数级谱变化
+- ✅ **transition profile within > between**：同类token的谱变化轨迹更相似
+
+### 跨方法对比
+
+| 方法 | 测量对象 | Qwen3 Δ | GLM4 Δ | DS7B Δ | 跨模型一致? |
+|------|---------|---------|--------|--------|------------|
+| Phase 275 Jacobian cosine | Jv方向相似性 | +0.120 | +0.199 | +0.110 | ✅ |
+| Phase 276 Subspace cosine | Jacobian子空间重叠 | +0.125 | +0.174 | +0.113 | ✅ |
+| Phase 276 Frobenius dist | 算子整体距离 | -0.165 | -0.261 | -0.140 | ✅ |
+| Phase 276 Spectral feature | 谱结构相似性 | ≈0 | ≈0 | ≈0 | ✅ (但≈0) |
+
+**关键对比**：
+- **Phase 275和276的Subspace cosine方向一致、量级相当** → 互相验证
+- **Frobenius距离提供新信息**：算子整体的距离差异比方向差异更大（delta -0.14~-0.26 vs +0.11~+0.17）
+- **谱结构几乎通用是最大发现**：意味着概念差异不在"增益结构"而在"方向结构"
+
+### 目前最精确的客观事实拼图（更新）
+
+1. **方差分布**：86-96%方差在V_inv方向（Phase 268）
+2. **Transport R²是假象**：随机子空间给出相同R²（Phase 271）
+3. **拓扑跨层保持**：Mantel r单调递增（Phase 271）
+4. **类内>类间delta_cosine**：差0.08-0.25（Phase 272）
+5. **Attention pattern不由概念决定**：between > within（Phase 272）
+6. **CRTM路由重叠 Within > Between**：cosine差0.09-0.17（Phase 274）
+7. **条件Jacobian相似性 Within > Between**：delta +0.11-0.20（Phase 275）
+8. **Jacobian差异随深度增长**：深层动力学分化最大（Phase 275）
+9. **吸引子动力学确认**：深层收敛度高（0.92-0.98）（Phase 275）
+10. **吸引子盆形状通用**：within/between几乎无差异（Phase 275）
+11. **最后一层"输出压缩"**：GLM4/DS7B最后层收敛度反而下降（Phase 275）
+12. **Jacobian谱结构几乎通用**：delta ≈ 0，所有token共享相似的奇异值分布（Phase 276新发现）
+13. **Jacobian有效秩≈1**：Qwen3/DS7B所有层、GLM4深层，Jacobian本质上是RANK-1操作（Phase 276新发现）
+14. **深层100%不稳定**：L28+所有奇异值>1，扰动被放大（Phase 276新发现）
+15. **Jacobian子空间方向概念特异**：subspace cosine delta +0.11~0.17（Phase 276新发现）
+16. **Jacobian子空间深层分化最大**：L28/L32 delta是浅层3-8倍（Phase 276新发现）
+17. **谱熵单调递减+Top-1奇异值指数增长**：深层越来越被单一方向主导（Phase 276新发现）
+18. **Frobenius算子距离：类内更近**：delta -0.14~-0.26（Phase 276新发现）
+
+### 关键硬伤
+
+1. **Jacobian仅估计了JV（Jacobian-向量乘积），不是完整Jacobian**：32个向量只捕捉了32维子空间
+2. **有效秩=1可能是因为扰动向量不够多**：32个随机向量可能无法发现低方差方向
+3. **GLM4早期层有效秩=32 vs Qwen3/DS7B=1**：这是架构差异还是扰动不足？
+4. **谱特征聚类ARI较低（0.20-0.42）vs embedding（0.48-1.0）**：7维谱特征可能不足以捕获概念差异
+5. **"深层100%不稳定"与Phase 275"深层吸引子收敛"如何统一？** 可能解释：Jacobian增益大但被LayerNorm/残差缩放补偿
+
+### 命令记录
+
+```bash
+python tests/glm5/phase276_jspectrum.py qwen3
+python tests/glm5/phase276_jspectrum.py glm4
+python tests/glm5/phase276_jspectrum.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase276_jspectrum/{model}_spectral.json` (谱特征数据)
+- `results/phase276_jspectrum/{model}_exp_a_summary.json` (谱分析摘要)
+- `results/phase276_jspectrum/{model}_exp_b_summary.json` (算子距离摘要)
+- `results/phase276_jspectrum/{model}_exp_c_clustering.json` (聚类结果)
+- `results/phase276_jspectrum/{model}_exp_d_critical.json` (临界层搜索)
+
+## Phase 277: 条件动力学图谱 — 全轨迹+扩展语义覆盖 [2026-05-25 12:20]
+
+### 实验动机
+
+Phase 276发现Jacobian有效秩≈1，谱结构通用但子空间方向概念特异。这产生一个关键预测：如果每层Jacobian是rank-1的，那么所有token的增量δ_l(x) = h_{l+1}(x) - h_l(x)是否也指向同一方向？即"通用更新方向假设"。
+
+同时，从"测几个名词"扩展到7个语言维度（实体/动作/抽象/逻辑/时态/指代/否定），覆盖53个token，检验编码机制是否跨语言功能通用。
+
+### 实验设计
+
+**53个token，11个语义维度**：
+- entities_animal: dog, cat, lion, eagle, fish
+- entities_tool: hammer, knife, wheel, rope, nail
+- entities_place: city, river, mountain, forest, ocean
+- actions_physical: run, jump, eat, build, cut
+- actions_mental: think, believe, know, dream, fear
+- abstractions: truth, justice, freedom, beauty, time
+- logic: and, or, not, if, so
+- tense: go, went, going, gone
+- reference: this, that, he, she
+- negation_pos: good, happy, alive, open, light
+- negation_neg: bad, sad, dead, closed, dark
+
+**五组实验**：
+- A. 通用方向测试：对每层构建D_l = [δ_l(x_1), ..., δ_l(x_N)]，SVD分解，测试var_top1
+- B. 标量剖面图谱：将δ_l(x)投影到u_l，构建标量矩阵C[l, x]，聚类测试
+- C. 轨迹拓扑：曲率、距离发散、相变搜索
+- D. DMD模式分析：对每个token拟合动态模态分解，提取特征值/模态
+- E. 语言维度签名：否定对、时态组、逻辑词 vs 内容词
+
+**效率**：53个forward pass（每token一个），远少于Phase 276的4320次
+
+### 核心结果
+
+#### 结果A：通用方向假设被拒绝！——最重要的发现
+
+| 模型 | var_top1 均值 | var_top1 最小层 | var_top1 最大层 |
+|------|-------------|----------------|----------------|
+| Qwen3 | 0.517 | L9: 0.210 | L0: 0.928 |
+| GLM4 | 0.447 | L8: 0.212 | L39: 0.954 |
+| DS7B | 0.497 | L8: 0.193 | L27: 0.929 |
+
+**关键发现**：
+- ❗ **中间层增量矩阵远非rank-1**：var_top1仅0.19-0.23，概念间方向差异巨大
+- ❗ **U型曲线**：首层和末层var_top1=0.81-0.95（接近rank-1），中间层0.19-0.23
+- ✅ **跨模型完全一致**：三个模型都显示相同的U型曲线
+- ❗ 这与Phase 276的"Jacobian rank-1"看似矛盾，实则互补（见下方分析）
+
+**逐层var_top1详细（Qwen3）**：
+
+| 层 | var_top1 | var_top3 | mean_cos | 含义 |
+|----|----------|----------|----------|------|
+| L0 | **0.928** | 0.954 | 0.926 | 首层接近rank-1 |
+| L9 | **0.210** | 0.324 | 0.197 | 中间层远非rank-1 |
+| L18 | 0.576 | 0.809 | 0.438 | 开始恢复 |
+| L27 | 0.531 | 0.616 | 0.532 | 继续恢复 |
+| L35 | **0.919** | 0.936 | 0.914 | 末层接近rank-1 |
+
+#### 结果B：标量剖面聚类效果弱
+
+| 模型 | within_corr | between_corr | delta | broad_ARI | fine_ARI |
+|------|------------|-------------|-------|-----------|----------|
+| Qwen3 | 0.979 | 0.973 | +0.006 | 0.311 | 0.217 |
+| GLM4 | 0.991 | 0.988 | +0.003 | 0.492 | 0.215 |
+| DS7B | 0.988 | 0.984 | +0.004 | 0.244 | 0.163 |
+
+**关键发现**：
+- 标量剖面在所有维度间几乎完全相同（within≈between≈0.98+）
+- delta极小（0.003-0.006），聚类ARI低（0.16-0.49）
+- 标量剖面无法有效区分语言维度——区分信息不在标量大小，而在方向
+
+#### 结果C：轨迹发散，不收敛
+
+| 模型 | within late/early | between late/early | max curvature |
+|------|------------------|--------------------|--------------|
+| Qwen3 | 56.3x | 70.2x | L34: 142.6° |
+| GLM4 | 296.6x | 355.6x | L38: 126.6° |
+| DS7B | 12.7x | 13.1x | L26: 144.0° |
+
+**关键发现**：
+- ✅ **轨迹强烈发散**：晚期/早期距离比12-356倍
+- ✅ **between > within**：不同维度的token发散更快（跨模型一致）
+- ✅ **最大曲率在输出前2-4层**：L26-L38出现急剧转向
+- ❗ 这与Phase 275的"吸引子收敛"不矛盾：扰动衰减（局部稳定），但不同token轨迹整体发散
+
+#### 结果D：DMD模式
+
+| 模型 | mode_within | mode_between | delta |
+|------|-----------|-------------|-------|
+| Qwen3 | 0.895 | 0.854 | +0.041 |
+| GLM4 | 0.836 | 0.788 | +0.048 |
+| DS7B | 0.912 | 0.882 | +0.031 |
+
+**关键发现**：
+- DMD模式相似度within > between（delta +0.03~0.05），方向一致但幅度小
+- 所有特征值<1.0（Qwen3/DS7B）：轨迹是衰减系统
+- GLM4有少量增长模式（n_growing=1-6）
+
+**特殊token模式（Qwen3）**：
+
+| Token | top1_mag | top1_energy | 特征 |
+|-------|----------|-------------|------|
+| and | 0.591 | **0.780** | 最高top1_energy，最"单模式" |
+| dog | 0.737 | 0.208 | 低top1_energy，多模式 |
+| not | 0.943 | 0.203 | 高top1_mag，低top1_energy |
+
+#### 结果E：否定不是动力学反转！
+
+| 模型 | neg_pearson_r | neg_opposite_frac |
+|------|-------------|------------------|
+| Qwen3 | 0.996 | 0.017 |
+| GLM4 | 0.999 | 0.000 |
+| DS7B | 0.999 | 0.000 |
+
+**关键发现**：
+- ❗ **否定对（good/bad, happy/sad）的标量剖面几乎完全相同**（pearson_r ≈ 0.999）
+- ❗ **opposite_fraction ≈ 0**：good和bad的更新方向几乎从不相反
+- ❗ 这直接否定了分析二中的"否定=动力学反转"假设
+- 否定对在动力学上几乎无法区分——语义对立不等于动力学对立
+
+**时态组**：go/went/going/gone标量剖面pearson_r ≈ 0.999，几乎相同
+
+**逻辑 vs 内容**：within_corr几乎相同（0.999 vs 0.999），逻辑词无特殊动力学签名
+
+**维度标量均值（Qwen3）**：
+- reference最低（-2.84）——指代词标量绝对值最小
+- logic次低（-3.22）
+- 其他维度接近（-4.1 ~ -4.7）
+- negation_pos vs negation_neg差异微小（-4.62 vs -4.42）
+
+### 与Phase 276的统一
+
+**Phase 276 vs 277看似矛盾但实际互补**：
+
+| 维度 | Phase 276 | Phase 277 | 统一解释 |
+|------|-----------|-----------|---------|
+| Jacobian rank | ≈1 | — | 局部线性响应是rank-1 |
+| 增量矩阵rank | — | 0.19-0.23 (中间层) | 完整非线性增量非rank-1 |
+| 首末层 | — | 0.81-0.95 | 首末层接近rank-1 |
+| 谱结构 | 通用 | — | 线性增益结构跨token通用 |
+| 子空间方向 | 概念特异 | — | 每个token有自己的rank-1方向 |
+
+**统一解释**：
+- Jacobian = 局部线性化（∂h_{l+1}/∂h_l），每个token的Jacobian rank-1
+- 增量 = 完整非线性计算（h_{l+1} - h_l），不同token方向不同
+- 因为每个token有自己的rank-1方向，所以增量矩阵[δ_l(x_1),...,δ_l(x_N)]是高秩的
+- 首末层接近rank-1是因为：首层主要由embedding决定，末层主要由输出投影决定
+
+### 目前最精确的客观事实拼图（更新）
+
+1. 方差分布：86-96%方差在V_inv方向（Phase 268）
+2. Transport R²是假象（Phase 271）
+3. 拓扑跨层保持（Phase 271）
+4. 类内>类间delta_cosine差0.08-0.25（Phase 272）
+5. Attention pattern不由概念决定（Phase 272）
+6. CRTM路由重叠Within > Between差0.09-0.17（Phase 274）
+7. 条件Jacobian相似性Within > Between差+0.11-0.20（Phase 275）
+8. Jacobian差异随深度增长（Phase 275）
+9. 吸引子动力学确认：深层收敛度0.92-0.98（Phase 275）
+10. Jacobian谱结构几乎通用：delta≈0（Phase 276）
+11. Jacobian有效秩≈1（Phase 276）
+12. Jacobian子空间方向概念特异：subspace cosine delta +0.11~0.17（Phase 276）
+13. **增量矩阵中间层远非rank-1：var_top1仅0.19-0.23（Phase 277新发现）**
+14. **首末层增量接近rank-1：var_top1 0.81-0.95（Phase 277新发现）**
+15. **U型曲线：中间层概念方向分化最大，首末层最统一（Phase 277新发现）**
+16. **否定不是动力学反转：pearson_r≈0.999（Phase 277新发现）**
+17. **轨迹强烈发散：late/early距离比12-356x（Phase 277新发现）**
+18. **between发散>within发散：不同维度token发散更快（Phase 277新发现）**
+19. **最大曲率在输出前2-4层（Phase 277新发现）**
+20. **标量剖面跨维度几乎相同：delta仅0.003-0.006（Phase 277新发现）**
+
+### 关键硬伤
+
+1. **"通用方向"假设被拒绝但未解释为什么首末层接近rank-1**：首末层的通用性可能只是架构约束（embedding层和输出投影），而非动力学普遍性
+2. **标量剖面无法区分维度**：可能因为投影到单一方向u_l损失了太多信息，需要多方向分析
+3. **否定≠反转但未给出否定编码机制**：如果否定不是动力学反转，那否定如何编码？
+4. **DMD特征值全部<1（衰减），但距离发散**：看似矛盾——可能是LayerNorm的归一化效应
+5. **53个token可能仍然不够**：特别是逻辑/指代/时态维度只有4-5个token
+6. **"The {word} is"的语境可能不适合功能词**：如"The and is"不合语法，可能影响结果
+
+### 命令记录
+
+```bash
+python tests/glm5/phase277_dynamics_atlas.py qwen3
+python tests/glm5/phase277_dynamics_atlas.py glm4
+python tests/glm5/phase277_dynamics_atlas.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase277_dynamics_atlas/{model}_trajectory_stats.json`
+- `results/phase277_dynamics_atlas/{model}_exp_a_universal_dir.json`
+- `results/phase277_dynamics_atlas/{model}_exp_b_scalar_atlas.json`
+- `results/phase277_dynamics_atlas/{model}_exp_c_topology.json`
+- `results/phase277_dynamics_atlas/{model}_exp_d_dmd.json`
+- `results/phase277_dynamics_atlas/{model}_exp_e_dimensions.json`
+- `results/phase277_dynamics_atlas/{model}_scalar_matrix.npy`
+
+## Phase 278: 全局语言动力学映射 — 分块客观测量 [2026-05-25 13:10]
+
+### 实验动机
+
+Phase 277发现中间层增量矩阵远非rank-1（var_top1仅0.19-0.23），否定不是动力学反转，标量剖面跨维度几乎相同。但仍有4个关键问题未解决：
+1. 隐藏状态是否按语义类别聚类？在哪个层开始分叉？
+2. 不同语境对轨迹的影响有多大？是否层依赖？
+3. 中间层top-1之外的方向编码什么？有多少显著方向？
+4. 轨迹对扰动的鲁棒性如何？盆半径是否层依赖？
+
+### 实验设计
+
+扩展到82个token（11维度），4个独立Block：
+
+**Block A: 轨迹分叉树** — 每层对所有token做层次聚类，计算ARI vs 真实类别标签
+**Block B: 上下文依赖** — 同一token在4种语境（"The X is"/"A X was"/"My X can"/"X"）中提取轨迹，比较跨语境余弦距离
+**Block C: 多方向谱** — 每层增量矩阵SVD分解，统计top-K方差贡献和显著方向数（>1%方差）
+**Block D: 吸引盆半径** — 在5个采样层对10个代表token施加5种量级（0.01-1.0倍||h||）的随机方向扰动，测量最终层相对偏差
+
+### 核心结果
+
+#### Block A: ARI聚类极弱 — 隐藏状态不按语义类别聚类
+
+| 模型 | bifurcation_broad (ARI>0.3) | peak_broad_ARI | peak_fine_ARI | peak层 |
+|------|---------------------------|----------------|---------------|--------|
+| Qwen3 | **None** | 0.126 | 0.205 | L9/L15 |
+| GLM4 | **L13** | 0.342 | 0.222 | L13/L40 |
+| DS7B | None | 0.247 | **0.373** | L9/L10 |
+
+**关键发现**：
+- ❗ **ARI几乎从不超过0.3**：即使最宽松的broad分类（entity/action/abstract/function/negation），ARI也仅0.13-0.34
+- ❗ **fine ARI更低**（0.06-0.37）：隐藏状态几乎完全无法区分具体语义维度
+- ❗ **Peak ARI出现在中间层**（L9-L13）：这是唯一有微弱分类信号的层
+- ❗ **sim_delta（within-between余弦差）很小**：最大仅0.18，不足以驱动强聚类
+- ❗ 这与Phase 272的delta_cosine差0.08-0.25一致——差异存在但太弱无法聚类
+
+**Qwen3逐层ARI（代表）**：
+
+| 层 | ari_broad | ari_fine | sim_delta |
+|----|-----------|----------|-----------|
+| L0 | 0.035 | 0.024 | 0.000 |
+| L9 | **0.126** | 0.040 | **0.148** |
+| L18 | 0.009 | 0.137 | 0.085 |
+| L36 | 0.009 | 0.184 | 0.057 |
+
+#### Block B: 上下文依赖 — U型曲线+中间层峰值
+
+| 模型 | L0 | L1 | L9-10 | 中层 | 末层 | peak层 |
+|------|-----|------|-------|------|------|--------|
+| Qwen3 | 0.839 | 0.455 | **0.634** | 0.46 | 0.41 | L0 |
+| GLM4 | 0.867 | 0.445 | **0.573** | 0.47 | 0.58 | L0 |
+| DS7B | 0.850 | 0.444 | **0.535** | 0.43 | 0.58 | L0 |
+
+**关键发现**：
+- ✅ **三个模型完全一致的上下文敏感度曲线**：L0极高→L1骤降→L7-10回升→逐渐下降→末层略有回升
+- ✅ **中间层(L7-L10)是上下文影响最大的区域之一**：与Phase 277中间层分化最严重的发现一致
+- ✅ **维度间差异小**：所有维度敏感度0.40-0.52，negation_neg略高(0.48-0.52)
+
+**完整曲线特征（Qwen3）**：
+```
+L0: 0.839 → L1: 0.455 → L5: 0.355 → L8: 0.630 → L9: 0.634 → L15: 0.500 → L36: 0.412
+```
+下降→上升→缓慢下降的模式，中间层峰值在L8-L10。
+
+#### Block C: 多方向谱 — 中间层有19-28个显著方向
+
+| 模型 | mean var_top1 | mean var_top3 | mean var_top5 | mean n_sig |
+|------|-------------|--------------|--------------|-----------|
+| Qwen3 | 0.520 | 0.631 | 0.677 | **12.3** |
+| GLM4 | 0.444 | 0.544 | 0.593 | **15.7** |
+| DS7B | 0.493 | 0.567 | 0.608 | **14.5** |
+
+**逐层多方向结构（Qwen3）**：
+
+| 层 | var_top1 | var_top3 | var_top5 | n_significant |
+|----|----------|----------|----------|--------------|
+| L0 | **0.931** | 0.956 | 0.966 | **2** |
+| L8 | **0.237** | 0.369 | 0.428 | **24** |
+| L17 | 0.352 | 0.472 | 0.530 | **18** |
+| L26 | 0.519 | 0.605 | 0.657 | **12** |
+| L34 | **0.855** | 0.888 | 0.906 | **3** |
+
+**关键发现**：
+- ❗ **中间层有24-28个显著方向**：远非rank-1，甚至远非rank-5
+- ❗ **var_top5仅0.42-0.48**：top-5方向只解释42-48%方差，剩余52-58%分散在20+个方向
+- ❗ **GLM4最多方向（15.7平均，L10有26个）**：比Qwen3的12.3更多
+- ✅ **首末层接近rank-1（var_top1=0.81-0.94）**：与Phase 277 U型曲线完全一致
+- ❗ **L8-L10是最多方向层**：var_top1仅0.22-0.29，这是概念分化最严重的层
+
+#### Block D: 吸引盆半径 — 从首层到末层单调递减
+
+| 模型 | L0 | L7-8 | L14-20 | L28-32 | L34-38 |
+|------|-----|------|--------|--------|--------|
+| Qwen3 | **1.000** | 0.584 | 0.409 | 0.209 | 0.133 |
+| GLM4 | **0.942** | 0.438 | 0.350 | 0.141 | 0.130 |
+| DS7B | 0.007* | 0.007* | 0.033* | 0.000* | 0.000* |
+
+*DS7B因Sliding Window Attention的eager实现问题，盆数据不可靠
+
+**'dog'偏差剖面（Qwen3）**：
+
+| 扰动层 | dev(0.01) | dev(1.0) | 含义 |
+|--------|-----------|----------|------|
+| L0 | 0.014 | **0.015** | 首层100%扰动仅1.5%偏差 |
+| L7 | 0.012 | 0.155 | 中间层100%扰动→15.5%偏差 |
+| L18 | 0.011 | 0.288 | 中层100%扰动→28.8%偏差 |
+| L28 | 0.010 | 0.489 | 深层100%扰动→48.9%偏差 |
+| L34 | 0.009 | **0.723** | 末层100%扰动→72.3%偏差 |
+
+**关键发现**：
+- ❗ **盆半径从首层到末层单调递减**：Qwen3从1.0降到0.13，GLM4从0.94降到0.13
+- ❗ **小扰动（0.01）在所有层都只引起1%以下偏差**：系统对小扰动非常鲁棒
+- ❗ **大扰动（1.0）的偏差随层深度急剧增加**：从首层1.5%到末层72%
+- ❗ **首层几乎完美吸收扰动**：即使替换100%的hidden state，最终偏差也只有1.5%
+- ❗ **末层极其脆弱**：13%的扰动就导致>10%最终偏差
+
+### 与Phase 277的统一
+
+| 指标 | Phase 277 | Phase 278 | 统一解释 |
+|------|-----------|-----------|---------|
+| var_top1 U型曲线 | 0.21-0.93 | 0.22-0.94 | 一致：首末rank-1，中间多方向 |
+| 中间层分化 | var_top1最低 | n_sig最多(24-28) | 一致：中间层是多方向分化区 |
+| 轨迹发散 | 12-356x | 盆半径递减 | 一致：深层扰动传播放大 |
+| 标量剖面通用 | delta=0.003 | ARI<0.3 | 一致：分类信号太弱 |
+| 上下文效应 | 未测 | L7-10峰值 | 新发现：中间层最敏感 |
+
+### 目前最精确的客观事实拼图（更新至20条新增）
+
+1. ARI聚类极弱：broad max 0.13-0.34, fine max 0.20-0.37（Phase 278新发现）
+2. 隐藏状态不按语义类别聚类：即使5大类也无法区分（Phase 278新发现）
+3. Peak ARI出现在中间层L9-L13：唯一有微弱分类信号的层（Phase 278新发现）
+4. sim_delta最大0.18：类内-类间余弦差不足以驱动聚类（Phase 278新发现）
+5. 上下文敏感度曲线：L0高→L1降→L7-10升→缓降（Phase 278新发现，跨模型一致）
+6. 中间层(L7-L10)是上下文影响最大区域之一（Phase 278新发现）
+7. 维度间上下文敏感度差异小：0.40-0.52（Phase 278新发现）
+8. 中间层有19-28个显著方向（>1%方差）（Phase 278新发现）
+9. var_top5仅0.42-0.48：top-5方向只解释42-48%方差（Phase 278新发现）
+10. L8-L10是最多方向层：var_top1仅0.22-0.29（Phase 278新发现，与Phase 277一致）
+11. 盆半径从首层到末层单调递减：1.0→0.13（Phase 278新发现，Qwen3/GLM4一致）
+12. 小扰动（0.01）在所有层只引起<1.5%偏差（Phase 278新发现）
+13. 大扰动（1.0）在首层仅1.5%偏差，在末层72%偏差（Phase 278新发现）
+14. 首层几乎完美吸收扰动（Phase 278新发现）
+15. 末层极其脆弱：13%扰动导致>10%最终偏差（Phase 278新发现）
+16. DS7B的Sliding Window Attention在eager模式下盆数据不可靠（Phase 278技术发现）
+17. GLM4的broad ARI在L13达到0.342：是三个模型中聚类最强的（Phase 278新发现）
+18. DS7B的fine ARI在L10达到0.373：是三个模型中细粒度聚类最强的（Phase 278新发现）
+19. 上下文敏感度在末层略有回升：Qwen3=0.41, GLM4=0.58, DS7B=0.58（Phase 278新发现）
+20. 多方向结构在GLM4中最显著：平均15.7个显著方向，最多26个（Phase 278新发现）
+
+### 关键硬伤
+
+1. **ARI极弱但有delta_cosine差**：Phase 272测到delta=0.08-0.25，但ARI<0.35。说明差异存在但太小，被整体高方差淹没
+2. **上下文效应的L0峰值是trivial的**：不同语境本身就有不同token，L0高是因为embedding不同
+3. **Block D的扰动方向是随机的**：Phase 275测到V_inv方向是稳定的，但随机方向可能落在不稳定子空间
+4. **DS7B盆数据完全不可靠**：Sliding Window Attention未实现导致结果异常
+5. **82个token可能仍然不够**：特别是某些维度只有5个token
+6. **"The X is"模板对功能词不合适**：如"The and is"不合语法
+
+### 命令记录
+
+```bash
+python tests/glm5/phase278_global_dynamics.py qwen3
+python tests/glm5/phase278_global_dynamics.py glm4
+python tests/glm5/phase278_global_dynamics.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase278_global_dynamics/{model}_block_a_bifurcation.json`
+- `results/phase278_global_dynamics/{model}_block_b_context.json`
+- `results/phase278_global_dynamics/{model}_block_c_multidirection.json`
+- `results/phase278_global_dynamics/{model}_block_d_basin.json`
+
+## Phase 279: 组合计算拓扑 — 关系/组合/操作子/递归 [2026-05-25 13:50]
+
+### 实验动机
+
+Phase 278确认隐藏状态不按语义聚类(ARI<0.35)，盆半径从首层到末层递减。但所有实验仍在单token级别。语言真正的编码单位可能是**关系、操作子、组合规则**，而非token本身。本阶段从token动力学升级到组合计算拓扑。
+
+### 实验设计
+
+4个Block分别测试：
+- **Block A: 关系动力学** — 8个SVO三元组("dog chases cat"等) vs 6个实体对照，测量关系交换、关系类型、SVO-实体差异、子空间重叠
+- **Block B: 组合测试** — 14个修饰-名词/副词-动词对("red apple"等)，测量f(A+B) vs f(A)+f(B)的非线性
+- **Block C: 操作子动力学** — 24个操作子+操作数对(not/if/because/every/will/can/must + operand)，测量操作子如何改变计算
+- **Block D: 递归闭包** — 12个递归深度递增句子("the dog"→"the dog that chased the cat"→...)，测量轨迹曲率和发散
+
+### 核心结果
+
+#### Block A: 关系动力学 — 关系交换在浅层造成巨大分化(0.16-0.33)
+
+| 模型 | swap min cos | swap mid cos | swap last cos | SVO-entity mid cos |
+|------|-------------|-------------|--------------|-------------------|
+| Qwen3 | 0.271 | 0.843 | 0.933 | 0.575-0.612 |
+| GLM4 | 0.223 | 0.855 | 0.879 | 0.628-0.686 |
+| DS7B | 0.163-0.206 | 0.809-0.841 | 0.730-0.845 | 0.446-0.485 |
+
+**关键发现**：
+- ❗ **关系交换余弦在L0最低(0.16-0.33)**：主语和宾语交换导致浅层轨迹极度不同
+- ❗ **中层回升到0.75-0.88**：深层重新收敛，关系差异被压缩
+- ❗ **SVO vs 实体单独 余弦0.45-0.69**：添加关系完全改变轨迹，不是简单加法
+- ❗ **子空间重叠：首层0.73-0.87，中间层骤降到0.06-0.18**：SVO和实体的增量子空间在中间层完全分离
+- ❗ **SVO增量var_top1(0.44-0.55) < 实体增量var_top1(0.69-0.74)**：关系使中间层增量更加多方向
+
+**子空间重叠逐层变化**：
+```
+L0: 0.73-0.87 (高重叠: embedding空间共享)
+L2-L4: 0.22-0.65 (快速分化)
+中间层: 0.06-0.18 (完全分离!)
+```
+
+#### Block B: 组合测试 — 组合高度非线性，中间层最显著
+
+| 模型 | L0 rel_delta | L(N/4) | L(N/2) | L(3N/4) | L(N) | 非线性方向数 |
+|------|------------|--------|--------|---------|------|-----------|
+| Qwen3 | 0.78 | 0.90 | 0.79 | 0.62 | 0.55 | 11 |
+| GLM4 | 0.86 | 0.85 | 0.71 | 0.62 | 0.83 | 14 |
+| DS7B | 0.87 | 4.29 | 4.93 | 2.25 | 0.63 | 14 |
+
+*DS7B数值异常大，Sliding Window Attention问题
+
+**关键发现**：
+- ❗ **f(A+B) ≠ f(A)+f(B)**：所有模型组合都高度非线性，相对偏差0.55-0.90
+- ❗ **中间层非线性最显著**：Qwen3在L9最高(0.90)，GLM4在L10最高(0.85)
+- ❗ **深层非线性降低**：Qwen3从L9的0.90降到L36的0.55——深层压缩把非线性消除
+- ❗ **非线性残差有11-14个显著方向**：远非rank-1，组合效果分散在多个方向
+- ❗ **GLM4在L40回升到0.83**：末层非线性再次升高，与Phase 278末层脆弱性一致
+
+#### Block C: 操作子动力学 — 操作子强效改变轨迹，且操作子间子空间几乎正交
+
+| 操作子 | Qwen3 mid rel_diff | GLM4 mid rel_diff | DS7B mid rel_diff |
+|--------|-------------------|------------------|------------------|
+| because | 0.568 | 0.608 | 0.611 |
+| can | 0.585 | 0.707 | 1.134* |
+| every | 0.597 | 0.692 | 0.859 |
+| if | **0.732** | 0.646 | 0.816 |
+| must | **0.767** | **0.868** | 0.825 |
+| no | **0.811** | **0.783** | **0.902** |
+| not | **0.773** | **0.816** | 1.278* |
+| some | 0.677 | 0.652 | 0.786 |
+| will | **0.829** | **0.856** | 0.541 |
+
+*DS7B的can/not超过1.0，Sliding Window Attention问题
+
+**关键发现**：
+- ❗ **操作子效应极强**：中间层相对偏差0.54-0.87——操作子完全改变后续轨迹
+- ❗ **no/will/not/must是最强操作子**：中间层偏差0.77-0.87
+- ❗ **because是最弱操作子**：偏差仅0.57-0.61
+- ❗ **操作子间子空间几乎正交**：重叠仅0.007-0.103！
+  - because_vs_no: 0.007 (几乎完全正交)
+  - because_vs_must: 0.013-0.104
+  - 平均跨操作子重叠约0.05
+- ❗ **不同操作子激活完全不同的计算方向**：不是共享一条"操作子轴"
+
+**否定测试(not X vs antonym)**：
+- Qwen3: cos(not happy, sad) 在中间层约0.3-0.5，不是简单反转
+- "not happy" 不等同于 "sad"——操作子不是语义反转，而是计算路径切换
+
+#### Block D: 递归闭包 — 递归深度增加轨迹发散，但曲率变化微小
+
+**轨迹曲率(0=直线, 2=反转)**：
+
+| 递归类型 | d0 | d1 | d2 | d3 | 趋势 |
+|---------|-----|-----|-----|-----|------|
+| relative(Qwen3) | 0.948 | 0.960 | 0.979 | 0.960 | 微增 |
+| prepositional(Qwen3) | 0.908 | 0.967 | 0.986 | 0.969 | 微增 |
+| complement(GLM4) | 0.786 | 0.845 | 0.864 | 0.881 | 微增 |
+
+**递归深度 vs 基准发散(中间层余弦)**：
+
+| 递归类型 | d0→d1 | d0→d2 | d0→d3 | 趋势 |
+|---------|-------|-------|-------|------|
+| relative(Qwen3) | 0.628 | 0.519 | 0.513 | 递增后饱和 |
+| prepositional(Qwen3) | 0.591 | 0.504 | 0.484 | 递增 |
+| complement(GLM4) | 0.537 | 0.425 | 0.377 | 递增 |
+
+**关键发现**：
+- ❗ **递归深度增加→中间层发散增大**：cos从0.63降到0.48——每增加一层子句，轨迹更远离基准
+- ❗ **GLM4的complement递归发散最剧烈**：d3余弦仅0.09-0.38
+- ❗ **曲率几乎不随递归深度变化**：d0~0.89, d3~0.93——递归不改变轨迹"弯曲度"
+- ❗ **发散主要在中间层**：深层(Last)余弦仍在0.45-0.88
+- ❗ **递归饱和效应**：Qwen3 d2和d3发散几乎相同(0.519 vs 0.513)——网络对递归深度有容量上限
+
+### 与Phase 278的统一
+
+| 指标 | Phase 278 | Phase 279 | 统一解释 |
+|------|-----------|-----------|---------|
+| 中间层多方向 | 24-28个显著方向 | SVO var_top1<entity, 非线性11-14方向 | 关系/组合增加中间层维度 |
+| 深层压缩 | 盆半径递减 | 组合非线性深层降低 | 深层压缩消除分叉 |
+| ARI<0.3 | 不按语义聚类 | 操作子间重叠<0.05 | 不同操作激活完全不同子空间 |
+| 首层高余弦 | 上下文敏感L0=0.84 | 关系交换L0=0.16-0.33 | 首层受token embedding主导 |
+
+### 新增客观事实拼图(25条)
+
+1. 关系交换L0余弦仅0.16-0.33：主语宾语交换导致浅层极度分化(Phase 279新发现)
+2. 关系交换中层余弦0.75-0.88：深层重新收敛(Phase 279新发现)
+3. SVO vs 实体单独中层余弦0.45-0.69：添加关系完全改变轨迹(Phase 279新发现)
+4. SVO-实体子空间重叠中间层仅0.06-0.18：关系增量与实体增量完全分离(Phase 279新发现)
+5. SVO增量var_top1(0.44-0.55) < 实体增量var_top1(0.69-0.74)：关系使中间层更多方向(Phase 279新发现)
+6. f(A+B)高度非线性：相对偏差0.55-0.90，远非简单加法(Phase 279新发现)
+7. 中间层组合非线性最显著(L9-L10峰值)(Phase 279新发现)
+8. 深层非线性降低：Qwen3 L36=0.55 vs L9=0.90(Phase 279新发现)
+9. 非线性残差有11-14个显著方向：组合效果分散在多方向(Phase 279新发现)
+10. 操作子效应极强：中间层相对偏差0.54-0.87(Phase 279新发现)
+11. no/will/not/must最强(bias 0.77-0.87)，because最弱(0.57-0.61)(Phase 279新发现)
+12. 操作子间子空间几乎正交：重叠仅0.007-0.103(Phase 279新发现)
+13. because_vs_no子空间重叠仅0.007：几乎完全正交(Phase 279新发现)
+14. 不同操作子激活完全不同的计算方向：不是共享一条"操作子轴"(Phase 279新发现)
+15. not X ≠ antonym：cos(not happy, sad)中间层仅0.3-0.5(Phase 279新发现)
+16. 操作子不是语义反转，而是计算路径切换(Phase 279新发现)
+17. 递归深度增加→中间层发散增大：cos从0.63降到0.48(Phase 279新发现)
+18. 递归曲率几乎不随深度变化：d0~0.89, d3~0.93(Phase 279新发现)
+19. GLM4 complement递归发散最剧烈：d3余弦仅0.09-0.38(Phase 279新发现)
+20. 递归饱和效应：d2和d3发散几乎相同(0.519 vs 0.513)(Phase 279新发现)
+21. SVO-实体子空间重叠从L0(0.73-0.87)快速分化到L3-4(0.22-0.65)(Phase 279新发现)
+22. DS7B Sliding Window Attention导致组合非线性异常(rel_delta>4)(Phase 279技术发现)
+23. GLM4末层(L40)非线性回升到0.83：与Phase 278末层脆弱性一致(Phase 279新发现)
+24. 关系类型效应(同S/O不同R)：不同动词在同S/O上有不同轨迹偏转(Phase 279新发现)
+25. 递归发散主要在中间层，深层余弦仍0.45-0.88(Phase 279新发现)
+
+### 关键硬伤
+
+1. **SVO样本量小**：仅8个三元组，2个交换对——可能不足以代表全部关系类型
+2. **组合测试使用简单平均**：(f(A)+f(B))/2 不一定是正确的线性基线
+3. **操作子对照不完整**：没有测试操作子对完全不同类别操作数的效果
+4. **递归句子太少**：仅3组×4深度=12句，无法覆盖所有递归类型
+5. **DS7B Sliding Window Attention**：导致组合和操作子数据不可靠
+6. **最后一token位置**：可能不是捕获关系的最佳位置(关系可能在主语/动词位置编码)
+7. **否定测试的antonym提取方式**：从"the sad"而非"not happy"提取，基线不够精确
+
+### 命令记录
+
+```bash
+python tests/glm5/phase279_compositional_topology.py qwen3
+python tests/glm5/phase279_compositional_topology.py glm4
+python tests/glm5/phase279_compositional_topology.py deepseek7b
+```
+
+### 数据文件
+
+- `results/phase279_compositional_topology/{model}_block_a_relation.json`
+- `results/phase279_compositional_topology/{model}_block_b_composition.json`
+- `results/phase279_compositional_topology/{model}_block_c_operator.json`
+- `results/phase279_compositional_topology/{model}_block_d_recursion.json`
