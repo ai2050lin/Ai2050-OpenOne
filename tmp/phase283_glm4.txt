@@ -1,0 +1,163 @@
+[2026-05-26 01:16:14] ============================================================
+[2026-05-26 01:16:14] Phase 283: Deep Analysis — glm4
+[2026-05-26 01:16:14] ============================================================
+[2026-05-26 01:16:14] Dataset: 89 pairs across 14 categories
+[2026-05-26 01:16:14]   abstract: 5 pairs
+[2026-05-26 01:16:14]   animal: 9 pairs
+[2026-05-26 01:16:14]   conditional: 6 pairs
+[2026-05-26 01:16:14]   human: 8 pairs
+[2026-05-26 01:16:14]   human_object: 6 pairs
+[2026-05-26 01:16:14]   negation: 7 pairs
+[2026-05-26 01:16:14]   negation_d: 6 pairs
+[2026-05-26 01:16:14]   passive: 5 pairs
+[2026-05-26 01:16:14]   passive_d: 5 pairs
+[2026-05-26 01:16:14]   place: 6 pairs
+[2026-05-26 01:16:14]   quantifier: 6 pairs
+[2026-05-26 01:16:14]   quantifier_d: 6 pairs
+[2026-05-26 01:16:14]   recursive: 6 pairs
+[2026-05-26 01:16:14]   translation: 8 pairs
+[2026-05-26 01:16:27] Loading glm4 (bf16 + flash_attention_2)...
+[2026-05-26 01:16:27]   flash_attn not found, using eager
+[2026-05-26 01:16:38]   glm4 loaded: device=cuda:0, GPU=8.99GB, attn=eager
+[2026-05-26 01:16:38] Model: GlmForCausalLM, L=40, d=4096
+[2026-05-26 01:16:38] Global warmup forward...
+[2026-05-26 01:16:49] Warmup done, GPU=9.0GB
+[2026-05-26 01:16:49] 
+============================================================
+[2026-05-26 01:16:49] Block A: Safetensors Deep Layer Weight Patching (ALL layers)
+[2026-05-26 01:16:49]   Head config: Q=32, KV=2, d_model=4096
+[2026-05-26 01:16:49]   Attempting all 40 layers via safetensors...
+[2026-05-26 01:16:50]   Loaded 40/40 layers via safetensors, skipped: []
+[2026-05-26 01:16:50]   Testing 21 layers: [0, 2, 4, 6, 8]...[36, 38, 39]
+[2026-05-26 01:22:32]   Block A: 20/89 pairs done
+[2026-05-26 01:28:09]   Block A: 40/89 pairs done
+[2026-05-26 01:33:52]   Block A: 60/89 pairs done
+[2026-05-26 01:39:21]   Block A: 80/89 pairs done
+[2026-05-26 01:41:47] 
+  Block A Summary (glm4, 40 layers):
+[2026-05-26 01:41:47]   Layer   wt_eff  val_eff   dom%               winner
+[2026-05-26 01:41:47]   L   0    0.721    0.898   0.54        VALUE>>weight
+[2026-05-26 01:41:47]   L   2    0.943    0.583   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L   4    0.965    0.469   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L   6    0.954    0.431   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L   8    0.967    0.467   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  10    0.961    0.439   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  12    0.929    0.587   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  14    0.936    0.552   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  16    0.944    0.468   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  18    0.958    0.498   0.00        WEIGHT>>value
+[2026-05-26 01:41:47]   L  20    0.234    0.971   1.00        VALUE>>weight
+[2026-05-26 01:41:47]   L  22    0.266    0.962   0.99        VALUE>>weight
+[2026-05-26 01:41:47]   L  24    0.455    0.890   0.98        VALUE>>weight
+[2026-05-26 01:41:47]   L  26    0.378    0.943   0.99        VALUE>>weight
+[2026-05-26 01:41:47]   L  28    0.753    0.752   0.49        WEIGHT>>value
+[2026-05-26 01:41:47]   L  30    0.472    0.919   1.00        VALUE>>weight
+[2026-05-26 01:41:47]   L  32    0.802    0.923   0.70        VALUE>>weight
+[2026-05-26 01:41:47]   L  34    0.773    0.928   0.80        VALUE>>weight
+[2026-05-26 01:41:47]   L  36    0.868    0.731   0.22        WEIGHT>>value
+[2026-05-26 01:41:47]   L  38    0.954    0.698   0.20        WEIGHT>>value
+[2026-05-26 01:41:47]   L  39    0.012    0.992   0.99        VALUE>>weight
+[2026-05-26 01:41:47] Block A done in 1498.1s (25.0min)
+[2026-05-26 01:41:47] Block B: Skipped (Qwen3 only)
+[2026-05-26 01:41:47] Block B done in 0.0s (0.0min)
+[2026-05-26 01:41:47] 
+============================================================
+[2026-05-26 01:41:47] Block C: GLM4 L0 Partial RoPE Decomposition
+[2026-05-26 01:41:47]   rotary_dim=64 (config), head_dim=TBD (from weights)
+[2026-05-26 01:41:47]   Actual d_head=128, rotary_dim=64, non_rotary_dim=64
+[2026-05-26 01:41:47]   Testing 20 pairs (negation+human+passive+animal)
+[2026-05-26 01:41:47] 
+  --- C1_full_rope ---
+[2026-05-26 01:42:14]     10/20 pairs...
+[2026-05-26 01:42:40]     20/20 pairs...
+[2026-05-26 01:42:40] 
+  --- C2_rotated_only ---
+[2026-05-26 01:43:06]     10/20 pairs...
+[2026-05-26 01:43:33]     20/20 pairs...
+[2026-05-26 01:43:33] 
+  --- C3_nonrotated_only ---
+[2026-05-26 01:43:59]     10/20 pairs...
+[2026-05-26 01:44:25]     20/20 pairs...
+[2026-05-26 01:44:25] 
+  GLM4 L0 Partial RoPE Decomposition Summary:
+[2026-05-26 01:44:25]                Variant   wt_eff  val_eff   dom%       winner
+[2026-05-26 01:44:25]           C1_full_rope    0.425    1.031  0.900        VALUE
+[2026-05-26 01:44:25]        C2_rotated_only    0.371    0.978  0.900        VALUE
+[2026-05-26 01:44:25]     C3_nonrotated_only    0.456    1.022  0.850        VALUE
+[2026-05-26 01:44:25] 
+  C1 (full) dom_rate=0.900, C3 (nonrotated only) dom_rate=0.850
+[2026-05-26 01:44:25]   → Both dim groups contribute similarly to VALUE dominance
+[2026-05-26 01:44:25] Block C done in 158.5s (2.6min)
+[2026-05-26 01:44:25] 
+============================================================
+[2026-05-26 01:44:25] Block E: Final Component Contribution Matrix — glm4
+[2026-05-26 01:44:25] 
+  Layer-level matrix:
+[2026-05-26 01:44:25]   Layer   wt_eff  val_eff   dom%      primary
+[2026-05-26 01:44:25]   L   0    0.721    0.898  0.539        VALUE
+[2026-05-26 01:44:25]   L   2    0.943    0.583  0.000       WEIGHT
+[2026-05-26 01:44:25]   L   4    0.965    0.469  0.000       WEIGHT
+[2026-05-26 01:44:25]   L   6    0.954    0.431  0.000       WEIGHT
+[2026-05-26 01:44:25]   L   8    0.967    0.467  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  10    0.961    0.439  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  12    0.929    0.587  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  14    0.936    0.552  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  16    0.944    0.468  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  18    0.958    0.498  0.000       WEIGHT
+[2026-05-26 01:44:25]   L  20    0.234    0.971  1.000        VALUE
+[2026-05-26 01:44:25]   L  22    0.266    0.962  0.989        VALUE
+[2026-05-26 01:44:25]   L  24    0.455    0.890  0.978        VALUE
+[2026-05-26 01:44:25]   L  26    0.378    0.943  0.989        VALUE
+[2026-05-26 01:44:25]   L  28    0.753    0.752  0.494       WEIGHT
+[2026-05-26 01:44:25]   L  30    0.472    0.919  1.000        VALUE
+[2026-05-26 01:44:25]   L  32    0.802    0.923  0.697        VALUE
+[2026-05-26 01:44:25]   L  34    0.773    0.928  0.798        VALUE
+[2026-05-26 01:44:25]   L  36    0.868    0.731  0.225       WEIGHT
+[2026-05-26 01:44:25]   L  38    0.954    0.698  0.202       WEIGHT
+[2026-05-26 01:44:25]   L  39    0.012    0.992  0.989        VALUE
+[2026-05-26 01:44:25] 
+  L0 per-head: 4/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L2 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L4 per-head: 1/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L6 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L8 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L10 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L12 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L14 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L16 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L18 per-head: 0/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L20 per-head: 31/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L22 per-head: 24/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L24 per-head: 23/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L26 per-head: 24/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L28 per-head: 23/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L30 per-head: 27/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L32 per-head: 30/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L34 per-head: 16/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L36 per-head: 26/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L38 per-head: 14/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  L39 per-head: 16/32 heads VALUE-dominant
+[2026-05-26 01:44:25] 
+  Special: glm4_L0_rope
+[2026-05-26 01:44:25] 
+Phase 283 complete for glm4: A=1498s, B=0s, C=159s
