@@ -845,3 +845,62 @@
 - P0：提交后继续开展错误样本审计，优先检查 negation、quantifier、temporal 三类低分样本是否由模板或 tokenization 偏差造成。
 - P1：建立第二套模板复测，判断当前语言结构结论是否具有跨模板稳定性。
 
+## Phase 16: VSCode Askpass 登录推送与凭证保存 [2026-05-26 11:41]
+
+### 命令
+- `sed -n '1,220p' /git-error-1779766701643`
+- `git status --porcelain=v1 -b && git remote -v && git config --show-origin --get-regexp '^(credential\.|http\.|url\.|user\.)'`
+- `command -v git-credential-manager || true; command -v git-credential-manager-core || true; command -v gnome-keyring-daemon || true; command -v secret-tool || true; command -v ksshaskpass || true; command -v ssh-askpass || true; command -v code || true`
+- `env | rg '^(DISPLAY|WAYLAND_DISPLAY|XDG_CURRENT_DESKTOP|GIT_ASKPASS|VSCODE_GIT|SSH_ASKPASS|DBUS_SESSION_BUS_ADDRESS)='`
+- `find /snap/code /usr/share/code ~/.vscode/extensions -path '*askpass*' -o -path '*github*authentication*' 2>/dev/null | head -120`
+- `git fetch origin --prune`
+- `git log --oneline --left-right --graph HEAD...origin/main`
+- `find /run/user/$(id -u) -maxdepth 3 -type s 2>/dev/null | rg 'vscode|Code|git|askpass' | head -80`
+- `git merge-tree --write-tree HEAD origin/main`
+- `git pull --rebase origin main`
+- `git config credential.helper store`
+- `env GIT_ASKPASS=/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass.sh VSCODE_GIT_ASKPASS_NODE=/snap/code/241/usr/share/code/code VSCODE_GIT_ASKPASS_MAIN=/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass-main.js VSCODE_GIT_IPC_HANDLE=/run/user/1000/vscode-git-b9b2a93ecf.sock VSCODE_GIT_COMMAND=push git push origin main`
+- `if [ -f ~/.git-credentials ]; then echo exists; wc -l < ~/.git-credentials; sed -E 's#https://[^:@/]+(:[^@]*)?@github.com#https://***:***@github.com#' ~/.git-credentials | rg 'github.com' || true; else echo missing; fi`
+- `printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^protocol=.*/protocol=https/p; s/^host=.*/host=github.com/p; s/^username=.*/username=*** /p; s/^password=.*/password=*** /p'`
+
+### 生成脚本
+- 无。本次没有新增测试脚本或临时脚本。
+
+### 原理
+- 本地 `git push` 分两类问题：
+  - 分支拓扑问题：本地 `ahead 1, behind 1` 时，直接推送会被远端拒绝，需要先 rebase 或 merge；
+  - 认证问题：HTTPS 推送需要 GitHub token，Git 可以通过 `GIT_ASKPASS` 向 VSCode 请求认证。
+- VSCode 的 Git 扩展提供 askpass 脚本和 IPC socket：
+  - askpass 脚本：`/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass.sh`
+  - askpass 主程序：`/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass-main.js`
+  - IPC socket：`/run/user/1000/vscode-git-b9b2a93ecf.sock`
+- `credential.helper store` 会把认证结果保存到用户目录 `~/.git-credentials`。这能让后续命令行 push 直接复用凭证，但代价是凭证以 Git store 格式保存在本机用户目录中；本次检查只输出脱敏结果，没有打印 token。
+
+### 结果
+- `/git-error-1779766701643` 在当前文件系统中不存在，无法直接读取 VSCode 临时错误文件。
+- 系统中未发现 `git-credential-manager` 或 `git-credential-manager-core`。
+- 系统有 GNOME keyring，但未发现可直接使用的 `git-credential-libsecret` 二进制。
+- 推送前状态为 `main...origin/main [ahead 1, behind 1]`。
+- 远端多出的提交为：
+  - `f4ca4a28 Phase 285: Real Forward Activation Patching — eliminates manual attention gap, reveals 3 distinct component-causal architectures (Qwen3 distributed, GLM4 L0-MLP bottleneck, DS7B component-decisive)`
+- 本地多出的提交为：
+  - `d1e67f6e`，后续 amend 后为 `ebd2c242`。
+- `git merge-tree --write-tree HEAD origin/main` 退出码为 0，说明可自动合并。
+- `git pull --rebase origin main` 成功，本地变为 `main...origin/main [ahead 1]`。
+- 使用 VSCode askpass 执行 `git push origin main` 成功：
+  - `f4ca4a28..ebd2c242  main -> main`
+- 推送后状态为 `main...origin/main`。
+- 凭证保存确认：
+  - `~/.git-credentials` 存在；
+  - 文件中有 1 条 GitHub 凭证记录；
+  - `git credential fill` 能返回 `protocol=https`、`host=github.com`、脱敏后的 `username` 与 `password` 字段。
+
+### 理论研究进展
+- 本次不涉及模型实验，不新增语言数学结构结论。
+- 工程进展是完成远端同步链路：本地 GPT5 系统语言测试资产已经推送到 GitHub，后续可直接执行 `git push origin main` 复用已保存凭证。
+
+### 下一步大任务
+- P0：继续开展 GPT5 系统语言测试的错误样本审计，优先处理 negation、quantifier、temporal。
+- P0：建立第二套模板复测，判断低分是否稳定跨模板存在。
+- P1：如果未来要提高凭证安全性，应安装 Git Credential Manager 或 `git-credential-libsecret`，把明文 store 迁移到系统密钥环。
+
