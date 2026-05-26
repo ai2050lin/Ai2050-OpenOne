@@ -1,0 +1,107 @@
+[2026-05-26 14:09:53] ============================================================
+[2026-05-26 14:09:53] Phase 287: Route-Content Separation — deepseek7b
+[2026-05-26 14:09:53] ============================================================
+[2026-05-26 14:09:53] Target: 5 heads across 4 layers
+[2026-05-26 14:09:53]   L0_H10 (layer=0, head=10)
+[2026-05-26 14:09:53]   L0_H3 (layer=0, head=3)
+[2026-05-26 14:09:53]   L21_H9 (layer=21, head=9)
+[2026-05-26 14:09:53]   L18_H0 (layer=18, head=0)
+[2026-05-26 14:09:53]   L24_H15 (layer=24, head=15)
+[2026-05-26 14:09:53] 
+============================================================
+[2026-05-26 14:09:53] PART 1: Caching AW + V (EAGER attention)
+[2026-05-26 14:09:53] ============================================================
+[2026-05-26 14:09:55] Loading deepseek7b (bf16 + EAGER + output_attentions)...
+[2026-05-26 14:10:07]   Loaded: device=cuda:0, GPU=9.01GB, mode=EAGER+output_attn
+[2026-05-26 14:10:07] Model: Qwen2ForCausalLM, L=28, n_heads=28, n_kv_heads=4, head_dim=128, d_model=3584
+[2026-05-26 14:10:07] GQA ratio: 7x
+[2026-05-26 14:10:07] Dataset: 121 pairs
+[2026-05-26 14:10:07] Warmup (eager)...
+[2026-05-26 14:10:14]   [1/121] Caching: 1s, ~2711 pairs/h, ETA=3min, GPU=9.0GB
+[2026-05-26 14:10:40]   [20/121] Caching: 27s, ~2659 pairs/h, ETA=2min, GPU=9.0GB
+[2026-05-26 14:11:07]   [40/121] Caching: 54s, ~2679 pairs/h, ETA=2min, GPU=9.0GB
+[2026-05-26 14:11:34]   [60/121] Caching: 81s, ~2682 pairs/h, ETA=1min, GPU=9.0GB
+[2026-05-26 14:12:01]   [80/121] Caching: 108s, ~2679 pairs/h, ETA=1min, GPU=9.0GB
+[2026-05-26 14:12:28]   [100/121] Caching: 135s, ~2676 pairs/h, ETA=0min, GPU=9.0GB
+[2026-05-26 14:12:54]   [120/121] Caching: 161s, ~2679 pairs/h, ETA=0min, GPU=9.0GB
+[2026-05-26 14:12:56]   Caching done: 121/121 pairs, 163s (2.7min)
+[2026-05-26 14:12:59] Cached 121 pairs. Eager model released. GPU=0.0GB
+[2026-05-26 14:12:59] 
+============================================================
+[2026-05-26 14:12:59] PART 2: Route-Content Patching (flash_attn_2)
+[2026-05-26 14:12:59] ============================================================
+[2026-05-26 14:12:59] Loading deepseek7b (bf16 + flash_attn_2)...
+[2026-05-26 14:12:59]   flash_attn not found, using eager
+[2026-05-26 14:13:04]   Loaded: device=cuda:0, GPU=9.02GB, attn=eager
+[2026-05-26 14:13:04] Flash model loaded. GPU=9.0GB
+[2026-05-26 14:13:06] 
+Computing baseline logits for all pairs...
+[2026-05-26 14:13:06]   (This reduces noise by filtering out low-KL pairs)
+[2026-05-26 14:13:44]   [30/121] Baselining: 38s
+[2026-05-26 14:14:22]   [60/121] Baselining: 75s
+[2026-05-26 14:14:59]   [90/121] Baselining: 113s
+[2026-05-26 14:15:36]   [120/121] Baselining: 150s
+[2026-05-26 14:15:38]   Baselining done: 121 pairs, 151s
+[2026-05-26 14:15:38] Patching pairs: 52 (KL >= 1.878)
+[2026-05-26 14:15:38]   abstract: 2 pairs
+[2026-05-26 14:15:38]   animal: 2 pairs
+[2026-05-26 14:15:38]   comparative: 2 pairs
+[2026-05-26 14:15:38]   conditional: 7 pairs
+[2026-05-26 14:15:38]   human: 4 pairs
+[2026-05-26 14:15:38]   human_object: 4 pairs
+[2026-05-26 14:15:38]   logical: 3 pairs
+[2026-05-26 14:15:38]   negation: 2 pairs
+[2026-05-26 14:15:38]   passive: 3 pairs
+[2026-05-26 14:15:38]   place: 3 pairs
+[2026-05-26 14:15:38]   quantifier: 3 pairs
+[2026-05-26 14:15:38]   recursive: 4 pairs
+[2026-05-26 14:15:38]   temporal: 3 pairs
+[2026-05-26 14:15:38]   translation: 10 pairs
+[2026-05-26 14:15:38] 
+Total patching forwards: 5 heads × 52 pairs × 4 conditions = 1040
+[2026-05-26 14:15:38] Pre-computing hybrid head outputs...
+[2026-05-26 14:15:38] Pre-computed 260 hybrid outputs
+[2026-05-26 14:17:46]   L0_H10: 52/52 done, 128s, errors=0
+[2026-05-26 14:19:56]   L0_H3: 52/52 done, 258s, errors=0
+[2026-05-26 14:22:11]   L21_H9: 52/52 done, 394s, errors=0
+[2026-05-26 14:24:23]   L18_H0: 52/52 done, 525s, errors=0
+[2026-05-26 14:26:35]   L24_H15: 52/52 done, 657s, errors=0
+[2026-05-26 14:26:35] 
+Patching complete: 260 results, 0 errors, 657s (11.0min)
+[2026-05-26 14:26:35] 
+============================================================
+[2026-05-26 14:26:35] PART 3: Route-Content Analysis
+[2026-05-26 14:26:35] ============================================================
+[2026-05-26 14:26:35] 
+  Per-Head Route-Content Decomposition:
+[2026-05-26 14:26:35]           Head     N   Full A  Routing  Content   Full B           Interpretation
+[2026-05-26 14:26:35]         L0_H10    52    1.000    1.362    2.047    0.376       EITHER (separable)
+[2026-05-26 14:26:35]          L0_H3    52    1.000    1.181    1.363    0.423       EITHER (separable)
+[2026-05-26 14:26:35]         L18_H0    52    1.000    1.790    1.775    0.306       EITHER (separable)
+[2026-05-26 14:26:35]         L21_H9    52    1.000    1.975    1.918    0.213       EITHER (separable)
+[2026-05-26 14:26:35]        L24_H15    52    1.000    1.210    1.621    0.225       EITHER (separable)
+[2026-05-26 14:26:35] 
+  Per-Category Route-Content Breakdown:
+[2026-05-26 14:26:35]     abstract          : full_A=1.000, routing=2.312, content=1.927
+[2026-05-26 14:26:35]     animal            : full_A=1.000, routing=1.631, content=1.562
+[2026-05-26 14:26:35]     comparative       : full_A=1.000, routing=1.398, content=2.080
+[2026-05-26 14:26:35]     conditional       : full_A=1.000, routing=1.299, content=1.356
+[2026-05-26 14:26:35]     human             : full_A=1.000, routing=1.907, content=2.232
+[2026-05-26 14:26:35]     human_object      : full_A=1.000, routing=2.050, content=2.106
+[2026-05-26 14:26:35]     logical           : full_A=1.000, routing=1.284, content=1.519
+[2026-05-26 14:26:35]     negation          : full_A=1.000, routing=0.620, content=2.886
+[2026-05-26 14:26:35]     passive           : full_A=1.000, routing=1.296, content=1.389
+[2026-05-26 14:26:35]     place             : full_A=1.000, routing=2.577, content=2.313
+[2026-05-26 14:26:35]     quantifier        : full_A=1.000, routing=1.419, content=2.228
+[2026-05-26 14:26:35]     recursive         : full_A=1.000, routing=1.503, content=2.018
+[2026-05-26 14:26:35]     temporal          : full_A=1.000, routing=1.607, content=1.287
+[2026-05-26 14:26:35]     translation       : full_A=1.000, routing=1.079, content=1.270
+[2026-05-26 14:26:35] 
+  Cross-Head Routing-vs-Content Balance:
+[2026-05-26 14:26:35]     L0_H10: routing/content ratio = 0.67
+[2026-05-26 14:26:35]     L0_H3: routing/content ratio = 0.87
+[2026-05-26 14:26:35]     L18_H0: routing/content ratio = 1.01
+[2026-05-26 14:26:35]     L21_H9: routing/content ratio = 1.03
+[2026-05-26 14:26:35]     L24_H15: routing/content ratio = 0.75
+[2026-05-26 14:26:35] 
+Results saved to results\phase287_route_content\deepseek7b_route_content.json

@@ -1,0 +1,173 @@
+{
+  "model": "deepseek7b",
+  "head_config": {
+    "n_heads": 28,
+    "n_kv_heads": 4,
+    "head_dim": 128,
+    "concat_dim": 3584
+  },
+  "n_pairs_cached": 121,
+  "n_pairs_patched": 52,
+  "n_heads_tested": 5,
+  "n_patches_total": 260,
+  "per_head_analysis": {
+    "L0_H10": {
+      "n": 52,
+      "mean_full_A_ratio": 1.0,
+      "mean_routing_ratio": 1.3624509245812724,
+      "mean_content_ratio": 2.0473269996381025,
+      "mean_full_B_ratio": 0.37551674926651113,
+      "interpretation": "EITHER (separable)"
+    },
+    "L0_H3": {
+      "n": 52,
+      "mean_full_A_ratio": 1.0,
+      "mean_routing_ratio": 1.1810009686059173,
+      "mean_content_ratio": 1.3631732453844272,
+      "mean_full_B_ratio": 0.42275693363435385,
+      "interpretation": "EITHER (separable)"
+    },
+    "L18_H0": {
+      "n": 52,
+      "mean_full_A_ratio": 1.0,
+      "mean_routing_ratio": 1.78957564153667,
+      "mean_content_ratio": 1.7748331018568826,
+      "mean_full_B_ratio": 0.3058829619486322,
+      "interpretation": "EITHER (separable)"
+    },
+    "L21_H9": {
+      "n": 52,
+      "mean_full_A_ratio": 1.0,
+      "mean_routing_ratio": 1.9754840567636274,
+      "mean_content_ratio": 1.918082544107361,
+      "mean_full_B_ratio": 0.2134571874610063,
+      "interpretation": "EITHER (separable)"
+    },
+    "L24_H15": {
+      "n": 52,
+      "mean_full_A_ratio": 1.0,
+      "mean_routing_ratio": 1.2101917489924547,
+      "mean_content_ratio": 1.620847802666785,
+      "mean_full_B_ratio": 0.22456349849001536,
+      "interpretation": "EITHER (separable)"
+    }
+  },
+  "per_category_analysis": {
+    "abstract": {
+      "full_A": 1.0,
+      "routing": 2.3119640058420226,
+      "content": 1.927121296190781,
+      "n_points": 10
+    },
+    "animal": {
+      "full_A": 1.0,
+      "routing": 1.6312085041009223,
+      "content": 1.5624516731074938,
+      "n_points": 10
+    },
+    "comparative": {
+      "full_A": 1.0,
+      "routing": 1.3979810163264874,
+      "content": 2.080112688006501,
+      "n_points": 10
+    },
+    "conditional": {
+      "full_A": 1.0,
+      "routing": 1.2986607144550386,
+      "content": 1.3555213313769687,
+      "n_points": 35
+    },
+    "human": {
+      "full_A": 1.0,
+      "routing": 1.9071440282038377,
+      "content": 2.231916713421373,
+      "n_points": 20
+    },
+    "human_object": {
+      "full_A": 1.0,
+      "routing": 2.049799955271268,
+      "content": 2.105720407451917,
+      "n_points": 20
+    },
+    "logical": {
+      "full_A": 1.0,
+      "routing": 1.2839459465729917,
+      "content": 1.5192234173547705,
+      "n_points": 15
+    },
+    "negation": {
+      "full_A": 1.0,
+      "routing": 0.6200134802500942,
+      "content": 2.8864909989957264,
+      "n_points": 10
+    },
+    "passive": {
+      "full_A": 1.0,
+      "routing": 1.296482249707207,
+      "content": 1.3885267159397074,
+      "n_points": 15
+    },
+    "place": {
+      "full_A": 1.0,
+      "routing": 2.5766005868886643,
+      "content": 2.3126431847513116,
+      "n_points": 15
+    },
+    "quantifier": {
+      "full_A": 1.0,
+      "routing": 1.4194774187779133,
+      "content": 2.2279555387555026,
+      "n_points": 15
+    },
+    "recursive": {
+      "full_A": 1.0,
+      "routing": 1.5032287336569328,
+      "content": 2.018125188408988,
+      "n_points": 20
+    },
+    "temporal": {
+      "full_A": 1.0,
+      "routing": 1.6070945234923406,
+      "content": 1.2866525409332121,
+      "n_points": 15
+    },
+    "translation": {
+      "full_A": 1.0,
+      "routing": 1.0790062681921564,
+      "content": 1.2703286351424596,
+      "n_points": 50
+    }
+  },
+  "selected_heads": [
+    [
+      0,
+      10,
+      "L0_H10"
+    ],
+    [
+      0,
+      3,
+      "L0_H3"
+    ],
+    [
+      21,
+      9,
+      "L21_H9"
+    ],
+    [
+      18,
+      0,
+      "L18_H0"
+    ],
+    [
+      24,
+      15,
+      "L24_H15"
+    ]
+  ],
+  "summary": {
+    "routing_dominant_heads": [],
+    "content_dominant_heads": [],
+    "coupled_heads": []
+  }
+}
