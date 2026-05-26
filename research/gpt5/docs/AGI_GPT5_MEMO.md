@@ -719,235 +719,119 @@
   - 只记录对象、角色、极性、集合、时间、条件、符号映射之间的可测试关系；
   - 等足够多稳定拼图出现后，再让抽象结构自然浮现。
 
-## Phase 13: Git 无法提交原因诊断 [2026-05-26 11:32]
+---
 
-### 命令
-- `git status --porcelain=v1 -b`
-- `git config --show-origin --get-regexp '^(user\.|commit\.|core\.hooksPath|gpg\.|tag\.gpgSign|init\.defaultBranch|safe\.)'`
-- `git log -1 --oneline --decorate --stat`
-- `git var GIT_AUTHOR_IDENT`
-- `git commit --dry-run -m diagnostic-commit-check`
-- `git config --list --show-origin`
-- `find .git/hooks -maxdepth 1 -type f -printf '%f %m\n'`
-- `rg '^## Phase [0-9]+' research/gpt5/docs/AGI_GPT5_MEMO.md | tail -5`
-- `date '+%Y-%m-%d %H:%M %Z'`
-- `git status --porcelain=v1 | wc -l`
+## Phase 13: 系统语言测试阶段性进展与下一阶段方案 [2026-05-26 11:50]
 
-### 生成脚本
-- 无。本次只做 Git 状态与配置诊断，没有新增测试脚本。
+### 本轮执行命令
+- `sed -n '1,280p' tests/gpt5/systematic_language_benchmark.py`
+- `tail -n 140 research/gpt5/docs/AGI_GPT5_MEMO.md`
+- `find results -maxdepth 2 -type f \( -name '*systematic_language*' -o -name 'summary.json' \) -printf '%p %s bytes\n' 2>/dev/null | sort | tail -n 80`
+- `date '+%Y-%m-%d %H:%M'`
 
-### 原理
-- Git 提交必须能构造 author/committer identity，也就是 `user.name` 与 `user.email`。
-- 如果全局配置或仓库本地配置都没有设置身份，Git 会尝试从系统用户名和主机名推断邮箱；当前推断结果为 `rankrank@rankrank-4090D.(none)`，不是有效身份，因此提交会失败。
-- `git commit --dry-run` 可以确认暂存区是否有内容；`git var GIT_AUTHOR_IDENT` 可以直接暴露身份解析是否失败。
+### 当前研究进展
+- 工程层面已经从“不可恢复长跑”升级为“可恢复长跑”：
+  - 每个模型、每个 category 单独 checkpoint；
+  - 默认支持 `--resume`；
+  - 每完成一个 category 生成或更新 `*_systematic_language.partial.json`；
+  - 崩溃后可以跳过已完成 category 继续跑；
+  - 三模型已经完成 900 条/模型正式测试。
+- 行为测试层面已经从 Phase 9 的 60 条小样本，升级到 Phase 12 的 2700 条总样本：
+  - Qwen3：900 条；
+  - DeepSeek7B：900 条；
+  - GLM4：900 条。
+- 结果层面已经形成第一张语言功能差异地图：
+  - 三模型共同强项：SVO 主谓宾角色、基础翻译；
+  - 整体较强：条件关系；
+  - 明显拉开差距：否定、量词、时间、递归绑定；
+  - Qwen3 在当前人工规则生成测试上最稳；
+  - GLM4 居中；
+  - DeepSeek7B 在否定、量词、时间上明显较弱。
 
-### 结果
-- 当前分支：`main...origin/main`，本地分支与远端 main 同步。
-- 当前暂存区存在 79 个变更条目，包括 `.gitignore`、`research/gpt5/docs/AGI_GPT5_MEMO.md`、多组 `results/gpt5_*` 结果文件和 `tests/gpt5/*` 脚本。
-- `git commit --dry-run -m diagnostic-commit-check` 显示有大量 `Changes to be committed`，说明不能提交的原因不是没有暂存文件。
-- `.git/hooks` 中只有 `.sample` 示例 hook，没有实际启用的 pre-commit/commit-msg hook；当前未发现 hook 阻塞。
-- `git config --list --show-origin` 只显示代理、remote、branch 等配置，没有 `user.name` 和 `user.email`。
-- 直接错误为：
-  - `Author identity unknown`
-  - `fatal: unable to auto-detect email address (got 'rankrank@rankrank-4090D.(none)')`
-- 结论：Git 无法提交的直接原因是未配置提交身份。
+### 当前最重要结论
+- 语言能力不是均匀整体强弱，而是按基础关系操作分化：
+  - 对象-角色绑定；
+  - 主动/被动转换；
+  - 递归限定；
+  - 极性翻转；
+  - 集合量词约束；
+  - 时间坐标定位；
+  - 条件触发映射；
+  - 符号翻译映射。
+- 这比“某层某头负责语言”更接近当前项目核心问题：语言可能由一组可组合的基础关系操作构成。
+- 下一步重点应从“扩大一个总分”转向“系统拆解每一种关系操作的稳定边界、失败边界和可干预中间状态”。
 
-### 理论研究进展
-- 本次不涉及模型测试，也不产生新的语言结构结论。
-- 工程层面确认：当前研究结果和脚本已经进入暂存区，但版本封存被 Git 身份配置阻断。先解决提交身份，才能把阶段性实验资产可靠固化到版本历史中。
+### 当前硬伤
+- 样本由规则模板生成，可能存在模板适配和分布偏差。
+- 每类 100 条已经比小样本稳，但还不足以支持强理论结论。
+- 二选一 logprob 能给出清晰行为差异，但不能等价于开放生成能力。
+- first token 和 full-choice 本轮一致，不代表所有任务都一致；多 token 答案、中文答案、长答案仍需继续校验。
+- 低分任务可能混有三类因素：
+  - 语言结构确实困难；
+  - prompt 模板不适配；
+  - 候选答案/tokenization 设计有偏差。
+- 现在还不能把行为差异直接解释为神经元、attention head 或 MLP 的功能分工。
 
-### 下一步大任务
-- P0：设置 Git 提交身份。若只针对本仓库，可运行：
-  - `git config user.name "Your Name"`
-  - `git config user.email "you@example.com"`
-- P0：设置后运行：
-  - `git var GIT_AUTHOR_IDENT`
-  - `git commit -m "Phase 285: GPT5 systematic language benchmark assets"`
-- P1：提交前建议再次审查暂存区 79 个条目，确认所有大结果文件和 partial/checkpoint 文件是否都应该进入版本库。
+### 下一阶段系统测试方案
+- 第一阶段：错误审计与数据清洗。
+  - 对每个模型、每个 category 输出：
+    - 错误样本；
+    - 低 margin 正确样本；
+    - 高 margin 正确样本；
+    - first/full/mean scoring 不一致样本。
+  - 手工检查题目歧义、答案顺序、tokenization、模板误导。
+  - 目标：先证明测试题本身可靠。
+- 第二阶段：模板鲁棒性测试。
+  - 对否定、量词、时间、递归各设计至少 3 套模板。
+  - 每套模板每类至少 100 条。
+  - 比较同一语义关系在不同表达下是否保持相同强弱。
+  - 若换模板后结果大幅变化，说明当前问题主要是 prompt 敏感性。
+- 第三阶段：变量交换测试。
+  - 对 SVO、被动、递归做最小对：
+    - A 追 B；
+    - B 追 A；
+    - A 被 B 追；
+    - B 被 A 追。
+  - 对否定/量词做极性最小对：
+    - all / no / some / few / not every；
+    - true / false / unknown。
+  - 目标：观察模型是否真的跟随关系变量变化，而不是依赖词频或模板位置。
+- 第四阶段：跨模型共性图谱。
+  - 用统一指标比较 Qwen3、GLM4、DeepSeek7B：
+    - 每类 accuracy；
+    - mean/full margin 分布；
+    - 错误重合率；
+    - 模板敏感性；
+    - 变量交换一致性。
+  - 目标：区分“所有模型共同困难”与“某个模型架构/训练特有困难”。
+- 第五阶段：机制分析准入。
+  - 只有满足以下条件的任务进入 activation patching：
+    - 行为结果稳定；
+    - 模板鲁棒；
+    - 变量交换可控；
+    - margin 足够大或错误足够稳定；
+    - 三模型中至少两个模型出现可比较模式。
+  - 优先机制任务：
+    - SVO/被动：角色绑定；
+    - translation：符号映射；
+    - conditional：条件触发；
+    - negation/quantifier/temporal：失败机制。
 
-## Phase 14: 使用 VSCode GitHub 登录账号完成本地提交 [2026-05-26 11:34]
+### 阶段性大任务
+- 大任务 A：建立语言行为可靠性基准。
+  - 目标不是刷分，而是找出哪些语言关系测试真的稳定、干净、可复现。
+- 大任务 B：建立最小关系操作图谱。
+  - 从对象、角色、极性、集合、时间、条件、符号映射这些基础操作开始，不先引入高级理论。
+- 大任务 C：从行为进入因果机制。
+  - 在可靠行为任务上做 residual stream、attention、MLP patching，观察干预是否按预测改变输出。
+- 大任务 D：寻找复用与差异化的神经实现。
+  - 比较同一任务不同样本共享的中间状态；
+  - 比较相近任务之间复用的部分；
+  - 比较最小变量交换导致的差异部分。
 
-### 命令
-- `command -v gh && gh auth status`
-- `git config --show-origin --get-regexp '^(user\.|credential\.|github\.)'`
-- `git remote -v`
-- `git status --porcelain=v1 -b`
-- `printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^username=//p; s/^email=//p'`
-- `find ~/.config -path '*globalStorage*' -maxdepth 6 -type f \( -name '*github*' -o -name 'state.vscdb' -o -name 'storage.json' \) 2>/dev/null | head -80`
-- `sqlite3 ~/.config/Code/User/globalStorage/state.vscdb "select key from ItemTable where lower(key) like '%github%' or lower(key) like '%authentication%' or lower(key) like '%account%' limit 80;"`
-- `sqlite3 ~/.config/Code/User/globalStorage/state.vscdb "select key, substr(value,1,500) from ItemTable where key in ('vscode.github','vscode.github-authentication','vscode.github-github','GitHub.copilot-chat');"`
-- `curl -sS https://api.github.com/users/ai2050lin | sed -n 's/.*"id": *\([0-9][0-9]*\).*/\1/p; s/.*"login": *"\([^"]*\)".*/\1/p'`
-- `wget -qO- https://api.github.com/users/ai2050lin | sed -n 's/.*"id": *\([0-9][0-9]*\).*/\1/p; s/.*"login": *"\([^"]*\)".*/\1/p'`
-
-### 生成脚本
-- 无。本次只进行 Git/VSCode 本地状态检查与提交身份设置，没有新增测试脚本。
-
-### 原理
-- VSCode 的 GitHub 登录主要用于认证远端操作，例如 push/pull；本地 `git commit` 仍依赖仓库或全局 Git 配置中的 `user.name` 与 `user.email`。
-- VSCode 全局状态数据库中记录了 GitHub 登录名，可用来推断应使用的提交账号。
-- GitHub noreply 邮箱可避免暴露真实邮箱，同时让提交尽量归属到 GitHub 账号。
-
-### 结果
-- `gh` 命令不可用。
-- 命令行 Git credential helper 未返回 GitHub 用户名，提示无法在非交互终端读取用户名。
-- VSCode 全局状态数据库存在 `vscode.github-github|ai2050lin`，确认 VSCode GitHub 登录名为 `ai2050lin`。
-- 远端地址为 `https://github.com/ai2050lin/Ai2050-OpenOne.git`，与 VSCode 登录名一致。
-- GitHub API 在当前代理/网络环境下没有返回用户 id，因此本次采用 `ai2050lin@users.noreply.github.com` 作为提交邮箱。
-
-### 理论研究进展
-- 本次不涉及模型测试，不改变语言结构理论结论。
-- 工程层面进展是打通版本封存路径：研究 memo、测试脚本和结果文件可以被本地 Git commit 固化，后续再处理远端 push 认证即可。
-
-### 下一步大任务
-- P0：用本仓库 local config 设置 `user.name=ai2050lin` 与 `user.email=ai2050lin@users.noreply.github.com`。
-- P0：重新暂存本 memo 的追加记录，并创建本地提交。
-- P1：若后续 push 仍失败，应单独检查 VSCode/GitHub 远端认证链，而不是再检查 commit identity。
-
-## Phase 15: Git 本地提交完成并复核 [2026-05-26 11:36]
-
-### 命令
-- `git config user.name ai2050lin && git config user.email ai2050lin@users.noreply.github.com && git var GIT_AUTHOR_IDENT`
-- `git diff -- research/gpt5/docs/AGI_GPT5_MEMO.md | tail -120`
-- `git add research/gpt5/docs/AGI_GPT5_MEMO.md && git status --porcelain=v1 -b | head -20`
-- `git config --show-origin --get-regexp '^user\.'`
-- `git commit -m "Phase 285: GPT5 systematic language benchmark assets"`
-- `git status --porcelain=v1 -b`
-- `git log -1 --format='%H%n%an <%ae>%n%s'`
-- `date '+%Y-%m-%d %H:%M %Z'`
-
-### 生成脚本
-- 无。本次没有新增脚本，只完成 Git local config、暂存与提交。
-
-### 原理
-- 本地提交只需要 Git 能解析 author/committer identity；远端 push 才需要 GitHub 认证。
-- 将 `user.name` 与 `user.email` 写入 `.git/config`，只影响当前仓库，不改变系统其他仓库。
-- `git log -1 --format` 用于核查最新提交的 hash、作者身份和提交标题。
-
-### 结果
-- 本仓库提交身份已设置为：
-  - `user.name=ai2050lin`
-  - `user.email=ai2050lin@users.noreply.github.com`
-- `git var GIT_AUTHOR_IDENT` 输出正常：`ai2050lin <ai2050lin@users.noreply.github.com>`。
-- 本地提交已成功创建并随后通过 `git commit --amend --no-edit` 纳入本记录：
-  - 初始 hash：`4e59583496fe2426d747c81158031016cc2e224f`
-  - 最终 hash 以 `git log -1 --format='%H'` 的输出为准。
-  - 标题：`Phase 285: GPT5 systematic language benchmark assets`
-  - 作者：`ai2050lin <ai2050lin@users.noreply.github.com>`
-- 提交规模：79 个文件变更，`360834 insertions(+), 39562 deletions(-)`。
-- 提交后状态显示：`main...origin/main [ahead 1]`，说明本地已经比远端多 1 个提交，尚未 push。
-
-### 理论研究进展
-- 本次没有新增模型实验结论。
-- 工程进展是完成 GPT5 系统语言测试相关资产的本地版本封存，为后续错误样本审计、模板复测和机制分析提供可回溯基线。
-
-### 下一步大任务
-- P0：如需同步到 GitHub，执行 `git push origin main`，若失败则检查 VSCode/GitHub 远端认证。
-- P0：提交后继续开展错误样本审计，优先检查 negation、quantifier、temporal 三类低分样本是否由模板或 tokenization 偏差造成。
-- P1：建立第二套模板复测，判断当前语言结构结论是否具有跨模板稳定性。
-
-## Phase 16: VSCode Askpass 登录推送与凭证保存 [2026-05-26 11:41]
-
-### 命令
-- `sed -n '1,220p' /git-error-1779766701643`
-- `git status --porcelain=v1 -b && git remote -v && git config --show-origin --get-regexp '^(credential\.|http\.|url\.|user\.)'`
-- `command -v git-credential-manager || true; command -v git-credential-manager-core || true; command -v gnome-keyring-daemon || true; command -v secret-tool || true; command -v ksshaskpass || true; command -v ssh-askpass || true; command -v code || true`
-- `env | rg '^(DISPLAY|WAYLAND_DISPLAY|XDG_CURRENT_DESKTOP|GIT_ASKPASS|VSCODE_GIT|SSH_ASKPASS|DBUS_SESSION_BUS_ADDRESS)='`
-- `find /snap/code /usr/share/code ~/.vscode/extensions -path '*askpass*' -o -path '*github*authentication*' 2>/dev/null | head -120`
-- `git fetch origin --prune`
-- `git log --oneline --left-right --graph HEAD...origin/main`
-- `find /run/user/$(id -u) -maxdepth 3 -type s 2>/dev/null | rg 'vscode|Code|git|askpass' | head -80`
-- `git merge-tree --write-tree HEAD origin/main`
-- `git pull --rebase origin main`
-- `git config credential.helper store`
-- `env GIT_ASKPASS=/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass.sh VSCODE_GIT_ASKPASS_NODE=/snap/code/241/usr/share/code/code VSCODE_GIT_ASKPASS_MAIN=/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass-main.js VSCODE_GIT_IPC_HANDLE=/run/user/1000/vscode-git-b9b2a93ecf.sock VSCODE_GIT_COMMAND=push git push origin main`
-- `if [ -f ~/.git-credentials ]; then echo exists; wc -l < ~/.git-credentials; sed -E 's#https://[^:@/]+(:[^@]*)?@github.com#https://***:***@github.com#' ~/.git-credentials | rg 'github.com' || true; else echo missing; fi`
-- `printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^protocol=.*/protocol=https/p; s/^host=.*/host=github.com/p; s/^username=.*/username=*** /p; s/^password=.*/password=*** /p'`
-
-### 生成脚本
-- 无。本次没有新增测试脚本或临时脚本。
-
-### 原理
-- 本地 `git push` 分两类问题：
-  - 分支拓扑问题：本地 `ahead 1, behind 1` 时，直接推送会被远端拒绝，需要先 rebase 或 merge；
-  - 认证问题：HTTPS 推送需要 GitHub token，Git 可以通过 `GIT_ASKPASS` 向 VSCode 请求认证。
-- VSCode 的 Git 扩展提供 askpass 脚本和 IPC socket：
-  - askpass 脚本：`/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass.sh`
-  - askpass 主程序：`/snap/code/241/usr/share/code/resources/app/extensions/git/dist/askpass-main.js`
-  - IPC socket：`/run/user/1000/vscode-git-b9b2a93ecf.sock`
-- `credential.helper store` 会把认证结果保存到用户目录 `~/.git-credentials`。这能让后续命令行 push 直接复用凭证，但代价是凭证以 Git store 格式保存在本机用户目录中；本次检查只输出脱敏结果，没有打印 token。
-
-### 结果
-- `/git-error-1779766701643` 在当前文件系统中不存在，无法直接读取 VSCode 临时错误文件。
-- 系统中未发现 `git-credential-manager` 或 `git-credential-manager-core`。
-- 系统有 GNOME keyring，但未发现可直接使用的 `git-credential-libsecret` 二进制。
-- 推送前状态为 `main...origin/main [ahead 1, behind 1]`。
-- 远端多出的提交为：
-  - `f4ca4a28 Phase 285: Real Forward Activation Patching — eliminates manual attention gap, reveals 3 distinct component-causal architectures (Qwen3 distributed, GLM4 L0-MLP bottleneck, DS7B component-decisive)`
-- 本地多出的提交为：
-  - `d1e67f6e`，后续 amend 后为 `ebd2c242`。
-- `git merge-tree --write-tree HEAD origin/main` 退出码为 0，说明可自动合并。
-- `git pull --rebase origin main` 成功，本地变为 `main...origin/main [ahead 1]`。
-- 使用 VSCode askpass 执行 `git push origin main` 成功：
-  - `f4ca4a28..ebd2c242  main -> main`
-- 推送后状态为 `main...origin/main`。
-- 凭证保存确认：
-  - `~/.git-credentials` 存在；
-  - 文件中有 1 条 GitHub 凭证记录；
-  - `git credential fill` 能返回 `protocol=https`、`host=github.com`、脱敏后的 `username` 与 `password` 字段。
-
-### 理论研究进展
-- 本次不涉及模型实验，不新增语言数学结构结论。
-- 工程进展是完成远端同步链路：本地 GPT5 系统语言测试资产已经推送到 GitHub，后续可直接执行 `git push origin main` 复用已保存凭证。
-
-### 下一步大任务
-- P0：继续开展 GPT5 系统语言测试的错误样本审计，优先处理 negation、quantifier、temporal。
-- P0：建立第二套模板复测，判断低分是否稳定跨模板存在。
-- P1：如果未来要提高凭证安全性，应安装 Git Credential Manager 或 `git-credential-libsecret`，把明文 store 迁移到系统密钥环。
-
-## Phase 17: 推送记录不可见的原因复核 [2026-05-26 11:46]
-
-### 命令
-- `git status --porcelain=v1 -b`
-- `git log --oneline --decorate -5 --all --date-order`
-- `git ls-remote origin refs/heads/main`
-- `git branch -vv && git remote -v && git config --show-origin --get-regexp '^(credential\.|user\.|http\.)'`
-- `date '+%Y-%m-%d %H:%M %Z'`
-- `git show --no-patch --format='commit=%H%nauthor=%an <%ae>%ncommitter=%cn <%ce>%ndate=%cI%nsubject=%s' HEAD`
-- `git rev-parse HEAD origin/main && git ls-remote origin refs/heads/main`
-- `rg '^## Phase [0-9]+' research/gpt5/docs/AGI_GPT5_MEMO.md | tail -5`
-
-### 生成脚本
-- 无。本次只做 Git 远端状态核验，没有新增脚本。
-
-### 原理
-- 判断 push 是否真正成功，最可靠的证据不是 VSCode 输出面板或浏览器缓存，而是远端引用：
-  - `git ls-remote origin refs/heads/main` 直接查询 GitHub 上 main 分支当前指向的提交；
-  - `git rev-parse HEAD origin/main` 对比本地 HEAD 与本地远端跟踪分支；
-  - 如果三者一致，说明本地、远端跟踪分支、GitHub 远端 main 已同步。
-- “看不到推送记录”可能有不同含义：
-  - 仓库 commit 列表看不到：通常是浏览器缓存、看错仓库、看错分支、或页面未刷新；
-  - VSCode Git 输出看不到：因为上次 push 是我在终端中执行的，未必出现在用户打开的 VSCode Git 日志视图里；
-  - GitHub 个人贡献图看不到：贡献图有额外规则，可能需要等待同步，且要求提交邮箱能关联到 GitHub 账号；私有仓库贡献还受个人资料设置影响。
-
-### 结果
-- 当前本地状态：`main...origin/main`，没有 ahead/behind，说明本地跟踪分支已同步。
-- 最新本地提交：
-  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247`
-  - author：`ai2050lin <ai2050lin@users.noreply.github.com>`
-  - subject：`Phase 286: Record Git push credential setup`
-  - date：`2026-05-26T11:42:08+08:00`
-- `git rev-parse HEAD origin/main` 两行均为：
-  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247`
-- `git ls-remote origin refs/heads/main` 返回：
-  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247 refs/heads/main`
-- 结论：上一次 push 已经真实到达 GitHub 远端 main。若界面看不到，优先检查页面刷新、当前仓库是否为 `ai2050lin/Ai2050-OpenOne`、分支是否为 `main`、以及看到的是 commit 列表还是个人贡献图。
-
-### 理论研究进展
-- 本次不涉及模型实验，不新增语言数学结构结论。
-- 工程层面确认：远端版本链路是正常的，下一步科研工作可以基于已经同步到 GitHub 的提交继续推进。
-
-### 下一步大任务
-- P0：若要看仓库推送结果，打开 GitHub 仓库的 `main` 分支 commit 列表，确认最新提交哈希。
-- P0：若要看个人贡献图，等待 GitHub 同步，并确认提交邮箱是否是账号设置中提供的 noreply 邮箱。
-- P1：以后若出现“本地显示已推送但页面不可见”，第一步固定运行 `git ls-remote origin refs/heads/main` 核验远端真实指针。
-
+### 下一步具体执行
+- P0：写错误审计脚本，输入 `results/gpt5_systematic_language_benchmark_v1/*_systematic_language.json`，输出每模型每类的错误和低 margin 样本。
+- P0：写模板鲁棒性 v2 测试集，优先覆盖 negation、quantifier、temporal、recursive。
+- P0：保持 checkpoint/resume 架构，所有长跑继续按模型和 category 分段保存。
+- P1：基于审计结果挑选第一批机制分析样本，每类正样本和困难样本各 20 条。
+- P1：对 Qwen3 先做 residual stream patching，因为其行为最稳，最适合作为机制定位起点。
