@@ -1,0 +1,107 @@
+[2026-05-26 13:28:09] ============================================================
+[2026-05-26 13:28:09] Phase 287: Route-Content Separation — qwen3
+[2026-05-26 13:28:09] ============================================================
+[2026-05-26 13:28:09] Target: 5 heads across 4 layers
+[2026-05-26 13:28:09]   L16_H27 (layer=16, head=27)
+[2026-05-26 13:28:09]   L12_H25 (layer=12, head=25)
+[2026-05-26 13:28:09]   L12_H0 (layer=12, head=0)
+[2026-05-26 13:28:09]   L35_H0 (layer=35, head=0)
+[2026-05-26 13:28:09]   L28_H14 (layer=28, head=14)
+[2026-05-26 13:28:09] 
+============================================================
+[2026-05-26 13:28:09] PART 1: Caching AW + V (EAGER attention)
+[2026-05-26 13:28:09] ============================================================
+[2026-05-26 13:28:10] Loading qwen3 (bf16 + EAGER + output_attentions)...
+[2026-05-26 13:28:23]   Loaded: device=cuda:0, GPU=8.04GB, mode=EAGER+output_attn
+[2026-05-26 13:28:23] Model: Qwen3ForCausalLM, L=36, n_heads=32, n_kv_heads=8, head_dim=128, d_model=2560
+[2026-05-26 13:28:23] GQA ratio: 4x
+[2026-05-26 13:28:23] Dataset: 121 pairs
+[2026-05-26 13:28:23] Warmup (eager)...
+[2026-05-26 13:28:24]   [1/121] Caching: 0s, ~3600 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:25]   [20/121] Caching: 2s, ~42126 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:27]   [40/121] Caching: 4s, ~40878 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:29]   [60/121] Caching: 5s, ~42643 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:30]   [80/121] Caching: 7s, ~43274 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:32]   [100/121] Caching: 9s, ~41183 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:35]   [120/121] Caching: 11s, ~39648 pairs/h, ETA=0min, GPU=8.1GB
+[2026-05-26 13:28:35]   Caching done: 121/121 pairs, 11s (0.2min)
+[2026-05-26 13:28:37] Cached 121 pairs. Eager model released. GPU=0.0GB
+[2026-05-26 13:28:37] 
+============================================================
+[2026-05-26 13:28:37] PART 2: Route-Content Patching (flash_attn_2)
+[2026-05-26 13:28:37] ============================================================
+[2026-05-26 13:28:37] Loading qwen3 (bf16 + flash_attn_2)...
+[2026-05-26 13:28:37]   flash_attn not found, using eager
+[2026-05-26 13:28:38]   Loaded: device=cuda:0, GPU=1.80GB, attn=eager
+[2026-05-26 13:28:38] Flash model loaded. GPU=1.8GB
+[2026-05-26 13:28:40] 
+Computing baseline logits for all pairs...
+[2026-05-26 13:28:40]   (This reduces noise by filtering out low-KL pairs)
+[2026-05-26 13:29:18]   [30/121] Baselining: 38s
+[2026-05-26 13:29:55]   [60/121] Baselining: 74s
+[2026-05-26 13:30:32]   [90/121] Baselining: 111s
+[2026-05-26 13:31:09]   [120/121] Baselining: 149s
+[2026-05-26 13:31:10]   Baselining done: 121 pairs, 150s
+[2026-05-26 13:31:10] Patching pairs: 53 (KL >= 0.816)
+[2026-05-26 13:31:10]   abstract: 2 pairs
+[2026-05-26 13:31:10]   animal: 2 pairs
+[2026-05-26 13:31:10]   comparative: 2 pairs
+[2026-05-26 13:31:10]   conditional: 5 pairs
+[2026-05-26 13:31:10]   human: 3 pairs
+[2026-05-26 13:31:10]   human_object: 4 pairs
+[2026-05-26 13:31:10]   logical: 4 pairs
+[2026-05-26 13:31:10]   negation: 5 pairs
+[2026-05-26 13:31:10]   passive: 4 pairs
+[2026-05-26 13:31:10]   place: 2 pairs
+[2026-05-26 13:31:10]   quantifier: 2 pairs
+[2026-05-26 13:31:10]   recursive: 5 pairs
+[2026-05-26 13:31:10]   temporal: 3 pairs
+[2026-05-26 13:31:10]   translation: 10 pairs
+[2026-05-26 13:31:10] 
+Total patching forwards: 5 heads × 53 pairs × 4 conditions = 1060
+[2026-05-26 13:31:10] Pre-computing hybrid head outputs...
+[2026-05-26 13:31:10] Pre-computed 265 hybrid outputs
+[2026-05-26 13:33:20]   L16_H27: 53/53 done, 130s, errors=0
+[2026-05-26 13:35:28]   L12_H25: 53/53 done, 258s, errors=0
+[2026-05-26 13:37:39]   L12_H0: 53/53 done, 389s, errors=0
+[2026-05-26 13:39:45]   L35_H0: 53/53 done, 515s, errors=0
+[2026-05-26 13:41:53]   L28_H14: 53/53 done, 643s, errors=0
+[2026-05-26 13:41:53] 
+Patching complete: 265 results, 0 errors, 643s (10.7min)
+[2026-05-26 13:41:53] 
+============================================================
+[2026-05-26 13:41:53] PART 3: Route-Content Analysis
+[2026-05-26 13:41:53] ============================================================
+[2026-05-26 13:41:53] 
+  Per-Head Route-Content Decomposition:
+[2026-05-26 13:41:53]           Head     N   Full A  Routing  Content   Full B           Interpretation
+[2026-05-26 13:41:53]         L12_H0    53    1.000    0.851    1.235    0.250       EITHER (separable)
+[2026-05-26 13:41:53]        L12_H25    53    1.000    0.639    1.260    0.239       EITHER (separable)
+[2026-05-26 13:41:53]        L16_H27    53    1.000    0.637    1.355    0.311       EITHER (separable)
+[2026-05-26 13:41:53]        L28_H14    53    1.000    1.121    0.983    0.246       EITHER (separable)
+[2026-05-26 13:41:53]         L35_H0    53    1.000    0.751    1.301    0.280       EITHER (separable)
+[2026-05-26 13:41:53] 
+  Per-Category Route-Content Breakdown:
+[2026-05-26 13:41:53]     abstract          : full_A=1.000, routing=0.504, content=1.106
+[2026-05-26 13:41:53]     animal            : full_A=1.000, routing=0.736, content=1.299
+[2026-05-26 13:41:53]     comparative       : full_A=1.000, routing=0.762, content=1.201
+[2026-05-26 13:41:53]     conditional       : full_A=1.000, routing=0.447, content=1.207
+[2026-05-26 13:41:53]     human             : full_A=1.000, routing=0.357, content=0.942
+[2026-05-26 13:41:53]     human_object      : full_A=1.000, routing=1.141, content=1.414
+[2026-05-26 13:41:53]     logical           : full_A=1.000, routing=0.249, content=1.066
+[2026-05-26 13:41:53]     negation          : full_A=1.000, routing=0.952, content=1.697
+[2026-05-26 13:41:53]     passive           : full_A=1.000, routing=0.921, content=1.515
+[2026-05-26 13:41:53]     place             : full_A=1.000, routing=0.719, content=1.015
+[2026-05-26 13:41:53]     quantifier        : full_A=1.000, routing=0.914, content=1.252
+[2026-05-26 13:41:53]     recursive         : full_A=1.000, routing=0.822, content=1.164
+[2026-05-26 13:41:53]     temporal          : full_A=1.000, routing=0.874, content=1.276
+[2026-05-26 13:41:53]     translation       : full_A=1.000, routing=1.107, content=1.029
+[2026-05-26 13:41:53] 
+  Cross-Head Routing-vs-Content Balance:
+[2026-05-26 13:41:53]     L12_H0: routing/content ratio = 0.69
+[2026-05-26 13:41:53]     L12_H25: routing/content ratio = 0.51
+[2026-05-26 13:41:53]     L16_H27: routing/content ratio = 0.47
+[2026-05-26 13:41:53]     L28_H14: routing/content ratio = 1.14
+[2026-05-26 13:41:53]     L35_H0: routing/content ratio = 0.58
+[2026-05-26 13:41:53] 
+Results saved to results\phase287_route_content\qwen3_route_content.json
