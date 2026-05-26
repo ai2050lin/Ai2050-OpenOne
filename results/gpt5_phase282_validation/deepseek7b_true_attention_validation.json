@@ -1,0 +1,1075 @@
+{
+  "model": "deepseek7b",
+  "class": "Qwen2ForCausalLM",
+  "n_layers": 28,
+  "tested_layers": [
+    0,
+    7,
+    14,
+    21,
+    27
+  ],
+  "n_pairs_total": 16,
+  "n_pairs_used": 14,
+  "skipped": [
+    {
+      "index": 13,
+      "A": "justice defeats corruption",
+      "B": "corruption defeats justice",
+      "reason": "token_length_mismatch"
+    },
+    {
+      "index": 15,
+      "A": "truth exposes the lie",
+      "B": "the lie exposes the truth",
+      "reason": "token_length_mismatch"
+    }
+  ],
+  "per_layer": {
+    "0": {
+      "n": 14,
+      "routing_effect_mean": 0.25459203124046326,
+      "content_effect_mean": 0.9766069650650024,
+      "routing_dominance_rate": 0.0,
+      "winner": "CONTENT"
+    },
+    "7": {
+      "n": 14,
+      "routing_effect_mean": 0.556797206401825,
+      "content_effect_mean": 0.94073486328125,
+      "routing_dominance_rate": 0.0,
+      "winner": "CONTENT"
+    },
+    "14": {
+      "n": 14,
+      "routing_effect_mean": 0.6989442110061646,
+      "content_effect_mean": 0.8027759194374084,
+      "routing_dominance_rate": 0.2142857164144516,
+      "winner": "CONTENT"
+    },
+    "21": {
+      "n": 14,
+      "routing_effect_mean": 0.5682016611099243,
+      "content_effect_mean": 0.893180251121521,
+      "routing_dominance_rate": 0.0,
+      "winner": "CONTENT"
+    },
+    "27": {
+      "n": 14,
+      "routing_effect_mean": 1.0065362453460693,
+      "content_effect_mean": 0.30792236328125,
+      "routing_dominance_rate": 0.9285714030265808,
+      "winner": "ROUTING"
+    }
+  },
+  "pairs": [
+    {
+      "category": "animal",
+      "A": "the dog chases the cat",
+      "B": "the cat chases the dog",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.2574816637511104,
+          "content_effect_correct": 0.9632734028715401,
+          "last_routing_effect": 0.31464464774959205,
+          "last_content_effect": 0.9688619609562379,
+          "routing_dominates": false,
+          "total_gap": 31.4134578704834,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.4300087484293683,
+          "content_effect_correct": 0.9957792499526739,
+          "last_routing_effect": 0.43789803397641486,
+          "last_content_effect": 0.9396929108420677,
+          "routing_dominates": false,
+          "total_gap": 52.47349548339844,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.6417006093425224,
+          "content_effect_correct": 0.7944790586593177,
+          "last_routing_effect": 0.48792656839134796,
+          "last_content_effect": 0.8828913484502534,
+          "routing_dominates": false,
+          "total_gap": 29.625539779663086,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.3922052230318063,
+          "content_effect_correct": 0.9966761607473175,
+          "last_routing_effect": 0.4044154441331532,
+          "last_content_effect": 0.9392479250658354,
+          "routing_dominates": false,
+          "total_gap": 63.50676345825195,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0166645286218472,
+          "content_effect_correct": 0.2285140366078758,
+          "last_routing_effect": 1.0064756948473494,
+          "last_content_effect": 0.0710509940568474,
+          "routing_dominates": true,
+          "total_gap": 814.0704956054688,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "category": "animal",
+      "A": "the wolf hunts the sheep",
+      "B": "the sheep hunts the wolf",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.22665206718295178,
+          "content_effect_correct": 0.969012769373636,
+          "last_routing_effect": 0.26290802851872985,
+          "last_content_effect": 0.9762166374008823,
+          "routing_dominates": false,
+          "total_gap": 39.56277084350586,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5151516736368518,
+          "content_effect_correct": 0.9423985836482437,
+          "last_routing_effect": 0.5858419218355335,
+          "last_content_effect": 0.9020860390030196,
+          "routing_dominates": false,
+          "total_gap": 48.139434814453125,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.6349978069067846,
+          "content_effect_correct": 0.7950368947065656,
+          "last_routing_effect": 0.763071044595522,
+          "last_content_effect": 0.8868238274814015,
+          "routing_dominates": false,
+          "total_gap": 32.55313491821289,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.49546593268611966,
+          "content_effect_correct": 0.8882387120246917,
+          "last_routing_effect": 0.49171338822205374,
+          "last_content_effect": 0.9107875792805723,
+          "routing_dominates": false,
+          "total_gap": 67.85836791992188,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0350040309984105,
+          "content_effect_correct": 0.13665707803698565,
+          "last_routing_effect": 1.0623682740724678,
+          "last_content_effect": 0.11430804078886689,
+          "routing_dominates": true,
+          "total_gap": 1491.1298828125,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "animal",
+      "A": "the lion chases the deer",
+      "B": "the deer chases the lion",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.23975173710720374,
+          "content_effect_correct": 0.9662874094206729,
+          "last_routing_effect": 0.30321221771558743,
+          "last_content_effect": 0.9449024757173585,
+          "routing_dominates": false,
+          "total_gap": 40.59041976928711,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.419241889630745,
+          "content_effect_correct": 0.9493491812828332,
+          "last_routing_effect": 0.37671504398831335,
+          "last_content_effect": 0.855712388791016,
+          "routing_dominates": false,
+          "total_gap": 66.50675964355469,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.6064669120601958,
+          "content_effect_correct": 0.8580018375809951,
+          "last_routing_effect": 0.6234790166568727,
+          "last_content_effect": 0.964765998879499,
+          "routing_dominates": false,
+          "total_gap": 31.8946533203125,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.598949711221498,
+          "content_effect_correct": 0.872179405486604,
+          "last_routing_effect": 0.49217918182753323,
+          "last_content_effect": 0.8974635178519571,
+          "routing_dominates": false,
+          "total_gap": 85.41700744628906,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0095540339181792,
+          "content_effect_correct": 0.1457219970887262,
+          "last_routing_effect": 0.9871261899845195,
+          "last_content_effect": 0.12392091283923173,
+          "routing_dominates": true,
+          "total_gap": 2057.095947265625,
+          "attn_shape": [
+            28,
+            6,
+            6
+          ]
+        }
+      }
+    },
+    {
+      "category": "animal",
+      "A": "the cat catches the mouse",
+      "B": "the mouse catches the cat",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.22606090360749415,
+          "content_effect_correct": 0.9911653752718017,
+          "last_routing_effect": 0.2633605205486798,
+          "last_content_effect": 0.9252002429134385,
+          "routing_dominates": false,
+          "total_gap": 34.08890914916992,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.6517110571328999,
+          "content_effect_correct": 0.8747490347590633,
+          "last_routing_effect": 0.5333289987243562,
+          "last_content_effect": 0.9719459243786233,
+          "routing_dominates": false,
+          "total_gap": 58.74649429321289,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.8159608913666888,
+          "content_effect_correct": 0.6418109063682702,
+          "last_routing_effect": 0.8060000149076216,
+          "last_content_effect": 0.751969844210695,
+          "routing_dominates": true,
+          "total_gap": 36.642662048339844,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.8019570725030118,
+          "content_effect_correct": 0.8326299089552918,
+          "last_routing_effect": 0.8069060935353444,
+          "last_content_effect": 0.9529747759093611,
+          "routing_dominates": false,
+          "total_gap": 82.3343734741211,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.7148707719318211,
+          "content_effect_correct": 0.8040548775286479,
+          "last_routing_effect": 1.024908014128375,
+          "last_content_effect": 1.843888971778597,
+          "routing_dominates": false,
+          "total_gap": 1194.9193115234375,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "human",
+      "A": "the man loves the woman",
+      "B": "the woman loves the man",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.350317513463442,
+          "content_effect_correct": 0.9870468338592806,
+          "last_routing_effect": 0.44325872500703145,
+          "last_content_effect": 0.8812051860154505,
+          "routing_dominates": false,
+          "total_gap": 28.68260383605957,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5219261371673962,
+          "content_effect_correct": 0.9257257773372345,
+          "last_routing_effect": 0.5650937717958185,
+          "last_content_effect": 0.937749814773251,
+          "routing_dominates": false,
+          "total_gap": 30.822460174560547,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.4926611407511426,
+          "content_effect_correct": 0.8323229602737089,
+          "last_routing_effect": 0.5116767255641628,
+          "last_content_effect": 0.8237352780099435,
+          "routing_dominates": false,
+          "total_gap": 29.403854370117188,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5998991744771636,
+          "content_effect_correct": 0.939096116697897,
+          "last_routing_effect": 0.5537173444460819,
+          "last_content_effect": 0.9765604184242117,
+          "routing_dominates": false,
+          "total_gap": 79.08196258544922,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.9823393052020898,
+          "content_effect_correct": 0.2495977993721872,
+          "last_routing_effect": 1.1096291198266348,
+          "last_content_effect": 0.203919573409298,
+          "routing_dominates": true,
+          "total_gap": 923.9861450195312,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "human",
+      "A": "the boy calls the girl",
+      "B": "the girl calls the boy",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.28368298502252753,
+          "content_effect_correct": 0.9604756899103124,
+          "last_routing_effect": 0.3596940638483759,
+          "last_content_effect": 0.8772612249553767,
+          "routing_dominates": false,
+          "total_gap": 27.71419906616211,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5543251335169982,
+          "content_effect_correct": 0.873395886208029,
+          "last_routing_effect": 0.6368772481540463,
+          "last_content_effect": 0.8537864807010886,
+          "routing_dominates": false,
+          "total_gap": 31.13475227355957,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7599391610190314,
+          "content_effect_correct": 0.694198622301164,
+          "last_routing_effect": 0.7488911311885965,
+          "last_content_effect": 0.7030117173553643,
+          "routing_dominates": true,
+          "total_gap": 23.847900390625,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.4435279100724298,
+          "content_effect_correct": 0.8390768794088138,
+          "last_routing_effect": 0.41453893058106295,
+          "last_content_effect": 0.738061495841151,
+          "routing_dominates": false,
+          "total_gap": 58.08541488647461,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.9624344767907511,
+          "content_effect_correct": 0.11664811432093086,
+          "last_routing_effect": 0.9347805156539039,
+          "last_content_effect": 0.07577922583143049,
+          "routing_dominates": true,
+          "total_gap": 1512.0877685546875,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "human",
+      "A": "the teacher teaches the student",
+      "B": "the student teaches the teacher",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.25055313256215395,
+          "content_effect_correct": 0.9611159115907386,
+          "last_routing_effect": 0.29911124722213706,
+          "last_content_effect": 0.9954600382328443,
+          "routing_dominates": false,
+          "total_gap": 28.128374099731445,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.539838607388658,
+          "content_effect_correct": 0.96104797460163,
+          "last_routing_effect": 0.49858339837706817,
+          "last_content_effect": 1.0155973813696426,
+          "routing_dominates": false,
+          "total_gap": 43.65735626220703,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7267843538029437,
+          "content_effect_correct": 0.8731758383529602,
+          "last_routing_effect": 0.7787786464646776,
+          "last_content_effect": 0.8907614813625224,
+          "routing_dominates": false,
+          "total_gap": 32.26521301269531,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.7096063516638126,
+          "content_effect_correct": 0.8024501512575812,
+          "last_routing_effect": 0.801818869111995,
+          "last_content_effect": 0.7733077912537428,
+          "routing_dominates": false,
+          "total_gap": 73.34696197509766,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0230387951015179,
+          "content_effect_correct": 0.11549084905898913,
+          "last_routing_effect": 1.0601231188766769,
+          "last_content_effect": 0.21201710501383383,
+          "routing_dominates": true,
+          "total_gap": 1448.35205078125,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "human",
+      "A": "the doctor helps the patient",
+      "B": "the patient helps the doctor",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.2675139430852803,
+          "content_effect_correct": 0.965026812283994,
+          "last_routing_effect": 0.28327200670121694,
+          "last_content_effect": 0.9982430427372654,
+          "routing_dominates": false,
+          "total_gap": 36.09070587158203,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5337615927608386,
+          "content_effect_correct": 0.9432961112776636,
+          "last_routing_effect": 0.6381467782222212,
+          "last_content_effect": 0.9872323774076873,
+          "routing_dominates": false,
+          "total_gap": 48.72164535522461,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.6456789168346122,
+          "content_effect_correct": 0.9368302362833303,
+          "last_routing_effect": 0.6644464386889528,
+          "last_content_effect": 0.9743422991877411,
+          "routing_dominates": false,
+          "total_gap": 39.29883575439453,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5698197136468434,
+          "content_effect_correct": 0.8788862378584177,
+          "last_routing_effect": 0.5618532879312897,
+          "last_content_effect": 0.9389620185793558,
+          "routing_dominates": false,
+          "total_gap": 91.11743927001953,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.9513490069827445,
+          "content_effect_correct": 0.11530515350886526,
+          "last_routing_effect": 0.6759277805403042,
+          "last_content_effect": 0.44929616706682873,
+          "routing_dominates": true,
+          "total_gap": 1434.024658203125,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "object",
+      "A": "the chef uses the knife",
+      "B": "the knife uses the chef",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.24624268320628012,
+          "content_effect_correct": 0.9846295604573295,
+          "last_routing_effect": 0.31158210537863024,
+          "last_content_effect": 0.902085956247961,
+          "routing_dominates": false,
+          "total_gap": 41.85102081298828,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.64550614933474,
+          "content_effect_correct": 0.9880214763695043,
+          "last_routing_effect": 0.6771234237861763,
+          "last_content_effect": 1.0046973967976565,
+          "routing_dominates": false,
+          "total_gap": 54.78746032714844,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.6958510492265619,
+          "content_effect_correct": 0.8074969203315168,
+          "last_routing_effect": 0.6900263067116611,
+          "last_content_effect": 0.9028550431196101,
+          "routing_dominates": false,
+          "total_gap": 32.09707260131836,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.709576954754628,
+          "content_effect_correct": 0.8858337011339944,
+          "last_routing_effect": 0.8461946243883381,
+          "last_content_effect": 0.8554758062920537,
+          "routing_dominates": false,
+          "total_gap": 78.3577651977539,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.8351874189682063,
+          "content_effect_correct": 0.7904236418656391,
+          "last_routing_effect": 0.21203897045414885,
+          "last_content_effect": 0.9770589009558824,
+          "routing_dominates": true,
+          "total_gap": 1779.681884765625,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "object",
+      "A": "the painter holds the brush",
+      "B": "the brush holds the painter",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.19553601642013646,
+          "content_effect_correct": 0.9909556207056456,
+          "last_routing_effect": 0.23655265153545263,
+          "last_content_effect": 1.0127576196591277,
+          "routing_dominates": false,
+          "total_gap": 39.568443298339844,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5875581724331057,
+          "content_effect_correct": 0.9832129502931315,
+          "last_routing_effect": 0.5616915427564946,
+          "last_content_effect": 0.9181564260697784,
+          "routing_dominates": false,
+          "total_gap": 55.38850402832031,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7183479278543277,
+          "content_effect_correct": 0.8866427873128079,
+          "last_routing_effect": 0.7230409737886507,
+          "last_content_effect": 0.8817787442712794,
+          "routing_dominates": false,
+          "total_gap": 35.7113037109375,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5530248084726354,
+          "content_effect_correct": 0.8332153103789401,
+          "last_routing_effect": 0.43872714058465234,
+          "last_content_effect": 0.8122834587557868,
+          "routing_dominates": false,
+          "total_gap": 96.12460327148438,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0331879034646354,
+          "content_effect_correct": 0.15782633302199836,
+          "last_routing_effect": 0.4568398581170033,
+          "last_content_effect": 0.9121212936339058,
+          "routing_dominates": true,
+          "total_gap": 1489.668212890625,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "object",
+      "A": "the writer uses the pen",
+      "B": "the pen uses the writer",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.2516999535405571,
+          "content_effect_correct": 0.9829768757005076,
+          "last_routing_effect": 0.26389799661098334,
+          "last_content_effect": 1.0561206869882762,
+          "routing_dominates": false,
+          "total_gap": 39.29694366455078,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.652548281698614,
+          "content_effect_correct": 1.0022062050493379,
+          "last_routing_effect": 0.5798684768683859,
+          "last_content_effect": 0.8810786298628636,
+          "routing_dominates": false,
+          "total_gap": 49.814693450927734,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7968998043629257,
+          "content_effect_correct": 0.8312867824120723,
+          "last_routing_effect": 0.8501781033613496,
+          "last_content_effect": 0.885876433712601,
+          "routing_dominates": false,
+          "total_gap": 37.97205352783203,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5268489698383585,
+          "content_effect_correct": 0.9649875196659915,
+          "last_routing_effect": 0.4555349480713652,
+          "last_content_effect": 0.9097046096935782,
+          "routing_dominates": false,
+          "total_gap": 108.20857238769531,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.5033386146384276,
+          "content_effect_correct": 0.4451662299415968,
+          "last_routing_effect": 1.308482268447393,
+          "last_content_effect": 0.337110386071881,
+          "routing_dominates": true,
+          "total_gap": 1330.8077392578125,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "place",
+      "A": "the king rules the city",
+      "B": "the city rules the king",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.21832263819908201,
+          "content_effect_correct": 0.9665404428139298,
+          "last_routing_effect": 0.23010490925055774,
+          "last_content_effect": 0.9721392361760375,
+          "routing_dominates": false,
+          "total_gap": 33.54002380371094,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.6061706905687132,
+          "content_effect_correct": 0.8662810569590862,
+          "last_routing_effect": 0.6736762631929212,
+          "last_content_effect": 0.7860688398397989,
+          "routing_dominates": false,
+          "total_gap": 53.024539947509766,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7419815808691778,
+          "content_effect_correct": 0.8531094173323317,
+          "last_routing_effect": 0.6906491463859089,
+          "last_content_effect": 0.8745269713490742,
+          "routing_dominates": false,
+          "total_gap": 32.08307647705078,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5416034050214035,
+          "content_effect_correct": 0.9927148668323768,
+          "last_routing_effect": 0.5255792697600337,
+          "last_content_effect": 0.8926355872597912,
+          "routing_dominates": false,
+          "total_gap": 87.16410827636719,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0416606941329194,
+          "content_effect_correct": 0.16539325096956936,
+          "last_routing_effect": 1.0700171299956418,
+          "last_content_effect": 0.21151018911709382,
+          "routing_dominates": true,
+          "total_gap": 1209.28466796875,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "place",
+      "A": "the explorer discovers the island",
+      "B": "the island discovers the explorer",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.2442344728586759,
+          "content_effect_correct": 0.9893396099460675,
+          "last_routing_effect": 0.2737496829635702,
+          "last_content_effect": 1.0557145165285806,
+          "routing_dominates": false,
+          "total_gap": 41.89679718017578,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.5209506739438124,
+          "content_effect_correct": 0.8917942270893604,
+          "last_routing_effect": 0.6600924328238887,
+          "last_content_effect": 0.9672796222072203,
+          "routing_dominates": false,
+          "total_gap": 56.66627883911133,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.7076727564670308,
+          "content_effect_correct": 0.8364405454009576,
+          "last_routing_effect": 0.8121204604699603,
+          "last_content_effect": 0.8894375234949374,
+          "routing_dominates": false,
+          "total_gap": 41.26188659667969,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.43113866286027624,
+          "content_effect_correct": 0.9339059612506821,
+          "last_routing_effect": 0.5268472338018104,
+          "last_content_effect": 0.8844986534593192,
+          "routing_dominates": false,
+          "total_gap": 77.99918365478516,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 1.0260970356781705,
+          "content_effect_correct": 0.229192435202051,
+          "last_routing_effect": 1.0302077349001841,
+          "last_content_effect": 0.20157107762706608,
+          "routing_dominates": true,
+          "total_gap": 1205.21875,
+          "attn_shape": [
+            28,
+            5,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "category": "abstract",
+      "A": "wisdom guides folly",
+      "B": "folly guides wisdom",
+      "layers": {
+        "0": {
+          "routing_effect_correct": 0.30623878024995993,
+          "content_effect_correct": 0.9946514484623473,
+          "last_routing_effect": 0.32729336392823366,
+          "last_content_effect": 0.9286450041227607,
+          "routing_dominates": false,
+          "total_gap": 66.52494049072266,
+          "attn_shape": [
+            28,
+            4,
+            4
+          ]
+        },
+        "7": {
+          "routing_effect_correct": 0.616462550607595,
+          "content_effect_correct": 0.9730303131053286,
+          "last_routing_effect": 0.631821506273514,
+          "last_content_effect": 1.023631072646014,
+          "routing_dominates": false,
+          "total_gap": 62.7606315612793,
+          "attn_shape": [
+            28,
+            4,
+            4
+          ]
+        },
+        "14": {
+          "routing_effect_correct": 0.8002764970549169,
+          "content_effect_correct": 0.598031001606409,
+          "last_routing_effect": 0.8051280048632993,
+          "last_content_effect": 0.8593659470217432,
+          "routing_dominates": true,
+          "total_gap": 41.1412239074707,
+          "attn_shape": [
+            28,
+            4,
+            4
+          ]
+        },
+        "21": {
+          "routing_effect_correct": 0.5811996735214298,
+          "content_effect_correct": 0.844631689169444,
+          "last_routing_effect": 0.49955478517764207,
+          "last_content_effect": 0.8165976017293612,
+          "routing_dominates": false,
+          "total_gap": 73.9106674194336,
+          "attn_shape": [
+            28,
+            4,
+            4
+          ]
+        },
+        "27": {
+          "routing_effect_correct": 0.9567817947791527,
+          "content_effect_correct": 0.6109222417928722,
+          "last_routing_effect": 0.8541322890331507,
+          "last_content_effect": 0.5996523013460205,
+          "routing_dominates": true,
+          "total_gap": 486.5185546875,
+          "attn_shape": [
+            28,
+            4,
+            4
+          ]
+        }
+      }
+    }
+  ]
+}

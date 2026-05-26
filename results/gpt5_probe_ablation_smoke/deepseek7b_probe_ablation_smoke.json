@@ -1,0 +1,85 @@
+{
+  "model": "deepseek7b",
+  "class": "Qwen2ForCausalLM",
+  "n_layers": 28,
+  "tested_layers": [
+    0,
+    7,
+    14,
+    21,
+    27
+  ],
+  "best_probe_layer": 21,
+  "probe_by_layer": {
+    "0": {
+      "fruit_mean": 5.6439056396484375,
+      "control_mean": 1.4823651313781738,
+      "fruit_control_margin": 4.161540508270264,
+      "eval_scores": [
+        5.282875061035156,
+        2.3341681957244873,
+        3.7229862213134766,
+        2.5252089500427246
+      ],
+      "direction_norm": 1.0
+    },
+    "7": {
+      "fruit_mean": 39.104793548583984,
+      "control_mean": 0.8394801020622253,
+      "fruit_control_margin": 38.26531219482422,
+      "eval_scores": [
+        32.94450378417969,
+        9.91716194152832,
+        36.345985412597656,
+        -1.0923668146133423
+      ],
+      "direction_norm": 1.0
+    },
+    "14": {
+      "fruit_mean": 73.4869384765625,
+      "control_mean": -4.7774434089660645,
+      "fruit_control_margin": 78.2643814086914,
+      "eval_scores": [
+        63.21889114379883,
+        4.350109577178955,
+        58.391441345214844,
+        -3.140646457672119
+      ],
+      "direction_norm": 1.0000001192092896
+    },
+    "21": {
+      "fruit_mean": 147.44625854492188,
+      "control_mean": 12.593595504760742,
+      "fruit_control_margin": 134.8526611328125,
+      "eval_scores": [
+        158.9539794921875,
+        30.968900680541992,
+        121.54080963134766,
+        16.613597869873047
+      ],
+      "direction_norm": 0.9999999403953552
+    },
+    "27": {
+      "fruit_mean": 116.39491271972656,
+      "control_mean": 5.683446884155273,
+      "fruit_control_margin": 110.71146392822266,
+      "eval_scores": [
+        123.23336791992188,
+        0.4869539737701416,
+        110.24966430664062,
+        3.6763877868652344
+      ],
+      "direction_norm": 1.0
+    }
+  },
+  "ablation": {
+    "prompt": "A mango is a kind of",
+    "clean_fruit_minus_tool_logit": 14.28125,
+    "ablated_fruit_minus_tool_logit": 9.375,
+    "delta_after_removing_fruit_direction": -4.90625
+  },
+  "gpu_gb": {
+    "allocated": 15.240802304,
+    "reserved": 15.258877952
+  }
+}

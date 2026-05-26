@@ -1,0 +1,3662 @@
+{
+  "model": "qwen3",
+  "class": "Qwen3ForCausalLM",
+  "category": "svo_agent",
+  "cases_per_category": 100,
+  "batch_size": 1,
+  "num_cases": 100,
+  "aggregate": {
+    "overall": {
+      "full": {
+        "n": 100,
+        "accuracy": 1.0,
+        "mean_margin": 3.9898483753204346,
+        "median_margin": 3.8127365112304688,
+        "min_margin": 1.75
+      },
+      "mean": {
+        "n": 100,
+        "accuracy": 1.0,
+        "mean_margin": 3.9898483753204346,
+        "median_margin": 3.8127365112304688,
+        "min_margin": 1.75
+      },
+      "first_token": {
+        "n": 100,
+        "accuracy": 1.0,
+        "mean_margin": 3.9898483753204346,
+        "median_margin": 3.8127365112304688,
+        "min_margin": 1.75
+      },
+      "first_full_disagreements": 0
+    },
+    "per_category": {
+      "svo_agent": {
+        "full": {
+          "n": 100,
+          "accuracy": 1.0,
+          "mean_margin": 3.9898483753204346,
+          "median_margin": 3.8127365112304688,
+          "min_margin": 1.75
+        },
+        "mean": {
+          "n": 100,
+          "accuracy": 1.0,
+          "mean_margin": 3.9898483753204346,
+          "median_margin": 3.8127365112304688,
+          "min_margin": 1.75
+        },
+        "first_token": {
+          "n": 100,
+          "accuracy": 1.0,
+          "mean_margin": 3.9898483753204346,
+          "median_margin": 3.8127365112304688,
+          "min_margin": 1.75
+        },
+        "first_full_disagreements": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "svo_agent_000",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the sheep\", the doer is the",
+      "choices": [
+        " dog",
+        " sheep"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "the dog chases the sheep",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -0.32224464416503906,
+          "mean_logprob": -0.32224464416503906,
+          "first_token_logprob": -0.32224464416503906,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -7.947244644165039,
+          "mean_logprob": -7.947244644165039,
+          "first_token_logprob": -7.947244644165039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.625,
+      "mean_margin": 7.625,
+      "first_token_margin": 7.625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_001",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat watches the doctor\", the doer is the",
+      "choices": [
+        " cat",
+        " doctor"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "the cat watches the doctor",
+      "choice_scores": [
+        {
+          "case_index": 1,
+          "choice_index": 0,
+          "full_logprob": -0.3179817199707031,
+          "mean_logprob": -0.3179817199707031,
+          "first_token_logprob": -0.3179817199707031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 1,
+          "choice_index": 1,
+          "full_logprob": -7.630481719970703,
+          "mean_logprob": -7.630481719970703,
+          "first_token_logprob": -7.630481719970703,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.3125,
+      "mean_margin": 7.3125,
+      "first_token_margin": 7.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_002",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf moves the guard\", the doer is the",
+      "choices": [
+        " wolf",
+        " guard"
+      ],
+      "answer_index": 0,
+      "answer": " wolf",
+      "note": "the wolf moves the guard",
+      "choice_scores": [
+        {
+          "case_index": 2,
+          "choice_index": 0,
+          "full_logprob": -1.154815673828125,
+          "mean_logprob": -1.154815673828125,
+          "first_token_logprob": -1.154815673828125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 2,
+          "choice_index": 1,
+          "full_logprob": -4.967443466186523,
+          "mean_logprob": -4.967443466186523,
+          "first_token_logprob": -4.967443466186523,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.8126277923583984,
+      "mean_margin": 3.8126277923583984,
+      "first_token_margin": 3.8126277923583984,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_003",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep carries the teacher\", the doer is the",
+      "choices": [
+        " sheep",
+        " teacher"
+      ],
+      "answer_index": 0,
+      "answer": " sheep",
+      "note": "the sheep carries the teacher",
+      "choice_scores": [
+        {
+          "case_index": 3,
+          "choice_index": 0,
+          "full_logprob": -1.3916702270507812,
+          "mean_logprob": -1.3916702270507812,
+          "first_token_logprob": -1.3916702270507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 3,
+          "choice_index": 1,
+          "full_logprob": -3.1416702270507812,
+          "mean_logprob": -3.1416702270507812,
+          "first_token_logprob": -3.1416702270507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.75,
+      "mean_margin": 1.75,
+      "first_token_margin": 1.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_004",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the nurse\", the doer is the",
+      "choices": [
+        " teacher",
+        " nurse"
+      ],
+      "answer_index": 0,
+      "answer": " teacher",
+      "note": "the teacher helps the nurse",
+      "choice_scores": [
+        {
+          "case_index": 4,
+          "choice_index": 0,
+          "full_logprob": -0.7485141754150391,
+          "mean_logprob": -0.7485141754150391,
+          "first_token_logprob": -0.7485141754150391,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 4,
+          "choice_index": 1,
+          "full_logprob": -3.122591018676758,
+          "mean_logprob": -3.122591018676758,
+          "first_token_logprob": -3.122591018676758,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.3740768432617188,
+      "mean_margin": 2.3740768432617188,
+      "first_token_margin": 2.3740768432617188,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_005",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student finds the robot\", the doer is the",
+      "choices": [
+        " student",
+        " robot"
+      ],
+      "answer_index": 0,
+      "answer": " student",
+      "note": "the student finds the robot",
+      "choice_scores": [
+        {
+          "case_index": 5,
+          "choice_index": 0,
+          "full_logprob": -0.33275413513183594,
+          "mean_logprob": -0.33275413513183594,
+          "first_token_logprob": -0.33275413513183594,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 5,
+          "choice_index": 1,
+          "full_logprob": -4.459999084472656,
+          "mean_logprob": -4.459999084472656,
+          "first_token_logprob": -4.459999084472656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.12724494934082,
+      "mean_margin": 4.12724494934082,
+      "first_token_margin": 4.12724494934082,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_006",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king pushes the student\", the doer is the",
+      "choices": [
+        " king",
+        " student"
+      ],
+      "answer_index": 0,
+      "answer": " king",
+      "note": "the king pushes the student",
+      "choice_scores": [
+        {
+          "case_index": 6,
+          "choice_index": 0,
+          "full_logprob": -0.27037811279296875,
+          "mean_logprob": -0.27037811279296875,
+          "first_token_logprob": -0.27037811279296875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 6,
+          "choice_index": 1,
+          "full_logprob": -4.395378112792969,
+          "mean_logprob": -4.395378112792969,
+          "first_token_logprob": -4.395378112792969,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_007",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the queen follows the artist\", the doer is the",
+      "choices": [
+        " queen",
+        " artist"
+      ],
+      "answer_index": 0,
+      "answer": " queen",
+      "note": "the queen follows the artist",
+      "choice_scores": [
+        {
+          "case_index": 7,
+          "choice_index": 0,
+          "full_logprob": -0.3926715850830078,
+          "mean_logprob": -0.3926715850830078,
+          "first_token_logprob": -0.3926715850830078,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 7,
+          "choice_index": 1,
+          "full_logprob": -3.517671585083008,
+          "mean_logprob": -3.517671585083008,
+          "first_token_logprob": -3.517671585083008,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.125,
+      "mean_margin": 3.125,
+      "first_token_margin": 3.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_008",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver guides the bird\", the doer is the",
+      "choices": [
+        " driver",
+        " bird"
+      ],
+      "answer_index": 0,
+      "answer": " driver",
+      "note": "the driver guides the bird",
+      "choice_scores": [
+        {
+          "case_index": 8,
+          "choice_index": 0,
+          "full_logprob": -0.3564739227294922,
+          "mean_logprob": -0.3564739227294922,
+          "first_token_logprob": -0.3564739227294922,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 8,
+          "choice_index": 1,
+          "full_logprob": -5.543973922729492,
+          "mean_logprob": -5.543973922729492,
+          "first_token_logprob": -5.543973922729492,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 5.1875,
+      "mean_margin": 5.1875,
+      "first_token_margin": 5.1875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_009",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the pilot guards the king\", the doer is the",
+      "choices": [
+        " pilot",
+        " king"
+      ],
+      "answer_index": 0,
+      "answer": " pilot",
+      "note": "the pilot guards the king",
+      "choice_scores": [
+        {
+          "case_index": 9,
+          "choice_index": 0,
+          "full_logprob": -1.0741004943847656,
+          "mean_logprob": -1.0741004943847656,
+          "first_token_logprob": -1.0741004943847656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 9,
+          "choice_index": 1,
+          "full_logprob": -3.1991004943847656,
+          "mean_logprob": -3.1991004943847656,
+          "first_token_logprob": -3.1991004943847656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.125,
+      "mean_margin": 2.125,
+      "first_token_margin": 2.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_010",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the doctor chases the child\", the doer is the",
+      "choices": [
+        " doctor",
+        " child"
+      ],
+      "answer_index": 0,
+      "answer": " doctor",
+      "note": "the doctor chases the child",
+      "choice_scores": [
+        {
+          "case_index": 10,
+          "choice_index": 0,
+          "full_logprob": -0.5574951171875,
+          "mean_logprob": -0.5574951171875,
+          "first_token_logprob": -0.5574951171875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 10,
+          "choice_index": 1,
+          "full_logprob": -3.5574951171875,
+          "mean_logprob": -3.5574951171875,
+          "first_token_logprob": -3.5574951171875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.0,
+      "mean_margin": 3.0,
+      "first_token_margin": 3.0,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_011",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the nurse watches the dog\", the doer is the",
+      "choices": [
+        " nurse",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " nurse",
+      "note": "the nurse watches the dog",
+      "choice_scores": [
+        {
+          "case_index": 11,
+          "choice_index": 0,
+          "full_logprob": -0.25753021240234375,
+          "mean_logprob": -0.25753021240234375,
+          "first_token_logprob": -0.25753021240234375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 11,
+          "choice_index": 1,
+          "full_logprob": -4.757530212402344,
+          "mean_logprob": -4.757530212402344,
+          "first_token_logprob": -4.757530212402344,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.5,
+      "mean_margin": 4.5,
+      "first_token_margin": 4.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_012",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the artist moves the queen\", the doer is the",
+      "choices": [
+        " artist",
+        " queen"
+      ],
+      "answer_index": 0,
+      "answer": " artist",
+      "note": "the artist moves the queen",
+      "choice_scores": [
+        {
+          "case_index": 12,
+          "choice_index": 0,
+          "full_logprob": -0.5823421478271484,
+          "mean_logprob": -0.5823421478271484,
+          "first_token_logprob": -0.5823421478271484,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 12,
+          "choice_index": 1,
+          "full_logprob": -4.082342147827148,
+          "mean_logprob": -4.082342147827148,
+          "first_token_logprob": -4.082342147827148,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5,
+      "mean_margin": 3.5,
+      "first_token_margin": 3.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_013",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the child carries the farmer\", the doer is the",
+      "choices": [
+        " child",
+        " farmer"
+      ],
+      "answer_index": 0,
+      "answer": " child",
+      "note": "the child carries the farmer",
+      "choice_scores": [
+        {
+          "case_index": 13,
+          "choice_index": 0,
+          "full_logprob": -0.35516357421875,
+          "mean_logprob": -0.35516357421875,
+          "first_token_logprob": -0.35516357421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 13,
+          "choice_index": 1,
+          "full_logprob": -4.10516357421875,
+          "mean_logprob": -4.10516357421875,
+          "first_token_logprob": -4.10516357421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_014",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the farmer helps the cat\", the doer is the",
+      "choices": [
+        " farmer",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " farmer",
+      "note": "the farmer helps the cat",
+      "choice_scores": [
+        {
+          "case_index": 14,
+          "choice_index": 0,
+          "full_logprob": -0.5634994506835938,
+          "mean_logprob": -0.5634994506835938,
+          "first_token_logprob": -0.5634994506835938,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 14,
+          "choice_index": 1,
+          "full_logprob": -4.500999450683594,
+          "mean_logprob": -4.500999450683594,
+          "first_token_logprob": -4.500999450683594,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.9375,
+      "mean_margin": 3.9375,
+      "first_token_margin": 3.9375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_015",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the soldier finds the driver\", the doer is the",
+      "choices": [
+        " soldier",
+        " driver"
+      ],
+      "answer_index": 0,
+      "answer": " soldier",
+      "note": "the soldier finds the driver",
+      "choice_scores": [
+        {
+          "case_index": 15,
+          "choice_index": 0,
+          "full_logprob": -0.6458625793457031,
+          "mean_logprob": -0.6458625793457031,
+          "first_token_logprob": -0.6458625793457031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 15,
+          "choice_index": 1,
+          "full_logprob": -5.08336067199707,
+          "mean_logprob": -5.08336067199707,
+          "first_token_logprob": -5.08336067199707,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.437498092651367,
+      "mean_margin": 4.437498092651367,
+      "first_token_margin": 4.437498092651367,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_016",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the chef pushes the soldier\", the doer is the",
+      "choices": [
+        " chef",
+        " soldier"
+      ],
+      "answer_index": 0,
+      "answer": " chef",
+      "note": "the chef pushes the soldier",
+      "choice_scores": [
+        {
+          "case_index": 16,
+          "choice_index": 0,
+          "full_logprob": -0.30089378356933594,
+          "mean_logprob": -0.30089378356933594,
+          "first_token_logprob": -0.30089378356933594,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 16,
+          "choice_index": 1,
+          "full_logprob": -4.675914764404297,
+          "mean_logprob": -4.675914764404297,
+          "first_token_logprob": -4.675914764404297,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.375020980834961,
+      "mean_margin": 4.375020980834961,
+      "first_token_margin": 4.375020980834961,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_017",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the guard follows the wolf\", the doer is the",
+      "choices": [
+        " guard",
+        " wolf"
+      ],
+      "answer_index": 0,
+      "answer": " guard",
+      "note": "the guard follows the wolf",
+      "choice_scores": [
+        {
+          "case_index": 17,
+          "choice_index": 0,
+          "full_logprob": -0.5585899353027344,
+          "mean_logprob": -0.5585899353027344,
+          "first_token_logprob": -0.5585899353027344,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 17,
+          "choice_index": 1,
+          "full_logprob": -4.683797836303711,
+          "mean_logprob": -4.683797836303711,
+          "first_token_logprob": -4.683797836303711,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125207901000977,
+      "mean_margin": 4.125207901000977,
+      "first_token_margin": 4.125207901000977,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_018",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the robot guides the pilot\", the doer is the",
+      "choices": [
+        " robot",
+        " pilot"
+      ],
+      "answer_index": 0,
+      "answer": " robot",
+      "note": "the robot guides the pilot",
+      "choice_scores": [
+        {
+          "case_index": 18,
+          "choice_index": 0,
+          "full_logprob": -0.19219970703125,
+          "mean_logprob": -0.19219970703125,
+          "first_token_logprob": -0.19219970703125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 18,
+          "choice_index": 1,
+          "full_logprob": -3.06719970703125,
+          "mean_logprob": -3.06719970703125,
+          "first_token_logprob": -3.06719970703125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.875,
+      "mean_margin": 2.875,
+      "first_token_margin": 2.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_019",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the bird guards the chef\", the doer is the",
+      "choices": [
+        " bird",
+        " chef"
+      ],
+      "answer_index": 0,
+      "answer": " bird",
+      "note": "the bird guards the chef",
+      "choice_scores": [
+        {
+          "case_index": 19,
+          "choice_index": 0,
+          "full_logprob": -0.16400146484375,
+          "mean_logprob": -0.16400146484375,
+          "first_token_logprob": -0.16400146484375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 19,
+          "choice_index": 1,
+          "full_logprob": -3.91400146484375,
+          "mean_logprob": -3.91400146484375,
+          "first_token_logprob": -3.91400146484375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_020",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the sheep\", the doer is the",
+      "choices": [
+        " dog",
+        " sheep"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "the dog chases the sheep",
+      "choice_scores": [
+        {
+          "case_index": 20,
+          "choice_index": 0,
+          "full_logprob": -0.32224464416503906,
+          "mean_logprob": -0.32224464416503906,
+          "first_token_logprob": -0.32224464416503906,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 20,
+          "choice_index": 1,
+          "full_logprob": -7.947244644165039,
+          "mean_logprob": -7.947244644165039,
+          "first_token_logprob": -7.947244644165039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.625,
+      "mean_margin": 7.625,
+      "first_token_margin": 7.625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_021",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat watches the doctor\", the doer is the",
+      "choices": [
+        " cat",
+        " doctor"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "the cat watches the doctor",
+      "choice_scores": [
+        {
+          "case_index": 21,
+          "choice_index": 0,
+          "full_logprob": -0.3179817199707031,
+          "mean_logprob": -0.3179817199707031,
+          "first_token_logprob": -0.3179817199707031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 21,
+          "choice_index": 1,
+          "full_logprob": -7.630481719970703,
+          "mean_logprob": -7.630481719970703,
+          "first_token_logprob": -7.630481719970703,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.3125,
+      "mean_margin": 7.3125,
+      "first_token_margin": 7.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_022",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf moves the guard\", the doer is the",
+      "choices": [
+        " wolf",
+        " guard"
+      ],
+      "answer_index": 0,
+      "answer": " wolf",
+      "note": "the wolf moves the guard",
+      "choice_scores": [
+        {
+          "case_index": 22,
+          "choice_index": 0,
+          "full_logprob": -1.154815673828125,
+          "mean_logprob": -1.154815673828125,
+          "first_token_logprob": -1.154815673828125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 22,
+          "choice_index": 1,
+          "full_logprob": -4.967315673828125,
+          "mean_logprob": -4.967315673828125,
+          "first_token_logprob": -4.967315673828125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.8125,
+      "mean_margin": 3.8125,
+      "first_token_margin": 3.8125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_023",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep carries the teacher\", the doer is the",
+      "choices": [
+        " sheep",
+        " teacher"
+      ],
+      "answer_index": 0,
+      "answer": " sheep",
+      "note": "the sheep carries the teacher",
+      "choice_scores": [
+        {
+          "case_index": 23,
+          "choice_index": 0,
+          "full_logprob": -1.3916702270507812,
+          "mean_logprob": -1.3916702270507812,
+          "first_token_logprob": -1.3916702270507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 23,
+          "choice_index": 1,
+          "full_logprob": -3.1416702270507812,
+          "mean_logprob": -3.1416702270507812,
+          "first_token_logprob": -3.1416702270507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.75,
+      "mean_margin": 1.75,
+      "first_token_margin": 1.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_024",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the nurse\", the doer is the",
+      "choices": [
+        " teacher",
+        " nurse"
+      ],
+      "answer_index": 0,
+      "answer": " teacher",
+      "note": "the teacher helps the nurse",
+      "choice_scores": [
+        {
+          "case_index": 24,
+          "choice_index": 0,
+          "full_logprob": -0.7485141754150391,
+          "mean_logprob": -0.7485141754150391,
+          "first_token_logprob": -0.7485141754150391,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 24,
+          "choice_index": 1,
+          "full_logprob": -3.116575241088867,
+          "mean_logprob": -3.116575241088867,
+          "first_token_logprob": -3.116575241088867,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.368061065673828,
+      "mean_margin": 2.368061065673828,
+      "first_token_margin": 2.368061065673828,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_025",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student finds the robot\", the doer is the",
+      "choices": [
+        " student",
+        " robot"
+      ],
+      "answer_index": 0,
+      "answer": " student",
+      "note": "the student finds the robot",
+      "choice_scores": [
+        {
+          "case_index": 25,
+          "choice_index": 0,
+          "full_logprob": -0.33499908447265625,
+          "mean_logprob": -0.33499908447265625,
+          "first_token_logprob": -0.33499908447265625,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 25,
+          "choice_index": 1,
+          "full_logprob": -4.459999084472656,
+          "mean_logprob": -4.459999084472656,
+          "first_token_logprob": -4.459999084472656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_026",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king pushes the student\", the doer is the",
+      "choices": [
+        " king",
+        " student"
+      ],
+      "answer_index": 0,
+      "answer": " king",
+      "note": "the king pushes the student",
+      "choice_scores": [
+        {
+          "case_index": 26,
+          "choice_index": 0,
+          "full_logprob": -0.27037811279296875,
+          "mean_logprob": -0.27037811279296875,
+          "first_token_logprob": -0.27037811279296875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 26,
+          "choice_index": 1,
+          "full_logprob": -4.395378112792969,
+          "mean_logprob": -4.395378112792969,
+          "first_token_logprob": -4.395378112792969,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_027",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the queen follows the artist\", the doer is the",
+      "choices": [
+        " queen",
+        " artist"
+      ],
+      "answer_index": 0,
+      "answer": " queen",
+      "note": "the queen follows the artist",
+      "choice_scores": [
+        {
+          "case_index": 27,
+          "choice_index": 0,
+          "full_logprob": -0.3926715850830078,
+          "mean_logprob": -0.3926715850830078,
+          "first_token_logprob": -0.3926715850830078,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 27,
+          "choice_index": 1,
+          "full_logprob": -3.517671585083008,
+          "mean_logprob": -3.517671585083008,
+          "first_token_logprob": -3.517671585083008,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.125,
+      "mean_margin": 3.125,
+      "first_token_margin": 3.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_028",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver guides the bird\", the doer is the",
+      "choices": [
+        " driver",
+        " bird"
+      ],
+      "answer_index": 0,
+      "answer": " driver",
+      "note": "the driver guides the bird",
+      "choice_scores": [
+        {
+          "case_index": 28,
+          "choice_index": 0,
+          "full_logprob": -0.3564739227294922,
+          "mean_logprob": -0.3564739227294922,
+          "first_token_logprob": -0.3564739227294922,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 28,
+          "choice_index": 1,
+          "full_logprob": -5.543973922729492,
+          "mean_logprob": -5.543973922729492,
+          "first_token_logprob": -5.543973922729492,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 5.1875,
+      "mean_margin": 5.1875,
+      "first_token_margin": 5.1875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_029",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the pilot guards the king\", the doer is the",
+      "choices": [
+        " pilot",
+        " king"
+      ],
+      "answer_index": 0,
+      "answer": " pilot",
+      "note": "the pilot guards the king",
+      "choice_scores": [
+        {
+          "case_index": 29,
+          "choice_index": 0,
+          "full_logprob": -1.0741004943847656,
+          "mean_logprob": -1.0741004943847656,
+          "first_token_logprob": -1.0741004943847656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 29,
+          "choice_index": 1,
+          "full_logprob": -3.1991004943847656,
+          "mean_logprob": -3.1991004943847656,
+          "first_token_logprob": -3.1991004943847656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.125,
+      "mean_margin": 2.125,
+      "first_token_margin": 2.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_030",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the doctor chases the child\", the doer is the",
+      "choices": [
+        " doctor",
+        " child"
+      ],
+      "answer_index": 0,
+      "answer": " doctor",
+      "note": "the doctor chases the child",
+      "choice_scores": [
+        {
+          "case_index": 30,
+          "choice_index": 0,
+          "full_logprob": -0.5574951171875,
+          "mean_logprob": -0.5574951171875,
+          "first_token_logprob": -0.5574951171875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 30,
+          "choice_index": 1,
+          "full_logprob": -3.5574951171875,
+          "mean_logprob": -3.5574951171875,
+          "first_token_logprob": -3.5574951171875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.0,
+      "mean_margin": 3.0,
+      "first_token_margin": 3.0,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_031",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the nurse watches the dog\", the doer is the",
+      "choices": [
+        " nurse",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " nurse",
+      "note": "the nurse watches the dog",
+      "choice_scores": [
+        {
+          "case_index": 31,
+          "choice_index": 0,
+          "full_logprob": -0.25753021240234375,
+          "mean_logprob": -0.25753021240234375,
+          "first_token_logprob": -0.25753021240234375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 31,
+          "choice_index": 1,
+          "full_logprob": -4.757530212402344,
+          "mean_logprob": -4.757530212402344,
+          "first_token_logprob": -4.757530212402344,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.5,
+      "mean_margin": 4.5,
+      "first_token_margin": 4.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_032",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the artist moves the queen\", the doer is the",
+      "choices": [
+        " artist",
+        " queen"
+      ],
+      "answer_index": 0,
+      "answer": " artist",
+      "note": "the artist moves the queen",
+      "choice_scores": [
+        {
+          "case_index": 32,
+          "choice_index": 0,
+          "full_logprob": -0.5818595886230469,
+          "mean_logprob": -0.5818595886230469,
+          "first_token_logprob": -0.5818595886230469,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 32,
+          "choice_index": 1,
+          "full_logprob": -4.082342147827148,
+          "mean_logprob": -4.082342147827148,
+          "first_token_logprob": -4.082342147827148,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5004825592041016,
+      "mean_margin": 3.5004825592041016,
+      "first_token_margin": 3.5004825592041016,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_033",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the child carries the farmer\", the doer is the",
+      "choices": [
+        " child",
+        " farmer"
+      ],
+      "answer_index": 0,
+      "answer": " child",
+      "note": "the child carries the farmer",
+      "choice_scores": [
+        {
+          "case_index": 33,
+          "choice_index": 0,
+          "full_logprob": -0.35516357421875,
+          "mean_logprob": -0.35516357421875,
+          "first_token_logprob": -0.35516357421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 33,
+          "choice_index": 1,
+          "full_logprob": -4.10516357421875,
+          "mean_logprob": -4.10516357421875,
+          "first_token_logprob": -4.10516357421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_034",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the farmer helps the cat\", the doer is the",
+      "choices": [
+        " farmer",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " farmer",
+      "note": "the farmer helps the cat",
+      "choice_scores": [
+        {
+          "case_index": 34,
+          "choice_index": 0,
+          "full_logprob": -0.5634994506835938,
+          "mean_logprob": -0.5634994506835938,
+          "first_token_logprob": -0.5634994506835938,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 34,
+          "choice_index": 1,
+          "full_logprob": -4.500999450683594,
+          "mean_logprob": -4.500999450683594,
+          "first_token_logprob": -4.500999450683594,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.9375,
+      "mean_margin": 3.9375,
+      "first_token_margin": 3.9375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_035",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the soldier finds the driver\", the doer is the",
+      "choices": [
+        " soldier",
+        " driver"
+      ],
+      "answer_index": 0,
+      "answer": " soldier",
+      "note": "the soldier finds the driver",
+      "choice_scores": [
+        {
+          "case_index": 35,
+          "choice_index": 0,
+          "full_logprob": -0.6458606719970703,
+          "mean_logprob": -0.6458606719970703,
+          "first_token_logprob": -0.6458606719970703,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 35,
+          "choice_index": 1,
+          "full_logprob": -5.08336067199707,
+          "mean_logprob": -5.08336067199707,
+          "first_token_logprob": -5.08336067199707,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.4375,
+      "mean_margin": 4.4375,
+      "first_token_margin": 4.4375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_036",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the chef pushes the soldier\", the doer is the",
+      "choices": [
+        " chef",
+        " soldier"
+      ],
+      "answer_index": 0,
+      "answer": " chef",
+      "note": "the chef pushes the soldier",
+      "choice_scores": [
+        {
+          "case_index": 36,
+          "choice_index": 0,
+          "full_logprob": -0.3009147644042969,
+          "mean_logprob": -0.3009147644042969,
+          "first_token_logprob": -0.3009147644042969,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 36,
+          "choice_index": 1,
+          "full_logprob": -4.675914764404297,
+          "mean_logprob": -4.675914764404297,
+          "first_token_logprob": -4.675914764404297,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.375,
+      "mean_margin": 4.375,
+      "first_token_margin": 4.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_037",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the guard follows the wolf\", the doer is the",
+      "choices": [
+        " guard",
+        " wolf"
+      ],
+      "answer_index": 0,
+      "answer": " guard",
+      "note": "the guard follows the wolf",
+      "choice_scores": [
+        {
+          "case_index": 37,
+          "choice_index": 0,
+          "full_logprob": -0.5585899353027344,
+          "mean_logprob": -0.5585899353027344,
+          "first_token_logprob": -0.5585899353027344,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 37,
+          "choice_index": 1,
+          "full_logprob": -4.683589935302734,
+          "mean_logprob": -4.683589935302734,
+          "first_token_logprob": -4.683589935302734,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_038",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the robot guides the pilot\", the doer is the",
+      "choices": [
+        " robot",
+        " pilot"
+      ],
+      "answer_index": 0,
+      "answer": " robot",
+      "note": "the robot guides the pilot",
+      "choice_scores": [
+        {
+          "case_index": 38,
+          "choice_index": 0,
+          "full_logprob": -0.19219970703125,
+          "mean_logprob": -0.19219970703125,
+          "first_token_logprob": -0.19219970703125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 38,
+          "choice_index": 1,
+          "full_logprob": -3.06719970703125,
+          "mean_logprob": -3.06719970703125,
+          "first_token_logprob": -3.06719970703125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.875,
+      "mean_margin": 2.875,
+      "first_token_margin": 2.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_039",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the bird guards the chef\", the doer is the",
+      "choices": [
+        " bird",
+        " chef"
+      ],
+      "answer_index": 0,
+      "answer": " bird",
+      "note": "the bird guards the chef",
+      "choice_scores": [
+        {
+          "case_index": 39,
+          "choice_index": 0,
+          "full_logprob": -0.16400146484375,
+          "mean_logprob": -0.16400146484375,
+          "first_token_logprob": -0.16400146484375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 39,
+          "choice_index": 1,
+          "full_logprob": -3.91400146484375,
+          "mean_logprob": -3.91400146484375,
+          "first_token_logprob": -3.91400146484375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_040",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the sheep\", the doer is the",
+      "choices": [
+        " dog",
+        " sheep"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "the dog chases the sheep",
+      "choice_scores": [
+        {
+          "case_index": 40,
+          "choice_index": 0,
+          "full_logprob": -0.32224464416503906,
+          "mean_logprob": -0.32224464416503906,
+          "first_token_logprob": -0.32224464416503906,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 40,
+          "choice_index": 1,
+          "full_logprob": -7.947244644165039,
+          "mean_logprob": -7.947244644165039,
+          "first_token_logprob": -7.947244644165039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.625,
+      "mean_margin": 7.625,
+      "first_token_margin": 7.625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_041",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat watches the doctor\", the doer is the",
+      "choices": [
+        " cat",
+        " doctor"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "the cat watches the doctor",
+      "choice_scores": [
+        {
+          "case_index": 41,
+          "choice_index": 0,
+          "full_logprob": -0.3179817199707031,
+          "mean_logprob": -0.3179817199707031,
+          "first_token_logprob": -0.3179817199707031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 41,
+          "choice_index": 1,
+          "full_logprob": -7.630481719970703,
+          "mean_logprob": -7.630481719970703,
+          "first_token_logprob": -7.630481719970703,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.3125,
+      "mean_margin": 7.3125,
+      "first_token_margin": 7.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_042",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf moves the guard\", the doer is the",
+      "choices": [
+        " wolf",
+        " guard"
+      ],
+      "answer_index": 0,
+      "answer": " wolf",
+      "note": "the wolf moves the guard",
+      "choice_scores": [
+        {
+          "case_index": 42,
+          "choice_index": 0,
+          "full_logprob": -1.154815673828125,
+          "mean_logprob": -1.154815673828125,
+          "first_token_logprob": -1.154815673828125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 42,
+          "choice_index": 1,
+          "full_logprob": -4.967315673828125,
+          "mean_logprob": -4.967315673828125,
+          "first_token_logprob": -4.967315673828125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.8125,
+      "mean_margin": 3.8125,
+      "first_token_margin": 3.8125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_043",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep carries the teacher\", the doer is the",
+      "choices": [
+        " sheep",
+        " teacher"
+      ],
+      "answer_index": 0,
+      "answer": " sheep",
+      "note": "the sheep carries the teacher",
+      "choice_scores": [
+        {
+          "case_index": 43,
+          "choice_index": 0,
+          "full_logprob": -1.3916702270507812,
+          "mean_logprob": -1.3916702270507812,
+          "first_token_logprob": -1.3916702270507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 43,
+          "choice_index": 1,
+          "full_logprob": -3.1416702270507812,
+          "mean_logprob": -3.1416702270507812,
+          "first_token_logprob": -3.1416702270507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.75,
+      "mean_margin": 1.75,
+      "first_token_margin": 1.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_044",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the nurse\", the doer is the",
+      "choices": [
+        " teacher",
+        " nurse"
+      ],
+      "answer_index": 0,
+      "answer": " teacher",
+      "note": "the teacher helps the nurse",
+      "choice_scores": [
+        {
+          "case_index": 44,
+          "choice_index": 0,
+          "full_logprob": -0.7485141754150391,
+          "mean_logprob": -0.7485141754150391,
+          "first_token_logprob": -0.7485141754150391,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 44,
+          "choice_index": 1,
+          "full_logprob": -3.025754928588867,
+          "mean_logprob": -3.025754928588867,
+          "first_token_logprob": -3.025754928588867,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.277240753173828,
+      "mean_margin": 2.277240753173828,
+      "first_token_margin": 2.277240753173828,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_045",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student finds the robot\", the doer is the",
+      "choices": [
+        " student",
+        " robot"
+      ],
+      "answer_index": 0,
+      "answer": " student",
+      "note": "the student finds the robot",
+      "choice_scores": [
+        {
+          "case_index": 45,
+          "choice_index": 0,
+          "full_logprob": -0.33499908447265625,
+          "mean_logprob": -0.33499908447265625,
+          "first_token_logprob": -0.33499908447265625,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 45,
+          "choice_index": 1,
+          "full_logprob": -4.459999084472656,
+          "mean_logprob": -4.459999084472656,
+          "first_token_logprob": -4.459999084472656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_046",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king pushes the student\", the doer is the",
+      "choices": [
+        " king",
+        " student"
+      ],
+      "answer_index": 0,
+      "answer": " king",
+      "note": "the king pushes the student",
+      "choice_scores": [
+        {
+          "case_index": 46,
+          "choice_index": 0,
+          "full_logprob": -0.27037811279296875,
+          "mean_logprob": -0.27037811279296875,
+          "first_token_logprob": -0.27037811279296875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 46,
+          "choice_index": 1,
+          "full_logprob": -4.395378112792969,
+          "mean_logprob": -4.395378112792969,
+          "first_token_logprob": -4.395378112792969,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_047",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the queen follows the artist\", the doer is the",
+      "choices": [
+        " queen",
+        " artist"
+      ],
+      "answer_index": 0,
+      "answer": " queen",
+      "note": "the queen follows the artist",
+      "choice_scores": [
+        {
+          "case_index": 47,
+          "choice_index": 0,
+          "full_logprob": -0.3926715850830078,
+          "mean_logprob": -0.3926715850830078,
+          "first_token_logprob": -0.3926715850830078,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 47,
+          "choice_index": 1,
+          "full_logprob": -3.517671585083008,
+          "mean_logprob": -3.517671585083008,
+          "first_token_logprob": -3.517671585083008,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.125,
+      "mean_margin": 3.125,
+      "first_token_margin": 3.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_048",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver guides the bird\", the doer is the",
+      "choices": [
+        " driver",
+        " bird"
+      ],
+      "answer_index": 0,
+      "answer": " driver",
+      "note": "the driver guides the bird",
+      "choice_scores": [
+        {
+          "case_index": 48,
+          "choice_index": 0,
+          "full_logprob": -0.3564739227294922,
+          "mean_logprob": -0.3564739227294922,
+          "first_token_logprob": -0.3564739227294922,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 48,
+          "choice_index": 1,
+          "full_logprob": -5.543973922729492,
+          "mean_logprob": -5.543973922729492,
+          "first_token_logprob": -5.543973922729492,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 5.1875,
+      "mean_margin": 5.1875,
+      "first_token_margin": 5.1875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_049",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the pilot guards the king\", the doer is the",
+      "choices": [
+        " pilot",
+        " king"
+      ],
+      "answer_index": 0,
+      "answer": " pilot",
+      "note": "the pilot guards the king",
+      "choice_scores": [
+        {
+          "case_index": 49,
+          "choice_index": 0,
+          "full_logprob": -1.0741004943847656,
+          "mean_logprob": -1.0741004943847656,
+          "first_token_logprob": -1.0741004943847656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 49,
+          "choice_index": 1,
+          "full_logprob": -3.1991004943847656,
+          "mean_logprob": -3.1991004943847656,
+          "first_token_logprob": -3.1991004943847656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.125,
+      "mean_margin": 2.125,
+      "first_token_margin": 2.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_050",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the doctor chases the child\", the doer is the",
+      "choices": [
+        " doctor",
+        " child"
+      ],
+      "answer_index": 0,
+      "answer": " doctor",
+      "note": "the doctor chases the child",
+      "choice_scores": [
+        {
+          "case_index": 50,
+          "choice_index": 0,
+          "full_logprob": -0.5574951171875,
+          "mean_logprob": -0.5574951171875,
+          "first_token_logprob": -0.5574951171875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 50,
+          "choice_index": 1,
+          "full_logprob": -3.5574951171875,
+          "mean_logprob": -3.5574951171875,
+          "first_token_logprob": -3.5574951171875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.0,
+      "mean_margin": 3.0,
+      "first_token_margin": 3.0,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_051",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the nurse watches the dog\", the doer is the",
+      "choices": [
+        " nurse",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " nurse",
+      "note": "the nurse watches the dog",
+      "choice_scores": [
+        {
+          "case_index": 51,
+          "choice_index": 0,
+          "full_logprob": -0.25753021240234375,
+          "mean_logprob": -0.25753021240234375,
+          "first_token_logprob": -0.25753021240234375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 51,
+          "choice_index": 1,
+          "full_logprob": -4.757530212402344,
+          "mean_logprob": -4.757530212402344,
+          "first_token_logprob": -4.757530212402344,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.5,
+      "mean_margin": 4.5,
+      "first_token_margin": 4.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_052",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the artist moves the queen\", the doer is the",
+      "choices": [
+        " artist",
+        " queen"
+      ],
+      "answer_index": 0,
+      "answer": " artist",
+      "note": "the artist moves the queen",
+      "choice_scores": [
+        {
+          "case_index": 52,
+          "choice_index": 0,
+          "full_logprob": -0.5823421478271484,
+          "mean_logprob": -0.5823421478271484,
+          "first_token_logprob": -0.5823421478271484,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 52,
+          "choice_index": 1,
+          "full_logprob": -4.082342147827148,
+          "mean_logprob": -4.082342147827148,
+          "first_token_logprob": -4.082342147827148,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5,
+      "mean_margin": 3.5,
+      "first_token_margin": 3.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_053",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the child carries the farmer\", the doer is the",
+      "choices": [
+        " child",
+        " farmer"
+      ],
+      "answer_index": 0,
+      "answer": " child",
+      "note": "the child carries the farmer",
+      "choice_scores": [
+        {
+          "case_index": 53,
+          "choice_index": 0,
+          "full_logprob": -0.35516357421875,
+          "mean_logprob": -0.35516357421875,
+          "first_token_logprob": -0.35516357421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 53,
+          "choice_index": 1,
+          "full_logprob": -4.10516357421875,
+          "mean_logprob": -4.10516357421875,
+          "first_token_logprob": -4.10516357421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_054",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the farmer helps the cat\", the doer is the",
+      "choices": [
+        " farmer",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " farmer",
+      "note": "the farmer helps the cat",
+      "choice_scores": [
+        {
+          "case_index": 54,
+          "choice_index": 0,
+          "full_logprob": -0.5634994506835938,
+          "mean_logprob": -0.5634994506835938,
+          "first_token_logprob": -0.5634994506835938,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 54,
+          "choice_index": 1,
+          "full_logprob": -4.500999450683594,
+          "mean_logprob": -4.500999450683594,
+          "first_token_logprob": -4.500999450683594,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.9375,
+      "mean_margin": 3.9375,
+      "first_token_margin": 3.9375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_055",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the soldier finds the driver\", the doer is the",
+      "choices": [
+        " soldier",
+        " driver"
+      ],
+      "answer_index": 0,
+      "answer": " soldier",
+      "note": "the soldier finds the driver",
+      "choice_scores": [
+        {
+          "case_index": 55,
+          "choice_index": 0,
+          "full_logprob": -0.6458606719970703,
+          "mean_logprob": -0.6458606719970703,
+          "first_token_logprob": -0.6458606719970703,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 55,
+          "choice_index": 1,
+          "full_logprob": -5.08336067199707,
+          "mean_logprob": -5.08336067199707,
+          "first_token_logprob": -5.08336067199707,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.4375,
+      "mean_margin": 4.4375,
+      "first_token_margin": 4.4375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_056",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the chef pushes the soldier\", the doer is the",
+      "choices": [
+        " chef",
+        " soldier"
+      ],
+      "answer_index": 0,
+      "answer": " chef",
+      "note": "the chef pushes the soldier",
+      "choice_scores": [
+        {
+          "case_index": 56,
+          "choice_index": 0,
+          "full_logprob": -0.3009147644042969,
+          "mean_logprob": -0.3009147644042969,
+          "first_token_logprob": -0.3009147644042969,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 56,
+          "choice_index": 1,
+          "full_logprob": -4.675914764404297,
+          "mean_logprob": -4.675914764404297,
+          "first_token_logprob": -4.675914764404297,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.375,
+      "mean_margin": 4.375,
+      "first_token_margin": 4.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_057",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the guard follows the wolf\", the doer is the",
+      "choices": [
+        " guard",
+        " wolf"
+      ],
+      "answer_index": 0,
+      "answer": " guard",
+      "note": "the guard follows the wolf",
+      "choice_scores": [
+        {
+          "case_index": 57,
+          "choice_index": 0,
+          "full_logprob": -0.5585899353027344,
+          "mean_logprob": -0.5585899353027344,
+          "first_token_logprob": -0.5585899353027344,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 57,
+          "choice_index": 1,
+          "full_logprob": -4.683589935302734,
+          "mean_logprob": -4.683589935302734,
+          "first_token_logprob": -4.683589935302734,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_058",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the robot guides the pilot\", the doer is the",
+      "choices": [
+        " robot",
+        " pilot"
+      ],
+      "answer_index": 0,
+      "answer": " robot",
+      "note": "the robot guides the pilot",
+      "choice_scores": [
+        {
+          "case_index": 58,
+          "choice_index": 0,
+          "full_logprob": -0.19219970703125,
+          "mean_logprob": -0.19219970703125,
+          "first_token_logprob": -0.19219970703125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 58,
+          "choice_index": 1,
+          "full_logprob": -3.06719970703125,
+          "mean_logprob": -3.06719970703125,
+          "first_token_logprob": -3.06719970703125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.875,
+      "mean_margin": 2.875,
+      "first_token_margin": 2.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_059",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the bird guards the chef\", the doer is the",
+      "choices": [
+        " bird",
+        " chef"
+      ],
+      "answer_index": 0,
+      "answer": " bird",
+      "note": "the bird guards the chef",
+      "choice_scores": [
+        {
+          "case_index": 59,
+          "choice_index": 0,
+          "full_logprob": -0.16400146484375,
+          "mean_logprob": -0.16400146484375,
+          "first_token_logprob": -0.16400146484375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 59,
+          "choice_index": 1,
+          "full_logprob": -3.91400146484375,
+          "mean_logprob": -3.91400146484375,
+          "first_token_logprob": -3.91400146484375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_060",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the sheep\", the doer is the",
+      "choices": [
+        " dog",
+        " sheep"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "the dog chases the sheep",
+      "choice_scores": [
+        {
+          "case_index": 60,
+          "choice_index": 0,
+          "full_logprob": -0.32224464416503906,
+          "mean_logprob": -0.32224464416503906,
+          "first_token_logprob": -0.32224464416503906,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 60,
+          "choice_index": 1,
+          "full_logprob": -7.947244644165039,
+          "mean_logprob": -7.947244644165039,
+          "first_token_logprob": -7.947244644165039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.625,
+      "mean_margin": 7.625,
+      "first_token_margin": 7.625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_061",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat watches the doctor\", the doer is the",
+      "choices": [
+        " cat",
+        " doctor"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "the cat watches the doctor",
+      "choice_scores": [
+        {
+          "case_index": 61,
+          "choice_index": 0,
+          "full_logprob": -0.3179817199707031,
+          "mean_logprob": -0.3179817199707031,
+          "first_token_logprob": -0.3179817199707031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 61,
+          "choice_index": 1,
+          "full_logprob": -7.630481719970703,
+          "mean_logprob": -7.630481719970703,
+          "first_token_logprob": -7.630481719970703,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.3125,
+      "mean_margin": 7.3125,
+      "first_token_margin": 7.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_062",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf moves the guard\", the doer is the",
+      "choices": [
+        " wolf",
+        " guard"
+      ],
+      "answer_index": 0,
+      "answer": " wolf",
+      "note": "the wolf moves the guard",
+      "choice_scores": [
+        {
+          "case_index": 62,
+          "choice_index": 0,
+          "full_logprob": -1.1545791625976562,
+          "mean_logprob": -1.1545791625976562,
+          "first_token_logprob": -1.1545791625976562,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 62,
+          "choice_index": 1,
+          "full_logprob": -4.967315673828125,
+          "mean_logprob": -4.967315673828125,
+          "first_token_logprob": -4.967315673828125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.8127365112304688,
+      "mean_margin": 3.8127365112304688,
+      "first_token_margin": 3.8127365112304688,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_063",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep carries the teacher\", the doer is the",
+      "choices": [
+        " sheep",
+        " teacher"
+      ],
+      "answer_index": 0,
+      "answer": " sheep",
+      "note": "the sheep carries the teacher",
+      "choice_scores": [
+        {
+          "case_index": 63,
+          "choice_index": 0,
+          "full_logprob": -1.3916702270507812,
+          "mean_logprob": -1.3916702270507812,
+          "first_token_logprob": -1.3916702270507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 63,
+          "choice_index": 1,
+          "full_logprob": -3.1416702270507812,
+          "mean_logprob": -3.1416702270507812,
+          "first_token_logprob": -3.1416702270507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.75,
+      "mean_margin": 1.75,
+      "first_token_margin": 1.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_064",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the nurse\", the doer is the",
+      "choices": [
+        " teacher",
+        " nurse"
+      ],
+      "answer_index": 0,
+      "answer": " teacher",
+      "note": "the teacher helps the nurse",
+      "choice_scores": [
+        {
+          "case_index": 64,
+          "choice_index": 0,
+          "full_logprob": -0.7485141754150391,
+          "mean_logprob": -0.7485141754150391,
+          "first_token_logprob": -0.7485141754150391,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 64,
+          "choice_index": 1,
+          "full_logprob": -3.123514175415039,
+          "mean_logprob": -3.123514175415039,
+          "first_token_logprob": -3.123514175415039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.375,
+      "mean_margin": 2.375,
+      "first_token_margin": 2.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_065",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student finds the robot\", the doer is the",
+      "choices": [
+        " student",
+        " robot"
+      ],
+      "answer_index": 0,
+      "answer": " student",
+      "note": "the student finds the robot",
+      "choice_scores": [
+        {
+          "case_index": 65,
+          "choice_index": 0,
+          "full_logprob": -0.33499908447265625,
+          "mean_logprob": -0.33499908447265625,
+          "first_token_logprob": -0.33499908447265625,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 65,
+          "choice_index": 1,
+          "full_logprob": -4.459999084472656,
+          "mean_logprob": -4.459999084472656,
+          "first_token_logprob": -4.459999084472656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_066",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king pushes the student\", the doer is the",
+      "choices": [
+        " king",
+        " student"
+      ],
+      "answer_index": 0,
+      "answer": " king",
+      "note": "the king pushes the student",
+      "choice_scores": [
+        {
+          "case_index": 66,
+          "choice_index": 0,
+          "full_logprob": -0.27037811279296875,
+          "mean_logprob": -0.27037811279296875,
+          "first_token_logprob": -0.27037811279296875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 66,
+          "choice_index": 1,
+          "full_logprob": -4.395378112792969,
+          "mean_logprob": -4.395378112792969,
+          "first_token_logprob": -4.395378112792969,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_067",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the queen follows the artist\", the doer is the",
+      "choices": [
+        " queen",
+        " artist"
+      ],
+      "answer_index": 0,
+      "answer": " queen",
+      "note": "the queen follows the artist",
+      "choice_scores": [
+        {
+          "case_index": 67,
+          "choice_index": 0,
+          "full_logprob": -0.3926715850830078,
+          "mean_logprob": -0.3926715850830078,
+          "first_token_logprob": -0.3926715850830078,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 67,
+          "choice_index": 1,
+          "full_logprob": -3.517671585083008,
+          "mean_logprob": -3.517671585083008,
+          "first_token_logprob": -3.517671585083008,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.125,
+      "mean_margin": 3.125,
+      "first_token_margin": 3.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_068",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver guides the bird\", the doer is the",
+      "choices": [
+        " driver",
+        " bird"
+      ],
+      "answer_index": 0,
+      "answer": " driver",
+      "note": "the driver guides the bird",
+      "choice_scores": [
+        {
+          "case_index": 68,
+          "choice_index": 0,
+          "full_logprob": -0.3564739227294922,
+          "mean_logprob": -0.3564739227294922,
+          "first_token_logprob": -0.3564739227294922,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 68,
+          "choice_index": 1,
+          "full_logprob": -5.543973922729492,
+          "mean_logprob": -5.543973922729492,
+          "first_token_logprob": -5.543973922729492,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 5.1875,
+      "mean_margin": 5.1875,
+      "first_token_margin": 5.1875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_069",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the pilot guards the king\", the doer is the",
+      "choices": [
+        " pilot",
+        " king"
+      ],
+      "answer_index": 0,
+      "answer": " pilot",
+      "note": "the pilot guards the king",
+      "choice_scores": [
+        {
+          "case_index": 69,
+          "choice_index": 0,
+          "full_logprob": -1.0741004943847656,
+          "mean_logprob": -1.0741004943847656,
+          "first_token_logprob": -1.0741004943847656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 69,
+          "choice_index": 1,
+          "full_logprob": -3.1991004943847656,
+          "mean_logprob": -3.1991004943847656,
+          "first_token_logprob": -3.1991004943847656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.125,
+      "mean_margin": 2.125,
+      "first_token_margin": 2.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_070",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the doctor chases the child\", the doer is the",
+      "choices": [
+        " doctor",
+        " child"
+      ],
+      "answer_index": 0,
+      "answer": " doctor",
+      "note": "the doctor chases the child",
+      "choice_scores": [
+        {
+          "case_index": 70,
+          "choice_index": 0,
+          "full_logprob": -0.5574951171875,
+          "mean_logprob": -0.5574951171875,
+          "first_token_logprob": -0.5574951171875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 70,
+          "choice_index": 1,
+          "full_logprob": -3.5574951171875,
+          "mean_logprob": -3.5574951171875,
+          "first_token_logprob": -3.5574951171875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.0,
+      "mean_margin": 3.0,
+      "first_token_margin": 3.0,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_071",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the nurse watches the dog\", the doer is the",
+      "choices": [
+        " nurse",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " nurse",
+      "note": "the nurse watches the dog",
+      "choice_scores": [
+        {
+          "case_index": 71,
+          "choice_index": 0,
+          "full_logprob": -0.25753021240234375,
+          "mean_logprob": -0.25753021240234375,
+          "first_token_logprob": -0.25753021240234375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 71,
+          "choice_index": 1,
+          "full_logprob": -4.757530212402344,
+          "mean_logprob": -4.757530212402344,
+          "first_token_logprob": -4.757530212402344,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.5,
+      "mean_margin": 4.5,
+      "first_token_margin": 4.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_072",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the artist moves the queen\", the doer is the",
+      "choices": [
+        " artist",
+        " queen"
+      ],
+      "answer_index": 0,
+      "answer": " artist",
+      "note": "the artist moves the queen",
+      "choice_scores": [
+        {
+          "case_index": 72,
+          "choice_index": 0,
+          "full_logprob": -0.5823421478271484,
+          "mean_logprob": -0.5823421478271484,
+          "first_token_logprob": -0.5823421478271484,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 72,
+          "choice_index": 1,
+          "full_logprob": -4.082342147827148,
+          "mean_logprob": -4.082342147827148,
+          "first_token_logprob": -4.082342147827148,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5,
+      "mean_margin": 3.5,
+      "first_token_margin": 3.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_073",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the child carries the farmer\", the doer is the",
+      "choices": [
+        " child",
+        " farmer"
+      ],
+      "answer_index": 0,
+      "answer": " child",
+      "note": "the child carries the farmer",
+      "choice_scores": [
+        {
+          "case_index": 73,
+          "choice_index": 0,
+          "full_logprob": -0.35516357421875,
+          "mean_logprob": -0.35516357421875,
+          "first_token_logprob": -0.35516357421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 73,
+          "choice_index": 1,
+          "full_logprob": -4.10516357421875,
+          "mean_logprob": -4.10516357421875,
+          "first_token_logprob": -4.10516357421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_074",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the farmer helps the cat\", the doer is the",
+      "choices": [
+        " farmer",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " farmer",
+      "note": "the farmer helps the cat",
+      "choice_scores": [
+        {
+          "case_index": 74,
+          "choice_index": 0,
+          "full_logprob": -0.5634994506835938,
+          "mean_logprob": -0.5634994506835938,
+          "first_token_logprob": -0.5634994506835938,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 74,
+          "choice_index": 1,
+          "full_logprob": -4.500999450683594,
+          "mean_logprob": -4.500999450683594,
+          "first_token_logprob": -4.500999450683594,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.9375,
+      "mean_margin": 3.9375,
+      "first_token_margin": 3.9375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_075",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the soldier finds the driver\", the doer is the",
+      "choices": [
+        " soldier",
+        " driver"
+      ],
+      "answer_index": 0,
+      "answer": " soldier",
+      "note": "the soldier finds the driver",
+      "choice_scores": [
+        {
+          "case_index": 75,
+          "choice_index": 0,
+          "full_logprob": -0.6458606719970703,
+          "mean_logprob": -0.6458606719970703,
+          "first_token_logprob": -0.6458606719970703,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 75,
+          "choice_index": 1,
+          "full_logprob": -5.0682525634765625,
+          "mean_logprob": -5.0682525634765625,
+          "first_token_logprob": -5.0682525634765625,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.422391891479492,
+      "mean_margin": 4.422391891479492,
+      "first_token_margin": 4.422391891479492,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_076",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the chef pushes the soldier\", the doer is the",
+      "choices": [
+        " chef",
+        " soldier"
+      ],
+      "answer_index": 0,
+      "answer": " chef",
+      "note": "the chef pushes the soldier",
+      "choice_scores": [
+        {
+          "case_index": 76,
+          "choice_index": 0,
+          "full_logprob": -0.3009147644042969,
+          "mean_logprob": -0.3009147644042969,
+          "first_token_logprob": -0.3009147644042969,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 76,
+          "choice_index": 1,
+          "full_logprob": -4.675914764404297,
+          "mean_logprob": -4.675914764404297,
+          "first_token_logprob": -4.675914764404297,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.375,
+      "mean_margin": 4.375,
+      "first_token_margin": 4.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_077",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the guard follows the wolf\", the doer is the",
+      "choices": [
+        " guard",
+        " wolf"
+      ],
+      "answer_index": 0,
+      "answer": " guard",
+      "note": "the guard follows the wolf",
+      "choice_scores": [
+        {
+          "case_index": 77,
+          "choice_index": 0,
+          "full_logprob": -0.5585899353027344,
+          "mean_logprob": -0.5585899353027344,
+          "first_token_logprob": -0.5585899353027344,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 77,
+          "choice_index": 1,
+          "full_logprob": -4.683589935302734,
+          "mean_logprob": -4.683589935302734,
+          "first_token_logprob": -4.683589935302734,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_078",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the robot guides the pilot\", the doer is the",
+      "choices": [
+        " robot",
+        " pilot"
+      ],
+      "answer_index": 0,
+      "answer": " robot",
+      "note": "the robot guides the pilot",
+      "choice_scores": [
+        {
+          "case_index": 78,
+          "choice_index": 0,
+          "full_logprob": -0.19219970703125,
+          "mean_logprob": -0.19219970703125,
+          "first_token_logprob": -0.19219970703125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 78,
+          "choice_index": 1,
+          "full_logprob": -3.06719970703125,
+          "mean_logprob": -3.06719970703125,
+          "first_token_logprob": -3.06719970703125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.875,
+      "mean_margin": 2.875,
+      "first_token_margin": 2.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_079",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the bird guards the chef\", the doer is the",
+      "choices": [
+        " bird",
+        " chef"
+      ],
+      "answer_index": 0,
+      "answer": " bird",
+      "note": "the bird guards the chef",
+      "choice_scores": [
+        {
+          "case_index": 79,
+          "choice_index": 0,
+          "full_logprob": -0.16400146484375,
+          "mean_logprob": -0.16400146484375,
+          "first_token_logprob": -0.16400146484375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 79,
+          "choice_index": 1,
+          "full_logprob": -3.91400146484375,
+          "mean_logprob": -3.91400146484375,
+          "first_token_logprob": -3.91400146484375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_080",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the sheep\", the doer is the",
+      "choices": [
+        " dog",
+        " sheep"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "the dog chases the sheep",
+      "choice_scores": [
+        {
+          "case_index": 80,
+          "choice_index": 0,
+          "full_logprob": -0.32224464416503906,
+          "mean_logprob": -0.32224464416503906,
+          "first_token_logprob": -0.32224464416503906,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 80,
+          "choice_index": 1,
+          "full_logprob": -7.947244644165039,
+          "mean_logprob": -7.947244644165039,
+          "first_token_logprob": -7.947244644165039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.625,
+      "mean_margin": 7.625,
+      "first_token_margin": 7.625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_081",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat watches the doctor\", the doer is the",
+      "choices": [
+        " cat",
+        " doctor"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "the cat watches the doctor",
+      "choice_scores": [
+        {
+          "case_index": 81,
+          "choice_index": 0,
+          "full_logprob": -0.3179817199707031,
+          "mean_logprob": -0.3179817199707031,
+          "first_token_logprob": -0.3179817199707031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 81,
+          "choice_index": 1,
+          "full_logprob": -7.630481719970703,
+          "mean_logprob": -7.630481719970703,
+          "first_token_logprob": -7.630481719970703,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 7.3125,
+      "mean_margin": 7.3125,
+      "first_token_margin": 7.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_082",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf moves the guard\", the doer is the",
+      "choices": [
+        " wolf",
+        " guard"
+      ],
+      "answer_index": 0,
+      "answer": " wolf",
+      "note": "the wolf moves the guard",
+      "choice_scores": [
+        {
+          "case_index": 82,
+          "choice_index": 0,
+          "full_logprob": -1.154815673828125,
+          "mean_logprob": -1.154815673828125,
+          "first_token_logprob": -1.154815673828125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 82,
+          "choice_index": 1,
+          "full_logprob": -4.967315673828125,
+          "mean_logprob": -4.967315673828125,
+          "first_token_logprob": -4.967315673828125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.8125,
+      "mean_margin": 3.8125,
+      "first_token_margin": 3.8125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_083",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep carries the teacher\", the doer is the",
+      "choices": [
+        " sheep",
+        " teacher"
+      ],
+      "answer_index": 0,
+      "answer": " sheep",
+      "note": "the sheep carries the teacher",
+      "choice_scores": [
+        {
+          "case_index": 83,
+          "choice_index": 0,
+          "full_logprob": -1.3916702270507812,
+          "mean_logprob": -1.3916702270507812,
+          "first_token_logprob": -1.3916702270507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 83,
+          "choice_index": 1,
+          "full_logprob": -3.1416702270507812,
+          "mean_logprob": -3.1416702270507812,
+          "first_token_logprob": -3.1416702270507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.75,
+      "mean_margin": 1.75,
+      "first_token_margin": 1.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_084",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the nurse\", the doer is the",
+      "choices": [
+        " teacher",
+        " nurse"
+      ],
+      "answer_index": 0,
+      "answer": " teacher",
+      "note": "the teacher helps the nurse",
+      "choice_scores": [
+        {
+          "case_index": 84,
+          "choice_index": 0,
+          "full_logprob": -0.7485141754150391,
+          "mean_logprob": -0.7485141754150391,
+          "first_token_logprob": -0.7485141754150391,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 84,
+          "choice_index": 1,
+          "full_logprob": -3.123514175415039,
+          "mean_logprob": -3.123514175415039,
+          "first_token_logprob": -3.123514175415039,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.375,
+      "mean_margin": 2.375,
+      "first_token_margin": 2.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_085",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student finds the robot\", the doer is the",
+      "choices": [
+        " student",
+        " robot"
+      ],
+      "answer_index": 0,
+      "answer": " student",
+      "note": "the student finds the robot",
+      "choice_scores": [
+        {
+          "case_index": 85,
+          "choice_index": 0,
+          "full_logprob": -0.33499908447265625,
+          "mean_logprob": -0.33499908447265625,
+          "first_token_logprob": -0.33499908447265625,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 85,
+          "choice_index": 1,
+          "full_logprob": -4.459999084472656,
+          "mean_logprob": -4.459999084472656,
+          "first_token_logprob": -4.459999084472656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_086",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king pushes the student\", the doer is the",
+      "choices": [
+        " king",
+        " student"
+      ],
+      "answer_index": 0,
+      "answer": " king",
+      "note": "the king pushes the student",
+      "choice_scores": [
+        {
+          "case_index": 86,
+          "choice_index": 0,
+          "full_logprob": -0.2932548522949219,
+          "mean_logprob": -0.2932548522949219,
+          "first_token_logprob": -0.2932548522949219,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 86,
+          "choice_index": 1,
+          "full_logprob": -4.395378112792969,
+          "mean_logprob": -4.395378112792969,
+          "first_token_logprob": -4.395378112792969,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.102123260498047,
+      "mean_margin": 4.102123260498047,
+      "first_token_margin": 4.102123260498047,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_087",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the queen follows the artist\", the doer is the",
+      "choices": [
+        " queen",
+        " artist"
+      ],
+      "answer_index": 0,
+      "answer": " queen",
+      "note": "the queen follows the artist",
+      "choice_scores": [
+        {
+          "case_index": 87,
+          "choice_index": 0,
+          "full_logprob": -0.3926715850830078,
+          "mean_logprob": -0.3926715850830078,
+          "first_token_logprob": -0.3926715850830078,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 87,
+          "choice_index": 1,
+          "full_logprob": -3.517671585083008,
+          "mean_logprob": -3.517671585083008,
+          "first_token_logprob": -3.517671585083008,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.125,
+      "mean_margin": 3.125,
+      "first_token_margin": 3.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_088",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver guides the bird\", the doer is the",
+      "choices": [
+        " driver",
+        " bird"
+      ],
+      "answer_index": 0,
+      "answer": " driver",
+      "note": "the driver guides the bird",
+      "choice_scores": [
+        {
+          "case_index": 88,
+          "choice_index": 0,
+          "full_logprob": -0.3564739227294922,
+          "mean_logprob": -0.3564739227294922,
+          "first_token_logprob": -0.3564739227294922,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 88,
+          "choice_index": 1,
+          "full_logprob": -5.543973922729492,
+          "mean_logprob": -5.543973922729492,
+          "first_token_logprob": -5.543973922729492,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 5.1875,
+      "mean_margin": 5.1875,
+      "first_token_margin": 5.1875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_089",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the pilot guards the king\", the doer is the",
+      "choices": [
+        " pilot",
+        " king"
+      ],
+      "answer_index": 0,
+      "answer": " pilot",
+      "note": "the pilot guards the king",
+      "choice_scores": [
+        {
+          "case_index": 89,
+          "choice_index": 0,
+          "full_logprob": -1.0741004943847656,
+          "mean_logprob": -1.0741004943847656,
+          "first_token_logprob": -1.0741004943847656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 89,
+          "choice_index": 1,
+          "full_logprob": -3.1991004943847656,
+          "mean_logprob": -3.1991004943847656,
+          "first_token_logprob": -3.1991004943847656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.125,
+      "mean_margin": 2.125,
+      "first_token_margin": 2.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_090",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the doctor chases the child\", the doer is the",
+      "choices": [
+        " doctor",
+        " child"
+      ],
+      "answer_index": 0,
+      "answer": " doctor",
+      "note": "the doctor chases the child",
+      "choice_scores": [
+        {
+          "case_index": 90,
+          "choice_index": 0,
+          "full_logprob": -0.5574951171875,
+          "mean_logprob": -0.5574951171875,
+          "first_token_logprob": -0.5574951171875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 90,
+          "choice_index": 1,
+          "full_logprob": -3.5574951171875,
+          "mean_logprob": -3.5574951171875,
+          "first_token_logprob": -3.5574951171875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.0,
+      "mean_margin": 3.0,
+      "first_token_margin": 3.0,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_091",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the nurse watches the dog\", the doer is the",
+      "choices": [
+        " nurse",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " nurse",
+      "note": "the nurse watches the dog",
+      "choice_scores": [
+        {
+          "case_index": 91,
+          "choice_index": 0,
+          "full_logprob": -0.25753021240234375,
+          "mean_logprob": -0.25753021240234375,
+          "first_token_logprob": -0.25753021240234375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 91,
+          "choice_index": 1,
+          "full_logprob": -4.757530212402344,
+          "mean_logprob": -4.757530212402344,
+          "first_token_logprob": -4.757530212402344,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.5,
+      "mean_margin": 4.5,
+      "first_token_margin": 4.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_092",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the artist moves the queen\", the doer is the",
+      "choices": [
+        " artist",
+        " queen"
+      ],
+      "answer_index": 0,
+      "answer": " artist",
+      "note": "the artist moves the queen",
+      "choice_scores": [
+        {
+          "case_index": 92,
+          "choice_index": 0,
+          "full_logprob": -0.5823421478271484,
+          "mean_logprob": -0.5823421478271484,
+          "first_token_logprob": -0.5823421478271484,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 92,
+          "choice_index": 1,
+          "full_logprob": -4.082342147827148,
+          "mean_logprob": -4.082342147827148,
+          "first_token_logprob": -4.082342147827148,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5,
+      "mean_margin": 3.5,
+      "first_token_margin": 3.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_093",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the child carries the farmer\", the doer is the",
+      "choices": [
+        " child",
+        " farmer"
+      ],
+      "answer_index": 0,
+      "answer": " child",
+      "note": "the child carries the farmer",
+      "choice_scores": [
+        {
+          "case_index": 93,
+          "choice_index": 0,
+          "full_logprob": -0.35516357421875,
+          "mean_logprob": -0.35516357421875,
+          "first_token_logprob": -0.35516357421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 93,
+          "choice_index": 1,
+          "full_logprob": -4.10516357421875,
+          "mean_logprob": -4.10516357421875,
+          "first_token_logprob": -4.10516357421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_094",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the farmer helps the cat\", the doer is the",
+      "choices": [
+        " farmer",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " farmer",
+      "note": "the farmer helps the cat",
+      "choice_scores": [
+        {
+          "case_index": 94,
+          "choice_index": 0,
+          "full_logprob": -0.5634994506835938,
+          "mean_logprob": -0.5634994506835938,
+          "first_token_logprob": -0.5634994506835938,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 94,
+          "choice_index": 1,
+          "full_logprob": -4.563648223876953,
+          "mean_logprob": -4.563648223876953,
+          "first_token_logprob": -4.563648223876953,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.000148773193359,
+      "mean_margin": 4.000148773193359,
+      "first_token_margin": 4.000148773193359,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_095",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the soldier finds the driver\", the doer is the",
+      "choices": [
+        " soldier",
+        " driver"
+      ],
+      "answer_index": 0,
+      "answer": " soldier",
+      "note": "the soldier finds the driver",
+      "choice_scores": [
+        {
+          "case_index": 95,
+          "choice_index": 0,
+          "full_logprob": -0.6458606719970703,
+          "mean_logprob": -0.6458606719970703,
+          "first_token_logprob": -0.6458606719970703,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 95,
+          "choice_index": 1,
+          "full_logprob": -5.08336067199707,
+          "mean_logprob": -5.08336067199707,
+          "first_token_logprob": -5.08336067199707,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.4375,
+      "mean_margin": 4.4375,
+      "first_token_margin": 4.4375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_096",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the chef pushes the soldier\", the doer is the",
+      "choices": [
+        " chef",
+        " soldier"
+      ],
+      "answer_index": 0,
+      "answer": " chef",
+      "note": "the chef pushes the soldier",
+      "choice_scores": [
+        {
+          "case_index": 96,
+          "choice_index": 0,
+          "full_logprob": -0.3009147644042969,
+          "mean_logprob": -0.3009147644042969,
+          "first_token_logprob": -0.3009147644042969,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 96,
+          "choice_index": 1,
+          "full_logprob": -4.675914764404297,
+          "mean_logprob": -4.675914764404297,
+          "first_token_logprob": -4.675914764404297,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.375,
+      "mean_margin": 4.375,
+      "first_token_margin": 4.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_097",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the guard follows the wolf\", the doer is the",
+      "choices": [
+        " guard",
+        " wolf"
+      ],
+      "answer_index": 0,
+      "answer": " guard",
+      "note": "the guard follows the wolf",
+      "choice_scores": [
+        {
+          "case_index": 97,
+          "choice_index": 0,
+          "full_logprob": -0.5585899353027344,
+          "mean_logprob": -0.5585899353027344,
+          "first_token_logprob": -0.5585899353027344,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 97,
+          "choice_index": 1,
+          "full_logprob": -4.683589935302734,
+          "mean_logprob": -4.683589935302734,
+          "first_token_logprob": -4.683589935302734,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 4.125,
+      "mean_margin": 4.125,
+      "first_token_margin": 4.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_098",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the robot guides the pilot\", the doer is the",
+      "choices": [
+        " robot",
+        " pilot"
+      ],
+      "answer_index": 0,
+      "answer": " robot",
+      "note": "the robot guides the pilot",
+      "choice_scores": [
+        {
+          "case_index": 98,
+          "choice_index": 0,
+          "full_logprob": -0.19219970703125,
+          "mean_logprob": -0.19219970703125,
+          "first_token_logprob": -0.19219970703125,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 98,
+          "choice_index": 1,
+          "full_logprob": -3.06719970703125,
+          "mean_logprob": -3.06719970703125,
+          "first_token_logprob": -3.06719970703125,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.875,
+      "mean_margin": 2.875,
+      "first_token_margin": 2.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "svo_agent_099",
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the bird guards the chef\", the doer is the",
+      "choices": [
+        " bird",
+        " chef"
+      ],
+      "answer_index": 0,
+      "answer": " bird",
+      "note": "the bird guards the chef",
+      "choice_scores": [
+        {
+          "case_index": 99,
+          "choice_index": 0,
+          "full_logprob": -0.16400146484375,
+          "mean_logprob": -0.16400146484375,
+          "first_token_logprob": -0.16400146484375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 99,
+          "choice_index": 1,
+          "full_logprob": -3.91400146484375,
+          "mean_logprob": -3.91400146484375,
+          "first_token_logprob": -3.91400146484375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.75,
+      "mean_margin": 3.75,
+      "first_token_margin": 3.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    }
+  ]
+}

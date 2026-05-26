@@ -1,0 +1,1341 @@
+{
+  "model": "glm4",
+  "class": "GlmForCausalLM",
+  "num_cases": 60,
+  "aggregate": {
+    "overall": {
+      "n": 60,
+      "accuracy": 0.8833333253860474,
+      "mean_margin": 4.745312690734863,
+      "median_margin": 4.1875,
+      "min_margin": -2.1875
+    },
+    "per_category": {
+      "comparison": {
+        "n": 6,
+        "accuracy": 0.6666666865348816,
+        "mean_margin": 3.2408854961395264,
+        "median_margin": 2.5,
+        "min_margin": -0.5
+      },
+      "conditional": {
+        "n": 6,
+        "accuracy": 1.0,
+        "mean_margin": 9.833333015441895,
+        "median_margin": 8.40625,
+        "min_margin": 7.3125
+      },
+      "negation_yesno": {
+        "n": 8,
+        "accuracy": 0.875,
+        "mean_margin": 1.1640625,
+        "median_margin": 0.9375,
+        "min_margin": -0.9375
+      },
+      "passive_agent": {
+        "n": 6,
+        "accuracy": 1.0,
+        "mean_margin": 4.583333492279053,
+        "median_margin": 4.0625,
+        "min_margin": 0.5
+      },
+      "quantifier": {
+        "n": 6,
+        "accuracy": 0.6666666865348816,
+        "mean_margin": 1.4322916269302368,
+        "median_margin": 0.25,
+        "min_margin": -2.1875
+      },
+      "recursive_binding": {
+        "n": 6,
+        "accuracy": 0.8333333134651184,
+        "mean_margin": 2.6875,
+        "median_margin": 2.1875,
+        "min_margin": -0.3125
+      },
+      "svo_agent": {
+        "n": 8,
+        "accuracy": 0.875,
+        "mean_margin": 6.58984375,
+        "median_margin": 6.5625,
+        "min_margin": -0.1875
+      },
+      "temporal": {
+        "n": 6,
+        "accuracy": 1.0,
+        "mean_margin": 2.9739582538604736,
+        "median_margin": 1.9375,
+        "min_margin": 1.1875
+      },
+      "translation": {
+        "n": 8,
+        "accuracy": 1.0,
+        "mean_margin": 9.2724609375,
+        "median_margin": 8.3125,
+        "min_margin": 5.6875
+      }
+    }
+  },
+  "cases": [
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the dog chases the cat\", the doer is the",
+      "target": " dog",
+      "distractors": [
+        " cat"
+      ],
+      "target_first_token_id": 5562,
+      "distractor_first_token_ids": [
+        8250
+      ],
+      "target_first_token_piece": " dog",
+      "distractor_first_token_pieces": [
+        " cat"
+      ],
+      "target_logit": 14.6875,
+      "best_distractor_logit": 5.6875,
+      "margin": 9.0,
+      "correct": true,
+      "note": "the dog chases the cat"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the cat chases the dog\", the doer is the",
+      "target": " cat",
+      "distractors": [
+        " dog"
+      ],
+      "target_first_token_id": 8250,
+      "distractor_first_token_ids": [
+        5562
+      ],
+      "target_first_token_piece": " cat",
+      "distractor_first_token_pieces": [
+        " dog"
+      ],
+      "target_logit": 15.25,
+      "best_distractor_logit": 8.6875,
+      "margin": 6.5625,
+      "correct": true,
+      "note": "the cat chases the dog"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the wolf hunts the sheep\", the doer is the",
+      "target": " wolf",
+      "distractors": [
+        " sheep"
+      ],
+      "target_first_token_id": 36357,
+      "distractor_first_token_ids": [
+        31776
+      ],
+      "target_first_token_piece": " wolf",
+      "distractor_first_token_pieces": [
+        " sheep"
+      ],
+      "target_logit": 15.1875,
+      "best_distractor_logit": 4.8125,
+      "margin": 10.375,
+      "correct": true,
+      "note": "the wolf hunts the sheep"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the sheep follows the wolf\", the doer is the",
+      "target": " sheep",
+      "distractors": [
+        " wolf"
+      ],
+      "target_first_token_id": 31776,
+      "distractor_first_token_ids": [
+        36357
+      ],
+      "target_first_token_piece": " sheep",
+      "distractor_first_token_pieces": [
+        " wolf"
+      ],
+      "target_logit": 14.875,
+      "best_distractor_logit": 15.0625,
+      "margin": -0.1875,
+      "correct": false,
+      "note": "the sheep follows the wolf"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the teacher helps the student\", the doer is the",
+      "target": " teacher",
+      "distractors": [
+        " student"
+      ],
+      "target_first_token_id": 11074,
+      "distractor_first_token_ids": [
+        5458
+      ],
+      "target_first_token_piece": " teacher",
+      "distractor_first_token_pieces": [
+        " student"
+      ],
+      "target_logit": 14.125,
+      "best_distractor_logit": 9.9375,
+      "margin": 4.1875,
+      "correct": true,
+      "note": "the teacher helps the student"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the student thanks the teacher\", the doer is the",
+      "target": " student",
+      "distractors": [
+        " teacher"
+      ],
+      "target_first_token_id": 5458,
+      "distractor_first_token_ids": [
+        11074
+      ],
+      "target_first_token_piece": " student",
+      "distractor_first_token_pieces": [
+        " teacher"
+      ],
+      "target_logit": 14.25,
+      "best_distractor_logit": 9.375,
+      "margin": 4.875,
+      "correct": true,
+      "note": "the student thanks the teacher"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the king rules the city\", the doer is the",
+      "target": " king",
+      "distractors": [
+        " city"
+      ],
+      "target_first_token_id": 11472,
+      "distractor_first_token_ids": [
+        3283
+      ],
+      "target_first_token_piece": " king",
+      "distractor_first_token_pieces": [
+        " city"
+      ],
+      "target_logit": 14.8125,
+      "best_distractor_logit": 6.28125,
+      "margin": 8.53125,
+      "correct": true,
+      "note": "the king rules the city"
+    },
+    {
+      "category": "svo_agent",
+      "prompt": "In the sentence \"the driver controls the car\", the doer is the",
+      "target": " driver",
+      "distractors": [
+        " car"
+      ],
+      "target_first_token_id": 5579,
+      "distractor_first_token_ids": [
+        1803
+      ],
+      "target_first_token_piece": " driver",
+      "distractor_first_token_pieces": [
+        " car"
+      ],
+      "target_logit": 15.25,
+      "best_distractor_logit": 5.875,
+      "margin": 9.375,
+      "correct": true,
+      "note": "the driver controls the car"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the cat is chased by the dog\", the doer is the",
+      "target": " dog",
+      "distractors": [
+        " cat"
+      ],
+      "target_first_token_id": 5562,
+      "distractor_first_token_ids": [
+        8250
+      ],
+      "target_first_token_piece": " dog",
+      "distractor_first_token_pieces": [
+        " cat"
+      ],
+      "target_logit": 15.125,
+      "best_distractor_logit": 12.3125,
+      "margin": 2.8125,
+      "correct": true,
+      "note": "the cat is chased by the dog"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the student is helped by the teacher\", the doer is the",
+      "target": " teacher",
+      "distractors": [
+        " student"
+      ],
+      "target_first_token_id": 11074,
+      "distractor_first_token_ids": [
+        5458
+      ],
+      "target_first_token_piece": " teacher",
+      "distractor_first_token_pieces": [
+        " student"
+      ],
+      "target_logit": 13.5625,
+      "best_distractor_logit": 13.0625,
+      "margin": 0.5,
+      "correct": true,
+      "note": "the student is helped by the teacher"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the city is ruled by the king\", the doer is the",
+      "target": " king",
+      "distractors": [
+        " city"
+      ],
+      "target_first_token_id": 11472,
+      "distractor_first_token_ids": [
+        3283
+      ],
+      "target_first_token_piece": " king",
+      "distractor_first_token_pieces": [
+        " city"
+      ],
+      "target_logit": 15.125,
+      "best_distractor_logit": 11.0625,
+      "margin": 4.0625,
+      "correct": true,
+      "note": "the city is ruled by the king"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the sheep is hunted by the wolf\", the doer is the",
+      "target": " wolf",
+      "distractors": [
+        " sheep"
+      ],
+      "target_first_token_id": 36357,
+      "distractor_first_token_ids": [
+        31776
+      ],
+      "target_first_token_piece": " wolf",
+      "distractor_first_token_pieces": [
+        " sheep"
+      ],
+      "target_logit": 15.625,
+      "best_distractor_logit": 10.625,
+      "margin": 5.0,
+      "correct": true,
+      "note": "the sheep is hunted by the wolf"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the apple is eaten by the child\", the doer is the",
+      "target": " child",
+      "distractors": [
+        " apple"
+      ],
+      "target_first_token_id": 1682,
+      "distractor_first_token_ids": [
+        23205
+      ],
+      "target_first_token_piece": " child",
+      "distractor_first_token_pieces": [
+        " apple"
+      ],
+      "target_logit": 15.25,
+      "best_distractor_logit": 6.375,
+      "margin": 8.875,
+      "correct": true,
+      "note": "the apple is eaten by the child"
+    },
+    {
+      "category": "passive_agent",
+      "prompt": "In the sentence \"the bridge is guarded by the soldier\", the doer is the",
+      "target": " soldier",
+      "distractors": [
+        " bridge"
+      ],
+      "target_first_token_id": 26029,
+      "distractor_first_token_ids": [
+        14155
+      ],
+      "target_first_token_piece": " soldier",
+      "distractor_first_token_pieces": [
+        " bridge"
+      ],
+      "target_logit": 14.8125,
+      "best_distractor_logit": 8.5625,
+      "margin": 6.25,
+      "correct": true,
+      "note": "the bridge is guarded by the soldier"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The door is not open. Is the door open? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 9.125,
+      "best_distractor_logit": 8.375,
+      "margin": 0.75,
+      "correct": true,
+      "note": "The door is not open. Is the door open? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The light is not on. Is the light on? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 11.125,
+      "best_distractor_logit": 9.5625,
+      "margin": 1.5625,
+      "correct": true,
+      "note": "The light is not on. Is the light on? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The person is not happy. Is the person happy? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 9.875,
+      "best_distractor_logit": 8.9375,
+      "margin": 0.9375,
+      "correct": true,
+      "note": "The person is not happy. Is the person happy? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The machine is not working. Is the machine working? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 10.6875,
+      "best_distractor_logit": 8.9375,
+      "margin": 1.75,
+      "correct": true,
+      "note": "The machine is not working. Is the machine working? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "There is no reason. Is there a reason? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 10.375,
+      "best_distractor_logit": 11.3125,
+      "margin": -0.9375,
+      "correct": false,
+      "note": "There is no reason. Is there a reason? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The answer is not correct. Is the answer correct? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 10.375,
+      "best_distractor_logit": 10.125,
+      "margin": 0.25,
+      "correct": true,
+      "note": "The answer is not correct. Is the answer correct? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The place is safe. Is the place safe? Answer yes or no:",
+      "target": " yes",
+      "distractors": [
+        " no"
+      ],
+      "target_first_token_id": 9829,
+      "distractor_first_token_ids": [
+        902
+      ],
+      "target_first_token_piece": " yes",
+      "distractor_first_token_pieces": [
+        " no"
+      ],
+      "target_logit": 10.8125,
+      "best_distractor_logit": 8.375,
+      "margin": 2.4375,
+      "correct": true,
+      "note": "The place is safe. Is the place safe? Answer yes or no:"
+    },
+    {
+      "category": "negation_yesno",
+      "prompt": "The bottle is empty. Is the bottle empty? Answer yes or no:",
+      "target": " yes",
+      "distractors": [
+        " no"
+      ],
+      "target_first_token_id": 9829,
+      "distractor_first_token_ids": [
+        902
+      ],
+      "target_first_token_piece": " yes",
+      "distractor_first_token_pieces": [
+        " no"
+      ],
+      "target_logit": 11.5,
+      "best_distractor_logit": 8.9375,
+      "margin": 2.5625,
+      "correct": true,
+      "note": "The bottle is empty. Is the bottle empty? Answer yes or no:"
+    },
+    {
+      "category": "conditional",
+      "prompt": "If it rains, the ground gets wet. It rains. The ground gets",
+      "target": " wet",
+      "distractors": [
+        " dry"
+      ],
+      "target_first_token_id": 14391,
+      "distractor_first_token_ids": [
+        9055
+      ],
+      "target_first_token_piece": " wet",
+      "distractor_first_token_pieces": [
+        " dry"
+      ],
+      "target_logit": 16.375,
+      "best_distractor_logit": 7.96875,
+      "margin": 8.40625,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "conditional",
+      "prompt": "If the alarm rings, the guard wakes up. The alarm rings. The guard wakes",
+      "target": " up",
+      "distractors": [
+        " down"
+      ],
+      "target_first_token_id": 705,
+      "distractor_first_token_ids": [
+        1495
+      ],
+      "target_first_token_piece": " up",
+      "distractor_first_token_pieces": [
+        " down"
+      ],
+      "target_logit": 17.125,
+      "best_distractor_logit": 5.625,
+      "margin": 11.5,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "conditional",
+      "prompt": "If the switch is off, the lamp is dark. The switch is off. The lamp is",
+      "target": " dark",
+      "distractors": [
+        " bright"
+      ],
+      "target_first_token_id": 6319,
+      "distractor_first_token_ids": [
+        9901
+      ],
+      "target_first_token_piece": " dark",
+      "distractor_first_token_pieces": [
+        " bright"
+      ],
+      "target_logit": 17.625,
+      "best_distractor_logit": 8.5625,
+      "margin": 9.0625,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "conditional",
+      "prompt": "If the ice melts, the water flows. The ice melts. The water",
+      "target": " flows",
+      "distractors": [
+        " stops"
+      ],
+      "target_first_token_id": 27363,
+      "distractor_first_token_ids": [
+        17906
+      ],
+      "target_first_token_piece": " flows",
+      "distractor_first_token_pieces": [
+        " stops"
+      ],
+      "target_logit": 15.1875,
+      "best_distractor_logit": 7.34375,
+      "margin": 7.84375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "conditional",
+      "prompt": "If the key turns, the door opens. The key turns. The door",
+      "target": " opens",
+      "distractors": [
+        " closes"
+      ],
+      "target_first_token_id": 15873,
+      "distractor_first_token_ids": [
+        33090
+      ],
+      "target_first_token_piece": " opens",
+      "distractor_first_token_pieces": [
+        " closes"
+      ],
+      "target_logit": 14.9375,
+      "best_distractor_logit": 7.625,
+      "margin": 7.3125,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "conditional",
+      "prompt": "If the seed grows, the plant appears. The seed grows. The plant",
+      "target": " appears",
+      "distractors": [
+        " vanishes"
+      ],
+      "target_first_token_id": 7951,
+      "distractor_first_token_ids": [
+        5242
+      ],
+      "target_first_token_piece": " appears",
+      "distractor_first_token_pieces": [
+        " van"
+      ],
+      "target_logit": 16.5,
+      "best_distractor_logit": 1.625,
+      "margin": 14.875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "Alice is taller than Bob. The taller person is",
+      "target": " Alice",
+      "distractors": [
+        " Bob"
+      ],
+      "target_first_token_id": 29296,
+      "distractor_first_token_ids": [
+        14251
+      ],
+      "target_first_token_piece": " Alice",
+      "distractor_first_token_pieces": [
+        " Bob"
+      ],
+      "target_logit": 8.75,
+      "best_distractor_logit": 9.25,
+      "margin": -0.5,
+      "correct": false,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "Bob is shorter than Alice. The taller person is",
+      "target": " Alice",
+      "distractors": [
+        " Bob"
+      ],
+      "target_first_token_id": 29296,
+      "distractor_first_token_ids": [
+        14251
+      ],
+      "target_first_token_piece": " Alice",
+      "distractor_first_token_pieces": [
+        " Bob"
+      ],
+      "target_logit": 9.5,
+      "best_distractor_logit": 10.0,
+      "margin": -0.5,
+      "correct": false,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "The red box is heavier than the blue box. The heavier box is",
+      "target": " red",
+      "distractors": [
+        " blue"
+      ],
+      "target_first_token_id": 2518,
+      "distractor_first_token_ids": [
+        6303
+      ],
+      "target_first_token_piece": " red",
+      "distractor_first_token_pieces": [
+        " blue"
+      ],
+      "target_logit": 10.3125,
+      "best_distractor_logit": 7.21875,
+      "margin": 3.09375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "The blue box is lighter than the red box. The heavier box is",
+      "target": " red",
+      "distractors": [
+        " blue"
+      ],
+      "target_first_token_id": 2518,
+      "distractor_first_token_ids": [
+        6303
+      ],
+      "target_first_token_piece": " red",
+      "distractor_first_token_pieces": [
+        " blue"
+      ],
+      "target_logit": 11.0,
+      "best_distractor_logit": 8.5,
+      "margin": 2.5,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "Paris is larger than the village. The larger place is",
+      "target": " Paris",
+      "distractors": [
+        " village"
+      ],
+      "target_first_token_id": 12089,
+      "distractor_first_token_ids": [
+        14117
+      ],
+      "target_first_token_piece": " Paris",
+      "distractor_first_token_pieces": [
+        " village"
+      ],
+      "target_logit": 10.375,
+      "best_distractor_logit": 1.2734375,
+      "margin": 9.1015625,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "comparison",
+      "prompt": "The river is longer than the road. The longer thing is the",
+      "target": " river",
+      "distractors": [
+        " road"
+      ],
+      "target_first_token_id": 14785,
+      "distractor_first_token_ids": [
+        5636
+      ],
+      "target_first_token_piece": " river",
+      "distractor_first_token_pieces": [
+        " road"
+      ],
+      "target_logit": 14.1875,
+      "best_distractor_logit": 8.4375,
+      "margin": 5.75,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Yesterday, Maria walked to school. The walking happened in the",
+      "target": " past",
+      "distractors": [
+        " future"
+      ],
+      "target_first_token_id": 3267,
+      "distractor_first_token_ids": [
+        3853
+      ],
+      "target_first_token_piece": " past",
+      "distractor_first_token_pieces": [
+        " future"
+      ],
+      "target_logit": 11.125,
+      "best_distractor_logit": 5.40625,
+      "margin": 5.71875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Tomorrow, Maria will walk to school. The walking happens in the",
+      "target": " future",
+      "distractors": [
+        " past"
+      ],
+      "target_first_token_id": 3853,
+      "distractor_first_token_ids": [
+        3267
+      ],
+      "target_first_token_piece": " future",
+      "distractor_first_token_pieces": [
+        " past"
+      ],
+      "target_logit": 9.4375,
+      "best_distractor_logit": 7.9375,
+      "margin": 1.5,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Last year, the tree grew. The growing happened in the",
+      "target": " past",
+      "distractors": [
+        " future"
+      ],
+      "target_first_token_id": 3267,
+      "distractor_first_token_ids": [
+        3853
+      ],
+      "target_first_token_piece": " past",
+      "distractor_first_token_pieces": [
+        " future"
+      ],
+      "target_logit": 10.9375,
+      "best_distractor_logit": 5.75,
+      "margin": 5.1875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Next year, the tree will grow. The growing happens in the",
+      "target": " future",
+      "distractors": [
+        " past"
+      ],
+      "target_first_token_id": 3853,
+      "distractor_first_token_ids": [
+        3267
+      ],
+      "target_first_token_piece": " future",
+      "distractor_first_token_pieces": [
+        " past"
+      ],
+      "target_logit": 7.21875,
+      "best_distractor_logit": 6.03125,
+      "margin": 1.1875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Now, the child is eating. The eating is happening in the",
+      "target": " present",
+      "distractors": [
+        " past"
+      ],
+      "target_first_token_id": 3042,
+      "distractor_first_token_ids": [
+        3267
+      ],
+      "target_first_token_piece": " present",
+      "distractor_first_token_pieces": [
+        " past"
+      ],
+      "target_logit": 9.75,
+      "best_distractor_logit": 7.4375,
+      "margin": 2.3125,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "temporal",
+      "prompt": "Before dinner, Sam washed his hands. The washing happened",
+      "target": " before",
+      "distractors": [
+        " after"
+      ],
+      "target_first_token_id": 1573,
+      "distractor_first_token_ids": [
+        1283
+      ],
+      "target_first_token_piece": " before",
+      "distractor_first_token_pieces": [
+        " after"
+      ],
+      "target_logit": 12.9375,
+      "best_distractor_logit": 11.0,
+      "margin": 1.9375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The dog that chased the cat was brown. The brown animal was the",
+      "target": " dog",
+      "distractors": [
+        " cat"
+      ],
+      "target_first_token_id": 5562,
+      "distractor_first_token_ids": [
+        8250
+      ],
+      "target_first_token_piece": " dog",
+      "distractor_first_token_pieces": [
+        " cat"
+      ],
+      "target_logit": 14.75,
+      "best_distractor_logit": 12.5625,
+      "margin": 2.1875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The cat that the dog chased was black. The black animal was the",
+      "target": " cat",
+      "distractors": [
+        " dog"
+      ],
+      "target_first_token_id": 8250,
+      "distractor_first_token_ids": [
+        5562
+      ],
+      "target_first_token_piece": " cat",
+      "distractor_first_token_pieces": [
+        " dog"
+      ],
+      "target_logit": 15.0,
+      "best_distractor_logit": 12.25,
+      "margin": 2.75,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The student who thanked the teacher was polite. The polite person was the",
+      "target": " student",
+      "distractors": [
+        " teacher"
+      ],
+      "target_first_token_id": 5458,
+      "distractor_first_token_ids": [
+        11074
+      ],
+      "target_first_token_piece": " student",
+      "distractor_first_token_pieces": [
+        " teacher"
+      ],
+      "target_logit": 14.25,
+      "best_distractor_logit": 9.8125,
+      "margin": 4.4375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The teacher who helped the student was kind. The kind person was the",
+      "target": " teacher",
+      "distractors": [
+        " student"
+      ],
+      "target_first_token_id": 11074,
+      "distractor_first_token_ids": [
+        5458
+      ],
+      "target_first_token_piece": " teacher",
+      "distractor_first_token_pieces": [
+        " student"
+      ],
+      "target_logit": 15.4375,
+      "best_distractor_logit": 13.5625,
+      "margin": 1.875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The key that opened the door was small. The small thing was the",
+      "target": " key",
+      "distractors": [
+        " door"
+      ],
+      "target_first_token_id": 1376,
+      "distractor_first_token_ids": [
+        6006
+      ],
+      "target_first_token_piece": " key",
+      "distractor_first_token_pieces": [
+        " door"
+      ],
+      "target_logit": 16.75,
+      "best_distractor_logit": 11.5625,
+      "margin": 5.1875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "recursive_binding",
+      "prompt": "The city that the king ruled was old. The old thing was the",
+      "target": " city",
+      "distractors": [
+        " king"
+      ],
+      "target_first_token_id": 3283,
+      "distractor_first_token_ids": [
+        11472
+      ],
+      "target_first_token_piece": " city",
+      "distractor_first_token_pieces": [
+        " king"
+      ],
+      "target_logit": 12.25,
+      "best_distractor_logit": 12.5625,
+      "margin": -0.3125,
+      "correct": false,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "All birds in this story can fly. A robin is a bird in this story. Can the robin fly? Answer yes or no:",
+      "target": " yes",
+      "distractors": [
+        " no"
+      ],
+      "target_first_token_id": 9829,
+      "distractor_first_token_ids": [
+        902
+      ],
+      "target_first_token_piece": " yes",
+      "distractor_first_token_pieces": [
+        " no"
+      ],
+      "target_logit": 11.5625,
+      "best_distractor_logit": 6.28125,
+      "margin": 5.28125,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "No stones in this story can swim. A pebble is a stone in this story. Can the pebble swim? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 7.75,
+      "best_distractor_logit": 9.9375,
+      "margin": -2.1875,
+      "correct": false,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "Some students passed the test. Did at least one student pass? Answer yes or no:",
+      "target": " yes",
+      "distractors": [
+        " no"
+      ],
+      "target_first_token_id": 9829,
+      "distractor_first_token_ids": [
+        902
+      ],
+      "target_first_token_piece": " yes",
+      "distractor_first_token_pieces": [
+        " no"
+      ],
+      "target_logit": 11.6875,
+      "best_distractor_logit": 8.1875,
+      "margin": 3.5,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "No visitors arrived. Did any visitor arrive? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 9.4375,
+      "best_distractor_logit": 10.375,
+      "margin": -0.9375,
+      "correct": false,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "Every key opened a door. Did each key open a door? Answer yes or no:",
+      "target": " yes",
+      "distractors": [
+        " no"
+      ],
+      "target_first_token_id": 9829,
+      "distractor_first_token_ids": [
+        902
+      ],
+      "target_first_token_piece": " yes",
+      "distractor_first_token_pieces": [
+        " no"
+      ],
+      "target_logit": 11.375,
+      "best_distractor_logit": 8.6875,
+      "margin": 2.6875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "quantifier",
+      "prompt": "Few people came to the room. Did many people come? Answer yes or no:",
+      "target": " no",
+      "distractors": [
+        " yes"
+      ],
+      "target_first_token_id": 902,
+      "distractor_first_token_ids": [
+        9829
+      ],
+      "target_first_token_piece": " no",
+      "distractor_first_token_pieces": [
+        " yes"
+      ],
+      "target_logit": 9.375,
+      "best_distractor_logit": 9.125,
+      "margin": 0.25,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to Chinese: apple\nChinese:",
+      "target": "苹果",
+      "distractors": [
+        " 香蕉"
+      ],
+      "target_first_token_id": 102083,
+      "distractor_first_token_ids": [
+        18109
+      ],
+      "target_first_token_piece": "苹果",
+      "distractor_first_token_pieces": [
+        " �"
+      ],
+      "target_logit": 21.5,
+      "best_distractor_logit": 13.1875,
+      "margin": 8.3125,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to Chinese: cat\nChinese:",
+      "target": "猫",
+      "distractors": [
+        "狗"
+      ],
+      "target_first_token_id": 100713,
+      "distractor_first_token_ids": [
+        100555
+      ],
+      "target_first_token_piece": "猫",
+      "distractor_first_token_pieces": [
+        "狗"
+      ],
+      "target_logit": 22.125,
+      "best_distractor_logit": 10.1875,
+      "margin": 11.9375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to Chinese: water\nChinese:",
+      "target": "水",
+      "distractors": [
+        "火"
+      ],
+      "target_first_token_id": 98442,
+      "distractor_first_token_ids": [
+        98957
+      ],
+      "target_first_token_piece": "水",
+      "distractor_first_token_pieces": [
+        "火"
+      ],
+      "target_logit": 19.125,
+      "best_distractor_logit": 6.65625,
+      "margin": 12.46875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to Chinese: sun\nChinese:",
+      "target": "太阳",
+      "distractors": [
+        "月亮"
+      ],
+      "target_first_token_id": 101327,
+      "distractor_first_token_ids": [
+        107680
+      ],
+      "target_first_token_piece": "太阳",
+      "distractor_first_token_pieces": [
+        "月亮"
+      ],
+      "target_logit": 18.5,
+      "best_distractor_logit": 5.875,
+      "margin": 12.625,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to English: 苹果\nEnglish:",
+      "target": " apple",
+      "distractors": [
+        " banana"
+      ],
+      "target_first_token_id": 23205,
+      "distractor_first_token_ids": [
+        42851
+      ],
+      "target_first_token_piece": " apple",
+      "distractor_first_token_pieces": [
+        " banana"
+      ],
+      "target_logit": 11.5,
+      "best_distractor_logit": 1.9609375,
+      "margin": 9.5390625,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to English: 狗\nEnglish:",
+      "target": " dog",
+      "distractors": [
+        " cat"
+      ],
+      "target_first_token_id": 5562,
+      "distractor_first_token_ids": [
+        8250
+      ],
+      "target_first_token_piece": " dog",
+      "distractor_first_token_pieces": [
+        " cat"
+      ],
+      "target_logit": 10.5625,
+      "best_distractor_logit": 4.875,
+      "margin": 5.6875,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to English: 水\nEnglish:",
+      "target": " water",
+      "distractors": [
+        " fire"
+      ],
+      "target_first_token_id": 3015,
+      "distractor_first_token_ids": [
+        3940
+      ],
+      "target_first_token_piece": " water",
+      "distractor_first_token_pieces": [
+        " fire"
+      ],
+      "target_logit": 11.1875,
+      "best_distractor_logit": 4.34375,
+      "margin": 6.84375,
+      "correct": true,
+      "note": ""
+    },
+    {
+      "category": "translation",
+      "prompt": "Translate to English: 太阳\nEnglish:",
+      "target": " sun",
+      "distractors": [
+        " moon"
+      ],
+      "target_first_token_id": 7015,
+      "distractor_first_token_ids": [
+        17762
+      ],
+      "target_first_token_piece": " sun",
+      "distractor_first_token_pieces": [
+        " moon"
+      ],
+      "target_logit": 9.75,
+      "best_distractor_logit": 2.984375,
+      "margin": 6.765625,
+      "correct": true,
+      "note": ""
+    }
+  ]
+}

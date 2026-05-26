@@ -1,0 +1,85 @@
+{
+  "model": "glm4",
+  "class": "GlmForCausalLM",
+  "n_layers": 40,
+  "tested_layers": [
+    0,
+    10,
+    20,
+    30,
+    39
+  ],
+  "best_probe_layer": 39,
+  "probe_by_layer": {
+    "0": {
+      "fruit_mean": -0.01059686578810215,
+      "control_mean": -0.019950751215219498,
+      "fruit_control_margin": 0.009353885427117348,
+      "eval_scores": [
+        -0.010533466003835201,
+        -0.01186448335647583,
+        -0.011051008477807045,
+        -0.016214953735470772
+      ],
+      "direction_norm": 0.9999998807907104
+    },
+    "10": {
+      "fruit_mean": 0.7170991897583008,
+      "control_mean": -0.3634262681007385,
+      "fruit_control_margin": 1.0805253982543945,
+      "eval_scores": [
+        0.513020932674408,
+        -0.11782211810350418,
+        0.6781020760536194,
+        -0.5545836687088013
+      ],
+      "direction_norm": 1.0000001192092896
+    },
+    "20": {
+      "fruit_mean": 1.5026806592941284,
+      "control_mean": -2.4875221252441406,
+      "fruit_control_margin": 3.9902029037475586,
+      "eval_scores": [
+        0.03673417866230011,
+        -0.870951771736145,
+        0.9129847288131714,
+        -3.188746452331543
+      ],
+      "direction_norm": 1.0000001192092896
+    },
+    "30": {
+      "fruit_mean": 18.129093170166016,
+      "control_mean": -16.88100814819336,
+      "fruit_control_margin": 35.010101318359375,
+      "eval_scores": [
+        14.810044288635254,
+        -14.569534301757812,
+        22.707935333251953,
+        -17.882518768310547
+      ],
+      "direction_norm": 1.000000238418579
+    },
+    "39": {
+      "fruit_mean": 79.8852310180664,
+      "control_mean": -42.62086486816406,
+      "fruit_control_margin": 122.50609588623047,
+      "eval_scores": [
+        78.13555908203125,
+        -25.35757827758789,
+        85.01190185546875,
+        -55.997352600097656
+      ],
+      "direction_norm": 1.0
+    }
+  },
+  "ablation": {
+    "prompt": "A mango is a kind of",
+    "clean_fruit_minus_tool_logit": 9.890625,
+    "ablated_fruit_minus_tool_logit": 1.0,
+    "delta_after_removing_fruit_direction": -8.890625
+  },
+  "gpu_gb": {
+    "allocated": 18.808423424,
+    "reserved": 18.830327808
+  }
+}
