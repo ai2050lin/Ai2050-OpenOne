@@ -904,3 +904,50 @@
 - P0：建立第二套模板复测，判断低分是否稳定跨模板存在。
 - P1：如果未来要提高凭证安全性，应安装 Git Credential Manager 或 `git-credential-libsecret`，把明文 store 迁移到系统密钥环。
 
+## Phase 17: 推送记录不可见的原因复核 [2026-05-26 11:46]
+
+### 命令
+- `git status --porcelain=v1 -b`
+- `git log --oneline --decorate -5 --all --date-order`
+- `git ls-remote origin refs/heads/main`
+- `git branch -vv && git remote -v && git config --show-origin --get-regexp '^(credential\.|user\.|http\.)'`
+- `date '+%Y-%m-%d %H:%M %Z'`
+- `git show --no-patch --format='commit=%H%nauthor=%an <%ae>%ncommitter=%cn <%ce>%ndate=%cI%nsubject=%s' HEAD`
+- `git rev-parse HEAD origin/main && git ls-remote origin refs/heads/main`
+- `rg '^## Phase [0-9]+' research/gpt5/docs/AGI_GPT5_MEMO.md | tail -5`
+
+### 生成脚本
+- 无。本次只做 Git 远端状态核验，没有新增脚本。
+
+### 原理
+- 判断 push 是否真正成功，最可靠的证据不是 VSCode 输出面板或浏览器缓存，而是远端引用：
+  - `git ls-remote origin refs/heads/main` 直接查询 GitHub 上 main 分支当前指向的提交；
+  - `git rev-parse HEAD origin/main` 对比本地 HEAD 与本地远端跟踪分支；
+  - 如果三者一致，说明本地、远端跟踪分支、GitHub 远端 main 已同步。
+- “看不到推送记录”可能有不同含义：
+  - 仓库 commit 列表看不到：通常是浏览器缓存、看错仓库、看错分支、或页面未刷新；
+  - VSCode Git 输出看不到：因为上次 push 是我在终端中执行的，未必出现在用户打开的 VSCode Git 日志视图里；
+  - GitHub 个人贡献图看不到：贡献图有额外规则，可能需要等待同步，且要求提交邮箱能关联到 GitHub 账号；私有仓库贡献还受个人资料设置影响。
+
+### 结果
+- 当前本地状态：`main...origin/main`，没有 ahead/behind，说明本地跟踪分支已同步。
+- 最新本地提交：
+  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247`
+  - author：`ai2050lin <ai2050lin@users.noreply.github.com>`
+  - subject：`Phase 286: Record Git push credential setup`
+  - date：`2026-05-26T11:42:08+08:00`
+- `git rev-parse HEAD origin/main` 两行均为：
+  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247`
+- `git ls-remote origin refs/heads/main` 返回：
+  - `5c08eaed0e7b5353febcef8f27ac9682f6c8b247 refs/heads/main`
+- 结论：上一次 push 已经真实到达 GitHub 远端 main。若界面看不到，优先检查页面刷新、当前仓库是否为 `ai2050lin/Ai2050-OpenOne`、分支是否为 `main`、以及看到的是 commit 列表还是个人贡献图。
+
+### 理论研究进展
+- 本次不涉及模型实验，不新增语言数学结构结论。
+- 工程层面确认：远端版本链路是正常的，下一步科研工作可以基于已经同步到 GitHub 的提交继续推进。
+
+### 下一步大任务
+- P0：若要看仓库推送结果，打开 GitHub 仓库的 `main` 分支 commit 列表，确认最新提交哈希。
+- P0：若要看个人贡献图，等待 GitHub 同步，并确认提交邮箱是否是账号设置中提供的 noreply 邮箱。
+- P1：以后若出现“本地显示已推送但页面不可见”，第一步固定运行 `git ls-remote origin refs/heads/main` 核验远端真实指针。
+
