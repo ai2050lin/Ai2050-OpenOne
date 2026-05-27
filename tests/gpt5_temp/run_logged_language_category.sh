@@ -3,15 +3,37 @@ set -euo pipefail
 
 cd /home/rankrank/Documents/OpenOne/Ai2050-OpenOne
 
+OPENONE_CONSERVATIVE_ENV="${OPENONE_CONSERVATIVE_ENV:-openone-cuda121}"
+OPENONE_USE_CONSERVATIVE_ENV="${OPENONE_USE_CONSERVATIVE_ENV:-1}"
+if [[ "$OPENONE_USE_CONSERVATIVE_ENV" == "1" && "${CONDA_DEFAULT_ENV:-}" != "$OPENONE_CONSERVATIVE_ENV" ]]; then
+  if command -v conda >/dev/null 2>&1; then
+    source "$(conda info --base)/etc/profile.d/conda.sh"
+  elif [[ -f /home/rankrank/miniconda3/etc/profile.d/conda.sh ]]; then
+    source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+  else
+    echo "conda was not found; cannot activate conservative env ${OPENONE_CONSERVATIVE_ENV}" >&2
+    exit 2
+  fi
+  conda activate "$OPENONE_CONSERVATIVE_ENV"
+fi
+
 MODEL="${1:?usage: $0 MODEL CATEGORY [cases_per_category]}"
 CATEGORY="${2:?usage: $0 MODEL CATEGORY [cases_per_category]}"
 CASES_PER_CATEGORY="${3:-10}"
-OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_systematic_language_v2_driver595_stage10}"
+OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_systematic_language_v2_conservative_stage10}"
 BATCH_SIZE="${BATCH_SIZE:-1}"
 CASE_CHUNK_SIZE="${CASE_CHUNK_SIZE:-1}"
 PROGRESS_EVERY="${PROGRESS_EVERY:-2}"
 MAX_SECONDS="${MAX_SECONDS:-1800}"
 ALLOW_EXISTING_GPU_PROCS="${ALLOW_EXISTING_GPU_PROCS:-0}"
+
+if [[ -z "${PROBE_TORCH_DTYPE:-}" ]]; then
+  case "$MODEL" in
+    deepseek7b) export PROBE_TORCH_DTYPE="bfloat16" ;;
+    qwen3|glm4) export PROBE_TORCH_DTYPE="float16" ;;
+    *) export PROBE_TORCH_DTYPE="bfloat16" ;;
+  esac
+fi
 
 RUN_ID="$(date +%Y%m%d_%H%M%S)_${MODEL}_${CATEGORY}"
 LOG_ROOT="results/gpt5_gpu_lock_logs"
@@ -27,6 +49,8 @@ echo "model=${MODEL}"
 echo "category=${CATEGORY}"
 echo "cases_per_category=${CASES_PER_CATEGORY}"
 echo "output_dir=${OUTPUT_DIR}"
+echo "conda_env=${CONDA_DEFAULT_ENV:-none}"
+echo "probe_torch_dtype=${PROBE_TORCH_DTYPE}"
 echo
 
 cleanup() {

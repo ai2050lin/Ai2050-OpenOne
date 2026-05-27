@@ -1,0 +1,19 @@
+=== Phase289 conservative logged run ===
+2026-05-27 22:49:18 CST
+run_id=20260527_224918_phase289_glm4
+model=glm4
+output_dir=results/gpt5_phase289_contract_expanded_lpr
+conda_env=openone-cuda121
+probe_torch_dtype=float16
+args=--categories logical,passive,recursive --max-pairs-per-subtype 999 --layer-stride 4 --alphas 0,0.25,0.5,0.75,1.0 --progress-every 4
+
+=== Start kernel log follower ===
+=== Start lightweight GPU/process monitor ===
+=== Run Phase289 ===
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  2.47it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.37it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  1.93it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.06it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.09it/s]
+[phase289] model=glm4 class=GlmForCausalLM layers=40
+[phase289] pairs=104 categories=['logical', 'passive', 'recursive']
+[phase289] target_layers=[0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 39]
+[phase289] alphas=[0.0, 0.25, 0.5, 0.75, 1.0] patch_types=['attn', 'mlp', 'both', 'resid', 'cross_battn_amlp', 'cross_aattn_bmlp']
+[phase289] progress pairs=4/104 results=1320 elapsed=144.1s
+[phase289] progress pairs=8/104 results=2640 elapsed=291.6s

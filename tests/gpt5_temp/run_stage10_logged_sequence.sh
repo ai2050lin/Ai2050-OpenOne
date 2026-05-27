@@ -3,7 +3,21 @@ set -euo pipefail
 
 cd /home/rankrank/Documents/OpenOne/Ai2050-OpenOne
 
-OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_systematic_language_v2_driver595_stage10}"
+OPENONE_CONSERVATIVE_ENV="${OPENONE_CONSERVATIVE_ENV:-openone-cuda121}"
+OPENONE_USE_CONSERVATIVE_ENV="${OPENONE_USE_CONSERVATIVE_ENV:-1}"
+if [[ "$OPENONE_USE_CONSERVATIVE_ENV" == "1" && "${CONDA_DEFAULT_ENV:-}" != "$OPENONE_CONSERVATIVE_ENV" ]]; then
+  if command -v conda >/dev/null 2>&1; then
+    source "$(conda info --base)/etc/profile.d/conda.sh"
+  elif [[ -f /home/rankrank/miniconda3/etc/profile.d/conda.sh ]]; then
+    source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+  else
+    echo "conda was not found; cannot activate conservative env ${OPENONE_CONSERVATIVE_ENV}" >&2
+    exit 2
+  fi
+  conda activate "$OPENONE_CONSERVATIVE_ENV"
+fi
+
+OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_systematic_language_v2_conservative_stage10}"
 CASES_PER_CATEGORY="${CASES_PER_CATEGORY:-10}"
 CATEGORIES=(
   svo_agent
@@ -25,6 +39,8 @@ fi
 echo "=== Logged stage10 sequence ==="
 date '+%Y-%m-%d %H:%M:%S %Z'
 echo "output_dir=${OUTPUT_DIR}"
+echo "conda_env=${CONDA_DEFAULT_ENV:-none}"
+echo "dtype_default=qwen3/glm4=float16, deepseek7b=bfloat16"
 echo "models=${MODELS[*]}"
 echo
 

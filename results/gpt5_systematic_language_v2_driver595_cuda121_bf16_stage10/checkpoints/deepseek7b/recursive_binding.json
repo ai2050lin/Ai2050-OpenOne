@@ -1,0 +1,425 @@
+{
+  "model": "deepseek7b",
+  "dataset_version": "v2_unique_20260526",
+  "class": "Qwen2ForCausalLM",
+  "category": "recursive_binding",
+  "cases_per_category": 10,
+  "batch_size": 1,
+  "case_chunk_size": 1,
+  "complete": true,
+  "num_cases": 10,
+  "aggregate": {
+    "overall": {
+      "full": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.2874999940395355,
+        "median_margin": 0.125,
+        "min_margin": -1.25
+      },
+      "mean": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.2874999940395355,
+        "median_margin": 0.125,
+        "min_margin": -1.25
+      },
+      "first_token": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.2874999940395355,
+        "median_margin": 0.125,
+        "min_margin": -1.25
+      },
+      "first_full_disagreements": 0
+    },
+    "per_category": {
+      "recursive_binding": {
+        "full": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.2874999940395355,
+          "median_margin": 0.125,
+          "min_margin": -1.25
+        },
+        "mean": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.2874999940395355,
+          "median_margin": 0.125,
+          "min_margin": -1.25
+        },
+        "first_token": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.2874999940395355,
+          "median_margin": 0.125,
+          "min_margin": -1.25
+        },
+        "first_full_disagreements": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "recursive_binding_000",
+      "category": "recursive_binding",
+      "prompt": "The dog that chased the cat was young. The young one was the",
+      "choices": [
+        " dog",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -1.7874069213867188,
+          "mean_logprob": -1.7874069213867188,
+          "first_token_logprob": -1.7874069213867188,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -2.5999069213867188,
+          "mean_logprob": -2.5999069213867188,
+          "first_token_logprob": -2.5999069213867188,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.8125,
+      "mean_margin": 0.8125,
+      "first_token_margin": 0.8125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_001",
+      "category": "recursive_binding",
+      "prompt": "The cat that the dog chased was young. The young one was the",
+      "choices": [
+        " cat",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -2.0323238372802734,
+          "mean_logprob": -2.0323238372802734,
+          "first_token_logprob": -2.0323238372802734,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -2.0323238372802734,
+          "mean_logprob": -2.0323238372802734,
+          "first_token_logprob": -2.0323238372802734,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.0,
+      "mean_margin": 0.0,
+      "first_token_margin": 0.0,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "recursive_binding_002",
+      "category": "recursive_binding",
+      "prompt": "The dog near the cat was young. The young one was the",
+      "choices": [
+        " dog",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -1.8143234252929688,
+          "mean_logprob": -1.8143234252929688,
+          "first_token_logprob": -1.8143234252929688,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -1.9393234252929688,
+          "mean_logprob": -1.9393234252929688,
+          "first_token_logprob": -1.9393234252929688,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.125,
+      "mean_margin": 0.125,
+      "first_token_margin": 0.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_003",
+      "category": "recursive_binding",
+      "prompt": "The cat beside the dog was young. The young one was the",
+      "choices": [
+        " cat",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -1.4777088165283203,
+          "mean_logprob": -1.4777088165283203,
+          "first_token_logprob": -1.4777088165283203,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -1.6027088165283203,
+          "mean_logprob": -1.6027088165283203,
+          "first_token_logprob": -1.6027088165283203,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.125,
+      "mean_margin": 0.125,
+      "first_token_margin": 0.125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_004",
+      "category": "recursive_binding",
+      "prompt": "The dog that followed the cat was green. The green one was the",
+      "choices": [
+        " dog",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -2.856048583984375,
+          "mean_logprob": -2.856048583984375,
+          "first_token_logprob": -2.856048583984375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -2.106048583984375,
+          "mean_logprob": -2.106048583984375,
+          "first_token_logprob": -2.106048583984375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": -0.75,
+      "mean_margin": -0.75,
+      "first_token_margin": -0.75,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "recursive_binding_005",
+      "category": "recursive_binding",
+      "prompt": "The cat that the dog followed was green. The green one was the",
+      "choices": [
+        " cat",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -0.8730506896972656,
+          "mean_logprob": -0.8730506896972656,
+          "first_token_logprob": -0.8730506896972656,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -1.2480506896972656,
+          "mean_logprob": -1.2480506896972656,
+          "first_token_logprob": -1.2480506896972656,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.375,
+      "mean_margin": 0.375,
+      "first_token_margin": 0.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_006",
+      "category": "recursive_binding",
+      "prompt": "The dog near the cat was green. The green one was the",
+      "choices": [
+        " dog",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -0.7171192169189453,
+          "mean_logprob": -0.7171192169189453,
+          "first_token_logprob": -0.7171192169189453,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -1.4671192169189453,
+          "mean_logprob": -1.4671192169189453,
+          "first_token_logprob": -1.4671192169189453,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.75,
+      "mean_margin": 0.75,
+      "first_token_margin": 0.75,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_007",
+      "category": "recursive_binding",
+      "prompt": "The cat beside the dog was green. The green one was the",
+      "choices": [
+        " cat",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -2.1133499145507812,
+          "mean_logprob": -2.1133499145507812,
+          "first_token_logprob": -2.1133499145507812,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -1.2383499145507812,
+          "mean_logprob": -1.2383499145507812,
+          "first_token_logprob": -1.2383499145507812,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": -0.875,
+      "mean_margin": -0.875,
+      "first_token_margin": -0.875,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "recursive_binding_008",
+      "category": "recursive_binding",
+      "prompt": "The dog that helped the cat was large. The large one was the",
+      "choices": [
+        " dog",
+        " cat"
+      ],
+      "answer_index": 0,
+      "answer": " dog",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -0.29798316955566406,
+          "mean_logprob": -0.29798316955566406,
+          "first_token_logprob": -0.29798316955566406,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -3.860483169555664,
+          "mean_logprob": -3.860483169555664,
+          "first_token_logprob": -3.860483169555664,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.5625,
+      "mean_margin": 3.5625,
+      "first_token_margin": 3.5625,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "recursive_binding_009",
+      "category": "recursive_binding",
+      "prompt": "The cat that the dog helped was large. The large one was the",
+      "choices": [
+        " cat",
+        " dog"
+      ],
+      "answer_index": 0,
+      "answer": " cat",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -1.9093894958496094,
+          "mean_logprob": -1.9093894958496094,
+          "first_token_logprob": -1.9093894958496094,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -0.6593894958496094,
+          "mean_logprob": -0.6593894958496094,
+          "first_token_logprob": -0.6593894958496094,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": -1.25,
+      "mean_margin": -1.25,
+      "first_token_margin": -1.25,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    }
+  ]
+}

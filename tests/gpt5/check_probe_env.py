@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 import torch
 import transformers
@@ -13,6 +14,8 @@ from hf_probe_env import local_model_status
 
 def main() -> None:
     info = {
+        "conda_env": os.environ.get("CONDA_DEFAULT_ENV"),
+        "probe_torch_dtype": os.environ.get("PROBE_TORCH_DTYPE", "model_default"),
         "torch": torch.__version__,
         "cuda": torch.version.cuda,
         "cuda_available": torch.cuda.is_available(),

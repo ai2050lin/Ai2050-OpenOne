@@ -1303,3 +1303,1545 @@ python tests/gpt5/systematic_language_benchmark.py glm4 \
 - 当前最主要瓶颈是实验平台稳定性。
 - 在平台稳定前，只能保留 Qwen3 stage10 行为结果和 GLM4 已完成 category 的局部结果。
 - 机制破解阶段必须推迟，不能在驱动死锁环境下做 activation patching 或消融。
+
+## Phase 18: CUDA 13/Driver 595 下 GLM4 Conditional 触发 Xid 62/45 的卡死取证 [2026-05-27 19:48]
+
+### 背景
+用户升级 CUDA/驱动后要求继续三模型测试，并要求增加完整日志，以便 CUDA 锁死后定位原因。本轮先关闭 ComfyUI 后，使用带日志包装脚本继续 stage10 测试。
+
+### 本轮执行命令
+- `uname -r; nvidia-smi; cat /proc/driver/nvidia/version; cat /proc/driver/nvidia/params | rg 'EnableGpuFirmware|EnableGpuFirmwareLogs'`
+- `timeout 8s nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits`
+- `ps -eo pid,ppid,etime,stat,pcpu,pmem,wchan:32,cmd | rg 'ComfyUI|python main.py|systematic_language_benchmark|python tests/gpt5|nvidia-smi'`
+- `kill -TERM 3616`
+- `OUTPUT_DIR=results/gpt5_systematic_language_v2_driver595_stage10 CASES_PER_CATEGORY=10 tests/gpt5_temp/run_stage10_logged_sequence.sh qwen3 glm4 deepseek7b`
+- `journalctl -b -k --since '2026-05-27 13:58:40' --no-pager | rg -i 'NVRM|Xid|GSP|GPU is probably locked|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset|os_acquire|BUG|Oops|Call Trace'`
+- `journalctl -b -5 -k --no-pager | rg -i 'NVRM|Xid|GSP|GPU is probably locked|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset|os_acquire|BUG|Oops|Call Trace'`
+- `sed -n '1,220p' results/gpt5_gpu_lock_logs/20260527_135845_glm4_conditional/run.log`
+- `tail -120 results/gpt5_gpu_lock_logs/20260527_135845_glm4_conditional/gpu_process_monitor.log`
+- `tail -160 results/gpt5_gpu_lock_logs/20260527_135845_glm4_conditional/kernel.follow.log`
+- `python - <<'PY' ... checkpoint 状态统计 ... PY`
+- `chmod +x tests/gpt5_temp/run_glm4_conditional_xid_repro.sh`
+- `bash -n tests/gpt5_temp/run_glm4_conditional_xid_repro.sh`
+
+### 当前系统与运行环境
+- 内核：
+  - `6.8.0-117-generic`
+- 当前 NVIDIA 驱动：
+  - `595.71.05`
+- `nvidia-smi` 显示 CUDA Version：
+  - `13.2`
+- `nvcc` 工具链：
+  - CUDA Toolkit `13.0`
+- PyTorch 运行时仍是：
+  - `torch 2.6.0+cu124`
+  - `torch.version.cuda = 12.4`
+- Python:
+  - `3.13.12`
+- transformers:
+  - `5.5.4`
+- GSP:
+  - `EnableGpuFirmware: 0`
+  - `GSP Firmware Version: N/A`
+
+### 重要前置修正
+- 测试开始前发现 ComfyUI 仍在运行：
+  - PID `3616`
+  - 命令：`python main.py --listen 0.0.0.0 --port 8188 --cuda-device 0 --highvram --fp16-vae --preview-method taesd`
+  - 显存占用约 `16912MiB`
+- 已执行 `kill -TERM 3616`。
+- 之后显存降到约 `780MiB`，只剩桌面/浏览器图形进程。
+- 因此本轮后续 Xid 不是 ComfyUI 干扰造成的。
+
+### 已完成测试
+- 输出目录：
+  - `results/gpt5_systematic_language_v2_driver595_stage10`
+- Qwen3 stage10 全部 9 类完成：
+  - `svo_agent`: 10/10
+  - `passive_agent`: 10/10
+  - `negation_yesno`: 10/10
+  - `conditional`: 10/10
+  - `comparison`: 10/10
+  - `temporal`: 10/10
+  - `recursive_binding`: 10/10
+  - `quantifier`: 10/10
+  - `translation`: 10/10
+- GLM4 已完成：
+  - `svo_agent`: 10/10
+  - `passive_agent`: 10/10
+  - `negation_yesno`: 10/10
+- GLM4 卡死于：
+  - `conditional`
+  - checkpoint 显示 `num_cases=8`, `complete=False`
+  - 最后完成到 `conditional_007`
+  - 卡死发生在 `conditional cases 8:9/10`
+- DeepSeek7B 未开始。
+
+### 关键日志证据
+- 运行日志：
+  - `results/gpt5_gpu_lock_logs/20260527_135845_glm4_conditional/run.log`
+- 运行日志停止位置：
+  - `GLM4 conditional cases 8:9/10`
+- 监控日志卡死前状态：
+  - `2026/05/27 13:58:46.759`
+  - 温度约 `38C`
+  - 功耗约 `24.99W`
+  - 显存约 `540MiB`
+  - GPU util 约 `1%`
+  - python 进程 PID `9684`
+- 内核日志明确记录：
+
+```text
+NVRM: GPU at PCI:0000:01:00: GPU-299fe279-1c52-2255-d4ba-07d7bd2861d9
+NVRM: Xid (PCI:0000:01:00): 62, 023f0f30 00000000 00000000 202c0ffe 202bc4b6 2029bdb6 202bccb8 20297b2a
+NVRM: Xid (PCI:0000:01:00): 45, pid=9684, name=python, channel 0x00000015
+```
+
+### 判断
+- 这次卡死已经不是“可能的 Python 卡死”。
+- `Xid 45` 明确指向测试进程 `pid=9684, name=python`。
+- `Xid 62` + `Xid 45` 说明 GPU/驱动通道发生硬错误，随后相关 channel 被驱动处理。
+- 因为卡死前温度、功耗、显存都很低，本次不支持“高温/满载/OOM”解释。
+- 因为 GSP 已关闭，本次也不是典型 GSP firmware timeout。
+- 当前最强解释：
+  1. GLM4 某次 forward 触发 NVIDIA driver / CUDA kernel / PyTorch kernel 路径错误；
+  2. 该错误导致 GPU channel 异常和系统卡死；
+  3. 桌面和 CUDA 共用 4090D，所以 GPU channel/driver 异常会放大为整机不可用。
+
+### 可能原因排序
+1. **Driver 595 + PyTorch cu124 + GLM4 forward 路径的兼容性问题**
+   - 驱动已升到 595，但 PyTorch 仍是 cu124 runtime；
+   - 当前 Python/transformers 栈非常新；
+   - Qwen3 可过，GLM4 conditional 稳定触发风险，说明模型/架构 forward 路径是关键变量。
+
+2. **GLM4 模型实现或 attention/MLP kernel 路径触发驱动 bug**
+   - 已使用 `attn_implementation='eager'`，仍可触发；
+   - 说明不只限于 flash attention。
+
+3. **显示与计算共用同一张 4090D**
+   - 不一定是根因，但会把 GPU 错误变成桌面卡死。
+
+4. **硬件/PCIe/主板 BIOS 稳定性**
+   - 不能排除，但本轮没有看到 AER/PCIe 明确错误。
+
+### 新增脚本
+- 新增带完整日志的单 category 包装脚本：
+  - `tests/gpt5_temp/run_logged_language_category.sh`
+- 新增 sequence 包装脚本：
+  - `tests/gpt5_temp/run_stage10_logged_sequence.sh`
+- 新增重启后取证脚本：
+  - `tests/gpt5_temp/collect_gpu_lock_report.sh`
+- 新增窄复现脚本：
+  - `tests/gpt5_temp/run_glm4_conditional_xid_repro.sh`
+  - 默认设置：
+    - `CUDA_LAUNCH_BLOCKING=1`
+    - `PYTORCH_NO_CUDA_MEMORY_CACHING=1`
+    - `TOKENIZERS_PARALLELISM=false`
+
+### 接下来建议
+- 暂停 GLM4 和 DeepSeek7B 的 CUDA 测试，不继续硬跑。
+- 如果必须复现，只运行：
+
+```bash
+tests/gpt5_temp/run_glm4_conditional_xid_repro.sh
+```
+
+- 但运行前必须保存工作，因为它可能再次锁死。
+- 锁死重启后立即运行：
+
+```bash
+tests/gpt5_temp/collect_gpu_lock_report.sh -1
+```
+
+### 解决方向
+1. 建立更保守的 Python/CUDA 环境：
+   - Python 3.11
+   - PyTorch 2.5.1 cu121 或更稳定组合
+   - transformers 4.x
+2. 尝试 GLM4 用 `float16` 而不是 `bfloat16`。
+3. 进一步降低 GPU 风险：
+   - power limit 降到 250W 或 300W；
+   - 但本轮功耗很低，降功耗可能帮助有限。
+4. 尽量让显示和计算分离：
+   - 启用核显/主板输出；
+   - 或加一张低功耗显示卡；
+   - 4090D 只做 CUDA。
+5. 在平台稳定前，语言机制破解只基于已完成且无 Xid 的 Qwen3 stage10 结果，不进入 GLM4/DeepSeek 的机制消融。
+
+### 研究影响
+- Qwen3 stage10 可作为当前稳定行为基线。
+- GLM4 在 driver595 下仍未稳定，且已明确触发 `Xid 62/45`。
+- DeepSeek7B 尚未测试，不应推断其语言机制。
+- 当前主要瓶颈仍是实验平台稳定性，不是语言理论本身。
+
+## Phase 19: 切换 CUDA 12.1 保守环境后的三模型语言测试稳定化 [2026-05-27 20:08]
+
+### 背景
+上一个阶段在 base 环境中已经明确捕获到 GLM4 conditional 测试触发 NVIDIA `Xid 62/45`，并且当时温度、功耗、显存都很低，所以问题更像是驱动/CUDA/PyTorch/模型 forward 路径兼容性，而不是 OOM 或高温。为避免继续用不稳定测量环境污染语言机制结论，本阶段切换到更保守的 CUDA 12.1 环境。
+
+### 环境
+- 内核：`6.8.0-117-generic`
+- 驱动：`595.71.05`
+- `nvidia-smi` 显示 CUDA capability：`13.2`
+- conda 环境：`openone-cuda121`
+- Python：`3.11.15`
+- PyTorch：`2.5.1+cu121`
+- PyTorch CUDA runtime：`12.1`
+- transformers：`4.52.4`
+- accelerate：`1.8.1`
+- GSP：此前已关闭
+
+### 代码和脚本
+- 修改 `tests/gpt5/hf_probe_env.py`
+  - 新增 `PROBE_TORCH_DTYPE` 环境变量。
+  - 支持 `bfloat16/bf16/float16/fp16/float32/fp32`。
+  - 目的：允许不同模型使用不同 dtype 复测，避免把数值精度问题误判成语言机制问题。
+- 使用已有长跑保护脚本：
+  - `tests/gpt5_temp/create_stable_cuda121_env.sh`
+  - `tests/gpt5_temp/run_logged_language_category.sh`
+  - `tests/gpt5_temp/run_stage10_logged_sequence.sh`
+  - `tests/gpt5_temp/collect_gpu_lock_report.sh`
+- 新增窄复现脚本：
+  - `tests/gpt5_temp/run_glm4_conditional_xid_repro.sh`
+
+### 关键命令
+创建保守环境：
+
+```bash
+bash tests/gpt5_temp/create_stable_cuda121_env.sh openone-cuda121
+```
+
+GLM4 conditional 窄复测：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+OUTPUT_DIR=results/gpt5_systematic_language_v2_driver595_cuda121_stage10 \
+PROBE_TORCH_DTYPE=float16 \
+CUDA_LAUNCH_BLOCKING=1 \
+PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
+TOKENIZERS_PARALLELISM=false \
+tests/gpt5_temp/run_logged_language_category.sh glm4 conditional 10
+```
+
+三模型 stage10 顺序测试：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+OUTPUT_DIR=results/gpt5_systematic_language_v2_driver595_cuda121_stage10 \
+CASES_PER_CATEGORY=10 \
+PROBE_TORCH_DTYPE=float16 \
+CUDA_LAUNCH_BLOCKING=1 \
+PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
+TOKENIZERS_PARALLELISM=false \
+tests/gpt5_temp/run_stage10_logged_sequence.sh qwen3 glm4 deepseek7b
+```
+
+DeepSeek7B bf16 修正复测：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+OUTPUT_DIR=results/gpt5_systematic_language_v2_driver595_cuda121_bf16_stage10 \
+CASES_PER_CATEGORY=10 \
+PROBE_TORCH_DTYPE=bfloat16 \
+CUDA_LAUNCH_BLOCKING=1 \
+PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
+TOKENIZERS_PARALLELISM=false \
+tests/gpt5_temp/run_stage10_logged_sequence.sh deepseek7b
+```
+
+### 稳定性结果
+- GLM4 conditional 在保守环境下完成 10/10，没有复现 `Xid 62/45`。
+- Qwen3 和 GLM4 完成 9 个 category，共 180 个 case，没有系统卡死。
+- DeepSeek7B 在 fp16 下完成流程但多类出现 `NaN` margin，因此 fp16 结果判定为无效。
+- DeepSeek7B 改用 bf16 后完成 9 个 category，共 90 个 case，没有 NaN，没有 Xid，没有卡死。
+- 本阶段末尾 GPU 处于正常桌面空闲状态，`nvidia-smi` 仅显示 Xorg、gnome-shell、浏览器等图形进程。
+
+### 结果摘要
+Qwen3，CUDA 12.1 保守环境，fp16，stage10：
+
+| category | acc | mean_margin |
+|---|---:|---:|
+| svo_agent | 0.60 | 1.641 |
+| passive_agent | 0.80 | 1.508 |
+| negation_yesno | 1.00 | 2.457 |
+| conditional | 0.70 | 2.601 |
+| comparison | 1.00 | 2.039 |
+| temporal | 0.90 | 1.688 |
+| recursive_binding | 0.70 | 0.898 |
+| quantifier | 1.00 | 2.212 |
+| translation | 1.00 | 11.205 |
+| micro average | 0.856 | - |
+
+GLM4，CUDA 12.1 保守环境，fp16，stage10：
+
+| category | acc | mean_margin |
+|---|---:|---:|
+| svo_agent | 1.00 | 4.859 |
+| passive_agent | 0.90 | 2.112 |
+| negation_yesno | 0.40 | 0.082 |
+| conditional | 1.00 | 3.686 |
+| comparison | 0.80 | 1.316 |
+| temporal | 1.00 | 1.013 |
+| recursive_binding | 0.80 | 0.630 |
+| quantifier | 0.50 | 0.340 |
+| translation | 1.00 | 7.736 |
+| micro average | 0.822 | - |
+
+DeepSeek7B，CUDA 12.1 保守环境，bf16，stage10：
+
+| category | acc | mean_margin |
+|---|---:|---:|
+| svo_agent | 0.70 | 2.343 |
+| passive_agent | 0.50 | -1.088 |
+| negation_yesno | 0.40 | -0.258 |
+| conditional | 0.70 | 2.632 |
+| comparison | 0.60 | 0.751 |
+| temporal | 0.50 | 0.750 |
+| recursive_binding | 0.60 | 0.287 |
+| quantifier | 0.50 | 0.648 |
+| translation | 1.00 | 8.834 |
+| micro average | 0.611 | - |
+
+### 结论
+1. 保守环境显著改善稳定性。此前 GLM4 conditional 在 base 环境触发 `Xid 62/45`，本阶段同一类测试在 `torch 2.5.1+cu121 + transformers 4.52.4 + fp16` 下通过，说明原问题更可能来自软件栈兼容性，而不是模型测试脚本的基本逻辑。
+2. DeepSeek7B 不应使用 fp16 结果。fp16 下多个 category 出现 NaN，说明数值路径不可信；bf16 复测后结果正常，后续 DeepSeek7B 默认使用 bf16。
+3. 当前语言测试仍只是 stage10 小样本，用于验证环境、流程、指标和大体方向，不能直接作为语言数学结构的强结论。
+4. 三个模型都表现出明显 category 分化：translation 最稳定，否定、量词、被动、递归绑定更弱。这支持“语言能力不是单一能力，而是多个可分离功能/模式的组合”的研究路线。
+
+### 硬伤和风险
+- 每类只有 10 个 case，统计量太小，只能看作工程稳定性检查和粗粒度信号。
+- 当前 benchmark 是二选一 logprob 形式，不能覆盖生成式语言使用中的完整路径。
+- acc 和 margin 只能说明输出偏好，不能直接说明神经元级编码机制。
+- 不同模型 dtype 不一致：Qwen3/GLM4 使用 fp16，DeepSeek7B 使用 bf16。这样更稳定，但跨模型比较必须谨慎。
+- 使用桌面同卡计算，未来长跑仍可能因为 GPU driver 错误放大为整机卡死。
+
+### 理论进展
+本阶段最重要的理论价值不是分数本身，而是确定了一个可继续工作的实验平台。语言背后编码机制的破解必须先区分三层变量：
+
+1. 测量系统变量：驱动、CUDA、PyTorch、dtype、attention 实现。
+2. 行为功能变量：SVO、被动、否定、条件、比较、时间、递归、量词、翻译。
+3. 神经编码变量：哪些 layer、head、MLP/neuron 对某类差异负责，哪些部分复用，哪些部分差异化。
+
+目前已经基本处理第一层，可以开始系统推进第二层，再进入第三层。若跳过第二层直接做组件消融，容易得到大量不可解释的局部现象。
+
+### 下一阶段计划
+1. 固定保守环境作为正式实验环境：
+   - `openone-cuda121`
+   - Qwen3/GLM4 默认 fp16
+   - DeepSeek7B 默认 bf16
+   - 每个模型、每个 category 单独进程，保留 `--hard-exit-after-model`
+2. 把 stage10 扩大为 stage100 或 stage200：
+   - 先跑 Qwen3 单模型全 category；
+   - 再跑 GLM4；
+   - 最后跑 DeepSeek7B；
+   - 每类独立 checkpoint，崩溃可 resume。
+3. 做错误模式分解：
+   - 不只看 acc，还记录错误 case 的语言类型；
+   - 判断失败来自词义、句法位置、逻辑关系、否定方向、量词范围，还是 tokenization 干扰。
+4. 设计“最小对照差异”数据：
+   - 只改变一个语言因素，例如主动/被动、肯定/否定、主语/宾语交换；
+   - 目标是让模型内部差异尽可能对应一个明确语言变量。
+5. 在 stage100 稳定后再进入组件分析：
+   - 对稳定 category 做 activation patching；
+   - 对弱 category 做 layer/head/MLP 差异定位；
+   - 比较同一 category 在三模型中的复用与差异化。
+
+### 当前判断
+现在可以继续语言机制破解，但必须先把语言行为矩阵做大。第一性原则是：先获得大量、稳定、可复现、单变量控制的语言差异，再去寻找这些差异在神经网络中的路径和复用结构。否则直接研究神经元，很容易把测量噪声、dtype 问题、样本偏差误认为编码机制。
+
+## Phase 20: 将 CUDA 12.1 保守环境固化为默认测试入口 [2026-05-27 20:33]
+
+### 背景
+Phase 19 已经证明 `openone-cuda121` 环境可以稳定完成三模型 stage10 语言测试，并且 GLM4 conditional 不再复现 `Xid 62/45`。本阶段目标是把保守环境从“手动输入一串环境变量”固化成默认入口，降低后续误用 base 环境、错误 dtype 或遗漏日志参数的概率。
+
+### 修改内容
+- 修改 `tests/gpt5_temp/run_logged_language_category.sh`
+  - 默认自动激活 `openone-cuda121`。
+  - 可用 `OPENONE_USE_CONSERVATIVE_ENV=0` 关闭自动激活。
+  - 默认输出目录改为 `results/gpt5_systematic_language_v2_conservative_stage10`。
+  - 默认 dtype 按模型选择：
+    - `qwen3`: `float16`
+    - `glm4`: `float16`
+    - `deepseek7b`: `bfloat16`
+  - 日志中新增：
+    - `conda_env`
+    - `probe_torch_dtype`
+- 修改 `tests/gpt5_temp/run_stage10_logged_sequence.sh`
+  - 默认自动激活 `openone-cuda121`。
+  - 默认输出目录改为 `results/gpt5_systematic_language_v2_conservative_stage10`。
+  - 日志中明确输出模型 dtype 默认策略。
+- 新增正式入口：
+  - `tests/gpt5/run_conservative_language_sequence.sh`
+  - 默认设置：
+    - `OPENONE_USE_CONSERVATIVE_ENV=1`
+    - `OPENONE_CONSERVATIVE_ENV=openone-cuda121`
+    - `CASES_PER_CATEGORY=10`
+    - `CUDA_LAUNCH_BLOCKING=1`
+    - `PYTORCH_NO_CUDA_MEMORY_CACHING=1`
+    - `TOKENIZERS_PARALLELISM=false`
+- 修改 `tests/gpt5/hf_probe_env.py`
+  - 将模型默认 dtype 下沉到 Python 加载层。
+  - 即使直接调用 benchmark，不经过 shell 包装，也默认使用：
+    - Qwen3/GLM4: fp16
+    - DeepSeek7B: bf16
+  - 仍可用 `PROBE_TORCH_DTYPE` 手动覆盖。
+- 修改 `tests/gpt5/check_probe_env.py`
+  - 输出当前 `conda_env`。
+  - 输出当前 `PROBE_TORCH_DTYPE`，未设置时显示 `model_default`。
+- 修改 `tests/gpt5_temp/create_stable_cuda121_env.sh`
+  - 固化 `numpy==1.26.4`，避免 TransformerLens 在 Python 3.11 下与 NumPy 2.x 不兼容。
+  - 安装本地 TransformerLens editable 包：
+    - `python -m pip install -e . --no-deps`
+  - 补齐 TransformerLens 关键依赖：
+    - `beartype`
+    - `better-abc`
+    - `datasets`
+    - `fancy-einsum`
+    - `jaxtyping`
+    - `pandas`
+    - `rich`
+    - `transformers-stream-generator`
+    - `typeguard`
+    - `wandb`
+
+### 当前环境修复命令
+已在当前 `openone-cuda121` 环境中执行：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+python -m pip install -e . --no-deps
+python -m pip install beartype==0.14.1 better-abc==0.0.3 datasets==2.21.0 fancy-einsum==0.0.3 jaxtyping==0.2.38 pandas==2.2.3 rich==13.9.4 transformers-stream-generator==0.0.5 typeguard==4.4.2 wandb==0.17.9
+python -m pip install numpy==1.26.4
+```
+
+### 验证命令
+语法验证：
+
+```bash
+bash -n tests/gpt5/run_conservative_language_sequence.sh \
+  tests/gpt5_temp/run_stage10_logged_sequence.sh \
+  tests/gpt5_temp/run_logged_language_category.sh \
+  tests/gpt5_temp/create_stable_cuda121_env.sh
+```
+
+Python 编译验证：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+python -m py_compile tests/gpt5/hf_probe_env.py tests/gpt5/check_probe_env.py tests/gpt5/systematic_language_benchmark.py
+```
+
+TransformerLens 环境验证：
+
+```bash
+source /home/rankrank/miniconda3/etc/profile.d/conda.sh
+conda activate openone-cuda121
+python tests/gpt5/check_probe_env.py
+```
+
+结果确认：
+- Python: `3.11.15`
+- NumPy: `1.26.4`
+- PyTorch: `2.5.1+cu121`
+- CUDA runtime: `12.1`
+- transformers: `4.52.4`
+- accelerate: `1.8.1`
+- transformer_lens: `local-editable`
+- 三个本地模型目录均存在，且有 config 和 safetensors。
+
+默认入口冒烟测试：
+
+```bash
+MAX_SECONDS=600 \
+OUTPUT_DIR=results/gpt5_conservative_default_smoke \
+tests/gpt5_temp/run_logged_language_category.sh qwen3 translation 1
+```
+
+结果：
+- 自动激活环境：`conda_env=openone-cuda121`
+- 自动选择 dtype：`probe_torch_dtype=float16`
+- checkpoint：`results/gpt5_conservative_default_smoke/checkpoints/qwen3/translation.json`
+- `num_cases=1`
+- `complete=True`
+- `accuracy=1.0`
+- `mean_margin=6.953125`
+- 未发现新的 `Xid/NVRM` 错误。
+
+### 后续默认用法
+小样本验证：
+
+```bash
+tests/gpt5/run_conservative_language_sequence.sh qwen3 glm4 deepseek7b
+```
+
+扩大样本：
+
+```bash
+CASES_PER_CATEGORY=100 \
+tests/gpt5/run_conservative_language_sequence.sh qwen3
+```
+
+单 category 调试：
+
+```bash
+tests/gpt5_temp/run_logged_language_category.sh glm4 conditional 10
+```
+
+临时覆盖 dtype：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 \
+tests/gpt5_temp/run_logged_language_category.sh qwen3 translation 10
+```
+
+### 判断
+当前默认路径已经从“base 环境 + 人工记忆参数”切换为“保守环境 + 模型级 dtype 默认 + 单 category 日志隔离”。这不会解决所有 CUDA/驱动风险，但能显著减少人为误用环境导致的假故障。
+
+### 下一步
+下一阶段可以正式跑 stage100：
+1. 先跑 Qwen3 全 category。
+2. 如果无 Xid、无 NaN，再跑 GLM4。
+3. 最后跑 DeepSeek7B。
+4. 所有结果必须先做错误类型审计，再进入 activation patching 和组件级定位。
+
+## Phase 21: 读取 GLM5 Phase 288 后调整为 Attention-MLP-Residual 契约图谱方案 [2026-05-27 20:47]
+
+### 读取对象
+- `research/glm5/docs/AGI_GLM5_MEMO.md`
+- Phase 288: `Attention vs MLP Causal Decomposition [2026-05-27 10:20]`
+- 相关脚本：
+  - `tests/glm5/phase288_attn_mlp_decomp.py`
+  - `tests/glm5_temp/phase288v2_summary.py`
+- 相关结果：
+  - `results/phase288_attn_mlp/qwen3_decomp.json`
+  - `results/phase288_attn_mlp/glm4_decomp.json`
+  - `results/phase288_attn_mlp/deepseek7b_decomp.json`
+
+### 综合判断
+Phase 288 的方向正确，而且比 Phase 287 更可靠。核心原因是：Phase 287 的 AW@V 手工重构路线因为 eager/flash attention 数值和模块边界不匹配，导致 `full_A_ratio` 远离 1，且 causal/random 不可区分；Phase 288 改为直接 hook attention block 输出和 MLP block 输出，属于标准 activation patching，避开了不可靠重构。
+
+但是 Phase 288 不是“破解编码机制”的终点。它真正把问题推进到更关键的一层：Attention、MLP、Residual 之间的模块契约。后续不能再只问“哪个模块贡献更大”，而要问：
+
+```text
+哪个功能在第几层由 attention 产生方向信号；
+哪个 MLP 把这个方向信号转换成可继续传播的内部格式；
+残差流如何累积这些变化；
+哪些替换离开自然分布，不能当作真实机制证据。
+```
+
+### 当前计划需要调整的地方
+1. AW@V 手工重构降级为探索工具，不再作为主线证据。
+2. 标准 activation patching 升级为主方法。
+3. `kl_ratio` 不再解释为贡献强度，只作为输出分布变化和过度转换信号。
+4. `over-conversion` 定义为契约破坏信号，不定义为功能贡献强度。
+5. `progress` 拆成至少三部分：
+   - 方向正确性：是否朝 B 方向移动；
+   - 幅度合理性：是否落在自然 A/B 差异范围内；
+   - 分布合法性：patch 后的中间状态是否仍像自然 forward。
+6. DS7B 后续不能继续使用 `device_map=auto` 的 Phase 288 结果做完整比较；必须使用当前 GPT5 保守环境的 `cuda` 加载策略，保证晚层 hook 生效。
+7. 当前 stage100 行为矩阵仍然需要做，但它的角色从“最终行为结论”调整为“Phase 289 数据质量门槛和功能子类筛选器”。
+
+### Phase 288 中可信的结论
+- Qwen3 和 DS7B 中 both-patching 普遍优于 attn-only 或 mlp-only，说明 attention 和 MLP 协同，而非二选一。
+- GLM4 的 attention-only patching 出现极端 KL 放大，而 MLP patching 更能缩小差距，继续支持“GLM4 更偏 MLP 集中型”的判断。
+- recursive 等功能在三模型中走不同路径，说明语言机制不是固定语义轴，也不是单一算法，而是架构约束下的复用/差异化策略。
+- Phase 288 已经从表示统计推进到计算机制层，下一步应该研究模块协同关系。
+
+### Phase 288 中不能直接成立的结论
+- `Attn_KR=21x` 不能解释为 attention 贡献 21 倍。
+- `over-conversion` 不能直接解释为“模块很重要”，只能说明替换破坏了下游期望的动态范围或内部格式。
+- 当前每功能 20-40 对，类别太粗，不能给出稳定的功能主导路径。
+- early/mid/late/all3 只替换 3 层，对分布式机制太粗。
+- translation 中英 tokenization 差异较大，跨语言 patching 可能混入 token 对齐问题；后续应单独处理，不和同语言功能混为同一种证据。
+
+### Phase 289 总目标
+建立：
+
+```text
+功能级 Attention-MLP-Residual 契约图谱
+```
+
+目标不是找单点贡献，而是画出每个功能从输入到输出过程中：
+
+```text
+attention 在哪里改变通信方向；
+MLP 在哪里完成门控和重编码；
+residual 在哪里累积和压缩；
+哪些层发生契约兼容；
+哪些层发生契约断裂。
+```
+
+### Phase 289 实验设计
+
+#### 实验 A：全层模块曲线扫描
+对每个模型、每个功能、每一层分别做：
+
+```text
+attn-only patch
+mlp-only patch
+both patch
+resid/post-layer patch
+```
+
+输出：
+
+```text
+layer -> attn_progress
+layer -> mlp_progress
+layer -> both_progress
+layer -> resid_progress
+layer -> over_conversion_flag
+layer -> naturalness_score
+```
+
+目的：
+- 找功能形成层；
+- 找 attention 到 MLP 的转换层；
+- 找输出压缩层；
+- 找契约断裂层。
+
+#### 实验 B：自然性检测
+不优先使用复杂统计指标，先使用基础、可解释指标：
+
+```text
+logit_delta_ratio = ||patched_logits - logits_A|| / ||logits_B - logits_A||
+hidden_norm_ratio = ||patched_hidden|| / mean(||natural_A_hidden||, ||natural_B_hidden||)
+attn_next_ratio = ||next_attn_after_patch|| / ||next_attn_natural_A||
+mlp_next_ratio = ||next_mlp_after_patch|| / ||next_mlp_natural_A||
+finite_check = 是否出现 NaN/Inf
+```
+
+判定：
+- 如果 progress 高但 norm/downstream ratio 爆炸，标记为非自然反事实；
+- 非自然反事实不能作为真实机制贡献证据；
+- GLM4 attention over-conversion 必须用这套指标重新解释。
+
+#### 实验 C：连续插值
+把硬替换：
+
+```text
+A_output <- B_output
+```
+
+改成：
+
+```text
+A_output <- (1-alpha) * A_output + alpha * B_output
+alpha = 0, 0.1, 0.25, 0.5, 0.75, 1.0
+```
+
+输出：
+
+```text
+alpha -> progress
+alpha -> KL ratio
+alpha -> hidden_norm_ratio
+alpha -> downstream_ratio
+```
+
+目的：
+- 如果曲线平滑，说明该模块可能是自然控制通道；
+- 如果某个 alpha 后突然爆炸，说明存在门控/契约断裂；
+- 对 GLM4 的 attention over-conversion 尤其关键。
+
+#### 实验 D：契约兼容度矩阵
+对每层构造四种组合：
+
+```text
+A_attn + A_mlp
+B_attn + B_mlp
+B_attn + A_mlp
+A_attn + B_mlp
+```
+
+再观察下一层和最终 logits 是否稳定。
+
+核心指标：
+
+```text
+contract_break = hidden_norm_ratio 超阈值 或 downstream_ratio 超阈值 或 KL 极端放大
+contract_compatible = 方向正确 且 幅度自然 且 下游未爆炸
+```
+
+目的：
+- 测 attention 输出是否能被另一个上下文中的 MLP 正常处理；
+- 测 MLP 输出是否能被残差流正常接收；
+- 解释 GLM4 为什么 attention 替换会产生极端 KL 放大。
+
+#### 实验 E：功能复用矩阵
+把每个功能表示成简单曲线签名：
+
+```text
+function_signature =
+[attn_curve, mlp_curve, both_curve, resid_curve, contract_break_curve]
+```
+
+先不做复杂数学，只做基础比较：
+- 峰值层是否相同；
+- 曲线形状是否相似；
+- attention/MLP 转换顺序是否相同；
+- 契约断裂层是否相同。
+
+输出：
+- 哪些功能复用同一类契约；
+- 哪些功能在特定层分叉；
+- 哪些模型的同一功能走不同架构路径。
+
+### 数据集调整
+不能继续只用粗类别。下一阶段至少拆成：
+
+```text
+negation:
+  lexical_not / auxiliary_not / existential_no / quantifier_not / logical_not / double_negation
+
+translation:
+  word_translation / phrase_translation / sentence_translation / word_order_shift / target_language_switch
+
+logical:
+  and_or / conditional / causal / contrast / inference / nested_logic
+
+recursive:
+  relative_clause / prepositional_recursion / complement_clause / nested_clause
+
+passive:
+  simple_passive / by_phrase_passive / implicit_agent_passive
+
+comparative:
+  adjective_comparison / quantity_comparison / relational_comparison / counterfactual_comparison
+```
+
+执行顺序：
+1. pilot：每子类 20 对，先跑 Qwen3；
+2. 稳定后扩到每子类 100 对；
+3. 再跑 GLM4；
+4. 最后跑 DeepSeek7B。
+
+### 工程执行方案
+后续脚本应放在 `tests/gpt5/`：
+
+```text
+tests/gpt5/phase289_contract_dataset.py
+tests/gpt5/phase289_layer_contract_scan.py
+tests/gpt5/phase289_contract_summary.py
+tests/gpt5/run_phase289_conservative.sh
+```
+
+运行环境：
+
+```bash
+tests/gpt5/run_conservative_language_sequence.sh qwen3
+```
+
+或 Phase 289 专用入口：
+
+```bash
+tests/gpt5/run_phase289_conservative.sh qwen3 --pilot
+```
+
+工程要求：
+- 默认使用 `openone-cuda121`；
+- 每个模型单独进程；
+- 每个 category/subcategory 单独 checkpoint；
+- 保留 `--hard-exit-after-model`；
+- Qwen3/GLM4 默认 fp16；
+- DeepSeek7B 默认 bf16；
+- 不使用 `device_map=auto` 作为 DS7B 的机制结论来源。
+
+### 阶段路线
+1. Phase 289a：Qwen3 pilot，全层扫描，少量子类，验证指标和日志。
+2. Phase 289b：加入自然性和连续插值，重点复查 GLM4 over-conversion。
+3. Phase 289c：三模型全层契约图谱，修复 DS7B late/all3 缺失。
+4. Phase 289d：每子类扩大到 100 对，形成稳定功能签名。
+5. Phase 289e：功能复用/差异化矩阵，回答哪些功能共享契约，哪些功能分叉。
+
+### 当前最合理理论版本
+语言编码暂时不应描述为固定语义轴，也不应描述为单纯 routing/content 二分。更稳的版本是：
+
+```text
+语言编码是条件模块契约系统。
+
+词嵌入提供初始条件；
+attention 生成通信方向和上下文结构偏置；
+MLP 将 attention 结果转换为可继续传播的内部格式；
+residual 保存多层候选状态并累积功能路径；
+不同语言功能通过改变 attention-MLP-residual 的契约路径实现复用和差异化。
+
+复用发生在契约相同的地方；
+差异化发生在契约断裂、动态范围改变、或者 MLP 门控重编码的地方。
+```
+
+### 最终判断
+当前方案需要调整，但调整方向不是放弃行为测试，也不是直接跳到单 head 消融，而是：
+
+```text
+行为矩阵作为数据质量门槛；
+标准 activation patching 作为主因果工具；
+自然性、连续插值、契约兼容度作为防止误判的约束；
+全层曲线和功能子类作为破解复用/差异化的主地图。
+```
+
+这会把研究从“某个模块有影响”推进到“某个语言功能在网络中如何沿契约路径传播和分叉”。
+
+## Phase 22: Phase 289 三模型 Attention-MLP-Residual 契约 Pilot 测试 [2026-05-27 20:52]
+
+### 目标
+开始执行 Phase 289 的“功能级 Attention-MLP-Residual 契约图谱”方案。为了避免再次出现 CUDA 卡死且无日志，本阶段只做小规模 pilot：
+
+- 三个模型分别单进程运行；
+- 使用 `openone-cuda121` 保守环境；
+- 每个模型使用 `--hard-exit-after-model`；
+- 每个模型独立 kernel/GPU/process 日志；
+- 每个模型独立 checkpoint；
+- 先测 negation 6 个子类，每子类 2 对，共 12 对。
+
+### 新增脚本
+- `tests/gpt5/phase289_contract_scan.py`
+  - GPT5 版 Phase 289 契约扫描脚本。
+  - 使用 `tests/gpt5/hf_probe_env.py` 的保守加载路径。
+  - 支持：
+    - `attn`
+    - `mlp`
+    - `both`
+    - `resid`
+    - `cross_battn_amlp`
+    - `cross_aattn_bmlp`
+  - 支持 alpha 连续插值：
+    - `0`
+    - `0.5`
+    - `1.0`
+  - 支持 checkpoint/resume。
+  - 支持 `--hard-exit-after-model`。
+
+- `tests/gpt5/run_phase289_conservative.sh`
+  - Phase 289 专用日志包装器。
+  - 默认激活 `openone-cuda121`。
+  - 默认记录：
+    - `run.log`
+    - `snapshots.log`
+    - `gpu_process_monitor.log`
+    - `kernel.follow.log`
+    - `kernel.since-start.log`
+    - `kernel.since-start.filtered.log`
+  - 运行前检查是否已有 compute GPU 进程。
+
+### 测试配置
+数据：
+
+```text
+negation:
+  lexical_not_adj
+  syntactic_do_not
+  existential_no
+  never
+  morphological_neg
+  scope_quantifier
+
+每子类 2 对，共 12 对/模型。
+```
+
+patch 类型：
+
+```text
+attn
+mlp
+both
+resid
+cross_battn_amlp  = B_attn + A_mlp
+cross_aattn_bmlp  = A_attn + B_mlp
+```
+
+alpha：
+
+```text
+0, 0.5, 1.0
+```
+
+层：
+
+```text
+Qwen3:      [0, 12, 24, 35]
+GLM4:       [0, 14, 28, 39]
+DeepSeek7B: [0, 9, 18, 27]
+```
+
+每模型结果数：
+
+```text
+12 pairs * 4 layers * 3 alpha * 6 patch_types = 864 rows
+```
+
+总结果数：
+
+```text
+2592 rows
+```
+
+### 命令记录
+Qwen3：
+
+```bash
+MAX_SECONDS=1800 \
+OUTPUT_DIR=results/gpt5_phase289_contract_pilot \
+tests/gpt5/run_phase289_conservative.sh qwen3 \
+  --pilot \
+  --categories negation \
+  --max-pairs-per-subtype 2 \
+  --layer-stride 12 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 1
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=2400 \
+OUTPUT_DIR=results/gpt5_phase289_contract_pilot \
+tests/gpt5/run_phase289_conservative.sh glm4 \
+  --pilot \
+  --categories negation \
+  --max-pairs-per-subtype 2 \
+  --layer-stride 14 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 1
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=2400 \
+OUTPUT_DIR=results/gpt5_phase289_contract_pilot \
+tests/gpt5/run_phase289_conservative.sh deepseek7b \
+  --pilot \
+  --categories negation \
+  --max-pairs-per-subtype 2 \
+  --layer-stride 9 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 1
+```
+
+### 输出文件
+结果：
+
+```text
+results/gpt5_phase289_contract_pilot/qwen3_phase289_contract_scan.json
+results/gpt5_phase289_contract_pilot/glm4_phase289_contract_scan.json
+results/gpt5_phase289_contract_pilot/deepseek7b_phase289_contract_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase289_contract_pilot/checkpoints/qwen3/negation_pilot.json
+results/gpt5_phase289_contract_pilot/checkpoints/glm4/negation_pilot.json
+results/gpt5_phase289_contract_pilot/checkpoints/deepseek7b/negation_pilot.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260527_204215_phase289_qwen3
+results/gpt5_gpu_lock_logs/20260527_204419_phase289_glm4
+results/gpt5_gpu_lock_logs/20260527_204632_phase289_deepseek7b
+```
+
+### 稳定性
+三模型均完成，退出码均为 0。
+
+```text
+Qwen3:      complete, 864 rows
+GLM4:       complete, 864 rows
+DeepSeek7B: complete, 864 rows
+```
+
+没有发现：
+
+```text
+Xid
+NVRM error
+Traceback
+NaN/Inf result row
+timeout
+```
+
+GPU 监控峰值约：
+
+```text
+Qwen3:      8.9GB, 40C, 89W
+GLM4:       19.1GB, 45C, 114W
+DeepSeek7B: 15.8GB, 46C, 121W
+```
+
+本轮支持一个工程判断：当前 `openone-cuda121 + hard-exit + 单模型单进程 + 日志包装` 路径可以继续作为机制测试默认路径。
+
+### 结果摘要
+
+#### Qwen3
+
+```text
+class: Qwen3ForCausalLM
+pairs: 12
+results: 864
+best_layer_by_both_progress: L0
+contract_broken_layers: [0]
+```
+
+核心层曲线，alpha=1：
+
+```text
+L0:
+  attn P=0.808 KR=0.159 DR=1.16
+  mlp  P=0.896 KR=0.140 DR=1.16
+  both P=0.914 KR=0.130 DR=1.14
+  resid P=0.899 KR=0.127 DR=1.11
+  B_attn + A_mlp P=0.446 KR=0.660 DR=0.78
+  A_attn + B_mlp P=0.896 KR=0.140 DR=1.16
+
+L12:
+  attn P=0.012 KR=0.990 DR=0.25
+  mlp  P=0.184 KR=0.929 DR=0.56
+  both P=0.180 KR=0.851 DR=0.55
+  resid P=0.992 KR=0.026 DR=1.12
+
+L24:
+  attn P=0.044 KR=0.950 DR=0.16
+  mlp  P=0.175 KR=0.748 DR=0.39
+  both P=0.224 KR=0.715 DR=0.43
+  resid P=1.031 KR=0.010 DR=1.16
+
+L35:
+  attn P=0.066 KR=0.932 DR=0.55
+  mlp  P=0.391 KR=0.985 DR=0.96
+  both P=0.424 KR=0.886 DR=0.80
+  resid P=1.000 KR=0.000 DR=1.00
+```
+
+初步解释：
+- L0 的 attention/MLP/both 都很强，说明早层已携带很强的否定 A→B 差异。
+- `B_attn + A_mlp` 在 L0 明显弱于 both，说明“只替换 attention 而保留 A 的 MLP”会破坏部分契约。
+- 中后层单独 attn/MLP 替换较弱，但 resid patch 很强，说明功能差异可能已经进入残差流整体状态，不再只由单模块输出表示。
+
+#### GLM4
+
+```text
+class: GlmForCausalLM
+pairs: 12
+results: 864
+best_layer_by_both_progress: L0
+contract_broken_layers: [0]
+```
+
+核心层曲线，alpha=1：
+
+```text
+L0:
+  attn P=0.010 KR=1.128 DR=0.36
+  mlp  P=0.969 KR=0.063 DR=1.02
+  both P=0.969 KR=0.063 DR=1.02
+  resid P=0.981 KR=0.053 DR=1.03
+  B_attn + A_mlp P=0.013 KR=1.123 DR=0.30
+  A_attn + B_mlp P=0.969 KR=0.063 DR=1.02
+
+L14:
+  attn P=0.013 KR=1.018 DR=0.09
+  mlp  P=0.169 KR=0.856 DR=0.41
+  both P=0.185 KR=0.847 DR=0.43
+  resid P=0.989 KR=0.007 DR=1.01
+
+L28:
+  attn P=0.004 KR=0.980 DR=0.05
+  mlp  P=0.050 KR=0.872 DR=0.22
+  both P=0.054 KR=0.860 DR=0.23
+  resid P=0.990 KR=0.002 DR=1.00
+
+L39:
+  attn P=-0.014 KR=1.037 DR=0.11
+  mlp  P=0.324 KR=1.317 DR=0.64
+  both P=0.331 KR=1.303 DR=0.65
+  resid P=1.000 KR=0.000 DR=1.00
+```
+
+初步解释：
+- GLM4 的 attention-only 在所有采样层几乎没有正向推进，L0 甚至 KR>1。
+- L0 MLP 和 both 几乎相同，支持“GLM4 否定 pilot 中 MLP 是主承载路径”的判断。
+- 本轮没有复现 Phase 288 中 21x 级别的 extreme KR，说明 extreme over-conversion 可能依赖样本、层、patch 位置或更细功能类型；不能用本轮小样本否定它。
+
+#### DeepSeek7B
+
+```text
+class: Qwen2ForCausalLM
+pairs: 12
+results: 864
+best_layer_by_both_progress: L27
+contract_broken_layers: [27]
+```
+
+核心层曲线，alpha=1：
+
+```text
+L0:
+  attn P=0.324 KR=0.640 DR=0.78
+  mlp  P=0.187 KR=0.885 DR=0.54
+  both P=0.216 KR=0.670 DR=0.70
+  resid P=0.365 KR=0.399 DR=0.69
+
+L9:
+  attn P=0.283 KR=1.027 DR=0.47
+  mlp  P=0.136 KR=1.236 DR=0.55
+  both P=0.285 KR=1.272 DR=0.65
+  resid P=0.399 KR=0.477 DR=0.65
+
+L18:
+  attn P=0.162 KR=1.209 DR=0.43
+  mlp  P=0.435 KR=1.052 DR=0.68
+  both P=0.314 KR=1.060 DR=0.66
+  resid P=0.375 KR=0.383 DR=0.62
+
+L27:
+  attn P=0.735 KR=0.677 DR=0.86
+  mlp  P=0.710 KR=0.529 DR=0.81
+  both P=0.851 KR=0.320 DR=0.95
+  resid P=1.000 KR=0.000 DR=1.00
+  B_attn + A_mlp P=0.009 KR=0.845 DR=0.23
+  A_attn + B_mlp P=0.710 KR=0.529 DR=0.81
+```
+
+初步解释：
+- DeepSeek7B 和 Qwen3/GLM4 不同，最强 both 层在最后层 L27。
+- L27 attention 与 MLP 都有效，both 更强，说明最后层存在明显协同。
+- `B_attn + A_mlp` 在 L27 几乎失效，而 `A_attn + B_mlp` 保留 MLP 效果，说明最后层 MLP 或 residual 接收格式可能更关键。
+- 这和此前“DS7B 可能有深层特殊释放/最后层压缩”的判断一致。
+
+### 关键洞察
+1. 三模型都没有统一路径：
+   - Qwen3：pilot 中 L0 attention/MLP/both 都强；
+   - GLM4：pilot 中 L0 MLP 极强，attention 几乎无效；
+   - DeepSeek7B：pilot 中最后层 L27 both 最强。
+
+2. `resid` patch 几乎总是很强：
+   - 这不是说明 residual 是“单独模块贡献”；
+   - 它更像是上界测量：如果直接替换整层输出，A 很容易接近 B；
+   - 后续 resid 指标应作为“该层整体状态是否足以推动功能”的上界，不和 attn/MLP 直接等价比较。
+
+3. 交叉契约指标可用：
+   - Qwen3 L0 和 DeepSeek7B L27 都出现 `B_attn + A_mlp` 明显弱于 both；
+   - 这说明 attention 输出不是任意上下文都可用，它需要匹配对应的 MLP/residual 状态；
+   - 这正是 Phase 289 要找的“模块契约”信号。
+
+4. GLM4 的结果继续支持 MLP 集中型：
+   - L0 `mlp` 和 `both` 几乎一样；
+   - `attn` 几乎没有 progress；
+   - 但本轮未出现 21x over-conversion，因此不能把 Phase 288 extreme KR 直接泛化到所有否定样本。
+
+### 硬伤
+1. 样本太小：每子类 2 对，只能验证脚本、日志和粗方向。
+2. 层太稀：每模型只测 4 层，不能确定真实关键层。
+3. 只有 negation：还不能推广到 passive、logical、recursive、translation、comparison。
+4. `resid` patch 是整层输出替换，上界意义强，机制分解意义弱。
+5. 当前 contract_broken 判定较粗：当 both KL 很小时，cross/both ratio 容易放大；下一版需要同时看 absolute KL、progress、delta ratio。
+6. 当前自然性指标仍主要在 logit 层，hidden/downstream 指标已经记录部分 norm，但还没有完整汇总。
+
+### 下一步
+1. 修正 summary：
+   - contract broken 不只用 `cross_kl / both_kl`；
+   - 加入 absolute KL、progress drop、logit_delta_ratio 范围。
+2. Qwen3 做 denser layer scan：
+   - 否定每子类 5-10 对；
+   - 层 stride 从 12 降到 4 或全层；
+   - 先只跑 Qwen3，确认 L0 强效是否稳定。
+3. GLM4 重点查 over-conversion：
+   - 加大样本；
+   - 全层或 stride=4；
+   - 重点输出 alpha 曲线，找是否存在突然爆炸阈值。
+4. DeepSeek7B 重点查最后层：
+   - 加密 L18-L27；
+   - 验证 “深层释放/最后层压缩” 是否稳定。
+5. 在否定稳定后扩展到 passive/logical/recursive。
+
+### 当前判断
+Phase 289 pilot 成功跑通，日志完整，三模型稳定。最重要的进展不是某个分数，而是已经建立了一个能直接测试“模块契约”的最小系统：
+
+```text
+单模块替换 -> 是否朝 B 移动
+联合替换 -> 是否协同增强
+交叉替换 -> 是否契约断裂
+resid 替换 -> 该层整体状态上界
+alpha 插值 -> 后续用于识别平滑控制还是突然爆炸
+```
+
+这条线可以继续扩大样本和层密度，进入真正的 Attention-MLP-Residual 契约图谱。
+
+## Phase 23: Phase 289 Dense Negation 三模型契约扫描 [2026-05-27 21:52]
+
+### 目标
+在 Phase 22 pilot 成功后，加大数据量和层密度，正式测试三模型在 negation 功能上的 Attention-MLP-Residual 契约图谱。
+
+本阶段相比 pilot 的扩大：
+
+```text
+pairs: 12 -> 40
+alpha: 0,0.5,1.0 -> 0,0.25,0.5,0.75,1.0
+layers:
+  Qwen3:      4层 -> 10层
+  GLM4:       4层 -> 11层
+  DeepSeek7B: 4层 -> 8层
+rows:
+  Qwen3:      864 -> 12000
+  GLM4:       864 -> 13200
+  DeepSeek7B: 864 -> 9600
+total rows: 34800
+```
+
+### 脚本改进
+修改 `tests/gpt5/phase289_contract_scan.py`：
+
+- 新增 `alpha_curve` 汇总。
+- 修正 `contract_broken_layers` 判定，不再只看 `cross_kl / both_kl`。
+- 新判定要求同时满足：
+
+```text
+cross_kl / both_kl >= 2.0
+cross_kl >= 0.5
+both_progress - cross_progress >= 0.25
+cross_logit_delta_ratio >= 0.15
+```
+
+目的：避免 both KL 极小时产生虚假 contract broken。
+
+### 命令记录
+
+Qwen3：
+
+```bash
+MAX_SECONDS=5400 \
+OUTPUT_DIR=results/gpt5_phase289_contract_dense_negation \
+tests/gpt5/run_phase289_conservative.sh qwen3 \
+  --categories negation \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 2
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=7200 \
+OUTPUT_DIR=results/gpt5_phase289_contract_dense_negation \
+tests/gpt5/run_phase289_conservative.sh glm4 \
+  --categories negation \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 2
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=5400 \
+OUTPUT_DIR=results/gpt5_phase289_contract_dense_negation \
+tests/gpt5/run_phase289_conservative.sh deepseek7b \
+  --categories negation \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 2
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase289_contract_dense_negation/qwen3_phase289_contract_scan.json
+results/gpt5_phase289_contract_dense_negation/glm4_phase289_contract_scan.json
+results/gpt5_phase289_contract_dense_negation/deepseek7b_phase289_contract_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase289_contract_dense_negation/checkpoints/qwen3/negation_full.json
+results/gpt5_phase289_contract_dense_negation/checkpoints/glm4/negation_full.json
+results/gpt5_phase289_contract_dense_negation/checkpoints/deepseek7b/negation_full.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260527_205629_phase289_qwen3
+results/gpt5_gpu_lock_logs/20260527_211127_phase289_glm4
+results/gpt5_gpu_lock_logs/20260527_213530_phase289_deepseek7b
+```
+
+### 稳定性
+三模型均完成，退出码均为 0。
+
+```text
+Qwen3:      40 pairs, 12000 rows, complete
+GLM4:       40 pairs, 13200 rows, complete
+DeepSeek7B: 40 pairs, 9600 rows, complete
+```
+
+没有发现：
+
+```text
+Xid
+NVRM error
+Traceback
+timeout
+系统卡死
+```
+
+GPU 峰值日志约：
+
+```text
+Qwen3:      8.9GB, 47C, 95W
+GLM4:       19.2GB, 50C, 112W
+DeepSeek7B: 15.8GB, 50C, 107W
+```
+
+GLM4 有 2 条非有限数值行：
+
+```text
+pair: neg_know
+subtype: syntactic_do_not
+patch_type: resid
+alpha: 0.5
+layers: L8, L12
+finite: 0
+```
+
+这不是 CUDA 卡死，也不是 kernel Xid；它是 patch 后模型输出非有限，后续应作为自然性/契约断裂异常样本单独追踪。
+
+### Qwen3 结果
+
+```text
+class: Qwen3ForCausalLM
+pairs: 40
+rows: 12000
+target_layers: [0,4,8,12,16,20,24,28,32,35]
+best_layer_by_both_progress: L0
+contract_broken_layers: [0]
+```
+
+contract event：
+
+```text
+L0, cross_battn_amlp
+cross_kl=0.962
+both_kl=0.161
+cross/both=5.96
+cross_progress=0.357
+both_progress=0.865
+progress_drop=0.508
+```
+
+Top layers by both progress：
+
+```text
+L0:  bothP=0.865 bothKR=0.161 attnP=0.735 mlpP=0.850 residP=0.859
+L4:  bothP=0.391 bothKR=0.682 attnP=0.173 mlpP=0.341 residP=0.872
+L35: bothP=0.390 bothKR=0.989 attnP=0.176 mlpP=0.287 residP=1.000
+L8:  bothP=0.283 bothKR=0.859 attnP=0.114 mlpP=0.264 residP=0.905
+```
+
+子类中非-resid 最强项：
+
+```text
+existential_no:    both P=0.220 KR=0.810
+lexical_not_adj:   both P=0.325 KR=0.748
+morphological_neg: both P=0.173 KR=0.826
+never:             both P=0.285 KR=0.806
+scope_quantifier:  both P=0.366 KR=0.661
+syntactic_do_not:  both P=0.300 KR=0.737
+```
+
+判断：
+- Qwen3 在否定任务上呈现强早层模式，L0 明显最强。
+- L0 both 强于 cross_battn_amlp，说明 B 的 attention 输出不能被 A 的 MLP/residual 直接完整接收，存在早层契约依赖。
+- 各否定子类非-resid 最强项均为 both，支持 attention + MLP 协同。
+
+### GLM4 结果
+
+```text
+class: GlmForCausalLM
+pairs: 40
+rows: 13200
+target_layers: [0,4,8,12,16,20,24,28,32,36,39]
+best_layer_by_both_progress: L0
+contract_broken_layers: [0,4]
+```
+
+contract events：
+
+```text
+L0, cross_battn_amlp
+cross_kl=1.116
+both_kl=0.048
+cross/both=23.18
+cross_progress=0.031
+both_progress=0.963
+progress_drop=0.932
+
+L4, cross_battn_amlp
+cross_kl=0.803
+both_kl=0.370
+cross/both=2.17
+cross_progress=0.177
+both_progress=0.564
+progress_drop=0.387
+```
+
+Top layers by both progress：
+
+```text
+L0:  bothP=0.963 bothKR=0.048 attnP=0.043 mlpP=0.961 residP=0.974
+L4:  bothP=0.564 bothKR=0.370 attnP=0.253 mlpP=0.449 residP=0.984
+L39: bothP=0.347 bothKR=1.287 attnP=-0.003 mlpP=0.339 residP=1.000
+L8:  bothP=0.280 bothKR=0.756 attnP=0.053 mlpP=0.219 residP=0.989
+```
+
+子类中非-resid 最强项：
+
+```text
+existential_no:    both P=0.244 KR=0.736
+lexical_not_adj:   both P=0.267 KR=0.793
+morphological_neg: both P=0.200 KR=0.785
+never:             both P=0.272 KR=0.768
+scope_quantifier:  both P=0.274 KR=0.857
+syntactic_do_not:  both P=0.278 KR=0.813
+```
+
+判断：
+- GLM4 的 L0 极端 MLP 主导非常稳定：`mlpP=0.961`，`attnP=0.043`。
+- L0 both 几乎等于 MLP，说明 attention 单独不是主要转换通道。
+- `B_attn + A_mlp` 在 L0/L4 明显失败，而 `A_attn + B_mlp` 继承 MLP 效果，说明 GLM4 的否定转换关键在 MLP 输出格式，而不是 attention 输出本身。
+- 这比 Phase 288 的“GLM4 MLP集中型”更强，因为样本和层密度都更高。
+
+### DeepSeek7B 结果
+
+```text
+class: Qwen2ForCausalLM
+pairs: 40
+rows: 9600
+target_layers: [0,4,8,12,16,20,24,27]
+best_layer_by_both_progress: L27
+contract_broken_layers: [27]
+```
+
+contract event：
+
+```text
+L27, cross_battn_amlp
+cross_kl=0.841
+both_kl=0.358
+cross/both=2.35
+cross_progress=0.000
+both_progress=0.765
+progress_drop=0.765
+```
+
+Top layers by both progress：
+
+```text
+L27: bothP=0.765 bothKR=0.358 attnP=0.628 mlpP=0.645 residP=1.006
+L0:  bothP=0.437 bothKR=0.856 attnP=0.443 mlpP=0.257 residP=0.508
+L24: bothP=0.233 bothKR=0.864 attnP=0.170 mlpP=0.178 residP=0.524
+L20: bothP=0.204 bothKR=1.056 attnP=0.095 mlpP=0.210 residP=0.556
+```
+
+子类中非-resid 最强项：
+
+```text
+existential_no:    attn P=0.536 KR=0.862
+lexical_not_adj:   both P=0.189 KR=0.915
+morphological_neg: both P=0.362 KR=1.064
+never:             attn P=0.424 KR=1.540
+scope_quantifier:  both P=0.124 KR=0.880
+syntactic_do_not:  both P=0.209 KR=0.891
+```
+
+判断：
+- DeepSeek7B 与 Qwen3/GLM4 不同，最强层在最后层 L27。
+- L27 attention 和 MLP 都强，both 更强，说明最后层有明显协同。
+- `B_attn + A_mlp` 在 L27 几乎完全失效，说明 B attention 必须配合 B MLP/残差上下文，存在强契约。
+- 这支持此前关于 DeepSeek7B “深层释放/最后层压缩”的猜想。
+
+### 总体结论
+本轮更完整地支持 Phase 289 的核心方向：
+
+```text
+语言功能不是单点模块贡献；
+而是 Attention、MLP、Residual 的层级契约路径。
+```
+
+三模型的否定功能路径明显不同：
+
+```text
+Qwen3:
+  早层 L0 attention+MLP 协同，both 最强。
+
+GLM4:
+  早层 L0 MLP 极强，attention 单独近乎无效，MLP 集中型最清楚。
+
+DeepSeek7B:
+  最后层 L27 attention+MLP 协同最强，呈深层/末层压缩型。
+```
+
+复用/差异化的第一性解释也更清楚：
+
+```text
+复用不是单个神经元复用；
+而是某些模块契约被多个功能共享。
+
+差异化不是某个固定语义轴不同；
+而是不同模型/功能在不同层选择不同契约路径。
+```
+
+### 严格审视
+1. 仍然只测 negation，不能推广到所有语言功能。
+2. Qwen3/GLM4 的 L0 强效可能部分来自 token/局部词形差异，需要通过更严格的最小对照验证。
+3. residual patch 很强，但它是整层状态替换，只能作为上界，不等价于机制解释。
+4. 当前 hidden naturalness 还不完整，主要使用 logit_delta_ratio 和 finite check。
+5. GLM4 的 2 条 non-finite resid patch 需要单独复现，确认是模型数值敏感点还是真实契约断裂点。
+6. DeepSeek7B 最后层强效可能受 final norm/lm_head 影响，需要细分 pre/post final-layer 状态。
+
+### 下一步计划
+1. 做 GLM4 `neg_know` 窄复现：
+   - L8/L12
+   - resid patch
+   - alpha=0.25/0.5/0.75
+   - 记录 hidden norm 和 logits finite 状态。
+2. 扩展到 passive 和 logical：
+   - 先每类 20-40 对；
+   - 使用同样 dense 层扫描；
+   - 看模型路径是否仍然 Qwen3 早层、GLM4 MLP、DeepSeek7B 末层。
+3. 给 Phase289 增加 hidden naturalness：
+   - patch vector norm ratio；
+   - next layer input/output norm ratio；
+   - finite/NaN 捕获；
+   - alpha 曲线拐点检测。
+4. 对 Qwen3 L0 和 GLM4 L0 做更细粒度：
+   - 分开 hook self_attn 前后；
+   - 分开 MLP gate/up/down；
+   - 检查是否是词形否定的早层模式，还是抽象否定机制。
+
+### 当前判断
+本轮已经从 pilot 进入可用的机制图谱雏形。最强结论是：
+
+```text
+否定功能在三模型中不是同一编码路径。
+Qwen3 是早层协同型；
+GLM4 是早层 MLP 集中型；
+DeepSeek7B 是末层协同/压缩型。
+```
+
+这说明接下来破解语言编码机制时，重点不应是寻找一个统一语义轴，而应追踪：
+
+```text
+每个功能在每个模型中选择了哪条 Attention-MLP-Residual 契约路径。
+```

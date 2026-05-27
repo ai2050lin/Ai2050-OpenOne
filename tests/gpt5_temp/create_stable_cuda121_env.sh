@@ -35,21 +35,39 @@ python -m pip install \
   transformers==4.52.4 \
   accelerate==1.8.1 \
   huggingface_hub==0.33.0 \
+  numpy==1.26.4 \
   safetensors==0.5.3 \
   sentencepiece==0.2.0 \
   protobuf==5.29.5 \
   einops==0.8.1 \
   tqdm==4.67.1
 
+python -m pip install -e . --no-deps
+python -m pip install \
+  beartype==0.14.1 \
+  better-abc==0.0.3 \
+  datasets==2.21.0 \
+  fancy-einsum==0.0.3 \
+  jaxtyping==0.2.38 \
+  pandas==2.2.3 \
+  rich==13.9.4 \
+  transformers-stream-generator==0.0.5 \
+  typeguard==4.4.2 \
+  wandb==0.17.9
+
 python - <<'PY'
 import sys
 import torch
+import numpy
 import transformers
 import accelerate
+import transformer_lens
 print("python", sys.version)
+print("numpy", numpy.__version__)
 print("torch", torch.__version__, "runtime", torch.version.cuda)
 print("transformers", transformers.__version__)
 print("accelerate", accelerate.__version__)
+print("transformer_lens", getattr(transformer_lens, "__version__", "local-editable"))
 print("cuda_available", torch.cuda.is_available())
 if torch.cuda.is_available():
     print("gpu", torch.cuda.get_device_name(0))

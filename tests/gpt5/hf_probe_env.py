@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gc
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -37,8 +38,28 @@ def load_probe_model(model_key: str) -> LoadedModel:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    default_dtype_by_model = {
+        "qwen3": "float16",
+        "glm4": "float16",
+        "deepseek7b": "bfloat16",
+    }
+    dtype_name = os.environ.get(
+        "PROBE_TORCH_DTYPE", default_dtype_by_model.get(model_key, "bfloat16")
+    ).strip().lower()
+    dtype_map = {
+        "bfloat16": torch.bfloat16,
+        "bf16": torch.bfloat16,
+        "float16": torch.float16,
+        "fp16": torch.float16,
+        "float32": torch.float32,
+        "fp32": torch.float32,
+    }
+    if dtype_name not in dtype_map:
+        valid = ", ".join(sorted(dtype_map))
+        raise ValueError(f"Unsupported PROBE_TORCH_DTYPE={dtype_name!r}. Valid: {valid}")
+
     kwargs: dict[str, Any] = {
-        "torch_dtype": torch.bfloat16,
+        "torch_dtype": dtype_map[dtype_name],
         "trust_remote_code": spec.trust_remote_code,
         "local_files_only": True,
         "attn_implementation": spec.attn_implementation,

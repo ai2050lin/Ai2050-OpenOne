@@ -1,0 +1,425 @@
+{
+  "model": "deepseek7b",
+  "dataset_version": "v2_unique_20260526",
+  "class": "Qwen2ForCausalLM",
+  "category": "comparison",
+  "cases_per_category": 10,
+  "batch_size": 1,
+  "case_chunk_size": 1,
+  "complete": true,
+  "num_cases": 10,
+  "aggregate": {
+    "overall": {
+      "full": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.7508514523506165,
+        "median_margin": 0.875,
+        "min_margin": -1.9511871337890625
+      },
+      "mean": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.5223007202148438,
+        "median_margin": 0.5772647857666016,
+        "min_margin": -1.25
+      },
+      "first_token": {
+        "n": 10,
+        "accuracy": 0.6000000238418579,
+        "mean_margin": 0.4961279034614563,
+        "median_margin": 0.5,
+        "min_margin": -1.3125
+      },
+      "first_full_disagreements": 0
+    },
+    "per_category": {
+      "comparison": {
+        "full": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.7508514523506165,
+          "median_margin": 0.875,
+          "min_margin": -1.9511871337890625
+        },
+        "mean": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.5223007202148438,
+          "median_margin": 0.5772647857666016,
+          "min_margin": -1.25
+        },
+        "first_token": {
+          "n": 10,
+          "accuracy": 0.6000000238418579,
+          "mean_margin": 0.4961279034614563,
+          "median_margin": 0.5,
+          "min_margin": -1.3125
+        },
+        "first_full_disagreements": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "comparison_000",
+      "category": "comparison",
+      "prompt": "Alice is taller than Bob. The taller person is",
+      "choices": [
+        " Alice",
+        " Bob"
+      ],
+      "answer_index": 0,
+      "answer": " Alice",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -8.591438293457031,
+          "mean_logprob": -8.591438293457031,
+          "first_token_logprob": -8.591438293457031,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -8.216438293457031,
+          "mean_logprob": -8.216438293457031,
+          "first_token_logprob": -8.216438293457031,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": -0.375,
+      "mean_margin": -0.375,
+      "first_token_margin": -0.375,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "comparison_001",
+      "category": "comparison",
+      "prompt": "Bob is shorter than Alice. The taller person is",
+      "choices": [
+        " Alice",
+        " Bob"
+      ],
+      "answer_index": 0,
+      "answer": " Alice",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -2.18304443359375,
+          "mean_logprob": -2.18304443359375,
+          "first_token_logprob": -2.18304443359375,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -3.49554443359375,
+          "mean_logprob": -3.49554443359375,
+          "first_token_logprob": -3.49554443359375,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 1.3125,
+      "mean_margin": 1.3125,
+      "first_token_margin": 1.3125,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_002",
+      "category": "comparison",
+      "prompt": "Compared with Bob, Alice is taller. The taller person is",
+      "choices": [
+        " Alice",
+        " Bob"
+      ],
+      "answer_index": 0,
+      "answer": " Alice",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -8.177873611450195,
+          "mean_logprob": -8.177873611450195,
+          "first_token_logprob": -8.177873611450195,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -6.927873611450195,
+          "mean_logprob": -6.927873611450195,
+          "first_token_logprob": -6.927873611450195,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": -1.25,
+      "mean_margin": -1.25,
+      "first_token_margin": -1.25,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "comparison_003",
+      "category": "comparison",
+      "prompt": "Compared with Alice, Bob is shorter. The taller person is",
+      "choices": [
+        " Alice",
+        " Bob"
+      ],
+      "answer_index": 0,
+      "answer": " Alice",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -3.333446502685547,
+          "mean_logprob": -3.333446502685547,
+          "first_token_logprob": -3.333446502685547,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -5.708446502685547,
+          "mean_logprob": -5.708446502685547,
+          "first_token_logprob": -5.708446502685547,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 2.375,
+      "mean_margin": 2.375,
+      "first_token_margin": 2.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_004",
+      "category": "comparison",
+      "prompt": "Between Alice and Bob, the one that is taller is",
+      "choices": [
+        " Alice",
+        " Bob"
+      ],
+      "answer_index": 0,
+      "answer": " Alice",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -4.61688232421875,
+          "mean_logprob": -4.61688232421875,
+          "first_token_logprob": -4.61688232421875,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -5.49188232421875,
+          "mean_logprob": -5.49188232421875,
+          "first_token_logprob": -5.49188232421875,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.875,
+      "mean_margin": 0.875,
+      "first_token_margin": 0.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_005",
+      "category": "comparison",
+      "prompt": "red box is heavier than blue box. The heavier box is",
+      "choices": [
+        " red box",
+        " blue box"
+      ],
+      "answer_index": 0,
+      "answer": " red box",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -7.348911285400391,
+          "mean_logprob": -3.6744556427001953,
+          "first_token_logprob": -2.720338821411133,
+          "num_choice_tokens": 2
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -8.503440856933594,
+          "mean_logprob": -4.251720428466797,
+          "first_token_logprob": -3.595338821411133,
+          "num_choice_tokens": 2
+        }
+      ],
+      "full_margin": 1.1545295715332031,
+      "mean_margin": 0.5772647857666016,
+      "first_token_margin": 0.875,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_006",
+      "category": "comparison",
+      "prompt": "blue box is lighter than red box. The heavier box is",
+      "choices": [
+        " red box",
+        " blue box"
+      ],
+      "answer_index": 0,
+      "answer": " red box",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -10.166601181030273,
+          "mean_logprob": -5.083300590515137,
+          "first_token_logprob": -4.514995574951172,
+          "num_choice_tokens": 2
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -12.12045669555664,
+          "mean_logprob": -6.06022834777832,
+          "first_token_logprob": -5.014995574951172,
+          "num_choice_tokens": 2
+        }
+      ],
+      "full_margin": 1.9538555145263672,
+      "mean_margin": 0.9769277572631836,
+      "first_token_margin": 0.5,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_007",
+      "category": "comparison",
+      "prompt": "Compared with blue box, red box is heavier. The heavier box is",
+      "choices": [
+        " red box",
+        " blue box"
+      ],
+      "answer_index": 0,
+      "answer": " red box",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -8.242000579833984,
+          "mean_logprob": -4.121000289916992,
+          "first_token_logprob": -2.0508174896240234,
+          "num_choice_tokens": 2
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -6.290813446044922,
+          "mean_logprob": -3.145406723022461,
+          "first_token_logprob": -1.6370964050292969,
+          "num_choice_tokens": 2
+        }
+      ],
+      "full_margin": -1.9511871337890625,
+      "mean_margin": -0.9755935668945312,
+      "first_token_margin": -0.41372108459472656,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    },
+    {
+      "case_id": "comparison_008",
+      "category": "comparison",
+      "prompt": "Compared with red box, blue box is lighter. The heavier box is",
+      "choices": [
+        " red box",
+        " blue box"
+      ],
+      "answer_index": 0,
+      "answer": " red box",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -4.019813537597656,
+          "mean_logprob": -2.009906768798828,
+          "first_token_logprob": -1.2656078338623047,
+          "num_choice_tokens": 2
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -8.173238754272461,
+          "mean_logprob": -4.0866193771362305,
+          "first_token_logprob": -3.6406078338623047,
+          "num_choice_tokens": 2
+        }
+      ],
+      "full_margin": 4.153425216674805,
+      "mean_margin": 2.0767126083374023,
+      "first_token_margin": 2.375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "comparison_009",
+      "category": "comparison",
+      "prompt": "Between red box and blue box, the one that is heavier is",
+      "choices": [
+        " red box",
+        " blue box"
+      ],
+      "answer_index": 0,
+      "answer": " red box",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -5.8475494384765625,
+          "mean_logprob": -2.9237747192382812,
+          "first_token_logprob": -4.703145980834961,
+          "num_choice_tokens": 2
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -5.107940673828125,
+          "mean_logprob": -2.5539703369140625,
+          "first_token_logprob": -3.390645980834961,
+          "num_choice_tokens": 2
+        }
+      ],
+      "full_margin": -0.7396087646484375,
+      "mean_margin": -0.36980438232421875,
+      "first_token_margin": -1.3125,
+      "full_correct": false,
+      "mean_correct": false,
+      "first_token_correct": false
+    }
+  ]
+}
