@@ -1,0 +1,137 @@
+{
+  "model": "qwen3",
+  "dataset_version": "v2_unique_20260526",
+  "class": "Qwen3ForCausalLM",
+  "category": "temporal",
+  "cases_per_category": 2,
+  "batch_size": 1,
+  "case_chunk_size": 1,
+  "complete": true,
+  "num_cases": 2,
+  "aggregate": {
+    "overall": {
+      "full": {
+        "n": 2,
+        "accuracy": 1.0,
+        "mean_margin": 1.84375,
+        "median_margin": 0.4375,
+        "min_margin": 0.4375
+      },
+      "mean": {
+        "n": 2,
+        "accuracy": 1.0,
+        "mean_margin": 1.84375,
+        "median_margin": 0.4375,
+        "min_margin": 0.4375
+      },
+      "first_token": {
+        "n": 2,
+        "accuracy": 1.0,
+        "mean_margin": 1.84375,
+        "median_margin": 0.4375,
+        "min_margin": 0.4375
+      },
+      "first_full_disagreements": 0
+    },
+    "per_category": {
+      "temporal": {
+        "full": {
+          "n": 2,
+          "accuracy": 1.0,
+          "mean_margin": 1.84375,
+          "median_margin": 0.4375,
+          "min_margin": 0.4375
+        },
+        "mean": {
+          "n": 2,
+          "accuracy": 1.0,
+          "mean_margin": 1.84375,
+          "median_margin": 0.4375,
+          "min_margin": 0.4375
+        },
+        "first_token": {
+          "n": 2,
+          "accuracy": 1.0,
+          "mean_margin": 1.84375,
+          "median_margin": 0.4375,
+          "min_margin": 0.4375
+        },
+        "first_full_disagreements": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "temporal_000",
+      "category": "temporal",
+      "prompt": "Yesterday, Maria walked. The walking happened in the",
+      "choices": [
+        " past",
+        " future"
+      ],
+      "answer_index": 0,
+      "answer": " past",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -7.703563690185547,
+          "mean_logprob": -7.703563690185547,
+          "first_token_logprob": -7.703563690185547,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -10.953563690185547,
+          "mean_logprob": -10.953563690185547,
+          "first_token_logprob": -10.953563690185547,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 3.25,
+      "mean_margin": 3.25,
+      "first_token_margin": 3.25,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    },
+    {
+      "case_id": "temporal_001",
+      "category": "temporal",
+      "prompt": "Tomorrow, Maria will walk. The walking happens in the",
+      "choices": [
+        " future",
+        " past"
+      ],
+      "answer_index": 0,
+      "answer": " future",
+      "note": "",
+      "choice_scores": [
+        {
+          "case_index": 0,
+          "choice_index": 0,
+          "full_logprob": -9.387716293334961,
+          "mean_logprob": -9.387716293334961,
+          "first_token_logprob": -9.387716293334961,
+          "num_choice_tokens": 1
+        },
+        {
+          "case_index": 0,
+          "choice_index": 1,
+          "full_logprob": -9.825216293334961,
+          "mean_logprob": -9.825216293334961,
+          "first_token_logprob": -9.825216293334961,
+          "num_choice_tokens": 1
+        }
+      ],
+      "full_margin": 0.4375,
+      "mean_margin": 0.4375,
+      "first_token_margin": 0.4375,
+      "full_correct": true,
+      "mean_correct": true,
+      "first_token_correct": true
+    }
+  ]
+}

@@ -29,13 +29,13 @@ MODEL_SPECS: dict[str, ModelSpec] = {
         key="glm4",
         repo_id="zai-org/glm-4-9b-chat-hf",
         local_dir=MODEL_ROOT / "glm4-9b-chat-hf",
-        load_strategy="auto",
+        load_strategy="cuda",
     ),
     "deepseek7b": ModelSpec(
         key="deepseek7b",
         repo_id="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
         local_dir=MODEL_ROOT / "deepseek-r1-distill-qwen-7b",
-        load_strategy="auto",
+        load_strategy="cuda",
     ),
 }
 

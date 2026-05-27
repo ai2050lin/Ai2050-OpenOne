@@ -835,3 +835,471 @@
 - P0：保持 checkpoint/resume 架构，所有长跑继续按模型和 category 分段保存。
 - P1：基于审计结果挑选第一批机制分析样本，每类正样本和困难样本各 20 条。
 - P1：对 Qwen3 先做 residual stream patching，因为其行为最稳，最适合作为机制定位起点。
+
+---
+
+## Phase 14: 系统语言结果错误审计与数据质量硬伤 [2026-05-26 11:55]
+
+### 本轮执行命令
+- `python - <<'PY' ... 检查 qwen3_systematic_language.json 的 case 结构 ... PY`
+- `sed -n '1,220p' results/gpt5_systematic_language_benchmark_v1/summary.json`
+- `find results/gpt5_systematic_language_benchmark_v1/checkpoints -mindepth 2 -maxdepth 2 -type f | sort | head -30`
+- `python -m py_compile tests/gpt5/audit_systematic_language_results.py`
+- `python tests/gpt5/audit_systematic_language_results.py --input-dir results/gpt5_systematic_language_benchmark_v1 --output-dir results/gpt5_systematic_language_audit_v1 --top-k 20 --low-margin 1.0`
+- `sed -n '1,220p' results/gpt5_systematic_language_audit_v1/audit.md`
+- `python - <<'PY' ... 输出跨模型全错样本、低 margin 统计和唯一 prompt 数 ... PY`
+- `date '+%Y-%m-%d %H:%M'`
+
+### 生成/修改脚本
+- 新增：`tests/gpt5/audit_systematic_language_results.py`
+- 输出：
+  - `results/gpt5_systematic_language_audit_v1/audit.json`
+  - `results/gpt5_systematic_language_audit_v1/audit.md`
+- 脚本功能：
+  - 每模型、每 category 统计准确率、失败数、低 margin 正确数；
+  - 提取最严重失败样本；
+  - 提取低 margin 正确样本；
+  - 提取高 margin 正确样本；
+  - 检查 first/full、mean/full scoring 是否不一致；
+  - 统计跨模型共同错误与混合错误；
+  - 新增 `unique_prompt_choices` 和 `duplicate_factor`，检查数据重复。
+
+### 审计结果
+- 三模型整体结果与 Phase 12 一致：
+  - DeepSeek7B：900 条，full accuracy 71.11%；
+  - GLM4：900 条，full accuracy 78.89%；
+  - Qwen3：900 条，full accuracy 95.56%。
+- 但发现严重数据质量问题：
+  - 多数 category 并不是 100 个唯一样本，而是 10-50 个唯一题重复扩容。
+  - `comparison`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `conditional`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `negation_yesno`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `passive_agent`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `recursive_binding`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `svo_agent`：100 条中只有 20 个唯一 prompt+choices，重复因子 5；
+  - `quantifier`：100 条中只有 10 个唯一 prompt+choices，重复因子 10；
+  - `temporal`：100 条中只有 10 个唯一 prompt+choices，重复因子 10；
+  - `translation`：100 条中只有 50 个唯一 prompt+choices，重复因子 2。
+
+### 关键样本发现
+- 跨模型共同全错只集中在两个类别：
+  - `recursive_binding`：5 条，实际是同一模板重复，如 `The student that the pilot guarded was old. The old one was the ...`
+  - `temporal`：10 条，实际是同一模板重复，如 `Tomorrow, the tree grew. The growing happens in the ...`
+- DeepSeek7B 典型错误：
+  - 否定 yes/no：大量把 `not ...?` 判断成 `yes`；
+  - 量词：`Few keys came... Did many keys come?` 判断成 `yes`；
+  - temporal：`Now, Sam washed his hands...` 倾向 `past`；
+  - passive：`the school is followed by the nurse` 倾向选择 patient。
+- GLM4 典型错误：
+  - 否定和量词也明显偏 `yes`；
+  - temporal 对 future/past 有模板偏置；
+  - recursive binding 在多名词绑定中不稳。
+- Qwen3 典型错误：
+  - conditional 中 `guard wakes up` 被 `asleep` 干扰；
+  - temporal 中 before/after 和未来时有错误；
+  - recursive binding 中部分主语关系从句不稳。
+
+### 对 Phase 12 结论的修正
+- Phase 12 的三模型分数仍有参考价值，但必须降级解释：
+  - 它不是 900 个独立语言样本的结果；
+  - 更准确地说，是“少量模板重复扩容后的稳定性结果”；
+  - 重复样本会放大某些错误，也会让 accuracy 看起来更稳定。
+- 仍可保留的结论：
+  - SVO 和 translation 在当前模板下非常稳定；
+  - negation、quantifier、temporal、recursive 是困难区；
+  - Qwen3 在当前模板分布下最稳。
+- 不能保留为强结论的部分：
+  - 不能说每类 100 条已充分覆盖该语言功能；
+  - 不能把错误重合率直接解释为三模型共同机制缺陷；
+  - 不能直接进入 activation patching，否则可能是在解释模板重复偏差。
+
+### 理论研究进展
+- 本轮最重要的研究进展是方法论上的：
+  - 语言机制研究不能只扩大样本数量，必须扩大“独立关系结构”的数量；
+  - 重复模板会把一个局部现象伪装成稳定规律；
+  - 真正需要的是“关系结构多样性”，不是简单题目条数。
+- 对“语言背后数学结构”的第一性约束进一步明确：
+  - 如果语言编码机制真的存在，应跨实体、跨动词、跨模板、跨表达方式保持某种稳定变换；
+  - 如果只在一个模板里稳定，那更可能是模板记忆或局部模式；
+  - 所以后续测试必须把变量空间系统展开：实体、关系、极性、时间、集合、句式都要分别控制。
+
+### 下一步任务
+- P0：重写 v2 测试集生成器，硬性要求每个 category 至少 100 个唯一 prompt+choices。
+- P0：加入 uniqueness guard：
+  - 生成后自动统计 `unique_prompt_choices`；
+  - 若低于要求，脚本直接报错，不允许长跑。
+- P0：优先修复四个关键类别：
+  - `negation_yesno`：增加不同句式，不只 `X is not Y`；
+  - `quantifier`：扩展 all/no/some/few/not all/exactly one/at least two；
+  - `temporal`：修正语义冲突模板，例如 `Tomorrow, the tree grew` 这种时态混乱；
+  - `recursive_binding`：增加主语关系从句、宾语关系从句、所有格、介词短语限定。
+- P1：v2 跑完后再做错误审计，只有通过唯一性和模板鲁棒性检查后，才进入机制分析。
+
+---
+
+## Phase 15: 读取 GLM5 Phase 285-287 后的研发计划与显卡稳定性复核 [2026-05-26 16:39]
+
+### 本轮执行命令
+- `rg -n "^## Phase (285|286|287):" research/glm5/docs/AGI_GLM5_MEMO.md`
+- `sed -n '58396,58585p' research/glm5/docs/AGI_GLM5_MEMO.md`
+- `sed -n '58586,58710p' research/glm5/docs/AGI_GLM5_MEMO.md`
+- `sed -n '58711,58920p' research/glm5/docs/AGI_GLM5_MEMO.md`
+- `nvidia-smi`
+- `cat /proc/driver/nvidia/version`
+- `cat /proc/driver/nvidia/params | rg -i 'EnableGpuFirmware|GSP|OpenRm|Firmware'`
+- `modinfo nvidia | rg -i 'filename|version|license|firmware|EnableGpuFirmware'`
+- `journalctl -b 0 -k --no-pager | rg -i 'NVRM|Xid|GSP|GPU is probably locked|GPU Reset Required|soft lockup|oom|out of memory'`
+- `python - <<'PY' ... torch tiny cuda op ... PY`
+- `apt-cache policy nvidia-driver-570 nvidia-driver-570-open nvidia-driver-580 nvidia-driver-580-open`
+- `dpkg -l | rg '^(ii)\s+(nvidia|libnvidia|linux-modules-nvidia)'`
+- `dkms status`
+- `for i in $(seq 1 6); do ... nvidia-smi ...; sleep 5; done`
+- `date '+%Y-%m-%d %H:%M'`
+
+### GLM5 Phase 285-287 关键信息
+- Phase 285：
+  - 从 manual attention 转向真实 forward activation patching；
+  - 用真实 hook/cache/patch 测 attn、mlp、resid 的因果效应；
+  - 得到三类架构图像：Qwen3 分布式、GLM4 L0 MLP 瓶颈、DS7B 组件因果决定型；
+  - 但只有 28 对样本，per-category 只有 2 对，且 effect>1 和 L0 artifact 需要谨慎。
+- Phase 286：
+  - 下沉到 head-level real forward patching；
+  - 发现 Qwen3 单 head 效应小，GLM4 attention head 大多可互换，DS7B head 因果效应强；
+  - 提出 diff norm 不能预测 causal importance，这是重要方法论发现；
+  - 但 per-category 只有 1 pair，GLM4 采样 head 数少，DS7B effect>1 普遍。
+- Phase 287：
+  - 进一步分离 attention head 的 routing 与 content；
+  - 结论是 15/15 heads 显示 routing/content 可分离；
+  - 重要发现：negation 在 Qwen3/DS7B 中偏 content，translation 三模型接近平衡；
+  - 但关键类别样本少，例如 DS7B negation R/C 基于 3 对，GLM4 平衡可能是弱效应噪声。
+
+### 结合 GPT5 当前研究进展的判断
+- GLM5 Phase 285-287 的方法方向是对的：
+  - 应优先使用真实 forward patching；
+  - manual attention 只能作为辅助解释；
+  - causal patching 比 diff norm/probing 更可信。
+- 但当前不能直接把这些结果作为强理论结论：
+  - GPT5 Phase 14 已发现 v1 行为数据存在重复模板扩容问题；
+  - GLM5 Phase 285-287 的机制实验样本更少，category 级解释信度不足；
+  - 机制实验应绑定到经过唯一性、模板鲁棒性、变量交换验证的行为样本上。
+- 因此下一步不是继续扩大 head patching，而是先建立可靠行为基准 v2，然后把 patching 接到 v2 的稳定样本和困难样本上。
+
+### 显卡驱动稳定性复核
+- 用户说明显卡驱动已更新为 570；但本机实际检查结果：
+  - `nvidia-driver-570` 元包确实显示已安装；
+  - 但当前活跃驱动仍是 `580.159.03`；
+  - `nvidia-smi` 显示 Driver Version `580.159.03`；
+  - `/proc/driver/nvidia/version` 显示 `580.159.03`；
+  - `dkms status` 显示 `nvidia/580.159.03`；
+  - 当前安装的 libnvidia/nvidia-utils/nvidia-dkms 也主要是 580。
+- 当前积极变化：
+  - 已不再加载 open kernel module；
+  - `modinfo nvidia` 路径为 `/updates/dkms/nvidia.ko.zst`；
+  - license 为 `NVIDIA`，不是 `Dual MIT/GPL`；
+  - `EnableGpuFirmware: 0`，即 GSP 已关闭；
+  - 当前 boot 没有发现新的 NVIDIA Xid/GSP timeout；
+  - tiny CUDA op 成功；
+  - 30 秒低负载 `nvidia-smi` 轮询正常。
+- 稳定性结论：
+  - 低负载状态目前正常；
+  - 但不能确认高负载稳定，因为当前活跃驱动仍是 580，不是 570；
+  - 由于此前 Xid 119 是高负载/长 CUDA 调用触发，必须通过分阶段 smoke 才能确认。
+
+### 下一步研发计划
+- P0：先解决驱动状态确认。
+  - 如果目标是 570，需清理 580 或切换 alternatives/DKMS，使 `nvidia-smi` 真正显示 570；
+  - 如果暂时接受 580 proprietary + GSP disabled，则先做小规模稳定性测试，不直接跑全量。
+- P0：恢复 v2 行为测试，但采用更保守阶梯：
+  1. Qwen3 `cases-per-category=1`；
+  2. Qwen3 单 category 20 条；
+  3. Qwen3 单 category 100 条；
+  4. 观察 30 分钟无 Xid 后再跑全部 900 条；
+  5. 再依次跑 GLM4、DeepSeek7B。
+- P0：继续完善 v2 唯一样本测试集。
+  - 当前 `systematic_language_benchmark.py` 已加入 v2 唯一性生成与 `DATASET_VERSION`；
+  - 每类 100 个唯一 prompt+choices；
+  - checkpoint 需继续细化到 category 内分片，避免单 category 卡死丢进度。
+- P1：v2 行为结果完成后，做错误审计 v2。
+  - 提取稳定正确样本、高 margin 样本、稳定错误样本、低 margin 样本；
+  - 排除模板歧义和 tokenization 偏差。
+- P1：机制实验准入标准。
+  - 只对通过行为基准的样本做 real forward patching；
+  - 优先 Qwen3，因为行为最稳、组件效应分布式，适合验证“复用/差异化”；
+  - 机制粒度按顺序推进：resid stream patching → attn/mlp patching → head patching → route/content separation。
+- P2：理论主线。
+  - 不直接相信“某 head 负责某功能”；
+  - 重点寻找对象、角色、极性、集合、时间、条件、翻译等最小关系操作在网络中的可复现状态转换；
+  - 用 causal patching 验证这些状态是否可干预，而不是只看激活差异。
+
+---
+
+## Phase 16: 6.17 回退导致 NVIDIA 570 再次无法加载的修复 [2026-05-26 21:24]
+
+### 背景
+用户反馈刚刚又出现卡死，重启后系统内核又变回 `6.17`，显卡驱动没有加载成功。
+
+### 本轮执行命令
+- `uname -r && nvidia-smi || true`
+- `cat /proc/driver/nvidia/version 2>/dev/null || true`
+- `dkms status || true`
+- `ls -1 /boot | sort | rg 'vmlinuz|initrd|config|System.map'`
+- `sed -n '1,120p' /etc/default/grub 2>/dev/null || true`
+- `grub-editenv list 2>/dev/null || true`
+- `journalctl -b -k --no-pager | rg -i 'nvidia|nvrm|Invalid relocation|Exec format|Xid|GSP' | tail -120`
+- `modinfo -k 6.8.0-117-generic nvidia | rg '^(filename|version|vermagic|signer|sig_hashalgo):'`
+- `modinfo -k 6.17.0-29-generic nvidia | rg '^(filename|version|vermagic|signer|sig_hashalgo):'`
+- `bash -n tests/gpt5_temp/force_kernel_6_8_default.sh`
+
+### 当前状态
+- 当前启动内核：
+  - `6.17.0-29-generic`
+- 当前 `nvidia-smi` 失败：
+  - 无法连接 NVIDIA driver。
+- DKMS 状态：
+  - `nvidia/570.211.01, 6.17.0-29-generic, x86_64: installed`
+  - `nvidia/570.211.01, 6.8.0-117-generic, x86_64: installed`
+- 6.8 内核文件仍存在：
+  - `/boot/vmlinuz-6.8.0-117-generic`
+  - `/boot/initrd.img-6.8.0-117-generic`
+- `/etc/default/grub` 当前仍是：
+  - `GRUB_DEFAULT=0`
+  - `GRUB_TIMEOUT_STYLE=hidden`
+  - `GRUB_TIMEOUT=0`
+
+### 关键判断
+- 这次“重启后回到 6.17”不是奇怪现象，而是 GRUB 默认项仍为 `0`：
+  - 默认选择最新内核；
+  - 当前最新内核是 `6.17.0-29-generic`；
+  - 所以每次普通重启都会回到 6.17。
+- 此前进入 6.8 是通过 `grub-reboot` 设置的一次性启动项；
+  - 一次性启动项使用后会清空；
+  - 后续重启自然回到默认 6.17。
+- 570 在 6.17 下仍复现同一类错误：
+  - `module: x86/modules: Invalid relocation target, existing value is nonzero for type 1`
+- 因此显卡驱动未加载成功的直接原因是：
+  - 系统启动到了 6.17；
+  - 570 模块在 6.17 下加载失败；
+  - 而不是 570 包丢失。
+
+### 生成脚本
+- 新增：
+  - `tests/gpt5_temp/force_kernel_6_8_default.sh`
+- 脚本功能：
+  - 检查 `6.8.0-117-generic` 内核是否存在；
+  - 检查 NVIDIA 570 DKMS 是否已为 6.8 安装；
+  - 备份 `/etc/default/grub`；
+  - 将 `GRUB_DEFAULT=0` 改为：
+    - `GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 6.8.0-117-generic"`
+  - 临时打开 5 秒 GRUB 菜单：
+    - `GRUB_TIMEOUT_STYLE=menu`
+    - `GRUB_TIMEOUT=5`
+  - 执行 `update-grub`。
+- 脚本已通过语法检查：
+  - `bash -n tests/gpt5_temp/force_kernel_6_8_default.sh`
+
+### 执行方式
+在本机终端执行：
+
+```bash
+cd /home/rankrank/Documents/OpenOne/Ai2050-OpenOne
+bash tests/gpt5_temp/force_kernel_6_8_default.sh
+sudo reboot
+```
+
+重启后验证：
+
+```bash
+uname -r
+nvidia-smi
+cat /proc/driver/nvidia/params | grep EnableGpuFirmware
+```
+
+### 对模型测试的影响
+- 本次卡死说明即使 `570 + 6.8 + GSP off` 能启动，模型测试仍可能在 CUDA/驱动清理阶段卡住。
+- 刚才的 stage10 结果显示：
+  - Qwen3 已完成 90 条并写入 checkpoint；
+  - 卡死发生在 Qwen3 完成后、准备释放模型或进入下一个模型阶段；
+  - 因此后续不能再用“一个 Python 进程连续跑三个模型”的方式。
+- 已对 `tests/gpt5/systematic_language_benchmark.py` 增加 `--hard-exit-after-model` 方案：
+  - 单模型单进程；
+  - 写完结果后跳过显式 CUDA cleanup；
+  - 用 `os._exit(0)` 直接结束进程；
+  - 避免卡在模型释放/CUDA 清理路径。
+
+### 下一步计划
+1. 先永久固定 6.8 默认启动，恢复 NVIDIA 570。
+2. 重启确认：
+   - `uname -r` 必须是 `6.8.0-117-generic`；
+   - `nvidia-smi` 必须正常；
+   - `EnableGpuFirmware` 必须为 `0`。
+3. 继续测试时采用单模型单进程：
+   - Qwen3 已有 stage10 结果；
+   - GLM4 单独跑；
+   - DeepSeek7B 单独跑；
+   - 每个模型结束后重新开进程，必要时每个模型之间重启。
+4. 研究结论保持谨慎：
+   - 当前最重要的不是扩大样本，而是先把驱动/内核变量固定；
+   - 否则语言机制结果会被系统不稳定污染。
+
+## Phase 17: 再次卡死后的根因分层与测试策略降级 [2026-05-26 21:48]
+
+### 背景
+用户反馈三个模型测试过程中再次出现卡死。此前已经固定到 `6.8.0-117-generic + NVIDIA 570.211.01 + GSP off`，因此本轮重点判断是否仍是 6.17 回退问题，还是更深层的 CUDA/NVIDIA 驱动死锁问题。
+
+### 本轮执行命令
+- `uname -r`
+- `cat /proc/driver/nvidia/version`
+- `cat /proc/driver/nvidia/params | rg 'EnableGpuFirmware|EnableGpuFirmwareLogs'`
+- `ps -eo pid,ppid,etime,stat,pcpu,pmem,wchan:32,cmd | rg 'python tests/gpt5|systematic_language_benchmark|nvidia-smi|cuda|python'`
+- `journalctl -b -k --since '20 minutes ago' --no-pager | rg -i 'NVRM|Xid|GSP|GPU is probably locked|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset'`
+- `journalctl -b -1 -k --no-pager | rg -i 'NVRM|Xid|GSP|GPU is probably locked|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset|os_acquire'`
+- `journalctl --list-boots --no-pager | tail -8`
+- `python - <<'PY' ... checkpoint 完成度统计 ... PY`
+- `lspci -nn | rg -i 'vga|3d|display|graphics|arc|intel'`
+- `ls -l /dev/dri`
+- `for f in /sys/class/drm/card*/device/vendor; do ...`
+- `python - <<'PY' ... torch/transformers/python 版本 ... PY`
+- `bash -n tests/gpt5_temp/run_stage10_single_category_after_reboot.sh`
+- `bash -n tests/gpt5_temp/create_stable_cuda121_env.sh`
+
+### 当前系统状态
+- 当前已回到正确内核与驱动组合：
+  - `uname -r`: `6.8.0-117-generic`
+  - NVIDIA kernel module: `570.211.01`
+  - `EnableGpuFirmware: 0`
+- 当前 boot 中 NVIDIA 驱动加载正常。
+- 上一轮卡死不是 6.17 回退导致的驱动加载失败，而是在 6.8 + 570 + GSP off 下运行模型时再次触发。
+
+### 关键现场
+- Qwen3 stage10 已完整完成：
+  - 9 个 category 全部 10/10；
+  - 结果文件已写入。
+- GLM4 stage10 进展：
+  - 已完成：`svo_agent`、`passive_agent`、`negation_yesno`、`conditional`、`comparison`、`temporal`、`recursive_binding`
+  - `quantifier` 只完成 5/10；
+  - `translation` 未完成。
+- DeepSeek7B stage10 未开始。
+- GLM4 卡死时进程状态显示：
+  - 主进程在用户态 `futex_wait_queue`；
+  - 一个 CUDA 相关线程进入 D 状态，wchan 为 `os_acquire_mutex`；
+  - `SIGKILL` 后主线程可变 zombie，但 D 状态 CUDA 线程不能被杀掉；
+  - 必须重启才能释放。
+
+### 重要判断
+- 这已经不是普通 Python 异常，也不是单纯脚本逻辑问题。
+- 这是 NVIDIA/CUDA 内核驱动路径死锁：
+  - 进程进入不可中断 D 状态；
+  - 普通 kill 无效；
+  - `nvidia-smi` 查询也可能卡住；
+  - 桌面可能一起卡死。
+- 内核日志没有稳定出现 Xid，并不代表没有驱动问题：
+  - D 状态卡死可能发生在驱动 mutex/rwlock 路径；
+  - 未必来得及输出 Xid；
+  - 也可能日志在硬重启前没有完整落盘。
+
+### 环境风险
+- 当前 Python/CUDA 栈偏激进：
+  - Python: `3.13.12`
+  - PyTorch: `2.6.0+cu124`
+  - CUDA runtime: `12.4`
+  - transformers: `5.5.4`
+- 对大模型 CUDA 稳定性测试来说，这套组合不够保守。
+- 用户此前也提到 Windows 上通过降低 CUDA 版本解决过类似卡死，因此当前应把 CUDA runtime / PyTorch 版本作为关键变量。
+
+### 显示与计算共卡问题
+- 当前机器只有 NVIDIA 作为 VGA/display 设备：
+  - `lspci` 只显示 4090D 为 VGA；
+  - `/dev/dri` 中只有 NVIDIA vendor `0x10de`；
+  - 没有可见 Intel/AMD 独显或核显 DRM card。
+- 这意味着桌面显示和 CUDA 计算共用同一张 4090D。
+- 一旦 CUDA/NVIDIA 内核驱动死锁，桌面也会被拖死。
+- 这是“模型进程卡死”升级成“整机卡死”的重要结构性原因。
+
+### 已做代码调整
+- 修改 `tests/gpt5/model_registry.py`：
+  - 将 GLM4 与 DeepSeek7B 的 `load_strategy` 从 `auto` 改为 `cuda`；
+  - 目的：减少 accelerate `device_map=auto` / CPU offload / 多路径调度的复杂性。
+- `tests/gpt5/systematic_language_benchmark.py` 已支持：
+  - `--hard-exit-after-model`
+  - 单模型单进程，写完后 `os._exit(0)`。
+- 新增：
+  - `tests/gpt5_temp/run_stage10_single_category_after_reboot.sh`
+  - 功能：每个模型、每个 category 单独进程运行，已完成 checkpoint 自动跳过。
+- 新增：
+  - `tests/gpt5_temp/create_stable_cuda121_env.sh`
+  - 功能：创建保守 CUDA 12.1 环境：
+    - Python 3.11
+    - PyTorch `2.5.1+cu121`
+    - transformers `4.52.4`
+    - accelerate `1.8.1`
+  - 目的：验证是否为当前 Python 3.13 / cu124 / transformers 5.x 组合触发驱动死锁。
+
+### 根因分层
+当前最可能原因排序：
+
+1. **NVIDIA/CUDA 驱动死锁**
+   - 证据最强：D 状态、`os_acquire_mutex`、kill 无效、重启释放。
+
+2. **当前 CUDA runtime / PyTorch / transformers 组合不稳**
+   - 当前栈过新，且用户历史经验支持“降低 CUDA 版本可能解决”。
+
+3. **显示和计算共用 4090D**
+   - 不一定是死锁根因，但会显著放大卡死影响。
+
+4. **GLM4/DeepSeek7B 加载路径复杂**
+   - 原先使用 `device_map=auto`，可能触发 accelerate/offload 与 CUDA 清理交互问题；
+   - 已改为整模型 CUDA。
+
+5. **硬件/供电/主板 BIOS/PCIe 稳定性**
+   - 不能排除，但目前还没有 ECC/PCIe/AER 证据。
+
+### 解决方案
+短期不继续强推三模型长跑。先按下面顺序降级排查：
+
+1. 固定内核与驱动：
+   - 保持 `6.8.0-117-generic`
+   - 保持 `570.211.01`
+   - 保持 `EnableGpuFirmware=0`
+
+2. 建立保守 CUDA 环境：
+
+```bash
+bash tests/gpt5_temp/create_stable_cuda121_env.sh
+conda activate openone-cuda121
+```
+
+3. 用保守环境只跑最小 category：
+
+```bash
+python tests/gpt5/systematic_language_benchmark.py glm4 \
+  --cases-per-category 10 \
+  --batch-size 1 \
+  --case-chunk-size 1 \
+  --progress-every 2 \
+  --categories quantifier \
+  --output-dir results/gpt5_systematic_language_v2_driver570_stage10 \
+  --hard-exit-after-model
+```
+
+4. 如果 GLM4 `quantifier` 能过，再跑 `translation`。
+5. 如果 GLM4 仍卡死，暂停 GLM4，改跑 DeepSeek7B 单 category。
+6. 如果 DeepSeek7B 也卡死，停止 GPU 模型测试，转向系统层稳定性处理。
+
+### 系统层建议
+- 最推荐：让显示和计算分离。
+  - 在 BIOS 中启用 Intel 核显/集显多显示；
+  - 显示器插主板视频输出；
+  - 让 4090D 只做 CUDA compute。
+- 如果这台机器无法启用核显：
+  - 可以考虑加一张低功耗显示卡；
+  - 或远程/TTY/headless 模式下跑测试，降低桌面被 GPU 死锁拖住的概率。
+- 可选降载：
+  - 降低 4090D power limit；
+  - 降低 batch size 已经做了；
+  - 每个 category 后重启是最保守但最慢的方式。
+
+### 研究影响
+- 当前不能把 GLM4/DeepSeek7B 未完成测试解释为语言机制问题。
+- 当前最主要瓶颈是实验平台稳定性。
+- 在平台稳定前，只能保留 Qwen3 stage10 行为结果和 GLM4 已完成 category 的局部结果。
+- 机制破解阶段必须推迟，不能在驱动死锁环境下做 activation patching 或消融。
