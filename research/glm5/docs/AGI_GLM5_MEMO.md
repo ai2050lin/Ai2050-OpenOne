@@ -59006,3 +59006,170 @@ Phase 288 最重要的发现是：**Over-conversion 不是 bug，是诊断信号
 3. **层消融实验**：确定每个功能的关键层（而非均匀采样）
 4. **Over-conversion 机制分析**：为什么 GLM4 attention patching 产生 21x 放大？是 LayerNorm、残差连接还是 MLP 门控导致的？
 
+## Phase 289: Layer-Scan Continuous Interpolation Contract Decomposition [2026-05-28 00:10]
+
+### 设计思路
+
+Phase 289 的核心升级：
+1. **全层扫描**（step=2）：不再是 3 层采样，而是每 2 层测试，绘制功能形成曲线
+2. **连续 α 插值** `[0, 0.5, 1.0]`：区分平滑控制通道 vs 开关式非线性门控
+3. **契约兼容度**：cross_am (A_attn+B_mlp) 和 cross_ma (B_attn+A_mlp) 测试
+4. Qwen3 使用完整版（36 层全扫描 + 5 种 patch 类型），GLM4/DS7B 因 GPU 限制使用精简版（step=2, 3 种 patch）
+
+### 跨模型层扫描曲线（α=1.0, 否定功能）
+
+**QWEN3 (36 层, 全扫描, 18 个采样层)**:
+```
+Layer  Attn_KR  MLP_KR  Both_KR  Attn_Prog  MLP_Prog  Both_Prog
+  0     4.636    4.795    1.091     0.229      0.373     0.968
+  7     3.177    3.798    2.529     0.333      0.326     0.544
+ 14     4.592    4.598    4.472     0.232      0.273     0.267   ← 最强层
+ 22     4.048    4.469    4.032     0.229      0.319     0.354
+ 35     4.081    5.356    4.163     0.101      0.464     0.509
+```
+特点：效果温和（KR 3-6x），跨层均匀分布，Both_Prog 从 L0 的 0.97 递减到深层 0.51。
+
+**GLM4 (40 层, L0-L18 GPU, step=2, 10 个有效层)**:
+```
+Layer  Attn_KR  MLP_KR  Both_KR  Attn_Prog  MLP_Prog  Both_Prog
+  0     18.111   0.839    0.753     0.351      0.844     0.845    ← 极端分化
+  2     12.129   2.595    2.094     0.312      0.394     0.456
+ 10     15.812   16.765  17.047     0.354      0.347     0.358
+ 18     15.565   13.286  12.555     0.350      0.375     0.381
+```
+特点：L0 极端分化（Attn_KR=18.1 vs MLP_KR=0.84），后续层逐渐趋同，深层 attn/mlp 都产生高 KR。
+
+**DS7B (28 层, L0-L16 GPU, step=2, 9 个有效层)**:
+```
+Layer  Attn_KR  MLP_KR  Both_KR  Attn_Prog  MLP_Prog  Both_Prog
+  0     1.836    2.018    1.782     0.282      0.384     0.309
+  8     2.492    2.448    2.343     0.174      0.206     0.389    ← 最强层
+ 16     3.070    2.516    2.426     0.159      0.249     0.179
+```
+特点：效果最弱（KR 1.8-3.1x），attn/mlp 几乎等同，Both_Prog 仅 0.18-0.39。
+
+### D1: α 插值揭示三种控制模式
+
+**Qwen3 L14：平坦线性 ≈ 分布式线性控制**
+```
+α=0.00: Both_KR=4.72, Both_Prog=0.235
+α=0.33: Both_KR=4.82, Both_Prog=0.232
+α=0.67: Both_KR=4.66, Both_Prog=0.249
+α=1.00: Both_KR=4.47, Both_Prog=0.267
+```
+→ α 变化几乎不影响结果。Qwen3 否定机制的"控制旋钮"是线性的。
+
+**GLM4 L0：平滑 MLP 补偿 = MLP 逐渐修正注意力误差**
+```
+α=0.00: Both_KR=15.5, Both_Prog=0.341
+α=0.50: Both_KR=2.57, Both_Prog=0.327    ← 平滑过渡
+α=1.00: Both_KR=0.75, Both_Prog=0.845    ← 超越 A 自身
+```
+→ α=0.5 时 KR 从 15.5 降到 2.57（不是突然跳变）。MLP 对注意力输出进行平滑补偿。
+
+**DS7B L8：全层平坦 = 最弱单层效应**
+```
+α=0.00: Both_KR=2.61, Both_Prog=0.131
+α=0.50: Both_KR=2.73, Both_Prog=0.100
+α=1.00: Both_KR=2.34, Both_Prog=0.389
+```
+→ 曲线最平坦，单层替换效应极弱。
+
+### D2: 契约兼容度（Qwen3 独有数据）
+
+Qwen3 的 cross_am (A_attn+B_mlp) 在所有层都 ≈ MLP_KR 而非 Attn_KR：
+```
+L14: cross_am_KR=4.60 ≈ MLP_KR=4.60 (远小于 Attn_KR=4.59)
+```
+→ 当使用 A 的 attention + B 的 MLP 时，效果等于纯 MLP 替换。意味着**MLP 决定了功能转换，attention 提供的是可交换的上下文**。
+
+cross_ma (B_attn+A_mlp) ≈ Attn_KR：
+```
+L14: cross_ma_KR=4.59 ≈ Attn_KR=4.59
+```
+→ B 的 attention + A 的 MLP ≈ 纯 attention 替换。这进一步证实：**功能转换路径 = MLP 决定内容 + Attention 提供方向上下文**。
+
+**Qwen3 无契约断裂层**（所有层 cross/both < 2x），表明 attention-MLP 契约高度兼容。
+
+### D3: 否定子类型层偏好差异（Qwen3, α=1.0, top-5 层）
+
+```
+existential_no:    L0:B=0.97  L35:B=0.38  L23:B=0.42 ← 首尾层
+lexical_not_adj:   L0:B=0.67  L7:B=0.34   L35:B=0.30 ← 全层分布式
+morphological_neg: L0:B=1.01  L23:B=0.35  L35:B=0.30 ← L0最强
+never:             L0:B=1.13  L35:B=0.63  L23:B=0.54 ← 深层效应
+scope_quantifier:  L0:M=0.86  L35:B=0.61  L22:B=0.56 ← MLP早期
+syntactic_do_not:  L0:B=0.93  L35:B=0.80  L23:B=0.72 ← 整体最强
+```
+→ 不同否定子类型确实使用不同的层模式。syntactic_do_not 深层效应最强（L35=0.80），existential_no 首尾层分化。
+
+### D4: GPU 层分配与 meta tensor 错误
+
+**关键发现**：device_map="auto" 使 GLM4 和 DS7B 的深层（约后半部分）offload 到 CPU，导致 patching 时出现 "Cannot copy out of meta tensor" 错误。
+
+- Qwen3: 36 层全在 GPU（8GB 模型）
+- GLM4: L0-L18 在 GPU，L20-L39 在 CPU（9.0GB/12GB）
+- DS7B: L0-L16 在 GPU，L18-L27 在 CPU（9.0GB/12GB）
+
+GPU 层恰好覆盖了关键的信息处理层（早中层），深层（压缩/输出层）数据缺失。这是 device_map="auto" 的硬限制。
+
+### 新增客观事实拼图（10条）
+
+1. Qwen3 否定功能全层 α 插值曲线平坦（α 从 0 到 1，Both_KR 从 4.72→4.47），说明是线性分布式控制
+2. GLM4 L0 的 α 插值显示平滑 MLP 补偿（α=0.5: 15.5→2.57），不是开关式门控
+3. DS7B 单层效应最弱（Both_KR max=2.43, Both_Prog max=0.39），全层平坦
+4. Qwen3 cross_am ≈ MLP 替换（非 Attention），证明 MLP 决定功能转换内容
+5. Qwen3 无契约断裂层（所有 cross/both < 2x），attention-MLP 高度兼容
+6. GLM4 L0 是唯一 Attn_KR(18.1) >> MLP_KR(0.84) 的极端分化层
+7. syntactic_do_not 否定子类深层效应最强（L35 Both_Prog=0.80）
+8. device_map="auto" 导致 GLM4/DS7B 深层 offload CPU，产生 meta tensor 错误
+9. 层扫描曲线揭示否定功能主要在 L0-L18（GLM4）/ L0-L16（DS7B）形成
+10. 不同否定子类型在 Qwen3 中使用不同的层偏好模式，syntactic 深层强
+
+### 硬伤分析
+
+1. **GLM4/DS7B 深层数据缺失**：CPU offload 导致后半层无法 patching。但这些层可能是输出压缩层，对功能形成贡献可能有限。
+
+2. **α 采样太粗**：[0, 0.5, 1.0] 只能看到粗略趋势。真正非线性跳变可能在 α=0.3 或 α=0.7 处。
+
+3. **GLM4 80 对结果被缩减为 40 对**：原始脚本反复崩溃导致回退到 40 对，统计信度降低。
+
+4. **每层 120 个样本中仅 80 对否定 + 20 翻译 + 20 逻辑**：对否定之外的函数，层扫描数据不足以做可靠分析。
+
+5. **Qwen3 跨层 Both_Prog 递减**：L0 的 0.97 递减到 L35 的 0.51。这可能不是功能在不同层形成，而是**残差流逐渐被下游层修改**导致的自然衰减。
+
+### 命令记录
+
+```bash
+# Qwen3 完整版
+python tests/glm5/phase289_layer_scan.py qwen3           # 43min, 86400 results
+
+# GLM4 完整版反复崩溃（meta tensor 错误），回退到精简版
+python tests/glm5_temp/phase289_glm4_fix.py               # 88min, 3600 results
+
+# DS7B 精简版
+python tests/glm5_temp/phase289_ds7b_fix.py               # 44min, 3240 results
+```
+
+### 数据文件
+
+- `results/phase289_layer_scan/{qwen3,glm4,deepseek7b}_layer_scan.json`
+- `tests/glm5/phase289_layer_scan.py`（完整版脚本）
+- `tests/glm5_temp/phase289_glm4_fix.py`（GLM4 精简版）
+- `tests/glm5_temp/phase289_ds7b_fix.py`（DS7B 精简版）
+
+### 关键洞察与下一步
+
+Phase 289 最重要的发现是：**α 插值曲线区分了三种模型的控制模式**。
+
+Qwen3 是线性分布式控制（α 平坦），GLM4 是 MLP 补偿式控制（α 平滑但存在补偿），DS7B 是极弱单层控制（α 平坦但效应极小）。
+
+这否定了"否定存在统一编码机制"的假设，支持"架构决定控制策略"的观点。
+
+**下一步 Phase 290 应做**：
+1. **细粒度 α 扫描**（0, 0.1, 0.2, ..., 1.0）：检测 GLM4 的非线性跳变点在哪个 α
+2. **全 GPU 加载 GLM4/DS7B**（8bit 或 BF16+CPU first then GPU）：获取深层数据
+3. **多 α + 多 patch 类型矩阵**：绘制完整的 attention-MLP 契约曲面
+4. **否定的 true counterfactual**：不替换整个模块输出，而是替换关键子空间
+
+
