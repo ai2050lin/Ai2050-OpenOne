@@ -1,0 +1,71 @@
+[2026-05-27 04:08:28] ============================================================
+[2026-05-27 04:08:28] Phase 288: Route-Content-MLP Causal Decomposition â€” glm4
+[2026-05-27 04:08:28] ============================================================
+[2026-05-27 04:08:28] Target: 8 heads (5 causal + 3 random) across 6 layers
+[2026-05-27 04:08:28]   CAUSAL: L16_H7 (L16_H7)
+[2026-05-27 04:08:28]   CAUSAL: L8_H16 (L8_H16)
+[2026-05-27 04:08:28]   CAUSAL: L28_H27 (L28_H27)
+[2026-05-27 04:08:28]   CAUSAL: L16_H30 (L16_H30)
+[2026-05-27 04:08:28]   CAUSAL: L8_H26 (L8_H26)
+[2026-05-27 04:08:28]   RANDOM: R_L4_H4 (L4_H4)
+[2026-05-27 04:08:28]   RANDOM: R_L20_H20 (L20_H20)
+[2026-05-27 04:08:28]   RANDOM: R_L32_H8 (L32_H8)
+[2026-05-27 04:08:28] 
+============================================================
+[2026-05-27 04:08:28] PART 1: Cache AW+V (EAGER attention)
+[2026-05-27 04:08:28] ============================================================
+[2026-05-27 04:08:41] Loading glm4 (bf16 + EAGER + output_attentions)...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|¨€¨€¨„       | 1/4 [00:05<00:15,  5.30s/it]Loading checkpoint shards:  50%|¨€¨€¨€¨€¨€     | 2/4 [00:06<00:06,  3.05s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 4/4 [00:06<00:00,  1.70s/it]
+Some parameters are on the meta device because they were offloaded to the cpu.
+[2026-05-27 04:08:50]   Loaded: device=cuda:0, GPU=8.99GB, mode=EAGER+output_attn
+[2026-05-27 04:08:50] Model: GlmForCausalLM, L=40, n_heads=32, n_kv_heads=2, head_dim=128, d_model=4096
+[2026-05-27 04:08:50] Dataset: 250 pairs across 6 functions
+[2026-05-27 04:08:50]   comparative: 30 pairs
+[2026-05-27 04:08:50]   logical: 40 pairs
+[2026-05-27 04:08:50]   negation: 80 pairs
+[2026-05-27 04:08:50]   passive: 30 pairs
+[2026-05-27 04:08:50]   recursive: 30 pairs
+[2026-05-27 04:08:50]   translation: 40 pairs
+[2026-05-27 04:08:56]   [1/250] Caching AW+V: 2s, ~1873 pairs/h, ETA=8min, GPU=9.0GB
+[2026-05-27 04:09:52]   [30/250] Caching AW+V: 58s, ~1859 pairs/h, ETA=7min, GPU=9.0GB
+[2026-05-27 04:10:50]   [60/250] Caching AW+V: 116s, ~1861 pairs/h, ETA=6min, GPU=9.0GB
+[2026-05-27 04:11:48]   [90/250] Caching AW+V: 174s, ~1859 pairs/h, ETA=5min, GPU=9.0GB
+[2026-05-27 04:12:46]   [120/250] Caching AW+V: 232s, ~1860 pairs/h, ETA=4min, GPU=9.0GB
+[2026-05-27 04:13:44]   [150/250] Caching AW+V: 290s, ~1860 pairs/h, ETA=3min, GPU=9.0GB
+[2026-05-27 04:14:42]   [180/250] Caching AW+V: 348s, ~1860 pairs/h, ETA=2min, GPU=9.0GB
+[2026-05-27 04:15:40]   [210/250] Caching AW+V: 406s, ~1861 pairs/h, ETA=1min, GPU=9.0GB
+[2026-05-27 04:16:38]   [240/250] Caching AW+V: 465s, ~1860 pairs/h, ETA=0min, GPU=9.0GB
+[2026-05-27 04:16:58]   Caching done: 250/250 pairs, 484s (8.1min)
+[2026-05-27 04:16:58] Cached 250/250 pairs
+[2026-05-27 04:16:58] 
+============================================================
+[2026-05-27 04:16:58] CALIBRATION: Manual AW@V Sanity Check
+[2026-05-27 04:16:58] ============================================================
+[2026-05-27 04:16:58]   L16_H7: norm_A=8.7617, norm_B=9.0739, cos_A_vs_B=0.7903, n_points=20, [OK]
+[2026-05-27 04:16:58]   L8_H16: norm_A=1.4726, norm_B=1.6375, cos_A_vs_B=0.8378, n_points=20, [OK]
+[2026-05-27 04:16:58]   L28_H27: norm_A=20.2445, norm_B=21.3138, cos_A_vs_B=0.4559, n_points=20, [OK]
+[2026-05-27 04:16:58]   L16_H30: norm_A=6.2067, norm_B=2.4020, cos_A_vs_B=0.3861, n_points=20, [OK]
+[2026-05-27 04:16:58]   L8_H26: norm_A=4.8730, norm_B=5.2913, cos_A_vs_B=0.6984, n_points=20, [OK]
+[2026-05-27 04:16:58] 
+============================================================
+[2026-05-27 04:16:58] PART 3: Route-Content Patching (SAME eager model, no flash)
+[2026-05-27 04:16:58] ============================================================
+[2026-05-27 04:16:58] Reusing eager model for patching. GPU=9.0GB
+[2026-05-27 04:16:58] 
+Computing baseline logits...
+[2026-05-27 04:18:15]   [40/250] Baselining: 77s
+[2026-05-27 04:19:31]   [80/250] Baselining: 153s
+[2026-05-27 04:20:47]   [120/250] Baselining: 229s
+[2026-05-27 04:22:02]   [160/250] Baselining: 304s
+[2026-05-27 04:23:17]   [200/250] Baselining: 380s
+[2026-05-27 04:24:33]   [240/250] Baselining: 455s
+[2026-05-27 04:24:52]   Baselining done: 250 pairs, 474s
+[2026-05-27 04:24:52] Patching pairs: 250
+[2026-05-27 04:24:52]   comparative: 30
+[2026-05-27 04:24:52]   logical: 40
+[2026-05-27 04:24:52]   negation: 80
+[2026-05-27 04:24:52]   passive: 30
+[2026-05-27 04:24:52]   recursive: 30
+[2026-05-27 04:24:52]   translation: 40
+[2026-05-27 04:24:52] Pre-computing hybrid head outputs (including random controls)...
+[2026-05-27 04:24:53] Pre-computed 2000 hybrid outputs

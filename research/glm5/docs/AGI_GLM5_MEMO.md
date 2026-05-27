@@ -59006,4 +59006,3 @@ Phase 288 最重要的发现是：**Over-conversion 不是 bug，是诊断信号
 3. **层消融实验**：确定每个功能的关键层（而非均匀采样）
 4. **Over-conversion 机制分析**：为什么 GLM4 attention patching 产生 21x 放大？是 LayerNorm、残差连接还是 MLP 门控导致的？
 
-l
