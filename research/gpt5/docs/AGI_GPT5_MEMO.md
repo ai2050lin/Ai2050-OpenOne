@@ -2845,3 +2845,4945 @@ DeepSeek7B 是末层协同/压缩型。
 ```text
 每个功能在每个模型中选择了哪条 Attention-MLP-Residual 契约路径。
 ```
+
+## Phase 24: Phase 289 扩展到 Logical/Passive/Recursive 三模型契约扫描 [2026-05-28 00:25]
+
+### 任务目标
+
+在 Phase 23 的 dense negation 基础上继续加大数据量，不再只测试否定，而是把同一套 Attention-MLP-Residual 契约扫描扩展到：
+
+1. logical：and/or、conditional、causal、contrast、inference。
+2. passive：by phrase passive、no-agent passive、get passive、dative passive。
+3. recursive：relative clause、PP chain、complement clause、possessive chain。
+
+核心目的不是证明某个单头或单层负责语言功能，而是继续绘制功能级模块契约图谱：不同语言功能在每一层中，是通过 attention、MLP、both、resid，还是跨模块错误拼接产生转换或断裂。
+
+### 脚本变更
+
+修改脚本：
+
+```text
+tests/gpt5/phase289_contract_scan.py
+```
+
+主要变更：
+
+1. 将 logical 样本从 6 条扩展到 40 条，覆盖 5 个子类。
+2. 将 passive 样本从 4 条扩展到 32 条，覆盖 4 个子类。
+3. 新增 recursive 样本 32 条，覆盖 4 个子类。
+4. 当前总样本数变为 144 条：
+   - negation: 40
+   - logical: 40
+   - passive: 32
+   - recursive: 32
+5. 修正 summary 的 mean 逻辑，只对有限值求均值，避免单个 NaN 把整条 alpha/layer 曲线污染为 NaN。
+6. 在 summary 中增加 nonfinite_rows，用于直接记录反事实 patch 后模型输出非有限的行数。
+
+### GLM4 非有限输出复现
+
+Phase 23 中 GLM4 的 dense negation 出现 2 行非有限输出，集中在：
+
+```text
+pair = neg_know
+subtype = syntactic_do_not
+patch_type = resid
+alpha = 0.5
+layer = 8, 12
+```
+
+复现命令：
+
+```bash
+MAX_SECONDS=1800 OUTPUT_DIR=results/gpt5_phase289_glm4_nonfinite_repro \
+tests/gpt5/run_phase289_conservative.sh glm4 \
+  --categories negation \
+  --subtypes syntactic_do_not \
+  --max-pairs-per-subtype 999 \
+  --layers 8,12 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --patch-types resid \
+  --progress-every 1
+```
+
+复现结果：
+
+```text
+结果文件：
+results/gpt5_phase289_glm4_nonfinite_repro/glm4_phase289_contract_scan.json
+
+日志目录：
+results/gpt5_gpu_lock_logs/20260527_220649_phase289_glm4
+
+bad_count = 2
+kernel.since-start.filtered.log = 0 行
+```
+
+结论：
+
+这 2 行非有限输出可稳定复现，而且 kernel 日志没有 Xid/NVRM/GPU lockup。因此它不是显卡驱动错误，而是特定 resid 插值反事实状态在 GLM4 内部触发了 logits 非有限输出。这个现象应标记为模型数值/契约不合法，而不是硬件故障。
+
+### 三模型扩展扫描命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=7200 OUTPUT_DIR=results/gpt5_phase289_contract_expanded_lpr \
+tests/gpt5/run_phase289_conservative.sh qwen3 \
+  --categories logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase289_contract_expanded_lpr \
+tests/gpt5/run_phase289_conservative.sh glm4 \
+  --categories logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=9000 OUTPUT_DIR=results/gpt5_phase289_contract_expanded_lpr \
+tests/gpt5/run_phase289_conservative.sh deepseek7b \
+  --categories logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layer-stride 4 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4
+```
+
+全部命令均通过 conservative CUDA 环境执行，逐模型运行，并保留 GPU/process/kernel 日志。
+
+### 输出文件
+
+结果文件：
+
+```text
+results/gpt5_phase289_contract_expanded_lpr/qwen3_phase289_contract_scan.json
+results/gpt5_phase289_contract_expanded_lpr/glm4_phase289_contract_scan.json
+results/gpt5_phase289_contract_expanded_lpr/deepseek7b_phase289_contract_scan.json
+```
+
+checkpoint：
+
+```text
+results/gpt5_phase289_contract_expanded_lpr/checkpoints/qwen3/logical-passive-recursive_full.json
+results/gpt5_phase289_contract_expanded_lpr/checkpoints/glm4/logical-passive-recursive_full.json
+results/gpt5_phase289_contract_expanded_lpr/checkpoints/deepseek7b/logical-passive-recursive_full.json
+```
+
+GPU/内核日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260527_220956_phase289_qwen3
+results/gpt5_gpu_lock_logs/20260527_224918_phase289_glm4
+results/gpt5_gpu_lock_logs/20260527_235200_phase289_deepseek7b
+```
+
+三轮的 kernel.since-start.filtered.log 都是 0 行，没有发现 Xid、NVRM、GSP、GPU locked、soft lockup、hung、timeout、reset 等关键错误。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 104
+  target_layers = 10
+  results = 31,200
+  nonfinite_rows = 0
+
+GLM4:
+  pairs = 104
+  target_layers = 11
+  results = 34,320
+  nonfinite_rows = 50
+
+DeepSeek7B:
+  pairs = 104
+  target_layers = 8
+  results = 24,960
+  nonfinite_rows = 0
+
+总结果行数 = 90,480
+```
+
+### Qwen3 结果
+
+```text
+class = Qwen3ForCausalLM
+best_layer_by_both_progress = 0
+contract_broken_layers = [0]
+nonfinite_rows = 0
+```
+
+L0 是最强层：
+
+```text
+L0:
+  attn_progress = 0.7415
+  mlp_progress = 0.8041
+  both_progress = 0.8346
+  both_kl_ratio = 0.2754
+  resid_progress = 0.8453
+```
+
+契约断裂事件：
+
+```text
+layer = 0
+cross_type = cross_battn_amlp
+cross_kl_ratio = 0.8851
+both_kl_ratio = 0.2754
+kl_ratio_vs_both = 3.2139
+cross_progress = 0.2082
+both_progress = 0.8346
+progress_drop = 0.6264
+cross_logit_delta_ratio = 0.5477
+```
+
+解释：
+
+Qwen3 在 logical/passive/recursive 上延续了 dense negation 的模式：早层 L0 是最强转换点，attention 与 MLP 单独都有明显作用，both 更强。错误组合 B_attn + A_mlp 会显著破坏转换，说明 Qwen3 的早层 attention 和 MLP 已经形成了明确契约。
+
+### GLM4 结果
+
+```text
+class = GlmForCausalLM
+best_layer_by_both_progress = 0
+contract_broken_layers = []
+nonfinite_rows = 50
+```
+
+L0 是最强层：
+
+```text
+L0:
+  attn_progress = 0.0165
+  mlp_progress = 0.9319
+  both_progress = 0.9401
+  both_kl_ratio = 0.1135
+  resid_progress = 0.9786
+```
+
+非有限输出分布：
+
+```text
+bad_count = 50
+
+by_patch:
+  resid = 18
+  cross_aattn_bmlp = 15
+  mlp = 9
+  both = 8
+
+by_alpha:
+  0.5 = 14
+  0.25 = 13
+  0.75 = 11
+  1.0 = 9
+  0.0 = 3
+
+by_layer:
+  L4 = 21
+  L0 = 13
+  L16 = 9
+  L8 = 5
+  L12 = 2
+
+by_subtype:
+  get_passive = 24
+  possessive_chain = 13
+  dative_passive = 8
+  and_or = 3
+  contrast = 1
+  by_phrase = 1
+```
+
+解释：
+
+GLM4 的结论更强了：在 logical/passive/recursive 上，L0 的 MLP 几乎等于 both，attention 单独几乎不推动转换。这比 dense negation 更支持“GLM4 是 MLP 集中型”的判断。
+
+同时，GLM4 的 nonfinite_rows = 50，且集中在早层和特定被动/递归子类。因为内核日志完全为空，这不是硬件错误，而是 GLM4 在某些反事实 patch 状态下的内部数值不合法。这个现象本身很重要：GLM4 的功能编码可能对 MLP/残差输入格式更敏感，契约更硬，错误状态不是平滑退化，而是直接数值崩坏。
+
+注意：本轮 contract_broken_layers = [] 不表示 GLM4 没有契约问题，而是当前契约断裂判据主要依赖 cross KL 相对 both KL 的放大和 progress drop；GLM4 的问题大量表现为非有限输出，被 summary 的有限均值过滤后没有进入 contract_events。因此下一步需要把 nonfinite_rows 本身纳入契约断裂定义。
+
+### DeepSeek7B 结果
+
+```text
+class = Qwen2ForCausalLM
+best_layer_by_both_progress = 27
+contract_broken_layers = [27]
+nonfinite_rows = 0
+```
+
+L27 是最强层：
+
+```text
+L27:
+  attn_progress = 0.7547
+  mlp_progress = 0.6767
+  both_progress = 0.8316
+  both_kl_ratio = 0.4152
+  resid_progress = 1.0000
+```
+
+契约断裂事件：
+
+```text
+layer = 27
+cross_type = cross_battn_amlp
+cross_kl_ratio = 0.9765
+both_kl_ratio = 0.4152
+kl_ratio_vs_both = 2.3520
+cross_progress = 0.0020
+both_progress = 0.8316
+progress_drop = 0.8297
+cross_logit_delta_ratio = 0.3090
+```
+
+解释：
+
+DeepSeek7B 和 Qwen3/GLM4 完全不同：最强层不是 L0，而是最后层 L27。attention、MLP、both 都很强，both 最强；错误组合 B_attn + A_mlp 在最后层几乎失去 progress。这继续支持前面观察到的 DeepSeek7B “深层释放/最后压缩”特征。
+
+### 三模型对照结论
+
+本轮扩展后，Phase 23 的模型差异没有消失，而是更清晰：
+
+```text
+Qwen3:
+  早层协同型。
+  L0 同时需要 attention 和 MLP，both 最强。
+  错误拼接 B_attn + A_mlp 在 L0 断裂。
+
+GLM4:
+  早层 MLP 集中型。
+  L0 的 MLP 单独几乎等于 both，attention 单独很弱。
+  出现大量反事实非有限输出，说明契约更硬、更脆。
+
+DeepSeek7B:
+  最后层释放/压缩型。
+  L27 最强，attention 和 MLP 都强，both 最强。
+  L27 的 B_attn + A_mlp 错误拼接几乎完全失去 progress。
+```
+
+这一轮非常重要，因为它说明：
+
+```text
+语言功能不是统一地在某个固定层、固定模块或固定语义轴中完成。
+不同模型的复用/差异化策略非常不同。
+但“attention 输出必须和下游 MLP/残差格式兼容”这个契约结构在多个模型中反复出现。
+```
+
+### 当前理论推进
+
+当前更稳的理论表达应改为：
+
+```text
+语言编码不是固定语义坐标。
+语言编码也不是单独 attention 路由或单独 MLP 内容。
+语言编码更像条件模块契约系统。
+
+attention 负责上下文通信方向和结构偏置；
+MLP 负责非线性变换、门控、压缩和内部格式重编码；
+residual 保存和累积候选状态；
+具体语言功能通过不同层位上的 attention-MLP-residual 契约路径实现。
+```
+
+复用和差异化也应重新定义：
+
+```text
+复用：
+  多个语言功能共享相似的层位、模块组合和契约格式。
+
+差异化：
+  某个功能在特定层、特定模块、特定动态范围或特定契约处偏离共享路径。
+
+契约断裂：
+  错误组合 attention/MLP/residual 后，progress 降低、KL 放大，或直接产生非有限输出。
+```
+
+### 硬伤和限制
+
+1. 当前样本虽然从否定扩展到 logical/passive/recursive，但每个子类仍只有 8 条左右，不能作为最终统计结论。
+2. 样本是人工模板生成，语言自然性和难度分布仍偏窄。
+3. progress 指标仍然只是“朝 B 移动”的粗指标，不能直接解释为真实因果贡献。
+4. resid patch 是上界，不是组件贡献，不能和 attention/MLP 直接等价比较。
+5. GLM4 的 nonfinite_rows 说明当前反事实 patch 有时会离开自然分布，必须把自然性/合法性作为一级指标。
+6. 当前 contract_events 没有把非有限输出纳入断裂判据，导致 GLM4 的断裂被低估。
+7. 当前层扫描 stride=4，仍不是逐层扫描；关键层附近需要更细粒度扫描。
+
+### 下一步计划
+
+1. 修改 Phase 289 summary：把 nonfinite_rows 按 layer/patch/subtype/alpha 纳入 contract_events，把非有限输出定义为最高等级契约断裂。
+2. 对 GLM4 的 get_passive、possessive_chain、dative_passive 做窄复现，确认非有限输出是否稳定、是否只在 fp16 出现，必要时用 bfloat16/float32 小样本对照。
+3. 对三模型的关键层做逐层精扫：
+   - Qwen3: L0-L8
+   - GLM4: L0-L8、L16
+   - DeepSeek7B: L20-L27
+4. 增加自然性指标：
+   - hidden norm ratio
+   - next layer output norm ratio
+   - patched logits finite check
+   - alpha 曲线是否平滑
+5. 把当前结果整理成“功能签名”：
+   - function_signature = [attn_curve, mlp_curve, both_curve, resid_curve, contract_break_curve, nonfinite_curve]
+6. 做功能复用矩阵：
+   - 比较 logical/passive/recursive/negation 各子类在三模型中的曲线相似度。
+7. 继续扩大样本，优先不是盲目增加同类句子，而是增加语言结构差异：
+   - passive 加入复杂施事、长距离宾语、嵌套被动；
+   - recursive 加入双层关系从句、多重 PP、嵌套 complement；
+   - logical 加入量词、否定、条件嵌套。
+
+### 阶段性判断
+
+Phase 24 后，当前研究已经不只是“组件功能分析”，而是进入了“模块契约破解”阶段。最关键的结果不是哪个模型哪个模块强，而是三模型都显示出：语言功能转换依赖 attention、MLP、residual 的兼容路径，错误拼接会导致 progress 下降、KL 放大或非有限输出。
+
+下一阶段真正要破解的不是单个神经元或单个 head，而是：
+
+```text
+模型如何决定某个语言功能应该复用哪条 attention-MLP-residual 契约路径；
+什么时候共享路径；
+什么时候分叉；
+什么时候错误状态会被自然修正；
+什么时候错误状态会直接崩坏。
+```
+
+这比“语义轴”更接近语言背后的编码机制。
+
+## Phase 25: Phase 290 断裂等级与关键层精扫 [2026-05-28 02:13]
+
+### 任务目标
+
+根据最新分析，Phase 24 的方向基本正确，但不能把当前现象直接上升为“语言编码就是契约系统”。本轮只做更客观的基础设施和测试：
+
+1. 把 nonfinite 输出纳入断裂记录。
+2. 增加 norm 合法性指标。
+3. 把 cross-module incompatibility 暂时作为现象记录，不直接称为最终契约证明。
+4. 使用关键层逐层精扫，而不是 stride=4 粗扫。
+5. 使用 BF16，不使用 bf8/8bit。
+6. GLM4 和 DeepSeek7B 使用 `device_map="auto"`。
+7. 使用 `attn_implementation="sdpa"`，即 PyTorch SDPA flash 路径；本机没有 `flash_attn` 包，因此不是 flash-attention-2。
+8. 模型逐个运行，并保留 kernel/GPU/process 日志。
+
+### 对用户分析的判断
+
+这次分析中正确的部分：
+
+```text
+1. Phase 24 不能证明强版本“语言编码就是契约系统”。
+2. progress 只能作为扫描指标，不能解释为真实因果贡献。
+3. resid patch 是上界，不是组件贡献。
+4. cross 拼接失败应先称为 cross-module incompatibility，而不是直接称为已证明的契约断裂。
+5. GLM4 nonfinite 必须做 dtype 复核。
+6. stride=4 会错过关键层，必须做关键层逐层精扫。
+```
+
+因此本轮没有继续盲目扩样本，而是先修正测试框架。
+
+### 脚本变更
+
+修改：
+
+```text
+tests/gpt5/hf_probe_env.py
+```
+
+新增环境变量：
+
+```text
+PROBE_ATTN_IMPLEMENTATION
+PROBE_DEVICE_MAP_AUTO_MODELS
+PROBE_MAX_GPU_MEMORY
+PROBE_MAX_CPU_MEMORY
+```
+
+修正关键问题：
+
+```text
+当某模型被 PROBE_DEVICE_MAP_AUTO_MODELS 指定为 auto 时，不再执行 model.to("cuda")。
+```
+
+新增脚本：
+
+```text
+tests/gpt5/phase290_contract_break_scan.py
+tests/gpt5/run_phase290_conservative.sh
+```
+
+Phase 290 脚本新增指标：
+
+```text
+nonfinite_rows
+norm_illegal_rows
+nonfinite_by_layer
+nonfinite_by_patch
+nonfinite_by_subtype
+nonfinite_by_alpha
+patch_*_norm_ratio_to_a
+patch_*_norm_ratio_to_b
+next_resid_in_norm_ratio_to_a/b
+next_layer_out_norm_ratio_to_a/b
+contract_events:
+  numeric_illegal
+  norm_illegal
+  functional_incompatible
+```
+
+同时新增 pair-level resume：如果长跑中断，partial checkpoint 中已完整的 pair 会跳过，继续跑剩余 pair。
+
+### Smoke Test
+
+Qwen3 smoke：
+
+```bash
+MAX_SECONDS=900 OUTPUT_DIR=results/gpt5_phase290_smoke \
+tests/gpt5/run_phase290_conservative.sh qwen3 \
+  --categories negation \
+  --subtypes lexical_not_adj \
+  --max-pairs-per-subtype 1 \
+  --layers 0 \
+  --alphas 0,1 \
+  --patch-types attn,mlp,both,resid,cross_battn_amlp,cross_aattn_bmlp \
+  --progress-every 1 \
+  --label smoke
+```
+
+结果：
+
+```text
+rows = 10
+exit_code = 0
+log_dir = results/gpt5_gpu_lock_logs/20260528_010014_phase290_qwen3
+```
+
+GLM4 smoke：
+
+```bash
+MAX_SECONDS=1200 OUTPUT_DIR=results/gpt5_phase290_smoke \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories passive \
+  --subtypes get_passive \
+  --max-pairs-per-subtype 1 \
+  --layers 0 \
+  --alphas 0,1 \
+  --patch-types mlp,resid,cross_aattn_bmlp \
+  --progress-every 1 \
+  --label smoke
+```
+
+结果：
+
+```text
+rows = 5
+exit_code = 0
+log_dir = results/gpt5_gpu_lock_logs/20260528_010029_phase290_glm4
+```
+
+### 正式测试命令
+
+Qwen3，L0-L8：
+
+```bash
+MAX_SECONDS=7200 OUTPUT_DIR=results/gpt5_phase290_contract_break_core \
+tests/gpt5/run_phase290_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4 \
+  --label core
+```
+
+GLM4，L0-L8 + L16：
+
+第一次运行命令：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase290_contract_break_core \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8,16 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4 \
+  --label core
+```
+
+第一次 GLM4 在 24/76 pair 后发生用户态 segmentation fault：
+
+```text
+exit_code = 139
+rows = 5280
+kernel.since-start.filtered.log = 0 行
+```
+
+随后补充 pair-level resume，并用更保守的运行参数继续：
+
+```bash
+CUDA_LAUNCH_BLOCKING=1 PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase290_contract_break_core \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8,16 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4 \
+  --label core
+```
+
+第二次从 24 个已完成 pair 后继续，最终完成。
+
+DeepSeek7B，L20-L27：
+
+```bash
+MAX_SECONDS=9000 OUTPUT_DIR=results/gpt5_phase290_contract_break_core \
+tests/gpt5/run_phase290_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 20,21,22,23,24,25,26,27 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 4 \
+  --label core
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase290_contract_break_core/qwen3_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_core/glm4_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_core/deepseek7b_phase290_contract_break_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase290_contract_break_core/checkpoints/qwen3/logical-negation-passive-recursive_core.json
+results/gpt5_phase290_contract_break_core/checkpoints/glm4/logical-negation-passive-recursive_core.json
+results/gpt5_phase290_contract_break_core/checkpoints/deepseek7b/logical-negation-passive-recursive_core.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_010046_phase290_qwen3
+results/gpt5_gpu_lock_logs/20260528_011803_phase290_glm4
+results/gpt5_gpu_lock_logs/20260528_013232_phase290_glm4
+results/gpt5_gpu_lock_logs/20260528_015556_phase290_deepseek7b
+```
+
+所有上述正式测试的 `kernel.since-start.filtered.log` 都是 0 行。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 76
+  rows = 15048
+  target_layers = L0-L8
+  nonfinite_rows = 0
+  norm_illegal_rows = 5
+
+GLM4:
+  pairs = 76
+  rows = 16720
+  target_layers = L0-L8 + L16
+  nonfinite_rows = 0
+  norm_illegal_rows = 0
+
+DeepSeek7B:
+  pairs = 76
+  rows = 13376
+  target_layers = L20-L27
+  nonfinite_rows = 0
+  norm_illegal_rows = 0
+
+总 rows = 45144
+```
+
+### Qwen3 客观结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = [0]
+nonfinite_rows = 0
+norm_illegal_rows = 5
+```
+
+L0：
+
+```text
+attn_progress = 0.7691
+mlp_progress = 0.8247
+both_progress = 0.8559
+both_kl_ratio = 0.2012
+resid_progress = 0.8620
+cross_battn_amlp_progress = 0.2577
+cross_battn_amlp_kl_ratio = 0.8825
+```
+
+主要 event：
+
+```text
+level = functional_incompatible
+layer = 0
+patch_type = cross_battn_amlp
+kl_ratio_vs_both = 4.3861
+progress_drop = 0.5982
+```
+
+客观现象：
+
+Qwen3 在 L0-L8 逐层精扫中仍然是 L0 最强。`B_attn + A_mlp` 在 L0 明显比 both 差，说明早层 attention/MLP 的错误拼接会造成强功能失败。没有非有限输出。
+
+### GLM4 客观结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = [0, 1]
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+L0：
+
+```text
+attn_progress = 0.0295
+mlp_progress = 0.9416
+both_progress = 0.9444
+both_kl_ratio = 0.0831
+resid_progress = 0.9775
+cross_battn_amlp_progress = 0.0193
+cross_battn_amlp_kl_ratio = 1.0764
+```
+
+L1：
+
+```text
+attn_progress = 0.2318
+mlp_progress = 0.6442
+both_progress = 0.6841
+both_kl_ratio = 0.4124
+cross_battn_amlp_progress = 0.0525
+cross_battn_amlp_kl_ratio = 0.9859
+```
+
+主要 events：
+
+```text
+L0 cross_battn_amlp:
+  kl_ratio_vs_both = 12.9533
+  progress_drop = 0.9251
+
+L1 cross_battn_amlp:
+  kl_ratio_vs_both = 2.3909
+  progress_drop = 0.6317
+```
+
+客观现象：
+
+1. GLM4 在 BF16 下 nonfinite_rows 从 Phase 24 的 fp16 50 行降为 0。
+2. 因此 Phase 24 的 GLM4 nonfinite 很可能主要是 fp16 数值脆弱性，而不是强机制证据。
+3. 但 GLM4 的 functional incompatibility 仍然很强，尤其 L0：both_progress = 0.9444，而 cross_battn_amlp_progress = 0.0193。
+4. GLM4 的 MLP 集中现象继续成立：L0 的 mlp_progress = 0.9416，几乎等于 both_progress = 0.9444，而 attn_progress = 0.0295。
+5. GLM4 第一次 SDPA 长跑出现用户态 segfault 139；kernel 日志为空。resume 后在 `CUDA_LAUNCH_BLOCKING=1` 和 `PYTORCH_NO_CUDA_MEMORY_CACHING=1` 下完成。这个是运行稳定性问题，需要后续保守参数默认化。
+
+### DeepSeek7B 客观结果
+
+```text
+best_layer_by_both_progress = 27
+contract_broken_layers = []
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+L27：
+
+```text
+attn_progress = 0.5728
+mlp_progress = 0.4139
+both_progress = 0.6117
+both_kl_ratio = 0.4922
+resid_progress = 1.0000
+cross_battn_amlp_progress = 0.1184
+cross_battn_amlp_kl_ratio = 0.7968
+```
+
+L26：
+
+```text
+attn_progress = -0.0199
+mlp_progress = 0.2957
+both_progress = 0.2771
+both_kl_ratio = 1.1028
+resid_progress = 0.6270
+```
+
+客观现象：
+
+DeepSeek7B 的 L20-L27 逐层精扫支持 L27 最强，L26 次强，但 L27 没有进入当前 `functional_incompatible` 阈值，因为 cross KL 相对 both 的放大未达到 2.0。也就是说，Phase 24 中 “L27 断裂” 在更换样本规模、关键层、BF16/SDPA/auto 后变弱了；末层最强仍成立，但断裂强度需要谨慎。
+
+### 三模型对比
+
+```text
+Qwen3:
+  L0 strongest
+  attn and MLP both strong
+  cross_battn_amlp functional incompatible at L0
+
+GLM4:
+  L0 strongest
+  MLP almost equals both
+  attention alone very weak
+  cross_battn_amlp functional incompatible at L0/L1
+  fp16 nonfinite disappears in BF16
+
+DeepSeek7B:
+  L27 strongest
+  attention > MLP, both strongest
+  no event under current strict threshold
+```
+
+### 当前最重要的修正
+
+Phase 24 中“GLM4 nonfinite 是最高等级契约断裂”的判断需要修正：
+
+```text
+在 fp16 下，GLM4 出现大量 nonfinite；
+在 BF16 下，同类关键层精扫 nonfinite = 0；
+因此 nonfinite 更可能是数值精度脆弱性，而不能直接作为机制性断裂证据。
+```
+
+但 GLM4 的 cross-module incompatibility 没有消失：
+
+```text
+L0 both_progress = 0.9444
+L0 cross_battn_amlp_progress = 0.0193
+```
+
+这说明即使去掉 fp16 溢出，GLM4 仍存在很强的 attention/MLP 组合不兼容现象。
+
+### 硬伤
+
+1. 当前 Phase 290 是关键层精扫，不是全层扫描。
+2. 每个 subtype 最多 4 对，样本语言多样性仍不足。
+3. SDPA 在 GLM4 第一次长跑中出现用户态 segfault，说明当前高性能路径还不够稳。
+4. DeepSeek7B 的 L27 强峰成立，但断裂 event 不成立，说明断裂阈值需要继续校准。
+5. norm_illegal 当前只基于粗阈值 `[0.5, 2.0]`，只能作为异常探测，不能作为精确流形距离。
+6. progress 仍不是因果贡献，只是扫描指标。
+
+### 下一步计划
+
+1. 把 `CUDA_LAUNCH_BLOCKING=1` 和 `PYTORCH_NO_CUDA_MEMORY_CACHING=1` 作为 GLM4 长跑默认保守参数，避免 SDPA 长跑 segfault。
+2. 对 GLM4 做 fp16 vs BF16 的同样小样本对照，只测出过 nonfinite 的 subtype 和 patch，确认 fp16 溢出的边界。
+3. 对 DeepSeek7B L24-L27 增加样本和更细事件阈值，确认 L27 是否只是输出接口，还是确实有最后层功能转换。
+4. 增加更客观的自然分布距离：
+   - per-layer natural norm mean/std
+   - norm z-score
+   - kNN distance 或 PCA residual distance
+5. 下一阶段不要急着做理论总结，优先继续积累：
+   - 哪些模型/层会出现 functional incompatibility；
+   - 哪些 dtype 会出现 numeric_illegal；
+   - 哪些 subtype 最容易触发不兼容；
+   - 这些现象能否跨样本稳定复现。
+
+## Phase 26: Phase 290 全量样本系统测试 [2026-05-28 04:31]
+
+### 任务目标
+
+在 Phase 25 的 76 pair 核心扫描之后，继续扩大数据量，把当前样本池全部跑完：
+
+```text
+total pairs = 144
+negation = 40
+logical = 40
+passive = 32
+recursive = 32
+```
+
+本轮继续使用 Phase 290 的断裂等级框架，不做新的理论总结，优先记录客观结果。
+
+### 脚本调整
+
+修改：
+
+```text
+tests/gpt5/run_phase290_conservative.sh
+```
+
+调整内容：
+
+```text
+如果 MODEL=glm4:
+  CUDA_LAUNCH_BLOCKING 默认设为 1
+  PYTORCH_NO_CUDA_MEMORY_CACHING 默认设为 1
+
+其他模型:
+  继续保持默认高性能设置
+```
+
+原因：
+
+Phase 25 中 GLM4 在 SDPA 长跑中出现过用户态 segmentation fault 139。这个修改不是改变实验指标，而是提高 GLM4 长跑稳定性。
+
+### 测试环境
+
+```text
+conda_env = openone-cuda121
+torch_dtype = bfloat16
+attn_implementation = sdpa
+device_map_auto_models = glm4,deepseek7b
+max_gpu_memory = 21GiB
+```
+
+说明：
+
+本机没有 `flash_attn` 包，所以这里开启的是 PyTorch SDPA flash 路径，不是 flash-attention-2。
+
+### 测试命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase290_contract_break_full \
+tests/gpt5/run_phase290_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layers 0,1,2,3,4,5,6,7,8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=14400 OUTPUT_DIR=results/gpt5_phase290_contract_break_full \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layers 0,1,2,3,4,5,6,7,8,16 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+GLM4 第一次运行到 96/144 pair 后出现用户态 illegal instruction：
+
+```text
+exit_code = 132
+rows = 21120
+kernel.since-start.filtered.log = 0 行
+```
+
+随后用同一命令从 checkpoint resume：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase290_contract_break_full \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layers 0,1,2,3,4,5,6,7,8,16 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+第二次从 96 个已完成 pair 继续，最终完成。
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase290_contract_break_full \
+tests/gpt5/run_phase290_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --layers 20,21,22,23,24,25,26,27 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase290_contract_break_full/qwen3_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_full/glm4_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_full/deepseek7b_phase290_contract_break_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase290_contract_break_full/checkpoints/qwen3/logical-negation-passive-recursive_full.json
+results/gpt5_phase290_contract_break_full/checkpoints/glm4/logical-negation-passive-recursive_full.json
+results/gpt5_phase290_contract_break_full/checkpoints/deepseek7b/logical-negation-passive-recursive_full.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_021635_phase290_qwen3
+results/gpt5_gpu_lock_logs/20260528_024847_phase290_glm4
+results/gpt5_gpu_lock_logs/20260528_033516_phase290_glm4
+results/gpt5_gpu_lock_logs/20260528_035815_phase290_deepseek7b
+```
+
+所有正式日志的 `kernel.since-start.filtered.log` 都是 0 行。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 144
+  rows = 28512
+  target_layers = L0-L8
+
+GLM4:
+  pairs = 144
+  rows = 31680
+  target_layers = L0-L8 + L16
+
+DeepSeek7B:
+  pairs = 144
+  rows = 25344
+  target_layers = L20-L27
+
+total rows = 85536
+```
+
+### Qwen3 结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = [0]
+nonfinite_rows = 0
+norm_illegal_rows = 17
+```
+
+L0：
+
+```text
+attn_progress = 0.7418
+mlp_progress = 0.8180
+both_progress = 0.8448
+both_kl_ratio = 0.2413
+resid_progress = 0.8509
+cross_battn_amlp_progress = 0.2506
+cross_battn_amlp_kl_ratio = 0.9090
+```
+
+主要 event：
+
+```text
+level = functional_incompatible
+layer = 0
+patch_type = cross_battn_amlp
+kl_ratio_vs_both = 3.7664
+progress_drop = 0.5943
+```
+
+客观现象：
+
+全量 144 pair 后，Qwen3 仍然只有 L0 进入 functional_incompatible。L0 的 both、attn、MLP 都较强，错误组合 `B_attn + A_mlp` 明显削弱 progress。
+
+### GLM4 结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = [0, 1]
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+L0：
+
+```text
+attn_progress = 0.0238
+mlp_progress = 0.9421
+both_progress = 0.9465
+both_kl_ratio = 0.0963
+resid_progress = 0.9779
+cross_battn_amlp_progress = 0.0097
+cross_battn_amlp_kl_ratio = 1.0445
+```
+
+L1：
+
+```text
+attn_progress = 0.2463
+mlp_progress = 0.6471
+both_progress = 0.6984
+both_kl_ratio = 0.4404
+resid_progress = 0.9863
+cross_battn_amlp_progress = 0.0509
+cross_battn_amlp_kl_ratio = 0.9752
+```
+
+主要 events：
+
+```text
+L0 cross_battn_amlp:
+  kl_ratio_vs_both = 10.8411
+  progress_drop = 0.9367
+
+L1 cross_battn_amlp:
+  kl_ratio_vs_both = 2.2145
+  progress_drop = 0.6475
+```
+
+客观现象：
+
+1. GLM4 全量 BF16 下仍然没有 nonfinite。
+2. Phase 24 中 fp16 nonfinite 继续被削弱为“fp16 数值脆弱性”解释。
+3. GLM4 的 MLP 集中现象在全量样本中更稳：L0 `mlp_progress = 0.9421`，几乎等于 `both_progress = 0.9465`，而 `attn_progress = 0.0238`。
+4. `cross_battn_amlp` 在 L0/L1 仍然强烈失败。
+5. GLM4 SDPA 长跑仍有用户态稳定性问题：本轮出现 exit_code=132，但不是 kernel/GPU 锁死，resume 后完成。
+
+### DeepSeek7B 结果
+
+```text
+best_layer_by_both_progress = 27
+contract_broken_layers = []
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+L27：
+
+```text
+attn_progress = 0.5970
+mlp_progress = 0.4561
+both_progress = 0.6563
+both_kl_ratio = 0.4632
+resid_progress = 1.0000
+cross_battn_amlp_progress = 0.0889
+cross_battn_amlp_kl_ratio = 0.7977
+```
+
+L26：
+
+```text
+attn_progress = 0.0149
+mlp_progress = 0.2539
+both_progress = 0.2570
+both_kl_ratio = 1.0894
+resid_progress = 0.5980
+```
+
+客观现象：
+
+DeepSeek7B 全量后仍然是 L27 最强。L27 的 `cross_battn_amlp_progress = 0.0889` 明显低于 `both_progress = 0.6563`，但因为当前 event 阈值要求 KL 相对 both 放大到 2.0 以上，所以没有进入 `contract_events`。这说明 L27 存在明显 progress drop，但不是 KL explosion 型断裂。
+
+### subtype 非 residual 最优分布
+
+Qwen3：
+
+```text
+both = 16
+mlp = 3
+attn = 0
+```
+
+GLM4：
+
+```text
+both = 19
+mlp = 0
+attn = 0
+```
+
+DeepSeek7B：
+
+```text
+both = 17
+mlp = 1
+attn = 1
+```
+
+客观现象：
+
+1. 三模型绝大多数 subtype 的非 residual 最优 patch 都是 both。
+2. GLM4 虽然全 subtype 最优都是 both，但 L0 的 MLP 单独几乎等于 both，因此“both 最优”不能掩盖 MLP 集中。
+3. DeepSeek7B 有少数 subtype 表现为单独 attention 或 MLP 最优，但主体仍是 both。
+
+### 与 Phase 25 的一致性
+
+```text
+Qwen3:
+  Phase 25: L0 broken
+  Phase 26: L0 broken
+  结论稳定
+
+GLM4:
+  Phase 25: L0/L1 broken, BF16 nonfinite=0
+  Phase 26: L0/L1 broken, BF16 nonfinite=0
+  结论稳定
+
+DeepSeek7B:
+  Phase 25: L27 strongest, no strict event
+  Phase 26: L27 strongest, no strict event
+  结论稳定
+```
+
+### 硬伤
+
+1. 样本池全部跑完后仍只有 144 pair，语言多样性仍有限。
+2. GLM4 的 SDPA 长跑稳定性仍有问题，出现过用户态 exit_code=132。
+3. 当前 event 阈值对 DeepSeek7B 这类“progress drop 强、KL 不爆炸”的情况不敏感。
+4. norm_illegal 使用粗阈值 `[0.5, 2.0]`，不是自然流形距离。
+5. progress 仍只是方向移动指标，不是因果贡献。
+
+### 下一步计划
+
+1. 增加 progress-drop-only event：
+   - 例如 `both_progress - cross_progress >= 0.5`
+   - 不强制 KL ratio >= 2.0
+   - 用于捕捉 DeepSeek7B L27 这类不兼容。
+2. 对 GLM4 SDPA 长跑做稳定性隔离：
+   - SDPA vs eager
+   - 每 48 pair 分段运行
+   - 判断 exit_code=132 是否只出现在长 session。
+3. 扩展样本不是继续模板复制，而是增加结构复杂度：
+   - long passive
+   - nested passive
+   - nested logical
+   - double recursive
+4. 开始保存自然分布参考统计：
+   - 每层 natural attn/mlp/resid/next_out norm 均值和方差
+   - 以 z-score 替代粗 norm_illegal。
+
+## Phase 27: Phase 291 多层 Block 契约扫描 [2026-05-28 05:48]
+
+### 任务目标
+
+根据“全局功能契约图谱算法”的建议，本轮先完成最可落地的一步：多层 block 契约扫描。
+
+当前不直接进入 head/neuron 级别，因为如果单层/多层功能曲线还不清楚，直接下沉到神经元会导致定位目标不稳定。
+
+本轮重点验证：
+
+```text
+1. 单层强是否等于局部功能节点；
+2. 连续层 block 是否比单层更强；
+3. cross_battn_amlp 是否在 block 级别继续失败；
+4. DeepSeek7B 的 L27 是否只是单层现象，还是深层 block 累积；
+5. progress-drop-only event 能否捕捉 KL 不爆炸但功能下降的情况。
+```
+
+### 对用户方案的判断
+
+“全局功能契约图谱算法”方向正确，但完整目标很大，应分阶段完成。
+
+当前正确部分：
+
+```text
+1. 不能继续只看单层，必须测试连续层 block。
+2. 每个功能需要拆子类型，不能把 negation/logical/translation 当作单一功能。
+3. 需要为每个功能生成 contract_signature。
+4. 复用/差异化矩阵是后续核心目标。
+5. head/neuron 映射必须建立在稳定的功能峰值层或 block 之上。
+```
+
+当前需要谨慎的部分：
+
+```text
+1. 每类 100 对样本是目标，但现阶段需要先验证算法和关键现象。
+2. head/neuron 级映射不能过早做，否则会把不稳定曲线映射到错误神经元。
+3. “全局图谱”必须先定义 signature，再做相似度矩阵，否则容易变成零散实验堆叠。
+```
+
+因此本轮执行 Phase 291：多层 block 契约扫描。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase291_block_contract_scan.py
+tests/gpt5/run_phase291_conservative.sh
+```
+
+脚本功能：
+
+```text
+1. 支持 block 参数，例如 0,0-2,0-4,0-8。
+2. 对 block 内所有层同时 patch。
+3. patch 类型：
+   - attn
+   - mlp
+   - both
+   - resid
+   - cross_battn_amlp
+   - cross_aattn_bmlp
+4. 支持 alpha 插值。
+5. 支持 pair-level resume。
+6. 输出 block_curve、alpha_curve、subtype_signature。
+7. 新增 functional_drop_only event：
+   - both_progress >= 0.4
+   - both_progress - cross_progress >= 0.5
+   - cross_progress <= 0.25
+   - 不要求 KL ratio >= 2
+```
+
+`functional_drop_only` 是为 DeepSeek7B L27 这类现象新增的：功能下降明显，但 KL 不一定爆炸。
+
+### Smoke Test
+
+命令：
+
+```bash
+MAX_SECONDS=900 OUTPUT_DIR=results/gpt5_phase291_smoke \
+tests/gpt5/run_phase291_conservative.sh qwen3 \
+  --categories negation \
+  --subtypes lexical_not_adj \
+  --max-pairs-per-subtype 1 \
+  --blocks 0,0-2 \
+  --alphas 0,1 \
+  --progress-every 1 \
+  --label smoke
+```
+
+结果：
+
+```text
+rows = 20
+best_block = L0
+broken_blocks = [L0, L0-L2]
+nonfinite = 0
+norm_illegal = 0
+log_dir = results/gpt5_gpu_lock_logs/20260528_043653_phase291_qwen3
+```
+
+### 正式测试命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase291_block_contract_full \
+tests/gpt5/run_phase291_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --blocks 0,0-2,0-4,0-8,4-8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=14400 OUTPUT_DIR=results/gpt5_phase291_block_contract_full \
+tests/gpt5/run_phase291_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --blocks 0,0-1,0-2,0-4,0-8,4-8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=10800 OUTPUT_DIR=results/gpt5_phase291_block_contract_full \
+tests/gpt5/run_phase291_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 999 \
+  --blocks 20-23,24-27,20-27,26-27,27 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase291_block_contract_full/qwen3_phase291_block_contract_scan.json
+results/gpt5_phase291_block_contract_full/glm4_phase291_block_contract_scan.json
+results/gpt5_phase291_block_contract_full/deepseek7b_phase291_block_contract_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase291_block_contract_full/checkpoints/qwen3/logical-negation-passive-recursive_full.json
+results/gpt5_phase291_block_contract_full/checkpoints/glm4/logical-negation-passive-recursive_full.json
+results/gpt5_phase291_block_contract_full/checkpoints/deepseek7b/logical-negation-passive-recursive_full.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_043712_phase291_qwen3
+results/gpt5_gpu_lock_logs/20260528_045551_phase291_glm4
+results/gpt5_gpu_lock_logs/20260528_052839_phase291_deepseek7b
+```
+
+三轮 `kernel.since-start.filtered.log` 都是 0 行。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 144
+  rows = 15840
+  blocks = L0, L0-L2, L0-L4, L0-L8, L4-L8
+
+GLM4:
+  pairs = 144
+  rows = 19008
+  blocks = L0, L0-L1, L0-L2, L0-L4, L0-L8, L4-L8
+
+DeepSeek7B:
+  pairs = 144
+  rows = 15840
+  blocks = L20-L23, L20-L27, L24-L27, L26-L27, L27
+
+total rows = 50688
+```
+
+### Qwen3 客观结果
+
+```text
+best_block_by_both_progress = L0-L8
+broken_blocks = [L0, L0-L2, L0-L4, L0-L8, L4-L8]
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+block 曲线：
+
+```text
+L0:
+  attn_progress = 0.7418
+  mlp_progress = 0.8180
+  both_progress = 0.8448
+  both_kl_ratio = 0.2414
+  cross_battn_amlp_progress = 0.2506
+
+L0-L2:
+  attn_progress = 0.7764
+  mlp_progress = 0.8270
+  both_progress = 0.8543
+  both_kl_ratio = 0.1338
+  cross_battn_amlp_progress = 0.3093
+
+L0-L4:
+  attn_progress = 0.7790
+  mlp_progress = 0.8482
+  both_progress = 0.8602
+  both_kl_ratio = 0.1112
+  cross_battn_amlp_progress = 0.2060
+
+L0-L8:
+  attn_progress = 0.7642
+  mlp_progress = 0.8547
+  both_progress = 0.8788
+  both_kl_ratio = 0.0820
+  cross_battn_amlp_progress = 0.1948
+
+L4-L8:
+  attn_progress = 0.3046
+  mlp_progress = 0.7577
+  both_progress = 0.7979
+  both_kl_ratio = 0.2229
+  cross_battn_amlp_progress = 0.1590
+```
+
+主要 event：
+
+```text
+L0-L8 cross_battn_amlp:
+  kl_ratio_vs_both = 10.8808
+  progress_drop = 0.6840
+
+L0-L4 cross_battn_amlp:
+  kl_ratio_vs_both = 8.1855
+  progress_drop = 0.6543
+
+L0-L2 cross_battn_amlp:
+  kl_ratio_vs_both = 6.1467
+  progress_drop = 0.5450
+```
+
+客观现象：
+
+Qwen3 的单层 L0 已经很强，但 L0-L8 比 L0 更强，且 both_kl_ratio 明显下降。这说明 Qwen3 不只是 L0 单点，也存在浅层 block 累积增强。L4-L8 单独也强，说明中浅层 block 能继续推动功能转换。
+
+### GLM4 客观结果
+
+```text
+best_block_by_both_progress = L0-L8
+broken_blocks = [L0, L0-L1, L0-L2, L0-L4, L0-L8, L4-L8]
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+block 曲线：
+
+```text
+L0:
+  attn_progress = 0.0238
+  mlp_progress = 0.9421
+  both_progress = 0.9465
+  both_kl_ratio = 0.0963
+  cross_battn_amlp_progress = 0.0097
+
+L0-L1:
+  attn_progress = 0.0517
+  mlp_progress = 0.9724
+  both_progress = 0.9823
+  both_kl_ratio = 0.0495
+  cross_battn_amlp_progress = 0.0402
+
+L0-L2:
+  attn_progress = 0.0969
+  mlp_progress = 0.9777
+  both_progress = 0.9846
+  both_kl_ratio = 0.0325
+  cross_battn_amlp_progress = 0.0596
+
+L0-L4:
+  attn_progress = 0.2741
+  mlp_progress = 0.9854
+  both_progress = 0.9884
+  both_kl_ratio = 0.0214
+  cross_battn_amlp_progress = 0.1951
+
+L0-L8:
+  attn_progress = 0.5050
+  mlp_progress = 0.9872
+  both_progress = 0.9906
+  both_kl_ratio = 0.0167
+  cross_battn_amlp_progress = 0.1846
+
+L4-L8:
+  attn_progress = 0.4255
+  mlp_progress = 0.8674
+  both_progress = 0.9213
+  both_kl_ratio = 0.0611
+  cross_battn_amlp_progress = 0.1315
+```
+
+主要 event：
+
+```text
+L0-L1 cross_battn_amlp:
+  kl_ratio_vs_both = 20.2548
+  progress_drop = 0.9421
+
+L0 cross_battn_amlp:
+  kl_ratio_vs_both = 10.8411
+  progress_drop = 0.9367
+
+L0-L2 cross_battn_amlp:
+  kl_ratio_vs_both = 29.7162
+  progress_drop = 0.9249
+
+L0-L8 cross_battn_amlp:
+  kl_ratio_vs_both = 52.8985
+  progress_drop = 0.8060
+```
+
+客观现象：
+
+GLM4 的 MLP 集中现象在 block 级别更强。L0 单层已经强，但 L0-L8 的 both_progress 接近 0.991，MLP_progress 也接近 0.987，几乎等于 both。attention_progress 随 block 变宽而上升，但仍明显低于 MLP/both。错误组合 `B_attn + A_mlp` 在所有 block 中都失败。
+
+### DeepSeek7B 客观结果
+
+```text
+best_block_by_both_progress = L20-L27
+broken_blocks = [L20-L27, L24-L27, L26-L27, L27]
+nonfinite_rows = 0
+norm_illegal_rows = 0
+```
+
+block 曲线：
+
+```text
+L20-L23:
+  attn_progress = 0.0841
+  mlp_progress = 0.2299
+  both_progress = 0.2695
+  both_kl_ratio = 0.7282
+  cross_battn_amlp_progress = 0.0556
+
+L20-L27:
+  attn_progress = 0.7033
+  mlp_progress = 0.7818
+  both_progress = 0.9173
+  both_kl_ratio = 0.0832
+  cross_battn_amlp_progress = 0.1300
+
+L24-L27:
+  attn_progress = 0.6447
+  mlp_progress = 0.6166
+  both_progress = 0.8004
+  both_kl_ratio = 0.2183
+  cross_battn_amlp_progress = 0.1098
+
+L26-L27:
+  attn_progress = 0.6076
+  mlp_progress = 0.5235
+  both_progress = 0.7254
+  both_kl_ratio = 0.3713
+  cross_battn_amlp_progress = 0.0993
+
+L27:
+  attn_progress = 0.5970
+  mlp_progress = 0.4561
+  both_progress = 0.6563
+  both_kl_ratio = 0.4632
+  cross_battn_amlp_progress = 0.0889
+```
+
+主要 events：
+
+```text
+L20-L27 cross_battn_amlp:
+  level = functional_kl_incompatible
+  kl_ratio_vs_both = 8.5146
+  progress_drop = 0.7873
+
+L24-L27 cross_battn_amlp:
+  level = functional_kl_incompatible
+  kl_ratio_vs_both = 3.3639
+  progress_drop = 0.6906
+
+L26-L27 cross_battn_amlp:
+  level = functional_kl_incompatible
+  kl_ratio_vs_both = 2.1216
+  progress_drop = 0.6261
+
+L27 cross_battn_amlp:
+  level = functional_drop_only
+  kl_ratio_vs_both = 1.7221
+  progress_drop = 0.5673
+```
+
+客观现象：
+
+Phase 290 中 DeepSeek7B L27 单层没有进入 strict KL event，但 Phase 291 新增的 progress-drop-only 捕捉到了 L27 单层功能下降。更重要的是，L20-L27 block 明显强于 L27 单层：both_progress 从 0.6563 提升到 0.9173，both_kl_ratio 从 0.4632 降到 0.0832。这说明 DeepSeek7B 的深层机制不是单独 L27，而是 L20-L27 跨层累积。
+
+### 三模型对比
+
+```text
+Qwen3:
+  L0 单层强；
+  L0-L8 更强；
+  浅层存在 block 累积增强。
+
+GLM4:
+  L0 单层极强；
+  L0-L8 更接近完整转换；
+  MLP block 几乎等于 both block；
+  attention 单独较弱，但随 block 变宽增强。
+
+DeepSeek7B:
+  L27 单层强；
+  L20-L27 block 明显更强；
+  深层 block 累积是主要现象。
+```
+
+### 当前最重要的新事实
+
+Phase 291 说明：
+
+```text
+单层峰值不是完整机制。
+Qwen3、GLM4、DeepSeek7B 都存在 block 累积增强。
+DeepSeek7B 尤其明显：L20-L27 远强于 L27。
+GLM4 的 MLP 集中不是 L0 单点，而是浅层 MLP block 持续累积。
+```
+
+这支持下一步继续做 contract_signature，而不是直接跳到单层 neuron。
+
+### 硬伤
+
+1. block patch 仍是 activation patch，不是严格意义上的“从 patch 后状态自然重算出每个内部模块输出”。
+2. block 内每层都直接替换为 B 的自然输出，因此它更像 block-level causal replacement，不是完整动态路径重建。
+3. 目前只测现有 144 pair，仍不足以覆盖完整语言功能。
+4. 当前没有 head/neuron 级定位。
+5. naturalness 仍是粗 norm 检查，没有 z-score/kNN/PCA 距离。
+
+### 下一步计划
+
+1. Phase 292：生成 contract_signature 表。
+   - 输入 Phase 290 单层结果 + Phase 291 block 结果。
+   - 每个 subtype 形成向量：
+     layer_curve + block_curve + alpha_curve + event_curve。
+   - 输出 subtype 相似度矩阵。
+
+2. Phase 293：扩展功能库。
+   - translation
+   - style
+   - tense
+   - coreference
+   - role binding 复杂版
+   - recursive 复杂版
+
+3. Phase 294：峰值 block 内 head/neuron 定位。
+   - Qwen3: L0-L8
+   - GLM4: L0-L8
+   - DeepSeek7B: L20-L27
+   - 先在 block 内定位，再做 head/neuron patch/ablation。
+
+## Phase 28: Phase 292 Contract Signature 与复用矩阵初版 [2026-05-28 09:25]
+
+### 任务目标
+
+根据 Phase 27 的下一步计划，本轮不继续跑 GPU 模型，而是把已有结果整理成第一版 contract_signature：
+
+```text
+输入：
+  Phase 290 单层关键层结果
+  Phase 291 多层 block 结果
+
+输出：
+  每个 model-subtype 的 contract_signature
+  模型内 subtype 相似度矩阵
+  模型内 top reuse / bottom differentiation pair
+  跨模型 same-subtype 相似度
+```
+
+这一步是“全局功能契约图谱算法”的数据结构骨架，不是最终理论结论。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase292_contract_signature.py
+```
+
+运行命令：
+
+```bash
+python tests/gpt5/phase292_contract_signature.py \
+  --output-dir results/gpt5_phase292_contract_signature
+```
+
+输入文件：
+
+```text
+results/gpt5_phase290_contract_break_full/qwen3_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_full/glm4_phase290_contract_break_scan.json
+results/gpt5_phase290_contract_break_full/deepseek7b_phase290_contract_break_scan.json
+
+results/gpt5_phase291_block_contract_full/qwen3_phase291_block_contract_scan.json
+results/gpt5_phase291_block_contract_full/glm4_phase291_block_contract_scan.json
+results/gpt5_phase291_block_contract_full/deepseek7b_phase291_block_contract_scan.json
+```
+
+输出文件：
+
+```text
+results/gpt5_phase292_contract_signature/contract_signatures.json
+results/gpt5_phase292_contract_signature/signature_summary.csv
+results/gpt5_phase292_contract_signature/cross_model_same_subtype_similarity.csv
+results/gpt5_phase292_contract_signature/qwen3_subtype_similarity.csv
+results/gpt5_phase292_contract_signature/glm4_subtype_similarity.csv
+results/gpt5_phase292_contract_signature/deepseek7b_subtype_similarity.csv
+results/gpt5_phase292_contract_signature/qwen3_top_reuse_pairs.csv
+results/gpt5_phase292_contract_signature/glm4_top_reuse_pairs.csv
+results/gpt5_phase292_contract_signature/deepseek7b_top_reuse_pairs.csv
+results/gpt5_phase292_contract_signature/qwen3_bottom_differentiation_pairs.csv
+results/gpt5_phase292_contract_signature/glm4_bottom_differentiation_pairs.csv
+results/gpt5_phase292_contract_signature/deepseek7b_bottom_differentiation_pairs.csv
+results/gpt5_phase292_contract_signature/CONTRACT_SIGNATURE_REPORT.md
+```
+
+### Signature 定义
+
+本轮生成两类向量：
+
+```text
+full_vectors:
+  保留模型内 layer/block 原始标签，用于模型内相似度。
+
+canonical_vectors:
+  使用 layer_pos/block_pos、best_progress、mean_progress、cross_drop、alpha 曲线等更通用特征，
+  用于模型内矩阵和跨模型 same-subtype 粗比较。
+```
+
+特征来源：
+
+```text
+Phase 290:
+  layer × patch_type × progress
+  layer × patch_type × kl_ratio
+  layer × cross_battn_amlp drop
+  alpha × patch_type curve
+
+Phase 291:
+  block × patch_type × progress
+  block × patch_type × kl_ratio
+  block × cross_battn_amlp drop
+  block width
+  alpha × patch_type curve
+```
+
+### 数据规模
+
+```text
+model-subtype signatures = 57
+cross-model same-subtype rows = 57
+
+每个模型:
+  subtypes = 19
+```
+
+### 模型级摘要
+
+Qwen3：
+
+```text
+avg p290 both best = 0.8506
+avg p291 both best = 0.8971
+avg p291 cross max drop = 0.7375
+```
+
+GLM4：
+
+```text
+avg p290 both best = 0.9550
+avg p291 both best = 0.9963
+avg p291 cross max drop = 0.9648
+```
+
+DeepSeek7B：
+
+```text
+avg p290 both best = 0.6624
+avg p291 both best = 0.9131
+avg p291 cross max drop = 0.7937
+```
+
+客观现象：
+
+```text
+1. 三模型 Phase 291 block best 都高于 Phase 290 layer best。
+2. GLM4 的平均 block best 最高，接近 1.0。
+3. DeepSeek7B 从单层到 block 的提升最大，符合 Phase 291 的深层累积观察。
+4. GLM4 的 cross max drop 最大，说明错误组合在 GLM4 中最严重。
+```
+
+### 模型内 Top Reuse Pairs
+
+Qwen3 top：
+
+```text
+complement_clause / syntactic_do_not: 0.9732
+complement_clause / relative_clause: 0.9721
+get_passive / pp_chain: 0.9704
+relative_clause / syntactic_do_not: 0.9607
+pp_chain / relative_clause: 0.9519
+```
+
+GLM4 top：
+
+```text
+complement_clause / possessive_chain: 0.9986
+conditional / existential_no: 0.9958
+complement_clause / never: 0.9939
+never / possessive_chain: 0.9933
+and_or / inference: 0.9893
+```
+
+DeepSeek7B top：
+
+```text
+possessive_chain / relative_clause: 0.9992
+get_passive / possessive_chain: 0.9988
+never / syntactic_do_not: 0.9985
+relative_clause / scope_quantifier: 0.9984
+possessive_chain / scope_quantifier: 0.9983
+```
+
+客观现象：
+
+```text
+1. 递归类内部经常出现高相似度，例如 complement_clause / relative_clause / possessive_chain。
+2. 否定内部 never / syntactic_do_not 在 DeepSeek7B 中高度相似。
+3. 也出现跨类别高相似度，例如 get_passive / pp_chain、conditional / existential_no。
+```
+
+但这不能直接解释为真实功能复用，因为当前 signature 可能仍被模型整体 block 曲线主导。
+
+### 模型内 Bottom Differentiation Pairs
+
+Qwen3 最低相似度：
+
+```text
+causal / scope_quantifier: 0.3541
+contrast / scope_quantifier: 0.4164
+conditional / scope_quantifier: 0.4808
+causal / complement_clause: 0.4972
+morphological_neg / scope_quantifier: 0.5207
+```
+
+GLM4 最低相似度：
+
+```text
+contrast / possessive_chain: 0.6715
+complement_clause / contrast: 0.6765
+contrast / never: 0.6771
+causal / pp_chain: 0.6793
+contrast / pp_chain: 0.6853
+```
+
+DeepSeek7B 最低相似度：
+
+```text
+complement_clause / no_agent: 0.7980
+complement_clause / inference: 0.8183
+complement_clause / pp_chain: 0.8594
+complement_clause / existential_no: 0.8714
+complement_clause / morphological_neg: 0.8751
+```
+
+客观现象：
+
+```text
+1. Qwen3 的 subtype 分化最明显，最低相似度可以到 0.35。
+2. GLM4 分化中等，最低在 0.67 左右。
+3. DeepSeek7B 分化最弱，最低仍接近 0.80。
+```
+
+这说明当前 canonical signature 对 DeepSeek7B 的功能区分能力不足，或者 DeepSeek7B 的深层 block 曲线在不同 subtype 中确实高度一致。需要后续用去模型均值/残差化 signature 区分这两种可能。
+
+### 跨模型 Same-Subtype 相似度
+
+```text
+qwen3 vs glm4:
+  mean = 0.8264
+  min = contrast, 0.6684
+  max = existential_no, 0.9884
+
+qwen3 vs deepseek7b:
+  mean = 0.8495
+  min = no_agent, 0.6492
+  max = relative_clause, 0.9586
+
+glm4 vs deepseek7b:
+  mean = 0.8445
+  min = inference, 0.6964
+  max = possessive_chain, 0.9504
+```
+
+客观现象：
+
+跨模型 same-subtype 相似度整体偏高，但最低值显示某些功能在不同模型中路径差异较大，例如：
+
+```text
+contrast: qwen3 vs glm4 差异大
+no_agent: qwen3 vs deepseek7b 差异大
+inference: glm4 vs deepseek7b 差异大
+```
+
+### Best Block Width 分布
+
+Qwen3：
+
+```text
+width 9 = 8 subtypes
+width 5 = 6 subtypes
+width 3 = 1 subtype
+width 1 = 4 subtypes
+```
+
+GLM4：
+
+```text
+width 9 = 6 subtypes
+width 5 = 3 subtypes
+width 3 = 6 subtypes
+width 2 = 2 subtypes
+width 1 = 2 subtypes
+```
+
+DeepSeek7B：
+
+```text
+width 8 = 19 subtypes
+```
+
+客观现象：
+
+DeepSeek7B 所有 subtype 的 best block width 都是 8，也就是 L20-L27。这再次说明当前 DS7B 的功能转换在本实验设置下高度集中到深层 block，而不是单层或窄 block。
+
+### 本轮最重要的新事实
+
+```text
+1. Contract signature 初版已经可以从 Phase 290/291 自动生成。
+2. block 曲线确实提供了比单层更强的功能指纹。
+3. Qwen3/GLM4/DeepSeek7B 的 subtype 分化程度不同：
+   Qwen3 分化最明显；
+   GLM4 中等；
+   DeepSeek7B 最弱或被全局深层 block 模式主导。
+4. 当前 signature 仍存在“模型整体曲线主导”的风险，不能直接把高相似度解释为真实功能复用。
+```
+
+### 硬伤
+
+1. 当前 canonical signature 没有做去模型均值，所以相似度可能被模型整体层/block形状主导。
+2. DeepSeek7B 的相似度过高，说明当前特征对 DS7B subtype 分化不够敏感。
+3. 还没有加入自然分布 z-score/kNN/PCA 距离。
+4. 还没有 head/neuron 级特征。
+5. 样本仍是 144 pair，功能库还没扩展到 translation/style/tense/coreference。
+
+### 下一步计划
+
+1. Phase 292b：生成 residualized signature。
+   - 对每个模型内部的 subtype signature 减去模型均值。
+   - 或对每个 category 内部减均值。
+   - 再计算相似度，判断哪些高相似度是真复用，哪些只是模型整体曲线。
+
+2. Phase 293：扩展功能库。
+   - translation
+   - style
+   - tense
+   - coreference
+   - long passive
+   - nested logical
+   - double recursive
+
+3. Phase 294：自然性指标升级。
+   - 保存 natural norm mean/std。
+   - 计算 norm z-score。
+   - 后续加入 PCA residual distance。
+
+4. Phase 295：峰值 block 内 head/neuron 定位。
+   - 在 residualized signature 稳定后再进入 head/neuron。
+
+## Phase 29: Phase 292b 残差化签名与复用候选过滤 [2026-05-28 09:38]
+
+### 任务目标
+
+根据最新分析，Phase 292 的 contract signature 只是功能图谱的数据结构初版，不能直接把 raw similarity 解释为真实复用。本轮不重新跑 GPU 模型，而是先对 Phase 292 的签名做去偏置分析：
+
+```text
+1. model-centered signature：减去模型内部所有 subtype 的均值。
+2. category-centered signature：减去同一 category 内 subtype 的均值。
+3. feature group normalized signature：按 layer/block/alpha/cross/summary 等特征组归一化。
+4. zscore_model signature：模型内部逐特征 z-score。
+```
+
+目标是区分：
+
+```text
+raw similarity 很高，但只是模型整体曲线相似；
+raw similarity 很高，残差化后仍然相似，作为更可信的复用候选。
+```
+
+### 对用户分析的判断
+
+这次分析中正确的部分：
+
+```text
+1. Phase 292 是必要进展，但不是语言编码机制破解。
+2. 高相似度不能直接解释为真实功能复用。
+3. DeepSeek7B 的 signature 很可能被整体深层 block 模式主导。
+4. 下一步必须做 residualized signature。
+5. 只有 signature、naturalness、dynamic recompute、variable decoding 一致时，才接近机制证据。
+```
+
+因此本轮先做 Phase 292b，而不是直接进入 head/neuron 定位。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase292b_residualized_signature.py
+```
+
+输入：
+
+```text
+results/gpt5_phase292_contract_signature/contract_signatures.json
+```
+
+运行命令：
+
+```bash
+python tests/gpt5/phase292b_residualized_signature.py \
+  --input results/gpt5_phase292_contract_signature/contract_signatures.json \
+  --output-dir results/gpt5_phase292b_residualized_signature \
+  --vector-kind canonical \
+  --top-k 20
+```
+
+本轮没有加载模型，没有占用 GPU。
+
+### 输出文件
+
+```text
+results/gpt5_phase292b_residualized_signature/RESIDUALIZED_SIGNATURE_REPORT.md
+results/gpt5_phase292b_residualized_signature/residualized_summary.csv
+results/gpt5_phase292b_residualized_signature/pair_stability_diagnostics.csv
+results/gpt5_phase292b_residualized_signature/cross_model_same_subtype_residual_similarity.csv
+results/gpt5_phase292b_residualized_signature/residualized_signatures.json
+```
+
+每个模型还输出：
+
+```text
+{model}_raw_similarity.csv
+{model}_model_centered_similarity.csv
+{model}_category_centered_similarity.csv
+{model}_group_normalized_similarity.csv
+{model}_zscore_model_similarity.csv
+{model}_pair_diagnostics.csv
+```
+
+### 数据规模
+
+```text
+models = 3
+subtypes/model = 19
+pairs/model = 171
+total pair diagnostics = 513
+cross-model same-subtype rows = 285
+```
+
+### Qwen3 客观结果
+
+```text
+raw similarity:
+  mean = 0.7789
+  min = 0.3541
+  max = 0.9732
+
+model-centered similarity:
+  mean = -0.0523
+  min = -0.9219
+  max = 0.8795
+
+category-centered similarity:
+  mean = -0.0535
+  min = -0.8586
+  max = 0.9236
+```
+
+诊断标签：
+
+```text
+residual_stable_candidate = 11
+model_shape_candidate = 2
+category_shape_candidate = 5
+stable_differentiation_candidate = 21
+```
+
+残差化后仍较稳定的候选：
+
+```text
+complement_clause / syntactic_do_not:
+  raw = 0.9732
+  model_resid = 0.8614
+  category_resid = 0.6784
+
+complement_clause / relative_clause:
+  raw = 0.9721
+  model_resid = 0.7949
+  category_resid = 0.3559
+
+get_passive / pp_chain:
+  raw = 0.9704
+  model_resid = 0.7676
+  category_resid = 0.7962
+
+causal / contrast:
+  raw = 0.9507
+  model_resid = 0.8795
+  category_resid = 0.6785
+```
+
+raw 高但 category-centered 后变弱的候选：
+
+```text
+dative_passive / possessive_chain:
+  raw = 0.9482
+  model_resid = 0.5706
+  category_resid = -0.1889
+
+lexical_not_adj / pp_chain:
+  raw = 0.9404
+  model_resid = 0.2382
+  category_resid = -0.2319
+
+get_passive / lexical_not_adj:
+  raw = 0.9385
+  model_resid = 0.3498
+  category_resid = -0.3191
+```
+
+客观现象：
+
+Qwen3 的 raw similarity 本来就不是特别高，残差化后仍保留一部分复用候选，同时也保留较多 differentiation candidate。这说明 Qwen3 的 subtype 分化不是纯粹由模型整体曲线造成。
+
+### GLM4 客观结果
+
+```text
+raw similarity:
+  mean = 0.8623
+  min = 0.6715
+  max = 0.9986
+
+model-centered similarity:
+  mean = -0.0476
+  min = -0.9630
+  max = 0.9905
+
+category-centered similarity:
+  mean = -0.0494
+  min = -0.9599
+  max = 0.9726
+```
+
+诊断标签：
+
+```text
+residual_stable_candidate = 21
+model_shape_candidate = 8
+category_shape_candidate = 18
+stable_differentiation_candidate = 0
+```
+
+残差化后仍较稳定的候选：
+
+```text
+complement_clause / possessive_chain:
+  raw = 0.9986
+  model_resid = 0.9905
+  category_resid = 0.9726
+
+conditional / existential_no:
+  raw = 0.9958
+  model_resid = 0.9673
+  category_resid = 0.7816
+
+complement_clause / never:
+  raw = 0.9939
+  model_resid = 0.9571
+  category_resid = 0.7936
+
+causal / contrast:
+  raw = 0.9871
+  model_resid = 0.9480
+  category_resid = 0.8207
+```
+
+raw 高但 category-centered 后变弱的候选：
+
+```text
+and_or / get_passive:
+  raw = 0.9707
+  model_resid = 0.8167
+  category_resid = 0.0659
+
+causal / get_passive:
+  raw = 0.9626
+  model_resid = 0.8128
+  category_resid = 0.0612
+
+dative_passive / morphological_neg:
+  raw = 0.9602
+  model_resid = 0.6439
+  category_resid = -0.1039
+```
+
+客观现象：
+
+GLM4 在 raw similarity 上整体高于 Qwen3，但残差化后并不是全部坍塌，仍有 21 个 residual_stable_candidate。GLM4 的 MLP 集中和高相似 signature 可能同时存在：一部分是模型整体浅层 MLP 模式，一部分可能是稳定的 subtype deviation 模式。
+
+### DeepSeek7B 客观结果
+
+```text
+raw similarity:
+  mean = 0.9556
+  min = 0.7980
+  max = 0.9992
+
+model-centered similarity:
+  mean = -0.0168
+  min = -0.7865
+  max = 0.9474
+
+category-centered similarity:
+  mean = -0.0002
+  min = -0.8773
+  max = 0.9662
+```
+
+诊断标签：
+
+```text
+residual_stable_candidate = 21
+model_shape_candidate = 108
+category_shape_candidate = 7
+stable_differentiation_candidate = 0
+```
+
+残差化后仍较稳定的候选：
+
+```text
+possessive_chain / relative_clause:
+  raw = 0.9992
+  model_resid = 0.9447
+  category_resid = 0.9662
+
+get_passive / possessive_chain:
+  raw = 0.9988
+  model_resid = 0.9197
+  category_resid = 0.6551
+
+never / syntactic_do_not:
+  raw = 0.9985
+  model_resid = 0.9052
+  category_resid = 0.8377
+
+by_phrase / dative_passive:
+  raw = 0.9983
+  model_resid = 0.9474
+  category_resid = 0.9165
+```
+
+raw 高但 model-centered 后变弱的候选很多：
+
+```text
+model_shape_candidate = 108 / 171 pairs
+```
+
+典型例子：
+
+```text
+by_phrase / get_passive:
+  raw = 0.9811
+  model_resid = 0.1214
+  category_resid = -0.1043
+
+by_phrase / possessive_chain:
+  raw = 0.9802
+  model_resid = 0.0871
+  category_resid = -0.2803
+
+dative_passive / get_passive:
+  raw = 0.9801
+  model_resid = 0.0929
+  category_resid = -0.1152
+```
+
+客观现象：
+
+DeepSeek7B 的 raw similarity 过高确实主要由模型整体曲线主导。raw mean = 0.9556，但 model-centered mean 降到 -0.0168，category-centered mean 接近 0。也就是说，Phase 292 中“DeepSeek7B subtype 分化最弱”的判断需要修正为：
+
+```text
+当前 canonical signature 下，DeepSeek7B 的 subtype 曲线被共同的 L20-L27 深层 block 模式强烈主导；
+残差化后仍有少数稳定复用候选，但大多数 raw 高相似不能当作复用证据。
+```
+
+### 跨模型 same-subtype similarity
+
+raw 均值：
+
+```text
+qwen3 vs glm4 = 0.8264
+qwen3 vs deepseek7b = 0.8495
+glm4 vs deepseek7b = 0.8445
+```
+
+model-centered 均值：
+
+```text
+qwen3 vs glm4 = 0.3531
+qwen3 vs deepseek7b = 0.1890
+glm4 vs deepseek7b = 0.1767
+```
+
+category-centered 均值：
+
+```text
+qwen3 vs glm4 = 0.1177
+qwen3 vs deepseek7b = 0.0729
+glm4 vs deepseek7b = 0.1949
+```
+
+zscore_model 均值：
+
+```text
+qwen3 vs glm4 = 0.3774
+qwen3 vs deepseek7b = -0.0792
+glm4 vs deepseek7b = -0.0501
+```
+
+客观现象：
+
+跨模型 raw same-subtype similarity 很高，但残差化后明显下降。说明三模型在“同一 subtype 的偏离模式”上并没有 raw similarity 看起来那么一致。Qwen3 与 GLM4 的残差模式相似度高于它们与 DeepSeek7B 的相似度。
+
+### 本轮最重要的新事实
+
+```text
+1. Phase 292 的 raw similarity 确实会被模型整体曲线主导。
+2. DeepSeek7B 是最明显的例子：108/171 个 pair 是 model_shape_candidate。
+3. Qwen3 的 subtype 分化更稳定，残差化后仍保留 differentiation candidate。
+4. GLM4 有较多 residual_stable_candidate，但也有不少 category_shape_candidate，说明高相似度必须分层解释。
+5. 跨模型 same-subtype raw similarity 不能直接解释为同一语言机制；残差化后相似度大幅降低。
+```
+
+### 当前需要修正的判断
+
+Phase 292 中：
+
+```text
+DeepSeek7B subtype 分化最弱
+```
+
+需要改成更谨慎的版本：
+
+```text
+DeepSeek7B 的 canonical signature 被共同深层 block 模式强烈主导；
+在当前特征下，raw similarity 无法有效区分 subtype；
+残差化后仍有少数候选复用 pair，但绝大多数 raw 高相似不是机制复用证据。
+```
+
+### 硬伤
+
+1. 残差化只是分析方法，不是新的因果实验。
+2. 阈值 `raw >= 0.90`、`model_resid >= 0.50`、`category_resid >= 0.30` 只是筛选标签，不是科学定律。
+3. 当前 signature 仍然来自 patch behavior，不是内部变量内容。
+4. 还没有 naturalness z-score/PCA/kNN。
+5. 还没有 dynamic recompute，无法证明 block patch 不是搬运自然轨迹。
+6. 还没有变量解码，不能回答路径中传递的具体语言变量是什么。
+
+### 下一步计划
+
+1. Phase 293：自然性指标升级。
+   - 从已有 Phase 290/291 结果中先生成 norm reference baseline。
+   - 输出每个 model/layer/block/patch 的 norm z-score。
+   - 把 functional failure 分成 off-manifold failure 和 norm-normal functional failure。
+
+2. Phase 294：动态重算路径。
+   - patch 起点，然后重算下游。
+   - patch attention output，然后让 MLP 真实重算。
+   - 优先测试：
+     Qwen3 L0-L8；
+     GLM4 L0-L8；
+     DeepSeek7B L20-L27。
+
+3. Phase 295：扩展功能库。
+   - translation
+   - style
+   - tense
+   - coreference
+   - long passive
+   - nested logical
+   - double recursive
+
+4. Phase 296：变量解码。
+   - agent
+   - patient
+   - operator
+   - scope
+   - clause boundary
+   - coreference target
+   - role binding
+
+## Phase 30: Phase 293 自然性扫描与 Phase 294 动态重算 Pilot [2026-05-28 09:56]
+
+### 任务目标
+
+继续进行系统性测试。本轮分两步：
+
+```text
+1. Phase 293：基于已有 Phase 290/291 大规模结果，建立 norm-based naturalness 检查。
+2. Phase 294：做小规模 GPU 动态重算 pilot，测试 patch 起点后让下游自然 forward 是否能恢复目标状态。
+```
+
+本轮仍然坚持只记录客观现象，不把结果直接上升为“语言编码机制已经破解”。
+
+### Phase 293 脚本
+
+新增：
+
+```text
+tests/gpt5/phase293_naturalness_scan.py
+```
+
+核心思路：
+
+```text
+1. 从 Phase 290/291 结果中读取 patch norm、ratio_to_a、ratio_to_b。
+2. 用 ratio 反推 A/B 自然参考 norm，建立每个 model/source/layer/module 的 norm reference。
+3. 对每个 patch 状态计算 norm z-score。
+4. 把 functional failure 分成：
+   - off_manifold_functional_failure
+   - norm_normal_functional_failure
+   - off_manifold_no_drop
+   - numeric_illegal
+```
+
+注意：
+
+```text
+这只是 norm-based naturalness，不是 PCA/kNN/Mahalanobis 流形距离。
+```
+
+### Phase 293 命令
+
+主阈值：
+
+```bash
+python tests/gpt5/phase293_naturalness_scan.py \
+  --phase290-dir results/gpt5_phase290_contract_break_full \
+  --phase291-dir results/gpt5_phase291_block_contract_full \
+  --output-dir results/gpt5_phase293_naturalness \
+  --z-threshold 4.0 \
+  --drop-threshold 0.5 \
+  --both-min 0.4
+```
+
+阈值敏感性：
+
+```bash
+python tests/gpt5/phase293_naturalness_scan.py \
+  --phase290-dir results/gpt5_phase290_contract_break_full \
+  --phase291-dir results/gpt5_phase291_block_contract_full \
+  --output-dir results/gpt5_phase293_naturalness_z3 \
+  --z-threshold 3.0 \
+  --drop-threshold 0.5 \
+  --both-min 0.4
+
+python tests/gpt5/phase293_naturalness_scan.py \
+  --phase290-dir results/gpt5_phase290_contract_break_full \
+  --phase291-dir results/gpt5_phase291_block_contract_full \
+  --output-dir results/gpt5_phase293_naturalness_z5 \
+  --z-threshold 5.0 \
+  --drop-threshold 0.5 \
+  --both-min 0.4
+```
+
+### Phase 293 输出
+
+```text
+results/gpt5_phase293_naturalness/NATURALNESS_REPORT.md
+results/gpt5_phase293_naturalness/natural_norm_reference.csv
+results/gpt5_phase293_naturalness/naturalness_events.csv
+results/gpt5_phase293_naturalness/naturalness_summary.csv
+results/gpt5_phase293_naturalness/naturalness_subtype_summary.csv
+results/gpt5_phase293_naturalness/naturalness_stats.json
+```
+
+主阈值结果：
+
+```text
+reference_rows = 211
+event_rows = 3330
+summary_rows = 15
+```
+
+### Phase 293 客观结果
+
+主阈值 z=4.0：
+
+```text
+Qwen3:
+  phase290 norm_normal_functional_failure = 221
+  phase290 off_manifold_functional_failure = 1
+  phase290 off_manifold_no_drop = 88
+  phase291 norm_normal_functional_failure = 474
+
+GLM4:
+  phase290 norm_normal_functional_failure = 541
+  phase290 off_manifold_functional_failure = 2
+  phase290 off_manifold_no_drop = 22
+  phase291 norm_normal_functional_failure = 825
+  phase291 off_manifold_functional_failure = 6
+  phase291 off_manifold_no_drop = 72
+
+DeepSeek7B:
+  phase290 norm_normal_functional_failure = 214
+  phase290 off_manifold_no_drop = 135
+  phase291 norm_normal_functional_failure = 467
+  phase291 off_manifold_functional_failure = 11
+  phase291 off_manifold_no_drop = 251
+```
+
+功能失败总数：
+
+```text
+Qwen3 = 696
+GLM4 = 1374
+DeepSeek7B = 692
+total = 2762
+```
+
+其中 off-manifold functional failure 很少：
+
+```text
+Qwen3 = 1
+GLM4 = 8
+DeepSeek7B = 11
+```
+
+阈值敏感性：
+
+```text
+z = 3.0:
+  functional failures = 2762
+  norm-normal = 2686
+  off-manifold = 76
+
+z = 4.0:
+  functional failures = 2762
+  norm-normal = 2742
+  off-manifold = 20
+
+z = 5.0:
+  functional failures = 2762
+  norm-normal = 2750
+  off-manifold = 12
+```
+
+客观现象：
+
+```text
+1. 功能失败总数对 z 阈值不敏感。
+2. 绝大多数 cross functional failure 没有明显 norm 异常。
+3. 因此，至少在粗 norm 检查下，cross failure 不能简单解释为“范数离开自然范围”。
+4. 但这还不能排除更细的 off-manifold，例如方向、局部密度、PCA residual 或 token-position 分布异常。
+```
+
+典型 norm-normal functional failure：
+
+```text
+DeepSeek7B phase290 L25 cross_battn_amlp existential_no:
+  progress_drop = 2.5447
+  off_manifold = 0
+  max_abs_norm_z = 1.76
+
+Qwen3 phase291 L0-L8 cross_battn_amlp no_agent:
+  progress_drop = 2.0209
+  off_manifold = 0
+  max_abs_norm_z = 2.09
+
+GLM4 phase291 L0-L1 cross_battn_amlp dative_passive:
+  progress_drop = 1.2202
+  off_manifold = 0
+  max_abs_norm_z = 1.09
+```
+
+### Phase 294 脚本
+
+新增：
+
+```text
+tests/gpt5/phase294_dynamic_recompute_pilot.py
+tests/gpt5/run_phase294_conservative.sh
+```
+
+测试内容：
+
+```text
+1. resid_in：把 A 在某层输入 residual 替换为 B 的同层 residual input，然后让后续自然 forward。
+2. resid_out：把 A 在某层输出 residual 替换为 B 的同层 residual output，然后让后续自然 forward。
+3. attn_out：只替换 attention output，让该层 MLP 和后续层自然重算。
+4. mlp_out：只替换 MLP output，让后续层自然重算。
+```
+
+这比 block patch 更接近动态路径测试，因为它不是替换整段 block 的自然轨迹，而是替换某个起点或单模块输出后看下游是否自然恢复。
+
+### Phase 294 Smoke
+
+```bash
+MAX_SECONDS=900 OUTPUT_DIR=results/gpt5_phase294_smoke \
+tests/gpt5/run_phase294_conservative.sh qwen3 \
+  --categories negation \
+  --subtypes lexical_not_adj \
+  --max-pairs-per-subtype 1 \
+  --layers 0 \
+  --alphas 1.0 \
+  --progress-every 1
+```
+
+结果：
+
+```text
+rows = 4
+nonfinite = 0
+exit_code = 0
+log_dir = results/gpt5_gpu_lock_logs/20260528_095251_phase294_qwen3
+```
+
+### Phase 294 三模型 Pilot 命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=3600 OUTPUT_DIR=results/gpt5_phase294_dynamic_recompute_pilot \
+tests/gpt5/run_phase294_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 2 \
+  --layers 0,4,8 \
+  --alphas 1.0 \
+  --progress-every 8
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=5400 OUTPUT_DIR=results/gpt5_phase294_dynamic_recompute_pilot \
+tests/gpt5/run_phase294_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 2 \
+  --layers 0,4,8 \
+  --alphas 1.0 \
+  --progress-every 8
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=5400 OUTPUT_DIR=results/gpt5_phase294_dynamic_recompute_pilot \
+tests/gpt5/run_phase294_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 2 \
+  --layers 20,24,27 \
+  --alphas 1.0 \
+  --progress-every 8
+```
+
+### Phase 294 输出
+
+```text
+results/gpt5_phase294_dynamic_recompute_pilot/qwen3_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase294_dynamic_recompute_pilot/glm4_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase294_dynamic_recompute_pilot/deepseek7b_phase294_dynamic_recompute_pilot.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_095304_phase294_qwen3
+results/gpt5_gpu_lock_logs/20260528_095354_phase294_glm4
+results/gpt5_gpu_lock_logs/20260528_095511_phase294_deepseek7b
+```
+
+三轮正式 pilot 的 `kernel.since-start.filtered.log` 都是 0 行。
+
+### Phase 294 数据规模
+
+```text
+Qwen3:
+  pairs = 38
+  rows = 456
+  nonfinite = 0
+
+GLM4:
+  pairs = 38
+  rows = 456
+  nonfinite = 0
+
+DeepSeek7B:
+  pairs = 38
+  rows = 456
+  nonfinite = 0
+
+total rows = 1368
+```
+
+### Phase 294 Qwen3 客观结果
+
+best by patch type：
+
+```text
+resid_in:
+  best layer = 8
+  progress = 0.8325
+
+resid_out:
+  best layer = 8
+  progress = 0.8485
+
+attn_out:
+  best layer = 0
+  progress = 0.7444
+
+mlp_out:
+  best layer = 0
+  progress = 0.7945
+```
+
+layer curve：
+
+```text
+L0:
+  attn_out_progress = 0.7444
+  mlp_out_progress = 0.7945
+  resid_in_progress = 0.6682
+  resid_out_progress = 0.8252
+
+L4:
+  attn_out_progress = 0.0649
+  mlp_out_progress = 0.3038
+  resid_in_progress = 0.8280
+  resid_out_progress = 0.8333
+
+L8:
+  attn_out_progress = 0.0847
+  mlp_out_progress = 0.2181
+  resid_in_progress = 0.8325
+  resid_out_progress = 0.8485
+```
+
+客观现象：
+
+Qwen3 中，单模块 attn_out/mlp_out 的动态重算效果集中在 L0；但 resid_in/resid_out 在 L4/L8 也很强。这说明浅层模块输出可以启动转换，而中浅层 residual 状态已经携带较完整的 B 方向。
+
+### Phase 294 GLM4 客观结果
+
+best by patch type：
+
+```text
+resid_in:
+  best layer = 4
+  progress = 0.9856
+
+resid_out:
+  best layer = 8
+  progress = 0.9843
+
+attn_out:
+  best layer = 4
+  progress = 0.1482
+
+mlp_out:
+  best layer = 0
+  progress = 0.9345
+```
+
+layer curve：
+
+```text
+L0:
+  attn_out_progress = 0.0066
+  mlp_out_progress = 0.9345
+  resid_in_progress = 0.9784
+  resid_out_progress = 0.9785
+
+L4:
+  attn_out_progress = 0.1482
+  mlp_out_progress = 0.3729
+  resid_in_progress = 0.9856
+  resid_out_progress = 0.9830
+
+L8:
+  attn_out_progress = 0.0284
+  mlp_out_progress = 0.1546
+  resid_in_progress = 0.9853
+  resid_out_progress = 0.9843
+```
+
+客观现象：
+
+GLM4 的动态重算 pilot 继续支持 MLP 集中：L0 mlp_out_progress = 0.9345，而 L0 attn_out_progress = 0.0066。resid_in/resid_out 在 L0/L4/L8 都接近完整转换，但这不能直接说明 residual 是独立组件，只能说明相应层的 residual 状态已足够携带 B 状态。
+
+### Phase 294 DeepSeek7B 客观结果
+
+best by patch type：
+
+```text
+resid_in:
+  best layer = 24
+  progress = 0.5822
+
+resid_out:
+  best layer = 27
+  progress = 1.0000
+
+attn_out:
+  best layer = 27
+  progress = 0.6052
+
+mlp_out:
+  best layer = 27
+  progress = 0.4115
+```
+
+layer curve：
+
+```text
+L20:
+  attn_out_progress = -0.0010
+  mlp_out_progress = 0.0452
+  resid_in_progress = 0.5822
+  resid_out_progress = 0.5758
+
+L24:
+  attn_out_progress = 0.0049
+  mlp_out_progress = 0.0179
+  resid_in_progress = 0.5822
+  resid_out_progress = 0.5827
+
+L27:
+  attn_out_progress = 0.6052
+  mlp_out_progress = 0.4115
+  resid_in_progress = 0.5750
+  resid_out_progress = 1.0000
+```
+
+客观现象：
+
+DeepSeek7B 的 L20/L24 单模块 attn_out/mlp_out 动态重算几乎不能推动目标转换，但 L27 attn_out 明显有效。resid_in 从 L20/L24/L27 都只能达到约 0.58，而不是 Phase 291 block L20-L27 的 0.9173。这说明 DeepSeek7B 的强 block 效果很可能不是单一起点 residual patch 后自然重算就能复现，而需要多层轨迹累积或多点持续干预。
+
+### 本轮最重要的新事实
+
+```text
+1. 粗 norm 自然性检查下，绝大多数 cross functional failure 不是范数异常导致。
+2. DeepSeek7B 的 L20-L27 block 强效果不能由单个 L20/L24 residual 起点 patch 复现。
+3. Qwen3/GLM4 的浅层 residual patch 很强，但必须谨慎，因为 residual patch 是上界，可能搬运了大量 token/position/任务格式信息。
+4. GLM4 的 MLP 集中在动态重算 pilot 中继续稳定出现。
+5. 三模型 Phase 294 pilot 均 nonfinite=0，kernel filtered log=0。
+```
+
+### 当前判断修正
+
+Phase 291 中：
+
+```text
+DeepSeek7B L20-L27 block 明显强于 L27 单层，说明深层 block 累积是主要现象。
+```
+
+现在需要补充：
+
+```text
+DeepSeek7B 的强 block 累积不是简单地由 L20 或 L24 的 B residual input 作为起点后自然重算完成；
+更可能需要多层持续 patch、多个模块共同推动，或者 block patch 搬运了多个中间轨迹状态。
+```
+
+### 硬伤
+
+1. Phase 293 只是 norm-based naturalness，不能排除更细的 off-manifold。
+2. Phase 294 只是 pilot，每个 subtype 只有 2 pair。
+3. Phase 294 只测 alpha=1.0，没有插值曲线。
+4. Phase 294 只测少数层，没有完整逐层动态重算。
+5. resid_in/resid_out patch 仍然可能搬运 token/position/任务格式，不等于找到了编码变量。
+6. 还没有解码 agent/patient/scope/operator 等内部变量。
+
+### 下一步计划
+
+1. Phase 294b：扩大动态重算。
+   - 每个 subtype 至少 4-8 pair。
+   - 加入 alpha = 0, 0.25, 0.5, 0.75, 1.0。
+   - Qwen3/GLM4 扫 L0-L8。
+   - DeepSeek7B 扫 L20-L27。
+
+2. Phase 295：多点动态路径测试。
+   - 单点 resid_in patch。
+   - 起点 resid_in + 后续 attn_out patch。
+   - 起点 resid_in + 后续 mlp_out patch。
+   - 连续层 segment patch 后重算下游。
+
+3. Phase 296：自然性升级。
+   - PCA residual distance。
+   - kNN distance。
+   - 按 token position 分层统计，而不是只看整体 norm。
+
+4. Phase 297：变量解码。
+   - 优先在 Qwen3 L0-L8、GLM4 L0-L8、DeepSeek7B L20-L27 内做 agent/patient/operator/scope 解码。
+
+## Phase 31: Phase 294b 扩展动态重算测试 [2026-05-28 10:59]
+
+### 任务目标
+
+在 Phase 294 pilot 基础上扩大动态重算测试：
+
+```text
+1. 每个 subtype 从 2 pair 扩大到 4 pair。
+2. Qwen3 / GLM4 扫 L0-L8。
+3. DeepSeek7B 扫 L20-L27。
+4. 加入 alpha 插值：
+   0, 0.25, 0.5, 0.75, 1.0
+5. patch 类型：
+   resid_in, resid_out, attn_out, mlp_out
+```
+
+目标是验证：
+
+```text
+1. 单点起点 patch 后自然重算是否能接近 Phase 291 block patch。
+2. alpha 曲线是否平滑。
+3. Qwen3/GLM4/DeepSeek7B 的动态路径是否存在模型差异。
+```
+
+### 脚本调整
+
+修改：
+
+```text
+tests/gpt5/phase294_dynamic_recompute_pilot.py
+```
+
+新增：
+
+```text
+1. pair-level checkpoint/resume。
+2. --label 参数。
+3. --resume / --no-resume 参数。
+```
+
+checkpoint：
+
+```text
+results/gpt5_phase294b_dynamic_recompute_full/checkpoints/{model}/logical-negation-passive-recursive_full.json
+```
+
+原因：
+
+GLM4 长跑之前多次出现用户态 segmentation fault / illegal instruction，必须保证中断后可恢复。
+
+### 测试命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=7200 OUTPUT_DIR=results/gpt5_phase294b_dynamic_recompute_full \
+tests/gpt5/run_phase294_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=9000 OUTPUT_DIR=results/gpt5_phase294b_dynamic_recompute_full \
+tests/gpt5/run_phase294_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+GLM4 第一次运行到 64/76 pair 后出现用户态 segmentation fault：
+
+```text
+exit_code = 139
+completed_rows = 11520
+```
+
+随后用同一命令 resume：
+
+```bash
+MAX_SECONDS=3600 OUTPUT_DIR=results/gpt5_phase294b_dynamic_recompute_full \
+tests/gpt5/run_phase294_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 0,1,2,3,4,5,6,7,8 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+resume 识别：
+
+```text
+resume rows = 11520
+expected_rows_per_pair = 180
+completed_pairs = 64
+```
+
+第二次完成剩余部分。
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=7200 OUTPUT_DIR=results/gpt5_phase294b_dynamic_recompute_full \
+tests/gpt5/run_phase294_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive \
+  --max-pairs-per-subtype 4 \
+  --layers 20,21,22,23,24,25,26,27 \
+  --alphas 0,0.25,0.5,0.75,1.0 \
+  --progress-every 8 \
+  --label full
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase294b_dynamic_recompute_full/qwen3_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase294b_dynamic_recompute_full/glm4_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase294b_dynamic_recompute_full/deepseek7b_phase294_dynamic_recompute_pilot.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_100011_phase294_qwen3
+results/gpt5_gpu_lock_logs/20260528_101558_phase294_glm4
+results/gpt5_gpu_lock_logs/20260528_103938_phase294_glm4
+results/gpt5_gpu_lock_logs/20260528_104356_phase294_deepseek7b
+```
+
+所有正式运行的 `kernel.since-start.filtered.log` 都是 0 行，包括 GLM4 segfault 那次。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 76
+  rows = 13680
+  nonfinite = 0
+
+GLM4:
+  pairs = 76
+  rows = 13680
+  nonfinite = 0
+
+DeepSeek7B:
+  pairs = 76
+  rows = 12160
+  nonfinite = 0
+
+total rows = 39520
+```
+
+### Qwen3 客观结果
+
+alpha 平均曲线：
+
+```text
+resid_in:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.2866
+  alpha 0.5  = 0.6220
+  alpha 0.75 = 0.8229
+  alpha 1.0  = 0.8455
+
+resid_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.2936
+  alpha 0.5  = 0.6371
+  alpha 0.75 = 0.8474
+  alpha 1.0  = 0.8714
+
+attn_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0454
+  alpha 0.5  = 0.1048
+  alpha 0.75 = 0.1631
+  alpha 1.0  = 0.2059
+
+mlp_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0859
+  alpha 0.5  = 0.1747
+  alpha 0.75 = 0.2578
+  alpha 1.0  = 0.3171
+```
+
+alpha=1.0 最强层：
+
+```text
+resid_in:
+  L7 = 0.8825
+  L6 = 0.8792
+  L8 = 0.8758
+
+resid_out:
+  L6 = 0.8825
+  L8 = 0.8819
+  L5 = 0.8792
+
+attn_out:
+  L0 = 0.7691
+  L1 = 0.1898
+  L6 = 0.1662
+
+mlp_out:
+  L0 = 0.8247
+  L4 = 0.2998
+  L5 = 0.2855
+```
+
+与 Phase 291 对比：
+
+```text
+Phase 291 Qwen3 L0-L8 both_progress = 0.8788
+Phase 294b Qwen3 resid_in L7 alpha=1 = 0.8825
+```
+
+客观现象：
+
+Qwen3 的单点 residual 起点 patch 后自然重算已经能接近 L0-L8 block patch。attn_out/mlp_out 单模块效果仍集中在 L0，后续层单模块效果明显弱于 residual。
+
+### GLM4 客观结果
+
+alpha 平均曲线：
+
+```text
+resid_in:
+  alpha 0    = -0.0000
+  alpha 0.25 = 0.2995
+  alpha 0.5  = 0.7200
+  alpha 0.75 = 0.9552
+  alpha 1.0  = 0.9856
+
+resid_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.2920
+  alpha 0.5  = 0.7380
+  alpha 0.75 = 0.9547
+  alpha 1.0  = 0.9876
+
+attn_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0079
+  alpha 0.5  = 0.0226
+  alpha 0.75 = 0.0480
+  alpha 1.0  = 0.0876
+
+mlp_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0490
+  alpha 0.5  = 0.1723
+  alpha 0.75 = 0.2885
+  alpha 1.0  = 0.4033
+```
+
+alpha=1.0 最强层：
+
+```text
+resid_in:
+  L8 = 0.9914
+  L7 = 0.9912
+  L6 = 0.9900
+
+resid_out:
+  L7 = 0.9914
+  L6 = 0.9912
+  L8 = 0.9912
+
+attn_out:
+  L1 = 0.2318
+  L4 = 0.1474
+  L2 = 0.1091
+
+mlp_out:
+  L0 = 0.9416
+  L1 = 0.6442
+  L2 = 0.5326
+```
+
+与 Phase 291 对比：
+
+```text
+Phase 291 GLM4 L0-L8 both_progress = 0.9906
+Phase 294b GLM4 resid_in L8 alpha=1 = 0.9914
+```
+
+客观现象：
+
+GLM4 的单点 residual 起点 patch 后自然重算几乎完全复现 block patch 效果。MLP_out 的 L0 仍然很强，attention_out 始终弱。这继续支持 GLM4 的 MLP 集中模式。GLM4 长跑仍然出现一次用户态 segfault 139，但 kernel filtered 日志为 0，resume 后完成。
+
+### DeepSeek7B 客观结果
+
+alpha 平均曲线：
+
+```text
+resid_in:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.1715
+  alpha 0.5  = 0.3207
+  alpha 0.75 = 0.4970
+  alpha 1.0  = 0.6289
+
+resid_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.1771
+  alpha 0.5  = 0.3340
+  alpha 0.75 = 0.5283
+  alpha 1.0  = 0.6753
+
+attn_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0194
+  alpha 0.5  = 0.0411
+  alpha 0.75 = 0.0688
+  alpha 1.0  = 0.0765
+
+mlp_out:
+  alpha 0    = 0.0000
+  alpha 0.25 = 0.0426
+  alpha 0.5  = 0.0713
+  alpha 0.75 = 0.1264
+  alpha 1.0  = 0.1786
+```
+
+alpha=1.0 最强层：
+
+```text
+resid_in:
+  L25 = 0.6317
+  L24 = 0.6314
+  L26 = 0.6294
+
+resid_out:
+  L27 = 1.0000
+  L24 = 0.6317
+  L23 = 0.6314
+
+attn_out:
+  L27 = 0.5728
+  L25 = 0.0417
+  L24 = 0.0137
+
+mlp_out:
+  L27 = 0.4139
+  L26 = 0.2957
+  L25 = 0.2592
+```
+
+与 Phase 291 对比：
+
+```text
+Phase 291 DeepSeek7B L20-L27 both_progress = 0.9173
+Phase 294b DeepSeek7B resid_in alpha=1:
+  L20 = 0.6289
+  L21 = 0.6269
+  L22 = 0.6282
+  L23 = 0.6277
+  L24 = 0.6314
+  L25 = 0.6317
+  L26 = 0.6294
+  L27 = 0.6270
+```
+
+客观现象：
+
+DeepSeek7B 的单点 residual 起点 patch 无法复现 L20-L27 block patch 效果。L27 resid_out 直接达到 1.0，说明最后层输出 residual 已经基本是目标状态；但 L20-L26 的 resid_in 起点 patch 后自然重算都停留在约 0.63。这支持：
+
+```text
+DeepSeek7B 的 L20-L27 强效果更像多层轨迹累计或持续多点干预，
+不是单个深层 residual 起点足以自然重算出来。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  单点 residual patch 可接近 block patch；
+  L0 attn_out/mlp_out 明显有效；
+  后续层单模块 patch 弱于 residual。
+
+GLM4:
+  单点 residual patch 几乎完全复现 block patch；
+  L0 mlp_out 极强；
+  attn_out 很弱；
+  仍有用户态长跑稳定性问题。
+
+DeepSeek7B:
+  单点 residual patch 明显低于 block patch；
+  L27 attn_out/mlp_out 有效；
+  L20-L26 单模块 patch 很弱；
+  L20-L27 block 强效果不能由单起点解释。
+```
+
+### 本轮最重要的新事实
+
+```text
+1. Qwen3/GLM4 的 block patch 效果大部分可以由单点 residual 起点 patch 后自然重算复现。
+2. DeepSeek7B 的 block patch 效果不能由单点 residual 起点 patch 复现。
+3. GLM4 的 L0 MLP_out 强效在更大样本和 alpha 曲线下继续稳定。
+4. DeepSeek7B 的有效单模块信号集中在 L27，深层前段 L20-L26 单模块信号弱。
+5. 三模型 alpha 曲线总体平滑，没有出现大量非有限输出。
+```
+
+### 当前判断修正
+
+Phase 291 的 block 累积增强现在应拆成两类：
+
+```text
+1. 可由单点 residual 起点重算复现的 block 效果：
+   Qwen3、GLM4 更接近这一类。
+
+2. 不能由单点 residual 起点重算复现的 block 效果：
+   DeepSeek7B 更接近这一类。
+```
+
+这说明 block patch 不能统一解释为同一种机制。对于 DeepSeek7B，必须测试 segment patch 或多点 patch。
+
+### 硬伤
+
+1. Phase 294b 仍然只测现有 76 pair，不是完整功能库。
+2. 只测 residual/attn/mlp 输出，不含 head/neuron 层级。
+3. `resid_out L27 = 1.0` 这类结果很可能包含输出接口效应，不能当作中间机制。
+4. GLM4 仍有用户态 segfault 139，虽然 kernel filtered 日志为空，但长跑稳定性仍需分段处理。
+5. 动态重算仍是反事实 patch，不是直接观察自然任务路径。
+
+### 下一步计划
+
+1. Phase 295：DeepSeek7B segment dynamic recompute。
+   - patch L20-L23，重算 L24-L27。
+   - patch L24-L27，重算输出。
+   - patch L20-L23 + L27 attn/mlp。
+   - 判断 DeepSeek7B 的关键差异是前段写入、中段传播，还是末层释放。
+
+2. Phase 296：Qwen3/GLM4 变量解码 pilot。
+   - 因为单点 residual 起点可重算，适合先在 Qwen3/GLM4 上解码 agent/patient/operator/scope。
+
+3. Phase 297：扩展功能库。
+   - translation
+   - tense
+   - coreference
+   - long passive
+   - nested logical
+   - double recursive
+
+4. Phase 298：GLM4 稳定性隔离。
+   - 每 48 pair 分段运行。
+   - 比较 SDPA vs eager。
+   - 判断 segfault 是否由长 session、SDPA、device_map auto 或 GLM remote code 引起。
+
+## Phase 32: Global Functional Contract Mapping v0 系统级图谱测试 [2026-05-28 11:08]
+
+### 任务目标
+
+根据“全局功能契约图谱算法”的建议，本轮先实现一个可落地的 v0 版本，不重新跑 GPU，而是把已有多阶段结果合成统一的系统级功能图谱：
+
+```text
+Phase 290: single-layer contract break scan
+Phase 291: block contract scan
+Phase 293: norm-based naturalness events
+Phase 294b: dynamic recompute alpha/layer curves
+```
+
+目标不是证明最终语言理论，而是建立可以累计的功能签名和复用/差异化矩阵。
+
+### 对用户方案的判断
+
+用户提出的 Global Functional Contract Mapping 方向正确，尤其是：
+
+```text
+1. 不应继续只看单层或单模块。
+2. 每个 subtype 应生成层 × block × alpha × dynamic recompute × naturalness 的契约指纹。
+3. 复用/差异化矩阵应分维度输出，而不是只输出一个总分。
+4. head/neuron 映射必须建立在稳定功能路径上。
+```
+
+但当前还不能直接做完整版本，因为：
+
+```text
+1. 功能库仍只有 19 个 subtype。
+2. 还没有 translation/style/tense/coreference。
+3. 还没有 head/neuron 级别数据。
+4. naturalness 仍只是 norm-based。
+```
+
+因此本轮先做 GFCM v0：系统级数据结构和矩阵，不做最终理论总结。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase295_global_contract_mapping.py
+```
+
+脚本输入：
+
+```text
+results/gpt5_phase290_contract_break_full
+results/gpt5_phase291_block_contract_full
+results/gpt5_phase293_naturalness
+results/gpt5_phase294b_dynamic_recompute_full
+```
+
+生成 signature 维度：
+
+```text
+layer_curve:
+  Phase 290 layer × patch progress/KL/delta
+
+single_alpha:
+  Phase 290 alpha × patch progress
+
+block_curve:
+  Phase 291 block × patch progress/KL/delta/drop
+
+block_alpha:
+  Phase 291 alpha × patch progress
+
+naturalness:
+  Phase 293 norm-normal/off-manifold/numeric event rates
+
+dynamic_layer:
+  Phase 294b layer × dynamic patch progress/KL/delta
+
+dynamic_alpha:
+  Phase 294b alpha × dynamic patch progress
+
+summary:
+  per-phase best/mean progress and block width summaries
+```
+
+同时输出：
+
+```text
+1. group-normalized similarity
+2. z-score similarity
+3. top reuse candidates
+4. bottom differentiation candidates
+5. per-dimension similarities:
+   layer / block / dynamic / naturalness / alpha / summary
+```
+
+### 命令
+
+```bash
+python tests/gpt5/phase295_global_contract_mapping.py \
+  --phase290-dir results/gpt5_phase290_contract_break_full \
+  --phase291-dir results/gpt5_phase291_block_contract_full \
+  --phase293-dir results/gpt5_phase293_naturalness \
+  --phase294-dir results/gpt5_phase294b_dynamic_recompute_full \
+  --output-dir results/gpt5_phase295_global_contract_mapping \
+  --top-k 25
+```
+
+说明：
+
+第一次输出时发现分维度相似度全为 0，是 group-normalized 特征前缀处理错误。已修复：
+
+```text
+group_subset() 支持识别 "layer_curve:" 等 group 前缀。
+```
+
+随后重跑并覆盖输出。
+
+### 输出文件
+
+```text
+results/gpt5_phase295_global_contract_mapping/GLOBAL_CONTRACT_MAPPING_REPORT.md
+results/gpt5_phase295_global_contract_mapping/global_mapping_summary.csv
+results/gpt5_phase295_global_contract_mapping/global_contract_maps.json
+
+results/gpt5_phase295_global_contract_mapping/qwen3_global_similarity.csv
+results/gpt5_phase295_global_contract_mapping/qwen3_global_top_reuse_candidates.csv
+results/gpt5_phase295_global_contract_mapping/qwen3_global_bottom_differentiation_candidates.csv
+results/gpt5_phase295_global_contract_mapping/qwen3_global_zscore_top_pairs.csv
+results/gpt5_phase295_global_contract_mapping/qwen3_global_zscore_bottom_pairs.csv
+
+results/gpt5_phase295_global_contract_mapping/glm4_global_similarity.csv
+results/gpt5_phase295_global_contract_mapping/glm4_global_top_reuse_candidates.csv
+results/gpt5_phase295_global_contract_mapping/glm4_global_bottom_differentiation_candidates.csv
+results/gpt5_phase295_global_contract_mapping/glm4_global_zscore_top_pairs.csv
+results/gpt5_phase295_global_contract_mapping/glm4_global_zscore_bottom_pairs.csv
+
+results/gpt5_phase295_global_contract_mapping/deepseek7b_global_similarity.csv
+results/gpt5_phase295_global_contract_mapping/deepseek7b_global_top_reuse_candidates.csv
+results/gpt5_phase295_global_contract_mapping/deepseek7b_global_bottom_differentiation_candidates.csv
+results/gpt5_phase295_global_contract_mapping/deepseek7b_global_zscore_top_pairs.csv
+results/gpt5_phase295_global_contract_mapping/deepseek7b_global_zscore_bottom_pairs.csv
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  phase290_rows = 28512
+  phase291_rows = 15840
+  phase293_event_rows = 784
+  phase294_rows = 13680
+  subtypes = 19
+  features/subtype = 504
+
+GLM4:
+  phase290_rows = 31680
+  phase291_rows = 19008
+  phase293_event_rows = 1468
+  phase294_rows = 13680
+  subtypes = 19
+  features/subtype = 544
+
+DeepSeek7B:
+  phase290_rows = 25344
+  phase291_rows = 15840
+  phase293_event_rows = 1078
+  phase294_rows = 12160
+  subtypes = 19
+  features/subtype = 472
+```
+
+### Group-normalized 总体相似度
+
+```text
+Qwen3:
+  combined_mean = 0.9505
+  combined_min = 0.8731
+  combined_max = 0.9953
+  same_category_mean = 0.9693
+  cross_category_mean = 0.9453
+
+GLM4:
+  combined_mean = 0.9675
+  combined_min = 0.9112
+  combined_max = 0.9980
+  same_category_mean = 0.9812
+  cross_category_mean = 0.9638
+
+DeepSeek7B:
+  combined_mean = 0.8913
+  combined_min = 0.6143
+  combined_max = 0.9900
+  same_category_mean = 0.9148
+  cross_category_mean = 0.8848
+```
+
+客观现象：
+
+group-normalized 后整体相似度仍然偏高，说明当前 19 个 subtype 的行为曲线有很强共同结构。DeepSeek7B 的分化最明显，min 降到 0.6143。
+
+### Qwen3 候选结果
+
+Group-normalized top reuse candidates：
+
+```text
+causal / contrast:
+  combined = 0.9953
+  layer = 0.9930
+  block = 0.9937
+  dynamic = 0.9899
+  naturalness = 0.9950
+
+contrast / inference:
+  combined = 0.9949
+  layer = 0.9870
+  block = 0.9896
+  dynamic = 0.9904
+  naturalness = 0.9960
+
+causal / inference:
+  combined = 0.9944
+  layer = 0.9876
+  block = 0.9932
+  dynamic = 0.9825
+  naturalness = 0.9998
+```
+
+Group-normalized bottom differentiation candidates：
+
+```text
+morphological_neg / syntactic_do_not:
+  combined = 0.8731
+  layer = 0.8298
+  block = 0.8875
+  dynamic = 0.8490
+
+get_passive / morphological_neg:
+  combined = 0.8763
+  layer = 0.8393
+  block = 0.9133
+  dynamic = 0.8552
+
+and_or / syntactic_do_not:
+  combined = 0.8794
+  layer = 0.8568
+  block = 0.8947
+  dynamic = 0.8607
+```
+
+Z-score top：
+
+```text
+conditional / morphological_neg = 0.8288
+causal / contrast = 0.8267
+causal / no_agent = 0.8255
+causal / morphological_neg = 0.8179
+causal / conditional = 0.8076
+```
+
+Z-score bottom：
+
+```text
+complement_clause / conditional = -0.7912
+causal / get_passive = -0.7702
+causal / complement_clause = -0.7651
+get_passive / morphological_neg = -0.7593
+complement_clause / inference = -0.7575
+```
+
+客观现象：
+
+Qwen3 的逻辑关系类功能在 z-score 偏离模式中较接近，complement_clause 与多个逻辑/被动/否定 subtype 分化明显。
+
+### GLM4 候选结果
+
+Group-normalized top reuse candidates：
+
+```text
+by_phrase / dative_passive:
+  combined = 0.9980
+  layer = 0.9955
+  block = 0.9965
+  dynamic = 0.9956
+  naturalness = 0.9998
+
+causal / inference:
+  combined = 0.9980
+  layer = 0.9950
+  block = 0.9980
+  dynamic = 0.9933
+  naturalness = 0.9979
+
+dative_passive / get_passive:
+  combined = 0.9971
+  layer = 0.9940
+  block = 0.9949
+  dynamic = 0.9923
+  naturalness = 0.9997
+```
+
+Group-normalized bottom differentiation candidates：
+
+```text
+and_or / syntactic_do_not:
+  combined = 0.9112
+  layer = 0.8359
+  block = 0.9700
+  dynamic = 0.9094
+
+and_or / lexical_not_adj:
+  combined = 0.9159
+  layer = 0.8292
+  block = 0.9574
+  dynamic = 0.9096
+
+causal / syntactic_do_not:
+  combined = 0.9188
+  layer = 0.8271
+  block = 0.9737
+  dynamic = 0.9019
+```
+
+Z-score top：
+
+```text
+conditional / contrast = 0.8637
+causal / inference = 0.8363
+causal / contrast = 0.8321
+causal / conditional = 0.7840
+contrast / no_agent = 0.7817
+```
+
+Z-score bottom：
+
+```text
+contrast / syntactic_do_not = -0.7417
+conditional / syntactic_do_not = -0.7128
+causal / syntactic_do_not = -0.6878
+inference / syntactic_do_not = -0.6707
+contrast / relative_clause = -0.6331
+```
+
+客观现象：
+
+GLM4 的 passive 子类型在多维度上高度相似，逻辑类也形成较稳定的相似簇；syntactic_do_not 与多个逻辑 subtype 在 z-score 偏离模式中分化明显。
+
+### DeepSeek7B 候选结果
+
+Group-normalized top reuse candidates：
+
+```text
+by_phrase / get_passive:
+  combined = 0.9900
+  layer = 0.9865
+  block = 0.9869
+  dynamic = 0.9832
+  naturalness = 0.9799
+
+possessive_chain / relative_clause:
+  combined = 0.9832
+  layer = 0.9687
+  block = 0.9678
+  dynamic = 0.9719
+  naturalness = 0.9820
+
+get_passive / possessive_chain:
+  combined = 0.9814
+  layer = 0.9955
+  block = 0.9910
+  dynamic = 0.9579
+  naturalness = 0.9386
+```
+
+Group-normalized bottom differentiation candidates：
+
+```text
+complement_clause / no_agent:
+  combined = 0.6143
+  layer = 0.8062
+  block = 0.8647
+  dynamic = 0.5793
+  naturalness = 0.9377
+
+complement_clause / morphological_neg:
+  combined = 0.6205
+  layer = 0.8404
+  block = 0.6968
+  dynamic = 0.5597
+  naturalness = 0.7675
+
+complement_clause / existential_no:
+  combined = 0.6440
+  layer = 0.8052
+  block = 0.8682
+  dynamic = 0.6314
+  naturalness = 0.8150
+```
+
+Z-score top：
+
+```text
+possessive_chain / pp_chain = 0.6327
+by_phrase / get_passive = 0.6307
+by_phrase / possessive_chain = 0.6010
+possessive_chain / relative_clause = 0.5783
+get_passive / possessive_chain = 0.5644
+```
+
+Z-score bottom：
+
+```text
+conditional / possessive_chain = -0.6292
+causal / possessive_chain = -0.5682
+existential_no / pp_chain = -0.5605
+inference / possessive_chain = -0.5374
+conditional / relative_clause = -0.5095
+```
+
+客观现象：
+
+DeepSeek7B 的 complement_clause 在 group-normalized 矩阵中与多个 subtype 明显分化，尤其 dynamic_layer 相似度低。这和 Phase 294b 中 DeepSeek7B 单点 residual 起点不能复现 block 效果一致：它的递归/补足从句路径可能与其他功能有不同的动态重算模式。
+
+### 本轮最重要的新事实
+
+```text
+1. GFCM v0 可以把 layer、block、naturalness、dynamic recompute 合成统一功能图谱。
+2. group-normalized 总体相似度仍偏高，说明当前功能库太窄，共同模板/共同路径仍强。
+3. z-score 后可以看到更明显的偏离结构。
+4. Qwen3/GLM4 中逻辑类关系形成较稳定相似簇。
+5. GLM4 中 passive 子类型高度相似。
+6. DeepSeek7B 中 complement_clause 和 possessive/relative 等递归相关结构显示强分化候选。
+```
+
+### 当前最重要的硬伤
+
+1. 当前 GFCM v0 仍只有 19 个 subtype，不是“全局语言”。
+2. group-normalized 相似度过高，说明当前特征仍可能被共同任务形状主导。
+3. z-score 结果更有区分度，但 z-score 只是模型内偏离模式，不等于真实机制复用。
+4. 没有 head/neuron 级数据。
+5. 没有变量解码，不能回答路径中传递的内容是什么。
+6. naturalness 仍只是 norm-based。
+
+### 下一步计划
+
+1. Phase 296：扩展功能库第一批。
+   - translation
+   - tense
+   - coreference
+   - style
+   - long passive
+   - nested logical
+   - double recursive
+
+2. Phase 297：GFCM v1。
+   - 新功能库进入 Phase 290/291/294b 流程。
+   - 每类至少 100 pair 作为目标，但先用 20-40 pair 验证脚本。
+   - 输出更大 subtype matrix。
+
+3. Phase 298：DeepSeek7B segment dynamic recompute。
+   - 解释 complement_clause 和深层 block 差异。
+
+4. Phase 299：head/neuron 映射 pilot。
+   - 只在 GFCM 中稳定的候选路径上做。
+   - 优先：
+     GLM4 passive 子类型；
+     Qwen3 logical 子类型；
+     DeepSeek7B complement_clause 分化路径。
+
+## Phase 33: Phase 296 扩展功能库与三模型 Pilot 验证 [2026-05-28 11:41]
+
+### 任务目标
+
+继续推进 Global Functional Contract Mapping。Phase 32 的最大硬伤是功能库太窄，只有 19 个 subtype。本轮先扩展功能库第一批，并用三模型做小规模 pilot，验证：
+
+```text
+1. 新功能库能否被现有 Phase 290/291/294b 脚本直接复用。
+2. 新 category/subtype 是否能稳定跑完三模型。
+3. 新功能是否继续表现出模型特异路径：
+   Qwen3 浅层协同；
+   GLM4 MLP 集中；
+   DeepSeek7B 末层释放。
+```
+
+### 脚本修改
+
+修改：
+
+```text
+tests/gpt5/phase289_contract_scan.py
+```
+
+在 `build_pairs()` 中新增功能库：
+
+```text
+translation
+tense
+coreference
+style
+passive.long_passive
+passive.nested_passive
+logical.nested_condition
+logical.nested_contrast
+logical.negated_condition
+recursive.double_relative
+recursive.center_embedding
+recursive.deep_complement
+```
+
+扩展后 pair 库规模：
+
+```text
+total pairs = 244
+categories = 8
+subtypes = 45
+```
+
+category 分布：
+
+```text
+coreference = 12
+logical = 52
+negation = 40
+passive = 44
+recursive = 44
+style = 16
+tense = 16
+translation = 20
+```
+
+subtype 分布：
+
+```text
+coreference:
+  deictic_switch = 4
+  he_coref = 2
+  it_coref = 2
+  she_coref = 2
+  they_coref = 2
+
+logical:
+  and_or = 8
+  causal = 8
+  conditional = 8
+  contrast = 8
+  inference = 8
+  negated_condition = 4
+  nested_condition = 4
+  nested_contrast = 4
+
+negation:
+  existential_no = 6
+  lexical_not_adj = 8
+  morphological_neg = 6
+  never = 6
+  scope_quantifier = 6
+  syntactic_do_not = 8
+
+passive:
+  by_phrase = 8
+  dative_passive = 8
+  get_passive = 8
+  long_passive = 8
+  nested_passive = 4
+  no_agent = 8
+
+recursive:
+  center_embedding = 4
+  complement_clause = 8
+  deep_complement = 4
+  double_relative = 4
+  possessive_chain = 8
+  pp_chain = 8
+  relative_clause = 8
+
+style:
+  casual = 4
+  concise = 4
+  formal = 4
+  poetic = 4
+
+tense:
+  future_will = 4
+  past_simple = 4
+  perfect = 4
+  progressive = 4
+
+translation:
+  en_fr_phrase = 4
+  en_fr_word = 4
+  en_zh_phrase = 4
+  en_zh_word = 4
+  target_language_switch = 4
+```
+
+### 测试命令
+
+本轮使用 Phase 290 单层扫描做扩展库 pilot。每个 subtype 取 2 pair：
+
+```text
+selected pairs = 90
+layers:
+  Qwen3 / GLM4 = L0, L4, L8
+  DeepSeek7B = L20, L24, L27
+alphas = 0, 0.5, 1.0
+patch_types = attn, mlp, both, resid, cross_battn_amlp, cross_aattn_bmlp
+```
+
+Qwen3：
+
+```bash
+MAX_SECONDS=3600 OUTPUT_DIR=results/gpt5_phase296_expanded_function_pilot \
+tests/gpt5/run_phase290_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --layers 0,4,8 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=5400 OUTPUT_DIR=results/gpt5_phase296_expanded_function_pilot \
+tests/gpt5/run_phase290_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --layers 0,4,8 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=3600 OUTPUT_DIR=results/gpt5_phase296_expanded_function_pilot \
+tests/gpt5/run_phase290_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --layers 20,24,27 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase296_expanded_function_pilot/qwen3_phase290_contract_break_scan.json
+results/gpt5_phase296_expanded_function_pilot/glm4_phase290_contract_break_scan.json
+results/gpt5_phase296_expanded_function_pilot/deepseek7b_phase290_contract_break_scan.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase296_expanded_function_pilot/checkpoints/qwen3/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_pilot.json
+results/gpt5_phase296_expanded_function_pilot/checkpoints/glm4/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_pilot.json
+results/gpt5_phase296_expanded_function_pilot/checkpoints/deepseek7b/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_pilot.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_112237_phase290_qwen3
+results/gpt5_gpu_lock_logs/20260528_112734_phase290_glm4
+results/gpt5_gpu_lock_logs/20260528_113557_phase290_deepseek7b
+```
+
+三轮 `kernel.since-start.filtered.log` 都是 0 行。
+
+### 数据规模
+
+```text
+Qwen3:
+  pairs = 90
+  rows = 3780
+  nonfinite = 0
+  norm_illegal = 1
+
+GLM4:
+  pairs = 90
+  rows = 3780
+  nonfinite = 0
+  norm_illegal = 0
+
+DeepSeek7B:
+  pairs = 90
+  rows = 3780
+  nonfinite = 0
+  norm_illegal = 0
+
+total rows = 11340
+```
+
+### Qwen3 客观结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = [0]
+```
+
+layer curve：
+
+```text
+L0:
+  both_progress = 0.7810
+  attn_progress = 0.7060
+  mlp_progress = 0.7391
+  resid_progress = 0.7855
+  cross_battn_amlp_progress = 0.2387
+
+L4:
+  both_progress = 0.3152
+  attn_progress = 0.0906
+  mlp_progress = 0.2694
+  resid_progress = 0.8088
+  cross_battn_amlp_progress = 0.0678
+
+L8:
+  both_progress = 0.1918
+  attn_progress = 0.0998
+  mlp_progress = 0.2062
+  resid_progress = 0.8249
+  cross_battn_amlp_progress = 0.0609
+```
+
+contract event：
+
+```text
+L0 cross_battn_amlp:
+  kl_ratio_vs_both = 2.7479
+  progress_drop = 0.5422
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.2775
+logical = 0.3923
+negation = 0.5326
+passive = 0.5359
+recursive = 0.4005
+style = 0.2471
+tense = 0.4716
+translation = 0.5409
+```
+
+top subtypes：
+
+```text
+syntactic_do_not = 0.9647
+center_embedding = 0.9153
+by_phrase = 0.7058
+possessive_chain = 0.6958
+en_zh_phrase = 0.6880
+```
+
+bottom subtypes：
+
+```text
+style.concise = -0.0146
+coreference.it_coref = 0.0597
+recursive.double_relative = 0.0658
+coreference.they_coref = 0.1701
+recursive.complement_clause = 0.1756
+```
+
+客观现象：
+
+Qwen3 在扩展库中仍是 L0 最强，且 attention/MLP/both 在 L0 都较强；cross_battn_amlp 在 L0 明显失败。translation、passive、negation 在这个 pilot 中 both_progress 较高，style/coreference 较低。
+
+### GLM4 客观结果
+
+```text
+best_layer_by_both_progress = 0
+contract_broken_layers = []
+```
+
+layer curve：
+
+```text
+L0:
+  both_progress = 0.8942
+  attn_progress = 0.0150
+  mlp_progress = 0.8969
+  resid_progress = 0.9440
+  cross_battn_amlp_progress = 0.0031
+
+L4:
+  both_progress = 0.4277
+  attn_progress = 0.1164
+  mlp_progress = 0.3445
+  resid_progress = 0.9618
+  cross_battn_amlp_progress = 0.0559
+
+L8:
+  both_progress = 0.1793
+  attn_progress = 0.0327
+  mlp_progress = 0.1379
+  resid_progress = 0.9718
+  cross_battn_amlp_progress = 0.0210
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.3632
+logical = 0.4595
+negation = 0.6153
+passive = 0.5873
+recursive = 0.5200
+style = 0.4464
+tense = 0.5770
+translation = 0.4153
+```
+
+top subtypes：
+
+```text
+syntactic_do_not = 0.7229
+negated_condition = 0.7126
+by_phrase = 0.6759
+never = 0.6707
+formal = 0.6638
+```
+
+bottom subtypes：
+
+```text
+it_coref = 0.1744
+they_coref = 0.1790
+style.concise = 0.2082
+target_language_switch = 0.2339
+style.casual = 0.2595
+```
+
+客观现象：
+
+GLM4 在扩展库中继续表现为 L0 MLP 集中：L0 mlp_progress = 0.8969，几乎等于 both_progress = 0.8942，而 L0 attn_progress = 0.0150。扩展库 pilot 没有复现 GLM4 用户态 segfault。
+
+### DeepSeek7B 客观结果
+
+```text
+best_layer_by_both_progress = 27
+contract_broken_layers = []
+```
+
+layer curve：
+
+```text
+L20:
+  both_progress = 0.0690
+  attn_progress = -0.0006
+  mlp_progress = 0.0565
+  resid_progress = 0.5336
+  cross_battn_amlp_progress = 0.0130
+
+L24:
+  both_progress = 0.0269
+  attn_progress = -0.0078
+  mlp_progress = 0.0445
+  resid_progress = 0.5674
+  cross_battn_amlp_progress = -0.0050
+
+L27:
+  both_progress = 0.6973
+  attn_progress = 0.5989
+  mlp_progress = 0.4959
+  resid_progress = 1.0000
+  cross_battn_amlp_progress = 0.0953
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.2565
+logical = 0.2521
+negation = 0.2675
+passive = 0.2278
+recursive = 0.2948
+style = 0.2709
+tense = 0.2316
+translation = 0.3106
+```
+
+top subtypes：
+
+```text
+past_simple = 0.4925
+target_language_switch = 0.4474
+existential_no = 0.4076
+she_coref = 0.3931
+en_fr_word = 0.3756
+```
+
+bottom subtypes：
+
+```text
+no_agent = 0.0188
+style.concise = 0.0476
+they_coref = 0.0591
+causal = 0.0786
+progressive = 0.1108
+```
+
+客观现象：
+
+DeepSeek7B 在扩展库中继续表现为 L27 最强。L20/L24 的 attn/mlp/both 都很弱，但 resid_progress 已有 0.53-0.57；L27 attn/mlp/both 均明显增强，resid_progress = 1.0。这与前面“深层/末层释放”一致。
+
+### 本轮最重要的新事实
+
+```text
+1. 扩展功能库可以直接接入现有测试框架。
+2. translation/tense/coreference/style 能在三模型上稳定跑完。
+3. 三模型原有结构差异在扩展功能库中仍然出现：
+   Qwen3 = L0 attention/MLP 协同；
+   GLM4 = L0 MLP 集中；
+   DeepSeek7B = L27 末层释放。
+4. style.concise 与 coreference 部分 subtype 在当前 patch 指标下较弱。
+5. translation 在 Qwen3 中较强，在 GLM4/DeepSeek7B 中中等，需要后续按目标语言拆分分析。
+```
+
+### 硬伤
+
+1. 本轮每个 subtype 只有 2 pair，只是 pilot。
+2. translation 模板仍较粗，目标语言切换与翻译内容混在一起。
+3. coreference 样本太少，he/she/it/they 只有 2 pair/subtype。
+4. style 的语义差异和风格差异没有完全解耦。
+5. 当前只跑 Phase 290 单层扫描，还没有 block/dynamic/naturalness/GFCM v1。
+
+### 下一步计划
+
+1. Phase 297：扩展功能库 Phase 291 block scan。
+   - 对新功能库跑 block 测试。
+   - Qwen3/GLM4：L0, L0-L2, L0-L4, L0-L8, L4-L8。
+   - DeepSeek7B：L20-L23, L24-L27, L20-L27, L26-L27, L27。
+
+2. Phase 298：扩展功能库 Phase 294b dynamic recompute。
+   - 每个 subtype 2-4 pair。
+   - 保留 alpha 曲线。
+   - 验证新功能是否也符合 Qwen3/GLM4 单点 residual 可重算、DeepSeek7B 需要 segment 的模式。
+
+3. Phase 299：GFCM v1。
+   - 合并扩展功能库 Phase 290/291/294b。
+   - 输出 45 subtype 的全局矩阵。
+
+4. Phase 300：扩展样本到每类 100 pair。
+   - 先补 coreference、translation、style。
+   - 再补 nested logical、double recursive、long passive。
+
+## Phase 34: 扩展功能库 Block Scan 与 GFCM v1 Partial [2026-05-28 12:30]
+
+### 任务目标
+
+根据最新分析，继续完成全局功能契约图谱任务。本轮做两件事：
+
+```text
+1. 对 Phase 33 扩展后的 45 subtype 功能库运行 Phase 291 block scan。
+2. 生成 GFCM v1 partial，先把扩展功能库的 layer/block 曲线纳入全局矩阵。
+```
+
+注意：
+
+```text
+本轮 GFCM v1 是 partial。
+新 subtype 目前只有 Phase 290/291 数据；
+naturalness 与 dynamic recompute 还没有为新功能库完整重跑。
+因此本轮主要解释 layer/block 路径，不解释完整动态签名。
+```
+
+### 对用户分析的判断
+
+用户分析基本正确：
+
+```text
+1. 当前已经进入路径图谱阶段，但还没有进入编码变量内容。
+2. Phase 294b 的动态重算把 block patch 分成可由单点 residual 复现和不可由单点 residual 复现两类。
+3. GFCM 是必要框架，但当前还是行为图谱，不是编码图谱。
+4. 需要扩展功能库，并逐步加入变量解码、自然流形距离、head/neuron 定位。
+```
+
+本轮选择继续扩展 GFCM，而不是马上做 head/neuron，因为新功能库刚加入，必须先确认 block 曲线是否稳定。
+
+### 测试命令
+
+Qwen3：
+
+```bash
+MAX_SECONDS=5400 OUTPUT_DIR=results/gpt5_phase297_expanded_block_pilot \
+tests/gpt5/run_phase291_conservative.sh qwen3 \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --blocks 0,0-2,0-4,0-8,4-8 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+GLM4：
+
+```bash
+MAX_SECONDS=7200 OUTPUT_DIR=results/gpt5_phase297_expanded_block_pilot \
+tests/gpt5/run_phase291_conservative.sh glm4 \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --blocks 0,0-1,0-2,0-4,0-8,4-8 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+DeepSeek7B：
+
+```bash
+MAX_SECONDS=5400 OUTPUT_DIR=results/gpt5_phase297_expanded_block_pilot \
+tests/gpt5/run_phase291_conservative.sh deepseek7b \
+  --categories negation,logical,passive,recursive,translation,tense,coreference,style \
+  --max-pairs-per-subtype 2 \
+  --blocks 20-23,24-27,20-27,26-27,27 \
+  --alphas 0,0.5,1.0 \
+  --progress-every 8 \
+  --label expanded_pilot
+```
+
+GFCM v1 partial：
+
+```bash
+python tests/gpt5/phase295_global_contract_mapping.py \
+  --phase290-dir results/gpt5_phase296_expanded_function_pilot \
+  --phase291-dir results/gpt5_phase297_expanded_block_pilot \
+  --phase293-dir results/gpt5_phase293_naturalness \
+  --phase294-dir results/gpt5_phase294b_dynamic_recompute_full \
+  --output-dir results/gpt5_phase297_expanded_gfcm_v1_partial \
+  --top-k 30
+```
+
+### 输出文件
+
+Block scan：
+
+```text
+results/gpt5_phase297_expanded_block_pilot/qwen3_phase291_block_contract_scan.json
+results/gpt5_phase297_expanded_block_pilot/glm4_phase291_block_contract_scan.json
+results/gpt5_phase297_expanded_block_pilot/deepseek7b_phase291_block_contract_scan.json
+```
+
+GFCM v1 partial：
+
+```text
+results/gpt5_phase297_expanded_gfcm_v1_partial/GLOBAL_CONTRACT_MAPPING_REPORT.md
+results/gpt5_phase297_expanded_gfcm_v1_partial/global_mapping_summary.csv
+results/gpt5_phase297_expanded_gfcm_v1_partial/global_contract_maps.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_115951_phase291_qwen3
+results/gpt5_gpu_lock_logs/20260528_120734_phase291_glm4
+results/gpt5_gpu_lock_logs/20260528_122101_phase291_deepseek7b
+```
+
+三轮 `kernel.since-start.filtered.log` 都是 0 行。
+
+### Block Scan 数据规模
+
+```text
+Qwen3:
+  pairs = 90
+  rows = 6300
+  best_block = L0-L8
+  nonfinite = 0
+  norm_illegal = 0
+
+GLM4:
+  pairs = 90
+  rows = 7560
+  best_block = L0-L8
+  nonfinite = 0
+  norm_illegal = 0
+
+DeepSeek7B:
+  pairs = 90
+  rows = 6300
+  best_block = L20-L27
+  nonfinite = 0
+  norm_illegal = 0
+```
+
+### Qwen3 Block 结果
+
+block curve：
+
+```text
+L0:
+  both = 0.7808
+  attn = 0.7059
+  mlp = 0.7390
+  resid = 0.7854
+  cross_battn_amlp = 0.2387
+
+L0-L2:
+  both = 0.7961
+  attn = 0.7575
+  mlp = 0.7637
+  resid = 0.7982
+  cross_battn_amlp = 0.3109
+
+L0-L4:
+  both = 0.8077
+  attn = 0.7603
+  mlp = 0.7729
+  resid = 0.8086
+  cross_battn_amlp = 0.2245
+
+L0-L8:
+  both = 0.8251
+  attn = 0.7395
+  mlp = 0.8002
+  resid = 0.8248
+  cross_battn_amlp = 0.1922
+
+L4-L8:
+  both = 0.6561
+  attn = 0.2763
+  mlp = 0.6045
+  resid = 0.8248
+  cross_battn_amlp = 0.1444
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.6821
+logical = 0.8278
+negation = 0.8866
+passive = 0.8270
+recursive = 0.5549
+style = 0.5060
+tense = 0.9343
+translation = 0.9666
+```
+
+top subtype：
+
+```text
+en_fr_phrase = 1.1882
+en_zh_phrase = 1.1210
+center_embedding = 1.1082
+syntactic_do_not = 1.0717
+en_fr_word = 1.0525
+```
+
+bottom subtype：
+
+```text
+concise = 0.0955
+it_coref = 0.1746
+double_relative = 0.2631
+relative_clause = 0.3007
+complement_clause = 0.3353
+```
+
+contract events：
+
+```text
+L0-L8 cross_battn_amlp:
+  kl_ratio_vs_both = 5.3472
+  progress_drop = 0.6329
+
+L0-L4 cross_battn_amlp:
+  kl_ratio_vs_both = 4.4402
+  progress_drop = 0.5831
+
+L4-L8 cross_battn_amlp:
+  kl_ratio_vs_both = 3.5702
+  progress_drop = 0.5118
+```
+
+客观现象：
+
+Qwen3 在扩展库 block scan 中仍是 L0-L8 最强，且 L0 单层已强。translation 与 tense 在 block patch 下非常强，style.concise 与部分 coreference/recursive subtype 明显较弱。
+
+### GLM4 Block 结果
+
+block curve：
+
+```text
+L0:
+  both = 0.8942
+  attn = 0.0150
+  mlp = 0.8969
+  resid = 0.9440
+  cross_battn_amlp = 0.0031
+
+L0-L1:
+  both = 0.9505
+  attn = 0.0316
+  mlp = 0.9405
+  resid = 0.9608
+  cross_battn_amlp = 0.0362
+
+L0-L2:
+  both = 0.9581
+  attn = 0.0698
+  mlp = 0.9507
+  resid = 0.9568
+  cross_battn_amlp = 0.0360
+
+L0-L4:
+  both = 0.9621
+  attn = 0.2528
+  mlp = 0.9658
+  resid = 0.9618
+  cross_battn_amlp = 0.1393
+
+L0-L8:
+  both = 0.9707
+  attn = 0.4661
+  mlp = 0.9675
+  resid = 0.9718
+  cross_battn_amlp = 0.1166
+
+L4-L8:
+  both = 0.8537
+  attn = 0.3742
+  mlp = 0.8157
+  resid = 0.9718
+  cross_battn_amlp = 0.0697
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.8457
+logical = 0.9311
+negation = 0.9742
+passive = 1.0126
+recursive = 0.8906
+style = 0.8612
+tense = 0.9958
+translation = 0.9320
+```
+
+top subtype：
+
+```text
+get_passive = 1.0667
+by_phrase = 1.0338
+long_passive = 1.0307
+dative_passive = 1.0123
+perfect = 1.0103
+```
+
+bottom subtype：
+
+```text
+it_coref = 0.6918
+they_coref = 0.7392
+concise = 0.7465
+casual = 0.7616
+nested_condition = 0.7866
+```
+
+contract events：
+
+```text
+L0-L2 cross_battn_amlp:
+  kl_ratio_vs_both = 18.1929
+  progress_drop = 0.9221
+
+L0-L1 cross_battn_amlp:
+  kl_ratio_vs_both = 11.6944
+  progress_drop = 0.9144
+
+L0-L8 cross_battn_amlp:
+  kl_ratio_vs_both = 35.9318
+  progress_drop = 0.8542
+```
+
+客观现象：
+
+GLM4 的 MLP 集中在扩展 block 中更清楚：L0 的 mlp_progress 直接等于 both，L0-L8 的 MLP 也几乎等于 both。扩展库所有大类的 block 效果都较高，passive 和 tense 尤其高。
+
+### DeepSeek7B Block 结果
+
+block curve：
+
+```text
+L20-L23:
+  both = 0.2541
+  attn = 0.0373
+  mlp = 0.1911
+  resid = 0.5716
+  cross_battn_amlp = 0.0500
+
+L20-L27:
+  both = 0.9324
+  attn = 0.6967
+  mlp = 0.7805
+  resid = 1.0000
+  cross_battn_amlp = 0.1346
+
+L24-L27:
+  both = 0.8517
+  attn = 0.6431
+  mlp = 0.6512
+  resid = 1.0000
+  cross_battn_amlp = 0.1162
+
+L26-L27:
+  both = 0.7759
+  attn = 0.6085
+  mlp = 0.5600
+  resid = 1.0000
+  cross_battn_amlp = 0.1050
+
+L27:
+  both = 0.6973
+  attn = 0.5989
+  mlp = 0.4959
+  resid = 1.0000
+  cross_battn_amlp = 0.0953
+```
+
+category both alpha=1：
+
+```text
+coreference = 0.6888
+logical = 0.8014
+negation = 0.6377
+passive = 0.6438
+recursive = 0.7437
+style = 0.7029
+tense = 0.5476
+translation = 0.7701
+```
+
+top subtype：
+
+```text
+conditional = 1.0288
+en_zh_phrase = 0.9245
+nested_passive = 0.9066
+target_language_switch = 0.8941
+nested_condition = 0.8824
+```
+
+bottom subtype：
+
+```text
+they_coref = 0.3876
+perfect = 0.4142
+progressive = 0.4726
+by_phrase = 0.4790
+future_will = 0.4800
+```
+
+contract events：
+
+```text
+L20-L27 cross_battn_amlp:
+  kl_ratio_vs_both = 11.6114
+  progress_drop = 0.7978
+
+L24-L27 cross_battn_amlp:
+  kl_ratio_vs_both = 3.8853
+  progress_drop = 0.7355
+
+L26-L27 cross_battn_amlp:
+  progress_drop = 0.6708
+
+L27 cross_battn_amlp:
+  progress_drop = 0.6020
+```
+
+客观现象：
+
+DeepSeek7B 在扩展库中仍然是 L20-L27 最强，且 L24-L27、L26-L27、L27 逐步下降。这继续支持深层 block 累积和末层释放。L20-L23 单独较弱，但不为零，说明前段可能有弱写入或准备作用。
+
+### GFCM v1 Partial 结果
+
+输入：
+
+```text
+phase290_dir = results/gpt5_phase296_expanded_function_pilot
+phase291_dir = results/gpt5_phase297_expanded_block_pilot
+phase293_dir = results/gpt5_phase293_naturalness
+phase294_dir = results/gpt5_phase294b_dynamic_recompute_full
+```
+
+输出：
+
+```text
+results/gpt5_phase297_expanded_gfcm_v1_partial/GLOBAL_CONTRACT_MAPPING_REPORT.md
+results/gpt5_phase297_expanded_gfcm_v1_partial/global_mapping_summary.csv
+results/gpt5_phase297_expanded_gfcm_v1_partial/global_contract_maps.json
+```
+
+数据规模：
+
+```text
+Qwen3:
+  subtypes = 45
+  features_min = 210
+  features_max = 368
+  combined_mean = 0.8022
+  combined_min = 0.2757
+  combined_max = 0.9983
+
+GLM4:
+  subtypes = 45
+  features_min = 230
+  features_max = 388
+  combined_mean = 0.8518
+  combined_min = 0.6245
+  combined_max = 0.9989
+
+DeepSeek7B:
+  subtypes = 45
+  features_min = 210
+  features_max = 356
+  combined_mean = 0.7962
+  combined_min = 0.5235
+  combined_max = 0.9917
+```
+
+重要说明：
+
+```text
+由于新 subtype 尚未跑 expanded naturalness 与 expanded dynamic recompute，
+GFCM v1 partial 的 dynamic/naturalness 维度不完整。
+因此本轮只把它作为 layer/block 图谱，不把它解释成完整功能契约图谱。
+```
+
+GFCM v1 partial 中的候选现象：
+
+```text
+Qwen3:
+  future_will / perfect / progressive 高相似；
+  concise 与 syntactic_do_not / by_phrase / lexical_not_adj 等强分化。
+
+GLM4:
+  future_will / perfect / progressive 高相似；
+  it_coref、casual 与多个强功能分化。
+
+DeepSeek7B:
+  future_will / perfect 高相似；
+  center_embedding / nested_condition 高相似；
+  complement_clause / they_coref、casual / causal 等分化明显。
+```
+
+Z-score 候选：
+
+```text
+Qwen3 top:
+  future_will / perfect = 0.9694
+  future_will / progressive = 0.9545
+  perfect / progressive = 0.9539
+
+GLM4 top:
+  future_will / perfect = 0.9675
+  future_will / progressive = 0.9630
+  perfect / progressive = 0.9574
+
+DeepSeek7B top:
+  future_will / perfect = 0.9378
+  nested_contrast / nested_passive = 0.8825
+  center_embedding / nested_condition = 0.8744
+```
+
+客观现象：
+
+扩展到 45 subtype 后，相似度均值明显下降：
+
+```text
+Qwen3:
+  Phase 32 19 subtype mean = 0.9505
+  Phase 34 45 subtype mean = 0.8022
+
+GLM4:
+  Phase 32 19 subtype mean = 0.9675
+  Phase 34 45 subtype mean = 0.8518
+
+DeepSeek7B:
+  Phase 32 19 subtype mean = 0.8913
+  Phase 34 45 subtype mean = 0.7962
+```
+
+这说明前面相似度过高确实有功能库过窄的原因。扩展结构型功能库后，GFCM 的分辨率提高。
+
+### 本轮最重要的新事实
+
+```text
+1. 45 subtype 扩展功能库能稳定运行 Phase 291 block scan。
+2. 三模型原有路径类型在扩展库中继续成立：
+   Qwen3 = 浅层协同 + L0-L8 block 增强；
+   GLM4 = 浅层 MLP 写入 + residual 传播；
+   DeepSeek7B = 深层 block 累积 + L27 释放。
+3. 扩展功能库显著降低 GFCM 平均相似度，提升分化能力。
+4. tense 的 future/perfect/progressive 在三模型中都高度相似，是强复用候选。
+5. style.concise、coreference.it/they、DeepSeek7B 的某些 complement/coreference 组合是分化候选。
+```
+
+### 硬伤
+
+1. GFCM v1 partial 仍缺 expanded dynamic recompute。
+2. GFCM v1 partial 仍缺 expanded naturalness。
+3. 每个 subtype 只有 2 pair，仍是 pilot。
+4. translation/style/coreference 仍可能有模板和语义混杂。
+5. 仍没有变量解码。
+
+### 下一步计划
+
+1. Phase 35：expanded dynamic recompute。
+   - 对 45 subtype 跑 Phase 294b。
+   - Qwen3/GLM4：L0-L8。
+   - DeepSeek7B：L20-L27。
+   - 先每 subtype 2 pair，保留 alpha 曲线。
+
+2. Phase 36：expanded naturalness。
+   - 对 expanded Phase 290/291/294b 结果生成 norm-based naturalness。
+   - 后续再升级 PCA/kNN。
+
+3. Phase 37：GFCM v1 full。
+   - 合并 expanded Phase 290/291/294b/naturalness。
+   - 输出完整 45 subtype matrix。
+
+4. Phase 38：变量解码 pilot。
+   - 优先从 tense、passive、logical 三组做。

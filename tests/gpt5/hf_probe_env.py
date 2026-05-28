@@ -62,16 +62,26 @@ def load_probe_model(model_key: str) -> LoadedModel:
         "torch_dtype": dtype_map[dtype_name],
         "trust_remote_code": spec.trust_remote_code,
         "local_files_only": True,
-        "attn_implementation": spec.attn_implementation,
+        "attn_implementation": os.environ.get(
+            "PROBE_ATTN_IMPLEMENTATION", spec.attn_implementation
+        ),
     }
-    if spec.load_strategy == "cuda":
+    auto_models = {
+        item.strip()
+        for item in os.environ.get("PROBE_DEVICE_MAP_AUTO_MODELS", "").split(",")
+        if item.strip()
+    }
+    force_auto = model_key in auto_models or os.environ.get("PROBE_DEVICE_MAP", "") == "auto"
+    if spec.load_strategy == "cuda" and not force_auto:
         kwargs["device_map"] = "cpu"
     else:
         kwargs["device_map"] = "auto"
-        kwargs["max_memory"] = {0: "22GiB", "cpu": "96GiB"}
+        gpu_mem = os.environ.get("PROBE_MAX_GPU_MEMORY", "22GiB")
+        cpu_mem = os.environ.get("PROBE_MAX_CPU_MEMORY", "96GiB")
+        kwargs["max_memory"] = {0: gpu_mem, "cpu": cpu_mem}
 
     model = AutoModelForCausalLM.from_pretrained(str(spec.local_dir), **kwargs)
-    if spec.load_strategy == "cuda" and torch.cuda.is_available():
+    if spec.load_strategy == "cuda" and not force_auto and torch.cuda.is_available():
         model = model.to("cuda")
     model.eval()
 

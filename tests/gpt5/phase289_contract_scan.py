@@ -213,6 +213,141 @@ def build_pairs() -> list[Pair]:
     for name, a, b, subtype in recursive_rows:
         pairs.append(Pair(f"rec_{name}", "recursive", subtype, a, b))
 
+    translation_rows = [
+        ("en_zh_cat", "translate cat into Chinese: cat", "translate cat into Chinese: 猫", "en_zh_word"),
+        ("en_zh_water", "translate water into Chinese: water", "translate water into Chinese: 水", "en_zh_word"),
+        ("en_zh_sun", "translate sun into Chinese: sun", "translate sun into Chinese: 太阳", "en_zh_word"),
+        ("en_zh_book", "translate book into Chinese: book", "translate book into Chinese: 书", "en_zh_word"),
+        ("en_zh_red", "translate red apple into Chinese: red apple", "translate red apple into Chinese: 红苹果", "en_zh_phrase"),
+        ("en_zh_fast", "translate fast train into Chinese: fast train", "translate fast train into Chinese: 快车", "en_zh_phrase"),
+        ("en_zh_small", "translate small house into Chinese: small house", "translate small house into Chinese: 小房子", "en_zh_phrase"),
+        ("en_zh_good", "translate good idea into Chinese: good idea", "translate good idea into Chinese: 好主意", "en_zh_phrase"),
+        ("en_fr_cat", "translate cat into French: cat", "translate cat into French: chat", "en_fr_word"),
+        ("en_fr_water", "translate water into French: water", "translate water into French: eau", "en_fr_word"),
+        ("en_fr_sun", "translate sun into French: sun", "translate sun into French: soleil", "en_fr_word"),
+        ("en_fr_book", "translate book into French: book", "translate book into French: livre", "en_fr_word"),
+        ("en_fr_red", "translate red apple into French: red apple", "translate red apple into French: pomme rouge", "en_fr_phrase"),
+        ("en_fr_fast", "translate fast train into French: fast train", "translate fast train into French: train rapide", "en_fr_phrase"),
+        ("en_fr_small", "translate small house into French: small house", "translate small house into French: petite maison", "en_fr_phrase"),
+        ("en_fr_good", "translate good idea into French: good idea", "translate good idea into French: bonne idée", "en_fr_phrase"),
+        ("target_zh_fr_cat", "translate cat into Chinese: 猫", "translate cat into French: chat", "target_language_switch"),
+        ("target_zh_fr_book", "translate book into Chinese: 书", "translate book into French: livre", "target_language_switch"),
+        ("target_zh_fr_water", "translate water into Chinese: 水", "translate water into French: eau", "target_language_switch"),
+        ("target_zh_fr_sun", "translate sun into Chinese: 太阳", "translate sun into French: soleil", "target_language_switch"),
+    ]
+    for name, a, b, subtype in translation_rows:
+        pairs.append(Pair(f"trans_{name}", "translation", subtype, a, b))
+
+    tense_rows = [
+        ("walk_past", "she walks to school", "she walked to school", "past_simple"),
+        ("cook_past", "he cooks dinner", "he cooked dinner", "past_simple"),
+        ("open_past", "they open the shop", "they opened the shop", "past_simple"),
+        ("call_past", "we call the office", "we called the office", "past_simple"),
+        ("walk_future", "she walks to school", "she will walk to school", "future_will"),
+        ("cook_future", "he cooks dinner", "he will cook dinner", "future_will"),
+        ("open_future", "they open the shop", "they will open the shop", "future_will"),
+        ("call_future", "we call the office", "we will call the office", "future_will"),
+        ("walk_progressive", "she walks to school", "she is walking to school", "progressive"),
+        ("cook_progressive", "he cooks dinner", "he is cooking dinner", "progressive"),
+        ("open_progressive", "they open the shop", "they are opening the shop", "progressive"),
+        ("call_progressive", "we call the office", "we are calling the office", "progressive"),
+        ("walk_perfect", "she walks to school", "she has walked to school", "perfect"),
+        ("cook_perfect", "he cooks dinner", "he has cooked dinner", "perfect"),
+        ("open_perfect", "they open the shop", "they have opened the shop", "perfect"),
+        ("call_perfect", "we call the office", "we have called the office", "perfect"),
+    ]
+    for name, a, b, subtype in tense_rows:
+        pairs.append(Pair(f"tense_{name}", "tense", subtype, a, b))
+
+    coreference_rows = [
+        ("john_he", "john dropped the glass because john was tired", "john dropped the glass because he was tired", "he_coref"),
+        ("mark_he", "mark forgot the key because mark was late", "mark forgot the key because he was late", "he_coref"),
+        ("anna_she", "anna closed the window because anna was cold", "anna closed the window because she was cold", "she_coref"),
+        ("mary_she", "mary solved the puzzle because mary was patient", "mary solved the puzzle because she was patient", "she_coref"),
+        ("dog_it", "the dog chased the ball because the ball rolled away", "the dog chased the ball because it rolled away", "it_coref"),
+        ("robot_it", "the robot stopped because the robot lost power", "the robot stopped because it lost power", "it_coref"),
+        ("team_they", "the players celebrated because the players won", "the players celebrated because they won", "they_coref"),
+        ("students_they", "the students left because the students finished", "the students left because they finished", "they_coref"),
+        ("this_that_plan", "this plan failed because this plan was rushed", "that plan failed because that plan was rushed", "deictic_switch"),
+        ("this_that_box", "this box opened because this box was unlocked", "that box opened because that box was unlocked", "deictic_switch"),
+        ("this_that_note", "this note matters because this note is recent", "that note matters because that note is recent", "deictic_switch"),
+        ("this_that_path", "this path works because this path is short", "that path works because that path is short", "deictic_switch"),
+    ]
+    for name, a, b, subtype in coreference_rows:
+        pairs.append(Pair(f"coref_{name}", "coreference", subtype, a, b))
+
+    style_rows = [
+        ("formal_help", "help me with this problem", "please assist me with this problem", "formal"),
+        ("formal_send", "send me the report", "please send me the report", "formal"),
+        ("formal_fix", "fix the error now", "please resolve the error now", "formal"),
+        ("formal_tell", "tell me the result", "please inform me of the result", "formal"),
+        ("casual_assist", "please assist me with this task", "help me with this task", "casual"),
+        ("casual_purchase", "i would like to purchase a ticket", "i want to buy a ticket", "casual"),
+        ("casual_depart", "we shall depart soon", "we will leave soon", "casual"),
+        ("casual_child", "the child is fatigued", "the kid is tired", "casual"),
+        ("concise_weather", "the weather today is quite cold and windy", "today is cold and windy", "concise"),
+        ("concise_report", "the report contains several important findings", "the report has key findings", "concise"),
+        ("concise_meeting", "the meeting has been postponed until Friday", "the meeting moved to Friday", "concise"),
+        ("concise_plan", "the plan requires additional careful review", "the plan needs review", "concise"),
+        ("poetic_night", "the night is dark", "the night wears a dark cloak", "poetic"),
+        ("poetic_rain", "rain falls on the street", "rain whispers on the street", "poetic"),
+        ("poetic_sun", "the sun rises over the hill", "the sun crowns the hill", "poetic"),
+        ("poetic_wind", "the wind moves through the trees", "the wind sings through the trees", "poetic"),
+    ]
+    for name, a, b, subtype in style_rows:
+        pairs.append(Pair(f"style_{name}", "style", subtype, a, b))
+
+    long_passive_rows = [
+        ("proposal_board", "the board unexpectedly revived the proposal that the committee rejected last year", "the proposal that the committee rejected last year was unexpectedly revived by the board", "long_passive"),
+        ("letter_editor", "the editor finally published the letter that the lawyer had reviewed", "the letter that the lawyer had reviewed was finally published by the editor", "long_passive"),
+        ("bridge_workers", "the workers repaired the bridge that the storm had damaged", "the bridge that the storm had damaged was repaired by the workers", "long_passive"),
+        ("painting_museum", "the museum displayed the painting that the artist had restored", "the painting that the artist had restored was displayed by the museum", "long_passive"),
+        ("report_team", "the team approved the report that the analyst submitted", "the report that the analyst submitted was approved by the team", "long_passive"),
+        ("contract_manager", "the manager signed the contract that the lawyer prepared", "the contract that the lawyer prepared was signed by the manager", "long_passive"),
+        ("song_band", "the band performed the song that the singer wrote", "the song that the singer wrote was performed by the band", "long_passive"),
+        ("meal_chef", "the chef served the meal that the assistant prepared", "the meal that the assistant prepared was served by the chef", "long_passive"),
+        ("nested_award", "the committee gave the scientist an award that the foundation sponsored", "the scientist was given an award that the foundation sponsored by the committee", "nested_passive"),
+        ("nested_offer", "the company made the engineer an offer that the manager approved", "the engineer was made an offer that the manager approved by the company", "nested_passive"),
+        ("nested_task", "the supervisor assigned the worker a task that the client requested", "the worker was assigned a task that the client requested by the supervisor", "nested_passive"),
+        ("nested_ticket", "the agent sent the traveler a ticket that the airline issued", "the traveler was sent a ticket that the airline issued by the agent", "nested_passive"),
+    ]
+    for name, a, b, subtype in long_passive_rows:
+        pairs.append(Pair(f"passx_{name}", "passive", subtype, a, b))
+
+    nested_logical_rows = [
+        ("if_because_rain", "if it rains we will cancel the trip", "if it rains because the storm arrives we will cancel the trip", "nested_condition"),
+        ("if_because_delay", "if the train is late call the office", "if the train is late because the signal failed call the office", "nested_condition"),
+        ("if_because_file", "if the file is missing report the issue", "if the file is missing because the upload failed report the issue", "nested_condition"),
+        ("if_because_alarm", "if the alarm rings leave the room", "if the alarm rings because smoke appears leave the room", "nested_condition"),
+        ("although_because_rain", "although it rained they played outside", "although it rained because the storm arrived they played outside", "nested_contrast"),
+        ("although_because_tired", "although she was tired she answered", "although she was tired because the shift was long she answered", "nested_contrast"),
+        ("although_because_late", "although the answer was late it was accepted", "although the answer was late because the server failed it was accepted", "nested_contrast"),
+        ("although_because_small", "although the room was small it worked", "although the room was small because the wall moved it worked", "nested_contrast"),
+        ("not_if_rain", "if it rains we will leave", "if it does not rain we will leave", "negated_condition"),
+        ("not_if_ready", "if the team is ready start the test", "if the team is not ready start the test", "negated_condition"),
+        ("not_if_safe", "if the road is safe we can drive", "if the road is not safe we can drive", "negated_condition"),
+        ("not_if_open", "if the shop is open buy bread", "if the shop is not open buy bread", "negated_condition"),
+    ]
+    for name, a, b, subtype in nested_logical_rows:
+        pairs.append(Pair(f"logicx_{name}", "logical", subtype, a, b))
+
+    double_recursive_rows = [
+        ("double_rel_man", "the man waved", "the man who saw the dog that chased the cat waved", "double_relative"),
+        ("double_rel_student", "the student smiled", "the student who answered the question that confused the class smiled", "double_relative"),
+        ("double_rel_book", "the book fell", "the book that was on the shelf that broke fell", "double_relative"),
+        ("double_rel_song", "the song ended", "the song that played on the radio that the child fixed ended", "double_relative"),
+        ("center_teacher", "the teacher left", "the teacher the student the principal praised admired left", "center_embedding"),
+        ("center_dog", "the dog barked", "the dog the cat the child fed chased barked", "center_embedding"),
+        ("center_report", "the report mattered", "the report the analyst the manager trusted wrote mattered", "center_embedding"),
+        ("center_actor", "the actor smiled", "the actor the director the critic liked praised smiled", "center_embedding"),
+        ("double_comp_team", "they believe the team won", "they believe that she said that the coach proved that the team won", "deep_complement"),
+        ("double_comp_road", "we know the road is safe", "we know that he reported that she confirmed that the road is safe", "deep_complement"),
+        ("double_comp_train", "she expects the train to arrive", "she expects that the sign says that the clerk believes that the train will arrive", "deep_complement"),
+        ("double_comp_file", "i noticed the file was missing", "i noticed that the log showed that the system reported that the file was missing", "deep_complement"),
+    ]
+    for name, a, b, subtype in double_recursive_rows:
+        pairs.append(Pair(f"recx_{name}", "recursive", subtype, a, b))
+
     return pairs
 
 
