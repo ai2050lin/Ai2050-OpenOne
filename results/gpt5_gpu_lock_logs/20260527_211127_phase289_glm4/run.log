@@ -1,47 +1,0 @@
-=== Phase289 conservative logged run ===
-2026-05-27 21:11:27 CST
-run_id=20260527_211127_phase289_glm4
-model=glm4
-output_dir=results/gpt5_phase289_contract_dense_negation
-conda_env=openone-cuda121
-probe_torch_dtype=float16
-args=--categories negation --max-pairs-per-subtype 999 --layer-stride 4 --alphas 0,0.25,0.5,0.75,1.0 --progress-every 2
-
-=== Start kernel log follower ===
-=== Start lightweight GPU/process monitor ===
-=== Run Phase289 ===
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  2.90it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.90it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.32it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  1.95it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.15it/s]
-[phase289] model=glm4 class=GlmForCausalLM layers=40
-[phase289] pairs=40 categories=['negation']
-[phase289] target_layers=[0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 39]
-[phase289] alphas=[0.0, 0.25, 0.5, 0.75, 1.0] patch_types=['attn', 'mlp', 'both', 'resid', 'cross_battn_amlp', 'cross_aattn_bmlp']
-[phase289] progress pairs=2/40 results=660 elapsed=69.6s
-[phase289] progress pairs=4/40 results=1320 elapsed=140.7s
-[phase289] progress pairs=6/40 results=1980 elapsed=212.7s
-[phase289] progress pairs=8/40 results=2640 elapsed=280.4s
-[phase289] progress pairs=10/40 results=3300 elapsed=348.7s
-[phase289] progress pairs=12/40 results=3960 elapsed=417.2s
-[phase289] progress pairs=14/40 results=4620 elapsed=486.4s
-[phase289] progress pairs=16/40 results=5280 elapsed=554.6s
-[phase289] progress pairs=18/40 results=5940 elapsed=622.5s
-[phase289] progress pairs=20/40 results=6600 elapsed=690.7s
-[phase289] progress pairs=22/40 results=7260 elapsed=761.2s
-[phase289] progress pairs=24/40 results=7920 elapsed=830.3s
-[phase289] progress pairs=26/40 results=8580 elapsed=900.4s
-[phase289] progress pairs=28/40 results=9240 elapsed=969.1s
-[phase289] progress pairs=30/40 results=9900 elapsed=1041.7s
-[phase289] progress pairs=32/40 results=10560 elapsed=1115.9s
-[phase289] progress pairs=34/40 results=11220 elapsed=1190.2s
-[phase289] progress pairs=36/40 results=11880 elapsed=1261.1s
-[phase289] progress pairs=38/40 results=12540 elapsed=1331.9s
-[phase289] progress pairs=40/40 results=13200 elapsed=1402.2s
-[phase289] saved checkpoint=results/gpt5_phase289_contract_dense_negation/checkpoints/glm4/negation_full.json
-[phase289] done model=glm4 pairs=40 results=13200 best_layer=0 broken_layers=[0, 4]
-phase289_exit_code=0
-=== Kernel log since start ===
-=== Result files ===
-results/gpt5_phase289_contract_dense_negation/checkpoints/glm4/negation_full.json
-results/gpt5_phase289_contract_dense_negation/checkpoints/qwen3/negation_full.json
-results/gpt5_phase289_contract_dense_negation/glm4_phase289_contract_scan.json
-results/gpt5_phase289_contract_dense_negation/qwen3_phase289_contract_scan.json
-log_dir=results/gpt5_gpu_lock_logs/20260527_211127_phase289_glm4
