@@ -59172,4 +59172,437 @@ Qwen3 是线性分布式控制（α 平坦），GLM4 是 MLP 补偿式控制（�
 3. **多 α + 多 patch 类型矩阵**：绘制完整的 attention-MLP 契约曲面
 4. **否定的 true counterfactual**：不替换整个模块输出，而是替换关键子空间
 
+## Phase 290: Recomputed Attention→MLP Contract Test [2026-05-28 02:50]
+
+### 设计思路
+
+Phase 290 的核心突破：**不再拼接缓存输出，而是让 MLP 在修改后的残差流上真实重新计算。**
+
+对比 Phase 289 的"缓存拼接"方法：
+- Phase 289: `A_attn_cached + B_mlp_cached → 拼接`（循环论证风险）
+- Phase 290: `注入 α*B_attn → MLP 重算 → 观察 MLP 是否补偿`（真契约测试）
+
+测试 37 对否定句（6 子类型），α = [0, 0.25, 0.5, 0.75, 1.0, 1.25]，step=2 全层扫描。
+
+新增指标：
+- `mlp_norm_ratio`: 重算后 MLP 输出范数 / 自然 A 的 MLP 范数
+- `mlp_to_b_ratio`: |mlp_n - mlp_nb| / |mlp_na - mlp_nb|（0=MLP移向B, 1=MLP留在A, >1=MLP远离两者）
+- `down_amp`: 下一层输出的范数放大比
+- `depth_corrected`: progress / remaining_layers（校正早层天然优势）
+
+### 跨模型核心对比表
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| GPU层 | 36/36 | 0-18/40 | 0-16/28 |
+| Recomp KR (α=1.0) | 3-6x | 10-19x | 1.5-3x |
+| Recomp Prog (α=1.0) | 0.21-0.76 | 0.26-0.30 | 0.18-0.32 |
+| MLP_NR (自然性) | 0.88-1.01 ✅ | 0.97-1.01 ✅ | 0.97-1.01 ✅ |
+| MLP_to_B (补偿方向) | 1.6-12.7 | 2.2-25.3 | 1.0-45.8 |
+| Spliced vs Recomp | Spliced更强 | Recomp≈Spliced | Recomp≈Spliced |
+| Depth-corr最高 | L34: 0.30 | L18: 0.014 | L12: 0.022 |
+
+### D1: 三模型 Attention-MLP 契约类型（核心发现）
+
+**Qwen3：兼容型契约（Compatible Contract）**
+- KR 温和（3-6x），MLP_to_B 偏低（1.6-12.7）
+- Recomp progress 在 L0 达到 0.76 → attention 修改能被 MLP 部分吸收
+- α 插值平稳，α=1.25（过度替换）时 KR 不爆炸
+- 结论：Qwen3 的 MLP 能"理解"外来 attention 输入，产生部分补偿
+
+**GLM4：拒绝型契约（Rejective Contract）**
+- KR 极高（10-19x），MLP_to_B 高（2.2-25.3）
+- Recomp progress 全层~0.29，变化不大
+- MLP 始终抗拒外来 attention，重算输出偏离 A 远超自然 A-B 差距
+- 结论：GLM4 的 MLP 不能"理解"外来 attention，产生强排斥
+
+**DS7B：敌对型契约（Hostile Contract）**
+- MLP_to_B 极端值（L12: 45.8），syntactic_do_not 出现**负 progress**
+- scope_quantifier L12 prog=0.60（最高），但 never L0 prog=0.77 且 mlp_to_b=0.87（唯一 mlp_to_b<1 的情况！）
+- 结论：DS7B 的 MLP 不仅拒绝外来 attention，某些子类型下甚至**反向推动**输出
+
+### D2: 唯一 MLP 接受案例 — DS7B never L0
+
+```
+DS7B L0, never subtype, α=1.0:
+  recomp_prog = 0.77 (最高)
+  mlp_to_b = 0.87 (唯一 < 1.0!)
+  KR = 2.2
+```
+这是三模型 37对×18-20层 的全部测试中**唯一** mlp_to_b < 1.0 的情况。意味着 DS7B 的 MLP 在 L0 对 never 子类型的外来 attention 输入**部分接受**了，重算后的 MLP 状态移向 B。
+
+这强烈暗示：never 的编码机制可能涉及不同于其他否定的 attention-MLP 交互模式。
+
+### D3: syntactic_do_not 的负 progress（DS7B 特有）
+
+```
+DS7B syntactic_do_not:
+  L0:  prog=-0.12
+  L8:  prog=-0.14
+  L12: prog=-0.05
+  L2:  prog=-0.20  ← 最负
+```
+→ DS7B 的 syntactic_do_not 否定在 attention 被替换后，MLP 重算导致输出**远离 B**。这是"敌对契约"的最强证据。
+
+### D4: α 插值 — 重算模式
+
+**Qwen3 L22（recomp）**:
+```
+α=0.00: KR=5.59, prog=0.19
+α=0.50: KR=5.20, prog=0.23
+α=1.00: KR=4.72, prog=0.32
+α=1.25: KR=4.72, prog=0.30
+```
+→ 平稳下降，α=1.25 无爆炸。线性控制。
+
+**GLM4 L12（recomp）**:
+```
+α=0.00: KR=10.12, prog=0.19
+α=0.50: KR=10.06, prog=0.25
+α=1.00: KR=9.53, prog=0.29
+α=1.25: KR=9.47, prog=0.29
+```
+→ KR 始终高（10x），α 增加几乎不改变 KR。MLP 始终拒绝。
+
+**DS7B L0（recomp）**:
+```
+α=0.00: KR=1.63, prog=0.13
+α=0.50: KR=1.67, prog=0.25
+α=1.00: KR=1.79, prog=0.31
+α=1.25: KR=1.90, prog=0.32
+```
+→ KR 最低（1.6-1.9x），prog 随 α 平稳上升。DS7B 的"弱但平稳"控制模式。
+
+### D5: 深度校正揭示真实功能形成层
+
+原始 progress 受"剩余层数"污染（早层影响更多下游层）。深度校正后：
+
+| 模型 | 最高 raw_prog 层 | 最高 depth-corrected 层 |
+|------|-----------------|----------------------|
+| Qwen3 | L0 (0.76) | L34 (0.30) |
+| GLM4 | L8 (0.30) | L18 (0.014) |
+| DS7B | L12 (0.32) | L12 (0.022) |
+
+→ Qwen3 的真实功能形成在深层（L34），而 L0 的高 prog 主要是传播层数多导致的。
+
+### D6: 自然性检查通过
+
+三模型的 MLP_NR 均稳定在 0.97-1.01，说明重算后的 MLP 输出范数与自然 A 的 MLP 范数高度一致。这意味着重算式契约测试的状态**没有离开自然分布**——这解决了 Phase 288-289 的 over-conversion 问题。
+
+### 新增客观事实拼图（10条）
+
+1. Qwen3 重算 MLP 可部分吸收外来 attention（KR~4x, MLP_to_B~3-12）
+2. GLM4 重算 MLP 强烈拒绝外来 attention（KR~15x, MLP_to_B~2-25）
+3. DS7B 重算 MLP 对 syntactic_do_not 产生负 progress（MLP_to_B~36）
+4. DS7B never L0 是三模型唯一 mlp_to_b<1 的案例（0.87）——MLP 接受外来 attn
+5. 深度校正后 Qwen3 功能形成层在 L34（非 L0）
+6. 三模型 MLP_NR 0.97-1.01 → 重算状态在自然分布内
+7. Qwen3 α 插值平稳（1.25x 不爆炸），GLM4 KR 始终高（10x恒定）
+8. syntactic_do_not 是三模型中编码差异最大的否定子类型
+9. scope_quantifier DS7B L12 prog=0.60（子类型最高），但 never L0 prog=0.77 更高
+10. 重算式契约揭示了 Phase 288-289 拼接式契约无法看到的"MLP补偿/拒绝"信号
+
+### 硬伤分析
+
+1. **GLM4/DS7B 深层缺失**（同 Phase 289）：L20+ / L18+ CPU offload。
+2. **mlp_to_b 指标含义需谨慎**：>1 不一定等于"拒绝"，可能是重算 MLP 输出进入了不同方向。
+3. **α 在 recomp 模式下上限效应弱**：α=1.25 时 KR 不爆炸（Qwen3），说明单层 attention 修改在残差流中被稀释。
+4. **仅 37 对否定**：每个子类型仅 4-7 对，DS7B never L0 的独特发现需要更大样本验证。
+5. **下游 L+1 norm 捕获粗糙**：仅采样 5 对的 natural downstream norms，信度有限。
+
+### 命令记录
+
+```bash
+python tests/glm5/phase290_recomputed_contract.py qwen3      # 4min, 5994 results, 0 fails
+python tests/glm5/phase290_recomputed_contract.py glm4        # 87min, 4536 results (L20+ meta fails)
+python tests/glm5/phase290_recomputed_contract.py deepseek7b  # 40min, 3402 results (L18+ meta fails)
+```
+
+### 数据文件
+
+- `results/phase290_recomputed/{qwen3,glm4,deepseek7b}_recomp.json`
+- `tests/glm5/phase290_recomputed_contract.py`
+
+### 关键洞察
+
+Phase 290 首次通过**重算式契约测试**揭示了三模型 attention-MLP 关系：
+- **Qwen3**：兼容契约（MLP 可吸收外来 attn，KR 温和）
+- **GLM4**：拒绝契约（MLP 排斥外来 attn，KR 始终高）
+- **DS7B**：敌对契约（MLP 不仅拒绝，某些子类型下还反向推动输出）
+
+这否定了"语言编码有统一机制"，支持"架构决定模块契约"。
+
+下一步：
+- 扩大样本验证 DS7B never L0 的独特 mlp_to_b<1 信号
+- 做多层同时重算（当前仅单层），观察契约兼容的累积效应
+- 用 8bit 加载 GLM4/DS7B 完整测试深层
+
+## Phase 291: Multi-Layer Block Recomputational Contract Test (进行中)
+
+### 设计思路
+
+升级 Phase 290 的单层重算→多层 Block 重算。每 4 个连续层为一个 Block，同时替换组内所有层的 attention 输出，让组内 MLP 真实重新计算。
+
+测试：单层效应 vs Block 累积效应（Block/Single 放大比）。
+
+### Qwen3 结果（77 否定对, 9 Blocks, α=[0,0.5,1.0]）
+
+### D1: Block 放大效应
+
+```
+Block     Blk_Prog  Blk_KR  Sgl_Prog  Sgl_KR  Ratio
+[0-3]      0.786    0.853    0.277    4.343   2.84x  ← 强分布式
+[4-7]      0.398    4.122    0.259    4.481   1.53x  ← 中等
+[20-23]    0.393    3.661    0.309    4.431   1.27x
+[32-35]    0.238    3.716    0.308    4.704   0.77x  ← 非分布式
+```
+
+Block/Single 平均放大 1.39x，最大 2.84x（L0-L3 早层 Block）。
+
+→ Qwen3 L0-L3 否定形成是强分布式契约（4层合力远强于单层）。
+
+### D2: Block [0-3] α 插值（平滑分布式）
+
+```
+α=0.00: PROG=0.245, KR=4.78  (baseline)
+α=0.50: PROG=0.302, KR=2.21  (中间点平滑过渡)
+α=1.00: PROG=0.786, KR=0.85  (接近完美重建)
+```
+
+→ α=0.5 时 KR 已从 4.78 降到 2.21，说明 L0-L3 Block 的 4 层 MLP 共同吸收了 50% 的注意力修改。平滑非门控。
+
+### D3: Block [0-3] 子类型分解
+
+```
+existential_no:    PROG=0.958  KR=0.082  ← 近乎完美
+never:             PROG=0.993  KR=0.228  ← 近乎完美
+syntactic_do_not:  PROG=0.986  KR=1.747  ← 完美但KR略高
+morphological_neg: PROG=0.858  KR=0.162
+scope_quantifier:  PROG=0.540  KR=1.472
+lexical_not_adj:   PROG=0.492  KR=0.959
+```
+
+→ existential_no/never 仅靠 L0-L3 的 4 层 attention 输出替换就能近乎完美重建（PROG>0.95）。scope_quantifier 需要更多层支持（PROG=0.54）。
+
+### 新增事实拼图
+
+1. Qwen3 L0-L3 Block 替换可近乎完美重建 existential_no 否定（PROG=0.96, KR=0.08）
+2. Qwen3 L0-L3 α 插值平滑（α=0.5 时 KR 从 4.78→2.21），非门控
+3. Block/Single 放大比最高 2.84x（L0-L3），晚期 Block 无放大
+4. scope_quantifier 在 Block [0-3] 仅 0.54 PROG，需要更深的层支持
+
+### GLM4 结果（77 否定对, 10 Blocks, 全层 L0-L39）
+
+Block 放大微弱：mean=1.11x, max=1.33x。GLM4 否定机制是局部单层操作，非分布式。
+
+```
+Block     Blk_Prog  Blk_KR  Sgl_Prog  Sgl_KR  Ratio
+[0-3]      0.343    14.27    0.287    11.32   1.20x
+[4-7]      0.424     7.62    0.320    13.06   1.33x  ← 最强
+[36-39]    0.368    13.19    0.316    13.15   1.17x
+```
+
+Block [4-7] α 插值：α=0→14.15, α=0.5→9.94, α=1.0→7.62。KR 始终 >7x（从未重建成功）。existential_no 子类型 prog=0.71（最高）。
+
+### DS7B 结果（77 否定对, 7 Blocks, 全层 L0-L27）
+
+深层 Block [24-27] 放大 2.18x，Block [0-3] 放大 1.82x。
+
+```
+Block     Blk_Prog  Blk_KR  Sgl_Prog  Sgl_KR  Ratio
+[0-3]      0.586    1.548    0.322    2.820   1.82x
+[24-27]    0.779    1.488    0.357    2.722   2.18x  ← 最强
+[4-7]      0.405    2.806    0.330    2.512   1.23x
+```
+
+Block [24-27] α 插值：α=0→2.60, α=0.5→1.97, α=1.0→1.49。平滑！子类型全高（scope_quantifier=0.886, syntactic=0.872, existential=0.811）。
+
+### 跨模型对比（Block 放大比）
+
+| 模型 | 最佳Block | 放大比 | Blk_Prog | Blk_KR | 分布式类型 |
+|------|----------|--------|----------|--------|------------|
+| Qwen3 | [0-3] 早层 | 2.84x | 0.786 | 0.85 | 早层强分布式 |
+| GLM4  | [4-7] 中层 | 1.33x | 0.424 | 7.62 | 局部单层（无放大） |
+| DS7B  | [24-27] 深层 | 2.18x | 0.779 | 1.49 | 深层分布式 |
+
+### D4: DS7B 深层分布式（重点发现）
+
+DS7B 的 Block [24-27] 是输出压缩层（L24-L27），但 Block 放大可达 2.18x。这意味着 DS7B 的否定功能在**深层重新激活**分布式契约——功能不是在早层形成后传递，而是在深层被多个层共同重新处理。
+
+### D5: GLM4 无 Block 放大（验证 Phase 288-290）
+
+Phase 288 发现 GLM4 attn patching KR=21x（极端过度转换），Phase 290 发现 MLP 拒绝。Phase 291 确认：即使同时替换 4 层 attention，GLM4 的 KR 仍保持 7-14x。**GLM4 否定功能需要注意力状态与 MLP 严格匹配的单层处理，不能通过多层累积改善。**
+
+### D6: Qwen3 vs DS7B 分布式位置差异
+
+Qwen3 分布式在 L0-L3（早层），DS7B 在 L24-L27（深层）。两者的"否定编码"不在同一层区——进一步否定"统一编码机制"，支持"架构决定编码位置"。
+
+### 删除事实拼图
+
+1. Qwen3 L0-L3 Block 放大 2.84x（强分布式），GLM4 无 Block 放大（max=1.33x），DS7B L24-L27 Block 放大 2.18x（深层分布式）
+2. GLM4 Block [4-7] α 插值 KR 始终 >7x（从未重建成功），与 Qwen3 α=1.0 KR=0.85 形成对比
+3. DS7B 深层 Block [24-27] 所有子类型 prog>0.59，scope_quantifier=0.886 最高
+4. 三模型用完全不同的层区实现否定分布式契约：Qwen3 早层、GLM4 无、DS7B 深层
+5. existential_no 在 Qwen3 和 DS7B 都可达 prog>0.81，但在 GLM4 仅 0.71
+
+### Phase 290 Deep Fix 补充结果
+
+深层修复成功：GLM4 全层 L0-L39 测试，0 ERR。GPU 层 prog=0.287/KR=14.53，CPU 层 prog=0.282/KR=14.51。深层行为与早中层一致。
+
+### 命令
+
+```bash
+python tests/glm5/phase291_multilayer_block.py qwen3      # 10min, 2772 results
+python tests/glm5/phase291_multilayer_block.py glm4        # 58min, 3080 results, 0 fails
+python tests/glm5/phase291_multilayer_block.py deepseek7b  # 22min, 2156 results, 0 fails
+```
+
+## Phase 292: Negation Contract Atlas [2026-05-28 12:20]
+
+### 设计思路
+
+Phase 292 在 Phase 291 基础上增加四个维度：
+
+A. **滑动 Block 热力图**：block_size=[1,2,4]，stride=block_size，全层扫描
+B. **位置特异 Patching**：operator(否定词)/operand(被否定内容)/last(预测位)/all
+C. **组件分解**：attn_only / mlp_only / both / resid_after
+D. **子类型 α 插值**：α=[0,0.25,0.5,0.75,1.0]，6 子类型分别测
+
+60 对否定句（每子类型 10 对），三模型全层测试（deep fix: output_t.device）。
+
+### 跨模型核心对比
+
+**Exp A: 最佳 Block**
+
+| 模型 | bs=1 最佳 | bs=4 最佳 | bs=4 PROG | bs=4 KR |
+|------|----------|----------|-----------|---------|
+| Qwen3 | L0 (0.573) | L0-3 (0.573) | 0.573 | 15.38 |
+| GLM4 | L38 (0.446) | L4-7 (0.447) | 0.447 | 28.01 |
+| DS7B | L3 (0.345) | L0-3 (0.327) | 0.327 | 6.85 |
+
+→ Block size 增大不增加 PROG（Phase 291 发现的放大是因为单层累加定义问题）。
+
+**Exp B: 位置敏感度 (operator - last)**
+
+| 模型 | operator | last | all | sensitivity |
+|------|---------|------|-----|-------------|
+| Qwen3 | 0.551 | 0.495 | 0.573 | **+0.056** |
+| GLM4 | 0.445 | 0.444 | 0.444 | +0.001 |
+| DS7B | 0.276 | 0.267 | 0.327 | +0.009 |
+
+→ **Qwen3 是唯一有位置特异性的模型**（operator > last，差异 0.056）。GLM4/DS7B 完全无位置差异。
+
+**Exp C: 组件敏感度 (mlp - attn)**
+
+| 模型 | attn | mlp | both | resid | mlp_advantage |
+|------|------|-----|------|-------|---------------|
+| Qwen3 | 0.573 | 0.570 | 0.572 | 0.572 | **-0.003** |
+| GLM4 | 0.444 | 0.448 | 0.448 | 0.448 | +0.004 |
+| DS7B | 0.327 | 0.377 | 0.371 | 0.371 | **+0.050** |
+
+→ **DS7B 是唯一 MLP > Attention 的模型**（mlp_adv=+0.050）。Qwen3 组件无差异，GLM4 无差异。
+
+**Exp D: 子类型 α 曲线（L0 Block）**
+
+Qwen3 关键子类型：
+```
+existential_no:    α0=0.621 α1=0.747 slope=+0.126 lin_dev=0.193 ← 非线性
+never:             α0=0.708 α1=0.703 slope=-0.006 lin_dev=0.004 ← 完全平坦
+scope_quantifier:  α0=0.490 α1=0.682 slope=+0.192 lin_dev=0.028 ← 线性
+syntactic_do_not:  α0=0.557 α1=0.689 slope=+0.133 lin_dev=0.031 ← 线性
+lexical_not_adj:   α0=0.154 α1=0.141 slope=-0.013 lin_dev=0.008 ← α无关
+```
+
+GLM4 所有子类型 α 曲线几乎平坦（slope < 0.01），α 不改变输出。
+
+DS7B 关键子类型：
+```
+never:             α0=-0.071 α1=0.255 slope=+0.326 lin_dev=0.210 ← 强非线性
+scope_quantifier:  α0=0.403 α1=0.694 slope=+0.291 lin_dev=0.039 ← 线性
+syntactic_do_not:  α0=0.209 α1=0.017 slope=-0.192 lin_dev=0.165 ← 负斜率！
+morphological_neg: α0=0.563 α1=0.441 slope=-0.122 lin_dev=0.131 ← 负斜率！
+```
+
+### D1: Qwen3 的位置特异性是真实信号
+
+Qwen3 L0 Block 的 operator(0.551) > last(0.495)，差异 0.056。虽然绝对值不大，但 GLM4 和 DS7B 的对应差异仅 0.001-0.009，说明**Qwen3 在早层对否定词位置有特异处理**，而其他模型无。
+
+### D2: DS7B 的 MLP 优势在 Phase 292 被确认
+
+DS7B L0 Block 的 mlp_only(0.377) > attn_only(0.327)，差异 0.050。这是三模型中唯一显著的组件偏好。与 Phase 291 "DS7B 深层分布式"一致——DS7B 的否定功能更依赖 MLP 重编码。
+
+### D3: DS7B syntactic_do_not 负 α 斜率
+
+DS7B 的 syntactic_do_not 在 L0 Block：α=0 时 prog=0.209，α=1 时 prog=0.017。增加注意力替换反而**降低** progress。与 Phase 290 的"敌对契约"一致——DS7B 的 MLP 不仅拒绝外来 attention，还反向推动。
+
+### D4: Qwen3 never 的 α 完全平坦
+
+Qwen3 never：α0=0.708, α0.5=0.709, α1=0.703。无论是否替换 attention，progress 恒定在 0.70。
+
+这意味着 **never 的否定功能不经过 attention 路由**，而是通过词嵌入或残差流直接编码。
+
+### D5: GLM4 α 完全无效应
+
+GLM4 所有子类型的 α slope 均 < 0.01。α 从 0 到 1 完全不改变输出。这意味着 **GLM4 的否定功能与 attention 输出无关**——功能完全由残差流或 MLP 内部状态决定，attention 替换被系统完全忽略。
+
+### D6: Synergy 全为负的物理解释
+
+block4_prog - sum_of_single_prog 全为负（-0.6 到 -1.5），但这不是"无协同"，而是 PROG 指标的非线性特性：单层替换的 PROG 已经包含了残差流传播的下游效应，4 层的 sum 是重复计算。
+
+正确的协同指标应该是：block4_KL_ratio / min(single_KL_ratios)，即 Block 是否比单层更有效地缩小 KL。
+
+### 新增客观事实拼图（10条）
+
+1. Qwen3 唯一有位置特异性（operator > last, +0.056），GLM4/DS7B 无位置差异
+2. DS7B 唯一有 MLP 优势（mlp_adv=+0.050），Qwen3/GLM4 无组件差异
+3. Qwen3 never 的 α 曲线完全平坦（slope=-0.006），否定功能不经 attention 路由
+4. GLM4 α 完全无效应（所有子类型 slope < 0.01），否定不依赖 attention 输出
+5. DS7B syntactic_do_not α 负斜率（-0.192），增加 attn 替换反而降低 progress
+6. DS7B morphological_neg α 负斜率（-0.122），同为敌对契约
+7. Qwen3 existential_no 非线性 α 曲线（lin_dev=0.193），α=0 时已有高 prog(0.62)
+8. Qwen3 scope_quantifier 最强 α 效应（slope=+0.192），线性递增
+9. Block size 增大不增加 PROG（三模型一致），否定是单层可实现的
+10. GLM4 KR 始终 ~28x（vs Qwen3 ~15x, DS7B ~7x），over-conversion 最严重
+
+### 硬伤分析
+
+1. **位置标注粗糙**：operator_pos 用 tokenizer 编码位置查找，可能不准（如 "do not" 被分成 2 个 token）
+2. **resid_after 实现为 both**：resid_after 条件实际替换了 attn+mlp，没有区分
+3. **Synergy 计算方法不当**：直接减 sum 会因为 PROG 非线性产生负值
+4. **60 对/模型，每子类型仅 10 对**：DS7B never 的 α0=-0.071 需要更大样本验证
+5. **GLM4 α 无效应可能是 KR 过高掩盖**：KR=28x 时 progress 方向信息被淹没
+
+### 命令记录
+
+```bash
+python tests/glm5/phase292_contract_atlas.py qwen3      # 4.2min, 5820 results
+python tests/glm5/phase292_contract_atlas.py glm4        # 108min, 6240 results
+python tests/glm5/phase292_contract_atlas.py deepseek7b  # 54min, 4980 results
+python tests/glm5_temp/phase292_compare.py               # 跨模型对比
+```
+
+### 数据文件
+
+- `results/phase292_contract_atlas/{qwen3,glm4,deepseek7b}_atlas.json`
+- `tests/glm5/phase292_contract_atlas.py`
+- `tests/glm5_temp/phase292_compare.py`
+
+### 关键洞察
+
+Phase 292 最重要的发现是**三模型的否定契约维度完全不同**：
+
+- Qwen3 的否定有**位置维度**（operator > last），其他模型无
+- DS7B 的否定有**组件维度**（MLP > Attn），其他模型无
+- GLM4 的否定**无任何维度差异**（位置、组件、α 全无效应）
+
+这意味着语言功能的"契约结构"不是语言本身决定的，而是架构决定的。同一否定功能在三模型中走了完全不同的路径。
+
+下一步：
+- 验证 Qwen3 never 的"不经 attention 路由"假设（测试词嵌入 patching）
+- 验证 GLM4 α 无效应是否因 KR 过高（用 KL-weighted progress 或 resid patching）
+- 扩展到翻译、逻辑功能，构建功能复用矩阵
+
+
+
+
 
