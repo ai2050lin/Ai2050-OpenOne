@@ -7787,3 +7787,3356 @@ DeepSeek7B:
 
 4. Phase 38：变量解码 pilot。
    - 优先从 tense、passive、logical 三组做。
+
+## Phase 35: 扩展功能库全量动态重算与 GSSC v1 Dynamic [2026-05-28 17:21]
+
+### 任务目标
+
+根据“全局语义语法契约图谱 GSSC Map”的设计，本轮补齐 Phase 34 最大缺口：扩展 45 subtype 功能库的动态重算曲线。
+
+本轮不使用保守脚本，按用户要求使用正常模式：
+
+```text
+CUDA_LAUNCH_BLOCKING = 0
+PYTORCH_NO_CUDA_MEMORY_CACHING = 0
+torch_dtype = bfloat16
+attn_implementation = sdpa
+device_map_auto_models = glm4,deepseek7b
+max_gpu_memory = 21GiB
+```
+
+并且每个模型单独进程运行，使用：
+
+```text
+--hard-exit-after-model
+```
+
+确保一个模型结束后退出进程、释放显存，再加载下一个模型。
+
+### 对 GSSC 方案的判断
+
+用户提出的“全局语义语法契约图谱”方向是正确的，但必须严格限定当前证据：
+
+```text
+1. 大量测试数据只能提供覆盖度，不能自动推出语言编码原理。
+2. 真正关键的是：功能分类、反事实干预、动态重算、自然性检验、变量解码、复用/分化矩阵、模块定位。
+3. 当前还没有变量解码，因此本轮仍然属于路径图谱和行为图谱，不是最终编码内容图谱。
+4. 但 expanded dynamic recompute 是 GSSC 的关键基础数据，因为它测试 patch 后后续自然 forward 是否能接上。
+```
+
+因此本轮任务是：
+
+```text
+补齐 45 subtype 的 dynamic recompute 数据，
+把它合并到 expanded GSSC/GFCM v1 dynamic 图谱，
+并记录正常模式下的运行稳定性。
+```
+
+### 新增脚本
+
+新增正常模式单模型运行器：
+
+```text
+tests/gpt5/run_phase294_normal.sh
+```
+
+功能：
+
+```text
+1. 使用 openone-cuda121 环境。
+2. 使用 BF16 + SDPA。
+3. GLM4 和 DeepSeek7B 使用 device_map="auto"。
+4. 默认不启用 CUDA_LAUNCH_BLOCKING。
+5. 默认不禁用 CUDA memory cache。
+6. 每轮启动 kernel follower 与 GPU/process monitor。
+7. 运行 phase294_dynamic_recompute_pilot.py 时强制加入 --hard-exit-after-model。
+8. 保存 run.log、gpu_process_monitor.log、kernel.follow.log、kernel.since-start.filtered.log。
+```
+
+新增三模型顺序运行器：
+
+```text
+tests/gpt5/run_phase298_expanded_dynamic_normal_all.sh
+```
+
+功能：
+
+```text
+1. 顺序运行 qwen3 -> glm4 -> deepseek7b。
+2. 每个模型独立进程，结束后查询 compute apps。
+3. 任一模型失败时默认停止，方便检查日志和 resume。
+4. 支持 checkpoint resume。
+```
+
+新增结果汇总脚本：
+
+```text
+tests/gpt5/phase298_dynamic_summary.py
+```
+
+输出：
+
+```text
+results/gpt5_phase298_expanded_dynamic_normal/expanded_dynamic_summary.json
+results/gpt5_phase298_expanded_dynamic_normal/EXPANDED_DYNAMIC_SUMMARY.md
+```
+
+### 测试命令
+
+正式运行命令：
+
+```bash
+MAX_PAIRS_PER_SUBTYPE=999 \
+QWEN3_MAX_SECONDS=14400 \
+GLM4_MAX_SECONDS=18000 \
+DEEPSEEK7B_MAX_SECONDS=14400 \
+OUTPUT_DIR=results/gpt5_phase298_expanded_dynamic_normal \
+tests/gpt5/run_phase298_expanded_dynamic_normal_all.sh
+```
+
+Qwen3 正常模式在 224/244 pair 处发生用户态 segmentation fault：
+
+```text
+exit_code = 139
+checkpoint rows = 40320
+kernel.since-start.filtered.log = 0 行
+```
+
+随后 resume：
+
+```bash
+MAX_PAIRS_PER_SUBTYPE=999 \
+QWEN3_MAX_SECONDS=7200 \
+GLM4_MAX_SECONDS=18000 \
+DEEPSEEK7B_MAX_SECONDS=14400 \
+OUTPUT_DIR=results/gpt5_phase298_expanded_dynamic_normal \
+tests/gpt5/run_phase298_expanded_dynamic_normal_all.sh
+```
+
+GLM4 正常模式在 88/244 pair 处发生用户态 segmentation fault：
+
+```text
+exit_code = 139
+checkpoint rows = 15840
+kernel.since-start.filtered.log = 0 行
+```
+
+随后 resume：
+
+```bash
+MAX_PAIRS_PER_SUBTYPE=999 \
+QWEN3_MAX_SECONDS=1200 \
+GLM4_MAX_SECONDS=18000 \
+DEEPSEEK7B_MAX_SECONDS=14400 \
+OUTPUT_DIR=results/gpt5_phase298_expanded_dynamic_normal \
+tests/gpt5/run_phase298_expanded_dynamic_normal_all.sh
+```
+
+Qwen3 checkpoint 已 complete，自动跳过；GLM4 从 88 pair 继续，最终完成；DeepSeek7B 一次完成。
+
+### 输出文件
+
+动态重算输出：
+
+```text
+results/gpt5_phase298_expanded_dynamic_normal/qwen3_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase298_expanded_dynamic_normal/glm4_phase294_dynamic_recompute_pilot.json
+results/gpt5_phase298_expanded_dynamic_normal/deepseek7b_phase294_dynamic_recompute_pilot.json
+```
+
+checkpoints：
+
+```text
+results/gpt5_phase298_expanded_dynamic_normal/checkpoints/qwen3/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_dynamic_normal.json
+results/gpt5_phase298_expanded_dynamic_normal/checkpoints/glm4/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_dynamic_normal.json
+results/gpt5_phase298_expanded_dynamic_normal/checkpoints/deepseek7b/coreference-logical-negation-passive-recursive-style-tense-translation_expanded_dynamic_normal.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_143141_phase294normal_qwen3
+results/gpt5_gpu_lock_logs/20260528_151538_phase294normal_qwen3
+results/gpt5_gpu_lock_logs/20260528_151945_phase294normal_glm4
+results/gpt5_gpu_lock_logs/20260528_154645_phase294normal_qwen3
+results/gpt5_gpu_lock_logs/20260528_154656_phase294normal_glm4
+results/gpt5_gpu_lock_logs/20260528_163056_phase294normal_deepseek7b
+```
+
+所有上述日志的：
+
+```text
+kernel.since-start.filtered.log = 0 行
+```
+
+说明本轮没有捕获到 NVRM/Xid/GSP/GPU locked/kernel hang 级别日志。Qwen3 和 GLM4 的问题是用户态进程崩溃，不是系统级 GPU 锁死。
+
+### 数据规模
+
+```text
+function library:
+  categories = 8
+  subtypes = 45
+  pairs = 244
+
+Qwen3:
+  target_layers = L0-L8
+  pairs = 244
+  rows = 43920
+  nonfinite_rows = 0
+
+GLM4:
+  target_layers = L0-L8
+  pairs = 244
+  rows = 43920
+  nonfinite_rows = 0
+
+DeepSeek7B:
+  target_layers = L20-L27
+  pairs = 244
+  rows = 39040
+  nonfinite_rows = 0
+
+total dynamic rows = 126880
+```
+
+### Qwen3 客观结果
+
+全局 summary 中，按所有 alpha 平均的 patch 最优：
+
+```text
+attn_out:
+  best_layer = 0
+  progress = 0.333718
+
+mlp_out:
+  best_layer = 0
+  progress = 0.386442
+
+resid_in:
+  best_layer = 4
+  progress = 0.488311
+
+resid_out:
+  best_layer = 3
+  progress = 0.488309
+```
+
+按 alpha=1 的 subtype 最优分布：
+
+```text
+best_patch_counts:
+  resid_out = 25
+  resid_in = 10
+  mlp_out = 6
+  attn_out = 4
+
+best_layer_counts:
+  L0 = 21
+  L1 = 1
+  L2 = 1
+  L3 = 3
+  L4 = 1
+  L6 = 7
+  L7 = 5
+  L8 = 6
+```
+
+top subtype：
+
+```text
+en_zh_phrase:
+  category = translation
+  best = resid_out L0
+  progress = 1.377287
+
+en_fr_phrase:
+  category = translation
+  best = resid_out L1
+  progress = 1.203791
+
+he_coref:
+  category = coreference
+  best = mlp_out L0
+  progress = 1.180285
+
+en_fr_word:
+  category = translation
+  best = resid_out L7
+  progress = 1.052615
+
+causal:
+  category = logical
+  best = attn_out L0
+  progress = 1.034798
+```
+
+bottom subtype：
+
+```text
+it_coref:
+  best = resid_out L7
+  progress = 0.396908
+
+double_relative:
+  best = resid_out L4
+  progress = 0.473765
+
+deep_complement:
+  best = resid_out L8
+  progress = 0.549443
+
+nested_condition:
+  best = mlp_out L3
+  progress = 0.615510
+
+perfect:
+  best = attn_out L0
+  progress = 0.623038
+```
+
+客观现象：
+
+```text
+1. Qwen3 的动态重算最强模块仍集中在浅层。
+2. L0 是大量 subtype 的最佳层，支持浅层写入/启动。
+3. resid_out/resid_in 多于 attn_out/mlp_out，说明单模块输出不能覆盖全部动态效果，残差状态仍是更强上界。
+4. translation/coreference 中存在 progress > 1 的 over-conversion，需要谨慎解释，不能当作贡献大于 1。
+```
+
+### GLM4 客观结果
+
+按所有 alpha 平均的 patch 最优：
+
+```text
+attn_out:
+  best_layer = 1
+  progress = 0.081681
+
+mlp_out:
+  best_layer = 0
+  progress = 0.490105
+
+resid_in:
+  best_layer = 2
+  progress = 0.590795
+
+resid_out:
+  best_layer = 1
+  progress = 0.590795
+```
+
+按 alpha=1 的 subtype 最优分布：
+
+```text
+best_patch_counts:
+  resid_out = 29
+  resid_in = 14
+  mlp_out = 2
+
+best_layer_counts:
+  L0 = 19
+  L1 = 4
+  L3 = 2
+  L4 = 1
+  L5 = 2
+  L6 = 1
+  L7 = 2
+  L8 = 14
+```
+
+top subtype：
+
+```text
+dative_passive:
+  category = passive
+  best = resid_out L1
+  progress = 1.122602
+
+get_passive:
+  category = passive
+  best = resid_in L0
+  progress = 1.062892
+
+long_passive:
+  category = passive
+  best = resid_out L1
+  progress = 1.047683
+
+by_phrase:
+  category = passive
+  best = resid_in L0
+  progress = 1.039192
+
+complement_clause:
+  category = recursive
+  best = resid_out L6
+  progress = 1.027453
+```
+
+bottom subtype：
+
+```text
+nested_condition:
+  best = resid_out L8
+  progress = 0.866974
+
+double_relative:
+  best = resid_out L8
+  progress = 0.869599
+
+pp_chain:
+  best = resid_out L5
+  progress = 0.874349
+
+it_coref:
+  best = resid_out L8
+  progress = 0.877729
+
+possessive_chain:
+  best = resid_out L8
+  progress = 0.894064
+```
+
+客观现象：
+
+```text
+1. GLM4 的 attn_out 动态效果非常弱，best progress 仅 0.081681。
+2. L0 mlp_out 仍然明显强于 attention，符合浅层 MLP 写入型判断。
+3. 但 subtype 最优主要落在 resid_in/resid_out，而不是 mlp_out，说明 MLP 写入之后的 residual 状态是更可重算的路径载体。
+4. passive 子类在 GLM4 中尤其强，top 4 全是 passive，这和之前 GLM4 MLP/residual 对角色/语态类敏感的现象一致。
+```
+
+### DeepSeek7B 客观结果
+
+按所有 alpha 平均的 patch 最优：
+
+```text
+attn_out:
+  best_layer = 27
+  progress = 0.288754
+
+mlp_out:
+  best_layer = 27
+  progress = 0.250668
+
+resid_in:
+  best_layer = 21
+  progress = 0.278892
+
+resid_out:
+  best_layer = 27
+  progress = 0.483323
+```
+
+按 alpha=1 的 subtype 最优分布：
+
+```text
+best_patch_counts:
+  resid_out = 32
+  resid_in = 9
+  attn_out = 3
+  mlp_out = 1
+
+best_layer_counts:
+  L20 = 9
+  L22 = 1
+  L23 = 1
+  L24 = 1
+  L26 = 1
+  L27 = 32
+```
+
+top subtype：
+
+```text
+concise:
+  category = style
+  best = resid_out L24
+  progress = 1.109055
+
+existential_no:
+  category = negation
+  best = resid_out L23
+  progress = 1.097377
+
+deep_complement:
+  category = recursive
+  best = attn_out L27
+  progress = 1.083397
+
+deictic_switch:
+  category = coreference
+  best = mlp_out L26
+  progress = 1.056671
+
+pp_chain:
+  category = recursive
+  best = attn_out L27
+  progress = 1.048624
+```
+
+bottom subtype 的 best progress 也接近 1：
+
+```text
+double_relative = 0.999981
+nested_contrast = 0.999984
+long_passive = 0.999985
+he_coref = 0.999985
+en_zh_word = 0.999986
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 的 alpha=1 subtype 最优几乎都能达到接近 1。
+2. 大多数 subtype 最优集中在 L27 resid_out。
+3. 这说明 L27 resid_out 非常接近 output-ready 表示，是强输出接口/释放点。
+4. 但这不等于 DeepSeek7B 的完整机制只在 L27，因为 Phase 34 block scan 已显示 L20-L27 block 远强于 L27 单层 both patch。
+5. 因此更合理的客观描述是：DeepSeek7B 的单点动态读出在 L27 最强，但完整路径仍可能依赖 L20-L27 的多点轨迹累积。
+```
+
+### GSSC v1 Dynamic 构建
+
+命令：
+
+```bash
+python tests/gpt5/phase295_global_contract_mapping.py \
+  --phase290-dir results/gpt5_phase296_expanded_function_pilot \
+  --phase291-dir results/gpt5_phase297_expanded_block_pilot \
+  --phase293-dir results/gpt5_phase293_naturalness \
+  --phase294-dir results/gpt5_phase298_expanded_dynamic_normal \
+  --output-dir results/gpt5_phase298_expanded_gssc_v1_dynamic \
+  --top-k 30
+```
+
+输出：
+
+```text
+results/gpt5_phase298_expanded_gssc_v1_dynamic/GLOBAL_CONTRACT_MAPPING_REPORT.md
+results/gpt5_phase298_expanded_gssc_v1_dynamic/global_mapping_summary.csv
+results/gpt5_phase298_expanded_gssc_v1_dynamic/global_contract_maps.json
+results/gpt5_phase298_expanded_gssc_v1_dynamic/*_global_similarity.csv
+results/gpt5_phase298_expanded_gssc_v1_dynamic/*_global_zscore_top_pairs.csv
+results/gpt5_phase298_expanded_gssc_v1_dynamic/*_global_zscore_bottom_pairs.csv
+```
+
+GSSC v1 dynamic 数据规模：
+
+```text
+Qwen3:
+  phase290_rows = 3780
+  phase291_rows = 6300
+  phase293_event_rows = 784
+  phase294_rows = 43920
+  subtypes = 45
+  features_min = 346
+  features_max = 368
+  combined_mean = 0.865291
+  combined_min = 0.377526
+  combined_max = 0.997370
+  same_category_mean = 0.892881
+  cross_category_mean = 0.861807
+
+GLM4:
+  phase290_rows = 3780
+  phase291_rows = 7560
+  phase293_event_rows = 1468
+  phase294_rows = 43920
+  subtypes = 45
+  features_min = 366
+  features_max = 388
+  combined_mean = 0.922709
+  combined_min = 0.751590
+  combined_max = 0.998955
+  same_category_mean = 0.947678
+  cross_category_mean = 0.919556
+
+DeepSeek7B:
+  phase290_rows = 3780
+  phase291_rows = 6300
+  phase293_event_rows = 1078
+  phase294_rows = 39040
+  subtypes = 45
+  features_min = 334
+  features_max = 356
+  combined_mean = 0.851783
+  combined_min = 0.570001
+  combined_max = 0.981900
+  same_category_mean = 0.876334
+  cross_category_mean = 0.848683
+```
+
+相对于 Phase 34 partial，加入 expanded dynamic 后：
+
+```text
+Qwen3:
+  0.8022 -> 0.8653
+
+GLM4:
+  0.8518 -> 0.9227
+
+DeepSeek7B:
+  0.7962 -> 0.8518
+```
+
+解释需要谨慎：
+
+```text
+动态曲线加入后相似度上升，说明很多 subtype 在动态重算层面共享较强模型整体模式。
+这不等于真实语言功能复用已经成立。
+必须继续做 residualized/z-score、变量解码和自然性升级来过滤模型整体曲线。
+```
+
+### GSSC v1 Dynamic 候选现象
+
+Qwen3 top reuse candidates：
+
+```text
+future_will / perfect:
+  combined = 0.9974
+  layer = 0.9967
+  block = 0.9973
+  dynamic = 0.9944
+
+future_will / progressive:
+  combined = 0.9961
+  dynamic = 0.9941
+
+perfect / progressive:
+  combined = 0.9948
+  dynamic = 0.9894
+
+causal / contrast:
+  combined = 0.9899
+  dynamic = 0.9973
+```
+
+Qwen3 bottom differentiation candidates：
+
+```text
+concise / syntactic_do_not:
+  combined = 0.3775
+  dynamic = 0.6545
+
+by_phrase / concise:
+  combined = 0.4109
+
+center_embedding / concise:
+  combined = 0.4166
+```
+
+GLM4 top reuse candidates：
+
+```text
+future_will / perfect:
+  combined = 0.9990
+  dynamic = 0.9986
+
+perfect / progressive:
+  combined = 0.9989
+  dynamic = 0.9991
+
+future_will / progressive:
+  combined = 0.9988
+
+conditional / contrast:
+  combined = 0.9964
+
+long_passive / nested_passive:
+  combined = 0.9963
+```
+
+GLM4 bottom differentiation candidates：
+
+```text
+it_coref / scope_quantifier:
+  combined = 0.7516
+
+it_coref / lexical_not_adj:
+  combined = 0.7572
+
+it_coref / never:
+  combined = 0.7574
+```
+
+DeepSeek7B top reuse candidates：
+
+```text
+future_will / perfect:
+  combined = 0.9819
+
+by_phrase / get_passive:
+  combined = 0.9814
+  dynamic = 0.9912
+
+formal / negated_condition:
+  combined = 0.9809
+
+and_or / morphological_neg:
+  combined = 0.9775
+
+by_phrase / relative_clause:
+  combined = 0.9741
+```
+
+DeepSeek7B bottom differentiation candidates：
+
+```text
+complement_clause / they_coref:
+  combined = 0.5700
+
+complement_clause / concise:
+  combined = 0.6104
+
+complement_clause / en_zh_word:
+  combined = 0.6366
+```
+
+### 本轮最重要的新事实
+
+```text
+1. 扩展 45 subtype、244 pairs 的动态重算已完成，新增 126880 rows。
+2. 三模型 nonfinite_rows 全部为 0。
+3. Qwen3 和 GLM4 在正常模式长 session 下都出现过用户态 segfault 139，但 kernel filtered log 为 0 行，checkpoint/resume 成功补完。
+4. DeepSeek7B 正常模式一次完成，没有用户态崩溃。
+5. Qwen3 动态最佳仍集中浅层，支持浅层启动/传播。
+6. GLM4 attn_out 极弱，mlp_out L0 明显强，residual 状态更强，支持浅层 MLP 写入 + residual 传播。
+7. DeepSeek7B L27 resid_out 对几乎所有 subtype 都极强，支持末层输出接口/释放点；但完整 block 机制仍需分段动态重算确认。
+8. GSSC v1 dynamic 已能整合 single-layer、block、naturalness event、dynamic recompute 四类行为签名。
+```
+
+### 硬伤
+
+```text
+1. Dynamic recompute 仍是行为证据，不是变量编码证据。
+2. progress > 1 的 subtype 存在 over-conversion，不能解释为贡献超过完整转换。
+3. DeepSeek7B 的 L27 resid_out 过强，可能掩盖 L20-L27 内部多点轨迹。
+4. naturalness 仍使用旧的 norm-based event，尚未对 expanded dynamic 结果做完整自然性升级。
+5. 当前 GSSC v1 dynamic 的高相似度仍可能被模型整体曲线主导。
+6. 每个 subtype 数量虽已使用当前库全部 244 pairs，但某些新增类别如 style/coreference/translation 的语言多样性仍有限。
+7. 正常模式下 Qwen3/GLM4 用户态 segfault 说明长 session 仍不够稳，虽然没有 GPU kernel 锁死。
+```
+
+### 当前理论进展的谨慎表述
+
+不能说已经破解语言整体编码机制。
+
+当前可以更稳地说：
+
+```text
+在扩展 45 subtype 功能库上，三模型表现出稳定但不同的路径组织方式：
+
+Qwen3:
+  浅层动态启动明显，L0 模块与 L0-L8 residual 传播都重要。
+
+GLM4:
+  attention 输出动态作用极弱，L0 MLP 和早层 residual 状态更关键。
+
+DeepSeek7B:
+  L27 resid_out 是强输出释放点，但结合 block scan，完整机制更像 L20-L27 多层轨迹累积。
+```
+
+这支持“路径格式假说”的弱版本：
+
+```text
+语言功能不是单个静态语义轴，而是沿 residual trajectory 形成；
+attention、MLP、residual 在不同模型中承担不同路径组织方式；
+功能复用/分化需要通过 layer/block/dynamic/naturalness/variable decoding 多维图谱共同确认。
+```
+
+但它还没有回答：
+
+```text
+路径里传递的具体语言变量是什么。
+```
+
+因此下一阶段必须从“路径行为图谱”推进到“路径变量图谱”。
+
+### 下一步计划
+
+Phase 36：expanded dynamic naturalness。
+
+```text
+目标：
+  对 results/gpt5_phase298_expanded_dynamic_normal 的动态 patch 状态加入自然性判断。
+
+内容：
+  1. 建立 expanded natural norm reference。
+  2. 对 resid_in/resid_out/attn_out/mlp_out patch 状态计算 norm z-score。
+  3. 标记 progress 高但 off-manifold 的样本。
+  4. 区分 on-manifold functional success/failure 与 off-manifold artifact。
+```
+
+Phase 37：DeepSeek7B segment dynamic recompute。
+
+```text
+目标：
+  拆开 L20-L27 深层轨迹。
+
+测试：
+  1. patch L20-L23, recompute L24-L27
+  2. patch L24-L27
+  3. patch L20-L26, recompute L27
+  4. patch every other layer
+  5. L27 attn_out / mlp_out 与前段 block 组合
+```
+
+Phase 38：变量解码 pilot。
+
+```text
+优先变量：
+  polarity
+  voice
+  operator
+  role binding
+  clause boundary
+  tense/aspect
+  coreference target
+
+优先对象：
+  GLM4 passive
+  Qwen3 logical
+  DeepSeek7B recursive/complement
+```
+
+Phase 39：GSSC v2。
+
+```text
+合并：
+  layer curve
+  block curve
+  dynamic curve
+  naturalness curve
+  variable decoding curve
+
+输出：
+  1. 功能复用矩阵
+  2. 功能分化矩阵
+  3. 模型对齐矩阵
+  4. 复杂度迁移矩阵
+```
+
+## Phase 36: Dynamic Naturalness 与 Residualized GSSC 过滤 [2026-05-28 18:08]
+
+### 任务目标
+
+根据最新判断，GSSC v1 Dynamic 和语言动态编码闭包工程不是二选一，而是上下游关系：
+
+```text
+GSSC v1 Dynamic:
+  负责发现候选路径、候选功能、候选模型差异。
+
+语言动态编码闭包工程:
+  负责变量解码、变量替换、变量恢复、动态重算闭包验证。
+```
+
+因此本轮不继续盲目扩大功能库，而是先修正 GSSC v1 Dynamic 的证据质量：
+
+```text
+1. 对 expanded dynamic recompute 做 norm/z-score naturalness。
+2. 对 GSSC v1 Dynamic 做 residualized similarity，过滤模型整体曲线污染。
+3. 为后续变量闭包工程筛选更可靠的候选对象。
+```
+
+本轮不重新加载模型，不新增 GPU 测试，直接分析 Phase 35 已生成的：
+
+```text
+results/gpt5_phase298_expanded_dynamic_normal
+results/gpt5_phase298_expanded_gssc_v1_dynamic
+```
+
+### 对用户分析的判断
+
+用户分析中正确的部分：
+
+```text
+1. GSSC 是全局路径图谱，不是最终编码机制证明。
+2. 语言动态编码闭包工程是局部机制证明路线。
+3. 二者应当串联：GSSC 找哪里有机制，闭包工程证明机制是什么。
+4. 当前 GSSC 最大硬伤是变量解码不足、自然性不足、整体曲线污染。
+5. 现在不应继续盲目扩 subtype，而应先做 naturalness、residualized similarity 和变量 pilot。
+6. GLM4 passive、Qwen3 logical、DeepSeek7B recursive/complement 是合理的闭包工程候选突破口。
+```
+
+需要谨慎的部分：
+
+```text
+1. 本轮 naturalness 只能做 norm/z-score，不能等价于 PCA/kNN/Mahalanobis 流形距离。
+2. residualized similarity 只能过滤部分整体曲线污染，不能证明真实机制复用。
+3. high progress、over-conversion、on-manifold 仍然只是候选证据，需要变量替换和恢复测试。
+```
+
+### 新增脚本
+
+新增动态自然性分析：
+
+```text
+tests/gpt5/phase299_dynamic_naturalness.py
+```
+
+输入：
+
+```text
+results/gpt5_phase298_expanded_dynamic_normal
+```
+
+输出：
+
+```text
+results/gpt5_phase299_dynamic_naturalness/dynamic_norm_reference.csv
+results/gpt5_phase299_dynamic_naturalness/dynamic_naturalness_events.csv
+results/gpt5_phase299_dynamic_naturalness/dynamic_naturalness_summary.csv
+results/gpt5_phase299_dynamic_naturalness/dynamic_naturalness_subtype_summary.csv
+results/gpt5_phase299_dynamic_naturalness/dynamic_naturalness_patch_layer_summary.csv
+results/gpt5_phase299_dynamic_naturalness/DYNAMIC_NATURALNESS_REPORT.md
+```
+
+原理：
+
+```text
+1. 对每个 model/layer/patch_type，用 a_ref_norm 与 b_ref_norm 建立自然 norm reference。
+2. 对 patch_norm 计算 norm_z。
+3. 标记 off_manifold、high_progress、over_conversion、negative_progress。
+4. 区分：
+   on_manifold_high_progress
+   off_manifold_high_progress
+   on_manifold_over_conversion
+   off_manifold_over_conversion
+```
+
+限制：
+
+```text
+没有激活向量，因此不能计算 PCA residual distance、kNN distance、Mahalanobis distance。
+没有保存完整 logits，因此不能计算 loss_delta、entropy、logit margin。
+```
+
+新增 residualized similarity 分析：
+
+```text
+tests/gpt5/phase299_gssc_residualized_similarity.py
+```
+
+输入：
+
+```text
+results/gpt5_phase298_expanded_gssc_v1_dynamic/global_contract_maps.json
+```
+
+输出：
+
+```text
+results/gpt5_phase299_gssc_residualized_dynamic/RESIDUALIZED_SIMILARITY_REPORT.md
+results/gpt5_phase299_gssc_residualized_dynamic/residualized_similarity_summary.csv
+results/gpt5_phase299_gssc_residualized_dynamic/*_residualized_pair_diagnostics.csv
+results/gpt5_phase299_gssc_residualized_dynamic/*_stable_reuse_candidates.csv
+results/gpt5_phase299_gssc_residualized_dynamic/*_stable_differentiation_candidates.csv
+```
+
+原理：
+
+```text
+对每个模型的 GSSC group-normalized signature，计算：
+  raw similarity
+  model-centered similarity
+  category-centered similarity
+  group-centered similarity
+  zscore similarity
+
+并标记：
+  residual_stable_reuse_candidate
+  model_curve_artifact_candidate
+  category_curve_artifact_candidate
+  stable_differentiation_candidate
+```
+
+### 运行命令
+
+Dynamic naturalness：
+
+```bash
+python tests/gpt5/phase299_dynamic_naturalness.py \
+  --input-dir results/gpt5_phase298_expanded_dynamic_normal \
+  --output-dir results/gpt5_phase299_dynamic_naturalness \
+  --z-threshold 3.0 \
+  --success-threshold 0.8 \
+  --over-threshold 1.05
+```
+
+Residualized GSSC：
+
+```bash
+python tests/gpt5/phase299_gssc_residualized_similarity.py \
+  --input results/gpt5_phase298_expanded_gssc_v1_dynamic/global_contract_maps.json \
+  --output-dir results/gpt5_phase299_gssc_residualized_dynamic \
+  --top-k 30
+```
+
+### Dynamic Naturalness 结果
+
+整体结果：
+
+```text
+Qwen3:
+  total_rows = 43920
+  off_manifold_rows = 84
+  off_manifold_rate = 0.001913
+  on_manifold_high_progress_rows = 7289
+  on_manifold_high_progress_rate = 0.165961
+  off_manifold_high_progress_rows = 10
+  on_manifold_over_conversion_rows = 1587
+  off_manifold_over_conversion_rows = 2
+
+GLM4:
+  total_rows = 43920
+  off_manifold_rows = 171
+  off_manifold_rate = 0.003893
+  on_manifold_high_progress_rows = 10843
+  on_manifold_high_progress_rate = 0.246881
+  off_manifold_high_progress_rows = 75
+  on_manifold_over_conversion_rows = 776
+  off_manifold_over_conversion_rows = 0
+
+DeepSeek7B:
+  total_rows = 39040
+  off_manifold_rows = 145
+  off_manifold_rate = 0.003714
+  on_manifold_high_progress_rows = 3600
+  on_manifold_high_progress_rate = 0.092213
+  off_manifold_high_progress_rows = 19
+  on_manifold_over_conversion_rows = 869
+  off_manifold_over_conversion_rows = 11
+```
+
+客观现象：
+
+```text
+1. 三模型 norm/z-score off_manifold 比例都低于 0.4%。
+2. 因此不能把 GSSC dynamic 的高 progress 整体解释为“范数离谱导致的伪影”。
+3. 但仍有少量 off_manifold_high_progress，需要在后续变量解码前过滤。
+4. over_conversion 大多数是 on_manifold_norm 层面，不是简单范数异常。
+```
+
+top off_manifold subtype：
+
+```text
+Qwen3:
+  en_zh_word = 23
+  target_language_switch = 21
+  nested_contrast = 12
+  en_zh_phrase = 7
+
+GLM4:
+  deep_complement = 134
+  long_passive = 18
+  double_relative = 5
+  en_fr_phrase = 5
+
+DeepSeek7B:
+  no_agent = 19
+  syntactic_do_not = 16
+  deep_complement = 13
+  complement_clause = 12
+```
+
+top over_conversion subtype：
+
+```text
+Qwen3:
+  lexical_not_adj = 192
+  syntactic_do_not = 152
+  by_phrase = 134
+  center_embedding = 129
+  get_passive = 114
+
+GLM4:
+  dative_passive = 214
+  get_passive = 173
+  by_phrase = 116
+  complement_clause = 73
+  long_passive = 65
+
+DeepSeek7B:
+  conditional = 100
+  causal = 87
+  inference = 77
+  contrast = 55
+  deep_complement = 54
+```
+
+关键解释：
+
+```text
+progress > 1 的 over_conversion 大多数不是 norm off-manifold。
+因此它更可能来自目标方向过冲、logit metric 过敏、或 patch 对输出分布的过度推进。
+不能把 over_conversion 当作贡献强度，只能作为需要审计的诊断信号。
+```
+
+### Residualized GSSC 结果
+
+summary：
+
+```text
+Qwen3:
+  raw_mean = 0.865291
+  model_centered_mean = -0.013480
+  category_centered_mean = -0.015242
+  residual_stable_reuse_candidate_count = 85
+  model_curve_artifact_candidate_count = 91
+  category_curve_artifact_candidate_count = 108
+  stable_differentiation_candidate_count = 47
+
+GLM4:
+  raw_mean = 0.922709
+  model_centered_mean = -0.014066
+  category_centered_mean = -0.015589
+  residual_stable_reuse_candidate_count = 178
+  model_curve_artifact_candidate_count = 336
+  category_curve_artifact_candidate_count = 120
+  stable_differentiation_candidate_count = 0
+
+DeepSeek7B:
+  raw_mean = 0.851783
+  model_centered_mean = -0.020525
+  category_centered_mean = -0.020343
+  residual_stable_reuse_candidate_count = 65
+  model_curve_artifact_candidate_count = 10
+  category_curve_artifact_candidate_count = 87
+  stable_differentiation_candidate_count = 28
+```
+
+客观现象：
+
+```text
+1. GLM4 raw similarity 最高，但 model_curve_artifact_candidate 也最多。
+2. 这说明 GLM4 的高相似度很容易被整体曲线污染，需要更谨慎解释。
+3. Qwen3 和 DeepSeek7B 有更多稳定分化候选。
+4. residualized 后仍然稳定的 pair，才适合作为变量闭包工程候选。
+```
+
+Qwen3 stable reuse candidates：
+
+```text
+contrast / no_agent:
+  raw = 0.9897
+  model_centered = 0.9083
+  category_centered = 0.8689
+
+causal / contrast:
+  raw = 0.9899
+  model_centered = 0.9017
+  category_centered = 0.8500
+
+contrast / inference:
+  raw = 0.9885
+  model_centered = 0.8887
+  category_centered = 0.8266
+
+causal / inference:
+  raw = 0.9862
+  model_centered = 0.8579
+  category_centered = 0.7744
+```
+
+Qwen3 stable differentiation candidates：
+
+```text
+concise / syntactic_do_not:
+  raw = 0.3775
+  model_centered = -0.3702
+
+by_phrase / concise:
+  raw = 0.4109
+  model_centered = -0.4806
+
+center_embedding / concise:
+  raw = 0.4166
+  model_centered = -0.2784
+```
+
+GLM4 stable reuse candidates：
+
+```text
+casual / concise:
+  raw = 0.9944
+  model_centered = 0.9722
+  category_centered = 0.9302
+
+long_passive / nested_passive:
+  raw = 0.9963
+  model_centered = 0.8977
+  category_centered = 0.9399
+
+conditional / contrast:
+  raw = 0.9964
+  model_centered = 0.9472
+  category_centered = 0.8906
+
+causal / inference:
+  raw = 0.9952
+  model_centered = 0.9343
+```
+
+GLM4 differentiation 注意事项：
+
+```text
+GLM4 的最底部 pair 如 it_coref / scope_quantifier 虽然 raw 低且 model_centered 为负，
+但 raw > 0.70，没有进入 stable_differentiation_candidate 阈值。
+这说明 GLM4 整体曲线仍然较强，需要更敏感的变量级测试才能区分。
+```
+
+DeepSeek7B stable reuse candidates：
+
+```text
+long_passive / nested_condition:
+  raw = 0.9649
+  model_centered = 0.8367
+  category_centered = 0.8118
+
+nested_contrast / nested_passive:
+  raw = 0.9709
+  model_centered = 0.8543
+  category_centered = 0.8032
+
+center_embedding / nested_contrast:
+  raw = 0.9690
+  model_centered = 0.8447
+  category_centered = 0.7766
+
+center_embedding / nested_condition:
+  raw = 0.9738
+  model_centered = 0.8806
+  category_centered = 0.7711
+```
+
+DeepSeek7B stable differentiation candidates：
+
+```text
+complement_clause / they_coref:
+  raw = 0.5700
+  model_centered = -0.6381
+
+complement_clause / concise:
+  raw = 0.6104
+  model_centered = -0.3662
+
+complement_clause / en_zh_word:
+  raw = 0.6366
+  model_centered = -0.5023
+
+casual / causal:
+  raw = 0.6460
+  model_centered = -0.4031
+```
+
+### 本轮最重要的新事实
+
+```text
+1. expanded dynamic 的 norm/z-score off_manifold 比例很低。
+2. 高 progress 大多不是简单 norm 异常导致。
+3. over_conversion 不能丢弃，但必须进入审计清单。
+4. GLM4 的高相似度确实有明显模型整体曲线污染。
+5. Qwen3 logical 簇在 residualized 后仍然稳定，是变量解码好候选。
+6. GLM4 passive/conditional/style 中有 residual-stable reuse 候选，但 GLM4 也最容易被模型整体曲线污染。
+7. DeepSeek7B nested/recursive/logical/passive 之间出现稳定复用候选，同时 complement_clause 与 coreference/style/translation 的分化很明显。
+```
+
+### 当前结论的边界
+
+当前可以说：
+
+```text
+GSSC v1 Dynamic 的主要高 progress 不是大量 norm off-manifold 伪影；
+residualized similarity 可以筛出比 raw similarity 更可靠的复用/分化候选；
+这些候选可以指导语言动态编码闭包工程。
+```
+
+当前不能说：
+
+```text
+1. residual_stable_reuse_candidate 就等于真实机制复用。
+2. on_manifold_high_progress 就等于真实变量编码。
+3. GLM4 high similarity 就等于功能共享同一机制。
+4. DeepSeek7B L27 resid_out 就是语言功能形成点。
+```
+
+### 对下一步闭包工程的选择
+
+基于 Phase 35/36，最合理的闭包 pilot：
+
+```text
+GLM4:
+  passive / voice / role binding
+  原因：
+    passive 子类 dynamic 强；
+    L0 MLP 与 residual 状态强；
+    long_passive / nested_passive residualized 后仍高相似。
+
+Qwen3:
+  logical / polarity / operator
+  原因：
+    causal / contrast / inference residualized 后仍高相似；
+    L0 attention/MLP 参与明显；
+    适合测试 operator 和 event-state 转换。
+
+DeepSeek7B:
+  recursive / clause boundary / output release
+  原因：
+    nested_condition / nested_contrast / center_embedding 等 residualized 后稳定；
+    complement_clause 与多个功能强分化；
+    需要拆 L20-L27 多点轨迹。
+```
+
+### 下一步计划
+
+Phase 37：GLM4 passive 变量闭包 pilot。
+
+目标：
+
+```text
+验证 voice / role binding 是否可以被解码、替换、恢复，并在后续 block recompute 后自然接上。
+```
+
+最小任务：
+
+```text
+1. 构造 active/passive/by_phrase/get_passive/dative_passive/long_passive 样本。
+2. 采集 GLM4 L0-L8 的 resid_in/resid_out/mlp_out。
+3. 训练或直接构造简单线性变量读出：
+   voice = active/passive
+   surface_subject
+   semantic_agent
+   semantic_patient
+4. 做变量方向替换：
+   active -> passive
+   agent <-> patient
+5. 做恢复测试：
+   破坏 role/voice 后，再恢复变量方向，看输出是否恢复。
+6. 做 downstream recompute：
+   patch L0/L1 residual 或 mlp_out 后，让 L1-L8 自然 forward。
+```
+
+Phase 38：DeepSeek7B segment dynamic recompute。
+
+目标：
+
+```text
+拆开 L20-L27 是写入、传播、压缩、释放中的哪一种。
+```
+
+Phase 39：Qwen3 logical operator pilot。
+
+目标：
+
+```text
+测试 causal/contrast/inference/conditional 的 operator 与 event-state 是否形成可替换变量。
+```
+
+## Phase 37: GLM4 Passive Voice 变量闭包 Pilot [2026-05-28 20:32]
+
+### 任务目标
+
+根据 Phase 36 的筛选结果，本轮开始从 GSSC 路径图谱进入“语言动态编码闭包工程”的第一步。
+
+选择对象：
+
+```text
+GLM4 passive / voice / role binding
+```
+
+原因：
+
+```text
+1. Phase 35/36 显示 GLM4 passive 类动态信号强。
+2. GLM4 的 L0 MLP 与 early residual 对 passive 特别敏感。
+3. long_passive / nested_passive 在 residualized GSSC 中仍然高相似。
+4. passive/voice 比 recursive/coreference 更适合先做最小变量闭包。
+```
+
+本轮先做最小闭包 pilot，只验证：
+
+```text
+voice(active/passive) 变量方向是否：
+  1. 可以被线性读出；
+  2. 可以从训练样本迁移到测试样本；
+  3. 可以通过方向 patch 推动 active -> passive；
+  4. 是否也可以推动 passive -> active。
+```
+
+注意：
+
+```text
+本轮还没有分离 agent/patient；
+还没有做 role binding 替换；
+还没有做破坏-恢复闭包；
+因此只能叫 voice variable pilot，不能叫完整 passive 机制破解。
+```
+
+### 脚本变更
+
+新增变量闭包测试脚本：
+
+```text
+tests/gpt5/phase300_voice_closure_pilot.py
+```
+
+核心逻辑：
+
+```text
+1. 构造 passive 数据：
+   by_phrase
+   get_passive
+   long_passive
+   dative_passive
+
+2. 分 subtype 做 stratified train/test split。
+
+3. 在 train set 上，对每个 layer/module 计算：
+   voice_direction = mean(passive_vector - active_vector)
+
+4. 在 test set 上做 probe：
+   score = dot(hidden_vector, voice_direction)
+   判断 active/passive 是否可分。
+
+5. 在 test set 上做 causal direction patch：
+   active hidden + alpha * voice_direction
+   passive hidden - alpha * voice_direction
+
+6. 让后续层自然 forward，计算：
+   progress
+   KL ratio
+   logit_delta_ratio
+   finite
+```
+
+测试模块：
+
+```text
+resid_in
+resid_out
+mlp_out
+```
+
+新增正常模式运行器：
+
+```text
+tests/gpt5/run_phase300_normal.sh
+tests/gpt5/run_phase300_voice_closure_normal_all.sh
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase300_voice_closure_summary.py
+```
+
+### 重要修正：stratified split
+
+第一次运行后发现一个关键问题：
+
+```text
+train/test split 按排序列表直接切半，
+导致 test set 主要落在 get_passive / long_passive，
+没有均匀覆盖 by_phrase / dative_passive。
+```
+
+因此第一版输出：
+
+```text
+results/gpt5_phase300_voice_closure_pilot
+```
+
+只作为诊断，不进入正式结论。
+
+随后修正为：
+
+```text
+stratified_train_test_split
+```
+
+保证每个 subtype 都进入 train/test。
+
+正式结果目录：
+
+```text
+results/gpt5_phase300_voice_closure_pilot_stratified
+```
+
+### 运行命令
+
+Smoke test：
+
+```bash
+MAX_SECONDS=1200 \
+OUTPUT_DIR=results/gpt5_phase300_voice_closure_smoke \
+tests/gpt5/run_phase300_normal.sh qwen3 \
+  --max-pairs-per-subtype 2 \
+  --train-fraction 0.5 \
+  --layers 0 \
+  --modules resid_in,resid_out,mlp_out \
+  --alphas 0,1.0 \
+  --progress-every 1
+```
+
+Smoke 结果：
+
+```text
+rows = 48
+nonfinite = 0
+best_probe_acc = 1.0
+exit_code = 0
+```
+
+正式分层测试：
+
+```bash
+MAX_PAIRS_PER_SUBTYPE=24 \
+QWEN3_MAX_SECONDS=7200 \
+GLM4_MAX_SECONDS=10800 \
+DEEPSEEK7B_MAX_SECONDS=7200 \
+OUTPUT_DIR=results/gpt5_phase300_voice_closure_pilot_stratified \
+tests/gpt5/run_phase300_voice_closure_normal_all.sh
+```
+
+运行设置：
+
+```text
+normal mode:
+  CUDA_LAUNCH_BLOCKING = 0
+  PYTORCH_NO_CUDA_MEMORY_CACHING = 0
+
+dtype:
+  bfloat16
+
+attention:
+  sdpa
+
+device_map:
+  glm4, deepseek7b = auto
+
+hard exit:
+  --hard-exit-after-model
+```
+
+### 输出文件
+
+正式结果：
+
+```text
+results/gpt5_phase300_voice_closure_pilot_stratified/qwen3_phase300_voice_closure_pilot.json
+results/gpt5_phase300_voice_closure_pilot_stratified/glm4_phase300_voice_closure_pilot.json
+results/gpt5_phase300_voice_closure_pilot_stratified/deepseek7b_phase300_voice_closure_pilot.json
+results/gpt5_phase300_voice_closure_pilot_stratified/VOICE_CLOSURE_SUMMARY.md
+results/gpt5_phase300_voice_closure_pilot_stratified/voice_closure_summary.json
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_195159_phase300normal_qwen3
+results/gpt5_gpu_lock_logs/20260528_200354_phase300normal_glm4
+results/gpt5_gpu_lock_logs/20260528_202037_phase300normal_deepseek7b
+```
+
+三轮正式测试：
+
+```text
+kernel.since-start.filtered.log = 0 行
+```
+
+说明本轮没有 GPU kernel/Xid/GSP/locked 级异常。
+
+### 数据规模
+
+```text
+passive voice pairs = 92
+train pairs = 46
+test pairs = 46
+
+subtypes:
+  by_phrase
+  dative_passive
+  get_passive
+  long_passive
+
+Qwen3:
+  layers = L0-L8
+  rows = 9936
+  nonfinite_rows = 0
+
+GLM4:
+  layers = L0-L8
+  rows = 9936
+  nonfinite_rows = 0
+
+DeepSeek7B:
+  layers = L20-L27
+  rows = 8832
+  nonfinite_rows = 0
+```
+
+### Qwen3 客观结果
+
+Probe：
+
+```text
+probe_mean_accuracy = 0.923108
+best_probe:
+  layer = L0
+  module = resid_in
+  accuracy = 1.000000
+  mean_signed_margin = 0.039576
+```
+
+Direction patch：
+
+```text
+active_to_passive best:
+  layer = L1
+  module = mlp_out
+  progress = 0.306731
+  kl_ratio = 1.197655
+  logit_delta_ratio = 0.905774
+
+passive_to_active best:
+  layer = L2
+  module = resid_out
+  progress = 0.305248
+  kl_ratio = 0.705311
+  logit_delta_ratio = 0.664987
+```
+
+Subtype curve：
+
+```text
+by_phrase:
+  active_to_passive = 0.166095
+  passive_to_active = 0.045212
+
+dative_passive:
+  active_to_passive = 0.112386
+  passive_to_active = 0.056769
+
+get_passive:
+  active_to_passive = 0.186283
+  passive_to_active = 0.051683
+
+long_passive:
+  active_to_passive = 0.185860
+  passive_to_active = 0.041687
+```
+
+客观现象：
+
+```text
+1. Qwen3 的 voice 方向可解码。
+2. 方向 patch 有中等 causal effect。
+3. active_to_passive 与 passive_to_active 都有效，但 subtype 平均上 active_to_passive 更强。
+4. 最强 active_to_passive 在 L1 mlp_out，说明浅层 MLP 方向可推动 voice 转换。
+```
+
+### GLM4 客观结果
+
+Probe：
+
+```text
+probe_mean_accuracy = 0.932770
+best_probe:
+  layer = L0
+  module = resid_in
+  accuracy = 1.000000
+  mean_signed_margin = 0.000298
+```
+
+Direction patch：
+
+```text
+active_to_passive best:
+  layer = L0
+  module = resid_in
+  progress = 0.487534
+  kl_ratio = 0.597967
+  logit_delta_ratio = 0.863517
+
+passive_to_active best:
+  layer = L8
+  module = resid_out
+  progress = 0.012508
+  kl_ratio = 1.005237
+  logit_delta_ratio = 0.105789
+```
+
+Subtype curve：
+
+```text
+by_phrase:
+  active_to_passive = 0.213462
+  passive_to_active = 0.001275
+
+dative_passive:
+  active_to_passive = 0.198536
+  passive_to_active = 0.000378
+
+get_passive:
+  active_to_passive = 0.213752
+  passive_to_active = 0.002016
+
+long_passive:
+  active_to_passive = 0.186301
+  passive_to_active = -0.008697
+```
+
+客观现象：
+
+```text
+1. GLM4 的 voice 变量在 L0 resid_in 可被完美线性分开。
+2. active_to_passive 方向 patch 在 L0 resid_in 有明显 causal effect：
+   progress = 0.487534
+   KL ratio 降到 0.597967
+3. passive_to_active 几乎无效：
+   best progress = 0.012508
+4. 这说明 GLM4 中当前学到的 voice_direction 更像“写入被动语态方向”，不是对称的 active/passive 双向变量轴。
+5. 这与 Phase 35 的 GLM4 浅层 MLP/residual 写入型判断一致，但也说明闭包还没有完成。
+```
+
+### DeepSeek7B 客观结果
+
+Probe：
+
+```text
+probe_mean_accuracy = 0.640399
+best_probe:
+  layer = L21
+  module = mlp_out
+  accuracy = 1.000000
+  mean_signed_margin = 108.308620
+```
+
+Direction patch：
+
+```text
+active_to_passive best:
+  layer = L27
+  module = resid_out
+  progress = 0.053636
+  kl_ratio = 0.854817
+  logit_delta_ratio = 0.283468
+
+passive_to_active best:
+  layer = L27
+  module = resid_out
+  progress = 0.184869
+  kl_ratio = 0.765157
+  logit_delta_ratio = 0.390689
+```
+
+Subtype curve：
+
+```text
+by_phrase:
+  active_to_passive = 0.008890
+  passive_to_active = 0.002664
+
+dative_passive:
+  active_to_passive = 0.015331
+  passive_to_active = 0.050772
+
+get_passive:
+  active_to_passive = 0.026669
+  passive_to_active = -0.000450
+
+long_passive:
+  active_to_passive = 0.012186
+  passive_to_active = 0.095901
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 某些 layer/module 可以完美 probe voice，但平均 probe accuracy 只有 0.640399。
+2. 可解码不等于可因果控制：active_to_passive direction patch 很弱。
+3. passive_to_active 稍强，但仍远弱于 GLM4 active_to_passive。
+4. 最强点仍在 L27 resid_out，符合 DeepSeek7B 输出释放点特征。
+5. 这支持：DeepSeek7B 的 voice 信息可能在深层输出接口可读，但单一全局 voice direction 不足以重写机制。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  voice 可解码；
+  双向 patch 都有中等效果；
+  active_to_passive 最强在 L1 mlp_out。
+
+GLM4:
+  voice 可解码；
+  active_to_passive 强；
+  passive_to_active 几乎无效；
+  最强点在 L0 resid_in。
+
+DeepSeek7B:
+  局部可解码；
+  direction patch 效果弱；
+  最强点仍在 L27 resid_out。
+```
+
+### 本轮最重要的新事实
+
+```text
+1. 这是第一轮变量级实验，不再只是 GSSC 行为图谱。
+2. 三模型都存在可解码 voice 信息。
+3. GLM4 的 active_to_passive 方向最具因果效应，符合前面筛选出的 GLM4 passive 候选。
+4. GLM4 的 voice 方向不是对称轴：被动写入有效，反向恢复无效。
+5. Qwen3 更像浅层双向可调，但效果不如 GLM4 active_to_passive 强。
+6. DeepSeek7B 再次表现为“可读出但难以单点方向控制”，说明它可能需要分段/多点轨迹而非单方向变量。
+```
+
+### 关键硬伤
+
+```text
+1. 当前 voice_direction 是 mean(passive - active)，还不是纯 voice 变量。
+   它可能混入：
+     surface subject
+     word order
+     auxiliary was/got
+     by phrase
+     verb participle
+     role binding
+
+2. 当前向量是 sequence mean pooling，可能丢失 token-level role binding。
+
+3. 当前只做 direction patch，没有做：
+   variable ablation
+   destroy-and-restore
+   agent/patient swap
+   by_phrase 控制
+   token-level causal patch
+
+4. GLM4 passive_to_active 失败说明闭包尚未成立。
+
+5. DeepSeek7B 可 probe 但 patch 弱，说明 probe 不是机制证明。
+```
+
+### 对编码机制的谨慎解释
+
+当前不能说：
+
+```text
+已经破解 passive 机制；
+已经找到 voice 变量本体；
+已经证明 GLM4 的 role binding 机制；
+```
+
+当前可以说：
+
+```text
+1. GLM4 中存在一个从 active 到 passive 的浅层 residual voice-like direction。
+2. 这个方向能从 train pair 泛化到 test pair。
+3. 在 L0 resid_in 加入该方向后，模型输出明显向 passive 目标推进。
+4. 但该方向不是对称闭包变量，因为 passive_to_active 几乎无效。
+```
+
+这说明：
+
+```text
+变量闭包工程是可行的；
+但必须从 voice-like direction 继续拆成更细变量：
+  voice
+  surface_subject
+  semantic_agent
+  semantic_patient
+  auxiliary/by_phrase
+```
+
+### 下一步计划
+
+Phase 38：GLM4 passive 变量拆分。
+
+目标：
+
+```text
+把当前 voice-like direction 拆成 voice 与 role binding。
+```
+
+测试：
+
+```text
+1. surface subject 控制：
+   the dog chased the cat
+   the dog was chased by the cat
+
+2. semantic role 控制：
+   the dog chased the cat
+   the cat chased the dog
+
+3. voice 控制：
+   the dog chased the cat
+   the cat was chased by the dog
+
+4. no-agent passive 控制：
+   someone broke the window
+   the window was broken
+
+5. by-phrase 控制：
+   the window was broken
+   the window was broken by the boy
+```
+
+关键指标：
+
+```text
+voice probe
+agent probe
+patient probe
+surface_subject probe
+direction patch
+ablation
+destroy + restore
+downstream recompute
+```
+
+Phase 39：Qwen3 logical operator 闭包。
+
+Phase 40：DeepSeek7B recursive segment closure。
+
+## Phase 38: Passive Factor 变量拆分与跨模型闭包测试 [2026-05-28 21:49]
+
+### 任务目标
+
+根据 Phase 37 的结果，继续从 GSSC 路径图谱进入变量级闭包工程。本轮不再只测试 `voice-like direction`，而是把 passive 相关变化拆成三个可测试变量：
+
+```text
+voice: active -> passive_by
+role_swap: agent/patient 交换
+by_phrase: passive_no_agent -> passive_by_agent
+```
+
+本轮重点验证：
+
+```text
+1. Phase 37 中 GLM4 的 active -> passive 效果主要来自哪个变量。
+2. role binding 是否能被 sequence-mean direction 捕捉。
+3. Qwen3 / GLM4 / DeepSeek7B 是否存在不同变量控制方式。
+4. probe 可读出是否等于 direction patch 可控制。
+```
+
+### 对用户分析的判断
+
+用户分析整体正确。Phase 37 只能说明存在 `voice-like direction`，不能说明已经破解 passive mechanism。原因是原始 `passive - active` 差分混入了：
+
+```text
+voice
+word_order
+surface_subject
+semantic_agent
+semantic_patient
+auxiliary
+by_phrase
+verb_participle
+```
+
+所以本轮必须做变量拆分。尤其是 passive 的核心不是“句子是否被动”这个整体标签，而是：
+
+```text
+谁是 semantic_agent
+谁是 semantic_patient
+谁成为 surface_subject
+是否出现 by_phrase
+语态模板如何写入
+```
+
+本轮仍然不是完整闭包，因为还没有 token-level role binding、destroy-and-restore、变量恢复实验。但它比 Phase 37 更接近机制：开始区分 `voice`、`role_swap`、`by_phrase` 三个因素。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase301_passive_factor_closure.py
+tests/gpt5/run_phase301_normal.sh
+tests/gpt5/run_phase301_passive_factor_normal_all.sh
+tests/gpt5/phase301_passive_factor_summary.py
+```
+
+脚本要点：
+
+```text
+1. 使用 BF16 + attn_implementation="sdpa"。
+2. GLM4 和 DeepSeek7B 使用 device_map="auto"。
+3. 每个模型单独进程运行，并添加 --hard-exit-after-model。
+4. run_all 脚本按 qwen3 -> glm4 -> deepseek7b 顺序运行。
+5. 每个模型结束后进程退出，避免前一个模型残留显存。
+6. 使用正常模式，不使用 CUDA_LAUNCH_BLOCKING=1 / PYTORCH_NO_CUDA_MEMORY_CACHING=1 的保守模式。
+7. 运行时记录 GPU / process / kernel 日志。
+```
+
+### 数据构造
+
+每个 base 构造 6 个状态：
+
+```text
+active_ab:
+  the agent verb the patient
+
+active_ba:
+  the patient verb the agent
+
+passive_ab_by:
+  the patient was verb by the agent
+
+passive_ba_by:
+  the agent was verb by the patient
+
+passive_ab_no:
+  the patient was verb
+
+passive_ba_no:
+  the agent was verb
+```
+
+变量方向：
+
+```text
+voice:
+  active_ab -> passive_ab_by
+  active_ba -> passive_ba_by
+
+role_swap:
+  active_ab -> active_ba
+  passive_ab_by -> passive_ba_by
+  passive_ab_no -> passive_ba_no
+
+by_phrase:
+  passive_ab_no -> passive_ab_by
+  passive_ba_no -> passive_ba_by
+```
+
+说明：
+
+```text
+本轮仍然使用 sequence mean pooling。
+这可以测试整体方向是否存在，但不适合证明 token-level role binding。
+```
+
+### Smoke Test
+
+```bash
+MAX_SECONDS=1200 OUTPUT_DIR=results/gpt5_phase301_passive_factor_smoke \
+tests/gpt5/run_phase301_normal.sh qwen3 \
+  --max-bases 4 \
+  --train-fraction 0.5 \
+  --layers 0 \
+  --modules resid_in,resid_out,mlp_out \
+  --alphas 0,1.0 \
+  --progress-every 1
+```
+
+结果：
+
+```text
+rows = 168
+nonfinite_rows = 0
+exit_code = 0
+```
+
+### 正式测试命令
+
+```bash
+MAX_BASES=24 \
+QWEN3_MAX_SECONDS=7200 \
+GLM4_MAX_SECONDS=10800 \
+DEEPSEEK7B_MAX_SECONDS=7200 \
+OUTPUT_DIR=results/gpt5_phase301_passive_factor_closure \
+tests/gpt5/run_phase301_passive_factor_normal_all.sh
+```
+
+汇总命令：
+
+```bash
+python tests/gpt5/phase301_passive_factor_summary.py \
+  --input-dir results/gpt5_phase301_passive_factor_closure \
+  --output-dir results/gpt5_phase301_passive_factor_closure
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase301_passive_factor_closure/qwen3_phase301_passive_factor_closure.json
+results/gpt5_phase301_passive_factor_closure/glm4_phase301_passive_factor_closure.json
+results/gpt5_phase301_passive_factor_closure/deepseek7b_phase301_passive_factor_closure.json
+results/gpt5_phase301_passive_factor_closure/passive_factor_summary.json
+results/gpt5_phase301_passive_factor_closure/PASSIVE_FACTOR_SUMMARY.md
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_205338_phase301normal_qwen3
+results/gpt5_gpu_lock_logs/20260528_210935_phase301normal_glm4
+results/gpt5_gpu_lock_logs/20260528_213154_phase301normal_deepseek7b
+```
+
+三个正式日志的 `kernel.since-start.filtered.log` 都是 0 行。
+
+### 数据规模
+
+```text
+Qwen3:
+  bases/train/test = 24 / 12 / 12
+  rows = 13608
+  nonfinite_rows = 0
+
+GLM4:
+  bases/train/test = 24 / 12 / 12
+  rows = 13608
+  nonfinite_rows = 0
+
+DeepSeek7B:
+  bases/train/test = 24 / 12 / 12
+  rows = 12096
+  nonfinite_rows = 0
+```
+
+总计：
+
+```text
+rows = 39312
+nonfinite_rows = 0
+```
+
+### Qwen3 客观结果
+
+probe 最佳结果：
+
+```text
+by_phrase:
+  best = L0 resid_in
+  acc = 1.000000
+  margin = 0.100888
+
+role_swap:
+  best = L7 mlp_out
+  acc = 0.944444
+  margin = 0.620264
+
+voice:
+  best = L0 resid_in
+  acc = 1.000000
+  margin = 0.054826
+```
+
+direction patch 最佳结果：
+
+```text
+by_phrase forward:
+  best = L1 mlp_out
+  progress = 0.480497
+  kl_ratio = 2.771863
+
+by_phrase reverse:
+  best = L2 resid_out
+  progress = 0.522776
+  kl_ratio = 1.089960
+
+role_swap forward:
+  best = L0 resid_in
+  progress = 0.017493
+  kl_ratio = 0.983960
+
+role_swap reverse:
+  best = L1 resid_out
+  progress = 0.027947
+  kl_ratio = 0.983883
+
+voice forward:
+  best = L0 resid_in
+  progress = 0.346220
+  kl_ratio = 1.296394
+
+voice reverse:
+  best = L2 resid_out
+  progress = 0.428750
+  kl_ratio = 0.755255
+```
+
+全局变量方向均值：
+
+```text
+by_phrase forward:
+  progress = 0.136004
+  kl_ratio = 1.188874
+
+by_phrase reverse:
+  progress = 0.146432
+  kl_ratio = 1.111486
+
+role_swap forward:
+  progress = 0.006346
+  kl_ratio = 1.004198
+
+role_swap reverse:
+  progress = 0.012143
+  kl_ratio = 1.003458
+
+voice forward:
+  progress = 0.183000
+  kl_ratio = 1.036725
+
+voice reverse:
+  progress = 0.087780
+  kl_ratio = 0.981955
+```
+
+客观现象：
+
+```text
+1. Qwen3 的 voice 和 by_phrase 都可读出，也都有一定 direction patch 效果。
+2. voice reverse 在最佳点上比 voice forward 更稳定，且 KL 降低。
+3. by_phrase 的最佳 progress 很高，但 KL 明显升高，说明可能存在过度推进或分布扰动。
+4. role_swap probe 可以读出，但 direction patch 几乎无效。
+```
+
+### GLM4 客观结果
+
+probe 最佳结果：
+
+```text
+by_phrase:
+  best = L0 resid_in
+  acc = 1.000000
+  margin = 0.000759
+
+role_swap:
+  best = L5 mlp_out
+  acc = 0.972222
+  margin = 0.000808
+
+voice:
+  best = L0 resid_in
+  acc = 1.000000
+  margin = 0.000386
+```
+
+direction patch 最佳结果：
+
+```text
+by_phrase forward:
+  best = L0 resid_in
+  progress = 0.269420
+  kl_ratio = 0.916097
+
+by_phrase reverse:
+  best = L7 resid_out
+  progress = 0.020095
+  kl_ratio = 0.990468
+
+role_swap forward:
+  best = L0 resid_out
+  progress = 0.017619
+  kl_ratio = 0.963600
+
+role_swap reverse:
+  best = L8 resid_out
+  progress = 0.030030
+  kl_ratio = 1.000330
+
+voice forward:
+  best = L0 resid_in
+  progress = 0.472474
+  kl_ratio = 0.598427
+
+voice reverse:
+  best = L8 resid_out
+  progress = 0.015532
+  kl_ratio = 0.998028
+```
+
+全局变量方向均值：
+
+```text
+by_phrase forward:
+  progress = 0.108485
+  kl_ratio = 0.933662
+
+by_phrase reverse:
+  progress = -0.005009
+  kl_ratio = 0.991968
+
+role_swap forward:
+  progress = 0.010789
+  kl_ratio = 1.001808
+
+role_swap reverse:
+  progress = 0.011120
+  kl_ratio = 0.999127
+
+voice forward:
+  progress = 0.271165
+  kl_ratio = 0.760783
+
+voice reverse:
+  progress = -0.001104
+  kl_ratio = 0.997715
+```
+
+客观现象：
+
+```text
+1. GLM4 的 Phase 37 active -> passive 效果主要来自 voice forward。
+2. by_phrase forward 有中等效果，但明显弱于 voice forward。
+3. role_swap 在 probe 上可读出，但 direction patch 几乎没有控制效果。
+4. voice reverse 继续失败，说明 GLM4 不是对称 active/passive 语态轴。
+5. 最强控制点仍然是 L0 resid_in，符合浅层写入型判断。
+```
+
+### DeepSeek7B 客观结果
+
+probe 最佳结果：
+
+```text
+by_phrase:
+  best = L21 mlp_out
+  acc = 0.958333
+  margin = 207.724309
+
+role_swap:
+  best = L21 mlp_out
+  acc = 0.847222
+  margin = 12.688938
+
+voice:
+  best = L20 mlp_out
+  acc = 1.000000
+  margin = 123.004636
+```
+
+direction patch 最佳结果：
+
+```text
+by_phrase forward:
+  best = L26 resid_out
+  progress = 0.620331
+  kl_ratio = 1.080685
+
+by_phrase reverse:
+  best = L26 resid_out
+  progress = 0.482621
+  kl_ratio = 1.392317
+
+role_swap forward:
+  best = L24 resid_in
+  progress = 0.018090
+  kl_ratio = 0.981939
+
+role_swap reverse:
+  best = L27 resid_out
+  progress = 0.015873
+  kl_ratio = 0.985071
+
+voice forward:
+  best = L20 resid_in
+  progress = 0.056489
+  kl_ratio = 1.055646
+
+voice reverse:
+  best = L27 resid_out
+  progress = 0.118703
+  kl_ratio = 0.798672
+```
+
+全局变量方向均值：
+
+```text
+by_phrase forward:
+  progress = 0.220030
+  kl_ratio = 1.243953
+
+by_phrase reverse:
+  progress = 0.003117
+  kl_ratio = 1.198228
+
+role_swap forward:
+  progress = 0.008298
+  kl_ratio = 0.980360
+
+role_swap reverse:
+  progress = -0.001965
+  kl_ratio = 1.157389
+
+voice forward:
+  progress = 0.017968
+  kl_ratio = 1.029938
+
+voice reverse:
+  progress = -0.027237
+  kl_ratio = 1.647137
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 的变量可以被 probe 读出，尤其 L20-L21 mlp_out 很强。
+2. 但 voice direction patch 很弱，继续支持“可读不等于可控”。
+3. by_phrase 在 L26 resid_out 有高 progress，但 KL 没有改善，甚至部分方向升高。
+4. 这更像深层输出格式扰动或过度推进，不足以证明 by_phrase 机制闭包。
+5. role_swap 同样可读但不可控。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  voice 和 by_phrase 都有中等控制效果；
+  role_swap 可读但不可控；
+  整体更像分布式、较双向的浅层变量系统。
+
+GLM4:
+  voice forward 最清楚；
+  by_phrase forward 次之；
+  role_swap 基本不可控；
+  active -> passive 是浅层 L0 resid_in 写入，不是双向语态轴。
+
+DeepSeek7B:
+  probe 读出很强；
+  direction patch 控制弱；
+  by_phrase 的 late residual progress 高但 KL 风险较大；
+  更像深层输出释放/格式扰动，不适合用单一方向解释。
+```
+
+### 当前最重要的新事实
+
+Phase 38 对 Phase 37 的 GLM4 结论进行了拆分：
+
+```text
+Phase 37:
+  GLM4 active -> passive 有强 voice-like direction。
+
+Phase 38:
+  这个强效果主要来自 voice forward；
+  by_phrase forward 有较小贡献；
+  role_swap 几乎没有 direction patch 效果。
+```
+
+因此更严格的表达是：
+
+```text
+GLM4 在 L0 resid_in 存在 passive-construction write signal。
+它更像“写入被动构造控制信号”，而不是完整 passive mechanism。
+完整 passive mechanism 至少还需要 token-level role binding：
+  semantic_agent
+  semantic_patient
+  surface_subject
+```
+
+### 硬伤
+
+1. 仍然使用 sequence mean pooling，不能证明 token-level role binding。
+2. `role_swap` probe 可读出但 patch 不可控，说明整体均值方向不能捕捉角色绑定机制。
+3. `by_phrase` 方向混合了语法长度、agent specification、介词结构和输出格式，不是纯变量。
+4. DeepSeek7B 的高 progress 伴随 KL 上升，不能作为干净机制证据。
+5. 还没有 destroy-and-restore，因此仍不是完整闭包。
+6. 还没有只替换 subject token / object token / by-agent token 的局部变量干预。
+7. 当前变量方向仍是线性均值差分，可能无法描述非线性或多点轨迹变量。
+
+### 对语言编码机制的谨慎判断
+
+本轮结果支持一个更稳的判断：
+
+```text
+passive 不是单一语义轴；
+passive 更像变量组合程序。
+```
+
+其中至少包含：
+
+```text
+voice control signal
+surface_subject selection
+semantic_agent / semantic_patient binding
+by_phrase realization
+verb morphology
+output formatting
+```
+
+GLM4 的 L0 resid_in 可以写入较强 `voice forward` 控制信号，但这个信号不能反向恢复 active，也不能单独完成 role binding。所以它不是 passive mechanism 本身，只是 passive program 的一个早期控制变量。
+
+### 下一步计划
+
+Phase 39：token-level GLM4 passive role binding。
+
+目标：
+
+```text
+从 sequence mean 改为 token-level 变量定位。
+```
+
+需要捕捉：
+
+```text
+subject token
+verb token
+object token
+by token
+by-agent token
+last token
+```
+
+变量：
+
+```text
+surface_subject
+semantic_agent
+semantic_patient
+voice
+by_phrase
+auxiliary
+```
+
+关键测试：
+
+```text
+1. token-level probe:
+   哪个 token 位置最能读出 agent/patient/voice。
+
+2. token-level direction patch:
+   只替换 subject token / object token / by-agent token。
+
+3. role swap patch:
+   单独交换 agent/patient token 表示，看输出是否改变。
+
+4. destroy-and-restore:
+   破坏 role variable 后恢复，看输出是否恢复。
+```
+
+Phase 40：Qwen3 logical operator 闭包。
+
+Phase 41：DeepSeek7B recursive segment closure。
+
+## Phase 39: Passive Token-Level Role Binding 脚本与正常模式 GPU 阻断记录 [2026-05-28 23:45]
+
+### 任务目标
+
+根据 Phase 38 的硬伤，继续把 passive 机制从 sequence mean direction 推进到 token-level role binding。
+
+本轮计划测试：
+
+```text
+1. subject / object / by_agent / verb / last token 是否能读出 voice、by_phrase、role。
+2. 只 patch 某个 token span 时，输出是否向目标状态移动。
+3. all_positions 是否比单 token 更强。
+4. role_swap 是否能在 token-level 变得可控。
+```
+
+### 对用户分析的判断
+
+用户分析是正确的。Phase 38 最大价值是证明：
+
+```text
+可读出不等于可控制；
+direction patch 不等于机制闭包；
+sequence mean pooling 不适合证明 role binding。
+```
+
+passive 的真正对象不是一个全句方向，而是：
+
+```text
+voice control
+surface_subject selection
+semantic_agent binding
+semantic_patient binding
+by-agent binding
+verb morphology
+prediction priority shift
+```
+
+因此下一步必须进入 token-level variable closure。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase302_passive_token_role_closure.py
+tests/gpt5/run_phase302_normal.sh
+tests/gpt5/run_phase302_passive_token_role_normal_all.sh
+tests/gpt5/phase302_passive_token_role_summary.py
+```
+
+脚本设计：
+
+```text
+1. 继续使用 BF16 + attn_implementation="sdpa"。
+2. GLM4 / DeepSeek7B 使用 device_map="auto"。
+3. 每个模型使用 --hard-exit-after-model。
+4. run_all 按 qwen3 -> glm4 -> deepseek7b 顺序运行。
+5. 使用正常模式：
+   CUDA_LAUNCH_BLOCKING=0
+   PYTORCH_NO_CUDA_MEMORY_CACHING=0
+6. 捕捉 token span：
+   subject
+   object
+   by_agent
+   verb
+   last
+7. token-level probe:
+   voice
+   by_phrase
+   agent_to_patient
+8. token-level patch:
+   subject_only
+   object_only
+   by_agent_only
+   verb_only
+   last_only
+   all_positions
+```
+
+注意：
+
+```text
+第一次 smoke 后发现 all_positions 只是逐个 token patch，名称会误导。
+随后修正为真正的多 token 同时 patch。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+MAX_SECONDS=1200 OUTPUT_DIR=results/gpt5_phase302_passive_token_role_smoke \
+tests/gpt5/run_phase302_normal.sh qwen3 \
+  --max-bases 4 \
+  --train-fraction 0.5 \
+  --layers 0 \
+  --modules resid_in,resid_out,mlp_out \
+  --alphas 0,1.0 \
+  --progress-every 1
+```
+
+修正后的 smoke 结果：
+
+```text
+rows = 288
+probe_rows = 21
+nonfinite_rows = 0
+exit_code = 0
+log_dir = results/gpt5_gpu_lock_logs/20260528_231858_phase302normal_qwen3
+```
+
+说明脚本的 token span 捕捉、hook patch、summary 基础流程可运行。
+
+### 24-base 正式测试尝试
+
+命令：
+
+```bash
+MAX_BASES=24 \
+QWEN3_MAX_SECONDS=7200 \
+GLM4_MAX_SECONDS=10800 \
+DEEPSEEK7B_MAX_SECONDS=7200 \
+OUTPUT_DIR=results/gpt5_phase302_passive_token_role_closure \
+tests/gpt5/run_phase302_passive_token_role_normal_all.sh
+```
+
+Qwen3 在 24-base 正常模式下发生用户态 segmentation fault：
+
+```text
+run_id = 20260528_231932_phase302normal_qwen3
+model = qwen3
+bases/train/test = 24 / 12 / 12
+probe_rows = 339
+progress:
+  intervention bases = 4/12, rows = 5184
+  intervention bases = 8/12, rows = 10368
+exit_code = 139
+kernel.since-start.filtered.log = 0 行
+```
+
+当时没有看到 Xid / NVRM kernel error，因此先判断为用户态长 session 稳定性问题。
+
+### 16-base 缩短测试尝试
+
+为了保持正常模式，同时缩短单进程运行时长，继续尝试：
+
+```bash
+MAX_BASES=16 \
+QWEN3_MAX_SECONDS=7200 \
+GLM4_MAX_SECONDS=10800 \
+DEEPSEEK7B_MAX_SECONDS=7200 \
+OUTPUT_DIR=results/gpt5_phase302_passive_token_role_closure \
+tests/gpt5/run_phase302_passive_token_role_normal_all.sh
+```
+
+Qwen3 第二次运行：
+
+```text
+run_id = 20260528_233408_phase302normal_qwen3
+model = qwen3
+bases/train/test = 16 / 8 / 8
+probe_rows = 303
+```
+
+但运行中出现 NVIDIA kernel Oops。手动生成 kernel 过滤日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260528_233408_phase302normal_qwen3/kernel.since-start.manual.log
+results/gpt5_gpu_lock_logs/20260528_233408_phase302normal_qwen3/kernel.since-start.manual.filtered.log
+```
+
+关键日志：
+
+```text
+May 28 23:38:11 kernel: RIP: 0010:os_alloc_mem+0xad/0x100 [nvidia]
+May 28 23:38:11 kernel: ? nvUvmInterfaceGetExternalAllocPtes+0xab/0xe0 [nvidia]
+May 28 23:38:11 kernel: ? map_rm_pt_range.constprop.0+0x2b9/0x5d0 [nvidia_uvm]
+May 28 23:38:11 kernel: ? uvm_page_table_range_vec_init+0x20c/0x2a0 [nvidia_uvm]
+May 28 23:38:11 kernel: ? uvm_va_range_map_rm_allocation+0x39f/0x4c0 [nvidia_uvm]
+May 28 23:38:11 kernel: ? uvm_map_external_allocation_on_gpu+0x319/0x4f0 [nvidia_uvm]
+May 28 23:38:11 kernel: ? uvm_api_map_external_allocation+0x5cc/0x850 [nvidia_uvm]
+May 28 23:38:11 kernel: ? uvm_ioctl+0x1650/0x1be0 [nvidia_uvm]
+May 28 23:38:11 kernel: note: python[94693] exited with irqs disabled
+```
+
+当前进程状态：
+
+```text
+nvidia-smi 进程卡在 D 状态：
+  os_acquire_rwlock_write
+```
+
+因此本轮不能继续加载 GLM4 和 DeepSeek7B。继续运行会污染测试结果，并可能导致系统再次卡死。
+
+### 当前有效结果
+
+本轮没有产生有效三模型正式结果。
+
+有效内容仅限于：
+
+```text
+1. Phase302 token-level 脚本已经完成并通过 qwen3 smoke。
+2. 正常模式长跑在 qwen3 上触发用户态 segfault 139。
+3. 缩短到 16 bases 后仍触发 NVIDIA kernel Oops，涉及 nvidia / nvidia_uvm。
+4. GPU 查询进程进入 D 状态，说明当前驱动状态不适合继续 CUDA 测试。
+```
+
+不能得出的结论：
+
+```text
+不能比较三模型 token-level role binding；
+不能判断 role_swap 是否在 token-level 可控；
+不能把本轮视为 Phase 39 机制结果。
+```
+
+### 技术判断
+
+这次和之前普通用户态 segfault 不同。
+
+24-base 尝试：
+
+```text
+exit_code = 139
+kernel filtered = 0
+```
+
+16-base 尝试：
+
+```text
+python exited with irqs disabled
+nvidia / nvidia_uvm kernel stack
+nvidia-smi D state
+```
+
+因此当前更像：
+
+```text
+NVIDIA UVM / driver kernel path 在大量小 forward + hook + SDPA 正常模式下触发异常。
+```
+
+这不是语言机制结果，而是测试环境稳定性问题。
+
+### 硬伤
+
+1. Phase302 正式结果未完成。
+2. 没有 GLM4 / DeepSeek7B 结果。
+3. qwen3 正式输出文件未保存。
+4. 当前 GPU 驱动状态异常，不能继续 CUDA 测试。
+5. 正常模式长 session 不稳定，和用户要求的“不要保守方式”存在现实冲突。
+
+### 下一步计划
+
+必须先解决测试工程稳定性，否则 token-level 机制实验无法推进。
+
+建议 Phase 40 先做测试工程修正，而不是继续理论扩展：
+
+```text
+1. Phase302 增加 pair/base-level checkpoint。
+   每完成 1 个 test base 就落盘 partial JSON。
+
+2. 增加 shard 参数：
+   --test-start
+   --test-count
+   每个进程只跑 1-2 个 test base。
+
+3. run_all 仍保持正常模式，但改成短进程 shard：
+   qwen3 shard 0..N
+   完成 qwen3 后再 glm4
+   完成 glm4 后再 deepseek7b
+
+4. 禁止在高风险运行中并发调用额外 nvidia-smi 查询。
+   这次 nvidia-smi 卡在 D 状态，说明监控本身也可能被 driver lock 牵连。
+
+5. 将 GPU monitor 改成可选：
+   默认只记录 run.log + kernel follower；
+   需要时再开启 nvidia-smi monitor。
+```
+
+研究路线不变：
+
+```text
+Phase 40:
+  稳定版 token-level shard runner。
+
+Phase 41:
+  GLM4 passive token-level role binding closure。
+
+Phase 42:
+  Qwen3 logical operator closure。
+
+Phase 43:
+  DeepSeek7B recursive segment closure。
+```
+
+当前最重要的结论不是机制结论，而是工程结论：
+
+```text
+token-level closure 的脚本方向正确；
+但正常模式长跑已经触发 nvidia_uvm kernel Oops；
+必须把长跑拆成短 shard + checkpoint，否则无法可靠积累全局语义语法契约图谱。
+```
+
+## Phase 40: Token-Level Shard Runner 与三模型短分片验证 [2026-05-29 12:23]
+
+### 任务目标
+
+继续完成 Phase 39 未完成的任务，但先解决工程稳定性问题。Phase 39 已经证明：
+
+```text
+Phase302 token-level 脚本方向正确；
+但正常模式长 session 会触发用户态 segfault，甚至 nvidia / nvidia_uvm kernel Oops。
+```
+
+因此本轮目标不是继续强行长跑，而是：
+
+```text
+1. 给 Phase302 增加 shard 参数。
+2. 每个进程只跑 1 个 test base。
+3. 每完成 1 个 base 就写 partial checkpoint。
+4. 每个 shard 独立加载模型、运行、保存、退出。
+5. qwen3 完成后再 glm4，glm4 完成后再 deepseek7b。
+6. 禁用并发 nvidia-smi GPU monitor，只保留 run.log 和 kernel follower。
+```
+
+### 脚本变更
+
+修改：
+
+```text
+tests/gpt5/phase302_passive_token_role_closure.py
+tests/gpt5/run_phase302_normal.sh
+tests/gpt5/phase302_passive_token_role_summary.py
+```
+
+新增：
+
+```text
+tests/gpt5/run_phase302_passive_token_role_sharded_normal_all.sh
+```
+
+新增参数：
+
+```text
+--test-start
+--test-count
+--shard-label
+```
+
+新增输出：
+
+```text
+results/.../partials/{model}/{model}_phase302_{shard}.partial.json
+results/.../{model}_phase302_passive_token_role_closure_{shard}.json
+results/.../passive_token_role_merged.json
+```
+
+运行脚本新增环境变量：
+
+```text
+ENABLE_GPU_MONITOR=0/1
+ENABLE_SNAPSHOT_NVIDIA_SMI=0/1
+```
+
+默认：
+
+```text
+ENABLE_GPU_MONITOR=0
+```
+
+原因：
+
+```text
+Phase 39 中 nvidia-smi 进程曾卡在 os_acquire_rwlock_write。
+高风险 token-level 长跑中并发 nvidia-smi 监控可能会被 driver lock 牵连。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+MAX_SECONDS=900 \
+OUTPUT_DIR=results/gpt5_phase302_shard_smoke \
+ENABLE_GPU_MONITOR=0 \
+tests/gpt5/run_phase302_normal.sh qwen3 \
+  --max-bases 4 \
+  --train-fraction 0.5 \
+  --layers 0 \
+  --modules resid_in,resid_out,mlp_out \
+  --alphas 0,1.0 \
+  --progress-every 1 \
+  --test-start 0 \
+  --test-count 1 \
+  --shard-label test000-001
+```
+
+结果：
+
+```text
+rows = 144
+probe_rows = 21
+nonfinite_rows = 0
+exit_code = 0
+kernel.since-start.filtered.log = 0 行
+```
+
+汇总也成功生成：
+
+```text
+results/gpt5_phase302_shard_smoke/passive_token_role_summary.json
+results/gpt5_phase302_shard_smoke/passive_token_role_merged.json
+results/gpt5_phase302_shard_smoke/PASSIVE_TOKEN_ROLE_SUMMARY.md
+```
+
+### 正式短分片测试
+
+第一轮每模型 2 个 test base：
+
+```bash
+MAX_BASES=16 \
+TEST_TOTAL=2 \
+SHARD_SIZE=1 \
+QWEN3_MAX_SECONDS=1800 \
+GLM4_MAX_SECONDS=2400 \
+DEEPSEEK7B_MAX_SECONDS=1800 \
+OUTPUT_DIR=results/gpt5_phase302_passive_token_role_sharded \
+ENABLE_GPU_MONITOR=0 \
+tests/gpt5/run_phase302_passive_token_role_sharded_normal_all.sh
+```
+
+随后继续扩展每模型第 3-4 个 test base：
+
+```bash
+OUT=results/gpt5_phase302_passive_token_role_sharded
+COMMON='--max-bases 16 --train-fraction 0.5 --modules resid_in,resid_out,mlp_out --alphas 0,1.0 --progress-every 1'
+
+for model_layers in \
+  'qwen3|0,1,2,3,4,5,6,7,8|1800' \
+  'glm4|0,1,2,3,4,5,6,7,8|2400' \
+  'deepseek7b|20,21,22,23,24,25,26,27|1800'; do
+  IFS='|' read -r model layers max_seconds <<< "$model_layers"
+  for start in 2 3; do
+    end=$((start+1))
+    label=$(printf 'test%03d-%03d' "$start" "$end")
+    MAX_SECONDS="$max_seconds" OUTPUT_DIR="$OUT" ENABLE_GPU_MONITOR=0 \
+      tests/gpt5/run_phase302_normal.sh "$model" \
+        --layers "$layers" \
+        --test-start "$start" \
+        --test-count 1 \
+        --shard-label "$label" \
+        $COMMON
+  done
+done
+
+python tests/gpt5/phase302_passive_token_role_summary.py \
+  --input-dir "$OUT" \
+  --output-dir "$OUT"
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase302_passive_token_role_sharded/qwen3_phase302_passive_token_role_closure_test000-001.json
+results/gpt5_phase302_passive_token_role_sharded/qwen3_phase302_passive_token_role_closure_test001-002.json
+results/gpt5_phase302_passive_token_role_sharded/qwen3_phase302_passive_token_role_closure_test002-003.json
+results/gpt5_phase302_passive_token_role_sharded/qwen3_phase302_passive_token_role_closure_test003-004.json
+
+results/gpt5_phase302_passive_token_role_sharded/glm4_phase302_passive_token_role_closure_test000-001.json
+results/gpt5_phase302_passive_token_role_sharded/glm4_phase302_passive_token_role_closure_test001-002.json
+results/gpt5_phase302_passive_token_role_sharded/glm4_phase302_passive_token_role_closure_test002-003.json
+results/gpt5_phase302_passive_token_role_sharded/glm4_phase302_passive_token_role_closure_test003-004.json
+
+results/gpt5_phase302_passive_token_role_sharded/deepseek7b_phase302_passive_token_role_closure_test000-001.json
+results/gpt5_phase302_passive_token_role_sharded/deepseek7b_phase302_passive_token_role_closure_test001-002.json
+results/gpt5_phase302_passive_token_role_sharded/deepseek7b_phase302_passive_token_role_closure_test002-003.json
+results/gpt5_phase302_passive_token_role_sharded/deepseek7b_phase302_passive_token_role_closure_test003-004.json
+
+results/gpt5_phase302_passive_token_role_sharded/passive_token_role_summary.json
+results/gpt5_phase302_passive_token_role_sharded/passive_token_role_merged.json
+results/gpt5_phase302_passive_token_role_sharded/PASSIVE_TOKEN_ROLE_SUMMARY.md
+```
+
+日志：
+
+```text
+results/gpt5_gpu_lock_logs/20260529_120156_phase302normal_qwen3
+results/gpt5_gpu_lock_logs/20260529_120326_phase302normal_qwen3
+results/gpt5_gpu_lock_logs/20260529_120456_phase302normal_glm4
+results/gpt5_gpu_lock_logs/20260529_120709_phase302normal_glm4
+results/gpt5_gpu_lock_logs/20260529_120918_phase302normal_deepseek7b
+results/gpt5_gpu_lock_logs/20260529_121052_phase302normal_deepseek7b
+results/gpt5_gpu_lock_logs/20260529_121249_phase302normal_qwen3
+results/gpt5_gpu_lock_logs/20260529_121421_phase302normal_qwen3
+results/gpt5_gpu_lock_logs/20260529_121549_phase302normal_glm4
+results/gpt5_gpu_lock_logs/20260529_121805_phase302normal_glm4
+results/gpt5_gpu_lock_logs/20260529_122014_phase302normal_deepseek7b
+results/gpt5_gpu_lock_logs/20260529_122145_phase302normal_deepseek7b
+```
+
+以上正式 shard 的 `kernel.since-start.filtered.log` 全部为 0 行。
+
+当前 GPU 状态：
+
+```text
+driver_version = 595.71.05
+memory_used = 566 MiB / 24564 MiB
+gpu_utilization = 3%
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  bases/train/test = 16 / 8 / 4
+  rows = 5184
+  nonfinite_rows = 0
+
+GLM4:
+  bases/train/test = 16 / 8 / 4
+  rows = 5184
+  nonfinite_rows = 0
+
+DeepSeek7B:
+  bases/train/test = 16 / 8 / 4
+  rows = 4608
+  nonfinite_rows = 0
+```
+
+总计：
+
+```text
+rows = 14976
+nonfinite_rows = 0
+shards = 12
+kernel filtered errors = 0
+```
+
+### Qwen3 客观结果
+
+probe 最佳结果：
+
+```text
+agent_to_patient:
+  best = L6 resid_out by_agent
+  acc = 0.750000
+  margin = 5.128343
+
+by_phrase:
+  best = L0 resid_out last
+  acc = 1.000000
+  margin = 9.339340
+
+voice:
+  best = L0 resid_out verb
+  acc = 1.000000
+  margin = 2.951893
+```
+
+token patch 最佳结果：
+
+```text
+by_phrase:
+  best = last_only / last
+  layer = L5 resid_out
+  progress = 0.188462
+  kl_ratio = 1.030767
+
+role_swap:
+  best = all_positions / object+subject
+  layer = L3 resid_out
+  progress = 0.057689
+  kl_ratio = 1.094042
+
+voice:
+  best = all_positions / object+subject+verb
+  layer = L2 resid_in
+  progress = 0.267556
+  kl_ratio = 1.272648
+```
+
+客观现象：
+
+```text
+1. Qwen3 的 voice 和 by_phrase 在 token-level probe 上很容易读出。
+2. token patch 有一定 progress，但 KL 没有稳定改善。
+3. role_swap 仍然很弱，即使 all_positions 同时 patch 也只有 0.058 左右。
+```
+
+### GLM4 客观结果
+
+probe 最佳结果：
+
+```text
+agent_to_patient:
+  best = L4 resid_out by_agent
+  acc = 0.750000
+  margin = 0.026202
+
+by_phrase:
+  best = L1 resid_out last
+  acc = 1.000000
+  margin = 0.067451
+
+voice:
+  best = L1 resid_out verb
+  acc = 1.000000
+  margin = 0.034583
+```
+
+token patch 最佳结果：
+
+```text
+by_phrase:
+  best = all_positions / last+subject+verb
+  layer = L4 resid_out
+  progress = 0.009157
+  kl_ratio = 0.990765
+
+role_swap:
+  best = all_positions / object+subject
+  layer = L4 resid_out
+  progress = 0.047778
+  kl_ratio = 0.948062
+
+voice:
+  best = subject_only / subject
+  layer = L8 resid_out
+  progress = 0.002460
+  kl_ratio = 1.008206
+```
+
+客观现象：
+
+```text
+1. GLM4 的 token-level probe 能读出 voice / by_phrase。
+2. 但 token-level direction patch 几乎不能推动输出。
+3. 这和 Phase 38 的 sequence-level voice forward 强效果形成反差。
+4. 说明 GLM4 的 passive write signal 可能更像整句/构造级状态，而不是简单 token 局部方向。
+```
+
+### DeepSeek7B 客观结果
+
+probe 最佳结果：
+
+```text
+agent_to_patient:
+  best = L20 mlp_out by_agent
+  acc = 0.750000
+  margin = 59.389148
+
+by_phrase:
+  best = L20 resid_in last
+  acc = 1.000000
+  margin = 7887.195618
+
+voice:
+  best = L20 resid_in verb
+  acc = 1.000000
+  margin = 3432.862277
+```
+
+token patch 最佳结果：
+
+```text
+by_phrase:
+  best = last_only / last
+  layer = L24 resid_out
+  progress = 0.006703
+  kl_ratio = 0.966365
+
+role_swap:
+  best = all_positions / object+subject
+  layer = L24 resid_out
+  progress = 0.093240
+  kl_ratio = 0.951682
+
+voice:
+  best = all_positions / object+subject+verb
+  layer = L20 resid_in
+  progress = 0.184532
+  kl_ratio = 1.185566
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 继续表现为 probe 极强、direction patch 较弱。
+2. voice token patch 比 by_phrase 更有 progress，但 KL 上升。
+3. role_swap 比 Qwen3/GLM4 稍强，但仍不足以称为角色绑定闭包。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  token-level voice patch 有一定效果；
+  by_phrase 有弱效果；
+  role_swap 很弱。
+
+GLM4:
+  token-level patch 整体很弱；
+  和 Phase 38 的 sequence-level voice forward 强效果相反；
+  更像 construction-level global write，不是 token-local direction。
+
+DeepSeek7B:
+  probe 极强；
+  token patch 仍弱；
+  role_swap 在三模型里相对略强，但仍不是闭包。
+```
+
+### 当前最重要的工程结论
+
+短 shard 方案有效：
+
+```text
+Phase 39:
+  长 session 触发 nvidia_uvm kernel Oops。
+
+Phase 40:
+  12 个短 shard 全部完成；
+  每个 shard 单独加载模型并退出；
+  kernel filtered 全部 0；
+  当前 GPU 正常。
+```
+
+因此后续 token-level 大测试必须使用：
+
+```text
+short shard + partial checkpoint + merge summary
+```
+
+不能再使用长 session 全量运行。
+
+### 当前最重要的机制线索
+
+Phase 40 不支持“token-level 单方向已经破解 role binding”。
+
+更谨慎的结论是：
+
+```text
+1. voice / by_phrase 在 token-level 可读出。
+2. agent_to_patient 也能部分读出，但准确率只有 0.75。
+3. token-level direction patch 对 role_swap 仍然很弱。
+4. 因此 role binding 不是简单 token 局部线性方向。
+```
+
+这进一步支持：
+
+```text
+passive = construction-level control + relational role binding + output formatting
+```
+
+其中：
+
+```text
+construction-level control:
+  Phase 38 GLM4 sequence-level voice forward 强。
+
+token-local role direction:
+  Phase 40 证据弱。
+```
+
+所以 passive 的下一步不应该继续做单方向 patch，而应该做：
+
+```text
+candidate-set role query
+destroy-and-restore
+token swap / state transplant
+subspace ablation
+segment recompute
+```
+
+### 硬伤
+
+1. 测试只有 4 个 test base/模型，仍是小样本。
+2. token-level direction 仍然是均值差分，不是学习到的 role subspace。
+3. 没有 candidate-set 输出验证，因此 role_swap progress 仍是全 logits 方向指标。
+4. 没有 destroy-and-restore。
+5. 没有真实 token swap，只是方向加法。
+6. GLM4 的 sequence-level 强效果与 token-level 弱效果之间还没有解释清楚。
+
+### 下一步计划
+
+Phase 41：candidate-set role query。
+
+核心目标：
+
+```text
+不要只看全 logits progress；
+直接问模型：who did the action / who received the action。
+```
+
+样本形式：
+
+```text
+The teacher praised the student. The person who did the action was the ...
+The student was praised by the teacher. The person who did the action was the ...
+The person who received the action was the ...
+```
+
+指标：
+
+```text
+agent candidate logprob
+patient candidate logprob
+agent-patient margin
+wrong-role margin
+```
+
+干预：
+
+```text
+1. patch subject token
+2. patch object token
+3. patch by_agent token
+4. swap subject/object hidden states
+5. restore correct role token state
+```
+
+判断标准：
+
+```text
+如果 patch 后 agent/patient candidate margin 按预期翻转或恢复，
+才开始接近 role binding closure。
+```
+
+Phase 42：GLM4 sequence-level construction signal 与 token-level role signal 的组合实验。
+
+Phase 43：Qwen3 logical operator closure。
+
+Phase 44：DeepSeek7B recursive segment closure。
