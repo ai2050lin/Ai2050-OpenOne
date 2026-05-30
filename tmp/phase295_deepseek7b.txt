@@ -1,0 +1,332 @@
+[2026-05-30 07:15:11] Phase 295: Identity-Role Decoupling — deepseek7b
+[2026-05-30 07:15:11] ============================================================
+[2026-05-30 07:15:13] Loading deepseek7b (bf16, device_map=auto)...
+[2026-05-30 07:15:14]   attn=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following 
+[2026-05-30 07:15:25]   Loaded with attn=sdpa, GPU=9.0GB
+[2026-05-30 07:15:25]   GPU layers: 17 (0-16), CPU: 11 (17-27)
+[2026-05-30 07:15:25]   n_layers=28, d_model=3584, class=Qwen2ForCausalLM
+[2026-05-30 07:15:25]   Valid stimuli: 250 pairs, 428 unique sentences
+[2026-05-30 07:15:25]     same_token_same_role: 100
+[2026-05-30 07:15:25]     same_token_diff_role: 21
+[2026-05-30 07:15:25]     diff_token_same_role: 109
+[2026-05-30 07:15:25]     diff_token_diff_role: 20
+[2026-05-30 07:15:25] 
+--- Capturing hidden states for 428 sentences ---
+[2026-05-30 07:15:37]   Captured 10/428 sentences (12s)
+[2026-05-30 07:15:44]   Captured 20/428 sentences (19s)
+[2026-05-30 07:15:51]   Captured 30/428 sentences (26s)
+[2026-05-30 07:15:58]   Captured 40/428 sentences (33s)
+[2026-05-30 07:16:05]   Captured 50/428 sentences (40s)
+[2026-05-30 07:16:11]   Captured 60/428 sentences (46s)
+[2026-05-30 07:16:18]   Captured 70/428 sentences (53s)
+[2026-05-30 07:16:25]   Captured 80/428 sentences (60s)
+[2026-05-30 07:16:32]   Captured 90/428 sentences (67s)
+[2026-05-30 07:16:39]   Captured 100/428 sentences (74s)
+[2026-05-30 07:16:46]   Captured 110/428 sentences (81s)
+[2026-05-30 07:16:53]   Captured 120/428 sentences (87s)
+[2026-05-30 07:16:59]   Captured 130/428 sentences (94s)
+[2026-05-30 07:17:06]   Captured 140/428 sentences (101s)
+[2026-05-30 07:17:13]   Captured 150/428 sentences (108s)
+[2026-05-30 07:17:20]   Captured 160/428 sentences (115s)
+[2026-05-30 07:17:27]   Captured 170/428 sentences (122s)
+[2026-05-30 07:17:34]   Captured 180/428 sentences (129s)
+[2026-05-30 07:17:41]   Captured 190/428 sentences (135s)
+[2026-05-30 07:17:48]   Captured 200/428 sentences (142s)
+[2026-05-30 07:17:54]   Captured 210/428 sentences (149s)
+[2026-05-30 07:18:01]   Captured 220/428 sentences (156s)
+[2026-05-30 07:18:08]   Captured 230/428 sentences (163s)
+[2026-05-30 07:18:15]   Captured 240/428 sentences (170s)
+[2026-05-30 07:18:22]   Captured 250/428 sentences (177s)
+[2026-05-30 07:18:29]   Captured 260/428 sentences (183s)
+[2026-05-30 07:18:36]   Captured 270/428 sentences (190s)
+[2026-05-30 07:18:42]   Captured 280/428 sentences (197s)
+[2026-05-30 07:18:49]   Captured 290/428 sentences (204s)
+[2026-05-30 07:18:56]   Captured 300/428 sentences (211s)
+[2026-05-30 07:19:03]   Captured 310/428 sentences (218s)
+[2026-05-30 07:19:10]   Captured 320/428 sentences (224s)
+[2026-05-30 07:19:16]   Captured 330/428 sentences (231s)
+[2026-05-30 07:19:23]   Captured 340/428 sentences (238s)
+[2026-05-30 07:19:30]   Captured 350/428 sentences (245s)
+[2026-05-30 07:19:37]   Captured 360/428 sentences (252s)
+[2026-05-30 07:19:44]   Captured 370/428 sentences (259s)
+[2026-05-30 07:19:51]   Captured 380/428 sentences (266s)
+[2026-05-30 07:19:57]   Captured 390/428 sentences (272s)
+[2026-05-30 07:20:05]   Captured 400/428 sentences (279s)
+[2026-05-30 07:20:11]   Captured 410/428 sentences (286s)
+[2026-05-30 07:20:18]   Captured 420/428 sentences (293s)
+[2026-05-30 07:20:24]   Captured all sentences in 298s
+[2026-05-30 07:20:24] 
+--- Measurement 1: Layer-wise Cosine Similarity ---
+[2026-05-30 07:20:24]   same_token_same_role: 100 pairs
+[2026-05-30 07:20:24]     L0: avg_cos=1.0000
+[2026-05-30 07:20:24]     L7: avg_cos=0.8367
+[2026-05-30 07:20:24]     L14: avg_cos=0.8053
+[2026-05-30 07:20:24]     L21: avg_cos=0.8695
+[2026-05-30 07:20:24]     L28: avg_cos=0.8328
+[2026-05-30 07:20:24]   same_token_diff_role: 21 pairs
+[2026-05-30 07:20:24]     L0: avg_cos=0.7876
+[2026-05-30 07:20:24]     L7: avg_cos=0.4391
+[2026-05-30 07:20:24]     L14: avg_cos=0.4790
+[2026-05-30 07:20:24]     L21: avg_cos=0.6457
+[2026-05-30 07:20:24]     L28: avg_cos=0.7168
+[2026-05-30 07:20:24]   diff_token_same_role: 109 pairs
+[2026-05-30 07:20:24]     L0: avg_cos=0.1380
+[2026-05-30 07:20:24]     L7: avg_cos=0.6450
+[2026-05-30 07:20:24]     L14: avg_cos=0.7235
+[2026-05-30 07:20:24]     L21: avg_cos=0.8289
+[2026-05-30 07:20:24]     L28: avg_cos=0.8787
+[2026-05-30 07:20:24]   diff_token_diff_role: 20 pairs
+[2026-05-30 07:20:24]     L0: avg_cos=0.0227
+[2026-05-30 07:20:24]     L7: avg_cos=0.5041
+[2026-05-30 07:20:24]     L14: avg_cos=0.6047
+[2026-05-30 07:20:24]     L21: avg_cos=0.7331
+[2026-05-30 07:20:24]     L28: avg_cos=0.8360
+[2026-05-30 07:20:24] 
+--- Measurement 2: Norm-Matched Patching ---
+[2026-05-30 07:20:25]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:26]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:28]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:29]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:30]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:31]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:33]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:20:34]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:21:42]   Norm-matched patching: 28 results, 78s
+[2026-05-30 07:21:42] 
+--- Measurement 3: Linear Probes (token identity vs role) ---
+[2026-05-30 07:21:42]   Token identity probe accuracy:
+[2026-05-30 07:21:42]   Role probe accuracy:
+[2026-05-30 07:21:42] 
+--- Measurement 4: Distance Structure ---
+[2026-05-30 07:22:27]   Intra-token vs Inter-token cosine sim:
+[2026-05-30 07:22:27]     L0: intra=0.9872 inter=0.0632 gap=+0.9240
+[2026-05-30 07:22:27]     L7: intra=0.7650 inter=0.3625 gap=+0.4025
+[2026-05-30 07:22:27]     L14: intra=0.7604 inter=0.4796 gap=+0.2807
+[2026-05-30 07:22:27]     L21: intra=0.8407 inter=0.6539 gap=+0.1868
+[2026-05-30 07:22:27]     L28: intra=0.8127 inter=0.6644 gap=+0.1484
+[2026-05-30 07:22:27]   Intra-role vs Inter-role cosine sim:
+[2026-05-30 07:22:27]     L0: intra=0.0940 inter=0.0359 gap=+0.0581
+[2026-05-30 07:22:27]     L7: intra=0.3926 inter=0.2966 gap=+0.0960
+[2026-05-30 07:22:27]     L14: intra=0.5029 inter=0.4266 gap=+0.0762
+[2026-05-30 07:22:27]     L21: intra=0.6750 inter=0.6006 gap=+0.0744
+[2026-05-30 07:22:27]     L28: intra=0.6901 inter=0.5931 gap=+0.0970
+[2026-05-30 07:22:27] 
+--- Saving results ---
+[2026-05-30 07:22:32]   Saved to results\phase295_identity_role\deepseek7b_identity_role.json
+[2026-05-30 07:22:32] 
+============================================================
+[2026-05-30 07:22:32] PHASE 295 SUMMARY — deepseek7b
+[2026-05-30 07:22:32] ============================================================
+[2026-05-30 07:22:32] 
+  Identity signal (intra_token - inter_token gap):
+[2026-05-30 07:22:32]     L 0: tok_gap=+0.9240 role_gap=+0.0581 dominant=TOKEN
+[2026-05-30 07:22:32]     L 4: tok_gap=+0.4263 role_gap=+0.0997 dominant=TOKEN
+[2026-05-30 07:22:32]     L 8: tok_gap=+0.4237 role_gap=+0.0709 dominant=TOKEN
+[2026-05-30 07:22:32]     L12: tok_gap=+0.3421 role_gap=+0.0692 dominant=TOKEN
+[2026-05-30 07:22:32]     L16: tok_gap=+0.2360 role_gap=+0.0923 dominant=TOKEN
+[2026-05-30 07:22:32]     L20: tok_gap=+0.1826 role_gap=+0.1017 dominant=TOKEN
+[2026-05-30 07:22:32]     L24: tok_gap=+0.1774 role_gap=+0.0552 dominant=TOKEN
+[2026-05-30 07:22:32]     L26: tok_gap=+0.1173 role_gap=+0.0641 dominant=TOKEN
+[2026-05-30 07:22:32]     L27: tok_gap=+0.0816 role_gap=+0.0468 dominant=TOKEN
+[2026-05-30 07:22:32]     L28: tok_gap=+0.1484 role_gap=+0.0970 dominant=TOKEN
+[2026-05-30 07:22:32] 
+  Norm-matched patching (early vs late):
+[2026-05-30 07:22:32]     Early: aligned=0.3303 misaligned=0.5866 norm_matched=0.1831 norm_ratio=0.79
+[2026-05-30 07:22:32]     Late: aligned=0.0070 misaligned=0.3391 norm_matched=-0.0006 norm_ratio=0.35
+[2026-05-30 07:22:33]   Model released. GPU: 0.01GB
+[2026-05-30 07:22:33] Phase 295 complete for deepseek7b!
+[2026-05-30 07:42:10] Phase 295: Identity-Role Decoupling — deepseek7b
+[2026-05-30 07:42:10] ============================================================
+[2026-05-30 07:42:12] Loading deepseek7b (bf16, device_map=auto)...
+[2026-05-30 07:42:14]   attn=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following 
+[2026-05-30 07:42:25]   Loaded with attn=sdpa, GPU=9.0GB
+[2026-05-30 07:42:25]   GPU layers: 17 (0-16), CPU: 11 (17-27)
+[2026-05-30 07:42:25]   n_layers=28, d_model=3584, class=Qwen2ForCausalLM
+[2026-05-30 07:42:25]   Valid stimuli: 250 pairs, 428 unique sentences
+[2026-05-30 07:42:25]     same_token_same_role: 100
+[2026-05-30 07:42:25]     same_token_diff_role: 21
+[2026-05-30 07:42:25]     diff_token_same_role: 109
+[2026-05-30 07:42:25]     diff_token_diff_role: 20
+[2026-05-30 07:42:25] 
+--- Capturing hidden states for 428 sentences ---
+[2026-05-30 07:42:37]   Captured 10/428 sentences (12s)
+[2026-05-30 07:42:44]   Captured 20/428 sentences (19s)
+[2026-05-30 07:42:51]   Captured 30/428 sentences (26s)
+[2026-05-30 07:42:57]   Captured 40/428 sentences (33s)
+[2026-05-30 07:43:04]   Captured 50/428 sentences (40s)
+[2026-05-30 07:43:11]   Captured 60/428 sentences (46s)
+[2026-05-30 07:43:18]   Captured 70/428 sentences (53s)
+[2026-05-30 07:43:24]   Captured 80/428 sentences (60s)
+[2026-05-30 07:43:31]   Captured 90/428 sentences (67s)
+[2026-05-30 07:43:38]   Captured 100/428 sentences (74s)
+[2026-05-30 07:43:45]   Captured 110/428 sentences (80s)
+[2026-05-30 07:43:52]   Captured 120/428 sentences (87s)
+[2026-05-30 07:43:59]   Captured 130/428 sentences (94s)
+[2026-05-30 07:44:05]   Captured 140/428 sentences (101s)
+[2026-05-30 07:44:12]   Captured 150/428 sentences (108s)
+[2026-05-30 07:44:19]   Captured 160/428 sentences (115s)
+[2026-05-30 07:44:26]   Captured 170/428 sentences (121s)
+[2026-05-30 07:44:33]   Captured 180/428 sentences (129s)
+[2026-05-30 07:44:40]   Captured 190/428 sentences (135s)
+[2026-05-30 07:44:47]   Captured 200/428 sentences (142s)
+[2026-05-30 07:44:53]   Captured 210/428 sentences (149s)
+[2026-05-30 07:45:00]   Captured 220/428 sentences (156s)
+[2026-05-30 07:45:07]   Captured 230/428 sentences (162s)
+[2026-05-30 07:45:14]   Captured 240/428 sentences (169s)
+[2026-05-30 07:45:21]   Captured 250/428 sentences (176s)
+[2026-05-30 07:45:27]   Captured 260/428 sentences (183s)
+[2026-05-30 07:45:34]   Captured 270/428 sentences (190s)
+[2026-05-30 07:45:41]   Captured 280/428 sentences (196s)
+[2026-05-30 07:45:48]   Captured 290/428 sentences (203s)
+[2026-05-30 07:45:54]   Captured 300/428 sentences (210s)
+[2026-05-30 07:46:02]   Captured 310/428 sentences (217s)
+[2026-05-30 07:46:08]   Captured 320/428 sentences (224s)
+[2026-05-30 07:46:15]   Captured 330/428 sentences (231s)
+[2026-05-30 07:46:22]   Captured 340/428 sentences (237s)
+[2026-05-30 07:46:29]   Captured 350/428 sentences (244s)
+[2026-05-30 07:46:35]   Captured 360/428 sentences (251s)
+[2026-05-30 07:46:42]   Captured 370/428 sentences (258s)
+[2026-05-30 07:46:49]   Captured 380/428 sentences (265s)
+[2026-05-30 07:46:56]   Captured 390/428 sentences (271s)
+[2026-05-30 07:47:03]   Captured 400/428 sentences (278s)
+[2026-05-30 07:47:09]   Captured 410/428 sentences (285s)
+[2026-05-30 07:47:16]   Captured 420/428 sentences (292s)
+[2026-05-30 07:47:22]   Captured all sentences in 297s
+[2026-05-30 07:47:22] 
+--- Measurement 1: Layer-wise Cosine Similarity ---
+[2026-05-30 07:47:22]   same_token_same_role: 100 pairs
+[2026-05-30 07:47:22]     L0: avg_cos=1.0000
+[2026-05-30 07:47:22]     L7: avg_cos=0.8367
+[2026-05-30 07:47:22]     L14: avg_cos=0.8053
+[2026-05-30 07:47:22]     L21: avg_cos=0.8695
+[2026-05-30 07:47:22]     L28: avg_cos=0.8328
+[2026-05-30 07:47:22]   same_token_diff_role: 21 pairs
+[2026-05-30 07:47:22]     L0: avg_cos=0.7876
+[2026-05-30 07:47:22]     L7: avg_cos=0.4391
+[2026-05-30 07:47:22]     L14: avg_cos=0.4790
+[2026-05-30 07:47:22]     L21: avg_cos=0.6457
+[2026-05-30 07:47:22]     L28: avg_cos=0.7168
+[2026-05-30 07:47:22]   diff_token_same_role: 109 pairs
+[2026-05-30 07:47:22]     L0: avg_cos=0.1380
+[2026-05-30 07:47:22]     L7: avg_cos=0.6450
+[2026-05-30 07:47:22]     L14: avg_cos=0.7235
+[2026-05-30 07:47:22]     L21: avg_cos=0.8289
+[2026-05-30 07:47:22]     L28: avg_cos=0.8787
+[2026-05-30 07:47:22]   diff_token_diff_role: 20 pairs
+[2026-05-30 07:47:22]     L0: avg_cos=0.0227
+[2026-05-30 07:47:22]     L7: avg_cos=0.5041
+[2026-05-30 07:47:22]     L14: avg_cos=0.6047
+[2026-05-30 07:47:22]     L21: avg_cos=0.7331
+[2026-05-30 07:47:22]     L28: avg_cos=0.8360
+[2026-05-30 07:47:22] 
+--- Measurement 2: Norm-Matched Patching ---
+[2026-05-30 07:47:23]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:24]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:26]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:27]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:28]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:29]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:31]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:47:32]   NormMatch 0/1120 (0.0/s) ETA=0s
+[2026-05-30 07:48:40]   Norm-matched patching: 28 results, 78s
+[2026-05-30 07:48:40] 
+--- Measurement 3: Linear Probes (token identity vs role) ---
+[2026-05-30 07:57:12]   Token identity probe accuracy:
+[2026-05-30 07:57:12]     L0: 0.9500 (n=500, classes=87)
+[2026-05-30 07:57:12]     L1: 0.9540 (n=500, classes=87)
+[2026-05-30 07:57:12]     L2: 0.9540 (n=500, classes=87)
+[2026-05-30 07:57:12]     L3: 0.9540 (n=500, classes=87)
+[2026-05-30 07:57:12]     L4: 0.9500 (n=500, classes=87)
+[2026-05-30 07:57:12]     L5: 0.9380 (n=500, classes=87)
+[2026-05-30 07:57:12]     L6: 0.9360 (n=500, classes=87)
+[2026-05-30 07:57:12]     L7: 0.9360 (n=500, classes=87)
+[2026-05-30 07:57:12]     L8: 0.9320 (n=500, classes=87)
+[2026-05-30 07:57:12]     L9: 0.9300 (n=500, classes=87)
+[2026-05-30 07:57:12]     L10: 0.9300 (n=500, classes=87)
+[2026-05-30 07:57:12]     L11: 0.9300 (n=500, classes=87)
+[2026-05-30 07:57:12]     L12: 0.9240 (n=500, classes=87)
+[2026-05-30 07:57:12]     L13: 0.9200 (n=500, classes=87)
+[2026-05-30 07:57:12]     L14: 0.9180 (n=500, classes=87)
+[2026-05-30 07:57:12]     L15: 0.9180 (n=500, classes=87)
+[2026-05-30 07:57:12]     L16: 0.9160 (n=500, classes=87)
+[2026-05-30 07:57:12]     L17: 0.9120 (n=500, classes=87)
+[2026-05-30 07:57:12]     L18: 0.9100 (n=500, classes=87)
+[2026-05-30 07:57:12]     L19: 0.9059 (n=500, classes=87)
+[2026-05-30 07:57:12]     L20: 0.9060 (n=500, classes=87)
+[2026-05-30 07:57:12]     L21: 0.9200 (n=500, classes=87)
+[2026-05-30 07:57:12]     L22: 0.9200 (n=500, classes=87)
+[2026-05-30 07:57:12]     L23: 0.9180 (n=500, classes=87)
+[2026-05-30 07:57:12]     L24: 0.9140 (n=500, classes=87)
+[2026-05-30 07:57:12]     L25: 0.9260 (n=500, classes=87)
+[2026-05-30 07:57:12]     L26: 0.9220 (n=500, classes=87)
+[2026-05-30 07:57:12]     L27: 0.9200 (n=500, classes=87)
+[2026-05-30 07:57:12]     L28: 0.8278 (n=500, classes=87)
+[2026-05-30 07:57:12]   Role probe accuracy:
+[2026-05-30 07:57:12]     L0: 0.9060 (n=500, classes=5)
+[2026-05-30 07:57:12]     L1: 0.9720 (n=500, classes=5)
+[2026-05-30 07:57:12]     L2: 0.9780 (n=500, classes=5)
+[2026-05-30 07:57:12]     L3: 0.9760 (n=500, classes=5)
+[2026-05-30 07:57:12]     L4: 0.9860 (n=500, classes=5)
+[2026-05-30 07:57:12]     L5: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L6: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L7: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L8: 0.9780 (n=500, classes=5)
+[2026-05-30 07:57:12]     L9: 0.9780 (n=500, classes=5)
+[2026-05-30 07:57:12]     L10: 0.9800 (n=500, classes=5)
+[2026-05-30 07:57:12]     L11: 0.9780 (n=500, classes=5)
+[2026-05-30 07:57:12]     L12: 0.9800 (n=500, classes=5)
+[2026-05-30 07:57:12]     L13: 0.9780 (n=500, classes=5)
+[2026-05-30 07:57:12]     L14: 0.9800 (n=500, classes=5)
+[2026-05-30 07:57:12]     L15: 0.9860 (n=500, classes=5)
+[2026-05-30 07:57:12]     L16: 0.9880 (n=500, classes=5)
+[2026-05-30 07:57:12]     L17: 0.9880 (n=500, classes=5)
+[2026-05-30 07:57:12]     L18: 0.9880 (n=500, classes=5)
+[2026-05-30 07:57:12]     L19: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L20: 0.9900 (n=500, classes=5)
+[2026-05-30 07:57:12]     L21: 0.9900 (n=500, classes=5)
+[2026-05-30 07:57:12]     L22: 0.9900 (n=500, classes=5)
+[2026-05-30 07:57:12]     L23: 0.9900 (n=500, classes=5)
+[2026-05-30 07:57:12]     L24: 0.9840 (n=500, classes=5)
+[2026-05-30 07:57:12]     L25: 0.9840 (n=500, classes=5)
+[2026-05-30 07:57:12]     L26: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L27: 0.9820 (n=500, classes=5)
+[2026-05-30 07:57:12]     L28: 0.9740 (n=500, classes=5)
+[2026-05-30 07:57:12] 
+--- Measurement 4: Distance Structure ---
+[2026-05-30 07:57:58]   Intra-token vs Inter-token cosine sim:
+[2026-05-30 07:57:58]     L0: intra=0.9872 inter=0.0632 gap=+0.9240
+[2026-05-30 07:57:58]     L7: intra=0.7650 inter=0.3625 gap=+0.4025
+[2026-05-30 07:57:58]     L14: intra=0.7604 inter=0.4796 gap=+0.2807
+[2026-05-30 07:57:58]     L21: intra=0.8407 inter=0.6539 gap=+0.1868
+[2026-05-30 07:57:58]     L28: intra=0.8127 inter=0.6644 gap=+0.1484
+[2026-05-30 07:57:58]   Intra-role vs Inter-role cosine sim:
+[2026-05-30 07:57:58]     L0: intra=0.0940 inter=0.0359 gap=+0.0581
+[2026-05-30 07:57:58]     L7: intra=0.3926 inter=0.2966 gap=+0.0960
+[2026-05-30 07:57:58]     L14: intra=0.5029 inter=0.4266 gap=+0.0762
+[2026-05-30 07:57:58]     L21: intra=0.6750 inter=0.6006 gap=+0.0744
+[2026-05-30 07:57:58]     L28: intra=0.6901 inter=0.5931 gap=+0.0970
+[2026-05-30 07:57:58] 
+--- Saving results ---
+[2026-05-30 07:58:02]   Saved to results\phase295_identity_role\deepseek7b_identity_role.json
+[2026-05-30 07:58:02] 
+============================================================
+[2026-05-30 07:58:02] PHASE 295 SUMMARY — deepseek7b
+[2026-05-30 07:58:02] ============================================================
+[2026-05-30 07:58:02] 
+  Identity signal (intra_token - inter_token gap):
+[2026-05-30 07:58:02]     L 0: tok_gap=+0.9240 role_gap=+0.0581 dominant=TOKEN
+[2026-05-30 07:58:02]     L 4: tok_gap=+0.4263 role_gap=+0.0997 dominant=TOKEN
+[2026-05-30 07:58:02]     L 8: tok_gap=+0.4237 role_gap=+0.0709 dominant=TOKEN
+[2026-05-30 07:58:02]     L12: tok_gap=+0.3421 role_gap=+0.0692 dominant=TOKEN
+[2026-05-30 07:58:02]     L16: tok_gap=+0.2360 role_gap=+0.0923 dominant=TOKEN
+[2026-05-30 07:58:02]     L20: tok_gap=+0.1826 role_gap=+0.1017 dominant=TOKEN
+[2026-05-30 07:58:02]     L24: tok_gap=+0.1774 role_gap=+0.0552 dominant=TOKEN
+[2026-05-30 07:58:02]     L26: tok_gap=+0.1173 role_gap=+0.0641 dominant=TOKEN
+[2026-05-30 07:58:02]     L27: tok_gap=+0.0816 role_gap=+0.0468 dominant=TOKEN
+[2026-05-30 07:58:02]     L28: tok_gap=+0.1484 role_gap=+0.0970 dominant=TOKEN
+[2026-05-30 07:58:02] 
+  Norm-matched patching (early vs late):
+[2026-05-30 07:58:02]     Early: aligned=0.3303 misaligned=0.5866 norm_matched=0.1831 norm_ratio=0.79
+[2026-05-30 07:58:02]     Late: aligned=0.0070 misaligned=0.3391 norm_matched=-0.0006 norm_ratio=0.35
+[2026-05-30 07:58:03]   Model released. GPU: 0.01GB
+[2026-05-30 07:58:03] Phase 295 complete for deepseek7b!

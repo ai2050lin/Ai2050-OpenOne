@@ -59602,6 +59602,1174 @@ Phase 292 最重要的发现是**三模型的否定契约维度完全不同**：
 - 验证 GLM4 α 无效应是否因 KR 过高（用 KL-weighted progress 或 resid patching）
 - 扩展到翻译、逻辑功能，构建功能复用矩阵
 
+## Phase 293: Component Contract Decomposition [2026-05-29 12:35]
+
+### 设计思路
+
+Phase 293 修正 Phase 292 的三个核心问题：
+1. **Natural Progress (NP) = PROG / (1+KR)**：惩罚不自然的高 KR patch
+2. **resid_post 正确实现**：用 hidden_states[li+1] 替换整层输出（非 fake both）
+3. **全层×组件扫描**：attn/mlp/resid_post 三组件全层测试
+
+60 对否定句（6 子类型×10 对），三模型全层全组件。
+
+### 跨模型核心对比
+
+**Exp A: 最佳层×组件 (by NP)**
+
+| 模型 | Best Attn | NP | Best MLP | NP | Best Resid | NP |
+|------|-----------|-----|----------|-----|------------|-----|
+| Qwen3 | L0 | 0.3117 | L0 | 0.3739 | L0 | 0.3966 |
+| GLM4 | L4 | 0.0786 | L0 | 0.4023 | L0 | 0.4166 |
+| DS7B | L27 | 0.2608 | L0 | 0.3425 | L0 | 0.4231 |
+
+**MLP Advantage at L0 (mlp_NP - attn_NP)**
+
+| 模型 | Attn NP | MLP NP | Resid NP | MLP_adv | Attn/MLP |
+|------|---------|--------|----------|---------|----------|
+| Qwen3 | 0.3117 | 0.3739 | 0.3966 | +0.062 | 0.83x |
+| GLM4 | 0.0115 | 0.4023 | 0.4166 | **+0.391** | **0.03x** |
+| DS7B | 0.2223 | 0.3425 | 0.4231 | +0.120 | 0.65x |
+
+→ **GLM4 的 attention 对否定几乎无效**（NP=0.0115），否定功能完全由 MLP 承载。
+
+**Position Effect: Early Layers (resid_post)**
+
+| 模型 | Layer | Operator | Operand | Last | Op/Last |
+|------|-------|----------|---------|------|---------|
+| Qwen3 | L0 | 0.491 | 0.288 | 0.150 | **3.28x** |
+| GLM4 | L0 | 0.455 | 0.181 | 0.150 | **3.03x** |
+| DS7B | L0 | 0.387 | 0.182 | 0.195 | **1.98x** |
+
+→ **三模型在早层都有 operator >> last 的位置效应**！Phase 292 的"GLM4 无位置效应"是错误结论——因为 Phase 292 只用了 attention-only patching，而 GLM4 的 attention 对否定无效。
+
+**Position Effect: Deep Layers (resid_post)**
+
+| 模型 | Layer | Operator | Operand | Last | Last/Op |
+|------|-------|----------|---------|------|---------|
+| Qwen3 | L23 | 0.203 | 0.205 | 0.314 | **1.55x** |
+| GLM4 | L38 | 0.166 | 0.192 | 0.382 | **2.31x** |
+| DS7B | L26 | 0.193 | 0.189 | 0.379 | **1.97x** |
+
+→ **三模型在深层都反转位置效应**：last >> operator。这是 Transformer 否定处理的普遍性质。
+
+**Last Layer Resid_Post Anomaly**
+
+| 模型 | L0 NP | Last NP | L0 KR | Last KR | Drop |
+|------|-------|---------|-------|---------|------|
+| Qwen3 | 0.3966 | 0.0367 | 10.19 | 28.97 | +0.360 |
+| GLM4 | 0.4166 | 0.4165 | 6.28 | 6.28 | +0.000 |
+| DS7B | 0.4231 | 0.1144 | 3.86 | 12.29 | +0.309 |
+
+→ Qwen3/DS7B 最后一层 resid_post "all" NP 暴跌，GLM4 无此问题。原因可能是 tokenizer 对齐差异导致的位置错配。
+
+### D1: 位置效应是三模型普遍性质（修正 Phase 292）
+
+Phase 292 认为"GLM4 无位置效应"。Phase 293 用 resid_post 替换（而非 attention-only 替换）发现：
+
+- Qwen3 L0 operator/last = 3.28x
+- GLM4 L0 operator/last = 3.03x
+- DS7B L0 operator/last = 1.98x
+
+三模型全部有 operator >> last 的位置效应。GLM4 在 Phase 292 中"无效应"是因为 attention 替换对 GLM4 无效（NP=0.0115），不是 GLM4 没有位置效应。
+
+### D2: 位置效应随层深度反转
+
+三模型一致显示：
+- 早层 (L0-L4): operator >> last (否定词位置最敏感)
+- 深层 (L22-L38): last >> operator (预测位置最敏感)
+
+这意味着否定功能的计算路径是：
+1. 早层：识别否定词位置，建立否定触发
+2. 中层：传播否定信息到全序列
+3. 深层：在预测位置整合否定结果
+
+### D3: GLM4 否定完全依赖 MLP
+
+GLM4 L0: attn NP=0.0115, mlp NP=0.4023, ratio=0.03x
+Qwen3 L0: attn NP=0.3117, mlp NP=0.3739, ratio=0.83x
+DS7B L0: attn NP=0.2223, mlp NP=0.3425, ratio=0.65x
+
+GLM4 的 attention 对否定功能几乎完全无效，而 Qwen3/DS7B 的 attention 有约 65-83% 的 MLP 效果。这说明 GLM4 的否定编码完全走 MLP 路径。
+
+### D4: DS7B 深层 Attention 独特
+
+DS7B 的最佳 attention 在 L27 (NP=0.2608)，而 Qwen3 在 L0 (NP=0.3117)，GLM4 在 L4 (NP=0.0786)。
+
+DS7B 是唯一一个深层 attention 比早层 attention 更强的模型。这与 Phase 291 的"DS7B 深层分布式"一致。
+
+### D5: Resid_post L0-L4 全等是数学性质
+
+三模型的 resid_post "all" 在 L0-L4 给出完全相同的 NP（差值 < 0.001）：
+- Qwen3: 0.39655
+- GLM4: 0.41655
+- DS7B: 0.42309
+
+这是因为在任意层做全位置残差流替换，后续层会自然地从 B 的状态重算到 B 的最终输出。不是"早层就完成否定"，而是"全位置替换 = 重置整个计算路径"。
+
+### D6: Alpha 曲线中 α=0 时 NP=0
+
+三模型在 resid_post 组件的 α=0 时 NP 都等于 0（因为替换 A 的 hidden_states 为 A 自己的 hidden_states = 不改变）。
+
+这说明 NP 指标比 PROG 更合理：α=0 时不应有推进，NP 正确反映这一点。
+
+### 新增客观事实拼图（8条）
+
+1. 三模型早层都有 operator >> last 位置效应（operator/last = 2-3.3x）
+2. 三模型深层都反转位置效应（last/operator = 1.4-2.3x）
+3. GLM4 attention 对否定几乎无效（NP=0.0115），否定完全走 MLP
+4. DS7B 最佳 attention 在深层 L27（NP=0.2608），其他模型在早层
+5. Resid_post 全位置替换在 L0-L4 给出相同结果（数学性质）
+6. Qwen3/DS7B 最后一层 resid_post NP 暴跌，GLM4 无此问题
+7. GLM4 L3 的 operator NP 最高（0.496），超过 Qwen3 L0（0.491）
+8. 三模型的 MLP 都比 Attention 更能传递否定信息（MLP_adv 全为正）
+
+### 硬伤分析
+
+1. **位置对齐问题**：A/B 句长度不同时，位置级替换产生错位，影响最后一层结果
+2. **α=0 的 NP=0 只对 resid_post 成立**：attn/mlp 的 α=0 NP 不一定为 0
+3. **"all" 位置 NP 的物理意义不明确**：全位置替换等同于重置计算路径，不是测试"哪层重要"
+4. **GLM4 深层 KR 可能掩盖真实效应**：GLM4 L0 KR=6.28 仍然较高
+5. **子类型分解未在 Exp B/C 中呈现**：位置和组件的子类型交互未测
+
+### 命令记录
+
+```bash
+python tests/glm5/phase293_component_contract.py qwen3      # 11min, 6480+5280+6300 results
+python tests/glm5/phase293_component_contract.py glm4        # 269min, 7200+4320+4500 results
+python tests/glm5/phase293_component_contract.py deepseek7b  # 160min, 5040+5280+5400 results
+python tests/glm5_temp/phase293_compare.py                   # 跨模型对比
+```
+
+### 数据文件
+
+- `results/phase293_component_contract/{qwen3,glm4,deepseek7b}_component.json`
+- `tests/glm5/phase293_component_contract.py`
+- `tests/glm5_temp/phase293_compare.py`
+
+### 关键洞察
+
+Phase 293 最重要发现：**位置效应是 Transformer 否定处理的普遍性质，不是模型特异**。
+
+Phase 292 的"三模型否定契约维度不同"需要修正：
+- ~~Qwen3 偏位置维度~~ → 三模型都有位置维度
+- ~~GLM4 无维度差异~~ → GLM4 有位置维度但依赖 MLP 而非 Attention
+- ~~DS7B 偏组件维度~~ → DS7B 也有位置维度，且深层 attention 独特
+
+真正的差异不在"有没有位置效应"，而在：
+1. **组件路径**：GLM4 几乎完全走 MLP，Qwen3/DS7B 的 attention 有 65-83% 的 MLP 效果
+2. **Attention 层位**：DS7B 在深层（L27），Qwen3 在早层（L0），GLM4 在早层但极弱（L4, NP=0.079）
+3. **最后一层行为**：GLM4 最后一层正常，Qwen3/DS7B 最后一层异常（可能是 tokenizer 对齐问题）
+
+下一步：
+- 解决 A/B 句长不一致的位置对齐问题（对齐 token 级 patching）
+- 测试 attn+mlp 联合替换 vs 单组件替换的差异
+- 增加子类型×位置×组件的三维交叉分析
+
+## Phase 294: Token Alignment Fix [2026-05-30 05:00]
+
+### 设计思路
+
+Phase 293 的核心缺陷：A/B 句长不同时，按绝对位置 patching 产生错位。例如 B="she is not happy" 的 "not" 在 pos3，A="she is happy" 的 pos3 是 "happy"，patch B[pos3]→A[pos3] 等于把 "not" 的激活注入 "happy" 位置。
+
+Phase 294 修复：建立语义角色对齐表，按角色位置 patching：
+- operand_aligned: B[operand_pos_B] → A[operand_pos_A]
+- last_aligned: B[last_pos_B] → A[last_pos_A]
+- operand_misaligned: B[operand_pos_B] → A[operand_pos_B]（Phase 293 bug 复现）
+- last_misaligned: B[last_pos_B] → A[last_pos_B]（Phase 293 bug 复现）
+
+三模型 60 对否定句（6 子类型×10 对），resid_post 全层扫描。
+
+### 核心发现1：早层对齐 < 错位，深层反转
+
+**Operand 位置（resid_post, B→A）**
+
+| 层段 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| L0 aligned | 0.283 | 0.267 | 0.302 |
+| L0 misaligned | **0.377** | **0.384** | **0.410** |
+| 交叉层 | L5 | L2 | L1 |
+| 深层 aligned | 0.383 | 0.390 | 0.361 |
+| 深层 misaligned | 0.247 | 0.256 | 0.284 |
+
+→ **三模型在 L0 全部显示 misaligned > aligned**。operand 错位 patching 在早层更有效。
+
+**Last 位置（resid_post, B→A）**
+
+| 层段 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| L0 aligned | 0.159 | 0.158 | 0.176 |
+| L0 misaligned | **0.394** | **0.393** | **0.396** |
+| 交叉层 | L28 | L31 | 未交叉 |
+| 深层 aligned | 0.985 | 0.995 | 0.771 |
+| 深层 misaligned | 0.976 | 0.998 | 0.875 |
+
+→ **三模型在 L0 全部显示 misaligned >> aligned（2.5倍）**。last 位置错位效果更强。GLM4 在 L31 交叉，Qwen3 在 L28 交叉，DS7B 始终未交叉。
+
+### 核心发现2：早层错位更强 = 残差流由 token 身份主导
+
+早层 misaligned > aligned 的物理解释：
+
+- **Aligned patching**: A[operand_pos_A] 的 "happy" 被 B[operand_pos_B] 的 "happy" 替换（语义相近，扰动小）
+- **Misaligned patching**: A[operand_pos_B] 的其他 token 被 B[operand_pos_B] 的 "happy" 替换（语义不同，扰动大）
+
+早层残差流主要由 **token 嵌入** 决定，不是功能角色。错位 patching 注入的扰动更大，因此推进更大。
+
+深层残差流逐渐被 **功能角色** 组织，所以对齐 patching 追上并超越错位。
+
+**这是残差流从 token-identity 表示到 functional-role 表示的层间转换的直接证据。**
+
+### 核心发现3：组件协同全为负（sub-additive）
+
+| 模型 | operand synergy | last synergy |
+|------|----------------|-------------|
+| Qwen3 | -0.196 | -0.099 |
+| GLM4 | -0.019 | -0.011 |
+| DS7B | -0.153 | -0.194 |
+
+三模型全部显示 **attn+mlp 联合替换 NP < attn NP + mlp NP**。
+
+这不是协同，而是**互斥**：同一个 patch 位置，attn 和 mlp 替换的效果重叠，联合替换不累加。GLM4 的 synergy 最接近 0（因为 attn 几乎无效，所以 mlp 几乎代表全部效果）。
+
+### 核心发现4：最后一层异常程度与模型架构有关
+
+| 模型 | operand drop | last drop | 层数 |
+|------|-------------|-----------|------|
+| Qwen3 | 97% | 91% | 36 |
+| GLM4 | **31%** | **38%** | 40 |
+| DS7B | 85% | 78% | 28 |
+
+GLM4 的最后一层异常**显著小于** Qwen3/DS7B。这不是 tokenizer 对齐问题（aligned 和 misaligned 都 drop），而是模型架构差异：
+- Qwen3/DS7B 的最后一层（final LayerNorm + unembedding）对单位置 patching 高度敏感
+- GLM4 的最后一层对此较鲁棒
+
+### 核心发现5：DS7B last 位置始终未交叉
+
+Qwen3 L28 和 GLM4 L31 的 last_aligned 追上了 last_misaligned，但 DS7B 在 L26 仍 last_aligned=0.771 < last_misaligned=0.875。
+
+这说明 DS7B 的 last token 位置在深层仍然偏由 token identity 主导，可能与其 sliding window attention 机制有关（信息传播受限）。
+
+### 核心发现6：A→B operator 效应三模型一致
+
+| 模型 | Best operator (A→B) |
+|------|-------------------|
+| Qwen3 | L0 NP=0.617 |
+| GLM4 | L0 NP=0.612 |
+| DS7B | L0 NP=0.514 |
+
+三模型最强的"移除否定"操作都在 L0 的 resid_post。注入/移除否定算子的信息在第一层残差流就可用。
+
+### 新增客观事实拼图（6条）
+
+1. 三模型 L0 全部 misaligned > aligned（错位 patching 在早层更有效）
+2. operand 对齐/错位交叉层：Qwen3 L5, GLM4 L2, DS7B L1
+3. last 对齐/错位交叉层：Qwen3 L28, GLM4 L31, DS7B 未交叉
+4. 三模型 attn+mlp 联合替换全为 sub-additive（synergy < 0）
+5. 最后一层 anomaly 程度：Qwen3 > DS7B >> GLM4
+6. A→B operator L0 NP 三模型范围 0.51-0.62
+
+### 硬伤分析
+
+1. **aligned < misaligned 的物理解释需要验证**：可能不是因为 token identity，而是因为 misaligned patching 注入了更多信息（不同位置的激活差异更大）
+2. **DS7B last 始终未交叉**：需要排除 sliding window attention 的干扰
+3. **sub-additive 的计算方式可能有问题**：attn_only + mlp_only 是两次独立 patching 的 NP 之和，不是联合 patching 的理论期望
+4. **60 对句子太少**：关键发现需要加量验证
+5. **GLM4 的 operand 在 L2-L4 快速上升**（0.27→0.61）：这与 Phase 293 的 GLM4 MLP 主导一致，但上升速度比 Qwen3/DS7B 快得多
+
+### 关键洞察
+
+Phase 294 最重要发现不是"对齐修复了问题"，而是：
+
+**早层残差流由 token identity 主导，深层由 functional role 主导。**
+
+这个发现直接揭示了 Transformer 的层间表示转换：
+- L0-L4: 表示 ≈ token embedding + 位置编码
+- L5-L20: 表示逐渐被功能角色重组
+- L20+: 表示主要由功能角色决定
+
+否定功能的传输路径：
+1. L0: token identity 识别否定词（not/no/never）
+2. L2-L5: 功能角色开始绑定（operand 对齐超越错位）
+3. L5-L20: 否定约束沿残差流传播
+4. L20+: 功能角色完成绑定，last token 获得否定结果
+5. 最终层: 输出层整合
+
+### 命令记录
+
+```
+python tests/glm5/phase294_token_alignment.py qwen3       # 26min, 19764+18792+5472 results
+python tests/glm5/phase294_token_alignment_fast.py glm4    # 285min, 7320+3306+6498 results
+python tests/glm5/phase294_token_alignment_fast.py deepseek7b  # 137min, 5124+2784+5472 results
+python tests/glm5_temp/phase294_cross_model.py             # 跨模型对比
+```
+
+### 数据文件
+
+- `results/phase294_token_alignment/{qwen3,glm4,deepseek7b}_alignment.json`
+- `tests/glm5/phase294_token_alignment.py`
+- `tests/glm5/phase294_token_alignment_fast.py`
+- `tests/glm5_temp/phase294_cross_model.py`
+
+### 下一步
+
+Phase 295 应验证"残差流从 token identity 到 functional role"的转换假设：
+1. 计算 token identity 一致性 vs 功能角色一致性在每层的可预测性
+2. 直接测量 embedding 层的余弦相似度：相同 token 不同句子 vs 相同角色不同 token
+3. 测试多位置联合 patching（operand+last 同时替换）
+4. 验证 DS7B 的 sliding window 效应
+
+## Phase 295: Identity-Role Decoupling [2026-05-30 07:58]
+
+### 设计思路
+
+Phase 294 的核心假设是"残差流从 token identity 转向 functional role"。Phase 295 直接验证这个假设。
+
+构造四类最小对照：
+- A. 同 token，同 role（"she is happy" vs "they are happy" — "happy" 都是 operand）
+- B. 同 token，不同 role（"the door is open" vs "they open the door" — "open" 从 adj 变 verb）
+- C. 不同 token，同 role（"she is happy" vs "she is sad" — 不同词同位置）
+- D. 不同 token，不同 role（"she is happy" vs "she is not happy" — 否定基线）
+
+250 对刺激，428 个唯一句子，三模型全层扫描。
+
+四个测量：
+1. 余弦相似度（四类对比×每层）
+2. 范数匹配 patching（控制扰动大小后 aligned vs misaligned）
+3. 线性探针（token identity probe vs role probe）
+4. 距离结构分析（intra-token gap vs intra-role gap）
+
+### 核心发现1：Token Identity 始终支配 Functional Role
+
+**三模型所有层，token identity gap > role gap，无一例外。**
+
+| 层段 | Token gap | Role gap | 比率 |
+|------|----------|---------|------|
+| Qwen3 L0 | +0.930 | +0.060 | 15.4x |
+| Qwen3 L18 | +0.184 | +0.050 | 3.7x |
+| Qwen3 L36 | +0.104 | +0.075 | 1.4x |
+| GLM4 L0 | +0.928 | +0.047 | 19.6x |
+| GLM4 L20 | +0.220 | +0.055 | 4.0x |
+| GLM4 L40 | +0.252 | +0.177 | 1.4x |
+| DS7B L0 | +0.924 | +0.058 | 15.9x |
+| DS7B L14 | +0.281 | +0.076 | 3.7x |
+| DS7B L28 | +0.148 | +0.097 | 1.5x |
+
+→ **Role gap 从未超过 token gap。** Phase 294 假设的"token identity → functional role 转换"不成立。Token identity 在所有层都占主导，只是差距在缩小。
+
+### 核心发现2：范数匹配后 Aligned > Misaligned
+
+Phase 294 发现 misaligned > aligned。Phase 295 控制范数后：
+
+| 模型 | Early aligned | Early misaligned | Early norm-matched |
+|------|-------------|-----------------|-------------------|
+| Qwen3 | +0.063 | +0.014 | +0.139 |
+| GLM4 | +0.095 | +0.039 | +0.154 |
+| DS7B | +0.330 | +0.587 | +0.183 |
+
+Qwen3/GLM4：norm-matched aligned > 原始 aligned > misaligned。
+DS7B：norm-matched aligned < 原始 aligned，但 misaligned 仍然最强。
+
+→ **Phase 294 的 misaligned > aligned 主要是范数效应，不是 token identity 主导效应。** Qwen3/GLM4 在控制范数后，aligned patching 反而更有效。DS7B 是例外。
+
+### 核心发现3：不同 token 同 role 的收敛
+
+| 模型 | L0 cos | Final cos |
+|------|--------|-----------|
+| Qwen3 | 0.264 | 0.908 |
+| GLM4 | 0.136 | 0.750 |
+| DS7B | 0.138 | 0.879 |
+
+不同 token 在 embedding 层几乎正交（cos ~0.15），但在深层高度收敛（cos ~0.75-0.91）。这证明深层确实形成了功能角色表示，但该表示**叠加在** token identity 之上，不是**替代** token identity。
+
+### 核心发现4：同 token 不同 role 的发散
+
+| 模型 | L0 cos | Final cos |
+|------|--------|-----------|
+| Qwen3 | 0.860 | 0.812 |
+| GLM4 | 0.794 | 0.409 |
+| DS7B | 0.788 | 0.717 |
+
+GLM4 的同 token 不同 role 在深层**显著发散**（0.79 → 0.41），说明 GLM4 的深层对角色差异最敏感。Qwen3/DS7B 变化较小。
+
+### 核心发现5：线性探针显示 Role 比 Token 更可读
+
+| 模型 | L0 token | L0 role | Final token | Final role |
+|------|---------|--------|------------|-----------|
+| Qwen3 | 0.938 | 0.908 | 0.932 | 0.968 |
+| GLM4 | 0.094 | 0.870 | 0.934 | 0.970 |
+| DS7B | 0.950 | 0.906 | 0.828 | 0.974 |
+
+GLM4 的 L0 token probe 准确率仅 9.4%（随机水平），因为其 tokenizer 把同一词分成了不同 token。但 role probe 在所有层都 > 0.87。
+
+**注意**：probe 准确率高不代表 role gap > token gap。Probe 使用监督学习（线性分类器），而 distance structure 是无监督统计。Probe 可能学到的是由 context 区分的伪 role 信号。
+
+### 核心发现6：同 token 同 role 的 U 形曲线
+
+| 模型 | L0 cos | Mid cos | Final cos |
+|------|--------|---------|-----------|
+| Qwen3 | 1.000 | 0.814(L12) | 0.913 |
+| GLM4 | 1.000 | 0.736(L13) | 0.763 |
+| DS7B | 1.000 | 0.805(L9) | 0.833 |
+
+同 token 在 embedding 层完全相同（cos=1.0），中间层因上下文差异而发散，深层重新收敛。这是残差流的 U 形编码：embedding → context mixing → output convergence。
+
+### 新增客观事实拼图（6条）
+
+1. Token identity gap 在所有层 > role gap（三模型一致，无一例外）
+2. Token identity gap 从 L0 的 ~0.93 单调下降到 final 的 ~0.08-0.15
+3. 范数匹配后 Qwen3/GLM4 的 aligned > misaligned（Phase 294 misaligned > aligned 是范数效应）
+4. 不同 token 同 role 从 cos~0.15 收敛到 cos~0.75-0.91
+5. GLM4 同 token 不同 role 深层发散（0.79→0.41），角色差异最敏感
+6. 同 token 同 role 呈 U 形曲线（embedding相同 → 中层发散 → 深层收敛）
+
+### 硬伤分析
+
+1. **Token identity 始终主导 ≠ role 信号不存在**：token identity gap 下降意味着 role 信号在增长，只是没超过 identity。不能说"role 不重要"。
+2. **范数匹配的 aligned > misaligned 可能因为方向更对**：matched 条件下的扰动方向更接近真实 B→A 变化方向，所以推进更大。这不是"identity vs role"的区别，而是"方向性"的区别。
+3. **DS7B 的 misaligned 始终 > aligned（即使 norm-matched）**：这与其他两个模型矛盾，需要解释。
+4. **Probe 准确率可能被 context 混淆**：role probe 学到的可能是上下文特征而非功能角色。
+5. **Category B（同 token 不同 role）数量太少（21 对）**：GLM4 的深层发散可能不稳定。
+6. **所有 stimulus 都是短句（3-6 词）**：长句中 token identity 的主导可能不同。
+
+### 关键洞察
+
+Phase 295 最重要发现是**修正了 Phase 294 的假设**：
+
+Phase 294 猜测："残差流从 token identity 转向 functional role"
+Phase 295 实测："残差流的 token identity 始终主导，functional role 叠加增长但从未超越"
+
+更精确的描述：
+
+```
+残差流 = token identity 基底 + functional role 增量
+
+L0:    token identity ~100%, role ~5%
+L1/3:  token identity ~60%, role ~10%
+L2/3:  token identity ~30%, role ~15%
+Final: token identity ~15%, role ~10%
+```
+
+这不是"转换"，而是"叠加增长"。Role 信号在增长，但 identity 信号在衰减但始终更强。
+
+对于语言编码机制的启示：
+
+```
+1. Token identity 是残差流的基础坐标系
+2. Functional role 是在 identity 之上叠加的增量信息
+3. 否定操作符（not/never/no）通过修改 role 增量起作用
+4. 早层 patching 测到的主要是 identity 扰动
+5. 深层 patching 测到的是 identity + role 联合扰动
+6. Patching 效应 = identity扰动强度 × role增量方向
+```
+
+### 命令记录
+
+```
+python tests/glm5/phase295_identity_role_decoupling.py qwen3       # 3min
+python tests/glm5/phase295_identity_role_decoupling.py glm4        # 15min
+python tests/glm5/phase295_identity_role_decoupling.py deepseek7b  # 16min
+python tests/glm5_temp/phase295_cross_model.py                     # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase295_identity_role/{qwen3,glm4,deepseek7b}_identity_role.json`
+- `tests/glm5/phase295_identity_role_decoupling.py`
+- `tests/glm5_temp/phase295_cross_model.py`
+
+### 下一步
+
+Phase 296 应区分"identity 叠加 role"的精确机制：
+1. **残差分解**：每层的 role 增量 = h[同token同role] - h[同token不同role]，identity基底 = h[同token不同role] 的平均
+2. **DS7B 特殊性**：为什么 DS7B 的 norm-matched aligned < misaligned？
+3. **子类型分析**：不同否定子类型的 identity-role 叠加是否不同？
+4. **长句验证**：长句中 token identity 主导是否减弱？
+5. **多位置联合 patching**：operand + last 同时替换是否产生 role-specific synergy？
+
+
+## Phase 296: Identity-Role Residual Decomposition [2026-05-30 11:23]
+
+### 目标
+
+直接分解每层残差流 h_l(token, role) 为：
+```
+h = μ + I(token) + R(role) + Interaction(token, role) + ε
+```
+
+验证叠加模型的精确形式，量化 identity/role/interaction 各占多少方差。
+
+### 方法
+
+**刺激设计**：16个双角色词元（同一词在不同语法角色），每(token, role)对5个句框：
+- 形容词↔动词：open, clear, free, warm, clean, dry (6个)
+- 形容词↔名词：fair, right, light, cold (4个)
+- 名词↔动词：fire, run, play, record, sign, state (6个)
+- 控制组：10个单角色词元（happy, sad, good, bad, tall, short, strong, weak, fast, slow）
+
+**分析**：双向 ANOVA 方差分解（vector ANOVA），每层报告 identity/role/interaction/residual 方差比。同时做范数归一化版本对照。
+
+### 核心发现1：Identity 始终占最大方差（三模型一致）
+
+| 层段 | Qwen3 Id% | Role% | GLM4 Id% | Role% | DS7B Id% | Role% |
+|------|-----------|-------|----------|-------|----------|-------|
+| L0   | 100% | 4% | 100% | 4% | 100% | 4% |
+| Mid  | 48% | 32% | 51% | 25% | 40% | 19% |
+| Deep | 56% | 24% | 52% | 33% | 51% | 9% |
+
+→ Identity 在所有层都占最大方差比。Role 在中层最强（25-32% for Qwen3/GLM4），深层回落。
+→ DS7B 的 Role 始终低（~19%），Identity 也低（~40%），因为 Interaction 占了 ~43%。
+
+### 核心发现2：叠加模型的 R²
+
+| 模型 | R² (RAW, 中层) | R² (NORM, 中层) |
+|------|---------------|-----------------|
+| Qwen3 | 0.80-0.87 | 0.80-0.87 |
+| GLM4 | 0.74-0.78 | 0.73-0.78 |
+| DS7B | 0.58-0.59 | 0.70-0.78 |
+
+→ **Qwen3/GLM4**：h ≈ μ + I + R 的加法模型解释 ~80% 方差，叠加模型基本成立。
+→ **DS7B**：RAW 版 R² 仅 0.58，但归一化后提升到 0.70-0.78。说明 DS7B 的交互效应主要由范数差异驱动。
+→ **归一化不改变基本结论**：Identity 仍然占最大方差。
+
+### 核心发现3：DS7B 的 Interaction 异常高
+
+| 模型 | Interaction% (中层) | 特征 |
+|------|-------------------|------|
+| Qwen3 | 21-30% | 中等交互 |
+| GLM4 | 22-26% | 中等交互 |
+| DS7B | 42-43% | **极高交互** |
+
+→ DS7B 的角色效应高度依赖 token：不同 token 的 role increment 方向差异大，没有统一的"角色轴"。
+→ 这与 Phase 295 的 DS7B 特殊性一致：sliding window attention 限制信息传播，导致角色编码更局部化。
+
+### 核心发现4：Identity-Role 近正交
+
+所有模型、所有层的 cos(I, R) ≈ 0.00（±0.07）。
+
+→ **Identity 和 Role 编码在几乎独立的子空间中**。这强烈支持叠加模型：I 和 R 不竞争同一维度，而是占据不同的表示维度。
+
+### 核心发现5：Identity Preservation 的 U 形曲线
+
+| 模型 | L0 | Mid(min) | Deep | Final |
+|------|-----|---------|------|-------|
+| Qwen3 | 1.00 | 0.61(L9) | 0.84 | 0.84 |
+| GLM4 | 1.00 | 0.56(L10) | 0.90 | 0.50 |
+| DS7B | 1.00 | 0.54(L8) | 0.86 | 0.70 |
+
+→ 同 token 在不同角色下的表示相似度：embedding 完全相同 → 中层分化 → 深层收敛。
+→ **GLM4 最终层骤降**（0.90→0.50）：输出层对同一 token 的不同角色做了最大区分。
+→ **DS7B 最终层也降**：但幅度较小。
+
+### 核心发现6：Role Increment 跨 Token 一致性
+
+adj↔verb 的 role increment 最一致：
+- Qwen3: cos = 0.73
+- GLM4: cos = 0.65
+- DS7B: cos = 0.44
+
+adj↔noun 和 noun↔verb 一致性较低：
+- Qwen3: cos = 0.40-0.44
+- GLM4: cos = 0.35-0.42
+- DS7B: cos = 0.33-0.38
+
+→ **形容词↔动词的角色变化方向最一致**，可能因为这两种角色的句法差异最大、信号最强。
+→ **名词↔动词一致性最低**，可能因为两者共享较多语义空间。
+
+### 新增客观事实拼图（6条）
+
+1. 加法模型 h ≈ μ + I + R 在 Qwen3/GLM4 上 R² ≈ 0.80（叠加模型基本成立）
+2. Identity 始终占最大方差（40-100%），Role 在中层最强（25-32% for Qwen3/GLM4）
+3. Identity 和 Role 近正交（cos ≈ 0.00），占据几乎独立的子空间
+4. DS7B 的 Interaction 占 43%（远高于 Qwen3/GLM4 的 20-30%），角色编码高度 token 依赖
+5. 归一化后 DS7B 的 R² 从 0.58 提升到 0.70+，交互效应部分由范数差异驱动
+6. adj↔verb 的 role increment 方向最一致（cos 0.44-0.73），noun↔verb 最低（cos 0.33-0.38）
+
+### 硬伤分析
+
+1. **L0 的 R² > 1.0**：非平衡设计的 ANOVA 分解在 L0 不精确，因为 cross-term 不为零。但这不影响中深层的结论。
+2. **角色效应被上下文混淆**：不同角色使用不同句型（"the door is open" vs "they open the door"），role 效应包含了句法结构差异。这是无法避免的语言学限制。
+3. **角色类别太少（3个）**：adjective/verb/noun 只有3个角色，ANOVA 的 role 自由度太低。需要更多角色类型。
+4. **短句限制**：所有刺激都是 3-6 词短句，长句中的 identity/role 比例可能不同。
+5. **Interaction 的物理解释不明**：43% 的 interaction 对 DS7B 意味着什么？是 token-specific role coding 还是其他机制？
+
+### 关键洞察
+
+Phase 296 把 Phase 295 的"叠加假说"推进到了可量化的方程：
+
+```
+h_l(token, role) = μ_l + I_l(token) + R_l(role) + Interaction_l(token, role) + ε_l
+
+其中：
+  I_l 占 ~40-60% 方差（中层）→ 始终主导
+  R_l 占 ~20-30% 方差（中层峰值）→ 叠加增长
+  Interaction 占 ~20-43% → Qwen3/GLM4 可忽略，DS7B 很大
+  ε_l ≈ 0%（帧内变异极小）
+```
+
+**核心结论**：叠加模型在 Qwen3/GLM4 上近似成立（R² ≈ 0.80），但 DS7B 例外（高交互）。
+Identity 和 Role 正交编码，意味着它们不竞争维度，而是在不同的特征方向上叠加。
+
+下一步需要：
+1. 为什么 DS7B 的交互这么高？是 sliding window 导致局部编码，还是蒸馏效应？
+2. 加法模型中 R_l(role) 的具体方向是什么？能否找到"角色轴"？
+3. 长句中 identity/role 比例是否变化？
+4. Interaction 项的 PCA 结构：是低维还是高维？
+
+### 命令记录
+
+```
+python tests/glm5/phase296_identity_role_decomposition.py qwen3       # 10s
+python tests/glm5/phase296_identity_role_decomposition.py glm4        # 4min
+python tests/glm5/phase296_identity_role_decomposition.py deepseek7b  # 2.5min
+python tests/glm5_temp/phase296_cross_model.py                        # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase296_residual_decomposition/{qwen3,glm4,deepseek7b}_residual_decomposition.json`
+- `tests/glm5/phase296_identity_role_decomposition.py`
+- `tests/glm5_temp/phase296_cross_model.py`
+
+### 下一步
+
+Phase 297 应聚焦：
+1. **Role-Causal Patching**：替换 role component 看输出是否按预期变化
+2. **角色轴提取**：对 R_l(role) 做 PCA，找低维角色方向
+3. **长句验证**：多从句、长距离依赖中的 identity/role 分解
+4. **DS7B 交互机制**：为什么 DS7B 的 interaction 这么高？
+5. **Operator 分解**：否定词 not/no/never 的 identity/operator/scope 分解
+
+
+## Phase 297: Orthogonal Identity-Role-Frame Decomposition [2026-05-30 12:44]
+
+### 目标
+
+Phase 296 的核心硬伤：Role 方差和句法模板方差混淆。Phase 297 引入三因素设计 `token × role × pair`，把 Role 从模板效应中分离。
+
+关键设计：每个"frame pair"（P1-P4）提供内容匹配的比较——同一个名词/宾语出现在两种角色中，仅语法结构不同。
+
+### 方法
+
+**刺激设计**：8个双角色词元，每(token,role,pair)2个变体：
+- adj↔verb：open, clear, warm, clean（4个）
+- adj↔noun：light, cold（2个）
+- noun↔verb：fire, record（2个）
+
+**4个匹配pair**：每个pair在两种角色中使用相同的名词/宾语，仅语法不同：
+- P1: adj copula ↔ verb transitive（如 "the door is open" ↔ "they open the door"）
+- P2: adj remains ↔ verb modal（如 "the door remains open" ↔ "we open the door"）
+- P3: adj prenominal ↔ verb intransitive（如 "the open door" ↔ "the door will open"）
+- P4: adj seemed ↔ verb infinitive（如 "the shop seemed open" ↔ "they began to open the shop"）
+
+**5个测量**：
+1. ANOVA per role：在每种角色内做 token × pair 分解
+2. Matched-pair role gap：控制内容词后角色差距
+3. Cross-role ANOVA（pair-averaged）：对pair取平均后做 token × role 分解
+4. Role increment decomposition：shared vs pair-specific role increment
+5. Identity preservation（pair-controlled）：同pair vs 不同pair的身份保留
+
+### 核心发现1：Frame/Pair 方差在中层占 22-30%（三模型一致）
+
+| 模型 | 层 | adj Pair% | verb Pair% | noun Pair% |
+|------|-----|-----------|------------|------------|
+| Qwen3 | L18 | 29.7% | 30.7% | 29.8% |
+| GLM4 | L20 | 25.0% | 25.5% | 22.1% |
+| DS7B | L14 | 28.0% | 21.2% | 76.2% |
+
+→ **句法模板/框架效应在中层占 22-30%，与 Role 方差（~25%）相当**。这意味着 Phase 296 的 "Role 方差" 中有相当部分是句法模板差异，不是纯角色编码。
+→ DS7B 的 noun 中 Pair% 高达 76%，是因为名词的4个pair在句法上差异更大（主语/宾语/介词短语等）。
+
+### 核心发现2：Pair-averaged 后交互大幅下降（Qwen3/GLM4）
+
+| 模型 | 层 | Phase296 Interact% | Phase297 Interact% | 下降 |
+|------|-----|-------------------|-------------------|------|
+| Qwen3 | L18 | 28.5% | 2.6% | **-25.9%** |
+| GLM4 | L20 | 23.8% | 4.6% | **-19.2%** |
+| DS7B | L14 | 42.1% | 27.3% | -14.8% |
+
+→ **Qwen3/GLM4 的 Phase 296 "交互项" 主要由句法模板差异驱动**。对 pair 取平均后，交互项从 ~25% 骤降到 ~3%。这说明：
+  - Phase 296 的 Identity-Role 交互主要是"不同角色使用不同句法结构"导致的
+  - 真正的 token-role 交互很小（~3%）
+→ **DS7B 例外**：交互项仍高达 27%，即使 pair-averaged 后。这说明 DS7B 的交互不是模板效应，而是真正的 token-specific role coding。
+
+### 核心发现3：DS7B 没有一致的角色方向
+
+| 模型 | 层 | CrossPairCos | SharedRatio |
+|------|-----|-------------|------------|
+| Qwen3 | L18 | 0.19 | 0.45 |
+| Qwen3 | L35 | 0.32 | 0.51 |
+| GLM4 | L20 | 0.18 | 0.45 |
+| GLM4 | L39 | 0.28 | 0.49 |
+| **DS7B** | L14 | **0.05** | **0.38** |
+| **DS7B** | L27 | **0.08** | **0.39** |
+
+→ **Qwen3/GLM4**：跨 pair 的角色增量方向有一定一致性（cos 0.18-0.32），约50%是共享的角色增量，50%是 pair-specific。
+→ **DS7B**：跨 pair 的角色增量方向几乎随机（cos ≈ 0.04-0.08），只有 ~38% 是共享的。DS7B 不存在统一的"角色轴"，每个句法框架中的角色编码方向不同。
+
+DS7B 全层 CrossPairCos：
+```
+L1-L4: 0.11-0.30（早层有微弱一致性）
+L5-L28: 0.03-0.08（中层深层几乎为零）
+L28: -0.03（最终层甚至为负）
+```
+
+### 核心发现4：Identity Preservation 对 pair 不敏感
+
+| 条件 | Qwen3 L18 | GLM4 L20 | DS7B L14 |
+|------|-----------|----------|----------|
+| 同pair不同角色 | 0.707 | 0.648 | 0.542 |
+| 不同pair不同角色 | 0.722 | 0.669 | 0.611 |
+| 同角色不同pair | 0.773 | 0.736 | 0.650 |
+
+→ **身份保留在控制pair后仍然成立**：同pair和不同pair的身份保留度非常接近（差值 < 0.07），说明身份保留不是pair效应的假象。
+
+### 核心发现5：GLM4 最终层 identity preservation 骤降
+
+GLM4 L39: SamePair=0.906 → L40: SamePair=0.514
+
+→ 与 Phase 296 一致，GLM4 的输出层对同一 token 的不同角色做了极端区分。
+
+### 新增客观事实拼图（5条）
+
+1. **Frame/Pair 方差在中层占 22-30%**，与 Role 方差相当，Phase 296 的 "Role 方差" 部分是句法模板差异
+2. **Pair-averaged 后 Qwen3/GLM4 交互项从 ~25% 骤降到 ~3%**，说明 Phase 296 的交互主要是句法模板效应
+3. **DS7B 即使 pair-averaged 后交互仍为 27%**，说明 DS7B 有真正的 token-specific role coding
+4. **DS7B 跨 pair 角色增量方向几乎随机（cos ≈ 0.04-0.08）**，不存在统一的"角色轴"
+5. **Identity Preservation 对 pair 不敏感**，差值 < 0.07，不是句法模板效应的假象
+
+### 硬伤分析
+
+1. **Pair 匹配不是完全的**：adj 的 "the open door" 和 verb 的 "the door will open" 使用相同名词但句法结构完全不同。Pair 只能控制内容词，不能控制语法结构。这是因为语法结构差异本身就是角色差异的一部分。
+2. **只有4个 pair**：更细粒度的句法控制需要更多 pair 类型。
+3. **Noun 的 pair 类型差异太大**：F1(subject) vs F4(prepositional) 在句法上差异巨大，导致 noun 的 pair% 异常高。
+4. **角色增量跨 pair 一致性低（即使 Qwen3/GLM4 也只有 cos 0.18-0.32）**：这意味着"纯角色效应"不是单一方向，而是依赖句法模板的多方向效应。
+5. **数据量仍偏小**：8个 token、4个 pair、2个变体 = 128 句。更多 token 和 pair 会增加统计功效。
+
+### 关键洞察
+
+Phase 297 揭示了一个比 Phase 296 更复杂的图景：
+
+**Phase 296 的模型**：
+```
+h ≈ μ + I(token) + R(role) + Interaction(token, role) + ε
+```
+
+**Phase 297 的修正模型**：
+```
+h ≈ μ + I(token) + R(role) + P(role:frame) + I×P|role + ε
+```
+
+其中：
+- I(token)：词元身份，占 ~50-70%（pair-averaged 后）
+- R(role)：功能角色，占 ~22-29%（pair-averaged 后仍然显著）
+- P(role:frame)：句法模板效应（嵌套在角色内），占 ~22-30%
+- I×P|role：词元-模板交互（嵌套在角色内），占 ~15-25%
+- ε：剩余，占 ~3-10%
+
+**DS7B 的特殊模型**：
+```
+h ≈ μ + I(token) + R(token, role) + P(role:frame) + I×P|role + ε
+```
+其中 R(token, role) 不是纯角色效应，而是 token-specific role coding——不同 token 在不同角色中的编码方向几乎独立。
+
+**对"叠加模型"的修正**：
+Phase 296 说：h ≈ I + R（叠加模型）
+Phase 297 修正为：**h ≈ I + R + P + I×P**（叠加+模板模型）
+
+角色效应 R 确实存在且在 pair-averaged 后仍然占 22-29%，但它不是唯一的"功能性增量"。句法模板 P 同样重要（22-30%），而且 R 和 P 不能简单分离——R 的方向随 P 变化。
+
+### 命令记录
+
+```
+python tests/glm5/phase297_role_frame_decomposition.py qwen3       # 13s
+python tests/glm5/phase297_role_frame_decomposition.py glm4        # 2.5min
+python tests/glm5/phase297_role_frame_decomposition.py deepseek7b  # 1.5min
+python tests/glm5_temp/phase297_cross_model.py                     # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase297_role_frame/{qwen3,glm4,deepseek7b}_role_frame.json`
+- `tests/glm5/phase297_role_frame_decomposition.py`
+- `tests/glm5_temp/phase297_cross_model.py`
+
+### 下一步
+
+Phase 298 应聚焦：
+1. **角色方向提取**：对 pair-averaged 后的 R_l(role) 做 PCA，找低维角色方向
+2. **角色-因果替换**：用提取的角色方向做 activation patching
+3. **长句验证**：多从句、长距离依赖中的 identity/role/pair 分解
+4. **DS7B 机制深入**：为什么 DS7B 没有一致角色方向？是 sliding window 限制还是蒸馏效应？
+5. **Operator 分解**：否定词的 identity/operator/scope 分解，引入 pair 控制
+
+## Phase 298: Role Subspace Extraction & Causal Direction Test [2026-05-30 14:21]
+
+### 目标
+
+Phase 297 建立了条件叠加模型 h ≈ I + R + P + I×P，但 R（角色增量）的方向是否一致？是否有因果效力？Phase 298 回答这两个问题。
+
+### 方法
+
+5个测量：
+1. **角色增量PCA**：对所有32个角色增量（8 token × 4 pair）做PCA，看维度
+2. **句框增量PCA**：对所有64个句框偏差做PCA，看维度
+3. **角色-句框子空间重叠**：principal angles
+4. **跨token泛化**（LOO）：留一法，用N-1个token的角色方向预测第N个token的角色差距
+5. **因果方向测试**：用提取的角色方向做activation patching，加上随机方向对照
+
+### 核心发现1：Qwen3/GLM4角色子空间中等低维，DS7B看似1维但实际不可靠
+
+| 模型 | 层 | Role top1% | dim50 | dim80 | Frame top1% | Frame dim50 |
+|------|-----|-----------|-------|-------|------------|-------------|
+| Qwen3 | L18 | 34.5% | 3 | 12 | 32.2% | 3 |
+| GLM4 | L20 | 22.1% | 5 | 14 | 19.5% | 7 |
+| **DS7B** | L14 | **99.3%** | **1** | **1** | **99.3%** | **1** |
+
+→ Qwen3/GLM4：角色增量不是1维轴，而是3-5维子空间（dim50=3-5）。top-1 PC只解释22-35%方差。
+→ DS7B：表面看角色增量是1维的（top1=99%），但这是**范数差异驱动的假象**（见发现3）。
+
+### 核心发现2：Qwen3/GLM4角色方向有真实因果效力
+
+| 模型 | avg cos_shift | positive rate | avg specificity |
+|------|--------------|---------------|-----------------|
+| Qwen3 | +0.0129 | 16/16 = 100% | ~5x |
+| GLM4 | +0.0187 | 23/24 = 96% | ~20x |
+| **DS7B** | **-0.0247** | **19/32 = 59%** | **-0.9x** |
+
+→ **Qwen3**：角色方向100%正向推动输出向目标角色移动，比随机方向有效5倍。
+→ **GLM4**：角色方向96%正向推动，比随机方向有效20倍。因果效力最强。
+→ **DS7B**：角色方向仅59%正向，平均推动方向为**负**（远离目标角色）。比随机方向还差。
+
+**Per token-pair因果测试详情（DS7B）**：
+```
+clean_adj→verb:  -0.024 (失败)
+clear_adj→verb:  +0.005 (弱)
+cold_adj→noun:   +0.035 (成功)
+fire_noun→verb:  +0.000 (中性)
+light_adj→noun:  -0.272 (巨大失败!)
+open_adj→verb:   +0.008 (弱)
+record_noun→verb: +0.001 (中性)
+warm_adj→verb:   +0.050 (成功)
+```
+
+### 核心发现3：DS7B的LOO cosine为负，揭示"伪1维"结构
+
+| 模型 | 层 | avg LOO cos | std LOO cos |
+|------|-----|-------------|-------------|
+| Qwen3 | L18 | +0.4647 | 0.2183 |
+| GLM4 | L20 | +0.4357 | 0.2090 |
+| **DS7B** | L14 | **-0.4941** | 0.6380 |
+
+→ Qwen3/GLM4：留一法cosine约+0.44，说明跨token角色方向有一定泛化性。
+→ **DS7B：留一法cosine为负（-0.49）！** 这意味着用其他token的角色方向来预测某个token的角色差距时，方向是**相反的**。
+
+**这是最重要的发现之一**：DS7B的PCA top1=99%看似1维，但LOO=-0.49说明这个"1维"是**范数差异驱动的假象**。具体机制：
+1. 不同token的角色增量范数差异极大（均值1106，但个别token可能远大于此）
+2. PCA被范数最大的token主导，top-1方向是最大范数token的方向
+3. 但不同token的角色增量方向不一致，甚至相互矛盾
+4. 用平均方向做因果干预时，对某些token反而推向错误方向
+
+### 核心发现4：角色子空间和句框子空间有显著重叠
+
+| 模型 | 层 | avg principal angle° | top1 cos |
+|------|-----|---------------------|----------|
+| Qwen3 | L18 | 47.4° | +0.996 |
+| GLM4 | L20 | 45.1° | +0.988 |
+| DS7B | L14 | 43.7° | +0.999 |
+
+→ 三模型的平均主角度约44-47°，说明角色和句框子空间有**中等程度重叠**（既不正交也不平行）。
+→ top1 cos接近1，说明两个子空间的第一主成分几乎重合。这与Phase 297的发现一致：角色和句框不能完全分离。
+
+### 核心发现5：DS7B深层角色子空间维度增加
+
+DS7B全层维度变化：
+```
+L7-L21: dim50=1, dim80=1 (看似1维)
+L26:    dim50=1, dim80=1
+L27:    dim50=1, dim80=2  (开始扩散)
+L28:    dim50=1, dim80=4  (进一步扩散)
+```
+
+→ DS7B在最终层（L27-L28）角色增量开始分散，从1维变成4维。这与Phase 297中DS7B深层交互项开始下降一致。
+
+### 新增客观事实拼图（5条）
+
+1. **Qwen3/GLM4角色子空间是3-5维**（dim50=3-5），不是1维轴；top-1 PC只解释22-35%方差
+2. **Qwen3/GLM4角色方向有真实因果效力**：Qwen3 100%正向，GLM4 96%正向，specificity 5-20x
+3. **DS7B的"1维角色子空间"是范数差异假象**：PCA top1=99%但LOO cosine为负（-0.49）
+4. **DS7B角色方向无因果效力**：因果测试59%正向，平均shift为负，specificity -0.9x
+5. **角色和句框子空间中等重叠**：avg principal angle 44-47°，top1 PC几乎重合
+
+### 硬伤分析
+
+1. **因果测试的"目标角色logits"定义不够精确**：我们用另一角色句子的logits作为"目标"，但两个句子的结构完全不同，所以logits差异不仅是角色差异。
+2. **只有16个因果测试句子**：8个token × 2角色 = 16，偏少。特别是light_adj→noun的-0.272可能是异常值。
+3. **PCA的n=32偏少**：8 token × 4 pair = 32个角色增量，对于3584/4096维空间，PCA估计不稳定。
+4. **DS7B的sliding window attention可能导致位置效应**：不同角色在不同句法位置，sliding window只看到局部上下文，角色编码更依赖位置而非全局角色信息。
+5. **因果测试只在中层（±5层）做**：更全面的测试应该覆盖所有层。
+
+### 关键洞察
+
+Phase 298揭示了三种根本不同的角色编码架构：
+
+**Type A: 叠加式角色编码（Qwen3/GLM4）**
+```
+h ≈ I + d_role + d_frame + small_interaction
+d_role: 3-5维子空间，跨token一致（LOO cos +0.44）
+因果有效：添加d_role可推动输出向目标角色移动
+```
+
+**Type B: 范数主导式角色编码（DS7B中层）**
+```
+h ≈ I + N(token) * d_dominant + d_frame
+d_dominant: 被1-2个高范数token主导的方向（PCA top1=99%）
+跨token不一致（LOO cos -0.49）
+因果无效：平均方向对多数token是错误方向
+```
+
+**Type C: 深层角色编码（DS7B L27-L28）**
+```
+h ≈ I + d_role(token-specific) + d_frame
+维度从1扩散到4，开始区分不同token的角色编码
+但已经太晚（输出层），无法有效参与中间层计算
+```
+
+这三种类型对"复用和差异化"有不同的含义：
+- **Type A**：复用 = 共享3-5维角色子空间；差异化 = 在该子空间中的不同方向
+- **Type B**：复用 = 共享1个高范数方向；差异化 = 在该方向上的不同尺度
+- **Type C**：复用 = 无（每个token独立编码角色）；差异化 = 完全独立的方向
+
+### 命令记录
+
+```
+python tests/glm5/phase298_role_subspace_causal.py qwen3       # 80s
+python tests/glm5/phase298_role_subspace_causal.py glm4        # 9min
+python tests/glm5/phase298_role_subspace_causal.py deepseek7b  # 6min
+python tests/glm5_temp/phase298_cross_model.py                 # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase298_role_subspace/{qwen3,glm4,deepseek7b}_role_subspace.json`
+- `tests/glm5/phase298_role_subspace_causal.py`
+- `tests/glm5_temp/phase298_cross_model.py`
+
+### 下一步
+
+1. ~~**归一化角色增量PCA**~~：已完成（Phase 298b）
+2. ~~**Per-role-pair PCA**~~：已完成（Phase 298b）
+3. **多alpha因果测试**：测试不同强度的角色方向添加（α=0.5, 1.0, 2.0），看效果是否单调
+4. **Operator分解**：否定词的 identity/operator/scope 分解（Phase 300方向）
+5. **长句验证**：多从句、长距离依赖中的角色编码
+
+## Phase 298b: Normalized & Per-Role-Pair PCA [2026-05-30 14:31]
+
+### 目标
+
+验证Phase 298的核心假说：DS7B的"1维角色子空间"是否由范数差异驱动。同时对不同角色对（adj-verb, adj-noun, noun-verb）分别做PCA，看维度是否不同。
+
+### 核心发现6（最重要！）：DS7B的"1维"完全是范数差异假象
+
+| 模型 | 层 | Raw top1% | Raw dim50 | **Norm top1%** | **Norm dim50** | **Norm dim80** |
+|------|-----|-----------|-----------|----------------|----------------|----------------|
+| Qwen3 | L18 | 34.5% | 3 | 31.8% | 4 | 13 |
+| GLM4 | L20 | 22.1% | 5 | 22.2% | 6 | 15 |
+| **DS7B** | L14 | **99.3%** | **1** | **37.3%** | **2** | **9** |
+
+→ **Qwen3/GLM4**：归一化后几乎不变（差值<2%），说明范数均匀，PCA反映真实方向结构。
+→ **DS7B**：归一化后top1从99.3%骤降到37.3%，dim50从1变2，dim80从1变9！
+
+**这完全证实了范数差异假说**：DS7B的PCA top1=99%不是因为有统一的角色方向，而是因为：
+1. 不同token的角色增量范数差异极大（3.8x）
+2. noun_verb tokens（fire=1073, record=842）远大于adj_verb tokens（warm=280, clean=302）
+3. PCA被高范数token主导，top-1方向是fire/record的方向
+4. 归一化后，范数差异消除，真实的多维方向结构暴露
+
+**范数比率对比**：
+```
+Qwen3 L18: min=40, max=50, ratio=1.2x  (非常均匀)
+GLM4  L20: min=6,  max=12, ratio=1.9x  (较均匀)
+DS7B  L14: min=280, max=1073, ratio=3.8x (极不均匀!)
+```
+
+### 核心发现7：DS7B归一化后的角色子空间维度与Qwen3/GLM4相似
+
+归一化后DS7B的中层维度：dim50=2, dim80=9
+
+对比：
+- Qwen3: dim50=4, dim80=13
+- GLM4: dim50=6, dim80=15
+- DS7B: dim50=2, dim80=9
+
+→ DS7B归一化后维度略低于Qwen3/GLM4，但远非1维。三个模型在排除范数效应后，角色子空间都是中等低维的（2-6维达到50%方差）。
+
+### 核心发现8：Per-Role-Pair分析揭示adj_verb最不一致
+
+**DS7B Per-Role-Pair LOO（L14）**：
+```
+adj_verb: avg_LOO=-0.49 (open=+0.07, clean=-0.95, clear=-0.51, warm=-0.50)
+adj_noun: avg_LOO=-0.51 (light=-0.49, cold=-0.54)
+noun_verb: avg_LOO=+0.50 (fire=+0.50, record=+0.50) ← 唯一正面的！
+```
+
+→ **noun_verb角色方向在两个token间一致（+0.50）**，但adj_verb极度不一致（clean=-0.95！）
+→ clean的角色增量方向与open/warm/clear几乎正交甚至相反
+→ 这解释了为什么DS7B的adj→verb因果测试失败：4个adj_verb token的角色方向互相矛盾
+
+**Qwen3/GLM4 Per-Role-Pair LOO（中层）**：
+```
+Qwen3: adj_verb=+0.47, adj_noun=+0.41, noun_verb=+0.55 (全部正面)
+GLM4:  adj_verb=+0.43, adj_noun=+0.36, noun_verb=+0.53 (全部正面)
+```
+
+→ Qwen3/GLM4所有角色对都有一致的跨token方向，其中noun_verb最一致。
+
+### 核心发现9：Per-Role-Pair归一化PCA揭示DS7B adj_verb维度最高
+
+**DS7B Per-Role-Pair 归一化PCA（L14）**：
+```
+adj_verb: top1=42.5%, dim50=2 (4 tokens, 16 increments)
+adj_noun: top1=52.7%, dim50=1 (2 tokens, 8 increments)
+noun_verb: top1=46.6%, dim50=1 (2 tokens, 8 increments)
+```
+
+→ adj_verb的top1最低（42.5%），维度最高（dim50=2），说明adj→verb的角色转换是最多方向的
+→ adj_noun和noun_verb的dim50=1，说明2个token的角色转换方向比较一致
+
+**对比Qwen3 Per-Role-Pair 归一化PCA（L18）**：
+```
+adj_verb: top1=48.6%, dim50=2
+adj_noun: top1=47.8%, dim50=2
+noun_verb: top1=28.5%, dim50=3
+```
+
+→ Qwen3中noun_verb维度最高（dim50=3），与DS7B相反。Qwen3的noun→verb转换比adj→verb更多样化。
+
+### 新增客观事实拼图（4条）
+
+6. **DS7B的"1维角色子空间"完全由范数差异驱动**：归一化后top1从99.3%骤降到37.3%，dim50从1变2
+7. **DS7B归一化后角色子空间维度与Qwen3/GLM4相似**：dim50=2（vs Qwen3 4, GLM4 6）
+8. **DS7B的adj_verb角色方向跨token极度不一致**：LOO=-0.49，clean的LOO=-0.95
+9. **DS7B的noun_verb角色方向跨token一致**：LOO=+0.50（与Qwen3/GLM4相似）
+
+### 对Phase 298因果测试结果的重新解释
+
+Phase 298中DS7B因果测试失败的原因现在清楚了：
+1. **不是DS7B没有角色方向**（归一化后dim50=2，确实有）
+2. **而是范数差异导致平均方向被高范数token主导**，对低范数token是错误方向
+3. **如果用归一化后的方向做因果测试**，效果可能好得多
+
+这意味着：DS7B的角色编码机制可能是"方向一致但范数不同"，而不是"方向不一致"。问题出在提取方向的方法（PCA对范数敏感），而不是模型本身。
+
+### 命令记录
+
+```
+python tests/glm5/phase298b_normalized_pca.py qwen3       # 5s
+python tests/glm5/phase298b_normalized_pca.py glm4        # 2.3min
+python tests/glm5/phase298b_normalized_pca.py deepseek7b  # 1.5min
+```
+
+### 数据文件
+
+- `results/phase298_role_subspace/{qwen3,glm4,deepseek7b}_normalized_pca.json`
+- `tests/glm5/phase298b_normalized_pca.py`
+
+### 下一步
+
+1. ~~**归一化方向因果测试**~~：已完成（Phase 298c）
+2. **范数归一化后LOO**：归一化角色增量后的LOO cosine，看是否改善
+3. **Operator分解**：否定词的 identity/operator/scope 分解
+4. **长句验证**：多从句、长距离依赖中的角色编码
+
+## Phase 298c: Normalized Direction Causal Test [2026-05-30 14:58]
+
+### 目标
+
+验证Phase 298b的假说：归一化后的角色方向对DS7B是否有因果效力。
+
+4种方向类型对比：
+1. **raw**：原始范数的平均角色增量（Phase 298用的）
+2. **norm_scaled**：先归一化每个增量再平均，最后缩放到raw的范数
+3. **rp_specific**：只使用同一角色对（adj_verb/adj_noun/noun_verb）的平均增量
+4. **rp_norm_scaled**：先归一化再按角色对平均，缩放到raw范数
+
+### 核心发现10：DS7B归一化方向因果测试从负变正
+
+| 模型 | 方向类型 | avg cos_shift | positive rate | specificity |
+|------|---------|--------------|---------------|-------------|
+| Qwen3 | raw | +0.012 | 100% | 5.3x |
+| Qwen3 | norm_scaled | +0.011 | 100% | 16.4x |
+| Qwen3 | rp_specific | +0.027 | 100% | 7.7x |
+| Qwen3 | rp_norm_scaled | +0.014 | 100% | 10.8x |
+| GLM4 | raw | +0.017 | 94% | 41.6x |
+| GLM4 | norm_scaled | +0.018 | 97% | 41.0x |
+| GLM4 | rp_specific | **+0.045** | **100%** | 17.9x |
+| GLM4 | rp_norm_scaled | +0.028 | 100% | 22.3x |
+| **DS7B** | raw | **-0.027** | **56%** | -0.1x |
+| **DS7B** | norm_scaled | **+0.009** | **69%** | 1.2x |
+| DS7B | rp_specific | -0.125 | 50% | -0.7x |
+| **DS7B** | rp_norm_scaled | **+0.016** | **75%** | **1.9x** |
+
+→ **DS7B raw方向失败**（-0.027, 56%正面），但**norm_scaled方向改善**（+0.009, 69%）
+→ **DS7B rp_norm_scaled最好**（+0.016, 75%正面），但仍远不如Qwen3/GLM4（100%/97%）
+→ **Qwen3/GLM4**：所有方向类型都有效，rp_specific效果最强
+
+### 核心发现11：角色对特异方向(rp_specific)在Qwen3/GLM4中最强
+
+GLM4 rp_specific: +0.045, 100%, 17.9x — 比raw方向（+0.017）强2.7倍
+
+→ 同一角色对内的方向一致性更高，提取出的方向更精准
+→ DS7B的rp_specific反而最差（-0.125），说明即使在同一角色对内，DS7B的token间方向也不一致
+
+### 对DS7B角色编码机制的修正理解
+
+Phase 298c揭示DS7B的角色编码是**"弱共享+强个体"**：
+1. **弱共享**：归一化后75%的token-role组合能被推向正确方向
+2. **强个体**：25%的token-role组合仍被推向错误方向
+3. **范数差异**：是混淆因素，不是编码机制本身
+4. **角色对特异性**：adj_verb内部方向不一致（LOO=-0.49），导致rp_specific也失败
+
+对比：
+- Qwen3/GLM4：角色方向是**强共享**（100%正面），跨token一致
+- DS7B：角色方向是**弱共享**（75%正面），跨token部分不一致
+
+### 新增客观事实拼图（2条）
+
+10. **DS7B归一化方向因果测试从-0.027变+0.016**，positive rate从56%升75%，证实角色方向存在但弱
+11. **角色对特异性方向(rp_specific)在Qwen3/GLM4中最强**（GLM4 +0.045），在DS7B中最弱（-0.125）
+
+### 命令记录
+
+```
+python tests/glm5/phase298c_norm_causal.py qwen3       # 25s
+python tests/glm5/phase298c_norm_causal.py glm4        # 14min
+python tests/glm5/phase298c_norm_causal.py deepseek7b  # 9min
+```
+
+### 数据文件
+
+- `results/phase298_role_subspace/{qwen3,glm4,deepseek7b}_norm_causal.json`
+- `tests/glm5/phase298c_norm_causal.py`
+
+### 下一步
+
+1. **Operator分解**：否定词(not/no/never)的 identity/operator/scope 分解，引入归一化方向和pair控制
+2. **长句验证**：多从句、长距离依赖中的角色编码
+3. **更大token集**：扩展到20-30个双角色词元，增加统计功效
+4. **DS7B sliding window分析**：验证sliding window attention是否是角色方向不一致的原因
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

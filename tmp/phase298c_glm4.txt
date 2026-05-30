@@ -1,0 +1,51 @@
+[2026-05-30 14:34:29] Phase 298c: Normalized Direction Causal Test -- glm4
+[2026-05-30 14:34:31] Loading glm4...
+[2026-05-30 14:34:42]   Loaded. GPU=9.0GB
+[2026-05-30 14:34:42]   n_layers=40, d_model=4096
+[2026-05-30 14:34:42] Capturing 146 sentences...
+[2026-05-30 14:35:12]   20/146 (0.7/s) ETA=192s
+[2026-05-30 14:35:33]   40/146 (0.8/s) ETA=137s
+[2026-05-30 14:35:55]   60/146 (0.8/s) ETA=105s
+[2026-05-30 14:36:16]   80/146 (0.8/s) ETA=78s
+[2026-05-30 14:36:37]   100/146 (0.9/s) ETA=53s
+[2026-05-30 14:36:59]   120/146 (0.9/s) ETA=30s
+[2026-05-30 14:37:20]   140/146 (0.9/s) ETA=7s
+[2026-05-30 14:37:27] Done in 165s
+[2026-05-30 14:37:27] 
+--- Extracting role directions (raw, normalized, per-role-pair) ---
+[2026-05-30 14:38:51]   L6: tested 32 direction-pair combinations
+[2026-05-30 14:40:16]   L12: tested 32 direction-pair combinations
+[2026-05-30 14:41:40]   L18: tested 32 direction-pair combinations
+[2026-05-30 14:43:04]   L24: tested 32 direction-pair combinations
+[2026-05-30 14:44:28]   L30: tested 32 direction-pair combinations
+[2026-05-30 14:45:52]   L36: tested 32 direction-pair combinations
+[2026-05-30 14:47:17]   L38: tested 32 direction-pair combinations
+[2026-05-30 14:48:41]   L39: tested 32 direction-pair combinations
+[2026-05-30 14:48:41] 
+--- Saving and Summarizing ---
+[2026-05-30 14:48:41]   Saved to results\phase298_role_subspace\glm4_norm_causal.json
+[2026-05-30 14:48:41] 
+============================================================
+[2026-05-30 14:48:41] PHASE 298c SUMMARY -- glm4
+[2026-05-30 14:48:41] ============================================================
+[2026-05-30 14:48:41] 
+  Direction type: raw (mid-layer +/-5):
+[2026-05-30 14:48:41]     avg cos_shift: +0.017026
+[2026-05-30 14:48:41]     positive rate: 15/16 = 94%
+[2026-05-30 14:48:41]     avg specificity: 41.6x
+[2026-05-30 14:48:41] 
+  Direction type: norm_scaled (mid-layer +/-5):
+[2026-05-30 14:48:41]     avg cos_shift: +0.018351
+[2026-05-30 14:48:41]     positive rate: 31/32 = 97%
+[2026-05-30 14:48:41]     avg specificity: 41.0x
+[2026-05-30 14:48:41] 
+  Direction type: rp_specific (mid-layer +/-5):
+[2026-05-30 14:48:41]     avg cos_shift: +0.045293
+[2026-05-30 14:48:41]     positive rate: 16/16 = 100%
+[2026-05-30 14:48:41]     avg specificity: 17.9x
+[2026-05-30 14:48:41] 
+  Direction type: rp_norm_scaled (mid-layer +/-5):
+[2026-05-30 14:48:41]     avg cos_shift: +0.028105
+[2026-05-30 14:48:41]     positive rate: 16/16 = 100%
+[2026-05-30 14:48:41]     avg specificity: 22.3x
+[2026-05-30 14:48:41] Phase 298c complete for glm4!
