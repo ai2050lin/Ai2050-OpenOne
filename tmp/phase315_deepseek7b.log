@@ -1,0 +1,255 @@
+[2026-05-31 19:45:43] === Phase 315: Context Activation + Causal Relation for deepseek7b ===
+[2026-05-31 19:45:45] Loading deepseek7b (bf16 + device_map=auto + sdpa)...
+[2026-05-31 19:45:57] Model loaded: Qwen2ForCausalLM, device=cuda:0, GPU=9.01GB
+[2026-05-31 19:45:57] Layer allocation: GPU=0, CPU=14 components
+[2026-05-31 19:45:57] Model: n_layers=28, d_model=3584
+[2026-05-31 19:45:57] ============================================================
+[2026-05-31 19:45:57] PART A: Context Activation Test
+[2026-05-31 19:45:57] ============================================================
+[2026-05-31 19:45:57] Test layers: [2, 6, 12, 18, 24, 26]
+[2026-05-31 19:45:57] 
+--- Relation type: attribute ---
+[2026-05-31 19:47:31]   L2: static=0.050(r=1.04) attribute_probe=0.034(r=1.54) attribute_fill=0.009(r=5.65) random=0.053
+[2026-05-31 19:48:59]   L6: static=0.164(r=1.06) attribute_probe=0.120(r=1.46) attribute_fill=0.033(r=5.26) random=0.174
+[2026-05-31 19:50:27]   L12: static=0.182(r=1.09) attribute_probe=0.167(r=1.18) attribute_fill=0.154(r=1.28) random=0.197
+[2026-05-31 19:51:54]   L18: static=0.139(r=0.93) attribute_probe=0.118(r=1.10) attribute_fill=0.125(r=1.04) random=0.130
+[2026-05-31 19:53:24]   L24: static=0.058(r=0.94) attribute_probe=0.074(r=0.73) attribute_fill=0.055(r=0.99) random=0.054
+[2026-05-31 19:54:52]   L26: static=0.041(r=0.94) attribute_probe=0.055(r=0.71) attribute_fill=0.037(r=1.03) random=0.039
+[2026-05-31 19:54:52] 
+--- Relation type: function ---
+[2026-05-31 19:56:21]   L2: static=0.044(r=1.20) function_probe=0.161(r=0.33) function_fill=0.026(r=2.01) random=0.053
+[2026-05-31 19:57:49]   L6: static=0.154(r=1.13) function_probe=0.381(r=0.46) function_fill=0.123(r=1.41) random=0.174
+[2026-05-31 19:59:18]   L12: static=0.181(r=1.09) function_probe=0.416(r=0.47) function_fill=0.328(r=0.60) random=0.197
+[2026-05-31 20:00:47]   L18: static=0.123(r=1.06) function_probe=0.280(r=0.46) function_fill=0.225(r=0.58) random=0.130
+[2026-05-31 20:02:16]   L24: static=0.045(r=1.21) function_probe=0.151(r=0.36) function_fill=0.104(r=0.52) random=0.054
+[2026-05-31 20:03:45]   L26: static=0.030(r=1.28) function_probe=0.101(r=0.38) function_fill=0.077(r=0.50) random=0.039
+[2026-05-31 20:03:45] 
+--- Relation type: same_class ---
+[2026-05-31 20:04:37]   L2: static=0.034(r=1.57) category_probe=0.009(r=6.14) random=0.053
+[2026-05-31 20:05:28]   L6: static=0.095(r=1.83) category_probe=0.016(r=11.16) random=0.174
+[2026-05-31 20:06:20]   L12: static=0.100(r=1.98) category_probe=0.038(r=5.13) random=0.197
+[2026-05-31 20:07:11]   L18: static=0.064(r=2.02) category_probe=0.036(r=3.60) random=0.130
+[2026-05-31 20:08:03]   L24: static=0.027(r=1.99) category_probe=0.018(r=3.04) random=0.054
+[2026-05-31 20:08:54]   L26: static=0.019(r=2.02) category_probe=0.012(r=3.08) random=0.039
+[2026-05-31 20:08:54] 
+--- Relation type: negation ---
+[2026-05-31 20:09:54]   L2: static_pos=0.297(r=0.18) static_neg=0.260(r=0.20) negation_probe=0.283(r=0.19) random=0.053
+[2026-05-31 20:10:54]   L6: static_pos=0.429(r=0.41) static_neg=0.348(r=0.50) negation_probe=0.416(r=0.42) random=0.174
+[2026-05-31 20:11:54]   L12: static_pos=0.374(r=0.53) static_neg=0.289(r=0.68) negation_probe=0.375(r=0.53) random=0.197
+[2026-05-31 20:12:53]   L18: static_pos=0.291(r=0.45) static_neg=0.199(r=0.65) negation_probe=0.245(r=0.53) random=0.130
+[2026-05-31 20:13:53]   L24: static_pos=0.144(r=0.38) static_neg=0.107(r=0.51) negation_probe=0.101(r=0.54) random=0.054
+[2026-05-31 20:14:53]   L26: static_pos=0.099(r=0.39) static_neg=0.079(r=0.49) negation_probe=0.062(r=0.62) random=0.039
+[2026-05-31 20:14:53] Part A completed in 1735.6s
+[2026-05-31 20:14:53] ============================================================
+[2026-05-31 20:14:53] PART B: Relation-Level Causal Test
+[2026-05-31 20:14:53] ============================================================
+[2026-05-31 20:14:53] Inject layer: 8, Read layers: [4, 8, 12, 16, 26]
+[2026-05-31 20:14:53] 
+--- Causal test: same_class ---
+[2026-05-31 20:14:53]   Base: 'the fruit was very'
+[2026-05-31 20:14:53]   Related: ['the apple was very', 'the banana was very', 'the pear was very']
+[2026-05-31 20:14:53]   Unrelated: ['the hammer was very', 'the knife was very', 'the car was very']
+[2026-05-31 20:14:58]   Relation dir norm=43.020027, related_norm=41.565159, unrelated_norm=49.554127
+[2026-05-31 20:14:59]   Running hook-based causal injection at L8...
+[2026-05-31 20:15:13]   W_U injection results:
+[2026-05-31 20:15:13]     relation_dir_0.5x: wu_gain=12.162, top_target=sweet(0.97x random)
+[2026-05-31 20:15:13]     relation_dir_1.0x: wu_gain=12.162, top_target=sweet(0.97x random)
+[2026-05-31 20:15:13]     related_delta_0.5x: wu_gain=9.238, top_target=ripe(1.16x random)
+[2026-05-31 20:15:13]     related_delta_1.0x: wu_gain=9.238, top_target=ripe(1.16x random)
+[2026-05-31 20:15:13]     unrelated_delta_0.5x: wu_gain=7.174, top_target=sweet(1.27x random)
+[2026-05-31 20:15:13]     unrelated_delta_1.0x: wu_gain=7.174, top_target=sweet(1.27x random)
+[2026-05-31 20:15:13]     random_0.5x: wu_gain=6.111, top_target=juicy(2.32x random)
+[2026-05-31 20:15:13]     random_1.0x: wu_gain=6.111, top_target=juicy(2.32x random)
+[2026-05-31 20:15:13]   Hook causal results:
+[2026-05-31 20:15:13]     relation_dir_L4: delta_norm=0.0000, top_target=fresh(0.00x random)
+[2026-05-31 20:15:13]     relation_dir_L8: delta_norm=43.0423, top_target=sweet(0.97x random)
+[2026-05-31 20:15:13]     relation_dir_L12: delta_norm=53.1145, top_target=sweet(1.42x random)
+[2026-05-31 20:15:13]     relation_dir_L16: delta_norm=59.3926, top_target=sweet(1.65x random)
+[2026-05-31 20:15:13]     relation_dir_L26: delta_norm=113.3076, top_target=fresh(0.86x random)
+[2026-05-31 20:15:13]     random_L4: delta_norm=0.0000, top_target=fresh(0.00x random)
+[2026-05-31 20:15:13]     random_L8: delta_norm=60.7033, top_target=juicy(2.31x random)
+[2026-05-31 20:15:13]     random_L12: delta_norm=51.4232, top_target=ripe(1.53x random)
+[2026-05-31 20:15:13]     random_L16: delta_norm=55.1112, top_target=sweet(1.30x random)
+[2026-05-31 20:15:13]     random_L26: delta_norm=102.2836, top_target=ripe(5.14x random)
+[2026-05-31 20:15:13] 
+--- Causal test: hypernym ---
+[2026-05-31 20:15:13]   Base: 'it was a kind of'
+[2026-05-31 20:15:13]   Related: ['the apple is a kind of', 'the dog is a kind of', 'the knife is a kind of']
+[2026-05-31 20:15:13]   Unrelated: ['the running is a kind of', 'the red is a kind of', 'the cutting is a kind of']
+[2026-05-31 20:15:18]   Relation dir norm=42.483997, related_norm=77.342964, unrelated_norm=75.256859
+[2026-05-31 20:15:19]   Running hook-based causal injection at L8...
+[2026-05-31 20:15:33]   W_U injection results:
+[2026-05-31 20:15:33]     relation_dir_0.5x: wu_gain=6.487, top_target=animal(1.41x random)
+[2026-05-31 20:15:33]     relation_dir_1.0x: wu_gain=6.487, top_target=animal(1.41x random)
+[2026-05-31 20:15:33]     related_delta_0.5x: wu_gain=8.424, top_target=animal(0.49x random)
+[2026-05-31 20:15:33]     related_delta_1.0x: wu_gain=8.424, top_target=animal(0.49x random)
+[2026-05-31 20:15:33]     unrelated_delta_0.5x: wu_gain=8.003, top_target=fruit(0.91x random)
+[2026-05-31 20:15:33]     unrelated_delta_1.0x: wu_gain=8.003, top_target=fruit(0.91x random)
+[2026-05-31 20:15:33]     random_0.5x: wu_gain=6.156, top_target=fruit(0.51x random)
+[2026-05-31 20:15:33]     random_1.0x: wu_gain=6.156, top_target=fruit(0.51x random)
+[2026-05-31 20:15:33]   Hook causal results:
+[2026-05-31 20:15:33]     relation_dir_L4: delta_norm=0.0000, top_target=fruit(0.00x random)
+[2026-05-31 20:15:33]     relation_dir_L8: delta_norm=42.4902, top_target=animal(1.42x random)
+[2026-05-31 20:15:33]     relation_dir_L12: delta_norm=40.0853, top_target=tool(0.64x random)
+[2026-05-31 20:15:33]     relation_dir_L16: delta_norm=44.5968, top_target=tool(0.98x random)
+[2026-05-31 20:15:33]     relation_dir_L26: delta_norm=80.4956, top_target=animal(2.36x random)
+[2026-05-31 20:15:33]     random_L4: delta_norm=0.0000, top_target=fruit(0.00x random)
+[2026-05-31 20:15:33]     random_L8: delta_norm=59.7718, top_target=fruit(0.49x random)
+[2026-05-31 20:15:33]     random_L12: delta_norm=51.3501, top_target=animal(0.84x random)
+[2026-05-31 20:15:33]     random_L16: delta_norm=53.7693, top_target=animal(1.57x random)
+[2026-05-31 20:15:33]     random_L26: delta_norm=105.7221, top_target=fruit(0.83x random)
+[2026-05-31 20:15:33] 
+--- Causal test: negation ---
+[2026-05-31 20:15:33]   Base: 'they were very happy about it'
+[2026-05-31 20:15:33]   Related: ['they were not happy about it', 'they were never happy about it']
+[2026-05-31 20:15:33]   Unrelated: ['they were very sad about it', 'they were quite angry about it']
+[2026-05-31 20:15:36]   Relation dir norm=53.430214, related_norm=45.596775, unrelated_norm=43.545162
+[2026-05-31 20:15:37]   Running hook-based causal injection at L8...
+[2026-05-31 20:15:51]   W_U injection results:
+[2026-05-31 20:15:51]     relation_dir_0.5x: wu_gain=6.077, top_target=not(1.42x random)
+[2026-05-31 20:15:51]     relation_dir_1.0x: wu_gain=6.077, top_target=not(1.42x random)
+[2026-05-31 20:15:51]     related_delta_0.5x: wu_gain=7.854, top_target=not(1.88x random)
+[2026-05-31 20:15:51]     related_delta_1.0x: wu_gain=7.854, top_target=not(1.88x random)
+[2026-05-31 20:15:51]     unrelated_delta_0.5x: wu_gain=8.348, top_target=not(0.87x random)
+[2026-05-31 20:15:51]     unrelated_delta_1.0x: wu_gain=8.348, top_target=not(0.87x random)
+[2026-05-31 20:15:51]     random_0.5x: wu_gain=6.260, top_target=not(0.94x random)
+[2026-05-31 20:15:51]     random_1.0x: wu_gain=6.260, top_target=not(0.94x random)
+[2026-05-31 20:15:51]   Hook causal results:
+[2026-05-31 20:15:51]     relation_dir_L4: delta_norm=0.0000, top_target=not(0.00x random)
+[2026-05-31 20:15:51]     relation_dir_L8: delta_norm=53.4279, top_target=not(1.41x random)
+[2026-05-31 20:15:51]     relation_dir_L12: delta_norm=49.1025, top_target=unhappy(1.19x random)
+[2026-05-31 20:15:51]     relation_dir_L16: delta_norm=49.9758, top_target=unhappy(1.14x random)
+[2026-05-31 20:15:51]     relation_dir_L26: delta_norm=87.2016, top_target=not(0.61x random)
+[2026-05-31 20:15:51]     random_L4: delta_norm=0.0000, top_target=not(0.00x random)
+[2026-05-31 20:15:51]     random_L8: delta_norm=59.8154, top_target=not(0.95x random)
+[2026-05-31 20:15:51]     random_L12: delta_norm=51.8114, top_target=never(0.42x random)
+[2026-05-31 20:15:51]     random_L16: delta_norm=55.8808, top_target=unhappy(0.87x random)
+[2026-05-31 20:15:51]     random_L26: delta_norm=86.0665, top_target=never(0.25x random)
+[2026-05-31 20:15:51] 
+--- Causal test: antonym ---
+[2026-05-31 20:15:51]   Base: 'the room was very bright'
+[2026-05-31 20:15:51]   Related: ['the room was very dark', 'the room was very dim']
+[2026-05-31 20:15:51]   Unrelated: ['the room was very large', 'the room was very quiet']
+[2026-05-31 20:15:54]   Relation dir norm=104.038368, related_norm=106.369316, unrelated_norm=109.870399
+[2026-05-31 20:15:55]   Running hook-based causal injection at L8...
+[2026-05-31 20:16:09]   W_U injection results:
+[2026-05-31 20:16:09]     relation_dir_0.5x: wu_gain=6.547, top_target=dim(4.25x random)
+[2026-05-31 20:16:09]     relation_dir_1.0x: wu_gain=6.547, top_target=dim(4.25x random)
+[2026-05-31 20:16:09]     related_delta_0.5x: wu_gain=7.279, top_target=shadow(2.14x random)
+[2026-05-31 20:16:09]     related_delta_1.0x: wu_gain=7.279, top_target=shadow(2.14x random)
+[2026-05-31 20:16:09]     unrelated_delta_0.5x: wu_gain=8.190, top_target=shadow(1.93x random)
+[2026-05-31 20:16:09]     unrelated_delta_1.0x: wu_gain=8.190, top_target=shadow(1.93x random)
+[2026-05-31 20:16:09]     random_0.5x: wu_gain=6.180, top_target=shadow(0.76x random)
+[2026-05-31 20:16:09]     random_1.0x: wu_gain=6.180, top_target=shadow(0.76x random)
+[2026-05-31 20:16:09]   Hook causal results:
+[2026-05-31 20:16:09]     relation_dir_L4: delta_norm=0.0000, top_target=dark(0.00x random)
+[2026-05-31 20:16:09]     relation_dir_L8: delta_norm=104.0274, top_target=dim(4.33x random)
+[2026-05-31 20:16:09]     relation_dir_L12: delta_norm=111.7049, top_target=shadow(1.10x random)
+[2026-05-31 20:16:09]     relation_dir_L16: delta_norm=118.5611, top_target=shadow(0.96x random)
+[2026-05-31 20:16:09]     relation_dir_L26: delta_norm=263.1755, top_target=dim(0.80x random)
+[2026-05-31 20:16:09]     random_L4: delta_norm=0.0000, top_target=dark(0.00x random)
+[2026-05-31 20:16:09]     random_L8: delta_norm=59.7683, top_target=shadow(0.75x random)
+[2026-05-31 20:16:09]     random_L12: delta_norm=53.3130, top_target=dim(0.64x random)
+[2026-05-31 20:16:09]     random_L16: delta_norm=56.0094, top_target=shadow(1.02x random)
+[2026-05-31 20:16:09]     random_L26: delta_norm=101.5568, top_target=shadow(2.24x random)
+[2026-05-31 20:16:09] 
+--- Causal test: attribute ---
+[2026-05-31 20:16:09]   Base: 'the apple was very'
+[2026-05-31 20:16:09]   Related: ['the red apple was very', 'the sweet apple was very', 'the ripe apple was very']
+[2026-05-31 20:16:09]   Unrelated: ['the heavy apple was very', 'the distant apple was very']
+[2026-05-31 20:16:13]   Relation dir norm=25.225359, related_norm=40.816269, unrelated_norm=46.227226
+[2026-05-31 20:16:14]   Running hook-based causal injection at L8...
+[2026-05-31 20:16:28]   W_U injection results:
+[2026-05-31 20:16:28]     relation_dir_0.5x: wu_gain=8.642, top_target=sweet(1.53x random)
+[2026-05-31 20:16:28]     relation_dir_1.0x: wu_gain=8.642, top_target=sweet(1.53x random)
+[2026-05-31 20:16:28]     related_delta_0.5x: wu_gain=6.013, top_target=ripe(3.90x random)
+[2026-05-31 20:16:28]     related_delta_1.0x: wu_gain=6.013, top_target=ripe(3.90x random)
+[2026-05-31 20:16:28]     unrelated_delta_0.5x: wu_gain=7.077, top_target=ripe(2.59x random)
+[2026-05-31 20:16:28]     unrelated_delta_1.0x: wu_gain=7.077, top_target=ripe(2.59x random)
+[2026-05-31 20:16:28]     random_0.5x: wu_gain=6.107, top_target=red(1.31x random)
+[2026-05-31 20:16:28]     random_1.0x: wu_gain=6.107, top_target=red(1.31x random)
+[2026-05-31 20:16:28]   Hook causal results:
+[2026-05-31 20:16:28]     relation_dir_L4: delta_norm=0.0000, top_target=red(0.00x random)
+[2026-05-31 20:16:28]     relation_dir_L8: delta_norm=25.2192, top_target=sweet(1.53x random)
+[2026-05-31 20:16:28]     relation_dir_L12: delta_norm=26.9746, top_target=sweet(1.69x random)
+[2026-05-31 20:16:28]     relation_dir_L16: delta_norm=30.0033, top_target=red(2.48x random)
+[2026-05-31 20:16:28]     relation_dir_L26: delta_norm=67.9410, top_target=ripe(2.74x random)
+[2026-05-31 20:16:28]     random_L4: delta_norm=0.0000, top_target=red(0.00x random)
+[2026-05-31 20:16:28]     random_L8: delta_norm=58.4686, top_target=red(1.31x random)
+[2026-05-31 20:16:28]     random_L12: delta_norm=52.5190, top_target=red(1.21x random)
+[2026-05-31 20:16:28]     random_L16: delta_norm=54.7275, top_target=colorful(1.62x random)
+[2026-05-31 20:16:28]     random_L26: delta_norm=102.1553, top_target=ripe(1.34x random)
+[2026-05-31 20:16:28] 
+--- Causal test: function ---
+[2026-05-31 20:16:28]   Base: 'the knife was very'
+[2026-05-31 20:16:28]   Related: ['the knife for cutting was very', 'the sharp knife was very']
+[2026-05-31 20:16:28]   Unrelated: ['the old knife was very', 'the lost knife was very']
+[2026-05-31 20:16:32]   Relation dir norm=36.176109, related_norm=42.279480, unrelated_norm=45.569931
+[2026-05-31 20:16:32]   Running hook-based causal injection at L8...
+[2026-05-31 20:16:46]   W_U injection results:
+[2026-05-31 20:16:46]     relation_dir_0.5x: wu_gain=6.871, top_target=sharp(2.07x random)
+[2026-05-31 20:16:46]     relation_dir_1.0x: wu_gain=6.871, top_target=sharp(2.07x random)
+[2026-05-31 20:16:46]     related_delta_0.5x: wu_gain=12.936, top_target=useful(0.53x random)
+[2026-05-31 20:16:46]     related_delta_1.0x: wu_gain=12.936, top_target=useful(0.53x random)
+[2026-05-31 20:16:46]     unrelated_delta_0.5x: wu_gain=14.587, top_target=sharp(0.45x random)
+[2026-05-31 20:16:46]     unrelated_delta_1.0x: wu_gain=14.587, top_target=sharp(0.45x random)
+[2026-05-31 20:16:46]     random_0.5x: wu_gain=6.532, top_target=cutting(0.92x random)
+[2026-05-31 20:16:46]     random_1.0x: wu_gain=6.532, top_target=cutting(0.92x random)
+[2026-05-31 20:16:46]   Hook causal results:
+[2026-05-31 20:16:46]     relation_dir_L4: delta_norm=0.0000, top_target=sharp(0.00x random)
+[2026-05-31 20:16:46]     relation_dir_L8: delta_norm=36.1868, top_target=sharp(2.08x random)
+[2026-05-31 20:16:46]     relation_dir_L12: delta_norm=33.3529, top_target=cutting(1.52x random)
+[2026-05-31 20:16:46]     relation_dir_L16: delta_norm=34.0835, top_target=cutting(2.14x random)
+[2026-05-31 20:16:46]     relation_dir_L26: delta_norm=66.0391, top_target=cutting(0.97x random)
+[2026-05-31 20:16:46]     random_L4: delta_norm=0.0000, top_target=sharp(0.00x random)
+[2026-05-31 20:16:46]     random_L8: delta_norm=59.7842, top_target=cutting(0.92x random)
+[2026-05-31 20:16:46]     random_L12: delta_norm=48.7114, top_target=useful(1.92x random)
+[2026-05-31 20:16:46]     random_L16: delta_norm=47.6215, top_target=cutting(1.71x random)
+[2026-05-31 20:16:46]     random_L26: delta_norm=80.8428, top_target=sharp(0.92x random)
+[2026-05-31 20:16:47] Part B completed in 113.5s
+[2026-05-31 20:16:47] Results saved to results\phase315_context_causal\deepseek7b_context_causal.json
+[2026-05-31 20:16:47] 
+======================================================================
+[2026-05-31 20:16:47] PHASE 315 SUMMARY - deepseek7b
+[2026-05-31 20:16:47] ======================================================================
+[2026-05-31 20:16:47] 
+Part A: Context Activation (ratio_vs_random > 1 means relation preserved)
+[2026-05-31 20:16:47] 
+  attribute:
+[2026-05-31 20:16:47]     Best: L2/attribute_fill = 5.65x
+[2026-05-31 20:16:47] 
+  function:
+[2026-05-31 20:16:47]     Best: L2/function_fill = 2.01x
+[2026-05-31 20:16:47] 
+  same_class:
+[2026-05-31 20:16:47]     Best: L6/category_probe = 11.16x
+[2026-05-31 20:16:47] 
+  negation:
+[2026-05-31 20:16:47]     Best: L12/static_neg = 0.68x
+[2026-05-31 20:16:47] 
+Part B: Causal Relation (target_vs_random > 1 means causal efficacy)
+[2026-05-31 20:16:47] 
+  same_class:
+[2026-05-31 20:16:47]     relation_dir_norm=43.020027
+[2026-05-31 20:16:47]     Best causal: relation_dir_L16/sweet = 1.65x random
+[2026-05-31 20:16:47] 
+  hypernym:
+[2026-05-31 20:16:47]     relation_dir_norm=42.483997
+[2026-05-31 20:16:47]     Best causal: relation_dir_L26/animal = 2.36x random
+[2026-05-31 20:16:47] 
+  negation:
+[2026-05-31 20:16:47]     relation_dir_norm=53.430214
+[2026-05-31 20:16:47]     Best causal: relation_dir_L8/not = 1.41x random
+[2026-05-31 20:16:47] 
+  antonym:
+[2026-05-31 20:16:47]     relation_dir_norm=104.038368
+[2026-05-31 20:16:47]     Best causal: relation_dir_L8/dim = 4.33x random
+[2026-05-31 20:16:47] 
+  attribute:
+[2026-05-31 20:16:47]     relation_dir_norm=25.225359
+[2026-05-31 20:16:47]     Best causal: relation_dir_L26/ripe = 2.74x random
+[2026-05-31 20:16:47] 
+  function:
+[2026-05-31 20:16:47]     relation_dir_norm=36.176109
+[2026-05-31 20:16:47]     Best causal: relation_dir_L16/cutting = 2.14x random
+[2026-05-31 20:16:47] Model deepseek7b released.

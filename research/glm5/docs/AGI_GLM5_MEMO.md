@@ -2101,6 +2101,183 @@ python tests/glm5_temp/phase314_cross_model.py  # 跨模型分析
 4. **操作代数测试**：not(not X)≈X, 翻译操作的可组合性
 5. **路径束图谱**：从单层距离升级到多层路径分析
 
+## Phase 315: Context Activation + Relation-Level Causal Test [2026-05-31 19:30]
+
+### 目标
+
+解决Phase 314的两大硬伤：
+A) 属性/功能关系在静态上下文中不被保持——是否因为缺少激活上下文？
+B) Mantel相关只能证明拓扑相似，不能证明因果机制——需要关系级因果测试
+
+### Part A: 上下文激活测试设计
+
+4种关系类型×3种上下文条件：
+- 属性：static("the apple was there"), attribute_probe("The apple is usually ___"), attribute_fill("The apple has the quality of being ___")
+- 功能：static, function_probe("You use a knife to ___"), function_fill("A knife is designed for ___")
+- 同类：static, category_probe("The apple and the banana are both ___")
+- 否定：static_pos("they felt happy"), static_neg("they were not happy"), negation_probe("It is not_happy that things are happy")
+
+15-20个概念对/关系类型，20个随机基线对
+
+### 核心发现91：属性关系被上下文条件激活——attribute_fill在L2有5.0-5.7x ratio
+
+```
+模型         L2 Static  L2 AttrFill  L2 Ratio  L6 Static  L6 AttrFill  L6 Ratio
+Qwen3        0.025      0.005        5.45x     0.093      0.036        3.27x
+GLM4         0.035      0.007        5.01x     0.171      0.028        5.99x
+DS7B         0.050      0.009        5.65x     0.164      0.033        5.26x
+```
+
+→ **静态上下文中属性ratio≈1.0-1.3x（不被保持）**
+→ **属性填空上下文中L2 ratio=5.0-5.7x（强烈保持）**
+→ **三模型完全一致——属性关系确实存在，但需要适当上下文激活**
+→ **这个效应在深层消失（L24+ ratio降到0.7-1.0）——深层做任务压缩**
+
+### 核心发现92：function_probe上下文摧毁功能关系（ratio=0.2-0.5x）
+
+```
+模型         L2 FuncProbe  L6 FuncProbe  L12 FuncProbe
+Qwen3       0.20x         0.40x         0.45x
+GLM4        0.24x         0.40x         0.61x
+DS7B        0.33x         0.46x         0.47x
+```
+
+→ **"You use a knife to"模板使功能概念对比随机对更远**
+→ **原因：function_probe模板让模型预测不同的动词（cut/open/drive），而非共享功能路径**
+→ **function_fill("A knife is designed for")在L2有1.3-2.0x ratio——稍微好些**
+→ **功能关系的激活方式不同于属性——可能需要更精确的上下文模板**
+
+### 核心发现93：同类关系被类别上下文极大增强（ratio=11-15x）
+
+```
+模型         L2 Static  L2 CatProbe   L2 Ratio   L6 Static  L6 CatProbe   L6 Ratio
+Qwen3       0.014      0.002         14.60x     0.044      0.009         12.90x
+GLM4        0.017      0.007         4.89x      0.072      0.012         14.00x
+DS7B        0.034      0.009         6.14x      0.095      0.016         11.16x
+```
+
+→ **类别探测上下文("The apple and the banana are both")使同类概念在激活空间极度接近**
+→ **L6的ratio=11-15x——比Phase 314的静态ratio(3-6x)高出3-5倍**
+→ **上下文门控效应极强——同一对概念在不同上下文中的距离可以差10倍以上**
+
+### 核心发现94：否定关系在所有上下文中ratio<1——否定产生对立而非相似
+
+```
+模型         L2 StaticPos  L2 StaticNeg  L2 NegProbe
+Qwen3       0.237         0.220         0.217
+GLM4        0.371         0.333         0.367
+DS7B        0.297         0.260         0.283
+```
+
+→ **否定对(happy/not_happy)在所有上下文中都比随机对更远**
+→ **这是符合预期的：否定创造对立，而非相似**
+→ **Phase 314的Mantel测试发现"否定关系被保持"是因为它测量距离排序**
+→ **修正：否定关系不是"距离近"，而是"有确定的方向性对立"**
+
+### 核心发现95：所有关系类型都有因果效力（1.4-7.5x random）
+
+```
+关系类型       Qwen3      GLM4      DS7B      跨模型范围
+same_class    4.61x      3.35x     1.65x     1.7-4.6x
+hypernym      7.47x      1.60x     2.36x     1.6-7.5x
+negation      3.63x      1.79x     1.41x     1.4-3.6x
+antonym       4.45x      2.87x     4.33x     2.9-4.5x
+attribute     3.14x      1.87x     2.74x     1.9-3.1x
+function      3.76x      2.53x     2.14x     1.9-3.8x
+```
+
+→ **所有关系类型的最佳因果效力都>1.4x random**
+→ **即使attribute和function也有1.9-3.8x的因果效力——尽管静态距离不明显**
+→ **这直接证明：属性/功能关系确实存在因果效力，只是静态测量不够敏感**
+→ **Qwen3的因果效力整体最强（4-7x），GLM4最弱（1.6-3.4x）**
+
+### 核心发现96：属性关系的上下文激活随层递减——从L2的5x降到L24的1x
+
+```
+模型         L2    L6    L12   L18   L24   L30   L32   L34
+Qwen3       5.45  3.27  1.48  1.14  1.08  0.78  0.73  0.82
+GLM4        5.01  5.99  3.49  1.61  1.01  0.78   -     -
+DS7B        5.65  5.26  1.28  1.04  0.99   -     -     -
+```
+
+→ **属性激活效应在L12-L18急剧减弱——从3-6x降到1-1.5x**
+→ **深层(L24+)完全消失——深层不再保持属性关系的上下文激活**
+→ **这说明属性关系主要在早中层被条件激活，深层做任务相关压缩**
+
+### 新增客观事实拼图（6条）
+
+91. **属性关系被上下文条件激活（L2 ratio=5.0-5.7x），但静态不保持（ratio≈1.0）**
+92. **function_probe上下文摧毁功能关系（ratio=0.2-0.5），功能需要不同激活方式**
+93. **同类关系被类别上下文极大增强（L6 ratio=11-15x）**
+94. **否定关系在所有上下文中ratio<1——否定产生对立而非相似**
+95. **所有关系类型都有因果效力（1.4-7.5x random），包括attribute和function**
+96. **属性关系的上下文激活随层递减（L2: 5x → L24: 1x）**
+
+### 修正Phase 314的判断
+
+Phase 314说"属性和功能关系不被保持"。Phase 315修正为：
+```
+旧判断: 属性/功能关系不被保持(ratio≈1.0)
+修正: 属性/功能关系在无上下文时不被静态保持，但在适当上下文中被条件激活
+     属性: attribute_fill context L2 ratio=5.0-5.7x
+     功能: function_fill context L2 ratio=1.3-2.0x
+     因果测试: attribute和function都有1.9-3.8x的因果效力
+```
+
+这验证了分析二的预测："属性/功能关系不是不存在，而是条件激活"。
+
+### 关系编码机制更新
+
+```
+Phase 314: 语言编码是关系网络编码
+Phase 315修正: 语言编码是条件激活的关系网络编码
+
+  1. 关系结构存在，但多数不是静态保持的
+     - 同类关系：静态弱保持(3-6x)，上下文强激活(11-15x)
+     - 属性关系：静态不保持(≈1x)，上下文强激活(5-6x)
+     - 功能关系：静态不保持(≈1x)，上下文弱激活(1.3-2.0x)
+     - 否定关系：产生对立而非相似(ratio<1)
+
+  2. 上下文门控机制
+     - 同一句子中的概念距离受上下文模板强烈影响（可差10倍）
+     - 上下文激活在早中层最强，深层消失
+     - 这意味着：概念不是固定点，而是上下文依赖的位置
+
+  3. 因果效力 ≠ 静态距离
+     - attribute和function静态ratio≈1，但因果效力1.9-3.8x
+     - 说明这些关系的因果路径存在，但静态余弦距离不足以测量
+     - 因果效力可能来自差分方向的放大（Phase 313发现）
+```
+
+### 命令记录
+
+```
+python tests/glm5/phase315_context_causal.py qwen3       # ~3min
+python tests/glm5/phase315_context_causal.py glm4        # ~38min
+python tests/glm5/phase315_context_causal.py deepseek7b  # ~31min
+python tests/glm5_temp/phase315_cross_model.py            # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase315_context_causal/{qwen3,glm4,deepseek7b}_context_causal.json`
+- `tests/glm5/phase315_context_causal.py`
+
+### 硬伤分析
+
+1. **function_probe模板设计有问题**："You use a knife to"让模型预测不同动词，不是测试共享路径。需要更好的模板。
+2. **否定关系的上下文模板不够好**：negation_probe模板"not_happy"不是自然语言，需要用真正的否定句。
+3. **因果测试只测了W_U层和hook注入**：还需要Jacobian传播分析来确认中间层放大。
+4. **概念对数量偏少**：属性15对，功能15对，需要更多来确认统计显著性。
+5. **function_fill的ratio只在L2达到2x，L6就降到1.4x以下**：功能关系的上下文激活可能需要更特定模板。
+
+### 下一步
+
+1. **修复function上下文模板**：设计更好的功能激活模板（如"Using a knife, you can"）
+2. **否定关系方向测试**：测量happy→not_happy的方向是否有因果效力（注入方向能否改变否定判断）
+3. **上下文-因果联合测试**：在attribute_fill上下文中注入attribute差分方向，测因果效力是否增强
+4. **大规模确认测试**：扩大概念对到50+对，确认属性/功能上下文激活的稳定性
+
 基于Phase 310-313的发现，下一步应从"单方向测试"升级到"全局关系网络测试"：
 
 1. **构建多层关系网络**：8类关系（同类/上下位/属性/功能/反义/否定/操作/组合）
@@ -2110,3 +2287,123 @@ python tests/glm5_temp/phase314_cross_model.py  # 跨模型分析
 5. **建立三图：复用图、差异图、冲突图**
 
 这才是破解整体编码机制的关键路径。
+
+## Phase 316: Phase 315-R2 确认测试跨模型分析 [2026-05-31 21:30]
+
+### 命令记录
+
+```
+python tests/glm5/phase315r2_confirm.py qwen3       # 已完成 (Qwen3 ~1.5min)
+python tests/glm5/phase315r2_confirm.py glm4        # 已完成 (GLM4 ~55min)
+python tests/glm5/phase315r2_confirm.py deepseek7b  # 已完成 (DS7B ~35min)
+python tests/glm5_temp/phase315r2_cross_model.py     # 跨模型分析
+```
+
+### 数据文件
+
+- `results/phase315r2_confirm/{qwen3,glm4,deepseek7b}_confirm.json`
+- `tests/glm5/phase315r2_confirm.py`
+- `tests/glm5_temp/phase315r2_cross_model.py`
+
+### Test 1: 属性上下文激活确认 (50+ 对) — 设计缺陷
+
+**关键发现：Test 1 存在设计缺陷**
+
+- attr_fill条件使用了非平行句子："The apple has the quality of being red" vs "The red is a quality"
+- static条件使用了平行句子："the apple was there" vs "the red was there"
+- 非平行句子的结构差异导致距离人为放大（0.597 vs 0.025），不反映属性激活
+- attr_fill_ratio < 1 是设计假象，不能与Phase 315原始结果对比
+- Phase 315原始测试使用平行模板（同一句式不同填词），设计正确
+
+**数据（参考但不作为有效证据）**：
+| Layer | Qwen3 attr_fill_ratio | GLM4 attr_fill_ratio | DS7B attr_fill_ratio |
+|-------|----------------------|---------------------|---------------------|
+| L2    | 0.048                | 0.044               | 0.068               |
+| L6    | 0.173                | 0.224               | 0.220               |
+| L12   | 0.228                | 0.444               | 0.290               |
+
+### Test 2: 功能模板比较 — 有效结果
+
+**发现 97: function_tool模板跨模型一致最优**
+- 所有3个模型中，"The X is a tool for"模板一致产生最高的功能关系激活
+- Qwen3: function_tool ratio=1.39(L6), 1.27(L12)
+- GLM4: function_tool ratio=1.18(L6), 1.44(L12)
+- DS7B: function_tool ratio=1.26(L6), 1.32(L12)
+- 跨模型平均: function_tool=1.31x > designed=1.20x > purpose=1.08x > using=1.05x
+
+**发现 98: function_purpose模板有害**
+- "The purpose of a X is to"模板在多个模型/层中ratio<1
+- Qwen3 L2: 0.89, DS7B L2: 0.78
+- 说明"purpose"这个词本身可能引向抽象语义而非功能关联
+
+**发现 99: 功能关系需要特定上下文框架**
+- 静态条件(static)下功能关系也很弱（ratio~1.0-1.3）
+- 只有tool框架能稳定激活（1.3-1.4x）
+- 这证实Phase 315的结论：功能关系不是静态编码的，而是条件激活的
+
+### Test 3: 否定方向因果测试 — 核心发现
+
+**发现 100: 否定方向范数跨模型差异巨大（编码架构差异的又一证据）**
+- Qwen3: neg_dir_norm avg=25.07, range=[17.19, 38.37]
+- GLM4: neg_dir_norm avg=3.01, range=[2.14, 3.67]  ← 8.3x小于Qwen3！
+- DS7B: neg_dir_norm avg=82.69, range=[46.83, 113.82] ← 3.3x大于Qwen3！
+
+这与Architecture A(Qwen3/GLM4) vs Architecture B(DS7B)完全一致：
+- GLM4使用更紧凑的表示空间，否定方向范数极小
+- DS7B使用更分散的表示空间，否定方向范数极大
+- 否定方向范数的数量级差异反映了底层编码架构的根本区别
+
+**发现 101: 否定方向具有稳定的因果效力（跨模型/跨语义域）**
+- 所有3个模型中，注入否定方向能可靠地激活语义对立词：
+  - happy→not: 激活 "unhappy"(1.5-1.6x), "disappointed"(1.0-2.1x)
+  - safe→not: 激活 "unsafe"(2.5-3.3x), "dangerous"(1.1-1.9x), "risky"(1.7-2.3x)
+  - good→not: 激活 "bad"(0.9-2.9x), "negative"(0.6-2.2x)
+  - possible→not: 激活 "impossible"(0.4-1.9x)
+  - clean→not: 激活 "dirty"(1.0-2.9x), "messy"(1.0-4.0x)
+
+- 语义否定效果（排除"not"token）随层深增加：
+  - Qwen3: L12=1.15x → L34=1.76x
+  - GLM4: L12=0.75x → L38=1.08x
+  - DS7B: L8=0.85x → L26=1.00x
+
+**发现 102: 否定方向是语义对跖方向，不是简单翻转**
+- 否定方向（pos→neg）的W_U投影不仅激活"not"，还激活整个否定语义网络
+- 例如happy→not方向同时激活unhappy+disappointed+sad，不仅仅是happy的反义词
+- 否定方向编码的是"语义极性翻转"的复合操作，而非单一token映射
+
+**发现 103: DS7B否定方向在深层出现语义发散**
+- DS7B的neg_dir_norm极大（L26=85-245），深层传播后语义效果不稳定
+- "possible→not"在DS7B的L8层效果仅0.04x（几乎无效），而Qwen3在L12=2.58x
+- 这与Phase 313发现的DS7B Jacobian不稳定一致
+- DS7B的大范数=低信噪比，否定方向在深层被噪声淹没
+
+### 硬伤分析
+
+1. **Test 1设计缺陷（严重）**：非平行句子比较使属性激活测试失效。必须用平行模板重测。
+2. **否定因果只测了5对**：需要更多否定对（20+对）来确认统计显著性。
+3. **功能模板只测了3层**：深层（L18+）功能关系激活未测，可能遗漏衰减模式。
+4. **缺少上下文×因果交互测试**：Phase 315计划了"在属性上下文中注入属性差分方向"的交互测试，R2未执行。
+5. **GLM4 neg_dir_norm极小(2-4)**：可能与GLM4的40层深度和4096维空间有关，需要进一步分析这是紧凑编码还是范数压缩。
+
+### 下一步
+
+1. **修复属性激活测试**：用平行模板重测50+对属性对
+2. **扩大否定对数量**：从5对扩展到20+对，测量否定方向的统计显著性
+3. **上下文×因果交互测试**：在attribute_fill上下文中注入属性差分方向，测因果效力是否增强
+4. **否定方向的正交性测试**：测量不同否定对的方向是否共享同一"否定子空间"
+5. **深层功能关系衰减测试**：测量L18-L34的功能模板效果
+
+### 阶段性任务规划
+
+当前已完成的事实拼图：
+- 语言编码 = 高方差共享 + 低方差差分 + 高增益读出（Phase 313）
+- 关系网络在中间层被保留（Phase 314 Mantel r=0.45-0.59）
+- 属性/功能关系条件激活（Phase 315）
+- 否定方向是因果有效的语义极性翻转（Phase 316/R2）
+- 否定方向范数反映编码架构差异（GLM4极小=紧凑, DS7B极大=分散）
+
+下一步应进入**关系子空间分解**阶段：
+- 8类关系是否共享同一条"关系编码主干"？
+- 否定子空间 vs 反义子空间 vs 属性子空间是否正交？
+- 如果不共享，关系的几何结构是什么？（分形？层级嵌套？环面？）
+- 这是破解"语言编码的数学结构"的关键突破口

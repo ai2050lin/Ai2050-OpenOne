@@ -1,0 +1,144 @@
+[2026-05-31 20:20:43] === Phase 315-R2: Confirmation for qwen3 ===
+[2026-05-31 20:20:45] Loading qwen3 (bf16 + device_map=auto + sdpa)...
+[2026-05-31 20:20:57] Model loaded: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-05-31 20:20:57] Model: n_layers=36, d_model=2560
+[2026-05-31 20:20:57] ============================================================
+[2026-05-31 20:20:57] TEST 1: Attribute Context Activation Confirmation (50+ pairs)
+[2026-05-31 20:20:57] ============================================================
+[2026-05-31 20:21:09]   L2: static=0.026(r=1.12), attr_fill=0.597(r=0.05), random=0.029, n_attr=62
+[2026-05-31 20:21:20]   L6: static=0.098(r=1.22), attr_fill=0.694(r=0.17), random=0.120, n_attr=62
+[2026-05-31 20:21:31]   L12: static=0.127(r=1.16), attr_fill=0.643(r=0.23), random=0.146, n_attr=62
+[2026-05-31 20:21:42]   L18: static=0.100(r=1.08), attr_fill=0.476(r=0.22), random=0.107, n_attr=62
+[2026-05-31 20:21:53]   L24: static=0.054(r=1.10), attr_fill=0.474(r=0.13), random=0.060, n_attr=62
+[2026-05-31 20:21:53] Test 1 completed in 56.2s
+[2026-05-31 20:21:53] ============================================================
+[2026-05-31 20:21:53] TEST 2: Function Template Comparison
+[2026-05-31 20:21:53] ============================================================
+[2026-05-31 20:21:56]   L2 static: dist=0.024, random=0.030, ratio=1.28
+[2026-05-31 20:21:59]   L2 function_designed: dist=0.020, random=0.025, ratio=1.24
+[2026-05-31 20:22:03]   L2 function_purpose: dist=0.034, random=0.031, ratio=0.89
+[2026-05-31 20:22:06]   L2 function_using: dist=0.011, random=0.012, ratio=1.11
+[2026-05-31 20:22:09]   L2 function_tool: dist=0.013, random=0.016, ratio=1.17
+[2026-05-31 20:22:12]   L6 static: dist=0.092, random=0.125, ratio=1.36
+[2026-05-31 20:22:15]   L6 function_designed: dist=0.128, random=0.153, ratio=1.20
+[2026-05-31 20:22:19]   L6 function_purpose: dist=0.121, random=0.140, ratio=1.16
+[2026-05-31 20:22:22]   L6 function_using: dist=0.057, random=0.062, ratio=1.09
+[2026-05-31 20:22:25]   L6 function_tool: dist=0.040, random=0.056, ratio=1.39
+[2026-05-31 20:22:28]   L12 static: dist=0.134, random=0.157, ratio=1.17
+[2026-05-31 20:22:31]   L12 function_designed: dist=0.286, random=0.334, ratio=1.17
+[2026-05-31 20:22:34]   L12 function_purpose: dist=0.297, random=0.329, ratio=1.11
+[2026-05-31 20:22:37]   L12 function_using: dist=0.176, random=0.167, ratio=0.95
+[2026-05-31 20:22:41]   L12 function_tool: dist=0.099, random=0.125, ratio=1.27
+[2026-05-31 20:22:41] Test 2 completed in 47.4s
+[2026-05-31 20:22:41] ============================================================
+[2026-05-31 20:22:41] TEST 3: Negation Direction Causal Test
+[2026-05-31 20:22:41] ============================================================
+[2026-05-31 20:22:41] Inject layer: 12, Read layers: [6, 12, 18, 24, 34]
+[2026-05-31 20:22:41] 
+  Positive: 'they were very happy about it'
+[2026-05-31 20:22:41]   Negative: 'they were not happy about it'
+[2026-05-31 20:22:41]   Negation direction norm: 17.188398
+[2026-05-31 20:22:41]     L6: delta_norm=0.000, neg_top=('not', 0.0), pos_top=('happy', 0.0)
+[2026-05-31 20:22:42]     L12: delta_norm=17.188, neg_top=('unhappy', 0.46164268255233765), pos_top=('joyful', -0.8023525476455688)
+[2026-05-31 20:22:42]     L18: delta_norm=15.319, neg_top=('disappointed', 0.3158464729785919), pos_top=('pleased', 0.7554278373718262)
+[2026-05-31 20:22:42]     L24: delta_norm=18.670, neg_top=('unhappy', 0.6610732078552246), pos_top=('joyful', -0.9776004552841187)
+[2026-05-31 20:22:42]     L34: delta_norm=37.155, neg_top=('disappointed', 0.9543954730033875), pos_top=('joyful', -1.7118282318115234)
+[2026-05-31 20:22:42] 
+  Positive: 'the result was very good'
+[2026-05-31 20:22:42]   Negative: 'the result was not good'
+[2026-05-31 20:22:42]   Negation direction norm: 22.348812
+[2026-05-31 20:22:42]     L6: delta_norm=0.000, neg_top=('not', 0.0), pos_top=('good', 0.0)
+[2026-05-31 20:22:42]     L12: delta_norm=22.350, neg_top=('not', -0.46863436698913574), pos_top=('positive', -0.9947300553321838)
+[2026-05-31 20:22:42]     L18: delta_norm=27.494, neg_top=('negative', 0.43421393632888794), pos_top=('positive', -2.0539181232452393)
+[2026-05-31 20:22:42]     L24: delta_norm=41.195, neg_top=('negative', 0.9183281660079956), pos_top=('good', -3.3190114498138428)
+[2026-05-31 20:22:43]     L34: delta_norm=99.064, neg_top=('bad', 3.7067489624023438), pos_top=('positive', -6.948948860168457)
+[2026-05-31 20:22:43] 
+  Positive: 'the place was very safe'
+[2026-05-31 20:22:43]   Negative: 'the place was not safe'
+[2026-05-31 20:22:43]   Negation direction norm: 27.085085
+[2026-05-31 20:22:43]     L6: delta_norm=0.000, neg_top=('not', 0.0), pos_top=('safe', 0.0)
+[2026-05-31 20:22:43]     L12: delta_norm=27.084, neg_top=('unsafe', 1.0422990322113037), pos_top=('protected', 0.47455841302871704)
+[2026-05-31 20:22:43]     L18: delta_norm=31.682, neg_top=('risky', 1.3987274169921875), pos_top=('secure', -2.8995180130004883)
+[2026-05-31 20:22:43]     L24: delta_norm=47.303, neg_top=('risky', 1.8653678894042969), pos_top=('secure', -2.14876651763916)
+[2026-05-31 20:22:43]     L34: delta_norm=127.593, neg_top=('not', -4.584010601043701), pos_top=('secure', -10.30376148223877)
+[2026-05-31 20:22:43] 
+  Positive: 'the task was very possible'
+[2026-05-31 20:22:43]   Negative: 'the task was not possible'
+[2026-05-31 20:22:43]   Negation direction norm: 38.372272
+[2026-05-31 20:22:43]     L6: delta_norm=0.000, neg_top=('not', 0.0), pos_top=('possible', 0.0)
+[2026-05-31 20:22:43]     L12: delta_norm=38.371, neg_top=('not', -1.4737765789031982), pos_top=('feasible', 1.1704161167144775)
+[2026-05-31 20:22:43]     L18: delta_norm=44.345, neg_top=('not', -1.897310495376587), pos_top=('feasible', 2.4383950233459473)
+[2026-05-31 20:22:44]     L24: delta_norm=78.746, neg_top=('not', -2.4585390090942383), pos_top=('feasible', 5.334715843200684)
+[2026-05-31 20:22:44]     L34: delta_norm=198.866, neg_top=('not', -9.719350814819336), pos_top=('possible', -14.446863174438477)
+[2026-05-31 20:22:44] 
+  Positive: 'the room was very clean'
+[2026-05-31 20:22:44]   Negative: 'the room was not clean'
+[2026-05-31 20:22:44]   Negation direction norm: 20.369381
+[2026-05-31 20:22:44]     L6: delta_norm=0.000, neg_top=('not', 0.0), pos_top=('clean', 0.0)
+[2026-05-31 20:22:44]     L12: delta_norm=20.370, neg_top=('dirty', 0.8248182535171509), pos_top=('neat', 0.31210222840309143)
+[2026-05-31 20:22:44]     L18: delta_norm=25.180, neg_top=('not', 0.6588014960289001), pos_top=('clean', -1.1100753545761108)
+[2026-05-31 20:22:44]     L24: delta_norm=37.594, neg_top=('dirty', 1.0039936304092407), pos_top=('clean', -2.3318469524383545)
+[2026-05-31 20:22:44]     L34: delta_norm=91.845, neg_top=('messy', 7.883516311645508), pos_top=('neat', 3.3854424953460693)
+[2026-05-31 20:22:44] Test 3 completed in 3.8s
+[2026-05-31 20:22:44] Results saved to results\phase315r2_confirm\qwen3_confirm.json
+[2026-05-31 20:22:44] 
+======================================================================
+[2026-05-31 20:22:44] PHASE 315-R2 SUMMARY - qwen3
+[2026-05-31 20:22:44] ======================================================================
+[2026-05-31 20:22:44] 
+Test 1: Attribute Confirmation
+[2026-05-31 20:22:44]   L2: static_ratio=1.12, attr_fill_ratio=0.05 (n_attr=62, n_random=32)
+[2026-05-31 20:22:44]   L6: static_ratio=1.22, attr_fill_ratio=0.17 (n_attr=62, n_random=32)
+[2026-05-31 20:22:44]   L12: static_ratio=1.16, attr_fill_ratio=0.23 (n_attr=62, n_random=32)
+[2026-05-31 20:22:44]   L18: static_ratio=1.08, attr_fill_ratio=0.22 (n_attr=62, n_random=32)
+[2026-05-31 20:22:44]   L24: static_ratio=1.10, attr_fill_ratio=0.13 (n_attr=62, n_random=32)
+[2026-05-31 20:22:44] 
+Test 2: Function Templates
+[2026-05-31 20:22:44]   L2 static: ratio=1.28
+[2026-05-31 20:22:44]   L2 function_designed: ratio=1.24
+[2026-05-31 20:22:44]   L2 function_purpose: ratio=0.89
+[2026-05-31 20:22:44]   L2 function_using: ratio=1.11
+[2026-05-31 20:22:44]   L2 function_tool: ratio=1.17
+[2026-05-31 20:22:44]   L6 static: ratio=1.36
+[2026-05-31 20:22:44]   L6 function_designed: ratio=1.20
+[2026-05-31 20:22:44]   L6 function_purpose: ratio=1.16
+[2026-05-31 20:22:44]   L6 function_using: ratio=1.09
+[2026-05-31 20:22:44]   L6 function_tool: ratio=1.39
+[2026-05-31 20:22:44]   L12 static: ratio=1.17
+[2026-05-31 20:22:44]   L12 function_designed: ratio=1.17
+[2026-05-31 20:22:44]   L12 function_purpose: ratio=1.11
+[2026-05-31 20:22:44]   L12 function_using: ratio=0.95
+[2026-05-31 20:22:44]   L12 function_tool: ratio=1.27
+[2026-05-31 20:22:44] 
+Test 3: Negation Causal
+[2026-05-31 20:22:44]   'they were very happy about it': neg_dir_norm=17.1884
+[2026-05-31 20:22:44]     L6: neg_top=not(0.00x)
+[2026-05-31 20:22:44]     L12: neg_top=unhappy(1.63x)
+[2026-05-31 20:22:44]     L18: neg_top=disappointed(1.25x)
+[2026-05-31 20:22:44]     L24: neg_top=unhappy(2.20x)
+[2026-05-31 20:22:44]     L34: neg_top=disappointed(1.58x)
+[2026-05-31 20:22:44]   'the result was very good': neg_dir_norm=22.3488
+[2026-05-31 20:22:44]     L6: neg_top=not(0.00x)
+[2026-05-31 20:22:44]     L12: neg_top=not(1.07x)
+[2026-05-31 20:22:44]     L18: neg_top=negative(0.63x)
+[2026-05-31 20:22:44]     L24: neg_top=negative(1.16x)
+[2026-05-31 20:22:44]     L34: neg_top=bad(2.88x)
+[2026-05-31 20:22:44]   'the place was very safe': neg_dir_norm=27.0851
+[2026-05-31 20:22:44]     L6: neg_top=not(0.00x)
+[2026-05-31 20:22:44]     L12: neg_top=unsafe(2.68x)
+[2026-05-31 20:22:44]     L18: neg_top=risky(2.19x)
+[2026-05-31 20:22:44]     L24: neg_top=risky(2.33x)
+[2026-05-31 20:22:44]     L34: neg_top=not(2.43x)
+[2026-05-31 20:22:44]   'the task was very possible': neg_dir_norm=38.3723
+[2026-05-31 20:22:44]     L6: neg_top=not(0.00x)
+[2026-05-31 20:22:44]     L12: neg_top=not(2.58x)
+[2026-05-31 20:22:44]     L18: neg_top=not(2.15x)
+[2026-05-31 20:22:44]     L24: neg_top=not(1.41x)
+[2026-05-31 20:22:44]     L34: neg_top=not(3.43x)
+[2026-05-31 20:22:44]   'the room was very clean': neg_dir_norm=20.3694
+[2026-05-31 20:22:44]     L6: neg_top=not(0.00x)
+[2026-05-31 20:22:44]     L12: neg_top=dirty(2.26x)
+[2026-05-31 20:22:44]     L18: neg_top=not(1.22x)
+[2026-05-31 20:22:44]     L24: neg_top=dirty(1.29x)
+[2026-05-31 20:22:44]     L34: neg_top=messy(3.97x)
+[2026-05-31 20:22:45] Model qwen3 released.
