@@ -1,0 +1,378 @@
+[2026-05-31 13:40:57] Phase 308: Scope Causal + O-C Orthogonality + Cross-Form Negation -- deepseek7b
+[2026-05-31 13:40:58] Loading deepseek7b (bf16 + device_map=auto)...
+[2026-05-31 13:40:59]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b
+[2026-05-31 13:41:10]   attn_implementation=sdpa succeeded
+[2026-05-31 13:41:10]   Loaded. GPU=9.0GB
+[2026-05-31 13:41:10]   n_layers=28, class=Qwen2ForCausalLM
+[2026-05-31 13:41:10]   Layer distribution: 0 GPU + 11 CPU
+[2026-05-31 13:41:10]   n_layers=28, d_model=3584
+[2026-05-31 13:41:10] Sample layers: [7, 9, 14, 18, 21, 26]
+[2026-05-31 13:41:10]   Scope pairs: 30
+[2026-05-31 13:41:10]   Construction stimuli: 48
+[2026-05-31 13:41:10]   Cross-form stimuli: 100
+[2026-05-31 13:41:10]   Unique sentences: 238
+[2026-05-31 13:41:10] Capturing 238 sentences...
+[2026-05-31 13:41:28]   20/238 (1.1/s) ETA=203s GPU=9.0GB
+[2026-05-31 13:41:41]   40/238 (1.3/s) ETA=153s GPU=9.0GB
+[2026-05-31 13:41:53]   60/238 (1.4/s) ETA=129s GPU=9.0GB
+[2026-05-31 13:42:06]   80/238 (1.4/s) ETA=110s GPU=9.0GB
+[2026-05-31 13:42:18]   100/238 (1.5/s) ETA=94s GPU=9.0GB
+[2026-05-31 13:42:30]   120/238 (1.5/s) ETA=79s GPU=9.0GB
+[2026-05-31 13:42:42]   140/238 (1.5/s) ETA=65s GPU=9.0GB
+[2026-05-31 13:42:55]   160/238 (1.5/s) ETA=51s GPU=9.0GB
+[2026-05-31 13:43:07]   180/238 (1.5/s) ETA=38s GPU=9.0GB
+[2026-05-31 13:43:20]   200/238 (1.5/s) ETA=25s GPU=9.0GB
+[2026-05-31 13:43:32]   220/238 (1.5/s) ETA=12s GPU=9.0GB
+[2026-05-31 13:43:43] Done capturing in 154s
+[2026-05-31 13:43:43] 
+============================================================
+[2026-05-31 13:43:43] PART A: SCOPE CAUSAL TESTING
+[2026-05-31 13:43:43] ============================================================
+[2026-05-31 13:43:43] 
+--- Layer 7: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.725 |O_narrow|=43.84 |O_wide|=57.96 |S_scope|=37.72
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.660 |O_narrow|=42.98 |O_wide|=61.75 |S_scope|=43.21
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.717 |O_narrow|=51.71 |O_wide|=66.00 |S_scope|=44.30
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.654 |O_narrow|=51.60 |O_wide|=66.10 |S_scope|=48.92
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.711 |O_narrow|=47.70 |O_wide|=60.13 |S_scope|=41.01
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.674 |O_narrow|=47.34 |O_wide|=69.24 |S_scope|=47.09
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=+0.158 |O_narrow|=46.20 |O_wide|=10698.35 |S_scope|=6969.77
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.520 |O_narrow|=46.43 |O_wide|=62.66 |S_scope|=53.45
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=-0.114 |O_narrow|=40.61 |O_wide|=10674.76 |S_scope|=7998.36
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.042 |O_narrow|=37.42 |O_wide|=103.31 |S_scope|=97.41
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.396 |O_narrow|=47.64 |O_wide|=72.56 |S_scope|=66.03
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.129 |O_narrow|=49.87 |O_wide|=10677.27 |S_scope|=8061.23
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.603 |O_narrow|=29.96 |O_wide|=48.10 |S_scope|=34.78
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.759 |O_narrow|=41.44 |O_wide|=60.95 |S_scope|=35.57
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.540 |O_narrow|=38.16 |O_wide|=50.72 |S_scope|=42.61
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.581 |O_narrow|=23.38 |O_wide|=48.95 |S_scope|=33.10
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.347 |O_narrow|=34.94 |O_wide|=47.15 |S_scope|=46.91
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.768 |O_narrow|=29.76 |O_wide|=43.96 |S_scope|=25.13
+[2026-05-31 13:43:43] 
+--- Layer 9: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.713 |O_narrow|=68.63 |O_wide|=79.62 |S_scope|=56.13
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.713 |O_narrow|=61.39 |O_wide|=80.12 |S_scope|=53.61
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.791 |O_narrow|=94.21 |O_wide|=102.19 |S_scope|=63.43
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.703 |O_narrow|=73.31 |O_wide|=81.31 |S_scope|=59.56
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.757 |O_narrow|=69.47 |O_wide|=78.62 |S_scope|=51.62
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.724 |O_narrow|=75.85 |O_wide|=90.49 |S_scope|=61.74
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=+0.048 |O_narrow|=57.38 |O_wide|=10987.08 |S_scope|=7620.37
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.640 |O_narrow|=67.17 |O_wide|=85.74 |S_scope|=64.90
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=-0.164 |O_narrow|=55.14 |O_wide|=10979.50 |S_scope|=8418.83
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.139 |O_narrow|=48.58 |O_wide|=143.21 |S_scope|=125.85
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.528 |O_narrow|=67.04 |O_wide|=92.63 |S_scope|=77.59
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.089 |O_narrow|=73.56 |O_wide|=10983.63 |S_scope|=8158.44
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.507 |O_narrow|=49.67 |O_wide|=74.72 |S_scope|=61.76
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.708 |O_narrow|=61.44 |O_wide|=83.34 |S_scope|=55.34
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.572 |O_narrow|=68.23 |O_wide|=76.54 |S_scope|=67.00
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.621 |O_narrow|=39.28 |O_wide|=69.45 |S_scope|=47.33
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.419 |O_narrow|=63.23 |O_wide|=75.91 |S_scope|=74.97
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.730 |O_narrow|=54.46 |O_wide|=75.36 |S_scope|=47.69
+[2026-05-31 13:43:43] 
+--- Layer 14: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.731 |O_narrow|=90.68 |O_wide|=98.56 |S_scope|=69.44
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.758 |O_narrow|=87.13 |O_wide|=103.88 |S_scope|=66.50
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.849 |O_narrow|=118.30 |O_wide|=125.51 |S_scope|=66.99
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.766 |O_narrow|=104.31 |O_wide|=110.26 |S_scope|=73.43
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.807 |O_narrow|=87.86 |O_wide|=97.88 |S_scope|=57.70
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.787 |O_narrow|=94.53 |O_wide|=106.07 |S_scope|=65.53
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=-0.043 |O_narrow|=92.36 |O_wide|=12518.99 |S_scope|=9106.94
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.657 |O_narrow|=87.14 |O_wide|=102.51 |S_scope|=78.53
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=-0.005 |O_narrow|=79.43 |O_wide|=12522.98 |S_scope|=8934.34
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.119 |O_narrow|=78.85 |O_wide|=170.65 |S_scope|=165.63
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.505 |O_narrow|=90.16 |O_wide|=111.60 |S_scope|=100.35
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.121 |O_narrow|=98.92 |O_wide|=12512.81 |S_scope|=9442.38
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.479 |O_narrow|=83.35 |O_wide|=96.17 |S_scope|=91.63
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.710 |O_narrow|=91.20 |O_wide|=106.62 |S_scope|=75.31
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.538 |O_narrow|=97.52 |O_wide|=104.79 |S_scope|=97.27
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.506 |O_narrow|=68.85 |O_wide|=92.25 |S_scope|=80.03
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.388 |O_narrow|=90.72 |O_wide|=104.27 |S_scope|=107.89
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.607 |O_narrow|=79.99 |O_wide|=97.44 |S_scope|=78.65
+[2026-05-31 13:43:43] 
+--- Layer 18: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.712 |O_narrow|=113.30 |O_wide|=111.75 |S_scope|=85.40
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.773 |O_narrow|=120.18 |O_wide|=140.32 |S_scope|=87.70
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.848 |O_narrow|=158.42 |O_wide|=159.44 |S_scope|=87.62
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.736 |O_narrow|=139.39 |O_wide|=141.19 |S_scope|=101.88
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.817 |O_narrow|=120.84 |O_wide|=125.49 |S_scope|=74.45
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.775 |O_narrow|=114.61 |O_wide|=123.24 |S_scope|=79.79
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=+0.002 |O_narrow|=113.59 |O_wide|=12560.85 |S_scope|=8951.44
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.690 |O_narrow|=121.68 |O_wide|=143.44 |S_scope|=104.34
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=+0.025 |O_narrow|=114.29 |O_wide|=12581.32 |S_scope|=8863.92
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.090 |O_narrow|=101.51 |O_wide|=200.29 |S_scope|=203.56
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.557 |O_narrow|=124.60 |O_wide|=144.90 |S_scope|=126.80
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.206 |O_narrow|=124.40 |O_wide|=12560.58 |S_scope|=9852.04
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.423 |O_narrow|=98.39 |O_wide|=113.40 |S_scope|=113.72
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.699 |O_narrow|=123.89 |O_wide|=137.95 |S_scope|=101.64
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.476 |O_narrow|=122.06 |O_wide|=148.86 |S_scope|=138.65
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.506 |O_narrow|=91.93 |O_wide|=113.26 |S_scope|=101.98
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.384 |O_narrow|=122.33 |O_wide|=144.72 |S_scope|=148.24
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.578 |O_narrow|=102.88 |O_wide|=120.51 |S_scope|=102.67
+[2026-05-31 13:43:43] 
+--- Layer 21: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.732 |O_narrow|=136.88 |O_wide|=137.95 |S_scope|=100.59
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.805 |O_narrow|=142.39 |O_wide|=168.31 |S_scope|=97.02
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.831 |O_narrow|=176.21 |O_wide|=179.79 |S_scope|=103.38
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.736 |O_narrow|=160.07 |O_wide|=162.86 |S_scope|=117.31
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.813 |O_narrow|=143.45 |O_wide|=143.17 |S_scope|=87.61
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.782 |O_narrow|=132.35 |O_wide|=144.58 |S_scope|=91.41
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=-0.072 |O_narrow|=138.56 |O_wide|=12259.28 |S_scope|=9076.25
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.746 |O_narrow|=154.89 |O_wide|=182.37 |S_scope|=120.26
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=-0.043 |O_narrow|=144.44 |O_wide|=12280.20 |S_scope|=8972.92
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.073 |O_narrow|=114.82 |O_wide|=261.41 |S_scope|=256.21
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.603 |O_narrow|=150.64 |O_wide|=173.87 |S_scope|=144.58
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.103 |O_narrow|=149.82 |O_wide|=12253.59 |S_scope|=9212.33
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.415 |O_narrow|=119.02 |O_wide|=133.47 |S_scope|=136.56
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.691 |O_narrow|=158.67 |O_wide|=168.97 |S_scope|=128.70
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.448 |O_narrow|=149.69 |O_wide|=178.03 |S_scope|=172.17
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.454 |O_narrow|=110.16 |O_wide|=128.36 |S_scope|=124.64
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.336 |O_narrow|=142.66 |O_wide|=174.52 |S_scope|=182.76
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.548 |O_narrow|=129.55 |O_wide|=152.97 |S_scope|=134.24
+[2026-05-31 13:43:43] 
+--- Layer 26: Scope analysis ---
+[2026-05-31 13:43:43]   adverb_scope_happy: cos(O_narrow,O_wide)=+0.715 |O_narrow|=246.37 |O_wide|=245.94 |S_scope|=185.77
+[2026-05-31 13:43:43]   adverb_scope_warm: cos(O_narrow,O_wide)=+0.793 |O_narrow|=233.82 |O_wide|=268.72 |S_scope|=161.75
+[2026-05-31 13:43:43]   adverb_scope_easy: cos(O_narrow,O_wide)=+0.793 |O_narrow|=265.89 |O_wide|=268.55 |S_scope|=171.98
+[2026-05-31 13:43:43]   adverb_scope_bright: cos(O_narrow,O_wide)=+0.701 |O_narrow|=243.35 |O_wide|=240.96 |S_scope|=187.30
+[2026-05-31 13:43:43]   adverb_scope_good: cos(O_narrow,O_wide)=+0.783 |O_narrow|=233.87 |O_wide|=216.23 |S_scope|=148.34
+[2026-05-31 13:43:43]   adverb_scope_smart: cos(O_narrow,O_wide)=+0.751 |O_narrow|=216.38 |O_wide|=226.72 |S_scope|=156.25
+[2026-05-31 13:43:43]   embedding_scope_lied: cos(O_narrow,O_wide)=+0.005 |O_narrow|=274.40 |O_wide|=10951.54 |S_scope|=7918.17
+[2026-05-31 13:43:43]   embedding_scope_knows: cos(O_narrow,O_wide)=+0.774 |O_narrow|=270.01 |O_wide|=303.00 |S_scope|=192.59
+[2026-05-31 13:43:43]   embedding_scope_tried: cos(O_narrow,O_wide)=+0.023 |O_narrow|=279.54 |O_wide|=10940.26 |S_scope|=7841.64
+[2026-05-31 13:43:43]   embedding_scope_helped: cos(O_narrow,O_wide)=+0.137 |O_narrow|=206.43 |O_wide|=539.89 |S_scope|=490.11
+[2026-05-31 13:43:43]   embedding_scope_wanted: cos(O_narrow,O_wide)=+0.633 |O_narrow|=240.45 |O_wide|=283.08 |S_scope|=224.16
+[2026-05-31 13:43:43]   embedding_scope_liked: cos(O_narrow,O_wide)=-0.067 |O_narrow|=237.96 |O_wide|=10855.07 |S_scope|=8104.07
+[2026-05-31 13:43:43]   infinitive_scope_leave: cos(O_narrow,O_wide)=+0.449 |O_narrow|=206.03 |O_wide|=220.09 |S_scope|=223.62
+[2026-05-31 13:43:43]   infinitive_scope_wait: cos(O_narrow,O_wide)=+0.713 |O_narrow|=279.00 |O_wide|=275.26 |S_scope|=210.09
+[2026-05-31 13:43:43]   infinitive_scope_find: cos(O_narrow,O_wide)=+0.441 |O_narrow|=238.20 |O_wide|=285.59 |S_scope|=276.91
+[2026-05-31 13:43:43]   infinitive_scope_open: cos(O_narrow,O_wide)=+0.427 |O_narrow|=205.40 |O_wide|=212.77 |S_scope|=223.75
+[2026-05-31 13:43:43]   infinitive_scope_solve: cos(O_narrow,O_wide)=+0.245 |O_narrow|=251.38 |O_wide|=263.62 |S_scope|=316.45
+[2026-05-31 13:43:43]   infinitive_scope_enter: cos(O_narrow,O_wide)=+0.521 |O_narrow|=228.40 |O_wide|=250.25 |S_scope|=234.12
+[2026-05-31 13:43:43] 
+--- Scope Causal Patching ---
+[2026-05-31 13:43:43] 
+  Layer 7: Scope causal patching
+[2026-05-31 13:43:49]     embedding_scope_lied: O_shared→not=-0.0312 S_scope→not=-0.0312 random→not=-0.1562
+[2026-05-31 13:43:54]     embedding_scope_knows: O_shared→not=+0.0938 S_scope→not=-1.0938 random→not=+0.0312
+[2026-05-31 13:43:59]     embedding_scope_tried: O_shared→not=-0.0781 S_scope→not=+0.0000 random→not=-0.0547
+[2026-05-31 13:44:05]     embedding_scope_helped: O_shared→not=-0.1094 S_scope→not=-0.0469 random→not=-0.1250
+[2026-05-31 13:44:10]     embedding_scope_wanted: O_shared→not=-0.1250 S_scope→not=+0.1562 random→not=+0.0938
+[2026-05-31 13:44:15]     embedding_scope_liked: O_shared→not=+0.1406 S_scope→not=+0.0938 random→not=+0.0781
+[2026-05-31 13:44:15] 
+  Layer 9: Scope causal patching
+[2026-05-31 13:44:21]     embedding_scope_lied: O_shared→not=-0.1250 S_scope→not=-0.0312 random→not=-0.0938
+[2026-05-31 13:44:26]     embedding_scope_knows: O_shared→not=-0.0625 S_scope→not=-2.4688 random→not=+0.4062
+[2026-05-31 13:44:31]     embedding_scope_tried: O_shared→not=+0.0000 S_scope→not=-0.0078 random→not=-0.0078
+[2026-05-31 13:44:37]     embedding_scope_helped: O_shared→not=-0.1094 S_scope→not=-0.0938 random→not=+0.0000
+[2026-05-31 13:44:42]     embedding_scope_wanted: O_shared→not=-1.7969 S_scope→not=+0.0938 random→not=+0.2188
+[2026-05-31 13:44:47]     embedding_scope_liked: O_shared→not=+0.1406 S_scope→not=+0.0625 random→not=+0.0781
+[2026-05-31 13:44:47] 
+  Layer 14: Scope causal patching
+[2026-05-31 13:44:53]     embedding_scope_lied: O_shared→not=-0.0938 S_scope→not=-0.0312 random→not=-0.1562
+[2026-05-31 13:44:58]     embedding_scope_knows: O_shared→not=+0.0625 S_scope→not=+0.5312 random→not=-0.0625
+[2026-05-31 13:45:03]     embedding_scope_tried: O_shared→not=+0.0078 S_scope→not=+0.0234 random→not=-0.0312
+[2026-05-31 13:45:09]     embedding_scope_helped: O_shared→not=+0.0000 S_scope→not=-0.0156 random→not=-0.1094
+[2026-05-31 13:45:14]     embedding_scope_wanted: O_shared→not=-0.2500 S_scope→not=-0.2188 random→not=-0.1250
+[2026-05-31 13:45:19]     embedding_scope_liked: O_shared→not=+0.0781 S_scope→not=+0.1719 random→not=+0.0312
+[2026-05-31 13:45:19] 
+  Layer 18: Scope causal patching
+[2026-05-31 13:45:25]     embedding_scope_lied: O_shared→not=-0.0312 S_scope→not=-0.0625 random→not=-0.0938
+[2026-05-31 13:45:30]     embedding_scope_knows: O_shared→not=+0.0000 S_scope→not=+0.0000 random→not=-0.0312
+[2026-05-31 13:45:35]     embedding_scope_tried: O_shared→not=-0.0312 S_scope→not=-0.0156 random→not=-0.0625
+[2026-05-31 13:45:40]     embedding_scope_helped: O_shared→not=-0.0938 S_scope→not=-0.1094 random→not=-0.1406
+[2026-05-31 13:45:46]     embedding_scope_wanted: O_shared→not=-1.5312 S_scope→not=+0.1875 random→not=+0.2188
+[2026-05-31 13:45:51]     embedding_scope_liked: O_shared→not=+0.2500 S_scope→not=+0.0781 random→not=+0.2031
+[2026-05-31 13:45:51] 
+  Layer 21: Scope causal patching
+[2026-05-31 13:45:57]     embedding_scope_lied: O_shared→not=-0.0625 S_scope→not=+0.1562 random→not=-0.1875
+[2026-05-31 13:46:02]     embedding_scope_knows: O_shared→not=+0.0000 S_scope→not=-0.0625 random→not=-0.1250
+[2026-05-31 13:46:07]     embedding_scope_tried: O_shared→not=-0.0469 S_scope→not=-0.0391 random→not=-0.0703
+[2026-05-31 13:46:13]     embedding_scope_helped: O_shared→not=-0.1719 S_scope→not=-0.0312 random→not=-0.1094
+[2026-05-31 13:46:18]     embedding_scope_wanted: O_shared→not=+0.1875 S_scope→not=+0.1875 random→not=-0.0625
+[2026-05-31 13:46:23]     embedding_scope_liked: O_shared→not=+0.1719 S_scope→not=+0.1094 random→not=-0.0312
+[2026-05-31 13:46:23] 
+  Layer 26: Scope causal patching
+[2026-05-31 13:46:29]     embedding_scope_lied: O_shared→not=-0.3125 S_scope→not=-0.3125 random→not=+0.0312
+[2026-05-31 13:46:34]     embedding_scope_knows: O_shared→not=-0.1250 S_scope→not=-0.5312 random→not=-0.0625
+[2026-05-31 13:46:39]     embedding_scope_tried: O_shared→not=-0.1172 S_scope→not=-0.1016 random→not=-0.0078
+[2026-05-31 13:46:45]     embedding_scope_helped: O_shared→not=-0.1719 S_scope→not=-0.4062 random→not=-0.0312
+[2026-05-31 13:46:50]     embedding_scope_wanted: O_shared→not=-0.2500 S_scope→not=-0.4062 random→not=+0.0000
+[2026-05-31 13:46:55]     embedding_scope_liked: O_shared→not=-0.4219 S_scope→not=-0.1719 random→not=+0.0938
+[2026-05-31 13:46:55] 
+============================================================
+[2026-05-31 13:46:55] PART B: O(not) vs C(construction) ORTHOGONALITY
+[2026-05-31 13:46:55] ============================================================
+[2026-05-31 13:46:55] 
+--- Layer 7: O-C orthogonality ---
+[2026-05-31 13:46:59]   cos(O_not, C)=-0.259
+[2026-05-31 13:46:59]   cos(O_not, C_pc1)=-0.251 (C_pc1_var=99.3%)
+[2026-05-31 13:46:59]   O_clean/C ratio=0.966 (after removing C)
+[2026-05-31 13:46:59]   O_clean/Cpc1 ratio=0.968 (after removing C_pc1)
+[2026-05-31 13:46:59]     O_not_raw → not: +0.6250
+[2026-05-31 13:46:59]     O_clean_C → not: +0.1250
+[2026-05-31 13:46:59]     O_clean_Cpc1 → not: +0.6875
+[2026-05-31 13:46:59]     C_only → not: +0.6250
+[2026-05-31 13:46:59]     random → not: +0.6250
+[2026-05-31 13:46:59] 
+--- Layer 9: O-C orthogonality ---
+[2026-05-31 13:47:02]   cos(O_not, C)=-0.263
+[2026-05-31 13:47:02]   cos(O_not, C_pc1)=-0.255 (C_pc1_var=99.0%)
+[2026-05-31 13:47:02]   O_clean/C ratio=0.965 (after removing C)
+[2026-05-31 13:47:02]   O_clean/Cpc1 ratio=0.967 (after removing C_pc1)
+[2026-05-31 13:47:02]     O_not_raw → not: -0.0625
+[2026-05-31 13:47:02]     O_clean_C → not: +0.0625
+[2026-05-31 13:47:02]     O_clean_Cpc1 → not: +0.6875
+[2026-05-31 13:47:02]     C_only → not: +0.6250
+[2026-05-31 13:47:02]     random → not: +0.6250
+[2026-05-31 13:47:02] 
+--- Layer 14: O-C orthogonality ---
+[2026-05-31 13:47:06]   cos(O_not, C)=-0.163
+[2026-05-31 13:47:06]   cos(O_not, C_pc1)=-0.157 (C_pc1_var=99.4%)
+[2026-05-31 13:47:06]   O_clean/C ratio=0.987 (after removing C)
+[2026-05-31 13:47:06]   O_clean/Cpc1 ratio=0.988 (after removing C_pc1)
+[2026-05-31 13:47:06]     O_not_raw → not: +0.0625
+[2026-05-31 13:47:06]     O_clean_C → not: +0.5000
+[2026-05-31 13:47:06]     O_clean_Cpc1 → not: +0.5625
+[2026-05-31 13:47:06]     C_only → not: +0.0000
+[2026-05-31 13:47:06]     random → not: +0.1250
+[2026-05-31 13:47:06] 
+--- Layer 18: O-C orthogonality ---
+[2026-05-31 13:47:10]   cos(O_not, C)=-0.110
+[2026-05-31 13:47:10]   cos(O_not, C_pc1)=-0.107 (C_pc1_var=99.2%)
+[2026-05-31 13:47:10]   O_clean/C ratio=0.994 (after removing C)
+[2026-05-31 13:47:10]   O_clean/Cpc1 ratio=0.994 (after removing C_pc1)
+[2026-05-31 13:47:10]     O_not_raw → not: +0.6875
+[2026-05-31 13:47:10]     O_clean_C → not: +0.0625
+[2026-05-31 13:47:10]     O_clean_Cpc1 → not: +0.0000
+[2026-05-31 13:47:10]     C_only → not: +0.6875
+[2026-05-31 13:47:10]     random → not: +0.6875
+[2026-05-31 13:47:10] 
+--- Layer 21: O-C orthogonality ---
+[2026-05-31 13:47:13]   cos(O_not, C)=-0.126
+[2026-05-31 13:47:13]   cos(O_not, C_pc1)=-0.122 (C_pc1_var=98.6%)
+[2026-05-31 13:47:13]   O_clean/C ratio=0.992 (after removing C)
+[2026-05-31 13:47:13]   O_clean/Cpc1 ratio=0.993 (after removing C_pc1)
+[2026-05-31 13:47:13]     O_not_raw → not: +0.7500
+[2026-05-31 13:47:13]     O_clean_C → not: +0.5000
+[2026-05-31 13:47:13]     O_clean_Cpc1 → not: +0.5625
+[2026-05-31 13:47:13]     C_only → not: +0.2500
+[2026-05-31 13:47:13]     random → not: +0.0000
+[2026-05-31 13:47:13] 
+--- Layer 26: O-C orthogonality ---
+[2026-05-31 13:47:17]   cos(O_not, C)=-0.049
+[2026-05-31 13:47:17]   cos(O_not, C_pc1)=-0.041 (C_pc1_var=92.9%)
+[2026-05-31 13:47:17]   O_clean/C ratio=0.999 (after removing C)
+[2026-05-31 13:47:17]   O_clean/Cpc1 ratio=0.999 (after removing C_pc1)
+[2026-05-31 13:47:17]     O_not_raw → not: +0.0000
+[2026-05-31 13:47:17]     O_clean_C → not: +0.0625
+[2026-05-31 13:47:17]     O_clean_Cpc1 → not: +0.0000
+[2026-05-31 13:47:17]     C_only → not: -0.0625
+[2026-05-31 13:47:17]     random → not: +0.0000
+[2026-05-31 13:47:17] 
+============================================================
+[2026-05-31 13:47:17] PART C: CROSS-FORM NEGATION SUBSPACE
+[2026-05-31 13:47:17] ============================================================
+[2026-05-31 13:47:17] 
+--- Layer 7: Cross-form negation ---
+[2026-05-31 13:47:17]   not/adj: 15 operands, norm=37.73
+[2026-05-31 13:47:17]   not/verb: 10 operands, norm=891.65
+[2026-05-31 13:47:17]   no/adj: 15 operands, norm=57.83
+[2026-05-31 13:47:17]   never/adj: 15 operands, norm=45.47
+[2026-05-31 13:47:17]   never/verb: 10 operands, norm=893.81
+[2026-05-31 13:47:17]   n't/verb: 10 operands, norm=888.91
+[2026-05-31 13:47:17]   cos(n't, never): adj=N/A verb=+0.999
+[2026-05-31 13:47:17]   cos(n't, not): adj=N/A verb=+1.000
+[2026-05-31 13:47:17]   cos(never, no): adj=+0.453 verb=N/A
+[2026-05-31 13:47:17]   cos(never, not): adj=+0.681 verb=+0.999
+[2026-05-31 13:47:17]   cos(no, not): adj=+0.513 verb=N/A
+[2026-05-31 13:47:24] 
+--- Layer 9: Cross-form negation ---
+[2026-05-31 13:47:24]   not/adj: 15 operands, norm=49.67
+[2026-05-31 13:47:24]   not/verb: 10 operands, norm=985.28
+[2026-05-31 13:47:24]   no/adj: 15 operands, norm=73.22
+[2026-05-31 13:47:24]   never/adj: 15 operands, norm=62.20
+[2026-05-31 13:47:24]   never/verb: 10 operands, norm=994.73
+[2026-05-31 13:47:24]   n't/verb: 10 operands, norm=983.27
+[2026-05-31 13:47:24]   cos(n't, never): adj=N/A verb=+0.997
+[2026-05-31 13:47:24]   cos(n't, not): adj=N/A verb=+0.999
+[2026-05-31 13:47:24]   cos(never, no): adj=+0.431 verb=N/A
+[2026-05-31 13:47:24]   cos(never, not): adj=+0.636 verb=+0.997
+[2026-05-31 13:47:24]   cos(no, not): adj=+0.472 verb=N/A
+[2026-05-31 13:47:31] 
+--- Layer 14: Cross-form negation ---
+[2026-05-31 13:47:31]   not/adj: 15 operands, norm=64.45
+[2026-05-31 13:47:31]   not/verb: 10 operands, norm=1780.31
+[2026-05-31 13:47:31]   no/adj: 15 operands, norm=89.50
+[2026-05-31 13:47:31]   never/adj: 15 operands, norm=79.02
+[2026-05-31 13:47:31]   never/verb: 10 operands, norm=1789.76
+[2026-05-31 13:47:31]   n't/verb: 10 operands, norm=1783.90
+[2026-05-31 13:47:31]   cos(n't, never): adj=N/A verb=+0.999
+[2026-05-31 13:47:31]   cos(n't, not): adj=N/A verb=+1.000
+[2026-05-31 13:47:31]   cos(never, no): adj=+0.506 verb=N/A
+[2026-05-31 13:47:31]   cos(never, not): adj=+0.691 verb=+0.999
+[2026-05-31 13:47:31]   cos(no, not): adj=+0.535 verb=N/A
+[2026-05-31 13:47:39] 
+--- Layer 18: Cross-form negation ---
+[2026-05-31 13:47:39]   not/adj: 15 operands, norm=82.95
+[2026-05-31 13:47:39]   not/verb: 10 operands, norm=1779.59
+[2026-05-31 13:47:39]   no/adj: 15 operands, norm=111.93
+[2026-05-31 13:47:39]   never/adj: 15 operands, norm=95.38
+[2026-05-31 13:47:39]   never/verb: 10 operands, norm=1789.86
+[2026-05-31 13:47:39]   n't/verb: 10 operands, norm=1785.23
+[2026-05-31 13:47:39]   cos(n't, never): adj=N/A verb=+0.999
+[2026-05-31 13:47:39]   cos(n't, not): adj=N/A verb=+1.000
+[2026-05-31 13:47:39]   cos(never, no): adj=+0.481 verb=N/A
+[2026-05-31 13:47:39]   cos(never, not): adj=+0.723 verb=+0.999
+[2026-05-31 13:47:39]   cos(no, not): adj=+0.471 verb=N/A
+[2026-05-31 13:47:46] 
+--- Layer 21: Cross-form negation ---
+[2026-05-31 13:47:46]   not/adj: 15 operands, norm=99.27
+[2026-05-31 13:47:46]   not/verb: 10 operands, norm=1466.65
+[2026-05-31 13:47:46]   no/adj: 15 operands, norm=140.45
+[2026-05-31 13:47:46]   never/adj: 15 operands, norm=112.72
+[2026-05-31 13:47:46]   never/verb: 10 operands, norm=1487.40
+[2026-05-31 13:47:46]   n't/verb: 10 operands, norm=1473.81
+[2026-05-31 13:47:46]   cos(n't, never): adj=N/A verb=+0.997
+[2026-05-31 13:47:46]   cos(n't, not): adj=N/A verb=+0.999
+[2026-05-31 13:47:46]   cos(never, no): adj=+0.442 verb=N/A
+[2026-05-31 13:47:46]   cos(never, not): adj=+0.722 verb=+0.997
+[2026-05-31 13:47:46]   cos(no, not): adj=+0.440 verb=N/A
+[2026-05-31 13:47:53] 
+--- Layer 26: Cross-form negation ---
+[2026-05-31 13:47:53]   not/adj: 15 operands, norm=178.19
+[2026-05-31 13:47:53]   not/verb: 10 operands, norm=1127.09
+[2026-05-31 13:47:53]   no/adj: 15 operands, norm=223.19
+[2026-05-31 13:47:53]   never/adj: 15 operands, norm=197.58
+[2026-05-31 13:47:53]   never/verb: 10 operands, norm=1153.41
+[2026-05-31 13:47:53]   n't/verb: 10 operands, norm=1138.97
+[2026-05-31 13:47:53]   cos(n't, never): adj=N/A verb=+0.988
+[2026-05-31 13:47:53]   cos(n't, not): adj=N/A verb=+0.996
+[2026-05-31 13:47:53]   cos(never, no): adj=+0.359 verb=N/A
+[2026-05-31 13:47:53]   cos(never, not): adj=+0.771 verb=+0.987
+[2026-05-31 13:47:53]   cos(no, not): adj=+0.365 verb=N/A
+[2026-05-31 13:48:00] 
+============================================================
+[2026-05-31 13:48:00] SCOPE SUMMARY BY TYPE
+[2026-05-31 13:48:00] ============================================================
+[2026-05-31 13:48:00]   L7 adverb_scope: cos(O_narrow,O_wide)=+0.690 |O_narrow|=47.53 |O_wide|=63.53 |S_scope|=43.71 ratio=0.920
+[2026-05-31 13:48:00]   L7 embedding_scope: cos(O_narrow,O_wide)=+0.145 |O_narrow|=44.69 |O_wide|=5381.49 |S_scope|=3874.37 ratio=86.690
+[2026-05-31 13:48:00]   L7 infinitive_scope: cos(O_narrow,O_wide)=+0.600 |O_narrow|=32.94 |O_wide|=49.97 |S_scope|=36.35 ratio=1.104
+[2026-05-31 13:48:00]   L9 adverb_scope: cos(O_narrow,O_wide)=+0.734 |O_narrow|=73.81 |O_wide|=85.39 |S_scope|=57.68 ratio=0.781
+[2026-05-31 13:48:00]   L9 embedding_scope: cos(O_narrow,O_wide)=+0.184 |O_narrow|=61.48 |O_wide|=5545.30 |S_scope|=4077.66 ratio=66.326
+[2026-05-31 13:48:00]   L9 infinitive_scope: cos(O_narrow,O_wide)=+0.593 |O_narrow|=56.05 |O_wide|=75.89 |S_scope|=59.02 ratio=1.053
+[2026-05-31 13:48:00]   L14 adverb_scope: cos(O_narrow,O_wide)=+0.783 |O_narrow|=97.13 |O_wide|=107.03 |S_scope|=66.60 ratio=0.686
+[2026-05-31 13:48:00]   L14 embedding_scope: cos(O_narrow,O_wide)=+0.185 |O_narrow|=87.81 |O_wide|=6323.26 |S_scope|=4638.03 ratio=52.820
+[2026-05-31 13:48:00]   L14 infinitive_scope: cos(O_narrow,O_wide)=+0.538 |O_narrow|=85.27 |O_wide|=100.26 |S_scope|=88.46 ratio=1.037
+[2026-05-31 13:48:00]   L18 adverb_scope: cos(O_narrow,O_wide)=+0.777 |O_narrow|=127.79 |O_wide|=133.57 |S_scope|=86.14 ratio=0.674
+[2026-05-31 13:48:00]   L18 embedding_scope: cos(O_narrow,O_wide)=+0.193 |O_narrow|=116.68 |O_wide|=6365.23 |S_scope|=4683.68 ratio=40.142
+[2026-05-31 13:48:00]   L18 infinitive_scope: cos(O_narrow,O_wide)=+0.511 |O_narrow|=110.25 |O_wide|=129.78 |S_scope|=117.82 ratio=1.069
+[2026-05-31 13:48:00]   L21 adverb_scope: cos(O_narrow,O_wide)=+0.783 |O_narrow|=148.56 |O_wide|=156.11 |S_scope|=99.55 ratio=0.670
+[2026-05-31 13:48:00]   L21 embedding_scope: cos(O_narrow,O_wide)=+0.200 |O_narrow|=142.19 |O_wide|=6235.12 |S_scope|=4630.43 ratio=32.564
+[2026-05-31 13:48:00]   L21 infinitive_scope: cos(O_narrow,O_wide)=+0.482 |O_narrow|=134.96 |O_wide|=156.06 |S_scope|=146.51 ratio=1.086
+[2026-05-31 13:48:00]   L26 adverb_scope: cos(O_narrow,O_wide)=+0.756 |O_narrow|=239.95 |O_wide|=244.52 |S_scope|=168.57 ratio=0.703
+[2026-05-31 13:48:00]   L26 embedding_scope: cos(O_narrow,O_wide)=+0.251 |O_narrow|=251.46 |O_wide|=5645.47 |S_scope|=4128.46 ratio=16.418
+[2026-05-31 13:48:00]   L26 infinitive_scope: cos(O_narrow,O_wide)=+0.466 |O_narrow|=234.74 |O_wide|=251.26 |S_scope|=247.49 ratio=1.054
+[2026-05-31 13:48:00] 
+Saving results...
+[2026-05-31 13:48:00] Saved to results\phase308_scope_causal\deepseek7b_scope_causal.json
+[2026-05-31 13:48:00] Phase 308 complete for deepseek7b

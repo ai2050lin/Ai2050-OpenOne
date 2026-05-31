@@ -1,0 +1,396 @@
+[2026-05-31 16:34:09] === Phase 313: W_U Readout Analysis for glm4 ===
+[2026-05-31 16:34:11] Loading glm4 (bf16 + device_map=auto)...
+[2026-05-31 16:34:22] Model loaded: GlmForCausalLM, device=cuda:0, GPU=8.99GB
+[2026-05-31 16:34:22] Model info: n_layers=40, d_model=4096, vocab=151552
+[2026-05-31 16:34:22] Test layers: [6, 12, 18, 24, 30, 38]
+[2026-05-31 16:34:22] Extracting W_U (lm_head weight matrix)...
+[2026-05-31 16:34:23] W_U shape: (151552, 4096)
+[2026-05-31 16:34:23]   Token 'not' -> id=537
+[2026-05-31 16:34:23]   Token 'sad' -> id=12415
+[2026-05-31 16:34:23]   Token 'happy' -> id=6247
+[2026-05-31 16:34:23]   Token 'very' -> id=1602
+[2026-05-31 16:34:23]   Token 'never' -> id=2581
+[2026-05-31 16:34:23]   Token 'always' -> id=2677
+[2026-05-31 16:34:23]   Token 'good' -> id=1661
+[2026-05-31 16:34:23]   Token 'bad' -> id=3873
+[2026-05-31 16:34:23] Extracting functional directions...
+[2026-05-31 16:34:23]   Layer 6: extracting directions...
+[2026-05-31 16:36:13]   Layer 6: 14 directions extracted
+[2026-05-31 16:36:13]   Layer 12: extracting directions...
+[2026-05-31 16:37:53]   Layer 12: 14 directions extracted
+[2026-05-31 16:37:53]   Layer 18: extracting directions...
+[2026-05-31 16:39:37]   Layer 18: 14 directions extracted
+[2026-05-31 16:39:37]   Layer 24: extracting directions...
+[2026-05-31 16:41:23]   Layer 24: 14 directions extracted
+[2026-05-31 16:41:23]   Layer 30: extracting directions...
+[2026-05-31 16:43:07]   Layer 30: 14 directions extracted
+[2026-05-31 16:43:07]   Layer 38: extracting directions...
+[2026-05-31 16:44:52]   Layer 38: 14 directions extracted
+[2026-05-31 16:44:52] Computing W_U readout analysis...
+[2026-05-31 16:59:25] Computing Jacobian gain analysis...
+[2026-05-31 17:00:30]   Layer 6: Jacobian gains computed for 13 directions
+[2026-05-31 17:01:33]   Layer 12: Jacobian gains computed for 13 directions
+[2026-05-31 17:02:36]   Layer 18: Jacobian gains computed for 13 directions
+[2026-05-31 17:03:39]   Layer 24: Jacobian gains computed for 13 directions
+[2026-05-31 17:04:43]   Layer 30: Jacobian gains computed for 13 directions
+[2026-05-31 17:05:46]   Layer 38: Jacobian gains computed for 13 directions
+[2026-05-31 17:05:46] Results saved to results\phase313_WU_readout\glm4_WU_readout.json
+[2026-05-31 17:05:46] 
+======================================================================
+[2026-05-31 17:05:46] W_U READOUT ANALYSIS SUMMARY - glm4
+[2026-05-31 17:05:46] ======================================================================
+[2026-05-31 17:05:46] 
+--- Layer 6 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 1.1986
+[2026-05-31 17:05:46]     R: 1.6198
+[2026-05-31 17:05:46]     C_raw: 1.2293
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 0.8764
+[2026-05-31 17:05:46]     O_clean_R: 1.1977
+[2026-05-31 17:05:46]     O_clean_RC: 1.1971
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 1.1933
+[2026-05-31 17:05:46]     R_delta_from_shared: 0.0990
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9997
+[2026-05-31 17:05:46]     A_delta_from_shared: 0.8730
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=5.41, ratio=1.24x random
+[2026-05-31 17:05:46]     R: gain=4.87, ratio=1.12x random
+[2026-05-31 17:05:46]     C_raw: gain=4.38, ratio=1.00x random
+[2026-05-31 17:05:46]     C_pc1: gain=5.67, ratio=1.30x random
+[2026-05-31 17:05:46]     A: gain=4.48, ratio=1.03x random
+[2026-05-31 17:05:46]     O_clean_R: gain=5.46, ratio=1.25x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=5.39, ratio=1.23x random
+[2026-05-31 17:05:46]     shared_pc1: gain=4.82, ratio=1.10x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=5.54, ratio=1.27x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=4.69, ratio=1.08x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=5.64, ratio=1.29x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=4.42, ratio=1.01x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0115, happy=0.0161, sad=0.0011
+[2026-05-31 17:05:46]     R: not=-0.0194, happy=-0.0171, sad=-0.0042
+[2026-05-31 17:05:46]     C_raw: not=0.0001, happy=-0.0125, sad=0.0013
+[2026-05-31 17:05:46]     C_pc1: not=-0.0028, happy=-0.0053, sad=-0.0194
+[2026-05-31 17:05:46]     A: not=-0.0000, happy=-0.0025, sad=-0.0004
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0107, happy=0.0168, sad=0.0013
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0107, happy=0.0169, sad=0.0019
+[2026-05-31 17:05:46]     shared_pc1: not=0.0198, happy=0.0160, sad=0.0039
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0097, happy=0.0177, sad=0.0015
+[2026-05-31 17:05:46]     R_delta_from_shared: not=0.0069, happy=-0.0174, sad=-0.0044
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=-0.0032, happy=-0.0057, sad=-0.0195
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0018, happy=-0.0039, sad=-0.0008
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=127.4964, ratio=1.17x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     R: jac_gain=144.1236, ratio=1.32x random, delta_not=-0.0938
+[2026-05-31 17:05:46]     C_raw: jac_gain=106.3581, ratio=0.97x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_pc1: jac_gain=125.2245, ratio=1.14x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     A: jac_gain=181.1805, ratio=1.66x random, delta_not=-0.0938
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=157.7763, ratio=1.44x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=112.2857, ratio=1.03x random, delta_not=0.0000
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=118.1697, ratio=1.08x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=184.5465, ratio=1.69x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=108.9227, ratio=1.00x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=133.8973, ratio=1.22x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=118.3926, ratio=1.08x random, delta_not=-0.0312
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 23.5826
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 28.8964
+[2026-05-31 17:05:46]     Delta amplified more: O_clean_R
+[2026-05-31 17:05:46]     Amplification ratio: 1.2253
+[2026-05-31 17:05:46] 
+--- Layer 12 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 1.8823
+[2026-05-31 17:05:46]     R: 3.1383
+[2026-05-31 17:05:46]     C_raw: 2.3992
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 1.7427
+[2026-05-31 17:05:46]     O_clean_R: 1.8823
+[2026-05-31 17:05:46]     O_clean_RC: 1.8802
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 1.8822
+[2026-05-31 17:05:46]     R_delta_from_shared: 0.0782
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9998
+[2026-05-31 17:05:46]     A_delta_from_shared: 1.7376
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=4.86, ratio=1.12x random
+[2026-05-31 17:05:46]     R: gain=7.62, ratio=1.75x random
+[2026-05-31 17:05:46]     C_raw: gain=5.31, ratio=1.22x random
+[2026-05-31 17:05:46]     C_pc1: gain=4.83, ratio=1.11x random
+[2026-05-31 17:05:46]     A: gain=4.46, ratio=1.02x random
+[2026-05-31 17:05:46]     O_clean_R: gain=4.87, ratio=1.12x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=4.82, ratio=1.11x random
+[2026-05-31 17:05:46]     shared_pc1: gain=7.63, ratio=1.75x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=4.90, ratio=1.12x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=4.30, ratio=0.99x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=4.89, ratio=1.12x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=4.36, ratio=1.00x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0143, happy=0.0162, sad=0.0060
+[2026-05-31 17:05:46]     R: not=-0.0246, happy=-0.0102, sad=-0.0005
+[2026-05-31 17:05:46]     C_raw: not=-0.0037, happy=-0.0042, sad=0.0045
+[2026-05-31 17:05:46]     C_pc1: not=-0.0031, happy=-0.0069, sad=-0.0113
+[2026-05-31 17:05:46]     A: not=-0.0134, happy=-0.0132, sad=-0.0264
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0143, happy=0.0162, sad=0.0060
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0141, happy=0.0165, sad=0.0065
+[2026-05-31 17:05:46]     shared_pc1: not=0.0243, happy=0.0098, sad=-0.0001
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0140, happy=0.0163, sad=0.0060
+[2026-05-31 17:05:46]     R_delta_from_shared: not=-0.0119, happy=-0.0154, sad=-0.0251
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=-0.0026, happy=-0.0067, sad=-0.0113
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0153, happy=-0.0140, sad=-0.0265
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=87.7166, ratio=0.88x random, delta_not=0.0312
+[2026-05-31 17:05:46]     R: jac_gain=115.8788, ratio=1.16x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_raw: jac_gain=127.2717, ratio=1.27x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_pc1: jac_gain=119.1541, ratio=1.19x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     A: jac_gain=119.9855, ratio=1.20x random, delta_not=-0.0938
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=109.9112, ratio=1.10x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=142.9310, ratio=1.43x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=89.4062, ratio=0.89x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=91.5263, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=127.2301, ratio=1.27x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=100.8208, ratio=1.01x random, delta_not=0.0000
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=127.6124, ratio=1.27x random, delta_not=-0.0625
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 18.0375
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 22.5730
+[2026-05-31 17:05:46]     Delta amplified more: O_clean_R
+[2026-05-31 17:05:46]     Amplification ratio: 1.2514
+[2026-05-31 17:05:46] 
+--- Layer 18 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 3.6108
+[2026-05-31 17:05:46]     R: 5.1245
+[2026-05-31 17:05:46]     C_raw: 4.3778
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 3.0380
+[2026-05-31 17:05:46]     O_clean_R: 3.6095
+[2026-05-31 17:05:46]     O_clean_RC: 3.6095
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 3.6056
+[2026-05-31 17:05:46]     R_delta_from_shared: 0.1391
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9975
+[2026-05-31 17:05:46]     A_delta_from_shared: 3.0379
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=4.73, ratio=1.09x random
+[2026-05-31 17:05:46]     R: gain=5.03, ratio=1.16x random
+[2026-05-31 17:05:46]     C_raw: gain=4.86, ratio=1.12x random
+[2026-05-31 17:05:46]     C_pc1: gain=6.50, ratio=1.50x random
+[2026-05-31 17:05:46]     A: gain=4.89, ratio=1.13x random
+[2026-05-31 17:05:46]     O_clean_R: gain=4.70, ratio=1.09x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=4.71, ratio=1.09x random
+[2026-05-31 17:05:46]     shared_pc1: gain=5.05, ratio=1.17x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=4.67, ratio=1.08x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=4.52, ratio=1.04x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=6.65, ratio=1.54x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=4.89, ratio=1.13x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0166, happy=0.0129, sad=0.0123
+[2026-05-31 17:05:46]     R: not=-0.0148, happy=-0.0101, sad=-0.0062
+[2026-05-31 17:05:46]     C_raw: not=-0.0008, happy=-0.0150, sad=-0.0003
+[2026-05-31 17:05:46]     C_pc1: not=0.0026, happy=0.0049, sad=-0.0214
+[2026-05-31 17:05:46]     A: not=-0.0048, happy=0.0000, sad=-0.0146
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0162, happy=0.0132, sad=0.0125
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0162, happy=0.0132, sad=0.0126
+[2026-05-31 17:05:46]     shared_pc1: not=0.0152, happy=0.0097, sad=0.0059
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0158, happy=0.0135, sad=0.0127
+[2026-05-31 17:05:46]     R_delta_from_shared: not=0.0148, happy=-0.0137, sad=-0.0111
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=0.0037, happy=0.0056, sad=-0.0210
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0049, happy=-0.0000, sad=-0.0147
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=76.4267, ratio=0.90x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R: jac_gain=76.9218, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_raw: jac_gain=83.1271, ratio=0.98x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_pc1: jac_gain=85.5039, ratio=1.01x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     A: jac_gain=79.3378, ratio=0.94x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=91.7768, ratio=1.09x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=84.9331, ratio=1.01x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=85.3610, ratio=1.01x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=80.0437, ratio=0.95x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=83.4119, ratio=0.99x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=83.8538, ratio=0.99x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=87.3749, ratio=1.03x random, delta_not=-0.0625
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 16.1719
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 19.5361
+[2026-05-31 17:05:46]     Delta amplified more: O_clean_R
+[2026-05-31 17:05:46]     Amplification ratio: 1.2080
+[2026-05-31 17:05:46] 
+--- Layer 24 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 10.1452
+[2026-05-31 17:05:46]     R: 13.6172
+[2026-05-31 17:05:46]     C_raw: 10.6586
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 8.1178
+[2026-05-31 17:05:46]     O_clean_R: 10.1420
+[2026-05-31 17:05:46]     O_clean_RC: 10.1379
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 10.1267
+[2026-05-31 17:05:46]     R_delta_from_shared: 0.4952
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9995
+[2026-05-31 17:05:46]     A_delta_from_shared: 8.1152
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=4.49, ratio=1.03x random
+[2026-05-31 17:05:46]     R: gain=4.58, ratio=1.05x random
+[2026-05-31 17:05:46]     C_raw: gain=5.61, ratio=1.29x random
+[2026-05-31 17:05:46]     C_pc1: gain=6.80, ratio=1.56x random
+[2026-05-31 17:05:46]     A: gain=4.87, ratio=1.12x random
+[2026-05-31 17:05:46]     O_clean_R: gain=4.50, ratio=1.03x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=4.55, ratio=1.05x random
+[2026-05-31 17:05:46]     shared_pc1: gain=4.56, ratio=1.05x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=4.52, ratio=1.04x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=4.70, ratio=1.08x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=6.84, ratio=1.57x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=4.89, ratio=1.12x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0033, happy=0.0163, sad=0.0055
+[2026-05-31 17:05:46]     R: not=-0.0125, happy=-0.0042, sad=-0.0087
+[2026-05-31 17:05:46]     C_raw: not=0.0013, happy=-0.0077, sad=0.0111
+[2026-05-31 17:05:46]     C_pc1: not=-0.0064, happy=0.0064, sad=-0.0177
+[2026-05-31 17:05:46]     A: not=-0.0078, happy=0.0032, sad=-0.0151
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0036, happy=0.0162, sad=0.0053
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0034, happy=0.0160, sad=0.0058
+[2026-05-31 17:05:46]     shared_pc1: not=-0.0125, happy=-0.0047, sad=-0.0090
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0040, happy=0.0160, sad=0.0049
+[2026-05-31 17:05:46]     R_delta_from_shared: not=-0.0018, happy=0.0139, sad=0.0083
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=-0.0060, happy=0.0065, sad=-0.0174
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0075, happy=0.0033, sad=-0.0149
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=69.6397, ratio=0.89x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R: jac_gain=65.8158, ratio=0.84x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_raw: jac_gain=76.3069, ratio=0.98x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     C_pc1: jac_gain=66.6370, ratio=0.85x random, delta_not=0.0000
+[2026-05-31 17:05:46]     A: jac_gain=85.9112, ratio=1.10x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=99.8743, ratio=1.28x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=70.1521, ratio=0.90x random, delta_not=0.0000
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=77.8259, ratio=0.99x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=70.8389, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=67.9063, ratio=0.87x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=81.3268, ratio=1.04x random, delta_not=-0.0312
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=67.7309, ratio=0.87x random, delta_not=0.0000
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 15.5149
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 22.1879
+[2026-05-31 17:05:46]     Delta amplified more: O_clean_R
+[2026-05-31 17:05:46]     Amplification ratio: 1.4301
+[2026-05-31 17:05:46] 
+--- Layer 30 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 20.1440
+[2026-05-31 17:05:46]     R: 28.8240
+[2026-05-31 17:05:46]     C_raw: 25.4084
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 16.8010
+[2026-05-31 17:05:46]     O_clean_R: 20.1403
+[2026-05-31 17:05:46]     O_clean_RC: 20.1336
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 20.1261
+[2026-05-31 17:05:46]     R_delta_from_shared: 0.7491
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9978
+[2026-05-31 17:05:46]     A_delta_from_shared: 16.7900
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=4.23, ratio=0.98x random
+[2026-05-31 17:05:46]     R: gain=8.23, ratio=1.90x random
+[2026-05-31 17:05:46]     C_raw: gain=5.39, ratio=1.24x random
+[2026-05-31 17:05:46]     C_pc1: gain=4.74, ratio=1.09x random
+[2026-05-31 17:05:46]     A: gain=4.41, ratio=1.02x random
+[2026-05-31 17:05:46]     O_clean_R: gain=4.21, ratio=0.97x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=4.22, ratio=0.97x random
+[2026-05-31 17:05:46]     shared_pc1: gain=8.25, ratio=1.90x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=4.19, ratio=0.97x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=4.22, ratio=0.97x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=4.54, ratio=1.05x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=4.35, ratio=1.00x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0135, happy=0.0113, sad=0.0037
+[2026-05-31 17:05:46]     R: not=-0.0164, happy=-0.0010, sad=0.0046
+[2026-05-31 17:05:46]     C_raw: not=-0.0180, happy=-0.0036, sad=0.0121
+[2026-05-31 17:05:46]     C_pc1: not=-0.0115, happy=0.0205, sad=-0.0098
+[2026-05-31 17:05:46]     A: not=-0.0000, happy=0.0114, sad=-0.0069
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0131, happy=0.0113, sad=0.0036
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0129, happy=0.0108, sad=0.0039
+[2026-05-31 17:05:46]     shared_pc1: not=0.0167, happy=0.0009, sad=-0.0047
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0128, happy=0.0113, sad=0.0035
+[2026-05-31 17:05:46]     R_delta_from_shared: not=0.0098, happy=-0.0035, sad=-0.0060
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=-0.0127, happy=0.0204, sad=-0.0095
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0006, happy=0.0114, sad=-0.0067
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=55.9884, ratio=0.81x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R: jac_gain=58.1437, ratio=0.84x random, delta_not=0.0312
+[2026-05-31 17:05:46]     C_raw: jac_gain=51.5571, ratio=0.74x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_pc1: jac_gain=109.4451, ratio=1.57x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     A: jac_gain=58.6316, ratio=0.84x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=59.0735, ratio=0.85x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=54.3422, ratio=0.78x random, delta_not=0.0000
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=63.2555, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=51.9668, ratio=0.75x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=96.2300, ratio=1.38x random, delta_not=-0.0625
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=53.1566, ratio=0.76x random, delta_not=0.0000
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=51.6366, ratio=0.74x random, delta_not=0.0000
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 13.2280
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 14.0248
+[2026-05-31 17:05:46]     Delta amplified more: O_clean_R
+[2026-05-31 17:05:46]     Amplification ratio: 1.0602
+[2026-05-31 17:05:46] 
+--- Layer 38 ---
+[2026-05-31 17:05:46]   Direction norms:
+[2026-05-31 17:05:46]     O_not: 46.1166
+[2026-05-31 17:05:46]     R: 87.3911
+[2026-05-31 17:05:46]     C_raw: 84.5866
+[2026-05-31 17:05:46]     C_pc1: 1.0000
+[2026-05-31 17:05:46]     A: 42.2832
+[2026-05-31 17:05:46]     O_clean_R: 46.0900
+[2026-05-31 17:05:46]     O_clean_RC: 46.0567
+[2026-05-31 17:05:46]     shared_pc1: 1.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: 46.0700
+[2026-05-31 17:05:46]     R_delta_from_shared: 1.0769
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: 0.9999
+[2026-05-31 17:05:46]     A_delta_from_shared: 42.2708
+[2026-05-31 17:05:46]   W_U gain (||WU@v||/||v||) and ratio to random:
+[2026-05-31 17:05:46]     O_not: gain=4.45, ratio=1.03x random
+[2026-05-31 17:05:46]     R: gain=7.63, ratio=1.76x random
+[2026-05-31 17:05:46]     C_raw: gain=4.19, ratio=0.97x random
+[2026-05-31 17:05:46]     C_pc1: gain=4.02, ratio=0.93x random
+[2026-05-31 17:05:46]     A: gain=5.50, ratio=1.27x random
+[2026-05-31 17:05:46]     O_clean_R: gain=4.36, ratio=1.01x random
+[2026-05-31 17:05:46]     O_clean_RC: gain=4.35, ratio=1.00x random
+[2026-05-31 17:05:46]     shared_pc1: gain=7.66, ratio=1.77x random
+[2026-05-31 17:05:46]     O_not_delta_from_shared: gain=4.33, ratio=1.00x random
+[2026-05-31 17:05:46]     R_delta_from_shared: gain=5.29, ratio=1.22x random
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: gain=4.01, ratio=0.93x random
+[2026-05-31 17:05:46]     A_delta_from_shared: gain=5.40, ratio=1.25x random
+[2026-05-31 17:05:46]   Target token logit changes (W_U@v[target]/||v||):
+[2026-05-31 17:05:46]     O_not: not=-0.0085, happy=0.0080, sad=0.0107
+[2026-05-31 17:05:46]     R: not=-0.0174, happy=0.0110, sad=0.0060
+[2026-05-31 17:05:46]     C_raw: not=-0.0208, happy=-0.0038, sad=-0.0088
+[2026-05-31 17:05:46]     C_pc1: not=-0.0033, happy=0.0261, sad=-0.0063
+[2026-05-31 17:05:46]     A: not=-0.0013, happy=0.0161, sad=-0.0165
+[2026-05-31 17:05:46]     O_clean_R: not=-0.0079, happy=0.0076, sad=0.0105
+[2026-05-31 17:05:46]     O_clean_RC: not=-0.0078, happy=0.0066, sad=0.0108
+[2026-05-31 17:05:46]     shared_pc1: not=0.0175, happy=-0.0111, sad=-0.0060
+[2026-05-31 17:05:46]     O_not_delta_from_shared: not=-0.0077, happy=0.0075, sad=0.0105
+[2026-05-31 17:05:46]     R_delta_from_shared: not=0.0082, happy=-0.0149, sad=-0.0030
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: not=-0.0031, happy=0.0259, sad=-0.0064
+[2026-05-31 17:05:46]     A_delta_from_shared: not=-0.0009, happy=0.0159, sad=-0.0167
+[2026-05-31 17:05:46]   Jacobian gain and ratio to random:
+[2026-05-31 17:05:46]     O_not: jac_gain=30.3914, ratio=1.01x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R: jac_gain=32.7648, ratio=1.09x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_raw: jac_gain=27.3238, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_pc1: jac_gain=32.6711, ratio=1.09x random, delta_not=0.0000
+[2026-05-31 17:05:46]     A: jac_gain=26.4089, ratio=0.88x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_clean_R: jac_gain=28.4040, ratio=0.94x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_clean_RC: jac_gain=28.6657, ratio=0.95x random, delta_not=0.0000
+[2026-05-31 17:05:46]     shared_pc1: jac_gain=32.3512, ratio=1.08x random, delta_not=0.0000
+[2026-05-31 17:05:46]     O_not_delta_from_shared: jac_gain=27.9458, ratio=0.93x random, delta_not=0.0000
+[2026-05-31 17:05:46]     R_delta_from_shared: jac_gain=26.3489, ratio=0.88x random, delta_not=0.0000
+[2026-05-31 17:05:46]     C_pc1_delta_from_shared: jac_gain=29.8154, ratio=0.99x random, delta_not=0.0000
+[2026-05-31 17:05:46]     A_delta_from_shared: jac_gain=27.3152, ratio=0.91x random, delta_not=0.0000
+[2026-05-31 17:05:46]   AMPLIFICATION SOURCE:
+[2026-05-31 17:05:46]     O_not: jac/wu = 6.8340
+[2026-05-31 17:05:46]     O_clean_R: jac/wu = 6.5197
+[2026-05-31 17:05:46]     Delta amplified more: O_not
+[2026-05-31 17:05:46]     Amplification ratio: 0.9540
+[2026-05-31 17:05:46] Model glm4 released.

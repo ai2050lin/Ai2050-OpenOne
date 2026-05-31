@@ -1,0 +1,469 @@
+[2026-05-31 09:46:11] Phase 305: Operator-Scope Causal Testing -- qwen3
+[2026-05-31 09:46:13] Loading qwen3 (bf16 + device_map=auto)...
+[2026-05-31 09:46:15]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b
+[2026-05-31 09:46:25]   attn_implementation=sdpa succeeded
+[2026-05-31 09:46:25]   Loaded. GPU=8.0GB, class=Qwen3ForCausalLM
+[2026-05-31 09:46:25]   n_layers=36, d_model=2560
+[2026-05-31 09:46:25]   Total stimuli resolved: 448
+[2026-05-31 09:46:25]     adj_negation: 160
+[2026-05-31 09:46:25]     antonym: 96
+[2026-05-31 09:46:25]     antonym_not: 48
+[2026-05-31 09:46:25]     noun_negation: 64
+[2026-05-31 09:46:25]     verb_negation: 80
+[2026-05-31 09:46:25]   Roles: {'adj': 304, 'verb': 80, 'noun': 64}
+[2026-05-31 09:46:25]   Unique sentences: 397
+[2026-05-31 09:46:25] Capturing 397 unique sentences...
+[2026-05-31 09:46:27]   50/397 (25.0/s) ETA=14s GPU=8.1GB
+[2026-05-31 09:46:29]   100/397 (26.7/s) ETA=11s GPU=8.1GB
+[2026-05-31 09:46:31]   150/397 (27.1/s) ETA=9s GPU=8.1GB
+[2026-05-31 09:46:33]   200/397 (27.5/s) ETA=7s GPU=8.1GB
+[2026-05-31 09:46:34]   250/397 (27.8/s) ETA=5s GPU=8.1GB
+[2026-05-31 09:46:36]   300/397 (27.9/s) ETA=3s GPU=8.1GB
+[2026-05-31 09:46:38]   350/397 (27.9/s) ETA=2s GPU=8.1GB
+[2026-05-31 09:46:40] Done capturing in 14s
+[2026-05-31 09:46:40]   adj_negation: 160, verb_negation: 80, noun_negation: 64, antonym: 96, antonym_not: 48
+[2026-05-31 09:46:40] Sample layers: [4, 9, 13, 18, 22, 27, 31, 34]
+[2026-05-31 09:46:40] 
+============================================================
+[2026-05-31 09:46:40] PART A: OPERATOR DIRECTION EXTRACTION
+[2026-05-31 09:46:40] ============================================================
+[2026-05-31 09:46:40] 
+--- Layer 4 ---
+[2026-05-31 09:46:40]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:46:40]   Antonym directions: 12 pairs
+[2026-05-31 09:46:40] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:46:40]     happy->sad: cos(O(not), antonym)=+0.0554, cos(O(not), -antonym)=-0.0554
+[2026-05-31 09:46:40]     big->small: cos(O(not), antonym)=+0.0428, cos(O(not), -antonym)=-0.0428
+[2026-05-31 09:46:40]     good->bad: cos(O(not), antonym)=+0.1430, cos(O(not), -antonym)=-0.1430
+[2026-05-31 09:46:40]     warm->cold: cos(O(not), antonym)=-0.0117, cos(O(not), -antonym)=+0.0117
+[2026-05-31 09:46:40]     fast->slow: cos(O(not), antonym)=+0.0641, cos(O(not), -antonym)=-0.0641
+[2026-05-31 09:46:40]     bright->dark: cos(O(not), antonym)=+0.1355, cos(O(not), -antonym)=-0.1355
+[2026-05-31 09:46:40]     safe->dangerous: cos(O(not), antonym)=-0.0246, cos(O(not), -antonym)=+0.0246
+[2026-05-31 09:46:40]     clean->dirty: cos(O(not), antonym)=+0.1646, cos(O(not), -antonym)=-0.1646
+[2026-05-31 09:46:40]     rich->poor: cos(O(not), antonym)=+0.1227, cos(O(not), -antonym)=-0.1227
+[2026-05-31 09:46:40]     strong->weak: cos(O(not), antonym)=+0.1442, cos(O(not), -antonym)=-0.1442
+[2026-05-31 09:46:40] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:46:40]     cos(O_adj, O_verb) = +0.6063
+[2026-05-31 09:46:40]     cos(O_adj, O_noun) = +0.3283
+[2026-05-31 09:46:40]     cos(O_verb, O_noun) = +0.3859
+[2026-05-31 09:46:40]     adj LOO cos: +0.7512 ± 0.0369
+[2026-05-31 09:46:40]     verb LOO cos: +0.7893 ± 0.0324
+[2026-05-31 09:46:40]     noun LOO cos: +0.6945 ± 0.0777
+[2026-05-31 09:46:40] 
+  O(not) norm statistics:
+[2026-05-31 09:46:40]     adj: mean=3.76 std=0.38
+[2026-05-31 09:46:40]     verb: mean=4.89 std=0.35
+[2026-05-31 09:46:40]     noun: mean=6.65 std=1.10
+[2026-05-31 09:46:40] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:46:40]   Test cases: 38
+[2026-05-31 09:46:42]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:45]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:47]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:49]     full_delta_cos_shift: +0.1883 pos=28/38
+[2026-05-31 09:46:49]     O_not_cos_shift: +0.1794 pos=28/38
+[2026-05-31 09:46:49]     O_loo_cos_shift: +0.1180 pos=30/38
+[2026-05-31 09:46:49]     O_avg_cos_shift: +0.1346 pos=28/38
+[2026-05-31 09:46:49]     antonym_dir_cos_shift: +0.3207 pos=18/20
+[2026-05-31 09:46:49]     avg_random_shift: +0.0859 pos=26/38
+[2026-05-31 09:46:49]     [adj] O_not: +0.1330 n=20
+[2026-05-31 09:46:49]     [adj] full_delta: +0.1605
+[2026-05-31 09:46:49]     [adj] O_avg: +0.1355
+[2026-05-31 09:46:49]     [verb] O_not: +0.1857 n=10
+[2026-05-31 09:46:49]     [verb] full_delta: +0.2352
+[2026-05-31 09:46:49]     [verb] O_avg: +0.1047
+[2026-05-31 09:46:49]     [noun] O_not: +0.2876 n=8
+[2026-05-31 09:46:49]     [noun] full_delta: +0.1994
+[2026-05-31 09:46:49]     [noun] O_avg: +0.1696
+[2026-05-31 09:46:49] 
+--- Layer 9 ---
+[2026-05-31 09:46:49]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:46:49]   Antonym directions: 12 pairs
+[2026-05-31 09:46:49] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:46:49]     happy->sad: cos(O(not), antonym)=+0.1382, cos(O(not), -antonym)=-0.1382
+[2026-05-31 09:46:49]     big->small: cos(O(not), antonym)=+0.1253, cos(O(not), -antonym)=-0.1253
+[2026-05-31 09:46:49]     good->bad: cos(O(not), antonym)=+0.3778, cos(O(not), -antonym)=-0.3778
+[2026-05-31 09:46:49]     warm->cold: cos(O(not), antonym)=+0.1975, cos(O(not), -antonym)=-0.1975
+[2026-05-31 09:46:49]     fast->slow: cos(O(not), antonym)=+0.1036, cos(O(not), -antonym)=-0.1036
+[2026-05-31 09:46:49]     bright->dark: cos(O(not), antonym)=+0.1953, cos(O(not), -antonym)=-0.1953
+[2026-05-31 09:46:49]     safe->dangerous: cos(O(not), antonym)=+0.3060, cos(O(not), -antonym)=-0.3060
+[2026-05-31 09:46:49]     clean->dirty: cos(O(not), antonym)=+0.1970, cos(O(not), -antonym)=-0.1970
+[2026-05-31 09:46:49]     rich->poor: cos(O(not), antonym)=+0.1575, cos(O(not), -antonym)=-0.1575
+[2026-05-31 09:46:49]     strong->weak: cos(O(not), antonym)=+0.1776, cos(O(not), -antonym)=-0.1776
+[2026-05-31 09:46:49] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:46:49]     cos(O_adj, O_verb) = +0.4847
+[2026-05-31 09:46:49]     cos(O_adj, O_noun) = +0.2711
+[2026-05-31 09:46:49]     cos(O_verb, O_noun) = +0.3826
+[2026-05-31 09:46:49]     adj LOO cos: +0.5761 ± 0.0769
+[2026-05-31 09:46:49]     verb LOO cos: +0.5797 ± 0.0778
+[2026-05-31 09:46:49]     noun LOO cos: +0.6711 ± 0.0656
+[2026-05-31 09:46:49] 
+  O(not) norm statistics:
+[2026-05-31 09:46:49]     adj: mean=15.39 std=1.61
+[2026-05-31 09:46:49]     verb: mean=16.42 std=1.44
+[2026-05-31 09:46:49]     noun: mean=21.47 std=2.63
+[2026-05-31 09:46:49] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:46:49]   Test cases: 38
+[2026-05-31 09:46:52]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:54]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:57]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:46:58]     full_delta_cos_shift: +0.6217 pos=37/38
+[2026-05-31 09:46:58]     O_not_cos_shift: +0.5006 pos=34/38
+[2026-05-31 09:46:58]     O_loo_cos_shift: +0.2767 pos=31/38
+[2026-05-31 09:46:58]     O_avg_cos_shift: +0.2904 pos=31/38
+[2026-05-31 09:46:58]     antonym_dir_cos_shift: +0.3057 pos=19/20
+[2026-05-31 09:46:58]     avg_random_shift: +0.0685 pos=27/38
+[2026-05-31 09:46:58]     [adj] O_not: +0.4921 n=20
+[2026-05-31 09:46:58]     [adj] full_delta: +0.6652
+[2026-05-31 09:46:58]     [adj] O_avg: +0.2451
+[2026-05-31 09:46:58]     [verb] O_not: +0.5914 n=10
+[2026-05-31 09:46:58]     [verb] full_delta: +0.5657
+[2026-05-31 09:46:58]     [verb] O_avg: +0.3692
+[2026-05-31 09:46:58]     [noun] O_not: +0.4081 n=8
+[2026-05-31 09:46:58]     [noun] full_delta: +0.5832
+[2026-05-31 09:46:58]     [noun] O_avg: +0.3051
+[2026-05-31 09:46:58] 
+--- Layer 13 ---
+[2026-05-31 09:46:58]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:46:58]   Antonym directions: 12 pairs
+[2026-05-31 09:46:58] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:46:58]     happy->sad: cos(O(not), antonym)=+0.2159, cos(O(not), -antonym)=-0.2159
+[2026-05-31 09:46:58]     big->small: cos(O(not), antonym)=+0.1358, cos(O(not), -antonym)=-0.1358
+[2026-05-31 09:46:58]     good->bad: cos(O(not), antonym)=+0.3891, cos(O(not), -antonym)=-0.3891
+[2026-05-31 09:46:58]     warm->cold: cos(O(not), antonym)=+0.2104, cos(O(not), -antonym)=-0.2104
+[2026-05-31 09:46:58]     fast->slow: cos(O(not), antonym)=+0.0872, cos(O(not), -antonym)=-0.0872
+[2026-05-31 09:46:58]     bright->dark: cos(O(not), antonym)=+0.1238, cos(O(not), -antonym)=-0.1238
+[2026-05-31 09:46:58]     safe->dangerous: cos(O(not), antonym)=+0.3094, cos(O(not), -antonym)=-0.3094
+[2026-05-31 09:46:58]     clean->dirty: cos(O(not), antonym)=+0.1531, cos(O(not), -antonym)=-0.1531
+[2026-05-31 09:46:58]     rich->poor: cos(O(not), antonym)=+0.2410, cos(O(not), -antonym)=-0.2410
+[2026-05-31 09:46:58]     strong->weak: cos(O(not), antonym)=+0.1328, cos(O(not), -antonym)=-0.1328
+[2026-05-31 09:46:58] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:46:58]     cos(O_adj, O_verb) = +0.5799
+[2026-05-31 09:46:58]     cos(O_adj, O_noun) = +0.3980
+[2026-05-31 09:46:58]     cos(O_verb, O_noun) = +0.4986
+[2026-05-31 09:46:58]     adj LOO cos: +0.5539 ± 0.0777
+[2026-05-31 09:46:58]     verb LOO cos: +0.5588 ± 0.0520
+[2026-05-31 09:46:58]     noun LOO cos: +0.6669 ± 0.0709
+[2026-05-31 09:46:58] 
+  O(not) norm statistics:
+[2026-05-31 09:46:58]     adj: mean=16.10 std=1.95
+[2026-05-31 09:46:58]     verb: mean=17.41 std=1.27
+[2026-05-31 09:46:58]     noun: mean=19.96 std=2.20
+[2026-05-31 09:46:58] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:46:58]   Test cases: 38
+[2026-05-31 09:47:01]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:04]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:06]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:08]     full_delta_cos_shift: +0.7419 pos=38/38
+[2026-05-31 09:47:08]     O_not_cos_shift: +0.5617 pos=36/38
+[2026-05-31 09:47:08]     O_loo_cos_shift: +0.4313 pos=35/38
+[2026-05-31 09:47:08]     O_avg_cos_shift: +0.4515 pos=36/38
+[2026-05-31 09:47:08]     antonym_dir_cos_shift: +0.3057 pos=19/20
+[2026-05-31 09:47:08]     avg_random_shift: +0.0441 pos=22/38
+[2026-05-31 09:47:08]     [adj] O_not: +0.6362 n=20
+[2026-05-31 09:47:08]     [adj] full_delta: +0.7904
+[2026-05-31 09:47:08]     [adj] O_avg: +0.3989
+[2026-05-31 09:47:08]     [verb] O_not: +0.4190 n=10
+[2026-05-31 09:47:08]     [verb] full_delta: +0.6764
+[2026-05-31 09:47:08]     [verb] O_avg: +0.5126
+[2026-05-31 09:47:08]     [noun] O_not: +0.5536 n=8
+[2026-05-31 09:47:08]     [noun] full_delta: +0.7026
+[2026-05-31 09:47:08]     [noun] O_avg: +0.5065
+[2026-05-31 09:47:08] 
+--- Layer 18 ---
+[2026-05-31 09:47:08]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:47:08]   Antonym directions: 12 pairs
+[2026-05-31 09:47:08] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:47:08]     happy->sad: cos(O(not), antonym)=+0.2747, cos(O(not), -antonym)=-0.2747
+[2026-05-31 09:47:08]     big->small: cos(O(not), antonym)=+0.1014, cos(O(not), -antonym)=-0.1014
+[2026-05-31 09:47:08]     good->bad: cos(O(not), antonym)=+0.4894, cos(O(not), -antonym)=-0.4894
+[2026-05-31 09:47:08]     warm->cold: cos(O(not), antonym)=+0.2193, cos(O(not), -antonym)=-0.2193
+[2026-05-31 09:47:08]     fast->slow: cos(O(not), antonym)=+0.0858, cos(O(not), -antonym)=-0.0858
+[2026-05-31 09:47:08]     bright->dark: cos(O(not), antonym)=+0.0919, cos(O(not), -antonym)=-0.0919
+[2026-05-31 09:47:08]     safe->dangerous: cos(O(not), antonym)=+0.3574, cos(O(not), -antonym)=-0.3574
+[2026-05-31 09:47:08]     clean->dirty: cos(O(not), antonym)=+0.2170, cos(O(not), -antonym)=-0.2170
+[2026-05-31 09:47:08]     rich->poor: cos(O(not), antonym)=+0.1575, cos(O(not), -antonym)=-0.1575
+[2026-05-31 09:47:08]     strong->weak: cos(O(not), antonym)=+0.1071, cos(O(not), -antonym)=-0.1071
+[2026-05-31 09:47:08] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:47:08]     cos(O_adj, O_verb) = +0.6304
+[2026-05-31 09:47:08]     cos(O_adj, O_noun) = +0.4496
+[2026-05-31 09:47:08]     cos(O_verb, O_noun) = +0.5386
+[2026-05-31 09:47:08]     adj LOO cos: +0.5983 ± 0.1009
+[2026-05-31 09:47:08]     verb LOO cos: +0.6160 ± 0.0518
+[2026-05-31 09:47:08]     noun LOO cos: +0.7380 ± 0.0898
+[2026-05-31 09:47:08] 
+  O(not) norm statistics:
+[2026-05-31 09:47:08]     adj: mean=20.24 std=2.19
+[2026-05-31 09:47:08]     verb: mean=20.54 std=2.52
+[2026-05-31 09:47:08]     noun: mean=23.43 std=2.18
+[2026-05-31 09:47:08] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:47:08]   Test cases: 38
+[2026-05-31 09:47:10]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:13]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:15]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:17]     full_delta_cos_shift: +0.8065 pos=38/38
+[2026-05-31 09:47:17]     O_not_cos_shift: +0.6641 pos=38/38
+[2026-05-31 09:47:17]     O_loo_cos_shift: +0.4155 pos=34/38
+[2026-05-31 09:47:17]     O_avg_cos_shift: +0.4531 pos=36/38
+[2026-05-31 09:47:17]     antonym_dir_cos_shift: +0.2957 pos=18/20
+[2026-05-31 09:47:17]     avg_random_shift: +0.0714 pos=26/38
+[2026-05-31 09:47:17]     [adj] O_not: +0.6928 n=20
+[2026-05-31 09:47:17]     [adj] full_delta: +0.8484
+[2026-05-31 09:47:17]     [adj] O_avg: +0.3557
+[2026-05-31 09:47:17]     [verb] O_not: +0.6432 n=10
+[2026-05-31 09:47:17]     [verb] full_delta: +0.7319
+[2026-05-31 09:47:17]     [verb] O_avg: +0.5796
+[2026-05-31 09:47:17]     [noun] O_not: +0.6187 n=8
+[2026-05-31 09:47:17]     [noun] full_delta: +0.7949
+[2026-05-31 09:47:17]     [noun] O_avg: +0.5382
+[2026-05-31 09:47:17] 
+--- Layer 22 ---
+[2026-05-31 09:47:17]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:47:17]   Antonym directions: 12 pairs
+[2026-05-31 09:47:17] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:47:17]     happy->sad: cos(O(not), antonym)=+0.2300, cos(O(not), -antonym)=-0.2300
+[2026-05-31 09:47:17]     big->small: cos(O(not), antonym)=+0.0965, cos(O(not), -antonym)=-0.0965
+[2026-05-31 09:47:17]     good->bad: cos(O(not), antonym)=+0.4716, cos(O(not), -antonym)=-0.4716
+[2026-05-31 09:47:17]     warm->cold: cos(O(not), antonym)=+0.2358, cos(O(not), -antonym)=-0.2358
+[2026-05-31 09:47:17]     fast->slow: cos(O(not), antonym)=+0.1417, cos(O(not), -antonym)=-0.1417
+[2026-05-31 09:47:17]     bright->dark: cos(O(not), antonym)=+0.0881, cos(O(not), -antonym)=-0.0881
+[2026-05-31 09:47:17]     safe->dangerous: cos(O(not), antonym)=+0.3761, cos(O(not), -antonym)=-0.3761
+[2026-05-31 09:47:17]     clean->dirty: cos(O(not), antonym)=+0.2461, cos(O(not), -antonym)=-0.2461
+[2026-05-31 09:47:17]     rich->poor: cos(O(not), antonym)=+0.1093, cos(O(not), -antonym)=-0.1093
+[2026-05-31 09:47:17]     strong->weak: cos(O(not), antonym)=+0.1166, cos(O(not), -antonym)=-0.1166
+[2026-05-31 09:47:17] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:47:17]     cos(O_adj, O_verb) = +0.5946
+[2026-05-31 09:47:17]     cos(O_adj, O_noun) = +0.4161
+[2026-05-31 09:47:17]     cos(O_verb, O_noun) = +0.4928
+[2026-05-31 09:47:17]     adj LOO cos: +0.6065 ± 0.0870
+[2026-05-31 09:47:17]     verb LOO cos: +0.6339 ± 0.0593
+[2026-05-31 09:47:17]     noun LOO cos: +0.7706 ± 0.1032
+[2026-05-31 09:47:17] 
+  O(not) norm statistics:
+[2026-05-31 09:47:17]     adj: mean=26.36 std=3.13
+[2026-05-31 09:47:17]     verb: mean=26.34 std=3.26
+[2026-05-31 09:47:17]     noun: mean=31.41 std=2.77
+[2026-05-31 09:47:17] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:47:17]   Test cases: 38
+[2026-05-31 09:47:20]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:22]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:25]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:27]     full_delta_cos_shift: +0.8635 pos=38/38
+[2026-05-31 09:47:27]     O_not_cos_shift: +0.7020 pos=38/38
+[2026-05-31 09:47:27]     O_loo_cos_shift: +0.4186 pos=34/38
+[2026-05-31 09:47:27]     O_avg_cos_shift: +0.4572 pos=36/38
+[2026-05-31 09:47:27]     antonym_dir_cos_shift: +0.2986 pos=19/20
+[2026-05-31 09:47:27]     avg_random_shift: +0.1339 pos=33/38
+[2026-05-31 09:47:27]     [adj] O_not: +0.6940 n=20
+[2026-05-31 09:47:27]     [adj] full_delta: +0.8640
+[2026-05-31 09:47:27]     [adj] O_avg: +0.4111
+[2026-05-31 09:47:27]     [verb] O_not: +0.7346 n=10
+[2026-05-31 09:47:27]     [verb] full_delta: +0.8727
+[2026-05-31 09:47:27]     [verb] O_avg: +0.5073
+[2026-05-31 09:47:27]     [noun] O_not: +0.6812 n=8
+[2026-05-31 09:47:27]     [noun] full_delta: +0.8508
+[2026-05-31 09:47:27]     [noun] O_avg: +0.5101
+[2026-05-31 09:47:27] 
+--- Layer 27 ---
+[2026-05-31 09:47:27]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:47:27]   Antonym directions: 12 pairs
+[2026-05-31 09:47:27] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:47:27]     happy->sad: cos(O(not), antonym)=+0.1910, cos(O(not), -antonym)=-0.1910
+[2026-05-31 09:47:27]     big->small: cos(O(not), antonym)=+0.0710, cos(O(not), -antonym)=-0.0710
+[2026-05-31 09:47:27]     good->bad: cos(O(not), antonym)=+0.4489, cos(O(not), -antonym)=-0.4489
+[2026-05-31 09:47:27]     warm->cold: cos(O(not), antonym)=+0.2288, cos(O(not), -antonym)=-0.2288
+[2026-05-31 09:47:27]     fast->slow: cos(O(not), antonym)=+0.3339, cos(O(not), -antonym)=-0.3339
+[2026-05-31 09:47:27]     bright->dark: cos(O(not), antonym)=+0.1206, cos(O(not), -antonym)=-0.1206
+[2026-05-31 09:47:27]     safe->dangerous: cos(O(not), antonym)=+0.3354, cos(O(not), -antonym)=-0.3354
+[2026-05-31 09:47:27]     clean->dirty: cos(O(not), antonym)=+0.2766, cos(O(not), -antonym)=-0.2766
+[2026-05-31 09:47:27]     rich->poor: cos(O(not), antonym)=+0.0535, cos(O(not), -antonym)=-0.0535
+[2026-05-31 09:47:27]     strong->weak: cos(O(not), antonym)=+0.1765, cos(O(not), -antonym)=-0.1765
+[2026-05-31 09:47:27] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:47:27]     cos(O_adj, O_verb) = +0.5950
+[2026-05-31 09:47:27]     cos(O_adj, O_noun) = +0.4183
+[2026-05-31 09:47:27]     cos(O_verb, O_noun) = +0.4769
+[2026-05-31 09:47:27]     adj LOO cos: +0.6562 ± 0.0750
+[2026-05-31 09:47:27]     verb LOO cos: +0.6551 ± 0.0778
+[2026-05-31 09:47:27]     noun LOO cos: +0.7777 ± 0.1229
+[2026-05-31 09:47:27] 
+  O(not) norm statistics:
+[2026-05-31 09:47:27]     adj: mean=46.85 std=5.91
+[2026-05-31 09:47:27]     verb: mean=52.22 std=5.99
+[2026-05-31 09:47:27]     noun: mean=66.26 std=6.67
+[2026-05-31 09:47:27] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:47:27]   Test cases: 38
+[2026-05-31 09:47:29]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:32]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:34]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:36]     full_delta_cos_shift: +0.8945 pos=38/38
+[2026-05-31 09:47:36]     O_not_cos_shift: +0.7321 pos=38/38
+[2026-05-31 09:47:36]     O_loo_cos_shift: +0.4000 pos=35/38
+[2026-05-31 09:47:36]     O_avg_cos_shift: +0.4502 pos=36/38
+[2026-05-31 09:47:36]     antonym_dir_cos_shift: +0.2585 pos=18/20
+[2026-05-31 09:47:36]     avg_random_shift: +0.0961 pos=30/38
+[2026-05-31 09:47:36]     [adj] O_not: +0.7070 n=20
+[2026-05-31 09:47:36]     [adj] full_delta: +0.9017
+[2026-05-31 09:47:36]     [adj] O_avg: +0.4001
+[2026-05-31 09:47:36]     [verb] O_not: +0.7573 n=10
+[2026-05-31 09:47:36]     [verb] full_delta: +0.8477
+[2026-05-31 09:47:36]     [verb] O_avg: +0.4819
+[2026-05-31 09:47:36]     [noun] O_not: +0.7633 n=8
+[2026-05-31 09:47:36]     [noun] full_delta: +0.9349
+[2026-05-31 09:47:36]     [noun] O_avg: +0.5358
+[2026-05-31 09:47:36] 
+--- Layer 31 ---
+[2026-05-31 09:47:36]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:47:36]   Antonym directions: 12 pairs
+[2026-05-31 09:47:36] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:47:36]     happy->sad: cos(O(not), antonym)=+0.2127, cos(O(not), -antonym)=-0.2127
+[2026-05-31 09:47:36]     big->small: cos(O(not), antonym)=+0.0403, cos(O(not), -antonym)=-0.0403
+[2026-05-31 09:47:36]     good->bad: cos(O(not), antonym)=+0.3439, cos(O(not), -antonym)=-0.3439
+[2026-05-31 09:47:36]     warm->cold: cos(O(not), antonym)=+0.2314, cos(O(not), -antonym)=-0.2314
+[2026-05-31 09:47:36]     fast->slow: cos(O(not), antonym)=+0.2610, cos(O(not), -antonym)=-0.2610
+[2026-05-31 09:47:36]     bright->dark: cos(O(not), antonym)=+0.1314, cos(O(not), -antonym)=-0.1314
+[2026-05-31 09:47:36]     safe->dangerous: cos(O(not), antonym)=+0.3448, cos(O(not), -antonym)=-0.3448
+[2026-05-31 09:47:36]     clean->dirty: cos(O(not), antonym)=+0.2765, cos(O(not), -antonym)=-0.2765
+[2026-05-31 09:47:36]     rich->poor: cos(O(not), antonym)=+0.0753, cos(O(not), -antonym)=-0.0753
+[2026-05-31 09:47:36]     strong->weak: cos(O(not), antonym)=+0.0923, cos(O(not), -antonym)=-0.0923
+[2026-05-31 09:47:36] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:47:36]     cos(O_adj, O_verb) = +0.5238
+[2026-05-31 09:47:36]     cos(O_adj, O_noun) = +0.3557
+[2026-05-31 09:47:36]     cos(O_verb, O_noun) = +0.4216
+[2026-05-31 09:47:36]     adj LOO cos: +0.6249 ± 0.0846
+[2026-05-31 09:47:36]     verb LOO cos: +0.5822 ± 0.0765
+[2026-05-31 09:47:36]     noun LOO cos: +0.6934 ± 0.1150
+[2026-05-31 09:47:36] 
+  O(not) norm statistics:
+[2026-05-31 09:47:36]     adj: mean=74.10 std=8.81
+[2026-05-31 09:47:36]     verb: mean=89.09 std=10.13
+[2026-05-31 09:47:36]     noun: mean=107.29 std=17.26
+[2026-05-31 09:47:36] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:47:36]   Test cases: 38
+[2026-05-31 09:47:39]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:41]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:44]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:45]     full_delta_cos_shift: +0.9282 pos=38/38
+[2026-05-31 09:47:45]     O_not_cos_shift: +0.7527 pos=38/38
+[2026-05-31 09:47:45]     O_loo_cos_shift: +0.3479 pos=35/38
+[2026-05-31 09:47:45]     O_avg_cos_shift: +0.4206 pos=35/38
+[2026-05-31 09:47:45]     antonym_dir_cos_shift: +0.2177 pos=16/20
+[2026-05-31 09:47:45]     avg_random_shift: +0.0529 pos=25/38
+[2026-05-31 09:47:45]     [adj] O_not: +0.7503 n=20
+[2026-05-31 09:47:45]     [adj] full_delta: +0.9329
+[2026-05-31 09:47:45]     [adj] O_avg: +0.3851
+[2026-05-31 09:47:45]     [verb] O_not: +0.7645 n=10
+[2026-05-31 09:47:45]     [verb] full_delta: +0.9126
+[2026-05-31 09:47:45]     [verb] O_avg: +0.4546
+[2026-05-31 09:47:45]     [noun] O_not: +0.7440 n=8
+[2026-05-31 09:47:45]     [noun] full_delta: +0.9360
+[2026-05-31 09:47:45]     [noun] O_avg: +0.4667
+[2026-05-31 09:47:45] 
+--- Layer 34 ---
+[2026-05-31 09:47:45]   O(not) extracted: 20 adj, 10 verb, 8 noun
+[2026-05-31 09:47:45]   Antonym directions: 12 pairs
+[2026-05-31 09:47:45] 
+  O(not) vs Antonym comparison:
+[2026-05-31 09:47:45]     happy->sad: cos(O(not), antonym)=+0.2004, cos(O(not), -antonym)=-0.2004
+[2026-05-31 09:47:45]     big->small: cos(O(not), antonym)=+0.0547, cos(O(not), -antonym)=-0.0547
+[2026-05-31 09:47:45]     good->bad: cos(O(not), antonym)=+0.3140, cos(O(not), -antonym)=-0.3140
+[2026-05-31 09:47:45]     warm->cold: cos(O(not), antonym)=+0.2074, cos(O(not), -antonym)=-0.2074
+[2026-05-31 09:47:45]     fast->slow: cos(O(not), antonym)=+0.2239, cos(O(not), -antonym)=-0.2239
+[2026-05-31 09:47:45]     bright->dark: cos(O(not), antonym)=+0.1386, cos(O(not), -antonym)=-0.1386
+[2026-05-31 09:47:45]     safe->dangerous: cos(O(not), antonym)=+0.3473, cos(O(not), -antonym)=-0.3473
+[2026-05-31 09:47:45]     clean->dirty: cos(O(not), antonym)=+0.2868, cos(O(not), -antonym)=-0.2868
+[2026-05-31 09:47:45]     rich->poor: cos(O(not), antonym)=+0.0923, cos(O(not), -antonym)=-0.0923
+[2026-05-31 09:47:45]     strong->weak: cos(O(not), antonym)=+0.1168, cos(O(not), -antonym)=-0.1168
+[2026-05-31 09:47:45] 
+  Cross-role O(not) sharing:
+[2026-05-31 09:47:45]     cos(O_adj, O_verb) = +0.4763
+[2026-05-31 09:47:45]     cos(O_adj, O_noun) = +0.3405
+[2026-05-31 09:47:45]     cos(O_verb, O_noun) = +0.3636
+[2026-05-31 09:47:45]     adj LOO cos: +0.6212 ± 0.0833
+[2026-05-31 09:47:45]     verb LOO cos: +0.5310 ± 0.0742
+[2026-05-31 09:47:45]     noun LOO cos: +0.6550 ± 0.0999
+[2026-05-31 09:47:45] 
+  O(not) norm statistics:
+[2026-05-31 09:47:45]     adj: mean=100.70 std=12.20
+[2026-05-31 09:47:45]     verb: mean=120.97 std=13.15
+[2026-05-31 09:47:45]     noun: mean=150.22 std=25.14
+[2026-05-31 09:47:45] 
+  --- Causal test of O(not) ---
+[2026-05-31 09:47:45]   Test cases: 38
+[2026-05-31 09:47:48]   10/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:51]   20/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:53]   30/38 test cases done, GPU=8.1GB
+[2026-05-31 09:47:55]     full_delta_cos_shift: +0.8848 pos=38/38
+[2026-05-31 09:47:55]     O_not_cos_shift: +0.7038 pos=38/38
+[2026-05-31 09:47:55]     O_loo_cos_shift: +0.3258 pos=35/38
+[2026-05-31 09:47:55]     O_avg_cos_shift: +0.3886 pos=36/38
+[2026-05-31 09:47:55]     antonym_dir_cos_shift: +0.2031 pos=17/20
+[2026-05-31 09:47:55]     avg_random_shift: +0.0577 pos=18/38
+[2026-05-31 09:47:55]     [adj] O_not: +0.7180 n=20
+[2026-05-31 09:47:55]     [adj] full_delta: +0.8815
+[2026-05-31 09:47:55]     [adj] O_avg: +0.3722
+[2026-05-31 09:47:55]     [verb] O_not: +0.6717 n=10
+[2026-05-31 09:47:55]     [verb] full_delta: +0.8473
+[2026-05-31 09:47:55]     [verb] O_avg: +0.3727
+[2026-05-31 09:47:55]     [noun] O_not: +0.7082 n=8
+[2026-05-31 09:47:55]     [noun] full_delta: +0.9399
+[2026-05-31 09:47:55]     [noun] O_avg: +0.4493
+[2026-05-31 09:47:55] 
+Saving results...
+[2026-05-31 09:47:56]   Saved to results\phase305_operator_causal\qwen3_operator_causal.json
+[2026-05-31 09:47:56] 
+============================================================
+[2026-05-31 09:47:56] KEY SUMMARY
+[2026-05-31 09:47:56] ============================================================
+[2026-05-31 09:47:56] 
+  O(not) vs Antonym at L18:
+[2026-05-31 09:47:56]     happy        [adj ]: O_not=+0.821 antonym=+0.181 cos(O,O_avg)=+0.573
+[2026-05-31 09:47:56]     sad          [adj ]: O_not=+0.876 antonym=+0.490 cos(O,O_avg)=+0.763
+[2026-05-31 09:47:56]     big          [adj ]: O_not=+0.371 antonym=-0.011 cos(O,O_avg)=+0.756
+[2026-05-31 09:47:56]     small        [adj ]: O_not=+0.592 antonym=+0.279 cos(O,O_avg)=+0.720
+[2026-05-31 09:47:56]     good         [adj ]: O_not=+0.659 antonym=+0.434 cos(O,O_avg)=+0.486
+[2026-05-31 09:47:56]     bad          [adj ]: O_not=+0.700 antonym=+0.586 cos(O,O_avg)=+0.465
+[2026-05-31 09:47:56]     warm         [adj ]: O_not=+0.670 antonym=+0.050 cos(O,O_avg)=+0.636
+[2026-05-31 09:47:56]     cold         [adj ]: O_not=+0.633 antonym=+0.399 cos(O,O_avg)=+0.708
+[2026-05-31 09:47:56]     fast         [adj ]: O_not=+0.702 antonym=+0.492 cos(O,O_avg)=+0.582
+[2026-05-31 09:47:56]     slow         [adj ]: O_not=+0.869 antonym=-0.291 cos(O,O_avg)=+0.652
+[2026-05-31 09:47:56]     bright       [adj ]: O_not=+0.448 antonym=+0.406 cos(O,O_avg)=+0.665
+[2026-05-31 09:47:56]     dark         [adj ]: O_not=+0.622 antonym=+0.203 cos(O,O_avg)=+0.734
+[2026-05-31 09:47:56]     safe         [adj ]: O_not=+0.846 antonym=+0.432 cos(O,O_avg)=+0.447
+[2026-05-31 09:47:56]     dangerous    [adj ]: O_not=+0.868 antonym=+0.255 cos(O,O_avg)=+0.672
+[2026-05-31 09:47:56]     clean        [adj ]: O_not=+0.743 antonym=+0.527 cos(O,O_avg)=+0.589
+[2026-05-31 09:47:56]     dirty        [adj ]: O_not=+0.562 antonym=+0.320 cos(O,O_avg)=+0.698
+[2026-05-31 09:47:56]     rich         [adj ]: O_not=+0.685 antonym=+0.106 cos(O,O_avg)=+0.727
+[2026-05-31 09:47:56]     poor         [adj ]: O_not=+0.845 antonym=+0.543 cos(O,O_avg)=+0.702
+[2026-05-31 09:47:56]     strong       [adj ]: O_not=+0.560 antonym=+0.223 cos(O,O_avg)=+0.708
+[2026-05-31 09:47:56]     weak         [adj ]: O_not=+0.786 antonym=+0.289 cos(O,O_avg)=+0.637
+[2026-05-31 09:47:56] 
+  Cross-role O(not) sharing at L18:
+[2026-05-31 09:47:56]     adj_noun: +0.4496
+[2026-05-31 09:47:56]     adj_verb: +0.6304
+[2026-05-31 09:47:56]     verb_noun: +0.5386
+[2026-05-31 09:47:56] 
+  O(not) LOO consistency at L18:
+[2026-05-31 09:47:56]     adj: +0.5983 ± 0.1009
+[2026-05-31 09:47:56]     verb: +0.6160 ± 0.0518
+[2026-05-31 09:47:56]     noun: +0.7380 ± 0.0898
+[2026-05-31 09:47:56] Phase 305 complete for qwen3!

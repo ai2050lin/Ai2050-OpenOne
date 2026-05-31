@@ -1,0 +1,61 @@
+[2026-05-30 23:16:08] Phase 300: Operator-Scope Decomposition -- glm4
+[2026-05-30 23:16:08] Total stimuli: 272
+[2026-05-30 23:16:09] Loading glm4...
+[2026-05-30 23:16:10]   attn_impl=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.
+[2026-05-30 23:16:20]   Loaded. GPU=9.0GB
+[2026-05-30 23:16:20]   n_layers=40, d_model=4096, mid=20
+[2026-05-30 23:16:20]   sample_layers=[15, 17, 19, 20, 21, 23, 25]
+[2026-05-30 23:16:20] Capturing 266 unique sentences...
+[2026-05-30 23:17:00]   30/266 (0.7/s) ETA=317s GPU=9.0GB
+[2026-05-30 23:17:31]   60/266 (0.8/s) ETA=244s GPU=9.0GB
+[2026-05-30 23:18:02]   90/266 (0.9/s) ETA=200s GPU=9.0GB
+[2026-05-30 23:18:33]   120/266 (0.9/s) ETA=162s GPU=9.0GB
+[2026-05-30 23:19:04]   150/266 (0.9/s) ETA=127s GPU=9.0GB
+[2026-05-30 23:19:35]   180/266 (0.9/s) ETA=93s GPU=9.0GB
+[2026-05-30 23:20:06]   210/266 (0.9/s) ETA=60s GPU=9.0GB
+[2026-05-30 23:20:37]   240/266 (0.9/s) ETA=28s GPU=9.0GB
+[2026-05-30 23:21:04] Done capturing in 284s
+[2026-05-30 23:21:04] Extracting hidden states at target positions...
+[2026-05-30 23:21:04]   Extraction stats: ok=272, miss_sent=0, miss_pos=0, miss_len=0
+[2026-05-30 23:21:04]   Averaged 272 (operand, frame, condition, group) combinations
+[2026-05-30 23:21:04] Analysis 1: Negation operator increment...
+[2026-05-30 23:21:04] Analysis 2: Operator PCA across operands...
+[2026-05-30 23:21:04]   L15: top1=15.7%, dim50=4, dim80=9, norm_range=[2.4, 2.8]
+[2026-05-30 23:21:04]   L17: top1=16.0%, dim50=4, dim80=9, norm_range=[2.9, 3.4]
+[2026-05-30 23:21:04]   L19: top1=16.2%, dim50=4, dim80=9, norm_range=[3.7, 4.3]
+[2026-05-30 23:21:04]   L20: top1=17.0%, dim50=4, dim80=9, norm_range=[4.2, 4.9]
+[2026-05-30 23:21:04]   L21: top1=17.6%, dim50=4, dim80=9, norm_range=[4.9, 5.6]
+[2026-05-30 23:21:04]   L23: top1=18.2%, dim50=4, dim80=9, norm_range=[7.3, 8.2]
+[2026-05-30 23:21:04]   L25: top1=18.7%, dim50=4, dim80=9, norm_range=[11.1, 12.9]
+[2026-05-30 23:21:04] Analysis 3: Cross-operand LOO cosine...
+[2026-05-30 23:21:04]   L15: avg_LOO_cos=0.852 +/- 0.049
+[2026-05-30 23:21:04]   L17: avg_LOO_cos=0.851 +/- 0.046
+[2026-05-30 23:21:04]   L19: avg_LOO_cos=0.858 +/- 0.045
+[2026-05-30 23:21:04]   L20: avg_LOO_cos=0.865 +/- 0.042
+[2026-05-30 23:21:04]   L21: avg_LOO_cos=0.873 +/- 0.041
+[2026-05-30 23:21:04]   L23: avg_LOO_cos=0.898 +/- 0.030
+[2026-05-30 23:21:04]   L25: avg_LOO_cos=0.894 +/- 0.031
+[2026-05-30 23:21:04] Analysis 4: Negation direction vs antonym direction...
+[2026-05-30 23:21:04] Analysis 5: Normalized operator PCA...
+[2026-05-30 23:21:04]   L15: norm_top1=15.5%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L17: norm_top1=15.5%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L19: norm_top1=16.3%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L20: norm_top1=17.0%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L21: norm_top1=17.7%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L23: norm_top1=18.2%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   L25: norm_top1=18.6%, dim50=4, dim80=9
+[2026-05-30 23:21:04] Saved to results\phase300_operator_scope\glm4_operator_scope.json
+[2026-05-30 23:21:04] 
+============================================================
+[2026-05-30 23:21:04] SUMMARY: glm4 (L20)
+[2026-05-30 23:21:04] ============================================================
+[2026-05-30 23:21:04]   Operator PCA: top1=17.0%, dim50=4, dim80=9, norm_ratio=1.2x
+[2026-05-30 23:21:04]   Norm PCA:     top1=17.0%, dim50=4, dim80=9
+[2026-05-30 23:21:04]   LOO cosine:   avg=0.865, min=0.752
+[2026-05-30 23:21:04] 
+  Comparison with Phase 298 role subspace:
+[2026-05-30 23:21:04]     Role PCA top1: 22-35% (Qwen3/GLM4), dim50=3-5
+[2026-05-30 23:21:04]     Operator PCA top1: 17.0%, dim50=4
+[2026-05-30 23:21:04]     Role LOO: +0.44 (Qwen3/GLM4), -0.49 (DS7B)
+[2026-05-30 23:21:04]     Operator LOO: 0.865
+[2026-05-30 23:21:04] Phase 300 complete for glm4

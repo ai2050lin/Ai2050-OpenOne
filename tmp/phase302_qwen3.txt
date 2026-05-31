@@ -1,0 +1,318 @@
+[2026-05-31 00:45:15] Phase 302: Full Factorial I/R/F Decomposition + Causal Test -- qwen3
+[2026-05-31 00:45:17] Loading qwen3 (bf16 + device_map=auto + flash_attn)...
+[2026-05-31 00:45:18]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package f
+[2026-05-31 00:45:29]   attn_implementation=sdpa succeeded
+[2026-05-31 00:45:29]   Loaded. GPU=8.0GB
+[2026-05-31 00:45:29]   Layer distribution: 0 GPU + 0 CPU
+[2026-05-31 00:45:29]   n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+[2026-05-31 00:45:29]   Observation stimuli: 440, Causal test stimuli: 44
+[2026-05-31 00:45:29]   Dual-role tokens: 22 = ['clean', 'clear', 'close', 'cold', 'cool', 'dry', 'fair', 'fire', 'free', 'light', 'open', 'play', 'quiet', 'record', 'right', 'round', 'run', 'sign', 'smooth', 'solid', 'state', 'warm']
+[2026-05-31 00:45:29]     clean: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     clear: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     close: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     cold: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     cool: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     dry: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     fair: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     fire: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     free: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     light: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     open: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     play: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     quiet: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     record: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     right: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     round: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     run: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     sign: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     smooth: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29]     solid: roles=['adj', 'noun'], frames=9, pair=adj_noun
+[2026-05-31 00:45:29]     state: roles=['noun', 'verb'], frames=10, pair=noun_verb
+[2026-05-31 00:45:29]     warm: roles=['adj', 'verb'], frames=10, pair=adj_verb
+[2026-05-31 00:45:29] Capturing 446 unique sentences...
+[2026-05-31 00:45:32]   50/446 (22.3/s) ETA=18s GPU=8.1GB
+[2026-05-31 00:45:33]   100/446 (24.8/s) ETA=14s GPU=8.1GB
+[2026-05-31 00:45:35]   150/446 (25.1/s) ETA=12s GPU=8.1GB
+[2026-05-31 00:45:37]   200/446 (25.8/s) ETA=10s GPU=8.1GB
+[2026-05-31 00:45:39]   250/446 (26.1/s) ETA=8s GPU=8.1GB
+[2026-05-31 00:45:41]   300/446 (26.0/s) ETA=6s GPU=8.1GB
+[2026-05-31 00:45:43]   350/446 (26.2/s) ETA=4s GPU=8.1GB
+[2026-05-31 00:45:45]   400/446 (26.0/s) ETA=2s GPU=8.1GB
+[2026-05-31 00:45:46] Done capturing in 17s
+[2026-05-31 00:45:46]   Causal test pairs: 22 tokens with both roles
+[2026-05-31 00:45:46] Sample layers (8-point coverage): [4, 9, 13, 18, 22, 27, 31, 34]
+[2026-05-31 00:45:46] 
+============================================================
+[2026-05-31 00:45:46] FACTORIAL I/R/F DECOMPOSITION + CAUSAL TEST
+[2026-05-31 00:45:46] ============================================================
+[2026-05-31 00:45:46] 
+--- Layer 4 ---
+[2026-05-31 00:45:46]   Factorial decomposition: 22 tokens
+[2026-05-31 00:45:49]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:45:51]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:45:54]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:45:57]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:45:58]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:45:58]   Layer 4: 22 test pairs completed
+[2026-05-31 00:45:58]     R_only=+0.0704
+[2026-05-31 00:45:58]     F_only=+0.0339
+[2026-05-31 00:45:58]     RF_only=+0.0426
+[2026-05-31 00:45:58]     R+F=+0.0644
+[2026-05-31 00:45:58]     R+F+RF=-0.0154
+[2026-05-31 00:45:58]     full_delta=+0.1144
+[2026-05-31 00:45:58]     random=-0.0016
+[2026-05-31 00:45:58]     *** RF BINDING TERM HURTS: -0.0798 ***
+[2026-05-31 00:45:58] 
+--- Layer 9 ---
+[2026-05-31 00:45:58]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:01]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:03]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:06]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:08]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:10]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:10]   Layer 9: 22 test pairs completed
+[2026-05-31 00:46:10]     R_only=+0.2932
+[2026-05-31 00:46:10]     F_only=+0.0155
+[2026-05-31 00:46:10]     RF_only=+0.1044
+[2026-05-31 00:46:10]     R+F=+0.2863
+[2026-05-31 00:46:10]     R+F+RF=-0.0169
+[2026-05-31 00:46:10]     full_delta=+0.3510
+[2026-05-31 00:46:10]     random=+0.1154
+[2026-05-31 00:46:10]     *** RF BINDING TERM HURTS: -0.3031 ***
+[2026-05-31 00:46:10] 
+--- Layer 13 ---
+[2026-05-31 00:46:10]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:13]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:15]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:17]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:20]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:21]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:21]   Layer 13: 22 test pairs completed
+[2026-05-31 00:46:21]     R_only=+0.3573
+[2026-05-31 00:46:21]     F_only=-0.0541
+[2026-05-31 00:46:21]     RF_only=+0.0347
+[2026-05-31 00:46:21]     R+F=+0.3650
+[2026-05-31 00:46:21]     R+F+RF=-0.0075
+[2026-05-31 00:46:21]     full_delta=+0.3807
+[2026-05-31 00:46:21]     random=+0.1628
+[2026-05-31 00:46:21]     *** RF BINDING TERM HURTS: -0.3725 ***
+[2026-05-31 00:46:21] 
+--- Layer 18 ---
+[2026-05-31 00:46:21]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:23]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:26]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:29]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:31]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:32]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:32]   Layer 18: 22 test pairs completed
+[2026-05-31 00:46:32]     R_only=+0.3500
+[2026-05-31 00:46:32]     F_only=+0.0288
+[2026-05-31 00:46:32]     RF_only=-0.0836
+[2026-05-31 00:46:32]     R+F=+0.3458
+[2026-05-31 00:46:32]     R+F+RF=+0.0746
+[2026-05-31 00:46:32]     full_delta=+0.3293
+[2026-05-31 00:46:32]     random=+0.1895
+[2026-05-31 00:46:32]     *** RF BINDING TERM HURTS: -0.2712 ***
+[2026-05-31 00:46:32] 
+--- Layer 22 ---
+[2026-05-31 00:46:32]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:35]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:37]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:39]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:42]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:43]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:43]   Layer 22: 22 test pairs completed
+[2026-05-31 00:46:43]     R_only=+0.3376
+[2026-05-31 00:46:43]     F_only=+0.0048
+[2026-05-31 00:46:43]     RF_only=-0.1759
+[2026-05-31 00:46:43]     R+F=+0.3685
+[2026-05-31 00:46:43]     R+F+RF=+0.0851
+[2026-05-31 00:46:43]     full_delta=+0.3576
+[2026-05-31 00:46:43]     random=+0.1279
+[2026-05-31 00:46:43]     *** RF BINDING TERM HURTS: -0.2834 ***
+[2026-05-31 00:46:43] 
+--- Layer 27 ---
+[2026-05-31 00:46:43]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:45]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:48]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:50]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:53]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:54]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:54]   Layer 27: 22 test pairs completed
+[2026-05-31 00:46:54]     R_only=+0.4264
+[2026-05-31 00:46:54]     F_only=+0.0252
+[2026-05-31 00:46:54]     RF_only=-0.2650
+[2026-05-31 00:46:54]     R+F=+0.4144
+[2026-05-31 00:46:54]     R+F+RF=+0.0996
+[2026-05-31 00:46:54]     full_delta=+0.4110
+[2026-05-31 00:46:54]     random=+0.0647
+[2026-05-31 00:46:54]     *** RF BINDING TERM HURTS: -0.3147 ***
+[2026-05-31 00:46:54] 
+--- Layer 31 ---
+[2026-05-31 00:46:54]   Factorial decomposition: 22 tokens
+[2026-05-31 00:46:56]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:46:59]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:01]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:04]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:05]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:05]   Layer 31: 22 test pairs completed
+[2026-05-31 00:47:05]     R_only=+0.3964
+[2026-05-31 00:47:05]     F_only=+0.0520
+[2026-05-31 00:47:05]     RF_only=-0.3426
+[2026-05-31 00:47:05]     R+F=+0.4065
+[2026-05-31 00:47:05]     R+F+RF=+0.0254
+[2026-05-31 00:47:05]     full_delta=+0.3650
+[2026-05-31 00:47:05]     random=+0.0390
+[2026-05-31 00:47:05]     *** RF BINDING TERM HURTS: -0.3811 ***
+[2026-05-31 00:47:05] 
+--- Layer 34 ---
+[2026-05-31 00:47:05]   Factorial decomposition: 22 tokens
+[2026-05-31 00:47:08]   5/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:10]   10/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:13]   15/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:16]   20/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:17]   22/22 test pairs done, GPU=8.1GB
+[2026-05-31 00:47:17]   Layer 34: 22 test pairs completed
+[2026-05-31 00:47:17]     R_only=+0.2065
+[2026-05-31 00:47:17]     F_only=+0.0849
+[2026-05-31 00:47:17]     RF_only=-0.0513
+[2026-05-31 00:47:17]     R+F=+0.2033
+[2026-05-31 00:47:17]     R+F+RF=+0.0205
+[2026-05-31 00:47:17]     full_delta=+0.1020
+[2026-05-31 00:47:17]     random=+0.0680
+[2026-05-31 00:47:17]     *** RF BINDING TERM HURTS: -0.1828 ***
+[2026-05-31 00:47:17] 
+Saved to results\phase302_factorial_decomposition\qwen3_factorial_decomposition.json
+[2026-05-31 00:47:17] 
+============================================================
+[2026-05-31 00:47:17] SUMMARY for qwen3
+[2026-05-31 00:47:17] ============================================================
+[2026-05-31 00:47:17] 
+--- Core: R+F vs R+F+RF (is RF binding real?) ---
+[2026-05-31 00:47:17] 
+  Layer 4:
+[2026-05-31 00:47:17]     R_only:       avg=+0.0704 pos=12/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0339 pos=2/22
+[2026-05-31 00:47:17]     RF_only:      avg=+0.0426 pos=12/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.0644 pos=11/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=-0.0154 pos=2/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.1144
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.1214 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=-0.0016
+[2026-05-31 00:47:17]     RF boost: -0.0798
+[2026-05-31 00:47:17] 
+  Layer 9:
+[2026-05-31 00:47:17]     R_only:       avg=+0.2932 pos=21/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0155 pos=3/22
+[2026-05-31 00:47:17]     RF_only:      avg=+0.1044 pos=13/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.2863 pos=20/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=-0.0169 pos=3/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.3510
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.3502 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.1154
+[2026-05-31 00:47:17]     RF boost: -0.3031
+[2026-05-31 00:47:17] 
+  Layer 13:
+[2026-05-31 00:47:17]     R_only:       avg=+0.3573 pos=21/22
+[2026-05-31 00:47:17]     F_only:       avg=-0.0541 pos=2/22
+[2026-05-31 00:47:17]     RF_only:      avg=+0.0347 pos=11/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.3650 pos=20/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=-0.0075 pos=2/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.3807
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.3891 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.1628
+[2026-05-31 00:47:17]     RF boost: -0.3725
+[2026-05-31 00:47:17] 
+  Layer 18:
+[2026-05-31 00:47:17]     R_only:       avg=+0.3500 pos=19/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0288 pos=3/22
+[2026-05-31 00:47:17]     RF_only:      avg=-0.0836 pos=7/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.3458 pos=19/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=+0.0746 pos=4/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.3293
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.3210 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.1895
+[2026-05-31 00:47:17]     RF boost: -0.2712
+[2026-05-31 00:47:17] 
+  Layer 22:
+[2026-05-31 00:47:17]     R_only:       avg=+0.3376 pos=18/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0048 pos=2/22
+[2026-05-31 00:47:17]     RF_only:      avg=-0.1759 pos=5/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.3685 pos=19/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=+0.0851 pos=6/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.3576
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.3594 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.1279
+[2026-05-31 00:47:17]     RF boost: -0.2834
+[2026-05-31 00:47:17] 
+  Layer 27:
+[2026-05-31 00:47:17]     R_only:       avg=+0.4264 pos=21/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0252 pos=3/22
+[2026-05-31 00:47:17]     RF_only:      avg=-0.2650 pos=2/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.4144 pos=20/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=+0.0996 pos=6/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.4110
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.4044 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.0647
+[2026-05-31 00:47:17]     RF boost: -0.3147
+[2026-05-31 00:47:17] 
+  Layer 31:
+[2026-05-31 00:47:17]     R_only:       avg=+0.3964 pos=19/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0520 pos=4/22
+[2026-05-31 00:47:17]     RF_only:      avg=-0.3426 pos=3/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.4065 pos=19/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=+0.0254 pos=4/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.3650
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.3624 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.0390
+[2026-05-31 00:47:17]     RF boost: -0.3811
+[2026-05-31 00:47:17] 
+  Layer 34:
+[2026-05-31 00:47:17]     R_only:       avg=+0.2065 pos=14/22
+[2026-05-31 00:47:17]     F_only:       avg=+0.0849 pos=5/22
+[2026-05-31 00:47:17]     RF_only:      avg=-0.0513 pos=10/22
+[2026-05-31 00:47:17]     R+F:          avg=+0.2033 pos=14/22
+[2026-05-31 00:47:17]     R+F+RF:       avg=+0.0205 pos=3/22
+[2026-05-31 00:47:17]     full_delta:   avg=+0.1020
+[2026-05-31 00:47:17]     R+F_residual: avg=+0.1015 (Phase 301 style)
+[2026-05-31 00:47:17]     random:       avg=+0.0680
+[2026-05-31 00:47:17]     RF boost: -0.1828
+[2026-05-31 00:47:17] 
+--- Factorial F vs Residual F (Phase 301 comparison) ---
+[2026-05-31 00:47:17]   L4: cos(R,F)_factorial avg=+0.0408 std=0.0933 range=[-0.0620, +0.3777]
+[2026-05-31 00:47:17]   L4: cos(R,F)_residual  avg=+0.0905 std=0.1666 range=[-0.1418, +0.4738]
+[2026-05-31 00:47:17]   L4: cos(F_fact, F_resid) avg=-0.0126
+[2026-05-31 00:47:17]   L9: cos(R,F)_factorial avg=+0.0928 std=0.1287 range=[-0.0902, +0.3396]
+[2026-05-31 00:47:17]   L9: cos(R,F)_residual  avg=+0.1224 std=0.1598 range=[-0.2342, +0.3652]
+[2026-05-31 00:47:17]   L9: cos(F_fact, F_resid) avg=+0.0251
+[2026-05-31 00:47:17]   L13: cos(R,F)_factorial avg=+0.0599 std=0.1549 range=[-0.1594, +0.3613]
+[2026-05-31 00:47:17]   L13: cos(R,F)_residual  avg=+0.0861 std=0.1851 range=[-0.3551, +0.4045]
+[2026-05-31 00:47:17]   L13: cos(F_fact, F_resid) avg=-0.0391
+[2026-05-31 00:47:17]   L18: cos(R,F)_factorial avg=+0.0571 std=0.1304 range=[-0.1840, +0.3430]
+[2026-05-31 00:47:17]   L18: cos(R,F)_residual  avg=+0.0899 std=0.2086 range=[-0.4080, +0.3757]
+[2026-05-31 00:47:17]   L18: cos(F_fact, F_resid) avg=-0.0794
+[2026-05-31 00:47:17]   L22: cos(R,F)_factorial avg=+0.0434 std=0.1098 range=[-0.0928, +0.3047]
+[2026-05-31 00:47:17]   L22: cos(R,F)_residual  avg=+0.0594 std=0.2219 range=[-0.3819, +0.4038]
+[2026-05-31 00:47:17]   L22: cos(F_fact, F_resid) avg=-0.0200
+[2026-05-31 00:47:17]   L27: cos(R,F)_factorial avg=+0.0516 std=0.1241 range=[-0.1152, +0.3433]
+[2026-05-31 00:47:17]   L27: cos(R,F)_residual  avg=+0.1340 std=0.1754 range=[-0.2157, +0.4432]
+[2026-05-31 00:47:17]   L27: cos(F_fact, F_resid) avg=-0.0607
+[2026-05-31 00:47:17]   L31: cos(R,F)_factorial avg=+0.0514 std=0.1155 range=[-0.2013, +0.3038]
+[2026-05-31 00:47:17]   L31: cos(R,F)_residual  avg=+0.1579 std=0.1781 range=[-0.1610, +0.4501]
+[2026-05-31 00:47:17]   L31: cos(F_fact, F_resid) avg=-0.0615
+[2026-05-31 00:47:17]   L34: cos(R,F)_factorial avg=+0.0781 std=0.1343 range=[-0.1393, +0.3585]
+[2026-05-31 00:47:17]   L34: cos(R,F)_residual  avg=+0.1721 std=0.1699 range=[-0.1100, +0.4834]
+[2026-05-31 00:47:17]   L34: cos(F_fact, F_resid) avg=-0.0039
+[2026-05-31 00:47:17] 
+--- Per-Role-Pair at Layer 18 ---
+[2026-05-31 00:47:17]   adj_noun (6 tokens):
+[2026-05-31 00:47:17]     R=+0.2296 F=+0.1057 RF=-0.0707 R+F=+0.2265 R+F+RF=+0.2736
+[2026-05-31 00:47:17]   adj_verb (10 tokens):
+[2026-05-31 00:47:17]     R=+0.3657 F=+0.0000 RF=-0.0152 R+F=+0.3653 R+F+RF=+0.0000
+[2026-05-31 00:47:17]   noun_verb (6 tokens):
+[2026-05-31 00:47:17]     R=+0.4442 F=+0.0000 RF=-0.2105 R+F=+0.4325 R+F+RF=+0.0000
+[2026-05-31 00:47:17] 
+--- Cos(R,F) Distribution: Factorial vs Residual ---
+[2026-05-31 00:47:17]   Factorial cos(R,F): mean=+0.0594, std=0.1261, range=[-0.2013, +0.3777], |cos|>0.9: 0/176
+[2026-05-31 00:47:17]   Residual cos(R,F):  mean=+0.1140, std=0.1879, range=[-0.4080, +0.4834], |cos|>0.9: 0/176
+[2026-05-31 00:47:17] Phase 302 complete for qwen3

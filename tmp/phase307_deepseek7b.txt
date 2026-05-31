@@ -1,0 +1,614 @@
+[2026-05-31 13:14:57] Phase 307: Operator Orthogonality + Multi-Operator -- deepseek7b
+[2026-05-31 13:14:59] Loading deepseek7b (bf16 + device_map=auto)...
+[2026-05-31 13:15:00]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b
+[2026-05-31 13:15:11]   attn_implementation=sdpa succeeded
+[2026-05-31 13:15:11]   Loaded. GPU=9.0GB
+[2026-05-31 13:15:11]   n_layers=28, class=Qwen2ForCausalLM
+[2026-05-31 13:15:11]   Layer distribution: 0 GPU + 11 CPU
+[2026-05-31 13:15:11]   n_layers=28, d_model=3584
+[2026-05-31 13:15:11]   Layer 0: accessible
+[2026-05-31 13:15:11]   Layer 14: accessible
+[2026-05-31 13:15:11]   Layer 26: accessible
+[2026-05-31 13:15:11]   Operator stimuli: 245, Role stimuli: 32
+[2026-05-31 13:15:11]   Resolved operator: 245, role: 32
+[2026-05-31 13:15:11]   Unique sentences: 277
+[2026-05-31 13:15:11] Capturing 277 sentences...
+[2026-05-31 13:15:37]   30/277 (1.1/s) ETA=218s GPU=9.0GB
+[2026-05-31 13:15:57]   60/277 (1.3/s) ETA=167s GPU=9.0GB
+[2026-05-31 13:16:17]   90/277 (1.4/s) ETA=138s GPU=9.0GB
+[2026-05-31 13:16:37]   120/277 (1.4/s) ETA=113s GPU=9.0GB
+[2026-05-31 13:16:57]   150/277 (1.4/s) ETA=90s GPU=9.0GB
+[2026-05-31 13:17:17]   180/277 (1.4/s) ETA=68s GPU=9.0GB
+[2026-05-31 13:17:36]   210/277 (1.4/s) ETA=46s GPU=9.0GB
+[2026-05-31 13:17:56]   240/277 (1.4/s) ETA=26s GPU=9.0GB
+[2026-05-31 13:18:16]   270/277 (1.5/s) ETA=5s GPU=9.0GB
+[2026-05-31 13:18:21] Done capturing in 190s
+[2026-05-31 13:18:21] Sample layers: [7, 14, 21, 26]
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART A: OPERATOR DIRECTION EXTRACTION
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:18:21] 
+--- Layer 7: Operator directions ---
+[2026-05-31 13:18:21]   not/adj: 20 operands, norm=38.22
+[2026-05-31 13:18:21]   not/verb: 10 operands, norm=891.65
+[2026-05-31 13:18:21]   not/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   maybe/adj: 20 operands, norm=43.53
+[2026-05-31 13:18:21]   maybe/verb: 10 operands, norm=893.11
+[2026-05-31 13:18:21]   maybe/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   must/adj: 20 operands, norm=41.75
+[2026-05-31 13:18:21]   must/verb: 10 operands, norm=895.59
+[2026-05-31 13:18:21]   must/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   can/adj: 20 operands, norm=45.10
+[2026-05-31 13:18:21]   can/verb: 10 operands, norm=888.01
+[2026-05-31 13:18:21]   can/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   should/adj: 20 operands, norm=38.99
+[2026-05-31 13:18:21]   should/verb: 10 operands, norm=896.12
+[2026-05-31 13:18:21]   should/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   never/adj: 20 operands, norm=45.83
+[2026-05-31 13:18:21]   never/verb: 10 operands, norm=893.81
+[2026-05-31 13:18:21]   never/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21] 
+--- Layer 14: Operator directions ---
+[2026-05-31 13:18:21]   not/adj: 20 operands, norm=63.58
+[2026-05-31 13:18:21]   not/verb: 10 operands, norm=1780.31
+[2026-05-31 13:18:21]   not/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   maybe/adj: 20 operands, norm=73.83
+[2026-05-31 13:18:21]   maybe/verb: 10 operands, norm=1774.22
+[2026-05-31 13:18:21]   maybe/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   must/adj: 20 operands, norm=76.81
+[2026-05-31 13:18:21]   must/verb: 10 operands, norm=1772.68
+[2026-05-31 13:18:21]   must/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   can/adj: 20 operands, norm=71.82
+[2026-05-31 13:18:21]   can/verb: 10 operands, norm=1776.47
+[2026-05-31 13:18:21]   can/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   should/adj: 20 operands, norm=69.41
+[2026-05-31 13:18:21]   should/verb: 10 operands, norm=1773.94
+[2026-05-31 13:18:21]   should/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   never/adj: 20 operands, norm=77.82
+[2026-05-31 13:18:21]   never/verb: 10 operands, norm=1789.76
+[2026-05-31 13:18:21]   never/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21] 
+--- Layer 21: Operator directions ---
+[2026-05-31 13:18:21]   not/adj: 20 operands, norm=97.66
+[2026-05-31 13:18:21]   not/verb: 10 operands, norm=1466.65
+[2026-05-31 13:18:21]   not/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   maybe/adj: 20 operands, norm=113.80
+[2026-05-31 13:18:21]   maybe/verb: 10 operands, norm=1477.01
+[2026-05-31 13:18:21]   maybe/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   must/adj: 20 operands, norm=115.00
+[2026-05-31 13:18:21]   must/verb: 10 operands, norm=1477.50
+[2026-05-31 13:18:21]   must/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   can/adj: 20 operands, norm=107.99
+[2026-05-31 13:18:21]   can/verb: 10 operands, norm=1473.87
+[2026-05-31 13:18:21]   can/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   should/adj: 20 operands, norm=105.40
+[2026-05-31 13:18:21]   should/verb: 10 operands, norm=1481.94
+[2026-05-31 13:18:21]   should/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   never/adj: 20 operands, norm=111.11
+[2026-05-31 13:18:21]   never/verb: 10 operands, norm=1487.40
+[2026-05-31 13:18:21]   never/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21] 
+--- Layer 26: Operator directions ---
+[2026-05-31 13:18:21]   not/adj: 20 operands, norm=176.49
+[2026-05-31 13:18:21]   not/verb: 10 operands, norm=1127.09
+[2026-05-31 13:18:21]   not/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   maybe/adj: 20 operands, norm=209.16
+[2026-05-31 13:18:21]   maybe/verb: 10 operands, norm=1149.43
+[2026-05-31 13:18:21]   maybe/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   must/adj: 20 operands, norm=187.63
+[2026-05-31 13:18:21]   must/verb: 10 operands, norm=1147.62
+[2026-05-31 13:18:21]   must/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   can/adj: 20 operands, norm=180.97
+[2026-05-31 13:18:21]   can/verb: 10 operands, norm=1132.33
+[2026-05-31 13:18:21]   can/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   should/adj: 20 operands, norm=177.64
+[2026-05-31 13:18:21]   should/verb: 10 operands, norm=1151.54
+[2026-05-31 13:18:21]   should/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21]   never/adj: 20 operands, norm=193.16
+[2026-05-31 13:18:21]   never/verb: 10 operands, norm=1153.41
+[2026-05-31 13:18:21]   never/noun: 5 operands, norm=0.00
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART B: R DIRECTION EXTRACTION
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:18:21]   L7: R_direction from 16 adj + 16 verb, norm=1019.03
+[2026-05-31 13:18:21]   L14: R_direction from 16 adj + 16 verb, norm=1839.27
+[2026-05-31 13:18:21]   L21: R_direction from 16 adj + 16 verb, norm=1611.12
+[2026-05-31 13:18:21]   L26: R_direction from 16 adj + 16 verb, norm=1334.19
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART C: OPERATOR vs ROLE ORTHOGONALITY
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:18:21]   L7 not/adj: cos(O,R)=-0.125 O_norm=38.22
+[2026-05-31 13:18:21]   L7 not/verb: cos(O,R)=-0.997 O_norm=891.65
+[2026-05-31 13:18:21]   L7 not/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L7 maybe/adj: cos(O,R)=+0.154 O_norm=43.53
+[2026-05-31 13:18:21]   L7 maybe/verb: cos(O,R)=-0.997 O_norm=893.11
+[2026-05-31 13:18:21]   L7 maybe/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L7 must/adj: cos(O,R)=-0.032 O_norm=41.75
+[2026-05-31 13:18:21]   L7 must/verb: cos(O,R)=-0.996 O_norm=895.59
+[2026-05-31 13:18:21]   L7 must/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L7 can/adj: cos(O,R)=+0.022 O_norm=45.10
+[2026-05-31 13:18:21]   L7 can/verb: cos(O,R)=-0.997 O_norm=888.01
+[2026-05-31 13:18:21]   L7 can/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L7 should/adj: cos(O,R)=+0.006 O_norm=38.99
+[2026-05-31 13:18:21]   L7 should/verb: cos(O,R)=-0.996 O_norm=896.12
+[2026-05-31 13:18:21]   L7 should/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L7 never/adj: cos(O,R)=-0.172 O_norm=45.83
+[2026-05-31 13:18:21]   L7 never/verb: cos(O,R)=-0.997 O_norm=893.81
+[2026-05-31 13:18:21]   L7 never/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 not/adj: cos(O,R)=-0.138 O_norm=63.58
+[2026-05-31 13:18:21]   L14 not/verb: cos(O,R)=-0.998 O_norm=1780.31
+[2026-05-31 13:18:21]   L14 not/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 maybe/adj: cos(O,R)=-0.133 O_norm=73.83
+[2026-05-31 13:18:21]   L14 maybe/verb: cos(O,R)=-0.997 O_norm=1774.22
+[2026-05-31 13:18:21]   L14 maybe/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 must/adj: cos(O,R)=-0.069 O_norm=76.81
+[2026-05-31 13:18:21]   L14 must/verb: cos(O,R)=-0.997 O_norm=1772.68
+[2026-05-31 13:18:21]   L14 must/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 can/adj: cos(O,R)=-0.191 O_norm=71.82
+[2026-05-31 13:18:21]   L14 can/verb: cos(O,R)=-0.998 O_norm=1776.47
+[2026-05-31 13:18:21]   L14 can/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 should/adj: cos(O,R)=-0.056 O_norm=69.41
+[2026-05-31 13:18:21]   L14 should/verb: cos(O,R)=-0.997 O_norm=1773.94
+[2026-05-31 13:18:21]   L14 should/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L14 never/adj: cos(O,R)=-0.108 O_norm=77.82
+[2026-05-31 13:18:21]   L14 never/verb: cos(O,R)=-0.998 O_norm=1789.76
+[2026-05-31 13:18:21]   L14 never/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 not/adj: cos(O,R)=+0.050 O_norm=97.66
+[2026-05-31 13:18:21]   L21 not/verb: cos(O,R)=-0.992 O_norm=1466.65
+[2026-05-31 13:18:21]   L21 not/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 maybe/adj: cos(O,R)=-0.010 O_norm=113.80
+[2026-05-31 13:18:21]   L21 maybe/verb: cos(O,R)=-0.991 O_norm=1477.01
+[2026-05-31 13:18:21]   L21 maybe/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 must/adj: cos(O,R)=-0.020 O_norm=115.00
+[2026-05-31 13:18:21]   L21 must/verb: cos(O,R)=-0.991 O_norm=1477.50
+[2026-05-31 13:18:21]   L21 must/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 can/adj: cos(O,R)=-0.112 O_norm=107.99
+[2026-05-31 13:18:21]   L21 can/verb: cos(O,R)=-0.993 O_norm=1473.87
+[2026-05-31 13:18:21]   L21 can/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 should/adj: cos(O,R)=+0.050 O_norm=105.40
+[2026-05-31 13:18:21]   L21 should/verb: cos(O,R)=-0.991 O_norm=1481.94
+[2026-05-31 13:18:21]   L21 should/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L21 never/adj: cos(O,R)=-0.046 O_norm=111.11
+[2026-05-31 13:18:21]   L21 never/verb: cos(O,R)=-0.991 O_norm=1487.40
+[2026-05-31 13:18:21]   L21 never/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 not/adj: cos(O,R)=-0.048 O_norm=176.49
+[2026-05-31 13:18:21]   L26 not/verb: cos(O,R)=-0.962 O_norm=1127.09
+[2026-05-31 13:18:21]   L26 not/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 maybe/adj: cos(O,R)=+0.006 O_norm=209.16
+[2026-05-31 13:18:21]   L26 maybe/verb: cos(O,R)=-0.967 O_norm=1149.43
+[2026-05-31 13:18:21]   L26 maybe/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 must/adj: cos(O,R)=-0.066 O_norm=187.63
+[2026-05-31 13:18:21]   L26 must/verb: cos(O,R)=-0.968 O_norm=1147.62
+[2026-05-31 13:18:21]   L26 must/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 can/adj: cos(O,R)=-0.060 O_norm=180.97
+[2026-05-31 13:18:21]   L26 can/verb: cos(O,R)=-0.969 O_norm=1132.33
+[2026-05-31 13:18:21]   L26 can/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 should/adj: cos(O,R)=-0.012 O_norm=177.64
+[2026-05-31 13:18:21]   L26 should/verb: cos(O,R)=-0.968 O_norm=1151.54
+[2026-05-31 13:18:21]   L26 should/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21]   L26 never/adj: cos(O,R)=-0.027 O_norm=193.16
+[2026-05-31 13:18:21]   L26 never/verb: cos(O,R)=-0.961 O_norm=1153.41
+[2026-05-31 13:18:21]   L26 never/noun: cos(O,R)=+0.000 O_norm=0.00
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART D: CROSS-OPERATOR SUBSPACE COMPARISON
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:18:21]   L7 can vs maybe: avg_cos=+0.533
+[2026-05-31 13:18:21]   L7 can vs must: avg_cos=+0.511
+[2026-05-31 13:18:21]   L7 can vs never: avg_cos=+0.411
+[2026-05-31 13:18:21]   L7 can vs not: avg_cos=+0.394
+[2026-05-31 13:18:21]   L7 can vs should: avg_cos=+0.507
+[2026-05-31 13:18:21]   L7 maybe vs must: avg_cos=+0.520
+[2026-05-31 13:18:21]   L7 maybe vs never: avg_cos=+0.432
+[2026-05-31 13:18:21]   L7 maybe vs not: avg_cos=+0.420
+[2026-05-31 13:18:21]   L7 maybe vs should: avg_cos=+0.527
+[2026-05-31 13:18:21]   L7 must vs never: avg_cos=+0.439
+[2026-05-31 13:18:21]   L7 must vs not: avg_cos=+0.437
+[2026-05-31 13:18:21]   L7 must vs should: avg_cos=+0.619
+[2026-05-31 13:18:21]   L7 never vs not: avg_cos=+0.560
+[2026-05-31 13:18:21]   L7 never vs should: avg_cos=+0.410
+[2026-05-31 13:18:21]   L7 not vs should: avg_cos=+0.414
+[2026-05-31 13:18:21]   L14 can vs maybe: avg_cos=+0.579
+[2026-05-31 13:18:21]   L14 can vs must: avg_cos=+0.520
+[2026-05-31 13:18:21]   L14 can vs never: avg_cos=+0.419
+[2026-05-31 13:18:21]   L14 can vs not: avg_cos=+0.416
+[2026-05-31 13:18:21]   L14 can vs should: avg_cos=+0.523
+[2026-05-31 13:18:21]   L14 maybe vs must: avg_cos=+0.527
+[2026-05-31 13:18:21]   L14 maybe vs never: avg_cos=+0.419
+[2026-05-31 13:18:21]   L14 maybe vs not: avg_cos=+0.427
+[2026-05-31 13:18:21]   L14 maybe vs should: avg_cos=+0.538
+[2026-05-31 13:18:21]   L14 must vs never: avg_cos=+0.416
+[2026-05-31 13:18:21]   L14 must vs not: avg_cos=+0.439
+[2026-05-31 13:18:21]   L14 must vs should: avg_cos=+0.633
+[2026-05-31 13:18:21]   L14 never vs not: avg_cos=+0.565
+[2026-05-31 13:18:21]   L14 never vs should: avg_cos=+0.401
+[2026-05-31 13:18:21]   L14 not vs should: avg_cos=+0.424
+[2026-05-31 13:18:21]   L21 can vs maybe: avg_cos=+0.570
+[2026-05-31 13:18:21]   L21 can vs must: avg_cos=+0.514
+[2026-05-31 13:18:21]   L21 can vs never: avg_cos=+0.419
+[2026-05-31 13:18:21]   L21 can vs not: avg_cos=+0.402
+[2026-05-31 13:18:21]   L21 can vs should: avg_cos=+0.522
+[2026-05-31 13:18:21]   L21 maybe vs must: avg_cos=+0.530
+[2026-05-31 13:18:21]   L21 maybe vs never: avg_cos=+0.430
+[2026-05-31 13:18:21]   L21 maybe vs not: avg_cos=+0.423
+[2026-05-31 13:18:21]   L21 maybe vs should: avg_cos=+0.545
+[2026-05-31 13:18:21]   L21 must vs never: avg_cos=+0.422
+[2026-05-31 13:18:21]   L21 must vs not: avg_cos=+0.429
+[2026-05-31 13:18:21]   L21 must vs should: avg_cos=+0.633
+[2026-05-31 13:18:21]   L21 never vs not: avg_cos=+0.574
+[2026-05-31 13:18:21]   L21 never vs should: avg_cos=+0.400
+[2026-05-31 13:18:21]   L21 not vs should: avg_cos=+0.409
+[2026-05-31 13:18:21]   L26 can vs maybe: avg_cos=+0.551
+[2026-05-31 13:18:21]   L26 can vs must: avg_cos=+0.510
+[2026-05-31 13:18:21]   L26 can vs never: avg_cos=+0.403
+[2026-05-31 13:18:21]   L26 can vs not: avg_cos=+0.394
+[2026-05-31 13:18:21]   L26 can vs should: avg_cos=+0.520
+[2026-05-31 13:18:21]   L26 maybe vs must: avg_cos=+0.502
+[2026-05-31 13:18:21]   L26 maybe vs never: avg_cos=+0.408
+[2026-05-31 13:18:21]   L26 maybe vs not: avg_cos=+0.402
+[2026-05-31 13:18:21]   L26 maybe vs should: avg_cos=+0.517
+[2026-05-31 13:18:21]   L26 must vs never: avg_cos=+0.410
+[2026-05-31 13:18:21]   L26 must vs not: avg_cos=+0.417
+[2026-05-31 13:18:21]   L26 must vs should: avg_cos=+0.628
+[2026-05-31 13:18:21]   L26 never vs not: avg_cos=+0.583
+[2026-05-31 13:18:21]   L26 never vs should: avg_cos=+0.383
+[2026-05-31 13:18:21]   L26 not vs should: avg_cos=+0.390
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART E: OPERATOR LOO CONSISTENCY
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:18:21]   L7 not/adj: LOO=0.768±0.074 (n=20)
+[2026-05-31 13:18:21]   L7 not/verb: LOO=0.694±0.371 (n=10)
+[2026-05-31 13:18:21]   L7 not/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L7 maybe/adj: LOO=0.812±0.036 (n=20)
+[2026-05-31 13:18:21]   L7 maybe/verb: LOO=0.733±0.324 (n=10)
+[2026-05-31 13:18:21]   L7 maybe/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L7 must/adj: LOO=0.798±0.032 (n=20)
+[2026-05-31 13:18:21]   L7 must/verb: LOO=0.725±0.333 (n=10)
+[2026-05-31 13:18:21]   L7 must/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L7 can/adj: LOO=0.809±0.037 (n=20)
+[2026-05-31 13:18:21]   L7 can/verb: LOO=0.681±0.387 (n=10)
+[2026-05-31 13:18:21]   L7 can/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L7 should/adj: LOO=0.792±0.040 (n=20)
+[2026-05-31 13:18:21]   L7 should/verb: LOO=0.732±0.326 (n=10)
+[2026-05-31 13:18:21]   L7 should/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L7 never/adj: LOO=0.789±0.041 (n=20)
+[2026-05-31 13:18:21]   L7 never/verb: LOO=0.714±0.347 (n=10)
+[2026-05-31 13:18:21]   L7 never/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 not/adj: LOO=0.622±0.075 (n=20)
+[2026-05-31 13:18:21]   L14 not/verb: LOO=0.659±0.418 (n=10)
+[2026-05-31 13:18:21]   L14 not/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 maybe/adj: LOO=0.645±0.059 (n=20)
+[2026-05-31 13:18:21]   L14 maybe/verb: LOO=0.657±0.421 (n=10)
+[2026-05-31 13:18:21]   L14 maybe/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 must/adj: LOO=0.635±0.050 (n=20)
+[2026-05-31 13:18:21]   L14 must/verb: LOO=0.642±0.438 (n=10)
+[2026-05-31 13:18:21]   L14 must/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 can/adj: LOO=0.643±0.043 (n=20)
+[2026-05-31 13:18:21]   L14 can/verb: LOO=0.651±0.428 (n=10)
+[2026-05-31 13:18:21]   L14 can/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 should/adj: LOO=0.618±0.035 (n=20)
+[2026-05-31 13:18:21]   L14 should/verb: LOO=0.655±0.425 (n=10)
+[2026-05-31 13:18:21]   L14 should/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L14 never/adj: LOO=0.684±0.052 (n=20)
+[2026-05-31 13:18:21]   L14 never/verb: LOO=0.680±0.392 (n=10)
+[2026-05-31 13:18:21]   L14 never/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 not/adj: LOO=0.630±0.078 (n=20)
+[2026-05-31 13:18:21]   L21 not/verb: LOO=0.612±0.466 (n=10)
+[2026-05-31 13:18:21]   L21 not/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 maybe/adj: LOO=0.663±0.055 (n=20)
+[2026-05-31 13:18:21]   L21 maybe/verb: LOO=0.641±0.434 (n=10)
+[2026-05-31 13:18:21]   L21 maybe/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 must/adj: LOO=0.642±0.060 (n=20)
+[2026-05-31 13:18:21]   L21 must/verb: LOO=0.651±0.421 (n=10)
+[2026-05-31 13:18:21]   L21 must/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 can/adj: LOO=0.652±0.043 (n=20)
+[2026-05-31 13:18:21]   L21 can/verb: LOO=0.635±0.439 (n=10)
+[2026-05-31 13:18:21]   L21 can/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 should/adj: LOO=0.638±0.055 (n=20)
+[2026-05-31 13:18:21]   L21 should/verb: LOO=0.665±0.404 (n=10)
+[2026-05-31 13:18:21]   L21 should/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L21 never/adj: LOO=0.679±0.057 (n=20)
+[2026-05-31 13:18:21]   L21 never/verb: LOO=0.652±0.416 (n=10)
+[2026-05-31 13:18:21]   L21 never/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 not/adj: LOO=0.587±0.081 (n=20)
+[2026-05-31 13:18:21]   L26 not/verb: LOO=0.562±0.454 (n=10)
+[2026-05-31 13:18:21]   L26 not/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 maybe/adj: LOO=0.617±0.063 (n=20)
+[2026-05-31 13:18:21]   L26 maybe/verb: LOO=0.597±0.434 (n=10)
+[2026-05-31 13:18:21]   L26 maybe/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 must/adj: LOO=0.559±0.056 (n=20)
+[2026-05-31 13:18:21]   L26 must/verb: LOO=0.591±0.446 (n=10)
+[2026-05-31 13:18:21]   L26 must/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 can/adj: LOO=0.587±0.062 (n=20)
+[2026-05-31 13:18:21]   L26 can/verb: LOO=0.565±0.459 (n=10)
+[2026-05-31 13:18:21]   L26 can/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 should/adj: LOO=0.562±0.056 (n=20)
+[2026-05-31 13:18:21]   L26 should/verb: LOO=0.602±0.431 (n=10)
+[2026-05-31 13:18:21]   L26 should/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21]   L26 never/adj: LOO=0.627±0.061 (n=20)
+[2026-05-31 13:18:21]   L26 never/verb: LOO=0.593±0.412 (n=10)
+[2026-05-31 13:18:21]   L26 never/noun: LOO=0.000±0.000 (n=5)
+[2026-05-31 13:18:21] 
+============================================================
+[2026-05-31 13:18:21] PART F: OPERATOR CAUSAL TEST
+[2026-05-31 13:18:21] ============================================================
+[2026-05-31 13:19:09]   L7 can: avg_causal=-0.1055 (n=10)
+[2026-05-31 13:19:09]   L7 maybe: avg_causal=-0.0703 (n=10)
+[2026-05-31 13:19:09]   L7 must: avg_causal=-0.0946 (n=10)
+[2026-05-31 13:19:09]   L7 never: avg_causal=-0.1174 (n=10)
+[2026-05-31 13:19:09]   L7 not: avg_causal=-0.1400 (n=10)
+[2026-05-31 13:19:57]   L14 can: avg_causal=+0.4021 (n=10)
+[2026-05-31 13:19:57]   L14 maybe: avg_causal=+0.4039 (n=10)
+[2026-05-31 13:19:57]   L14 must: avg_causal=+0.3046 (n=10)
+[2026-05-31 13:19:57]   L14 never: avg_causal=+0.4688 (n=10)
+[2026-05-31 13:19:57]   L14 not: avg_causal=+0.3641 (n=10)
+[2026-05-31 13:20:44]   L21 can: avg_causal=-0.2909 (n=10)
+[2026-05-31 13:20:44]   L21 maybe: avg_causal=-0.3077 (n=10)
+[2026-05-31 13:20:44]   L21 must: avg_causal=-0.3781 (n=10)
+[2026-05-31 13:20:44]   L21 never: avg_causal=-0.2518 (n=10)
+[2026-05-31 13:20:44]   L21 not: avg_causal=-0.2635 (n=10)
+[2026-05-31 13:21:32]   L26 can: avg_causal=+0.5023 (n=10)
+[2026-05-31 13:21:32]   L26 maybe: avg_causal=+0.5630 (n=10)
+[2026-05-31 13:21:32]   L26 must: avg_causal=+0.4910 (n=10)
+[2026-05-31 13:21:32]   L26 never: avg_causal=+0.4725 (n=10)
+[2026-05-31 13:21:32]   L26 not: avg_causal=+0.4283 (n=10)
+[2026-05-31 13:21:32] 
+Saving results...
+[2026-05-31 13:21:32]   Saved to results\phase307_operator_ortho\deepseek7b_operator_ortho.json
+[2026-05-31 13:21:32] 
+============================================================
+[2026-05-31 13:21:32] SUMMARY: Phase 307 -- deepseek7b
+[2026-05-31 13:21:32] ============================================================
+[2026-05-31 13:21:32] 
+--- O vs R Orthogonality ---
+[2026-05-31 13:21:32]   Layer 7:
+[2026-05-31 13:21:32]     not_adj: cos(O,R)=-0.125
+[2026-05-31 13:21:32]     not_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     not_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     maybe_adj: cos(O,R)=+0.154
+[2026-05-31 13:21:32]     maybe_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     maybe_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     must_adj: cos(O,R)=-0.032
+[2026-05-31 13:21:32]     must_verb: cos(O,R)=-0.996
+[2026-05-31 13:21:32]     must_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     can_adj: cos(O,R)=+0.022
+[2026-05-31 13:21:32]     can_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     can_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     should_adj: cos(O,R)=+0.006
+[2026-05-31 13:21:32]     should_verb: cos(O,R)=-0.996
+[2026-05-31 13:21:32]     should_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     never_adj: cos(O,R)=-0.172
+[2026-05-31 13:21:32]     never_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     never_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]   Layer 14:
+[2026-05-31 13:21:32]     not_adj: cos(O,R)=-0.138
+[2026-05-31 13:21:32]     not_verb: cos(O,R)=-0.998
+[2026-05-31 13:21:32]     not_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     maybe_adj: cos(O,R)=-0.133
+[2026-05-31 13:21:32]     maybe_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     maybe_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     must_adj: cos(O,R)=-0.069
+[2026-05-31 13:21:32]     must_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     must_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     can_adj: cos(O,R)=-0.191
+[2026-05-31 13:21:32]     can_verb: cos(O,R)=-0.998
+[2026-05-31 13:21:32]     can_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     should_adj: cos(O,R)=-0.056
+[2026-05-31 13:21:32]     should_verb: cos(O,R)=-0.997
+[2026-05-31 13:21:32]     should_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     never_adj: cos(O,R)=-0.108
+[2026-05-31 13:21:32]     never_verb: cos(O,R)=-0.998
+[2026-05-31 13:21:32]     never_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]   Layer 21:
+[2026-05-31 13:21:32]     not_adj: cos(O,R)=+0.050
+[2026-05-31 13:21:32]     not_verb: cos(O,R)=-0.992
+[2026-05-31 13:21:32]     not_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     maybe_adj: cos(O,R)=-0.010
+[2026-05-31 13:21:32]     maybe_verb: cos(O,R)=-0.991
+[2026-05-31 13:21:32]     maybe_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     must_adj: cos(O,R)=-0.020
+[2026-05-31 13:21:32]     must_verb: cos(O,R)=-0.991
+[2026-05-31 13:21:32]     must_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     can_adj: cos(O,R)=-0.112
+[2026-05-31 13:21:32]     can_verb: cos(O,R)=-0.993
+[2026-05-31 13:21:32]     can_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     should_adj: cos(O,R)=+0.050
+[2026-05-31 13:21:32]     should_verb: cos(O,R)=-0.991
+[2026-05-31 13:21:32]     should_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     never_adj: cos(O,R)=-0.046
+[2026-05-31 13:21:32]     never_verb: cos(O,R)=-0.991
+[2026-05-31 13:21:32]     never_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]   Layer 26:
+[2026-05-31 13:21:32]     not_adj: cos(O,R)=-0.048
+[2026-05-31 13:21:32]     not_verb: cos(O,R)=-0.962
+[2026-05-31 13:21:32]     not_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     maybe_adj: cos(O,R)=+0.006
+[2026-05-31 13:21:32]     maybe_verb: cos(O,R)=-0.967
+[2026-05-31 13:21:32]     maybe_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     must_adj: cos(O,R)=-0.066
+[2026-05-31 13:21:32]     must_verb: cos(O,R)=-0.968
+[2026-05-31 13:21:32]     must_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     can_adj: cos(O,R)=-0.060
+[2026-05-31 13:21:32]     can_verb: cos(O,R)=-0.969
+[2026-05-31 13:21:32]     can_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     should_adj: cos(O,R)=-0.012
+[2026-05-31 13:21:32]     should_verb: cos(O,R)=-0.968
+[2026-05-31 13:21:32]     should_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32]     never_adj: cos(O,R)=-0.027
+[2026-05-31 13:21:32]     never_verb: cos(O,R)=-0.961
+[2026-05-31 13:21:32]     never_noun: cos(O,R)=+0.000
+[2026-05-31 13:21:32] 
+--- Cross-Operator Similarity ---
+[2026-05-31 13:21:32]   Layer 7:
+[2026-05-31 13:21:32]     can vs maybe: avg_cos=+0.533
+[2026-05-31 13:21:32]     can vs must: avg_cos=+0.511
+[2026-05-31 13:21:32]     can vs never: avg_cos=+0.411
+[2026-05-31 13:21:32]     can vs not: avg_cos=+0.394
+[2026-05-31 13:21:32]     can vs should: avg_cos=+0.507
+[2026-05-31 13:21:32]     maybe vs must: avg_cos=+0.520
+[2026-05-31 13:21:32]     maybe vs never: avg_cos=+0.432
+[2026-05-31 13:21:32]     maybe vs not: avg_cos=+0.420
+[2026-05-31 13:21:32]     maybe vs should: avg_cos=+0.527
+[2026-05-31 13:21:32]     must vs never: avg_cos=+0.439
+[2026-05-31 13:21:32]     must vs not: avg_cos=+0.437
+[2026-05-31 13:21:32]     must vs should: avg_cos=+0.619
+[2026-05-31 13:21:32]     never vs not: avg_cos=+0.560
+[2026-05-31 13:21:32]     never vs should: avg_cos=+0.410
+[2026-05-31 13:21:32]     not vs should: avg_cos=+0.414
+[2026-05-31 13:21:32]   Layer 14:
+[2026-05-31 13:21:32]     can vs maybe: avg_cos=+0.579
+[2026-05-31 13:21:32]     can vs must: avg_cos=+0.520
+[2026-05-31 13:21:32]     can vs never: avg_cos=+0.419
+[2026-05-31 13:21:32]     can vs not: avg_cos=+0.416
+[2026-05-31 13:21:32]     can vs should: avg_cos=+0.523
+[2026-05-31 13:21:32]     maybe vs must: avg_cos=+0.527
+[2026-05-31 13:21:32]     maybe vs never: avg_cos=+0.419
+[2026-05-31 13:21:32]     maybe vs not: avg_cos=+0.427
+[2026-05-31 13:21:32]     maybe vs should: avg_cos=+0.538
+[2026-05-31 13:21:32]     must vs never: avg_cos=+0.416
+[2026-05-31 13:21:32]     must vs not: avg_cos=+0.439
+[2026-05-31 13:21:32]     must vs should: avg_cos=+0.633
+[2026-05-31 13:21:32]     never vs not: avg_cos=+0.565
+[2026-05-31 13:21:32]     never vs should: avg_cos=+0.401
+[2026-05-31 13:21:32]     not vs should: avg_cos=+0.424
+[2026-05-31 13:21:32]   Layer 21:
+[2026-05-31 13:21:32]     can vs maybe: avg_cos=+0.570
+[2026-05-31 13:21:32]     can vs must: avg_cos=+0.514
+[2026-05-31 13:21:32]     can vs never: avg_cos=+0.419
+[2026-05-31 13:21:32]     can vs not: avg_cos=+0.402
+[2026-05-31 13:21:32]     can vs should: avg_cos=+0.522
+[2026-05-31 13:21:32]     maybe vs must: avg_cos=+0.530
+[2026-05-31 13:21:32]     maybe vs never: avg_cos=+0.430
+[2026-05-31 13:21:32]     maybe vs not: avg_cos=+0.423
+[2026-05-31 13:21:32]     maybe vs should: avg_cos=+0.545
+[2026-05-31 13:21:32]     must vs never: avg_cos=+0.422
+[2026-05-31 13:21:32]     must vs not: avg_cos=+0.429
+[2026-05-31 13:21:32]     must vs should: avg_cos=+0.633
+[2026-05-31 13:21:32]     never vs not: avg_cos=+0.574
+[2026-05-31 13:21:32]     never vs should: avg_cos=+0.400
+[2026-05-31 13:21:32]     not vs should: avg_cos=+0.409
+[2026-05-31 13:21:32]   Layer 26:
+[2026-05-31 13:21:32]     can vs maybe: avg_cos=+0.551
+[2026-05-31 13:21:32]     can vs must: avg_cos=+0.510
+[2026-05-31 13:21:32]     can vs never: avg_cos=+0.403
+[2026-05-31 13:21:32]     can vs not: avg_cos=+0.394
+[2026-05-31 13:21:32]     can vs should: avg_cos=+0.520
+[2026-05-31 13:21:32]     maybe vs must: avg_cos=+0.502
+[2026-05-31 13:21:32]     maybe vs never: avg_cos=+0.408
+[2026-05-31 13:21:32]     maybe vs not: avg_cos=+0.402
+[2026-05-31 13:21:32]     maybe vs should: avg_cos=+0.517
+[2026-05-31 13:21:32]     must vs never: avg_cos=+0.410
+[2026-05-31 13:21:32]     must vs not: avg_cos=+0.417
+[2026-05-31 13:21:32]     must vs should: avg_cos=+0.628
+[2026-05-31 13:21:32]     never vs not: avg_cos=+0.583
+[2026-05-31 13:21:32]     never vs should: avg_cos=+0.383
+[2026-05-31 13:21:32]     not vs should: avg_cos=+0.390
+[2026-05-31 13:21:32] 
+--- LOO Consistency ---
+[2026-05-31 13:21:32]   Layer 7:
+[2026-05-31 13:21:32]     not/adj: LOO=0.768
+[2026-05-31 13:21:32]     not/verb: LOO=0.694
+[2026-05-31 13:21:32]     not/noun: LOO=0.000
+[2026-05-31 13:21:32]     maybe/adj: LOO=0.812
+[2026-05-31 13:21:32]     maybe/verb: LOO=0.733
+[2026-05-31 13:21:32]     maybe/noun: LOO=0.000
+[2026-05-31 13:21:32]     must/adj: LOO=0.798
+[2026-05-31 13:21:32]     must/verb: LOO=0.725
+[2026-05-31 13:21:32]     must/noun: LOO=0.000
+[2026-05-31 13:21:32]     can/adj: LOO=0.809
+[2026-05-31 13:21:32]     can/verb: LOO=0.681
+[2026-05-31 13:21:32]     can/noun: LOO=0.000
+[2026-05-31 13:21:32]     should/adj: LOO=0.792
+[2026-05-31 13:21:32]     should/verb: LOO=0.732
+[2026-05-31 13:21:32]     should/noun: LOO=0.000
+[2026-05-31 13:21:32]     never/adj: LOO=0.789
+[2026-05-31 13:21:32]     never/verb: LOO=0.714
+[2026-05-31 13:21:32]     never/noun: LOO=0.000
+[2026-05-31 13:21:32]   Layer 14:
+[2026-05-31 13:21:32]     not/adj: LOO=0.622
+[2026-05-31 13:21:32]     not/verb: LOO=0.659
+[2026-05-31 13:21:32]     not/noun: LOO=0.000
+[2026-05-31 13:21:32]     maybe/adj: LOO=0.645
+[2026-05-31 13:21:32]     maybe/verb: LOO=0.657
+[2026-05-31 13:21:32]     maybe/noun: LOO=0.000
+[2026-05-31 13:21:32]     must/adj: LOO=0.635
+[2026-05-31 13:21:32]     must/verb: LOO=0.642
+[2026-05-31 13:21:32]     must/noun: LOO=0.000
+[2026-05-31 13:21:32]     can/adj: LOO=0.643
+[2026-05-31 13:21:32]     can/verb: LOO=0.651
+[2026-05-31 13:21:32]     can/noun: LOO=0.000
+[2026-05-31 13:21:32]     should/adj: LOO=0.618
+[2026-05-31 13:21:32]     should/verb: LOO=0.655
+[2026-05-31 13:21:32]     should/noun: LOO=0.000
+[2026-05-31 13:21:32]     never/adj: LOO=0.684
+[2026-05-31 13:21:32]     never/verb: LOO=0.680
+[2026-05-31 13:21:32]     never/noun: LOO=0.000
+[2026-05-31 13:21:32]   Layer 21:
+[2026-05-31 13:21:32]     not/adj: LOO=0.630
+[2026-05-31 13:21:32]     not/verb: LOO=0.612
+[2026-05-31 13:21:32]     not/noun: LOO=0.000
+[2026-05-31 13:21:32]     maybe/adj: LOO=0.663
+[2026-05-31 13:21:32]     maybe/verb: LOO=0.641
+[2026-05-31 13:21:32]     maybe/noun: LOO=0.000
+[2026-05-31 13:21:32]     must/adj: LOO=0.642
+[2026-05-31 13:21:32]     must/verb: LOO=0.651
+[2026-05-31 13:21:32]     must/noun: LOO=0.000
+[2026-05-31 13:21:32]     can/adj: LOO=0.652
+[2026-05-31 13:21:32]     can/verb: LOO=0.635
+[2026-05-31 13:21:32]     can/noun: LOO=0.000
+[2026-05-31 13:21:32]     should/adj: LOO=0.638
+[2026-05-31 13:21:32]     should/verb: LOO=0.665
+[2026-05-31 13:21:32]     should/noun: LOO=0.000
+[2026-05-31 13:21:32]     never/adj: LOO=0.679
+[2026-05-31 13:21:32]     never/verb: LOO=0.652
+[2026-05-31 13:21:32]     never/noun: LOO=0.000
+[2026-05-31 13:21:32]   Layer 26:
+[2026-05-31 13:21:32]     not/adj: LOO=0.587
+[2026-05-31 13:21:32]     not/verb: LOO=0.562
+[2026-05-31 13:21:32]     not/noun: LOO=0.000
+[2026-05-31 13:21:32]     maybe/adj: LOO=0.617
+[2026-05-31 13:21:32]     maybe/verb: LOO=0.597
+[2026-05-31 13:21:32]     maybe/noun: LOO=0.000
+[2026-05-31 13:21:32]     must/adj: LOO=0.559
+[2026-05-31 13:21:32]     must/verb: LOO=0.591
+[2026-05-31 13:21:32]     must/noun: LOO=0.000
+[2026-05-31 13:21:32]     can/adj: LOO=0.587
+[2026-05-31 13:21:32]     can/verb: LOO=0.565
+[2026-05-31 13:21:32]     can/noun: LOO=0.000
+[2026-05-31 13:21:32]     should/adj: LOO=0.562
+[2026-05-31 13:21:32]     should/verb: LOO=0.602
+[2026-05-31 13:21:32]     should/noun: LOO=0.000
+[2026-05-31 13:21:32]     never/adj: LOO=0.627
+[2026-05-31 13:21:32]     never/verb: LOO=0.593
+[2026-05-31 13:21:32]     never/noun: LOO=0.000
+[2026-05-31 13:21:32] 
+--- Causal Test ---
+[2026-05-31 13:21:32]   Layer 7:
+[2026-05-31 13:21:32]     can: -0.1055
+[2026-05-31 13:21:32]     maybe: -0.0703
+[2026-05-31 13:21:32]     must: -0.0946
+[2026-05-31 13:21:32]     never: -0.1174
+[2026-05-31 13:21:32]     not: -0.1400
+[2026-05-31 13:21:32]   Layer 14:
+[2026-05-31 13:21:32]     can: +0.4021
+[2026-05-31 13:21:32]     maybe: +0.4039
+[2026-05-31 13:21:32]     must: +0.3046
+[2026-05-31 13:21:32]     never: +0.4688
+[2026-05-31 13:21:32]     not: +0.3641
+[2026-05-31 13:21:32]   Layer 21:
+[2026-05-31 13:21:32]     can: -0.2909
+[2026-05-31 13:21:32]     maybe: -0.3077
+[2026-05-31 13:21:32]     must: -0.3781
+[2026-05-31 13:21:32]     never: -0.2518
+[2026-05-31 13:21:32]     not: -0.2635
+[2026-05-31 13:21:32]   Layer 26:
+[2026-05-31 13:21:32]     can: +0.5023
+[2026-05-31 13:21:32]     maybe: +0.5630
+[2026-05-31 13:21:32]     must: +0.4910
+[2026-05-31 13:21:32]     never: +0.4725
+[2026-05-31 13:21:32]     not: +0.4283
+[2026-05-31 13:21:32] Phase 307 complete for deepseek7b

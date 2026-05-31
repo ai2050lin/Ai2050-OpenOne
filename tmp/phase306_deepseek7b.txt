@@ -1,0 +1,234 @@
+[2026-05-31 12:17:42] Phase 306: Normalized Construction PCA + Position/Norm Decomposition -- deepseek7b
+[2026-05-31 12:17:45] Loading deepseek7b (bf16 + device_map=auto + flash_attn)...
+[2026-05-31 12:17:46]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b
+[2026-05-31 12:17:58]   attn_implementation=sdpa succeeded
+[2026-05-31 12:17:58]   Loaded. GPU=9.0GB
+[2026-05-31 12:17:58]   n_layers=28, class=Qwen2ForCausalLM
+[2026-05-31 12:17:58]   Layer distribution: 0 GPU + 11 CPU (total 28)
+[2026-05-31 12:17:58]   n_layers=28, d_model=3584
+[2026-05-31 12:17:58]   Layer 0: accessible
+[2026-05-31 12:17:58]   Layer 14: accessible
+[2026-05-31 12:17:58]   Layer 26: accessible
+[2026-05-31 12:17:58]   Observation stimuli: 1520, Causal: 120, Position: 40
+[2026-05-31 12:17:58]   Dual-role tokens: 60
+[2026-05-31 12:17:58]   Unique sentences: 1552
+[2026-05-31 12:17:58] Capturing 1552 unique sentences...
+[2026-05-31 12:18:35]   50/1552 (1.3/s) ETA=1124s GPU=9.0GB
+[2026-05-31 12:19:05]   100/1552 (1.5/s) ETA=981s GPU=9.0GB
+[2026-05-31 12:19:36]   150/1552 (1.5/s) ETA=915s GPU=9.0GB
+[2026-05-31 12:20:06]   200/1552 (1.6/s) ETA=866s GPU=9.0GB
+[2026-05-31 12:20:36]   250/1552 (1.6/s) ETA=824s GPU=9.0GB
+[2026-05-31 12:21:06]   300/1552 (1.6/s) ETA=787s GPU=9.0GB
+[2026-05-31 12:21:37]   350/1552 (1.6/s) ETA=752s GPU=9.0GB
+[2026-05-31 12:22:07]   400/1552 (1.6/s) ETA=718s GPU=9.0GB
+[2026-05-31 12:22:37]   450/1552 (1.6/s) ETA=685s GPU=9.0GB
+[2026-05-31 12:23:08]   500/1552 (1.6/s) ETA=653s GPU=9.0GB
+[2026-05-31 12:23:38]   550/1552 (1.6/s) ETA=620s GPU=9.0GB
+[2026-05-31 12:24:09]   600/1552 (1.6/s) ETA=589s GPU=9.0GB
+[2026-05-31 12:24:39]   650/1552 (1.6/s) ETA=557s GPU=9.0GB
+[2026-05-31 12:25:10]   700/1552 (1.6/s) ETA=526s GPU=9.0GB
+[2026-05-31 12:25:40]   750/1552 (1.6/s) ETA=494s GPU=9.0GB
+[2026-05-31 12:26:10]   800/1552 (1.6/s) ETA=463s GPU=9.0GB
+[2026-05-31 12:26:41]   850/1552 (1.6/s) ETA=432s GPU=9.0GB
+[2026-05-31 12:27:11]   900/1552 (1.6/s) ETA=401s GPU=9.0GB
+[2026-05-31 12:27:41]   950/1552 (1.6/s) ETA=369s GPU=9.0GB
+[2026-05-31 12:28:11]   1000/1552 (1.6/s) ETA=339s GPU=9.0GB
+[2026-05-31 12:28:41]   1050/1552 (1.6/s) ETA=308s GPU=9.0GB
+[2026-05-31 12:29:11]   1100/1552 (1.6/s) ETA=277s GPU=9.0GB
+[2026-05-31 12:29:42]   1150/1552 (1.6/s) ETA=246s GPU=9.0GB
+[2026-05-31 12:30:12]   1200/1552 (1.6/s) ETA=215s GPU=9.0GB
+[2026-05-31 12:30:42]   1250/1552 (1.6/s) ETA=185s GPU=9.0GB
+[2026-05-31 12:31:13]   1300/1552 (1.6/s) ETA=154s GPU=9.0GB
+[2026-05-31 12:31:44]   1350/1552 (1.6/s) ETA=124s GPU=9.0GB
+[2026-05-31 12:32:14]   1400/1552 (1.6/s) ETA=93s GPU=9.0GB
+[2026-05-31 12:32:45]   1450/1552 (1.6/s) ETA=62s GPU=9.0GB
+[2026-05-31 12:33:15]   1500/1552 (1.6/s) ETA=32s GPU=9.0GB
+[2026-05-31 12:33:46]   1550/1552 (1.6/s) ETA=1s GPU=9.0GB
+[2026-05-31 12:33:47] Done capturing in 949s
+[2026-05-31 12:33:47]   Causal test pairs: 60 tokens
+[2026-05-31 12:33:47] Sample layers: [3, 7, 10, 14, 17, 21, 24, 26]
+[2026-05-31 12:33:47] 
+============================================================
+[2026-05-31 12:33:47] PART A: NORMALIZED VS RAW PCA COMPARISON
+[2026-05-31 12:33:47] ============================================================
+[2026-05-31 12:33:47] 
+--- Layer 3: Normalized PCA ---
+[2026-05-31 12:33:47]   [adj] Raw PC1=32.0%, Unit PC1=22.7%, Norm CV=0.272, cos(PC1,mean)=+0.085, corr(|PC1|,norm)=+0.948
+[2026-05-31 12:33:47]   [verb] Raw PC1=23.7%, Unit PC1=24.8%, Norm CV=0.213, cos(PC1,mean)=+0.049, corr(|PC1|,norm)=+0.539
+[2026-05-31 12:33:47]   [noun] Raw PC1=33.1%, Unit PC1=31.1%, Norm CV=0.206, cos(PC1,mean)=+0.028, corr(|PC1|,norm)=+0.815
+[2026-05-31 12:33:47] 
+--- Layer 7: Normalized PCA ---
+[2026-05-31 12:33:47]   [adj] Raw PC1=97.2%, Unit PC1=28.4%, Norm CV=1.951, cos(PC1,mean)=-0.410, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:47]   [verb] Raw PC1=99.0%, Unit PC1=43.5%, Norm CV=1.729, cos(PC1,mean)=-0.434, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:33:47]   [noun] Raw PC1=99.5%, Unit PC1=75.1%, Norm CV=1.106, cos(PC1,mean)=+0.704, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:33:47] 
+--- Layer 10: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=96.8%, Unit PC1=29.9%, Norm CV=1.861, cos(PC1,mean)=-0.587, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:48]   [verb] Raw PC1=98.7%, Unit PC1=43.4%, Norm CV=1.657, cos(PC1,mean)=-0.856, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:33:48]   [noun] Raw PC1=99.4%, Unit PC1=75.8%, Norm CV=1.071, cos(PC1,mean)=+0.715, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:33:48] 
+--- Layer 14: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=98.0%, Unit PC1=32.3%, Norm CV=1.839, cos(PC1,mean)=-0.528, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:48]   [verb] Raw PC1=99.0%, Unit PC1=45.2%, Norm CV=1.593, cos(PC1,mean)=+0.497, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:33:48]   [noun] Raw PC1=99.5%, Unit PC1=79.6%, Norm CV=0.977, cos(PC1,mean)=+0.750, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:33:48] 
+--- Layer 17: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=97.4%, Unit PC1=31.4%, Norm CV=1.772, cos(PC1,mean)=+0.638, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:48]   [verb] Raw PC1=98.8%, Unit PC1=44.5%, Norm CV=1.564, cos(PC1,mean)=-0.408, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:33:48]   [noun] Raw PC1=99.4%, Unit PC1=78.8%, Norm CV=0.967, cos(PC1,mean)=+0.598, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:33:48] 
+--- Layer 21: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=93.6%, Unit PC1=24.6%, Norm CV=1.634, cos(PC1,mean)=+0.132, corr(|PC1|,norm)=+0.994
+[2026-05-31 12:33:48]   [verb] Raw PC1=97.4%, Unit PC1=39.8%, Norm CV=1.524, cos(PC1,mean)=-0.098, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:48]   [noun] Raw PC1=98.8%, Unit PC1=72.7%, Norm CV=1.015, cos(PC1,mean)=-0.933, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:33:48] 
+--- Layer 24: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=84.0%, Unit PC1=19.4%, Norm CV=1.306, cos(PC1,mean)=-0.733, corr(|PC1|,norm)=+0.987
+[2026-05-31 12:33:48]   [verb] Raw PC1=93.7%, Unit PC1=34.8%, Norm CV=1.376, cos(PC1,mean)=+0.530, corr(|PC1|,norm)=+0.996
+[2026-05-31 12:33:48]   [noun] Raw PC1=96.7%, Unit PC1=63.4%, Norm CV=0.986, cos(PC1,mean)=+0.256, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:33:48] 
+--- Layer 26: Normalized PCA ---
+[2026-05-31 12:33:48]   [adj] Raw PC1=73.0%, Unit PC1=16.2%, Norm CV=1.062, cos(PC1,mean)=-0.654, corr(|PC1|,norm)=+0.976
+[2026-05-31 12:33:48]   [verb] Raw PC1=88.8%, Unit PC1=29.6%, Norm CV=1.223, cos(PC1,mean)=+0.160, corr(|PC1|,norm)=+0.993
+[2026-05-31 12:33:48]   [noun] Raw PC1=94.0%, Unit PC1=56.8%, Norm CV=0.931, cos(PC1,mean)=-0.884, corr(|PC1|,norm)=+0.997
+[2026-05-31 12:33:48] 
+============================================================
+[2026-05-31 12:33:48] PART B: POSITION DIRECTION + R/C/P/N DECOMPOSITION
+[2026-05-31 12:33:48] ============================================================
+[2026-05-31 12:33:48] 
+--- Layer 3: R/C/P/N Decomposition ---
+[2026-05-31 12:33:48]   Position direction: 10 tokens, norm=33.04
+[2026-05-31 12:33:49]   Energy budget: C=32.3%, P=8.1%, N=2.6%, U=72.1%
+[2026-05-31 12:33:49] 
+--- Layer 7: R/C/P/N Decomposition ---
+[2026-05-31 12:33:49]   Position direction: 10 tokens, norm=256.28
+[2026-05-31 12:33:49]   Energy budget: C=79.4%, P=65.6%, N=65.5%, U=87.1%
+[2026-05-31 12:33:49] 
+--- Layer 10: R/C/P/N Decomposition ---
+[2026-05-31 12:33:49]   Position direction: 10 tokens, norm=328.93
+[2026-05-31 12:33:50]   Energy budget: C=74.8%, P=62.9%, N=63.4%, U=89.1%
+[2026-05-31 12:33:50] 
+--- Layer 14: R/C/P/N Decomposition ---
+[2026-05-31 12:33:50]   Position direction: 10 tokens, norm=529.91
+[2026-05-31 12:33:51]   Energy budget: C=84.1%, P=75.5%, N=74.2%, U=92.0%
+[2026-05-31 12:33:51] 
+--- Layer 17: R/C/P/N Decomposition ---
+[2026-05-31 12:33:51]   Position direction: 10 tokens, norm=546.47
+[2026-05-31 12:33:51]   Energy budget: C=82.8%, P=71.9%, N=69.3%, U=89.9%
+[2026-05-31 12:33:51] 
+--- Layer 21: R/C/P/N Decomposition ---
+[2026-05-31 12:33:51]   Position direction: 10 tokens, norm=439.07
+[2026-05-31 12:33:52]   Energy budget: C=72.6%, P=52.1%, N=49.3%, U=80.5%
+[2026-05-31 12:33:52] 
+--- Layer 24: R/C/P/N Decomposition ---
+[2026-05-31 12:33:52]   Position direction: 10 tokens, norm=387.42
+[2026-05-31 12:33:53]   Energy budget: C=59.5%, P=31.6%, N=29.7%, U=71.7%
+[2026-05-31 12:33:53] 
+--- Layer 26: R/C/P/N Decomposition ---
+[2026-05-31 12:33:53]   Position direction: 10 tokens, norm=393.79
+[2026-05-31 12:33:53]   Energy budget: C=51.9%, P=24.3%, N=20.4%, U=70.8%
+[2026-05-31 12:33:53] 
+============================================================
+[2026-05-31 12:33:53] PART C: O(not) ORTHOGONALITY CHECK (Phase 305 data)
+[2026-05-31 12:33:53] ============================================================
+[2026-05-31 12:33:54]   Phase 305 data loaded: 8 layers
+[2026-05-31 12:33:54] 
+============================================================
+[2026-05-31 12:33:54] PART D: CAUSAL TEST WITH NORMALIZED C + POSITION
+[2026-05-31 12:33:54] ============================================================
+[2026-05-31 12:33:54] 
+--- Layer 3: Causal test ---
+[2026-05-31 12:33:54]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:37:00]   R_only=+0.0343, C_raw=+0.0757, C_unit=-0.0813, P_only=-0.1573, FD=-0.1256
+[2026-05-31 12:37:00] 
+--- Layer 7: Causal test ---
+[2026-05-31 12:37:00]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:40:05]   R_only=+0.3456, C_raw=-0.1288, C_unit=-0.2429, P_only=-0.4368, FD=+0.7183
+[2026-05-31 12:40:05] 
+--- Layer 10: Causal test ---
+[2026-05-31 12:40:05]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:43:10]   R_only=+0.3653, C_raw=-0.2564, C_unit=-0.4130, P_only=-0.3690, FD=+0.8541
+[2026-05-31 12:43:10] 
+--- Layer 14: Causal test ---
+[2026-05-31 12:43:10]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:46:14]   R_only=+0.4700, C_raw=-0.7395, C_unit=-0.7760, P_only=-1.0178, FD=+1.0550
+[2026-05-31 12:46:14] 
+--- Layer 17: Causal test ---
+[2026-05-31 12:46:14]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:49:20]   R_only=-0.0370, C_raw=-0.8753, C_unit=-0.8614, P_only=-0.9420, FD=+0.6271
+[2026-05-31 12:49:20] 
+--- Layer 21: Causal test ---
+[2026-05-31 12:49:20]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:52:26]   R_only=+0.0150, C_raw=-0.9939, C_unit=-0.9386, P_only=-1.1272, FD=+0.9456
+[2026-05-31 12:52:26] 
+--- Layer 24: Causal test ---
+[2026-05-31 12:52:26]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:55:35]   R_only=-0.0323, C_raw=-1.3628, C_unit=-1.3836, P_only=-1.8052, FD=+0.9415
+[2026-05-31 12:55:35] 
+--- Layer 26: Causal test ---
+[2026-05-31 12:55:35]   W_U extraction failed: Cannot copy out of meta tensor; no data!
+[2026-05-31 12:58:42]   R_only=-0.5465, C_raw=+0.3173, C_unit=+0.3777, P_only=-0.2077, FD=-0.6853
+[2026-05-31 12:58:42] 
+Saving results...
+[2026-05-31 12:58:43]   Saved to results\phase306_norm_position\deepseek7b_norm_position.json
+[2026-05-31 12:58:43] 
+============================================================
+[2026-05-31 12:58:43] SUMMARY: Phase 306 -- deepseek7b
+[2026-05-31 12:58:43] ============================================================
+[2026-05-31 12:58:43] 
+--- Normalized PCA comparison ---
+[2026-05-31 12:58:43]   Layer 3:
+[2026-05-31 12:58:43]     adj: Raw PC1=32.0%, Unit PC1=22.7%, Norm CV=0.272, cos(PC1,mean)=+0.085, corr(|PC1|,norm)=+0.948
+[2026-05-31 12:58:43]     verb: Raw PC1=23.7%, Unit PC1=24.8%, Norm CV=0.213, cos(PC1,mean)=+0.049, corr(|PC1|,norm)=+0.539
+[2026-05-31 12:58:43]     noun: Raw PC1=33.1%, Unit PC1=31.1%, Norm CV=0.206, cos(PC1,mean)=+0.028, corr(|PC1|,norm)=+0.815
+[2026-05-31 12:58:43]   Layer 7:
+[2026-05-31 12:58:43]     adj: Raw PC1=97.2%, Unit PC1=28.4%, Norm CV=1.951, cos(PC1,mean)=-0.410, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]     verb: Raw PC1=99.0%, Unit PC1=43.5%, Norm CV=1.729, cos(PC1,mean)=-0.434, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:58:43]     noun: Raw PC1=99.5%, Unit PC1=75.1%, Norm CV=1.106, cos(PC1,mean)=+0.704, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:58:43]   Layer 10:
+[2026-05-31 12:58:43]     adj: Raw PC1=96.8%, Unit PC1=29.9%, Norm CV=1.861, cos(PC1,mean)=-0.587, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]     verb: Raw PC1=98.7%, Unit PC1=43.4%, Norm CV=1.657, cos(PC1,mean)=-0.856, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:58:43]     noun: Raw PC1=99.4%, Unit PC1=75.8%, Norm CV=1.071, cos(PC1,mean)=+0.715, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:58:43]   Layer 14:
+[2026-05-31 12:58:43]     adj: Raw PC1=98.0%, Unit PC1=32.3%, Norm CV=1.839, cos(PC1,mean)=-0.528, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]     verb: Raw PC1=99.0%, Unit PC1=45.2%, Norm CV=1.593, cos(PC1,mean)=+0.497, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:58:43]     noun: Raw PC1=99.5%, Unit PC1=79.6%, Norm CV=0.977, cos(PC1,mean)=+0.750, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:58:43]   Layer 17:
+[2026-05-31 12:58:43]     adj: Raw PC1=97.4%, Unit PC1=31.4%, Norm CV=1.772, cos(PC1,mean)=+0.638, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]     verb: Raw PC1=98.8%, Unit PC1=44.5%, Norm CV=1.564, cos(PC1,mean)=-0.408, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:58:43]     noun: Raw PC1=99.4%, Unit PC1=78.8%, Norm CV=0.967, cos(PC1,mean)=+0.598, corr(|PC1|,norm)=+1.000
+[2026-05-31 12:58:43]   Layer 21:
+[2026-05-31 12:58:43]     adj: Raw PC1=93.6%, Unit PC1=24.6%, Norm CV=1.634, cos(PC1,mean)=+0.132, corr(|PC1|,norm)=+0.994
+[2026-05-31 12:58:43]     verb: Raw PC1=97.4%, Unit PC1=39.8%, Norm CV=1.524, cos(PC1,mean)=-0.098, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]     noun: Raw PC1=98.8%, Unit PC1=72.7%, Norm CV=1.015, cos(PC1,mean)=-0.933, corr(|PC1|,norm)=+0.999
+[2026-05-31 12:58:43]   Layer 24:
+[2026-05-31 12:58:43]     adj: Raw PC1=84.0%, Unit PC1=19.4%, Norm CV=1.306, cos(PC1,mean)=-0.733, corr(|PC1|,norm)=+0.987
+[2026-05-31 12:58:43]     verb: Raw PC1=93.7%, Unit PC1=34.8%, Norm CV=1.376, cos(PC1,mean)=+0.530, corr(|PC1|,norm)=+0.996
+[2026-05-31 12:58:43]     noun: Raw PC1=96.7%, Unit PC1=63.4%, Norm CV=0.986, cos(PC1,mean)=+0.256, corr(|PC1|,norm)=+0.998
+[2026-05-31 12:58:43]   Layer 26:
+[2026-05-31 12:58:43]     adj: Raw PC1=73.0%, Unit PC1=16.2%, Norm CV=1.062, cos(PC1,mean)=-0.654, corr(|PC1|,norm)=+0.976
+[2026-05-31 12:58:43]     verb: Raw PC1=88.8%, Unit PC1=29.6%, Norm CV=1.223, cos(PC1,mean)=+0.160, corr(|PC1|,norm)=+0.993
+[2026-05-31 12:58:43]     noun: Raw PC1=94.0%, Unit PC1=56.8%, Norm CV=0.931, cos(PC1,mean)=-0.884, corr(|PC1|,norm)=+0.997
+[2026-05-31 12:58:43] 
+--- R/C/P/N energy budget ---
+[2026-05-31 12:58:43]   Layer 3: C=32.3%, P=8.1%, N=2.6%, U=72.1%
+[2026-05-31 12:58:43]   Layer 7: C=79.4%, P=65.6%, N=65.5%, U=87.1%
+[2026-05-31 12:58:43]   Layer 10: C=74.8%, P=62.9%, N=63.4%, U=89.1%
+[2026-05-31 12:58:43]   Layer 14: C=84.1%, P=75.5%, N=74.2%, U=92.0%
+[2026-05-31 12:58:43]   Layer 17: C=82.8%, P=71.9%, N=69.3%, U=89.9%
+[2026-05-31 12:58:43]   Layer 21: C=72.6%, P=52.1%, N=49.3%, U=80.5%
+[2026-05-31 12:58:43]   Layer 24: C=59.5%, P=31.6%, N=29.7%, U=71.7%
+[2026-05-31 12:58:43]   Layer 26: C=51.9%, P=24.3%, N=20.4%, U=70.8%
+[2026-05-31 12:58:43] 
+--- O(not) orthogonality with C ---
+[2026-05-31 12:58:43] 
+--- Causal test summary ---
+[2026-05-31 12:58:43]   Layer 3: R=+0.0343, C_raw=+0.0757, C_unit=-0.0813, P=-0.1573, FD=-0.1256
+[2026-05-31 12:58:43]   Layer 7: R=+0.3456, C_raw=-0.1288, C_unit=-0.2429, P=-0.4368, FD=+0.7183
+[2026-05-31 12:58:43]   Layer 10: R=+0.3653, C_raw=-0.2564, C_unit=-0.4130, P=-0.3690, FD=+0.8541
+[2026-05-31 12:58:43]   Layer 14: R=+0.4700, C_raw=-0.7395, C_unit=-0.7760, P=-1.0178, FD=+1.0550
+[2026-05-31 12:58:43]   Layer 17: R=-0.0370, C_raw=-0.8753, C_unit=-0.8614, P=-0.9420, FD=+0.6271
+[2026-05-31 12:58:43]   Layer 21: R=+0.0150, C_raw=-0.9939, C_unit=-0.9386, P=-1.1272, FD=+0.9456
+[2026-05-31 12:58:43]   Layer 24: R=-0.0323, C_raw=-1.3628, C_unit=-1.3836, P=-1.8052, FD=+0.9415
+[2026-05-31 12:58:43]   Layer 26: R=-0.5465, C_raw=+0.3173, C_unit=+0.3777, P=-0.2077, FD=-0.6853
+[2026-05-31 12:58:44] Phase 306 complete for deepseek7b

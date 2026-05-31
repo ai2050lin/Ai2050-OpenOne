@@ -1,0 +1,42 @@
+[2026-05-31 18:38:06] === Phase 315: Context Activation + Causal Relation for glm4 ===
+[2026-05-31 18:38:08] Loading glm4 (bf16 + device_map=auto + sdpa)...
+[2026-05-31 18:38:18] Model loaded: GlmForCausalLM, device=cuda:0, GPU=8.99GB
+[2026-05-31 18:38:18] Layer allocation: GPU=0, CPU=24 components
+[2026-05-31 18:38:18] Model: n_layers=40, d_model=4096
+[2026-05-31 18:38:18] ============================================================
+[2026-05-31 18:38:18] PART A: Context Activation Test
+[2026-05-31 18:38:18] ============================================================
+[2026-05-31 18:38:18] Test layers: [2, 6, 12, 18, 24, 30, 36, 38]
+[2026-05-31 18:38:18] 
+--- Relation type: attribute ---
+[2026-05-31 18:40:49]   L2: static=0.035(r=0.98) attribute_probe=0.037(r=0.91) attribute_fill=0.007(r=5.01) random=0.034
+[2026-05-31 18:43:12]   L6: static=0.171(r=0.97) attribute_probe=0.085(r=1.96) attribute_fill=0.028(r=5.99) random=0.166
+[2026-05-31 18:45:39]   L12: static=0.267(r=1.11) attribute_probe=0.184(r=1.61) attribute_fill=0.085(r=3.49) random=0.296
+[2026-05-31 18:48:04]   L18: static=0.173(r=0.99) attribute_probe=0.126(r=1.35) attribute_fill=0.106(r=1.61) random=0.170
+[2026-05-31 18:50:32]   L24: static=0.112(r=0.99) attribute_probe=0.118(r=0.94) attribute_fill=0.110(r=1.01) random=0.110
+[2026-05-31 18:53:04]   L30: static=0.080(r=1.15) attribute_probe=0.128(r=0.71) attribute_fill=0.116(r=0.78) random=0.091
+[2026-05-31 18:55:33]   L36: static=0.049(r=1.23) attribute_probe=0.107(r=0.56) attribute_fill=0.094(r=0.64) random=0.060
+[2026-05-31 18:58:02]   L38: static=0.039(r=1.20) attribute_probe=0.072(r=0.65) attribute_fill=0.066(r=0.71) random=0.047
+[2026-05-31 18:58:02] 
+--- Relation type: function ---
+[2026-05-31 19:00:30]   L2: static=0.032(r=1.07) function_probe=0.138(r=0.24) function_fill=0.020(r=1.69) random=0.034
+[2026-05-31 19:03:01]   L6: static=0.172(r=0.96) function_probe=0.413(r=0.40) function_fill=0.119(r=1.39) random=0.166
+[2026-05-31 19:05:33]   L12: static=0.286(r=1.03) function_probe=0.483(r=0.61) function_fill=0.310(r=0.96) random=0.296
+[2026-05-31 19:08:01]   L18: static=0.202(r=0.85) function_probe=0.332(r=0.51) function_fill=0.244(r=0.70) random=0.170
+[2026-05-31 19:10:30]   L24: static=0.126(r=0.87) function_probe=0.308(r=0.36) function_fill=0.231(r=0.48) random=0.110
+[2026-05-31 19:13:00]   L30: static=0.086(r=1.06) function_probe=0.264(r=0.34) function_fill=0.190(r=0.48) random=0.091
+[2026-05-31 19:15:33]   L36: static=0.050(r=1.20) function_probe=0.177(r=0.34) function_fill=0.135(r=0.45) random=0.060
+[2026-05-31 19:18:04]   L38: static=0.039(r=1.21) function_probe=0.116(r=0.40) function_fill=0.098(r=0.48) random=0.047
+[2026-05-31 19:18:04] 
+--- Relation type: same_class ---
+[2026-05-31 19:19:30]   L2: static=0.017(r=2.04) category_probe=0.007(r=4.89) random=0.034
+[2026-05-31 19:20:54]   L6: static=0.072(r=2.29) category_probe=0.012(r=14.00) random=0.166
+[2026-05-31 19:22:18]   L12: static=0.134(r=2.21) category_probe=0.038(r=7.85) random=0.296
+[2026-05-31 19:23:42]   L18: static=0.068(r=2.50) category_probe=0.035(r=4.84) random=0.170
+[2026-05-31 19:25:06]   L24: static=0.041(r=2.72) category_probe=0.030(r=3.72) random=0.110
+[2026-05-31 19:26:30]   L30: static=0.039(r=2.36) category_probe=0.021(r=4.25) random=0.091
+[2026-05-31 19:27:53]   L36: static=0.026(r=2.28) category_probe=0.018(r=3.42) random=0.060
+[2026-05-31 19:29:20]   L38: static=0.018(r=2.65) category_probe=0.014(r=3.36) random=0.047
+[2026-05-31 19:29:20] 
+--- Relation type: negation ---
+[2026-05-31 19:31:00]   L2: static_pos=0.371(r=0.09) static_neg=0.333(r=0.10) negation_probe=0.367(r=0.09) random=0.034

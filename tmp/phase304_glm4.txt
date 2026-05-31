@@ -1,0 +1,374 @@
+[2026-05-31 07:04:14] Phase 304: Construction Identification + Gap Decomposition -- glm4
+[2026-05-31 07:04:16] Loading glm4 (bf16 + device_map=auto + flash_attn)...
+[2026-05-31 07:04:17]   attn_implementation=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to b
+[2026-05-31 07:04:27]   attn_implementation=sdpa succeeded
+[2026-05-31 07:04:27]   Loaded. GPU=9.0GB
+[2026-05-31 07:04:27]   n_layers=40, class=GlmForCausalLM
+[2026-05-31 07:04:27]   Layer distribution: 0 GPU + 21 CPU (total 40)
+[2026-05-31 07:04:27]   n_layers=40, d_model=4096, class=GlmForCausalLM
+[2026-05-31 07:04:27]   Layer 0: accessible
+[2026-05-31 07:04:27]   Layer 20: accessible
+[2026-05-31 07:04:27]   Layer 38: accessible
+[2026-05-31 07:04:27]   Observation stimuli resolved: 1520, Causal test stimuli: 120
+[2026-05-31 07:04:27]   Dual-role tokens: 60
+[2026-05-31 07:04:27]     adj_noun: 20 tokens
+[2026-05-31 07:04:27]     adj_verb: 20 tokens
+[2026-05-31 07:04:27]     noun_verb: 20 tokens
+[2026-05-31 07:04:27]   Unique sentences: 1520
+[2026-05-31 07:04:27] Capturing 1520 unique sentences...
+[2026-05-31 07:05:30]   50/1520 (0.8/s) ETA=1832s GPU=9.0GB
+[2026-05-31 07:06:21]   100/1520 (0.9/s) ETA=1611s GPU=9.0GB
+[2026-05-31 07:07:12]   150/1520 (0.9/s) ETA=1503s GPU=9.0GB
+[2026-05-31 07:08:03]   200/1520 (0.9/s) ETA=1421s GPU=9.0GB
+[2026-05-31 07:08:54]   250/1520 (0.9/s) ETA=1354s GPU=9.0GB
+[2026-05-31 07:09:44]   300/1520 (0.9/s) ETA=1290s GPU=9.0GB
+[2026-05-31 07:10:35]   350/1520 (1.0/s) ETA=1229s GPU=9.0GB
+[2026-05-31 07:11:26]   400/1520 (1.0/s) ETA=1171s GPU=9.0GB
+[2026-05-31 07:12:16]   450/1520 (1.0/s) ETA=1115s GPU=9.0GB
+[2026-05-31 07:13:07]   500/1520 (1.0/s) ETA=1060s GPU=9.0GB
+[2026-05-31 07:13:58]   550/1520 (1.0/s) ETA=1007s GPU=9.0GB
+[2026-05-31 07:14:49]   600/1520 (1.0/s) ETA=954s GPU=9.0GB
+[2026-05-31 07:15:40]   650/1520 (1.0/s) ETA=900s GPU=9.0GB
+[2026-05-31 07:16:30]   700/1520 (1.0/s) ETA=847s GPU=9.0GB
+[2026-05-31 07:17:21]   750/1520 (1.0/s) ETA=794s GPU=9.0GB
+[2026-05-31 07:18:12]   800/1520 (1.0/s) ETA=742s GPU=9.0GB
+[2026-05-31 07:19:03]   850/1520 (1.0/s) ETA=690s GPU=9.0GB
+[2026-05-31 07:19:54]   900/1520 (1.0/s) ETA=638s GPU=9.0GB
+[2026-05-31 07:20:44]   950/1520 (1.0/s) ETA=586s GPU=9.0GB
+[2026-05-31 07:21:35]   1000/1520 (1.0/s) ETA=534s GPU=9.0GB
+[2026-05-31 07:22:28]   1050/1520 (1.0/s) ETA=484s GPU=9.0GB
+[2026-05-31 07:23:18]   1100/1520 (1.0/s) ETA=432s GPU=9.0GB
+[2026-05-31 07:24:10]   1150/1520 (1.0/s) ETA=381s GPU=9.0GB
+[2026-05-31 07:25:02]   1200/1520 (1.0/s) ETA=329s GPU=9.0GB
+[2026-05-31 07:25:53]   1250/1520 (1.0/s) ETA=278s GPU=9.0GB
+[2026-05-31 07:26:44]   1300/1520 (1.0/s) ETA=226s GPU=9.0GB
+[2026-05-31 07:27:35]   1350/1520 (1.0/s) ETA=175s GPU=9.0GB
+[2026-05-31 07:28:25]   1400/1520 (1.0/s) ETA=123s GPU=9.0GB
+[2026-05-31 07:29:16]   1450/1520 (1.0/s) ETA=72s GPU=9.0GB
+[2026-05-31 07:30:08]   1500/1520 (1.0/s) ETA=21s GPU=9.0GB
+[2026-05-31 07:30:29] Done capturing in 1562s
+[2026-05-31 07:30:29]   Causal test pairs: 60 tokens with both roles
+[2026-05-31 07:30:29] Sample layers: [5, 10, 15, 20, 25, 30, 35, 38]
+[2026-05-31 07:30:29] 
+============================================================
+[2026-05-31 07:30:29] PART A: WITHIN-ROLE FRAME PCA (CONSTRUCTION IDENTIFICATION)
+[2026-05-31 07:30:29] ============================================================
+[2026-05-31 07:30:29] 
+--- Layer 5: Within-role frame PCA ---
+[2026-05-31 07:30:29]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.22216327 0.11440482 0.06620864 0.047367   0.04198184]
+[2026-05-31 07:30:29]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.1637794  0.12170584 0.07961178 0.06865057 0.0445678 ]
+[2026-05-31 07:30:29]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.21033767 0.10431496 0.08885471 0.06248715 0.0496747 ]
+[2026-05-31 07:30:29]   Subspace angle adj vs noun: min=55.3° mean=77.8°
+[2026-05-31 07:30:29]   Subspace angle adj vs verb: min=55.2° mean=76.9°
+[2026-05-31 07:30:29]   Subspace angle noun vs verb: min=58.4° mean=79.1°
+[2026-05-31 07:30:30] 
+--- Layer 10: Within-role frame PCA ---
+[2026-05-31 07:30:30]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.21448368 0.09173407 0.0423513  0.03912156 0.03271361]
+[2026-05-31 07:30:30]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.14208953 0.11591329 0.06181388 0.05432684 0.03896105]
+[2026-05-31 07:30:30]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.15388753 0.08918447 0.06211489 0.04826407 0.04194931]
+[2026-05-31 07:30:30]   Subspace angle adj vs noun: min=48.8° mean=77.3°
+[2026-05-31 07:30:30]   Subspace angle adj vs verb: min=56.2° mean=76.7°
+[2026-05-31 07:30:30]   Subspace angle noun vs verb: min=56.9° mean=77.9°
+[2026-05-31 07:30:30] 
+--- Layer 15: Within-role frame PCA ---
+[2026-05-31 07:30:30]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.2198342  0.0676451  0.03121401 0.02989555 0.02322696]
+[2026-05-31 07:30:30]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.12390249 0.10737453 0.05715569 0.04451544 0.03363758]
+[2026-05-31 07:30:30]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.1406605  0.08029988 0.06588242 0.04814499 0.03522715]
+[2026-05-31 07:30:30]   Subspace angle adj vs noun: min=41.2° mean=74.8°
+[2026-05-31 07:30:30]   Subspace angle adj vs verb: min=51.9° mean=74.1°
+[2026-05-31 07:30:30]   Subspace angle noun vs verb: min=54.2° mean=77.1°
+[2026-05-31 07:30:31] 
+--- Layer 20: Within-role frame PCA ---
+[2026-05-31 07:30:31]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.22090429 0.08542045 0.04404373 0.03439181 0.02544723]
+[2026-05-31 07:30:31]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.12572786 0.10567887 0.06154726 0.04956238 0.03620289]
+[2026-05-31 07:30:31]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.13348918 0.08584259 0.05297598 0.04793676 0.03560241]
+[2026-05-31 07:30:31]   Subspace angle adj vs noun: min=42.5° mean=73.4°
+[2026-05-31 07:30:31]   Subspace angle adj vs verb: min=51.5° mean=71.4°
+[2026-05-31 07:30:31]   Subspace angle noun vs verb: min=58.0° mean=78.1°
+[2026-05-31 07:30:31] 
+--- Layer 25: Within-role frame PCA ---
+[2026-05-31 07:30:31]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.25156993 0.08460137 0.04603483 0.03438301 0.03341272]
+[2026-05-31 07:30:31]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.14011085 0.0895145  0.06749548 0.05578393 0.0432812 ]
+[2026-05-31 07:30:31]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.12892766 0.12448844 0.06673388 0.05035929 0.03630165]
+[2026-05-31 07:30:31]   Subspace angle adj vs noun: min=46.7° mean=74.3°
+[2026-05-31 07:30:31]   Subspace angle adj vs verb: min=46.9° mean=70.4°
+[2026-05-31 07:30:31]   Subspace angle noun vs verb: min=61.0° mean=77.3°
+[2026-05-31 07:30:32] 
+--- Layer 30: Within-role frame PCA ---
+[2026-05-31 07:30:32]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.21908334 0.07153406 0.04635311 0.02850749 0.02697658]
+[2026-05-31 07:30:32]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.12891835 0.06618254 0.04735424 0.0453388  0.03517577]
+[2026-05-31 07:30:32]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.10445707 0.08115476 0.04908905 0.03726833 0.03311112]
+[2026-05-31 07:30:32]   Subspace angle adj vs noun: min=58.4° mean=77.3°
+[2026-05-31 07:30:32]   Subspace angle adj vs verb: min=52.3° mean=72.4°
+[2026-05-31 07:30:32]   Subspace angle noun vs verb: min=63.2° mean=79.2°
+[2026-05-31 07:30:32] 
+--- Layer 35: Within-role frame PCA ---
+[2026-05-31 07:30:32]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.20153527 0.06067049 0.03790563 0.02887742 0.0251735 ]
+[2026-05-31 07:30:32]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.141405   0.05334332 0.04105125 0.03837684 0.03127045]
+[2026-05-31 07:30:32]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.09357724 0.06546982 0.04617761 0.03104788 0.02711862]
+[2026-05-31 07:30:32]   Subspace angle adj vs noun: min=49.5° mean=72.0°
+[2026-05-31 07:30:32]   Subspace angle adj vs verb: min=48.4° mean=72.1°
+[2026-05-31 07:30:32]   Subspace angle noun vs verb: min=50.0° mean=75.6°
+[2026-05-31 07:30:33] 
+--- Layer 38: Within-role frame PCA ---
+[2026-05-31 07:30:33]   Within-role PCA [adj]: 280 obs from 40 tokens, top-5 var ratio: [0.19296844 0.0721472  0.04145477 0.03143722 0.02573005]
+[2026-05-31 07:30:33]   Within-role PCA [verb]: 280 obs from 40 tokens, top-5 var ratio: [0.14906095 0.05798912 0.0413462  0.03505813 0.02972943]
+[2026-05-31 07:30:33]   Within-role PCA [noun]: 280 obs from 40 tokens, top-5 var ratio: [0.10803592 0.06101021 0.05584812 0.0295402  0.02528185]
+[2026-05-31 07:30:33]   Subspace angle adj vs noun: min=42.0° mean=69.7°
+[2026-05-31 07:30:33]   Subspace angle adj vs verb: min=44.2° mean=69.4°
+[2026-05-31 07:30:33]   Subspace angle noun vs verb: min=43.4° mean=74.1°
+[2026-05-31 07:30:33] 
+============================================================
+[2026-05-31 07:30:33] PART B: FACTORIAL DECOMPOSITION + GAP DECOMPOSITION
+[2026-05-31 07:30:33] ============================================================
+[2026-05-31 07:30:33] 
+--- Layer 5: Factorial + Gap ---
+[2026-05-31 07:32:06]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:33:38]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:35:11]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:36:43]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:38:15]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:39:47]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:39:47]   Layer 5: 60 test pairs completed
+[2026-05-31 07:39:47]     R_only_cos_shift: avg=+0.1332 pos=48/60
+[2026-05-31 07:39:47]     full_delta_cos_shift: avg=+0.1782 pos=54/60
+[2026-05-31 07:39:47]     Gap_only_cos_shift: avg=+0.0623 pos=43/60
+[2026-05-31 07:39:47]     C_only_cos_shift: avg=+0.0311 pos=39/60
+[2026-05-31 07:39:47]     R+C_cos_shift: avg=+0.1393 pos=52/60
+[2026-05-31 07:39:47]     avg_random_shift: avg=+0.0960 pos=48/60
+[2026-05-31 07:39:47]     Gap norm: 1.1280
+[2026-05-31 07:39:47]     C(construction) norm: 0.5812
+[2026-05-31 07:39:47]     U(unresolved) norm: 0.9554 (84.5%)
+[2026-05-31 07:39:47]     cos(Gap, R): -0.0611
+[2026-05-31 07:39:47]     cos(Gap, C): +0.5178
+[2026-05-31 07:39:47]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 07:39:47] 
+--- Layer 10: Factorial + Gap ---
+[2026-05-31 07:41:19]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:42:52]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:44:24]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:45:57]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:47:30]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:49:02]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:49:02]   Layer 10: 60 test pairs completed
+[2026-05-31 07:49:02]     R_only_cos_shift: avg=+0.2268 pos=55/60
+[2026-05-31 07:49:02]     full_delta_cos_shift: avg=+0.2836 pos=57/60
+[2026-05-31 07:49:02]     Gap_only_cos_shift: avg=+0.1882 pos=57/60
+[2026-05-31 07:49:02]     C_only_cos_shift: avg=+0.0826 pos=46/60
+[2026-05-31 07:49:02]     R+C_cos_shift: avg=+0.2643 pos=59/60
+[2026-05-31 07:49:02]     avg_random_shift: avg=+0.1175 pos=55/60
+[2026-05-31 07:49:02]     Gap norm: 2.6580
+[2026-05-31 07:49:02]     C(construction) norm: 1.3783
+[2026-05-31 07:49:02]     U(unresolved) norm: 2.2310 (84.1%)
+[2026-05-31 07:49:02]     cos(Gap, R): +0.0377
+[2026-05-31 07:49:02]     cos(Gap, C): +0.5142
+[2026-05-31 07:49:02]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 07:49:02] 
+--- Layer 15: Factorial + Gap ---
+[2026-05-31 07:50:36]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:52:10]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:53:43]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:55:17]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:56:50]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:58:24]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 07:58:24]   Layer 15: 60 test pairs completed
+[2026-05-31 07:58:24]     R_only_cos_shift: avg=+0.2337 pos=54/60
+[2026-05-31 07:58:24]     full_delta_cos_shift: avg=+0.2856 pos=57/60
+[2026-05-31 07:58:24]     Gap_only_cos_shift: avg=+0.1846 pos=53/60
+[2026-05-31 07:58:24]     C_only_cos_shift: avg=+0.0426 pos=38/60
+[2026-05-31 07:58:24]     R+C_cos_shift: avg=+0.2682 pos=59/60
+[2026-05-31 07:58:24]     avg_random_shift: avg=+0.1198 pos=54/60
+[2026-05-31 07:58:24]     Gap norm: 3.7532
+[2026-05-31 07:58:24]     C(construction) norm: 1.8178
+[2026-05-31 07:58:24]     U(unresolved) norm: 3.2441 (86.4%)
+[2026-05-31 07:58:24]     cos(Gap, R): +0.0506
+[2026-05-31 07:58:24]     cos(Gap, C): +0.4841
+[2026-05-31 07:58:24]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 07:58:24] 
+--- Layer 20: Factorial + Gap ---
+[2026-05-31 07:59:56]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:01:28]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:02:59]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:04:30]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:06:01]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:07:32]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:07:32]   Layer 20: 60 test pairs completed
+[2026-05-31 08:07:32]     R_only_cos_shift: avg=+0.2355 pos=56/60
+[2026-05-31 08:07:32]     full_delta_cos_shift: avg=+0.2763 pos=57/60
+[2026-05-31 08:07:32]     Gap_only_cos_shift: avg=+0.1808 pos=57/60
+[2026-05-31 08:07:32]     C_only_cos_shift: avg=+0.0068 pos=28/60
+[2026-05-31 08:07:32]     R+C_cos_shift: avg=+0.2386 pos=59/60
+[2026-05-31 08:07:32]     avg_random_shift: avg=+0.0940 pos=48/60
+[2026-05-31 08:07:32]     Gap norm: 5.8908
+[2026-05-31 08:07:32]     C(construction) norm: 2.8528
+[2026-05-31 08:07:32]     U(unresolved) norm: 5.0980 (86.5%)
+[2026-05-31 08:07:32]     cos(Gap, R): +0.0311
+[2026-05-31 08:07:32]     cos(Gap, C): +0.4839
+[2026-05-31 08:07:32]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 08:07:32] 
+--- Layer 25: Factorial + Gap ---
+[2026-05-31 08:09:03]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:10:34]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:12:05]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:13:32]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:14:59]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:16:26]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:16:26]   Layer 25: 60 test pairs completed
+[2026-05-31 08:16:26]     R_only_cos_shift: avg=+0.2381 pos=57/60
+[2026-05-31 08:16:26]     full_delta_cos_shift: avg=+0.2834 pos=59/60
+[2026-05-31 08:16:26]     Gap_only_cos_shift: avg=+0.1872 pos=55/60
+[2026-05-31 08:16:26]     C_only_cos_shift: avg=+0.0218 pos=33/60
+[2026-05-31 08:16:26]     R+C_cos_shift: avg=+0.2377 pos=58/60
+[2026-05-31 08:16:26]     avg_random_shift: avg=+0.0699 pos=49/60
+[2026-05-31 08:16:26]     Gap norm: 12.6993
+[2026-05-31 08:16:26]     C(construction) norm: 6.1170
+[2026-05-31 08:16:26]     U(unresolved) norm: 11.0415 (86.8%)
+[2026-05-31 08:16:26]     cos(Gap, R): +0.0676
+[2026-05-31 08:16:26]     cos(Gap, C): +0.4838
+[2026-05-31 08:16:26]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 08:16:26] 
+--- Layer 30: Factorial + Gap ---
+[2026-05-31 08:17:52]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:19:18]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:20:45]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:22:11]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:23:37]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:25:03]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:25:03]   Layer 30: 60 test pairs completed
+[2026-05-31 08:25:03]     R_only_cos_shift: avg=+0.2369 pos=55/60
+[2026-05-31 08:25:03]     full_delta_cos_shift: avg=+0.2714 pos=56/60
+[2026-05-31 08:25:03]     Gap_only_cos_shift: avg=+0.1850 pos=53/60
+[2026-05-31 08:25:03]     C_only_cos_shift: avg=+0.0193 pos=30/60
+[2026-05-31 08:25:03]     R+C_cos_shift: avg=+0.2356 pos=56/60
+[2026-05-31 08:25:03]     avg_random_shift: avg=+0.0849 pos=51/60
+[2026-05-31 08:25:03]     Gap norm: 24.5988
+[2026-05-31 08:25:03]     C(construction) norm: 9.2919
+[2026-05-31 08:25:03]     U(unresolved) norm: 22.6017 (91.8%)
+[2026-05-31 08:25:03]     cos(Gap, R): +0.0553
+[2026-05-31 08:25:03]     cos(Gap, C): +0.3807
+[2026-05-31 08:25:03]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 08:25:03] 
+--- Layer 35: Factorial + Gap ---
+[2026-05-31 08:26:29]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:27:55]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:29:21]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:30:47]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:32:13]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:33:40]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:33:40]   Layer 35: 60 test pairs completed
+[2026-05-31 08:33:40]     R_only_cos_shift: avg=+0.2171 pos=51/60
+[2026-05-31 08:33:40]     full_delta_cos_shift: avg=+0.2678 pos=56/60
+[2026-05-31 08:33:40]     Gap_only_cos_shift: avg=+0.1870 pos=52/60
+[2026-05-31 08:33:40]     C_only_cos_shift: avg=+0.0224 pos=32/60
+[2026-05-31 08:33:40]     R+C_cos_shift: avg=+0.2166 pos=54/60
+[2026-05-31 08:33:40]     avg_random_shift: avg=+0.0701 pos=49/60
+[2026-05-31 08:33:40]     Gap norm: 35.5587
+[2026-05-31 08:33:40]     C(construction) norm: 13.7012
+[2026-05-31 08:33:40]     U(unresolved) norm: 32.4076 (91.1%)
+[2026-05-31 08:33:40]     cos(Gap, R): +0.0559
+[2026-05-31 08:33:40]     cos(Gap, C): +0.3877
+[2026-05-31 08:33:40]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 08:33:40] 
+--- Layer 38: Factorial + Gap ---
+[2026-05-31 08:35:06]   10/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:36:32]   20/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:37:58]   30/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:39:25]   40/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:40:51]   50/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:42:17]   60/60 test pairs done, GPU=9.0GB
+[2026-05-31 08:42:17]   Layer 38: 60 test pairs completed
+[2026-05-31 08:42:17]     R_only_cos_shift: avg=+0.1296 pos=46/60
+[2026-05-31 08:42:17]     full_delta_cos_shift: avg=+0.1613 pos=49/60
+[2026-05-31 08:42:17]     Gap_only_cos_shift: avg=+0.1173 pos=48/60
+[2026-05-31 08:42:17]     C_only_cos_shift: avg=-0.0138 pos=27/60
+[2026-05-31 08:42:17]     R+C_cos_shift: avg=+0.1065 pos=42/60
+[2026-05-31 08:42:17]     avg_random_shift: avg=+0.0209 pos=40/60
+[2026-05-31 08:42:17]     Gap norm: 46.2085
+[2026-05-31 08:42:17]     C(construction) norm: 18.7439
+[2026-05-31 08:42:17]     U(unresolved) norm: 41.7481 (90.3%)
+[2026-05-31 08:42:17]     cos(Gap, R): +0.0509
+[2026-05-31 08:42:17]     cos(Gap, C): +0.4083
+[2026-05-31 08:42:17]     R-FD sign agreement: 60/60 (100%)
+[2026-05-31 08:42:17] 
+============================================================
+[2026-05-31 08:42:17] PART C: PER-ROLE-PAIR BREAKDOWN + BOOTSTRAP
+[2026-05-31 08:42:17] ============================================================
+[2026-05-31 08:42:17]   Using layer 20 for detailed analysis
+[2026-05-31 08:42:17] 
+  adj_noun (20 tokens):
+[2026-05-31 08:42:17]     R_only_cos_shift: +0.2567 ± 0.1693 pos=19/20
+[2026-05-31 08:42:17]     full_delta_cos_shift: +0.3332 ± 0.1892 pos=19/20
+[2026-05-31 08:42:17]     Gap_only_cos_shift: +0.2542 ± 0.1492 pos=19/20
+[2026-05-31 08:42:17]     C_only_cos_shift: -0.0517 ± 0.1215 pos=5/20
+[2026-05-31 08:42:17]     R+C_cos_shift: +0.2637 ± 0.1648 pos=19/20
+[2026-05-31 08:42:17]     avg_random_shift: +0.1236 ± 0.0670 pos=20/20
+[2026-05-31 08:42:17]     cos(Gap, R): +0.1446
+[2026-05-31 08:42:17]     cos(Gap, C): +0.3624
+[2026-05-31 08:42:17]     C_proj_energy: 0.1363
+[2026-05-31 08:42:17]     U(unresolved): 92.9%
+[2026-05-31 08:42:17]     R-FD sign agreement: 20/20 (100%)
+[2026-05-31 08:42:17] 
+  adj_verb (20 tokens):
+[2026-05-31 08:42:17]     R_only_cos_shift: +0.3037 ± 0.1332 pos=19/20
+[2026-05-31 08:42:17]     full_delta_cos_shift: +0.3029 ± 0.1456 pos=20/20
+[2026-05-31 08:42:17]     Gap_only_cos_shift: +0.1807 ± 0.1533 pos=20/20
+[2026-05-31 08:42:17]     C_only_cos_shift: +0.0244 ± 0.1068 pos=11/20
+[2026-05-31 08:42:17]     R+C_cos_shift: +0.2592 ± 0.1340 pos=20/20
+[2026-05-31 08:42:17]     avg_random_shift: +0.1682 ± 0.0738 pos=20/20
+[2026-05-31 08:42:17]     cos(Gap, R): +0.0137
+[2026-05-31 08:42:17]     cos(Gap, C): +0.5658
+[2026-05-31 08:42:17]     C_proj_energy: 0.3222
+[2026-05-31 08:42:17]     U(unresolved): 82.3%
+[2026-05-31 08:42:17]     R-FD sign agreement: 20/20 (100%)
+[2026-05-31 08:42:17] 
+  noun_verb (20 tokens):
+[2026-05-31 08:42:17]     R_only_cos_shift: +0.1460 ± 0.0787 pos=18/20
+[2026-05-31 08:42:17]     full_delta_cos_shift: +0.1928 ± 0.1171 pos=18/20
+[2026-05-31 08:42:17]     Gap_only_cos_shift: +0.1074 ± 0.0907 pos=18/20
+[2026-05-31 08:42:17]     C_only_cos_shift: +0.0476 ± 0.1099 pos=12/20
+[2026-05-31 08:42:17]     R+C_cos_shift: +0.1930 ± 0.0919 pos=20/20
+[2026-05-31 08:42:17]     avg_random_shift: -0.0097 ± 0.0650 pos=8/20
+[2026-05-31 08:42:17]     cos(Gap, R): -0.0650
+[2026-05-31 08:42:17]     cos(Gap, C): +0.5235
+[2026-05-31 08:42:17]     C_proj_energy: 0.2831
+[2026-05-31 08:42:17]     U(unresolved): 84.5%
+[2026-05-31 08:42:17]     R-FD sign agreement: 20/20 (100%)
+[2026-05-31 08:42:17] 
+  Bootstrap 95% CI (layer 20):
+[2026-05-31 08:42:17]     [all] C_only_cos_shift: +0.0068 CI=[-0.0215, +0.0385] n=60
+[2026-05-31 08:42:17]     [all] Gap_only_cos_shift: +0.1808 CI=[+0.1444, +0.2199] n=60
+[2026-05-31 08:42:17]     [all] R+C_cos_shift: +0.2386 CI=[+0.2021, +0.2731] n=60
+[2026-05-31 08:42:17]     [all] R_only_cos_shift: +0.2355 CI=[+0.1982, +0.2724] n=60
+[2026-05-31 08:42:17]     [all] full_delta_cos_shift: +0.2763 CI=[+0.2361, +0.3210] n=60
+[2026-05-31 08:42:17] 
+============================================================
+[2026-05-31 08:42:17] PART D: PER-TOKEN GAP ANALYSIS (Layer 20)
+[2026-05-31 08:42:17] ============================================================
+[2026-05-31 08:42:17] 
+  Tokens with most anti-R Gap (cos(Gap,R) most negative):
+[2026-05-31 08:42:17]     book       [noun_verb ] cos_gR=-0.518 cos_gC=+0.522 R_shift=+0.293 FD_shift=+0.309 Gap_shift=+0.025 sign=1
+[2026-05-31 08:42:17]     prime      [adj_noun  ] cos_gR=-0.331 cos_gC=+0.280 R_shift=+0.117 FD_shift=+0.051 Gap_shift=+0.205 sign=1
+[2026-05-31 08:42:17]     fire       [noun_verb ] cos_gR=-0.181 cos_gC=+0.554 R_shift=+0.126 FD_shift=+0.254 Gap_shift=+0.003 sign=1
+[2026-05-31 08:42:17]     quiet      [adj_verb  ] cos_gR=-0.147 cos_gC=+0.550 R_shift=+0.370 FD_shift=+0.375 Gap_shift=+0.277 sign=1
+[2026-05-31 08:42:17]     sign       [noun_verb ] cos_gR=-0.141 cos_gC=+0.513 R_shift=+0.203 FD_shift=+0.272 Gap_shift=+0.186 sign=1
+[2026-05-31 08:42:17]     record     [noun_verb ] cos_gR=-0.135 cos_gC=+0.643 R_shift=+0.201 FD_shift=+0.210 Gap_shift=-0.052 sign=1
+[2026-05-31 08:42:17]     hand       [noun_verb ] cos_gR=-0.130 cos_gC=+0.546 R_shift=+0.149 FD_shift=+0.215 Gap_shift=+0.170 sign=1
+[2026-05-31 08:42:17]     drink      [noun_verb ] cos_gR=-0.127 cos_gC=+0.635 R_shift=+0.246 FD_shift=+0.393 Gap_shift=+0.264 sign=1
+[2026-05-31 08:42:17]     mark       [noun_verb ] cos_gR=-0.127 cos_gC=+0.521 R_shift=+0.148 FD_shift=+0.189 Gap_shift=+0.110 sign=1
+[2026-05-31 08:42:17]     close      [adj_verb  ] cos_gR=-0.112 cos_gC=+0.589 R_shift=+0.395 FD_shift=+0.399 Gap_shift=+0.215 sign=1
+[2026-05-31 08:42:17] 
+  Tokens with most pro-R Gap (cos(Gap,R) most positive):
+[2026-05-31 08:42:17]     deal       [adj_noun  ] cos_gR=+0.362 cos_gC=+0.424 R_shift=+0.474 FD_shift=+0.655 Gap_shift=+0.567 sign=1
+[2026-05-31 08:42:17]     match      [adj_noun  ] cos_gR=+0.346 cos_gC=+0.458 R_shift=+0.368 FD_shift=+0.430 Gap_shift=+0.092 sign=1
+[2026-05-31 08:42:17]     mean       [adj_noun  ] cos_gR=+0.322 cos_gC=+0.336 R_shift=+0.446 FD_shift=+0.628 Gap_shift=+0.259 sign=1
+[2026-05-31 08:42:17]     blue       [adj_noun  ] cos_gR=+0.272 cos_gC=+0.318 R_shift=+0.384 FD_shift=+0.380 Gap_shift=+0.229 sign=1
+[2026-05-31 08:42:17]     fair       [adj_noun  ] cos_gR=+0.269 cos_gC=+0.320 R_shift=+0.118 FD_shift=+0.233 Gap_shift=+0.204 sign=1
+[2026-05-31 08:42:17]     green      [adj_noun  ] cos_gR=+0.253 cos_gC=+0.380 R_shift=+0.222 FD_shift=+0.389 Gap_shift=+0.440 sign=1
+[2026-05-31 08:42:17]     solid      [adj_noun  ] cos_gR=+0.199 cos_gC=+0.333 R_shift=+0.231 FD_shift=+0.331 Gap_shift=+0.324 sign=1
+[2026-05-31 08:42:17]     right      [adj_noun  ] cos_gR=+0.188 cos_gC=+0.237 R_shift=+0.487 FD_shift=+0.631 Gap_shift=+0.607 sign=1
+[2026-05-31 08:42:17]     plain      [adj_noun  ] cos_gR=+0.187 cos_gC=+0.399 R_shift=+0.299 FD_shift=+0.378 Gap_shift=+0.204 sign=1
+[2026-05-31 08:42:17]     sweet      [adj_noun  ] cos_gR=+0.158 cos_gC=+0.397 R_shift=+0.430 FD_shift=+0.451 Gap_shift=+0.334 sign=1
+[2026-05-31 08:42:17] 
+Saving results...
+[2026-05-31 08:42:18]   Saved to results\phase304_construction_gap\glm4_construction_gap.json
+[2026-05-31 08:42:18] Phase 304 complete for glm4!
