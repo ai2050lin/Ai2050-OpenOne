@@ -1,0 +1,133 @@
+[2026-06-01 11:19:50] === Phase 322: Indirect Readout Path Tracing for deepseek7b ===
+[2026-06-01 11:19:52] Loading deepseek7b (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 11:19:54]   flash_attention_2 failed, trying next...
+[2026-06-01 11:20:04]   Loaded with sdpa
+[2026-06-01 11:20:04]   Model: Qwen2ForCausalLM, device=cuda:0, GPU=9.01GB
+[2026-06-01 11:20:04]   n_layers=28, d_model=3584, class=Qwen2ForCausalLM
+[2026-06-01 11:20:04] Loading W_U...
+[2026-06-01 11:20:05]   W_U shape: (152064, 3584)
+[2026-06-01 11:20:05] 
+============================================================
+[2026-06-01 11:20:05] Part A: Direction Transformation Tracing (Attribute)
+[2026-06-01 11:20:05] ============================================================
+[2026-06-01 11:20:12]   First pair transformation tracing:
+[2026-06-01 11:20:12]     L7(+1): norm=2.1890, cos_tgt=0.0346, cos_src=0.0346, cos_orig=0.7763
+[2026-06-01 11:20:12]     L8(+2): norm=2.4604, cos_tgt=0.0345, cos_src=0.0345, cos_orig=0.6765
+[2026-06-01 11:20:12]     L9(+3): norm=2.4787, cos_tgt=0.0242, cos_src=0.0242, cos_orig=0.6105
+[2026-06-01 11:20:12]     L10(+4): norm=2.6113, cos_tgt=0.0197, cos_src=0.0197, cos_orig=0.5632
+[2026-06-01 11:20:12]     L11(+5): norm=2.7632, cos_tgt=0.0249, cos_src=0.0249, cos_orig=0.5133
+[2026-06-01 11:20:12]     L12(+6): norm=2.9775, cos_tgt=0.0132, cos_src=0.0132, cos_orig=0.4807
+[2026-06-01 11:20:12]     L13(+7): norm=3.0280, cos_tgt=0.0210, cos_src=0.0210, cos_orig=0.4733
+[2026-06-01 11:20:12]     L14(+8): norm=3.2642, cos_tgt=0.0186, cos_src=0.0186, cos_orig=0.4310
+[2026-06-01 11:20:12]     L15(+9): norm=3.4594, cos_tgt=0.0174, cos_src=0.0174, cos_orig=0.4018
+[2026-06-01 11:20:12]     L16(+10): norm=3.5950, cos_tgt=0.0217, cos_src=0.0217, cos_orig=0.3935
+[2026-06-01 11:20:12]     L17(+11): norm=3.8733, cos_tgt=0.0222, cos_src=0.0222, cos_orig=0.3689
+[2026-06-01 11:20:12]     L18(+12): norm=4.1837, cos_tgt=0.0134, cos_src=0.0134, cos_orig=0.3376
+[2026-06-01 11:20:12]     L19(+13): norm=4.3044, cos_tgt=0.0200, cos_src=0.0200, cos_orig=0.3155
+[2026-06-01 11:20:12]     L20(+14): norm=4.9824, cos_tgt=0.0109, cos_src=0.0109, cos_orig=0.2657
+[2026-06-01 11:20:12]     L21(+15): norm=5.6100, cos_tgt=0.0144, cos_src=0.0144, cos_orig=0.2261
+[2026-06-01 11:20:12]     L22(+16): norm=6.4553, cos_tgt=0.0064, cos_src=0.0064, cos_orig=0.1848
+[2026-06-01 11:20:12]     L23(+17): norm=7.9201, cos_tgt=0.0053, cos_src=0.0053, cos_orig=0.1289
+[2026-06-01 11:20:12]     L24(+18): norm=8.8004, cos_tgt=0.0165, cos_src=0.0165, cos_orig=0.1194
+[2026-06-01 11:20:12]     L25(+19): norm=9.8350, cos_tgt=0.0120, cos_src=0.0120, cos_orig=0.0858
+[2026-06-01 11:20:12]     L26(+20): norm=10.2158, cos_tgt=0.0216, cos_src=0.0216, cos_orig=0.0830
+[2026-06-01 11:20:12]     L27(+21): norm=14.9708, cos_tgt=0.0336, cos_src=0.0336, cos_orig=0.0465
+[2026-06-01 11:20:25] 
+  Attribute direction transformation by distance from injection layer:
+[2026-06-01 11:20:25]   +1 layers: norm=2.1700, cos_tgt=0.0365, cos_src=0.0365, cos_orig=0.7756
+[2026-06-01 11:20:25]   +2 layers: norm=2.4076, cos_tgt=0.0314, cos_src=0.0314, cos_orig=0.6588
+[2026-06-01 11:20:25]   +3 layers: norm=2.3396, cos_tgt=0.0212, cos_src=0.0212, cos_orig=0.6092
+[2026-06-01 11:20:25]   +4 layers: norm=2.4164, cos_tgt=0.0159, cos_src=0.0159, cos_orig=0.5566
+[2026-06-01 11:20:25]   +5 layers: norm=2.6151, cos_tgt=0.0143, cos_src=0.0143, cos_orig=0.5023
+[2026-06-01 11:20:25]   +6 layers: norm=2.8056, cos_tgt=0.0208, cos_src=0.0208, cos_orig=0.4645
+[2026-06-01 11:20:25]   +7 layers: norm=2.9099, cos_tgt=0.0246, cos_src=0.0246, cos_orig=0.4392
+[2026-06-01 11:20:25]   +8 layers: norm=3.0587, cos_tgt=0.0231, cos_src=0.0231, cos_orig=0.4168
+[2026-06-01 11:20:25]   +9 layers: norm=3.2313, cos_tgt=0.0268, cos_src=0.0268, cos_orig=0.3851
+[2026-06-01 11:20:25]   +10 layers: norm=3.3524, cos_tgt=0.0251, cos_src=0.0251, cos_orig=0.3735
+[2026-06-01 11:20:25]   +11 layers: norm=3.5774, cos_tgt=0.0209, cos_src=0.0209, cos_orig=0.3390
+[2026-06-01 11:20:25]   +12 layers: norm=3.6628, cos_tgt=0.0034, cos_src=0.0034, cos_orig=0.3251
+[2026-06-01 11:20:25]   +13 layers: norm=3.8485, cos_tgt=0.0080, cos_src=0.0080, cos_orig=0.3099
+[2026-06-01 11:20:25]   +14 layers: norm=4.1638, cos_tgt=0.0064, cos_src=0.0064, cos_orig=0.2944
+[2026-06-01 11:20:25]   +15 layers: norm=4.6808, cos_tgt=0.0012, cos_src=0.0012, cos_orig=0.2644
+[2026-06-01 11:20:25]   +16 layers: norm=5.5037, cos_tgt=-0.0166, cos_src=-0.0166, cos_orig=0.2213
+[2026-06-01 11:20:25]   +17 layers: norm=6.6628, cos_tgt=-0.0001, cos_src=-0.0001, cos_orig=0.1711
+[2026-06-01 11:20:25]   +18 layers: norm=7.4517, cos_tgt=0.0076, cos_src=0.0076, cos_orig=0.1523
+[2026-06-01 11:20:25]   +19 layers: norm=8.4648, cos_tgt=0.0071, cos_src=0.0071, cos_orig=0.1261
+[2026-06-01 11:20:25]   +20 layers: norm=10.2466, cos_tgt=0.0119, cos_src=0.0119, cos_orig=0.0935
+[2026-06-01 11:20:25]   +21 layers: norm=63.8472, cos_tgt=0.0572, cos_src=0.0572, cos_orig=0.0122
+[2026-06-01 11:20:25] 
+============================================================
+[2026-06-01 11:20:25] Part B: Block Recomputation Test (Attribute)
+[2026-06-01 11:20:25] ============================================================
+[2026-06-01 11:20:35]   First pair block test:
+[2026-06-01 11:20:35]     L4: alpha2=-0.2500, alpha4=-0.5000
+[2026-06-01 11:20:35]     L5: alpha2=-0.2500, alpha4=-0.0312
+[2026-06-01 11:20:35]     L6: alpha2=0.0625, alpha4=-0.4375
+[2026-06-01 11:20:35]     L7: alpha2=-0.3438, alpha4=-0.5000
+[2026-06-01 11:20:35]     L8: alpha2=-0.0312, alpha4=-0.1562
+[2026-06-01 11:20:35]     L9: alpha2=0.1875, alpha4=-0.0938
+[2026-06-01 11:21:05] 
+  Block recomputation test by layer:
+[2026-06-01 11:21:05]   L4: alpha2_mean=-0.0820, alpha4_mean=0.0938
+[2026-06-01 11:21:05]   L5: alpha2_mean=-0.1797, alpha4_mean=-0.1250
+[2026-06-01 11:21:05]   L6: alpha2_mean=-0.0195, alpha4_mean=-0.1094
+[2026-06-01 11:21:05]   L7: alpha2_mean=-0.0781, alpha4_mean=-0.0859
+[2026-06-01 11:21:05]   L8: alpha2_mean=0.0078, alpha4_mean=0.0039
+[2026-06-01 11:21:05]   L9: alpha2_mean=0.0273, alpha4_mean=0.0195
+[2026-06-01 11:21:05] 
+============================================================
+[2026-06-01 11:21:05] Part C: Negation Path Transformation
+[2026-06-01 11:21:05] ============================================================
+[2026-06-01 11:21:16] 
+  Negation direction transformation by distance from L0:
+[2026-06-01 11:21:16]   +1 layers: norm=2.3739, neg_cos=0.0000, adj_cos=0.0020
+[2026-06-01 11:21:16]   +2 layers: norm=2.5249, neg_cos=0.0000, adj_cos=0.0135
+[2026-06-01 11:21:16]   +3 layers: norm=5.1707, neg_cos=0.0047, adj_cos=-0.0525
+[2026-06-01 11:21:16]   +4 layers: norm=33.4082, neg_cos=0.0145, adj_cos=-0.0509
+[2026-06-01 11:21:16]   +5 layers: norm=43.1191, neg_cos=0.0134, adj_cos=-0.0519
+[2026-06-01 11:21:16]   +6 layers: norm=48.3724, neg_cos=0.0145, adj_cos=-0.0817
+[2026-06-01 11:21:16]   +7 layers: norm=50.0684, neg_cos=0.0140, adj_cos=-0.0812
+[2026-06-01 11:21:16]   +8 layers: norm=52.7251, neg_cos=0.0130, adj_cos=-0.0754
+[2026-06-01 11:21:16]   +9 layers: norm=54.5976, neg_cos=0.0102, adj_cos=-0.0470
+[2026-06-01 11:21:16]   +10 layers: norm=54.5104, neg_cos=0.0103, adj_cos=-0.0435
+[2026-06-01 11:21:16]   +11 layers: norm=60.3747, neg_cos=0.0099, adj_cos=-0.0390
+[2026-06-01 11:21:16]   +12 layers: norm=60.6337, neg_cos=0.0101, adj_cos=-0.0427
+[2026-06-01 11:21:16]   +13 layers: norm=65.2895, neg_cos=0.0105, adj_cos=-0.0428
+[2026-06-01 11:21:16]   +14 layers: norm=65.3008, neg_cos=0.0107, adj_cos=-0.0453
+[2026-06-01 11:21:16]   +15 layers: norm=65.3665, neg_cos=0.0110, adj_cos=-0.0451
+[2026-06-01 11:21:16]   +16 layers: norm=62.3025, neg_cos=0.0106, adj_cos=-0.0456
+[2026-06-01 11:21:16]   +17 layers: norm=62.4368, neg_cos=0.0109, adj_cos=-0.0450
+[2026-06-01 11:21:16]   +18 layers: norm=62.5682, neg_cos=0.0125, adj_cos=-0.0431
+[2026-06-01 11:21:16]   +19 layers: norm=62.8583, neg_cos=0.0116, adj_cos=-0.0448
+[2026-06-01 11:21:16]   +20 layers: norm=67.7889, neg_cos=0.0122, adj_cos=-0.0432
+[2026-06-01 11:21:16]   +21 layers: norm=68.0386, neg_cos=0.0125, adj_cos=-0.0377
+[2026-06-01 11:21:16]   +22 layers: norm=68.4756, neg_cos=0.0139, adj_cos=-0.0359
+[2026-06-01 11:21:16]   +23 layers: norm=69.0692, neg_cos=0.0161, adj_cos=-0.0377
+[2026-06-01 11:21:16]   +24 layers: norm=70.6621, neg_cos=0.0164, adj_cos=-0.0356
+[2026-06-01 11:21:16]   +25 layers: norm=70.2620, neg_cos=0.0161, adj_cos=-0.0340
+[2026-06-01 11:21:16]   +26 layers: norm=51.9056, neg_cos=0.0144, adj_cos=-0.0427
+[2026-06-01 11:21:16]   +27 layers: norm=92.7592, neg_cos=0.0118, adj_cos=-0.0761
+[2026-06-01 11:21:16] 
+============================================================
+[2026-06-01 11:21:16] Part D: L1→L2 Transition Analysis
+[2026-06-01 11:21:16] ============================================================
+[2026-06-01 11:21:21] 
+  Direction norm and readout by layer:
+[2026-06-01 11:21:21]     apple→red L0: norm=35.6785, cos_tgt=0.0122, cos_src=0.0122
+[2026-06-01 11:21:21]     apple→red L1: norm=51.1758, cos_tgt=0.0333, cos_src=0.0333
+[2026-06-01 11:21:21]     apple→red L2: norm=62.8939, cos_tgt=0.0441, cos_src=0.0441
+[2026-06-01 11:21:21]     apple→red L3: norm=75.4014, cos_tgt=0.0463, cos_src=0.0463
+[2026-06-01 11:21:21]     apple→red L4: norm=83.8868, cos_tgt=0.0415, cos_src=0.0415
+[2026-06-01 11:21:21]     apple→red L5: norm=85.5040, cos_tgt=0.0417, cos_src=0.0417
+[2026-06-01 11:21:21]     apple→red L6: norm=105.1106, cos_tgt=0.0428, cos_src=0.0428
+[2026-06-01 11:21:21]     apple→red L7: norm=134.9176, cos_tgt=0.0461, cos_src=0.0461
+[2026-06-01 11:21:21] Results saved to results\phase322_indirect_readout\deepseek7b_phase322.json
+[2026-06-01 11:21:21] 
+============================================================
+[2026-06-01 11:21:21] PHASE 322 SUMMARY - deepseek7b
+[2026-06-01 11:21:21] ============================================================
+[2026-06-01 11:21:21]   Readout alignment at +1 layer: 0.0365
+[2026-06-01 11:21:21]   Readout alignment at +5+ layers: 0.0142
+[2026-06-01 11:21:21]   Alignment change: -0.0223
+[2026-06-01 11:21:21]   → Readout alignment DECREASES through layers
+[2026-06-01 11:21:22] Model deepseek7b released.

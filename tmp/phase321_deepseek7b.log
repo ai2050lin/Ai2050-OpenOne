@@ -1,0 +1,121 @@
+[2026-06-01 11:07:36] === Phase 321: Fine Layer Scan + Readout Alignment for deepseek7b ===
+[2026-06-01 11:07:38] Loading deepseek7b (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 11:07:40]   flash_attention_2 failed, trying next...
+[2026-06-01 11:07:50]   Loaded with sdpa
+[2026-06-01 11:07:50]   Model: Qwen2ForCausalLM, device=cuda:0, GPU=9.01GB
+[2026-06-01 11:07:50]   n_layers=28, d_model=3584, class=Qwen2ForCausalLM
+[2026-06-01 11:07:50] Loading W_U for readout alignment...
+[2026-06-01 11:07:51]   W_U shape: (152064, 3584)
+[2026-06-01 11:07:51]   Attribute scan layers: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+[2026-06-01 11:07:51]   Function scan layers: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+[2026-06-01 11:07:51]   Negation scan layers: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+[2026-06-01 11:07:51]   Total sentences: 136
+[2026-06-01 11:07:51]   Total target layers: 16
+[2026-06-01 11:07:51] Extracting representations at fine-grained layers...
+[2026-06-01 11:08:17]     All Extracted 30/136, GPU=9.02GB
+[2026-06-01 11:08:37]     All Extracted 60/136, GPU=9.02GB
+[2026-06-01 11:08:57]     All Extracted 90/136, GPU=9.02GB
+[2026-06-01 11:09:17]     All Extracted 120/136, GPU=9.02GB
+[2026-06-01 11:09:27]     All Extracted 136/136, GPU=9.02GB
+[2026-06-01 11:09:27]   Extraction time: 96.1s
+[2026-06-01 11:09:27] 
+============================================================
+[2026-06-01 11:09:27] Part A: Attribute Fine Scan + Readout Alignment
+[2026-06-01 11:09:27] ============================================================
+[2026-06-01 11:09:37]   First source detailed results:
+[2026-06-01 11:09:37]     L3: delta=-0.2188, direct_ro=0.0463, cluster_ro=0.0230
+[2026-06-01 11:09:37]     L4: delta=-0.2500, direct_ro=0.0415, cluster_ro=0.0204
+[2026-06-01 11:09:37]     L5: delta=-0.2500, direct_ro=0.0417, cluster_ro=0.0230
+[2026-06-01 11:09:37]     L6: delta=0.0625, direct_ro=0.0428, cluster_ro=0.0245
+[2026-06-01 11:09:37]     L7: delta=-0.3438, direct_ro=0.0461, cluster_ro=0.0260
+[2026-06-01 11:09:37]     L8: delta=-0.0312, direct_ro=0.0420, cluster_ro=0.0220
+[2026-06-01 11:09:37]     L9: delta=0.1875, direct_ro=0.0413, cluster_ro=0.0276
+[2026-06-01 11:09:37]     L10: delta=-0.2188, direct_ro=0.0413, cluster_ro=0.0224
+[2026-06-01 11:09:37]     L11: delta=-0.0625, direct_ro=0.0357, cluster_ro=0.0149
+[2026-06-01 11:09:37]     L12: delta=0.0938, direct_ro=0.0459, cluster_ro=0.0110
+[2026-06-01 11:09:37]     L13: delta=-0.0625, direct_ro=0.0429, cluster_ro=0.0098
+[2026-06-01 11:09:37]     L14: delta=0.1250, direct_ro=0.0443, cluster_ro=0.0134
+[2026-06-01 11:09:37]     L15: delta=-0.1250, direct_ro=0.0398, cluster_ro=0.0146
+[2026-06-01 11:10:41] 
+  Attribute fine scan by layer (alpha=2.0):
+[2026-06-01 11:10:41]   L3: delta=0.0357(38%), direct_ro=0.0266, cluster_ro=0.0087
+[2026-06-01 11:10:41]   L4: delta=-0.0119(50%), direct_ro=0.0300, cluster_ro=0.0113
+[2026-06-01 11:10:41]   L5: delta=-0.0768(38%), direct_ro=0.0310, cluster_ro=0.0114
+[2026-06-01 11:10:41]   L6: delta=0.0691(62%), direct_ro=0.0312, cluster_ro=0.0119
+[2026-06-01 11:10:41]   L7: delta=-0.0507(50%), direct_ro=0.0427, cluster_ro=0.0174
+[2026-06-01 11:10:41]   L8: delta=0.0592(62%), direct_ro=0.0444, cluster_ro=0.0183
+[2026-06-01 11:10:41]   L9: delta=0.0386(75%), direct_ro=0.0334, cluster_ro=0.0170
+[2026-06-01 11:10:41]   L10: delta=-0.0087(50%), direct_ro=0.0271, cluster_ro=0.0135
+[2026-06-01 11:10:41]   L11: delta=0.0177(50%), direct_ro=0.0203, cluster_ro=0.0091
+[2026-06-01 11:10:41]   L12: delta=0.0199(62%), direct_ro=0.0236, cluster_ro=0.0094
+[2026-06-01 11:10:41]   L13: delta=0.0050(50%), direct_ro=0.0229, cluster_ro=0.0086
+[2026-06-01 11:10:41]   L14: delta=0.0410(75%), direct_ro=0.0231, cluster_ro=0.0089
+[2026-06-01 11:10:41]   L15: delta=-0.0074(38%), direct_ro=0.0226, cluster_ro=0.0095
+[2026-06-01 11:10:41] 
+============================================================
+[2026-06-01 11:10:41] Part B: Function Fine Scan + Readout Alignment
+[2026-06-01 11:10:41] ============================================================
+[2026-06-01 11:11:35] 
+  Function fine scan by layer (alpha=2.0):
+[2026-06-01 11:11:35]   L0: delta=0.0430(50%), direct_ro=0.0116, cluster_ro=0.0051
+[2026-06-01 11:11:35]   L1: delta=0.0234(62%), direct_ro=0.0042, cluster_ro=-0.0012
+[2026-06-01 11:11:35]   L2: delta=0.0430(62%), direct_ro=0.0094, cluster_ro=0.0041
+[2026-06-01 11:11:35]   L3: delta=0.0469(62%), direct_ro=0.0106, cluster_ro=0.0034
+[2026-06-01 11:11:35]   L4: delta=0.0312(50%), direct_ro=0.0126, cluster_ro=0.0056
+[2026-06-01 11:11:35]   L5: delta=0.0586(75%), direct_ro=0.0100, cluster_ro=0.0033
+[2026-06-01 11:11:35]   L6: delta=0.0625(75%), direct_ro=0.0154, cluster_ro=0.0109
+[2026-06-01 11:11:35]   L7: delta=0.0391(62%), direct_ro=0.0107, cluster_ro=0.0051
+[2026-06-01 11:11:35]   L8: delta=0.0430(62%), direct_ro=0.0102, cluster_ro=0.0061
+[2026-06-01 11:11:35] 
+============================================================
+[2026-06-01 11:11:35] Part C: Negation Fine Scan + Readout Alignment
+[2026-06-01 11:11:35] ============================================================
+[2026-06-01 11:12:27] 
+  Negation fine scan by layer (alpha=2.0):
+[2026-06-01 11:12:27]   L0: neg_delta=0.1753, adj_delta=0.1061, neg_ro=-0.0067, neg_adj_ro=0.0045
+[2026-06-01 11:12:27]   L1: neg_delta=0.0694, adj_delta=-0.0847, neg_ro=-0.0135, neg_adj_ro=0.0018
+[2026-06-01 11:12:27]   L2: neg_delta=0.0298, adj_delta=-0.1309, neg_ro=-0.0100, neg_adj_ro=-0.0023
+[2026-06-01 11:12:27]   L3: neg_delta=0.0752, adj_delta=0.0006, neg_ro=-0.0152, neg_adj_ro=-0.0369
+[2026-06-01 11:12:27]   L4: neg_delta=0.0493, adj_delta=0.0229, neg_ro=-0.0176, neg_adj_ro=-0.0517
+[2026-06-01 11:12:27]   L5: neg_delta=0.0810, adj_delta=0.0285, neg_ro=-0.0188, neg_adj_ro=-0.0537
+[2026-06-01 11:12:27]   L6: neg_delta=0.0569, adj_delta=0.0474, neg_ro=-0.0202, neg_adj_ro=-0.0530
+[2026-06-01 11:12:27]   L7: neg_delta=0.0637, adj_delta=0.0508, neg_ro=-0.0180, neg_adj_ro=-0.0512
+[2026-06-01 11:12:27]   L8: neg_delta=0.0713, adj_delta=0.0234, neg_ro=-0.0192, neg_adj_ro=-0.0524
+[2026-06-01 11:12:27] 
+============================================================
+[2026-06-01 11:12:27] Part D: Direction-Readout Alignment (no injection, all layers)
+[2026-06-01 11:12:27] ============================================================
+[2026-06-01 11:12:27] 
+  Readout alignment by layer (attribute):
+[2026-06-01 11:12:27]   L0: target_cos=0.0118, random_cos=0.0079, diff=0.0039
+[2026-06-01 11:12:27]   L1: target_cos=0.0197, random_cos=-0.0008, diff=0.0205
+[2026-06-01 11:12:27]   L2: target_cos=0.0269, random_cos=-0.0010, diff=0.0279
+[2026-06-01 11:12:27]   L3: target_cos=0.0257, random_cos=-0.0131, diff=0.0388
+[2026-06-01 11:12:27]   L4: target_cos=0.0333, random_cos=-0.0063, diff=0.0396
+[2026-06-01 11:12:27]   L5: target_cos=0.0329, random_cos=-0.0063, diff=0.0392
+[2026-06-01 11:12:27]   L6: target_cos=0.0352, random_cos=-0.0044, diff=0.0396
+[2026-06-01 11:12:27]   L7: target_cos=0.0457, random_cos=-0.0096, diff=0.0552
+[2026-06-01 11:12:27]   L8: target_cos=0.0500, random_cos=0.0078, diff=0.0422
+[2026-06-01 11:12:27]   L9: target_cos=0.0402, random_cos=-0.0019, diff=0.0421
+[2026-06-01 11:12:27]   L10: target_cos=0.0363, random_cos=-0.0049, diff=0.0412
+[2026-06-01 11:12:27]   L11: target_cos=0.0306, random_cos=0.0018, diff=0.0288
+[2026-06-01 11:12:27]   L12: target_cos=0.0378, random_cos=0.0029, diff=0.0349
+[2026-06-01 11:12:27]   L13: target_cos=0.0377, random_cos=-0.0025, diff=0.0402
+[2026-06-01 11:12:27]   L14: target_cos=0.0369, random_cos=-0.0044, diff=0.0413
+[2026-06-01 11:12:27]   L15: target_cos=0.0369, random_cos=-0.0074, diff=0.0444
+[2026-06-01 11:12:27] Results saved to results\phase321_fine_readout\deepseek7b_phase321.json
+[2026-06-01 11:12:27] 
+============================================================
+[2026-06-01 11:12:27] PHASE 321 SUMMARY - deepseek7b
+[2026-06-01 11:12:27] ============================================================
+[2026-06-01 11:12:27] 
+Best injection layer (max mean_delta) with readout alignment:
+[2026-06-01 11:12:27]   attribute: best=L6, delta=0.0691, direct_readout=0.0312
+[2026-06-01 11:12:27]   function: best=L6, delta=0.0625, direct_readout=0.0154
+[2026-06-01 11:12:27]   negation: best=L0, neg_delta=0.1753, neg_readout=-0.0067
+[2026-06-01 11:12:27] 
+Readout alignment summary (target vs random):
+[2026-06-01 11:12:27]   Mean target alignment: 0.0336
+[2026-06-01 11:12:27]   Mean random alignment: -0.0026
+[2026-06-01 11:12:27]   Alignment above random: 0.0362
+[2026-06-01 11:12:28] Model deepseek7b released.

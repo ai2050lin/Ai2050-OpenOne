@@ -1,0 +1,165 @@
+[2026-06-01 11:16:55] === Phase 322: Indirect Readout Path Tracing for qwen3 ===
+[2026-06-01 11:16:56] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 11:16:57]   flash_attention_2 failed, trying next...
+[2026-06-01 11:17:08]   Loaded with sdpa
+[2026-06-01 11:17:08]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-06-01 11:17:08]   n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+[2026-06-01 11:17:08] Loading W_U...
+[2026-06-01 11:17:09]   W_U shape: (151936, 2560)
+[2026-06-01 11:17:09] 
+============================================================
+[2026-06-01 11:17:09] Part A: Direction Transformation Tracing (Attribute)
+[2026-06-01 11:17:09] ============================================================
+[2026-06-01 11:17:10]   First pair transformation tracing:
+[2026-06-01 11:17:10]     L1(+1): norm=2.0766, cos_tgt=0.0862, cos_src=0.0862, cos_orig=0.9536
+[2026-06-01 11:17:10]     L2(+2): norm=2.1926, cos_tgt=0.0927, cos_src=0.0927, cos_orig=0.8909
+[2026-06-01 11:17:10]     L3(+3): norm=2.2759, cos_tgt=0.0972, cos_src=0.0972, cos_orig=0.8472
+[2026-06-01 11:17:10]     L4(+4): norm=2.4108, cos_tgt=0.0805, cos_src=0.0805, cos_orig=0.7820
+[2026-06-01 11:17:10]     L5(+5): norm=2.4758, cos_tgt=0.0433, cos_src=0.0433, cos_orig=0.6579
+[2026-06-01 11:17:10]     L6(+6): norm=2.6499, cos_tgt=0.0185, cos_src=0.0185, cos_orig=0.5739
+[2026-06-01 11:17:10]     L7(+7): norm=2.8003, cos_tgt=0.0226, cos_src=0.0226, cos_orig=0.5145
+[2026-06-01 11:17:10]     L8(+8): norm=3.0801, cos_tgt=-0.0022, cos_src=-0.0022, cos_orig=0.4253
+[2026-06-01 11:17:10]     L9(+9): norm=3.0771, cos_tgt=-0.0148, cos_src=-0.0148, cos_orig=0.4064
+[2026-06-01 11:17:10]     L10(+10): norm=3.2379, cos_tgt=-0.0071, cos_src=-0.0071, cos_orig=0.3586
+[2026-06-01 11:17:10]     L11(+11): norm=3.2760, cos_tgt=-0.0059, cos_src=-0.0059, cos_orig=0.3497
+[2026-06-01 11:17:10]     L12(+12): norm=3.4476, cos_tgt=0.0085, cos_src=0.0085, cos_orig=0.3117
+[2026-06-01 11:17:10]     L13(+13): norm=3.4562, cos_tgt=-0.0005, cos_src=-0.0005, cos_orig=0.2951
+[2026-06-01 11:17:10]     L14(+14): norm=3.5345, cos_tgt=0.0010, cos_src=0.0010, cos_orig=0.2968
+[2026-06-01 11:17:10]     L15(+15): norm=3.6969, cos_tgt=0.0092, cos_src=0.0092, cos_orig=0.2733
+[2026-06-01 11:17:10]     L16(+16): norm=3.5569, cos_tgt=0.0068, cos_src=0.0068, cos_orig=0.2928
+[2026-06-01 11:17:10]     L17(+17): norm=3.6808, cos_tgt=0.0007, cos_src=0.0007, cos_orig=0.2854
+[2026-06-01 11:17:10]     L18(+18): norm=3.8731, cos_tgt=0.0048, cos_src=0.0048, cos_orig=0.3010
+[2026-06-01 11:17:10]     L19(+19): norm=4.3121, cos_tgt=0.0139, cos_src=0.0139, cos_orig=0.3300
+[2026-06-01 11:17:10]     L20(+20): norm=4.5109, cos_tgt=0.0147, cos_src=0.0147, cos_orig=0.3340
+[2026-06-01 11:17:10]     L21(+21): norm=4.8668, cos_tgt=0.0285, cos_src=0.0285, cos_orig=0.3311
+[2026-06-01 11:17:10]     L22(+22): norm=5.2208, cos_tgt=0.0268, cos_src=0.0268, cos_orig=0.3424
+[2026-06-01 11:17:10]     L23(+23): norm=5.7067, cos_tgt=0.0309, cos_src=0.0309, cos_orig=0.3055
+[2026-06-01 11:17:10]     L24(+24): norm=6.6632, cos_tgt=0.0221, cos_src=0.0221, cos_orig=0.3205
+[2026-06-01 11:17:10]     L25(+25): norm=7.0534, cos_tgt=0.0258, cos_src=0.0258, cos_orig=0.3060
+[2026-06-01 11:17:10]     L26(+26): norm=7.6804, cos_tgt=0.0359, cos_src=0.0359, cos_orig=0.3009
+[2026-06-01 11:17:10]     L27(+27): norm=8.2904, cos_tgt=0.0493, cos_src=0.0493, cos_orig=0.2918
+[2026-06-01 11:17:10]     L28(+28): norm=9.1157, cos_tgt=0.0538, cos_src=0.0538, cos_orig=0.2926
+[2026-06-01 11:17:10]     L29(+29): norm=9.9165, cos_tgt=0.0763, cos_src=0.0763, cos_orig=0.2724
+[2026-06-01 11:17:10]     L30(+30): norm=10.8320, cos_tgt=0.0966, cos_src=0.0966, cos_orig=0.2623
+[2026-06-01 11:17:10]     L31(+31): norm=11.5857, cos_tgt=0.1087, cos_src=0.1087, cos_orig=0.2487
+[2026-06-01 11:17:10]     L32(+32): norm=12.6515, cos_tgt=0.1097, cos_src=0.1097, cos_orig=0.2268
+[2026-06-01 11:17:10]     L33(+33): norm=13.3783, cos_tgt=0.0891, cos_src=0.0891, cos_orig=0.2147
+[2026-06-01 11:17:10]     L34(+34): norm=16.4000, cos_tgt=0.0680, cos_src=0.0680, cos_orig=0.1641
+[2026-06-01 11:17:10]     L35(+35): norm=24.2874, cos_tgt=0.0679, cos_src=0.0679, cos_orig=0.0861
+[2026-06-01 11:17:10] 
+  Attribute direction transformation by distance from injection layer:
+[2026-06-01 11:17:10]   +1 layers: norm=2.0636, cos_tgt=0.0769, cos_src=0.0769, cos_orig=0.9558
+[2026-06-01 11:17:10]   +2 layers: norm=2.1858, cos_tgt=0.0771, cos_src=0.0771, cos_orig=0.8879
+[2026-06-01 11:17:10]   +3 layers: norm=2.2754, cos_tgt=0.0735, cos_src=0.0735, cos_orig=0.8412
+[2026-06-01 11:17:10]   +4 layers: norm=2.4865, cos_tgt=0.0587, cos_src=0.0587, cos_orig=0.7489
+[2026-06-01 11:17:10]   +5 layers: norm=2.5134, cos_tgt=0.0353, cos_src=0.0353, cos_orig=0.6456
+[2026-06-01 11:17:10]   +6 layers: norm=2.7138, cos_tgt=0.0214, cos_src=0.0214, cos_orig=0.5559
+[2026-06-01 11:17:10]   +7 layers: norm=2.9162, cos_tgt=0.0260, cos_src=0.0260, cos_orig=0.4872
+[2026-06-01 11:17:10]   +8 layers: norm=3.2868, cos_tgt=0.0156, cos_src=0.0156, cos_orig=0.4003
+[2026-06-01 11:17:10]   +9 layers: norm=3.3165, cos_tgt=0.0059, cos_src=0.0059, cos_orig=0.3650
+[2026-06-01 11:17:10]   +10 layers: norm=3.2422, cos_tgt=0.0017, cos_src=0.0017, cos_orig=0.3476
+[2026-06-01 11:17:10]   +11 layers: norm=3.3177, cos_tgt=-0.0044, cos_src=-0.0044, cos_orig=0.3213
+[2026-06-01 11:17:10]   +12 layers: norm=3.3527, cos_tgt=-0.0032, cos_src=-0.0032, cos_orig=0.3024
+[2026-06-01 11:17:10]   +13 layers: norm=3.3762, cos_tgt=-0.0092, cos_src=-0.0092, cos_orig=0.2974
+[2026-06-01 11:17:10]   +14 layers: norm=3.3983, cos_tgt=-0.0025, cos_src=-0.0025, cos_orig=0.2957
+[2026-06-01 11:17:10]   +15 layers: norm=3.5452, cos_tgt=-0.0020, cos_src=-0.0020, cos_orig=0.2822
+[2026-06-01 11:17:10]   +16 layers: norm=3.5259, cos_tgt=0.0017, cos_src=0.0017, cos_orig=0.2868
+[2026-06-01 11:17:10]   +17 layers: norm=3.6475, cos_tgt=-0.0005, cos_src=-0.0005, cos_orig=0.2845
+[2026-06-01 11:17:10]   +18 layers: norm=3.8767, cos_tgt=0.0021, cos_src=0.0021, cos_orig=0.2862
+[2026-06-01 11:17:10]   +19 layers: norm=4.2560, cos_tgt=-0.0012, cos_src=-0.0012, cos_orig=0.2921
+[2026-06-01 11:17:10]   +20 layers: norm=4.4278, cos_tgt=0.0011, cos_src=0.0011, cos_orig=0.2919
+[2026-06-01 11:17:10]   +21 layers: norm=4.8170, cos_tgt=0.0066, cos_src=0.0066, cos_orig=0.2898
+[2026-06-01 11:17:10]   +22 layers: norm=4.9505, cos_tgt=0.0119, cos_src=0.0119, cos_orig=0.2931
+[2026-06-01 11:17:10]   +23 layers: norm=5.3846, cos_tgt=0.0127, cos_src=0.0127, cos_orig=0.2732
+[2026-06-01 11:17:10]   +24 layers: norm=6.2338, cos_tgt=0.0124, cos_src=0.0124, cos_orig=0.2904
+[2026-06-01 11:17:10]   +25 layers: norm=6.6685, cos_tgt=0.0103, cos_src=0.0103, cos_orig=0.2772
+[2026-06-01 11:17:10]   +26 layers: norm=7.3501, cos_tgt=0.0178, cos_src=0.0178, cos_orig=0.2633
+[2026-06-01 11:17:10]   +27 layers: norm=7.9440, cos_tgt=0.0177, cos_src=0.0177, cos_orig=0.2512
+[2026-06-01 11:17:10]   +28 layers: norm=8.8402, cos_tgt=0.0215, cos_src=0.0215, cos_orig=0.2417
+[2026-06-01 11:17:10]   +29 layers: norm=9.7689, cos_tgt=0.0307, cos_src=0.0307, cos_orig=0.2282
+[2026-06-01 11:17:10]   +30 layers: norm=10.8779, cos_tgt=0.0387, cos_src=0.0387, cos_orig=0.2109
+[2026-06-01 11:17:10]   +31 layers: norm=11.8582, cos_tgt=0.0419, cos_src=0.0419, cos_orig=0.1973
+[2026-06-01 11:17:10]   +32 layers: norm=12.9513, cos_tgt=0.0371, cos_src=0.0371, cos_orig=0.1777
+[2026-06-01 11:17:10]   +33 layers: norm=13.8902, cos_tgt=0.0364, cos_src=0.0364, cos_orig=0.1620
+[2026-06-01 11:17:10]   +34 layers: norm=15.7570, cos_tgt=0.0357, cos_src=0.0357, cos_orig=0.1359
+[2026-06-01 11:17:10]   +35 layers: norm=20.4545, cos_tgt=0.0207, cos_src=0.0207, cos_orig=0.0898
+[2026-06-01 11:17:10] 
+============================================================
+[2026-06-01 11:17:10] Part B: Block Recomputation Test (Attribute)
+[2026-06-01 11:17:10] ============================================================
+[2026-06-01 11:17:11]   First pair block test:
+[2026-06-01 11:17:11]     L0: alpha2=0.5000, alpha4=0.8438
+[2026-06-01 11:17:11]     L1: alpha2=0.3750, alpha4=0.8438
+[2026-06-01 11:17:11]     L2: alpha2=0.2812, alpha4=0.5000
+[2026-06-01 11:17:11]     L3: alpha2=0.2500, alpha4=0.5625
+[2026-06-01 11:17:12] 
+  Block recomputation test by layer:
+[2026-06-01 11:17:12]   L0: alpha2_mean=0.1719, alpha4_mean=0.4297
+[2026-06-01 11:17:12]   L1: alpha2_mean=0.1328, alpha4_mean=0.3203
+[2026-06-01 11:17:12]   L2: alpha2_mean=0.1094, alpha4_mean=0.1719
+[2026-06-01 11:17:12]   L3: alpha2_mean=0.0781, alpha4_mean=0.1875
+[2026-06-01 11:17:12] 
+============================================================
+[2026-06-01 11:17:12] Part C: Negation Path Transformation
+[2026-06-01 11:17:12] ============================================================
+[2026-06-01 11:17:13] 
+  Negation direction transformation by distance from L0:
+[2026-06-01 11:17:13]   +1 layers: norm=2.4656, neg_cos=0.0162, adj_cos=-0.0115
+[2026-06-01 11:17:13]   +2 layers: norm=4.4760, neg_cos=0.0160, adj_cos=-0.0150
+[2026-06-01 11:17:13]   +3 layers: norm=5.6275, neg_cos=0.0235, adj_cos=-0.0032
+[2026-06-01 11:17:13]   +4 layers: norm=7.4698, neg_cos=0.0307, adj_cos=0.0202
+[2026-06-01 11:17:13]   +5 layers: norm=7.3994, neg_cos=0.0320, adj_cos=0.0343
+[2026-06-01 11:17:13]   +6 layers: norm=407.2783, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +7 layers: norm=407.2665, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +8 layers: norm=407.2555, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +9 layers: norm=407.2548, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +10 layers: norm=407.2548, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +11 layers: norm=407.2541, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +12 layers: norm=407.2545, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +13 layers: norm=407.2540, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +14 layers: norm=407.2534, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +15 layers: norm=407.2533, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +16 layers: norm=407.2379, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +17 layers: norm=407.2702, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +18 layers: norm=407.3499, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +19 layers: norm=407.3071, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +20 layers: norm=407.3071, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +21 layers: norm=407.3069, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +22 layers: norm=407.3065, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +23 layers: norm=407.2857, neg_cos=0.0150, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +24 layers: norm=407.3071, neg_cos=0.0149, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +25 layers: norm=407.2868, neg_cos=0.0150, adj_cos=-0.0206
+[2026-06-01 11:17:13]   +26 layers: norm=407.2873, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +27 layers: norm=407.2875, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +28 layers: norm=407.2696, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +29 layers: norm=407.2697, neg_cos=0.0150, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +30 layers: norm=407.2894, neg_cos=0.0149, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +31 layers: norm=407.3108, neg_cos=0.0149, adj_cos=-0.0205
+[2026-06-01 11:17:13]   +32 layers: norm=407.3107, neg_cos=0.0148, adj_cos=-0.0204
+[2026-06-01 11:17:13]   +33 layers: norm=407.3483, neg_cos=0.0149, adj_cos=-0.0203
+[2026-06-01 11:17:13]   +34 layers: norm=354.1749, neg_cos=0.0178, adj_cos=-0.0195
+[2026-06-01 11:17:13]   +35 layers: norm=217.2286, neg_cos=0.0155, adj_cos=-0.0104
+[2026-06-01 11:17:13] 
+============================================================
+[2026-06-01 11:17:13] Part D: L1→L2 Transition Analysis
+[2026-06-01 11:17:13] ============================================================
+[2026-06-01 11:17:13] 
+  Direction norm and readout by layer:
+[2026-06-01 11:17:13]     apple→red L0: norm=9.8969, cos_tgt=0.0965, cos_src=0.0965
+[2026-06-01 11:17:13]     apple→red L1: norm=11.0490, cos_tgt=0.0894, cos_src=0.0894
+[2026-06-01 11:17:13]     apple→red L2: norm=12.6492, cos_tgt=0.0818, cos_src=0.0818
+[2026-06-01 11:17:13]     apple→red L3: norm=16.6422, cos_tgt=0.0578, cos_src=0.0578
+[2026-06-01 11:17:13]     apple→red L4: norm=23.4202, cos_tgt=0.0421, cos_src=0.0421
+[2026-06-01 11:17:13]     apple→red L5: norm=29.0070, cos_tgt=0.0188, cos_src=0.0188
+[2026-06-01 11:17:13]     apple→red L6: norm=33.9642, cos_tgt=0.0114, cos_src=0.0114
+[2026-06-01 11:17:13]     apple→red L7: norm=39.6051, cos_tgt=0.0349, cos_src=0.0349
+[2026-06-01 11:17:13] Results saved to results\phase322_indirect_readout\qwen3_phase322.json
+[2026-06-01 11:17:13] 
+============================================================
+[2026-06-01 11:17:13] PHASE 322 SUMMARY - qwen3
+[2026-06-01 11:17:13] ============================================================
+[2026-06-01 11:17:13]   Readout alignment at +1 layer: 0.0769
+[2026-06-01 11:17:13]   Readout alignment at +5+ layers: 0.0142
+[2026-06-01 11:17:13]   Alignment change: -0.0627
+[2026-06-01 11:17:13]   → Readout alignment DECREASES through layers
+[2026-06-01 11:17:13] Model qwen3 released.

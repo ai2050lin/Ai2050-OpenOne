@@ -1,0 +1,194 @@
+[2026-06-01 07:31:37] === Phase 319: Baseline Control for glm4 ===
+[2026-06-01 07:31:38] Loading glm4 (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 07:31:40]   flash_attention_2 failed (FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.), falling back to sdpa
+[2026-06-01 07:31:49]   Loaded with sdpa
+[2026-06-01 07:31:49]   Model: GlmForCausalLM, device=cuda:0, GPU=8.99GB
+[2026-06-01 07:31:49]   Layer allocation: GPU=0, CPU=24 components
+[2026-06-01 07:31:49]   n_layers=40, d_model=4096, class=GlmForCausalLM
+[2026-06-01 07:31:49]   Load time: 12.2s
+[2026-06-01 07:31:49]   Target layers: [6, 12, 18, 24, 38]
+[2026-06-01 07:31:49]   Total unique items: 527
+[2026-06-01 07:31:49] Extracting representations...
+[2026-06-01 07:32:33]     All Extracted 30/527, GPU=9.00GB
+[2026-06-01 07:33:05]     All Extracted 60/527, GPU=9.00GB
+[2026-06-01 07:33:38]     All Extracted 90/527, GPU=9.00GB
+[2026-06-01 07:34:10]     All Extracted 120/527, GPU=9.00GB
+[2026-06-01 07:34:43]     All Extracted 150/527, GPU=9.00GB
+[2026-06-01 07:35:15]     All Extracted 180/527, GPU=9.00GB
+[2026-06-01 07:35:47]     All Extracted 210/527, GPU=9.00GB
+[2026-06-01 07:36:19]     All Extracted 240/527, GPU=9.00GB
+[2026-06-01 07:36:51]     All Extracted 270/527, GPU=9.00GB
+[2026-06-01 07:37:24]     All Extracted 300/527, GPU=9.00GB
+[2026-06-01 07:37:56]     All Extracted 330/527, GPU=9.00GB
+[2026-06-01 07:38:28]     All Extracted 360/527, GPU=9.00GB
+[2026-06-01 07:39:00]     All Extracted 390/527, GPU=9.00GB
+[2026-06-01 07:39:33]     All Extracted 420/527, GPU=9.00GB
+[2026-06-01 07:40:04]     All Extracted 450/527, GPU=9.00GB
+[2026-06-01 07:40:36]     All Extracted 480/527, GPU=9.00GB
+[2026-06-01 07:41:08]     All Extracted 510/527, GPU=9.00GB
+[2026-06-01 07:41:26]     All Extracted 527/527, GPU=9.00GB
+[2026-06-01 07:41:26]   Extraction time: 577.4s, cached 2635 representations
+[2026-06-01 07:41:26] 
+Running Part A: Random Baseline...
+[2026-06-01 07:41:26] 
+--- Part A: Random Baseline Analysis ---
+[2026-06-01 07:41:26]   random_mixed/L6: dim@80=17, top1=0.111, LOO_cos=0.718, pair_cos=0.3662, norm_mean=1.59
+[2026-06-01 07:41:26]   random_mixed/L12: dim@80=18, top1=0.133, LOO_cos=0.677, pair_cos=0.3065, norm_mean=3.68
+[2026-06-01 07:41:26]   random_mixed/L18: dim@80=17, top1=0.137, LOO_cos=0.704, pair_cos=0.3099, norm_mean=6.15
+[2026-06-01 07:41:27]   random_mixed/L24: dim@80=16, top1=0.156, LOO_cos=0.759, pair_cos=0.3533, norm_mean=14.54
+[2026-06-01 07:41:27]   random_mixed/L38: dim@80=15, top1=0.175, LOO_cos=0.758, pair_cos=0.3165, norm_mean=98.22
+[2026-06-01 07:41:27]   random_noun_noun/L6: dim@80=16, top1=0.135, LOO_cos=0.677, pair_cos=0.2296, norm_mean=1.23
+[2026-06-01 07:41:27]   random_noun_noun/L12: dim@80=16, top1=0.158, LOO_cos=0.686, pair_cos=0.2527, norm_mean=3.16
+[2026-06-01 07:41:27]   random_noun_noun/L18: dim@80=16, top1=0.166, LOO_cos=0.716, pair_cos=0.2664, norm_mean=5.27
+[2026-06-01 07:41:27]   random_noun_noun/L24: dim@80=15, top1=0.182, LOO_cos=0.747, pair_cos=0.2748, norm_mean=11.59
+[2026-06-01 07:41:27]   random_noun_noun/L38: dim@80=14, top1=0.162, LOO_cos=0.744, pair_cos=0.2216, norm_mean=88.69
+[2026-06-01 07:41:27]   random_adj_adj/L6: dim@80=17, top1=0.138, LOO_cos=0.582, pair_cos=0.0492, norm_mean=1.36
+[2026-06-01 07:41:27]   random_adj_adj/L12: dim@80=17, top1=0.153, LOO_cos=0.572, pair_cos=0.0168, norm_mean=3.39
+[2026-06-01 07:41:27]   random_adj_adj/L18: dim@80=16, top1=0.192, LOO_cos=0.621, pair_cos=0.0182, norm_mean=5.90
+[2026-06-01 07:41:27]   random_adj_adj/L24: dim@80=15, top1=0.192, LOO_cos=0.673, pair_cos=0.0295, norm_mean=13.74
+[2026-06-01 07:41:27]   random_adj_adj/L38: dim@80=14, top1=0.162, LOO_cos=0.688, pair_cos=0.0176, norm_mean=92.59
+[2026-06-01 07:41:27] 
+Running Part B: Template Control...
+[2026-06-01 07:41:27] 
+--- Part B: Multi-Template Consistency ---
+[2026-06-01 07:41:27]   same_class t1 vs t2: mean_cos=0.265, median=0.265, frac>0.3=0.40, frac>0.5=0.00
+[2026-06-01 07:41:27]   same_class t1 vs t3: mean_cos=0.240, median=0.231, frac>0.3=0.27, frac>0.5=0.00
+[2026-06-01 07:41:27]   same_class t2 vs t3: mean_cos=0.935, median=0.931, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:27]   attribute t1 vs t2: mean_cos=0.193, median=0.174, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:27]   attribute t1 vs t3: mean_cos=0.188, median=0.193, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:27]   attribute t2 vs t3: mean_cos=0.942, median=0.940, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:27]   function t1 vs t2: mean_cos=0.241, median=0.243, frac>0.3=0.27, frac>0.5=0.00
+[2026-06-01 07:41:27]   function t1 vs t3: mean_cos=0.213, median=0.229, frac>0.3=0.13, frac>0.5=0.00
+[2026-06-01 07:41:27]   function t2 vs t3: mean_cos=0.919, median=0.931, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:27]   antonym t1 vs t2: mean_cos=0.154, median=0.150, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:27]   antonym t1 vs t3: mean_cos=0.134, median=0.129, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:27]   antonym t2 vs t3: mean_cos=0.938, median=0.945, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:27] 
+Running Part C: Negation Token Control...
+[2026-06-01 07:41:27] 
+--- Part C: Negation Token Control ---
+[2026-06-01 07:41:27]   not/L6: dim@80=11, LOO_cos=0.753, pair_cos=0.3516, norm_mean=0.86
+[2026-06-01 07:41:27]   not/L12: dim@80=11, LOO_cos=0.643, pair_cos=0.1928, norm_mean=2.26
+[2026-06-01 07:41:28]   not/L18: dim@80=12, LOO_cos=0.615, pair_cos=0.1851, norm_mean=4.16
+[2026-06-01 07:41:28]   not/L24: dim@80=12, LOO_cos=0.681, pair_cos=0.2796, norm_mean=8.41
+[2026-06-01 07:41:28]   not/L38: dim@80=11, LOO_cos=0.781, pair_cos=0.4254, norm_mean=51.59
+[2026-06-01 07:41:28]   never/L6: dim@80=11, LOO_cos=0.802, pair_cos=0.4895, norm_mean=0.95
+[2026-06-01 07:41:28]   never/L12: dim@80=11, LOO_cos=0.698, pair_cos=0.3086, norm_mean=2.68
+[2026-06-01 07:41:28]   never/L18: dim@80=12, LOO_cos=0.667, pair_cos=0.2933, norm_mean=4.97
+[2026-06-01 07:41:28]   never/L24: dim@80=11, LOO_cos=0.738, pair_cos=0.3950, norm_mean=10.60
+[2026-06-01 07:41:28]   never/L38: dim@80=11, LOO_cos=0.840, pair_cos=0.5740, norm_mean=68.54
+[2026-06-01 07:41:28]   barely/L6: dim@80=11, LOO_cos=0.802, pair_cos=0.5005, norm_mean=0.85
+[2026-06-01 07:41:28]   barely/L12: dim@80=12, LOO_cos=0.690, pair_cos=0.3044, norm_mean=2.39
+[2026-06-01 07:41:28]   barely/L18: dim@80=12, LOO_cos=0.659, pair_cos=0.2959, norm_mean=4.55
+[2026-06-01 07:41:28]   barely/L24: dim@80=12, LOO_cos=0.711, pair_cos=0.3642, norm_mean=9.44
+[2026-06-01 07:41:28]   barely/L38: dim@80=11, LOO_cos=0.814, pair_cos=0.5091, norm_mean=59.64
+[2026-06-01 07:41:28]   morphological/L6: dim@80=11, LOO_cos=0.683, pair_cos=0.2635, norm_mean=0.95
+[2026-06-01 07:41:28]   morphological/L12: dim@80=11, LOO_cos=0.637, pair_cos=0.1682, norm_mean=2.52
+[2026-06-01 07:41:28]   morphological/L18: dim@80=12, LOO_cos=0.613, pair_cos=0.1761, norm_mean=4.61
+[2026-06-01 07:41:28]   morphological/L24: dim@80=11, LOO_cos=0.653, pair_cos=0.1924, norm_mean=9.00
+[2026-06-01 07:41:28]   morphological/L38: dim@80=10, LOO_cos=0.722, pair_cos=0.2235, norm_mean=54.15
+[2026-06-01 07:41:28]   Negation not vs never: mean_cos=0.699, frac>0.3=1.00, frac>0.5=0.95
+[2026-06-01 07:41:28]   Negation not vs barely: mean_cos=0.684, frac>0.3=1.00, frac>0.5=0.85
+[2026-06-01 07:41:28]   Negation not vs morphological: mean_cos=0.608, frac>0.3=1.00, frac>0.5=0.70
+[2026-06-01 07:41:28]   Negation never vs barely: mean_cos=0.693, frac>0.3=1.00, frac>0.5=0.95
+[2026-06-01 07:41:28]   Negation never vs morphological: mean_cos=0.465, frac>0.3=0.70, frac>0.5=0.45
+[2026-06-01 07:41:28]   Negation barely vs morphological: mean_cos=0.512, frac>0.3=0.90, frac>0.5=0.50
+[2026-06-01 07:41:28]   L6 Negation not_vs_never: mean_angle=16.0deg, min_angle=0.0deg, mean_cos=0.902
+[2026-06-01 07:41:28]   L6 Negation not_vs_barely: mean_angle=21.0deg, min_angle=0.0deg, mean_cos=0.859
+[2026-06-01 07:41:28]   L6 Negation not_vs_morphological: mean_angle=21.6deg, min_angle=0.0deg, mean_cos=0.862
+[2026-06-01 07:41:28]   L6 Negation never_vs_barely: mean_angle=19.0deg, min_angle=0.0deg, mean_cos=0.882
+[2026-06-01 07:41:28]   L6 Negation never_vs_morphological: mean_angle=21.6deg, min_angle=0.0deg, mean_cos=0.866
+[2026-06-01 07:41:28]   L6 Negation barely_vs_morphological: mean_angle=22.7deg, min_angle=0.0deg, mean_cos=0.855
+[2026-06-01 07:41:28]   L12 Negation not_vs_never: mean_angle=14.9deg, min_angle=0.0deg, mean_cos=0.930
+[2026-06-01 07:41:28]   L12 Negation not_vs_barely: mean_angle=19.9deg, min_angle=0.0deg, mean_cos=0.890
+[2026-06-01 07:41:28]   L12 Negation not_vs_morphological: mean_angle=16.7deg, min_angle=0.0deg, mean_cos=0.910
+[2026-06-01 07:41:28]   L12 Negation never_vs_barely: mean_angle=23.1deg, min_angle=0.0deg, mean_cos=0.835
+[2026-06-01 07:41:28]   L12 Negation never_vs_morphological: mean_angle=18.5deg, min_angle=0.0deg, mean_cos=0.901
+[2026-06-01 07:41:28]   L12 Negation barely_vs_morphological: mean_angle=25.1deg, min_angle=0.0deg, mean_cos=0.820
+[2026-06-01 07:41:28]   L18 Negation not_vs_never: mean_angle=18.3deg, min_angle=0.0deg, mean_cos=0.886
+[2026-06-01 07:41:28]   L18 Negation not_vs_barely: mean_angle=20.1deg, min_angle=0.0deg, mean_cos=0.876
+[2026-06-01 07:41:28]   L18 Negation not_vs_morphological: mean_angle=21.2deg, min_angle=0.0deg, mean_cos=0.848
+[2026-06-01 07:41:28]   L18 Negation never_vs_barely: mean_angle=24.5deg, min_angle=0.0deg, mean_cos=0.824
+[2026-06-01 07:41:28]   L18 Negation never_vs_morphological: mean_angle=23.4deg, min_angle=0.0deg, mean_cos=0.828
+[2026-06-01 07:41:28]   L18 Negation barely_vs_morphological: mean_angle=22.7deg, min_angle=0.0deg, mean_cos=0.850
+[2026-06-01 07:41:28]   L24 Negation not_vs_never: mean_angle=23.7deg, min_angle=0.0deg, mean_cos=0.827
+[2026-06-01 07:41:28]   L24 Negation not_vs_barely: mean_angle=21.1deg, min_angle=0.0deg, mean_cos=0.866
+[2026-06-01 07:41:28]   L24 Negation not_vs_morphological: mean_angle=22.4deg, min_angle=0.0deg, mean_cos=0.847
+[2026-06-01 07:41:28]   L24 Negation never_vs_barely: mean_angle=24.9deg, min_angle=0.0deg, mean_cos=0.821
+[2026-06-01 07:41:28]   L24 Negation never_vs_morphological: mean_angle=23.6deg, min_angle=0.0deg, mean_cos=0.856
+[2026-06-01 07:41:28]   L24 Negation barely_vs_morphological: mean_angle=28.3deg, min_angle=0.0deg, mean_cos=0.795
+[2026-06-01 07:41:28]   L38 Negation not_vs_never: mean_angle=29.2deg, min_angle=0.0deg, mean_cos=0.776
+[2026-06-01 07:41:28]   L38 Negation not_vs_barely: mean_angle=26.3deg, min_angle=0.0deg, mean_cos=0.807
+[2026-06-01 07:41:28]   L38 Negation not_vs_morphological: mean_angle=27.0deg, min_angle=0.0deg, mean_cos=0.812
+[2026-06-01 07:41:28]   L38 Negation never_vs_barely: mean_angle=29.9deg, min_angle=0.0deg, mean_cos=0.787
+[2026-06-01 07:41:28]   L38 Negation never_vs_morphological: mean_angle=29.1deg, min_angle=0.0deg, mean_cos=0.792
+[2026-06-01 07:41:28]   L38 Negation barely_vs_morphological: mean_angle=30.7deg, min_angle=0.0deg, mean_cos=0.769
+[2026-06-01 07:41:28] Results saved to results\phase319_control\glm4_phase319.json
+[2026-06-01 07:41:28] 
+======================================================================
+[2026-06-01 07:41:28] PHASE 319 SUMMARY - glm4
+[2026-06-01 07:41:28] ======================================================================
+[2026-06-01 07:41:28] 
+--- Part A: Random Baseline vs Phase 318 (deepest layer) ---
+[2026-06-01 07:41:28] Group                dim@80   top1%    LOO_cos   pair_cos  
+[2026-06-01 07:41:28] random_mixed         15       0.175   0.758   0.3165
+[2026-06-01 07:41:28] random_noun_noun     14       0.162   0.744   0.2216
+[2026-06-01 07:41:28] random_adj_adj       14       0.162   0.688   0.0176
+[2026-06-01 07:41:28] 
+  Phase 318 reference (deepest layer):
+[2026-06-01 07:41:28]   same_class           18-19    0.07-0.11 0.43-0.50 0.002-0.023
+[2026-06-01 07:41:28]   antonym              16-18    0.14-0.16 0.51-0.62 0.008-0.032
+[2026-06-01 07:41:28]   weak_negation        14-20    0.12-0.20 0.67-0.83 0.27-0.66 
+[2026-06-01 07:41:28] 
+--- Part B: Cross-Template Direction Consistency ---
+[2026-06-01 07:41:28]   same_class t1_vs_t2: mean_cos=0.265, median=0.265, frac>0.3=0.40, frac>0.5=0.00
+[2026-06-01 07:41:28]   same_class t1_vs_t3: mean_cos=0.240, median=0.231, frac>0.3=0.27, frac>0.5=0.00
+[2026-06-01 07:41:28]   same_class t2_vs_t3: mean_cos=0.935, median=0.931, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:28]   attribute t1_vs_t2: mean_cos=0.193, median=0.174, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:28]   attribute t1_vs_t3: mean_cos=0.188, median=0.193, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:28]   attribute t2_vs_t3: mean_cos=0.942, median=0.940, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:28]   function t1_vs_t2: mean_cos=0.241, median=0.243, frac>0.3=0.27, frac>0.5=0.00
+[2026-06-01 07:41:28]   function t1_vs_t3: mean_cos=0.213, median=0.229, frac>0.3=0.13, frac>0.5=0.00
+[2026-06-01 07:41:28]   function t2_vs_t3: mean_cos=0.919, median=0.931, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:28]   antonym t1_vs_t2: mean_cos=0.154, median=0.150, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:28]   antonym t1_vs_t3: mean_cos=0.134, median=0.129, frac>0.3=0.00, frac>0.5=0.00
+[2026-06-01 07:41:28]   antonym t2_vs_t3: mean_cos=0.938, median=0.945, frac>0.3=1.00, frac>0.5=1.00
+[2026-06-01 07:41:28] 
+--- Part C: Negation Token Control ---
+[2026-06-01 07:41:28]   not_vs_never: mean_cos=0.699, frac>0.3=1.00, frac>0.5=0.95
+[2026-06-01 07:41:28]   not_vs_barely: mean_cos=0.684, frac>0.3=1.00, frac>0.5=0.85
+[2026-06-01 07:41:28]   not_vs_morphological: mean_cos=0.608, frac>0.3=1.00, frac>0.5=0.70
+[2026-06-01 07:41:28]   never_vs_barely: mean_cos=0.693, frac>0.3=1.00, frac>0.5=0.95
+[2026-06-01 07:41:28]   never_vs_morphological: mean_cos=0.465, frac>0.3=0.70, frac>0.5=0.45
+[2026-06-01 07:41:28]   barely_vs_morphological: mean_cos=0.512, frac>0.3=0.90, frac>0.5=0.50
+[2026-06-01 07:41:28]   L12 not_vs_never: mean_angle=14.9deg, mean_cos=0.930
+[2026-06-01 07:41:28]   L12 not_vs_barely: mean_angle=19.9deg, mean_cos=0.890
+[2026-06-01 07:41:28]   L12 not_vs_morphological: mean_angle=16.7deg, mean_cos=0.910
+[2026-06-01 07:41:28]   L12 never_vs_barely: mean_angle=23.1deg, mean_cos=0.835
+[2026-06-01 07:41:28]   L12 never_vs_morphological: mean_angle=18.5deg, mean_cos=0.901
+[2026-06-01 07:41:28]   L12 barely_vs_morphological: mean_angle=25.1deg, mean_cos=0.820
+[2026-06-01 07:41:28]   L18 not_vs_never: mean_angle=18.3deg, mean_cos=0.886
+[2026-06-01 07:41:28]   L18 not_vs_barely: mean_angle=20.1deg, mean_cos=0.876
+[2026-06-01 07:41:28]   L18 not_vs_morphological: mean_angle=21.2deg, mean_cos=0.848
+[2026-06-01 07:41:28]   L18 never_vs_barely: mean_angle=24.5deg, mean_cos=0.824
+[2026-06-01 07:41:28]   L18 never_vs_morphological: mean_angle=23.4deg, mean_cos=0.828
+[2026-06-01 07:41:28]   L18 barely_vs_morphological: mean_angle=22.7deg, mean_cos=0.850
+[2026-06-01 07:41:28]   L24 not_vs_never: mean_angle=23.7deg, mean_cos=0.827
+[2026-06-01 07:41:28]   L24 not_vs_barely: mean_angle=21.1deg, mean_cos=0.866
+[2026-06-01 07:41:28]   L24 not_vs_morphological: mean_angle=22.4deg, mean_cos=0.847
+[2026-06-01 07:41:28]   L24 never_vs_barely: mean_angle=24.9deg, mean_cos=0.821
+[2026-06-01 07:41:28]   L24 never_vs_morphological: mean_angle=23.6deg, mean_cos=0.856
+[2026-06-01 07:41:28]   L24 barely_vs_morphological: mean_angle=28.3deg, mean_cos=0.795
+[2026-06-01 07:41:28]   L38 not_vs_never: mean_angle=29.2deg, mean_cos=0.776
+[2026-06-01 07:41:28]   L38 not_vs_barely: mean_angle=26.3deg, mean_cos=0.807
+[2026-06-01 07:41:28]   L38 not_vs_morphological: mean_angle=27.0deg, mean_cos=0.812
+[2026-06-01 07:41:28]   L38 never_vs_barely: mean_angle=29.9deg, mean_cos=0.787
+[2026-06-01 07:41:28]   L38 never_vs_morphological: mean_angle=29.1deg, mean_cos=0.792
+[2026-06-01 07:41:28]   L38 barely_vs_morphological: mean_angle=30.7deg, mean_cos=0.769
+[2026-06-01 07:41:28]   L6 not_vs_never: mean_angle=16.0deg, mean_cos=0.902
+[2026-06-01 07:41:28]   L6 not_vs_barely: mean_angle=21.0deg, mean_cos=0.859
+[2026-06-01 07:41:28]   L6 not_vs_morphological: mean_angle=21.6deg, mean_cos=0.862
+[2026-06-01 07:41:28]   L6 never_vs_barely: mean_angle=19.0deg, mean_cos=0.882
+[2026-06-01 07:41:28]   L6 never_vs_morphological: mean_angle=21.6deg, mean_cos=0.866
+[2026-06-01 07:41:28]   L6 barely_vs_morphological: mean_angle=22.7deg, mean_cos=0.855
+[2026-06-01 07:41:30] Model glm4 released.

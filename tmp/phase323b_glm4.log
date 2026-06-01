@@ -1,0 +1,106 @@
+[2026-06-01 12:00:01] === Phase 323b: Attention Paradox & Attribute Decomposition for glm4 ===
+[2026-06-01 12:00:13]   Loaded glm4 with attn_impl=sdpa
+[2026-06-01 12:00:13]   Model: GlmForCausalLM, device=cuda:0, GPU=8.99GB
+[2026-06-01 12:00:13]   n_layers=40, d_model=4096
+[2026-06-01 12:00:14] 
+============================================================
+[2026-06-01 12:00:14] Test 1: Attention Ablation Paradox — Stability Check
+[2026-06-01 12:00:14] ============================================================
+[2026-06-01 12:00:42]     L2 α=2.0: full=1.8750, attn_abl=2.0938, mlp_abl=0.3906, random=0.4740, paradox=True
+[2026-06-01 12:01:07]     L3 α=2.0: full=0.8594, attn_abl=0.8281, mlp_abl=0.0625, random=0.2812, paradox=False
+[2026-06-01 12:01:31]     L4 α=2.0: full=0.5938, attn_abl=0.7188, mlp_abl=0.2969, random=-0.0521, paradox=True
+[2026-06-01 12:07:49] 
+  Attention Ablation Paradox Summary:
+[2026-06-01 12:07:49]     Paradox rate: 32/54 (59.3%)
+[2026-06-01 12:07:49]     attn_importance: mean=-0.1267, positive%=40.7%
+[2026-06-01 12:07:49]     mlp_importance: mean=-0.0226, positive%=57.4%
+[2026-06-01 12:07:49]     L2: attn_imp=-0.0712, mlp_imp=0.2117, paradox_rate=61.1%
+[2026-06-01 12:07:49]     L3: attn_imp=-0.0160, mlp_imp=0.1308, paradox_rate=44.4%
+[2026-06-01 12:07:49]     L4: attn_imp=-0.2929, mlp_imp=-0.4105, paradox_rate=72.2%
+[2026-06-01 12:07:49] 
+============================================================
+[2026-06-01 12:07:49] Test 2: Attribute Decomposition (Slot → Type → Value)
+[2026-06-01 12:07:49] ============================================================
+[2026-06-01 12:07:49]   Decomposition: color at L3...
+[2026-06-01 12:08:03]     Levels: ['slot', 'type', 'value', 'full_attr']
+[2026-06-01 12:08:03]       slot: tgt_delta=-3.1943, cluster_delta=-1.7794
+[2026-06-01 12:08:03]       type: tgt_delta=3.4375, cluster_delta=1.8597
+[2026-06-01 12:08:03]       value: tgt_delta=0.4688, cluster_delta=0.9948
+[2026-06-01 12:08:03]       full_attr: tgt_delta=0.8281, cluster_delta=1.3366
+[2026-06-01 12:08:03]       cos(slot,type)=0.5733
+[2026-06-01 12:08:03]       cos(slot,value)=0.4855
+[2026-06-01 12:08:03]       cos(slot,full_attr)=0.0029
+[2026-06-01 12:08:03]       cos(type,value)=0.6118
+[2026-06-01 12:08:03]       cos(type,full_attr)=0.1761
+[2026-06-01 12:08:03]       cos(value,full_attr)=0.6117
+[2026-06-01 12:08:03]   Decomposition: taste at L3...
+[2026-06-01 12:08:17]     Levels: ['slot', 'type', 'value', 'full_attr']
+[2026-06-01 12:08:17]       slot: tgt_delta=-0.3438, cluster_delta=-0.8945
+[2026-06-01 12:08:17]       type: tgt_delta=-0.5938, cluster_delta=0.3590
+[2026-06-01 12:08:17]       value: tgt_delta=1.4023, cluster_delta=1.4719
+[2026-06-01 12:08:17]       full_attr: tgt_delta=2.2930, cluster_delta=2.2875
+[2026-06-01 12:08:17]       cos(slot,type)=0.5576
+[2026-06-01 12:08:17]       cos(slot,value)=0.4265
+[2026-06-01 12:08:17]       cos(slot,full_attr)=-0.0434
+[2026-06-01 12:08:17]       cos(type,value)=0.5193
+[2026-06-01 12:08:17]       cos(type,full_attr)=0.1210
+[2026-06-01 12:08:17]       cos(value,full_attr)=0.6520
+[2026-06-01 12:08:17]   Decomposition: temperature at L3...
+[2026-06-01 12:08:31]     Levels: ['slot', 'type', 'value', 'full_attr']
+[2026-06-01 12:08:31]       slot: tgt_delta=-2.3203, cluster_delta=-0.4814
+[2026-06-01 12:08:31]       type: tgt_delta=0.3047, cluster_delta=1.1826
+[2026-06-01 12:08:31]       value: tgt_delta=1.5156, cluster_delta=1.8945
+[2026-06-01 12:08:31]       full_attr: tgt_delta=1.6562, cluster_delta=1.1729
+[2026-06-01 12:08:31]       cos(slot,type)=0.5709
+[2026-06-01 12:08:31]       cos(slot,value)=0.5057
+[2026-06-01 12:08:31]       cos(slot,full_attr)=-0.0014
+[2026-06-01 12:08:31]       cos(type,value)=0.5857
+[2026-06-01 12:08:31]       cos(type,full_attr)=0.1190
+[2026-06-01 12:08:31]       cos(value,full_attr)=0.5801
+[2026-06-01 12:08:31]   Decomposition: texture at L3...
+[2026-06-01 12:08:45]     Levels: ['slot', 'type', 'value', 'full_attr']
+[2026-06-01 12:08:45]       slot: tgt_delta=-2.1992, cluster_delta=-1.0426
+[2026-06-01 12:08:45]       type: tgt_delta=1.2148, cluster_delta=0.6223
+[2026-06-01 12:08:45]       value: tgt_delta=1.9883, cluster_delta=1.5375
+[2026-06-01 12:08:45]       full_attr: tgt_delta=2.3945, cluster_delta=1.5648
+[2026-06-01 12:08:45]       cos(slot,type)=0.5469
+[2026-06-01 12:08:45]       cos(slot,value)=0.4568
+[2026-06-01 12:08:45]       cos(slot,full_attr)=-0.0220
+[2026-06-01 12:08:45]       cos(type,value)=0.5195
+[2026-06-01 12:08:45]       cos(type,full_attr)=0.0686
+[2026-06-01 12:08:45]       cos(value,full_attr)=0.5938
+[2026-06-01 12:08:45] 
+============================================================
+[2026-06-01 12:08:45] Test 3: Attribute Slot Transfer
+[2026-06-01 12:08:45] ============================================================
+[2026-06-01 12:09:12] 
+  Slot Transfer: same_cluster_mean=-0.9608, diff_cluster_mean=-0.5023
+[2026-06-01 12:09:12] Results saved to results\phase323b_attn_paradox\glm4_phase323b.json
+[2026-06-01 12:09:12] 
+============================================================
+[2026-06-01 12:09:12] PHASE 323b SUMMARY - glm4
+[2026-06-01 12:09:12] ============================================================
+[2026-06-01 12:09:12]   Attention ablation paradox rate: 32/54 (59.3%)
+[2026-06-01 12:09:12]   attn_importance mean: -0.1267
+[2026-06-01 12:09:12]   mlp_importance mean: -0.0226
+[2026-06-01 12:09:12]   Decomposition color:
+[2026-06-01 12:09:12]     slot: tgt_delta=-3.1943, cluster_delta=-1.7794
+[2026-06-01 12:09:12]     type: tgt_delta=3.4375, cluster_delta=1.8597
+[2026-06-01 12:09:12]     value: tgt_delta=0.4688, cluster_delta=0.9948
+[2026-06-01 12:09:12]     full_attr: tgt_delta=0.8281, cluster_delta=1.3366
+[2026-06-01 12:09:12]   Decomposition taste:
+[2026-06-01 12:09:12]     slot: tgt_delta=-0.3438, cluster_delta=-0.8945
+[2026-06-01 12:09:12]     type: tgt_delta=-0.5938, cluster_delta=0.3590
+[2026-06-01 12:09:12]     value: tgt_delta=1.4023, cluster_delta=1.4719
+[2026-06-01 12:09:12]     full_attr: tgt_delta=2.2930, cluster_delta=2.2875
+[2026-06-01 12:09:12]   Decomposition temperature:
+[2026-06-01 12:09:12]     slot: tgt_delta=-2.3203, cluster_delta=-0.4814
+[2026-06-01 12:09:12]     type: tgt_delta=0.3047, cluster_delta=1.1826
+[2026-06-01 12:09:12]     value: tgt_delta=1.5156, cluster_delta=1.8945
+[2026-06-01 12:09:12]     full_attr: tgt_delta=1.6562, cluster_delta=1.1729
+[2026-06-01 12:09:12]   Decomposition texture:
+[2026-06-01 12:09:12]     slot: tgt_delta=-2.1992, cluster_delta=-1.0426
+[2026-06-01 12:09:12]     type: tgt_delta=1.2148, cluster_delta=0.6223
+[2026-06-01 12:09:12]     value: tgt_delta=1.9883, cluster_delta=1.5375
+[2026-06-01 12:09:12]     full_attr: tgt_delta=2.3945, cluster_delta=1.5648
+[2026-06-01 12:09:14] Model glm4 released. Total time: 552.7s

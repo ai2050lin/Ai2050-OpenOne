@@ -1,0 +1,48 @@
+[2026-06-01 11:25:05] === Phase 322b: Readout Gain Decomposition for qwen3 ===
+[2026-06-01 11:25:18]   Loaded qwen3 with sdpa
+[2026-06-01 11:25:18]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-06-01 11:25:18]   n_layers=36, d_model=2560
+[2026-06-01 11:25:19]   W_U shape: (151936, 2560)
+[2026-06-01 11:25:19] 
+============================================================
+[2026-06-01 11:25:19] Test 1: Direction Type Comparison
+[2026-06-01 11:25:19] ============================================================
+[2026-06-01 11:25:20]   apple→red:
+[2026-06-01 11:25:20]     attr_dir: delta_tgt=0.5000, delta_src=0.5000
+[2026-06-01 11:25:20]     wu_tgt_dir: delta_tgt=0.3125, delta_src=0.3125
+[2026-06-01 11:25:20]     wu_src_dir: delta_tgt=0.3125, delta_src=0.3125
+[2026-06-01 11:25:20]     random_dir: delta_tgt=0.0688, delta_src=0.0688
+[2026-06-01 11:25:20]     cos(attr, wu_tgt)=0.0965
+[2026-06-01 11:25:22] 
+  Direction type comparison (mean across pairs):
+[2026-06-01 11:25:22]     attr_delta_tgt: mean=0.1562, std=0.1583
+[2026-06-01 11:25:22]     wu_tgt_delta_tgt: mean=0.3490, std=0.4256
+[2026-06-01 11:25:22]     wu_src_delta_tgt: mean=0.3490, std=0.4256
+[2026-06-01 11:25:22]     random_mean_delta_tgt: mean=0.0438, std=0.0263
+[2026-06-01 11:25:22] 
+  Gain above random:
+[2026-06-01 11:25:22]     attr_direction: 0.1125
+[2026-06-01 11:25:22]     wu_tgt_direction: 0.3052
+[2026-06-01 11:25:22] 
+============================================================
+[2026-06-01 11:25:22] Test 2: Readout Gain by Layer (Inject at opt layer, readout at each layer)
+[2026-06-01 11:25:22] ============================================================
+[2026-06-01 11:25:25] 
+  Layer comparison (mean across pairs):
+[2026-06-01 11:25:25]   L0: attr_delta=0.1719, wu_delta=0.1562, diff=0.0156, cos=0.0887
+[2026-06-01 11:25:25]   L1: attr_delta=0.1328, wu_delta=0.1250, diff=0.0078, cos=0.0769
+[2026-06-01 11:25:25]   L2: attr_delta=0.1094, wu_delta=0.0781, diff=0.0312, cos=0.0662
+[2026-06-01 11:25:25]   L3: attr_delta=0.0781, wu_delta=0.0703, diff=0.0078, cos=0.0512
+[2026-06-01 11:25:25]   L4: attr_delta=0.0938, wu_delta=0.1094, diff=-0.0156, cos=0.0359
+[2026-06-01 11:25:25]   L5: attr_delta=0.0938, wu_delta=0.0469, diff=0.0469, cos=0.0220
+[2026-06-01 11:25:25] Results saved to results\phase322b_gain\qwen3_phase322b.json
+[2026-06-01 11:25:25] 
+============================================================
+[2026-06-01 11:25:25] PHASE 322b SUMMARY - qwen3
+[2026-06-01 11:25:25] ============================================================
+[2026-06-01 11:25:25]   Attribute direction: delta_tgt=0.1562
+[2026-06-01 11:25:25]   W_U-target direction: delta_tgt=0.3490
+[2026-06-01 11:25:25]   Random direction: delta_tgt=0.0438
+[2026-06-01 11:25:25]   cos(attr_dir, wu_dir)=0.0799
+[2026-06-01 11:25:25]   → W_U direction more effective (direct readout)
+[2026-06-01 11:25:25] Model qwen3 released.

@@ -1,0 +1,304 @@
+[2026-06-01 08:51:49] === Phase 320: Causal Verification for qwen3 ===
+[2026-06-01 08:51:50] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 08:51:51]   flash_attention_2 failed (FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.), falling back to sdpa
+[2026-06-01 08:52:03]   Loaded with sdpa
+[2026-06-01 08:52:03]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-06-01 08:52:03]   Layer allocation: GPU=0, CPU=0 components
+[2026-06-01 08:52:03]   n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+[2026-06-01 08:52:03]   Load time: 13.7s
+[2026-06-01 08:52:03]   Target layers: [6, 12, 18, 24, 34]
+[2026-06-01 08:52:03]   Total unique sentences: 300
+[2026-06-01 08:52:03] Extracting representations...
+[2026-06-01 08:52:05]     All Extracted 50/300, GPU=8.05GB
+[2026-06-01 08:52:07]     All Extracted 100/300, GPU=8.05GB
+[2026-06-01 08:52:09]     All Extracted 150/300, GPU=8.05GB
+[2026-06-01 08:52:10]     All Extracted 200/300, GPU=8.05GB
+[2026-06-01 08:52:12]     All Extracted 250/300, GPU=8.05GB
+[2026-06-01 08:52:15]     All Extracted 300/300, GPU=8.05GB
+[2026-06-01 08:52:15]   Extraction time: 12.1s
+[2026-06-01 08:52:15] 
+============================================================
+[2026-06-01 08:52:15] Part A: Attribute Direction Causal Injection
+[2026-06-01 08:52:15] ============================================================
+[2026-06-01 08:52:16]   A1: Extracting source attribute directions...
+[2026-06-01 08:52:16]   Extracted 20 attribute directions
+[2026-06-01 08:52:16]   A2: Extracting pure attribute axis directions (same-object, different values)...
+[2026-06-01 08:52:16]   Extracted 15 axis directions
+[2026-06-01 08:52:16]   A3: Causal injection — attribute directions into neutral sentences...
+[2026-06-01 08:52:16]   Testing 20 source→target pairs at layer L34
+[2026-06-01 08:52:20]   A4: Pure attribute axis injection (same-object different-value)...
+[2026-06-01 08:52:22]   A5: Cross-object transfer — color direction from apple→red into banana...
+[2026-06-01 08:52:24] 
+  --- Attribute Causal Summary ---
+[2026-06-01 08:52:24]   d_attr injection alpha=0.5: mean_delta=-0.007, frac_positive=0.05
+[2026-06-01 08:52:24]   d_attr injection alpha=1.0: mean_delta=0.004, frac_positive=0.15
+[2026-06-01 08:52:24]   d_attr injection alpha=2.0: mean_delta=0.010, frac_positive=0.35
+[2026-06-01 08:52:24]   d_attr injection alpha=4.0: mean_delta=0.034, frac_positive=0.75
+[2026-06-01 08:52:24]   d_axis injection alpha=1.0: mean_target_delta=0.006, mean_source_delta=0.007, frac_positive=0.33
+[2026-06-01 08:52:24]   d_axis injection alpha=2.0: mean_target_delta=0.002, mean_source_delta=-0.014, frac_positive=0.27
+[2026-06-01 08:52:24]   d_axis injection alpha=4.0: mean_target_delta=0.027, mean_source_delta=-0.014, frac_positive=0.53
+[2026-06-01 08:52:24]   Cross-object transfer: mean_delta=0.015, frac_positive=0.36, frac_color_top5=0.00
+[2026-06-01 08:52:25] 
+============================================================
+[2026-06-01 08:52:25] Part B: Function Direction Causal Injection
+[2026-06-01 08:52:25] ============================================================
+[2026-06-01 08:52:25]   B1: Extracting source function directions...
+[2026-06-01 08:52:25]   Extracted 20 function directions
+[2026-06-01 08:52:25]   B2: Cross-tool transfer for same function...
+[2026-06-01 08:52:26]   B3: Direct function injection (same tool)...
+[2026-06-01 08:52:27] 
+  --- Function Causal Summary ---
+[2026-06-01 08:52:27]   Direct injection alpha=1.0: mean_delta=0.000, frac_positive=0.10
+[2026-06-01 08:52:27]   Direct injection alpha=2.0: mean_delta=0.006, frac_positive=0.20
+[2026-06-01 08:52:27]   Cross-tool transfer alpha=1.0: mean_delta=0.000, frac_positive=0.00, frac_action_top5=0.86
+[2026-06-01 08:52:27]   Cross-tool transfer alpha=2.0: mean_delta=0.009, frac_positive=0.14, frac_action_top5=0.86
+[2026-06-01 08:52:27] 
+============================================================
+[2026-06-01 08:52:27] Part C: Negation Sub-Type Decomposition
+[2026-06-01 08:52:27] ============================================================
+[2026-06-01 08:52:27]   Negation types: ['not', 'never', 'barely', 'morphological', 'double_neg', 'scope_neg']
+[2026-06-01 08:52:27]     not: 20 pairs
+[2026-06-01 08:52:27]     never: 20 pairs
+[2026-06-01 08:52:27]     barely: 20 pairs
+[2026-06-01 08:52:27]     morphological: 13 pairs
+[2026-06-01 08:52:27]     double_neg: 13 pairs
+[2026-06-01 08:52:27]     scope_neg: 20 pairs
+[2026-06-01 08:52:27]   C1: Extracting negation type directions...
+[2026-06-01 08:52:27]     not: 20 directions at L34
+[2026-06-01 08:52:27]     never: 20 directions at L34
+[2026-06-01 08:52:27]     barely: 20 directions at L34
+[2026-06-01 08:52:27]     morphological: 13 directions at L34
+[2026-06-01 08:52:27]     double_neg: 13 directions at L34
+[2026-06-01 08:52:27]     scope_neg: 20 directions at L34
+[2026-06-01 08:52:27]   C2: Within-type and cross-type cosine similarity...
+[2026-06-01 08:52:27]   C3: Subspace analysis per negation type...
+[2026-06-01 08:52:27]     not: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:52:27]     never: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:52:27]     barely: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:52:27]     morphological: n=13, dim@80=1, pair_cos=0.693
+[2026-06-01 08:52:27]     double_neg: n=13, dim@80=9, pair_cos=0.215
+[2026-06-01 08:52:27]     scope_neg: n=20, dim@80=13, pair_cos=0.445
+[2026-06-01 08:52:27]   C4: Negation causal injection...
+[2026-06-01 08:52:29] 
+  --- Negation Decomposition Summary ---
+[2026-06-01 08:52:29]   barely_within: mean_cos=0.999
+[2026-06-01 08:52:29]   barely_vs_double_neg: mean_cos=-0.007
+[2026-06-01 08:52:29]   barely_vs_morphological: mean_cos=0.846
+[2026-06-01 08:52:29]   barely_vs_never: mean_cos=0.999
+[2026-06-01 08:52:29]   barely_vs_not: mean_cos=0.999
+[2026-06-01 08:52:29]   barely_vs_scope_neg: mean_cos=0.079
+[2026-06-01 08:52:29]   double_neg_within: mean_cos=0.215
+[2026-06-01 08:52:29]   double_neg_vs_morphological: mean_cos=-0.002
+[2026-06-01 08:52:29]   double_neg_vs_never: mean_cos=-0.008
+[2026-06-01 08:52:29]   double_neg_vs_not: mean_cos=-0.009
+[2026-06-01 08:52:29]   double_neg_vs_scope_neg: mean_cos=0.027
+[2026-06-01 08:52:29]   morphological_within: mean_cos=0.693
+[2026-06-01 08:52:29]   morphological_vs_never: mean_cos=0.846
+[2026-06-01 08:52:29]   morphological_vs_not: mean_cos=0.846
+[2026-06-01 08:52:29]   morphological_vs_scope_neg: mean_cos=0.066
+[2026-06-01 08:52:29]   never_within: mean_cos=0.999
+[2026-06-01 08:52:29]   never_vs_not: mean_cos=0.999
+[2026-06-01 08:52:29]   never_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:52:29]   not_within: mean_cos=0.999
+[2026-06-01 08:52:29]   not_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:52:29]   scope_neg_within: mean_cos=0.445
+[2026-06-01 08:52:29]   not causal: mean_max_neg_delta=-0.002, mean_adj_delta=-0.005
+[2026-06-01 08:52:29]   never causal: mean_max_neg_delta=0.013, mean_adj_delta=-0.002
+[2026-06-01 08:52:29]   barely causal: mean_max_neg_delta=0.008, mean_adj_delta=-0.003
+[2026-06-01 08:52:29] Results saved to results\phase320_causal\qwen3_phase320.json
+[2026-06-01 08:52:29] 
+======================================================================
+[2026-06-01 08:52:29] PHASE 320 OVERALL SUMMARY - qwen3
+[2026-06-01 08:52:29] ======================================================================
+[2026-06-01 08:52:29] 
+--- Attribute Causal Injection ---
+[2026-06-01 08:52:29]   d_attr alpha=0.5: mean_delta=-0.007, positive=5%
+[2026-06-01 08:52:29]   d_attr alpha=1.0: mean_delta=0.004, positive=15%
+[2026-06-01 08:52:29]   d_attr alpha=2.0: mean_delta=0.010, positive=35%
+[2026-06-01 08:52:29]   d_attr alpha=4.0: mean_delta=0.034, positive=75%
+[2026-06-01 08:52:29]   d_axis alpha=1.0: target_delta=0.006, source_delta=0.007, positive=33%
+[2026-06-01 08:52:29]   d_axis alpha=2.0: target_delta=0.002, source_delta=-0.014, positive=27%
+[2026-06-01 08:52:29]   d_axis alpha=4.0: target_delta=0.027, source_delta=-0.014, positive=53%
+[2026-06-01 08:52:29]   Cross-object transfer: mean_delta=0.015, positive=36%
+[2026-06-01 08:52:29] 
+--- Function Causal Injection ---
+[2026-06-01 08:52:29]   Direct alpha=1.0: mean_delta=0.000, positive=10%
+[2026-06-01 08:52:29]   Direct alpha=2.0: mean_delta=0.006, positive=20%
+[2026-06-01 08:52:29]   Transfer alpha=1.0: mean_delta=0.000, positive=0%
+[2026-06-01 08:52:29]   Transfer alpha=2.0: mean_delta=0.009, positive=14%
+[2026-06-01 08:52:29] 
+--- Negation Decomposition ---
+[2026-06-01 08:52:29]   not: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:52:29]   never: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:52:29]   barely: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:52:29]   morphological: dim@80=1, pair_cos=0.693, n=13
+[2026-06-01 08:52:29]   double_neg: dim@80=9, pair_cos=0.215, n=13
+[2026-06-01 08:52:29]   scope_neg: dim@80=13, pair_cos=0.445, n=20
+[2026-06-01 08:52:29]   Cross-type barely_vs_double_neg: mean_cos=-0.007
+[2026-06-01 08:52:29]   Cross-type barely_vs_morphological: mean_cos=0.846
+[2026-06-01 08:52:29]   Cross-type barely_vs_never: mean_cos=0.999
+[2026-06-01 08:52:29]   Cross-type barely_vs_not: mean_cos=0.999
+[2026-06-01 08:52:29]   Cross-type barely_vs_scope_neg: mean_cos=0.079
+[2026-06-01 08:52:29]   Cross-type double_neg_vs_morphological: mean_cos=-0.002
+[2026-06-01 08:52:29]   Cross-type double_neg_vs_never: mean_cos=-0.008
+[2026-06-01 08:52:29]   Cross-type double_neg_vs_not: mean_cos=-0.009
+[2026-06-01 08:52:29]   Cross-type double_neg_vs_scope_neg: mean_cos=0.027
+[2026-06-01 08:52:29]   Cross-type morphological_vs_never: mean_cos=0.846
+[2026-06-01 08:52:29]   Cross-type morphological_vs_not: mean_cos=0.846
+[2026-06-01 08:52:29]   Cross-type morphological_vs_scope_neg: mean_cos=0.066
+[2026-06-01 08:52:29]   Cross-type never_vs_not: mean_cos=0.999
+[2026-06-01 08:52:29]   Cross-type never_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:52:29]   Cross-type not_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:52:29] Model qwen3 released.
+[2026-06-01 08:52:37] === Phase 320: Causal Verification for qwen3 ===
+[2026-06-01 08:52:38] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 08:52:39]   flash_attention_2 failed (FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.), falling back to sdpa
+[2026-06-01 08:52:43]   Loaded with sdpa
+[2026-06-01 08:52:43]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-06-01 08:52:43]   Layer allocation: GPU=0, CPU=0 components
+[2026-06-01 08:52:43]   n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+[2026-06-01 08:52:43]   Load time: 6.5s
+[2026-06-01 08:52:43]   Target layers: [6, 12, 18, 24, 34]
+[2026-06-01 08:52:43]   Total unique sentences: 300
+[2026-06-01 08:52:43] Extracting representations...
+[2026-06-01 08:52:45]     All Extracted 50/300, GPU=8.05GB
+[2026-06-01 08:52:47]     All Extracted 100/300, GPU=8.05GB
+[2026-06-01 08:52:49]     All Extracted 150/300, GPU=8.05GB
+[2026-06-01 08:52:51]     All Extracted 200/300, GPU=8.05GB
+[2026-06-01 08:52:52]     All Extracted 250/300, GPU=8.05GB
+[2026-06-01 08:52:54]     All Extracted 300/300, GPU=8.05GB
+[2026-06-01 08:52:54]   Extraction time: 10.4s
+[2026-06-01 08:52:54] 
+============================================================
+[2026-06-01 08:52:54] Part A: Attribute Direction Causal Injection
+[2026-06-01 08:52:54] ============================================================
+[2026-06-01 08:52:54]   A1: Extracting source attribute directions...
+[2026-06-01 08:52:54]   Extracted 20 attribute directions
+[2026-06-01 08:52:54]   A2: Extracting pure attribute axis directions (same-object, different values)...
+[2026-06-01 08:52:54]   Extracted 15 axis directions
+[2026-06-01 08:52:54]   A3: Causal injection — attribute directions into neutral sentences...
+[2026-06-01 08:52:54]   Testing 20 source→target pairs at layer L34
+[2026-06-01 08:52:59]   A4: Pure attribute axis injection (same-object different-value)...
+[2026-06-01 08:53:01]   A5: Cross-object transfer — color direction from apple→red into banana...
+[2026-06-01 08:53:03] 
+  --- Attribute Causal Summary ---
+[2026-06-01 08:53:03]   d_attr injection alpha=0.5: mean_delta=-0.007, frac_positive=0.05
+[2026-06-01 08:53:03]   d_attr injection alpha=1.0: mean_delta=0.004, frac_positive=0.15
+[2026-06-01 08:53:03]   d_attr injection alpha=2.0: mean_delta=0.010, frac_positive=0.35
+[2026-06-01 08:53:03]   d_attr injection alpha=4.0: mean_delta=0.034, frac_positive=0.75
+[2026-06-01 08:53:03]   d_axis injection alpha=1.0: mean_target_delta=0.006, mean_source_delta=0.007, frac_positive=0.33
+[2026-06-01 08:53:03]   d_axis injection alpha=2.0: mean_target_delta=0.002, mean_source_delta=-0.014, frac_positive=0.27
+[2026-06-01 08:53:03]   d_axis injection alpha=4.0: mean_target_delta=0.027, mean_source_delta=-0.014, frac_positive=0.53
+[2026-06-01 08:53:03]   Cross-object transfer: mean_delta=0.015, frac_positive=0.36, frac_color_top5=0.00
+[2026-06-01 08:53:03] 
+============================================================
+[2026-06-01 08:53:03] Part B: Function Direction Causal Injection
+[2026-06-01 08:53:03] ============================================================
+[2026-06-01 08:53:03]   B1: Extracting source function directions...
+[2026-06-01 08:53:03]   Extracted 20 function directions
+[2026-06-01 08:53:03]   B2: Cross-tool transfer for same function...
+[2026-06-01 08:53:04]   B3: Direct function injection (same tool)...
+[2026-06-01 08:53:05] 
+  --- Function Causal Summary ---
+[2026-06-01 08:53:05]   Direct injection alpha=1.0: mean_delta=0.000, frac_positive=0.10
+[2026-06-01 08:53:05]   Direct injection alpha=2.0: mean_delta=0.006, frac_positive=0.20
+[2026-06-01 08:53:05]   Cross-tool transfer alpha=1.0: mean_delta=0.000, frac_positive=0.00, frac_action_top5=0.86
+[2026-06-01 08:53:05]   Cross-tool transfer alpha=2.0: mean_delta=0.009, frac_positive=0.14, frac_action_top5=0.86
+[2026-06-01 08:53:05] 
+============================================================
+[2026-06-01 08:53:05] Part C: Negation Sub-Type Decomposition
+[2026-06-01 08:53:05] ============================================================
+[2026-06-01 08:53:05]   Negation types: ['not', 'never', 'barely', 'morphological', 'double_neg', 'scope_neg']
+[2026-06-01 08:53:05]     not: 20 pairs
+[2026-06-01 08:53:05]     never: 20 pairs
+[2026-06-01 08:53:05]     barely: 20 pairs
+[2026-06-01 08:53:05]     morphological: 13 pairs
+[2026-06-01 08:53:05]     double_neg: 13 pairs
+[2026-06-01 08:53:05]     scope_neg: 20 pairs
+[2026-06-01 08:53:05]   C1: Extracting negation type directions...
+[2026-06-01 08:53:05]     not: 20 directions at L34
+[2026-06-01 08:53:05]     never: 20 directions at L34
+[2026-06-01 08:53:05]     barely: 20 directions at L34
+[2026-06-01 08:53:05]     morphological: 13 directions at L34
+[2026-06-01 08:53:05]     double_neg: 13 directions at L34
+[2026-06-01 08:53:05]     scope_neg: 20 directions at L34
+[2026-06-01 08:53:05]   C2: Within-type and cross-type cosine similarity...
+[2026-06-01 08:53:05]   C3: Subspace analysis per negation type...
+[2026-06-01 08:53:05]     not: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:53:05]     never: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:53:05]     barely: n=20, dim@80=11, pair_cos=0.999
+[2026-06-01 08:53:05]     morphological: n=13, dim@80=1, pair_cos=0.693
+[2026-06-01 08:53:05]     double_neg: n=13, dim@80=9, pair_cos=0.215
+[2026-06-01 08:53:05]     scope_neg: n=20, dim@80=13, pair_cos=0.445
+[2026-06-01 08:53:05]   C4: Negation causal injection...
+[2026-06-01 08:53:07] 
+  --- Negation Decomposition Summary ---
+[2026-06-01 08:53:07]   barely_within: mean_cos=0.999
+[2026-06-01 08:53:07]   barely_vs_double_neg: mean_cos=-0.007
+[2026-06-01 08:53:07]   barely_vs_morphological: mean_cos=0.846
+[2026-06-01 08:53:07]   barely_vs_never: mean_cos=0.999
+[2026-06-01 08:53:07]   barely_vs_not: mean_cos=0.999
+[2026-06-01 08:53:07]   barely_vs_scope_neg: mean_cos=0.079
+[2026-06-01 08:53:07]   double_neg_within: mean_cos=0.215
+[2026-06-01 08:53:07]   double_neg_vs_morphological: mean_cos=-0.002
+[2026-06-01 08:53:07]   double_neg_vs_never: mean_cos=-0.008
+[2026-06-01 08:53:07]   double_neg_vs_not: mean_cos=-0.009
+[2026-06-01 08:53:07]   double_neg_vs_scope_neg: mean_cos=0.027
+[2026-06-01 08:53:07]   morphological_within: mean_cos=0.693
+[2026-06-01 08:53:07]   morphological_vs_never: mean_cos=0.846
+[2026-06-01 08:53:07]   morphological_vs_not: mean_cos=0.846
+[2026-06-01 08:53:07]   morphological_vs_scope_neg: mean_cos=0.066
+[2026-06-01 08:53:07]   never_within: mean_cos=0.999
+[2026-06-01 08:53:07]   never_vs_not: mean_cos=0.999
+[2026-06-01 08:53:07]   never_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:53:07]   not_within: mean_cos=0.999
+[2026-06-01 08:53:07]   not_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:53:07]   scope_neg_within: mean_cos=0.445
+[2026-06-01 08:53:07]   not causal: mean_max_neg_delta=-0.002, mean_adj_delta=-0.005
+[2026-06-01 08:53:07]   never causal: mean_max_neg_delta=0.013, mean_adj_delta=-0.002
+[2026-06-01 08:53:07]   barely causal: mean_max_neg_delta=0.008, mean_adj_delta=-0.003
+[2026-06-01 08:53:07] Results saved to results\phase320_causal\qwen3_phase320.json
+[2026-06-01 08:53:07] 
+======================================================================
+[2026-06-01 08:53:07] PHASE 320 OVERALL SUMMARY - qwen3
+[2026-06-01 08:53:07] ======================================================================
+[2026-06-01 08:53:07] 
+--- Attribute Causal Injection ---
+[2026-06-01 08:53:07]   d_attr alpha=0.5: mean_delta=-0.007, positive=5%
+[2026-06-01 08:53:07]   d_attr alpha=1.0: mean_delta=0.004, positive=15%
+[2026-06-01 08:53:07]   d_attr alpha=2.0: mean_delta=0.010, positive=35%
+[2026-06-01 08:53:07]   d_attr alpha=4.0: mean_delta=0.034, positive=75%
+[2026-06-01 08:53:07]   d_axis alpha=1.0: target_delta=0.006, source_delta=0.007, positive=33%
+[2026-06-01 08:53:07]   d_axis alpha=2.0: target_delta=0.002, source_delta=-0.014, positive=27%
+[2026-06-01 08:53:07]   d_axis alpha=4.0: target_delta=0.027, source_delta=-0.014, positive=53%
+[2026-06-01 08:53:07]   Cross-object transfer: mean_delta=0.015, positive=36%
+[2026-06-01 08:53:07] 
+--- Function Causal Injection ---
+[2026-06-01 08:53:07]   Direct alpha=1.0: mean_delta=0.000, positive=10%
+[2026-06-01 08:53:07]   Direct alpha=2.0: mean_delta=0.006, positive=20%
+[2026-06-01 08:53:07]   Transfer alpha=1.0: mean_delta=0.000, positive=0%
+[2026-06-01 08:53:07]   Transfer alpha=2.0: mean_delta=0.009, positive=14%
+[2026-06-01 08:53:07] 
+--- Negation Decomposition ---
+[2026-06-01 08:53:07]   not: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:53:07]   never: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:53:07]   barely: dim@80=11, pair_cos=0.999, n=20
+[2026-06-01 08:53:07]   morphological: dim@80=1, pair_cos=0.693, n=13
+[2026-06-01 08:53:07]   double_neg: dim@80=9, pair_cos=0.215, n=13
+[2026-06-01 08:53:07]   scope_neg: dim@80=13, pair_cos=0.445, n=20
+[2026-06-01 08:53:07]   Cross-type barely_vs_double_neg: mean_cos=-0.007
+[2026-06-01 08:53:07]   Cross-type barely_vs_morphological: mean_cos=0.846
+[2026-06-01 08:53:07]   Cross-type barely_vs_never: mean_cos=0.999
+[2026-06-01 08:53:07]   Cross-type barely_vs_not: mean_cos=0.999
+[2026-06-01 08:53:07]   Cross-type barely_vs_scope_neg: mean_cos=0.079
+[2026-06-01 08:53:07]   Cross-type double_neg_vs_morphological: mean_cos=-0.002
+[2026-06-01 08:53:07]   Cross-type double_neg_vs_never: mean_cos=-0.008
+[2026-06-01 08:53:07]   Cross-type double_neg_vs_not: mean_cos=-0.009
+[2026-06-01 08:53:07]   Cross-type double_neg_vs_scope_neg: mean_cos=0.027
+[2026-06-01 08:53:07]   Cross-type morphological_vs_never: mean_cos=0.846
+[2026-06-01 08:53:07]   Cross-type morphological_vs_not: mean_cos=0.846
+[2026-06-01 08:53:07]   Cross-type morphological_vs_scope_neg: mean_cos=0.066
+[2026-06-01 08:53:07]   Cross-type never_vs_not: mean_cos=0.999
+[2026-06-01 08:53:07]   Cross-type never_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:53:07]   Cross-type not_vs_scope_neg: mean_cos=0.078
+[2026-06-01 08:53:07] Model qwen3 released.

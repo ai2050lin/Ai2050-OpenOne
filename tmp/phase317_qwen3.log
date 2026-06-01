@@ -1,0 +1,1000 @@
+[2026-05-31 22:12:06] === Phase 317: Comprehensive Test for qwen3 ===
+[2026-05-31 22:12:08] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-05-31 22:12:09]   flash_attention_2 failed (FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.), falling back to sdpa
+[2026-05-31 22:12:20]   Loaded with sdpa
+[2026-05-31 22:12:20]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-05-31 22:12:20]   Layer allocation: GPU=0, CPU=0 components
+[2026-05-31 22:12:20] Model: n_layers=36, d_model=2560
+[2026-05-31 22:12:20] ============================================================
+[2026-05-31 22:12:20] TEST 1: Attribute Activation with PARALLEL Templates (50 pairs)
+[2026-05-31 22:12:20] ============================================================
+[2026-05-31 22:12:20] Test layers: [2, 6, 12, 18, 24, 34]
+[2026-05-31 22:12:22]   [static] L2: 50/360 done
+[2026-05-31 22:12:24]   [static] L2: 100/360 done
+[2026-05-31 22:12:27]   L2 static: real=0.0255, random=0.0277, ratio=1.09
+[2026-05-31 22:12:29]   [static] L6: 250/360 done
+[2026-05-31 22:12:31]   [static] L6: 300/360 done
+[2026-05-31 22:12:35]   L6 static: real=0.1007, random=0.1163, ratio=1.15
+[2026-05-31 22:12:37]   [static] L12: 450/360 done
+[2026-05-31 22:12:38]   [static] L12: 500/360 done
+[2026-05-31 22:12:42]   L12 static: real=0.1261, random=0.1434, ratio=1.14
+[2026-05-31 22:12:44]   [static] L18: 650/360 done
+[2026-05-31 22:12:46]   [static] L18: 700/360 done
+[2026-05-31 22:12:50]   L18 static: real=0.0969, random=0.1041, ratio=1.07
+[2026-05-31 22:12:52]   [static] L24: 850/360 done
+[2026-05-31 22:12:53]   [static] L24: 900/360 done
+[2026-05-31 22:12:57]   L24 static: real=0.0521, random=0.0588, ratio=1.13
+[2026-05-31 22:12:59]   [static] L34: 1050/360 done
+[2026-05-31 22:13:01]   [static] L34: 1100/360 done
+[2026-05-31 22:13:05]   L34 static: real=0.0259, random=0.0365, ratio=1.41
+[2026-05-31 22:13:06]   [attribute_probe] L2: 1250/360 done
+[2026-05-31 22:13:08]   [attribute_probe] L2: 1300/360 done
+[2026-05-31 22:13:12]   L2 attribute_probe: real=0.0179, random=0.0173, ratio=0.96
+[2026-05-31 22:13:14]   [attribute_probe] L6: 1450/360 done
+[2026-05-31 22:13:16]   [attribute_probe] L6: 1500/360 done
+[2026-05-31 22:13:19]   L6 attribute_probe: real=0.0745, random=0.0842, ratio=1.13
+[2026-05-31 22:13:21]   [attribute_probe] L12: 1650/360 done
+[2026-05-31 22:13:23]   [attribute_probe] L12: 1700/360 done
+[2026-05-31 22:13:27]   L12 attribute_probe: real=0.1314, random=0.1405, ratio=1.07
+[2026-05-31 22:13:29]   [attribute_probe] L18: 1850/360 done
+[2026-05-31 22:13:31]   [attribute_probe] L18: 1900/360 done
+[2026-05-31 22:13:34]   L18 attribute_probe: real=0.0976, random=0.1086, ratio=1.11
+[2026-05-31 22:13:36]   [attribute_probe] L24: 2050/360 done
+[2026-05-31 22:13:38]   [attribute_probe] L24: 2100/360 done
+[2026-05-31 22:13:42]   L24 attribute_probe: real=0.0915, random=0.1091, ratio=1.19
+[2026-05-31 22:13:43]   [attribute_probe] L34: 2250/360 done
+[2026-05-31 22:13:45]   [attribute_probe] L34: 2300/360 done
+[2026-05-31 22:13:48]   L34 attribute_probe: real=0.0700, random=0.1057, ratio=1.51
+[2026-05-31 22:13:50]   [attribute_fill] L2: 2450/360 done
+[2026-05-31 22:13:52]   [attribute_fill] L2: 2500/360 done
+[2026-05-31 22:13:56]   L2 attribute_fill: real=0.0053, random=0.0059, ratio=1.11
+[2026-05-31 22:13:58]   [attribute_fill] L6: 2650/360 done
+[2026-05-31 22:13:59]   [attribute_fill] L6: 2700/360 done
+[2026-05-31 22:14:03]   L6 attribute_fill: real=0.0383, random=0.0451, ratio=1.18
+[2026-05-31 22:14:05]   [attribute_fill] L12: 2850/360 done
+[2026-05-31 22:14:07]   [attribute_fill] L12: 2900/360 done
+[2026-05-31 22:14:10]   L12 attribute_fill: real=0.1073, random=0.1302, ratio=1.21
+[2026-05-31 22:14:12]   [attribute_fill] L18: 3050/360 done
+[2026-05-31 22:14:14]   [attribute_fill] L18: 3100/360 done
+[2026-05-31 22:14:17]   L18 attribute_fill: real=0.1021, random=0.1214, ratio=1.19
+[2026-05-31 22:14:19]   [attribute_fill] L24: 3250/360 done
+[2026-05-31 22:14:21]   [attribute_fill] L24: 3300/360 done
+[2026-05-31 22:14:25]   L24 attribute_fill: real=0.0633, random=0.0865, ratio=1.37
+[2026-05-31 22:14:26]   [attribute_fill] L34: 3450/360 done
+[2026-05-31 22:14:28]   [attribute_fill] L34: 3500/360 done
+[2026-05-31 22:14:32]   L34 attribute_fill: real=0.0481, random=0.0862, ratio=1.79
+[2026-05-31 22:14:32] Test 1 completed in 132.1s
+[2026-05-31 22:14:32] ============================================================
+[2026-05-31 22:14:32] TEST 2: Context × Causal Interaction (CRITICAL)
+[2026-05-31 22:14:32] ============================================================
+[2026-05-31 22:14:32] Inject layer: 12, Read layers: [12, 18, 24, 34]
+[2026-05-31 22:14:33] 
+  Pair 1/15: (apple, red)
+[2026-05-31 22:14:33]   attr_dir_norm=11.3155
+[2026-05-31 22:14:33]   Injecting into STATIC: 'the apple was there'
+[2026-05-31 22:14:33]   Injecting into ATTRIBUTE: 'The apple is usually'
+[2026-05-31 22:14:33]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.52, attr_top=2.51
+[2026-05-31 22:14:33]     L18: attr_dir_interaction=1.39, random_interaction=1.85, static_top=0.87, attr_top=1.21
+[2026-05-31 22:14:33]     L24: attr_dir_interaction=0.90, random_interaction=0.72, static_top=2.24, attr_top=2.01
+[2026-05-31 22:14:33]     L34: attr_dir_interaction=2.16, random_interaction=2.09, static_top=2.44, attr_top=5.26
+[2026-05-31 22:14:33] 
+  Pair 2/15: (knife, sharp)
+[2026-05-31 22:14:34]   attr_dir_norm=14.1341
+[2026-05-31 22:14:34]   Injecting into STATIC: 'the knife was there'
+[2026-05-31 22:14:34]   Injecting into ATTRIBUTE: 'The knife is usually'
+[2026-05-31 22:14:34]     L12: attr_dir_interaction=0.99, random_interaction=0.99, static_top=3.15, attr_top=3.13
+[2026-05-31 22:14:34]     L18: attr_dir_interaction=1.47, random_interaction=1.31, static_top=1.78, attr_top=2.63
+[2026-05-31 22:14:34]     L24: attr_dir_interaction=1.43, random_interaction=2.10, static_top=2.61, attr_top=3.74
+[2026-05-31 22:14:34]     L34: attr_dir_interaction=1.49, random_interaction=1.40, static_top=3.65, attr_top=5.45
+[2026-05-31 22:14:34] 
+  Pair 3/15: (ice, cold)
+[2026-05-31 22:14:34]   attr_dir_norm=15.1928
+[2026-05-31 22:14:34]   Injecting into STATIC: 'the ice was there'
+[2026-05-31 22:14:35]   Injecting into ATTRIBUTE: 'The ice is usually'
+[2026-05-31 22:14:35]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.05, attr_top=3.04
+[2026-05-31 22:14:35]     L18: attr_dir_interaction=1.11, random_interaction=0.45, static_top=0.69, attr_top=0.77
+[2026-05-31 22:14:35]     L24: attr_dir_interaction=1.16, random_interaction=1.11, static_top=1.97, attr_top=2.28
+[2026-05-31 22:14:35]     L34: attr_dir_interaction=0.80, random_interaction=1.07, static_top=2.18, attr_top=1.74
+[2026-05-31 22:14:35] 
+  Pair 4/15: (fire, hot)
+[2026-05-31 22:14:35]   attr_dir_norm=23.4335
+[2026-05-31 22:14:35]   Injecting into STATIC: 'the fire was there'
+[2026-05-31 22:14:35]   Injecting into ATTRIBUTE: 'The fire is usually'
+[2026-05-31 22:14:36]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.11, attr_top=3.10
+[2026-05-31 22:14:36]     L18: attr_dir_interaction=2.30, random_interaction=0.86, static_top=1.59, attr_top=3.66
+[2026-05-31 22:14:36]     L24: attr_dir_interaction=1.26, random_interaction=1.74, static_top=4.41, attr_top=5.55
+[2026-05-31 22:14:36]     L34: attr_dir_interaction=3.74, random_interaction=1.03, static_top=1.02, attr_top=3.81
+[2026-05-31 22:14:36] 
+  Pair 5/15: (silk, smooth)
+[2026-05-31 22:14:36]   attr_dir_norm=10.6355
+[2026-05-31 22:14:36]   Injecting into STATIC: 'the silk was there'
+[2026-05-31 22:14:36]   Injecting into ATTRIBUTE: 'The silk is usually'
+[2026-05-31 22:14:36]     L12: attr_dir_interaction=1.01, random_interaction=1.00, static_top=1.13, attr_top=1.14
+[2026-05-31 22:14:36]     L18: attr_dir_interaction=2.14, random_interaction=1.18, static_top=1.10, attr_top=2.35
+[2026-05-31 22:14:36]     L24: attr_dir_interaction=0.73, random_interaction=1.19, static_top=2.71, attr_top=1.99
+[2026-05-31 22:14:36]     L34: attr_dir_interaction=0.81, random_interaction=0.86, static_top=1.21, attr_top=0.98
+[2026-05-31 22:14:36] 
+  Pair 6/15: (stone, hard)
+[2026-05-31 22:14:36]   attr_dir_norm=17.7179
+[2026-05-31 22:14:36]   Injecting into STATIC: 'the stone was there'
+[2026-05-31 22:14:37]   Injecting into ATTRIBUTE: 'The stone is usually'
+[2026-05-31 22:14:37]     L12: attr_dir_interaction=1.00, random_interaction=0.98, static_top=1.53, attr_top=1.53
+[2026-05-31 22:14:37]     L18: attr_dir_interaction=1.29, random_interaction=1.71, static_top=1.63, attr_top=2.10
+[2026-05-31 22:14:37]     L24: attr_dir_interaction=1.17, random_interaction=0.81, static_top=1.90, attr_top=2.22
+[2026-05-31 22:14:37]     L34: attr_dir_interaction=1.07, random_interaction=2.24, static_top=2.05, attr_top=2.20
+[2026-05-31 22:14:37] 
+  Pair 7/15: (honey, sweet)
+[2026-05-31 22:14:37]   attr_dir_norm=15.4680
+[2026-05-31 22:14:37]   Injecting into STATIC: 'the honey was there'
+[2026-05-31 22:14:37]   Injecting into ATTRIBUTE: 'The honey is usually'
+[2026-05-31 22:14:38]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.97, attr_top=2.96
+[2026-05-31 22:14:38]     L18: attr_dir_interaction=1.05, random_interaction=1.15, static_top=1.99, attr_top=2.09
+[2026-05-31 22:14:38]     L24: attr_dir_interaction=1.54, random_interaction=0.80, static_top=1.18, attr_top=1.83
+[2026-05-31 22:14:38]     L34: attr_dir_interaction=1.03, random_interaction=1.33, static_top=2.13, attr_top=2.20
+[2026-05-31 22:14:38] 
+  Pair 8/15: (lemon, sour)
+[2026-05-31 22:14:38]   attr_dir_norm=10.1563
+[2026-05-31 22:14:38]   Injecting into STATIC: 'the lemon was there'
+[2026-05-31 22:14:38]   Injecting into ATTRIBUTE: 'The lemon is usually'
+[2026-05-31 22:14:38]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.19, attr_top=3.18
+[2026-05-31 22:14:38]     L18: attr_dir_interaction=1.92, random_interaction=0.68, static_top=2.14, attr_top=4.12
+[2026-05-31 22:14:38]     L24: attr_dir_interaction=0.89, random_interaction=0.69, static_top=4.84, attr_top=4.30
+[2026-05-31 22:14:38]     L34: attr_dir_interaction=0.62, random_interaction=0.68, static_top=4.38, attr_top=2.70
+[2026-05-31 22:14:38] 
+  Pair 9/15: (thunder, loud)
+[2026-05-31 22:14:38]   attr_dir_norm=11.1258
+[2026-05-31 22:14:38]   Injecting into STATIC: 'the thunder was there'
+[2026-05-31 22:14:39]   Injecting into ATTRIBUTE: 'The thunder is usually'
+[2026-05-31 22:14:39]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.48, attr_top=2.47
+[2026-05-31 22:14:39]     L18: attr_dir_interaction=2.49, random_interaction=1.33, static_top=2.11, attr_top=5.26
+[2026-05-31 22:14:39]     L24: attr_dir_interaction=1.42, random_interaction=1.01, static_top=2.09, attr_top=2.97
+[2026-05-31 22:14:39]     L34: attr_dir_interaction=0.75, random_interaction=2.65, static_top=2.46, attr_top=1.84
+[2026-05-31 22:14:39] 
+  Pair 10/15: (cotton, soft)
+[2026-05-31 22:14:39]   attr_dir_norm=22.3847
+[2026-05-31 22:14:39]   Injecting into STATIC: 'the cotton was there'
+[2026-05-31 22:14:39]   Injecting into ATTRIBUTE: 'The cotton is usually'
+[2026-05-31 22:14:40]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.89, attr_top=2.89
+[2026-05-31 22:14:40]     L18: attr_dir_interaction=0.79, random_interaction=1.10, static_top=2.06, attr_top=1.64
+[2026-05-31 22:14:40]     L24: attr_dir_interaction=0.35, random_interaction=0.78, static_top=5.38, attr_top=1.90
+[2026-05-31 22:14:40]     L34: attr_dir_interaction=1.07, random_interaction=2.77, static_top=3.77, attr_top=4.04
+[2026-05-31 22:14:40] 
+  Pair 11/15: (cheetah, fast)
+[2026-05-31 22:14:40]   attr_dir_norm=11.7545
+[2026-05-31 22:14:40]   Injecting into STATIC: 'the cheetah was there'
+[2026-05-31 22:14:40]   Injecting into ATTRIBUTE: 'The cheetah is usually'
+[2026-05-31 22:14:40]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.10, attr_top=2.11
+[2026-05-31 22:14:40]     L18: attr_dir_interaction=1.75, random_interaction=1.32, static_top=1.76, attr_top=3.09
+[2026-05-31 22:14:40]     L24: attr_dir_interaction=2.01, random_interaction=2.72, static_top=1.47, attr_top=2.95
+[2026-05-31 22:14:40]     L34: attr_dir_interaction=0.41, random_interaction=2.53, static_top=5.06, attr_top=2.06
+[2026-05-31 22:14:40] 
+  Pair 12/15: (elephant, huge)
+[2026-05-31 22:14:40]   attr_dir_norm=10.8832
+[2026-05-31 22:14:40]   Injecting into STATIC: 'the elephant was there'
+[2026-05-31 22:14:41]   Injecting into ATTRIBUTE: 'The elephant is usually'
+[2026-05-31 22:14:41]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.31, attr_top=2.32
+[2026-05-31 22:14:41]     L18: attr_dir_interaction=0.98, random_interaction=2.28, static_top=2.42, attr_top=2.36
+[2026-05-31 22:14:41]     L24: attr_dir_interaction=0.52, random_interaction=2.23, static_top=2.77, attr_top=1.43
+[2026-05-31 22:14:41]     L34: attr_dir_interaction=0.89, random_interaction=1.37, static_top=3.45, attr_top=3.05
+[2026-05-31 22:14:41] 
+  Pair 13/15: (diamond, hard)
+[2026-05-31 22:14:41]   attr_dir_norm=16.7435
+[2026-05-31 22:14:41]   Injecting into STATIC: 'the diamond was there'
+[2026-05-31 22:14:41]   Injecting into ATTRIBUTE: 'The diamond is usually'
+[2026-05-31 22:14:42]     L12: attr_dir_interaction=1.00, random_interaction=1.01, static_top=1.90, attr_top=1.91
+[2026-05-31 22:14:42]     L18: attr_dir_interaction=0.80, random_interaction=0.41, static_top=2.82, attr_top=2.27
+[2026-05-31 22:14:42]     L24: attr_dir_interaction=0.82, random_interaction=0.53, static_top=2.41, attr_top=1.99
+[2026-05-31 22:14:42]     L34: attr_dir_interaction=1.59, random_interaction=0.71, static_top=2.22, attr_top=3.53
+[2026-05-31 22:14:42] 
+  Pair 14/15: (snow, white)
+[2026-05-31 22:14:42]   attr_dir_norm=29.4542
+[2026-05-31 22:14:42]   Injecting into STATIC: 'the snow was there'
+[2026-05-31 22:14:42]   Injecting into ATTRIBUTE: 'The snow is usually'
+[2026-05-31 22:14:43]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=1.78, attr_top=1.78
+[2026-05-31 22:14:43]     L18: attr_dir_interaction=1.13, random_interaction=1.64, static_top=1.71, attr_top=1.93
+[2026-05-31 22:14:43]     L24: attr_dir_interaction=2.45, random_interaction=0.96, static_top=1.47, attr_top=3.60
+[2026-05-31 22:14:43]     L34: attr_dir_interaction=0.76, random_interaction=0.72, static_top=3.97, attr_top=3.01
+[2026-05-31 22:14:43] 
+  Pair 15/15: (night, dark)
+[2026-05-31 22:14:43]   attr_dir_norm=15.7996
+[2026-05-31 22:14:43]   Injecting into STATIC: 'the night was there'
+[2026-05-31 22:14:43]   Injecting into ATTRIBUTE: 'The night is usually'
+[2026-05-31 22:14:43]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.76, attr_top=2.76
+[2026-05-31 22:14:43]     L18: attr_dir_interaction=0.92, random_interaction=1.63, static_top=3.23, attr_top=2.98
+[2026-05-31 22:14:43]     L24: attr_dir_interaction=0.48, random_interaction=0.76, static_top=3.41, attr_top=1.63
+[2026-05-31 22:14:43]     L34: attr_dir_interaction=0.88, random_interaction=0.85, static_top=2.81, attr_top=2.47
+[2026-05-31 22:14:43] Test 2 completed in 11.4s
+[2026-05-31 22:14:43] ============================================================
+[2026-05-31 22:14:43] TEST 3: Expanded Negation with Controls (25 pairs)
+[2026-05-31 22:14:43] ============================================================
+[2026-05-31 22:14:43] Inject layer: 12, Read layers: [6, 12, 18, 24, 34]
+[2026-05-31 22:14:44] 
+--- Negation type: regular ---
+[2026-05-31 22:14:44]   Pair 1/10: 'they were very happy about it' vs 'they were not happy about it'
+[2026-05-31 22:14:44]   neg_dir_norm=17.1884, antonym_dir_norm=24.0827
+[2026-05-31 22:14:44]     L6: neg_top=disappointed(0.00x), rand_top=disappointed(0.00x), antonym_top=disappointed(0.00x)
+[2026-05-31 22:14:44]     L12: neg_top=happy(1.97x), rand_top=happy(3.50x), antonym_top=happy(2.62x)
+[2026-05-31 22:14:44]     L18: neg_top=pleased(2.70x), rand_top=happy(2.98x), antonym_top=happy(1.93x)
+[2026-05-31 22:14:44]     L24: neg_top=pleased(2.75x), rand_top=not(1.45x), antonym_top=unhappy(1.49x)
+[2026-05-31 22:14:44]     L34: neg_top=pleased(1.57x), rand_top=disappointed(1.44x), antonym_top=disappointed(2.29x)
+[2026-05-31 22:14:44]   Pair 2/10: 'the place was very safe' vs 'the place was not safe'
+[2026-05-31 22:14:45]   neg_dir_norm=27.0851, antonym_dir_norm=33.8080
+[2026-05-31 22:14:45]     L6: neg_top=safe(0.00x), rand_top=safe(0.00x), antonym_top=safe(0.00x)
+[2026-05-31 22:14:45]     L12: neg_top=unsafe(1.65x), rand_top=safe(3.65x), antonym_top=safe(2.66x)
+[2026-05-31 22:14:45]     L18: neg_top=secure(3.92x), rand_top=not(1.00x), antonym_top=secure(4.35x)
+[2026-05-31 22:14:45]     L24: neg_top=secure(1.89x), rand_top=dangerous(1.27x), antonym_top=safe(4.12x)
+[2026-05-31 22:14:45]     L34: neg_top=secure(5.18x), rand_top=not(1.74x), antonym_top=secure(4.97x)
+[2026-05-31 22:14:45]   Pair 3/10: 'the result was very good' vs 'the result was not good'
+[2026-05-31 22:14:45]   neg_dir_norm=22.3488, antonym_dir_norm=26.3757
+[2026-05-31 22:14:46]     L6: neg_top=excellent(0.00x), rand_top=excellent(0.00x), antonym_top=excellent(0.00x)
+[2026-05-31 22:14:46]     L12: neg_top=excellent(1.44x), rand_top=bad(1.84x), antonym_top=not(2.14x)
+[2026-05-31 22:14:46]     L18: neg_top=good(2.02x), rand_top=excellent(2.56x), antonym_top=not(1.91x)
+[2026-05-31 22:14:46]     L24: neg_top=good(3.83x), rand_top=excellent(2.29x), antonym_top=not(2.64x)
+[2026-05-31 22:14:46]     L34: neg_top=good(2.96x), rand_top=good(2.83x), antonym_top=bad(5.25x)
+[2026-05-31 22:14:46]   Pair 4/10: 'the room was very clean' vs 'the room was not clean'
+[2026-05-31 22:14:46]   neg_dir_norm=20.3694, antonym_dir_norm=30.8321
+[2026-05-31 22:14:47]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:47]     L12: neg_top=dirty(1.99x), rand_top=neat(2.35x), antonym_top=dirty(3.63x)
+[2026-05-31 22:14:47]     L18: neg_top=clean(2.35x), rand_top=messy(2.36x), antonym_top=dirty(4.12x)
+[2026-05-31 22:14:47]     L24: neg_top=clean(3.79x), rand_top=not(2.70x), antonym_top=dirty(7.12x)
+[2026-05-31 22:14:47]     L34: neg_top=messy(5.31x), rand_top=not(2.54x), antonym_top=dirty(6.84x)
+[2026-05-31 22:14:47]   Pair 5/10: 'the task was very possible' vs 'the task was not possible'
+[2026-05-31 22:14:47]   neg_dir_norm=38.3723, antonym_dir_norm=33.7895
+[2026-05-31 22:14:47]     L6: neg_top=feasible(0.00x), rand_top=feasible(0.00x), antonym_top=feasible(0.00x)
+[2026-05-31 22:14:47]     L12: neg_top=not(1.89x), rand_top=achievable(1.78x), antonym_top=possible(3.10x)
+[2026-05-31 22:14:47]     L18: neg_top=feasible(2.88x), rand_top=unfeasible(1.75x), antonym_top=feasible(3.80x)
+[2026-05-31 22:14:47]     L24: neg_top=feasible(4.61x), rand_top=not(1.35x), antonym_top=feasible(2.32x)
+[2026-05-31 22:14:47]     L34: neg_top=possible(4.66x), rand_top=unfeasible(2.66x), antonym_top=impossible(2.84x)
+[2026-05-31 22:14:47]   Pair 6/10: 'the room was very bright' vs 'the room was not bright'
+[2026-05-31 22:14:48]   neg_dir_norm=19.7021, antonym_dir_norm=37.3275
+[2026-05-31 22:14:48]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:48]     L12: neg_top=bright(2.42x), rand_top=bright(1.76x), antonym_top=dark(2.95x)
+[2026-05-31 22:14:48]     L18: neg_top=dim(1.84x), rand_top=dark(2.34x), antonym_top=bright(2.63x)
+[2026-05-31 22:14:48]     L24: neg_top=light(2.90x), rand_top=illuminated(5.36x), antonym_top=dark(2.47x)
+[2026-05-31 22:14:48]     L34: neg_top=bright(4.61x), rand_top=illuminated(5.14x), antonym_top=dark(6.52x)
+[2026-05-31 22:14:48]   Pair 7/10: 'the man was very strong' vs 'the man was not strong'
+[2026-05-31 22:14:48]   neg_dir_norm=23.4603, antonym_dir_norm=30.3926
+[2026-05-31 22:14:49]     L6: neg_top=weak(0.00x), rand_top=weak(0.00x), antonym_top=weak(0.00x)
+[2026-05-31 22:14:49]     L12: neg_top=mighty(1.33x), rand_top=strong(3.45x), antonym_top=weak(3.55x)
+[2026-05-31 22:14:49]     L18: neg_top=mighty(1.79x), rand_top=strong(1.80x), antonym_top=weak(3.43x)
+[2026-05-31 22:14:49]     L24: neg_top=not(1.51x), rand_top=strong(1.73x), antonym_top=weak(4.14x)
+[2026-05-31 22:14:49]     L34: neg_top=weak(1.23x), rand_top=mighty(1.79x), antonym_top=strong(3.89x)
+[2026-05-31 22:14:49]   Pair 8/10: 'the weather was very warm' vs 'the weather was not warm'
+[2026-05-31 22:14:49]   neg_dir_norm=23.0774, antonym_dir_norm=31.2194
+[2026-05-31 22:14:49]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:49]     L12: neg_top=cold(1.57x), rand_top=warm(2.82x), antonym_top=cold(3.71x)
+[2026-05-31 22:14:49]     L18: neg_top=chilly(1.41x), rand_top=cold(2.46x), antonym_top=warm(4.16x)
+[2026-05-31 22:14:49]     L24: neg_top=cold(1.75x), rand_top=cold(3.33x), antonym_top=warm(4.46x)
+[2026-05-31 22:14:49]     L34: neg_top=mild(2.04x), rand_top=cold(3.96x), antonym_top=cold(5.22x)
+[2026-05-31 22:14:49]   Pair 9/10: 'the door was very open' vs 'the door was not open'
+[2026-05-31 22:14:50]   neg_dir_norm=30.8058, antonym_dir_norm=32.6688
+[2026-05-31 22:14:50]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:50]     L12: neg_top=closed(3.46x), rand_top=not(2.00x), antonym_top=open(3.23x)
+[2026-05-31 22:14:50]     L18: neg_top=not(4.42x), rand_top=open(3.26x), antonym_top=unlocked(2.37x)
+[2026-05-31 22:14:50]     L24: neg_top=not(2.59x), rand_top=not(1.82x), antonym_top=not(3.28x)
+[2026-05-31 22:14:50]     L34: neg_top=closed(2.98x), rand_top=not(3.22x), antonym_top=closed(3.67x)
+[2026-05-31 22:14:50]   Pair 10/10: 'the situation was very fair' vs 'the situation was not fair'
+[2026-05-31 22:14:50]   neg_dir_norm=30.9549, antonym_dir_norm=28.2854
+[2026-05-31 22:14:51]     L6: neg_top=fair(0.00x), rand_top=fair(0.00x), antonym_top=fair(0.00x)
+[2026-05-31 22:14:51]     L12: neg_top=unfair(1.81x), rand_top=not(1.94x), antonym_top=fair(2.14x)
+[2026-05-31 22:14:51]     L18: neg_top=fair(2.11x), rand_top=biased(2.35x), antonym_top=fair(2.94x)
+[2026-05-31 22:14:51]     L24: neg_top=biased(1.96x), rand_top=equitable(1.46x), antonym_top=biased(3.37x)
+[2026-05-31 22:14:51]     L34: neg_top=just(1.83x), rand_top=unfair(2.98x), antonym_top=unfair(3.34x)
+[2026-05-31 22:14:51] 
+--- Negation type: double_negation ---
+[2026-05-31 22:14:51]   Pair 1/5: 'the result was very bad' vs 'the result was not bad'
+[2026-05-31 22:14:51]   neg_dir_norm=28.4604, antonym_dir_norm=39.2537
+[2026-05-31 22:14:51]     L6: neg_top=terrible(0.00x), rand_top=terrible(0.00x), antonym_top=terrible(0.00x)
+[2026-05-31 22:14:51]     L12: neg_top=bad(0.94x), rand_top=terrible(3.27x), antonym_top=okay(2.58x)
+[2026-05-31 22:14:51]     L18: neg_top=not(3.71x), rand_top=okay(1.88x), antonym_top=okay(3.02x)
+[2026-05-31 22:14:51]     L24: neg_top=okay(2.81x), rand_top=poor(1.40x), antonym_top=okay(6.31x)
+[2026-05-31 22:14:51]     L34: neg_top=acceptable(3.26x), rand_top=not(2.36x), antonym_top=okay(5.74x)
+[2026-05-31 22:14:51]     L6 double_neg: pos_effects={'bad': 0, 'poor': 0, 'terrible': 0}, neg_effects={'not': 0, 'okay': 0, 'acceptable': 0}
+[2026-05-31 22:14:51]     L12 double_neg: pos_effects={'bad': 0.9447008032507451, 'poor': 0.6890556922758438, 'terrible': 0.754381936310509}, neg_effects={'not': 0.682525540867416, 'okay': 0.7152097526788864, 'acceptable': 0.005533940314172295}
+[2026-05-31 22:14:51]     L18 double_neg: pos_effects={'bad': 1.6139547362301119, 'poor': 0.67643509943212, 'terrible': 0.9133640922606214}, neg_effects={'not': 3.7061374175185358, 'okay': 2.5738997561610155, 'acceptable': 0.4165743849533833}
+[2026-05-31 22:14:51]     L24 double_neg: pos_effects={'bad': 0.05803670642533891, 'poor': 0.5572345192591056, 'terrible': 2.350257887664586}, neg_effects={'not': 0.7345828994076187, 'okay': 2.813186757221122, 'acceptable': 2.233552254208496}
+[2026-05-31 22:14:51]     L34 double_neg: pos_effects={'bad': 2.8331108777572296, 'poor': 0.9807906046059152, 'terrible': 0.9288835349132607}, neg_effects={'not': 1.96003678768604, 'okay': 2.435963908107117, 'acceptable': 3.255727321863684}
+[2026-05-31 22:14:51]   Pair 2/5: 'the task was very impossible' vs 'the task was not impossible'
+[2026-05-31 22:14:52]   neg_dir_norm=30.5667, antonym_dir_norm=33.7895
+[2026-05-31 22:14:52]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:52]     L12: neg_top=not(2.51x), rand_top=hopeless(0.72x), antonym_top=possible(2.60x)
+[2026-05-31 22:14:52]     L18: neg_top=not(1.79x), rand_top=feasible(2.81x), antonym_top=feasible(2.87x)
+[2026-05-31 22:14:52]     L24: neg_top=not(1.05x), rand_top=feasible(2.95x), antonym_top=hopeless(1.91x)
+[2026-05-31 22:14:52]     L34: neg_top=impossible(4.08x), rand_top=impossible(5.58x), antonym_top=impossible(4.18x)
+[2026-05-31 22:14:52]     L6 double_neg: pos_effects={'impossible': 0, 'unfeasible': 0, 'hopeless': 0}, neg_effects={'not': 0, 'possible': 0, 'feasible': 0}
+[2026-05-31 22:14:52]     L12 double_neg: pos_effects={'impossible': 0.5442952290058404, 'unfeasible': 1.3390050957607462, 'hopeless': 1.4435489267610813}, neg_effects={'not': 2.510890532886912, 'possible': 0.24497714325765646, 'feasible': 0.7408209414221822}
+[2026-05-31 22:14:52]     L18 double_neg: pos_effects={'impossible': 0.3000037792047228, 'unfeasible': 0.4095569711148975, 'hopeless': 1.1725224297326242}, neg_effects={'not': 1.7858881902359263, 'possible': 0.5210538409902041, 'feasible': 1.3351236001898443}
+[2026-05-31 22:14:52]     L24 double_neg: pos_effects={'impossible': 0.4653408382551481, 'unfeasible': 0.09558429395250494, 'hopeless': 0.8851694011991647}, neg_effects={'not': 1.053067395407987, 'possible': 0.33832127559613645, 'feasible': 0.051314031303350285}
+[2026-05-31 22:14:52]     L34 double_neg: pos_effects={'impossible': 4.084753324168204, 'unfeasible': 2.306070212765055, 'hopeless': 0.8449397885148702}, neg_effects={'not': 0.5720690756197787, 'possible': 2.0520404869163027, 'feasible': 0.07797779568918367}
+[2026-05-31 22:14:52]   Pair 3/5: 'the answer was very wrong' vs 'the answer was not wrong'
+[2026-05-31 22:14:52]   neg_dir_norm=31.8705, antonym_dir_norm=37.1975
+[2026-05-31 22:14:53]     L6: neg_top=right(0.00x), rand_top=right(0.00x), antonym_top=right(0.00x)
+[2026-05-31 22:14:53]     L12: neg_top=incorrect(2.77x), rand_top=false(2.67x), antonym_top=incorrect(3.61x)
+[2026-05-31 22:14:53]     L18: neg_top=not(3.07x), rand_top=false(2.24x), antonym_top=incorrect(1.89x)
+[2026-05-31 22:14:53]     L24: neg_top=incorrect(2.77x), rand_top=wrong(2.77x), antonym_top=wrong(3.23x)
+[2026-05-31 22:14:53]     L34: neg_top=incorrect(4.52x), rand_top=right(1.72x), antonym_top=wrong(1.67x)
+[2026-05-31 22:14:53]     L6 double_neg: pos_effects={'wrong': 0, 'incorrect': 0, 'false': 0}, neg_effects={'not': 0, 'correct': 0, 'right': 0}
+[2026-05-31 22:14:53]     L12 double_neg: pos_effects={'wrong': 2.2243874895431266, 'incorrect': 2.767286859095872, 'false': 1.083354946672471}, neg_effects={'not': 2.0110645090181385, 'correct': 0.7448013630204743, 'right': 2.1288820419797183}
+[2026-05-31 22:14:53]     L18 double_neg: pos_effects={'wrong': 2.5621308629744095, 'incorrect': 2.794802251766357, 'false': 3.045029812366993}, neg_effects={'not': 3.071663533833255, 'correct': 0.5942996598616772, 'right': 1.829166372293673}
+[2026-05-31 22:14:53]     L24 double_neg: pos_effects={'wrong': 2.031763174971544, 'incorrect': 2.770951413459529, 'false': 2.422662802343466}, neg_effects={'not': 1.6677580029029515, 'correct': 0.6265548118432116, 'right': 0.2669124691121808}
+[2026-05-31 22:14:53]     L34 double_neg: pos_effects={'wrong': 3.114946932248129, 'incorrect': 4.515538453014101, 'false': 2.501921945350022}, neg_effects={'not': 2.126157655196071, 'correct': 0.2610295080753651, 'right': 0.23180270038716227}
+[2026-05-31 22:14:53]   Pair 4/5: 'the outcome was very unlikely' vs 'the outcome was not unlikely'
+[2026-05-31 22:14:53]   neg_dir_norm=30.8133, antonym_dir_norm=28.9515
+[2026-05-31 22:14:53]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:53]     L12: neg_top=not(2.39x), rand_top=improbable(1.61x), antonym_top=doubtful(1.57x)
+[2026-05-31 22:14:53]     L18: neg_top=likely(2.59x), rand_top=improbable(3.48x), antonym_top=unlikely(1.28x)
+[2026-05-31 22:14:53]     L24: neg_top=unlikely(4.81x), rand_top=probable(1.77x), antonym_top=not(4.31x)
+[2026-05-31 22:14:53]     L34: neg_top=not(1.37x), rand_top=unlikely(3.11x), antonym_top=not(6.70x)
+[2026-05-31 22:14:53]     L6 double_neg: pos_effects={'unlikely': 0, 'improbable': 0, 'doubtful': 0}, neg_effects={'not': 0, 'likely': 0, 'probable': 0}
+[2026-05-31 22:14:53]     L12 double_neg: pos_effects={'unlikely': 1.2152157923956268, 'improbable': 0.6571132056121604, 'doubtful': 2.0723132119152803}, neg_effects={'not': 2.3852209476116544, 'likely': 1.7395717618118844, 'probable': 0.3205201249814481}
+[2026-05-31 22:14:53]     L18 double_neg: pos_effects={'unlikely': 2.4616206747338656, 'improbable': 0.9239603850290182, 'doubtful': 1.075901238112485}, neg_effects={'not': 1.5311266188372148, 'likely': 2.5903117133408875, 'probable': 1.8323931947156074}
+[2026-05-31 22:14:53]     L24 double_neg: pos_effects={'unlikely': 4.806603929602519, 'improbable': 0.51588966025262, 'doubtful': 0.8039934754922207}, neg_effects={'not': 0.710066903872177, 'likely': 2.4526113993101166, 'probable': 2.5354614809791367}
+[2026-05-31 22:14:53]     L34 double_neg: pos_effects={'unlikely': 0.1372161634896933, 'improbable': 0.15956297966026656, 'doubtful': 0.794233167728566}, neg_effects={'not': 1.3701054647781667, 'likely': 1.2922352176474952, 'probable': 0.3160534848500695}
+[2026-05-31 22:14:53]   Pair 5/5: 'the person was very unhappy' vs 'the person was not unhappy'
+[2026-05-31 22:14:53]   neg_dir_norm=26.0889, antonym_dir_norm=24.0827
+[2026-05-31 22:14:54]     L6: neg_top=happy(0.00x), rand_top=happy(0.00x), antonym_top=happy(0.00x)
+[2026-05-31 22:14:54]     L12: neg_top=not(2.60x), rand_top=unhappy(3.40x), antonym_top=happy(2.82x)
+[2026-05-31 22:14:54]     L18: neg_top=sad(2.00x), rand_top=okay(2.50x), antonym_top=happy(3.31x)
+[2026-05-31 22:14:54]     L24: neg_top=sad(1.88x), rand_top=not(2.94x), antonym_top=happy(3.00x)
+[2026-05-31 22:14:54]     L34: neg_top=happy(2.57x), rand_top=unhappy(3.47x), antonym_top=sad(2.77x)
+[2026-05-31 22:14:54]     L6 double_neg: pos_effects={'unhappy': 0, 'sad': 0, 'miserable': 0}, neg_effects={'not': 0, 'happy': 0, 'okay': 0}
+[2026-05-31 22:14:54]     L12 double_neg: pos_effects={'unhappy': 0.6985958772236267, 'sad': 0.05336382955919433, 'miserable': 0.384798686337675}, neg_effects={'not': 2.598729896057664, 'happy': 0.4987431395290903, 'okay': 0.07272325093052955}
+[2026-05-31 22:14:54]     L18 double_neg: pos_effects={'unhappy': 0.0333151797617135, 'sad': 2.0049537287788395, 'miserable': 1.0663942348416786}, neg_effects={'not': 0.5767569144270838, 'happy': 1.5148519448168098, 'okay': 1.1353388558534516}
+[2026-05-31 22:14:54]     L24 double_neg: pos_effects={'unhappy': 0.525517238653314, 'sad': 1.8764683123821846, 'miserable': 1.6635014670831219}, neg_effects={'not': 0.929780525782949, 'happy': 0.5611109758957334, 'okay': 0.9401648079251028}
+[2026-05-31 22:14:54]     L34 double_neg: pos_effects={'unhappy': 0.14143383653716052, 'sad': 0.48855969782506103, 'miserable': 1.1657090398412207}, neg_effects={'not': 1.0162646159604463, 'happy': 2.570510764996035, 'okay': 1.3272720689903457}
+[2026-05-31 22:14:54] 
+--- Negation type: weak_negation ---
+[2026-05-31 22:14:54]   Pair 1/5: 'the movie was very great' vs 'the movie was not great'
+[2026-05-31 22:14:54]   neg_dir_norm=28.7695, antonym_dir_norm=40.7246
+[2026-05-31 22:14:55]     L6: neg_top=excellent(0.00x), rand_top=excellent(0.00x), antonym_top=excellent(0.00x)
+[2026-05-31 22:14:55]     L12: neg_top=okay(2.33x), rand_top=excellent(2.32x), antonym_top=okay(3.20x)
+[2026-05-31 22:14:55]     L18: neg_top=okay(2.92x), rand_top=amazing(1.89x), antonym_top=mediocre(4.06x)
+[2026-05-31 22:14:55]     L24: neg_top=okay(3.39x), rand_top=excellent(1.52x), antonym_top=not(3.23x)
+[2026-05-31 22:14:55]     L34: neg_top=great(2.70x), rand_top=great(2.53x), antonym_top=okay(3.62x)
+[2026-05-31 22:14:55]   Pair 2/5: 'the food was very terrible' vs 'the food was not terrible'
+[2026-05-31 22:14:55]   neg_dir_norm=27.8628, antonym_dir_norm=37.4950
+[2026-05-31 22:14:55]     L6: neg_top=terrible(0.00x), rand_top=terrible(0.00x), antonym_top=terrible(0.00x)
+[2026-05-31 22:14:55]     L12: neg_top=horrible(3.22x), rand_top=okay(1.51x), antonym_top=okay(3.72x)
+[2026-05-31 22:14:55]     L18: neg_top=okay(3.61x), rand_top=awful(0.94x), antonym_top=okay(2.89x)
+[2026-05-31 22:14:55]     L24: neg_top=okay(3.13x), rand_top=okay(1.07x), antonym_top=okay(5.52x)
+[2026-05-31 22:14:55]     L34: neg_top=awful(4.02x), rand_top=decent(3.05x), antonym_top=okay(4.97x)
+[2026-05-31 22:14:55]   Pair 3/5: 'the plan was very perfect' vs 'the plan was not perfect'
+[2026-05-31 22:14:55]   neg_dir_norm=28.4899, antonym_dir_norm=37.0974
+[2026-05-31 22:14:56]     L6: neg_top=perfect(0.00x), rand_top=perfect(0.00x), antonym_top=perfect(0.00x)
+[2026-05-31 22:14:56]     L12: neg_top=not(2.84x), rand_top=okay(2.01x), antonym_top=ideal(3.59x)
+[2026-05-31 22:14:56]     L18: neg_top=okay(3.85x), rand_top=ideal(1.78x), antonym_top=ideal(2.82x)
+[2026-05-31 22:14:56]     L24: neg_top=okay(5.90x), rand_top=not(1.22x), antonym_top=ideal(4.46x)
+[2026-05-31 22:14:56]     L34: neg_top=okay(4.72x), rand_top=okay(1.77x), antonym_top=ideal(4.19x)
+[2026-05-31 22:14:56]   Pair 4/5: 'the design was very horrible' vs 'the design was not horrible'
+[2026-05-31 22:14:56]   neg_dir_norm=23.8197, antonym_dir_norm=38.9952
+[2026-05-31 22:14:57]     L6: neg_top=horrible(0.00x), rand_top=horrible(0.00x), antonym_top=horrible(0.00x)
+[2026-05-31 22:14:57]     L12: neg_top=okay(3.99x), rand_top=decent(2.08x), antonym_top=okay(2.57x)
+[2026-05-31 22:14:57]     L18: neg_top=okay(5.26x), rand_top=terrible(3.59x), antonym_top=okay(2.63x)
+[2026-05-31 22:14:57]     L24: neg_top=okay(7.33x), rand_top=terrible(2.98x), antonym_top=not(5.46x)
+[2026-05-31 22:14:57]     L34: neg_top=okay(5.30x), rand_top=not(1.42x), antonym_top=okay(5.89x)
+[2026-05-31 22:14:57]   Pair 5/5: 'the idea was very amazing' vs 'the idea was not amazing'
+[2026-05-31 22:14:57]   neg_dir_norm=30.0013, antonym_dir_norm=39.8282
+[2026-05-31 22:14:57]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:14:57]     L12: neg_top=ordinary(2.30x), rand_top=incredible(2.23x), antonym_top=amazing(3.50x)
+[2026-05-31 22:14:57]     L18: neg_top=ordinary(2.07x), rand_top=incredible(1.24x), antonym_top=amazing(2.42x)
+[2026-05-31 22:14:57]     L24: neg_top=okay(2.39x), rand_top=okay(2.87x), antonym_top=incredible(3.49x)
+[2026-05-31 22:14:57]     L34: neg_top=amazing(2.11x), rand_top=okay(3.18x), antonym_top=okay(6.60x)
+[2026-05-31 22:14:58] Test 3 completed in 14.2s
+[2026-05-31 22:14:58] Results saved to results\phase317_comprehensive\qwen3_phase317.json
+[2026-05-31 22:14:58] 
+======================================================================
+[2026-05-31 22:14:58] PHASE 317 SUMMARY - qwen3
+[2026-05-31 22:14:58] ======================================================================
+[2026-05-31 22:14:58] 
+Test 1: Attribute Activation (PARALLEL templates)
+[2026-05-31 22:14:58]   Template: static
+[2026-05-31 22:14:58]     L2: ratio=1.09 (real=0.0255, random=0.0277, n=52)
+[2026-05-31 22:14:58]     L6: ratio=1.15 (real=0.1007, random=0.1163, n=52)
+[2026-05-31 22:14:58]     L12: ratio=1.14 (real=0.1261, random=0.1434, n=52)
+[2026-05-31 22:14:58]     L18: ratio=1.07 (real=0.0969, random=0.1041, n=52)
+[2026-05-31 22:14:58]     L24: ratio=1.13 (real=0.0521, random=0.0588, n=52)
+[2026-05-31 22:14:58]     L34: ratio=1.41 (real=0.0259, random=0.0365, n=52)
+[2026-05-31 22:14:58]   Template: attribute_probe
+[2026-05-31 22:14:58]     L2: ratio=0.96 (real=0.0179, random=0.0173, n=52)
+[2026-05-31 22:14:58]     L6: ratio=1.13 (real=0.0745, random=0.0842, n=52)
+[2026-05-31 22:14:58]     L12: ratio=1.07 (real=0.1314, random=0.1405, n=52)
+[2026-05-31 22:14:58]     L18: ratio=1.11 (real=0.0976, random=0.1086, n=52)
+[2026-05-31 22:14:58]     L24: ratio=1.19 (real=0.0915, random=0.1091, n=52)
+[2026-05-31 22:14:58]     L34: ratio=1.51 (real=0.0700, random=0.1057, n=52)
+[2026-05-31 22:14:58]   Template: attribute_fill
+[2026-05-31 22:14:58]     L2: ratio=1.11 (real=0.0053, random=0.0059, n=52)
+[2026-05-31 22:14:58]     L6: ratio=1.18 (real=0.0383, random=0.0451, n=52)
+[2026-05-31 22:14:58]     L12: ratio=1.21 (real=0.1073, random=0.1302, n=52)
+[2026-05-31 22:14:58]     L18: ratio=1.19 (real=0.1021, random=0.1214, n=52)
+[2026-05-31 22:14:58]     L24: ratio=1.37 (real=0.0633, random=0.0865, n=52)
+[2026-05-31 22:14:58]     L34: ratio=1.79 (real=0.0481, random=0.0862, n=52)
+[2026-05-31 22:14:58] 
+Test 2: Context × Causal Interaction
+[2026-05-31 22:14:58]   apple_red/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   apple_red/L18: attr_dir_ratio=1.39, random_ratio=1.85
+[2026-05-31 22:14:58]   apple_red/L24: attr_dir_ratio=0.90, random_ratio=0.72
+[2026-05-31 22:14:58]   apple_red/L34: attr_dir_ratio=2.16, random_ratio=2.09
+[2026-05-31 22:14:58]   knife_sharp/L12: attr_dir_ratio=0.99, random_ratio=0.99
+[2026-05-31 22:14:58]   knife_sharp/L18: attr_dir_ratio=1.47, random_ratio=1.31
+[2026-05-31 22:14:58]   knife_sharp/L24: attr_dir_ratio=1.43, random_ratio=2.10
+[2026-05-31 22:14:58]   knife_sharp/L34: attr_dir_ratio=1.49, random_ratio=1.40
+[2026-05-31 22:14:58]   ice_cold/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   ice_cold/L18: attr_dir_ratio=1.11, random_ratio=0.45
+[2026-05-31 22:14:58]   ice_cold/L24: attr_dir_ratio=1.16, random_ratio=1.11
+[2026-05-31 22:14:58]   ice_cold/L34: attr_dir_ratio=0.80, random_ratio=1.07
+[2026-05-31 22:14:58]   fire_hot/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   fire_hot/L18: attr_dir_ratio=2.30, random_ratio=0.86
+[2026-05-31 22:14:58]   fire_hot/L24: attr_dir_ratio=1.26, random_ratio=1.74
+[2026-05-31 22:14:58]   fire_hot/L34: attr_dir_ratio=3.74, random_ratio=1.03
+[2026-05-31 22:14:58]   silk_smooth/L12: attr_dir_ratio=1.01, random_ratio=1.00
+[2026-05-31 22:14:58]   silk_smooth/L18: attr_dir_ratio=2.14, random_ratio=1.18
+[2026-05-31 22:14:58]   silk_smooth/L24: attr_dir_ratio=0.73, random_ratio=1.19
+[2026-05-31 22:14:58]   silk_smooth/L34: attr_dir_ratio=0.81, random_ratio=0.86
+[2026-05-31 22:14:58]   stone_hard/L12: attr_dir_ratio=1.00, random_ratio=0.98
+[2026-05-31 22:14:58]   stone_hard/L18: attr_dir_ratio=1.29, random_ratio=1.71
+[2026-05-31 22:14:58]   stone_hard/L24: attr_dir_ratio=1.17, random_ratio=0.81
+[2026-05-31 22:14:58]   stone_hard/L34: attr_dir_ratio=1.07, random_ratio=2.24
+[2026-05-31 22:14:58]   honey_sweet/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   honey_sweet/L18: attr_dir_ratio=1.05, random_ratio=1.15
+[2026-05-31 22:14:58]   honey_sweet/L24: attr_dir_ratio=1.54, random_ratio=0.80
+[2026-05-31 22:14:58]   honey_sweet/L34: attr_dir_ratio=1.03, random_ratio=1.33
+[2026-05-31 22:14:58]   lemon_sour/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   lemon_sour/L18: attr_dir_ratio=1.92, random_ratio=0.68
+[2026-05-31 22:14:58]   lemon_sour/L24: attr_dir_ratio=0.89, random_ratio=0.69
+[2026-05-31 22:14:58]   lemon_sour/L34: attr_dir_ratio=0.62, random_ratio=0.68
+[2026-05-31 22:14:58]   thunder_loud/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   thunder_loud/L18: attr_dir_ratio=2.49, random_ratio=1.33
+[2026-05-31 22:14:58]   thunder_loud/L24: attr_dir_ratio=1.42, random_ratio=1.01
+[2026-05-31 22:14:58]   thunder_loud/L34: attr_dir_ratio=0.75, random_ratio=2.65
+[2026-05-31 22:14:58]   cotton_soft/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   cotton_soft/L18: attr_dir_ratio=0.79, random_ratio=1.10
+[2026-05-31 22:14:58]   cotton_soft/L24: attr_dir_ratio=0.35, random_ratio=0.78
+[2026-05-31 22:14:58]   cotton_soft/L34: attr_dir_ratio=1.07, random_ratio=2.77
+[2026-05-31 22:14:58]   cheetah_fast/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   cheetah_fast/L18: attr_dir_ratio=1.75, random_ratio=1.32
+[2026-05-31 22:14:58]   cheetah_fast/L24: attr_dir_ratio=2.01, random_ratio=2.72
+[2026-05-31 22:14:58]   cheetah_fast/L34: attr_dir_ratio=0.41, random_ratio=2.53
+[2026-05-31 22:14:58]   elephant_huge/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   elephant_huge/L18: attr_dir_ratio=0.98, random_ratio=2.28
+[2026-05-31 22:14:58]   elephant_huge/L24: attr_dir_ratio=0.52, random_ratio=2.23
+[2026-05-31 22:14:58]   elephant_huge/L34: attr_dir_ratio=0.89, random_ratio=1.37
+[2026-05-31 22:14:58]   diamond_hard/L12: attr_dir_ratio=1.00, random_ratio=1.01
+[2026-05-31 22:14:58]   diamond_hard/L18: attr_dir_ratio=0.80, random_ratio=0.41
+[2026-05-31 22:14:58]   diamond_hard/L24: attr_dir_ratio=0.82, random_ratio=0.53
+[2026-05-31 22:14:58]   diamond_hard/L34: attr_dir_ratio=1.59, random_ratio=0.71
+[2026-05-31 22:14:58]   snow_white/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   snow_white/L18: attr_dir_ratio=1.13, random_ratio=1.64
+[2026-05-31 22:14:58]   snow_white/L24: attr_dir_ratio=2.45, random_ratio=0.96
+[2026-05-31 22:14:58]   snow_white/L34: attr_dir_ratio=0.76, random_ratio=0.72
+[2026-05-31 22:14:58]   night_dark/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:14:58]   night_dark/L18: attr_dir_ratio=0.92, random_ratio=1.63
+[2026-05-31 22:14:58]   night_dark/L24: attr_dir_ratio=0.48, random_ratio=0.76
+[2026-05-31 22:14:58]   night_dark/L34: attr_dir_ratio=0.88, random_ratio=0.85
+[2026-05-31 22:14:58]   MEAN interaction ratio (attr_dir): 1.20
+[2026-05-31 22:14:58]   → Context gating NOT confirmed (threshold: 1.2x)
+[2026-05-31 22:14:58] 
+Test 3: Expanded Negation
+[2026-05-31 22:14:58]   Type: regular
+[2026-05-31 22:15:20] === Phase 317: Comprehensive Test for qwen3 ===
+[2026-05-31 22:15:21] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-05-31 22:15:22]   flash_attention_2 failed (FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package flash_attn seems to be not installed. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.), falling back to sdpa
+[2026-05-31 22:15:27]   Loaded with sdpa
+[2026-05-31 22:15:27]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-05-31 22:15:27]   Layer allocation: GPU=0, CPU=0 components
+[2026-05-31 22:15:27] Model: n_layers=36, d_model=2560
+[2026-05-31 22:15:27] ============================================================
+[2026-05-31 22:15:27] TEST 1: Attribute Activation with PARALLEL Templates (50 pairs)
+[2026-05-31 22:15:27] ============================================================
+[2026-05-31 22:15:27] Test layers: [2, 6, 12, 18, 24, 34]
+[2026-05-31 22:15:29]   [static] L2: 50/360 done
+[2026-05-31 22:15:31]   [static] L2: 100/360 done
+[2026-05-31 22:15:34]   L2 static: real=0.0255, random=0.0277, ratio=1.09
+[2026-05-31 22:15:36]   [static] L6: 250/360 done
+[2026-05-31 22:15:38]   [static] L6: 300/360 done
+[2026-05-31 22:15:42]   L6 static: real=0.1007, random=0.1163, ratio=1.15
+[2026-05-31 22:15:44]   [static] L12: 450/360 done
+[2026-05-31 22:15:45]   [static] L12: 500/360 done
+[2026-05-31 22:15:49]   L12 static: real=0.1261, random=0.1434, ratio=1.14
+[2026-05-31 22:15:50]   [static] L18: 650/360 done
+[2026-05-31 22:15:52]   [static] L18: 700/360 done
+[2026-05-31 22:15:56]   L18 static: real=0.0969, random=0.1041, ratio=1.07
+[2026-05-31 22:15:58]   [static] L24: 850/360 done
+[2026-05-31 22:16:00]   [static] L24: 900/360 done
+[2026-05-31 22:16:03]   L24 static: real=0.0521, random=0.0588, ratio=1.13
+[2026-05-31 22:16:05]   [static] L34: 1050/360 done
+[2026-05-31 22:16:07]   [static] L34: 1100/360 done
+[2026-05-31 22:16:11]   L34 static: real=0.0259, random=0.0365, ratio=1.41
+[2026-05-31 22:16:13]   [attribute_probe] L2: 1250/360 done
+[2026-05-31 22:16:14]   [attribute_probe] L2: 1300/360 done
+[2026-05-31 22:16:18]   L2 attribute_probe: real=0.0179, random=0.0173, ratio=0.96
+[2026-05-31 22:16:20]   [attribute_probe] L6: 1450/360 done
+[2026-05-31 22:16:22]   [attribute_probe] L6: 1500/360 done
+[2026-05-31 22:16:26]   L6 attribute_probe: real=0.0745, random=0.0842, ratio=1.13
+[2026-05-31 22:16:27]   [attribute_probe] L12: 1650/360 done
+[2026-05-31 22:16:29]   [attribute_probe] L12: 1700/360 done
+[2026-05-31 22:16:32]   L12 attribute_probe: real=0.1314, random=0.1405, ratio=1.07
+[2026-05-31 22:16:34]   [attribute_probe] L18: 1850/360 done
+[2026-05-31 22:16:36]   [attribute_probe] L18: 1900/360 done
+[2026-05-31 22:16:40]   L18 attribute_probe: real=0.0976, random=0.1086, ratio=1.11
+[2026-05-31 22:16:41]   [attribute_probe] L24: 2050/360 done
+[2026-05-31 22:16:43]   [attribute_probe] L24: 2100/360 done
+[2026-05-31 22:16:47]   L24 attribute_probe: real=0.0915, random=0.1091, ratio=1.19
+[2026-05-31 22:16:49]   [attribute_probe] L34: 2250/360 done
+[2026-05-31 22:16:51]   [attribute_probe] L34: 2300/360 done
+[2026-05-31 22:16:54]   L34 attribute_probe: real=0.0700, random=0.1057, ratio=1.51
+[2026-05-31 22:16:56]   [attribute_fill] L2: 2450/360 done
+[2026-05-31 22:16:57]   [attribute_fill] L2: 2500/360 done
+[2026-05-31 22:17:01]   L2 attribute_fill: real=0.0053, random=0.0059, ratio=1.11
+[2026-05-31 22:17:03]   [attribute_fill] L6: 2650/360 done
+[2026-05-31 22:17:05]   [attribute_fill] L6: 2700/360 done
+[2026-05-31 22:17:08]   L6 attribute_fill: real=0.0383, random=0.0451, ratio=1.18
+[2026-05-31 22:17:10]   [attribute_fill] L12: 2850/360 done
+[2026-05-31 22:17:12]   [attribute_fill] L12: 2900/360 done
+[2026-05-31 22:17:16]   L12 attribute_fill: real=0.1073, random=0.1302, ratio=1.21
+[2026-05-31 22:17:18]   [attribute_fill] L18: 3050/360 done
+[2026-05-31 22:17:19]   [attribute_fill] L18: 3100/360 done
+[2026-05-31 22:17:22]   L18 attribute_fill: real=0.1021, random=0.1214, ratio=1.19
+[2026-05-31 22:17:24]   [attribute_fill] L24: 3250/360 done
+[2026-05-31 22:17:26]   [attribute_fill] L24: 3300/360 done
+[2026-05-31 22:17:30]   L24 attribute_fill: real=0.0633, random=0.0865, ratio=1.37
+[2026-05-31 22:17:32]   [attribute_fill] L34: 3450/360 done
+[2026-05-31 22:17:33]   [attribute_fill] L34: 3500/360 done
+[2026-05-31 22:17:37]   L34 attribute_fill: real=0.0481, random=0.0862, ratio=1.79
+[2026-05-31 22:17:37] Test 1 completed in 129.9s
+[2026-05-31 22:17:37] ============================================================
+[2026-05-31 22:17:37] TEST 2: Context × Causal Interaction (CRITICAL)
+[2026-05-31 22:17:37] ============================================================
+[2026-05-31 22:17:37] Inject layer: 12, Read layers: [12, 18, 24, 34]
+[2026-05-31 22:17:37] 
+  Pair 1/15: (apple, red)
+[2026-05-31 22:17:37]   attr_dir_norm=11.3155
+[2026-05-31 22:17:37]   Injecting into STATIC: 'the apple was there'
+[2026-05-31 22:17:37]   Injecting into ATTRIBUTE: 'The apple is usually'
+[2026-05-31 22:17:38]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.52, attr_top=2.51
+[2026-05-31 22:17:38]     L18: attr_dir_interaction=1.39, random_interaction=1.85, static_top=0.87, attr_top=1.21
+[2026-05-31 22:17:38]     L24: attr_dir_interaction=0.90, random_interaction=0.72, static_top=2.24, attr_top=2.01
+[2026-05-31 22:17:38]     L34: attr_dir_interaction=2.16, random_interaction=2.09, static_top=2.44, attr_top=5.26
+[2026-05-31 22:17:38] 
+  Pair 2/15: (knife, sharp)
+[2026-05-31 22:17:38]   attr_dir_norm=14.1341
+[2026-05-31 22:17:38]   Injecting into STATIC: 'the knife was there'
+[2026-05-31 22:17:38]   Injecting into ATTRIBUTE: 'The knife is usually'
+[2026-05-31 22:17:38]     L12: attr_dir_interaction=0.99, random_interaction=0.99, static_top=3.15, attr_top=3.13
+[2026-05-31 22:17:38]     L18: attr_dir_interaction=1.47, random_interaction=1.31, static_top=1.78, attr_top=2.63
+[2026-05-31 22:17:38]     L24: attr_dir_interaction=1.43, random_interaction=2.10, static_top=2.61, attr_top=3.74
+[2026-05-31 22:17:38]     L34: attr_dir_interaction=1.49, random_interaction=1.40, static_top=3.65, attr_top=5.45
+[2026-05-31 22:17:38] 
+  Pair 3/15: (ice, cold)
+[2026-05-31 22:17:38]   attr_dir_norm=15.1928
+[2026-05-31 22:17:38]   Injecting into STATIC: 'the ice was there'
+[2026-05-31 22:17:39]   Injecting into ATTRIBUTE: 'The ice is usually'
+[2026-05-31 22:17:39]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.05, attr_top=3.04
+[2026-05-31 22:17:39]     L18: attr_dir_interaction=1.11, random_interaction=0.45, static_top=0.69, attr_top=0.77
+[2026-05-31 22:17:39]     L24: attr_dir_interaction=1.16, random_interaction=1.11, static_top=1.97, attr_top=2.28
+[2026-05-31 22:17:39]     L34: attr_dir_interaction=0.80, random_interaction=1.07, static_top=2.18, attr_top=1.74
+[2026-05-31 22:17:39] 
+  Pair 4/15: (fire, hot)
+[2026-05-31 22:17:39]   attr_dir_norm=23.4335
+[2026-05-31 22:17:39]   Injecting into STATIC: 'the fire was there'
+[2026-05-31 22:17:40]   Injecting into ATTRIBUTE: 'The fire is usually'
+[2026-05-31 22:17:40]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.11, attr_top=3.10
+[2026-05-31 22:17:40]     L18: attr_dir_interaction=2.30, random_interaction=0.86, static_top=1.59, attr_top=3.66
+[2026-05-31 22:17:40]     L24: attr_dir_interaction=1.26, random_interaction=1.74, static_top=4.41, attr_top=5.55
+[2026-05-31 22:17:40]     L34: attr_dir_interaction=3.74, random_interaction=1.03, static_top=1.02, attr_top=3.81
+[2026-05-31 22:17:40] 
+  Pair 5/15: (silk, smooth)
+[2026-05-31 22:17:40]   attr_dir_norm=10.6355
+[2026-05-31 22:17:40]   Injecting into STATIC: 'the silk was there'
+[2026-05-31 22:17:40]   Injecting into ATTRIBUTE: 'The silk is usually'
+[2026-05-31 22:17:41]     L12: attr_dir_interaction=1.01, random_interaction=1.00, static_top=1.13, attr_top=1.14
+[2026-05-31 22:17:41]     L18: attr_dir_interaction=2.14, random_interaction=1.18, static_top=1.10, attr_top=2.35
+[2026-05-31 22:17:41]     L24: attr_dir_interaction=0.73, random_interaction=1.19, static_top=2.71, attr_top=1.99
+[2026-05-31 22:17:41]     L34: attr_dir_interaction=0.81, random_interaction=0.86, static_top=1.21, attr_top=0.98
+[2026-05-31 22:17:41] 
+  Pair 6/15: (stone, hard)
+[2026-05-31 22:17:41]   attr_dir_norm=17.7179
+[2026-05-31 22:17:41]   Injecting into STATIC: 'the stone was there'
+[2026-05-31 22:17:41]   Injecting into ATTRIBUTE: 'The stone is usually'
+[2026-05-31 22:17:41]     L12: attr_dir_interaction=1.00, random_interaction=0.98, static_top=1.53, attr_top=1.53
+[2026-05-31 22:17:41]     L18: attr_dir_interaction=1.29, random_interaction=1.71, static_top=1.63, attr_top=2.10
+[2026-05-31 22:17:41]     L24: attr_dir_interaction=1.17, random_interaction=0.81, static_top=1.90, attr_top=2.22
+[2026-05-31 22:17:41]     L34: attr_dir_interaction=1.07, random_interaction=2.24, static_top=2.05, attr_top=2.20
+[2026-05-31 22:17:41] 
+  Pair 7/15: (honey, sweet)
+[2026-05-31 22:17:41]   attr_dir_norm=15.4680
+[2026-05-31 22:17:41]   Injecting into STATIC: 'the honey was there'
+[2026-05-31 22:17:42]   Injecting into ATTRIBUTE: 'The honey is usually'
+[2026-05-31 22:17:42]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.97, attr_top=2.96
+[2026-05-31 22:17:42]     L18: attr_dir_interaction=1.05, random_interaction=1.15, static_top=1.99, attr_top=2.09
+[2026-05-31 22:17:42]     L24: attr_dir_interaction=1.54, random_interaction=0.80, static_top=1.18, attr_top=1.83
+[2026-05-31 22:17:42]     L34: attr_dir_interaction=1.03, random_interaction=1.33, static_top=2.13, attr_top=2.20
+[2026-05-31 22:17:42] 
+  Pair 8/15: (lemon, sour)
+[2026-05-31 22:17:42]   attr_dir_norm=10.1563
+[2026-05-31 22:17:42]   Injecting into STATIC: 'the lemon was there'
+[2026-05-31 22:17:42]   Injecting into ATTRIBUTE: 'The lemon is usually'
+[2026-05-31 22:17:43]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=3.19, attr_top=3.18
+[2026-05-31 22:17:43]     L18: attr_dir_interaction=1.92, random_interaction=0.68, static_top=2.14, attr_top=4.12
+[2026-05-31 22:17:43]     L24: attr_dir_interaction=0.89, random_interaction=0.69, static_top=4.84, attr_top=4.30
+[2026-05-31 22:17:43]     L34: attr_dir_interaction=0.62, random_interaction=0.68, static_top=4.38, attr_top=2.70
+[2026-05-31 22:17:43] 
+  Pair 9/15: (thunder, loud)
+[2026-05-31 22:17:43]   attr_dir_norm=11.1258
+[2026-05-31 22:17:43]   Injecting into STATIC: 'the thunder was there'
+[2026-05-31 22:17:43]   Injecting into ATTRIBUTE: 'The thunder is usually'
+[2026-05-31 22:17:43]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.48, attr_top=2.47
+[2026-05-31 22:17:43]     L18: attr_dir_interaction=2.49, random_interaction=1.33, static_top=2.11, attr_top=5.26
+[2026-05-31 22:17:43]     L24: attr_dir_interaction=1.42, random_interaction=1.01, static_top=2.09, attr_top=2.97
+[2026-05-31 22:17:43]     L34: attr_dir_interaction=0.75, random_interaction=2.65, static_top=2.46, attr_top=1.84
+[2026-05-31 22:17:43] 
+  Pair 10/15: (cotton, soft)
+[2026-05-31 22:17:43]   attr_dir_norm=22.3847
+[2026-05-31 22:17:43]   Injecting into STATIC: 'the cotton was there'
+[2026-05-31 22:17:44]   Injecting into ATTRIBUTE: 'The cotton is usually'
+[2026-05-31 22:17:44]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.89, attr_top=2.89
+[2026-05-31 22:17:44]     L18: attr_dir_interaction=0.79, random_interaction=1.10, static_top=2.06, attr_top=1.64
+[2026-05-31 22:17:44]     L24: attr_dir_interaction=0.35, random_interaction=0.78, static_top=5.38, attr_top=1.90
+[2026-05-31 22:17:44]     L34: attr_dir_interaction=1.07, random_interaction=2.77, static_top=3.77, attr_top=4.04
+[2026-05-31 22:17:44] 
+  Pair 11/15: (cheetah, fast)
+[2026-05-31 22:17:44]   attr_dir_norm=11.7545
+[2026-05-31 22:17:44]   Injecting into STATIC: 'the cheetah was there'
+[2026-05-31 22:17:44]   Injecting into ATTRIBUTE: 'The cheetah is usually'
+[2026-05-31 22:17:45]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.10, attr_top=2.11
+[2026-05-31 22:17:45]     L18: attr_dir_interaction=1.75, random_interaction=1.32, static_top=1.76, attr_top=3.09
+[2026-05-31 22:17:45]     L24: attr_dir_interaction=2.01, random_interaction=2.72, static_top=1.47, attr_top=2.95
+[2026-05-31 22:17:45]     L34: attr_dir_interaction=0.41, random_interaction=2.53, static_top=5.06, attr_top=2.06
+[2026-05-31 22:17:45] 
+  Pair 12/15: (elephant, huge)
+[2026-05-31 22:17:45]   attr_dir_norm=10.8832
+[2026-05-31 22:17:45]   Injecting into STATIC: 'the elephant was there'
+[2026-05-31 22:17:45]   Injecting into ATTRIBUTE: 'The elephant is usually'
+[2026-05-31 22:17:45]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.31, attr_top=2.32
+[2026-05-31 22:17:45]     L18: attr_dir_interaction=0.98, random_interaction=2.28, static_top=2.42, attr_top=2.36
+[2026-05-31 22:17:45]     L24: attr_dir_interaction=0.52, random_interaction=2.23, static_top=2.77, attr_top=1.43
+[2026-05-31 22:17:45]     L34: attr_dir_interaction=0.89, random_interaction=1.37, static_top=3.45, attr_top=3.05
+[2026-05-31 22:17:45] 
+  Pair 13/15: (diamond, hard)
+[2026-05-31 22:17:45]   attr_dir_norm=16.7435
+[2026-05-31 22:17:45]   Injecting into STATIC: 'the diamond was there'
+[2026-05-31 22:17:46]   Injecting into ATTRIBUTE: 'The diamond is usually'
+[2026-05-31 22:17:46]     L12: attr_dir_interaction=1.00, random_interaction=1.01, static_top=1.90, attr_top=1.91
+[2026-05-31 22:17:46]     L18: attr_dir_interaction=0.80, random_interaction=0.41, static_top=2.82, attr_top=2.27
+[2026-05-31 22:17:46]     L24: attr_dir_interaction=0.82, random_interaction=0.53, static_top=2.41, attr_top=1.99
+[2026-05-31 22:17:46]     L34: attr_dir_interaction=1.59, random_interaction=0.71, static_top=2.22, attr_top=3.53
+[2026-05-31 22:17:46] 
+  Pair 14/15: (snow, white)
+[2026-05-31 22:17:46]   attr_dir_norm=29.4542
+[2026-05-31 22:17:46]   Injecting into STATIC: 'the snow was there'
+[2026-05-31 22:17:46]   Injecting into ATTRIBUTE: 'The snow is usually'
+[2026-05-31 22:17:47]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=1.78, attr_top=1.78
+[2026-05-31 22:17:47]     L18: attr_dir_interaction=1.13, random_interaction=1.64, static_top=1.71, attr_top=1.93
+[2026-05-31 22:17:47]     L24: attr_dir_interaction=2.45, random_interaction=0.96, static_top=1.47, attr_top=3.60
+[2026-05-31 22:17:47]     L34: attr_dir_interaction=0.76, random_interaction=0.72, static_top=3.97, attr_top=3.01
+[2026-05-31 22:17:47] 
+  Pair 15/15: (night, dark)
+[2026-05-31 22:17:47]   attr_dir_norm=15.7996
+[2026-05-31 22:17:47]   Injecting into STATIC: 'the night was there'
+[2026-05-31 22:17:47]   Injecting into ATTRIBUTE: 'The night is usually'
+[2026-05-31 22:17:47]     L12: attr_dir_interaction=1.00, random_interaction=1.00, static_top=2.76, attr_top=2.76
+[2026-05-31 22:17:47]     L18: attr_dir_interaction=0.92, random_interaction=1.63, static_top=3.23, attr_top=2.98
+[2026-05-31 22:17:47]     L24: attr_dir_interaction=0.48, random_interaction=0.76, static_top=3.41, attr_top=1.63
+[2026-05-31 22:17:47]     L34: attr_dir_interaction=0.88, random_interaction=0.85, static_top=2.81, attr_top=2.47
+[2026-05-31 22:17:47] Test 2 completed in 10.6s
+[2026-05-31 22:17:47] ============================================================
+[2026-05-31 22:17:47] TEST 3: Expanded Negation with Controls (25 pairs)
+[2026-05-31 22:17:47] ============================================================
+[2026-05-31 22:17:47] Inject layer: 12, Read layers: [6, 12, 18, 24, 34]
+[2026-05-31 22:17:48] 
+--- Negation type: regular ---
+[2026-05-31 22:17:48]   Pair 1/10: 'they were very happy about it' vs 'they were not happy about it'
+[2026-05-31 22:17:48]   neg_dir_norm=17.1884, antonym_dir_norm=24.0827
+[2026-05-31 22:17:48]     L6: neg_top=not(0.00x), rand_top=not(0.00x), antonym_top=not(0.00x)
+[2026-05-31 22:17:48]     L12: neg_top=happy(1.97x), rand_top=happy(3.50x), antonym_top=happy(2.62x)
+[2026-05-31 22:17:48]     L18: neg_top=pleased(2.70x), rand_top=happy(2.98x), antonym_top=happy(1.93x)
+[2026-05-31 22:17:48]     L24: neg_top=pleased(2.75x), rand_top=not(1.45x), antonym_top=unhappy(1.49x)
+[2026-05-31 22:17:48]     L34: neg_top=pleased(1.57x), rand_top=disappointed(1.44x), antonym_top=disappointed(2.29x)
+[2026-05-31 22:17:48]   Pair 2/10: 'the place was very safe' vs 'the place was not safe'
+[2026-05-31 22:17:48]   neg_dir_norm=27.0851, antonym_dir_norm=33.8080
+[2026-05-31 22:17:49]     L6: neg_top=secure(0.00x), rand_top=secure(0.00x), antonym_top=secure(0.00x)
+[2026-05-31 22:17:49]     L12: neg_top=unsafe(1.65x), rand_top=safe(3.65x), antonym_top=safe(2.66x)
+[2026-05-31 22:17:49]     L18: neg_top=secure(3.92x), rand_top=not(1.00x), antonym_top=secure(4.35x)
+[2026-05-31 22:17:49]     L24: neg_top=secure(1.89x), rand_top=dangerous(1.27x), antonym_top=safe(4.12x)
+[2026-05-31 22:17:49]     L34: neg_top=secure(5.18x), rand_top=not(1.74x), antonym_top=secure(4.97x)
+[2026-05-31 22:17:49]   Pair 3/10: 'the result was very good' vs 'the result was not good'
+[2026-05-31 22:17:49]   neg_dir_norm=22.3488, antonym_dir_norm=26.3757
+[2026-05-31 22:17:50]     L6: neg_top=excellent(0.00x), rand_top=excellent(0.00x), antonym_top=excellent(0.00x)
+[2026-05-31 22:17:50]     L12: neg_top=excellent(1.44x), rand_top=bad(1.84x), antonym_top=not(2.14x)
+[2026-05-31 22:17:50]     L18: neg_top=good(2.02x), rand_top=excellent(2.56x), antonym_top=not(1.91x)
+[2026-05-31 22:17:50]     L24: neg_top=good(3.83x), rand_top=excellent(2.29x), antonym_top=not(2.64x)
+[2026-05-31 22:17:50]     L34: neg_top=good(2.96x), rand_top=good(2.83x), antonym_top=bad(5.25x)
+[2026-05-31 22:17:50]   Pair 4/10: 'the room was very clean' vs 'the room was not clean'
+[2026-05-31 22:17:50]   neg_dir_norm=20.3694, antonym_dir_norm=30.8321
+[2026-05-31 22:17:50]     L6: neg_top=dirty(0.00x), rand_top=dirty(0.00x), antonym_top=dirty(0.00x)
+[2026-05-31 22:17:50]     L12: neg_top=dirty(1.99x), rand_top=neat(2.35x), antonym_top=dirty(3.63x)
+[2026-05-31 22:17:50]     L18: neg_top=clean(2.35x), rand_top=messy(2.36x), antonym_top=dirty(4.12x)
+[2026-05-31 22:17:50]     L24: neg_top=clean(3.79x), rand_top=not(2.70x), antonym_top=dirty(7.12x)
+[2026-05-31 22:17:50]     L34: neg_top=messy(5.31x), rand_top=not(2.54x), antonym_top=dirty(6.84x)
+[2026-05-31 22:17:50]   Pair 5/10: 'the task was very possible' vs 'the task was not possible'
+[2026-05-31 22:17:50]   neg_dir_norm=38.3723, antonym_dir_norm=33.7895
+[2026-05-31 22:17:51]     L6: neg_top=possible(0.00x), rand_top=possible(0.00x), antonym_top=possible(0.00x)
+[2026-05-31 22:17:51]     L12: neg_top=not(1.89x), rand_top=achievable(1.78x), antonym_top=possible(3.10x)
+[2026-05-31 22:17:51]     L18: neg_top=feasible(2.88x), rand_top=unfeasible(1.75x), antonym_top=feasible(3.80x)
+[2026-05-31 22:17:51]     L24: neg_top=feasible(4.61x), rand_top=not(1.35x), antonym_top=feasible(2.32x)
+[2026-05-31 22:17:51]     L34: neg_top=possible(4.66x), rand_top=unfeasible(2.66x), antonym_top=impossible(2.84x)
+[2026-05-31 22:17:51]   Pair 6/10: 'the room was very bright' vs 'the room was not bright'
+[2026-05-31 22:17:51]   neg_dir_norm=19.7021, antonym_dir_norm=37.3275
+[2026-05-31 22:17:52]     L6: neg_top=light(0.00x), rand_top=light(0.00x), antonym_top=light(0.00x)
+[2026-05-31 22:17:52]     L12: neg_top=bright(2.42x), rand_top=bright(1.76x), antonym_top=dark(2.95x)
+[2026-05-31 22:17:52]     L18: neg_top=dim(1.84x), rand_top=dark(2.34x), antonym_top=bright(2.63x)
+[2026-05-31 22:17:52]     L24: neg_top=light(2.90x), rand_top=illuminated(5.36x), antonym_top=dark(2.47x)
+[2026-05-31 22:17:52]     L34: neg_top=bright(4.61x), rand_top=illuminated(5.14x), antonym_top=dark(6.52x)
+[2026-05-31 22:17:52]   Pair 7/10: 'the man was very strong' vs 'the man was not strong'
+[2026-05-31 22:17:52]   neg_dir_norm=23.4603, antonym_dir_norm=30.3926
+[2026-05-31 22:17:52]     L6: neg_top=weak(0.00x), rand_top=weak(0.00x), antonym_top=weak(0.00x)
+[2026-05-31 22:17:52]     L12: neg_top=mighty(1.33x), rand_top=strong(3.45x), antonym_top=weak(3.55x)
+[2026-05-31 22:17:52]     L18: neg_top=mighty(1.79x), rand_top=strong(1.80x), antonym_top=weak(3.43x)
+[2026-05-31 22:17:52]     L24: neg_top=not(1.51x), rand_top=strong(1.73x), antonym_top=weak(4.14x)
+[2026-05-31 22:17:52]     L34: neg_top=weak(1.23x), rand_top=mighty(1.79x), antonym_top=strong(3.89x)
+[2026-05-31 22:17:52]   Pair 8/10: 'the weather was very warm' vs 'the weather was not warm'
+[2026-05-31 22:17:53]   neg_dir_norm=23.0774, antonym_dir_norm=31.2194
+[2026-05-31 22:17:53]     L6: neg_top=pleasant(0.00x), rand_top=pleasant(0.00x), antonym_top=pleasant(0.00x)
+[2026-05-31 22:17:53]     L12: neg_top=cold(1.57x), rand_top=warm(2.82x), antonym_top=cold(3.71x)
+[2026-05-31 22:17:53]     L18: neg_top=chilly(1.41x), rand_top=cold(2.46x), antonym_top=warm(4.16x)
+[2026-05-31 22:17:53]     L24: neg_top=cold(1.75x), rand_top=cold(3.33x), antonym_top=warm(4.46x)
+[2026-05-31 22:17:53]     L34: neg_top=mild(2.04x), rand_top=cold(3.96x), antonym_top=cold(5.22x)
+[2026-05-31 22:17:53]   Pair 9/10: 'the door was very open' vs 'the door was not open'
+[2026-05-31 22:17:53]   neg_dir_norm=30.8058, antonym_dir_norm=32.6688
+[2026-05-31 22:17:54]     L6: neg_top=shut(0.00x), rand_top=shut(0.00x), antonym_top=shut(0.00x)
+[2026-05-31 22:17:54]     L12: neg_top=closed(3.46x), rand_top=not(2.00x), antonym_top=open(3.23x)
+[2026-05-31 22:17:54]     L18: neg_top=not(4.42x), rand_top=open(3.26x), antonym_top=unlocked(2.37x)
+[2026-05-31 22:17:54]     L24: neg_top=not(2.59x), rand_top=not(1.82x), antonym_top=not(3.28x)
+[2026-05-31 22:17:54]     L34: neg_top=closed(2.98x), rand_top=not(3.22x), antonym_top=closed(3.67x)
+[2026-05-31 22:17:54]   Pair 10/10: 'the situation was very fair' vs 'the situation was not fair'
+[2026-05-31 22:17:54]   neg_dir_norm=30.9549, antonym_dir_norm=28.2854
+[2026-05-31 22:17:55]     L6: neg_top=biased(0.00x), rand_top=biased(0.00x), antonym_top=biased(0.00x)
+[2026-05-31 22:17:55]     L12: neg_top=unfair(1.81x), rand_top=not(1.94x), antonym_top=fair(2.14x)
+[2026-05-31 22:17:55]     L18: neg_top=fair(2.11x), rand_top=biased(2.35x), antonym_top=fair(2.94x)
+[2026-05-31 22:17:55]     L24: neg_top=biased(1.96x), rand_top=equitable(1.46x), antonym_top=biased(3.37x)
+[2026-05-31 22:17:55]     L34: neg_top=just(1.83x), rand_top=unfair(2.98x), antonym_top=unfair(3.34x)
+[2026-05-31 22:17:55] 
+--- Negation type: double_negation ---
+[2026-05-31 22:17:55]   Pair 1/5: 'the result was very bad' vs 'the result was not bad'
+[2026-05-31 22:17:55]   neg_dir_norm=28.4604, antonym_dir_norm=39.2537
+[2026-05-31 22:17:55]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:17:55]     L12: neg_top=bad(0.94x), rand_top=terrible(3.27x), antonym_top=okay(2.58x)
+[2026-05-31 22:17:55]     L18: neg_top=not(3.71x), rand_top=okay(1.88x), antonym_top=okay(3.02x)
+[2026-05-31 22:17:55]     L24: neg_top=okay(2.81x), rand_top=poor(1.40x), antonym_top=okay(6.31x)
+[2026-05-31 22:17:55]     L34: neg_top=acceptable(3.26x), rand_top=not(2.36x), antonym_top=okay(5.74x)
+[2026-05-31 22:17:55]     L6 double_neg: pos_effects={'bad': 0, 'poor': 0, 'terrible': 0}, neg_effects={'not': 0, 'okay': 0, 'acceptable': 0}
+[2026-05-31 22:17:55]     L12 double_neg: pos_effects={'bad': 0.9447008032507451, 'poor': 0.6890556922758438, 'terrible': 0.754381936310509}, neg_effects={'not': 0.682525540867416, 'okay': 0.7152097526788864, 'acceptable': 0.005533940314172295}
+[2026-05-31 22:17:55]     L18 double_neg: pos_effects={'bad': 1.6139547362301119, 'poor': 0.67643509943212, 'terrible': 0.9133640922606214}, neg_effects={'not': 3.7061374175185358, 'okay': 2.5738997561610155, 'acceptable': 0.4165743849533833}
+[2026-05-31 22:17:55]     L24 double_neg: pos_effects={'bad': 0.05803670642533891, 'poor': 0.5572345192591056, 'terrible': 2.350257887664586}, neg_effects={'not': 0.7345828994076187, 'okay': 2.813186757221122, 'acceptable': 2.233552254208496}
+[2026-05-31 22:17:55]     L34 double_neg: pos_effects={'bad': 2.8331108777572296, 'poor': 0.9807906046059152, 'terrible': 0.9288835349132607}, neg_effects={'not': 1.96003678768604, 'okay': 2.435963908107117, 'acceptable': 3.255727321863684}
+[2026-05-31 22:17:55]   Pair 2/5: 'the task was very impossible' vs 'the task was not impossible'
+[2026-05-31 22:17:55]   neg_dir_norm=30.5667, antonym_dir_norm=33.7895
+[2026-05-31 22:17:56]     L6: neg_top=possible(0.00x), rand_top=possible(0.00x), antonym_top=possible(0.00x)
+[2026-05-31 22:17:56]     L12: neg_top=not(2.51x), rand_top=hopeless(0.72x), antonym_top=possible(2.60x)
+[2026-05-31 22:17:56]     L18: neg_top=not(1.79x), rand_top=feasible(2.81x), antonym_top=feasible(2.87x)
+[2026-05-31 22:17:56]     L24: neg_top=not(1.05x), rand_top=feasible(2.95x), antonym_top=hopeless(1.91x)
+[2026-05-31 22:17:56]     L34: neg_top=impossible(4.08x), rand_top=impossible(5.58x), antonym_top=impossible(4.18x)
+[2026-05-31 22:17:56]     L6 double_neg: pos_effects={'impossible': 0, 'unfeasible': 0, 'hopeless': 0}, neg_effects={'not': 0, 'possible': 0, 'feasible': 0}
+[2026-05-31 22:17:56]     L12 double_neg: pos_effects={'impossible': 0.5442952290058404, 'unfeasible': 1.3390050957607462, 'hopeless': 1.4435489267610813}, neg_effects={'not': 2.510890532886912, 'possible': 0.24497714325765646, 'feasible': 0.7408209414221822}
+[2026-05-31 22:17:56]     L18 double_neg: pos_effects={'impossible': 0.3000037792047228, 'unfeasible': 0.4095569711148975, 'hopeless': 1.1725224297326242}, neg_effects={'not': 1.7858881902359263, 'possible': 0.5210538409902041, 'feasible': 1.3351236001898443}
+[2026-05-31 22:17:56]     L24 double_neg: pos_effects={'impossible': 0.4653408382551481, 'unfeasible': 0.09558429395250494, 'hopeless': 0.8851694011991647}, neg_effects={'not': 1.053067395407987, 'possible': 0.33832127559613645, 'feasible': 0.051314031303350285}
+[2026-05-31 22:17:56]     L34 double_neg: pos_effects={'impossible': 4.084753324168204, 'unfeasible': 2.306070212765055, 'hopeless': 0.8449397885148702}, neg_effects={'not': 0.5720690756197787, 'possible': 2.0520404869163027, 'feasible': 0.07797779568918367}
+[2026-05-31 22:17:56]   Pair 3/5: 'the answer was very wrong' vs 'the answer was not wrong'
+[2026-05-31 22:17:56]   neg_dir_norm=31.8705, antonym_dir_norm=37.1975
+[2026-05-31 22:17:57]     L6: neg_top=wrong(0.00x), rand_top=wrong(0.00x), antonym_top=wrong(0.00x)
+[2026-05-31 22:17:57]     L12: neg_top=incorrect(2.77x), rand_top=false(2.67x), antonym_top=incorrect(3.61x)
+[2026-05-31 22:17:57]     L18: neg_top=not(3.07x), rand_top=false(2.24x), antonym_top=incorrect(1.89x)
+[2026-05-31 22:17:57]     L24: neg_top=incorrect(2.77x), rand_top=wrong(2.77x), antonym_top=wrong(3.23x)
+[2026-05-31 22:17:57]     L34: neg_top=incorrect(4.52x), rand_top=right(1.72x), antonym_top=wrong(1.67x)
+[2026-05-31 22:17:57]     L6 double_neg: pos_effects={'wrong': 0, 'incorrect': 0, 'false': 0}, neg_effects={'not': 0, 'correct': 0, 'right': 0}
+[2026-05-31 22:17:57]     L12 double_neg: pos_effects={'wrong': 2.2243874895431266, 'incorrect': 2.767286859095872, 'false': 1.083354946672471}, neg_effects={'not': 2.0110645090181385, 'correct': 0.7448013630204743, 'right': 2.1288820419797183}
+[2026-05-31 22:17:57]     L18 double_neg: pos_effects={'wrong': 2.5621308629744095, 'incorrect': 2.794802251766357, 'false': 3.045029812366993}, neg_effects={'not': 3.071663533833255, 'correct': 0.5942996598616772, 'right': 1.829166372293673}
+[2026-05-31 22:17:57]     L24 double_neg: pos_effects={'wrong': 2.031763174971544, 'incorrect': 2.770951413459529, 'false': 2.422662802343466}, neg_effects={'not': 1.6677580029029515, 'correct': 0.6265548118432116, 'right': 0.2669124691121808}
+[2026-05-31 22:17:57]     L34 double_neg: pos_effects={'wrong': 3.114946932248129, 'incorrect': 4.515538453014101, 'false': 2.501921945350022}, neg_effects={'not': 2.126157655196071, 'correct': 0.2610295080753651, 'right': 0.23180270038716227}
+[2026-05-31 22:17:57]   Pair 4/5: 'the outcome was very unlikely' vs 'the outcome was not unlikely'
+[2026-05-31 22:17:57]   neg_dir_norm=30.8133, antonym_dir_norm=28.9515
+[2026-05-31 22:17:57]     L6: neg_top=unlikely(0.00x), rand_top=unlikely(0.00x), antonym_top=unlikely(0.00x)
+[2026-05-31 22:17:57]     L12: neg_top=not(2.39x), rand_top=improbable(1.61x), antonym_top=doubtful(1.57x)
+[2026-05-31 22:17:57]     L18: neg_top=likely(2.59x), rand_top=improbable(3.48x), antonym_top=unlikely(1.28x)
+[2026-05-31 22:17:57]     L24: neg_top=unlikely(4.81x), rand_top=probable(1.77x), antonym_top=not(4.31x)
+[2026-05-31 22:17:57]     L34: neg_top=not(1.37x), rand_top=unlikely(3.11x), antonym_top=not(6.70x)
+[2026-05-31 22:17:57]     L6 double_neg: pos_effects={'unlikely': 0, 'improbable': 0, 'doubtful': 0}, neg_effects={'not': 0, 'likely': 0, 'probable': 0}
+[2026-05-31 22:17:57]     L12 double_neg: pos_effects={'unlikely': 1.2152157923956268, 'improbable': 0.6571132056121604, 'doubtful': 2.0723132119152803}, neg_effects={'not': 2.3852209476116544, 'likely': 1.7395717618118844, 'probable': 0.3205201249814481}
+[2026-05-31 22:17:57]     L18 double_neg: pos_effects={'unlikely': 2.4616206747338656, 'improbable': 0.9239603850290182, 'doubtful': 1.075901238112485}, neg_effects={'not': 1.5311266188372148, 'likely': 2.5903117133408875, 'probable': 1.8323931947156074}
+[2026-05-31 22:17:57]     L24 double_neg: pos_effects={'unlikely': 4.806603929602519, 'improbable': 0.51588966025262, 'doubtful': 0.8039934754922207}, neg_effects={'not': 0.710066903872177, 'likely': 2.4526113993101166, 'probable': 2.5354614809791367}
+[2026-05-31 22:17:57]     L34 double_neg: pos_effects={'unlikely': 0.1372161634896933, 'improbable': 0.15956297966026656, 'doubtful': 0.794233167728566}, neg_effects={'not': 1.3701054647781667, 'likely': 1.2922352176474952, 'probable': 0.3160534848500695}
+[2026-05-31 22:17:57]   Pair 5/5: 'the person was very unhappy' vs 'the person was not unhappy'
+[2026-05-31 22:17:57]   neg_dir_norm=26.0889, antonym_dir_norm=24.0827
+[2026-05-31 22:17:58]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:17:58]     L12: neg_top=not(2.60x), rand_top=unhappy(3.40x), antonym_top=happy(2.82x)
+[2026-05-31 22:17:58]     L18: neg_top=sad(2.00x), rand_top=okay(2.50x), antonym_top=happy(3.31x)
+[2026-05-31 22:17:58]     L24: neg_top=sad(1.88x), rand_top=not(2.94x), antonym_top=happy(3.00x)
+[2026-05-31 22:17:58]     L34: neg_top=happy(2.57x), rand_top=unhappy(3.47x), antonym_top=sad(2.77x)
+[2026-05-31 22:17:58]     L6 double_neg: pos_effects={'unhappy': 0, 'sad': 0, 'miserable': 0}, neg_effects={'not': 0, 'happy': 0, 'okay': 0}
+[2026-05-31 22:17:58]     L12 double_neg: pos_effects={'unhappy': 0.6985958772236267, 'sad': 0.05336382955919433, 'miserable': 0.384798686337675}, neg_effects={'not': 2.598729896057664, 'happy': 0.4987431395290903, 'okay': 0.07272325093052955}
+[2026-05-31 22:17:58]     L18 double_neg: pos_effects={'unhappy': 0.0333151797617135, 'sad': 2.0049537287788395, 'miserable': 1.0663942348416786}, neg_effects={'not': 0.5767569144270838, 'happy': 1.5148519448168098, 'okay': 1.1353388558534516}
+[2026-05-31 22:17:58]     L24 double_neg: pos_effects={'unhappy': 0.525517238653314, 'sad': 1.8764683123821846, 'miserable': 1.6635014670831219}, neg_effects={'not': 0.929780525782949, 'happy': 0.5611109758957334, 'okay': 0.9401648079251028}
+[2026-05-31 22:17:58]     L34 double_neg: pos_effects={'unhappy': 0.14143383653716052, 'sad': 0.48855969782506103, 'miserable': 1.1657090398412207}, neg_effects={'not': 1.0162646159604463, 'happy': 2.570510764996035, 'okay': 1.3272720689903457}
+[2026-05-31 22:17:58] 
+--- Negation type: weak_negation ---
+[2026-05-31 22:17:58]   Pair 1/5: 'the movie was very great' vs 'the movie was not great'
+[2026-05-31 22:17:58]   neg_dir_norm=28.7695, antonym_dir_norm=40.7246
+[2026-05-31 22:17:59]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:17:59]     L12: neg_top=okay(2.33x), rand_top=excellent(2.32x), antonym_top=okay(3.20x)
+[2026-05-31 22:17:59]     L18: neg_top=okay(2.92x), rand_top=amazing(1.89x), antonym_top=mediocre(4.06x)
+[2026-05-31 22:17:59]     L24: neg_top=okay(3.39x), rand_top=excellent(1.52x), antonym_top=not(3.23x)
+[2026-05-31 22:17:59]     L34: neg_top=great(2.70x), rand_top=great(2.53x), antonym_top=okay(3.62x)
+[2026-05-31 22:17:59]   Pair 2/5: 'the food was very terrible' vs 'the food was not terrible'
+[2026-05-31 22:17:59]   neg_dir_norm=27.8628, antonym_dir_norm=37.4950
+[2026-05-31 22:17:59]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:17:59]     L12: neg_top=horrible(3.22x), rand_top=okay(1.51x), antonym_top=okay(3.72x)
+[2026-05-31 22:17:59]     L18: neg_top=okay(3.61x), rand_top=awful(0.94x), antonym_top=okay(2.89x)
+[2026-05-31 22:17:59]     L24: neg_top=okay(3.13x), rand_top=okay(1.07x), antonym_top=okay(5.52x)
+[2026-05-31 22:17:59]     L34: neg_top=awful(4.02x), rand_top=decent(3.05x), antonym_top=okay(4.97x)
+[2026-05-31 22:17:59]   Pair 3/5: 'the plan was very perfect' vs 'the plan was not perfect'
+[2026-05-31 22:17:59]   neg_dir_norm=28.4899, antonym_dir_norm=37.0974
+[2026-05-31 22:18:00]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:18:00]     L12: neg_top=not(2.84x), rand_top=okay(2.01x), antonym_top=ideal(3.59x)
+[2026-05-31 22:18:00]     L18: neg_top=okay(3.85x), rand_top=ideal(1.78x), antonym_top=ideal(2.82x)
+[2026-05-31 22:18:00]     L24: neg_top=okay(5.90x), rand_top=not(1.22x), antonym_top=ideal(4.46x)
+[2026-05-31 22:18:00]     L34: neg_top=okay(4.72x), rand_top=okay(1.77x), antonym_top=ideal(4.19x)
+[2026-05-31 22:18:00]   Pair 4/5: 'the design was very horrible' vs 'the design was not horrible'
+[2026-05-31 22:18:00]   neg_dir_norm=23.8197, antonym_dir_norm=38.9952
+[2026-05-31 22:18:01]     L6: neg_top=okay(0.00x), rand_top=okay(0.00x), antonym_top=okay(0.00x)
+[2026-05-31 22:18:01]     L12: neg_top=okay(3.99x), rand_top=decent(2.08x), antonym_top=okay(2.57x)
+[2026-05-31 22:18:01]     L18: neg_top=okay(5.26x), rand_top=terrible(3.59x), antonym_top=okay(2.63x)
+[2026-05-31 22:18:01]     L24: neg_top=okay(7.33x), rand_top=terrible(2.98x), antonym_top=not(5.46x)
+[2026-05-31 22:18:01]     L34: neg_top=okay(5.30x), rand_top=not(1.42x), antonym_top=okay(5.89x)
+[2026-05-31 22:18:01]   Pair 5/5: 'the idea was very amazing' vs 'the idea was not amazing'
+[2026-05-31 22:18:01]   neg_dir_norm=30.0013, antonym_dir_norm=39.8282
+[2026-05-31 22:18:01]     L6: neg_top=wonderful(0.00x), rand_top=wonderful(0.00x), antonym_top=wonderful(0.00x)
+[2026-05-31 22:18:01]     L12: neg_top=ordinary(2.30x), rand_top=incredible(2.23x), antonym_top=amazing(3.50x)
+[2026-05-31 22:18:01]     L18: neg_top=ordinary(2.07x), rand_top=incredible(1.24x), antonym_top=amazing(2.42x)
+[2026-05-31 22:18:01]     L24: neg_top=okay(2.39x), rand_top=okay(2.87x), antonym_top=incredible(3.49x)
+[2026-05-31 22:18:01]     L34: neg_top=amazing(2.11x), rand_top=okay(3.18x), antonym_top=okay(6.60x)
+[2026-05-31 22:18:01] Test 3 completed in 13.8s
+[2026-05-31 22:18:01] Results saved to results\phase317_comprehensive\qwen3_phase317.json
+[2026-05-31 22:18:01] 
+======================================================================
+[2026-05-31 22:18:01] PHASE 317 SUMMARY - qwen3
+[2026-05-31 22:18:01] ======================================================================
+[2026-05-31 22:18:01] 
+Test 1: Attribute Activation (PARALLEL templates)
+[2026-05-31 22:18:01]   Template: static
+[2026-05-31 22:18:01]     L2: ratio=1.09 (real=0.0255, random=0.0277, n=52)
+[2026-05-31 22:18:01]     L6: ratio=1.15 (real=0.1007, random=0.1163, n=52)
+[2026-05-31 22:18:01]     L12: ratio=1.14 (real=0.1261, random=0.1434, n=52)
+[2026-05-31 22:18:01]     L18: ratio=1.07 (real=0.0969, random=0.1041, n=52)
+[2026-05-31 22:18:01]     L24: ratio=1.13 (real=0.0521, random=0.0588, n=52)
+[2026-05-31 22:18:01]     L34: ratio=1.41 (real=0.0259, random=0.0365, n=52)
+[2026-05-31 22:18:01]   Template: attribute_probe
+[2026-05-31 22:18:01]     L2: ratio=0.96 (real=0.0179, random=0.0173, n=52)
+[2026-05-31 22:18:01]     L6: ratio=1.13 (real=0.0745, random=0.0842, n=52)
+[2026-05-31 22:18:01]     L12: ratio=1.07 (real=0.1314, random=0.1405, n=52)
+[2026-05-31 22:18:01]     L18: ratio=1.11 (real=0.0976, random=0.1086, n=52)
+[2026-05-31 22:18:01]     L24: ratio=1.19 (real=0.0915, random=0.1091, n=52)
+[2026-05-31 22:18:01]     L34: ratio=1.51 (real=0.0700, random=0.1057, n=52)
+[2026-05-31 22:18:01]   Template: attribute_fill
+[2026-05-31 22:18:01]     L2: ratio=1.11 (real=0.0053, random=0.0059, n=52)
+[2026-05-31 22:18:01]     L6: ratio=1.18 (real=0.0383, random=0.0451, n=52)
+[2026-05-31 22:18:01]     L12: ratio=1.21 (real=0.1073, random=0.1302, n=52)
+[2026-05-31 22:18:01]     L18: ratio=1.19 (real=0.1021, random=0.1214, n=52)
+[2026-05-31 22:18:01]     L24: ratio=1.37 (real=0.0633, random=0.0865, n=52)
+[2026-05-31 22:18:01]     L34: ratio=1.79 (real=0.0481, random=0.0862, n=52)
+[2026-05-31 22:18:01] 
+Test 2: Context × Causal Interaction
+[2026-05-31 22:18:01]   apple_red/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   apple_red/L18: attr_dir_ratio=1.39, random_ratio=1.85
+[2026-05-31 22:18:01]   apple_red/L24: attr_dir_ratio=0.90, random_ratio=0.72
+[2026-05-31 22:18:01]   apple_red/L34: attr_dir_ratio=2.16, random_ratio=2.09
+[2026-05-31 22:18:01]   knife_sharp/L12: attr_dir_ratio=0.99, random_ratio=0.99
+[2026-05-31 22:18:01]   knife_sharp/L18: attr_dir_ratio=1.47, random_ratio=1.31
+[2026-05-31 22:18:01]   knife_sharp/L24: attr_dir_ratio=1.43, random_ratio=2.10
+[2026-05-31 22:18:01]   knife_sharp/L34: attr_dir_ratio=1.49, random_ratio=1.40
+[2026-05-31 22:18:01]   ice_cold/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   ice_cold/L18: attr_dir_ratio=1.11, random_ratio=0.45
+[2026-05-31 22:18:01]   ice_cold/L24: attr_dir_ratio=1.16, random_ratio=1.11
+[2026-05-31 22:18:01]   ice_cold/L34: attr_dir_ratio=0.80, random_ratio=1.07
+[2026-05-31 22:18:01]   fire_hot/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   fire_hot/L18: attr_dir_ratio=2.30, random_ratio=0.86
+[2026-05-31 22:18:01]   fire_hot/L24: attr_dir_ratio=1.26, random_ratio=1.74
+[2026-05-31 22:18:01]   fire_hot/L34: attr_dir_ratio=3.74, random_ratio=1.03
+[2026-05-31 22:18:01]   silk_smooth/L12: attr_dir_ratio=1.01, random_ratio=1.00
+[2026-05-31 22:18:01]   silk_smooth/L18: attr_dir_ratio=2.14, random_ratio=1.18
+[2026-05-31 22:18:01]   silk_smooth/L24: attr_dir_ratio=0.73, random_ratio=1.19
+[2026-05-31 22:18:01]   silk_smooth/L34: attr_dir_ratio=0.81, random_ratio=0.86
+[2026-05-31 22:18:01]   stone_hard/L12: attr_dir_ratio=1.00, random_ratio=0.98
+[2026-05-31 22:18:01]   stone_hard/L18: attr_dir_ratio=1.29, random_ratio=1.71
+[2026-05-31 22:18:01]   stone_hard/L24: attr_dir_ratio=1.17, random_ratio=0.81
+[2026-05-31 22:18:01]   stone_hard/L34: attr_dir_ratio=1.07, random_ratio=2.24
+[2026-05-31 22:18:01]   honey_sweet/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   honey_sweet/L18: attr_dir_ratio=1.05, random_ratio=1.15
+[2026-05-31 22:18:01]   honey_sweet/L24: attr_dir_ratio=1.54, random_ratio=0.80
+[2026-05-31 22:18:01]   honey_sweet/L34: attr_dir_ratio=1.03, random_ratio=1.33
+[2026-05-31 22:18:01]   lemon_sour/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   lemon_sour/L18: attr_dir_ratio=1.92, random_ratio=0.68
+[2026-05-31 22:18:01]   lemon_sour/L24: attr_dir_ratio=0.89, random_ratio=0.69
+[2026-05-31 22:18:01]   lemon_sour/L34: attr_dir_ratio=0.62, random_ratio=0.68
+[2026-05-31 22:18:01]   thunder_loud/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   thunder_loud/L18: attr_dir_ratio=2.49, random_ratio=1.33
+[2026-05-31 22:18:01]   thunder_loud/L24: attr_dir_ratio=1.42, random_ratio=1.01
+[2026-05-31 22:18:01]   thunder_loud/L34: attr_dir_ratio=0.75, random_ratio=2.65
+[2026-05-31 22:18:01]   cotton_soft/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   cotton_soft/L18: attr_dir_ratio=0.79, random_ratio=1.10
+[2026-05-31 22:18:01]   cotton_soft/L24: attr_dir_ratio=0.35, random_ratio=0.78
+[2026-05-31 22:18:01]   cotton_soft/L34: attr_dir_ratio=1.07, random_ratio=2.77
+[2026-05-31 22:18:01]   cheetah_fast/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   cheetah_fast/L18: attr_dir_ratio=1.75, random_ratio=1.32
+[2026-05-31 22:18:01]   cheetah_fast/L24: attr_dir_ratio=2.01, random_ratio=2.72
+[2026-05-31 22:18:01]   cheetah_fast/L34: attr_dir_ratio=0.41, random_ratio=2.53
+[2026-05-31 22:18:01]   elephant_huge/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   elephant_huge/L18: attr_dir_ratio=0.98, random_ratio=2.28
+[2026-05-31 22:18:01]   elephant_huge/L24: attr_dir_ratio=0.52, random_ratio=2.23
+[2026-05-31 22:18:01]   elephant_huge/L34: attr_dir_ratio=0.89, random_ratio=1.37
+[2026-05-31 22:18:01]   diamond_hard/L12: attr_dir_ratio=1.00, random_ratio=1.01
+[2026-05-31 22:18:01]   diamond_hard/L18: attr_dir_ratio=0.80, random_ratio=0.41
+[2026-05-31 22:18:01]   diamond_hard/L24: attr_dir_ratio=0.82, random_ratio=0.53
+[2026-05-31 22:18:01]   diamond_hard/L34: attr_dir_ratio=1.59, random_ratio=0.71
+[2026-05-31 22:18:01]   snow_white/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   snow_white/L18: attr_dir_ratio=1.13, random_ratio=1.64
+[2026-05-31 22:18:01]   snow_white/L24: attr_dir_ratio=2.45, random_ratio=0.96
+[2026-05-31 22:18:01]   snow_white/L34: attr_dir_ratio=0.76, random_ratio=0.72
+[2026-05-31 22:18:01]   night_dark/L12: attr_dir_ratio=1.00, random_ratio=1.00
+[2026-05-31 22:18:01]   night_dark/L18: attr_dir_ratio=0.92, random_ratio=1.63
+[2026-05-31 22:18:01]   night_dark/L24: attr_dir_ratio=0.48, random_ratio=0.76
+[2026-05-31 22:18:01]   night_dark/L34: attr_dir_ratio=0.88, random_ratio=0.85
+[2026-05-31 22:18:01]   MEAN interaction ratio (attr_dir): 1.20
+[2026-05-31 22:18:01]   → Context gating NOT confirmed (threshold: 1.2x)
+[2026-05-31 22:18:01] 
+Test 3: Expanded Negation
+[2026-05-31 22:18:01]   Type: regular
+[2026-05-31 22:18:01]     pair_0/L12: neg_top=happy(1.97x), rand_top=happy(3.50x), selectivity=0.56
+[2026-05-31 22:18:01]     pair_0/L34: neg_top=pleased(1.57x), rand_top=disappointed(1.44x), selectivity=1.09
+[2026-05-31 22:18:01]     pair_1/L12: neg_top=unsafe(1.65x), rand_top=safe(3.65x), selectivity=0.45
+[2026-05-31 22:18:01]     pair_1/L34: neg_top=secure(5.18x), rand_top=not(1.74x), selectivity=2.97
+[2026-05-31 22:18:01]     pair_2/L12: neg_top=excellent(1.44x), rand_top=bad(1.84x), selectivity=0.78
+[2026-05-31 22:18:01]     pair_2/L34: neg_top=good(2.96x), rand_top=good(2.83x), selectivity=1.05
+[2026-05-31 22:18:01]     pair_3/L12: neg_top=dirty(1.99x), rand_top=neat(2.35x), selectivity=0.85
+[2026-05-31 22:18:01]     pair_3/L34: neg_top=messy(5.31x), rand_top=not(2.54x), selectivity=2.09
+[2026-05-31 22:18:01]     pair_4/L12: neg_top=not(1.89x), rand_top=achievable(1.78x), selectivity=1.06
+[2026-05-31 22:18:01]     pair_4/L34: neg_top=possible(4.66x), rand_top=unfeasible(2.66x), selectivity=1.75
+[2026-05-31 22:18:01]     pair_5/L12: neg_top=bright(2.42x), rand_top=bright(1.76x), selectivity=1.37
+[2026-05-31 22:18:01]     pair_5/L34: neg_top=bright(4.61x), rand_top=illuminated(5.14x), selectivity=0.90
+[2026-05-31 22:18:01]     pair_6/L12: neg_top=mighty(1.33x), rand_top=strong(3.45x), selectivity=0.38
+[2026-05-31 22:18:01]     pair_6/L34: neg_top=weak(1.23x), rand_top=mighty(1.79x), selectivity=0.69
+[2026-05-31 22:18:01]     pair_7/L12: neg_top=cold(1.57x), rand_top=warm(2.82x), selectivity=0.56
+[2026-05-31 22:18:01]     pair_7/L34: neg_top=mild(2.04x), rand_top=cold(3.96x), selectivity=0.51
+[2026-05-31 22:18:01]     pair_8/L12: neg_top=closed(3.46x), rand_top=not(2.00x), selectivity=1.73
+[2026-05-31 22:18:01]     pair_8/L34: neg_top=closed(2.98x), rand_top=not(3.22x), selectivity=0.92
+[2026-05-31 22:18:01]     pair_9/L12: neg_top=unfair(1.81x), rand_top=not(1.94x), selectivity=0.93
+[2026-05-31 22:18:01]     pair_9/L34: neg_top=just(1.83x), rand_top=unfair(2.98x), selectivity=0.62
+[2026-05-31 22:18:01]     Mean neg_dir vs random: 2.10x
+[2026-05-31 22:18:01]   Type: double_negation
+[2026-05-31 22:18:01]     pair_0/L12: neg_top=bad(0.94x), rand_top=terrible(3.27x), selectivity=0.29
+[2026-05-31 22:18:01]     pair_0/L34: neg_top=acceptable(3.26x), rand_top=not(2.36x), selectivity=1.38
+[2026-05-31 22:18:01]     pair_1/L12: neg_top=not(2.51x), rand_top=hopeless(0.72x), selectivity=3.47
+[2026-05-31 22:18:01]     pair_1/L34: neg_top=impossible(4.08x), rand_top=impossible(5.58x), selectivity=0.73
+[2026-05-31 22:18:01]     pair_2/L12: neg_top=incorrect(2.77x), rand_top=false(2.67x), selectivity=1.04
+[2026-05-31 22:18:01]     pair_2/L34: neg_top=incorrect(4.52x), rand_top=right(1.72x), selectivity=2.62
+[2026-05-31 22:18:01]     pair_3/L12: neg_top=not(2.39x), rand_top=improbable(1.61x), selectivity=1.48
+[2026-05-31 22:18:01]     pair_3/L34: neg_top=not(1.37x), rand_top=unlikely(3.11x), selectivity=0.44
+[2026-05-31 22:18:01]     pair_4/L12: neg_top=not(2.60x), rand_top=unhappy(3.40x), selectivity=0.76
+[2026-05-31 22:18:01]     pair_4/L34: neg_top=happy(2.57x), rand_top=unhappy(3.47x), selectivity=0.74
+[2026-05-31 22:18:01]     Mean neg_dir vs random: 2.14x
+[2026-05-31 22:18:01]   Type: weak_negation
+[2026-05-31 22:18:01]     pair_0/L12: neg_top=okay(2.33x), rand_top=excellent(2.32x), selectivity=1.00
+[2026-05-31 22:18:01]     pair_0/L34: neg_top=great(2.70x), rand_top=great(2.53x), selectivity=1.07
+[2026-05-31 22:18:01]     pair_1/L12: neg_top=horrible(3.22x), rand_top=okay(1.51x), selectivity=2.13
+[2026-05-31 22:18:01]     pair_1/L34: neg_top=awful(4.02x), rand_top=decent(3.05x), selectivity=1.32
+[2026-05-31 22:18:01]     pair_2/L12: neg_top=not(2.84x), rand_top=okay(2.01x), selectivity=1.42
+[2026-05-31 22:18:01]     pair_2/L34: neg_top=okay(4.72x), rand_top=okay(1.77x), selectivity=2.67
+[2026-05-31 22:18:01]     pair_3/L12: neg_top=okay(3.99x), rand_top=decent(2.08x), selectivity=1.92
+[2026-05-31 22:18:01]     pair_3/L34: neg_top=okay(5.30x), rand_top=not(1.42x), selectivity=3.74
+[2026-05-31 22:18:01]     pair_4/L12: neg_top=ordinary(2.30x), rand_top=incredible(2.23x), selectivity=1.03
+[2026-05-31 22:18:01]     pair_4/L34: neg_top=amazing(2.11x), rand_top=okay(3.18x), selectivity=0.66
+[2026-05-31 22:18:01]     Mean neg_dir vs random: 2.94x
+[2026-05-31 22:18:01] Model qwen3 released.

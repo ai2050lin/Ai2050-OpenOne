@@ -1,0 +1,88 @@
+[2026-06-01 09:14:35] === Phase 320b: Layer-Specific Causal for qwen3 ===
+[2026-06-01 09:14:36] Loading qwen3 (bf16 + device_map=auto + flash_attention_2)...
+[2026-06-01 09:14:37]   flash_attention_2 failed, trying next...
+[2026-06-01 09:14:48]   Loaded with sdpa
+[2026-06-01 09:14:48]   Model: Qwen3ForCausalLM, device=cuda:0, GPU=8.04GB
+[2026-06-01 09:14:48]   n_layers=36, d_model=2560, class=Qwen3ForCausalLM
+[2026-06-01 09:14:48]   Injection layers: [0, 4, 8, 12, 16, 20, 24, 28, 32, 34]
+[2026-06-01 09:14:48]   Total sentences: 122
+[2026-06-01 09:14:48] Extracting representations at all layers...
+[2026-06-01 09:14:50]     All Extracted 30/122, GPU=8.05GB
+[2026-06-01 09:14:52]     All Extracted 60/122, GPU=8.05GB
+[2026-06-01 09:14:53]     All Extracted 90/122, GPU=8.05GB
+[2026-06-01 09:14:55]     All Extracted 120/122, GPU=8.05GB
+[2026-06-01 09:14:55]     All Extracted 122/122, GPU=8.05GB
+[2026-06-01 09:14:55]   Extraction time: 6.7s
+[2026-06-01 09:14:55] 
+--- Attribute: Layer-by-layer injection ---
+[2026-06-01 09:14:55]   L0: delta=0.5000
+[2026-06-01 09:14:55]   L4: delta=0.2812
+[2026-06-01 09:14:55]   L8: delta=0.1562
+[2026-06-01 09:14:55]   L12: delta=0.2188
+[2026-06-01 09:14:55]   L16: delta=0.1875
+[2026-06-01 09:14:55]   L20: delta=0.1250
+[2026-06-01 09:14:55]   L24: delta=0.1250
+[2026-06-01 09:14:55]   L28: delta=0.0625
+[2026-06-01 09:14:55]   L32: delta=0.0625
+[2026-06-01 09:14:55]   L34: delta=0.0000
+[2026-06-01 09:14:57] 
+  Attribute injection by layer (alpha=2.0):
+[2026-06-01 09:14:57]   L0: mean_delta=0.2266, positive=100%
+[2026-06-01 09:14:57]   L4: mean_delta=0.1406, positive=75%
+[2026-06-01 09:14:57]   L8: mean_delta=0.1484, positive=100%
+[2026-06-01 09:14:57]   L12: mean_delta=0.1563, positive=100%
+[2026-06-01 09:14:57]   L16: mean_delta=0.1719, positive=100%
+[2026-06-01 09:14:57]   L20: mean_delta=0.1250, positive=100%
+[2026-06-01 09:14:57]   L24: mean_delta=0.0859, positive=100%
+[2026-06-01 09:14:57]   L28: mean_delta=0.0625, positive=75%
+[2026-06-01 09:14:57]   L32: mean_delta=0.0312, positive=50%
+[2026-06-01 09:14:57]   L34: mean_delta=0.0000, positive=0%
+[2026-06-01 09:14:57] 
+--- Function: Layer-by-layer injection ---
+[2026-06-01 09:14:58]   L0: delta=0.1250
+[2026-06-01 09:14:58]   L4: delta=0.0625
+[2026-06-01 09:14:58]   L8: delta=0.0625
+[2026-06-01 09:14:58]   L12: delta=0.1250
+[2026-06-01 09:14:58]   L16: delta=0.1250
+[2026-06-01 09:14:58]   L20: delta=0.1250
+[2026-06-01 09:14:58]   L24: delta=0.0625
+[2026-06-01 09:14:58]   L28: delta=0.0625
+[2026-06-01 09:14:58]   L32: delta=0.0625
+[2026-06-01 09:14:58]   L34: delta=0.0000
+[2026-06-01 09:15:00] 
+  Function injection by layer (alpha=2.0):
+[2026-06-01 09:15:00]   L0: mean_delta=0.0312, positive=25%
+[2026-06-01 09:15:00]   L4: mean_delta=0.0859, positive=100%
+[2026-06-01 09:15:00]   L8: mean_delta=0.0312, positive=50%
+[2026-06-01 09:15:00]   L12: mean_delta=0.0469, positive=50%
+[2026-06-01 09:15:00]   L16: mean_delta=0.0625, positive=75%
+[2026-06-01 09:15:00]   L20: mean_delta=0.0859, positive=75%
+[2026-06-01 09:15:00]   L24: mean_delta=0.0547, positive=75%
+[2026-06-01 09:15:00]   L28: mean_delta=0.0078, positive=25%
+[2026-06-01 09:15:00]   L32: mean_delta=0.0156, positive=50%
+[2026-06-01 09:15:00]   L34: mean_delta=0.0000, positive=0%
+[2026-06-01 09:15:00] 
+--- Negation: Layer-by-layer injection ---
+[2026-06-01 09:15:01] 
+  Negation injection by layer (alpha=2.0):
+[2026-06-01 09:15:01]   L0: neg_delta=-0.0781, adj_delta=-0.0755
+[2026-06-01 09:15:01]   L4: neg_delta=-0.0130, adj_delta=0.0130
+[2026-06-01 09:15:01]   L8: neg_delta=-0.0026, adj_delta=0.0000
+[2026-06-01 09:15:01]   L12: neg_delta=0.0000, adj_delta=-0.0026
+[2026-06-01 09:15:01]   L16: neg_delta=0.0052, adj_delta=-0.0026
+[2026-06-01 09:15:01]   L20: neg_delta=0.0026, adj_delta=0.0000
+[2026-06-01 09:15:01]   L24: neg_delta=0.0000, adj_delta=-0.0026
+[2026-06-01 09:15:01]   L28: neg_delta=0.0052, adj_delta=0.0052
+[2026-06-01 09:15:01]   L32: neg_delta=0.0000, adj_delta=-0.0052
+[2026-06-01 09:15:01]   L34: neg_delta=0.0000, adj_delta=-0.0026
+[2026-06-01 09:15:01] Results saved to results\phase320b_layer\qwen3_phase320b.json
+[2026-06-01 09:15:01] 
+============================================================
+[2026-06-01 09:15:01] PHASE 320b SUMMARY - qwen3
+[2026-06-01 09:15:01] ============================================================
+[2026-06-01 09:15:01] 
+Best injection layer (max mean_delta):
+[2026-06-01 09:15:01]   attribute: best=L0, mean_delta=0.2266
+[2026-06-01 09:15:01]   function: best=L4, mean_delta=0.0859
+[2026-06-01 09:15:01]   negation: best=L16, mean_neg_delta=0.0052
+[2026-06-01 09:15:02] Model qwen3 released.
