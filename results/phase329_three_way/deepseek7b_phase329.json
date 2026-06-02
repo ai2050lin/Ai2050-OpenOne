@@ -1,0 +1,1339 @@
+{
+  "model": "deepseek7b",
+  "opt_layer": 6,
+  "alpha": 1.0,
+  "direction_approach": "object_agnostic_SV",
+  "level_summaries": {
+    "high_compatible": {
+      "n": 12,
+      "IxV_binding_mean": -0.0084,
+      "IxV_binding_pos_rate": 0.333,
+      "SxV_binding_mean": -0.0179,
+      "SxV_binding_pos_rate": 0.25,
+      "IxSxV_binding_mean": 0.0268,
+      "IxSxV_binding_pos_rate": 0.583,
+      "IxV_target_mean": 0.0013,
+      "IxSxV_target_mean": 0.0099
+    },
+    "near_incompatible": {
+      "n": 4,
+      "IxV_binding_mean": -0.0107,
+      "IxV_binding_pos_rate": 0.25,
+      "SxV_binding_mean": 0.0078,
+      "SxV_binding_pos_rate": 0.5,
+      "IxSxV_binding_mean": -0.0205,
+      "IxSxV_binding_pos_rate": 0.0,
+      "IxV_target_mean": 0.002,
+      "IxSxV_target_mean": 0.0049
+    },
+    "cross_type": {
+      "n": 2,
+      "IxV_binding_mean": -0.0263,
+      "IxV_binding_pos_rate": 0.0,
+      "SxV_binding_mean": 0.0283,
+      "SxV_binding_pos_rate": 1.0,
+      "IxSxV_binding_mean": 0.0146,
+      "IxSxV_binding_pos_rate": 0.5,
+      "IxV_target_mean": -0.0029,
+      "IxSxV_target_mean": 0.0068
+    },
+    "abstract_absurd": {
+      "n": 5,
+      "IxV_binding_mean": 0.0063,
+      "IxV_binding_pos_rate": 0.8,
+      "SxV_binding_mean": -0.0015,
+      "SxV_binding_pos_rate": 0.4,
+      "IxSxV_binding_mean": 0.0031,
+      "IxSxV_binding_pos_rate": 0.4,
+      "IxV_target_mean": -0.0047,
+      "IxSxV_target_mean": 0.0078
+    }
+  },
+  "attr_summaries": {
+    "color": {
+      "n": 6,
+      "IxV_binding_mean": -0.0104,
+      "SxV_binding_mean": -0.0253,
+      "IxSxV_binding_mean": 0.0315
+    },
+    "texture": {
+      "n": 3,
+      "IxV_binding_mean": 0.0156,
+      "SxV_binding_mean": -0.0052,
+      "IxSxV_binding_mean": -0.013
+    },
+    "temperature": {
+      "n": 3,
+      "IxV_binding_mean": -0.0286,
+      "SxV_binding_mean": -0.0156,
+      "IxSxV_binding_mean": 0.0572
+    }
+  },
+  "details": {
+    "apple_red": {
+      "obj": "apple",
+      "target_val": "red",
+      "competitor_val": "blue",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "IV": {
+          "target": -0.0312,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": -0.0312,
+      "IxV_compet": 0.0,
+      "IxV_binding": -0.0312,
+      "SxV_target": -0.0156,
+      "SxV_compet": 0.0156,
+      "SxV_binding": -0.0312,
+      "IxS_target": 0.0,
+      "IxS_compet": 0.0312,
+      "IxSxV_target": 0.0312,
+      "IxSxV_compet": -0.0312,
+      "IxSxV_binding": 0.0624,
+      "prior_target": -2.3438,
+      "prior_compet": -3.2812,
+      "prior_diff": 0.9375
+    },
+    "banana_yellow": {
+      "obj": "banana",
+      "target_val": "yellow",
+      "competitor_val": "purple",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0078,
+          "competitor": -0.0312
+        },
+        "S": {
+          "target": -0.0078,
+          "competitor": -0.0312
+        },
+        "V": {
+          "target": 0.0078,
+          "competitor": -0.0312
+        },
+        "IS": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": 0.0234,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0624,
+      "IxV_binding": -0.0468,
+      "SxV_target": 0.0,
+      "SxV_compet": 0.0624,
+      "SxV_binding": -0.0624,
+      "IxS_target": 0.0078,
+      "IxS_compet": 0.0624,
+      "IxSxV_target": 0.0078,
+      "IxSxV_compet": -0.0936,
+      "IxSxV_binding": 0.1014,
+      "prior_target": -1.9297,
+      "prior_compet": -4.125,
+      "prior_diff": 2.1953
+    },
+    "snow_white": {
+      "obj": "snow",
+      "target_val": "white",
+      "competitor_val": "black",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0195,
+          "competitor": -0.0156
+        },
+        "S": {
+          "target": -0.0215,
+          "competitor": -0.0078
+        },
+        "V": {
+          "target": -0.0078,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": -0.0117,
+          "competitor": -0.0234
+        },
+        "IV": {
+          "target": -0.0117,
+          "competitor": -0.0156
+        },
+        "SV": {
+          "target": -0.0176,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": -0.0137,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0156,
+      "IxV_binding": 0.0,
+      "SxV_target": 0.0117,
+      "SxV_compet": 0.0234,
+      "SxV_binding": -0.0117,
+      "IxS_target": 0.0293,
+      "IxS_compet": -0.0,
+      "IxSxV_target": -0.0215,
+      "IxSxV_compet": -0.0156,
+      "IxSxV_binding": -0.0059,
+      "prior_target": -0.2734,
+      "prior_compet": -1.6172,
+      "prior_diff": 1.3438
+    },
+    "sky_blue": {
+      "obj": "sky",
+      "target_val": "blue",
+      "competitor_val": "green",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0312,
+          "competitor": -0.0156
+        },
+        "S": {
+          "target": -0.0156,
+          "competitor": -0.0312
+        },
+        "V": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0156,
+          "competitor": -0.0156
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": -0.0312
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0312
+        },
+        "ISV": {
+          "target": 0.0,
+          "competitor": -0.0312
+        }
+      },
+      "IxV_target": -0.0468,
+      "IxV_compet": -0.0156,
+      "IxV_binding": -0.0312,
+      "SxV_target": -0.0312,
+      "SxV_compet": 0.0,
+      "SxV_binding": -0.0312,
+      "IxS_target": 0.0,
+      "IxS_compet": 0.0312,
+      "IxSxV_target": 0.0468,
+      "IxSxV_compet": -0.0,
+      "IxSxV_binding": 0.0468,
+      "prior_target": -3.2812,
+      "prior_compet": -2.5625,
+      "prior_diff": -0.7188
+    },
+    "cherry_red": {
+      "obj": "cherry",
+      "target_val": "red",
+      "competitor_val": "blue",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": -0.0156,
+          "competitor": 0.0156
+        },
+        "IV": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": 0.0,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": -0.0156,
+      "IxV_binding": 0.0312,
+      "SxV_target": -0.0156,
+      "SxV_compet": 0.0156,
+      "SxV_binding": -0.0312,
+      "IxS_target": -0.0156,
+      "IxS_compet": 0.0156,
+      "IxSxV_target": 0.0156,
+      "IxSxV_compet": -0.0156,
+      "IxSxV_binding": 0.0312,
+      "prior_target": -2.3438,
+      "prior_compet": -3.2812,
+      "prior_diff": 0.9375
+    },
+    "leaf_green": {
+      "obj": "leaf",
+      "target_val": "green",
+      "competitor_val": "red",
+      "attr_type": "color",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": -0.0312,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0,
+      "IxV_binding": 0.0156,
+      "SxV_target": 0.0312,
+      "SxV_compet": 0.0156,
+      "SxV_binding": 0.0156,
+      "IxS_target": 0.0156,
+      "IxS_compet": -0.0312,
+      "IxSxV_target": -0.0312,
+      "IxSxV_compet": 0.0156,
+      "IxSxV_binding": -0.0468,
+      "prior_target": -2.5625,
+      "prior_compet": -2.3438,
+      "prior_diff": -0.2188
+    },
+    "apple_blue": {
+      "obj": "apple",
+      "target_val": "blue",
+      "competitor_val": "black",
+      "attr_type": "color",
+      "compat_level": "near_incompatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": -0.0156,
+          "competitor": -0.0078
+        },
+        "V": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0078
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0312
+        },
+        "ISV": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": -0.0156,
+      "IxV_compet": 0.0078,
+      "IxV_binding": -0.0234,
+      "SxV_target": -0.0312,
+      "SxV_compet": -0.0234,
+      "SxV_binding": -0.0078,
+      "IxS_target": 0.0312,
+      "IxS_compet": 0.0078,
+      "IxSxV_target": -0.0156,
+      "IxSxV_compet": 0.0,
+      "IxSxV_binding": -0.0156,
+      "prior_target": -3.2812,
+      "prior_compet": -1.6172,
+      "prior_diff": -1.6641
+    },
+    "snow_pink": {
+      "obj": "snow",
+      "target_val": "pink",
+      "competitor_val": "orange",
+      "attr_type": "color",
+      "compat_level": "near_incompatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0391,
+          "competitor": -0.0176
+        },
+        "S": {
+          "target": -0.0234,
+          "competitor": -0.0137
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": -0.002
+        },
+        "IS": {
+          "target": 0.0,
+          "competitor": -0.0254
+        },
+        "IV": {
+          "target": -0.0156,
+          "competitor": -0.0078
+        },
+        "SV": {
+          "target": -0.0664,
+          "competitor": -0.0664
+        },
+        "ISV": {
+          "target": 0.0,
+          "competitor": -0.0273
+        }
+      },
+      "IxV_target": 0.0235,
+      "IxV_compet": 0.0118,
+      "IxV_binding": 0.0117,
+      "SxV_target": -0.043,
+      "SxV_compet": -0.0507,
+      "SxV_binding": 0.0077,
+      "IxS_target": 0.0625,
+      "IxS_compet": 0.0059,
+      "IxSxV_target": 0.0195,
+      "IxSxV_compet": 0.039,
+      "IxSxV_binding": -0.0195,
+      "prior_target": 1.0234,
+      "prior_compet": -0.4238,
+      "prior_diff": 1.4473
+    },
+    "apple_sharp": {
+      "obj": "apple",
+      "target_val": "sharp",
+      "competitor_val": "cold",
+      "attr_type": "texture",
+      "compat_level": "cross_type",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0117,
+          "competitor": -0.0156
+        },
+        "S": {
+          "target": -0.0137,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": -0.002,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": 0.0137,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0039,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0059,
+          "competitor": -0.0312
+        },
+        "ISV": {
+          "target": -0.002,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": -0.0058,
+      "IxV_compet": 0.0312,
+      "IxV_binding": -0.037,
+      "SxV_target": 0.0098,
+      "SxV_compet": -0.0156,
+      "SxV_binding": 0.0254,
+      "IxS_target": 0.0157,
+      "IxS_compet": 0.0156,
+      "IxSxV_target": -0.0177,
+      "IxSxV_compet": -0.0156,
+      "IxSxV_binding": -0.0021,
+      "prior_target": -0.4395,
+      "prior_compet": -2.6875,
+      "prior_diff": 2.248
+    },
+    "snow_sweet": {
+      "obj": "snow",
+      "target_val": "sweet",
+      "competitor_val": "loud",
+      "attr_type": "taste",
+      "compat_level": "cross_type",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": -0.0625,
+          "competitor": -0.0156
+        },
+        "V": {
+          "target": -0.0469,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": -0.0312,
+          "competitor": -0.0312
+        },
+        "IV": {
+          "target": -0.0625,
+          "competitor": 0.0156
+        },
+        "SV": {
+          "target": -0.0938,
+          "competitor": -0.0312
+        },
+        "ISV": {
+          "target": -0.0312,
+          "competitor": -0.0312
+        }
+      },
+      "IxV_target": 0.0,
+      "IxV_compet": 0.0156,
+      "IxV_binding": -0.0156,
+      "SxV_target": 0.0156,
+      "SxV_compet": -0.0156,
+      "SxV_binding": 0.0312,
+      "IxS_target": 0.0469,
+      "IxS_compet": -0.0156,
+      "IxSxV_target": 0.0313,
+      "IxSxV_compet": 0.0,
+      "IxSxV_binding": 0.0313,
+      "prior_target": -3.2656,
+      "prior_compet": -3.0312,
+      "prior_diff": -0.2344
+    },
+    "idea_red": {
+      "obj": "idea",
+      "target_val": "red",
+      "competitor_val": "blue",
+      "attr_type": "color",
+      "compat_level": "abstract_absurd",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "SV": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": 0.0,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": 0.0,
+      "IxV_compet": 0.0156,
+      "IxV_binding": -0.0156,
+      "SxV_target": -0.0156,
+      "SxV_compet": 0.0156,
+      "SxV_binding": -0.0312,
+      "IxS_target": -0.0156,
+      "IxS_compet": 0.0156,
+      "IxSxV_target": 0.0312,
+      "IxSxV_compet": -0.0312,
+      "IxSxV_binding": 0.0624,
+      "prior_target": -2.3438,
+      "prior_compet": -3.2812,
+      "prior_diff": 0.9375
+    },
+    "concept_green": {
+      "obj": "concept",
+      "target_val": "green",
+      "competitor_val": "yellow",
+      "attr_type": "color",
+      "compat_level": "abstract_absurd",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": -0.0312,
+          "competitor": -0.0078
+        },
+        "V": {
+          "target": -0.0156,
+          "competitor": 0.0078
+        },
+        "IS": {
+          "target": -0.0312,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "SV": {
+          "target": -0.0156,
+          "competitor": 0.0078
+        },
+        "ISV": {
+          "target": -0.0312,
+          "competitor": 0.0078
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": -0.0078,
+      "IxV_binding": 0.0234,
+      "SxV_target": 0.0312,
+      "SxV_compet": 0.0078,
+      "SxV_binding": 0.0234,
+      "IxS_target": 0.0,
+      "IxS_compet": -0.0078,
+      "IxSxV_target": -0.0312,
+      "IxSxV_compet": 0.0,
+      "IxSxV_binding": -0.0312,
+      "prior_target": -2.5625,
+      "prior_compet": -1.9297,
+      "prior_diff": -0.6328
+    },
+    "justice_blue": {
+      "obj": "justice",
+      "target_val": "blue",
+      "competitor_val": "red",
+      "attr_type": "color",
+      "compat_level": "abstract_absurd",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0156,
+          "competitor": -0.0312
+        },
+        "S": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": -0.0156,
+          "competitor": -0.0469
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0469
+        },
+        "ISV": {
+          "target": -0.0312,
+          "competitor": -0.0625
+        }
+      },
+      "IxV_target": -0.0156,
+      "IxV_compet": -0.0157,
+      "IxV_binding": 0.0001,
+      "SxV_target": -0.0312,
+      "SxV_compet": -0.0469,
+      "SxV_binding": 0.0157,
+      "IxS_target": 0.0468,
+      "IxS_compet": 0.0312,
+      "IxSxV_target": -0.0156,
+      "IxSxV_compet": 0.0001,
+      "IxSxV_binding": -0.0157,
+      "prior_target": -3.2812,
+      "prior_compet": -2.3438,
+      "prior_diff": -0.9375
+    },
+    "stone_rough": {
+      "obj": "stone",
+      "target_val": "rough",
+      "competitor_val": "soft",
+      "attr_type": "texture",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0156,
+          "competitor": -0.0312
+        },
+        "S": {
+          "target": 0.0156,
+          "competitor": -0.0156
+        },
+        "V": {
+          "target": 0.0156,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": 0.0156,
+          "competitor": -0.0156
+        },
+        "IV": {
+          "target": 0.0156,
+          "competitor": -0.0156
+        },
+        "SV": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "ISV": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0312,
+      "IxV_binding": -0.0156,
+      "SxV_target": -0.0312,
+      "SxV_compet": 0.0156,
+      "SxV_binding": -0.0468,
+      "IxS_target": 0.0156,
+      "IxS_compet": 0.0312,
+      "IxSxV_target": -0.0312,
+      "IxSxV_compet": -0.0312,
+      "IxSxV_binding": 0.0,
+      "prior_target": -2.9688,
+      "prior_compet": -2.875,
+      "prior_diff": -0.0938
+    },
+    "silk_smooth": {
+      "obj": "silk",
+      "target_val": "smooth",
+      "competitor_val": "rough",
+      "attr_type": "texture",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": 0.0156,
+          "competitor": 0.0156
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "IS": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "IV": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": -0.0078,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": -0.0078,
+      "IxV_compet": -0.0312,
+      "IxV_binding": 0.0234,
+      "SxV_target": -0.0156,
+      "SxV_compet": -0.0312,
+      "SxV_binding": 0.0156,
+      "IxS_target": -0.0156,
+      "IxS_compet": -0.0468,
+      "IxSxV_target": 0.0156,
+      "IxSxV_compet": 0.0468,
+      "IxSxV_binding": -0.0312,
+      "prior_target": -1.5391,
+      "prior_compet": -2.9688,
+      "prior_diff": 1.4297
+    },
+    "glass_smooth": {
+      "obj": "glass",
+      "target_val": "smooth",
+      "competitor_val": "rough",
+      "attr_type": "texture",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": 0.0156,
+          "competitor": 0.0156
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "IS": {
+          "target": 0.0078,
+          "competitor": 0.0156
+        },
+        "IV": {
+          "target": 0.0234,
+          "competitor": 0.0156
+        },
+        "SV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": 0.0234,
+          "competitor": 0.0
+        }
+      },
+      "IxV_target": 0.0234,
+      "IxV_compet": -0.0156,
+      "IxV_binding": 0.039,
+      "SxV_target": -0.0156,
+      "SxV_compet": -0.0312,
+      "SxV_binding": 0.0156,
+      "IxS_target": -0.0078,
+      "IxS_compet": -0.0156,
+      "IxSxV_target": 0.0078,
+      "IxSxV_compet": 0.0156,
+      "IxSxV_binding": -0.0078,
+      "prior_target": -1.5391,
+      "prior_compet": -2.9688,
+      "prior_diff": 1.4297
+    },
+    "stone_soft": {
+      "obj": "stone",
+      "target_val": "soft",
+      "competitor_val": "fluffy",
+      "attr_type": "texture",
+      "compat_level": "near_incompatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        },
+        "S": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        },
+        "IV": {
+          "target": -0.0312,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0469
+        },
+        "ISV": {
+          "target": -0.0156,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0312,
+      "IxV_binding": -0.0156,
+      "SxV_target": 0.0,
+      "SxV_compet": -0.0313,
+      "SxV_binding": 0.0313,
+      "IxS_target": 0.0312,
+      "IxS_compet": 0.0,
+      "IxSxV_target": 0.0,
+      "IxSxV_compet": 0.0157,
+      "IxSxV_binding": -0.0157,
+      "prior_target": -2.875,
+      "prior_compet": -3.4531,
+      "prior_diff": 0.5781
+    },
+    "theory_rough": {
+      "obj": "theory",
+      "target_val": "rough",
+      "competitor_val": "smooth",
+      "attr_type": "texture",
+      "compat_level": "abstract_absurd",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "S": {
+          "target": 0.0156,
+          "competitor": 0.0156
+        },
+        "V": {
+          "target": 0.0156,
+          "competitor": 0.0078
+        },
+        "IS": {
+          "target": 0.0156,
+          "competitor": 0.0312
+        },
+        "IV": {
+          "target": 0.0156,
+          "competitor": -0.0234
+        },
+        "SV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "ISV": {
+          "target": 0.0156,
+          "competitor": 0.0234
+        }
+      },
+      "IxV_target": 0.0,
+      "IxV_compet": -0.0156,
+      "IxV_binding": 0.0156,
+      "SxV_target": -0.0312,
+      "SxV_compet": -0.0234,
+      "SxV_binding": -0.0078,
+      "IxS_target": 0.0,
+      "IxS_compet": 0.0312,
+      "IxSxV_target": 0.0156,
+      "IxSxV_compet": 0.0234,
+      "IxSxV_binding": -0.0078,
+      "prior_target": -2.9688,
+      "prior_compet": -1.5391,
+      "prior_diff": -1.4297
+    },
+    "ice_cold": {
+      "obj": "ice",
+      "target_val": "cold",
+      "competitor_val": "hot",
+      "attr_type": "temperature",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0156,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": 0.0,
+          "competitor": -0.0078
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": -0.0156
+        },
+        "IS": {
+          "target": -0.0156,
+          "competitor": -0.0078
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0078
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0234
+        },
+        "ISV": {
+          "target": 0.0156,
+          "competitor": -0.0312
+        }
+      },
+      "IxV_target": -0.0156,
+      "IxV_compet": 0.0234,
+      "IxV_binding": -0.039,
+      "SxV_target": -0.0312,
+      "SxV_compet": -0.0,
+      "SxV_binding": -0.0312,
+      "IxS_target": -0.0312,
+      "IxS_compet": 0.0,
+      "IxSxV_target": 0.078,
+      "IxSxV_compet": -0.0312,
+      "IxSxV_binding": 0.1092,
+      "prior_target": -2.6875,
+      "prior_compet": -1.6328,
+      "prior_diff": -1.0547
+    },
+    "fire_hot": {
+      "obj": "fire",
+      "target_val": "hot",
+      "competitor_val": "cold",
+      "attr_type": "temperature",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0156,
+          "competitor": -0.0312
+        },
+        "S": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0078,
+          "competitor": -0.0312
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        },
+        "ISV": {
+          "target": -0.0078,
+          "competitor": -0.0312
+        }
+      },
+      "IxV_target": 0.0156,
+      "IxV_compet": 0.0312,
+      "IxV_binding": -0.0156,
+      "SxV_target": -0.0234,
+      "SxV_compet": -0.0156,
+      "SxV_binding": -0.0078,
+      "IxS_target": 0.0312,
+      "IxS_compet": 0.0,
+      "IxSxV_target": -0.0078,
+      "IxSxV_compet": -0.0156,
+      "IxSxV_binding": 0.0078,
+      "prior_target": -1.6328,
+      "prior_compet": -2.6875,
+      "prior_diff": 1.0547
+    },
+    "oven_hot": {
+      "obj": "oven",
+      "target_val": "hot",
+      "competitor_val": "cold",
+      "attr_type": "temperature",
+      "compat_level": "high_compatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": -0.0078,
+          "competitor": -0.0312
+        },
+        "S": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": -0.0078,
+          "competitor": 0.0156
+        },
+        "IV": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        },
+        "ISV": {
+          "target": -0.0234,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": 0.0,
+      "IxV_compet": 0.0312,
+      "IxV_binding": -0.0312,
+      "SxV_target": -0.0234,
+      "SxV_compet": -0.0156,
+      "SxV_binding": -0.0078,
+      "IxS_target": 0.0078,
+      "IxS_compet": 0.0468,
+      "IxSxV_target": 0.0078,
+      "IxSxV_compet": -0.0468,
+      "IxSxV_binding": 0.0546,
+      "prior_target": -1.6328,
+      "prior_compet": -2.6875,
+      "prior_diff": 1.0547
+    },
+    "ice_warm": {
+      "obj": "ice",
+      "target_val": "warm",
+      "competitor_val": "burning",
+      "attr_type": "temperature",
+      "compat_level": "near_incompatible",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0156,
+          "competitor": 0.0156
+        },
+        "S": {
+          "target": -0.0156,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": 0.0,
+          "competitor": 0.0156
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        },
+        "ISV": {
+          "target": -0.0156,
+          "competitor": 0.0312
+        }
+      },
+      "IxV_target": -0.0156,
+      "IxV_compet": 0.0,
+      "IxV_binding": -0.0156,
+      "SxV_target": -0.0156,
+      "SxV_compet": -0.0156,
+      "SxV_binding": 0.0,
+      "IxS_target": 0.0,
+      "IxS_compet": -0.0156,
+      "IxSxV_target": 0.0156,
+      "IxSxV_compet": 0.0468,
+      "IxSxV_binding": -0.0312,
+      "prior_target": -3.3906,
+      "prior_compet": -2.1562,
+      "prior_diff": -1.2344
+    },
+    "music_hot": {
+      "obj": "music",
+      "target_val": "hot",
+      "competitor_val": "cold",
+      "attr_type": "temperature",
+      "compat_level": "abstract_absurd",
+      "effects": {
+        "baseline": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "I": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "S": {
+          "target": -0.0078,
+          "competitor": 0.0
+        },
+        "V": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IS": {
+          "target": 0.0,
+          "competitor": 0.0
+        },
+        "IV": {
+          "target": -0.0234,
+          "competitor": -0.0312
+        },
+        "SV": {
+          "target": -0.0312,
+          "competitor": -0.0156
+        },
+        "ISV": {
+          "target": -0.0078,
+          "competitor": -0.0156
+        }
+      },
+      "IxV_target": -0.0234,
+      "IxV_compet": -0.0312,
+      "IxV_binding": 0.0078,
+      "SxV_target": -0.0234,
+      "SxV_compet": -0.0156,
+      "SxV_binding": -0.0078,
+      "IxS_target": 0.0078,
+      "IxS_compet": 0.0,
+      "IxSxV_target": 0.039,
+      "IxSxV_compet": 0.0312,
+      "IxSxV_binding": 0.0078,
+      "prior_target": -1.6328,
+      "prior_compet": -2.6875,
+      "prior_diff": 1.0547
+    }
+  }
+}

@@ -1,0 +1,148 @@
+[2026-06-01 15:21:56] === Phase 325: Specialized Template Confirmation for deepseek7b ===
+[2026-06-01 15:22:25]   Loaded deepseek7b with attn_impl=sdpa
+[2026-06-01 15:22:25]   Model: Qwen2ForCausalLM, device=cuda:0, GPU=9.01GB
+[2026-06-01 15:22:25]   n_layers=28, d_model=3584
+[2026-06-01 15:22:25] 
+============================================================
+[2026-06-01 15:22:25] Test 1: Generic vs Specialized Template Comparison
+[2026-06-01 15:22:25] ============================================================
+[2026-06-01 15:22:25] 
+  --- color ---
+[2026-06-01 15:23:50]     color pair 5/15 done
+[2026-06-01 15:25:09]     color pair 10/15 done
+[2026-06-01 21:29:11] === Phase 325: Specialized Template Confirmation for deepseek7b ===
+[2026-06-01 21:29:37]   Loaded deepseek7b with attn_impl=sdpa
+[2026-06-01 21:29:37]   Model: Qwen2ForCausalLM, device=cuda:0, GPU=9.01GB
+[2026-06-01 21:29:37]   n_layers=28, d_model=3584
+[2026-06-01 21:29:37] 
+============================================================
+[2026-06-01 21:29:37] Test 1: Generic vs Specialized Template Comparison
+[2026-06-01 21:29:37] ============================================================
+[2026-06-01 21:29:37] 
+  --- color ---
+[2026-06-01 21:30:57]     color pair 5/15 done
+[2026-06-01 21:32:10]     color pair 10/15 done
+[2026-06-01 21:33:24]     color pair 15/15 done
+[2026-06-01 21:33:24]   color Generic:    slot=0.3539, type=0.6919, value=-0.0945
+[2026-06-01 21:33:24]   color Specialized: slot=0.3010, type=0.8201, value=0.4992
+[2026-06-01 21:33:24]   Improvement: {'slot': 0.85, 'type': 1.19, 'value': -5.28}
+[2026-06-01 21:33:24] 
+  --- taste ---
+[2026-06-01 21:34:38]     taste pair 5/15 done
+[2026-06-01 21:35:51]     taste pair 10/15 done
+[2026-06-01 21:37:04]     taste pair 15/15 done
+[2026-06-01 21:37:04]   taste Generic:    slot=-0.0341, type=0.0578, value=-0.0615
+[2026-06-01 21:37:04]   taste Specialized: slot=0.0586, type=-0.0115, value=0.0026
+[2026-06-01 21:37:04]   Improvement: {'slot': -1.72, 'type': -0.2, 'value': -0.04}
+[2026-06-01 21:37:04] 
+  --- temperature ---
+[2026-06-01 21:38:18]     temperature pair 5/15 done
+[2026-06-01 21:39:30]     temperature pair 10/15 done
+[2026-06-01 21:40:43]     temperature pair 15/15 done
+[2026-06-01 21:40:43]   temperature Generic:    slot=0.0516, type=0.0641, value=-0.0568
+[2026-06-01 21:40:43]   temperature Specialized: slot=-0.1555, type=0.0161, value=-0.1333
+[2026-06-01 21:40:43]   Improvement: {'slot': -3.01, 'type': 0.25, 'value': 2.35}
+[2026-06-01 21:40:43] 
+  --- texture ---
+[2026-06-01 21:41:56]     texture pair 5/15 done
+[2026-06-01 21:43:09]     texture pair 10/15 done
+[2026-06-01 21:44:22]     texture pair 15/15 done
+[2026-06-01 21:44:22]   texture Generic:    slot=-0.0576, type=-0.1356, value=0.0336
+[2026-06-01 21:44:22]   texture Specialized: slot=0.0767, type=-0.0755, value=-0.0127
+[2026-06-01 21:44:22]   Improvement: {'slot': -1.33, 'type': 0.56, 'value': -0.38}
+[2026-06-01 21:44:22] 
+  --- shape ---
+[2026-06-01 21:45:34]     shape pair 5/15 done
+[2026-06-01 21:46:48]     shape pair 10/15 done
+[2026-06-01 21:48:01]     shape pair 15/15 done
+[2026-06-01 21:48:01]   shape Generic:    slot=-0.0507, type=-0.0864, value=-0.1094
+[2026-06-01 21:48:01]   shape Specialized: slot=-0.0631, type=0.0408, value=-0.0358
+[2026-06-01 21:48:01]   Improvement: {'slot': 1.24, 'type': -0.47, 'value': 0.33}
+[2026-06-01 21:48:01] 
+  --- size ---
+[2026-06-01 21:49:14]     size pair 5/15 done
+[2026-06-01 21:50:28]     size pair 10/15 done
+[2026-06-01 21:51:40]     size pair 15/15 done
+[2026-06-01 21:51:40]   size Generic:    slot=-0.0858, type=-0.0060, value=-0.1013
+[2026-06-01 21:51:40]   size Specialized: slot=-0.0445, type=-0.1268, value=-0.0891
+[2026-06-01 21:51:40]   Improvement: {'slot': 0.52, 'type': 21.13, 'value': 0.88}
+[2026-06-01 21:51:40] 
+============================================================
+[2026-06-01 21:51:40] Test 2: Cross-Template Consistency (Specialized)
+[2026-06-01 21:51:40] ============================================================
+[2026-06-01 21:51:40] 
+  --- color consistency ---
+[2026-06-01 21:52:44]   color: slot=0.6418, type=0.8969, value=0.8774
+[2026-06-01 21:52:44] 
+  --- taste consistency ---
+[2026-06-01 21:53:47]   taste: slot=0.5581, type=0.7695, value=0.5733
+[2026-06-01 21:53:47] 
+  --- temperature consistency ---
+[2026-06-01 21:54:51]   temperature: slot=0.8492, type=0.8085, value=0.4457
+[2026-06-01 21:54:51] 
+  --- texture consistency ---
+[2026-06-01 21:55:54]   texture: slot=0.8129, type=0.5577, value=0.5536
+[2026-06-01 21:55:54] 
+  --- shape consistency ---
+[2026-06-01 21:56:58]   shape: slot=0.5588, type=0.665, value=0.7973
+[2026-06-01 21:56:58] 
+  --- size consistency ---
+[2026-06-01 21:58:01]   size: slot=0.5162, type=0.6611, value=0.5089
+[2026-06-01 21:58:01] 
+============================================================
+[2026-06-01 21:58:01] Test 3: Best Level per Attribute Type
+[2026-06-01 21:58:01] ============================================================
+[2026-06-01 21:58:01]   color: best=type (0.8201), slot=0.3010, type=0.8201, value=0.4992
+[2026-06-01 21:58:01]   taste: best=slot (0.0586), slot=0.0586, type=-0.0115, value=0.0026
+[2026-06-01 21:58:01]   temperature: best=type (0.0161), slot=-0.1555, type=0.0161, value=-0.1333
+[2026-06-01 21:58:01]   texture: best=slot (0.0767), slot=0.0767, type=-0.0755, value=-0.0127
+[2026-06-01 21:58:01]   shape: best=type (0.0408), slot=-0.0631, type=0.0408, value=-0.0358
+[2026-06-01 21:58:01]   size: best=none (all negative) (-0.0445), slot=-0.0445, type=-0.1268, value=-0.0891
+[2026-06-01 21:58:01] Results saved to results\phase325_specialized\deepseek7b_phase325.json
+[2026-06-01 21:58:01] 
+============================================================
+[2026-06-01 21:58:01] PHASE 325 SUMMARY - deepseek7b
+[2026-06-01 21:58:01] ============================================================
+[2026-06-01 21:58:01] 
+  Generic vs Specialized tgt_delta comparison:
+[2026-06-01 21:58:01]     color:
+[2026-06-01 21:58:01]       Generic:    slot=0.3539, type=0.6919, value=-0.0945
+[2026-06-01 21:58:01]       Specialized: slot=0.3010, type=0.8201, value=0.4992
+[2026-06-01 21:58:01]       Improvement: {'slot': 0.85, 'type': 1.19, 'value': -5.28}
+[2026-06-01 21:58:01]     taste:
+[2026-06-01 21:58:01]       Generic:    slot=-0.0341, type=0.0578, value=-0.0615
+[2026-06-01 21:58:01]       Specialized: slot=0.0586, type=-0.0115, value=0.0026
+[2026-06-01 21:58:01]       Improvement: {'slot': -1.72, 'type': -0.2, 'value': -0.04}
+[2026-06-01 21:58:01]     temperature:
+[2026-06-01 21:58:01]       Generic:    slot=0.0516, type=0.0641, value=-0.0568
+[2026-06-01 21:58:01]       Specialized: slot=-0.1555, type=0.0161, value=-0.1333
+[2026-06-01 21:58:01]       Improvement: {'slot': -3.01, 'type': 0.25, 'value': 2.35}
+[2026-06-01 21:58:01]     texture:
+[2026-06-01 21:58:01]       Generic:    slot=-0.0576, type=-0.1356, value=0.0336
+[2026-06-01 21:58:01]       Specialized: slot=0.0767, type=-0.0755, value=-0.0127
+[2026-06-01 21:58:01]       Improvement: {'slot': -1.33, 'type': 0.56, 'value': -0.38}
+[2026-06-01 21:58:01]     shape:
+[2026-06-01 21:58:01]       Generic:    slot=-0.0507, type=-0.0864, value=-0.1094
+[2026-06-01 21:58:01]       Specialized: slot=-0.0631, type=0.0408, value=-0.0358
+[2026-06-01 21:58:01]       Improvement: {'slot': 1.24, 'type': -0.47, 'value': 0.33}
+[2026-06-01 21:58:01]     size:
+[2026-06-01 21:58:01]       Generic:    slot=-0.0858, type=-0.0060, value=-0.1013
+[2026-06-01 21:58:01]       Specialized: slot=-0.0445, type=-0.1268, value=-0.0891
+[2026-06-01 21:58:01]       Improvement: {'slot': 0.52, 'type': 21.13, 'value': 0.88}
+[2026-06-01 21:58:01] 
+  Best level per type (specialized):
+[2026-06-01 21:58:01]     color: type (0.8201)
+[2026-06-01 21:58:01]     taste: slot (0.0586)
+[2026-06-01 21:58:01]     temperature: type (0.0161)
+[2026-06-01 21:58:01]     texture: slot (0.0767)
+[2026-06-01 21:58:01]     shape: type (0.0408)
+[2026-06-01 21:58:01]     size: none (all negative) (-0.0445)
+[2026-06-01 21:58:01] 
+  Cross-template consistency (specialized):
+[2026-06-01 21:58:01]     color: slot=0.6418, type=0.8969, value=0.8774
+[2026-06-01 21:58:01]     taste: slot=0.5581, type=0.7695, value=0.5733
+[2026-06-01 21:58:01]     temperature: slot=0.8492, type=0.8085, value=0.4457
+[2026-06-01 21:58:01]     texture: slot=0.8129, type=0.5577, value=0.5536
+[2026-06-01 21:58:01]     shape: slot=0.5588, type=0.665, value=0.7973
+[2026-06-01 21:58:01]     size: slot=0.5162, type=0.6611, value=0.5089
+[2026-06-01 21:58:02] Model deepseek7b released. Total time: 1731.6s

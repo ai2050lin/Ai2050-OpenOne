@@ -1,0 +1,374 @@
+{
+  "model": "qwen3",
+  "n_layers": 36,
+  "d_model": 2560,
+  "opt_layer": 0,
+  "alpha": 2.0,
+  "test1_slot_output": {
+    "per_object": [
+      {
+        "object": "apple",
+        "specific": 0.0677,
+        "type": 0.0859,
+        "generic": 0.1777
+      },
+      {
+        "object": "banana",
+        "specific": -0.1393,
+        "type": -0.0859,
+        "generic": 0.0215
+      },
+      {
+        "object": "snow",
+        "specific": -0.0143,
+        "type": -0.0104,
+        "generic": 0.1094
+      },
+      {
+        "object": "knife",
+        "specific": -0.0355,
+        "type": 0.0417,
+        "generic": 0.1362
+      },
+      {
+        "object": "stone",
+        "specific": -0.0905,
+        "type": -0.0612,
+        "generic": -0.0127
+      },
+      {
+        "object": "silk",
+        "specific": -0.0593,
+        "type": -0.0885,
+        "generic": -0.0361
+      },
+      {
+        "object": "tea",
+        "specific": 0.2389,
+        "type": 0.1953,
+        "generic": 0.2422
+      },
+      {
+        "object": "lemon",
+        "specific": 0.0775,
+        "type": 0.0651,
+        "generic": 0.0781
+      },
+      {
+        "object": "ball",
+        "specific": -0.0726,
+        "type": 0.0339,
+        "generic": 0.1519
+      },
+      {
+        "object": "ice",
+        "specific": 0.0752,
+        "type": 0.1042,
+        "generic": 0.1348
+      }
+    ],
+    "aggregated": {
+      "specific": {
+        "mean": 0.0048,
+        "std": 0.1053,
+        "positive_rate": 0.4
+      },
+      "type": {
+        "mean": 0.028,
+        "std": 0.0865,
+        "positive_rate": 0.6
+      },
+      "generic": {
+        "mean": 0.1003,
+        "std": 0.0833,
+        "positive_rate": 0.8
+      }
+    }
+  },
+  "test2_sensory_channel": {
+    "color": {
+      "visual": {
+        "tgt_mean": 0.1055,
+        "cluster_mean": 0.1117,
+        "n": 8
+      },
+      "state": {
+        "tgt_mean": 0.0996,
+        "cluster_mean": 0.1174,
+        "n": 8
+      },
+      "type": {
+        "tgt_mean": 0.1523,
+        "cluster_mean": 0.0936,
+        "n": 8
+      }
+    },
+    "texture": {
+      "tactile": {
+        "tgt_mean": 0.0762,
+        "cluster_mean": 0.0264,
+        "n": 8
+      },
+      "state": {
+        "tgt_mean": 0.0537,
+        "cluster_mean": 0.015,
+        "n": 8
+      },
+      "type": {
+        "tgt_mean": 0.0527,
+        "cluster_mean": 0.0222,
+        "n": 8
+      }
+    },
+    "temperature": {
+      "tactile": {
+        "tgt_mean": 0.043,
+        "cluster_mean": 0.1329,
+        "n": 8
+      },
+      "contact": {
+        "tgt_mean": 0.0049,
+        "cluster_mean": 0.0771,
+        "n": 8
+      },
+      "state": {
+        "tgt_mean": 0.0225,
+        "cluster_mean": 0.1387,
+        "n": 8
+      },
+      "type": {
+        "tgt_mean": 0.0869,
+        "cluster_mean": 0.0539,
+        "n": 8
+      }
+    }
+  },
+  "test3_binding": {
+    "per_pair": [
+      {
+        "object": "apple",
+        "compat": "red",
+        "incompat": "blue",
+        "type": "color",
+        "type_dir": {
+          "compat_delta": 0.125,
+          "incompat_delta": 0.0938,
+          "binding": 0.0312
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.125,
+          "incompat_delta": 0.1562,
+          "binding": -0.0312
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.125,
+          "incompat_delta": 0.1562,
+          "binding": -0.0312
+        }
+      },
+      {
+        "object": "banana",
+        "compat": "yellow",
+        "incompat": "blue",
+        "type": "color",
+        "type_dir": {
+          "compat_delta": 0.0312,
+          "incompat_delta": -0.375,
+          "binding": 0.4062
+        },
+        "compat_value_dir": {
+          "compat_delta": -0.125,
+          "incompat_delta": -0.25,
+          "binding": 0.125
+        },
+        "incompat_value_dir": {
+          "compat_delta": -0.0625,
+          "incompat_delta": 0.0312,
+          "binding": -0.0938
+        }
+      },
+      {
+        "object": "snow",
+        "compat": "white",
+        "incompat": "black",
+        "type": "color",
+        "type_dir": {
+          "compat_delta": 0.2188,
+          "incompat_delta": -0.0312,
+          "binding": 0.25
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.25,
+          "incompat_delta": 0.25,
+          "binding": 0.0
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.25,
+          "incompat_delta": 0.2812,
+          "binding": -0.0312
+        }
+      },
+      {
+        "object": "sky",
+        "compat": "blue",
+        "incompat": "green",
+        "type": "color",
+        "type_dir": {
+          "compat_delta": 0.0625,
+          "incompat_delta": -0.0156,
+          "binding": 0.0781
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.0625,
+          "incompat_delta": 0.1562,
+          "binding": -0.0938
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.1562,
+          "incompat_delta": 0.0781,
+          "binding": 0.0781
+        }
+      },
+      {
+        "object": "grass",
+        "compat": "green",
+        "incompat": "red",
+        "type": "color",
+        "type_dir": {
+          "compat_delta": 0.1562,
+          "incompat_delta": -0.0938,
+          "binding": 0.25
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.0938,
+          "incompat_delta": 0.0625,
+          "binding": 0.0312
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.0312,
+          "incompat_delta": 0.0625,
+          "binding": -0.0312
+        }
+      },
+      {
+        "object": "knife",
+        "compat": "sharp",
+        "incompat": "soft",
+        "type": "texture",
+        "type_dir": {
+          "compat_delta": -0.125,
+          "incompat_delta": -0.0312,
+          "binding": -0.0938
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.0625,
+          "incompat_delta": -0.1875,
+          "binding": 0.25
+        },
+        "incompat_value_dir": {
+          "compat_delta": -0.0625,
+          "incompat_delta": -0.0625,
+          "binding": 0.0
+        }
+      },
+      {
+        "object": "stone",
+        "compat": "rough",
+        "incompat": "sweet",
+        "type": "texture",
+        "type_dir": {
+          "compat_delta": -0.125,
+          "incompat_delta": -0.1836,
+          "binding": 0.0586
+        },
+        "compat_value_dir": {
+          "compat_delta": -0.0938,
+          "incompat_delta": 0.0781,
+          "binding": -0.1719
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.1484,
+          "incompat_delta": 0.0859,
+          "binding": 0.0625
+        }
+      },
+      {
+        "object": "silk",
+        "compat": "smooth",
+        "incompat": "rough",
+        "type": "texture",
+        "type_dir": {
+          "compat_delta": 0.0312,
+          "incompat_delta": 0.0312,
+          "binding": 0.0
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.0938,
+          "incompat_delta": -0.0312,
+          "binding": 0.125
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.1875,
+          "incompat_delta": -0.0781,
+          "binding": 0.2656
+        }
+      },
+      {
+        "object": "tea",
+        "compat": "hot",
+        "incompat": "cold",
+        "type": "temperature",
+        "type_dir": {
+          "compat_delta": 0.4062,
+          "incompat_delta": 0.3594,
+          "binding": 0.0469
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.0625,
+          "incompat_delta": 0.0938,
+          "binding": -0.0312
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.0469,
+          "incompat_delta": 0.1094,
+          "binding": -0.0625
+        }
+      },
+      {
+        "object": "ice",
+        "compat": "cold",
+        "incompat": "hot",
+        "type": "temperature",
+        "type_dir": {
+          "compat_delta": 0.1562,
+          "incompat_delta": 0.0312,
+          "binding": 0.125
+        },
+        "compat_value_dir": {
+          "compat_delta": 0.125,
+          "incompat_delta": 0.0625,
+          "binding": 0.0625
+        },
+        "incompat_value_dir": {
+          "compat_delta": 0.0625,
+          "incompat_delta": 0.0312,
+          "binding": 0.0312
+        }
+      }
+    ],
+    "aggregated": {
+      "type": {
+        "mean_binding": 0.1152,
+        "positive_rate": 0.8
+      },
+      "compat_value": {
+        "mean_binding": 0.0266,
+        "positive_rate": 0.5
+      },
+      "incompat_value": {
+        "mean_binding": 0.0187,
+        "positive_rate": 0.4
+      }
+    }
+  }
+}
