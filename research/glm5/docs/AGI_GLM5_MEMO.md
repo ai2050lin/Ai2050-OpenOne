@@ -6355,3 +6355,444 @@ python tests/glm5/phase339_multibaseline_pipeline.py glm4         # ~568s (9.5mi
 脚本位置：
 - `tests/glm5/phase339_multibaseline_pipeline.py` — 主测试（Phase 339+340+341）
 - 结果：`results/phase339_multibaseline/{qwen3,glm4,deepseek7b}_phase339.json`
+
+## Phase 342+342b: MLP内部通道分析 — 平衡放大发现 [2026-06-02 14:15]
+
+### 背景
+
+Phase 339-341确认了MLP是binding的主要因果通道，但**MLP如何把对象身份变成属性排序**仍未知。Phase 342目标：进入MLP内部，分解通道级贡献。
+
+### 方法
+
+**Phase 342: MLP通道绑定分解**
+- 对关键binding层（Qwen3 L21-29, GLM4 L30-38, DS7B L19-24）提取gate_proj和up_proj激活
+- SwiGLU: MLP(x) = down_proj(SiLU(gate_proj(x)) * up_proj(x))
+- 通道i对binding方向的贡献 = (d·W_down[:,i]) * SiLU(gate_i) * up_i
+- 分类：兼容通道(d·W_down[:,i]>0) vs 不兼容通道(d·W_down[:,i]<0)
+
+**Phase 342b: 修正命名+平衡放大确认**
+- 修正变量命名（Phase 342中"incompat_suppress"实际测量的是不兼容信号增加）
+- 新增：放大平衡比 = incompat_gross / compat_gross
+- 新增：净/总比 = |net_binding| / gross_amplification
+- Per-pair分析验证模式稳健性
+
+### 核心发现：平衡放大（Balanced Amplification）
+
+**三模型13个binding层的结果完全一致：**
+
+| 模型 | 层 | 兼容提升 | 不兼容放大 | 平衡比 | 净/总比 |
+|------|-----|---------|----------|--------|---------|
+| Qwen3 | L21 | +9.60 | -9.51 | 1.003 | 2.0% |
+| Qwen3 | L23 | +12.27 | -12.04 | 1.007 | 2.3% |
+| Qwen3 | L25 | +16.73 | -16.61 | 1.020 | 2.7% |
+| Qwen3 | L27 | +21.34 | -21.29 | 1.011 | 2.3% |
+| Qwen3 | L29 | +25.16 | -24.63 | 1.016 | 2.9% |
+| DS7B | L19 | +19.55 | -19.44 | 0.996 | 1.6% |
+| DS7B | L21 | +30.67 | -29.86 | 0.996 | 2.1% |
+| DS7B | L23 | +43.07 | -40.43 | 0.994 | 2.9% |
+| DS7B | L24 | +51.53 | -50.56 | 0.996 | 1.2% |
+| GLM4 | L30 | +2.60 | -2.51 | 1.003 | 2.3% |
+| GLM4 | L33 | +3.36 | -3.32 | 1.004 | 1.9% |
+| GLM4 | L36 | +4.45 | -4.39 | 0.985 | 1.7% |
+| GLM4 | L38 | +12.43 | -11.94 | 0.999 | 2.1% |
+
+**关键数据：**
+1. **放大平衡比 = 0.985-1.020（均值≈1.00, std≈0.05）** — 兼容和不兼容通道被几乎完全同等放大
+2. **净/总比 = 1.2%-2.9%** — 总放大的97-98%相互抵消，仅1-3%作为净binding效果存活
+3. **Per-pair稳健** — 所有22-24个pair的平衡比都在0.88-1.18范围内
+
+### 平衡放大的含义
+
+MLP不是"选择性增强兼容、抑制不兼容"的选择器，而是**几乎对称地放大兼容和不兼容信号**，仅有极小偏向（~2%偏向兼容方向）。
+
+数学表述：
+```
+MLP_l(clean) - MLP_l(corrupt)
+= gross_compat_boost + gross_incompat_amplify + ...
+≈ A * (1 + 0.02) + A * (1 - 0.02)  [A=gross amplification]
+= 2A + 0.04A - 2A + 0.04A
+net ≈ 0.02 * gross
+```
+
+### MLP不是均匀放大器
+
+Experiment 2测试了MLP输出差异与输入差异的余弦相似度：
+
+| 模型 | 层 | cos_sim(diff) |
+|------|-----|--------------|
+| Qwen3 | L21 | 0.040 |
+| Qwen3 | L29 | 0.104 |
+| DS7B | L21 | 0.181 |
+| GLM4 | L38 | 0.361 |
+
+余弦相似度远低于1.0，说明MLP不是简单缩放输入。MLP对输入进行了非线性变换，但这个变换在兼容和不兼容方向上几乎等量。
+
+### Binding如何从1-3%的净偏向中产生？
+
+关键在于**多层累积**：
+- 每层MLP的净binding贡献 ≈ 0.2-1.5
+- 5-9个binding层累积 → 总binding信号 ≈ 1-7
+- 这与观测到的binding_range（通常1-10）一致
+
+**Binding机制是"多弱选择器累积"而非"少强选择器"**。
+
+### 客观事实拼图更新
+
+1. **MLP对兼容和不兼容通道几乎同等放大** — 平衡比≈1.00（13/13层确认）
+2. **净binding效果仅占总放大的1-3%** — 97-98%的放大被抵消
+3. **MLP不是均匀放大器** — 输出差异与输入差异cos_sim≈0.04-0.36
+4. **Binding通过多层微小偏向累积产生** — "多弱选择器"机制
+5. **Per-pair模式稳健** — 所有pair的平衡比在0.88-1.18
+
+### 嵌入差值patch测试
+
+Phase 342的嵌入差值patch实验显示：完整嵌入差值patch给出~100%恢复（trivially等价于运行clean模型）。由于device_map="auto"导致embed_tokens在meta device上，部分嵌入patch（binding-only/ortho-only）未能在DS7B和GLM4上完成。
+
+### 关键硬伤
+
+1. **1-3%的净偏向为何存在？** — 如果MLP真的等量放大，为何不是精确0%净效果？这个微小偏向的来源是什么？
+2. **平衡放大是否是MLP的通用属性？** — 还是只在binding方向上平衡？其他方向是否也平衡？
+3. **MLP的非线性变换是什么？** — cos_sim低说明不是简单缩放，但具体变换形式未知
+4. **累积效应的数学描述** — 5-9层×2%偏向如何精确累积？需要层级轨迹分析
+5. **兼容通道和不兼容通道的区分标准** — 基于d·W_down的符号，但这个符号是否在所有对象上一致？
+6. **未能完成部分嵌入patch实验** — device_map="auto"限制了hook能力
+
+### 命令记录
+
+```bash
+# Phase 342: MLP通道分析（第一轮）
+python tests/glm5/phase342_mlp_channel_analysis.py qwen3       # ~28s
+python tests/glm5/phase342_mlp_channel_analysis.py deepseek7b   # ~102s
+python tests/glm5/phase342_mlp_channel_analysis.py glm4         # ~171s
+
+# Phase 342b: 平衡放大确认（第二轮）
+python tests/glm5/phase342b_balanced_amplification.py qwen3     # ~25s
+python tests/glm5/phase342b_balanced_amplification.py deepseek7b # ~82s
+python tests/glm5/phase342b_balanced_amplification.py glm4       # ~131s
+```
+
+脚本位置：
+- `tests/glm5/phase342_mlp_channel_analysis.py` — Phase 342 MLP通道分析
+- `tests/glm5/phase342b_balanced_amplification.py` — Phase 342b 平衡放大确认
+- 结果：`results/phase342_mlp_channel/{qwen3,glm4,deepseek7b}_phase342.json`
+- 结果：`results/phase342_mlp_channel/{qwen3,glm4,deepseek7b}_phase342b.json`
+
+## Phase 343+343b: 平衡放大通用性 + 微偏置来源 [2026-06-02 14:45]
+
+### 背景
+
+Phase 342发现MLP在binding方向上做平衡放大（平衡比≈1.00，净/总比1-3%）。关键问题：
+1. 平衡放大是binding特有还是MLP通用属性？
+2. 1-3%微偏置从哪里来？
+
+### 方法
+
+**Experiment A (Phase 343): 多方向通道分解**
+- 对6种方向类型做通道分解：binding、random、object_identity、same_class、attribute_only、unrelated
+- 所有方向使用相同的clean/corrupt激活（仅方向向量不同）
+- 10个随机方向 × 5 binding层 + 多种语义方向
+
+**Experiment B (Phase 343): 微偏置来源分解**
+- 分解MLP(x) = down(SiLU(gate(x)) * up(x))的微偏置
+- 乘积分解：gate驱动项、up驱动项、交互项
+- 结构不对称性：|d|投影、SiLU激活、ΔSiLU、Δup在正/负通道间的差异
+- 通道-方向相关性
+
+**Round 2 (Phase 343b): 50随机方向确认**
+- 50个随机方向 vs 10个binding方向
+- 5个不同prompt上下文 × 10随机方向
+- t-test统计检验
+
+### 核心发现1：平衡放大是MLP通用属性
+
+**三模型6方向类型的平衡比均值：**
+
+| 方向类型 | Qwen3 | DS7B | GLM4 |
+|---------|-------|------|------|
+| binding | 0.995 | 1.008 | 0.989 |
+| random | 1.003 | 1.005 | 1.011 |
+| object_identity | 0.949 | 1.008 | 1.030 |
+| same_class | 1.004 | 0.998 | 1.000 |
+| attribute_only | 0.998 | 0.998 | 0.995 |
+| unrelated | 1.009 | 1.004 | 1.009 |
+
+→ 所有方向类型的平衡比都在0.95-1.03范围，无显著差异
+→ **平衡放大不是binding特有机制，而是SwiGLU MLP的通用几何性质**
+
+### 核心发现2：Net/gross比在binding方向显著更高
+
+**Round 2 (50随机方向) 统计检验：**
+
+| 模型 | Binding N/G | Random N/G | p值 | 显著性 |
+|------|------------|-----------|------|--------|
+| Qwen3 | 0.028±0.020 | 0.018±0.014 | 0.0000 | *** |
+| DS7B | 0.023±0.018 | 0.016±0.011 | 0.0059 | ** |
+| GLM4 | 0.023±0.018 | 0.018±0.014 | 0.0338 | * |
+
+→ binding方向的net/gross比显著高于随机方向（约1.3-1.6倍）
+→ **binding方向确实有更强的方向性偏向，这不是噪声**
+→ 但绝对差异很小（~0.01），说明binding特异性是微弱的
+
+### 核心发现3：微偏置由gate和up共同产生，无主导成分
+
+**Phase 344微偏置来源分解（6 pair × 多层）：**
+
+| 模型 | Gate N/G | Up N/G | Gate-Dir相关 | Up-Dir相关 | ΔSiLU不对称 | ΔUp不对称 |
+|------|----------|--------|-------------|-----------|------------|----------|
+| Qwen3 | 0.031 | 0.031 | -0.001 | -0.002 | 1.007 | 1.000 |
+| DS7B | 0.021 | 0.027 | +0.003 | +0.005 | 1.012 | 1.001 |
+| GLM4 | 0.033 | 0.028 | +0.004 | +0.000 | 1.007 | 1.001 |
+
+关键发现：
+1. **Gate和up的net/gross比几乎相等** — 两者对微偏置的贡献相当，无主导成分
+2. **Gate和up与binding方向的相关性≈0** — 激活变化不沿binding方向系统偏向
+3. **ΔSiLU不对称≈1.00** — gate激活变化在正/负通道间对称
+4. **Δup不对称≈1.00** — up投影变化在正/负通道间对称
+5. **W_down投影不对称≈1.00** — |d|在正/负通道间均匀
+
+### 重新理解微偏置来源
+
+微偏置不是来自任何单一组件的系统性偏向，而是：
+- gate变化对称 + up变化对称 + W_down结构对称
+- 但三者乘积的**高阶交互效应**在binding方向上产生微小残余
+- 这个残余虽小（~1-2%），但在binding方向上显著高于随机方向
+- 多层累积后，这个微小偏向足以产生可观测的binding
+
+数学表述：
+```
+微偏置 ≈ Σ_{ijk} ∂³f/∂gate_i∂up_j∂W_down_k × Δgate_i × Δup_j × W_k
+         ↑ 三阶交互项
+```
+
+这不是"gate选择"或"up选择"，而是**高维空间中多对称分量交互的统计残余**。
+
+### 客观事实拼图更新
+
+1. **平衡放大是SwiGLU MLP的通用几何性质** — 对所有方向都成立（6方向类型×3模型确认）
+2. **Binding方向的net/gross比显著高于随机方向** — 约1.3-1.6倍（3模型t-test确认）
+3. **微偏置不由gate或up单独产生** — 两者贡献相当，且都对称
+4. **微偏置来自高阶交互效应** — 对称分量的乘积产生的统计残余
+5. **W_down结构无系统性偏向** — 投影在正负通道间均匀
+6. **Gate/Up激活变化不沿binding方向系统偏向** — 相关性≈0
+
+### 硬伤和问题
+
+1. **交互效应的具体数学形式未确定** — "高阶交互"是定性描述，不是精确公式
+2. **Net/gross差异虽显著但很小** — binding方向1.5-2.8% vs 随机1.6-1.8%，绝对差异<1%
+3. **多层累积的具体动力学未建模** — 层间如何传递和增强微偏置？
+4. **平衡放大的数学证明缺失** — 为什么SwiGLU结构必然导致平衡放大？
+5. **Prompt上下文对微偏置的影响未系统测试** — 当前只用"The apple"和"The item"
+
+### 命令记录
+
+```bash
+# Phase 343: 平衡放大通用性（第一轮）
+python tests/glm5/phase343_balanced_amplification_generality.py qwen3       # ~14s
+python tests/glm5/phase343_balanced_amplification_generality.py deepseek7b   # ~43s
+python tests/glm5/phase343_balanced_amplification_generality.py glm4         # ~59s
+
+# Phase 343b: 50随机方向确认（第二轮）
+python tests/glm5/phase343b_confirmation.py qwen3      # ~51s
+python tests/glm5/phase343b_confirmation.py deepseek7b  # ~122s
+python tests/glm5/phase343b_confirmation.py glm4        # ~137s
+```
+
+脚本位置：
+- `tests/glm5/phase343_balanced_amplification_generality.py` — Phase 343 主测试
+- `tests/glm5/phase343b_confirmation.py` — Phase 343b 确认测试
+- 结果：`results/phase343_generality/{qwen3,glm4,deepseek7b}_phase343.json`
+- 结果：`results/phase343_generality/{qwen3,glm4,deepseek7b}_phase343b.json`
+
+## Phase 344+345: 多关系方向验证 + 方向匹配随机对照 [2026-06-02 15:10]
+
+### 背景
+
+Phase 343/343b证明平衡放大是MLP通用属性，但有两个硬伤：
+1. 随机方向未严格匹配范数和输出空间对齐（Phase 344）
+2. 只测了binding方向，未验证其他语言关系是否同样"平衡+微偏置增强"（Phase 345）
+
+### 方法
+
+**Phase 344 — 方向匹配随机对照（4种）**：
+1. norm-matched random：与binding方向相同L2范数
+2. W_U-subspace random：在W_U列空间内随机采样（通过SVD得到主子空间）
+3. binding-orthogonal random：与binding方向正交的随机方向
+4. pure random：标准高斯随机方向
+
+**Phase 345 — 多关系方向（6种语言关系）**：
+1. binding（对象-属性）：apple-red, banana-yellow, etc.
+2. negation（否定）："is red" vs "is not"
+3. antonym（反义）：hot-cold, big-small
+4. role（角色）：主语vs宾语位置
+5. tense（时态）：过去vs现在
+6. same_class（同类）：apple-banana
+
+每个方向都做通道分解，测平衡比和net/gross比。
+
+### 核心发现1：所有6种语言关系方向的平衡比≈1.00
+
+| 关系类型 | Qwen3 | DS7B | GLM4 |
+|---------|-------|------|------|
+| binding | 1.017 | 0.996 | 0.997 |
+| negation | 1.054 | 1.013 | 0.991 |
+| antonym | 0.998 | 0.992 | 0.994 |
+| role | 1.016 | 0.992 | 1.003 |
+| tense | 0.992 | 0.995 | 0.981 |
+| same_class | 1.006 | 0.999 | 0.994 |
+
+→ 所有语言关系方向都呈现平衡放大，与binding方向一致
+→ **平衡放大不仅不是binding特有，甚至不是binding+negation等特定关系特有，而是所有语义方向的通用属性**
+
+### 核心发现2：Net/gross比在不同关系类型间有差异
+
+| 关系类型 | Qwen3 N/G | DS7B N/G | GLM4 N/G |
+|---------|----------|---------|---------|
+| binding | 0.028 | 0.021 | 0.020 |
+| negation | 0.031 | 0.024 | 0.037 |
+| antonym | 0.023 | 0.017 | 0.024 |
+| role | 0.028 | 0.014 | 0.032 |
+| tense | 0.017 | 0.015 | 0.017 |
+| same_class | 0.033 | 0.020 | 0.032 |
+
+→ tense（时态）的net/gross最低（~0.015），binding/negation/role/same_class较高（~0.02-0.03）
+→ **不同语言关系确实有不同的微偏置强度**
+→ negation和same_class的net/gross甚至高于binding，说明"语义对比强度"不是binding独有的
+
+### 核心发现3：方向匹配对照确认binding方向net/gross高于W_U子空间随机
+
+**Binding vs 4种随机对照的net/gross比**：
+
+| 对照类型 | Qwen3 N/G | DS7B N/G | GLM4 N/G |
+|---------|----------|---------|---------|
+| binding | 0.028 | 0.021 | 0.020 |
+| norm-matched | 0.020 | 0.014 | 0.019 |
+| W_U-subspace | 0.021 | 0.015 | 0.018 |
+| binding-orthogonal | 0.021 | 0.015 | 0.017 |
+| pure random | 0.019 | 0.014 | 0.016 |
+
+**统计检验**：
+
+| 对照 | Qwen3 p值 | DS7B p值 | GLM4 p值 |
+|------|----------|---------|---------|
+| norm-matched | 0.53 ns | 0.08 ns | 0.90 ns |
+| W_U-subspace | **0.031*** | **0.004**** | 0.92 ns |
+| binding-orthogonal | 0.24 ns | **0.015*** | 0.98 ns |
+| pure random | 0.19 ns | 0.16 ns | 0.64 ns |
+
+→ Qwen3和DS7B对W_U-subspace random显著，DS7B对binding-orthogonal也显著
+→ **GLM4无任何显著差异**——GLM4的binding方向微偏置不比任何随机方向强
+→ 这个结果需要谨慎解读：binding vs random的net/gross差异在Qwen3/DS7B存在但边际，GLM4完全消失
+
+### 客观事实拼图更新
+
+1. **6种语言关系都呈现平衡放大** — 不是binding特有，是所有语义方向通用
+2. **不同关系类型的net/gross有差异** — tense最低(~0.015)，negation/role/same_class较高(~0.03)
+3. **Binding vs 匹配随机对照** — Qwen3/DS7B对W_U-subspace有边际显著性，GLM4完全不显著
+4. **Binding的net/gross优势非常微弱** — 约0.004-0.007的绝对差异
+5. **Net/gross差异可能来自方向分布特性**（如W_U子空间对齐），而非binding特有的编码机制
+
+---
+
+## Phase 346: 精确交互分解 + 层级累积闭合 [2026-06-02 15:10]
+
+### 背景
+
+Phase 343/344发现微偏置来自"高阶交互"，但那只是排除法推论。需要精确分解。
+
+### 方法
+
+**Part A: 精确4-way因子分解**
+对MLP输出 = W_down @ (SiLU(gate) * up)，构造4种条件：
+- CC: SiLU(gate_clean) * up_clean
+- CR: SiLU(gate_clean) * up_corrupt
+- RC: SiLU(gate_corrupt) * up_clean
+- RR: SiLU(gate_corrupt) * up_corrupt
+
+标准2×2因子分解（精确，非近似）：
+- gate_main = ((CC-CR) + (RC-RR)) / 2
+- up_main = ((CC-RC) + (CR-RR)) / 2
+- interaction = CC - CR - RC + RR
+
+**Part B: 层级累积闭合**
+计算每个binding层MLP的净方向投影，求和，与最终binding信号比较。
+
+### 核心发现1：交互项是最大贡献者（约40%）
+
+| 模型 | Gate main | Up main | Interaction | 总效应 |
+|------|-----------|---------|------------|--------|
+| Qwen3 | 25.7% | 31.4% | **42.8%** | +0.566 |
+| DS7B | 27.9% | 26.4% | **45.6%** | +1.008 |
+| GLM4 | 30.2% | 30.7% | **39.1%** | +0.334 |
+
+→ **三模型一致：gate×up交互项占总效应的39-46%**
+→ Gate和up主效应几乎相等（各25-31%）
+→ **微偏置主要由交互项产生，不是由gate或up单独产生**
+
+### 核心发现2：层级累积不闭合
+
+| 模型 | Closure ratio | Final binding | MLP net sum | Correlation |
+|------|--------------|--------------|-------------|------------|
+| Qwen3 | 1.11±2.40 | 2.38 | 3.57 | 0.70 |
+| DS7B | -0.04±6.97 | 1.66 | 4.24 | 0.82 |
+| GLM4 | 0.43±0.66 | 2.95 | 1.28 | 0.77 |
+
+→ Closure ratio极不稳定（Qwen3: -3.4~4.0, DS7B: -13.7~6.0, GLM4: -0.6~1.7）
+→ **MLP net sum不等于final binding** — 因为：
+  1. 只测了binding层的MLP，忽略了非binding层
+  2. 忽略了attention的贡献
+  3. 忽略了LayerNorm的重缩放
+  4. 忽略了层间残差交互
+→ 但相关性较高（0.70-0.82），说明MLP贡献的方向是正确的
+
+### 核心发现3：交互项方向不固定
+
+- Qwen3: 28正/12负
+- DS7B: 18正/14负
+- GLM4: 14正/18负
+
+→ 交互项方向（正/负）因pair和layer而异，不是系统性偏向
+→ **交互项的绝对值大，但符号不稳定** — 这与"平衡放大+微小净偏置"一致
+
+### 理论更新
+
+微偏置的精确结构现在更清楚了：
+
+```
+微偏置 = gate_main(25-30%) + up_main(25-31%) + interaction(39-46%)
+```
+
+交互项最大，但它不是系统性偏向——它是gate和up同时变化时产生的非线性效应。这个非线性效应在binding方向上的投影平均为正，但方差很大。
+
+更精确的描述：
+```
+微偏置不是"单方向选择"
+而是"gate和up变化的非线性乘积在binding方向上的统计残余"
+```
+
+### 硬伤和问题
+
+1. **交互项的物理意义不明确** — 知道它占40%，但不清楚SiLU(gate)×up的哪个具体性质导致交互
+2. **Closure不闭合** — 当前方法只考虑binding层MLP，忽略attention和非binding层
+3. **GLM4的binding vs random差异消失** — 与Phase 343b矛盾，可能是样本量不够或统计方法问题
+4. **交互项符号不稳定** — 说明交互不是系统性偏向，而是高方差噪声+微弱均值
+5. **W_down结构未深入分析** — 为什么W_down投影后正负通道如此平衡？
+
+### 命令记录
+
+```bash
+# Phase 344+345: 多关系方向 + 匹配随机对照
+python tests/glm5/phase344_345_multi_relation.py qwen3       # ~57s
+python tests/glm5/phase344_345_multi_relation.py deepseek7b   # ~160s
+python tests/glm5/phase344_345_multi_relation.py glm4         # ~195s
+
+# Phase 346: 精确交互分解 + 层级累积闭合
+python tests/glm5/phase346_interaction_closure.py qwen3       # ~19s
+python tests/glm5/phase346_interaction_closure.py deepseek7b  # ~51s
+python tests/glm5/phase346_interaction_closure.py glm4        # ~71s
+```
+
+脚本位置：
+- `tests/glm5/phase344_345_multi_relation.py` — Phase 344+345 主测试
+- `tests/glm5/phase346_interaction_closure.py` — Phase 346 精确交互+闭合
+- 结果：`results/phase344_345_multi_relation/{qwen3,glm4,deepseek7b}_phase344_345.json`
+- 结果：`results/phase346_interaction_closure/{qwen3,glm4,deepseek7b}_phase346.json`
