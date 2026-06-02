@@ -1,0 +1,38 @@
+=== Phase305 normal logged run ===
+2026-05-29 18:49:07 CST
+run_id=20260529_184907_phase305normal_deepseek7b
+model=deepseek7b
+output_dir=results/gpt5_phase305_role_query_option_calibration
+conda_env=openone-cuda121
+probe_torch_dtype=bfloat16
+probe_attn_implementation=sdpa
+probe_device_map_auto_models=glm4,deepseek7b
+probe_max_gpu_memory=21GiB
+cuda_launch_blocking=0
+pytorch_no_cuda_memory_caching=0
+enable_gpu_monitor=0
+enable_snapshot_nvidia_smi=1
+args=--max-bases 32 --max-seq-len 128 --progress-every 4
+
+=== Start kernel log follower ===
+=== GPU/process monitor disabled ===
+=== Run Phase305 normal ===
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.10s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.24it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
+[phase305] model=deepseek7b class=Qwen2ForCausalLM bases=32 templates=8
+[phase305] base 4/32 rows=256 elapsed=17.8s
+[phase305] base 8/32 rows=512 elapsed=35.2s
+[phase305] base 12/32 rows=768 elapsed=52.7s
+[phase305] base 16/32 rows=1024 elapsed=69.8s
+[phase305] base 20/32 rows=1280 elapsed=87.1s
+[phase305] base 24/32 rows=1536 elapsed=104.4s
+[phase305] base 28/32 rows=1792 elapsed=121.5s
+[phase305] base 32/32 rows=2048 elapsed=138.3s
+[phase305] saved results/gpt5_phase305_role_query_option_calibration/deepseek7b_phase305_role_query_option_calibration.json
+[phase305] done rows=2048 reliable=0 nonfinite=0
+phase305_exit_code=0
+=== Kernel log since start ===
+=== Result files ===
+results/gpt5_phase305_role_query_option_calibration/deepseek7b_phase305_role_query_option_calibration.json
+results/gpt5_phase305_role_query_option_calibration/glm4_phase305_role_query_option_calibration.json
+results/gpt5_phase305_role_query_option_calibration/qwen3_phase305_role_query_option_calibration.json
+log_dir=results/gpt5_gpu_lock_logs/20260529_184907_phase305normal_deepseek7b

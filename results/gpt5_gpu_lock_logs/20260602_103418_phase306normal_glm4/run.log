@@ -1,0 +1,33 @@
+=== Phase306 normal logged run ===
+2026-06-02 10:34:18 CST
+run_id=20260602_103418_phase306normal_glm4
+model=glm4
+output_dir=results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16
+conda_env=openone-cu130-py312
+probe_torch_dtype=bfloat16
+probe_attn_implementation=sdpa
+probe_device_map_auto_models=glm4,deepseek7b
+probe_max_gpu_memory=21GiB
+cuda_launch_blocking=0
+pytorch_no_cuda_memory_caching=0
+enable_gpu_monitor=0
+enable_snapshot_nvidia_smi=1
+args=--max-bases 16 --max-seq-len 128 --entity-styles ab,entity_ab,nonce --answer-styles letter,entity --progress-every 4
+
+=== Start kernel log follower ===
+=== GPU/process monitor disabled ===
+=== Run Phase306 normal ===
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  1.84it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.07it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.16it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.38it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.25it/s]
+[phase306] model=glm4 class=GlmForCausalLM bases=16 entity_styles=['ab', 'entity_ab', 'nonce'] answer_styles=['letter', 'entity'] templates=8
+[phase306] base 4/16 rows=1536 elapsed=84.3s
+[phase306] base 8/16 rows=3072 elapsed=168.4s
+[phase306] base 12/16 rows=4608 elapsed=252.5s
+[phase306] base 16/16 rows=6144 elapsed=336.4s
+[phase306] saved results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16/glm4_phase306_symbolic_role_query_calibration.json
+[phase306] done rows=6144 reliable=3 nonfinite=0
+phase306_exit_code=0
+=== Kernel log since start ===
+=== Result files ===
+results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16/glm4_phase306_symbolic_role_query_calibration.json
+results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16/qwen3_phase306_symbolic_role_query_calibration.json
+log_dir=results/gpt5_gpu_lock_logs/20260602_103418_phase306normal_glm4

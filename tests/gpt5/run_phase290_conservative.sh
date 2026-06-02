@@ -6,7 +6,7 @@ cd /home/rankrank/Documents/OpenOne/Ai2050-OpenOne
 MODEL="${1:?usage: $0 MODEL [phase290 args...]}"
 shift || true
 
-export OPENONE_CONSERVATIVE_ENV="${OPENONE_CONSERVATIVE_ENV:-openone-cuda121}"
+export OPENONE_CONSERVATIVE_ENV="${OPENONE_CONSERVATIVE_ENV:-openone-cu130-py312}"
 export OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_phase290_contract_break_scan}"
 export MAX_SECONDS="${MAX_SECONDS:-7200}"
 if [[ "$MODEL" == "glm4" ]]; then

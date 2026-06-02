@@ -6,7 +6,7 @@ cd /home/rankrank/Documents/OpenOne/Ai2050-OpenOne
 MODEL="${1:?usage: $0 MODEL [phase302 args...]}"
 shift || true
 
-export OPENONE_NORMAL_ENV="${OPENONE_NORMAL_ENV:-openone-cuda121}"
+export OPENONE_NORMAL_ENV="${OPENONE_NORMAL_ENV:-openone-cu130-py312}"
 export OUTPUT_DIR="${OUTPUT_DIR:-results/gpt5_phase302_passive_token_role_closure}"
 export MAX_SECONDS="${MAX_SECONDS:-7200}"
 export CUDA_LAUNCH_BLOCKING="${CUDA_LAUNCH_BLOCKING:-0}"

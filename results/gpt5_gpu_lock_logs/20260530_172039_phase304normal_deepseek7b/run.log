@@ -1,0 +1,30 @@
+=== Phase304 normal logged run ===
+2026-05-30 17:20:39 CST
+run_id=20260530_172039_phase304normal_deepseek7b
+model=deepseek7b
+output_dir=results/gpt5_phase304_role_query_template_570_smoke_all
+conda_env=openone-cuda121
+probe_torch_dtype=bfloat16
+probe_attn_implementation=eager
+probe_device_map_auto_models=glm4,deepseek7b
+probe_max_gpu_memory=21GiB
+cuda_launch_blocking=1
+pytorch_no_cuda_memory_caching=1
+enable_gpu_monitor=0
+enable_snapshot_nvidia_smi=1
+args=--max-bases 2 --max-seq-len 96 --progress-every 4
+
+=== Start kernel log follower ===
+=== GPU/process monitor disabled ===
+=== Run Phase304 normal ===
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.88s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:05<00:00,  2.55s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:05<00:00,  2.60s/it]
+[phase304] model=deepseek7b class=Qwen2ForCausalLM bases=2 templates=16
+[phase304] saved results/gpt5_phase304_role_query_template_570_smoke_all/deepseek7b_phase304_role_query_template_calibration.json
+[phase304] done rows=128 reliable=0 nonfinite=0
+phase304_exit_code=0
+=== Kernel log since start ===
+=== Result files ===
+results/gpt5_phase304_role_query_template_570_smoke_all/deepseek7b_phase304_role_query_template_calibration.json
+results/gpt5_phase304_role_query_template_570_smoke_all/glm4_phase304_role_query_template_calibration.json
+results/gpt5_phase304_role_query_template_570_smoke_all/qwen3_phase304_role_query_template_calibration.json
+log_dir=results/gpt5_gpu_lock_logs/20260530_172039_phase304normal_deepseek7b

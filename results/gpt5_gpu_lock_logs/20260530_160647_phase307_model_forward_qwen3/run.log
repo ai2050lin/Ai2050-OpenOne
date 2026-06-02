@@ -1,0 +1,20 @@
+=== Phase307 conservative logged run ===
+2026-05-30 16:06:47 CST
+run_id=20260530_160647_phase307_model_forward_qwen3
+mode=model_forward
+model=qwen3
+output_dir=results/gpt5_phase307_cuda_stability_probe
+conda_env=openone-cuda121
+PROBE_TORCH_DTYPE=bfloat16
+PROBE_ATTN_IMPLEMENTATION=eager
+CUDA_LAUNCH_BLOCKING=1
+PYTORCH_NO_CUDA_MEMORY_CACHING=1
+args=--repeats 1 --max-seq-len 32 --prompt A praised B. AGENT =
+[phase307] mode=model_forward model=qwen3
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 126.16it/s]
+[phase307] forward repeat=1/1 finite=True max_logit=15.3750
+[phase307] saved results/gpt5_phase307_cuda_stability_probe/phase307_model_forward_qwen3.json
+[phase307] done complete=True
+phase307_exit_code=0
+=== filtered kernel lines ===
+log_dir=results/gpt5_gpu_lock_logs/20260530_160647_phase307_model_forward_qwen3

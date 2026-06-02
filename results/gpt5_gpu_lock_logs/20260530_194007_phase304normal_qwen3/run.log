@@ -1,0 +1,21 @@
+=== Phase304 normal logged run ===
+2026-05-30 19:40:07 CST
+run_id=20260530_194007_phase304normal_qwen3
+model=qwen3
+output_dir=results/gpt5_phase304_role_query_template_after_config_qwen3_bases4
+conda_env=openone-cuda121
+probe_torch_dtype=bfloat16
+probe_attn_implementation=eager
+probe_device_map_auto_models=glm4,deepseek7b
+probe_max_gpu_memory=21GiB
+cuda_launch_blocking=1
+pytorch_no_cuda_memory_caching=1
+enable_gpu_monitor=0
+enable_snapshot_nvidia_smi=0
+args=--max-bases 4 --max-seq-len 96 --progress-every 2
+
+=== Start kernel log follower ===
+=== GPU/process monitor disabled ===
+=== Run Phase304 normal ===
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 127.68it/s]
+[phase304] model=qwen3 class=Qwen3ForCausalLM bases=4 templates=16

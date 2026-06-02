@@ -1,0 +1,32 @@
+=== Phase306 normal logged run ===
+2026-06-02 10:30:42 CST
+run_id=20260602_103042_phase306normal_qwen3
+model=qwen3
+output_dir=results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16
+conda_env=openone-cu130-py312
+probe_torch_dtype=bfloat16
+probe_attn_implementation=sdpa
+probe_device_map_auto_models=glm4,deepseek7b
+probe_max_gpu_memory=21GiB
+cuda_launch_blocking=0
+pytorch_no_cuda_memory_caching=0
+enable_gpu_monitor=0
+enable_snapshot_nvidia_smi=1
+args=--max-bases 16 --max-seq-len 128 --entity-styles ab,entity_ab,nonce --answer-styles letter,entity --progress-every 4
+
+=== Start kernel log follower ===
+=== GPU/process monitor disabled ===
+=== Run Phase306 normal ===
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 226.17it/s]
+[phase306] model=qwen3 class=Qwen3ForCausalLM bases=16 entity_styles=['ab', 'entity_ab', 'nonce'] answer_styles=['letter', 'entity'] templates=8
+[phase306] base 4/16 rows=1536 elapsed=50.4s
+[phase306] base 8/16 rows=3072 elapsed=100.6s
+[phase306] base 12/16 rows=4608 elapsed=150.9s
+[phase306] base 16/16 rows=6144 elapsed=201.1s
+[phase306] saved results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16/qwen3_phase306_symbolic_role_query_calibration.json
+[phase306] done rows=6144 reliable=0 nonfinite=0
+phase306_exit_code=0
+=== Kernel log since start ===
+=== Result files ===
+results/gpt5_phase306_symbolic_role_query_after_gpu_fix_bases16/qwen3_phase306_symbolic_role_query_calibration.json
+log_dir=results/gpt5_gpu_lock_logs/20260602_103042_phase306normal_qwen3
