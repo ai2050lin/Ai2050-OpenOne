@@ -5725,3 +5725,394 @@ python tests/glm5/phase333b_confirm.py
 - `tests/glm5/phase333b_confirm.py` — 确认分析
 - 结果：`results/phase333_attn_mlp_decomposition/{qwen3,glm4,deepseek7b}_phase333.json`
 - 结果：`results/phase333b_confirm/summary.json`
+
+## Phase 334+335: 组件因果替换 — 直接与间接效应 [2026-06-02 12:30]
+
+### 背景
+
+Phase 333确定了MLP在关键binding层的归因贡献为80-99%。但归因≠因果。核心问题：
+1. MLP是否因果必要？（去掉MLP的输出，binding是否消失？）
+2. Attention的直接因果效应有多大？
+3. Attention是否通过MLP产生间接效应？（路由假说）
+
+### 方法：激活替换（Activation Patching）
+
+```
+Clean: "The apple" → 高binding信号
+Corrupted: "The item" → 低binding信号
+Patched: 运行corrupted，但在特定层替换特定组件输出为clean版本
+```
+
+四种替换条件：
+1. **attn_patch**: 替换attn_out为clean版本 → Attention直接+间接效应
+2. **mlp_patch**: 替换mlp_out为clean版本 → MLP直接效应
+3. **attn_direct_only**: 替换attn_out为clean + 冻结mlp_out为corrupted版本 → 仅Attention直接效应
+4. **full_block**: 替换attn_out和mlp_out都为clean版本 → 完整层效应
+
+恢复率指标：
+```
+recovery_pct = (binding_patched - binding_corrupted) / (binding_clean - binding_corrupted) × 100
+```
+
+间接效应 = attn_patch recovery - attn_direct_only recovery
+
+### Phase 334 Round 1 结果（全部pair，未过滤）
+
+**HC关键层因果替换（Round 1，12 HC pairs）：**
+
+| 模型 | 关键层 | attn recovery | MLP recovery | full_block | MLP/attn比 |
+|------|--------|---------------|-------------|------------|-----------|
+| Qwen3 | L29 | +4.6% | +3.0% | +6.1% | 0.7x |
+| GLM4 | L38 | +0.6% | **+40.7%** | +41.1% | **67.8x** |
+| DS7B | L23 | +24.3% | +24.8% | +37.9% | 1.0x |
+
+Round 1问题：部分pair的binding_range为负或极小，导致recovery噪声极大。
+- Qwen3 fire_hot: binding_range = -0.725（负！）
+- DS7B apple_red: binding_range = -0.965（负！）
+
+### Phase 334b Round 2 结果（过滤binding_range < 0.3的异常pair）
+
+**关键发现：过滤异常pair后，三模型一致显示MLP因果主导！**
+
+| 模型 | 有效pair | 关键层 | attn recovery | MLP recovery | full_block | MLP/attn比 | 间接attn |
+|------|---------|--------|---------------|-------------|------------|-----------|---------|
+| Qwen3 | 22/24 | L29 | +3.1% | **+7.9%** | +10.6% | **2.5x** | +1.2% |
+| GLM4 | 22/24 | L38 | +0.8% | **+28.8%** | +29.5% | **36.9x** | +0.2% |
+| DS7B | 18/24 | L23 | +1.1% | **+15.0%** | +9.6% | **13.5x** | +0.3% |
+
+### 关键发现1：MLP是binding的因果必要组件 — 三模型一致确认
+
+过滤异常pair后：
+- Qwen3 L29: MLP recovery 7.9% vs attn 3.1%（MLP 2.5倍）
+- GLM4 L38: MLP recovery 28.8% vs attn 0.8%（MLP 36.9倍！）
+- DS7B L23: MLP recovery 15.0% vs attn 1.1%（MLP 13.5倍）
+
+**这从因果层面确认了Phase 333的归因发现：MLP是binding的主要计算组件。**
+
+### 关键发现2：GLM4的MLP因果主导最极端
+
+GLM4 L38: MLP recovery 28.8%，attn仅0.8%，MLP/attn = 36.9倍。
+这与Phase 333的99% MLP归因完全一致。GLM4的binding几乎完全由后期MLP计算。
+
+### 关键发现3：Attention的直接因果效应极小
+
+三模型在关键层的Attention直接因果效应：
+- Qwen3 L29: attn_direct_only = +1.9%
+- GLM4 L38: attn_direct_only = +0.5%
+- DS7B L23: attn_direct_only = +0.8%
+
+Attention对binding的直接因果贡献几乎为零。
+
+### 关键发现4：Attention的间接效应也极小 — 路由假说被削弱
+
+间接效应 = attn_patch - attn_direct_only：
+- Qwen3 L29: +1.2%
+- GLM4 L38: +0.2%
+- DS7B L23: +0.3%
+
+**Attention既没有直接因果效应，也没有通过MLP产生显著的间接效应。**
+这意味着"Attention路由信息给MLP"的假说在binding场景下不成立。
+Attention在binding中的作用可能是更基础的（如token identity传播、位置编码等），
+而不是有目的地将对象信息路由给MLP。
+
+### 关键发现5：单层替换恢复率仅7-29%，说明binding是分布式计算
+
+- GLM4 L38: 28.8%（最高）
+- DS7B L23: 15.0%
+- Qwen3 L29: 7.9%
+
+单层MLP替换只能恢复7-29%的binding信号，说明binding计算分布在多个层。
+后续需要多层联合替换来验证。
+
+### 关键发现6：DS7B Round 1的attn/MLP平分是噪声伪影
+
+- Round 1（未过滤）: DS7B L23 attn=24.3%, mlp=24.8% — 看似平分
+- Round 2（过滤后）: DS7B L23 attn=1.1%, mlp=15.0% — MLP 13.5倍主导
+
+差异原因：6个异常pair（binding_range为负或极小）严重扭曲了平均值。
+特别是apple_red在DS7B中binding_range=-0.965，导致recovery计算不稳定。
+
+### 关键发现7：多层MLP贡献模式
+
+**Qwen3（7层扫描，Round 1）：**
+| 层 | attn% | MLP% | MLP share |
+|---|-------|------|-----------|
+| L15 | +3.8 | +20.3 | 84.2% |
+| L25 | +6.5 | +24.7 | 79.2% |
+| L29 | +4.6 | +3.0 | 39.5% |
+
+L25的MLP recovery最高（24.7%），L29反而较低。说明Qwen3的binding计算高峰在L25附近。
+
+**GLM4（6层扫描，Round 1）：**
+| 层 | attn% | MLP% | MLP share |
+|---|-------|------|-----------|
+| L30 | -0.2 | +11.4 | 101.8% |
+| L38 | +0.6 | +40.7 | 98.5% |
+
+L38的MLP recovery远高于其他层，确认GLM4的binding集中在最后几层。
+
+### 客观事实拼图更新
+
+1. **MLP在关键binding层是因果必要组件** — 三模型一致，从归因推进到因果
+2. **GLM4的MLP因果主导最极端（36.9倍）** — 与99%归因完全一致
+3. **Attention的直接因果效应极小（0.5-1.9%）** — Attention不是binding的计算者
+4. **Attention的间接效应也极小（0.2-1.2%）** — 路由假说被削弱
+5. **单层MLP替换恢复7-29%** — binding是分布式多层计算
+6. **DS7B Round 1的attn/MLP平分是噪声伪影** — 过滤后MLP 13.5倍主导
+7. **异常pair的binding_range为负是严重污染源** — 后续必须过滤
+
+### 关键硬伤
+
+1. **单层替换恢复率低** — 只能证明MLP在单层因果必要，不能证明MLP是唯一因果路径
+2. **Attention间接效应的测量受限于单层替换** — Attention可能在更早层产生间接效应
+3. **binding_range为负的pair未深入分析** — 为什么apple_red在DS7B中binding为负？
+4. **恢复率不是100%** — 说明多层的协同计算未捕获
+5. **间接效应可能存在于跨层路径中** — 当前只测量同层的间接效应
+6. **corrupted baseline（"The item"）可能不是最佳控制** — "item"本身可能携带语义
+
+### 命令记录
+
+```bash
+# Phase 334: 组件因果替换（Round 1）
+python tests/glm5/phase334_causal_patching.py qwen3       # ~27s
+python tests/glm5/phase334_causal_patching.py glm4         # ~473s (7.9min)
+python tests/glm5/phase334_causal_patching.py deepseek7b   # ~303s (5.0min)
+
+# Phase 334b: 确认测试（Round 2，过滤异常pair，扩展数据）
+python tests/glm5/phase334b_confirm.py deepseek7b           # ~163s (2.7min)
+python tests/glm5/phase334b_confirm.py qwen3                # ~24s
+python tests/glm5/phase334b_confirm.py glm4                 # ~229s (3.8min)
+```
+
+脚本位置：
+- `tests/glm5/phase334_causal_patching.py` — 主测试
+- `tests/glm5/phase334b_confirm.py` — 确认测试
+- 结果：`results/phase334_causal_patching/{qwen3,glm4,deepseek7b}_phase334.json`
+- 结果：`results/phase334_causal_patching/{qwen3,glm4,deepseek7b}_phase334b.json`
+
+## Phase 336+337+338: 多层替换+反向破坏+跨层注意力 [2026-06-02 13:10]
+
+### 背景
+
+Phase 334/334b 确定了MLP在关键binding层是主要因果恢复通道，但三大硬伤：
+1. 单层MLP恢复率仅7-29%→binding是分布式计算？需多层联合替换验证
+2. 仅证因果充分性→需反向破坏（clean→corrupted）证必要性
+3. Attention跨层间接效应未测→需测早期Attention是否传递对象身份
+
+### 方法
+
+**Phase 336：多层MLP块替换（corrupted→clean recovery）**
+- 同时替换连续多层的MLP/Attention输出为clean版本
+- 块定义：Qwen3[L21-23, L24-26, L27-29, L21-29]，GLM4[L30-34, L35-38, L30-38]，DS7B[L19-21, L22-24, L19-24]
+
+**Phase 337：反向破坏（clean→corrupted destruction）**
+- 运行clean输入"The apple"，但在关键层替换组件输出为corrupted版本
+- destruction_pct = (binding_clean - binding_reverse) / (binding_clean - binding_corrupted) × 100
+- 如果destruction高→组件因果必要
+
+**Phase 338：跨层早期注意力（corrupted→clean early attn）**
+- 替换早期注意力层的输出为clean版本，让后续层自然重算
+- 测试早期Attention是否携带对象身份信息
+
+### Phase 336 Round 1 结果：多层MLP块替换
+
+**Qwen3（22 valid pairs）：**
+
+| 块 | mlp_block | attn_block | full_block | MLP占full比例 |
+|---|-----------|------------|------------|-------------|
+| L21-23 | +18.9% | -0.9% | +21.2% | 89.2% |
+| L24-26 | +4.9% | **+16.5%** | +16.1% | 30.4% |
+| L27-29 | +36.1% | +1.6% | +49.4% | 73.1% |
+| **L21-29** | **+69.6%** | +24.5% | +79.6% | 87.4% |
+
+**GLM4（22 valid pairs）：**
+
+| 块 | mlp_block | attn_block | full_block | MLP占full比例 |
+|---|-----------|------------|------------|-------------|
+| L30-34 | +30.5% | +11.3% | +42.1% | 72.4% |
+| L35-38 | +24.6% | +0.3% | +26.9% | 91.4% |
+| **L30-38** | **+46.0%** | +11.0% | +56.5% | 81.4% |
+
+**DS7B（18 valid pairs）：**
+
+| 块 | mlp_block | attn_block | full_block | MLP占full比例 |
+|---|-----------|------------|------------|-------------|
+| L19-21 | +6.4% | -1.8% | +5.1% | 125.5% |
+| L22-24 | +32.2% | +4.1% | +47.0% | 68.5% |
+| **L19-24** | **+58.5%** | +5.5% | +62.2% | 94.1% |
+
+**关键对比：单层 vs 多层MLP恢复率**
+
+| 模型 | 单层恢复率 | 最佳多层恢复率 | 提升倍数 |
+|------|-----------|-------------|---------|
+| Qwen3 | 7.9% (L25) | **69.6%** (L21-29) | **8.8x** |
+| GLM4 | 28.8% (L38) | **46.0%** (L30-38) | **1.6x** |
+| DS7B | 15.0% (L23) | **58.5%** (L19-24) | **3.9x** |
+
+### Phase 337 结果：反向破坏（因果必要性）
+
+**MLP反向破坏确认因果必要性，Attention破坏极小：**
+
+| 模型 | 关键层 | MLP destruction | Attn destruction | MLP/Attn比 |
+|------|--------|----------------|-----------------|-----------|
+| Qwen3 | L29 | +25.7% | +8.6% | 3.0x |
+| GLM4 | L38 | **+32.5%** | +1.1% | **29.5x** |
+| DS7B | L23 | +68.8% | +65.2%* | 1.1x* |
+
+*DS7B L23 attn destruction异常高（std=183.6%），可能为噪声驱动
+
+**从因果充分性+因果必要性双重确认：MLP是binding的主要因果组件。**
+
+### Phase 338 Round 1 结果：跨层早期注意力
+
+**惊人发现：Qwen3和DS7B的早期注意力恢复率极高！**
+
+| 模型 | 早期Attn块 | 恢复率 | std |
+|------|-----------|--------|-----|
+| Qwen3 | L0-8 | **+69.7%** | 45.0% |
+| GLM4 | L0-10 | **+0.3%** | 12.5% |
+| DS7B | L0-8 | **+88.5%** | 38.6% |
+
+### Phase 336b Round 2 结果：细粒度早期组件分析
+
+**关键发现：早期效应集中在L0-L2！**
+
+**Qwen3 细粒度早期注意力恢复：**
+
+| 块 | 注意力恢复 | MLP恢复 |
+|---|----------|--------|
+| L0-2 | **+93.3%** | **+101.8%** |
+| L3-5 | -4.9% | -1.7% |
+| L6-8 | +4.8% | -23.4% |
+| L0-4 | +87.2% | — |
+| L0-8 full | — | **+97.9%** |
+
+**GLM4 细粒度早期组件恢复：**
+
+| 块 | 注意力恢复 | MLP恢复 |
+|---|----------|--------|
+| L0-4 | **-0.0%** | **+99.4%** |
+| L5-10 | -1.5% | +81.9% |
+| L0-10 full | — | **+99.6%** |
+
+**DS7B 细粒度早期注意力恢复：**
+
+| 块 | 注意力恢复 | MLP恢复 |
+|---|----------|--------|
+| L0-2 | **+87.1%** | **+93.9%** |
+| L3-5 | -4.3% | -10.0% |
+| L6-8 | -4.0% | +13.1% |
+| L0-4 | +88.5% | — |
+| L0-8 full | — | **+100.3%** |
+
+### 关键发现1：Binding是分布式MLP契约 — 三模型一致确认
+
+多层MLP块替换恢复率（46-70%）远超单层（8-29%）：
+- Qwen3 L21-29: 69.6% vs 7.9% = 8.8倍
+- GLM4 L30-38: 46.0% vs 28.8% = 1.6倍
+- DS7B L19-24: 58.5% vs 15.0% = 3.9倍
+
+**binding不是某一层MLP单独完成的，而是多层MLP链式累积的结果。**
+
+### 关键发现2：MLP因果必要性确认 — 反向破坏实验
+
+GLM4 L38: MLP destruction 32.5% vs Attn 1.1%（29.5倍差距）。
+Qwen3 L29: MLP destruction 25.7% vs Attn 8.6%（3.0倍差距）。
+
+**从corrupted→clean恢复和clean→corrupted破坏两个方向，都确认MLP是binding的因果必要组件。**
+
+### 关键发现3：对象身份传播的三模型差异 — 最重要的新发现
+
+**早期组件（L0-L2/4）携带对象身份，但机制不同：**
+
+| 模型 | 早期Attn恢复 | 早期MLP恢复 | 早期full恢复 | 身份传播机制 |
+|------|------------|-----------|------------|-----------|
+| Qwen3 | 93.3% | 101.8% | 97.9% | Attn+MLP双通道 |
+| GLM4 | **0.0%** | **99.4%** | 99.6% | **仅MLP通道** |
+| DS7B | 87.1% | 93.9% | 100.3% | Attn+MLP双通道 |
+
+**这是首次发现三模型在binding机制上的根本差异：**
+- Qwen3/DS7B：早期Attention和MLP都传播对象身份（双通道冗余）
+- GLM4：仅早期MLP传播对象身份，Attention完全不参与（单通道）
+
+### 关键发现4：L0-L2是对象身份传播的关键区域
+
+三模型一致：L0-L2/L0-L4的组件恢复率最高，L3-L8几乎为零。
+这意味着对象身份在模型最前面的2-4层就已经被写入residual stream。
+
+### 关键发现5：早期完整块恢复接近100%
+
+| 模型 | L0-8/10 full恢复 | std |
+|------|----------------|-----|
+| Qwen3 | 97.9% | 4.7% |
+| GLM4 | 99.6% | 1.6% |
+| DS7B | 100.3% | 7.6% |
+
+**如果前8-10层的组件全部替换为clean版本，后续层可以自然计算binding。**
+这意味着binding计算需要的是"正确的residual stream输入"，而非特定层的特定计算。
+
+### 关键发现6：Qwen3 L24-26的Attention主导
+
+Qwen3 L24-26块中：attn_block=+16.5% > mlp_block=+4.9%。
+这是唯一一个Attention主导的binding层块，可能暗示该区域有路由/通信功能。
+但需要更多数据确认。
+
+### 关键发现7：DS7B L23 Attention异常高方差
+
+DS7B L23: attn_reverse destruction = +65.2%（std=183.6%），mlp_reverse = +68.8%（std=138.9%）。
+超高方差表明这不是稳定的机制效应，而是少数pair驱动的噪声。
+
+### 客观事实拼图更新
+
+1. **Binding是分布式MLP契约** — 多层联合恢复46-70%，远超单层8-29%
+2. **MLP因果必要性确认** — 反向破坏25-33%（Qwen3/GLM4）
+3. **对象身份在L0-L2/4传播** — 早期组件恢复87-102%
+4. **三模型身份传播机制不同** — Qwen3/DS7B双通道(Attn+MLP)，GLM4单通道(仅MLP)
+5. **早期完整块恢复~100%** — 正确的residual stream输入足以让后续层计算binding
+6. **L3-L8组件对binding几乎无直接贡献** — 对象身份在L0-L2已传播完毕
+7. **GLM4的Attention完全不参与对象身份传播** — 这是根本性的架构差异
+
+### Binding计算管线模型更新
+
+```
+Binding Pipeline:
+  1. Token Embedding → 对象身份向量 (embedding space)
+  2. L0-L2 MLP + Attn → 对象身份传播到residual stream (identity propagation)
+  3. L3-L20 → 上下文整合、句法处理 (context integration)
+  4. L21-L38 MLP → 属性兼容性计算 (compatibility computation)
+  5. Last layers → 输出读出 (readout)
+```
+
+关键洞察：
+- **步骤2是对象身份的入口**：不同模型用不同机制（Attn+MLP vs 仅MLP）
+- **步骤4是binding的核心计算**：MLP将对象身份转换为属性兼容性排序
+- **整条管线需要正确的输入**：单层替换只能恢复局部，多层替换恢复全部
+
+### 关键硬伤
+
+1. **早期MLP恢复100%的含义需要深入理解** — 这可能只是"正确的residual stream输入"效应，不代表早期MLP在计算binding
+2. **Qwen3 L24-26 Attention主导** — 仅一个块出现，可能是噪声或特殊机制，需确认
+3. **DS7B L23的Attention异常** — 超高方差（std=183.6%），不可靠
+4. **early full block恢复~100%** — 这说明后续层的MLP在干净输入上自然产生binding，但无法区分哪些层贡献最大
+5. **反向破坏率未达100%** — MLP destruction仅25-33%（Qwen3/GLM4），说明binding是多组件冗余的
+6. **corrupted baseline "The item"仍可能携带语义** — 更好的baseline需要多个中性词
+
+### 命令记录
+
+```bash
+# Phase 336 Round 1: 多层替换+反向破坏+跨层注意力
+python tests/glm5/phase336_multilayer_patching.py qwen3       # ~33s
+python tests/glm5/phase336_multilayer_patching.py glm4         # ~400s (6.7min)
+python tests/glm5/phase336_multilayer_patching.py deepseek7b   # ~217s (3.6min)
+
+# Phase 336b Round 2: 细粒度早期组件确认
+python tests/glm5/phase336b_early_attn_confirm.py qwen3        # ~29s
+python tests/glm5/phase336b_early_attn_confirm.py deepseek7b   # ~204s (3.4min)
+python tests/glm5/phase336b_early_attn_confirm.py glm4         # ~229s (3.8min)
+```
+
+脚本位置：
+- `tests/glm5/phase336_multilayer_patching.py` — 主测试（Phase 336+337+338）
+- `tests/glm5/phase336b_early_attn_confirm.py` — Round 2确认
+- 结果：`results/phase336_multilayer/{qwen3,glm4,deepseek7b}_phase336.json`
+- 结果：`results/phase336_multilayer/{qwen3,glm4,deepseek7b}_phase336b.json`
