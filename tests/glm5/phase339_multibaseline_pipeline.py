@@ -30,8 +30,14 @@ import sys, os, time, json, gc, traceback
 import torch
 import numpy as np
 from datetime import datetime
+from pathlib import Path
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+OUTPUT_DIR = os.environ.get("PHASE339_OUTPUT_DIR", "results/phase339_multibaseline")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "tests" / "gpt5"))
+from model_registry import get_model_spec
 
 def log(msg):
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}", flush=True)
@@ -41,15 +47,15 @@ def log(msg):
 
 MODEL_CONFIGS = {
     "qwen3": {
-        "path": "D:/develop/model/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c",
+        "path": str(get_model_spec("qwen3").local_dir),
         "n_layers": 36, "d_model": 2560,
     },
     "glm4": {
-        "path": "D:/develop/model/hub/modelscope_cache/ZhipuAI/glm-4-9b-chat-hf",
+        "path": str(get_model_spec("glm4").local_dir),
         "n_layers": 40, "d_model": 4096,
     },
     "deepseek7b": {
-        "path": "D:/develop/model/hub/modelscope_cache/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "path": str(get_model_spec("deepseek7b").local_dir),
         "n_layers": 28, "d_model": 3584,
     },
 }
@@ -169,7 +175,12 @@ def load_model_bf16(model_name):
         tokenizer.pad_token = tokenizer.eos_token
 
     model = None
-    for impl in ["flash_attention_2", "sdpa", "eager"]:
+    impls = [
+        item.strip()
+        for item in os.environ.get("PHASE339_ATTN_IMPLEMENTATIONS", "flash_attention_2,sdpa,eager").split(",")
+        if item.strip()
+    ]
+    for impl in impls:
         try:
             log(f"  Trying attn_implementation={impl}...")
             model = AutoModelForCausalLM.from_pretrained(
@@ -907,8 +918,8 @@ def run_experiment(model_name):
 
     save_data = convert(save_data)
 
-    os.makedirs("results/phase339_multibaseline", exist_ok=True)
-    out_path = f"results/phase339_multibaseline/{model_name}_phase339.json"
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUTPUT_DIR, f"{model_name}_phase339.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(save_data, f, indent=2, ensure_ascii=False)
     log(f"\nResults saved to {out_path}")
@@ -925,7 +936,20 @@ def run_experiment(model_name):
 
 
 if __name__ == "__main__":
-    model_name = sys.argv[1] if len(sys.argv) > 1 else "qwen3"
+    argv = sys.argv[1:]
+    hard_exit = False
+    if "--hard-exit-after-model" in argv:
+        hard_exit = True
+        argv.remove("--hard-exit-after-model")
+    if "--output-dir" in argv:
+        idx = argv.index("--output-dir")
+        try:
+            OUTPUT_DIR = argv[idx + 1]
+        except IndexError:
+            raise SystemExit("--output-dir requires a path")
+        del argv[idx:idx + 2]
+
+    model_name = argv[0] if argv else "qwen3"
     if model_name not in MODEL_CONFIGS:
         log(f"Unknown model: {model_name}")
         log(f"Available: {list(MODEL_CONFIGS.keys())}")
@@ -933,3 +957,7 @@ if __name__ == "__main__":
 
     run_experiment(model_name)
     log("Phase 339+340+341 complete!")
+    if hard_exit:
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(0)

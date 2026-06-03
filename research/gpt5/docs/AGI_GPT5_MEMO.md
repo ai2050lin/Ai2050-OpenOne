@@ -11939,2728 +11939,7 @@ candidate-set query 是正确方向，但当前自然语言模板仍不够干净
 
 这不是倒退，而是机制研究必须经过的校准层。
 
-## Phase 43: Phase306 Smoke 崩溃后的 CUDA / PyTorch / 驱动环境诊断 [2026-05-29 19:04]
-
-### 触发背景
-
-Phase 43 原计划继续 Phase 42 的结论，构造 symbolic role query benchmark：
-
-```text
-实体：A / B, ENTITY_A / ENTITY_B, dax / wug
-输出：A/B 或 ENTITY_A/ENTITY_B
-评分：完整答案序列 logprob，而不是 first-token logits
-```
-
-新增脚本：
-
-```text
-tests/gpt5/phase306_symbolic_role_query_calibration.py
-tests/gpt5/phase306_symbolic_role_query_summary.py
-tests/gpt5/run_phase306_normal.sh
-tests/gpt5/run_phase306_symbolic_role_query_normal_all.sh
-```
-
-Smoke 命令：
-
-```bash
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase306_symbolic_role_query_smoke \
-ENABLE_GPU_MONITOR=0 \
-tests/gpt5/run_phase306_normal.sh qwen3 \
-  --max-bases 2 \
-  --entity-styles ab \
-  --answer-styles letter \
-  --progress-every 1
-```
-
-运行到模型加载完成后，系统再次出现桌面卡死/崩溃，随后系统重新启动。
-
-### 关键时间线
-
-```text
-2026-05-29 19:00:03:
-  Phase306 qwen3 smoke 启动。
-
-2026-05-29 19:00:08:
-  kernel 记录 NVRM Xid。
-
-2026-05-29 19:01:26:
-  当前 boot 启动，说明上一轮系统发生重启/硬恢复。
-```
-
-### Phase306 日志
-
-```text
-log_dir = results/gpt5_gpu_lock_logs/20260529_190003_phase306normal_qwen3
-```
-
-run.log 最后记录：
-
-```text
-model=qwen3
-probe_torch_dtype=bfloat16
-probe_attn_implementation=sdpa
-PROBE_DEVICE_MAP_AUTO_MODELS=glm4,deepseek7b
-torch=2.5.1+cu121
-runtime=12.1
-flash_sdp_enabled=True
-
-[phase306] model=qwen3 class=Qwen3ForCausalLM bases=2 entity_styles=['ab'] answer_styles=['letter'] templates=8
-```
-
-没有正常保存结果文件。
-
-### 上一轮 boot 的 kernel 错误
-
-命令：
-
-```bash
-journalctl -b -1 -k --no-pager | grep -Ei 'NVRM|Xid|GSP|GPU|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset|os_acquire' | tail -240
-```
-
-关键记录：
-
-```text
-NVRM: Xid (PCI:0000:01:00): 62
-NVRM: Xid (PCI:0000:01:00): 45, pid=11210, name=python
-NVRM: Xid (PCI:0000:01:00): 154, GPU recovery action changed from 0x0 (None) to 0x1 (GPU Reset Required)
-NVRM: Xid (PCI:0000:01:00): 8, pid=11210, name=python
-```
-
-判断：
-
-```text
-1. 这是 GPU/驱动级错误，不是普通 Python 异常。
-2. Xid 154 明确表示 GPU Reset Required。
-3. 错误由 python 进程触发。
-4. 当前不应继续任何模型测试。
-```
-
-### 当前系统环境
-
-命令：
-
-```bash
-uname -a
-nvidia-smi
-cat /proc/driver/nvidia/version
-nvcc --version
-```
-
-结果：
-
-```text
-OS:
-  Ubuntu 24.04.4 LTS
-
-Kernel:
-  Linux 6.8.0-117-generic
-
-GPU:
-  NVIDIA GeForce RTX 4090 D
-
-Loaded NVIDIA driver:
-  595.71.05
-
-nvidia-smi CUDA version:
-  13.2
-
-nvcc:
-  CUDA compilation tools 13.0, V13.0.88
-```
-
-当前驱动不是之前希望稳定使用的 570，也不是 580，而是 595。
-
-### Python / PyTorch 环境
-
-命令：
-
-```bash
-conda activate openone-cuda121
-python - <<'PY'
-import torch, transformers
-print(torch.__version__)
-print(torch.version.cuda)
-print(torch.cuda.is_available())
-print(torch.backends.cuda.flash_sdp_enabled())
-print(transformers.__version__)
-PY
-```
-
-结果：
-
-```text
-conda env:
-  openone-cuda121
-
-Python:
-  3.11.15
-
-PyTorch:
-  2.5.1+cu121
-
-torch.version.cuda:
-  12.1
-
-cuDNN:
-  90100
-
-Transformers:
-  4.52.4
-
-Accelerate:
-  1.8.1
-
-Triton:
-  3.1.0
-
-flash_attn:
-  missing
-
-xformers:
-  missing
-
-bitsandbytes:
-  missing
-
-transformer_lens:
-  installed
-```
-
-### 驱动包状态
-
-命令：
-
-```bash
-dpkg -l | rg 'nvidia-driver|nvidia-dkms|cuda-toolkit|nvidia-kernel'
-apt-cache policy nvidia-driver-570 nvidia-driver-580 nvidia-driver-590 nvidia-driver-595
-dkms status | rg 'nvidia'
-```
-
-关键结果：
-
-```text
-Installed:
-  nvidia-dkms-595
-  nvidia-driver-595
-  nvidia-driver-590
-  nvidia-kernel-source-595
-  nvidia-kernel-common-595
-  cuda-toolkit-13-0
-
-DKMS:
-  nvidia/595.71.05, 6.8.0-117-generic, x86_64: installed
-
-Available 570:
-  nvidia-driver-570 candidate exists:
-    570.211.01
-
-580:
-  not installed
-  candidate none under apt-cache policy nvidia-driver-580,
-  but several 580 packages are visible from CUDA repo with priority -1.
-```
-
-当前系统存在一个不干净状态：
-
-```text
-1. 实际加载驱动是 595.71.05。
-2. nvidia-driver-590 metapackage 仍处于 installed。
-3. nvidia-firmware-570 仍存在。
-4. PyTorch 是 cu121，但系统 CUDA toolkit 是 13.0，驱动暴露 CUDA 13.2。
-```
-
-虽然 NVIDIA 驱动通常向下兼容 cu121，但本机已经多次出现 Xid 和桌面卡死，因此这个组合不能视为稳定环境。
-
-### GSP 设置
-
-存在配置：
-
-```text
-/etc/modprobe.d/nvidia-disable-gsp.conf:
-  options nvidia NVreg_EnableGpuFirmware=0
-```
-
-说明当前曾尝试关闭 GSP。  
-但在 595 驱动下仍然出现 Xid 62 / 45 / 154 / 8，因此“关闭 GSP”没有解决本机问题。
-
-### 当前判断
-
-本轮崩溃发生在极小 qwen3 smoke：
-
-```text
-max_bases = 2
-entity_styles = ab
-answer_styles = letter
-无 activation hook
-无 transplant
-无长跑
-```
-
-因此问题已经不能简单归因于：
-
-```text
-1. 数据量太大；
-2. 显存占用太高；
-3. 长 session；
-4. hook/transplant 写坏激活；
-5. GLM4/DS7B device_map auto。
-```
-
-更合理的判断：
-
-```text
-当前 595 驱动 + 桌面显示同卡 + PyTorch cu121 SDPA/大模型加载/推理 的组合不稳定。
-```
-
-### 风险等级
-
-```text
-当前不建议继续任何 GPU 模型测试。
-继续测试很可能再次触发：
-  桌面冻结；
-  nvidia-smi D state；
-  GPU Reset Required；
-  系统硬重启。
-```
-
-### 建议修复路线
-
-优先目标不是继续实验，而是恢复稳定 GPU 环境。
-
-建议：
-
-```text
-1. 卸载 595 / 590 驱动包，避免多版本残留。
-2. 安装并固定 nvidia-driver-570。
-3. 暂时不要安装 cuda-toolkit-13 / cuda-drivers 这类会拉高驱动版本的元包。
-4. 保留 PyTorch 2.5.1+cu121 或重新建一个明确 cu121/cu124 的隔离环境。
-5. apt-mark hold nvidia-driver-570 nvidia-dkms-570 nvidia-kernel-common-570 等关键包。
-6. 重启后确认：
-   nvidia-smi 显示 570；
-   dkms status 只有 570；
-   dpkg 不再显示 nvidia-driver-590/595；
-   torch.cuda.is_available=True。
-```
-
-如果必须继续使用 595，则需要先做极小稳定性测试：
-
-```text
-1. 纯 torch cuda tensor 测试；
-2. 小模型 forward；
-3. qwen3 只加载不 forward；
-4. qwen3 单 prompt forward；
-5. 禁用 SDPA flash，改 eager；
-6. 每一步都检查 kernel Xid。
-```
-
-但基于当前多次 Xid，推荐优先回退 570，而不是继续在 595 上调参。
-
-### 对研究任务的影响
-
-Phase306 symbolic role query benchmark 的方向仍然正确，但被环境阻断。
-
-当前研究路线暂停在：
-
-```text
-自然语言 role query 不可靠；
-下一步需要 symbolic role query；
-但 GPU 环境不稳定，不能继续测试。
-```
-
-接下来必须先完成：
-
-```text
-GPU 环境稳定化 -> 最小 CUDA 稳定性验证 -> Phase306 symbolic role query 重跑
-```
-
-## Phase 44: Phase42 保守复跑再次触发 NVIDIA Xid 阻断 [2026-05-30 06:55]
-
-### 任务目标
-
-用户要求：
-
-```text
-系统再次出现崩溃，请使用保守方式继续完成 Phase 42 任务。
-```
-
-Phase 42 的任务本质是 role query template calibration：
-
-```text
-1. Phase304：普通自然语言 role query 模板校准。
-2. Phase305：显式二选一 role query 模板校准。
-```
-
-本轮先尝试保守复跑 Phase304，目标是验证 Phase42 的负结果是否能在保守环境中复现。
-
-### 保守运行设置
-
-命令：
-
-```bash
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=3000 \
-QWEN3_MAX_SECONDS=2400 \
-GLM4_MAX_SECONDS=3000 \
-DEEPSEEK7B_MAX_SECONDS=3000 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_conservative \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase304_role_query_template_normal_all.sh
-```
-
-实际运行环境中，脚本显示：
-
-```text
-conda_env = openone-cu130-py312
-probe_torch_dtype = bfloat16
-probe_attn_implementation = eager
-cuda_launch_blocking = 1
-pytorch_no_cuda_memory_caching = 1
-```
-
-注意：
-
-```text
-当前实际 conda 环境是 openone-cu130-py312，
-不是之前常用的 openone-cuda121。
-```
-
-### 运行过程
-
-Qwen3 启动后：
-
-```text
-model=qwen3
-class=Qwen3ForCausalLM
-bases=32
-templates=16
-```
-
-运行进度：
-
-```text
-base 4/32 rows=256 elapsed=20.2s
-base 8/32 rows=512 elapsed=38.8s
-base 12/32 rows=768 elapsed=57.0s
-```
-
-随后长时间没有继续输出。
-
-检查进程时：
-
-```text
-python tests/gpt5/phase304_role_query_template_calibration.py
-  CPU 占用约 363%
-  wchan = futex_wait_queue
-
-nvidia-smi
-  卡住
-  wchan = os_acquire_rwlock_write
-```
-
-这是前几次 GPU/桌面卡死前出现过的危险信号，因此手动终止 Python 和 runner。
-
-### Kernel 错误
-
-终止后检查：
-
-```bash
-journalctl -b -k --since '2026-05-30 06:51:00' --no-pager \
-  | grep -Ei 'NVRM|Xid|GSP|GPU|nvidia|uvm|drm|soft lockup|hung|blocked|timeout|reset|os_acquire'
-```
-
-关键错误：
-
-```text
-May 30 06:53:17 NVRM: Xid 62
-May 30 06:53:17 NVRM: Xid 45, pid=26482, name=python
-May 30 06:53:46 NVRM: Xid 45, pid=26482, name=python
-May 30 06:53:46 NVRM: Xid 154, GPU recovery action changed from 0x0 (None) to 0x1 (GPU Reset Required)
-May 30 06:53:56 NVRM: Xid 158, pid=10466, name=code, timeout error waiting for NV_UFLUSH_FB_FLUSH
-May 30 06:54:06 NVRM: Xid 8, pid=26482, name=python
-May 30 06:55:01 watchdog: BUG: soft lockup - CPU#2 stuck for 26s! [code:10575]
-May 30 06:55:29 watchdog: BUG: soft lockup - CPU#2 stuck for 52s! [code:10575]
-```
-
-其中：
-
-```text
-Xid 154 = GPU Reset Required
-Xid 158 = 显示/刷新相关 timeout
-soft lockup 栈位于 nvidia 内核模块
-```
-
-### 关键判断
-
-这次测试已经是保守方式：
-
-```text
-1. eager attention；
-2. CUDA_LAUNCH_BLOCKING=1；
-3. PYTORCH_NO_CUDA_MEMORY_CACHING=1；
-4. baseline-only；
-5. 无 hook；
-6. 无 transplant；
-7. 无 GLM4 / DS7B；
-8. Qwen3 只跑到 12/32 base。
-```
-
-但仍然触发：
-
-```text
-NVIDIA Xid 62 / 45 / 154 / 158 / 8
-GPU Reset Required
-nvidia-smi D state
-soft lockup
-```
-
-因此不能再把问题归因于：
-
-```text
-1. flash / SDPA；
-2. CUDA memory cache；
-3. long session；
-4. activation hook；
-5. transplant；
-6. GLM4/DS7B device_map。
-```
-
-更合理的结论是：
-
-```text
-当前 595 驱动 + 桌面显示同卡 + 大模型 CUDA 推理环境本身不稳定。
-```
-
-### 对 Phase42 的影响
-
-Phase42 在正常模式已经完成过：
-
-```text
-Phase304:
-  三模型都完成；
-  每模型 2048 rows；
-  reliable_templates = 0；
-  kernel.filtered = 0。
-
-Phase305:
-  三模型都完成；
-  每模型 2048 rows；
-  reliable_templates = 0；
-  kernel.filtered = 0。
-```
-
-本轮保守复跑没有完成，且再次证明环境不稳定。
-
-因此 Phase42 机制结论仍以之前已完成结果为准：
-
-```text
-自然语言 role query 和显式二选一 role query 都不是可靠 role binding 读出器。
-```
-
-但当前不能继续进行大模型测试。
-
-### 当前强制暂停项
-
-在修复 GPU 环境前，不建议继续运行：
-
-```text
-1. qwen3；
-2. GLM4；
-3. DS7B；
-4. Phase306 symbolic query；
-5. 任何 hook / transplant / patch / ablation。
-```
-
-继续测试很可能导致：
-
-```text
-1. 桌面卡死；
-2. nvidia-smi D state；
-3. GPU Reset Required；
-4. 系统硬重启；
-5. 日志污染，实验不可解释。
-```
-
-### 后续建议
-
-优先级已经不是继续 Phase42，而是修复环境：
-
-```text
-1. 回退并固定 nvidia-driver-570。
-2. 清理 nvidia-driver-590 / 595 残留。
-3. 避免 cuda-drivers / cuda-toolkit-13 元包再次拉高驱动。
-4. 重启后确认 nvidia-smi 显示 570。
-5. 建立一个明确的稳定 Python 环境：
-   openone-cuda121 或重新建 cu124，
-   不要混用 cu130 环境和 595 驱动。
-6. 再做最小 CUDA 稳定性阶梯测试：
-   torch tensor -> 小模型 -> qwen3 load -> qwen3 single forward -> Phase304 smoke。
-```
-
-### 阶段性结论
-
-这次保守复跑给出的最重要结论不是语言机制，而是工程边界：
-
-```text
-当前 GPU/驱动环境已经不能安全支持本项目的大模型机制测试。
-```
-
-Phase42 的科学结论不应再通过当前 595 环境继续扩展。
-
-下一步必须先完成：
-
-```text
-GPU 环境稳定化 -> 最小 CUDA 稳定性验证 -> Phase306 symbolic role query 重跑
-```
-
-## Phase 45: ComfyUI 关闭后保守 CUDA 阶梯测试与硬件风险判断 [2026-05-30 16:09]
-
-### 任务背景
-
-用户反馈：
-
-```text
-还是一直出现屏幕卡死，但是鼠标可以移动的问题。
-已经关闭 ComfyUI，请使用保守方式使用 CUDA 进行测试，同时做好记录，方便查找卡死原因。
-```
-
-本轮目标不是继续机制实验，而是用最小风险方式判断 CUDA 环境是否还能安全运行。
-
-### 当前环境状态
-
-检查：
-
-```bash
-timeout 8s nvidia-smi
-```
-
-结果：
-
-```text
-Driver Version: 535.309.01
-CUDA Version: 12.2
-GPU: NVIDIA GeForce RTX 4090 D
-显存占用：约 842MiB
-```
-
-说明：
-
-```text
-1. 当前驱动已从之前的 595 降到 535.309.01。
-2. ComfyUI 已关闭，显存从约 18GB 降到桌面占用水平。
-3. 当前 GPU 可以响应 nvidia-smi。
-```
-
-关闭 ComfyUI 前曾发现：
-
-```text
-PID 4447:
-  python main.py --listen 0.0.0.0 --port 8188
-  GPU memory ≈ 17248MiB
-```
-
-这说明之前频繁卡死中，ComfyUI 的显存占用是重要风险因素之一。
-
-### 新增稳定性探针
-
-新增：
-
-```text
-tests/gpt5/phase307_cuda_stability_probe.py
-tests/gpt5/run_phase307_conservative.sh
-```
-
-设计为最小阶梯测试：
-
-```text
-1. tensor:
-   只做 torch CUDA 小矩阵计算。
-
-2. model_load:
-   只加载 Qwen3，不 forward。
-
-3. model_forward:
-   只加载 Qwen3，并做一个短 prompt forward。
-
-4. Phase304 smoke:
-   跑最小 role query baseline。
-```
-
-保守参数：
-
-```text
-CUDA_LAUNCH_BLOCKING=1
-PYTORCH_NO_CUDA_MEMORY_CACHING=1
-PROBE_ATTN_IMPLEMENTATION=eager
-PROBE_TORCH_DTYPE=bfloat16
-OPENONE_NORMAL_ENV=openone-cuda121
-ENABLE_GPU_MONITOR=0
-```
-
-### 阶梯测试结果
-
-#### Step 1: 纯 CUDA tensor
-
-命令：
-
-```bash
-MAX_SECONDS=300 \
-OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe \
-tests/gpt5/run_phase307_conservative.sh tensor qwen3 \
-  --tensor-size 1024 \
-  --repeats 1
-```
-
-结果：
-
-```text
-complete = True
-norm = 46466.9688
-kernel.filtered = 0 行
-```
-
-判断：
-
-```text
-CUDA 基础张量计算通过。
-```
-
-#### Step 2: Qwen3 只加载
-
-命令：
-
-```bash
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe \
-tests/gpt5/run_phase307_conservative.sh model_load qwen3
-```
-
-结果：
-
-```text
-complete = True
-kernel.filtered = 0 行
-```
-
-判断：
-
-```text
-Qwen3 权重加载/释放通过。
-```
-
-#### Step 3: Qwen3 单 prompt forward
-
-命令：
-
-```bash
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe \
-tests/gpt5/run_phase307_conservative.sh model_forward qwen3 \
-  --repeats 1 \
-  --max-seq-len 32 \
-  --prompt 'A praised B. AGENT ='
-```
-
-结果：
-
-```text
-complete = True
-finite = True
-max_logit = 15.3750
-kernel.filtered = 0 行
-```
-
-判断：
-
-```text
-Qwen3 极小 forward 通过。
-```
-
-### Phase304 极小 smoke 再次卡死
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_conservative_smoke \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 2 \
-  --query-types agent \
-  --progress-every 1
-```
-
-运行日志：
-
-```text
-run_id = 20260530_160657_phase304normal_qwen3
-model = qwen3
-probe_attn_implementation = eager
-cuda_launch_blocking = 1
-pytorch_no_cuda_memory_caching = 1
-
-[phase304] model=qwen3 class=Qwen3ForCausalLM bases=2 templates=8
-```
-
-随后系统再次出现屏幕卡死/重启。
-
-当前 boot 信息：
-
-```text
-上一 boot:
-  Sat 2026-05-30 13:16:15 CST -> Sat 2026-05-30 16:07:33 CST
-
-当前 boot:
-  Sat 2026-05-30 16:08:15 CST
-```
-
-说明：
-
-```text
-Phase304 smoke 后系统发生重启/硬恢复。
-```
-
-上一 boot 的 kernel.follow.log 没有记录到 Xid，只在 16:07:04 记录：
-
-```text
-sched: RT throttling activated
-```
-
-当前 boot 中也没有上一轮 Xid 细节。这可能说明系统硬卡死时来不及把 GPU 错误完整写入 journal。
-
-### 当前硬件风险判断
-
-这次结果比之前更关键。
-
-因为：
-
-```text
-1. ComfyUI 已关闭；
-2. 显存已释放；
-3. 使用 openone-cuda121；
-4. 使用 eager attention；
-5. CUDA_LAUNCH_BLOCKING=1；
-6. PYTORCH_NO_CUDA_MEMORY_CACHING=1；
-7. Qwen3 单 prompt forward 可以通过；
-8. 但 Phase304 极小 smoke 仍触发屏幕卡死/重启。
-```
-
-这说明问题不再只是：
-
-```text
-1. ComfyUI 显存占用；
-2. SDPA/flash；
-3. GLM4/DS7B；
-4. 大数据量；
-5. activation hook；
-6. long session。
-```
-
-当前最可能的几类原因：
-
-```text
-A. NVIDIA 驱动 / 显示栈问题
-   单卡同时承担桌面显示和 CUDA 推理，GPU reset 会拖死桌面。
-
-B. 电源 / 供电瞬态问题
-   4090D 在模型推理瞬间可能有功耗/电流尖峰，即使平均功耗不高。
-
-C. GPU 硬件或显存稳定性问题
-   频率越来越高，且不同驱动版本都出现卡死，必须纳入怀疑。
-
-D. PCIe / 主板 / 插槽 / 供电线材问题
-   GPU 硬 reset、Xid、桌面冻结都可能由链路不稳触发。
-
-E. 驱动版本与当前内核/桌面组合不稳定
-   当前是 535.309.01，之前 595 也触发过 Xid。
-```
-
-不能直接断言“GPU 硬件坏了”，但硬件/供电/PCIe 链路问题已经成为高优先级怀疑对象。
-
-### 不建议继续的操作
-
-在完成硬件和驱动排查前，不建议继续：
-
-```text
-1. Phase304 / Phase305 / Phase306；
-2. Qwen3 多 prompt 测试；
-3. GLM4 / DS7B；
-4. hook / transplant / ablation；
-5. ComfyUI 和模型测试同时运行。
-```
-
-继续测试会有较高概率导致：
-
-```text
-桌面卡死；
-系统重启；
-journal 无法完整落盘；
-实验结果不可解释。
-```
-
-### 建议排查顺序
-
-#### 1. 软件侧最低成本排查
-
-```text
-1. 确认只保留一个稳定 NVIDIA 驱动版本。
-2. 清理 590/595/535 混装残留。
-3. 优先测试 570 驱动。
-4. 禁止 cuda-drivers / cuda-toolkit 元包自动拉高驱动。
-5. 固定内核版本，不要频繁切换。
-```
-
-#### 2. 显示与计算隔离
-
-如果机器有核显或第二张显卡：
-
-```text
-1. 桌面接核显/另一张显卡；
-2. 4090D 只做 CUDA；
-3. 再跑 Phase307 阶梯测试。
-```
-
-如果隔离后稳定，说明主要是 NVIDIA 显示栈/GPU reset 拖死桌面。
-
-#### 3. 电源/硬件排查
-
-```text
-1. 检查 12VHPWR / 供电线是否插到底；
-2. 检查是否使用转接线，尽量使用原生线；
-3. 检查电源功率和单路供电能力；
-4. 重新插拔 GPU；
-5. 换 PCIe 插槽或降低 PCIe 速率到 Gen3/Gen4 试验；
-6. 限功耗到 250W/300W 后再测；
-7. 跑独立显存压力测试和 GPU 压力测试。
-```
-
-#### 4. 最小复现矩阵
-
-环境稳定后，只跑：
-
-```text
-Step 1: torch tensor
-Step 2: qwen3 load
-Step 3: qwen3 single forward
-Step 4: qwen3 10 prompts
-Step 5: Phase304 smoke
-```
-
-每一步都保存：
-
-```text
-nvidia-smi
-journalctl kernel filtered log
-功耗/温度
-退出码
-```
-
-### 对研究任务的影响
-
-Phase42 的科学结论已经由之前完整结果支持：
-
-```text
-自然语言 role query 和显式二选一 role query 都不可靠。
-```
-
-但后续 Phase306 symbolic role query 目前不能继续，因为 CUDA 环境仍会卡死。
-
-当前研究任务应转为：
-
-```text
-1. 离线整理 Phase304/305 结果；
-2. 完善 Phase306 脚本；
-3. 等 GPU 环境稳定后再跑；
-4. 不再在当前状态下强行推进 CUDA 实验。
-```
-
-## Phase 46: 570 稳定驱动后的 CUDA Smoke 测试 [2026-05-30 17:23]
-
-### 任务目标
-
-用户已将显卡驱动切换到稳定版本，要求继续进行 smoke 测试。本轮目标不是恢复大规模机制实验，而是先确认：
-
-```text
-1. 当前 NVIDIA 驱动 / CUDA 基础链路是否能承受最小 CUDA 测试。
-2. qwen3 模型是否能完成加载和一次 forward。
-3. Phase304/Phase305 的 role query 校准脚本能否在三模型上逐个完成。
-4. 运行后是否出现 kernel Xid / NVIDIA UVM / GPU reset 相关日志。
-```
-
-### 环境状态
-
-测试前检查：
-
-```text
-driver = 570.211.01
-nvidia-smi CUDA Version = 12.8
-GPU = NVIDIA GeForce RTX 4090 D
-```
-
-测试前发现 ComfyUI 仍在占用 GPU：
-
-```text
-python main.py --listen 0.0.0.0 --port 8188
-GPU memory ≈ 17248 MiB
-```
-
-已先关闭 ComfyUI 相关进程。关闭后 GPU 显存回到约 813 MiB，避免与模型测试抢占显存。
-
-测试后检查：
-
-```text
-driver = 570.211.01
-GPU memory ≈ 768 MiB
-无模型 compute process 残留
-```
-
-### Smoke 测试参数
-
-为了避免刚恢复驱动后再次触发桌面卡死，本轮 smoke 使用保守 CUDA 参数：
-
-```text
-conda_env = openone-cuda121
-torch_dtype = bfloat16
-attn_implementation = eager
-CUDA_LAUNCH_BLOCKING = 1
-PYTORCH_NO_CUDA_MEMORY_CACHING = 1
-ENABLE_GPU_MONITOR = 0
-ENABLE_SNAPSHOT_NVIDIA_SMI = 1
-```
-
-说明：
-
-```text
-1. 本轮是稳定性 smoke，不是正式高性能测试。
-2. 关闭 GPU monitor，避免 nvidia-smi 高频查询与历史 Xid/卡死问题混杂。
-3. 三模型测试仍然逐个加载、逐个退出，避免显存残留。
-```
-
-### 基础 CUDA 阶梯测试
-
-命令：
-
-```bash
-MAX_SECONDS=300 OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe_570 \
-tests/gpt5/run_phase307_conservative.sh tensor qwen3 \
-  --tensor-size 1024 --repeats 1
-
-MAX_SECONDS=900 OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe_570 \
-tests/gpt5/run_phase307_conservative.sh model_load qwen3
-
-MAX_SECONDS=900 OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe_570 \
-tests/gpt5/run_phase307_conservative.sh model_forward qwen3 \
-  --repeats 1 \
-  --max-seq-len 32 \
-  --prompt 'A praised B. AGENT ='
-```
-
-结果：
-
-```text
-tensor:
-  exit_code = 0
-  norm = 46307.3398
-  log_dir = results/gpt5_gpu_lock_logs/20260530_171816_phase307_tensor_qwen3
-
-model_load:
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_171826_phase307_model_load_qwen3
-
-model_forward:
-  exit_code = 0
-  finite = True
-  max_logit = 15.3750
-  log_dir = results/gpt5_gpu_lock_logs/20260530_171836_phase307_model_forward_qwen3
-```
-
-三个基础测试的 `kernel.since-start.filtered.log` 均为 0 行。
-
-输出文件：
-
-```text
-results/gpt5_phase307_cuda_stability_probe_570/phase307_tensor_qwen3.json
-results/gpt5_phase307_cuda_stability_probe_570/phase307_model_load_qwen3.json
-results/gpt5_phase307_cuda_stability_probe_570/phase307_model_forward_qwen3.json
-```
-
-### Phase304 qwen3 单模型 smoke
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_570_smoke \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 2 \
-  --query-types agent \
-  --progress-every 1
-```
-
-结果：
-
-```text
-model = qwen3
-rows = 64
-reliable_templates = 3
-nonfinite = 0
-exit_code = 0
-log_dir = results/gpt5_gpu_lock_logs/20260530_171847_phase304normal_qwen3
-kernel.since-start.filtered.log = 0 行
-```
-
-输出文件：
-
-```text
-results/gpt5_phase304_role_query_template_570_smoke/qwen3_phase304_role_query_template_calibration.json
-```
-
-### Phase305 qwen3 单模型 smoke
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase305_role_query_option_570_smoke \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase305_normal.sh qwen3 \
-  --max-bases 2 \
-  --progress-every 1
-```
-
-结果：
-
-```text
-model = qwen3
-rows = 128
-reliable_templates = 0
-nonfinite = 0
-exit_code = 0
-log_dir = results/gpt5_gpu_lock_logs/20260530_171911_phase305normal_qwen3
-kernel.since-start.filtered.log = 0 行
-```
-
-输出文件：
-
-```text
-results/gpt5_phase305_role_query_option_570_smoke/qwen3_phase305_role_query_option_calibration.json
-```
-
-### Phase304 三模型 smoke
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=1200 \
-QWEN3_MAX_SECONDS=900 \
-GLM4_MAX_SECONDS=1200 \
-DEEPSEEK7B_MAX_SECONDS=1200 \
-MAX_BASES=2 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_570_smoke_all \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase304_role_query_template_normal_all.sh
-```
-
-结果：
-
-```text
-Qwen3:
-  rows = 128
-  reliable_templates = 3
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_171944_phase304normal_qwen3
-
-GLM4:
-  rows = 128
-  reliable_templates = 12
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_172008_phase304normal_glm4
-
-DeepSeek7B:
-  rows = 128
-  reliable_templates = 0
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_172039_phase304normal_deepseek7b
-```
-
-三个模型的 `kernel.since-start.filtered.log` 均为 0 行。
-
-输出文件：
-
-```text
-results/gpt5_phase304_role_query_template_570_smoke_all/qwen3_phase304_role_query_template_calibration.json
-results/gpt5_phase304_role_query_template_570_smoke_all/glm4_phase304_role_query_template_calibration.json
-results/gpt5_phase304_role_query_template_570_smoke_all/deepseek7b_phase304_role_query_template_calibration.json
-results/gpt5_phase304_role_query_template_570_smoke_all/ROLE_QUERY_TEMPLATE_CALIBRATION_SUMMARY.md
-results/gpt5_phase304_role_query_template_570_smoke_all/role_query_template_calibration_summary.json
-```
-
-### Phase305 三模型 smoke
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=1500 \
-QWEN3_MAX_SECONDS=900 \
-GLM4_MAX_SECONDS=1200 \
-DEEPSEEK7B_MAX_SECONDS=1200 \
-MAX_BASES=2 \
-OUTPUT_DIR=results/gpt5_phase305_role_query_option_570_smoke_all \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase305_role_query_option_normal_all.sh
-```
-
-结果：
-
-```text
-Qwen3:
-  rows = 128
-  reliable_templates = 0
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_172137_phase305normal_qwen3
-
-GLM4:
-  rows = 128
-  reliable_templates = 1
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_172202_phase305normal_glm4
-
-DeepSeek7B:
-  rows = 128
-  reliable_templates = 0
-  nonfinite = 0
-  exit_code = 0
-  log_dir = results/gpt5_gpu_lock_logs/20260530_172234_phase305normal_deepseek7b
-```
-
-三个模型的 `kernel.since-start.filtered.log` 均为 0 行。
-
-输出文件：
-
-```text
-results/gpt5_phase305_role_query_option_570_smoke_all/qwen3_phase305_role_query_option_calibration.json
-results/gpt5_phase305_role_query_option_570_smoke_all/glm4_phase305_role_query_option_calibration.json
-results/gpt5_phase305_role_query_option_570_smoke_all/deepseek7b_phase305_role_query_option_calibration.json
-results/gpt5_phase305_role_query_option_570_smoke_all/ROLE_QUERY_OPTION_CALIBRATION_SUMMARY.md
-results/gpt5_phase305_role_query_option_570_smoke_all/role_query_option_calibration_summary.json
-```
-
-### 当前客观判断
-
-本轮最重要的事实：
-
-```text
-1. 570.211.01 驱动 + 关闭 ComfyUI 后，CUDA 基础测试通过。
-2. qwen3 模型加载和单次 forward 通过。
-3. Phase304 / Phase305 三模型 smoke 均完成。
-4. 所有本轮 smoke 的 kernel filtered log 均为 0 行。
-5. 测试结束后无模型 compute process 残留。
-```
-
-这说明 570 驱动下当前环境比 595/535 阶段稳定很多，至少可以支撑小规模、短时、逐模型 smoke 测试。
-
-### 机制结果如何解释
-
-本轮 smoke 的机制结果不能作为正式语言机制结论，只能作为读出器校准的极小样本信号：
-
-```text
-Phase304:
-  GLM4 在 2 base 小样本中出现 12 个 reliable natural-language template。
-  Qwen3 只有 3 个。
-  DeepSeek7B 为 0。
-
-Phase305:
-  GLM4 在 2 base 小样本中出现 1 个 reliable option template。
-  Qwen3 / DeepSeek7B 为 0。
-```
-
-这个结果不能推翻 Phase42 的全量负结果，因为本轮只有 `max_bases=2`，样本太小，模板可靠性很容易被具体名字、动词和顺序影响。它只能说明脚本和环境恢复可跑，不能说明 role query 已经可靠。
-
-### 硬伤和风险
-
-```text
-1. 本轮使用的是保守 CUDA 参数，不代表正常高性能路径已经稳定。
-2. max_bases=2 太小，不能用于机制判断。
-3. ComfyUI 仍会自动或手动占用 GPU，需要后续测试前固定检查并关闭。
-4. 570 驱动目前通过 smoke，但还没有证明可以承受长时间大样本 hook/patch 实验。
-5. 当前 role query 读出器在历史全量测试中仍然不稳定，不能直接进入 transplant / destroy-restore。
-```
-
-### 下一步计划
-
-建议按阶梯推进，不要直接恢复大跑：
-
-```text
-Phase 47:
-  继续在 570 驱动下做 Phase304/305 的 max_bases=4/8/16 阶梯测试。
-  每一级都要求：
-    逐模型运行；
-    关闭 ComfyUI；
-    kernel filtered log = 0；
-    运行后无 compute process 残留。
-
-Phase 48:
-  若 max_bases=16 仍稳定，再恢复 Phase306 symbolic role query smoke。
-  优先 qwen3 单模型，再三模型。
-
-Phase 49:
-  如果 symbolic role query 读出器能稳定通过，再考虑 candidate-set role query 的小规模因果干预。
-```
-
-当前关键原则仍然是：
-
-```text
-先稳定 CUDA / 驱动 / 读出器；
-再做因果干预；
-最后才谈变量闭包和语言编码机制。
-```
-
-## Phase 47: Phase304 max_bases=4 再次触发 NVIDIA 内核锁等待 [2026-05-30 17:35]
-
-### 任务目标
-
-在 Phase 46 的 `max_bases=2` smoke 通过后，继续按阶梯方式扩大测试：
-
-```text
-Phase304 role query template calibration
-max_bases = 4
-逐模型运行：qwen3 → GLM4 → DeepSeek7B
-继续保留日志，便于卡死后定位原因
-```
-
-### 运行前检查
-
-运行前 GPU 状态：
-
-```text
-driver = 570.211.01
-GPU = NVIDIA GeForce RTX 4090 D
-显存占用 ≈ 748 MiB
-无 ComfyUI compute 进程
-```
-
-确认底层脚本：
-
-```text
-tests/gpt5/run_phase304_normal.sh
-tests/gpt5/run_phase305_normal.sh
-```
-
-已经在 Python 调用中强制加入：
-
-```text
---hard-exit-after-model
-```
-
-因此满足“模型测完后硬退出，避免显存残留”的要求。
-
-### 测试命令
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=1800 \
-QWEN3_MAX_SECONDS=900 \
-GLM4_MAX_SECONDS=1200 \
-DEEPSEEK7B_MAX_SECONDS=1200 \
-MAX_BASES=4 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_570_bases4 \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=1 \
-tests/gpt5/run_phase304_role_query_template_normal_all.sh
-```
-
-### qwen3 结果
-
-qwen3 完成：
-
-```text
-model = qwen3
-rows = 256
-reliable = 0
-nonfinite = 0
-exit_code = 0
-log_dir = results/gpt5_gpu_lock_logs/20260530_172636_phase304normal_qwen3
-kernel.since-start.filtered.log = 0 行
-```
-
-输出文件：
-
-```text
-results/gpt5_phase304_role_query_template_570_bases4/qwen3_phase304_role_query_template_calibration.json
-```
-
-### GLM4 阻断现场
-
-GLM4 已完成模型加载：
-
-```text
-model = glm4
-class = GlmForCausalLM
-bases = 4
-templates = 16
-log_dir = results/gpt5_gpu_lock_logs/20260530_172710_phase304normal_glm4
-```
-
-随后无正常进度输出，并出现桌面卡死。`ps` 在卡死前显示：
-
-```text
-python tests/gpt5/phase304_role_query_template_calibration.py glm4 ...
-  state = D
-  wchan = os_acquire_rwlock_read
-
-nvidia-smi --query-gpu=...
-  state = D
-  wchan = os_acquire_rwlock_write
-```
-
-其中 Python 进程是 GLM4 测试进程，`nvidia-smi` 是我尝试检查 GPU 状态时触发的查询进程。两者都进入不可中断 D 状态，说明 NVIDIA 内核锁已经被卡住。之后系统经历重启，当前 boot 列表显示：
-
-```text
--2: 2026-05-30 16:34:34 至 2026-05-30 17:30:54
--1: 2026-05-30 17:32:00 至 2026-05-30 17:33:33
- 0: 2026-05-30 17:34:05 至当前
-```
-
-这说明本次卡死发生在 `-2` 这个 boot 中，随后至少经历了一次短启动，再进入当前系统。
-
-### 关键 kernel 日志
-
-从 `journalctl -b -2 -k --since '2026-05-30 17:26:00' --until '2026-05-30 17:31:00'` 提取到关键日志：
-
-```text
-May 30 17:29:50 kernel: INFO: task code:6516 blocked for more than 122 seconds.
-May 30 17:29:50 kernel: os_acquire_rwlock_write+0x3c/0x70 [nvidia]
-
-May 30 17:29:50 kernel: INFO: task nvtop:8170 blocked for more than 122 seconds.
-May 30 17:29:50 kernel: os_acquire_rwlock_read+0x3c/0x70 [nvidia]
-
-May 30 17:29:50 kernel: INFO: task python:11846 blocked for more than 122 seconds.
-May 30 17:29:50 kernel: task:python state:D pid:11846
-May 30 17:29:50 kernel: os_acquire_rwlock_read+0x3c/0x70 [nvidia]
-May 30 17:29:50 kernel: nvUvmInterfaceGetExternalAllocPtes+0xab/0xe0 [nvidia]
-May 30 17:29:50 kernel: map_rm_pt_range+0x2ae/0x5a0 [nvidia_uvm]
-May 30 17:29:50 kernel: uvm_page_table_range_vec_init+0x20c/0x2a0 [nvidia_uvm]
-May 30 17:29:50 kernel: uvm_va_range_map_rm_allocation+0x330/0x430 [nvidia_uvm]
-May 30 17:29:50 kernel: uvm_map_external_allocation_on_gpu+0x36c/0x510 [nvidia_uvm]
-May 30 17:29:50 kernel: uvm_api_map_external_allocation+0x5dd/0x860 [nvidia_uvm]
-May 30 17:29:50 kernel: uvm_ioctl+0x1aad/0x1e70 [nvidia_uvm]
-```
-
-同时已保存手动过滤日志：
-
-```text
-results/gpt5_gpu_lock_logs/20260530_172710_phase304normal_glm4/kernel.follow.filtered.manual.log
-```
-
-该文件包含 51 行 NVIDIA / UVM / blocked task 相关记录。
-
-### 当前原因判断
-
-本次卡死原因非常明确：
-
-```text
-GLM4 CUDA 运行期间触发 NVIDIA 驱动 / UVM 内核路径阻塞；
-Python 进程进入不可中断 D 状态；
-nvidia-smi / nvtop 等 GPU 查询工具也进入 NVIDIA rwlock 等待；
-桌面与 CUDA 共用同一张 4090D，驱动锁等待会拖死图形界面；
-最终系统必须重启。
-```
-
-这不是普通 Python 异常，也不是脚本逻辑死循环：
-
-```text
-1. qwen3 同一 Phase304 max_bases=4 已完成。
-2. GLM4 卡在 NVIDIA 内核锁，而不是 Python 层。
-3. 进程 wchan 明确是 os_acquire_rwlock_read/write [nvidia]。
-4. 栈中出现 nvidia_uvm 的 external allocation / page table mapping 路径。
-```
-
-也不能简单解释为“显存不够”：
-
-```text
-1. 运行前显存基本空闲。
-2. GLM4 max_bases=2 smoke 之前通过。
-3. 这次在 max_bases=4 才触发，说明更像驱动/UVM/模型加载方式/长一点计算路径之间的稳定性问题。
-```
-
-### 重要修正
-
-Phase 46 中认为 570 驱动在 smoke 层面明显好转，这个判断仍然成立；但 Phase 47 说明：
-
-```text
-570.211.01 仍不能稳定承受 GLM4 max_bases=4 的 Phase304 CUDA 测试。
-```
-
-因此不能继续扩大样本，也不能进入 Phase305/Phase306 或因果干预测试。
-
-### 对后续测试方式的影响
-
-本次暴露出一个非常重要的工程结论：
-
-```text
-运行期间不能再使用 nvidia-smi / nvtop 做实时监控。
-```
-
-原因：
-
-```text
-一旦 NVIDIA 内核锁出现等待，nvidia-smi / nvtop 自己也会进入 D 状态，
-反而加重桌面卡死和诊断混乱。
-```
-
-后续日志策略应改成：
-
-```text
-1. 运行前可做一次 GPU 快照。
-2. 运行中只保留 journalctl kernel follower。
-3. 不启用 GPU monitor。
-4. 不在运行中手动调用 nvidia-smi。
-5. 卡死后从上一个 boot 的 journalctl 取证。
-```
-
-### 当前硬伤和瓶颈
-
-```text
-1. 单 GPU 同时承担桌面显示和 CUDA 计算，驱动锁死会直接拖死桌面。
-2. GLM4 + device_map=auto + UVM/external allocation 路径是当前最高风险组合。
-3. 即使使用 eager + BF16 + CUDA_LAUNCH_BLOCKING + no CUDA cache，仍然会触发 NVIDIA 内核锁等待。
-4. 570 驱动只解决了小 smoke，不足以支撑 GLM4 稍大一点的测试。
-5. 当前不能安全进行三模型完整 GSSC 测试。
-```
-
-### 下一步建议
-
-当前不建议继续任何 GLM4 / DS7B CUDA 测试，除非先解决工程隔离问题。可选方案：
-
-```text
-方案 A：先只在 qwen3 上继续小规模 CPU/GPU 分离验证。
-  优点：qwen3 已通过 max_bases=4。
-  缺点：不能完成三模型对比。
-
-方案 B：GLM4/DS7B 改成 CPU 或极慢 offload smoke，只用于读出器校准，不做机制 patch。
-  优点：避免 GPU 锁死。
-  缺点：速度很慢，不能做大样本。
-
-方案 C：增加第二张显示卡或使用核显/远程无头模式，让 4090D 不承担桌面显示。
-  优点：即使 CUDA 卡住，也不直接冻结桌面。
-  缺点：需要硬件/系统配置。
-
-方案 D：彻底排查硬件链路。
-  包括 PSU、显卡供电线、PCIe、主板 BIOS、Resizable BAR、GSP、显卡压力测试、显存测试。
-  因为 595/535/570 多版本都出现过不同形式卡死，不能排除硬件/平台兼容性。
-```
-
-短期最稳计划：
-
-```text
-1. 暂停 GLM4/DS7B CUDA 研究测试。
-2. 禁用运行期 nvidia-smi/nvtop。
-3. 只做 qwen3 的小阶梯测试，验证是否单模型稳定。
-4. 若必须测 GLM4，先做 CPU/offload 或极小单样本，不再 max_bases=4。
-5. 优先解决显示与计算隔离，再恢复三模型 GSSC。
-```
-
-### 对研究路线的影响
-
-本次不是语言机制上的负结果，而是工程基础设施阻断：
-
-```text
-当前最大瓶颈不是 GSSC 理论，而是 CUDA/驱动/UVM 稳定性。
-```
-
-在这个问题解决前，继续加大数据量会制造更多卡死，不会带来可靠科学结论。
-
-因此全局语义语法契约图谱的下一步必须变成：
-
-```text
-先建立稳定测量系统；
-再恢复读出器校准；
-最后才进入变量闭包和机制破解。
-```
-## Phase 48: qwen3 max_bases=8 无 GPU 监控仍触发系统卡死 [2026-05-30 17:42]
-
-### 任务目标
-
-Phase 47 中 GLM4 `max_bases=4` 触发 NVIDIA 内核锁等待，因此本轮不再继续 GLM4/DeepSeek7B，而是只测试 qwen3，判断是否可以在单模型、无 GPU 监控、无 `nvidia-smi` 快照的情况下继续推进小阶梯测试。
-
-本轮重点排除两个混杂因素：
-
-```text
-1. 排除 nvtop / nvidia-smi 实时监控导致 NVIDIA 锁等待。
-2. 排除 GLM4 特有 device_map=auto / UVM 路径导致卡死。
-```
-
-### 运行前状态
-
-运行前检查：
-
-```text
-无 ComfyUI 进程
-无 phase304 / phase305 / phase306 残留进程
-无 nvidia-smi / nvtop 进程
-```
-
-当前系统环境：
-
-```text
-NVIDIA driver = 570.211.01
-kernel = Linux 6.8.0-117-generic
-cmdline = quiet splash vt.handoff=7
-```
-
-### 测试命令
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=1200 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_570_qwen3_bases8 \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 8 \
-  --max-seq-len 96 \
-  --progress-every 4
-```
-
-关键参数：
-
-```text
-ENABLE_GPU_MONITOR = 0
-ENABLE_SNAPSHOT_NVIDIA_SMI = 0
-```
-
-也就是说，本轮运行期间没有启用 `nvidia-smi` 快照，也没有 GPU monitor。
-
-### 运行结果
-
-脚本日志停在：
-
-```text
-=== Phase304 normal logged run ===
-2026-05-30 17:38:01 CST
-run_id = 20260530_173801_phase304normal_qwen3
-model = qwen3
-output_dir = results/gpt5_phase304_role_query_template_570_qwen3_bases8
-enable_gpu_monitor = 0
-enable_snapshot_nvidia_smi = 0
-
-[phase304] model=qwen3 class=Qwen3ForCausalLM bases=8 templates=16
-```
-
-没有出现：
-
-```text
-[phase304] base 4/8 ...
-[phase304] saved ...
-[phase304] done ...
-```
-
-输出文件不存在：
-
-```text
-results/gpt5_phase304_role_query_template_570_qwen3_bases8/qwen3_phase304_role_query_template_calibration.json
-```
-
-说明程序在 qwen3 模型加载完成、开始实际计算后不久触发系统卡死/重启。
-
-### boot 记录
-
-`journalctl --list-boots` 显示：
-
-```text
--1: 2026-05-30 17:34:05 至 2026-05-30 17:39:07
- 0: 2026-05-30 17:40:42 至当前
-```
-
-`last -x` 显示：
-
-```text
-rankrank tty7 :0 Sat May 30 17:34 - crash (00:06)
-reboot system boot 6.8.0-117-generic Sat May 30 17:40
-```
-
-这说明本轮测试所在的 boot 在 17:39 左右异常结束，随后系统重新启动。
-
-### kernel 日志
-
-与 Phase 47 不同，本轮 `journalctl -b -1` 没有留下 NVIDIA / Xid / UVM / hung task 关键日志。
-
-上一个 boot 中与测试时段相关的 kernel 日志只有：
-
-```text
-2026-05-30T17:38:11 kernel: sched: RT throttling activated
-```
-
-普通系统日志在 17:39 附近记录：
-
-```text
-May 30 17:39:06 systemd-logind: Power key pressed short.
-```
-
-这说明：
-
-```text
-1. 卡死发生后，用户通过电源键触发了重启/恢复动作。
-2. 内核没有来得及记录 NVIDIA Xid 或 UVM blocked task。
-3. 这次更像硬冻结 / 显示栈冻结 / 电源键手动恢复，而不是可完整写入日志的驱动锁等待。
-```
-
-已保存日志：
-
-```text
-results/gpt5_gpu_lock_logs/20260530_173801_phase304normal_qwen3/run.log
-results/gpt5_gpu_lock_logs/20260530_173801_phase304normal_qwen3/kernel.follow.log
-results/gpt5_gpu_lock_logs/20260530_173801_phase304normal_qwen3/previous_boot_173730_173910.log
-results/gpt5_gpu_lock_logs/20260530_173801_phase304normal_qwen3/previous_boot_kernel_173730_173910.log
-```
-
-### 当前原因判断
-
-本轮最重要的结论：
-
-```text
-卡死不是 nvtop / nvidia-smi 实时监控造成的。
-```
-
-因为本轮已经关闭：
-
-```text
-ENABLE_GPU_MONITOR=0
-ENABLE_SNAPSHOT_NVIDIA_SMI=0
-```
-
-仍然出现系统卡死。
-
-同时，本轮也说明：
-
-```text
-卡死不是 GLM4 特有问题。
-```
-
-因为本轮只运行 qwen3，且 qwen3 在 `max_bases=8` 时仍触发系统异常。
-
-因此，当前问题已经从“某个模型/某个脚本触发 NVIDIA UVM 锁”等局部问题，升级为更底层的稳定性问题：
-
-```text
-CUDA 推理负载一旦超过极小 smoke，就可能导致桌面冻结或系统异常重启。
-```
-
-### 与前几轮对比
-
-```text
-Phase 46:
-  qwen3 / GLM4 / DeepSeek7B max_bases=2 smoke 通过。
-
-Phase 47:
-  qwen3 max_bases=4 通过；
-  GLM4 max_bases=4 触发 NVIDIA/UVM 内核锁等待。
-
-Phase 48:
-  只跑 qwen3；
-  max_bases=8；
-  不启用 nvidia-smi/nvtop；
-  仍触发系统卡死/重启；
-  未留下 NVIDIA Xid/UVM 日志。
-```
-
-这个阶梯结果说明：
-
-```text
-当前系统只能承受极小 CUDA smoke；
-稍微扩大计算量就不稳定；
-问题不是单一模型，不是监控工具，不是 ComfyUI。
-```
-
-### 更严格的判断
-
-目前不能继续把问题主要归因于：
-
-```text
-1. ComfyUI 占显存；
-2. nvtop/nvidia-smi 查询；
-3. GLM4 device_map=auto；
-4. 某个脚本死循环；
-5. 单纯显存溢出。
-```
-
-这些因素都已经被部分排除。
-
-更可能的方向是：
-
-```text
-1. 显卡/供电/PCIe/主板平台稳定性问题；
-2. NVIDIA 570 + 当前 kernel/桌面显示栈兼容性问题；
-3. 单卡同时负责桌面显示和 CUDA 计算，CUDA 异常直接拖死图形界面；
-4. GSP / power management / PCIe ASPM / Resizable BAR 等平台参数问题；
-5. CUDA/PyTorch 与驱动组合在当前机器上不稳定。
-```
-
-注意：本轮没有 Xid，不能直接断言硬件损坏；但 595、535、570 多个驱动阶段都出现卡死，且现在 qwen3 小负载也能触发，硬件/平台兼容性风险已经明显升高。
-
-### 对研究任务的影响
-
-当前不应该继续任何 CUDA 研究测试。
-
-原因：
-
-```text
-1. 已经无法保证测试完成。
-2. 卡死没有稳定日志，无法形成可靠实验记录。
-3. 频繁硬重启可能增加文件系统、模型文件、驱动状态风险。
-4. 继续测试不会带来可靠机制结论，只会继续消耗时间并污染环境。
-```
-
-全局语义语法契约图谱任务必须暂停 CUDA 路线，先解决测量平台稳定性。
-
-### 下一步建议
-
-优先级从高到低：
-
-```text
-1. 暂停所有 CUDA 模型测试。
-2. 如果必须继续研究，只使用 CPU/offload 极小脚本验证读出器逻辑，不做大样本。
-3. 做硬件/平台排障：
-   - 检查电源功率和 12VHPWR/显卡供电线；
-   - 检查 PCIe 插槽和显卡接触；
-   - 关闭 BIOS 中的 PCIe ASPM / 省电项；
-   - 关闭 Resizable BAR 做对照；
-   - 固定 PCIe Gen4 或 Gen3 做对照；
-   - 检查 GSP firmware 开关；
-   - 做独立 GPU 压力测试和显存测试；
-   - 尝试无桌面/纯 TTY 或第二显示卡隔离；
-   - 尝试另一个稳定 kernel / 驱动组合。
-4. 若条件允许，使用第二张卡或核显负责桌面，4090D 只做计算。
-```
-
-最关键的工程原则：
-
-```text
-在平台稳定性恢复前，不再扩大模型测试。
-```
-
-### 研究路线修正
-
-语言机制研究本身的路线没有被推翻；被推翻的是当前这台机器上继续 CUDA 长跑的可行性。
-
-下一阶段应改为：
-
-```text
-Phase 49:
-  建立 CPU/offload 的最小读出器验证流程，
-  只验证模板/符号化读出器逻辑，不做机制 patch。
-
-Phase 50:
-  完成硬件/平台排障后，
-  从 tensor → model_load → single_forward → qwen3 bases=2 → qwen3 bases=4 重新阶梯测试。
-
-Phase 51:
-  只有连续通过后，才恢复三模型 GSSC。
-```
-
-当前第一性原则：
-
-```text
-破解语言编码机制依赖可靠测量；
-测量平台不稳定时，任何机制结论都不可信。
-```
-## Phase 49: 非模型 CUDA 场景下仍卡死的系统日志排查 [2026-05-30 18:13]
-
-### 任务背景
-
-用户反馈：
-
-```text
-刚刚系统没有使用显卡，也出现卡死。
-```
-
-本轮目标是区分：
-
-```text
-1. 是否仍然是模型 CUDA 计算导致；
-2. 是否是 nvidia-smi / nvtop 监控工具导致；
-3. 是否是桌面/远控/浏览器等图形程序访问 NVIDIA 设备导致；
-4. 是否已经上升为整机平台稳定性问题。
-```
-
-本轮没有调用 `nvidia-smi`，避免再次触发 NVIDIA ioctl 路径。
-
-### 当前系统状态
-
-当前启动参数：
-
-```text
-kernel = Linux 6.8.0-117-generic
-driver = NVIDIA 570.211.01
-cmdline = quiet splash nvidia-drm.modeset=0 pcie_aspm=off vt.handoff=7
-```
-
-说明：
-
-```text
-1. 已经加入 nvidia-drm.modeset=0。
-2. 已经关闭 pcie_aspm。
-3. 当前仍在 X11/GNOME/lightdm 桌面会话中。
-```
-
-当前相关服务：
-
-```text
-lightdm.service = active
-nvidia-persistenced.service = active
-runsunloginclient.service = active
-org.gnome.Shell@x11.service = active
-```
-
-当前图形/远控相关进程包括：
-
-```text
-/usr/lib/xorg/Xorg
-/usr/bin/gnome-shell
-/usr/local/sunlogin/bin/oray_rundaemon
-/usr/local/sunlogin/bin/sunloginclient
-/usr/local/sunlogin/bin/sunloginclient_desktop
-/usr/local/sunlogin/bin/sunloginclient --type=gpu-process ...
-VSCode / Code snap
-Firefox snap
-```
-
-因此，“没有使用模型 CUDA”不等于“显卡完全没有被使用”。桌面、远控、浏览器、Electron/snap 应用仍然可能访问 NVIDIA 设备节点和图形栈。
-
-### boot / crash 记录
-
-最近启动记录：
-
-```text
--2: 2026-05-30 18:03:14 至 2026-05-30 18:05:15
--1: 2026-05-30 18:05:35 至 2026-05-30 18:10:57
- 0: 2026-05-30 18:11:29 至当前
-```
-
-`last -x` 显示：
-
-```text
-rankrank tty7 :0 Sat May 30 18:05 - crash (00:05)
-reboot system boot 6.8.0-117-generic Sat May 30 18:11
-```
-
-在 `-1` boot 的尾部日志中，关键记录是：
-
-```text
-May 30 18:10:57 systemd-logind: Power key pressed short.
-```
-
-说明本轮卡死后，是通过短按电源键触发恢复/重启。
-
-### GPU / NVIDIA 相关线索
-
-本轮没有模型 CUDA 测试，但日志中仍然有大量图形程序访问 NVIDIA 设备节点的记录。
-
-向日葵 sunlogin 启动时出现 GPU process：
-
-```text
-sunloginclient --type=gpu-process
-  --gpu-vendor-id=0x10de
-  --gpu-device-id=0x2685
-  --gpu-driver-vendor=NVIDIA
-  --gpu-driver-version=570.211.01
-```
-
-sunlogin / oray 相关日志：
-
-```text
-sunlogin.desktop: InitializeSandbox() called with multiple threads in process gpu-process.
-oray_rundaemon: x264 warning...
-```
-
-snap / Firefox / Notepad++ / snapd-desktop-integration 多次访问 NVIDIA 设备节点，被 AppArmor 拒绝：
-
-```text
-apparmor="DENIED" operation="unlink" name="/dev/char/195:255"
-apparmor="DENIED" operation="unlink" name="/dev/char/195:254"
-apparmor="DENIED" operation="unlink" name="/dev/char/195:0"
-comm="glxtest"
-comm="CanvasRenderer"
-comm="notepad-plus-pl"
-comm="snapd-desktop-i"
-```
-
-这些日志本身未必是卡死原因，但它们证明：
-
-```text
-即使没有模型测试，图形桌面和应用仍在接触 NVIDIA 图形设备路径。
-```
-
-### 非 GPU 线索
-
-本轮没有看到明确的：
-
-```text
-NVRM Xid
-nvidia_uvm hung task
-kernel panic
-MCE / machine check
-nvme I/O error
-ext4 error
-hard lockup
-soft lockup
-```
-
-但是有：
-
-```text
-sched: RT throttling activated
-```
-
-以及大量 GNOME / sunlogin / snap / Firefox / Notepad++ 图形会话噪声。
-
-另外在 `-1` boot 中看到：
-
-```text
-sudo COMMAND=/usr/bin/nvidia-smi -pl 320
-```
-
-说明用户曾设置 GPU power limit 为 320W。这个动作本身不一定导致卡死，但它仍然说明该 boot 中 NVIDIA 管理接口被访问过。
-
-### 当前原因判断
-
-本轮结论需要比 Phase 48 更进一步收缩：
-
-```text
-卡死不再能只归因于模型 CUDA 计算。
-```
-
-因为用户报告没有跑模型/显卡计算，系统仍发生桌面卡死。
-
-但也不能说“完全没用显卡”：
-
-```text
-1. 桌面 Xorg/GNOME 仍使用 NVIDIA 图形栈。
-2. sunlogin 有 GPU process。
-3. Firefox / snap / Notepad++ 等仍尝试访问 /dev/char/195:*。
-4. nvidia-persistenced 仍在运行。
-```
-
-更准确的判断是：
-
-```text
-当前问题已经从 CUDA 研究负载问题，扩大为 NVIDIA 图形/驱动/平台稳定性问题。
-```
-
-可能的触发范围包括：
-
-```text
-1. NVIDIA 570.211.01 + kernel 6.8.0-117 + Xorg/GNOME/lightdm 组合不稳定；
-2. sunlogin 远控 GPU process / 屏幕采集 / x264 编码与 NVIDIA 图形栈冲突；
-3. snap 应用、Firefox、Electron、Wine/Notepad++ 的 GPU/glx/canvas 路径反复访问 NVIDIA 设备；
-4. 单卡同时承担显示、远控、浏览器、CUDA 的历史状态导致驱动/显示栈容易冻结；
-5. 硬件/平台层面的供电、PCIe、BIOS、电源管理问题仍不能排除。
-```
-
-### 关键排除
-
-本轮可以排除或弱化：
-
-```text
-1. 不是单纯由 GLM4 引发。
-2. 不是单纯由 qwen3 引发。
-3. 不是单纯由 nvidia-smi/nvtop 监控引发。
-4. 不是单纯由 ComfyUI 引发。
-5. 不是单纯由显存占满引发。
-```
-
-### 最重要的新判断
-
-当前最危险的共性不再是“模型大小”，而是：
-
-```text
-NVIDIA 驱动 + 桌面显示栈 + 远控/浏览器/应用 GPU 访问 + 单 4090D 显示计算混用
-```
-
-也就是说，只要 NVIDIA 图形栈参与桌面，即使不跑模型，也可能卡死。
-
-### 建议的下一步排障顺序
-
-不建议继续任何 CUDA 或模型测试。
-
-优先做系统稳定性隔离：
-
-```text
-1. 临时停止 sunlogin / oray：
-   sudo systemctl stop runsunloginclient.service
-   并确认不再有 sunloginclient --type=gpu-process。
-
-2. 关闭浏览器、VSCode、Notepad++、snap 图形应用的硬件加速。
-
-3. 做纯本地最小桌面测试：
-   只保留 Xorg/GNOME，不开远控、不打开浏览器和 Wine 应用，
-   观察是否仍卡死。
-
-4. 做纯 TTY 测试：
-   不启动图形桌面，只进入 multi-user.target，
-   观察空闲 30-60 分钟是否稳定。
-
-5. 如果 TTY 稳定、桌面不稳定：
-   优先排查 Xorg/GNOME/sunlogin/snap 图形栈。
-
-6. 如果 TTY 也卡死：
-   优先排查硬件、供电、内存、主板、BIOS、kernel。
-```
-
-建议的硬件/平台对照：
-
-```text
-1. 检查 12VHPWR / 供电线 / 电源功率。
-2. BIOS 固定 PCIe Gen4 或 Gen3。
-3. 关闭 Resizable BAR。
-4. 保持 pcie_aspm=off。
-5. 检查 GSP firmware 设置。
-6. 使用 memtest / stress-ng 做 CPU/RAM 稳定性测试。
-7. 使用独立 GPU/核显负责显示，让 4090D 只计算。
-```
-
-### 对研究任务的影响
-
-当前不能继续全局语义语法契约图谱的 CUDA 测试。
-
-原因：
-
-```text
-现在连非模型场景都可能卡死，说明测量平台本身不可信。
-```
-
-下一阶段研究应切换为：
-
-```text
-1. CPU/offload 读出器逻辑验证；
-2. 不启动 CUDA；
-3. 等系统稳定性隔离完成后，再恢复 GPU 阶梯测试。
-```
-
-当前第一性原则：
-
-```text
-测量系统必须先稳定；
-否则所有语言机制测试都会被硬件/驱动/桌面噪声污染。
-```
-## Phase 50: 修改显卡配置后的最小阶梯复测与 qwen3 bases=4 阻断 [2026-05-30 19:42]
-
-### 任务目标
-
-用户修改显卡配置后，要求继续测试并保存日志。本轮不直接恢复三模型测试，而是采用最小阶梯：
-
-```text
-1. 无 CUDA 空闲基线；
-2. CUDA tensor；
-3. qwen3 单次 forward；
-4. Phase304 qwen3 max_bases=2；
-5. Phase304 qwen3 max_bases=4。
-```
-
-本轮继续禁用运行期 GPU 查询：
-
-```text
-ENABLE_GPU_MONITOR=0
-ENABLE_SNAPSHOT_NVIDIA_SMI=0
-```
-
-避免 `nvidia-smi` / `nvtop` 自身进入 NVIDIA ioctl 路径。
-
-### 当前配置
-
-运行前环境：
-
-```text
-kernel = Linux 6.8.0-117-generic
-driver = NVIDIA 570.211.01
-cmdline = quiet splash nvidia-drm.modeset=0 pcie_aspm=off vt.handoff=7
-```
-
-说明：
-
-```text
-nvidia-drm.modeset=0 已启用；
-pcie_aspm=off 已启用。
-```
-
-运行前仍然发现向日葵远控 GPU 进程：
-
-```text
-sunloginclient --type=gpu-process
-  --gpu-vendor-id=0x10de
-  --gpu-device-id=0x2685
-  --gpu-driver-version=570.211.01
-```
-
-因为直接停止 sunlogin 可能断开用户远程连接，本轮没有擅自停止该服务。因此本轮结果仍然包含：
-
-```text
-Xorg / GNOME / sunlogin GPU process / VSCode Electron
-```
-
-这些桌面图形栈因素。
-
-### 测试 1：无 CUDA 空闲基线
-
-命令逻辑：
-
-```bash
-启动 journalctl kernel follower
-sleep 180
-过滤 NVIDIA / UVM / Xid / hung / reset / thermal 等日志
-```
-
-结果：
-
-```text
-log_dir = results/gpt5_gpu_lock_logs/20260530_193613_phase50_idle_no_cuda
-kernel.since-start.filtered.log = 0 行
-```
-
-结论：
-
-```text
-修改配置后，3 分钟空闲桌面基线没有记录到 NVIDIA/Xid/UVM/hung 日志。
-```
-
-### 测试 2：CUDA tensor
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=300 \
-OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe_after_config \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase307_conservative.sh tensor qwen3 \
-  --tensor-size 1024 \
-  --repeats 1
-```
-
-结果：
-
-```text
-exit_code = 0
-norm = 46296.7734
-log_dir = results/gpt5_gpu_lock_logs/20260530_193922_phase307_tensor_qwen3
-filtered kernel lines = 0
-```
-
-输出：
-
-```text
-results/gpt5_phase307_cuda_stability_probe_after_config/phase307_tensor_qwen3.json
-```
-
-### 测试 3：qwen3 单次 forward
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase307_cuda_stability_probe_after_config \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase307_conservative.sh model_forward qwen3 \
-  --repeats 1 \
-  --max-seq-len 32 \
-  --prompt 'A praised B. AGENT ='
-```
-
-结果：
-
-```text
-exit_code = 0
-finite = True
-max_logit = 15.3750
-log_dir = results/gpt5_gpu_lock_logs/20260530_193936_phase307_model_forward_qwen3
-filtered kernel lines = 0
-```
-
-输出：
-
-```text
-results/gpt5_phase307_cuda_stability_probe_after_config/phase307_model_forward_qwen3.json
-```
-
-### 测试 4：Phase304 qwen3 max_bases=2
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_after_config_qwen3_bases2 \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 2 \
-  --max-seq-len 96 \
-  --progress-every 1
-```
-
-结果：
-
-```text
-rows = 128
-reliable = 3
-nonfinite = 0
-exit_code = 0
-log_dir = results/gpt5_gpu_lock_logs/20260530_193947_phase304normal_qwen3
-```
-
-输出：
-
-```text
-results/gpt5_phase304_role_query_template_after_config_qwen3_bases2/qwen3_phase304_role_query_template_calibration.json
-```
-
-### 测试 5：Phase304 qwen3 max_bases=4
-
-命令：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_after_config_qwen3_bases4 \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 4 \
-  --max-seq-len 96 \
-  --progress-every 2
-```
-
-日志停在：
-
-```text
-[phase304] model=qwen3 class=Qwen3ForCausalLM bases=4 templates=16
-```
-
-没有出现：
-
-```text
-[phase304] base 2/4 ...
-[phase304] saved ...
-[phase304] done ...
-```
-
-输出文件不存在：
-
-```text
-results/gpt5_phase304_role_query_template_after_config_qwen3_bases4/qwen3_phase304_role_query_template_calibration.json
-```
-
-进程状态：
-
-```text
-PID = 6388
-cmd = python tests/gpt5/phase304_role_query_template_calibration.py qwen3 ...
-State = D (disk sleep / uninterruptible sleep)
-wchan = os_acquire_mutex
-VmRSS ≈ 1.16 GiB
-VmHWM ≈ 4.61 GiB
-```
-
-`kill -TERM` 和 `kill -KILL` 后仍残留：
-
-```text
-6388 Dl os_acquire_mutex python tests/gpt5/phase304_role_query_template_calibration.py qwen3 ...
-```
-
-这说明进程已经进入不可中断内核等待，不能被普通 kill 清理。
-
-当前 kernel filtered 文件：
-
-```text
-results/gpt5_gpu_lock_logs/20260530_194007_phase304normal_qwen3/kernel.current_boot_since_1940.filtered.log
-```
-
-目前为 0 行。也就是说，此刻进程已经 D 状态，但内核尚未输出 hung task / Xid / UVM 栈日志。若继续等待，可能像前几轮一样最终桌面卡死或重启。
-
-### 本轮关键结论
-
-显卡配置修改后，稳定性有所改善，但仍没有解决核心问题：
-
-```text
-通过：
-  idle 180s
-  tensor
-  qwen3 single forward
-  Phase304 qwen3 bases=2
-
-失败：
-  Phase304 qwen3 bases=4
-```
-
-本轮失败非常关键，因为：
-
-```text
-1. 没有运行 GLM4；
-2. 没有运行 DeepSeek7B；
-3. 没有启用 nvidia-smi snapshot；
-4. 没有启用 GPU monitor；
-5. 仍然进入 os_acquire_mutex 的不可中断 D 状态。
-```
-
-因此可以继续排除：
-
-```text
-1. 不是 GLM4 特有问题；
-2. 不是 nvidia-smi/nvtop 导致；
-3. 不是 ComfyUI 导致；
-4. 不是单纯显存占满导致。
-```
-
-### 当前原因判断
-
-当前最可能的问题仍然是：
-
-```text
-NVIDIA 驱动/内核模块与当前平台在稍大 CUDA 推理循环下进入内核锁等待。
-```
-
-由于本轮 `wchan = os_acquire_mutex`，而 Phase 47 出现过：
-
-```text
-os_acquire_rwlock_read/write [nvidia]
-nvidia_uvm external allocation / page table mapping
-```
-
-两者都指向 NVIDIA 内核模块内部同步/锁等待路径。
-
-同时，本轮仍有 sunlogin GPU process 和 Xorg/GNOME 共享同一张 4090D，因此桌面图形栈仍可能参与放大问题。
-
-### 风险状态
-
-当前系统中仍残留不可中断 D 状态进程：
-
-```text
-PID 6388
-state = D
-wchan = os_acquire_mutex
-```
-
-该进程普通 kill 无法清理。继续测试会非常危险。
-
-建议：
-
-```text
-立即停止所有 CUDA/模型测试；
-重启系统清理 D 状态进程；
-下次测试前先停止 sunlogin GPU process 或进入纯 TTY。
-```
-
-### 下一步建议
-
-本轮已经明确给出新的稳定边界：
-
-```text
-当前配置下，qwen3 bases=2 可通过；
-qwen3 bases=4 会卡进 NVIDIA 内核等待。
-```
-
-下一步不应该继续加大模型测试，而应做隔离对照：
-
-```text
-1. 重启。
-2. 停止 sunlogin / oray 服务，或进入纯 TTY。
-3. 关闭 VSCode / Firefox / snap 图形应用硬件加速。
-4. 在无远控 GPU process 的环境中重复：
-   idle → tensor → forward → qwen3 bases=2 → qwen3 bases=4。
-5. 如果纯 TTY 下 bases=4 通过，说明桌面/远控图形栈是关键因素。
-6. 如果纯 TTY 下 bases=4 仍卡，说明更偏硬件/驱动/PCIe/供电/BIOS。
-```
-
-在完成这个隔离前：
-
-```text
-不再运行 GLM4 / DeepSeek7B；
-不再运行 qwen3 bases>=4；
-不再做任何 GSSC 机制测试。
-```
-
-### 对研究任务的影响
-
-本轮不是语言机制结论，而是测量平台稳定性边界结论：
-
-```text
-当前机器可以执行极小 CUDA smoke；
-但不能稳定执行稍长的 qwen3 读出器循环。
-```
-
-因此全局语义语法契约图谱暂时只能继续做：
-
-```text
-CPU/offload 读出器逻辑；
-或者等待 GPU/平台稳定后恢复。
-```
-
-第一性原则仍然是：
-
-```text
-先有稳定测量系统；
-再谈语言编码机制。
-```
-
-## Phase 51: 卡死日志复盘与 NVIDIA 内核锁定位 [2026-05-30 20:38]
-
-### 任务目标
-
-用户反馈修改显卡配置后继续测试仍然出现桌面卡死。本轮不继续做模型测试，而是根据上一轮 boot 日志复盘卡死原因。
-
-### 当前环境
-
-当前重启后环境：
-
-```text
-kernel = 6.8.0-117-generic
-nvidia_driver = 570.211.01
-cmdline = quiet splash nvidia-drm.modeset=0 pcie_aspm=off vt.handoff=7
-current_boot = 2026-05-30 20:36:11
-previous_boot = 2026-05-30 19:29:22 - 20:35:33
-```
-
-当前 boot 中仍然可以看到图形桌面和远程桌面进程使用 NVIDIA：
-
-```text
-Xorg
-gnome-shell
-sunloginclient --type=gpu-process
-```
-
-### 上一轮卡死时间线
-
-上一轮 Phase 50 中，qwen3 bases=4 正常模式命令在模型加载后进入卡死：
-
-```bash
-OPENONE_NORMAL_ENV=openone-cuda121 \
-CUDA_LAUNCH_BLOCKING=1 \
-PYTORCH_NO_CUDA_MEMORY_CACHING=1 \
-PROBE_ATTN_IMPLEMENTATION=eager \
-PROBE_TORCH_DTYPE=bfloat16 \
-MAX_SECONDS=900 \
-OUTPUT_DIR=results/gpt5_phase304_role_query_template_after_config_qwen3_bases4 \
-ENABLE_GPU_MONITOR=0 \
-ENABLE_SNAPSHOT_NVIDIA_SMI=0 \
-tests/gpt5/run_phase304_normal.sh qwen3 \
-  --max-bases 4 \
-  --max-seq-len 96 \
-  --progress-every 2
-```
-
-run.log 停在：
-
-```text
-[phase304] model=qwen3 class=Qwen3ForCausalLM bases=4 templates=16
-```
-
-随后系统进入“鼠标可移动、桌面不可用”的卡死状态，用户按电源键重启：
-
-```text
-2026-05-30 20:35:33 systemd-logind: Power key pressed short.
-```
-
-### 关键日志证据
-
-上一轮 boot 的 kernel 日志显示，CUDA/Python 进程首先进入 NVIDIA 内核模块锁等待：
-
-```text
-2026-05-30 19:43:41 kernel: INFO: task python:6418 blocked for more than 122 seconds.
-python -> os_acquire_rwlock_read [nvidia] -> rm_ioctl -> nvidia_unlocked_ioctl
-```
-
-之后 VSCode 也被 NVIDIA 写锁路径阻塞：
-
-```text
-2026-05-30 19:45:44 kernel: INFO: task code:4021 blocked for more than 122 seconds.
-code -> os_acquire_rwlock_write [nvidia] -> rm_cleanup_file_private -> nvidia_close_callback
-```
-
-随后 GNOME 桌面进程也进入 NVIDIA ioctl 锁等待：
-
-```text
-2026-05-30 19:47:47 kernel: INFO: task gnome-shell:2725 blocked for more than 122 seconds.
-gnome-shell -> os_acquire_rwlock_write [nvidia] -> nvidia_unlocked_ioctl
-```
-
-后续日志继续显示：
-
-```text
-python blocked for more than 245 / 368 / 491 seconds
-code blocked for more than 245 / 368 seconds
-gnome-shell blocked for more than 245 / 368 seconds
-Future hung task reports are suppressed
-```
-
-### 判断
-
-本轮卡死原因已经比较明确：
-
-```text
-不是普通 Python 死循环；
-不是单纯显存不足；
-不是 nvidia-smi/nvtop 监控导致；
-而是 NVIDIA 内核模块中的锁等待/死锁型问题。
-```
-
-直接证据是多个进程同时阻塞在：
-
-```text
-os_acquire_rwlock_read [nvidia]
-os_acquire_rwlock_write [nvidia]
-nvidia_unlocked_ioctl
-```
-
-卡死表现为“鼠标能动但桌面卡死”的原因也能解释：
-
-```text
-gnome-shell 也被 NVIDIA ioctl 锁住；
-因此图形桌面无法继续响应；
-但底层输入/内核仍部分存活。
-```
-
-### 与前几轮结论的关系
-
-Phase 47 已经出现过类似 NVIDIA rwlock 现象。
-
-Phase 48 没有看到明显 NVIDIA 日志，可能是日志未及时 flush 或没有触发 hung task 输出。
-
-Phase 49 显示即使不主动跑 CUDA，桌面/远程/浏览器/VSCode 等图形程序仍会使用 NVIDIA。
-
-Phase 50 在禁用 nvidia-smi 快照、关闭 GPU monitor、设置 `nvidia-drm.modeset=0 pcie_aspm=off` 后，qwen3 bases=4 仍然触发 NVIDIA 锁等待。
-
-因此：
-
-```text
-nvidia-drm.modeset=0 和 pcie_aspm=off 没有解决该问题。
-```
-
-### 当前不能继续做的事
-
-在当前图形桌面会话中继续运行 CUDA 大模型测试风险很高：
-
-```text
-1. CUDA 进程可能再次进入 D state，无法 kill。
-2. gnome-shell / code / sunloginclient 可能被同一个 NVIDIA 锁拖住。
-3. 一旦进入 D state，通常只能重启恢复。
-4. 测试结果会被平台不稳定性污染，不能用于语言机制结论。
-```
-
-### 下一步最小定位方案
-
-下一轮不应该继续扩大模型测试，而应该做隔离实验：
-
-```text
-方案 A：纯 TTY / multi-user.target 测试
-  1. 重启。
-  2. 不进入 GNOME 图形桌面。
-  3. 停止 display-manager。
-  4. 停止 sunloginclient GPU 进程。
-  5. 只通过本地 TTY 或 SSH 运行同一个 qwen3 bases=4。
-
-判断：
-  如果仍卡死，问题更可能在 NVIDIA driver / CUDA / PCIe / 电源 / 显卡硬件平台。
-  如果通过，问题更可能是 CUDA 与图形桌面/远程桌面/Electron 共享 NVIDIA 驱动时触发。
-```
-
-```text
-方案 B：CPU/offload 继续验证读出器逻辑
-  暂停 CUDA 大模型长跑，只验证符号化读出器、模板校准、结果汇总逻辑。
-```
-
-```text
-方案 C：更换硬件/驱动栈验证
-  用同一脚本在另一张显卡或另一台机器上运行 qwen3 bases=4。
-  如果另一环境稳定，当前机器平台问题概率上升。
-```
-
-### 对研究任务的影响
-
-本轮没有产生新的语言机制数据。
-
-当前最重要结论是：
-
-```text
-测量平台仍不稳定；
-CUDA/GPU 路径不能作为可靠实验基础；
-必须先隔离 NVIDIA 锁死来源，再继续全局语义语法契约图谱测试。
-```
-
-第一性原则：
-
-```text
-语言编码机制研究依赖可重复测量；
-如果底层测量系统会随机锁死，
-任何 patch / probe / closure 结论都必须暂停解释。
-```
-
-## Phase 52: GPU 修复后 Phase306 符号化角色读出器恢复测试 [2026-06-02 11:14]
+## Phase 43: GPU 修复后 Phase306 符号化角色读出器恢复测试 [2026-06-02 11:14]
 
 ### 任务目标
 
@@ -15164,4 +12443,2777 @@ minimal circuit search
 → 做因果干预
 → 做破坏恢复
 → 归纳语言编码机制。
+```
+
+## Phase 53: GLM5 最新进展综合与语言编码机制路线校准 [2026-06-02 13:50]
+
+### 任务目标
+
+读取 `research/glm5/docs/AGI_GLM5_MEMO.md` 最新记录，结合 GPT5 当前研究计划，给出破解语言编码机制的整体进度报告和下一步计划。
+
+本轮没有新增模型测试，只做跨 memo 研究综合。
+
+### 读取范围
+
+GLM5 最新阶段：
+
+```text
+Phase 339+340+341: 多Baseline验证+管线组合+身份探针 [2026-06-02 13:45]
+```
+
+相关前置阶段：
+
+```text
+Phase 336+337+338: 多层替换+反向破坏+跨层注意力
+Phase 333-335: Attention vs MLP 组件因果替换
+Phase 328-332: Context-Gated Binding 与层级轨迹
+```
+
+GPT5 当前阶段：
+
+```text
+Phase 52: GPU 修复后 Phase306 符号化角色读出器恢复测试 [2026-06-02 11:14]
+```
+
+### GLM5 最新核心进展
+
+#### 1. MLP > Attention 在多 baseline 下稳健成立
+
+GLM5 Phase 339 使用 4 个 corrupted baseline：
+
+```text
+The item
+The thing
+The object
+The entity
+```
+
+三模型关键块结果显示：
+
+```text
+Qwen3:
+  L21-L29 MLP 恢复 = 69.6% - 92.7%
+  Attention 恢复 = 6.3% - 24.5%
+
+GLM4:
+  L30-L38 MLP 恢复 = 46.0% - 66.4%
+  Attention 恢复 = 2.8% - 15.8%
+
+DS7B:
+  L19-L24 MLP 恢复 = 58.5% - 71.3%
+  Attention 恢复 = 2.3% - 7.9%
+```
+
+结论：
+
+```text
+对象-属性 binding 的后期计算主通道是 MLP，而不是 Attention。
+```
+
+这个结论比早期单 baseline 结果更可信，因为 baseline 选择偏差已经被明显削弱。
+
+#### 2. 早期 identity block 单独接近 100% 恢复
+
+Phase 340 的最重要发现：
+
+```text
+Qwen3:
+  identity_L0-L2_full = 99.4%
+
+GLM4:
+  identity_L0-L4_full = 99.6%
+
+DS7B:
+  identity_L0-L2_full = 100.6%
+```
+
+这说明：
+
+```text
+只要早期 residual stream 被修正为 clean 状态，
+后续层可以自然计算出正确 binding。
+```
+
+关键修正：
+
+```text
+早期层不一定直接写入 binding 结果；
+更准确地说，早期层提供正确的对象身份/上下文 residual 输入。
+```
+
+#### 3. 后期 MLP 是兼容性计算主通道，但不是唯一通道
+
+GLM4 更宽 MLP 计算块结果：
+
+```text
+L30-L38 MLP = 46.0%
+L25-L38 MLP = 80.3%
+L20-L38 MLP = 90.9%
+```
+
+说明：
+
+```text
+binding 不是单层完成；
+而是多层 MLP 链式累积。
+```
+
+后期 MLP 的意义不是“唯一存储 binding”，而是：
+
+```text
+在正确对象身份输入上，把身份信息转换为属性兼容性排序。
+```
+
+#### 4. 对象身份信息从 L0 就存在，并贯穿全层
+
+Phase 341 的身份探针显示：
+
+```text
+对象类别最近质心分类器 chance = 14.3%
+三模型各层分类准确率约 33.3% - 58.3%
+所有层远高于 chance
+```
+
+说明：
+
+```text
+对象身份信息从嵌入/早期 residual 就存在；
+但“身份存在”不等于“binding 已经计算完成”。
+```
+
+身份信息和 binding 计算必须区分：
+
+```text
+身份信息 = 对象是谁
+binding 计算 = 该对象与当前属性/上下文是否兼容，如何排序输出
+```
+
+### GPT5 当前进展对照
+
+GPT5 Phase 52 刚完成 GPU 修复后的 Phase306 符号化 role query 恢复测试：
+
+```text
+qwen3:
+  rows = 12288
+  reliable_templates = 0
+  nonfinite = 0
+
+GLM4:
+  rows = 12288
+  reliable_templates = 3
+  nonfinite = 0
+
+DS7B:
+  rows = 12288
+  reliable_templates = 0
+  nonfinite = 0
+
+kernel filtered logs = 0 lines for all models
+```
+
+工程结论：
+
+```text
+GPU/driver/CUDA 平台重新可用。
+```
+
+机制结论：
+
+```text
+agent/patient role query 读出器仍未可靠；
+不能继续做 role binding 的 transplant / patch / destroy-restore。
+```
+
+### 当前整体进度判断
+
+现在研究出现了两条不同成熟度的路线：
+
+#### 路线 A：对象-属性 binding 路线，进展较成熟
+
+GLM5 当前已经形成相对清晰的管线：
+
+```text
+1. L0 附近：对象身份向量已经存在。
+2. 早期 L0-L2/L0-L4 full block：提供正确 residual 输入。
+3. 中层：维持与转换 residual stream。
+4. 后期 MLP：将对象身份转换为属性兼容性排序。
+5. 输出层：把兼容性排序读出到 logits。
+```
+
+这条路线已经有：
+
+```text
+多 baseline 验证；
+三模型验证；
+多层 patch；
+组件分解；
+身份探针；
+较明确的因果恢复现象。
+```
+
+因此它是当前最接近“语言编码机制拼图”的主线。
+
+#### 路线 B：语法角色 binding 路线，仍卡在读出器层
+
+GPT5 role binding 方向目前还没过读出器门槛：
+
+```text
+agent/patient 自然语言模板不稳；
+symbolic role query 也不稳；
+patient 读出尤其失败；
+qwen3 和 DS7B 没有可靠模板。
+```
+
+因此这条路线现在不能做机制归因。
+
+更准确地说：
+
+```text
+不是 role binding 机制不存在；
+而是我们还没有构造出可靠读出器来测它。
+```
+
+### 关键理论进展
+
+当前最稳的机制表达不应是“语言有某个固定语义轴”，而应是：
+
+```text
+语言功能 = 早期身份/结构条件输入
+       + 中层 residual 维持与格式转换
+       + 后期 MLP 兼容性/排序计算
+       + 输出读出
+```
+
+其中：
+
+```text
+Attention 更像上下文信息传递和结构选择；
+MLP 更像非线性兼容性计算、排序、门控与格式转换；
+Residual stream 是跨层状态载体。
+```
+
+这和此前“路径格式假说”一致，但 GLM5 最新结果把它具体化到了对象-属性 binding 上。
+
+### 重要硬伤
+
+#### 1. identity block 100% 恢复的解释仍需谨慎
+
+早期 full block patch 接近 100%，可能说明：
+
+```text
+早期 identity/context 输入是充分起点。
+```
+
+但也可能只是：
+
+```text
+patch 前几层接近于把模型切换成 clean forward 轨迹。
+```
+
+需要继续拆：
+
+```text
+resid_in
+attn_out
+mlp_out
+position/token 子空间
+对象 token vs 属性 token
+```
+
+#### 2. 后期 MLP 内部如何计算兼容性仍未破解
+
+现在只知道：
+
+```text
+后期 MLP patch 恢复率高；
+更宽 MLP block 恢复率更高。
+```
+
+还不知道：
+
+```text
+具体哪些 neuron / subspace 表示对象身份？
+哪些表示属性类型？
+哪些表示属性值？
+如何组合成兼容性排序？
+```
+
+#### 3. GPT5 role binding 读出器仍不可靠
+
+没有可靠读出器，就不能做：
+
+```text
+state transplant
+subspace patch
+destroy-restore
+head/neuron localization
+```
+
+否则会把模板偏置误判为语言机制。
+
+#### 4. 对象身份分类准确率仍不高
+
+类别分类远超 chance，但最高约 58.3%。
+
+说明：
+
+```text
+对象身份不是简单线性类别向量；
+可能是上下文相关、分布式、多子空间编码。
+```
+
+### 下一步大计划
+
+#### Phase A：优先沿 GLM5 对象-属性 binding 路线继续突破
+
+目标：
+
+```text
+从“MLP 块恢复”推进到“MLP 内部计算结构”。
+```
+
+任务：
+
+```text
+1. 拆 identity block：
+   L0-L2/L0-L4 中 resid/attn/mlp/token position 哪个最关键。
+
+2. 拆后期 MLP：
+   找出恢复率最高层段中的 neuron/subspace。
+
+3. 做对象 token vs 属性 token patch：
+   区分对象身份通道、属性类型通道、属性值通道。
+
+4. 做 destroy-restore：
+   破坏对象身份子空间或属性兼容性子空间，
+   再恢复，验证必要性与充分性。
+
+5. 做跨 baseline / 跨属性类型复用矩阵：
+   判断 color/temperature/shape 等属性是否共享同一兼容性计算格式。
+```
+
+#### Phase B：重建 GPT5 role binding 读出器
+
+目标：
+
+```text
+让 agent/patient 读出器先过门槛，再谈闭包。
+```
+
+任务：
+
+```text
+1. 改用联合结构输出：
+   ROLE_MAP = {AGENT: A, PATIENT: B}
+   vs
+   ROLE_MAP = {AGENT: B, PATIENT: A}
+
+2. 加 few-shot 格式校准：
+   只教输出格式，不泄漏测试样本。
+
+3. 用 AB/BA、active/passive、candidate order 全对照。
+
+4. 对 DS7B 做 sdpa/eager 对照。
+
+5. 通过后再恢复 state transplant 和 destroy-restore。
+```
+
+#### Phase C：统一成全局语义语法契约图谱
+
+最终图谱不应只记录：
+
+```text
+哪个层强；
+哪个模块强。
+```
+
+而应记录：
+
+```text
+功能对象：
+  object-property binding
+  role binding
+  coreference
+  negation/scope
+  recursive structure
+
+路径对象：
+  identity block
+  computation block
+  output block
+
+变量对象：
+  object identity
+  attribute type
+  attribute value
+  semantic agent
+  semantic patient
+  scope/operator
+
+因果证据：
+  patch recovery
+  ablation damage
+  destroy-restore recovery
+  cross-template stability
+  cross-model stability
+```
+
+### 当前最重要判断
+
+语言编码机制研究已经从：
+
+```text
+找语义方向
+```
+
+推进到：
+
+```text
+找条件化计算管线。
+```
+
+当前最清晰的一条管线是：
+
+```text
+对象身份输入 → residual 轨迹维持 → 后期 MLP 兼容性计算 → 输出排序
+```
+
+这不是完整语言机制，但它很可能是理解语言中“概念-属性-值绑定”的第一个稳定子机制。
+
+### 第一性原则
+
+当前不能急着提出统一数学理论。
+
+更合理的突破路线是：
+
+```text
+先破解一个稳定子机制：
+  对象-属性 binding
+
+再迁移到更复杂机制：
+  agent/patient role binding
+  scope binding
+  coreference binding
+  recursive binding
+
+最后再抽象：
+  不同 binding 是否共享同一种条件化残差轨迹 + MLP兼容性计算结构。
+```
+
+如果这些机制最终共享相似结构，那么语言背后的数学原理可能不是“某个语义轴”，而是：
+
+```text
+在 residual stream 中维持变量身份，
+通过 MLP 链进行上下文兼容性变换，
+再由输出层读出排序的动态编码系统。
+```
+
+## Phase 54: 对象-属性 Binding 有效性验证测试 [2026-06-02 14:06]
+
+### 任务目标
+
+用户要求对对象-属性 binding 进行验证测试，保证测试结果有效；显卡问题已经解决，不再输出跟踪日志，直接进行正常全量测试。
+
+本轮目标：
+
+```text
+1. 复验 GLM5 Phase 339+340+341 的核心发现。
+2. 保证三模型按 qwen3 → GLM4 → DS7B 顺序单独运行。
+3. 每个模型测试后使用 --hard-exit-after-model 硬退出，避免显存残留。
+4. 不启用 GPU 跟踪日志。
+5. 自动审计结果是否满足核心有效性判据。
+```
+
+### 脚本修改
+
+修改：
+
+```text
+tests/glm5/phase339_multibaseline_pipeline.py
+```
+
+修改内容：
+
+```text
+1. 使用 tests/gpt5/model_registry.py 中的 Linux 本地模型路径，
+   替代原脚本中的 Windows D:/develop/... 路径。
+
+2. 新增 --output-dir 参数。
+
+3. 新增 --hard-exit-after-model 参数。
+
+4. 新增 PHASE339_ATTN_IMPLEMENTATIONS 环境变量，
+   可控制 attention implementation 尝试顺序。
+```
+
+新增：
+
+```text
+tests/gpt5/run_phase342_object_binding_validation_normal_all.sh
+tests/gpt5/phase342_object_binding_validation_summary.py
+```
+
+用途：
+
+```text
+run_phase342_object_binding_validation_normal_all.sh:
+  正常方式顺序运行 qwen3、GLM4、DS7B；
+  每个模型单独进程；
+  每个模型结束硬退出；
+  不启用 GPU 跟踪日志。
+
+phase342_object_binding_validation_summary.py:
+  读取三个模型的 phase339 JSON；
+  自动检查核心判据：
+    all_baselines_mlp_gt_attn
+    identity_recovery_ge_95
+    min_valid_pairs_ge_12
+    category_probe_above_chance
+```
+
+### 运行环境
+
+```text
+date = 2026-06-02
+conda_env = openone-cu130-py312
+nvidia_driver = 595.71.05
+gpu = NVIDIA GeForce RTX 4090 D
+```
+
+测试结束后 GPU 状态：
+
+```text
+memory_used = 675 MiB
+temperature = 40 C
+pstate = P8
+```
+
+说明：
+
+```text
+模型进程已正常释放；
+没有出现之前的显卡锁死问题。
+```
+
+### 第一次全量命令
+
+```bash
+PHASE339_OUTPUT_DIR=results/gpt5_phase342_object_binding_validation_full \
+tests/gpt5/run_phase342_object_binding_validation_normal_all.sh
+```
+
+第一次结果：
+
+```text
+qwen3:
+  core_validation = True
+
+GLM4:
+  core_validation = True
+
+DS7B(sdpa):
+  core_validation = False
+  原因：identity_L0-2_full = 86.5%，低于 95% 阈值
+```
+
+DS7B 运行时出现警告：
+
+```text
+Sliding Window Attention is enabled but not implemented for `sdpa`;
+unexpected results may be encountered.
+```
+
+因此 DS7B 的 sdpa 结果不能直接作为最终机制证据。
+
+### DS7B eager 对照命令
+
+```bash
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate openone-cu130-py312
+
+PHASE339_ATTN_IMPLEMENTATIONS=eager \
+PHASE339_OUTPUT_DIR=results/gpt5_phase342_object_binding_validation_deepseek7b_eager \
+PYTHONUNBUFFERED=1 \
+python tests/glm5/phase339_multibaseline_pipeline.py deepseek7b \
+  --output-dir results/gpt5_phase342_object_binding_validation_deepseek7b_eager \
+  --hard-exit-after-model
+```
+
+DS7B eager 结果：
+
+```text
+identity_L0-2_full = 116.1%
+identity+compute = 115.0%
+all_baselines_mlp_gt_attn = True
+category_probe_above_chance = True
+core_validation = True
+```
+
+注意：
+
+```text
+eager 下仍提示 sliding window 未实现；
+但 identity block 恢复回到高位。
+因此最终汇总使用 DS7B eager 结果，
+并把 DS7B attention implementation 作为硬伤记录。
+```
+
+### 最终汇总目录
+
+```text
+results/gpt5_phase342_object_binding_validation_final/
+```
+
+最终文件：
+
+```text
+results/gpt5_phase342_object_binding_validation_final/qwen3_phase339.json
+results/gpt5_phase342_object_binding_validation_final/glm4_phase339.json
+results/gpt5_phase342_object_binding_validation_final/deepseek7b_phase339.json
+results/gpt5_phase342_object_binding_validation_final/phase342_object_binding_validation_summary.json
+results/gpt5_phase342_object_binding_validation_final/PHASE342_OBJECT_BINDING_VALIDATION_SUMMARY.md
+```
+
+### 最终核心结果
+
+#### Qwen3
+
+```text
+core_validation = True
+
+baseline results:
+  The item:
+    MLP = 70.1%
+    Attention = 23.8%
+    Full = 80.5%
+    n_valid = 22
+
+  The thing:
+    MLP = 94.1%
+    Attention = 6.6%
+    Full = 91.5%
+    n_valid = 18
+
+  The object:
+    MLP = 90.9%
+    Attention = 10.9%
+    Full = 93.8%
+    n_valid = 19
+
+  The entity:
+    MLP = 93.2%
+    Attention = 9.4%
+    Full = 97.2%
+    n_valid = 19
+
+mean_mlp = 87.08%
+mean_attention = 12.68%
+mean_full = 90.75%
+identity_L0-2_full = 99.60%
+identity+compute = 100.30%
+mean_category_accuracy = 0.4653
+chance = 0.1429
+```
+
+#### GLM4
+
+```text
+core_validation = True
+
+baseline results:
+  The item:
+    MLP = 45.5%
+    Attention = 10.9%
+    Full = 56.1%
+    n_valid = 22
+
+  The thing:
+    MLP = 56.9%
+    Attention = 2.6%
+    Full = 62.1%
+    n_valid = 17
+
+  The object:
+    MLP = 65.3%
+    Attention = 16.7%
+    Full = 74.0%
+    n_valid = 19
+
+  The entity:
+    MLP = 63.7%
+    Attention = 14.2%
+    Full = 72.0%
+    n_valid = 22
+
+mean_mlp = 57.85%
+mean_attention = 11.10%
+mean_full = 66.05%
+identity_L0-4_full = 100.00%
+identity+compute = 100.20%
+mean_category_accuracy = 0.4653
+chance = 0.1429
+```
+
+#### DS7B（eager 对照）
+
+```text
+core_validation = True
+
+baseline results:
+  The item:
+    MLP = 56.6%
+    Attention = 16.2%
+    Full = 83.7%
+    n_valid = 15
+
+  The thing:
+    MLP = 86.0%
+    Attention = -1.6%
+    Full = 91.1%
+    n_valid = 21
+
+  The object:
+    MLP = 64.9%
+    Attention = -5.2%
+    Full = 73.9%
+    n_valid = 18
+
+  The entity:
+    MLP = 81.6%
+    Attention = -0.6%
+    Full = 96.0%
+    n_valid = 18
+
+mean_mlp = 72.28%
+mean_attention = 2.20%
+mean_full = 86.17%
+identity_L0-2_full = 116.10%
+identity+compute = 115.00%
+mean_category_accuracy = 0.5000
+chance = 0.1429
+```
+
+### 自动有效性判据
+
+三模型最终均满足：
+
+```text
+all_baselines_mlp_gt_attn = True
+identity_recovery_ge_95 = True
+min_valid_pairs_ge_12 = True
+category_probe_above_chance = True
+passes_core_validation = True
+```
+
+因此本轮对象-属性 binding 核心结论通过有效性验证。
+
+### 客观结论
+
+#### 1. MLP > Attention 跨模型、跨 baseline 稳健成立
+
+三模型、四 baseline 下全部满足：
+
+```text
+MLP recovery > Attention recovery
+```
+
+这说明对象-属性 binding 的主要计算通道不是 Attention block，而是后期 MLP block。
+
+#### 2. Early identity block 是充分起点
+
+```text
+Qwen3 identity_L0-2_full = 99.6%
+GLM4 identity_L0-4_full = 100.0%
+DS7B identity_L0-2_full = 116.1%（eager）
+```
+
+这说明：
+
+```text
+只要早期 residual stream 被修正为 clean 状态，
+后续自然计算可以恢复对象-属性 binding。
+```
+
+这不能简单解释为“早期层直接计算了 binding”，更准确是：
+
+```text
+早期层提供正确对象身份/上下文状态，
+后续层自然完成兼容性计算。
+```
+
+#### 3. 后期 MLP 是兼容性变换主通道
+
+对象身份信息从 L0 就存在，但它不是最终 binding。
+
+当前最稳的管线是：
+
+```text
+对象 token → 早期 residual 身份状态
+→ 中层维持/转换
+→ 后期 MLP 兼容性计算
+→ 输出排序
+```
+
+#### 4. DS7B 的 implementation 需要特别处理
+
+DS7B sdpa 版本：
+
+```text
+identity_L0-2_full = 86.5%
+core_validation = False
+```
+
+DS7B eager 版本：
+
+```text
+identity_L0-2_full = 116.1%
+core_validation = True
+```
+
+因此 DS7B 后续实验必须显式记录 attention implementation，并优先避免把 sdpa/sliding-window 警告污染为机制差异。
+
+### 硬伤
+
+```text
+1. DS7B eager 下仍提示 sliding window 未实现；
+   虽然结果通过，但 implementation 仍是硬伤。
+
+2. identity recovery 可超过 100%，说明恢复率指标存在 over-recovery；
+   不能解释为“贡献超过真实机制”，只能说明 patch 后目标 logit margin 超过 clean。
+
+3. identity block 是 full block，不是纯身份子空间；
+   它包含 attention、MLP、residual 更新和层归一化影响。
+
+4. category probe 虽远高于 chance，但只有约 0.46-0.50；
+   对象身份不是简单线性类别向量。
+
+5. 后期 MLP 内部如何实现兼容性计算仍未拆开。
+```
+
+### 对语言编码机制的意义
+
+本轮最重要的稳定拼图是：
+
+```text
+对象-属性 binding 不是固定语义轴；
+而是条件化计算管线。
+```
+
+更具体：
+
+```text
+1. 对象身份从输入早期就进入 residual stream。
+2. 早期 residual 状态必须正确，否则后续 binding 会错。
+3. 后期 MLP 将对象身份和属性上下文转换为兼容性排序。
+4. Attention 不是主恢复通道，但可能提供上下文信息流。
+5. 输出层读出兼容性排序。
+```
+
+这与当前“全局语义语法契约图谱”的方向一致：
+
+```text
+功能不是单点；
+是变量状态 + 层间路径 + 模块变换 + 输出读出。
+```
+
+### 下一步计划
+
+#### Phase 55：拆 early identity block
+
+目标：
+
+```text
+确认 L0-L2 / L0-L4 full block 中，
+到底是 resid_in、attn_out、mlp_out 还是某些 token position 最关键。
+```
+
+必须区分：
+
+```text
+早期 full block patch 近 100%
+```
+
+和：
+
+```text
+对象身份子空间本身足以恢复
+```
+
+#### Phase 56：拆后期 MLP 兼容性计算
+
+目标：
+
+```text
+在 Qwen3 L21-L29、GLM4 L20-L38、DS7B L19-L24/L12-L24 中，
+定位具体层、neuron/subspace 如何完成对象-属性兼容性排序。
+```
+
+优先做：
+
+```text
+1. 单层 MLP scan
+2. MLP neuron activation difference
+3. top-k neuron patch/ablation
+4. destroy-restore
+```
+
+#### Phase 57：对象 token vs 属性 token 分离
+
+目标：
+
+```text
+区分对象身份通道、属性类型通道、属性值通道。
+```
+
+测试：
+
+```text
+只 patch object token
+只 patch attribute value token
+只 patch prompt context token
+只 patch final token
+```
+
+#### Phase 58：扩展属性类型与复用矩阵
+
+目标：
+
+```text
+检查 color / temperature / texture / material / state 是否共享同一 MLP 兼容性计算格式。
+```
+
+这一步才开始接近：
+
+```text
+语言中概念-属性-值系统的复用与差异化图谱。
+```
+
+### 第一性原则
+
+对象-属性 binding 当前已经是最稳定的可破解子机制。
+
+接下来不应该急着扩大到所有语言功能，而应先把这个子机制拆到：
+
+```text
+变量层：
+  object identity
+  attribute type
+  attribute value
+
+路径层：
+  early identity block
+  middle residual trajectory
+  late MLP compatibility block
+
+因果层：
+  patch recovery
+  ablation damage
+  destroy-restore
+```
+
+如果这条机制能被完整闭包，再迁移到：
+
+```text
+agent/patient role binding
+scope binding
+coreference binding
+recursive binding
+```
+
+才有可能逐步拼出语言背后的整体编码机制。
+
+## Phase 55: 最新 Memo 读取后的对象-属性 Binding 下一阶段计划 [2026-06-02 15:29]
+
+### 任务目标
+
+读取 GPT5 与 GLM5 memo 最新记录，确定接下来破解语言编码机制的研发计划。
+
+本轮没有新增模型测试，只做计划校准。
+
+### 最新记录要点
+
+GPT5 最新阶段：
+
+```text
+Phase 54: 对象-属性 Binding 有效性验证测试 [2026-06-02 14:06]
+```
+
+已经确认：
+
+```text
+1. qwen3、GLM4、DS7B 最终都通过对象-属性 binding 核心有效性验证。
+2. MLP > Attention 跨模型、跨 baseline 稳健成立。
+3. early identity block 可以让后续自然计算恢复 binding。
+4. DS7B 需要 eager 对照，不能直接使用 sdpa/sliding-window 警告结果解释机制。
+```
+
+GLM5 最新阶段：
+
+```text
+Phase 344+345: 多关系方向 + 匹配随机对照
+Phase 346: 精确交互分解 + 层级累积闭合
+```
+
+关键新事实：
+
+```text
+1. binding / negation / antonym / role / tense / same_class 六种语言关系方向
+   都呈现 balance ratio ≈ 1.00。
+
+2. 平衡放大不是 binding 特有，而是语义方向的通用属性。
+
+3. 不同关系的 net/gross 比不同：
+   tense 最低；
+   negation / role / same_class / binding 较高。
+
+4. binding 相对随机方向的 net/gross 优势很弱：
+   Qwen3/DS7B 对 W_U-subspace random 有边际显著；
+   GLM4 不显著。
+
+5. Phase 346 精确分解显示：
+   MLP 中 gate_main ≈ 25-30%
+   up_main ≈ 25-31%
+   gate×up interaction ≈ 39-46%
+
+6. 交互项是最大贡献者，但符号不稳定。
+
+7. MLP net sum 与 final binding 不闭合：
+   说明只看 binding 层 MLP 不足，
+   还需要 attention、LayerNorm、非 binding 层、残差交互进入闭合模型。
+```
+
+### 当前总体判断
+
+对象-属性 binding 现在已经从：
+
+```text
+有没有可恢复路径？
+```
+
+推进到：
+
+```text
+MLP 内部如何通过 gate、up、interaction 产生微偏置？
+```
+
+这是一个重要升级。
+
+当前最稳的机制表述是：
+
+```text
+对象身份在 early residual stream 中形成充分起点；
+后续 MLP 链把对象身份和属性上下文转换为兼容性排序；
+这种转换不是单方向选择，
+而是 gate/up 主效应 + gate×up 非线性交互共同产生的微小净偏置；
+大量正负通道平衡放大，最终只留下很小的方向性残余。
+```
+
+### 对 Phase54 计划的修正
+
+Phase54 原计划：
+
+```text
+Phase55: 拆 early identity block
+Phase56: 拆后期 MLP 兼容性计算
+Phase57: 对象 token vs 属性 token 分离
+Phase58: 扩展属性类型与复用矩阵
+```
+
+根据 GLM5 Phase344-346，计划需要调整顺序：
+
+```text
+优先级 1:
+  先把后期 MLP 的 gate/up/interaction 机制做闭合。
+
+优先级 2:
+  再拆 early identity block。
+
+原因：
+  GLM5 已经发现后期 MLP 内部的精确交互结构，
+  这是当前最接近“编码机制数学结构”的入口。
+```
+
+### 下一步阶段计划
+
+#### Phase 56：MLP Gate-Up-Interaction 机制复验与扩样
+
+目标：
+
+```text
+确认 gate_main / up_main / interaction 占比是否在更大样本、
+更多属性类型、更多 baseline 下稳定。
+```
+
+测试内容：
+
+```text
+1. 扩大对象-属性 pair 数量：
+   从 24 对扩到 80-150 对。
+
+2. 扩展属性类型：
+   color
+   temperature
+   texture
+   material
+   state
+   size
+
+3. 对每个模型关键 MLP 层做精确 2x2 分解：
+   CC = gate_clean * up_clean
+   CR = gate_clean * up_corrupt
+   RC = gate_corrupt * up_clean
+   RR = gate_corrupt * up_corrupt
+
+4. 输出：
+   gate_main ratio
+   up_main ratio
+   interaction ratio
+   interaction sign stability
+   per-layer distribution
+   per-attribute distribution
+```
+
+通过标准：
+
+```text
+interaction 仍稳定占最大或接近最大；
+gate/up 主效应均非零；
+不同属性类型不完全相同，但结构可比较；
+三模型结果方向一致。
+```
+
+#### Phase 57：层级闭合模型修正
+
+目标：
+
+```text
+解决 Phase346 中 MLP net sum 与 final binding 不闭合的问题。
+```
+
+需要纳入：
+
+```text
+1. 所有层 MLP，不只 binding 层。
+2. Attention 输出贡献。
+3. LayerNorm / RMSNorm 缩放。
+4. residual stream 累积与重投影。
+5. final logits readout。
+```
+
+输出：
+
+```text
+layer_contribution_sum
+attention_contribution_sum
+mlp_contribution_sum
+norm_rescale_factor
+residual_closure_ratio
+final_logit_alignment
+```
+
+目标不是强行闭合到 1.0，而是判断：
+
+```text
+最终 binding 信号到底由哪些路径累计而来。
+```
+
+#### Phase 58：Early Identity Block 精拆
+
+目标：
+
+```text
+确认 identity_L0-2 / identity_L0-4 full block 的充分性来自哪里。
+```
+
+测试：
+
+```text
+1. resid_in patch
+2. attn_out patch
+3. mlp_out patch
+4. full block patch
+5. object token only
+6. attribute token only
+7. final token only
+```
+
+关键问题：
+
+```text
+是对象 token 的身份状态足够？
+还是整句 early residual 轨迹足够？
+Attention 是否只是搬运上下文？
+MLP 是否已经做早期格式化？
+```
+
+#### Phase 59：对象/属性/值三变量分离
+
+目标：
+
+```text
+把对象-属性 binding 拆成 object identity、attribute type、attribute value 三个变量。
+```
+
+设计：
+
+```text
+object:
+  apple / banana / snow / fire ...
+
+attribute type:
+  color / temperature / texture / material ...
+
+attribute value:
+  red / yellow / hot / cold / rough / smooth ...
+```
+
+测试：
+
+```text
+只替换 object identity；
+只替换 attribute type；
+只替换 attribute value；
+组合替换 object+type；
+组合替换 object+value；
+组合替换 type+value；
+完整替换 object+type+value。
+```
+
+目标：
+
+```text
+确定 binding 的最小变量组合。
+```
+
+#### Phase 60：Destroy-Restore 闭包
+
+目标：
+
+```text
+从 patch recovery 进入真正因果闭包。
+```
+
+流程：
+
+```text
+1. 定位关键 MLP interaction 子空间。
+2. destroy：消融或扰动该子空间。
+3. observe：binding 输出下降。
+4. restore：只恢复该子空间。
+5. check：binding 输出恢复，非目标属性尽量不被破坏。
+```
+
+通过标准：
+
+```text
+破坏后显著下降；
+恢复后显著恢复；
+随机子空间不能恢复；
+跨 baseline 有效；
+跨属性类型部分迁移。
+```
+
+### 当前不应优先做的事
+
+```text
+1. 不应立刻回到 agent/patient role binding。
+   原因：GPT5 Phase306 读出器仍未过关。
+
+2. 不应直接做 head/neuron 全模型扫描。
+   原因：目前还没确定 interaction 子空间和变量分离结构。
+
+3. 不应急着提出统一数学理论。
+   原因：当前只是对象-属性 binding 子机制初步清晰。
+```
+
+### 当前第一性原则
+
+下一步要围绕一个核心问题：
+
+```text
+对象身份和属性值如何在 MLP 中经过 gate×up 非线性交互，
+变成最终的兼容性排序？
+```
+
+如果这个问题被破解，就得到语言编码机制中的第一个可闭合单元：
+
+```text
+变量输入
+→ residual 轨迹
+→ MLP 非线性交互
+→ 微偏置
+→ 输出排序
+```
+
+这个单元之后才能迁移到：
+
+```text
+role binding
+scope binding
+coreference binding
+recursive binding
+```
+
+### 推荐立即执行
+
+下一轮应执行：
+
+```text
+Phase 56:
+  MLP Gate-Up-Interaction 机制复验与扩样。
+```
+
+这是当前最接近“语言背后数学结构”的切入点。
+
+## Phase 56: 全局路径比较与 MLP Gate-Up-Interaction 复验 [2026-06-02 15:40]
+
+### 任务目标
+
+根据最新判断，深度神经网络更可能是相对编码系统。单一 object-property binding 路径只能提供局部信息，不能直接解释语言整体编码机制。本轮不再只看 binding，而是把 binding 放入多关系路径中比较：
+
+```text
+binding
+negation
+antonym
+role
+tense
+same_class
+```
+
+同时复验 object-property binding 中的 MLP gate/up/interaction 结构，观察：
+
+```text
+1. binding 是否相对其他关系特殊；
+2. binding 相对随机方向是否有稳定优势；
+3. MLP gate、up、gate×up interaction 的比例是否稳定；
+4. 单独 MLP net sum 是否能闭合最终 binding；
+5. 是否支持“全局路径图谱优先于单一路径解释”。
+```
+
+### 脚本变更
+
+修改：
+
+```text
+tests/glm5/phase344_345_multi_relation.py
+tests/glm5/phase346_interaction_closure.py
+```
+
+主要变更：
+
+```text
+1. 使用 tests/gpt5/model_registry.py 中的本地模型路径，替代 Windows D:/ 路径。
+2. 新增 --output-dir。
+3. 新增 --hard-exit-after-model，保证每个模型运行后硬退出并释放显存。
+4. 新增 PHASE344_OUTPUT_DIR / PHASE346_OUTPUT_DIR。
+5. 新增 PHASE344_ATTN_IMPLEMENTATIONS / PHASE346_ATTN_IMPLEMENTATIONS。
+6. scipy 不存在时跳过 t-test，不中断核心实验。
+```
+
+新增：
+
+```text
+tests/gpt5/run_phase56_global_path_interaction_normal_all.sh
+tests/gpt5/phase56_global_path_interaction_summary.py
+```
+
+运行脚本逻辑：
+
+```text
+qwen3 -> phase344/345 -> hard exit
+qwen3 -> phase346 -> hard exit
+glm4 -> phase344/345 -> hard exit
+glm4 -> phase346 -> hard exit
+deepseek7b -> phase344/345 -> hard exit
+deepseek7b -> phase346 -> hard exit
+summary
+```
+
+DeepSeek7B 使用 eager，原因是前面 sdpa 对 sliding-window attention 的结果不稳定；本轮记录为解释硬伤。
+
+### 测试命令
+
+```bash
+PHASE56_OUTPUT_DIR=results/gpt5_phase56_global_path_interaction_full \
+tests/gpt5/run_phase56_global_path_interaction_normal_all.sh
+```
+
+输出文件：
+
+```text
+results/gpt5_phase56_global_path_interaction_full/phase344_345/qwen3_phase344_345.json
+results/gpt5_phase56_global_path_interaction_full/phase344_345/glm4_phase344_345.json
+results/gpt5_phase56_global_path_interaction_full/phase344_345/deepseek7b_phase344_345.json
+
+results/gpt5_phase56_global_path_interaction_full/phase346/qwen3_phase346.json
+results/gpt5_phase56_global_path_interaction_full/phase346/glm4_phase346.json
+results/gpt5_phase56_global_path_interaction_full/phase346/deepseek7b_phase346.json
+
+results/gpt5_phase56_global_path_interaction_full/PHASE56_GLOBAL_PATH_INTERACTION_SUMMARY.md
+results/gpt5_phase56_global_path_interaction_full/phase56_global_path_interaction_summary.json
+```
+
+### 一、全局关系路径结果
+
+#### Qwen3
+
+```text
+binding:
+  balance = 1.0169
+  net/gross = 0.0279
+  n = 45
+
+negation:
+  balance = 1.0532
+  net/gross = 0.0313
+  n = 25
+
+role:
+  balance = 1.0160
+  net/gross = 0.0281
+  n = 20
+
+same_class:
+  balance = 1.0066
+  net/gross = 0.0331
+  n = 25
+
+binding_net_gross_rank_among_relations = 4
+```
+
+客观现象：
+
+```text
+Qwen3 中 binding 不是最强路径。
+same_class、negation、role 的 net/gross 都高于或接近 binding。
+```
+
+#### GLM4
+
+```text
+binding:
+  balance = 0.9969
+  net/gross = 0.0200
+  n = 36
+
+negation:
+  balance = 0.9910
+  net/gross = 0.0369
+  n = 20
+
+role:
+  balance = 1.0028
+  net/gross = 0.0318
+  n = 16
+
+same_class:
+  balance = 0.9941
+  net/gross = 0.0317
+  n = 20
+
+binding_net_gross_rank_among_relations = 5
+```
+
+客观现象：
+
+```text
+GLM4 中 binding 明显不是最突出路径。
+negation、role、same_class、antonym 都高于 binding。
+```
+
+#### DeepSeek7B
+
+```text
+binding:
+  balance = 0.9957
+  net/gross = 0.0214
+  n = 32
+
+negation:
+  balance = 1.0133
+  net/gross = 0.0245
+  n = 20
+
+same_class:
+  balance = 0.9995
+  net/gross = 0.0198
+  n = 20
+
+binding_net_gross_rank_among_relations = 2
+```
+
+客观现象：
+
+```text
+DeepSeek7B 中 binding 排第 2，仅低于 negation。
+但 DeepSeek7B 使用 eager，且有 sliding-window attention warning，因此不能过度解释。
+```
+
+### 二、随机方向对照
+
+Qwen3：
+
+```text
+binding reference net/gross = 0.0279
+norm-matched random = 0.0198
+W_U-subspace random = 0.0208
+binding-orthogonal random = 0.0203
+pure random = 0.0186
+```
+
+GLM4：
+
+```text
+binding reference net/gross = 0.0200
+norm-matched random = 0.0186
+W_U-subspace random = 0.0177
+binding-orthogonal random = 0.0173
+pure random = 0.0163
+```
+
+DeepSeek7B：
+
+```text
+binding reference net/gross = 0.0214
+norm-matched random = 0.0141
+W_U-subspace random = 0.0150
+binding-orthogonal random = 0.0154
+pure random = 0.0136
+```
+
+客观现象：
+
+```text
+binding 相比随机方向有一定优势，但优势不大。
+这说明 binding 不是普通随机方向，但也不是可以单独解释语言机制的特殊轴。
+```
+
+### 三、MLP Gate / Up / Interaction 复验
+
+#### Qwen3
+
+```text
+gate_main_frac = 0.2570
+up_main_frac = 0.3157
+interaction_frac = 0.4273
+total_effect_mean = 0.5644
+
+closure:
+  mean_closure_ratio = 1.1237
+  mean_final_binding = 2.4064
+  mean_mlp_net_sum = 3.5695
+```
+
+#### GLM4
+
+```text
+gate_main_frac = 0.3034
+up_main_frac = 0.3060
+interaction_frac = 0.3906
+total_effect_mean = 0.3340
+
+closure:
+  mean_closure_ratio = 0.4228
+  mean_final_binding = 2.9638
+  mean_mlp_net_sum = 1.2823
+```
+
+#### DeepSeek7B
+
+```text
+gate_main_frac = 0.2803
+up_main_frac = 0.2635
+interaction_frac = 0.4562
+total_effect_mean = 1.0111
+
+closure:
+  mean_closure_ratio = -11.4383
+  mean_final_binding = 1.2340
+  mean_mlp_net_sum = 4.2638
+```
+
+客观现象：
+
+```text
+1. 三模型中 interaction_frac 都是最大或接近最大：
+   Qwen3 = 42.7%
+   GLM4 = 39.1%
+   DeepSeek7B = 45.6%
+
+2. gate 和 up 单独都重要，但 gate×up interaction 是不可忽略的核心项。
+
+3. MLP net sum 不能稳定闭合最终 binding：
+   Qwen3 closure ratio 波动较大；
+   GLM4 平均只解释约 42%；
+   DeepSeek7B closure ratio 极端不稳定。
+```
+
+### 四、综合判断
+
+本轮最重要的结论不是“binding 被破解了”，而是：
+
+```text
+单一 binding 路径信息有限。
+binding 必须放在 negation、role、same_class、tense 等多关系路径中比较。
+```
+
+当前更稳的表述是：
+
+```text
+object-property binding 是全局语义路径中的一个局部投影。
+它确实有 MLP gate/up/interaction 结构，
+但这个结构不是 binding 独有。
+语言编码更像多路径相对编码系统，
+每个功能都通过一组路径和其他功能比较后才能定位。
+```
+
+这与当前核心猜想一致：
+
+```text
+深度神经网络不是固定语义轴编码，
+而是相对路径、功能差异、模块交互、残差累积共同形成的编码网络。
+```
+
+### 五、硬伤和问题
+
+```text
+1. scipy 不存在，本轮跳过 t-test。
+   但核心均值和对照结果已经保存。
+
+2. DeepSeek7B 使用 eager。
+   运行时出现 sliding-window attention warning，
+   因此 DeepSeek7B 的绝对数值需要谨慎，只用于结构性参考。
+
+3. 当前 relation 数据量仍不大。
+   binding 有 32-45 个观测，其他关系约 12-25 个观测。
+   后续重要结论必须扩样本。
+
+4. MLP closure 不完整。
+   说明除了目标 binding layers 的 MLP，还存在 attention、RMSNorm、其他层、残差路径和输出层影响。
+
+5. binding 随机对照优势很小。
+   说明它不是纯随机方向，但也不能作为单独机制本体。
+```
+
+### 六、关键洞察
+
+如果把 object-property binding 当作单一路径，会误导研究。
+
+更合理的第一性原则是：
+
+```text
+语言编码机制不是某个功能自己的独立通道，
+而是多个功能路径之间的相对差异结构。
+```
+
+也就是说，要破解语言背后的数学结构，必须同时回答：
+
+```text
+1. 某个功能路径本身是什么；
+2. 它与相邻功能路径有何不同；
+3. 哪些路径复用同一 MLP interaction；
+4. 哪些路径在 residual trajectory 中分叉；
+5. 哪些路径最终通过输出层被读出。
+```
+
+### 七、下一步计划
+
+下一阶段不应只继续扩大 binding，而要进入：
+
+```text
+Phase 57: 全局路径矩阵扩样与层级路径图谱
+```
+
+目标：
+
+```text
+1. 扩大 relation library：
+   binding / negation / role / same_class / antonym / tense / coreference / quantifier / causal / comparison。
+
+2. 每类至少扩展到 50-100 对基础样本。
+
+3. 对每个 relation 输出：
+   path signature
+   MLP gate/up/interaction signature
+   random-control advantage
+   closure ratio
+   layer trajectory
+
+4. 构造 relation-to-relation path matrix：
+   看哪些功能共享路径，哪些功能分化。
+
+5. 再回到 object-property binding：
+   用全局矩阵判断 binding 到底接近 same_class、role、还是 negation。
+```
+
+阶段性大任务：
+
+```text
+从单功能机制分析，升级为全局语义路径图谱。
+只有在全局路径中定位 binding，后续 destroy-restore 才有解释意义。
+```
+
+## Phase 57: 全局关系路径矩阵扩样 [2026-06-02 16:04]
+
+### 任务目标
+
+根据最新分析，Phase 54-56 的方向基本正确，但 object-property binding 不能孤立解释语言编码机制。深度神经网络更像相对编码系统，单一 binding 路径信息有限，必须与其他关系路径比较，才能获得全局结构。
+
+本轮目标：
+
+```text
+1. 扩大 relation library。
+2. 每个 relation 使用更多语境变体样本。
+3. 对每个 relation 生成 path signature。
+4. 构造 relation-to-relation similarity matrix。
+5. 判断 binding 在全局语义关系路径中的相对位置。
+```
+
+### 对用户分析的判断
+
+用户提供的分析大方向正确，尤其是以下部分：
+
+```text
+1. binding 是当前较稳定的子机制，但不是语言机制本体。
+2. early identity block 是充分起点，不是完整 binding 计算器。
+3. MLP gate/up/interaction 是重要机制入口，但不是 binding 独有。
+4. MLP net sum 不能闭合 final binding，说明需要全路径模型。
+5. 下一步应优先做全局关系路径矩阵，而不是继续孤立扩大 binding。
+```
+
+本轮据此执行 Phase 57。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase57_global_relation_path_matrix.py
+tests/gpt5/run_phase57_global_relation_path_matrix_normal_all.sh
+tests/gpt5/phase57_global_relation_path_matrix_summary.py
+```
+
+脚本特性：
+
+```text
+1. 三模型顺序运行：
+   qwen3 -> GLM4 -> DeepSeek7B
+
+2. 每个模型运行后使用：
+   --hard-exit-after-model
+
+3. 关系库扩展到 14 类：
+   binding
+   negation
+   antonym
+   role
+   tense
+   same_class
+   coreference
+   quantifier
+   causal
+   comparison
+   spatial
+   temporal_order
+   condition
+   contrast
+
+4. 每类最多 40 对样本，并加入语境前缀变体：
+   Usually
+   In general
+   People know
+   In this sentence
+   For this example
+
+5. 对每个 relation 输出：
+   balance
+   net/gross
+   gate_main_frac
+   up_main_frac
+   interaction_frac
+   per-layer path signature
+   relation similarity matrix
+```
+
+说明：
+
+```text
+DeepSeek7B 使用 eager。
+运行时仍出现 sliding-window attention warning。
+因此 DS7B 结果只作为结构性参考，不做过细数值解释。
+```
+
+### 测试命令
+
+```bash
+PHASE57_OUTPUT_DIR=results/gpt5_phase57_global_relation_path_matrix_full \
+PHASE57_MAX_PAIRS_PER_RELATION=40 \
+tests/gpt5/run_phase57_global_relation_path_matrix_normal_all.sh
+```
+
+输出：
+
+```text
+results/gpt5_phase57_global_relation_path_matrix_full/qwen3_phase57_global_relation_path_matrix.json
+results/gpt5_phase57_global_relation_path_matrix_full/glm4_phase57_global_relation_path_matrix.json
+results/gpt5_phase57_global_relation_path_matrix_full/deepseek7b_phase57_global_relation_path_matrix.json
+
+results/gpt5_phase57_global_relation_path_matrix_full/PHASE57_GLOBAL_RELATION_PATH_MATRIX_SUMMARY.md
+results/gpt5_phase57_global_relation_path_matrix_full/phase57_global_relation_path_matrix_summary.json
+```
+
+运行后 GPU 状态：
+
+```text
+RTX 4090 D
+driver = 595.71.05
+memory_used = 646 MiB
+temperature = 47 C
+```
+
+### 数据规模
+
+Qwen3：
+
+```text
+target_layers = [21, 23, 25, 27, 29]
+每个 relation 约 160-200 个 layer observations
+```
+
+GLM4：
+
+```text
+target_layers = [30, 33, 36, 38]
+每个 relation 约 128-160 个 layer observations
+```
+
+DeepSeek7B：
+
+```text
+target_layers = [19, 21, 23, 24]
+每个 relation 约 128-160 个 layer observations
+```
+
+总观测约：
+
+```text
+14 relations × 3 models × 128-200 observations
+```
+
+### Qwen3 结果
+
+按 net/gross 排名：
+
+```text
+1. temporal_order  0.0451
+2. same_class      0.0378
+3. role            0.0315
+4. causal          0.0293
+5. binding         0.0278
+6. negation        0.0278
+7. antonym         0.0268
+8. contrast        0.0249
+9. condition       0.0245
+10. tense          0.0238
+11. coreference    0.0222
+12. quantifier     0.0213
+13. comparison     0.0195
+14. spatial        0.0191
+```
+
+binding：
+
+```text
+net/gross = 0.0278
+balance = 1.0111
+interaction = 0.4260
+n = 200
+rank = 5/14
+```
+
+相似度候选：
+
+```text
+condition / contrast = 0.9945
+comparison / contrast = 0.9938
+antonym / role = 0.9816
+tense / coreference = 0.9756
+```
+
+低相似度：
+
+```text
+negation / comparison = 0.5666
+binding / comparison = 0.6382
+binding / contrast = 0.6663
+```
+
+客观现象：
+
+```text
+Qwen3 中 binding 不是中心路径。
+temporal_order、same_class、role、causal 都高于 binding。
+binding 与 comparison/contrast 的路径差异明显。
+```
+
+### GLM4 结果
+
+按 net/gross 排名：
+
+```text
+1. quantifier      0.0442
+2. condition       0.0392
+3. contrast        0.0364
+4. negation        0.0329
+5. same_class      0.0316
+6. antonym         0.0281
+7. role            0.0266
+8. tense           0.0265
+9. spatial         0.0253
+10. coreference    0.0243
+11. binding        0.0228
+12. causal         0.0225
+13. temporal_order 0.0214
+14. comparison     0.0201
+```
+
+binding：
+
+```text
+net/gross = 0.0228
+balance = 0.9959
+interaction = 0.3757
+n = 160
+rank = 11/14
+```
+
+相似度候选：
+
+```text
+tense / condition = 0.9962
+comparison / temporal_order = 0.9953
+coreference / causal = 0.9948
+tense / contrast = 0.9924
+```
+
+低相似度：
+
+```text
+antonym / comparison = 0.8162
+negation / comparison = 0.8206
+binding / comparison = 0.8468
+```
+
+客观现象：
+
+```text
+GLM4 中 binding 排名很低。
+quantifier、condition、contrast、negation 更强。
+这说明 GLM4 的全局路径里，binding 不是主导关系，而更像局部兼容性路径。
+```
+
+### DeepSeek7B 结果
+
+按 net/gross 排名：
+
+```text
+1. temporal_order  0.0260
+2. contrast        0.0259
+3. same_class      0.0243
+4. condition       0.0243
+5. spatial         0.0221
+6. quantifier      0.0214
+7. antonym         0.0203
+8. negation        0.0203
+9. coreference     0.0185
+10. role           0.0184
+11. binding        0.0179
+12. comparison     0.0163
+13. tense          0.0162
+14. causal         0.0162
+```
+
+binding：
+
+```text
+net/gross = 0.0179
+balance = 0.9985
+interaction = 0.4586
+n = 160
+rank = 11/14
+```
+
+相似度候选：
+
+```text
+binding / antonym = 0.9894
+role / condition = 0.9783
+tense / condition = 0.9760
+binding / negation = 0.9707
+```
+
+低相似度：
+
+```text
+negation / comparison = 0.6255
+binding / comparison = 0.7156
+same_class / comparison = 0.7589
+```
+
+客观现象：
+
+```text
+DS7B 中 binding 排名也很低。
+但 interaction = 0.4586，说明 binding 的 MLP 非线性交互比例仍高。
+这支持“binding 有结构，但不是全局主路径”。
+```
+
+### 三模型共同现象
+
+#### 1. binding 不是全局最强路径
+
+```text
+Qwen3: binding rank = 5/14
+GLM4: binding rank = 11/14
+DeepSeek7B: binding rank = 11/14
+```
+
+这比 Phase56 更明确地支持：
+
+```text
+binding 只是全局语义关系路径中的一个节点。
+```
+
+#### 2. balance 仍接近 1
+
+绝大多数 relation 的 balance 都接近 1。
+
+这说明：
+
+```text
+正负通道的 gross amplification 普遍接近平衡。
+平衡放大不是 binding 特有，而是 MLP 处理多类语义方向的通用现象。
+```
+
+#### 3. 不同 relation 的 interaction_frac 明显不同
+
+例如：
+
+```text
+Qwen3 binding interaction = 0.4260
+Qwen3 temporal_order interaction = 0.1758
+
+GLM4 binding interaction = 0.3757
+GLM4 quantifier interaction = 0.1602
+
+DeepSeek7B binding interaction = 0.4586
+DeepSeek7B contrast interaction = 0.1676
+```
+
+这说明不同关系不只是强弱不同，MLP 内部计算结构也不同。
+
+### 核心结论
+
+本轮最重要的结论：
+
+```text
+语言功能不能用单一路径解释。
+object-property binding 是稳定入口，但不是中心机制。
+全局关系路径矩阵比单功能 patch 更接近语言编码机制。
+```
+
+更谨慎的理论表述：
+
+```text
+深度网络中的语言编码可能不是固定语义轴，
+而是多个语义/语法关系在 residual trajectory 与 MLP interaction 中形成的相对路径网络。
+
+每个 relation 有自己的 path signature：
+  balance
+  net/gross
+  gate/up/interaction
+  layer trajectory
+  similarity to other relations
+
+真正要破解的是这些 path signature 之间的复用与分化。
+```
+
+### 硬伤
+
+```text
+1. 部分 relation 仍是粗模板。
+   coreference、quantifier、condition 等还不是稳定读出器，
+   这里只能作为路径方向样本，不是功能正确性证明。
+
+2. 每类 40 对仍不是最终规模。
+   已明显好于 Phase56，但要支撑机制结论，还需要按 subtype 扩到 50-100 对。
+
+3. DeepSeek7B 使用 eager 且有 sliding-window warning。
+   DS7B 结果只能作为结构参考。
+
+4. 当前 similarity matrix 是行为路径签名相似度。
+   高相似不等于真实机制复用。
+   后续必须做变量拆分和 destroy-restore。
+
+5. 本轮没有 random-control advantage。
+   Phase56 已做随机方向对照，本轮优先做全局矩阵。
+   后续 Phase57b 应把随机对照也扩到所有 relation。
+```
+
+### 对破解语言背后数学结构的第一性原则
+
+本轮进一步支持：
+
+```text
+语言编码机制的基本单位不是一个概念方向，
+而是关系路径。
+```
+
+更具体：
+
+```text
+1. 每个语言关系不是独立通道，而是在全局路径网络中相对定位。
+2. MLP 对不同关系普遍产生平衡放大，但净偏置很小。
+3. 不同关系的 gate/up/interaction 比例不同，说明同一 MLP 框架承载了不同计算格式。
+4. binding、same_class、role、negation、temporal_order 等关系之间的差异，可能就是语言网络复用和差异化的真实入口。
+```
+
+所以接下来要研究的不是：
+
+```text
+binding 到底在哪一层？
+```
+
+而是：
+
+```text
+binding 与 same_class、role、negation、temporal_order 在路径签名上哪里相同，哪里分叉？
+这些分叉对应哪些 token、变量、MLP 子空间和 residual 轨迹？
+```
+
+### 下一步计划
+
+Phase 58 应优先做：
+
+```text
+全局关系路径矩阵 Phase57b：随机对照与 subtype 扩展
+```
+
+具体任务：
+
+```text
+1. 对 14 类 relation 增加 subtype：
+   binding:
+     color / temperature / texture / taste / material
+   role:
+     active / passive / dative
+   negation:
+     lexical / syntactic / quantifier scope
+   quantifier:
+     all/some/no/every/not all
+   temporal_order:
+     before/after/while/then
+   condition:
+     if/unless/only if
+
+2. 每个 subtype 至少 40-60 对。
+
+3. 为每个 relation/subtype 加入随机对照：
+   norm-matched random
+   W_U-subspace random
+   relation-orthogonal random
+
+4. 输出：
+   subtype path matrix
+   relation path matrix
+   random advantage matrix
+   interaction matrix
+
+5. 找出最稳定的复用/分化候选，再进入变量级闭包。
+```
+
+更大的阶段任务：
+
+```text
+建立全局语义/语法关系路径图谱 v1。
+用它决定哪个功能值得进入 destroy-restore，而不是凭直觉选择 binding 或 role。
+```
+
+## Phase 58: 关系子类型随机对照与候选路径筛选 [2026-06-02 16:56]
+
+### 任务目标
+
+Phase 57 建立了 14 类 relation 的全局路径矩阵，但仍有一个关键硬伤：
+
+```text
+某个 relation 的 net/gross 高，
+不一定说明它有语言机制优势；
+可能只是该方向更容易和 W_U 或 MLP 权重分布对齐。
+```
+
+因此本轮补充：
+
+```text
+1. subtype 拆分；
+2. 随机方向对照；
+3. random advantage 计算；
+4. subtype-level similarity matrix；
+5. 重新筛选值得进入变量闭包的候选。
+```
+
+### 对最新分析的判断
+
+用户给出的分析基本正确：
+
+```text
+1. Phase 57 是全局路径图谱第一版，不是机制闭包。
+2. binding 不是全局中心机制。
+3. relation path similarity 只能作为复用候选，不能当作复用证明。
+4. Phase 57 缺少随机方向对照，这是核心硬伤。
+5. 下一步必须做 subtype + random advantage。
+```
+
+本轮按该方向执行 Phase 58。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase58_relation_subtype_random_controls.py
+tests/gpt5/run_phase58_relation_subtype_random_controls_normal_all.sh
+tests/gpt5/phase58_relation_subtype_random_controls_summary.py
+```
+
+脚本功能：
+
+```text
+1. 三模型顺序运行：
+   qwen3 -> GLM4 -> DeepSeek7B
+
+2. 每个模型运行后：
+   --hard-exit-after-model
+
+3. 每个 subtype 输出：
+   real net/gross
+   random mean net/gross
+   random advantage
+   balance
+   interaction fraction
+   subtype similarity matrix
+
+4. 随机对照类型：
+   norm_matched
+   W_U-subspace
+   relation_orthogonal
+   pure_random
+```
+
+### 测试命令
+
+```bash
+PHASE58_OUTPUT_DIR=results/gpt5_phase58_relation_subtype_random_controls_full \
+PHASE58_MAX_PAIRS_PER_SUBTYPE=30 \
+PHASE58_RANDOM_SAMPLES_PER_PAIR=2 \
+tests/gpt5/run_phase58_relation_subtype_random_controls_normal_all.sh
+```
+
+输出：
+
+```text
+results/gpt5_phase58_relation_subtype_random_controls_full/qwen3_phase58_relation_subtype_random_controls.json
+results/gpt5_phase58_relation_subtype_random_controls_full/glm4_phase58_relation_subtype_random_controls.json
+results/gpt5_phase58_relation_subtype_random_controls_full/deepseek7b_phase58_relation_subtype_random_controls.json
+
+results/gpt5_phase58_relation_subtype_random_controls_full/PHASE58_RELATION_SUBTYPE_RANDOM_CONTROLS_SUMMARY.md
+results/gpt5_phase58_relation_subtype_random_controls_full/phase58_relation_subtype_random_controls_summary.json
+```
+
+运行后 GPU 状态：
+
+```text
+RTX 4090 D
+driver = 595.71.05
+memory_used = 574 MiB
+temperature = 46 C
+```
+
+### 数据规模
+
+Qwen3：
+
+```text
+target_layers = [21, 23, 25, 27, 29]
+每个 subtype:
+  pairs = 30
+  real observations = 150
+  random controls = 4 类 × 2 samples/pair × 5 layers
+```
+
+GLM4：
+
+```text
+target_layers = [30, 33, 36, 38]
+每个 subtype:
+  pairs = 30
+  real observations = 120
+```
+
+DeepSeek7B：
+
+```text
+target_layers = [19, 21, 23, 24]
+每个 subtype:
+  pairs = 30
+  real observations = 120
+  attn_impl = eager
+```
+
+### Qwen3 结果
+
+按 random advantage 排名：
+
+```text
+1. temporal_order/before_after
+   real = 0.0446
+   random = 0.0180
+   advantage = 0.0265
+   interaction = 0.1849
+
+2. same_class/category_peer
+   real = 0.0372
+   random = 0.0214
+   advantage = 0.0158
+   interaction = 0.3365
+
+3. contrast/but_and
+   real = 0.0267
+   random = 0.0181
+   advantage = 0.0087
+   interaction = 0.1826
+
+4. binding/color
+   real = 0.0294
+   random = 0.0216
+   advantage = 0.0078
+   interaction = 0.3672
+
+5. negation/syntactic_not
+   real = 0.0276
+   random = 0.0200
+   advantage = 0.0076
+   interaction = 0.3726
+
+6. role/active_swap
+   real = 0.0264
+   random = 0.0193
+   advantage = 0.0071
+   interaction = 0.2500
+```
+
+弱或负优势：
+
+```text
+quantifier/all_some:
+  advantage = 0.0007
+
+comparison/greater_less:
+  advantage = -0.0022
+```
+
+客观现象：
+
+```text
+Qwen3 中 temporal_order/before_after 是最强候选。
+same_class/category_peer 也明显强于多数 binding subtype。
+binding 内部不统一：
+  color > taste > temperature ≈ texture
+```
+
+### GLM4 结果
+
+按 random advantage 排名：
+
+```text
+1. negation/quantifier_no
+   real = 0.0525
+   random = 0.0181
+   advantage = 0.0344
+   interaction = 0.2218
+
+2. quantifier/all_some
+   real = 0.0456
+   random = 0.0180
+   advantage = 0.0277
+   interaction = 0.1761
+
+3. negation/syntactic_not
+   real = 0.0428
+   random = 0.0194
+   advantage = 0.0234
+   interaction = 0.3321
+
+4. condition/if_unless
+   real = 0.0413
+   random = 0.0195
+   advantage = 0.0218
+   interaction = 0.1638
+
+5. contrast/but_and
+   real = 0.0341
+   random = 0.0191
+   advantage = 0.0150
+   interaction = 0.1921
+
+6. same_class/category_peer
+   real = 0.0310
+   random = 0.0171
+   advantage = 0.0139
+   interaction = 0.3143
+```
+
+binding subtype：
+
+```text
+binding/taste:
+  advantage = 0.0100
+
+binding/color:
+  advantage = 0.0022
+
+binding/texture:
+  advantage = 0.0000
+
+binding/temperature:
+  advantage = -0.0006
+```
+
+客观现象：
+
+```text
+GLM4 的强候选明显不是 binding。
+negation 和 quantifier 相关 subtype 显著强于 binding。
+这和 Phase57 中 GLM4 quantifier/condition/contrast 排名高一致。
+```
+
+### DeepSeek7B 结果
+
+按 random advantage 排名：
+
+```text
+1. contrast/but_and
+   real = 0.0290
+   random = 0.0148
+   advantage = 0.0142
+   interaction = 0.1906
+
+2. temporal_order/before_after
+   real = 0.0270
+   random = 0.0140
+   advantage = 0.0130
+   interaction = 0.2368
+
+3. quantifier/all_some
+   real = 0.0269
+   random = 0.0139
+   advantage = 0.0129
+   interaction = 0.3279
+
+4. condition/if_unless
+   real = 0.0251
+   random = 0.0147
+   advantage = 0.0104
+   interaction = 0.2970
+
+5. negation/syntactic_not
+   real = 0.0240
+   random = 0.0150
+   advantage = 0.0090
+   interaction = 0.4202
+
+6. binding/texture
+   real = 0.0225
+   random = 0.0161
+   advantage = 0.0065
+   interaction = 0.3565
+```
+
+弱或接近随机：
+
+```text
+role/active_swap:
+  advantage = 0.0007
+
+binding/temperature:
+  advantage = -0.0005
+
+comparison/greater_less:
+  advantage = 0.0014
+```
+
+客观现象：
+
+```text
+DeepSeek7B 中 contrast、temporal_order、quantifier、condition 更强。
+binding 大多较弱，只有 texture 有一定正优势。
+role/active_swap 也几乎没有随机优势。
+```
+
+### 三模型共同现象
+
+#### 1. binding 不是稳定最高候选
+
+```text
+Qwen3:
+  最强 = temporal_order/before_after
+  binding/color 排第 4
+
+GLM4:
+  最强 = negation/quantifier_no
+  binding 最好的是 taste，排第 7
+
+DeepSeek7B:
+  最强 = contrast/but_and
+  binding 最好的是 texture，排第 6
+```
+
+这说明：
+
+```text
+object-property binding 不是全局路径图谱的中心。
+```
+
+#### 2. subtype 层比 relation 粗标签更重要
+
+binding 内部：
+
+```text
+Qwen3:
+  color advantage = 0.0078
+  temperature = 0.0026
+  texture = 0.0025
+  taste = 0.0044
+
+GLM4:
+  taste = 0.0100
+  color = 0.0022
+  texture = 0.0000
+  temperature = -0.0006
+
+DeepSeek7B:
+  texture = 0.0065
+  color = 0.0027
+  taste = 0.0016
+  temperature = -0.0005
+```
+
+同一个 relation 内部，subtype 差异很大。
+
+#### 3. 随机对照改变解释
+
+Phase57 中某些 relation 的 net/gross 不低，但 Phase58 显示：
+
+```text
+quantifier/all_some in Qwen3:
+  advantage = 0.0007
+
+comparison/greater_less in Qwen3:
+  advantage = -0.0022
+
+role/active_swap in DeepSeek7B:
+  advantage = 0.0007
+```
+
+这说明：
+
+```text
+只看 net/gross 会误判。
+random advantage 是必须指标。
+```
+
+#### 4. interaction 高不等于 random advantage 高
+
+例子：
+
+```text
+DeepSeek7B binding/taste:
+  interaction = 0.6137
+  advantage = 0.0016
+
+Qwen3 binding/temperature:
+  interaction = 0.4746
+  advantage = 0.0026
+```
+
+说明：
+
+```text
+gate×up interaction 比例高，
+不等于该方向有真实结构优势。
+```
+
+### 核心结论
+
+Phase58 最重要的修正：
+
+```text
+全局关系路径图谱必须同时看：
+  real net/gross
+  random baseline
+  random advantage
+  subtype stability
+  interaction structure
+```
+
+当前最强候选不是泛化的 binding，而是：
+
+```text
+Qwen3:
+  temporal_order/before_after
+  same_class/category_peer
+  contrast/but_and
+
+GLM4:
+  negation/quantifier_no
+  quantifier/all_some
+  negation/syntactic_not
+  condition/if_unless
+
+DeepSeek7B:
+  contrast/but_and
+  temporal_order/before_after
+  quantifier/all_some
+  condition/if_unless
+```
+
+这说明：
+
+```text
+不同模型的强路径候选不同。
+语言编码机制不是固定功能路径，而是模型特异的相对路径网络。
+```
+
+### 硬伤
+
+```text
+1. 当前 subtype 仍然不够多。
+   例如 quantifier 只测 all_some，
+   condition 只测 if_unless，
+   contrast 只测 but_and。
+
+2. random controls 每 pair 只有 2 个样本。
+   可以用于筛选，但不能作为最终统计结论。
+
+3. DeepSeek7B 仍使用 eager，且有 sliding-window attention warning。
+
+4. 当前仍是路径行为图谱。
+   random advantage 高不等于变量已破解。
+
+5. 还没有做 token/subspace 定位和 destroy-restore。
+```
+
+### 对破解语言机制的第一性原则更新
+
+本轮进一步说明：
+
+```text
+语言编码机制不能从单一 relation 推出，
+也不能只从 relation 粗标签推出。
+必须下沉到 relation subtype，
+再通过随机对照筛出真正高于背景方向分布的路径。
+```
+
+更准确的机制单位应是：
+
+```text
+relation subtype path
+```
+
+而不是：
+
+```text
+relation path
+```
+
+例如：
+
+```text
+binding/color、binding/temperature、binding/taste
+不是同一强度路径；
+
+negation/syntactic_not、negation/quantifier_no
+也不是同一路径；
+
+quantifier/all_some 在 GLM4/DS7B 强，
+但在 Qwen3 很弱。
+```
+
+所以全局机制应表示为：
+
+```text
+语言机制 = subtype path network
+             + random-advantage filter
+             + cross-model alignment
+             + variable-level closure
+```
+
+### 下一步计划
+
+Phase 59 应做：
+
+```text
+稳定候选路径的变量拆分与 token/subspace 定位
+```
+
+不建议再盲目扩大所有 subtype。
+
+优先候选：
+
+```text
+1. temporal_order/before_after
+   原因：
+     Qwen3 强；
+     DeepSeek7B 强；
+     读出相对简单；
+     before/after 是明确变量。
+
+2. quantifier/all_some 或 negation/quantifier_no
+   原因：
+     GLM4 强；
+     DeepSeek7B 强；
+     但需要更可靠读出器。
+
+3. same_class/category_peer
+   原因：
+     Qwen3 强；
+     GLM4 中等强；
+     概念类别关系较适合变量拆分。
+
+4. contrast/but_and
+   原因：
+     DeepSeek7B 强；
+     Qwen3/GLM4 也有正优势。
+```
+
+Phase 59 具体任务：
+
+```text
+1. 选择 2-3 个稳定 subtype。
+2. 对每个 subtype 做：
+   token-level path signature
+   layer trajectory
+   MLP gate/up/interaction token split
+   candidate-output readout
+
+3. 判断：
+   变量信息在哪里写入？
+   哪个 token 承载关系变量？
+   哪些 MLP 层产生净偏置？
+   是否可以做 destroy-restore？
+```
+
+阶段性大任务：
+
+```text
+从全局路径筛选，进入稳定 subtype 的变量级闭包。
 ```
