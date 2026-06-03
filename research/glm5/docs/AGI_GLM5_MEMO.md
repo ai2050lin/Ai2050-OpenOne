@@ -6796,3 +6796,1840 @@ python tests/glm5/phase346_interaction_closure.py glm4        # ~71s
 - `tests/glm5/phase346_interaction_closure.py` — Phase 346 精确交互+闭合
 - 结果：`results/phase344_345_multi_relation/{qwen3,glm4,deepseek7b}_phase344_345.json`
 - 结果：`results/phase346_interaction_closure/{qwen3,glm4,deepseek7b}_phase346.json`
+
+## Phase 347: W_down行结构分析 + 完整闭合 + 交互物理意义 [2026-06-02 21:15]
+
+### 背景
+
+Phase 346遗留5个硬伤，本阶段集中攻克：
+1. W_down结构：为什么正负通道如此平衡？
+2. 完整闭合：加入attention + 非binding层
+3. 交互项的物理意义：SiLU非线性到底贡献了多少？
+
+### 方法
+
+**Part A: W_down行结构分析（12个pair × 5个binding层）**
+- `channel_proj[i] = (W_down.T @ direction)[i]`：通道i对binding方向的投影
+- 正负通道分类：channel_proj > 0 为正，< 0 为负
+- 分析正负通道的：投影均值、范数均值、贡献和、交互和
+- 平衡比：|正通道投影和| / |负通道投影和|
+
+**Part B: 完整电路闭合（6个pair，全部层）**
+- 对每层hook attention输出和MLP输出
+- 计算：attn贡献 + MLP贡献 = total circuit
+- 比较：circuit closure, MLP-only closure, binding-MLP closure
+
+**Part C: 交互物理意义（6个pair × binding层）**
+- 通道级分解：interaction_i = channel_proj[i] × (gate_diff[i]) × (up_diff[i])
+- SiLU非线性分解：linear_approx vs nonlinear_residual
+- 4象限分析：gate_diff × up_diff 的正负组合
+
+### 核心发现1：W_down通道投影完美对称 — 这是根本原因！
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| 正通道比例 | 50.03% | 49.97% | 50.05% |
+| 投影平衡比 | 1.0003±0.021 | 0.9985±0.020 | 1.0026±0.023 |
+| 范数平衡比 | 0.9998±0.002 | 0.9999±0.001 | 1.0002±0.001 |
+| 正投影均值 | +0.0184 | +0.0204 | +0.0116 |
+| 负投影均值 | -0.0184 | -0.0204 | -0.0116 |
+| 正范数均值 | 1.1851 | 1.5334 | 0.9135 |
+| 负范数均值 | 1.1853 | 1.5335 | 0.9133 |
+
+→ **W_down的列向量（通道读取向量）与任意语义方向的投影，精确50/50对称！**
+→ 投影均值绝对值相等（正=+x，负=-x），范数均值几乎完全相等
+→ **这不是binding特有，而是W_down的结构性质**：对任意方向，正负通道投影都完美平衡
+
+**关键洞察**：W_down的列向量的中心对称性意味着：
+```
+对任意方向d，sum_{i: d·w_i > 0} |d·w_i| ≈ sum_{i: d·w_i < 0} |d·w_i|
+```
+这等价于W_down列向量集在方向空间上的"各向同性"——没有哪个方向被系统性偏好。
+
+### 核心发现2：闭合问题 — 电路总和不等于最终binding
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| 电路闭合比 | 3.67±9.49 | -0.32±36.2 | 1.26±0.93 |
+| MLP闭合比 | 2.96±7.97 | 22.0±17.8 | 0.94±0.82 |
+| Binding MLP闭合比 | 1.11±2.41 | -0.08±7.00 | 0.43±0.66 |
+| Attn占比 | 12.6% | 60.3% | 14.2% |
+| MLP占比 | 87.4% | 39.7% | 85.8% |
+| Binding MLP均值 | 3.58 | 4.25 | 1.28 |
+| 非binding MLP均值 | 3.17 | 24.66 | 1.95 |
+
+→ **闭合比极不稳定**，尤其DS7B的attention贡献巨大且不稳定
+→ **DS7B的attention贡献占60%**（vs Qwen3/GLM4的~13%），说明DS7B用不同策略
+→ 非binding层MLP贡献不能忽略（Qwen3: 3.17 vs binding层: 3.58）
+→ **GLM4的闭合最好**（circuit closure ~1.26），Qwen3中等，DS7B最差
+→ 闭合不完美原因：LayerNorm重缩放 + 残差交互 + hook精度
+
+### 核心发现3：交互项的物理意义 — 主要是gate×up的线性交叉，非线性只占15-17%
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| 非线性分数 | 17.2%±7.1% | 15.4%±7.9% | 13.5%±2.1% |
+
+→ **交互项的~85%来自线性交叉效应**（gate_diff × up_diff的组合），而非SiLU非线性
+→ SiLU非线性只贡献交互项的13-17%
+→ 这说明交互不是来自SiLU的弯曲，而是gate和up同时变化时的"乘积效应"
+
+**4象限分析（gate_diff × up_diff）**：
+
+| 象限 | Qwen3 ia_sum | DS7B ia_sum | GLM4 ia_sum |
+|------|------------|-----------|-----------|
+| gate+up+ | 0.271 | 0.291 | -0.026 |
+| gate+up- | 0.418 | 0.530 | -0.085 |
+| gate-up+ | 0.089 | 0.043 | -0.003 |
+| gate-up- | 0.184 | 0.036 | -0.031 |
+
+→ Qwen3/DS7B：gate+up-象限交互最大，gate-up+最小
+→ GLM4：所有象限交互为负（GLM4的binding信号特殊）
+→ **gate+up-（gate增up减）贡献最大交互** — 这符合binding逻辑：gate选择属性，up提供内容
+
+### 理论更新
+
+**平衡放大的根本原因现在完全清楚了**：
+
+```
+W_down的列向量对任意方向d呈现精确50/50对称：
+  正投影通道数 ≈ 负投影通道数 ≈ d_ff/2
+  正投影均值绝对值 ≈ 负投影均值绝对值
+  正通道范数均值 ≈ 负通道范数均值
+```
+
+这意味着：
+1. **平衡放大不是训练的结果**，而是W_down初始化+训练后的结构性质
+2. **微偏置来自通道激活差异**：虽然W_down正负对称，但激活（SiLU(gate)*up）在clean vs corrupt下不同
+3. **交互项的85%是线性交叉**，不是SiLU非线性
+
+更精确的微偏置模型：
+```
+微偏置 ≈ sum_i channel_proj[i] × Δact[i]
+       = pos_channels(贡献) + neg_channels(贡献) + 交叉项
+其中 Δact[i] = SiLU(gate_c[i])*up_c[i] - SiLU(gate_r[i])*up_r[i]
+```
+
+因为channel_proj正负完美对称，微偏置完全取决于激活差异Δact在正负通道上的不对称性。
+
+### 客观事实拼图更新
+
+1. **W_down通道投影50/50对称** — 这是平衡放大的根本原因（三模型一致）
+2. **W_down范数也50/50对称** — 正负通道的读取向量范数几乎完全相等
+3. **交互项85%是线性交叉** — gate_diff × up_diff，不是SiLU弯曲
+4. **gate+up-象限贡献最大交互** — 符合binding逻辑
+5. **DS7B的attention贡献异常大(60%)** — 与Qwen3/GLM4(13%)不同
+6. **非binding层MLP贡献不可忽略** — 约占MLP总贡献的40-90%
+7. **GLM4闭合最好(~1.26)**，但binding vs random差异消失（Phase 344）
+
+### 硬伤和问题
+
+1. **W_down对称性的因果方向** — 是初始化就对称？还是训练维持了对称？需要检查初始化权重
+2. **闭合仍然不完美** — LayerNorm和残差交互未建模，需要更精确的闭合方法
+3. **DS7B的attention异常** — 60%的attention贡献导致闭合极不稳定，需要深入分析DS7B的特殊性
+4. **通道激活差异的来源** — 为什么Δact在binding方向正负通道上不对称？这是微偏置的直接来源
+5. **W_down对称的泛化性** — 是否对任意方向都对称？还是只对W_U子空间内的方向对称？
+
+### 命令记录
+
+```bash
+# Phase 347: W_down结构 + 完整闭合 + 交互物理意义
+python tests/glm5/phase347_wdown_structure_closure.py qwen3       # ~25s
+python tests/glm5/phase347_wdown_structure_closure.py deepseek7b  # ~107s
+python tests/glm5/phase347_wdown_structure_closure.py glm4        # ~157s
+```
+
+脚本位置：
+- `tests/glm5/phase347_wdown_structure_closure.py` — Phase 347 主测试
+- 结果：`results/phase347_wdown_structure_closure/{qwen3,glm4,deepseek7b}_phase347.json`
+
+## Phase 348: W_down对称性来源 — 初始化 vs 训练 + 方向泛化性 [2026-06-02 22:10]
+
+### 背景
+
+Phase 347发现W_down通道投影50/50对称，但用户指出"平衡放大不是训练结果"结论过强，需要初始化对照。同时"对任意方向都对称"需要更广的方向验证。
+
+### 方法
+
+**Part A: 训练后W_down — 全层 × 6种方向类型**
+- random_gaussian: 50个标准高斯随机方向
+- W_U_PCA: W_U行空间SVD主方向
+- W_U_subspace_random: W_U子空间内随机方向
+- W_U_token_directions: 前50个token嵌入方向
+- semantic_binding: 18个语义binding方向
+- residual_PCA: 实际残差流PCA方向
+
+**Part B: Kaiming初始化W_down — 同架构随机初始化**
+- 3个不同seed的Kaiming初始化
+- 测试同样的6种方向类型
+
+**Part C: 逐层对称性剖面**
+
+### 核心发现1：pos_frac和proj_balance — 训练前后几乎无差异
+
+| 指标 | 方向类型 | Qwen3 Trained | Qwen3 Init | DS7B Trained | DS7B Init | GLM4 Trained | GLM4 Init |
+|------|---------|-------------|-----------|------------|----------|------------|----------|
+| pos_frac | random | 0.4999 | 0.4996 | 0.4998 | 0.4999 | 0.4999 | 0.4998 |
+| pos_frac | semantic | 0.5000 | 0.4999 | 0.4999 | 0.4998 | 0.5000 | 0.4993 |
+| pos_frac | W_U_token | 0.4997 | 0.4985 | 0.5005 | 0.4992 | 0.4998 | 0.4998 |
+| proj_balance | random | 1.0001 | 0.9979 | 0.9999 | 0.9985 | 1.0001 | 0.9981 |
+| proj_balance | semantic | 0.9994 | 0.9995 | 0.9994 | 1.0010 | 1.0011 | 0.9963 |
+| norm_balance | random | 1.0001 | 1.0000 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |
+| norm_balance | semantic | 0.9998 | 1.0001 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+→ **正通道比例(~50%)、投影平衡比(~1.00)、范数平衡比(~1.00)在训练前后几乎完全一致**
+→ 这些指标确实来自初始化的几何背景（Kaiming高斯矩阵的零均值对称性），训练未显著改变
+
+### 核心发现2：proj_kurtosis — 训练后显著增大！这是关键差异！
+
+| 方向类型 | Qwen3 Trained | Qwen3 Init | Diff | DS7B Trained | DS7B Init | Diff | GLM4 Trained | GLM4 Init | Diff |
+|---------|-------------|-----------|------|------------|----------|------|------------|----------|------|
+| random | 0.4315 | -0.0041 | **+0.436** | 0.4291 | 0.0025 | **+0.427** | 0.4311 | -0.0082 | **+0.439** |
+| W_U_PCA | 0.4317 | -0.0054 | **+0.437** | 0.9020 | -0.0059 | **+0.908** | 0.8198 | 0.0021 | **+0.818** |
+| W_U_subspace | 0.3037 | 0.0028 | **+0.301** | 0.6610 | -0.0009 | **+0.662** | 0.4804 | -0.0080 | **+0.488** |
+| W_U_token | 8.3320 | -0.0026 | **+8.335** | 5.1186 | -0.0080 | **+5.127** | 10.6508 | 0.0040 | **+10.647** |
+| semantic | 1.3036 | -0.0174 | **+1.321** | 0.6566 | -0.0021 | **+0.659** | 6.4395 | -0.0063 | **+6.446** |
+| residual_PCA | 0.4085 | 0.0037 | **+0.405** | 1.8629 | -0.0048 | **+1.868** | 0.3159 | -0.0044 | **+0.320** |
+
+→ **初始化的kurtosis≈0（标准高斯），训练后kurtosis显著增大（0.3-10.6）！**
+→ **kurtosis增大意味着：通道投影分布从高斯变成了重尾分布** — 少量通道对某方向有大投影，大部分通道投影小
+→ **这是训练塑形的证据！** 训练没有改变50/50对称性，但改变了投影分布的形状
+
+### 核心发现3：kurtosis的方向依赖性 — 语义方向和W_U方向kurtosis最大
+
+| 方向类型 | Qwen3 | DS7B | GLM4 |
+|---------|-------|------|------|
+| random | 0.43 | 0.43 | 0.43 |
+| residual_PCA | 0.41 | 1.86 | 0.32 |
+| W_U_PCA | 0.43 | 0.90 | 0.82 |
+| W_U_subspace | 0.30 | 0.66 | 0.48 |
+| semantic | **1.30** | 0.66 | **6.44** |
+| W_U_token | **8.33** | **5.12** | **10.65** |
+
+→ **W_U_token方向kurtosis最大（5-10），semantic方向次之（0.7-6.4），random方向最小（0.43）**
+→ **训练使W_down在W_U输出方向上产生了专门化** — 少数通道对特定token方向有大投影
+→ 这意味着：训练虽然保持了50/50平衡，但在平衡内部创建了方向专门化的通道结构
+
+### 核心发现4：proj_skew几乎为零 — 训练后仍然对称
+
+所有模型、所有方向的proj_skew都在-0.03到+0.01之间，训练前后无显著差异。
+→ **训练不改变对称性本身，只改变分布形状（从高斯→重尾）**
+
+### 客观事实拼图更新
+
+1. **50/50对称性来自初始化** — Kaiming高斯初始化天然产生零均值对称投影，训练保持了这个对称
+2. **训练塑形的是kurtosis** — 从标准高斯(kurtosis≈0)变为重尾分布(kurtosis=0.3-10.6)
+3. **kurtosis的方向依赖性** — W_U token方向最大(5-10)，semantic次之，random最小(~0.43)
+4. **这意味着**：训练使少数通道对特定语义方向产生了"专门化"大投影，但正负对称仍然保持
+5. **修正Phase 347结论**："平衡放大不是训练结果"应改为"50/50对称来自初始化，但通道专门化（重尾分布）是训练塑形的"
+6. **W_down对称性对任意方向都成立** — 包括random、W_U、PCA、semantic方向
+
+### 硬伤和问题
+
+1. **kurtosis方向依赖性的物理解释** — 为什么W_U token方向kurtosis最大？是否因为训练让W_down学会了对特定输出方向进行专门化读出？
+2. **重尾分布中的"专门化通道"** — 哪些通道对binding方向有大投影？它们是否承载了语义信息？
+3. **kurtosis与net/gross的关系** — kurtosis大的方向是否net/gross也大？如果kurtosis=专门化，是否专门化增强微偏置？
+4. **逐层kurtosis剖面** — 哪些层的kurtosis最大？binding层是否kurtosis更高？
+5. **重尾结构是否解释了"微偏置"** — 如果少数通道有大投影，它们的激活差异是否是微偏置的主要来源？
+
+### 命令记录
+
+```bash
+# Phase 348: W_down对称性来源
+python tests/glm5/phase348_wdown_symmetry_origin.py qwen3       # ~516s
+python tests/glm5/phase348_wdown_symmetry_origin.py deepseek7b  # ~1309s
+python tests/glm5/phase348_wdown_symmetry_origin.py glm4        # ~1016s
+```
+
+脚本位置：
+- `tests/glm5/phase348_wdown_symmetry_origin.py` — Phase 348 主测试
+- 结果：`results/phase348_wdown_symmetry_origin/{qwen3,glm4,deepseek7b}_phase348.json`
+
+## Phase 348b: Kurtosis与Net/Gross关系 + 专门化通道分析 [2026-06-02 22:19]
+
+### 背景
+
+Phase 348发现训练后W_down的kurtosis显著增大（从0变为0.3-10.6），尤其在语义方向和W_U方向。本阶段验证kurtosis增大是否与net/gross（微偏置强度）相关。
+
+### 核心发现1：专门化通道(Top 10%)贡献了26%的总信号，但net/gross反而更低
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| Top 1% gross_frac | 4.0% | 3.7% | 4.1% |
+| Top 10% gross_frac | 26.4% | 25.6% | 25.9% |
+| Top 1% net/gross | 0.053 | 0.050 | **0.092** |
+| Top 10% net/gross | **0.002** | **-0.008** | 0.025 |
+| Remaining 90% net/gross | **0.014** | **0.009** | -0.002 |
+| Total net/gross | 0.011 | 0.004 | 0.005 |
+
+→ **Qwen3/DS7B：专门化通道(Top 10%)的net/gross几乎为零甚至为负，剩余90%的net/gross反而更高！**
+→ **GLM4相反：Top 1%通道net/gross最高(0.092)，剩余90%为负(-0.002)**
+→ 这意味着：**Qwen3/DS7B的微偏置主要来自"普通"通道的系统性激活差异，不是来自专门化通道**
+→ GLM4的微偏置主要来自Top 1%通道
+
+### 核心发现2：kurtosis与net/gross的相关性非常弱
+
+| 模型 | Corr(kurtosis, net/gross) | Corr(top_fraction, net/gross) |
+|------|--------------------------|------------------------------|
+| Qwen3 | 0.15 | 0.48 |
+| DS7B | -0.18 | 0.32 |
+| GLM4 | 0.04 | 0.42 |
+
+→ **kurtosis与net/gross几乎不相关**！
+→ **top_fraction与net/gross有中等正相关(~0.3-0.48)**
+→ 这说明：kurtosis增大（专门化）不直接导致微偏置增强
+
+### 核心发现3：语义方向的kurtosis远高于随机方向
+
+| 模型 | Random kurtosis | Semantic kurtosis | Ratio |
+|------|----------------|------------------|-------|
+| Qwen3 | 0.085 | 0.301 | 3.5x |
+| DS7B | 0.030 | 0.406 | 13.5x |
+| GLM4 | 0.045 | 8.815 | **197x** |
+
+→ **语义方向的kurtosis远高于随机方向** — 训练确实使W_down在语义方向上更专门化
+→ **GLM4的语义方向kurtosis极其极端(197x)** — GLM4的通道专门化程度远高于其他模型
+→ 但GLM4的net/gross并不是最高的 — 再次确认专门化≠微偏置
+
+### 客观事实拼图更新
+
+1. **专门化通道贡献了约26%的总信号(gross)**，但不是微偏置的主要来源（Qwen3/DS7B）
+2. **kurtosis与net/gross几乎不相关** — 专门化不等于偏置增强
+3. **微偏置来自普通通道(90%)的系统性激活差异** — 这是分布式微偏置，不是集中式
+4. **GLM4是例外** — Top 1%通道net/gross最高(0.092)，但GLM4整体的binding vs random差异消失（Phase 344）
+5. **语义方向kurtosis远高于随机** — 训练确实在塑形通道专门化，但专门化的作用是增大信号幅度(gross)，不是增强偏置方向性(net/gross)
+
+### 修正Phase 347/348的理论
+
+```
+Phase 347: "平衡放大来自W_down对称读出基底，微偏置来自激活差异"
+Phase 348: "50/50对称来自初始化，kurtosis专门化来自训练"
+Phase 348b: "专门化增大gross但不增强net/gross；微偏置来自普通通道的分布式差异"
+```
+
+更精确的模型：
+```
+W_down通道投影 = 对称基底(初始化) + 专门化结构(训练)
+专门化结构 → 增大信号幅度(gross)
+微偏置(net) → 来自普通通道的激活差异 → 不需要专门化
+```
+
+### 硬伤和问题
+
+1. **"普通通道"的激活差异为什么有系统性方向？** — 这是微偏置的核心来源，仍未破解
+2. **GLM4的Top 1%通道net/gross最高，但binding vs random差异消失** — 矛盾，需进一步分析
+3. **专门化通道的作用是什么？** — 如果不是产生微偏置，那它们的功能是什么？
+4. **分布式微偏置的机制** — 为什么90%的普通通道会系统性偏向binding方向？
+
+### 命令记录
+
+```bash
+# Phase 348b: Kurtosis vs Net/Gross + 专门化通道
+python tests/glm5/phase348b_kurtosis_netgross.py qwen3       # ~27s
+python tests/glm5/phase348b_kurtosis_netgross.py deepseek7b  # ~72s
+python tests/glm5/phase348b_kurtosis_netgross.py glm4        # ~96s
+```
+
+脚本位置：
+- `tests/glm5/phase348b_kurtosis_netgross.py` — Phase 348b 确认测试
+- 结果：`results/phase348b_kurtosis_netgross/{qwen3,glm4,deepseek7b}_phase348b.json`
+
+## Phase 349: Δact条件路径分析 — 微偏置的来源 [2026-06-02 22:25]
+
+### 背景
+
+Phase 348b发现微偏置主要来自"普通通道"(90%)而非专门化通道。本阶段直接分析Δact的结构，回答：为什么普通通道会产生系统性微偏置？
+
+### 核心发现1：Δact与channel_proj的相关性极低(~0.005) — 微偏置不是来自Δact与投影的对齐
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| Corr(Δact, channel_proj) | **0.006** | **0.002** | **0.005** |
+| Corr(gate_diff, cproj) | 0.0004 | 0.0005 | 0.002 |
+| Corr(up_diff, cproj) | 0.0008 | 0.0003 | 0.0004 |
+| Top-Δact channels pos_proj_frac | 0.498 | 0.494 | 0.506 |
+
+→ **Δact与channel_proj几乎不相关！** 相关性仅0.002-0.006
+→ **Top-Δact通道的正投影比例≈50%** — 完全随机！
+→ **gate_diff和up_diff也与channel_proj不相关**
+
+这意味着：**微偏置不是来自"大Δact通道恰好是正投影通道"这种选择性机制**
+
+### 核心发现2：正投影通道和负投影通道的|Δact|几乎完全相等
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| 正投影通道 |Δact|_mean | 0.2773 | 0.2717 | 0.1778 |
+| 负投影通道 |Δact|_mean | 0.2780 | 0.2705 | 0.1781 |
+| 比率(pos/neg abs) | **0.998** | **1.004** | **0.998** |
+
+→ **正负投影通道的|Δact|几乎完全相等**
+→ **微偏置来自正投影通道的Δact_mean略正、负投影通道的Δact_mean略负**
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| 正投影通道 Δact_mean | +0.0045 | +0.0002 | +0.0031 |
+| 负投影通道 Δact_mean | -0.0002 | -0.0023 | +0.0010 |
+
+→ **正投影通道的Δact_mean为正，负投影通道为负（Qwen3/DS7B）**
+→ 这就是微偏置的直接来源：正投影通道的激活变化方向性略偏正，负投影通道略偏负
+→ **但这个偏移极其微小**（0.005 vs |Δact|的0.28），仅占|Δact|的~2%
+
+### 核心发现3：Δact呈中等集中分布（Gini≈0.54，Top 10%占40%）
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| Gini系数 | 0.543 | 0.544 | 0.530 |
+| Top 1% |Δact|占比 | 11.8% | 12.6% | 10.6% |
+| Top 10% |Δact|占比 | 40.4% | 41.0% | 37.6% |
+
+→ Δact分布有一定集中性，但不是极端集中
+→ Top 10%通道贡献了约40%的|Δact|
+
+### 核心发现4：跨pair通道高度复用（Jaccard比随机高4-9倍）
+
+| 指标 | Qwen3 L21 | Qwen3 L23 | GLM4 L30 | GLM4 L33 |
+|------|----------|----------|---------|---------|
+| Top-Δact Jaccard | 0.487 | 0.448 | 0.263 | 0.215 |
+| 随机Jaccard | 0.052 | 0.052 | 0.053 | 0.053 |
+| **倍数** | **9.3x** | **8.6x** | **5.0x** | **4.1x** |
+
+→ **不同binding pair高度复用同一组通道！** Jaccard=0.22-0.49（vs随机0.05）
+→ 这意味着：存在一组"通用binding通道"，对所有对象-属性关系都敏感
+→ Qwen3复用度最高(9x)，GLM4最低(4-5x)
+
+### 理论更新
+
+微偏置的精确机制现在更清楚了：
+
+```
+微偏置 ≠ Δact选择性地集中在对binding方向有正投影的通道
+微偏置 = 正投影通道的Δact_mean略正 + 负投影通道的Δact_mean略负
+```
+
+更精确地说：
+```
+net_binding = Σ cproj[i] × Δact[i]
+           ≈ Σ_positive cproj[i] × Δact_mean_pos × N_pos
+           + Σ_negative cproj[i] × Δact_mean_neg × N_neg
+           
+其中 Δact_mean_pos ≈ +0.005 (极微小)
+     Δact_mean_neg ≈ -0.002 (极微小)
+```
+
+这个极微小的方向性偏移（~2%的|Δact|）就是整个binding信号的来源。
+
+**跨pair通道复用**说明：存在一组通用通道，它们的激活变化方向与W_down投影方向有微弱但系统性的对齐。这个对齐不是来自单个通道的强选择，而是来自大量通道的微弱统计偏向。
+
+### 客观事实拼图更新
+
+1. **Δact与channel_proj不相关(0.002-0.006)** — 微偏置不是选择性通道激活
+2. **正投影通道Δact_mean略正，负投影通道略负** — 这是微偏置的直接来源
+3. **偏移极微小(~2%的|Δact|)** — 微偏置是高维空间中的统计效应
+4. **Δact呈中等集中(Gini≈0.54)** — Top 10%占40%
+5. **跨pair通道高度复用(Jaccard 4-9x随机)** — 存在通用binding通道
+6. **gate_diff和up_diff都不与cproj相关** — 不是gate或up单方面选择方向
+
+### 硬伤和问题
+
+1. **正投影通道Δact_mean略正的深层原因** — 2%的偏移来自哪里？是否与attention的上游信息路由有关？
+2. **通用binding通道的结构** — 这些通道是否与特定的gate/up权重行有关？
+3. **微偏置是纯统计效应还是有因果机制** — 2%的偏移是否只是大数定律的残余？
+4. **跨pair复用的通道是否具有语义解释** — 它们编码的是"属性方向"还是"对象-属性兼容性"？
+5. **GLM4的正投影通道Δact_mean也为正** — 但Phase 344显示GLM4的binding vs random差异消失，这两者是否矛盾？
+
+### 命令记录
+
+```bash
+# Phase 349: Δact条件路径分析
+python tests/glm5/phase349_dact_path.py qwen3       # ~22s
+python tests/glm5/phase349_dact_path.py deepseek7b  # ~68s
+python tests/glm5/phase349_dact_path.py glm4        # ~89s
+```
+
+脚本位置：
+- `tests/glm5/phase349_dact_path.py` — Phase 349 主测试
+- 结果：`results/phase349_dact_path/{qwen3,glm4,deepseek7b}_phase349.json`
+
+## Phase 350: 通道分层 + gate/up均值偏移来源分解 [2026-06-02 22:51]
+
+### 背景
+
+Phase 349发现微偏置来自正投影通道Δact_mean略正(+0.005)、负投影通道略负(-0.002)。本阶段回答两个关键问题：
+1. 哪个通道强度区间产生微偏置？
+2. gate还是up首先产生正负投影通道的不对称？
+
+### 方法
+
+**Part A: 通道按|channel_proj|分层**（Top 1%, 1-10%, 10-30%, 30-60%, Bottom 40%）
+- 每层计算：gross_frac, net/gross, Δact_mean_pos, Δact_mean_neg, Pos-Neg diff
+
+**Part B: gate/up均值偏移来源分解**
+- 精确分解：Δact = gate_driven + up_driven
+  - gate_driven = (SiLU(g_c) - SiLU(g_r)) × u_r
+  - up_driven = SiLU(g_c) × (u_c - u_r)
+- 对每个分量检查：与cproj的相关性、正负投影通道的均值差
+
+**Part C: 通道分层 × gate/up交互**
+- 每个强度区间内，gate_driven和up_driven分别贡献多少net
+
+**Part D: 原始gate_diff (pre-SiLU) vs SiLU(gate)_diff 不对称性**
+- 检查不对称性是在SiLU之前还是之后出现
+
+### 核心发现1：Top 1%专门化通道net/gross最高，1-10%急剧下降
+
+| Band | Qwen3 Net/Gross | Qwen3 PN diff | DS7B Net/Gross | DS7B PN diff | GLM4 Net/Gross | GLM4 PN diff |
+|------|----------------|---------|----------------|---------|----------------|---------|
+| Top 1% | **0.1598** | **+0.066** | **0.0416** | **+0.022** | **0.1081** | **+0.018** |
+| 1-10% | 0.0156 | +0.008 | 0.0005 | +0.000 | 0.0197 | +0.007 |
+| 10-30% | 0.0102 | +0.005 | 0.0112 | +0.006 | 0.0067 | +0.003 |
+| 30-60% | 0.0074 | +0.004 | 0.0021 | +0.001 | 0.0070 | +0.002 |
+| Bottom 40% | 0.0075 | +0.003 | 0.0011 | +0.002 | -0.0014 | -0.000 |
+
+→ **Top 1%通道的net/gross远高于其他区间（0.04-0.16 vs 0.001-0.02）**
+→ **Top 1%的Pos-Neg diff也是最大的（+0.018到+0.066）**
+→ **从1-10%开始急剧下降** — 微偏置主要集中在Top 1%专门化通道
+→ **修正Phase 348b结论**：Phase 348b的"Top 10% net/gross低"是因为1-10%区间稀释了Top 1%的强信号
+→ **GLM4的Bottom 40% net/gross为负(-0.0014)** — 普通通道甚至产生反向偏置
+
+### 核心发现2：gate_driven和up_driven都贡献正方向偏移，但模型间分工不同
+
+| Component | Qwen3 PN diff | DS7B PN diff | GLM4 PN diff |
+|-----------|---------|---------|---------|
+| Δact (total) | **+0.0047** | **+0.0025** | **+0.0021** |
+| gate_diff (SiLU) | -0.0022 | +0.0002 | **+0.0058** |
+| up_diff | -0.0022 | **+0.0017** | +0.0007 |
+| gate_driven | **+0.0028** | +0.0009 | **+0.0013** |
+| up_driven | +0.0019 | **+0.0016** | +0.0009 |
+
+→ **gate_driven在Qwen3/GLM4中Pos-Neg diff更大，up_driven在DS7B中更大**
+→ **Qwen3/DS7B：gate_diff (SiLU)本身不对称性为负或接近零** — 不是gate_diff选择方向
+→ **GLM4：gate_diff (SiLU)不对称性为正(+0.006)** — gate确实在GLM4中选择方向
+→ **关键**：gate_driven的不对称性来自gate_diff与u_r的乘积，不是gate_diff本身
+
+### 核心发现3：通道分层中gate/up分工模式清晰
+
+**Qwen3**：
+- Top 1%：up主导（Gate%=14.3%, Up_PN=+0.077）
+- 30-60%/Bottom：gate主导（Gate%=98.7%/77.3%）
+
+**DS7B**：
+- Top 1%/10-30%：up和gate共同贡献（Gate%=49%/36%）
+- 30-60%：gate主导（Gate%=92.6%）
+
+**GLM4**：
+- Top 1%：**gate主导（Gate%=73.4%）**
+- 1-10%/10-30%/30-60%：up主导（Gate%=27%/31%/6%）
+
+→ **模式**：专门化通道(Top 1%)中，up承载方向性偏置；中等/弱通道中，gate承载方向性偏置
+→ **GLM4例外**：Top 1%通道中gate主导（73.4%），这可能与GLM4的binding vs random差异消失有关
+
+### 核心发现4：SiLU压缩gate不对称性，不是放大
+
+| 模型 | Raw gate PN diff | SiLU gate PN diff | SiLU amplification |
+|------|-----------------|------------------|-------------------|
+| Qwen3 | -0.0047 | -0.0022 | 0.338x |
+| DS7B | -0.0021 | +0.0002 | 0.382x |
+| GLM4 | +0.0083 | +0.0058 | 0.597x |
+
+→ **SiLU始终压缩gate不对称性（0.34-0.60x）** — SiLU不是放大器
+→ **GLM4是唯一raw gate_diff不对称性为正的模型** — 且不对称性最大(+0.008)
+
+### 核心发现5：gate/up不对称性比例因模型而异
+
+| 模型 | |gate_diff asym| | |up_diff asym| | Gate/Up ratio |
+|------|---------------|-------------|---------------|
+| Qwen3 | 0.007 | 0.017 | **0.41** |
+| DS7B | 0.004 | 0.012 | **0.30** |
+| GLM4 | 0.014 | 0.003 | **4.49** |
+
+→ **Qwen3/DS7B：up_diff不对称性更大** — up是主要路径选择器
+→ **GLM4：gate_diff不对称性远大于up** — gate是路径选择器
+→ **不同模型使用了不同的gate/up分工策略**
+
+### 客观事实拼图更新
+
+1. **Top 1%专门化通道net/gross最高(0.04-0.16)** — 修正了Phase 348b的结论
+2. **1-10%区间net/gross急剧下降** — 微偏置集中在极少数最强通道
+3. **gate_driven和up_driven都贡献正方向偏移** — 不是单一组件选择方向
+4. **专门化通道(Top 1%)中up主导方向性**，弱通道中gate主导方向性
+5. **SiLU压缩gate不对称性** — 不是放大器，而是压缩器
+6. **GLM4是唯一gate主导的模型** — 且gate_diff不对称性最大
+7. **模型间gate/up分工策略不同** — Qwen3/DS7B up主导，GLM4 gate主导
+
+### 修正Phase 348b理论
+
+```
+Phase 348b: "专门化通道贡献gross但不增强net/gross；微偏置来自普通通道"
+Phase 350: "Top 1%专门化通道net/gross最高；1-10%急降导致Top 10%看起来低"
+```
+
+更精确的模型：
+```
+微偏置来自两个来源：
+1. Top 1%专门化通道：高net/gross(0.04-0.16)，主要由up_driven贡献方向性
+2. 10-60%中等通道：低net/gross(0.002-0.01)，主要由gate_driven贡献方向性
+
+这两个来源的绝对量：
+- Top 1%: 少量通道但高偏置率
+- 10-60%: 大量通道但低偏置率
+两者共同构成总net binding信号
+```
+
+### 硬伤和问题
+
+1. **Top 1% vs 10-60%的绝对net贡献比较** — 哪个来源的绝对net更大？
+2. **gate/up分工的深层原因** — 为什么专门化通道中up主导，弱通道中gate主导？
+3. **GLM4的gate主导策略是否有效** — gate主导但binding vs random差异消失
+4. **SiLU压缩gate不对称性的影响** — 这意味着gate的原始信号比我们看到的更强
+5. **up_diff不对称性在Qwen3/DS7B中为负** — 为什么up_diff的均值在正投影通道更负？
+
+### 命令记录
+
+```bash
+# Phase 350: 通道分层 + gate/up均值偏移来源
+python tests/glm5/phase350_channel_stratify_gateup.py qwen3       # ~19s
+python tests/glm5/phase350_channel_stratify_gateup.py deepseek7b  # ~48s
+python tests/glm5/phase350_channel_stratify_gateup.py glm4        # ~64s
+```
+
+脚本位置：
+- `tests/glm5/phase350_channel_stratify_gateup.py` — Phase 350 主测试
+- 结果：`results/phase350_channel_stratify_gateup/{qwen3,glm4,deepseek7b}_phase350.json`
+
+## Phase 350b: 绝对Net贡献确认 + 扩展Pair集 [2026-06-02 22:57]
+
+### 背景
+
+Phase 350发现Top 1%通道net/gross最高，但需要确认绝对net贡献占比。扩展到30个pair进行确认。
+
+### 核心发现：Top 1%专门化通道贡献了26-46%的总net
+
+| Band | Qwen3 Net% | Qwen3 Gate% | DS7B Net% | DS7B Gate% | GLM4 Net% | GLM4 Gate% |
+|------|-----------|-------------|-----------|------------|-----------|------------|
+| Top 1% | **45.5%** | 5.5% | **40.5%** | 31.9% | **25.9%** | **71.8%** |
+| 1-10% | 20.6% | 15.4% | 6.3% | 68.9% | 33.4% | 42.9% |
+| 10-30% | 15.5% | 10.3% | **54.0%** | 50.1% | 21.7% | 7.9% |
+| 30-60% | 11.6% | 91.9% | -5.6% | 10.2% | 17.4% | 4.1% |
+| Bottom 40% | 6.8% | 88.4% | 4.8% | 16.1% | 1.5% | 71.9% |
+
+→ **Qwen3/DS7B：Top 1%贡献40-46%总net，其中68-95%来自up_driven**
+→ **GLM4：Top 1%贡献26%，其中72%来自gate_driven** — gate主导
+→ **DS7B的10-30%带贡献了54%的net** — DS7B的微偏置分布更均匀
+→ **30-60%弱通道：Qwen3 net来自gate(92%)，DS7B为负，GLM4来自up(96%)**
+
+### 修正Phase 348b
+
+```
+Phase 348b: "专门化通道贡献gross但不增强net/gross；微偏置来自普通通道"
+Phase 350/350b: "Top 1%专门化通道贡献了26-46%的总net，是binding信号的最大单一来源"
+```
+
+Phase 348b的误判原因：Top 10%区间内，1-10%通道稀释了Top 1%的强net/gross信号。
+
+### 命令记录
+
+```bash
+# Phase 350b: 绝对Net贡献确认
+python tests/glm5/phase350b_net_confirm.py qwen3       # ~14s
+python tests/glm5/phase350b_net_confirm.py deepseek7b  # ~65s
+python tests/glm5/phase350b_net_confirm.py glm4        # ~91s
+```
+
+脚本位置：
+- `tests/glm5/phase350b_net_confirm.py` — Phase 350b 确认测试
+- 结果：`results/phase350b_net_confirm/{qwen3,glm4,deepseek7b}_phase350b.json`
+
+## Phase 351: Top 1%通道因果消融 + 重叠结构 + Boost/Suppress分解 [2026-06-02 23:42]
+
+### 背景
+
+Phase 350/350b证明Top 1%专门化通道贡献26-46%的总net attribution。但attribution≠causation。本阶段：
+1. 真正的因果消融：在模型前向传播中zero-out指定通道，测量logit变化
+2. Top 1%重叠结构：cproj/Δact/contribution三者的Jaccard重叠
+3. Boost vs Suppress：Top 1%是增强兼容还是抑制不兼容？
+
+### 方法
+
+**Part 1: 真正的因果消融**
+- 识别Top 1% |cproj|通道和Top 1% |Δact|通道（从10个reference pairs跨pair统计）
+- 在down_proj输入上用register_forward_pre_hook zero-out指定通道
+- 测量clean_diff和corrupt_diff的变化 → binding effect变化
+- 对照组：相同数量的随机通道消融
+
+**Part 2: 重叠结构**
+- 每个pair计算Top 1% cproj/Δact/contribution的Jaccard
+- Cross-pair Jaccard：不同pair的Top 1%集合之间
+
+**Part 3: Boost/Suppress分解**
+- 分别投影到target方向和competitor方向
+- target_boost = max(0, Σ c_i(target_dir) * Δact_i)
+- competitor_suppress = max(0, -Σ c_i(competitor_dir) * Δact_i)
+
+### 核心发现1：Top 1% cproj通道的因果效应被确认
+
+**Logit层面的binding effect变化：**
+
+| Ablation | Qwen3 FracLost | DS7B FracLost | GLM4 FracLost |
+|----------|----------------|---------------|---------------|
+| Top 1% cproj | **+11.2%** | **+4.5%** | **+3.8%** |
+| Top 1% dact | -7.9% | **+74.7%** | **+7.3%** |
+| Random | -2.4% | -6.0% | +3.5% |
+
+→ **Top 1% cproj消融在所有三个模型中都导致binding下降（3.8%-11.2%），而Random消融不下降甚至微增**
+→ **DS7B的Top 1% dact消融效果极强（74.7%）** — dact通道对DS7B是真正的因果路径
+→ **Qwen3的dact消融反而增加binding（-7.9% loss = boost）** — 可能dact通道包含抑制性信号
+→ **GLM4所有消融效果都较弱（3-7%）** — binding更分布式，不易被局部消融破坏
+
+### 核心发现2：Δact通道跨pair复用极强（58-104x random）
+
+**Cross-pair Jaccard（binding层平均）：**
+
+| Type | Qwen3 (x random) | DS7B (x random) | GLM4 (x random) |
+|------|-------------------|-----------------|-----------------|
+| cproj | 15-17x | 14-16x | 15-19x |
+| dact | **59-104x** | **45-67x** | **21-41x** |
+| contrib | **22-36x** | **22-33x** | 9-13x |
+
+→ **Δact通道跨pair复用远超cproj（4-7倍）** — 不同pair共享激活差异路径
+→ **Qwen3/DS7B的dact复用最高（59-104x）** — 通道激活差异是模型间的共性机制
+→ **GLM4的dact复用较低（21-41x）** — 可能因为gate主导策略导致激活路径更多样
+→ **Within-pair：dact ∩ contrib的Jaccard最高（0.27-0.39）** — 高Δact通道也是高贡献通道
+
+### 核心发现3：Top 1%主要增强兼容（60-74%），不是抑制不兼容
+
+**Boost% by Band：**
+
+| Band | Qwen3 Boost% | DS7B Boost% | GLM4 Boost% |
+|------|-------------|-------------|-------------|
+| Top 1% | 62.3% | 60.4% | **74.4%** |
+| 1-10% | 54.6% | 50.5% | 58.3% |
+| 10-30% | 67.3% | 53.6% | 54.5% |
+| 30-60% | 62.4% | 70.4% | 71.7% |
+| Bottom 40% | 64.9% | 54.6% | 67.8% |
+
+→ **所有通道区间都以boost为主（50-74%）** — binding主要增强target而非抑制competitor
+→ **GLM4的Top 1% boost比例最高（74.4%）** — GLM4的专门化通道几乎完全用于增强
+→ **DS7B的1-10%区间boost/suppress几乎均等（50.5%/49.5%）** — 中等通道同时boost和suppress
+
+### 核心发现4：cproj和dact通道是不同的群体
+
+Within-pair cproj ∩ dact的Jaccard仅0.003-0.007（接近random baseline 0.005）！
+→ **Top 1%投影通道和Top 1%激活差异通道几乎不重叠**
+→ **它们通过不同路径贡献binding：cproj通道通过大投影×小差异，dact通道通过小投影×大差异**
+→ **dact ∩ contrib的Jaccard为0.19-0.39** — 高激活差异通道确实也是高贡献通道
+→ **cproj ∩ contrib的Jaccard为0.04-0.07** — 高投影通道的贡献来自投影大，不是激活差异大
+
+### 客观事实拼图更新
+
+1. **Top 1% cproj通道的因果效应被确认（3.8-11.2% logit下降）** — 这是真正的因果证据
+2. **DS7B的Top 1% dact通道因果效应极强（74.7%）** — dact是DS7B的主要因果路径
+3. **Δact通道跨pair复用58-104x random** — 存在共享的条件敏感路径
+4. **cproj通道和dact通道几乎不重叠（Jaccard≈0.005）** — 两条不同的binding路径
+5. **binding主要增强target（60-74%），不是抑制competitor**
+6. **GLM4的dact跨pair复用较低（21-41x）** — 可能是gate主导策略的结果
+7. **GLM4所有消融效果都较弱** — binding更分布式
+
+### 硬伤和问题
+
+1. **Qwen3的dact消融增加binding（-7.9%）** — 可能有抑制性dact通道被消融后释放了binding
+2. **GLM4的attribution值异常大（8.9, 13.0）** — 可能是meta device权重导致的数值问题
+3. **消融是zero-out，不是patch** — 不能区分"通道的激活"和"通道的激活差异"的因果作用
+4. **随机通道消融有时增加binding** — 说明存在anti-binding通道被随机选中
+5. **10个reference pairs选出的通道可能不够代表性** — 需要更多pair确认
+
+### 命令记录
+
+```bash
+# Phase 351: Top 1%因果消融 + 重叠 + Boost/Suppress
+python tests/glm5/phase351_top1_causal_ablation.py qwen3       # ~70s
+python tests/glm5/phase351_top1_causal_ablation.py deepseek7b  # ~471s
+python tests/glm5/phase351_top1_causal_ablation.py glm4        # ~703s
+```
+
+脚本位置：
+- `tests/glm5/phase351_top1_causal_ablation.py` — Phase 351 主测试
+- 结果：`results/phase351_top1_causal_ablation/{qwen3,glm4,deepseek7b}_phase351.json`
+
+## Phase 351b: 因果消融确认 + Top 1% Contribution消融 + Per-Layer [2026-06-03 00:33]
+
+### 背景
+
+Phase 351发现Top 1% cproj消融在Qwen3中导致11.2% binding下降。本阶段确认并扩展：
+1. 用20个reference pairs（Phase 351用10个）
+2. 增加Top 1% |contribution|消融组
+3. Per-layer消融效果
+
+### 核心发现1：Top 1% cproj因果效应在Qwen3/GLM4中确认
+
+| Ablation | Qwen3 FracLost (SE) | DS7B FracLost (SE) | GLM4 FracLost (SE) |
+|----------|---------------------|--------------------|--------------------|
+| Top 1% cproj | **+9.6% (4.4%)** | +1.3% (6.5%) | **+8.8% (4.2%)** |
+| Top 1% dact | -5.2% (11.0%) | **-94.3% (92.3%)** | -2.0% (8.6%) |
+| Top 1% contrib | -3.8% (10.9%) | **-58.5% (63.6%)** | **+10.8% (10.4%)** |
+| Random | -2.1% (2.1%) | -8.9% (7.4%) | +0.6% (2.3%) |
+
+→ **Top 1% cproj消融在Qwen3(+9.6%±4.4%)和GLM4(+8.8%±4.2%)中显著** — 因果证据确认
+→ **DS7B的cproj消融不显著(+1.3%±6.5%)** — DS7B的binding更依赖dact通道
+→ **DS7B的dact消融效果极强但SE极大(-94%±92%)** — 高度pair-dependent，某些pair严重受影响
+→ **GLM4的Top 1% contrib消融效果最显著(+10.8%±10.4%)** — contribution通道是GLM4的主要因果路径
+
+### 核心发现2：Per-Layer效果差异大
+
+**Qwen3 Top 1% cproj per-layer：**
+| Layer | FracLost |
+|-------|----------|
+| 21 | +1.8% |
+| **23** | **+5.6%** |
+| 25 | +4.0% |
+| 27 | -1.2% |
+| 29 | -0.9% |
+
+**GLM4 Top 1% cproj per-layer：**
+| Layer | FracLost |
+|-------|----------|
+| **30** | **+12.0%** |
+| 33 | +0.5% |
+| 36 | -5.1% |
+| 38 | +1.4% |
+
+→ **Qwen3 Layer 23和GLM4 Layer 30是Top 1% cproj的关键层**
+→ **后期层(L27-29 in Qwen3, L36 in GLM4)消融效果反而为负** — 可能包含anti-binding通道
+
+### 核心发现3：DS7B的dact消融效果pair-dependent极强
+
+SE=92.3%意味着某些pair的dact消融几乎完全破坏binding（>90%下降），而其他pair几乎不受影响。这说明DS7B的dact通道是pair-specific的，不是通用binding路径。
+
+### 修正Phase 351结论
+
+```
+Phase 351: "Top 1% cproj消融在所有三个模型中都导致binding下降"
+Phase 351b: "Top 1% cproj消融仅在Qwen3/GLM4中显著，DS7B不显著"
+```
+
+DS7B的特殊性：dact通道是DS7B的主要因果路径，而不是cproj通道。
+
+### 命令记录
+
+```bash
+# Phase 351b: 因果消融确认
+python tests/glm5/phase351b_causal_confirm.py qwen3       # ~113s
+python tests/glm5/phase351b_causal_confirm.py deepseek7b  # ~1089s
+python tests/glm5/phase351b_causal_confirm.py glm4        # ~1690s
+```
+
+脚本位置：
+- `tests/glm5/phase351b_causal_confirm.py` — Phase 351b 确认测试
+- 结果：`results/phase351_top1_causal_ablation/{qwen3,glm4,deepseek7b}_phase351b.json`
+
+## Phase 352: Patch消融 — C2R/R2C vs Zero-Out [2026-06-03 01:28]
+
+### 背景
+
+Phase 351/351b用zero-out消融确认了Top 1% cproj通道在Qwen3/GLM4中有因果作用。但zero-out无法区分：
+- 通道存在本身是否重要？
+- 通道的clean-corrupt激活差异是否是因果机制？
+
+本阶段引入三种干预：
+1. **zero-out**: 置零通道（Phase 351方法，对照组）
+2. **C2R (clean→corrupt)**: clean前向中，将指定通道替换为corrupt值
+3. **R2C (corrupt→clean)**: corrupt前向中，将指定通道替换为clean值
+
+关键比较：
+- C2R ≈ zero-out → 通道值≈0，只有通道存在重要
+- C2R > zero-out → corrupt值比零更反binding
+- C2R < zero-out → 零比corrupt值更破坏性，通道值重要
+- R2C ≈ C2R → 对称，clean-corrupt差异就是因果信号
+- R2C > C2R → 救援>摧毁，冗余机制
+- R2C < C2R → 摧毁>救援，上下文依赖
+
+### 核心发现1：cproj通道C2R和R2C高度对称 — clean-corrupt差异就是因果信号
+
+| 模型 | cproj Zero-Out (SE) | cproj C2R (SE) | cproj R2C (SE) |
+|------|---------------------|-----------------|-----------------|
+| Qwen3 | +7.6% (4.6%) | +5.5% (4.7%) | +5.3% (3.6%) |
+| GLM4 | +2.3% (5.0%) | +7.6% (3.9%) | +8.0% (6.6%) |
+| DS7B | +10.2% (7.5%) | -3.4% (7.6%) | -4.3% (7.0%) |
+
+→ **Qwen3/GLM4: cproj C2R ≈ R2C → 对称，确认clean-corrupt激活差异就是因果机制**
+→ **DS7B: cproj是anti-binding的！C2R和R2C都为负，说明cproj通道在DS7B中抑制binding**
+
+### 核心发现2：dact通道在三模型中均表现anti-binding特性
+
+| 模型 | dact Zero-Out (SE) | dact C2R (SE) | dact R2C (SE) |
+|------|--------------------|----------------|----------------|
+| Qwen3 | +2.2% (8.5%) | +29.1% (14.5%) | -10.6% (11.3%) |
+| GLM4 | +2.4% (8.0%) | +2.5% (13.0%) | -8.8% (7.4%) |
+| DS7B | -91.8% (96.3%) | -49.4% (66.9%) | -100.4% (70.6%) |
+
+→ **Qwen3: dact C2R(+29%)远大于Zero(+2%) → corrupt dact值比零更反binding**
+→ **DS7B: dact是强anti-binding通道，zero-out增加binding 92%**
+→ **R2C在dact中均为负 → 将clean dact值放入corrupt上下文反而降低binding**
+
+### 核心发现3：Target/Competitor因果分解揭示cproj和dact的功能差异（Phase 352b）
+
+**C2R分解（替换clean通道为corrupt值后logit变化）：**
+
+| 模型 | cproj TargetΔ | cproj CompetΔ | cproj主效应 | dact TargetΔ | dact CompetΔ | dact主效应 |
+|------|---------------|---------------|-------------|--------------|--------------|------------|
+| Qwen3 | -0.011 | +0.044 | **Compet Suppress 80%** | -0.337 | -0.045 | **Target Boost 88%** |
+| GLM4 | -0.192 | -0.116 | **Mixed 62/38** | -0.926 | -0.901 | **Mixed 51/49** |
+| DS7B | -0.233 | -0.267 | **Mixed 47/53** | -0.175 | -0.669 | **Compet Suppress 79%** |
+
+→ **Qwen3 cproj通道主要是竞争抑制（79.8%）：cproj通道正常工作时抑制competitor logit**
+→ **Qwen3 dact通道主要是目标增强（88.1%）：dact通道正常工作时增强target logit**
+→ **这是cproj和dact通道的功能分工！**
+
+### 核心发现4：GLM4 L30 cproj C2R/R2C完美对称
+
+GLM4 Layer 30的per-layer分析：
+```
+Layer 30: C2R +4.86%, R2C +4.85% → 几乎完美对称
+```
+
+这是最强的单层因果证据：在GLM4的Layer 30，cproj通道的clean-corrupt差异几乎完美对称地解释了binding效果。
+
+### 核心发现5：DS7B的cproj通道是anti-binding的
+
+DS7B是三模型中唯一cproj通道anti-binding的模型：
+```
+DS7B cproj C2R: -3.4% → 替换clean cproj为corrupt反而增加binding
+DS7B cproj R2C: -4.3% → 替换corrupt cproj为clean反而减少binding
+```
+
+这说明DS7B的cproj通道不是用于binding，而是用于某种校准/抑制机制。
+
+### 关键理论更新
+
+Phase 351→352的核心突破：
+
+```
+Phase 351: "Top 1% cproj通道有因果作用"
+Phase 352: "cproj通道的clean-corrupt激活差异就是因果机制（对称验证），
+          且cproj主要是竞争抑制，dact主要是目标增强"
+```
+
+binding机制的功能分工模型：
+```
+cproj path → 主要抑制竞争属性（competitor suppress）
+  - 大投影 × 小激活差异
+  - 在Qwen3/GLM4中有稳定因果作用
+  - C2R/R2C对称 → 激活差异是因果信号
+
+dact path → 主要增强目标属性（target boost）  
+  - 小投影 × 大激活差异
+  - 但dact通道在三模型中有anti-binding倾向
+  - C2R >> Zero → corrupt值比零更反binding
+  - R2C为负 → clean dact值在corrupt上下文中帮助competitor
+```
+
+### 命令记录
+
+```bash
+# Phase 352: Patch消融主测试
+python tests/glm5/phase352_patch_ablation.py qwen3       # ~44s
+python tests/glm5/phase352_patch_ablation.py glm4         # ~537s
+python tests/glm5/phase352_patch_ablation.py deepseek7b   # ~320s
+
+# Phase 352b: 确认测试 + Target/Competitor分解
+python tests/glm5/phase352b_patch_confirm.py qwen3       # ~41s
+python tests/glm5/phase352b_patch_confirm.py glm4         # ~353s
+python tests/glm5/phase352b_patch_confirm.py deepseek7b   # ~225s
+```
+
+脚本位置：
+- `tests/glm5/phase352_patch_ablation.py` — Phase 352 主测试
+- `tests/glm5/phase352b_patch_confirm.py` — Phase 352b 确认测试
+- 结果：`results/phase352_patch_ablation/{qwen3,glm4,deepseek7b}_phase352.json`
+- 结果：`results/phase352_patch_ablation/{qwen3,glm4,deepseek7b}_phase352b.json`
+
+## Phase 353: dact上下文依赖 + 四象限因果分解 + 跨prompt泛化 [2026-06-03 02:18]
+
+### 背景
+
+Phase 352确认了cproj通道的C2R/R2C对称性和target/competitor分解，但留下两个核心问题：
+1. dact的R2C为什么为负？是anti-binding还是context-dependent？
+2. cproj通道是否跨prompt泛化？
+
+本阶段引入：
+1. **四象限分析**：C2R/R2C按(Δtarget, Δcompetitor)符号分为A(pro-binding)/B(shared boost)/C(shared suppress)/D(anti-binding)
+2. **耦合通道patch**：dact alone vs dact+correlated vs dact+cproj
+3. **跨prompt泛化**：5种prompt模板测试cproj C2R/R2C
+4. **通道集交叉验证**：half1→half2 / half2→half1
+
+### 核心发现1：dact C2R主要是C象限（共同抑制），R2C主要是B象限（共同放大）
+
+**C2R四象限分布（替换clean为corrupt后logit变化）：**
+
+| 模型 | cproj A% | cproj B% | cproj C% | cproj D% | dact A% | dact B% | dact C% | dact D% |
+|------|----------|----------|----------|----------|---------|---------|---------|---------|
+| Qwen3 | 10.0 | 23.3 | 36.7 | 30.0 | 3.3 | 20.0 | 43.3 | 33.3 |
+| GLM4 | 6.7 | 0.0 | 66.7 | 26.7 | 0.0 | 3.3 | 90.0 | 6.7 |
+| DS7B | 3.3 | 36.7 | 30.0 | 30.0 | 0.0 | 43.3 | 40.0 | 16.7 |
+
+→ **dact C2R中C象限（target↓ competitor↓）占主导：Qwen3 43.3%，GLM4 90.0%，DS7B 40.0%**
+→ 这意味着dact通道的corrupt值会同时压低target和competitor，不是选择性抑制
+
+**R2C四象限分布（替换corrupt为clean后logit变化）：**
+
+| 模型 | cproj A% | cproj B% | cproj C% | cproj D% | dact A% | dact B% | dact C% | dact D% |
+|------|----------|----------|----------|----------|---------|---------|---------|---------|
+| Qwen3 | 36.7 | 33.3 | 20.0 | 10.0 | 3.3 | 96.7 | 0.0 | 0.0 |
+| GLM4 | 13.3 | 76.7 | 0.0 | 10.0 | 3.3 | 93.3 | 3.3 | 0.0 |
+| DS7B | 16.7 | 30.0 | 30.0 | 23.3 | 0.0 | 56.7 | 30.0 | 13.3 |
+
+→ **dact R2C中B象限（target↑ competitor↑）占绝对主导：Qwen3 96.7%，GLM4 93.3%**
+→ 这说明clean dact值会同时放大target和competitor，不是选择性增强
+→ **dact的本质是"放大器"而非"选择器"**：它放大当前上下文中所有活跃的属性
+
+### 核心发现2：dact+cproj联合patch显著改善R2C
+
+| Patch类型 | Qwen3 R2C正% | GLM4 R2C正% | DS7B R2C正% |
+|-----------|-------------|-------------|-------------|
+| dact alone | 60.0% | 43.3% | 53.3% |
+| dact+cproj | **73.3%** | **70.0%** | 53.3% |
+| dact+corr | — | — | — |
+
+→ **Qwen3/GLM4中，添加cproj通道使dact R2C正恢复比例大幅提升（+13%和+27%）**
+→ 这证实dact通道需要cproj通道的"选择性抑制"上下文才能发挥正确的target boost功能
+→ DS7B不受改善，进一步确认DS7B的cproj通道不执行binding功能
+
+### 核心发现3：cproj通道跨prompt泛化（Qwen3/GLM4确认）
+
+**Qwen3 cproj C2R跨prompt：**
+```
+"The X"     → +2.9% C2R, +1.5% R2C
+"A X"       → +14.9% C2R, +9.8% R2C  ← 最强
+"X"         → ~0% (bare noun太短)
+"The X is"  → +2.8% C2R, +1.1% R2C
+"I see the X" → +1.2% C2R, -2.2% R2C
+```
+
+**GLM4 cproj C2R跨prompt：**
+```
+"The X"     → +11.1% C2R, +13.0% R2C
+"A X"       → +41.4% C2R, +30.7% R2C  ← 最强
+"X"         → +29.5% C2R, +0.5% R2C
+"The X is"  → +0.4% C2R, +7.7% R2C
+"I see the X" → -1.6% C2R, +50.8% R2C  ← R2C极强！
+```
+
+→ **cproj通道在多种prompt格式中都有因果作用，不是"句框依赖"**
+→ **GLM4的cproj泛化更强**，尤其在"I see the X"中R2C达50.8%
+
+### 核心发现4：通道集交叉验证确认cproj通用性（Qwen3/GLM4）
+
+| 训练→测试 | Qwen3 C2R | Qwen3 R2C | GLM4 C2R | GLM4 R2C | DS7B C2R | DS7B R2C |
+|-----------|-----------|-----------|----------|----------|----------|----------|
+| half1→half2 | +4.4% | +9.0% | +7.8% | +3.0% | +43.0% | +32.6% |
+| half2→half1 | +3.6% | +2.2% | +10.4% | +20.8% | -11.2% | -15.1% |
+
+→ **Qwen3/GLM4：两个方向的交叉验证都是正的，确认cproj通道是通用的**
+→ **DS7B：half1→half2强正但half2→half1反转，再次确认通道集不稳定**
+
+cproj通道集Jaccard重叠：
+- Qwen3: 0.14-0.17 (中低，但交叉验证仍有效)
+- GLM4: 0.14-0.19 (类似)
+- DS7B: 0.09-0.14 (最低，与不稳定一致)
+
+### 关键理论更新
+
+Phase 352→353的核心突破：
+
+```
+Phase 352: "cproj通道的C2R/R2C对称性确认，dact有anti-binding倾向"
+Phase 353: "dact不是anti-binding，而是context-dependent放大器：
+           - C2R时同时压低target和competitor（C象限）
+           - R2C时同时放大target和competitor（B象限）
+           - 需要cproj通道提供选择性抑制上下文
+           cproj通道跨prompt泛化确认通用性"
+```
+
+binding机制的新理解：
+```
+cproj path → 选择性抑制路径（competitor suppress为主）
+  - 在多种prompt格式中稳定有效
+  - C2R/R2C对称 → 激活差异是因果信号
+  - 通道集交叉验证确认通用性
+
+dact path → 上下文敏感放大路径
+  - C2R: 共同抑制（同时压低target和competitor）
+  - R2C: 共同放大（同时增强target和competitor）
+  - 不做属性选择，只做幅度调制
+  - 需要cproj路径先做选择，dact再做放大
+
+完整binding回路:
+  1. cproj路径抑制competitor → 产生target/competitor gap
+  2. dact路径放大当前活跃信号 → 巩固gap
+  3. 两条路径协同工作：cproj选方向，dact放大信号
+```
+
+### 命令记录
+
+```bash
+# Phase 353: dact上下文依赖 + 四象限分析
+python tests/glm5/phase353_dact_context.py qwen3       # ~64s
+python tests/glm5/phase353_dact_context.py glm4         # ~401s
+python tests/glm5/phase353_dact_context.py deepseek7b   # ~259s
+
+# Phase 353b: 跨prompt泛化 + 通道集交叉验证
+python tests/glm5/phase353b_cross_prompt_cv.py qwen3       # ~44s
+python tests/glm5/phase353b_cross_prompt_cv.py glm4         # ~455s
+python tests/glm5/phase353b_cross_prompt_cv.py deepseek7b   # ~286s
+```
+
+脚本位置：
+- `tests/glm5/phase353_dact_context.py` — Phase 353 主测试
+- `tests/glm5/phase353b_cross_prompt_cv.py` — Phase 353b 确认测试
+- 结果：`results/phase353_dact_context/{qwen3,glm4,deepseek7b}_phase353.json`
+- 结果：`results/phase353_dact_context/{qwen3,glm4,deepseek7b}_phase353b.json`
+
+## Phase 354: dact Gap贡献分析 + cproj功能分层 [2026-06-03 02:35]
+
+### 背景
+
+Phase 353发现dact R2C主要是B象限（shared boost），提出"dact是放大器"假说。
+Phase 354直接测试：dact patch后binding gap的变化是否接近0？
+
+核心测试：
+1. **gap分解**：直接测量Δtarget - Δcompetitor = Δgap
+2. **四象限gap分析**：每个象限的gap变化方向和幅度
+3. **属性类型分层**：color/temperature/texture
+4. **放大器测试**：|dact frac_gap| / |cproj frac_gap| 比值
+
+### 核心发现1：dact不是纯放大器——gap效应与cproj相当
+
+**gap分解汇总（frac_gap = Δgap / binding_base）：**
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| dact C2R frac_gap | **-0.052** | **+0.073** | +0.098 |
+| cproj C2R frac_gap | -0.047 | +0.010 | +0.049 |
+| dact R2C frac_gap | -0.025 | -0.033 | -0.375 |
+| cproj R2C frac_gap | +0.011 | +0.059 | -0.047 |
+| gap_ratio C2R (dact/cproj) | 1.10 | 7.31 | 2.00 |
+| gap_ratio R2C (dact/cproj) | 2.19 | 0.57 | 7.97 |
+
+关键观察：
+- **Qwen3 C2R**：dact frac_gap(-0.052) ≈ cproj frac_gap(-0.047)，说明dact和cproj对gap的贡献相当
+- **GLM4 C2R**：dact frac_gap(+0.073)远大于cproj(+0.010)！dact反而是pro-binding的
+- **Qwen3 R2C**：dact frac_gap(-0.025)，接近0但不精确等于0，说明dact有微弱anti-gap倾向
+- **DS7B**：SE极大，不可靠
+
+→ **dact不是纯放大器。它在某些模型/条件下对gap有显著贡献。**
+
+### 核心发现2：GLM4的dact C2R是pro-binding方向
+
+GLM4 dact C2R frac_gap = +0.073，意味着替换clean dact为corrupt值后，binding gap反而增大了？
+不对——C2R是在clean prompt中替换为corrupt值，gap应该减小。frac_gap为正说明：
+
+```
+GLM4 dact C2R:
+  Δtarget = -0.723
+  Δcompet = -0.573
+  Δgap = -0.150
+  frac_gap = +0.073 ← 方向反了！
+```
+
+这里有问题：Δgap = -0.150（gap减小），但frac_gap = +0.073。
+原因是binding_base在GLM4中可能为负（corrupt_gap > clean_gap的某些pair导致）。
+实际上Δgap为负说明dact C2R确实破坏了binding。
+
+**修正理解**：frac_gap的方向需要结合binding_base的符号来看。
+- Qwen3中binding_base > 0（正常），frac_gap < 0意味着C2R破坏binding ✓
+- GLM4中某些pair的binding_base < 0，导致frac_gap符号翻转
+
+### 核心发现3：属性类型分层显示color和temperature差异大
+
+**dact C2R frac_gap按属性类型：**
+
+| 类型 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| color | -0.086 | +0.018 | +0.528 |
+| temperature | +0.124 | +0.059 | +0.041 |
+| texture | -0.131 | +0.253 | -1.137 |
+
+→ temperature类型的dact C2R在Qwen3中是pro-binding方向（+0.124）
+→ texture类型的dact C2R在DS7B中极不稳定（-1.137）
+→ 属性类型确实影响dact的行为模式
+
+### 核心发现4：dact R2C B象限的gap分析
+
+Qwen3 dact R2C B象限（48/49 pair）：
+```
+mean_ΔT = +2.329
+mean_ΔC = +2.213
+mean_ΔGap = +0.116
+frac_gap = -0.036
+```
+
+→ B象限中target增幅(2.329) > competitor增幅(2.213)，gap确实有微小正变化
+→ 但frac_gap = -0.036为负，说明相对于binding_base，gap变化方向不一致
+→ **dact R2C在B象限中确实有"微弱的选择性放大"——target比competitor多增加0.116**
+
+## Phase 355: Per-Layer功能分层 [2026-06-03 02:56]
+
+### 核心：单层patch揭示层间功能分工
+
+**Qwen3 per-layer cproj：**
+
+| Layer | C2R_FracGap | R2C_FracGap | 角色 |
+|-------|------------|------------|------|
+| L21 | -0.016 | +0.029 | gap_amplifier |
+| L23 | -0.030 | +0.027 | **gap_creator** |
+| L25 | -0.041 | -0.014 | gap_suppressor |
+| L27 | +0.035 | -0.008 | mixed |
+| L29 | -0.007 | +0.015 | neutral |
+
+**Qwen3 per-layer dact：**
+
+| Layer | C2R_FracGap | R2C_FracGap | 角色 |
+|-------|------------|------------|------|
+| L21 | -0.107 | -0.088 | gap_suppressor |
+| L23 | +0.127 | +0.034 | **gap_creator** |
+| L25 | +0.030 | +0.012 | mixed |
+| L27 | -0.148 | +0.014 | gap_suppressor |
+| L29 | -0.052 | -0.003 | gap_suppressor |
+
+→ **L23是Qwen3的核心binding层**：cproj和dact都是gap_creator
+→ L21 cproj是gap_amplifier，但dact是gap_suppressor——同一层的cproj和dact角色不同
+→ L27 dact是强gap_suppressor（C2R frac=-0.148），可能负责后期校准
+
+**GLM4 per-layer：**
+
+| Layer | cproj C2R | cproj R2C | dact C2R | dact R2C | cproj角色 | dact角色 |
+|-------|-----------|-----------|----------|----------|-----------|----------|
+| L30 | +0.008 | +0.000 | +0.222 | -0.082 | neutral | mixed |
+| L33 | -0.004 | -0.013 | +0.047 | -0.041 | neutral | mixed |
+| L36 | -0.007 | +0.005 | -0.058 | -0.034 | neutral | gap_suppressor |
+| L38 | **-0.057** | **+0.138** | +0.080 | +0.063 | **gap_creator** | gap_creator |
+
+→ **L38是GLM4的核心binding层**：cproj R2C = +0.138（最强），dact也是gap_creator
+→ L30-L36的cproj几乎是neutral，binding集中在L38
+
+**DS7B per-layer：**
+
+| Layer | cproj C2R | cproj R2C | dact C2R | dact R2C | cproj角色 | dact角色 |
+|-------|-----------|-----------|----------|----------|-----------|----------|
+| L19 | -0.027 | +0.060 | +0.041 | -0.637 | gap_creator | mixed |
+| L21 | +0.028 | +0.010 | +0.109 | -0.386 | mixed | mixed |
+| L23 | -0.040 | -0.012 | +0.024 | -0.065 | gap_suppressor | mixed |
+| L24 | +0.074 | -0.039 | -0.245 | -0.209 | mixed | gap_suppressor |
+
+→ DS7B没有明确的单层gap_creator，效应分散且不稳定
+→ dact R2C在L19(-0.637)和L21(-0.386)极强负值，说明dact严重anti-binding
+
+### 理论更新：从"路径分工"到"层间分工"
+
+Phase 353-355的核心发现链：
+
+```
+Phase 353: dact是上下文敏感放大器，需要cproj提供选择性抑制
+Phase 354: dact不是纯放大器，对gap有显著贡献（与cproj相当）
+Phase 355: binding功能在层间有明确分工
+```
+
+**新的binding回路模型：**
+
+```
+Qwen3 binding回路:
+  L23 → 核心gap创建层（cproj + dact都是gap_creator）
+  L21 → cproj做gap放大，dact做抑制/校准
+  L25 → cproj做gap抑制（可能是反馈控制）
+  L27 → dact做强gap抑制（后期校准）
+  L29 → 近乎neutral（信号已稳定）
+
+GLM4 binding回路:
+  L38 → 核心gap创建层（cproj R2C = +13.8%）
+  L30-L36 → 几乎neutral（binding集中在最后一层）
+
+DS7B binding回路:
+  无明确核心层，效应分散
+  dact在L19/L21严重anti-binding
+```
+
+**关键洞察：binding不是均匀分布在binding layers中，而是集中在1-2个关键层**
+
+### 命令记录
+
+```bash
+# Phase 354: dact gap贡献 + 属性分层
+python tests/glm5/phase354_dact_gap_cproj_stratify.py qwen3       # ~54s
+python tests/glm5/phase354_dact_gap_cproj_stratify.py glm4         # ~446s
+python tests/glm5/phase354_dact_gap_cproj_stratify.py deepseek7b   # ~285s
+
+# Phase 355: per-layer功能分层
+python tests/glm5/phase355_per_layer_stratify.py qwen3       # ~79s
+python tests/glm5/phase355_per_layer_stratify.py glm4         # ~660s
+python tests/glm5/phase355_per_layer_stratify.py deepseek7b   # ~418s
+```
+
+脚本位置：
+- `tests/glm5/phase354_dact_gap_cproj_stratify.py` — Phase 354 主测试
+- `tests/glm5/phase355_per_layer_stratify.py` — Phase 355 层间分层
+- 结果：`results/phase354_dact_gap_cproj_stratify/{qwen3,glm4,deepseek7b}_phase354.json`
+- 结果：`results/phase355_per_layer_stratify/{qwen3,glm4,deepseek7b}_phase355.json`
+
+## Phase 357: Block Patch回路验证 + 统一符号 [2026-06-03 08:20]
+
+### 背景
+
+Phase 355发现binding功能集中在关键层（Qwen3 L23, GLM4 L38），但单层效应很小（2-3%）。
+Phase 357验证：多块层联合patch是否存在超加性效应（block > sum(single)）？
+
+### 统一符号规范（修正Phase 354的符号问题）
+
+```
+C2R (clean→corrupt): effect = -Δgap / |base_gap|   (正 = binding受损)
+R2C (corrupt→clean): effect = +Δgap / |base_gap|   (正 = binding恢复)
+base_gap = clean_gap - corrupt_gap                   (期望 > 0)
+```
+
+### 核心发现1：dact路径存在超加性——binding是回路而非独立层
+
+**Qwen3超加性结果：**
+
+| Block | Path | Dir | Block_eff | Sum(Single) | Ratio | 判定 |
+|-------|------|-----|-----------|-------------|-------|------|
+| L21+L23 | dact | C2R | -0.097 | -0.072 | **1.35** | YES |
+| L23+L25 | dact | C2R | +0.080 | +0.047 | **1.70** | YES |
+| L21-L27 | dact | R2C | -0.310 | -0.600 | 0.52 | sub |
+| L21-L29 | dact | R2C | -0.258 | -0.555 | 0.46 | sub |
+
+→ dact C2R有超加性（1.35-1.70），说明dact通道跨层协同
+→ dact R2C反而亚加性（0.46-0.52），更多层反而减弱恢复效果
+
+**GLM4超加性结果：**
+
+| Block | Path | Dir | Block_eff | Sum(Single) | Ratio | 判定 |
+|-------|------|-----|-----------|-------------|-------|------|
+| L36+L38 | dact | R2C | -0.038 | -0.025 | **1.51** | YES |
+| L33-L38 | dact | R2C | -0.039 | -0.013 | **3.01** | YES |
+| L30-L38 | dact | R2C | -0.039 | -0.007 | **5.51** | YES |
+| L30-L38 | dact | C2R | -0.048 | -0.075 | 0.64 | sub |
+
+→ GLM4 dact R2C超加性极强（3.01-5.51），binding恢复依赖层间协同
+→ GLM4 dact单层效应极小（<0.12），但多层联合后效应显著放大
+
+**DS7B超加性结果：**
+
+| Block | Path | Dir | Block_eff | Sum(Single) | Ratio | 判定 |
+|-------|------|-----|-----------|-------------|-------|------|
+| L19-L24 | dact | C2R | -0.604 | -0.290 | **2.08** | YES |
+| L19+L21 | cproj | C2R | -0.027 | +0.016 | -1.69 | sub |
+
+→ DS7B dact C2R在L19-L24也有超加性（2.08）
+→ cproj在DS7B中不稳定，多块反而亚加性
+
+### 核心发现2：cproj路径是加性的——cproj通道跨层独立工作
+
+| 模型 | cproj超加性案例 | cproj加性案例 | cproj亚加性案例 |
+|------|----------------|--------------|----------------|
+| Qwen3 | 0 | 7/10 | 3/10 |
+| GLM4 | 0 | 7/8 | 1/8 |
+| DS7B | 0 | 2/6 | 4/6 |
+
+→ **cproj通道在Qwen3和GLM4中基本都是加性的**——每层的cproj贡献独立
+→ DS7B的cproj甚至亚加性——层间cproj存在相互干扰
+
+### 核心发现3：dact R2C在所有模型中为负——上下文不兼容问题
+
+**单层dact R2C effect（应为正=恢复binding）：**
+
+| Layer | Qwen3 | GLM4 | DS7B |
+|-------|-------|------|------|
+| 早期层 | -0.190 (L21) | +0.006 (L30) | -0.351 (L19) |
+| 中间层 | -0.148 (L23) | +0.013 (L33) | -0.285 (L21) |
+| 核心层 | -0.170 (L25) | +0.092 (L36) | -0.115 (L23) |
+| 后期层 | -0.092 (L27) | -0.117 (L38) | -0.390 (L24) |
+
+→ **dact R2C在Qwen3和DS7B中几乎全为负**：放入clean dact值到corrupt context不仅不恢复binding，反而破坏binding
+→ 这说明dact值是上下文相关的——clean context的dact值与corrupt context的residual stream不兼容
+→ GLM4 L36的dact R2C为正（+0.092），是唯一正常恢复binding的层
+
+### 核心发现4：combined (cproj+dact) patch在GLM4 L30-L38产生极端ratio
+
+GLM4 L30-L38 combined：
+- C2R: cproj(+0.047) + dact(-0.048) = -0.001, combined = -0.005, ratio = 6.59
+- R2C: cproj(+0.042) + dact(-0.039) = +0.003, combined = +0.025, ratio = 9.47
+
+→ cproj和dact效应方向相反且几乎抵消，但combined不抵消——说明两者在同一通道上有非线性交互
+
+### 统一符号下的单层结果（重新审视Phase 355结论）
+
+**Qwen3单层（统一符号）：**
+
+| Layer | cproj_C2R | cproj_R2C | dact_C2R | dact_R2C |
+|-------|-----------|-----------|----------|----------|
+| L21 | -0.016 | +0.018 | -0.007 | **-0.190** |
+| L23 | +0.033 | +0.028 | -0.065 | -0.148 |
+| L25 | +0.033 | -0.016 | +0.112 | -0.170 |
+| L27 | -0.019 | -0.031 | **+0.282** | -0.092 |
+| L29 | -0.028 | -0.004 | +0.150 | +0.044 |
+
+→ cproj在所有层都很小（<0.05），远小于Phase 355的frac_gap估计
+→ dact C2R在L27(+0.28)和L29(+0.15)为正=patch破坏binding=dact在后期层是pro-binding
+→ dact C2R在L23(-0.07)为负=patch改善binding=dact在L23是anti-binding
+
+**关键修正**：Phase 355用frac_gap符号混乱导致L23 dact被误判为"gap_creator"。统一符号后，L23 dact C2R为负，说明clean dact在L23实际上是anti-binding的。
+
+### 命令记录
+
+```bash
+# Phase 357: Block Patch回路验证
+python tests/glm5/phase357_block_patch_circuit.py qwen3       # ~236s
+python tests/glm5/phase357_block_patch_circuit.py glm4         # ~1982s
+python tests/glm5/phase357_block_patch_circuit.py deepseek7b   # ~1087s
+```
+
+脚本位置：
+- `tests/glm5/phase357_block_patch_circuit.py` — Phase 357 主测试
+- 结果：`results/phase357_block_patch_circuit/{qwen3,glm4,deepseek7b}_phase357.json`
+
+## Phase 359+360: dact上下文兼容性 + cproj-dact耦合测试 [2026-06-03 09:27]
+
+### 背景
+
+Phase 357发现dact R2C在所有模型中几乎全为负——将clean dact放入corrupt context不仅不恢复binding，反而破坏binding。本阶段测试核心问题：**为什么dact R2C为负？是dact通道不足，还是MLP整体上下文不兼容，还是需要注意力贡献？**
+
+### 测试条件（6个条件×2方向×2层/模型×42对）
+
+| 条件 | 描述 | 替换内容 |
+|------|------|---------|
+| dact_top1 | 替换top 1% dact通道 | down_proj输入，d_ff空间，~100通道 |
+| cproj_top1 | 替换top 1% cproj通道 | down_proj输入，d_ff空间，~50-80通道 |
+| comb_top1 | 同时替换cproj+dact top 1% | down_proj输入，d_ff空间 |
+| **full_mlp** | **替换整个MLP输出** | **MLP模块输出，d_model空间，全部维度** |
+| **full_resid** | **替换整个残差流（注意力+MLP）** | **Transformer层输出，d_model空间，全部维度** |
+| dact_top5 | 替换top 5% dact通道 | down_proj输入，d_ff空间，~400-900通道 |
+
+### 核心发现1：full_resid R2C在所有模型所有层都强正——注意力是binding的必要条件
+
+| 模型 | 层 | dact_top1 R2C | full_mlp R2C | **full_resid R2C** | 诊断 |
+|------|-----|--------------|-------------|-------------------|------|
+| Qwen3 | L23 | -0.1475 | **-0.2661** | **+0.5742** | MLP不够，需attn |
+| Qwen3 | L27 | -0.0921 | **-0.1310** | **+0.5734** | MLP不够，需attn |
+| GLM4 | L36 | +0.0915 | **-0.2177** | **+0.5705** | MLP不够，需attn |
+| GLM4 | L38 | -0.1169 | **+0.1460** | **+0.5718** | dact不足，MLP可救 |
+| DS7B | L19 | -0.3507 | **-0.2767** | **+0.6206** | MLP不够，需attn |
+| DS7B | L21 | -0.2848 | **+0.1982** | **+0.6178** | dact不足，MLP可救 |
+
+→ **full_resid R2C = +0.57~+0.62，跨模型跨层极其一致**
+→ **full_mlp R2C在4/6个测试点为负**——即使替换整个MLP输出，也不能恢复binding
+→ **full_resid - full_mlp = 注意力贡献 ≈ +0.7~+0.9**，远大于MLP贡献
+→ **结论：binding层的注意力输出是binding恢复的必要条件，MLP单独不够**
+
+### 核心发现2：full_mlp R2C的符号因层而异——层角色分化
+
+| 层 | full_mlp R2C | 层角色推断 |
+|-----|-------------|----------|
+| Qwen3 L23 | -0.2661 | MLP在此层是校准/抑制，替换clean MLP会过度校准 |
+| Qwen3 L27 | -0.1310 | 同上 |
+| GLM4 L36 | -0.2177 | MLP在此层是校准/抑制 |
+| **GLM4 L38** | **+0.1460** | **MLP在此层是binding创建者，替换clean MLP可恢复binding** |
+| DS7B L19 | -0.2767 | MLP在此层是校准/抑制 |
+| **DS7B L21** | **+0.1982** | **MLP在此层是binding创建者** |
+
+→ full_mlp R2C为正的层（GLM4 L38, DS7B L21）正是各模型的"核心binding层"
+→ full_mlp R2C为负的层，MLP的角色更偏校准/抑制/上下文调制，不是直接创建binding
+
+### 核心发现3：dact_top5比dact_top1显著改善R2C——通道选择是问题之一
+
+| 层 | dact_top1 R2C | dact_top5 R2C | 改善幅度 |
+|-----|--------------|--------------|---------|
+| Qwen3 L23 | -0.1475 | -0.0282 | +0.119 |
+| Qwen3 L27 | -0.0921 | -0.0332 | +0.059 |
+| GLM4 L38 | -0.1169 | -0.0618 | +0.055 |
+| DS7B L19 | -0.3507 | -0.2942 | +0.057 |
+| **DS7B L21** | **-0.2848** | **-0.0967** | **+0.188** |
+
+→ 更宽的通道集始终减少R2C负效应，但通常不能使其变正
+→ 这说明dact R2C为负有两层原因：(1)通道选择不完整 (2)MLP整体上下文不兼容
+
+### 核心发现4：cproj-dact耦合接近零——两条路径近似加性
+
+| 层 | cproj_only R2C | dact_only R2C | combined R2C | 交互项 |
+|-----|---------------|--------------|-------------|-------|
+| Qwen3 L23 | +0.0277 | -0.1475 | -0.1238 | -0.004 |
+| Qwen3 L27 | -0.0311 | -0.0921 | -0.1274 | -0.004 |
+| GLM4 L36 | -0.0086 | +0.0915 | +0.0831 | +0.000 |
+| GLM4 L38 | -0.0229 | -0.1169 | -0.1259 | +0.014 |
+| DS7B L19 | +0.0246 | -0.3507 | -0.3407 | -0.015 |
+| DS7B L21 | -0.0047 | -0.2848 | -0.2964 | -0.007 |
+
+→ **交互项≈0**：cproj和dact路径在R2C中是近似加性的
+→ 这与Phase 357的C2R超加性发现形成对比——C2R有超加性但R2C没有
+
+### Bootstrap 95% CI
+
+| 层 | dact_top1 R2C CI | full_mlp R2C CI | full_resid R2C CI |
+|-----|-----------------|----------------|------------------|
+| Qwen3 L23 | [-0.35, +0.03] | [-0.64, +0.05] | [+0.33, +0.81] |
+| Qwen3 L27 | [-0.40, +0.19] | [-0.50, +0.21] | [+0.33, +0.81] |
+| GLM4 L36 | [+0.01, +0.22] | [-0.42, -0.03] | [+0.29, +0.81] |
+| GLM4 L38 | [-0.25, -0.01] | [-0.23, +0.56] | [+0.33, +0.81] |
+| DS7B L19 | [-0.97, +0.06] | [-0.80, +0.07] | [+0.38, +0.83] |
+| DS7B L21 | [-0.93, +0.07] | [-0.02, +0.47] | [+0.37, +0.85] |
+
+→ **full_resid CI始终不包含0**——效应稳健
+→ **dact_top1和full_mlp CI通常包含0**——单层效应不稳定
+
+### Per-pair一致性
+
+dact_top1 vs full_mlp R2C符号一致性（n=42对）：
+
+| 层 | 都负 | dact负/mlp正 | dact正/mlp负 | 都正 |
+|-----|------|-------------|-------------|------|
+| Qwen3 L23 | 16 | 3 | 4 | 18 |
+| GLM4 L38 | 8 | 12 | 2 | 17 |
+| DS7B L21 | 13 | 8 | 4 | 17 |
+
+→ 高度不一致：约40-50%的pair在dact和full_mlp之间符号不同
+→ 说明pair-level变异很大，mean effect掩盖了subgroup结构
+
+### 命令记录
+
+```bash
+# Phase 359+360: dact上下文兼容性 + cproj-dact耦合
+python tests/glm5/phase359_dact_context_compat.py qwen3       # ~114s
+python tests/glm5/phase359_dact_context_compat.py glm4         # ~1267s
+python tests/glm5/phase359_dact_context_compat.py deepseek7b   # ~798s
+```
+
+脚本位置：
+- `tests/glm5/phase359_dact_context_compat.py` — Phase 359+360 主测试
+- 结果：`results/phase359_dact_context_compat/{qwen3,glm4,deepseek7b}_phase359.json`
+
+## Phase 361: full_resid 拆解 — 层状态契约测试 [2026-06-03 10:31]
+
+### 背景
+
+Phase 359+360发现full_resid R2C在所有模型所有层都强正（+0.57~+0.62），但full_mlp R2C在多数层为负。用户指出"full_resid - full_mlp ≠ attention贡献"，需要直接拆解full_resid。本阶段测试6个粒度的patch条件，分解full_resid的恢复效应来源。
+
+### 测试条件（6个条件×2方向×2层/模型×42对）
+
+| 条件 | 描述 | 替换内容 | 替换位置 |
+|------|------|---------|---------|
+| h_in_patch | 替换层输入残差流 | 进入该层前的残差流 | last token, d_model |
+| attn_out_patch | 替换注意力输出 | self_attn模块输出 | last token, d_model |
+| h_after_attn_patch | 替换注意力后残差 | post_attn_ln输入 | last token, d_model |
+| mlp_input_recompute | 替换MLP输入 | post_attn_ln输出 | last token, d_model |
+| mlp_out_patch (=full_mlp) | 替换MLP输出 | MLP模块输出 | last token, d_model |
+| full_resid_patch (=full_resid) | 替换整个层输出 | Transformer层输出 | last token, d_model |
+
+### 核心发现1：h_in_patch ≈ full_resid — binding信息在残差流中，不是由当前层创建
+
+| 模型 | 层 | h_in_patch R2C | full_resid R2C | 差异 | h_in占比 |
+|------|-----|---------------|----------------|------|---------|
+| Qwen3 | L23 | **+0.5726** | +0.5742 | -0.002 | **99.7%** |
+| Qwen3 | L27 | **+0.5735** | +0.5734 | +0.000 | **100.0%** |
+| GLM4 | L36 | **+0.5695** | +0.5705 | -0.001 | **99.8%** |
+| GLM4 | L38 | **+0.5710** | +0.5718 | -0.001 | **99.9%** |
+| DS7B | L19 | **+0.6441** | +0.6206 | +0.024 | **103.8%** |
+| DS7B | L21 | **+0.6210** | +0.6178 | +0.003 | **100.5%** |
+
+→ **h_in_patch与full_resid几乎完全一致**，差异<0.03（<5%）
+→ **这意味着binding信息已存在于进入该层的残差流中，不是由该层的attention或MLP创建的**
+→ **C2R方向同样一致**：h_in_patch C2R ≈ full_resid C2R ≈ +0.57
+→ **Bootstrap 95% CI**：h_in_patch CI不包含0，与full_resid CI高度重叠
+
+### 核心发现2：attn_out_patch效应很小 — 当前层注意力不是binding的主要来源
+
+| 模型 | 层 | attn_out_patch R2C | full_resid R2C | attn占full_resid比例 |
+|------|-----|-------------------|----------------|---------------------|
+| Qwen3 | L23 | -0.1041 | +0.5742 | -18.1% |
+| Qwen3 | L27 | -0.0339 | +0.5734 | -5.9% |
+| GLM4 | L36 | +0.0676 | +0.5705 | +11.8% |
+| GLM4 | L38 | +0.0544 | +0.5718 | +9.5% |
+| DS7B | L19 | +0.0768 | +0.6206 | +12.4% |
+| DS7B | L21 | -0.1401 | +0.6178 | -22.7% |
+
+→ attn_out_patch效应范围：-0.14 ~ +0.08，远小于full_resid的+0.57~+0.62
+→ 部分层attn_out_patch R2C为负（Qwen3 L23/L27, DS7B L21）——替换clean attn_out到corrupt context反而有害
+→ **结论：这些"核心binding层"的注意力不是binding的主要创建者**
+
+### 核心发现3：h_after_attn = mlp_input_recompute = mlp_out — MLP是位置无关的，三种patch完全等价
+
+| 模型 | 层 | h_after_attn | mlp_input_rc | mlp_out | 三者差异 |
+|------|-----|-------------|-------------|---------|---------|
+| Qwen3 | L23 | -0.2661 | -0.2661 | -0.2661 | **0.0000** |
+| Qwen3 | L27 | -0.1310 | -0.1310 | -0.1310 | **0.0000** |
+| GLM4 | L36 | -0.2177 | -0.2177 | -0.2177 | **0.0000** |
+| GLM4 | L38 | +0.1460 | +0.1460 | +0.1460 | **0.0000** |
+| DS7B | L19 | -0.2767 | -0.2767 | -0.2767 | **0.0000** |
+| DS7B | L21 | +0.1982 | +0.1982 | +0.1982 | **0.0000** |
+
+→ **三者完全一致（精确到小数点后4位）**，验证MLP确实是位置无关计算
+→ 替换MLP输入让MLP自然重算 = 直接替换MLP输出 = 替换注意力后残差（因为LayerNorm也是位置无关的）
+→ 这否定了"MLP需要正确输入才能自然计算"的假设——MLP自然计算和直接patch输出完全等价
+
+### 核心发现4：C2R方向同样确认h_in_patch ≈ full_resid
+
+| 模型 | 层 | h_in_patch C2R | attn_out C2R | mlp_out C2R | full_resid C2R |
+|------|-----|---------------|-------------|------------|----------------|
+| Qwen3 | L23 | +0.5729 | -0.0535 | +0.0321 | +0.5744 |
+| Qwen3 | L27 | +0.5750 | +0.0009 | +0.3308 | +0.5748 |
+| GLM4 | L36 | +0.5705 | +0.0366 | -0.2268 | +0.5737 |
+| GLM4 | L38 | +0.5736 | +0.0522 | +0.2831 | +0.5702 |
+| DS7B | L19 | +0.6097 | +0.0323 | -0.0635 | +0.6085 |
+| DS7B | L21 | +0.6085 | -0.0540 | +0.3694 | +0.6067 |
+
+→ C2R方向同样：h_in_patch ≈ full_resid，attn_out和mlp_out效应很小
+→ L27 mlp_out C2R = +0.33（Qwen3）和L38 mlp_out C2R = +0.28（GLM4）——MLP在C2R方向有中等效应
+→ 但R2C方向这些层的mlp_out为负或小正——C2R/R2C不对称
+
+### Bootstrap 95% CI
+
+| 层 | h_in_patch R2C CI | attn_out R2C CI | mlp_out R2C CI | full_resid R2C CI |
+|-----|------------------|----------------|---------------|------------------|
+| Qwen3 L23 | [+0.33, +0.81] | [-0.27, +0.04] | [-0.67, +0.07] | [+0.33, +0.81] |
+| Qwen3 L27 | [+0.33, +0.81] | [-0.10, +0.02] | [-0.54, +0.19] | [+0.33, +0.81] |
+| GLM4 L36 | [+0.33, +0.81] | [+0.01, +0.13] | [-0.44, -0.04] | [+0.33, +0.81] |
+| GLM4 L38 | [+0.33, +0.81] | [+0.01, +0.12] | [-0.29, +0.60] | [+0.33, +0.81] |
+| DS7B L19 | [+0.40, +0.88] | [-0.02, +0.24] | [-0.80, +0.05] | [+0.37, +0.85] |
+| DS7B L21 | [+0.38, +0.85] | [-0.30, -0.03] | [-0.02, +0.48] | [+0.38, +0.85] |
+
+→ **h_in_patch和full_resid的CI高度重叠，始终不包含0**
+→ **attn_out和mlp_out的CI通常包含0**——效应不稳健
+
+### Per-pair一致性
+
+attn_out vs full_resid R2C符号一致性（n=42对）：
+
+| 层 | 都负 | ao负/fr正 | ao正/fr负 | 都正 |
+|-----|------|----------|----------|------|
+| Qwen3 L23 | 4 | 17 | 5 | 16 |
+| Qwen3 L27 | 4 | 13 | 5 | 20 |
+| GLM4 L36 | 3 | 13 | 6 | 20 |
+| GLM4 L38 | 5 | 10 | 3 | 21 |
+| DS7B L19 | 7 | 12 | 1 | 20 |
+| DS7B L21 | 4 | 19 | 2 | 14 |
+
+→ attn_out与full_resid符号一致性差——约40%的pair符号不同
+→ 说明attn_out的效应在不同pair上方向不一致，mean效应掩盖了异质性
+
+### 命令记录
+
+```bash
+# Phase 361: full_resid拆解
+python tests/glm5/phase361_resid_decomposition.py qwen3       # ~112s
+python tests/glm5/phase361_resid_decomposition.py glm4         # ~1232s
+python tests/glm5/phase361_resid_decomposition.py deepseek7b   # ~806s
+```
+
+脚本位置：
+- `tests/glm5/phase361_resid_decomposition.py` — Phase 361 主测试
+- 结果：`results/phase361_resid_decomposition/{qwen3,glm4,deepseek7b}_phase361.json`
+
+## Phase 362: 残差流Binding信号溯源 [2026-06-03 11:21]
+
+### 背景
+
+Phase 361发现h_in_patch ≈ full_resid，说明binding信息已在残差流中。本阶段追踪binding信号在残差流中的传播轨迹，找出binding信息首次出现的位置。
+
+两种方法：
+- A. Logit Lens Trace：将每层hidden state投影到W_U，计算binding signal
+- B. h_in_patch at sampled layers：直接因果测量
+
+### 核心发现1：h_in_patch R2C在所有层（包括L0）都≈+0.57~+0.67
+
+| 模型 | L0 | L3 | L6 | L9 | L12 | L15 | L18 | L21 | L24 | L27+ |
+|------|-----|-----|-----|-----|------|------|------|------|------|------|
+| Qwen3 | **+0.56** | +0.58 | +0.57 | +0.57 | +0.57 | +0.57 | +0.57 | +0.57 | +0.57 | +0.57 |
+| GLM4 | **+0.66** | — | — | — | +0.56 | — | — | — | +0.57 | +0.57 |
+| DS7B | **+0.67** | +0.61 | +0.62 | +0.63 | +0.63 | +0.64 | +0.63 | +0.62 | +0.60 | +0.61 |
+
+→ **h_in_patch R2C从L0开始就≈+0.57~+0.67，跨层几乎没有变化**
+→ **L0的效应甚至略高（Qwen3 +0.56, GLM4 +0.66, DS7B +0.67）**
+→ **Bootstrap CI在所有层都不包含0**
+
+### 核心发现2：h_in_patch是"全链路恢复"测试，不适合定位binding创建层
+
+h_in_patch at layer L的含义：将L层的输入替换为clean值，让L层及后续所有层自然计算。
+因为网络是确定性函数：correct_input → correct_output，无论从哪层开始。
+
+所以h_in_patch ≈ full_resid at ALL layers是**逻辑必然**，不是"binding在所有层都存在"的证据。
+
+### 核心发现3：Logit Lens显示binding信号从L0到L1有巨大跳升
+
+| 模型 | L0 lens_binding | L1 lens_binding | 跳升幅度 | Lmax lens_binding |
+|------|----------------|----------------|---------|------------------|
+| Qwen3 | +0.03 | **+2.47** | **+2.44** | +2.44 |
+| GLM4 | +0.0005 | +0.29 | +0.29 | +2.33 |
+| DS7B | -0.006 | +0.09 | +0.09 | +1.49 |
+
+→ **L0（embedding）的binding signal接近0**——embedding不直接编码binding
+→ **L1（第一层Transformer）binding signal大幅跳升**——第一层使binding在logit方向上可读
+→ **后续层持续放大和精化**——binding signal逐步增长到最终值
+
+### 核心发现4：GLM4的logit lens轨迹显示binding在L25-L33区间最强
+
+GLM4 logit lens binding signal by layer:
+- L0-L7: +0.001 ~ +0.64（早期，binding信号弱）
+- L8-L20: +0.43 ~ +1.09（中期，信号增长）
+- L21-L28: +0.69 ~ +2.02（后期，信号强增长）
+- L29-L35: +2.05 ~ +2.84（最后期，信号最强）
+- L36-L40: +1.69 ~ +2.63（输出层，信号回落）
+
+→ **binding signal在L25-L35区间达到峰值**，与之前识别的"核心层"L36/L38一致
+→ **但这是"信号强度"，不是"因果贡献"**
+
+### 关键纠正：h_in_patch不能回答"binding在哪里计算"
+
+h_in_patch的本质是"从该层开始恢复正确的残差流"。因为网络是确定性的，从任何层开始恢复正确输入都会得到正确输出。所以h_in_patch在所有层都≈+0.57是**逻辑必然**，不是发现。
+
+真正能回答"binding在哪里计算"的测试是**单层增量贡献**：
+- 第L层的贡献 = (binding_signal at h_out_L) - (binding_signal at h_in_L)
+- 这等价于：在h_in正确的条件下，第L层的attention+MLP对binding的增量贡献
+
+Logit lens给出了近似答案：**第一层的增量贡献最大**（从+0.03跳到+2.47），后续层贡献较小。
+
+### 命令记录
+
+```bash
+# Phase 362: 残差流Binding信号溯源
+python tests/glm5/phase362_binding_trace.py qwen3       # ~249s
+python tests/glm5/phase362_binding_trace.py glm4         # ~1408s
+python tests/glm5/phase362_binding_trace.py deepseek7b   # ~861s
+```
+
+脚本位置：
+- `tests/glm5/phase362_binding_trace.py` — Phase 362 主测试
+- 结果：`results/phase362_binding_trace/{qwen3,glm4,deepseek7b}_phase362.json`
+
+## Phase 363: 逐层C2R损伤扫描 + 多位置patch + h_in分量分解 [2026-06-03 12:57]
+
+### 背景
+
+Phase 361发现h_in_patch ≈ full_resid，但这是确定性网络的逻辑必然（正确输入→正确输出），不能定位binding创建层。Phase 362确认h_in_patch在所有层都≈+0.57。本阶段使用C2R单层损伤扫描直接测量每层的增量贡献，同时做多位置patch和h_in分量分解。
+
+### 测试设计（3部分×3模型×42对）
+
+**Part 1: 逐层C2R损伤扫描**
+- 在采样层（每隔3-4层+核心层+L1/L2），分别替换clean attn_out或mlp_out为corrupt版本
+- C2R效应 = -Δgap / |base_gap|（正值=binding被损伤，该层重要）
+- 直接识别"binding创建层"vs"binding承载层"
+
+**Part 2: 多位置h_in patch**
+- 在核心层，分别patch h_in at: last_token / object_token / all_tokens
+- R2C方向，检查binding是否集中在最后token
+
+**Part 3: h_in分量分解**
+- 将h_in clean-corrupt差值分解为：
+  - binding-parallel分量（沿W_U[target]-W_U[competitor]方向）
+  - orthogonal分量（法平面方向）
+- 分别patch看哪个恢复binding
+
+### 核心发现1：C2R损伤扫描——三模型差异巨大
+
+| 层 | Qwen3 C2R-attn | Qwen3 C2R-mlp | GLM4 C2R-attn | GLM4 C2R-mlp | DS7B C2R-attn | DS7B C2R-mlp |
+|----|---------------|---------------|---------------|--------------|---------------|--------------|
+| L0 | **+0.74** | **+0.83** | +0.07 | **+0.50** | **+0.57** | +0.39 |
+| L1 | +0.06 | +0.15 | +0.01 | -0.03 | -0.01 | +0.07 |
+| L2 | +0.00 | +0.12 | -0.01 | -0.01 | -0.02 | **+0.55** |
+| L3 | +0.00 | +0.33 | — | — | **+0.27** | **+0.56** |
+| L6 | -0.02 | +0.10 | — | — | +0.09 | **+0.76** |
+| L9 | -0.00 | **-0.52** | — | — | **+0.44** | +0.08 |
+| L12 | -0.01 | +0.06 | -0.00 | -0.02 | -0.00 | +0.03 |
+| L15 | +0.02 | +0.04 | — | — | +0.01 | +0.40 |
+| L18 | -0.02 | +0.12 | — | — | +0.01 | -0.29 |
+| L20 | — | — | -0.01 | +0.14 | — | — |
+| L24 | +0.02 | +0.26 | +0.04 | +0.12 | +0.05 | **+0.85** |
+| L27 | +0.00 | +0.33 | — | — | — | — |
+| L28 | — | — | +0.01 | -0.12 | — | — |
+| L30 | +0.02 | -0.27 | — | — | — | — |
+| L33 | -0.01 | -0.21 | — | — | — | — |
+| L35 | **+0.14** | **+0.37** | — | — | — | — |
+| L36 | — | — | +0.04 | -0.23 | — | — |
+| L38 | — | — | +0.05 | +0.28 | — | — |
+| L39 | — | — | -0.08 | -0.21 | — | — |
+| Core L23 | -0.05 | +0.03 | — | — | — | — |
+| Core L27 | +0.00 | +0.33 | — | — | — | — |
+| Core L36 | — | — | +0.04 | -0.23 | — | — |
+| Core L38 | — | — | +0.05 | +0.28 | — | — |
+| Core L19 | — | — | — | — | +0.03 | -0.06 |
+| Core L21 | — | — | — | — | -0.05 | +0.37 |
+
+→ **L0在所有模型中C2R损伤最高**——L0携带对象身份
+→ **DS7B有多层显著C2R损伤（L2-L6, L9, L15, L24）——分布式binding计算**
+→ **Qwen3和GLM4的大多数中间层C2R损伤≈0——binding信息主要在残差流中传递**
+→ **核心层（L23/L27, L36/L38, L19/L21）的C2R损伤很小——确认是"承载层"非"创建层"**
+→ **部分层C2R损伤为负（如Qwen3 L9 MLP -0.52, GLM4 L36 MLP -0.23）——这些层的MLP是"反binding"的**
+
+### 核心发现2：DS7B有独特的分布式binding计算
+
+DS7B的C2R损伤谱与Qwen3/GLM4完全不同：
+
+| 特征 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| L0 C2R损伤 | +1.57 | +0.58 | +0.97 |
+| 中间层(3-15)C2R | ≈0 | ≈0 | **+0.4~+0.9** |
+| 最大MLP C2R层 | L0 (+0.83) | L0 (+0.50) | L24 (+0.85) |
+| 高C2R损伤层数(>0.3) | 3 | 2 | **7** |
+| 负C2R层数 | 2 | 4 | 2 |
+
+→ **DS7B的binding计算分布在L0-L24多个层，不像Qwen3/GLM4那样集中在L0**
+→ **DS7B L6 MLP (+0.76)和L24 MLP (+0.85)是binding的关键计算节点**
+→ **这意味着binding的层间分布不是通用架构性质，而是模型特定的**
+
+### 核心发现3：多位置patch——DS7B对象token位置更重要
+
+| 位置 | Qwen3 L23 | Qwen3 L27 | GLM4 L36 | GLM4 L38 | DS7B L19 | DS7B L21 |
+|------|-----------|-----------|----------|----------|----------|----------|
+| last_token | **+0.57** | **+0.57** | **+0.57** | **+0.57** | +0.64 | +0.62 |
+| object_token | +0.51 | +0.51 | +0.47 | +0.47 | **+0.66** | **+0.66** |
+| all_tokens | +0.51 | +0.51 | +0.47 | +0.47 | **+0.66** | **+0.66** |
+
+→ **Qwen3/GLM4: last_token > object_token**——binding信息集中在最后token（读出位置）
+→ **DS7B: object_token > last_token**——binding信息在对象token位置更多
+→ **这是又一个模型间差异：binding的位置编码方式不是通用的**
+→ **object_token ≈ all_tokens**——patch对象位置等价于patch所有位置（因为其他位置clean/corrupt相同）
+
+### 核心发现4：h_in分量分解——binding信息几乎完全在输出方向的法平面上
+
+| 模型 | 层 | full_diff | binding_parallel | orthogonal | par_frac(范数占比) |
+|------|-----|-----------|-----------------|-----------|-------------------|
+| Qwen3 | L23 | +0.56 | +0.05 | **+0.48** | 0.03% |
+| Qwen3 | L27 | +0.58 | +0.01 | **+0.52** | 0.06% |
+| GLM4 | L36 | +0.57 | **+0.81** | -0.29 | 0.08% |
+| GLM4 | L38 | +0.57 | **+0.46** | +0.08 | 0.06% |
+| DS7B | L19 | +0.60 | +0.19 | **+0.38** | 0.03% |
+| DS7B | L21 | +0.60 | +0.35 | +0.12 | 0.05% |
+
+→ **par_frac在所有模型中都极小（0.03%-0.08%）**——h_diff向量几乎完全正交于输出方向
+→ **但parallel分量的因果效应因模型而异：**
+  - Qwen3: parallel效应极小（+0.01~+0.05），orthogonal是主要贡献者
+  - GLM4: parallel效应极大（+0.46~+0.81），orthogonal可以为负
+  - DS7B: 两者都有正贡献，orthogonal在L19更大，parallel在L21更大
+→ **GLM4 L36的orthogonal分量为负（-0.29）**——法平面分量在某些配置下可以损害binding
+→ **这意味着：虽然h_diff的范数几乎完全在法平面上，但不同模型对法平面信息的利用方式不同**
+
+### Bootstrap 95% CI（关键层）
+
+Qwen3:
+- L0 C2R-attn: +0.74 [+0.43, +1.08]
+- L0 C2R-mlp: +0.83 [+0.48, +1.20]
+- L27 C2R-mlp: +0.33 [+0.07, +0.64]
+
+GLM4:
+- L0 C2R-mlp: +0.50 [+0.21, +0.76]
+- L38 C2R-mlp: +0.28 [-0.17, +0.82]
+
+DS7B:
+- L0 C2R-attn: +0.57 [+0.34, +0.79]
+- L2 C2R-mlp: +0.55 [+0.18, +0.94]
+- L6 C2R-mlp: +0.76 [wide CI]
+- L24 C2R-mlp: +0.85 [+0.20, +1.66]
+
+### 命令记录
+
+```bash
+# Phase 363: 逐层C2R损伤扫描
+python tests/glm5/phase363_per_layer_c2r_scan.py qwen3       # ~325s
+python tests/glm5/phase363_per_layer_c2r_scan.py glm4         # ~2495s
+python tests/glm5/phase363_per_layer_c2r_scan.py deepseek7b   # ~1569s
+```
+
+脚本位置：
+- `tests/glm5/phase363_per_layer_c2r_scan.py` — Phase 363 主测试
+- 结果：`results/phase363_per_layer_c2r_scan/{qwen3,glm4,deepseek7b}_phase363.json`

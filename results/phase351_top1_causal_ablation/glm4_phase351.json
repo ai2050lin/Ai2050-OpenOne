@@ -1,0 +1,132 @@
+{
+  "model": "glm4",
+  "timestamp": "2026-06-02 23:41:36",
+  "n_pairs": 30,
+  "ablation_summary": {
+    "baseline": {
+      "mean_base_binding_effect": 2.8871973673502604,
+      "mean_ablated_binding_effect": 2.8871973673502604,
+      "mean_frac_logit_lost": 0.0,
+      "mean_frac_attn_lost": 0.0,
+      "n_pairs": 30
+    },
+    "top1_cproj": {
+      "mean_base_binding_effect": 2.8871973673502604,
+      "mean_ablated_binding_effect": 2.6021728515625,
+      "mean_frac_logit_lost": 0.03805470279737792,
+      "mean_frac_attn_lost": 8.875884034847905,
+      "n_pairs": 30
+    },
+    "top1_dact": {
+      "mean_base_binding_effect": 2.8871973673502604,
+      "mean_ablated_binding_effect": 2.7627766927083335,
+      "mean_frac_logit_lost": 0.07305540093504823,
+      "mean_frac_attn_lost": 12.99684858105545,
+      "n_pairs": 30
+    },
+    "random": {
+      "mean_base_binding_effect": 2.8871973673502604,
+      "mean_ablated_binding_effect": 2.890679931640625,
+      "mean_frac_logit_lost": 0.03526222275509407,
+      "mean_frac_attn_lost": -2.5498244949855846,
+      "n_pairs": 30
+    }
+  },
+  "overlap": {
+    "30": {
+      "within_cproj_dact": 0.006558478283745731,
+      "within_cproj_contrib": 0.04626599906932973,
+      "within_dact_contrib": 0.29628562296823496,
+      "cross_cproj": 0.08516601429991116,
+      "cross_dact": 0.1347953757629237,
+      "cross_contrib": 0.06029411566026992,
+      "random_baseline": 0.004989727032579982,
+      "cross_vs_random_cproj": 17.068271218811606,
+      "cross_vs_random_dact": 27.014579130840062,
+      "cross_vs_random_contrib": 12.083650120855271
+    },
+    "33": {
+      "within_cproj_dact": 0.004074560117761443,
+      "within_cproj_contrib": 0.041746922039971664,
+      "within_dact_contrib": 0.26957632102876794,
+      "cross_cproj": 0.07534579087528828,
+      "cross_dact": 0.11704160780133566,
+      "cross_contrib": 0.048472585980346115,
+      "random_baseline": 0.004989727032579982,
+      "cross_vs_random_cproj": 15.100182912476892,
+      "cross_vs_random_dact": 23.456515163479445,
+      "cross_vs_random_contrib": 9.714476496178778
+    },
+    "36": {
+      "within_cproj_dact": 0.005189822227492899,
+      "within_cproj_contrib": 0.04868989591971726,
+      "within_dact_contrib": 0.26856303490906086,
+      "cross_cproj": 0.08130464701137222,
+      "cross_dact": 0.10630491892991141,
+      "cross_contrib": 0.0448849118459591,
+      "random_baseline": 0.004989727032579982,
+      "cross_vs_random_cproj": 16.29440778633795,
+      "cross_vs_random_dact": 21.304756399659304,
+      "cross_vs_random_contrib": 8.995464391716627
+    },
+    "38": {
+      "within_cproj_dact": 0.003953421924621633,
+      "within_cproj_contrib": 0.06599835802360925,
+      "within_dact_contrib": 0.18927030749150778,
+      "cross_cproj": 0.09474425507595652,
+      "cross_dact": 0.20338253225741756,
+      "cross_contrib": 0.06424335610666106,
+      "random_baseline": 0.004989727032579982,
+      "cross_vs_random_cproj": 18.987863355516698,
+      "cross_vs_random_dact": 40.760252200060094,
+      "cross_vs_random_contrib": 12.875124367964366
+    }
+  },
+  "boost_suppress": {
+    "Top 1%": {
+      "target_boost": 0.1626669536305902,
+      "competitor_suppress": 0.055885550744521124,
+      "boost_frac": 0.7442923342182239,
+      "suppress_frac": 0.2557076657817761,
+      "target_gross": 0.7560022706786792,
+      "competitor_gross": 0.653566825017333,
+      "n_pairs": 120
+    },
+    "1-10%": {
+      "target_boost": 0.15724956278378766,
+      "competitor_suppress": 0.11256837846400837,
+      "boost_frac": 0.5827987644430673,
+      "suppress_frac": 0.41720123555693267,
+      "target_gross": 3.5795373052358626,
+      "competitor_gross": 3.6396146307388944,
+      "n_pairs": 120
+    },
+    "10-30%": {
+      "target_boost": 0.14300404875539244,
+      "competitor_suppress": 0.11943423391009371,
+      "boost_frac": 0.544905443302534,
+      "suppress_frac": 0.45509455669746607,
+      "target_gross": 5.911991073687871,
+      "competitor_gross": 5.99833924372991,
+      "n_pairs": 120
+    },
+    "30-60%": {
+      "target_boost": 0.20225635992052654,
+      "competitor_suppress": 0.07972980714403093,
+      "boost_frac": 0.7172563180172674,
+      "suppress_frac": 0.28274368198273253,
+      "target_gross": 6.970107932885488,
+      "competitor_gross": 7.037523587544759,
+      "n_pairs": 120
+    },
+    "Bottom 40%": {
+      "target_boost": 0.17878932563277583,
+      "competitor_suppress": 0.08502754659081499,
+      "boost_frac": 0.6777023930495537,
+      "suppress_frac": 0.3222976069504463,
+      "target_gross": 8.087350789705912,
+      "competitor_gross": 8.049560511112213,
+      "n_pairs": 120
+    }
+  }
+}
