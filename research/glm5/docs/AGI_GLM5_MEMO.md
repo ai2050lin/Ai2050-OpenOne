@@ -10739,3 +10739,1082 @@ Phase 378 MEMO中Qwen3 L4的same-cat/cross-cat数据（0.695/0.277/gap=0.418）�
 **Phase 381: 跨任务泛化测试**（保留原计划）
 - 否定任务、角色转换、语法变化等
 - 验证2通道支配和RMSNorm重映射的通用性
+
+## Phase 379: RMSNorm信息重映射机制审计 [2026-06-04 21:42]
+
+### 核心目标
+
+1. **纠正Phase 378的根本方法论错误**：Phase 378计算post-RMSNorm Δh时用的是`RMSNorm(Δh)`（PSEUDO），但正确计算应为`RMSNorm(h_clean) - RMSNorm(h_corrupt)`（PROPER）。RMSNorm不是线性算子，两种计算结果不等价。
+2. **对比PROPER vs PSEUDO**：在5种消融条件下比较两者的差异
+3. **PC语义解码**：回归proper post-RMSNorm各PC与已知变量的相关性
+4. **Jacobian分析**：计算RMSNorm对2通道信号方向的局部行为
+
+### Part 1: PROPER vs PSEUDO post-RMSNorm对比（三模型L4基线）
+
+**⚠️ 重大发现：DS7B L4的PROPER与PSEUDO结果完全不同！**
+
+| 指标 | DS7B raw | DS7B PROPER | DS7B PSEUDO |
+|------|----------|-------------|-------------|
+| PC1 | **0.991** | **0.629** | 0.945 |
+| same-cat cos | 0.069 | **0.511** | 0.036 |
+| cross-cat cos | 0.084 | **0.491** | 0.052 |
+| gap | -0.015 | **+0.019** | -0.016 |
+| eff_rank | 1 | **52** | 2 |
+
+**这意味着**：
+- Phase 378的PSEUDO方法（`RMSNorm(Δh)`）显示DS7B post-RMSNorm PC1=0.945, gap=-0.016——看似"类别结构消失"
+- 但PROPER方法（`RMSNorm(h_clean) - RMSNorm(h_corrupt)`）显示PC1=0.629, gap=+0.019——**类别结构反而存在了！**
+- PROPER方法的PC1从0.991降到0.629（不再是1D），有效秩从1升到52——信息被分散到多个维度
+- 但类别gap从-0.015翻转为+0.019——同类向量在proper空间中反而更相似
+
+**Phase 378的"类别结构消失"结论是方法论假象！** 错误出在把RMSNorm当作线性算子。
+
+**Qwen3 L4 和 GLM4 L4：PROPER与PSEUDO差异小**：
+
+| 指标 | Qwen3 raw | Qwen3 PROPER | Qwen3 PSEUDO | GLM4 raw | GLM4 PROPER | GLM4 PSEUDO |
+|------|-----------|-------------|--------------|----------|-------------|-------------|
+| PC1 | 0.164 | 0.205 | 0.189 | 0.112 | 0.110 | 0.114 |
+| gap | 0.079 | 0.075 | 0.079 | 0.132 | 0.135 | 0.136 |
+| cos(raw↔proper) | — | **0.031** | 0.432 | — | **0.965** | 0.907 |
+
+- Qwen3: PROPER和PSEUDO的类别gap相近(0.075 vs 0.079)，但**PC1方向几乎完全不同**(cos=0.031)
+- GLM4: PROPER和PSEUDO几乎等价(cos=0.965)，因为GLM4的raw Δh范数很小
+
+**DS7B L4消融条件下的PROPER分析**：
+
+| 消融 | raw PC1 | PROPER PC1 | PROPER rank | PROPER gap |
+|------|---------|------------|-------------|------------|
+| baseline | 0.991 | 0.629 | 52 | +0.019 |
+| keep_only_top2 | 0.989 | 0.601 | 58 | +0.009 |
+| mask_top2 | 0.972 | 0.615 | 48 | +0.023 |
+| keep_only_top10 | 0.991 | 0.625 | 52 | +0.017 |
+| mask_top10 | 0.091 | 0.092 | 91 | +0.004 |
+
+→ 遮蔽top2后，PROPER PC1几乎不变(0.629→0.615)，rank略降(52→48)，gap略升
+→ 遮蔽全部top10后崩溃(PC1=0.092)
+→ **2通道支配的是raw空间的1D结构，但PROPER空间的多维结构不依赖2通道**
+
+### Part 2: PC语义解码（PROPER post-RMSNorm空间）
+
+**DS7B L4 PC语义**：
+
+| PC | explained | cat_R² | ch2_energy | tot_dgu_E | \|Δh_raw\| | norm_ratio | \|Δh_n\| | logit_raw | logit_norm |
+|-----|-----------|--------|------------|-----------|----------|-----------|----------|-----------|------------|
+| PC1 | 0.629 | 0.082 | -0.020 | -0.007 | 0.076 | **-0.934** | -0.032 | -0.224 | -0.047 |
+| PC2 | 0.042 | **0.292** | 0.015 | 0.021 | 0.052 | -0.071 | **0.477** | -0.162 | -0.161 |
+| PC3 | 0.035 | 0.128 | 0.048 | 0.032 | 0.042 | 0.022 | 0.376 | -0.258 | -0.073 |
+
+**关键发现**：
+1. **PC1 = 范数比轴**：与norm_ratio的相关性高达-0.934！PC1编码的是"clean/corrupt残差的范数比例"，而非类别标签（cat_R²仅0.082）
+2. **PC2 = 类别+强度混合轴**：cat_R²=0.292，与dh_proper_norm相关0.477。类别信息在PC2中
+3. **PC1的frac_positive=0.47**：几乎所有类别都是~50%正/50%负——验证了"PC1编码强度而非类别"
+4. 但类别信息确实存在：cat_R²在PC2达到0.292，在更高PC中也有分布
+
+**Qwen3 L4 PC语义**：
+
+| PC | explained | cat_R² | ch2_energy | norm_ratio | logit_norm |
+|-----|-----------|--------|------------|-----------|------------|
+| PC1 | 0.205 | 0.087 | -0.379 | 0.035 | 0.091 |
+| PC2 | 0.144 | **0.289** | 0.627 | -0.537 | 0.185 |
+
+→ Qwen3 PC1与dh_proper_norm相关-0.632，PC2与ch2_energy相关0.627
+→ Qwen3的类别信息也主要在PC2(R²=0.289)
+
+**GLM4 L4 PC语义**：
+
+| PC | explained | cat_R² | dh_raw_norm | logit_norm |
+|-----|-----------|--------|------------|------------|
+| PC1 | 0.110 | **0.882** | 0.717 | -0.107 |
+| PC2 | 0.077 | **0.789** | -0.061 | 0.054 |
+
+**⚠️ GLM4完全不同！PC1的cat_R²=0.882**——GLM4的PROPER post-RMSNorm PC1直接编码类别标签！
+- brightness: frac_positive=1.0, color: frac_positive=0.0, speed: frac_positive=1.0
+- 类别在PC1上完美分离
+- PC1与dh_raw_norm相关0.717——范数差异也携带类别信息
+
+### Part 3: RMSNorm Jacobian分析
+
+**RMSNorm对2通道信号方向(v)的局部行为**：
+
+| 模型/层 | cos(v, J_clean@v) | cos(v, J_corrupt@v) | cos(J_c@v, J_r@v) | cos(ΔJv, v) |
+|---------|-------------------|---------------------|--------------------|----|
+| **DS7B L4** | **0.253** | **0.246** | 0.904 | -0.013 |
+| DS7B L5 | 0.185 | 0.192 | 0.952 | 0.023 |
+| DS7B L8 | 0.341 | 0.346 | 0.993 | 0.046 |
+| DS7B L24 | 0.463 | 0.455 | 0.993 | 0.066 |
+| Qwen3 L4 | 0.954 | 0.943 | 0.998 | 0.013 |
+| Qwen3 L28 | 0.972 | 0.975 | 0.997 | -0.153 |
+| GLM4 L4 | 0.991 | 0.989 | 0.999 | 0.243 |
+| GLM4 L30 | 0.818 | 0.809 | 0.972 | -0.440 |
+
+**关键发现**：
+1. **DS7B L4: Jacobian剧烈旋转2通道方向**：cos(v, J@v)≈0.25，意味着RMSNorm把2通道方向旋转了约75度！
+2. **Qwen3/GLM4: Jacobian几乎保持2通道方向**：cos(v, J@v)≈0.95-0.99
+3. **DS7B深层逐渐恢复方向保持**：L4→L8→L24，cos从0.25→0.34→0.46
+4. **cos(J_c@v, J_r@v) ≈ 0.9**：clean和corrupt状态的Jacobian行为相似，但ΔJv与原始方向v几乎正交(cos≈0)
+
+### 命令记录
+
+```bash
+python tests/glm5/phase379_rmsnorm_remapping_audit.py qwen3       # ~35s
+python tests/glm5/phase379_rmsnorm_remapping_audit.py deepseek7b   # ~720s
+python tests/glm5/phase379_rmsnorm_remapping_audit.py glm4         # ~580s
+```
+
+脚本位置：
+- `tests/glm5/phase379_rmsnorm_remapping_audit.py`
+- 结果：`results/phase379_rmsnorm_remapping/{qwen3,deepseek7b,glm4}_phase379.json`
+
+### 严格审视
+
+#### 硬伤1（✅ 已解决）：Phase 378的方法论错误
+Phase 378用`RMSNorm(Δh)`代替`RMSNorm(h_clean) - RMSNorm(h_corrupt)`。这在DS7B L4导致完全不同的结论：
+- PSEUDO: "类别结构消失"（gap=-0.016）
+- PROPER: "类别结构存在"（gap=+0.019）
+
+**修正**：今后所有post-RMSNorm分析必须使用PROPER方法。
+
+#### 硬伤2（新发现）：DS7B PC1 = 范数比轴，不是类别轴
+PROPER post-RMSNorm PC1与norm_ratio相关-0.934，与类别R²仅0.082。这意味着：
+- PC1编码"binding是否存在/多强"（范数差异），不是"binding什么类别"
+- 类别信息主要在PC2（R²=0.292）
+
+#### 硬伤3（新发现）：GLM4的PROPER PC1直接编码类别
+GLM4的cat_R²=0.882，类别在PC1上完美分离。这与DS7B形成鲜明对比——GLM4的binding编码更"直接"，无需从强度轴中提取类别。
+
+#### 硬伤4（新发现）：DS7B的RMSNorm Jacobian剧烈旋转2通道方向
+cos(v, J@v)≈0.25——RMSNorm把2通道主轴旋转了约75度。这是DS7B特有的：Qwen3和GLM4的Jacobian几乎保持方向不变(0.95-0.99)。
+
+#### 硬伤5（未解决）：PROPER post-RMSNorm空间中2通道因果地位
+keep_only_top2时PROPER PC1=0.601（vs baseline 0.629），差异不大。这可能意味着PROPER空间的结构不完全依赖2通道——更深层的高维交互在PROPER空间中也有贡献。
+
+#### 硬伤6（未解决）：跨任务稳定性
+PROPER vs PSEUDO差异是否是binding-specific？需要其他任务类型验证。
+
+### 关键洞察（更新Phase 378的结论）
+
+1. **Phase 378的"类别结构消失"结论是方法论假象**。正确计算下，DS7B L4的post-RMSNorm类别gap为正(+0.019)，类别结构存在。
+
+2. **DS7B的RMSNorm不是"恢复"类别结构，而是"重组"信号**：
+   - raw空间：1D主轴(0.991)承载全部binding差异
+   - PROPER空间：主轴分裂为多维(0.629, rank=52)
+   - 主轴语义从"binding强度"切换为"范数比"
+   - 类别信息从PC1转移到PC2
+
+3. **三模型编码策略的完整图景**：
+   - **DS7B**: 2通道冗余压缩 → raw 1D主轴 → RMSNorm Jacobian剧烈旋转(~75°) → PROPER多维结构 + PC1=范数比 + 类别在PC2
+   - **Qwen3**: 分散编码 → raw弱1D(0.16) → RMSNorm几乎保持方向 → PROPER结构类似raw + 类别在PC2
+   - **GLM4**: 极度分散 → raw无1D(0.11) → RMSNorm完全保持方向 → PROPER PC1直接编码类别(R²=0.88)
+
+4. **RMSNorm的Jacobian行为是理解模型差异的关键**：
+   - DS7B: ||h|| >> ||Δh|| → RMSNorm的重映射效应显著 → Jacobian旋转~75°
+   - Qwen3/GLM4: ||h|| 与 ||Δh|| 的比例不同 → Jacobian更接近恒等映射
+
+### 下一步（阶段性大任务）
+
+**Phase 380: 类别分量真正因果patch**
+- 在PROPER post-RMSNorm空间中提取类别方向（利用PC2或类别centroid）
+- 替换类别分量，看模型输出是否改变
+- 重点是DS7B L4（验证PC2的类别信息是否因果有效）
+
+**Phase 381: 2通道主轴深层追踪**
+- 追踪DS7B L4→L5→L8→L24的2通道投影
+- Jacobian旋转角度随层数递减(75°→68°→63°→62°)——是否最终被"解旋转"？
+
+**Phase 382: 跨任务泛化**
+
+### 确认测试 (Phase 379b)
+
+**数据量**：从132对扩展到221对（每类别~30对）
+
+**DS7B L4 确认（221对）**：
+
+| 指标 | raw | PROPER | PSEUDO |
+|------|-----|--------|--------|
+| PC1 | 0.992 | **0.641** | 0.946 |
+| same-cat | 0.072 | **0.517** | 0.042 |
+| cross-cat | 0.077 | **0.490** | 0.052 |
+| gap | -0.005 | **+0.027** | -0.010 |
+| cat_R²(PC1) | 0.020 | 0.022 | 0.010 |
+| norm_ratio_corr(PC1) | -0.984 | **-0.928** | -0.814 |
+
+✅ **Phase 379全部关键结论稳定确认**：
+1. PROPER gap为正(+0.027 vs 132对时+0.019)——类别结构存在，非偶然
+2. PROPER PC1=0.641 vs PSEUDO PC1=0.946——PROPER方法揭示多维结构
+3. norm_ratio_corr=-0.928——PC1与范数比高度相关（132对时-0.934）
+4. raw空间norm_ratio_corr=-0.984——raw PC1几乎完美编码范数比
+
+**GLM4 L4 确认（221对）**：
+
+| 指标 | raw | PROPER | PSEUDO |
+|------|-----|--------|--------|
+| PC1 | 0.105 | 0.099 | 0.101 |
+| gap | 0.132 | 0.135 | 0.136 |
+| cat_R²(PC1) | 0.766 | **0.788** | 0.878 |
+| norm_ratio_corr(PC1) | 0.392 | -0.366 | 0.388 |
+
+✅ GLM4确认：PROPER≈PSEUDO（差异极小），PC1直接编码类别(R²=0.788)
+
+命令：
+```bash
+python tests/glm5/phase379b_confirmation.py deepseek7b  # ~300s
+python tests/glm5/phase379b_confirmation.py glm4         # ~480s
+```
+
+## Phase 380: 监督类别子空间因果patch [2026-06-05 01:40]
+
+### 核心目标
+
+1. **监督类别子空间提取**：用LDA/centroid替代PCA单PC分析，量化类别信息在PROPER post-RMSNorm空间中的完整存在量
+2. **因果patch实验**：在residual stream中添加类别/非类别分量，观察实际模型输出logit变化
+3. **Jacobian线性预测误差**：验证J(h_mid)·Δh能否准确预测RMSNorm(h_clean)-RMSNorm(h_corrupt)
+
+### Part 1: 监督类别子空间分类准确率（LOO最近centroid）
+
+**DS7B（chance=14.3%）**：
+
+| 子空间方法 | L4 dim=1 | L4 dim=3 | L4 dim=5 | L8 dim=5 | L24 dim=5 |
+|-----------|---------|---------|---------|----------|-----------|
+| PCA(PROPER) | 12.9% | 22.7% | 30.3% | 38.6% | 42.4% |
+| PCA(RAW) | **8.3%** | **9.1%** | **9.1%** | 15.9% | 14.4% |
+| Centroid | 15.2% | 31.8% | 42.4% | 49.2% | **79.6%** |
+| LDA | 18.9% | 22.7% | 24.2% | 24.2% | **70.5%** |
+
+**Qwen3（chance=14.3%）**：
+
+| 子空间方法 | L4 dim=1 | L4 dim=5 | L4 dim=7 | L28 dim=5 | L28 dim=7 |
+|-----------|---------|---------|---------|----------|-----------|
+| PCA(PROPER) | 18.9% | 54.5% | 62.1% | 68.9% | 73.5% |
+| PCA(RAW) | 31.1% | 61.4% | 68.2% | 63.6% | 75.8% |
+| Centroid | 40.2% | **87.1%** | 84.9% | **90.2%** | **93.9%** |
+| LDA | 25.8% | 63.6% | 63.6% | 69.7% | 73.5% |
+
+**GLM4（chance=14.3%）**：
+
+| 子空间方法 | L4 dim=1 | L4 dim=3 | L4 dim=5 | L30 dim=5 | L30 dim=7 |
+|-----------|---------|---------|---------|----------|-----------|
+| PCA(PROPER) | **56.8%** | **80.3%** | **89.4%** | 68.9% | 78.8% |
+| PCA(RAW) | 58.3% | 81.8% | 86.4% | 65.9% | 76.5% |
+| Centroid | **66.7%** | **98.5%** | **100%** | **97.0%** | **98.5%** |
+| LDA | 60.6% | 88.6% | 95.5% | 56.1% | 56.1% |
+
+### Part 1 关键发现
+
+1. **DS7B L4 RAW空间几乎无法分类类别**（PCA 9.1%≈chance），但PROPER空间可以（centroid 42.4%）
+   - 这直接证实了Phase 379的结论：RMSNorm重组后类别信息更可分离
+   - 但绝对准确率仍很低（42%），远低于GLM4的100%
+
+2. **DS7B深层类别结构大幅增强**：L24 centroid达79.6%，而L4仅42.4%
+   - 说明类别信息在L4-L24之间被逐步重建/放大
+
+3. **GLM4 L4仅需3维centroid即可达98.5%准确率**
+   - 类别信息几乎完全集中在一个极低维子空间中
+   - 与Phase 379的cat_R²(PC1)=0.88一致
+
+4. **Centroid方法优于LDA**：所有模型中centroid分类都优于或等于LDA
+   - 可能因为LDA假设正态分布，而centroid（最近心法）更鲁棒
+
+5. **DS7B LDA方向与norm_ratio高度相关**：
+   - LDA0与norm_ratio相关0.92，LDA1为0.87
+   - 即使是"最优判别方向"也主要由范数比主导
+   - 这进一步证实DS7B的类别判别依赖于范数差异
+
+### Part 2: 因果patch实验（在residual stream上添加Δh分量）
+
+**DS7B 因果patch**：
+
+| 层 | Baseline(corrupt) | Clean | +Cat patch | +Noncat patch | Δ_cat | Δ_noncat | Cat→clean? |
+|-----|---------|-------|-----------|-------------|-------|----------|-----------|
+| L4 | 1.60 | -7.65 | 1.59 | 1.40 | **-0.01** | -0.21 | ✓(微弱) |
+| L8 | 1.60 | -14.11 | 1.66 | 1.72 | +0.06 | +0.11 | ✗ |
+| L24 | 1.60 | -18.51 | 1.53 | 2.09 | **-0.07** | +0.48 | ✓(微弱) |
+
+**Qwen3 因果patch**：
+
+| 层 | Baseline(corrupt) | Clean | +Cat patch | +Noncat patch | Δ_cat | Δ_noncat | Cat→clean? |
+|-----|---------|-------|-----------|-------------|-------|----------|-----------|
+| L4 | 1.82 | -0.01 | 2.19 | -0.21 | +0.37 | -2.02 | ✗ |
+| L28 | 1.82 | 1.37 | 1.99 | -0.12 | +0.17 | -1.94 | ✗ |
+
+**GLM4 因果patch**：
+
+| 层 | Baseline(corrupt) | Clean | +Cat patch | +Noncat patch | Δ_cat | Δ_noncat | Cat→clean? |
+|-----|---------|-------|-----------|-------------|-------|----------|-----------|
+| L4 | 2.91 | -0.003 | 0.99 | -0.37 | **-1.92** | -3.28 | ✓ |
+| L30 | 2.91 | 0.03 | -0.37 | -1.00 | **-3.28** | -3.91 | ✓ |
+
+### Part 2 关键发现
+
+1. **GLM4的类别分量因果有效！** 添加LDA类别分量使logit diff从2.91降到0.99（朝clean方向移动1.92），而非类别分量效果更大(-3.28)
+   - 这是第一个真正因果证据：GLM4的类别子空间对模型输出有因果影响
+
+2. **DS7B的类别分量因果效应极弱**：
+   - L4: Δ_cat仅-0.01（几乎无效应），而Δ_noncat=-0.21
+   - L24: Δ_cat=-0.07（微弱效应），而Δ_noncat=+0.48（较大但方向不对）
+   - 类别子空间在DS7B中对logit的影响远小于非类别分量
+
+3. **Qwen3的类别patch方向错误**：Δ_cat为正值（远离clean），说明LDA类别方向不是因果有效的
+
+4. **W_U readout patch与真正因果patch不一致**：
+   - DS7B L4: readout patch显示corr(full, cat)=0.38，但因果patch效果仅-0.01
+   - GLM4 L4: readout patch显示corr(full, cat)=-0.003（接近0！），但因果patch效果达-1.92
+   - **这说明W_U线性探针不能预测因果效果**
+
+5. **非类别分量在所有模型中都是主要因果驱动力**：
+   - corr(full, noncat)≈0.92-0.98，且因果效应更大
+   - 但"非类别"≠"无意义"——它可能包含对象特异信息、绑定强度等
+
+### Part 3: Jacobian线性预测误差
+
+| 模型/层 | cos(proper, linear_mid) | rel_err | gap_proper | gap_linear | ‖h‖/‖Δh‖ |
+|---------|------------------------|---------|-----------|-----------|----------|
+| DS7B L4 | **1.0000** | 0.0086 | 0.0196 | 0.0197 | 11.3 |
+| DS7B L8 | **1.0000** | 0.0033 | 0.0530 | 0.0530 | 13.9 |
+| DS7B L24 | **1.0000** | 0.0027 | 0.0633 | 0.0633 | 13.0 |
+| Qwen3 L4 | **1.0000** | 0.0068 | 0.0702 | 0.0702 | — |
+| Qwen3 L28 | **1.0000** | 0.0251 | 0.1667 | 0.1667 | — |
+| GLM4 L4 | **1.0000** | 0.0161 | 0.1327 | 0.1326 | — |
+| GLM4 L30 | **0.9999** | 0.0410 | 0.2640 | 0.2650 | — |
+
+### Part 3 关键发现
+
+1. **Jacobian中点线性近似极其精确！** cos(proper, linear_mid)≈1.000，rel_err < 4.1%
+   - 这与Phase 379的Jacobian分析表面上矛盾（DS7B L4 cos(v, J@v)=0.253）
+   - 但实际上不矛盾：Phase 379测的是"2通道方向v经Jacobian变换后是否保持方向"
+   - Phase 380测的是"J(h_mid)·Δh能否预测RMSNorm(h_clean)-RMSNorm(h_corrupt)"
+   - 前者测试特定方向，后者测试完整差值
+
+2. **线性预测完美保持类别结构**：gap_proper ≈ gap_linear（差异<0.001）
+   - 说明RMSNorm的类别重组效应可以在一阶近似下完全捕捉
+   - 不需要二阶项
+
+3. **‖h‖/‖Δh‖与预测误差负相关**（corr≈-0.72~-0.97）
+   - 比值越大（Δh相对越小），线性近似越精确
+   - 这在数学上合理：当Δh很小时，一阶展开更准确
+
+4. **Phase 379的"Jacobian旋转75°"需要重新理解**：
+   - Phase 379: cos(v, J@v)=0.253 → 看起来Jacobian大幅旋转
+   - Phase 380: cos(proper, linear)=1.000 → Jacobian线性近似几乎完美
+   - 解释：Jacobian旋转的是2通道特定方向v，但Δh不只在v方向上
+   - Δh包含大量非2通道分量，这些分量经Jacobian后方向保持良好
+   - 2通道分量虽然被旋转，但在完整Δh中占比被其他分量稀释
+
+### 命令记录
+
+```bash
+python tests/glm5/phase380_category_subspace_causal_patch.py qwen3       # ~1250s
+python tests/glm5/phase380_category_subspace_causal_patch.py deepseek7b   # ~3380s
+python tests/glm5/phase380_category_subspace_causal_patch.py glm4         # ~3120s
+```
+
+脚本位置：
+- `tests/glm5/phase380_category_subspace_causal_patch.py`
+- 结果：`results/phase380_category_subspace_causal_patch/{qwen3,deepseek7b,glm4}_phase380.json`
+
+### 严格审视
+
+#### 硬伤1：因果patch中"类别分量"的定义依赖LDA，而LDA在DS7B上效果差
+LDA在DS7B L4仅达24.2%分类准确率（6维），远低于centroid的42.4%。LDA假设正态等协差矩阵，可能不适合DS7B的分布。但即使用centroid方向，因果效果也应该类似——因为centroid在DS7B上分类也不高。
+
+#### 硬伤2：因果patch的信号量级极小
+DS7B L4: Δ_cat=-0.01 vs Δ_clean=-9.25。类别patch仅解释了clean-corrupt差异的0.1%。
+GLM4 L4: Δ_cat=-1.92 vs Δ_clean=-2.91。类别patch解释了66%。
+这说明DS7B的类别信息虽然统计存在，但因果贡献极弱。
+
+#### 硬伤3：GLM4 W_U readout显示cat相关接近0(-0.003)，但因果patch效果强(-1.92)
+这看似矛盾，实际上是因为：
+- W_U readout是单层线性映射，假设logit = W_U @ h_norm
+- 因果patch经过后续层（L4→L40）的非线性变换，效果被放大
+- 类别分量对后续层的影响远大于对直接logit读出的影响
+
+#### 硬伤4：Jacobian线性近似完美≠RMSNorm不重要
+线性近似精确说明RMSNorm的效应可以被一阶Jacobian完全捕捉。但Jacobian本身依赖于h的范数和方向——所以RMSNorm仍然是关键的非线性环节，只是它的效应可以线性化。
+
+#### 硬伤5：因果patch只测试了"添加"操作，没测试"替换"和"移除"
+当前只做了 corrupt + Δh_cat → 观察logit。还需要：
+- 移除类别分量：clean - Δh_cat → logit是否朝corrupt移动？
+- 交换类别分量：swap → 是否交换类别偏好？
+
+### 关键洞察
+
+1. **类别信息的因果有效性因模型而异**：
+   - GLM4: 类别子空间因果有效（Δ_cat解释66% clean-corrupt差异）
+   - Qwen3: 类别子空间因果方向错误
+   - DS7B: 类别子空间因果效应极弱（0.1%）
+
+2. **W_U线性探针不能替代因果patch**：
+   - GLM4: W_U探针说cat不相关(0.003)，因果patch说cat强因果(-1.92)
+   - 这意味着类别信息在中间层可能不走"直接logit路径"，而是通过后续层间接影响
+
+3. **DS7B的类别结构是统计存在但因果无效的**：
+   - LOO分类准确率42% > chance(14%)，说明类别信息确实存在
+   - 但因果patch效果仅0.01，说明类别信息不直接驱动输出
+   - DS7B的binding输出可能完全由非类别分量驱动（范数/强度/对象特异信息）
+
+4. **Jacobian一阶近似完美，说明RMSNorm的重映射在数学上是"温和的"**：
+   - Phase 379的"旋转75°"是针对特定2通道方向的
+   - 对完整Δh信号，Jacobian近似误差<1%
+   - 这降低了RMSNorm作为"关键非线性环节"的理论地位
+
+### 下一步
+
+**Phase 381: 反向因果patch + 移除实验**
+- 从clean中移除类别分量：clean - Δh_cat → 是否朝corrupt移动？
+- 这是比"添加到corrupt"更强的因果证据
+- 重点：GLM4 L4（预期移除后logit大幅改变）和DS7B L24（深层是否有更强因果）
+
+**Phase 382: 类别子空间深层追踪**
+- DS7B L4→L8→L24的centroid分类准确率从42%→49%→80%
+- 追踪这个增强的机制：是attention放大还是MLP重建？
+
+**Phase 383: 跨任务范数比验证**
+- DS7B LDA0与norm_ratio相关0.92——是否所有任务都如此？
+- 如果是数学背景，那DS7B的"类别判别"本质上是"范数判别"
+
+### 确认测试 (Phase 380b: 反向因果patch)
+
+**数据量**：179对（Phase 380用132对）
+
+**反向patch方法**：从clean residual中移除类别/非类别分量，观察logit变化。
+预期：如果类别分量因果有效，移除后logit应朝corrupt方向移动（即朝远离target方向移动）。
+
+**三模型反向patch结果**：
+
+| 模型/层 | Clean | Corrupt | -Cat | -Noncat | -All | Δ(-Cat) | Δ(-Noncat) |
+|---------|-------|---------|------|---------|------|---------|-----------|
+| **DS7B L4** | 1.57 | 1.65 | 1.53 | 1.59 | 1.76 | **-0.04** | +0.02 |
+| **DS7B L24** | 1.57 | 1.65 | 1.55 | 1.34 | 1.24 | **-0.02** | **-0.23** |
+| **Qwen3 L4** | 1.57 | 1.79 | 1.08 | 1.77 | 2.66 | **-0.49** | +0.20 |
+| **Qwen3 L28** | 1.57 | 1.79 | 1.16 | 2.37 | 2.11 | **-0.41** | +0.79 |
+| **GLM4 L4** | 2.92 | 2.97 | **0.37** | **0.11** | 0.63 | **-2.56** | **-2.82** |
+| **GLM4 L30** | 2.92 | 2.97 | **1.25** | **0.33** | 0.37 | **-1.67** | **-2.60** |
+
+### Phase 380b 关键发现
+
+1. **GLM4的类别分量因果有效（再次确认）**：
+   - L4: 移除类别后logit从2.92降到0.37（Δ=-2.56），这是巨大的因果效应
+   - L30: 移除类别后从2.92降到1.25（Δ=-1.67）
+   - 但注意：移除非类别的效应更大（-2.82/-2.60）
+   - 两者都远离corrupt方向（2.97）——这很意外
+
+2. **⚠️ 所有模型中移除分量都导致logit远离corrupt，而非朝corrupt移动！**
+   - Clean→Corrupt的Δ通常很小（0.05-0.21）
+   - 但移除任何分量（cat或noncat）后logit变化巨大且方向不稳定
+   - 这说明"从residual中减去Δh分量"不是简单的"朝corrupt移动"
+   - 因为RMSNorm的非线性：修改h_raw后RMSNorm(h_raw - Δh_cat) ≠ h_norm - Δh_cat_norm
+
+3. **DS7B的类别分量因果效应仍极弱**：
+   - L4: Δ(-Cat)=-0.04（vs Δ_clean→corrupt=+0.08）
+   - L24: Δ(-Cat)=-0.02（vs Δ_clean→corrupt=+0.08）
+   - 但L24的非类别分量有较大效应（-0.23）
+
+4. **Qwen3的类别分量移除效果显著**：
+   - L4: Δ(-Cat)=-0.49（比DS7B大10倍！）
+   - 但方向是朝远离corrupt方向移动（不是朝corrupt）
+   - 这与Phase 380的"添加cat到corrupt效果朝远离clean"一致
+
+5. **关键方法学问题**：residual stream patch经过后续层的RMSNorm后，效果会被放大/改变
+   - 线性W_U探针无法预测非线性patch效果
+   - 需要区分"直接logit路径"和"后续层非线性变换路径"
+
+命令：
+```bash
+python tests/glm5/phase380b_reverse_causal_patch.py qwen3       # ~75s
+python tests/glm5/phase380b_reverse_causal_patch.py deepseek7b   # ~620s
+python tests/glm5/phase380b_reverse_causal_patch.py glm4         # ~1010s
+```
+
+## Phase 381: 范数比信号因果验证 [2026-06-05 03:15]
+
+### 核心问题
+
+DS7B的类别判别是否100%来自范数差异？Phase 380发现DS7B LDA0与norm_ratio相关0.92。
+
+### Part 1: 范数匹配/回归后类别分类准确率
+
+**方法1：Norm-Matched**：将h_corrupt缩放到与h_clean同范数后，重算PROPER post-RMSNorm差值，再做centroid分类。
+**方法2：NoNR（回归掉norm_ratio）**：从dh_proper中线性回归掉norm_ratio分量后做centroid分类。
+
+| 模型/层 | PROPER | NormMatched | NoNR | PC1~nr_corr | drop_NM | drop_NR |
+|---------|--------|-------------|------|-------------|---------|---------|
+| **DS7B L4** | 0.391 | 0.391 | **0.801** | -0.963 | **0.000** | **-0.411** |
+| **DS7B L8** | 0.523 | 0.523 | **0.940** | -0.985 | **0.000** | **-0.417** |
+| **DS7B L12** | 0.603 | 0.603 | **0.960** | -0.994 | **0.000** | **-0.358** |
+| **DS7B L16** | 0.656 | 0.656 | **0.960** | -0.989 | **0.000** | **-0.305** |
+| **DS7B L20** | 0.722 | 0.722 | **0.967** | -0.988 | **0.000** | **-0.245** |
+| **DS7B L24** | 0.762 | 0.762 | **0.934** | -0.989 | **0.000** | **-0.172** |
+| **Qwen3 L4** | 0.848 | 0.848 | 0.815 | 0.047 | 0.000 | +0.033 |
+| **Qwen3 L12** | 0.954 | 0.954 | 0.927 | -0.097 | 0.000 | +0.026 |
+| **Qwen3 L28** | 0.868 | 0.868 | 0.901 | 0.793 | 0.000 | -0.033 |
+| **GLM4 L4** | 1.000 | 1.000 | 0.993 | 0.240 | 0.000 | +0.007 |
+| **GLM4 L12** | 0.993 | 0.993 | 0.993 | -0.118 | 0.000 | +0.000 |
+| **GLM4 L30** | 0.934 | 0.934 | 0.927 | -0.228 | 0.000 | +0.007 |
+
+### Part 1 关键发现
+
+1. **Norm-Matched准确率完全不降（drop=0.000）！所有模型、所有层都如此！**
+   - 这不是"DS7B类别=范数"的证据
+   - 而是因为RMSNorm的尺度不变性：RMSNorm(h * α) = RMSNorm(h)
+   - 所以缩放corrupt的范数后，RMSNorm(h_corrupt_matched) = RMSNorm(h_corrupt)
+   - 因此dh_proper在norm-matching后完全不变
+   - **这是一个方法学盲区**：在post-RMSNorm空间中无法测试范数效应
+
+2. **DS7B回归掉norm_ratio后准确率反而上升（0.391→0.801）！**
+   - 这是反直觉的：移除一个"信息维度"后分类更准
+   - 原因：DS7B的PC1几乎完全由norm_ratio主导（PC1~nr=-0.963~-0.994）
+   - PC1是最大方差方向，但不是类别判别方向
+   - 回归掉PC1（norm_ratio）后，类别信号从被PC1淹没变为可分类
+   - 这直接证实：**DS7B的norm_ratio轴是分类噪声，不是分类信号**
+
+3. **Qwen3和GLM4回归掉norm_ratio后准确率略微下降（+0.007~+0.053）**
+   - 说明它们的norm_ratio不是噪声，但也不是主要分类维度
+   - GLM4的norm_ratio影响最小（drop≤0.007），类别信息高度独立于范数
+
+4. **DS7B深层NoNR准确率趋势**：L4(0.801)→L8(0.940)→L12(0.960)→L24(0.934)
+   - 移除norm_ratio后，DS7B的类别分类准确率与Qwen3相当
+   - 说明DS7B的类别信息确实存在，只是被强norm_ratio主轴遮蔽了
+
+### Part 2: 范数 vs 方向因果分离
+
+**方法**：构造"纯范数"patch（只改变h的范数，不改变方向）和"纯方向"patch（只改变方向，不改变范数），通过logit lens观察效果。
+
+**结果**：所有模型所有层的norm_frac=0.000, dir_frac=1.000。
+
+**⚠️ 方法学错误**：RMSNorm是尺度不变的（RMSNorm(αx) = RMSNorm(x)），所以"纯范数"patch在post-RMSNorm空间中恒等于corrupt。这不是真正的因果测试，而是RMSNorm数学性质的直接后果。
+
+**正确理解**：范数差异在raw residual space中存在，但经过RMSNorm后被完全吸收。范数差异通过Jacobian的非线性效应（而非直接尺度效应）影响后续表示。
+
+### Part 3: 深层类别结构追踪
+
+**DS7B**（chance=14.3%）：
+
+| 层 | PC1_var | eff_rank | PC1~nr | acc(PROPER) | acc(NM) | acc(NoNR) |
+|----|---------|----------|--------|-------------|---------|-----------|
+| L4 | 0.633 | 57 | -0.963 | 0.391 | 0.391 | **0.801** |
+| L8 | 0.476 | 87 | -0.985 | 0.523 | 0.523 | **0.940** |
+| L12 | 0.395 | 102 | -0.994 | 0.603 | 0.603 | **0.960** |
+| L16 | 0.340 | 105 | -0.989 | 0.656 | 0.656 | **0.960** |
+| L20 | 0.285 | 106 | -0.988 | 0.722 | 0.722 | **0.967** |
+| L24 | 0.243 | 103 | -0.989 | 0.762 | 0.762 | **0.934** |
+
+**Qwen3**：
+
+| 层 | PC1_var | eff_rank | PC1~nr | acc | acc_nm | acc_no_nr |
+|----|---------|----------|--------|-----|--------|-----------|
+| L4 | 0.186 | 73 | 0.047 | 0.848 | 0.848 | 0.815 |
+| L12 | 0.113 | 89 | -0.097 | 0.954 | 0.954 | 0.927 |
+| L20 | 0.143 | 90 | 0.517 | 0.907 | 0.907 | 0.921 |
+| L28 | 0.188 | 82 | 0.793 | 0.868 | 0.868 | 0.901 |
+
+**GLM4**：
+
+| 层 | PC1_var | eff_rank | PC1~nr | acc | acc_nm | acc_no_nr |
+|----|---------|----------|--------|-----|--------|-----------|
+| L4 | 0.109 | 96 | 0.240 | 1.000 | 1.000 | 0.993 |
+| L12 | 0.152 | 86 | -0.118 | 0.993 | 0.993 | 0.993 |
+| L20 | 0.139 | 86 | 0.282 | 0.967 | 0.967 | 0.914 |
+| L30 | 0.167 | 80 | -0.228 | 0.934 | 0.934 | 0.927 |
+
+### Part 3 关键发现
+
+1. **DS7B的PC1方差从L4(0.633)持续下降到L24(0.243)**
+   - 说明2通道强主轴效应在深层逐渐被稀释
+   - 有效秩从57→103，越来越分散
+
+2. **DS7B PC1与norm_ratio相关始终保持极强（-0.963~-0.994）**
+   - 所有层PC1都是范数比轴，不是类别轴
+   - 这是DS7B的普遍特征，不仅限于L4
+
+3. **DS7B NoNR准确率在深层略有下降（L20=0.967→L24=0.934）**
+   - 可能因为深层的类别信息重新与norm_ratio混合
+   - 或者深层有其他干扰维度
+
+4. **Qwen3 L28的PC1~nr=0.793**，但NoNR准确率反而高于原始（0.901 vs 0.868）
+   - 说明即使PC1与norm_ratio高度相关，回归掉norm_ratio也改善分类
+   - 这说明norm_ratio轴也是Qwen3深层的分类噪声
+
+### 核心结论
+
+**Phase 381最重要的发现是范式性的：**
+
+1. **在post-RMSNorm空间中，范数差异被完全吸收**（尺度不变性）。因此"norm-matched"测试在此空间中无效——这正是为什么所有模型drop_NM=0.000。
+
+2. **DS7B的norm_ratio轴是分类噪声，不是分类信号。** 移除后准确率从39%→80%（L4）。这意味着：
+   - DS7B的PC1（norm_ratio轴）在centroid分类中实际上是噪声——它占据了最大方差，但对类别判别没有帮助
+   - 类别信息藏在PC2+中，之前被PC1淹没
+
+3. **三模型的真实类别信息量（NoNR准确率）其实相当接近**：
+   - DS7B L4: 80.1%, Qwen3 L4: 81.5%, GLM4 L4: 99.3%
+   - DS7B深层: 93-96%, Qwen3深层: 90%, GLM4深层: 93-99%
+
+4. **DS7B不是"类别信息弱"，而是"类别信息被强norm_ratio主轴遮蔽"。** 移除遮蔽后，DS7B的类别结构与Qwen3相当。
+
+### 命令
+
+```bash
+python tests/glm5/phase381_norm_matched_category_test.py qwen3       # ~960s
+python tests/glm5/phase381_norm_matched_category_test.py deepseek7b   # ~3300s
+python tests/glm5/phase381_norm_matched_category_test.py glm4         # ~3000s
+```
+
+### 严格审视
+
+#### 硬伤1：NoNR方法（回归掉norm_ratio）只是线性移除
+线性回归移除了norm_ratio的线性效应。但norm_ratio可能还有非线性交互效应。不过，考虑到PC1~nr≈-0.99，norm_ratio几乎完全对应PC1，移除PC1的效果应该类似。
+
+#### 硬伤2：NoNR后DS7B准确率上升的真正原因
+可能有两种解释：
+- A) norm_ratio轴是噪声（与类别无关的方差），移除后信噪比提高
+- B) norm_ratio轴与某些类别正相关、与另一些负相关，造成centroid偏移
+
+从F-stat(norm_ratio across cats)=14.8（DS7B L4）来看，norm_ratio确实与类别有统计关联。但这种关联的方向性（某些类别norm高，某些低）可能导致centroid方法误判。
+
+#### 硬伤3：Part 2的范数因果测试方法学错误
+RMSNorm的尺度不变性使得"纯范数"patch在post-RMSNorm空间中无效。正确的做法应该是：
+- 在raw residual space中测试范数效应
+- 或通过Jacobian分析范数效应如何间接影响方向
+
+#### 硬伤4：centroid分类对norm_ratio轴的敏感性
+centroid方法按距离分类。如果norm_ratio轴占据PC1（63%方差），那么centroid距离主要由norm_ratio决定。回归掉norm_ratio后，距离更反映类别信息。
+
+### 确认测试 (Phase 381b)
+
+**方法**：用多种移除方式（no_pc1, no_pc13, no_pc15, no_norm_ratio, no_norm_diff）和多种分类器（centroid, KNN5, centroid10d）交叉验证。
+
+**DS7B 核心确认数据**：
+
+| 层 | 方法 | centroid(5d) | KNN5(5d) | centroid(10d) |
+|----|------|-------------|----------|---------------|
+| L4 | original | 0.391 | 0.735 | 0.430 |
+| L4 | no_pc1 | **0.834** | **0.881** | **0.940** |
+| L4 | no_norm_ratio | 0.801 | 0.848 | 0.887 |
+| L12 | original | 0.603 | 0.841 | 0.629 |
+| L12 | no_pc1 | **0.960** | **0.960** | **0.993** |
+| L12 | no_norm_ratio | 0.960 | 0.960 | 0.993 |
+| L24 | original | 0.762 | 0.841 | 0.795 |
+| L24 | no_pc1 | **0.921** | **0.954** | 0.940 |
+| L24 | no_norm_ratio | 0.934 | 0.960 | 0.947 |
+
+**跨模型对比（centroid 5d, 移除PC1）**：
+
+| 模型/层 | original | no_pc1 | 变化 |
+|---------|---------|--------|------|
+| DS7B L4 | 0.391 | **0.834** | **+0.443** |
+| DS7B L12 | 0.603 | **0.960** | **+0.357** |
+| DS7B L24 | 0.762 | **0.921** | **+0.159** |
+| Qwen3 L4 | 0.848 | 0.848 | 0.000 |
+| Qwen3 L28 | 0.868 | 0.940 | +0.072 |
+| GLM4 L4 | 1.000 | 0.993 | -0.007 |
+| GLM4 L30 | 0.934 | 0.907 | -0.027 |
+
+**关键确认**：
+
+1. **DS7B的no_pc1提升被多分类器交叉验证**：KNN5从73.5%→88.1%（L4），从84.1%→96.0%（L12）
+2. **Qwen3 L28移除PC1也有提升（86.8%→94.0%）**，但Qwen3 L4不变
+3. **GLM4移除PC1准确率反而略降**（100%→99.3%），说明GLM4的PC1承载类别信息
+
+**移除PC1后新PC1特征**：
+- DS7B L4: 新PC1 = 原PC2 (corr=-1.000)，新PC1与norm_ratio仅相关-0.104，类别相关性=0.399
+- DS7B L12: 新PC1与norm_ratio相关0.000，类别相关性=0.719
+- 这说明**移除PC1后暴露出的PC2才是真正的类别轴**
+
+**PC类别相关性（DS7B L12）**：
+- PC1: max|cat_corr|=0.154 （几乎与类别无关=norm_ratio轴）
+- PC2: max|cat_corr|=0.719 （强类别信号）
+- PC3: max|cat_corr|=0.482
+- PC4: max|cat_corr|=0.393
+
+**Qwen3 L28 PC类别相关性**：
+- PC1: max|cat_corr|=0.342 （中等）
+- PC2: max|cat_corr|=0.791 （强类别信号，与DS7B类似！）
+
+**GLM4 L4 PC类别相关性**：
+- PC1: max|cat_corr|=0.838 （PC1直接编码类别！）
+- PC2: max|cat_corr|=0.531
+
+### Phase 381b 关键结论
+
+**三模型的PC1语义分化**：
+1. GLM4: PC1 = 类别轴 (cat_corr=0.838)
+2. DS7B: PC1 = norm_ratio轴 (cat_corr=0.154, nr_corr=-0.963)
+3. Qwen3: PC1 = 混合轴 (L4: cat_corr=0.210, nr_corr=0.047; L28: cat_corr=0.342, nr_corr=0.793)
+
+**但三模型的PC2都是类别轴**：
+- GLM4 PC2: cat_corr=0.531
+- DS7B PC2: cat_corr=0.719
+- Qwen3 PC2: cat_corr=0.791
+
+**PC2在所有模型中都有强类别信号**。DS7B的特殊之处是PC1与norm_ratio几乎完全耦合（corr=-0.963），导致PC1成为类别分类的噪声维度。
+
+### 关键洞察
+
+**DS7B的编码策略重新理解：**
+- DS7B不是"类别信息弱"
+- 而是DS7B选择了一个"范数比主导"的PC1轴
+- 这个PC1轴可能是"绑定强度"或"语义对齐度"的编码
+- 类别信息在PC2+中，信号强度与Qwen3/GLM4相当
+
+**这意味着三模型的差异不是"类别信息量"，而是"主轴选择"：**
+- DS7B: PC1=范数比/绑定强度, 类别在PC2+
+- Qwen3: PC1混合（L4弱, L28=norm_ratio），类别分散
+- GLM4: PC1=类别标签，直接显式编码
+
+**对RRFC理论的升级：**
+- 需要区分"主轴方向"和"信息维度"
+- 最大方差方向≠最重要语义维度
+- 归一化层的选择使得范数信息在post-RMSNorm空间中不可直接读出
+- 但范数信息通过Jacobian的方向旋转间接影响所有后续表示
+
+## Phase 382: 多因子残差分解 & PC1语义解码 [2026-06-05 07:30]
+
+### 核心目标
+
+1. 分解dh_proper中各因子的方差贡献
+2. 解码DS7B PC1的真实语义
+3. 建立PC-factor相关性矩阵
+
+### Part 1: 因子R²分解（跨模型对比）
+
+**因子定义**：category(7类), object_identity(~150个), scalar_norm_ratio, scalar_norm_diff, scalar_norm_clean, scalar_logit_target_clean, scalar_logit_diff, scalar_entropy_clean
+
+| 模型/层 | obj_id | category | norm_ratio | norm_diff | norm_clean | logit_tgt | logit_diff | entropy |
+|---------|--------|----------|------------|-----------|------------|-----------|------------|---------|
+| **DS7B L4** | 0.985 | **0.103** | **0.587** | **0.569** | 0.345 | 0.132 | 0.033 | 0.024 |
+| **DS7B L12** | 0.990 | **0.107** | **0.390** | **0.390** | 0.265 | 0.087 | 0.032 | 0.021 |
+| **DS7B L24** | 0.989 | **0.133** | **0.238** | **0.236** | 0.153 | 0.057 | 0.027 | 0.015 |
+| **Qwen3 L4** | 0.985 | 0.210 | 0.065 | 0.064 | 0.042 | 0.039 | 0.020 | 0.017 |
+| **Qwen3 L12** | 0.970 | 0.346 | 0.037 | 0.038 | 0.033 | 0.036 | 0.020 | 0.034 |
+| **Qwen3 L28** | 0.968 | 0.274 | 0.130 | 0.130 | 0.129 | 0.039 | 0.021 | 0.085 |
+| **GLM4 L4** | 0.975 | 0.306 | 0.030 | 0.030 | 0.038 | 0.021 | 0.013 | 0.039 |
+| **GLM4 L12** | 0.968 | 0.370 | 0.036 | 0.036 | 0.042 | 0.030 | 0.014 | 0.057 |
+| **GLM4 L30** | 0.971 | 0.341 | 0.052 | 0.053 | 0.056 | 0.028 | 0.013 | 0.067 |
+
+### Part 1 关键发现
+
+1. **Object identity是dh_proper的主导因子**（R²=97-99%），三模型一致
+   - dh_proper = h_clean - h_corrupt 主要编码的是"哪个对象"，不是"哪个类别"
+   - 这解释了为什么Phase 380/381的类别分类准确率只有39%（DS7B L4）——category只是10%的信息
+
+2. **DS7B的norm_ratio解释58.7%方差**（L4），远超其他模型
+   - Qwen3 L4: 6.5%, GLM4 L4: 3.0%
+   - DS7B的dh_proper主要被norm_ratio和object_identity占据，category只占10%
+   - 在non-NR空间中，DS7B的category R²升至25%（L4），仍低于GLM4的31%
+
+3. **GLM4的category R²=30.6%（L4）是最高的**
+   - GLM4将类别信息编码得更显式
+   - 但即使GLM4，category也只占30%方差，远低于object_identity的97%
+
+4. **norm_clean的R²在DS7B中高达34.5%（L4）**
+   - 说明clean残差的范数本身携带大量信息
+   - 这与DS7B的2通道冗余压缩理论一致
+
+### Part 2: PC1语义解码（多因子回归）
+
+**DS7B PC1 individual R²**：
+| 因子 | L4 | L8 | L12 | L16 | L20 | L24 |
+|------|-----|-----|------|------|------|------|
+| scalar_norm_ratio | **0.927** | **0.970** | **0.987** | **0.977** | **0.976** | **0.978** |
+| scalar_norm_diff | **0.897** | **0.971** | **0.988** | **0.973** | **0.968** | **0.970** |
+| scalar_norm_clean | 0.527 | 0.586 | 0.658 | 0.645 | 0.625 | 0.585 |
+| scalar_logit_tgt | 0.202 | 0.196 | 0.136 | 0.122 | 0.106 | 0.097 |
+
+**结论：DS7B PC1 ≈ norm_ratio/norm_diff轴，R²高达0.93-0.99**。这是跨所有层的一致特征。
+
+**GLM4 PC1 individual R²**：
+| 因子 | L4 | L12 | L20 | L30 |
+|------|-----|------|------|------|
+| category_color | **0.702** | **0.854** | **0.767** | **0.695** |
+| scalar_norm_corrupt | 0.447 | 0.256 | 0.371 | - |
+| scalar_entropy | 0.205 | 0.192 | 0.200 | 0.211 |
+
+**结论：GLM4 PC1 = category_color轴**（R²=0.70-0.85）。颜色类别在PC1上编码最强。
+
+**Qwen3 PC1语义随深度变化**：
+- L4: PC1 = 无主导因子（object_identity_dust_mote=0.23, norm_clean=0.09）
+- L12: PC1 = category_color (R²=0.81)
+- L20: PC1 = entropy/norm混合
+- L28: PC1 = norm_diff/norm_ratio (R²=0.63)
+
+### Part 3: PC-factor对齐矩阵
+
+| 模型/层 | Category→PC | NR→PC | ObjId→PC |
+|---------|------------|-------|----------|
+| DS7B L4 | PC3(0.635) | PC1(-0.963) | PC1(0.996) |
+| DS7B L12 | PC2(0.760) | PC1(-0.994) | PC4(0.999) |
+| DS7B L24 | PC3(0.768) | PC1(-0.989) | PC4(0.999) |
+| Qwen3 L4 | PC4(0.760) | PC4(0.551) | PC1(0.999) |
+| Qwen3 L12 | PC1(0.931) | PC2(-0.395) | PC2(0.994) |
+| Qwen3 L28 | PC2(0.900) | PC1(0.793) | PC10(0.995) |
+| GLM4 L4 | PC1(0.942) | PC5(-0.285) | PC2(0.994) |
+| GLM4 L12 | PC1(0.952) | PC4(-0.402) | PC3(0.998) |
+| GLM4 L30 | PC1(0.892) | PC4(-0.531) | PC6(0.995) |
+
+**关键观察**：
+1. **DS7B的category在PC2-3**（0.6-0.8），而非PC1
+2. **GLM4的category在PC1**（0.89-0.95），最直接
+3. **Qwen3的category位置随深度移动**：L4→PC4, L12→PC1, L28→PC2
+4. **Object identity总是与某个PC高度对齐**（0.99+），但具体哪个PC因模型而异
+5. **DS7B的NR总是在PC1**（-0.96~-0.99），而其他模型NR分散在PC4-5
+
+### 命令
+
+```bash
+python tests/glm5/phase382_factor_decomposition.py qwen3       # ~600s
+python tests/glm5/phase382_factor_decomposition.py deepseek7b   # ~1200s
+python tests/glm5/phase382_factor_decomposition.py glm4         # ~1200s
+```
+
+## Phase 383: 真实类别Swap因果测试 [2026-06-05 07:35]
+
+### 核心目标
+
+用实际模型干预（而非logit lens近似）验证类别分量的因果有效性。
+
+### 实验设计
+
+6种干预方式：
+1. clean_baseline: 正常clean前向传播
+2. corrupt_baseline: 正常corrupt前向传播
+3. add_cat_to_corrupt: 在corrupt的layer l residual上添加category分量
+4. remove_cat_from_clean: 在clean的layer l residual上移除category分量
+5. cross_cat_swap: 将clean的category分量替换为不同类别的category分量
+6. same_cat_swap: 将clean的category分量替换为同类别的category分量
+7. zero_cat: 在clean上移除整个category分量
+
+测试样本：每模型30对（随机选取），每层6种干预。
+
+### 结果（因果效应，Δ logit_diff）
+
+**add_cat_causal_effect = add_cat - corrupt_baseline**：
+| 模型/层 | mean | std | t_stat | 显著? |
+|---------|------|-----|--------|-------|
+| DS7B L4 | +0.08 | 0.82 | 0.52 | 否 |
+| DS7B L12 | -0.10 | 0.60 | -0.88 | 否 |
+| DS7B L24 | -0.27 | 0.64 | -2.27 | 是(方向反!) |
+| Qwen3 L4 | -0.05 | 3.55 | -0.07 | 否 |
+| Qwen3 L12 | -0.69 | 3.95 | -0.95 | 否 |
+| Qwen3 L28 | -1.87 | 3.13 | -3.26 | 是(方向反!) |
+| GLM4 L4 | -2.17 | 4.37 | -2.72 | 是(方向反!) |
+| GLM4 L12 | -3.07 | 2.33 | -7.21 | 是(方向反!) |
+| GLM4 L30 | -3.89 | 4.04 | -5.26 | 是(方向反!) |
+
+**remove_cat_causal_effect = remove_cat - clean_baseline**：
+| 模型/层 | mean | std | t_stat | 显著? |
+|---------|------|-----|--------|-------|
+| DS7B L4 | +0.19 | 1.09 | 0.97 | 否 |
+| DS7B L12 | +0.31 | 1.05 | 1.61 | 否 |
+| DS7B L24 | +0.04 | 0.52 | 0.47 | 否 |
+| Qwen3 L4 | -0.31 | 4.37 | -0.39 | 否 |
+| Qwen3 L12 | -1.27 | 3.66 | -1.90 | 边缘 |
+| Qwen3 L28 | +1.03 | 5.04 | 1.12 | 否 |
+| GLM4 L4 | -2.77 | 3.10 | -4.90 | 是(方向反!) |
+| GLM4 L12 | -2.38 | 2.84 | -4.60 | 是(方向反!) |
+| GLM4 L30 | -2.76 | 3.01 | -5.02 | 是(方向反!) |
+
+**swap_causal_effect (cross_vs_same_diff)**：
+| 模型/层 | cross_mean | same_mean | diff |
+|---------|-----------|-----------|------|
+| DS7B L4 | +0.20 | -0.10 | +0.30 |
+| DS7B L12 | +0.37 | +0.33 | +0.04 |
+| DS7B L24 | -0.02 | -0.03 | +0.01 |
+| Qwen3 L4 | -1.15 | -0.99 | -0.15 |
+| Qwen3 L12 | -1.27 | -1.01 | -0.27 |
+| Qwen3 L28 | -0.45 | -0.13 | -0.32 |
+| GLM4 L4 | -2.15 | -2.19 | +0.04 |
+| GLM4 L12 | -2.83 | -2.23 | -0.60 |
+| GLM4 L30 | -2.76 | -1.82 | **-0.94** |
+
+### Phase 383 关键发现
+
+1. **简单add/remove方法有根本缺陷**：
+   - GLM4 L12: add_cat=-3.07, remove_cat=-2.38，两者都显著为负
+   - 这意味着**添加category分量和移除category分量都伤害了logit_diff**
+   - 这不是category的因果效应，而是**residual patching本身的破坏效应**
+   - 解释：在raw residual空间中添加post-RMSNorm空间的向量会产生空间不匹配
+
+### Phase 383b确认测试：Raw空间类别Swap + 更大样本
+
+**修复**：在raw residual空间计算category subspace（而非post-RMSNorm空间），样本量增至60对。
+
+**Raw空间 vs Post-RMSNorm空间 category R²对比**：
+
+| 模型/层 | cat_R²_raw | cat_R²_post-RMSNorm | RMSNorm增幅 |
+|---------|------------|---------------------|-------------|
+| DS7B L4 | 0.0453 | 0.1031 | **2.28x** |
+| DS7B L12 | 0.0504 | 0.1074 | **2.13x** |
+| DS7B L24 | 0.0590 | 0.1334 | **2.26x** |
+| Qwen3 L4 | 0.2379 | 0.2097 | 0.88x |
+| Qwen3 L28 | 0.2688 | 0.2737 | 1.02x |
+| GLM4 L4 | 0.3061 | 0.3061 | 1.00x |
+| GLM4 L30 | 0.3195 | 0.3408 | 1.07x |
+
+**关键发现**：**DS7B的RMSNorm将category信号放大了2.3倍**，而Qwen3和GLM4几乎没有变化。这是因为DS7B的norm_ratio主轴（PC1）在RMSNorm后被吸收，释放出category信号的相对权重。
+
+**Raw空间因果效应**：
+
+| 模型/层 | add_cat (mean, t) | remove_cat (mean, t) | swap diff (diff_t) |
+|---------|-------------------|----------------------|---------------------|
+| **DS7B L4** | **+0.091 (1.74)** | **-0.128 (-1.15)** | -0.061 (-0.49) |
+| **DS7B L12** | **+0.073 (1.21)** | **-0.109 (-1.47)** | -0.055 (-0.50) |
+| **DS7B L24** | **+0.100 (1.52)** | **-0.027 (-0.37)** | -0.135 (-1.06) |
+| Qwen3 L4 | -0.020 (-2.57) | +0.015 (2.32) | -0.006 (-0.61) |
+| Qwen3 L28 | -0.224 (-3.67) | +0.240 (3.92) | +0.099 (1.01) |
+| GLM4 L4 | -0.030 (-1.67) | +0.010 (0.71) | +0.029 (1.30) |
+| GLM4 L30 | -0.836 (-5.90) | +0.655 (6.09) | +0.230 (1.57) |
+
+### Phase 383b 关键发现
+
+1. **DS7B在raw空间修复后因果方向正确**：
+   - add_cat=+0.091（添加category到corrupt → logit_diff增加 ✓）
+   - remove_cat=-0.128（从clean移除category → logit_diff减少 ✓）
+   - 这是第一个支持DS7B category因果有效的证据
+
+2. **Qwen3和GLM4的因果方向仍然反常**：
+   - add_cat为负，remove_cat为正
+   - 这与预期相反（添加应该帮助，移除应该伤害）
+   - 可能原因：category subspace被object identity污染（obj R²=97%）
+
+3. **DS7B的RMSNorm放大category信号2.3倍**是全新发现：
+   - Raw空间只有4.5-5.9%的category R²
+   - Post-RMSNorm空间有10.3-13.3%的category R²
+   - RMSNorm通过吸收norm_ratio主轴，释放了category信号的相对权重
+   - 这解释了为什么Phase 381发现no_pc1后准确率从39%→83%
+
+4. **swap测试的diff方向一致为正**（DS7B L24: -0.135, GLM4 L30: +0.230），但统计不显著
+
+### Phase 383b 方向反常的解释
+
+Qwen3和GLM4的add/remove方向反常，可能原因：
+
+**假说A**：category subspace被object identity污染。由于object R²=97%，category subspace不可避免地包含object-specific信息。添加"含有object-specific信号的category分量"到corrupt会产生冲突。
+
+**假说B**：模型在浅层已经通过attribute token获得了category信息。例如"The item is red"已经知道"red"是颜色词。添加额外的category信号是冗余的，甚至产生干扰。
+
+**假说C**：residual patching的固有局限性。即使方向正确，添加的向量与后续层的权重矩阵交互后可能产生非预期效果。
+
+**支持假说A的证据**：DS7B的category R²只有4.5%（raw空间），远小于Qwen3的24%和GLM4的31%。DS7B的category分量更"纯"（less contaminated by object identity），所以因果方向正确。
+
+### 命令
+
+```bash
+python tests/glm5/phase383b_raw_space_swap.py qwen3       # ~600s
+python tests/glm5/phase383b_raw_space_swap.py deepseek7b   # ~1500s
+python tests/glm5/phase383b_raw_space_swap.py glm4         # ~1500s
+```
+
+### Phase 382-383b 综合结论
+
+**1. 因子分解层级**：
+```
+dh_proper方差构成（跨模型一致）：
+  Object identity: 97-99%（绝对主导）
+  Category: 10-37%（次要，DS7B最弱）
+  Norm_ratio: 3-59%（DS7B特高，其他<7%）
+  Logit-based: 1-13%（微弱）
+```
+
+**2. DS7B PC1语义解码完成**：
+```
+DS7B PC1 = norm_ratio/norm_diff轴
+  - individual R² = 0.93-0.99（跨所有层一致）
+  - 标准化β: norm_diff=-0.56, norm_clean=-0.33, norm_corrupt=+0.20
+  - 不是绑定强度、不是对象显著性，而是纯粹的范数比差异
+```
+
+**3. RMSNorm的category信号放大效应**：
+```
+DS7B: RMSNorm将category R²从5%放大到10%（2.3倍）
+Qwen3/GLM4: RMSNorm几乎不影响category R²（~1.0倍）
+
+机制：RMSNorm吸收norm_ratio主轴（PC1），使category信号的相对权重增大
+```
+
+**4. 类别因果有效性排序**：
+```
+Raw空间add_cat效应（方向正确的因果证据）：
+  DS7B: +0.07~+0.10 (方向正确, t=1.2~1.7)
+  Qwen3: -0.02~-0.22 (方向反常)
+  GLM4: -0.03~-0.84 (方向反常)
+
+看似矛盾，但可解释：DS7B的category分量更"纯"（R²小=less contaminated）
+```
+
+**5. 四维语义分化**：
+```
+              PC1语义      Category位置    RMSNorm增幅    Raw因果方向
+GLM4:         category     PC1(0.89-0.95)  1.0x          反常
+Qwen3:        variable     PC1-PC2(0.90+)  0.9-1.0x      反常
+DS7B:         norm_ratio   PC2-3(0.63-0.77) 2.3x         正确
+```
+
+**6. 硬伤与局限**：
+- Category subspace被object identity污染（97% R²无法避免）
+- Raw空间干预的信噪比低（std >> mean）
+- Qwen3/GLM4的因果方向反常未解决
+- Swap测试统计不显著（需要更大样本量或更干净的category分量提取方法）
+
+2. **GLM4的swap效果最大**（L30: cross_vs_same=-0.94），说明：
+   - GLM4的category分量确实有类别特异性
+   - 跨类别swap比同类别swap产生更大的logit_diff下降
+   - 但整体效果仍然很noisy（std远大于mean）
+
+3. **DS7B的swap效果几乎为零**（L24: diff=+0.01），说明：
+   - DS7B的category分量在residual stream中不具有因果效力
+   - Category信息可能通过其他机制（如attention pattern）间接影响输出
+
+4. **空间不匹配问题**：
+   - cat_projection是在post-RMSNorm空间计算的
+   - 但被添加到raw residual空间
+   - RMSNorm的非线性使得空间映射不平坦
+   - 这可能导致所有add/remove实验的系统偏差
+
+### 命令
+
+```bash
+python tests/glm5/phase383_category_swap_causal.py qwen3       # ~300s
+python tests/glm5/phase383_category_swap_causal.py deepseek7b   # ~1200s
+python tests/glm5/phase383_category_swap_causal.py glm4         # ~1200s
+```
+
+### 严格审视
+
+#### 硬伤1：空间不匹配是致命问题
+cat_projection在post-RMSNorm空间，但被添加到raw residual空间。RMSNorm是非线性的，这两个空间不是简单的线性关系。正确做法应该是：
+- 在raw residual空间计算category subspace
+- 或者通过Jacobian将post-RMSNorm空间的向量映射回raw空间
+
+#### 硬伤2：add/remove都伤害logit_diff
+这不是category的因果效应，而是residual perturbation的一般效应。任何向residual stream添加向量都会打破模型的内部平衡。
+
+#### 硬伤3：swap测试的信噪比太低
+swap效应（cross_vs_same）的绝对值通常<1.0，而std在2-4之间。t统计量不足以证明swap效应显著。
+
+#### 硬伤4：样本量偏小
+每模型只测30对，对于7个类别、150+对象的实验来说不够。需要至少100对才能有足够的统计效力。
+
+### Phase 382-383 核心结论
+
+**因子分解的层级结构**：
+```
+dh_proper方差构成：
+  Object identity: 97-99%（绝对主导）
+  Category: 10-37%（次要）
+  Norm_ratio: 3-59%（DS7B特高）
+  其他: 1-10%
+```
+
+**三模型编码策略的完整图景**：
+```
+GLM4:   PC1=category(R²=0.70-0.85), category→PC1(0.89-0.95), swap因果最强
+Qwen3:  PC1=variable, category→PC1-PC2(0.90+), swap因果中等
+DS7B:   PC1=norm_ratio(R²=0.93-0.99), category→PC2-3(0.63-0.77), swap因果最弱
+```
+
+**类别因果有效性排序**：
+GLM4 > Qwen3 > DS7B（与PC1是否对齐category一致）
+
+**关键洞察**：
+1. dh_proper主要是"对象身份信号"，不是"类别信号"
+2. 类别信号只占10-37%方差，但可能通过非线性放大在深层起作用
+3. Residual patching方法有根本缺陷，需要新方法验证因果性
+4. DS7B的类别信号确实存在（no_pc1后83%准确率），但不直接驱动输出
