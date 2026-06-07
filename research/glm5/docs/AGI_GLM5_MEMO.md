@@ -14191,3 +14191,348 @@ DS7B L26:  L2=0/7 vs L1=1/7 (L2反而更差!)
 2. GLM4 size的跨层IDEAL — 可能揭示量级属性的特殊编码
 3. moisture的跨模型IDEAL倾向（Qwen3 L12 L2, DS7B L12 L2, GLM4无）— 部分一致
 ```
+
+## Phase 394: Cross-Fitted L2_obj_cat Validation [2026-06-07 11:10]
+
+### 背景
+
+Phase 393发现L2_obj_cat在GLM4中产生最高IDEAL比例(3/7)。
+核心质疑：L2_obj_cat的方向来自同一对样本的delta_h ANOVA残差，
+然后在同一对上测试——这是否构成数据泄漏？
+Phase 394用Leave-One-Pair-Out(LOPO)交叉拟合验证。
+
+### 关键发现0：当前数据集无法支撑L2交叉拟合
+
+```
+所有155个(obj,cat)组都只有1个样本！
+因为每个对象在每个类别中只出现一次。
+例如：apple在color中只出现1次(apple-red-blue)
+LOPO交叉拟合退化为L1_category(无obj-cat特异信息)
+```
+
+**这意味着L2_obj_cat的ANOVA残差本质上是单样本方向——和L3_pair类似！**
+L2_obj_cat = L1_category + A_obj_cat(单样本ANOVA残差)
+所以L2_original比L1好的部分，可能完全来自单样本噪声。
+
+### 关键发现1：L2_original的IDEAL在crossfit后大幅消失
+
+```
+GLM4 L20 color:   L2_orig=IDEAL → L2_cf=BOOST_C ← 确认泄漏！
+GLM4 L38 size:    L2_orig=IDEAL → L2_cf=DOM_BOOST ← 确认泄漏！(T保持+0.261但C从-0.021→+0.133)
+GLM4 L38 weight:  L2_orig=IDEAL → L2_cf=BOOST_C ← 确认泄漏！
+
+Qwen3 L4 moisture:  L2_orig=IDEAL → L2_cf=MIXED ← 确认泄漏！
+Qwen3 L20 moisture: L2_orig=IDEAL → L2_cf=SUPP_C ← 确认泄漏！
+
+DS7B L4 size:     L2_orig=DOM_BOOST → L2_cf=REVERSED ← 大幅变化
+DS7B L20 size:    L2_orig=DOM_BOOST → L2_cf=REVERSED ← 确认size方向不稳定
+```
+
+### 关键发现2：moisture的IDEAL在DS7B中保持
+
+```
+DS7B L4 moisture:  L2_orig=IDEAL → L2_cf=IDEAL (T+0.012→+0.161, C-0.009→-0.085)
+DS7B L20 moisture: L2_orig=IDEAL → L2_cf=IDEAL (T+0.021→+0.099, C-0.023→-0.150)
+→ moisture在DS7B中是跨层稳定的IDEAL，无论L1还是L2都是IDEAL
+→ 这是最可靠的齿轮证据之一
+```
+
+### 关键发现3：speed在GLM4 L4保持IDEAL
+
+```
+GLM4 L4 speed: L2_orig=IDEAL → L2_cf=IDEAL (T+0.005→+0.026, C-0.004→-0.010)
+→ speed在GLM4 L4无论L1还是L2都是IDEAL
+→ 加上Phase 393发现speed在GLM4 L4跨L0-L2都是IDEAL
+→ speed是当前最稳定的IDEAL类别
+```
+
+### 关键发现4：GLM4 L38 size的target保持但competitor大幅变化
+
+```
+L2_original:  T=+0.263, C=-0.021 → IDEAL
+L2_crossfit:  T=+0.261, C=+0.133 → DOM_BOOST
+→ target效应几乎不变(+0.263 vs +0.261)
+→ 但competitor从-0.021变为+0.133
+→ 说明L2_original中competitor的抑制来自单样本特异方向(泄漏)
+→ 而target的增强来自L1_category共享方向(真实)
+```
+
+### Phase 394b: Extended Data Cross-Fit (3 templates per pair) [2026-06-07 12:15]
+
+### 背景
+
+Phase 394发现所有(obj,cat)组只有1个样本，LOPO退化为L1。
+394b用3个句框("The/An/This {obj} is {attr}.")为每个(obj,cat)创建3个样本，
+使真正的LOPO交叉拟合成为可能。
+聚焦4个类别：size, speed, moisture, color。
+
+### 核心结果：L2_crossfit验证
+
+```
+Qwen3 L4:  L1=IDEAL(0/4), L2_orig=SUPP_T(0/4), L2_cf=IDEAL(1/4)
+Qwen3 L20: L1=DOM_BOOST(1/4), L2_orig=IDEAL(1/4), L2_cf=SUPP_C(1/4)
+
+DS7B L4:   L1=REVERSED(0/4), L2_orig=BOOST_C(0/4), L2_cf=IDEAL(1/4)
+DS7B L20:  L1=IDEAL(1/4), L2_orig=IDEAL(0/4), L2_cf=IDEAL(2/4) ← L2_cf最好!
+
+GLM4 L4:   L1=DOM_BOOST(0/4), L2_orig=REVERSED(0/4), L2_cf=DOM_BOOST(0/4)
+GLM4 L20:  L1=IDEAL(1/4), L2_orig=IDEAL(2/4), L2_cf=SUPP_C(1/4)
+```
+
+### 关键发现1：GLM4 L20 color确认泄漏
+
+```
+L2_original:  color=IDEAL(T+0.121, C-0.013)
+L2_crossfit:  color=SUPP_C(T-0.421, C-0.532)
+→ crossfit后color从IDEAL变成大幅抑制，确认L2_original的IDEAL是假象
+```
+
+### 关键发现2：moisture跨模型保持IDEAL
+
+```
+GLM4 L20: moisture L2_orig=IDEAL(T+0.063,C-0.103), L2_cf=IDEAL(T+0.052,C-1.954)
+DS7B L20: moisture L2_orig=DOM_BOOST(T+0.022,C+0.019), L2_cf=IDEAL(T+0.342,C-0.188)
+→ moisture在GLM4和DS7B中都是IDEAL，无论L1/L2_original/L2_crossfit
+→ moisture是目前最可靠的齿轮类别
+```
+
+### 关键发现3：DS7B L20 L2_crossfit比L1更好(2/4 IDEAL)
+
+```
+DS7B L20 L2_crossfit:
+  moisture: T=+0.342, C=-0.188 → IDEAL (极强!)
+  size:     T=+0.304, C=-0.057 → IDEAL (强!)
+  speed:    T=+0.060, C=+0.032 → DOM_BOOST
+  color:    T=-0.169, C=+0.068 → REVERSED
+→ DS7B是唯一模型中L2_crossfit超过L1的案例
+→ 可能因为DS7B的(obj,cat)方向确实比(category)方向更有选择性
+```
+
+### 关键发现4：L2_crossfit效应量极大但不稳定
+
+```
+GLM4 L20 L2_crossfit: add=+0.491, T=-0.112, C=-0.604 → SUPP_C
+Qwen3 L20 L2_crossfit: add=+0.165, T=-0.182, C=-0.347 → SUPP_C
+→ 效应量比L1大10-30倍，但方向错误
+→ 3个模板的ANOVA残差方向可能不稳定
+→ LOPO用2个模板估计，在第3个模板上测试 → 方向偏差大
+```
+
+### 核心结论修正
+
+```
+1. Phase 394的结论需要修正：
+   "L2_obj_cat优势全是泄漏"过于绝对
+
+2. 正确结论：
+   - L2_obj_cat的color/speed IDEAL确实是泄漏（crossfit后消失）
+   - 但moisture在GLM4/DS7B中crossfit后保持IDEAL
+   - DS7B L20 L2_crossfit比L1更好(2/4 vs 1/4 IDEAL)
+
+3. 3模板LOPO仍不够稳定：
+   - 效应量巨大但方向不一致
+   - 需要更多模板(5-7个)才能可靠估计(obj,cat)方向
+
+4. 最可靠的结论仍然是L1_category：
+   - moisture跨模型IDEAL（最稳定）
+   - 但DS7B L20 L2_crossfit提示更高粒度可能有收益
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase394b_extended_crossfit.py qwen3       # ~1min
+python tests/glm5/phase394b_extended_crossfit.py deepseek7b  # ~15min
+python tests/glm5/phase394b_extended_crossfit.py glm4        # ~25min
+```
+
+### 核心结论
+
+```
+1. L2_obj_cat的IDEAL优势大部分来自数据泄漏
+   因为(obj,cat)组只有1个样本，L2残差等价于单样本噪声
+2. 真正可靠的IDEAL来自L1_category级别：
+   - DS7B moisture: L1=IDEAL (跨L4/L20)
+   - GLM4 speed: L1=IDEAL (L4)
+   - DS7B temperature: L1=IDEAL (L4)
+3. L2比L1多出的效应量主要增强target但不选择性抑制competitor
+   → L2噪声方向偏好target(因为它是从target pair的delta_h算出来的)
+   → 这是典型的过拟合特征
+```
+
+### 修正后的模型
+
+```
+之前：L2_obj_cat是"甜蜜点"，比L1更好
+现在：L2_obj_cat的优势是数据泄漏假象
+真正可迁移的齿面在L1_category级别
+L2需要更多数据(每个obj-cat≥3样本)才能验证
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase394_crossfit_l2.py qwen3       # ~1min
+python tests/glm5/phase394_crossfit_l2.py deepseek7b  # ~20min
+python tests/glm5/phase394_crossfit_l2.py glm4        # ~45min
+```
+
+## Phase 395: Denoised L2 + Rich Dataset + Distribution Damage [2026-06-07 13:50]
+
+### 背景
+
+Phase 394b用3模板扩展，但LOPO只用2个训练样本，方差极高。
+Phase 395重新设计数据集：每个(obj,cat)有8个样本(4 frames × 2 value combos)，
+支持真正的LOPO交叉拟合。新增：
+1. Shrinkage估计：L2_denoised = L1 + lambda * ObjectOffset (lambda sweep)
+2. 分布损伤指标：damage_ratio = |other_mean_delta| / |target_delta|
+3. Frame作为ANOVA显式因子
+4. 3个类别：moisture(阳性对照), color(复杂对照), size(比较属性)
+
+### 数据设计
+
+```
+3 categories × 6 objects × 2 value_combos × 4 frames = 144 samples
+每个(obj,cat)组：8个样本
+LOPO: 训练7个，测试1个 → 比之前3模板的2训练样本稳定得多
+```
+
+### 核心结果：L1 vs L2_original vs L2_crossfit
+
+```
+Qwen3 L4:  L1=1/3 IDEAL(color), L2_orig=1/3, L2_cf=1/3
+  color: L1=IDEAL(T+0.003,C-0.038), L2_cf=IDEAL(T+0.008,C-0.015) ← color保持IDEAL!
+  moisture: 全SUPP_T ← Qwen3中moisture不是IDEAL，与之前发现矛盾!
+  size: 全DOM_BOOST/BOOST_C
+
+Qwen3 L12: 0/3 IDEAL (全SUPP_T/BOOST_C)
+Qwen3 L20: 0/3 IDEAL (全SUPP_C)
+
+DS7B L4: 0/3 IDEAL (全DOM_BOOST/BOOST_C)
+DS7B L12: L1=1/3(moisture IDEAL), L2_orig=2/3, L2_cf=2/3
+  moisture: L2_orig=IDEAL(T+0.054,C-0.033) ← 稳定!
+  size:     L2_cf=IDEAL(T+0.030,C-0.025) ← L2_crossfit比L1好!
+
+DS7B L20: L1=1/3, L2_orig=1/3, L2_cf=1/3
+  moisture: L1=IDEAL(T+0.111,C-1.821 dmg=3.40) ← C极端抑制，不可信!
+  size:     L2_cf_lam2.0=IDEAL(T+0.555,C-0.248 dmg=0.51) ← 可信的IDEAL
+
+GLM4 L4:  0/3 IDEAL (全DOM_BOOST)
+GLM4 L20: L1=1/3, L2_orig=0/3, L2_cf=0/3
+  moisture: L1=IDEAL(T+0.111,C-1.821 dmg=3.40) ← C极端抑制
+  color:    全SUPP_C ← GLM4 color在L2_crossfit后完全崩溃
+  size:     全SUPP_C ← GLM4 size不是IDEAL
+
+GLM4 L30: 0/3 IDEAL (全SUPP_C)
+```
+
+### 关键发现1：8样本LOPO确实比3样本更稳定
+
+```
+Phase 394b(3样本LOPO): L2_crossfit效应量极大但方向不稳定
+Phase 395(8样本LOPO): L2_crossfit效应量温和，方向更合理
+→ 8样本LOPO显著减少了过拟合噪声
+```
+
+### 关键发现2：L2_crossfit在DS7B L12中确实比L1更好
+
+```
+DS7B L12:
+  L1_category: moisture=IDEAL, size=DOM_BOOST → 1/3 IDEAL
+  L2_crossfit: moisture=IDEAL, size=IDEAL     → 2/3 IDEAL
+→ L2_obj_cat方向在DS7B中间层确实有额外选择性信息
+→ 这是首次在充足交叉拟合下证明L2 > L1
+```
+
+### 关键发现3：moisture的IDEAL跨模型不稳定
+
+```
+之前认为moisture是跨模型最稳定的IDEAL类别
+Phase 395显示：
+  Qwen3: moisture在所有层都不是IDEAL！(L4=SUPP_T, L12=SUPP_T, L20=SUPP_C)
+  DS7B:  moisture在L12=IDEAL, L20=IDEAL(dmg=3.40不可信)
+  GLM4:  moisture在L20=IDEAL(dmg=3.40不可信)
+
+→ moisture的IDEAL高度模型依赖!
+→ Qwen3中moisture甚至不是IDEAL，说明之前结论过于乐观
+```
+
+### 关键发现4：color在Qwen3 L4是稳定IDEAL
+
+```
+Qwen3 L4 color:
+  L1=IDEAL(T+0.003,C-0.038 dmg=0.38)
+  L2_orig=IDEAL(T+0.021,C-0.010 dmg=0.83)
+  L2_cf=IDEAL(T+0.008,C-0.015 dmg=1.51)
+  L2_cf_lam0.2=IDEAL(T+0.004,C-0.018 dmg=4.73)
+→ color在Qwen3 L4跨所有条件化级别都是IDEAL
+→ 但damage_ratio较高(0.38-4.73)，说明其他logit也有变化
+```
+
+### 关键发现5：分布损伤(damage_ratio)揭示质量差异
+
+```
+低damage(好): DS7B L12 size L2_cf=0.17, Qwen3 L4 color L1=0.38
+高damage(差): GLM4 L20 moisture L1=3.40, DS7B L20 moisture L1=3.40
+
+→ 高damage_ratio的IDEAL可能是"整体抑制"而非"选择性增强"
+→ damage_ratio < 0.5 的IDEAL更可信
+→ damage_ratio > 2.0 的IDEAL需要警惕
+```
+
+### 关键发现6：GLM4 color的L2完全崩溃
+
+```
+GLM4 L20 color:
+  L1=SUPP_C(T-0.135,C-0.237)
+  L2_orig=SUPP_C(T-0.474,C-0.686)
+  L2_crossfit=SUPP_C(T-0.624,C-0.759)
+→ GLM4中color方向的L2_obj_cat偏移完全是破坏性的
+→ 与Qwen3 L4 color=IDEAL形成鲜明对比
+→ 同一类别在不同模型中机制完全不同
+```
+
+### 关键发现7：Shrinkage的最佳lambda
+
+```
+DS7B L12: best_lambda=0.5 (moisture+size IDEAL, score最高)
+DS7B L20: best_lambda=0.2 (moisture IDEAL但dmg高)
+Qwen3 L4: best_lambda=0.5 (color IDEAL, moisture SUPP_T)
+GLM4 L4:  best_lambda=2.0 (整体IDEAL但各类别无IDEAL)
+GLM4 L20: best_lambda=0.2 (moisture IDEAL dmg=3.4)
+
+→ 没有通用最优lambda
+→ 大多数情况lambda=0.2-0.5优于1.0(无收缩)
+→ 确认了收缩估计的价值：适度收缩比无收缩更稳
+```
+
+### 核心结论修正
+
+```
+1. L2_crossfit在DS7B L12确实优于L1 ← 首次在8样本LOPO下确认
+2. moisture不是跨模型稳定的IDEAL ← Qwen3完全否证
+3. color在Qwen3 L4是可靠IDEAL(dmg=0.38) ← 新发现
+4. 分布损伤是区分"真选择性"和"整体抑制"的关键指标
+5. 收缩估计(lambda=0.2-0.5)通常比无收缩(lambda=1.0)更好
+6. 同一类别跨模型机制差异巨大(color: Qwen3=IDEAL, GLM4=SUPP_C)
+```
+
+### 硬伤
+
+```
+1. 每个类别的IDEAL只出现在特定模型特定层，无跨模型一致性
+2. damage_ratio高时IDEAL不可信(如GLM4 moisture C=-1.821)
+3. L2_crossfit仍只在DS7B中间层有优势，Qwen3/GLM4无
+4. 8样本LOPO虽比3样本好，但ANOVA残差仍有噪声
+5. 缺少SYMMETRIC验证(correct vs incorrect镜像)
+6. value_combo的设计可能引入混淆(wet/dry vs wet/arid)
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase395_denoised_l2.py qwen3       # ~2min
+python tests/glm5/phase395_denoised_l2.py deepseek7b  # ~15min
+python tests/glm5/phase395_denoised_l2.py glm4        # ~40min
+```
+ 
