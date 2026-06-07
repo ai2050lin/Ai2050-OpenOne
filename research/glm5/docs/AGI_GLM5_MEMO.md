@@ -14535,4 +14535,146 @@ python tests/glm5/phase395_denoised_l2.py qwen3       # ~2min
 python tests/glm5/phase395_denoised_l2.py deepseek7b  # ~15min
 python tests/glm5/phase395_denoised_l2.py glm4        # ~40min
 ```
+
+### Phase 395b: Confirmation — 4 Categories + 5-Layer Evolution [2026-06-07 16:15]
+
+### 数据扩展
+
+```
+4 categories × 6 objects × 2 value_combos × 4 frames = 192 samples
+新增speed类别: cheetah/rocket/falcon/turtle/snail/sloth
+5层演化: Qwen3/DS7B用L4/L8/L12/L16/L20, GLM4用L4/L10/L20/L30
+```
+
+### 核心结果：跨模型IDEAL完整表
+
+```
+=== DS7B (最丰富的IDEAL结构) ===
+L4:  0/4 IDEAL (全DOM_BOOST/BOOST_C)
+L8:  L2_orig=2/4(color+size), L2_cf=1/4(size)
+L12: L1=1/4(size), L2_orig=2/4(color+size), L2_cf=2/4(color+size)
+L16: L1=1/4(size), L2=1/4(size)
+L20: L1=1/4(size), L2_orig=2/4(moisture+size), L2_cf=1/4(size)
+
+→ DS7B: size是跨L8-L20最稳定的IDEAL类别(L1就是IDEAL)
+→ color在L8/L12=IDEAL但仅限L2(L1不是IDEAL)
+→ moisture只在L20 L2_orig=IDEAL，不稳定
+→ speed始终REVERSED
+
+=== Qwen3 ===
+L4:  L2_orig=1/4(color), L2_cf=1/4(color) ← color仅L2=IDEAL
+L8-L20: 0/4 IDEAL (全SUPP_C/SUPP_T/BOOST_C)
+
+→ Qwen3: 只有L4 color是IDEAL(仅限L2)，其他层全无
+→ moisture/size/speed在Qwen3中均不是IDEAL
+
+=== GLM4 ===
+L4:  0/4 IDEAL (全DOM_BOOST/SUPP_C)
+L10: L1=1/4(moisture), L2_orig=1/4(moisture), L2_cf=1/4(moisture)
+L20: L1=1/4(moisture), L2=0/4 ← L2破坏了moisture IDEAL!
+L30: 0/4 IDEAL (全SUPP_C)
+
+→ GLM4: moisture在L10/L20=IDEAL(仅L1)，L2反而破坏
+→ size在所有层都是DOM_BOOST(不是IDEAL)
+→ speed始终不是IDEAL
+```
+
+### 关键发现1：size是DS7B最稳定的IDEAL(跨4层)
+
+```
+DS7B size IDEAL:
+  L12: L1=IDEAL, L2_orig=IDEAL, L2_cf=IDEAL
+  L16: L1=IDEAL, L2_orig=IDEAL, L2_cf=IDEAL
+  L20: L1=IDEAL, L2_orig=IDEAL, L2_cf=IDEAL
+  
+→ size在DS7B中是L1级别就IDEAL的类别
+→ L2不增加也不减少IDEAL
+→ 说明size的因果方向在category层面已经足够精确
+```
+
+### 关键发现2：moisture的跨模型表现完全不同
+
+```
+Qwen3: moisture在所有层都不是IDEAL
+DS7B:  moisture在L12=DOM_BOOST(不是IDEAL), L20 L2_orig=IDEAL
+GLM4:  moisture在L10/L20=IDEAL(仅L1), L2破坏
+
+→ moisture不是跨模型稳定的IDEAL！
+→ 之前Phase 393-394的"moisture是最可靠IDEAL"结论被修正
+→ moisture的IDEAL仅限DS7B深层和GLM4中间层
+```
+
+### 关键发现3：color在DS7B L8/L12=IDEAL但仅限L2
+
+```
+DS7B color:
+  L8:  L1=DOM_BOOST, L2_orig=IDEAL, L2_cf=SUPP_C
+  L12: L1=DOM_BOOST, L2_orig=IDEAL, L2_cf=IDEAL
+
+→ L2_original的color=IDEAL但L1=DOM_BOOST
+→ L2_crossfit在L12确认了IDEAL(8样本LOPO)
+→ 但L8的L2_crossfit=SUPP_C(泄漏?)
+→ color可能是DS7B中L2确实比L1好的案例
+```
+
+### 关键发现4：speed始终不是IDEAL
+
+```
+Qwen3: speed=BOOST_C/DOM_BOOST(所有层)
+DS7B:  speed=REVERSED(所有层! target下降competitor上升!)
+GLM4:  speed=REVERSED(L4)/SUPP_C(L10/L20/L30)
+
+→ speed在所有模型中都不是IDEAL
+→ DS7B中甚至是REVERSED(反方向!)
+→ 说明"速度"这个关系在当前模板下不存在选择性齿面
+→ 或者speed的编码方式与color/size完全不同
+```
+
+### 关键发现5：GLM4 L2在L20破坏moisture IDEAL
+
+```
+GLM4 L20:
+  L1_category: moisture=IDEAL(T+0.079,C-0.616)
+  L2_original: moisture=SUPP_C(T-0.xxx,C-0.xxx)
+  L2_crossfit: moisture=SUPP_C(T-0.xxx,C-0.xxx)
+
+→ L1的moisture方向是IDEAL，但加入obj-cat偏移后变成SUPP_C
+→ 说明GLM4 L20的obj-cat偏移是破坏性的
+→ 与DS7B L12(color)中L2有益形成对比
+→ 不同模型+不同层中，L2偏移的效果完全不同
+```
+
+### 修正后的核心结论
+
+```
+1. 没有跨模型稳定的IDEAL类别
+   - DS7B: size最稳定(跨4层)
+   - GLM4: moisture在L10/L20(仅L1)
+   - Qwen3: color在L4(仅L2)
+   
+2. L2_obj_cat的效果高度模型/层/类别依赖
+   - DS7B L12: L2_cf=2/4 IDEAL > L1=1/4 (确认L2有益)
+   - GLM4 L20: L2破坏moisture IDEAL (L2有害)
+   - Qwen3 L4: L2使color从MIXED→IDEAL (L2有益)
+   
+3. speed是最差的关系类别
+   - 所有模型所有层都不是IDEAL
+   - DS7B中甚至是REVERSED
+   - 需要重新设计句框或放弃speed
+   
+4. damage_ratio是关键质量指标
+   - dmg<0.5的IDEAL更可信
+   - dmg>2.0的IDEAL需要警惕
+   
+5. 收缩估计(lambda=0.2-0.5)通常优于无收缩
+   - 但没有通用最优lambda
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase395b_confirmation.py qwen3       # ~5min
+python tests/glm5/phase395b_confirmation.py deepseek7b  # ~70min
+python tests/glm5/phase395b_confirmation.py glm4        # ~90min
+```
  
