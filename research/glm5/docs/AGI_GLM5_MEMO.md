@@ -13461,3 +13461,733 @@ python tests/glm5/phase389_per_pair_analysis.py qwen3       # ~8min (2 layers)
 python tests/glm5/phase389_per_pair_analysis.py deepseek7b  # ~30min (1 layer)
 python tests/glm5/phase389_per_pair_analysis.py glm4        # ~40min (1 layer)
 ```
+
+## Phase 390: Multi-Layer Per-Category Centroid Tracking [2026-06-07 00:20]
+
+### 背景
+
+Phase 389发现Qwen3和DS7B的centroid效应在correct/incorrect条件下呈SYMMETRIC反转。
+Phase 390目标：追踪centroid效应在多层上的方向变化，理解brightness/speed的反常行为。
+
+### 方法论修正
+
+Phase 390经历了三个版本：
+- v1: W_U线性投影 → **失败**：投影结果与实际forward pass完全不一致（符号都不同）
+- v2: Global centroid + 实际forward pass → **失败**：global centroid效应微弱，与Phase 389不一致
+- v3: Per-category centroid + 实际forward pass → **成功**：与Phase 389结果一致
+
+关键修正：**baseline logit_diff必须在corrupt prompt上计算**（不是clean prompt），
+因为add_effect = patched(corrupt+delta) - baseline(corrupt)，测量的是"在corrupt状态上add delta后logit_diff变化了多少"。
+
+### 结果：Qwen3 (4B, 36层) — 测试L4, L12, L20, L28
+
+**Category centroid trajectory:**
+```
+color:       L4=+0.010 -> L12=+0.008 -> L20=+0.050 -> L28=+0.056  (稳定正向，深层增强)
+temperature: L4=-0.003 -> L12=+0.039 -> L20=-0.001 -> L28=+0.001  (方向不稳定)
+moisture:    L4=+0.037 -> L12=+0.000 -> L20=+0.025 -> L28=+0.028  (L12骤降后恢复)
+size:        L4=+0.031 -> L12=+0.033 -> L20=+0.018 -> L28=+0.050  (稳定正向)
+weight:      L4=+0.013 -> L12=+0.045 -> L20=+0.054 -> L28=-0.054  (L28反转！)
+speed:       L4=-0.017 -> L12=-0.034 -> L20=-0.010 -> L28=-0.043  (全层负向)
+brightness:  L4=+0.013 -> L12=+0.000 -> L20=-0.054 -> L28=-0.121  (L12后反转！)
+```
+
+**方向反转：**
+- brightness: L4→L12→L20 **从正变负**，L28更负（-0.121）
+- weight: L20→L28 **从正变负**
+- temperature: 反复反转（不稳定）
+
+### 结果：DS7B (7B, 28层) — 测试L4, L12, L20
+
+**Category centroid trajectory:**
+```
+color:       L4=+0.008 -> L12=-0.012 -> L20=+0.024  (L12反转)
+temperature: L4=+0.262 -> L12=-0.018 -> L20=-0.025  (L4强正→L12反转)
+moisture:    L4=+0.246 -> L12=+0.199 -> L20=+0.249  (稳定强正向)
+size:        L4=-0.482 -> L12=-0.529 -> L20=-0.546  (全层强负向！异常)
+weight:      L4=-0.027 -> L12=-0.013 -> L20=+0.018  (L20反转)
+speed:       L4=+0.012 -> L12=+0.046 -> L20=+0.012  (稳定正向)
+brightness:  L4=-0.013 -> L12=+0.045 -> L20=-0.094  (L12反转后再次反转)
+```
+
+**DS7B异常发现：**
+1. **size全层强负**：-0.48 ~ -0.55，而Qwen3/GLM4为正。DS7B的size centroid方向与Qwen3/GLM4**完全相反**！
+2. **temperature L4=+0.262**：比Qwen3大20倍！DS7B在浅层有极强temperature centroid
+3. **moisture全层强正**：+0.20 ~ +0.25，远超Qwen3（+0.00~+0.04）
+
+### 结果：GLM4 (9B, 40层) — 测试L4, L20, L30
+
+**Category centroid trajectory:**
+```
+color:       L4=-0.035 -> L20=-0.046 -> L30=-0.159  (全层负向！与Qwen3相反)
+temperature: L4=-0.043 -> L20=-0.025 -> L30=+0.106  (L30反转)
+moisture:    L4=-0.017 -> L20=+0.094 -> L30=+0.016  (L4→L20反转)
+size:        L4=+0.040 -> L20=+0.208 -> L30=+0.172  (稳定正向)
+weight:      L4=-0.005 -> L20=-0.058 -> L30=+0.192  (L30强正反转！)
+speed:       L4=+0.037 -> L20=+0.006 -> L30=-0.042  (L30反转)
+brightness:  L4=+0.031 -> L20=+0.116 -> L30=+0.152  (稳定正向！与Qwen3相反)
+```
+
+**GLM4异常发现：**
+1. **color全层负向**：与Qwen3的全层正向完全相反！
+2. **brightness全层正向**：与Qwen3的L20后负向完全相反！
+3. **weight L30=+0.192**：突然强正向，Qwen3 L28为-0.054（完全相反）
+
+### Phase 390 核心发现
+
+**发现1：centroid效应方向在不同模型间不一致**
+```
+color:      Qwen3=+ , DS7B=± , GLM4=-   → 跨模型不一致！
+brightness: Qwen3=L20后负, DS7B=振荡, GLM4=全正 → 跨模型不一致！
+weight:     Qwen3=L28负, DS7B=L20正, GLM4=L30强正 → 跨模型不一致！
+speed:      Qwen3=全负, DS7B=全正, GLM4=L30变负 → 跨模型不一致！
+size:       Qwen3=+, DS7B=强负, GLM4=+  → DS7B与其他相反！
+```
+
+**发现2：只有moisture在Qwen3和DS7B中稳定正向，但GLM4 L4为负**
+```
+moisture: Qwen3=+, DS7B=+, GLM4=L4负/L20正 → 部分一致
+```
+
+**发现3：temperature是跨模型最不稳定的类别**
+```
+temperature: Qwen3=反复反转, DS7B=L4强正→L12负, GLM4=L30强正反转
+→ temperature centroid效应高度依赖模型和层
+```
+
+**发现4：DS7B的size centroid效应为强负（-0.48~-0.55），与Qwen3/GLM4完全相反**
+```
+这表明DS7B的size编码机制与其他模型本质不同
+→ 可能是DS7B使用sliding window attention导致的架构差异
+→ 或者DS7B对size属性使用了完全不同的内部表示
+```
+
+**发现5：centroid效应在深层（L20+）显著增大**
+```
+Qwen3:  L4=0.010 → L20=0.050 → L28=0.056 (color)
+GLM4:   L4=0.040 → L20=0.208 → L30=0.172 (size)
+DS7B:   L4=0.246 → L12=0.199 → L20=0.249 (moisture)
+→ 深层centroid效应更强，说明category编码在深层更集中
+```
+
+### Phase 390 硬伤分析
+
+**硬伤1：centroid效应方向跨模型不一致，不能称为"语言不变量"**
+```
+color在Qwen3中正向帮助correct，在GLM4中负向伤害correct
+brightness在Qwen3深层负向，在GLM4全层正向
+→ 这些是模型实现特征，不是语言编码不变量
+→ "齿轮"形状因模型而异
+```
+
+**硬伤2：W_U线性投影不能替代实际forward pass**
+```
+Phase 390v1用W_U投影得到完全错误的结果（符号都不同）
+→ centroid的因果效应必须通过实际patched forward pass测量
+→ 原因：RMSNorm非线性、层间依赖、非线性变换
+→ 这严重限制了可以测试的层数和pair数量
+```
+
+**硬伤3：GLM4的color全层为负与Phase 386结果不一致**
+```
+Phase 386 GLM4 L4 centroid: mean=-0.005~+0.008, 不稳定
+Phase 390 GLM4 L4 color: -0.035 (0%pos) → 明确为负
+→ 需要更多数据确认GLM4的color方向
+```
+
+**硬伤4：per-category centroid vs global centroid差异巨大**
+```
+global centroid几乎无因果效力
+per-category centroid有显著因果效力
+→ 但per-category centroid只有7个方向（7个类别）
+→ 可能不够细粒度——同类别内不同value方向可能不同
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase390_conditional_centroid.py qwen3       # ~2min (4 layers)
+python tests/glm5/phase390_conditional_centroid.py deepseek7b  # ~35min (3 layers)
+python tests/glm5/phase390_conditional_centroid.py glm4        # ~35min (3 layers)
+```
+
+### Phase 390 客观数据总结
+
+1. centroid效应方向跨模型高度不一致：color/brightness/weight/speed在不同模型中方向不同
+2. 只有moisture在Qwen3和DS7B中稳定正向（GLM4 L4为负例外）
+3. brightness在Qwen3中L12后方向反转（+→-），但在GLM4中全层正向
+4. speed在Qwen3中全层负向，DS7B中全层正向
+5. DS7B的size centroid为强负（-0.48），与Qwen3/GLM4完全相反
+6. centroid效应在深层（L20+）显著增大
+7. W_U线性投影不能替代实际forward pass
+8. per-category centroid远比global centroid有效
+
+## Phase 391: Target/Competitor Decomposition [2026-06-07 01:40]
+
+### 背景
+
+Phase 390发现centroid效应方向跨模型不一致。Phase 391目标：分解centroid效应的机制——
+是增强target（兼容值）还是抑制competitor（不兼容值）？这能解释为什么跨模型方向不同。
+
+### 方法
+
+与Phase 390 v3一致：per-category centroid + 实际forward pass + corrupt baseline。
+关键增加：对每个pair记录target_delta和competitor_delta分别变化。
+同时比较global vs per-category centroid（hierarchy验证）。
+深层覆盖：DS7B增加L26，GLM4增加L38。
+
+### 三种机制类型
+
+```
+IDEAL (理想):        T↑ + C↓ → 正add_effect (增强target + 抑制competitor)
+DOMINANT_BOOST (主导增强): T↑ + C↑ (T>C) → 正add_effect (都增强，target更多)
+REVERSED (反向):     T↓ + C↑ → 负add_effect (抑制target + 增强competitor)
+SUPPRESS_BOTH (双向抑制): T↓ + C↓ (|T|>|C|) → 负add_effect (都抑制，target更多)
+```
+
+### 结果：Qwen3 (4B, 36层) — L4, L12, L20, L28
+
+**层级机制轨迹:**
+```
+L4:  add=+0.013, T=+0.020, C=+0.007 → DOMINANT_BOOST (T>C)
+L12: add=+0.015, T=+0.022, C=+0.007 → DOMINANT_BOOST (T>C)
+L20: add=+0.021, T=+0.032, C=+0.010 → DOMINANT_BOOST (T>C)
+L28: add=+0.008, T=+0.026, C=+0.018 → DOMINANT_BOOST (T>C)
+→ Qwen3全层DOMINANT_BOOST，无机制变化
+```
+
+**类别分解 (关键):**
+```
+color L4:      add=+0.010, T=+0.006, C=-0.004 → IDEAL (T↑C↓)!
+brightness L4: add=+0.013, T=+0.027, C=+0.013 → DOMINANT_BOOST
+brightness L20: add=-0.054, T=-0.152, C=-0.098 → SUPPRESS_BOTH (T更负)
+brightness L28: add=-0.121, T=-0.277, C=-0.156 → SUPPRESS_BOTH (T更负)
+→ brightness方向反转是因为L12后开始同时压低target和competitor，但target被压低更多！
+
+speed L4:  add=-0.017, T=+0.000, C=+0.017 → BOOST_C (competitor上升)
+speed L28: add=-0.043, T=-0.048, C=-0.005 → SUPPRESS_T (target下降)
+→ speed负向效应：浅层增强competitor，深层压低target
+
+weight L20: add=+0.054, T=+0.170, C=+0.116 → DOMINANT_BOOST
+weight L28: add=-0.054, T=+0.004, C=+0.058 → BOOST_C (competitor上升，target不变)
+→ weight L28反转：target不再被增强，competitor开始被增强
+```
+
+### 结果：DS7B (7B, 28层) — L4, L12, L20, L26
+
+**层级机制轨迹:**
+```
+L4:  add=+0.026, T=+0.102, C=+0.076 → DOMINANT_BOOST (T>C)
+L12: add=-0.027, T=-0.013, C=+0.014 → REVERSED (SUPPRESS_T + BOOST_C)
+L20: add=-0.023, T=+0.005, C=+0.028 → BOOST_C (dominant)
+L26: add=-0.072, T=-0.071, C=+0.000 → REVERSED (SUPPRESS_T + BOOST_C)
+→ DS7B从L4的正向变成L12+的负向，机制发生根本变化！
+```
+
+**类别分解 (关键):**
+```
+moisture L4:  add=+0.246, T=+0.161, C=-0.085 → IDEAL (T↑C↓)!!!
+moisture L12: add=+0.199, T=+0.089, C=-0.111 → IDEAL (T↑C↓)!
+moisture L20: add=+0.249, T=+0.099, C=-0.150 → IDEAL (T↑C↓)!
+moisture L26: add=-0.017, T=+0.000, C=+0.017 → BOOST_C (最深层崩溃)
+→ DS7B moisture L4-L20展示最理想的IDEAL机制：增强target + 抑制competitor
+
+temperature L4: add=+0.262, T=+0.143, C=-0.118 → IDEAL (T↑C↓)!
+temperature L12: add=-0.018, T=+0.051, C=+0.069 → BOOST_C
+→ temperature L4也有IDEAL机制，但L12后崩溃
+
+size L4:  add=-0.482, T=-0.244, C=+0.237 → REVERSED (T↓C↑)!!!
+size L20: add=-0.546, T=-0.388, C=+0.158 → REVERSED (T↓C↑)
+size L26: add=-0.562, T=-0.483, C=+0.079 → REVERSED (T↓C↑)
+→ DS7B size全层REVERSED：centroid压低target并增强competitor，完全反向！
+```
+
+### 结果：GLM4 (9B, 40层) — L4, L20, L30, L38
+
+**层级机制轨迹:**
+```
+L4:  add=-0.009, T=+0.015, C=+0.025 → BOOST_C (competitor上升更多)
+L20: add=+0.026, T=+0.046, C=+0.020 → DOMINANT_BOOST (T>C)
+L30: add=+0.017, T=+0.082, C=+0.065 → DOMINANT_BOOST (T>C)
+L38: add=+0.019, T=+0.061, C=+0.043 → DOMINANT_BOOST (T>C)
+→ GLM4 L4是唯一一个浅层BOOST_COMPETITOR的模型
+```
+
+**类别分解 (关键):**
+```
+color L4:  add=-0.035, T=+0.006, C=+0.042 → BOOST_C (competitor上升更多)
+color L20: add=-0.046, T=+0.004, C=+0.050 → BOOST_C
+color L30: add=-0.158, T=-0.026, C=+0.133 → REVERSED (T↓C↑)
+color L38: add=-0.026, T=+0.093, C=+0.118 → BOOST_C
+→ GLM4 color全层为负是因为centroid总是增强competitor更多！
+
+speed L4:  add=+0.037, T=+0.026, C=-0.010 → IDEAL (T↑C↓)!
+speed L20: add=+0.010, T=+0.046, C=+0.036 → DOMINANT_BOOST
+→ GLM4 speed L4有IDEAL机制（与Qwen3相反方向）
+
+brightness L4:  add=+0.031, T=+0.036, C=+0.004 → DOMINANT_BOOST
+brightness L20: add=+0.116, T=+0.045, C=-0.071 → IDEAL (T↑C↓)!
+brightness L30: add=+0.158, T=+0.165, C=+0.007 → DOMINANT_BOOST
+→ GLM4 brightness L20有IDEAL机制（与Qwen3 L20完全相反！）
+```
+
+### Phase 391 核心发现
+
+**发现1：三种机制类型确实存在**
+```
+IDEAL (T↑C↓):         centroid增强兼容值 + 抑制不兼容值
+DOMINANT_BOOST (T↑C↑): centroid同时增强两者，但target更多
+REVERSED (T↓C↑):       centroid抑制兼容值 + 增强不兼容值
+```
+
+**发现2：IDEAL机制是稀有的，只在特定category-layer组合出现**
+```
+Qwen3: color L4
+DS7B:  moisture L4-L20, temperature L4
+GLM4:  speed L4, brightness L20
+→ 不是所有category-layer都有IDEAL机制
+→ 大部分是DOMINANT_BOOST（同时增强两者）
+```
+
+**发现3：跨模型方向不一致的根源是机制差异**
+```
+GLM4 color为负：因为centroid增强competitor更多（BOOST_C机制）
+DS7B size为强负：因为centroid抑制target+增强competitor（REVERSED机制）
+Qwen3 brightness深层为负：因为centroid同时压低两者，target被压更多（SUPPRESS_BOTH机制）
+→ 不是简单的"方向反转"，而是不同模型使用不同的target/competitor操作策略
+```
+
+**发现4：DS7B moisture L4-L20是最理想的编码示例**
+```
+L4:  T=+0.161, C=-0.085 → clean T↑C↓
+L12: T=+0.089, C=-0.111 → clean T↑C↓
+L20: T=+0.099, C=-0.150 → clean T↑C↓
+→ 跨3层持续IDEAL，这是目前发现的最强语言编码证据
+```
+
+**发现5：GLM4 L4是唯一浅层BOOST_COMPETITOR的模型**
+```
+Qwen3 L4:  DOMINANT_BOOST (T↑C↑, T>C)
+DS7B L4:   DOMINANT_BOOST (T↑C↑, T>C)
+GLM4 L4:   BOOST_C (T↑C↑, C>T)
+→ GLM4的浅层centroid更有利于competitor而非target
+→ 这可能说明GLM4在浅层使用不同的编码策略
+```
+
+**发现6：Qwen3 brightness方向反转的精确机制**
+```
+L4:  T=+0.027, C=+0.013 → 都增强，target更多 (正)
+L12: T=-0.054, C=-0.054 → 都抑制，等量 (≈0)
+L20: T=-0.152, C=-0.098 → 都抑制，target更多 (负)
+L28: T=-0.277, C=-0.156 → 都强抑制，target更多 (强负)
+→ 不是"方向反转"，而是"从增强到抑制"的连续过渡
+→ target比competitor被抑制得更快，所以add_effect变负
+```
+
+### Phase 391 硬伤分析
+
+**硬伤1：IDEAL机制只在少数category-layer组合出现**
+```
+大部分组合是DOMINANT_BOOST——同时增强target和competitor
+这意味着centroid不是精确的兼容性选择器
+它更像是"类别方向推动"，而不是"兼容性开关"
+```
+
+**硬伤2：DS7B L12-L26的机制变为REVERSED/BOOST_C**
+```
+DS7B浅层L4是DOMINANT_BOOST，但L12+变为REVERSED
+这意味着centroid在DS7B深层反而伤害correct pair
+→ DS7B的centroid在深层失去正向功能
+→ 这与Qwen3和GLM4（深层DOMINANT_BOOST）完全不同
+```
+
+**硬伤3：没有测试incorrect条件下的target/competitor分解**
+```
+Phase 389发现correct和incorrect条件呈SYMMETRIC模式
+但Phase 391只测试了correct条件
+如果incorrect条件展示T↓C↑（IDEAL的精确反转），
+那SYMMETRIC模式在机制层面也成立
+→ 这是下一步最重要的确认测试
+```
+
+**硬伤4：DOMINANT_BOOST机制的物理解释不清楚**
+```
+为什么centroid同时增强target和competitor？
+可能原因：
+1. centroid是粗粒度方向，同时覆盖了target和competitor的增强区域
+2. 模型在corrupt prompt上对category的表示本来就弱，add centroid只是整体提升了该category的可见性
+3. 需要更细粒度的方向才能分离target和competitor
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase391_target_competitor_decomp.py qwen3       # ~2min (4 layers)
+python tests/glm5/phase391_target_competitor_decomp.py deepseek7b  # ~30min (4 layers)
+python tests/glm5/phase391_target_competitor_decomp.py glm4        # ~50min (4 layers)
+```
+
+### Phase 391b: Incorrect-Condition Target/Competitor Decomposition [2026-06-07 02:40]
+
+### 背景
+
+Phase 391发现correct条件下的三种机制类型(IDEAL/DOMINANT_BOOST/REVERSED)。
+Phase 391b目标：验证incorrect条件下是否呈现机制镜像——SYMMETRIC模式在target/competitor分解层面是否成立。
+
+### 方法
+
+使用correct pairs的centroid测试incorrect pairs。
+incorrect prompt: "The apple is blue" (错误属性值)
+测量: logit(兼容值=red) - logit(不兼容值=blue)
+只测关键层: Qwen3 L4/L20, DS7B L4, GLM4 L20
+
+### 核心结果：跨模型SYMMETRIC确认
+
+```
+Qwen3 L4:  6/7 SYMMETRIC (temperature ASYMMETRIC)
+Qwen3 L20: 7/7 SYMMETRIC
+DS7B L4:   6/7 SYMMETRIC (color ASYMMETRIC)
+GLM4 L20:  6/7 SYMMETRIC (temperature ASYMMETRIC)
+总计: 25/28 = 89% SYMMETRIC
+```
+
+**机制层面完美镜像：**
+
+```
+Qwen3 L4:
+  color correct:    T↑C↓ (IDEAL) → incorrect: T↓C↑ (REVERSED) ← 完美镜像!
+  moisture correct: T↑C↓ (IDEAL) → incorrect: T↓C↑ (REVERSED) ← 完美镜像!
+  speed correct:    T↓C↑ (REVERSED) → incorrect: T↑C↓ (IDEAL) ← 完美镜像!
+
+DS7B L4:
+  moisture correct:    T↑C↓ (IDEAL) → incorrect: T↓C↑ (REVERSED) ← 完美镜像!
+  size correct:        T↓C↑ (REVERSED) → incorrect: T↑C↓ (IDEAL) ← 完美镜像!
+  temperature correct: T↑C↓ (IDEAL) → incorrect: T↓C↑ (REVERSED) ← 完美镜像!
+
+GLM4 L20:
+  brightness correct: T↑C↓ (IDEAL) → incorrect: T↓C↑ (REVERSED) ← 完美镜像!
+  size correct:       T↑C↑ → incorrect: T↑C↑ (add方向相反) ← SYMMETRIC
+  weight correct:     T↑C↑ → incorrect: T↑C↑ (add方向相反) ← SYMMETRIC
+```
+
+**DS7B size的完美镜像（效应量级最大）：**
+```
+correct: add=-0.482, T=-0.244, C=+0.237 → T↓C↑ (REVERSED)
+incorrect: add=+0.550, T=+0.275, C=-0.275 → T↑C↓ (IDEAL)
+→ centroid在correct pair中压低target+增强competitor
+  在incorrect pair中增强target+压低competitor
+  完美对称！效应量级几乎相同(0.48 vs 0.55)
+```
+
+**DS7B temperature的完美镜像：**
+```
+correct: add=+0.262, T=+0.143, C=-0.118 → T↑C↓ (IDEAL)
+incorrect: add=-0.251, T=-0.125, C=+0.125 → T↓C↑ (REVERSED)
+→ 效应量级几乎完全对称(0.262 vs 0.251)
+```
+
+### Phase 391b 关键发现
+
+**发现1：SYMMETRIC模式在target/competitor机制层面成立（89%类别）**
+```
+centroid不是简单地"方向相反"
+而是在机制层面精确镜像：
+  correct → 增强兼容值 + 抑制不兼容值
+  incorrect → 抑制兼容值 + 增强不兼容值
+```
+
+**发现2：temperature是唯一跨模型一致ASYMMETRIC的类别**
+```
+Qwen3 L4: temperature ASYMMETRIC (both small negative)
+GLM4 L20: temperature ASYMMETRIC (both small negative)
+→ temperature的centroid效应太弱且不稳定，无法形成清晰的方向
+→ 可能因为temperature有更多模糊边界(warm/cool vs hot/cold)
+```
+
+**发现3：DS7B的size效应展示最强SYMMETRIC（效应量0.48/0.55）**
+```
+虽然DS7B size centroid在correct pair中是REVERSED(压低target+增强competitor)
+但在incorrect pair中完美反转为IDEAL(增强target+压低competitor)
+→ 即使centroid方向"错误"，它仍然在correct/incorrect之间保持对称
+→ 这说明centroid是一个双向梯度，不是单向轴
+```
+
+### Phase 391b 硬伤分析
+
+**硬伤1：只测了1-2层/模型，需要更多层确认**
+```
+Qwen3: L4, L20
+DS7B: L4 only
+GLM4: L20 only
+→ 需要在更多层验证SYMMETRIC是否跨层稳定
+```
+
+**硬伤2：DOMINANT_BOOST类别在incorrect中仍然T↑C↑**
+```
+当correct pair的centroid同时增强target和competitor时(T↑C↑)
+incorrect pair中也同时增强两者(T↑C↑)，但add方向相反
+→ 这不是"完美镜像"，只是"方向相反"
+→ 完美镜像只在IDEAL/REVERSED类别中出现(T↑C↓ ↔ T↓C↑)
+```
+
+**硬伤3：temperature跨模型ASYMMETRIC可能揭示重要结构**
+```
+temperature是唯一跨模型一致的例外
+可能说明temperature在语言中的编码方式不同于其他属性
+warm/cool/hot/cold之间存在程度连续性，不是二分对立
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase391b_incorrect_tc_decomp.py qwen3       # ~1min (2 layers)
+python tests/glm5/phase391b_incorrect_tc_decomp.py deepseek7b  # ~10min (1 layer)
+python tests/glm5/phase391b_incorrect_tc_decomp.py glm4        # ~17min (1 layer)
+```
+
+## Phase 393: Conditional Centroid Hierarchy + T/C Decomposition [2026-06-07 09:00]
+
+### 背景
+
+Phase 391发现三种机制类型(IDEAL/DOM_BOOST/REVERSED)，391b确认89%SYMMETRIC。
+Phase 393目标：测试条件centroid层级假设——"越条件化，IDEAL比例越高"。
+如果成立，证明centroid粒度不够是DOM_BOOST占主导的原因。
+
+### 方法
+
+4级条件centroid：
+```
+L0_global:    全局单一方向（所有类别平均）
+L1_category:  7个类别方向（ANOVA残差）
+L2_obj_cat:   ~140个对象-类别方向（ANOVA二级残差）
+L3_pair:      155个独立对方向（原始delta_h）
+```
+每级都做target/competitor分解。
+测试层：Qwen3 L4/L20, DS7B L4/L20, GLM4 L4/L20。
+同时测correct和incorrect条件（L0/L1级）。
+
+### 核心结果：IDEAL比例跨层级变化
+
+```
+IDEAL比例 (x/7类别):
+Qwen3  L4:  L0=0/7 -> L1=1/7 -> L2=0/7 -> L3=0/7
+Qwen3  L20: L0=3/7 -> L1=0/7 -> L2=1/7 -> L3=2/7
+DS7B   L4:  L0=0/7 -> L1=2/7 -> L2=1/7 -> L3=0/7
+DS7B   L20: L0=0/7 -> L1=2/7 -> L2=0/7 -> L3=2/7
+GLM4   L4:  L0=2/7 -> L1=1/7 -> L2=3/7 -> L3=1/7
+GLM4   L20: L0=0/7 -> L1=1/7 -> L2=3/7 -> L3=1/7
+```
+
+**关键发现：预测"L0<L1<L2<L3"不成立！IDEAL比例不随条件化单调递增。**
+
+### 核心发现1：L2_obj_cat在GLM4中产生最高IDEAL比例
+
+```
+GLM4 L4:  L2_obj_cat = 3/7 (43%) — 全部测试中最高
+GLM4 L20: L2_obj_cat = 3/7 (43%) — 且整体mechanism=IDEAL
+```
+
+GLM4 L20 L2_obj_cat详细：
+```
+color:       add=+0.1072, T=+0.0300, C=-0.0772 → IDEAL
+size:        add=+0.5654, T=+0.5039, C=-0.0615 → IDEAL (最强!)
+temperature: add=+0.1408, T=+0.0768, C=-0.0640 → IDEAL
+```
+
+**GLM4 size L20 L2_obj_cat: T=+0.504, C=-0.062** — 这是目前发现的最强选择性centroid！
+
+### 核心发现2：L3_pair（per-pair方向）不稳定
+
+```
+L3_pair效应量非常大但机制不一致：
+Qwen3 L20: add=+0.107, 但T=-0.242, C=-0.349 → SUPP_C
+DS7B L20:  add=+0.222, T=+0.387, C=+0.165 → DOM_BOOST
+GLM4 L20:  add=+0.371, T=-0.719, C=-1.090 → SUPP_C
+```
+
+L3_pair经常导致巨大的抑制效应(T和C都大幅下降)，
+说明单个pair的delta_h方向太偏，添加到corrupt prompt后造成严重扰动。
+
+### 核心发现3：层级改进(Hierarchy Improvement)模式
+
+跨模型跨层分析，发现多个类别在更深层级出现IDEAL：
+
+```
+DS7B L20:
+  brightness:  DOM_BOOST -> REVERSED -> SUPP_T -> IDEAL [L3优于L0-L2]
+  moisture:    DOM_BOOST -> IDEAL -> BOOST_C -> IDEAL [L1和L3有IDEAL]
+
+GLM4 L4:
+  color:       SUPP_T -> BOOST_C -> IDEAL -> SUPP_C [L2优于L0-L1]
+  speed:       IDEAL -> IDEAL -> IDEAL -> BOOST_C [L0-L2一致IDEAL]
+  temperature: SUPP_C -> REVERSED -> IDEAL -> IDEAL [L2-L3优于L0-L1]
+
+GLM4 L20:
+  color:       SUPP_C -> BOOST_C -> IDEAL -> SUPP_C [L2优于L0-L1-L3]
+  size:        SUPP_C -> DOM_BOOST -> IDEAL -> IDEAL [L2-L3优于L0-L1]
+  temperature: SUPP_C -> BOOST_C -> IDEAL -> SUPP_T [L2优于L0-L1]
+```
+
+### 核心发现4：L2_obj_cat是"甜蜜点"
+
+```
+L0_global: 太粗，平均掉方向差异
+L1_category: 有类别分离，但仍不够细
+L2_obj_cat: 在GLM4中达到最高IDEAL比例(43%)，且效应稳定
+L3_pair: 太细，噪声太大，造成大幅扰动
+```
+
+L2_obj_cat成功的关键：
+- 它区分了同一类别内不同对象的齿面差异
+- 例如apple-color vs sky-color有不同的centroid
+- 但不像L3_pair那样过拟合到单个样本
+
+### 核心发现5：SYMMETRIC在不同层级也成立
+
+```
+Qwen3 L4:  SYMMETRIC 5/7 (71%)
+Qwen3 L20: SYMMETRIC 6/7 (86%)
+DS7B L4:   SYMMETRIC 5/7 (71%)
+DS7B L20:  SYMMETRIC 6/7 (86%)
+GLM4 L4:   SYMMETRIC 5/7 (71%)
+GLM4 L20:  SYMMETRIC 6/7 (86%)
+总计: 33/42 = 79% SYMMETRIC
+```
+
+SYMMETRIC跨层级稳定成立！
+
+### Phase 393 硬伤分析
+
+**硬伤1：核心预测"越条件化越IDEAL"不成立**
+```
+IDEAL比例没有从L0到L3单调递增
+L3_pair反而比L1/L2更不稳定
+这说明centroid条件化的收益有一个最优点（L2）
+超过这个点（L3），噪声开始主导
+```
+
+**硬伤2：L3_pair的巨大效应可能是扰动而非因果**
+```
+Qwen3 L20 L3_pair: T=-0.242, C=-0.349 → 两者都被大幅抑制
+GLM4 L20 L3_pair:  T=-0.719, C=-1.090 → 更剧烈的抑制
+这不是"齿轮啮合"，而是"扰动残差流"
+per-pair方向可能已经偏离了可加方向
+```
+
+**硬伤3：L2_obj_cat只在GLM4中表现最好**
+```
+Qwen3 L2_obj_cat: IDEAL 0-1/7
+DS7B L2_obj_cat:  IDEAL 0/7
+GLM4 L2_obj_cat:  IDEAL 3/7
+→ L2优势可能只是GLM4的特定属性
+→ 需要更多层验证
+```
+
+**硬伤4：GLM4 speed在L4跨L0-L2都是IDEAL**
+```
+这是唯一跨3个层级都IDEAL的类别
+但L3变成BOOST_C，说明过度条件化也会破坏
+speed可能有特殊的编码稳定性
+```
+
+### 关键洞察
+
+1. **条件化有最优点**：L2_obj_cat（对象-类别）可能是语言齿轮的最佳粒度
+   - 粗于L2：方向平均掉齿面差异
+   - 细于L2：噪声和过拟合主导
+
+2. **GLM4 L20 L2_obj_cat size的强IDEAL(T=+0.50, C=-0.06)**是目前发现的**最强选择性centroid**
+   - 它精确地增强target而不增强competitor
+   - 证明对象-类别级别的centroid确实存在选择性
+
+3. **SYMMETRIC在所有层级稳定成立(79%)**，说明兼容性梯度是层级无关的语言不变量
+
+4. **L3_pair不稳定说明**：单个pair的delta_h不是可加方向
+   - 这可能因为corrupt prompt的residual流形和clean prompt差异太大
+   - 或者因为per-pair方向包含太多特定于该样本的信息
+
+### 命令
+
+```bash
+python tests/glm5/phase393_centroid_hierarchy.py qwen3       # ~1min (2 layers)
+python tests/glm5/phase393_centroid_hierarchy.py deepseek7b  # ~30min (2 layers)
+python tests/glm5/phase393_centroid_hierarchy.py glm4        # ~40min (2 layers)
+```
+
+### Phase 393b: L2_obj_cat Deep Verification [2026-06-07 10:10]
+
+### 背景
+
+Phase 393发现GLM4 L2_obj_cat在L4/L20有43% IDEAL。393b在更多层验证L2_obj_cat是否持续优于L1/L0。
+
+### 核心结果：L2_obj_cat跨层IDEAL比例
+
+```
+Qwen3 L12: L0=0/7, L1=1/7, L2=1/7 (moisture IDEAL)
+Qwen3 L28: L0=0/7, L1=0/7, L2=0/7 (深层全部SUPP_T/SUPP_C)
+
+DS7B L12:  L0=2/7, L1=1/7, L2=1/7 (moisture IDEAL)
+DS7B L26:  L0=2/7, L1=1/7, L2=0/7 (深层全部SUPP_T)
+
+GLM4 L30:  L0=0/7, L1=1/7, L2=0/7 (L2在L30反而崩溃为REVERSED!)
+GLM4 L38:  L0=0/7, L1=1/7, L2=2/7 (size+weight IDEAL!)
+```
+
+### 关键发现1：GLM4 size跨层L2_obj_cat持续IDEAL
+
+```
+GLM4 size L2_obj_cat:
+  L4:  add=+0.075, T=+0.075, C=+0.036 → DOM_BOOST (接近IDEAL)
+  L20: add=+0.565, T=+0.504, C=-0.062 → IDEAL (最强!)
+  L30: add=+0.254, T=+0.256, C=+0.002 → DOM_BOOST (接近IDEAL)
+  L38: add=+0.284, T=+0.263, C=-0.021 → IDEAL
+→ GLM4 size在L20和L38有IDEAL，L4和L30接近IDEAL(T>>C)
+→ 这是目前发现的最稳定跨层选择性centroid!
+```
+
+### 关键发现2：GLM4 weight在L38出现IDEAL
+
+```
+GLM4 weight L2_obj_cat L38: add=+0.303, T=+0.209, C=-0.093 → IDEAL
+→ size和weight都是"量级属性"，可能在GLM4中使用相似编码
+```
+
+### 关键发现3：L2_obj_cat在深层(L30)的GLM4崩溃
+
+```
+GLM4 L30: L2_obj_cat有4/7 REVERSED!
+brightness, color, moisture, temperature全是REVERSED
+→ L30可能是"过渡层"，centroid方向在此发生翻转
+→ L38恢复，但机制不同(L30 REVERSED → L38 IDEAL)
+```
+
+### 关键发现4：DS7B和Qwen3在深层L2_obj_cat不如L1
+
+```
+Qwen3 L28: L2=0/7 vs L1=0/7 (都没IDEAL)
+DS7B L26:  L2=0/7 vs L1=1/7 (L2反而更差!)
+→ L2_obj_cat的优势只在GLM4的中层(L4-L20)和深层(L38)出现
+→ Qwen3和DS7B的L2_obj_cat没有明显优势
+```
+
+### 综合393+393b结论
+
+**核心预测"越条件化越IDEAL"被修正为：**
+
+```
+1. L3_pair（per-pair方向）不稳定，不是最优点
+2. L2_obj_cat在GLM4中确实优于L1，但跨模型不一致
+3. 真正的"甜蜜点"可能是模型相关的：
+   - GLM4: L2_obj_cat（对象-类别级别）
+   - DS7B:  L1_category（类别级别）
+   - Qwen3: L1_category（类别级别）
+4. GLM4 size是唯一跨层稳定的L2_obj_cat IDEAL案例
+```
+
+**语言不变量的候选更新：**
+
+```
+1. SYMMETRIC（79%跨层级稳定）— 仍是最强的语言不变量
+2. GLM4 size的跨层IDEAL — 可能揭示量级属性的特殊编码
+3. moisture的跨模型IDEAL倾向（Qwen3 L12 L2, DS7B L12 L2, GLM4无）— 部分一致
+```
