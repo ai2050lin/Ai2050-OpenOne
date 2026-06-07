@@ -14677,4 +14677,320 @@ python tests/glm5/phase395b_confirmation.py qwen3       # ~5min
 python tests/glm5/phase395b_confirmation.py deepseek7b  # ~70min
 python tests/glm5/phase395b_confirmation.py glm4        # ~90min
 ```
+
+## Phase 396: SYMMETRIC Verification — Correct vs Incorrect Mirror Test [2026-06-07 18:50]
+
+### 背景
+
+Phase 395/395b发现IDEAL类别但无跨模型一致性。核心未解问题：
+同一个方向在correct条件下是IDEAL(T↑C↓)，
+在incorrect条件下(同一对象+不兼容值)是否镜像(T↓C↑)?
+
+如果是 → 方向编码兼容性梯度(真机制)
+如果否 → 方向编码值偏好(非关系机制)
+
+### 实验设计
+
+```
+4 categories × 6 objects × 2 value_combos × 4 frames = 192 samples
+Correct条件: "The elephant is big." vs corrupt "The item is big."
+Incorrect条件: "The elephant is small." vs corrupt "The item is small."
+
+delta_h_correct = h(correct_clean) - h(correct_corrupt)
+delta_h_incorrect = h(incorrect_clean) - h(incorrect_corrupt)
+
+测试:
+1. cos(delta_h_correct, delta_h_incorrect) — 是否MIRROR?
+2. 用correct条件方向注入incorrect-corrupt prompt — 是否SYMMETRIC?
+3. 用correct条件方向注入correct-corrupt prompt — 复制395b结果
+
+Layers: Qwen3(L4,L20), DS7B(L4,L12), GLM4(L10,L30)
+```
+
+### 核心结果1：cos(correct, incorrect)全部ALIGNED
+
+```
+模型       层    均值cos   color   moisture  size    speed
+Qwen3     L4   +0.87    +0.99   +0.98    +0.99   +1.00
+Qwen3     L20  +0.56    +0.83   +0.85    +0.87   +0.83
+DS7B      L4   +0.71    +0.99   +0.85    +1.00   +1.00
+DS7B      L12  +0.77    +0.98   +0.83    +1.00   +1.00
+GLM4      L10  +0.71    +0.94   +0.92    +0.96   +0.98
+GLM4      L30  +0.55    +0.77   +0.85    +0.79   +0.84
+
+→ 所有cosine similarity为正(+0.55~+1.00)
+→ delta_h_correct和delta_h_incorrect指向同一方向!
+→ 没有MIRROR结构，全部是ALIGNED
+→ 这意味着对象编码与值是否兼容无关
+```
+
+### 核心结果2：SYMMETRIC测试
+
+```
+=== IDEAL在correct条件下出现的情况 ===
+
+Qwen3 L4 L2_cf color:    CORR=IDEAL(T+0.014,C-0.015) → INCORR=SUPP_C(T-0.003,C-0.009) [HALF]
+DS7B L12 L1 size:        CORR=IDEAL(T+0.075,C-0.107) → INCORR=REVERSED(T-0.107,C+0.075) [HALF]
+DS7B L12 L2_cf color:    CORR=IDEAL(T+0.046,C-0.044) → INCORR=BOOST_C(T+0.135,C+0.170) [HALF]
+DS7B L12 L2_cf size:     CORR=IDEAL(T+0.138,C-0.085) → INCORR=BOOST_C(T+0.040,C+0.183) [HALF]
+GLM4 L10 L1 moisture:    CORR=IDEAL(T+0.418,C-1.125) → INCORR=REVERSED(T-0.826,C+0.285) [HALF]
+GLM4 L10 L2_cf moisture: CORR=IDEAL(T+0.241,C-1.209) → INCORR=REVERSED(T-0.691,C+0.363) [HALF]
+
+→ 无FULL_SYMMETRIC!
+→ IDEAL在correct → REVERSED或BOOST_C在incorrect
+→ 方向不是兼容性梯度!
+```
+
+### 核心结果3：GLM4 L10 moisture的强烈反转
+
+```
+GLM4 L10 L1 moisture:
+  Correct:   T(兼容值)=+0.418,  C(不兼容值)=-1.125 → IDEAL
+  Incorrect: T(兼容值)=-0.826,  C(不兼容值)=+0.285 → REVERSED
+
+→ 同一个方向在correct条件下boost兼容值/suppress不兼容值
+  但在incorrect条件下完全反转！
+→ 方向的因果效果是上下文依赖的!
+→ 这说明方向不是静态兼容性梯度，而是与当前残差流状态交互
+```
+
+### 核心结果4：size/speed的T/C精确互换
+
+```
+DS7B L12 L1 size:
+  Correct:   T(comp)=+0.0752, C(incomp)=-0.1074
+  Incorrect: T(comp)=-0.1074, C(incomp)=+0.0752
+
+→ T和C的delta值精确互换!
+→ 原因: size类一半对象target=big,一半target=small
+→ L1_category方向对所有size对象相同
+→ 当prompt中的值翻转时，方向对相同token的效果也翻转
+
+注意: 这可能是跨对象平均的伪影，需要分对象验证
+moisture的REVERSED则不是伪影(对象target方向一致)
+```
+
+### 关键发现1：delta_h层面的对象编码与兼容性无关
+
+```
+cos(correct, incorrect) = +0.55~+1.00 (全部ALIGNED)
+
+→ "elephant"在"The elephant is big."和"The elephant is small."
+  产生的delta_h几乎相同
+→ 对象的身份编码不依赖于值是否兼容
+→ 这与"兼容性梯度是基础机制"的假说矛盾
+```
+
+### 关键发现2：方向的因果效果是上下文依赖的
+
+```
+GLM4 L10 moisture L1方向:
+  + 添加到correct prompt → T↑C↓ (IDEAL)
+  + 添加到incorrect prompt → T↓C↑ (REVERSED)
+
+→ 同一个向量在不同上下文中产生相反效果
+→ 这不是简单的值偏好方向
+→ 而是: 对象编码方向与当前残差流状态的交互决定了最终效果
+→ 当prompt包含兼容值时，对象编码强化兼容性
+→ 当prompt包含不兼容值时，对象编码产生冲突反转
+```
+
+### 关键发现3：不存在兼容性梯度方向
+
+```
+如果兼容性梯度存在:
+  同一方向应该总是boost兼容值、suppress不兼容值
+  无论prompt中包含什么值
+
+但实验显示:
+  方向效果高度依赖prompt中的值
+  IDEAL → REVERSED (不是IDEAL → IDEAL)
+
+→ 不存在独立的兼容性梯度方向
+→ 兼容性是对象编码与上下文交互的涌现属性
+```
+
+### 硬伤
+
+```
+1. size/speed的T/C互换可能是跨对象平均伪影
+   - 需要分对象分析确认moisture的REVERSED不是伪影
+   - 但moisture的对象target方向一致，互换不太可能
+
+2. 只测了correct-condition方向
+   - 没测incorrect-condition方向在correct prompt上的效果
+   - 但cosine similarity已经是ALIGNED，不太可能不同
+
+3. 方向注入是加性操作
+   - 真实编码可能是乘性/门控的
+   - 加性注入可能不反映真实交互机制
+
+4. 层数偏少(每模型2层)
+   - 可能有特定层存在FULL_SYMMETRIC
+   - 但从趋势看不太可能
+
+5. 没有中性prompt测试
+   - "The elephant is ___." (无值)可以区分值偏好vs兼容性
+   - 如果方向在中性prompt下仍boost兼容值 → 值偏好
+   - 如果方向在中性prompt下无效果 → 纯交互机制
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase396_symmetric.py qwen3       # ~3min
+python tests/glm5/phase396_symmetric.py deepseek7b  # ~35min
+python tests/glm5/phase396_symmetric.py glm4        # ~55min
+```
+
+### Phase 396b: Per-Object SYMMETRIC + Neutral Prompt [2026-06-07 20:10]
+
+### 背景
+
+Phase 396发现类别平均下无FULL_SYMMETRIC，但size/speed的T/C互换
+可能是跨对象平均伪影(L1方向混合了big-compatible和small-compatible对象)。
+Phase 396b分对象测试+增加中性prompt("The item is"，无值)。
+
+### 核心结果1：分对象FULL_SYMMETRIC确实存在！
+
+```
+=== FULL_SYMMETRIC对象(正确=IDEAL AND 不正确=IDEAL) ===
+
+Qwen3 L4 color L2_cf:
+  ocean_c: CORR[IDEAL T+0.031 C-0.898] INCORR[IDEAL T+0.020 C-1.965]
+  snow:    CORR[IDEAL T+0.125 C-0.660] INCORR[IDEAL T+0.012 C-2.215]
+
+DS7B L12 size L1+L2_cf:
+  ant:   CORR[IDEAL T+0.965 C-0.412] INCORR[IDEAL T+1.251 C-1.486]
+  grain: CORR[IDEAL T+0.965 C-0.412] INCORR[IDEAL T+1.251 C-1.486]
+  pin:   CORR[IDEAL T+0.965 C-0.412] INCORR[IDEAL T+1.251 C-1.486]
+
+DS7B L12 moisture L1+L2_cf:
+  ocean: CORR[IDEAL T+0.383 C-0.601] INCORR[IDEAL T+0.348 C-2.613]
+  rain:  CORR[IDEAL T+0.383 C-0.601] INCORR[IDEAL T+0.348 C-2.613]
+  river: CORR[IDEAL T+0.383 C-0.601] INCORR[IDEAL T+0.348 C-2.613]
+
+DS7B L12 color L2_cf:
+  sky:   CORR[IDEAL T+0.066 C-0.132] INCORR[IDEAL T+0.124 C-1.804]
+
+GLM4 L10 color L1+L2_cf:
+  apple:  CORR[IDEAL T+0.359 C-0.137] INCORR[IDEAL T+0.711 C-1.547]
+  cherry: CORR[IDEAL T+0.359 C-0.137] INCORR[IDEAL T+0.711 C-1.547]
+  cherry L2_cf: CORR[IDEAL T+0.641 C-0.324] INCORR[IDEAL T+0.391 C-1.798]
+
+→ FULL_SYMMETRIC确实存在，但只在分对象分析中可见
+→ 类别平均时被value-bias抵消(见下文)
+```
+
+### 核心结果2：L1_category有value bias
+
+```
+DS7B L12 size L1方向: 推向"small"
+  → ant/grain/pin(small-compatible) = FULL_SYMMETRIC
+  → elephant/mountain/whale(big-compatible) = REVERSED(被L1推向small!)
+
+DS7B L12 moisture L1方向: 推向"wet"
+  → ocean/rain/river(wet-compatible) = FULL_SYMMETRIC
+  → desert/dust/sand(dry-compatible) = REVERSED(被L1推向wet!)
+
+GLM4 L10 color L1方向: 推向"red"
+  → apple/cherry(red-compatible) = FULL_SYMMETRIC
+  → sky/ocean_c(blue-compatible) = REVERSED(被L1推向red!)
+
+→ L1_category不是中性的兼容性梯度
+→ 它有具体的值偏好(推small/wet/red)
+→ 这解释了Phase 396的类别平均结果:
+   只有与L1偏好一致的对象贡献IDEAL,
+   反方向的对象贡献REVERSED,平均后部分抵消
+```
+
+### 核心结果3：中性prompt从不IDEAL
+
+```
+所有18个对象(3模型)在neutral prompt("The item is")上:
+  → 无一例外是SUPP_C, SUPP_T, 或REVERSED
+  → 从不出现IDEAL
+
+示例:
+  DS7B ant L1 NEUTRAL: SUPP_C(T-4.043, C-5.455) ← 两个值都下降
+  DS7B ocean L1 NEUTRAL: SUPP_C(T-1.551, C-3.233) ← 两个值都下降
+  GLM4 apple L1 NEUTRAL: SUPP_T(T-5.014, C-1.966) ← 两个值都下降
+
+→ 方向在没有值token的prompt上不产生兼容性梯度
+→ 方向的IDEAL效果需要prompt中已有值信息
+→ 这说明兼容性是方向与值上下文的交互结果，不是方向的固有属性
+```
+
+### 核心结果4：FULL_SYMMETRIC的上下文依赖模式
+
+```
+对于FULL_SYMMETRIC对象(如DS7B ocean moisture):
+  Correct("The item is wet."):  T(wet)+0.383, C(dry)-0.601 → IDEAL
+  Incorrect("The item is dry."): T(wet)+0.348, C(dry)-2.613 → IDEAL
+  Neutral("The item is"):       T(wet)-1.551, C(dry)-3.233 → SUPP_C
+
+→ 方向在有值prompt时boost兼容值、suppress不兼容值
+→ 方向在无值prompt时suppress两个值(兼容值少降)
+→ 兼容性梯度只在值token已存在于residual stream时激活
+```
+
+### 核心结果5：DS7B有最多的FULL_SYMMETRIC
+
+```
+模型    层   FULL_SYMMETRIC对象数  类别
+Qwen3  L4   2                    color(ocean_c,snow)
+DS7B   L12  7                    size(3)+moisture(3)+color(1)
+GLM4   L10  3                    color(apple,cherry×2)
+
+→ DS7B L12的兼容性梯度机制最发达
+→ 这与Phase 395b发现DS7B L12的L2_crossfit=2/4 IDEAL一致
+```
+
+### 修正Phase 396的结论
+
+```
+Phase 396(类别平均): "无FULL_SYMMETRIC,方向不是兼容性梯度"
+Phase 396b(分对象):  "FULL_SYMMETRIC确实存在,但:
+  1. 只出现在L1偏好值与对象兼容值一致时
+  2. 中性prompt不产生IDEAL
+  3. 兼容性是方向与值上下文的交互"
+
+更准确结论:
+  → 存在对象-类别级的兼容性梯度方向
+  → 但这些方向有value bias,不是中性兼容性编码
+  → 兼容性梯度是上下文依赖的:需要值信息在residual stream中
+  → L1_category混合了不同value-bias的对象,平均后信号抵消
+  → L2_crossfit(分对象)方向更可能反映真实兼容性机制
+```
+
+### 硬伤
+
+```
+1. FULL_SYMMETRIC可能部分来自L1的value bias而非兼容性
+   - 需要设计实验分离"value preference"和"compatibility gradient"
+   - 中性prompt测试已部分解决: IDEAL需要值上下文
+
+2. 每模型只测1层
+   - DS7B L12可能不是唯一有FULL_SYMMETRIC的层
+   - 需要更多层追踪演化
+
+3. 加性方向注入可能不反映真实计算
+   - 真实机制可能是乘性/门控/路由
+   - 加性注入可能遗漏非线性交互
+
+4. 只用correct-condition方向
+   - incorrect-condition方向可能有不同SYMMETRIC模式
+
+5. 中性prompt的tokenizer差异
+   - "The item is"后面没有token,与"The item is big."不同
+   - 最后token位置不同,可能影响方向注入效果
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase396b_per_object.py qwen3       # ~1min
+python tests/glm5/phase396b_per_object.py deepseek7b  # ~20min
+python tests/glm5/phase396b_per_object.py glm4        # ~30min
+```
  
