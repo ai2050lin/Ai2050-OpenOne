@@ -15217,3 +15217,2726 @@ Phase 59 具体任务：
 ```text
 从全局路径筛选，进入稳定 subtype 的变量级闭包。
 ```
+
+## Phase 59: Temporal Order 符号读出器与 Token Path 定位 [2026-06-02 18:45]
+
+### 任务目标
+
+根据 Phase 58 的结果，`temporal_order/before_after` 在 Qwen3 和 DeepSeek7B 中都是随机对照优势较强的 subtype，因此本轮选择它作为第一个稳定候选路径，测试：
+
+```text
+1. before/after 是否可以构造成更干净的符号化读出器；
+2. temporal_order 信息是否集中在某些 token / layer / module；
+3. 是否可以进入后续 subspace patch 或 destroy-restore；
+4. 当前全局关系路径图谱是否能从 relation-subtype path 推进到 variable/token path。
+```
+
+本轮仍然严格限定结论：只做读出器校准和候选路径定位，不做机制闭包结论。
+
+### 对用户分析的判断
+
+用户提供的分析整体正确。关键正确点：
+
+```text
+1. Phase 58 证明的是 relation subtype path，而不是最终语言机制。
+2. 单一 binding 路径信息有限，必须和其他关系路径比较，才有全局意义。
+3. 下一步不应继续盲目扩大所有 subtype，而应选择稳定候选 subtype 做变量拆分。
+4. temporal_order/before_after 适合作为优先候选，因为变量清晰，且在 Qwen3 / DeepSeek7B 中随机优势较强。
+5. 任何路径定位必须先有可靠读出器，否则 patch / ablation / destroy-restore 都会被读出偏差污染。
+```
+
+需要补充的谨慎点：
+
+```text
+Phase 58 中 temporal_order 强，不等于 FIRST_EVENT 读出器天然稳定。
+如果符号读出器准确率不足 0.9，就不能进入因果闭包，只能继续校准读出器和观察候选路径。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase59_temporal_order_token_path.py
+tests/gpt5/run_phase59_temporal_order_token_path_normal_all.sh
+tests/gpt5/phase59_temporal_order_token_path_summary.py
+```
+
+脚本设计：
+
+```text
+1. 构造符号化 temporal_order 样本：
+   A = dax smiled. B = wug left.
+   Relation: A happened before B.
+   Answer with A or B. FIRST_EVENT:
+
+2. 同时构造 before / after、AB / BA、模板变化。
+
+3. 使用完整候选 completion logprob 比较：
+   logP(" A") vs logP(" B")
+
+4. 捕获目标层的：
+   resid_in
+   resid_out
+   attn_out
+   mlp_out
+
+5. 捕获 token position：
+   A_label
+   B_label
+   before
+   after
+   last
+
+6. 用 W_U(" A") - W_U(" B") 作为粗输出方向，计算 sign-corrected projection。
+
+7. 三模型按顺序运行，每个模型完成后使用 --hard-exit-after-model 退出，避免模型共存导致显存污染。
+```
+
+### 测试命令
+
+Smoke：
+
+```bash
+PHASE59_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase59_temporal_order_token_path.py qwen3 \
+  --output-dir results/gpt5_phase59_smoke \
+  --max-cases 8 \
+  --progress-every 4
+```
+
+正式三模型顺序测试：
+
+```bash
+PHASE59_OUTPUT_DIR=results/gpt5_phase59_temporal_order_token_path_full \
+PHASE59_MAX_CASES=96 \
+tests/gpt5/run_phase59_temporal_order_token_path_normal_all.sh
+```
+
+运行说明：
+
+```text
+qwen3 -> glm4 -> deepseek7b 顺序执行；
+每个模型都添加 --hard-exit-after-model；
+Qwen3 / GLM4 优先 sdpa；
+DeepSeek7B 使用 eager，仍有 Sliding Window Attention warning。
+```
+
+运行中 PyTorch 输出：
+
+```text
+Can't initialize NVML
+```
+
+该警告影响 GPU 监控状态读取，不影响本轮 CUDA 计算完成；但后续如果要做稳定性诊断，需要单独检查 NVML / nvidia-smi 状态。
+
+### 输出文件
+
+```text
+results/gpt5_phase59_temporal_order_token_path_full/qwen3_phase59_temporal_order_token_path.json
+results/gpt5_phase59_temporal_order_token_path_full/glm4_phase59_temporal_order_token_path.json
+results/gpt5_phase59_temporal_order_token_path_full/deepseek7b_phase59_temporal_order_token_path.json
+results/gpt5_phase59_temporal_order_token_path_full/phase59_temporal_order_token_path_summary.json
+results/gpt5_phase59_temporal_order_token_path_full/PHASE59_TEMPORAL_ORDER_TOKEN_PATH_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+每模型 cases = 96
+三模型 total cases = 288
+
+Qwen3 target layers:
+  L21, L23, L25, L27, L29
+
+GLM4 target layers:
+  L30, L33, L36, L38
+
+DeepSeek7B target layers:
+  L19, L21, L23, L24
+```
+
+### Qwen3 结果
+
+```text
+accuracy = 0.8021
+mean_abs_margin = 0.9961
+n_cases = 96
+```
+
+Top token/module paths：
+
+```text
+1. L29:resid_out:last  projection = 3.1995
+2. L29:attn_out:last   projection = 2.9250
+3. L27:resid_out:last  projection = 0.4705
+4. L27:resid_in:last   projection = 0.4697
+5. L29:resid_in:last   projection = 0.4233
+6. L25:resid_in:last   projection = 0.4061
+7. L25:resid_out:last  projection = 0.3872
+8. L23:resid_out:last  projection = 0.1016
+```
+
+客观现象：
+
+```text
+1. Qwen3 的 FIRST_EVENT 读出准确率只有 0.8021，未达到 0.9 闭包门槛。
+2. 输出方向投影高度集中在 last token 的深层 residual / attention。
+3. L29 attn_out:last 很高，说明最后层 attention 输出可能强烈参与候选 A/B 输出偏置。
+4. 但由于读出器不够稳定，不能把 L29 attn_out 解释为 temporal_order 机制本体。
+```
+
+### GLM4 结果
+
+```text
+accuracy = 0.8021
+mean_abs_margin = 0.7319
+n_cases = 96
+```
+
+Top token/module paths：
+
+```text
+1. L38:resid_out:last  projection = 0.9618
+2. L38:resid_in:last   projection = 0.5610
+3. L36:resid_out:last  projection = 0.5604
+4. L36:resid_in:last   projection = 0.5166
+5. L33:resid_out:last  projection = 0.4121
+6. L38:mlp_out:last    projection = 0.3899
+7. L33:resid_in:last   projection = 0.3628
+8. L33:attn_out:last   projection = 0.0603
+```
+
+客观现象：
+
+```text
+1. GLM4 和 Qwen3 的准确率相同，都是 0.8021。
+2. GLM4 路径主要集中在 deep residual last token。
+3. L38 mlp_out:last 有一定正投影，但弱于 residual。
+4. 这更像输出读出状态形成，而不是已经定位到 before/after 变量写入位置。
+```
+
+### DeepSeek7B 结果
+
+```text
+accuracy = 0.6562
+mean_abs_margin = 0.9391
+n_cases = 96
+```
+
+Top token/module paths：
+
+```text
+1. L24:resid_out:last  projection = 0.4095
+2. L24:attn_out:last   projection = 0.2907
+3. L21:resid_in:last   projection = 0.1162
+4. L24:mlp_out:last    projection = 0.1058
+5. L21:resid_out:last  projection = 0.1027
+6. L19:attn_out:last   projection = 0.0617
+7. L19:resid_out:last  projection = 0.0519
+8. L21:attn_out:last   projection = 0.0371
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 的 FIRST_EVENT 读出准确率只有 0.6562。
+2. 虽然 Phase 58 中 temporal_order/before_after 是 DS7B 的强随机优势 subtype，
+   但当前符号化读出器不能稳定读取 FIRST_EVENT。
+3. Top path 仍集中在末层 L24 last token。
+4. DS7B 本轮有 Sliding Window Attention eager warning，因此路径结果只能作为候选观察。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  reader accuracy = 0.8021
+  strongest path = L29 resid_out / attn_out at last token
+
+GLM4:
+  reader accuracy = 0.8021
+  strongest path = L38 residual last token
+
+DeepSeek7B:
+  reader accuracy = 0.6562
+  strongest path = L24 residual / attention last token
+```
+
+共同现象：
+
+```text
+1. 三模型 top path 都集中在 last token 的深层 residual_out。
+2. 这说明当前 FIRST_EVENT 任务主要在输出位置形成 A/B 候选偏置。
+3. 但 before/after operator token、A/B label token 没有进入 top path。
+4. 因此本轮更像输出读出路径定位，而不是 temporal_order 变量写入机制定位。
+```
+
+### 当前结论
+
+本轮最重要的结果不是找到了 temporal_order 机制，而是发现：
+
+```text
+Phase 58 的 temporal_order/before_after 随机优势强，
+但当前 FIRST_EVENT 符号读出器仍不够稳定。
+```
+
+因此：
+
+```text
+1. temporal_order 仍是值得继续研究的强候选 subtype。
+2. 当前读出器不能进入 destroy-restore 或 subspace causal patch。
+3. top path 主要反映输出 A/B 候选读出位置，而不一定是 before/after 变量编码位置。
+4. 下一步必须继续校准读出器和任务格式。
+```
+
+### 硬伤
+
+```text
+1. 读出器准确率不足：
+   Qwen3 / GLM4 = 0.8021，DeepSeek7B = 0.6562，均未达到 0.9。
+
+2. 指标仍然依赖 W_U(" A") - W_U(" B")：
+   这只是候选输出方向，不是变量本体。
+
+3. top path 集中在 last token：
+   可能说明任务被模型当成输出选择，而不是内部 temporal relation 推理。
+
+4. DS7B 使用 eager 且有 sliding-window warning：
+   不能和 Qwen3 / GLM4 完全对称解释。
+
+5. NVML 初始化失败：
+   不影响本次结果生成，但说明 GPU 监控链路仍需单独排查。
+
+6. 没有 patch / ablation / destroy-restore：
+   本轮没有因果闭包证据。
+```
+
+### 关键洞察
+
+这轮强化了一个判断：
+
+```text
+关系路径强，不等于读出器稳定；
+读出器稳定之前，不应进入机制闭包；
+路径图谱必须和读出器校准绑定推进。
+```
+
+也就是说，全局语义语法契约图谱不能只记录：
+
+```text
+哪个 relation subtype 强；
+哪个 layer/module 强；
+```
+
+还必须记录：
+
+```text
+该 subtype 的读出器可靠性；
+候选输出是否稳定；
+operator token 是否参与；
+relation variable 是否能从 output choice 中分离。
+```
+
+### 下一步计划
+
+Phase 60 应优先做 temporal_order 读出器重构，而不是直接做 patch：
+
+```text
+1. 改用更强约束的完整答案格式：
+   FIRST_EVENT = A
+   FIRST_EVENT = B
+   或 ANSWER: A / ANSWER: B
+
+2. 使用多 token candidate sequence logprob：
+   " A\n"
+   " B\n"
+   " EVENT_A"
+   " EVENT_B"
+
+3. 加入真假判断格式：
+   Statement: A happened before B.
+   Query: Did A happen first? Answer yes/no.
+
+4. 分离 operator 读出和 output choice：
+   before/after token path
+   answer token path
+   event label path
+
+5. 只有当 reader accuracy > 0.9 且跨模板稳定后，
+   才进入 temporal_order token/state transplant 和 destroy-restore。
+```
+
+阶段性大任务：
+
+```text
+建立每个 relation subtype 的可靠读出器层。
+
+全局路径图谱 = relation path matrix
+              + random-control advantage
+              + reader reliability
+              + token/module path
+              + causal closure status
+```
+
+只有这个结构完成后，才可能从“关系路径拼图”进入“语言编码机制拼图”。
+
+## Phase 60: Temporal Order 读出器重构与长会话工程阻断 [2026-06-02 18:59]
+
+### 任务目标
+
+根据 Phase 59 的结果，`temporal_order/before_after` 虽然在 Phase 58 中是强候选 subtype，但 `FIRST_EVENT` 读出器未达到 0.9 稳定门槛。因此本轮不做 patch / ablation / destroy-restore，而是先重构读出器：
+
+```text
+1. 比较多种 temporal_order 读出格式；
+2. 使用完整 candidate sequence logprob，而不是只看首 token；
+3. 平衡 before/after、A/B 反转、上下文模板；
+4. 为每个 reader 输出 overall accuracy、context accuracy、relation accuracy；
+5. 只有 reader 同时满足：
+   overall accuracy >= 0.90
+   min_context_accuracy >= 0.85
+   min_relation_accuracy >= 0.85
+   才允许进入后续机制闭包。
+```
+
+### 对用户分析的判断
+
+用户分析整体正确。关键正确点：
+
+```text
+1. Phase 59 是“读出器失败但路径定位有效”的阶段。
+2. relation subtype 有 random advantage，不等于读出器可靠。
+3. top path 集中在 last token，说明当前任务更像 output choice path，不是 temporal variable 本体。
+4. GSSC 必须加入 reader reliability，否则路径图谱无法进入机制闭包。
+5. 下一步应该先改 reader，而不是直接做 subspace patch。
+```
+
+需要强调：
+
+```text
+读出器是机制研究的地基。
+如果读出器不能稳定回答 before/after 或 first event，
+后续任何 patch 成功都可能只是输出偏置或模板偏置。
+```
+
+### 新增和修改脚本
+
+新增：
+
+```text
+tests/gpt5/phase60_temporal_order_reader_calibration.py
+tests/gpt5/run_phase60_temporal_order_reader_calibration_normal_all.sh
+tests/gpt5/phase60_temporal_order_reader_calibration_summary.py
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+脚本功能：
+
+```text
+1. 不注册 hook，不做内部状态捕获，只做读出器校准。
+2. 每个 case 生成 8 种 reader：
+   first_event_letter
+   first_event_event_label
+   json_first_event
+   order_pair
+   a_first_yesno
+   b_first_yesno
+   before_statement_yesno
+   after_statement_yesno
+
+3. 每个 reader 比较 correct completion 和 wrong completion 的完整序列 logprob。
+4. 输出 by_reader、by_context、by_relation、by_target_type。
+5. 支持 --case-offset / --case-count / --output-suffix，用于短分片恢复。
+6. sharded runner 默认每片 16 cases，每片完成后 hard-exit。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE60_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase60_temporal_order_reader_calibration.py qwen3 \
+  --output-dir results/gpt5_phase60_smoke \
+  --max-cases 8 \
+  --progress-every 4
+
+python tests/gpt5/phase60_temporal_order_reader_calibration_summary.py \
+  --input-dir results/gpt5_phase60_smoke \
+  --output-dir results/gpt5_phase60_smoke
+```
+
+结果：
+
+```text
+qwen3 smoke:
+  cases = 8
+  rows = 64
+  exit_code = 0
+```
+
+Smoke summary：
+
+```text
+after_statement_yesno:
+  accuracy = 0.8750
+  min_context_accuracy = 0.8750
+  min_relation_accuracy = 0.5000
+  pass = no
+
+first_event_event_label:
+  accuracy = 0.8750
+  min_context_accuracy = 0.8750
+  min_relation_accuracy = 0.5000
+  pass = no
+
+a_first_yesno:
+  accuracy = 0.7500
+  min_relation_accuracy = 0.0000
+
+b_first_yesno:
+  accuracy = 0.7500
+  min_relation_accuracy = 0.0000
+
+first_event_letter:
+  accuracy = 0.5000
+```
+
+客观现象：
+
+```text
+1. 脚本逻辑可以跑通。
+2. 小样本中某些 reader overall accuracy 看似较高。
+3. 但 min_relation_accuracy 很低，说明 reader 仍存在 relation type 偏置。
+4. 因此即使 smoke 中 accuracy=0.875，也不能进入闭包。
+```
+
+### 正式长会话测试尝试
+
+命令：
+
+```bash
+PHASE60_OUTPUT_DIR=results/gpt5_phase60_temporal_order_reader_calibration_full \
+PHASE60_MAX_CASES=384 \
+tests/gpt5/run_phase60_temporal_order_reader_calibration_normal_all.sh
+```
+
+目标规模：
+
+```text
+每模型 base cases = 384
+每 case readers = 8
+每 reader 两个 candidate sequence
+每模型 rows = 3072
+三模型 rows = 9216
+```
+
+实际结果：
+
+```text
+Qwen3 加载成功，flash_attention_2 不可用后自动降级到 sdpa。
+但在第一批 progress 输出前，进程进入 D-state。
+```
+
+进程状态：
+
+```text
+PID 41457:
+  python tests/gpt5/phase60_temporal_order_reader_calibration.py qwen3 ...
+  STAT = Dl
+
+PID 41559:
+  nvidia-smi
+  STAT = Ds
+```
+
+`kill -TERM` 和 `kill -KILL` 均无法清除该进程：
+
+```text
+41457 仍为 D-state
+41559 仍为 D-state
+```
+
+`dmesg -T` 当前用户无权限读取：
+
+```text
+dmesg: read kernel buffer failed: Operation not permitted
+```
+
+输出文件：
+
+```text
+results/gpt5_phase60_temporal_order_reader_calibration_full/
+```
+
+没有生成正式模型结果文件，说明长会话卡在第一批样本之前。因此本轮不能给出三模型全量 reader 结论。
+
+### 工程判断
+
+本轮最重要的工程结论：
+
+```text
+即使不注册 hook、不做 patch、不做内部状态捕获，
+384 cases 单进程 CUDA 长会话仍可能触发 D-state 卡死。
+```
+
+这说明问题不一定来自 hook 或 patch，也不一定来自机制实验本身，而可能来自：
+
+```text
+1. 长时间连续 CUDA forward；
+2. NVML / nvidia-smi 与 CUDA 运行的交互；
+3. driver / kernel / display GPU 组合；
+4. 模型加载后的某些 CUDA 调用；
+5. 单进程长 session 的资源状态。
+```
+
+因此，后续不能再使用单进程长会话作为默认全量方案。
+
+### 已完成的修正
+
+为恢复后继续测试，已经把 Phase60 改为短分片：
+
+```text
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+默认设置：
+
+```text
+PHASE60_MAX_CASES = 384
+PHASE60_SHARD_CASES = 16
+每个 shard:
+  独立加载模型
+  独立运行 16 cases
+  独立保存 shard JSON
+  --hard-exit-after-model
+
+summary 脚本会自动合并：
+  *_shard0000.json
+  *_shard0001.json
+  ...
+```
+
+恢复后推荐命令：
+
+```bash
+PHASE60_OUTPUT_DIR=results/gpt5_phase60_temporal_order_reader_calibration_sharded_full \
+PHASE60_MAX_CASES=384 \
+PHASE60_SHARD_CASES=16 \
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+### 当前结论
+
+本轮不能给出 temporal_order 读出器的三模型全量结论，只能给出两个可靠结论：
+
+```text
+1. Phase60 reader calibration 脚本和 summary 脚本已经完成，并通过 Qwen3 smoke。
+2. 单进程 384 cases 长会话在 Qwen3 上触发 CUDA/NVML D-state 工程阻断。
+```
+
+因此，当前研究进展不是机制结果，而是实验系统校准：
+
+```text
+GSSC 不能只设计科学指标；
+还必须设计可恢复、短分片、可合并的工程结构。
+```
+
+### 硬伤
+
+```text
+1. 三模型正式 Phase60 未完成。
+2. 当前 D-state 进程未能被 kill 清除，需要系统/驱动恢复后继续。
+3. Qwen3 smoke 样本太少，只能验证脚本，不能验证 reader。
+4. Smoke 已显示 min_relation_accuracy 很低，reader 偏置仍然存在。
+5. 本轮没有 token path、patch、ablation 或 destroy-restore。
+```
+
+### 下一步计划
+
+Phase 60 需要在环境恢复后继续，但必须使用短分片：
+
+```text
+1. 先运行 sharded runner，每片 16 cases。
+2. 如果仍卡死，把 PHASE60_SHARD_CASES 降到 4 或 8。
+3. 禁止并发 nvidia-smi 监控。
+4. 每个模型、每个 shard 独立 hard-exit。
+5. 完成后合并 reader reliability matrix。
+```
+
+如果 Phase60 找到稳定 reader：
+
+```text
+进入 Phase61:
+  temporal_order token/path 复测；
+  区分 operator token、event label token、last token；
+  再考虑 token transplant。
+```
+
+如果 Phase60 仍找不到稳定 reader：
+
+```text
+暂时降低 temporal_order 优先级，
+转向 same_class/category_peer 或 quantifier/all_some，
+因为它们可能更容易构造稳定符号读出器。
+```
+
+阶段性大任务保持不变：
+
+```text
+全局语义语法契约图谱 =
+  relation subtype matrix
+  + random-control advantage
+  + reader reliability
+  + variable/token path
+  + causal closure status
+  + engineering recoverability
+```
+
+只有读出器和工程系统都稳定后，才应继续推进语言编码机制闭包。
+
+## Phase 61: Phase60a 短分片恢复尝试与最小 CUDA Smoke 阻断 [2026-06-02 19:18]
+
+### 任务目标
+
+用户要求继续完成 Phase 59 中未完成的测试，并结合最新分析继续推进全局语义语法契约图谱。
+
+根据 Phase 59 / Phase 60 的关系，本轮实际应补的是：
+
+```text
+Phase 60a:
+  用短分片完成 temporal_order/before_after reader calibration。
+
+原因：
+  Phase 59 已经完成 token/path 定位；
+  未完成的是 Phase 59 暴露出的 reader reliability 问题；
+  只有 reader 过门槛，才能继续 Phase61/62 的 token path 复测和 causal closure。
+```
+
+### 对用户分析的判断
+
+用户提供的分析正确。关键点：
+
+```text
+1. Phase 60 不是机制结论，而是实验地基校准。
+2. temporal_order/before_after 是强候选 subtype，但 reader 仍不稳定。
+3. 读出器不稳定时，不能进入 patch / ablation / destroy-restore。
+4. GSSC 必须包含 reader reliability 和 engineering recoverability。
+5. 长 CUDA session 不能作为默认全量方案，必须使用短分片、落盘、合并。
+```
+
+本轮继续沿用这个判断，不做新的理论外推。
+
+### 已完成的脚本修正
+
+根据 Phase 60 的长会话阻断，继续完善短分片能力。
+
+修改：
+
+```text
+tests/gpt5/phase60_temporal_order_reader_calibration.py
+```
+
+修正内容：
+
+```text
+1. 增加 --case-offset
+2. 增加 --case-count
+3. 增加 --output-suffix
+4. sequence_logprob 中 candidate token ids 保留在 CPU，
+   只把 input_ids 放到 GPU，减少不必要的 CUDA tensor .tolist() 同步。
+```
+
+修改：
+
+```text
+tests/gpt5/phase60_temporal_order_reader_calibration_summary.py
+```
+
+修正内容：
+
+```text
+1. 支持自动合并：
+   *_phase60_temporal_order_reader_calibration_shard*.json
+
+2. 如果没有单文件正式结果，会从 shard 文件重建：
+   rows
+   by_reader
+   by_context
+   by_relation
+   cross_model_readers
+```
+
+已存在短分片 runner：
+
+```text
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+设计：
+
+```text
+PHASE60_MAX_CASES = 384
+PHASE60_SHARD_CASES = 16
+每个 shard 独立加载模型、运行、保存、hard-exit。
+```
+
+### 短分片正式运行尝试
+
+命令：
+
+```bash
+PHASE60_OUTPUT_DIR=results/gpt5_phase60_temporal_order_reader_calibration_sharded_full \
+PHASE60_MAX_CASES=384 \
+PHASE60_SHARD_CASES=16 \
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+结果：
+
+```text
+qwen3 shard0000:
+  模型加载成功；
+  flash_attention_2 不可用，自动降级到 sdpa；
+  运行第一个 shard 时出现：
+    torch.AcceleratorError: CUDA error: unspecified launch failure
+```
+
+错误位置表面发生在：
+
+```text
+sequence_logprob -> wrong candidate logprob
+```
+
+但 CUDA 报错是异步的，因此不能判断真实错误发生点。
+
+该次失败后没有生成 shard 结果文件：
+
+```text
+results/gpt5_phase60_temporal_order_reader_calibration_sharded_full/
+  无正式 JSON 输出
+```
+
+### 最小 CUDA Smoke 尝试
+
+为了判断是否只是 shard 数据量太大，本轮进一步把测试缩到 1 case：
+
+```bash
+PHASE60_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase60_temporal_order_reader_calibration.py qwen3 \
+  --output-dir results/gpt5_phase60_smoke_after_fix \
+  --max-cases 1 \
+  --case-count 1 \
+  --progress-every 1 \
+  --output-suffix onecase
+```
+
+结果：
+
+```text
+只输出：
+  `torch_dtype` is deprecated! Use `dtype` instead!
+
+随后无进度输出。
+```
+
+进程状态：
+
+```text
+PID 9097:
+  python tests/gpt5/phase60_temporal_order_reader_calibration.py qwen3 ...
+  STAT = Dsl / Ds
+
+kill -TERM 无效；
+kill -KILL 无效。
+```
+
+因此：
+
+```text
+即使 1 case、无 hook、无 patch、无 nvidia-smi 并发，
+当前 CUDA 环境仍会进入 D-state。
+```
+
+### 当前客观结论
+
+本轮没有完成 Phase60a 三模型读出器全量校准，也不能继续 GLM4 / DS7B。
+
+可靠结论只有：
+
+```text
+1. Phase60a 的短分片与合并脚本已经完成。
+2. Qwen3 shard0000 在当前环境下触发 CUDA unspecified launch failure。
+3. 修正 CPU token ids 后，1 case 最小 CUDA smoke 仍进入 D-state。
+4. 当前问题已经不是数据量过大，也不是 hook / patch 造成。
+5. 当前 CUDA/驱动/系统状态不适合继续模型测试。
+```
+
+### 对当前研究计划的影响
+
+Phase 59 的科学结论仍然成立：
+
+```text
+temporal_order/before_after 是强候选 subtype；
+但 FIRST_EVENT reader 不稳定；
+top path 更像 output choice path；
+不能进入 closure。
+```
+
+Phase 60 / 61 的新增影响是：
+
+```text
+工程系统仍是当前瓶颈。
+在 CUDA 最小 smoke 无法完成前，
+继续设计更复杂机制测试没有意义。
+```
+
+因此当前不能把失败解释为：
+
+```text
+temporal_order reader 永久失败
+```
+
+只能解释为：
+
+```text
+当前环境未能完成 reader calibration。
+```
+
+### 硬伤
+
+```text
+1. Phase60a 未完成三模型测试。
+2. Qwen3 1 case smoke 也进入 D-state。
+3. 没有可用的全量 reader reliability matrix。
+4. 当前不能启动 GLM4 / DS7B，否则会污染环境和结果。
+5. 缺少 dmesg / kernel 日志权限，不能从本轮直接定位 Xid 或驱动错误。
+```
+
+### 下一步计划
+
+必须先恢复 CUDA 环境，再继续 Phase60a。
+
+恢复后执行顺序：
+
+```text
+1. 不运行 nvidia-smi 长监控。
+2. 先跑最小 1 case qwen3：
+   PHASE60_ATTN_IMPLEMENTATIONS=sdpa
+   max_cases=1
+   case_count=1
+
+3. 如果成功，再跑 shard_cases=4。
+4. 如果成功，再跑 shard_cases=8。
+5. 最后才跑 shard_cases=16。
+6. qwen3 完整后再跑 GLM4，再跑 DS7B。
+```
+
+推荐恢复后命令：
+
+```bash
+PHASE60_OUTPUT_DIR=results/gpt5_phase60_temporal_order_reader_calibration_sharded_full \
+PHASE60_MAX_CASES=384 \
+PHASE60_SHARD_CASES=4 \
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+如果 Phase60a 最终完成：
+
+```text
+1. 若 temporal_order reader 通过门槛：
+   进入 temporal_order token path 复测与 operator/output 分离。
+
+2. 若 temporal_order reader 不通过：
+   暂停 temporal_order 闭包；
+   转向 same_class/category_peer 或 quantifier/all_some reader calibration。
+```
+
+阶段性大任务不变：
+
+```text
+先建立可靠读出器层；
+再定位变量/token路径；
+再做 causality；
+最后做 destroy-restore。
+```
+
+目前最重要的原则：
+
+```text
+不要让工程不稳定伪装成机制负结果；
+也不要在读出器未完成时强行解释内部路径。
+```
+
+## Phase 62: Phase60a Temporal Order 全量短分片读出器校准完成 [2026-06-08 17:13]
+
+### 任务目标
+
+显卡问题恢复后，继续完成 Phase 59 暴露出的未完成任务：
+
+```text
+temporal_order/before_after reader reliability calibration
+```
+
+本轮使用 Phase 60 已经实现的短分片系统，完成三模型全量测试。
+
+### 运行环境
+
+```text
+date = 2026-06-08
+driver = 595.71.05
+CUDA shown by nvidia-smi = 13.2
+GPU = RTX 4090 D 24GB
+conda_env = openone-cu130-py312
+```
+
+运行前检查：
+
+```text
+nvidia-smi 正常返回；
+无 Phase59/60 残留模型进程；
+GPU 显存仅桌面占用。
+```
+
+### 测试命令
+
+```bash
+PHASE60_OUTPUT_DIR=results/gpt5_phase60_temporal_order_reader_calibration_sharded_full_20260608 \
+PHASE60_MAX_CASES=384 \
+PHASE60_SHARD_CASES=16 \
+SLEEP_AFTER_SHARD=1 \
+tests/gpt5/run_phase60_temporal_order_reader_calibration_sharded_normal_all.sh
+```
+
+运行策略：
+
+```text
+1. qwen3 -> glm4 -> deepseek7b 顺序执行。
+2. 每个模型 24 shards。
+3. 每个 shard = 16 base cases。
+4. 每个 shard 独立加载模型、保存 JSON、hard-exit。
+5. summary 脚本自动合并所有 shards。
+```
+
+注意：
+
+```text
+Qwen3 / GLM4:
+  flash_attention_2 未安装，自动降级到 sdpa。
+
+DeepSeek7B:
+  使用 eager；
+  仍有 Sliding Window Attention warning。
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase60_temporal_order_reader_calibration_sharded_full_20260608/
+  qwen3_phase60_temporal_order_reader_calibration_shard0000.json ... shard0023.json
+  glm4_phase60_temporal_order_reader_calibration_shard0000.json ... shard0023.json
+  deepseek7b_phase60_temporal_order_reader_calibration_shard0000.json ... shard0023.json
+  phase60_temporal_order_reader_calibration_summary.json
+  PHASE60_TEMPORAL_ORDER_READER_CALIBRATION_SUMMARY.md
+```
+
+数据规模：
+
+```text
+每模型:
+  cases = 384
+  rows = 3072
+
+三模型:
+  cases = 1152
+  rows = 9216
+
+shards:
+  qwen3 = 24/24
+  glm4 = 24/24
+  deepseek7b = 24/24
+```
+
+### Qwen3 结果
+
+```text
+best reader = json_first_event
+accuracy = 0.7578
+min_context_accuracy = 0.6562
+min_relation_accuracy = 0.4479
+pass = false
+```
+
+完整排名：
+
+```text
+json_first_event:
+  acc = 0.7578
+  min_ctx = 0.6562
+  min_rel = 0.4479
+
+a_first_yesno:
+  acc = 0.7448
+  min_ctx = 0.6771
+  min_rel = 0.0833
+
+first_event_event_label:
+  acc = 0.7109
+  min_ctx = 0.6146
+  min_rel = 0.2708
+
+after_statement_yesno:
+  acc = 0.6536
+  min_ctx = 0.5104
+  min_rel = 0.4167
+
+before_statement_yesno:
+  acc = 0.6354
+  min_ctx = 0.5000
+  min_rel = 0.2708
+
+order_pair:
+  acc = 0.4974
+  min_rel = 0.0000
+```
+
+客观现象：
+
+```text
+Qwen3 有一定 temporal_order 读出信号，
+但所有 reader 都未达到闭包门槛。
+最好的 json_first_event 仍然存在明显 relation-type 失衡。
+```
+
+### GLM4 结果
+
+```text
+best reader = first_event_letter
+accuracy = 0.6068
+min_context_accuracy = 0.5208
+min_relation_accuracy = 0.2292
+pass = false
+```
+
+完整排名：
+
+```text
+first_event_letter:
+  acc = 0.6068
+  min_ctx = 0.5208
+  min_rel = 0.2292
+
+first_event_event_label:
+  acc = 0.5625
+  min_ctx = 0.4896
+  min_rel = 0.0417
+
+b_first_yesno:
+  acc = 0.5495
+  min_rel = 0.0104
+
+order_pair:
+  acc = 0.5469
+  min_rel = 0.0938
+
+json_first_event:
+  acc = 0.5286
+  min_rel = 0.2812
+
+yes/no statement readers:
+  acc ≈ 0.50
+  min_rel = 0
+```
+
+客观现象：
+
+```text
+GLM4 在当前 temporal_order symbolic reader 上基本不稳定。
+读出结果接近弱偏置而不是可靠时间顺序理解。
+```
+
+### DeepSeek7B 结果
+
+```text
+best reader = json_first_event
+accuracy = 0.5990
+min_context_accuracy = 0.5729
+min_relation_accuracy = 0.1354
+pass = false
+```
+
+完整排名：
+
+```text
+json_first_event:
+  acc = 0.5990
+  min_ctx = 0.5729
+  min_rel = 0.1354
+
+first_event_event_label:
+  acc = 0.5807
+  min_rel = 0.0521
+
+first_event_letter:
+  acc = 0.5573
+  min_rel = 0.0625
+
+order_pair:
+  acc = 0.5286
+  min_rel = 0.0104
+
+yes/no readers:
+  acc ≈ 0.50
+  min_rel = 0
+```
+
+客观现象：
+
+```text
+DeepSeek7B 的 temporal_order reader 仍然较弱，
+和 Phase59 中 FIRST_EVENT accuracy = 0.6562 的现象一致。
+本轮因为 eager + sliding-window warning，仍需谨慎解释。
+```
+
+### Cross Model 结果
+
+没有任何 reader 跨模型通过门槛。
+
+跨模型最好项：
+
+```text
+json_first_event:
+  mean_acc = 0.6285
+  min_acc = 0.5286
+  min_ctx = 0.4896
+  min_rel = 0.1354
+  all_pass = false
+
+first_event_event_label:
+  mean_acc = 0.6181
+  min_acc = 0.5625
+  min_rel = 0.0417
+  all_pass = false
+```
+
+### 当前结论
+
+Phase60a 给出明确负结果：
+
+```text
+当前 8 种 temporal_order reader 均不可靠。
+```
+
+这不是 temporal_order 机制不存在，而是说明：
+
+```text
+1. 当前 prompt / candidate 格式不能稳定读出时间顺序变量；
+2. Phase59 的 last-token top path 更可能是 output choice path；
+3. temporal_order/before_after 暂时不能进入 patch / ablation / destroy-restore；
+4. GSSC 必须记录 reader failure，而不是只记录 Phase58 的 random advantage。
+```
+
+### 对 Phase59 的补完
+
+Phase59 中未完成的问题是：
+
+```text
+temporal_order 是否有可靠 reader？
+```
+
+本轮回答：
+
+```text
+在当前 8 类 reader、384 cases、三模型测试下，没有。
+```
+
+因此 Phase59 后续不能继续走：
+
+```text
+temporal_order token path -> subspace patch -> destroy-restore
+```
+
+而应转向：
+
+```text
+寻找更稳定的 relation subtype reader。
+```
+
+### 硬伤
+
+```text
+1. 本轮只测 reader，不测内部路径。
+2. temporal_order 的 prompt 仍可能不适合这些模型。
+3. DeepSeek7B 使用 eager 且 sliding-window warning。
+4. 读出失败不能证明模型没有 temporal_order 表征。
+5. 但读出失败足以阻止机制闭包。
+```
+
+### 下一步计划
+
+根据 Phase58 的候选排序和 Phase60a 的失败结果，下一步转向：
+
+```text
+Phase63: same_class/category_peer reader calibration
+```
+
+原因：
+
+```text
+1. same_class/category_peer 在 Qwen3 中强；
+2. GLM4 中等；
+3. 关系变量比 temporal_order 更容易构造稳定读出器；
+4. 可用显式 fact table 降低世界知识干扰。
+```
+
+Phase63 设计原则：
+
+```text
+1. 使用符号对象和显式类别事实：
+   Object A belongs to category K1.
+   Object B belongs to category K1.
+   Object C belongs to category K2.
+
+2. 查询：
+   Which object is in the same category as A?
+   B or C
+
+3. 平衡：
+   A/B/C 顺序；
+   正确候选位置；
+   category label；
+   context template；
+   answer format。
+
+4. 门槛不变：
+   overall >= 0.90
+   min_context >= 0.85
+   min_relation/candidate-position >= 0.85
+```
+
+如果 same_class reader 通过：
+
+```text
+进入 same_class token path 和 subspace closure。
+```
+
+如果 same_class 也失败：
+
+```text
+转向 quantifier/all_some 或 object-attribute binding，
+但必须先过 reader calibration。
+```
+## Phase 63: Same-Class 符号关系读出器全量校准 [2026-06-08 17:31]
+
+### 任务目标
+
+Phase 60/62 的 temporal_order（时间顺序）读出器全量校准没有任何三模型通用读出器通过门槛，因此不能进入 temporal_order 的 patch/closure（干预/闭包）实验。
+
+本轮继续全局关系路径图谱路线，但换成相对更简单的对象类别关系：
+
+```text
+same_class / different_class
+```
+
+目标不是直接做机制结论，而是先验证：
+
+```text
+模型是否能稳定读出：
+Object B 和 Object C 中，谁与 Object A 属于同一类别？
+或者谁与 Object A 属于不同类别？
+```
+
+如果读出器不稳定，后续 token path、state transplant、destroy-restore 都不能解释为对象-属性 binding 机制证据。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase63_same_class_reader_calibration.py
+tests/gpt5/phase63_same_class_reader_calibration_summary.py
+tests/gpt5/run_phase63_same_class_reader_calibration_sharded_normal_all.sh
+```
+
+脚本设计：
+
+```text
+1. 使用符号化 fact table，不依赖真实世界常识。
+2. 每个 case 中包含 Object A/B/C 的 category。
+3. 两种关系变体：
+   - B_same: B 与 A 同类，C 不同类
+   - C_same: C 与 A 同类，B 不同类
+4. 四种上下文风格：
+   - table
+   - sentences
+   - compact
+   - record
+5. 8 个 reader：
+   - same_letter
+   - different_letter
+   - json_same
+   - same_object_label
+   - b_same_yesno
+   - c_same_yesno
+   - b_statement_true
+   - c_statement_true
+6. pass gate:
+   - overall accuracy >= 0.90
+   - min_context_accuracy >= 0.85
+   - min_variant_accuracy >= 0.85
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+PHASE63_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase63_same_class_reader_calibration.py qwen3 \
+  --output-dir results/gpt5_phase63_smoke \
+  --max-cases 8 \
+  --case-count 8 \
+  --progress-every 4 \
+  --output-suffix smoke
+```
+
+全量短分片：
+
+```bash
+PHASE63_OUTPUT_DIR=results/gpt5_phase63_same_class_reader_calibration_sharded_full_20260608 \
+PHASE63_MAX_CASES=384 \
+PHASE63_SHARD_CASES=16 \
+SLEEP_AFTER_SHARD=1 \
+tests/gpt5/run_phase63_same_class_reader_calibration_sharded_normal_all.sh
+```
+
+运行方式：
+
+```text
+qwen3 -> glm4 -> deepseek7b 顺序运行；
+每个模型 24 shard；
+每个 shard 16 cases；
+每个 shard 使用 --hard-exit-after-model；
+一个 shard 完成后退出 Python 进程，再加载下一个 shard；
+避免长 CUDA session 和模型残留显存。
+```
+
+### 工程结果
+
+输出目录：
+
+```text
+results/gpt5_phase63_same_class_reader_calibration_sharded_full_20260608
+```
+
+汇总文件：
+
+```text
+results/gpt5_phase63_same_class_reader_calibration_sharded_full_20260608/phase63_same_class_reader_calibration_summary.json
+results/gpt5_phase63_same_class_reader_calibration_sharded_full_20260608/PHASE63_SAME_CLASS_READER_CALIBRATION_SUMMARY.md
+```
+
+完成情况：
+
+```text
+qwen3:      24/24 shards completed
+glm4:       24/24 shards completed
+deepseek7b: 24/24 shards completed
+```
+
+说明：
+
+```text
+GLM4 在 shard0001 第一次运行时出现一次用户态 segfault 139；
+没有进入 D-state，没有发现 GPU reset 阻断；
+resume 后跳过已完成 qwen3 和 glm4 shard0000，从 glm4 shard0001 继续，最终完成全部 shard。
+```
+
+### 数据规模
+
+```text
+qwen3:
+  cases = 384
+  rows = 3072
+
+glm4:
+  cases = 384
+  rows = 3072
+
+deepseek7b:
+  cases = 384
+  rows = 3072
+
+total:
+  cases = 1152
+  rows = 9216
+```
+
+### Qwen3 结果
+
+最佳 reader：
+
+```text
+reader = different_letter
+accuracy = 0.9896
+min_context_accuracy = 0.9583
+min_variant_accuracy = 0.9792
+mean_margin = 2.5648
+passes_gate = yes
+```
+
+其他 reader：
+
+```text
+b_statement_true:
+  accuracy = 0.9271
+  min_context_accuracy = 0.7083
+  min_variant_accuracy = 0.9010
+  pass = no
+
+c_statement_true:
+  accuracy = 0.9010
+  min_context_accuracy = 0.7396
+  min_variant_accuracy = 0.8021
+  pass = no
+
+same_letter:
+  accuracy = 0.8802
+  min_context_accuracy = 0.5208
+  min_variant_accuracy = 0.7865
+  pass = no
+```
+
+客观现象：
+
+```text
+Qwen3 可以稳定回答“哪个对象与 A 不同类”，different_letter 通过全部门槛。
+但 same_letter 没有通过，说明“同类对象”自然读出和“不同对象”读出并不对称。
+```
+
+### GLM4 结果
+
+最佳 reader：
+
+```text
+reader = json_same
+accuracy = 0.8099
+min_context_accuracy = 0.5729
+min_variant_accuracy = 0.6979
+mean_margin = 1.1681
+passes_gate = no
+```
+
+其他 reader：
+
+```text
+c_statement_true:
+  accuracy = 0.7057
+  min_context_accuracy = 0.5208
+  min_variant_accuracy = 0.4792
+  pass = no
+
+same_object_label:
+  accuracy = 0.6510
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.3021
+  pass = no
+```
+
+客观现象：
+
+```text
+GLM4 在 same-class 符号读出上有一定信号，但上下文和 B/C 变体稳定性不足。
+当前不能把 GLM4 的 same_class 读出结果作为干预闭包读出器。
+```
+
+### DeepSeek7B 结果
+
+最佳 reader：
+
+```text
+reader = c_same_yesno
+accuracy = 0.7552
+min_context_accuracy = 0.5521
+min_variant_accuracy = 0.5938
+mean_margin = 0.5418
+passes_gate = no
+```
+
+其他 reader：
+
+```text
+b_same_yesno:
+  accuracy = 0.7266
+  min_context_accuracy = 0.5312
+  min_variant_accuracy = 0.5365
+  pass = no
+
+b_statement_true:
+  accuracy = 0.6536
+  min_context_accuracy = 0.5208
+  min_variant_accuracy = 0.4427
+  pass = no
+```
+
+客观现象：
+
+```text
+DeepSeek7B 没有稳定 same_class reader。
+虽然 yes/no 形式有一定总体准确率，但 min_context 和 min_variant 均远低于门槛。
+```
+
+### 跨模型结果
+
+跨模型最佳 reader：
+
+```text
+reader = c_statement_true
+mean_accuracy = 0.7535
+min_accuracy = 0.6536
+min_context_accuracy = 0.5104
+min_variant_accuracy = 0.4062
+all_pass = no
+```
+
+结论：
+
+```text
+没有任何 same_class reader 在三模型上同时通过。
+```
+
+### 与 Phase62 的关系
+
+Phase62 temporal_order 结论：
+
+```text
+三模型没有任何 temporal_order reader 通过；
+不能进入 temporal_order closure。
+```
+
+Phase63 same_class 结论：
+
+```text
+Qwen3 的 different_letter reader 通过；
+GLM4 和 DeepSeek7B 没有 reader 通过；
+三模型通用 reader 没有通过。
+```
+
+这说明：
+
+```text
+1. same_class/different_class 比 temporal_order 更容易读出；
+2. 但读出器仍然强烈依赖模型和问题形式；
+3. 不能假设“一个符号读出模板可以跨模型、跨关系稳定工作”。
+```
+
+### 当前研究判断
+
+这轮结果支持一个更严格的测试原则：
+
+```text
+关系机制实验必须先校准读出器；
+读出器必须按模型、关系类型、输出形式分别过门槛；
+没有稳定读出器时，patch/probe/closure 都不能解释为机制证据。
+```
+
+对语言编码机制的意义：
+
+```text
+same_class 不是单纯对象属性表读取。
+模型对“相同”和“不同”的输出偏好并不对称；
+Qwen3 对 different-object 读出极稳，而 GLM4/DS7B 仍受上下文形式和候选变体影响。
+这说明关系编码的读出端本身就是机制的一部分，而不是一个可忽略的测量工具。
+```
+
+### 硬伤
+
+1. 这仍是 reader calibration，不是 path localization，也不是因果闭包。
+2. 384 cases 中包含 trial repeat，虽然上下文和类别组合覆盖较大，但独立结构仍有限。
+3. Qwen3 通过的是 different_letter，而不是 same_letter；后续如果研究 same_class binding，要谨慎区分“同类读出”和“异类排除”。
+4. GLM4 与 DeepSeek7B 没有可靠 reader，因此不能直接进入三模型同构机制比较。
+5. GLM4 曾出现一次用户态 segfault，虽然 resume 后完成，但长时间多 shard 仍需要保留 checkpoint/resume 结构。
+
+### 下一步计划
+
+下一阶段不应直接对三模型做 same_class patch，而应分两条线推进：
+
+```text
+Phase64a: Qwen3 different-class path localization
+  使用已经通过门槛的 different_letter reader；
+  定位 Qwen3 中 different_class 的 layer/token/module 路径；
+  先确认它是对象-属性比较路径，还是输出排除路径。
+
+Phase64b: GLM4/DeepSeek7B reader 改写
+  针对 GLM4/DS7B 设计更强符号读出器；
+  避免 yes/no 和 B/C 单侧偏置；
+  尝试 forced-choice JSON、label-only、verifier-style 多步格式；
+  只有 reader 过门槛后再进入 path/closure。
+```
+
+更大的阶段任务：
+
+```text
+1. 建立关系读出器库：
+   same_class / different_class / object_attribute / temporal_order / causal_order / role_binding。
+
+2. 每个关系先通过 reader gate：
+   overall >= 0.90；
+   min_context >= 0.85；
+   min_variant >= 0.85。
+
+3. 通过 gate 的关系才进入：
+   token path localization；
+   state transplant；
+   subspace destroy-restore；
+   cross-model comparison。
+```
+
+### 当前结论
+
+Phase63 完成了 same_class/different_class 的三模型全量短分片读出器校准。
+
+最可靠的客观发现是：
+
+```text
+Qwen3 能稳定读出“哪个对象与 A 不同类”；
+GLM4 和 DeepSeek7B 当前没有稳定 same_class/different_class reader；
+三模型没有通用读出器通过。
+```
+
+所以，当前不能说已经找到对象-属性 binding 机制。
+
+更稳的说法是：
+
+```text
+对象-属性关系机制研究进入了读出器分化阶段；
+Qwen3 可以先进入 different_class 路径定位；
+GLM4/DS7B 必须先继续读出器校准。
+```
+## Phase 64: Same-Class 读出器改写复验与接口偏置确认 [2026-06-08 17:53]
+
+### 任务目标
+
+Phase63 中：
+
+```text
+Qwen3:
+  different_letter 通过 reader gate；
+
+GLM4 / DeepSeek7B:
+  没有 same_class/different_class reader 通过；
+
+三模型：
+  没有通用 reader 通过。
+```
+
+本轮继续 reader calibration，而不是进入 patch/closure。
+
+核心问题：
+
+```text
+GLM4 和 DeepSeek7B 没有过门槛，
+到底是因为上一轮自然语言模板不合适，
+还是因为当前 B/C 二选一读出接口本身不稳定？
+```
+
+因此本轮设计改写版 reader：
+
+```text
+1. 减少自然语言；
+2. 使用 A_CAT/B_CAT/C_CAT 字段；
+3. 加入 CSV / JSON / equation / key-value 上下文；
+4. 保留 Phase63 中 Qwen3 表现最好的自然 forced-choice reader 作为对照；
+5. 继续用三模型全量短分片。
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase64_same_class_reader_refine.py
+tests/gpt5/phase64_same_class_reader_refine_summary.py
+tests/gpt5/run_phase64_same_class_reader_refine_sharded_normal_all.sh
+```
+
+reader 类型：
+
+```text
+same_key_letter
+same_key_space
+same_json_min
+same_option_line
+same_natural_control
+same_compare_values
+
+different_key_letter
+different_key_space
+different_json_min
+different_option_line
+different_natural_control
+different_compare_values
+
+b_eq_a_binary
+c_eq_a_binary
+```
+
+上下文类型：
+
+```text
+key_value:
+  A_CAT=K0
+  B_CAT=K0
+  C_CAT=K1
+
+csv:
+  object,cat
+  A,K0
+  B,K0
+  C,K1
+
+json:
+  {"A_CAT":"K0","B_CAT":"K0","C_CAT":"K1"}
+
+equation:
+  cat(A)=K0; cat(B)=K0; cat(C)=K1.
+```
+
+pass gate 保持不变：
+
+```text
+overall accuracy >= 0.90
+min_context_accuracy >= 0.85
+min_variant_accuracy >= 0.85
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+PHASE64_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase64_same_class_reader_refine.py qwen3 \
+  --output-dir results/gpt5_phase64_smoke \
+  --max-cases 16 \
+  --case-count 16 \
+  --progress-every 8 \
+  --output-suffix smoke \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+PHASE64_OUTPUT_DIR=results/gpt5_phase64_same_class_reader_refine_sharded_full_20260608 \
+PHASE64_MAX_CASES=384 \
+PHASE64_SHARD_CASES=16 \
+SLEEP_AFTER_SHARD=1 \
+tests/gpt5/run_phase64_same_class_reader_refine_sharded_normal_all.sh
+```
+
+运行方式：
+
+```text
+qwen3 -> glm4 -> deepseek7b 顺序运行；
+每模型 24 shard；
+每 shard 16 cases；
+每 shard 使用 --hard-exit-after-model；
+完成一个 shard 后退出 Python 进程，释放模型和显存；
+再运行下一个 shard。
+```
+
+### 工程结果
+
+输出目录：
+
+```text
+results/gpt5_phase64_same_class_reader_refine_sharded_full_20260608
+```
+
+汇总文件：
+
+```text
+results/gpt5_phase64_same_class_reader_refine_sharded_full_20260608/phase64_same_class_reader_refine_summary.json
+results/gpt5_phase64_same_class_reader_refine_sharded_full_20260608/PHASE64_SAME_CLASS_READER_REFINE_SUMMARY.md
+```
+
+完成情况：
+
+```text
+qwen3:      24/24 shards completed
+glm4:       24/24 shards completed
+deepseek7b: 24/24 shards completed
+```
+
+数据规模：
+
+```text
+qwen3:
+  cases = 384
+  rows = 5376
+
+glm4:
+  cases = 384
+  rows = 5376
+
+deepseek7b:
+  cases = 384
+  rows = 5376
+
+total:
+  cases = 1152
+  rows = 16128
+```
+
+工程状态：
+
+```text
+全量运行完成；
+没有出现系统卡死；
+没有出现 GPU reset；
+运行结束后显存约 438 MiB / 24564 MiB；
+短分片 + --hard-exit-after-model 继续有效。
+```
+
+说明：
+
+```text
+本机没有 flash_attn 包；
+qwen3/glm4 尝试 flash_attention_2 后回退到 sdpa；
+deepseek7b 使用 eager，并出现 Sliding Window Attention warning；
+这是模型实现路径差异，不改变本轮 reader calibration 的指标解释。
+```
+
+### Qwen3 结果
+
+通过 reader：
+
+```text
+reader = different_natural_control
+accuracy = 0.9766
+min_context_accuracy = 0.9583
+min_variant_accuracy = 0.9635
+mean_margin = 1.0465
+passes_gate = yes
+```
+
+未通过 reader：
+
+```text
+same_compare_values:
+  accuracy = 0.6823
+  min_context_accuracy = 0.4792
+  min_variant_accuracy = 0.6042
+  pass = no
+
+b_eq_a_binary:
+  accuracy = 0.6719
+  min_context_accuracy = 0.5625
+  min_variant_accuracy = 0.3438
+  pass = no
+
+same_natural_control:
+  accuracy = 0.6641
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.3281
+  pass = no
+```
+
+客观现象：
+
+```text
+Qwen3 的 different-class 自然 forced-choice 读出稳定通过；
+但 same-class 读出仍然明显不稳；
+字段化/JSON/二元等式模板没有改善 same-class。
+```
+
+与 Phase63 一致：
+
+```text
+Qwen3 对“哪个对象与 A 不同类”的读出稳定；
+但“哪个对象与 A 同类”的读出不对称地弱。
+```
+
+### GLM4 结果
+
+最佳 reader：
+
+```text
+reader = same_compare_values
+accuracy = 0.6198
+min_context_accuracy = 0.5000
+min_variant_accuracy = 0.2760
+mean_margin = 0.2995
+passes_gate = no
+```
+
+其他 reader：
+
+```text
+c_eq_a_binary:
+  accuracy = 0.5781
+  min_context_accuracy = 0.4375
+  min_variant_accuracy = 0.4271
+  pass = no
+
+same_option_line:
+  accuracy = 0.5417
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.0885
+  pass = no
+
+b_eq_a_binary:
+  accuracy = 0.5365
+  min_context_accuracy = 0.4896
+  min_variant_accuracy = 0.0990
+  pass = no
+```
+
+客观现象：
+
+```text
+GLM4 没有任何 reader 接近 pass gate。
+改写为字段比较、JSON、equation 后没有改善；
+相反，Phase63 中 json_same 还能达到 0.8099，本轮最佳只有 0.6198。
+```
+
+解释限制：
+
+```text
+这不能说明 GLM4 没有对象-属性关系编码；
+只能说明当前 B/C forced-choice 读出接口对 GLM4 不可靠。
+```
+
+### DeepSeek7B 结果
+
+最佳 reader：
+
+```text
+reader = b_eq_a_binary
+accuracy = 0.5885
+min_context_accuracy = 0.5000
+min_variant_accuracy = 0.2188
+mean_margin = 0.2795
+passes_gate = no
+```
+
+其他 reader：
+
+```text
+same_compare_values:
+  accuracy = 0.5339
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.1042
+  pass = no
+
+different_option_line:
+  accuracy = 0.5156
+  min_context_accuracy = 0.4583
+  min_variant_accuracy = 0.1094
+  pass = no
+
+c_eq_a_binary:
+  accuracy = 0.5130
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.0729
+  pass = no
+```
+
+客观现象：
+
+```text
+DeepSeek7B 的改写版 reader 全部失败；
+个别 shard 中 b_eq_a_binary 可达到 1.0，但全量后不稳定；
+这说明局部高分更可能是 label/case 适配，不是稳定关系读出器。
+```
+
+### 跨模型结果
+
+跨模型最佳 reader：
+
+```text
+reader = b_eq_a_binary
+mean_accuracy = 0.5990
+min_accuracy = 0.5365
+min_context_accuracy = 0.4896
+min_variant_accuracy = 0.0990
+all_pass = no
+```
+
+其他：
+
+```text
+same_compare_values:
+  mean_accuracy = 0.6120
+  min_accuracy = 0.5339
+  min_context_accuracy = 0.4792
+  min_variant_accuracy = 0.1042
+  all_pass = no
+
+different_natural_control:
+  mean_accuracy = 0.6589
+  min_accuracy = 0.5000
+  min_context_accuracy = 0.5000
+  min_variant_accuracy = 0.0000
+  all_pass = no
+```
+
+结论：
+
+```text
+没有任何 Phase64 reader 在三模型上同时通过。
+```
+
+### 与 Phase63 对比
+
+Phase63：
+
+```text
+Qwen3:
+  different_letter pass
+  accuracy = 0.9896
+
+GLM4:
+  best json_same accuracy = 0.8099
+  pass = no
+
+DeepSeek7B:
+  best c_same_yesno accuracy = 0.7552
+  pass = no
+```
+
+Phase64：
+
+```text
+Qwen3:
+  different_natural_control pass
+  accuracy = 0.9766
+
+GLM4:
+  best same_compare_values accuracy = 0.6198
+  pass = no
+
+DeepSeek7B:
+  best b_eq_a_binary accuracy = 0.5885
+  pass = no
+```
+
+主要变化：
+
+```text
+1. Qwen3 different-class 结果稳定复现。
+2. GLM4/DS7B 没有因为字段化、JSON、equation、binary equality 而改善。
+3. 过度符号化模板反而降低了 GLM4/DS7B 的读出稳定性。
+```
+
+### 当前研究判断
+
+这轮最重要的结论不是“找到更好的 reader”，而是：
+
+```text
+关系读出接口本身是模型特异的；
+同一个符号关系在 Qwen3、GLM4、DS7B 上不能直接共享同一种读出器；
+过度符号化不一定更干净，可能反而偏离模型自然输出接口。
+```
+
+对相对编码的意义：
+
+```text
+对象-属性 binding 不能只看单一路径；
+读出端、输出格式、候选偏置、上下文格式都是相对编码系统的一部分；
+关系机制必须放进全局路径比较中，而不是拿一个 reader 当固定观察窗。
+```
+
+### 硬伤
+
+1. Phase64 仍是 reader calibration，不是因果机制测试。
+2. Qwen3 通过的是 different-class reader，不是 same-class reader。
+3. GLM4/DeepSeek7B 没有可用 reader，因此不能进入同类关系的三模型闭包比较。
+4. 字段化模板失败不能证明模型没有内部关系表示，只能证明当前输出接口不可靠。
+5. DeepSeek7B 使用 eager 路径并有 sliding-window warning，因此 DS7B 数值结果仍需谨慎和稳定 reader 复核。
+
+### 下一步计划
+
+下一步不能直接做三模型 same_class patch。
+
+建议拆成三个阶段：
+
+```text
+Phase65a: Qwen3 different-class token path localization
+  使用通过门槛的 different_natural_control reader；
+  定位 layer/token/module 路径；
+  判断 different-class 是对象-属性比较，还是输出排除路径。
+
+Phase65b: GLM4/DS7B 读出协议重建
+  不继续只做 B/C 二选一；
+  尝试完整答案序列评分：
+    "A same as B; A different from C"
+    vs
+    "A same as C; A different from B"
+  尝试 few-shot 格式；
+  尝试让模型生成完整 relation table，再评分整段 logprob。
+
+Phase65c: 全局关系读出器矩阵
+  对 temporal_order / same_class / different_class / object_attribute / role_binding
+  统一记录：
+    reader_type
+    model
+    context_format
+    variant_stability
+    label_bias
+    pass_gate
+```
+
+### 第一性原则修正
+
+本轮进一步说明：
+
+```text
+破解语言编码机制不能把“读出器”当作外部透明测量工具。
+读出器本身也是模型计算闭环的一部分。
+```
+
+更基础的表达是：
+
+```text
+语言关系编码 = 内部关系状态 + 输出接口 + 候选竞争 + 任务格式。
+```
+
+所以后续图谱必须同时记录：
+
+```text
+1. 关系内部路径；
+2. 读出器路径；
+3. 候选输出路径；
+4. 三者之间是否可自然接上。
+```
+
+否则会把“读出器失败”误判为“内部机制不存在”，或者把“读出器偏置”误判为“机制成功”。
+
+### 当前结论
+
+Phase64 完成了三模型 same_class/different_class 改写读出器全量复验。
+
+最可靠事实：
+
+```text
+Qwen3 的 different-class 自然 forced-choice reader 稳定通过；
+Qwen3 的 same-class reader 不稳定；
+GLM4 和 DeepSeek7B 在本轮所有改写 reader 中均未通过；
+没有三模型通用 reader。
+```
+
+因此当前不能进入三模型对象-属性 binding 闭包。
+
+可以进入的是：
+
+```text
+Qwen3 different-class 路径定位。
+```
+
+必须继续校准的是：
+
+```text
+GLM4 / DeepSeek7B 的关系读出协议。
+```
+## Phase 65: 对象-属性兼容性梯度分解全量测试 [2026-06-08 18:29]
+
+### 任务目标
+
+根据 GLM5 memo 最新 Phase 396/396b 的结论，继续完成对象-属性 binding 的全量复验。
+
+核心问题：
+
+```text
+对象-属性兼容性是否存在稳定方向？
+这个方向是纯 compatibility gradient，
+还是 value bias 与上下文值 token 交互后的结果？
+```
+
+本轮不再只看类别平均方向，而是做：
+
+```text
+1. per-object 分对象方向；
+2. correct / incorrect / neutral 三条件；
+3. 多层追踪；
+4. L1_category / L2_crossfit / OBJ_crossfit 三种方向；
+5. 三模型完整测试。
+```
+
+关键判据：
+
+```text
+FULL_SYMMETRIC:
+  correct prompt 下 IDEAL(T↑ C↓)
+  incorrect prompt 下仍 IDEAL(T↑ C↓)
+
+neutral_ideal:
+  neutral prompt 下也 IDEAL
+
+如果 FULL 多但 neutral_ideal 也多：
+  说明可能混入 value preference / output bias
+
+如果 FULL 多且 neutral_ideal 少：
+  更接近上下文依赖的兼容性交互机制
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase65_object_attribute_compat_decomposition.py
+tests/gpt5/phase65_object_attribute_compat_summary.py
+tests/gpt5/run_phase65_object_attribute_compat_full.sh
+```
+
+数据：
+
+```text
+3 categories:
+  color
+  size
+  moisture
+
+每类 6 objects；
+每 object 2 value pairs；
+每 pair 4 frames；
+total pairs/model = 144
+```
+
+方向：
+
+```text
+L1:
+  mu + category_centroid
+
+L2_cf:
+  mu + category_centroid + leave-one-pair-out object-category residual
+
+OBJ_cf:
+  leave-one-pair-out object-category residual only
+```
+
+prompt 条件：
+
+```text
+correct:
+  clean:   The elephant is big.
+  corrupt: The item is big.
+
+incorrect:
+  clean:   The elephant is small.
+  corrupt: The item is small.
+
+neutral:
+  clean:   The elephant is
+  corrupt: The item is
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+PHASE65_ATTN_IMPLEMENTATIONS=sdpa \
+python tests/gpt5/phase65_object_attribute_compat_decomposition.py qwen3 \
+  --layers 4 \
+  --output-dir results/gpt5_phase65_smoke \
+  --max-pairs 12 \
+  --progress-every 6 \
+  --output-suffix smoke \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+PHASE65_OUTPUT_DIR=results/gpt5_phase65_object_attribute_compat_full_20260608_1818 \
+SLEEP_AFTER_MODEL=3 \
+tests/gpt5/run_phase65_object_attribute_compat_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+测试层：
+
+```text
+qwen3:
+  L4, L8, L12, L16, L20
+
+glm4:
+  L4, L10, L20, L30
+
+deepseek7b:
+  L4, L8, L12, L16, L20
+```
+
+每个模型运行完使用：
+
+```text
+--hard-exit-after-model
+```
+
+### 工程结果
+
+输出目录：
+
+```text
+results/gpt5_phase65_object_attribute_compat_full_20260608_1818
+```
+
+汇总文件：
+
+```text
+results/gpt5_phase65_object_attribute_compat_full_20260608_1818/phase65_object_attribute_compat_summary.json
+results/gpt5_phase65_object_attribute_compat_full_20260608_1818/PHASE65_OBJECT_ATTRIBUTE_COMPAT_SUMMARY.md
+```
+
+运行状态：
+
+```text
+三模型全部完成；
+没有系统卡死；
+没有 GPU reset；
+运行结束后显存约 680 MiB / 24564 MiB；
+```
+
+### Qwen3 结果
+
+```text
+Layer | FULL | neutral_ideal | clean_margin(FULL-neutral)
+L4    | 3    | 3             | 0
+L8    | 2    | 3             | -1
+L12   | 1    | 3             | -2
+L16   | 2    | 3             | -1
+L20   | 0    | 1             | -1
+```
+
+方向分解：
+
+```text
+L4:
+  L1_FULL = 1
+  L2cf_FULL = 1
+  OBJcf_FULL = 1
+
+L8:
+  OBJcf_FULL = 2
+
+L12:
+  OBJcf_FULL = 1
+
+L16:
+  OBJcf_FULL = 2
+```
+
+分类别：
+
+```text
+size:
+  全部 NO
+
+color:
+  少量 FULL，主要在 OBJ_cf
+
+moisture:
+  少量 FULL / HALF，主要在 OBJ_cf 或 L2_cf
+```
+
+客观现象：
+
+```text
+Qwen3 的 FULL 数量很少；
+neutral_ideal 与 FULL 同量甚至更多；
+因此 Qwen3 当前不能作为干净兼容性梯度证据。
+```
+
+更谨慎解释：
+
+```text
+Qwen3 早层存在一些对象-属性方向效果，
+但它们很可能混入 value bias / neutral 输出偏好。
+```
+
+### GLM4 结果
+
+```text
+Layer | FULL | neutral_ideal | clean_margin(FULL-neutral)
+L4    | 0    | 0             | 0
+L10   | 3    | 0             | 3
+L20   | 1    | 1             | 0
+L30   | 2    | 1             | 1
+```
+
+方向分解：
+
+```text
+L10:
+  L1_FULL = 2
+  L2cf_FULL = 1
+  OBJcf_FULL = 0
+
+L20:
+  OBJcf_FULL = 1
+
+L30:
+  OBJcf_FULL = 2
+```
+
+分类别：
+
+```text
+color:
+  L1_FULL = 2
+  L2cf_FULL = 1
+  OBJcf_FULL = 1
+
+moisture:
+  L1/L2_cf 多为 HALF
+  OBJcf_FULL = 1
+
+size:
+  只有极少 OBJcf_FULL
+```
+
+客观现象：
+
+```text
+GLM4 L10 是本轮最干净的 GLM4 峰值：
+  FULL = 3
+  neutral_ideal = 0
+
+这与 GLM5 memo Phase396b 中 GLM4 L10 color/moisture 的线索一致。
+```
+
+解释：
+
+```text
+GLM4 的对象-属性兼容性更像中层交互；
+L10 比 L20/L30 更少受到 neutral value bias 污染。
+```
+
+### DeepSeek7B 结果
+
+```text
+Layer | FULL | neutral_ideal | clean_margin(FULL-neutral)
+L4    | 12   | 4             | 8
+L8    | 6    | 3             | 3
+L12   | 11   | 2             | 9
+L16   | 10   | 1             | 9
+L20   | 7    | 5             | 2
+```
+
+方向分解：
+
+```text
+L4:
+  L1_FULL = 3
+  L2cf_FULL = 4
+  OBJcf_FULL = 5
+
+L12:
+  L1_FULL = 6
+  L2cf_FULL = 2
+  OBJcf_FULL = 3
+
+L16:
+  L1_FULL = 3
+  L2cf_FULL = 3
+  OBJcf_FULL = 4
+
+L20:
+  L1_FULL = 2
+  L2cf_FULL = 1
+  OBJcf_FULL = 4
+```
+
+分类别：
+
+```text
+size:
+  L1_FULL = 9
+  L2cf_FULL = 10
+  OBJcf_FULL = 11
+
+color:
+  L1_FULL = 4
+  L2cf_FULL = 2
+  OBJcf 主要是 HALF
+
+moisture:
+  OBJcf_FULL = 6
+  L1_FULL = 3
+  L2cf_FULL = 1
+```
+
+客观现象：
+
+```text
+DS7B 是当前对象-属性兼容性最强模型。
+L12/L16 是最干净的峰值区：
+  L12: FULL=11, neutral=2
+  L16: FULL=10, neutral=1
+```
+
+解释：
+
+```text
+DS7B 的对象-属性兼容性不是单层点；
+它在 L12-L16 形成较稳定的上下文依赖兼容性交互。
+L20 仍有 FULL，但 neutral_ideal 上升，说明更深层可能混入输出值偏好。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  FULL 少，neutral 多；
+  当前不是干净兼容性机制候选。
+
+GLM4:
+  L10 小规模但干净；
+  中层有少量真实交互候选。
+
+DS7B:
+  L12-L16 强且相对干净；
+  当前最适合继续做对象-属性机制闭包。
+```
+
+排序：
+
+```text
+compatibility_interaction_candidate:
+  DS7B L12/L16 > GLM4 L10 > Qwen3 L4
+```
+
+### 对 GLM5 Phase396/396b 的复验结论
+
+本轮支持 Phase396b 的关键修正：
+
+```text
+1. 分对象后确实存在 FULL_SYMMETRIC。
+2. 类别平均会掩盖对象级信号。
+3. neutral prompt 是必要过滤器。
+4. DS7B L12 是最强候选层之一。
+```
+
+但本轮进一步修正：
+
+```text
+1. DS7B L16 与 L12 同样重要，甚至 neutral 更少。
+2. Qwen3 的 FULL 被 neutral_ideal 抵消，不应作为强证据。
+3. GLM4 L10 比 L20/L30 更干净。
+4. OBJ_cf 方向在 DS7B L4/L16/L20 中有贡献，说明 object-specific residual 不是噪声。
+```
+
+### 当前理论进展
+
+对象-属性兼容性机制更像：
+
+```text
+object identity direction
+× current value context
+× model/layer-specific value bias
+→ target/competitor logit interaction
+```
+
+而不是：
+
+```text
+一个固定 compatibility axis。
+```
+
+更准确的第一性描述：
+
+```text
+兼容性不是方向自身的属性；
+兼容性是对象状态与值状态在残差流中的交互结果。
+```
+
+这与“相对编码”一致：
+
+```text
+对象的意义不是静态向量；
+属性的意义也不是静态向量；
+兼容关系在对象-属性-上下文三者组合中产生。
+```
+
+### 硬伤
+
+1. 仍然是加性方向注入，不是自然动态重算。
+2. neutral prompt 与 valued prompt 的 token 结构仍不完全匹配。
+3. target/competitor logit 只取单 token，可能受到 tokenizer 与输出接口影响。
+4. 只测 color/size/moisture 三类，还没有扩展到 texture、temperature、material、function 等。
+5. 没有做 destroy-restore，不能称为闭包。
+6. 没有做 MLP/attention 分解，无法判断 DS7B L12-L16 具体由哪个模块完成。
+
+### 下一步计划
+
+下一阶段应以 DS7B L12/L16 为主线，做真正机制拆解。
+
+建议 Phase66：
+
+```text
+DS7B L12-L16 Object-Attribute Dynamic Closure
+```
+
+任务：
+
+```text
+1. 对 DS7B L12/L16 做 token-level path localization:
+   object token
+   value token
+   last token
+   all tokens
+
+2. 做 module decomposition:
+   resid_in
+   attn_out
+   mlp_out
+   resid_out
+
+3. 对 FULL 对象做 destroy-restore:
+   破坏 object-specific direction；
+   破坏 value-context direction；
+   恢复 object-specific direction；
+   测 target/competitor 是否恢复。
+
+4. 做 matched neutral:
+   使用占位值或语法匹配 prompt，
+   减少 "The item is" 与 "The item is wet." 的结构差异。
+
+5. 扩展 category:
+   temperature
+   texture
+   material
+   function
+```
+
+并行任务：
+
+```text
+GLM4 L10 小规模机制复核；
+Qwen3 暂停对象-属性闭包，优先处理 reader/path 更稳定的 different-class。
+```
+
+### 当前结论
+
+Phase65 完成三模型对象-属性兼容性梯度分解全量测试。
+
+最可靠结果：
+
+```text
+DS7B L12-L16 是当前最强、相对最干净的对象-属性兼容性交互候选；
+GLM4 L10 有少量但干净的中层交互；
+Qwen3 的对象-属性 FULL 信号被 neutral_ideal 抵消，不宜作为强机制证据。
+```
+
+因此，当前已经可以从“对象-属性是否有方向”推进到：
+
+```text
+DS7B L12-L16 的对象-属性兼容性交互如何由 token、module、residual path 共同实现？
+```
