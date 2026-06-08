@@ -17940,3 +17940,960 @@ Qwen3 的对象-属性 FULL 信号被 neutral_ideal 抵消，不宜作为强机�
 ```text
 DS7B L12-L16 的对象-属性兼容性交互如何由 token、module、residual path 共同实现？
 ```
+
+## Phase 66: 三图谱一闭包整体研究计划 [2026-06-08 19:18]
+
+### 任务来源
+
+读取并分析：
+
+```text
+research/MainAnalysis/20260609_03_从知识网络-逻辑推理-语法规则三者破解编码机制.md
+```
+
+并结合当前 Phase63-65 的真实测试结果，重新制定后续大计划。
+
+### 对 MainAnalysis 文档的判断
+
+文档的大方向是正确的。它把研究对象从：
+
+```text
+单一概念方向
+单一路径
+单一 probe 准确率
+```
+
+推进到：
+
+```text
+知识网络
+逻辑推理
+语法规则
+三者背后的 relation state / candidate distribution / routing dynamics
+```
+
+这是当前项目最需要的升级。
+
+其中最正确的部分：
+
+```text
+1. 语言编码不是固定语义轴，而是条件化关系状态。
+2. 单个 binding 路径意义有限，必须和其他关系路径比较，形成全局路径图谱。
+3. 知识网络、逻辑推理、语法规则应分别建任务宇宙，再比较它们的共同结构。
+4. 读出器校准是机制研究的一部分，不是外部评测。
+5. 候选集合分布比 target-vs-competitor 更接近真实机制。
+6. 必须区分 norm/readout 效应和真正关系绑定效应。
+7. 不能直接把 additive patch 当成自然机制，需要逐步进入 natural activation exchange、destroy-restore、path closure。
+```
+
+需要修正的部分：
+
+```text
+1. 不能同时全面铺开知识、逻辑、语法三大宇宙，否则每条线都会停在行为图谱层。
+2. 当前 reader 仍是最大瓶颈，逻辑和语法不能越过 reader gate 直接做 patch。
+3. Phase65 显示对象-属性 binding 的最佳突破口不是 Qwen3，而是 DS7B L12-L16。
+4. Qwen3 当前更适合 different-class / category reader 或逻辑路径，暂时不适合作为对象-属性闭包主模型。
+5. GLM4 L10 有干净但小的对象-属性中层交互，适合作为复核对象，不适合作为第一主线。
+```
+
+### 当前研究进展定位
+
+已经完成的拼图：
+
+```text
+Phase63-64:
+  same/different class reader 校准证明：
+  Qwen3 可形成较可靠 class relation reader；
+  GLM4 和 DS7B 在该 reader 任务上不稳定；
+  跨模型 reader 不成立。
+
+Phase65:
+  object-attribute compatibility decomposition 证明：
+  DS7B L12-L16 存在当前最强、相对最干净的对象-属性兼容性交互候选；
+  GLM4 L10 存在少量但干净的中层交互；
+  Qwen3 对象-属性 full 信号大多被 neutral_ideal 抵消，不宜过度解释。
+```
+
+因此当前不能再只说“语言是相对编码”，而要进入更具体的问题：
+
+```text
+相对编码中的关系状态，如何在对象-属性、逻辑算子、语法角色三类任务中形成、传播、读出和复用？
+```
+
+### 总体大计划：三图谱一闭包
+
+后续研究不再按零散小功能推进，而按一个大框架推进：
+
+```text
+一、知识网络关系图谱
+二、逻辑状态转移图谱
+三、语法角色路由图谱
+四、机制闭包验证
+```
+
+简称：
+
+```text
+三图谱一闭包
+```
+
+核心原则：
+
+```text
+先找到可稳定读出的关系；
+再定位路径；
+再做候选集合分布；
+再做 neutral/norm/control 扣除；
+再做 natural exchange；
+最后做 destroy-restore。
+```
+
+### 第一大任务：知识网络关系图谱
+
+优先级最高。
+
+原因：
+
+```text
+1. Phase65 已经给出 DS7B L12-L16 的强候选层。
+2. 对象-属性关系比语法角色查询更容易构造稳定 candidate set。
+3. object-attribute 是知识网络最基础的关系单元：
+   object + attribute + value + compatibility + candidate distribution。
+```
+
+目标：
+
+```text
+建立对象-属性关系如何在模型中编码、传播、读出的全局路径图谱。
+```
+
+任务拆分：
+
+```text
+Phase67:
+  DS7B L12-L16 对象-属性 token/module/path 定位。
+  测 resid_in, attn_out, mlp_out, resid_out。
+  测 object token, attribute token, value token, last token。
+
+Phase68:
+  DS7B 对象-属性 candidate-set 全量读出。
+  不只测 target/competitor，而测 compatible/incompatible/neutral/full candidate distribution。
+
+Phase69:
+  DS7B 对象-属性 natural activation exchange。
+  从 additive patch 转为 clean object/value/context state exchange。
+
+Phase70:
+  DS7B 对象-属性 destroy-restore。
+  破坏 object-specific relation direction / value-context direction；
+  再恢复；
+  检查 candidate distribution 是否恢复。
+
+Phase71:
+  扩展知识关系：
+  color, size, wetness, temperature, texture, material, function, location, part-of, used-for, can-do, is-a。
+```
+
+并行复核：
+
+```text
+GLM4 L10:
+  小规模复核中层对象-属性干净交互是否稳定。
+
+Qwen3:
+  暂停对象-属性闭包；
+  优先使用 Phase64 已通过 reader 的 different_natural_control 做 category relation 图谱。
+```
+
+### 第二大任务：逻辑状态转移图谱
+
+不能立即做 patch，必须先通过 reader gate。
+
+原因：
+
+```text
+之前 temporal_order / role query 的自然语言 reader 多次失败；
+说明读出器不稳时，任何 patch 结果都没有机制解释力。
+```
+
+目标：
+
+```text
+建立 operator × scope × candidate distribution 的状态转移图。
+```
+
+第一批逻辑任务：
+
+```text
+negation:
+  A is true / A is not true / not all / none / double negation
+
+causal:
+  because / so / therefore
+
+contrast:
+  but / although / however
+
+condition:
+  if / unless / only if
+
+temporal:
+  before / after / during / then
+```
+
+执行顺序：
+
+```text
+Phase72:
+  只做 symbolic reader calibration，不做 patch。
+
+Phase73:
+  对通过 reader gate 的逻辑任务，建立 layer/module candidate distribution map。
+
+Phase74:
+  对稳定逻辑任务做 operator state exchange。
+
+Phase75:
+  做 operator destroy-restore。
+```
+
+通过标准：
+
+```text
+reader 必须跨：
+  template variation
+  candidate order
+  AB/BA
+  entity/value replacement
+  three models 或至少 one-model stable
+
+否则不进入机制解释。
+```
+
+### 第三大任务：语法角色路由图谱
+
+语法任务暂时不能直接继续做 role-binding patch，因为之前 Phase42/304/305 暴露出 reader 不稳。
+
+目标：
+
+```text
+建立 identity-role-construction-position routing map。
+```
+
+第一批任务：
+
+```text
+active/passive
+agent/patient
+surface subject / semantic agent
+by-agent
+dative
+relative clause
+coreference
+```
+
+执行顺序：
+
+```text
+Phase76:
+  重新设计 symbolic role reader。
+  不用自然语言 next-token 问答作为主读出器。
+
+Phase77:
+  用候选集合全序列概率校准 agent/patient reader。
+
+Phase78:
+  只对通过 reader 的结构做 token-relation state transplant。
+
+Phase79:
+  做 construction signal + role signal 组合实验。
+
+Phase80:
+  做 role subspace destroy-restore。
+```
+
+### 第四大任务：机制闭包与跨模型不变量
+
+最终不是找某个模型里的某个方向，而是找跨模型功能约束。
+
+闭包标准：
+
+```text
+1. 可读出：
+   候选集合分布稳定指向正确关系。
+
+2. 可定位：
+   能定位到 layer / module / token / path。
+
+3. 可干预：
+   natural exchange 或 subspace patch 能按预测改变候选分布。
+
+4. 可破坏：
+   删除候选变量后，功能下降。
+
+5. 可恢复：
+   恢复候选变量后，功能恢复。
+
+6. 可迁移：
+   换实体、换属性、换模板、换模型后仍保留功能结构。
+```
+
+跨模型比较不比较向量本身，而比较：
+
+```text
+功能路径类型
+candidate distribution shape
+层段位置
+module 分工
+destroy-restore 曲线
+对 neutral/norm/control 的敏感性
+```
+
+### 第一性原理判断
+
+当前最稳的第一性原理不是“语言有某个语义轴”，而是：
+
+```text
+语言系统必须在有限参数中高效表示无限组合；
+因此它必须把 object, relation, value, operator, role, scope, position, context 分解成可复用变量；
+同时通过残差路径、模块变换、候选集合竞争实现条件化组合。
+```
+
+所以真正要找的是：
+
+```text
+变量如何复用；
+变量如何绑定；
+变量如何读出；
+变量如何在不同功能中分叉；
+哪些动态约束跨模型保留。
+```
+
+这比寻找固定语义方向更接近语言背后的数学结构。
+
+### 下一步立即执行建议
+
+不要再平均推进所有功能。下一步集中完成：
+
+```text
+知识网络图谱第一阶段：
+DS7B L12-L16 对象-属性关系路径闭包。
+```
+
+具体执行：
+
+```text
+1. 编写 Phase67 跨模型脚本，但主分析对象为 DS7B。
+2. 三模型都跑，必须添加 --hard-exit-after-model。
+3. qwen3 -> glm4 -> deepseek7b 依次运行，每个模型结束后卸载。
+4. 对 DS7B L12/L16 加大数据量。
+5. 生成 token × module × layer × relation 的候选分布图谱。
+6. 只把通过 neutral/norm/control 扣除的结果作为机制候选。
+```
+
+### 当前结论
+
+MainAnalysis 文档方向正确，但后续执行必须收束到：
+
+```text
+先知识网络；
+再逻辑状态；
+再语法路由；
+最后跨模型闭包。
+```
+
+当前第一突破口已经非常明确：
+
+```text
+DS7B L12-L16 对象-属性兼容性交互。
+```
+
+这条线如果完成 destroy-restore，才真正从“全局路径图谱”进入“语言编码机制闭包”。
+
+## Phase 67: 对象-属性关系 token/module/path 图谱测试 [2026-06-08 19:56]
+
+### 任务目标
+
+根据 Phase66 的“三图谱一闭包”计划，开始第一大任务：
+
+```text
+知识网络关系图谱
+```
+
+本轮聚焦对象-属性关系：
+
+```text
+object -> attribute candidate distribution
+```
+
+不再只看 target/competitor 的整体 logit 差，而是开始拆：
+
+```text
+layer
+module
+token position
+candidate rank flip
+candidate margin shift
+```
+
+核心问题：
+
+```text
+对象信息从 clean prompt 移植到 generic prompt 后，
+候选属性分布是否按对象属性兼容性移动？
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase67_object_attribute_path_map.py
+tests/gpt5/phase67_object_attribute_path_summary.py
+tests/gpt5/run_phase67_object_attribute_path_full.sh
+```
+
+### 测试原理
+
+构造 clean/corrupt prompt：
+
+```text
+clean:
+  The apple is
+
+corrupt:
+  The item is
+```
+
+候选集合：
+
+```text
+target:
+  red
+
+distractors:
+  blue / white / black / small ...
+```
+
+在指定 layer/module/token position 上提取：
+
+```text
+delta = activation(clean object prompt) - activation(corrupt generic prompt)
+```
+
+再把 delta 加到 corrupt prompt 中，观察：
+
+```text
+target rank 是否上升；
+target-vs-distractor margin 是否上升；
+patch 后 target 是否变成 top1。
+```
+
+测试模块：
+
+```text
+resid_out
+attn_out
+mlp_out
+```
+
+测试位置：
+
+```text
+object_first
+object_last
+last
+```
+
+关系类别：
+
+```text
+color
+moisture
+size
+temperature
+texture
+material
+```
+
+### 关键工程修正
+
+第一次 full run 发现：
+
+```text
+GLM4 delta_norm 全部为 0；
+DS7B object token delta 大量为 0。
+```
+
+原因不是机制结果，而是输入位置不一致：
+
+```text
+GLM4 tokenizer 默认 forward 时会加入特殊 token；
+而位置匹配使用的是 add_special_tokens=False 的 token 序列；
+导致 patch 打到错误位置。
+```
+
+修正：
+
+```text
+所有 forward encode 显式使用 add_special_tokens=False。
+```
+
+旧目录：
+
+```text
+results/gpt5_phase67_object_attribute_path_full_20260608_193555
+```
+
+只作为工程错误记录，不作为机制结果。
+
+有效目录：
+
+```text
+results/gpt5_phase67_object_attribute_path_full_20260608_194412
+```
+
+### 正式测试命令
+
+```bash
+PHASE67_OUTPUT_DIR=results/gpt5_phase67_object_attribute_path_full_20260608_194412 \
+PHASE67_PROGRESS_EVERY=24 \
+bash tests/gpt5/run_phase67_object_attribute_path_full.sh
+```
+
+脚本内部按顺序运行：
+
+```text
+qwen3:
+  layers = 4,8,12,16,20
+  items = 72
+
+glm4:
+  layers = 4,10,20,30
+  items = 72
+
+deepseek7b:
+  layers = 8,12,16,20
+  items = 144
+```
+
+每个模型都使用：
+
+```text
+--hard-exit-after-model
+```
+
+模型顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase67_object_attribute_path_full_20260608_194412/qwen3_phase67_object_attribute_path_map.json
+results/gpt5_phase67_object_attribute_path_full_20260608_194412/glm4_phase67_object_attribute_path_map.json
+results/gpt5_phase67_object_attribute_path_full_20260608_194412/deepseek7b_phase67_object_attribute_path_map.json
+results/gpt5_phase67_object_attribute_path_full_20260608_194412/phase67_object_attribute_path_summary.json
+results/gpt5_phase67_object_attribute_path_full_20260608_194412/PHASE67_OBJECT_ATTRIBUTE_PATH_SUMMARY.md
+```
+
+数据规模：
+
+```text
+qwen3:
+  rows = 3240
+
+glm4:
+  rows = 2592
+
+deepseek7b:
+  rows = 5184
+
+total:
+  rows = 11016
+```
+
+### 三模型客观结果
+
+#### Qwen3
+
+最强路径：
+
+```text
+L4 resid_out object_first/object_last
+mean_progress = 0.7790
+rank_flip_rate = 0.6528
+improve_rate = 0.8750
+clean_top1 = 0.7361
+corrupt_not_top1 = 0.9444
+```
+
+稳健 eligible 子集：
+
+```text
+eligible = clean target top1 且 corrupt target 非 top1
+n = 49 / 72
+
+L4 resid_out object token:
+  delta_eligible = 3.4592
+  patch_top1_eligible = 0.9184
+```
+
+客观现象：
+
+```text
+Qwen3 的对象-属性候选分布可以被早层 object-token residual state 强力恢复。
+L4 是当前最强层。
+attention_out 和 mlp_out 单独作用很弱。
+```
+
+这和 Phase65 中 Qwen3 object-attribute full 结果被 neutral 抵消的结论并不矛盾：
+
+```text
+Phase65 测的是 full value-conditioned direction；
+Phase67 测的是 object-neutral 到 generic-neutral 的 object state transplant。
+Qwen3 更像 object identity / category 信息可以在早层 residual 中读出并影响候选属性，
+但这不等于已经证明 value-conditioned compatibility binding。
+```
+
+#### GLM4
+
+最强路径：
+
+```text
+L30 resid_out last
+mean_progress = 0.6848
+rank_flip_rate = 0.6528
+improve_rate = 0.9028
+clean_top1 = 0.7500
+corrupt_not_top1 = 0.9167
+```
+
+稳健 eligible 子集：
+
+```text
+eligible = 48 / 72
+
+L30 resid_out last:
+  delta_eligible = 4.6885
+  patch_top1_eligible = 0.9792
+
+L20 resid_out last:
+  delta_eligible = 3.8314
+  patch_top1_eligible = 0.8750
+
+L4 resid_out object token:
+  delta_eligible = 3.9662
+  patch_top1_eligible = 0.8333
+```
+
+客观现象：
+
+```text
+GLM4 在修正 token 位置后不再是 0；
+它存在强 residual path；
+但最强不是 Phase65 的 L10，而是 L30 last-token residual readout。
+```
+
+解释需谨慎：
+
+```text
+Phase65 的 L10 干净交互更可能是 value-conditioned full delta；
+Phase67 的对象到属性候选恢复，更像 late residual readout 或 early object residual identity。
+两者不是同一实验，不应强行合并为同一机制。
+```
+
+#### DeepSeek7B
+
+四层扫描最强路径：
+
+```text
+L12 resid_out object_last
+mean_progress = 0.7463
+rank_flip_rate = 0.2292
+improve_rate = 0.9167
+clean_top1 = 0.4583
+corrupt_not_top1 = 0.9028
+```
+
+稳健 eligible 子集：
+
+```text
+eligible = 54 / 144
+
+L12 resid_out object_last:
+  delta_eligible = 2.2274
+  patch_top1_eligible = 0.5185
+
+L12 resid_out object_first:
+  delta_eligible = 2.1227
+  patch_top1_eligible = 0.5000
+
+L8 resid_out object_last:
+  delta_eligible = 2.2541
+  patch_top1_eligible = 0.4630
+```
+
+客观现象：
+
+```text
+DS7B 的 clean_top1 只有 0.4583，说明候选读出器本身较弱；
+但在 eligible 子集上，L8-L12 object-token residual transplant 能显著提升 target margin；
+L12 object_last 是当前最强候选。
+```
+
+### DS7B Dense Scan
+
+为了避免 L8/L12/L16 四点采样错过峰值层，追加 DS7B dense scan：
+
+```bash
+OUT=results/gpt5_phase67_object_attribute_path_ds7b_dense_20260608_195121
+PHASE67_ATTN_IMPLEMENTATIONS=flash_attention_2,sdpa,eager \
+python tests/gpt5/phase67_object_attribute_path_map.py deepseek7b \
+  --layers 8,9,10,11,12,13,14,15,16 \
+  --max-items 144 \
+  --modules resid_out,mlp_out \
+  --positions object_first,object_last,last \
+  --frames the,this,that,a \
+  --output-dir "$OUT" \
+  --progress-every 24 \
+  --hard-exit-after-model
+```
+
+输出：
+
+```text
+results/gpt5_phase67_object_attribute_path_ds7b_dense_20260608_195121/deepseek7b_phase67_object_attribute_path_map.json
+```
+
+数据规模：
+
+```text
+rows = 7776
+items = 144
+layers = L8-L16
+modules = resid_out, mlp_out
+```
+
+Dense scan 关键结果：
+
+```text
+L12 resid_out object_last:
+  eligible_top1 = 0.5185
+  delta_eligible = 2.2274
+  rank_flip_rate = 0.2292
+
+L11 resid_out object_last:
+  eligible_top1 = 0.4815
+  delta_eligible = 2.1921
+  rank_flip_rate = 0.2361
+
+L8 resid_out object_last:
+  eligible_top1 = 0.4630
+  delta_eligible = 2.2541
+  rank_flip_rate = 0.2292
+
+L10 resid_out object_last:
+  eligible_top1 = 0.4630
+  delta_eligible = 2.1629
+  rank_flip_rate = 0.2222
+```
+
+连续层曲线：
+
+```text
+resid_out object_last:
+
+L8:
+  flip = 0.2292
+  eligible_top1 = 0.4630
+  delta_eligible = 2.2541
+
+L9:
+  flip = 0.2222
+  eligible_top1 = 0.4444
+  delta_eligible = 2.2075
+
+L10:
+  flip = 0.2222
+  eligible_top1 = 0.4630
+  delta_eligible = 2.1629
+
+L11:
+  flip = 0.2361
+  eligible_top1 = 0.4815
+  delta_eligible = 2.1921
+
+L12:
+  flip = 0.2292
+  eligible_top1 = 0.5185
+  delta_eligible = 2.2274
+
+L13-L16:
+  eligible_top1 降到 0.4074-0.4259 区间
+```
+
+结论：
+
+```text
+DS7B 对象-属性关系不是单点 L12，而是 L8-L12 中层 residual object-token 平台；
+L12 是当前最好的读出点，但 L8-L11 也保留明显路径能力；
+L13-L16 开始下降。
+```
+
+这修正 Phase65 的判断：
+
+```text
+Phase65 认为 DS7B L12/L16 最强；
+Phase67 dense scan 进一步显示，L8-L12 是更合理的对象-属性关系平台，
+L16 仍有效但不是峰值。
+```
+
+### 当前最可靠结论
+
+```text
+1. Qwen3:
+   早层 L4 object-token residual state 可以强力恢复对象属性候选分布。
+
+2. GLM4:
+   late L30 last-token residual readout 最强；
+   也存在 L4 object-token residual 早层信号。
+
+3. DS7B:
+   L8-L12 中层 object-token residual 平台最值得继续做闭包；
+   L12 object_last 是当前最佳单点。
+```
+
+三模型共同点：
+
+```text
+对象-属性候选分布最主要由 residual path 承载；
+attn_out 和 mlp_out 单独 transplant 都弱得多；
+这说明 object-attribute relation 更像 residual trajectory 中的可读状态，
+而不是单个 attention/MLP 输出直接决定。
+```
+
+### 硬伤和问题
+
+1. 当前仍是 additive delta，不是 natural activation exchange。
+
+```text
+delta = clean - corrupt
+patch = corrupt + delta
+```
+
+这会带来非自然状态风险。
+
+2. DS7B 的 clean_top1 只有 0.4583。
+
+```text
+说明当前候选集合里很多样本模型本来不把 target 当 top1；
+DS7B 的机制结论必须主要基于 eligible 子集。
+```
+
+3. GLM4 的 Phase65 L10 和 Phase67 L30 不一致。
+
+```text
+这可能说明 value-conditioned compatibility 和 object-neutral attribute readout 是两种不同任务；
+不能过度合并。
+```
+
+4. `arid` 是 multi-token candidate，被跳过。
+
+```text
+后续需要清理 candidate vocabulary，
+保证候选值尽量都是单 token 或改用 full-sequence logprob。
+```
+
+5. DS7B 使用 sdpa 时有 sliding-window attention warning。
+
+```text
+attention_out 结果需要降级解释；
+本轮主要依据 resid_out 和 mlp_out。
+```
+
+### 理论进展
+
+本轮支持一个更具体的知识网络机制图景：
+
+```text
+对象属性关系不是简单属性方向；
+而是对象 token 的 residual state 改变候选属性分布。
+```
+
+更通俗地说：
+
+```text
+模型不是只记住 “red” 这个属性；
+而是对象词元在残差路径里携带一种候选分布偏置，
+这个偏置会让后续 “is ...” 的属性候选发生排序变化。
+```
+
+这比“对象-属性有一个方向”更接近知识网络编码机制。
+
+当前第一性原理判断：
+
+```text
+知识网络可能不是按固定概念轴储存，
+而是通过对象 token residual state 对候选属性集合施加条件化约束。
+```
+
+这符合相对编码：
+
+```text
+apple 的编码不是独立固定点；
+apple 在 “The apple is ...” 这种上下文中，
+相对于候选属性集合产生 red/green/small 等候选优先级变化。
+```
+
+### 下一步计划
+
+Phase68 不应继续只加数据，而要升级干预方式：
+
+```text
+Phase68:
+  DS7B L8-L12 object-attribute natural activation exchange。
+
+核心实验：
+  不再做 corrupt + (clean - corrupt)；
+  而是直接 transplant clean object token state 到 corrupt prompt 的对应位置。
+
+目标：
+  判断对象 token residual state 本身是否足以恢复属性候选分布。
+```
+
+Phase69:
+
+```text
+DS7B L8-L12 object-attribute destroy-restore。
+
+destroy:
+  移除 object-token residual relation component。
+
+restore:
+  恢复 object-token residual relation component。
+
+判据:
+  target candidate rank / margin 是否下降再恢复。
+```
+
+Phase70:
+
+```text
+扩展知识网络关系：
+  is-a
+  part-of
+  used-for
+  can-do
+  location
+  material
+  function
+```
+
+最终目标：
+
+```text
+从 object -> attribute
+扩展到 object -> relation -> value，
+建立知识网络候选分布图谱。
+```
