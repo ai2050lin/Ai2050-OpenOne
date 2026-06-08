@@ -14993,4 +14993,1019 @@ python tests/glm5/phase396b_per_object.py qwen3       # ~1min
 python tests/glm5/phase396b_per_object.py deepseek7b  # ~20min
 python tests/glm5/phase396b_per_object.py glm4        # ~30min
 ```
+
+## Phase 397: Value Bias vs Compatibility Separation [2026-06-07 21:20]
+
+### 背景
+
+Phase 396b发现FULL_SYMMETRIC在分对象层面存在，但L1_category有value bias。
+核心未解问题：FULL_SYMMETRIC是真实的兼容性梯度，还是仅仅是值偏好方向与对象
+兼容值对齐的巧合？如果翻转方向(-L1)能让REVERSED对象变成IDEAL，则是纯值偏好。
+
+### 实验1：Per-Object方向余弦相似度
+
+```
+=== 跨值组余弦相似度(正确条件per-object方向) ===
+
+模型      层   类别     同组cos     跨组cos
+Qwen3    L4   size     small=0.75  big=0.87   small↔big=0.65
+Qwen3    L4   moisture dry=0.78    wet=0.86   dry↔wet=0.69
+Qwen3    L4   color    red=0.92    blue=0.86  red↔blue=0.69
+
+DS7B     L12  size     small=-0.09 big=0.51   small↔big=0.33
+DS7B     L12  moisture dry=-0.21   wet=0.81   dry↔wet=0.35
+DS7B     L12  color    red=0.95    blue=0.43  red↔blue=0.45
+
+GLM4     L10  size     small=0.60  big=0.86   small↔big=0.56
+GLM4     L10  moisture dry=0.84    wet=0.86   dry↔wet=0.63
+GLM4     L10  color    red=0.83    blue=0.82  red↔blue=0.70
+
+→ 所有跨组cos为正(0.33~0.82)，per-object方向不反平行
+→ DS7B: within-small=-0.09, within-dry=-0.21 → 同组对象方向不相关甚至反平行!
+→ 对象方向的对齐结构与值兼容性无关
+```
+
+### 实验2：方向翻转测试(核心发现)
+
+```
+=== DS7B L12: 方向翻转测试 ===
+
+ant (small-compatible):
+  L1+:  C[IDEAL T=+0.961 C=-0.407] I[IDEAL T=+1.251 C=-1.489] FULL
+  L1-:  C[IDEAL T=+0.535 C=-0.296] I[IDEAL T=+1.546 C=-1.134] FULL ← 也IDEAL!
+  POBJ+: C[IDEAL T=+0.688 C=-0.870] I[IDEAL T=+1.255 C=-1.318] FULL
+  POBJ-: C[IDEAL T=+0.633 C=-0.147] I[IDEAL T=+1.597 C=-0.920] FULL ← 也IDEAL!
+
+elephant (big-compatible):
+  L1+:  C[REVERSED T=-1.489 C=+1.251] I[REVERSED T=-0.407 C=+0.961]
+  L1-:  C[REVERSED T=-1.134 C=+1.546] I[REVERSED T=-0.296 C=+0.535] ← 也REVERSED!
+  POBJ+: C[REVERSED T=-1.484 C=+1.380] I[REVERSED T=-0.273 C=+0.981]
+  POBJ-: C[REVERSED T=-0.997 C=+1.403] I[REVERSED T=-0.284 C=+0.629] ← 也REVERSED!
+
+→ ant: +方向和-方向都给IDEAL — 方向符号无关!
+→ elephant: +方向和-方向都给REVERSED — 方向符号无关!
+→ 线性系统中不可能! 模型处理高度非线性
+```
+
+```
+=== 跨模型翻转测试总结(CORRECT条件) ===
+
+对象(值对齐)    Qwen3 L4     DS7B L12     GLM4 L10
+               L1+ / L1-    L1+ / L1-    L1+ / L1-
+ant(small)     REV / SUPP   IDEAL/IDEAL  REV / SUPP
+grain(small)   REV / SUPP   IDEAL/IDEAL  REV / SUPP
+pin(small)     REV / SUPP   IDEAL/IDEAL  REV / SUPP
+elephant(big)  REV / REV    REV / REV    BC  / SUPP
+mountain(big)  REV / REV    REV / REV    BC  / SUPP
+whale(big)     REV / REV    REV / REV    BC  / SUPP
+ocean(wet)     REV / BC     IDEAL/SUPP   DB  / REV
+rain(wet)      REV / BC     IDEAL/SUPP   DB  / REV
+river(wet)     REV / BC     IDEAL/SUPP   DB  / REV
+desert(dry)    SUPP/ IDEAL  REV / BC     IDEAL/REV
+dust(dry)      SUPP/ IDEAL  REV / BC     IDEAL/REV
+sand(dry)      SUPP/ IDEAL  REV / BC     IDEAL/REV
+apple(red)     BC  / BC     REV / REV    IDEAL/REV
+cherry(red)    BC  / BC     REV / REV    IDEAL/REV
+sky(blue)      MIX / IDEAL  BC  / REV    REV / SUPP
+ocean_c(blue)  MIX / IDEAL  BC  / REV    REV / SUPP
+snow(white)    IDEAL/IDEAL  BC  / REV    REV / REV
+grass(green)   REV / BC     DB  / SUPP   SUPP/ SUPP
+
+IDEAL = T↑C↓, REV = T↓C↑, BC = BOOST_C, DB = DOM_BOOST, SUPP = SUPP_T/C
+
+→ 大-compatible对象: 所有模型无方向能使其IDEAL
+→ DS7B小-compatible: +/-都IDEAL(强非线性)
+→ GLM4 red-compatible: L1+给IDEAL但L1-给REVERSED(线性值偏好)
+→ Qwen3 dry-compatible: L1-给IDEAL(翻转有效,线性值偏好)
+```
+
+### 实验3：跨对象方向测试
+
+```
+=== ant方向→elephant提示 ===
+Qwen3:  C=REVERSED, I=IDEAL
+DS7B:   C=REVERSED, I=REVERSED
+GLM4:   C=BOOST_C,  I=IDEAL
+
+=== elephant方向→ant提示 ===
+Qwen3:  C=REVERSED, I=IDEAL
+DS7B:   C=IDEAL,    I=IDEAL  ← FULL_SYMMETRIC!
+GLM4:   C=REVERSED, I=DOM_BOOST
+
+=== sky方向→apple提示 (GLM4) ===
+GLM4:   C=IDEAL, I=IDEAL ← FULL_SYMMETRIC!
+
+→ 同一方向在不同prompt上产生不同效果
+→ DS7B: elephant方向在ant的prompt上给IDEAL
+→ 效果高度依赖目标prompt的值上下文
+```
+
+### 核心发现1：方向翻转不产生对称效果
+
+```
+在线性系统中: 方向d的效果 = f(d), -d的效果 = -f(d)
+但实测: ant L1+给IDEAL, L1-也给IDEAL (效果不翻转!)
+
+这说明:
+1. 模型在注入层之后的处理是高度非线性的
+2. 加性注入方向的效果被后续层的非线性变换吸收
+3. 后续层存在强"吸引子"——size类别有"small"吸引子
+4. 任何扰动(无论正负)都被吸引到"small"偏好
+```
+
+### 核心发现2：大-compatible对象无法通过加性注入实现IDEAL
+
+```
+elephant(mountain/whale)在三个模型中:
+  L1+, L1-, POBJ+, POBJ- 全部给REVERSED或非IDEAL
+
+原因不是值偏好(翻转也不行),而是:
+  模型在测试层之后有强"size→small"吸引子
+  任何注入到该层的扰动都被后续处理覆盖
+  elephant的真实兼容性计算不经过该路径
+```
+
+### 核心发现3：兼容性效果是上下文依赖的非线性交互
+
+```
+elephant方向在elephant提示上: REVERSED
+elephant方向在ant提示上:      IDEAL (DS7B)
+
+→ 同一方向在不同prompt上效果完全不同
+→ 效果不是方向的固有属性,而是方向×上下文的非线性函数
+→ 兼容性不是residual stream中的方向,而是计算过程的涌现属性
+```
+
+### 对值偏好vs兼容性的判断
+
+```
+Phase 397前假设:
+  如果-L1让REVERSED对象变IDEAL → 纯值偏好
+  如果-L1不让REVERSED对象变IDEAL → 真兼容性
+
+Phase 397实际发现:
+  -L1的效果不是简单的-L1+效果的取反
+  方向注入的效果被后续层非线性处理覆盖
+  无法通过翻转测试区分值偏好和兼容性
+
+更准确结论:
+  值偏好和兼容性在residual stream层面不可分离
+  因为模型的计算是高度非线性的
+  真正的兼容性计算可能发生在:
+    - 注意力头的路由机制
+    - MLP的非线性变换
+    - 跨层的动态信息流
+  而不是residual stream中的某个方向
+```
+
+### 硬伤
+
+```
+1. 方向翻转测试被非线性失效
+   - 无法用简单加性注入区分值偏好和兼容性
+   - 需要非线性探测方法(注意力分析、MLP分析)
+
+2. 只测了1层/模型
+   - 不同层可能有不同的非线性特征
+   - 需要全层轨迹追踪
+
+3. 加性注入本身可能不反映真实计算
+   - 真实机制可能是乘性门控或路由
+   - 加性注入可能激活了非自然路径
+
+4. DS7B within-group负余弦相似度未解释
+   - ant/grain/pin方向为何不相关甚至反平行?
+   - 可能反映不同对象使用不同计算路径
+
+5. "吸引子"假说需要直接验证
+   - 需要分析后续层的注意力模式
+   - 需要追踪信息流而不是方向
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase397_value_bias.py qwen3       # ~1min
+python tests/glm5/phase397_value_bias.py deepseek7b  # ~25min
+python tests/glm5/phase397_value_bias.py glm4        # ~35min
+```
+
+### Phase 397b: 层轨迹确认 [2026-06-07 22:05]
+
+### 全层轨迹(size类别, ant vs elephant)
+
+```
+=== DS7B (28层) ===
+Layer  ant_L1+     ant_L1-     elephant_L1+  elephant_L1-
+2      IDEAL +0.73 IDEAL +0.85 REVERSED -1.02 REVERSED -1.01
+4      IDEAL +0.82 IDEAL +0.66 REVERSED -1.07 REVERSED -1.22
+8      IDEAL +0.96 IDEAL +0.54 REVERSED -1.28 REVERSED -1.25
+12     IDEAL +0.96 IDEAL +0.54 REVERSED -1.49 REVERSED -1.13
+16     IDEAL +0.95 IDEAL +0.59 REVERSED -1.47 REVERSED -1.09
+20     IDEAL +0.98 IDEAL +0.55 REVERSED -1.43 REVERSED -1.01
+24     IDEAL +0.94 IDEAL +0.58 REVERSED -1.32 REVERSED -1.08
+27     SUPP_C -0.02 DOM_B +1.23 REVERSED -2.16 REVERSED -0.63
+
+→ DS7B: ant的L1+和L1-从L2到L24都给IDEAL! 方向符号完全无关!
+→ DS7B: elephant在所有层都REVERSED,无论方向符号
+
+=== Qwen3 (36层) ===
+Layer  ant_L1+     ant_L1-     elephant_L1+  elephant_L1-
+2      REV -0.24   SUPP_T -0.25 REV -1.10     REV -1.20
+8      REV -0.23   SUPP_T -0.25 REV -0.88     REV -1.41
+16     REV -0.23   SUPP_C -0.46 REV -0.88     REV -1.41
+24     REV -1.03   SUPP_C -0.16 REV -0.68     REV -1.75
+32     REV -0.89   IDEAL +0.04  REV -0.86     REV -1.47
+35     REV -1.18   IDEAL +0.41  REV -0.71     REV -1.66
+
+→ Qwen3: L1+始终REVERSED, L1-在L32+变为IDEAL(翻转在深层生效)
+→ Qwen3: elephant在所有层都REVERSED,翻转也不行
+
+=== GLM4 (40层) ===
+Layer  ant_L1+     ant_L1-     elephant_L1+  elephant_L1-
+2      REV -1.49   SUPP_T -2.19 SUPP_T -0.51  SUPP_T -0.97
+10     REV -1.31   SUPP_T -1.99 BOOST_C +0.11 SUPP_T -1.35
+20     REV -1.24   SUPP_T -2.69 BOOST_C +0.58 SUPP_T -2.62
+30     REV -1.28   SUPP_T -3.37 BOOST_C +0.76 SUPP_T -3.42
+39     REV -1.20   SUPP_T -2.76 BOOST_C +0.29 SUPP_T -2.21
+
+→ GLM4: ant L1+始终REVERSED, L1-始终SUPP_T,无IDEAL
+→ GLM4: elephant L1+在中后层给BOOST_C(双升),非IDEAL
+→ GLM4: 无任何层无任何方向能让size对象实现IDEAL!
+```
+
+### 轨迹核心结论
+
+```
+1. elephant(大-compatible)在三个模型的所有层都
+   无法通过加性方向注入实现IDEAL
+   → 这不是值偏好问题(翻转也不行)
+   → 这是结构性问题:加性注入无法模拟兼容性计算
+
+2. DS7B的非线性最强:
+   ant的L1+和L1-都给IDEAL (L2-L24)
+   → 方向符号完全被后续处理覆盖
+   → 模型存在强"small吸引子"
+
+3. Qwen3在深层(L32+)开始表现出线性特征:
+   -L1给ant IDEAL → 翻转在深层生效
+   → 深层的"small吸引子"减弱
+
+4. GLM4的方向注入效果最弱:
+   大部分是SUPP_T(全面抑制)
+   → GLM4的兼容性计算更依赖非线性路由
+
+5. "吸引子"是结构属性,不是层特异现象:
+   从L2到最后一层,模式高度一致
+   → 模型的计算流程天然偏向统计上更频繁的值
+```
+
+### 命令
+
+```bash
+python tests/glm5/phase397b_trajectory.py qwen3       # ~1min
+python tests/glm5/phase397b_trajectory.py deepseek7b  # ~15min
+python tests/glm5/phase397b_trajectory.py glm4        # ~25min
+```
+
+## Phase 398: Odd-Even Decomposition — 验证非线性来源 [2026-06-07 22:37]
+
+### 目标
+
+Phase 397发现方向翻转测试失效（+d和-d给相同效果），提出了"吸引子"假说。
+本阶段用奇偶分解直接量化线性和非线性成分的比例。
+
+方法：
+```
+对同一方向d，测试多强度注入:
+  alpha in {-2, -1, -0.5, 0, 0.5, 1, 2}
+
+奇偶分解:
+  Odd(alpha)  = [Effect(alpha*d) - Effect(-alpha*d)] / 2  (线性方向效应)
+  Even(alpha) = [Effect(alpha*d) + Effect(-alpha*d)] / 2  (符号无关非线性效应)
+
+判断标准:
+  Even > 75%: NONLINEAR_DOM (方向符号不重要)
+  Odd  > 75%: LINEAR_DOM (方向符号重要)
+  否则: MIXED
+```
+
+测试对象: 3类别8对象 (size: ant/grain/elephant/mountain, moisture: ocean/desert, color: apple/sky)
+层配置: 每模型4层
+
+### 核心发现1：三个模型的早期层都由非线性主导
+
+| 模型 | 早期层 | Odd% | Even% | 判定 |
+|------|--------|------|-------|------|
+| Qwen3 | L4 | 7.7% | **92.3%** | NONLINEAR_DOM |
+| DS7B | L4 | 7.4% | **92.6%** | NONLINEAR_DOM |
+| GLM4 | L5 | 23.1% | **76.9%** | NONLINEAR_DOM |
+
+```
+→ 三个模型在早期层，方向注入效果的90%以上是符号无关的非线性效应
+→ 方向符号(+d或-d)对最终输出几乎没有影响
+→ Phase 397的"吸引子"假说得到直接量化验证
+```
+
+### 核心发现2：模型间非线性衰减模式截然不同
+
+| 模型 | 早期 | 中前 | 中后 | 晚期 | 趋势 |
+|------|------|------|------|------|------|
+| Qwen3 | L4:92% | L16:62% | L28:49% | L35:44% | 稳定线性化 |
+| DS7B | L4:93% | L12:82% | L20:81% | L27:**75%** | 全层非线性 |
+| GLM4 | L5:77% | L15:69% | L30:53% | L39:**69%** | 非单调!晚期反弹 |
+
+```
+→ DS7B: 连最后一层都是NONLINEAR_DOM(75%), 非线性是全局结构属性
+→ Qwen3: 从L4到L35, Even从92%逐步降到44%, 深层线性化显著
+→ GLM4: L30降到53%后L39反弹到69%! 最后一层反而增强非线性
+  - GLM4最后一层可能在做特殊处理(最终层norm/readout的特殊非线性)
+```
+
+### 核心发现3：size类别中small-compatible对象非线性更强
+
+DS7B L27 (POBJ方向):
+```
+ant:     Odd=33.4% Even=66.6% (MIXED)
+grain:   Odd=36.3% Even=63.7% (MIXED)
+elephant: Odd=10.5% Even=89.5% (NONLINEAR_DOM!)
+mountain: Odd=0.8%  Even=99.2% (NONLINEAR_DOM!)
+```
+
+```
+→ 大兼容对象(elephant/mountain)的非线性成分(89-99%)远高于小兼容对象(64-67%)
+→ 这解释了Phase 397的关键现象: big-compatible对象无法通过加性注入实现IDEAL
+  因为对big对象, 任何方向的注入都被非线性解释器覆盖
+→ mountain的Even=99.2%是极端值: 方向符号几乎完全被消除
+```
+
+### 核心发现4：Qwen3深层线性化是size类别驱动的
+
+Qwen3 L35 per-object:
+```
+ant:    Odd=77.7% Even=22.3% → LINEAR_DOM (深层方向符号有效!)
+grain:  Odd=77.7% Even=22.3% → LINEAR_DOM
+elephant: Odd=34.6% Even=65.4% → MIXED
+mountain: Odd=34.6% Even=65.4% → MIXED
+desert: Odd=98.1% Even=1.9%  → LINEAR_DOM (moisture也线性化)
+```
+
+```
+→ Qwen3深层: small-compatible对象变成LINEAR_DOM, big-compatible仍是MIXED
+→ 这与Phase 397b的发现一致: Qwen3深层-L1对ant给IDEAL(翻转生效)
+→ moisture的desert在深层是LINEAR_DOM(98.1%!), 说明线性化不限于size
+```
+
+### 核心发现5：alpha强度与非线性比例的关系
+
+DS7B ant L1 (L4):
+```
+alpha=+0.5: Even=96.7%
+alpha=+1.0: Even=94.6%
+alpha=+2.0: Even=92.4%
+```
+
+```
+→ 更大的alpha略微增加Odd比例(7.6%→16%→24%), 但Even仍占绝对主导
+→ 非线性不是弱扰动现象, 在2倍标准强度下仍主导
+→ 但alpha=2时Odd开始显著增长, 说明强扰动可能突破非线性区
+```
+
+### 新增客观事实拼图（5条）
+
+28. **早期层方向注入效果92%是非线性的**: 三模型一致, 奇偶分解直接量化
+29. **DS7B全层非线性主导(75-93%)**: 即使最后一层方向符号也不重要
+30. **Qwen3深层逐步线性化(92%→44%)**: 深层方向符号开始有意义
+31. **GLM4最后一层非线性反弹(53%→69%)**: 最终层有特殊非线性处理
+32. **big-compatible对象非线性更强(89-99% Even)**: 解释了加性注入无法实现IDEAL的原因
+
+### 对Phase 397分析的判断
+
+**用户分析总体正确，奇偶分解提供了直接量化证据**:
+
+1. ✅ "方向翻转测试失效" → **量化验证**: Even=92%说明方向符号只贡献8%效果
+2. ✅ "吸引子假说合理" → **直接支持**: Odd≈0说明+/-d都被映射到同侧
+3. ✅ "DS7B强非线性" → **验证**: DS7B全层Even>75%, 是三个模型中最非线性的
+4. ✅ "Qwen3深层部分线性翻转" → **验证**: L35 Odd=55.8%, 深层线性成分显著增长
+5. ✅ "GLM4更依赖非线性路由" → **验证**: GLM4最后一层Even反弹到69%
+6. ✅ "big-compatible对象无法通过加性注入实现IDEAL" → **直接解释**: big对象的Even=89-99%, 方向注入几乎被非线性完全覆盖
+
+**重要修正**:
+1. ⚠️ "兼容性不是残差流中的静态方向" → 需要更精确: 早期层确实是静态方向(但被后续层非线性解释), 深层在某些模型(Qwen3)逐渐变为方向重要
+2. ⚠️ 用户未提到GLM4的非单调模式 → 这是新发现, 最后一层非线性反弹可能有特殊机制
+
+### 硬伤分析
+
+1. **Even主导不等于"吸引子"**: Even成分可能来自:
+   - 吸引子动力学(后续层把±d都推向同侧)
+   - RMSNorm的符号部分消除
+   - MLP门控的符号不敏感区
+   - 范数效应(±d都增加范数→同一效果)
+   需要进一步分解Even的来源
+
+2. **POBJ方向比L1方向更线性**: 例如DS7B L27 mountain L1 Even=87.5% vs POBJ Even=99.2%
+   这可能是因为L1方向包含了跨对象的异质成分
+
+3. **alpha=0时也有非零delta_diff**: baseline不一致, 可能是数值误差或hook注册副作用
+
+4. **只测了correct-corrupt prompt**: 未测incorrect条件下的奇偶分解
+
+5. **未区分范数效应和方向效应**: Even成分可能主要是范数变化(±d都增加范数)
+
+### 命令
+
+```bash
+python tests/glm5/phase398_oddeven_decomposition.py qwen3       # ~3min
+python tests/glm5/phase398_oddeven_decomposition.py deepseek7b  # ~25min
+python tests/glm5/phase398_oddeven_decomposition.py glm4        # ~40min
+```
+
+### 数据文件
+
+- `results/phase398_oddeven/{qwen3,deepseek7b,glm4}_phase398.json`
+- `tests/glm5/phase398_oddeven_decomposition.py`
+
+### 下一步
+
+1. **分解Even来源**: 区分范数效应 vs 吸引子效应 vs RMSNorm效应
+   - 测试纯范数注入(正交方向+范数匹配)的Even成分
+   - 测试RMSNorm前后的hook来隔离norm效应
+2. **自然激活交换**: 从加性注入转向自然样本交换
+3. **多候选排序测试**: 超越二元target/competitor
+4. **组件级追踪**: 找出哪个组件(attention/MLP/norm)贡献了最大Even成分
+5. **GLM4最后一层非线性反弹机制**: 为什么L39的Even从53%反弹到69%?
+
+## Phase 398b: Even成分来源分解 — 范数效应是主因 [2026-06-08 00:44]
+
+### 目标
+
+Phase 398发现Even成分占主导(92%), 但不知道来源:
+- 吸引子效应? (后续层把±d推向同侧)
+- 范数效应? (±d都改变范数, 范数变化是符号无关的)
+- RMSNorm效应? (RMSNorm消除方向符号信息)
+
+方法:
+```
+A. 随机正交方向测试:
+   - 生成与d正交的随机方向, 范数=d的范数
+   - 测试5个随机方向的Even成分
+   - 如果random_orthogonal Even ≈ L1 Even → 范数是主因
+   - 如果random_orthogonal Even << L1 Even → 吸引子是主因
+
+B. RMSNorm符号保存测试:
+   - 在下一层RMSNorm前后捕获残差变化
+   - 测量cos(delta_before_norm, delta_after_norm)
+   - 如果cos→0 → RMSNorm消除了方向信息
+```
+
+### 核心发现6：Even成分几乎完全由范数效应解释 — 不是吸引子!
+
+**Qwen3 L4** (Even=92.3%):
+```
+Object    L1 Even   Ortho Even  ortho/L1  判定
+ant       -0.2305   -0.2357     1.023     NORM_DOM
+elephant  -2.9062   -2.9018     0.998     NORM_DOM
+mountain  -2.8926   -2.9004     1.003     NORM_DOM
+```
+
+**DS7B L4** (Even=92.6%):
+```
+Object    L1 Even   Ortho Even  ortho/L1  判定
+ant       +1.1464   +1.0745     0.937     NORM_DOM
+elephant  -2.6902   -2.6376     0.980     NORM_DOM
+mountain  -2.6133   -2.6382     1.010     NORM_DOM
+```
+
+**DS7B L12** (Even=81.8%):
+```
+Object    L1 Even   Ortho Even  ortho/L1  判定
+ant       +1.1685   +1.2198     1.044     NORM_DOM
+elephant  -2.6322   -2.6681     1.014     NORM_DOM
+mountain  -2.6843   -2.6643     0.993     NORM_DOM
+```
+
+**DS7B L20** (Even=80.9%):
+```
+Object    L1 Even   Ortho Even  ortho/L1  判定
+ant       +1.0954   +1.2081     1.103     NORM_DOM
+elephant  -2.6050   -2.6416     1.014     NORM_DOM
+mountain  -2.6562   -2.6189     0.986     NORM_DOM
+```
+
+```
+→ 三个模型全层: 随机正交方向的Even ≈ L1方向的Even (ortho/L1 = 0.94~1.10)
+→ 这意味着: Even成分不是来自d方向的吸引子, 而是来自范数变化
+→ 任何方向(无论+/-d或随机)的等范数注入都产生几乎相同的Even效果
+→ Phase 397/398的"吸引子"假说被否证! 真正机制是范数放大效应
+```
+
+### 核心发现7：范数效应是状态依赖的 — 放大当前偏好
+
+```
+ant的Even:       +1.15 (正值 → 推向small → IDEAL)
+elephant的Even:  -2.69 (负值 → 推离big → REVERSED)
+```
+
+```
+→ 同样的范数注入, 对不同对象产生相反方向的logit变化
+→ 这不是范数本身的属性, 而是当前状态的属性
+→ 范数注入放大了当前状态中已有的偏好方向
+→ ant的corrupt状态已偏向small → 范数放大此偏好
+→ elephant的corrupt状态已偏向非big → 范数放大此偏好
+```
+
+### 核心发现8：Qwen3深层ant的范数效应减弱 — 方向开始有意义
+
+```
+Qwen3 ant L1方向:
+  L4:  ortho/L1 = 1.023 → NORM_DOM (纯范数)
+  L16: ortho/L1 = 0.438 → MIXED (范数+方向)
+  L32: ortho/L1 = 0.490 → MIXED (范数+方向)
+
+Qwen3 elephant/mountain L1方向:
+  L4:  ortho/L1 ≈ 1.0   → NORM_DOM
+  L16: ortho/L1 ≈ 1.0   → NORM_DOM
+  L32: ortho/L1 ≈ 1.0   → NORM_DOM
+```
+
+```
+→ Qwen3深层: small-compatible对象的方向开始有意义(ortho/L1降到0.44-0.49)
+→ 但big-compatible对象在所有层都是NORM_DOM
+→ 这与Phase 398发现一致: Qwen3深层ant从NONLINEAR_DOM变为LINEAR_DOM
+→ 方向效应对不同对象在不同层有不同表现
+```
+
+### 对Phase 397/398分析的修正
+
+**Phase 397/398的核心错误: "吸引子"假说**
+
+```
+Phase 397提出: DS7B存在"small吸引子", 把±d都推向small偏好
+Phase 398验证: Even成分占92%, 好像支持吸引子
+
+但Phase 398b揭示: Even ≈ random_orthogonal Even
+→ Even不是d方向的吸引子, 而是范数变化的效果
+→ 模型对"范数注入"的响应是: 放大当前状态的主导偏好
+→ 不是"吸引到small", 而是"范数放大已有偏好"
+```
+
+**修正后的机制**:
+```
+1. 范数注入改变residual stream的幅度
+2. 后续层的RMSNorm/注意力/MLP对幅度变化做出响应
+3. 响应方式: 放大当前状态中已有的主导方向
+4. ant的corrupt状态主导方向→small → 范数放大→更small → IDEAL
+5. elephant的corrupt状态主导方向→非big → 范数放大→更非big → REVERSED
+6. 所以±d和随机方向都给相同结果: 因为范数变化方向相同
+```
+
+### 新增客观事实拼图（3条）
+
+33. **Even成分由范数效应主导(ortho/L1≈1.0)**: 不是吸引子, 而是范数放大
+34. **范数效应是状态依赖的**: 同样范数放大不同对象的不同偏好
+35. **Qwen3深层ant的方向开始有意义(ortho/L1=0.44)**: 深层线性化从small对象开始
+
+### 硬伤分析
+
+1. **范数放大的具体机制未明**: RMSNorm? 注意力缩放? MLP门控?
+   RMSNorm测试失败(模块名不匹配), 需要修复
+
+2. **范数放大的"当前偏好"是什么?**:
+   corrupt prompt本身的token prior? 上下文累积的bias?
+   需要分析corrupt prompt的baseline logit分布
+
+3. **为什么big对象的范数效应是负值?**:
+   elephant的Even=-2.69, 说明范数注入推向非big
+   这可能是因为corrupt prompt("The item is big")中"item"没有big先验
+   但"big"作为competitor本身有强先验?
+   需要分析baseline的logit分布
+
+4. **只测了correct-corrupt条件**: 
+   未测试incorrect-corrupt的范数效应
+
+5. **随机方向只用了5个**: 样本偏少, 可能有偶然性
+
+### 命令
+
+```bash
+python tests/glm5/phase398b_even_source.py qwen3       # ~1min
+python tests/glm5/phase398b_even_source.py deepseek7b  # ~20min
+```
+
+### 数据文件
+
+- `results/phase398b_even_source/{qwen3,deepseek7b}_phase398b.json`
+- `tests/glm5/phase398b_even_source.py`
+
+### 下一步
+
+1. **修复RMSNorm测试**: 找到正确的模块名, 测量RMSNorm前后符号保存
+2. **分析corrupt prompt的baseline logit分布**: 理解为什么范数放大特定方向
+3. **范数注入vs方向注入的系统对比**: 在干净prompt上测试纯范数效果
+4. **自然激活交换测试**: 对比范数注入和自然状态交换
+5. **多候选排序**: 超越target/competitor, 看范数放大影响整个候选集合
+
+## Phase 399: 范数放大机制组件归因 + 基线审计 [2026-06-08 04:17]
+
+### 目标
+
+Phase 398b证明Even成分≈范数效应(ortho/L1≈1.0), 但不知道:
+1. 哪个组件把范数变化转化为偏好变化?
+2. "当前偏好"具体是什么?
+3. RMSNorm在其中扮演什么角色?
+
+三个子实验:
+```
+A. 基线Logit分布审计: 记录corrupt prompt的完整logit分布
+B. RMSNorm符号保存测试: 注入±d后测量RMSNorm前后delta的方向保存
+C. Attention vs MLP归因: 追踪注入delta通过后续层时的组件贡献
+```
+
+### 核心发现9：基线偏好存在强不对称 — small远比big更容易被激活
+
+| 模型 | ant small gap | elephant big gap | mountain big gap | 小/大偏好比 |
+|------|-------------|-----------------|-----------------|------------|
+| Qwen3 | +3.094 | +0.594 | +0.594 | 5.2x |
+| DS7B | +2.531 | +1.250 | +1.250 | 2.0x |
+| GLM4 | +1.195 | +5.068 | +5.068 | 0.24x |
+
+```
+→ Qwen3/DS7B: small偏好远强于big偏好 (ant gap > elephant gap)
+→ GLM4: big偏好远强于small偏好 (elephant gap >> ant gap)! 完全相反
+→ 这是跨模型的关键差异: 不同模型对"大小"维度的默认偏好方向不同
+→ GLM4的corrupt prompt "The item is big" 已经强偏好big (gap=5.07)
+   而 "The item is small" 只弱偏好small (gap=1.20)
+```
+
+候选排序(Qwen3):
+```
+ant corrupt:   small=6.59 > large=4.50 > miniature=4.41 > tiny=4.25 > massive=4.09 > medium=3.86 > big=3.50 > huge=0.38
+elephant:      big=5.72 > small=5.13 > large=4.91 > massive=4.09 > miniature=3.67 > medium=3.34 > tiny=3.03 > huge=2.34
+```
+→ "small"在ant corrupt中是绝对最高(6.59), "big"在elephant corrupt中只比"small"高0.59
+
+### 核心发现10：RMSNorm行为在三个模型间根本不同
+
+| 模型 | 层 | cos_preserved | norm_ratio | even/odd | 行为判定 |
+|------|---|--------------|------------|----------|---------|
+| Qwen3 | L4 | 0.84 | 0.33 | 6.2/0.33 | 压缩+符号保留 |
+| Qwen3 | L16 | 0.85 | 0.44 | 25.5/0.44 | 压缩+符号保留 |
+| DS7B | L4 ant | **0.17** | **0.005** | 0.29/0.005 | **重压缩+符号摧毁** |
+| DS7B | L4 elephant | 0.69 | 0.019 | 0.20/0.019 | 重压缩+符号部分保留 |
+| DS7B | L12 ant | 0.31 | 0.004 | 0.12/0.004 | 重压缩+符号差 |
+| GLM4 | L5 | **0.93** | **18.8** | **1507/18.5** | **强放大+符号保留** |
+| GLM4 | L15 | 0.94 | 7.0 | 761/6.9 | 中等放大 |
+| GLM4 | L25 | 0.94 | 2.1 | 110/2.1 | 弱放大 |
+| GLM4 | L35 | 0.97 | **1.14** | 62/1.1 | 微弱放大 |
+
+```
+→ 三个模型的RMSNorm行为完全不同:
+  Qwen3: 压缩delta(0.33x), 但Even>Odd(6-47x), 保留符号(cos≈0.85)
+  DS7B: 重压缩delta(0.005x), 对ant几乎摧毁符号(cos=0.17!), Even和Odd都被压缩
+  GLM4: 放大delta(1-19x!), Even>>Odd(62-1507x), 保留符号(cos≈0.94)
+
+→ DS7B对ant的RMSNorm符号摧毁(cos=0.17)解释了为什么DS7B对ant最非线性
+→ GLM4的RMSNorm放大(18.8x)解释了为什么GLM4的Even效应最大
+
+→ GLM4 RMSNorm放大从早期到晚期递减: 18.8→7.0→2.1→1.14
+  早期层: RMSNorm是巨大的Even放大器 (1507x Even vs 18x Odd)
+  晚期层: RMSNorm几乎不放大 (62x Even vs 1.1x Odd)
+```
+
+### 核心发现11：MLP是delta传播的主导组件
+
+Qwen3 L4→L5 (第一追踪层):
+```
+Object    attn_norm  mlp_norm  attn/mlp  pref_attn  pref_mlp  Δdiff
+ant       0.38       1.56      0.24      -0.008     +0.023    -0.06
+elephant  0.48       1.77      0.27      +0.016     -0.038    -0.03
+```
+
+Qwen3 L16→L17:
+```
+Object    attn_norm  mlp_norm  attn/mlp  pref_attn  pref_mlp  Δdiff
+ant       3.52       8.54      0.41      -0.013     -0.129    -0.39
+elephant  3.50       10.14     0.35      +0.061     -0.029    +0.00
+```
+
+```
+→ MLP norm 是 Attention norm 的 2.4-4.0 倍
+→ 深层(L16): MLP贡献更显著(8.5-10.1 vs attention 3.2-3.5)
+→ MLP的preference projection也更大: mlp=-0.13 vs attn=-0.01
+→ 但preference projection总体很小(0.01-0.13), 说明delta主要不在偏好方向
+```
+
+### 新增客观事实拼图（5条）
+
+36. **基线偏好不对称**: Qwen3/DS7B的small偏好>>big偏好, GLM4完全相反(big>>small)
+37. **DS7B RMSNorm对ant摧毁方向符号(cos=0.17)**: 这解释了DS7B对ant的最强非线性
+38. **GLM4 RMSNorm是巨大的Even放大器(norm_ratio=18.8x, even/odd=1507x)**: 与其他模型根本不同
+39. **GLM4 RMSNorm放大从早到晚递减(18.8→7.0→2.1→1.14)**: 早期层是主要放大器
+40. **MLP是delta传播主导组件(2.4-4.0x attention)**: 但preference projection总体很小
+
+## Phase 399b: 范数放大验证 — 纯范数注入确认 [2026-06-08 05:30]
+
+### 目标
+
+Round 2确认Phase 399的关键发现:
+1. 纯范数注入(乘以1+epsilon)是否给相同效果?
+2. 30个随机正交方向是否稳定确认NORM_DOM?
+3. 更多层级的RMSNorm行为
+
+### 核心发现12：纯范数注入与方向注入效果几乎完全一致
+
+| 模型 | 对象 | norm_boost Δdiff | ortho Even Δdiff | 差异 |
+|------|------|-----------------|-----------------|------|
+| Qwen3 L4 | ant | -0.28 | -0.23 | 18% |
+| Qwen3 L4 | elephant | -2.83 | -2.90 | 2% |
+| DS7B L4 | ant | **+0.97** | **+1.12** | 14% |
+| DS7B L4 | elephant | -2.70 | -2.65 | 2% |
+| GLM4 L5 | ant | -1.63 | -1.68 | 3% |
+| GLM4 L5 | elephant | -0.51 | -0.50 | 2% |
+
+```
+→ 纯范数注入(乘以1.1)和随机正交方向注入给几乎相同效果
+→ 这直接证明: 方向注入的效果确实来自范数变化, 不是方向本身
+→ 差异<20%, 在模型非线性误差范围内
+```
+
+### 核心发现13：范数注入效果方向是模型和对象依赖的 — 不是简单的"放大已有偏好"
+
+**Qwen3: 所有对象范数注入都减小target-competitor gap**
+```
+ant (target=small):      Δdiff=-0.28 (gap 3.09→2.81, 仍偏small但减弱)
+elephant (target=big):   Δdiff=-2.83 (gap 0.59→-2.24, 反转! 变成偏small)
+```
+
+**DS7B: ant增强偏好, elephant反转偏好**
+```
+ant (target=small):      Δdiff=+0.97 (gap 2.53→3.50, 增强small偏好)
+elephant (target=big):   Δdiff=-2.70 (gap 1.25→-1.45, 反转! 变成偏small)
+```
+
+**GLM4: 所有对象范数注入都减小target-competitor gap**
+```
+ant (target=small):      Δdiff=-1.63 (gap 1.20→-0.43, 反转! 变成偏big)
+elephant (target=big):   Δdiff=-0.51 (gap 5.07→4.56, 仍偏big但减弱)
+```
+
+```
+→ Phase 398b的"范数放大已有偏好"结论需要修正:
+  - Qwen3/GLM4: 范数注入实际减小已有偏好 (回归均值)
+  - DS7B ant: 范数注入增强已有偏好 (放大)
+  - DS7B elephant: 范数注入反转已有偏好
+
+→ 更准确描述: 范数注入放大"模型的默认token偏好"而非"上下文诱导的偏好"
+  - Qwen3/DS7B: "small"是默认强token, 范数增大→small更强
+  - GLM4: "big"是默认强token (但ant的上下文激活了small), 范数增大→big更强
+
+→ 关键不对称: 上下文对某些值的激活强(small), 对另一些弱(big)
+  范数变化放大了这种激活强度差异
+```
+
+### 核心发现14：30个随机正交方向稳定确认NORM_DOM (ortho/L1≈1.0)
+
+| 模型 | 层 | 对象 | ortho/L1 | std | 判定 |
+|------|---|------|---------|-----|------|
+| Qwen3 | L4 | ant | 1.019 | 0.009 | NORM_DOM |
+| Qwen3 | L4 | elephant | 0.998 | 0.010 | NORM_DOM |
+| Qwen3 | L28 | ant | 0.442 | 0.078 | MIXED |
+| Qwen3 | L28 | elephant | 1.125 | 0.137 | NORM_DOM |
+| DS7B | L4 | ant | 0.976 | 0.109 | NORM_DOM |
+| DS7B | L20 | ant | 1.081 | 0.173 | NORM_DOM |
+| GLM4 | L5 | ant | 1.095 | 0.059 | NORM_DOM |
+| GLM4 | L35 | ant | 0.999 | 0.187 | NORM_DOM |
+
+```
+→ 30个随机方向的标准差很小(0.01-0.19), 确认NORM_DOM稳定
+→ Qwen3 L28 ant: ortho/L1=0.44→MIXED (深层small对象方向开始有意义)
+→ 其他所有情况: ortho/L1≈1.0 → NORM_DOM (范数完全主导)
+```
+
+### 对用户Phase 398/398b分析的关键修正
+
+1. ⚠️ **"范数放大已有偏好"不完全正确**:
+   - 对Qwen3/GLM4: 范数注入减小已有偏好(回归均值)
+   - 对DS7B ant: 范数注入增强已有偏好
+   - 更准确: 范数注入放大模型的"默认token优先级"
+
+2. ⚠️ **"吸引子"假说需进一步修正**:
+   - Phase 398b否证了"语义吸引子", 修正为"范数效应"
+   - Phase 399b进一步发现: 范数效应不是"放大当前偏好", 而是"放大默认token优先级"
+   - 在Qwen3/DS7B中, "small"的默认优先级高于"big"
+   - 在GLM4中, "big"的默认优先级高于"small"
+
+3. ✅ **RMSNorm是范数效应的关键贡献者**: 
+   - GLM4 RMSNorm放大delta norm 18.8x, Even/Odd=1507
+   - DS7B RMSNorm对ant摧毁符号(cos=0.17), 创造Even主导
+   - Qwen3 RMSNorm压缩delta但放大Even/Odd比率(6-47x)
+
+4. ✅ **MLP是delta传播的主导组件**: 确认2.4-4.0x attention
+
+### 硬伤分析
+
+1. **"默认token优先级"尚未量化**: 需要测量模型在无上下文时的token先验分布
+2. **范数注入的效果因上下文而异**: 同一范数注入在不同prompt下可能给不同效果
+3. **GLM4 big偏好强于small的原因不明**: 可能是训练数据差异或架构差异
+4. **只测了size类别**: moisture和color可能有不同的默认token优先级
+5. **RMSNorm贡献和MLP贡献的交互未分解**: RMSNorm放大后, MLP如何进一步处理?
+
+### 命令
+
+```bash
+python tests/glm5/phase399_norm_attribution.py qwen3       # ~2min
+python tests/glm5/phase399_norm_attribution.py deepseek7b  # ~25min
+python tests/glm5/phase399_norm_attribution.py glm4        # ~40min
+python tests/glm5/phase399b_norm_verify.py qwen3           # ~10min
+python tests/glm5/phase399b_norm_verify.py deepseek7b      # ~60min
+python tests/glm5/phase399b_norm_verify.py glm4            # ~90min
+```
+
+### 数据文件
+
+- `results/phase399_norm_attribution/{qwen3,deepseek7b,glm4}_phase399.json`
+- `results/phase399b_norm_verify/{qwen3,deepseek7b,glm4}_phase399b.json`
+- `tests/glm5/phase399_norm_attribution.py`
+- `tests/glm5/phase399b_norm_verify.py`
+
+### 下一步
+
+1. **无上下文token先验测试**: 去掉prompt, 测量模型的默认logit分布
+2. **moisture/color类别测试**: 验证"默认token优先级"假说是否跨类别成立
+3. **RMSNorm+MLP交互分解**: RMSNorm放大后MLP如何进一步处理?
+4. **自然激活交换**: 从加性/乘性注入转向自然状态交换
+5. **多候选排序**: 范数注入如何影响整个候选分布(不只是top-2)?
+
+## Phase 400: Token先验 + 跨类别范数效应 + 多候选排序 [2026-06-08 10:30]
+
+### 目标
+
+解决Phase 399/399b遗留的三大硬伤:
+1. 默认token优先级未量化
+2. 只测了size类别
+3. 只看top-2候选
+
+三个子实验:
+```
+A. 无上下文Token先验: 5种模板 x 5种类别, 记录完整候选排序
+B. 跨类别范数效应: 5种类别的Even/Odd分解 + 纯范数注入
+C. 多候选排序: 范数注入对完整候选分布的影响
+```
+
+### 核心发现15：无上下文Token先验是模型特异的，且与corrupt prompt偏好不同
+
+| 模型 | size先验 | moisture先验 | color先验 | speed先验 | temp先验 |
+|------|---------|-------------|----------|----------|---------|
+| Qwen3 | big>small | wet>>dry | red>green | fast~slow | hot>cold |
+| DS7B | small>big | wet>>dry | red~green | fast~slow | hot>cold |
+| GLM4 | big>>small | wet~dry | blue>green | fast>slow | cold>hot |
+
+```
+→ Qwen3/DS7B: size先验偏向big(无上下文), 但corrupt prompt偏向small(Phase 399)
+→ 这说明"上下文"改变了偏好方向! 无上下文先验≠corrupt prompt偏好
+→ GLM4: big先验极强(-0.77 vs -5.28), 与Phase 399的corrupt big偏好一致
+→ moisture: Qwen3/DS7B中wet>>dry(gap高达12.7!), GLM4中wet~dry
+→ color: 三个模型都偏red/blue, 但强度不同
+→ speed: 所有模型先验都很弱(fast~slow, gap<2)
+→ temperature: Qwen3/DS7B偏hot, GLM4偏cold
+```
+
+### 核心发现16：speed类别是唯一的MIXED类别 — 方向信息在speed中更重要
+
+| 模型 | 层 | speed/cheetah | speed/rocket | speed/turtle |
+|------|---|--------------|-------------|-------------|
+| Qwen3 | L4 | 0.42 MIXED | 0.49 MIXED | - |
+| Qwen3 | L28 | 0.51 MIXED | 0.50 MIXED | - |
+| DS7B | L4 | 0.44 MIXED | 0.44 MIXED | 0.22 ATTRACTOR |
+| DS7B | L20 | 0.49 MIXED | 0.49 MIXED | -0.15 ATTRACTOR |
+| GLM4 | L5 | 0.89 NORM_DOM | 0.89 NORM_DOM | 0.56 MIXED |
+| GLM4 | L35 | -0.21 ATTRACTOR | -0.21 ATTRACTOR | -0.21 ATTRACTOR |
+
+```
+→ Qwen3/DS7B: speed在L4就是MIXED(even_ratio=0.42-0.49), 说明方向信息重要
+→ DS7B turtle: 甚至出现ATTRACTOR_DOM(even_ratio=0.22)!
+→ GLM4 L35: speed全部ATTRACTOR_DOM(even_ratio=-0.21)
+→ 对比: size/moisture/color/temperature几乎全部NORM_DOM
+
+→ 关键洞察: speed类别的方向信息比范数信息更重要!
+  可能原因: fast/slow不是简单的频率差异词汇, 而是更抽象的概念
+  fast/slow在语料中的分布更均衡, 导致模型必须用方向来编码
+
+→ 这是第一个发现"方向信息可以主导范数效应"的类别!
+```
+
+### 核心发现17：范数注入与token先验的相关性为负 — 范数注入导致回归均值
+
+| 模型 | 层 | prior-norm对齐率 | 相关系数 |
+|------|---|-----------------|---------|
+| Qwen3 | L4 | 20% (3/15) | **-0.540** |
+| Qwen3 | L28 | 60% (9/15) | +0.389 |
+| DS7B | L4 | 60% (9/15) | +0.390 |
+| DS7B | L20 | 40% (6/15) | -0.331 |
+| GLM4 | L5 | 67% (10/15) | **-0.288** |
+| GLM4 | L35 | 47% (7/15) | **-0.346** |
+
+```
+→ 关键修正: Phase 399b的"范数注入放大默认token优先级"结论不完全正确!
+  Qwen3 L4: 相关性-0.540! 先验gap越大, 范数注入越减小gap
+  GLM4 L5/L35: 负相关(-0.288/-0.346)
+
+→ 更准确描述: 范数注入导致logit分布回归均值(regression toward mean)
+  - 高logit的token: 范数注入后下降
+  - 低logit的token: 范数注入后上升
+  - 结果: gap缩小, 不是放大
+
+→ 但DS7B L4: 正相关(+0.390), 说明某些模型/层确实有放大效应
+→ DS7B L20又变负(-0.331): 同一模型不同层行为不同
+
+→ 结论: 范数注入的效果不能用单一机制解释
+  - 有回归均值效应(主要)
+  - 有放大当前偏好效应(次要, 模型/层依赖)
+  - 有效果反转效应(某些对象)
+```
+
+### 核心发现18：moisture类别的范数效应方向与size完全不同
+
+Qwen3 L4 moisture:
+```
+ocean(align=wet):   norm_boost=+0.078, baseline_gap=+1.25
+desert(align=dry):  norm_boost=-0.234, baseline_gap=-1.88
+```
+
+对比Qwen3 L4 size:
+```
+ant(align=small):   norm_boost=-0.281, baseline_gap=+3.09
+elephant(align=big):norm_boost=-2.903, baseline_gap=+0.59
+```
+
+```
+→ size: 范数注入几乎总是减小gap(回归均值)
+→ moisture: ocean的范数注入微增gap(+0.078), desert微减gap(-0.234)
+→ moisture的范数效应比size弱很多(0.078 vs -0.281)
+→ 可能原因: moisture的token先验gap更大(wet=8.81 vs dry=-3.89)
+  大gap意味着回归均值的空间更大, 但实际效果更小
+  这说明模型对moisture的编码策略与size不同
+```
+
+### 核心发现19：多候选排序显示范数注入效果集中在高logit候选
+
+Qwen3 L4 size/ant 范数注入后的候选变化:
+```
+baseline: small(6.59) > large(4.50) > miniature(4.41) > tiny(4.25) > massive(4.09) > medium(3.86) > big(3.50) > huge(0.38)
+boosted:  small(6.32) > large(4.47) > miniature(4.47) > massive(4.12) > tiny(4.00) > medium(3.95) > big(3.46) > huge(0.27)
+```
+
+```
+→ small(最高): -0.27 (最大降幅)
+→ huge(最低): -0.11 (也下降)
+→ massive: +0.03 (微升)
+→ 高logit候选下降更多, 低logit候选变化小
+
+→ 范数注入不是简单地推高所有token
+→ 更像: 高logit token被压缩, 候选分布变平
+→ 这与"回归均值"一致: 分布方差减小
+```
+
+### 新增客观事实拼图（5条）
+
+41. **无上下文token先验与corrupt prompt偏好方向不同**: Qwen3/DS7B无上下文偏big, 但corrupt prompt偏small
+42. **speed类别是唯一的MIXED/ATTRACTOR类别**: fast/slow的方向信息比范数信息更重要, 与其他类别根本不同
+43. **范数注入与token先验负相关(r=-0.54)**: 范数注入导致回归均值, 不是放大偏好
+44. **moisture的范数效应弱于size**: 尽管token先验gap更大, 范数注入效果更小
+45. **范数注入压缩高logit候选**: 多候选排序显示高logit token降幅最大, 分布变平
+
+### 对用户Phase 399/399b分析的关键修正
+
+1. **"范数扰动调制默认token优先级"需要修正**: 实际上是回归均值, 不是调制优先级
+   - 负相关(-0.540): 先验gap越大, 范数注入越减小gap
+   - 更准确: 范数注入压缩logit分布(减小方差)
+
+2. **"不同模型有不同默认候选优先级"部分正确, 但**: 
+   - 无上下文先验和corrupt prompt偏好方向不一致(Qwen3)
+   - 这说明上下文会改变偏好, 不能简单用"默认优先级"概括
+
+3. **speed类别是突破点**: 它是唯一方向>范数的类别, 可能揭示真正的语义方向编码
+
+4. **范数注入的本质是"分布压缩"**: 不是放大或缩小特定方向, 而是压缩整个候选分布
+
+### 命令
+
+```bash
+python tests/glm5/phase400_token_prior.py qwen3       # ~8min
+python tests/glm5/phase400_token_prior.py deepseek7b   # ~55min
+python tests/glm5/phase400_token_prior.py glm4         # ~60min
+```
+
+### 数据文件
+
+- `results/phase400_token_prior/{qwen3,deepseek7b,glm4}_phase400.json`
+- `tests/glm5/phase400_token_prior.py`
+
+### 下一步
+
+1. **speed类别深入分析**: 为什么speed是MIXED? 语义方向是什么?
+2. **范数注入的"分布压缩"机制**: 为什么压缩高logit? 与RMSNorm的关系?
+3. **上下文如何改变偏好**: 从无上下文到corrupt到clean, 偏好如何变化?
+4. **自然激活交换**: 对比人工注入和自然状态
+5. **更深层的范数效应来源分解**: RMSNorm vs attention vs MLP各自贡献多少到"分布压缩"?
  

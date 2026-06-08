@@ -1,0 +1,5844 @@
+{
+  "model": "glm4",
+  "timestamp": "2026-06-08 10:18",
+  "layer_indices": [
+    5,
+    35
+  ],
+  "categories": [
+    "size",
+    "moisture",
+    "color",
+    "speed",
+    "temperature"
+  ],
+  "token_prior": {
+    "<empty>": {
+      "size": {
+        "candidate_ranking": [
+          [
+            "massive",
+            -1.90625
+          ],
+          [
+            "huge",
+            -1.984375
+          ],
+          [
+            "small",
+            -2.359375
+          ],
+          [
+            "big",
+            -2.546875
+          ],
+          [
+            "large",
+            -2.71875
+          ],
+          [
+            "tiny",
+            -3.515625
+          ],
+          [
+            "medium",
+            -3.625
+          ],
+          [
+            "miniature",
+            -4.0625
+          ]
+        ],
+        "obj_gaps": {
+          "ant": {
+            "target": "small",
+            "comp": "big",
+            "target_logit": -2.359375,
+            "comp_logit": -2.546875,
+            "gap": 0.1875
+          },
+          "elephant": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -2.546875,
+            "comp_logit": -2.359375,
+            "gap": -0.1875
+          },
+          "mountain": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -2.546875,
+            "comp_logit": -2.359375,
+            "gap": -0.1875
+          }
+        }
+      },
+      "moisture": {
+        "candidate_ranking": [
+          [
+            "humid",
+            -0.06396484375
+          ],
+          [
+            "parched",
+            -1.359375
+          ],
+          [
+            "damp",
+            -2.484375
+          ],
+          [
+            "dry",
+            -3.265625
+          ],
+          [
+            "wet",
+            -3.5
+          ],
+          [
+            "soaked",
+            -5.21875
+          ],
+          [
+            "moist",
+            -5.40625
+          ],
+          [
+            "arid",
+            -5.65625
+          ]
+        ],
+        "obj_gaps": {
+          "ocean": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -3.5,
+            "comp_logit": -3.265625,
+            "gap": -0.234375
+          },
+          "desert": {
+            "target": "dry",
+            "comp": "wet",
+            "target_logit": -3.265625,
+            "comp_logit": -3.5,
+            "gap": 0.234375
+          },
+          "rainforest": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -3.5,
+            "comp_logit": -3.265625,
+            "gap": -0.234375
+          }
+        }
+      },
+      "color": {
+        "candidate_ranking": [
+          [
+            "yellow",
+            0.5546875
+          ],
+          [
+            "purple",
+            -1.2109375
+          ],
+          [
+            "white",
+            -1.578125
+          ],
+          [
+            "black",
+            -1.9140625
+          ],
+          [
+            "orange",
+            -1.921875
+          ],
+          [
+            "blue",
+            -2.296875
+          ],
+          [
+            "green",
+            -2.375
+          ],
+          [
+            "red",
+            -4.125
+          ]
+        ],
+        "obj_gaps": {
+          "apple": {
+            "target": "red",
+            "comp": "green",
+            "target_logit": -4.125,
+            "comp_logit": -2.375,
+            "gap": -1.75
+          },
+          "sky": {
+            "target": "blue",
+            "comp": "yellow",
+            "target_logit": -2.296875,
+            "comp_logit": 0.5546875,
+            "gap": -2.8515625
+          },
+          "grass": {
+            "target": "green",
+            "comp": "red",
+            "target_logit": -2.375,
+            "comp_logit": -4.125,
+            "gap": 1.75
+          }
+        }
+      },
+      "speed": {
+        "candidate_ranking": [
+          [
+            "speedy",
+            -0.68359375
+          ],
+          [
+            "fast",
+            -2.5625
+          ],
+          [
+            "sluggish",
+            -2.953125
+          ],
+          [
+            "quick",
+            -3.25
+          ],
+          [
+            "rapid",
+            -3.5625
+          ],
+          [
+            "slow",
+            -3.734375
+          ],
+          [
+            "leisurely",
+            -4.4375
+          ],
+          [
+            "swift",
+            -5.59375
+          ]
+        ],
+        "obj_gaps": {
+          "cheetah": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -2.5625,
+            "comp_logit": -3.734375,
+            "gap": 1.171875
+          },
+          "turtle": {
+            "target": "slow",
+            "comp": "fast",
+            "target_logit": -3.734375,
+            "comp_logit": -2.5625,
+            "gap": -1.171875
+          },
+          "rocket": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -2.5625,
+            "comp_logit": -3.734375,
+            "gap": 1.171875
+          }
+        }
+      },
+      "temperature": {
+        "candidate_ranking": [
+          [
+            "warm",
+            -1.9921875
+          ],
+          [
+            "freezing",
+            -2.421875
+          ],
+          [
+            "lukewarm",
+            -2.796875
+          ],
+          [
+            "cold",
+            -2.9375
+          ],
+          [
+            "hot",
+            -3.484375
+          ],
+          [
+            "boiling",
+            -4.5
+          ],
+          [
+            "frigid",
+            -4.5
+          ],
+          [
+            "cool",
+            -5.0
+          ]
+        ],
+        "obj_gaps": {
+          "fire": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -3.484375,
+            "comp_logit": -2.9375,
+            "gap": -0.546875
+          },
+          "ice": {
+            "target": "cold",
+            "comp": "hot",
+            "target_logit": -2.9375,
+            "comp_logit": -3.484375,
+            "gap": 0.546875
+          },
+          "volcano": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -3.484375,
+            "comp_logit": -2.9375,
+            "gap": -0.546875
+          }
+        }
+      }
+    },
+    "The": {
+      "size": {
+        "candidate_ranking": [
+          [
+            "big",
+            -0.76953125
+          ],
+          [
+            "tiny",
+            -4.09375
+          ],
+          [
+            "huge",
+            -4.40625
+          ],
+          [
+            "miniature",
+            -4.71875
+          ],
+          [
+            "massive",
+            -4.96875
+          ],
+          [
+            "medium",
+            -5.15625
+          ],
+          [
+            "small",
+            -5.28125
+          ],
+          [
+            "large",
+            -5.84375
+          ]
+        ],
+        "obj_gaps": {
+          "ant": {
+            "target": "small",
+            "comp": "big",
+            "target_logit": -5.28125,
+            "comp_logit": -0.76953125,
+            "gap": -4.51171875
+          },
+          "elephant": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -0.76953125,
+            "comp_logit": -5.28125,
+            "gap": 4.51171875
+          },
+          "mountain": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -0.76953125,
+            "comp_logit": -5.28125,
+            "gap": 4.51171875
+          }
+        }
+      },
+      "moisture": {
+        "candidate_ranking": [
+          [
+            "parched",
+            0.55859375
+          ],
+          [
+            "damp",
+            -0.3359375
+          ],
+          [
+            "arid",
+            -0.9140625
+          ],
+          [
+            "moist",
+            -2.25
+          ],
+          [
+            "soaked",
+            -2.3125
+          ],
+          [
+            "humid",
+            -3.796875
+          ],
+          [
+            "wet",
+            -4.21875
+          ],
+          [
+            "dry",
+            -4.5
+          ]
+        ],
+        "obj_gaps": {
+          "ocean": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -4.21875,
+            "comp_logit": -4.5,
+            "gap": 0.28125
+          },
+          "desert": {
+            "target": "dry",
+            "comp": "wet",
+            "target_logit": -4.5,
+            "comp_logit": -4.21875,
+            "gap": -0.28125
+          },
+          "rainforest": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -4.21875,
+            "comp_logit": -4.5,
+            "gap": 0.28125
+          }
+        }
+      },
+      "color": {
+        "candidate_ranking": [
+          [
+            "blue",
+            -2.515625
+          ],
+          [
+            "black",
+            -2.640625
+          ],
+          [
+            "green",
+            -4.0
+          ],
+          [
+            "white",
+            -4.21875
+          ],
+          [
+            "red",
+            -4.53125
+          ],
+          [
+            "orange",
+            -4.5625
+          ],
+          [
+            "yellow",
+            -4.96875
+          ],
+          [
+            "purple",
+            -6.34375
+          ]
+        ],
+        "obj_gaps": {
+          "apple": {
+            "target": "red",
+            "comp": "green",
+            "target_logit": -4.53125,
+            "comp_logit": -4.0,
+            "gap": -0.53125
+          },
+          "sky": {
+            "target": "blue",
+            "comp": "yellow",
+            "target_logit": -2.515625,
+            "comp_logit": -4.96875,
+            "gap": 2.453125
+          },
+          "grass": {
+            "target": "green",
+            "comp": "red",
+            "target_logit": -4.0,
+            "comp_logit": -4.53125,
+            "gap": 0.53125
+          }
+        }
+      },
+      "speed": {
+        "candidate_ranking": [
+          [
+            "leisurely",
+            0.00830078125
+          ],
+          [
+            "quick",
+            -3.15625
+          ],
+          [
+            "sluggish",
+            -3.765625
+          ],
+          [
+            "fast",
+            -3.8125
+          ],
+          [
+            "speedy",
+            -4.5625
+          ],
+          [
+            "rapid",
+            -5.25
+          ],
+          [
+            "slow",
+            -5.6875
+          ],
+          [
+            "swift",
+            -8.6875
+          ]
+        ],
+        "obj_gaps": {
+          "cheetah": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -3.8125,
+            "comp_logit": -5.6875,
+            "gap": 1.875
+          },
+          "turtle": {
+            "target": "slow",
+            "comp": "fast",
+            "target_logit": -5.6875,
+            "comp_logit": -3.8125,
+            "gap": -1.875
+          },
+          "rocket": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -3.8125,
+            "comp_logit": -5.6875,
+            "gap": 1.875
+          }
+        }
+      },
+      "temperature": {
+        "candidate_ranking": [
+          [
+            "boiling",
+            -1.9765625
+          ],
+          [
+            "cold",
+            -2.296875
+          ],
+          [
+            "frigid",
+            -2.84375
+          ],
+          [
+            "freezing",
+            -3.46875
+          ],
+          [
+            "warm",
+            -3.90625
+          ],
+          [
+            "hot",
+            -3.921875
+          ],
+          [
+            "cool",
+            -3.921875
+          ],
+          [
+            "lukewarm",
+            -5.78125
+          ]
+        ],
+        "obj_gaps": {
+          "fire": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -3.921875,
+            "comp_logit": -2.296875,
+            "gap": -1.625
+          },
+          "ice": {
+            "target": "cold",
+            "comp": "hot",
+            "target_logit": -2.296875,
+            "comp_logit": -3.921875,
+            "gap": 1.625
+          },
+          "volcano": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -3.921875,
+            "comp_logit": -2.296875,
+            "gap": -1.625
+          }
+        }
+      }
+    },
+    "It is": {
+      "size": {
+        "candidate_ranking": [
+          [
+            "small",
+            -2.0
+          ],
+          [
+            "big",
+            -2.078125
+          ],
+          [
+            "miniature",
+            -2.078125
+          ],
+          [
+            "huge",
+            -2.359375
+          ],
+          [
+            "massive",
+            -2.96875
+          ],
+          [
+            "medium",
+            -3.046875
+          ],
+          [
+            "large",
+            -3.5625
+          ],
+          [
+            "tiny",
+            -4.375
+          ]
+        ],
+        "obj_gaps": {
+          "ant": {
+            "target": "small",
+            "comp": "big",
+            "target_logit": -2.0,
+            "comp_logit": -2.078125,
+            "gap": 0.078125
+          },
+          "elephant": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -2.078125,
+            "comp_logit": -2.0,
+            "gap": -0.078125
+          },
+          "mountain": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -2.078125,
+            "comp_logit": -2.0,
+            "gap": -0.078125
+          }
+        }
+      },
+      "moisture": {
+        "candidate_ranking": [
+          [
+            "damp",
+            0.6875
+          ],
+          [
+            "parched",
+            0.314453125
+          ],
+          [
+            "soaked",
+            0.294921875
+          ],
+          [
+            "moist",
+            -1.015625
+          ],
+          [
+            "arid",
+            -1.0703125
+          ],
+          [
+            "wet",
+            -1.8671875
+          ],
+          [
+            "humid",
+            -1.9609375
+          ],
+          [
+            "dry",
+            -2.296875
+          ]
+        ],
+        "obj_gaps": {
+          "ocean": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -1.8671875,
+            "comp_logit": -2.296875,
+            "gap": 0.4296875
+          },
+          "desert": {
+            "target": "dry",
+            "comp": "wet",
+            "target_logit": -2.296875,
+            "comp_logit": -1.8671875,
+            "gap": -0.4296875
+          },
+          "rainforest": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -1.8671875,
+            "comp_logit": -2.296875,
+            "gap": 0.4296875
+          }
+        }
+      },
+      "color": {
+        "candidate_ranking": [
+          [
+            "black",
+            -2.46875
+          ],
+          [
+            "blue",
+            -2.484375
+          ],
+          [
+            "white",
+            -2.921875
+          ],
+          [
+            "red",
+            -2.953125
+          ],
+          [
+            "green",
+            -2.953125
+          ],
+          [
+            "yellow",
+            -3.65625
+          ],
+          [
+            "orange",
+            -3.6875
+          ],
+          [
+            "purple",
+            -5.1875
+          ]
+        ],
+        "obj_gaps": {
+          "apple": {
+            "target": "red",
+            "comp": "green",
+            "target_logit": -2.953125,
+            "comp_logit": -2.953125,
+            "gap": 0.0
+          },
+          "sky": {
+            "target": "blue",
+            "comp": "yellow",
+            "target_logit": -2.484375,
+            "comp_logit": -3.65625,
+            "gap": 1.171875
+          },
+          "grass": {
+            "target": "green",
+            "comp": "red",
+            "target_logit": -2.953125,
+            "comp_logit": -2.953125,
+            "gap": 0.0
+          }
+        }
+      },
+      "speed": {
+        "candidate_ranking": [
+          [
+            "leisurely",
+            -0.298828125
+          ],
+          [
+            "quick",
+            -1.7890625
+          ],
+          [
+            "fast",
+            -1.796875
+          ],
+          [
+            "swift",
+            -1.921875
+          ],
+          [
+            "speedy",
+            -2.015625
+          ],
+          [
+            "sluggish",
+            -2.125
+          ],
+          [
+            "rapid",
+            -2.46875
+          ],
+          [
+            "slow",
+            -2.546875
+          ]
+        ],
+        "obj_gaps": {
+          "cheetah": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -1.796875,
+            "comp_logit": -2.546875,
+            "gap": 0.75
+          },
+          "turtle": {
+            "target": "slow",
+            "comp": "fast",
+            "target_logit": -2.546875,
+            "comp_logit": -1.796875,
+            "gap": -0.75
+          },
+          "rocket": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -1.796875,
+            "comp_logit": -2.546875,
+            "gap": 0.75
+          }
+        }
+      },
+      "temperature": {
+        "candidate_ranking": [
+          [
+            "hot",
+            -0.4765625
+          ],
+          [
+            "cold",
+            -1.21875
+          ],
+          [
+            "cool",
+            -1.3203125
+          ],
+          [
+            "freezing",
+            -1.328125
+          ],
+          [
+            "frigid",
+            -1.4765625
+          ],
+          [
+            "boiling",
+            -1.609375
+          ],
+          [
+            "warm",
+            -1.7734375
+          ],
+          [
+            "lukewarm",
+            -2.96875
+          ]
+        ],
+        "obj_gaps": {
+          "fire": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -0.4765625,
+            "comp_logit": -1.21875,
+            "gap": 0.7421875
+          },
+          "ice": {
+            "target": "cold",
+            "comp": "hot",
+            "target_logit": -1.21875,
+            "comp_logit": -0.4765625,
+            "gap": -0.7421875
+          },
+          "volcano": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -0.4765625,
+            "comp_logit": -1.21875,
+            "gap": 0.7421875
+          }
+        }
+      }
+    },
+    "The item is": {
+      "size": {
+        "candidate_ranking": [
+          [
+            "huge",
+            -0.197265625
+          ],
+          [
+            "small",
+            -0.60546875
+          ],
+          [
+            "tiny",
+            -0.83984375
+          ],
+          [
+            "big",
+            -1.140625
+          ],
+          [
+            "massive",
+            -1.2890625
+          ],
+          [
+            "miniature",
+            -1.3203125
+          ],
+          [
+            "large",
+            -1.3828125
+          ],
+          [
+            "medium",
+            -1.671875
+          ]
+        ],
+        "obj_gaps": {
+          "ant": {
+            "target": "small",
+            "comp": "big",
+            "target_logit": -0.60546875,
+            "comp_logit": -1.140625,
+            "gap": 0.53515625
+          },
+          "elephant": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -1.140625,
+            "comp_logit": -0.60546875,
+            "gap": -0.53515625
+          },
+          "mountain": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": -1.140625,
+            "comp_logit": -0.60546875,
+            "gap": -0.53515625
+          }
+        }
+      },
+      "moisture": {
+        "candidate_ranking": [
+          [
+            "damp",
+            1.46875
+          ],
+          [
+            "parched",
+            1.25
+          ],
+          [
+            "soaked",
+            1.2265625
+          ],
+          [
+            "wet",
+            -1.4921875
+          ],
+          [
+            "moist",
+            -1.984375
+          ],
+          [
+            "dry",
+            -2.296875
+          ],
+          [
+            "arid",
+            -2.546875
+          ],
+          [
+            "humid",
+            -4.96875
+          ]
+        ],
+        "obj_gaps": {
+          "ocean": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -1.4921875,
+            "comp_logit": -2.296875,
+            "gap": 0.8046875
+          },
+          "desert": {
+            "target": "dry",
+            "comp": "wet",
+            "target_logit": -2.296875,
+            "comp_logit": -1.4921875,
+            "gap": -0.8046875
+          },
+          "rainforest": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -1.4921875,
+            "comp_logit": -2.296875,
+            "gap": 0.8046875
+          }
+        }
+      },
+      "color": {
+        "candidate_ranking": [
+          [
+            "white",
+            -1.21875
+          ],
+          [
+            "blue",
+            -1.921875
+          ],
+          [
+            "black",
+            -1.96875
+          ],
+          [
+            "yellow",
+            -2.109375
+          ],
+          [
+            "red",
+            -2.53125
+          ],
+          [
+            "green",
+            -2.8125
+          ],
+          [
+            "orange",
+            -2.96875
+          ],
+          [
+            "purple",
+            -3.828125
+          ]
+        ],
+        "obj_gaps": {
+          "apple": {
+            "target": "red",
+            "comp": "green",
+            "target_logit": -2.53125,
+            "comp_logit": -2.8125,
+            "gap": 0.28125
+          },
+          "sky": {
+            "target": "blue",
+            "comp": "yellow",
+            "target_logit": -1.921875,
+            "comp_logit": -2.109375,
+            "gap": 0.1875
+          },
+          "grass": {
+            "target": "green",
+            "comp": "red",
+            "target_logit": -2.8125,
+            "comp_logit": -2.53125,
+            "gap": -0.28125
+          }
+        }
+      },
+      "speed": {
+        "candidate_ranking": [
+          [
+            "leisurely",
+            0.61328125
+          ],
+          [
+            "sluggish",
+            -2.140625
+          ],
+          [
+            "rapid",
+            -3.0
+          ],
+          [
+            "fast",
+            -3.359375
+          ],
+          [
+            "swift",
+            -3.375
+          ],
+          [
+            "quick",
+            -3.5
+          ],
+          [
+            "slow",
+            -3.640625
+          ],
+          [
+            "speedy",
+            -4.71875
+          ]
+        ],
+        "obj_gaps": {
+          "cheetah": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -3.359375,
+            "comp_logit": -3.640625,
+            "gap": 0.28125
+          },
+          "turtle": {
+            "target": "slow",
+            "comp": "fast",
+            "target_logit": -3.640625,
+            "comp_logit": -3.359375,
+            "gap": -0.28125
+          },
+          "rocket": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": -3.359375,
+            "comp_logit": -3.640625,
+            "gap": 0.28125
+          }
+        }
+      },
+      "temperature": {
+        "candidate_ranking": [
+          [
+            "cool",
+            -0.8515625
+          ],
+          [
+            "freezing",
+            -0.9296875
+          ],
+          [
+            "frigid",
+            -1.3125
+          ],
+          [
+            "hot",
+            -1.734375
+          ],
+          [
+            "boiling",
+            -2.078125
+          ],
+          [
+            "warm",
+            -2.4375
+          ],
+          [
+            "cold",
+            -3.1875
+          ],
+          [
+            "lukewarm",
+            -4.03125
+          ]
+        ],
+        "obj_gaps": {
+          "fire": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -1.734375,
+            "comp_logit": -3.1875,
+            "gap": 1.453125
+          },
+          "ice": {
+            "target": "cold",
+            "comp": "hot",
+            "target_logit": -3.1875,
+            "comp_logit": -1.734375,
+            "gap": -1.453125
+          },
+          "volcano": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": -1.734375,
+            "comp_logit": -3.1875,
+            "gap": 1.453125
+          }
+        }
+      }
+    },
+    "___": {
+      "size": {
+        "candidate_ranking": [
+          [
+            "big",
+            3.734375
+          ],
+          [
+            "large",
+            3.421875
+          ],
+          [
+            "massive",
+            3.046875
+          ],
+          [
+            "small",
+            2.65625
+          ],
+          [
+            "miniature",
+            1.4609375
+          ],
+          [
+            "medium",
+            1.4453125
+          ],
+          [
+            "tiny",
+            -1.1875
+          ],
+          [
+            "huge",
+            -1.328125
+          ]
+        ],
+        "obj_gaps": {
+          "ant": {
+            "target": "small",
+            "comp": "big",
+            "target_logit": 2.65625,
+            "comp_logit": 3.734375,
+            "gap": -1.078125
+          },
+          "elephant": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": 3.734375,
+            "comp_logit": 2.65625,
+            "gap": 1.078125
+          },
+          "mountain": {
+            "target": "big",
+            "comp": "small",
+            "target_logit": 3.734375,
+            "comp_logit": 2.65625,
+            "gap": 1.078125
+          }
+        }
+      },
+      "moisture": {
+        "candidate_ranking": [
+          [
+            "damp",
+            6.5625
+          ],
+          [
+            "parched",
+            6.375
+          ],
+          [
+            "arid",
+            2.625
+          ],
+          [
+            "soaked",
+            0.16796875
+          ],
+          [
+            "moist",
+            0.12890625
+          ],
+          [
+            "humid",
+            -0.5625
+          ],
+          [
+            "dry",
+            -0.80078125
+          ],
+          [
+            "wet",
+            -2.796875
+          ]
+        ],
+        "obj_gaps": {
+          "ocean": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -2.796875,
+            "comp_logit": -0.80078125,
+            "gap": -1.99609375
+          },
+          "desert": {
+            "target": "dry",
+            "comp": "wet",
+            "target_logit": -0.80078125,
+            "comp_logit": -2.796875,
+            "gap": 1.99609375
+          },
+          "rainforest": {
+            "target": "wet",
+            "comp": "dry",
+            "target_logit": -2.796875,
+            "comp_logit": -0.80078125,
+            "gap": -1.99609375
+          }
+        }
+      },
+      "color": {
+        "candidate_ranking": [
+          [
+            "white",
+            3.84375
+          ],
+          [
+            "black",
+            2.953125
+          ],
+          [
+            "red",
+            2.828125
+          ],
+          [
+            "green",
+            1.7421875
+          ],
+          [
+            "yellow",
+            1.5546875
+          ],
+          [
+            "blue",
+            0.55078125
+          ],
+          [
+            "orange",
+            0.1767578125
+          ],
+          [
+            "purple",
+            -1.0703125
+          ]
+        ],
+        "obj_gaps": {
+          "apple": {
+            "target": "red",
+            "comp": "green",
+            "target_logit": 2.828125,
+            "comp_logit": 1.7421875,
+            "gap": 1.0859375
+          },
+          "sky": {
+            "target": "blue",
+            "comp": "yellow",
+            "target_logit": 0.55078125,
+            "comp_logit": 1.5546875,
+            "gap": -1.00390625
+          },
+          "grass": {
+            "target": "green",
+            "comp": "red",
+            "target_logit": 1.7421875,
+            "comp_logit": 2.828125,
+            "gap": -1.0859375
+          }
+        }
+      },
+      "speed": {
+        "candidate_ranking": [
+          [
+            "leisurely",
+            3.34375
+          ],
+          [
+            "fast",
+            2.390625
+          ],
+          [
+            "speedy",
+            2.390625
+          ],
+          [
+            "sluggish",
+            2.140625
+          ],
+          [
+            "quick",
+            2.0
+          ],
+          [
+            "swift",
+            1.2421875
+          ],
+          [
+            "slow",
+            -0.04638671875
+          ],
+          [
+            "rapid",
+            -0.10498046875
+          ]
+        ],
+        "obj_gaps": {
+          "cheetah": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": 2.390625,
+            "comp_logit": -0.04638671875,
+            "gap": 2.43701171875
+          },
+          "turtle": {
+            "target": "slow",
+            "comp": "fast",
+            "target_logit": -0.04638671875,
+            "comp_logit": 2.390625,
+            "gap": -2.43701171875
+          },
+          "rocket": {
+            "target": "fast",
+            "comp": "slow",
+            "target_logit": 2.390625,
+            "comp_logit": -0.04638671875,
+            "gap": 2.43701171875
+          }
+        }
+      },
+      "temperature": {
+        "candidate_ranking": [
+          [
+            "boiling",
+            2.171875
+          ],
+          [
+            "frigid",
+            2.0
+          ],
+          [
+            "freezing",
+            1.9296875
+          ],
+          [
+            "hot",
+            1.875
+          ],
+          [
+            "cold",
+            0.2265625
+          ],
+          [
+            "warm",
+            -0.298828125
+          ],
+          [
+            "cool",
+            -0.65625
+          ],
+          [
+            "lukewarm",
+            -0.65625
+          ]
+        ],
+        "obj_gaps": {
+          "fire": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": 1.875,
+            "comp_logit": 0.2265625,
+            "gap": 1.6484375
+          },
+          "ice": {
+            "target": "cold",
+            "comp": "hot",
+            "target_logit": 0.2265625,
+            "comp_logit": 1.875,
+            "gap": -1.6484375
+          },
+          "volcano": {
+            "target": "hot",
+            "comp": "cold",
+            "target_logit": 1.875,
+            "comp_logit": 0.2265625,
+            "gap": 1.6484375
+          }
+        }
+      }
+    }
+  },
+  "cross_category_norm": {
+    "5": {
+      "size": {
+        "ant": {
+          "align": "small",
+          "baseline_gap": 1.572265625,
+          "l1_even": 0.07470703125,
+          "l1_odd": 0.14599609375,
+          "avg_ortho_even": -0.0323974609375,
+          "std_ortho_even": 0.07766516206440893,
+          "avg_ortho_odd": -0.0636962890625,
+          "even_ratio": -0.4336601301384732,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.03515625
+        },
+        "elephant": {
+          "align": "big",
+          "baseline_gap": 5.18426513671875,
+          "l1_even": 0.07208251953125,
+          "l1_odd": -0.17626953125,
+          "avg_ortho_even": 0.03545074462890625,
+          "std_ortho_even": 0.044266389581119336,
+          "avg_ortho_odd": 0.10066070556640624,
+          "even_ratio": 0.4918077893261831,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.013749122619628906
+        },
+        "mountain": {
+          "align": "big",
+          "baseline_gap": 5.18426513671875,
+          "l1_even": -0.03948974609375,
+          "l1_odd": -0.260986328125,
+          "avg_ortho_even": 0.03487529754638672,
+          "std_ortho_even": 0.04346222118656799,
+          "avg_ortho_odd": 0.09902515411376953,
+          "even_ratio": -0.8831481861622102,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.013749122619628906
+        }
+      },
+      "moisture": {
+        "ocean": {
+          "align": "wet",
+          "baseline_gap": 0.046875,
+          "l1_even": -0.01171875,
+          "l1_odd": 0.25390625,
+          "avg_ortho_even": -0.05263671875,
+          "std_ortho_even": 0.04324077159351957,
+          "avg_ortho_odd": -0.07451171875,
+          "even_ratio": 4.491666704995556,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.09375
+        },
+        "desert": {
+          "align": "dry",
+          "baseline_gap": 1.99609375,
+          "l1_even": -0.01708984375,
+          "l1_odd": 0.40869140625,
+          "avg_ortho_even": 0.04990234375,
+          "std_ortho_even": 0.05637303777354368,
+          "avg_ortho_odd": 0.09638671875,
+          "even_ratio": -2.920000017086172,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.064453125
+        },
+        "rainforest": {
+          "align": "wet",
+          "baseline_gap": 0.046875,
+          "l1_even": 0.103515625,
+          "l1_odd": 0.189453125,
+          "avg_ortho_even": -0.0552734375,
+          "std_ortho_even": 0.04733296790899784,
+          "avg_ortho_odd": -0.076171875,
+          "even_ratio": -0.5339622636351158,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.09375
+        }
+      },
+      "color": {
+        "apple": {
+          "align": "red",
+          "baseline_gap": 2.94921875,
+          "l1_even": 0.001953125,
+          "l1_odd": 0.236328125,
+          "avg_ortho_even": 0.03017578125,
+          "std_ortho_even": 0.05176509014282808,
+          "avg_ortho_odd": 0.04365234375,
+          "even_ratio": 15.449999208960039,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.11328125
+        },
+        "sky": {
+          "align": "blue",
+          "baseline_gap": 4.1640625,
+          "l1_even": -0.0517578125,
+          "l1_odd": 0.0361328125,
+          "avg_ortho_even": -0.061669921875,
+          "std_ortho_even": 0.03643870597400932,
+          "avg_ortho_odd": -0.009423828125,
+          "even_ratio": 1.1915094362643504,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.03515625
+        },
+        "grass": {
+          "align": "green",
+          "baseline_gap": 2.83203125,
+          "l1_even": 0.109375,
+          "l1_odd": -0.2890625,
+          "avg_ortho_even": 0.0408203125,
+          "std_ortho_even": 0.0435426430235305,
+          "avg_ortho_odd": -0.01298828125,
+          "even_ratio": 0.3732142853730612,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.0859375
+        }
+      },
+      "speed": {
+        "cheetah": {
+          "align": "fast",
+          "baseline_gap": 3.40478515625,
+          "l1_even": -0.02685546875,
+          "l1_odd": -0.1181640625,
+          "avg_ortho_even": -0.019646835327148438,
+          "std_ortho_even": 0.06972030076237969,
+          "avg_ortho_odd": 0.059547042846679686,
+          "even_ratio": 0.7315767072695802,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.03173828125
+        },
+        "turtle": {
+          "align": "slow",
+          "baseline_gap": 2.88348388671875,
+          "l1_even": -0.17449951171875,
+          "l1_odd": -0.1533203125,
+          "avg_ortho_even": -0.07491827011108398,
+          "std_ortho_even": 0.037877119141847555,
+          "avg_ortho_odd": -0.09558172225952148,
+          "even_ratio": 0.4293322624006359,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.02984619140625
+        },
+        "rocket": {
+          "align": "fast",
+          "baseline_gap": 3.40478515625,
+          "l1_even": -0.0399169921875,
+          "l1_odd": -0.0347900390625,
+          "avg_ortho_even": -0.014056968688964843,
+          "std_ortho_even": 0.06238365202468797,
+          "avg_ortho_odd": 0.05971736907958984,
+          "even_ratio": 0.3521550085274782,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.03173828125
+        }
+      },
+      "temperature": {
+        "fire": {
+          "align": "hot",
+          "baseline_gap": 4.53857421875,
+          "l1_even": -0.01220703125,
+          "l1_odd": 0.623046875,
+          "avg_ortho_even": -0.07445831298828125,
+          "std_ortho_even": 0.09062343686755586,
+          "avg_ortho_odd": 0.08097686767578124,
+          "even_ratio": 6.099625049968128,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.161376953125
+        },
+        "ice": {
+          "align": "cold",
+          "baseline_gap": 0.458984375,
+          "l1_even": 0.03076171875,
+          "l1_odd": 0.12646484375,
+          "avg_ortho_even": 0.052197265625,
+          "std_ortho_even": 0.08708436889276076,
+          "avg_ortho_odd": 0.012255859375,
+          "even_ratio": 1.6968253913093676,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.08203125
+        },
+        "volcano": {
+          "align": "hot",
+          "baseline_gap": 4.53857421875,
+          "l1_even": -0.020263671875,
+          "l1_odd": 0.517333984375,
+          "avg_ortho_even": -0.06625823974609375,
+          "std_ortho_even": 0.0871530689068319,
+          "avg_ortho_odd": 0.07706146240234375,
+          "even_ratio": 3.2698042330037573,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.161376953125
+        }
+      }
+    },
+    "35": {
+      "size": {
+        "ant": {
+          "align": "small",
+          "baseline_gap": 1.572265625,
+          "l1_even": -0.212738037109375,
+          "l1_odd": -1.109527587890625,
+          "avg_ortho_even": -0.1752338409423828,
+          "std_ortho_even": 0.21759330335349863,
+          "avg_ortho_odd": 0.01949653625488281,
+          "even_ratio": 0.8237071442689892,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.064453125
+        },
+        "elephant": {
+          "align": "big",
+          "baseline_gap": 5.18426513671875,
+          "l1_even": -0.3306884765625,
+          "l1_odd": 0.79681396484375,
+          "avg_ortho_even": -0.3014507293701172,
+          "std_ortho_even": 0.19844928521125677,
+          "avg_ortho_odd": 0.11422843933105468,
+          "even_ratio": 0.9115852254510043,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.05584716796875
+        },
+        "mountain": {
+          "align": "big",
+          "baseline_gap": 5.18426513671875,
+          "l1_even": -0.7996826171875,
+          "l1_odd": -0.52667236328125,
+          "avg_ortho_even": -0.3281391143798828,
+          "std_ortho_even": 0.21385859851969583,
+          "avg_ortho_odd": 0.11286354064941406,
+          "even_ratio": 0.4103366852902073,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.05584716796875
+        }
+      },
+      "moisture": {
+        "ocean": {
+          "align": "wet",
+          "baseline_gap": 0.046875,
+          "l1_even": 0.45849609375,
+          "l1_odd": 3.33837890625,
+          "avg_ortho_even": 0.13707275390625,
+          "std_ortho_even": 0.40594513145920375,
+          "avg_ortho_odd": 0.15955810546875,
+          "even_ratio": 0.2989616612766482,
+          "even_source": "ATTRACTOR_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.01171875
+        },
+        "desert": {
+          "align": "dry",
+          "baseline_gap": 1.99609375,
+          "l1_even": 0.515625,
+          "l1_odd": 1.046875,
+          "avg_ortho_even": -0.024837493896484375,
+          "std_ortho_even": 0.3866131900925632,
+          "avg_ortho_odd": -0.05174942016601562,
+          "even_ratio": -0.04816968512323376,
+          "even_source": "ATTRACTOR_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.03125
+        },
+        "rainforest": {
+          "align": "wet",
+          "baseline_gap": 0.046875,
+          "l1_even": 0.34423828125,
+          "l1_odd": 1.66455078125,
+          "avg_ortho_even": 0.1391998291015625,
+          "std_ortho_even": 0.409869897099149,
+          "avg_ortho_odd": 0.1667816162109375,
+          "even_ratio": 0.4043705672584183,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.01171875
+        }
+      },
+      "color": {
+        "apple": {
+          "align": "red",
+          "baseline_gap": 2.94921875,
+          "l1_even": -0.130859375,
+          "l1_odd": -0.619140625,
+          "avg_ortho_even": -0.1261962890625,
+          "std_ortho_even": 0.159682189121506,
+          "avg_ortho_odd": 0.0816162109375,
+          "even_ratio": 0.9643656723787392,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.0546875
+        },
+        "sky": {
+          "align": "blue",
+          "baseline_gap": 4.1640625,
+          "l1_even": -0.018310546875,
+          "l1_odd": -0.165771484375,
+          "avg_ortho_even": -0.08609485626220703,
+          "std_ortho_even": 0.14695096973210386,
+          "avg_ortho_odd": -0.25992565155029296,
+          "even_ratio": 4.701927109012125,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.0966796875
+        },
+        "grass": {
+          "align": "green",
+          "baseline_gap": 2.83203125,
+          "l1_even": -0.140625,
+          "l1_odd": 0.5,
+          "avg_ortho_even": -0.0222412109375,
+          "std_ortho_even": 0.17746202163314753,
+          "avg_ortho_odd": -0.0320068359375,
+          "even_ratio": 0.15815972233469136,
+          "even_source": "ATTRACTOR_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.16015625
+        }
+      },
+      "speed": {
+        "cheetah": {
+          "align": "fast",
+          "baseline_gap": 3.40478515625,
+          "l1_even": 0.25262451171875,
+          "l1_odd": -2.29571533203125,
+          "avg_ortho_even": -0.1263885498046875,
+          "std_ortho_even": 0.4618639009934155,
+          "avg_ortho_odd": 0.10341796875,
+          "even_ratio": -0.5003020051172518,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.033203125
+        },
+        "turtle": {
+          "align": "slow",
+          "baseline_gap": 2.88348388671875,
+          "l1_even": -0.43231201171875,
+          "l1_odd": 1.740234375,
+          "avg_ortho_even": -0.24692306518554688,
+          "std_ortho_even": 0.3200218451777949,
+          "avg_ortho_odd": -0.023096466064453126,
+          "even_ratio": 0.5711686433623893,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.024749755859375
+        },
+        "rocket": {
+          "align": "fast",
+          "baseline_gap": 3.40478515625,
+          "l1_even": 0.8896484375,
+          "l1_odd": -0.61962890625,
+          "avg_ortho_even": -0.06839790344238281,
+          "std_ortho_even": 0.3902415402976019,
+          "avg_ortho_odd": 0.05776710510253906,
+          "even_ratio": -0.07688194634152282,
+          "even_source": "ATTRACTOR_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": 0.033203125
+        }
+      },
+      "temperature": {
+        "fire": {
+          "align": "hot",
+          "baseline_gap": 4.53857421875,
+          "l1_even": -0.8663330078125,
+          "l1_odd": 0.6109619140625,
+          "avg_ortho_even": -0.404962158203125,
+          "std_ortho_even": 0.20312556179592497,
+          "avg_ortho_odd": -0.24658203125,
+          "even_ratio": 0.4674439904724433,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.19873046875
+        },
+        "ice": {
+          "align": "cold",
+          "baseline_gap": 0.458984375,
+          "l1_even": -0.751953125,
+          "l1_odd": 1.703125,
+          "avg_ortho_even": 0.28978424072265624,
+          "std_ortho_even": 0.2963075788292398,
+          "avg_ortho_odd": 0.15055389404296876,
+          "even_ratio": -0.38537540589540575,
+          "even_source": "MIXED",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.06640625
+        },
+        "volcano": {
+          "align": "hot",
+          "baseline_gap": 4.53857421875,
+          "l1_even": -0.384765625,
+          "l1_odd": 0.30029296875,
+          "avg_ortho_even": -0.5306174278259277,
+          "std_ortho_even": 0.25760014569165535,
+          "avg_ortho_odd": -0.2665421485900879,
+          "even_ratio": 1.3790666148095594,
+          "even_source": "NORM_DOM",
+          "n_ortho": 20,
+          "norm_boost_delta_diff": -0.19873046875
+        }
+      }
+    }
+  },
+  "multi_candidate": {
+    "5": {
+      "size": {
+        "ant": {
+          "align": "small",
+          "target": "small",
+          "comp": "big",
+          "baseline_ranking": [
+            [
+              "medium",
+              2.84375
+            ],
+            [
+              "small",
+              2.828125
+            ],
+            [
+              "tiny",
+              2.578125
+            ],
+            [
+              "big",
+              1.6328125
+            ],
+            [
+              "large",
+              1.578125
+            ],
+            [
+              "miniature",
+              1.3671875
+            ],
+            [
+              "massive",
+              0.80078125
+            ],
+            [
+              "huge",
+              -1.234375
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "small",
+              2.875
+            ],
+            [
+              "medium",
+              2.78125
+            ],
+            [
+              "tiny",
+              2.734375
+            ],
+            [
+              "large",
+              1.65625
+            ],
+            [
+              "big",
+              1.5859375
+            ],
+            [
+              "miniature",
+              1.453125
+            ],
+            [
+              "massive",
+              0.86328125
+            ],
+            [
+              "huge",
+              -1.2265625
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": 2.578125,
+              "boosted": 2.734375,
+              "delta": 0.15625
+            },
+            "small": {
+              "baseline": 2.828125,
+              "boosted": 2.875,
+              "delta": 0.046875
+            },
+            "medium": {
+              "baseline": 2.84375,
+              "boosted": 2.78125,
+              "delta": -0.0625
+            },
+            "large": {
+              "baseline": 1.578125,
+              "boosted": 1.65625,
+              "delta": 0.078125
+            },
+            "big": {
+              "baseline": 1.6328125,
+              "boosted": 1.5859375,
+              "delta": -0.046875
+            },
+            "huge": {
+              "baseline": -1.234375,
+              "boosted": -1.2265625,
+              "delta": 0.0078125
+            },
+            "massive": {
+              "baseline": 0.80078125,
+              "boosted": 0.86328125,
+              "delta": 0.0625
+            },
+            "miniature": {
+              "baseline": 1.3671875,
+              "boosted": 1.453125,
+              "delta": 0.0859375
+            }
+          },
+          "rank_changes": {
+            "medium": -1,
+            "small": 1,
+            "tiny": 0,
+            "big": -1,
+            "large": 1,
+            "miniature": 0,
+            "massive": 0,
+            "huge": 0
+          },
+          "baseline_std": 1.2609308103173595,
+          "boosted_std": 1.2680782512923865,
+          "target_delta": 0.046875,
+          "comp_delta": -0.046875,
+          "target_comp_delta_diff": 0.09375
+        },
+        "elephant": {
+          "align": "big",
+          "target": "big",
+          "comp": "small",
+          "baseline_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.015625
+            ],
+            [
+              "medium",
+              2.46875
+            ],
+            [
+              "massive",
+              0.478515625
+            ],
+            [
+              "huge",
+              0.13671875
+            ],
+            [
+              "small",
+              -0.224609375
+            ],
+            [
+              "tiny",
+              -0.62109375
+            ],
+            [
+              "miniature",
+              -1.96875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.078125
+            ],
+            [
+              "medium",
+              2.609375
+            ],
+            [
+              "massive",
+              0.486328125
+            ],
+            [
+              "huge",
+              0.15234375
+            ],
+            [
+              "small",
+              -0.283203125
+            ],
+            [
+              "tiny",
+              -0.5234375
+            ],
+            [
+              "miniature",
+              -1.890625
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": -0.62109375,
+              "boosted": -0.5234375,
+              "delta": 0.09765625
+            },
+            "small": {
+              "baseline": -0.224609375,
+              "boosted": -0.283203125,
+              "delta": -0.05859375
+            },
+            "medium": {
+              "baseline": 2.46875,
+              "boosted": 2.609375,
+              "delta": 0.140625
+            },
+            "large": {
+              "baseline": 3.015625,
+              "boosted": 3.078125,
+              "delta": 0.0625
+            },
+            "big": {
+              "baseline": 4.84375,
+              "boosted": 4.84375,
+              "delta": 0.0
+            },
+            "huge": {
+              "baseline": 0.13671875,
+              "boosted": 0.15234375,
+              "delta": 0.015625
+            },
+            "massive": {
+              "baseline": 0.478515625,
+              "boosted": 0.486328125,
+              "delta": 0.0078125
+            },
+            "miniature": {
+              "baseline": -1.96875,
+              "boosted": -1.890625,
+              "delta": 0.078125
+            }
+          },
+          "rank_changes": {
+            "big": 0,
+            "large": 0,
+            "medium": 0,
+            "massive": 0,
+            "huge": 0,
+            "small": 0,
+            "tiny": 0,
+            "miniature": 0
+          },
+          "baseline_std": 2.0901733708912023,
+          "boosted_std": 2.0904767655306555,
+          "target_delta": 0.0,
+          "comp_delta": -0.05859375,
+          "target_comp_delta_diff": 0.05859375
+        },
+        "mountain": {
+          "align": "big",
+          "target": "big",
+          "comp": "small",
+          "baseline_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.015625
+            ],
+            [
+              "medium",
+              2.46875
+            ],
+            [
+              "massive",
+              0.478515625
+            ],
+            [
+              "huge",
+              0.13671875
+            ],
+            [
+              "small",
+              -0.224609375
+            ],
+            [
+              "tiny",
+              -0.62109375
+            ],
+            [
+              "miniature",
+              -1.96875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.078125
+            ],
+            [
+              "medium",
+              2.609375
+            ],
+            [
+              "massive",
+              0.486328125
+            ],
+            [
+              "huge",
+              0.15234375
+            ],
+            [
+              "small",
+              -0.283203125
+            ],
+            [
+              "tiny",
+              -0.5234375
+            ],
+            [
+              "miniature",
+              -1.890625
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": -0.62109375,
+              "boosted": -0.5234375,
+              "delta": 0.09765625
+            },
+            "small": {
+              "baseline": -0.224609375,
+              "boosted": -0.283203125,
+              "delta": -0.05859375
+            },
+            "medium": {
+              "baseline": 2.46875,
+              "boosted": 2.609375,
+              "delta": 0.140625
+            },
+            "large": {
+              "baseline": 3.015625,
+              "boosted": 3.078125,
+              "delta": 0.0625
+            },
+            "big": {
+              "baseline": 4.84375,
+              "boosted": 4.84375,
+              "delta": 0.0
+            },
+            "huge": {
+              "baseline": 0.13671875,
+              "boosted": 0.15234375,
+              "delta": 0.015625
+            },
+            "massive": {
+              "baseline": 0.478515625,
+              "boosted": 0.486328125,
+              "delta": 0.0078125
+            },
+            "miniature": {
+              "baseline": -1.96875,
+              "boosted": -1.890625,
+              "delta": 0.078125
+            }
+          },
+          "rank_changes": {
+            "big": 0,
+            "large": 0,
+            "medium": 0,
+            "massive": 0,
+            "huge": 0,
+            "small": 0,
+            "tiny": 0,
+            "miniature": 0
+          },
+          "baseline_std": 2.0901733708912023,
+          "boosted_std": 2.0904767655306555,
+          "target_delta": 0.0,
+          "comp_delta": -0.05859375,
+          "target_comp_delta_diff": 0.05859375
+        }
+      },
+      "moisture": {
+        "ocean": {
+          "align": "wet",
+          "target": "wet",
+          "comp": "dry",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.21875
+            ],
+            [
+              "wet",
+              4.1875
+            ],
+            [
+              "damp",
+              4.03125
+            ],
+            [
+              "soaked",
+              1.4296875
+            ],
+            [
+              "parched",
+              0.9453125
+            ],
+            [
+              "humid",
+              0.63671875
+            ],
+            [
+              "arid",
+              0.490234375
+            ],
+            [
+              "moist",
+              0.1201171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "dry",
+              4.3125
+            ],
+            [
+              "damp",
+              4.21875
+            ],
+            [
+              "wet",
+              4.125
+            ],
+            [
+              "soaked",
+              1.4921875
+            ],
+            [
+              "parched",
+              0.96484375
+            ],
+            [
+              "humid",
+              0.6484375
+            ],
+            [
+              "arid",
+              0.55078125
+            ],
+            [
+              "moist",
+              0.1396484375
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 4.1875,
+              "boosted": 4.125,
+              "delta": -0.0625
+            },
+            "damp": {
+              "baseline": 4.03125,
+              "boosted": 4.21875,
+              "delta": 0.1875
+            },
+            "moist": {
+              "baseline": 0.1201171875,
+              "boosted": 0.1396484375,
+              "delta": 0.01953125
+            },
+            "dry": {
+              "baseline": 4.21875,
+              "boosted": 4.3125,
+              "delta": 0.09375
+            },
+            "arid": {
+              "baseline": 0.490234375,
+              "boosted": 0.55078125,
+              "delta": 0.060546875
+            },
+            "humid": {
+              "baseline": 0.63671875,
+              "boosted": 0.6484375,
+              "delta": 0.01171875
+            },
+            "soaked": {
+              "baseline": 1.4296875,
+              "boosted": 1.4921875,
+              "delta": 0.0625
+            },
+            "parched": {
+              "baseline": 0.9453125,
+              "boosted": 0.96484375,
+              "delta": 0.01953125
+            }
+          },
+          "rank_changes": {
+            "dry": 0,
+            "wet": -1,
+            "damp": 1,
+            "soaked": 0,
+            "parched": 0,
+            "humid": 0,
+            "arid": 0,
+            "moist": 0
+          },
+          "baseline_std": 1.6934819996575177,
+          "boosted_std": 1.713106248391814,
+          "target_delta": -0.0625,
+          "comp_delta": 0.09375,
+          "target_comp_delta_diff": -0.15625
+        },
+        "desert": {
+          "align": "dry",
+          "target": "dry",
+          "comp": "wet",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.5
+            ],
+            [
+              "humid",
+              2.953125
+            ],
+            [
+              "damp",
+              2.921875
+            ],
+            [
+              "wet",
+              2.421875
+            ],
+            [
+              "soaked",
+              1.65625
+            ],
+            [
+              "moist",
+              0.99609375
+            ],
+            [
+              "parched",
+              0.828125
+            ],
+            [
+              "arid",
+              -0.03564453125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "dry",
+              4.53125
+            ],
+            [
+              "damp",
+              3.140625
+            ],
+            [
+              "humid",
+              3.03125
+            ],
+            [
+              "wet",
+              2.53125
+            ],
+            [
+              "soaked",
+              1.78125
+            ],
+            [
+              "moist",
+              1.15625
+            ],
+            [
+              "parched",
+              1.0390625
+            ],
+            [
+              "arid",
+              0.0186767578125
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 2.421875,
+              "boosted": 2.53125,
+              "delta": 0.109375
+            },
+            "damp": {
+              "baseline": 2.921875,
+              "boosted": 3.140625,
+              "delta": 0.21875
+            },
+            "moist": {
+              "baseline": 0.99609375,
+              "boosted": 1.15625,
+              "delta": 0.16015625
+            },
+            "dry": {
+              "baseline": 4.5,
+              "boosted": 4.53125,
+              "delta": 0.03125
+            },
+            "arid": {
+              "baseline": -0.03564453125,
+              "boosted": 0.0186767578125,
+              "delta": 0.0543212890625
+            },
+            "humid": {
+              "baseline": 2.953125,
+              "boosted": 3.03125,
+              "delta": 0.078125
+            },
+            "soaked": {
+              "baseline": 1.65625,
+              "boosted": 1.78125,
+              "delta": 0.125
+            },
+            "parched": {
+              "baseline": 0.828125,
+              "boosted": 1.0390625,
+              "delta": 0.2109375
+            }
+          },
+          "rank_changes": {
+            "dry": 0,
+            "humid": -1,
+            "damp": 1,
+            "wet": 0,
+            "soaked": 0,
+            "moist": 0,
+            "parched": 0,
+            "arid": 0
+          },
+          "baseline_std": 1.3611625765018873,
+          "boosted_std": 1.345072928747112,
+          "target_delta": 0.03125,
+          "comp_delta": 0.109375,
+          "target_comp_delta_diff": -0.078125
+        },
+        "rainforest": {
+          "align": "wet",
+          "target": "wet",
+          "comp": "dry",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.21875
+            ],
+            [
+              "wet",
+              4.1875
+            ],
+            [
+              "damp",
+              4.03125
+            ],
+            [
+              "soaked",
+              1.4296875
+            ],
+            [
+              "parched",
+              0.9453125
+            ],
+            [
+              "humid",
+              0.63671875
+            ],
+            [
+              "arid",
+              0.490234375
+            ],
+            [
+              "moist",
+              0.1201171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "dry",
+              4.3125
+            ],
+            [
+              "damp",
+              4.21875
+            ],
+            [
+              "wet",
+              4.125
+            ],
+            [
+              "soaked",
+              1.4921875
+            ],
+            [
+              "parched",
+              0.96484375
+            ],
+            [
+              "humid",
+              0.6484375
+            ],
+            [
+              "arid",
+              0.55078125
+            ],
+            [
+              "moist",
+              0.1396484375
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 4.1875,
+              "boosted": 4.125,
+              "delta": -0.0625
+            },
+            "damp": {
+              "baseline": 4.03125,
+              "boosted": 4.21875,
+              "delta": 0.1875
+            },
+            "moist": {
+              "baseline": 0.1201171875,
+              "boosted": 0.1396484375,
+              "delta": 0.01953125
+            },
+            "dry": {
+              "baseline": 4.21875,
+              "boosted": 4.3125,
+              "delta": 0.09375
+            },
+            "arid": {
+              "baseline": 0.490234375,
+              "boosted": 0.55078125,
+              "delta": 0.060546875
+            },
+            "humid": {
+              "baseline": 0.63671875,
+              "boosted": 0.6484375,
+              "delta": 0.01171875
+            },
+            "soaked": {
+              "baseline": 1.4296875,
+              "boosted": 1.4921875,
+              "delta": 0.0625
+            },
+            "parched": {
+              "baseline": 0.9453125,
+              "boosted": 0.96484375,
+              "delta": 0.01953125
+            }
+          },
+          "rank_changes": {
+            "dry": 0,
+            "wet": -1,
+            "damp": 1,
+            "soaked": 0,
+            "parched": 0,
+            "humid": 0,
+            "arid": 0,
+            "moist": 0
+          },
+          "baseline_std": 1.6934819996575177,
+          "boosted_std": 1.713106248391814,
+          "target_delta": -0.0625,
+          "comp_delta": 0.09375,
+          "target_comp_delta_diff": -0.15625
+        }
+      },
+      "color": {
+        "apple": {
+          "align": "red",
+          "target": "red",
+          "comp": "green",
+          "baseline_ranking": [
+            [
+              "red",
+              5.53125
+            ],
+            [
+              "blue",
+              3.421875
+            ],
+            [
+              "green",
+              2.40625
+            ],
+            [
+              "purple",
+              2.140625
+            ],
+            [
+              "orange",
+              2.078125
+            ],
+            [
+              "yellow",
+              1.7421875
+            ],
+            [
+              "black",
+              1.234375
+            ],
+            [
+              "white",
+              -0.171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "red",
+              5.71875
+            ],
+            [
+              "blue",
+              3.46875
+            ],
+            [
+              "green",
+              2.421875
+            ],
+            [
+              "purple",
+              2.171875
+            ],
+            [
+              "orange",
+              2.140625
+            ],
+            [
+              "yellow",
+              1.859375
+            ],
+            [
+              "black",
+              1.3203125
+            ],
+            [
+              "white",
+              -0.11669921875
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 5.53125,
+              "boosted": 5.71875,
+              "delta": 0.1875
+            },
+            "blue": {
+              "baseline": 3.421875,
+              "boosted": 3.46875,
+              "delta": 0.046875
+            },
+            "green": {
+              "baseline": 2.40625,
+              "boosted": 2.421875,
+              "delta": 0.015625
+            },
+            "yellow": {
+              "baseline": 1.7421875,
+              "boosted": 1.859375,
+              "delta": 0.1171875
+            },
+            "white": {
+              "baseline": -0.171875,
+              "boosted": -0.11669921875,
+              "delta": 0.05517578125
+            },
+            "black": {
+              "baseline": 1.234375,
+              "boosted": 1.3203125,
+              "delta": 0.0859375
+            },
+            "orange": {
+              "baseline": 2.078125,
+              "boosted": 2.140625,
+              "delta": 0.0625
+            },
+            "purple": {
+              "baseline": 2.140625,
+              "boosted": 2.171875,
+              "delta": 0.03125
+            }
+          },
+          "rank_changes": {
+            "red": 0,
+            "blue": 0,
+            "green": 0,
+            "purple": 0,
+            "orange": 0,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.5549251815606644,
+          "boosted_std": 1.5835921593344273,
+          "target_delta": 0.1875,
+          "comp_delta": 0.015625,
+          "target_comp_delta_diff": 0.171875
+        },
+        "sky": {
+          "align": "blue",
+          "target": "blue",
+          "comp": "yellow",
+          "baseline_ranking": [
+            [
+              "blue",
+              5.375
+            ],
+            [
+              "red",
+              2.5
+            ],
+            [
+              "orange",
+              2.203125
+            ],
+            [
+              "purple",
+              1.9765625
+            ],
+            [
+              "green",
+              1.7890625
+            ],
+            [
+              "yellow",
+              1.234375
+            ],
+            [
+              "black",
+              0.39453125
+            ],
+            [
+              "white",
+              -0.337890625
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "blue",
+              5.4375
+            ],
+            [
+              "red",
+              2.59375
+            ],
+            [
+              "orange",
+              2.1875
+            ],
+            [
+              "purple",
+              1.9609375
+            ],
+            [
+              "green",
+              1.8046875
+            ],
+            [
+              "yellow",
+              1.2578125
+            ],
+            [
+              "black",
+              0.40625
+            ],
+            [
+              "white",
+              -0.40234375
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 2.5,
+              "boosted": 2.59375,
+              "delta": 0.09375
+            },
+            "blue": {
+              "baseline": 5.375,
+              "boosted": 5.4375,
+              "delta": 0.0625
+            },
+            "green": {
+              "baseline": 1.7890625,
+              "boosted": 1.8046875,
+              "delta": 0.015625
+            },
+            "yellow": {
+              "baseline": 1.234375,
+              "boosted": 1.2578125,
+              "delta": 0.0234375
+            },
+            "white": {
+              "baseline": -0.337890625,
+              "boosted": -0.40234375,
+              "delta": -0.064453125
+            },
+            "black": {
+              "baseline": 0.39453125,
+              "boosted": 0.40625,
+              "delta": 0.01171875
+            },
+            "orange": {
+              "baseline": 2.203125,
+              "boosted": 2.1875,
+              "delta": -0.015625
+            },
+            "purple": {
+              "baseline": 1.9765625,
+              "boosted": 1.9609375,
+              "delta": -0.015625
+            }
+          },
+          "rank_changes": {
+            "blue": 0,
+            "red": 0,
+            "orange": 0,
+            "purple": 0,
+            "green": 0,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.5914927747947738,
+          "boosted_std": 1.6215295412687978,
+          "target_delta": 0.0625,
+          "comp_delta": 0.0234375,
+          "target_comp_delta_diff": 0.0390625
+        },
+        "grass": {
+          "align": "green",
+          "target": "green",
+          "comp": "red",
+          "baseline_ranking": [
+            [
+              "green",
+              5.25
+            ],
+            [
+              "blue",
+              3.359375
+            ],
+            [
+              "orange",
+              2.796875
+            ],
+            [
+              "purple",
+              2.515625
+            ],
+            [
+              "red",
+              2.453125
+            ],
+            [
+              "yellow",
+              1.515625
+            ],
+            [
+              "black",
+              0.7265625
+            ],
+            [
+              "white",
+              -0.5078125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "green",
+              5.1875
+            ],
+            [
+              "blue",
+              3.34375
+            ],
+            [
+              "orange",
+              2.765625
+            ],
+            [
+              "red",
+              2.484375
+            ],
+            [
+              "purple",
+              2.484375
+            ],
+            [
+              "yellow",
+              1.5703125
+            ],
+            [
+              "black",
+              0.72265625
+            ],
+            [
+              "white",
+              -0.51953125
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 2.453125,
+              "boosted": 2.484375,
+              "delta": 0.03125
+            },
+            "blue": {
+              "baseline": 3.359375,
+              "boosted": 3.34375,
+              "delta": -0.015625
+            },
+            "green": {
+              "baseline": 5.25,
+              "boosted": 5.1875,
+              "delta": -0.0625
+            },
+            "yellow": {
+              "baseline": 1.515625,
+              "boosted": 1.5703125,
+              "delta": 0.0546875
+            },
+            "white": {
+              "baseline": -0.5078125,
+              "boosted": -0.51953125,
+              "delta": -0.01171875
+            },
+            "black": {
+              "baseline": 0.7265625,
+              "boosted": 0.72265625,
+              "delta": -0.00390625
+            },
+            "orange": {
+              "baseline": 2.796875,
+              "boosted": 2.765625,
+              "delta": -0.03125
+            },
+            "purple": {
+              "baseline": 2.515625,
+              "boosted": 2.484375,
+              "delta": -0.03125
+            }
+          },
+          "rank_changes": {
+            "green": 0,
+            "blue": 0,
+            "orange": 0,
+            "purple": -1,
+            "red": 1,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.6242615415689439,
+          "boosted_std": 1.6072412067172197,
+          "target_delta": -0.0625,
+          "comp_delta": 0.03125,
+          "target_comp_delta_diff": -0.09375
+        }
+      },
+      "speed": {
+        "cheetah": {
+          "align": "fast",
+          "target": "fast",
+          "comp": "slow",
+          "baseline_ranking": [
+            [
+              "fast",
+              3.671875
+            ],
+            [
+              "rapid",
+              2.546875
+            ],
+            [
+              "quick",
+              1.8203125
+            ],
+            [
+              "speedy",
+              0.5703125
+            ],
+            [
+              "slow",
+              0.40234375
+            ],
+            [
+              "swift",
+              0.2890625
+            ],
+            [
+              "leisurely",
+              -0.412109375
+            ],
+            [
+              "sluggish",
+              -0.482421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "fast",
+              3.890625
+            ],
+            [
+              "rapid",
+              2.71875
+            ],
+            [
+              "quick",
+              2.046875
+            ],
+            [
+              "speedy",
+              0.7421875
+            ],
+            [
+              "slow",
+              0.6328125
+            ],
+            [
+              "swift",
+              0.34765625
+            ],
+            [
+              "sluggish",
+              -0.251953125
+            ],
+            [
+              "leisurely",
+              -0.255859375
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 3.671875,
+              "boosted": 3.890625,
+              "delta": 0.21875
+            },
+            "slow": {
+              "baseline": 0.40234375,
+              "boosted": 0.6328125,
+              "delta": 0.23046875
+            },
+            "rapid": {
+              "baseline": 2.546875,
+              "boosted": 2.71875,
+              "delta": 0.171875
+            },
+            "sluggish": {
+              "baseline": -0.482421875,
+              "boosted": -0.251953125,
+              "delta": 0.23046875
+            },
+            "quick": {
+              "baseline": 1.8203125,
+              "boosted": 2.046875,
+              "delta": 0.2265625
+            },
+            "swift": {
+              "baseline": 0.2890625,
+              "boosted": 0.34765625,
+              "delta": 0.05859375
+            },
+            "leisurely": {
+              "baseline": -0.412109375,
+              "boosted": -0.255859375,
+              "delta": 0.15625
+            },
+            "speedy": {
+              "baseline": 0.5703125,
+              "boosted": 0.7421875,
+              "delta": 0.171875
+            }
+          },
+          "rank_changes": {
+            "fast": 0,
+            "rapid": 0,
+            "quick": 0,
+            "speedy": 0,
+            "slow": 0,
+            "swift": 0,
+            "leisurely": -1,
+            "sluggish": 1
+          },
+          "baseline_std": 1.3884751063784742,
+          "boosted_std": 1.4026561166024483,
+          "target_delta": 0.21875,
+          "comp_delta": 0.23046875,
+          "target_comp_delta_diff": -0.01171875
+        },
+        "turtle": {
+          "align": "slow",
+          "target": "slow",
+          "comp": "fast",
+          "baseline_ranking": [
+            [
+              "slow",
+              4.21875
+            ],
+            [
+              "sluggish",
+              2.109375
+            ],
+            [
+              "fast",
+              1.1796875
+            ],
+            [
+              "speedy",
+              1.1796875
+            ],
+            [
+              "rapid",
+              0.2001953125
+            ],
+            [
+              "quick",
+              0.1630859375
+            ],
+            [
+              "leisurely",
+              -1.46875
+            ],
+            [
+              "swift",
+              -2.125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "slow",
+              4.25
+            ],
+            [
+              "sluggish",
+              2.171875
+            ],
+            [
+              "fast",
+              1.1875
+            ],
+            [
+              "speedy",
+              1.1875
+            ],
+            [
+              "rapid",
+              0.1884765625
+            ],
+            [
+              "quick",
+              0.185546875
+            ],
+            [
+              "leisurely",
+              -1.4296875
+            ],
+            [
+              "swift",
+              -2.09375
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 1.1796875,
+              "boosted": 1.1875,
+              "delta": 0.0078125
+            },
+            "slow": {
+              "baseline": 4.21875,
+              "boosted": 4.25,
+              "delta": 0.03125
+            },
+            "rapid": {
+              "baseline": 0.2001953125,
+              "boosted": 0.1884765625,
+              "delta": -0.01171875
+            },
+            "sluggish": {
+              "baseline": 2.109375,
+              "boosted": 2.171875,
+              "delta": 0.0625
+            },
+            "quick": {
+              "baseline": 0.1630859375,
+              "boosted": 0.185546875,
+              "delta": 0.0224609375
+            },
+            "swift": {
+              "baseline": -2.125,
+              "boosted": -2.09375,
+              "delta": 0.03125
+            },
+            "leisurely": {
+              "baseline": -1.46875,
+              "boosted": -1.4296875,
+              "delta": 0.0390625
+            },
+            "speedy": {
+              "baseline": 1.1796875,
+              "boosted": 1.1875,
+              "delta": 0.0078125
+            }
+          },
+          "rank_changes": {
+            "slow": 0,
+            "sluggish": 0,
+            "fast": 0,
+            "speedy": 0,
+            "rapid": 0,
+            "quick": 0,
+            "leisurely": 0,
+            "swift": 0
+          },
+          "baseline_std": 1.872423818181936,
+          "boosted_std": 1.874529044291585,
+          "target_delta": 0.03125,
+          "comp_delta": 0.0078125,
+          "target_comp_delta_diff": 0.0234375
+        },
+        "rocket": {
+          "align": "fast",
+          "target": "fast",
+          "comp": "slow",
+          "baseline_ranking": [
+            [
+              "fast",
+              3.671875
+            ],
+            [
+              "rapid",
+              2.546875
+            ],
+            [
+              "quick",
+              1.8203125
+            ],
+            [
+              "speedy",
+              0.5703125
+            ],
+            [
+              "slow",
+              0.40234375
+            ],
+            [
+              "swift",
+              0.2890625
+            ],
+            [
+              "leisurely",
+              -0.412109375
+            ],
+            [
+              "sluggish",
+              -0.482421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "fast",
+              3.890625
+            ],
+            [
+              "rapid",
+              2.71875
+            ],
+            [
+              "quick",
+              2.046875
+            ],
+            [
+              "speedy",
+              0.7421875
+            ],
+            [
+              "slow",
+              0.6328125
+            ],
+            [
+              "swift",
+              0.34765625
+            ],
+            [
+              "sluggish",
+              -0.251953125
+            ],
+            [
+              "leisurely",
+              -0.255859375
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 3.671875,
+              "boosted": 3.890625,
+              "delta": 0.21875
+            },
+            "slow": {
+              "baseline": 0.40234375,
+              "boosted": 0.6328125,
+              "delta": 0.23046875
+            },
+            "rapid": {
+              "baseline": 2.546875,
+              "boosted": 2.71875,
+              "delta": 0.171875
+            },
+            "sluggish": {
+              "baseline": -0.482421875,
+              "boosted": -0.251953125,
+              "delta": 0.23046875
+            },
+            "quick": {
+              "baseline": 1.8203125,
+              "boosted": 2.046875,
+              "delta": 0.2265625
+            },
+            "swift": {
+              "baseline": 0.2890625,
+              "boosted": 0.34765625,
+              "delta": 0.05859375
+            },
+            "leisurely": {
+              "baseline": -0.412109375,
+              "boosted": -0.255859375,
+              "delta": 0.15625
+            },
+            "speedy": {
+              "baseline": 0.5703125,
+              "boosted": 0.7421875,
+              "delta": 0.171875
+            }
+          },
+          "rank_changes": {
+            "fast": 0,
+            "rapid": 0,
+            "quick": 0,
+            "speedy": 0,
+            "slow": 0,
+            "swift": 0,
+            "leisurely": -1,
+            "sluggish": 1
+          },
+          "baseline_std": 1.3884751063784742,
+          "boosted_std": 1.4026561166024483,
+          "target_delta": 0.21875,
+          "comp_delta": 0.23046875,
+          "target_comp_delta_diff": -0.01171875
+        }
+      },
+      "temperature": {
+        "fire": {
+          "align": "hot",
+          "target": "hot",
+          "comp": "cold",
+          "baseline_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.3125
+            ],
+            [
+              "warm",
+              1.0
+            ],
+            [
+              "cold",
+              0.080078125
+            ],
+            [
+              "boiling",
+              6.103515625e-05
+            ],
+            [
+              "frigid",
+              -0.19140625
+            ],
+            [
+              "lukewarm",
+              -0.84375
+            ],
+            [
+              "freezing",
+              -1.25
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.40625
+            ],
+            [
+              "warm",
+              1.03125
+            ],
+            [
+              "cold",
+              0.2099609375
+            ],
+            [
+              "boiling",
+              -0.01495361328125
+            ],
+            [
+              "frigid",
+              -0.1162109375
+            ],
+            [
+              "lukewarm",
+              -0.8359375
+            ],
+            [
+              "freezing",
+              -1.3046875
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 4.03125,
+              "boosted": 4.03125,
+              "delta": 0.0
+            },
+            "cold": {
+              "baseline": 0.080078125,
+              "boosted": 0.2099609375,
+              "delta": 0.1298828125
+            },
+            "warm": {
+              "baseline": 1.0,
+              "boosted": 1.03125,
+              "delta": 0.03125
+            },
+            "cool": {
+              "baseline": 2.3125,
+              "boosted": 2.40625,
+              "delta": 0.09375
+            },
+            "freezing": {
+              "baseline": -1.25,
+              "boosted": -1.3046875,
+              "delta": -0.0546875
+            },
+            "boiling": {
+              "baseline": 6.103515625e-05,
+              "boosted": -0.01495361328125,
+              "delta": -0.0150146484375
+            },
+            "lukewarm": {
+              "baseline": -0.84375,
+              "boosted": -0.8359375,
+              "delta": 0.0078125
+            },
+            "frigid": {
+              "baseline": -0.19140625,
+              "boosted": -0.1162109375,
+              "delta": 0.0751953125
+            }
+          },
+          "rank_changes": {
+            "hot": 0,
+            "cool": 0,
+            "warm": 0,
+            "cold": 0,
+            "boiling": 0,
+            "frigid": 0,
+            "lukewarm": 0,
+            "freezing": 0
+          },
+          "baseline_std": 1.6437485265060887,
+          "boosted_std": 1.654877468712321,
+          "target_delta": 0.0,
+          "comp_delta": 0.1298828125,
+          "target_comp_delta_diff": -0.1298828125
+        },
+        "ice": {
+          "align": "cold",
+          "target": "cold",
+          "comp": "hot",
+          "baseline_ranking": [
+            [
+              "cold",
+              3.109375
+            ],
+            [
+              "freezing",
+              3.03125
+            ],
+            [
+              "cool",
+              1.765625
+            ],
+            [
+              "frigid",
+              1.5625
+            ],
+            [
+              "warm",
+              1.53125
+            ],
+            [
+              "hot",
+              1.375
+            ],
+            [
+              "boiling",
+              0.90234375
+            ],
+            [
+              "lukewarm",
+              -1.7421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "cold",
+              3.109375
+            ],
+            [
+              "freezing",
+              3.046875
+            ],
+            [
+              "cool",
+              1.6875
+            ],
+            [
+              "frigid",
+              1.6328125
+            ],
+            [
+              "warm",
+              1.5859375
+            ],
+            [
+              "hot",
+              1.5390625
+            ],
+            [
+              "boiling",
+              0.921875
+            ],
+            [
+              "lukewarm",
+              -1.7578125
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 1.375,
+              "boosted": 1.5390625,
+              "delta": 0.1640625
+            },
+            "cold": {
+              "baseline": 3.109375,
+              "boosted": 3.109375,
+              "delta": 0.0
+            },
+            "warm": {
+              "baseline": 1.53125,
+              "boosted": 1.5859375,
+              "delta": 0.0546875
+            },
+            "cool": {
+              "baseline": 1.765625,
+              "boosted": 1.6875,
+              "delta": -0.078125
+            },
+            "freezing": {
+              "baseline": 3.03125,
+              "boosted": 3.046875,
+              "delta": 0.015625
+            },
+            "boiling": {
+              "baseline": 0.90234375,
+              "boosted": 0.921875,
+              "delta": 0.01953125
+            },
+            "lukewarm": {
+              "baseline": -1.7421875,
+              "boosted": -1.7578125,
+              "delta": -0.015625
+            },
+            "frigid": {
+              "baseline": 1.5625,
+              "boosted": 1.6328125,
+              "delta": 0.0703125
+            }
+          },
+          "rank_changes": {
+            "cold": 0,
+            "freezing": 0,
+            "cool": 0,
+            "frigid": 0,
+            "warm": 0,
+            "hot": 0,
+            "boiling": 0,
+            "lukewarm": 0
+          },
+          "baseline_std": 1.4083608255957107,
+          "boosted_std": 1.4135646892219804,
+          "target_delta": 0.0,
+          "comp_delta": 0.1640625,
+          "target_comp_delta_diff": -0.1640625
+        },
+        "volcano": {
+          "align": "hot",
+          "target": "hot",
+          "comp": "cold",
+          "baseline_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.3125
+            ],
+            [
+              "warm",
+              1.0
+            ],
+            [
+              "cold",
+              0.080078125
+            ],
+            [
+              "boiling",
+              6.103515625e-05
+            ],
+            [
+              "frigid",
+              -0.19140625
+            ],
+            [
+              "lukewarm",
+              -0.84375
+            ],
+            [
+              "freezing",
+              -1.25
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.40625
+            ],
+            [
+              "warm",
+              1.03125
+            ],
+            [
+              "cold",
+              0.2099609375
+            ],
+            [
+              "boiling",
+              -0.01495361328125
+            ],
+            [
+              "frigid",
+              -0.1162109375
+            ],
+            [
+              "lukewarm",
+              -0.8359375
+            ],
+            [
+              "freezing",
+              -1.3046875
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 4.03125,
+              "boosted": 4.03125,
+              "delta": 0.0
+            },
+            "cold": {
+              "baseline": 0.080078125,
+              "boosted": 0.2099609375,
+              "delta": 0.1298828125
+            },
+            "warm": {
+              "baseline": 1.0,
+              "boosted": 1.03125,
+              "delta": 0.03125
+            },
+            "cool": {
+              "baseline": 2.3125,
+              "boosted": 2.40625,
+              "delta": 0.09375
+            },
+            "freezing": {
+              "baseline": -1.25,
+              "boosted": -1.3046875,
+              "delta": -0.0546875
+            },
+            "boiling": {
+              "baseline": 6.103515625e-05,
+              "boosted": -0.01495361328125,
+              "delta": -0.0150146484375
+            },
+            "lukewarm": {
+              "baseline": -0.84375,
+              "boosted": -0.8359375,
+              "delta": 0.0078125
+            },
+            "frigid": {
+              "baseline": -0.19140625,
+              "boosted": -0.1162109375,
+              "delta": 0.0751953125
+            }
+          },
+          "rank_changes": {
+            "hot": 0,
+            "cool": 0,
+            "warm": 0,
+            "cold": 0,
+            "boiling": 0,
+            "frigid": 0,
+            "lukewarm": 0,
+            "freezing": 0
+          },
+          "baseline_std": 1.6437485265060887,
+          "boosted_std": 1.654877468712321,
+          "target_delta": 0.0,
+          "comp_delta": 0.1298828125,
+          "target_comp_delta_diff": -0.1298828125
+        }
+      }
+    },
+    "35": {
+      "size": {
+        "ant": {
+          "align": "small",
+          "target": "small",
+          "comp": "big",
+          "baseline_ranking": [
+            [
+              "medium",
+              2.84375
+            ],
+            [
+              "small",
+              2.828125
+            ],
+            [
+              "tiny",
+              2.578125
+            ],
+            [
+              "big",
+              1.6328125
+            ],
+            [
+              "large",
+              1.578125
+            ],
+            [
+              "miniature",
+              1.3671875
+            ],
+            [
+              "massive",
+              0.80078125
+            ],
+            [
+              "huge",
+              -1.234375
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "small",
+              2.875
+            ],
+            [
+              "medium",
+              2.859375
+            ],
+            [
+              "tiny",
+              2.515625
+            ],
+            [
+              "big",
+              1.6796875
+            ],
+            [
+              "large",
+              1.5703125
+            ],
+            [
+              "miniature",
+              1.421875
+            ],
+            [
+              "massive",
+              0.8359375
+            ],
+            [
+              "huge",
+              -1.265625
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": 2.578125,
+              "boosted": 2.515625,
+              "delta": -0.0625
+            },
+            "small": {
+              "baseline": 2.828125,
+              "boosted": 2.875,
+              "delta": 0.046875
+            },
+            "medium": {
+              "baseline": 2.84375,
+              "boosted": 2.859375,
+              "delta": 0.015625
+            },
+            "large": {
+              "baseline": 1.578125,
+              "boosted": 1.5703125,
+              "delta": -0.0078125
+            },
+            "big": {
+              "baseline": 1.6328125,
+              "boosted": 1.6796875,
+              "delta": 0.046875
+            },
+            "huge": {
+              "baseline": -1.234375,
+              "boosted": -1.265625,
+              "delta": -0.03125
+            },
+            "massive": {
+              "baseline": 0.80078125,
+              "boosted": 0.8359375,
+              "delta": 0.03515625
+            },
+            "miniature": {
+              "baseline": 1.3671875,
+              "boosted": 1.421875,
+              "delta": 0.0546875
+            }
+          },
+          "rank_changes": {
+            "medium": -1,
+            "small": 1,
+            "tiny": 0,
+            "big": 0,
+            "large": 0,
+            "miniature": 0,
+            "massive": 0,
+            "huge": 0
+          },
+          "baseline_std": 1.2609308103173595,
+          "boosted_std": 1.2684998063571107,
+          "target_delta": 0.046875,
+          "comp_delta": 0.046875,
+          "target_comp_delta_diff": 0.0
+        },
+        "elephant": {
+          "align": "big",
+          "target": "big",
+          "comp": "small",
+          "baseline_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.015625
+            ],
+            [
+              "medium",
+              2.46875
+            ],
+            [
+              "massive",
+              0.478515625
+            ],
+            [
+              "huge",
+              0.13671875
+            ],
+            [
+              "small",
+              -0.224609375
+            ],
+            [
+              "tiny",
+              -0.62109375
+            ],
+            [
+              "miniature",
+              -1.96875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "big",
+              4.8125
+            ],
+            [
+              "large",
+              3.0
+            ],
+            [
+              "medium",
+              2.4375
+            ],
+            [
+              "massive",
+              0.494140625
+            ],
+            [
+              "huge",
+              0.09765625
+            ],
+            [
+              "small",
+              -0.20703125
+            ],
+            [
+              "tiny",
+              -0.69140625
+            ],
+            [
+              "miniature",
+              -1.78125
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": -0.62109375,
+              "boosted": -0.69140625,
+              "delta": -0.0703125
+            },
+            "small": {
+              "baseline": -0.224609375,
+              "boosted": -0.20703125,
+              "delta": 0.017578125
+            },
+            "medium": {
+              "baseline": 2.46875,
+              "boosted": 2.4375,
+              "delta": -0.03125
+            },
+            "large": {
+              "baseline": 3.015625,
+              "boosted": 3.0,
+              "delta": -0.015625
+            },
+            "big": {
+              "baseline": 4.84375,
+              "boosted": 4.8125,
+              "delta": -0.03125
+            },
+            "huge": {
+              "baseline": 0.13671875,
+              "boosted": 0.09765625,
+              "delta": -0.0390625
+            },
+            "massive": {
+              "baseline": 0.478515625,
+              "boosted": 0.494140625,
+              "delta": 0.015625
+            },
+            "miniature": {
+              "baseline": -1.96875,
+              "boosted": -1.78125,
+              "delta": 0.1875
+            }
+          },
+          "rank_changes": {
+            "big": 0,
+            "large": 0,
+            "medium": 0,
+            "massive": 0,
+            "huge": 0,
+            "small": 0,
+            "tiny": 0,
+            "miniature": 0
+          },
+          "baseline_std": 2.0901733708912023,
+          "boosted_std": 2.05309299055024,
+          "target_delta": -0.03125,
+          "comp_delta": 0.017578125,
+          "target_comp_delta_diff": -0.048828125
+        },
+        "mountain": {
+          "align": "big",
+          "target": "big",
+          "comp": "small",
+          "baseline_ranking": [
+            [
+              "big",
+              4.84375
+            ],
+            [
+              "large",
+              3.015625
+            ],
+            [
+              "medium",
+              2.46875
+            ],
+            [
+              "massive",
+              0.478515625
+            ],
+            [
+              "huge",
+              0.13671875
+            ],
+            [
+              "small",
+              -0.224609375
+            ],
+            [
+              "tiny",
+              -0.62109375
+            ],
+            [
+              "miniature",
+              -1.96875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "big",
+              4.8125
+            ],
+            [
+              "large",
+              3.0
+            ],
+            [
+              "medium",
+              2.4375
+            ],
+            [
+              "massive",
+              0.494140625
+            ],
+            [
+              "huge",
+              0.09765625
+            ],
+            [
+              "small",
+              -0.20703125
+            ],
+            [
+              "tiny",
+              -0.69140625
+            ],
+            [
+              "miniature",
+              -1.78125
+            ]
+          ],
+          "cand_changes": {
+            "tiny": {
+              "baseline": -0.62109375,
+              "boosted": -0.69140625,
+              "delta": -0.0703125
+            },
+            "small": {
+              "baseline": -0.224609375,
+              "boosted": -0.20703125,
+              "delta": 0.017578125
+            },
+            "medium": {
+              "baseline": 2.46875,
+              "boosted": 2.4375,
+              "delta": -0.03125
+            },
+            "large": {
+              "baseline": 3.015625,
+              "boosted": 3.0,
+              "delta": -0.015625
+            },
+            "big": {
+              "baseline": 4.84375,
+              "boosted": 4.8125,
+              "delta": -0.03125
+            },
+            "huge": {
+              "baseline": 0.13671875,
+              "boosted": 0.09765625,
+              "delta": -0.0390625
+            },
+            "massive": {
+              "baseline": 0.478515625,
+              "boosted": 0.494140625,
+              "delta": 0.015625
+            },
+            "miniature": {
+              "baseline": -1.96875,
+              "boosted": -1.78125,
+              "delta": 0.1875
+            }
+          },
+          "rank_changes": {
+            "big": 0,
+            "large": 0,
+            "medium": 0,
+            "massive": 0,
+            "huge": 0,
+            "small": 0,
+            "tiny": 0,
+            "miniature": 0
+          },
+          "baseline_std": 2.0901733708912023,
+          "boosted_std": 2.05309299055024,
+          "target_delta": -0.03125,
+          "comp_delta": 0.017578125,
+          "target_comp_delta_diff": -0.048828125
+        }
+      },
+      "moisture": {
+        "ocean": {
+          "align": "wet",
+          "target": "wet",
+          "comp": "dry",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.21875
+            ],
+            [
+              "wet",
+              4.1875
+            ],
+            [
+              "damp",
+              4.03125
+            ],
+            [
+              "soaked",
+              1.4296875
+            ],
+            [
+              "parched",
+              0.9453125
+            ],
+            [
+              "humid",
+              0.63671875
+            ],
+            [
+              "arid",
+              0.490234375
+            ],
+            [
+              "moist",
+              0.1201171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "wet",
+              4.15625
+            ],
+            [
+              "dry",
+              4.15625
+            ],
+            [
+              "damp",
+              3.875
+            ],
+            [
+              "soaked",
+              1.296875
+            ],
+            [
+              "parched",
+              0.90234375
+            ],
+            [
+              "humid",
+              0.65234375
+            ],
+            [
+              "arid",
+              0.29296875
+            ],
+            [
+              "moist",
+              0.11083984375
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 4.1875,
+              "boosted": 4.15625,
+              "delta": -0.03125
+            },
+            "damp": {
+              "baseline": 4.03125,
+              "boosted": 3.875,
+              "delta": -0.15625
+            },
+            "moist": {
+              "baseline": 0.1201171875,
+              "boosted": 0.11083984375,
+              "delta": -0.00927734375
+            },
+            "dry": {
+              "baseline": 4.21875,
+              "boosted": 4.15625,
+              "delta": -0.0625
+            },
+            "arid": {
+              "baseline": 0.490234375,
+              "boosted": 0.29296875,
+              "delta": -0.197265625
+            },
+            "humid": {
+              "baseline": 0.63671875,
+              "boosted": 0.65234375,
+              "delta": 0.015625
+            },
+            "soaked": {
+              "baseline": 1.4296875,
+              "boosted": 1.296875,
+              "delta": -0.1328125
+            },
+            "parched": {
+              "baseline": 0.9453125,
+              "boosted": 0.90234375,
+              "delta": -0.04296875
+            }
+          },
+          "rank_changes": {
+            "dry": -1,
+            "wet": 1,
+            "damp": 0,
+            "soaked": 0,
+            "parched": 0,
+            "humid": 0,
+            "arid": 0,
+            "moist": 0
+          },
+          "baseline_std": 1.6934819996575177,
+          "boosted_std": 1.687229504584357,
+          "target_delta": -0.03125,
+          "comp_delta": -0.0625,
+          "target_comp_delta_diff": 0.03125
+        },
+        "desert": {
+          "align": "dry",
+          "target": "dry",
+          "comp": "wet",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.5
+            ],
+            [
+              "humid",
+              2.953125
+            ],
+            [
+              "damp",
+              2.921875
+            ],
+            [
+              "wet",
+              2.421875
+            ],
+            [
+              "soaked",
+              1.65625
+            ],
+            [
+              "moist",
+              0.99609375
+            ],
+            [
+              "parched",
+              0.828125
+            ],
+            [
+              "arid",
+              -0.03564453125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "dry",
+              4.5
+            ],
+            [
+              "humid",
+              2.875
+            ],
+            [
+              "damp",
+              2.75
+            ],
+            [
+              "wet",
+              2.359375
+            ],
+            [
+              "soaked",
+              1.5390625
+            ],
+            [
+              "moist",
+              1.0
+            ],
+            [
+              "parched",
+              0.671875
+            ],
+            [
+              "arid",
+              -0.12060546875
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 2.421875,
+              "boosted": 2.359375,
+              "delta": -0.0625
+            },
+            "damp": {
+              "baseline": 2.921875,
+              "boosted": 2.75,
+              "delta": -0.171875
+            },
+            "moist": {
+              "baseline": 0.99609375,
+              "boosted": 1.0,
+              "delta": 0.00390625
+            },
+            "dry": {
+              "baseline": 4.5,
+              "boosted": 4.5,
+              "delta": 0.0
+            },
+            "arid": {
+              "baseline": -0.03564453125,
+              "boosted": -0.12060546875,
+              "delta": -0.0849609375
+            },
+            "humid": {
+              "baseline": 2.953125,
+              "boosted": 2.875,
+              "delta": -0.078125
+            },
+            "soaked": {
+              "baseline": 1.65625,
+              "boosted": 1.5390625,
+              "delta": -0.1171875
+            },
+            "parched": {
+              "baseline": 0.828125,
+              "boosted": 0.671875,
+              "delta": -0.15625
+            }
+          },
+          "rank_changes": {
+            "dry": 0,
+            "humid": 0,
+            "damp": 0,
+            "wet": 0,
+            "soaked": 0,
+            "moist": 0,
+            "parched": 0,
+            "arid": 0
+          },
+          "baseline_std": 1.3611625765018873,
+          "boosted_std": 1.3764997764070892,
+          "target_delta": 0.0,
+          "comp_delta": -0.0625,
+          "target_comp_delta_diff": 0.0625
+        },
+        "rainforest": {
+          "align": "wet",
+          "target": "wet",
+          "comp": "dry",
+          "baseline_ranking": [
+            [
+              "dry",
+              4.21875
+            ],
+            [
+              "wet",
+              4.1875
+            ],
+            [
+              "damp",
+              4.03125
+            ],
+            [
+              "soaked",
+              1.4296875
+            ],
+            [
+              "parched",
+              0.9453125
+            ],
+            [
+              "humid",
+              0.63671875
+            ],
+            [
+              "arid",
+              0.490234375
+            ],
+            [
+              "moist",
+              0.1201171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "wet",
+              4.15625
+            ],
+            [
+              "dry",
+              4.15625
+            ],
+            [
+              "damp",
+              3.875
+            ],
+            [
+              "soaked",
+              1.296875
+            ],
+            [
+              "parched",
+              0.90234375
+            ],
+            [
+              "humid",
+              0.65234375
+            ],
+            [
+              "arid",
+              0.29296875
+            ],
+            [
+              "moist",
+              0.11083984375
+            ]
+          ],
+          "cand_changes": {
+            "wet": {
+              "baseline": 4.1875,
+              "boosted": 4.15625,
+              "delta": -0.03125
+            },
+            "damp": {
+              "baseline": 4.03125,
+              "boosted": 3.875,
+              "delta": -0.15625
+            },
+            "moist": {
+              "baseline": 0.1201171875,
+              "boosted": 0.11083984375,
+              "delta": -0.00927734375
+            },
+            "dry": {
+              "baseline": 4.21875,
+              "boosted": 4.15625,
+              "delta": -0.0625
+            },
+            "arid": {
+              "baseline": 0.490234375,
+              "boosted": 0.29296875,
+              "delta": -0.197265625
+            },
+            "humid": {
+              "baseline": 0.63671875,
+              "boosted": 0.65234375,
+              "delta": 0.015625
+            },
+            "soaked": {
+              "baseline": 1.4296875,
+              "boosted": 1.296875,
+              "delta": -0.1328125
+            },
+            "parched": {
+              "baseline": 0.9453125,
+              "boosted": 0.90234375,
+              "delta": -0.04296875
+            }
+          },
+          "rank_changes": {
+            "dry": -1,
+            "wet": 1,
+            "damp": 0,
+            "soaked": 0,
+            "parched": 0,
+            "humid": 0,
+            "arid": 0,
+            "moist": 0
+          },
+          "baseline_std": 1.6934819996575177,
+          "boosted_std": 1.687229504584357,
+          "target_delta": -0.03125,
+          "comp_delta": -0.0625,
+          "target_comp_delta_diff": 0.03125
+        }
+      },
+      "color": {
+        "apple": {
+          "align": "red",
+          "target": "red",
+          "comp": "green",
+          "baseline_ranking": [
+            [
+              "red",
+              5.53125
+            ],
+            [
+              "blue",
+              3.421875
+            ],
+            [
+              "green",
+              2.40625
+            ],
+            [
+              "purple",
+              2.140625
+            ],
+            [
+              "orange",
+              2.078125
+            ],
+            [
+              "yellow",
+              1.7421875
+            ],
+            [
+              "black",
+              1.234375
+            ],
+            [
+              "white",
+              -0.171875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "red",
+              5.53125
+            ],
+            [
+              "blue",
+              3.5
+            ],
+            [
+              "green",
+              2.453125
+            ],
+            [
+              "orange",
+              2.125
+            ],
+            [
+              "purple",
+              2.09375
+            ],
+            [
+              "yellow",
+              1.78125
+            ],
+            [
+              "black",
+              1.28125
+            ],
+            [
+              "white",
+              -0.10009765625
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 5.53125,
+              "boosted": 5.53125,
+              "delta": 0.0
+            },
+            "blue": {
+              "baseline": 3.421875,
+              "boosted": 3.5,
+              "delta": 0.078125
+            },
+            "green": {
+              "baseline": 2.40625,
+              "boosted": 2.453125,
+              "delta": 0.046875
+            },
+            "yellow": {
+              "baseline": 1.7421875,
+              "boosted": 1.78125,
+              "delta": 0.0390625
+            },
+            "white": {
+              "baseline": -0.171875,
+              "boosted": -0.10009765625,
+              "delta": 0.07177734375
+            },
+            "black": {
+              "baseline": 1.234375,
+              "boosted": 1.28125,
+              "delta": 0.046875
+            },
+            "orange": {
+              "baseline": 2.078125,
+              "boosted": 2.125,
+              "delta": 0.046875
+            },
+            "purple": {
+              "baseline": 2.140625,
+              "boosted": 2.09375,
+              "delta": -0.046875
+            }
+          },
+          "rank_changes": {
+            "red": 0,
+            "blue": 0,
+            "green": 0,
+            "purple": -1,
+            "orange": 1,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.5549251815606644,
+          "boosted_std": 1.542570771426585,
+          "target_delta": 0.0,
+          "comp_delta": 0.046875,
+          "target_comp_delta_diff": -0.046875
+        },
+        "sky": {
+          "align": "blue",
+          "target": "blue",
+          "comp": "yellow",
+          "baseline_ranking": [
+            [
+              "blue",
+              5.375
+            ],
+            [
+              "red",
+              2.5
+            ],
+            [
+              "orange",
+              2.203125
+            ],
+            [
+              "purple",
+              1.9765625
+            ],
+            [
+              "green",
+              1.7890625
+            ],
+            [
+              "yellow",
+              1.234375
+            ],
+            [
+              "black",
+              0.39453125
+            ],
+            [
+              "white",
+              -0.337890625
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "blue",
+              5.46875
+            ],
+            [
+              "red",
+              2.640625
+            ],
+            [
+              "orange",
+              2.28125
+            ],
+            [
+              "purple",
+              1.9453125
+            ],
+            [
+              "green",
+              1.84375
+            ],
+            [
+              "yellow",
+              1.25
+            ],
+            [
+              "black",
+              0.443359375
+            ],
+            [
+              "white",
+              -0.28125
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 2.5,
+              "boosted": 2.640625,
+              "delta": 0.140625
+            },
+            "blue": {
+              "baseline": 5.375,
+              "boosted": 5.46875,
+              "delta": 0.09375
+            },
+            "green": {
+              "baseline": 1.7890625,
+              "boosted": 1.84375,
+              "delta": 0.0546875
+            },
+            "yellow": {
+              "baseline": 1.234375,
+              "boosted": 1.25,
+              "delta": 0.015625
+            },
+            "white": {
+              "baseline": -0.337890625,
+              "boosted": -0.28125,
+              "delta": 0.056640625
+            },
+            "black": {
+              "baseline": 0.39453125,
+              "boosted": 0.443359375,
+              "delta": 0.048828125
+            },
+            "orange": {
+              "baseline": 2.203125,
+              "boosted": 2.28125,
+              "delta": 0.078125
+            },
+            "purple": {
+              "baseline": 1.9765625,
+              "boosted": 1.9453125,
+              "delta": -0.03125
+            }
+          },
+          "rank_changes": {
+            "blue": 0,
+            "red": 0,
+            "orange": 0,
+            "purple": 0,
+            "green": 0,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.5914927747947738,
+          "boosted_std": 1.6092714257845913,
+          "target_delta": 0.09375,
+          "comp_delta": 0.015625,
+          "target_comp_delta_diff": 0.078125
+        },
+        "grass": {
+          "align": "green",
+          "target": "green",
+          "comp": "red",
+          "baseline_ranking": [
+            [
+              "green",
+              5.25
+            ],
+            [
+              "blue",
+              3.359375
+            ],
+            [
+              "orange",
+              2.796875
+            ],
+            [
+              "purple",
+              2.515625
+            ],
+            [
+              "red",
+              2.453125
+            ],
+            [
+              "yellow",
+              1.515625
+            ],
+            [
+              "black",
+              0.7265625
+            ],
+            [
+              "white",
+              -0.5078125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "green",
+              5.1875
+            ],
+            [
+              "blue",
+              3.375
+            ],
+            [
+              "orange",
+              2.828125
+            ],
+            [
+              "red",
+              2.578125
+            ],
+            [
+              "purple",
+              2.4375
+            ],
+            [
+              "yellow",
+              1.5234375
+            ],
+            [
+              "black",
+              0.79296875
+            ],
+            [
+              "white",
+              -0.4296875
+            ]
+          ],
+          "cand_changes": {
+            "red": {
+              "baseline": 2.453125,
+              "boosted": 2.578125,
+              "delta": 0.125
+            },
+            "blue": {
+              "baseline": 3.359375,
+              "boosted": 3.375,
+              "delta": 0.015625
+            },
+            "green": {
+              "baseline": 5.25,
+              "boosted": 5.1875,
+              "delta": -0.0625
+            },
+            "yellow": {
+              "baseline": 1.515625,
+              "boosted": 1.5234375,
+              "delta": 0.0078125
+            },
+            "white": {
+              "baseline": -0.5078125,
+              "boosted": -0.4296875,
+              "delta": 0.078125
+            },
+            "black": {
+              "baseline": 0.7265625,
+              "boosted": 0.79296875,
+              "delta": 0.06640625
+            },
+            "orange": {
+              "baseline": 2.796875,
+              "boosted": 2.828125,
+              "delta": 0.03125
+            },
+            "purple": {
+              "baseline": 2.515625,
+              "boosted": 2.4375,
+              "delta": -0.078125
+            }
+          },
+          "rank_changes": {
+            "green": 0,
+            "blue": 0,
+            "orange": 0,
+            "purple": -1,
+            "red": 1,
+            "yellow": 0,
+            "black": 0,
+            "white": 0
+          },
+          "baseline_std": 1.6242615415689439,
+          "boosted_std": 1.5887263539833367,
+          "target_delta": -0.0625,
+          "comp_delta": 0.125,
+          "target_comp_delta_diff": -0.1875
+        }
+      },
+      "speed": {
+        "cheetah": {
+          "align": "fast",
+          "target": "fast",
+          "comp": "slow",
+          "baseline_ranking": [
+            [
+              "fast",
+              3.671875
+            ],
+            [
+              "rapid",
+              2.546875
+            ],
+            [
+              "quick",
+              1.8203125
+            ],
+            [
+              "speedy",
+              0.5703125
+            ],
+            [
+              "slow",
+              0.40234375
+            ],
+            [
+              "swift",
+              0.2890625
+            ],
+            [
+              "leisurely",
+              -0.412109375
+            ],
+            [
+              "sluggish",
+              -0.482421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "fast",
+              3.59375
+            ],
+            [
+              "rapid",
+              2.453125
+            ],
+            [
+              "quick",
+              1.734375
+            ],
+            [
+              "speedy",
+              0.58203125
+            ],
+            [
+              "swift",
+              0.408203125
+            ],
+            [
+              "slow",
+              0.3046875
+            ],
+            [
+              "sluggish",
+              -0.466796875
+            ],
+            [
+              "leisurely",
+              -0.546875
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 3.671875,
+              "boosted": 3.59375,
+              "delta": -0.078125
+            },
+            "slow": {
+              "baseline": 0.40234375,
+              "boosted": 0.3046875,
+              "delta": -0.09765625
+            },
+            "rapid": {
+              "baseline": 2.546875,
+              "boosted": 2.453125,
+              "delta": -0.09375
+            },
+            "sluggish": {
+              "baseline": -0.482421875,
+              "boosted": -0.466796875,
+              "delta": 0.015625
+            },
+            "quick": {
+              "baseline": 1.8203125,
+              "boosted": 1.734375,
+              "delta": -0.0859375
+            },
+            "swift": {
+              "baseline": 0.2890625,
+              "boosted": 0.408203125,
+              "delta": 0.119140625
+            },
+            "leisurely": {
+              "baseline": -0.412109375,
+              "boosted": -0.546875,
+              "delta": -0.134765625
+            },
+            "speedy": {
+              "baseline": 0.5703125,
+              "boosted": 0.58203125,
+              "delta": 0.01171875
+            }
+          },
+          "rank_changes": {
+            "fast": 0,
+            "rapid": 0,
+            "quick": 0,
+            "speedy": 0,
+            "slow": -1,
+            "swift": 1,
+            "leisurely": -1,
+            "sluggish": 1
+          },
+          "baseline_std": 1.3884751063784742,
+          "boosted_std": 1.3661362448309897,
+          "target_delta": -0.078125,
+          "comp_delta": -0.09765625,
+          "target_comp_delta_diff": 0.01953125
+        },
+        "turtle": {
+          "align": "slow",
+          "target": "slow",
+          "comp": "fast",
+          "baseline_ranking": [
+            [
+              "slow",
+              4.21875
+            ],
+            [
+              "sluggish",
+              2.109375
+            ],
+            [
+              "fast",
+              1.1796875
+            ],
+            [
+              "speedy",
+              1.1796875
+            ],
+            [
+              "rapid",
+              0.2001953125
+            ],
+            [
+              "quick",
+              0.1630859375
+            ],
+            [
+              "leisurely",
+              -1.46875
+            ],
+            [
+              "swift",
+              -2.125
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "slow",
+              4.15625
+            ],
+            [
+              "sluggish",
+              2.015625
+            ],
+            [
+              "fast",
+              1.1171875
+            ],
+            [
+              "speedy",
+              1.09375
+            ],
+            [
+              "rapid",
+              0.058837890625
+            ],
+            [
+              "quick",
+              0.0322265625
+            ],
+            [
+              "leisurely",
+              -1.625
+            ],
+            [
+              "swift",
+              -2.125
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 1.1796875,
+              "boosted": 1.1171875,
+              "delta": -0.0625
+            },
+            "slow": {
+              "baseline": 4.21875,
+              "boosted": 4.15625,
+              "delta": -0.0625
+            },
+            "rapid": {
+              "baseline": 0.2001953125,
+              "boosted": 0.058837890625,
+              "delta": -0.141357421875
+            },
+            "sluggish": {
+              "baseline": 2.109375,
+              "boosted": 2.015625,
+              "delta": -0.09375
+            },
+            "quick": {
+              "baseline": 0.1630859375,
+              "boosted": 0.0322265625,
+              "delta": -0.130859375
+            },
+            "swift": {
+              "baseline": -2.125,
+              "boosted": -2.125,
+              "delta": 0.0
+            },
+            "leisurely": {
+              "baseline": -1.46875,
+              "boosted": -1.625,
+              "delta": -0.15625
+            },
+            "speedy": {
+              "baseline": 1.1796875,
+              "boosted": 1.09375,
+              "delta": -0.0859375
+            }
+          },
+          "rank_changes": {
+            "slow": 0,
+            "sluggish": 0,
+            "fast": 0,
+            "speedy": 0,
+            "rapid": 0,
+            "quick": 0,
+            "leisurely": 0,
+            "swift": 0
+          },
+          "baseline_std": 1.872423818181936,
+          "boosted_std": 1.8759307336943383,
+          "target_delta": -0.0625,
+          "comp_delta": -0.0625,
+          "target_comp_delta_diff": 0.0
+        },
+        "rocket": {
+          "align": "fast",
+          "target": "fast",
+          "comp": "slow",
+          "baseline_ranking": [
+            [
+              "fast",
+              3.671875
+            ],
+            [
+              "rapid",
+              2.546875
+            ],
+            [
+              "quick",
+              1.8203125
+            ],
+            [
+              "speedy",
+              0.5703125
+            ],
+            [
+              "slow",
+              0.40234375
+            ],
+            [
+              "swift",
+              0.2890625
+            ],
+            [
+              "leisurely",
+              -0.412109375
+            ],
+            [
+              "sluggish",
+              -0.482421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "fast",
+              3.59375
+            ],
+            [
+              "rapid",
+              2.453125
+            ],
+            [
+              "quick",
+              1.734375
+            ],
+            [
+              "speedy",
+              0.58203125
+            ],
+            [
+              "swift",
+              0.408203125
+            ],
+            [
+              "slow",
+              0.3046875
+            ],
+            [
+              "sluggish",
+              -0.466796875
+            ],
+            [
+              "leisurely",
+              -0.546875
+            ]
+          ],
+          "cand_changes": {
+            "fast": {
+              "baseline": 3.671875,
+              "boosted": 3.59375,
+              "delta": -0.078125
+            },
+            "slow": {
+              "baseline": 0.40234375,
+              "boosted": 0.3046875,
+              "delta": -0.09765625
+            },
+            "rapid": {
+              "baseline": 2.546875,
+              "boosted": 2.453125,
+              "delta": -0.09375
+            },
+            "sluggish": {
+              "baseline": -0.482421875,
+              "boosted": -0.466796875,
+              "delta": 0.015625
+            },
+            "quick": {
+              "baseline": 1.8203125,
+              "boosted": 1.734375,
+              "delta": -0.0859375
+            },
+            "swift": {
+              "baseline": 0.2890625,
+              "boosted": 0.408203125,
+              "delta": 0.119140625
+            },
+            "leisurely": {
+              "baseline": -0.412109375,
+              "boosted": -0.546875,
+              "delta": -0.134765625
+            },
+            "speedy": {
+              "baseline": 0.5703125,
+              "boosted": 0.58203125,
+              "delta": 0.01171875
+            }
+          },
+          "rank_changes": {
+            "fast": 0,
+            "rapid": 0,
+            "quick": 0,
+            "speedy": 0,
+            "slow": -1,
+            "swift": 1,
+            "leisurely": -1,
+            "sluggish": 1
+          },
+          "baseline_std": 1.3884751063784742,
+          "boosted_std": 1.3661362448309897,
+          "target_delta": -0.078125,
+          "comp_delta": -0.09765625,
+          "target_comp_delta_diff": 0.01953125
+        }
+      },
+      "temperature": {
+        "fire": {
+          "align": "hot",
+          "target": "hot",
+          "comp": "cold",
+          "baseline_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.3125
+            ],
+            [
+              "warm",
+              1.0
+            ],
+            [
+              "cold",
+              0.080078125
+            ],
+            [
+              "boiling",
+              6.103515625e-05
+            ],
+            [
+              "frigid",
+              -0.19140625
+            ],
+            [
+              "lukewarm",
+              -0.84375
+            ],
+            [
+              "freezing",
+              -1.25
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "hot",
+              3.859375
+            ],
+            [
+              "cool",
+              2.296875
+            ],
+            [
+              "warm",
+              0.94921875
+            ],
+            [
+              "cold",
+              0.1875
+            ],
+            [
+              "boiling",
+              -0.1279296875
+            ],
+            [
+              "frigid",
+              -0.357421875
+            ],
+            [
+              "lukewarm",
+              -0.8125
+            ],
+            [
+              "freezing",
+              -1.34375
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 4.03125,
+              "boosted": 3.859375,
+              "delta": -0.171875
+            },
+            "cold": {
+              "baseline": 0.080078125,
+              "boosted": 0.1875,
+              "delta": 0.107421875
+            },
+            "warm": {
+              "baseline": 1.0,
+              "boosted": 0.94921875,
+              "delta": -0.05078125
+            },
+            "cool": {
+              "baseline": 2.3125,
+              "boosted": 2.296875,
+              "delta": -0.015625
+            },
+            "freezing": {
+              "baseline": -1.25,
+              "boosted": -1.34375,
+              "delta": -0.09375
+            },
+            "boiling": {
+              "baseline": 6.103515625e-05,
+              "boosted": -0.1279296875,
+              "delta": -0.12799072265625
+            },
+            "lukewarm": {
+              "baseline": -0.84375,
+              "boosted": -0.8125,
+              "delta": 0.03125
+            },
+            "frigid": {
+              "baseline": -0.19140625,
+              "boosted": -0.357421875,
+              "delta": -0.166015625
+            }
+          },
+          "rank_changes": {
+            "hot": 0,
+            "cool": 0,
+            "warm": 0,
+            "cold": 0,
+            "boiling": 0,
+            "frigid": 0,
+            "lukewarm": 0,
+            "freezing": 0
+          },
+          "baseline_std": 1.6437485265060887,
+          "boosted_std": 1.6206525409019266,
+          "target_delta": -0.171875,
+          "comp_delta": 0.107421875,
+          "target_comp_delta_diff": -0.279296875
+        },
+        "ice": {
+          "align": "cold",
+          "target": "cold",
+          "comp": "hot",
+          "baseline_ranking": [
+            [
+              "cold",
+              3.109375
+            ],
+            [
+              "freezing",
+              3.03125
+            ],
+            [
+              "cool",
+              1.765625
+            ],
+            [
+              "frigid",
+              1.5625
+            ],
+            [
+              "warm",
+              1.53125
+            ],
+            [
+              "hot",
+              1.375
+            ],
+            [
+              "boiling",
+              0.90234375
+            ],
+            [
+              "lukewarm",
+              -1.7421875
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "cold",
+              3.046875
+            ],
+            [
+              "freezing",
+              2.96875
+            ],
+            [
+              "cool",
+              1.7734375
+            ],
+            [
+              "frigid",
+              1.625
+            ],
+            [
+              "warm",
+              1.421875
+            ],
+            [
+              "hot",
+              1.375
+            ],
+            [
+              "boiling",
+              0.828125
+            ],
+            [
+              "lukewarm",
+              -1.6015625
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 1.375,
+              "boosted": 1.375,
+              "delta": 0.0
+            },
+            "cold": {
+              "baseline": 3.109375,
+              "boosted": 3.046875,
+              "delta": -0.0625
+            },
+            "warm": {
+              "baseline": 1.53125,
+              "boosted": 1.421875,
+              "delta": -0.109375
+            },
+            "cool": {
+              "baseline": 1.765625,
+              "boosted": 1.7734375,
+              "delta": 0.0078125
+            },
+            "freezing": {
+              "baseline": 3.03125,
+              "boosted": 2.96875,
+              "delta": -0.0625
+            },
+            "boiling": {
+              "baseline": 0.90234375,
+              "boosted": 0.828125,
+              "delta": -0.07421875
+            },
+            "lukewarm": {
+              "baseline": -1.7421875,
+              "boosted": -1.6015625,
+              "delta": 0.140625
+            },
+            "frigid": {
+              "baseline": 1.5625,
+              "boosted": 1.625,
+              "delta": 0.0625
+            }
+          },
+          "rank_changes": {
+            "cold": 0,
+            "freezing": 0,
+            "cool": 0,
+            "frigid": 0,
+            "warm": 0,
+            "hot": 0,
+            "boiling": 0,
+            "lukewarm": 0
+          },
+          "baseline_std": 1.4083608255957107,
+          "boosted_std": 1.3552548462345329,
+          "target_delta": -0.0625,
+          "comp_delta": 0.0,
+          "target_comp_delta_diff": -0.0625
+        },
+        "volcano": {
+          "align": "hot",
+          "target": "hot",
+          "comp": "cold",
+          "baseline_ranking": [
+            [
+              "hot",
+              4.03125
+            ],
+            [
+              "cool",
+              2.3125
+            ],
+            [
+              "warm",
+              1.0
+            ],
+            [
+              "cold",
+              0.080078125
+            ],
+            [
+              "boiling",
+              6.103515625e-05
+            ],
+            [
+              "frigid",
+              -0.19140625
+            ],
+            [
+              "lukewarm",
+              -0.84375
+            ],
+            [
+              "freezing",
+              -1.25
+            ]
+          ],
+          "boosted_ranking": [
+            [
+              "hot",
+              3.859375
+            ],
+            [
+              "cool",
+              2.296875
+            ],
+            [
+              "warm",
+              0.94921875
+            ],
+            [
+              "cold",
+              0.1875
+            ],
+            [
+              "boiling",
+              -0.1279296875
+            ],
+            [
+              "frigid",
+              -0.357421875
+            ],
+            [
+              "lukewarm",
+              -0.8125
+            ],
+            [
+              "freezing",
+              -1.34375
+            ]
+          ],
+          "cand_changes": {
+            "hot": {
+              "baseline": 4.03125,
+              "boosted": 3.859375,
+              "delta": -0.171875
+            },
+            "cold": {
+              "baseline": 0.080078125,
+              "boosted": 0.1875,
+              "delta": 0.107421875
+            },
+            "warm": {
+              "baseline": 1.0,
+              "boosted": 0.94921875,
+              "delta": -0.05078125
+            },
+            "cool": {
+              "baseline": 2.3125,
+              "boosted": 2.296875,
+              "delta": -0.015625
+            },
+            "freezing": {
+              "baseline": -1.25,
+              "boosted": -1.34375,
+              "delta": -0.09375
+            },
+            "boiling": {
+              "baseline": 6.103515625e-05,
+              "boosted": -0.1279296875,
+              "delta": -0.12799072265625
+            },
+            "lukewarm": {
+              "baseline": -0.84375,
+              "boosted": -0.8125,
+              "delta": 0.03125
+            },
+            "frigid": {
+              "baseline": -0.19140625,
+              "boosted": -0.357421875,
+              "delta": -0.166015625
+            }
+          },
+          "rank_changes": {
+            "hot": 0,
+            "cool": 0,
+            "warm": 0,
+            "cold": 0,
+            "boiling": 0,
+            "frigid": 0,
+            "lukewarm": 0,
+            "freezing": 0
+          },
+          "baseline_std": 1.6437485265060887,
+          "boosted_std": 1.6206525409019266,
+          "target_delta": -0.171875,
+          "comp_delta": 0.107421875,
+          "target_comp_delta_diff": -0.279296875
+        }
+      }
+    }
+  }
+}
