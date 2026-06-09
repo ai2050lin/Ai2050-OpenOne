@@ -23515,3 +23515,1168 @@ Phase 80：迁移到 logic/syntax。
 
 当前不应直接做大理论收束；
 应该继续补全“关系组合路径图谱”的自然 control 和子因子审计。
+
+## Phase 77: balanced cross-relation joint closure 大范围复核 [2026-06-09 13:59]
+
+### 任务目标
+
+根据 Phase 76 的 object-frame 联合闭包结果继续扩大数据范围，验证：
+
+```text
+object × relation-frame joint closure 是否只是 12 objects / 6 relations 小数据集现象，
+还是能在更大 object/relation/value/frame 覆盖上继续成立。
+```
+
+本轮遵守用户要求：
+
+```text
+1. 测试数据范围尽量扩大。
+2. 三模型按 qwen3 -> GLM4 -> DS7B 顺序运行。
+3. 每个模型完成后 hard-exit。
+4. 模型测试中不做中途分析。
+5. 优先记录客观结果，不轻易做理论总结。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase77_balanced_cross_relation_joint_closure.py
+tests/gpt5/phase77_balanced_cross_relation_joint_closure_summary.py
+tests/gpt5/run_phase77_balanced_cross_relation_joint_closure_full.sh
+```
+
+### 数据设计
+
+Phase 76：
+
+```text
+objects = 12
+relations = 6
+frames = 3
+items = 216
+```
+
+Phase 77 扩展为：
+
+```text
+objects = 24
+relations = 7
+frames = 4
+items = 672
+```
+
+relations：
+
+```text
+is_a
+used_for
+can_do
+location
+material
+property
+part_of
+```
+
+每个 object 覆盖所有 relation，每个 relation 有 4 个 frame。继续使用完整 answer sequence likelihood，不使用 first-token scoring。
+
+### 条件设计
+
+沿用 Phase 76 的 joint closure 条件：
+
+```text
+object_only_matched
+frame_only_matched
+joint_matched
+joint_mismatched_frame
+joint_restore_object_only
+joint_restore_frame_only
+joint_restore_both
+```
+
+关键指标：
+
+```text
+clean_drop:
+  clean target margin 下降多少。
+
+matched_gain:
+  matched source target margin 上升多少。
+
+matched_top1:
+  patched 后 matched source target 成为第一名的比例。
+```
+
+本轮继续强调：
+
+```text
+不能只看 clean_drop。
+必须同时看 matched_gain 和 matched_top1，
+区分“破坏输出”和“合法转移到 matched value space”。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE77_OUTPUT_DIR=results/gpt5_phase77_smoke_$(date +%Y%m%d_%H%M%S) \
+PHASE77_MODELS=qwen3 \
+QWEN3_PHASE77_MAX_ITEMS=28 \
+QWEN3_PHASE77_LAYER_PAIRS=4-8 \
+PHASE77_PROGRESS_EVERY=14 \
+tests/gpt5/run_phase77_balanced_cross_relation_joint_closure_full.sh
+```
+
+结果：
+
+```text
+qwen3 smoke:
+  items = 28
+  rows = 196
+  exit_code = 0
+```
+
+说明扩展数据、matched/mismatched 选择、多点 hook、full-sequence scoring 和 summary 均正常。
+
+### 正式测试命令
+
+```bash
+PHASE77_OUTPUT_DIR=results/gpt5_phase77_balanced_cross_relation_joint_closure_full_$(date +%Y%m%d_%H%M%S) \
+PHASE77_PROGRESS_EVERY=84 \
+tests/gpt5/run_phase77_balanced_cross_relation_joint_closure_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642
+```
+
+输出文件：
+
+```text
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642/qwen3_phase77_balanced_cross_relation_joint_closure.json
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642/glm4_phase77_balanced_cross_relation_joint_closure.json
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642/deepseek7b_phase77_balanced_cross_relation_joint_closure.json
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642/phase77_balanced_cross_relation_joint_closure_summary.json
+results/gpt5_phase77_balanced_cross_relation_joint_closure_full_20260609_123642/PHASE77_BALANCED_CROSS_RELATION_JOINT_CLOSURE_SUMMARY.md
+```
+
+注意：
+
+```text
+flash_attention_2 仍因未安装 flash_attn 自动 fallback 到 sdpa。
+DS7B 仍出现 sliding window attention + sdpa warning，解释 DS7B 结果时继续标记该实现差异。
+```
+
+### 数据规模
+
+```text
+qwen3:
+  objects = 24
+  items = 672
+  rows = 9408
+
+GLM4:
+  objects = 24
+  items = 672
+  rows = 9408
+
+DS7B:
+  objects = 24
+  items = 672
+  rows = 9408
+
+total rows = 28224
+```
+
+三模型完整完成。
+
+### Qwen3 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 10.6469
+  eligible_matched_gain = 13.6120
+  eligible_matched_margin_after = 0.4939
+  eligible_patched_clean_top1 = 0.0577
+  eligible_patched_matched_top1 = 0.5295
+
+joint_mismatched_frame:
+  eligible_clean_drop = 9.1362
+  eligible_matched_gain = 8.7118
+  eligible_matched_margin_after = -4.4062
+  eligible_patched_matched_top1 = 0.1744
+
+object_only_matched:
+  eligible_clean_drop = 7.6197
+  eligible_matched_gain = 5.4163
+  eligible_patched_matched_top1 = 0.0667
+
+frame_only_matched:
+  eligible_clean_drop = 4.2557
+  eligible_matched_gain = 8.4183
+  eligible_patched_matched_top1 = 0.1564
+
+joint_restore_both:
+  eligible_clean_drop = 0.7039
+  eligible_matched_gain = 0.7830
+  eligible_patched_clean_top1 = 0.8744
+  eligible_patched_matched_top1 = 0.0077
+```
+
+路径维度：
+
+```text
+joint_matched L8->L12:
+  clean_drop = 10.3321
+  matched_gain = 14.2122
+  matched_top1 = 0.5718
+
+joint_matched L4->L8:
+  clean_drop = 10.9617
+  matched_gain = 13.0117
+  matched_top1 = 0.4872
+```
+
+关系维度：
+
+```text
+joint_matched can_do:
+  clean_drop = 11.4236
+  matched_gain = 16.9673
+  matched_top1 = 0.7153
+
+joint_matched location:
+  clean_drop = 9.2001
+  matched_gain = 11.9923
+  matched_top1 = 0.6351
+
+joint_matched property:
+  clean_drop = 9.8111
+  matched_gain = 10.0038
+  matched_top1 = 0.6053
+
+joint_matched part_of:
+  clean_drop = 9.7537
+  matched_gain = 12.9344
+  matched_top1 = 0.4151
+```
+
+客观现象：
+
+```text
+Qwen3 在扩展数据上继续保持 joint_matched 最强。
+matched_top1 从 Phase 76 的 0.6028 降到 0.5295，但仍远高于 object_only / frame_only / mismatched。
+restore_both 后 clean_top1 = 0.8744，matched_top1 = 0.0077。
+```
+
+### GLM4 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 9.9306
+  eligible_matched_gain = 14.0403
+  eligible_matched_margin_after = 1.8232
+  eligible_patched_clean_top1 = 0.1126
+  eligible_patched_matched_top1 = 0.6486
+
+joint_mismatched_frame:
+  eligible_clean_drop = 8.2591
+  eligible_matched_gain = 8.2753
+  eligible_matched_margin_after = -3.9419
+  eligible_patched_matched_top1 = 0.2005
+
+object_only_matched:
+  eligible_clean_drop = 5.8580
+  eligible_matched_gain = 5.3420
+  eligible_patched_matched_top1 = 0.0923
+
+frame_only_matched:
+  eligible_clean_drop = 3.3112
+  eligible_matched_gain = 8.1506
+  eligible_patched_matched_top1 = 0.2005
+
+joint_restore_both:
+  eligible_clean_drop = 0.7635
+  eligible_matched_gain = 1.2880
+  eligible_patched_clean_top1 = 0.8998
+  eligible_patched_matched_top1 = 0.0113
+```
+
+路径维度：
+
+```text
+joint_matched L4->L10:
+  clean_drop = 11.0774
+  matched_gain = 14.3068
+  matched_top1 = 0.6712
+
+joint_matched L10->L20:
+  clean_drop = 8.7839
+  matched_gain = 13.7739
+  matched_top1 = 0.6261
+```
+
+关系维度：
+
+```text
+joint_matched property:
+  clean_drop = 9.5283
+  matched_gain = 11.6585
+  matched_top1 = 0.8469
+
+joint_matched can_do:
+  clean_drop = 9.4343
+  matched_gain = 17.2041
+  matched_top1 = 0.7361
+
+joint_matched location:
+  clean_drop = 9.4483
+  matched_gain = 11.6492
+  matched_top1 = 0.7353
+
+joint_matched used_for:
+  clean_drop = 12.2855
+  matched_gain = 16.7086
+  matched_top1 = 0.6986
+
+joint_matched part_of:
+  clean_drop = 9.1177
+  matched_gain = 12.6077
+  matched_top1 = 0.4789
+```
+
+客观现象：
+
+```text
+GLM4 扩展数据中 joint_matched 仍最强，matched_top1 = 0.6486。
+L4->L10 比 L10->L20 更强，延续 Phase 76 现象。
+restore_both 后 clean_top1 = 0.8998，matched_top1 = 0.0113。
+```
+
+### DS7B 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 7.1563
+  eligible_matched_gain = 12.1629
+  eligible_matched_margin_after = -1.3271
+  eligible_patched_clean_top1 = 0.2535
+  eligible_patched_matched_top1 = 0.4161
+
+joint_mismatched_frame:
+  eligible_clean_drop = 6.2317
+  eligible_matched_gain = 7.2367
+  eligible_matched_margin_after = -6.2533
+  eligible_patched_matched_top1 = 0.1119
+
+object_only_matched:
+  eligible_clean_drop = 3.6021
+  eligible_matched_gain = 3.4196
+  eligible_patched_matched_top1 = 0.0262
+
+frame_only_matched:
+  eligible_clean_drop = 3.7984
+  eligible_matched_gain = 8.7878
+  eligible_patched_matched_top1 = 0.2133
+
+joint_restore_both:
+  eligible_clean_drop = 0.4736
+  eligible_matched_gain = 0.5091
+  eligible_patched_clean_top1 = 0.8794
+  eligible_patched_matched_top1 = 0.0087
+```
+
+路径维度：
+
+```text
+joint_matched L8->L10:
+  clean_drop = 7.5145
+  matched_gain = 12.3939
+  matched_top1 = 0.4371
+
+joint_matched L12->L14:
+  clean_drop = 6.7981
+  matched_gain = 11.9320
+  matched_top1 = 0.3951
+```
+
+关系维度：
+
+```text
+joint_matched can_do:
+  clean_drop = 8.7604
+  matched_gain = 17.0136
+  matched_top1 = 0.6311
+
+joint_matched used_for:
+  clean_drop = 9.5306
+  matched_gain = 15.3395
+  matched_top1 = 0.5135
+
+joint_matched part_of:
+  clean_drop = 6.7018
+  matched_gain = 13.4518
+  matched_top1 = 0.4459
+
+joint_matched property:
+  clean_drop = 5.5004
+  matched_gain = 8.4085
+  matched_top1 = 0.4143
+```
+
+客观现象：
+
+```text
+DS7B 在扩展数据中仍保持 joint_matched > frame_only > object_only 的 matched_top1 结构。
+matched_top1 = 0.4161，低于 Qwen3/GLM4，但明显高于 mismatched = 0.1119。
+restore_both 后 clean_top1 = 0.8794，matched_top1 = 0.0087。
+```
+
+### 与 Phase 76 的一致性
+
+```text
+Qwen3:
+  Phase 76 joint_matched matched_top1 = 0.6028
+  Phase 77 joint_matched matched_top1 = 0.5295
+  扩展后效应变弱但仍稳定。
+
+GLM4:
+  Phase 76 joint_matched matched_top1 = 0.6533
+  Phase 77 joint_matched matched_top1 = 0.6486
+  几乎完全稳定。
+
+DS7B:
+  Phase 76 joint_matched matched_top1 = 0.4457
+  Phase 77 joint_matched matched_top1 = 0.4161
+  扩展后仍稳定，但绝对值较低。
+```
+
+### 当前客观结论
+
+Phase 77 说明：
+
+```text
+Phase 76 的 object-frame joint matched effect 不是小数据集偶发现象。
+在 24 objects / 7 relations / 4 frames 的扩展数据上，三模型仍稳定出现：
+
+joint_matched > joint_mismatched_frame > object_only/frame_only
+
+其中最关键的是 matched_top1：
+  joint_matched 明显高于 mismatched 和单路径。
+```
+
+更严格地说：
+
+```text
+object-frame 同源组合可以产生合法 value-space 转移；
+object-frame 不匹配组合更多表现为破坏，而不是合法转移。
+```
+
+### 问题和硬伤
+
+```text
+1. Phase 77 数据虽然更大，但仍是人工构造 dataset，不能等同自然语言全分布。
+
+2. 扩展数据中部分对象/关系语义较简单，可能存在模板和候选池先验。
+
+3. 当前仍是 whole-token transplant，不是 factor subspace closure。
+
+4. matched_top1 在 Qwen3/DS7B 扩展后下降，说明组合闭包强度受数据复杂度影响。
+
+5. DS7B 仍需以 eligible subset 相对比较为主。
+
+6. 当前仍是 closed candidate scoring，不是 open generation。
+```
+
+### 下一步计划
+
+Phase 78：factor subspace audit。
+
+目标：
+
+```text
+在 Phase 76/77 已证明 whole-token joint closure 后，
+开始拆分 object token 与 frame token 内部的混合因子。
+```
+
+优先分离：
+
+```text
+identity factor
+category factor
+relation gate factor
+value-support factor
+slot/readout factor
+compatibility factor
+```
+
+但判据必须是：
+
+```text
+subspace destroy-restore
+```
+
+而不是：
+
+```text
+probe accuracy
+```
+
+Phase 79：open generation audit。
+
+目标：
+
+```text
+验证 object-frame joint matched intervention 是否影响自由生成，
+而不是只改变封闭候选排序。
+```
+
+Phase 80：从知识关系迁移到逻辑和语法。
+
+原则：
+
+```text
+reader calibration
+-> path localization
+-> joint closure
+-> factor subspace closure
+```
+
+当前不应继续做宏大理论收束；应先把组合闭包推进到子因子层。
+
+## Phase 78: factor subspace audit 大范围测试 [2026-06-09 16:12]
+
+### 任务目标
+
+根据 Phase 76/77 的结果，whole-token joint closure 已经在三模型和更大数据上稳定出现：
+
+```text
+object token + relation-frame token 的同源组合，可以把 clean answer 推向 matched answer。
+```
+
+但这仍然是 whole-token transplant，不知道 object token 和 frame token 内部到底哪些成分在起作用。本轮目标是做更保守的 factor subspace audit：
+
+```text
+1. 不训练 probe。
+2. 不用复杂统计理论做机制结论。
+3. 只用自然对比差分构造低秩子空间。
+4. 只替换 object/frame 在该子空间内的成分。
+5. 测试子空间级 joint matched 是否还能复现 Phase 77 的整词元 joint matched 效果。
+```
+
+用户提醒是正确的：深度网络是相对编码，单一路径信息有限，必须和其他路径比较，获得全局路径才有意义。因此本轮不是只看 object binding，而是继续围绕：
+
+```text
+object path
+relation-frame path
+matched joint path
+mismatched frame path
+restore path
+```
+
+做对比。
+
+### 生成脚本
+
+新增：
+
+```text
+tests/gpt5/phase78_factor_subspace_audit.py
+tests/gpt5/phase78_factor_subspace_audit_summary.py
+tests/gpt5/run_phase78_factor_subspace_audit_full.sh
+```
+
+脚本检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase78_factor_subspace_audit.py \
+  tests/gpt5/phase78_factor_subspace_audit_summary.py
+```
+
+结果：
+
+```text
+compile passed
+```
+
+### 测试原理
+
+对每个模型、每个 layer pair，先用自然样本构造两个子空间：
+
+```text
+object_basis:
+  matched object token state - clean object token state
+
+frame_basis:
+  matched relation-frame token state - clean relation-frame token state
+```
+
+然后不是替换整个 token state，而是只替换这些 basis 张成的子空间成分：
+
+```text
+current_state <- current_state + B @ B.T @ (source_state - current_state)
+```
+
+测试条件：
+
+```text
+object_subspace_matched
+frame_subspace_matched
+joint_subspace_matched
+joint_subspace_mismatched_frame
+joint_subspace_restore_object_only
+joint_subspace_restore_frame_only
+joint_subspace_restore_both
+```
+
+关键判据：
+
+```text
+joint_subspace_matched 是否明显强于 object_subspace_matched 和 frame_subspace_matched；
+joint_subspace_matched 是否明显强于 joint_subspace_mismatched_frame；
+restore_both 是否恢复 clean answer；
+```
+
+如果成立，说明 Phase 76/77 的 whole-token effect 不是只能靠整词元混合产生，object/frame 的自然对比子空间中已经包含部分可因果迁移的信息。
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE78_MODELS=qwen3 \
+QWEN3_PHASE78_MAX_ITEMS=28 \
+QWEN3_PHASE78_LAYER_PAIRS=4-8 \
+PHASE78_MAX_BASIS_ITEMS=28 \
+PHASE78_PROGRESS_EVERY=14 \
+PHASE78_OUTPUT_DIR=results/gpt5_phase78_factor_subspace_audit_smoke_$(date +%Y%m%d_%H%M%S) \
+tests/gpt5/run_phase78_factor_subspace_audit_full.sh
+```
+
+结果：
+
+```text
+qwen3 rows = 196
+exit_code = 0
+attn_impl = sdpa
+```
+
+说明子空间构造、hook、full-sequence scoring、hard-exit、summary 全链路可运行。
+
+### 全量测试命令
+
+```bash
+PHASE78_OUTPUT_DIR=results/gpt5_phase78_factor_subspace_audit_full_$(date +%Y%m%d_%H%M%S) \
+PHASE78_PROGRESS_EVERY=84 \
+PHASE78_MAX_BASIS_ITEMS=168 \
+tests/gpt5/run_phase78_factor_subspace_audit_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+每个模型都使用：
+
+```text
+--hard-exit-after-model
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908
+```
+
+输出文件：
+
+```text
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908/qwen3_phase78_factor_subspace_audit.json
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908/glm4_phase78_factor_subspace_audit.json
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908/deepseek7b_phase78_factor_subspace_audit.json
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908/phase78_factor_subspace_audit_summary.json
+results/gpt5_phase78_factor_subspace_audit_full_20260609_141908/PHASE78_FACTOR_SUBSPACE_AUDIT_SUMMARY.md
+```
+
+注意：
+
+```text
+本机未安装 flash_attn，因此 flash_attention_2 加载失败后自动回退到 sdpa。
+DeepSeek7B 运行时出现 sliding-window + sdpa 的 transformers 提醒，因此 DeepSeek7B 的结论需要保留实现路径 caveat。
+```
+
+### 数据规模
+
+```text
+objects = 24
+relations = 7
+frames = 4
+items/model = 672
+basis_items/model = 168
+conditions = 7
+layer_pairs/model = 2
+rows/model = 9408
+total_rows = 28224
+```
+
+layer pairs：
+
+```text
+Qwen3:
+  L4->L8
+  L8->L12
+
+GLM4:
+  L4->L10
+  L10->L20
+
+DeepSeek7B:
+  L8->L10
+  L12->L14
+```
+
+### Qwen3 客观结果
+
+```text
+rows = 9408
+eligible = 780
+```
+
+condition summary：
+
+```text
+joint_subspace_matched:
+  clean_drop = 8.8485
+  matched_gain = 12.0854
+  clean_after = -4.6308
+  matched_after = -1.0326
+  clean_top1 = 0.1641
+  matched_top1 = 0.4051
+
+joint_subspace_mismatched_frame:
+  clean_drop = 7.6611
+  matched_gain = 7.7940
+  clean_top1 = 0.2141
+  matched_top1 = 0.1205
+
+frame_subspace_matched:
+  clean_drop = 4.0292
+  matched_gain = 7.9465
+  clean_top1 = 0.5397
+  matched_top1 = 0.1385
+
+object_subspace_matched:
+  clean_drop = 6.1465
+  matched_gain = 4.1399
+  clean_top1 = 0.3692
+  matched_top1 = 0.0256
+
+joint_subspace_restore_both:
+  clean_drop = 1.0651
+  matched_gain = 1.2686
+  clean_top1 = 0.8423
+  matched_top1 = 0.0077
+```
+
+路径对比：
+
+```text
+L8->L12 joint_subspace_matched:
+  matched_top1 = 0.4436
+
+L4->L8 joint_subspace_matched:
+  matched_top1 = 0.3667
+```
+
+Qwen3 现象：
+
+```text
+1. 子空间 joint matched 明显强于 object-only 和 frame-only。
+2. matched frame 比 mismatched frame 更能产生合法 matched transfer。
+3. restore_both 能显著恢复 clean answer。
+4. L8->L12 略强于 L4->L8，说明中浅层 object-frame 子空间组合路径更清晰。
+```
+
+与 Phase 77 whole-token 对比：
+
+```text
+Phase77 joint_matched matched_top1 = 0.5295
+Phase78 joint_subspace_matched matched_top1 = 0.4051
+```
+
+说明子空间替换保留了相当一部分整词元闭包效果，但没有完全复现 whole-token effect。
+
+### GLM4 客观结果
+
+```text
+rows = 9408
+eligible = 888
+```
+
+condition summary：
+
+```text
+joint_subspace_matched:
+  clean_drop = 7.1730
+  matched_gain = 11.4769
+  clean_after = -2.8415
+  matched_after = -0.7403
+  clean_top1 = 0.3052
+  matched_top1 = 0.4403
+
+joint_subspace_mismatched_frame:
+  clean_drop = 6.1109
+  matched_gain = 7.1422
+  clean_top1 = 0.3637
+  matched_top1 = 0.1273
+
+frame_subspace_matched:
+  clean_drop = 2.6983
+  matched_gain = 7.0353
+  clean_top1 = 0.6892
+  matched_top1 = 0.1261
+
+object_subspace_matched:
+  clean_drop = 4.4448
+  matched_gain = 3.8216
+  clean_top1 = 0.5372
+  matched_top1 = 0.0507
+
+joint_subspace_restore_both:
+  clean_drop = 1.0388
+  matched_gain = 1.5692
+  clean_top1 = 0.8806
+  matched_top1 = 0.0135
+```
+
+路径对比：
+
+```text
+L4->L10 joint_subspace_matched:
+  matched_top1 = 0.4730
+
+L10->L20 joint_subspace_matched:
+  matched_top1 = 0.4077
+```
+
+GLM4 现象：
+
+```text
+1. 子空间 joint matched 明显成立。
+2. L4->L10 强于 L10->L20，说明 GLM4 的 object-frame 组合路径偏浅层。
+3. frame_subspace 单独比 object_subspace 更能提升 matched_gain，但合法 top1 仍主要来自 joint。
+4. restore_both clean_top1 = 0.8806，说明 object/frame 两个子空间确实是可恢复的主要扰动来源。
+```
+
+与 Phase 77 whole-token 对比：
+
+```text
+Phase77 joint_matched matched_top1 = 0.6486
+Phase78 joint_subspace_matched matched_top1 = 0.4403
+```
+
+GLM4 子空间保留效果明显，但相比 whole-token 下降更大，说明 whole token 中还有其他格式/路由成分未被 rank-16 object/frame 自然对比子空间覆盖。
+
+### DeepSeek7B 客观结果
+
+```text
+rows = 9408
+eligible = 572
+```
+
+condition summary：
+
+```text
+joint_subspace_matched:
+  clean_drop = 5.0480
+  matched_gain = 9.6949
+  clean_after = -1.1080
+  matched_after = -3.7951
+  clean_top1 = 0.4108
+  matched_top1 = 0.2640
+
+joint_subspace_mismatched_frame:
+  clean_drop = 4.8122
+  matched_gain = 6.0316
+  clean_top1 = 0.4231
+  matched_top1 = 0.0769
+
+frame_subspace_matched:
+  clean_drop = 2.8841
+  matched_gain = 7.6324
+  clean_top1 = 0.6101
+  matched_top1 = 0.1486
+
+object_subspace_matched:
+  clean_drop = 2.7596
+  matched_gain = 2.4039
+  clean_top1 = 0.6399
+  matched_top1 = 0.0140
+
+joint_subspace_restore_both:
+  clean_drop = 0.6379
+  matched_gain = 0.5466
+  clean_top1 = 0.8392
+  matched_top1 = 0.0035
+```
+
+路径对比：
+
+```text
+L12->L14 joint_subspace_matched:
+  matched_top1 = 0.2657
+
+L8->L10 joint_subspace_matched:
+  matched_top1 = 0.2622
+```
+
+DeepSeek7B 现象：
+
+```text
+1. 子空间 joint matched 成立，但弱于 Qwen3/GLM4。
+2. 两条路径接近，说明当前 L8-L14 早中层范围内没有明显单一路径峰值。
+3. frame_subspace_matched 明显强于 object_subspace_matched。
+4. restore_both 仍能恢复 clean top1 到 0.8392。
+```
+
+与 Phase 77 whole-token 对比：
+
+```text
+Phase77 joint_matched matched_top1 = 0.4161
+Phase78 joint_subspace_matched matched_top1 = 0.2640
+```
+
+说明 DS7B 的合法转移更依赖 whole-token 或更复杂的轨迹成分，rank-16 子空间只能保留部分 effect。
+
+### 三模型对比
+
+Phase 78 joint_subspace_matched：
+
+```text
+Qwen3:
+  matched_top1 = 0.4051
+  matched_gain = 12.0854
+
+GLM4:
+  matched_top1 = 0.4403
+  matched_gain = 11.4769
+
+DeepSeek7B:
+  matched_top1 = 0.2640
+  matched_gain = 9.6949
+```
+
+Phase 77 whole-token joint_matched -> Phase 78 subspace joint_matched：
+
+```text
+Qwen3:
+  0.5295 -> 0.4051
+
+GLM4:
+  0.6486 -> 0.4403
+
+DeepSeek7B:
+  0.4161 -> 0.2640
+```
+
+客观结论：
+
+```text
+1. 三模型中，rank-16 object/frame 自然对比子空间都能保留一部分 Phase 77 的 whole-token joint closure。
+2. 子空间 joint matched 都强于 object-only、frame-only、mismatched-frame。
+3. restore_both 都能恢复 clean answer，说明子空间扰动不是不可逆破坏。
+4. 子空间 effect 明显低于 whole-token effect，说明当前 basis 只捕获了部分因子。
+5. frame path 在三模型中普遍比 object path 单独更强，说明 relation-frame 可能更接近 value readout / relation gate。
+6. object path 单独弱，但与 frame path 同源组合后明显增强，说明 object 因子可能不是独立输出因子，而是 compatibility / identity support。
+```
+
+### 当前研究进展
+
+Phase 78 把 Phase 76/77 的结论推进了一层：
+
+```text
+Phase 76:
+  object token + frame token 同源整词元组合有效。
+
+Phase 77:
+  在 24 objects × 7 relations × 4 frames 大范围数据上仍有效。
+
+Phase 78:
+  不替换整词元，只替换 object/frame 自然对比子空间，也能部分复现 joint closure。
+```
+
+这说明 object-frame binding 不是只存在于不可分解的整词元 hidden state 中，而是至少有一部分信息落在可由自然对比提取的低秩子空间里。
+
+更谨慎的理论表述：
+
+```text
+知识关系的输出不是 object identity 单独决定，
+也不是 relation-frame 单独决定，
+而是 object support factor 与 relation-frame readout factor 的相容组合。
+```
+
+这和当前“条件化关系因子动力学”方向一致：
+
+```text
+object 提供身份/类别/可兼容性支持；
+relation-frame 提供读取槽位/关系门控/输出格式；
+两者同源组合形成合法 value-space 转移；
+两者不匹配组合更多表现为破坏或弱转移。
+```
+
+### 问题和硬伤
+
+```text
+1. 当前 basis 是 rank-16 自然对比子空间，仍然不是纯 factor。
+
+2. object_basis 和 frame_basis 仍可能混入 identity、relation、value、position、template 多种因素。
+
+3. 子空间替换低于 whole-token 替换，说明还有未捕获成分：
+   token residual remainder；
+   attention route；
+   MLP nonlinear gate；
+   position-specific compatibility；
+   multi-layer trajectory；
+   output formatting factor。
+
+4. 当前仍是 closed candidate scoring，不是 open generation。
+
+5. 当前不是 destroy-restore 子空间闭包，只是 matched subspace transfer + clean restore。
+
+6. DeepSeek7B 使用 sdpa 时有 sliding-window warning，因此 DS7B 结果要与其实现路径绑定解释。
+
+7. 当前仍然只覆盖知识关系 value retrieval，还没有迁移到逻辑推理和语法规则。
+```
+
+### 条件化关系因子动力学公式的改进
+
+Phase 78 后，公式需要从：
+
+```text
+Value = F(Object, RelationFrame)
+```
+
+细化为：
+
+```text
+h_l = h_l
+    + P_O^l(source_O - clean_O)
+    + P_R^l(source_R - clean_R)
+
+Readout(value)
+    = G_l(
+        IdentitySupport_O,
+        RelationGate_R,
+        Compatibility(O, R),
+        ResidualContext,
+        OutputSlot
+      )
+```
+
+其中：
+
+```text
+P_O^l:
+  object 自然对比子空间投影
+
+P_R^l:
+  relation-frame 自然对比子空间投影
+
+IdentitySupport_O:
+  object 提供的身份/类别/兼容性支持
+
+RelationGate_R:
+  relation-frame 提供的读取槽位和关系门控
+
+Compatibility(O, R):
+  object 与 relation-frame 是否同源、是否可组合
+
+OutputSlot:
+  当前 prompt 的输出位置和候选 value 格式
+```
+
+这仍不是最终数学理论，只是更贴近当前实验事实的操作性公式。
+
+### 下一步计划
+
+Phase 79：rank sweep + residual remainder audit。
+
+目标：
+
+```text
+测试 rank=4,8,16,32,64 时 joint_subspace_matched 如何变化；
+同时测试 remainder-only 是否仍含有大量 closure effect。
+```
+
+关键问题：
+
+```text
+object-frame factor 是低秩集中，还是高维分散？
+whole-token effect 中有多少能被自然对比子空间解释？
+剩余维度是否是噪声，还是另一个关键 factor？
+```
+
+Phase 80：factor orthogonal audit。
+
+目标：
+
+```text
+把 object basis、relation-frame basis、value basis、template basis 做正交化对比。
+```
+
+判据：
+
+```text
+去掉 value direction 后，object-frame joint 是否还有效；
+去掉 template direction 后，relation-frame 是否仍有效；
+```
+
+Phase 81：open generation audit。
+
+目标：
+
+```text
+验证子空间 joint matched 是否影响自由生成，
+而不是只改变封闭候选排序。
+```
+
+Phase 82：知识关系 -> 逻辑/语法迁移。
+
+目标：
+
+```text
+把同一套流程迁移到：
+逻辑 operator-event binding；
+语法 active/passive role binding；
+temporal order binding；
+coreference entity binding。
+```
+
+统一路径：
+
+```text
+reader calibration
+-> path localization
+-> whole-token joint closure
+-> factor subspace audit
+-> destroy-restore
+-> open generation
+```
+
+当前最重要的结论不是“已经破解编码机制”，而是：
+
+```text
+全局关系路径图谱已经从 token 级推进到 subspace 级。
+现在看到的语言/知识机制更像条件化因子组合，而不是单一方向或单一路径。
+```
