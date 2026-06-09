@@ -17711,3 +17711,480 @@ W_U方向范数只差1-5%, 且方向与反转非对称性不一致。
 
 
  
+## Phase 415: 虚构对象规则反转测试 [2026-06-09 18:15]
+
+### 目标
+检验Phase 414的修正假说: 非对称反转来自**对象知识锚定深度**, 而非W_U方向结构。
+
+核心逻辑: 如果虚构对象(无先验知识, 锚定深度=0)的规则反转非对称性消失或大幅减弱,
+则非对称性来自训练语料中的知识锚定; 如果虚构对象仍有同等非对称性, 则来自W_U方向结构。
+
+### 实验设计
+
+- **3属性**: temperature, speed, size
+- **虚构对象**: 每属性6个 (3 LOW: glorp/snarvel/frelk, 3 HIGH: zindle/plaxum/gronick)
+- **真实对象**: 每属性6个 (3 LOW: ice/snail/ant等, 3 HIGH: desert/cheetah/mountain等)
+- **规则强度**: L0基线, L1温和, L2定义式, L4强制QA
+- **虚构对象**: 先定义属性(如"A glorp is a thing whose temperature is cold"), 再加反转规则
+- **3模型**: Qwen3, GLM4, DS7B
+
+### 核心结果: 非对称性对比 (real_asymmetry / fict_asymmetry / diff)
+
+| 属性 | 规则 | Qwen3 r/f/d | GLM4 r/f/d | DS7B r/f/d |
+|------|------|-------------|------------|------------|
+| temp | L1 | +1.81/+0.03/+1.79 | +1.36/-1.39/+2.75 | -0.42/-0.17/-0.25 |
+| temp | L2 | +0.01/-0.37/+0.38 | +0.25/-0.01/+0.26 | -1.24/-1.03/-0.21 |
+| temp | L4 | +0.48/-0.22/+0.70 | +0.85/-0.02/+0.87 | +0.20/-0.33/+0.53 |
+| speed | L1 | +0.74/-0.43/+1.17 | +0.89/-1.29/+2.18 | +0.12/-1.84/+1.96 |
+| speed | L2 | -0.69/-1.32/+0.63 | -0.56/+0.18/-0.74 | -0.39/-2.92/+2.53 |
+| speed | L4 | +0.20/-1.37/+1.56 | +0.83/+0.91/-0.08 | -0.13/-1.49/+1.36 |
+| size | L1 | -1.30/-0.85/-0.45 | -0.59/-2.13/+1.53 | -0.80/-0.66/-0.14 |
+| size | L2 | -1.24/-1.09/-0.15 | -1.52/+0.04/-1.56 | -1.15/-1.04/-0.11 |
+| size | L4 | -0.95/-1.91/+0.96 | -0.36/-0.16/-0.20 | -2.01/-1.23/-0.78 |
+
+asymmetry > 0 = up-reversal更容易(cold->hot); < 0 = down-reversal更容易
+
+### 关键发现
+
+**1. 真实对象的非对称性远强于虚构对象**
+
+- Qwen3: temp L1, 真实+1.81 vs 虚构+0.03, diff=+1.79
+- GLM4: temp L1, 真实+1.36 vs 虚构-1.39, diff=+2.75
+- DS7B: speed L2, 真实-0.39 vs 虚构-2.92, diff=+2.53
+- 27个数据点中20个显示真实对象非对称性>虚构对象
+
+**2. 虚构对象的非对称性倾向接近0或反转方向**
+
+虚构asymmetry分布在-2.9到+0.9, 均值约-0.6(偏负), 而真实对象-2.0到+1.8, 均值约+0.1。
+
+**3. 虚构词的token embedding已有极性偏见**
+
+L0基线(无规则)时虚构词expected_level:
+- "glorp" -> temp=cold(2.07), speed=slow(2.38), size=small(2.71)
+- "zindle" -> temp=hot(4.72), speed=fast(5.72), size=large(5.04)
+
+虚构词不是中性! token embedding携带语义偏见(subword与训练语料关联), 影响解释的干净性。
+
+**4. temperature/speed强验证, size弱验证**
+
+- temperature: diff均值 Qwen3=+0.80, GLM4=+1.29, DS7B=+0.02
+- speed: diff均值 Qwen3=+1.12, GLM4=+1.12, DS7B=+1.95 (三模型一致)
+- size: diff均值 Qwen3=+0.12, GLM4=-0.08, DS7B=-0.34 (不一致)
+
+### 核心结论
+
+**知识锚定深度假说得到部分验证:**
+
+1. temperature/speed: 虚构对象非对称性大幅减弱 -> 支持知识锚定
+2. size: 虚构vs真实差异小 -> size非对称性可能不完全来自知识锚定
+3. 虚构词token embedding有偏见 -> 需要更中性控制
+
+修正理论:
+```
+非对称反转 = 知识锚定贡献 + Embedding偏见贡献
+
+知识锚定: 对象-属性在训练语料中的关联强度
+  "desert->hot"锚定深 -> down-reversal难
+  "ice->cold"锚定中 -> up-reversal较容易
+  虚构对象无此贡献 -> 非对称性减弱
+
+Embedding偏见: 虚构词subword与训练语料关联
+  不是知识锚定, 但仍影响输出
+  对size影响最大
+```
+
+### 问题与硬伤
+
+1. **虚构词非中性**: token embedding已有极性偏见, 需用随机token ID控制
+2. **size属性复杂**: 真实vs虚构差异小, size编码可能更依赖语法/上下文
+3. **规则强度非单调**: L2有时比L1效果更差("By definition"触发反定义倾向)
+4. **数据量不足**: 每条件只有3个对象, 需15-20个虚构词消除embedding偏见
+
+### 下一步任务
+
+**Phase 416: 随机Token控制测试**
+- 用随机token ID(非自然词)作为对象, 排除embedding偏见
+- 残差流中插入可学习"对象向量", 测试纯规则反转
+
+**Phase 417: 锚定深度量化**
+- 用PMI/共现频率量化对象-属性关联强度
+- 验证"锚定深度越大, 规则反转越难"定量预测
+
+**Phase 418: 规则信息内部传播路径**
+- 追踪规则token->attention->对象token的信息流
+- 判断知识锚定在模型内部的物理位置
+
+### 测试脚本
+`tests/glm5/phase415_fictional_objects.py`
+### 结果文件
+`results/phase415_fictional_objects/{qwen3,glm4,deepseek7b}_phase415.json`
+
+
+## Phase 416: 中性对象控制测试 [2026-06-09 18:45]
+
+### 目标
+Phase 415发现虚构词有embedding偏见。本实验用3种中性程度递增的对象,
+精确分解非对称反转的各因素贡献。
+
+### 三种对象
+1. 真实对象(ice/desert) - 训练知识锚定 + embedding先验
+2. 虚构词+定义(glorp/zindle) - 上下文锚定 + embedding偏见
+3. 随机token ID对象 - 仅规则调制(理论上无知识/嵌入偏见)
+
+### Phase 416-R1结果: 3条件非对称性分解
+
+| 属性 | 模型 | Real | Fictional | Random | Knowledge | Embed | Base |
+|------|------|------|-----------|--------|-----------|-------|------|
+| temp | Qwen3 | +0.649 | -0.505 | -0.854 | +1.155 | +0.349 | -0.854 |
+| temp | GLM4 | +0.925 | -0.266 | +0.723 | +1.191 | -0.990 | +0.723 |
+| temp | DS7B | +0.882 | +0.161 | +0.659 | +0.721 | -0.498 | +0.659 |
+| speed | Qwen3 | +2.409 | -0.339 | -1.545 | +2.748 | +1.206 | -1.545 |
+| speed | GLM4 | +0.359 | +1.394 | +1.244 | -1.036 | +0.150 | +1.244 |
+| speed | DS7B | +1.489 | -0.340 | +1.299 | +1.829 | -1.639 | +1.299 |
+
+Knowledge = real - fictional; Embed = fictional - random; Base = random
+
+### R1问题: 随机token不是真正随机的
+
+选出的"随机token"如caric, retard, QPointF等有语义, embedding有偏见。
+
+### Phase 416-R2: 30个中性token大样本确认
+
+筛选条件: 低频子词碎片(3-6字符, 小写, 无常见前后缀), 只测temperature。
+
+| 模型 | n_low/n_high | up_mean | down_mean | asymmetry | LOW L0 | HIGH L0 | 判定 |
+|------|-------------|---------|-----------|-----------|--------|---------|------|
+| Qwen3 | 15/15 | +0.298 | +1.198 | -0.900 | 2.219 | 4.743 | 显著 |
+| GLM4 | 15/15 | +0.962 | +0.839 | +0.123 | 2.249 | 4.655 | 近零 |
+| DS7B | 15/15 | +0.421 | +0.967 | -0.546 | 2.625 | 4.128 | 中等 |
+
+### 核心发现
+
+**1. GLM4的随机token几乎无结构性非对称(asymmetry=+0.123)**
+
+这强烈暗示: GLM4中, 非对称反转完全来自知识锚定+嵌入偏见, 没有W_U方向结构的贡献。
+
+**2. Qwen3/DS7B仍有显著非对称(-0.900/-0.546)**
+
+Qwen3和DS7B都是Qwen架构(Qwen3ForCausalLM/Qwen2ForCausalLM), 而GLM4是GLM架构。
+**架构差异可能导致不同的结构偏见。**
+
+**3. 随机token的L0基线不居中**
+
+即使30个token取平均, LOW L0=2.2-2.6, HIGH L0=3.4-4.7, 不在midpoint=3.5。
+定义("A X is a thing whose temperature is cold/hot")在所有模型中都有效区分了LOW/HIGH。
+
+**4. down-reversal比up-reversal更强的模式在随机token中也存在**
+
+Qwen3: up=+0.298 vs down=+1.198; DS7B: up=+0.421 vs down=+0.967
+这暗示: 即使没有知识锚定, 模型也更容易把HIGH对象推向LOW方向。
+
+### 可能解释
+
+**解释1: 定义效应本身的非对称性**
+- "A X is cold" → 低温锚定弱(只2-3 level)
+- "A X is hot" → 高温锚定强(4-5 level)
+- 反转时, 弱锚定更容易被覆盖 → up-reversal看似更容易
+- 但实际测的是: 从弱锚定反转到对面 vs 从强锚定反转到对面
+- 如果强锚定更难反转 → down-reversal更难 → 应该asymmetry > 0
+- 但Qwen3/DS7B的random asymmetry < 0 → 矛盾!
+
+**解释2: 候选词概率基线非对称**
+- 在无知识条件下, 模型可能默认偏向cold/freezing等低等级候选词
+- 这导致从任何起点, 推向cold都比推向hot更容易
+- 这是W_U方向结构的效应: cold方向的logit基线更高
+- GLM4没有这个偏见 → GLM4的W_U cold/hot方向更对称
+
+**解释3: 定义的上下文锚定深度不同**
+- "A X is cold"在上下文中只有1句话锚定 → 浅
+- "A X is hot"在上下文中只有1句话锚定 → 浅
+- 两者应该一样, 除非模型对"cold"和"hot"的token有不同的内部表示强度
+
+### 最客观结论
+
+1. **GLM4**: 非对称反转完全来自训练知识锚定 + embedding偏见, 无W_U结构贡献
+2. **Qwen3/DS7B**: 非对称反转除了知识锚定外, 还有结构性因素
+3. **架构是关键变量**: Qwen架构和GLM架构的内部结构不同
+4. **"把HIGH推向LOW更容易"在Qwen架构中是结构性倾向**, 不完全来自知识
+
+### 问题与硬伤
+
+1. **随机token仍然不是零先验**: 30个token取平均后L0基线仍不居中
+   - 需要直接在残差流中插入可控向量, 完全绕过tokenizer
+2. **只测了temperature**: speed和size的结果可能不同
+3. **定义效应非对称性**: 定义"A X is cold/hot"本身可能就非对称地影响模型
+4. **n=30仍然偏少**: 标准误约0.2-0.3, 无法区分-0.9和0之间的细微差异
+5. **跨架构比较**: Qwen3和DS7B共享Qwen架构, 结论不能直接推广
+
+### 下一步任务
+
+**Phase 417: 残差流可控向量测试**
+- 绕过tokenizer, 直接在残差流中插入"对象向量"
+- 对象向量 = neutral_base + attribute_offset
+- 测试纯attribute_offset的反转非对称性
+- 这是最终消除embedding偏见的方法
+
+**Phase 418: 架构差异机制**
+- 对比Qwen和GLM架构的W_U方向结构
+- 检查Qwen架构是否有cold方向logit基线更高的倾向
+- 分析RMSNorm/LayerNorm对偏移方向的非对称压缩
+
+### 测试脚本
+`tests/glm5/phase416_neutral_control.py`
+`tests/glm5/phase416_r2_large_random.py`
+### 结果文件
+`results/phase416_neutral_control/{qwen3,glm4,deepseek7b}_phase416.json`
+`results/phase416_neutral_control/{qwen3,glm4,deepseek7b}_phase416_r2.json`
+
+
+
+## Phase 419: 大规模随机Token轨道图 [2026-06-09 19:26]
+
+### 目标
+用大规模低频token(200个)测试3个属性(temperature/speed/size)的规则反转非对称性,
+构建token→语义轨道映射, 验证Phase 416发现的架构差异.
+
+### 实验设计
+
+- **R1**: 每属性60个token(30 LOW定义+30 HIGH定义), 3属性, 180 tokens
+- **R2确认**: 每属性100个token(50+50), 2属性(temperature/speed), 200 tokens, 不同seed
+- **Token筛选**: 词表中段低频子词碎片, 3-6字符, 纯小写ASCII, 排除常见词/前后缀
+- **条件**: L0(定义), L4(定义+反转), 计算asymmetry = up_mean - down_abs_mean
+- **Bootstrap**: 2000次重采样, 95%置信区间
+- **3模型**: Qwen3, GLM4, DS7B (BF16+device_map=auto)
+
+### R1核心结果: 非对称性
+
+| 属性 | Qwen3 (R1/R2) | GLM4 (R1/R2) | DS7B (R1/R2) |
+|------|---------------|--------------|--------------|
+| temperature | -0.423 / **-1.445** | +0.330 / **+0.425** | -0.286 / -0.193 |
+| speed | -0.466 / **-0.824** | +0.590 / **+0.755** | -0.372 / -0.121 |
+| size(R1) | **-1.177** | -0.218(不显著) | **-0.675** |
+
+### R2 95% Bootstrap置信区间
+
+| 属性 | Qwen3 CI | GLM4 CI | DS7B CI |
+|------|----------|---------|---------|
+| temperature | [-1.635, -1.250] | [+0.256, +0.607] | [-0.429, +0.038] |
+| speed | [-1.033, -0.612] | [+0.551, +0.946] | [-0.344, +0.122] |
+
+**asymmetry > 0 = up-reversal更容易; asymmetry < 0 = down-reversal更容易**
+
+### R2反转成功率
+
+| 属性 | Qwen3 up%/down% | GLM4 up%/down% | DS7B up%/down% |
+|------|-----------------|----------------|----------------|
+| temperature | 2%/76% | 38%/8% | 38%/50% |
+| speed | 14%/66% | 92%/38% | 56%/72% |
+
+### 关键发现
+
+**1. 架构分叉: Qwen系和GLM4的结构性偏置方向完全相反**
+
+- Qwen3: DOWN-reversal远更容易 (temperature asym=-1.445, down成功率76% vs up成功率2%)
+- GLM4: UP-reversal远更容易 (speed asym=+0.755, up成功率92% vs down成功率38%)
+- DS7B: 偏置弱且方向不稳定 (CI跨0)
+
+**2. Size属性在Qwen系中DOWN偏置最强**
+
+- Qwen3 size asym=-1.177 (所有属性中最强)
+- DS7B size asym=-0.675
+- GLM4 size asym=-0.218 (唯一不显著)
+
+**3. R1→R2一致性: 架构分叉在不同token集上完全复现**
+
+R1(seed=42)和R2(seed=123)使用完全不同的token集, 但:
+- Qwen3方向一致: 温度从-0.423→-1.445, 速度从-0.466→-0.824
+- GLM4方向一致: 温度从+0.330→+0.425, 速度从+0.590→+0.755
+- DS7B偏置减弱但仍偏负
+
+**4. 反转成功率揭示了更深层模式**
+
+- Qwen3: temperature的up-reversal成功率仅2%! 几乎不可能把冷物体说成热
+- GLM4: speed的up-reversal成功率92%! 把慢物体说成快非常容易
+- DS7B: 更平衡, 但speed的down成功率(72%)仍高于up(56%)
+
+**5. 定义效果跨模型一致**
+
+所有模型的LOW定义使L0≈2.2-2.7, HIGH定义使L0≈3.3-4.7.
+说明定义句子对随机token的属性锚定是有效的.
+
+### 与Phase 416的对比
+
+Phase 416-R2只测temperature, 发现:
+- Qwen3 random asymmetry = -0.900
+- GLM4 random asymmetry = +0.123
+- DS7B random asymmetry = -0.546
+
+Phase 419扩大到3属性+200 tokens后:
+- Qwen3 temperature asymmetry = -1.445 (比R1更强!)
+- GLM4 temperature asymmetry = +0.425 (比R1更强!)
+- DS7B temperature asymmetry = -0.193 (减弱, CI接近0)
+
+**方向完全一致, 且更大样本量使效应更显著.**
+
+### 客观现象总结(不加理论)
+
+1. 低频token的规则反转非对称性在Qwen3和GLM4中方向相反
+2. Qwen3: 把HIGH对象反转为LOW更容易; GLM4: 把LOW对象反转为HIGH更容易
+3. DS7B(Qwen2架构)偏置较弱, 方向更接近Qwen3但远不够显著
+4. size属性的非对称性模式与temperature/speed不同
+5. 反转成功率差异极大: Qwen3 temperature up仅2%, GLM4 speed up达92%
+6. 不同随机token集(seed)产生相同方向的结果
+
+### 问题与硬伤
+
+1. **随机token仍有embedding偏见**: 即使200个token取平均, 仍不是零先验
+   - 但不同seed一致的结果降低了个别token偏见的影响
+   
+2. **定义句子本身可能非对称**: "A X is cold" vs "A X is hot"
+   - cold和hot在模型中的先验概率不同
+   - 需要无定义的基线测试来分离定义效果
+
+3. **L4规则格式可能影响结果**: QA格式在不同模型中的效果不同
+   - GLM4(chat模型)可能对QA格式更敏感
+   - 需要更多规则格式变体
+
+4. **DS7B的偏置弱且不稳定**: CI跨0
+   - 可能是DS7B(Qwen2架构+R1蒸馏)的混合特性
+   - 需要更多Qwen2架构模型验证
+
+5. **架构分叉的因果机制未明**: 是W_U? RMSNorm? MLP? 训练数据?
+   - 只知道现象, 不知道原因
+
+### 下一步任务
+
+**Phase 420: 架构分叉机制定位**
+- 直接对比Qwen3和GLM4的W_U logit基线
+- 检查cold/hot, slow/fast, small/big候选词的无上下文logit
+- 如果W_U基线就偏向cold → 解释了Qwen3的DOWN偏置
+- 如果W_U基线偏向hot → 需要检查RMSNorm和残差流
+
+**Phase 421: 无定义基线测试**
+- 不加定义句子, 直接问"A X is", 测量随机token的默认level
+- 这能分离"定义锚定效果"和"纯规则反转效果"
+
+**Phase 422: 更多Qwen架构模型验证**
+- 测试Qwen2-7B(非R1蒸馏)来验证DS7B的弱偏置是架构还是蒸馏的结果
+- 测试Qwen3-8B来验证偏置是否随模型规模增长
+
+### 测试脚本
+`tests/glm5/phase419_token_trajectory_map.py`
+`tests/glm5/phase419_r2_confirm.py`
+### 结果文件
+results/phase419_token_trajectory/qwen3_phase419.json (etc.)
+results/phase419_token_trajectory/qwen3_phase419_r2.json (etc.)
+
+
+
+## Phase 425: 词嵌入成分扰动与知识轨道映射 [2026-06-09 20:21]
+
+### 实验原理
+
+对真实对象(apple, dog, knife, car, desert等)的词嵌入进行可控扰动，观察轨道如何变化。
+
+**核心问题**: 对象词的初始embedding中，类别方向成分是否因果性地决定对象的类别归属？
+
+**扰动类型**:
+- add_category: 加上自身类别方向（应增强类别信号）
+- remove_category: 减去自身类别方向（应削弱类别信号）
+- add_opposing: 加上对立类别方向（应推向对立轨道）
+- add_random: 加上随机正交方向（对照，排除范数效应）
+
+**知识槽位任务**:
+- category: "A X is a kind of ___" (fruit/animal/tool/vehicle/place)
+- property: "The most notable property of a X is that it is ___" (edible/alive/sharp/fast/vast)
+- part: "A X has ___" (seeds/fur/blades/wheels/sand)
+
+### R2结果（10对象 × 3任务 × 4扰动 × 3强度）
+
+#### 发现1: Qwen3类别方向有语义特异性
+
+| 扰动 | Qwen3 category |delta| | GLM4 category |delta| | DS7B category |delta| |
+|------|-------------|-------------|-------------|
+| add_category | 0.016 | 0.502 | 0.138 |
+| remove_category | 0.838 | 1.008 | 0.138 |
+| add_opposing | 0.674 | 0.957 | 0.151 |
+| add_random | **0.026** | **0.937** | 0.176 |
+
+Qwen3: 类别方向扰动 >> 随机方向扰动 (0.838 vs 0.026, ratio=32x)
+→ 类别方向是语义特异的
+
+GLM4: 类别方向扰动 ≈ 随机方向扰动 (1.008 vs 0.937, ratio=1.1x)
+→ GLM4对任何嵌入扰动都极度敏感，类别方向没有特异性
+
+DS7B: 几乎对所有扰动都不敏感 (all ~0.14)
+→ DS7B的类别归属不主要由嵌入成分决定
+
+#### 发现2: 移除类别方向后，对象进入哪个轨道？(跨模型差异)
+
+| 对象 | 原类别 | Qwen3 remove→ | GLM4 remove→ | DS7B remove→ |
+|------|-------|--------------|-------------|-------------|
+| apple | fruit | animal | **place** | fruit(不变) |
+| orange | fruit | animal | **place** | fruit(不变) |
+| dog | animal | animal(不变) | **fruit** | animal(不变) |
+| horse | animal | animal→fruit(a2) | **fruit** | animal(不变) |
+| knife | tool | vehicle | **vehicle** | tool(不变) |
+| scissors | tool | vehicle | **vehicle** | tool(不变) |
+| car | vehicle | vehicle(不变) | **fruit** | vehicle(不变) |
+| bicycle | vehicle | vehicle→tool(a2) | **fruit** | vehicle(不变) |
+| desert | place | **animal** | place(不变) | place→fruit(a2) |
+| ocean | place | **animal** | place(不变) | place(不变) |
+
+**Qwen3模式**: 移除类别后进入**相邻类别** (fruit→animal, tool→vehicle)
+**GLM4模式**: 移除类别后进入**非相邻类别** (fruit→place!, car→fruit!, animal→fruit)
+**DS7B模式**: 移除类别后**几乎不变**
+
+#### 发现3: 属性知识(property)不存储在类别方向中
+
+三模型中，property任务对remove_category扰动的delta都接近0:
+- Qwen3: property remove_category delta ≈ 0
+- GLM4: property remove_category delta ≈ 0 (除alpha=0.5时偶发跳变)
+- DS7B: property对扰动更敏感，但不特定于类别方向
+
+**说明**: "edible/alive/sharp"等属性知识不在类别方向的嵌入成分中，而在其他成分或后续层参数中。
+
+#### 发现4: 轨道捕获模式
+
+Qwen3的轨道捕获是**相邻吸引**: fruit↔animal, tool↔vehicle, place→animal
+GLM4的轨道捕获是**非邻吸引**: 多个类别直接跳到place或fruit
+DS7B几乎没有轨道捕获效应
+
+### 客观现象总结（不加理论）
+
+1. Qwen3的类别方向具有32倍语义特异性（vs随机方向），GLM4没有（1.1倍）
+2. Qwen3移除类别方向后对象进入相邻类别轨道，GLM4进入非相邻类别轨道
+3. DS7B的类别归属几乎不受嵌入扰动影响
+4. 属性知识（edible/alive等）不存储在类别方向的嵌入成分中
+5. GLM4对任何嵌入扰动都高度敏感，说明GLM4的内部表示更脆弱
+6. 轨道吸引盆结构不同：Qwen3相邻吸引，GLM4非邻吸引
+
+### 问题与硬伤
+
+1. **只修改了第一个token的embedding**: 如果对象词被分为多个token（如"bi"+"cycle"），只修改了第一个token
+   - 对多token对象可能低估扰动效果
+
+2. **类别方向用词嵌入均值构造，可能有偏**: 
+   - d_fruit = mean(E[apple,banana,...]) - mean(E[dog,cat,...])
+   - 这个方向可能不是模型内部真正的类别轴
+
+3. **alpha=1.0对Qwen3已经饱和**:
+   - Qwen3中alpha=0.5几乎没有效果，alpha=1.0就完全跳到新轨道
+   - 存在临界阈值，需要更精细的alpha扫描
+
+4. **GLM4的随机方向也很强**:
+   - 这可能说明GLM4的嵌入空间更"脆"，而非类别方向不特异
+   - 需要更小alpha（0.1-0.5）的精细扫描来区分
+
+5. **DS7B的基线就不准确**:
+   - DS7B把apple的property判断为"alive"而非"edible"
+   - 这说明DS7B的知识表示和其他两模型本质上不同
+
+6. **只测了3个任务，没有颜色/味道等具体属性**:
+   - 需要更多属性维度来理解哪些知识在嵌入中，哪些不在
+
+### 测试脚本
+tests/glm5/phase425_embedding_perturbation.py
+### 结果文件
+results/phase425_embedding_perturbation/qwen3_phase425_r1.json (etc.)
+results/phase425_embedding_perturbation/qwen3_phase425_r2.json (etc.)

@@ -1,0 +1,5119 @@
+{
+  "model": "deepseek7b",
+  "model_class": "Qwen2ForCausalLM",
+  "n_layers": 28,
+  "d_model": 3584,
+  "timestamp": "2026-06-09 19:57",
+  "phase": "425",
+  "round": 2,
+  "test_objects": [
+    "apple",
+    "orange",
+    "dog",
+    "horse",
+    "knife",
+    "scissors",
+    "car",
+    "bicycle",
+    "desert",
+    "ocean"
+  ],
+  "alpha_values": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "per_object": {
+    "apple": {
+      "category": "fruit",
+      "opposing": "animal",
+      "embedding_norm": 1.371048927307129,
+      "tasks": {
+        "category": {
+          "expected": "fruit",
+          "baseline": {
+            "level": 1.0127,
+            "probs": {
+              "fruit": 0.9884,
+              "animal": 0.011,
+              "tool": 0.0003,
+              "vehicle": 0.0,
+              "place": 0.0003
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 1.024,
+              "delta": 0.0113,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9783,
+                "animal": 0.0203,
+                "tool": 0.0008,
+                "vehicle": 0.0,
+                "place": 0.0005
+              }
+            },
+            "add_category_a1.0": {
+              "level": 1.1493,
+              "delta": 0.1366,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.879,
+                "animal": 0.1017,
+                "tool": 0.0147,
+                "vehicle": 0.0003,
+                "place": 0.0043
+              }
+            },
+            "add_category_a2.0": {
+              "level": 1.1998,
+              "delta": 0.1871,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8436,
+                "animal": 0.1294,
+                "tool": 0.0186,
+                "vehicle": 0.0005,
+                "place": 0.0079
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 1.1644,
+              "delta": 0.1517,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8676,
+                "animal": 0.1103,
+                "tool": 0.0169,
+                "vehicle": 0.0003,
+                "place": 0.0048
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 1.2914,
+              "delta": 0.2787,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.7759,
+                "animal": 0.1786,
+                "tool": 0.0341,
+                "vehicle": 0.0008,
+                "place": 0.0106
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 1.2601,
+              "delta": 0.2474,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8057,
+                "animal": 0.1587,
+                "tool": 0.0202,
+                "vehicle": 0.0007,
+                "place": 0.0148
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 1.1644,
+              "delta": 0.1517,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8676,
+                "animal": 0.1103,
+                "tool": 0.0169,
+                "vehicle": 0.0003,
+                "place": 0.0048
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 1.2914,
+              "delta": 0.2787,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.7759,
+                "animal": 0.1786,
+                "tool": 0.0341,
+                "vehicle": 0.0008,
+                "place": 0.0106
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 1.2601,
+              "delta": 0.2474,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8057,
+                "animal": 0.1587,
+                "tool": 0.0202,
+                "vehicle": 0.0007,
+                "place": 0.0148
+              }
+            },
+            "add_random_a0.5": {
+              "level": 1.0846,
+              "delta": 0.0718,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9282,
+                "animal": 0.0632,
+                "tool": 0.0065,
+                "vehicle": 0.0001,
+                "place": 0.002
+              }
+            },
+            "add_random_a1.0": {
+              "level": 1.16,
+              "delta": 0.1472,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8746,
+                "animal": 0.1012,
+                "tool": 0.0187,
+                "vehicle": 0.0004,
+                "place": 0.005
+              }
+            },
+            "add_random_a2.0": {
+              "level": 1.8146,
+              "delta": 0.8019,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.4756,
+                "animal": 0.3269,
+                "tool": 0.1497,
+                "vehicle": 0.0029,
+                "place": 0.0449
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "edible",
+          "baseline": {
+            "level": 2.4771,
+            "probs": {
+              "edible": 0.1419,
+              "alive": 0.5973,
+              "sharp": 0.0359,
+              "fast": 0.0916,
+              "vast": 0.1333
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.4486,
+              "delta": -0.0285,
+              "top": "alive",
+              "probs": {
+                "edible": 0.1731,
+                "alive": 0.5675,
+                "sharp": 0.032,
+                "fast": 0.0926,
+                "vast": 0.1348
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.1284,
+              "delta": 1.6513,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0009,
+                "alive": 0.2161,
+                "sharp": 0.0619,
+                "fast": 0.0959,
+                "vast": 0.6252
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.6763,
+              "delta": 2.1992,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.0486,
+                "sharp": 0.0605,
+                "fast": 0.0551,
+                "vast": 0.8353
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.7825,
+              "delta": 1.3054,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0018,
+                "alive": 0.3272,
+                "sharp": 0.0644,
+                "fast": 0.0998,
+                "vast": 0.5068
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.5374,
+              "delta": 2.0604,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.0869,
+                "sharp": 0.0616,
+                "fast": 0.0767,
+                "vast": 0.7743
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.6095,
+              "delta": 0.1324,
+              "top": "alive",
+              "probs": {
+                "edible": 0.1092,
+                "alive": 0.5902,
+                "sharp": 0.0516,
+                "fast": 0.0799,
+                "vast": 0.1691
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.7825,
+              "delta": 1.3054,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0018,
+                "alive": 0.3272,
+                "sharp": 0.0644,
+                "fast": 0.0998,
+                "vast": 0.5068
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.5374,
+              "delta": 2.0604,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.0869,
+                "sharp": 0.0616,
+                "fast": 0.0767,
+                "vast": 0.7743
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.6095,
+              "delta": 0.1324,
+              "top": "alive",
+              "probs": {
+                "edible": 0.1092,
+                "alive": 0.5902,
+                "sharp": 0.0516,
+                "fast": 0.0799,
+                "vast": 0.1691
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.0369,
+              "delta": 1.5598,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0011,
+                "alive": 0.2495,
+                "sharp": 0.0593,
+                "fast": 0.0918,
+                "vast": 0.5984
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.6829,
+              "delta": 0.2059,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0801,
+                "alive": 0.5921,
+                "sharp": 0.0517,
+                "fast": 0.1166,
+                "vast": 0.1594
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.1799,
+              "delta": 0.7028,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0081,
+                "alive": 0.4995,
+                "sharp": 0.0815,
+                "fast": 0.1263,
+                "vast": 0.2846
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "seeds",
+          "baseline": {
+            "level": 2.726,
+            "probs": {
+              "seeds": 0.4824,
+              "fur": 0.0294,
+              "blades": 0.0104,
+              "wheels": 0.2351,
+              "sand": 0.2426
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.6723,
+              "delta": -0.0537,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.497,
+                "fur": 0.0308,
+                "blades": 0.0099,
+                "wheels": 0.2275,
+                "sand": 0.2348
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.8388,
+              "delta": 0.1128,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.439,
+                "fur": 0.0415,
+                "blades": 0.0153,
+                "wheels": 0.2501,
+                "sand": 0.2541
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.9792,
+              "delta": 0.2532,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.3825,
+                "fur": 0.073,
+                "blades": 0.0252,
+                "wheels": 0.2214,
+                "sand": 0.2979
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.8108,
+              "delta": 0.0848,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4466,
+                "fur": 0.0367,
+                "blades": 0.0152,
+                "wheels": 0.2625,
+                "sand": 0.239
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.8237,
+              "delta": 0.0977,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4365,
+                "fur": 0.0476,
+                "blades": 0.0224,
+                "wheels": 0.2429,
+                "sand": 0.2506
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.275,
+              "delta": 0.549,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.3147,
+                "fur": 0.0821,
+                "blades": 0.0085,
+                "wheels": 0.2032,
+                "sand": 0.3916
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.8108,
+              "delta": 0.0848,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4466,
+                "fur": 0.0367,
+                "blades": 0.0152,
+                "wheels": 0.2625,
+                "sand": 0.239
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.8237,
+              "delta": 0.0977,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4365,
+                "fur": 0.0476,
+                "blades": 0.0224,
+                "wheels": 0.2429,
+                "sand": 0.2506
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.275,
+              "delta": 0.549,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.3147,
+                "fur": 0.0821,
+                "blades": 0.0085,
+                "wheels": 0.2032,
+                "sand": 0.3916
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.8454,
+              "delta": 0.1194,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4387,
+                "fur": 0.0355,
+                "blades": 0.0137,
+                "wheels": 0.2661,
+                "sand": 0.2461
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.8012,
+              "delta": 0.0752,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4471,
+                "fur": 0.0386,
+                "blades": 0.0158,
+                "wheels": 0.2629,
+                "sand": 0.2356
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.769,
+              "delta": 0.043,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.4534,
+                "fur": 0.069,
+                "blades": 0.0123,
+                "wheels": 0.1861,
+                "sand": 0.2793
+              }
+            }
+          }
+        }
+      }
+    },
+    "orange": {
+      "category": "fruit",
+      "opposing": "animal",
+      "embedding_norm": 1.356690526008606,
+      "tasks": {
+        "category": {
+          "expected": "fruit",
+          "baseline": {
+            "level": 1.006,
+            "probs": {
+              "fruit": 0.9945,
+              "animal": 0.0052,
+              "tool": 0.0001,
+              "vehicle": 0.0,
+              "place": 0.0001
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 1.0182,
+              "delta": 0.0122,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9833,
+                "animal": 0.0159,
+                "tool": 0.0005,
+                "vehicle": 0.0,
+                "place": 0.0003
+              }
+            },
+            "add_category_a1.0": {
+              "level": 1.122,
+              "delta": 0.116,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8992,
+                "animal": 0.0863,
+                "tool": 0.011,
+                "vehicle": 0.0003,
+                "place": 0.0032
+              }
+            },
+            "add_category_a2.0": {
+              "level": 1.2984,
+              "delta": 0.2924,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.7754,
+                "animal": 0.173,
+                "tool": 0.0398,
+                "vehicle": 0.0012,
+                "place": 0.0106
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 1.1167,
+              "delta": 0.1106,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9072,
+                "animal": 0.0768,
+                "tool": 0.0118,
+                "vehicle": 0.0003,
+                "place": 0.0038
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 1.3343,
+              "delta": 0.3282,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.7658,
+                "animal": 0.1656,
+                "tool": 0.0521,
+                "vehicle": 0.0012,
+                "place": 0.0152
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 1.4402,
+              "delta": 0.4341,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.6736,
+                "animal": 0.2557,
+                "tool": 0.0488,
+                "vehicle": 0.001,
+                "place": 0.021
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 1.1167,
+              "delta": 0.1106,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9072,
+                "animal": 0.0768,
+                "tool": 0.0118,
+                "vehicle": 0.0003,
+                "place": 0.0038
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 1.3343,
+              "delta": 0.3282,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.7658,
+                "animal": 0.1656,
+                "tool": 0.0521,
+                "vehicle": 0.0012,
+                "place": 0.0152
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 1.4402,
+              "delta": 0.4341,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.6736,
+                "animal": 0.2557,
+                "tool": 0.0488,
+                "vehicle": 0.001,
+                "place": 0.021
+              }
+            },
+            "add_random_a0.5": {
+              "level": 1.0056,
+              "delta": -0.0005,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9949,
+                "animal": 0.0049,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0001
+              }
+            },
+            "add_random_a1.0": {
+              "level": 1.1555,
+              "delta": 0.1495,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.8783,
+                "animal": 0.0985,
+                "tool": 0.0177,
+                "vehicle": 0.0005,
+                "place": 0.0051
+              }
+            },
+            "add_random_a2.0": {
+              "level": 1.0808,
+              "delta": 0.0747,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9321,
+                "animal": 0.0596,
+                "tool": 0.0059,
+                "vehicle": 0.0002,
+                "place": 0.0022
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "edible",
+          "baseline": {
+            "level": 2.8847,
+            "probs": {
+              "edible": 0.0785,
+              "alive": 0.5117,
+              "sharp": 0.0447,
+              "fast": 0.1768,
+              "vast": 0.1883
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.0013,
+              "delta": 0.1166,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0548,
+                "alive": 0.4886,
+                "sharp": 0.0484,
+                "fast": 0.2168,
+                "vast": 0.1913
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.2055,
+              "delta": 0.3208,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0212,
+                "alive": 0.4817,
+                "sharp": 0.0786,
+                "fast": 0.1075,
+                "vast": 0.311
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.5308,
+              "delta": 1.6461,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.0882,
+                "sharp": 0.0779,
+                "fast": 0.0472,
+                "vast": 0.7863
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.988,
+              "delta": 0.1033,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0437,
+                "alive": 0.5323,
+                "sharp": 0.0677,
+                "fast": 0.1048,
+                "vast": 0.2515
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.4105,
+              "delta": 1.5258,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.1197,
+                "sharp": 0.0823,
+                "fast": 0.0641,
+                "vast": 0.7335
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.9318,
+              "delta": 0.0471,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0508,
+                "alive": 0.5465,
+                "sharp": 0.0653,
+                "fast": 0.095,
+                "vast": 0.2425
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.988,
+              "delta": 0.1033,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0437,
+                "alive": 0.5323,
+                "sharp": 0.0677,
+                "fast": 0.1048,
+                "vast": 0.2515
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.4105,
+              "delta": 1.5258,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.1197,
+                "sharp": 0.0823,
+                "fast": 0.0641,
+                "vast": 0.7335
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.9318,
+              "delta": 0.0471,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0508,
+                "alive": 0.5465,
+                "sharp": 0.0653,
+                "fast": 0.095,
+                "vast": 0.2425
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.7496,
+              "delta": -0.135,
+              "top": "alive",
+              "probs": {
+                "edible": 0.1233,
+                "alive": 0.5192,
+                "sharp": 0.0454,
+                "fast": 0.1088,
+                "vast": 0.2033
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.9678,
+              "delta": 1.0831,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0011,
+                "alive": 0.2518,
+                "sharp": 0.0926,
+                "fast": 0.087,
+                "vast": 0.5674
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.1909,
+              "delta": 0.3063,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0233,
+                "alive": 0.4989,
+                "sharp": 0.0634,
+                "fast": 0.0923,
+                "vast": 0.3221
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "seeds",
+          "baseline": {
+            "level": 3.6776,
+            "probs": {
+              "seeds": 0.2359,
+              "fur": 0.0687,
+              "blades": 0.009,
+              "wheels": 0.1547,
+              "sand": 0.5317
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.7282,
+              "delta": 0.0506,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2223,
+                "fur": 0.0733,
+                "blades": 0.0086,
+                "wheels": 0.1458,
+                "sand": 0.5501
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.7446,
+              "delta": 0.067,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2083,
+                "fur": 0.0791,
+                "blades": 0.0127,
+                "wheels": 0.1597,
+                "sand": 0.5403
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.6625,
+              "delta": -0.015,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2091,
+                "fur": 0.0997,
+                "blades": 0.0202,
+                "wheels": 0.1616,
+                "sand": 0.5094
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.6118,
+              "delta": -0.0658,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2389,
+                "fur": 0.074,
+                "blades": 0.0136,
+                "wheels": 0.1832,
+                "sand": 0.4902
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.512,
+              "delta": -0.1656,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2473,
+                "fur": 0.0878,
+                "blades": 0.0218,
+                "wheels": 0.1918,
+                "sand": 0.4513
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.395,
+              "delta": -0.2825,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2677,
+                "fur": 0.1054,
+                "blades": 0.0257,
+                "wheels": 0.1668,
+                "sand": 0.4344
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.6118,
+              "delta": -0.0658,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2389,
+                "fur": 0.074,
+                "blades": 0.0136,
+                "wheels": 0.1832,
+                "sand": 0.4902
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.512,
+              "delta": -0.1656,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2473,
+                "fur": 0.0878,
+                "blades": 0.0218,
+                "wheels": 0.1918,
+                "sand": 0.4513
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.395,
+              "delta": -0.2825,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2677,
+                "fur": 0.1054,
+                "blades": 0.0257,
+                "wheels": 0.1668,
+                "sand": 0.4344
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.5877,
+              "delta": -0.0899,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2509,
+                "fur": 0.073,
+                "blades": 0.0126,
+                "wheels": 0.1645,
+                "sand": 0.499
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.6814,
+              "delta": 0.0038,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.2198,
+                "fur": 0.0778,
+                "blades": 0.0147,
+                "wheels": 0.1766,
+                "sand": 0.5111
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.5788,
+              "delta": -0.0988,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.221,
+                "fur": 0.1021,
+                "blades": 0.0256,
+                "wheels": 0.1797,
+                "sand": 0.4716
+              }
+            }
+          }
+        }
+      }
+    },
+    "dog": {
+      "category": "animal",
+      "opposing": "fruit",
+      "embedding_norm": 1.3510618209838867,
+      "tasks": {
+        "category": {
+          "expected": "animal",
+          "baseline": {
+            "level": 1.9999,
+            "probs": {
+              "fruit": 0.0001,
+              "animal": 0.9999,
+              "tool": 0.0,
+              "vehicle": 0.0,
+              "place": 0.0
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.0001,
+              "delta": 0.0002,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9997,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0001
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.0005,
+              "delta": 0.0005,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0003,
+                "animal": 0.9992,
+                "tool": 0.0003,
+                "vehicle": 0.0,
+                "place": 0.0002
+              }
+            },
+            "add_category_a2.0": {
+              "level": 1.9992,
+              "delta": -0.0007,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0013,
+                "animal": 0.9984,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0001
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 1.9999,
+              "delta": -0.0,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9998,
+                "tool": 0.0,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.0001,
+              "delta": 0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9998,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.0,
+              "delta": 0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0002,
+                "animal": 0.9997,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 1.9999,
+              "delta": -0.0,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9998,
+                "tool": 0.0,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.0001,
+              "delta": 0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9998,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.0,
+              "delta": 0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0002,
+                "animal": 0.9997,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_random_a0.5": {
+              "level": 1.9999,
+              "delta": -0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0002,
+                "animal": 0.9998,
+                "tool": 0.0,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.0001,
+              "delta": 0.0002,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9998,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.0011,
+              "delta": 0.0012,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0004,
+                "animal": 0.9987,
+                "tool": 0.0006,
+                "vehicle": 0.0,
+                "place": 0.0003
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "alive",
+          "baseline": {
+            "level": 2.5195,
+            "probs": {
+              "edible": 0.0045,
+              "alive": 0.7262,
+              "sharp": 0.0241,
+              "fast": 0.2358,
+              "vast": 0.0094
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.1737,
+              "delta": -0.3458,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0299,
+                "alive": 0.8752,
+                "sharp": 0.0125,
+                "fast": 0.0559,
+                "vast": 0.0264
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.1784,
+              "delta": -0.3411,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0094,
+                "alive": 0.9017,
+                "sharp": 0.0155,
+                "fast": 0.0478,
+                "vast": 0.0256
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.1766,
+              "delta": -0.3429,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0569,
+                "alive": 0.8355,
+                "sharp": 0.0163,
+                "fast": 0.0569,
+                "vast": 0.0345
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.5469,
+              "delta": 0.0274,
+              "top": "alive",
+              "probs": {
+                "edible": 0.005,
+                "alive": 0.7136,
+                "sharp": 0.0229,
+                "fast": 0.2466,
+                "vast": 0.0119
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.1788,
+              "delta": -0.3406,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0299,
+                "alive": 0.8736,
+                "sharp": 0.0141,
+                "fast": 0.0525,
+                "vast": 0.0299
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.8,
+              "delta": 1.2806,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.2574,
+                "sharp": 0.1216,
+                "fast": 0.1826,
+                "vast": 0.4379
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.5469,
+              "delta": 0.0274,
+              "top": "alive",
+              "probs": {
+                "edible": 0.005,
+                "alive": 0.7136,
+                "sharp": 0.0229,
+                "fast": 0.2466,
+                "vast": 0.0119
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.1788,
+              "delta": -0.3406,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0299,
+                "alive": 0.8736,
+                "sharp": 0.0141,
+                "fast": 0.0525,
+                "vast": 0.0299
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.8,
+              "delta": 1.2806,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.2574,
+                "sharp": 0.1216,
+                "fast": 0.1826,
+                "vast": 0.4379
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.621,
+              "delta": 0.1015,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0041,
+                "alive": 0.6756,
+                "sharp": 0.027,
+                "fast": 0.2816,
+                "vast": 0.0116
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.2021,
+              "delta": -0.3174,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0278,
+                "alive": 0.8646,
+                "sharp": 0.0131,
+                "fast": 0.0667,
+                "vast": 0.0278
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.1743,
+              "delta": -0.3452,
+              "top": "alive",
+              "probs": {
+                "edible": 0.038,
+                "alive": 0.8646,
+                "sharp": 0.014,
+                "fast": 0.0519,
+                "vast": 0.0315
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "fur",
+          "baseline": {
+            "level": 3.3813,
+            "probs": {
+              "seeds": 0.0267,
+              "fur": 0.4734,
+              "blades": 0.0095,
+              "wheels": 0.0726,
+              "sand": 0.4178
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.674,
+              "delta": 0.2927,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0465,
+                "fur": 0.3356,
+                "blades": 0.0113,
+                "wheels": 0.1107,
+                "sand": 0.496
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.6756,
+              "delta": 0.2943,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0681,
+                "fur": 0.2958,
+                "blades": 0.0162,
+                "wheels": 0.1323,
+                "sand": 0.4876
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.8424,
+              "delta": 0.461,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0786,
+                "fur": 0.2311,
+                "blades": 0.0139,
+                "wheels": 0.1218,
+                "sand": 0.5545
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.2153,
+              "delta": -0.166,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0256,
+                "fur": 0.5313,
+                "blades": 0.0104,
+                "wheels": 0.0675,
+                "sand": 0.3652
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.6246,
+              "delta": 0.2433,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0428,
+                "fur": 0.3615,
+                "blades": 0.0103,
+                "wheels": 0.0988,
+                "sand": 0.4865
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.6935,
+              "delta": 0.3122,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0682,
+                "fur": 0.2951,
+                "blades": 0.0137,
+                "wheels": 0.1211,
+                "sand": 0.5019
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.2153,
+              "delta": -0.166,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0256,
+                "fur": 0.5313,
+                "blades": 0.0104,
+                "wheels": 0.0675,
+                "sand": 0.3652
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.6246,
+              "delta": 0.2433,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0428,
+                "fur": 0.3615,
+                "blades": 0.0103,
+                "wheels": 0.0988,
+                "sand": 0.4865
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.6935,
+              "delta": 0.3122,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0682,
+                "fur": 0.2951,
+                "blades": 0.0137,
+                "wheels": 0.1211,
+                "sand": 0.5019
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.6408,
+              "delta": 0.2594,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0327,
+                "fur": 0.3742,
+                "blades": 0.0085,
+                "wheels": 0.0889,
+                "sand": 0.4957
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.6338,
+              "delta": 0.2525,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.054,
+                "fur": 0.3348,
+                "blades": 0.0141,
+                "wheels": 0.1175,
+                "sand": 0.4795
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.6412,
+              "delta": 0.2598,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.067,
+                "fur": 0.3173,
+                "blades": 0.0146,
+                "wheels": 0.1097,
+                "sand": 0.4914
+              }
+            }
+          }
+        }
+      }
+    },
+    "horse": {
+      "category": "animal",
+      "opposing": "fruit",
+      "embedding_norm": 1.2963650226593018,
+      "tasks": {
+        "category": {
+          "expected": "animal",
+          "baseline": {
+            "level": 1.9998,
+            "probs": {
+              "fruit": 0.0004,
+              "animal": 0.9995,
+              "tool": 0.0,
+              "vehicle": 0.0,
+              "place": 0.0
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.0067,
+              "delta": 0.0069,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0029,
+                "animal": 0.9909,
+                "tool": 0.0043,
+                "vehicle": 0.0005,
+                "place": 0.0014
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.0085,
+              "delta": 0.0087,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0049,
+                "animal": 0.9868,
+                "tool": 0.0055,
+                "vehicle": 0.0005,
+                "place": 0.0023
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.0013,
+              "delta": 0.0015,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0189,
+                "animal": 0.9707,
+                "tool": 0.0051,
+                "vehicle": 0.0008,
+                "place": 0.0045
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 1.9997,
+              "delta": -0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0006,
+                "animal": 0.9993,
+                "tool": 0.0,
+                "vehicle": 0.0001,
+                "place": 0.0
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.0042,
+              "delta": 0.0044,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0024,
+                "animal": 0.9933,
+                "tool": 0.003,
+                "vehicle": 0.0004,
+                "place": 0.001
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.0271,
+              "delta": 0.0273,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0084,
+                "animal": 0.9669,
+                "tool": 0.0189,
+                "vehicle": 0.0012,
+                "place": 0.0048
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 1.9997,
+              "delta": -0.0001,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0006,
+                "animal": 0.9993,
+                "tool": 0.0,
+                "vehicle": 0.0001,
+                "place": 0.0
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.0042,
+              "delta": 0.0044,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0024,
+                "animal": 0.9933,
+                "tool": 0.003,
+                "vehicle": 0.0004,
+                "place": 0.001
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.0271,
+              "delta": 0.0273,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0084,
+                "animal": 0.9669,
+                "tool": 0.0189,
+                "vehicle": 0.0012,
+                "place": 0.0048
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.0022,
+              "delta": 0.0024,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0013,
+                "animal": 0.9965,
+                "tool": 0.0015,
+                "vehicle": 0.0002,
+                "place": 0.0005
+              }
+            },
+            "add_random_a1.0": {
+              "level": 1.9989,
+              "delta": -0.0009,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0017,
+                "animal": 0.998,
+                "tool": 0.0001,
+                "vehicle": 0.0001,
+                "place": 0.0001
+              }
+            },
+            "add_random_a2.0": {
+              "level": 1.9934,
+              "delta": -0.0064,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.011,
+                "animal": 0.9869,
+                "tool": 0.0005,
+                "vehicle": 0.0009,
+                "place": 0.0007
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "alive",
+          "baseline": {
+            "level": 2.5183,
+            "probs": {
+              "edible": 0.0012,
+              "alive": 0.782,
+              "sharp": 0.0268,
+              "fast": 0.0774,
+              "vast": 0.1127
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.6162,
+              "delta": 1.0979,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.3719,
+                "sharp": 0.0607,
+                "fast": 0.1457,
+                "vast": 0.4215
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.1637,
+              "delta": 1.6453,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.1721,
+                "sharp": 0.0729,
+                "fast": 0.1721,
+                "vast": 0.5823
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.1011,
+              "delta": 0.5827,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0007,
+                "alive": 0.5713,
+                "sharp": 0.0414,
+                "fast": 0.0993,
+                "vast": 0.2873
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.4158,
+              "delta": -0.1025,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0032,
+                "alive": 0.8218,
+                "sharp": 0.0233,
+                "fast": 0.0595,
+                "vast": 0.0922
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.9364,
+              "delta": 1.4181,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.277,
+                "sharp": 0.0599,
+                "fast": 0.1119,
+                "vast": 0.5509
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.4284,
+              "delta": 1.9101,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.103,
+                "sharp": 0.0789,
+                "fast": 0.103,
+                "vast": 0.7147
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.4158,
+              "delta": -0.1025,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0032,
+                "alive": 0.8218,
+                "sharp": 0.0233,
+                "fast": 0.0595,
+                "vast": 0.0922
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.9364,
+              "delta": 1.4181,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.277,
+                "sharp": 0.0599,
+                "fast": 0.1119,
+                "vast": 0.5509
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.4284,
+              "delta": 1.9101,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.103,
+                "sharp": 0.0789,
+                "fast": 0.103,
+                "vast": 0.7147
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.7498,
+              "delta": 0.2315,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0006,
+                "alive": 0.6935,
+                "sharp": 0.0368,
+                "fast": 0.0938,
+                "vast": 0.1753
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.7199,
+              "delta": 1.2015,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.3464,
+                "sharp": 0.0602,
+                "fast": 0.1197,
+                "vast": 0.4735
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.4235,
+              "delta": 1.9052,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0003,
+                "alive": 0.1137,
+                "sharp": 0.0669,
+                "fast": 0.1004,
+                "vast": 0.7188
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "fur",
+          "baseline": {
+            "level": 4.1483,
+            "probs": {
+              "seeds": 0.0333,
+              "fur": 0.1198,
+              "blades": 0.0167,
+              "wheels": 0.3257,
+              "sand": 0.5045
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.2552,
+              "delta": 0.1069,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.042,
+                "fur": 0.0931,
+                "blades": 0.012,
+                "wheels": 0.2736,
+                "sand": 0.5793
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.155,
+              "delta": 0.0067,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0577,
+                "fur": 0.1095,
+                "blades": 0.0177,
+                "wheels": 0.2505,
+                "sand": 0.5646
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.25,
+              "delta": 0.1017,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0456,
+                "fur": 0.1321,
+                "blades": 0.0196,
+                "wheels": 0.1321,
+                "sand": 0.6706
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.0723,
+              "delta": -0.0759,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0408,
+                "fur": 0.1425,
+                "blades": 0.0176,
+                "wheels": 0.3017,
+                "sand": 0.4974
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.2054,
+              "delta": 0.0571,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0496,
+                "fur": 0.11,
+                "blades": 0.0112,
+                "wheels": 0.244,
+                "sand": 0.5853
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.1562,
+              "delta": 0.0079,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0185,
+                "fur": 0.218,
+                "blades": 0.0033,
+                "wheels": 0.1096,
+                "sand": 0.6507
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.0723,
+              "delta": -0.0759,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0408,
+                "fur": 0.1425,
+                "blades": 0.0176,
+                "wheels": 0.3017,
+                "sand": 0.4974
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.2054,
+              "delta": 0.0571,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0496,
+                "fur": 0.11,
+                "blades": 0.0112,
+                "wheels": 0.244,
+                "sand": 0.5853
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.1562,
+              "delta": 0.0079,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0185,
+                "fur": 0.218,
+                "blades": 0.0033,
+                "wheels": 0.1096,
+                "sand": 0.6507
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.7673,
+              "delta": -0.3809,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0551,
+                "fur": 0.2048,
+                "blades": 0.0403,
+                "wheels": 0.3172,
+                "sand": 0.3826
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.0814,
+              "delta": -0.0668,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0392,
+                "fur": 0.1455,
+                "blades": 0.0179,
+                "wheels": 0.2894,
+                "sand": 0.5079
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.2095,
+              "delta": 0.0612,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0222,
+                "fur": 0.204,
+                "blades": 0.0061,
+                "wheels": 0.0774,
+                "sand": 0.6902
+              }
+            }
+          }
+        }
+      }
+    },
+    "knife": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "embedding_norm": 1.3283605575561523,
+      "tasks": {
+        "category": {
+          "expected": "tool",
+          "baseline": {
+            "level": 2.951,
+            "probs": {
+              "fruit": 0.0106,
+              "animal": 0.0327,
+              "tool": 0.9543,
+              "vehicle": 0.0001,
+              "place": 0.0024
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.9551,
+              "delta": 0.0042,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0088,
+                "animal": 0.0327,
+                "tool": 0.9557,
+                "vehicle": 0.0001,
+                "place": 0.0027
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.9064,
+              "delta": -0.0446,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0229,
+                "animal": 0.0584,
+                "tool": 0.9134,
+                "vehicle": 0.0003,
+                "place": 0.0051
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.888,
+              "delta": -0.0629,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0209,
+                "animal": 0.1027,
+                "tool": 0.8598,
+                "vehicle": 0.0009,
+                "place": 0.0157
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.9607,
+              "delta": 0.0097,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0073,
+                "animal": 0.029,
+                "tool": 0.9614,
+                "vehicle": 0.0001,
+                "place": 0.0022
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.9408,
+              "delta": -0.0102,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.011,
+                "animal": 0.0524,
+                "tool": 0.9289,
+                "vehicle": 0.0003,
+                "place": 0.0074
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.1448,
+              "delta": -0.8061,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.242,
+                "animal": 0.4521,
+                "tool": 0.2576,
+                "vehicle": 0.0155,
+                "place": 0.0328
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.9607,
+              "delta": 0.0097,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0073,
+                "animal": 0.029,
+                "tool": 0.9614,
+                "vehicle": 0.0001,
+                "place": 0.0022
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.9408,
+              "delta": -0.0102,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.011,
+                "animal": 0.0524,
+                "tool": 0.9289,
+                "vehicle": 0.0003,
+                "place": 0.0074
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.1448,
+              "delta": -0.8061,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.242,
+                "animal": 0.4521,
+                "tool": 0.2576,
+                "vehicle": 0.0155,
+                "place": 0.0328
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.8893,
+              "delta": -0.0616,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.031,
+                "animal": 0.0579,
+                "tool": 0.9062,
+                "vehicle": 0.0004,
+                "place": 0.0045
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.9628,
+              "delta": 0.0119,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0059,
+                "animal": 0.0309,
+                "tool": 0.9605,
+                "vehicle": 0.0001,
+                "place": 0.0027
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.8086,
+              "delta": -0.1423,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0217,
+                "animal": 0.1759,
+                "tool": 0.7882,
+                "vehicle": 0.0007,
+                "place": 0.0136
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "sharp",
+          "baseline": {
+            "level": 3.0718,
+            "probs": {
+              "edible": 0.0168,
+              "alive": 0.0402,
+              "sharp": 0.8082,
+              "fast": 0.1239,
+              "vast": 0.0108
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.1065,
+              "delta": 0.0346,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0184,
+                "sharp": 0.8848,
+                "fast": 0.0682,
+                "vast": 0.0284
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.1802,
+              "delta": 0.1084,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0142,
+                "sharp": 0.849,
+                "fast": 0.079,
+                "vast": 0.0578
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.1256,
+              "delta": 0.0538,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0078,
+                "sharp": 0.9035,
+                "fast": 0.0436,
+                "vast": 0.045
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.0533,
+              "delta": -0.0186,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0218,
+                "alive": 0.1177,
+                "sharp": 0.6776,
+                "fast": 0.1512,
+                "vast": 0.0317
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.0949,
+              "delta": 0.0231,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0084,
+                "sharp": 0.914,
+                "fast": 0.0516,
+                "vast": 0.0259
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.0793,
+              "delta": 0.0075,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0139,
+                "alive": 0.0427,
+                "sharp": 0.8066,
+                "fast": 0.1237,
+                "vast": 0.013
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.0533,
+              "delta": -0.0186,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0218,
+                "alive": 0.1177,
+                "sharp": 0.6776,
+                "fast": 0.1512,
+                "vast": 0.0317
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.0949,
+              "delta": 0.0231,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0084,
+                "sharp": 0.914,
+                "fast": 0.0516,
+                "vast": 0.0259
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.0793,
+              "delta": 0.0075,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0139,
+                "alive": 0.0427,
+                "sharp": 0.8066,
+                "fast": 0.1237,
+                "vast": 0.013
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.1123,
+              "delta": 0.0405,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0018,
+                "alive": 0.0123,
+                "sharp": 0.8599,
+                "fast": 0.1239,
+                "vast": 0.0021
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.2514,
+              "delta": 0.1796,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0135,
+                "sharp": 0.8122,
+                "fast": 0.083,
+                "vast": 0.0911
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.071,
+              "delta": -0.0008,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0096,
+                "alive": 0.0852,
+                "sharp": 0.7594,
+                "fast": 0.1165,
+                "vast": 0.0294
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "blades",
+          "baseline": {
+            "level": 4.0797,
+            "probs": {
+              "seeds": 0.1148,
+              "fur": 0.0494,
+              "blades": 0.0422,
+              "wheels": 0.2284,
+              "sand": 0.5652
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.1048,
+              "delta": 0.0251,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1127,
+                "fur": 0.0549,
+                "blades": 0.0378,
+                "wheels": 0.2041,
+                "sand": 0.5905
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.0359,
+              "delta": -0.0438,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1261,
+                "fur": 0.0675,
+                "blades": 0.0339,
+                "wheels": 0.1893,
+                "sand": 0.5831
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.1735,
+              "delta": 0.0938,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0343,
+                "fur": 0.1355,
+                "blades": 0.1195,
+                "wheels": 0.044,
+                "sand": 0.6668
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.0055,
+              "delta": -0.0742,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1241,
+                "fur": 0.0559,
+                "blades": 0.0493,
+                "wheels": 0.2318,
+                "sand": 0.5389
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.8819,
+              "delta": -0.1978,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1391,
+                "fur": 0.0719,
+                "blades": 0.0618,
+                "wheels": 0.2223,
+                "sand": 0.5049
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.8526,
+              "delta": -0.2271,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0205,
+                "fur": 0.3212,
+                "blades": 0.0435,
+                "wheels": 0.0146,
+                "sand": 0.6002
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.0055,
+              "delta": -0.0742,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1241,
+                "fur": 0.0559,
+                "blades": 0.0493,
+                "wheels": 0.2318,
+                "sand": 0.5389
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.8819,
+              "delta": -0.1978,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1391,
+                "fur": 0.0719,
+                "blades": 0.0618,
+                "wheels": 0.2223,
+                "sand": 0.5049
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.8526,
+              "delta": -0.2271,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0205,
+                "fur": 0.3212,
+                "blades": 0.0435,
+                "wheels": 0.0146,
+                "sand": 0.6002
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.0467,
+              "delta": -0.033,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1149,
+                "fur": 0.0502,
+                "blades": 0.0479,
+                "wheels": 0.2471,
+                "sand": 0.5398
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.0483,
+              "delta": -0.0314,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1259,
+                "fur": 0.0595,
+                "blades": 0.0372,
+                "wheels": 0.195,
+                "sand": 0.5823
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.0619,
+              "delta": -0.0178,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0575,
+                "fur": 0.1469,
+                "blades": 0.1199,
+                "wheels": 0.0278,
+                "sand": 0.648
+              }
+            }
+          }
+        }
+      }
+    },
+    "scissors": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "embedding_norm": 1.5204159021377563,
+      "tasks": {
+        "category": {
+          "expected": "tool",
+          "baseline": {
+            "level": 2.8479,
+            "probs": {
+              "fruit": 0.0297,
+              "animal": 0.1332,
+              "tool": 0.8158,
+              "vehicle": 0.0022,
+              "place": 0.0192
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.871,
+              "delta": 0.0231,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0198,
+                "animal": 0.1213,
+                "tool": 0.8423,
+                "vehicle": 0.0012,
+                "place": 0.0154
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.8427,
+              "delta": -0.0053,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0312,
+                "animal": 0.1399,
+                "tool": 0.8053,
+                "vehicle": 0.0021,
+                "place": 0.0215
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.8631,
+              "delta": 0.0151,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0179,
+                "animal": 0.132,
+                "tool": 0.8342,
+                "vehicle": 0.0012,
+                "place": 0.0148
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.9167,
+              "delta": 0.0687,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0106,
+                "animal": 0.0833,
+                "tool": 0.8953,
+                "vehicle": 0.0006,
+                "place": 0.0103
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.8218,
+              "delta": -0.0261,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0572,
+                "animal": 0.226,
+                "tool": 0.634,
+                "vehicle": 0.0035,
+                "place": 0.0793
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.6693,
+              "delta": -0.1787,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.1073,
+                "animal": 0.2916,
+                "tool": 0.5118,
+                "vehicle": 0.003,
+                "place": 0.0862
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.9167,
+              "delta": 0.0687,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0106,
+                "animal": 0.0833,
+                "tool": 0.8953,
+                "vehicle": 0.0006,
+                "place": 0.0103
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.8218,
+              "delta": -0.0261,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0572,
+                "animal": 0.226,
+                "tool": 0.634,
+                "vehicle": 0.0035,
+                "place": 0.0793
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.6693,
+              "delta": -0.1787,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.1073,
+                "animal": 0.2916,
+                "tool": 0.5118,
+                "vehicle": 0.003,
+                "place": 0.0862
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.8575,
+              "delta": 0.0096,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0299,
+                "animal": 0.126,
+                "tool": 0.8214,
+                "vehicle": 0.0022,
+                "place": 0.0206
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.9184,
+              "delta": 0.0704,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0088,
+                "animal": 0.0835,
+                "tool": 0.8976,
+                "vehicle": 0.0007,
+                "place": 0.0094
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.8487,
+              "delta": 0.0007,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0439,
+                "animal": 0.1849,
+                "tool": 0.7088,
+                "vehicle": 0.0032,
+                "place": 0.0591
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "sharp",
+          "baseline": {
+            "level": 3.161,
+            "probs": {
+              "edible": 0.0338,
+              "alive": 0.3011,
+              "sharp": 0.207,
+              "fast": 0.3866,
+              "vast": 0.0715
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.3144,
+              "delta": 0.1534,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0168,
+                "alive": 0.2472,
+                "sharp": 0.1925,
+                "fast": 0.4916,
+                "vast": 0.0518
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.2019,
+              "delta": 0.0409,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0274,
+                "alive": 0.2941,
+                "sharp": 0.2021,
+                "fast": 0.402,
+                "vast": 0.0744
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.2904,
+              "delta": 0.1294,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0023,
+                "alive": 0.2589,
+                "sharp": 0.3324,
+                "fast": 0.2589,
+                "vast": 0.1475
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.0633,
+              "delta": -0.0977,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0108,
+                "alive": 0.358,
+                "sharp": 0.2788,
+                "fast": 0.2619,
+                "vast": 0.0905
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.5983,
+              "delta": 0.4373,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.1014,
+                "sharp": 0.4268,
+                "fast": 0.2432,
+                "vast": 0.2284
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.2194,
+              "delta": 0.0584,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0327,
+                "alive": 0.2916,
+                "sharp": 0.1883,
+                "fast": 0.3985,
+                "vast": 0.0889
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.0633,
+              "delta": -0.0977,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0108,
+                "alive": 0.358,
+                "sharp": 0.2788,
+                "fast": 0.2619,
+                "vast": 0.0905
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.5983,
+              "delta": 0.4373,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.1014,
+                "sharp": 0.4268,
+                "fast": 0.2432,
+                "vast": 0.2284
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.2194,
+              "delta": 0.0584,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0327,
+                "alive": 0.2916,
+                "sharp": 0.1883,
+                "fast": 0.3985,
+                "vast": 0.0889
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.3041,
+              "delta": 0.1431,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0169,
+                "alive": 0.2487,
+                "sharp": 0.1937,
+                "fast": 0.4946,
+                "vast": 0.046
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.0563,
+              "delta": -0.1047,
+              "top": "alive",
+              "probs": {
+                "edible": 0.023,
+                "alive": 0.3593,
+                "sharp": 0.247,
+                "fast": 0.2799,
+                "vast": 0.0909
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.2041,
+              "delta": 0.0431,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.004,
+                "alive": 0.2961,
+                "sharp": 0.3152,
+                "fast": 0.2613,
+                "vast": 0.1234
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "blades",
+          "baseline": {
+            "level": 3.2591,
+            "probs": {
+              "seeds": 0.0235,
+              "fur": 0.0467,
+              "blades": 0.7301,
+              "wheels": 0.0467,
+              "sand": 0.153
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.3636,
+              "delta": 0.1044,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0263,
+                "fur": 0.0433,
+                "blades": 0.6776,
+                "wheels": 0.0461,
+                "sand": 0.2067
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.2649,
+              "delta": 0.0057,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0479,
+                "fur": 0.0742,
+                "blades": 0.621,
+                "wheels": 0.079,
+                "sand": 0.1779
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.69,
+              "delta": 0.4309,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1308,
+                "fur": 0.0845,
+                "blades": 0.2124,
+                "wheels": 0.1085,
+                "sand": 0.4639
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.3061,
+              "delta": 0.047,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0265,
+                "fur": 0.03,
+                "blades": 0.7271,
+                "wheels": 0.0437,
+                "sand": 0.1727
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.0463,
+              "delta": -0.2129,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.1031,
+                "fur": 0.3598,
+                "blades": 0.205,
+                "wheels": 0.0518,
+                "sand": 0.2802
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.8882,
+              "delta": -0.371,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0863,
+                "fur": 0.4118,
+                "blades": 0.2498,
+                "wheels": 0.0318,
+                "sand": 0.2204
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.3061,
+              "delta": 0.047,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0265,
+                "fur": 0.03,
+                "blades": 0.7271,
+                "wheels": 0.0437,
+                "sand": 0.1727
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.0463,
+              "delta": -0.2129,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.1031,
+                "fur": 0.3598,
+                "blades": 0.205,
+                "wheels": 0.0518,
+                "sand": 0.2802
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.8882,
+              "delta": -0.371,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0863,
+                "fur": 0.4118,
+                "blades": 0.2498,
+                "wheels": 0.0318,
+                "sand": 0.2204
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.354,
+              "delta": 0.0949,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0246,
+                "fur": 0.0302,
+                "blades": 0.7085,
+                "wheels": 0.04,
+                "sand": 0.1967
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.4441,
+              "delta": 0.185,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.0354,
+                "fur": 0.0343,
+                "blades": 0.6267,
+                "wheels": 0.0583,
+                "sand": 0.2454
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.8111,
+              "delta": -0.448,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.1085,
+                "fur": 0.403,
+                "blades": 0.2602,
+                "wheels": 0.0258,
+                "sand": 0.2026
+              }
+            }
+          }
+        }
+      }
+    },
+    "car": {
+      "category": "vehicle",
+      "opposing": "tool",
+      "embedding_norm": 1.474029541015625,
+      "tasks": {
+        "category": {
+          "expected": "vehicle",
+          "baseline": {
+            "level": 2.2363,
+            "probs": {
+              "fruit": 0.0116,
+              "animal": 0.8158,
+              "tool": 0.1104,
+              "vehicle": 0.049,
+              "place": 0.0132
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 2.4379,
+              "delta": 0.2016,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0133,
+                "animal": 0.6202,
+                "tool": 0.3118,
+                "vehicle": 0.0248,
+                "place": 0.0299
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.5832,
+              "delta": 0.3469,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0208,
+                "animal": 0.4969,
+                "tool": 0.412,
+                "vehicle": 0.0187,
+                "place": 0.0516
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.2528,
+              "delta": 0.0165,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0582,
+                "animal": 0.7546,
+                "tool": 0.1087,
+                "vehicle": 0.0332,
+                "place": 0.0453
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.2389,
+              "delta": 0.0026,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0146,
+                "animal": 0.7981,
+                "tool": 0.1387,
+                "vehicle": 0.0309,
+                "place": 0.0176
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.3228,
+              "delta": 0.0865,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0167,
+                "animal": 0.7095,
+                "tool": 0.2303,
+                "vehicle": 0.0214,
+                "place": 0.0221
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.4616,
+              "delta": 0.2253,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0292,
+                "animal": 0.5867,
+                "tool": 0.324,
+                "vehicle": 0.0134,
+                "place": 0.0467
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 2.2389,
+              "delta": 0.0026,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0146,
+                "animal": 0.7981,
+                "tool": 0.1387,
+                "vehicle": 0.0309,
+                "place": 0.0176
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.3228,
+              "delta": 0.0865,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0167,
+                "animal": 0.7095,
+                "tool": 0.2303,
+                "vehicle": 0.0214,
+                "place": 0.0221
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.4616,
+              "delta": 0.2253,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0292,
+                "animal": 0.5867,
+                "tool": 0.324,
+                "vehicle": 0.0134,
+                "place": 0.0467
+              }
+            },
+            "add_random_a0.5": {
+              "level": 2.4621,
+              "delta": 0.2258,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0142,
+                "animal": 0.5941,
+                "tool": 0.3385,
+                "vehicle": 0.0216,
+                "place": 0.0315
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.5398,
+              "delta": 0.3035,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0165,
+                "animal": 0.5309,
+                "tool": 0.3884,
+                "vehicle": 0.0244,
+                "place": 0.0397
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.2255,
+              "delta": -0.0108,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0526,
+                "animal": 0.7731,
+                "tool": 0.1114,
+                "vehicle": 0.0219,
+                "place": 0.041
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "fast",
+          "baseline": {
+            "level": 3.7187,
+            "probs": {
+              "edible": 0.0027,
+              "alive": 0.1545,
+              "sharp": 0.0112,
+              "fast": 0.7845,
+              "vast": 0.0471
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.1244,
+              "delta": -0.5943,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0297,
+                "alive": 0.4371,
+                "sharp": 0.0297,
+                "fast": 0.3857,
+                "vast": 0.1176
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.9667,
+              "delta": -0.7521,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0195,
+                "alive": 0.5361,
+                "sharp": 0.0468,
+                "fast": 0.2532,
+                "vast": 0.1443
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.1754,
+              "delta": -0.5433,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0401,
+                "alive": 0.4055,
+                "sharp": 0.0333,
+                "fast": 0.3809,
+                "vast": 0.1401
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.3565,
+              "delta": -0.3622,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0048,
+                "alive": 0.4067,
+                "sharp": 0.0624,
+                "fast": 0.2795,
+                "vast": 0.2467
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.2652,
+              "delta": -0.4536,
+              "top": "alive",
+              "probs": {
+                "edible": 0.008,
+                "alive": 0.4392,
+                "sharp": 0.0674,
+                "fast": 0.2503,
+                "vast": 0.2351
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.6649,
+              "delta": 0.9461,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0003,
+                "alive": 0.026,
+                "sharp": 0.0542,
+                "fast": 0.1474,
+                "vast": 0.7721
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.3565,
+              "delta": -0.3622,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0048,
+                "alive": 0.4067,
+                "sharp": 0.0624,
+                "fast": 0.2795,
+                "vast": 0.2467
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.2652,
+              "delta": -0.4536,
+              "top": "alive",
+              "probs": {
+                "edible": 0.008,
+                "alive": 0.4392,
+                "sharp": 0.0674,
+                "fast": 0.2503,
+                "vast": 0.2351
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.6649,
+              "delta": 0.9461,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0003,
+                "alive": 0.026,
+                "sharp": 0.0542,
+                "fast": 0.1474,
+                "vast": 0.7721
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.1596,
+              "delta": -0.5592,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0082,
+                "alive": 0.477,
+                "sharp": 0.0606,
+                "fast": 0.2553,
+                "vast": 0.1988
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.2309,
+              "delta": 0.5121,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.1273,
+                "sharp": 0.0498,
+                "fast": 0.2868,
+                "vast": 0.5359
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.5216,
+              "delta": -0.1972,
+              "top": "alive",
+              "probs": {
+                "edible": 0.0041,
+                "alive": 0.3438,
+                "sharp": 0.0636,
+                "fast": 0.3034,
+                "vast": 0.2851
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "wheels",
+          "baseline": {
+            "level": 4.0038,
+            "probs": {
+              "seeds": 0.0021,
+              "fur": 0.0007,
+              "blades": 0.001,
+              "wheels": 0.9839,
+              "sand": 0.0124
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.0061,
+              "delta": 0.0023,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0126,
+                "fur": 0.0054,
+                "blades": 0.0039,
+                "wheels": 0.9193,
+                "sand": 0.0588
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.9624,
+              "delta": -0.0413,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0403,
+                "fur": 0.0213,
+                "blades": 0.0121,
+                "wheels": 0.7883,
+                "sand": 0.1381
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.8384,
+              "delta": -0.1654,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0447,
+                "fur": 0.0506,
+                "blades": 0.0073,
+                "wheels": 0.8166,
+                "sand": 0.0809
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.012,
+              "delta": 0.0082,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0064,
+                "fur": 0.0025,
+                "blades": 0.0018,
+                "wheels": 0.9512,
+                "sand": 0.0381
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.009,
+              "delta": 0.0052,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0107,
+                "fur": 0.0038,
+                "blades": 0.0023,
+                "wheels": 0.9322,
+                "sand": 0.051
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.9056,
+              "delta": -0.0981,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.031,
+                "fur": 0.0514,
+                "blades": 0.0058,
+                "wheels": 0.8046,
+                "sand": 0.1072
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.012,
+              "delta": 0.0082,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0064,
+                "fur": 0.0025,
+                "blades": 0.0018,
+                "wheels": 0.9512,
+                "sand": 0.0381
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.009,
+              "delta": 0.0052,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0107,
+                "fur": 0.0038,
+                "blades": 0.0023,
+                "wheels": 0.9322,
+                "sand": 0.051
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.9056,
+              "delta": -0.0981,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.031,
+                "fur": 0.0514,
+                "blades": 0.0058,
+                "wheels": 0.8046,
+                "sand": 0.1072
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.0096,
+              "delta": 0.0059,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0101,
+                "fur": 0.0043,
+                "blades": 0.0031,
+                "wheels": 0.9308,
+                "sand": 0.0517
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.0026,
+              "delta": -0.0012,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0207,
+                "fur": 0.0087,
+                "blades": 0.005,
+                "wheels": 0.8786,
+                "sand": 0.087
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.929,
+              "delta": -0.0748,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0586,
+                "fur": 0.0291,
+                "blades": 0.0148,
+                "wheels": 0.7198,
+                "sand": 0.1778
+              }
+            }
+          }
+        }
+      }
+    },
+    "bicycle": {
+      "category": "vehicle",
+      "opposing": "tool",
+      "embedding_norm": 1.524670958518982,
+      "tasks": {
+        "category": {
+          "expected": "vehicle",
+          "baseline": {
+            "level": 3.9641,
+            "probs": {
+              "fruit": 0.0026,
+              "animal": 0.0132,
+              "tool": 0.0023,
+              "vehicle": 0.9815,
+              "place": 0.0005
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.9233,
+              "delta": -0.0408,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0024,
+                "animal": 0.0308,
+                "tool": 0.0088,
+                "vehicle": 0.9573,
+                "place": 0.0008
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.8056,
+              "delta": -0.1585,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0049,
+                "animal": 0.0726,
+                "tool": 0.0365,
+                "vehicle": 0.884,
+                "place": 0.0021
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.5795,
+              "delta": -0.3847,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0262,
+                "animal": 0.1508,
+                "tool": 0.0489,
+                "vehicle": 0.7656,
+                "place": 0.0085
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.9515,
+              "delta": -0.0126,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0033,
+                "animal": 0.0179,
+                "tool": 0.0035,
+                "vehicle": 0.9747,
+                "place": 0.0007
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.9036,
+              "delta": -0.0606,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0068,
+                "animal": 0.0346,
+                "tool": 0.0082,
+                "vehicle": 0.9491,
+                "place": 0.0013
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.9267,
+              "delta": -1.0374,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.024,
+                "animal": 0.2328,
+                "tool": 0.5762,
+                "vehicle": 0.1266,
+                "place": 0.0405
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.9515,
+              "delta": -0.0126,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0033,
+                "animal": 0.0179,
+                "tool": 0.0035,
+                "vehicle": 0.9747,
+                "place": 0.0007
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.9036,
+              "delta": -0.0606,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0068,
+                "animal": 0.0346,
+                "tool": 0.0082,
+                "vehicle": 0.9491,
+                "place": 0.0013
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.9267,
+              "delta": -1.0374,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.024,
+                "animal": 0.2328,
+                "tool": 0.5762,
+                "vehicle": 0.1266,
+                "place": 0.0405
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.8877,
+              "delta": -0.0764,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0049,
+                "animal": 0.0439,
+                "tool": 0.0111,
+                "vehicle": 0.9387,
+                "place": 0.0014
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.5433,
+              "delta": -0.4208,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0066,
+                "animal": 0.1445,
+                "tool": 0.1538,
+                "vehicle": 0.6894,
+                "place": 0.0058
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.3942,
+              "delta": -0.5699,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0204,
+                "animal": 0.2189,
+                "tool": 0.1172,
+                "vehicle": 0.6334,
+                "place": 0.0102
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "fast",
+          "baseline": {
+            "level": 3.5886,
+            "probs": {
+              "edible": 0.0218,
+              "alive": 0.1712,
+              "sharp": 0.0218,
+              "fast": 0.7672,
+              "vast": 0.018
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.4202,
+              "delta": -0.1684,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0103,
+                "alive": 0.2667,
+                "sharp": 0.0493,
+                "fast": 0.6397,
+                "vast": 0.0339
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.8486,
+              "delta": 0.26,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.0804,
+                "sharp": 0.0488,
+                "fast": 0.8118,
+                "vast": 0.0588
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.4272,
+              "delta": -0.1614,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0131,
+                "alive": 0.2793,
+                "sharp": 0.0456,
+                "fast": 0.5914,
+                "vast": 0.0706
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.3375,
+              "delta": -0.2511,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0104,
+                "alive": 0.305,
+                "sharp": 0.068,
+                "fast": 0.5698,
+                "vast": 0.0468
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.3234,
+              "delta": -0.2652,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0137,
+                "alive": 0.3118,
+                "sharp": 0.0696,
+                "fast": 0.5472,
+                "vast": 0.0577
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.8925,
+              "delta": 0.3039,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.0732,
+                "sharp": 0.0732,
+                "fast": 0.7397,
+                "vast": 0.1134
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.3375,
+              "delta": -0.2511,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0104,
+                "alive": 0.305,
+                "sharp": 0.068,
+                "fast": 0.5698,
+                "vast": 0.0468
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.3234,
+              "delta": -0.2652,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0137,
+                "alive": 0.3118,
+                "sharp": 0.0696,
+                "fast": 0.5472,
+                "vast": 0.0577
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.8925,
+              "delta": 0.3039,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.0732,
+                "sharp": 0.0732,
+                "fast": 0.7397,
+                "vast": 0.1134
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.8576,
+              "delta": 0.269,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0043,
+                "alive": 0.0627,
+                "sharp": 0.008,
+                "fast": 0.9213,
+                "vast": 0.0038
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.5825,
+              "delta": -0.0061,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0017,
+                "alive": 0.1976,
+                "sharp": 0.0641,
+                "fast": 0.6896,
+                "vast": 0.0469
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.3531,
+              "delta": -0.2355,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0162,
+                "alive": 0.3058,
+                "sharp": 0.0641,
+                "fast": 0.5366,
+                "vast": 0.0773
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "wheels",
+          "baseline": {
+            "level": 4.002,
+            "probs": {
+              "seeds": 0.0007,
+              "fur": 0.0002,
+              "blades": 0.002,
+              "wheels": 0.9904,
+              "sand": 0.0067
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.005,
+              "delta": 0.0029,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0036,
+                "fur": 0.0012,
+                "blades": 0.0056,
+                "wheels": 0.9658,
+                "sand": 0.0238
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.997,
+              "delta": -0.005,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0166,
+                "fur": 0.0071,
+                "blades": 0.0172,
+                "wheels": 0.8809,
+                "sand": 0.0782
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.9566,
+              "delta": -0.0455,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0603,
+                "fur": 0.0305,
+                "blades": 0.0321,
+                "wheels": 0.6466,
+                "sand": 0.2305
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.0048,
+              "delta": 0.0028,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0013,
+                "fur": 0.0004,
+                "blades": 0.0028,
+                "wheels": 0.9831,
+                "sand": 0.0124
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.0084,
+              "delta": 0.0064,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0024,
+                "fur": 0.0007,
+                "blades": 0.0037,
+                "wheels": 0.9723,
+                "sand": 0.0208
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.0616,
+              "delta": 0.0596,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0487,
+                "fur": 0.0245,
+                "blades": 0.0215,
+                "wheels": 0.627,
+                "sand": 0.2782
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.0048,
+              "delta": 0.0028,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0013,
+                "fur": 0.0004,
+                "blades": 0.0028,
+                "wheels": 0.9831,
+                "sand": 0.0124
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.0084,
+              "delta": 0.0064,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0024,
+                "fur": 0.0007,
+                "blades": 0.0037,
+                "wheels": 0.9723,
+                "sand": 0.0208
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.0616,
+              "delta": 0.0596,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0487,
+                "fur": 0.0245,
+                "blades": 0.0215,
+                "wheels": 0.627,
+                "sand": 0.2782
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.0037,
+              "delta": 0.0017,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0016,
+                "fur": 0.0005,
+                "blades": 0.0033,
+                "wheels": 0.9819,
+                "sand": 0.0128
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.0106,
+              "delta": 0.0085,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.004,
+                "fur": 0.0012,
+                "blades": 0.0054,
+                "wheels": 0.959,
+                "sand": 0.0303
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.9978,
+              "delta": -0.0043,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0286,
+                "fur": 0.0129,
+                "blades": 0.0206,
+                "wheels": 0.808,
+                "sand": 0.1299
+              }
+            }
+          }
+        }
+      }
+    },
+    "desert": {
+      "category": "place",
+      "opposing": "fruit",
+      "embedding_norm": 1.4367411136627197,
+      "tasks": {
+        "category": {
+          "expected": "place",
+          "baseline": {
+            "level": 3.2844,
+            "probs": {
+              "fruit": 0.0688,
+              "animal": 0.4779,
+              "tool": 0.0022,
+              "vehicle": 0.0021,
+              "place": 0.449
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.8161,
+              "delta": 0.5317,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0173,
+                "animal": 0.3701,
+                "tool": 0.0019,
+                "vehicle": 0.0003,
+                "place": 0.6103
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.7367,
+              "delta": 0.4523,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0169,
+                "animal": 0.3665,
+                "tool": 0.0473,
+                "vehicle": 0.0015,
+                "place": 0.5677
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.7548,
+              "delta": 0.4705,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0176,
+                "animal": 0.3763,
+                "tool": 0.0226,
+                "vehicle": 0.0007,
+                "place": 0.5828
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 3.6847,
+              "delta": 0.4003,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0171,
+                "animal": 0.4145,
+                "tool": 0.0015,
+                "vehicle": 0.0003,
+                "place": 0.5666
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 3.7372,
+              "delta": 0.4528,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0109,
+                "animal": 0.3972,
+                "tool": 0.0136,
+                "vehicle": 0.0005,
+                "place": 0.5779
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.3912,
+              "delta": 0.1068,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0195,
+                "animal": 0.4884,
+                "tool": 0.0322,
+                "vehicle": 0.0011,
+                "place": 0.4588
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.2263,
+              "delta": -0.0581,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.075,
+                "animal": 0.4889,
+                "tool": 0.0024,
+                "vehicle": 0.0023,
+                "place": 0.4315
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 3.9144,
+              "delta": 0.63,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0103,
+                "animal": 0.3415,
+                "tool": 0.0097,
+                "vehicle": 0.0004,
+                "place": 0.6381
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.6374,
+              "delta": 0.353,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0204,
+                "animal": 0.3902,
+                "tool": 0.0545,
+                "vehicle": 0.0016,
+                "place": 0.5334
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.1787,
+              "delta": -0.1056,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.077,
+                "animal": 0.5021,
+                "tool": 0.0023,
+                "vehicle": 0.0023,
+                "place": 0.4163
+              }
+            },
+            "add_random_a1.0": {
+              "level": 3.8138,
+              "delta": 0.5294,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0125,
+                "animal": 0.3648,
+                "tool": 0.0206,
+                "vehicle": 0.0006,
+                "place": 0.6015
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.5719,
+              "delta": 0.2875,
+              "top": "place",
+              "probs": {
+                "fruit": 0.0177,
+                "animal": 0.4293,
+                "tool": 0.0342,
+                "vehicle": 0.001,
+                "place": 0.5178
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "vast",
+          "baseline": {
+            "level": 4.8887,
+            "probs": {
+              "edible": 0.0002,
+              "alive": 0.0287,
+              "sharp": 0.0035,
+              "fast": 0.0174,
+              "vast": 0.9502
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.8771,
+              "delta": -0.0116,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0003,
+                "alive": 0.0324,
+                "sharp": 0.0041,
+                "fast": 0.0163,
+                "vast": 0.9469
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.8313,
+              "delta": -0.0574,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.0463,
+                "sharp": 0.0052,
+                "fast": 0.017,
+                "vast": 0.9309
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.8468,
+              "delta": -0.0419,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0007,
+                "alive": 0.0411,
+                "sharp": 0.0049,
+                "fast": 0.0171,
+                "vast": 0.9361
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.8915,
+              "delta": 0.0027,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.0269,
+                "sharp": 0.0036,
+                "fast": 0.0197,
+                "vast": 0.9495
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.8611,
+              "delta": -0.0276,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0007,
+                "alive": 0.039,
+                "sharp": 0.0039,
+                "fast": 0.0112,
+                "vast": 0.9452
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.9518,
+              "delta": 0.0631,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0005,
+                "alive": 0.0131,
+                "sharp": 0.0013,
+                "fast": 0.0043,
+                "vast": 0.9808
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.8921,
+              "delta": 0.0034,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.027,
+                "sharp": 0.0039,
+                "fast": 0.0185,
+                "vast": 0.9505
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.7033,
+              "delta": -0.1854,
+              "top": "vast",
+              "probs": {
+                "edible": 0.005,
+                "alive": 0.0829,
+                "sharp": 0.0072,
+                "fast": 0.0135,
+                "vast": 0.8913
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.6859,
+              "delta": -0.2028,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0053,
+                "alive": 0.0878,
+                "sharp": 0.0093,
+                "fast": 0.0112,
+                "vast": 0.8865
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.899,
+              "delta": 0.0103,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.0271,
+                "sharp": 0.003,
+                "fast": 0.0128,
+                "vast": 0.9569
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.8427,
+              "delta": -0.046,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0004,
+                "alive": 0.0409,
+                "sharp": 0.0055,
+                "fast": 0.0219,
+                "vast": 0.9312
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.954,
+              "delta": 0.0653,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0123,
+                "sharp": 0.0013,
+                "fast": 0.0058,
+                "vast": 0.9804
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "sand",
+          "baseline": {
+            "level": 4.5542,
+            "probs": {
+              "seeds": 0.0733,
+              "fur": 0.0282,
+              "blades": 0.008,
+              "wheels": 0.052,
+              "sand": 0.8385
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.5185,
+              "delta": -0.0356,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0753,
+                "fur": 0.0345,
+                "blades": 0.0087,
+                "wheels": 0.0595,
+                "sand": 0.822
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.2977,
+              "delta": -0.2565,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1025,
+                "fur": 0.0582,
+                "blades": 0.0182,
+                "wheels": 0.0817,
+                "sand": 0.7395
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.1012,
+              "delta": -0.453,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1269,
+                "fur": 0.091,
+                "blades": 0.0221,
+                "wheels": 0.074,
+                "sand": 0.686
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.5001,
+              "delta": -0.054,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0809,
+                "fur": 0.0322,
+                "blades": 0.0098,
+                "wheels": 0.0601,
+                "sand": 0.817
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.3624,
+              "delta": -0.1918,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.099,
+                "fur": 0.0464,
+                "blades": 0.0146,
+                "wheels": 0.073,
+                "sand": 0.7669
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.0006,
+              "delta": -0.5536,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1412,
+                "fur": 0.0982,
+                "blades": 0.0273,
+                "wheels": 0.0856,
+                "sand": 0.6477
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.5207,
+              "delta": -0.0335,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0768,
+                "fur": 0.0336,
+                "blades": 0.0076,
+                "wheels": 0.0562,
+                "sand": 0.8258
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.335,
+              "delta": -0.2192,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0989,
+                "fur": 0.0546,
+                "blades": 0.013,
+                "wheels": 0.0795,
+                "sand": 0.754
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.0312,
+              "delta": -0.5229,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1318,
+                "fur": 0.103,
+                "blades": 0.0211,
+                "wheels": 0.0902,
+                "sand": 0.6538
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.4839,
+              "delta": -0.0702,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0818,
+                "fur": 0.0374,
+                "blades": 0.0089,
+                "wheels": 0.0589,
+                "sand": 0.813
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.3294,
+              "delta": -0.2248,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1039,
+                "fur": 0.0487,
+                "blades": 0.0173,
+                "wheels": 0.0743,
+                "sand": 0.7558
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.0839,
+              "delta": -0.4703,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1318,
+                "fur": 0.0851,
+                "blades": 0.0252,
+                "wheels": 0.0831,
+                "sand": 0.6747
+              }
+            }
+          }
+        }
+      }
+    },
+    "ocean": {
+      "category": "place",
+      "opposing": "fruit",
+      "embedding_norm": 1.5459860563278198,
+      "tasks": {
+        "category": {
+          "expected": "place",
+          "baseline": {
+            "level": 3.0608,
+            "probs": {
+              "fruit": 0.0564,
+              "animal": 0.4581,
+              "tool": 0.1685,
+              "vehicle": 0.0021,
+              "place": 0.3148
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 3.0402,
+              "delta": -0.0206,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0477,
+                "animal": 0.3997,
+                "tool": 0.2834,
+                "vehicle": 0.0028,
+                "place": 0.2663
+              }
+            },
+            "add_category_a1.0": {
+              "level": 2.9464,
+              "delta": -0.1144,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.055,
+                "animal": 0.3703,
+                "tool": 0.3589,
+                "vehicle": 0.0048,
+                "place": 0.211
+              }
+            },
+            "add_category_a2.0": {
+              "level": 2.8752,
+              "delta": -0.1856,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0802,
+                "animal": 0.4763,
+                "tool": 0.1865,
+                "vehicle": 0.0021,
+                "place": 0.2549
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 2.9586,
+              "delta": -0.1022,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0549,
+                "animal": 0.4746,
+                "tool": 0.1978,
+                "vehicle": 0.0023,
+                "place": 0.2704
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 2.933,
+              "delta": -0.1278,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0503,
+                "animal": 0.4214,
+                "tool": 0.2988,
+                "vehicle": 0.0039,
+                "place": 0.2255
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 2.7542,
+              "delta": -0.3066,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0803,
+                "animal": 0.4079,
+                "tool": 0.3489,
+                "vehicle": 0.0033,
+                "place": 0.1597
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 3.0263,
+              "delta": -0.0345,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0553,
+                "animal": 0.4627,
+                "tool": 0.1812,
+                "vehicle": 0.0021,
+                "place": 0.2987
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 2.9777,
+              "delta": -0.0831,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0488,
+                "animal": 0.4086,
+                "tool": 0.2989,
+                "vehicle": 0.0035,
+                "place": 0.2402
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 2.885,
+              "delta": -0.1758,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0614,
+                "animal": 0.382,
+                "tool": 0.3589,
+                "vehicle": 0.0056,
+                "place": 0.1921
+              }
+            },
+            "add_random_a0.5": {
+              "level": 3.0039,
+              "delta": -0.057,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0698,
+                "animal": 0.4846,
+                "tool": 0.1304,
+                "vehicle": 0.0023,
+                "place": 0.3129
+              }
+            },
+            "add_random_a1.0": {
+              "level": 2.9324,
+              "delta": -0.1284,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0501,
+                "animal": 0.4132,
+                "tool": 0.3119,
+                "vehicle": 0.0035,
+                "place": 0.2212
+              }
+            },
+            "add_random_a2.0": {
+              "level": 2.9589,
+              "delta": -0.1019,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0596,
+                "animal": 0.4271,
+                "tool": 0.259,
+                "vehicle": 0.0031,
+                "place": 0.2511
+              }
+            }
+          }
+        },
+        "property": {
+          "expected": "vast",
+          "baseline": {
+            "level": 4.7763,
+            "probs": {
+              "edible": 0.0002,
+              "alive": 0.0709,
+              "sharp": 0.0007,
+              "fast": 0.009,
+              "vast": 0.9193
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.3453,
+              "delta": -0.4311,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0026,
+                "alive": 0.2079,
+                "sharp": 0.0036,
+                "fast": 0.0133,
+                "vast": 0.7726
+              }
+            },
+            "add_category_a1.0": {
+              "level": 4.608,
+              "delta": -0.1683,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0008,
+                "alive": 0.1239,
+                "sharp": 0.002,
+                "fast": 0.0131,
+                "vast": 0.8602
+              }
+            },
+            "add_category_a2.0": {
+              "level": 4.6054,
+              "delta": -0.171,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0009,
+                "alive": 0.1235,
+                "sharp": 0.0019,
+                "fast": 0.0167,
+                "vast": 0.857
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.8082,
+              "delta": 0.0319,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0593,
+                "sharp": 0.0008,
+                "fast": 0.0117,
+                "vast": 0.9281
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.1728,
+              "delta": -0.6036,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0037,
+                "alive": 0.2629,
+                "sharp": 0.0048,
+                "fast": 0.0139,
+                "vast": 0.7146
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 4.2129,
+              "delta": -0.5634,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0036,
+                "alive": 0.2528,
+                "sharp": 0.0022,
+                "fast": 0.0098,
+                "vast": 0.7316
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.8101,
+              "delta": 0.0338,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0595,
+                "sharp": 0.0007,
+                "fast": 0.0097,
+                "vast": 0.9301
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.1731,
+              "delta": -0.6033,
+              "top": "vast",
+              "probs": {
+                "edible": 0.004,
+                "alive": 0.2636,
+                "sharp": 0.0043,
+                "fast": 0.0116,
+                "vast": 0.7166
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 4.791,
+              "delta": 0.0146,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0001,
+                "alive": 0.0672,
+                "sharp": 0.0018,
+                "fast": 0.0036,
+                "vast": 0.9274
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.7967,
+              "delta": 0.0203,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0002,
+                "alive": 0.0629,
+                "sharp": 0.0009,
+                "fast": 0.0124,
+                "vast": 0.9237
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.3142,
+              "delta": -0.4621,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0026,
+                "alive": 0.2184,
+                "sharp": 0.0035,
+                "fast": 0.0131,
+                "vast": 0.7624
+              }
+            },
+            "add_random_a2.0": {
+              "level": 4.2114,
+              "delta": -0.5649,
+              "top": "vast",
+              "probs": {
+                "edible": 0.0034,
+                "alive": 0.2517,
+                "sharp": 0.0034,
+                "fast": 0.0133,
+                "vast": 0.7282
+              }
+            }
+          }
+        },
+        "part": {
+          "expected": "sand",
+          "baseline": {
+            "level": 4.2546,
+            "probs": {
+              "seeds": 0.0871,
+              "fur": 0.0844,
+              "blades": 0.0333,
+              "wheels": 0.0769,
+              "sand": 0.7182
+            }
+          },
+          "perturbations": {
+            "add_category_a0.5": {
+              "level": 4.1842,
+              "delta": -0.0704,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0948,
+                "fur": 0.0926,
+                "blades": 0.0358,
+                "wheels": 0.087,
+                "sand": 0.6897
+              }
+            },
+            "add_category_a1.0": {
+              "level": 3.916,
+              "delta": -0.3386,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1237,
+                "fur": 0.1235,
+                "blades": 0.0527,
+                "wheels": 0.1131,
+                "sand": 0.5869
+              }
+            },
+            "add_category_a2.0": {
+              "level": 3.8798,
+              "delta": -0.3748,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1387,
+                "fur": 0.117,
+                "blades": 0.0495,
+                "wheels": 0.1154,
+                "sand": 0.5794
+              }
+            },
+            "remove_category_a0.5": {
+              "level": 4.1802,
+              "delta": -0.0744,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.091,
+                "fur": 0.0984,
+                "blades": 0.0384,
+                "wheels": 0.0835,
+                "sand": 0.6886
+              }
+            },
+            "remove_category_a1.0": {
+              "level": 4.0397,
+              "delta": -0.2149,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1047,
+                "fur": 0.1209,
+                "blades": 0.0456,
+                "wheels": 0.0878,
+                "sand": 0.6411
+              }
+            },
+            "remove_category_a2.0": {
+              "level": 3.9874,
+              "delta": -0.2672,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1221,
+                "fur": 0.1044,
+                "blades": 0.0384,
+                "wheels": 0.1341,
+                "sand": 0.601
+              }
+            },
+            "add_opposing_a0.5": {
+              "level": 4.2378,
+              "delta": -0.0168,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.0868,
+                "fur": 0.0924,
+                "blades": 0.0324,
+                "wheels": 0.0731,
+                "sand": 0.7153
+              }
+            },
+            "add_opposing_a1.0": {
+              "level": 4.041,
+              "delta": -0.2136,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1042,
+                "fur": 0.1248,
+                "blades": 0.0403,
+                "wheels": 0.0871,
+                "sand": 0.6436
+              }
+            },
+            "add_opposing_a2.0": {
+              "level": 3.7932,
+              "delta": -0.4614,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1359,
+                "fur": 0.1555,
+                "blades": 0.0492,
+                "wheels": 0.0984,
+                "sand": 0.561
+              }
+            },
+            "add_random_a0.5": {
+              "level": 4.1409,
+              "delta": -0.1137,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1002,
+                "fur": 0.0956,
+                "blades": 0.0413,
+                "wheels": 0.0891,
+                "sand": 0.6738
+              }
+            },
+            "add_random_a1.0": {
+              "level": 4.149,
+              "delta": -0.1056,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1001,
+                "fur": 0.0897,
+                "blades": 0.0447,
+                "wheels": 0.0919,
+                "sand": 0.6736
+              }
+            },
+            "add_random_a2.0": {
+              "level": 3.9109,
+              "delta": -0.3437,
+              "top": "sand",
+              "probs": {
+                "seeds": 0.1333,
+                "fur": 0.1142,
+                "blades": 0.0558,
+                "wheels": 0.1015,
+                "sand": 0.5951
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "summary": {
+    "add_category": {
+      "fruit_category": {
+        "mean": 0.1259,
+        "n": 6
+      },
+      "fruit_property": {
+        "mean": 0.9842,
+        "n": 6
+      },
+      "fruit_part": {
+        "mean": 0.0691,
+        "n": 6
+      },
+      "animal_category": {
+        "mean": 0.0028,
+        "n": 6
+      },
+      "animal_property": {
+        "mean": 0.3827,
+        "n": 6
+      },
+      "animal_part": {
+        "mean": 0.2106,
+        "n": 6
+      },
+      "tool_category": {
+        "mean": -0.0117,
+        "n": 6
+      },
+      "tool_property": {
+        "mean": 0.0867,
+        "n": 6
+      },
+      "tool_part": {
+        "mean": 0.1027,
+        "n": 6
+      },
+      "vehicle_category": {
+        "mean": -0.0032,
+        "n": 6
+      },
+      "vehicle_property": {
+        "mean": -0.3266,
+        "n": 6
+      },
+      "vehicle_part": {
+        "mean": -0.042,
+        "n": 6
+      },
+      "place_category": {
+        "mean": 0.189,
+        "n": 6
+      },
+      "place_property": {
+        "mean": -0.1469,
+        "n": 6
+      },
+      "place_part": {
+        "mean": -0.2548,
+        "n": 6
+      }
+    },
+    "remove_category": {
+      "fruit_category": {
+        "mean": 0.2584,
+        "n": 6
+      },
+      "fruit_property": {
+        "mean": 0.8624,
+        "n": 6
+      },
+      "fruit_part": {
+        "mean": 0.0363,
+        "n": 6
+      },
+      "animal_category": {
+        "mean": 0.0053,
+        "n": 6
+      },
+      "animal_property": {
+        "mean": 0.6988,
+        "n": 6
+      },
+      "animal_part": {
+        "mean": 0.0631,
+        "n": 6
+      },
+      "tool_category": {
+        "mean": -0.1571,
+        "n": 6
+      },
+      "tool_property": {
+        "mean": 0.0683,
+        "n": 6
+      },
+      "tool_part": {
+        "mean": -0.1727,
+        "n": 6
+      },
+      "vehicle_category": {
+        "mean": -0.1327,
+        "n": 6
+      },
+      "vehicle_property": {
+        "mean": -0.0137,
+        "n": 6
+      },
+      "vehicle_part": {
+        "mean": -0.0027,
+        "n": 6
+      },
+      "place_category": {
+        "mean": 0.0706,
+        "n": 6
+      },
+      "place_property": {
+        "mean": -0.1828,
+        "n": 6
+      },
+      "place_part": {
+        "mean": -0.226,
+        "n": 6
+      }
+    },
+    "add_opposing": {
+      "fruit_category": {
+        "mean": 0.2584,
+        "n": 6
+      },
+      "fruit_property": {
+        "mean": 0.8624,
+        "n": 6
+      },
+      "fruit_part": {
+        "mean": 0.0363,
+        "n": 6
+      },
+      "animal_category": {
+        "mean": 0.0053,
+        "n": 6
+      },
+      "animal_property": {
+        "mean": 0.6988,
+        "n": 6
+      },
+      "animal_part": {
+        "mean": 0.0631,
+        "n": 6
+      },
+      "tool_category": {
+        "mean": -0.1571,
+        "n": 6
+      },
+      "tool_property": {
+        "mean": 0.0683,
+        "n": 6
+      },
+      "tool_part": {
+        "mean": -0.1727,
+        "n": 6
+      },
+      "vehicle_category": {
+        "mean": -0.1327,
+        "n": 6
+      },
+      "vehicle_property": {
+        "mean": -0.0137,
+        "n": 6
+      },
+      "vehicle_part": {
+        "mean": -0.0027,
+        "n": 6
+      },
+      "place_category": {
+        "mean": 0.1052,
+        "n": 6
+      },
+      "place_property": {
+        "mean": -0.1566,
+        "n": 6
+      },
+      "place_part": {
+        "mean": -0.2446,
+        "n": 6
+      }
+    },
+    "add_random": {
+      "fruit_category": {
+        "mean": 0.2074,
+        "n": 6
+      },
+      "fruit_property": {
+        "mean": 0.6205,
+        "n": 6
+      },
+      "fruit_part": {
+        "mean": 0.0088,
+        "n": 6
+      },
+      "animal_category": {
+        "mean": -0.0006,
+        "n": 6
+      },
+      "animal_property": {
+        "mean": 0.4628,
+        "n": 6
+      },
+      "animal_part": {
+        "mean": 0.0642,
+        "n": 6
+      },
+      "tool_category": {
+        "mean": -0.0186,
+        "n": 6
+      },
+      "tool_property": {
+        "mean": 0.0501,
+        "n": 6
+      },
+      "tool_part": {
+        "mean": -0.0417,
+        "n": 6
+      },
+      "vehicle_category": {
+        "mean": -0.0914,
+        "n": 6
+      },
+      "vehicle_property": {
+        "mean": -0.0361,
+        "n": 6
+      },
+      "vehicle_part": {
+        "mean": -0.0107,
+        "n": 6
+      },
+      "place_category": {
+        "mean": 0.0707,
+        "n": 6
+      },
+      "place_property": {
+        "mean": -0.1628,
+        "n": 6
+      },
+      "place_part": {
+        "mean": -0.2214,
+        "n": 6
+      }
+    },
+    "basin_transition": {}
+  }
+}
