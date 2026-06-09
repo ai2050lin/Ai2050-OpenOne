@@ -1,0 +1,6676 @@
+{
+  "model": "glm4",
+  "model_class": "GlmForCausalLM",
+  "n_layers": 40,
+  "d_model": 4096,
+  "timestamp": "2026-06-09 20:37",
+  "phase": "426",
+  "round": 1,
+  "alpha_grid": [
+    0.0,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "test_objects": [
+    "apple",
+    "orange",
+    "dog",
+    "horse",
+    "knife",
+    "hammer",
+    "car",
+    "bus"
+  ],
+  "per_object": {
+    "apple": {
+      "category": "fruit",
+      "opposing": "animal",
+      "embedding_norm": 0.10756281018257141,
+      "identity_norm": 0.09649601578712463,
+      "tasks": {
+        "category": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.0009,
+              "entropy": 0.005,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9997,
+                "animal": 0.0001,
+                "tool": 0.0001,
+                "vehicle": 0.0001,
+                "place": 0.0001
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.005,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.0036,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0006,
+                "delta": -0.0002,
+                "entropy": 0.0036,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0019,
+                "delta": 0.001,
+                "entropy": 0.0097,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 3.8919,
+                "delta": 2.8911,
+                "entropy": 1.8613,
+                "top": "place"
+              },
+              "0.5": {
+                "level": 4.1189,
+                "delta": 3.1181,
+                "entropy": 1.6921,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.2111,
+                "delta": 3.2102,
+                "entropy": 1.5271,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 4.1917,
+                "delta": 3.1908,
+                "entropy": 1.5484,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 4.1801,
+                "delta": 3.1793,
+                "entropy": 1.5607,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 4.1716,
+                "delta": 3.1708,
+                "entropy": 1.5672,
+                "top": "place"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.005,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.0036,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0006,
+                "delta": -0.0002,
+                "entropy": 0.0036,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0019,
+                "delta": 0.001,
+                "entropy": 0.0097,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 3.8919,
+                "delta": 2.8911,
+                "entropy": 1.8613,
+                "top": "place"
+              },
+              "0.5": {
+                "level": 4.1189,
+                "delta": 3.1181,
+                "entropy": 1.6921,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.2111,
+                "delta": 3.2102,
+                "entropy": 1.5271,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 4.1917,
+                "delta": 3.1908,
+                "entropy": 1.5484,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 4.1801,
+                "delta": 3.1793,
+                "entropy": 1.5607,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 4.1716,
+                "delta": 3.1708,
+                "entropy": 1.5672,
+                "top": "place"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.005,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.0049,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0006,
+                "delta": -0.0002,
+                "entropy": 0.0035,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.0031,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.0032,
+                "top": "fruit"
+              },
+              "0.5": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.0045,
+                "top": "fruit"
+              },
+              "0.75": {
+                "level": 1.0008,
+                "delta": -0.0001,
+                "entropy": 0.004,
+                "top": "fruit"
+              },
+              "1.0": {
+                "level": 1.0008,
+                "delta": -0.0001,
+                "entropy": 0.0041,
+                "top": "fruit"
+              },
+              "1.5": {
+                "level": 1.0011,
+                "delta": 0.0002,
+                "entropy": 0.0054,
+                "top": "fruit"
+              },
+              "2.0": {
+                "level": 1.0017,
+                "delta": 0.0008,
+                "entropy": 0.0085,
+                "top": "fruit"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.0009,
+                "delta": 0.0,
+                "entropy": 0.005,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0009,
+                "delta": 0.0001,
+                "entropy": 0.0053,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.0032,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0006,
+                "delta": -0.0003,
+                "entropy": 0.003,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 1.0007,
+                "delta": -0.0001,
+                "entropy": 0.0038,
+                "top": "fruit"
+              },
+              "0.5": {
+                "level": 1.0007,
+                "delta": -0.0002,
+                "entropy": 0.0037,
+                "top": "fruit"
+              },
+              "0.75": {
+                "level": 1.0007,
+                "delta": -0.0002,
+                "entropy": 0.0038,
+                "top": "fruit"
+              },
+              "1.0": {
+                "level": 1.0007,
+                "delta": -0.0002,
+                "entropy": 0.0036,
+                "top": "fruit"
+              },
+              "1.5": {
+                "level": 1.0006,
+                "delta": -0.0002,
+                "entropy": 0.0035,
+                "top": "fruit"
+              },
+              "2.0": {
+                "level": 1.0007,
+                "delta": -0.0002,
+                "entropy": 0.0036,
+                "top": "fruit"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.0073,
+              "entropy": 0.0441,
+              "top": "edible",
+              "probs": {
+                "edible": 0.9959,
+                "alive": 0.0023,
+                "sharp": 0.0004,
+                "fast": 0.0013,
+                "vast": 0.0001
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.0073,
+                "delta": 0.0,
+                "entropy": 0.0441,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0083,
+                "delta": 0.001,
+                "entropy": 0.0479,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0089,
+                "delta": 0.0016,
+                "entropy": 0.0479,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.0237,
+                "delta": 0.0164,
+                "entropy": 0.0984,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 3.9354,
+                "delta": 2.9281,
+                "entropy": 1.1544,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.881,
+                "delta": 2.8737,
+                "entropy": 1.1181,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8945,
+                "delta": 2.8871,
+                "entropy": 1.1097,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9024,
+                "delta": 2.8951,
+                "entropy": 1.1085,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9185,
+                "delta": 2.9112,
+                "entropy": 1.129,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9394,
+                "delta": 2.932,
+                "entropy": 1.172,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.0073,
+                "delta": 0.0,
+                "entropy": 0.0441,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0083,
+                "delta": 0.001,
+                "entropy": 0.0479,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0089,
+                "delta": 0.0016,
+                "entropy": 0.0479,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.0237,
+                "delta": 0.0164,
+                "entropy": 0.0984,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 3.9354,
+                "delta": 2.9281,
+                "entropy": 1.1544,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.881,
+                "delta": 2.8737,
+                "entropy": 1.1181,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8945,
+                "delta": 2.8871,
+                "entropy": 1.1097,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9024,
+                "delta": 2.8951,
+                "entropy": 1.1085,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9185,
+                "delta": 2.9112,
+                "entropy": 1.129,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9394,
+                "delta": 2.932,
+                "entropy": 1.172,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.0073,
+                "delta": 0.0,
+                "entropy": 0.0441,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.008,
+                "delta": 0.0007,
+                "entropy": 0.0442,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0288,
+                "delta": 0.0215,
+                "entropy": 0.1292,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.0324,
+                "delta": 0.0251,
+                "entropy": 0.1386,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 1.0418,
+                "delta": 0.0344,
+                "entropy": 0.1682,
+                "top": "edible"
+              },
+              "0.5": {
+                "level": 1.0465,
+                "delta": 0.0392,
+                "entropy": 0.1779,
+                "top": "edible"
+              },
+              "0.75": {
+                "level": 1.0418,
+                "delta": 0.0345,
+                "entropy": 0.1611,
+                "top": "edible"
+              },
+              "1.0": {
+                "level": 1.039,
+                "delta": 0.0317,
+                "entropy": 0.1517,
+                "top": "edible"
+              },
+              "1.5": {
+                "level": 1.0389,
+                "delta": 0.0316,
+                "entropy": 0.1517,
+                "top": "edible"
+              },
+              "2.0": {
+                "level": 1.0385,
+                "delta": 0.0311,
+                "entropy": 0.1495,
+                "top": "edible"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.0073,
+                "delta": 0.0,
+                "entropy": 0.0441,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0235,
+                "delta": 0.0162,
+                "entropy": 0.1135,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0277,
+                "delta": 0.0204,
+                "entropy": 0.1219,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.0345,
+                "delta": 0.0272,
+                "entropy": 0.1381,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 1.0389,
+                "delta": 0.0316,
+                "entropy": 0.1532,
+                "top": "edible"
+              },
+              "0.5": {
+                "level": 1.0387,
+                "delta": 0.0314,
+                "entropy": 0.1525,
+                "top": "edible"
+              },
+              "0.75": {
+                "level": 1.0376,
+                "delta": 0.0303,
+                "entropy": 0.1485,
+                "top": "edible"
+              },
+              "1.0": {
+                "level": 1.035,
+                "delta": 0.0277,
+                "entropy": 0.1394,
+                "top": "edible"
+              },
+              "1.5": {
+                "level": 1.0366,
+                "delta": 0.0292,
+                "entropy": 0.143,
+                "top": "edible"
+              },
+              "2.0": {
+                "level": 1.0424,
+                "delta": 0.0351,
+                "entropy": 0.1606,
+                "top": "edible"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.0835,
+              "entropy": 0.3088,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.959,
+                "fur": 0.018,
+                "blades": 0.0045,
+                "wheels": 0.0177,
+                "sand": 0.0009
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.0835,
+                "delta": 0.0,
+                "entropy": 0.3088,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.0711,
+                "delta": -0.0124,
+                "entropy": 0.269,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.0676,
+                "delta": -0.0158,
+                "entropy": 0.2568,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.135,
+                "delta": 0.0515,
+                "entropy": 0.4357,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.1333,
+                "delta": 0.0498,
+                "entropy": 0.408,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.1086,
+                "delta": 0.0251,
+                "entropy": 0.3678,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.1282,
+                "delta": 0.0447,
+                "entropy": 0.3952,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.1242,
+                "delta": 0.0408,
+                "entropy": 0.3762,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1012,
+                "delta": 0.0177,
+                "entropy": 0.3208,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.0775,
+                "delta": -0.006,
+                "entropy": 0.2659,
+                "top": "seeds"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.0835,
+                "delta": 0.0,
+                "entropy": 0.3088,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.0711,
+                "delta": -0.0124,
+                "entropy": 0.269,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.0676,
+                "delta": -0.0158,
+                "entropy": 0.2568,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.135,
+                "delta": 0.0515,
+                "entropy": 0.4357,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.1333,
+                "delta": 0.0498,
+                "entropy": 0.408,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.1086,
+                "delta": 0.0251,
+                "entropy": 0.3678,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.1282,
+                "delta": 0.0447,
+                "entropy": 0.3952,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.1242,
+                "delta": 0.0408,
+                "entropy": 0.3762,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1012,
+                "delta": 0.0177,
+                "entropy": 0.3208,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.0775,
+                "delta": -0.006,
+                "entropy": 0.2659,
+                "top": "seeds"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.0835,
+                "delta": 0.0,
+                "entropy": 0.3088,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.0838,
+                "delta": 0.0003,
+                "entropy": 0.2896,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.0754,
+                "delta": -0.008,
+                "entropy": 0.2638,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.1067,
+                "delta": 0.0232,
+                "entropy": 0.3475,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.1319,
+                "delta": 0.0484,
+                "entropy": 0.3907,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.1347,
+                "delta": 0.0512,
+                "entropy": 0.4137,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.1282,
+                "delta": 0.0447,
+                "entropy": 0.4043,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.1185,
+                "delta": 0.035,
+                "entropy": 0.3804,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1289,
+                "delta": 0.0454,
+                "entropy": 0.4048,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.1564,
+                "delta": 0.0729,
+                "entropy": 0.4708,
+                "top": "seeds"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.0835,
+                "delta": 0.0,
+                "entropy": 0.3088,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.075,
+                "delta": -0.0084,
+                "entropy": 0.2746,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.1241,
+                "delta": 0.0406,
+                "entropy": 0.3856,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.115,
+                "delta": 0.0315,
+                "entropy": 0.3591,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.108,
+                "delta": 0.0245,
+                "entropy": 0.3422,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.1246,
+                "delta": 0.0411,
+                "entropy": 0.3851,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.1263,
+                "delta": 0.0428,
+                "entropy": 0.3925,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.1331,
+                "delta": 0.0496,
+                "entropy": 0.4155,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1216,
+                "delta": 0.0381,
+                "entropy": 0.4001,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.114,
+                "delta": 0.0305,
+                "entropy": 0.3843,
+                "top": "seeds"
+              }
+            }
+          }
+        }
+      }
+    },
+    "orange": {
+      "category": "fruit",
+      "opposing": "animal",
+      "embedding_norm": 0.10221777111291885,
+      "identity_norm": 0.09326284378767014,
+      "tasks": {
+        "category": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.0005,
+              "entropy": 0.003,
+              "top": "fruit",
+              "probs": {
+                "fruit": 0.9998,
+                "animal": 0.0,
+                "tool": 0.0001,
+                "vehicle": 0.0,
+                "place": 0.0
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.0005,
+                "delta": 0.0,
+                "entropy": 0.003,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0003,
+                "delta": -0.0002,
+                "entropy": 0.0018,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0003,
+                "delta": -0.0002,
+                "entropy": 0.0017,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0011,
+                "delta": 0.0006,
+                "entropy": 0.0058,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 3.5526,
+                "delta": 2.5522,
+                "entropy": 2.0372,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.1298,
+                "delta": 2.1293,
+                "entropy": 1.9062,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.1272,
+                "delta": 2.1268,
+                "entropy": 1.9177,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.11,
+                "delta": 2.1095,
+                "entropy": 1.9101,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.6955,
+                "delta": 2.6951,
+                "entropy": 1.824,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.6486,
+                "delta": 2.6482,
+                "entropy": 1.8335,
+                "top": "tool"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.0005,
+                "delta": 0.0,
+                "entropy": 0.003,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0003,
+                "delta": -0.0002,
+                "entropy": 0.0018,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0003,
+                "delta": -0.0002,
+                "entropy": 0.0017,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0011,
+                "delta": 0.0006,
+                "entropy": 0.0058,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 3.5526,
+                "delta": 2.5522,
+                "entropy": 2.0372,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.1298,
+                "delta": 2.1293,
+                "entropy": 1.9062,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.1272,
+                "delta": 2.1268,
+                "entropy": 1.9177,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.11,
+                "delta": 2.1095,
+                "entropy": 1.9101,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.6955,
+                "delta": 2.6951,
+                "entropy": 1.824,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.6486,
+                "delta": 2.6482,
+                "entropy": 1.8335,
+                "top": "tool"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.0005,
+                "delta": 0.0,
+                "entropy": 0.003,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0004,
+                "delta": -0.0,
+                "entropy": 0.0028,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0005,
+                "delta": 0.0,
+                "entropy": 0.0032,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0009,
+                "delta": 0.0005,
+                "entropy": 0.0044,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 1.001,
+                "delta": 0.0005,
+                "entropy": 0.0045,
+                "top": "fruit"
+              },
+              "0.5": {
+                "level": 3.9814,
+                "delta": 2.981,
+                "entropy": 1.814,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 3.9793,
+                "delta": 2.9789,
+                "entropy": 1.7534,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 3.9653,
+                "delta": 2.9649,
+                "entropy": 1.7554,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.9056,
+                "delta": 2.9051,
+                "entropy": 1.8049,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.8973,
+                "delta": 2.8968,
+                "entropy": 1.8329,
+                "top": "place"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.0005,
+                "delta": 0.0,
+                "entropy": 0.003,
+                "top": "fruit"
+              },
+              "0.05": {
+                "level": 1.0012,
+                "delta": 0.0008,
+                "entropy": 0.0055,
+                "top": "fruit"
+              },
+              "0.1": {
+                "level": 1.0011,
+                "delta": 0.0007,
+                "entropy": 0.005,
+                "top": "fruit"
+              },
+              "0.2": {
+                "level": 1.0014,
+                "delta": 0.001,
+                "entropy": 0.0064,
+                "top": "fruit"
+              },
+              "0.3": {
+                "level": 1.0023,
+                "delta": 0.0018,
+                "entropy": 0.0099,
+                "top": "fruit"
+              },
+              "0.5": {
+                "level": 1.0027,
+                "delta": 0.0022,
+                "entropy": 0.0118,
+                "top": "fruit"
+              },
+              "0.75": {
+                "level": 1.0029,
+                "delta": 0.0024,
+                "entropy": 0.0126,
+                "top": "fruit"
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0023,
+                "entropy": 0.0118,
+                "top": "fruit"
+              },
+              "1.5": {
+                "level": 1.0024,
+                "delta": 0.002,
+                "entropy": 0.0101,
+                "top": "fruit"
+              },
+              "2.0": {
+                "level": 1.0027,
+                "delta": 0.0022,
+                "entropy": 0.0108,
+                "top": "fruit"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.0256,
+              "entropy": 0.1013,
+              "top": "edible",
+              "probs": {
+                "edible": 0.9894,
+                "alive": 0.0027,
+                "sharp": 0.0013,
+                "fast": 0.0059,
+                "vast": 0.0007
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.0256,
+                "delta": 0.0,
+                "entropy": 0.1013,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0264,
+                "delta": 0.0008,
+                "entropy": 0.1065,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0247,
+                "delta": -0.0009,
+                "entropy": 0.1008,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.1216,
+                "delta": 0.096,
+                "entropy": 0.3433,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 3.9319,
+                "delta": 2.9062,
+                "entropy": 1.0996,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9973,
+                "delta": 2.9716,
+                "entropy": 1.1736,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 4.0032,
+                "delta": 2.9776,
+                "entropy": 1.1821,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 4.0124,
+                "delta": 2.9868,
+                "entropy": 1.1863,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 4.0447,
+                "delta": 3.0191,
+                "entropy": 1.2309,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 4.0238,
+                "delta": 2.9982,
+                "entropy": 1.2284,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.0256,
+                "delta": 0.0,
+                "entropy": 0.1013,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0264,
+                "delta": 0.0008,
+                "entropy": 0.1065,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.0247,
+                "delta": -0.0009,
+                "entropy": 0.1008,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.1216,
+                "delta": 0.096,
+                "entropy": 0.3433,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 3.9319,
+                "delta": 2.9062,
+                "entropy": 1.0996,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9973,
+                "delta": 2.9716,
+                "entropy": 1.1736,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 4.0032,
+                "delta": 2.9776,
+                "entropy": 1.1821,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 4.0124,
+                "delta": 2.9868,
+                "entropy": 1.1863,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 4.0447,
+                "delta": 3.0191,
+                "entropy": 1.2309,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 4.0238,
+                "delta": 2.9982,
+                "entropy": 1.2284,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.0256,
+                "delta": 0.0,
+                "entropy": 0.1013,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.0234,
+                "delta": -0.0022,
+                "entropy": 0.0967,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.022,
+                "delta": -0.0036,
+                "entropy": 0.0924,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.017,
+                "delta": -0.0086,
+                "entropy": 0.0769,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 1.0739,
+                "delta": 0.0483,
+                "entropy": 0.2443,
+                "top": "edible"
+              },
+              "0.5": {
+                "level": 1.5183,
+                "delta": 0.4927,
+                "entropy": 1.0734,
+                "top": "edible"
+              },
+              "0.75": {
+                "level": 3.9237,
+                "delta": 2.8981,
+                "entropy": 1.2635,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9812,
+                "delta": 2.9556,
+                "entropy": 0.9808,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 1.5281,
+                "delta": 0.5025,
+                "entropy": 0.9938,
+                "top": "edible"
+              },
+              "2.0": {
+                "level": 1.3932,
+                "delta": 0.3676,
+                "entropy": 0.8865,
+                "top": "edible"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.0256,
+                "delta": 0.0,
+                "entropy": 0.1013,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 1.2333,
+                "delta": 0.2077,
+                "entropy": 0.5954,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 1.2586,
+                "delta": 0.233,
+                "entropy": 0.6475,
+                "top": "edible"
+              },
+              "0.2": {
+                "level": 1.3153,
+                "delta": 0.2897,
+                "entropy": 0.7546,
+                "top": "edible"
+              },
+              "0.3": {
+                "level": 1.3277,
+                "delta": 0.3021,
+                "entropy": 0.774,
+                "top": "edible"
+              },
+              "0.5": {
+                "level": 1.3146,
+                "delta": 0.289,
+                "entropy": 0.7567,
+                "top": "edible"
+              },
+              "0.75": {
+                "level": 1.3206,
+                "delta": 0.295,
+                "entropy": 0.7636,
+                "top": "edible"
+              },
+              "1.0": {
+                "level": 1.3045,
+                "delta": 0.2789,
+                "entropy": 0.7398,
+                "top": "edible"
+              },
+              "1.5": {
+                "level": 1.3246,
+                "delta": 0.299,
+                "entropy": 0.7803,
+                "top": "edible"
+              },
+              "2.0": {
+                "level": 1.3248,
+                "delta": 0.2992,
+                "entropy": 0.7803,
+                "top": "edible"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "fruit",
+          "baselines": {
+            "0.0": {
+              "level": 1.5178,
+              "entropy": 1.27,
+              "top": "seeds",
+              "probs": {
+                "seeds": 0.6193,
+                "fur": 0.3114,
+                "blades": 0.0058,
+                "wheels": 0.0594,
+                "sand": 0.0041
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 1.5178,
+                "delta": 0.0,
+                "entropy": 1.27,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.6334,
+                "delta": 0.1156,
+                "entropy": 1.3899,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.58,
+                "delta": 0.0622,
+                "entropy": 1.3447,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.5071,
+                "delta": -0.0107,
+                "entropy": 1.1891,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.2468,
+                "delta": -0.271,
+                "entropy": 0.7855,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.0854,
+                "delta": -0.4324,
+                "entropy": 0.2516,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.0602,
+                "delta": -0.4576,
+                "entropy": 0.1875,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.0686,
+                "delta": -0.4492,
+                "entropy": 0.2138,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.2316,
+                "delta": -0.2862,
+                "entropy": 0.7545,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.4762,
+                "delta": -0.0416,
+                "entropy": 1.1941,
+                "top": "seeds"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 1.5178,
+                "delta": 0.0,
+                "entropy": 1.27,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.6334,
+                "delta": 0.1156,
+                "entropy": 1.3899,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.58,
+                "delta": 0.0622,
+                "entropy": 1.3447,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.5071,
+                "delta": -0.0107,
+                "entropy": 1.1891,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.2468,
+                "delta": -0.271,
+                "entropy": 0.7855,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.0854,
+                "delta": -0.4324,
+                "entropy": 0.2516,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.0602,
+                "delta": -0.4576,
+                "entropy": 0.1875,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.0686,
+                "delta": -0.4492,
+                "entropy": 0.2138,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.2316,
+                "delta": -0.2862,
+                "entropy": 0.7545,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.4762,
+                "delta": -0.0416,
+                "entropy": 1.1941,
+                "top": "seeds"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 1.5178,
+                "delta": 0.0,
+                "entropy": 1.27,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.5082,
+                "delta": -0.0096,
+                "entropy": 1.2525,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.4612,
+                "delta": -0.0565,
+                "entropy": 1.1991,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.3625,
+                "delta": -0.1553,
+                "entropy": 1.0108,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.3851,
+                "delta": -0.1327,
+                "entropy": 1.0438,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.1268,
+                "delta": -0.391,
+                "entropy": 0.3915,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.1324,
+                "delta": -0.3853,
+                "entropy": 0.3853,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.1461,
+                "delta": -0.3717,
+                "entropy": 0.4192,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1561,
+                "delta": -0.3616,
+                "entropy": 0.454,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.1411,
+                "delta": -0.3767,
+                "entropy": 0.4257,
+                "top": "seeds"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 1.5178,
+                "delta": 0.0,
+                "entropy": 1.27,
+                "top": "seeds"
+              },
+              "0.05": {
+                "level": 1.3554,
+                "delta": -0.1623,
+                "entropy": 0.9837,
+                "top": "seeds"
+              },
+              "0.1": {
+                "level": 1.3448,
+                "delta": -0.173,
+                "entropy": 0.9479,
+                "top": "seeds"
+              },
+              "0.2": {
+                "level": 1.3242,
+                "delta": -0.1936,
+                "entropy": 0.9163,
+                "top": "seeds"
+              },
+              "0.3": {
+                "level": 1.2857,
+                "delta": -0.2321,
+                "entropy": 0.8532,
+                "top": "seeds"
+              },
+              "0.5": {
+                "level": 1.3134,
+                "delta": -0.2043,
+                "entropy": 0.9247,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.3081,
+                "delta": -0.2096,
+                "entropy": 0.9219,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.2989,
+                "delta": -0.2189,
+                "entropy": 0.9047,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.301,
+                "delta": -0.2168,
+                "entropy": 0.9136,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.2827,
+                "delta": -0.235,
+                "entropy": 0.8793,
+                "top": "seeds"
+              }
+            }
+          }
+        }
+      }
+    },
+    "dog": {
+      "category": "animal",
+      "opposing": "fruit",
+      "embedding_norm": 0.10810911655426025,
+      "identity_norm": 0.09772112965583801,
+      "tasks": {
+        "category": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 2.0004,
+              "entropy": 0.0049,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.9997,
+                "tool": 0.0001,
+                "vehicle": 0.0001,
+                "place": 0.0
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.0004,
+                "delta": 0.0,
+                "entropy": 0.0049,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0008,
+                "delta": 0.0004,
+                "entropy": 0.0093,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.001,
+                "delta": 0.0006,
+                "entropy": 0.0131,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0009,
+                "delta": 0.0005,
+                "entropy": 0.0121,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0093,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0092,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.009,
+                "top": "animal"
+              },
+              "1.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0088,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0081,
+                "top": "animal"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.0004,
+                "delta": 0.0,
+                "entropy": 0.0049,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0008,
+                "delta": 0.0004,
+                "entropy": 0.0093,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.001,
+                "delta": 0.0006,
+                "entropy": 0.0131,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0009,
+                "delta": 0.0005,
+                "entropy": 0.0121,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0093,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0092,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.009,
+                "top": "animal"
+              },
+              "1.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.0007,
+                "delta": 0.0003,
+                "entropy": 0.0088,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0081,
+                "top": "animal"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.0004,
+                "delta": 0.0,
+                "entropy": 0.0049,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0004,
+                "delta": -0.0,
+                "entropy": 0.005,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0004,
+                "delta": 0.0,
+                "entropy": 0.0056,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0012,
+                "delta": 0.0008,
+                "entropy": 0.0136,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0015,
+                "delta": 0.0011,
+                "entropy": 0.0165,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0008,
+                "delta": 0.0004,
+                "entropy": 0.0098,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0082,
+                "top": "animal"
+              },
+              "1.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0077,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0072,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0006,
+                "delta": 0.0002,
+                "entropy": 0.0075,
+                "top": "animal"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.0004,
+                "delta": 0.0,
+                "entropy": 0.0049,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0004,
+                "delta": -0.0,
+                "entropy": 0.0051,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0004,
+                "delta": -0.0,
+                "entropy": 0.0052,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0003,
+                "delta": -0.0001,
+                "entropy": 0.0038,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 3.9618,
+                "delta": 1.9614,
+                "entropy": 1.9195,
+                "top": "place"
+              },
+              "0.5": {
+                "level": 3.9499,
+                "delta": 1.9495,
+                "entropy": 1.9128,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 3.7267,
+                "delta": 1.7263,
+                "entropy": 2.1009,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 2.0011,
+                "delta": 0.0007,
+                "entropy": 0.0087,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.0005,
+                "delta": 0.0001,
+                "entropy": 0.006,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0005,
+                "delta": 0.0002,
+                "entropy": 0.0071,
+                "top": "animal"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 2.3602,
+              "entropy": 1.4722,
+              "top": "alive",
+              "probs": {
+                "edible": 0.1598,
+                "alive": 0.5756,
+                "sharp": 0.011,
+                "fast": 0.2515,
+                "vast": 0.002
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.3602,
+                "delta": 0.0,
+                "entropy": 1.4722,
+                "top": "alive"
+              },
+              "0.05": {
+                "level": 2.3107,
+                "delta": -0.0495,
+                "entropy": 1.0584,
+                "top": "alive"
+              },
+              "0.1": {
+                "level": 2.2595,
+                "delta": -0.1007,
+                "entropy": 0.9602,
+                "top": "alive"
+              },
+              "0.2": {
+                "level": 2.2156,
+                "delta": -0.1446,
+                "entropy": 0.8187,
+                "top": "alive"
+              },
+              "0.3": {
+                "level": 2.1853,
+                "delta": -0.1749,
+                "entropy": 0.7698,
+                "top": "alive"
+              },
+              "0.5": {
+                "level": 2.2426,
+                "delta": -0.1176,
+                "entropy": 0.87,
+                "top": "alive"
+              },
+              "0.75": {
+                "level": 2.2411,
+                "delta": -0.1191,
+                "entropy": 0.8753,
+                "top": "alive"
+              },
+              "1.0": {
+                "level": 2.229,
+                "delta": -0.1312,
+                "entropy": 0.8452,
+                "top": "alive"
+              },
+              "1.5": {
+                "level": 2.2702,
+                "delta": -0.09,
+                "entropy": 0.9168,
+                "top": "alive"
+              },
+              "2.0": {
+                "level": 2.251,
+                "delta": -0.1092,
+                "entropy": 0.8762,
+                "top": "alive"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.3602,
+                "delta": 0.0,
+                "entropy": 1.4722,
+                "top": "alive"
+              },
+              "0.05": {
+                "level": 2.3107,
+                "delta": -0.0495,
+                "entropy": 1.0584,
+                "top": "alive"
+              },
+              "0.1": {
+                "level": 2.2595,
+                "delta": -0.1007,
+                "entropy": 0.9602,
+                "top": "alive"
+              },
+              "0.2": {
+                "level": 2.2156,
+                "delta": -0.1446,
+                "entropy": 0.8187,
+                "top": "alive"
+              },
+              "0.3": {
+                "level": 2.1853,
+                "delta": -0.1749,
+                "entropy": 0.7698,
+                "top": "alive"
+              },
+              "0.5": {
+                "level": 2.2426,
+                "delta": -0.1176,
+                "entropy": 0.87,
+                "top": "alive"
+              },
+              "0.75": {
+                "level": 2.2411,
+                "delta": -0.1191,
+                "entropy": 0.8753,
+                "top": "alive"
+              },
+              "1.0": {
+                "level": 2.229,
+                "delta": -0.1312,
+                "entropy": 0.8452,
+                "top": "alive"
+              },
+              "1.5": {
+                "level": 2.2702,
+                "delta": -0.09,
+                "entropy": 0.9168,
+                "top": "alive"
+              },
+              "2.0": {
+                "level": 2.251,
+                "delta": -0.1092,
+                "entropy": 0.8762,
+                "top": "alive"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.3602,
+                "delta": 0.0,
+                "entropy": 1.4722,
+                "top": "alive"
+              },
+              "0.05": {
+                "level": 2.1398,
+                "delta": -0.2204,
+                "entropy": 0.6656,
+                "top": "alive"
+              },
+              "0.1": {
+                "level": 2.1699,
+                "delta": -0.1903,
+                "entropy": 0.7795,
+                "top": "alive"
+              },
+              "0.2": {
+                "level": 2.1151,
+                "delta": -0.2451,
+                "entropy": 0.5458,
+                "top": "alive"
+              },
+              "0.3": {
+                "level": 2.0899,
+                "delta": -0.2703,
+                "entropy": 0.492,
+                "top": "alive"
+              },
+              "0.5": {
+                "level": 2.0785,
+                "delta": -0.2817,
+                "entropy": 0.3891,
+                "top": "alive"
+              },
+              "0.75": {
+                "level": 2.0754,
+                "delta": -0.2848,
+                "entropy": 0.3877,
+                "top": "alive"
+              },
+              "1.0": {
+                "level": 2.0788,
+                "delta": -0.2815,
+                "entropy": 0.4169,
+                "top": "alive"
+              },
+              "1.5": {
+                "level": 2.1046,
+                "delta": -0.2557,
+                "entropy": 0.517,
+                "top": "alive"
+              },
+              "2.0": {
+                "level": 2.1019,
+                "delta": -0.2584,
+                "entropy": 0.5046,
+                "top": "alive"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.3602,
+                "delta": 0.0,
+                "entropy": 1.4722,
+                "top": "alive"
+              },
+              "0.05": {
+                "level": 2.3598,
+                "delta": -0.0004,
+                "entropy": 1.5147,
+                "top": "alive"
+              },
+              "0.1": {
+                "level": 2.2039,
+                "delta": -0.1563,
+                "entropy": 0.9051,
+                "top": "alive"
+              },
+              "0.2": {
+                "level": 2.2097,
+                "delta": -0.1505,
+                "entropy": 0.8632,
+                "top": "alive"
+              },
+              "0.3": {
+                "level": 2.262,
+                "delta": -0.0983,
+                "entropy": 0.966,
+                "top": "alive"
+              },
+              "0.5": {
+                "level": 2.3205,
+                "delta": -0.0397,
+                "entropy": 1.032,
+                "top": "alive"
+              },
+              "0.75": {
+                "level": 2.2941,
+                "delta": -0.0661,
+                "entropy": 1.0243,
+                "top": "alive"
+              },
+              "1.0": {
+                "level": 2.2566,
+                "delta": -0.1036,
+                "entropy": 0.9606,
+                "top": "alive"
+              },
+              "1.5": {
+                "level": 2.2116,
+                "delta": -0.1486,
+                "entropy": 0.8651,
+                "top": "alive"
+              },
+              "2.0": {
+                "level": 2.1636,
+                "delta": -0.1966,
+                "entropy": 0.7541,
+                "top": "alive"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 2.0473,
+              "entropy": 0.2356,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0056,
+                "fur": 0.9718,
+                "blades": 0.0019,
+                "wheels": 0.0108,
+                "sand": 0.0098
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.0473,
+                "delta": 0.0,
+                "entropy": 0.2356,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.4011,
+                "delta": 0.3537,
+                "entropy": 0.9221,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.5596,
+                "delta": 0.5122,
+                "entropy": 1.1334,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.5144,
+                "delta": 0.4671,
+                "entropy": 1.0796,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.2477,
+                "delta": 0.2004,
+                "entropy": 0.671,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.1882,
+                "delta": 0.1409,
+                "entropy": 0.5607,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.171,
+                "delta": 0.1236,
+                "entropy": 0.5201,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.182,
+                "delta": 0.1347,
+                "entropy": 0.5361,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.225,
+                "delta": 0.1776,
+                "entropy": 0.616,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.2491,
+                "delta": 0.2018,
+                "entropy": 0.6603,
+                "top": "fur"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.0473,
+                "delta": 0.0,
+                "entropy": 0.2356,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.4011,
+                "delta": 0.3537,
+                "entropy": 0.9221,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.5596,
+                "delta": 0.5122,
+                "entropy": 1.1334,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.5144,
+                "delta": 0.4671,
+                "entropy": 1.0796,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.2477,
+                "delta": 0.2004,
+                "entropy": 0.671,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.1882,
+                "delta": 0.1409,
+                "entropy": 0.5607,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.171,
+                "delta": 0.1236,
+                "entropy": 0.5201,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.182,
+                "delta": 0.1347,
+                "entropy": 0.5361,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.225,
+                "delta": 0.1776,
+                "entropy": 0.616,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.2491,
+                "delta": 0.2018,
+                "entropy": 0.6603,
+                "top": "fur"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.0473,
+                "delta": 0.0,
+                "entropy": 0.2356,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.0474,
+                "delta": 0.0,
+                "entropy": 0.2333,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.0499,
+                "delta": 0.0026,
+                "entropy": 0.2375,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.0491,
+                "delta": 0.0018,
+                "entropy": 0.2231,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.1177,
+                "delta": 0.0704,
+                "entropy": 0.4089,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.1282,
+                "delta": 0.0809,
+                "entropy": 0.4274,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.4679,
+                "delta": 0.4206,
+                "entropy": 1.03,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.458,
+                "delta": 0.4106,
+                "entropy": 1.0018,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.3742,
+                "delta": 0.3268,
+                "entropy": 0.888,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.3193,
+                "delta": 0.272,
+                "entropy": 0.8005,
+                "top": "fur"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.0473,
+                "delta": 0.0,
+                "entropy": 0.2356,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.0521,
+                "delta": 0.0047,
+                "entropy": 0.2484,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.0524,
+                "delta": 0.005,
+                "entropy": 0.2475,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.0601,
+                "delta": 0.0127,
+                "entropy": 0.2371,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.0824,
+                "delta": 0.035,
+                "entropy": 0.2974,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.1082,
+                "delta": 0.0609,
+                "entropy": 0.3634,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.2955,
+                "delta": 0.2482,
+                "entropy": 0.7709,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.3666,
+                "delta": 0.3192,
+                "entropy": 0.8729,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.4144,
+                "delta": 0.3671,
+                "entropy": 0.9367,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.4428,
+                "delta": 0.3954,
+                "entropy": 0.9834,
+                "top": "fur"
+              }
+            }
+          }
+        }
+      }
+    },
+    "horse": {
+      "category": "animal",
+      "opposing": "fruit",
+      "embedding_norm": 0.10828063637018204,
+      "identity_norm": 0.09949711710214615,
+      "tasks": {
+        "category": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 2.0009,
+              "entropy": 0.0085,
+              "top": "animal",
+              "probs": {
+                "fruit": 0.0,
+                "animal": 0.9994,
+                "tool": 0.0003,
+                "vehicle": 0.0002,
+                "place": 0.0001
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0016,
+                "delta": 0.0007,
+                "entropy": 0.0168,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0014,
+                "delta": 0.0006,
+                "entropy": 0.016,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0019,
+                "delta": 0.001,
+                "entropy": 0.0197,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0013,
+                "delta": 0.0004,
+                "entropy": 0.0111,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0016,
+                "delta": 0.0007,
+                "entropy": 0.0134,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 2.0019,
+                "delta": 0.0011,
+                "entropy": 0.0175,
+                "top": "animal"
+              },
+              "1.0": {
+                "level": 2.002,
+                "delta": 0.0012,
+                "entropy": 0.0194,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.002,
+                "delta": 0.0011,
+                "entropy": 0.0195,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0019,
+                "delta": 0.001,
+                "entropy": 0.0191,
+                "top": "animal"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0016,
+                "delta": 0.0007,
+                "entropy": 0.0168,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0014,
+                "delta": 0.0006,
+                "entropy": 0.016,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0019,
+                "delta": 0.001,
+                "entropy": 0.0197,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0013,
+                "delta": 0.0004,
+                "entropy": 0.0111,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0016,
+                "delta": 0.0007,
+                "entropy": 0.0134,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 2.0019,
+                "delta": 0.0011,
+                "entropy": 0.0175,
+                "top": "animal"
+              },
+              "1.0": {
+                "level": 2.002,
+                "delta": 0.0012,
+                "entropy": 0.0194,
+                "top": "animal"
+              },
+              "1.5": {
+                "level": 2.002,
+                "delta": 0.0011,
+                "entropy": 0.0195,
+                "top": "animal"
+              },
+              "2.0": {
+                "level": 2.0019,
+                "delta": 0.001,
+                "entropy": 0.0191,
+                "top": "animal"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.009,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.009,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0006,
+                "delta": -0.0002,
+                "entropy": 0.0062,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.0004,
+                "delta": -0.0004,
+                "entropy": 0.0047,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.009,
+                "top": "animal"
+              },
+              "0.75": {
+                "level": 3.8082,
+                "delta": 1.8073,
+                "entropy": 1.9275,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 3.8026,
+                "delta": 1.8017,
+                "entropy": 1.936,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.8007,
+                "delta": 1.7998,
+                "entropy": 1.9461,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.8203,
+                "delta": 1.8194,
+                "entropy": 1.9306,
+                "top": "place"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.0009,
+                "delta": 0.0,
+                "entropy": 0.0085,
+                "top": "animal"
+              },
+              "0.05": {
+                "level": 2.0009,
+                "delta": 0.0001,
+                "entropy": 0.0095,
+                "top": "animal"
+              },
+              "0.1": {
+                "level": 2.0009,
+                "delta": 0.0001,
+                "entropy": 0.0094,
+                "top": "animal"
+              },
+              "0.2": {
+                "level": 2.0006,
+                "delta": -0.0002,
+                "entropy": 0.0067,
+                "top": "animal"
+              },
+              "0.3": {
+                "level": 2.001,
+                "delta": 0.0001,
+                "entropy": 0.0099,
+                "top": "animal"
+              },
+              "0.5": {
+                "level": 3.7063,
+                "delta": 1.7054,
+                "entropy": 1.9679,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.7241,
+                "delta": 1.7233,
+                "entropy": 1.9468,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.7285,
+                "delta": 1.7276,
+                "entropy": 1.927,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.6853,
+                "delta": 1.6845,
+                "entropy": 1.9366,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.7716,
+                "delta": 1.7708,
+                "entropy": 1.9841,
+                "top": "place"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 3.5537,
+              "entropy": 0.8892,
+              "top": "fast",
+              "probs": {
+                "edible": 0.0781,
+                "alive": 0.1067,
+                "sharp": 0.0001,
+                "fast": 0.8136,
+                "vast": 0.0015
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.5537,
+                "delta": 0.0,
+                "entropy": 0.8892,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.7392,
+                "delta": 0.1855,
+                "entropy": 0.6335,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.7131,
+                "delta": 0.1595,
+                "entropy": 0.6743,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.5202,
+                "delta": -0.0335,
+                "entropy": 0.9264,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.6054,
+                "delta": 0.0517,
+                "entropy": 0.8282,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.6113,
+                "delta": 0.0576,
+                "entropy": 0.8196,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.6084,
+                "delta": 0.0547,
+                "entropy": 0.8235,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.6054,
+                "delta": 0.0517,
+                "entropy": 0.8282,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.5815,
+                "delta": 0.0278,
+                "entropy": 0.8598,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.5878,
+                "delta": 0.0341,
+                "entropy": 0.8503,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.5537,
+                "delta": 0.0,
+                "entropy": 0.8892,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.7392,
+                "delta": 0.1855,
+                "entropy": 0.6335,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.7131,
+                "delta": 0.1595,
+                "entropy": 0.6743,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.5202,
+                "delta": -0.0335,
+                "entropy": 0.9264,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.6054,
+                "delta": 0.0517,
+                "entropy": 0.8282,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.6113,
+                "delta": 0.0576,
+                "entropy": 0.8196,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.6084,
+                "delta": 0.0547,
+                "entropy": 0.8235,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.6054,
+                "delta": 0.0517,
+                "entropy": 0.8282,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.5815,
+                "delta": 0.0278,
+                "entropy": 0.8598,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.5878,
+                "delta": 0.0341,
+                "entropy": 0.8503,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.5537,
+                "delta": 0.0,
+                "entropy": 0.8892,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.6235,
+                "delta": 0.0698,
+                "entropy": 0.7962,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.5861,
+                "delta": 0.0324,
+                "entropy": 0.8466,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.6844,
+                "delta": 0.1307,
+                "entropy": 0.7209,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.6893,
+                "delta": 0.1356,
+                "entropy": 0.7085,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.5888,
+                "delta": 0.0352,
+                "entropy": 0.8395,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.4614,
+                "delta": -0.0923,
+                "entropy": 0.9803,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.5702,
+                "delta": 0.0165,
+                "entropy": 0.8622,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.6244,
+                "delta": 0.0707,
+                "entropy": 0.7968,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.6495,
+                "delta": 0.0959,
+                "entropy": 0.7644,
+                "top": "fast"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.5537,
+                "delta": 0.0,
+                "entropy": 0.8892,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.6226,
+                "delta": 0.0689,
+                "entropy": 0.7949,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.6427,
+                "delta": 0.089,
+                "entropy": 0.7836,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.6669,
+                "delta": 0.1133,
+                "entropy": 0.7482,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.6868,
+                "delta": 0.1331,
+                "entropy": 0.7142,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.761,
+                "delta": 0.2073,
+                "entropy": 0.5918,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.7715,
+                "delta": 0.2179,
+                "entropy": 0.5718,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.753,
+                "delta": 0.1993,
+                "entropy": 0.6046,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.7472,
+                "delta": 0.1935,
+                "entropy": 0.6144,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.7401,
+                "delta": 0.1864,
+                "entropy": 0.6264,
+                "top": "fast"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "animal",
+          "baselines": {
+            "0.0": {
+              "level": 2.3291,
+              "entropy": 0.9206,
+              "top": "fur",
+              "probs": {
+                "seeds": 0.0208,
+                "fur": 0.8072,
+                "blades": 0.0083,
+                "wheels": 0.1493,
+                "sand": 0.0143
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.3291,
+                "delta": 0.0,
+                "entropy": 0.9206,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.4192,
+                "delta": 0.0901,
+                "entropy": 1.0813,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.4649,
+                "delta": 0.1359,
+                "entropy": 1.1524,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.4582,
+                "delta": 0.1291,
+                "entropy": 1.1561,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.3557,
+                "delta": 0.0266,
+                "entropy": 1.0127,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.3518,
+                "delta": 0.0227,
+                "entropy": 0.9971,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.3446,
+                "delta": 0.0155,
+                "entropy": 0.9801,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.3428,
+                "delta": 0.0138,
+                "entropy": 0.9681,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.3593,
+                "delta": 0.0303,
+                "entropy": 0.986,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.3592,
+                "delta": 0.0301,
+                "entropy": 0.9798,
+                "top": "fur"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.3291,
+                "delta": 0.0,
+                "entropy": 0.9206,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.4192,
+                "delta": 0.0901,
+                "entropy": 1.0813,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.4649,
+                "delta": 0.1359,
+                "entropy": 1.1524,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.4582,
+                "delta": 0.1291,
+                "entropy": 1.1561,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.3557,
+                "delta": 0.0266,
+                "entropy": 1.0127,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.3518,
+                "delta": 0.0227,
+                "entropy": 0.9971,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.3446,
+                "delta": 0.0155,
+                "entropy": 0.9801,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.3428,
+                "delta": 0.0138,
+                "entropy": 0.9681,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.3593,
+                "delta": 0.0303,
+                "entropy": 0.986,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.3592,
+                "delta": 0.0301,
+                "entropy": 0.9798,
+                "top": "fur"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.3291,
+                "delta": 0.0,
+                "entropy": 0.9206,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.3158,
+                "delta": -0.0132,
+                "entropy": 0.9096,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.2777,
+                "delta": -0.0514,
+                "entropy": 0.8329,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.4706,
+                "delta": 0.1416,
+                "entropy": 1.1456,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.4346,
+                "delta": 0.1055,
+                "entropy": 1.0899,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.426,
+                "delta": 0.097,
+                "entropy": 1.0679,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.4005,
+                "delta": 0.0714,
+                "entropy": 1.03,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.4025,
+                "delta": 0.0735,
+                "entropy": 1.0293,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.3941,
+                "delta": 0.0651,
+                "entropy": 1.0164,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.3581,
+                "delta": 0.029,
+                "entropy": 0.95,
+                "top": "fur"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.3291,
+                "delta": 0.0,
+                "entropy": 0.9206,
+                "top": "fur"
+              },
+              "0.05": {
+                "level": 2.3317,
+                "delta": 0.0027,
+                "entropy": 0.9384,
+                "top": "fur"
+              },
+              "0.1": {
+                "level": 2.3196,
+                "delta": -0.0095,
+                "entropy": 0.9186,
+                "top": "fur"
+              },
+              "0.2": {
+                "level": 2.2211,
+                "delta": -0.108,
+                "entropy": 0.6639,
+                "top": "fur"
+              },
+              "0.3": {
+                "level": 2.0831,
+                "delta": -0.246,
+                "entropy": 0.3083,
+                "top": "fur"
+              },
+              "0.5": {
+                "level": 2.4216,
+                "delta": 0.0925,
+                "entropy": 0.9947,
+                "top": "fur"
+              },
+              "0.75": {
+                "level": 2.462,
+                "delta": 0.1329,
+                "entropy": 1.0755,
+                "top": "fur"
+              },
+              "1.0": {
+                "level": 2.4662,
+                "delta": 0.1372,
+                "entropy": 1.0556,
+                "top": "fur"
+              },
+              "1.5": {
+                "level": 2.4198,
+                "delta": 0.0908,
+                "entropy": 0.9946,
+                "top": "fur"
+              },
+              "2.0": {
+                "level": 2.4031,
+                "delta": 0.074,
+                "entropy": 0.9675,
+                "top": "fur"
+              }
+            }
+          }
+        }
+      }
+    },
+    "knife": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "embedding_norm": 0.10221034288406372,
+      "identity_norm": 0.09387756139039993,
+      "tasks": {
+        "category": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 2.9989,
+              "entropy": 0.012,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0006,
+                "animal": 0.0001,
+                "tool": 0.9991,
+                "vehicle": 0.0002,
+                "place": 0.0001
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.9989,
+                "delta": 0.0,
+                "entropy": 0.012,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 2.9989,
+                "delta": -0.0001,
+                "entropy": 0.0135,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 2.999,
+                "delta": 0.0001,
+                "entropy": 0.0118,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 2.9995,
+                "delta": 0.0005,
+                "entropy": 0.0063,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.9918,
+                "delta": 0.9928,
+                "entropy": 1.7686,
+                "top": "place"
+              },
+              "0.5": {
+                "level": 3.8107,
+                "delta": 0.8117,
+                "entropy": 1.9231,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.1226,
+                "delta": 1.1237,
+                "entropy": 1.6427,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 4.0014,
+                "delta": 1.0024,
+                "entropy": 1.7598,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.893,
+                "delta": 0.894,
+                "entropy": 1.7064,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.9209,
+                "delta": 0.9219,
+                "entropy": 1.7105,
+                "top": "place"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.9989,
+                "delta": 0.0,
+                "entropy": 0.012,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 2.9989,
+                "delta": -0.0001,
+                "entropy": 0.0135,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 2.999,
+                "delta": 0.0001,
+                "entropy": 0.0118,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 2.9995,
+                "delta": 0.0005,
+                "entropy": 0.0063,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.9918,
+                "delta": 0.9928,
+                "entropy": 1.7686,
+                "top": "place"
+              },
+              "0.5": {
+                "level": 3.8107,
+                "delta": 0.8117,
+                "entropy": 1.9231,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.1226,
+                "delta": 1.1237,
+                "entropy": 1.6427,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 4.0014,
+                "delta": 1.0024,
+                "entropy": 1.7598,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.893,
+                "delta": 0.894,
+                "entropy": 1.7064,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.9209,
+                "delta": 0.9219,
+                "entropy": 1.7105,
+                "top": "place"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.9989,
+                "delta": 0.0,
+                "entropy": 0.012,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 2.9991,
+                "delta": 0.0001,
+                "entropy": 0.0107,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 2.999,
+                "delta": 0.0,
+                "entropy": 0.0115,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 2.9989,
+                "delta": 0.0,
+                "entropy": 0.012,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 2.9991,
+                "delta": 0.0002,
+                "entropy": 0.0101,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 2.9995,
+                "delta": 0.0006,
+                "entropy": 0.006,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 2.9997,
+                "delta": 0.0007,
+                "entropy": 0.0052,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 2.9997,
+                "delta": 0.0007,
+                "entropy": 0.0054,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 2.9999,
+                "delta": 0.001,
+                "entropy": 0.0026,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 2.9998,
+                "delta": 0.0009,
+                "entropy": 0.014,
+                "top": "tool"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.9989,
+                "delta": 0.0,
+                "entropy": 0.012,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0012,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0011,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0008,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0009,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0009,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.001,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.0,
+                "delta": 0.001,
+                "entropy": 0.0015,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 2.9998,
+                "delta": 0.0008,
+                "entropy": 0.0044,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 2.9992,
+                "delta": 0.0002,
+                "entropy": 0.0098,
+                "top": "tool"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 2.9894,
+              "entropy": 0.0641,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0057,
+                "alive": 0.0001,
+                "sharp": 0.9932,
+                "fast": 0.001,
+                "vast": 0.0
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.9894,
+                "delta": 0.0,
+                "entropy": 0.0641,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9844,
+                "delta": -0.005,
+                "entropy": 0.0845,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 2.9791,
+                "delta": -0.0103,
+                "entropy": 0.1032,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 2.9774,
+                "delta": -0.0121,
+                "entropy": 0.1132,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.9721,
+                "delta": 0.9827,
+                "entropy": 0.9726,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9757,
+                "delta": 0.9862,
+                "entropy": 1.1029,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8778,
+                "delta": 0.8884,
+                "entropy": 0.9117,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9624,
+                "delta": 0.973,
+                "entropy": 1.0791,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9172,
+                "delta": 0.9278,
+                "entropy": 1.2161,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9554,
+                "delta": 0.9659,
+                "entropy": 1.1056,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.9894,
+                "delta": 0.0,
+                "entropy": 0.0641,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9844,
+                "delta": -0.005,
+                "entropy": 0.0845,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 2.9791,
+                "delta": -0.0103,
+                "entropy": 0.1032,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 2.9774,
+                "delta": -0.0121,
+                "entropy": 0.1132,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.9721,
+                "delta": 0.9827,
+                "entropy": 0.9726,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9757,
+                "delta": 0.9862,
+                "entropy": 1.1029,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8778,
+                "delta": 0.8884,
+                "entropy": 0.9117,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9624,
+                "delta": 0.973,
+                "entropy": 1.0791,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9172,
+                "delta": 0.9278,
+                "entropy": 1.2161,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9554,
+                "delta": 0.9659,
+                "entropy": 1.1056,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.9894,
+                "delta": 0.0,
+                "entropy": 0.0641,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9939,
+                "delta": 0.0044,
+                "entropy": 0.0528,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 2.9935,
+                "delta": 0.0041,
+                "entropy": 0.0566,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 2.9936,
+                "delta": 0.0042,
+                "entropy": 0.0585,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 2.9913,
+                "delta": 0.0019,
+                "entropy": 0.0751,
+                "top": "sharp"
+              },
+              "0.5": {
+                "level": 2.9919,
+                "delta": 0.0024,
+                "entropy": 0.0735,
+                "top": "sharp"
+              },
+              "0.75": {
+                "level": 2.9918,
+                "delta": 0.0024,
+                "entropy": 0.0715,
+                "top": "sharp"
+              },
+              "1.0": {
+                "level": 2.9912,
+                "delta": 0.0018,
+                "entropy": 0.0748,
+                "top": "sharp"
+              },
+              "1.5": {
+                "level": 2.9912,
+                "delta": 0.0018,
+                "entropy": 0.0736,
+                "top": "sharp"
+              },
+              "2.0": {
+                "level": 2.9913,
+                "delta": 0.0019,
+                "entropy": 0.0751,
+                "top": "sharp"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.9894,
+                "delta": 0.0,
+                "entropy": 0.0641,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9931,
+                "delta": 0.0037,
+                "entropy": 0.0597,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 2.99,
+                "delta": 0.0005,
+                "entropy": 0.0827,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 2.9899,
+                "delta": 0.0005,
+                "entropy": 0.0931,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 2.9894,
+                "delta": -0.0,
+                "entropy": 0.0986,
+                "top": "sharp"
+              },
+              "0.5": {
+                "level": 2.9897,
+                "delta": 0.0003,
+                "entropy": 0.0978,
+                "top": "sharp"
+              },
+              "0.75": {
+                "level": 2.9892,
+                "delta": -0.0002,
+                "entropy": 0.099,
+                "top": "sharp"
+              },
+              "1.0": {
+                "level": 2.9896,
+                "delta": 0.0002,
+                "entropy": 0.0956,
+                "top": "sharp"
+              },
+              "1.5": {
+                "level": 2.9886,
+                "delta": -0.0008,
+                "entropy": 0.0951,
+                "top": "sharp"
+              },
+              "2.0": {
+                "level": 2.9879,
+                "delta": -0.0016,
+                "entropy": 0.0971,
+                "top": "sharp"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 3.0113,
+              "entropy": 0.1183,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.001,
+                "fur": 0.0003,
+                "blades": 0.9859,
+                "wheels": 0.012,
+                "sand": 0.0008
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.0113,
+                "delta": 0.0,
+                "entropy": 0.1183,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.011,
+                "delta": -0.0003,
+                "entropy": 0.1238,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.0096,
+                "delta": -0.0017,
+                "entropy": 0.1165,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.0175,
+                "delta": 0.0062,
+                "entropy": 0.1815,
+                "top": "blades"
+              },
+              "0.3": {
+                "level": 3.0101,
+                "delta": -0.0012,
+                "entropy": 0.1182,
+                "top": "blades"
+              },
+              "0.5": {
+                "level": 3.1769,
+                "delta": 0.1656,
+                "entropy": 1.72,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9725,
+                "delta": 0.9613,
+                "entropy": 0.2314,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.6234,
+                "delta": 0.6121,
+                "entropy": 1.2967,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9857,
+                "delta": 0.9744,
+                "entropy": 0.126,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9577,
+                "delta": 0.9464,
+                "entropy": 0.3064,
+                "top": "wheels"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.0113,
+                "delta": 0.0,
+                "entropy": 0.1183,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.011,
+                "delta": -0.0003,
+                "entropy": 0.1238,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.0096,
+                "delta": -0.0017,
+                "entropy": 0.1165,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.0175,
+                "delta": 0.0062,
+                "entropy": 0.1815,
+                "top": "blades"
+              },
+              "0.3": {
+                "level": 3.0101,
+                "delta": -0.0012,
+                "entropy": 0.1182,
+                "top": "blades"
+              },
+              "0.5": {
+                "level": 3.1769,
+                "delta": 0.1656,
+                "entropy": 1.72,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9725,
+                "delta": 0.9613,
+                "entropy": 0.2314,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.6234,
+                "delta": 0.6121,
+                "entropy": 1.2967,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9857,
+                "delta": 0.9744,
+                "entropy": 0.126,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9577,
+                "delta": 0.9464,
+                "entropy": 0.3064,
+                "top": "wheels"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.0113,
+                "delta": 0.0,
+                "entropy": 0.1183,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.0121,
+                "delta": 0.0008,
+                "entropy": 0.1256,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.0121,
+                "delta": 0.0008,
+                "entropy": 0.1283,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.0114,
+                "delta": 0.0002,
+                "entropy": 0.1249,
+                "top": "blades"
+              },
+              "0.3": {
+                "level": 3.0211,
+                "delta": 0.0098,
+                "entropy": 0.1753,
+                "top": "blades"
+              },
+              "0.5": {
+                "level": 3.0199,
+                "delta": 0.0087,
+                "entropy": 0.1674,
+                "top": "blades"
+              },
+              "0.75": {
+                "level": 3.0181,
+                "delta": 0.0069,
+                "entropy": 0.1566,
+                "top": "blades"
+              },
+              "1.0": {
+                "level": 3.0181,
+                "delta": 0.0068,
+                "entropy": 0.1573,
+                "top": "blades"
+              },
+              "1.5": {
+                "level": 3.0167,
+                "delta": 0.0055,
+                "entropy": 0.1494,
+                "top": "blades"
+              },
+              "2.0": {
+                "level": 3.0163,
+                "delta": 0.005,
+                "entropy": 0.1458,
+                "top": "blades"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.0113,
+                "delta": 0.0,
+                "entropy": 0.1183,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.0191,
+                "delta": 0.0079,
+                "entropy": 0.1673,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.0173,
+                "delta": 0.0061,
+                "entropy": 0.1551,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.0145,
+                "delta": 0.0033,
+                "entropy": 0.1319,
+                "top": "blades"
+              },
+              "0.3": {
+                "level": 3.0152,
+                "delta": 0.004,
+                "entropy": 0.1382,
+                "top": "blades"
+              },
+              "0.5": {
+                "level": 3.0148,
+                "delta": 0.0035,
+                "entropy": 0.135,
+                "top": "blades"
+              },
+              "0.75": {
+                "level": 3.0133,
+                "delta": 0.002,
+                "entropy": 0.1223,
+                "top": "blades"
+              },
+              "1.0": {
+                "level": 3.014,
+                "delta": 0.0028,
+                "entropy": 0.1274,
+                "top": "blades"
+              },
+              "1.5": {
+                "level": 3.014,
+                "delta": 0.0028,
+                "entropy": 0.1266,
+                "top": "blades"
+              },
+              "2.0": {
+                "level": 3.0159,
+                "delta": 0.0047,
+                "entropy": 0.1392,
+                "top": "blades"
+              }
+            }
+          }
+        }
+      }
+    },
+    "hammer": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "embedding_norm": 0.10879399627447128,
+      "identity_norm": 0.09829407930374146,
+      "tasks": {
+        "category": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 3.0001,
+              "entropy": 0.0121,
+              "top": "tool",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.0003,
+                "tool": 0.9991,
+                "vehicle": 0.0003,
+                "place": 0.0002
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0121,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 3.0002,
+                "delta": 0.0001,
+                "entropy": 0.0128,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0103,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 3.0,
+                "delta": -0.0001,
+                "entropy": 0.0065,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.7698,
+                "delta": 0.7697,
+                "entropy": 1.624,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.8904,
+                "delta": 0.8903,
+                "entropy": 1.8966,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.0334,
+                "delta": 1.0333,
+                "entropy": 1.7925,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 3.9183,
+                "delta": 0.9182,
+                "entropy": 1.8692,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.9049,
+                "delta": 0.9048,
+                "entropy": 1.7813,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.8996,
+                "delta": 0.8994,
+                "entropy": 1.7926,
+                "top": "place"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0121,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 3.0002,
+                "delta": 0.0001,
+                "entropy": 0.0128,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0103,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 3.0,
+                "delta": -0.0001,
+                "entropy": 0.0065,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.7698,
+                "delta": 0.7697,
+                "entropy": 1.624,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.8904,
+                "delta": 0.8903,
+                "entropy": 1.8966,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.0334,
+                "delta": 1.0333,
+                "entropy": 1.7925,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 3.9183,
+                "delta": 0.9182,
+                "entropy": 1.8692,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.9049,
+                "delta": 0.9048,
+                "entropy": 1.7813,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.8996,
+                "delta": 0.8994,
+                "entropy": 1.7926,
+                "top": "place"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0121,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0117,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0114,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 3.0,
+                "delta": -0.0001,
+                "entropy": 0.0109,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 2.9998,
+                "delta": -0.0004,
+                "entropy": 0.0124,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.7466,
+                "delta": 0.7465,
+                "entropy": 1.7584,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.8445,
+                "delta": 0.8444,
+                "entropy": 1.7664,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.8426,
+                "delta": 0.8425,
+                "entropy": 1.7747,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.8388,
+                "delta": 0.8387,
+                "entropy": 1.7726,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.8319,
+                "delta": 0.8318,
+                "entropy": 1.7694,
+                "top": "tool"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0121,
+                "top": "tool"
+              },
+              "0.05": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0079,
+                "top": "tool"
+              },
+              "0.1": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0069,
+                "top": "tool"
+              },
+              "0.2": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0067,
+                "top": "tool"
+              },
+              "0.3": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0064,
+                "top": "tool"
+              },
+              "0.5": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0067,
+                "top": "tool"
+              },
+              "0.75": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0068,
+                "top": "tool"
+              },
+              "1.0": {
+                "level": 3.0001,
+                "delta": 0.0,
+                "entropy": 0.0068,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0069,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.0001,
+                "delta": -0.0,
+                "entropy": 0.0075,
+                "top": "tool"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 2.9834,
+              "entropy": 0.4379,
+              "top": "sharp",
+              "probs": {
+                "edible": 0.0264,
+                "alive": 0.0026,
+                "sharp": 0.9323,
+                "fast": 0.0385,
+                "vast": 0.0002
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.9834,
+                "delta": 0.0,
+                "entropy": 0.4379,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9948,
+                "delta": 0.0114,
+                "entropy": 0.5377,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 3.0011,
+                "delta": 0.0177,
+                "entropy": 0.545,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 3.0082,
+                "delta": 0.0248,
+                "entropy": 0.5219,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.9697,
+                "delta": 0.9863,
+                "entropy": 1.0899,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9157,
+                "delta": 0.9323,
+                "entropy": 1.0971,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8612,
+                "delta": 0.8778,
+                "entropy": 0.9882,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9274,
+                "delta": 0.944,
+                "entropy": 1.0747,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.914,
+                "delta": 0.9307,
+                "entropy": 1.158,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.927,
+                "delta": 0.9436,
+                "entropy": 1.2022,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.9834,
+                "delta": 0.0,
+                "entropy": 0.4379,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9948,
+                "delta": 0.0114,
+                "entropy": 0.5377,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 3.0011,
+                "delta": 0.0177,
+                "entropy": 0.545,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 3.0082,
+                "delta": 0.0248,
+                "entropy": 0.5219,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.9697,
+                "delta": 0.9863,
+                "entropy": 1.0899,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9157,
+                "delta": 0.9323,
+                "entropy": 1.0971,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.8612,
+                "delta": 0.8778,
+                "entropy": 0.9882,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9274,
+                "delta": 0.944,
+                "entropy": 1.0747,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.914,
+                "delta": 0.9307,
+                "entropy": 1.158,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.927,
+                "delta": 0.9436,
+                "entropy": 1.2022,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.9834,
+                "delta": 0.0,
+                "entropy": 0.4379,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 2.9946,
+                "delta": 0.0112,
+                "entropy": 0.5238,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 2.9939,
+                "delta": 0.0105,
+                "entropy": 0.5816,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 3.0399,
+                "delta": 0.0565,
+                "entropy": 0.5553,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.0289,
+                "delta": 0.0455,
+                "entropy": 0.4787,
+                "top": "sharp"
+              },
+              "0.5": {
+                "level": 3.0254,
+                "delta": 0.0421,
+                "entropy": 0.4417,
+                "top": "sharp"
+              },
+              "0.75": {
+                "level": 3.0371,
+                "delta": 0.0537,
+                "entropy": 0.4703,
+                "top": "sharp"
+              },
+              "1.0": {
+                "level": 3.0373,
+                "delta": 0.0539,
+                "entropy": 0.4675,
+                "top": "sharp"
+              },
+              "1.5": {
+                "level": 3.0417,
+                "delta": 0.0584,
+                "entropy": 0.4938,
+                "top": "sharp"
+              },
+              "2.0": {
+                "level": 3.0424,
+                "delta": 0.0591,
+                "entropy": 0.4921,
+                "top": "sharp"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.9834,
+                "delta": 0.0,
+                "entropy": 0.4379,
+                "top": "sharp"
+              },
+              "0.05": {
+                "level": 3.037,
+                "delta": 0.0537,
+                "entropy": 0.5514,
+                "top": "sharp"
+              },
+              "0.1": {
+                "level": 3.0483,
+                "delta": 0.0649,
+                "entropy": 0.6492,
+                "top": "sharp"
+              },
+              "0.2": {
+                "level": 3.0415,
+                "delta": 0.0581,
+                "entropy": 0.6369,
+                "top": "sharp"
+              },
+              "0.3": {
+                "level": 3.0416,
+                "delta": 0.0583,
+                "entropy": 0.636,
+                "top": "sharp"
+              },
+              "0.5": {
+                "level": 3.0443,
+                "delta": 0.0609,
+                "entropy": 0.6796,
+                "top": "sharp"
+              },
+              "0.75": {
+                "level": 3.0401,
+                "delta": 0.0567,
+                "entropy": 0.6748,
+                "top": "sharp"
+              },
+              "1.0": {
+                "level": 3.0502,
+                "delta": 0.0669,
+                "entropy": 0.695,
+                "top": "sharp"
+              },
+              "1.5": {
+                "level": 3.0582,
+                "delta": 0.0748,
+                "entropy": 0.725,
+                "top": "sharp"
+              },
+              "2.0": {
+                "level": 3.0562,
+                "delta": 0.0728,
+                "entropy": 0.7141,
+                "top": "sharp"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "tool",
+          "baselines": {
+            "0.0": {
+              "level": 3.4286,
+              "entropy": 1.619,
+              "top": "blades",
+              "probs": {
+                "seeds": 0.029,
+                "fur": 0.0266,
+                "blades": 0.5219,
+                "wheels": 0.3318,
+                "sand": 0.0907
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.4286,
+                "delta": 0.0,
+                "entropy": 1.619,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.4045,
+                "delta": -0.0241,
+                "entropy": 1.6533,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.3995,
+                "delta": -0.0291,
+                "entropy": 1.6536,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.514,
+                "delta": 0.0854,
+                "entropy": 1.6986,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.6019,
+                "delta": 0.1733,
+                "entropy": 1.7008,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.0684,
+                "delta": -0.3601,
+                "entropy": 1.7845,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9729,
+                "delta": 0.5443,
+                "entropy": 0.2256,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.1992,
+                "delta": -0.2294,
+                "entropy": 1.6236,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9753,
+                "delta": 0.5467,
+                "entropy": 0.2079,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9497,
+                "delta": 0.5211,
+                "entropy": 0.3575,
+                "top": "wheels"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.4286,
+                "delta": 0.0,
+                "entropy": 1.619,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.4045,
+                "delta": -0.0241,
+                "entropy": 1.6533,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.3995,
+                "delta": -0.0291,
+                "entropy": 1.6536,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.514,
+                "delta": 0.0854,
+                "entropy": 1.6986,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.6019,
+                "delta": 0.1733,
+                "entropy": 1.7008,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.0684,
+                "delta": -0.3601,
+                "entropy": 1.7845,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9729,
+                "delta": 0.5443,
+                "entropy": 0.2256,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.1992,
+                "delta": -0.2294,
+                "entropy": 1.6236,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9753,
+                "delta": 0.5467,
+                "entropy": 0.2079,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9497,
+                "delta": 0.5211,
+                "entropy": 0.3575,
+                "top": "wheels"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.4286,
+                "delta": 0.0,
+                "entropy": 1.619,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.4464,
+                "delta": 0.0178,
+                "entropy": 1.6342,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.4795,
+                "delta": 0.0509,
+                "entropy": 1.6629,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.4884,
+                "delta": 0.0599,
+                "entropy": 1.6785,
+                "top": "blades"
+              },
+              "0.3": {
+                "level": 3.5424,
+                "delta": 0.1138,
+                "entropy": 1.5909,
+                "top": "blades"
+              },
+              "0.5": {
+                "level": 3.6565,
+                "delta": 0.2279,
+                "entropy": 1.5097,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.8009,
+                "delta": 0.3723,
+                "entropy": 0.9083,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.7894,
+                "delta": 0.3608,
+                "entropy": 0.9444,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.8077,
+                "delta": 0.3792,
+                "entropy": 0.8808,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.8354,
+                "delta": 0.4068,
+                "entropy": 0.7793,
+                "top": "wheels"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.4286,
+                "delta": 0.0,
+                "entropy": 1.619,
+                "top": "blades"
+              },
+              "0.05": {
+                "level": 3.5471,
+                "delta": 0.1185,
+                "entropy": 1.7893,
+                "top": "blades"
+              },
+              "0.1": {
+                "level": 3.5279,
+                "delta": 0.0993,
+                "entropy": 1.8089,
+                "top": "blades"
+              },
+              "0.2": {
+                "level": 3.5653,
+                "delta": 0.1368,
+                "entropy": 1.7258,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.56,
+                "delta": 0.1314,
+                "entropy": 1.6924,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.5693,
+                "delta": 0.1407,
+                "entropy": 1.6495,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.5717,
+                "delta": 0.1431,
+                "entropy": 1.6478,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.5639,
+                "delta": 0.1353,
+                "entropy": 1.6485,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.5418,
+                "delta": 0.1132,
+                "entropy": 1.662,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.5362,
+                "delta": 0.1077,
+                "entropy": 1.6717,
+                "top": "wheels"
+              }
+            }
+          }
+        }
+      }
+    },
+    "car": {
+      "category": "vehicle",
+      "opposing": "tool",
+      "embedding_norm": 0.10577061772346497,
+      "identity_norm": 0.09365545213222504,
+      "tasks": {
+        "category": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 3.8643,
+              "entropy": 0.6064,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0013,
+                "animal": 0.0196,
+                "tool": 0.0933,
+                "vehicle": 0.8851,
+                "place": 0.0007
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.8643,
+                "delta": 0.0,
+                "entropy": 0.6064,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.973,
+                "delta": 0.1087,
+                "entropy": 0.1837,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9755,
+                "delta": 0.1112,
+                "entropy": 0.1699,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9752,
+                "delta": 0.1109,
+                "entropy": 0.1719,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.976,
+                "delta": 0.1116,
+                "entropy": 0.1691,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.9679,
+                "delta": 0.1036,
+                "entropy": 0.2125,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.9661,
+                "delta": 0.1018,
+                "entropy": 0.2219,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.9679,
+                "delta": 0.1036,
+                "entropy": 0.2125,
+                "top": "vehicle"
+              },
+              "1.5": {
+                "level": 3.9725,
+                "delta": 0.1081,
+                "entropy": 0.188,
+                "top": "vehicle"
+              },
+              "2.0": {
+                "level": 3.975,
+                "delta": 0.1106,
+                "entropy": 0.1745,
+                "top": "vehicle"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.8643,
+                "delta": 0.0,
+                "entropy": 0.6064,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.973,
+                "delta": 0.1087,
+                "entropy": 0.1837,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9755,
+                "delta": 0.1112,
+                "entropy": 0.1699,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9752,
+                "delta": 0.1109,
+                "entropy": 0.1719,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.976,
+                "delta": 0.1116,
+                "entropy": 0.1691,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.9679,
+                "delta": 0.1036,
+                "entropy": 0.2125,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.9661,
+                "delta": 0.1018,
+                "entropy": 0.2219,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.9679,
+                "delta": 0.1036,
+                "entropy": 0.2125,
+                "top": "vehicle"
+              },
+              "1.5": {
+                "level": 3.9725,
+                "delta": 0.1081,
+                "entropy": 0.188,
+                "top": "vehicle"
+              },
+              "2.0": {
+                "level": 3.975,
+                "delta": 0.1106,
+                "entropy": 0.1745,
+                "top": "vehicle"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.8643,
+                "delta": 0.0,
+                "entropy": 0.6064,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.8935,
+                "delta": 0.0292,
+                "entropy": 0.5106,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.8909,
+                "delta": 0.0266,
+                "entropy": 0.5225,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9065,
+                "delta": 0.0422,
+                "entropy": 0.4658,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9591,
+                "delta": 0.0948,
+                "entropy": 0.2441,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.8556,
+                "delta": -0.0087,
+                "entropy": 1.8997,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 4.0001,
+                "delta": 0.1357,
+                "entropy": 1.8067,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 4.0104,
+                "delta": 0.1461,
+                "entropy": 1.8152,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.8074,
+                "delta": -0.0569,
+                "entropy": 1.9417,
+                "top": "place"
+              },
+              "2.0": {
+                "level": 3.8138,
+                "delta": -0.0505,
+                "entropy": 1.937,
+                "top": "place"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.8643,
+                "delta": 0.0,
+                "entropy": 0.6064,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.8213,
+                "delta": -0.043,
+                "entropy": 0.7304,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.8235,
+                "delta": -0.0408,
+                "entropy": 0.727,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.8987,
+                "delta": 0.0344,
+                "entropy": 0.495,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9507,
+                "delta": 0.0864,
+                "entropy": 0.2889,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.1784,
+                "delta": -0.6859,
+                "entropy": 1.9,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.1614,
+                "delta": -0.7029,
+                "entropy": 1.9171,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.1562,
+                "delta": -0.7081,
+                "entropy": 1.9076,
+                "top": "tool"
+              },
+              "1.5": {
+                "level": 3.1116,
+                "delta": -0.7527,
+                "entropy": 1.9192,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.0868,
+                "delta": -0.7776,
+                "entropy": 1.9342,
+                "top": "tool"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 3.9881,
+              "entropy": 0.0697,
+              "top": "fast",
+              "probs": {
+                "edible": 0.002,
+                "alive": 0.0029,
+                "sharp": 0.0009,
+                "fast": 0.9934,
+                "vast": 0.0009
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.9881,
+                "delta": 0.0,
+                "entropy": 0.0697,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.9905,
+                "delta": 0.0024,
+                "entropy": 0.0649,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9904,
+                "delta": 0.0023,
+                "entropy": 0.0683,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.9849,
+                "delta": -0.0031,
+                "entropy": 0.0906,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.986,
+                "delta": -0.0021,
+                "entropy": 0.0883,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9852,
+                "delta": -0.0029,
+                "entropy": 0.0905,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.9857,
+                "delta": -0.0023,
+                "entropy": 0.0878,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9847,
+                "delta": -0.0034,
+                "entropy": 0.0922,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9843,
+                "delta": -0.0038,
+                "entropy": 0.095,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9838,
+                "delta": -0.0043,
+                "entropy": 0.0984,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.9881,
+                "delta": 0.0,
+                "entropy": 0.0697,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.9905,
+                "delta": 0.0024,
+                "entropy": 0.0649,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9904,
+                "delta": 0.0023,
+                "entropy": 0.0683,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.9849,
+                "delta": -0.0031,
+                "entropy": 0.0906,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.986,
+                "delta": -0.0021,
+                "entropy": 0.0883,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9852,
+                "delta": -0.0029,
+                "entropy": 0.0905,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.9857,
+                "delta": -0.0023,
+                "entropy": 0.0878,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9847,
+                "delta": -0.0034,
+                "entropy": 0.0922,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9843,
+                "delta": -0.0038,
+                "entropy": 0.095,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9838,
+                "delta": -0.0043,
+                "entropy": 0.0984,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.9881,
+                "delta": 0.0,
+                "entropy": 0.0697,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.9889,
+                "delta": 0.0008,
+                "entropy": 0.0656,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9907,
+                "delta": 0.0026,
+                "entropy": 0.0632,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.9917,
+                "delta": 0.0036,
+                "entropy": 0.0566,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.9906,
+                "delta": 0.0025,
+                "entropy": 0.0681,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 3.9894,
+                "delta": 0.0013,
+                "entropy": 0.0693,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.9896,
+                "delta": 0.0015,
+                "entropy": 0.0703,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.99,
+                "delta": 0.002,
+                "entropy": 0.0685,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9885,
+                "delta": 0.0004,
+                "entropy": 0.0768,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9885,
+                "delta": 0.0004,
+                "entropy": 0.0792,
+                "top": "fast"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.9881,
+                "delta": 0.0,
+                "entropy": 0.0697,
+                "top": "fast"
+              },
+              "0.05": {
+                "level": 3.9876,
+                "delta": -0.0005,
+                "entropy": 0.0718,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9864,
+                "delta": -0.0017,
+                "entropy": 0.0789,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.9784,
+                "delta": -0.0097,
+                "entropy": 0.112,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 3.9768,
+                "delta": -0.0113,
+                "entropy": 0.116,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 4.0504,
+                "delta": 0.0623,
+                "entropy": 1.251,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 4.0354,
+                "delta": 0.0473,
+                "entropy": 1.2336,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 4.0572,
+                "delta": 0.0691,
+                "entropy": 1.2565,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 4.0713,
+                "delta": 0.0832,
+                "entropy": 1.2737,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 4.0873,
+                "delta": 0.0992,
+                "entropy": 1.2814,
+                "top": "fast"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 3.9951,
+              "entropy": 0.0447,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0007,
+                "fur": 0.0004,
+                "blades": 0.0025,
+                "wheels": 0.9959,
+                "sand": 0.0005
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.9951,
+                "delta": 0.0,
+                "entropy": 0.0447,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9978,
+                "delta": 0.0026,
+                "entropy": 0.0217,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9982,
+                "delta": 0.0031,
+                "entropy": 0.0177,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9985,
+                "delta": 0.0034,
+                "entropy": 0.0152,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9982,
+                "delta": 0.003,
+                "entropy": 0.0189,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9979,
+                "delta": 0.0027,
+                "entropy": 0.0212,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9981,
+                "delta": 0.003,
+                "entropy": 0.0196,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9981,
+                "delta": 0.0029,
+                "entropy": 0.0199,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9981,
+                "delta": 0.003,
+                "entropy": 0.0193,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9983,
+                "delta": 0.0031,
+                "entropy": 0.0181,
+                "top": "wheels"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.9951,
+                "delta": 0.0,
+                "entropy": 0.0447,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9978,
+                "delta": 0.0026,
+                "entropy": 0.0217,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9982,
+                "delta": 0.0031,
+                "entropy": 0.0177,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9985,
+                "delta": 0.0034,
+                "entropy": 0.0152,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9982,
+                "delta": 0.003,
+                "entropy": 0.0189,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9979,
+                "delta": 0.0027,
+                "entropy": 0.0212,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9981,
+                "delta": 0.003,
+                "entropy": 0.0196,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9981,
+                "delta": 0.0029,
+                "entropy": 0.0199,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9981,
+                "delta": 0.003,
+                "entropy": 0.0193,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9983,
+                "delta": 0.0031,
+                "entropy": 0.0181,
+                "top": "wheels"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.9951,
+                "delta": 0.0,
+                "entropy": 0.0447,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9949,
+                "delta": -0.0003,
+                "entropy": 0.047,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9942,
+                "delta": -0.0009,
+                "entropy": 0.0524,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9921,
+                "delta": -0.003,
+                "entropy": 0.0698,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9931,
+                "delta": -0.002,
+                "entropy": 0.0602,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9952,
+                "delta": 0.0001,
+                "entropy": 0.0426,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9961,
+                "delta": 0.001,
+                "entropy": 0.0421,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9956,
+                "delta": 0.0004,
+                "entropy": 0.0459,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9952,
+                "delta": 0.0,
+                "entropy": 0.0506,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9955,
+                "delta": 0.0004,
+                "entropy": 0.0495,
+                "top": "wheels"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.9951,
+                "delta": 0.0,
+                "entropy": 0.0447,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9937,
+                "delta": -0.0014,
+                "entropy": 0.054,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.994,
+                "delta": -0.0012,
+                "entropy": 0.0523,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9926,
+                "delta": -0.0025,
+                "entropy": 0.0624,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9911,
+                "delta": -0.0041,
+                "entropy": 0.0789,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 1.2265,
+                "delta": -2.7686,
+                "entropy": 0.7585,
+                "top": "seeds"
+              },
+              "0.75": {
+                "level": 1.2187,
+                "delta": -2.7764,
+                "entropy": 0.7415,
+                "top": "seeds"
+              },
+              "1.0": {
+                "level": 1.2074,
+                "delta": -2.7877,
+                "entropy": 0.7032,
+                "top": "seeds"
+              },
+              "1.5": {
+                "level": 1.1884,
+                "delta": -2.8068,
+                "entropy": 0.6498,
+                "top": "seeds"
+              },
+              "2.0": {
+                "level": 1.1845,
+                "delta": -2.8107,
+                "entropy": 0.6309,
+                "top": "seeds"
+              }
+            }
+          }
+        }
+      }
+    },
+    "bus": {
+      "category": "vehicle",
+      "opposing": "tool",
+      "embedding_norm": 0.10838194936513901,
+      "identity_norm": 0.0977802723646164,
+      "tasks": {
+        "category": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 3.9975,
+              "entropy": 0.0294,
+              "top": "vehicle",
+              "probs": {
+                "fruit": 0.0001,
+                "animal": 0.0006,
+                "tool": 0.0013,
+                "vehicle": 0.9975,
+                "place": 0.0004
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.9975,
+                "delta": 0.0,
+                "entropy": 0.0294,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.998,
+                "delta": 0.0005,
+                "entropy": 0.0328,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9985,
+                "delta": 0.001,
+                "entropy": 0.0323,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9995,
+                "delta": 0.002,
+                "entropy": 0.0212,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9993,
+                "delta": 0.0018,
+                "entropy": 0.0203,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0018,
+                "entropy": 0.0211,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.999,
+                "delta": 0.0015,
+                "entropy": 0.0258,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.9983,
+                "delta": 0.0008,
+                "entropy": 0.0355,
+                "top": "vehicle"
+              },
+              "1.5": {
+                "level": 3.9977,
+                "delta": 0.0002,
+                "entropy": 0.0395,
+                "top": "vehicle"
+              },
+              "2.0": {
+                "level": 3.9972,
+                "delta": -0.0003,
+                "entropy": 0.0447,
+                "top": "vehicle"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.9975,
+                "delta": 0.0,
+                "entropy": 0.0294,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.998,
+                "delta": 0.0005,
+                "entropy": 0.0328,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9985,
+                "delta": 0.001,
+                "entropy": 0.0323,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9995,
+                "delta": 0.002,
+                "entropy": 0.0212,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9993,
+                "delta": 0.0018,
+                "entropy": 0.0203,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0018,
+                "entropy": 0.0211,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.999,
+                "delta": 0.0015,
+                "entropy": 0.0258,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.9983,
+                "delta": 0.0008,
+                "entropy": 0.0355,
+                "top": "vehicle"
+              },
+              "1.5": {
+                "level": 3.9977,
+                "delta": 0.0002,
+                "entropy": 0.0395,
+                "top": "vehicle"
+              },
+              "2.0": {
+                "level": 3.9972,
+                "delta": -0.0003,
+                "entropy": 0.0447,
+                "top": "vehicle"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.9975,
+                "delta": 0.0,
+                "entropy": 0.0294,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.9971,
+                "delta": -0.0004,
+                "entropy": 0.0329,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9966,
+                "delta": -0.0009,
+                "entropy": 0.0376,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9981,
+                "delta": 0.0006,
+                "entropy": 0.0209,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9981,
+                "delta": 0.0007,
+                "entropy": 0.0213,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.9986,
+                "delta": 0.0012,
+                "entropy": 0.0222,
+                "top": "vehicle"
+              },
+              "0.75": {
+                "level": 3.9988,
+                "delta": 0.0013,
+                "entropy": 0.0162,
+                "top": "vehicle"
+              },
+              "1.0": {
+                "level": 3.7192,
+                "delta": -0.2783,
+                "entropy": 1.668,
+                "top": "vehicle"
+              },
+              "1.5": {
+                "level": 3.6965,
+                "delta": -0.3009,
+                "entropy": 1.4776,
+                "top": "vehicle"
+              },
+              "2.0": {
+                "level": 3.7571,
+                "delta": -0.2404,
+                "entropy": 1.1206,
+                "top": "vehicle"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.9975,
+                "delta": 0.0,
+                "entropy": 0.0294,
+                "top": "vehicle"
+              },
+              "0.05": {
+                "level": 3.9976,
+                "delta": 0.0002,
+                "entropy": 0.0276,
+                "top": "vehicle"
+              },
+              "0.1": {
+                "level": 3.9978,
+                "delta": 0.0003,
+                "entropy": 0.0259,
+                "top": "vehicle"
+              },
+              "0.2": {
+                "level": 3.9978,
+                "delta": 0.0003,
+                "entropy": 0.0248,
+                "top": "vehicle"
+              },
+              "0.3": {
+                "level": 3.9987,
+                "delta": 0.0012,
+                "entropy": 0.0174,
+                "top": "vehicle"
+              },
+              "0.5": {
+                "level": 3.806,
+                "delta": -0.1915,
+                "entropy": 1.9742,
+                "top": "place"
+              },
+              "0.75": {
+                "level": 3.819,
+                "delta": -0.1784,
+                "entropy": 1.9671,
+                "top": "place"
+              },
+              "1.0": {
+                "level": 3.794,
+                "delta": -0.2034,
+                "entropy": 1.9727,
+                "top": "place"
+              },
+              "1.5": {
+                "level": 3.6531,
+                "delta": -0.3444,
+                "entropy": 1.9848,
+                "top": "tool"
+              },
+              "2.0": {
+                "level": 3.6288,
+                "delta": -0.3687,
+                "entropy": 1.8211,
+                "top": "vehicle"
+              }
+            }
+          }
+        },
+        "property": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 2.6907,
+              "entropy": 1.9683,
+              "top": "edible",
+              "probs": {
+                "edible": 0.3652,
+                "alive": 0.1725,
+                "sharp": 0.0119,
+                "fast": 0.3075,
+                "vast": 0.143
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 2.6907,
+                "delta": 0.0,
+                "entropy": 1.9683,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 3.9194,
+                "delta": 1.2287,
+                "entropy": 0.6487,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9793,
+                "delta": 1.2886,
+                "entropy": 0.7138,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 4.0133,
+                "delta": 1.3226,
+                "entropy": 0.6232,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 4.0071,
+                "delta": 1.3164,
+                "entropy": 0.5991,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 4.0049,
+                "delta": 1.3142,
+                "entropy": 0.5795,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.9977,
+                "delta": 1.3071,
+                "entropy": 0.6086,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9973,
+                "delta": 1.3067,
+                "entropy": 0.6225,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9917,
+                "delta": 1.3011,
+                "entropy": 0.6993,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9918,
+                "delta": 1.3011,
+                "entropy": 0.6986,
+                "top": "fast"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 2.6907,
+                "delta": 0.0,
+                "entropy": 1.9683,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 3.9194,
+                "delta": 1.2287,
+                "entropy": 0.6487,
+                "top": "fast"
+              },
+              "0.1": {
+                "level": 3.9793,
+                "delta": 1.2886,
+                "entropy": 0.7138,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 4.0133,
+                "delta": 1.3226,
+                "entropy": 0.6232,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 4.0071,
+                "delta": 1.3164,
+                "entropy": 0.5991,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 4.0049,
+                "delta": 1.3142,
+                "entropy": 0.5795,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 3.9977,
+                "delta": 1.3071,
+                "entropy": 0.6086,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 3.9973,
+                "delta": 1.3067,
+                "entropy": 0.6225,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 3.9917,
+                "delta": 1.3011,
+                "entropy": 0.6993,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 3.9918,
+                "delta": 1.3011,
+                "entropy": 0.6986,
+                "top": "fast"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 2.6907,
+                "delta": 0.0,
+                "entropy": 1.9683,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 2.7537,
+                "delta": 0.0631,
+                "entropy": 1.9683,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 3.939,
+                "delta": 1.2483,
+                "entropy": 0.7232,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 3.9797,
+                "delta": 1.289,
+                "entropy": 0.7257,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 4.076,
+                "delta": 1.3853,
+                "entropy": 0.7397,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 4.0514,
+                "delta": 1.3607,
+                "entropy": 0.7783,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 4.0248,
+                "delta": 1.3341,
+                "entropy": 0.7249,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 4.0258,
+                "delta": 1.3351,
+                "entropy": 0.7377,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 4.0194,
+                "delta": 1.3287,
+                "entropy": 0.7364,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 4.0119,
+                "delta": 1.3213,
+                "entropy": 0.738,
+                "top": "fast"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 2.6907,
+                "delta": 0.0,
+                "entropy": 1.9683,
+                "top": "edible"
+              },
+              "0.05": {
+                "level": 2.7525,
+                "delta": 0.0619,
+                "entropy": 1.9716,
+                "top": "edible"
+              },
+              "0.1": {
+                "level": 3.9226,
+                "delta": 1.2319,
+                "entropy": 0.6699,
+                "top": "fast"
+              },
+              "0.2": {
+                "level": 4.0176,
+                "delta": 1.3269,
+                "entropy": 0.7429,
+                "top": "fast"
+              },
+              "0.3": {
+                "level": 4.044,
+                "delta": 1.3533,
+                "entropy": 0.604,
+                "top": "fast"
+              },
+              "0.5": {
+                "level": 4.0193,
+                "delta": 1.3286,
+                "entropy": 0.5949,
+                "top": "fast"
+              },
+              "0.75": {
+                "level": 4.0209,
+                "delta": 1.3302,
+                "entropy": 0.5907,
+                "top": "fast"
+              },
+              "1.0": {
+                "level": 4.0204,
+                "delta": 1.3297,
+                "entropy": 0.6056,
+                "top": "fast"
+              },
+              "1.5": {
+                "level": 4.0216,
+                "delta": 1.3309,
+                "entropy": 0.7028,
+                "top": "fast"
+              },
+              "2.0": {
+                "level": 4.0145,
+                "delta": 1.3238,
+                "entropy": 0.7339,
+                "top": "fast"
+              }
+            }
+          }
+        },
+        "part": {
+          "expected_category": "vehicle",
+          "baselines": {
+            "0.0": {
+              "level": 3.9617,
+              "entropy": 0.172,
+              "top": "wheels",
+              "probs": {
+                "seeds": 0.0104,
+                "fur": 0.0005,
+                "blades": 0.0077,
+                "wheels": 0.9798,
+                "sand": 0.0016
+              }
+            }
+          },
+          "perturbation_curves": {
+            "remove_category": {
+              "0.0": {
+                "level": 3.9617,
+                "delta": 0.0,
+                "entropy": 0.172,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9894,
+                "delta": 0.0277,
+                "entropy": 0.0835,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9921,
+                "delta": 0.0304,
+                "entropy": 0.072,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9942,
+                "delta": 0.0324,
+                "entropy": 0.0613,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9947,
+                "delta": 0.0329,
+                "entropy": 0.0549,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9941,
+                "delta": 0.0324,
+                "entropy": 0.0596,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9936,
+                "delta": 0.0319,
+                "entropy": 0.0643,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9934,
+                "delta": 0.0316,
+                "entropy": 0.0673,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9931,
+                "delta": 0.0314,
+                "entropy": 0.0691,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9924,
+                "delta": 0.0307,
+                "entropy": 0.0745,
+                "top": "wheels"
+              }
+            },
+            "add_opposing": {
+              "0.0": {
+                "level": 3.9617,
+                "delta": 0.0,
+                "entropy": 0.172,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9894,
+                "delta": 0.0277,
+                "entropy": 0.0835,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9921,
+                "delta": 0.0304,
+                "entropy": 0.072,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9942,
+                "delta": 0.0324,
+                "entropy": 0.0613,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9947,
+                "delta": 0.0329,
+                "entropy": 0.0549,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9941,
+                "delta": 0.0324,
+                "entropy": 0.0596,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9936,
+                "delta": 0.0319,
+                "entropy": 0.0643,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9934,
+                "delta": 0.0316,
+                "entropy": 0.0673,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9931,
+                "delta": 0.0314,
+                "entropy": 0.0691,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9924,
+                "delta": 0.0307,
+                "entropy": 0.0745,
+                "top": "wheels"
+              }
+            },
+            "add_random": {
+              "0.0": {
+                "level": 3.9617,
+                "delta": 0.0,
+                "entropy": 0.172,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9606,
+                "delta": -0.0012,
+                "entropy": 0.1759,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9592,
+                "delta": -0.0026,
+                "entropy": 0.1829,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.9622,
+                "delta": 0.0004,
+                "entropy": 0.1727,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9744,
+                "delta": 0.0127,
+                "entropy": 0.1408,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9862,
+                "delta": 0.0245,
+                "entropy": 0.0902,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9842,
+                "delta": 0.0224,
+                "entropy": 0.0988,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9909,
+                "delta": 0.0292,
+                "entropy": 0.0848,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9811,
+                "delta": 0.0194,
+                "entropy": 0.1213,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.9845,
+                "delta": 0.0227,
+                "entropy": 0.105,
+                "top": "wheels"
+              }
+            },
+            "remove_identity": {
+              "0.0": {
+                "level": 3.9617,
+                "delta": 0.0,
+                "entropy": 0.172,
+                "top": "wheels"
+              },
+              "0.05": {
+                "level": 3.9551,
+                "delta": -0.0066,
+                "entropy": 0.1921,
+                "top": "wheels"
+              },
+              "0.1": {
+                "level": 3.9491,
+                "delta": -0.0127,
+                "entropy": 0.2101,
+                "top": "wheels"
+              },
+              "0.2": {
+                "level": 3.967,
+                "delta": 0.0052,
+                "entropy": 0.1589,
+                "top": "wheels"
+              },
+              "0.3": {
+                "level": 3.9827,
+                "delta": 0.021,
+                "entropy": 0.1,
+                "top": "wheels"
+              },
+              "0.5": {
+                "level": 3.9931,
+                "delta": 0.0313,
+                "entropy": 0.0591,
+                "top": "wheels"
+              },
+              "0.75": {
+                "level": 3.9912,
+                "delta": 0.0295,
+                "entropy": 0.068,
+                "top": "wheels"
+              },
+              "1.0": {
+                "level": 3.9894,
+                "delta": 0.0277,
+                "entropy": 0.0749,
+                "top": "wheels"
+              },
+              "1.5": {
+                "level": 3.9899,
+                "delta": 0.0282,
+                "entropy": 0.0703,
+                "top": "wheels"
+              },
+              "2.0": {
+                "level": 3.988,
+                "delta": 0.0262,
+                "entropy": 0.0775,
+                "top": "wheels"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "critical_alphas": {
+    "apple": {
+      "category": {
+        "remove_category": 0.217,
+        "add_opposing": 0.217
+      },
+      "property": {
+        "remove_category": 0.217,
+        "add_opposing": 0.217
+      }
+    },
+    "orange": {
+      "category": {
+        "remove_category": 0.22,
+        "add_opposing": 0.22,
+        "add_random": 0.334
+      },
+      "property": {
+        "remove_category": 0.214,
+        "add_opposing": 0.214,
+        "add_random": 0.501
+      }
+    },
+    "dog": {
+      "category": {
+        "remove_identity": 0.225
+      },
+      "part": {
+        "remove_category": 0.096,
+        "add_opposing": 0.096
+      }
+    },
+    "horse": {
+      "category": {
+        "add_random": 0.569,
+        "remove_identity": 0.359
+      }
+    },
+    "knife": {
+      "category": {
+        "remove_category": 0.25,
+        "add_opposing": 0.25
+      },
+      "property": {
+        "remove_category": 0.25,
+        "add_opposing": 0.25
+      },
+      "part": {
+        "remove_category": 0.605,
+        "add_opposing": 0.605
+      }
+    },
+    "hammer": {
+      "category": {
+        "remove_category": 0.265,
+        "add_opposing": 0.265,
+        "add_random": 0.434
+      },
+      "property": {
+        "remove_category": 0.249,
+        "add_opposing": 0.249
+      },
+      "part": {
+        "remove_category": 0.69,
+        "add_opposing": 0.69
+      }
+    },
+    "car": {
+      "category": {
+        "remove_identity": 0.438
+      },
+      "part": {
+        "remove_identity": 0.336
+      }
+    },
+    "bus": {
+      "property": {
+        "remove_category": 0.02,
+        "add_opposing": 0.02,
+        "add_random": 0.068,
+        "remove_identity": 0.069
+      }
+    }
+  },
+  "specificity_ratios": {
+    "apple_category_a0.5": Infinity,
+    "apple_category_a1.0": Infinity,
+    "apple_property_a0.5": 73.31,
+    "apple_property_a1.0": 91.33,
+    "apple_part_a0.5": 0.49,
+    "apple_part_a1.0": 1.17,
+    "orange_category_a0.5": 0.71,
+    "orange_category_a1.0": 0.71,
+    "orange_property_a0.5": 6.03,
+    "orange_property_a1.0": 1.01,
+    "orange_part_a0.5": 1.11,
+    "orange_part_a1.0": 1.21,
+    "dog_category_a0.5": Infinity,
+    "dog_category_a1.0": Infinity,
+    "dog_property_a0.5": 0.42,
+    "dog_property_a1.0": 0.47,
+    "dog_part_a0.5": 1.74,
+    "dog_part_a1.0": 0.33,
+    "horse_category_a0.5": Infinity,
+    "horse_category_a1.0": 0.0,
+    "horse_property_a0.5": 1.64,
+    "horse_property_a1.0": 3.13,
+    "horse_part_a0.5": 0.23,
+    "horse_part_a1.0": 0.19,
+    "knife_category_a0.5": Infinity,
+    "knife_category_a1.0": Infinity,
+    "knife_property_a0.5": Infinity,
+    "knife_property_a1.0": Infinity,
+    "knife_part_a0.5": Infinity,
+    "knife_part_a1.0": Infinity,
+    "hammer_category_a0.5": 1.19,
+    "hammer_category_a1.0": 1.09,
+    "hammer_property_a0.5": 22.14,
+    "hammer_property_a1.0": 17.51,
+    "hammer_part_a0.5": 1.58,
+    "hammer_part_a1.0": 0.64,
+    "car_category_a0.5": Infinity,
+    "car_category_a1.0": 0.71,
+    "car_property_a0.5": Infinity,
+    "car_property_a1.0": Infinity,
+    "car_part_a0.5": Infinity,
+    "car_part_a1.0": Infinity,
+    "bus_category_a0.5": Infinity,
+    "bus_category_a1.0": 0.0,
+    "bus_property_a0.5": 0.97,
+    "bus_property_a1.0": 0.98,
+    "bus_part_a0.5": 1.32,
+    "bus_part_a1.0": 1.08
+  },
+  "top1_switches": {
+    "apple_category_remove_category": 0.3,
+    "apple_category_add_opposing": 0.3,
+    "apple_property_remove_category": 0.3,
+    "apple_property_add_opposing": 0.3,
+    "orange_category_remove_category": 0.3,
+    "orange_category_add_opposing": 0.3,
+    "orange_category_add_random": 0.5,
+    "orange_property_remove_category": 0.3,
+    "orange_property_add_opposing": 0.3,
+    "orange_property_add_random": 0.75,
+    "dog_category_remove_identity": 0.3,
+    "horse_category_add_random": 0.75,
+    "horse_category_remove_identity": 0.5,
+    "knife_category_remove_category": 0.3,
+    "knife_category_add_opposing": 0.3,
+    "knife_property_remove_category": 0.3,
+    "knife_property_add_opposing": 0.3,
+    "knife_part_remove_category": 0.5,
+    "knife_part_add_opposing": 0.5,
+    "hammer_category_remove_category": 0.5,
+    "hammer_category_add_opposing": 0.5,
+    "hammer_property_remove_category": 0.3,
+    "hammer_property_add_opposing": 0.3,
+    "hammer_part_remove_category": 0.2,
+    "hammer_part_add_opposing": 0.2,
+    "hammer_part_add_random": 0.5,
+    "hammer_part_remove_identity": 0.2,
+    "car_category_add_random": 0.5,
+    "car_category_remove_identity": 1.0,
+    "car_part_remove_identity": 0.5,
+    "bus_category_remove_identity": 0.5,
+    "bus_property_remove_category": 0.05,
+    "bus_property_add_opposing": 0.05,
+    "bus_property_add_random": 0.1,
+    "bus_property_remove_identity": 0.1
+  }
+}

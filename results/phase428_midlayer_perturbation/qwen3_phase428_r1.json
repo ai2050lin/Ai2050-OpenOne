@@ -1,0 +1,4598 @@
+{
+  "model": "qwen3",
+  "model_class": "Qwen3ForCausalLM",
+  "n_layers": 36,
+  "d_model": 2560,
+  "timestamp": "2026-06-09 23:11",
+  "phase": "428",
+  "round": 1,
+  "target_layers": {
+    "0.0": "embed",
+    "0.25": "L9",
+    "0.5": "L18",
+    "0.75": "L27"
+  },
+  "alpha_grid": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.75,
+    1.0,
+    1.5
+  ],
+  "test_objects": [
+    "apple",
+    "dog",
+    "knife"
+  ],
+  "per_object": {
+    "apple": {
+      "category": "fruit",
+      "opposing": "animal",
+      "baselines": {
+        "category": {
+          "level": 1.001,
+          "entropy": 0.009,
+          "top": "fruit",
+          "probs": {
+            "fruit": 0.9993,
+            "animal": 0.0005,
+            "tool": 0.0,
+            "vehicle": 0.0001,
+            "place": 0.0
+          },
+          "full_entropy": 2.0491,
+          "confidence": 0.8212,
+          "top2_gap": 0.7993
+        },
+        "property": {
+          "level": 1.0028,
+          "entropy": 0.0161,
+          "top": "edible",
+          "probs": {
+            "edible": 0.9987,
+            "alive": 0.0003,
+            "sharp": 0.0004,
+            "fast": 0.0006,
+            "vast": 0.0
+          },
+          "full_entropy": 3.8248,
+          "confidence": 0.313,
+          "top2_gap": 0.0692
+        }
+      },
+      "perturbations": {
+        "category_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 1.9972,
+              "confidence": 0.8235,
+              "top2_gap": 0.8016
+            },
+            "0.2": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.1283,
+              "confidence": 0.81,
+              "top2_gap": 0.7884
+            },
+            "0.3": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.1487,
+              "confidence": 0.8041,
+              "top2_gap": 0.7798
+            },
+            "0.5": {
+              "level": 1.0008,
+              "delta": -0.0002,
+              "top": "fruit",
+              "full_entropy": 2.0054,
+              "confidence": 0.81,
+              "top2_gap": 0.7786
+            },
+            "0.75": {
+              "level": 1.7779,
+              "delta": 0.7769,
+              "top": "animal",
+              "full_entropy": 3.726,
+              "confidence": 0.4648,
+              "top2_gap": 0.3316
+            },
+            "1.0": {
+              "level": 2.0002,
+              "delta": 0.9992,
+              "top": "animal",
+              "full_entropy": 2.0428,
+              "confidence": 0.7284,
+              "top2_gap": 0.6018
+            },
+            "1.5": {
+              "level": 2.0002,
+              "delta": 0.9992,
+              "top": "animal",
+              "full_entropy": 2.0611,
+              "confidence": 0.6928,
+              "top2_gap": 0.5724
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1652,
+              "confidence": 0.8107,
+              "top2_gap": 0.7891,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.97,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1524,
+              "confidence": 0.8143,
+              "top2_gap": 0.7939,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.975,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1438,
+              "confidence": 0.8143,
+              "top2_gap": 0.7926,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9695,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0176,
+              "confidence": 0.8249,
+              "top2_gap": 0.8042,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9819,
+                "norm_change_pct": 0.02
+              }
+            },
+            "0.75": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1832,
+              "confidence": 0.8111,
+              "top2_gap": 0.7895,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9851,
+                "norm_change_pct": 0.03
+              }
+            },
+            "1.0": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.156,
+              "confidence": 0.8126,
+              "top2_gap": 0.791,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9924,
+                "norm_change_pct": 0.04
+              }
+            },
+            "1.5": {
+              "level": 1.0009,
+              "delta": -0.0001,
+              "top": "fruit",
+              "full_entropy": 1.9739,
+              "confidence": 0.8311,
+              "top2_gap": 0.8116,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 48.017,
+                "norm_change_pct": 0.09
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1458,
+              "confidence": 0.8138,
+              "top2_gap": 0.7921,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7408,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1872,
+              "confidence": 0.8093,
+              "top2_gap": 0.7877,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7399,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1728,
+              "confidence": 0.8105,
+              "top2_gap": 0.7889,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7361,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 1.0012,
+              "delta": 0.0002,
+              "top": "fruit",
+              "full_entropy": 2.1814,
+              "confidence": 0.8086,
+              "top2_gap": 0.7857,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7468,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.75": {
+              "level": 1.0012,
+              "delta": 0.0002,
+              "top": "fruit",
+              "full_entropy": 2.2043,
+              "confidence": 0.807,
+              "top2_gap": 0.7855,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7618,
+                "norm_change_pct": 0.04
+              }
+            },
+            "1.0": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1238,
+              "confidence": 0.8153,
+              "top2_gap": 0.7936,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7732,
+                "norm_change_pct": 0.05
+              }
+            },
+            "1.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1622,
+              "confidence": 0.8116,
+              "top2_gap": 0.7899,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7879,
+                "norm_change_pct": 0.08
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1508,
+              "confidence": 0.8137,
+              "top2_gap": 0.792,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.783,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.177,
+              "confidence": 0.8098,
+              "top2_gap": 0.7882,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7823,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1768,
+              "confidence": 0.8104,
+              "top2_gap": 0.7888,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7815,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1974,
+              "confidence": 0.8075,
+              "top2_gap": 0.7846,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7822,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1928,
+              "confidence": 0.8079,
+              "top2_gap": 0.7849,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7743,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.2013,
+              "confidence": 0.8071,
+              "top2_gap": 0.7842,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.783,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1574,
+              "confidence": 0.8111,
+              "top2_gap": 0.7895,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7856,
+                "norm_change_pct": 0.0
+              }
+            }
+          }
+        },
+        "category_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1765,
+              "confidence": 0.809,
+              "top2_gap": 0.786
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.2383,
+              "confidence": 0.8,
+              "top2_gap": 0.7759
+            },
+            "0.3": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.1246,
+              "confidence": 0.808,
+              "top2_gap": 0.7836
+            },
+            "0.5": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.1379,
+              "confidence": 0.8055,
+              "top2_gap": 0.7826
+            },
+            "0.75": {
+              "level": 1.0008,
+              "delta": -0.0002,
+              "top": "fruit",
+              "full_entropy": 1.9244,
+              "confidence": 0.8231,
+              "top2_gap": 0.7949
+            },
+            "1.0": {
+              "level": 1.0008,
+              "delta": -0.0002,
+              "top": "fruit",
+              "full_entropy": 1.987,
+              "confidence": 0.8098,
+              "top2_gap": 0.7641
+            },
+            "1.5": {
+              "level": 1.0079,
+              "delta": 0.0069,
+              "top": "fruit",
+              "full_entropy": 4.1611,
+              "confidence": 0.5189,
+              "top2_gap": 0.3026
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.155,
+              "confidence": 0.8113,
+              "top2_gap": 0.7897,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9712,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1799,
+              "confidence": 0.8101,
+              "top2_gap": 0.7885,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9669,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1712,
+              "confidence": 0.811,
+              "top2_gap": 0.7894,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9635,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1739,
+              "confidence": 0.8108,
+              "top2_gap": 0.7892,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9543,
+                "norm_change_pct": -0.04
+              }
+            },
+            "0.75": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1621,
+              "confidence": 0.8112,
+              "top2_gap": 0.7882,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.9444,
+                "norm_change_pct": -0.06
+              }
+            },
+            "1.0": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.2044,
+              "confidence": 0.8071,
+              "top2_gap": 0.7842,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.942,
+                "norm_change_pct": -0.06
+              }
+            },
+            "1.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1953,
+              "confidence": 0.8091,
+              "top2_gap": 0.7876,
+              "residual_metrics": {
+                "pre_obj_norm": 47.9722,
+                "post_obj_norm": 47.928,
+                "norm_change_pct": -0.09
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1511,
+              "confidence": 0.8127,
+              "top2_gap": 0.791,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7371,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1909,
+              "confidence": 0.8079,
+              "top2_gap": 0.7864,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7379,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1688,
+              "confidence": 0.8102,
+              "top2_gap": 0.7886,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.735,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1704,
+              "confidence": 0.8101,
+              "top2_gap": 0.7885,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7245,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.75": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1172,
+              "confidence": 0.8172,
+              "top2_gap": 0.7967,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7313,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.0": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1844,
+              "confidence": 0.8092,
+              "top2_gap": 0.7876,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7221,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.5": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0159,
+              "confidence": 0.8256,
+              "top2_gap": 0.8049,
+              "residual_metrics": {
+                "pre_obj_norm": 61.7394,
+                "post_obj_norm": 61.7328,
+                "norm_change_pct": -0.01
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0491,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993
+            },
+            "0.1": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1935,
+              "confidence": 0.8076,
+              "top2_gap": 0.7847,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7835,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1856,
+              "confidence": 0.8083,
+              "top2_gap": 0.7854,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7807,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1642,
+              "confidence": 0.8105,
+              "top2_gap": 0.7889,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7792,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1201,
+              "confidence": 0.8156,
+              "top2_gap": 0.7939,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7661,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.75": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0355,
+              "confidence": 0.8235,
+              "top2_gap": 0.8029,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7581,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.0": {
+              "level": 1.001,
+              "delta": 0.0,
+              "top": "fruit",
+              "full_entropy": 2.0521,
+              "confidence": 0.8212,
+              "top2_gap": 0.7993,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7532,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.5": {
+              "level": 1.0011,
+              "delta": 0.0001,
+              "top": "fruit",
+              "full_entropy": 2.1425,
+              "confidence": 0.8143,
+              "top2_gap": 0.7926,
+              "residual_metrics": {
+                "pre_obj_norm": 186.7829,
+                "post_obj_norm": 186.7451,
+                "norm_change_pct": -0.02
+              }
+            }
+          }
+        },
+        "property_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0032,
+              "delta": 0.0004,
+              "top": "edible",
+              "full_entropy": 3.8501,
+              "confidence": 0.291,
+              "top2_gap": 0.0342
+            },
+            "0.2": {
+              "level": 1.0027,
+              "delta": -0.0001,
+              "top": "edible",
+              "full_entropy": 3.8855,
+              "confidence": 0.2875,
+              "top2_gap": 0.0338
+            },
+            "0.3": {
+              "level": 1.0031,
+              "delta": 0.0003,
+              "top": "edible",
+              "full_entropy": 3.7929,
+              "confidence": 0.2722,
+              "top2_gap": 0.0
+            },
+            "0.5": {
+              "level": 1.0032,
+              "delta": 0.0004,
+              "top": "edible",
+              "full_entropy": 3.9105,
+              "confidence": 0.298,
+              "top2_gap": 0.0659
+            },
+            "0.75": {
+              "level": 1.0036,
+              "delta": 0.0008,
+              "top": "edible",
+              "full_entropy": 3.9448,
+              "confidence": 0.2948,
+              "top2_gap": 0.0652
+            },
+            "1.0": {
+              "level": 1.0037,
+              "delta": 0.0009,
+              "top": "edible",
+              "full_entropy": 4.0459,
+              "confidence": 0.2991,
+              "top2_gap": 0.0935
+            },
+            "1.5": {
+              "level": 1.004,
+              "delta": 0.0012,
+              "top": "edible",
+              "full_entropy": 4.0603,
+              "confidence": 0.3108,
+              "top2_gap": 0.0972
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8552,
+              "confidence": 0.3109,
+              "top2_gap": 0.0688,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8195,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.9367,
+              "confidence": 0.2926,
+              "top2_gap": 0.0344,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8179,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 1.0025,
+              "delta": -0.0003,
+              "top": "edible",
+              "full_entropy": 3.8205,
+              "confidence": 0.2993,
+              "top2_gap": 0.0352,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8166,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8358,
+              "confidence": 0.3122,
+              "top2_gap": 0.0691,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8278,
+                "norm_change_pct": 0.02
+              }
+            },
+            "0.75": {
+              "level": 1.0026,
+              "delta": -0.0002,
+              "top": "edible",
+              "full_entropy": 3.8411,
+              "confidence": 0.2981,
+              "top2_gap": 0.035,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8204,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.0": {
+              "level": 1.0031,
+              "delta": 0.0003,
+              "top": "edible",
+              "full_entropy": 3.8939,
+              "confidence": 0.2965,
+              "top2_gap": 0.0348,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8366,
+                "norm_change_pct": 0.04
+              }
+            },
+            "1.5": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8343,
+              "confidence": 0.3208,
+              "top2_gap": 0.071,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.844,
+                "norm_change_pct": 0.05
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8951,
+              "confidence": 0.2957,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9918,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8979,
+              "confidence": 0.2949,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.991,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8444,
+              "confidence": 0.3118,
+              "top2_gap": 0.069,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9869,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9891,
+              "confidence": 0.3024,
+              "top2_gap": 0.0669,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9899,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.9418,
+              "confidence": 0.2924,
+              "top2_gap": 0.0344,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9977,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9315,
+              "confidence": 0.293,
+              "top2_gap": 0.0344,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0035,
+                "norm_change_pct": 0.02
+              }
+            },
+            "1.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8656,
+              "confidence": 0.3185,
+              "top2_gap": 0.0704,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0089,
+                "norm_change_pct": 0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8311,
+              "confidence": 0.3128,
+              "top2_gap": 0.0692,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9221,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9071,
+              "confidence": 0.295,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.924,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8426,
+              "confidence": 0.3205,
+              "top2_gap": 0.0709,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9232,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9361,
+              "confidence": 0.2926,
+              "top2_gap": 0.0344,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9221,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.75": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9136,
+              "confidence": 0.295,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9181,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9108,
+              "confidence": 0.295,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9078,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9249,
+              "confidence": 0.2942,
+              "top2_gap": 0.0346,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9356,
+                "norm_change_pct": 0.01
+              }
+            }
+          }
+        },
+        "property_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8363,
+              "confidence": 0.3126,
+              "top2_gap": 0.0692
+            },
+            "0.2": {
+              "level": 1.0033,
+              "delta": 0.0005,
+              "top": "edible",
+              "full_entropy": 3.9795,
+              "confidence": 0.3038,
+              "top2_gap": 0.0672
+            },
+            "0.3": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8827,
+              "confidence": 0.3165,
+              "top2_gap": 0.07
+            },
+            "0.5": {
+              "level": 1.0036,
+              "delta": 0.0008,
+              "top": "edible",
+              "full_entropy": 3.8824,
+              "confidence": 0.2963,
+              "top2_gap": 0.0348
+            },
+            "0.75": {
+              "level": 1.0042,
+              "delta": 0.0014,
+              "top": "edible",
+              "full_entropy": 3.9339,
+              "confidence": 0.2913,
+              "top2_gap": 0.0342
+            },
+            "1.0": {
+              "level": 1.0045,
+              "delta": 0.0017,
+              "top": "edible",
+              "full_entropy": 4.0382,
+              "confidence": 0.305,
+              "top2_gap": 0.0675
+            },
+            "1.5": {
+              "level": 1.0065,
+              "delta": 0.0037,
+              "top": "edible",
+              "full_entropy": 4.2357,
+              "confidence": 0.3577,
+              "top2_gap": 0.1663
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8987,
+              "confidence": 0.2955,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8194,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.808,
+              "confidence": 0.3005,
+              "top2_gap": 0.0353,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8184,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8474,
+              "confidence": 0.3193,
+              "top2_gap": 0.0706,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8216,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8808,
+              "confidence": 0.289,
+              "top2_gap": 0.034,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8255,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.75": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8329,
+              "confidence": 0.321,
+              "top2_gap": 0.071,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8293,
+                "norm_change_pct": 0.02
+              }
+            },
+            "1.0": {
+              "level": 1.0027,
+              "delta": -0.0001,
+              "top": "edible",
+              "full_entropy": 3.8904,
+              "confidence": 0.2957,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8289,
+                "norm_change_pct": 0.02
+              }
+            },
+            "1.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8829,
+              "confidence": 0.3309,
+              "top2_gap": 0.1035,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8471,
+                "norm_change_pct": 0.06
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8413,
+              "confidence": 0.3121,
+              "top2_gap": 0.069,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9917,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0029,
+              "delta": 0.0001,
+              "top": "edible",
+              "full_entropy": 3.8632,
+              "confidence": 0.3184,
+              "top2_gap": 0.0704,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9913,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9009,
+              "confidence": 0.2872,
+              "top2_gap": 0.0337,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9949,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.921,
+              "confidence": 0.2936,
+              "top2_gap": 0.0345,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9946,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.75": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9004,
+              "confidence": 0.2956,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0079,
+                "norm_change_pct": 0.03
+              }
+            },
+            "1.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9023,
+              "confidence": 0.2952,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0232,
+                "norm_change_pct": 0.06
+              }
+            },
+            "1.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8526,
+              "confidence": 0.3193,
+              "top2_gap": 0.0706,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0427,
+                "norm_change_pct": 0.09
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.8248,
+              "confidence": 0.313,
+              "top2_gap": 0.0692
+            },
+            "0.1": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9151,
+              "confidence": 0.2936,
+              "top2_gap": 0.0345,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9224,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9009,
+              "confidence": 0.2954,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9235,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9047,
+              "confidence": 0.2952,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.921,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 1.0027,
+              "delta": -0.0001,
+              "top": "edible",
+              "full_entropy": 3.9039,
+              "confidence": 0.2953,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9275,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.75": {
+              "level": 1.0031,
+              "delta": 0.0003,
+              "top": "edible",
+              "full_entropy": 3.8652,
+              "confidence": 0.2983,
+              "top2_gap": 0.035,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9297,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.0": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.897,
+              "confidence": 0.2949,
+              "top2_gap": 0.0347,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9304,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.5": {
+              "level": 1.0028,
+              "delta": 0.0,
+              "top": "edible",
+              "full_entropy": 3.9012,
+              "confidence": 0.2958,
+              "top2_gap": 0.0348,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9461,
+                "norm_change_pct": 0.01
+              }
+            }
+          }
+        }
+      }
+    },
+    "dog": {
+      "category": "animal",
+      "opposing": "fruit",
+      "baselines": {
+        "category": {
+          "level": 2.0003,
+          "entropy": 0.0022,
+          "top": "animal",
+          "probs": {
+            "fruit": 0.0,
+            "animal": 0.9999,
+            "tool": 0.0,
+            "vehicle": 0.0,
+            "place": 0.0
+          },
+          "full_entropy": 2.1549,
+          "confidence": 0.7332,
+          "top2_gap": 0.6339
+        },
+        "property": {
+          "level": 2.3679,
+          "entropy": 1.2038,
+          "top": "alive",
+          "probs": {
+            "edible": 0.0737,
+            "alive": 0.699,
+            "sharp": 0.0136,
+            "fast": 0.2132,
+            "vast": 0.0005
+          },
+          "full_entropy": 1.9444,
+          "confidence": 0.7239,
+          "top2_gap": 0.5814
+        }
+      },
+      "perturbations": {
+        "category_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2958,
+              "confidence": 0.7125,
+              "top2_gap": 0.6032
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2767,
+              "confidence": 0.7139,
+              "top2_gap": 0.6044
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2629,
+              "confidence": 0.7127,
+              "top2_gap": 0.6034
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.3136,
+              "confidence": 0.7026,
+              "top2_gap": 0.5948
+            },
+            "0.75": {
+              "level": 2.0035,
+              "delta": 0.0032,
+              "top": "animal",
+              "full_entropy": 7.1288,
+              "confidence": 0.3748,
+              "top2_gap": 0.3173
+            },
+            "1.0": {
+              "level": 2.0093,
+              "delta": 0.009,
+              "top": "animal",
+              "full_entropy": 10.7774,
+              "confidence": 0.0737,
+              "top2_gap": 0.0449
+            },
+            "1.5": {
+              "level": 2.1389,
+              "delta": 0.1386,
+              "top": "animal",
+              "full_entropy": 12.1644,
+              "confidence": 0.0178,
+              "top2_gap": 0.0021
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0002,
+              "delta": -0.0001,
+              "top": "animal",
+              "full_entropy": 2.1321,
+              "confidence": 0.7367,
+              "top2_gap": 0.637,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6765,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1048,
+              "confidence": 0.7398,
+              "top2_gap": 0.6397,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6698,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.0763,
+              "confidence": 0.7505,
+              "top2_gap": 0.6608,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6667,
+                "norm_change_pct": -0.03
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1384,
+              "confidence": 0.7365,
+              "top2_gap": 0.6369,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6503,
+                "norm_change_pct": -0.06
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1159,
+              "confidence": 0.7385,
+              "top2_gap": 0.6386,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6277,
+                "norm_change_pct": -0.11
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1542,
+              "confidence": 0.7352,
+              "top2_gap": 0.6357,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6205,
+                "norm_change_pct": -0.13
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1371,
+              "confidence": 0.7368,
+              "top2_gap": 0.6371,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.5914,
+                "norm_change_pct": -0.19
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1286,
+              "confidence": 0.7375,
+              "top2_gap": 0.6376,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7472,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1287,
+              "confidence": 0.7373,
+              "top2_gap": 0.6375,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7429,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1681,
+              "confidence": 0.7316,
+              "top2_gap": 0.6326,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7398,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.145,
+              "confidence": 0.7359,
+              "top2_gap": 0.6363,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7306,
+                "norm_change_pct": -0.03
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1217,
+              "confidence": 0.7377,
+              "top2_gap": 0.6379,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7012,
+                "norm_change_pct": -0.08
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1744,
+              "confidence": 0.7315,
+              "top2_gap": 0.6325,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.6841,
+                "norm_change_pct": -0.1
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1521,
+              "confidence": 0.7334,
+              "top2_gap": 0.6341,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.6689,
+                "norm_change_pct": -0.13
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1343,
+              "confidence": 0.7368,
+              "top2_gap": 0.6371,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0238,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1475,
+              "confidence": 0.7349,
+              "top2_gap": 0.6355,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0197,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1373,
+              "confidence": 0.7366,
+              "top2_gap": 0.6369,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0172,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1282,
+              "confidence": 0.7374,
+              "top2_gap": 0.6376,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0017,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1323,
+              "confidence": 0.737,
+              "top2_gap": 0.6373,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 171.9827,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1461,
+              "confidence": 0.7359,
+              "top2_gap": 0.6363,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 171.9655,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1396,
+              "confidence": 0.7364,
+              "top2_gap": 0.6368,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 171.9404,
+                "norm_change_pct": -0.05
+              }
+            }
+          }
+        },
+        "category_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1345,
+              "confidence": 0.7367,
+              "top2_gap": 0.637
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2909,
+              "confidence": 0.7131,
+              "top2_gap": 0.6038
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1979,
+              "confidence": 0.7289,
+              "top2_gap": 0.6303
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.3411,
+              "confidence": 0.7058,
+              "top2_gap": 0.5975
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.4001,
+              "confidence": 0.6896,
+              "top2_gap": 0.5698
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.4877,
+              "confidence": 0.6647,
+              "top2_gap": 0.5338
+            },
+            "1.5": {
+              "level": 2.0035,
+              "delta": 0.0032,
+              "top": "animal",
+              "full_entropy": 3.4121,
+              "confidence": 0.4706,
+              "top2_gap": 0.1852
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0002,
+              "delta": -0.0001,
+              "top": "animal",
+              "full_entropy": 2.1462,
+              "confidence": 0.734,
+              "top2_gap": 0.6347,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6778,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2229,
+              "confidence": 0.7281,
+              "top2_gap": 0.6295,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6741,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1406,
+              "confidence": 0.7361,
+              "top2_gap": 0.6365,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6744,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2728,
+              "confidence": 0.7144,
+              "top2_gap": 0.6048,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6725,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1574,
+              "confidence": 0.7334,
+              "top2_gap": 0.6342,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6698,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1401,
+              "confidence": 0.7364,
+              "top2_gap": 0.6367,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6699,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.2823,
+              "confidence": 0.7136,
+              "top2_gap": 0.6042,
+              "residual_metrics": {
+                "pre_obj_norm": 45.6791,
+                "post_obj_norm": 45.6778,
+                "norm_change_pct": -0.0
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1222,
+              "confidence": 0.7378,
+              "top2_gap": 0.6379,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7496,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1343,
+              "confidence": 0.7368,
+              "top2_gap": 0.637,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7497,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1257,
+              "confidence": 0.7376,
+              "top2_gap": 0.6377,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7496,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1548,
+              "confidence": 0.7331,
+              "top2_gap": 0.6339,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7479,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1208,
+              "confidence": 0.7377,
+              "top2_gap": 0.6379,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7451,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1348,
+              "confidence": 0.7367,
+              "top2_gap": 0.637,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7522,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1527,
+              "confidence": 0.7349,
+              "top2_gap": 0.6355,
+              "residual_metrics": {
+                "pre_obj_norm": 64.7504,
+                "post_obj_norm": 64.7695,
+                "norm_change_pct": 0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1549,
+              "confidence": 0.7332,
+              "top2_gap": 0.6339
+            },
+            "0.1": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1368,
+              "confidence": 0.7366,
+              "top2_gap": 0.6369,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0248,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1396,
+              "confidence": 0.7364,
+              "top2_gap": 0.6367,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0248,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1647,
+              "confidence": 0.7344,
+              "top2_gap": 0.635,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0229,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1284,
+              "confidence": 0.7374,
+              "top2_gap": 0.6376,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0252,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.75": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1418,
+              "confidence": 0.7362,
+              "top2_gap": 0.6366,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0183,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.1413,
+              "confidence": 0.7363,
+              "top2_gap": 0.6366,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0118,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.5": {
+              "level": 2.0003,
+              "delta": 0.0,
+              "top": "animal",
+              "full_entropy": 2.134,
+              "confidence": 0.7369,
+              "top2_gap": 0.6371,
+              "residual_metrics": {
+                "pre_obj_norm": 172.0245,
+                "post_obj_norm": 172.0095,
+                "norm_change_pct": -0.01
+              }
+            }
+          }
+        },
+        "property_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.4138,
+              "delta": 0.0459,
+              "top": "alive",
+              "full_entropy": 1.9527,
+              "confidence": 0.7116,
+              "top2_gap": 0.5528
+            },
+            "0.2": {
+              "level": 2.4196,
+              "delta": 0.0517,
+              "top": "alive",
+              "full_entropy": 1.9377,
+              "confidence": 0.7251,
+              "top2_gap": 0.5823
+            },
+            "0.3": {
+              "level": 2.4132,
+              "delta": 0.0453,
+              "top": "alive",
+              "full_entropy": 1.9361,
+              "confidence": 0.7241,
+              "top2_gap": 0.5816
+            },
+            "0.5": {
+              "level": 2.4685,
+              "delta": 0.1006,
+              "top": "alive",
+              "full_entropy": 1.9231,
+              "confidence": 0.7262,
+              "top2_gap": 0.5832
+            },
+            "0.75": {
+              "level": 2.5138,
+              "delta": 0.1459,
+              "top": "alive",
+              "full_entropy": 2.0425,
+              "confidence": 0.7011,
+              "top2_gap": 0.5446
+            },
+            "1.0": {
+              "level": 2.631,
+              "delta": 0.2631,
+              "top": "alive",
+              "full_entropy": 2.1767,
+              "confidence": 0.6863,
+              "top2_gap": 0.5332
+            },
+            "1.5": {
+              "level": 2.9347,
+              "delta": 0.5668,
+              "top": "fast",
+              "full_entropy": 2.6464,
+              "confidence": 0.6325,
+              "top2_gap": 0.4913
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.4138,
+              "delta": 0.0459,
+              "top": "alive",
+              "full_entropy": 2.0094,
+              "confidence": 0.7062,
+              "top2_gap": 0.5486,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8214,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.9754,
+              "confidence": 0.7098,
+              "top2_gap": 0.5514,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8224,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.3839,
+              "delta": 0.016,
+              "top": "alive",
+              "full_entropy": 1.9737,
+              "confidence": 0.7087,
+              "top2_gap": 0.5506,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8245,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.5": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.9282,
+              "confidence": 0.7268,
+              "top2_gap": 0.5837,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8187,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 2.3737,
+              "delta": 0.0058,
+              "top": "alive",
+              "full_entropy": 1.9487,
+              "confidence": 0.7113,
+              "top2_gap": 0.5526,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8329,
+                "norm_change_pct": 0.03
+              }
+            },
+            "1.0": {
+              "level": 2.3903,
+              "delta": 0.0224,
+              "top": "alive",
+              "full_entropy": 1.9178,
+              "confidence": 0.7274,
+              "top2_gap": 0.5842,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8269,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.5": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.9651,
+              "confidence": 0.7094,
+              "top2_gap": 0.5511,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8449,
+                "norm_change_pct": 0.05
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3897,
+              "delta": 0.0218,
+              "top": "alive",
+              "full_entropy": 1.8602,
+              "confidence": 0.7324,
+              "top2_gap": 0.5882,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.992,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.3839,
+              "delta": 0.016,
+              "top": "alive",
+              "full_entropy": 1.8171,
+              "confidence": 0.7478,
+              "top2_gap": 0.6178,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9929,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.9702,
+              "confidence": 0.7211,
+              "top2_gap": 0.5791,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9983,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9678,
+              "confidence": 0.7096,
+              "top2_gap": 0.5512,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9985,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.75": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.8334,
+              "confidence": 0.7465,
+              "top2_gap": 0.6168,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9961,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.0": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.8292,
+              "confidence": 0.7467,
+              "top2_gap": 0.6169,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9984,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.5": {
+              "level": 2.3676,
+              "delta": -0.0003,
+              "top": "alive",
+              "full_entropy": 1.8559,
+              "confidence": 0.7327,
+              "top2_gap": 0.5884,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0158,
+                "norm_change_pct": 0.04
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9809,
+              "confidence": 0.7081,
+              "top2_gap": 0.5501,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9219,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.3678,
+              "delta": -0.0001,
+              "top": "alive",
+              "full_entropy": 1.9335,
+              "confidence": 0.7249,
+              "top2_gap": 0.5822,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9202,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9482,
+              "confidence": 0.7235,
+              "top2_gap": 0.581,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9213,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9728,
+              "confidence": 0.7087,
+              "top2_gap": 0.5506,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9229,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.75": {
+              "level": 2.3897,
+              "delta": 0.0218,
+              "top": "alive",
+              "full_entropy": 1.853,
+              "confidence": 0.733,
+              "top2_gap": 0.5886,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9282,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.85,
+              "confidence": 0.7334,
+              "top2_gap": 0.589,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.941,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.5": {
+              "level": 2.374,
+              "delta": 0.0061,
+              "top": "alive",
+              "full_entropy": 1.9466,
+              "confidence": 0.7237,
+              "top2_gap": 0.5812,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9201,
+                "norm_change_pct": -0.0
+              }
+            }
+          }
+        },
+        "property_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3961,
+              "delta": 0.0282,
+              "top": "alive",
+              "full_entropy": 1.839,
+              "confidence": 0.7343,
+              "top2_gap": 0.5897
+            },
+            "0.2": {
+              "level": 2.4312,
+              "delta": 0.0633,
+              "top": "alive",
+              "full_entropy": 1.9467,
+              "confidence": 0.7124,
+              "top2_gap": 0.5534
+            },
+            "0.3": {
+              "level": 2.4138,
+              "delta": 0.0459,
+              "top": "alive",
+              "full_entropy": 1.9208,
+              "confidence": 0.7272,
+              "top2_gap": 0.584
+            },
+            "0.5": {
+              "level": 2.4374,
+              "delta": 0.0695,
+              "top": "alive",
+              "full_entropy": 1.9654,
+              "confidence": 0.7105,
+              "top2_gap": 0.552
+            },
+            "0.75": {
+              "level": 2.4619,
+              "delta": 0.094,
+              "top": "alive",
+              "full_entropy": 1.8674,
+              "confidence": 0.7311,
+              "top2_gap": 0.5871
+            },
+            "1.0": {
+              "level": 2.5074,
+              "delta": 0.1395,
+              "top": "alive",
+              "full_entropy": 1.8705,
+              "confidence": 0.7308,
+              "top2_gap": 0.5869
+            },
+            "1.5": {
+              "level": 2.6936,
+              "delta": 0.3257,
+              "top": "alive",
+              "full_entropy": 2.0854,
+              "confidence": 0.7172,
+              "top2_gap": 0.5926
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3901,
+              "delta": 0.0222,
+              "top": "alive",
+              "full_entropy": 1.922,
+              "confidence": 0.727,
+              "top2_gap": 0.5838,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8165,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.2": {
+              "level": 2.3731,
+              "delta": 0.0052,
+              "top": "alive",
+              "full_entropy": 1.9727,
+              "confidence": 0.7089,
+              "top2_gap": 0.5507,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8143,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 2.3897,
+              "delta": 0.0218,
+              "top": "alive",
+              "full_entropy": 1.8473,
+              "confidence": 0.7336,
+              "top2_gap": 0.5892,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8066,
+                "norm_change_pct": -0.03
+              }
+            },
+            "0.5": {
+              "level": 2.3958,
+              "delta": 0.0279,
+              "top": "alive",
+              "full_entropy": 1.8968,
+              "confidence": 0.7296,
+              "top2_gap": 0.586,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8132,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.75": {
+              "level": 2.39,
+              "delta": 0.0221,
+              "top": "alive",
+              "full_entropy": 1.9677,
+              "confidence": 0.7094,
+              "top2_gap": 0.5511,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8079,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.0": {
+              "level": 2.3897,
+              "delta": 0.0218,
+              "top": "alive",
+              "full_entropy": 1.9701,
+              "confidence": 0.7091,
+              "top2_gap": 0.5509,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7894,
+                "norm_change_pct": -0.07
+              }
+            },
+            "1.5": {
+              "level": 2.3676,
+              "delta": -0.0003,
+              "top": "alive",
+              "full_entropy": 1.8434,
+              "confidence": 0.7339,
+              "top2_gap": 0.5894,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7997,
+                "norm_change_pct": -0.05
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3676,
+              "delta": -0.0003,
+              "top": "alive",
+              "full_entropy": 1.9375,
+              "confidence": 0.7245,
+              "top2_gap": 0.5818,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9902,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.3678,
+              "delta": -0.0001,
+              "top": "alive",
+              "full_entropy": 1.9525,
+              "confidence": 0.7231,
+              "top2_gap": 0.5808,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9891,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9526,
+              "confidence": 0.7231,
+              "top2_gap": 0.5807,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9877,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.8381,
+              "confidence": 0.7455,
+              "top2_gap": 0.616,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9876,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.75": {
+              "level": 2.3839,
+              "delta": 0.016,
+              "top": "alive",
+              "full_entropy": 1.9572,
+              "confidence": 0.7225,
+              "top2_gap": 0.5802,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9742,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9619,
+              "confidence": 0.7219,
+              "top2_gap": 0.5797,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9917,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9753,
+              "confidence": 0.7085,
+              "top2_gap": 0.5504,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0061,
+                "norm_change_pct": 0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9444,
+              "confidence": 0.7239,
+              "top2_gap": 0.5814
+            },
+            "0.1": {
+              "level": 2.3678,
+              "delta": -0.0001,
+              "top": "alive",
+              "full_entropy": 1.8296,
+              "confidence": 0.7462,
+              "top2_gap": 0.6165,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.921,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9478,
+              "confidence": 0.7237,
+              "top2_gap": 0.5812,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9203,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9414,
+              "confidence": 0.7243,
+              "top2_gap": 0.5817,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9181,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.8299,
+              "confidence": 0.7461,
+              "top2_gap": 0.6165,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9111,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.75": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9426,
+              "confidence": 0.724,
+              "top2_gap": 0.5814,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9042,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.0": {
+              "level": 2.3903,
+              "delta": 0.0224,
+              "top": "alive",
+              "full_entropy": 1.8329,
+              "confidence": 0.7459,
+              "top2_gap": 0.6163,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9046,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.5": {
+              "level": 2.3679,
+              "delta": 0.0,
+              "top": "alive",
+              "full_entropy": 1.9366,
+              "confidence": 0.7248,
+              "top2_gap": 0.582,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.894,
+                "norm_change_pct": -0.01
+              }
+            }
+          }
+        }
+      }
+    },
+    "knife": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "baselines": {
+        "category": {
+          "level": 2.9958,
+          "entropy": 0.0489,
+          "top": "tool",
+          "probs": {
+            "fruit": 0.001,
+            "animal": 0.003,
+            "tool": 0.9954,
+            "vehicle": 0.0004,
+            "place": 0.0002
+          },
+          "full_entropy": 5.9496,
+          "confidence": 0.2272,
+          "top2_gap": 0.0503
+        },
+        "property": {
+          "level": 3.0027,
+          "entropy": 0.0345,
+          "top": "sharp",
+          "probs": {
+            "edible": 0.0002,
+            "alive": 0.0001,
+            "sharp": 0.9966,
+            "fast": 0.0032,
+            "vast": 0.0
+          },
+          "full_entropy": 3.7144,
+          "confidence": 0.491,
+          "top2_gap": 0.3668
+        }
+      },
+      "perturbations": {
+        "category_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8468,
+              "confidence": 0.2335,
+              "top2_gap": 0.0516
+            },
+            "0.2": {
+              "level": 2.9961,
+              "delta": 0.0003,
+              "top": "tool",
+              "full_entropy": 5.8846,
+              "confidence": 0.2238,
+              "top2_gap": 0.0495
+            },
+            "0.3": {
+              "level": 2.9965,
+              "delta": 0.0007,
+              "top": "tool",
+              "full_entropy": 5.8395,
+              "confidence": 0.2074,
+              "top2_gap": 0.0244
+            },
+            "0.5": {
+              "level": 2.9969,
+              "delta": 0.0011,
+              "top": "tool",
+              "full_entropy": 5.6951,
+              "confidence": 0.1728,
+              "top2_gap": 0.0203
+            },
+            "0.75": {
+              "level": 3.3872,
+              "delta": 0.3914,
+              "top": "tool",
+              "full_entropy": 4.9922,
+              "confidence": 0.4132,
+              "top2_gap": 0.3087
+            },
+            "1.0": {
+              "level": 3.9985,
+              "delta": 1.0027,
+              "top": "vehicle",
+              "full_entropy": 2.5508,
+              "confidence": 0.6952,
+              "top2_gap": 0.6381
+            },
+            "1.5": {
+              "level": 3.9979,
+              "delta": 1.0021,
+              "top": "vehicle",
+              "full_entropy": 2.6245,
+              "confidence": 0.7159,
+              "top2_gap": 0.6701
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.996,
+              "delta": 0.0002,
+              "top": "tool",
+              "full_entropy": 5.9189,
+              "confidence": 0.2307,
+              "top2_gap": 0.051,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9388,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.2": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9195,
+              "confidence": 0.2294,
+              "top2_gap": 0.0507,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9365,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 2.9961,
+              "delta": 0.0003,
+              "top": "tool",
+              "full_entropy": 5.8094,
+              "confidence": 0.2394,
+              "top2_gap": 0.0529,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9336,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.7657,
+              "confidence": 0.2415,
+              "top2_gap": 0.0534,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9295,
+                "norm_change_pct": -0.03
+              }
+            },
+            "0.75": {
+              "level": 2.9955,
+              "delta": -0.0003,
+              "top": "tool",
+              "full_entropy": 5.8476,
+              "confidence": 0.2471,
+              "top2_gap": 0.0773,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9284,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.0": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9614,
+              "confidence": 0.2259,
+              "top2_gap": 0.05,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9317,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.5": {
+              "level": 2.9961,
+              "delta": 0.0003,
+              "top": "tool",
+              "full_entropy": 5.7725,
+              "confidence": 0.2415,
+              "top2_gap": 0.0534,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9289,
+                "norm_change_pct": -0.03
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9424,
+              "confidence": 0.2282,
+              "top2_gap": 0.0505,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3401,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9535,
+              "confidence": 0.2281,
+              "top2_gap": 0.0505,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3384,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 2.996,
+              "delta": 0.0002,
+              "top": "tool",
+              "full_entropy": 5.8202,
+              "confidence": 0.239,
+              "top2_gap": 0.0529,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3297,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.7565,
+              "confidence": 0.2422,
+              "top2_gap": 0.0536,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3269,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.75": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.8378,
+              "confidence": 0.2476,
+              "top2_gap": 0.0774,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3213,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.0": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.948,
+              "confidence": 0.2271,
+              "top2_gap": 0.0502,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3303,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.5": {
+              "level": 2.9964,
+              "delta": 0.0006,
+              "top": "tool",
+              "full_entropy": 5.8485,
+              "confidence": 0.2242,
+              "top2_gap": 0.0263,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3235,
+                "norm_change_pct": -0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9436,
+              "confidence": 0.2291,
+              "top2_gap": 0.0507,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7928,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9535,
+              "confidence": 0.2269,
+              "top2_gap": 0.0502,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7941,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.959,
+              "confidence": 0.2262,
+              "top2_gap": 0.05,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7933,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8136,
+              "confidence": 0.2394,
+              "top2_gap": 0.053,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7929,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8076,
+              "confidence": 0.2413,
+              "top2_gap": 0.0534,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7918,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 2.9956,
+              "delta": -0.0002,
+              "top": "tool",
+              "full_entropy": 5.9456,
+              "confidence": 0.2289,
+              "top2_gap": 0.0506,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7971,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.5": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9593,
+              "confidence": 0.2281,
+              "top2_gap": 0.0505,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7971,
+                "norm_change_pct": 0.0
+              }
+            }
+          }
+        },
+        "category_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9959,
+              "delta": 0.0001,
+              "top": "tool",
+              "full_entropy": 5.8257,
+              "confidence": 0.2507,
+              "top2_gap": 0.0784
+            },
+            "0.2": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.7763,
+              "confidence": 0.2417,
+              "top2_gap": 0.0535
+            },
+            "0.3": {
+              "level": 2.9967,
+              "delta": 0.0009,
+              "top": "tool",
+              "full_entropy": 5.7001,
+              "confidence": 0.248,
+              "top2_gap": 0.0548
+            },
+            "0.5": {
+              "level": 2.9973,
+              "delta": 0.0015,
+              "top": "tool",
+              "full_entropy": 5.681,
+              "confidence": 0.224,
+              "top2_gap": 0.0
+            },
+            "0.75": {
+              "level": 2.9979,
+              "delta": 0.0021,
+              "top": "tool",
+              "full_entropy": 5.5591,
+              "confidence": 0.2682,
+              "top2_gap": 0.0839
+            },
+            "1.0": {
+              "level": 2.9981,
+              "delta": 0.0023,
+              "top": "tool",
+              "full_entropy": 5.2047,
+              "confidence": 0.2725,
+              "top2_gap": 0.1072
+            },
+            "1.5": {
+              "level": 2.8165,
+              "delta": -0.1793,
+              "top": "tool",
+              "full_entropy": 7.1125,
+              "confidence": 0.3301,
+              "top2_gap": 0.2826
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.9114,
+              "confidence": 0.2176,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9428,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9235,
+              "confidence": 0.2307,
+              "top2_gap": 0.051,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.944,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8752,
+              "confidence": 0.2176,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9466,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8415,
+              "confidence": 0.2232,
+              "top2_gap": 0.0262,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9563,
+                "norm_change_pct": 0.03
+              }
+            },
+            "0.75": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8663,
+              "confidence": 0.2181,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.9795,
+                "norm_change_pct": 0.09
+              }
+            },
+            "1.0": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8846,
+              "confidence": 0.2178,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 43.983,
+                "norm_change_pct": 0.09
+              }
+            },
+            "1.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8527,
+              "confidence": 0.2178,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 43.9421,
+                "post_obj_norm": 44.0077,
+                "norm_change_pct": 0.15
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9745,
+              "confidence": 0.2257,
+              "top2_gap": 0.0499,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3426,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9629,
+              "confidence": 0.2279,
+              "top2_gap": 0.0504,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.344,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.9081,
+              "confidence": 0.2176,
+              "top2_gap": 0.0256,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3438,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 2.9959,
+              "delta": 0.0001,
+              "top": "tool",
+              "full_entropy": 5.8072,
+              "confidence": 0.2381,
+              "top2_gap": 0.0527,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3576,
+                "norm_change_pct": 0.02
+              }
+            },
+            "0.75": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9222,
+              "confidence": 0.2284,
+              "top2_gap": 0.0505,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3578,
+                "norm_change_pct": 0.02
+              }
+            },
+            "1.0": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.9015,
+              "confidence": 0.2196,
+              "top2_gap": 0.0258,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3589,
+                "norm_change_pct": 0.03
+              }
+            },
+            "1.5": {
+              "level": 2.9961,
+              "delta": 0.0003,
+              "top": "tool",
+              "full_entropy": 5.7872,
+              "confidence": 0.2409,
+              "top2_gap": 0.0533,
+              "residual_metrics": {
+                "pre_obj_norm": 65.3419,
+                "post_obj_norm": 65.3936,
+                "norm_change_pct": 0.08
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 2.9958,
+              "delta": 0.0,
+              "top": "tool",
+              "full_entropy": 5.9496,
+              "confidence": 0.2272,
+              "top2_gap": 0.0503
+            },
+            "0.1": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9697,
+              "confidence": 0.2274,
+              "top2_gap": 0.0503,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7938,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.972,
+              "confidence": 0.2273,
+              "top2_gap": 0.0503,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7933,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.9373,
+              "confidence": 0.2293,
+              "top2_gap": 0.0507,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.7951,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.9023,
+              "confidence": 0.2198,
+              "top2_gap": 0.0258,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.8065,
+                "norm_change_pct": 0.01
+              }
+            },
+            "0.75": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8184,
+              "confidence": 0.2404,
+              "top2_gap": 0.0532,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.8108,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.0": {
+              "level": 2.9957,
+              "delta": -0.0001,
+              "top": "tool",
+              "full_entropy": 5.962,
+              "confidence": 0.2265,
+              "top2_gap": 0.0501,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.8252,
+                "norm_change_pct": 0.02
+              }
+            },
+            "1.5": {
+              "level": 2.9962,
+              "delta": 0.0004,
+              "top": "tool",
+              "full_entropy": 5.8148,
+              "confidence": 0.2396,
+              "top2_gap": 0.053,
+              "residual_metrics": {
+                "pre_obj_norm": 198.7933,
+                "post_obj_norm": 198.846,
+                "norm_change_pct": 0.03
+              }
+            }
+          }
+        },
+        "property_remove_category": {
+          "embed": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6787,
+              "confidence": 0.501,
+              "top2_gap": 0.3744
+            },
+            "0.2": {
+              "level": 3.0033,
+              "delta": 0.0006,
+              "top": "sharp",
+              "full_entropy": 3.6952,
+              "confidence": 0.4989,
+              "top2_gap": 0.3728
+            },
+            "0.3": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7135,
+              "confidence": 0.4814,
+              "top2_gap": 0.3435
+            },
+            "0.5": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.7061,
+              "confidence": 0.497,
+              "top2_gap": 0.3713
+            },
+            "0.75": {
+              "level": 3.0033,
+              "delta": 0.0006,
+              "top": "sharp",
+              "full_entropy": 3.7451,
+              "confidence": 0.4845,
+              "top2_gap": 0.3457
+            },
+            "1.0": {
+              "level": 3.0035,
+              "delta": 0.0008,
+              "top": "sharp",
+              "full_entropy": 3.7823,
+              "confidence": 0.4927,
+              "top2_gap": 0.3682
+            },
+            "1.5": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 4.0242,
+              "confidence": 0.4522,
+              "top2_gap": 0.3226
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 3.6795,
+              "confidence": 0.501,
+              "top2_gap": 0.3743,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8206,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6753,
+              "confidence": 0.4952,
+              "top2_gap": 0.37,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8139,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 3.6709,
+              "confidence": 0.5017,
+              "top2_gap": 0.3749,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8142,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6916,
+              "confidence": 0.499,
+              "top2_gap": 0.3728,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8084,
+                "norm_change_pct": -0.03
+              }
+            },
+            "0.75": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.7191,
+              "confidence": 0.4964,
+              "top2_gap": 0.3709,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8106,
+                "norm_change_pct": -0.02
+              }
+            },
+            "1.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7394,
+              "confidence": 0.4791,
+              "top2_gap": 0.3419,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8153,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.5": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 3.7022,
+              "confidence": 0.4988,
+              "top2_gap": 0.3727,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8181,
+                "norm_change_pct": -0.01
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6887,
+              "confidence": 0.5003,
+              "top2_gap": 0.3738,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9911,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7204,
+              "confidence": 0.49,
+              "top2_gap": 0.3661,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9915,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.6924,
+              "confidence": 0.493,
+              "top2_gap": 0.3684,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9911,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.5": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.6892,
+              "confidence": 0.4939,
+              "top2_gap": 0.369,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9912,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6901,
+              "confidence": 0.5002,
+              "top2_gap": 0.3737,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9874,
+                "norm_change_pct": -0.01
+              }
+            },
+            "1.0": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.696,
+              "confidence": 0.4834,
+              "top2_gap": 0.3449,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9975,
+                "norm_change_pct": 0.01
+              }
+            },
+            "1.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6765,
+              "confidence": 0.4954,
+              "top2_gap": 0.3701,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 55.0066,
+                "norm_change_pct": 0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7126,
+              "confidence": 0.4909,
+              "top2_gap": 0.3668,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9222,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7148,
+              "confidence": 0.4911,
+              "top2_gap": 0.3669,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9205,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.3": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7006,
+              "confidence": 0.4925,
+              "top2_gap": 0.368,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9252,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.689,
+              "confidence": 0.4928,
+              "top2_gap": 0.3682,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9177,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6896,
+              "confidence": 0.4938,
+              "top2_gap": 0.3689,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9198,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7243,
+              "confidence": 0.481,
+              "top2_gap": 0.3432,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9302,
+                "norm_change_pct": 0.0
+              }
+            },
+            "1.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6816,
+              "confidence": 0.4945,
+              "top2_gap": 0.3695,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9473,
+                "norm_change_pct": 0.01
+              }
+            }
+          }
+        },
+        "property_add_random": {
+          "embed": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.003,
+              "delta": 0.0003,
+              "top": "sharp",
+              "full_entropy": 3.6962,
+              "confidence": 0.4938,
+              "top2_gap": 0.3689
+            },
+            "0.2": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.8389,
+              "confidence": 0.4711,
+              "top2_gap": 0.3361
+            },
+            "0.3": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 3.7745,
+              "confidence": 0.4858,
+              "top2_gap": 0.363
+            },
+            "0.5": {
+              "level": 3.0032,
+              "delta": 0.0005,
+              "top": "sharp",
+              "full_entropy": 3.7607,
+              "confidence": 0.4878,
+              "top2_gap": 0.3644
+            },
+            "0.75": {
+              "level": 3.0036,
+              "delta": 0.0009,
+              "top": "sharp",
+              "full_entropy": 3.9068,
+              "confidence": 0.4845,
+              "top2_gap": 0.3764
+            },
+            "1.0": {
+              "level": 3.005,
+              "delta": 0.0023,
+              "top": "sharp",
+              "full_entropy": 3.9866,
+              "confidence": 0.4928,
+              "top2_gap": 0.3958
+            },
+            "1.5": {
+              "level": 3.0057,
+              "delta": 0.003,
+              "top": "sharp",
+              "full_entropy": 4.4409,
+              "confidence": 0.4379,
+              "top2_gap": 0.3402
+            }
+          },
+          "L9": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6913,
+              "confidence": 0.5002,
+              "top2_gap": 0.3737,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8187,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0029,
+              "delta": 0.0002,
+              "top": "sharp",
+              "full_entropy": 3.8132,
+              "confidence": 0.473,
+              "top2_gap": 0.3375,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8108,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.3": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7117,
+              "confidence": 0.4913,
+              "top2_gap": 0.3671,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.8042,
+                "norm_change_pct": -0.04
+              }
+            },
+            "0.5": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.6853,
+              "confidence": 0.4946,
+              "top2_gap": 0.3695,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7972,
+                "norm_change_pct": -0.05
+              }
+            },
+            "0.75": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.7224,
+              "confidence": 0.4964,
+              "top2_gap": 0.3709,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7859,
+                "norm_change_pct": -0.08
+              }
+            },
+            "1.0": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6704,
+              "confidence": 0.5016,
+              "top2_gap": 0.3748,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7767,
+                "norm_change_pct": -0.1
+              }
+            },
+            "1.5": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7201,
+              "confidence": 0.4811,
+              "top2_gap": 0.3433,
+              "residual_metrics": {
+                "pre_obj_norm": 45.8204,
+                "post_obj_norm": 45.7664,
+                "norm_change_pct": -0.12
+              }
+            }
+          },
+          "L18": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6652,
+              "confidence": 0.5026,
+              "top2_gap": 0.3756,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9919,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6849,
+              "confidence": 0.4991,
+              "top2_gap": 0.3729,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9867,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.3": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6954,
+              "confidence": 0.483,
+              "top2_gap": 0.3446,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9836,
+                "norm_change_pct": -0.01
+              }
+            },
+            "0.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6943,
+              "confidence": 0.4927,
+              "top2_gap": 0.3681,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9831,
+                "norm_change_pct": -0.02
+              }
+            },
+            "0.75": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6987,
+              "confidence": 0.4982,
+              "top2_gap": 0.3722,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9758,
+                "norm_change_pct": -0.03
+              }
+            },
+            "1.0": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6771,
+              "confidence": 0.5007,
+              "top2_gap": 0.3741,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.9688,
+                "norm_change_pct": -0.04
+              }
+            },
+            "1.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6722,
+              "confidence": 0.4949,
+              "top2_gap": 0.3697,
+              "residual_metrics": {
+                "pre_obj_norm": 54.9918,
+                "post_obj_norm": 54.973,
+                "norm_change_pct": -0.03
+              }
+            }
+          },
+          "L27": {
+            "0.0": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7144,
+              "confidence": 0.491,
+              "top2_gap": 0.3668
+            },
+            "0.1": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.6867,
+              "confidence": 0.4939,
+              "top2_gap": 0.369,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9218,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.2": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7187,
+              "confidence": 0.4904,
+              "top2_gap": 0.3664,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9225,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.3": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7097,
+              "confidence": 0.4919,
+              "top2_gap": 0.3675,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9221,
+                "norm_change_pct": 0.0
+              }
+            },
+            "0.5": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7005,
+              "confidence": 0.4922,
+              "top2_gap": 0.3677,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9126,
+                "norm_change_pct": -0.0
+              }
+            },
+            "0.75": {
+              "level": 3.0027,
+              "delta": 0.0,
+              "top": "sharp",
+              "full_entropy": 3.7208,
+              "confidence": 0.4903,
+              "top2_gap": 0.3664,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.919,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.0": {
+              "level": 3.0028,
+              "delta": 0.0001,
+              "top": "sharp",
+              "full_entropy": 3.7094,
+              "confidence": 0.4918,
+              "top2_gap": 0.3675,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.922,
+                "norm_change_pct": -0.0
+              }
+            },
+            "1.5": {
+              "level": 3.0031,
+              "delta": 0.0004,
+              "top": "sharp",
+              "full_entropy": 3.6898,
+              "confidence": 0.4996,
+              "top2_gap": 0.3733,
+              "residual_metrics": {
+                "pre_obj_norm": 206.922,
+                "post_obj_norm": 206.9117,
+                "norm_change_pct": -0.0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
