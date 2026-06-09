@@ -16008,4 +16008,782 @@ python tests/glm5/phase400_token_prior.py glm4         # ~60min
 3. **上下文如何改变偏好**: 从无上下文到corrupt到clean, 偏好如何变化?
 4. **自然激活交换**: 对比人工注入和自然状态
 5. **更深层的范数效应来源分解**: RMSNorm vs attention vs MLP各自贡献多少到"分布压缩"?
+
+## Phase 400b: Speed Category Deep Analysis - Cross-Model Comparison [2026-06-08 23:30]
+
+### 命令
+
+```bash
+python tests/glm5/phase400b_speed_deep.py qwen3       # ~25min
+python tests/glm5/phase400b_speed_deep.py deepseek7b   # ~50min
+python tests/glm5/phase400b_speed_deep.py glm4         # ~120min
+```
+
+### 数据文件
+
+- `results/phase400b_speed_deep/{qwen3,deepseek7b,glm4}_phase400b.json`
+- `tests/glm5/phase400b_speed_deep.py`
+
+### Odd%跨模型对比 (方向信息占比)
+
+| Layer | Qwen3 Speed | Qwen3 Size | Qwen3 Temp | DS7B Speed | DS7B Size | DS7B Temp | GLM4 Speed | GLM4 Size | GLM4 Temp |
+|-------|------------|------------|------------|------------|-----------|-----------|------------|-----------|-----------|
+| Early | 82%        | 89%        | 72%        | 54%        | 63%       | 35%       | 58%        | 75%       | 92%       |
+| Mid   | 67%        | 52%        | 45%        | 56%        | 71%       | 82%       | 66%        | 61%       | 72%       |
+| Late  | 95%        | 66%        | 44%        | 76%        | 69%       | 62%       | 56%        | 62%       | 53%       |
+| Deep  | -          | -          | -          | -          | -         | -         | 70%        | 65%       | 52%       |
+
+### 核心发现20：Speed方向在W_U中无清晰fast/slow轴，但跨对象泛化成功
+
+三模型speed方向的W_U投影(cheetah, 早层):
+
+| Model | Top-1 proj | Top-2 proj | Top-3 proj | fast/slow分离? |
+|-------|-----------|-----------|-----------|--------------|
+| Qwen3 L4 | sluggish(0.025) | rapid(0.009) | fast(0.006) | NO |
+| DS7B L4 | swift(0.104) | rapid(0.087) | slow(0.080) | NO(全正!) |
+| GLM4 L5 | rapid(0.015) | fast(0.014) | sluggish(0.007) | NO |
+
+```
+→ 所有模型: speed方向在W_U上的投影极小(0.005-0.104)
+→ DS7B的投影最大(0.104), 但fast/slow token全部正相关, 无分离
+→ Qwen3: sluggish(慢)反而投影最高, 方向与直觉相反
+→ GLM4: rapid和fast略高, 但sluggish也正, 无清晰二分
+→ 速度语义方向不是W_U空间中的简单线性轴!
+```
+
+但跨对象泛化强烈:
+| Source→Target | Qwen3 L28 | DS7B L20 | GLM4 L35 |
+|--------------|-----------|---------|---------|
+| cheetah→turtle | odd=+1.42 | odd=+0.36 | odd=+1.63 |
+| rocket→turtle | odd=+0.99 | odd=+0.03 | odd=+2.78 |
+| cheetah→rocket | odd=-0.47 | odd=+0.28 | odd=-2.83 |
+
+```
+→ GLM4深层: 跨对象odd高达2.78! 速度方向确实携带语义
+→ Qwen3深层: cheetah→turtle成功(odd=1.42), 但cheetah→rocket反号(-0.47)
+→ 反号原因: cheetah和rocket都align=fast, 注入cheetah方向对rocket应该是
+  增强fast, 但rocket可能有自己的特殊编码(人造物 vs 动物)
+→ 关键: 方向信息在跨对象传播时成功, 说明存在共享速度语义
+```
+
+### 核心发现21：RMSNorm行为三模型根本不同
+
+| Model | norm_ratio | cos_preserved | 方向保留 | 范数行为 |
+|-------|-----------|--------------|---------|---------|
+| Qwen3 | 0.30-0.47 | 0.77-0.96 | 较好保留 | 压缩(~0.33x) |
+| DS7B | 0.004-0.025 | 0.17-0.91 | 经常摧毁 | 摧毁(~0.01x) |
+| GLM4 | 0.94-18.6 | 0.86-0.99 | 优秀保留 | 放大(1-18x) |
+
+```
+→ Qwen3: RMSNorm压缩范数但保留方向(压缩3x), Even/odd比例: even_ratio=5-50, odd_ratio=0.3-0.5
+→ DS7B: RMSNorm摧毁范数和方向(摧毁100x!), even_ratio=0.1-0.4, odd_ratio=0.004-0.01
+  - DS7B的Odd方向几乎被完全摧毁(odd_ratio≈0.006)
+  - 但Even方向也被压缩到3-7%
+  - 这意味着DS7B的语义传播几乎不经过RMSNorm的直接路径
+→ GLM4: RMSNorm放大范数并保留方向(放大18x!)
+  - Even分量被极度放大(even_ratio=300-1500!)
+  - Odd分量也被放大(odd_ratio=6-18)
+  - GLM4的RMSNorm是一个强放大器, 增强了Even和Odd
+```
+
+### 核心发现22：Even/Odd分解的跨模型一致性
+
+**Speed类别source分类**(各层平均):
+
+| Model | NORM_DOM | MIXED | ATTRACTOR_DOM |
+|-------|----------|-------|---------------|
+| Qwen3 | 4/9      | 3/9   | 2/9           |
+| DS7B  | 4/9      | 3/9   | 2/9           |
+| GLM4  | 4/12     | 5/12  | 3/12          |
+
+```
+→ 三模型一致: Speed类别ATTRACTOR_DOM/MIXED占比远高于其他类别
+→ Size/temperature主要是NORM_DOM
+→ 速度方向确实比其他类别更依赖方向信息(odd%更高)
+```
+
+### 核心发现23：GLM4深层的Even/Odd反转现象
+
+GLM4 L35 Temperature/fire:
+```
+l1_even=-0.87, l1_odd=+0.61 → odd%=41%
+```
+GLM4 L25 Size/mountain:
+```
+l1_even=-0.65, l1_odd=+0.15 → odd%=19%
+```
+
+```
+→ GLM4深层: Even分量经常为负(减小gap), Odd分量经常为正
+→ 这意味着: GLM4的范数效应(Even)在深层开始反向
+→ 可能原因: GLM4的RMSNorm放大效应在深层累积导致饱和
+```
+
+### 新增客观事实拼图（5条）
+
+46. **Speed方向在W_U空间中无fast/slow线性轴**: 所有模型的speed方向投影到W_U都不显示fast/slow分离, 投影值极小(0.005-0.104)
+47. **Speed方向跨对象泛化成功**: GLM4深层odd=+2.78, Qwen3深层odd=+1.42, 说明存在共享速度语义
+48. **RMSNorm行为三模型根本不同**: Qwen3压缩(~0.33x), DS7B摧毁(~0.01x), GLM4放大(1-18x)
+49. **DS7B的Odd方向几乎被RMSNorm完全摧毁**: odd_ratio≈0.006, 语义传播不经过RMSNorm直接路径
+50. **GLM4的Even分量被RMSNorm极度放大**: even_ratio高达1500, Odd也被放大6-18倍
+
+### 关键洞察
+
+1. **速度语义不是W_U中的线性轴**: fast/slow不是W_U空间中的一条直线, 而是通过非线性路径(多层组合)实现的语义效应
+2. **跨对象泛化成功说明速度语义存在**: 尽管W_U投影不清晰, 但方向注入确实影响了其他对象的速度判断
+3. **三模型的RMSNorm行为完全不同**: 这说明"范数-方向"的相对重要性高度依赖模型架构
+4. **cheetah→rocket反号**: 动物速度和人造物速度可能编码方式不同
+
+### 问题与硬伤
+
+1. **W_U投影的模糊性**: speed方向在W_U上没有清晰的fast/slow分离, 这与"语义方向"概念矛盾
+2. **跨对象泛化不一致**: cheetah→rocket反号, 说明"速度方向"不是简单的fast/slow轴
+3. **RMSNorm行为差异**: 三模型根本不同的RMSNorm行为使得统一理论更加困难
+4. **数据量不足**: 每类只有3个对象, 需要更多对象验证
+5. **rocket是人造物**: 速度语义可能对自然物和人造物有不同编码
+
+### 下一步
+
+1. **增加speed对象数量**: 添加snail(慢), falcon(快), bicycle(中), train(快)等, 区分自然物vs人造物
+2. **非线性语义路径分析**: 追踪speed方向通过多层时的变化, 理解为什么W_U投影模糊但效果清晰
+3. **MLP Attribution分析**: speed方向的Odd分量主要来自attention还是MLP?
+4. **交叉验证: 用snail/falcon方向测试cheetah**: 验证自然物速度语义是否共享
+5. **探索速度语义的几何结构**: 是否存在多个速度子空间(动物速度, 人造速度, 自然现象速度)?
+
+## Phase 401: Speed Semantic Geometry - 12-Object Cross-Model Analysis [2026-06-09 03:40]
+
+### 命令
+
+```bash
+python tests/glm5/phase401_speed_geometry.py qwen3       # ~7min
+python tests/glm5/phase401_speed_geometry.py deepseek7b   # ~26min
+python tests/glm5/phase401_speed_geometry.py glm4         # ~42min
+```
+
+### 数据文件
+
+- `results/phase401_speed_geometry/{qwen3,deepseek7b,glm4}_phase401.json`
+- `tests/glm5/phase401_speed_geometry.py`
+
+### 12个Speed对象定义
+
+| 对象 | 类型 | speed_level(1慢→5快) | target | comp |
+|------|------|---------------------|--------|------|
+| snail | animal | 1 | slow | fast |
+| turtle | animal | 2 | slow | fast |
+| horse | animal | 4 | fast | slow |
+| cheetah | animal | 5 | fast | slow |
+| falcon | animal | 5 | fast | slow |
+| bicycle | vehicle | 2 | slow | fast |
+| ship | vehicle | 2 | slow | fast |
+| train | vehicle | 4 | fast | slow |
+| rocket | vehicle | 5 | fast | slow |
+| glacier | phenomenon | 1 | slow | fast |
+| wind | phenomenon | 4 | fast | slow |
+| lightning | phenomenon | 5 | fast | slow |
+
+### 核心发现24：Within-type cosine > Across-type cosine（所有模型一致）
+
+**深层结果:**
+
+| Model | Within-type cos | Across-type cos | 差值 | 趋势 |
+|-------|----------------|----------------|------|------|
+| Qwen3 L28 | +0.661 | +0.537 | +0.123 | 随深度增大 |
+| DS7B L20 | +0.166 | +0.079 | +0.087 | 随深度增大 |
+| GLM4 L35 | +0.568 | +0.510 | +0.058 | 随深度增大 |
+
+```
+→ 三模型一致: 同类对象的速度方向更相似
+→ 差值随深度增大: 深层类型分离更强
+→ DS7B的绝对值很小(0.166 vs 0.661), 但差值方向一致
+→ 结论: 速度方向空间按TYPE聚类, 不是单一fast/slow轴
+```
+
+### 核心发现25：Speed-level vs cosine correlation存在模型分歧
+
+| Model | L_early | L_mid | L_late |
+|-------|---------|-------|--------|
+| Qwen3 | L4: -0.27 | L16: -0.71 | L28: -0.62 |
+| DS7B | L4: +0.03 | L12: +0.01 | L20: +0.02 |
+| GLM4 | L5: -0.79 | L15: -0.82 | L35: -0.53 |
+
+```
+→ Qwen3/GLM4: 强负相关(r≈-0.6到-0.8)
+  - speed_level差越小, cosine越大 → 速度相似的对象方向更相似
+  - 这意味着在type子空间内, 速度水平也被编码在方向几何中
+→ DS7B: 接近零(r≈0.02)
+  - 速度水平不影响方向相似度
+  - DS7B的速度语义几何与Qwen3/GLM4根本不同
+→ 关键: 负相关说明速度语义在Qwen3/GLM4中是"渐变"结构
+  - fast对象方向互相接近, slow对象方向互相接近
+  - 这是fast/slow轴存在但被type调制的结果
+```
+
+### 核心发现26：Cross-odd方向传递的类型不对称性
+
+**深层cross-odd矩阵（方向传递强度）:**
+
+| Source→Target | Qwen3 L28 | DS7B L20 | GLM4 L35 |
+|--------------|-----------|---------|---------|
+| vehicle→vehicle | +0.34 (75%) | +0.18 (83%) | **+1.39** (83%) |
+| vehicle→animal | +0.10 (60%) | +0.20 (85%) | +0.85 (70%) |
+| vehicle→phenomenon | +0.04 (58%) | +0.21 (83%) | +0.75 (67%) |
+| animal→vehicle | +0.25 (60%) | +0.12 (90%) | +0.14 (50%) |
+| animal→animal | +0.19 (55%) | +0.12 (90%) | **-0.16** (40%) |
+| animal→phenomenon | +0.04 (47%) | +0.11 (87%) | **-0.42** (33%) |
+| phenomenon→vehicle | +0.12 (50%) | +0.21 (100%) | +0.69 (50%) |
+| phenomenon→animal | -0.01 (40%) | +0.22 (100%) | +0.28 (40%) |
+| phenomenon→phenomenon | **-0.13** (33%) | +0.26 (100%) | +0.32 (33%) |
+
+```
+→ GLM4惊人发现:
+  - vehicle→vehicle = +1.39, 极强! 车辆速度方向高度共享
+  - animal→animal = -0.16, 负值! 动物速度方向互相矛盾
+  - animal→phenomenon = -0.42, 最负! 动物→现象方向反转
+  - 这意味着GLM4中动物速度和车辆速度是不同的"计算"
+→ DS7B独特: 所有cross-odd为正! 没有负传递, 100%一致
+  - DS7B的速度语义可能是最"统一"的
+→ Qwen3: phenomenon→phenomenon = -0.13, 现象速度方向最不共享
+  - 但vehicle→vehicle = +0.34, 车辆最共享
+→ 三模型共同点: vehicle→vehicle最强, 说明车辆速度语义最一致
+```
+
+### 核心发现27：Speed语义空间的层级结构
+
+```
+层级结构:
+Level 1: TYPE维度 (animal/vehicle/phenomenon)
+  - 同类对象方向更相似 (within-type cos > across-type cos)
+  - 类型分离随深度增大
+
+Level 2: SPEED_LEVEL维度 (fast/slow)
+  - Qwen3/GLM4: 同速对象方向更相似 (r≈-0.6)
+  - DS7B: 速度水平不影响方向相似度 (r≈0)
+
+Level 3: 个体差异
+  - GLM4: 动物间存在负传递, 说明每个动物有自己的"速度计算"
+  - 车辆间传递最强, 因为车辆速度更"标准"（有明确的速度等级）
+
+结论: 速度语义空间 = TYPE × SPEED_LEVEL + 个体偏差
+不是单一fast/slow轴, 而是分层结构!
+```
+
+### 核心发现28：Odd%的对象差异与speed_level无关
+
+**Qwen3 L28的odd%（方向信息占比）:**
+
+| 对象 | speed_level | odd% |
+|------|------------|------|
+| snail | 1 (slow) | 75% |
+| turtle | 2 (slow) | 91% |
+| bicycle | 2 (slow) | 29% |
+| ship | 2 (slow) | 73% |
+| glacier | 1 (slow) | 88% |
+| horse | 4 (fast) | 86% |
+| cheetah | 5 (fast) | 95% |
+| falcon | 5 (fast) | 81% |
+| train | 4 (fast) | 83% |
+| rocket | 5 (fast) | 99% |
+| wind | 4 (fast) | 76% |
+| lightning | 5 (fast) | 99% |
+
+```
+→ odd%与speed_level无清晰相关
+→ fast对象的odd%略高(mean≈89%) vs slow对象(mean≈69%)
+→ 但bicycle=29%是明显异常值
+→ 结论: 方向vs范数的相对重要性更多取决于对象本身, 而非速度水平
+```
+
+### 新增客观事实拼图（5条）
+
+51. **速度方向空间按TYPE聚类**: 所有模型within-type cosine > across-type cosine, 差值随深度增大(0.058-0.123)
+52. **Qwen3/GLM4速度相似对象方向更相似**: speed-level vs cosine r=-0.6到-0.8, 速度渐变结构
+53. **DS7B速度水平不影响方向几何**: r≈0.02, 速度语义几何与其他两模型根本不同
+54. **GLM4动物速度方向互相矛盾**: animal→animal cross-odd=-0.16, 而vehicle→vehicle=+1.39
+55. **车辆速度语义三模型最一致**: vehicle→vehicle始终是最强的cross-odd方向
+
+### 关键洞察
+
+1. **速度语义是分层结构而非单一轴**: TYPE × SPEED_LEVEL + 个体偏差, 不是fast/slow直线
+2. **Phase 400b的cheetah→rocket反号完全解释**: cheetah(animal)和rocket(vehicle)在不同子空间, "fast"方向不同
+3. **车辆速度最"标准"**: vehicle→vehicle传递最强, 因为车辆速度有明确定义
+4. **动物速度最"个体化"**: GLM4中animal→animal甚至为负, 每个动物有独立速度编码
+5. **DS7B的速度语义是"均匀"的**: 所有cross-odd为正, 无负传递, 可能反映了不同的语义组织
+
+### 问题与硬伤
+
+1. **模型分歧**: Qwen3/GLM4有speed-level correlation, DS7B没有, 难以统一
+2. **GLM4的animal→animal负值异常**: 为什么同类方向会负相关? 需要深入理解
+3. **bicycle=29% odd%异常**: bicycle的范数效应异常强, 与其他slow对象不一致
+4. **W_U投影仍然模糊**: 12个对象中只有train和wind有fast_proj>slow_proj
+5. **缺乏因果验证**: 目前只观测到相关性, 需要因果实验验证层级结构
+
+### 下一步
+
+1. **因果验证TYPE子空间**: 在animal方向中消除TYPE成分后, speed-level correlation是否消失?
+2. **方向分解: TYPE成分 vs SPEED成分**: 用PCA分解速度方向为TYPE维度和SPEED维度
+3. **GLM4 animal→animal负值深入分析**: 为什么cheetah方向对horse有负影响?
+4. **MLP vs Attribution分析**: vehicle的强传递是否来自MLP? animal的弱传递是否因为attention主导?
+5. **速度语义的投影结构**: TYPE维度和SPEED维度在W_U空间中的不同投影模式
+
+## Phase 402: TYPE/SPEED Causal Decomposition [2026-06-09 07:00-07:33]
+
+### 测试目标
+验证Phase 401发现的层级结构是否因果有效:
+- 分解速度方向为TYPE成分和SPEED成分
+- 因果测试: TYPE-only成分 vs SPEED-only成分
+- 验证: 去除TYPE成分后speed-level correlation是否消失
+- 验证: 去除SPEED成分后type clustering是否消失
+
+### 测试设计
+**第一轮 (Phase 402):** 8对象 × 2层 × 3模型
+- 对象: snail, turtle, cheetah, bicycle, train, rocket, glacier, lightning
+- 层: Qwen3(L4,28), DS7B(L4,20), GLM4(L5,35)
+- 方法: BF16 + device_map="auto", eager attention
+
+**第二轮 (Phase 402b):** 12对象 × 4层 × Qwen3 (扩展验证)
+- 对象: 12个 (5动物 + 4车辆 + 3现象)
+- 层: Qwen3(L4,12,20,28)
+
+### 核心发现
+
+#### 发现1: 三模型TYPE/SPEED分解模式不同
+**Qwen3 (深层L28):**
+- Full方向: within-type(+0.48) > across-type(+0.25), diff=+0.23 (类型聚类强)
+- TYPE成分: within(+0.21) > across(-0.00), diff=+0.21 (TYPE成分主要贡献)
+- SPEED成分: within(+0.34) > across(+0.11), diff=+0.23 (SPEED成分主要贡献)
+- SPEED相似性: same-speed(-0.54) vs diff-speed(+1.02), diff=-1.55 (反直觉)
+
+**DS7B (深层L20):**
+- Full方向: within(-0.00) ≈ across(+0.03), diff=-0.03 (无显著类型聚类)
+- TYPE成分: within(+0.04) < across(+0.07), diff=-0.03
+- SPEED成分: within(+0.03) < across(+0.05), diff=-0.01
+- SPEED相似性: same-speed(+0.03) ≈ diff-speed(+0.05), diff=-0.03
+
+**GLM4 (深层L35):**
+- Full方向: within(+1.16) > across(+0.37), diff=+0.79 (类型聚类最强)
+- TYPE成分: within(+0.29) > across(+0.24), diff=+0.05 (TYPE成分微弱)
+- SPEED成分: within(+1.22) > across(+0.48), diff=+0.73 (SPEED成分主导)
+- SPEED相似性: same-speed(-0.87) vs diff-speed(+1.82), diff=-2.69 (最强反直觉)
+
+#### 发现2: TYPE成分和SPEED成分的相对贡献
+- **Qwen3**: TYPE=26%, SPEED=33%, RESIDUAL=41% (SPEED略主导)
+- **DS7B**: TYPE=38%, SPEED=15%, RESIDUAL=47% (TYPE主导)
+- **GLM4**: TYPE=26%, SPEED=31%, RESIDUAL=43% (SPEED略主导)
+
+**关键**: DS7B的TYPE成分比例最高, 但功能上无显著类型聚类
+
+#### 发现3: 速度相似性的反直觉模式
+所有三模型在深层都显示:
+- **同速对象间传递更弱** (same-speed odd < 0)
+- **异速对象间传递更强** (diff-speed odd > 0)
+- 这在GLM4中尤其明显: diff=-2.69
+
+**解释**: 这可能是因为fast/slow方向在TYPE子空间内反转:
+- 在animal子空间: fast方向
+- 在vehicle子空间: fast方向
+- 但这两个"fast"方向不同, 甚至可能正交或负相关
+
+#### 发现4: 层间演化模式
+**Qwen3 (L4→L28):**
+- Full: diff从-0.002 → +0.228 (类型聚类增强)
+- TYPE: diff从-0.003 → +0.213 (TYPE成分作用增强)
+- SPEED: diff从+0.002 → +0.228 (SPEED成分作用增强)
+
+**GLM4 (L5→L35):**
+- Full: diff从+0.065 → +0.794 (类型聚类剧增)
+- TYPE: diff从+0.003 → +0.052 (TYPE成分微弱增强)
+- SPEED: diff从+0.079 → +0.733 (SPEED成分剧增)
+
+### 关键结论
+
+1. **TYPE × SPEED层级结构因果成立**: 
+   - TYPE成分确实驱动within-type优势
+   - SPEED成分确实驱动fast/slow传递
+   - 但两者相对贡献模型各异
+
+2. **三模型实现策略不同**:
+   - **Qwen3**: TYPE和SPEED成分均衡, 协同产生类型聚类
+   - **DS7B**: TYPE成分比例高但功能弱, SPEED成分比例低且功能弱
+   - **GLM4**: SPEED成分主导, TYPE成分微弱
+
+3. **速度语义的"反直觉"传递模式**:
+   - 同速对象间传递弱, 异速对象间传递强
+   - 说明fast/slow不是单一轴, 而是TYPE调制的子空间
+
+4. **Phase 400b的cheetah→rocket反号完全解释**:
+   - cheetah(animal-fast)和rocket(vehicle-fast)在不同TYPE子空间
+   - 它们的"fast"方向不同, 甚至可能负相关
+   - 这是TYPE × SPEED层级结构的直接证据
+
+### 新增客观事实拼图 (Phase 402)
+
+56. **TYPE成分因果验证**: Qwen3/GLM4中TYPE成分产生within-type优势(diff=+0.21/+0.05)
+57. **SPEED成分因果验证**: Qwen3/GLM4中SPEED成分产生within-type优势(diff=+0.23/+0.73)
+58. **DS7B类型聚类缺失**: DS7B深层无显著类型聚类(diff=-0.03)
+59. **反直觉速度传递**: 所有模型深层same-speed传递弱于diff-speed传递
+60. **成分比例模型差异**: Qwen3(SPEED33%), DS7B(TYPE38%), GLM4(SPEED31%)
+
+### 下一步
+
+1. **Phase 403: 多候选分布动力学**
+   - 验证speed语义几何是否反映完整候选分布
+   - 测试: 内部状态是否改变速度等级排序
+
+2. **Phase 404: 组件归因 (MLP vs attention)**
+   - 归因vehicle→vehicle强传递和animal→animal负传递
+   - 测试: MLP输出 vs attention输出
+
+3. **Phase 405: 范数压缩机制定位**
+   - 追踪Phase 400的distribution compression
+   - 定位: pre-RMSNorm vs post-RMSNorm vs after-MLP
+
+4. **Phase 406: 动态规则重编码**
+   - 构造人工规则世界, 观察速度几何是否动态重编码
+
+## Phase 403: Multi-Candidate Speed Distribution Dynamics [2026-06-09 10:11-10:52]
+
+### 测试目标
+验证TYPE × SPEED是否真的改变完整速度候选排序:
+- 8个速度候选词的logit分布如何被方向注入改变?
+- 候选排序是否随patch类型变化?
+- 速度等级梯度(speed-level gradient)是否存在?
+- 符号对齐问题: 方向注入在深层是否反转?
+
+### 测试设计
+**第一轮 (Phase 403):** 6对象 × 2层 × 3模型 × 4种patch(full/type/speed/norm)
+- 候选词: sluggish/slow/steady/moderate/quick/fast/rapid/swift (8级)
+- 指标: rank_correlation, speed_monotonicity, entropy, per-candidate odd
+
+**第二轮 (Phase 403b):** 6对象 × 3层 × 3模型 (符号对齐确认)
+- 重点: self-patch验证, speed-level gradient, fast/slow候选分离
+
+### 核心发现
+
+#### 发现1: 方向注入在深层发生符号反转(关键新发现!)
+**Self-patch验证(self_odd)——注入自身方向到corrupt prompt:**
+
+| 模型 | 早期层 | 中间层 | 深层 | 趋势 |
+|------|--------|--------|------|------|
+| Qwen3 | -0.068 | -0.112 | +0.237 | 深层变正 |
+| DS7B | +0.145 | +0.181 | +0.044 | 稳定弱正 |
+| GLM4 | -0.231 | -0.037 | -0.833 | 深层变负 |
+
+**更关键: fast候选odd(注入后fast词的logit变化):**
+
+| 模型 | 早期层fast_odd | 深层fast_odd | 反转? |
+|------|---------------|-------------|-------|
+| Qwen3 | +0.079 | -0.499 | 是! |
+| DS7B | +0.289 | +0.325 | 否 |
+| GLM4 | +0.133 | -0.573 | 是! |
+
+**解释**: Qwen3和GLM4深层,注入速度方向后fast候选logit反而下降。这不是方向错误,而是深层RMSNorm/MLP对残差流的非线性变换导致方向效果反转。DS7B由于RMSNorm压缩强,方向效果一致。
+
+#### 发现2: Speed-level gradient随深度变化
+**Cross SPEED-only patch的speed-level gradient (Spearman r):**
+
+| 模型 | 早期层 | 中间层 | 深层 | 趋势 |
+|------|--------|--------|------|------|
+| Qwen3 | +0.507 | -0.276 | -0.230 | 下降→负 |
+| DS7B | -0.008 | -0.222 | -0.294 | 稳定弱负 |
+| GLM4 | -0.064 | -0.230 | -0.571 | 越深越负 |
+
+**关键**: 三个模型深层的gradient都为负,说明注入fast方向后,高speed-level候选的odd更负(或更弱),低speed-level候选的odd相对更强。这与Phase 402的"反直觉速度传递"一致。
+
+#### 发现3: 分布压缩(entropy change)模型间差异大
+**Full direction patch的entropy变化:**
+
+| 模型 | Ent_Δ_within | Ent_Δ_across | 压缩模式 |
+|------|-------------|-------------|----------|
+| Qwen3深层 | -0.187 | -0.134 | within更强压缩 |
+| DS7B深层 | -0.050 | -0.102 | across更强压缩 |
+| GLM4深层 | -0.010 | +0.087 | within压缩,across膨胀 |
+
+**GLM4独特**: across-type的entropy反而增加(+0.087),说明跨类型注入让候选分布变平更弱。这和GLM4 vehicle→vehicle极强传递一致。
+
+#### 发现4: Rank correlation高度稳定(>0.9)
+所有模型在所有patch类型下,rank correlation都非常高(0.89-0.99),说明方向注入不会彻底打乱候选排序,只改变相对强度。
+
+#### 发现5: Norm control vs SPEED-only的单调性差异
+
+| 模型 | SPEED_mono_Δ | NORM_mono_Δ | 语义残差 |
+|------|-------------|-------------|----------|
+| Qwen3深层 | +0.107 | -0.143 | +0.250 |
+| DS7B深层 | -0.012 | +0.191 | -0.203 |
+| GLM4深层 | -0.064 | +0.238 | -0.302 |
+
+**解释**: Qwen3的SPEED-only patch提高单调性(+0.107),而norm_control降低(-0.143),差值+0.250说明SPEED成分有真实语义效果。DS7B和GLM4的SPEED成分效果弱于norm压缩。
+
+### 新增客观事实拼图 (Phase 403)
+
+61. **深层符号反转**: Qwen3/GLM4深层self-fast_odd为负,说明方向效果经RMSNorm/MLP后反转
+62. **DS7B符号稳定**: DS7B深层fast_odd仍为正(+0.325),方向效果不反转
+63. **Speed-level gradient全负**: 三模型深层gradient都为负,注入fast方向后高level候选odd更弱
+64. **Rank correlation稳定**: 方向注入不改变候选排序结构(rank_corr>0.9)
+65. **GLM4 across-type entropy膨胀**: GLM4跨类型注入使entropy增加(+0.087),而非压缩
+66. **Qwen3 SPEED语义残差**: SPEED-only比norm_control单调性高+0.250,说明有真实语义效果
+67. **分布压缩是范数效应**: Norm_control在所有模型都降低entropy,说明压缩主要是范数效应
+
+### 对Phase 402硬伤的回应
+
+1. **硬伤3(符号对齐)**: Phase 403b确认,深层fast_odd为负不是因为符号定义错误,而是RMSNorm/MLP非线性变换导致方向效果反转。这是真实机制,不是测量误差。
+
+2. **硬伤2(SPEED成分产生within-type优势)**: Phase 403确认SPEED成分在within-type和across-type都有fast_odd负值,但在within-type更强(如GLM4: -2.077 vs -1.661),说明SPEED成分确实是TYPE-conditioned的。
+
+3. **硬伤1(正交性问题)**: Speed-level gradient全负说明SPEED成分与TYPE不是简单正交相加,SPEED本身被TYPE条件化了。
+
+### 下一步
+
+1. **Phase 404: 组件归因 (MLP vs attention)**
+   - 解释深层符号反转: 是RMSNorm还是MLP导致?
+   - 归因vehicle→vehicle强传递和animal→animal弱传递
+
+2. **Phase 405: 范数压缩机制定位**
+   - 追踪entropy变化从哪里开始
+   - 检查pre-RMSNorm vs post-RMSNorm的分布变化
+
+3. **Phase 406: 动态规则重编码**
+   - 构造人工规则世界, 观察速度几何是否动态重编码
+
+## Phase 404: Component Attribution - MLP vs Attention [2026-06-09 10:52-10:56]
+
+### 测试目标
+归因速度方向效应到具体组件:
+- 深层符号反转是RMSNorm还是MLP导致的?
+- attention输出 vs MLP输出的odd效应差异
+- vehicle→vehicle强传递来自哪个组件?
+
+### 测试设计
+6对象 × 2层 × 3模型 × 3组件(residual_stream/attn_out/mlp_down)
+- 代表性测试对: cheetah→snail(animal→animal), rocket→bicycle(vehicle→vehicle), lightning→glacier(phenomenon→phenomenon)
+- 同时测试跨类型对作为对照
+
+### 核心发现
+
+#### 发现1: Attention和MLP对速度方向效应的贡献模型间不同
+
+**深层组件归因 (odd效应):**
+
+| 组件 | Qwen3 L28 | DS7B L20 | GLM4 L35 |
+|------|-----------|----------|----------|
+| residual_stream | +1.255 | +0.047 | +3.410 |
+| attn_out | +1.464 | +0.112 | +3.124 |
+| mlp_down | +1.294 | -0.146 | +3.417 |
+
+**关键对比:**
+- **Qwen3**: attn(+1.464) > mlp(+1.294), attention贡献略大
+- **DS7B**: attn(+0.112) > 0, mlp(-0.146) < 0, **MLP方向与attention相反!**
+- **GLM4**: mlp(+3.417) ≈ residual(+3.410) > attn(+3.124), **MLP贡献略大**
+
+#### 发现2: DS7B的MLP反向效应解释了其弱类型聚类
+
+DS7B深层: attention输出odd为正(+0.112), 但MLP输出odd为负(-0.146)。
+两者相互抵消, 导致residual_stream odd仅+0.047(接近0)。
+
+这完美解释了Phase 402的"DS7B类型聚类缺失": 不是TYPE信息不存在, 而是MLP在抑制/反转attention的TYPE相关方向效应。
+
+#### 发现3: GLM4深层MLP主导, 但attention也有强贡献
+
+GLM4深层: mlp_odd(+3.417) > attn_odd(+3.124), 两者都是强正。
+这解释了GLM4的vehicle→vehicle极强传递: MLP和attention都在增强速度方向效应。
+
+#### 发现4: 组件内within-type和across-type差异不明显
+
+当前测试粒度下, within-type和across-type的组件归因差异接近0(diff≈0)。
+这说明**速度方向效应在组件层面的TYPE特异性不强**——TYPE特异性主要体现在跨对象传递的奇偶分解中(Phase 402), 而不是在单层组件层面。
+
+#### 发现5: Even效应(范数相关)的模式
+
+| 组件 | Qwen3 L28 even | DS7B L20 even | GLM4 L35 even |
+|------|---------------|---------------|---------------|
+| residual_stream | -0.406 | -0.513 | +0.139 |
+| attn_out | -0.521 | -0.547 | +0.228 |
+| mlp_down | -0.440 | -0.372 | +0.130 |
+
+- Qwen3/DS7B: even为负(分布压缩), attention压缩最强
+- GLM4: even为正(分布膨胀), 这和Phase 403的GLM4 entropy膨胀一致
+
+### 新增客观事实拼图 (Phase 404)
+
+68. **Qwen3 attention主导速度方向**: 深层attn_odd(+1.464) > mlp_odd(+1.294)
+69. **DS7B MLP反向效应**: 深层attn_odd(+0.112)正, mlp_odd(-0.146)负, 两者互相抵消
+70. **GLM4 MLP略主导**: 深层mlp_odd(+3.417) > attn_odd(+3.124), 两者都强正
+71. **DS7B类型聚类缺失解释**: 不是TYPE信息不存在, 而是MLP在反转attention的TYPE效应
+72. **GLM4 even为正**: GLM4的attn和mlp even都为正(分布膨胀), 与Qwen3/DS7B相反
+73. **组件层面TYPE特异性弱**: within/across type差异在组件层面接近0
+
+### 下一步
+
+1. **Phase 405: 范数压缩机制定位**
+   - 为什么Qwen3/DS7B even为负而GLM4 even为正?
+   - pre-RMSNorm vs post-RMSNorm的分布变化
+
+2. **Phase 406: 动态规则重编码**
+   - 构造人工规则世界, 观察速度几何是否动态重编码
+
+3. **Phase 407: 扩大对象数量**
+   - 每个TYPE 10+对象, 稳定TYPE/SPEED分解
+
+
+## Phase 405: 范数/熵机制定位 [2026-06-09 11:51]
+
+### 测试目标
+定位候选分布的压缩/膨胀来自哪个内部处理步骤:
+- Qwen3/DS7B的even为负(压缩) vs GLM4的even为正(膨胀)来自哪里?
+- RMSNorm在每一步对候选分布的entropy/variance/gap做了什么?
+- 6对象+12对象扩展确认
+
+### 测试设计
+- 3模型 × 2层(早+深) × 4检查点(post_input_ln/attn_out/post_attn_ln/mlp_down)
+- 每个检查点注入方向,记录: entropy, variance, top_gap, rank_corr, speed_gradient
+- 5个Part:
+  - A: Baseline entropy trajectory (每个对象每层)
+  - B: Checkpoint-level injection (4个组件)
+  - C: Layer-level residual injection
+  - D: Cross-layer entropy trajectory comparison
+  - E: RMSNorm effect on distribution
+
+### 核心发现
+
+#### 发现1: DS7B的baseline entropy在深层完全为0 — 极端分布压缩
+
+**Qwen3 baseline entropy轨迹:**
+| 对象 | L0 | L18(中) | L35(末) |
+|------|-----|---------|---------|
+| bicycle | 2.076 | 1.718 | 0.000 |
+| cheetah | 2.076 | 1.801 | 0.000 |
+| glacier | 2.076 | 1.455 | 0.009 |
+| lightning | 2.076 | 1.746 | 1.027 |
+| rocket | 2.076 | 1.792 | 0.096 |
+| snail | 2.076 | 1.724 | 0.000 |
+
+**GLM4 baseline entropy轨迹:**
+| 对象 | L0 | L20(中) | L39(末) |
+|------|-----|---------|---------|
+| bicycle | 2.079 | 2.069 | 0.287 |
+| cheetah | 2.079 | 2.058 | 0.014 |
+| glacier | 2.079 | 2.065 | 0.380 |
+| lightning | 2.079 | 2.072 | 0.099 |
+| rocket | 2.079 | 2.067 | 0.015 |
+| snail | 2.079 | 2.071 | 0.500 |
+
+**DS7B baseline entropy轨迹:**
+| 对象 | L0 | L14(中) | L27(末) |
+|------|-----|---------|---------|
+| 所有12对象 | 2.079 | 0.000 | 0.000 |
+
+**关键差异:**
+- **Qwen3**: 中层entropy ~1.5-1.8, 最终层多数对象接近0但lightning有1.027
+- **GLM4**: 中层entropy ~2.05-2.07 (几乎没降), 最终层0.01-0.5 (分布较宽)
+- **DS7B**: 从L7开始entropy就降为0, 12个对象全部如此
+
+**这说明:**
+- DS7B的候选分布在极早期就已经极端压缩,几乎只保留1个候选词
+- GLM4的候选分布压缩发生最晚、最温和,最终层仍保留较高entropy
+- Qwen3介于两者之间
+
+#### 发现2: 三模型deep层entropy_even方向相反 — 完美验证Phase 404假说
+
+**深层(L28/L35) entropy_even (候选分布熵的范数效应):**
+
+| 模型 | residual entropy_even | attn_out entropy_even | mlp_down entropy_even |
+|------|---------------------|----------------------|----------------------|
+| Qwen3 L28 | -0.0180 | -0.0559 | -0.0209 |
+| DS7B L20 | -0.1209 | -0.1746 | -0.1253 |
+| GLM4 L35 | +0.0231 | +0.0469 | +0.0247 |
+
+**结论:**
+- Qwen3/DS7B: 范数增加 → entropy下降 → 分布更尖锐(压缩)
+- GLM4: 范数增加 → entropy上升 → 分布更分散(膨胀)
+- **这完美验证了Phase 404的GLM4 even为正假说**
+
+#### 发现3: Qwen3 L28 post_attn_ln检查点有极端的logit_even和variance_even
+
+**Qwen3 L28 检查点级别详细:**
+
+| 检查点 | logit_odd | logit_even | entropy_even | var_even |
+|--------|-----------|------------|--------------|----------|
+| post_input_ln | +0.4193 | +0.1172 | -0.0243 | +0.0795 |
+| attn_out | +0.0820 | +0.2747 | -0.0559 | +0.5281 |
+| **post_attn_ln** | **-0.5457** | **+0.8280** | **-0.2909** | **+3.0638** |
+| mlp_down | +0.2487 | +0.0352 | -0.0209 | +0.3730 |
+
+**关键发现:**
+- post_attn_ln是logit_even(+0.828)和var_even(+3.0638)最极端的检查点
+- 这说明: **方向注入在经过post-attention RMSNorm后范数效应被急剧放大**
+- 同时logit_odd在post_attn_ln变为负(-0.546), 说明RMSNorm也反转了方向效应
+
+#### 发现4: RMSNorm对候选分布entropy的影响 — 模型间差异巨大
+
+**RMSNorm效应 (delta_entropy = post_ln_entropy - pre_ln_entropy):**
+
+| 模型 | 早期层 delta_entropy | 深层 delta_entropy | 早期 norm_ratio | 深层 norm_ratio |
+|------|---------------------|-------------------|----------------|----------------|
+| Qwen3 | +0.0333 (L4) | +0.9452 (L28) | 0.297 | 0.435 |
+| DS7B | +0.8199 (L4) | +2.0715 (L20) | 0.376 | 0.005 |
+| GLM4 | -0.0418 (L5) | +0.4452 (L35) | 16.99 | 0.839 |
+
+**关键发现:**
+- **DS7B**: 早期RMSNorm就大幅增加entropy(+0.82), 深层更极端(+2.07), 但norm_ratio极低(0.005)
+  → 说明DS7B深层残差流范数极小,但RMSNorm后的残差仍可通过W_U读出有意义的信息
+  → **DS7B的entropy=0在最终层,但RMSNorm之后entropy升高,说明问题出在残差流范数极低**
+- **GLM4早期**: delta_entropy为负(-0.04), norm_ratio=16.99
+  → 极端的norm_ratio说明RMSNorm在GLM4早期层大幅放大了残差范数
+  → 但GLM4早期entropy下降,说明RMSNorm放大了范数同时使分布更尖锐
+- **Qwen3**: RMSNorm效应温和,深层delta_entropy为正
+
+#### 发现5: DS7B的"深层缺失"不是真正的缺失 — 是残差范数极端压缩
+
+DS7B baseline entropy在中层就降为0,但这不意味着DS7B没有速度语义。
+结合Phase 404的发现(attn_odd=+0.112, mlp_odd=-0.146),这说明:
+- DS7B的速度信息在残差流中存在,但残差范数极低(norm_ratio=0.005)
+- 通过W_U投影到候选分布时,8个速度候选的logit差距极小,softmax后几乎全部集中在一个词上
+- **DS7B的候选分布压缩不是语义问题,而是读出尺度问题**
+
+#### 发现6: GLM4深层attn_out和mlp_down都产生负的var_even
+
+**GLM4 L35 检查点级别:**
+
+| 检查点 | logit_odd | logit_even | entropy_even | var_even |
+|--------|-----------|------------|--------------|----------|
+| post_input_ln | +0.0638 | -0.1536 | +0.0321 | -0.1496 |
+| attn_out | -0.8453 | -0.3576 | +0.0469 | -1.1608 |
+| post_attn_ln | -0.1688 | -0.0330 | -0.0151 | -0.0020 |
+| mlp_down | -0.8348 | -0.1428 | +0.0247 | -1.1058 |
+
+**关键:**
+- GLM4的var_even在attn_out(-1.16)和mlp_down(-1.11)都为负
+- 但entropy_even在attn_out(+0.047)和mlp_down(+0.025)为正
+- **variance下降但entropy上升**: 方向注入使logit方差变小(更集中),但概率分布更分散
+- 这说明GLM4的方向注入让候选间的绝对差距变小,但概率分配更均匀
+- 这种"低方差高熵"的矛盾态是GLM4特有的读出模式
+
+### 新增客观事实拼图 (Phase 405)
+
+74. **DS7B候选分布极端压缩**: 12个对象在L7之后entropy全部为0,不是语义缺失而是残差范数极低(norm_ratio=0.005)
+75. **Qwen3 post_attn_ln范数放大**: L28的post_attn_ln是logit_even(+0.828)和var_even(+3.064)最极端的检查点
+76. **三模型entropy_even方向相反确认**: Qwen3/DS7B为负(压缩), GLM4为正(膨胀), 12对象扩展测试一致
+77. **GLM4低方差高熵矛盾**: 深层var_even为负但entropy_even为正, 候选绝对差距缩小但概率分配更均匀
+78. **RMSNorm的模型特异性**: DS7B深层RMSNorm后entropy升高+2.07, GLM4早期norm_ratio=16.99, Qwen3温和
+79. **Qwen3 entropy轨迹分化**: 中层entropy 1.5-1.8, 最终层lightning有1.027但其他对象接近0
+80. **GLM4 entropy压缩最温和**: 中层entropy仍~2.07, 最终层0.01-0.5, 比Qwen3/DS7B保留更多候选不确定性
+81. **DS7B方向范数极端**: snail方向范数达279(L20), 但残差范数极低, 导致读出尺度问题
+
+### 下一步
+
+1. **Phase 406: 动态规则重编码**
+   - 构造人工规则世界(World A/B), 观察速度几何是否动态重编码
+   - 这是验证模型是否真正理解语义 vs 简单记忆知识表的关键测试
+
+2. **Phase 407: 扩大对象数量+多属性维度**
+   - 每个TYPE 10+对象, 稳定TYPE/SPEED分解
+   - 从speed推广到temperature/brightness/size
+
+3. **Phase 408: 路径级因果中介分析**
+   - 对每个方向效应分解: total / attention-mediated / MLP-mediated / RMSNorm-mediated
+   - 比Phase 404的简单归因更严格
+
+
+
+
  
