@@ -1,0 +1,168 @@
+{
+  "phase": 73,
+  "model": "qwen3",
+  "timestamp": "2026-06-09 06:32",
+  "task": "multitoken_object_relation_value_fullseq_closure",
+  "layer_pairs": [
+    [
+      4,
+      8
+    ]
+  ],
+  "module": "resid_out",
+  "positions": [
+    "object_last"
+  ],
+  "relations": [
+    "is_a",
+    "property"
+  ],
+  "num_items": 2,
+  "rows": [
+    {
+      "destroy_layer": 4,
+      "restore_layer": 8,
+      "module": "resid_out",
+      "position": "object_last",
+      "relation": "is_a",
+      "frame_key": "kind",
+      "object": "robin",
+      "target": "small bird",
+      "target_token_len": 2,
+      "distractor_token_lens": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "control_object": "lemon",
+      "control_target": "very sour",
+      "clean_margin": 9.033056512475014,
+      "destroy_margin": -9.322611689567566,
+      "restore_margin": 7.4204181134700775,
+      "destroy_drop": 18.35566820204258,
+      "restore_gain": 16.743029803037643,
+      "restore_to_clean_gap": 1.6126383990049362,
+      "clean_target_rank": 1,
+      "destroy_target_rank": 4,
+      "restore_target_rank": 1,
+      "clean_top": "small bird",
+      "destroy_top": "sweet fruit",
+      "restore_top": "small bird"
+    },
+    {
+      "destroy_layer": 4,
+      "restore_layer": 8,
+      "module": "resid_out",
+      "position": "object_last",
+      "relation": "property",
+      "frame_key": "is_often",
+      "object": "lemon",
+      "target": "very sour",
+      "target_token_len": 2,
+      "distractor_token_lens": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "control_object": "robin",
+      "control_target": "small bird",
+      "clean_margin": 1.1875,
+      "destroy_margin": -1.84375,
+      "restore_margin": 1.0625,
+      "destroy_drop": 3.03125,
+      "restore_gain": 2.90625,
+      "restore_to_clean_gap": 0.125,
+      "clean_target_rank": 1,
+      "destroy_target_rank": 2,
+      "restore_target_rank": 1,
+      "clean_top": "very sour",
+      "destroy_top": "very sweet",
+      "restore_top": "very sour"
+    }
+  ],
+  "summary": {
+    "by_path": {
+      "L4->L8:object_last": {
+        "n": 2,
+        "eligible_n": 2,
+        "destroy_drop": 10.69345910102129,
+        "restore_gain": 9.824639901518822,
+        "restore_to_clean_gap": 0.8688191995024681,
+        "eligible_destroy_drop": 10.69345910102129,
+        "eligible_restore_gain": 9.824639901518822,
+        "eligible_restore_to_clean_gap": 0.8688191995024681,
+        "clean_top1": 1.0,
+        "destroy_top1": 0.0,
+        "restore_top1": 1.0,
+        "eligible_destroy_top1": 0.0,
+        "eligible_restore_top1": 1.0
+      }
+    },
+    "by_relation": {
+      "is_a": {
+        "n": 1,
+        "eligible_n": 1,
+        "destroy_drop": 18.35566820204258,
+        "restore_gain": 16.743029803037643,
+        "restore_to_clean_gap": 1.6126383990049362,
+        "eligible_destroy_drop": 18.35566820204258,
+        "eligible_restore_gain": 16.743029803037643,
+        "eligible_restore_to_clean_gap": 1.6126383990049362,
+        "clean_top1": 1.0,
+        "destroy_top1": 0.0,
+        "restore_top1": 1.0,
+        "eligible_destroy_top1": 0.0,
+        "eligible_restore_top1": 1.0
+      },
+      "property": {
+        "n": 1,
+        "eligible_n": 1,
+        "destroy_drop": 3.03125,
+        "restore_gain": 2.90625,
+        "restore_to_clean_gap": 0.125,
+        "eligible_destroy_drop": 3.03125,
+        "eligible_restore_gain": 2.90625,
+        "eligible_restore_to_clean_gap": 0.125,
+        "clean_top1": 1.0,
+        "destroy_top1": 0.0,
+        "restore_top1": 1.0,
+        "eligible_destroy_top1": 0.0,
+        "eligible_restore_top1": 1.0
+      }
+    },
+    "by_relation_path": {
+      "is_a:L4->L8:object_last": {
+        "n": 1,
+        "eligible_n": 1,
+        "destroy_drop": 18.35566820204258,
+        "restore_gain": 16.743029803037643,
+        "restore_to_clean_gap": 1.6126383990049362,
+        "eligible_destroy_drop": 18.35566820204258,
+        "eligible_restore_gain": 16.743029803037643,
+        "eligible_restore_to_clean_gap": 1.6126383990049362,
+        "clean_top1": 1.0,
+        "destroy_top1": 0.0,
+        "restore_top1": 1.0,
+        "eligible_destroy_top1": 0.0,
+        "eligible_restore_top1": 1.0
+      },
+      "property:L4->L8:object_last": {
+        "n": 1,
+        "eligible_n": 1,
+        "destroy_drop": 3.03125,
+        "restore_gain": 2.90625,
+        "restore_to_clean_gap": 0.125,
+        "eligible_destroy_drop": 3.03125,
+        "eligible_restore_gain": 2.90625,
+        "eligible_restore_to_clean_gap": 0.125,
+        "clean_top1": 1.0,
+        "destroy_top1": 0.0,
+        "restore_top1": 1.0,
+        "eligible_destroy_top1": 0.0,
+        "eligible_restore_top1": 1.0
+      }
+    }
+  }
+}

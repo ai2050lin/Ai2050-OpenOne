@@ -20900,3 +20900,2618 @@ Phase75：全局知识网络路径矩阵。
 但下一步必须从 whole-state closure 进入 factor-level closure，
 否则无法真正回答深度网络如何高效实现多层次知识网络。
 ```
+
+## Phase 72: 对象-关系-值 full-sequence value scoring 闭包复核 [2026-06-09 01:24]
+
+### 任务目标
+
+根据 Phase71 的硬伤继续推进。
+
+Phase70/71 仍使用 first-token logit 作为候选 value 分数。本轮升级为：
+
+```text
+full-sequence candidate logprob
+```
+
+目标是验证：
+
+```text
+object-relation-value destroy-restore closure 是否在完整候选序列概率下仍然成立。
+```
+
+本轮继续优先客观结果，不做过度理论总结。
+
+### 对用户分析的判断
+
+用户提供的分析基本正确：
+
+```text
+1. Phase71 已进入受控闭包阶段。
+2. 但 Phase71 仍是 whole-state closure。
+3. random_same_norm / same_prompt_last 不为零，说明 whole-state replacement 有格式扰动。
+4. first-token logit 是硬伤，必须升级到 full-sequence logprob。
+5. 当前不应轻易总结理论，应继续积累真实现象拼图。
+```
+
+因此本轮执行 Phase72：full-sequence value scoring 复核。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase72_object_relation_value_fullseq_closure.py
+tests/gpt5/phase72_object_relation_value_fullseq_closure_summary.py
+tests/gpt5/run_phase72_object_relation_value_fullseq_closure_full.sh
+```
+
+脚本特性：
+
+```text
+1. 三模型依次运行：qwen3 -> glm4 -> deepseek7b。
+2. 每个模型使用 --hard-exit-after-model。
+3. 使用 bfloat16 + device_map="auto"。
+4. 优先 flash_attention_2，当前环境未安装 flash_attn，自动 fallback 到 sdpa。
+5. 对每个候选 value 计算完整 token 序列 logprob。
+6. 仍使用 destroy/restore 框架。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+OUT=results/gpt5_phase72_smoke_$(date +%Y%m%d_%H%M%S)
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate openone-cu130-py312
+python tests/gpt5/phase72_object_relation_value_fullseq_closure.py qwen3 \
+  --layer-pairs 4-8 \
+  --max-items 12 \
+  --module resid_out \
+  --positions object_last \
+  --output-dir "$OUT" \
+  --progress-every 4 \
+  --hard-exit-after-model
+```
+
+结果：
+
+```text
+rows = 12
+exit_code = 0
+```
+
+### 正式测试命令
+
+```bash
+PHASE72_OUTPUT_DIR=results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202 \
+PHASE72_PROGRESS_EVERY=24 \
+bash tests/gpt5/run_phase72_object_relation_value_fullseq_closure_full.sh
+```
+
+三模型均正常完成。
+
+### 输出文件
+
+```text
+results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202/qwen3_phase72_object_relation_value_fullseq_closure.json
+results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202/glm4_phase72_object_relation_value_fullseq_closure.json
+results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202/deepseek7b_phase72_object_relation_value_fullseq_closure.json
+results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202/phase72_object_relation_value_fullseq_closure_summary.json
+results/gpt5_phase72_object_relation_value_fullseq_closure_full_20260609_005202/PHASE72_OBJECT_RELATION_VALUE_FULLSEQ_CLOSURE_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 342
+  rows = 2052
+  layer_pairs = L4-L8, L8-L12, L8-L16
+
+GLM4:
+  items = 342
+  rows = 2052
+  layer_pairs = L4-L10, L10-L20, L4-L30
+
+DeepSeek7B:
+  items = 342
+  rows = 2736
+  layer_pairs = L8-L10, L8-L12, L12-L14, L12-L16
+
+total_rows = 6840
+```
+
+说明：
+
+```text
+Phase72 每一行包含 target + distractors 的 full-sequence logprob 计算，
+因此 rows 数少于 Phase71，但实际 forward 次数更多。
+```
+
+### Qwen3 客观结果
+
+最强路径：
+
+```text
+L4 -> L8 object_last:
+  eligible = 299
+  eligible_destroy_drop = 9.8617
+  eligible_restore_gain = 8.7756
+  eligible_restore_to_clean_gap = 1.0861
+  eligible_destroy_top1 = 0.1773
+  eligible_restore_top1 = 0.8930
+
+L4 -> L8 object_first:
+  eligible_destroy_drop = 9.3575
+  eligible_restore_gain = 8.2764
+  eligible_restore_to_clean_gap = 1.0811
+  eligible_restore_top1 = 0.8963
+
+L8 -> L12 object_last:
+  eligible_destroy_drop = 8.1866
+  eligible_restore_gain = 7.7153
+  eligible_restore_to_clean_gap = 0.4713
+  eligible_restore_top1 = 0.9666
+
+L8 -> L16 object_last:
+  eligible_restore_top1 = 0.9766
+```
+
+关系级结果：
+
+```text
+is_a:
+  eligible_destroy_drop = 13.5765
+  eligible_restore_gain = 12.7790
+  eligible_restore_to_clean_gap = 0.7975
+  eligible_restore_top1 = 1.0000
+
+used_for:
+  eligible_destroy_drop = 10.5310
+  eligible_restore_gain = 9.7953
+  eligible_restore_top1 = 0.9514
+
+can_do:
+  eligible_destroy_drop = 8.0405
+  eligible_restore_gain = 7.4337
+  eligible_restore_top1 = 0.9203
+
+function:
+  eligible_restore_top1 = 0.9778
+
+part_of:
+  eligible_restore_top1 = 0.9402
+
+material:
+  eligible_restore_top1 = 0.8537
+
+location:
+  eligible_restore_top1 = 0.9679
+```
+
+客观现象：
+
+```text
+full-sequence scoring 下，Qwen3 的路径排序和 Phase70/71 基本一致。
+L4->L8 仍是最强 early closure path；
+L8->L12/L16 restore gap 更小。
+```
+
+### GLM4 客观结果
+
+最强路径：
+
+```text
+L4 -> L10 object_last:
+  eligible = 316
+  eligible_destroy_drop = 9.3528
+  eligible_restore_gain = 6.1330
+  eligible_restore_to_clean_gap = 3.2198
+  eligible_destroy_top1 = 0.1709
+  eligible_restore_top1 = 0.7057
+
+L10 -> L20 object_last:
+  eligible_destroy_drop = 4.0757
+  eligible_restore_gain = 3.8694
+  eligible_restore_to_clean_gap = 0.2063
+  eligible_destroy_top1 = 0.6519
+  eligible_restore_top1 = 0.9873
+
+L4 -> L30 object_last:
+  eligible_destroy_drop = 9.3528
+  eligible_restore_gain = 0.9982
+  eligible_restore_to_clean_gap = 8.3546
+  eligible_restore_top1 = 0.2437
+```
+
+关系级结果：
+
+```text
+used_for:
+  eligible_destroy_drop = 9.7794
+  eligible_restore_gain = 5.7145
+  eligible_restore_top1 = 0.7118
+
+is_a:
+  eligible_destroy_drop = 11.5040
+  eligible_restore_gain = 4.8221
+  eligible_restore_to_clean_gap = 6.6819
+  eligible_restore_top1 = 0.6204
+
+can_do:
+  eligible_restore_top1 = 0.6738
+
+function:
+  eligible_restore_top1 = 0.7355
+
+part_of:
+  eligible_restore_top1 = 0.6583
+
+location:
+  eligible_restore_top1 = 0.6351
+
+material:
+  eligible_restore_top1 = 0.5379
+```
+
+客观现象：
+
+```text
+1. GLM4 full-sequence scoring 下仍显示 L10->L20 是最干净 closure window。
+2. L4->L30 object-token restore 继续失败。
+3. GLM4 的 relation restore top1 明显低于 Qwen3/DS7B。
+4. 这不是 first-token 指标造成的假象。
+```
+
+### DeepSeek7B 客观结果
+
+最强路径：
+
+```text
+L8 -> L10 object_last:
+  eligible = 246
+  eligible_destroy_drop = 5.0276
+  eligible_restore_gain = 4.3647
+  eligible_restore_to_clean_gap = 0.6629
+  eligible_destroy_top1 = 0.3537
+  eligible_restore_top1 = 0.9024
+
+L12 -> L14 object_last:
+  eligible_destroy_drop = 3.9365
+  eligible_restore_gain = 3.9421
+  eligible_restore_to_clean_gap = -0.0056
+  eligible_destroy_top1 = 0.5163
+  eligible_restore_top1 = 0.9756
+
+L12 -> L16 object_last:
+  eligible_restore_to_clean_gap = 0.0310
+  eligible_restore_top1 = 0.9675
+```
+
+关系级结果：
+
+```text
+is_a:
+  eligible_destroy_drop = 7.2960
+  eligible_restore_gain = 6.9268
+  eligible_restore_to_clean_gap = 0.3692
+  eligible_restore_top1 = 1.0000
+
+used_for:
+  eligible_destroy_drop = 5.9446
+  eligible_restore_gain = 5.2757
+  eligible_restore_top1 = 0.9044
+
+can_do:
+  eligible_destroy_drop = 4.3964
+  eligible_restore_gain = 4.1408
+  eligible_restore_top1 = 0.9143
+
+function:
+  eligible_restore_top1 = 0.8350
+
+location:
+  eligible_restore_top1 = 0.9113
+
+part_of:
+  eligible_restore_top1 = 0.9643
+
+material:
+  eligible_restore_top1 = 0.9551
+```
+
+客观现象：
+
+```text
+1. DeepSeek7B 的 L8-L16 中层 residual platform 在 full-sequence scoring 下继续成立。
+2. L12->L14/L16 的 restore gap 仍接近 0。
+3. is_a restore_top1 仍为 1.0。
+```
+
+### 与 Phase70/71 的一致性
+
+```text
+Qwen3:
+  first-token 与 full-sequence 结果几乎一致。
+
+GLM4:
+  L10->L20 是干净窗口、L4->L30 失败，这一点完全复现。
+
+DeepSeek7B:
+  L8-L16 中层平台、L12->L14/L16 干净恢复继续复现。
+```
+
+这说明：
+
+```text
+Phase70/71 的核心结果不是 first-token logit 假象。
+```
+
+但也要注意：
+
+```text
+当前候选多数本身较短，很多仍接近单 token；
+full-sequence scoring 是必要修正，但还不是最终自然语言读出。
+```
+
+### 当前更稳的结论
+
+Phase72 支持：
+
+```text
+object-relation-value whole-state closure 在完整候选序列评分下仍然成立。
+```
+
+更具体：
+
+```text
+对象 token residual state 对 relation-conditioned candidate value distribution 的影响，
+不是 first-token 评分造成的假象。
+```
+
+### 严格硬伤
+
+1. full-sequence scoring 仍然是候选集合评分。
+
+```text
+它比 first-token 干净，但还不是开放式自然生成验证。
+```
+
+2. 仍是 whole-state closure。
+
+```text
+还没有分解 identity/category/relation/value 子空间。
+```
+
+3. 关系模板仍简单。
+
+```text
+需要后续加入复杂句式、组合关系、上下文临时绑定。
+```
+
+4. full-sequence 与 first-token 几乎一致，部分原因可能是候选词较短。
+
+```text
+后续需要刻意加入多 token value，例如 "fresh water", "cutting food", "school building"。
+```
+
+### 下一步计划
+
+Phase73：多 token value 复核。
+
+目标：
+
+```text
+刻意构造多 token candidate value，
+验证 full-sequence scoring 是否仍保持 closure。
+```
+
+Phase74：factor-level / subspace-level control。
+
+目标：
+
+```text
+从 whole object-token residual state 中分离：
+identity
+category
+relation-conditioned constraint
+value prior
+format/readout alignment
+```
+
+Phase75：relation frame token 干预。
+
+目标：
+
+```text
+当前主要替换 object token；
+下一步需要替换 relation-frame token，
+判断 relation context 如何选择候选 value 空间。
+```
+
+阶段性判断：
+
+```text
+知识网络闭包主线继续稳固。
+现在已经完成：
+  whole-state closure
+  multi-control audit
+  full-sequence scoring audit
+
+下一步必须从 object state 进入 factor 和 relation-frame 的联合机制。
+```
+
+## Phase 73: 多 token value 全序列闭包复核 [2026-06-09 07:06]
+
+### 任务目标
+
+根据 Phase 72 的硬伤继续复核：
+
+```text
+Phase 72 已经证明 full-sequence scoring 下 object-relation-value closure 不是 first-token 假象。
+但 Phase 72 的很多 target/distractor 仍然较短，可能仍然被首 token 主导。
+```
+
+本轮专门构造所有候选值都是 2-token phrase 的数据，例如：
+
+```text
+small bird
+freshwater fish
+cutting food
+drinking water
+school building
+shiny metal
+bright red
+```
+
+目标是验证：
+
+```text
+对象 token residual state 对 relation-conditioned multi-token value distribution 的影响是否仍成立。
+```
+
+### 对用户分析的判断
+
+用户分析中正确的部分：
+
+```text
+1. Phase 72 的 full-sequence scoring 是正确进展，但还不能停止。
+2. 如果候选值太短，full-sequence 与 first-token 可能接近，仍需刻意加入多 token value。
+3. 当前主线仍应优先积累客观现象，不应急着抽象统一理论。
+4. 单一路径信息有限，必须在多 relation、多路径、多模型之间比较。
+```
+
+因此本轮执行 Phase 73：多 token value 全序列闭包复核。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase73_multitoken_value_closure.py
+tests/gpt5/phase73_multitoken_value_closure_summary.py
+tests/gpt5/run_phase73_multitoken_value_closure_full.sh
+```
+
+脚本特性：
+
+```text
+1. 复用 Phase 72 已验证的 fullseq_logprob / capture_state / restore scoring。
+2. 新增 7 类 relation：
+   is_a
+   part_of
+   used_for
+   can_do
+   location
+   material
+   property
+3. 每个 target 和 distractor 都刻意构造为 2-token candidate value。
+4. 三模型按 qwen3 -> GLM4 -> DeepSeek7B 顺序运行。
+5. 每个模型命令均带 --hard-exit-after-model，避免模型间显存残留。
+6. attn implementation 优先 flash_attention_2；本机无 flash_attn 包，因此实际回退到 sdpa。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE73_OUTPUT_DIR=results/gpt5_phase73_multitoken_value_closure_smoke2_$(date +%Y%m%d_%H%M%S) \
+PHASE73_MODELS=qwen3 \
+QWEN3_PHASE73_MAX_ITEMS=2 \
+QWEN3_PHASE73_LAYER_PAIRS=4-8 \
+PHASE73_PROGRESS_EVERY=1 \
+PHASE73_POSITIONS=object_last \
+tests/gpt5/run_phase73_multitoken_value_closure_full.sh
+```
+
+结果：
+
+```text
+qwen3:
+  items = 2
+  rows = 2
+  exit_code = 0
+```
+
+说明：
+
+```text
+脚本、多 token 数据、full-sequence scoring、hook、hard-exit 都可以正常运行。
+```
+
+中间曾有一次 smoke 参数误用：
+
+```text
+GLM4_PHASE73_MAX_ITEMS=0
+```
+
+由于脚本中 0 被解释为不限制，GLM4 开始跑全量烟测，已手动终止，不作为正式结果。
+随后给 runner 增加：
+
+```text
+PHASE73_MODELS
+```
+
+用于控制烟测模型列表。
+
+### 正式测试命令
+
+```bash
+PHASE73_OUTPUT_DIR=results/gpt5_phase73_multitoken_value_closure_full_$(date +%Y%m%d_%H%M%S) \
+PHASE73_PROGRESS_EVERY=48 \
+tests/gpt5/run_phase73_multitoken_value_closure_full.sh
+```
+
+模型参数：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12,8-16
+  max_items = 336
+
+GLM4:
+  layer_pairs = 4-10,10-20,4-30
+  max_items = 336
+
+DeepSeek7B:
+  layer_pairs = 8-10,8-12,12-14,12-16
+  max_items = 336
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase73_multitoken_value_closure_full_20260609_063421/qwen3_phase73_multitoken_value_closure.json
+results/gpt5_phase73_multitoken_value_closure_full_20260609_063421/glm4_phase73_multitoken_value_closure.json
+results/gpt5_phase73_multitoken_value_closure_full_20260609_063421/deepseek7b_phase73_multitoken_value_closure.json
+results/gpt5_phase73_multitoken_value_closure_full_20260609_063421/phase73_multitoken_value_closure_summary.json
+results/gpt5_phase73_multitoken_value_closure_full_20260609_063421/PHASE73_MULTITOKEN_VALUE_CLOSURE_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+qwen3:
+  items = 336
+  rows = 2016
+  target_token_len_mean = 2.000
+  distractor_token_len_mean = 2.000
+
+GLM4:
+  items = 336
+  rows = 2016
+  target_token_len_mean = 2.000
+  distractor_token_len_mean = 2.000
+
+DeepSeek7B:
+  items = 336
+  rows = 2688
+  target_token_len_mean = 2.000
+  distractor_token_len_mean = 2.000
+
+total_rows = 6720
+```
+
+三模型均完成，并且每个模型结束后均 hard-exit。
+
+### Qwen3 客观结果
+
+总体：
+
+```text
+clean_top1 = 0.7649
+destroy_top1 = 0.2068
+restore_top1 = 0.6766
+mean_destroy_drop = 7.5594
+mean_restore_gain = 6.6472
+mean_restore_to_clean_gap = 0.9122
+```
+
+Top paths：
+
+```text
+L4->L8:object_last
+  eligible_n = 257
+  eligible_destroy_drop = 9.9709
+  eligible_restore_gain = 8.3849
+  eligible_restore_to_clean_gap = 1.5860
+  eligible_destroy_top1 = 0.1634
+  eligible_restore_top1 = 0.8171
+
+L8->L12:object_last
+  eligible_destroy_drop = 7.7094
+  eligible_restore_gain = 6.9590
+  eligible_restore_to_clean_gap = 0.7504
+  eligible_restore_top1 = 0.9066
+
+L8->L16:object_last
+  eligible_destroy_drop = 7.7094
+  eligible_restore_gain = 6.7620
+  eligible_restore_to_clean_gap = 0.9474
+  eligible_restore_top1 = 0.8794
+```
+
+Relation summary：
+
+```text
+used_for:
+  eligible_destroy_drop = 10.6666
+  eligible_restore_gain = 9.8943
+  eligible_restore_top1 = 0.9048
+
+is_a:
+  eligible_destroy_drop = 9.8723
+  eligible_restore_gain = 9.0859
+  eligible_restore_top1 = 0.9757
+
+can_do:
+  eligible_destroy_drop = 8.8372
+  eligible_restore_gain = 8.5723
+  eligible_restore_top1 = 0.8952
+```
+
+客观现象：
+
+```text
+Qwen3 在所有候选值都是 2-token phrase 的情况下，仍然出现强 destroy/restore。
+L4->L8 破坏最强，L8->L12 恢复更接近 clean。
+used_for / is_a / can_do 三类关系最稳定。
+```
+
+### GLM4 客观结果
+
+总体：
+
+```text
+clean_top1 = 0.8274
+destroy_top1 = 0.2927
+restore_top1 = 0.5124
+mean_destroy_drop = 7.4817
+mean_restore_gain = 3.3654
+mean_restore_to_clean_gap = 4.1163
+```
+
+Top paths：
+
+```text
+L4->L10:object_last
+  eligible_n = 278
+  eligible_destroy_drop = 10.5254
+  eligible_restore_gain = 6.4832
+  eligible_restore_to_clean_gap = 4.0421
+  eligible_restore_top1 = 0.6295
+
+L10->L20:object_last
+  eligible_destroy_drop = 4.3480
+  eligible_restore_gain = 4.1079
+  eligible_restore_to_clean_gap = 0.2401
+  eligible_restore_top1 = 0.9856
+
+L4->L30:object_last
+  eligible_destroy_drop = 10.5254
+  eligible_restore_gain = 0.8460
+  eligible_restore_to_clean_gap = 9.6794
+  eligible_restore_top1 = 0.2014
+```
+
+Relation summary：
+
+```text
+used_for:
+  eligible_destroy_drop = 12.2873
+  eligible_restore_gain = 6.5743
+  eligible_restore_to_clean_gap = 5.7130
+  eligible_restore_top1 = 0.6560
+
+is_a:
+  eligible_destroy_drop = 10.3334
+  eligible_restore_gain = 4.7041
+  eligible_restore_to_clean_gap = 5.6293
+  eligible_restore_top1 = 0.6123
+
+can_do:
+  eligible_destroy_drop = 7.8246
+  eligible_restore_gain = 3.6981
+  eligible_restore_to_clean_gap = 4.1265
+  eligible_restore_top1 = 0.6228
+```
+
+客观现象：
+
+```text
+GLM4 的 early destroy 很强，但 early->late restore 不完整。
+L10->L20 恢复几乎闭合，eligible_restore_top1 接近 0.986。
+L4->L30 restore 明显失败，说明直接恢复到过深层并不能自然接上。
+```
+
+这与此前 GLM4 “浅层强写入，但路径格式有层段限制” 的观察一致。
+
+### DeepSeek7B 客观结果
+
+总体：
+
+```text
+clean_top1 = 0.5327
+destroy_top1 = 0.3118
+restore_top1 = 0.5335
+mean_destroy_drop = 3.4082
+mean_restore_gain = 3.0283
+mean_restore_to_clean_gap = 0.3799
+```
+
+Top paths：
+
+```text
+L8->L10:object_last
+  eligible_n = 179
+  eligible_destroy_drop = 5.4433
+  eligible_restore_gain = 4.4255
+  eligible_restore_to_clean_gap = 1.0178
+  eligible_restore_top1 = 0.8827
+
+L12->L14:object_last
+  eligible_destroy_drop = 3.8526
+  eligible_restore_gain = 3.7800
+  eligible_restore_to_clean_gap = 0.0726
+  eligible_restore_top1 = 0.9777
+
+L12->L16:object_last
+  eligible_destroy_drop = 3.8526
+  eligible_restore_gain = 3.7106
+  eligible_restore_to_clean_gap = 0.1420
+  eligible_restore_top1 = 0.9777
+```
+
+Relation summary：
+
+```text
+is_a:
+  eligible_destroy_drop = 6.5960
+  eligible_restore_gain = 6.0588
+  eligible_restore_top1 = 0.9593
+
+used_for:
+  eligible_destroy_drop = 6.4740
+  eligible_restore_gain = 5.4767
+  eligible_restore_top1 = 0.9537
+
+can_do:
+  eligible_destroy_drop = 5.9283
+  eligible_restore_gain = 5.3504
+  eligible_restore_top1 = 0.8971
+```
+
+客观现象：
+
+```text
+DeepSeek7B 的 clean_top1 只有 0.533，因此必须重点看 eligible 子集。
+eligible 子集里 L12->L14 和 L12->L16 restore 几乎闭合。
+L8->L10 destroy 更强，但 gap 也更大。
+```
+
+这说明 DeepSeek7B 在多 token value 上仍有闭包信号，但 baseline 候选选择能力较弱，不能把全体 rows 直接解释为机制强弱。
+
+### 与 Phase 72 的关系
+
+Phase 72：
+
+```text
+full-sequence scoring 下 object-relation-value closure 成立。
+但候选值可能较短。
+```
+
+Phase 73：
+
+```text
+所有 target/distractor 均为 2-token phrase。
+三模型仍然出现 destroy_drop 与 restore_gain。
+因此 Phase 72 的核心现象不是短候选或 first-token artifact。
+```
+
+更稳的结论：
+
+```text
+对象 token residual state 对 relation-conditioned candidate value distribution 的影响，
+在刻意多 token value 的 full-sequence scoring 下仍然成立。
+```
+
+### 严格硬伤
+
+1. 仍然是候选集合评分。
+
+```text
+full-sequence candidate scoring 比 first-token 更干净，但还不是开放式生成验证。
+```
+
+2. 仍然是 whole-state closure。
+
+```text
+当前替换的是 object token residual state 整体，还没有分离 identity/category/relation-conditioned constraint/value prior。
+```
+
+3. GLM4 早层恢复缺口很大。
+
+```text
+L4->L10 destroy 很强，但 restore gap 约 4.0。
+说明 GLM4 早层 object state 携带强信息，但简单 restore 不足以完全重建下游格式。
+```
+
+4. DeepSeek7B baseline 低。
+
+```text
+clean_top1 只有 0.533。
+必须以 eligible rows 为主要解释对象，否则会把模型本身没选对 target 的行混入机制分析。
+```
+
+5. 本机没有 flash_attn 包。
+
+```text
+脚本优先尝试 flash_attention_2，但实际回退到 sdpa。
+DeepSeek7B 仍出现 sliding window attention + sdpa 的实现警告，结果可用但需要在后续关键实验中谨慎复核。
+```
+
+### 研究进展
+
+目前知识网络闭包主线已经完成四级审计：
+
+```text
+Phase 68:
+  natural exchange
+
+Phase 69:
+  destroy/restore
+
+Phase 70:
+  object-relation-value closure
+
+Phase 71:
+  multi-control audit
+
+Phase 72:
+  full-sequence scoring audit
+
+Phase 73:
+  deliberately multi-token value audit
+```
+
+最稳的客观拼图：
+
+```text
+对象状态不是孤立词义，而是可以在关系模板中约束候选 value 分布。
+这种约束跨 relation、跨模型、跨 full-sequence multi-token candidate 都存在。
+不同模型的闭包路径不同：
+  Qwen3: L4->L8 强破坏，L8->L12 恢复更闭合。
+  GLM4: L10->L20 恢复闭合，过深 restore 明显失败。
+  DeepSeek7B: eligible 子集里中层恢复闭合，但 clean baseline 较低。
+```
+
+### 下一步计划
+
+Phase 74：factor-level / subspace-level control。
+
+目标：
+
+```text
+从 whole object-token state 中分离：
+1. object identity
+2. category/type
+3. relation-conditioned constraint
+4. value prior
+5. prompt/readout alignment
+```
+
+关键实验：
+
+```text
+同 relation、不同 category 的 control；
+同 category、不同 relation 的 control；
+同 object、不同 frame 的 control；
+用投影/残差化方式测试哪些因素能独立破坏或恢复 value distribution。
+```
+
+Phase 75：relation-frame token 干预。
+
+目标：
+
+```text
+当前主要替换 object token；
+下一步要替换 relation token / frame token，
+判断 relation context 如何选择候选 value 空间。
+```
+
+Phase 76：object-state + relation-frame 联合闭包。
+
+目标：
+
+```text
+测试 value prediction 是否来自：
+object state 单独决定；
+relation frame 单独决定；
+object state 与 relation frame 的交互决定。
+```
+
+这一步比继续单独扩大数据更关键，因为深度网络是相对编码，必须比较路径之间的相互关系，才能形成全局路径图谱。
+
+## Phase 74: 多 token value 因子级 control audit [2026-06-09 08:02]
+
+### 任务目标
+
+根据 Phase 73 的结论继续推进：
+
+```text
+Phase 73 证明 multi-token value full-sequence closure 成立；
+但仍然是 whole object-token state closure。
+```
+
+本轮不直接宣称已经完成 factor/subspace 分离，而是先做更稳的 factor-level control audit：
+
+```text
+用不同类型的自然控制状态替换 object token residual state，
+观察哪些 control 会破坏多 token value distribution，
+哪些 control 基本不破坏。
+```
+
+### 对用户分析的判断
+
+用户分析中正确的部分：
+
+```text
+1. Phase 73 已经补上短候选 / first-token artifact 的关键硬伤。
+2. 当前最大硬伤是 whole-state closure，不是因子级闭包。
+3. 下一步应拆分 object identity / category / value support / relation-conditioned constraint / readout alignment。
+4. relation-frame token 还没有进入干预核心，后续必须做。
+5. 不应急于理论总结，应优先完成客观拼图。
+```
+
+因此本轮执行 Phase 74：多 token value 因子级 control audit。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase74_factor_control_audit.py
+tests/gpt5/phase74_factor_control_audit_summary.py
+tests/gpt5/run_phase74_factor_control_audit_full.sh
+```
+
+脚本使用 Phase 73 的 multi-token value 数据和 Phase 72 的 full-sequence scoring。
+
+### Control 类型
+
+本轮比较四类 control：
+
+```text
+wrong_target_same_relation_frame:
+  同 relation / 同 frame，但 object 和 target 不同。
+  这是标准强破坏 control。
+
+same_target_same_relation_frame:
+  同 relation / 同 frame / 同 target，但 object 不同。
+  测试是否只要 value support 相同，就不会破坏。
+
+same_object_same_relation_other_frame:
+  同 object / 同 relation / 同 target，但 frame 模板不同。
+  测试 object state 是否对同关系不同表达稳定。
+
+same_object_different_relation:
+  同 object，但 relation 不同。
+  测试 object token state 是否强烈依赖 relation context。
+```
+
+注意：
+
+```text
+same_object_different_relation 当前只覆盖在多个 relation 中都出现的 object，因此 rows 更少。
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE74_OUTPUT_DIR=results/gpt5_phase74_factor_control_audit_smoke_$(date +%Y%m%d_%H%M%S) \
+PHASE74_MODELS=qwen3 \
+QWEN3_PHASE74_MAX_ITEMS=6 \
+QWEN3_PHASE74_LAYER_PAIRS=4-8 \
+PHASE74_POSITIONS=object_last \
+PHASE74_PROGRESS_EVERY=2 \
+tests/gpt5/run_phase74_factor_control_audit_full.sh
+```
+
+结果：
+
+```text
+qwen3:
+  rows = 6
+  exit_code = 0
+```
+
+说明：
+
+```text
+脚本、control 查找、full-sequence scoring、hard-exit 正常。
+```
+
+### 正式测试命令
+
+```bash
+PHASE74_OUTPUT_DIR=results/gpt5_phase74_factor_control_audit_full_$(date +%Y%m%d_%H%M%S) \
+PHASE74_POSITIONS=object_first,object_last \
+PHASE74_PROGRESS_EVERY=48 \
+tests/gpt5/run_phase74_factor_control_audit_full.sh
+```
+
+模型参数：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12
+  max_items = 336
+
+GLM4:
+  layer_pairs = 4-10,10-20
+  max_items = 336
+
+DeepSeek7B:
+  layer_pairs = 8-10,12-14
+  max_items = 336
+```
+
+说明：
+
+```text
+本轮没有继续跑所有 Phase 73 layer pairs，而是选取每个模型最关键的两个窗口：
+  一个偏强破坏窗口；
+  一个偏恢复闭包窗口。
+这样在数据量较大时仍能保持模型顺序全量完成。
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase74_factor_control_audit_full_20260609_071434/qwen3_phase74_factor_control_audit.json
+results/gpt5_phase74_factor_control_audit_full_20260609_071434/glm4_phase74_factor_control_audit.json
+results/gpt5_phase74_factor_control_audit_full_20260609_071434/deepseek7b_phase74_factor_control_audit.json
+results/gpt5_phase74_factor_control_audit_full_20260609_071434/phase74_factor_control_audit_summary.json
+results/gpt5_phase74_factor_control_audit_full_20260609_071434/PHASE74_FACTOR_CONTROL_AUDIT_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+qwen3:
+  items = 336
+  rows = 3900
+
+GLM4:
+  items = 336
+  rows = 3900
+
+DeepSeek7B:
+  items = 336
+  rows = 3900
+
+total_rows = 11700
+```
+
+三模型均完成，并且每个模型结束后均 hard-exit。
+
+### Qwen3 客观结果
+
+By control type：
+
+```text
+wrong_target_same_relation_frame:
+  n = 1344
+  eligible_n = 1028
+  eligible_destroy_drop = 8.5678
+  eligible_restore_gain = 7.4166
+  eligible_restore_to_clean_gap = 1.1512
+  eligible_destroy_top1 = 0.2451
+  eligible_restore_top1 = 0.8619
+
+same_target_same_relation_frame:
+  n = 840
+  eligible_n = 644
+  eligible_destroy_drop = 0.5579
+  eligible_restore_gain = 0.4630
+  eligible_restore_to_clean_gap = 0.0949
+  eligible_destroy_top1 = 0.8680
+  eligible_restore_top1 = 0.9488
+
+same_object_same_relation_other_frame:
+  n = 1344
+  eligible_n = 1028
+  eligible_destroy_drop = 0.0611
+  eligible_restore_gain = 0.0508
+  eligible_restore_to_clean_gap = 0.0103
+  eligible_destroy_top1 = 0.9708
+  eligible_restore_top1 = 0.9805
+
+same_object_different_relation:
+  n = 372
+  eligible_n = 268
+  eligible_destroy_drop = 0.0324
+  eligible_restore_gain = 0.0190
+  eligible_restore_to_clean_gap = 0.0133
+  eligible_destroy_top1 = 0.9701
+  eligible_restore_top1 = 0.9776
+```
+
+客观现象：
+
+```text
+Qwen3 中，wrong-target control 强破坏；
+same-target control 破坏很小；
+same-object other-frame 和 same-object different-relation 几乎不破坏。
+```
+
+这说明：
+
+```text
+此前 Qwen3 的强闭包主要来自 target/value-support mismatch，
+不是任意 object identity 变化，也不是同 object 的 frame 表达变化。
+```
+
+### GLM4 客观结果
+
+By control type：
+
+```text
+wrong_target_same_relation_frame:
+  n = 1344
+  eligible_n = 1112
+  eligible_destroy_drop = 7.1684
+  eligible_restore_gain = 5.0584
+  eligible_restore_to_clean_gap = 2.1101
+  eligible_destroy_top1 = 0.4344
+  eligible_restore_top1 = 0.8076
+
+same_target_same_relation_frame:
+  n = 840
+  eligible_n = 688
+  eligible_destroy_drop = 0.1032
+  eligible_restore_gain = 0.1651
+  eligible_restore_to_clean_gap = -0.0619
+  eligible_destroy_top1 = 0.9462
+  eligible_restore_top1 = 0.9767
+
+same_object_different_relation:
+  n = 372
+  eligible_n = 280
+  eligible_destroy_drop = 0.0006
+  eligible_restore_gain = 0.0117
+  eligible_restore_to_clean_gap = -0.0111
+  eligible_destroy_top1 = 0.9857
+  eligible_restore_top1 = 0.9929
+
+same_object_same_relation_other_frame:
+  n = 1344
+  eligible_n = 1112
+  eligible_destroy_drop = -0.0287
+  eligible_restore_gain = 0.0013
+  eligible_restore_to_clean_gap = -0.0300
+  eligible_destroy_top1 = 0.9910
+  eligible_restore_top1 = 0.9964
+```
+
+客观现象：
+
+```text
+GLM4 的 factor-control 对比最干净：
+wrong-target 强破坏；
+same-target / same-object-other-frame / same-object-different-relation 基本不破坏。
+```
+
+这说明：
+
+```text
+GLM4 中 object token state 的关键因果差异更接近 value-support / target-compatibility，
+而不是对象身份本身或 frame 表面表达。
+```
+
+同时：
+
+```text
+wrong-target 的 restore gap 仍较大，说明 GLM4 的状态格式转换问题仍存在。
+```
+
+### DeepSeek7B 客观结果
+
+By control type：
+
+```text
+wrong_target_same_relation_frame:
+  n = 1344
+  eligible_n = 716
+  eligible_destroy_drop = 4.5743
+  eligible_restore_gain = 4.0297
+  eligible_restore_to_clean_gap = 0.5446
+  eligible_destroy_top1 = 0.5503
+  eligible_restore_top1 = 0.9302
+
+same_target_same_relation_frame:
+  n = 840
+  eligible_n = 468
+  eligible_destroy_drop = 0.1491
+  eligible_restore_gain = 0.0311
+  eligible_restore_to_clean_gap = 0.1180
+  eligible_destroy_top1 = 0.9359
+  eligible_restore_top1 = 0.9444
+
+same_object_same_relation_other_frame:
+  n = 1344
+  eligible_n = 716
+  eligible_destroy_drop = 0.1462
+  eligible_restore_gain = 0.1435
+  eligible_restore_to_clean_gap = 0.0027
+  eligible_destroy_top1 = 0.9860
+  eligible_restore_top1 = 0.9972
+
+same_object_different_relation:
+  n = 372
+  eligible_n = 184
+  eligible_destroy_drop = 0.1194
+  eligible_restore_gain = 0.0720
+  eligible_restore_to_clean_gap = 0.0474
+  eligible_destroy_top1 = 0.9891
+  eligible_restore_top1 = 1.0000
+```
+
+客观现象：
+
+```text
+DeepSeek7B 中 wrong-target control 仍明显破坏；
+其他三类 control 仅产生很小破坏。
+eligible 子集下 same-object / same-target control 的 top1 基本保持。
+```
+
+这说明：
+
+```text
+DeepSeek7B 中同样不是任意 object identity 或 frame 变化导致闭包，
+而是目标值支持结构变化导致闭包。
+```
+
+### 三模型一致结果
+
+最重要的共同现象：
+
+```text
+wrong_target_same_relation_frame:
+  三模型均强破坏。
+
+same_target_same_relation_frame:
+  三模型均只产生很小破坏。
+
+same_object_same_relation_other_frame:
+  三模型几乎不破坏。
+
+same_object_different_relation:
+  三模型整体也几乎不破坏，但该 control rows 较少。
+```
+
+这说明 Phase 70-73 的强 destroy/restore 不是因为：
+
+```text
+1. 任意换一个 object token 就会破坏；
+2. 同 object 换一个 prompt frame 就会破坏；
+3. 同 target 的另一个 object 会强烈破坏；
+4. 同 object 在不同 relation prompt 下必然强烈破坏。
+```
+
+更稳的解释是：
+
+```text
+object token residual state 中存在某种 value-support compatibility。
+当 control object 支持不同 target value 时，候选值分布被强烈破坏；
+当 control object 支持相同 target value 时，破坏很小。
+```
+
+### 对 Phase 73 的修正和推进
+
+Phase 73 的结论：
+
+```text
+多 token full-sequence value closure 成立。
+```
+
+Phase 74 推进一步：
+
+```text
+闭包效应对 control 类型高度选择性。
+强效主要来自 target/value-support mismatch，而不是任意对象替换。
+```
+
+因此当前更准确的对象状态描述是：
+
+```text
+object token residual state 不只是 object identity，
+而包含可与 relation frame 和 candidate value distribution 兼容的 value-support factor。
+```
+
+### 严格硬伤
+
+1. 还不是真正的子空间分离。
+
+```text
+本轮是自然 control audit，不是投影、正交化或 learned subspace patch。
+不能说已经找到了 z_id / z_cat / z_valseq 的具体向量子空间。
+```
+
+2. same_object_different_relation 覆盖较少。
+
+```text
+只有同一个 object 在多个 relation 中都出现时才有该 control。
+三模型该 control rows = 372，少于其他 control。
+后续需要专门构造 object-cross-relation 平衡数据。
+```
+
+3. same_target control 不等于纯 value-support control。
+
+```text
+同 target 的两个 object 往往也共享 category 或功能类型。
+它仍混合 category/value-support，而不是纯粹 value factor。
+```
+
+4. relation-frame token 仍未被直接干预。
+
+```text
+本轮只改变 object token state 的来源 prompt；
+还没有替换 relation frame token state。
+```
+
+5. 仍是 closed candidate scoring。
+
+```text
+候选集合内 full-sequence scoring 已经很稳；
+但还不是开放式生成。
+```
+
+### 研究进展
+
+目前知识网络闭包主线进入第六级审计：
+
+```text
+Phase 68:
+  natural exchange
+
+Phase 69:
+  destroy/restore
+
+Phase 70:
+  object-relation-value closure
+
+Phase 71:
+  multi-control audit
+
+Phase 72:
+  full-sequence scoring audit
+
+Phase 73:
+  deliberately multi-token value audit
+
+Phase 74:
+  factor-level natural control audit
+```
+
+当前最稳的客观拼图：
+
+```text
+1. object token residual state 能控制 relation-conditioned multi-token candidate value distribution。
+2. 这种控制不是 first-token artifact。
+3. 这种控制不是短候选 artifact。
+4. 这种控制不是任意 object replacement artifact。
+5. 同 target / 同 object / 同 relation other-frame 的自然状态基本兼容。
+6. 不同 target 的同 relation control 才强破坏。
+```
+
+第一性原则层面的谨慎表述：
+
+```text
+语言知识网络中的对象编码，更像是“相对兼容性结构”，而不是固定对象身份轴。
+对象状态在给定关系框架下，与候选 value 的支持结构兼容或不兼容；
+这种兼容性决定了候选值分布是否稳定。
+```
+
+这和“深度神经网络是相对编码”的核心判断一致：
+
+```text
+单一 object state 没有完整意义；
+必须放在 relation frame、candidate value space、layer window、readout position 中比较，
+才显示出它的编码作用。
+```
+
+### 下一步计划
+
+Phase 75：relation-frame token intervention。
+
+目标：
+
+```text
+直接替换 relation-frame token state，
+测试 relation frame 如何选择 value candidate space。
+```
+
+关键设计：
+
+```text
+保持 object token state 不变；
+替换 frame token state：
+  is_a frame -> used_for frame
+  used_for frame -> can_do frame
+  location frame -> material frame
+
+观察 candidate value distribution 是否随 frame state 切换。
+```
+
+Phase 76：object-state + relation-frame 联合闭包。
+
+四种组合：
+
+```text
+clean object + clean frame
+clean object + wrong frame
+wrong object + clean frame
+wrong object + wrong frame
+```
+
+目标：
+
+```text
+判断 value prediction 是否由 object × relation 的组合兼容性决定。
+```
+
+Phase 77：balanced cross-relation object dataset。
+
+目标：
+
+```text
+专门构造同一批 object 覆盖所有 relation：
+is_a
+used_for
+can_do
+location
+material
+property
+part_of
+
+解决 Phase 74 中 same_object_different_relation rows 较少的问题。
+```
+
+Phase 78：subspace projection audit。
+
+目标：
+
+```text
+在 Phase 74 自然 control 结果稳定后，
+再用 residualization / projection / low-rank subspace patch 尝试分离：
+identity factor
+category factor
+value-support factor
+relation-compatibility factor
+readout-format factor
+```
+
+当前不宜直接跳到复杂数学分解；
+应先完成 relation-frame 干预和 object-frame 联合闭包。
+
+## Phase 75: 关系框架词元干预 [2026-06-09 11:10]
+
+### 任务目标
+
+根据 Phase 74 的 object token（对象词元）破坏-恢复结果，本轮继续验证全局关系路径图谱中的另一半：
+
+```text
+value prediction 是否不仅依赖 object state（对象状态），
+也依赖 relation-frame token（关系框架词元）携带的关系/读出约束。
+```
+
+核心问题：
+
+```text
+如果保持 object 不变，只把 relation frame token 的 hidden state（隐藏状态）
+替换成同一 object 的其他 relation frame，
+模型对当前 relation 的正确 value 是否下降？
+
+如果再恢复 clean frame token state，
+模型是否能恢复正确 value margin？
+```
+
+这轮继续遵守当前研究原则：
+
+```text
+1. 不先做理论总结，优先跑完三模型客观现象。
+2. 三模型 qwen3 -> GLM4 -> DS7B 顺序执行。
+3. 每个模型运行结束后 hard exit，避免显存残留。
+4. 数据量使用完整 relation-frame balanced dataset，不使用小样本结论。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase75_relation_frame_token_intervention.py
+tests/gpt5/phase75_relation_frame_token_intervention_summary.py
+tests/gpt5/run_phase75_relation_frame_token_intervention_full.sh
+```
+
+脚本设计：
+
+```text
+objects = 12
+relations = 6
+frames = 3
+items = 216
+
+relations:
+  is_a
+  used_for
+  can_do
+  location
+  material
+  property
+
+frame token positions:
+  frame_first
+  frame_last
+
+controls:
+  wrong_relation_same_object
+  same_relation_other_frame
+  same_relation_frame_other_object
+```
+
+三个 control 的含义：
+
+```text
+wrong_relation_same_object:
+  同一 object，不同 relation frame。
+  用来测试 relation-frame state 是否真的控制当前 relation 的读出。
+
+same_relation_other_frame:
+  同一 object、同一 relation、同一 target，不同模板 frame。
+  用作格式扰动对照。
+
+same_relation_frame_other_object:
+  同一 relation、同一 frame、不同 object。
+  用来测试 frame token 中是否混入 object/readout 信息。
+```
+
+每个 row 执行：
+
+```text
+1. clean forward 得到原始 candidate margin。
+2. destroy:
+   在 destroy layer 把 frame token state 替换为 control item 的对应 frame token state。
+3. restore:
+   在 restore layer 把 clean frame token state 恢复。
+4. 用完整 answer sequence likelihood（答案序列概率）计算 target/distractor margin。
+```
+
+### 执行命令
+
+```bash
+PHASE75_OUTPUT_DIR=results/gpt5_phase75_relation_frame_token_intervention_full_$(date +%Y%m%d_%H%M%S) \
+PHASE75_PROGRESS_EVERY=36 \
+tests/gpt5/run_phase75_relation_frame_token_intervention_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811
+```
+
+输出文件：
+
+```text
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811/qwen3_phase75_relation_frame_token_intervention.json
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811/glm4_phase75_relation_frame_token_intervention.json
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811/deepseek7b_phase75_relation_frame_token_intervention.json
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811/phase75_relation_frame_token_intervention_summary.json
+results/gpt5_phase75_relation_frame_token_intervention_full_20260609_103811/PHASE75_RELATION_FRAME_TOKEN_INTERVENTION_SUMMARY.md
+```
+
+注意：
+
+```text
+脚本优先尝试 flash_attention_2。
+本机当前未安装 flash_attn，因此自动 fallback 到 sdpa。
+DeepSeek7B 有 sliding window attention + sdpa warning，结果需保留该实现差异标记。
+```
+
+### 数据规模
+
+```text
+qwen3:
+  rows = 2592
+
+GLM4:
+  rows = 2592
+
+DS7B:
+  rows = 2592
+
+total rows = 7776
+```
+
+每个模型均完成完整 dataset，没有分批分析。
+
+### Qwen3 客观结果
+
+control 汇总：
+
+```text
+wrong_relation_same_object:
+  eligible_destroy_drop = 1.6677
+  eligible_restore_gain = 1.6606
+  eligible_restore_gap = 0.0071
+  eligible_destroy_top1 = 0.8160
+  eligible_restore_top1 = 0.9392
+
+same_relation_other_frame:
+  eligible_destroy_drop = 0.3143
+  eligible_restore_gain = 0.2620
+  eligible_restore_gap = 0.0523
+  eligible_destroy_top1 = 0.9323
+  eligible_restore_top1 = 0.9670
+
+same_relation_frame_other_object:
+  eligible_destroy_drop = 0.1397
+  eligible_restore_gain = 0.0978
+  eligible_restore_gap = 0.0419
+  eligible_destroy_top1 = 0.9566
+  eligible_restore_top1 = 0.9844
+```
+
+最强路径：
+
+```text
+wrong_relation_same_object L8->L12 frame_last:
+  destroy_drop = 2.8263
+  restore_gain = 2.8474
+  restore_gap = -0.0211
+  destroy_top1 = 0.7431
+  restore_top1 = 0.9514
+
+wrong_relation_same_object L4->L8 frame_last:
+  destroy_drop = 2.7624
+  restore_gain = 2.7346
+  restore_gap = 0.0278
+  destroy_top1 = 0.7083
+  restore_top1 = 0.9375
+```
+
+关系维度：
+
+```text
+wrong_relation_same_object used_for:
+  destroy_drop = 3.1260
+  restore_gain = 3.0223
+
+wrong_relation_same_object can_do:
+  destroy_drop = 1.7359
+  restore_gain = 1.8389
+
+wrong_relation_same_object is_a:
+  destroy_drop = 1.6487
+  restore_gain = 1.6950
+```
+
+客观现象：
+
+```text
+Qwen3 的 relation-frame token 干预有效，
+尤其 frame_last 明显强于 frame_first。
+wrong_relation_same_object 远强于两个 same-relation control。
+说明 relation frame state 对当前 relation value 读出有非平凡作用。
+```
+
+### GLM4 客观结果
+
+control 汇总：
+
+```text
+wrong_relation_same_object:
+  eligible_destroy_drop = 1.1403
+  eligible_restore_gain = 1.2104
+  eligible_restore_gap = -0.0701
+  eligible_destroy_top1 = 0.8660
+  eligible_restore_top1 = 0.9641
+
+same_relation_other_frame:
+  eligible_destroy_drop = 0.2553
+  eligible_restore_gain = 0.2783
+  eligible_restore_gap = -0.0229
+  eligible_destroy_top1 = 0.9003
+  eligible_restore_top1 = 0.9641
+
+same_relation_frame_other_object:
+  eligible_destroy_drop = 0.4396
+  eligible_restore_gain = 0.4231
+  eligible_restore_gap = 0.0165
+  eligible_destroy_top1 = 0.9232
+  eligible_restore_top1 = 0.9592
+```
+
+最强路径：
+
+```text
+wrong_relation_same_object L10->L20 frame_last:
+  destroy_drop = 2.0501
+  restore_gain = 2.1373
+  restore_gap = -0.0872
+  destroy_top1 = 0.7778
+  restore_top1 = 0.9673
+
+wrong_relation_same_object L4->L10 frame_last:
+  destroy_drop = 1.9294
+  restore_gain = 2.0396
+  restore_gap = -0.1103
+```
+
+关系维度：
+
+```text
+wrong_relation_same_object used_for:
+  destroy_drop = 2.4622
+  restore_gain = 2.1074
+
+wrong_relation_same_object can_do:
+  destroy_drop = 1.3125
+  restore_gain = 1.5228
+
+wrong_relation_same_object is_a:
+  destroy_drop = 1.2839
+  restore_gain = 1.3569
+```
+
+客观现象：
+
+```text
+GLM4 也存在 relation-frame token 因果作用。
+最强路径偏 L10->L20，比 Qwen3 更靠中层。
+same_relation_frame_other_object 的 effect 不为零，
+说明 GLM4 的 frame token 可能混入 object/readout 或 category-compatible 信息。
+```
+
+### DS7B 客观结果
+
+control 汇总：
+
+```text
+wrong_relation_same_object:
+  eligible_destroy_drop = 1.6177
+  eligible_restore_gain = 1.6495
+  eligible_restore_gap = -0.0318
+  eligible_destroy_top1 = 0.7849
+  eligible_restore_top1 = 0.9704
+
+same_relation_other_frame:
+  eligible_destroy_drop = 0.5184
+  eligible_restore_gain = 0.5656
+  eligible_restore_gap = -0.0472
+  eligible_destroy_top1 = 0.8898
+  eligible_restore_top1 = 0.9704
+
+same_relation_frame_other_object:
+  eligible_destroy_drop = 0.7954
+  eligible_restore_gain = 0.8009
+  eligible_restore_gap = -0.0055
+  eligible_destroy_top1 = 0.8817
+  eligible_restore_top1 = 0.9677
+```
+
+最强路径：
+
+```text
+wrong_relation_same_object L8->L10 frame_last:
+  destroy_drop = 2.9246
+  restore_gain = 2.7970
+  restore_gap = 0.1276
+  destroy_top1 = 0.6989
+  restore_top1 = 0.9570
+
+wrong_relation_same_object L12->L14 frame_last:
+  destroy_drop = 2.6094
+  restore_gain = 2.6047
+  restore_gap = 0.0047
+```
+
+关系维度：
+
+```text
+wrong_relation_same_object can_do:
+  destroy_drop = 2.6444
+  restore_gain = 2.7255
+
+wrong_relation_same_object used_for:
+  destroy_drop = 2.3401
+  restore_gain = 2.4907
+
+wrong_relation_same_object material:
+  destroy_drop = 1.6311
+  restore_gain = 1.6731
+```
+
+客观现象：
+
+```text
+DS7B 也存在可恢复 relation-frame token 作用。
+但 DS7B 的 clean_top1 baseline 较低，eligible subset 解释要更谨慎。
+same_relation controls 明显不为零，说明 frame token 不是纯 relation-only state。
+```
+
+### 三模型共同现象
+
+```text
+1. wrong_relation_same_object 的破坏效应在三模型中都明显大于 same_relation_other_frame。
+2. frame_last 明显强于 frame_first。
+3. restore gain 基本可以恢复 destroy drop，说明干预不是单纯随机破坏。
+4. relation-frame token 的作用小于 Phase 74 object token wrong-target replacement，
+   但仍是稳定非零因果因素。
+5. used_for / can_do 在三模型中普遍更敏感，
+   说明功能性 relation 可能比 is_a/property 更依赖显式 relation-frame gating。
+```
+
+### 当前理论进展
+
+Phase 75 支持一个更稳的局部图景：
+
+```text
+value prediction 不是 object token 单独决定，
+也不是 relation frame token 单独决定，
+而是 object state × relation-frame state 的兼容性读出。
+```
+
+从破解语言编码机制角度看，本轮推进了：
+
+```text
+知识网络中的 relation binding 不应被理解为一个静态语义轴。
+它更像由 object identity / relation frame / candidate value / readout format
+共同形成的条件化路径。
+```
+
+更具体地说：
+
+```text
+object token 提供“当前对象是谁”和部分 value-support 信息；
+frame_last token 提供“当前要读取哪类 relation/value”的关系门控；
+最终 candidate margin 来自两者与输出候选之间的兼容。
+```
+
+这与当前“相对编码”判断一致：
+
+```text
+单一路径信息有限；
+必须比较 object path、relation-frame path、same-relation control、
+wrong-relation control 和 joint path，才有全局路径意义。
+```
+
+### 问题和硬伤
+
+```text
+1. relation-frame token 并不是纯 relation 变量。
+   same_relation_frame_other_object 在 GLM4/DS7B 中不为零，
+   说明 frame token state 混入 object/readout/format 信息。
+
+2. 当前还没有 object token + relation-frame token 联合干预。
+   因此只能证明两条路径都相关，
+   还不能证明二者的组合闭包。
+
+3. 当前仍是整 token state transplant，
+   不是 subspace-level factor isolation。
+   不能区分 identity factor、relation factor、format factor。
+
+4. DS7B baseline 较低，
+   需要在下一轮对 DS7B 的候选答案稳定性单独做 baseline filter。
+
+5. 结果说明 relation-frame path 重要，
+   但不能直接上升为“语言整体编码机制”。
+   它只是知识网络 relation binding 拼图的一块。
+```
+
+### 下一步计划
+
+Phase 76：object + relation-frame joint closure。
+
+目标：
+
+```text
+同时干预 object token 和 relation-frame token，
+比较：
+1. only object wrong-target
+2. only relation-frame wrong-relation
+3. object + relation-frame matched wrong item
+4. object + relation-frame mismatched item
+5. restore object only
+6. restore frame only
+7. restore both
+```
+
+关键判据：
+
+```text
+如果 both restore 明显强于单独 restore，
+说明 value prediction 是组合闭包；
+
+如果 matched wrong item 比 mismatched item 更稳定地转向对应 value，
+说明 object × relation compatibility 是真实路径结构。
+```
+
+Phase 77：balanced cross-relation dataset 扩展。
+
+目标：
+
+```text
+扩大 object/relation/value 三元组，
+重点加强：
+same_object_different_relation
+same_relation_different_object
+same_value_different_path
+```
+
+Phase 78：factor subspace audit。
+
+目标：
+
+```text
+在 object path 与 relation-frame path 均稳定后，
+再尝试分离：
+identity factor
+relation factor
+value-support factor
+readout-format factor
+compatibility factor
+```
+
+当前不建议直接做复杂数学抽象；
+应继续用大样本、强 control、可恢复干预，把全局关系路径图谱补完整。
+
+## Phase 76: object-frame 联合闭包测试 [2026-06-09 12:20]
+
+### 任务目标
+
+根据 Phase 75 的结论继续推进：
+
+```text
+Phase 74:
+  object token path 有稳定因果作用。
+
+Phase 75:
+  relation-frame token path 也有稳定因果作用。
+
+Phase 76:
+  测试 object token 与 relation-frame token 是否形成组合闭包。
+```
+
+核心问题：
+
+```text
+value prediction 是否由 object state × relation-frame state 的组合兼容性决定？
+```
+
+本轮不做模型测试前理论分析，直接编写跨模型脚本并按顺序跑完：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后均使用 `--hard-exit-after-model`。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase76_object_frame_joint_closure.py
+tests/gpt5/phase76_object_frame_joint_closure_summary.py
+tests/gpt5/run_phase76_object_frame_joint_closure_full.sh
+```
+
+脚本设计：
+
+```text
+dataset:
+  objects = 12
+  relations = 6
+  frames = 3
+  items = 216
+
+relations:
+  is_a
+  used_for
+  can_do
+  location
+  material
+  property
+
+patched positions:
+  object_last
+  frame_last
+```
+
+每个 clean item 选择：
+
+```text
+matched source:
+  different object
+  different relation
+  different target
+
+mismatch frame source:
+  different from clean relation
+  different from matched relation
+```
+
+条件：
+
+```text
+object_only_matched:
+  只替换 object token 为 matched source 的 object token state。
+
+frame_only_matched:
+  只替换 frame_last token 为 matched source 的 frame_last token state。
+
+joint_matched:
+  object token 与 frame_last token 都来自同一个 matched source。
+
+joint_mismatched_frame:
+  object token 来自 matched source，
+  frame_last token 来自另一个 mismatch source。
+
+joint_restore_object_only:
+  destroy 时替换 object + frame，
+  restore 时只恢复 object。
+
+joint_restore_frame_only:
+  destroy 时替换 object + frame，
+  restore 时只恢复 frame。
+
+joint_restore_both:
+  destroy 时替换 object + frame，
+  restore 时同时恢复 object + frame。
+```
+
+评分方式：
+
+```text
+使用完整 answer sequence likelihood。
+
+候选集合包括：
+  clean target
+  clean distractors
+  matched source target
+  mismatch source target
+
+同时记录：
+  clean target margin 是否下降；
+  matched source target margin 是否上升；
+  patched top1 是否转向 matched source target。
+```
+
+这能区分：
+
+```text
+只是破坏 clean target
+vs
+真的朝 matched source 的 value space 转移
+```
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE76_OUTPUT_DIR=results/gpt5_phase76_smoke_$(date +%Y%m%d_%H%M%S) \
+PHASE76_MODELS=qwen3 \
+QWEN3_PHASE76_MAX_ITEMS=12 \
+QWEN3_PHASE76_LAYER_PAIRS=4-8 \
+PHASE76_PROGRESS_EVERY=6 \
+tests/gpt5/run_phase76_object_frame_joint_closure_full.sh
+```
+
+结果：
+
+```text
+qwen3 smoke:
+  rows = 84
+  exit_code = 0
+```
+
+说明多点 hook、matched/mismatched source、full-sequence candidate scoring、summary 均可运行。
+
+### 正式测试命令
+
+```bash
+PHASE76_OUTPUT_DIR=results/gpt5_phase76_object_frame_joint_closure_full_$(date +%Y%m%d_%H%M%S) \
+PHASE76_PROGRESS_EVERY=36 \
+tests/gpt5/run_phase76_object_frame_joint_closure_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345
+```
+
+输出文件：
+
+```text
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345/qwen3_phase76_object_frame_joint_closure.json
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345/glm4_phase76_object_frame_joint_closure.json
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345/deepseek7b_phase76_object_frame_joint_closure.json
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345/phase76_object_frame_joint_closure_summary.json
+results/gpt5_phase76_object_frame_joint_closure_full_20260609_115345/PHASE76_OBJECT_FRAME_JOINT_CLOSURE_SUMMARY.md
+```
+
+注意：
+
+```text
+本机未安装 flash_attn，flash_attention_2 自动 fallback 到 sdpa。
+DS7B 仍有 sliding window attention + sdpa warning，后续解释继续标记该实现差异。
+```
+
+### 数据规模
+
+```text
+qwen3:
+  items = 216
+  rows = 3024
+
+GLM4:
+  items = 216
+  rows = 3024
+
+DS7B:
+  items = 216
+  rows = 3024
+
+total rows = 9072
+```
+
+三模型均完整完成，没有分批分析。
+
+### Qwen3 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 11.3796
+  eligible_matched_gain = 14.3994
+  eligible_clean_margin_after = -6.6304
+  eligible_matched_margin_after = 1.5088
+  eligible_patched_clean_top1 = 0.0851
+  eligible_patched_matched_top1 = 0.6028
+
+joint_mismatched_frame:
+  eligible_clean_drop = 10.0603
+  eligible_matched_gain = 8.9988
+  eligible_clean_margin_after = -5.3112
+  eligible_matched_margin_after = -3.8918
+  eligible_patched_clean_top1 = 0.1099
+  eligible_patched_matched_top1 = 0.2092
+
+object_only_matched:
+  eligible_clean_drop = 7.5133
+  eligible_matched_gain = 5.7724
+  eligible_patched_matched_top1 = 0.0745
+
+frame_only_matched:
+  eligible_clean_drop = 4.0672
+  eligible_matched_gain = 8.7956
+  eligible_patched_matched_top1 = 0.1702
+
+joint_restore_both:
+  eligible_clean_drop = 0.7328
+  eligible_matched_gain = 0.9057
+  eligible_patched_clean_top1 = 0.8546
+  eligible_patched_matched_top1 = 0.0035
+```
+
+最强路径：
+
+```text
+joint_matched L4->L8:
+  eligible_clean_drop = 12.0060
+  eligible_matched_gain = 14.2684
+  eligible_patched_matched_top1 = 0.5957
+
+joint_matched L8->L12:
+  eligible_clean_drop = 10.7532
+  eligible_matched_gain = 14.5303
+  eligible_patched_matched_top1 = 0.6099
+```
+
+关系维度：
+
+```text
+joint_matched can_do:
+  clean_drop = 13.5527
+  matched_gain = 17.3343
+  matched_top1 = 0.6667
+
+joint_matched is_a:
+  clean_drop = 13.0722
+  matched_gain = 17.5949
+  matched_top1 = 0.7000
+
+joint_matched property:
+  clean_drop = 11.7313
+  matched_gain = 11.9787
+  matched_top1 = 0.7778
+```
+
+客观现象：
+
+```text
+Qwen3 中 joint_matched 明显强于 object_only 和 frame_only。
+matched target 被显著推高，并且 matched_top1 达到 0.6028。
+mismatched frame 也会破坏 clean target，但 matched_top1 明显低于 joint_matched。
+restore both 后 clean target 基本恢复，matched target 基本退出 top1。
+```
+
+### GLM4 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 10.3216
+  eligible_matched_gain = 13.4800
+  eligible_clean_margin_after = -5.5684
+  eligible_matched_margin_after = 1.8823
+  eligible_patched_clean_top1 = 0.1567
+  eligible_patched_matched_top1 = 0.6533
+
+joint_mismatched_frame:
+  eligible_clean_drop = 8.7697
+  eligible_matched_gain = 7.4227
+  eligible_matched_margin_after = -4.1750
+  eligible_patched_matched_top1 = 0.1800
+
+object_only_matched:
+  eligible_clean_drop = 5.3553
+  eligible_matched_gain = 4.5411
+  eligible_patched_matched_top1 = 0.0733
+
+frame_only_matched:
+  eligible_clean_drop = 3.9600
+  eligible_matched_gain = 8.3804
+  eligible_patched_matched_top1 = 0.2633
+
+joint_restore_both:
+  eligible_clean_drop = 0.8120
+  eligible_matched_gain = 1.6062
+  eligible_patched_clean_top1 = 0.9067
+  eligible_patched_matched_top1 = 0.0067
+```
+
+最强路径：
+
+```text
+joint_matched L4->L10:
+  clean_drop = 11.8084
+  matched_gain = 14.1173
+  matched_top1 = 0.6800
+
+joint_matched L10->L20:
+  clean_drop = 8.8349
+  matched_gain = 12.8428
+  matched_top1 = 0.6267
+```
+
+关系维度：
+
+```text
+joint_matched can_do:
+  clean_drop = 12.7828
+  matched_gain = 16.8680
+  matched_top1 = 0.8500
+
+joint_matched used_for:
+  clean_drop = 12.1617
+  matched_gain = 13.8461
+  matched_top1 = 0.6136
+
+joint_matched property:
+  clean_drop = 10.2595
+  matched_gain = 10.7197
+  matched_top1 = 0.8478
+```
+
+客观现象：
+
+```text
+GLM4 的 joint_matched 同样强于单路径。
+L4->L10 比 L10->L20 更强，说明本轮 joint source transplant 对 GLM4 的早中层窗口更敏感。
+restore both 后 clean_top1 回到 0.9067，matched_top1 降到 0.0067。
+```
+
+### DS7B 客观结果
+
+condition 汇总：
+
+```text
+joint_matched:
+  eligible_clean_drop = 9.3725
+  eligible_matched_gain = 12.5306
+  eligible_clean_margin_after = -3.8368
+  eligible_matched_margin_after = -1.2280
+  eligible_patched_clean_top1 = 0.2717
+  eligible_patched_matched_top1 = 0.4457
+
+joint_mismatched_frame:
+  eligible_clean_drop = 8.4139
+  eligible_matched_gain = 7.1188
+  eligible_matched_margin_after = -6.6399
+  eligible_patched_matched_top1 = 0.0707
+
+object_only_matched:
+  eligible_clean_drop = 4.0315
+  eligible_matched_gain = 3.8427
+  eligible_patched_matched_top1 = 0.0163
+
+frame_only_matched:
+  eligible_clean_drop = 5.8079
+  eligible_matched_gain = 9.8481
+  eligible_patched_matched_top1 = 0.2663
+
+joint_restore_both:
+  eligible_clean_drop = 0.4271
+  eligible_matched_gain = 0.5590
+  eligible_patched_clean_top1 = 0.9130
+  eligible_patched_matched_top1 = 0.0054
+```
+
+最强路径：
+
+```text
+joint_matched L8->L10:
+  clean_drop = 9.8944
+  matched_gain = 12.6858
+  matched_top1 = 0.4565
+
+joint_matched L12->L14:
+  clean_drop = 8.8505
+  matched_gain = 12.3755
+  matched_top1 = 0.4348
+```
+
+关系维度：
+
+```text
+joint_matched can_do:
+  clean_drop = 13.8635
+  matched_gain = 17.6439
+  matched_top1 = 0.7857
+
+joint_matched used_for:
+  clean_drop = 9.9869
+  matched_gain = 13.9578
+  matched_top1 = 0.4615
+
+joint_matched property:
+  clean_drop = 9.3158
+  matched_gain = 10.2682
+  matched_top1 = 0.6500
+```
+
+客观现象：
+
+```text
+DS7B 的 clean baseline eligible_n 较低，但在 eligible subset 中 joint_matched 仍明显强于 object_only。
+frame_only 在 DS7B 中较强，说明 DS7B 对 relation-frame/readout state 更敏感。
+joint_matched 的 matched_top1 = 0.4457，明显高于 joint_mismatched_frame = 0.0707。
+restore both 后 clean_top1 = 0.9130，matched_top1 = 0.0054。
+```
+
+### 三模型共同现象
+
+```text
+1. joint_matched 在三模型中都是最强组合干预。
+
+2. joint_matched 同时满足：
+   clean target 大幅下降；
+   matched source target 大幅上升；
+   matched target top1 显著高于 object_only、frame_only、mismatched。
+
+3. joint_mismatched_frame 也会强烈破坏 clean target，
+   但 matched target 上升明显弱于 joint_matched。
+   这说明“组合一致性”比“简单破坏”更重要。
+
+4. restore both 在三模型中均能大幅恢复 clean target，
+   且 matched target 基本退出 top1。
+
+5. object-only 与 frame-only 都有作用，
+   但单独路径很少能稳定把输出转向 matched source target。
+
+6. can_do / used_for / property 等关系在 joint matched 下更敏感，
+   说明功能/属性类关系更依赖 object-frame 组合兼容。
+```
+
+### 当前研究进展
+
+Phase 76 对 Phase 75 的关键推进是：
+
+```text
+Phase 75:
+  证明 relation-frame path 也有因果作用。
+
+Phase 76:
+  证明 object token 与 relation-frame token 同源匹配时，
+  输出不只是被破坏，
+  而是会明显转向 matched source 的 value space。
+```
+
+这比单路径 patch 更接近组合闭包。
+
+当前最稳的客观结论：
+
+```text
+value prediction 由 object state 和 relation-frame state 的组合兼容性共同决定。
+```
+
+但严格说，还不能说已经得到纯数学机制，因为：
+
+```text
+当前仍然是 whole-token state transplant；
+object state 和 frame state 都是混合因子；
+还没有 subspace-level factor isolation。
+```
+
+### 对条件化关系因子动力学公式的修正
+
+当前更合适的局部公式：
+
+```text
+S(v | o, r, c, l)
+=
+S_base(v, c)
++
+S_obj(v, z_o(l))
++
+S_frame(v, z_f(l))
++
+S_joint(v, z_o(l), z_f(l))
++
+S_read(v, h_l)
+```
+
+中文解释：
+
+```text
+S_obj:
+  对象状态对候选值的支持。
+
+S_frame:
+  关系框架对候选空间和值槽位的门控。
+
+S_joint:
+  对象状态和关系框架状态之间的组合兼容性。
+
+S_read:
+  当前残差轨迹到输出候选序列的读出项。
+```
+
+Phase 76 的证据主要支持：
+
+```text
+S_joint 不等于 S_obj + S_frame 的简单相加。
+```
+
+原因：
+
+```text
+joint_matched 能显著推高 matched source target；
+joint_mismatched_frame 虽然也破坏 clean target，
+但不能稳定推高 matched source target。
+```
+
+也就是说：
+
+```text
+同源 object-frame pair 更像合法组合状态；
+不同源 object-frame pair 更像不兼容/混乱状态。
+```
+
+这就是 object-frame compatibility dynamics 的核心证据。
+
+### 问题和硬伤
+
+```text
+1. 本轮使用的是完整 token state transplant，
+   不能区分 identity、relation、format、readout、compatibility 等子因子。
+
+2. matched source target 的上升并不等于完全自然生成。
+   它仍是在 closed candidate set 内的 full-sequence scoring。
+
+3. joint_mismatched_frame 也有强 clean_drop，
+   说明不兼容状态本身就会强烈破坏输出，
+   因此必须同时看 matched_gain 和 matched_top1，不能只看 clean_drop。
+
+4. DS7B baseline eligible_n 较低，且仍有 SDPA sliding window warning。
+   DS7B 结论以 eligible subset 的相对比较为主。
+
+5. 当前只测 object_last + frame_last。
+   还没有测试 value slot 前后、多 token object、多 token frame、last token readout。
+
+6. 当前没有 open generation audit。
+   还不能证明自然生成会稳定转向 matched source value。
+```
+
+### 下一步计划
+
+Phase 77：balanced cross-relation 扩展与复核。
+
+目标：
+
+```text
+扩大 object/relation/value 三元组，
+重点增强：
+same_object_different_relation
+same_relation_different_object
+same_value_different_path
+matched vs mismatched joint source
+```
+
+Phase 78：factor subspace audit。
+
+目标：
+
+```text
+在 Phase 76 证明 object-frame joint closure 后，
+开始尝试分离：
+identity factor
+category factor
+relation gate factor
+value-support factor
+compatibility factor
+readout factor
+```
+
+但判据必须是：
+
+```text
+subspace destroy-restore，
+不是 probe accuracy。
+```
+
+Phase 79：open generation audit。
+
+目标：
+
+```text
+验证 object-frame joint intervention 是否影响自由生成，
+而不仅仅影响 closed candidate ranking。
+```
+
+Phase 80：迁移到 logic/syntax。
+
+原则：
+
+```text
+先建立稳定 reader；
+再定位 object/operator/frame path；
+再做 joint closure；
+最后做 factor subspace closure。
+```
+
+当前不应直接做大理论收束；
+应该继续补全“关系组合路径图谱”的自然 control 和子因子审计。
