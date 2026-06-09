@@ -24680,3 +24680,1212 @@ reader calibration
 全局关系路径图谱已经从 token 级推进到 subspace 级。
 现在看到的语言/知识机制更像条件化因子组合，而不是单一方向或单一路径。
 ```
+
+## Phase 79: rank sweep + residual remainder audit [2026-06-09 20:42]
+
+### 任务目标
+
+根据 Phase 78 的结果，rank-16 natural contrast subspace 已经能保留一部分 whole-token joint closure，但仍明显低于 Phase 77 whole-token effect。因此本轮继续验证两个关键问题：
+
+```text
+1. object-frame 因子是低秩集中，还是高维分散？
+2. 被 rank 子空间拿走后，remainder 是否仍然保留大量 closure effect？
+```
+
+本轮不是理论总结，而是做 rank sweep + remainder audit：
+
+```text
+rank = 4, 8, 16, 32, 64
+
+joint_subspace_matched:
+  只替换 rank 子空间成分
+
+joint_remainder_matched:
+  只替换 rank 子空间正交剩余成分
+
+joint_subspace_mismatched_frame:
+  用不匹配 relation-frame 检查合法组合是否下降
+
+joint_subspace_restore_both:
+  恢复 object/frame 子空间，检查 clean answer 是否恢复
+```
+
+用户提供的 Phase 78 分析判断基本正确：
+
+```text
+1. Phase 78 是 natural contrast subspace transfer audit，不是纯因子闭包。
+2. rank-16 子空间不是纯 identity/relation/value factor。
+3. 子空间效果低于 whole-token，说明仍有 remainder、route、gate、format、trajectory 成分。
+4. 下一步必须做 rank sweep 和 remainder-only。
+```
+
+因此本轮直接执行 Phase 79。
+
+### 生成脚本
+
+新增：
+
+```text
+tests/gpt5/phase79_rank_sweep_remainder_audit.py
+tests/gpt5/phase79_rank_sweep_remainder_audit_summary.py
+tests/gpt5/run_phase79_rank_sweep_remainder_audit_full.sh
+```
+
+脚本检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase79_rank_sweep_remainder_audit.py \
+  tests/gpt5/phase79_rank_sweep_remainder_audit_summary.py
+```
+
+结果：
+
+```text
+compile passed
+```
+
+### 测试原理
+
+先用最大 rank=64 构造 object/frame 自然对比 basis：
+
+```text
+object_basis = matched object state - clean object state
+frame_basis  = matched frame state - clean frame state
+```
+
+对每个 rank 取前 k 个方向：
+
+```text
+B_k = B[:, :k]
+```
+
+子空间替换：
+
+```text
+current <- current + B_k @ B_k.T @ (source - current)
+```
+
+剩余成分替换：
+
+```text
+current <- current + ((source - current) - B_k @ B_k.T @ (source - current))
+```
+
+如果 rank 增大时 subspace effect 上升、remainder effect 下降，说明 causal signal 主要集中在这些自然对比主方向中。
+
+如果 remainder effect 仍然很强，说明 hidden state 中还有大量未被低秩 basis 捕获的高维成分。
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE79_MODELS=qwen3 \
+QWEN3_PHASE79_MAX_ITEMS=28 \
+QWEN3_PHASE79_LAYER_PAIRS=4-8 \
+PHASE79_RANKS=4,8 \
+PHASE79_MAX_BASIS_ITEMS=28 \
+PHASE79_PROGRESS_EVERY=14 \
+PHASE79_OUTPUT_DIR=results/gpt5_phase79_rank_sweep_remainder_audit_smoke_$(date +%Y%m%d_%H%M%S) \
+tests/gpt5/run_phase79_rank_sweep_remainder_audit_full.sh
+```
+
+结果：
+
+```text
+qwen3 rows = 224
+exit_code = 0
+attn_impl = sdpa
+```
+
+### 全量测试命令
+
+```bash
+PHASE79_OUTPUT_DIR=results/gpt5_phase79_rank_sweep_remainder_audit_full_$(date +%Y%m%d_%H%M%S) \
+PHASE79_PROGRESS_EVERY=84 \
+PHASE79_MAX_BASIS_ITEMS=224 \
+tests/gpt5/run_phase79_rank_sweep_remainder_audit_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+每个模型都使用：
+
+```text
+--hard-exit-after-model
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459
+```
+
+输出文件：
+
+```text
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459/qwen3_phase79_rank_sweep_remainder_audit.json
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459/glm4_phase79_rank_sweep_remainder_audit.json
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459/deepseek7b_phase79_rank_sweep_remainder_audit.json
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459/phase79_rank_sweep_remainder_audit_summary.json
+results/gpt5_phase79_rank_sweep_remainder_audit_full_20260609_165459/PHASE79_RANK_SWEEP_REMAINDER_AUDIT_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+objects = 24
+relations = 7
+frames = 4
+items/model = 672
+basis_items/model = 224
+ranks = 4, 8, 16, 32, 64
+conditions = 4
+layer_pairs/model = 2
+rows/model = 26880
+total_rows = 80640
+```
+
+layer pairs：
+
+```text
+Qwen3:
+  L4->L8
+  L8->L12
+
+GLM4:
+  L4->L10
+  L10->L20
+
+DeepSeek7B:
+  L8->L10
+  L12->L14
+```
+
+注意：
+
+```text
+本机未安装 flash_attn，因此 flash_attention_2 自动回退到 sdpa。
+DeepSeek7B 使用 sdpa 时仍有 sliding-window warning，因此 DS7B 结论要带实现路径 caveat。
+```
+
+### Qwen3 客观结果
+
+rank sweep：
+
+```text
+rank4 joint_subspace_matched:
+  matched_top1 = 0.1010
+  matched_gain = 5.1931
+
+rank8 joint_subspace_matched:
+  matched_top1 = 0.2082
+  matched_gain = 8.7201
+
+rank16 joint_subspace_matched:
+  matched_top1 = 0.4264
+  matched_gain = 12.1618
+
+rank32 joint_subspace_matched:
+  matched_top1 = 0.5299
+  matched_gain = 13.7214
+
+rank64 joint_subspace_matched:
+  matched_top1 = 0.5399
+  matched_gain = 13.8309
+```
+
+remainder：
+
+```text
+rank4 joint_remainder_matched:
+  matched_top1 = 0.1771
+  matched_gain = 7.7217
+
+rank8 joint_remainder_matched:
+  matched_top1 = 0.0561
+  matched_gain = 4.3982
+
+rank16 joint_remainder_matched:
+  matched_top1 = 0.0175
+  matched_gain = 1.6927
+
+rank32 joint_remainder_matched:
+  matched_top1 = 0.0025
+  matched_gain = 0.0329
+
+rank64 joint_remainder_matched:
+  matched_top1 = 0.0000
+  matched_gain = 0.0027
+```
+
+mismatched frame：
+
+```text
+rank64 joint_subspace_mismatched_frame:
+  matched_top1 = 0.1883
+  matched_gain = 8.9235
+```
+
+restore：
+
+```text
+rank64 joint_subspace_restore_both:
+  clean_top1 = 0.8653
+  matched_top1 = 0.0100
+```
+
+Qwen3 现象：
+
+```text
+1. subspace effect 随 rank 单调上升。
+2. rank32 已接近 Phase77 whole-token matched_top1 = 0.5295。
+3. remainder effect 从 rank4 的 0.1771 快速下降到 rank64 的 0。
+4. matched frame 明显强于 mismatched frame，说明合法组合不是纯破坏。
+```
+
+### GLM4 客观结果
+
+rank sweep：
+
+```text
+rank4 joint_subspace_matched:
+  matched_top1 = 0.0629
+  matched_gain = 3.3169
+
+rank8 joint_subspace_matched:
+  matched_top1 = 0.1812
+  matched_gain = 6.8299
+
+rank16 joint_subspace_matched:
+  matched_top1 = 0.4488
+  matched_gain = 11.3391
+
+rank32 joint_subspace_matched:
+  matched_top1 = 0.6407
+  matched_gain = 13.5902
+
+rank64 joint_subspace_matched:
+  matched_top1 = 0.6546
+  matched_gain = 13.8849
+```
+
+remainder：
+
+```text
+rank4 joint_remainder_matched:
+  matched_top1 = 0.2846
+  matched_gain = 8.7733
+
+rank8 joint_remainder_matched:
+  matched_top1 = 0.1077
+  matched_gain = 5.1105
+
+rank16 joint_remainder_matched:
+  matched_top1 = 0.0277
+  matched_gain = 1.7149
+
+rank32 joint_remainder_matched:
+  matched_top1 = 0.0075
+  matched_gain = 0.0979
+
+rank64 joint_remainder_matched:
+  matched_top1 = 0.0043
+  matched_gain = -0.0123
+```
+
+mismatched frame：
+
+```text
+rank64 joint_subspace_mismatched_frame:
+  matched_top1 = 0.2100
+  matched_gain = 8.3018
+```
+
+restore：
+
+```text
+rank64 joint_subspace_restore_both:
+  clean_top1 = 0.8838
+  matched_top1 = 0.0171
+```
+
+GLM4 现象：
+
+```text
+1. rank32/64 subspace almost fully recovers Phase77 whole-token effect。
+2. Phase77 whole-token matched_top1 = 0.6486，Phase79 rank64 = 0.6546。
+3. remainder 在 rank32/64 基本消失。
+4. GLM4 的 object-frame causal signal 比 Qwen3/DS7B 更集中在自然对比子空间中。
+```
+
+### DeepSeek7B 客观结果
+
+rank sweep：
+
+```text
+rank4 joint_subspace_matched:
+  matched_top1 = 0.0554
+  matched_gain = 3.9165
+
+rank8 joint_subspace_matched:
+  matched_top1 = 0.1487
+  matched_gain = 7.1524
+
+rank16 joint_subspace_matched:
+  matched_top1 = 0.2896
+  matched_gain = 9.6624
+
+rank32 joint_subspace_matched:
+  matched_top1 = 0.3829
+  matched_gain = 11.2440
+
+rank64 joint_subspace_matched:
+  matched_top1 = 0.4193
+  matched_gain = 11.6139
+```
+
+remainder：
+
+```text
+rank4 joint_remainder_matched:
+  matched_top1 = 0.1978
+  matched_gain = 7.4433
+
+rank8 joint_remainder_matched:
+  matched_top1 = 0.0506
+  matched_gain = 3.9489
+
+rank16 joint_remainder_matched:
+  matched_top1 = 0.0174
+  matched_gain = 2.0311
+
+rank32 joint_remainder_matched:
+  matched_top1 = 0.0063
+  matched_gain = 0.8004
+
+rank64 joint_remainder_matched:
+  matched_top1 = 0.0047
+  matched_gain = 0.3668
+```
+
+mismatched frame：
+
+```text
+rank64 joint_subspace_mismatched_frame:
+  matched_top1 = 0.1123
+  matched_gain = 6.7360
+```
+
+restore：
+
+```text
+rank64 joint_subspace_restore_both:
+  clean_top1 = 0.8655
+  matched_top1 = 0.0047
+```
+
+DeepSeek7B 现象：
+
+```text
+1. subspace effect 随 rank 上升。
+2. rank64 matched_top1 = 0.4193，接近 Phase77 whole-token 0.4161。
+3. remainder effect 下降明显，但 rank64 matched_gain 仍有 0.3668。
+4. 相比 Qwen3/GLM4，DS7B 的低 rank subspace 较弱，说明因子更分散或更依赖轨迹。
+```
+
+### 三模型对比
+
+Phase77 whole-token joint matched vs Phase79 rank64 subspace：
+
+```text
+Qwen3:
+  Phase77 = 0.5295
+  Phase79 rank64 = 0.5399
+
+GLM4:
+  Phase77 = 0.6486
+  Phase79 rank64 = 0.6546
+
+DeepSeek7B:
+  Phase77 = 0.4161
+  Phase79 rank64 = 0.4193
+```
+
+rank64 remainder：
+
+```text
+Qwen3:
+  matched_top1 = 0.0000
+  matched_gain = 0.0027
+
+GLM4:
+  matched_top1 = 0.0043
+  matched_gain = -0.0123
+
+DeepSeek7B:
+  matched_top1 = 0.0047
+  matched_gain = 0.3668
+```
+
+客观结论：
+
+```text
+1. rank64 natural contrast subspace 基本复现 Phase77 whole-token effect。
+2. rank32 已经接近饱和，rank64 只小幅提升。
+3. remainder effect 随 rank 增大快速消失。
+4. rank4/8 仍保留部分 remainder effect，说明低 rank 不足以解释全部 closure。
+5. 三模型均显示：object-frame joint closure 的主要 causal signal 集中在前 32-64 个自然对比方向。
+6. DS7B 的低 rank 更弱，说明其关系因子更分散或更依赖上下游轨迹。
+```
+
+### 当前研究进展
+
+Phase 79 是一个非常关键的客观结果：
+
+```text
+Phase 78:
+  rank16 子空间能部分复现 whole-token effect。
+
+Phase 79:
+  rank32/64 子空间基本复现 whole-token effect；
+  rank64 remainder 基本不再保留合法 matched transfer。
+```
+
+这说明：
+
+```text
+object-frame joint closure 的主要因果成分不是随机分散在整个 hidden state 中，
+而是集中在自然对比主方向中。
+```
+
+但是：
+
+```text
+这仍不是纯 factor。
+```
+
+因为自然对比方向仍混合：
+
+```text
+identity
+category
+relation
+value support
+template
+position
+readout format
+compatibility
+```
+
+最稳妥表述：
+
+```text
+知识关系 value retrieval 的可迁移因果信号主要集中在 object-frame natural contrast subspace 中；
+该子空间可以近似复现 whole-token joint closure；
+但它仍是混合因子子空间，不是最终的纯语义变量。
+```
+
+### 对条件化关系因子动力学公式的更新
+
+Phase 79 后，公式可以进一步加入 rank saturation：
+
+```text
+h_l' = h_l
+     + P_O^{l,k}(source_O - clean_O)
+     + P_R^{l,k}(source_R - clean_R)
+
+Effect(k)
+  -> saturates around k = 32..64
+
+Remainder(k)
+  -> decays toward zero as k increases
+```
+
+因此：
+
+```text
+ValueReadout
+  ≈ G(
+      LowRankObjectContrast,
+      LowRankRelationFrameContrast,
+      Compatibility(O, R),
+      ResidualContext,
+      OutputSlot
+    )
+```
+
+更直白地说：
+
+```text
+object-frame binding 的核心不是全 hidden state；
+也不是单一方向；
+而是一组有限数量的自然对比方向形成的条件化组合子空间。
+```
+
+### 问题和硬伤
+
+```text
+1. rank32/64 子空间虽然基本复现 whole-token effect，但仍不是纯 factor。
+
+2. 当前没有把 identity、relation、value、template、position 分开。
+
+3. 当前 rank basis 来自 matched-clean 差分，可能包含答案 value 信息。
+
+4. 当前仍是 closed candidate scoring。
+
+5. 当前还没有 open generation 验证。
+
+6. 当前还没有真正的 remove-only / restore-only / subspace-only / remainder-only 的完整闭包矩阵。
+   本轮 remainder 是 source-clean 的正交剩余转移，不等同 erase clean subspace。
+
+7. DeepSeek7B 仍受 sdpa sliding-window 实现提醒影响。
+```
+
+### 下一步计划
+
+Phase 80：orthogonal factor audit。
+
+目标：
+
+```text
+把 object/relation/value/template/position 因子进一步拆开。
+```
+
+核心测试：
+
+```text
+1. value basis:
+   用 target value 的 token state 构造 value 子空间。
+
+2. template basis:
+   用同 object/relation 但不同 frame 构造 template 子空间。
+
+3. position basis:
+   用同 token 不同位置构造 position 子空间。
+
+4. orthogonal removal:
+   从 object/frame basis 中去掉 value/template/position 子空间后，再测 joint closure。
+```
+
+Phase 81：open generation audit。
+
+目标：
+
+```text
+验证 rank64 object-frame subspace 是否影响自由生成，
+而不是只改变封闭候选排序。
+```
+
+Phase 82：destroy-restore matrix。
+
+目标：
+
+```text
+真正做 erase subspace / restore subspace：
+  clean erase object/frame subspace 是否破坏 clean answer；
+  erase 后恢复是否恢复；
+  只保留 subspace 是否足够；
+  只保留 remainder 是否不足。
+```
+
+Phase 83：迁移到逻辑/语法。
+
+目标：
+
+```text
+把 relation-frame 机制迁移到：
+operator-event binding；
+active/passive role binding；
+temporal order binding；
+coreference entity binding。
+```
+
+当前优先级：
+
+```text
+先拆因子，再谈理论收束。
+```
+
+## Phase 80: orthogonal factor audit [2026-06-09 23:34]
+
+### 任务目标
+
+根据 Phase 79 的结果，rank32/64 natural contrast subspace 已经基本复现 whole-token joint closure，remainder effect 基本消失。但用户提供的分析指出一个关键硬伤：
+
+```text
+rank64 子空间仍然不是纯 factor。
+matched-clean contrast 可能混入：
+  value
+  template
+  position
+  readout format
+  identity
+  relation
+  compatibility
+```
+
+因此 Phase 80 做 orthogonal factor audit，目标不是证明纯因子，而是检查：
+
+```text
+从 object/frame contrast basis 中正交移除 value/template/position nuisance basis 后，
+joint closure 还剩多少。
+```
+
+### 生成脚本
+
+新增：
+
+```text
+tests/gpt5/phase80_orthogonal_factor_audit.py
+tests/gpt5/phase80_orthogonal_factor_audit_summary.py
+tests/gpt5/run_phase80_orthogonal_factor_audit_full.sh
+```
+
+脚本检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase80_orthogonal_factor_audit.py \
+  tests/gpt5/phase80_orthogonal_factor_audit_summary.py
+```
+
+结果：
+
+```text
+compile passed
+```
+
+### 测试原理
+
+构造主对比子空间：
+
+```text
+object_basis:
+  matched object token state - clean object token state
+
+frame_basis:
+  matched relation-frame token state - clean relation-frame token state
+```
+
+构造 nuisance basis：
+
+```text
+value_basis:
+  matched value token state - clean value token state
+
+template_basis:
+  同 object/relation/value 下，不同 frame 的 frame token state 差异
+
+position_basis:
+  同 object 在短 prompt 和长 prompt 中的位置/上下文差异
+```
+
+注意：
+
+```text
+这些 nuisance basis 也不是纯因子，只是混杂因素审计工具。
+```
+
+然后进行正交移除：
+
+```text
+object_orth_value    = object_basis 去掉 value_basis 投影
+frame_orth_value     = frame_basis  去掉 value_basis 投影
+
+object_orth_template = object_basis 去掉 template_basis 投影
+frame_orth_template  = frame_basis  去掉 template_basis 投影
+
+object_orth_position = object_basis 去掉 position_basis 投影
+frame_orth_position  = frame_basis  去掉 position_basis 投影
+
+object_orth_all      = object_basis 去掉 value/template/position 总投影
+frame_orth_all       = frame_basis  去掉 value/template/position 总投影
+```
+
+测试条件：
+
+```text
+joint_raw
+joint_orth_value
+joint_orth_template
+joint_orth_position
+joint_orth_all
+joint_mismatched_frame_raw
+joint_value_basis_only
+joint_template_basis_only
+joint_position_basis_only
+joint_raw_restore_both
+```
+
+### 工程记录
+
+第一次全量运行中，Qwen3 在 L4->L8 item=504/672 后发生用户态 segmentation fault：
+
+```text
+exit_code = 139
+kernel log = 无可读错误
+nvidia-smi = 正常
+```
+
+脚本随后增加：
+
+```text
+item_idx 记录
+progress checkpoint
+CUDA/Python cache cleanup
+malloc_trim
+```
+
+重新运行后，三模型全部完成。
+
+### Smoke Test
+
+命令：
+
+```bash
+PHASE80_MODELS=qwen3 \
+QWEN3_PHASE80_MAX_ITEMS=28 \
+QWEN3_PHASE80_LAYER_PAIRS=4-8 \
+PHASE80_MAX_BASIS_ITEMS=28 \
+PHASE80_PROGRESS_EVERY=14 \
+PHASE80_CONTRAST_RANK=16 \
+PHASE80_NUISANCE_RANK=8 \
+PHASE80_OUTPUT_DIR=results/gpt5_phase80_orthogonal_factor_audit_smoke_$(date +%Y%m%d_%H%M%S) \
+tests/gpt5/run_phase80_orthogonal_factor_audit_full.sh
+```
+
+结果：
+
+```text
+qwen3 rows = 280
+exit_code = 0
+```
+
+### 全量测试命令
+
+```bash
+PHASE80_OUTPUT_DIR=results/gpt5_phase80_orthogonal_factor_audit_full_$(date +%Y%m%d_%H%M%S) \
+PHASE80_PROGRESS_EVERY=42 \
+PHASE80_MAX_BASIS_ITEMS=224 \
+tests/gpt5/run_phase80_orthogonal_factor_audit_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637
+```
+
+输出文件：
+
+```text
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637/qwen3_phase80_orthogonal_factor_audit.json
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637/glm4_phase80_orthogonal_factor_audit.json
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637/deepseek7b_phase80_orthogonal_factor_audit.json
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637/phase80_orthogonal_factor_audit_summary.json
+results/gpt5_phase80_orthogonal_factor_audit_full_20260609_211637/PHASE80_ORTHOGONAL_FACTOR_AUDIT_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+items/model = 672
+basis_items/model = 224
+contrast_rank = 64
+nuisance_rank = 24
+conditions = 10
+layer_pairs/model = 2
+rows/model = 13440
+total_rows = 40320
+```
+
+### Qwen3 客观结果
+
+```text
+joint_raw:
+  matched_top1 = 0.5399
+  matched_gain = 13.8309
+
+joint_orth_value:
+  matched_top1 = 0.5050
+  matched_gain = 13.2989
+
+joint_orth_template:
+  matched_top1 = 0.2668
+  matched_gain = 9.7317
+
+joint_orth_position:
+  matched_top1 = 0.5436
+  matched_gain = 13.7312
+
+joint_orth_all:
+  matched_top1 = 0.2082
+  matched_gain = 8.8659
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.1883
+  matched_gain = 8.9235
+
+joint_value_basis_only:
+  matched_top1 = 0.0050
+  matched_gain = 0.5279
+
+joint_template_basis_only:
+  matched_top1 = 0.0474
+  matched_gain = 3.3716
+
+joint_position_basis_only:
+  matched_top1 = 0.0025
+  matched_gain = 0.0681
+
+joint_raw_restore_both:
+  clean_top1 = 0.8653
+  matched_top1 = 0.0100
+```
+
+Qwen3 现象：
+
+```text
+1. 去掉 value 后，effect 只小幅下降：0.5399 -> 0.5050。
+2. 去掉 template 后，effect 大幅下降：0.5399 -> 0.2668。
+3. 去掉 position 几乎不影响：0.5399 -> 0.5436。
+4. 去掉 value/template/position 后，effect 降到 0.2082，接近 mismatched_frame 0.1883。
+5. value/template/position basis only 都不能单独形成合法 transfer。
+```
+
+### GLM4 客观结果
+
+```text
+joint_raw:
+  matched_top1 = 0.6546
+  matched_gain = 13.8849
+
+joint_orth_value:
+  matched_top1 = 0.6205
+  matched_gain = 13.2570
+
+joint_orth_template:
+  matched_top1 = 0.3294
+  matched_gain = 9.6652
+
+joint_orth_position:
+  matched_top1 = 0.6557
+  matched_gain = 13.8489
+
+joint_orth_all:
+  matched_top1 = 0.2783
+  matched_gain = 8.8383
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.2100
+  matched_gain = 8.3018
+
+joint_value_basis_only:
+  matched_top1 = 0.0053
+  matched_gain = 0.3133
+
+joint_template_basis_only:
+  matched_top1 = 0.0277
+  matched_gain = 2.0030
+
+joint_position_basis_only:
+  matched_top1 = 0.0000
+  matched_gain = 0.0108
+
+joint_raw_restore_both:
+  clean_top1 = 0.8838
+  matched_top1 = 0.0171
+```
+
+GLM4 现象：
+
+```text
+1. 去掉 value 后仍很强：0.6546 -> 0.6205。
+2. 去掉 template 后显著下降：0.6546 -> 0.3294。
+3. 去掉 position 不影响：0.6546 -> 0.6557。
+4. orth_all 降到 0.2783，仍略高于 mismatched_frame 0.2100。
+5. nuisance basis only 几乎不能独立产生 matched transfer。
+```
+
+### DeepSeek7B 客观结果
+
+```text
+joint_raw:
+  matched_top1 = 0.4193
+  matched_gain = 11.6139
+
+joint_orth_value:
+  matched_top1 = 0.3244
+  matched_gain = 10.3805
+
+joint_orth_template:
+  matched_top1 = 0.2753
+  matched_gain = 9.5142
+
+joint_orth_position:
+  matched_top1 = 0.4114
+  matched_gain = 11.4794
+
+joint_orth_all:
+  matched_top1 = 0.1978
+  matched_gain = 8.1449
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.1123
+  matched_gain = 6.7360
+
+joint_value_basis_only:
+  matched_top1 = 0.0063
+  matched_gain = 1.1287
+
+joint_template_basis_only:
+  matched_top1 = 0.0174
+  matched_gain = 1.7876
+
+joint_position_basis_only:
+  matched_top1 = 0.0047
+  matched_gain = 0.2243
+
+joint_raw_restore_both:
+  clean_top1 = 0.8655
+  matched_top1 = 0.0047
+```
+
+DeepSeek7B 现象：
+
+```text
+1. 去掉 value 下降更明显：0.4193 -> 0.3244。
+2. 去掉 template 也下降：0.4193 -> 0.2753。
+3. 去掉 position 基本不影响：0.4193 -> 0.4114。
+4. orth_all 仍高于 mismatched_frame：0.1978 vs 0.1123。
+5. nuisance basis only 不能独立形成合法 transfer。
+```
+
+### 三模型对比
+
+```text
+Qwen3:
+  raw = 0.5399
+  orth_value = 0.5050
+  orth_template = 0.2668
+  orth_position = 0.5436
+  orth_all = 0.2082
+  mismatched = 0.1883
+
+GLM4:
+  raw = 0.6546
+  orth_value = 0.6205
+  orth_template = 0.3294
+  orth_position = 0.6557
+  orth_all = 0.2783
+  mismatched = 0.2100
+
+DeepSeek7B:
+  raw = 0.4193
+  orth_value = 0.3244
+  orth_template = 0.2753
+  orth_position = 0.4114
+  orth_all = 0.1978
+  mismatched = 0.1123
+```
+
+跨模型稳定现象：
+
+```text
+1. value_basis_only 几乎无效。
+2. position_basis_only 几乎无效。
+3. template_basis_only 弱于 raw 很多。
+4. 去掉 position 基本不影响 joint closure。
+5. 去掉 value 小幅到中等影响。
+6. 去掉 template 影响最大。
+7. 去掉 value/template/position 后，joint closure 大幅下降，但仍略高于 mismatched_frame。
+```
+
+### 当前研究进展
+
+Phase 80 回答了 Phase 79 的核心硬伤之一：
+
+```text
+rank64 子空间不是纯 value leakage。
+```
+
+证据：
+
+```text
+1. value_basis_only 几乎不能单独产生 matched transfer。
+2. 从 object/frame basis 中去掉 value 后，Qwen3/GLM4 仍保留大部分 effect。
+3. DS7B 对 value removal 更敏感，但 effect 仍未消失。
+```
+
+同时 Phase 80 发现 template/readout-format 相关方向非常关键：
+
+```text
+去掉 template 后，三模型 matched_top1 均大幅下降。
+```
+
+这说明 relation-frame 的作用不只是 relation semantic gate，也包含 frame/readout format。
+
+更谨慎地说：
+
+```text
+object-frame joint closure 的 rank64 causal subspace 中，
+value leakage 不是主解释；
+template/readout-format 是重要组成；
+position 不是主要组成；
+去掉三类 nuisance 后仍有一部分 residual compatibility signal。
+```
+
+### 条件化关系因子动力学公式更新
+
+Phase 80 后，公式应从：
+
+```text
+LowRankObjectContrast + LowRankRelationFrameContrast
+```
+
+细化为：
+
+```text
+LowRankObjectFrameContrast
+  =
+  CompatibilityCore
+  + ReadoutTemplate
+  + ValueSupport
+  + PositionContext
+  + ResidualMixedFactor
+```
+
+实验约束：
+
+```text
+ValueSupport only:
+  weak
+
+Template only:
+  weak but larger than value/position
+
+Position only:
+  near zero
+
+Remove value:
+  small/moderate drop
+
+Remove template:
+  large drop
+
+Remove all:
+  large drop, but residual remains above mismatched in GLM4/DS7B
+```
+
+因此当前更稳的操作性公式：
+
+```text
+Score(value)
+  =
+  BaseContext
+  + Compat(Object, Relation)
+  + ReadoutTemplate(Frame)
+  + CompatTemplateInteraction(Object, Frame)
+  + weak ValueSupport
+```
+
+关键改进：
+
+```text
+relation-frame path 不只是 relation gate，
+还携带 readout template / output format。
+
+object path 不只是 identity，
+而是和 frame template 发生兼容性组合。
+```
+
+### 问题和硬伤
+
+```text
+1. value/template/position basis 仍是粗糙混杂审计，不是纯因子。
+
+2. template_basis 的定义是同 object/relation/value 不同 frame 的 frame token 差异，
+   它可能同时包含模板、语序、读出槽位、局部上下文。
+
+3. position_basis 是短/长 neutral prompt 对比，不能完全代表真实 prompt 中的位置编码。
+
+4. orth_all 下降很大，但不能说明全部下降都来自这些 nuisance；
+   子空间正交化本身可能移除部分 compatibility core。
+
+5. 当前仍是 closed candidate scoring。
+
+6. 当前没有 open generation。
+
+7. 当前还没有 erase-clean-subspace 的 destroy-restore matrix。
+```
+
+### 下一步计划
+
+Phase 81：template/readout-factor 深挖。
+
+目标：
+
+```text
+把 template/readout-format 从 relation-frame 中进一步拆出来。
+```
+
+测试：
+
+```text
+same relation + different frame
+same frame + different relation
+same object + same relation + paraphrased frame
+same prompt + changed output slot
+```
+
+关键问题：
+
+```text
+template 下降到底来自表面模板，
+还是来自 output slot/readout format？
+```
+
+Phase 82：destroy-restore matrix。
+
+目标：
+
+```text
+对 rank64 object/frame subspace 做真正 erase-clean-subspace：
+  erase 是否破坏 clean answer；
+  restore 是否恢复；
+  subspace-only 是否足够；
+  remainder-only 是否不足。
+```
+
+Phase 83：open generation audit。
+
+目标：
+
+```text
+验证 rank64 subspace 和 orthogonal factors 是否影响自由生成。
+```
+
+Phase 84：迁移到逻辑/语法。
+
+目标：
+
+```text
+用同样流程测试：
+operator-event binding
+active/passive role binding
+temporal order binding
+coreference entity binding
+```
+
+目前最重要的结论：
+
+```text
+知识关系编码不是单纯 object identity，也不是单纯 value leakage。
+它更像 object compatibility 与 relation-frame readout template 的条件化组合。
+```
