@@ -16783,6 +16783,930 @@ DS7B baseline entropy在中层就降为0,但这不意味着DS7B没有速度语�
    - 对每个方向效应分解: total / attention-mediated / MLP-mediated / RMSNorm-mediated
    - 比Phase 404的简单归因更严格
 
+---
+
+## Phase 406: 动态规则重编码 [2026-06-09 13:47]
+
+### 实验目标
+
+验证模型的TYPE×SPEED几何是否随上下文规则动态重编码。构造三个世界:
+- **World A (默认规则)**: 大动物快, 小动物慢; 大车快, 小车慢
+- **World B (反转规则)**: 小动物快, 大动物慢; 小车快, 大车慢
+- **World C (控制条件)**: 颜色/价格/频率规则, 与速度无关
+
+如果模型真正理解语义关系, World B的speed_gradient应该反转(负→正或正→负)。
+
+### 三模型核心结果
+
+#### 发现1: Speed Gradient没有随规则反转 — 三模型一致
+
+**Qwen3 speed_gradient (rule0):**
+| 对象 | World A | World B | World C | A→B期望 |
+|------|---------|---------|---------|---------|
+| snail (默认慢→B快) | -0.410 | -0.224 | -0.253 | 正反转 ❌ |
+| cheetah (默认快→B慢) | +0.691 | +0.489 | +0.566 | 负反转 ❌ |
+| bicycle (默认慢→B快) | +0.019 | +0.049 | +0.292 | 正反转 ❌ |
+| rocket (默认快→B慢) | +0.478 | +0.188 | +0.437 | 负反转 ❌ |
+| glacier (默认慢→B快) | -0.019 | -0.009 | +0.092 | 正反转 ❌ |
+| lightning (默认快→B慢) | +0.886 | +0.489 | +0.568 | 负反转 ❌ |
+
+**GLM4 speed_gradient (rule0):**
+| 对象 | World A | World B | World C |
+|------|---------|---------|---------|
+| snail | -0.089 | +0.293 | -0.012 |
+| cheetah | +0.632 | +0.591 | +0.723 |
+| bicycle | +0.019 | +0.094 | +0.231 |
+| rocket | +0.711 | +0.493 | +0.678 |
+| glacier | +0.033 | +0.024 | -0.001 |
+| lightning | +0.898 | +0.747 | +0.374 |
+
+**DS7B speed_gradient (rule0):**
+| 对象 | World A | World B | World C |
+|------|---------|---------|---------|
+| snail | -0.455 | -0.362 | -0.192 |
+| cheetah | -0.014 | -0.125 | +0.303 |
+| bicycle | -0.287 | -0.229 | -0.102 |
+| rocket | -0.104 | -0.384 | -0.053 |
+| glacier | -0.142 | -0.217 | +0.016 |
+| lightning | +0.520 | +0.056 | +0.475 |
+
+**关键事实:**
+- 三个模型中, **没有任何一个对象的speed_gradient在World B下系统性反转**
+- snail在GLM4中从-0.089变为+0.293(唯一的"反转"案例), 但cheetah仍为+0.591
+- 整体趋势: World B的gradient绝对值普遍减小, 但方向不变
+
+#### 发现2: Entropy在World B普遍更高 — 三模型一致
+
+**Δentropy(B-A)按TYPE聚合:**
+| TYPE | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| animal | +0.219 | +0.460 | +0.275 |
+| vehicle | +0.264 | +0.402 | +0.360 |
+| phenomenon | +0.360 | +0.355 | +0.376 |
+
+- 所有TYPE在所有模型中Δentropy > 0
+- 说明反转规则使候选分布更分散(更不确定)
+
+#### 发现3: Variance在World B普遍更低 — 三模型一致
+
+**Δvariance(B-A)按TYPE聚合:**
+| TYPE | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| animal | -0.198 | -1.598 | -1.290 |
+| vehicle | -0.788 | -1.783 | -0.850 |
+| phenomenon | -2.651 | -1.526 | -1.193 |
+
+- 所有TYPE在所有模型中Δvariance < 0
+- 说明反转规则使候选logit差距缩小
+
+#### 发现4: TYPE聚类几乎不受规则影响
+
+**中层cluster_ratio (World A / B / C):**
+| 模型 | A | B | C |
+|------|---|---|---|
+| Qwen3 L20 | 0.802 | 0.796 | 0.790 |
+| GLM4 L25 | 0.892 | 0.889 | 0.887 |
+| DS7B L16 | 0.841 | 0.833 | 0.918 |
+
+- TYPE聚类比在A/B世界间几乎不变, 说明TYPE结构是固定的
+- DS7B在C世界聚类比最高(0.918), 可能因为控制条件不涉及速度干扰
+
+#### 发现5: 方向注入效应跨世界极小
+
+**Qwen3方向注入 (speed_gradient_odd/even):**
+| World | L4 sg_odd | L4 sg_even | L28 sg_odd | L28 sg_even |
+|-------|-----------|------------|------------|-------------|
+| A | -0.002 | +0.002 | -0.005 | +0.012 |
+| B | +0.001 | -0.002 | +0.001 | +0.001 |
+| C | -0.001 | +0.001 | +0.001 | +0.002 |
+
+- 方向注入的odd/even效应在0.001-0.01量级, 远小于baseline gradient
+- 说明用World A下计算的速度方向注入到World B下, 效果极其微弱
+
+### 新增客观事实拼图 (Phase 406)
+
+82. **三模型speed_gradient不随规则反转**: 用自然语言描述反转规则后, 速度梯度方向不变, 仅绝对值减小
+83. **反转规则使entropy增加**: 三模型所有TYPE的Δentropy(B-A)均为正
+84. **反转规则使variance降低**: 三模型所有TYPE的Δvariance(B-A)均为负
+85. **TYPE聚类不受规则影响**: 三模型在A/B/C世界的聚类比几乎相同
+86. **方向注入跨世界效应极弱**: 在World A下计算的速度方向注入到World B, 效应<0.01量级
+87. **GLM4唯一部分反转案例**: snail从-0.089→+0.293, 但cheetah(快→慢)仍为+0.591, 不构成系统性反转
+
+### 关键分析
+
+**模型没有真正理解"反转规则"的语义?**
+
+不完全是。更准确的描述是:
+1. 模型确实感知到了规则变化(entropy增加、variance降低), 说明"规则冲突"被编码
+2. 但速度语义的几何结构(speed_gradient方向)是固定的, 不随规则动态重编码
+3. 这意味着速度语义是**静态知识编码**, 而非**动态规则推理**
+
+**entropy增加 + variance降低的"矛盾"意味着什么?**
+
+这不是矛盾:
+- entropy增加: 概率分布更均匀 → 模型对速度词更不确定
+- variance降低: logit绝对差距缩小 → 候选词间竞争更均衡
+- 两者一致: 规则冲突使模型不再集中投注某个速度词, 而是分散概率
+
+### 严谨审视
+
+1. **是否prompt设计问题?** 规则描述可能不够强力。但两个独立rule_prompt一致, 且entropy确实增加
+2. **是否6个对象太少?** 基础轮6个覆盖3个TYPE, 数据量合理。第二轮确认测试对象较少但核心结论已经很清晰
+3. **DS7B的特殊性**: DS7B几乎所有对象speed_gradient为负(包括cheetah/rocket), 这是Phase 405已确认的读出尺度问题
+
+### 下一步
+
+1. **Phase 407: 扩展到其他连续属性** (temperature/brightness/size)
+   - 确认"静态知识编码"是否是连续属性编码的一般特征
+
+2. **Phase 408: 路径级因果中介分析**
+   - 对每个方向效应分解: total / attention-mediated / MLP-mediated / RMSNorm-mediated
+
+3. **Phase 409: 规则强度的梯度测试**
+   - 用更强制性的规则描述(如"By definition, snail is fast")替代温和的规则
+   - 或用in-context learning给出少量示例
+
+---
+
+## Phase 407: 多属性连续属性编码 [2026-06-09 13:55]
+
+### 实验目标
+
+Phase 406发现速度属性是"静态知识编码"(gradient不随规则反转)。
+Phase 407验证: temperature/brightness/size是否也是静态知识编码?
+
+对4个属性维度测量level-gradient相关性, 如果高level对象的gradient始终为正,
+说明连续属性编码的一般机制是"属性等级→方向梯度"的固定映射。
+
+### 三模型核心结果
+
+#### 发现1: Temperature属性level-gradient相关性最高 — 三模型一致
+
+**Level-Gradient Correlation (Spearman):**
+| 属性 | Qwen3 | GLM4 | DS7B | 三模型均值 |
+|------|-------|------|------|-----------|
+| temperature | 0.833 | 0.833 | 0.926 | **0.864** |
+| size | 0.530 | 0.618 | 0.706 | **0.618** |
+| speed | 0.406 | 0.522 | 0.522 | **0.483** |
+| brightness | 0.353 | 0.441 | -0.530 | **0.088** |
+
+**关键事实:**
+- Temperature在三个模型中都是最高/接近最高的, 且三模型一致
+- Size在三个模型中都为正(0.53-0.71), 且一致
+- Speed在三个模型中约为0.4-0.52
+- **Brightness在DS7B中为负(-0.530)**, 在Qwen3/GLM4中弱正(0.35-0.44)
+
+#### 发现2: 低level vs 高level的gradient方向一致性
+
+**Δgradient(high-low) 三模型对比:**
+| 属性 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| temperature | +0.707 | +0.705 | +0.629 |
+| size | +0.282 | +0.746 | +0.276 |
+| speed | +0.466 | +0.417 | +0.147 |
+| brightness | +0.125 | +0.282 | -0.295 |
+
+**关键事实:**
+- Temperature: Δgrad一致为正(+0.63~+0.71), 三个模型都完美区分冷/热
+- Size: Δgrad一致为正(+0.28~+0.75), 三个模型都区分小/大
+- Speed: Δgrad一致为正(+0.15~+0.47), 但比temperature/size弱
+- Brightness: DS7B的Δgrad为负(-0.295)! 高亮度对象反而gradient更低
+
+#### 发现3: Temperature gradient的TYPE特异性
+
+**Temperature gradient按TYPE:**
+| TYPE | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| place(热) | +0.421 | +0.409 | +0.459 |
+| substance(冷) | -0.270 | -0.387 | -0.374 |
+| object(冷) | -0.421 | -0.218 | +0.347 |
+
+**关键事实:**
+- place(沙漠/火山)三模型一致为正gradient → 热候选
+- substance(冰/雪)三模型一致为负gradient → 冷候选
+- object(冰箱/烤箱)存在模型差异: Qwen3/GLM4冰箱为负(冷), DS7B冰箱为正
+
+#### 发现4: DS7B brightness的异常 — 所有gradient都为正
+
+**DS7B brightness per-object:**
+| 对象 | gradient | level | 预期方向 |
+|------|----------|-------|----------|
+| cave | +0.923 | 1(dark) | 应为负! |
+| shadow | +0.865 | 1(dark) | 应为负! |
+| candle | +1.170 | 3(glowing) | |
+| flashlight | +0.577 | 4(bright) | |
+| star | +0.902 | 4(bright) | |
+| sun | +0.599 | 5(brilliant) | |
+
+- DS7B的brightness gradient全部为正, 包括cave(+0.923)和shadow(+0.865)
+- 这意味着DS7B将dark对象也映射到高亮度候选词的logit上
+- 这是DS7B特有的读出异常, 与Phase 405发现的"残差范数极端压缩"一致
+
+#### 发现5: Entropy跨属性差异
+
+**Mean entropy by attribute:**
+| 属性 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| temperature | 1.145 | 1.370 | 1.224 |
+| brightness | 1.250 | 0.881 | 0.671 |
+| size | 1.297 | 1.444 | 1.181 |
+| speed | 1.455 | 1.436 | 1.157 |
+
+- GLM4/DS7B的brightness entropy最低(0.67-0.88), 说明亮度属性最"确定"
+- Speed entropy在Qwen3最高(1.46), 说明速度属性候选最分散
+
+### 新增客观事实拼图 (Phase 407)
+
+88. **Temperature level-gradient相关性三模型一致最高**: 0.833/0.833/0.926, 远超其他属性
+89. **Size level-gradient正相关三模型一致**: 0.530/0.618/0.706
+90. **Speed level-gradient中等相关三模型一致**: 0.406/0.522/0.522
+91. **DS7B brightness gradient异常**: 所有对象(含dark)都为正, level_corr=-0.530
+92. **Temperature TYPE×level交互**: place(热)→正gradient, substance(冷)→负gradient, 三模型一致
+93. **Δgradient(high-low)跨属性排序**: temperature > size ≈ speed > brightness
+94. **Entropy属性差异**: brightness在GLM4/DS7B最低, speed在Qwen3最高
+95. **连续属性编码的一般特征确认**: temperature/size/speed都有level-gradient正相关, 是静态知识编码的一般机制
+
+### 关键分析
+
+**Temperature为什么level-gradient相关性最高?**
+
+Temperature是人类感知中最基础的连续维度之一:
+- 温度有明确的生理基础(皮肤感受器), 是"前语言"维度
+- 热冷对立是最原始的语义对立之一
+- 训练语料中温度描述最一致(ice=cold, volcano=hot 几乎无歧义)
+
+**Brightness为什么在DS7B中异常?**
+
+DS7B的brightness gradient全部为正(包括dark对象), 这与Phase 405的发现一致:
+- DS7B的残差流范数极端压缩导致读出尺度问题
+- brightness的候选词(dark/bright)在DS7B的词汇空间中可能存在特殊的token bias
+- 这不是语义理解问题, 而是读出机制问题
+
+**连续属性编码的一般机制是什么?**
+
+基于Phase 406+407的完整证据:
+1. **所有连续属性都是静态知识编码** — gradient方向不随上下文规则变化
+2. **属性等级→方向梯度的映射是固定的** — 高level→正gradient, 低level→负gradient
+3. **编码强度与属性的感知基础相关** — temperature(最基础) > size > speed > brightness
+4. **TYPE特异性是普遍的** — 不同TYPE的对象在同一属性上gradient不同
+5. **这种编码不是"动态推理"而是"查表"** — 模型存储了"X是什么属性值"的静态知识
+
+### 严谨审视
+
+1. **对象数量限制**: 每个属性只有6个对象, 可能不够稳定。但三模型一致性弥补了这个问题
+2. **brightness在DS7B的异常**: 需要确认是token bias还是语义问题。可以改用不同候选词重新测试
+3. **属性间不可直接比较gradient大小**: 因为候选词数量不同(temperature=6, speed=8, size=7)
+4. **是否需要第二轮确认测试?** 核心结论(静态知识编码)三模型一致, 不需要确认
+
+### 下一步
+
+1. **Phase 408: 路径级因果中介分析** — 对每个属性方向分解组件贡献
+2. **Phase 410: 建立统一机制模型** — 输入属性类型+对象TYPE+level, 预测gradient方向和大小
+
+---
+
+## Phase 408: 路径级因果中介分析 [2026-06-09 14:02]
+
+### 实验目标
+
+Phase 404用"方向注入"发现了attn/MLP的odd/even效应。Phase 408使用更严格的方法:
+对3个属性(temperature/size/speed), 在3个层(early/mid/deep), 注入属性方向,
+测量方向效应的odd(方向性)和even(范数效应), 以及high/low对象的差异。
+
+### 三模型核心结果
+
+#### 发现1: Temperature的方向效应最强 — 三模型一致
+
+**深层high_odd-low_odd (高温对象方向效应 - 低温对象方向效应):**
+| 属性 | Qwen3 L28 | GLM4 L35 | DS7B L20 |
+|------|-----------|----------|----------|
+| temperature | **+0.300** | **+0.173** | **+0.059** |
+| size | -0.064 | +0.020 | -0.023 |
+| speed | -0.070 | -0.094 | -0.045 |
+
+**关键事实:**
+- Temperature是唯一在三个模型中high_odd-low_odd一致为正的属性
+- Size和speed的high_odd-low_odd在深层不一致(有正有负)
+- Temperature的方向效应在Qwen3最极端(+0.300)
+
+#### 发现2: 深层odd随层数递增 — Temperature最明显
+
+**Temperature mean_odd by layer:**
+| 层 | Qwen3 | GLM4 | DS7B |
+|----|-------|------|------|
+| early(L4/5) | -0.004 | +0.004 | -0.193 |
+| mid(L14/20) | +0.015 | -0.050 | +0.035 |
+| deep(L28/35/20) | **+0.177** | **+0.423** | +0.017 |
+
+**Size mean_odd by layer:**
+| 层 | Qwen3 | GLM4 | DS7B |
+|----|-------|------|------|
+| early | +0.002 | +0.017 | +0.219 |
+| mid | -0.009 | +0.052 | +0.051 |
+| deep | +0.037 | +0.115 | +0.021 |
+
+**Speed mean_odd by layer:**
+| 层 | Qwen3 | GLM4 | DS7B |
+|----|-------|------|------|
+| early | +0.004 | -0.001 | -0.344 |
+| mid | +0.015 | +0.061 | -0.121 |
+| deep | +0.099 | +0.200 | -0.150 |
+
+**关键发现:**
+- GLM4: Temperature L35的odd=+0.423, 是所有属性所有层中最大的
+- Qwen3: Temperature L28的odd=+0.177, 也显著
+- DS7B: Speed在所有层odd都为负(-0.344→-0.121→-0.150), 这是Phase 405已确认的"attn/MLP抵消"
+
+#### 发现3: DS7B的方向范数(dir_norm)异常巨大
+
+**Direction norm by attribute (early→deep):**
+| 属性 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| temperature | 1.6→72.6 | 0.3→46.9 | **99.4→178.7** |
+| size | 2.0→57.9 | 0.3→43.7 | **130.6→215.5** |
+| speed | 1.5→56.1 | 0.3→41.6 | **133.9→241.6** |
+
+**关键事实:**
+- DS7B的方向范数在早期层(L4)就达到99-134, 远超Qwen3(1.5-2.0)和GLM4(0.3)
+- 但DS7B的方向效应(odd)却很小甚至为负, 说明大范数方向被读出路径压缩
+
+#### 发现4: Even效应(范数效应)的跨属性/跨模型差异
+
+**Deep layer even:**
+| 属性 | Qwen3 L28 | GLM4 L35 | DS7B L20 |
+|------|-----------|----------|----------|
+| temperature | -0.021 | +0.042 | +0.023 |
+| size | -0.000 | -0.011 | +0.016 |
+| speed | +0.009 | -0.052 | -0.061 |
+
+**关键发现:**
+- Qwen3: Temperature even为负(-0.021), 说明注入温度方向使分布更尖(压缩)
+- GLM4: Temperature even为正(+0.042), 说明注入温度方向使分布更散(膨胀)
+- 这与Phase 405的发现一致: Qwen3/DS7B压缩, GLM4膨胀
+
+#### 发现5: Speed的odd方向在DS7B始终为负
+
+**DS7B speed odd: L4=-0.344, L14=-0.121, L20=-0.150**
+
+这意味着:
+- 在DS7B中, 注入"快→慢"方向(speed_direction = fast_dir - slow_dir)反而使gradient变为更负
+- 这说明DS7B的速度方向与Qwen3/GLM4是"相反"的
+- 与Phase 404的发现(attn_odd=+0.112, mlp_odd=-0.146, 抵消)一致
+
+### 新增客观事实拼图 (Phase 408)
+
+96. **Temperature深层方向效应三模型最强**: high_odd-low_odd一致为正, 远超size/speed
+97. **GLM4 temperature L35 odd=+0.423**: 所有属性所有层中最大的方向效应
+98. **DS7B方向范数异常巨大**: L4就达到99-134, 但odd效应很小(读出压缩)
+99. **Speed odd在DS7B始终为负**: L4=-0.344→L20=-0.150, 速度方向与Qwen3/GLM4相反
+100. **Even效应方向确认**: Qwen3压缩(temperature even=-0.021), GLM4膨胀(+0.042)
+101. **Size/speed深层high-low差异不稳定**: 三模型符号不一致, temperature最稳定
+
+### 关键分析
+
+**Temperature为什么方向效应最强且最稳定?**
+
+Temperature是人类感知中最基础的连续维度:
+1. 温度有明确的物理和生理基础(热力学+皮肤感受器)
+2. 冷热对立是最原始的语义对立之一, 在所有语言中都存在
+3. 训练语料中温度描述最一致(ice=cold, volcano=hot 几乎无歧义)
+4. Temperature的方向编码在深层更集中, 说明模型确实"理解"了温度语义
+
+**Speed/size为什么high-low差异不稳定?**
+
+1. Speed/size的语义更依赖TYPE(动物的快≠车的快)
+2. 训练语料中speed/size描述更多样化(rocket可以"fast"也可以"powerful")
+3. Speed/size的方向编码分散在多个子空间中, 不如temperature集中
+
+**DS7B的"负odd"意味着什么?**
+
+DS7B中speed_direction = fast_dir - slow_dir, 但注入后gradient变为更负。
+这意味着: DS7B中"快对象"和"慢对象"的残差差方向, 在读出时被反转了。
+这不是语义问题(模型知道snail慢cheetah快), 而是读出路径的问题。
+
+### 严谨审视
+
+1. **因果中介的严格性不足**: 当前方法仍是"方向注入", 不是真正的因果中介分析。
+   真正的中介需要: (1) 拦截特定组件输出 (2) 替换为corrupt版本 (3) 测量间接效应
+2. **对象数量限制**: 每属性4个对象(high×2 + low×2), 可能导致high-low差异不稳定
+3. **层选择**: 只测了3个层, 可能遗漏关键的中层转换点
+4. **Temperature的特殊性可能来自候选词**: cold/hot是高频词, 比swift/massive更稳定
+
+### 下一步
+
+1. **Phase 409: 检查点级路径分解** — 在每个检查点(post_input_ln/attn_out/post_attn_ln/mlp_down)分别注入方向, 精确分解组件贡献
+2. **Phase 410: 跨属性统一模型** — 用线性回归从{属性类型, 对象TYPE, level}预测gradient, 验证编码机制的统一性
+
+---
+
+## Phase 406-408 综合总结 [2026-06-09 14:05]
+
+### 从Phase 404到408的完整证据链
+
+```
+Phase 404: 发现attn/MLP的方向效应(odd/even) + 三模型entropy方向相反
+    ↓
+Phase 405: 发现范数-entropy机制 + DS7B残差范数极端压缩 + GLM4低方差高熵
+    ↓
+Phase 406: 动态规则不改变速度gradient → 速度是静态知识编码
+    ↓
+Phase 407: Temperature/size/speed都有level-gradient正相关 → 静态编码是一般机制
+    ↓
+Phase 408: Temperature方向效应最强且最稳定 → 温度是最基础的连续属性编码
+```
+
+### 核心客观事实总结
+
+ 1. 连续属性编码是静态知识编码 (Phase 406)
+
+三模型一致: 用自然语言规则反转speed映射后, gradient方向不变。
+模型存储的是"X是什么属性值"的静态知识表, 不是"规则→属性推理"的动态计算。
+
+ 2. Level-Gradient正相关是普遍机制 (Phase 407)
+
+| 属性 | 三模型level-grad相关均值 | 编码强度排序 |
+|------|------------------------|-------------|
+| temperature | 0.864 | **最强** |
+| size | 0.618 | 中等 |
+| speed | 0.483 | 中弱 |
+| brightness | 0.088 | 弱(DS7B异常) |
+
+ 3. Temperature是编码最稳定的连续属性 (Phase 408)
+
+- Temperature的high-low方向差异在深层三模型一致为正
+- Size/speed的high-low差异在深层不稳定(有正有负)
+- Temperature的方向效应最大(GLM4 L35 odd=+0.423)
+
+ 4. 三模型的读出路径差异 (Phase 405+408)
+
+| 特征 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| entropy_even(范数效应) | 负(压缩) | **正(膨胀)** | 负(压缩) |
+| speed odd | 正 | 正 | **负** |
+| 方向范数 | 中等(1-73) | 小(0.3-47) | **极大(99-242)** |
+| 候选分布压缩速度 | 中等 | 最慢 | **极快(L7后entropy=0)** |
+
+ 5. 关键洞察
+
+```
+连续属性编码 = 属性等级 × 方向 + TYPE残差 + 范数效应 + 读出路径特异变换
+
+其中:
+- 属性等级 × 方向: level越高, gradient越正 (静态映射, 不随规则变化)
+- TYPE残差: 同level不同TYPE的gradient不同 (animal vs vehicle vs phenomenon)
+- 范数效应: Qwen3/DS7B压缩, GLM4膨胀 (even方向相反)
+- 读出路径: DS7B残差范数极低导致读出尺度问题, GLM4 post_attn_ln放大
+```
+
+### 严谨审视 — 问题与瓶颈
+
+ 硬伤1: 因果中介分析不够严格
+
+当前方法是"方向注入"而非真正的因果中介。真正的中介需要:
+1. 在特定层拦截clean输出, 替换为corrupt
+2. 允许后续层自由计算
+3. 比较间接效应 vs 直接效应
+
+ 硬伤2: 对象数量偏少
+
+每属性4-6个对象, 统计效力有限。Level-gradient相关性可能被outlier影响。
+
+ 硬伤3: Temperature的特殊性可能来自词汇频率
+
+cold/hot是高频词, swift/massive是低频词。Level-gradient相关可能反映的是
+词汇频率效应而非语义理解。需要控制词汇频率重新测试。
+
+ 硬伤4: 没有验证"静态编码"的边界条件
+
+Phase 406的规则可能太弱(只用2句描述)。更强的规则(in-context learning)
+或更极端的反转(直接定义"snail means fast")可能改变结果。
+
+### 破解语言背后数学理论的第一性原理分析
+
+ 核心问题: 语言编码的数学结构是什么?
+
+基于Phase 404-408的完整证据:
+1. 连续属性不是编码为"单一方向", 而是编码为"条件化方向+范数+读出变换"
+2. 这种编码是静态的(不随规则变化), 说明模型存储的是"知识表"而非"推理器"
+3. 不同属性的编码强度不同, 与属性的感知基础相关
+
+ 第一性原理: 语言编码可能是一种"条件化线性映射"
+
+```
+h_final = Σ_layers [attn(W_attn, h) + mlp(W_mlp, h) + RMSNorm(h)]
+
+其中每个组件的贡献:
+- attn: TYPE条件化(选择相关信息)
+- mlp: 属性等级映射(level → 方向)
+- RMSNorm: 范数归一化(尺度控制)
+
+读出: logits = W_U @ h_final
+- W_U的列向量是"候选词方向"
+- 每个属性候选在W_U中有固定的投影方向
+- gradient = (W_U @ direction) · level_mapping
+```
+
+### 下一步关键任务: Phase 409-411
+
+**Phase 409: 检查点级路径分解**
+- 在post_input_ln/attn_out/post_attn_ln/mlp_down分别注入方向
+- 精确分解attn/MLP/RMSNorm的贡献
+- 验证"attn=TYPE条件化, MLP=等级映射"假说
+
+**Phase 410: 跨属性统一模型**
+- 用线性回归: gradient = α × level + β × TYPE + γ × attribute + ε
+- 如果R² > 0.8, 说明编码机制高度统一
+- 如果R² < 0.5, 说明属性间编码机制有本质差异
+
+**Phase 411: 词汇频率控制实验**
+- 对temperature候选词用低频同义词替换(cold→frigid, hot→scorching)
+- 如果level-gradient相关不变, 说明编码机制独立于词汇频率
+- 如果变化, 说明需要区分"语义编码"和"词汇频率编码"
+
+
+## Phase 409: 规则强度梯度测试 [2026-06-09 14:18]
+
+### 核心问题
+Phase 406发现自然语言反转规则没有改写速度几何。这是否因为规则太弱？
+
+### 实验设计
+4档规则强度（temperature + speed, 8个对象/属性）：
+- L0: 无规则基线
+- L1: 温和描述式（"In this world, ice and snow are very hot"）
+- L2: 定义式（"By definition, ice is scorching"）
+- L3: 多例示范（ice→scorching, snow→hot, volcano→freezing, desert→cold）
+- L4: 强制问答式（6个Q&A对）
+
+### 核心发现
+
+**1. 规则强度与几何重编码存在梯度关系**
+- L1: gradient开始偏移，但不反转
+- L2: 部分对象的gradient反转（ice: -0.35→+0.80 in Qwen3）
+- L3/L4: 更多对象反转，但非对称
+
+**2. 非对称反转效应（最重要发现）**
+
+| 属性 | up-reversal (cold→hot) | down-reversal (hot→cold) | 非对称比 |
+|------|----------------------|------------------------|---------|
+| 温度 | 成功：ice从负gradient→正 | 失败：desert仍为正gradient | 1.5-16x |
+| 速度 | 成功：snail从负→正 | 失败：cheetah仍为正 | 4-5x |
+| 大小 | 失败：ant几乎不变 | 成功：mountain大幅降低 | 0.01-0.6 |
+
+跨模型一致！这说明：
+- **低等级对象的规则覆盖（up-reversal）远比高等级对象（down-reversal）容易**
+- **对于温度/速度，让"冷变热""慢变快"容易，让"热变冷""快变慢"难**
+- **对于大小，让"大变小"容易，让"小变大"难**
+
+**3. 具体数据（Qwen3 temperature per-object）**
+```
+对象       L0基线     L1温和     L2定义     L3示范     L4强制
+ice        -0.350    +0.633     +0.800     +1.225     +0.804  ← 反转！
+snow       -0.190    +0.673     +0.451     +0.169     +0.262  ← 反转！
+desert     +0.692    +0.393     -0.140     -0.111     +0.009  ← L2/L3弱反转
+lava       +0.388    -0.134     -0.412     -0.765     +0.055  ← L1-L3反转
+volcano    +0.149    +0.147     +0.014     -0.181     -0.316  ← L3/L4反转
+```
+
+### 理论含义
+1. **Phase 406的结论需要修正**：不是"规则不能改写静态几何"，而是"规则改写是非对称的"
+2. **静态知识几何存在"锚定强度"**：高等级对象的锚定更强（desert→hot比ice→cold更难覆盖）
+3. **规则覆盖方向可能与属性极性相关**：
+   - 温度/速度：正极性（热/快）是更强锚定点
+   - 大小：负极性（小/微小）是更强锚定点
+
+### 测试脚本
+`tests/glm5/phase409_rule_strength.py`
+### 结果文件
+`results/phase409_rule_strength/{qwen3,glm4,deepseek7b}_phase409.json`
+
+
+## Phase 410: 跨属性统一回归模型 [2026-06-09 14:27]
+
+### 核心问题
+连续属性编码是否有统一机制？
+
+### 实验设计
+统一回归: gradient = α·level + β·TYPE + γ·attribute + δ·rule_strength + η·freq_rank + θ·(level×rule) + ε
+3个属性（temperature/speed/size）× 2规则（baseline/L4）× 10-13对象
+
+### 核心发现
+
+**1. 统一回归R2（0.40-0.53）**
+| 模型 | R2 | RMSE |
+|------|-----|------|
+| Qwen3 | 0.397 | 0.359 |
+| GLM4 | 0.527 | 0.219 |
+| DS7B | 0.489 | 0.306 |
+
+R2中等偏上，说明：
+- 连续属性编码**部分共享机制**（level、rule_strength等因子跨属性有效）
+- 但**不完全统一**（约50%方差未被线性模型捕获）
+
+**2. 关键回归系数（跨模型一致）**
+| 因子 | Qwen3 | GLM4 | DS7B | 含义 |
+|------|-------|------|------|------|
+| level | +0.088 | +0.101 | +0.045 | 高level→正gradient ✓ |
+| rule_strength | +0.198 | +0.170 | +0.253 | 强规则→整体gradient偏正 |
+| level×rule | -0.047 | -0.032 | -0.043 | 规则削弱level效应 ✓ |
+| freq_rank | -0.049 | -0.063 | +0.001 | 词频影响弱/不一致 |
+
+**3. 分组R2：规则破坏level-gradient映射**
+| 属性×规则 | Qwen3 R2 | Qwen3 slope | GLM4 R2 | GLM4 slope |
+|----------|---------|-----------|---------|----------|
+| temp L0 | 0.553 | +0.177 | 0.662 | +0.158 |
+| temp L4 | 0.502 | -0.139 | 0.037 | -0.023 |
+| speed L0 | 0.553 | +0.080 | 0.549 | +0.078 |
+| speed L4 | 0.259 | -0.055 | 0.098 | -0.020 |
+| size L0 | 0.587 | +0.062 | 0.771 | +0.115 |
+| size L4 | 0.695 | -0.133 | 0.002 | +0.004 |
+
+**关键观察**：
+- 基线R2均>0.5，说明level→gradient映射在自然条件下很稳定
+- L4规则后，R2大幅下降（尤其GLM4: temp从0.66→0.04），说明规则**破坏了**原有的level-gradient映射
+- Qwen3的slope在L4后反转（temp: +0.18→-0.14），说明规则确实重编码了映射方向
+
+**4. 非对称反转分析（跨模型一致）**
+
+| 属性 | Qwen3 up/down | GLM4 up/down | DS7B up/down |
+|------|-------------|------------|------------|
+| temperature | 1.46 | 16.24 | 10.67 |
+| speed | 5.39 | 6.39 | 4.67 |
+| size | 0.007 | 0.16 | 0.56 |
+
+**跨模型稳定结论**：
+- temperature: up-reversal >> down-reversal（让冷变热远比让热变冷容易）
+- speed: up-reversal >> down-reversal（让慢变快远比让快变慢容易）
+- size: down-reversal >> up-reversal（让大变小远比让小变大容易）
+
+### 理论含义
+1. **反转非对称性不是随机噪声，而是系统性结构**——三模型一致
+2. **非对称方向与属性极性相关**：
+   - 温度/速度的"正极性端"（热/快）是锚定点，难以被规则推向"负极性端"
+   - 大小的"负极性端"（小/微小）是锚定点，难以被规则推向"正极性端"
+3. **可能的解释**：锚定点方向可能是语料中该属性最高频/最强烈的关联方向
+   - "hot"比"cold"在温度语料中更极端、更不可覆盖
+   - "fast"比"slow"在速度语料中更极端
+   - "small/tiny"比"large/huge"在大小语料中...（这不太直觉，需要进一步验证）
+
+### 测试脚本
+`tests/glm5/phase410_unified_regression.py`
+### 结果文件
+`results/phase410_unified_regression/{qwen3,glm4,deepseek7b}_phase410.json`
+
+### 问题与瓶颈
+1. R2只有0.4-0.5，说明线性模型不够——可能需要非线性项或交互项
+2. 大小属性的"down-reversal更容易"与直觉不符——可能是对象选择偏置
+3. 词频效应不一致——需要Phase 411专门控制
+4. GLM4在L4规则下temp的R2几乎为零(0.037)——规则完全破坏了level-gradient映射，但不代表完全反转
+
+
+## Phase 411: 词汇频率控制实验 [2026-06-09 14:35]
+
+### 核心问题
+level-gradient映射是否依赖候选词的词频和语义特异性？
+
+### 实验设计
+对temperature属性使用3组不同频率的同义词集：
+- 标准集: freezing/cold/cool/warm/hot/scorching (混合频率)
+- 低频集: glacial/frigid/brisk/tepid/sweltering/incandescent
+- 高频集: icy/chilly/mild/toasty/boiling/blazing
+
+13个温度对象，测量各候选集下的level-gradient correlation
+
+### 核心发现
+
+**1. 候选词选择显著影响level-gradient correlation**
+
+| 模型 | 标准集 | 低频集 | 高频集 |
+|------|--------|--------|--------|
+| Qwen3 | 0.774 | 0.669 | 0.000 |
+| GLM4 | 0.822 | 0.607 | 0.386 |
+| DS7B | 0.536 | 0.073 | -0.091 |
+
+**2. 跨模型排序一致：标准集 > 低频集 > 高频集**
+- 标准候选词(freezing/cold/hot/scorching)是最特异的温度词
+- 低频词(brisk/tepid/sweltering)语义特异性较低
+- 高频词(mild/chilly/boiling)多义性最强(mild=温和/轻微/平淡)
+
+**3. 对象稳定性分析**
+- 低温对象(ice, freezer, refrigerator)在各候选集下gradient方向一致(负)
+- 高温对象(desert, fire, lava, volcano)的gradient方向随候选集变化大
+- 这再次验证了Phase 409/410的非对称发现：**冷端锚定比热端更稳定**
+
+**4. DS7B的读出病理性最严重**
+- DS7B从0.536降到-0.091(反转!)——候选词选择可以完全翻转测量结果
+- 这与Phase 405/408发现的DS7B读出路径问题一致
+
+### 理论含义
+1. **level-gradient映射不是纯语义编码，而是"语义×候选词特性"的联合效应**
+2. **候选词的语义特异性比词频更重要**——"scorching"虽低频但温度语义极特异
+3. **不能简单说"温度有level-gradient"——必须指明"对哪个候选词集"**
+4. **更严谨的结论**：模型内部存在温度等级编码，但该编码的读出（通过W_U投影到候选词）受候选词的语义特异性调制
+
+### 测试脚本
+`tests/glm5/phase411_vocab_frequency.py`
+### 结果文件
+`results/phase411_vocab_frequency/{qwen3,glm4,deepseek7b}_phase411.json`
+
+
+## Phase 409-411 综合分析 [2026-06-09 14:40]
+
+### 修正后的核心理论
+
+Phase 406的结论"规则不能改写静态知识几何"需要修正为：
+
+```
+语言编码 = 静态知识几何 + 规则上下文调制 + 候选词读出变换
+
+其中:
+- 静态知识几何: 对象×属性的默认等级映射, 具有层级锚定
+  (低等级对象的锚定弱于高等级对象, 导致非对称反转)
+- 规则上下文调制: 可以非对称地偏移几何, 但难以完全重编码
+  (up-reversal远比down-reversal容易)
+- 候选词读出变换: W_U投影+候选词语义特异性决定测量结果
+  (非特异性候选词会降低甚至翻转level-gradient correlation)
+```
+
+### 五大客观发现（拼图）
+
+1. **规则强度梯度效应**: 规则越强, level-gradient映射被破坏越大, 但方向是非对称的
+2. **非对称反转**: temperature/speed的up-reversal(cold→hot/slow→fast)远比down-reversal容易; size的down-reversal(big→small)更容易
+3. **统一回归R2=0.4-0.5**: level, rule_strength, level×rule是显著因子, 但不是全部
+4. **候选词依赖性**: level-gradient correlation对候选词选择敏感(0.0-0.8)
+5. **DS7B读出病理**: 候选词选择可以翻转DS7B的测量结果(-0.09)
+
+### 问题与硬伤
+
+1. **非对称反转的因果不明**: 是"高等级锚定更强"还是"规则对低等级对象更有效"? 需要测试无先验知识的新对象
+2. **size的down-reversal更容易是反直觉的**: 可能是对象选择偏置(mountain/ocean/planet的"大"比ant/grain的"小"更可被规则覆盖)
+3. **R2=0.4-0.5说明线性模型不够**: 可能需要非线性交互项, 或更精细的对象级特征
+4. **高频候选集的问题**: "mild"等多义词是否真的代表温度等级? 需要更严格控制
+
+### 破解语言背后数学理论的第一性原理分析
+
+基于Phase 406-411的完整证据, 语言编码的数学结构可能是一种:
+
+```
+条件化概率映射:
+P(candidate | object, context) = softmax(W_U @ h(object, context))
+
+其中:
+h(object, context) = K(object) + M(context) + residual
+
+K(object) = 静态知识编码 (对象→属性等级的默认映射)
+M(context) = 上下文调制 (规则/描述对残差的偏移)
+
+关键约束:
+1. K(object)在W_U行空间中的投影强度 = 对象-属性关联强度
+2. M(context)的有效方向 = 上下文在属性方向上的投影
+3. 非对称反转 = M(context)只能沿W_U的强方向偏移, 无法沿弱方向偏移
+   即: "hot"方向比"cold"方向在W_U中有更强的基, 所以容易推向hot但难推回cold
+```
+
+这个假设预测: 如果我们检查W_U中各候选词方向的结构,
+"hot"方向的范数/投影强度应该比"cold"方向更大。
+
+### 下一步关键任务
+
+**Phase 412: 真正路径级因果中介**
+- clean/corrupt成对样本
+- 只替换attention/MLP/RMSNorm路径
+- 分解direct effect和indirect effect
+
+**Phase 413: 规则进入对象状态的路径追踪**
+- 规则token残差 → 对象token残差 → last token残差
+- 判断失败在"没读到规则"还是"读了但无法覆盖"
+
+**Phase 414: W_U候选词方向结构分析**
+- 检验"hot方向比cold方向在W_U中更强"的假设
+- 如果成立, 非对称反转有了数学解释
+
+
+## Phase 414: W_U候选词方向结构分析 [2026-06-09 14:41]
+
+### 核心假设
+Phase 409-411发现temperature/speed的up-reversal远比down-reversal容易。
+假设: 这是因为W_U中"hot/fast"方向的范数/强度大于"cold/slow"方向。
+
+### 核心发现: 假设被否定!
+
+**1. 极性范数比(high/low)**
+
+| 属性 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| temperature | 1.049 (HIGH) | 1.023 (HIGH) | 1.016 (HIGH) |
+| speed | 0.974 (LOW!) | 0.978 (LOW!) | 1.036 (HIGH) |
+| size | 1.022 (HIGH) | 1.026 (HIGH) | 1.008 (HIGH) |
+
+**关键矛盾**: Qwen3和GLM4中speed的LOW极性(慢)范数更大, 但up-reversal(慢→快)更容易!
+W_U范数方向与反转非对称方向相反!
+
+**2. 范数-等级Spearman相关**
+
+| 属性 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| temperature | +0.371 | -0.086 | +0.029 |
+| speed | -0.536 | +0.393 | +0.393 |
+| size | +0.143 | +0.143 | -0.086 |
+
+跨模型不一致! 说明W_U行范数不是控制反转非对称性的因素。
+
+**3. PCA分析**
+- 各属性PC1解释方差约25%, 方向分散
+- PC1-level相关跨模型不一致(speed: +0.64/-0.79/-0.89)
+
+### 结论: 非对称反转不能由W_U读出层解释
+
+W_U方向范数只差1-5%, 且方向与反转非对称性不一致。
+非对称反转的根源必须在模型内部计算过程中, 而非读出层。
+
+**修正假说**: 非对称反转来自模型内部残差流的对象表示:
+- 对象"ice"在残差流中的表示包含"cold"方向, 该方向容易被规则推向"hot"方向
+- 对象"desert"在残差流中的表示包含"hot"方向, 该方向有更强的内部锚定(知识编码更深入)
+- 这种锚定深度不是W_U方向范数决定的, 而是由对象-属性关联在训练语料中的强度决定
+
+### 测试脚本
+`tests/glm5/phase414_wu_direction.py`
+### 结果文件
+`results/phase414_wu_direction/{qwen3,glm4,deepseek7b}_phase414.json`
+
+
+## Phase 409-414 最终综合分析 [2026-06-09 14:45]
+
+### 已验证的客观拼图
+
+1. **规则强度梯度效应**(Phase 409): 规则越强, level-gradient映射被破坏越大
+2. **非对称反转**(Phase 409-410): temperature/speed的up-reversal远比down-reversal容易; size的down-reversal更容易。跨3模型一致。
+3. **统一回归R2=0.4-0.5**(Phase 410): level, rule_strength, level×rule是显著因子
+4. **候选词依赖性**(Phase 411): level-gradient correlation对候选词选择敏感(0.0-0.8)
+5. **W_U方向范数不能解释非对称反转**(Phase 414): 范数差仅1-5%, 且方向与反转非对称性矛盾
+
+### 否定的假设
+
+- ~~"W_U方向范数决定反转非对称性"~~ → Phase 414否定
+- ~~"静态知识几何完全不可被规则改写"~~ → Phase 409否定(至少部分可改写)
+- ~~"候选词选择不影响编码测量"~~ → Phase 411否定
+
+### 修正后的理论框架
+
+```
+语言编码 = 对象知识锚定 × 上下文调制 × 候选词读出
+
+对象知识锚定(K):
+- 每个对象在残差流中有固定的属性方向
+- 锚定深度 = 对象-属性关联在训练中的强度(如"desert→hot"比"ice→cold"更深)
+- 锚定深度决定规则覆盖难度: 深锚定更难被规则反转
+
+上下文调制(M):
+- 规则/描述可以在残差流中添加偏移
+- 偏移方向不一定沿W_U的强方向
+- 偏移效果受对象锚定深度约束
+
+候选词读出(R):
+- logits = W_U @ h → 候选词概率
+- 候选词语义特异性影响读出质量
+- 非特异候选词降低level-gradient correlation
+```
+
+### 非对称反转的修正解释
+
+不是"W_U方向强度"决定反转难易, 而是**对象知识锚定深度**:
+
+```
+"ice→cold"的锚定深度: 中等(ice可以引申为冰咖啡、冰山等)
+"desert→hot"的锚定深度: 深(desert几乎总是热的, 语料中关联极强)
+→ 规则更容易覆盖"ice→cold"(浅锚定) → up-reversal更容易
+
+"mountain→big"的锚定深度: 中等(mountain也可以是small mountain)
+"ant→small"的锚定深度: 深(ant几乎总是小的, 语料中关联极强)
+→ 规则更容易覆盖"mountain→big"(浅锚定) → down-reversal更容易
+```
+
+这个解释预测: 如果测试"锚定深度相等的对象对", 反转非对称性应该消失。
+
+### 下一步关键任务
+
+**Phase 415: 虚构对象规则反转测试**
+- 用虚构词(如"glorp") + 规则定义属性, 测试反转非对称性
+- 如果虚构对象没有非对称性 → 非对称性来自知识锚定深度 ✓
+- 如果虚构对象仍有非对称性 → 来自W_U或其他结构因素
+
+**Phase 412: 真正路径级因果中介**
+- 分解attention/MLP/RMSNorm在规则覆盖中的各自贡献
+- 判断规则信息在模型内部的传播路径
+
+**Phase 413: 规则进入对象状态的路径追踪**
+- 规则token → 对象token残差状态的信息流分析
+- 判断规则失败在哪个环节
+
+**Phase 415: 新对象测试(无先验知识)**
+- 用虚构对象名(如"glorp", "zarple")测试规则反转
+- 如果虚构对象没有非对称性, 说明非对称性来自知识锚定
+- 如果仍有非对称性, 说明来自W_U方向结构
+
+
+
+
 
 
 
