@@ -27188,3 +27188,366 @@ coreference prompt + entity binding
 语言中的关系编码不是“对象向量 + 关系词向量”。
 更像是对象 token 在一个后续 frame suffix/readout boundary 中被重新读出。
 ```
+
+## Phase 83: suffix token decomposition 全量测试 [2026-06-10 13:03]
+
+### 任务目标
+
+根据最新分析，Phase 82 已经说明：
+
+```text
+pre-object context 不是主要因素；
+post-object natural frame suffix / answer boundary 是 object-value closure 的关键因素。
+```
+
+但 Phase 82 仍然只把 suffix 当作整体处理。本轮目标是继续拆开 suffix：
+
+```text
+1. suffix_all：对象之后到 frame 末尾的全部后缀。
+2. suffix_nonfinal：不含最后 readout token 的后缀。
+3. suffix_final：最后一个 pre-answer/readout token。
+4. suffix_penultimate：倒数第二个 token。
+5. suffix_first / suffix_second：后缀开头 token。
+6. suffix_function：功能词后缀子空间。
+7. suffix_lexical：非功能词/关系词后缀子空间。
+8. all_suffix_tokens：多个 suffix token component 拼接后的整体子空间。
+```
+
+核心问题：
+
+```text
+真正强的是最后 readout token？
+还是倒数第二个/词汇 token？
+还是整个 suffix trajectory？
+```
+
+### 对用户分析的判断
+
+这次分析方向正确：
+
+```text
+1. Phase 82 不能停在“suffix 很重要”。
+2. relation lexical words 可能不是纯关系类型，而是 object-after readout program fragment。
+3. 必须拆 suffix token-level component，否则无法判断是关系词、功能词、最后边界，还是整体轨迹在起作用。
+4. 当前仍然不要上升为完整数学理论，优先继续收集客观拼图。
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase83_suffix_token_decomposition.py
+tests/gpt5/phase83_suffix_token_decomposition_summary.py
+tests/gpt5/run_phase83_suffix_token_decomposition_full.sh
+```
+
+运行中 Qwen3 第一次在 `L4->L8 item=588/672` 后发生用户态 segmentation fault：
+
+```text
+exit_code = 139
+已落盘 partial rows = 9996
+已完成完整 item = 588
+```
+
+随后给 Phase 83 主脚本补充 pair/item 级 resume：
+
+```text
+默认 --resume；
+如果存在 partial/final，则读取已有 rows；
+对每个 destroy_layer/restore_layer/item_idx，如果已有 17 条 condition rows，则跳过；
+继续完成剩余 item。
+```
+
+这个修改不改变实验指标，只保证长跑中断后可以继续。
+
+### 正式命令
+
+```bash
+PHASE83_OUTPUT_DIR=results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932 \
+tests/gpt5/run_phase83_suffix_token_decomposition_full.sh
+```
+
+runner 内部顺序：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12
+  max_items = 672
+
+glm4:
+  layer_pairs = 4-10,10-20
+  max_items = 672
+
+deepseek7b:
+  layer_pairs = 8-10,12-14
+  max_items = 672
+```
+
+共同参数：
+
+```text
+module = resid_out
+contrast_rank = 64
+component_rank = 24
+max_basis_items = 224
+max_distractors = 10
+hard_exit_after_model = true
+attn path = flash_attention_2 fallback to sdpa
+```
+
+说明：
+
+```text
+本机没有 flash_attn 包，因此 flash_attention_2 加载失败后自动使用 PyTorch SDPA。
+DeepSeek7B 仍然出现 sliding window attention + sdpa 的实现警告，后续解释 DS7B 结果时需要保留这个限制。
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932/qwen3_phase83_suffix_token_decomposition.json
+results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932/glm4_phase83_suffix_token_decomposition.json
+results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932/deepseek7b_phase83_suffix_token_decomposition.json
+results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932/phase83_suffix_token_decomposition_summary.json
+results/gpt5_phase83_suffix_token_decomposition_full_20260610_092932/PHASE83_SUFFIX_TOKEN_DECOMPOSITION_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 672
+  layer_pairs = 2
+  rows = 22848
+  eligible raw rows = 802
+
+GLM4:
+  items = 672
+  layer_pairs = 2
+  rows = 22848
+  eligible raw rows = 938
+
+DeepSeek7B:
+  items = 672
+  layer_pairs = 2
+  rows = 22848
+  eligible raw rows = 632
+
+total rows = 68544
+```
+
+### Qwen3 客观结果
+
+以 eligible_patched_matched_top1 为主：
+
+```text
+joint_raw                         = 0.5399
+joint_orth_suffix_all             = 0.0810
+joint_orth_suffix_nonfinal        = 0.2556
+joint_orth_suffix_final           = 0.0711
+joint_orth_suffix_penultimate     = 0.4127
+joint_orth_suffix_first           = 0.3042
+joint_orth_suffix_second          = 0.2469
+joint_orth_suffix_function        = 0.1010
+joint_orth_suffix_lexical         = 0.4102
+joint_orth_all_suffix_tokens      = 0.0623
+joint_suffix_all_basis_only       = 0.1372
+joint_suffix_final_basis_only     = 0.1534
+joint_suffix_lexical_basis_only   = 0.0150
+joint_mismatched_frame_raw        = 0.2369
+joint_raw_restore_both            = 0.0100
+```
+
+客观现象：
+
+```text
+1. raw joint patch 仍最强。
+2. remove suffix_all 或 remove final token 后，matched_top1 基本塌到 0.08/0.07。
+3. remove penultimate 或 lexical 后仍保留较多效果，约 0.41。
+4. suffix_final basis_only 有一定迁移，0.1534，高于 lexical basis_only 的 0.0150。
+5. mismatched frame raw = 0.2369，说明错误 frame 仍能带来部分推进，但远低于 raw。
+```
+
+### GLM4 客观结果
+
+```text
+joint_raw                         = 0.6546
+joint_orth_suffix_all             = 0.1269
+joint_orth_suffix_nonfinal        = 0.4009
+joint_orth_suffix_final           = 0.1013
+joint_orth_suffix_penultimate     = 0.5267
+joint_orth_suffix_first           = 0.3977
+joint_orth_suffix_second          = 0.3870
+joint_orth_suffix_function        = 0.1386
+joint_orth_suffix_lexical         = 0.5608
+joint_orth_all_suffix_tokens      = 0.0959
+joint_suffix_all_basis_only       = 0.1183
+joint_suffix_final_basis_only     = 0.1461
+joint_suffix_lexical_basis_only   = 0.0043
+joint_mismatched_frame_raw        = 0.2751
+joint_raw_restore_both            = 0.0171
+```
+
+客观现象：
+
+```text
+1. GLM4 raw 最强，0.6546。
+2. remove suffix_final 后降到 0.1013，remove suffix_all 后降到 0.1269。
+3. remove suffix_lexical 后仍有 0.5608，说明 lexical token 不是 GLM4 的主因。
+4. remove suffix_penultimate 后仍有 0.5267，也不是单独倒数第二 token 主导。
+5. suffix_final basis_only = 0.1461，仍有少量迁移，但远低于 raw。
+```
+
+### DeepSeek7B 客观结果
+
+```text
+joint_raw                         = 0.4193
+joint_orth_suffix_all             = 0.0538
+joint_orth_suffix_nonfinal        = 0.1772
+joint_orth_suffix_final           = 0.0396
+joint_orth_suffix_penultimate     = 0.2690
+joint_orth_suffix_first           = 0.2089
+joint_orth_suffix_second          = 0.1899
+joint_orth_suffix_function        = 0.0570
+joint_orth_suffix_lexical         = 0.3085
+joint_orth_all_suffix_tokens      = 0.0364
+joint_suffix_all_basis_only       = 0.1108
+joint_suffix_final_basis_only     = 0.1566
+joint_suffix_lexical_basis_only   = 0.0174
+joint_mismatched_frame_raw        = 0.2674
+joint_raw_restore_both            = 0.0047
+```
+
+客观现象：
+
+```text
+1. DS7B raw = 0.4193，低于 Qwen3/GLM4。
+2. remove suffix_all/final/function 后几乎塌陷到 0.04-0.06。
+3. remove suffix_lexical 后仍保留 0.3085。
+4. suffix_final basis_only = 0.1566，是三个模型中 final basis-only 相对最强的。
+5. mismatched_frame_raw = 0.2674，与 raw 差距小于 Qwen3/GLM4，说明 DS7B 对 frame mismatch 的区分更弱或更受输出边界影响。
+```
+
+### 三模型共同事实
+
+本轮最稳定的共同现象：
+
+```text
+1. suffix_all 和 suffix_final 是最关键破坏项。
+   remove suffix_all / remove suffix_final 后，三模型 matched_top1 都大幅下降。
+
+2. suffix_lexical 不是主因。
+   remove suffix_lexical 后仍保留大量 raw 效果：
+     Qwen3: 0.4102 / raw 0.5399
+     GLM4: 0.5608 / raw 0.6546
+     DS7B: 0.3085 / raw 0.4193
+
+3. suffix_final basis_only 有少量但有限的可迁移性：
+     Qwen3: 0.1534
+     GLM4: 0.1461
+     DS7B: 0.1566
+   说明最后 readout token 自身带有一部分输出接口格式，但不足以独立完成 object-value closure。
+
+4. raw_restore_both 基本恢复 clean，matched_top1 接近 0：
+     Qwen3: 0.0100
+     GLM4: 0.0171
+     DS7B: 0.0047
+   说明 destroy/restore 框架本身是有效的，不是补丁后不可逆污染。
+```
+
+### 当前最重要修正
+
+Phase 83 支持对 Phase 82 的进一步修正：
+
+```text
+object-value closure 的关键不是 relation lexical word 本身。
+更关键的是 object token 后面的 suffix/readout boundary，尤其 final pre-answer token。
+```
+
+但它也说明：
+
+```text
+final token 不是完整机制。
+suffix_final basis_only 只能产生有限迁移；
+完整 raw 效果需要 object state + frame/readout state 的 joint compatibility。
+```
+
+更谨慎的表达：
+
+```text
+对象-属性/对象-关系读取不是“对象向量 + 关系词向量”。
+它更像：
+object state 在 post-object suffix trajectory 中被格式化，
+最后由 answer-boundary/readout token 接入候选输出。
+```
+
+### 硬伤
+
+```text
+1. suffix token 分类仍然粗糙，function/lexical 由简单词表判断，不能当作最终语言变量。
+2. orthogonal removal 仍可能同时移除兼容性核心，因此“下降”不能直接解释为该 token 独立编码了关系。
+3. basis_only 只能说明该子空间有部分可迁移格式，不能说明它是完整因果机制。
+4. DS7B 使用 SDPA 时存在 sliding window attention 实现警告，DS7B 结果需要谨慎。
+5. Qwen3 第一次长跑出现用户态 segfault，虽然 resume 后完成，但说明超长单进程仍有工程稳定性风险。
+```
+
+### 下一步计划
+
+Phase 84：clean-state erase / restore 测试。
+
+目标：
+
+```text
+从 clean 状态中 erase suffix_final / suffix_all / all_suffix_tokens 子空间；
+观察 clean answer 是否下降；
+再 restore 该子空间；
+观察 clean answer 是否恢复。
+```
+
+意义：
+
+```text
+Phase 83 主要是在 matched transfer 中看 suffix component；
+Phase 84 要在 clean computation 中验证这些子空间是否必要。
+```
+
+Phase 85：readout boundary open generation audit。
+
+目标：
+
+```text
+不只看 closed candidate scoring；
+还要看自然生成中 suffix_final/readout boundary 改变后，生成内容是否按目标关系切换。
+```
+
+Phase 86：迁移到其他关系路径。
+
+目标：
+
+```text
+把 object + suffix/readout boundary 结构迁移到：
+temporal order
+logical operator
+passive role query
+coreference
+translation/style control
+```
+
+阶段性大任务：
+
+```text
+建立 global relation-path map：
+1. object/value binding path；
+2. temporal order path；
+3. logical operator path；
+4. role binding path；
+5. coreference path。
+
+每条路径都要拆成：
+source token state；
+post-source suffix/context trajectory；
+readout boundary；
+candidate answer interface；
+destroy/restore closure。
+```
