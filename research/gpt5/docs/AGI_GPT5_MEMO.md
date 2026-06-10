@@ -27551,3 +27551,819 @@ readout boundary；
 candidate answer interface；
 destroy/restore closure。
 ```
+
+## Phase 84: clean suffix erase/restore 全量测试 [2026-06-10 17:48]
+
+### 任务目标
+
+根据 Phase 83 和最新分析，本轮从 matched transfer 转向 clean computation：
+
+```text
+Phase 83:
+  在 matched transfer 中发现 suffix_final / suffix_all 极关键。
+
+Phase 84:
+  在 clean prompt 本身中 erase suffix/readout 子空间；
+  观察 clean answer 是否下降；
+  再 restore clean 子空间；
+  观察是否恢复。
+```
+
+核心问题：
+
+```text
+suffix_final / suffix_all 是 transfer 相关因素，
+还是 clean computation 中的必要读出成分？
+```
+
+### 对用户分析的判断
+
+这次分析基本正确：
+
+```text
+1. Phase 83 的主要进展不是 relation lexical word，而是 readout boundary。
+2. final token 不是完整机制，但很可能是候选值空间接口。
+3. 需要在 clean 状态中做 erase/restore，才能判断它是否必要。
+4. 不应直接做理论总结，应该继续补客观拼图。
+```
+
+因此本轮执行 Phase 84：clean suffix erase/restore。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase84_clean_suffix_erase_restore.py
+tests/gpt5/phase84_clean_suffix_erase_restore_summary.py
+tests/gpt5/run_phase84_clean_suffix_erase_restore_full.sh
+```
+
+测试逻辑：
+
+```text
+1. 使用 Phase 83 相同方式构造 suffix component bases：
+   suffix_all
+   suffix_final
+   suffix_nonfinal
+   suffix_function
+   suffix_lexical
+   all_suffix_tokens
+
+2. 对 clean prompt 的 object_last / frame_last 位置做 erase：
+   erase_object_*
+   erase_frame_*
+   erase_both_*
+
+3. erase 方法：
+   在对应 basis 上把 clean state 的投影减掉。
+
+4. restore 方法：
+   在 restore_layer 上把 clean state 的对应 basis 投影加回。
+
+5. 指标：
+   clean_drop = base_margin - erase_margin
+   restore_gain = restore_margin - erase_margin
+   restore_gap = base_margin - restore_margin
+   erase_top1
+   restore_top1
+```
+
+### Smoke Test
+
+```bash
+PHASE84_MODELS=qwen3 \
+QWEN3_PHASE84_MAX_ITEMS=2 \
+QWEN3_PHASE84_LAYER_PAIRS=4-8 \
+PHASE84_OUTPUT_DIR=results/gpt5_phase84_smoke \
+tests/gpt5/run_phase84_clean_suffix_erase_restore_full.sh
+```
+
+结果：
+
+```text
+exit_code = 0
+rows = 36
+```
+
+### 正式命令
+
+```bash
+PHASE84_OUTPUT_DIR=results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647 \
+tests/gpt5/run_phase84_clean_suffix_erase_restore_full.sh
+```
+
+runner 内部顺序：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12
+  max_items = 672
+
+glm4:
+  layer_pairs = 4-10,10-20
+  max_items = 672
+
+deepseek7b:
+  layer_pairs = 8-10,12-14
+  max_items = 672
+```
+
+共同参数：
+
+```text
+module = resid_out
+contrast_rank = 64
+component_rank = 24
+max_basis_items = 224
+max_distractors = 10
+hard_exit_after_model = true
+```
+
+说明：
+
+```text
+本机没有 flash_attn 包，flash_attention_2 加载失败后自动使用 SDPA。
+DeepSeek7B 仍有 sliding window attention + SDPA warning，解释 DS7B 结果时需要保留限制。
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647/qwen3_phase84_clean_suffix_erase_restore.json
+results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647/glm4_phase84_clean_suffix_erase_restore.json
+results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647/deepseek7b_phase84_clean_suffix_erase_restore.json
+results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647/phase84_clean_suffix_erase_restore_summary.json
+results/gpt5_phase84_clean_suffix_erase_restore_full_20260610_132647/PHASE84_CLEAN_SUFFIX_ERASE_RESTORE_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 672
+  rows = 24192
+  eligible = 828
+
+GLM4:
+  items = 672
+  rows = 24192
+  eligible = 954
+
+DeepSeek7B:
+  items = 672
+  rows = 24192
+  eligible = 656
+
+total rows = 72576
+```
+
+### Qwen3 客观结果
+
+核心条件：
+
+```text
+erase_frame_suffix_all:
+  drop = 1.9121
+  restore_gain = 1.4408
+  restore_gap = 0.4713
+  erase_top1 = 0.7778
+  restore_top1 = 0.9143
+
+erase_frame_suffix_final:
+  drop = 2.2054
+  restore_gain = 1.6714
+  restore_gap = 0.5340
+  erase_top1 = 0.7488
+  restore_top1 = 0.9046
+
+erase_frame_suffix_nonfinal:
+  drop = 0.8843
+  restore_gain = 0.6162
+  restore_gap = 0.2681
+  erase_top1 = 0.8901
+  restore_top1 = 0.9408
+
+erase_frame_suffix_function:
+  drop = 1.9586
+  restore_gain = 1.4983
+  restore_gap = 0.4603
+  erase_top1 = 0.7802
+  restore_top1 = 0.9251
+
+erase_frame_suffix_lexical:
+  drop = 0.2764
+  restore_gain = 0.1738
+  restore_gap = 0.1025
+  erase_top1 = 0.9469
+  restore_top1 = 0.9541
+
+erase_frame_all_suffix_tokens:
+  drop = 2.5583
+  restore_gain = 2.0840
+  restore_gap = 0.4743
+  erase_top1 = 0.7162
+  restore_top1 = 0.9118
+
+erase_object_suffix_final:
+  drop = 0.1122
+  restore_gain = 0.0237
+  restore_gap = 0.0885
+  erase_top1 = 0.9674
+  restore_top1 = 0.9686
+```
+
+客观现象：
+
+```text
+1. frame/readout 位置 erase 很强，object 位置 erase 很弱。
+2. suffix_final 比 suffix_nonfinal 更关键。
+3. suffix_function 接近 suffix_all，suffix_lexical 很弱。
+4. all_suffix_tokens 最强，说明 readout boundary 不是单点，而是 suffix component 联合接口。
+5. restore 能恢复大部分 drop，但不是完全恢复。
+```
+
+### GLM4 客观结果
+
+```text
+erase_frame_suffix_all:
+  drop = 0.6251
+  restore_gain = 0.5344
+  restore_gap = 0.0907
+  erase_top1 = 0.9078
+  restore_top1 = 0.9623
+
+erase_frame_suffix_final:
+  drop = 0.4368
+  restore_gain = 0.3238
+  restore_gap = 0.1130
+  erase_top1 = 0.9172
+  restore_top1 = 0.9602
+
+erase_frame_suffix_nonfinal:
+  drop = 0.2375
+  restore_gain = 0.1948
+  restore_gap = 0.0427
+  erase_top1 = 0.9539
+  restore_top1 = 0.9727
+
+erase_frame_suffix_function:
+  drop = 0.3142
+  restore_gain = 0.2724
+  restore_gap = 0.0418
+  erase_top1 = 0.9486
+  restore_top1 = 0.9675
+
+erase_frame_suffix_lexical:
+  drop = 0.2029
+  restore_gain = 0.1430
+  restore_gap = 0.0599
+  erase_top1 = 0.9455
+  restore_top1 = 0.9654
+
+erase_frame_all_suffix_tokens:
+  drop = 1.0872
+  restore_gain = 0.9205
+  restore_gap = 0.1666
+  erase_top1 = 0.8700
+  restore_top1 = 0.9497
+
+erase_object_suffix_final:
+  drop = 0.0156
+  restore_gain = -0.0012
+  restore_gap = 0.0168
+  erase_top1 = 0.9864
+  restore_top1 = 0.9853
+```
+
+客观现象：
+
+```text
+1. GLM4 的 clean erase 效果明显弱于 Qwen3 和 DS7B。
+2. 但 all_suffix_tokens 仍有最大 drop = 1.0872。
+3. object 位置几乎不受 suffix erase 影响。
+4. restore 非常接近 base，restore_gap 很小。
+```
+
+### DeepSeek7B 客观结果
+
+```text
+erase_frame_suffix_all:
+  drop = 1.2361
+  restore_gain = 1.0544
+  restore_gap = 0.1817
+  erase_top1 = 0.8171
+  restore_top1 = 0.9345
+
+erase_frame_suffix_final:
+  drop = 1.2377
+  restore_gain = 1.0238
+  restore_gap = 0.2139
+  erase_top1 = 0.7973
+  restore_top1 = 0.9253
+
+erase_frame_suffix_nonfinal:
+  drop = 0.6634
+  restore_gain = 0.5074
+  restore_gap = 0.1559
+  erase_top1 = 0.8765
+  restore_top1 = 0.9558
+
+erase_frame_suffix_function:
+  drop = 1.0788
+  restore_gain = 0.9109
+  restore_gap = 0.1680
+  erase_top1 = 0.8323
+  restore_top1 = 0.9390
+
+erase_frame_suffix_lexical:
+  drop = 0.3569
+  restore_gain = 0.2214
+  restore_gap = 0.1355
+  erase_top1 = 0.9085
+  restore_top1 = 0.9543
+
+erase_frame_all_suffix_tokens:
+  drop = 1.5748
+  restore_gain = 1.4061
+  restore_gap = 0.1687
+  erase_top1 = 0.7546
+  restore_top1 = 0.9192
+
+erase_object_suffix_final:
+  drop = 0.1857
+  restore_gain = 0.0955
+  restore_gap = 0.0901
+  erase_top1 = 0.9527
+  restore_top1 = 0.9588
+```
+
+客观现象：
+
+```text
+1. DS7B clean erase 支持 frame/readout 位置重要。
+2. suffix_final 与 suffix_all 几乎同等 drop。
+3. suffix_lexical 仍明显弱。
+4. restore 能恢复大部分 drop。
+5. object 位置影响弱，但略强于 Qwen3/GLM4。
+```
+
+### 三模型共同事实
+
+```text
+1. clean computation 中，frame/readout 位置远比 object 位置更受 suffix erase 影响。
+
+2. suffix_final 是 clean answer 的重要必要成分：
+   Qwen3 drop = 2.2054
+   GLM4 drop = 0.4368
+   DS7B drop = 1.2377
+
+3. all_suffix_tokens 是最强破坏项：
+   Qwen3 drop = 2.5583
+   GLM4 drop = 1.0872
+   DS7B drop = 1.5748
+
+4. suffix_lexical 是弱项：
+   Qwen3 drop = 0.2764
+   GLM4 drop = 0.2029
+   DS7B drop = 0.3569
+
+5. restore 能恢复大部分 erase 造成的下降：
+   Qwen3 all_suffix_tokens restore_gain = 2.0840
+   GLM4 all_suffix_tokens restore_gain = 0.9205
+   DS7B all_suffix_tokens restore_gain = 1.4061
+
+6. restore_gap 仍非零，说明当前 basis restore 不是完整状态恢复。
+```
+
+### 对 Phase 83 的验证
+
+Phase 84 直接支持 Phase 83 的核心判断：
+
+```text
+suffix_final / readout boundary 不只是 transfer artifact；
+它在 clean answer computation 中也是必要成分。
+```
+
+同时修正为：
+
+```text
+不是 final token 单点决定一切；
+all_suffix_tokens 更强，说明 final token 是接口核心，
+但完整机制仍依赖 suffix trajectory 的联合格式。
+```
+
+当前更稳表达：
+
+```text
+object-value closure =
+object state
++ post-object suffix trajectory
++ final readout boundary
++ candidate answer interface
+
+其中真正被 clean erase 证实的关键位置是 frame/readout token，
+不是 object token 本身。
+```
+
+### 硬伤
+
+```text
+1. erase 使用的是子空间投影移除，不等于精确删除单一语言变量。
+2. suffix_final basis 仍混合 readout boundary、位置、局部语法、候选类型期待。
+3. restore 不是完整恢复，说明 basis 只捕捉部分必要成分。
+4. GLM4 clean erase drop 较小，说明模型间路径机制差异仍然很大。
+5. DeepSeek7B 使用 SDPA 时有 sliding window attention warning。
+```
+
+### 当前关键洞察
+
+本轮把 object-value binding 的拼图推进了一层：
+
+```text
+关系不是储存在关系实词里；
+也不是只存在对象 token 本身；
+而是在对象之后的自然语言后缀轨迹中形成读出格式，
+最后由 frame/readout boundary 接入候选值空间。
+```
+
+这对“相对编码”非常关键：
+
+```text
+对象本身不是孤立编码单元；
+对象必须放在某个 readout frame 中才形成可回答的关系值。
+```
+
+### 下一步计划
+
+Phase 85：suffix/readout open generation audit。
+
+目标：
+
+```text
+验证 suffix_final / all_suffix_tokens 的作用是否影响自由生成，
+而不只是 closed candidate scoring。
+```
+
+Phase 86：readout boundary cross-function transfer。
+
+目标：
+
+```text
+把 object-value 的 readout boundary 结构迁移到：
+1. temporal order；
+2. logical operator；
+3. role binding；
+4. coreference；
+5. translation/style。
+```
+
+Phase 87：minimal readout circuit search。
+
+目标：
+
+```text
+在 frame/readout token 上定位：
+attention heads；
+MLP channels；
+residual subspace；
+看哪些组件负责 candidate-space gateway。
+```
+
+阶段性大任务：
+
+```text
+建立 global readout-interface map。
+
+每个语言功能都拆成：
+source token
+context/suffix trajectory
+readout boundary
+candidate/output interface
+destroy-restore closure
+```
+
+## Phase 85: readout open generation audit 全量测试 [2026-06-10 19:03]
+
+### 任务目标
+
+Phase 84 已经证明：
+
+```text
+suffix_final / all_suffix_tokens 在 clean candidate scoring 中是必要成分。
+```
+
+但 Phase 84 仍然是 closed candidate scoring。本轮尝试进入 open generation：
+
+```text
+对 clean prompt 做 greedy generation；
+在 frame/readout 位置 erase/restore suffix 子空间；
+观察自由生成是否仍命中 target。
+```
+
+本轮目标不是证明机制，而是检查：
+
+```text
+closed candidate scoring 中的 readout boundary 效应，
+是否能直接迁移到 open generation。
+```
+
+### 对用户分析的判断
+
+最新分析方向正确：
+
+```text
+1. Phase 84 是性质升级，说明 suffix/readout 不只是 transfer artifact。
+2. 但 Phase 84 仍然缺 sufficiency 和 open generation。
+3. open generation 必须做，但读出模板本身也可能成为新瓶颈。
+```
+
+因此本轮执行 Phase 85：readout open generation audit。
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase85_readout_open_generation_audit.py
+tests/gpt5/phase85_readout_open_generation_audit_summary.py
+tests/gpt5/run_phase85_readout_open_generation_audit_full.sh
+```
+
+测试逻辑：
+
+```text
+1. 使用 Phase 83/84 的 suffix component bases。
+2. 对 clean_prompt 做 greedy generation。
+3. 在 frame_last 位置进行：
+   erase_frame_suffix_final
+   erase_frame_suffix_all
+   erase_frame_suffix_function
+   erase_frame_suffix_lexical
+   erase_frame_all_suffix_tokens
+4. 同时做 restore_frame_*。
+5. 记录 generated text 是否 prefix/contains target。
+6. 记录 generated text 是否相对 base changed。
+```
+
+### Smoke Test
+
+```bash
+PHASE85_MODELS=qwen3 \
+QWEN3_PHASE85_MAX_ITEMS=2 \
+QWEN3_PHASE85_LAYER_PAIRS=4-8 \
+PHASE85_OUTPUT_DIR=results/gpt5_phase85_smoke \
+tests/gpt5/run_phase85_readout_open_generation_audit_full.sh
+```
+
+结果：
+
+```text
+exit_code = 0
+```
+
+### 正式命令
+
+```bash
+PHASE85_OUTPUT_DIR=results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741 \
+tests/gpt5/run_phase85_readout_open_generation_audit_full.sh
+```
+
+runner 内部顺序：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12
+  audit_layers = 4,8,12
+  max_items = 224
+
+glm4:
+  layer_pairs = 4-10,10-20
+  audit_layers = 4,10,20
+  max_items = 224
+
+deepseek7b:
+  layer_pairs = 8-10,12-14
+  audit_layers = 8,10,12,14
+  max_items = 224
+```
+
+共同参数：
+
+```text
+module = resid_out
+component_rank = 24
+max_basis_items = 224
+max_new_tokens = 6
+hard_exit_after_model = true
+generation = greedy, use_cache=false
+```
+
+说明：
+
+```text
+本机没有 flash_attn 包，flash_attention_2 加载失败后自动使用 SDPA。
+DeepSeek7B 仍有 sliding window attention + SDPA warning。
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741/qwen3_phase85_readout_open_generation_audit.json
+results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741/glm4_phase85_readout_open_generation_audit.json
+results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741/deepseek7b_phase85_readout_open_generation_audit.json
+results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741/phase85_readout_open_generation_audit_summary.json
+results/gpt5_phase85_readout_open_generation_audit_full_20260610_175741/PHASE85_READOUT_OPEN_GENERATION_AUDIT_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 224
+  audit_layers = 3
+  rows = 7392
+
+GLM4:
+  items = 224
+  audit_layers = 3
+  rows = 7392
+
+DeepSeek7B:
+  items = 224
+  audit_layers = 4
+  rows = 9856
+
+total rows = 24640
+```
+
+### 关键负结果
+
+三模型 base open generation 的 target prefix hit 全部为 0：
+
+```text
+Qwen3:
+  base prefix_hit = 0.0000
+  eligible_n = 0
+
+GLM4:
+  base prefix_hit = 0.0000
+  eligible_n = 0
+
+DeepSeek7B:
+  base prefix_hit = 0.0000
+  eligible_n = 0
+```
+
+示例：
+
+```text
+Qwen3:
+  prompt target = metal tool
+  base generation = " weapon, but it's not"
+  erase_all generation = " a tool, but it's"
+
+GLM4:
+  prompt target = metal tool
+  base generation = " tool with a cutting edge."
+  erase_all generation = " tool with a cutting edge."
+
+DeepSeek7B:
+  prompt target = metal tool
+  base generation = " __________ tool.\n\n\nA"
+  erase_all generation = " 62.5%"
+```
+
+客观解释：
+
+```text
+当前 natural clean_prompt 不是稳定 open-generation answer reader。
+模型自由生成经常生成语义相关补全，但不是数据集 target 的 exact prefix。
+因此不能用 prefix_hit 作为机制判断指标。
+```
+
+### 仍有价值的现象
+
+虽然 target hit 不可用，但 generated text changed 指标显示：
+
+Qwen3：
+
+```text
+erase_frame_suffix_final changed = 0.7262
+erase_frame_suffix_all changed = 0.5268
+erase_frame_suffix_function changed = 0.5580
+erase_frame_suffix_lexical changed = 0.3676
+erase_frame_all_suffix_tokens changed = 0.9643
+restore_frame_all_suffix_tokens changed = 0.1146
+```
+
+GLM4：
+
+```text
+erase_frame_suffix_final changed = 0.5104
+erase_frame_suffix_all changed = 0.3512
+erase_frame_suffix_function changed = 0.3720
+erase_frame_suffix_lexical changed = 0.2530
+erase_frame_all_suffix_tokens changed = 0.9062
+restore_frame_all_suffix_tokens changed = 0.0744
+```
+
+DeepSeek7B：
+
+```text
+erase/restore 完成，但由于 base target hit = 0，不能解释为答案命中变化。
+```
+
+客观现象：
+
+```text
+1. erase_frame_all_suffix_tokens 几乎总会改变自由生成文本。
+2. restore_frame_all_suffix_tokens 会大幅接近 base generation，changed 下降到约 0.07-0.11。
+3. 这说明 suffix/readout 子空间确实影响自由生成轨迹。
+4. 但当前 prompt 没有稳定生成标准答案，因此不能把 changed 解释为正确/错误答案切换。
+```
+
+### 当前最重要修正
+
+Phase 85 不是机制成功结果，而是读出器校准结果：
+
+```text
+closed candidate scoring 里的 readout boundary 效应很强；
+open generation 中 readout 子空间能改变生成轨迹；
+但当前 open generation prompt 不能稳定读出 target；
+因此 open generation 机制实验必须先做 answer-only reader calibration。
+```
+
+这与前面 role query 的经验一致：
+
+```text
+读出器不稳时，不能直接做机制解释。
+```
+
+### 硬伤
+
+```text
+1. base generation target prefix_hit = 0，导致 eligible_n = 0。
+2. exact prefix target 对自由生成过于严格，语义相关输出无法计入。
+3. prompt 没有明确 answer-only 约束，模型会生成解释、补充短语或模板文本。
+4. changed 指标只能说明生成轨迹变化，不能说明答案正确性变化。
+5. 仍需设计开放生成专用读出器。
+```
+
+### 下一步计划
+
+Phase 86：answer-only open generation reader calibration。
+
+目标：
+
+```text
+设计稳定的 open generation reader：
+1. 明确 Answer: 格式；
+2. 要求只输出 value；
+3. 使用符号或短答案约束；
+4. 对 base generation 做校准；
+5. 只有 base target hit 足够高，才进入 erase/restore。
+```
+
+建议模板：
+
+```text
+Question: What is the answer value?
+Context: A knife is a type of
+Answer:
+```
+
+或：
+
+```text
+Complete with only the answer value.
+A knife is a type of
+Answer:
+```
+
+Phase 87：open generation erase/restore 复测。
+
+目标：
+
+```text
+在校准过的 answer-only reader 上，
+复测 suffix_final / all_suffix_tokens 对自由生成答案的影响。
+```
+
+Phase 88：跨功能 readout reader 设计。
+
+目标：
+
+```text
+对 temporal order、logical operator、role binding、coreference 等功能，
+先建立稳定 reader，
+再做 erase/restore。
+```
+
+关键结论：
+
+```text
+open generation 不能直接使用自然 prompt；
+必须先建立稳定读出器。
+这不是失败，而是说明机制研究必须把“读出器校准”作为正式实验层。
+```
