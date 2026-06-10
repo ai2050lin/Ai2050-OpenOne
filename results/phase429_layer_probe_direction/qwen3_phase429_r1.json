@@ -1,0 +1,4764 @@
+{
+  "model": "qwen3",
+  "model_class": "Qwen3ForCausalLM",
+  "n_layers": 36,
+  "d_model": 2560,
+  "timestamp": "2026-06-10 00:37",
+  "phase": "429",
+  "round": 1,
+  "test_objects": [
+    "apple",
+    "knife",
+    "car"
+  ],
+  "alpha_grid": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "target_layers": {
+    "0.0": "embed",
+    "0.2": "L7",
+    "0.4": "L14",
+    "0.6": "L21",
+    "0.8": "L28"
+  },
+  "per_object": {
+    "apple": {
+      "category": "fruit",
+      "opposing": "animal",
+      "baselines": {
+        "category": {
+          "level": 1.001,
+          "entropy": 0.009,
+          "top": "fruit",
+          "full_entropy": 2.0491,
+          "confidence": 0.8212,
+          "top2_gap": 0.7993
+        },
+        "property": {
+          "level": 1.0028,
+          "entropy": 0.0161,
+          "top": "edible",
+          "full_entropy": 3.8248,
+          "confidence": 0.313,
+          "top2_gap": 0.0692
+        }
+      },
+      "perturbations": {
+        "category_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0014,
+                "delta": 0.0004,
+                "top": "fruit",
+                "full_entropy": 2.2892,
+                "confidence": 0.8106
+              },
+              "1.0": {
+                "level": 1.0021,
+                "delta": 0.0011,
+                "top": "fruit",
+                "full_entropy": 2.6691,
+                "confidence": 0.785
+              },
+              "2.0": {
+                "level": 1.0057,
+                "delta": 0.0047,
+                "top": "fruit",
+                "full_entropy": 3.4978,
+                "confidence": 0.713
+              },
+              "4.0": {
+                "level": 1.4509,
+                "delta": 0.4499,
+                "top": "fruit",
+                "full_entropy": 11.4629,
+                "confidence": 0.0564
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1609,
+                "confidence": 0.8113
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1887,
+                "confidence": 0.8086
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1108,
+                "confidence": 0.8169
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.0869,
+                "confidence": 0.8193
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.138,
+                "confidence": 0.8146
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1729,
+                "confidence": 0.8099
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.187,
+                "confidence": 0.8095
+              },
+              "4.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1026,
+                "confidence": 0.8189
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1432,
+                "confidence": 0.8143
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1322,
+                "confidence": 0.8147
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1452,
+                "confidence": 0.8144
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1525,
+                "confidence": 0.8123
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1948,
+                "confidence": 0.8075
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1904,
+                "confidence": 0.8079
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1932,
+                "confidence": 0.807
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1624,
+                "confidence": 0.8118
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0129,
+                "confidence": 0.8273
+              },
+              "1.0": {
+                "level": 1.0009,
+                "delta": -0.0001,
+                "top": "fruit",
+                "full_entropy": 2.0613,
+                "confidence": 0.825
+              },
+              "2.0": {
+                "level": 1.002,
+                "delta": 0.001,
+                "top": "fruit",
+                "full_entropy": 2.9505,
+                "confidence": 0.7424
+              },
+              "4.0": {
+                "level": 1.0161,
+                "delta": 0.0151,
+                "top": "fruit",
+                "full_entropy": 3.8053,
+                "confidence": 0.5336
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1567,
+                "confidence": 0.8118
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1622,
+                "confidence": 0.8123
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.2139,
+                "confidence": 0.8079
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1641,
+                "confidence": 0.8135
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1872,
+                "confidence": 0.8089
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1929,
+                "confidence": 0.8084
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1987,
+                "confidence": 0.8085
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.2173,
+                "confidence": 0.8069
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1526,
+                "confidence": 0.8121
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1583,
+                "confidence": 0.8119
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1942,
+                "confidence": 0.8084
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1675,
+                "confidence": 0.8103
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1636,
+                "confidence": 0.8112
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1841,
+                "confidence": 0.8083
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1441,
+                "confidence": 0.8138
+              },
+              "4.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1224,
+                "confidence": 0.8157
+              }
+            }
+          }
+        },
+        "category_layer_probe": {
+          "obj": {
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1751,
+                "confidence": 0.8106
+              },
+              "1.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1181,
+                "confidence": 0.8182
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.172,
+                "confidence": 0.8111
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1332,
+                "confidence": 0.8163
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1558,
+                "confidence": 0.8126
+              },
+              "1.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1057,
+                "confidence": 0.818
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0884,
+                "confidence": 0.8196
+              },
+              "4.0": {
+                "level": 1.0009,
+                "delta": -0.0001,
+                "top": "fruit",
+                "full_entropy": 2.0352,
+                "confidence": 0.8268
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 1.9876,
+                "confidence": 0.8289
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.148,
+                "confidence": 0.8141
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1454,
+                "confidence": 0.8136
+              },
+              "4.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1014,
+                "confidence": 0.8195
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1125,
+                "confidence": 0.8174
+              },
+              "1.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.029,
+                "confidence": 0.8241
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1329,
+                "confidence": 0.8152
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1349,
+                "confidence": 0.8155
+              }
+            }
+          },
+          "last": {
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.15,
+                "confidence": 0.8135
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1586,
+                "confidence": 0.8124
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.104,
+                "confidence": 0.8176
+              },
+              "4.0": {
+                "level": 1.0009,
+                "delta": -0.0001,
+                "top": "fruit",
+                "full_entropy": 1.9532,
+                "confidence": 0.8323
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1641,
+                "confidence": 0.812
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.161,
+                "confidence": 0.8127
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0478,
+                "confidence": 0.8243
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1792,
+                "confidence": 0.8129
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.15,
+                "confidence": 0.8123
+              },
+              "1.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1171,
+                "confidence": 0.8168
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0949,
+                "confidence": 0.8184
+              },
+              "4.0": {
+                "level": 1.0009,
+                "delta": -0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1218,
+                "confidence": 0.8163
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1802,
+                "confidence": 0.8095
+              },
+              "1.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1426,
+                "confidence": 0.8142
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1025,
+                "confidence": 0.8177
+              },
+              "4.0": {
+                "level": 1.0008,
+                "delta": -0.0002,
+                "top": "fruit",
+                "full_entropy": 1.99,
+                "confidence": 0.8283
+              }
+            }
+          }
+        },
+        "category_random": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1379,
+                "confidence": 0.8055
+              },
+              "1.0": {
+                "level": 1.0008,
+                "delta": -0.0002,
+                "top": "fruit",
+                "full_entropy": 1.987,
+                "confidence": 0.8098
+              },
+              "2.0": {
+                "level": 1.0396,
+                "delta": 0.0386,
+                "top": "fruit",
+                "full_entropy": 7.4384,
+                "confidence": 0.2465
+              },
+              "4.0": {
+                "level": 2.625,
+                "delta": 1.624,
+                "top": "tool",
+                "full_entropy": 11.4455,
+                "confidence": 0.018
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.146,
+                "confidence": 0.8134
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.2023,
+                "confidence": 0.8062
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1306,
+                "confidence": 0.8148
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.2072,
+                "confidence": 0.8046
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1477,
+                "confidence": 0.8132
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1755,
+                "confidence": 0.8103
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1254,
+                "confidence": 0.8156
+              },
+              "4.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.1621,
+                "confidence": 0.8117
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.178,
+                "confidence": 0.8096
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1412,
+                "confidence": 0.8136
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.001,
+                "confidence": 0.8269
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1208,
+                "confidence": 0.8152
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0228,
+                "confidence": 0.8251
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1801,
+                "confidence": 0.8095
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1649,
+                "confidence": 0.8116
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1407,
+                "confidence": 0.8128
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0013,
+                "delta": 0.0003,
+                "top": "fruit",
+                "full_entropy": 2.2433,
+                "confidence": 0.8056
+              },
+              "1.0": {
+                "level": 1.0015,
+                "delta": 0.0005,
+                "top": "fruit",
+                "full_entropy": 2.4691,
+                "confidence": 0.7806
+              },
+              "2.0": {
+                "level": 1.0063,
+                "delta": 0.0053,
+                "top": "fruit",
+                "full_entropy": 4.1739,
+                "confidence": 0.6388
+              },
+              "4.0": {
+                "level": 1.0849,
+                "delta": 0.0839,
+                "top": "fruit",
+                "full_entropy": 6.1302,
+                "confidence": 0.5194
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0196,
+                "confidence": 0.8254
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1589,
+                "confidence": 0.8125
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1829,
+                "confidence": 0.8109
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.109,
+                "confidence": 0.8203
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1846,
+                "confidence": 0.808
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1965,
+                "confidence": 0.8079
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1584,
+                "confidence": 0.8121
+              },
+              "4.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0391,
+                "confidence": 0.8231
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1548,
+                "confidence": 0.8136
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1566,
+                "confidence": 0.8134
+              },
+              "2.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1738,
+                "confidence": 0.8118
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1685,
+                "confidence": 0.8123
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0491,
+                "confidence": 0.8212
+              },
+              "0.5": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1261,
+                "confidence": 0.8156
+              },
+              "1.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1682,
+                "confidence": 0.8118
+              },
+              "2.0": {
+                "level": 1.001,
+                "delta": 0.0,
+                "top": "fruit",
+                "full_entropy": 2.0256,
+                "confidence": 0.8251
+              },
+              "4.0": {
+                "level": 1.0011,
+                "delta": 0.0001,
+                "top": "fruit",
+                "full_entropy": 2.1787,
+                "confidence": 0.8112
+              }
+            }
+          }
+        },
+        "property_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0029,
+                "delta": 0.0001,
+                "top": "edible",
+                "full_entropy": 3.87,
+                "confidence": 0.3168
+              },
+              "1.0": {
+                "level": 1.0047,
+                "delta": 0.0019,
+                "top": "edible",
+                "full_entropy": 3.9739,
+                "confidence": 0.3194
+              },
+              "2.0": {
+                "level": 1.0114,
+                "delta": 0.0086,
+                "top": "edible",
+                "full_entropy": 4.2727,
+                "confidence": 0.4756
+              },
+              "4.0": {
+                "level": 1.0085,
+                "delta": 0.0057,
+                "top": "edible",
+                "full_entropy": 4.1279,
+                "confidence": 0.5191
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.003,
+                "delta": 0.0002,
+                "top": "edible",
+                "full_entropy": 3.8706,
+                "confidence": 0.2972
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8811,
+                "confidence": 0.2887
+              },
+              "2.0": {
+                "level": 1.0029,
+                "delta": 0.0001,
+                "top": "edible",
+                "full_entropy": 3.8691,
+                "confidence": 0.2895
+              },
+              "4.0": {
+                "level": 1.0029,
+                "delta": 0.0001,
+                "top": "edible",
+                "full_entropy": 3.8867,
+                "confidence": 0.2884
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.003,
+                "delta": 0.0002,
+                "top": "edible",
+                "full_entropy": 3.8609,
+                "confidence": 0.3187
+              },
+              "1.0": {
+                "level": 1.0027,
+                "delta": -0.0001,
+                "top": "edible",
+                "full_entropy": 3.8101,
+                "confidence": 0.3142
+              },
+              "2.0": {
+                "level": 1.0031,
+                "delta": 0.0003,
+                "top": "edible",
+                "full_entropy": 3.889,
+                "confidence": 0.2883
+              },
+              "4.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8262,
+                "confidence": 0.3128
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9273,
+                "confidence": 0.2931
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8942,
+                "confidence": 0.2957
+              },
+              "2.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9157,
+                "confidence": 0.2939
+              },
+              "4.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.965,
+                "confidence": 0.3038
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9025,
+                "confidence": 0.2954
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8451,
+                "confidence": 0.3117
+              },
+              "2.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.898,
+                "confidence": 0.2957
+              },
+              "4.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9051,
+                "confidence": 0.2868
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0027,
+                "delta": -0.0001,
+                "top": "edible",
+                "full_entropy": 3.8671,
+                "confidence": 0.3177
+              },
+              "1.0": {
+                "level": 1.0025,
+                "delta": -0.0003,
+                "top": "edible",
+                "full_entropy": 3.7566,
+                "confidence": 0.349
+              },
+              "2.0": {
+                "level": 1.0505,
+                "delta": 0.0477,
+                "top": "edible",
+                "full_entropy": 4.4996,
+                "confidence": 0.2684
+              },
+              "4.0": {
+                "level": 3.889,
+                "delta": 2.8862,
+                "top": "fast",
+                "full_entropy": 4.5673,
+                "confidence": 0.3618
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8471,
+                "confidence": 0.3194
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8173,
+                "confidence": 0.3221
+              },
+              "2.0": {
+                "level": 1.0031,
+                "delta": 0.0003,
+                "top": "edible",
+                "full_entropy": 3.8499,
+                "confidence": 0.2988
+              },
+              "4.0": {
+                "level": 1.0032,
+                "delta": 0.0004,
+                "top": "edible",
+                "full_entropy": 3.8249,
+                "confidence": 0.3007
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8425,
+                "confidence": 0.3197
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8504,
+                "confidence": 0.3115
+              },
+              "2.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9347,
+                "confidence": 0.2927
+              },
+              "4.0": {
+                "level": 1.0027,
+                "delta": -0.0001,
+                "top": "edible",
+                "full_entropy": 3.9215,
+                "confidence": 0.2937
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9116,
+                "confidence": 0.2942
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8963,
+                "confidence": 0.2875
+              },
+              "2.0": {
+                "level": 1.0027,
+                "delta": -0.0001,
+                "top": "edible",
+                "full_entropy": 3.8289,
+                "confidence": 0.3133
+              },
+              "4.0": {
+                "level": 1.0027,
+                "delta": -0.0001,
+                "top": "edible",
+                "full_entropy": 3.8267,
+                "confidence": 0.3138
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8248,
+                "confidence": 0.313
+              },
+              "0.5": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8476,
+                "confidence": 0.3196
+              },
+              "1.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.9564,
+                "confidence": 0.3049
+              },
+              "2.0": {
+                "level": 1.0028,
+                "delta": 0.0,
+                "top": "edible",
+                "full_entropy": 3.8394,
+                "confidence": 0.3209
+              },
+              "4.0": {
+                "level": 1.0031,
+                "delta": 0.0003,
+                "top": "edible",
+                "full_entropy": 3.9213,
+                "confidence": 0.3082
+              }
+            }
+          }
+        }
+      }
+    },
+    "knife": {
+      "category": "tool",
+      "opposing": "vehicle",
+      "baselines": {
+        "category": {
+          "level": 2.9958,
+          "entropy": 0.0489,
+          "top": "tool",
+          "full_entropy": 5.9496,
+          "confidence": 0.2272,
+          "top2_gap": 0.0503
+        },
+        "property": {
+          "level": 3.0027,
+          "entropy": 0.0345,
+          "top": "sharp",
+          "full_entropy": 3.7144,
+          "confidence": 0.491,
+          "top2_gap": 0.3668
+        }
+      },
+      "perturbations": {
+        "category_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9977,
+                "delta": 0.0019,
+                "top": "tool",
+                "full_entropy": 5.5859,
+                "confidence": 0.2504
+              },
+              "1.0": {
+                "level": 2.9991,
+                "delta": 0.0033,
+                "top": "tool",
+                "full_entropy": 4.7856,
+                "confidence": 0.3381
+              },
+              "2.0": {
+                "level": 2.4578,
+                "delta": -0.538,
+                "top": "animal",
+                "full_entropy": 12.0727,
+                "confidence": 0.0149
+              },
+              "4.0": {
+                "level": 2.2407,
+                "delta": -0.7551,
+                "top": "animal",
+                "full_entropy": 12.29,
+                "confidence": 0.0134
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9963,
+                "delta": 0.0005,
+                "top": "tool",
+                "full_entropy": 5.8637,
+                "confidence": 0.2222
+              },
+              "1.0": {
+                "level": 2.9964,
+                "delta": 0.0006,
+                "top": "tool",
+                "full_entropy": 5.8343,
+                "confidence": 0.2236
+              },
+              "2.0": {
+                "level": 2.9965,
+                "delta": 0.0007,
+                "top": "tool",
+                "full_entropy": 5.9558,
+                "confidence": 0.2033
+              },
+              "4.0": {
+                "level": 2.9966,
+                "delta": 0.0008,
+                "top": "tool",
+                "full_entropy": 6.004,
+                "confidence": 0.2101
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8574,
+                "confidence": 0.2205
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8146,
+                "confidence": 0.2404
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9413,
+                "confidence": 0.2264
+              },
+              "4.0": {
+                "level": 2.9961,
+                "delta": 0.0003,
+                "top": "tool",
+                "full_entropy": 5.8774,
+                "confidence": 0.219
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.7864,
+                "confidence": 0.2428
+              },
+              "1.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.8905,
+                "confidence": 0.2336
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.8735,
+                "confidence": 0.2354
+              },
+              "4.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9294,
+                "confidence": 0.23
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8939,
+                "confidence": 0.2202
+              },
+              "1.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9544,
+                "confidence": 0.2267
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9385,
+                "confidence": 0.2275
+              },
+              "4.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.9192,
+                "confidence": 0.2189
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9967,
+                "delta": 0.0009,
+                "top": "tool",
+                "full_entropy": 5.9041,
+                "confidence": 0.2029
+              },
+              "1.0": {
+                "level": 2.9976,
+                "delta": 0.0018,
+                "top": "tool",
+                "full_entropy": 5.8946,
+                "confidence": 0.2368
+              },
+              "2.0": {
+                "level": 2.9972,
+                "delta": 0.0014,
+                "top": "tool",
+                "full_entropy": 6.224,
+                "confidence": 0.161
+              },
+              "4.0": {
+                "level": 3.0089,
+                "delta": 0.0131,
+                "top": "tool",
+                "full_entropy": 4.3686,
+                "confidence": 0.6651
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9447,
+                "confidence": 0.2265
+              },
+              "1.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9044,
+                "confidence": 0.2329
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9543,
+                "confidence": 0.2303
+              },
+              "4.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9892,
+                "confidence": 0.2302
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8843,
+                "confidence": 0.2202
+              },
+              "1.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.8765,
+                "confidence": 0.2353
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9399,
+                "confidence": 0.2301
+              },
+              "4.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9695,
+                "confidence": 0.2305
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9225,
+                "confidence": 0.2294
+              },
+              "1.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9615,
+                "confidence": 0.2258
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.8712,
+                "confidence": 0.2306
+              },
+              "4.0": {
+                "level": 2.9961,
+                "delta": 0.0003,
+                "top": "tool",
+                "full_entropy": 5.854,
+                "confidence": 0.2313
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9284,
+                "confidence": 0.2295
+              },
+              "1.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9505,
+                "confidence": 0.2277
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9464,
+                "confidence": 0.2263
+              },
+              "4.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 6.0231,
+                "confidence": 0.2103
+              }
+            }
+          }
+        },
+        "category_layer_probe": {
+          "obj": {
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.9171,
+                "confidence": 0.2196
+              },
+              "1.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9014,
+                "confidence": 0.2335
+              },
+              "2.0": {
+                "level": 2.9954,
+                "delta": -0.0004,
+                "top": "tool",
+                "full_entropy": 5.9093,
+                "confidence": 0.2475
+              },
+              "4.0": {
+                "level": 2.9954,
+                "delta": -0.0004,
+                "top": "tool",
+                "full_entropy": 5.9067,
+                "confidence": 0.2509
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8754,
+                "confidence": 0.2194
+              },
+              "1.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9073,
+                "confidence": 0.2292
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.962,
+                "confidence": 0.2288
+              },
+              "4.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8717,
+                "confidence": 0.2225
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8828,
+                "confidence": 0.2202
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8172,
+                "confidence": 0.2408
+              },
+              "2.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.8142,
+                "confidence": 0.2405
+              },
+              "4.0": {
+                "level": 2.9961,
+                "delta": 0.0003,
+                "top": "tool",
+                "full_entropy": 5.9164,
+                "confidence": 0.221
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9477,
+                "confidence": 0.2303
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8684,
+                "confidence": 0.2218
+              },
+              "2.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.895,
+                "confidence": 0.222
+              },
+              "4.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9582,
+                "confidence": 0.2307
+              }
+            }
+          },
+          "last": {
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2266
+              },
+              "1.0": {
+                "level": 2.9964,
+                "delta": 0.0006,
+                "top": "tool",
+                "full_entropy": 5.8029,
+                "confidence": 0.2247
+              },
+              "2.0": {
+                "level": 2.9964,
+                "delta": 0.0006,
+                "top": "tool",
+                "full_entropy": 5.7943,
+                "confidence": 0.225
+              },
+              "4.0": {
+                "level": 2.9967,
+                "delta": 0.0009,
+                "top": "tool",
+                "full_entropy": 5.673,
+                "confidence": 0.2508
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8932,
+                "confidence": 0.2199
+              },
+              "1.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9164,
+                "confidence": 0.2304
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.8966,
+                "confidence": 0.2331
+              },
+              "4.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9202,
+                "confidence": 0.2358
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9367,
+                "confidence": 0.2273
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.7744,
+                "confidence": 0.2398
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9204,
+                "confidence": 0.2284
+              },
+              "4.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9391,
+                "confidence": 0.2307
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9743,
+                "confidence": 0.2268
+              },
+              "1.0": {
+                "level": 2.9956,
+                "delta": -0.0002,
+                "top": "tool",
+                "full_entropy": 5.9513,
+                "confidence": 0.2265
+              },
+              "2.0": {
+                "level": 2.9956,
+                "delta": -0.0002,
+                "top": "tool",
+                "full_entropy": 5.9611,
+                "confidence": 0.2261
+              },
+              "4.0": {
+                "level": 2.9956,
+                "delta": -0.0002,
+                "top": "tool",
+                "full_entropy": 5.9732,
+                "confidence": 0.2249
+              }
+            }
+          }
+        },
+        "category_random": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9033,
+                "confidence": 0.1767
+              },
+              "1.0": {
+                "level": 2.9967,
+                "delta": 0.0009,
+                "top": "tool",
+                "full_entropy": 5.4552,
+                "confidence": 0.1975
+              },
+              "2.0": {
+                "level": 2.9989,
+                "delta": 0.0031,
+                "top": "tool",
+                "full_entropy": 7.4612,
+                "confidence": 0.1519
+              },
+              "4.0": {
+                "level": 2.986,
+                "delta": -0.0098,
+                "top": "tool",
+                "full_entropy": 11.1168,
+                "confidence": 0.0239
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9416,
+                "confidence": 0.2269
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8914,
+                "confidence": 0.2227
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9692,
+                "confidence": 0.2262
+              },
+              "4.0": {
+                "level": 2.9954,
+                "delta": -0.0004,
+                "top": "tool",
+                "full_entropy": 5.9073,
+                "confidence": 0.2487
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8746,
+                "confidence": 0.2196
+              },
+              "1.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9336,
+                "confidence": 0.2277
+              },
+              "2.0": {
+                "level": 2.9959,
+                "delta": 0.0001,
+                "top": "tool",
+                "full_entropy": 5.9741,
+                "confidence": 0.225
+              },
+              "4.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9264,
+                "confidence": 0.2302
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.8959,
+                "confidence": 0.2296
+              },
+              "1.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.782,
+                "confidence": 0.2406
+              },
+              "2.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.8973,
+                "confidence": 0.2297
+              },
+              "4.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.8796,
+                "confidence": 0.2173
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.952,
+                "confidence": 0.2287
+              },
+              "1.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.968,
+                "confidence": 0.2276
+              },
+              "2.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9611,
+                "confidence": 0.2279
+              },
+              "4.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8795,
+                "confidence": 0.2211
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9949,
+                "delta": -0.0009,
+                "top": "tool",
+                "full_entropy": 6.1701,
+                "confidence": 0.2272
+              },
+              "1.0": {
+                "level": 2.9949,
+                "delta": -0.0009,
+                "top": "tool",
+                "full_entropy": 6.4915,
+                "confidence": 0.2176
+              },
+              "2.0": {
+                "level": 2.9963,
+                "delta": 0.0005,
+                "top": "tool",
+                "full_entropy": 6.7402,
+                "confidence": 0.1921
+              },
+              "4.0": {
+                "level": 2.9963,
+                "delta": 0.0005,
+                "top": "tool",
+                "full_entropy": 5.5372,
+                "confidence": 0.3839
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9469,
+                "confidence": 0.2249
+              },
+              "1.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.8895,
+                "confidence": 0.2329
+              },
+              "2.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.8845,
+                "confidence": 0.2375
+              },
+              "4.0": {
+                "level": 2.9952,
+                "delta": -0.0006,
+                "top": "tool",
+                "full_entropy": 5.8248,
+                "confidence": 0.2735
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9511,
+                "confidence": 0.2286
+              },
+              "1.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9231,
+                "confidence": 0.2292
+              },
+              "2.0": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.8004,
+                "confidence": 0.2417
+              },
+              "4.0": {
+                "level": 2.9955,
+                "delta": -0.0003,
+                "top": "tool",
+                "full_entropy": 5.8611,
+                "confidence": 0.2521
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9962,
+                "delta": 0.0004,
+                "top": "tool",
+                "full_entropy": 5.876,
+                "confidence": 0.2206
+              },
+              "1.0": {
+                "level": 2.9957,
+                "delta": -0.0001,
+                "top": "tool",
+                "full_entropy": 5.9351,
+                "confidence": 0.2295
+              },
+              "2.0": {
+                "level": 2.9961,
+                "delta": 0.0003,
+                "top": "tool",
+                "full_entropy": 5.8788,
+                "confidence": 0.2226
+              },
+              "4.0": {
+                "level": 2.9955,
+                "delta": -0.0003,
+                "top": "tool",
+                "full_entropy": 5.9699,
+                "confidence": 0.2293
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.9496,
+                "confidence": 0.2272
+              },
+              "0.5": {
+                "level": 2.9958,
+                "delta": 0.0,
+                "top": "tool",
+                "full_entropy": 5.952,
+                "confidence": 0.2267
+              },
+              "1.0": {
+                "level": 2.9963,
+                "delta": 0.0005,
+                "top": "tool",
+                "full_entropy": 5.8869,
+                "confidence": 0.2206
+              },
+              "2.0": {
+                "level": 2.996,
+                "delta": 0.0002,
+                "top": "tool",
+                "full_entropy": 5.9299,
+                "confidence": 0.2276
+              },
+              "4.0": {
+                "level": 2.9961,
+                "delta": 0.0003,
+                "top": "tool",
+                "full_entropy": 5.9403,
+                "confidence": 0.2311
+              }
+            }
+          }
+        },
+        "property_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0032,
+                "delta": 0.0005,
+                "top": "sharp",
+                "full_entropy": 3.7568,
+                "confidence": 0.4967
+              },
+              "1.0": {
+                "level": 3.0044,
+                "delta": 0.0017,
+                "top": "sharp",
+                "full_entropy": 3.9469,
+                "confidence": 0.4792
+              },
+              "2.0": {
+                "level": 3.0056,
+                "delta": 0.0029,
+                "top": "sharp",
+                "full_entropy": 5.3637,
+                "confidence": 0.3547
+              },
+              "4.0": {
+                "level": 3.0062,
+                "delta": 0.0035,
+                "top": "sharp",
+                "full_entropy": 5.6906,
+                "confidence": 0.3326
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7353,
+                "confidence": 0.4803
+              },
+              "1.0": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.6789,
+                "confidence": 0.5011
+              },
+              "2.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7621,
+                "confidence": 0.4769
+              },
+              "4.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.68,
+                "confidence": 0.4951
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.7002,
+                "confidence": 0.493
+              },
+              "1.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.7009,
+                "confidence": 0.4925
+              },
+              "2.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.8289,
+                "confidence": 0.4651
+              },
+              "4.0": {
+                "level": 3.0029,
+                "delta": 0.0002,
+                "top": "sharp",
+                "full_entropy": 3.6638,
+                "confidence": 0.5023
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.6934,
+                "confidence": 0.4934
+              },
+              "1.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.7209,
+                "confidence": 0.4901
+              },
+              "2.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.6926,
+                "confidence": 0.4931
+              },
+              "4.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7096,
+                "confidence": 0.4913
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.6978,
+                "confidence": 0.4923
+              },
+              "1.0": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.6986,
+                "confidence": 0.4987
+              },
+              "2.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7193,
+                "confidence": 0.4906
+              },
+              "4.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7111,
+                "confidence": 0.491
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7497,
+                "confidence": 0.488
+              },
+              "1.0": {
+                "level": 3.0024,
+                "delta": -0.0003,
+                "top": "sharp",
+                "full_entropy": 3.628,
+                "confidence": 0.5023
+              },
+              "2.0": {
+                "level": 3.0008,
+                "delta": -0.0019,
+                "top": "sharp",
+                "full_entropy": 4.762,
+                "confidence": 0.4159
+              },
+              "4.0": {
+                "level": 3.0054,
+                "delta": 0.0027,
+                "top": "sharp",
+                "full_entropy": 7.6626,
+                "confidence": 0.1013
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.6938,
+                "confidence": 0.4998
+              },
+              "1.0": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.715,
+                "confidence": 0.4968
+              },
+              "2.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.73,
+                "confidence": 0.4798
+              },
+              "4.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.73,
+                "confidence": 0.4893
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7112,
+                "confidence": 0.492
+              },
+              "1.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7138,
+                "confidence": 0.4921
+              },
+              "2.0": {
+                "level": 3.0029,
+                "delta": 0.0002,
+                "top": "sharp",
+                "full_entropy": 3.6786,
+                "confidence": 0.5014
+              },
+              "4.0": {
+                "level": 3.0024,
+                "delta": -0.0003,
+                "top": "sharp",
+                "full_entropy": 3.6582,
+                "confidence": 0.4879
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.7175,
+                "confidence": 0.4904
+              },
+              "1.0": {
+                "level": 3.0029,
+                "delta": 0.0002,
+                "top": "sharp",
+                "full_entropy": 3.7193,
+                "confidence": 0.4967
+              },
+              "2.0": {
+                "level": 3.0026,
+                "delta": -0.0001,
+                "top": "sharp",
+                "full_entropy": 3.729,
+                "confidence": 0.4895
+              },
+              "4.0": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.6977,
+                "confidence": 0.4994
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7144,
+                "confidence": 0.491
+              },
+              "0.5": {
+                "level": 3.003,
+                "delta": 0.0003,
+                "top": "sharp",
+                "full_entropy": 3.7343,
+                "confidence": 0.4892
+              },
+              "1.0": {
+                "level": 3.0027,
+                "delta": 0.0,
+                "top": "sharp",
+                "full_entropy": 3.7135,
+                "confidence": 0.491
+              },
+              "2.0": {
+                "level": 3.0028,
+                "delta": 0.0001,
+                "top": "sharp",
+                "full_entropy": 3.7034,
+                "confidence": 0.4916
+              },
+              "4.0": {
+                "level": 3.0031,
+                "delta": 0.0004,
+                "top": "sharp",
+                "full_entropy": 3.6941,
+                "confidence": 0.5003
+              }
+            }
+          }
+        }
+      }
+    },
+    "car": {
+      "category": "vehicle",
+      "opposing": "tool",
+      "baselines": {
+        "category": {
+          "level": 3.9914,
+          "entropy": 0.0611,
+          "top": "vehicle",
+          "full_entropy": 4.1299,
+          "confidence": 0.4741,
+          "top2_gap": 0.3202
+        },
+        "property": {
+          "level": 3.9992,
+          "entropy": 0.0084,
+          "top": "fast",
+          "full_entropy": 3.6275,
+          "confidence": 0.5857,
+          "top2_gap": 0.5377
+        }
+      },
+      "perturbations": {
+        "category_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9926,
+                "delta": 0.0012,
+                "top": "vehicle",
+                "full_entropy": 3.9432,
+                "confidence": 0.5103
+              },
+              "1.0": {
+                "level": 3.994,
+                "delta": 0.0026,
+                "top": "vehicle",
+                "full_entropy": 3.8066,
+                "confidence": 0.5694
+              },
+              "2.0": {
+                "level": 3.995,
+                "delta": 0.0036,
+                "top": "vehicle",
+                "full_entropy": 3.4679,
+                "confidence": 0.6425
+              },
+              "4.0": {
+                "level": 3.9968,
+                "delta": 0.0054,
+                "top": "vehicle",
+                "full_entropy": 3.025,
+                "confidence": 0.7221
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.117,
+                "confidence": 0.4629
+              },
+              "1.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.0974,
+                "confidence": 0.4772
+              },
+              "2.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.0991,
+                "confidence": 0.4647
+              },
+              "4.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9148,
+                "confidence": 0.4951
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1284,
+                "confidence": 0.476
+              },
+              "1.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1252,
+                "confidence": 0.4768
+              },
+              "2.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1037,
+                "confidence": 0.4821
+              },
+              "4.0": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1129,
+                "confidence": 0.4772
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.0764,
+                "confidence": 0.4807
+              },
+              "1.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9404,
+                "confidence": 0.4942
+              },
+              "2.0": {
+                "level": 3.9919,
+                "delta": 0.0005,
+                "top": "vehicle",
+                "full_entropy": 3.9741,
+                "confidence": 0.4922
+              },
+              "4.0": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 3.9865,
+                "confidence": 0.4912
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1406,
+                "confidence": 0.4734
+              },
+              "1.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1062,
+                "confidence": 0.4814
+              },
+              "2.0": {
+                "level": 3.9921,
+                "delta": 0.0007,
+                "top": "vehicle",
+                "full_entropy": 3.9714,
+                "confidence": 0.504
+              },
+              "4.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9445,
+                "confidence": 0.5061
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9911,
+                "delta": -0.0003,
+                "top": "vehicle",
+                "full_entropy": 4.0043,
+                "confidence": 0.4885
+              },
+              "1.0": {
+                "level": 3.9875,
+                "delta": -0.0039,
+                "top": "vehicle",
+                "full_entropy": 3.7096,
+                "confidence": 0.549
+              },
+              "2.0": {
+                "level": 3.9847,
+                "delta": -0.0067,
+                "top": "vehicle",
+                "full_entropy": 5.0946,
+                "confidence": 0.2875
+              },
+              "4.0": {
+                "level": 3.9739,
+                "delta": -0.0175,
+                "top": "vehicle",
+                "full_entropy": 3.2984,
+                "confidence": 0.3648
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 3.9553,
+                "confidence": 0.4926
+              },
+              "1.0": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 3.9806,
+                "confidence": 0.4919
+              },
+              "2.0": {
+                "level": 3.9905,
+                "delta": -0.0009,
+                "top": "vehicle",
+                "full_entropy": 4.1305,
+                "confidence": 0.4617
+              },
+              "4.0": {
+                "level": 3.9895,
+                "delta": -0.0019,
+                "top": "vehicle",
+                "full_entropy": 4.2208,
+                "confidence": 0.4713
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9475,
+                "confidence": 0.4937
+              },
+              "1.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9196,
+                "confidence": 0.4951
+              },
+              "2.0": {
+                "level": 3.9927,
+                "delta": 0.0013,
+                "top": "vehicle",
+                "full_entropy": 3.9108,
+                "confidence": 0.494
+              },
+              "4.0": {
+                "level": 3.9936,
+                "delta": 0.0022,
+                "top": "vehicle",
+                "full_entropy": 3.7709,
+                "confidence": 0.5016
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1567,
+                "confidence": 0.4721
+              },
+              "1.0": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1501,
+                "confidence": 0.4747
+              },
+              "2.0": {
+                "level": 3.9919,
+                "delta": 0.0005,
+                "top": "vehicle",
+                "full_entropy": 3.9692,
+                "confidence": 0.4941
+              },
+              "4.0": {
+                "level": 3.9903,
+                "delta": -0.0011,
+                "top": "vehicle",
+                "full_entropy": 4.1572,
+                "confidence": 0.4635
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.0996,
+                "confidence": 0.4816
+              },
+              "1.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1193,
+                "confidence": 0.4786
+              },
+              "2.0": {
+                "level": 3.9921,
+                "delta": 0.0007,
+                "top": "vehicle",
+                "full_entropy": 3.9693,
+                "confidence": 0.493
+              },
+              "4.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9792,
+                "confidence": 0.4919
+              }
+            }
+          }
+        },
+        "category_layer_probe": {
+          "obj": {
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1391,
+                "confidence": 0.4603
+              },
+              "1.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1619,
+                "confidence": 0.4724
+              },
+              "2.0": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 4.0039,
+                "confidence": 0.4882
+              },
+              "4.0": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1241,
+                "confidence": 0.4761
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9915,
+                "delta": 0.0001,
+                "top": "vehicle",
+                "full_entropy": 4.1015,
+                "confidence": 0.465
+              },
+              "1.0": {
+                "level": 3.9918,
+                "delta": 0.0004,
+                "top": "vehicle",
+                "full_entropy": 4.0973,
+                "confidence": 0.4821
+              },
+              "2.0": {
+                "level": 3.9923,
+                "delta": 0.0009,
+                "top": "vehicle",
+                "full_entropy": 3.9476,
+                "confidence": 0.4943
+              },
+              "4.0": {
+                "level": 3.9915,
+                "delta": 0.0001,
+                "top": "vehicle",
+                "full_entropy": 4.0957,
+                "confidence": 0.468
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1076,
+                "confidence": 0.4777
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.937,
+                "confidence": 0.5067
+              },
+              "2.0": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 3.9716,
+                "confidence": 0.4921
+              },
+              "4.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.0976,
+                "confidence": 0.4785
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9341,
+                "confidence": 0.4959
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9442,
+                "confidence": 0.4945
+              },
+              "2.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9627,
+                "confidence": 0.5047
+              },
+              "4.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9503,
+                "confidence": 0.5056
+              }
+            }
+          },
+          "last": {
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9927,
+                "delta": 0.0013,
+                "top": "vehicle",
+                "full_entropy": 3.9061,
+                "confidence": 0.5099
+              },
+              "1.0": {
+                "level": 3.9917,
+                "delta": 0.0003,
+                "top": "vehicle",
+                "full_entropy": 4.0108,
+                "confidence": 0.4895
+              },
+              "2.0": {
+                "level": 3.9927,
+                "delta": 0.0013,
+                "top": "vehicle",
+                "full_entropy": 3.8603,
+                "confidence": 0.506
+              },
+              "4.0": {
+                "level": 3.9938,
+                "delta": 0.0024,
+                "top": "vehicle",
+                "full_entropy": 3.7139,
+                "confidence": 0.5343
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9596,
+                "confidence": 0.5042
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9187,
+                "confidence": 0.5112
+              },
+              "2.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.937,
+                "confidence": 0.492
+              },
+              "4.0": {
+                "level": 3.9932,
+                "delta": 0.0018,
+                "top": "vehicle",
+                "full_entropy": 3.781,
+                "confidence": 0.5214
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9565,
+                "confidence": 0.4937
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9218,
+                "confidence": 0.4958
+              },
+              "2.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.905,
+                "confidence": 0.4968
+              },
+              "4.0": {
+                "level": 3.9933,
+                "delta": 0.0019,
+                "top": "vehicle",
+                "full_entropy": 3.753,
+                "confidence": 0.5238
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1322,
+                "confidence": 0.4763
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9465,
+                "confidence": 0.4945
+              },
+              "2.0": {
+                "level": 3.9928,
+                "delta": 0.0014,
+                "top": "vehicle",
+                "full_entropy": 3.9183,
+                "confidence": 0.4974
+              },
+              "4.0": {
+                "level": 3.9931,
+                "delta": 0.0017,
+                "top": "vehicle",
+                "full_entropy": 3.9426,
+                "confidence": 0.4956
+              }
+            }
+          }
+        },
+        "category_random": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9933,
+                "delta": 0.0019,
+                "top": "vehicle",
+                "full_entropy": 3.7625,
+                "confidence": 0.5334
+              },
+              "1.0": {
+                "level": 3.9945,
+                "delta": 0.0031,
+                "top": "vehicle",
+                "full_entropy": 3.3787,
+                "confidence": 0.5927
+              },
+              "2.0": {
+                "level": 3.9983,
+                "delta": 0.0069,
+                "top": "vehicle",
+                "full_entropy": 2.9385,
+                "confidence": 0.6494
+              },
+              "4.0": {
+                "level": 3.9212,
+                "delta": -0.0702,
+                "top": "vehicle",
+                "full_entropy": 9.0984,
+                "confidence": 0.1507
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1123,
+                "confidence": 0.4759
+              },
+              "1.0": {
+                "level": 3.9925,
+                "delta": 0.0011,
+                "top": "vehicle",
+                "full_entropy": 3.901,
+                "confidence": 0.4968
+              },
+              "2.0": {
+                "level": 3.992,
+                "delta": 0.0006,
+                "top": "vehicle",
+                "full_entropy": 4.0443,
+                "confidence": 0.484
+              },
+              "4.0": {
+                "level": 3.9927,
+                "delta": 0.0013,
+                "top": "vehicle",
+                "full_entropy": 3.8872,
+                "confidence": 0.5091
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1151,
+                "confidence": 0.4641
+              },
+              "1.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1042,
+                "confidence": 0.4783
+              },
+              "2.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9635,
+                "confidence": 0.4932
+              },
+              "4.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1109,
+                "confidence": 0.4643
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9577,
+                "confidence": 0.4936
+              },
+              "1.0": {
+                "level": 3.9919,
+                "delta": 0.0005,
+                "top": "vehicle",
+                "full_entropy": 3.9858,
+                "confidence": 0.4897
+              },
+              "2.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.964,
+                "confidence": 0.4925
+              },
+              "4.0": {
+                "level": 3.9917,
+                "delta": 0.0003,
+                "top": "vehicle",
+                "full_entropy": 4.0079,
+                "confidence": 0.4876
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1558,
+                "confidence": 0.4724
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9438,
+                "confidence": 0.4946
+              },
+              "2.0": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1202,
+                "confidence": 0.4634
+              },
+              "4.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.149,
+                "confidence": 0.4782
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9883,
+                "delta": -0.0031,
+                "top": "vehicle",
+                "full_entropy": 4.4251,
+                "confidence": 0.4562
+              },
+              "1.0": {
+                "level": 3.982,
+                "delta": -0.0094,
+                "top": "vehicle",
+                "full_entropy": 5.0824,
+                "confidence": 0.4098
+              },
+              "2.0": {
+                "level": 3.9872,
+                "delta": -0.0042,
+                "top": "vehicle",
+                "full_entropy": 5.9264,
+                "confidence": 0.2992
+              },
+              "4.0": {
+                "level": 3.8318,
+                "delta": -0.1596,
+                "top": "vehicle",
+                "full_entropy": 7.544,
+                "confidence": 0.3993
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9579,
+                "confidence": 0.493
+              },
+              "1.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9217,
+                "confidence": 0.4955
+              },
+              "2.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 3.9649,
+                "confidence": 0.5048
+              },
+              "4.0": {
+                "level": 3.9924,
+                "delta": 0.001,
+                "top": "vehicle",
+                "full_entropy": 4.018,
+                "confidence": 0.5004
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9396,
+                "confidence": 0.4947
+              },
+              "1.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9886,
+                "confidence": 0.4908
+              },
+              "2.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9607,
+                "confidence": 0.4945
+              },
+              "4.0": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9761,
+                "confidence": 0.4949
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9922,
+                "delta": 0.0008,
+                "top": "vehicle",
+                "full_entropy": 3.9256,
+                "confidence": 0.4962
+              },
+              "1.0": {
+                "level": 3.9919,
+                "delta": 0.0005,
+                "top": "vehicle",
+                "full_entropy": 3.9683,
+                "confidence": 0.4928
+              },
+              "2.0": {
+                "level": 3.9907,
+                "delta": -0.0007,
+                "top": "vehicle",
+                "full_entropy": 4.1483,
+                "confidence": 0.4755
+              },
+              "4.0": {
+                "level": 3.9903,
+                "delta": -0.0011,
+                "top": "vehicle",
+                "full_entropy": 4.2168,
+                "confidence": 0.4695
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1299,
+                "confidence": 0.4741
+              },
+              "0.5": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1041,
+                "confidence": 0.4813
+              },
+              "1.0": {
+                "level": 3.9912,
+                "delta": -0.0002,
+                "top": "vehicle",
+                "full_entropy": 4.1483,
+                "confidence": 0.473
+              },
+              "2.0": {
+                "level": 3.9914,
+                "delta": 0.0,
+                "top": "vehicle",
+                "full_entropy": 4.1386,
+                "confidence": 0.4776
+              },
+              "4.0": {
+                "level": 3.9909,
+                "delta": -0.0005,
+                "top": "vehicle",
+                "full_entropy": 4.1852,
+                "confidence": 0.4685
+              }
+            }
+          }
+        },
+        "property_embed_dir": {
+          "obj": {
+            "embed": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.4867,
+                "confidence": 0.6054
+              },
+              "1.0": {
+                "level": 3.9995,
+                "delta": 0.0003,
+                "top": "fast",
+                "full_entropy": 3.5808,
+                "confidence": 0.5916
+              },
+              "2.0": {
+                "level": 3.9984,
+                "delta": -0.0008,
+                "top": "fast",
+                "full_entropy": 5.6933,
+                "confidence": 0.3515
+              },
+              "4.0": {
+                "level": 3.9952,
+                "delta": -0.004,
+                "top": "fast",
+                "full_entropy": 5.8635,
+                "confidence": 0.38
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.5176,
+                "confidence": 0.6
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6768,
+                "confidence": 0.5793
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6857,
+                "confidence": 0.5798
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.666,
+                "confidence": 0.5814
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6857,
+                "confidence": 0.5784
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6625,
+                "confidence": 0.5801
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6711,
+                "confidence": 0.5814
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.4814,
+                "confidence": 0.6081
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6812,
+                "confidence": 0.5788
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6683,
+                "confidence": 0.5789
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6739,
+                "confidence": 0.5793
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6872,
+                "confidence": 0.5778
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6571,
+                "confidence": 0.5833
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6558,
+                "confidence": 0.5826
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6465,
+                "confidence": 0.5845
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6908,
+                "confidence": 0.5774
+              }
+            }
+          },
+          "last": {
+            "embed": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.7065,
+                "confidence": 0.5721
+              },
+              "1.0": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.3754,
+                "confidence": 0.6175
+              },
+              "2.0": {
+                "level": 3.9738,
+                "delta": -0.0254,
+                "top": "fast",
+                "full_entropy": 5.6371,
+                "confidence": 0.2531
+              },
+              "4.0": {
+                "level": 3.9628,
+                "delta": -0.0364,
+                "top": "fast",
+                "full_entropy": 5.48,
+                "confidence": 0.2484
+              }
+            },
+            "L7": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.637,
+                "confidence": 0.5867
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6714,
+                "confidence": 0.5801
+              },
+              "2.0": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.6955,
+                "confidence": 0.5748
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.7258,
+                "confidence": 0.5709
+              }
+            },
+            "L14": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6689,
+                "confidence": 0.58
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.4721,
+                "confidence": 0.6083
+              },
+              "2.0": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.6812,
+                "confidence": 0.5755
+              },
+              "4.0": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.7085,
+                "confidence": 0.5727
+              }
+            },
+            "L21": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9993,
+                "delta": 0.0001,
+                "top": "fast",
+                "full_entropy": 3.6824,
+                "confidence": 0.5761
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6445,
+                "confidence": 0.5848
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.7126,
+                "confidence": 0.569
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.726,
+                "confidence": 0.5701
+              }
+            },
+            "L28": {
+              "0.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6275,
+                "confidence": 0.5857
+              },
+              "0.5": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6659,
+                "confidence": 0.583
+              },
+              "1.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6738,
+                "confidence": 0.5813
+              },
+              "2.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6251,
+                "confidence": 0.5865
+              },
+              "4.0": {
+                "level": 3.9992,
+                "delta": 0.0,
+                "top": "fast",
+                "full_entropy": 3.6681,
+                "confidence": 0.5786
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "direction_similarity": {
+    "fruit_vs_animal": {
+      "L0_obj": 0.1497,
+      "L0_last": 0.0009,
+      "L1_obj": 0.1189,
+      "L1_last": 0.0112,
+      "L2_obj": 0.1232,
+      "L2_last": 0.0212,
+      "L3_obj": 0.1081,
+      "L3_last": 0.0032,
+      "L4_obj": 0.1104,
+      "L4_last": 0.0286,
+      "L5_obj": 0.1007,
+      "L5_last": 0.0037,
+      "L6_obj": 0.1173,
+      "L6_last": 0.022,
+      "L7_obj": 0.0931,
+      "L7_last": 0.0339,
+      "L8_obj": 0.0914,
+      "L8_last": 0.0521,
+      "L9_obj": 0.094,
+      "L9_last": 0.0644,
+      "L10_obj": 0.0824,
+      "L10_last": 0.0686,
+      "L11_obj": 0.0773,
+      "L11_last": 0.0488,
+      "L12_obj": 0.0739,
+      "L12_last": 0.0588,
+      "L13_obj": 0.08,
+      "L13_last": 0.0585,
+      "L14_obj": 0.077,
+      "L14_last": 0.0663,
+      "L15_obj": 0.0757,
+      "L15_last": 0.049,
+      "L16_obj": 0.0769,
+      "L16_last": 0.0513,
+      "L17_obj": 0.0603,
+      "L17_last": 0.0482,
+      "L18_obj": 0.0674,
+      "L18_last": 0.0624,
+      "L19_obj": 0.067,
+      "L19_last": 0.0701,
+      "L20_obj": 0.0677,
+      "L20_last": 0.0591,
+      "L21_obj": 0.0806,
+      "L21_last": 0.0649,
+      "L22_obj": 0.0853,
+      "L22_last": 0.0675,
+      "L23_obj": 0.0747,
+      "L23_last": 0.092,
+      "L24_obj": 0.0865,
+      "L24_last": 0.1093,
+      "L25_obj": 0.066,
+      "L25_last": 0.115,
+      "L26_obj": 0.0554,
+      "L26_last": 0.1352,
+      "L27_obj": 0.0616,
+      "L27_last": 0.1416,
+      "L28_obj": 0.0683,
+      "L28_last": 0.1457,
+      "L29_obj": 0.0915,
+      "L29_last": 0.1855,
+      "L30_obj": 0.0905,
+      "L30_last": 0.1933,
+      "L31_obj": 0.0857,
+      "L31_last": 0.1849,
+      "L32_obj": 0.0796,
+      "L32_last": 0.1595,
+      "L33_obj": 0.0428,
+      "L33_last": 0.1231,
+      "L34_obj": 0.048,
+      "L34_last": 0.1087,
+      "L35_obj": 0.0568,
+      "L35_last": 0.0969
+    },
+    "animal_vs_fruit": {
+      "L0_obj": 0.1497,
+      "L0_last": 0.0009,
+      "L1_obj": 0.1189,
+      "L1_last": 0.0112,
+      "L2_obj": 0.1232,
+      "L2_last": 0.0212,
+      "L3_obj": 0.1081,
+      "L3_last": 0.0032,
+      "L4_obj": 0.1104,
+      "L4_last": 0.0286,
+      "L5_obj": 0.1007,
+      "L5_last": 0.0037,
+      "L6_obj": 0.1173,
+      "L6_last": 0.022,
+      "L7_obj": 0.0931,
+      "L7_last": 0.0339,
+      "L8_obj": 0.0914,
+      "L8_last": 0.0521,
+      "L9_obj": 0.094,
+      "L9_last": 0.0644,
+      "L10_obj": 0.0824,
+      "L10_last": 0.0686,
+      "L11_obj": 0.0773,
+      "L11_last": 0.0488,
+      "L12_obj": 0.0739,
+      "L12_last": 0.0588,
+      "L13_obj": 0.08,
+      "L13_last": 0.0585,
+      "L14_obj": 0.077,
+      "L14_last": 0.0663,
+      "L15_obj": 0.0757,
+      "L15_last": 0.049,
+      "L16_obj": 0.0769,
+      "L16_last": 0.0513,
+      "L17_obj": 0.0603,
+      "L17_last": 0.0482,
+      "L18_obj": 0.0674,
+      "L18_last": 0.0624,
+      "L19_obj": 0.067,
+      "L19_last": 0.0701,
+      "L20_obj": 0.0677,
+      "L20_last": 0.0591,
+      "L21_obj": 0.0806,
+      "L21_last": 0.0649,
+      "L22_obj": 0.0853,
+      "L22_last": 0.0675,
+      "L23_obj": 0.0747,
+      "L23_last": 0.092,
+      "L24_obj": 0.0865,
+      "L24_last": 0.1093,
+      "L25_obj": 0.066,
+      "L25_last": 0.115,
+      "L26_obj": 0.0554,
+      "L26_last": 0.1352,
+      "L27_obj": 0.0616,
+      "L27_last": 0.1416,
+      "L28_obj": 0.0683,
+      "L28_last": 0.1457,
+      "L29_obj": 0.0915,
+      "L29_last": 0.1855,
+      "L30_obj": 0.0905,
+      "L30_last": 0.1933,
+      "L31_obj": 0.0857,
+      "L31_last": 0.1849,
+      "L32_obj": 0.0796,
+      "L32_last": 0.1595,
+      "L33_obj": 0.0428,
+      "L33_last": 0.1231,
+      "L34_obj": 0.048,
+      "L34_last": 0.1087,
+      "L35_obj": 0.0568,
+      "L35_last": 0.0969
+    },
+    "tool_vs_vehicle": {
+      "L0_obj": 0.1507,
+      "L0_last": 0.0061,
+      "L1_obj": 0.1258,
+      "L1_last": 0.0279,
+      "L2_obj": 0.1144,
+      "L2_last": 0.0242,
+      "L3_obj": 0.0778,
+      "L3_last": 0.0182,
+      "L4_obj": 0.0912,
+      "L4_last": -0.0043,
+      "L5_obj": 0.0864,
+      "L5_last": 0.0014,
+      "L6_obj": 0.0903,
+      "L6_last": 0.0112,
+      "L7_obj": 0.0903,
+      "L7_last": 0.0125,
+      "L8_obj": 0.0799,
+      "L8_last": 0.0793,
+      "L9_obj": 0.0844,
+      "L9_last": 0.0688,
+      "L10_obj": 0.082,
+      "L10_last": 0.0525,
+      "L11_obj": 0.0818,
+      "L11_last": 0.0356,
+      "L12_obj": 0.0929,
+      "L12_last": 0.0595,
+      "L13_obj": 0.1062,
+      "L13_last": 0.051,
+      "L14_obj": 0.0957,
+      "L14_last": 0.0448,
+      "L15_obj": 0.0944,
+      "L15_last": 0.0188,
+      "L16_obj": 0.1017,
+      "L16_last": 0.0299,
+      "L17_obj": 0.0957,
+      "L17_last": 0.039,
+      "L18_obj": 0.091,
+      "L18_last": 0.0215,
+      "L19_obj": 0.0873,
+      "L19_last": 0.0319,
+      "L20_obj": 0.0871,
+      "L20_last": 0.0242,
+      "L21_obj": 0.0725,
+      "L21_last": 0.0046,
+      "L22_obj": 0.0705,
+      "L22_last": 0.0223,
+      "L23_obj": 0.0695,
+      "L23_last": 0.0711,
+      "L24_obj": 0.0764,
+      "L24_last": 0.121,
+      "L25_obj": 0.0908,
+      "L25_last": 0.1257,
+      "L26_obj": 0.0816,
+      "L26_last": 0.1469,
+      "L27_obj": 0.0765,
+      "L27_last": 0.1628,
+      "L28_obj": 0.0685,
+      "L28_last": 0.167,
+      "L29_obj": 0.0761,
+      "L29_last": 0.1891,
+      "L30_obj": 0.084,
+      "L30_last": 0.1901,
+      "L31_obj": 0.0877,
+      "L31_last": 0.1923,
+      "L32_obj": 0.0621,
+      "L32_last": 0.1648,
+      "L33_obj": 0.0483,
+      "L33_last": 0.1227,
+      "L34_obj": 0.0258,
+      "L34_last": 0.1275,
+      "L35_obj": 0.0121,
+      "L35_last": 0.118
+    },
+    "vehicle_vs_tool": {
+      "L0_obj": 0.1507,
+      "L0_last": 0.0061,
+      "L1_obj": 0.1258,
+      "L1_last": 0.0279,
+      "L2_obj": 0.1144,
+      "L2_last": 0.0242,
+      "L3_obj": 0.0778,
+      "L3_last": 0.0182,
+      "L4_obj": 0.0912,
+      "L4_last": -0.0043,
+      "L5_obj": 0.0864,
+      "L5_last": 0.0014,
+      "L6_obj": 0.0903,
+      "L6_last": 0.0112,
+      "L7_obj": 0.0903,
+      "L7_last": 0.0125,
+      "L8_obj": 0.0799,
+      "L8_last": 0.0793,
+      "L9_obj": 0.0844,
+      "L9_last": 0.0688,
+      "L10_obj": 0.082,
+      "L10_last": 0.0525,
+      "L11_obj": 0.0818,
+      "L11_last": 0.0356,
+      "L12_obj": 0.0929,
+      "L12_last": 0.0595,
+      "L13_obj": 0.1062,
+      "L13_last": 0.051,
+      "L14_obj": 0.0957,
+      "L14_last": 0.0448,
+      "L15_obj": 0.0944,
+      "L15_last": 0.0188,
+      "L16_obj": 0.1017,
+      "L16_last": 0.0299,
+      "L17_obj": 0.0957,
+      "L17_last": 0.039,
+      "L18_obj": 0.091,
+      "L18_last": 0.0215,
+      "L19_obj": 0.0873,
+      "L19_last": 0.0319,
+      "L20_obj": 0.0871,
+      "L20_last": 0.0242,
+      "L21_obj": 0.0725,
+      "L21_last": 0.0046,
+      "L22_obj": 0.0705,
+      "L22_last": 0.0223,
+      "L23_obj": 0.0695,
+      "L23_last": 0.0711,
+      "L24_obj": 0.0764,
+      "L24_last": 0.121,
+      "L25_obj": 0.0908,
+      "L25_last": 0.1257,
+      "L26_obj": 0.0816,
+      "L26_last": 0.1469,
+      "L27_obj": 0.0765,
+      "L27_last": 0.1628,
+      "L28_obj": 0.0685,
+      "L28_last": 0.167,
+      "L29_obj": 0.0761,
+      "L29_last": 0.1891,
+      "L30_obj": 0.084,
+      "L30_last": 0.1901,
+      "L31_obj": 0.0877,
+      "L31_last": 0.1923,
+      "L32_obj": 0.0621,
+      "L32_last": 0.1648,
+      "L33_obj": 0.0483,
+      "L33_last": 0.1227,
+      "L34_obj": 0.0258,
+      "L34_last": 0.1275,
+      "L35_obj": 0.0121,
+      "L35_last": 0.118
+    },
+    "place_vs_fruit": {
+      "L0_obj": 0.1175,
+      "L0_last": 0.0027,
+      "L1_obj": 0.0853,
+      "L1_last": -0.0084,
+      "L2_obj": 0.0886,
+      "L2_last": 0.0163,
+      "L3_obj": 0.1051,
+      "L3_last": 0.0014,
+      "L4_obj": 0.0818,
+      "L4_last": -0.01,
+      "L5_obj": 0.073,
+      "L5_last": 0.0005,
+      "L6_obj": 0.0752,
+      "L6_last": -0.001,
+      "L7_obj": 0.0537,
+      "L7_last": -0.0062,
+      "L8_obj": 0.0559,
+      "L8_last": -0.0133,
+      "L9_obj": 0.062,
+      "L9_last": 0.0295,
+      "L10_obj": 0.0605,
+      "L10_last": 0.033,
+      "L11_obj": 0.0563,
+      "L11_last": 0.0325,
+      "L12_obj": 0.0645,
+      "L12_last": 0.0417,
+      "L13_obj": 0.0688,
+      "L13_last": 0.0469,
+      "L14_obj": 0.0589,
+      "L14_last": 0.0469,
+      "L15_obj": 0.0589,
+      "L15_last": 0.0476,
+      "L16_obj": 0.057,
+      "L16_last": 0.0545,
+      "L17_obj": 0.0535,
+      "L17_last": 0.0675,
+      "L18_obj": 0.0538,
+      "L18_last": 0.0808,
+      "L19_obj": 0.0511,
+      "L19_last": 0.0718,
+      "L20_obj": 0.0483,
+      "L20_last": 0.0658,
+      "L21_obj": 0.0552,
+      "L21_last": 0.0532,
+      "L22_obj": 0.0533,
+      "L22_last": 0.0469,
+      "L23_obj": 0.0499,
+      "L23_last": 0.0718,
+      "L24_obj": 0.0618,
+      "L24_last": 0.0911,
+      "L25_obj": 0.0673,
+      "L25_last": 0.0896,
+      "L26_obj": 0.0578,
+      "L26_last": 0.12,
+      "L27_obj": 0.0595,
+      "L27_last": 0.1076,
+      "L28_obj": 0.0617,
+      "L28_last": 0.1118,
+      "L29_obj": 0.0769,
+      "L29_last": 0.1663,
+      "L30_obj": 0.0764,
+      "L30_last": 0.1458,
+      "L31_obj": 0.0821,
+      "L31_last": 0.1352,
+      "L32_obj": 0.0831,
+      "L32_last": 0.1096,
+      "L33_obj": 0.0694,
+      "L33_last": 0.0887,
+      "L34_obj": 0.0596,
+      "L34_last": 0.084,
+      "L35_obj": 0.0592,
+      "L35_last": 0.0777
+    }
+  }
+}

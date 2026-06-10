@@ -1,0 +1,56 @@
+{
+  "model": "glm4",
+  "round": 1,
+  "n_layers": 40,
+  "alpha": 1.5,
+  "timestamp": "2026-06-10T08:54:08",
+  "results": {
+    "same_class": {
+      "apple→orange": {
+        "category": "fruit",
+        "src_base_gap": 2.832,
+        "src_pert_gap": 4.2203,
+        "tgt_base_gap": 3.728,
+        "transfer_score": 2.2496
+      },
+      "knife→hammer": {
+        "category": "tool",
+        "src_base_gap": 2.2188,
+        "src_pert_gap": -0.0049,
+        "tgt_base_gap": 1.5508,
+        "transfer_score": -1.304
+      },
+      "dog→cat": {
+        "category": "animal",
+        "src_base_gap": 2.0981,
+        "src_pert_gap": 4.3228,
+        "tgt_base_gap": 3.3252,
+        "transfer_score": -1.0
+      }
+    },
+    "cross_class": {
+      "apple(fruit)→knife(tool)": {
+        "src_category": "fruit",
+        "tgt_category": "tool",
+        "tgt_base_gap": 2.2188,
+        "transfer_score": 1.1057
+      },
+      "dog(animal)→apple(fruit)": {
+        "src_category": "animal",
+        "tgt_category": "fruit",
+        "tgt_base_gap": 2.832,
+        "transfer_score": 2.0918
+      },
+      "knife(tool)→dog(animal)": {
+        "src_category": "tool",
+        "tgt_category": "animal",
+        "tgt_base_gap": 2.0981,
+        "transfer_score": -4.0006
+      }
+    }
+  },
+  "summary": {
+    "avg_same_class": -0.0181,
+    "avg_cross_class": -0.2677
+  }
+}

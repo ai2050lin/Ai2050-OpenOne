@@ -1,0 +1,111 @@
+{
+  "model": "deepseek7b",
+  "round": 1,
+  "n_layers": 28,
+  "alpha": 1.5,
+  "timestamp": "2026-06-10T08:20:28.028665",
+  "same_class": {
+    "apple→orange": {
+      "src": "apple",
+      "tgt": "orange",
+      "category": "fruit",
+      "base_cat_gap": 5.6146,
+      "trans_cat_gap": 5.4896,
+      "transfer_score": -0.125
+    },
+    "knife→hammer": {
+      "src": "knife",
+      "tgt": "hammer",
+      "category": "tool",
+      "base_cat_gap": 4.1979,
+      "trans_cat_gap": 5.2292,
+      "transfer_score": 1.0312
+    },
+    "dog→cat": {
+      "src": "dog",
+      "tgt": "cat",
+      "category": "animal",
+      "base_cat_gap": 2.8229,
+      "trans_cat_gap": 2.5,
+      "transfer_score": -0.3229
+    },
+    "car→train": {
+      "src": "car",
+      "tgt": "train",
+      "category": "vehicle",
+      "base_cat_gap": 0.2409,
+      "trans_cat_gap": 0.0339,
+      "transfer_score": -0.207
+    }
+  },
+  "cross_class": {
+    "apple(fruit)→knife(tool)": {
+      "src": "apple",
+      "tgt": "knife",
+      "src_cat": "fruit",
+      "tgt_cat": "tool",
+      "base_cross_gap": -1.5312,
+      "trans_cross_gap": -1.9271,
+      "transfer_score": -0.3958
+    },
+    "apple(fruit)→dog(animal)": {
+      "src": "apple",
+      "tgt": "dog",
+      "src_cat": "fruit",
+      "tgt_cat": "animal",
+      "base_cross_gap": -3.6302,
+      "trans_cross_gap": -4.0729,
+      "transfer_score": -0.4427
+    },
+    "knife(tool)→car(vehicle)": {
+      "src": "knife",
+      "tgt": "car",
+      "src_cat": "tool",
+      "tgt_cat": "vehicle",
+      "base_cross_gap": 1.2292,
+      "trans_cross_gap": 1.6992,
+      "transfer_score": 0.4701
+    },
+    "dog(animal)→apple(fruit)": {
+      "src": "dog",
+      "tgt": "apple",
+      "src_cat": "animal",
+      "tgt_cat": "fruit",
+      "base_cross_gap": 0.0625,
+      "trans_cross_gap": -0.1354,
+      "transfer_score": -0.1979
+    }
+  },
+  "random_control": {
+    "apple→orange_rand": {
+      "src": "apple",
+      "tgt": "orange",
+      "category": "fruit",
+      "random_transfer": 0.0208
+    },
+    "knife→hammer_rand": {
+      "src": "knife",
+      "tgt": "hammer",
+      "category": "tool",
+      "random_transfer": 0.0625
+    }
+  },
+  "reverse_class": {
+    "fruit→knife(tool)": {
+      "src_cat": "fruit",
+      "tgt": "knife",
+      "tgt_cat": "tool",
+      "base_gap": -1.5312,
+      "rev_gap": -1.1354,
+      "reverse_transfer": 0.3958
+    },
+    "animal→car(vehicle)": {
+      "src_cat": "animal",
+      "tgt": "car",
+      "tgt_cat": "vehicle",
+      "base_gap": 1.5208,
+      "rev_gap": 2.8125,
+      "reverse_transfer": 1.2917
+    }
+  }
+}
