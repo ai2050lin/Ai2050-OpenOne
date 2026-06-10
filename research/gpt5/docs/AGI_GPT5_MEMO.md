@@ -25889,3 +25889,1302 @@ coreference entity binding
 知识关系编码不是单纯 object identity，也不是单纯 value leakage。
 它更像 object compatibility 与 relation-frame readout template 的条件化组合。
 ```
+
+## Phase 81: template/readout decomposition [2026-06-10 04:35]
+
+### 任务目标
+
+用户提供的最新分析认为：
+
+```text
+Phase 68-79 已经比早期 GFCM 路线更深入；
+Phase 80 排除了 value leakage 和 position artifact 作为主解释；
+但 Phase 80 中的 template/readout-format 仍然是混合概念；
+下一步必须拆开 surface template 和 output slot/readout format。
+```
+
+这个判断基本正确。
+
+Phase 81 因此不继续证明 rank64 强，而是构造一个受控 prompt family，把 relation phrase（关系表达短语）和 answer slot（答案槽位）显式拆开。
+
+核心问题：
+
+```text
+Phase 80 中 template/readout-format 下降，
+到底来自表面模板，
+还是来自输出槽位/读出格式，
+还是来自更深的 object-frame compatibility core？
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase81_template_readout_decomposition.py
+tests/gpt5/phase81_template_readout_decomposition_summary.py
+tests/gpt5/run_phase81_template_readout_decomposition_full.sh
+```
+
+脚本特点：
+
+```text
+1. 三模型顺序运行：qwen3 -> GLM4 -> DS7B。
+2. 每个模型运行后使用 --hard-exit-after-model，避免显存残留。
+3. 使用正常 CUDA 路径，优先 flash_attention_2，失败后自动回退到 sdpa。
+4. 使用受控 prompt：
+   Object: {object}. Relation: {phrase}.{slot}
+5. 每个 relation 有 4 个 relation phrase。
+6. 每个 prompt 有 4 个 slot style：
+   Answer:
+   Value:
+   ->
+   =
+7. 每个模型 max_items=1344。
+8. 每个模型 2 个 layer pair。
+9. 每个模型 rows=34944。
+10. 三模型总 rows=104832。
+```
+
+relation phrase 示例：
+
+```text
+is_a:
+  category / kind / type / class
+
+used_for:
+  use / purpose / function / used for
+
+location:
+  location / place / where found / usual place
+```
+
+测试条件：
+
+```text
+joint_raw
+joint_orth_phrase
+joint_orth_slot
+joint_orth_phrase_slot
+joint_orth_relation
+joint_orth_all
+joint_phrase_basis_only
+joint_slot_basis_only
+joint_relation_basis_only
+joint_same_relation_other_phrase_frame
+joint_same_relation_other_slot_frame
+joint_same_object_other_relation_frame
+joint_raw_restore_both
+```
+
+说明：
+
+```text
+joint_raw:
+  rank64 object_basis + frame_basis 原始联合转移。
+
+joint_orth_phrase:
+  从 object/frame rank64 basis 中移除 relation phrase nuisance basis。
+
+joint_orth_slot:
+  移除 answer slot/readout style nuisance basis。
+
+joint_orth_phrase_slot:
+  同时移除 phrase + slot。
+
+joint_orth_relation:
+  移除 same object / same phrase / same slot / other relation 的 relation nuisance basis。
+
+joint_orth_all:
+  同时移除 phrase + slot + relation。
+
+*_basis_only:
+  只使用对应 nuisance basis 做转移，检查该 nuisance 是否单独足以产生合法 value transfer。
+```
+
+### 运行命令
+
+```bash
+PHASE81_OUTPUT_DIR=results/gpt5_phase81_template_readout_decomposition_full_$(date +%Y%m%d_%H%M%S) \
+tests/gpt5/run_phase81_template_readout_decomposition_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258
+```
+
+输出文件：
+
+```text
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258/qwen3_phase81_template_readout_decomposition.json
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258/glm4_phase81_template_readout_decomposition.json
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258/deepseek7b_phase81_template_readout_decomposition.json
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258/phase81_template_readout_decomposition_summary.json
+results/gpt5_phase81_template_readout_decomposition_full_20260609_235258/PHASE81_TEMPLATE_READOUT_DECOMPOSITION_SUMMARY.md
+```
+
+### 运行过程
+
+Qwen3：
+
+```text
+loaded with sdpa
+items = 1344
+layer_pairs = L4->L8, L8->L12
+rows = 34944
+exit_code = 0
+```
+
+GLM4：
+
+```text
+loaded with sdpa
+items = 1344
+layer_pairs = L4->L10, L10->L20
+rows = 34944
+exit_code = 0
+```
+
+DeepSeek7B：
+
+```text
+loaded with sdpa
+items = 1344
+layer_pairs = L8->L10, L12->L14
+rows = 34944
+exit_code = 0
+```
+
+注意：
+
+```text
+本机仍没有 flash_attn 包，因此 flash_attention_2 加载失败后回退到 sdpa。
+DeepSeek7B 加载时 transformers 提示：
+Sliding Window Attention is enabled but not implemented for sdpa;
+因此 DS7B 结果仍需保留这个实现差异 caveat。
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 1344
+  rows = 34944
+  eligible_n = 1228
+
+GLM4:
+  items = 1344
+  rows = 34944
+  eligible_n = 1500
+
+DeepSeek7B:
+  items = 1344
+  rows = 34944
+  eligible_n = 1190
+
+total rows = 104832
+```
+
+### 客观结果：Qwen3
+
+核心条件：
+
+```text
+joint_raw:
+  eligible_clean_drop = 6.0488
+  eligible_matched_gain = 5.4541
+  eligible_clean_top1 = 0.5399
+  eligible_matched_top1 = 0.1857
+
+joint_orth_phrase:
+  eligible_matched_top1 = 0.1857
+  matched_gain_delta_vs_raw = -0.0128
+
+joint_orth_slot:
+  eligible_matched_top1 = 0.1849
+  matched_gain_delta_vs_raw = -0.0039
+
+joint_orth_phrase_slot:
+  eligible_matched_top1 = 0.1849
+  matched_gain_delta_vs_raw = -0.0226
+
+joint_orth_relation:
+  eligible_matched_top1 = 0.1865
+  matched_gain_delta_vs_raw = -0.0080
+
+joint_orth_all:
+  eligible_matched_top1 = 0.1865
+  matched_gain_delta_vs_raw = -0.0166
+```
+
+nuisance basis only：
+
+```text
+joint_phrase_basis_only:
+  eligible_matched_top1 = 0.0000
+
+joint_slot_basis_only:
+  eligible_matched_top1 = 0.0000
+
+joint_relation_basis_only:
+  eligible_matched_top1 = 0.0008
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  eligible_clean_top1 = 0.9251
+  eligible_matched_top1 = 0.0033
+```
+
+客观现象：
+
+```text
+在受控 prompt family 中，移除 phrase/slot/relation nuisance basis 几乎不降低 Qwen3 的 joint_raw matched_top1。
+phrase/slot/relation basis alone 几乎不能产生 matched transfer。
+restore_both 仍然强烈恢复 clean target，说明干预位置和 restore 流程有效。
+```
+
+### 客观结果：GLM4
+
+核心条件：
+
+```text
+joint_raw:
+  eligible_clean_drop = 4.0473
+  eligible_matched_gain = 4.2601
+  eligible_clean_top1 = 0.5933
+  eligible_matched_top1 = 0.1507
+
+joint_orth_phrase:
+  eligible_matched_top1 = 0.1447
+  matched_gain_delta_vs_raw = +0.0195
+
+joint_orth_slot:
+  eligible_matched_top1 = 0.1487
+  matched_gain_delta_vs_raw = +0.0156
+
+joint_orth_phrase_slot:
+  eligible_matched_top1 = 0.1467
+  matched_gain_delta_vs_raw = +0.0091
+
+joint_orth_relation:
+  eligible_matched_top1 = 0.1500
+  matched_gain_delta_vs_raw = +0.0203
+
+joint_orth_all:
+  eligible_matched_top1 = 0.1460
+  matched_gain_delta_vs_raw = +0.0092
+```
+
+nuisance basis only：
+
+```text
+joint_phrase_basis_only:
+  eligible_matched_top1 = 0.0013
+
+joint_slot_basis_only:
+  eligible_matched_top1 = 0.0007
+
+joint_relation_basis_only:
+  eligible_matched_top1 = 0.0027
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  eligible_clean_top1 = 0.9500
+  eligible_matched_top1 = 0.0073
+```
+
+客观现象：
+
+```text
+GLM4 中移除 phrase/slot/relation 也几乎不破坏 joint_raw。
+单独 phrase/slot/relation basis 基本无效。
+restore_both 对 clean target 的恢复最强。
+```
+
+### 客观结果：DeepSeek7B
+
+核心条件：
+
+```text
+joint_raw:
+  eligible_clean_drop = 3.7176
+  eligible_matched_gain = 3.7061
+  eligible_clean_top1 = 0.6160
+  eligible_matched_top1 = 0.1521
+
+joint_orth_phrase:
+  eligible_matched_top1 = 0.1513
+  matched_gain_delta_vs_raw = -0.0316
+
+joint_orth_slot:
+  eligible_matched_top1 = 0.1529
+  matched_gain_delta_vs_raw = -0.0135
+
+joint_orth_phrase_slot:
+  eligible_matched_top1 = 0.1555
+  matched_gain_delta_vs_raw = -0.0600
+
+joint_orth_relation:
+  eligible_matched_top1 = 0.1504
+  matched_gain_delta_vs_raw = -0.0619
+
+joint_orth_all:
+  eligible_matched_top1 = 0.1538
+  matched_gain_delta_vs_raw = -0.1046
+```
+
+nuisance basis only：
+
+```text
+joint_phrase_basis_only:
+  eligible_matched_top1 = 0.0050
+
+joint_slot_basis_only:
+  eligible_matched_top1 = 0.0050
+
+joint_relation_basis_only:
+  eligible_matched_top1 = 0.0034
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  eligible_clean_top1 = 0.9311
+  eligible_matched_top1 = 0.0109
+```
+
+客观现象：
+
+```text
+DeepSeek7B 中 phrase/slot/relation 正交移除对 matched_top1 基本无破坏。
+matched_gain 有小幅下降，尤其 orth_all 下降 -0.1046，但 matched_top1 反而略高。
+单独 nuisance basis 仍几乎无效。
+```
+
+### 三模型共同事实
+
+共同事实 1：
+
+```text
+在受控 prompt family 中，phrase/slot/relation nuisance basis alone 几乎不能产生合法 matched value transfer。
+```
+
+共同事实 2：
+
+```text
+从 rank64 object/frame basis 中移除 phrase/slot/relation nuisance 后，
+joint_raw 的 matched_top1 基本不下降。
+```
+
+共同事实 3：
+
+```text
+restore_both 在三模型中都能明显恢复 clean target：
+Qwen3 = 0.9251
+GLM4 = 0.9500
+DeepSeek7B = 0.9311
+```
+
+共同事实 4：
+
+```text
+Phase 80 中 template/readout-format 下降很大；
+Phase 81 在受控 phrase/slot 分解下没有复现这种大下降。
+```
+
+这说明 Phase 80 的 template/readout-format 不能简单解释成：
+
+```text
+表面 relation phrase
+或 answer slot 文本
+```
+
+更可能包含：
+
+```text
+自然语言 frame 的完整局部上下文；
+relation expression 与 object 的兼容格式；
+answer slot 与上文共同形成的 readout alignment；
+自然模板中的语序、功能词、语用提示；
+而不是单独 phrase 或 slot。
+```
+
+### 重要解释修正
+
+Phase 80 后的表达是：
+
+```text
+template/readout-format 是重要组成。
+```
+
+Phase 81 后必须修正为：
+
+```text
+受控拆出的 phrase/slot/relation nuisance 不是 Phase 80 template effect 的主因。
+Phase 80 的 template effect 更可能是自然 frame 级别的整体 readout alignment，
+不是单独 surface phrase 或 output slot marker。
+```
+
+这使 object-frame 机制进一步接近：
+
+```text
+object compatibility support
++
+frame-conditioned readout alignment
++
+relation-object compatibility core
+```
+
+而不是：
+
+```text
+object identity + surface template + output slot
+```
+
+### 硬伤和注意事项
+
+1. `joint_same_relation_other_phrase_frame` 和 `joint_same_relation_other_slot_frame` 的 `matched_gain` 不能直接解释为跨对象合法 value transfer。
+
+原因：
+
+```text
+这些条件的目标值与 clean target 相同，
+matched_gain 的基线仍来自 matched object source target。
+因此 matched_gain 会被高估。
+```
+
+本轮只把这两个条件作为：
+
+```text
+clean target preservation / phrase-slot perturbation observation
+```
+
+不把它们作为主要机制证据。
+
+2. 受控 prompt family 和 Phase77/80 的自然模板不同。
+
+本轮结果说明：
+
+```text
+单独 phrase/slot 不是主因。
+```
+
+但不能说明：
+
+```text
+自然模板不重要。
+```
+
+3. 受控 prompt 的 slot style 差异仍较浅。
+
+```text
+Answer:
+Value:
+->
+=
+```
+
+它们主要测试局部输出标记，不等价于完整 natural-language readout format。
+
+4. 当前仍是 closed candidate scoring。
+
+5. 当前仍没有 open generation。
+
+6. 当前没有对 natural frame 做更细粒度的 clause/slot/function-word 拆分。
+
+7. DeepSeek7B 使用 SDPA 时有 sliding window attention caveat。
+
+### 当前进展
+
+到 Phase 81，知识关系编码机制的拼图更清楚：
+
+```text
+1. whole-token object-frame joint closure 成立。
+2. rank64 natural contrast subspace 基本复现 whole-token effect。
+3. remainder 几乎无效。
+4. value leakage 不是主解释。
+5. position artifact 不是主解释。
+6. Phase80 template/readout effect 很重要。
+7. Phase81 显示：受控拆出的 phrase/slot/relation 不是该 effect 的主因。
+```
+
+因此现在更稳的判断是：
+
+```text
+知识关系 value retrieval 的因果信号，
+集中在 object-frame 兼容子空间中；
+这个子空间包含自然 frame 条件化的 readout alignment，
+但不是简单答案值、位置、短语表面、槽位标记可以单独解释。
+```
+
+### 条件化关系因子动力学公式修正
+
+Phase 80 后的公式：
+
+```text
+h_{l+1}
+= h_l
++ C_l(object, relation-frame, readout-template)
+```
+
+Phase 81 后应改为：
+
+```text
+h_{l+1}
+= h_l
++ C_l(
+     object support,
+     natural frame context,
+     relation-object compatibility,
+     readout alignment
+   )
+```
+
+更谨慎地说：
+
+```text
+relation-frame 不是纯 relation，也不是 surface phrase + slot。
+它更像一个由自然框架上下文形成的条件化读出对齐状态。
+```
+
+### 下一步计划
+
+Phase 82：natural frame component ablation。
+
+目标：
+
+```text
+继续拆 Phase80 中真正强的 natural template effect。
+```
+
+需要把自然 frame 分成：
+
+```text
+relation lexical words
+function words
+answer-slot boundary
+object-relative word order
+pre-object context
+post-object context
+full frame suffix
+```
+
+测试：
+
+```text
+1. 只替换 relation lexical words。
+2. 只替换 answer-slot boundary。
+3. 只替换 object 后面的 frame suffix。
+4. 只替换 pre-object context。
+5. relation words + suffix 联合替换。
+6. full natural frame 替换。
+```
+
+Phase 83：erase-clean-subspace destroy-restore matrix。
+
+目标：
+
+```text
+不是只做 matched transfer，
+而是从 clean hidden state 中 erase rank64 object/frame subspace，
+看 clean answer 是否下降；
+再 restore 对应子空间，看 clean answer 是否恢复。
+```
+
+Phase 84：open generation audit。
+
+目标：
+
+```text
+验证 rank64 subspace 和 natural frame alignment 是否影响自由生成，
+而不是只影响 closed candidate scoring。
+```
+
+Phase 85：迁移到逻辑/语法。
+
+目标：
+
+```text
+用同一套 object support + frame alignment + compatibility core 的思想，
+测试：
+operator-event binding
+temporal order binding
+active/passive role binding
+coreference entity binding
+```
+
+最重要的提醒：
+
+```text
+当前不要把 phrase/slot 当作语言编码核心。
+真正核心更可能是自然上下文形成的相对兼容路径。
+```
+
+## Phase 82: natural frame component ablation [2026-06-10 09:16]
+
+### 任务目标
+
+用户提供的最新分析认为 Phase 81 的判断基本正确：
+
+```text
+Phase 80 的 template/readout-format 效应不能简单归因于表面 phrase、slot、relation label；
+Phase 81 的受控 prompt family 说明单独 phrase/slot/relation nuisance 不是主因；
+下一步应该回到自然 frame，把自然 frame 进一步拆成组件。
+```
+
+这个判断是正确的。
+
+Phase 82 因此执行 natural frame component ablation，目标是继续拆 Phase 80 中真正强的 natural template effect。
+
+本轮重点测试：
+
+```text
+pre-object context
+post-object suffix / natural frame suffix
+answer boundary
+relation label prompt
+full natural frame variation
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase82_natural_frame_component_ablation.py
+tests/gpt5/phase82_natural_frame_component_ablation_summary.py
+tests/gpt5/run_phase82_natural_frame_component_ablation_full.sh
+```
+
+核心 basis：
+
+```text
+object_basis:
+  matched source object token - clean object token
+
+frame_basis:
+  matched source natural frame token - clean natural frame token
+
+full_frame_basis:
+  same object / same relation / same target / different natural frame 的 frame_last 差异
+
+pre_object_basis:
+  same object / same relation / different natural frame 的 object_last 差异
+
+suffix_basis:
+  clean natural frame_last - object-only prompt object_last
+
+boundary_basis:
+  clean prompt + " Answer:" 的新 frame_last - clean frame_last
+
+relation_label_basis:
+  "{object} {relation_label}" prompt 的 frame_last - clean frame_last
+```
+
+测试条件：
+
+```text
+joint_raw
+joint_orth_full_frame
+joint_orth_pre_object
+joint_orth_suffix
+joint_orth_boundary
+joint_orth_relation_label
+joint_orth_all_components
+joint_full_frame_basis_only
+joint_pre_object_basis_only
+joint_suffix_basis_only
+joint_boundary_basis_only
+joint_relation_label_basis_only
+joint_mismatched_frame_raw
+joint_raw_restore_both
+```
+
+说明：
+
+```text
+orth_*:
+  从 rank64 object/frame basis 中正交移除对应 component basis。
+
+basis_only:
+  只使用该 component basis 做 object+frame 转移，检查它是否单独足够。
+```
+
+### 运行命令
+
+```bash
+PHASE82_OUTPUT_DIR=results/gpt5_phase82_natural_frame_component_ablation_full_$(date +%Y%m%d_%H%M%S) \
+tests/gpt5/run_phase82_natural_frame_component_ablation_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746
+```
+
+输出文件：
+
+```text
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746/qwen3_phase82_natural_frame_component_ablation.json
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746/glm4_phase82_natural_frame_component_ablation.json
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746/deepseek7b_phase82_natural_frame_component_ablation.json
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746/phase82_natural_frame_component_ablation_summary.json
+results/gpt5_phase82_natural_frame_component_ablation_full_20260610_061746/PHASE82_NATURAL_FRAME_COMPONENT_ABLATION_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+Qwen3:
+  items = 672
+  rows = 18816
+  layer_pairs = L4->L8, L8->L12
+  eligible_n = 802
+
+GLM4:
+  items = 672
+  rows = 18816
+  layer_pairs = L4->L10, L10->L20
+  eligible_n = 938
+
+DeepSeek7B:
+  items = 672
+  rows = 18816
+  layer_pairs = L8->L10, L12->L14
+  eligible_n = 632
+
+total rows = 56448
+```
+
+运行情况：
+
+```text
+三模型均完成。
+每个模型完成后使用 --hard-exit-after-model。
+flash_attention_2 因未安装 flash_attn 包失败，自动回退到 sdpa。
+DeepSeek7B 仍有 sliding window attention under sdpa caveat。
+```
+
+### Qwen3 客观结果
+
+核心结果：
+
+```text
+joint_raw:
+  matched_top1 = 0.5399
+  matched_gain = 13.8309
+
+joint_orth_pre_object:
+  matched_top1 = 0.5162
+  matched_gain = 13.4426
+  delta_top1 = -0.0237
+
+joint_orth_full_frame:
+  matched_top1 = 0.2693
+  matched_gain = 9.7438
+  delta_top1 = -0.2706
+
+joint_orth_relation_label:
+  matched_top1 = 0.2544
+  matched_gain = 9.7924
+  delta_top1 = -0.2855
+
+joint_orth_suffix:
+  matched_top1 = 0.0711
+  matched_gain = 5.7915
+  delta_top1 = -0.4688
+
+joint_orth_boundary:
+  matched_top1 = 0.0711
+  matched_gain = 5.9752
+  delta_top1 = -0.4688
+
+joint_orth_all_components:
+  matched_top1 = 0.0623
+  matched_gain = 5.1338
+  delta_top1 = -0.4776
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.2369
+```
+
+basis only：
+
+```text
+joint_suffix_basis_only:
+  matched_top1 = 0.1534
+
+joint_boundary_basis_only:
+  matched_top1 = 0.1446
+
+joint_full_frame_basis_only:
+  matched_top1 = 0.0474
+
+joint_pre_object_basis_only:
+  matched_top1 = 0.0000
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  clean_top1 = 0.8653
+  matched_top1 = 0.0100
+```
+
+客观现象：
+
+```text
+Qwen3 中 pre-object context 几乎不是主因。
+去掉 suffix 或 boundary 后，matched_top1 从 0.5399 下降到 0.0711，低于 mismatched_frame_raw。
+suffix/boundary basis only 有一定效果，但远低于 joint_raw。
+```
+
+### GLM4 客观结果
+
+核心结果：
+
+```text
+joint_raw:
+  matched_top1 = 0.6546
+  matched_gain = 13.8849
+
+joint_orth_pre_object:
+  matched_top1 = 0.6365
+  matched_gain = 13.5154
+  delta_top1 = -0.0181
+
+joint_orth_full_frame:
+  matched_top1 = 0.3337
+  matched_gain = 9.6759
+  delta_top1 = -0.3209
+
+joint_orth_relation_label:
+  matched_top1 = 0.4392
+  matched_gain = 10.9777
+  delta_top1 = -0.2154
+
+joint_orth_suffix:
+  matched_top1 = 0.1013
+  matched_gain = 5.9859
+  delta_top1 = -0.5533
+
+joint_orth_boundary:
+  matched_top1 = 0.1162
+  matched_gain = 6.1659
+  delta_top1 = -0.5384
+
+joint_orth_all_components:
+  matched_top1 = 0.0981
+  matched_gain = 5.4180
+  delta_top1 = -0.5565
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.2751
+```
+
+basis only：
+
+```text
+joint_suffix_basis_only:
+  matched_top1 = 0.1461
+
+joint_boundary_basis_only:
+  matched_top1 = 0.1194
+
+joint_full_frame_basis_only:
+  matched_top1 = 0.0245
+
+joint_pre_object_basis_only:
+  matched_top1 = 0.0011
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  clean_top1 = 0.8838
+  matched_top1 = 0.0171
+```
+
+客观现象：
+
+```text
+GLM4 中 pre-object context 也几乎不是主因。
+suffix/boundary 正交移除造成最大破坏。
+relation_label 移除有中等破坏，但明显弱于 suffix/boundary。
+```
+
+### DeepSeek7B 客观结果
+
+核心结果：
+
+```text
+joint_raw:
+  matched_top1 = 0.4193
+  matched_gain = 11.6139
+
+joint_orth_pre_object:
+  matched_top1 = 0.3655
+  matched_gain = 10.6894
+  delta_top1 = -0.0538
+
+joint_orth_full_frame:
+  matched_top1 = 0.2706
+  matched_gain = 9.4406
+  delta_top1 = -0.1487
+
+joint_orth_relation_label:
+  matched_top1 = 0.2801
+  matched_gain = 9.5748
+  delta_top1 = -0.1392
+
+joint_orth_suffix:
+  matched_top1 = 0.0396
+  matched_gain = 3.9577
+  delta_top1 = -0.3797
+
+joint_orth_boundary:
+  matched_top1 = 0.0617
+  matched_gain = 4.6512
+  delta_top1 = -0.3576
+
+joint_orth_all_components:
+  matched_top1 = 0.0316
+  matched_gain = 3.1118
+  delta_top1 = -0.3877
+
+joint_mismatched_frame_raw:
+  matched_top1 = 0.2674
+```
+
+basis only：
+
+```text
+joint_suffix_basis_only:
+  matched_top1 = 0.1566
+
+joint_boundary_basis_only:
+  matched_top1 = 0.1171
+
+joint_full_frame_basis_only:
+  matched_top1 = 0.0206
+
+joint_pre_object_basis_only:
+  matched_top1 = 0.0079
+```
+
+restore：
+
+```text
+joint_raw_restore_both:
+  clean_top1 = 0.8655
+  matched_top1 = 0.0047
+```
+
+客观现象：
+
+```text
+DeepSeek7B 中 suffix/boundary 仍是最关键组件。
+pre-object context 有轻微影响，但远弱于 suffix/boundary。
+```
+
+### 三模型共同事实
+
+共同事实 1：
+
+```text
+pre-object context 不是主要因果成分。
+```
+
+证据：
+
+```text
+Qwen3:
+  raw 0.5399 -> orth_pre_object 0.5162
+
+GLM4:
+  raw 0.6546 -> orth_pre_object 0.6365
+
+DeepSeek7B:
+  raw 0.4193 -> orth_pre_object 0.3655
+```
+
+共同事实 2：
+
+```text
+post-object suffix / natural frame suffix 是最强因果成分。
+```
+
+证据：
+
+```text
+Qwen3:
+  raw 0.5399 -> orth_suffix 0.0711
+
+GLM4:
+  raw 0.6546 -> orth_suffix 0.1013
+
+DeepSeek7B:
+  raw 0.4193 -> orth_suffix 0.0396
+```
+
+共同事实 3：
+
+```text
+answer boundary basis 与 suffix basis 高度相关，也非常关键。
+```
+
+证据：
+
+```text
+Qwen3:
+  orth_boundary = 0.0711
+
+GLM4:
+  orth_boundary = 0.1162
+
+DeepSeek7B:
+  orth_boundary = 0.0617
+```
+
+共同事实 4：
+
+```text
+relation_label/full_frame 有中等影响，但不是最核心。
+```
+
+共同事实 5：
+
+```text
+suffix/boundary basis only 有一定效果，但不足以复现 joint_raw。
+```
+
+证据：
+
+```text
+Qwen3:
+  suffix_basis_only = 0.1534
+  raw = 0.5399
+
+GLM4:
+  suffix_basis_only = 0.1461
+  raw = 0.6546
+
+DeepSeek7B:
+  suffix_basis_only = 0.1566
+  raw = 0.4193
+```
+
+这说明：
+
+```text
+suffix/boundary 是必要或近必要成分，
+但不是充分成分。
+完整机制仍需要 object support + frame suffix/readout boundary + compatibility composition。
+```
+
+### 和 Phase 81 的关系
+
+Phase 81 结论：
+
+```text
+受控 phrase/slot/relation marker 不是主因。
+```
+
+Phase 82 结论：
+
+```text
+自然 frame 中 object 后的 suffix/readout boundary 是主因。
+```
+
+二者合起来说明：
+
+```text
+不是任意 slot marker 重要；
+而是自然语言 frame 在 object 后形成的读出后缀和答案边界重要。
+```
+
+这正好解释 Phase 80：
+
+```text
+Phase 80 的 template/readout-format 效应，
+更具体地说是 natural post-object frame suffix + readout boundary effect。
+```
+
+### 当前理论修正
+
+Phase 81 后公式：
+
+```text
+h_{l+1}
+= h_l
++ C_l(
+     object support,
+     natural frame context,
+     relation-object compatibility,
+     readout alignment
+   )
+```
+
+Phase 82 后进一步修正：
+
+```text
+h_{l+1}
+= h_l
++ C_l(
+     object support,
+     post-object frame suffix,
+     readout boundary,
+     relation-object compatibility
+   )
+```
+
+更具体：
+
+```text
+object token 提供可兼容的对象支持；
+object 后面的 natural frame suffix 提供关系化读出路径；
+answer boundary 决定该路径如何进入候选值空间；
+三者联合形成 value-space transfer。
+```
+
+这不是单一语义轴，也不是单一模板词，而是：
+
+```text
+对象支持 + 后缀读出路径 + 关系兼容性 的条件化组合。
+```
+
+### 严格硬伤
+
+1. suffix_basis 定义仍然较粗。
+
+```text
+clean frame_last - object-only prompt object_last
+```
+
+它包含：
+
+```text
+post-object relation words
+function words
+answer-ready slot state
+local syntax
+position drift
+readout preparation
+```
+
+因此不能说已经找到纯 suffix factor。
+
+2. boundary_basis 也不纯。
+
+```text
+clean prompt + " Answer:" - clean prompt
+```
+
+它可能包含新的 answer marker，也可能包含额外 token 带来的位置和上下文变化。
+
+3. basis only 有一定 transfer。
+
+这说明 suffix/boundary 含有可推动 value-space 的成分，但由于远低于 raw，不能单独解释完整机制。
+
+4. 当前仍是 closed candidate scoring。
+
+5. 当前仍没有 open generation。
+
+6. 当前没有对 suffix 内部 token 逐词拆分。
+
+7. 当前没有 erase-clean-subspace。
+
+8. DS7B 仍有 SDPA sliding window caveat。
+
+### 下一步计划
+
+Phase 83：suffix token-level decomposition。
+
+目标：
+
+```text
+把 post-object frame suffix 逐 token 拆开。
+```
+
+例如：
+
+```text
+A {obj} is a kind of
+```
+
+拆成：
+
+```text
+is
+a
+kind
+of
+```
+
+测试：
+
+```text
+1. 每个 suffix token 单独 basis。
+2. suffix token cumulative basis。
+3. relation lexical token basis。
+4. final pre-answer token basis。
+5. function word basis。
+6. suffix without final token。
+7. final token only。
+```
+
+关键问题：
+
+```text
+真正强的是 relation lexical words，
+还是最后一个 pre-answer token，
+还是整个 suffix trajectory？
+```
+
+Phase 84：erase-clean-subspace destroy-restore matrix。
+
+目标：
+
+```text
+从 clean state 中 erase suffix/readout subspace，看 clean answer 是否下降；
+再 restore，看 clean answer 是否恢复。
+```
+
+Phase 85：open generation audit。
+
+目标：
+
+```text
+验证 suffix/readout boundary 是否影响自由生成，而不只是 closed candidate scoring。
+```
+
+Phase 86：迁移到逻辑/语法。
+
+目标：
+
+```text
+把 object + suffix/readout 的结构迁移到：
+operator + event suffix
+temporal marker + event order
+passive suffix + role binding
+coreference prompt + entity binding
+```
+
+当前最关键洞察：
+
+```text
+语言中的关系编码不是“对象向量 + 关系词向量”。
+更像是对象 token 在一个后续 frame suffix/readout boundary 中被重新读出。
+```
