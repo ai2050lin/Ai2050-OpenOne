@@ -28848,3 +28848,1956 @@ R_open：开放短答案生成。
 2. 再回到 suffix/readout erase/restore；
 3. 最后把 closed / choice / open 三层读出与内部路径图谱连接起来。
 ```
+
+## Phase 87: reader stack calibration 全量测试 [2026-06-11 09:37]
+
+### 任务目标
+
+Phase 86 说明 answer-only open reader 仍不稳定。本轮继续完成读出器栈校准，不做机制干预。
+
+目标是把知识读出拆成三层：
+
+```text
+R_closed：封闭候选评分。
+R_choice：显式多选生成。
+R_open：开放短答案生成。
+```
+
+核心问题：
+
+```text
+1. closed candidate scoring 是否稳定？
+2. multiple-choice generation 是否能把候选评分转成文本选择？
+3. open answer generation 是否仍然失败？
+4. 多选是否存在 candidate order bias？
+```
+
+### 脚本
+
+新增：
+
+```text
+tests/gpt5/phase87_reader_stack_calibration.py
+tests/gpt5/phase87_reader_stack_calibration_summary.py
+tests/gpt5/run_phase87_reader_stack_calibration_full.sh
+```
+
+脚本特性：
+
+```text
+1. 三模型顺序运行：qwen3 -> GLM4 -> DS7B。
+2. 每个模型完成后使用 --hard-exit-after-model。
+3. 每个 item 同时测 closed / choice / open 三类 reader。
+4. choice reader 使用 4 个模板、3 种候选顺序。
+5. open reader 使用 Phase 86 中相对最好的 2 个模板。
+6. 支持 resume。
+```
+
+choice 模板：
+
+```text
+choice_plain
+choice_blank
+choice_no_explain
+choice_json_letter
+```
+
+候选顺序：
+
+```text
+target_first
+target_last
+rotating
+```
+
+open 模板：
+
+```text
+open_fill_blank
+open_short_phrase
+```
+
+### 运行命令
+
+smoke：
+
+```bash
+PHASE87_OUTPUT_DIR=results/gpt5_phase87_reader_stack_calibration_smoke_$(date +%Y%m%d_%H%M%S) \
+PHASE87_MODELS=qwen3 \
+QWEN3_PHASE87_MAX_ITEMS=4 \
+PHASE87_CHOICE_TEMPLATES=choice_plain \
+PHASE87_OPEN_TEMPLATES=open_fill_blank \
+PHASE87_PROGRESS_EVERY=2 \
+tests/gpt5/run_phase87_reader_stack_calibration_full.sh
+```
+
+正式全量：
+
+```bash
+PHASE87_OUTPUT_DIR=results/gpt5_phase87_reader_stack_calibration_full_$(date +%Y%m%d_%H%M%S) \
+PHASE87_PROGRESS_EVERY=84 \
+tests/gpt5/run_phase87_reader_stack_calibration_full.sh
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase87_reader_stack_calibration_full_20260611_084922/qwen3_phase87_reader_stack_calibration.json
+results/gpt5_phase87_reader_stack_calibration_full_20260611_084922/glm4_phase87_reader_stack_calibration.json
+results/gpt5_phase87_reader_stack_calibration_full_20260611_084922/deepseek7b_phase87_reader_stack_calibration.json
+results/gpt5_phase87_reader_stack_calibration_full_20260611_084922/phase87_reader_stack_calibration_summary.json
+results/gpt5_phase87_reader_stack_calibration_full_20260611_084922/PHASE87_READER_STACK_CALIBRATION_SUMMARY.md
+```
+
+### 数据规模
+
+每个 item：
+
+```text
+closed = 1 row
+choice = 4 templates * 3 orders = 12 rows
+open = 2 rows
+total = 15 rows/item
+```
+
+正式数据：
+
+```text
+qwen3:
+  items = 672
+  rows = 10080
+
+GLM4:
+  items = 672
+  rows = 10080
+
+DS7B:
+  items = 672
+  rows = 10080
+
+total rows = 30240
+```
+
+三模型均完成。本轮没有运行中断。
+
+说明：
+
+```text
+本机无 flash_attn 包，因此 flash_attention_2 加载失败后回退到 sdpa。
+DS7B 加载时仍提示 Sliding Window Attention is enabled but not implemented for sdpa。
+```
+
+### Qwen3 客观结果
+
+按 reader：
+
+```text
+closed:
+  top1 = 0.5923
+  margin = 1.3528
+
+choice:
+  top1 = 0.7334
+  valid = 0.8545
+  no_target_first_top1 = 0.8105
+  rotating_top1 = 0.7630
+  target_last_top1 = 0.8579
+
+open:
+  word_subset_hit = 0.0082
+  family_overlap_hit = 0.2612
+  format_violation = 0.0729
+```
+
+choice 模板：
+
+```text
+choice_no_explain:
+  top1 = 0.8656
+  no_target_first_top1 = 0.8854
+  rotating_top1 = 0.8899
+  target_last_top1 = 0.8810
+
+choice_json_letter:
+  top1 = 0.8487
+  no_target_first_top1 = 0.8720
+  rotating_top1 = 0.8810
+  target_last_top1 = 0.8631
+```
+
+客观现象：
+
+```text
+Qwen3 的 multiple-choice reader 明显强于 closed scoring 和 open generation。
+choice_no_explain / choice_json_letter 在去掉 target_first 后仍稳定在 0.87-0.89 左右。
+```
+
+### GLM4 客观结果
+
+按 reader：
+
+```text
+closed:
+  top1 = 0.6696
+  margin = 2.1754
+
+choice:
+  top1 = 0.6997
+  valid = 1.0000
+  no_target_first_top1 = 0.6315
+  rotating_top1 = 0.7121
+  target_last_top1 = 0.5510
+
+open:
+  word_subset_hit = 0.0186
+  family_overlap_hit = 0.2872
+  format_violation = 0.1615
+```
+
+choice 模板：
+
+```text
+choice_no_explain:
+  top1 = 0.7728
+  no_target_first_top1 = 0.7634
+  rotating_top1 = 0.8318
+  target_last_top1 = 0.6949
+
+choice_blank:
+  top1 = 0.7688
+  no_target_first_top1 = 0.7485
+  rotating_top1 = 0.8080
+  target_last_top1 = 0.6890
+
+choice_json_letter:
+  top1 = 0.7401
+  no_target_first_top1 = 0.7225
+  rotating_top1 = 0.7991
+  target_last_top1 = 0.6458
+```
+
+客观现象：
+
+```text
+GLM4 的 closed scoring 最强，choice reader 也稳定。
+choice_plain 有很强顺序偏置，target_first = 0.9673，但 target_last = 0.1741。
+choice_no_explain / choice_blank / choice_json_letter 更可靠。
+```
+
+### DeepSeek7B 客观结果
+
+按 reader：
+
+```text
+closed:
+  top1 = 0.4390
+  margin = -1.1054
+
+choice:
+  top1 = 0.4701
+  valid = 0.8914
+  no_target_first_top1 = 0.2775
+  rotating_top1 = 0.3460
+  target_last_top1 = 0.2091
+
+open:
+  word_subset_hit = 0.0030
+  family_overlap_hit = 0.0930
+  format_violation = 0.1064
+```
+
+choice 模板：
+
+```text
+choice_json_letter:
+  top1 = 0.6637
+  no_target_first_top1 = 0.5610
+  rotating_top1 = 0.6369
+  target_last_top1 = 0.4851
+
+choice_no_explain:
+  top1 = 0.4449
+  no_target_first_top1 = 0.3542
+  rotating_top1 = 0.3571
+  target_last_top1 = 0.3512
+```
+
+客观现象：
+
+```text
+DS7B 的 reader stack 明显弱于 qwen3 和 GLM4。
+choice_plain / choice_blank 存在极强 target_first 偏置：
+  choice_plain target_first = 1.0000
+  choice_plain target_last = 0.0000
+  choice_blank target_first = 0.9256
+  choice_blank target_last = 0.0000
+choice_json_letter 相对最好，但 target_last 仍只有 0.4851。
+```
+
+### 跨模型结果
+
+```text
+closed:
+  top1 = 0.5670
+  margin = 0.8076
+
+choice:
+  top1 = 0.6344
+  valid = 0.9153
+
+open:
+  word_subset_hit = 0.0099
+  family_overlap_hit = 0.2138
+  format_violation = 0.1136
+```
+
+choice 模板跨模型：
+
+```text
+choice_json_letter:
+  top1 = 0.7508
+  valid = 1.0000
+
+choice_no_explain:
+  top1 = 0.6944
+  valid = 0.8848
+
+choice_blank:
+  top1 = 0.5766
+  valid = 0.8447
+
+choice_plain:
+  top1 = 0.5157
+  valid = 0.9317
+```
+
+### 关键结论
+
+Phase 87 明确把三层 reader 分开：
+
+```text
+R_closed：封闭候选评分，中等稳定。
+R_choice：显式多选生成，明显强于开放生成。
+R_open：开放短答案生成，仍然不合格。
+```
+
+最重要的客观发现：
+
+```text
+1. qwen3 和 GLM4 的 multiple-choice reader 已经可用，尤其 choice_no_explain / choice_json_letter。
+2. open generation 仍然只能输出弱值族相关结果，不能稳定输出完整 target。
+3. DS7B 在 sdpa 下 reader stack 整体较弱，且存在强候选顺序偏置。
+4. 多选结果必须报告 no_target_first / rotating / target_last，否则容易把第一选项偏置误判为读出能力。
+```
+
+### 对 Phase 86 的修正
+
+Phase 86 只能说明 answer-only open reader 不合格。
+
+Phase 87 进一步说明：
+
+```text
+open reader 不合格，并不代表文本读出完全失败；
+显式多选 reader 可以显著恢复读出能力。
+```
+
+因此目前最稳的 reader stack 是：
+
+```text
+closed scoring：机制验证基准；
+choice_json_letter / choice_no_explain：可用于生成式读出校准；
+open answer-only：暂不可用于机制验证。
+```
+
+### 硬伤
+
+```text
+1. R_choice 仍然不是自由语言生成，只是结构化选择读出。
+2. qwen3 和 GLM4 的 choice reader 可用，但不同模板和候选顺序影响很大。
+3. DS7B 的 choice reader 有强 target_first 偏置，必须使用 rotating / target_last 做校正。
+4. closed scoring 与 choice generation 并不完全一致，说明从候选评分到输出选择还有接口层。
+5. open generation 仍然不能作为机制验证读出器。
+6. DS7B 的 sdpa sliding-window warning 仍是模型实现层硬伤。
+```
+
+### 理论进展
+
+当前语言知识读出应明确分成三层：
+
+```text
+内部兼容状态
+  -> R_closed 封闭候选评分
+  -> R_choice 显式选择读出
+  -> R_open 开放短答案生成
+```
+
+Phase 87 说明：
+
+```text
+R_closed 与 R_choice 已经能反映一部分内部知识路径；
+R_open 仍受格式、短语习惯、解释倾向和解码策略影响严重。
+```
+
+这支持一个更精确的理论：
+
+```text
+语言编码机制不是直接等于自然生成文本。
+内部状态先形成候选兼容性；
+读出器再把候选兼容性转成选择或生成。
+不同 reader 的失败位置不同。
+```
+
+### 下一步计划
+
+Phase 88：choice-reader erase/restore retest。
+
+理由：
+
+```text
+现在 R_choice 已经比 R_open 稳定，尤其 qwen3 / GLM4。
+可以在 choice_json_letter 或 choice_no_explain 上复测 suffix/readout erase/restore。
+```
+
+建议测试：
+
+```text
+1. qwen3:
+   reader = choice_no_explain, choice_json_letter
+   order = rotating, target_last
+
+2. GLM4:
+   reader = choice_no_explain, choice_blank, choice_json_letter
+   order = rotating, target_last
+
+3. DS7B:
+   reader = choice_json_letter
+   order = rotating, target_last
+```
+
+核心指标：
+
+```text
+choice_top1_drop
+choice_restore_gain
+choice_target_letter_margin
+choice_order_robustness
+closed_score_drop
+closed_restore_gain
+```
+
+阶段性大任务：
+
+```text
+1. 用 R_closed 继续定位内部机制；
+2. 用 R_choice 验证生成式读出接口；
+3. 暂停 R_open 机制干预；
+4. 等 choice-reader erase/restore 稳定后，再重新设计 open reader。
+```
+
+## Phase 88: choice reader erase/restore 迁移测试 [2026-06-11 14:48]
+
+### 任务目标
+
+根据 Phase87 的结果，`R_choice` 是目前最稳定的桥接读出器：它比 open answer 更稳定，又比 closed fullseq candidate scoring 更接近真实输出。本轮测试 Phase84 的 `suffix/readout gateway` 是否能从 closed scoring 迁移到结构化 choice 输出。
+
+核心问题：
+
+```text
+如果 frame suffix 子空间在 closed candidate scoring 中是必要读出门，
+那么擦除该子空间是否也会降低 choice reader 的真实选择正确率？
+恢复该子空间是否能恢复 choice 输出？
+```
+
+同时结合 GLM5 Phase456 的发现，本轮不使用 softmax margin 作为主指标，只记录 full-sequence logprob margin、rank/top1 和 choice top1/valid。
+
+### 脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase88_choice_reader_erase_restore.py
+tests/gpt5/phase88_choice_reader_erase_restore_summary.py
+tests/gpt5/run_phase88_choice_reader_erase_restore_full.sh
+```
+
+运行命令：
+
+```bash
+PHASE88_OUTPUT_DIR=results/gpt5_phase88_choice_reader_erase_restore_full_20260611_1046 \
+tests/gpt5/run_phase88_choice_reader_erase_restore_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+每个模型都使用：
+
+```text
+--hard-exit-after-model
+BF16
+device_map="auto"
+attn_implementation: flash_attention_2 尝试失败后回退 sdpa
+```
+
+本机仍未安装 flash_attn，因此实际成功路径是 PyTorch SDPA，不是 flash-attention-2。
+
+### 测试规模
+
+为避免小样本误判，同时控制生成式 erase/restore 的组合爆炸，本轮使用中大规模测试：
+
+```text
+max_items = 336
+choice_orders = rotating,target_last
+conditions =
+  frame_suffix_final
+  frame_suffix_all
+  frame_suffix_function
+  frame_suffix_lexical
+  frame_all_suffix_tokens
+  object_suffix_final
+  object_all_suffix_tokens
+```
+
+模型配置：
+
+```text
+qwen3:
+  layer_pairs = 4-8,8-12
+  templates = choice_json_letter,choice_no_explain
+  rows = 18816
+
+GLM4:
+  layer_pairs = 4-10,10-20
+  templates = choice_json_letter,choice_no_explain,choice_blank
+  rows = 28224
+
+DeepSeek7B:
+  layer_pairs = 8-10,12-14
+  templates = choice_json_letter
+  rows = 9408
+```
+
+总行数：
+
+```text
+56448 rows
+bad_numeric_rows = 0 for all three models
+```
+
+输出目录：
+
+```text
+results/gpt5_phase88_choice_reader_erase_restore_full_20260611_1046/
+```
+
+### 总体结果
+
+模型级汇总：
+
+```text
+qwen3:
+  n = 18816
+  base_choice_top1 = 0.8646
+  erase_choice_top1 = 0.8595
+  restore_choice_top1 = 0.8587
+  choice_drop = 0.0050
+  choice_restore_gain = -0.0009
+  closed_base_top1 = 0.6190
+  closed_erase_top1 = 0.5548
+  closed_restore_top1 = 0.6025
+  closed_drop = 0.6348
+  closed_restore_gain = 0.4807
+
+GLM4:
+  n = 28224
+  base_choice_top1 = 0.7411
+  erase_choice_top1 = 0.7402
+  restore_choice_top1 = 0.7407
+  choice_drop = 0.0009
+  choice_restore_gain = 0.0005
+  closed_base_top1 = 0.6488
+  closed_erase_top1 = 0.6533
+  closed_restore_top1 = 0.6694
+  closed_drop = 0.0803
+  closed_restore_gain = 0.1447
+
+DeepSeek7B:
+  n = 9408
+  base_choice_top1 = 0.5685
+  erase_choice_top1 = 0.5669
+  restore_choice_top1 = 0.5638
+  choice_drop = 0.0016
+  choice_restore_gain = -0.0031
+  closed_base_top1 = 0.4613
+  closed_erase_top1 = 0.4226
+  closed_restore_top1 = 0.4524
+  closed_drop = 0.3132
+  closed_restore_gain = 0.2884
+```
+
+### 条件级结果
+
+最强 closed scoring 效应仍来自 frame all suffix tokens：
+
+```text
+qwen3 frame_all_suffix_tokens:
+  choice_drop = 0.0097
+  choice_restore_gain = -0.0108
+  closed_drop = 1.5555
+  closed_restore_gain = 1.3861
+
+GLM4 frame_all_suffix_tokens:
+  choice_drop = 0.0030
+  choice_restore_gain = -0.0010
+  closed_drop = 0.5721
+  closed_restore_gain = 0.5936
+
+DeepSeek7B frame_all_suffix_tokens:
+  choice_drop = 0.0030
+  choice_restore_gain = -0.0141
+  closed_drop = 0.8301
+  closed_restore_gain = 0.7506
+```
+
+Qwen3 的 frame suffix closed 效应最强，但 choice 输出只轻微下降，且 restore 没有恢复：
+
+```text
+qwen3 frame_suffix_final:
+  choice_drop = 0.0037
+  choice_restore_gain = -0.0011
+  closed_drop = 0.8107
+  closed_restore_gain = 0.6947
+
+qwen3 frame_suffix_all:
+  choice_drop = 0.0041
+  choice_restore_gain = -0.0004
+  closed_drop = 0.5975
+  closed_restore_gain = 0.3777
+```
+
+GLM4 的 closed margin 对部分 frame 条件有恢复，但 choice 几乎不动：
+
+```text
+GLM4 frame_all_suffix_tokens:
+  choice_drop = 0.0030
+  choice_restore_gain = -0.0010
+  closed_drop = 0.5721
+  closed_restore_gain = 0.5936
+
+GLM4 frame_suffix_all:
+  choice_drop = -0.0007
+  choice_restore_gain = 0.0000
+  closed_drop = 0.0163
+  closed_restore_gain = 0.1659
+```
+
+DeepSeek7B 的 closed 恢复明显，但 choice 输出仍不恢复：
+
+```text
+DeepSeek7B frame_suffix_final:
+  choice_drop = 0.0030
+  choice_restore_gain = -0.0015
+  closed_drop = 0.4635
+  closed_restore_gain = 0.4246
+
+DeepSeek7B frame_suffix_function:
+  choice_drop = -0.0015
+  choice_restore_gain = 0.0000
+  closed_drop = 0.4770
+  closed_restore_gain = 0.4476
+```
+
+### 路径级结果
+
+Qwen3 的 closed effect 在两个路径都稳定存在：
+
+```text
+qwen3 frame_all_suffix_tokens L4->L8:
+  choice_drop = 0.0156
+  choice_restore_gain = -0.0089
+  closed_drop = 1.3950
+  closed_restore_gain = 1.3021
+
+qwen3 frame_all_suffix_tokens L8->L12:
+  choice_drop = 0.0037
+  choice_restore_gain = -0.0126
+  closed_drop = 1.7160
+  closed_restore_gain = 1.4702
+```
+
+GLM4 的 closed effect 也在两个路径上存在，但 choice 输出仍弱：
+
+```text
+GLM4 frame_all_suffix_tokens L4->L10:
+  choice_drop = 0.0040
+  choice_restore_gain = -0.0035
+  closed_drop = 0.5937
+  closed_restore_gain = 0.6090
+
+GLM4 frame_all_suffix_tokens L10->L20:
+  choice_drop = 0.0020
+  choice_restore_gain = 0.0015
+  closed_drop = 0.5506
+  closed_restore_gain = 0.5783
+```
+
+DeepSeek7B 的 closed effect 在 L8->L10 和 L12->L14 都存在：
+
+```text
+DeepSeek7B frame_all_suffix_tokens L8->L10:
+  choice_drop = 0.0015
+  choice_restore_gain = -0.0164
+  closed_drop = 0.8756
+  closed_restore_gain = 0.6926
+
+DeepSeek7B frame_all_suffix_tokens L12->L14:
+  choice_drop = 0.0045
+  choice_restore_gain = -0.0119
+  closed_drop = 0.7846
+  closed_restore_gain = 0.8086
+```
+
+### 关系级高效应片段
+
+closed scoring 中最强片段：
+
+```text
+qwen3 frame_all_suffix_tokens used_for:
+  closed_drop = 3.6508
+  closed_restore_gain = 3.3784
+  choice_drop = 0.0260
+  choice_restore_gain = -0.0104
+
+qwen3 frame_suffix_final is_a:
+  closed_drop = 2.2511
+  closed_restore_gain = 1.6739
+  choice_drop = 0.0052
+  choice_restore_gain = 0.0104
+
+GLM4 frame_all_suffix_tokens used_for:
+  closed_drop = 1.8393
+  closed_restore_gain = 1.5861
+  choice_drop = 0.0000
+
+DeepSeek7B frame_all_suffix_tokens location:
+  closed_drop = 1.6783
+  closed_restore_gain = 1.7299
+  choice_drop = 0.0000
+```
+
+### 客观判断
+
+本轮最重要的客观现象：
+
+```text
+1. Phase84 的 closed scoring suffix/readout gateway 效应被再次复现。
+2. 三模型中 frame_all_suffix_tokens 都是最强 closed erase/restore 条件之一。
+3. frame 条件明显强于 object 条件，说明读出端更依赖 relation/frame suffix，而不是单纯对象 token。
+4. closed scoring 的擦除-恢复强效没有稳定迁移到 choice 输出。
+5. choice 输出在 qwen3 中有轻微下降，但幅度远小于 closed margin；GLM4 和 DeepSeek7B 几乎不受影响。
+6. restore 在 closed scoring 中有效，但在 choice 输出中没有稳定恢复，甚至常出现负恢复。
+```
+
+因此，当前不能说：
+
+```text
+suffix/readout gateway 已经控制真实结构化输出。
+```
+
+更稳的说法是：
+
+```text
+suffix/readout gateway 是 closed candidate scoring 的强读出因子；
+但结构化 choice generation 还有额外输出层、格式层、选项顺序层或决策层缓冲，
+使得 closed margin 改变不会线性转化为 choice top1 改变。
+```
+
+### 对当前分析的判断
+
+附件中“Phase87 后应做 Choice-Reader Readout-Gateway Erase/Restore”的分析是正确的：
+
+```text
+R_choice 必须作为 closed 与 open 之间的桥；
+不能直接把 closed scoring 的 gateway 结果解释成真实生成控制；
+需要测试 choice 输出是否同步下降和恢复。
+```
+
+本轮结果支持这个谨慎路线，并进一步收缩结论：
+
+```text
+closed scoring 可以看到强读出门；
+choice 输出没有出现同等强度闭包；
+所以读出门更像 candidate scoring interface 的必要因子，
+还不是完整语言输出机制闭包。
+```
+
+### 硬伤
+
+1. choice top1 是离散指标，可能对 margin 改变不敏感；本轮没有记录 choice letter logits margin。
+2. choice generation 存在模板、格式和选项顺序缓冲；擦除 closed margin 不一定立刻翻转输出字母。
+3. 本轮只用 suffix 子空间擦除/恢复，没有做 attention/MLP route patch。
+4. 本轮测试的是对象-关系值任务，不是完整语义、逻辑、语法全域。
+5. DeepSeek7B 的 base choice 仍偏低，DS7B 的 choice 结论要弱于 qwen3/GLM4。
+6. restore 对 closed scoring 有效，但对 choice 输出无效，说明“变量恢复”还没有进入生成决策闭包。
+
+### 下一步
+
+下一阶段不应继续只扩大 choice erase/restore，而应把读出链拆成两层：
+
+```text
+closed candidate scoring interface
+structured choice decision interface
+```
+
+建议 Phase89 做：
+
+```text
+choice letter full-sequence scoring audit
+```
+
+具体做法：
+
+```text
+1. 对同一个 choice prompt，不生成，而是分别计算 A/B/C/D/E 各选项字母的 full-sequence logprob。
+2. 在同样的 frame suffix erase/restore 条件下，观察 target_letter_margin 是否下降和恢复。
+3. 同时保留原始 candidate value fullseq margin。
+4. 比较：
+   candidate value margin 是否变；
+   choice letter margin 是否变；
+   generated choice top1 是否变。
+```
+
+如果：
+
+```text
+candidate value margin 变，但 choice letter margin 不变
+```
+
+说明 closed candidate scoring 和 choice decision 之间有格式/选项映射层。
+
+如果：
+
+```text
+choice letter margin 变，但 generated top1 不变
+```
+
+说明 generation decoding/format layer 有缓冲。
+
+如果：
+
+```text
+candidate margin、letter margin、generated top1 三者同步
+```
+
+才可以把 readout gateway 推进为真实 choice decision gateway。
+
+## Phase 89: GPT5/GLM5 双线进展比较与主线选择 [2026-06-11 16:06]
+
+### 比较对象
+
+本轮读取并比较：
+
+```text
+research/gpt5/docs/AGI_GPT5_MEMO.md
+research/glm5/docs/AGI_GLM5_MEMO.md
+```
+
+重点比较最新阶段：
+
+```text
+GPT5:
+  Phase84-88
+  object-relation-value closed scoring
+  suffix/readout gateway
+  reader stack calibration
+  choice reader erase/restore
+
+GLM5:
+  Phase454-456
+  candidate family margin dynamics
+  attn/MLP component effect
+  category/slot/template robustness
+  family logit decomposition
+```
+
+### GPT5 线的当前进展
+
+GPT5 线最强的贡献不是直接机制结论，而是读出器与闭包测试基础设施。
+
+已完成：
+
+```text
+1. object-relation-value 的 closed full-sequence candidate scoring 闭包测试。
+2. frame suffix/readout gateway 的 erase/restore 效应。
+3. answer-only open reader 校准，证明 open reader 不稳定。
+4. reader stack calibration，确认 R_choice 是 closed 与 open 之间的桥。
+5. choice reader erase/restore 迁移测试，证明 closed gateway 强效没有稳定迁移到 generated choice top1。
+```
+
+最新 Phase88 的关键结果：
+
+```text
+closed scoring:
+  qwen3 closed_drop = 0.6348, restore_gain = 0.4807
+  GLM4 closed_drop = 0.0803, restore_gain = 0.1447
+  DS7B closed_drop = 0.3132, restore_gain = 0.2884
+
+choice generation:
+  qwen3 choice_drop = 0.0050
+  GLM4 choice_drop = 0.0009
+  DS7B choice_drop = 0.0016
+```
+
+这说明：
+
+```text
+closed candidate scoring 的读出门存在；
+但它还不是生成式 choice decision 的完整控制机制。
+```
+
+GPT5 线最可靠的意义：
+
+```text
+测量系统建设；
+读出器校准；
+closed/choice/open 三层接口区分；
+防止把 scoring artifact 误判为语言机制。
+```
+
+GPT5 线最大硬伤：
+
+```text
+1. 当前主要停留在读出器与接口层；
+2. choice 输出没有形成强闭包；
+3. 还没深入 attention/MLP 组件如何改变竞争候选；
+4. 对语言机制本体的解释力弱于 GLM5 线；
+5. 下一步必须做 choice letter full-sequence scoring，拆出 candidate margin、letter margin、generated top1 三者关系。
+```
+
+### GLM5 线的当前进展
+
+GLM5 线更接近机制本体，尤其 Phase455-456 已经从“是否促进/压制”推进到“目标族与竞争族 margin 如何被组件选择性改变”。
+
+最新可靠结果：
+
+```text
+1. Softmax margin 不可用，因为概率差异被大词表稀释。
+2. Top1 margin 和 mean margin 大体一致，但 DS7B vehicle 的 attention 效应在两者间翻转。
+3. attention/MLP 效应强烈依赖类别、槽位和模型。
+4. DS7B L27 fruit/animal 路径翻转稳定复现：
+   fruit: attn=SUPPRESS, mlp=PROMOTE
+   animal: attn=PROMOTE, mlp=SUPPRESS
+5. GLM4 L39 中 attention 近似 neutral，MLP 是主要 margin driver。
+6. Qwen3 后层 MLP 从 amplifier 转为 suppressor，GLM4/DS7B 最后层 MLP 多数转为 amplifier。
+7. MLP 不是统一促进或压制，而是对不同候选族有选择性幅度差。
+```
+
+GLM5 线的关键突破是：
+
+```text
+Logit 效应 != Margin 效应
+```
+
+同一个组件可以：
+
+```text
+压低所有候选 logit，
+但如果更强压低竞争族，
+目标 margin 反而上升。
+```
+
+这比 GPT5 当前的 suffix/readout gateway 更接近语言编码机制，因为它开始解释：
+
+```text
+模型如何在目标候选与竞争候选之间重新分配优势；
+attention 和 MLP 如何在不同类别/槽位上承担相反功能；
+同一模型内部为什么会出现路径翻转。
+```
+
+GLM5 线最大硬伤：
+
+```text
+1. 当前仍集中在候选族与对象/属性类任务，语言结构覆盖不够。
+2. color/function slot 数据仍偏少。
+3. GLM4 MLP 跨模板稳定性不足。
+4. DS7B vehicle 的 attention 在 Top1/Mean 间翻转，说明竞争族内部结构还没拆清。
+5. 仍需把组件 margin 动力学接入 GPT5 的读出器校准框架，避免读出器偏差。
+```
+
+### 哪条线更值得推进
+
+如果目标是：
+
+```text
+破解语言背后的编码机制
+```
+
+当前更值得作为主线推进的是：
+
+```text
+GLM5 线
+```
+
+原因：
+
+```text
+1. GLM5 已经进入组件级机制：
+   attention / MLP 如何改变目标族与竞争族 margin。
+
+2. GLM5 发现了稳定的路径分化：
+   DS7B fruit/animal 的 attn/MLP 路径翻转，
+   Qwen3/GLM4/DS7B 的最后层 MLP 转折模式。
+
+3. GLM5 的结果更接近“相对编码”：
+   不是单一方向，而是同一组件在不同类别、槽位、竞争环境下改变作用。
+
+4. GLM5 已经可以解释 margin 来源：
+   目标族 logit 和竞争族 logit 的选择性幅度差。
+
+5. GPT5 当前更像测量接口研究：
+   它告诉我们哪些读出器可信，哪些现象不能直接解释为生成控制。
+```
+
+但不是放弃 GPT5。最合理路线是：
+
+```text
+GLM5 做机制主线；
+GPT5 做读出器和闭包验证框架；
+两者合并。
+```
+
+### 综合判断
+
+当前路线优先级：
+
+```text
+第一优先级:
+  推进 GLM5 的 candidate-family margin dynamics，
+  扩展到更多槽位、更多关系、更多语言结构。
+
+第二优先级:
+  用 GPT5 的 reader stack 方法校准 GLM5 的读出器，
+  避免把 closed scoring artifact 当成语言机制。
+
+第三优先级:
+  将 GPT5 的 erase/restore 框架用于 GLM5 已发现的组件路径翻转，
+  做 destroy/restore 因果闭包。
+```
+
+### 下一步建议
+
+下一阶段应做一个合并测试：
+
+```text
+Phase90: component-margin dynamics + reader interface alignment
+```
+
+测试目标：
+
+```text
+1. 在 GLM5 已发现的类别/槽位路径上，加入 GPT5 的 reader stack：
+   candidate value margin
+   choice letter margin
+   generated choice top1
+
+2. 对 attention 和 MLP 分别做 zero/restore：
+   看组件 margin effect 是否传导到 choice letter decision。
+
+3. 扩大槽位：
+   category
+   color
+   function
+   material
+   location
+   action
+
+4. 扩大类别：
+   fruit
+   animal
+   tool
+   vehicle
+   place
+   body_part
+   profession
+
+5. 输出三层矩阵：
+   component -> candidate family margin
+   candidate family margin -> choice letter margin
+   choice letter margin -> generated top1
+```
+
+判断标准：
+
+```text
+如果 component margin 改变能稳定传导到 choice letter margin，
+说明机制已跨过 closed scoring 接口。
+
+如果 choice letter margin 改变仍不能改变 generated top1，
+说明生成格式/解码层还有额外缓冲。
+
+如果三者同步改变，
+才接近真实输出机制闭包。
+```
+
+### 当前最稳结论
+
+```text
+GPT5 线告诉我们：读出器必须分层，closed scoring 不能直接等于生成机制。
+GLM5 线告诉我们：真正机制可能在 attention/MLP 对目标族与竞争族 margin 的选择性重分配中。
+```
+
+因此：
+
+```text
+下一步主攻 GLM5 机制线，
+同时用 GPT5 的 reader calibration 和 erase/restore 框架做严格验证。
+```
+
+## Phase 90: component-margin dynamics 与 reader interface 对齐测试 [2026-06-11 18:32]
+
+### 任务目标
+
+根据 Phase89 的路线判断，本轮把 GLM5 线的组件边际动力学接入 GPT5 线的读出器分层框架。
+
+核心问题：
+
+```text
+attention / MLP 对 candidate value margin 的影响，
+是否能传导到 choice letter margin，
+并进一步传导到 generated choice top1？
+```
+
+这不是继续测 suffix/readout gateway，而是直接测：
+
+```text
+component -> candidate family/value margin -> choice letter margin -> generated choice
+```
+
+### 脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase90_component_margin_reader_alignment.py
+tests/gpt5/phase90_component_margin_reader_alignment_summary.py
+tests/gpt5/run_phase90_component_margin_reader_alignment_full.sh
+```
+
+运行命令：
+
+```bash
+PHASE90_OUTPUT_DIR=results/gpt5_phase90_component_margin_reader_alignment_full_20260611_1640 \
+tests/gpt5/run_phase90_component_margin_reader_alignment_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DeepSeek7B
+```
+
+每个模型独立进程，带：
+
+```text
+--hard-exit-after-model
+BF16
+device_map="auto"
+attn_implementation: flash_attention_2 尝试失败后回退 sdpa
+```
+
+实际成功路径仍是 PyTorch SDPA。
+
+### 数据范围
+
+本轮测试 5 个 slot：
+
+```text
+category
+color
+function
+material
+location
+```
+
+对象覆盖：
+
+```text
+fruit
+animal
+tool
+vehicle
+place
+body_part
+profession
+```
+
+每模型：
+
+```text
+items = 420
+layers = 6 个关键层
+components = clean, zero_attn, zero_mlp
+rows = 7560
+```
+
+三模型总行数：
+
+```text
+22680 rows
+bad_numeric_rows = 0
+```
+
+结果目录：
+
+```text
+results/gpt5_phase90_component_margin_reader_alignment_full_20260611_1640/
+```
+
+### 指标定义
+
+对每个 prompt 同时计算三层指标：
+
+```text
+1. candidate value full-sequence margin
+   对真实答案文本和干扰文本做 full-sequence logprob scoring。
+
+2. choice letter full-sequence margin
+   对同一个 choice prompt 的 A/B/C/D/E 字母做 full-sequence logprob scoring。
+
+3. generated choice top1
+   直接生成结构化 JSON letter，解析选择值。
+```
+
+组件效应定义：
+
+```text
+component_effect = clean_margin - zero_ablated_margin
+```
+
+因此：
+
+```text
+正数 = 该组件促进目标 margin
+负数 = 该组件压制目标 margin
+```
+
+### 模型级结果
+
+```text
+qwen3 clean:
+  value_top1 = 0.7333
+  letter_top1 = 0.9262
+  choice_top1 = 0.9286
+
+qwen3 zero_attn:
+  component_value_effect_top1 = 0.1793
+  component_letter_effect_top1 = 0.5374
+  choice_drop = 0.1095
+
+qwen3 zero_mlp:
+  component_value_effect_top1 = 0.6206
+  component_letter_effect_top1 = 0.6016
+  choice_drop = 0.1893
+```
+
+Qwen3 出现较清楚的三层传导：
+
+```text
+zero_mlp 使 candidate value margin 下降；
+choice letter margin 同步下降；
+generated choice top1 也明显下降。
+```
+
+GLM4：
+
+```text
+GLM4 clean:
+  value_top1 = 0.7595
+  letter_top1 = 0.7619
+  choice_top1 = 0.7595
+
+GLM4 zero_attn:
+  component_value_effect_top1 = 0.0313
+  component_letter_effect_top1 = 0.0362
+  choice_drop = 0.0004
+
+GLM4 zero_mlp:
+  component_value_effect_top1 = 0.2821
+  component_letter_effect_top1 = -0.0874
+  choice_drop = -0.0187
+```
+
+GLM4 出现接口断裂/反转：
+
+```text
+MLP 促进 candidate value margin；
+但对 choice letter margin 是负效应；
+generated choice 反而略升。
+```
+
+这与 GLM5 Phase456 中“GLM4 MLP 跨模板不稳定”的硬伤一致。
+
+DeepSeek7B：
+
+```text
+DeepSeek7B clean:
+  value_top1 = 0.6333
+  letter_top1 = 0.8857
+  choice_top1 = 0.8881
+
+DeepSeek7B zero_attn:
+  component_value_effect_top1 = 0.0631
+  component_letter_effect_top1 = -0.2963
+  choice_drop = 0.0683
+
+DeepSeek7B zero_mlp:
+  component_value_effect_top1 = 0.2502
+  component_letter_effect_top1 = -0.1776
+  choice_drop = 0.1444
+```
+
+DeepSeek7B 也出现断裂：
+
+```text
+candidate value margin 显示组件促进目标；
+choice letter margin 平均反而显示负效应；
+但 generated choice top1 下降。
+```
+
+说明 DS7B 的 generated choice 不完全由 letter fullseq margin 解释，可能存在格式、缓存路径、最后层生成动态或 token-level 决策差异。
+
+### 层级关键发现
+
+Qwen3：
+
+```text
+L6 zero_mlp:
+  value_effect = 3.047
+  letter_effect = 3.563
+  choice_drop = 0.924
+
+L24 zero_attn:
+  value_effect = 0.101
+  letter_effect = 4.315
+  choice_drop = 0.610
+
+L35 zero_mlp:
+  value_effect = -0.240
+  letter_effect = 2.241
+  choice_drop = 0.167
+```
+
+Qwen3 的重要现象：
+
+```text
+1. L6 MLP 是强全链路节点：candidate、letter、generated 三层同步下降。
+2. L24 attention 主要影响 choice letter/generation，而不是 candidate value margin。
+3. L35 MLP 对 candidate value margin 是负效应，但对 letter/generation 是正效应，说明 candidate 与 choice interface 在后层分叉。
+```
+
+GLM4：
+
+```text
+L39 zero_mlp:
+  value_effect = 0.656
+  letter_effect = -0.681
+  choice_drop = -0.038
+
+L38 zero_mlp:
+  value_effect = 0.538
+  letter_effect = -0.056
+  choice_drop = -0.052
+```
+
+GLM4 的重要现象：
+
+```text
+最后层 MLP 明显促进 candidate value margin；
+但不促进 choice letter decision；
+甚至 zero_mlp 后 choice top1 略升。
+```
+
+这说明 GLM4 的 candidate scoring interface 和 choice decision interface 明显分离。
+
+DeepSeek7B：
+
+```text
+L26 zero_mlp:
+  value_effect = 0.455
+  letter_effect = -0.862
+  choice_drop = 0.829
+
+L27 zero_attn:
+  value_effect = -0.046
+  letter_effect = 0.854
+  choice_drop = 0.590
+
+L27 zero_mlp:
+  value_effect = 0.082
+  letter_effect = 0.474
+  choice_drop = 0.050
+```
+
+DeepSeek7B 的重要现象：
+
+```text
+1. L26 MLP 对 generated choice 极其关键，但 letter margin 方向反常。
+2. L27 attention 对 generated choice 极其关键，且主要通过 letter/generation interface，而不是 candidate value margin。
+3. L27 MLP 的影响弱于 L27 attention。
+```
+
+这和 GLM5 中 DS7B 最后层路径特异、L26->L27 剧烈翻转的现象相互支持。
+
+### 槽位结果
+
+Qwen3 中，zero_mlp 对所有 slot 都有明显 choice drop：
+
+```text
+category: choice_drop = 0.179
+color:    choice_drop = 0.169
+function: choice_drop = 0.214
+location: choice_drop = 0.171
+material: choice_drop = 0.214
+```
+
+说明 Qwen3 的 MLP 对结构化 choice 输出有广泛支持作用。
+
+GLM4 中，zero_mlp 对 choice 几乎不造成下降，多个 slot 甚至为负：
+
+```text
+category: choice_drop = -0.040
+color:    choice_drop = -0.038
+function: choice_drop = 0.014
+location: choice_drop = 0.000
+material: choice_drop = -0.030
+```
+
+说明 GLM4 的 candidate margin MLP 效应不能直接解释 choice 输出。
+
+DeepSeek7B 中，zero_mlp 对所有 slot 都造成 choice drop：
+
+```text
+category: choice_drop = 0.159
+color:    choice_drop = 0.099
+function: choice_drop = 0.200
+location: choice_drop = 0.095
+material: choice_drop = 0.169
+```
+
+但其 letter margin 平均不一定同步，说明 DS7B 需要进一步拆 letter scoring 与 generation decoding。
+
+### 核心客观进展
+
+本轮第一次把三层读出链放到同一张表里：
+
+```text
+component ablation
+candidate value margin
+choice letter margin
+generated choice top1
+```
+
+结果说明：
+
+```text
+1. Qwen3 有相对清楚的三层传导，尤其 L6 MLP 和 L24 attention。
+2. GLM4 的 candidate value margin 与 choice decision 明显分离。
+3. DeepSeek7B 的 generated choice 对 L26 MLP 和 L27 attention 极敏感，但 letter margin 与生成结果不完全一致。
+4. candidate margin、letter margin、generated top1 不是同一个东西，必须分层研究。
+```
+
+这直接支持 Phase89 的判断：
+
+```text
+GPT5 的 reader stack 是必要的；
+GLM5 的 component margin dynamics 更接近机制主线；
+两者必须合并。
+```
+
+### 当前理论收缩
+
+不能说：
+
+```text
+candidate value margin 就是模型真实选择机制。
+choice letter margin 就是模型真实生成机制。
+```
+
+更稳的说法：
+
+```text
+语言读出至少有三层接口：
+1. semantic candidate/value scoring interface
+2. structured option-letter decision interface
+3. autoregressive generation/format interface
+```
+
+不同模型的三层接口耦合程度不同：
+
+```text
+Qwen3:
+  三层接口耦合较强，部分层有同步传导。
+
+GLM4:
+  candidate scoring 与 choice decision 明显分离。
+
+DeepSeek7B:
+  generation 对深层组件非常敏感，但 letter scoring 不能完全解释生成变化。
+```
+
+### 硬伤
+
+1. 本轮仍是 zero ablation，不是 restore，因此还不是闭包证明。
+2. 数据虽然覆盖 420 items / 5 slots，但仍是对象-槽位任务，不是完整语法/逻辑。
+3. choice letter scoring 只测单字母 continuation，没有测完整 JSON 结束序列。
+4. generated choice 可能受格式合法性、停止符、缓存路径影响。
+5. GLM4/DS7B 的接口反转说明还需要逐层拆解生成决策，而不能直接用单一 margin 解释。
+
+### 下一步
+
+Phase91 应做：
+
+```text
+component destroy/restore across reader interfaces
+```
+
+目标：
+
+```text
+对 Phase90 中最强节点做 restore：
+
+qwen3:
+  L6 MLP
+  L24 attention
+  L35 MLP
+
+GLM4:
+  L38/L39 MLP
+
+DeepSeek7B:
+  L26 MLP
+  L27 attention
+```
+
+测试三层是否能恢复：
+
+```text
+candidate value margin restore
+choice letter margin restore
+generated choice top1 restore
+```
+
+如果某层组件：
+
+```text
+zero 后三层下降；
+restore 后三层恢复；
+跨 slot 稳定；
+```
+
+才可以称为真正接近 reader-interface mechanism closure。
+
+## Phase 91: component restore reader closure 全量测试 [2026-06-11 19:44]
+
+### 任务目标
+
+根据 Phase90 的结果，本轮对最强组件节点做 restore 测试，检查：
+
+```text
+clean
+zero component
+restore clean component output
+```
+
+三种条件下：
+
+```text
+candidate value margin
+choice letter margin
+generated choice top1
+```
+
+是否能同步下降和恢复。
+
+本轮不是全层扫描，而是只测试 Phase90 中最强和最有解释价值的节点：
+
+```text
+qwen3:
+  L6 MLP
+  L24 attention
+  L35 MLP
+
+GLM4:
+  L38 MLP
+  L39 MLP
+
+DeepSeek7B:
+  L26 MLP
+  L27 attention
+```
+
+### 脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase91_component_restore_reader_closure.py
+tests/gpt5/phase91_component_restore_reader_closure_summary.py
+tests/gpt5/run_phase91_component_restore_reader_closure_full.sh
+```
+
+运行命令：
+
+```bash
+PHASE91_OUTPUT_DIR=results/gpt5_phase91_component_restore_reader_closure_full_20260611_1849 \
+tests/gpt5/run_phase91_component_restore_reader_closure_full.sh
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DeepSeek7B
+```
+
+每个模型使用：
+
+```text
+--hard-exit-after-model
+BF16
+device_map="auto"
+attn_implementation: flash_attention_2 尝试失败后回退 sdpa
+```
+
+实际成功路径仍是 PyTorch SDPA。
+
+### 测试规模
+
+```text
+slots = category,color,function,material,location
+max_items = 420
+qwen3 rows = 1260
+GLM4 rows = 840
+DeepSeek7B rows = 840
+total rows = 2940
+bad_numeric_rows = 0
+```
+
+结果目录：
+
+```text
+results/gpt5_phase91_component_restore_reader_closure_full_20260611_1849/
+```
+
+### 方法说明
+
+本轮 restore 的具体含义：
+
+```text
+zero:
+  将指定 layer 的指定组件输出置零。
+
+restore:
+  在同一个输入上捕获 clean component output，
+  然后将该 clean component output 写回该组件输出位置。
+```
+
+因此本轮回答的是：
+
+```text
+被 zero 破坏的三层读出接口，能否由同一组件的 clean output 恢复？
+```
+
+它不是更强版本的“独立变量子空间恢复”，因为恢复源仍是同输入 clean component output。这一点必须谨慎。
+
+### 模型级核心结果
+
+#### Qwen3
+
+```text
+qwen3 L6 MLP:
+  clean_choice_top1 = 0.9286
+  zero_choice_top1 = 0.0048
+  restore_choice_top1 = 0.9286
+  value_drop = 3.0473
+  value_restore_gain = 3.0473
+  letter_drop = 3.5628
+  letter_restore_gain = 3.5628
+  choice_drop = 0.9238
+  choice_restore_gain = 0.9238
+
+qwen3 L24 attention:
+  clean_choice_top1 = 0.9286
+  zero_choice_top1 = 0.3190
+  restore_choice_top1 = 0.9286
+  value_drop = 0.1010
+  letter_drop = 4.3152
+  choice_drop = 0.6095
+
+qwen3 L35 MLP:
+  clean_choice_top1 = 0.9286
+  zero_choice_top1 = 0.7619
+  restore_choice_top1 = 0.9286
+  value_drop = -0.2404
+  letter_drop = 2.2412
+  choice_drop = 0.1667
+```
+
+Qwen3 的结果最清楚：
+
+```text
+L6 MLP 是强全链路节点：
+candidate value margin、choice letter margin、generated choice 全部下降，并全部恢复。
+
+L24 attention 主要控制 letter/generation 接口：
+value_drop 很小，但 letter_drop 和 choice_drop 很大。
+
+L35 MLP 出现 candidate/choice 分叉：
+value_drop 为负，但 letter_drop 和 choice_drop 为正。
+```
+
+#### GLM4
+
+```text
+GLM4 L38 MLP:
+  clean_choice_top1 = 0.7595
+  zero_choice_top1 = 0.8119
+  restore_choice_top1 = 0.7595
+  value_drop = 0.5381
+  letter_drop = -0.0558
+  choice_drop = -0.0524
+
+GLM4 L39 MLP:
+  clean_choice_top1 = 0.7595
+  zero_choice_top1 = 0.7976
+  restore_choice_top1 = 0.7595
+  value_drop = 0.6564
+  letter_drop = -0.6807
+  choice_drop = -0.0381
+```
+
+GLM4 的结果确认 Phase90 的接口分离：
+
+```text
+最后层 MLP 促进 candidate value margin，
+但并不促进 choice letter 或 generated choice。
+
+zero MLP 后 choice top1 反而上升，
+restore 后回到 clean。
+```
+
+这说明 GLM4 的 MLP candidate scoring interface 与 choice decision interface 分离很明显。
+
+#### DeepSeek7B
+
+```text
+DeepSeek7B L26 MLP:
+  clean_choice_top1 = 0.8881
+  zero_choice_top1 = 0.0595
+  restore_choice_top1 = 0.8881
+  value_drop = 0.4551
+  letter_drop = -0.8616
+  choice_drop = 0.8286
+
+DeepSeek7B L27 attention:
+  clean_choice_top1 = 0.8881
+  zero_choice_top1 = 0.2976
+  restore_choice_top1 = 0.8881
+  value_drop = -0.0460
+  letter_drop = 0.8537
+  choice_drop = 0.5905
+```
+
+DeepSeek7B 结果确认：
+
+```text
+L26 MLP 是生成选择的极强节点，
+但 letter margin 方向仍与 generated choice 不一致。
+
+L27 attention 是强 generation/letter interface 节点，
+但 candidate value margin 几乎不解释它。
+```
+
+### slot 级结果
+
+Qwen3 L6 MLP 对所有 slot 都强：
+
+```text
+category: choice_drop = 1.000
+color:    choice_drop = 0.845
+function: choice_drop = 0.964
+location: choice_drop = 0.893
+material: choice_drop = 0.917
+```
+
+Qwen3 L24 attention 对所有 slot 都影响 choice：
+
+```text
+category: choice_drop = 0.702
+color:    choice_drop = 0.464
+function: choice_drop = 0.643
+location: choice_drop = 0.500
+material: choice_drop = 0.738
+```
+
+GLM4 L39 MLP 对所有 slot 的 choice_drop 基本不为正：
+
+```text
+category: choice_drop = -0.083
+color:    choice_drop = -0.024
+function: choice_drop = -0.012
+location: choice_drop = 0.000
+material: choice_drop = -0.071
+```
+
+DeepSeek7B L26 MLP 对所有 slot 都强烈影响 choice：
+
+```text
+category: choice_drop = 0.798
+color:    choice_drop = 0.774
+function: choice_drop = 0.929
+location: choice_drop = 0.762
+material: choice_drop = 0.881
+```
+
+DeepSeek7B L27 attention 也对所有 slot 有明显影响：
+
+```text
+category: choice_drop = 0.750
+color:    choice_drop = 0.500
+function: choice_drop = 0.631
+location: choice_drop = 0.631
+material: choice_drop = 0.440
+```
+
+### 客观进展
+
+本轮确认：
+
+```text
+1. Qwen3 L6 MLP 是强三层闭包节点：
+   value、letter、generation 同步下降并恢复。
+
+2. Qwen3 L24 attention 是 choice/generation 接口节点：
+   candidate value margin 解释力弱，但 letter/generation 影响强。
+
+3. GLM4 L38/L39 MLP 不是 choice decision 支持节点：
+   它促进 candidate value margin，但 zero 后 choice 反而略升。
+
+4. DeepSeek7B L26 MLP 和 L27 attention 是强 generation 节点：
+   zero 后 generated choice 大幅下降，restore 完全恢复。
+
+5. 三模型的读出接口结构明显不同：
+   Qwen3 更连续；
+   GLM4 candidate 与 choice 分离；
+   DeepSeek7B generation 对深层组件敏感但 letter/candidate 解释不充分。
+```
+
+### 对附件分析的判断
+
+附件中关于 Phase90 的分析基本正确：
+
+```text
+Phase90 的关键进展不是理论总结，
+而是从读出门推进到组件—边际—输出链。
+```
+
+附件提出的硬伤也正确：
+
+```text
+Phase90 只是 zero ablation，不是 restore closure。
+```
+
+Phase91 对这一点做了直接补充：
+
+```text
+zero 后下降；
+restore clean component output 后恢复；
+三层接口一起记录。
+```
+
+但要强调：Phase91 的 restore 是同输入 clean component output 的恢复，证明的是“组件输出对当前读出接口必要且可恢复”，不是已经找到了抽象变量子空间。
+
+### 当前最稳结论
+
+可以较稳地说：
+
+```text
+1. Qwen3 的早层 MLP 存在强全链路读出支持作用。
+2. Qwen3 中层 attention 存在 choice/generation 接口支持作用。
+3. GLM4 最后层 MLP 的 candidate margin 与 choice output 分离。
+4. DeepSeek7B 的 L26 MLP 和 L27 attention 是强生成决策节点。
+```
+
+不能说：
+
+```text
+已经破解语言编码机制；
+已经找到抽象语义变量；
+restore 证明了跨样本变量闭包；
+candidate margin 可以统一解释所有模型输出。
+```
+
+### 硬伤
+
+1. restore 来源是同输入 clean component output，不是跨样本变量，不是子空间变量。
+2. 本轮仍是对象-槽位任务，不是逻辑/语法/指代。
+3. generated choice 使用的是短 JSON letter，不是开放生成。
+4. DeepSeek7B 的 letter margin 与 generated choice 仍有反向关系，需要拆完整生成格式路径。
+5. GLM4 的 candidate/choice 分离说明还缺 interface transformation layer 的解释。
+
+### 下一步
+
+Phase92 应做：
+
+```text
+cross-item component transplant
+```
+
+目标：
+
+```text
+不再从同输入恢复 clean component output，
+而是在同 slot / 不同 object / 不同 target 的样本之间移植组件输出。
+```
+
+测试：
+
+```text
+1. same-slot same-target transplant
+2. same-slot different-target transplant
+3. different-slot transplant
+4. same-object different-slot transplant
+```
+
+重点节点：
+
+```text
+qwen3:
+  L6 MLP
+  L24 attention
+
+DeepSeek7B:
+  L26 MLP
+  L27 attention
+
+GLM4:
+  L39 MLP 作为 candidate/choice 分离对照
+```
+
+判断标准：
+
+```text
+如果 same-target transplant 能恢复，
+但 different-target transplant 不能恢复，
+说明组件输出含有目标候选变量。
+
+如果 same-slot transplant 有效，
+但 different-slot transplant 无效，
+说明组件输出含有 slot/interface 格式。
+
+如果跨 object 仍有效，
+说明开始接近抽象变量级机制。
+```

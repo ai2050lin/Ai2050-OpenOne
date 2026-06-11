@@ -1,0 +1,20 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+[2026-06-11 19:28:10] Failed loading deepseek7b with flash_attention_2: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:32, 10.52it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 118.21it/s]Loading weights:  19%|█▉        | 65/339 [00:00<00:01, 206.58it/s]Loading weights:  28%|██▊       | 96/339 [00:00<00:01, 217.47it/s]Loading weights:  37%|███▋      | 126/339 [00:00<00:00, 237.96it/s]Loading weights:  51%|█████     | 172/339 [00:00<00:00, 279.01it/s]Loading weights:  61%|██████▏   | 208/339 [00:00<00:00, 299.54it/s]Loading weights:  71%|███████   | 239/339 [00:01<00:00, 267.22it/s]Loading weights:  80%|████████  | 272/339 [00:01<00:00, 281.00it/s]Loading weights:  91%|█████████ | 308/339 [00:01<00:00, 280.32it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 261.11it/s]
+[2026-06-11 19:28:11] Loaded deepseek7b with attn_impl=sdpa
+[2026-06-11 19:28:11] Phase91 model=deepseek7b items=420 nodes=[(26, 'mlp'), (27, 'attn')] generate=True
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[2026-06-11 19:29:28] node=L26:mlp item=70/420 rows=70 elapsed=77s
+[2026-06-11 19:30:46] node=L26:mlp item=140/420 rows=140 elapsed=155s
+[2026-06-11 19:32:03] node=L26:mlp item=210/420 rows=210 elapsed=232s
+[2026-06-11 19:33:20] node=L26:mlp item=280/420 rows=280 elapsed=309s
+[2026-06-11 19:34:38] node=L26:mlp item=350/420 rows=350 elapsed=387s
+[2026-06-11 19:35:55] node=L26:mlp item=420/420 rows=420 elapsed=464s
+[2026-06-11 19:37:12] node=L27:attn item=70/420 rows=490 elapsed=541s
+[2026-06-11 19:38:29] node=L27:attn item=140/420 rows=560 elapsed=618s
+[2026-06-11 19:39:46] node=L27:attn item=210/420 rows=630 elapsed=695s
+[2026-06-11 19:41:03] node=L27:attn item=280/420 rows=700 elapsed=772s
+[2026-06-11 19:42:20] node=L27:attn item=350/420 rows=770 elapsed=849s
+[2026-06-11 19:43:37] node=L27:attn item=420/420 rows=840 elapsed=926s
+[2026-06-11 19:43:37] Wrote results/gpt5_phase91_component_restore_reader_closure_full_20260611_1849/deepseek7b_phase91_component_restore_reader_closure.json
+[2026-06-11 19:43:38] Hard exit after model requested.

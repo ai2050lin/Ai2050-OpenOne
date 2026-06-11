@@ -24,8 +24,8 @@ def sort_entries(entries: dict[str, Any]) -> list[dict[str, Any]]:
 
 def table(entries: list[dict[str, Any]], limit: int = 80) -> str:
     lines = [
-        "| rank | key | n | closed_top1 | closed_margin | choice_top1 | choice_valid | target_letter_rate | open_subset | open_family | open_format_bad |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| rank | key | n | closed_top1 | closed_margin | choice_top1 | choice_no_first | choice_rot | choice_last | choice_valid | open_subset | open_family | open_format_bad |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for i, e in enumerate(entries[:limit], 1):
         lines.append(
@@ -33,8 +33,10 @@ def table(entries: list[dict[str, Any]], limit: int = 80) -> str:
             f"{float(e.get('closed_top1', 0.0)):.4f} | "
             f"{float(e.get('closed_margin', 0.0)):.4f} | "
             f"{float(e.get('choice_top1', 0.0)):.4f} | "
+            f"{float(e.get('choice_no_target_first_top1', 0.0)):.4f} | "
+            f"{float(e.get('choice_rotating_top1', 0.0)):.4f} | "
+            f"{float(e.get('choice_target_last_top1', 0.0)):.4f} | "
             f"{float(e.get('choice_valid', 0.0)):.4f} | "
-            f"{float(e.get('choice_target_letter_rate', 0.0)):.4f} | "
             f"{float(e.get('open_word_subset_hit', 0.0)):.4f} | "
             f"{float(e.get('open_family_overlap_hit', 0.0)):.4f} | "
             f"{float(e.get('open_format_violation', 0.0)):.4f} |"
@@ -100,6 +102,8 @@ def main() -> None:
         metrics = [
             "closed_top1", "closed_margin", "choice_top1", "choice_valid",
             "choice_target_letter_rate", "open_word_subset_hit",
+            "choice_no_target_first_top1", "choice_rotating_top1",
+            "choice_target_last_top1",
             "open_family_overlap_hit", "open_format_violation",
         ]
         for key, vals in groups.items():

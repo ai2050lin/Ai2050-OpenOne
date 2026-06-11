@@ -150,6 +150,9 @@ def parse_choice(generated: str, candidates: list[str]) -> dict[str, Any]:
 def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     def group_summary(vals: list[dict[str, Any]]) -> dict[str, Any]:
         choice_vals = [v for v in vals if v["reader_type"] == "choice"]
+        choice_no_target_first = [v for v in choice_vals if v.get("order_key") != "target_first"]
+        choice_rotating = [v for v in choice_vals if v.get("order_key") == "rotating"]
+        choice_target_last = [v for v in choice_vals if v.get("order_key") == "target_last"]
         open_vals = [v for v in vals if v["reader_type"] == "open"]
         closed_vals = [v for v in vals if v["reader_type"] == "closed"]
         letters = Counter(v.get("selected_letter", "") for v in choice_vals)
@@ -163,6 +166,9 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "choice_top1": avg([float(v.get("choice_correct", False)) for v in choice_vals]),
             "choice_valid": avg([float(v.get("choice_valid", False)) for v in choice_vals]),
             "choice_target_letter_rate": avg([float(v.get("selected_letter") == v.get("target_letter")) for v in choice_vals]),
+            "choice_no_target_first_top1": avg([float(v.get("choice_correct", False)) for v in choice_no_target_first]),
+            "choice_rotating_top1": avg([float(v.get("choice_correct", False)) for v in choice_rotating]),
+            "choice_target_last_top1": avg([float(v.get("choice_correct", False)) for v in choice_target_last]),
             "open_exact_hit": avg([float(v.get("exact_hit", False)) for v in open_vals]),
             "open_word_subset_hit": avg([float(v.get("word_subset_hit", False)) for v in open_vals]),
             "open_family_overlap_hit": avg([float(v.get("family_overlap_hit", False)) for v in open_vals]),
