@@ -1,0 +1,3267 @@
+{
+  "model": "qwen3",
+  "round": 2,
+  "sign_convention": "ComponentMarginEffect = Margin_clean - Margin_zero_ablated (positive=promotes)",
+  "model_info": {
+    "class": "Qwen3ForCausalLM",
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "exp1_competitor_margin_vector": {
+    "fruit": {
+      "apple": {
+        "clean_margins": {
+          "class_animal": 1.4219,
+          "class_tool": 2.1445,
+          "class_vehicle": 0.7461
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.3359,
+          "class_tool": 0.2734,
+          "class_vehicle": 0.3086
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.2031,
+          "class_tool": -0.2423,
+          "class_vehicle": -0.8731
+        }
+      },
+      "banana": {
+        "clean_margins": {
+          "class_animal": 1.0879,
+          "class_tool": 2.5078,
+          "class_vehicle": 0.7417
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.3811,
+          "class_tool": 0.1462,
+          "class_vehicle": 0.0969
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.1835,
+          "class_tool": -0.2402,
+          "class_vehicle": -0.812
+        }
+      },
+      "orange": {
+        "clean_margins": {
+          "class_animal": 1.3574,
+          "class_tool": 2.209,
+          "class_vehicle": 0.0449
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.2911,
+          "class_tool": 0.1269,
+          "class_vehicle": 0.3378
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.2207,
+          "class_tool": -0.3183,
+          "class_vehicle": -0.7929
+        }
+      },
+      "grape": {
+        "clean_margins": {
+          "class_animal": 2.4297,
+          "class_tool": 3.7422,
+          "class_vehicle": 2.2207
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.25,
+          "class_tool": 0.2129,
+          "class_vehicle": 0.2363
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.2822,
+          "class_tool": -0.1611,
+          "class_vehicle": -0.7705
+        }
+      },
+      "pear": {
+        "clean_margins": {
+          "class_animal": 1.75,
+          "class_tool": 2.6445,
+          "class_vehicle": 1.2246
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.2734,
+          "class_tool": 0.2734,
+          "class_vehicle": 0.2363
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.3692,
+          "class_tool": -0.3106,
+          "class_vehicle": -0.8829
+        }
+      },
+      "peach": {
+        "clean_margins": {
+          "class_animal": 1.7011,
+          "class_tool": 3.3115,
+          "class_vehicle": 2.0791
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.2305,
+          "class_tool": 0.3682,
+          "class_vehicle": 0.335
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.3458,
+          "class_tool": -0.1573,
+          "class_vehicle": -0.7022
+        }
+      },
+      "lemon": {
+        "clean_margins": {
+          "class_animal": 2.0117,
+          "class_tool": 2.0351,
+          "class_vehicle": 0.6132
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.336,
+          "class_tool": 0.1522,
+          "class_vehicle": 0.3124
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.1328,
+          "class_tool": -0.1875,
+          "class_vehicle": -0.7608
+        }
+      },
+      "mango": {
+        "clean_margins": {
+          "class_animal": 1.918,
+          "class_tool": 3.1895,
+          "class_vehicle": 1.9219
+        },
+        "attn_margin_vector": {
+          "class_animal": -0.2383,
+          "class_tool": 0.3184,
+          "class_vehicle": 0.3047
+        },
+        "mlp_margin_vector": {
+          "class_animal": -0.1621,
+          "class_tool": -0.2715,
+          "class_vehicle": -0.6738
+        }
+      },
+      "summary": {
+        "attn": {
+          "class_animal": {
+            "avg": -0.292,
+            "type": "SUPPRESSES"
+          },
+          "class_tool": {
+            "avg": 0.2339,
+            "type": "PROMOTES"
+          },
+          "class_vehicle": {
+            "avg": 0.271,
+            "type": "PROMOTES"
+          }
+        },
+        "mlp": {
+          "class_animal": {
+            "avg": -0.2374,
+            "type": "SUPPRESSES"
+          },
+          "class_tool": {
+            "avg": -0.2361,
+            "type": "SUPPRESSES"
+          },
+          "class_vehicle": {
+            "avg": -0.7835,
+            "type": "SUPPRESSES"
+          }
+        }
+      }
+    },
+    "animal": {
+      "dog": {
+        "clean_margins": {
+          "class_fruit": 3.6816,
+          "class_tool": 2.6934,
+          "class_vehicle": 0.7422
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.582,
+          "class_tool": 0.6348,
+          "class_vehicle": 0.6875
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.2763,
+          "class_tool": 0.2139,
+          "class_vehicle": -0.751
+        }
+      },
+      "cat": {
+        "clean_margins": {
+          "class_fruit": 3.3428,
+          "class_tool": 3.7871,
+          "class_vehicle": 1.0782
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.4493,
+          "class_tool": 0.5899,
+          "class_vehicle": 0.7345
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.333,
+          "class_tool": -0.0488,
+          "class_vehicle": -0.9452
+        }
+      },
+      "horse": {
+        "clean_margins": {
+          "class_fruit": 3.8053,
+          "class_tool": 3.6553,
+          "class_vehicle": 1.6055
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.5401,
+          "class_tool": 0.544,
+          "class_vehicle": 0.7579
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.3031,
+          "class_tool": -0.2305,
+          "class_vehicle": -0.876
+        }
+      },
+      "lion": {
+        "clean_margins": {
+          "class_fruit": 3.7893,
+          "class_tool": 5.5068,
+          "class_vehicle": 3.2553
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.3449,
+          "class_tool": 0.2253,
+          "class_vehicle": 0.5299
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.2019,
+          "class_tool": -0.3204,
+          "class_vehicle": -0.7701
+        }
+      },
+      "bear": {
+        "clean_margins": {
+          "class_fruit": 4.1387,
+          "class_tool": 5.3257,
+          "class_vehicle": 2.3721
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.5606,
+          "class_tool": 0.6094,
+          "class_vehicle": 0.6963
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.166,
+          "class_tool": -0.0845,
+          "class_vehicle": -0.7901
+        }
+      },
+      "rabbit": {
+        "clean_margins": {
+          "class_fruit": 2.6865,
+          "class_tool": 4.9038,
+          "class_vehicle": 1.5547
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.3945,
+          "class_tool": 0.357,
+          "class_vehicle": 0.6094
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.3101,
+          "class_tool": -0.3311,
+          "class_vehicle": -1.0767
+        }
+      },
+      "cow": {
+        "clean_margins": {
+          "class_fruit": 2.4239,
+          "class_tool": 3.1465,
+          "class_vehicle": 1.5508
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.5411,
+          "class_tool": 0.541,
+          "class_vehicle": 0.6953
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.4335,
+          "class_tool": -0.1171,
+          "class_vehicle": -0.9003
+        }
+      },
+      "tiger": {
+        "clean_margins": {
+          "class_fruit": 3.5986,
+          "class_tool": 5.2759,
+          "class_vehicle": 2.5249
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.4619,
+          "class_tool": 0.522,
+          "class_vehicle": 0.728
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.3799,
+          "class_tool": -0.4917,
+          "class_vehicle": -0.9975
+        }
+      },
+      "summary": {
+        "attn": {
+          "class_fruit": {
+            "avg": 0.4843,
+            "type": "PROMOTES"
+          },
+          "class_tool": {
+            "avg": 0.5029,
+            "type": "PROMOTES"
+          },
+          "class_vehicle": {
+            "avg": 0.6799,
+            "type": "PROMOTES"
+          }
+        },
+        "mlp": {
+          "class_fruit": {
+            "avg": -0.2314,
+            "type": "SUPPRESSES"
+          },
+          "class_tool": {
+            "avg": -0.1763,
+            "type": "SUPPRESSES"
+          },
+          "class_vehicle": {
+            "avg": -0.8884,
+            "type": "SUPPRESSES"
+          }
+        }
+      }
+    },
+    "tool": {
+      "hammer": {
+        "clean_margins": {
+          "class_fruit": 3.4775,
+          "class_animal": 1.3828,
+          "class_vehicle": 1.2734
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0375,
+          "class_animal": -0.2852,
+          "class_vehicle": 0.0429
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.9151,
+          "class_animal": -0.8691,
+          "class_vehicle": -1.418
+        }
+      },
+      "knife": {
+        "clean_margins": {
+          "class_fruit": 3.6504,
+          "class_animal": 2.3887,
+          "class_vehicle": 2.169
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.2486,
+          "class_animal": -0.5312,
+          "class_vehicle": -0.0263
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.5913,
+          "class_animal": -0.7046,
+          "class_vehicle": -1.2602
+        }
+      },
+      "wrench": {
+        "clean_margins": {
+          "class_fruit": 4.4746,
+          "class_animal": 2.5547,
+          "class_vehicle": 1.9629
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.1084,
+          "class_animal": -0.1914,
+          "class_vehicle": 0.2559
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.7443,
+          "class_animal": -0.7501,
+          "class_vehicle": -1.3165
+        }
+      },
+      "saw": {
+        "clean_margins": {
+          "class_fruit": 3.5124,
+          "class_animal": 2.2168,
+          "class_vehicle": 2.0879
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0984,
+          "class_animal": -0.4433,
+          "class_vehicle": 0.1153
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.679,
+          "class_animal": -0.6855,
+          "class_vehicle": -1.207
+        }
+      },
+      "drill": {
+        "clean_margins": {
+          "class_fruit": 3.3203,
+          "class_animal": 1.5274,
+          "class_vehicle": 0.9981
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0194,
+          "class_animal": -0.3241,
+          "class_vehicle": 0.0059
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.5818,
+          "class_animal": -0.5309,
+          "class_vehicle": -1.0641
+        }
+      },
+      "axe": {
+        "clean_margins": {
+          "class_fruit": 3.7271,
+          "class_animal": 2.041,
+          "class_vehicle": 1.959
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.2436,
+          "class_animal": -0.4941,
+          "class_vehicle": -0.0156
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.559,
+          "class_animal": -0.6142,
+          "class_vehicle": -1.1845
+        }
+      },
+      "shovel": {
+        "clean_margins": {
+          "class_fruit": 3.6021,
+          "class_animal": 2.2539,
+          "class_vehicle": 1.75
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0014,
+          "class_animal": -0.2676,
+          "class_vehicle": 0.1484
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.6323,
+          "class_animal": -0.7539,
+          "class_vehicle": -1.2149
+        }
+      },
+      "scissors": {
+        "clean_margins": {
+          "class_fruit": 4.073,
+          "class_animal": 2.3633,
+          "class_vehicle": 1.4062
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0622,
+          "class_animal": -0.3164,
+          "class_vehicle": 0.1093
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.6787,
+          "class_animal": -0.6111,
+          "class_vehicle": -1.2205
+        }
+      },
+      "summary": {
+        "attn": {
+          "class_fruit": {
+            "avg": -0.0753,
+            "type": "NEUTRAL"
+          },
+          "class_animal": {
+            "avg": -0.3567,
+            "type": "SUPPRESSES"
+          },
+          "class_vehicle": {
+            "avg": 0.0795,
+            "type": "NEUTRAL"
+          }
+        },
+        "mlp": {
+          "class_fruit": {
+            "avg": -0.6727,
+            "type": "SUPPRESSES"
+          },
+          "class_animal": {
+            "avg": -0.6899,
+            "type": "SUPPRESSES"
+          },
+          "class_vehicle": {
+            "avg": -1.2357,
+            "type": "SUPPRESSES"
+          }
+        }
+      }
+    },
+    "vehicle": {
+      "car": {
+        "clean_margins": {
+          "class_fruit": 3.6166,
+          "class_animal": 2.875,
+          "class_tool": 3.4082
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.0073,
+          "class_animal": -0.2539,
+          "class_tool": 0.2285
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.1718,
+          "class_animal": 0.1631,
+          "class_tool": 0.2954
+        }
+      },
+      "bus": {
+        "clean_margins": {
+          "class_fruit": 5.0352,
+          "class_animal": 2.5156,
+          "class_tool": 3.3086
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0097,
+          "class_animal": -0.2383,
+          "class_tool": 0.0742
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.2011,
+          "class_animal": 0.0761,
+          "class_tool": 0.3125
+        }
+      },
+      "bicycle": {
+        "clean_margins": {
+          "class_fruit": 5.1504,
+          "class_animal": 2.7246,
+          "class_tool": 2.2695
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.1699,
+          "class_animal": -0.2383,
+          "class_tool": 0.1269
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.1191,
+          "class_animal": 0.1113,
+          "class_tool": 0.473
+        }
+      },
+      "truck": {
+        "clean_margins": {
+          "class_fruit": 4.8105,
+          "class_animal": 2.5508,
+          "class_tool": 3.8613
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.2422,
+          "class_animal": -0.0468,
+          "class_tool": 0.3145
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.1265,
+          "class_animal": -0.0659,
+          "class_tool": 0.059
+        }
+      },
+      "train": {
+        "clean_margins": {
+          "class_fruit": 4.1895,
+          "class_animal": 2.9648,
+          "class_tool": 3.5527
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.0644,
+          "class_animal": -0.3399,
+          "class_tool": 0.1269
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.4698,
+          "class_animal": 0.5009,
+          "class_tool": 0.8056
+        }
+      },
+      "boat": {
+        "clean_margins": {
+          "class_fruit": 2.082,
+          "class_animal": 1.6601,
+          "class_tool": 3.082
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.0361,
+          "class_animal": -0.5118,
+          "class_tool": 0.0703
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.1636,
+          "class_animal": 0.5444,
+          "class_tool": 0.9253
+        }
+      },
+      "plane": {
+        "clean_margins": {
+          "class_fruit": 1.0664,
+          "class_animal": 1.3125,
+          "class_tool": 2.1211
+        },
+        "attn_margin_vector": {
+          "class_fruit": -0.3833,
+          "class_animal": -0.4531,
+          "class_tool": -0.0625
+        },
+        "mlp_margin_vector": {
+          "class_fruit": 0.5586,
+          "class_animal": 0.8926,
+          "class_tool": 0.9082
+        }
+      },
+      "scooter": {
+        "clean_margins": {
+          "class_fruit": 4.875,
+          "class_animal": 2.7696,
+          "class_tool": 3.004
+        },
+        "attn_margin_vector": {
+          "class_fruit": 0.1484,
+          "class_animal": -0.1562,
+          "class_tool": 0.2774
+        },
+        "mlp_margin_vector": {
+          "class_fruit": -0.2597,
+          "class_animal": -0.0057,
+          "class_tool": 0.1603
+        }
+      },
+      "summary": {
+        "attn": {
+          "class_fruit": {
+            "avg": 0.0183,
+            "type": "NEUTRAL"
+          },
+          "class_animal": {
+            "avg": -0.2798,
+            "type": "SUPPRESSES"
+          },
+          "class_tool": {
+            "avg": 0.1445,
+            "type": "PROMOTES"
+          }
+        },
+        "mlp": {
+          "class_fruit": {
+            "avg": 0.1119,
+            "type": "PROMOTES"
+          },
+          "class_animal": {
+            "avg": 0.2771,
+            "type": "PROMOTES"
+          },
+          "class_tool": {
+            "avg": 0.4924,
+            "type": "PROMOTES"
+          }
+        }
+      }
+    }
+  },
+  "exp2_family_local_softmax": {
+    "fruit": {
+      "apple": {
+        "top1_margin": 0.7461,
+        "mean_margin": 1.4375,
+        "lse_margin": 3.7465,
+        "softmax_margin": 0.940438,
+        "family_probs": {
+          "class_fruit": 0.963169,
+          "class_animal": 0.007974,
+          "class_tool": 0.006127,
+          "class_vehicle": 0.022731
+        }
+      },
+      "banana": {
+        "top1_margin": 0.7417,
+        "mean_margin": 1.4458,
+        "lse_margin": 3.7098,
+        "softmax_margin": 0.94333,
+        "family_probs": {
+          "class_fruit": 0.967005,
+          "class_animal": 0.007867,
+          "class_tool": 0.001453,
+          "class_vehicle": 0.023675
+        }
+      },
+      "orange": {
+        "top1_margin": 0.0449,
+        "mean_margin": 1.2038,
+        "lse_margin": 3.5356,
+        "softmax_margin": 0.936016,
+        "family_probs": {
+          "class_fruit": 0.964111,
+          "class_animal": 0.005672,
+          "class_tool": 0.002121,
+          "class_vehicle": 0.028095
+        }
+      },
+      "grape": {
+        "top1_margin": 2.2207,
+        "mean_margin": 2.7975,
+        "lse_margin": 4.5381,
+        "softmax_margin": 0.974526,
+        "family_probs": {
+          "class_fruit": 0.98506,
+          "class_animal": 0.003461,
+          "class_tool": 0.000945,
+          "class_vehicle": 0.010534
+        }
+      },
+      "pear": {
+        "top1_margin": 1.2246,
+        "mean_margin": 1.873,
+        "lse_margin": 3.7419,
+        "softmax_margin": 0.943523,
+        "family_probs": {
+          "class_fruit": 0.966436,
+          "class_animal": 0.006742,
+          "class_tool": 0.003909,
+          "class_vehicle": 0.022913
+        }
+      },
+      "peach": {
+        "top1_margin": 1.7011,
+        "mean_margin": 2.3639,
+        "lse_margin": 4.9189,
+        "softmax_margin": 0.977967,
+        "family_probs": {
+          "class_fruit": 0.985166,
+          "class_animal": 0.006202,
+          "class_tool": 0.001434,
+          "class_vehicle": 0.007199
+        }
+      },
+      "lemon": {
+        "top1_margin": 0.6132,
+        "mean_margin": 1.5533,
+        "lse_margin": 3.676,
+        "softmax_margin": 0.946146,
+        "family_probs": {
+          "class_fruit": 0.970729,
+          "class_animal": 0.002069,
+          "class_tool": 0.002618,
+          "class_vehicle": 0.024583
+        }
+      },
+      "mango": {
+        "top1_margin": 1.918,
+        "mean_margin": 2.3431,
+        "lse_margin": 4.6848,
+        "softmax_margin": 0.976012,
+        "family_probs": {
+          "class_fruit": 0.985109,
+          "class_animal": 0.004498,
+          "class_tool": 0.001296,
+          "class_vehicle": 0.009097
+        }
+      },
+      "summary": {
+        "top1_margin": {
+          "avg": 1.1513,
+          "std": 0.6968
+        },
+        "mean_margin": {
+          "avg": 1.8772,
+          "std": 0.529
+        },
+        "lse_margin": {
+          "avg": 4.069,
+          "std": 0.5124
+        },
+        "softmax_margin": {
+          "avg": 0.9547,
+          "std": 0.0168
+        },
+        "top1_mean_consistency": "8/8"
+      }
+    },
+    "animal": {
+      "dog": {
+        "top1_margin": 0.7422,
+        "mean_margin": 2.3724,
+        "lse_margin": 0.8162,
+        "softmax_margin": 0.358832,
+        "family_probs": {
+          "class_fruit": 0.044725,
+          "class_animal": 0.643192,
+          "class_tool": 0.027722,
+          "class_vehicle": 0.28436
+        }
+      },
+      "cat": {
+        "top1_margin": 1.0782,
+        "mean_margin": 2.736,
+        "lse_margin": 1.1935,
+        "softmax_margin": 0.508982,
+        "family_probs": {
+          "class_fruit": 0.036712,
+          "class_animal": 0.730412,
+          "class_tool": 0.011446,
+          "class_vehicle": 0.22143
+        }
+      },
+      "horse": {
+        "top1_margin": 1.6055,
+        "mean_margin": 3.022,
+        "lse_margin": 1.5527,
+        "softmax_margin": 0.631644,
+        "family_probs": {
+          "class_fruit": 0.016859,
+          "class_animal": 0.801249,
+          "class_tool": 0.012287,
+          "class_vehicle": 0.169605
+        }
+      },
+      "lion": {
+        "top1_margin": 3.2553,
+        "mean_margin": 4.1838,
+        "lse_margin": 2.2303,
+        "softmax_margin": 0.779502,
+        "family_probs": {
+          "class_fruit": 0.030593,
+          "class_animal": 0.873388,
+          "class_tool": 0.002133,
+          "class_vehicle": 0.093886
+        }
+      },
+      "bear": {
+        "top1_margin": 2.3721,
+        "mean_margin": 3.9455,
+        "lse_margin": 2.0648,
+        "softmax_margin": 0.751245,
+        "family_probs": {
+          "class_fruit": 0.027801,
+          "class_animal": 0.860378,
+          "class_tool": 0.002688,
+          "class_vehicle": 0.109133
+        }
+      },
+      "rabbit": {
+        "top1_margin": 1.5547,
+        "mean_margin": 3.0483,
+        "lse_margin": 1.9267,
+        "softmax_margin": 0.712177,
+        "family_probs": {
+          "class_fruit": 0.041397,
+          "class_animal": 0.833568,
+          "class_tool": 0.003643,
+          "class_vehicle": 0.121391
+        }
+      },
+      "cow": {
+        "top1_margin": 1.5508,
+        "mean_margin": 2.3737,
+        "lse_margin": 1.7537,
+        "softmax_margin": 0.616472,
+        "family_probs": {
+          "class_fruit": 0.105956,
+          "class_animal": 0.745551,
+          "class_tool": 0.019415,
+          "class_vehicle": 0.129079
+        }
+      },
+      "tiger": {
+        "top1_margin": 2.5249,
+        "mean_margin": 3.7998,
+        "lse_margin": 2.073,
+        "softmax_margin": 0.763078,
+        "family_probs": {
+          "class_fruit": 0.015737,
+          "class_animal": 0.872895,
+          "class_tool": 0.001551,
+          "class_vehicle": 0.109817
+        }
+      },
+      "summary": {
+        "top1_margin": {
+          "avg": 1.8355,
+          "std": 0.7714
+        },
+        "mean_margin": {
+          "avg": 3.1852,
+          "std": 0.6633
+        },
+        "lse_margin": {
+          "avg": 1.7014,
+          "std": 0.4565
+        },
+        "softmax_margin": {
+          "avg": 0.6402,
+          "std": 0.1365
+        },
+        "top1_mean_consistency": "8/8"
+      }
+    },
+    "tool": {
+      "hammer": {
+        "top1_margin": 1.2734,
+        "mean_margin": 2.0446,
+        "lse_margin": 0.9689,
+        "softmax_margin": 0.373968,
+        "family_probs": {
+          "class_fruit": 0.024866,
+          "class_animal": 0.143725,
+          "class_tool": 0.602689,
+          "class_vehicle": 0.228721
+        }
+      },
+      "knife": {
+        "top1_margin": 2.169,
+        "mean_margin": 2.736,
+        "lse_margin": 1.5308,
+        "softmax_margin": 0.58583,
+        "family_probs": {
+          "class_fruit": 0.024787,
+          "class_animal": 0.065887,
+          "class_tool": 0.747578,
+          "class_vehicle": 0.161748
+        }
+      },
+      "wrench": {
+        "top1_margin": 1.9629,
+        "mean_margin": 2.9974,
+        "lse_margin": 1.3556,
+        "softmax_margin": 0.550036,
+        "family_probs": {
+          "class_fruit": 0.010926,
+          "class_animal": 0.056946,
+          "class_tool": 0.741082,
+          "class_vehicle": 0.191046
+        }
+      },
+      "saw": {
+        "top1_margin": 2.0879,
+        "mean_margin": 2.6057,
+        "lse_margin": 2.153,
+        "softmax_margin": 0.716419,
+        "family_probs": {
+          "class_fruit": 0.022316,
+          "class_animal": 0.072997,
+          "class_tool": 0.810553,
+          "class_vehicle": 0.094134
+        }
+      },
+      "drill": {
+        "top1_margin": 0.9981,
+        "mean_margin": 1.9486,
+        "lse_margin": 0.8048,
+        "softmax_margin": 0.330124,
+        "family_probs": {
+          "class_fruit": 0.024363,
+          "class_animal": 0.11144,
+          "class_tool": 0.59716,
+          "class_vehicle": 0.267036
+        }
+      },
+      "axe": {
+        "top1_margin": 1.959,
+        "mean_margin": 2.5757,
+        "lse_margin": 1.7319,
+        "softmax_margin": 0.63984,
+        "family_probs": {
+          "class_fruit": 0.015087,
+          "class_animal": 0.069955,
+          "class_tool": 0.777399,
+          "class_vehicle": 0.137559
+        }
+      },
+      "shovel": {
+        "top1_margin": 1.75,
+        "mean_margin": 2.5353,
+        "lse_margin": 1.5884,
+        "softmax_margin": 0.609306,
+        "family_probs": {
+          "class_fruit": 0.015712,
+          "class_animal": 0.06219,
+          "class_tool": 0.765702,
+          "class_vehicle": 0.156396
+        }
+      },
+      "scissors": {
+        "top1_margin": 1.4062,
+        "mean_margin": 2.6142,
+        "lse_margin": 1.2223,
+        "softmax_margin": 0.50104,
+        "family_probs": {
+          "class_fruit": 0.012866,
+          "class_animal": 0.067688,
+          "class_tool": 0.710243,
+          "class_vehicle": 0.209203
+        }
+      },
+      "summary": {
+        "top1_margin": {
+          "avg": 1.7008,
+          "std": 0.3984
+        },
+        "mean_margin": {
+          "avg": 2.5072,
+          "std": 0.3251
+        },
+        "lse_margin": {
+          "avg": 1.4195,
+          "std": 0.4032
+        },
+        "softmax_margin": {
+          "avg": 0.5383,
+          "std": 0.1231
+        },
+        "top1_mean_consistency": "8/8"
+      }
+    },
+    "vehicle": {
+      "car": {
+        "top1_margin": 2.875,
+        "mean_margin": 3.2999,
+        "lse_margin": 1.907,
+        "softmax_margin": 0.680855,
+        "family_probs": {
+          "class_fruit": 0.035077,
+          "class_animal": 0.118764,
+          "class_tool": 0.046541,
+          "class_vehicle": 0.799619
+        }
+      },
+      "bus": {
+        "top1_margin": 2.5156,
+        "mean_margin": 3.6198,
+        "lse_margin": 3.1777,
+        "softmax_margin": 0.891156,
+        "family_probs": {
+          "class_fruit": 0.012438,
+          "class_animal": 0.03876,
+          "class_tool": 0.018885,
+          "class_vehicle": 0.929916
+        }
+      },
+      "bicycle": {
+        "top1_margin": 2.2695,
+        "mean_margin": 3.3815,
+        "lse_margin": 3.1966,
+        "softmax_margin": 0.899984,
+        "family_probs": {
+          "class_fruit": 0.004108,
+          "class_animal": 0.019149,
+          "class_tool": 0.03838,
+          "class_vehicle": 0.938364
+        }
+      },
+      "truck": {
+        "top1_margin": 2.5508,
+        "mean_margin": 3.7409,
+        "lse_margin": 3.4862,
+        "softmax_margin": 0.926135,
+        "family_probs": {
+          "class_fruit": 0.006449,
+          "class_animal": 0.029251,
+          "class_tool": 0.008914,
+          "class_vehicle": 0.955386
+        }
+      },
+      "train": {
+        "top1_margin": 2.9648,
+        "mean_margin": 3.569,
+        "lse_margin": 2.4412,
+        "softmax_margin": 0.778585,
+        "family_probs": {
+          "class_fruit": 0.040852,
+          "class_animal": 0.074244,
+          "class_tool": 0.032074,
+          "class_vehicle": 0.852829
+        }
+      },
+      "boat": {
+        "top1_margin": 1.6601,
+        "mean_margin": 2.2747,
+        "lse_margin": 1.1556,
+        "softmax_margin": 0.451565,
+        "family_probs": {
+          "class_fruit": 0.115545,
+          "class_animal": 0.207527,
+          "class_tool": 0.017835,
+          "class_vehicle": 0.659092
+        }
+      },
+      "plane": {
+        "top1_margin": 1.0664,
+        "mean_margin": 1.5,
+        "lse_margin": 0.8154,
+        "softmax_margin": 0.332594,
+        "family_probs": {
+          "class_fruit": 0.263947,
+          "class_animal": 0.106607,
+          "class_tool": 0.032906,
+          "class_vehicle": 0.596541
+        }
+      },
+      "scooter": {
+        "top1_margin": 2.7696,
+        "mean_margin": 3.5495,
+        "lse_margin": 3.7091,
+        "softmax_margin": 0.928697,
+        "family_probs": {
+          "class_fruit": 0.005576,
+          "class_animal": 0.023324,
+          "class_tool": 0.019079,
+          "class_vehicle": 0.952021
+        }
+      },
+      "summary": {
+        "top1_margin": {
+          "avg": 2.334,
+          "std": 0.615
+        },
+        "mean_margin": {
+          "avg": 3.1169,
+          "std": 0.7467
+        },
+        "lse_margin": {
+          "avg": 2.4861,
+          "std": 1.0233
+        },
+        "softmax_margin": {
+          "avg": 0.7362,
+          "std": 0.2159
+        },
+        "top1_mean_consistency": "8/8"
+      }
+    }
+  },
+  "exp3_knowledge_graph_edges": {
+    "is_a": {
+      "fruit": {
+        "objects": [
+          {
+            "obj": "apple",
+            "clean_margin": 0.7461,
+            "attn_effect": 0.3086,
+            "mlp_effect": -0.8731,
+            "clean_target_logit": 5.3242
+          },
+          {
+            "obj": "banana",
+            "clean_margin": 0.7417,
+            "attn_effect": 0.0969,
+            "mlp_effect": -0.5297,
+            "clean_target_logit": 4.3887
+          },
+          {
+            "obj": "orange",
+            "clean_margin": 0.0449,
+            "attn_effect": 0.3378,
+            "mlp_effect": -0.7929,
+            "clean_target_logit": 4.6582
+          },
+          {
+            "obj": "grape",
+            "clean_margin": 2.2207,
+            "attn_effect": 0.2363,
+            "mlp_effect": -0.4912,
+            "clean_target_logit": 5.3906
+          },
+          {
+            "obj": "pear",
+            "clean_margin": 1.2246,
+            "attn_effect": 0.2363,
+            "mlp_effect": -0.8829,
+            "clean_target_logit": 5.1445
+          },
+          {
+            "obj": "peach",
+            "clean_margin": 1.7011,
+            "attn_effect": -0.043,
+            "mlp_effect": -0.3458,
+            "clean_target_logit": 4.7441
+          },
+          {
+            "obj": "lemon",
+            "clean_margin": 0.6132,
+            "attn_effect": 0.3124,
+            "mlp_effect": -0.7608,
+            "clean_target_logit": 5.5312
+          },
+          {
+            "obj": "mango",
+            "clean_margin": 1.918,
+            "attn_effect": 0.3008,
+            "mlp_effect": -0.1621,
+            "clean_target_logit": 5.0508
+          }
+        ],
+        "avg_clean_margin": 1.1513,
+        "avg_attn_effect": 0.2233,
+        "avg_mlp_effect": -0.6048,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "animal": {
+        "objects": [
+          {
+            "obj": "dog",
+            "clean_margin": 0.7422,
+            "attn_effect": 0.6875,
+            "mlp_effect": -0.751,
+            "clean_target_logit": 4.9336
+          },
+          {
+            "obj": "cat",
+            "clean_margin": 1.0782,
+            "attn_effect": 0.7345,
+            "mlp_effect": -0.9452,
+            "clean_target_logit": 5.6641
+          },
+          {
+            "obj": "horse",
+            "clean_margin": 1.6055,
+            "attn_effect": 0.7579,
+            "mlp_effect": -0.876,
+            "clean_target_logit": 5.4688
+          },
+          {
+            "obj": "lion",
+            "clean_margin": 3.2553,
+            "attn_effect": 0.5299,
+            "mlp_effect": -0.7359,
+            "clean_target_logit": 4.4609
+          },
+          {
+            "obj": "bear",
+            "clean_margin": 2.3721,
+            "attn_effect": 0.6963,
+            "mlp_effect": -0.7901,
+            "clean_target_logit": 5.875
+          },
+          {
+            "obj": "rabbit",
+            "clean_margin": 1.5547,
+            "attn_effect": 0.6094,
+            "mlp_effect": -1.0767,
+            "clean_target_logit": 5.5781
+          },
+          {
+            "obj": "cow",
+            "clean_margin": 1.5508,
+            "attn_effect": 0.6953,
+            "mlp_effect": -0.9003,
+            "clean_target_logit": 5.6094
+          },
+          {
+            "obj": "tiger",
+            "clean_margin": 2.5249,
+            "attn_effect": 0.728,
+            "mlp_effect": -0.9975,
+            "clean_target_logit": 4.4492
+          }
+        ],
+        "avg_clean_margin": 1.8355,
+        "avg_attn_effect": 0.6799,
+        "avg_mlp_effect": -0.8841,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "tool": {
+        "objects": [
+          {
+            "obj": "hammer",
+            "clean_margin": 1.2734,
+            "attn_effect": 0.0429,
+            "mlp_effect": -0.9785,
+            "clean_target_logit": 4.5625
+          },
+          {
+            "obj": "knife",
+            "clean_margin": 2.169,
+            "attn_effect": -0.0263,
+            "mlp_effect": -0.9243,
+            "clean_target_logit": 4.8047
+          },
+          {
+            "obj": "wrench",
+            "clean_margin": 1.9629,
+            "attn_effect": 0.2559,
+            "mlp_effect": -1.3165,
+            "clean_target_logit": 5.1875
+          },
+          {
+            "obj": "saw",
+            "clean_margin": 2.0879,
+            "attn_effect": 0.1153,
+            "mlp_effect": -0.8144,
+            "clean_target_logit": 4.9609
+          },
+          {
+            "obj": "drill",
+            "clean_margin": 0.9981,
+            "attn_effect": 0.0059,
+            "mlp_effect": -1.0602,
+            "clean_target_logit": 4.543
+          },
+          {
+            "obj": "axe",
+            "clean_margin": 1.959,
+            "attn_effect": -0.0156,
+            "mlp_effect": -0.6962,
+            "clean_target_logit": 4.3711
+          },
+          {
+            "obj": "shovel",
+            "clean_margin": 1.75,
+            "attn_effect": 0.1484,
+            "mlp_effect": -1.2149,
+            "clean_target_logit": 4.1094
+          },
+          {
+            "obj": "scissors",
+            "clean_margin": 1.4062,
+            "attn_effect": 0.1093,
+            "mlp_effect": -1.2205,
+            "clean_target_logit": 5.0
+          }
+        ],
+        "avg_clean_margin": 1.7008,
+        "avg_attn_effect": 0.0795,
+        "avg_mlp_effect": -1.0282,
+        "attn_type": "NEUTRAL",
+        "mlp_type": "SUPPRESSES"
+      },
+      "vehicle": {
+        "objects": [
+          {
+            "obj": "car",
+            "clean_margin": 2.875,
+            "attn_effect": -0.2539,
+            "mlp_effect": 0.1631,
+            "clean_target_logit": 6.4062
+          },
+          {
+            "obj": "bus",
+            "clean_margin": 2.5156,
+            "attn_effect": -0.2383,
+            "mlp_effect": 0.0761,
+            "clean_target_logit": 7.1875
+          },
+          {
+            "obj": "bicycle",
+            "clean_margin": 2.2695,
+            "attn_effect": 0.1269,
+            "mlp_effect": 0.473,
+            "clean_target_logit": 5.7422
+          },
+          {
+            "obj": "truck",
+            "clean_margin": 2.5508,
+            "attn_effect": -0.0468,
+            "mlp_effect": -0.0659,
+            "clean_target_logit": 6.9453
+          },
+          {
+            "obj": "train",
+            "clean_margin": 2.9648,
+            "attn_effect": -0.3399,
+            "mlp_effect": 0.5009,
+            "clean_target_logit": 6.5625
+          },
+          {
+            "obj": "boat",
+            "clean_margin": 1.6601,
+            "attn_effect": -0.3858,
+            "mlp_effect": 0.5444,
+            "clean_target_logit": 6.2812
+          },
+          {
+            "obj": "plane",
+            "clean_margin": 1.0664,
+            "attn_effect": -0.3833,
+            "mlp_effect": 0.6465,
+            "clean_target_logit": 5.3672
+          },
+          {
+            "obj": "scooter",
+            "clean_margin": 2.7696,
+            "attn_effect": 0.043,
+            "mlp_effect": -0.0057,
+            "clean_target_logit": 6.2188
+          }
+        ],
+        "avg_clean_margin": 2.334,
+        "avg_attn_effect": -0.1848,
+        "avg_mlp_effect": 0.2916,
+        "attn_type": "SUPPRESSES",
+        "mlp_type": "PROMOTES"
+      }
+    },
+    "has_color": {
+      "fruit": {
+        "objects": [
+          {
+            "obj": "apple",
+            "clean_margin": 5.076,
+            "attn_effect": 0.5697,
+            "mlp_effect": -0.8639,
+            "clean_target_logit": 7.0719
+          },
+          {
+            "obj": "banana",
+            "clean_margin": 5.2359,
+            "attn_effect": 0.5624,
+            "mlp_effect": -0.1412,
+            "clean_target_logit": 6.5031
+          },
+          {
+            "obj": "orange",
+            "clean_margin": 2.6664,
+            "attn_effect": 0.3164,
+            "mlp_effect": -0.4887,
+            "clean_target_logit": 7.1594
+          },
+          {
+            "obj": "grape",
+            "clean_margin": 4.2005,
+            "attn_effect": 0.524,
+            "mlp_effect": -0.6532,
+            "clean_target_logit": 7.1719
+          },
+          {
+            "obj": "pear",
+            "clean_margin": 3.4605,
+            "attn_effect": 0.5245,
+            "mlp_effect": -1.084,
+            "clean_target_logit": 7.3562
+          },
+          {
+            "obj": "peach",
+            "clean_margin": 3.1446,
+            "attn_effect": 0.6008,
+            "mlp_effect": -1.0568,
+            "clean_target_logit": 7.0563
+          },
+          {
+            "obj": "lemon",
+            "clean_margin": 3.925,
+            "attn_effect": 0.4007,
+            "mlp_effect": -0.6393,
+            "clean_target_logit": 6.4297
+          },
+          {
+            "obj": "mango",
+            "clean_margin": 4.569,
+            "attn_effect": 0.4331,
+            "mlp_effect": -0.5061,
+            "clean_target_logit": 7.3187
+          }
+        ],
+        "avg_clean_margin": 4.0347,
+        "avg_attn_effect": 0.4914,
+        "avg_mlp_effect": -0.6792,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "animal": {
+        "objects": [
+          {
+            "obj": "dog",
+            "clean_margin": 7.0541,
+            "attn_effect": 0.6963,
+            "mlp_effect": -0.3885,
+            "clean_target_logit": 9.3031
+          },
+          {
+            "obj": "cat",
+            "clean_margin": 6.811,
+            "attn_effect": 0.5751,
+            "mlp_effect": -0.732,
+            "clean_target_logit": 8.9094
+          },
+          {
+            "obj": "horse",
+            "clean_margin": 6.3888,
+            "attn_effect": 0.6079,
+            "mlp_effect": -0.5577,
+            "clean_target_logit": 7.5375
+          },
+          {
+            "obj": "lion",
+            "clean_margin": 4.7244,
+            "attn_effect": 0.351,
+            "mlp_effect": -0.5809,
+            "clean_target_logit": 7.3844
+          },
+          {
+            "obj": "bear",
+            "clean_margin": 5.0531,
+            "attn_effect": 0.1859,
+            "mlp_effect": -0.2473,
+            "clean_target_logit": 8.45
+          },
+          {
+            "obj": "rabbit",
+            "clean_margin": 6.175,
+            "attn_effect": 0.6125,
+            "mlp_effect": -1.0647,
+            "clean_target_logit": 9.1125
+          },
+          {
+            "obj": "cow",
+            "clean_margin": 7.3917,
+            "attn_effect": 0.6623,
+            "mlp_effect": -0.1933,
+            "clean_target_logit": 7.8656
+          },
+          {
+            "obj": "tiger",
+            "clean_margin": 5.4205,
+            "attn_effect": 0.5111,
+            "mlp_effect": -0.4081,
+            "clean_target_logit": 7.425
+          }
+        ],
+        "avg_clean_margin": 6.1273,
+        "avg_attn_effect": 0.5253,
+        "avg_mlp_effect": -0.5216,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "tool": {
+        "objects": [
+          {
+            "obj": "hammer",
+            "clean_margin": 3.7453,
+            "attn_effect": 0.589,
+            "mlp_effect": -0.8099,
+            "clean_target_logit": 8.2125
+          },
+          {
+            "obj": "knife",
+            "clean_margin": 3.3078,
+            "attn_effect": 0.5891,
+            "mlp_effect": -1.1424,
+            "clean_target_logit": 7.8406
+          },
+          {
+            "obj": "wrench",
+            "clean_margin": 4.5626,
+            "attn_effect": 0.722,
+            "mlp_effect": -0.4427,
+            "clean_target_logit": 9.1938
+          },
+          {
+            "obj": "saw",
+            "clean_margin": 3.6516,
+            "attn_effect": 0.4985,
+            "mlp_effect": -1.0754,
+            "clean_target_logit": 8.8375
+          },
+          {
+            "obj": "drill",
+            "clean_margin": 3.0687,
+            "attn_effect": 0.5999,
+            "mlp_effect": -1.2387,
+            "clean_target_logit": 7.5312
+          },
+          {
+            "obj": "axe",
+            "clean_margin": 3.1547,
+            "attn_effect": 0.5547,
+            "mlp_effect": -0.7084,
+            "clean_target_logit": 7.7719
+          },
+          {
+            "obj": "shovel",
+            "clean_margin": 3.6735,
+            "attn_effect": 0.5798,
+            "mlp_effect": -0.7366,
+            "clean_target_logit": 8.5188
+          },
+          {
+            "obj": "scissors",
+            "clean_margin": 3.8032,
+            "attn_effect": 0.5875,
+            "mlp_effect": -1.0327,
+            "clean_target_logit": 8.5188
+          }
+        ],
+        "avg_clean_margin": 3.6209,
+        "avg_attn_effect": 0.5901,
+        "avg_mlp_effect": -0.8983,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "vehicle": {
+        "objects": [
+          {
+            "obj": "car",
+            "clean_margin": 5.0281,
+            "attn_effect": 0.7765,
+            "mlp_effect": -1.0172,
+            "clean_target_logit": 8.3031
+          },
+          {
+            "obj": "bus",
+            "clean_margin": 4.7356,
+            "attn_effect": 0.6778,
+            "mlp_effect": -0.7647,
+            "clean_target_logit": 8.0219
+          },
+          {
+            "obj": "bicycle",
+            "clean_margin": 4.7164,
+            "attn_effect": 0.7946,
+            "mlp_effect": -0.9801,
+            "clean_target_logit": 8.6156
+          },
+          {
+            "obj": "truck",
+            "clean_margin": 4.9508,
+            "attn_effect": 0.6695,
+            "mlp_effect": -0.967,
+            "clean_target_logit": 8.7469
+          },
+          {
+            "obj": "train",
+            "clean_margin": 4.1203,
+            "attn_effect": 0.6875,
+            "mlp_effect": -0.8799,
+            "clean_target_logit": 7.8656
+          },
+          {
+            "obj": "boat",
+            "clean_margin": 3.8356,
+            "attn_effect": 0.6216,
+            "mlp_effect": -0.9679,
+            "clean_target_logit": 7.8594
+          },
+          {
+            "obj": "plane",
+            "clean_margin": 3.9281,
+            "attn_effect": 0.4312,
+            "mlp_effect": -1.0223,
+            "clean_target_logit": 8.9844
+          },
+          {
+            "obj": "scooter",
+            "clean_margin": 4.6953,
+            "attn_effect": 0.7265,
+            "mlp_effect": -0.9842,
+            "clean_target_logit": 8.5312
+          }
+        ],
+        "avg_clean_margin": 4.5013,
+        "avg_attn_effect": 0.6732,
+        "avg_mlp_effect": -0.9479,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      }
+    },
+    "has_part": {
+      "fruit": {
+        "objects": [
+          {
+            "obj": "apple",
+            "clean_margin": -1.9101,
+            "attn_effect": -0.3101,
+            "mlp_effect": -0.0619,
+            "clean_target_logit": 2.5336
+          },
+          {
+            "obj": "banana",
+            "clean_margin": -1.9355,
+            "attn_effect": -0.3767,
+            "mlp_effect": -0.3367,
+            "clean_target_logit": 1.7887
+          },
+          {
+            "obj": "orange",
+            "clean_margin": -1.5063,
+            "attn_effect": -0.3251,
+            "mlp_effect": 0.0035,
+            "clean_target_logit": 3.0281
+          },
+          {
+            "obj": "grape",
+            "clean_margin": -1.2163,
+            "attn_effect": -0.3491,
+            "mlp_effect": -0.0302,
+            "clean_target_logit": 2.5032
+          },
+          {
+            "obj": "pear",
+            "clean_margin": -1.5039,
+            "attn_effect": -0.3082,
+            "mlp_effect": -0.0559,
+            "clean_target_logit": 2.7555
+          },
+          {
+            "obj": "peach",
+            "clean_margin": -1.7508,
+            "attn_effect": -0.3893,
+            "mlp_effect": -0.0106,
+            "clean_target_logit": 2.232
+          },
+          {
+            "obj": "lemon",
+            "clean_margin": -1.5516,
+            "attn_effect": -0.3345,
+            "mlp_effect": -0.0629,
+            "clean_target_logit": 2.7484
+          },
+          {
+            "obj": "mango",
+            "clean_margin": -2.2644,
+            "attn_effect": -0.4597,
+            "mlp_effect": -0.1225,
+            "clean_target_logit": 2.3294
+          }
+        ],
+        "avg_clean_margin": -1.7049,
+        "avg_attn_effect": -0.3566,
+        "avg_mlp_effect": -0.0847,
+        "attn_type": "SUPPRESSES",
+        "mlp_type": "NEUTRAL"
+      },
+      "animal": {
+        "objects": [
+          {
+            "obj": "dog",
+            "clean_margin": -0.9892,
+            "attn_effect": -0.2568,
+            "mlp_effect": -0.306,
+            "clean_target_logit": 2.9788
+          },
+          {
+            "obj": "cat",
+            "clean_margin": -1.0499,
+            "attn_effect": -0.1648,
+            "mlp_effect": -0.2589,
+            "clean_target_logit": 3.1939
+          },
+          {
+            "obj": "horse",
+            "clean_margin": -0.4219,
+            "attn_effect": -0.3461,
+            "mlp_effect": -0.0626,
+            "clean_target_logit": 3.0336
+          },
+          {
+            "obj": "lion",
+            "clean_margin": 0.0663,
+            "attn_effect": -0.1534,
+            "mlp_effect": -0.1592,
+            "clean_target_logit": 2.61
+          },
+          {
+            "obj": "bear",
+            "clean_margin": -0.1963,
+            "attn_effect": -0.0885,
+            "mlp_effect": -0.3482,
+            "clean_target_logit": 2.9408
+          },
+          {
+            "obj": "rabbit",
+            "clean_margin": -0.5527,
+            "attn_effect": -0.1382,
+            "mlp_effect": -0.216,
+            "clean_target_logit": 3.4887
+          },
+          {
+            "obj": "cow",
+            "clean_margin": -0.943,
+            "attn_effect": -0.2047,
+            "mlp_effect": -0.1132,
+            "clean_target_logit": 3.2461
+          },
+          {
+            "obj": "tiger",
+            "clean_margin": -0.936,
+            "attn_effect": -0.1719,
+            "mlp_effect": -0.0042,
+            "clean_target_logit": 3.2781
+          }
+        ],
+        "avg_clean_margin": -0.6278,
+        "avg_attn_effect": -0.1905,
+        "avg_mlp_effect": -0.1835,
+        "attn_type": "SUPPRESSES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "tool": {
+        "objects": [
+          {
+            "obj": "hammer",
+            "clean_margin": -0.1237,
+            "attn_effect": -0.3131,
+            "mlp_effect": -0.5153,
+            "clean_target_logit": 3.3318
+          },
+          {
+            "obj": "knife",
+            "clean_margin": -0.7553,
+            "attn_effect": -0.2038,
+            "mlp_effect": -0.6133,
+            "clean_target_logit": 2.4228
+          },
+          {
+            "obj": "wrench",
+            "clean_margin": -0.1723,
+            "attn_effect": -0.2231,
+            "mlp_effect": -0.5332,
+            "clean_target_logit": 3.3609
+          },
+          {
+            "obj": "saw",
+            "clean_margin": 0.2255,
+            "attn_effect": -0.26,
+            "mlp_effect": -0.5562,
+            "clean_target_logit": 3.838
+          },
+          {
+            "obj": "drill",
+            "clean_margin": -1.0086,
+            "attn_effect": -0.2412,
+            "mlp_effect": -0.5025,
+            "clean_target_logit": 3.0211
+          },
+          {
+            "obj": "axe",
+            "clean_margin": 0.0153,
+            "attn_effect": -0.2805,
+            "mlp_effect": -0.5558,
+            "clean_target_logit": 3.8414
+          },
+          {
+            "obj": "shovel",
+            "clean_margin": -0.057,
+            "attn_effect": -0.2371,
+            "mlp_effect": -0.6257,
+            "clean_target_logit": 3.5094
+          },
+          {
+            "obj": "scissors",
+            "clean_margin": 0.2581,
+            "attn_effect": -0.1944,
+            "mlp_effect": -0.5738,
+            "clean_target_logit": 4.2479
+          }
+        ],
+        "avg_clean_margin": -0.2022,
+        "avg_attn_effect": -0.2442,
+        "avg_mlp_effect": -0.5595,
+        "attn_type": "SUPPRESSES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "vehicle": {
+        "objects": [
+          {
+            "obj": "car",
+            "clean_margin": 0.1551,
+            "attn_effect": -0.1781,
+            "mlp_effect": -0.566,
+            "clean_target_logit": 2.9176
+          },
+          {
+            "obj": "bus",
+            "clean_margin": -0.1455,
+            "attn_effect": -0.0873,
+            "mlp_effect": -0.367,
+            "clean_target_logit": 0.7551
+          },
+          {
+            "obj": "bicycle",
+            "clean_margin": 0.5168,
+            "attn_effect": -0.0336,
+            "mlp_effect": -0.7462,
+            "clean_target_logit": 3.418
+          },
+          {
+            "obj": "truck",
+            "clean_margin": -0.3295,
+            "attn_effect": 0.026,
+            "mlp_effect": -0.2236,
+            "clean_target_logit": 1.2523
+          },
+          {
+            "obj": "train",
+            "clean_margin": 0.4351,
+            "attn_effect": -0.006,
+            "mlp_effect": -0.4945,
+            "clean_target_logit": 2.4134
+          },
+          {
+            "obj": "boat",
+            "clean_margin": -0.5517,
+            "attn_effect": -0.2548,
+            "mlp_effect": -0.3891,
+            "clean_target_logit": 2.6038
+          },
+          {
+            "obj": "plane",
+            "clean_margin": -2.0749,
+            "attn_effect": -0.2044,
+            "mlp_effect": -0.2374,
+            "clean_target_logit": 1.7157
+          },
+          {
+            "obj": "scooter",
+            "clean_margin": 1.0967,
+            "attn_effect": -0.0674,
+            "mlp_effect": -0.7266,
+            "clean_target_logit": 3.3535
+          }
+        ],
+        "avg_clean_margin": -0.1122,
+        "avg_attn_effect": -0.1007,
+        "avg_mlp_effect": -0.4688,
+        "attn_type": "SUPPRESSES",
+        "mlp_type": "SUPPRESSES"
+      }
+    },
+    "used_for": {
+      "fruit": {
+        "objects": [
+          {
+            "obj": "apple",
+            "clean_margin": 1.1711,
+            "attn_effect": 0.0758,
+            "mlp_effect": -0.1935,
+            "clean_target_logit": 4.3094
+          },
+          {
+            "obj": "banana",
+            "clean_margin": 0.7746,
+            "attn_effect": 0.239,
+            "mlp_effect": -0.3389,
+            "clean_target_logit": 2.1105
+          },
+          {
+            "obj": "orange",
+            "clean_margin": 1.0898,
+            "attn_effect": 0.1352,
+            "mlp_effect": 0.1914,
+            "clean_target_logit": 3.7906
+          },
+          {
+            "obj": "grape",
+            "clean_margin": 0.919,
+            "attn_effect": 0.183,
+            "mlp_effect": -0.1816,
+            "clean_target_logit": 2.7211
+          },
+          {
+            "obj": "pear",
+            "clean_margin": 0.8236,
+            "attn_effect": 0.1556,
+            "mlp_effect": -0.213,
+            "clean_target_logit": 2.75
+          },
+          {
+            "obj": "peach",
+            "clean_margin": 0.9218,
+            "attn_effect": 0.1435,
+            "mlp_effect": -0.2428,
+            "clean_target_logit": 2.1562
+          },
+          {
+            "obj": "lemon",
+            "clean_margin": 0.6098,
+            "attn_effect": 0.1403,
+            "mlp_effect": 0.1535,
+            "clean_target_logit": 2.6234
+          },
+          {
+            "obj": "mango",
+            "clean_margin": 1.1721,
+            "attn_effect": 0.1947,
+            "mlp_effect": -0.2346,
+            "clean_target_logit": 2.4875
+          }
+        ],
+        "avg_clean_margin": 0.9352,
+        "avg_attn_effect": 0.1584,
+        "avg_mlp_effect": -0.1324,
+        "attn_type": "PROMOTES",
+        "mlp_type": "SUPPRESSES"
+      },
+      "animal": {
+        "objects": [
+          {
+            "obj": "dog",
+            "clean_margin": 2.2622,
+            "attn_effect": 0.3768,
+            "mlp_effect": 0.1006,
+            "clean_target_logit": 2.8657
+          },
+          {
+            "obj": "cat",
+            "clean_margin": 2.4509,
+            "attn_effect": 0.2643,
+            "mlp_effect": -0.1399,
+            "clean_target_logit": 3.4289
+          },
+          {
+            "obj": "horse",
+            "clean_margin": 3.2385,
+            "attn_effect": 0.2536,
+            "mlp_effect": 0.3678,
+            "clean_target_logit": 3.6336
+          },
+          {
+            "obj": "lion",
+            "clean_margin": 1.9414,
+            "attn_effect": 0.2305,
+            "mlp_effect": -0.1507,
+            "clean_target_logit": 2.9125
+          },
+          {
+            "obj": "bear",
+            "clean_margin": 2.5128,
+            "attn_effect": 0.5741,
+            "mlp_effect": 0.1245,
+            "clean_target_logit": 2.5361
+          },
+          {
+            "obj": "rabbit",
+            "clean_margin": 2.7031,
+            "attn_effect": 0.1624,
+            "mlp_effect": -0.0824,
+            "clean_target_logit": 3.5211
+          },
+          {
+            "obj": "cow",
+            "clean_margin": 2.584,
+            "attn_effect": 0.4477,
+            "mlp_effect": 0.3847,
+            "clean_target_logit": 2.5672
+          },
+          {
+            "obj": "tiger",
+            "clean_margin": 2.3244,
+            "attn_effect": 0.2506,
+            "mlp_effect": -0.1811,
+            "clean_target_logit": 2.4781
+          }
+        ],
+        "avg_clean_margin": 2.5022,
+        "avg_attn_effect": 0.32,
+        "avg_mlp_effect": 0.0529,
+        "attn_type": "PROMOTES",
+        "mlp_type": "NEUTRAL"
+      },
+      "tool": {
+        "objects": [
+          {
+            "obj": "hammer",
+            "clean_margin": 1.1905,
+            "attn_effect": -0.0699,
+            "mlp_effect": 0.2594,
+            "clean_target_logit": 1.7969
+          },
+          {
+            "obj": "knife",
+            "clean_margin": 1.7178,
+            "attn_effect": 0.1789,
+            "mlp_effect": -0.1947,
+            "clean_target_logit": 1.8578
+          },
+          {
+            "obj": "wrench",
+            "clean_margin": 2.9676,
+            "attn_effect": 0.3196,
+            "mlp_effect": 0.4684,
+            "clean_target_logit": 1.7446
+          },
+          {
+            "obj": "saw",
+            "clean_margin": 1.4878,
+            "attn_effect": 0.0592,
+            "mlp_effect": -0.3567,
+            "clean_target_logit": 1.9979
+          },
+          {
+            "obj": "drill",
+            "clean_margin": 2.5755,
+            "attn_effect": -0.0243,
+            "mlp_effect": -0.3831,
+            "clean_target_logit": 1.8455
+          },
+          {
+            "obj": "axe",
+            "clean_margin": 1.7214,
+            "attn_effect": 0.0946,
+            "mlp_effect": -0.5461,
+            "clean_target_logit": 2.4166
+          },
+          {
+            "obj": "shovel",
+            "clean_margin": 3.2639,
+            "attn_effect": 0.0757,
+            "mlp_effect": -0.2504,
+            "clean_target_logit": 1.5922
+          },
+          {
+            "obj": "scissors",
+            "clean_margin": 2.4848,
+            "attn_effect": 0.0456,
+            "mlp_effect": -0.6138,
+            "clean_target_logit": 2.5029
+          }
+        ],
+        "avg_clean_margin": 2.1762,
+        "avg_attn_effect": 0.0849,
+        "avg_mlp_effect": -0.2021,
+        "attn_type": "NEUTRAL",
+        "mlp_type": "SUPPRESSES"
+      },
+      "vehicle": {
+        "objects": [
+          {
+            "obj": "car",
+            "clean_margin": 2.9436,
+            "attn_effect": 0.1779,
+            "mlp_effect": -0.147,
+            "clean_target_logit": 3.9635
+          },
+          {
+            "obj": "bus",
+            "clean_margin": 4.3291,
+            "attn_effect": 0.6042,
+            "mlp_effect": 0.976,
+            "clean_target_logit": 3.422
+          },
+          {
+            "obj": "bicycle",
+            "clean_margin": 2.7058,
+            "attn_effect": 0.124,
+            "mlp_effect": -0.0044,
+            "clean_target_logit": 3.7802
+          },
+          {
+            "obj": "truck",
+            "clean_margin": 3.3426,
+            "attn_effect": 0.3734,
+            "mlp_effect": -0.1059,
+            "clean_target_logit": 3.7766
+          },
+          {
+            "obj": "train",
+            "clean_margin": 3.243,
+            "attn_effect": 0.3158,
+            "mlp_effect": -0.1203,
+            "clean_target_logit": 3.5547
+          },
+          {
+            "obj": "boat",
+            "clean_margin": 3.1553,
+            "attn_effect": 0.37,
+            "mlp_effect": -0.0152,
+            "clean_target_logit": 3.6701
+          },
+          {
+            "obj": "plane",
+            "clean_margin": 2.1648,
+            "attn_effect": 0.5474,
+            "mlp_effect": 0.4675,
+            "clean_target_logit": 1.3375
+          },
+          {
+            "obj": "scooter",
+            "clean_margin": 2.527,
+            "attn_effect": 0.1915,
+            "mlp_effect": -0.3103,
+            "clean_target_logit": 3.4461
+          }
+        ],
+        "avg_clean_margin": 3.0514,
+        "avg_attn_effect": 0.338,
+        "avg_mlp_effect": 0.0925,
+        "attn_type": "PROMOTES",
+        "mlp_type": "NEUTRAL"
+      }
+    }
+  },
+  "exp4_path_flip_scan": {
+    "L0": {
+      "fruit": {
+        "attn": 0.6558,
+        "mlp": 0.0232,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": -0.5352,
+        "mlp": 0.254,
+        "attn_t": "SUPPRESSES",
+        "mlp_t": "PROMOTES"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=SUPPRESSES,m=PROMOTES",
+      "_flipped": true
+    },
+    "L4": {
+      "fruit": {
+        "attn": 0.0042,
+        "mlp": 0.0261,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.0197,
+        "mlp": -0.0703,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=NEUTRAL,m=NEUTRAL",
+      "_animal_path": "a=NEUTRAL,m=NEUTRAL",
+      "_flipped": true
+    },
+    "L8": {
+      "fruit": {
+        "attn": 0.0698,
+        "mlp": 0.1057,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "PROMOTES"
+      },
+      "animal": {
+        "attn": 0.2207,
+        "mlp": -0.1464,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=NEUTRAL,m=PROMOTES",
+      "_animal_path": "a=PROMOTES,m=SUPPRESSES",
+      "_flipped": true
+    },
+    "L12": {
+      "fruit": {
+        "attn": -0.1099,
+        "mlp": 0.1978,
+        "attn_t": "SUPPRESSES",
+        "mlp_t": "PROMOTES"
+      },
+      "animal": {
+        "attn": 0.2891,
+        "mlp": 0.0293,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=SUPPRESSES,m=PROMOTES",
+      "_animal_path": "a=PROMOTES,m=NEUTRAL",
+      "_flipped": true
+    },
+    "L16": {
+      "fruit": {
+        "attn": 0.1562,
+        "mlp": 0.0144,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.1504,
+        "mlp": -0.0215,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=PROMOTES,m=NEUTRAL",
+      "_flipped": true
+    },
+    "L20": {
+      "fruit": {
+        "attn": 0.0494,
+        "mlp": -0.0298,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.0742,
+        "mlp": -0.0624,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=NEUTRAL,m=NEUTRAL",
+      "_animal_path": "a=NEUTRAL,m=NEUTRAL",
+      "_flipped": false
+    },
+    "L24": {
+      "fruit": {
+        "attn": 0.2393,
+        "mlp": 0.0062,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.0255,
+        "mlp": -0.1035,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=NEUTRAL,m=SUPPRESSES",
+      "_flipped": true
+    },
+    "L28": {
+      "fruit": {
+        "attn": 0.0163,
+        "mlp": -0.3025,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "SUPPRESSES"
+      },
+      "animal": {
+        "attn": 0.1465,
+        "mlp": -0.543,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=NEUTRAL,m=SUPPRESSES",
+      "_animal_path": "a=PROMOTES,m=SUPPRESSES",
+      "_flipped": false
+    },
+    "L29": {
+      "fruit": {
+        "attn": 0.3865,
+        "mlp": -0.177,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "animal": {
+        "attn": 0.4336,
+        "mlp": -0.1445,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=PROMOTES,m=SUPPRESSES",
+      "_animal_path": "a=PROMOTES,m=SUPPRESSES",
+      "_flipped": false
+    },
+    "L30": {
+      "fruit": {
+        "attn": 0.2017,
+        "mlp": 0.0525,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.3731,
+        "mlp": 0.0762,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=PROMOTES,m=NEUTRAL",
+      "_flipped": false
+    },
+    "L31": {
+      "fruit": {
+        "attn": 0.3372,
+        "mlp": 0.0712,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.2364,
+        "mlp": 0.1915,
+        "attn_t": "PROMOTES",
+        "mlp_t": "PROMOTES"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=PROMOTES,m=PROMOTES",
+      "_flipped": false
+    },
+    "L32": {
+      "fruit": {
+        "attn": -0.0748,
+        "mlp": -0.6743,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "SUPPRESSES"
+      },
+      "animal": {
+        "attn": -0.0898,
+        "mlp": 0.1056,
+        "attn_t": "NEUTRAL",
+        "mlp_t": "PROMOTES"
+      },
+      "_fruit_path": "a=NEUTRAL,m=SUPPRESSES",
+      "_animal_path": "a=NEUTRAL,m=PROMOTES",
+      "_flipped": true
+    },
+    "L33": {
+      "fruit": {
+        "attn": 0.3049,
+        "mlp": -0.7752,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "animal": {
+        "attn": 0.254,
+        "mlp": -0.5371,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=PROMOTES,m=SUPPRESSES",
+      "_animal_path": "a=PROMOTES,m=SUPPRESSES",
+      "_flipped": false
+    },
+    "L34": {
+      "fruit": {
+        "attn": 0.4766,
+        "mlp": -0.005,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "animal": {
+        "attn": 0.3809,
+        "mlp": -0.0703,
+        "attn_t": "PROMOTES",
+        "mlp_t": "NEUTRAL"
+      },
+      "_fruit_path": "a=PROMOTES,m=NEUTRAL",
+      "_animal_path": "a=PROMOTES,m=NEUTRAL",
+      "_flipped": false
+    },
+    "L35": {
+      "fruit": {
+        "attn": 0.2027,
+        "mlp": -0.7014,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "animal": {
+        "attn": 0.711,
+        "mlp": -0.8481,
+        "attn_t": "PROMOTES",
+        "mlp_t": "SUPPRESSES"
+      },
+      "_fruit_path": "a=PROMOTES,m=SUPPRESSES",
+      "_animal_path": "a=PROMOTES,m=SUPPRESSES",
+      "_flipped": false
+    }
+  },
+  "exp5_negation_effect": {
+    "fruit": {
+      "objects": [
+        {
+          "obj": "apple",
+          "condition": "affirmative",
+          "target_logit": 5.3242,
+          "margin": 0.7461,
+          "family_logits": {
+            "class_fruit": 5.3242,
+            "class_animal": 3.9023,
+            "class_tool": 3.1797,
+            "class_vehicle": 4.5781
+          }
+        },
+        {
+          "obj": "apple",
+          "condition": "negation",
+          "target_logit": 4.4395,
+          "margin": -0.0839,
+          "family_logits": {
+            "class_fruit": 4.4395,
+            "class_animal": 3.918,
+            "class_tool": 2.5762,
+            "class_vehicle": 4.5234
+          }
+        },
+        {
+          "obj": "banana",
+          "condition": "affirmative",
+          "target_logit": 4.3887,
+          "margin": 0.7417,
+          "family_logits": {
+            "class_fruit": 4.3887,
+            "class_animal": 3.3008,
+            "class_tool": 1.8809,
+            "class_vehicle": 3.647
+          }
+        },
+        {
+          "obj": "banana",
+          "condition": "negation",
+          "target_logit": 3.9375,
+          "margin": 1.3281,
+          "family_logits": {
+            "class_fruit": 3.9375,
+            "class_animal": 2.6094,
+            "class_tool": 0.989,
+            "class_vehicle": 2.0801
+          }
+        },
+        {
+          "obj": "orange",
+          "condition": "affirmative",
+          "target_logit": 4.6582,
+          "margin": 0.0449,
+          "family_logits": {
+            "class_fruit": 4.6582,
+            "class_animal": 3.3008,
+            "class_tool": 2.4492,
+            "class_vehicle": 4.6133
+          }
+        },
+        {
+          "obj": "orange",
+          "condition": "negation",
+          "target_logit": 3.6692,
+          "margin": -0.3386,
+          "family_logits": {
+            "class_fruit": 3.6692,
+            "class_animal": 3.043,
+            "class_tool": 1.832,
+            "class_vehicle": 4.0078
+          }
+        },
+        {
+          "obj": "grape",
+          "condition": "affirmative",
+          "target_logit": 5.3906,
+          "margin": 2.2207,
+          "family_logits": {
+            "class_fruit": 5.3906,
+            "class_animal": 2.9609,
+            "class_tool": 1.6484,
+            "class_vehicle": 3.1699
+          }
+        },
+        {
+          "obj": "grape",
+          "condition": "negation",
+          "target_logit": 4.8613,
+          "margin": 1.834,
+          "family_logits": {
+            "class_fruit": 4.8613,
+            "class_animal": 3.0273,
+            "class_tool": 0.8086,
+            "class_vehicle": 3.0195
+          }
+        },
+        {
+          "obj": "pear",
+          "condition": "affirmative",
+          "target_logit": 5.1445,
+          "margin": 1.2246,
+          "family_logits": {
+            "class_fruit": 5.1445,
+            "class_animal": 3.3945,
+            "class_tool": 2.5,
+            "class_vehicle": 3.9199
+          }
+        },
+        {
+          "obj": "pear",
+          "condition": "negation",
+          "target_logit": 2.6348,
+          "margin": 0.2681,
+          "family_logits": {
+            "class_fruit": 2.6348,
+            "class_animal": 1.5732,
+            "class_tool": 0.7021,
+            "class_vehicle": 2.3667
+          }
+        },
+        {
+          "obj": "peach",
+          "condition": "affirmative",
+          "target_logit": 4.7441,
+          "margin": 1.7011,
+          "family_logits": {
+            "class_fruit": 4.7441,
+            "class_animal": 3.043,
+            "class_tool": 1.4326,
+            "class_vehicle": 2.665
+          }
+        },
+        {
+          "obj": "peach",
+          "condition": "negation",
+          "target_logit": 1.9863,
+          "margin": 0.3886,
+          "family_logits": {
+            "class_fruit": 1.9863,
+            "class_animal": 1.2085,
+            "class_tool": -0.0786,
+            "class_vehicle": 1.5977
+          }
+        },
+        {
+          "obj": "lemon",
+          "condition": "affirmative",
+          "target_logit": 5.5312,
+          "margin": 0.6132,
+          "family_logits": {
+            "class_fruit": 5.5312,
+            "class_animal": 3.5195,
+            "class_tool": 3.4961,
+            "class_vehicle": 4.918
+          }
+        },
+        {
+          "obj": "lemon",
+          "condition": "negation",
+          "target_logit": 4.3057,
+          "margin": 0.5733,
+          "family_logits": {
+            "class_fruit": 4.3057,
+            "class_animal": 3.0938,
+            "class_tool": 1.8682,
+            "class_vehicle": 3.7324
+          }
+        },
+        {
+          "obj": "mango",
+          "condition": "affirmative",
+          "target_logit": 5.0508,
+          "margin": 1.918,
+          "family_logits": {
+            "class_fruit": 5.0508,
+            "class_animal": 3.1328,
+            "class_tool": 1.8613,
+            "class_vehicle": 3.1289
+          }
+        },
+        {
+          "obj": "mango",
+          "condition": "negation",
+          "target_logit": 4.0254,
+          "margin": 0.7656,
+          "family_logits": {
+            "class_fruit": 4.0254,
+            "class_animal": 2.916,
+            "class_tool": 1.3071,
+            "class_vehicle": 3.2598
+          }
+        }
+      ],
+      "affirmative_margin": 1.1513,
+      "negation_margin": 0.5919,
+      "margin_change": -0.5594,
+      "affirmative_target": 5.029,
+      "negation_target": 3.7325
+    },
+    "animal": {
+      "objects": [
+        {
+          "obj": "dog",
+          "condition": "affirmative",
+          "target_logit": 4.9336,
+          "margin": 0.7422,
+          "family_logits": {
+            "class_animal": 4.9336,
+            "class_fruit": 1.252,
+            "class_tool": 2.2402,
+            "class_vehicle": 4.1914
+          }
+        },
+        {
+          "obj": "dog",
+          "condition": "negation",
+          "target_logit": 4.4062,
+          "margin": -0.2969,
+          "family_logits": {
+            "class_animal": 4.4062,
+            "class_fruit": 1.6416,
+            "class_tool": 1.8652,
+            "class_vehicle": 4.7031
+          }
+        },
+        {
+          "obj": "cat",
+          "condition": "affirmative",
+          "target_logit": 5.6641,
+          "margin": 1.0782,
+          "family_logits": {
+            "class_animal": 5.6641,
+            "class_fruit": 2.3213,
+            "class_tool": 1.877,
+            "class_vehicle": 4.5859
+          }
+        },
+        {
+          "obj": "cat",
+          "condition": "negation",
+          "target_logit": 5.0625,
+          "margin": 0.1719,
+          "family_logits": {
+            "class_animal": 5.0625,
+            "class_fruit": 2.4771,
+            "class_tool": 2.4902,
+            "class_vehicle": 4.8906
+          }
+        },
+        {
+          "obj": "horse",
+          "condition": "affirmative",
+          "target_logit": 5.4688,
+          "margin": 1.6055,
+          "family_logits": {
+            "class_animal": 5.4688,
+            "class_fruit": 1.6635,
+            "class_tool": 1.8135,
+            "class_vehicle": 3.8633
+          }
+        },
+        {
+          "obj": "horse",
+          "condition": "negation",
+          "target_logit": 4.7188,
+          "margin": 0.25,
+          "family_logits": {
+            "class_animal": 4.7188,
+            "class_fruit": 1.6094,
+            "class_tool": 1.7891,
+            "class_vehicle": 4.4688
+          }
+        },
+        {
+          "obj": "lion",
+          "condition": "affirmative",
+          "target_logit": 4.4609,
+          "margin": 3.2553,
+          "family_logits": {
+            "class_animal": 4.4609,
+            "class_fruit": 0.6716,
+            "class_tool": -1.0459,
+            "class_vehicle": 1.2056
+          }
+        },
+        {
+          "obj": "lion",
+          "condition": "negation",
+          "target_logit": 4.3008,
+          "margin": 2.7849,
+          "family_logits": {
+            "class_animal": 4.3008,
+            "class_fruit": 1.1797,
+            "class_tool": -1.6084,
+            "class_vehicle": 1.5159
+          }
+        },
+        {
+          "obj": "bear",
+          "condition": "affirmative",
+          "target_logit": 5.875,
+          "margin": 2.3721,
+          "family_logits": {
+            "class_animal": 5.875,
+            "class_fruit": 1.7363,
+            "class_tool": 0.5493,
+            "class_vehicle": 3.5029
+          }
+        },
+        {
+          "obj": "bear",
+          "condition": "negation",
+          "target_logit": 5.1914,
+          "margin": 1.5664,
+          "family_logits": {
+            "class_animal": 5.1914,
+            "class_fruit": 2.3789,
+            "class_tool": 0.4768,
+            "class_vehicle": 3.625
+          }
+        },
+        {
+          "obj": "rabbit",
+          "condition": "affirmative",
+          "target_logit": 5.5781,
+          "margin": 1.5547,
+          "family_logits": {
+            "class_animal": 5.5781,
+            "class_fruit": 2.8916,
+            "class_tool": 0.6743,
+            "class_vehicle": 4.0234
+          }
+        },
+        {
+          "obj": "rabbit",
+          "condition": "negation",
+          "target_logit": 4.4922,
+          "margin": 1.2617,
+          "family_logits": {
+            "class_animal": 4.4922,
+            "class_fruit": 2.9575,
+            "class_tool": -0.3418,
+            "class_vehicle": 3.2305
+          }
+        },
+        {
+          "obj": "cow",
+          "condition": "affirmative",
+          "target_logit": 5.6094,
+          "margin": 1.5508,
+          "family_logits": {
+            "class_animal": 5.6094,
+            "class_fruit": 3.1855,
+            "class_tool": 2.4629,
+            "class_vehicle": 4.0586
+          }
+        },
+        {
+          "obj": "cow",
+          "condition": "negation",
+          "target_logit": 5.1875,
+          "margin": 0.1094,
+          "family_logits": {
+            "class_animal": 5.1875,
+            "class_fruit": 3.4961,
+            "class_tool": 2.8008,
+            "class_vehicle": 5.0781
+          }
+        },
+        {
+          "obj": "tiger",
+          "condition": "affirmative",
+          "target_logit": 4.4492,
+          "margin": 2.5249,
+          "family_logits": {
+            "class_animal": 4.4492,
+            "class_fruit": 0.8506,
+            "class_tool": -0.8267,
+            "class_vehicle": 1.9243
+          }
+        },
+        {
+          "obj": "tiger",
+          "condition": "negation",
+          "target_logit": 4.0312,
+          "margin": 1.4609,
+          "family_logits": {
+            "class_animal": 4.0312,
+            "class_fruit": 1.3252,
+            "class_tool": -0.5664,
+            "class_vehicle": 2.5703
+          }
+        }
+      ],
+      "affirmative_margin": 1.8355,
+      "negation_margin": 0.9135,
+      "margin_change": -0.922,
+      "affirmative_target": 5.2549,
+      "negation_target": 4.6738
+    },
+    "tool": {
+      "objects": [
+        {
+          "obj": "hammer",
+          "condition": "affirmative",
+          "target_logit": 4.5625,
+          "margin": 1.2734,
+          "family_logits": {
+            "class_tool": 4.5625,
+            "class_fruit": 1.085,
+            "class_animal": 3.1797,
+            "class_vehicle": 3.2891
+          }
+        },
+        {
+          "obj": "hammer",
+          "condition": "negation",
+          "target_logit": 4.4336,
+          "margin": 0.9063,
+          "family_logits": {
+            "class_tool": 4.4336,
+            "class_fruit": 1.4355,
+            "class_animal": 2.8633,
+            "class_vehicle": 3.5273
+          }
+        },
+        {
+          "obj": "knife",
+          "condition": "affirmative",
+          "target_logit": 4.8047,
+          "margin": 2.169,
+          "family_logits": {
+            "class_tool": 4.8047,
+            "class_fruit": 1.1543,
+            "class_animal": 2.416,
+            "class_vehicle": 2.6357
+          }
+        },
+        {
+          "obj": "knife",
+          "condition": "negation",
+          "target_logit": 4.9492,
+          "margin": 1.9726,
+          "family_logits": {
+            "class_tool": 4.9492,
+            "class_fruit": 1.2949,
+            "class_animal": 2.2397,
+            "class_vehicle": 2.9766
+          }
+        },
+        {
+          "obj": "wrench",
+          "condition": "affirmative",
+          "target_logit": 5.1875,
+          "margin": 1.9629,
+          "family_logits": {
+            "class_tool": 5.1875,
+            "class_fruit": 0.7129,
+            "class_animal": 2.6328,
+            "class_vehicle": 3.2246
+          }
+        },
+        {
+          "obj": "wrench",
+          "condition": "negation",
+          "target_logit": 5.0547,
+          "margin": 1.3828,
+          "family_logits": {
+            "class_tool": 5.0547,
+            "class_fruit": 1.043,
+            "class_animal": 2.1182,
+            "class_vehicle": 3.6719
+          }
+        },
+        {
+          "obj": "saw",
+          "condition": "affirmative",
+          "target_logit": 4.9609,
+          "margin": 2.0879,
+          "family_logits": {
+            "class_tool": 4.9609,
+            "class_fruit": 1.4485,
+            "class_animal": 2.7441,
+            "class_vehicle": 2.873
+          }
+        },
+        {
+          "obj": "saw",
+          "condition": "negation",
+          "target_logit": 4.8086,
+          "margin": 1.543,
+          "family_logits": {
+            "class_tool": 4.8086,
+            "class_fruit": 1.91,
+            "class_animal": 2.6738,
+            "class_vehicle": 3.2656
+          }
+        },
+        {
+          "obj": "drill",
+          "condition": "affirmative",
+          "target_logit": 4.543,
+          "margin": 0.9981,
+          "family_logits": {
+            "class_tool": 4.543,
+            "class_fruit": 1.2227,
+            "class_animal": 3.0156,
+            "class_vehicle": 3.5449
+          }
+        },
+        {
+          "obj": "drill",
+          "condition": "negation",
+          "target_logit": 4.25,
+          "margin": 0.8105,
+          "family_logits": {
+            "class_tool": 4.25,
+            "class_fruit": 1.2627,
+            "class_animal": 2.3906,
+            "class_vehicle": 3.4395
+          }
+        },
+        {
+          "obj": "axe",
+          "condition": "affirmative",
+          "target_logit": 4.3711,
+          "margin": 1.959,
+          "family_logits": {
+            "class_tool": 4.3711,
+            "class_fruit": 0.644,
+            "class_animal": 2.3301,
+            "class_vehicle": 2.4121
+          }
+        },
+        {
+          "obj": "axe",
+          "condition": "negation",
+          "target_logit": 4.7656,
+          "margin": 2.3447,
+          "family_logits": {
+            "class_tool": 4.7656,
+            "class_fruit": 1.1588,
+            "class_animal": 2.4043,
+            "class_vehicle": 2.4209
+          }
+        },
+        {
+          "obj": "shovel",
+          "condition": "affirmative",
+          "target_logit": 4.1094,
+          "margin": 1.75,
+          "family_logits": {
+            "class_tool": 4.1094,
+            "class_fruit": 0.5073,
+            "class_animal": 1.8555,
+            "class_vehicle": 2.3594
+          }
+        },
+        {
+          "obj": "shovel",
+          "condition": "negation",
+          "target_logit": 4.4805,
+          "margin": 1.6534,
+          "family_logits": {
+            "class_tool": 4.4805,
+            "class_fruit": 1.4639,
+            "class_animal": 2.4434,
+            "class_vehicle": 2.8271
+          }
+        },
+        {
+          "obj": "scissors",
+          "condition": "affirmative",
+          "target_logit": 5.0,
+          "margin": 1.4062,
+          "family_logits": {
+            "class_tool": 5.0,
+            "class_fruit": 0.927,
+            "class_animal": 2.6367,
+            "class_vehicle": 3.5938
+          }
+        },
+        {
+          "obj": "scissors",
+          "condition": "negation",
+          "target_logit": 5.1797,
+          "margin": 1.293,
+          "family_logits": {
+            "class_tool": 5.1797,
+            "class_fruit": 1.6353,
+            "class_animal": 2.6934,
+            "class_vehicle": 3.8867
+          }
+        }
+      ],
+      "affirmative_margin": 1.7008,
+      "negation_margin": 1.4883,
+      "margin_change": -0.2125,
+      "affirmative_target": 4.6924,
+      "negation_target": 4.7402
+    },
+    "vehicle": {
+      "objects": [
+        {
+          "obj": "car",
+          "condition": "affirmative",
+          "target_logit": 6.4062,
+          "margin": 2.875,
+          "family_logits": {
+            "class_vehicle": 6.4062,
+            "class_fruit": 2.7896,
+            "class_animal": 3.5312,
+            "class_tool": 2.998
+          }
+        },
+        {
+          "obj": "car",
+          "condition": "negation",
+          "target_logit": 6.4375,
+          "margin": 3.668,
+          "family_logits": {
+            "class_vehicle": 6.4375,
+            "class_fruit": 1.5684,
+            "class_animal": 2.7695,
+            "class_tool": 2.3457
+          }
+        },
+        {
+          "obj": "bus",
+          "condition": "affirmative",
+          "target_logit": 7.1875,
+          "margin": 2.5156,
+          "family_logits": {
+            "class_vehicle": 7.1875,
+            "class_fruit": 2.1523,
+            "class_animal": 4.6719,
+            "class_tool": 3.8789
+          }
+        },
+        {
+          "obj": "bus",
+          "condition": "negation",
+          "target_logit": 6.4453,
+          "margin": 3.3398,
+          "family_logits": {
+            "class_vehicle": 6.4453,
+            "class_fruit": 1.5566,
+            "class_animal": 3.0039,
+            "class_tool": 3.1055
+          }
+        },
+        {
+          "obj": "bicycle",
+          "condition": "affirmative",
+          "target_logit": 5.7422,
+          "margin": 2.2695,
+          "family_logits": {
+            "class_vehicle": 5.7422,
+            "class_fruit": 0.5918,
+            "class_animal": 3.0176,
+            "class_tool": 3.4727
+          }
+        },
+        {
+          "obj": "bicycle",
+          "condition": "negation",
+          "target_logit": 6.7109,
+          "margin": 3.2109,
+          "family_logits": {
+            "class_vehicle": 6.7109,
+            "class_fruit": 0.8242,
+            "class_animal": 2.8984,
+            "class_tool": 3.5
+          }
+        },
+        {
+          "obj": "truck",
+          "condition": "affirmative",
+          "target_logit": 6.9453,
+          "margin": 2.5508,
+          "family_logits": {
+            "class_vehicle": 6.9453,
+            "class_fruit": 2.1348,
+            "class_animal": 4.3945,
+            "class_tool": 3.084
+          }
+        },
+        {
+          "obj": "truck",
+          "condition": "negation",
+          "target_logit": 6.5625,
+          "margin": 3.1719,
+          "family_logits": {
+            "class_vehicle": 6.5625,
+            "class_fruit": 2.1523,
+            "class_animal": 3.3906,
+            "class_tool": 2.0312
+          }
+        },
+        {
+          "obj": "train",
+          "condition": "affirmative",
+          "target_logit": 6.5625,
+          "margin": 2.9648,
+          "family_logits": {
+            "class_vehicle": 6.5625,
+            "class_fruit": 2.373,
+            "class_animal": 3.5977,
+            "class_tool": 3.0098
+          }
+        },
+        {
+          "obj": "train",
+          "condition": "negation",
+          "target_logit": 6.5156,
+          "margin": 3.332,
+          "family_logits": {
+            "class_vehicle": 6.5156,
+            "class_fruit": 1.3809,
+            "class_animal": 3.1836,
+            "class_tool": 2.6621
+          }
+        },
+        {
+          "obj": "boat",
+          "condition": "affirmative",
+          "target_logit": 6.2812,
+          "margin": 1.6601,
+          "family_logits": {
+            "class_vehicle": 6.2812,
+            "class_fruit": 4.1992,
+            "class_animal": 4.6211,
+            "class_tool": 3.1992
+          }
+        },
+        {
+          "obj": "boat",
+          "condition": "negation",
+          "target_logit": 5.4883,
+          "margin": 2.3633,
+          "family_logits": {
+            "class_vehicle": 5.4883,
+            "class_fruit": 2.0452,
+            "class_animal": 3.125,
+            "class_tool": 2.3516
+          }
+        },
+        {
+          "obj": "plane",
+          "condition": "affirmative",
+          "target_logit": 5.3672,
+          "margin": 1.0664,
+          "family_logits": {
+            "class_vehicle": 5.3672,
+            "class_fruit": 4.3008,
+            "class_animal": 4.0547,
+            "class_tool": 3.2461
+          }
+        },
+        {
+          "obj": "plane",
+          "condition": "negation",
+          "target_logit": 5.4922,
+          "margin": 1.4883,
+          "family_logits": {
+            "class_vehicle": 5.4922,
+            "class_fruit": 3.5186,
+            "class_animal": 4.0039,
+            "class_tool": 3.5156
+          }
+        },
+        {
+          "obj": "scooter",
+          "condition": "affirmative",
+          "target_logit": 6.2188,
+          "margin": 2.7696,
+          "family_logits": {
+            "class_vehicle": 6.2188,
+            "class_fruit": 1.3438,
+            "class_animal": 3.4492,
+            "class_tool": 3.2148
+          }
+        },
+        {
+          "obj": "scooter",
+          "condition": "negation",
+          "target_logit": 6.1172,
+          "margin": 3.2656,
+          "family_logits": {
+            "class_vehicle": 6.1172,
+            "class_fruit": 1.5645,
+            "class_animal": 2.8516,
+            "class_tool": 2.6836
+          }
+        }
+      ],
+      "affirmative_margin": 2.334,
+      "negation_margin": 2.98,
+      "margin_change": 0.646,
+      "affirmative_target": 6.3389,
+      "negation_target": 6.2212
+    }
+  }
+}

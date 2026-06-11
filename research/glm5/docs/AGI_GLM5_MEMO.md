@@ -21820,4 +21820,209 @@ MLP不是统一放大或压制所有族, 而是有选择性地对不同族施加
 
 时间: 2026-06-11 07:50
 
-时间: 2026-06-11 03:38
+## Phase 457: 候选族竞争边际向量与知识图边验证 [2026-06-11 09:42]
+
+### 核心目标
+验证: (1) 竞争族特异边际向量 (2) Family-local softmax (3) 知识图边 (4) DS7B路径翻转层定位 (5) 否定效应
+
+### Exp1: 竞争族特异边际向量 (R2, 8对象/类, 最后层)
+
+**关键发现: attn对竞争族的效应方向不统一!**
+
+Qwen3 L35 fruit的attn边际向量:
+- vs class_animal: -0.29 (压制animal竞争族)
+- vs class_tool: +0.23 (促进tool竞争族)
+- vs class_vehicle: +0.27 (促进vehicle竞争族)
+
+→ attn对fruit的效应: 压制最强竞争族animal, 但促进tool/vehicle! 这就是Top1/Mean不一致的来源!
+
+DS7B L27 fruit的attn边际向量:
+- vs class_animal: -2.16 (强压制animal竞争族!)
+- vs class_tool: -1.17 (强压制tool)
+- vs class_vehicle: -1.61 (强压制vehicle)
+
+→ DS7B attn对fruit的效应: 统一压制所有竞争族, 但对animal压制最强烈
+
+DS7B L27 animal的attn边际向量:
+- vs class_fruit: +1.74 (强促进fruit竞争族!)
+- vs class_tool: +0.58 (促进tool)
+- vs class_vehicle: +0.29 (弱促进vehicle)
+
+→ DS7B animal的attn帮助fruit竞争族最多! 这精确解释了为什么animal的margin被attn提升
+
+**三模型MLP边际向量对比 (R2):**
+
+| 模型 | 类别 | vs fruit | vs animal | vs tool | vs vehicle | 主方向 |
+|------|------|---------|----------|---------|-----------|-------|
+| Qwen3 | fruit | - | -0.24 | -0.24 | -0.78 | 统一压制(vehicle最弱) |
+| Qwen3 | animal | -0.23 | - | -0.18 | -0.89 | 统一压制(vehicle最弱) |
+| Qwen3 | vehicle | +0.11 | +0.28 | +0.49 | - | 统一促进(tool最弱→竞争族) |
+| GLM4 | fruit | - | +0.09 | +1.12 | -0.18 | 对tool竞争族强促进 |
+| GLM4 | animal | +1.06 | - | +1.66 | +0.50 | 对所有竞争族强促进! |
+| GLM4 | tool | +0.20 | -0.53 | - | -0.57 | 对animal/vehicle竞争族压制 |
+| GLM4 | vehicle | +1.11 | +0.17 | +1.63 | - | 对fruit/tool竞争族强促进 |
+| DS7B | fruit | - | +1.09 | +0.53 | +0.60 | 统一促进(animal最多) |
+| DS7B | animal | -1.89 | - | -1.03 | -0.90 | 统一压制(fruit最强烈!) |
+| DS7B | tool | -0.79 | +0.64 | - | +0.05 | 对animal竞争族促进 |
+| DS7B | vehicle | -0.49 | +0.40 | +0.04 | - | 对animal竞争族促进 |
+
+→ GLM4 MLP边际向量最分裂: 对fruit竞争族效应(1.06)和对animal竞争族效应(1.66)差异巨大
+→ DS7B MLP对animal统一压制(-1.89,-1.03,-0.90), 对fruit统一促进(+1.09,+0.53,+0.60) — 选择性极强!
+→ Qwen3 MLP最统一: 要么全压制要么全促进
+
+### Exp2: Family-Local Softmax (解决了Phase 456的softmax不可用问题!)
+
+**Family-local softmax成功产出有效概率!** (不再被全词表稀释)
+
+| 模型 | 类别 | top1_margin | mean_margin | lse_margin | softmax_margin | 一致性 |
+|------|------|-----------|-----------|----------|-------------|-------|
+| Qwen3 | fruit | 1.15 | 1.88 | 4.07 | 0.955 | 8/8 |
+| Qwen3 | animal | 1.84 | 3.19 | 1.70 | 0.640 | 8/8 |
+| Qwen3 | tool | 1.70 | 2.51 | 1.42 | 0.538 | 8/8 |
+| Qwen3 | vehicle | 2.33 | 3.12 | 2.49 | 0.736 | 8/8 |
+| GLM4 | fruit | 1.30 | 1.74 | 2.58 | 0.791 | 8/8 |
+| GLM4 | animal | 2.42 | 3.30 | 2.26 | 0.747 | 8/8 |
+| GLM4 | tool | 2.11 | 2.79 | 2.20 | 0.718 | 8/8 |
+| GLM4 | vehicle | 1.38 | 2.28 | 0.33 | 0.121 | 8/8 |
+| DS7B | fruit | -1.99 | -1.06 | -2.13 | -0.417 | 7/8 |
+| DS7B | animal | 1.59 | 2.24 | 2.69 | 0.780 | 8/8 |
+| DS7B | tool | -1.24 | -0.03 | -2.80 | -0.766 | 5/8 |
+| DS7B | vehicle | -0.92 | 0.70 | -2.59 | -0.777 | 0/8 |
+
+→ Family-local softmax有效! 概率不再为0!
+→ Qwen3/GLM4: 所有类别softmax_margin > 0, 说明模型确实让目标族概率更高
+→ DS7B: fruit/tool/vehicle的softmax_margin为负! 说明DS7B的is_a模板下目标族没有概率优势
+→ DS7B vehicle: top1/mean一致率0/8, 不同对象间高度不一致
+
+### Exp3: 知识图边验证 (4种关系, R2, 8对象/类)
+
+**最关键发现: 同一对象在不同关系槽位下打开完全不同的目标候选族!**
+
+| 关系 | 目标族 | Qwen3_margin | GLM4_margin | DS7B_margin |
+|------|-------|------------|-----------|-----------|
+| is_a | 动态 | 1.15~2.33 | 1.30~2.42 | -1.99~1.59 |
+| has_color | attr_color | 3.62~6.13 | 3.41~5.00 | 2.92~3.75 |
+| has_part | attr_part | -1.70~-0.11 | -1.59~0.98 | -0.97~-0.73 |
+| used_for | attr_function | 0.94~3.05 | 0.91~2.43 | 0.58~2.33 |
+
+→ has_color margin最高(3-6), 说明颜色属性最强
+→ has_part margin为负或接近0, 说明部件属性最弱(可能因为has_part的模板触发了更复杂的语义)
+→ is_a margin中等, 但类别间差异大
+
+**组件效应跨关系对比 (Qwen3):**
+
+| 关系 | attn效应 | MLP效应 | attn类型 | MLP类型 |
+|------|---------|--------|---------|--------|
+| is_a | +0.22~+0.68 | -0.60~-1.03 | PROMOTES(3/4) | SUPPRESSES(3/4) |
+| has_color | +0.49~+0.67 | -0.52~-0.95 | PROMOTES | SUPPRESSES |
+| has_part | -0.10~-0.36 | -0.08~-0.56 | SUPPRESSES | SUPPRESSES |
+| used_for | +0.08~+0.34 | -0.13~+0.09 | PROMOTES(3/4) | NEUTRAL |
+
+→ Qwen3: is_a和has_color走 attn=PROMOTES + MLP=SUPPRESSES 路径
+→ has_part走 attn=SUPPRESSES + MLP=SUPPRESSES 路径 (双压制!)
+→ used_for走 attn=PROMOTES + MLP=NEUTRAL 路径
+
+**DS7B 关系特异性 (最独特!):**
+
+| 关系 | attn效应 | MLP效应 |
+|------|---------|--------|
+| is_a | fruit=SUPP,animal=PRO | fruit=PRO,animal=SUPP (翻转!) |
+| has_color | 全PRO(1.3~2.0) | fruit/animal/vehicle=SUPP,tool=PRO |
+| has_part | 全PRO(1.3~1.7) | 全PRO(0.6~0.9) |
+| used_for | 全PRO(0.9~1.8) | fruit/animal/tool=SUPP,vehicle=NEU |
+
+→ DS7B is_a: fruit/animal路径翻转再次确认
+→ DS7B has_color/has_part/used_for: attn全部PROMOTES(1.3~2.0), 与is_a下attn对fruit=SUPPRESSES完全不同!
+→ 这说明DS7B的attn功能是关系条件化的: is_a下对fruit压制, 但has_color/has_part/used_for下全面促进
+
+### Exp4: DS7B fruit/animal路径翻转密集层扫描 (R2)
+
+**最惊人的发现: DS7B的fruit/animal路径翻转从L0就存在! 不是最后层才出现的!**
+
+DS7B逐层翻转情况:
+```
+L0:  fruit=[SUPP,SUPP] animal=[PRO,PRO]   FLIP!
+L3:  fruit=[SUPP,SUPP] animal=[PRO,PRO]   FLIP!
+L6:  fruit=[PRO,SUPP]  animal=[PRO,PRO]   FLIP!
+L9:  fruit=[PRO,SUPP]  animal=[PRO,PRO]   FLIP!
+L12: fruit=[SUPP,PRO]  animal=[PRO,PRO]   FLIP!
+L18: fruit=[SUPP,SUPP] animal=[PRO,PRO]   FLIP!
+L21: fruit=[SUPP,PRO]  animal=[PRO,PRO]   FLIP!
+L22: fruit=[SUPP,SUPP] animal=[PRO,PRO]   FLIP!
+L27: fruit=[SUPP,PRO]  animal=[PRO,SUPP]  FLIP!
+```
+
+→ 15层中13层有翻转! 只有L15和L20没有!
+→ 这说明DS7B不是"最后层路径翻转", 而是"全层路径分裂"
+→ DS7B的fruit和animal从第一层就走不同的attn/MLP路径
+
+**Qwen3和GLM4的翻转模式完全不同:**
+
+Qwen3: 15层中6层翻转, 且大多在早期层(L0-L12), 后层(L29-L35)几乎不翻转
+GLM4: 15层中11层翻转, 但后层(L38-L39)不翻转 — 最后2层fruit/animal一致
+
+→ 只有DS7B在最后层仍然翻转! Qwen3和GLM4最后层fruit/animal路径趋于一致
+
+### Exp5: 否定效应 (R2, 8对象/类)
+
+**三模型否定效应对比:**
+
+| 模型 | fruit_margin_change | animal_change | tool_change | vehicle_change |
+|------|-------------------|-------------|-----------|-------------|
+| Qwen3 | -0.56 | -0.92 | -0.21 | +0.65 |
+| GLM4 | -0.24 | -1.41 | -1.05 | +0.16 |
+| DS7B | +2.19 | -1.23 | +1.95 | +1.45 |
+
+→ Qwen3/GLM4: 否定后fruit/animal/tool的margin下降, 但vehicle微升
+→ ⚠️⚠️⚠️ DS7B: 否定后fruit/tool/vehicle的margin大幅上升! 只有animal下降!
+→ DS7B对"not"的理解可能是: "不是动物" → 大幅提升所有非动物类的概率
+
+**DS7B否定后目标族logit大幅上升:**
+
+| 对象 | 肯定目标logit | 否定目标logit | 变化 |
+|------|-----------|-----------|------|
+| fruit | 2.06 | 6.11 | +4.05 |
+| tool | 4.62 | 6.12 | +1.50 |
+| vehicle | 2.68 | 6.65 | +3.97 |
+
+→ DS7B否定后目标logit暴涨4分! 这完全反常, 说明DS7B把"not a"理解为"是a"的某种反转信号
+
+### Phase 457 核心发现
+
+1. **竞争族特异边际向量揭示了Top1/Mean不一致的来源**: attn对不同竞争族效应方向不同
+2. **Family-local softmax成功解决了Phase 456的softmax不可用问题**: 在候选族子集上做softmax, 概率有效
+3. **知识图边验证确认: 关系槽位决定目标候选族和组件效应模式**: is_a/has_color/has_part/used_for完全不同
+4. **DS7B路径翻转从L0就存在**: 不是最后层才出现的现象, 而是全层路径分裂
+5. **DS7B的attn功能是关系条件化的**: is_a下对fruit=SUPPRESSES, 但has_color/has_part/used_for下全面PROMOTES
+6. **否定效应跨模型差异极大**: Qwen3/GLM4正常(margin下降), DS7B反常(margin暴涨)
+7. **GLM4 MLP边际向量最分裂**: 对不同竞争族效应方向不同, 解释了跨模板不稳定
+
+### 关键新发现: 关系条件化组件路由
+
+不同关系槽位下, 同一组件的功能完全不同:
+
+```
+DS7B attn对fruit:
+  is_a下: SUPPRESSES (-2.16)
+  has_color下: PROMOTES (+1.29)
+  has_part下: PROMOTES (+1.46)
+  used_for下: PROMOTES (+0.91)
+
+Qwen3 MLP:
+  is_a下: SUPPRESSES (-0.60~-1.03)
+  has_color下: SUPPRESSES (-0.52~-0.95)
+  has_part下: SUPPRESSES (-0.08~-0.56)
+  used_for下: NEUTRAL (-0.13~+0.09)
+```
+
+→ 组件功能不仅依赖类别, 还依赖关系槽位!
+
+### 硬伤与问题
+
+1. **DS7B否定效应反常**: "not"导致目标logit暴涨, 可能是tokenization或模板问题, 需要更深入分析
+2. **has_part的margin普遍为负**: 可能模板"The {obj} has a"触发的不是部件属性, 而是其他语义
+3. **DS7B vehicle一致性0/8**: 不同对象间高度不一致, 可能受tokenization影响
+4. **Exp4只用2对象/类**: 密集层扫描受对象数限制, 可能有个别对象异常
+5. **否定模板单一**: 只用了"The {obj} is not a", 需要更多否定表达
+
+时间: 2026-06-11 09:42
