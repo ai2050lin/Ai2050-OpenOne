@@ -1,0 +1,675 @@
+{
+  "model": "glm4",
+  "round": 1,
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096,
+    "mlp_type": "merged_gate_up"
+  },
+  "exp1": {
+    "ablation_results": {
+      "L0": {
+        "zero_attn": {
+          "cat_delta": 0.7188,
+          "color_delta": -0.4466
+        },
+        "zero_mlp": {
+          "cat_delta": -4.9531,
+          "color_delta": -2.0729
+        },
+        "zero_attn_shared_inj_cat": 3.1848,
+        "zero_mlp_shared_inj_cat": 4.1406
+      },
+      "L10": {
+        "zero_attn": {
+          "cat_delta": 0.0781,
+          "color_delta": -0.082
+        },
+        "zero_mlp": {
+          "cat_delta": -0.3516,
+          "color_delta": -0.0885
+        },
+        "zero_attn_shared_inj_cat": 2.4532,
+        "zero_mlp_shared_inj_cat": 3.0495
+      },
+      "L19": {
+        "zero_attn": {
+          "cat_delta": -0.013,
+          "color_delta": -0.0905
+        },
+        "zero_mlp": {
+          "cat_delta": -0.0339,
+          "color_delta": -0.5444
+        },
+        "zero_attn_shared_inj_cat": 2.1302,
+        "zero_mlp_shared_inj_cat": 2.0443
+      },
+      "L20": {
+        "zero_attn": {
+          "cat_delta": 0.0833,
+          "color_delta": 0.0326
+        },
+        "zero_mlp": {
+          "cat_delta": 0.0026,
+          "color_delta": 0.1745
+        },
+        "zero_attn_shared_inj_cat": 1.3568,
+        "zero_mlp_shared_inj_cat": 1.1016
+      },
+      "L21": {
+        "zero_attn": {
+          "cat_delta": -0.1146,
+          "color_delta": 0.0625
+        },
+        "zero_mlp": {
+          "cat_delta": -0.0208,
+          "color_delta": -0.3932
+        },
+        "zero_attn_shared_inj_cat": 1.9688,
+        "zero_mlp_shared_inj_cat": 1.2942
+      },
+      "L22": {
+        "zero_attn": {
+          "cat_delta": -0.0677,
+          "color_delta": 0.1836
+        },
+        "zero_mlp": {
+          "cat_delta": -0.0182,
+          "color_delta": 0.0267
+        },
+        "zero_attn_shared_inj_cat": 1.5859,
+        "zero_mlp_shared_inj_cat": 1.2096
+      },
+      "L23": {
+        "zero_attn": {
+          "cat_delta": -0.1224,
+          "color_delta": -0.1432
+        },
+        "zero_mlp": {
+          "cat_delta": -0.2969,
+          "color_delta": 0.1868
+        },
+        "zero_attn_shared_inj_cat": 1.6458,
+        "zero_mlp_shared_inj_cat": 1.5938
+      },
+      "L24": {
+        "zero_attn": {
+          "cat_delta": -0.0052,
+          "color_delta": 0.1009
+        },
+        "zero_mlp": {
+          "cat_delta": 0.4193,
+          "color_delta": -0.237
+        },
+        "zero_attn_shared_inj_cat": -0.7933,
+        "zero_mlp_shared_inj_cat": -2.2539
+      },
+      "L25": {
+        "zero_attn": {
+          "cat_delta": 0.1055,
+          "color_delta": 0.2422
+        },
+        "zero_mlp": {
+          "cat_delta": -0.1302,
+          "color_delta": 0.291
+        },
+        "zero_attn_shared_inj_cat": -0.896,
+        "zero_mlp_shared_inj_cat": -1.9961
+      },
+      "L26": {
+        "zero_attn": {
+          "cat_delta": 0.3281,
+          "color_delta": -0.1585
+        },
+        "zero_mlp": {
+          "cat_delta": -0.2604,
+          "color_delta": -0.4258
+        },
+        "zero_attn_shared_inj_cat": -1.539,
+        "zero_mlp_shared_inj_cat": -2.1992
+      },
+      "L27": {
+        "zero_attn": {
+          "cat_delta": -0.3542,
+          "color_delta": -0.3118
+        },
+        "zero_mlp": {
+          "cat_delta": 0.1354,
+          "color_delta": 0.1029
+        },
+        "zero_attn_shared_inj_cat": -1.9788,
+        "zero_mlp_shared_inj_cat": -3.4552
+      },
+      "L28": {
+        "zero_attn": {
+          "cat_delta": -0.0495,
+          "color_delta": 0.1003
+        },
+        "zero_mlp": {
+          "cat_delta": 0.6095,
+          "color_delta": 0.964
+        },
+        "zero_attn_shared_inj_cat": -1.817,
+        "zero_mlp_shared_inj_cat": -3.771
+      }
+    },
+    "base_logits": {
+      "cat": 1.4635,
+      "color": -0.7031
+    },
+    "baseline_shared_injection": {
+      "L0": 2.5078,
+      "L10": 2.7214,
+      "L19": 2.1276,
+      "L20": 1.5677,
+      "L21": 1.9635,
+      "L22": 1.6641,
+      "L23": 1.4818,
+      "L24": -0.291,
+      "L25": -0.9091,
+      "L26": -1.431,
+      "L27": -2.0114,
+      "L28": -1.6315
+    }
+  },
+  "exp2": {
+    "fruit": {
+      "L0": {
+        "shared": {
+          "category": 2.5859,
+          "color": 0.7627,
+          "taste": -0.6882,
+          "part": -0.4248
+        },
+        "private": {
+          "category": -0.0078,
+          "color": -0.0143,
+          "taste": 0.0059,
+          "part": -0.0225
+        },
+        "shared+private": {
+          "category": 2.5755,
+          "color": 0.7559,
+          "taste": -0.6986,
+          "part": -0.4482
+        }
+      },
+      "L6": {
+        "shared": {
+          "category": 2.6198,
+          "color": 1.7948,
+          "taste": 1.1794,
+          "part": 0.5186
+        },
+        "private": {
+          "category": -0.2708,
+          "color": -0.276,
+          "taste": -0.2168,
+          "part": -0.0879
+        },
+        "shared+private": {
+          "category": 3.0391,
+          "color": 2.3535,
+          "taste": 0.9674,
+          "part": 0.8649
+        }
+      },
+      "L13": {
+        "shared": {
+          "category": 3.375,
+          "color": 2.0137,
+          "taste": 0.0078,
+          "part": -0.4144
+        },
+        "private": {
+          "category": 0.1719,
+          "color": -0.0501,
+          "taste": -0.1159,
+          "part": 0.0726
+        },
+        "shared+private": {
+          "category": 3.651,
+          "color": 0.6566,
+          "taste": -0.0609,
+          "part": -1.075
+        }
+      },
+      "L20": {
+        "shared": {
+          "category": 1.2656,
+          "color": 0.5732,
+          "taste": 0.6556,
+          "part": -0.6175
+        },
+        "private": {
+          "category": 0.2057,
+          "color": 0.4245,
+          "taste": -0.0247,
+          "part": -0.2585
+        },
+        "shared+private": {
+          "category": 2.2109,
+          "color": 0.438,
+          "taste": 0.4776,
+          "part": -1.4271
+        }
+      },
+      "L26": {
+        "shared": {
+          "category": -1.2005,
+          "color": -1.752,
+          "taste": -0.0566,
+          "part": -0.891
+        },
+        "private": {
+          "category": 0.2083,
+          "color": 0.3789,
+          "taste": -0.6576,
+          "part": -0.8467
+        },
+        "shared+private": {
+          "category": 0.2357,
+          "color": -1.4987,
+          "taste": -0.1107,
+          "part": -2.5029
+        }
+      },
+      "L33": {
+        "shared": {
+          "category": -2.5755,
+          "color": -1.3154,
+          "taste": 0.1676,
+          "part": -0.8675
+        },
+        "private": {
+          "category": 0.2754,
+          "color": -0.3099,
+          "taste": -1.3796,
+          "part": -1.2061
+        },
+        "shared+private": {
+          "category": -1.0117,
+          "color": -0.4251,
+          "taste": -0.2331,
+          "part": -1.7087
+        }
+      },
+      "L38": {
+        "shared": {
+          "category": 1.0026,
+          "color": -0.582,
+          "taste": -0.7109,
+          "part": -1.0967
+        },
+        "private": {
+          "category": 0.1068,
+          "color": -0.6458,
+          "taste": -1.0013,
+          "part": -1.5771
+        },
+        "shared+private": {
+          "category": 0.8464,
+          "color": -1.0942,
+          "taste": -1.3249,
+          "part": -2.335
+        }
+      },
+      "L39": {
+        "shared": {
+          "category": 2.4271,
+          "color": 1.0501,
+          "taste": 0.1354,
+          "part": 0.8695
+        },
+        "private": {
+          "category": 0.0521,
+          "color": -0.8828,
+          "taste": -1.23,
+          "part": -2.055
+        },
+        "shared+private": {
+          "category": 2.2656,
+          "color": 0.3698,
+          "taste": -0.7419,
+          "part": -0.641
+        }
+      }
+    },
+    "animal": {
+      "L0": {
+        "shared": {
+          "category": -0.2624,
+          "color": 0.3828,
+          "part": 4.2435,
+          "habitat": 1.3854
+        },
+        "private": {
+          "category": -0.0156,
+          "color": 0.0156,
+          "part": -0.0156,
+          "habitat": -0.0143
+        },
+        "shared+private": {
+          "category": -0.196,
+          "color": 0.4714,
+          "part": 4.2943,
+          "habitat": 1.3711
+        }
+      },
+      "L6": {
+        "shared": {
+          "category": -0.6243,
+          "color": 1.1214,
+          "part": 2.3669,
+          "habitat": 1.6022
+        },
+        "private": {
+          "category": 0.1283,
+          "color": -0.2604,
+          "part": -0.2005,
+          "habitat": -0.1582
+        },
+        "shared+private": {
+          "category": 0.7754,
+          "color": 1.4769,
+          "part": 2.6061,
+          "habitat": 1.9408
+        }
+      },
+      "L13": {
+        "shared": {
+          "category": -2.5052,
+          "color": 0.1641,
+          "part": 3.8906,
+          "habitat": 1.8219
+        },
+        "private": {
+          "category": 0.2988,
+          "color": 0.0156,
+          "part": -0.1432,
+          "habitat": -0.2415
+        },
+        "shared+private": {
+          "category": -2.8717,
+          "color": 0.4252,
+          "part": 2.3307,
+          "habitat": 2.1634
+        }
+      },
+      "L20": {
+        "shared": {
+          "category": 0.321,
+          "color": -0.1719,
+          "part": 2.2037,
+          "habitat": 2.9206
+        },
+        "private": {
+          "category": 0.6921,
+          "color": 0.7227,
+          "part": 0.2611,
+          "habitat": -0.2773
+        },
+        "shared+private": {
+          "category": -0.3145,
+          "color": 1.0,
+          "part": 0.8828,
+          "habitat": 4.0475
+        }
+      },
+      "L26": {
+        "shared": {
+          "category": -3.7962,
+          "color": -0.7541,
+          "part": 1.5391,
+          "habitat": 4.9095
+        },
+        "private": {
+          "category": 0.6536,
+          "color": -0.2135,
+          "part": -0.0495,
+          "habitat": -0.5046
+        },
+        "shared+private": {
+          "category": -4.6608,
+          "color": -0.9798,
+          "part": 0.5391,
+          "habitat": 4.5918
+        }
+      },
+      "L33": {
+        "shared": {
+          "category": -5.9733,
+          "color": -0.3333,
+          "part": 0.9766,
+          "habitat": 4.7168
+        },
+        "private": {
+          "category": 0.5254,
+          "color": -1.112,
+          "part": -1.8828,
+          "habitat": -0.2103
+        },
+        "shared+private": {
+          "category": -4.0169,
+          "color": -0.3151,
+          "part": -0.4661,
+          "habitat": 5.0684
+        }
+      },
+      "L38": {
+        "shared": {
+          "category": -4.2962,
+          "color": 0.0299,
+          "part": 2.3724,
+          "habitat": 2.0316
+        },
+        "private": {
+          "category": 1.2533,
+          "color": -1.2474,
+          "part": -2.6797,
+          "habitat": -0.3229
+        },
+        "shared+private": {
+          "category": -2.4056,
+          "color": -0.5254,
+          "part": -0.3099,
+          "habitat": 2.2858
+        }
+      },
+      "L39": {
+        "shared": {
+          "category": -1.4286,
+          "color": 2.625,
+          "part": 4.7865,
+          "habitat": 3.5553
+        },
+        "private": {
+          "category": 1.7454,
+          "color": -1.0964,
+          "part": -3.2943,
+          "habitat": -0.2702
+        },
+        "shared+private": {
+          "category": -0.1914,
+          "color": 1.7266,
+          "part": 2.2891,
+          "habitat": 3.1673
+        }
+      }
+    },
+    "tool": {
+      "L0": {
+        "shared": {
+          "category": -0.7467,
+          "color": 1.5334,
+          "part": 0.2454,
+          "material": 1.0849
+        },
+        "private": {
+          "category": 0.0286,
+          "color": 0.0339,
+          "part": 0.0579,
+          "material": 0.0469
+        },
+        "shared+private": {
+          "category": -0.6979,
+          "color": 1.4949,
+          "part": 0.2689,
+          "material": 1.075
+        }
+      },
+      "L6": {
+        "shared": {
+          "category": -0.3275,
+          "color": 2.5443,
+          "part": -0.5213,
+          "material": 2.1927
+        },
+        "private": {
+          "category": -0.2747,
+          "color": -0.151,
+          "part": -0.2988,
+          "material": -0.026
+        },
+        "shared+private": {
+          "category": -0.3776,
+          "color": 2.4714,
+          "part": -0.7048,
+          "material": 2.1501
+        }
+      },
+      "L13": {
+        "shared": {
+          "category": -0.8496,
+          "color": 1.9883,
+          "part": -1.1211,
+          "material": 1.3047
+        },
+        "private": {
+          "category": -0.4701,
+          "color": -0.1094,
+          "part": -0.3682,
+          "material": 0.224
+        },
+        "shared+private": {
+          "category": 0.4193,
+          "color": 2.6276,
+          "part": -1.6862,
+          "material": 1.6777
+        }
+      },
+      "L20": {
+        "shared": {
+          "category": -1.2155,
+          "color": 1.739,
+          "part": -0.4785,
+          "material": 1.0645
+        },
+        "private": {
+          "category": 0.1504,
+          "color": 0.2786,
+          "part": 0.5189,
+          "material": 0.6224
+        },
+        "shared+private": {
+          "category": 0.1732,
+          "color": 2.1576,
+          "part": -0.8109,
+          "material": 1.8698
+        }
+      },
+      "L26": {
+        "shared": {
+          "category": -0.4909,
+          "color": 0.2806,
+          "part": -2.347,
+          "material": 0.1868
+        },
+        "private": {
+          "category": 0.0872,
+          "color": -0.1589,
+          "part": 0.0878,
+          "material": 0.7995
+        },
+        "shared+private": {
+          "category": 2.0221,
+          "color": 0.3841,
+          "part": -3.4069,
+          "material": 1.1497
+        }
+      },
+      "L33": {
+        "shared": {
+          "category": -1.3675,
+          "color": 1.3177,
+          "part": -1.5436,
+          "material": 1.3529
+        },
+        "private": {
+          "category": 0.2943,
+          "color": 0.1263,
+          "part": -1.7559,
+          "material": 1.4779
+        },
+        "shared+private": {
+          "category": -2.4935,
+          "color": 2.0677,
+          "part": -5.3027,
+          "material": 1.9036
+        }
+      },
+      "L38": {
+        "shared": {
+          "category": -1.6465,
+          "color": 2.431,
+          "part": -0.638,
+          "material": 2.3971
+        },
+        "private": {
+          "category": 1.4362,
+          "color": 0.2839,
+          "part": -0.6803,
+          "material": 0.9349
+        },
+        "shared+private": {
+          "category": -0.9674,
+          "color": 1.8229,
+          "part": -1.9069,
+          "material": 2.2552
+        }
+      },
+      "L39": {
+        "shared": {
+          "category": -1.0117,
+          "color": 3.5132,
+          "part": 0.0566,
+          "material": 3.5052
+        },
+        "private": {
+          "category": 1.7799,
+          "color": -0.0312,
+          "part": -0.9434,
+          "material": 0.3229
+        },
+        "shared+private": {
+          "category": -0.0885,
+          "color": 3.6771,
+          "part": -0.6439,
+          "material": 3.8828
+        }
+      }
+    }
+  },
+  "exp3": {
+    "target_layers": [
+      0,
+      10,
+      20,
+      30,
+      38,
+      39
+    ],
+    "projection_results": {}
+  }
+}

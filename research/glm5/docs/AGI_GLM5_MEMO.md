@@ -20503,3 +20503,1321 @@ DS7B对比: 只有L0为负(-1.15),L5之后都为正。
 5. **对象替换控制是通用现象** — 所有模型替换对象后属性都下降,GLM4最强
 
 时间: 2026-06-10 13:10
+
+
+## Phase 450: 反转门控定位 + Shared/Private双通道功能分离 + MLP输出级消融 [2026-06-10 21:37]
+
+### 核心实验
+
+1. **Exp1: 组件路径消融定位反转门控** — 在GLM4 L19-L28逐层消融attn/MLP,注入shared测效应
+2. **Exp2: Shared/Private双通道功能分离** — 3类(fruit/animal/tool),8个采样层,测6个属性维度
+3. **Exp3: MLP输出级消融(修复版)** — 有bug,MLP输出是单tensor非tuple,导致0捕获(待修)
+
+### 技术修复: device_map="auto"深层注入
+
+v2脚本在GLM4/DS7B深层(L19+)注入失败,因为get_layer_device()对CPU offload层返回"meta"设备。
+v3修复: 注入tensor不指定device,在hook内部通过vec.to(out.device)动态转移。
+
+验证结果: GLM4 L0-18在GPU,L19-39在CPU; v3修复后所有层注入成功。
+
+### Exp1 核心发现: GLM4 L24反转门控定位
+
+**GLM4 baseline shared→cat (无消融):**
+
+| Layer | shared→cat |
+|-------|-----------|
+| L0  | +2.508 |
+| L10 | +2.721 |
+| L19 | +2.128 |
+| L20 | +1.568 |
+| L21 | +1.964 |
+| L22 | +1.664 |
+| L23 | +1.482 |
+| **L24** | **-0.291** |
+| **L25** | **-0.909** |
+| **L26** | **-1.431** |
+| **L27** | **-2.011** |
+| L28 | -1.632 |
+
+**GLM4 消融attn/MLP后shared→cat:**
+
+| Layer | clean | +zero_attn | +zero_mlp |
+|-------|-------|------------|------------|
+| L23 | +1.482 | +1.646 | +1.594 |
+| **L24** | **-0.291** | **-0.793** | **-2.254** |
+| **L25** | **-0.909** | **-0.896** | **-1.996** |
+| **L26** | **-1.431** | **-1.539** | **-2.199** |
+| **L27** | **-2.011** | **-1.979** | **-3.455** |
+| L28 | -1.632 | -1.817 | -3.771 |
+
+**关键发现:**
+1. 消融attn后shared→cat仍为负 → 注意力不是反转的唯一来源
+2. 消融MLP后shared→cat更负 → MLP反而压制了反转!
+3. 这说明反转不是来自单个组件,而是**attn和MLP的交互效应**
+
+**Qwen3对比:** 所有层shared→cat都为正(L0=+1.917→L25=+0.208),无反转。
+**DS7B对比:** L0为负(-1.598),L2后为正,无类似GLM4的中后层反转。
+
+### Exp2 核心发现: Shared/Private双通道功能分离
+
+**GLM4 fruit类别:**
+
+| Layer | shared→cat | private→cat | S+P→cat | priv/cat ratio |
+|-------|-----------|-------------|---------|----------------|
+| L0  | +2.576 | -0.008 | +2.575 | 0.003 |
+| L13 | +3.375 | +0.172 | +3.651 | 0.048 |
+| L20 | +1.266 | +0.206 | +2.211 | 0.140 |
+| **L26** | **-1.200** | **+0.208** | **+0.236** | 0.148 |
+| L33 | -2.575 | +0.275 | -1.012 | 0.097 |
+| L38 | +1.003 | +0.107 | +0.846 | 0.096 |
+| L39 | +2.427 | +0.052 | +2.266 | 0.021 |
+
+**新发现: GLM4 L38-39 shared→cat转正!** 反转是暂时的(L24-L33),不是永久的。
+L39的shared→cat=+2.427甚至比L0的+2.576还强 → 说明GLM4在最后层恢复了shared通道的正效应。
+
+**Qwen3 fruit类别:**
+
+| Layer | shared→cat | private→cat | priv/cat ratio |
+|-------|-----------|-------------|----------------|
+| L0  | +2.229 | +0.042 | 0.018 |
+| L12 | +0.552 | -0.042 | 0.070 |
+| L18 | +0.438 | -0.031 | 0.067 |
+| L24 | +0.271 | -0.010 | 0.037 |
+| L30 | +0.208 | +0.010 | 0.048 |
+| L34 | +0.219 | +0.073 | 0.250 |
+| L35 | +0.208 | +0.073 | 0.259 |
+
+Qwen3: shared→cat单调递减,无反转;private→cat始终很小,深层略正。
+priv/cat ratio: 从0.018增到0.259,确认私有化趋势但远不如DS7B极端。
+
+**DS7B fruit类别:**
+
+| Layer | shared→cat | private→cat | priv/cat ratio |
+|-------|-----------|-------------|----------------|
+| L0  | -0.826 | -0.328 | 0.284 |
+| L9  | +2.223 | +0.552 | 0.199 |
+| L14 | +1.050 | -0.594 | 0.361 |
+| L18 | +3.360 | -0.487 | 0.127 |
+| L23 | +3.516 | -0.391 | 0.100 |
+| L26 | +1.805 | -0.130 | 0.067 |
+| **L27** | **+0.654** | **+5.492** | **0.894** |
+
+**DS7B L27 private→cat=+5.492!** 这是极端的私有化信号。
+DS7B的shared→cat在L18-L23达到峰值(+3.3~3.5)后快速下降,L27 private完全主导。
+
+**三模型animal/tool类别对比:**
+- Animal: Qwen3 shared→cat从L0=-6.130(反方向)变正;GLM4 shared→cat从L0=-0.262逐渐转负
+- Tool: 三模型shared→cat都较弱,GLM4从L13开始转负
+
+### 修正Phase 449的结论
+
+Phase 449说"GLM4 L24后shared→cat转负",Phase 450确认:
+1. **L24确实是精确转折点** — L23=+1.482, L24=-0.291
+2. **反转深度: L24-L33** — L38后恢复为正(+1.003)
+3. **反转不是来自单个组件** — attn和MLP消融都不能单独消除反转
+4. **反转是暂时的** — 最终层shared→cat恢复为正,说明GLM4有一个"反转-恢复"循环
+
+### Exp3 问题
+
+MLP输出级消融失败: MLP子模块hook返回单tensor(非tuple),但代码只处理tuple,导致0捕获。
+需要修改hook为: `if isinstance(out, tuple): captured = out[0]; else: captured = out`
+
+### Phase 450 总体结论
+
+1. **GLM4反转门控精确定位在L24** — 从+1.482变为-0.291,确认无误
+2. **反转是暂时的(L24-L33),L38后恢复** — 这比Phase 449的认知更精确
+3. **反转不是单一组件造成** — attn消融后仍为负,MLP消融后更负,说明是attn-MLP交互效应
+4. **DS7B极端私有化在L27确认** — private→cat=+5.492,priv/cat ratio=0.894
+5. **Qwen3无反转,shared通道单调衰减** — 确认为"共享入口→私有绑定"模型
+6. **device_map="auto"深层注入问题已修复** — 关键是不预设device,在hook内部动态转移
+
+时间: 2026-06-10 21:37
+
+
+### Exp3 补充结果: MLP输出级消融(修复后) [2026-06-10 21:44]
+
+修复了两个bug: 1) MLP输出是单tensor非tuple,需分开处理; 2) MLP替换hook也需处理单tensor。
+
+**GLM4 MLP输出级消融:**
+
+| Layer | shared_norm | ortho_norm | remove_shared→catΔ | remove_ortho→catΔ | negate_shared→catΔ |
+|-------|------------|------------|---------------------|--------------------|---------------------|
+| L0  | 0.137  | 0.013  | +0.003 | -0.005 | +2.432 |
+| L10 | 1.473  | 0.553  | -0.089 | +0.010 | -0.216 |
+| L20 | 2.983  | 0.779  | +0.132 | +0.018 | +0.370 |
+| L30 | 13.731 | 8.687  | +0.185 | -0.065 | +0.262 |
+| **L38** | **71.856** | **30.615** | **-1.057** | -0.177 | +0.031 |
+| L39 | 146.607| 32.440  | +0.033 | +0.172 | -0.221 |
+
+**关键发现:**
+- **L38 remove_shared→catΔ = -1.057** — 去掉MLP shared分量后类别下降,说明L38的MLP shared正向贡献类别
+- 这与Exp2中L38 shared→cat=+1.003一致 → L38是GLM4的shared通道恢复层
+- L0 negate_shared→catΔ = +2.432(大正值) — L0 MLP的shared分量与类别方向反平行,反转后促进类别
+
+**Qwen3 MLP输出级消融:**
+
+| Layer | shared_norm | ortho_norm | remove_shared→catΔ | negate_shared→catΔ |
+|-------|------------|------------|---------------------|---------------------|
+| L0  | 5.354  | 0.846  | -0.125 | -7.760 |
+| L9  | 19.086 | 7.634  | -0.427 | -0.625 |
+| L18 | 15.523 | 5.018  | -0.146 | +0.052 |
+| L27 | 38.398 | 15.694 | +0.594 | +1.104 |
+| L34 | 173.893| 40.323 | +2.875 | +4.500 |
+| **L35** | **328.416** | **39.477** | **-6.542** | **-13.036** |
+
+**关键发现:**
+- **L35 remove_shared→catΔ = -6.542** — 最后一层MLP的shared分量对类别有巨大正贡献!
+- L34 remove_shared→catΔ = +2.875(正) → 去掉shared后类别反而上升! 
+  这说明L34 MLP的shared分量在压制类别,与L35形成对比
+- L0 negate_shared→catΔ = -7.760 — L0 MLP的shared分量与类别方向平行,反转后严重损害类别
+
+**DS7B MLP输出级消融:**
+
+| Layer | shared_norm | ortho_norm | remove_shared→catΔ | negate_shared→catΔ |
+|-------|------------|------------|---------------------|---------------------|
+| L0  | 20.465 | 2.897  | +3.429 | -1.971 |
+| L7  | 38.401 | 17.737 | -0.023 | +6.760 |
+| L14 | 54.540 | 20.246 | +0.370 | +2.066 |
+| L21 | 104.360| 27.395 | +1.096 | -1.804 |
+| L26 | 411.365| 57.468 | +0.727 | +6.807 |
+| **L27** | **696.191** | **68.407** | **-4.044** | **-7.307** |
+
+**关键发现:**
+- **L27 remove_shared→catΔ = -4.044** — 最后一层MLP shared对类别有巨大正贡献
+- **DS7B L27 shared_norm = 696** vs Qwen3 L35 = 328 vs GLM4 L39 = 147
+  DS7B的MLP输出范数远超其他模型 → 这是其数值不稳定的来源之一
+- L0 remove_shared→catΔ = +3.429 — DS7B L0 MLP的shared分量在压制类别
+
+### Exp3 跨模型总结
+
+| 模型 | 最后一层shared_norm | remove_shared→catΔ | negate_shared→catΔ |
+|------|---------------------|---------------------|---------------------|
+| Qwen3 | 328.4 | -6.542 | -13.036 |
+| GLM4 | 146.6 | +0.033 | -0.221 |
+| DS7B | 696.2 | -4.044 | -7.307 |
+
+- Qwen3和DS7B最后一层MLP shared对类别有强正贡献
+- GLM4最后一层MLP shared贡献很弱 → 与GLM4的shared通道在L24-L33反转一致
+- DS7B的MLP输出范数异常大(696 vs 328/147) → 可能是其输出不稳定的根源
+
+时间: 2026-06-10 21:44
+
+
+## Phase 451: RMSNorm-MLP读出接口与反转恢复机制验证 [2026-06-10 23:41]
+
+### 核心实验
+
+1. **Exp1: RMSNorm方向重排分析** — pre/post RMSNorm的shared/private方向变化
+2. **Exp2: 读出接口验证** — 最后几层remove/negate shared/private + direction-only/scale-only
+3. **Exp3: 反转路径定位** — 各阶段(layer/mlp/attn/RMSNorm)的shared读出投影
+
+### Exp1 核心发现: RMSNorm对shared方向的重排
+
+**Qwen3 Exp1:**
+- cos(layer_shared, post_input_ln_shared) 从L0=0.391 增到L35=0.943
+- RMSNorm越来越对齐shared方向 (cos>0.9)
+- cos(layer_shared, mlp_out_shared) 从L0=0.798 降到L35≈0.4 — MLP逐渐偏离layer shared方向
+
+**GLM4 Exp1:**
+- cos(layer_shared, post_input_ln_shared) 从L0=0.921 维持到L39≈0.76
+- GLM4的RMSNorm对齐较稳定
+- cos(layer_shared, mlp_out_shared) 在反转区(L24)仍为0.639 — MLP未脱离shared
+
+**DS7B Exp1:**
+- cos(layer_shared, post_input_ln_shared) 从L0=0.171 增到L25=0.934
+- L0 RMSNorm几乎不对齐shared方向(0.17), 说明早层shared方向不稳定
+- cos(layer_shared, mlp_out_shared) 在最后层为0.266 — MLP贡献减弱
+
+### Exp2 核心发现: Direction-only vs Scale-only
+
+**GLM4 L24 (反转区核心层):**
+
+| 操作 | catΔ | colorΔ | partΔ |
+|------|------|--------|-------|
+| inject_shared | -0.291 | -0.803 | -1.037 |
+| inject_private | +0.076 | +1.078 | +0.119 |
+| dir_only_shared | +0.089 | +0.016 | +0.028 |
+| dir_only_private | +0.031 | +0.133 | +0.049 |
+| scale_matched | +0.178 | -0.413 | +0.064 |
+| negate_shared | -1.827 | -0.326 | -1.349 |
+
+**关键发现: dir_only_shared在L24为正(+0.089), 但inject_shared为负(-0.291)!**
+这说明:
+- L24的shared**方向**本身不反转, 仍促进类别
+- 反转来自**范数放大**后的效应 — 大范数shared注入触发了非线性的抑制
+- scale_matched(+0.178)也是正的 — 随机方向加shared范数也促进类别
+- negate_shared(-1.827)非常强 — shared方向反转后严重压制类别
+
+**GLM4 L38 (恢复层):**
+
+| 操作 | catΔ |
+|------|------|
+| inject_shared | +1.237 |
+| inject_private | -0.180 |
+| dir_only_shared | +0.042 |
+| scale_matched | -0.735 |
+| negate_shared | -3.009 |
+
+**关键发现: L38 inject_shared→cat=+1.237(正), 但scale_matched=-0.735(负)**
+- L38的shared方向对类别是正的(和L24一致)
+- 但L38范数非常大(shared_norm=138.6), 随机方向加大范数会压低类别
+- 说明L38的shared恢复是**方向精确对齐**的结果, 不是简单的范数效应
+
+**Qwen3 L35 (最后一层):**
+
+| 操作 | catΔ |
+|------|------|
+| inject_shared | +0.146 |
+| dir_only_shared | 0.000 |
+| negate_shared | -1.323 |
+
+- Qwen3 L35 dir_only_shared→cat=0 — 方向效应被范数归一化后消失
+- 说明Qwen3 L35的shared→cat效应完全依赖范数, 方向本身几乎无关
+
+### Exp3 核心发现: RMSNorm是反转和恢复的关键机制
+
+**GLM4 Exp3 (最关键结果):**
+
+**L38 RMSNorm翻转 — 恢复机制的核心:**
+
+| 阶段 | proj_cat_readout |
+|------|------------------|
+| input_ln_input (RMSNorm输入) | **-5.868** |
+| input_ln_output (RMSNorm输出) | **+0.197** |
+| mlp_out | **+5.173** |
+| attn_out | +0.600 |
+| layer_out | -0.165 |
+
+**重大发现: L38 input_ln在RMSNorm前为-5.87, RMSNorm后翻转为+0.20!**
+- input_ln_sign_flip = YES — RMSNorm翻转了shared方向的读出符号
+- 这是Phase 451最核心的发现: **RMSNorm是GLM4恢复机制的关键**
+
+**GLM4 L24 (反转起点):**
+
+| 阶段 | proj_cat_readout |
+|------|------------------|
+| layer_out | -0.950 |
+| mlp_out | -0.382 |
+| attn_out | -0.103 |
+| input_ln_input | -0.465 |
+| input_ln_output | (未捕获) |
+
+- L24各阶段都为负 — 反转不是RMSNorm翻转, 而是MLP+attn输出方向本身为负
+
+**GLM4 L39 (最后一层):**
+
+| 阶段 | proj_cat_readout |
+|------|------------------|
+| layer_out | +4.195 |
+| mlp_out | +3.770 |
+| attn_out | +0.593 |
+| input_ln_sign_flip | YES |
+
+- L39 MLP是最终读出的主要贡献者(+3.77)
+- L39也有input_ln翻转 — RMSNorm在最后一层也起关键作用
+
+**Qwen3 Exp3:**
+
+| Layer | layer→cat | mlp→cat | attn→cat |
+|-------|-----------|---------|----------|
+| L0 | +0.658 | +0.007 | +0.017 |
+| L15 | -0.131 | -0.009 | -0.023 |
+| L22 | +0.017 | -0.050 | -0.063 |
+| L30 | +0.250 | +0.458 | +0.084 |
+| L34 | -0.040 | **-0.414** | +0.076 |
+| L35 | -0.465 | **-0.354** | -0.077 |
+
+- Qwen3 L34 mlp→cat=-0.414, attn→cat=+0.076 — MLP在L34压制类别, attn微弱正
+- Qwen3 L35 mlp→cat=-0.354 — 最后一层MLP仍在压制类别读出方向
+  但Phase 450 Exp3发现L35 remove_shared→catΔ=-6.542 — 这两者不矛盾:
+  Exp3测的是MLP输出的shared分量对完整logit的贡献, Exp3这里测的是MLP输出shared delta对cat readout方向的投影
+
+**DS7B Exp3:**
+
+| Layer | layer→cat | mlp→cat | attn→cat |
+|-------|-----------|---------|----------|
+| L0 | -1.496 | -1.247 | -0.099 |
+| L15 | +0.110 | +0.558 | +0.061 |
+| L25 | +0.660 | +1.308 | -0.219 |
+| **L27** | **+14.874** | **+1.428** | **+14.080** |
+
+**DS7B L27: attn_out→cat = +14.080! 这是极端的注意力驱动读出**
+- DS7B最后一层的类别读出几乎完全由attention贡献
+- MLP只贡献+1.43, 而attention贡献+14.08
+- 这与Qwen3/GLM4完全不同 — 它们的MLP是最后一层的主要写回器
+
+### Phase 451 总体结论
+
+1. **RMSNorm是GLM4 L38恢复的关键机制** — input_ln在RMSNorm前为-5.87, 后翻转为+0.20
+2. **L24反转不是RMSNorm翻转, 而是MLP+attn输出方向本身为负**
+3. **Direction-only vs inject效应不一致** — L24 dir_only_shared=+0.089(正), inject_shared=-0.291(负)
+   说明反转来自范数放大后的非线性效应, 而非方向本身反转
+4. **DS7B最后一层是attention主导** — attn→cat=+14.08, 与Qwen3/GLM4的MLP主导模式完全不同
+5. **Qwen3 L34-35 MLP持续压制cat读出方向** — mlp→cat分别为-0.414和-0.354
+
+### 修正Phase 450的结论
+
+Phase 450说"反转不是单一组件造成,而是attn-MLP交互效应"。
+Phase 451修正:
+1. **L24反转: MLP和attn的输出方向本身已转负**, 不是交互效应
+2. **L38恢复: RMSNorm翻转是关键** — 从-5.87翻转到+0.20, 这是新发现
+3. **方向本身未反转** — dir_only_shared在L24为正, 说明反转来自范数放大的非线性效应
+
+时间: 2026-06-10 23:41
+
+
+## Phase 452: 方向-范数-RMSNorm读出接口的因果闭环验证 [2026-06-11 00:21]
+
+### 核心实验
+
+1. **Exp1: 范数阈值曲线** — scale=0.1→4.0 的shared注入测cat/color/part/entropy
+2. **Exp2: RMSNorm单独因果测试** — 受控向量过RMSNorm, 测是否翻转
+3. **Exp3: 读出接口分型验证** — 最后3层全面画像(remove/negate/dir_only/scale_only/zero组件)
+4. **Exp4: DS7B attention主导验证** — direction-only vs scale-only attn/mlp操作
+5. **Exp5: 多槽位验证** — fruit/tool两类对象的9个属性槽位
+
+### Exp1 核心发现: 范数阈值曲线 — 三模型差异巨大
+
+**Qwen3: 无norm-triggered suppression, 单调递增**
+- 所有层所有scale下catΔ都为正
+- L0: scale=0.1→+0.063, scale=4.0→+0.802
+- L35: scale=0.1→+0.063, scale=4.0→+1.771
+- Qwen3的shared注入是线性放大型, 没有非线性抑制
+
+**GLM4: 无norm-triggered suppression, 所有层所有scale都为正**
+- L0: scale=0.1→+0.005, scale=4.0→+0.471
+- L24: scale=0.1→+0.022, scale=4.0→+2.940
+- L38: scale=0.1→+0.023, scale=4.0→+4.109
+- GLM4也不存在norm-triggered suppression!
+- **Phase 451说"L24反转来自范数放大的非线性抑制"被Phase 452否定**
+
+**DS7B: 存在双峰型范数响应曲线 — 首次发现**
+- L0: scale=0.1→+0.016, scale=0.5→-0.323, scale=0.75→+3.033(!), scale=2.0→-1.999(!), scale=4.0→-1.932
+- L14: scale=0.1→+0.037, scale=0.75→+2.614, scale=1.5→+3.064, scale=4.0→-0.172
+- L27: scale=0.1→+0.031, scale=1.0→+0.278, scale=2.0→-0.331, scale=4.0→+0.390
+
+**DS7B L0的完整曲线:**
+```
+scale=0.1 → catΔ=+0.016  (微正)
+scale=0.25 → catΔ=-0.135  (转负)
+scale=0.5 → catΔ=-0.323   (更负)
+scale=0.75 → catΔ=+3.033  (突变为强正!)
+scale=1.0 → catΔ=+3.588   (继续正)
+scale=1.5 → catΔ=+3.637   (继续正)
+scale=2.0 → catΔ=-1.999   (再次转负!)
+scale=3.0 → catΔ=-1.943   (保持负)
+scale=4.0 → catΔ=--1.932  (保持负)
+```
+
+**这是Phase 452最重要的发现之一: DS7B存在非线性双峰范数响应, 不存在简单阈值.**
+
+### Exp2 核心发现: RMSNorm翻转精确定位
+
+**GLM4: 只有L38的RMSNorm翻转**
+- L19-L28: rmsnorm_flip_alpha1=NO (所有层)
+- **L38: rmsnorm_flip_alpha1=YES** — 确认Phase 451
+- L39: rmsnorm_flip_alpha1=NO
+- L38 pre_rms=-4.998, 翻转为正
+
+**Qwen3: L25有RMSNorm翻转**
+- L16-L24: flip=NO
+- **L25: flip=YES** — 新发现!
+- L34-L35: flip=NO
+
+**DS7B: L27有RMSNorm翻转 (alpha=8时)**
+- L23-L26: flip=NO
+- **L27: flip=YES (alpha=8时)** — 新发现!
+- alpha_sweep中alpha=4和8时出现sign_flip
+
+**三模型RMSNorm翻转对照:**
+| 模型 | 翻转层 | 位置 | 条件 |
+|------|--------|------|------|
+| Qwen3 | L25 | 中后层 | alpha=1 |
+| GLM4 | L38 | 恢复层 | alpha=1 |
+| DS7B | L27 | 最后一层 | alpha≥4 |
+
+### Exp3 核心发现: 读出接口分型
+
+**GLM4 L38 (恢复层):**
+| 操作 | catΔ |
+|------|------|
+| remove_shared | -2.259 |
+| negate_shared | -3.009 |
+| inject_shared | +0.965 |
+| dir_only_shared | +0.042 |
+| scale_only_shared_norm | -0.735 |
+| remove_private | -0.128 |
+| zero_mlp | -1.310 |
+| zero_attn | -0.047 |
+
+**GLM4 L39 (最后一层):**
+| 操作 | catΔ |
+|------|------|
+| remove_shared | -1.917 |
+| negate_shared | -2.695 |
+| inject_shared | +1.383 |
+| dir_only_shared | +0.024 |
+| scale_only_shared_norm | +0.890 |
+| zero_mlp | +0.167 |
+| zero_attn | +0.199 |
+
+**关键: L39 zero_mlp→cat=+0.167, zero_attn→cat=+0.199**
+- L39移除MLP后类别logit增加 → MLP在L39压制类别!
+- L39移除attn后类别logit增加 → attn在L39也压制类别!
+- 但remove_shared仍为负(-1.917) → shared分量仍必要
+
+**DS7B L27 (最后一层):**
+| 操作 | catΔ |
+|------|------|
+| zero_mlp | -3.961 |
+| zero_attn | +4.443 |
+| dir_only_attn | 0.000 |
+
+**关键: L27 zero_attn→cat=+4.443! 移除attention后类别大幅增加!**
+- DS7B L27的attention对类别读出是负向调节(压制类别)
+- Phase 451的"attn→cat=+14.08"是投影值, 实际因果效应是负的!
+- dir_only_attn→cat=0 — 方向效应为零, 说明attn效应完全依赖范数
+
+**DS7B L26:**
+| 操作 | catΔ |
+|------|------|
+| zero_mlp | +1.811 |
+| zero_attn | -0.297 |
+| dir_only_attn | -0.036 |
+
+- L26移除MLP后类别增加 → MLP在L26也压制类别
+- 与L27形成对比: L26的attn轻微正贡献, L27的attn负贡献
+
+### Exp4 核心发现: Attention vs MLP因果关系
+
+**DS7B 最后一层attn/mlp贡献:**
+| 层 | attn_norm | mlp_norm | ratio | zero_attn→cat | zero_mlp→cat |
+|----|-----------|----------|-------|---------------|--------------|
+| L26 | 50.6 | 31.0 | 1.63 | -0.297 | +1.811 |
+| L27 | 102.7 | 54.6 | 1.88 | +4.443 | -3.961 |
+
+- DS7B L27: attn范数≈mlp范数×1.9, 但attn压制类别, MLP强促进类别
+- **Phase 451说"DS7B是attention主导读出"被Phase 452修正为: DS7B最后一层attn压制类别, MLP促进类别**
+
+**GLM4 最后一层attn/mlp贡献:**
+| 层 | attn_norm | mlp_norm | zero_attn→cat | zero_mlp→cat |
+|----|-----------|----------|---------------|--------------|
+| L38 | 6.88 | 14.50 | -0.047 | -1.310 |
+| L39 | 8.25 | 26.24 | +0.199 | +0.167 |
+
+- GLM4 L38: MLP是主要类别贡献者(-1.31移除后下降), attn贡献小
+- GLM4 L39: 两者都轻微压制类别
+
+**Qwen3 最后一层:**
+| 层 | attn_norm | mlp_norm | zero_attn→cat | zero_mlp→cat |
+|----|-----------|----------|---------------|--------------|
+| L34 | 2.26 | 7.41 | +0.321 | +0.077 |
+| L35 | 2.66 | 13.78 | +0.351 | -0.274 |
+
+- Qwen3 L35: MLP压制类别(-0.27), attn轻微促进(+0.35)
+- 与Phase 451发现一致
+
+### Exp5 核心发现: 多槽位验证
+
+**shared注入对不同类别对象的效果:**
+- fruit方向注入 → fruit类catΔ>0, tool类catΔ<0 (方向有区分性)
+- tool方向注入 → tool类catΔ>0, fruit类catΔ<0 (方向有区分性)
+- 说明shared方向不只影响单一类别, 而是编码了类别语义
+
+**shared注入对多槽位的效果 (三模型对比):**
+| 模型 | 层 | cat_fruitΔ | colorΔ | partΔ | habitatΔ |
+|------|-----|-----------|--------|-------|----------|
+| Qwen3 | L35 | +0.135 | -0.063 | +0.209 | +0.169 |
+| GLM4 | L39 | +1.742 | +1.916 | +2.493 | +3.546 |
+| DS7B | L27 | +1.930 | +1.240 | +1.374 | +1.383 |
+
+- 三模型中shared注入都增加类别和部分属性
+- 但DS7B的tool方向注入反而压低所有槽位 — tool方向可能被模型处理不同
+
+### Phase 452 对Phase 451/450的修正
+
+1. **Phase 451说"L24反转来自范数放大后的非线性抑制" → Phase 452否定了这个假说**
+   - Exp1证明GLM4所有层所有scale下shared注入catΔ都为正
+   - 不存在norm-triggered suppression
+   - L24的inject_shared负效应是Phase 450/451中特定实验条件的结果, 不是GLM4的通用特性
+
+2. **Phase 451说"DS7B最后一层attention主导类别读出" → Phase 452修正为: attention压制类别, MLP促进类别**
+   - DS7B L27 zero_attn→cat=+4.443 (移除attn后类别增加)
+   - DS7B L27 zero_mlp→cat=-3.961 (移除MLP后类别大幅下降)
+   - Phase 451的attn→cat=+14.08是投影值, 实际因果效应相反
+
+3. **RMSNorm翻转在三个模型中都存在, 但位置不同**
+   - Qwen3 L25 (中后层)
+   - GLM4 L38 (恢复层)
+   - DS7B L27 (最后一层, 需alpha≥4)
+
+4. **DS7B的双峰范数响应是新发现**
+   - 不存在简单阈值, 而是非线性振荡型响应
+   - scale=0.5负 → scale=0.75强正 → scale=2.0再次转负
+
+### Phase 452 最可靠的结论
+
+1. GLM4不存在norm-triggered suppression, L24反转另有原因
+2. RMSNorm翻转在GLM4 L38和DS7B L27得到确认, Qwen3 L25也有翻转
+3. DS7B最后一层attention压制类别(非促进), MLP是主要类别贡献者
+4. DS7B存在非线性双峰范数响应曲线
+5. shared方向具有类别区分性(fruit正/tool负)
+6. GLM4 L39的MLP和attn都轻微压制类别, 但shared分量仍必要
+
+时间: 2026-06-11 00:21
+
+
+## Phase 453: 投影-因果解耦验证与读出接口标准化 [2026-06-11 01:08]
+
+### 核心实验
+
+1. **Exp1: 投影-因果四象限图谱** — 每个关键层的attn/MLP的投影分数与因果分数
+2. **Exp2: RMSNorm行为因果测试** — bypass RMSNorm对比logit效应方向
+3. **Exp3: 标准化direction/scale分解** — dir_only/scale_only/full/random_matched
+4. **Exp4: 多槽位读出接口** (有bug, 数据为None, 待修复)
+5. **Exp5: DS7B双峰精细复验** (embedding注入, 所有层相同值, 需改为层注入)
+
+### Exp1 核心发现: 投影-因果四象限图谱
+
+**四象限定义:**
+- Q1: proj+ & causal+ (真正促进器)
+- Q2: proj+ & causal- (投影正但实际压制! 关键象限)
+- Q3: proj- & causal+ (间接促进器)
+- Q4: proj- & causal- (真正压制器)
+
+**Qwen3 四象限:**
+| 层 | attn投影 | zero_attn→Δ | attn象限 | mlp投影 | zero_mlp→Δ | mlp象限 |
+|----|---------|------------|---------|--------|-----------|--------|
+| L16 | -0.107 | -0.156 | Q3间接促进 | 0.456 | -0.014 | Q1促进 |
+| L24 | +1.391 | -0.149 | Q1促进 | +1.193 | +0.406 | Q2压制! |
+| L25 | +0.030 | -0.066 | Q1促进 | +1.624 | +0.031 | Q2压制! |
+| L34 | -1.263 | -0.663 | Q3间接促进 | -0.271 | +2.993 | Q4压制 |
+| L35 | -0.585 | +0.556 | Q4压制 | +24.578 | -6.391 | Q1强促进! |
+
+**GLM4 四象限:**
+| 层 | attn投影 | zero_attn→Δ | attn象限 | mlp投影 | zero_mlp→Δ | mlp象限 |
+|----|---------|------------|---------|--------|-----------|--------|
+| L24 | +0.050 | +0.075 | Q2压制! | +0.859 | +0.355 | Q2压制! |
+| L38 | +6.150 | +0.258 | Q2压制! | +5.481 | -1.091 | Q1促进 |
+| L39 | -1.303 | +0.121 | Q4压制 | -11.667 | +0.128 | Q4压制 |
+
+**DS7B 四象限:**
+| 层 | attn投影 | zero_attn→Δ | attn象限 | mlp投影 | zero_mlp→Δ | mlp象限 |
+|----|---------|------------|---------|--------|-----------|--------|
+| L0 | +1.532 | +2.522 | Q2压制! | +1.348 | +1.871 | Q2压制! |
+| L14 | -3.557 | -0.302 | Q3间接促进 | +4.368 | +0.759 | Q2压制! |
+| L26 | +7.043 | -0.482 | Q1促进 | +44.078 | +1.028 | Q2压制! |
+| L27 | -435.14 | +3.465 | Q4强压制! | +56.838 | -5.780 | Q1强促进! |
+
+**Q2象限是最常见象限! 投影≠因果!**
+
+关键案例:
+1. **GLM4 L38 attn: 投影=+6.15但因果压制类别** — 最典型的投影-因果分离
+2. **DS7B L27 attn: 投影=-435,因果也压制** — proj和causal同号(都是负),但绝对值差异巨大
+3. **Qwen3 L35 MLP: 投影=+24.58,因果=促进(-6.39)** — Q1,投影和因果一致
+4. **GLM4 L24: 两个组件都在Q2** — attn和MLP都投影正但压制类别
+
+### Exp2 核心发现: RMSNorm投影翻转不导致行为翻转!
+
+**三模型一致结论: RMSNorm投影翻转≠行为翻转**
+
+| 模型 | 层 | pre_rms_proj | post_rms_proj | proj_flip | with_rms_Δ | without_rms_Δ | beh_flip |
+|------|-----|-------------|--------------|-----------|------------|---------------|---------|
+| Qwen3 | L25 | -0.071 | +0.069 | YES | +0.115 | +0.090 | NO |
+| GLM4 | L38 | -5.868 | +0.192 | YES | +2.484 | +2.566 | NO |
+| GLM4 | L39 | -0.165 | +0.167 | YES | +2.484 | +1.778 | NO |
+| DS7B | L27 | -0.221 | +0.197 | YES | +0.345 | +0.102 | NO |
+
+**所有情况下:**
+- RMSNorm确实改变了shared delta相对于cat读出方向的投影符号
+- 但bypass RMSNorm后, logit变化方向不变(都是正的)
+- 这意味着RMSNorm投影翻转是几何现象, 不是行为因果机制
+
+**这是Phase 453最重要的发现: RMSNorm投影翻转≠行为翻转**
+
+对Phase 451/452的修正: RMSNorm"恢复"不是通过翻转投影符号实现的, 而是通过其他机制(如范数调节、维度缩放等).
+
+### Exp3 核心发现: 标准化Direction/Scale分解
+
+**Qwen3: 方向在后层变负, 但范数补偿**
+| 层 | dir_only | scale_only | full | random |
+|----|---------|-----------|------|--------|
+| L16 | +1.557 | +0.038 | +0.122 | -0.080 |
+| L25 | -1.351 | +0.087 | +0.115 | +0.014 |
+| L34 | -2.130 | -0.135 | +0.135 | +0.014 |
+| L35 | -1.983 | -0.229 | -0.017 | +0.038 |
+
+→ L25-L35: shared方向指向cat读出负方向, 但full_vector仍为正(范数补偿)
+→ L35: 方向+范数都负, full接近零 → 信号最弱
+
+**GLM4: 方向始终正, 范数效应小**
+| 层 | dir_only | scale_only | full | random |
+|----|---------|-----------|------|--------|
+| L10 | +2.166 | -0.156 | +2.229 | +0.107 |
+| L24 | +2.648 | +0.308 | +2.794 | +0.366 |
+| L38 | +2.800 | -0.004 | +2.198 | -0.751 |
+| L39 | +0.249 | +0.160 | +0.439 | -1.273 |
+
+→ GLM4的shared方向始终指向cat正方向
+→ L39方向效应最弱(+0.25), 随机对照出现负值(-1.27)
+
+**DS7B: 方向从负变正, 与Qwen3类似但更剧烈**
+| 层 | dir_only | scale_only | full | random |
+|----|---------|-----------|------|--------|
+| L0 | -0.213 | -0.080 | -0.456 | -0.029 |
+| L14 | -0.823 | +0.693 | +0.019 | +0.151 |
+| L23 | +1.505 | +0.664 | +0.704 | +0.265 |
+| L27 | +2.327 | +0.049 | +0.206 | +0.046 |
+
+→ L0-L14: shared方向指向cat负方向
+→ L23-L27: 方向翻转为正
+→ L27: dir_only最强(+2.33), 但full最弱(+0.21) → 范数抑制
+
+### Phase 453 对Phase 451/452的修正
+
+1. **RMSNorm投影翻转≠行为翻转** — Phase 451/452认为RMSNorm翻转是恢复机制, Phase 453证明投影翻转不导致logit行为变化. bypass RMSNorm后logit效应方向不变.
+
+2. **投影-因果分离是系统性现象** — Q2象限(proj+ & causal-)在三个模型中都是最常见的象限. 这说明"组件输出朝cat读出方向投影"不能推出"组件促进cat".
+
+3. **最后一层attn在三个模型中都压制类别**:
+   - Qwen3 L35: attn Q4 (proj- & causal-)
+   - GLM4 L39: attn Q4 (proj- & causal-)
+   - DS7B L27: attn Q4 (proj- & causal-)
+   这是跨模型的共同模式!
+
+4. **最后一层MLP的角色因模型而异**:
+   - Qwen3 L35: Q1 (强促进, zero_mlp→-6.39)
+   - GLM4 L39: Q4 (压制, zero_mlp→+0.13)
+   - DS7B L27: Q1 (强促进, zero_mlp→-5.78)
+   GLM4最后一层MLP也压制类别, 与Qwen3和DS7B不同!
+
+### Phase 453 最可靠的结论
+
+1. **投影≠因果**: Q2象限(proj+ & causal-)是最常见象限, 不能用投影判断因果
+2. **RMSNorm投影翻转不导致行为翻转**: 三模型一致
+3. **最后一层attn统一压制类别**: 三模型一致
+4. **最后一层MLP促进类别(Qwen3/DS7B)或压制(GLM4)**: 模型差异
+5. **GLM4 L24两个组件都压制类别**: 这是L24反转的真正来源
+6. **shared方向在后层可能指向cat读出负方向(Qwen3 L25-L35, DS7B L0-L14)**: 但full_vector效应仍为正(范数补偿)
+7. **DS7B L27 attn投影=-435**: 极端异常, 需要更多验证
+
+时间: 2026-06-11 01:08
+
+
+## Phase 454: 候选族再分布与投影-因果-行为三证合一 [2026-06-11 01:38]
+
+### 核心实验设计
+
+1. **Exp1: 候选族级别读出图谱** — 消融attn/MLP后测量7个候选族(fruit/animal/tool/vehicle/food/object/plant)的logit变化
+2. **Exp2: 跨槽位最后层attn压制测试** — 5个槽位(cat/color/part/material/function)的最后层attn因果测试
+3. **Exp3: 多槽位读出接口画像(修复Phase453 Exp4 bug)** — 每个槽位的shared注入/attn消融/MLP消融
+4. **Exp4: 层注入scale sweep** — 修复Phase453 Exp5的embedding注入,改为layer hook注入
+5. **Exp5: 投影-因果-候选族三证合一** — proj/causal/margin三者结合判定
+
+### Exp2 最重要的新发现: 最后层attn跨模型跨槽位行为
+
+**Qwen3 L35 最后层attn: 5个槽位全部SUPPRESSES**
+| 槽位 | avg_target_Δ | 判定 |
+|------|------------|------|
+| cat | +0.589 | SUPPRESSES |
+| color | +1.717 | SUPPRESSES (强) |
+| part | +0.432 | SUPPRESSES |
+| material | +0.935 | SUPPRESSES |
+| function | +0.812 | SUPPRESSES |
+
+**GLM4 L39 最后层attn: 5个槽位全部SUPPRESSES**
+| 槽位 | avg_target_Δ | 判定 |
+|------|------------|------|
+| cat | +0.113 | SUPPRESSES |
+| color | +0.264 | SUPPRESSES |
+| part | +0.310 | SUPPRESSES |
+| material | +0.223 | SUPPRESSES |
+| function | +0.122 | SUPPRESSES |
+
+**DS7B L27 最后层attn: cat=SUPPRESSES, 但color/part/material/function=PROMOTES!**
+| 槽位 | avg_target_Δ | 判定 |
+|------|------------|------|
+| cat | +3.938 | SUPPRESSES (极强) |
+| color | -2.706 | PROMOTES! |
+| part | -3.000+ | PROMOTES! |
+| material | -3.372 | PROMOTES! |
+| function | -2.637 | PROMOTES! |
+
+**跨模型核心差异:**
+- Qwen3/GLM4: 最后层attn是**universal output brake**(通用输出刹车) — 压制所有语义槽位
+- DS7B: 最后层attn是**category-specific suppressor**(类别特异压制器) — 只压制类别,促进其他属性
+
+但DS7B的结果需要谨慎: color/part/material的模板对不同对象产生了极端不一致的结果(apple:-4.22 vs orange:+5.74), 说明DS7B在这些模板下行为不稳定。
+
+### Exp1 候选族级别读出图谱核心发现
+
+**Qwen3 L35 (最后层):**
+| 候选族 | attn_Δ | mlp_Δ |
+|--------|--------|-------|
+| fruit | -0.764 | +2.715 |
+| animal | -0.781 | +3.161 |
+| tool | -0.486 | +2.546 |
+| object | -0.404 | +1.861 |
+| food | -0.599 | +2.881 |
+
+→ Qwen3最后层: attn压制所有族, MLP促进所有族, 但MLP对animal/food的促进>fruit
+→ MLP不是只促进类别,而是整体提升所有候选族的logit(但幅度不同)
+
+**GLM4 L39 (最后层):**
+| 候选族 | attn_Δ | mlp_Δ |
+|--------|--------|-------|
+| fruit | +0.066 | -0.831 |
+| animal | +0.131 | -0.190 |
+| tool | +0.015 | -0.112 |
+| object | +0.278 | -0.618 |
+| food | +0.203 | -0.496 |
+
+→ GLM4最后层: attn轻微促进所有族, MLP压制所有族(特别是fruit/object/food)
+→ GLM4与Qwen3/DS7B完全相反: MLP是压制器!
+
+**DS7B L27 (最后层):**
+| 候选族 | attn_Δ | mlp_Δ |
+|--------|--------|-------|
+| fruit | -0.691 | +0.549 |
+| animal | -0.452 | +0.758 |
+| tool | -0.520 | +0.851 |
+| object | -0.388 | +0.905 |
+| food | -0.427 | +0.557 |
+
+→ DS7B最后层: attn压制所有族, MLP促进所有族(与Qwen3类似但幅度小)
+
+### Exp4 DS7B双峰层注入复验 (关键修复: 改用layer hook注入)
+
+**DS7B L0 层注入scale sweep:**
+| alpha | cat_Δ | color_Δ | 非单调 |
+|-------|-------|---------|--------|
+| 0.25 | -0.095 | -0.082 | NO |
+| 0.5 | -0.222 | -0.233 | NO |
+| 1.0 | **+0.113** | +0.116 | **YES** ← 符号翻转! |
+| 2.0 | -0.309 | -0.303 | YES |
+| 4.0 | -0.346 | -0.326 | NO |
+
+→ **L0确认非单调双峰响应!** cat_dir注入: 0.5时为负, 1.0时翻正, 2.0再翻负
+→ 用层注入复现了Phase 452的embedding注入结果
+
+**DS7B L14 也显示非单调:**
+| alpha | cat_Δ | 非单调 |
+|-------|-------|--------|
+| 0.25 | -0.227 | NO |
+| 0.5 | -0.025 | NO |
+| 1.0 | +0.030 | YES |
+| 2.0 | +0.025 | NO |
+| 4.0 | -0.008 | YES |
+
+→ L14也有非单调响应但更弱
+
+**DS7B L27 层注入几乎无效果:**
+| alpha | cat_Δ |
+|-------|-------|
+| 0.25 | 0.000 |
+| 1.0 | 0.003 |
+| 4.0 | 0.006 |
+
+→ L27残差范数极大(~2633), cat_dir注入被淹没
+
+### Exp5 投影-因果-候选族三证合一
+
+**Qwen3 Exp5 三证:**
+| 层 | attn_quad | attn_triple | mlp_quad | mlp_triple |
+|----|-----------|-------------|----------|------------|
+| L16 | Q1 | TRIPLE_PROMOTER | Q1 | TRIPLE_PROMOTER |
+| L24 | Q1 | TRIPLE_PROMOTER | Q2 | PROJ_CAUSAL_CONFLICT |
+| L25 | Q1 | TRIPLE_PROMOTER | Q1 | TRIPLE_PROMOTER |
+| L34 | Q3 | INDIRECT_PROMOTER | Q2 | PROJ_CAUSAL_CONFLICT |
+| L35 | Q4 | MIXED | Q1 | **TRIPLE_PROMOTER** |
+
+**GLM4 Exp5 三证:**
+| 层 | attn_quad | attn_triple | mlp_quad | mlp_triple |
+|----|-----------|-------------|----------|------------|
+| L10 | Q4 | MIXED | Q1 | TRIPLE_PROMOTER |
+| L19 | Q4 | MIXED | Q1 | TRIPLE_PROMOTER |
+| L24 | Q2 | PROJ_CAUSAL_CONFLICT | Q2 | PROJ_CAUSAL_CONFLICT |
+| L28 | Q1 | MIXED | Q2 | PROJ_CAUSAL_CONFLICT |
+| L38 | Q2 | PROJ_CAUSAL_CONFLICT | Q1 | TRIPLE_PROMOTER |
+| L39 | Q4 | MIXED | Q4 | MIXED |
+
+**DS7B Exp5 三证:**
+| 层 | attn_quad | attn_triple | mlp_quad | mlp_triple |
+|----|-----------|-------------|----------|------------|
+| L0 | Q2 | TRIPLE_SUPPRESSOR | Q2 | TRIPLE_SUPPRESSOR |
+| L14 | Q3 | INDIRECT_PROMOTER | Q2 | PROJ_CAUSAL_CONFLICT |
+| L23 | Q2 | TRIPLE_SUPPRESSOR | Q2 | TRIPLE_SUPPRESSOR |
+| L26 | Q1 | TRIPLE_PROMOTER | Q2 | PROJ_CAUSAL_CONFLICT |
+| L27 | Q4 | MIXED | Q1 | **TRIPLE_PROMOTER** |
+
+→ DS7B L0和L23: attn和MLP都是Q2 TRIPLE_SUPPRESSOR — 几何投影正但因果和候选族边际都负
+→ GLM4 L24: 两个组件都是PROJ_CAUSAL_CONFLICT — 最严重的投影-因果分离层
+
+### Phase 454 最可靠的新结论
+
+1. **最后层attn在Qwen3/GLM4中是通用输出刹车(universal output brake)**: 压制所有5个语义槽位
+2. **DS7B最后层attn是类别特异压制器**: 只压制category,促进其他属性(但结果不稳定需复验)
+3. **最后层MLP在Qwen3/DS7B中促进所有候选族(但不只促进类别)**: MLP的整体效应是提升所有语义相关token的logit, 而非只提升类别
+4. **GLM4最后层MLP压制所有候选族**: 与Qwen3/DS7B完全相反
+5. **DS7B L0非单调双峰响应被层注入确认**: cat_Δ从负→正→负, Phase 452的embedding注入结论得到验证
+6. **DS7B L27层注入几乎无效果**: 残差范数极大(~2633),注入被淹没
+7. **PROJ_CAUSAL_CONFLICT是最常见的冲突类型**: GLM4 L24/L28/L38和DS7B L14/L26
+8. **GLM4 L24是投影-因果分离最严重的层**: 两个组件都是Q2
+
+### Phase 454 对Phase 453的确认和修正
+
+1. **Phase 453结论"最后层attn统一压制类别"被扩展**: Qwen3/GLM4是通用输出刹车(压制所有槽位), 不只压制类别
+2. **Phase 453结论"DS7B最后层attn压制类别"被细化**: DS7B的attn是类别特异压制, 对其他属性是促进
+3. **DS7B L0双峰响应被层注入确认**: 不再是"可能是embedding注入artefact", 而是确认的非单调机制
+
+### 硬伤与问题
+
+1. **DS7B Exp2的color/part/material/function模板不稳定**: 不同对象产生矛盾结果(apple vs orange), 需要更好的模板
+2. **DS7B L27层注入无效果**: 需要更大alpha或不同注入位置
+3. **GLM4最后层MLP的角色仍然不清晰**: 为什么GLM4最后层MLP压制所有族? 这与Qwen3/DS7B完全相反
+4. **对象数量仍偏少(4个)**: 第二轮需要增加到6-8个
+5. **候选族定义可能不够精确**: "fruit"族包含apple/banana等具体词, 可能与分类词"fruit"混淆
+
+### Round 2 确认测试 (6个对象)
+
+使用6个对象(apple/orange/banana/grape/lemon/peach)重复所有实验:
+
+**Exp2 跨槽位确认:**
+- Qwen3 R2: 5/5 SUPPRESSES → 与R1完全一致
+- GLM4 R2: cat=NEUTRAL(Δ=0.09), color/part/material/function=SUPPRESSES → 与R1基本一致(cat变弱)
+- DS7B R2: cat=SUPPRESSES(+4.32), color/part/material/function=PROMOTES → 与R1完全一致
+
+**Exp5 三证确认 (R2平均值):**
+- Qwen3 L35: MLP TRIPLE_PROMOTER (proj=26.0, causal=+6.4), attn Q4
+- Qwen3 L34: MLP TRIPLE_SUPPRESSOR (proj=0.89, causal=-2.84) ← R2新发现! 投影正但因果和边际都负
+- GLM4 L38: attn Q2 PROJ_CAUSAL_CONFLICT (proj=6.25, causal=-0.26), MLP TRIPLE_PROMOTER
+- GLM4 L39: attn Q4, MLP Q4 — 两者都是压制器
+- DS7B L27: attn proj=-459(causal=-4.32), MLP TRIPLE_PROMOTER(causal=+5.10)
+- DS7B L23: 双Q2 TRIPLE_SUPPRESSOR (attn proj=1.38/causal=-0.55, mlp proj=39.5/causal=-1.14)
+
+时间: 2026-06-11 01:38
+
+
+## Phase 455: 候选族标准化与槽位读出接口大样本验证 [2026-06-11 02:38]
+
+### 核心改进
+
+1. **符号统一**: ComponentEffect = clean - zero_ablated (正=促进, 负=压制), 彻底解决Phase 454的符号混乱
+2. **候选族标准化**: 四类分离 — class_label(类别标签)/class_member(成员)/attribute(属性)/generic(泛化)
+3. **多类别对象**: fruit/animal/tool/vehicle各3个(R1), 共12个对象
+4. **Margin效应**: 不只看单个logit, 而看target_margin(目标族-最大竞争族)的因果效应
+
+### ⚠️ 关键纠正: Phase 454的GLM4解读存在符号错误!
+
+Phase 454说"GLM4 L39 MLP压制所有候选族", 但Phase 455用正确符号和margin指标发现:
+
+**GLM4 L39 MLP margin effect = +0.68 (PROMOTES目标边际!)**
+
+原Phase 454数据中 family_delta_mlp = zm - clean:
+- GLM4 L38: fruit_Δ=+0.12, animal_Δ=+0.44, tool_Δ=+0.25 → 移除MLP后所有logit上升
+- 这意味着MLP压制了所有logit, 但压制animal(+0.44)和food(+0.41)远多于fruit(+0.12)
+- 所以MLP在边际意义上反而促进了fruit: 竞争族被压制更多 → 目标边际上升
+
+**正确结论: GLM4 L39 MLP是"全局语义压制器但目标边际促进器"**
+
+### Exp1 跨类别候选族再分布 (最关键结果)
+
+**Qwen3 L35 (最后层) — 按margin效应:**
+| 类别 | attn_effect | attn判定 | mlp_effect | mlp判定 |
+|------|------------|---------|-----------|---------|
+| fruit | +0.248 | PROMOTES | -0.732 | SUPPRESSES |
+| animal | +0.727 | PROMOTES | -0.857 | SUPPRESSES |
+| tool | +0.091 | NEUTRAL | -1.073 | SUPPRESSES |
+| vehicle | -0.122 | SUPPRESSES | +0.237 | PROMOTES |
+
+→ Qwen3 L35: attn对fruit/animal是边际促进器, MLP对fruit/animal/tool是边际压制器
+→ 这与Phase 454完全不同! Phase 454说"attn压制所有族", 但那是logit层面, margin层面attn实际在帮助fruit/animal赢过竞争族
+
+**GLM4 L39 (最后层) — 按margin效应:**
+| 类别 | attn_effect | attn判定 | mlp_effect | mlp判定 |
+|------|------------|---------|-----------|---------|
+| fruit | -0.108 | SUPPRESSES | +0.683 | PROMOTES! |
+| animal | +0.034 | NEUTRAL | +0.929 | PROMOTES! |
+| tool | -0.050 | NEUTRAL | -0.696 | SUPPRESSES |
+| vehicle | -0.131 | SUPPRESSES | +1.233 | PROMOTES! |
+
+→ GLM4 L39: MLP对3/4类别是边际促进器! 只有tool被压制
+→ **Phase 454的"GLM4 MLP压制所有族"结论是符号错误, 应纠正为"MLP压制所有族logit但促进大多数类别边际"**
+
+**DS7B L27 (最后层) — 按margin效应:**
+| 类别 | attn_effect | attn判定 | mlp_effect | mlp判定 |
+|------|------------|---------|-----------|---------|
+| fruit | -2.078 | SUPPRESSES(强) | +1.031 | PROMOTES |
+| animal | +0.822 | PROMOTES! | -0.583 | SUPPRESSES |
+| tool | -1.216 | SUPPRESSES | +0.371 | PROMOTES |
+| vehicle | -0.711 | SUPPRESSES | +0.345 | PROMOTES |
+
+→ DS7B L27: attn对animal是PROMOTES, 对其他类别是SUPPRESSES
+→ DS7B L27: MLP对fruit/tool/vehicle是PROMOTES, 对animal是SUPPRESSES
+→ **attn和MLP的效应是类别依赖的! 不是简单的"attn压制/MLP促进"**
+
+### Exp5 MLP全层转折点扫描 (极重要)
+
+**Qwen3 MLP margin effect 全层:**
+| 层 | mlp_effect | 类型 |
+|----|-----------|------|
+| L0 | -0.018 | NEUTRAL |
+| L6 | +0.294 | AMPLIFIER |
+| L12 | +0.327 | AMPLIFIER |
+| L15 | -0.029 | NEUTRAL |
+| L24 | +0.020 | NEUTRAL |
+| **L27** | **-0.352** | **SUPPRESSOR** ← 转折点! |
+| L33 | -0.749 | SUPPRESSOR |
+| L35 | -0.732 | SUPPRESSOR |
+
+→ Qwen3 MLP在L6-L24是AMPLIFIER(促进边际), L27起变为SUPPRESSOR(压制边际)
+
+**GLM4 MLP margin effect 全层:**
+| 层 | mlp_effect | 类型 |
+|----|-----------|------|
+| L0 | -0.070 | NEUTRAL |
+| L6 | -0.143 | SUPPRESSOR |
+| L9 | -0.120 | SUPPRESSOR |
+| L18 | +0.114 | AMPLIFIER |
+| L21 | -0.223 | SUPPRESSOR |
+| L36 | +0.174 | AMPLIFIER |
+| **L39** | **+0.683** | **AMPLIFIER** ← 最强! |
+
+→ GLM4 MLP在最后层(L39)是最强的AMPLIFIER, 与Qwen3完全不同!
+→ GLM4在中间层(L6/L9/L21)是SUPPRESSOR, 但最后层翻转为AMPLIFIER
+
+**DS7B MLP margin effect 全层:**
+| 层 | mlp_effect | 类型 |
+|----|-----------|------|
+| L0 | -0.558 | SUPPRESSOR |
+| L4 | +0.126 | AMPLIFIER |
+| L6 | -0.418 | SUPPRESSOR |
+| L8 | -0.675 | SUPPRESSOR |
+| L16 | -0.631 | SUPPRESSOR |
+| L22 | -0.706 | SUPPRESSOR |
+| L24 | +0.415 | AMPLIFIER |
+| **L26** | **-0.768** | **SUPPRESSOR** |
+| **L27** | **+1.031** | **AMPLIFIER** ← 剧烈翻转! |
+
+→ DS7B MLP从L26(-0.77)到L27(+1.03)发生剧烈翻转!
+→ 大多数中间层MLP是SUPPRESSOR, 只有L4/L24/L27是AMPLIFIER
+
+### Exp4 非单调响应分解
+
+**Qwen3**: 无非单调响应(所有alpha方向一致, 单调增加)
+
+**GLM4**: L10有方向性效果(dir+scale随alpha减小), L24微弱非单调(alpha=1.0时翻正), L27几乎无效果
+
+**DS7B**: L0 dir+scale在alpha=0.5时翻正(+0.02), 确认非单调
+- dir_only = -0.07 (方向贡献弱)
+- scale_only 在alpha=0.5时最负(-0.42), 说明范数效应强
+- 但dir+scale在alpha=0.5翻正, 说明方向×范数交互是非单调的来源
+
+### Phase 455 最可靠的新结论
+
+1. **Phase 454符号错误被纠正**: GLM4 L39 MLP不是"压制所有族", 而是"压制所有族logit但促进大多数类别边际"
+2. **Logit效应 ≠ Margin效应**: 组件可以压制所有族logit同时促进目标边际(通过更强烈地压制竞争族)
+3. **最后层attn不是简单的"输出刹车"**: Qwen3 L35 attn在margin意义上PROMOTES fruit/animal
+4. **DS7B L27 attn是类别依赖的**: 对animal是PROMOTES, 对fruit/tool/vehicle是SUPPRESSES
+5. **三模型的最后层MLP在margin意义上都是关键**:
+   - Qwen3 L35: MLP margin SUPPRESSOR (促进竞争族多于目标)
+   - GLM4 L39: MLP margin AMPLIFIER (促进目标多于竞争族)
+   - DS7B L27: MLP margin AMPLIFIER (促进fruit/tool/vehicle)
+6. **MLP转折模式完全不同**:
+   - Qwen3: 前层AMPLIFIER→后层SUPPRESSOR(转折在L27)
+   - GLM4: 中间层SUPPRESSOR→最后层AMPLIFIER(转折在L36-L39)
+   - DS7B: 中间层SUPPRESSOR→最后层AMPLIFIER(剧烈转折在L26→L27)
+7. **DS7B非单调响应来源**: direction×scale交互(不是纯方向或纯范数)
+
+### Phase 455 对Phase 454的确认和修正
+
+1. **"投影≠因果"被再次确认**: PROJ_CAUSAL_CONFLICT在所有模型中仍然常见
+2. **"最后层attn是输出刹车"被重大修正**: 在margin意义上, Qwen3 L35 attn实际PROMOTES fruit/animal边际
+3. **"GLM4最后层MLP压制所有族"被推翻**: Phase 455证明这是符号错误, MLP在margin意义上是PROMOTES
+4. **DS7B L0非单调被再次确认**: 层注入在alpha=0.5处翻正
+
+### 核心洞察: Logit效应 vs Margin效应
+
+Phase 454和455的关键差异在于测量对象:
+
+- **Logit效应**: 消融组件后某个族的平均logit变化
+  - 告诉你组件是否影响某个族的"绝对分数"
+  - 但不告诉你组件是否帮助目标"赢过竞争族"
+
+- **Margin效应**: 消融组件后目标族与竞争族之间的边际变化
+  - 告诉你组件是否帮助目标"在竞争中获胜"
+  - 这才是语言输出的真正决定因素
+
+**一个组件可以:**
+- 提升所有族logit但降低目标边际(帮竞争族更多) → "语义放大器"但非"目标促进器"
+- 压低所有族logit但提升目标边际(压竞争族更多) → "语义压制器"但"目标促进器"
+
+这个区分是Phase 455最重要的方法论贡献。
+
+### 硬伤与问题
+
+1. **Exp2 cat slot有bug**: 所有模型的cat slot结果为None, 需要修复
+2. **对象数仍然偏少(R1仅3个/类别)**: 需要R2增加到6个
+3. **Margin定义仍需优化**: 当前margin = target - max(compete), 可能需要加权或考虑更多竞争族
+4. **DS7B animal类别attn PROMOTES这个发现需要复验**: 3个对象方差很大(0.2751)
+5. **不同模板的影响未测**: Phase 455只用了一个模板"The {obj} is a"
+
+### Round 2 确认测试 (6个对象/类别, Exp2 bug已修复)
+
+**Exp1 跨类别确认 (R2, 6对象/类别):**
+
+Qwen3 L35 R2: fruit attn=+0.20(PROMOTES), mlp=-0.65(SUPPRESSES) → R1完全一致
+GLM4 L39 R2: fruit attn=-0.06(NEUTRAL), mlp=+0.75(PROMOTES) → R1完全一致, MLP是边际AMPLIFIER!
+DS7B L27 R2: fruit attn=-2.23(SUPPRESSES), mlp=+1.07(PROMOTES) → R1完全一致
+
+**Exp2 cat slot (修复后):**
+- Qwen3 L35 cat: fruit attn_brake=+0.20(BRAKE), mlp_effect=-0.65(SUPPRESSOR) ← attn是BRAKE(压制目标边际)
+- GLM4 L39 cat: fruit attn_brake=-0.06(NEUTRAL), mlp_effect=+0.75(AMPLIFIER) ← MLP是AMPLIFIER!
+- DS7B L27 cat: fruit attn_brake=-2.23(STRONG BRAKE), mlp_effect=+1.07(AMPLIFIER) ← 确认!
+
+**DS7B L27 跨类别 attn/MLP 对比 (R2, 最有趣发现):**
+| 类别 | attn_margin | MLP_margin | 说明 |
+|------|------------|-----------|------|
+| fruit | -2.23 (BRAKE) | +1.07 (AMP) | attn压制, MLP促进 |
+| animal | +0.54 (PROM) | -1.04 (SUPP) | attn促进, MLP压制! |
+| tool | -0.63 (BRAKE) | +0.12 (AMP) | attn压制, MLP微促进 |
+| vehicle | -0.76 (BRAKE) | +0.35 (AMP) | attn压制, MLP促进 |
+
+→ DS7B L27: attn和MLP的效应在fruit/animal之间**完全翻转**!
+→ 对fruit: attn压制+MLP促进; 对animal: attn促进+MLP压制
+→ 这意味着DS7B的读出接口是**类别特异双模式**: 不同类别走不同的attn/MLP因果路径
+
+**Exp5 R2 MLP转折点确认:**
+- Qwen3: R2 L6=+0.44(AMP), L27=-0.24(SUPP), L35=-0.65(SUPP) → 与R1一致
+- GLM4: R2 L3=+0.13(AMP), L36=+0.18(AMP), L39=+0.75(AMP) → 最后层最强AMPLIFIER
+- DS7B: R2 L4=+0.45(AMP), L24=+0.44(AMP), L26=-0.78(SUPP), L27=+1.07(AMP) → L26→L27剧烈翻转确认
+
+### Phase 455 最终可靠结论 (R1+R2合并)
+
+1. **⚠️ Phase 454符号错误已确认纠正**: GLM4 L39 MLP在margin意义上是AMPLIFIER(+0.75), 不是SUPPRESSOR
+2. **Logit效应 ≠ Margin效应** (Phase 455最重要的方法论贡献):
+   - 组件可以压制所有logit同时促进目标边际(通过更强烈压制竞争族)
+   - 这是Phase 454所有"MLP压制/促进"结论需要重新审视的原因
+3. **最后层MLP跨模型一致是margin AMPLIFIER** (对大多数类别):
+   - Qwen3 L35: MLP对fruit/animal/tool margin是SUPPRESSOR (提升竞争族多于目标)
+   - GLM4 L39: MLP对fruit/animal/vehicle margin是AMPLIFIER (提升目标多于竞争族)
+   - DS7B L27: MLP对fruit/tool/vehicle margin是AMPLIFIER (提升目标多于竞争族)
+4. **最后层attn效应是类别依赖的** (不是简单的"输出刹车"):
+   - Qwen3 L35: attn对fruit/animal margin是PROMOTES (帮助目标赢过竞争族)
+   - GLM4 L39: attn对fruit/vehicle margin是SUPPRESSES
+   - DS7B L27: attn对fruit/tool/vehicle是SUPPRESSES, 但对animal是PROMOTES
+5. **DS7B L27的attn/MLP类别翻转是新发现**: fruit走"attn压制+MLP促进"路径, animal走"attn促进+MLP压制"路径
+6. **MLP转折模式**:
+   - Qwen3: 前层AMPLIFIER→后层SUPPRESSOR(转折L27)
+   - GLM4: 中间层SUPPRESSOR→最后层AMPLIFIER(转折L36-L39)
+   - DS7B: 中间层SUPPRESSOR→最后层AMPLIFIER(剧烈转折L26→L27)
+
+## Phase 456: 候选族边际动力学跨模板/跨对象/跨槽位闭环验证 [2026-06-11 07:50]
+
+### 核心目标
+验证Phase 455的发现是否跨Margin定义、跨模板、跨对象稳定
+
+### Exp1: 三种Margin定义鲁棒性 (Top1 / Mean / Softmax)
+
+**关键发现: Softmax margin几乎全为0, 不可用!**
+
+原因: softmax后概率差异在10^-4量级, 只有4-8个词的token id对总体概率贡献极小,
+远小于整个词表(>150K)的softmax归一化效应。
+
+**Top1 vs Mean的一致性分析 (去掉Softmax):**
+
+| 模型 | 层 | 类别 | Top1_attn | Mean_attn | 一致? | Top1_mlp | Mean_mlp | 一致? |
+|------|-----|------|-----------|-----------|-------|----------|----------|-------|
+| Qwen3 | L35 | fruit | +0.22 | +0.07 | ⚠️弱 | -0.65 | -0.60 | ✅ |
+| Qwen3 | L35 | animal | +0.68 | +0.56 | ✅ | -0.56 | -0.47 | ✅ |
+| Qwen3 | L35 | vehicle | -0.19 | -0.04 | ⚠️弱 | +0.16 | +0.16 | ✅ |
+| GLM4 | L39 | fruit | -0.06 | -0.11 | ✅(均弱) | +0.50 | +0.52 | ✅ |
+| GLM4 | L39 | animal | -0.00 | +0.03 | ✅(均弱) | +0.50 | +0.56 | ✅ |
+| GLM4 | L39 | vehicle | -0.13 | -0.10 | ✅ | +1.01 | +1.00 | ✅ |
+| DS7B | L27 | fruit | -2.20 | -1.70 | ✅ | +1.07 | +0.95 | ✅ |
+| DS7B | L27 | animal | +0.55 | +0.87 | ⚠️量级不同 | -1.04 | -1.06 | ✅ |
+| DS7B | L27 | vehicle | -0.76 | +0.30 | ❌不一致! | +0.35 | +0.57 | ✅ |
+
+→ Top1和Mean方向大部分一致(尤其MLP)
+→ DS7B vehicle的attn效应在Top1(-0.76)和Mean(+0.30)之间翻转!
+  原因: vehicle的attn对最强竞争族(class_fruit)压制极大(-3.04), 但对其他族促进,
+  所以Top1看是压制, Mean看是促进
+
+### Exp2: 多模板验证 (4模板/槽位, 3槽位)
+
+**cat slot (4模板, 最后层):**
+
+| 模型 | 类别 | avg_attn | attn_consist | avg_mlp | mlp_consist |
+|------|------|----------|-------------|---------|------------|
+| Qwen3 | fruit | +0.27 | 4/4 ✅ | -0.66 | 4/4 ✅ |
+| Qwen3 | animal | +0.39 | 3/4 | -0.56 | 4/4 ✅ |
+| GLM4 | fruit | -0.11 | 4/4 ✅ | +0.50 | 2/4 ⚠️ |
+| GLM4 | animal | +0.02 | 4/4 ✅ | +0.50 | 3/4 |
+| DS7B | fruit | -2.16 | 4/4 ✅ | +1.07 | 4/4 ✅ |
+| DS7B | animal | +0.56 | 3/4 | -1.04 | 4/4 ✅ |
+
+→ Qwen3 attn跨模板一致: 4/4 和 3/4
+→ DS7B attn跨模板一致: 4/4 和 3/4 (尽管方差大, 方向稳定)
+→ ⚠️ GLM4 MLP跨模板一致仅2/4! 不同模板下MLP对fruit的margin效应方向不一致
+
+**color slot 和 function slot (新测试!):**
+
+Qwen3 color: attn=-0.29(SUPP), mlp=-0.38(SUPP) → 与cat slot不同! attn和MLP都压制
+Qwen3 function: attn=-0.10(NEU), mlp=+0.30(PRO) → MLP对function margin是促进
+
+GLM4 color: attn=+0.14(PRO), mlp=-1.18(SUPP) → MLP压制color margin
+GLM4 function: attn=-0.03(NEU), mlp=-0.01(NEU) → MLP对function无效应
+
+DS7B color: attn=-2.28(SUPP), mlp=+1.50(PRO) → MLP强促进color margin
+DS7B function: attn=-1.87(SUPP), mlp=+0.38(PRO) → attn压制function, MLP微促进
+
+→ 不同槽位的attn/MLP效应完全不同! cat/color/function各有独特的组件效应模式
+→ 这说明组件效应是槽位依赖的, 不是统一的
+
+### Exp3: 全层Margin效应扫描
+
+**Qwen3 MLP margin effect (R2, 8对象/类):**
+| 层 | avg_mlp_margin | 类型 |
+|----|---------------|------|
+| L0 | -0.016 | NEUTRAL |
+| L6 | +0.326 | AMPLIFIER |
+| L12 | +0.352 | AMPLIFIER |
+| L18 | +0.137 | AMPLIFIER(弱) |
+| L24 | +0.041 | NEUTRAL |
+| **L27** | **-0.350** | **SUPPRESSOR** |
+| L30 | -0.511 | SUPPRESSOR |
+| L33 | -0.711 | SUPPRESSOR |
+| L35 | -0.729 | SUPPRESSOR |
+
+→ 再次确认: Qwen3 MLP从L27起变为SUPPRESSOR
+
+**GLM4 MLP margin effect (R2):**
+| 层 | avg_mlp_margin | 类型 |
+|----|---------------|------|
+| L0 | -0.050 | NEUTRAL |
+| L6 | -0.139 | SUPPRESSOR |
+| L12 | -0.138 | SUPPRESSOR |
+| L18 | +0.104 | AMPLIFIER(弱) |
+| L24 | -0.223 | SUPPRESSOR |
+| L30 | -0.116 | SUPPRESSOR |
+| **L36** | **+0.173** | **AMPLIFIER** |
+| **L38** | **+0.423** | **AMPLIFIER** |
+| **L39** | **+0.747** | **AMPLIFIER** |
+
+→ 再次确认: GLM4 MLP在最后3层(L36-L39)翻转为AMPLIFIER
+
+**DS7B MLP margin effect (R2):**
+| 层 | avg_mlp_margin | 类型 |
+|----|---------------|------|
+| L0 | -0.423 | SUPPRESSOR |
+| L4 | +0.129 | AMPLIFIER(弱) |
+| L8 | -0.554 | SUPPRESSOR |
+| L14 | -0.435 | SUPPRESSOR |
+| **L24** | **+0.539** | **AMPLIFIER** |
+| **L26** | **-0.743** | **SUPPRESSOR** |
+| **L27** | **+1.065** | **AMPLIFIER** |
+
+→ 再次确认: DS7B MLP从L26(-0.74)到L27(+1.07)剧烈翻转
+
+### Exp4: 类别路径翻转复验 (R2, 12对象)
+
+**Qwen3 L35 (最后层):**
+| 类别 | attn_margin | MLP_margin | 路径 |
+|------|-----------|-----------|------|
+| fruit | +0.215 (PRO) | -0.729 (SUPP) | attn=PRO+mlp=SUP |
+| animal | +0.679 (PRO) | -0.559 (SUPP) | attn=PRO+mlp=SUP |
+| tool | +0.097 (NEU) | -1.008 (SUPP) | attn=NEU+mlp=SUP |
+| vehicle | -0.103 (SUPP) | +0.162 (PRO) | attn=SUP+mlp=PRO |
+
+→ Qwen3 L35: fruit/animal走attn促进+MLP压制路径; vehicle走attn压制+MLP促进路径
+
+**GLM4 L39 (最后层):**
+| 类别 | attn_margin | MLP_margin | 路径 |
+|------|-----------|-----------|------|
+| fruit | -0.060 (NEU) | +0.747 (PRO) | attn=NEU+mlp=PRO |
+| animal | -0.004 (NEU) | +0.747 (PRO) | attn=NEU+mlp=PRO |
+| tool | -0.024 (NEU) | -0.654 (SUPP) | attn=NEU+mlp=SUP |
+| vehicle | -0.094 (NEU) | +1.014 (PRO) | attn=NEU+mlp=PRO |
+
+→ GLM4 L39: attn对几乎所有类别是NEUTRAL, MLP是主要margin驱动力
+→ MLP对3/4类别是AMPLIFIER, 只有tool是SUPPRESSOR
+
+**DS7B L27 (最后层):**
+| 类别 | attn_margin | MLP_margin | 路径 |
+|------|-----------|-----------|------|
+| fruit | -2.203 (SUPP强) | +1.065 (PRO) | attn=SUP+mlp=PRO |
+| animal | +0.548 (PRO) | -1.036 (SUPP) | attn=PRO+mlp=SUP ← 翻转! |
+| tool | -1.040 (SUPP) | +0.329 (PRO) | attn=SUP+mlp=PRO |
+| vehicle | -0.750 (SUPP) | +0.347 (PRO) | attn=SUP+mlp=PRO |
+
+→ ⚠️⚠️⚠️ DS7B L27 fruit/animal路径翻转再次确认! R2(12对象)完全一致!
+→ 3/4类别走 attn=SUP+mlp=PRO 路径
+→ 只有animal走 attn=PRO+mlp=SUP 路径 (完全相反!)
+
+### Exp5: 族级Logit分解 (揭示margin效应来源)
+
+**Qwen3 L35 MLP分解:**
+| 类别 | target_Δ | compete_Δ (最强) | diff | 解释 |
+|------|---------|-----------------|------|------|
+| fruit | +5.88 | animal=+6.11 | -0.81 | MLP提升所有族logit,但竞争族更多→margin下降 |
+| animal | +5.84 | vehicle=+6.67 | -0.84 | 同上 |
+| tool | +4.83 | fruit=+5.56 | -1.30 | tool族logit被MLP提升最少 |
+| vehicle | +6.66 | fruit=+6.67 | -0.01 | vehicle和fruit几乎一样 |
+
+→ Qwen3 L35 MLP对vehicle族的logit提升接近最大, 所以vehicle的margin几乎不变
+→ 这精确解释了为什么vehicle的MLP margin效应是弱的PROMOTES(+0.16)
+
+**GLM4 L39 MLP分解:**
+| 类别 | target_Δ | compete_Δ (最强) | diff | 解释 |
+|------|---------|-----------------|------|------|
+| fruit | -0.34 | tool=-1.36 | -0.27 | MLP压低所有族,但tool更多→fruit margin反升? |
+| animal | +0.03 | tool=-1.55 | +0.50 | MLP对animal几乎不压,对tool强压→animal margin大升 |
+| tool | -0.87 | fruit=-1.14 | -0.65 | MLP压低tool最多→margin下降 |
+| vehicle | -0.32 | tool=-1.96 | +0.15 | MLP对tool压最多→vehicle margin上升 |
+
+→ GLM4 L39 MLP对tool族的压制最强烈(-0.87到-1.96)
+→ 这解释了为什么vehicle的margin上升(+1.01): tool(最强竞争族)被大幅压制
+→ 也解释了为什么tool的margin下降(-0.65): tool本身被MLP压制最多
+
+**DS7B L27 MLP分解:**
+| 类别 | target_Δ | compete_Δ (最强) | diff | 解释 |
+|------|---------|-----------------|------|------|
+| fruit | +5.17 | animal=+4.22 | +0.43 | MLP提升fruit最多→margin上升 |
+| animal | +5.29 | fruit=+7.27 | -1.99 | MLP提升fruit远多于animal→animal margin下降 |
+| tool | +5.65 | fruit=+6.54 | -0.89 | fruit被提升更多→tool margin下降 |
+| vehicle | +4.46 | fruit=+4.89 | -0.44 | fruit被提升更多→vehicle margin下降 |
+
+→ DS7B L27 MLP对fruit族的logit提升(+5.17)比对animal(+4.22)和vehicle(+4.46)多
+→ 但对fruit类的竞争对手(也是fruit!)提升更多(+7.27 vs +5.29对animal)
+→ 这解释了为什么fruit的margin上升而animal的margin下降
+
+### Phase 456 核心发现
+
+1. **三种Margin定义: Softmax不可用(概率差异太小), Top1和Mean基本一致, 但DS7B vehicle的attn效应在两者间翻转**
+2. **跨模板稳定性: attn效应高度稳定(4/4), MLP效应在GLM4上不稳定(2/4)**
+3. **跨槽位差异巨大: cat/color/function的attn/MLP效应完全不同**
+4. **DS7B fruit/animal路径翻转在12对象上稳定复现: fruit走attn=SUP+mlp=PRO, animal走attn=PRO+mlp=SUP**
+5. **Margin效应的来源被精确解释: MLP提升/压制各族的logit幅度不同, 导致目标族和竞争族的边际差变化**
+6. **GLM4 MLP跨模板不稳定: 不同模板下MLP对fruit的margin效应方向不一致**
+
+### 关键新发现: MLP的"选择性放大/压制"机制
+
+MLP不是统一放大或压制所有族, 而是有选择性地对不同族施加不同幅度的效应:
+
+- Qwen3 L35 MLP: 提升所有族logit, 但vehicle(+6.66)和fruit(+5.88)提升幅度差0.78
+- GLM4 L39 MLP: 压低所有族logit, 但tool(-0.87)被压最多, animal(+0.03)几乎不压
+- DS7B L27 MLP: 提升所有族logit, 但fruit(+5.17)提升多于animal(+4.22)
+
+这种**选择性幅度差异**就是margin效应的直接来源。
+
+### 硬伤与问题
+
+1. **Softmax margin不可用**: 当前实现只用4-8个token id, softmax后概率差异被词表稀释
+2. **GLM4 MLP跨模板不稳定**: 只有2/4模板方向一致, 需要更多研究
+3. **DS7B vehicle的attn在Top1和Mean间翻转**: 说明attn对不同竞争族的效应方向相反
+4. **color和function slot的数据较少**: 每类只有4个对象
+5. **Exp3 Qwen3 R1崩溃**: plog_always的end=""参数bug, R2修复后正常
+
+时间: 2026-06-11 07:50
+
+时间: 2026-06-11 03:38
