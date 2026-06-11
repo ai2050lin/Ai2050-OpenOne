@@ -22026,3 +22026,404 @@ Qwen3 MLP:
 5. **否定模板单一**: 只用了"The {obj} is not a", 需要更多否定表达
 
 时间: 2026-06-11 09:42
+
+---
+
+## Phase 458: 关系槽位纯化、否定作用域与多跳知识路径验证 [2026-06-11 10:04]
+
+### 实验设计
+
+Phase 458解决Phase 457遗留的5个硬伤:
+1. 关系槽位纯化: 6个is_a模板, 4个has_color模板, 5个has_part模板, 4个used_for模板
+2. 否定作用域分解: 5种否定模板(simple/explicit_alt/contrast/scope_control/double_neg)
+3. 多跳知识路径: 6条路径(4条2-hop + 2条1-hop对照)
+4. DS7B路径分裂大样本: 8对象/类, 12-16层采样
+5. has_part槽位修复: 5种模板 × 3种部件候选族(bio/mech/generic)
+6. 候选族词表控制: full/single-token/bootstrap/W_U norm
+
+脚本: tests/glm5/phase458_slot_purification_negation_multihop.py
+结果: results/glm5/phase458_{model}_r{1,2}.json
+
+---
+
+### Exp1: 关系槽位纯化 — 核心发现
+
+**关系槽位存在模板无关一致性, 但程度不同:**
+
+| 关系 | Qwen3平均 | GLM4平均 | DS7B平均 | 稳定性 |
+|------|----------|---------|---------|--------|
+| is_a | 0.833 | 0.885 | 0.844 | 中等,tool/fruit不稳定 |
+| has_color | 0.867 | 0.969 | 0.969 | 高,tool偏弱 |
+| has_part | 0.988 | 0.888 | 1.000 | 极高! |
+| used_for | 0.992 | 0.992 | 0.953 | 极高! |
+
+**关键发现:**
+- **has_part一致性反常地高(0.89-1.0)**: Phase 457认为has_part有问题, 但多模板测试显示has_part模板间高度一致! 之前margin为负不是模板问题, 而是**部件知识本身比类别知识更难读出**
+- **is_a一致性最低(0.83-0.89)**: "The {obj} belongs to the category"模板频繁产生负margin, 说明is_a槽位对模板形式更敏感
+- **tool类在is_a下最不稳定(0.65-0.75)**: "tool"这个类别在不同模板下表现差异大
+
+**is_a模板特异性(Qwen3 fruit):**
+- "is a kind of": margin=+1.46 (正确)
+- "belongs to the category": margin=-1.50 (反转!)
+- "is a type of": margin=+1.58 (正确)
+- "is a": margin=+0.75 (正确但较弱)
+
+→ "belongs to the category"模板触发的是分类框架而非类别名称, 是不同层面的输出
+
+---
+
+### Exp2: 否定作用域分解 — 核心发现
+
+**三种模型的否定机制完全不同:**
+
+| 条件 | Qwen3 animal | GLM4 animal | DS7B animal |
+|------|-------------|-------------|-------------|
+| affirmative | 1.84 | 2.42 | 1.59 |
+| simple_neg | 0.91 | 1.01 | 0.36 |
+| explicit_alt | 1.51 | 2.07 | -0.83 |
+| contrast_neg | 0.83 | 0.74 | -0.89 |
+| scope_control | 2.53 | 3.48 | -1.04 |
+| double_neg | 4.02 | 2.43 | 0.67 |
+
+**Qwen3/GLM4的否定模式:**
+- simple_neg: 正确降低目标族margin(从1.84→0.91)
+- double_neg: 恢复甚至超过affirmative(4.02 > 1.84) — **双重否定≈肯定, 符合逻辑!**
+- explicit_alt/contrast_neg: 仍为正(模板显式引导)
+- scope_control: 最高(2.53-3.48) — "It is false that X is an animal"先否定, 再"The X is a"重新引导
+
+**DS7B的否定模式 — 完全异常:**
+- **simple_neg: 0.36 (从1.59降到0.36, 降幅最大, 这个是正确的)**
+- **explicit_alt: -0.83 (负!)** — "not an animal; it is a"导致目标族margin为负!
+- **contrast_neg: -0.89 (负!)** — "not an animal but a"也导致负margin
+- **scope_control: -1.04 (负!)** — 连显式否定+重引导都失败
+- **double_neg: 0.67 (低)** — 双重否定只恢复到0.67
+
+→ DS7B否定的问题是: 一旦否定上下文出现, 它就彻底破坏了类别选择能力
+
+**DS7B fruit/tool的肯定基线为负:**
+- fruit affirmative = -1.99 (DS7B用"The X is a"不能正确识别fruit!)
+- tool affirmative = -1.24
+- 但simple_neg后: fruit=0.20, tool=0.71 (反而变正!)
+
+→ DS7B的"not"对fruit/tool产生了对比增强效应: 否定animal后, 非animal类别被释放
+
+---
+
+### Exp3: 多跳知识路径 — 核心发现
+
+**2-hop路径vs 0-hop的margin提升:**
+
+| 路径 | Qwen3 2vs0 | GLM4 2vs0 | DS7B 2vs0 |
+|------|-----------|----------|----------|
+| robin→bird→animal | +3.32 | +0.72 | +1.01 |
+| salmon→fish→animal | +1.75 | +1.61 | -0.11 |
+| car→vehicle→machine | -2.71 | +0.37 | +1.48 |
+| hammer→tool→object | -2.17 | -0.86 | +3.44 |
+
+**关键发现:**
+1. **多跳路径确实有效(部分)**: robin→bird→animal和salmon→fish→animal在Qwen3和GLM4中给出显著margin提升
+2. **object/machine不是有效中间类别**: "object"和"machine"不在候选族中, 导致2-hop反而降低margin
+3. **DS7B的hammer→tool→object路径2vs0=+3.44(最高!)**: 但这可能因为DS7B的is_a基线为负, 所以2-hop修复了基线问题
+4. **单跳对照**: robin_single的2vs0=+1.81(Qwen3), 证明即使单前提也有显著知识激活
+
+**层间消融(Qwen3 robin→bird→animal):**
+- 前层(0-6): attn PROMOTES animal margin
+- 中层(9-18): MLP逐渐主导
+- 后层(27-35): attn SUPPRESSES animal, MLP PROMOTES
+
+→ 多跳推理主要在后层MLP中完成, 前层attention负责激活中间概念
+
+---
+
+### Exp4: DS7B路径分裂大样本 — 核心发现
+
+**8对象/类, 16层采样的fruit/animal路径分裂:**
+
+| 模型 | attn flip比 | MLP flip比 | 总层数 |
+|------|-----------|-----------|--------|
+| Qwen3 | 6/15 (40%) | 5/15 (33%) | 15 |
+| GLM4 | 8/16 (50%) | 8/16 (50%) | 16 |
+| DS7B | 6/16 (38%) | **12/16 (75%)** | 16 |
+
+**DS7B MLP flip极高(75%):**
+- L0: fruit=[SUPPRESSES, SUPPRESSES] vs animal=[PROMOTES, PROMOTES] — **从第0层就分裂!**
+- L8-L18: fruit MLP=SUPPRESSES, animal MLP=PROMOTES (稳定分裂)
+- L27: fruit=[SUPPRESSES, PROMOTES] vs animal=[PROMOTES, SUPPRESSES] — 最终层也翻转
+
+**GLM4也有高flip比(50%)**, 但分散在attn和MLP中
+**Qwen3 flip比较低(33-40%)**, 路径分裂不那么稳定
+
+→ DS7B的fruit/animal路径分裂是MLP驱动的, 从浅层贯穿到深层, 确认为全层类别特异路由
+
+---
+
+### Exp5: has_part槽位修复 — 核心发现
+
+**5种模板 × 3种部件候选族的margin汇总(Qwen3 R2):**
+
+| 模板 | fruit bio | fruit mech | fruit generic | tool bio | tool mech | tool generic |
+|------|-----------|------------|---------------|----------|-----------|-------------|
+| original | -1.58 | -2.71 | -0.69 | -2.68 | -0.69 | -1.75 |
+| component | -1.24 | -2.43 | -0.69 | -3.22 | -0.98 | -2.25 |
+| physical | -1.18 | -2.36 | -1.48 | -2.58 | -1.47 | -1.73 |
+| contains | -0.75 | -2.13 | **+0.83** | -1.97 | -0.65 | -0.76 |
+| body_part | -1.34 | -2.52 | -1.69 | -1.92 | -0.67 | -0.86 |
+
+**关键发现:**
+1. **"contains"模板 + generic_parts是唯一正margin组合**(fruit +0.83)
+2. **bio_parts几乎总是负margin**: 即使改进模板, 生物部件知识仍然读不出
+3. **mech_parts在tool/vehicle下接近0**: "component"模板对机械部件有帮助(-0.65 ~ -0.98)
+4. **generic_parts(=piece/section/component等)表现最好**: 说明模型确实知道"部件"概念, 但不能用具体部件名读出
+
+→ **has_part的负margin不是模板问题, 而是部件词汇的表示问题**: 模型有部件概念但具体部件词太弱
+
+---
+
+### Exp6: 候选族词表控制 — 核心发现
+
+**三种测量方法(full/single/bootstrap)的一致性:**
+
+| 类别 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| fruit | True | True | True(全负) |
+| animal | True | True | True |
+| tool | True | True | **False** |
+| vehicle | True | True | **False** |
+
+**DS7B tool/vehicle的vocab控制失败:**
+- tool: full=-1.24, single=+0.27, boot=-1.53
+- vehicle: full=-0.92, single=+0.29, boot=-1.06
+- 单token测量给正margin, 但full和bootstrap给负margin
+- 原因: "tool"/"implement"等单token有较高logit, 但多token候选词("device"被切分)拉低了均值
+
+→ **DS7B的tool/vehicle负margin部分来自多token候选词的tokenization偏差**, 但bootstrap也确认了负margin
+
+**W_U norm(Qwen3):**
+- class_fruit: 7.42, class_animal: 8.01, class_tool: 7.13, class_vehicle: 7.55
+- 差异不大, 排除W_U norm伪影
+
+---
+
+### Phase 458 核心发现汇总
+
+1. **关系槽位确实存在模板无关一致性**: has_part(0.89-1.0)和used_for(0.95-1.0)极高, is_a(0.83-0.89)和has_color(0.87-0.97)中等
+2. **is_a的"belongs to the category"模板产生负margin**: 不是关系槽位问题, 而是模板触发了分类框架而非类别名称
+3. **Qwen3/GLM4的否定机制符合逻辑**: simple_neg降低, double_neg恢复甚至超过affirmative
+4. **DS7B的否定机制完全异常**: 一旦否定上下文出现, 类别选择能力被彻底破坏, 但simple_neg仍有部分效果
+5. **DS7B的fruit/tool肯定基线为负**: "The X is a"模板不能正确识别fruit/tool, 但"not"后反而释放非动物类别
+6. **多跳推理在部分路径有效**: robin→bird→animal和salmon→fish→animal给出2-3分margin提升
+7. **多跳推理需要中间类别在候选族中**: "object"/"machine"不在候选族中, 导致2-hop无效
+8. **DS7B MLP flip比达75%(12/16层)**: fruit/animal全层路径分裂由MLP驱动, 确认为全层类别特异路由
+9. **has_part负margin不是模板问题而是部件词汇表示问题**: generic_parts(=piece/component等)有正margin, 但bio/mech具体部件词太弱
+10. **DS7B tool/vehicle负margin部分来自tokenization偏差**: 单token给正margin, 但多token候选词拉低
+
+### 硬伤与问题
+
+1. **DS7B否定异常的根因未明**: 是模型缺陷还是不同的否定计算方式? 需要更深入的层间分析
+2. **has_part仍然无法读出具体部件**: 即使改进模板和候选族, bio_parts/mech_parts始终为负
+3. **多跳路径只验证了4条**: 需要更多路径类型和更复杂的推理链
+4. **is_a的"belongs to the category"异常未深入分析**: 可能揭示了分类框架和类别名称的不同编码
+5. **DS7B tool/vehicle的vocab控制不一致**: bootstrap确认负margin, 但单token给正, 需要更大样本
+
+时间: 2026-06-11 11:38
+
+---
+
+## Phase 459: 槽位子类型发现、否定算子闭环与多跳路径因果验证 [2026-06-11 13:19]
+
+### 实验设计
+
+Phase 459解决Phase 458的三个核心问题 + 新增语法角色绑定:
+1. Exp1: is_a子槽位聚类 — 12模板(6 kind-of + 2 type-of + 2 simple + 2 classification-frame)
+2. Exp2: 否定算子闭环 — 10种否定模板(新增not_only/not_because/without/never)
+3. Exp3: 多跳路径因果验证 — 8条路径(4条2-hop + 2条1-hop + 2条0-hop) + 层间消融
+4. Exp4: has_part具体部件修复 — 对象特异部件候选族(bio/mech/generic)
+5. Exp5: DS7B全层类别路由大样本 — 6对象/类, 每2层采样
+6. Exp6: 语法角色绑定预实验 — 主宾交换 + agent-patient动词选择
+
+脚本: tests/glm5/phase459_subslot_negation_causal_multihop.py
+结果: results/glm5/phase459_{model}_r{1,2}.json
+
+---
+
+### Exp1: is_a子槽位聚类 — 核心发现
+
+**is_a确实包含多个内部子槽位, "belongs to the category"在部分模型中单独聚类:**
+
+| 模型 | fruit | animal | tool | vehicle |
+|------|-------|--------|------|---------|
+| Qwen3 | 7 clusters, btcat=False | 4, False | 6, **True** | 2, False |
+| GLM4 | 7, **True** | 4, False | 5, **True** | 5, False |
+| DS7B | 5, False | 7, **True** | 5, False | 7, False |
+
+**关键发现:**
+
+1. **"belongs to the category"在GLM4的fruit和tool中单独聚类**: 说明GLM4确实把"属于类别"理解为分类框架而非类别名称
+2. **"is an example of a"在Qwen3 fruit中margin为负(-0.25)**: 说明"是例子"触发的是实例层面而非类别层面
+3. **Qwen3 tool的"belongs to the category"(-0.18)和"The correct class for"(-0.65)也单独聚类**: 工具类的分类框架和类别名更是两种不同查询
+4. **DS7B animal的"belongs to the category"单独聚类**: DS7B在动物分类上也区分框架和名称
+
+**模板聚类模式(Qwen3 fruit):**
+- cluster_0: "is a kind of" + "is a sort of" + "is a form of" + "belongs to the category" (avg_m=+0.80)
+- cluster_1: "is a type of" + "The correct class for" (avg_m=+0.94)
+- cluster_2: "is a" + "A is a" (avg_m=+0.69)
+- cluster_3: "People classify the as" (avg_m=+1.50) — 最强!
+- cluster_4: "is classified as" (avg_m=+0.50)
+- cluster_5: "falls under the category" (avg_m=+1.39)
+- cluster_6: "is an example of a" (avg_m=-0.25) — 唯一负margin!
+
+→ is_a至少有3个子槽位: (1)kind-of/type-of (2)classification-frame (3)instance-example
+
+---
+
+### Exp2: 否定算子闭环 — 核心发现
+
+**三种模型的否定算子指标:**
+
+| 类别 | Qwen3 NFD | GLM4 NFD | DS7B NFD |
+|------|-----------|----------|----------|
+| fruit | +0.56 | +0.24 | **-2.19** |
+| animal | +0.92 | +1.41 | **+1.23** |
+| tool | +0.21 | +1.05 | **-1.95** |
+| vehicle | -0.65 | -0.16 | **-1.45** |
+
+**NFD=affirmative_margin - simple_neg_margin, 正值=正确否定(目标族下降)**
+
+**关键发现:**
+
+1. **Qwen3/GLM4: fruit/animal/tool的NFD为正, 表示否定正确降低目标族margin**
+2. **DS7B: fruit/tool/vehicle的NFD为负!** — "not a"反而增加了非animal类的margin!
+3. **DS7B的否定模式是"反向释放":** not animal → 释放所有非animal候选族(fruit+2.19, tool+1.95, vehicle+1.45)
+
+**DoubleNegRecovery指标:**
+- Qwen3 animal: DNR=3.10 (非常强! 双重否定远超肯定)
+- GLM4 animal: DNR=1.42 (正确恢复)
+- DS7B fruit: DNR=-0.03 (完全不能恢复)
+
+**AlternativeRelease(否定后竞争族变化):**
+- Qwen3: animal否定后, fruit+0.31, vehicle+0.34 (替代族正确上升)
+- DS7B: fruit否定后, animal+1.29, tool+2.92, vehicle+3.00 (替代族大幅上升, 过度释放)
+- DS7B: vehicle否定后, fruit+4.47, animal+2.49, tool+3.08 (极端释放!)
+
+→ DS7B的否定不是"不理解not", 而是把"not X"当成"释放所有非X"的对比增强信号
+
+---
+
+### Exp3: 多跳路径因果验证 — 核心发现
+
+**2-hop vs 0-hop margin提升:**
+
+| 路径 | Qwen3 2vs0 | GLM4 2vs0 | DS7B 2vs0 |
+|------|-----------|----------|----------|
+| robin→bird→animal | **+3.32** | +0.72 | +1.01 |
+| salmon→fish→animal | +1.75 | +1.61 | -0.11 |
+| rose→flower→plant | +0.22 | -0.16 | +1.36 |
+| oak→tree→plant | +1.13 | +0.58 | +1.59 |
+| robin_single(1-hop) | +1.81 | +0.83 | -0.13 |
+| apple_single(1-hop) | +2.25 | +0.44 | +2.80 |
+
+**关键发现:**
+
+1. **Qwen3 robin→bird→animal 2vs0=3.32非常强**: 2-hop推理确实有效
+2. **salmon→fish→animal在Qwen3中1-hop(6.16)甚至比2-hop(5.24)更高!**: 说明"fish"这个词本身比"bird"更强关联"animal"
+3. **plant路径普遍为负或弱**: "plant"不在候选族中, 无法形成有效中间节点
+4. **DS7B的apple_single 2vs0=2.80(最强)**: 但robin_single为-0.13, 路径特异性大
+
+**Qwen3 robin→bird→animal层间消融:**
+- L0-6: attn PROMOTES animal margin
+- L9-18: MLP逐渐主导, attn变NEUTRAL
+- L21-27: attn SUPPRESSES, MLP PROMOTES (互补!)
+- L30-35: MLP强PROMOTES, attn SUPPRESSES
+
+→ 多跳推理的层间分工: 前层attn激活中间概念, 后层MLP完成推理, 末层attn抑制干扰
+
+---
+
+### Exp4: has_part具体部件修复 — 核心发现
+
+**对象特异部件候选族的avg margin:**
+
+| 类别/部件 | Qwen3 | GLM4 | DS7B |
+|-----------|-------|------|------|
+| fruit/bio_parts | **+1.04** | -0.53 | **+1.04** |
+| fruit/generic_parts | +0.94 | -0.22 | +0.94 |
+| animal/bio_parts | +0.47 | -0.24 | +0.47 |
+| tool/mech_parts | -0.10 | -0.39 | **-0.44** |
+| tool/generic_parts | **+1.13** | +0.04 | +1.13 |
+| vehicle/generic_parts | +1.82 | -0.13 | **+1.82** |
+| vehicle/mech_parts | +0.13 | -0.28 | -0.15 |
+
+**关键发现:**
+
+1. **Qwen3和DS7B的fruit bio_parts终于转正(+1.04)!** — Phase 458说部件知识弱, 但Phase 459用对象特异候选族修复了
+2. **generic_parts在Qwen3/DS7B中普遍为正**: "piece/component/section"确实更容易读出
+3. **GLM4所有部件类型均为负margin**: GLM4在has_part关系上确实比其他模型弱
+4. **mech_parts在所有模型中均为负或弱正**: 具体机械部件词(handle/blade/engine)确实太弱
+
+→ Phase 458说"部件知识边弱"需要修正: **对Qwen3/DS7B, 水果生物部件知识边并不弱, 是候选族定义问题; 但机械部件知识确实弱**
+
+---
+
+### Exp5: DS7B全层类别路由 — 核心发现
+
+**DS7B fruit/animal路径分裂: flip=11/15层(73.3%)**
+
+关键层轨迹:
+- L0: fruit=[SUPP,SUPP] vs animal=[PROM,PROM] — 从第0层就分裂!
+- L4: fruit=[PROM,PROM] vs animal=[PROM,SUPP] — MLP开始分化
+- L10: fruit=[PROM,PROM] vs animal=[PROM,SUPP] — MLP持续分化
+- L24: fruit=[SUPP,PROM] vs animal=[PROM,PROM] — 深层翻转
+- L27: fruit=[SUPP,PROM] vs animal=[PROM,PROM] — 最终层确认
+
+→ DS7B的MLP flip占主导: MLP从浅层开始对fruit和animal执行不同路由
+
+---
+
+### Exp6: 语法角色绑定 — 核心发现
+
+**Qwen3动词选择patient候选族:**
+
+| 主语+动词 | animal | fruit | tool | vehicle |
+|-----------|--------|-------|------|---------|
+| dog chased | 3.06 | -4.04 | -2.56 | 1.59 |
+| cat chased | 1.41 | -4.76 | -3.97 | -1.45 |
+| boy ate | 4.80 | **3.20** | 0.26 | 2.12 |
+| girl cut | 1.38 | -1.11 | -2.33 | -1.90 |
+| monkey rode | 3.36 | 1.05 | 0.33 | **3.47** |
+
+**关键发现:**
+
+1. **Qwen3: 动词驱动patient选择!** "ate"→fruit高(3.20), "rode"→vehicle高(3.47)
+2. **"chased"→animal高但主语差异大**: dog=3.06 vs cat=1.41, 说明agent身份也影响
+3. **DS7B: "dog chased" vs "cat chased"几乎无差异**(7.30 vs 7.22) — 不区分主宾角色
+4. **GLM4: 所有logit都偏低**, 语法角色信号弱
+
+**主宾交换(Qwen3 "The dog chased the" vs "The cat chased the"):**
+- active: animal=3.06, reversed: animal=1.41 → **agent影响patient选择**
+- "The boy hit the" vs "The ball hit the": 最大diff在attr_part_mech(1.74) → 奇怪
+
+→ **Qwen3已初步形成动词→patient候选族的语法路由, 但GLM4和DS7B尚未形成**
+
+---
+
+### Phase 459 核心发现汇总
+
+1. **is_a包含至少3个子槽位**: kind-of/type-of, classification-frame, instance-example. "belongs to the category"在GLM4/DS7B中单独聚类
+2. **DS7B的否定是"反向释放"机制**: not X → 释放所有非X候选族(NFD为负!), 而非压制X
+3. **Qwen3/GLM4的否定是"边际重分配"机制**: not X → 压制X, 释放替代族(NFD为正), 双重否定≈肯定
+4. **多跳推理在Qwen3中最强(robin 2vs0=3.32)**, 层间分工: 前层attn激活中间概念, 后层MLP完成推理
+5. **has_part修复后Qwen3/DS7B的bio_parts转正(+1.04)**, 但GLM4仍为负, mech_parts普遍弱
+6. **DS7B全层路径分裂73.3%确认**, MLP是主要分裂源
+7. **Qwen3形成动词→patient语法路由**: "ate"→fruit, "rode"→vehicle
+8. **DS7B和GLM4缺乏语法角色区分**: 主宾交换几乎无差异
+
+### 硬伤与问题
+
+1. **is_a子槽位聚类用简单相关阈值(0.7), 不够精确**: 需要更正式的聚类方法(如k-means on margin向量)
+2. **多跳推理的因果干预只做了前提移除(0-hop/1-hop/2-hop对比)**, 没有做patch中间族表示的实验
+3. **语法角色绑定样本太少**: 只有5个agent-patient对, 需要扩展到20+对
+4. **has_part修复在GLM4上完全失败**: 所有类型都为负, 需要分析GLM4为何部件知识如此弱
+5. **DS7B的"反向释放"机制未在层间分析**: 需要追踪否定信号在哪些层被转换为释放信号
+6. **多跳路径的中间节点不在候选族中(plant/machine/object)**: 需要扩展候选族或用不同路径
+
+时间: 2026-06-11 13:19
