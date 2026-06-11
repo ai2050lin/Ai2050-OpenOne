@@ -28367,3 +28367,484 @@ open generation 不能直接使用自然 prompt；
 必须先建立稳定读出器。
 这不是失败，而是说明机制研究必须把“读出器校准”作为正式实验层。
 ```
+
+## Phase 86: answer-only reader calibration 全量测试 [2026-06-10 21:58]
+
+### 任务目标
+
+根据 Phase 85 的负结果，本轮不继续做 erase/restore 机制干预，而是先校准开放生成读出器。
+
+Phase 85 已经说明：
+
+```text
+suffix/readout 子空间会显著改变开放生成轨迹；
+但自然 prompt 的 base target prefix_hit = 0；
+因此不能直接把 open generation 命中率当作内部机制证据。
+```
+
+本轮目标：
+
+```text
+1. 设计 answer-only reader templates；
+2. 在 qwen3、GLM4、DS7B 三模型上做大样本开放生成校准；
+3. 区分严格命中、值族重叠、格式违规；
+4. 判断是否已经具备进入 open generation erase/restore 的读出条件。
+```
+
+### 对输入分析的判断
+
+输入分析中正确的部分：
+
+```text
+1. Phase 85 不是机制失败，而是 reader failure。
+2. open generation 必须拆成内部机制层 + 读出器层 + 解码层。
+3. 不应在 base reader 不稳定时继续做机制干预。
+4. answer-only reader calibration 应作为正式实验层。
+```
+
+需要谨慎的部分：
+
+```text
+1. exact/prefix hit 太严格，但不能直接用弱语义相似替代机制证据。
+2. family overlap 只能表示值族重叠，不等于完整答案正确。
+3. 如果 answer-only reader 仍不稳定，应继续重建读出器，而不是强行做 erase/restore。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase86_answer_only_reader_calibration.py
+tests/gpt5/phase86_answer_only_reader_calibration_summary.py
+tests/gpt5/run_phase86_answer_only_reader_calibration_full.sh
+```
+
+脚本特性：
+
+```text
+1. 三模型顺序运行：qwen3 -> GLM4 -> DS7B。
+2. 每个模型完成后使用 --hard-exit-after-model。
+3. 使用本地模型和 CUDA。
+4. 默认加载 flash_attention_2,sdpa,eager；本机无 flash_attn 包，因此实际回退到 sdpa。
+5. 支持 resume；DeepSeek7B 中途 segfault 后通过 partial 继续完成。
+6. 不做 hook、不做 patch，只做 reader calibration。
+```
+
+### 模板
+
+测试 8 个 answer-only reader 模板：
+
+```text
+answer_only_plain
+answer_only_short_phrase
+question_value
+fill_blank_answer
+json_value
+value_equals
+bare_answer
+one_phrase
+```
+
+核心指标：
+
+```text
+exact_hit：生成首段完全等于 target。
+prefix_hit：生成首段以前缀方式命中 target。
+contains_hit：生成文本包含 target。
+word_subset_hit：target content words 全部出现在首段中。
+family_overlap_hit：首段与 target 有至少 50% content-word 双向重叠。
+target_word_coverage：target words 被首段覆盖比例。
+first_word_precision：首段中属于 target 的词比例。
+format_violation：出现解释、长句、重复上下文等格式违规。
+```
+
+说明：
+
+```text
+family_overlap_hit 只作为弱值族信号，不作为完整答案正确证据。
+```
+
+### 运行命令
+
+smoke：
+
+```bash
+PHASE86_OUTPUT_DIR=results/gpt5_phase86_answer_only_reader_calibration_smoke2_$(date +%Y%m%d_%H%M%S) \
+PHASE86_MODELS=qwen3 \
+QWEN3_PHASE86_MAX_ITEMS=4 \
+PHASE86_TEMPLATES=answer_only_plain,question_value \
+PHASE86_PROGRESS_EVERY=2 \
+tests/gpt5/run_phase86_answer_only_reader_calibration_full.sh
+```
+
+正式全量：
+
+```bash
+PHASE86_OUTPUT_DIR=results/gpt5_phase86_answer_only_reader_calibration_full_$(date +%Y%m%d_%H%M%S) \
+PHASE86_PROGRESS_EVERY=84 \
+tests/gpt5/run_phase86_answer_only_reader_calibration_full.sh
+```
+
+DeepSeek7B 第一次运行到 420/672 item 后出现用户态 segmentation fault：
+
+```text
+exit_code = 139
+```
+
+随后使用同一输出目录 resume：
+
+```bash
+PHASE86_OUTPUT_DIR=results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347 \
+PHASE86_MODELS=qwen3,glm4,deepseek7b \
+PHASE86_PROGRESS_EVERY=84 \
+tests/gpt5/run_phase86_answer_only_reader_calibration_full.sh
+```
+
+resume 后 DeepSeek7B 完成。
+
+### 输出文件
+
+```text
+results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347/qwen3_phase86_answer_only_reader_calibration.json
+results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347/glm4_phase86_answer_only_reader_calibration.json
+results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347/deepseek7b_phase86_answer_only_reader_calibration.json
+results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347/phase86_answer_only_reader_calibration_summary.json
+results/gpt5_phase86_answer_only_reader_calibration_full_20260610_211347/PHASE86_ANSWER_ONLY_READER_CALIBRATION_SUMMARY.md
+```
+
+### 数据规模
+
+```text
+qwen3:
+  items = 672
+  templates = 8
+  rows = 5376
+
+GLM4:
+  items = 672
+  templates = 8
+  rows = 5376
+
+DS7B:
+  items = 672
+  templates = 8
+  rows = 5376
+
+total rows = 16128
+```
+
+### Qwen3 客观结果
+
+按 template：
+
+```text
+fill_blank_answer:
+  exact_hit = 0.0060
+  prefix_hit = 0.0060
+  word_subset_hit = 0.0074
+  family_overlap_hit = 0.3006
+  format_violation = 0.0640
+
+answer_only_plain:
+  exact_hit = 0.0060
+  prefix_hit = 0.0074
+  word_subset_hit = 0.0104
+  family_overlap_hit = 0.2560
+  format_violation = 0.0863
+
+answer_only_short_phrase:
+  exact_hit = 0.0074
+  prefix_hit = 0.0074
+  word_subset_hit = 0.0089
+  family_overlap_hit = 0.2217
+  format_violation = 0.0818
+```
+
+按 relation：
+
+```text
+is_a:
+  family_overlap_hit = 0.2552
+  word_subset_hit = 0.0130
+
+used_for:
+  family_overlap_hit = 0.2227
+  word_subset_hit = 0.0169
+
+location:
+  family_overlap_hit = 0.2201
+  word_subset_hit = 0.0065
+```
+
+样例：
+
+```text
+target = metal tool
+generated = tool
+解释：值族重叠，但不是完整 target。
+
+target = cutting food
+generated = cutting food
+解释：严格命中。
+```
+
+### GLM4 客观结果
+
+按 template：
+
+```text
+fill_blank_answer:
+  exact_hit = 0.0074
+  prefix_hit = 0.0074
+  word_subset_hit = 0.0104
+  family_overlap_hit = 0.3021
+  format_violation = 0.1979
+
+answer_only_short_phrase:
+  exact_hit = 0.0238
+  prefix_hit = 0.0238
+  word_subset_hit = 0.0268
+  family_overlap_hit = 0.2723
+  format_violation = 0.1250
+
+answer_only_plain:
+  exact_hit = 0.0045
+  prefix_hit = 0.0045
+  word_subset_hit = 0.0104
+  family_overlap_hit = 0.2292
+  format_violation = 0.1935
+```
+
+按 relation：
+
+```text
+location:
+  family_overlap_hit = 0.2031
+  word_subset_hit = 0.0078
+
+part_of:
+  family_overlap_hit = 0.1797
+  word_subset_hit = 0.0117
+
+used_for:
+  family_overlap_hit = 0.1758
+  word_subset_hit = 0.0221
+```
+
+样例：
+
+```text
+target = metal tool
+generated = cutting tool
+解释：语义相关，但不是完整 target。
+
+target = cutting food
+generated = cutting food
+解释：严格命中。
+```
+
+### DeepSeek7B 客观结果
+
+按 template：
+
+```text
+fill_blank_answer:
+  exact_hit = 0.0000
+  prefix_hit = 0.0000
+  word_subset_hit = 0.0060
+  family_overlap_hit = 0.1220
+  format_violation = 0.1161
+
+bare_answer:
+  exact_hit = 0.0045
+  prefix_hit = 0.0060
+  word_subset_hit = 0.0060
+  family_overlap_hit = 0.0967
+  format_violation = 0.0982
+
+answer_only_short_phrase:
+  exact_hit = 0.0000
+  prefix_hit = 0.0000
+  word_subset_hit = 0.0000
+  family_overlap_hit = 0.0640
+  format_violation = 0.0967
+```
+
+按 relation：
+
+```text
+part_of:
+  family_overlap_hit = 0.0534
+  word_subset_hit = 0.0026
+
+location:
+  family_overlap_hit = 0.0521
+  word_subset_hit = 0.0026
+
+can_do:
+  family_overlap_hit = 0.0495
+  word_subset_hit = 0.0000
+```
+
+样例：
+
+```text
+target = metal tool
+generated = tool
+解释：弱值族重叠，但不完整。
+
+target = cutting food
+generated = cutting food
+解释：少量 strict hit 存在。
+```
+
+### 跨模型模板排名
+
+```text
+fill_blank_answer:
+  exact_hit = 0.0045
+  word_subset_hit = 0.0079
+  family_overlap_hit = 0.2416
+  format_violation = 0.1260
+
+answer_only_short_phrase:
+  exact_hit = 0.0104
+  word_subset_hit = 0.0119
+  family_overlap_hit = 0.1860
+  format_violation = 0.1012
+
+answer_only_plain:
+  exact_hit = 0.0035
+  word_subset_hit = 0.0079
+  family_overlap_hit = 0.1647
+  format_violation = 0.1290
+```
+
+### 关键客观现象
+
+```text
+1. 三模型 answer-only reader 的 strict hit 仍然很低。
+2. Qwen3 和 GLM4 在 fill_blank_answer 上有约 0.30 的 family_overlap_hit，但 strict word_subset_hit 仍只有约 0.01。
+3. DeepSeek7B 的 answer-only reader 更弱，最佳 family_overlap_hit 只有 0.1220。
+4. 很多输出是值族核心词，例如 tool / animal / cutting tool，而不是目标完整短语 metal tool / home animal。
+5. answer_only 约束能减少解释倾向，但不能让模型稳定输出目标 value。
+6. 当前 answer-only reader 仍不满足进入 open generation erase/restore 的条件。
+```
+
+### 对 Phase 85/86 的修正
+
+Phase 85 的自然 prompt 完全不能读出 target。
+
+Phase 86 的 answer-only prompt 有改进，但仍只达到：
+
+```text
+strict hit ≈ 0.00-0.03
+family overlap ≈ 0.12-0.30
+```
+
+因此当前不能进入：
+
+```text
+open generation erase/restore
+open generation matched transfer
+```
+
+否则会把 reader failure 与机制 failure 混在一起。
+
+### 硬伤
+
+```text
+1. target 多为实验设计中的具体短语，例如 metal tool、home animal；模型自然生成更倾向于 tool、animal、cutting tool 等一般答案。
+2. exact/prefix hit 过低，说明 reader 没有校准到目标短语级别。
+3. family_overlap_hit 只能说明值族相关，不能说明完整答案正确。
+4. 部分模板 format_violation 仍明显，尤其 GLM4 的 fill_blank_answer 和 Qwen3/GLM4 的 is_a 关系。
+5. DeepSeek7B 使用 sdpa 时有 Sliding Window Attention warning，且本轮中途出现一次用户态 segmentation fault；resume 后完成，但这是工程硬伤。
+6. 本轮不包含机制干预，因此不能直接证明 suffix/readout 子空间对正确答案生成的因果作用。
+```
+
+### 当前理论进展
+
+Phase 86 支持一个更严格的分层判断：
+
+```text
+closed candidate reader 已稳定；
+open natural reader 失败；
+answer-only reader 仍不足；
+因此当前知识读出机制主要仍只能在 closed candidate scoring 中可靠验证。
+```
+
+这说明：
+
+```text
+内部 readout-gateway compatibility 可以存在；
+但开放生成是否表现为目标短语，需要额外的 reader alignment。
+```
+
+更准确的理论表达：
+
+```text
+语言知识读出不是从内部状态直接等价到生成文本。
+它至少经过：
+1. 内部兼容状态；
+2. 读出网关；
+3. 候选评分或生成读出器；
+4. 输出格式约束；
+5. 解码策略。
+```
+
+Phase 86 的负结果把“开放生成读出器”正式提升为需要单独破解的对象。
+
+### 下一步计划
+
+不要马上做 open generation erase/restore。
+
+下一阶段应改为：
+
+```text
+Phase 87：symbolic / multiple-choice reader calibration。
+```
+
+核心方案：
+
+```text
+1. 给定 object + relation + 4-8 个候选 value；
+2. 让模型只输出选项字母或 value；
+3. 同时保留 closed candidate logits 作为基准；
+4. 比较：
+   - closed candidate score 是否正确；
+   - forced choice generation 是否正确；
+   - answer-only free generation 是否正确。
+```
+
+目标是拆开三类读出器：
+
+```text
+R_closed：封闭候选评分；
+R_choice：显式多选生成；
+R_open：开放短答案生成。
+```
+
+如果 R_closed 强、R_choice 强、R_open 弱：
+
+```text
+说明问题主要是开放生成格式，不是知识读出。
+```
+
+如果 R_closed 强、R_choice 弱：
+
+```text
+说明从候选评分到文本选择仍有读出接口问题。
+```
+
+如果三者都弱：
+
+```text
+再回到内部机制测试。
+```
+
+更大的阶段性任务：
+
+```text
+1. 先建立可靠 reader stack；
+2. 再回到 suffix/readout erase/restore；
+3. 最后把 closed / choice / open 三层读出与内部路径图谱连接起来。
+```

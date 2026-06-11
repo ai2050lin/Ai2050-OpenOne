@@ -1,0 +1,257 @@
+{
+  "models": {
+    "qwen3": {
+      "num_items": 4,
+      "rows": 8,
+      "max_new_tokens": 8,
+      "relations": [
+        "is_a",
+        "part_of"
+      ],
+      "templates": [
+        "answer_only_plain",
+        "question_value"
+      ],
+      "by_template": [
+        {
+          "key": "answer_only_plain",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.25,
+          "short_output": 1.0
+        },
+        {
+          "key": "question_value",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.5,
+          "short_output": 1.0
+        }
+      ],
+      "by_relation": [
+        {
+          "key": "is_a",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.25,
+          "short_output": 1.0
+        },
+        {
+          "key": "part_of",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.5,
+          "short_output": 1.0
+        }
+      ],
+      "top_template_relation": [
+        {
+          "key": "question_value:is_a",
+          "n": 2,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.0,
+          "short_output": 1.0
+        },
+        {
+          "key": "answer_only_plain:part_of",
+          "n": 2,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.0,
+          "short_output": 1.0
+        },
+        {
+          "key": "answer_only_plain:is_a",
+          "n": 2,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.5,
+          "short_output": 1.0
+        },
+        {
+          "key": "question_value:part_of",
+          "n": 2,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 1.0,
+          "short_output": 1.0
+        }
+      ],
+      "samples": [
+        {
+          "item_idx": 0,
+          "template_key": "answer_only_plain",
+          "relation": "is_a",
+          "frame_key": "kind",
+          "object": "knife",
+          "target": "metal tool",
+          "prompt": "",
+          "generated": " tool\n\nA knife is a kind of",
+          "first_span": "tool",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": true
+        },
+        {
+          "item_idx": 0,
+          "template_key": "question_value",
+          "relation": "is_a",
+          "frame_key": "kind",
+          "object": "knife",
+          "target": "metal tool",
+          "prompt": "",
+          "generated": " tool\n\nQuestion: What is the answer",
+          "first_span": "tool",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": false
+        },
+        {
+          "item_idx": 1,
+          "template_key": "answer_only_plain",
+          "relation": "is_a",
+          "frame_key": "kind",
+          "object": "dog",
+          "target": "home animal",
+          "prompt": "",
+          "generated": " animal\nOkay, so the question is",
+          "first_span": "animal",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": false
+        },
+        {
+          "item_idx": 1,
+          "template_key": "question_value",
+          "relation": "is_a",
+          "frame_key": "kind",
+          "object": "dog",
+          "target": "home animal",
+          "prompt": "",
+          "generated": " animal\n\nQuestion: What is the answer",
+          "first_span": "animal",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": false
+        },
+        {
+          "item_idx": 2,
+          "template_key": "answer_only_plain",
+          "relation": "part_of",
+          "frame_key": "component_of",
+          "object": "broom",
+          "target": "a cleaning kit",
+          "prompt": "",
+          "generated": " a house\n\nWait, that doesn't",
+          "first_span": "a house",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": false
+        },
+        {
+          "item_idx": 2,
+          "template_key": "question_value",
+          "relation": "part_of",
+          "frame_key": "component_of",
+          "object": "broom",
+          "target": "a cleaning kit",
+          "prompt": "",
+          "generated": " A broom is a component of a",
+          "first_span": "a broom is a component of a",
+          "exact_hit": false,
+          "prefix_hit": false,
+          "contains_hit": false,
+          "word_subset_hit": false,
+          "short_output": true,
+          "format_violation": true
+        }
+      ]
+    }
+  },
+  "cross_model_template": [
+    {
+      "key": "answer_only_plain",
+      "models": "qwen3",
+      "n": 4,
+      "exact_hit": 0.0,
+      "prefix_hit": 0.0,
+      "contains_hit": 0.0,
+      "word_subset_hit": 0.0,
+      "short_output": 1.0,
+      "format_violation": 0.25,
+      "per_model": [
+        {
+          "model": "qwen3",
+          "key": "answer_only_plain",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.25,
+          "short_output": 1.0
+        }
+      ]
+    },
+    {
+      "key": "question_value",
+      "models": "qwen3",
+      "n": 4,
+      "exact_hit": 0.0,
+      "prefix_hit": 0.0,
+      "contains_hit": 0.0,
+      "word_subset_hit": 0.0,
+      "short_output": 1.0,
+      "format_violation": 0.5,
+      "per_model": [
+        {
+          "model": "qwen3",
+          "key": "question_value",
+          "n": 4,
+          "exact_hit": 0.0,
+          "prefix_hit": 0.0,
+          "contains_hit": 0.0,
+          "word_subset_hit": 0.0,
+          "format_violation": 0.5,
+          "short_output": 1.0
+        }
+      ]
+    }
+  ]
+}
