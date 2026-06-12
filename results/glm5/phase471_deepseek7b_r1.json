@@ -1,0 +1,4391 @@
+{
+  "phase": 471,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-12 16:25:26",
+  "theory": "Layer-Causal DCF Tracing",
+  "core_question": "At which layer are semantic constraints written into the residual stream?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_logit_lens_dcf": {
+    "per_layer": {
+      "L0": {
+        "logit_lens_dcf_silhouette": 0.0,
+        "logit_lens_dcf_discriminability": 0.0,
+        "resid_silhouette": 0.0,
+        "layer_idx": 0,
+        "n_objects": 36
+      },
+      "L2": {
+        "logit_lens_dcf_silhouette": -0.1625,
+        "logit_lens_dcf_discriminability": 0.0002,
+        "resid_silhouette": -0.0256,
+        "layer_idx": 2,
+        "n_objects": 36
+      },
+      "L4": {
+        "logit_lens_dcf_silhouette": -0.1986,
+        "logit_lens_dcf_discriminability": 0.0001,
+        "resid_silhouette": 0.0812,
+        "layer_idx": 4,
+        "n_objects": 36
+      },
+      "L6": {
+        "logit_lens_dcf_silhouette": -0.0521,
+        "logit_lens_dcf_discriminability": 0.0004,
+        "resid_silhouette": 0.1666,
+        "layer_idx": 6,
+        "n_objects": 36
+      },
+      "L8": {
+        "logit_lens_dcf_silhouette": 0.0402,
+        "logit_lens_dcf_discriminability": 0.0017,
+        "resid_silhouette": 0.2195,
+        "layer_idx": 8,
+        "n_objects": 36
+      },
+      "L10": {
+        "logit_lens_dcf_silhouette": -0.0231,
+        "logit_lens_dcf_discriminability": 0.001,
+        "resid_silhouette": 0.2956,
+        "layer_idx": 10,
+        "n_objects": 36
+      },
+      "L12": {
+        "logit_lens_dcf_silhouette": -0.0232,
+        "logit_lens_dcf_discriminability": 0.0021,
+        "resid_silhouette": 0.2736,
+        "layer_idx": 12,
+        "n_objects": 36
+      },
+      "L14": {
+        "logit_lens_dcf_silhouette": -0.0589,
+        "logit_lens_dcf_discriminability": 0.0013,
+        "resid_silhouette": 0.2657,
+        "layer_idx": 14,
+        "n_objects": 36
+      },
+      "L16": {
+        "logit_lens_dcf_silhouette": -0.0331,
+        "logit_lens_dcf_discriminability": 0.0007,
+        "resid_silhouette": 0.241,
+        "layer_idx": 16,
+        "n_objects": 36
+      },
+      "L18": {
+        "logit_lens_dcf_silhouette": -0.046,
+        "logit_lens_dcf_discriminability": 0.0007,
+        "resid_silhouette": 0.2211,
+        "layer_idx": 18,
+        "n_objects": 36
+      },
+      "L20": {
+        "logit_lens_dcf_silhouette": -0.0599,
+        "logit_lens_dcf_discriminability": 0.0003,
+        "resid_silhouette": 0.2176,
+        "layer_idx": 20,
+        "n_objects": 36
+      },
+      "L22": {
+        "logit_lens_dcf_silhouette": 0.0654,
+        "logit_lens_dcf_discriminability": 0.0003,
+        "resid_silhouette": 0.2351,
+        "layer_idx": 22,
+        "n_objects": 36
+      },
+      "L24": {
+        "logit_lens_dcf_silhouette": 0.1529,
+        "logit_lens_dcf_discriminability": 0.0005,
+        "resid_silhouette": 0.2192,
+        "layer_idx": 24,
+        "n_objects": 36
+      },
+      "L26": {
+        "logit_lens_dcf_silhouette": 0.1596,
+        "logit_lens_dcf_discriminability": 0.001,
+        "resid_silhouette": 0.2439,
+        "layer_idx": 26,
+        "n_objects": 36
+      },
+      "L27": {
+        "logit_lens_dcf_silhouette": 0.3171,
+        "logit_lens_dcf_discriminability": 0.0012,
+        "resid_silhouette": 0.2584,
+        "layer_idx": 27,
+        "n_objects": 36
+      }
+    },
+    "summary": {
+      "n_layers_tested": 15,
+      "emergence_layer": "L27",
+      "peak_layer": "L27",
+      "peak_silhouette": 0.3171,
+      "silhouette_trajectory": {
+        "L0": 0.0,
+        "L2": -0.1625,
+        "L4": -0.1986,
+        "L6": -0.0521,
+        "L8": 0.0402,
+        "L10": -0.0231,
+        "L12": -0.0232,
+        "L14": -0.0589,
+        "L16": -0.0331,
+        "L18": -0.046,
+        "L20": -0.0599,
+        "L22": 0.0654,
+        "L24": 0.1529,
+        "L26": 0.1596,
+        "L27": 0.3171
+      }
+    }
+  },
+  "exp2_causal_intervention": {
+    "interventions": [
+      {
+        "object": "apple",
+        "source_cat": "fruit",
+        "target_cat": "vehicle",
+        "prompt": "The apple is a kind of",
+        "base_top1": " ",
+        "base_top5": [
+          " ",
+          "\n",
+          " a",
+          " graph",
+          " tree"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                "\n",
+                " n",
+                " the"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": -0.9323,
+              "source_suppress": 2.0977,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                " ",
+                " the",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -1.5859,
+              "source_suppress": 3.6074,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": -2.7318,
+              "source_suppress": 4.5068,
+              "target_dim_rank": 1
+            }
+          }
+        }
+      },
+      {
+        "object": "banana",
+        "source_cat": "fruit",
+        "target_cat": "vehicle",
+        "prompt": "The banana is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " ",
+          " the",
+          "\n",
+          " tree"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " tree",
+                " fruit",
+                "...",
+                " a"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.026,
+              "source_suppress": -1.5859,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n\n",
+                "\n",
+                " "
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.1068,
+              "source_suppress": 1.7578,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                ",",
+                "\n",
+                "\n\n",
+                "."
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.707,
+              "source_suppress": 5.0193,
+              "target_dim_rank": 1
+            }
+          }
+        }
+      },
+      {
+        "object": "dog",
+        "source_cat": "animal",
+        "target_cat": "tool",
+        "prompt": "The dog is a kind of",
+        "base_top1": " animal",
+        "base_top5": [
+          " animal",
+          " ",
+          "...",
+          " \\(",
+          " (...)"
+        ],
+        "base_top_dim": "animal",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " \\(",
+                " animal",
+                " frog",
+                " (...)"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.7031,
+              "source_suppress": -0.0208,
+              "target_dim_rank": 7
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "?):",
+                "...)\n\n",
+                "?'\n\n",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 1.1875,
+              "source_suppress": -1.7292,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "?):",
+                "={`",
+                "?'\n\n"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.6758,
+              "source_suppress": 3.0156,
+              "target_dim_rank": 7
+            }
+          }
+        }
+      },
+      {
+        "object": "cat",
+        "source_cat": "animal",
+        "target_cat": "tool",
+        "prompt": "The cat is a kind of",
+        "base_top1": " animal",
+        "base_top5": [
+          " animal",
+          " ",
+          " \\(",
+          " integer",
+          "..."
+        ],
+        "base_top_dim": "animal",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                "\n",
+                " a",
+                " special",
+                " an"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -3.2847,
+              "source_suppress": 3.625,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " animal",
+                "...)\n\n",
+                " of",
+                " creature"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -0.9922,
+              "source_suppress": -1.0938,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " ():",
+                "?):",
+                "</think>",
+                "?:"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.8398,
+              "source_suppress": 1.8854,
+              "target_dim_rank": 7
+            }
+          }
+        }
+      },
+      {
+        "object": "apple",
+        "source_cat": "fruit",
+        "target_cat": "animal",
+        "prompt": "The apple is a kind of",
+        "base_top1": " ",
+        "base_top5": [
+          " ",
+          "\n",
+          " a",
+          " graph",
+          " tree"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " tree",
+                " polygon",
+                " graph"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "False",
+              "target_boost": 0.8281,
+              "source_suppress": -0.2891,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                " of",
+                ".${",
+                "angement"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.9479,
+              "source_suppress": -4.5586,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "olate",
+                ",**",
+                ".${",
+                "red"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 3.0104,
+              "source_suppress": -4.1211,
+              "target_dim_rank": 4
+            }
+          }
+        }
+      },
+      {
+        "object": "banana",
+        "source_cat": "fruit",
+        "target_cat": "animal",
+        "prompt": "The banana is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " ",
+          " the",
+          "\n",
+          " tree"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " the",
+                " a",
+                "\n",
+                " fruit"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 1.0156,
+              "source_suppress": 0.75,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                " of",
+                ",",
+                "red",
+                "olate"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 4.4531,
+              "source_suppress": -4.0664,
+              "target_dim_rank": 4
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                ",",
+                " of",
+                "\n\n",
+                "\n"
+              ],
+              "mod_top_dim": "plant",
+              "switched": "True",
+              "target_boost": 2.75,
+              "source_suppress": -0.8125,
+              "target_dim_rank": 1
+            }
+          }
+        }
+      },
+      {
+        "object": "car",
+        "source_cat": "vehicle",
+        "target_cat": "tool",
+        "prompt": "The car is a kind of",
+        "base_top1": " ",
+        "base_top5": [
+          " ",
+          "\n",
+          " a",
+          " S",
+          "\n\n"
+        ],
+        "base_top_dim": "vehicle",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " the",
+                "\n",
+                " an"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": -4.1914,
+              "source_suppress": 4.2578,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                " of",
+                "\\(",
+                ","
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -1.1504,
+              "source_suppress": 1.4896,
+              "target_dim_rank": 7
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "!</",
+                " of",
+                "={`"
+              ],
+              "mod_top_dim": "furniture",
+              "switched": "True",
+              "target_boost": -3.0034,
+              "source_suppress": 4.2756,
+              "target_dim_rank": 6
+            }
+          }
+        }
+      },
+      {
+        "object": "bus",
+        "source_cat": "vehicle",
+        "target_cat": "tool",
+        "prompt": "The bus is a kind of",
+        "base_top1": " ",
+        "base_top5": [
+          " ",
+          " a",
+          "\n",
+          " \\(",
+          " the"
+        ],
+        "base_top_dim": "vehicle",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L3": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L6": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L9": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L12": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L18": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L21": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L24": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          },
+          "L27": {
+            "beta_2.0": {
+              "mod_top1": " ",
+              "mod_top5": [
+                " ",
+                " a",
+                " \\(",
+                ",",
+                "\n"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "False",
+              "target_boost": 0.6016,
+              "source_suppress": -0.5521,
+              "target_dim_rank": 3
+            },
+            "beta_5.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "\\(",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 0.0312,
+              "source_suppress": 1.2344,
+              "target_dim_rank": 5
+            },
+            "beta_10.0": {
+              "mod_top1": "<think>",
+              "mod_top5": [
+                "<think>",
+                "</think>",
+                "={`",
+                "并不意味",
+                "poke"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -2.4355,
+              "source_suppress": 3.8255,
+              "target_dim_rank": 6
+            }
+          }
+        }
+      }
+    ],
+    "summary": {
+      "n_interventions": 8,
+      "best_beta": 5.0,
+      "success_by_layer": {
+        "L0": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L3": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L6": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L9": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L12": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L15": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L18": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L21": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L24": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        },
+        "L27": {
+          "total": 8,
+          "target_boosted": 5,
+          "dim_switched": 1
+        }
+      },
+      "causal_control_possible": true
+    }
+  },
+  "exp3_extended_dcf": {
+    "comparison": {
+      "8d_silhouette": -0.1374,
+      "20d_silhouette": -0.1189,
+      "8d_discriminability": 0.0083,
+      "20d_discriminability": 0.0048,
+      "improvement_sil": 0.0185,
+      "improvement_disc": -0.0035
+    },
+    "dim_importance": [
+      {
+        "dimension": "cat_clothing",
+        "variance": 3.7254,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_furniture",
+        "variance": 3.0877,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_food",
+        "variance": 2.7742,
+        "type": "category"
+      },
+      {
+        "dimension": "attr_motion",
+        "variance": 1.8048,
+        "type": "attribute"
+      },
+      {
+        "dimension": "cat_fruit",
+        "variance": 1.6385,
+        "type": "category"
+      },
+      {
+        "dimension": "attr_taste",
+        "variance": 1.5655,
+        "type": "attribute"
+      },
+      {
+        "dimension": "attr_habitat",
+        "variance": 1.4967,
+        "type": "attribute"
+      },
+      {
+        "dimension": "attr_sound",
+        "variance": 1.4865,
+        "type": "attribute"
+      },
+      {
+        "dimension": "attr_temperature",
+        "variance": 1.3348,
+        "type": "attribute"
+      },
+      {
+        "dimension": "cat_plant",
+        "variance": 1.229,
+        "type": "category"
+      }
+    ],
+    "category_vs_attribute_variance": {
+      "category_dim_mean_var": 2.0018,
+      "attribute_dim_mean_var": 1.1507,
+      "ratio_cat_to_attr": 1.7397
+    },
+    "cat_attr_profiles": {
+      "fruit": {
+        "cat_fruit": 5.8522,
+        "cat_animal": 5.7448,
+        "cat_tool": 5.1232,
+        "cat_vehicle": 5.6172,
+        "cat_clothing": 3.3066,
+        "cat_furniture": 3.8825,
+        "cat_food": 4.4574,
+        "cat_plant": 7.151,
+        "attr_color": 5.1039,
+        "attr_size": 5.3424,
+        "attr_shape": 5.7068,
+        "attr_material": 4.7327,
+        "attr_motion": 3.2504,
+        "attr_habitat": 5.0856,
+        "attr_function": 5.0378,
+        "attr_sound": 4.3208,
+        "attr_taste": 6.224,
+        "attr_texture": 5.444,
+        "attr_weight": 5.4876,
+        "attr_temperature": 4.7707
+      },
+      "animal": {
+        "cat_fruit": 5.4792,
+        "cat_animal": 8.191,
+        "cat_tool": 5.6055,
+        "cat_vehicle": 6.5816,
+        "cat_clothing": 4.1758,
+        "cat_furniture": 4.7643,
+        "cat_food": 5.1438,
+        "cat_plant": 6.8047,
+        "attr_color": 5.1698,
+        "attr_size": 6.2911,
+        "attr_shape": 5.8286,
+        "attr_material": 5.2938,
+        "attr_motion": 4.3484,
+        "attr_habitat": 5.8486,
+        "attr_function": 5.8219,
+        "attr_sound": 5.1572,
+        "attr_taste": 5.1693,
+        "attr_texture": 5.9464,
+        "attr_weight": 6.0137,
+        "attr_temperature": 5.3146
+      },
+      "vehicle": {
+        "cat_fruit": 4.1416,
+        "cat_animal": 6.7066,
+        "cat_tool": 5.7523,
+        "cat_vehicle": 7.4062,
+        "cat_clothing": 2.4971,
+        "cat_furniture": 4.3379,
+        "cat_food": 3.3547,
+        "cat_plant": 5.2839,
+        "attr_color": 4.7844,
+        "attr_size": 6.2698,
+        "attr_shape": 5.9,
+        "attr_material": 4.6875,
+        "attr_motion": 3.982,
+        "attr_habitat": 5.2142,
+        "attr_function": 5.4026,
+        "attr_sound": 4.5646,
+        "attr_taste": 4.8672,
+        "attr_texture": 5.6276,
+        "attr_weight": 6.2643,
+        "attr_temperature": 4.7484
+      },
+      "tool": {
+        "cat_fruit": 4.8665,
+        "cat_animal": 6.5226,
+        "cat_tool": 7.1611,
+        "cat_vehicle": 5.5339,
+        "cat_clothing": 3.6546,
+        "cat_furniture": 4.2923,
+        "cat_food": 4.1485,
+        "cat_plant": 6.0391,
+        "attr_color": 4.7656,
+        "attr_size": 6.1729,
+        "attr_shape": 5.9786,
+        "attr_material": 4.9936,
+        "attr_motion": 4.0919,
+        "attr_habitat": 5.3739,
+        "attr_function": 5.3799,
+        "attr_sound": 4.779,
+        "attr_taste": 4.7109,
+        "attr_texture": 5.7276,
+        "attr_weight": 6.1413,
+        "attr_temperature": 4.6427
+      },
+      "furniture": {
+        "cat_fruit": 4.2409,
+        "cat_animal": 6.3724,
+        "cat_tool": 5.7474,
+        "cat_vehicle": 5.895,
+        "cat_clothing": 3.0098,
+        "cat_furniture": 4.8854,
+        "cat_food": 4.2017,
+        "cat_plant": 5.9362,
+        "attr_color": 4.6174,
+        "attr_size": 5.9865,
+        "attr_shape": 6.1771,
+        "attr_material": 5.123,
+        "attr_motion": 3.7108,
+        "attr_habitat": 5.6296,
+        "attr_function": 5.5714,
+        "attr_sound": 4.9128,
+        "attr_taste": 5.4036,
+        "attr_texture": 5.6089,
+        "attr_weight": 5.9661,
+        "attr_temperature": 5.0195
+      },
+      "clothing": {
+        "cat_fruit": 4.6514,
+        "cat_animal": 6.9913,
+        "cat_tool": 5.9564,
+        "cat_vehicle": 5.7847,
+        "cat_clothing": 4.0065,
+        "cat_furniture": 4.3971,
+        "cat_food": 4.6398,
+        "cat_plant": 5.5,
+        "attr_color": 5.0438,
+        "attr_size": 5.7021,
+        "attr_shape": 5.55,
+        "attr_material": 5.4863,
+        "attr_motion": 3.543,
+        "attr_habitat": 5.4095,
+        "attr_function": 5.2151,
+        "attr_sound": 4.7677,
+        "attr_taste": 5.1615,
+        "attr_texture": 5.5849,
+        "attr_weight": 5.7474,
+        "attr_temperature": 5.2664
+      }
+    },
+    "cat_top_attrs": {
+      "fruit": [
+        [
+          "attr_taste",
+          6.224
+        ],
+        [
+          "attr_shape",
+          5.7068
+        ],
+        [
+          "attr_weight",
+          5.4876
+        ]
+      ],
+      "animal": [
+        [
+          "attr_size",
+          6.2911
+        ],
+        [
+          "attr_weight",
+          6.0137
+        ],
+        [
+          "attr_texture",
+          5.9464
+        ]
+      ],
+      "vehicle": [
+        [
+          "attr_size",
+          6.2698
+        ],
+        [
+          "attr_weight",
+          6.2643
+        ],
+        [
+          "attr_shape",
+          5.9
+        ]
+      ],
+      "tool": [
+        [
+          "attr_size",
+          6.1729
+        ],
+        [
+          "attr_weight",
+          6.1413
+        ],
+        [
+          "attr_shape",
+          5.9786
+        ]
+      ],
+      "furniture": [
+        [
+          "attr_shape",
+          6.1771
+        ],
+        [
+          "attr_size",
+          5.9865
+        ],
+        [
+          "attr_weight",
+          5.9661
+        ]
+      ],
+      "clothing": [
+        [
+          "attr_weight",
+          5.7474
+        ],
+        [
+          "attr_size",
+          5.7021
+        ],
+        [
+          "attr_texture",
+          5.5849
+        ]
+      ]
+    },
+    "n_dims": 20,
+    "n_objects": 36
+  }
+}

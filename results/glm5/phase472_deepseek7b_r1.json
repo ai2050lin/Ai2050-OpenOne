@@ -1,0 +1,664 @@
+{
+  "phase": 472,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-12 18:14:31",
+  "theory": "Constraint Crystallization Mechanism",
+  "core_question": "What drives the Phase2→3 DCF silhouette jump?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_mlp_attn_decomposition": {
+    "L24": {
+      "base_silhouette": -0.1374,
+      "no_mlp_silhouette": -0.2083,
+      "no_attn_silhouette": -0.184,
+      "mlp_sil_drop": 0.0709,
+      "attn_sil_drop": 0.0466,
+      "mlp_shift": 4.5734,
+      "attn_shift": 5.0018,
+      "mlp_more_important": true
+    },
+    "L25": {
+      "base_silhouette": -0.1374,
+      "no_mlp_silhouette": -0.2912,
+      "no_attn_silhouette": -0.2813,
+      "mlp_sil_drop": 0.1539,
+      "attn_sil_drop": 0.1439,
+      "mlp_shift": 6.0641,
+      "attn_shift": 5.2302,
+      "mlp_more_important": true
+    },
+    "L26": {
+      "base_silhouette": -0.1374,
+      "no_mlp_silhouette": -0.3088,
+      "no_attn_silhouette": -0.1475,
+      "mlp_sil_drop": 0.1714,
+      "attn_sil_drop": 0.0102,
+      "mlp_shift": 7.0692,
+      "attn_shift": 5.0205,
+      "mlp_more_important": true
+    },
+    "L27": {
+      "base_silhouette": -0.1374,
+      "no_mlp_silhouette": 0.186,
+      "no_attn_silhouette": 0.2357,
+      "mlp_sil_drop": -0.3234,
+      "attn_sil_drop": -0.3731,
+      "mlp_shift": 27.5521,
+      "attn_shift": 5.97,
+      "mlp_more_important": true
+    },
+    "summary": {
+      "n_layers_tested": 4,
+      "mlp_dominant_layers": 4,
+      "attn_dominant_layers": 0,
+      "key_layers": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "mlp_is_primary_constraint_writer": true
+    }
+  },
+  "exp2_direction_stability": {
+    "fruit_vs_vehicle": {
+      "inter_layer_cos": [
+        {
+          "from": "L2",
+          "to": "L4",
+          "cos": 0.0019
+        },
+        {
+          "from": "L4",
+          "to": "L6",
+          "cos": 0.5562
+        },
+        {
+          "from": "L6",
+          "to": "L8",
+          "cos": -0.2032
+        },
+        {
+          "from": "L8",
+          "to": "L10",
+          "cos": 0.3701
+        },
+        {
+          "from": "L10",
+          "to": "L12",
+          "cos": 0.4717
+        },
+        {
+          "from": "L12",
+          "to": "L14",
+          "cos": 0.75
+        },
+        {
+          "from": "L14",
+          "to": "L16",
+          "cos": 0.7435
+        },
+        {
+          "from": "L16",
+          "to": "L18",
+          "cos": 0.5739
+        },
+        {
+          "from": "L18",
+          "to": "L20",
+          "cos": 0.2681
+        },
+        {
+          "from": "L20",
+          "to": "L22",
+          "cos": 0.8404
+        },
+        {
+          "from": "L22",
+          "to": "L24",
+          "cos": 0.9148
+        },
+        {
+          "from": "L24",
+          "to": "L26",
+          "cos": 0.7708
+        },
+        {
+          "from": "L26",
+          "to": "L27",
+          "cos": 0.8788
+        }
+      ],
+      "cos_to_final": [
+        {
+          "layer": "L2",
+          "cos_to_final": -0.091
+        },
+        {
+          "layer": "L4",
+          "cos_to_final": 0.1062
+        },
+        {
+          "layer": "L6",
+          "cos_to_final": 0.2235
+        },
+        {
+          "layer": "L8",
+          "cos_to_final": 0.0379
+        },
+        {
+          "layer": "L10",
+          "cos_to_final": 0.1867
+        },
+        {
+          "layer": "L12",
+          "cos_to_final": 0.0316
+        },
+        {
+          "layer": "L14",
+          "cos_to_final": 0.0866
+        },
+        {
+          "layer": "L16",
+          "cos_to_final": 0.5083
+        },
+        {
+          "layer": "L18",
+          "cos_to_final": 0.3174
+        },
+        {
+          "layer": "L20",
+          "cos_to_final": 0.6079
+        },
+        {
+          "layer": "L22",
+          "cos_to_final": 0.7738
+        },
+        {
+          "layer": "L24",
+          "cos_to_final": 0.8882
+        },
+        {
+          "layer": "L26",
+          "cos_to_final": 0.8788
+        }
+      ],
+      "phase2_mean_inter_cos": 0.3843,
+      "phase3_mean_inter_cos": 0.7346,
+      "phase2_mean_cos_to_final": 0.1362,
+      "phase3_mean_cos_to_final": 0.6932,
+      "stability_increase": 0.3503
+    },
+    "animal_vs_tool": {
+      "inter_layer_cos": [
+        {
+          "from": "L2",
+          "to": "L4",
+          "cos": 0.864
+        },
+        {
+          "from": "L4",
+          "to": "L6",
+          "cos": 0.9736
+        },
+        {
+          "from": "L6",
+          "to": "L8",
+          "cos": 0.9587
+        },
+        {
+          "from": "L8",
+          "to": "L10",
+          "cos": 0.8278
+        },
+        {
+          "from": "L10",
+          "to": "L12",
+          "cos": 0.9493
+        },
+        {
+          "from": "L12",
+          "to": "L14",
+          "cos": 0.9548
+        },
+        {
+          "from": "L14",
+          "to": "L16",
+          "cos": 0.9261
+        },
+        {
+          "from": "L16",
+          "to": "L18",
+          "cos": 0.2024
+        },
+        {
+          "from": "L18",
+          "to": "L20",
+          "cos": 0.8806
+        },
+        {
+          "from": "L20",
+          "to": "L22",
+          "cos": 0.5931
+        },
+        {
+          "from": "L22",
+          "to": "L24",
+          "cos": 0.4438
+        },
+        {
+          "from": "L24",
+          "to": "L26",
+          "cos": 0.843
+        },
+        {
+          "from": "L26",
+          "to": "L27",
+          "cos": 0.9547
+        }
+      ],
+      "cos_to_final": [
+        {
+          "layer": "L2",
+          "cos_to_final": -0.1438
+        },
+        {
+          "layer": "L4",
+          "cos_to_final": -0.0883
+        },
+        {
+          "layer": "L6",
+          "cos_to_final": -0.0652
+        },
+        {
+          "layer": "L8",
+          "cos_to_final": -0.1913
+        },
+        {
+          "layer": "L10",
+          "cos_to_final": -0.1427
+        },
+        {
+          "layer": "L12",
+          "cos_to_final": -0.0768
+        },
+        {
+          "layer": "L14",
+          "cos_to_final": 0.0728
+        },
+        {
+          "layer": "L16",
+          "cos_to_final": 0.0524
+        },
+        {
+          "layer": "L18",
+          "cos_to_final": 0.3952
+        },
+        {
+          "layer": "L20",
+          "cos_to_final": 0.0359
+        },
+        {
+          "layer": "L22",
+          "cos_to_final": 0.304
+        },
+        {
+          "layer": "L24",
+          "cos_to_final": 0.8516
+        },
+        {
+          "layer": "L26",
+          "cos_to_final": 0.9547
+        }
+      ],
+      "phase2_mean_inter_cos": 0.922,
+      "phase3_mean_inter_cos": 0.743,
+      "phase2_mean_cos_to_final": -0.0729,
+      "phase3_mean_cos_to_final": 0.5083,
+      "stability_increase": -0.179
+    },
+    "clothing_vs_furniture": {
+      "inter_layer_cos": [
+        {
+          "from": "L2",
+          "to": "L4",
+          "cos": 0.401
+        },
+        {
+          "from": "L4",
+          "to": "L6",
+          "cos": 0.6611
+        },
+        {
+          "from": "L6",
+          "to": "L8",
+          "cos": 0.8098
+        },
+        {
+          "from": "L8",
+          "to": "L10",
+          "cos": 0.8108
+        },
+        {
+          "from": "L10",
+          "to": "L12",
+          "cos": -0.0295
+        },
+        {
+          "from": "L12",
+          "to": "L14",
+          "cos": 0.5606
+        },
+        {
+          "from": "L14",
+          "to": "L16",
+          "cos": -0.2877
+        },
+        {
+          "from": "L16",
+          "to": "L18",
+          "cos": 0.7937
+        },
+        {
+          "from": "L18",
+          "to": "L20",
+          "cos": -0.1669
+        },
+        {
+          "from": "L20",
+          "to": "L22",
+          "cos": 0.5988
+        },
+        {
+          "from": "L22",
+          "to": "L24",
+          "cos": 0.8684
+        },
+        {
+          "from": "L24",
+          "to": "L26",
+          "cos": 0.9526
+        },
+        {
+          "from": "L26",
+          "to": "L27",
+          "cos": 0.961
+        }
+      ],
+      "cos_to_final": [
+        {
+          "layer": "L2",
+          "cos_to_final": -0.3626
+        },
+        {
+          "layer": "L4",
+          "cos_to_final": -0.0025
+        },
+        {
+          "layer": "L6",
+          "cos_to_final": -0.6364
+        },
+        {
+          "layer": "L8",
+          "cos_to_final": -0.5395
+        },
+        {
+          "layer": "L10",
+          "cos_to_final": -0.0439
+        },
+        {
+          "layer": "L12",
+          "cos_to_final": 0.2038
+        },
+        {
+          "layer": "L14",
+          "cos_to_final": 0.1011
+        },
+        {
+          "layer": "L16",
+          "cos_to_final": -0.2994
+        },
+        {
+          "layer": "L18",
+          "cos_to_final": -0.344
+        },
+        {
+          "layer": "L20",
+          "cos_to_final": 0.2284
+        },
+        {
+          "layer": "L22",
+          "cos_to_final": 0.751
+        },
+        {
+          "layer": "L24",
+          "cos_to_final": 0.9146
+        },
+        {
+          "layer": "L26",
+          "cos_to_final": 0.961
+        }
+      ],
+      "phase2_mean_inter_cos": 0.418,
+      "phase3_mean_inter_cos": 0.6428,
+      "phase2_mean_cos_to_final": -0.1974,
+      "phase3_mean_cos_to_final": 0.5022,
+      "stability_increase": 0.2248
+    },
+    "fruit_vs_animal": {
+      "inter_layer_cos": [
+        {
+          "from": "L2",
+          "to": "L4",
+          "cos": -0.0635
+        },
+        {
+          "from": "L4",
+          "to": "L6",
+          "cos": 0.6296
+        },
+        {
+          "from": "L6",
+          "to": "L8",
+          "cos": 0.4763
+        },
+        {
+          "from": "L8",
+          "to": "L10",
+          "cos": 0.7414
+        },
+        {
+          "from": "L10",
+          "to": "L12",
+          "cos": 0.8892
+        },
+        {
+          "from": "L12",
+          "to": "L14",
+          "cos": 0.7804
+        },
+        {
+          "from": "L14",
+          "to": "L16",
+          "cos": 0.7274
+        },
+        {
+          "from": "L16",
+          "to": "L18",
+          "cos": 0.5308
+        },
+        {
+          "from": "L18",
+          "to": "L20",
+          "cos": 0.9054
+        },
+        {
+          "from": "L20",
+          "to": "L22",
+          "cos": 0.2775
+        },
+        {
+          "from": "L22",
+          "to": "L24",
+          "cos": 0.8048
+        },
+        {
+          "from": "L24",
+          "to": "L26",
+          "cos": 0.8867
+        },
+        {
+          "from": "L26",
+          "to": "L27",
+          "cos": 0.931
+        }
+      ],
+      "cos_to_final": [
+        {
+          "layer": "L2",
+          "cos_to_final": 0.0067
+        },
+        {
+          "layer": "L4",
+          "cos_to_final": -0.1412
+        },
+        {
+          "layer": "L6",
+          "cos_to_final": 0.2804
+        },
+        {
+          "layer": "L8",
+          "cos_to_final": 0.3344
+        },
+        {
+          "layer": "L10",
+          "cos_to_final": 0.1343
+        },
+        {
+          "layer": "L12",
+          "cos_to_final": -0.0269
+        },
+        {
+          "layer": "L14",
+          "cos_to_final": 0.0169
+        },
+        {
+          "layer": "L16",
+          "cos_to_final": 0.3331
+        },
+        {
+          "layer": "L18",
+          "cos_to_final": -0.1425
+        },
+        {
+          "layer": "L20",
+          "cos_to_final": -0.1652
+        },
+        {
+          "layer": "L22",
+          "cos_to_final": 0.5053
+        },
+        {
+          "layer": "L24",
+          "cos_to_final": 0.816
+        },
+        {
+          "layer": "L26",
+          "cos_to_final": 0.931
+        }
+      ],
+      "phase2_mean_inter_cos": 0.5973,
+      "phase3_mean_inter_cos": 0.7611,
+      "phase2_mean_cos_to_final": 0.1172,
+      "phase3_mean_cos_to_final": 0.3889,
+      "stability_increase": 0.1638
+    },
+    "summary": {
+      "phase2_mean_inter_stability": 0.5804,
+      "phase3_mean_inter_stability": 0.7204,
+      "phase2_mean_alignment_to_final": -0.0042,
+      "phase3_mean_alignment_to_final": 0.5232,
+      "direction_crystallization_confirmed": true
+    }
+  },
+  "exp3_mlp_contribution": {
+    "L24": {
+      "resid_silhouette": 0.4211,
+      "mlp_output_silhouette": 0.2589,
+      "delta_silhouette": 0.2589,
+      "mlp_contributes_to_clustering": true,
+      "delta_to_resid_ratio_per_dim": [
+        0.247,
+        0.2507,
+        0.2394,
+        0.2431,
+        0.2055,
+        0.2387,
+        0.2709,
+        0.222
+      ],
+      "n_objects": 16
+    },
+    "L25": {
+      "resid_silhouette": 0.4985,
+      "mlp_output_silhouette": 0.4358,
+      "delta_silhouette": 0.4358,
+      "mlp_contributes_to_clustering": true,
+      "delta_to_resid_ratio_per_dim": [
+        0.2028,
+        0.2016,
+        0.1951,
+        0.1821,
+        0.1599,
+        0.1889,
+        0.1873,
+        0.2025
+      ],
+      "n_objects": 16
+    },
+    "L26": {
+      "resid_silhouette": 0.5933,
+      "mlp_output_silhouette": 0.6234,
+      "delta_silhouette": 0.6234,
+      "mlp_contributes_to_clustering": true,
+      "delta_to_resid_ratio_per_dim": [
+        0.1962,
+        0.2045,
+        0.2056,
+        0.2171,
+        0.1575,
+        0.1873,
+        0.1813,
+        0.2143
+      ],
+      "n_objects": 16
+    },
+    "L27": {
+      "resid_silhouette": -0.0982,
+      "mlp_output_silhouette": -0.3185,
+      "delta_silhouette": -0.3185,
+      "mlp_contributes_to_clustering": false,
+      "delta_to_resid_ratio_per_dim": [
+        1.4126,
+        1.4579,
+        1.3495,
+        1.3132,
+        0.7728,
+        0.9705,
+        0.9602,
+        1.7233
+      ],
+      "n_objects": 16
+    },
+    "summary": {
+      "n_layers_tested": 4,
+      "mlp_contributes_count": 3,
+      "last_layer_mlp_is_semantic_writer": false,
+      "model": "deepseek7b"
+    }
+  }
+}

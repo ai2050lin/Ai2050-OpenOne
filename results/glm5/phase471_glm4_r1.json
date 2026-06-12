@@ -1,0 +1,4002 @@
+{
+  "phase": 471,
+  "model": "glm4",
+  "round": 1,
+  "timestamp": "2026-06-12 15:54:20",
+  "theory": "Layer-Causal DCF Tracing",
+  "core_question": "At which layer are semantic constraints written into the residual stream?",
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "exp1_logit_lens_dcf": {
+    "per_layer": {
+      "L0": {
+        "logit_lens_dcf_silhouette": 0.0,
+        "logit_lens_dcf_discriminability": 0.0,
+        "resid_silhouette": 0.0,
+        "layer_idx": 0,
+        "n_objects": 36
+      },
+      "L3": {
+        "logit_lens_dcf_silhouette": -0.118,
+        "logit_lens_dcf_discriminability": 0.0017,
+        "resid_silhouette": 0.0646,
+        "layer_idx": 3,
+        "n_objects": 36
+      },
+      "L6": {
+        "logit_lens_dcf_silhouette": 0.0102,
+        "logit_lens_dcf_discriminability": 0.0137,
+        "resid_silhouette": 0.2233,
+        "layer_idx": 6,
+        "n_objects": 36
+      },
+      "L9": {
+        "logit_lens_dcf_silhouette": 0.0668,
+        "logit_lens_dcf_discriminability": 0.0383,
+        "resid_silhouette": 0.3091,
+        "layer_idx": 9,
+        "n_objects": 36
+      },
+      "L12": {
+        "logit_lens_dcf_silhouette": 0.0891,
+        "logit_lens_dcf_discriminability": 0.0165,
+        "resid_silhouette": 0.3096,
+        "layer_idx": 12,
+        "n_objects": 36
+      },
+      "L15": {
+        "logit_lens_dcf_silhouette": 0.0416,
+        "logit_lens_dcf_discriminability": 0.0115,
+        "resid_silhouette": 0.3007,
+        "layer_idx": 15,
+        "n_objects": 36
+      },
+      "L18": {
+        "logit_lens_dcf_silhouette": -0.0092,
+        "logit_lens_dcf_discriminability": 0.005,
+        "resid_silhouette": 0.2539,
+        "layer_idx": 18,
+        "n_objects": 36
+      },
+      "L21": {
+        "logit_lens_dcf_silhouette": 0.1233,
+        "logit_lens_dcf_discriminability": 0.0038,
+        "resid_silhouette": 0.225,
+        "layer_idx": 21,
+        "n_objects": 36
+      },
+      "L24": {
+        "logit_lens_dcf_silhouette": 0.4285,
+        "logit_lens_dcf_discriminability": 0.0086,
+        "resid_silhouette": 0.3141,
+        "layer_idx": 24,
+        "n_objects": 36
+      },
+      "L27": {
+        "logit_lens_dcf_silhouette": 0.571,
+        "logit_lens_dcf_discriminability": 0.0176,
+        "resid_silhouette": 0.3669,
+        "layer_idx": 27,
+        "n_objects": 36
+      },
+      "L30": {
+        "logit_lens_dcf_silhouette": 0.6337,
+        "logit_lens_dcf_discriminability": 0.0356,
+        "resid_silhouette": 0.4579,
+        "layer_idx": 30,
+        "n_objects": 36
+      },
+      "L33": {
+        "logit_lens_dcf_silhouette": 0.6269,
+        "logit_lens_dcf_discriminability": 0.0531,
+        "resid_silhouette": 0.4637,
+        "layer_idx": 33,
+        "n_objects": 36
+      },
+      "L36": {
+        "logit_lens_dcf_silhouette": 0.5109,
+        "logit_lens_dcf_discriminability": 0.0268,
+        "resid_silhouette": 0.4271,
+        "layer_idx": 36,
+        "n_objects": 36
+      },
+      "L39": {
+        "logit_lens_dcf_silhouette": 0.6312,
+        "logit_lens_dcf_discriminability": 0.0204,
+        "resid_silhouette": 0.4278,
+        "layer_idx": 39,
+        "n_objects": 36
+      }
+    },
+    "summary": {
+      "n_layers_tested": 14,
+      "emergence_layer": "L24",
+      "peak_layer": "L30",
+      "peak_silhouette": 0.6337,
+      "silhouette_trajectory": {
+        "L0": 0.0,
+        "L3": -0.118,
+        "L6": 0.0102,
+        "L9": 0.0668,
+        "L12": 0.0891,
+        "L15": 0.0416,
+        "L18": -0.0092,
+        "L21": 0.1233,
+        "L24": 0.4285,
+        "L27": 0.571,
+        "L30": 0.6337,
+        "L33": 0.6269,
+        "L36": 0.5109,
+        "L39": 0.6312
+      }
+    }
+  },
+  "exp2_causal_intervention": {
+    "interventions": [
+      {
+        "object": "apple",
+        "source_cat": "fruit",
+        "target_cat": "vehicle",
+        "prompt": "The apple is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " p",
+          " delicious",
+          " decid",
+          " stone"
+        ],
+        "base_top_dim": "fruit",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "abor",
+                " fruit",
+                " apple",
+                " object"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 1.4089,
+              "source_suppress": 0.8984,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": " apple",
+              "mod_top5": [
+                " apple",
+                ".",
+                "\n",
+                " of",
+                ","
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.151,
+              "source_suppress": 1.5859,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                ".",
+                "\n",
+                "The",
+                " apple"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 2.5221,
+              "source_suppress": 4.6191,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "banana",
+        "source_cat": "fruit",
+        "target_cat": "vehicle",
+        "prompt": "The banana is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " tropical",
+          " food",
+          " banana",
+          " very"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                " banana",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 0.0391,
+              "source_suppress": -0.0889,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                ",",
+                " that",
+                "\n",
+                " banana"
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": -0.5107,
+              "source_suppress": 1.7563,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                "Ban",
+                " banana",
+                "A",
+                "The"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.9661,
+              "source_suppress": 3.1914,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "dog",
+        "source_cat": "animal",
+        "target_cat": "tool",
+        "prompt": "The dog is a kind of",
+        "base_top1": " animal",
+        "base_top5": [
+          " animal",
+          " pet",
+          " domestic",
+          " mamm",
+          " dog"
+        ],
+        "base_top_dim": "animal",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": " animals",
+              "mod_top5": [
+                " animals",
+                " of",
+                " domestic",
+                ".",
+                " dogs"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": -1.5888,
+              "source_suppress": 3.3242,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 1.2276,
+              "source_suppress": 3.6738,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                "Solution",
+                " and"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 3.9893,
+              "source_suppress": 8.1302,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "cat",
+        "source_cat": "animal",
+        "target_cat": "tool",
+        "prompt": "The cat is a kind of",
+        "base_top1": " pet",
+        "base_top5": [
+          " pet",
+          " animal",
+          " small",
+          " domestic",
+          " mamm"
+        ],
+        "base_top_dim": "animal",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " animal",
+                " domestic",
+                " animals",
+                " of"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 0.2888,
+              "source_suppress": 1.5833,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " in",
+              "mod_top5": [
+                " in",
+                ".",
+                ",",
+                "\n",
+                " that"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 2.458,
+              "source_suppress": 2.5794,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": ".",
+              "mod_top5": [
+                ".",
+                " in",
+                ",",
+                " and",
+                " tool"
+              ],
+              "mod_top_dim": "tool",
+              "switched": "True",
+              "target_boost": 5.2178,
+              "source_suppress": 5.9837,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "apple",
+        "source_cat": "fruit",
+        "target_cat": "animal",
+        "prompt": "The apple is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " p",
+          " delicious",
+          " decid",
+          " stone"
+        ],
+        "base_top_dim": "fruit",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " fruit",
+                "ennial",
+                " food",
+                " or"
+              ],
+              "mod_top_dim": "fruit",
+              "switched": "True",
+              "target_boost": 3.099,
+              "source_suppress": 0.6016,
+              "target_dim_rank": 2
+            },
+            "beta_5.0": {
+              "mod_top1": ",",
+              "mod_top5": [
+                ",",
+                " person",
+                " of",
+                " fruit",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 3.7617,
+              "source_suppress": 2.4346,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                "\n",
+                ".",
+                " animal",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 6.9375,
+              "source_suppress": 4.7676,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "banana",
+        "source_cat": "fruit",
+        "target_cat": "animal",
+        "prompt": "The banana is a kind of",
+        "base_top1": " fruit",
+        "base_top5": [
+          " fruit",
+          " tropical",
+          " food",
+          " banana",
+          " very"
+        ],
+        "base_top_dim": "plant",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": " of",
+              "mod_top5": [
+                " of",
+                " food",
+                "arian",
+                " plant",
+                ","
+              ],
+              "mod_top_dim": "food",
+              "switched": "True",
+              "target_boost": 3.0114,
+              "source_suppress": 0.3643,
+              "target_dim_rank": 4
+            },
+            "beta_5.0": {
+              "mod_top1": " food",
+              "mod_top5": [
+                " food",
+                ",",
+                " of",
+                " person",
+                " fruit"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "True",
+              "target_boost": 5.1432,
+              "source_suppress": 1.0845,
+              "target_dim_rank": 0
+            },
+            "beta_10.0": {
+              "mod_top1": " fruit",
+              "mod_top5": [
+                " fruit",
+                ".",
+                " animal",
+                " in",
+                " food"
+              ],
+              "mod_top_dim": "animal",
+              "switched": "False",
+              "target_boost": 7.8073,
+              "source_suppress": 3.5381,
+              "target_dim_rank": 0
+            }
+          }
+        }
+      },
+      {
+        "object": "car",
+        "source_cat": "vehicle",
+        "target_cat": "tool",
+        "prompt": "The car is a kind of",
+        "base_top1": " transportation",
+        "base_top5": [
+          " transportation",
+          " car",
+          " vehicle",
+          " transport",
+          " luxury"
+        ],
+        "base_top_dim": "vehicle",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "士",
+                "手",
+                "，",
+                "志"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 1.7568,
+              "source_suppress": -1.4479,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                ".",
+                ",",
+                " for",
+                " that"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 1.2886,
+              "source_suppress": 3.4922,
+              "target_dim_rank": 3
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " or",
+                ".",
+                ",",
+                " in"
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.02,
+              "source_suppress": 5.9284,
+              "target_dim_rank": 3
+            }
+          }
+        }
+      },
+      {
+        "object": "bus",
+        "source_cat": "vehicle",
+        "target_cat": "tool",
+        "prompt": "The bus is a kind of",
+        "base_top1": " public",
+        "base_top5": [
+          " public",
+          " transportation",
+          " vehicle",
+          " transport",
+          " mass"
+        ],
+        "base_top_dim": "vehicle",
+        "intervention_by_layer": {
+          "L0": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L5": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L10": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L15": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L20": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L25": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L30": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L35": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          },
+          "L39": {
+            "beta_2.0": {
+              "mod_top1": "车",
+              "mod_top5": [
+                "车",
+                "交通工具",
+                "工具",
+                "人",
+                " tool"
+              ],
+              "mod_top_dim": "vehicle",
+              "switched": "True",
+              "target_boost": 3.4698,
+              "source_suppress": -2.0469,
+              "target_dim_rank": 1
+            },
+            "beta_5.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " tool",
+                " for",
+                " in",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 2.5333,
+              "source_suppress": 2.1406,
+              "target_dim_rank": 1
+            },
+            "beta_10.0": {
+              "mod_top1": " on",
+              "mod_top5": [
+                " on",
+                " in",
+                ".",
+                " or",
+                ","
+              ],
+              "mod_top_dim": "clothing",
+              "switched": "True",
+              "target_boost": 3.0538,
+              "source_suppress": 5.9349,
+              "target_dim_rank": 1
+            }
+          }
+        }
+      }
+    ],
+    "summary": {
+      "n_interventions": 8,
+      "best_beta": 5.0,
+      "success_by_layer": {
+        "L0": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L5": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L10": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L15": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L20": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L25": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L30": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L35": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        },
+        "L39": {
+          "total": 8,
+          "target_boosted": 7,
+          "dim_switched": 3
+        }
+      },
+      "causal_control_possible": true
+    }
+  },
+  "exp3_extended_dcf": {
+    "comparison": {
+      "8d_silhouette": 0.5499,
+      "20d_silhouette": 0.4836,
+      "8d_discriminability": 0.6813,
+      "20d_discriminability": 0.4837,
+      "improvement_sil": -0.0663,
+      "improvement_disc": -0.1976
+    },
+    "dim_importance": [
+      {
+        "dimension": "cat_fruit",
+        "variance": 4.1034,
+        "type": "category"
+      },
+      {
+        "dimension": "attr_taste",
+        "variance": 4.0012,
+        "type": "attribute"
+      },
+      {
+        "dimension": "cat_animal",
+        "variance": 3.9266,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_clothing",
+        "variance": 3.7171,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_plant",
+        "variance": 3.2222,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_food",
+        "variance": 2.2476,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_furniture",
+        "variance": 2.0576,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_vehicle",
+        "variance": 1.6531,
+        "type": "category"
+      },
+      {
+        "dimension": "cat_tool",
+        "variance": 1.6143,
+        "type": "category"
+      },
+      {
+        "dimension": "attr_material",
+        "variance": 1.0941,
+        "type": "attribute"
+      }
+    ],
+    "category_vs_attribute_variance": {
+      "category_dim_mean_var": 2.8177,
+      "attribute_dim_mean_var": 0.9594,
+      "ratio_cat_to_attr": 2.937
+    },
+    "cat_attr_profiles": {
+      "fruit": {
+        "cat_fruit": 3.2642,
+        "cat_animal": -2.0207,
+        "cat_tool": -0.4007,
+        "cat_vehicle": 0.8701,
+        "cat_clothing": -2.0169,
+        "cat_furniture": -2.9232,
+        "cat_food": 0.2625,
+        "cat_plant": 2.6107,
+        "attr_color": 0.6057,
+        "attr_size": 1.0903,
+        "attr_shape": 0.0904,
+        "attr_material": -1.5207,
+        "attr_motion": -1.901,
+        "attr_habitat": -0.7544,
+        "attr_function": -0.6506,
+        "attr_sound": -1.6184,
+        "attr_taste": 1.2594,
+        "attr_texture": -0.8126,
+        "attr_weight": -0.9077,
+        "attr_temperature": -0.6198
+      },
+      "animal": {
+        "cat_fruit": -0.8037,
+        "cat_animal": 3.5109,
+        "cat_tool": -0.2811,
+        "cat_vehicle": 0.9195,
+        "cat_clothing": -0.9287,
+        "cat_furniture": -2.1372,
+        "cat_food": 0.8094,
+        "cat_plant": 0.2098,
+        "attr_color": -0.7925,
+        "attr_size": 2.0785,
+        "attr_shape": -1.0009,
+        "attr_material": -1.3978,
+        "attr_motion": -2.1208,
+        "attr_habitat": -0.4763,
+        "attr_function": -0.1075,
+        "attr_sound": -1.3064,
+        "attr_taste": -2.2122,
+        "attr_texture": -1.2566,
+        "attr_weight": -0.4883,
+        "attr_temperature": 0.5589
+      },
+      "vehicle": {
+        "cat_fruit": -2.2485,
+        "cat_animal": -0.8252,
+        "cat_tool": 0.5687,
+        "cat_vehicle": 3.4822,
+        "cat_clothing": -1.8828,
+        "cat_furniture": -2.1549,
+        "cat_food": -2.4921,
+        "cat_plant": -1.9282,
+        "attr_color": -1.0581,
+        "attr_size": 0.3442,
+        "attr_shape": -1.4469,
+        "attr_material": -1.4315,
+        "attr_motion": -1.4959,
+        "attr_habitat": -1.2467,
+        "attr_function": -0.3594,
+        "attr_sound": -2.033,
+        "attr_taste": -3.6589,
+        "attr_texture": -2.283,
+        "attr_weight": 0.6235,
+        "attr_temperature": -0.8797
+      },
+      "tool": {
+        "cat_fruit": -1.4002,
+        "cat_animal": -1.4645,
+        "cat_tool": 2.3441,
+        "cat_vehicle": 0.482,
+        "cat_clothing": 0.4865,
+        "cat_furniture": -1.137,
+        "cat_food": -2.2965,
+        "cat_plant": -1.4357,
+        "attr_color": -1.5483,
+        "attr_size": 0.3957,
+        "attr_shape": -0.3054,
+        "attr_material": 0.5752,
+        "attr_motion": -1.1652,
+        "attr_habitat": -1.2722,
+        "attr_function": 0.6096,
+        "attr_sound": -2.2718,
+        "attr_taste": -4.6693,
+        "attr_texture": -1.4636,
+        "attr_weight": 0.1607,
+        "attr_temperature": -0.0341
+      },
+      "furniture": {
+        "cat_fruit": -2.5378,
+        "cat_animal": -1.4088,
+        "cat_tool": 0.1663,
+        "cat_vehicle": 0.6026,
+        "cat_clothing": -0.7493,
+        "cat_furniture": 0.5389,
+        "cat_food": -1.8912,
+        "cat_plant": -1.6331,
+        "attr_color": -0.9236,
+        "attr_size": 0.1301,
+        "attr_shape": -0.0885,
+        "attr_material": 0.3888,
+        "attr_motion": -2.0479,
+        "attr_habitat": -0.6519,
+        "attr_function": -0.1957,
+        "attr_sound": -2.0487,
+        "attr_taste": -2.7318,
+        "attr_texture": -1.8014,
+        "attr_weight": 0.0975,
+        "attr_temperature": -1.2119
+      },
+      "clothing": {
+        "cat_fruit": -1.3799,
+        "cat_animal": -0.761,
+        "cat_tool": 0.5572,
+        "cat_vehicle": 0.5204,
+        "cat_clothing": 3.0586,
+        "cat_furniture": -1.5112,
+        "cat_food": -1.4102,
+        "cat_plant": -1.4684,
+        "attr_color": -0.8924,
+        "attr_size": -0.2228,
+        "attr_shape": -0.4756,
+        "attr_material": -0.054,
+        "attr_motion": -2.1928,
+        "attr_habitat": -1.0545,
+        "attr_function": -0.0765,
+        "attr_sound": -2.3363,
+        "attr_taste": -2.4128,
+        "attr_texture": -1.5491,
+        "attr_weight": -0.0158,
+        "attr_temperature": -0.1673
+      }
+    },
+    "cat_top_attrs": {
+      "fruit": [
+        [
+          "attr_taste",
+          1.2594
+        ],
+        [
+          "attr_size",
+          1.0903
+        ],
+        [
+          "attr_color",
+          0.6057
+        ]
+      ],
+      "animal": [
+        [
+          "attr_size",
+          2.0785
+        ],
+        [
+          "attr_temperature",
+          0.5589
+        ],
+        [
+          "attr_function",
+          -0.1075
+        ]
+      ],
+      "vehicle": [
+        [
+          "attr_weight",
+          0.6235
+        ],
+        [
+          "attr_size",
+          0.3442
+        ],
+        [
+          "attr_function",
+          -0.3594
+        ]
+      ],
+      "tool": [
+        [
+          "attr_function",
+          0.6096
+        ],
+        [
+          "attr_material",
+          0.5752
+        ],
+        [
+          "attr_size",
+          0.3957
+        ]
+      ],
+      "furniture": [
+        [
+          "attr_material",
+          0.3888
+        ],
+        [
+          "attr_size",
+          0.1301
+        ],
+        [
+          "attr_weight",
+          0.0975
+        ]
+      ],
+      "clothing": [
+        [
+          "attr_weight",
+          -0.0158
+        ],
+        [
+          "attr_material",
+          -0.054
+        ],
+        [
+          "attr_function",
+          -0.0765
+        ]
+      ]
+    },
+    "n_dims": 20,
+    "n_objects": 36
+  }
+}

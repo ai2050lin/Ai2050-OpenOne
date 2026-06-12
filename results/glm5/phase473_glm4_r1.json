@@ -1,0 +1,886 @@
+{
+  "phase": 473,
+  "model": "glm4",
+  "round": 1,
+  "timestamp": "2026-06-12 19:07:48",
+  "theory": "Local Crystallization Decomposition & Attractor Verification",
+  "core_question": "What drives the Phase2→3 LL-DCF jump? Is Phase3 an attractor?",
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "exp1_local_ll_dcf_decomposition": {
+    "L22": {
+      "base_ll_dcf_silhouette": 0.0896,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.0896,
+      "attn_sil_drop": 0.0896,
+      "mlp_drives_local_readability": false
+    },
+    "L23": {
+      "base_ll_dcf_silhouette": 0.4285,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.4285,
+      "attn_sil_drop": 0.4285,
+      "mlp_drives_local_readability": false
+    },
+    "L24": {
+      "base_ll_dcf_silhouette": 0.5484,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.5484,
+      "attn_sil_drop": 0.5484,
+      "mlp_drives_local_readability": false
+    },
+    "L25": {
+      "base_ll_dcf_silhouette": 0.5483,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.5483,
+      "attn_sil_drop": 0.5483,
+      "mlp_drives_local_readability": false
+    },
+    "L26": {
+      "base_ll_dcf_silhouette": 0.571,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.571,
+      "attn_sil_drop": 0.571,
+      "mlp_drives_local_readability": false
+    },
+    "L27": {
+      "base_ll_dcf_silhouette": 0.6153,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6153,
+      "attn_sil_drop": 0.6153,
+      "mlp_drives_local_readability": false
+    },
+    "L28": {
+      "base_ll_dcf_silhouette": 0.6221,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6221,
+      "attn_sil_drop": 0.6221,
+      "mlp_drives_local_readability": false
+    },
+    "L29": {
+      "base_ll_dcf_silhouette": 0.6337,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6337,
+      "attn_sil_drop": 0.6337,
+      "mlp_drives_local_readability": false
+    },
+    "L30": {
+      "base_ll_dcf_silhouette": 0.6223,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6223,
+      "attn_sil_drop": 0.6223,
+      "mlp_drives_local_readability": false
+    },
+    "L31": {
+      "base_ll_dcf_silhouette": 0.6548,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6548,
+      "attn_sil_drop": 0.6548,
+      "mlp_drives_local_readability": false
+    },
+    "L32": {
+      "base_ll_dcf_silhouette": 0.6269,
+      "no_mlp_ll_dcf_silhouette": 0,
+      "no_attn_ll_dcf_silhouette": 0,
+      "mlp_sil_drop": 0.6269,
+      "attn_sil_drop": 0.6269,
+      "mlp_drives_local_readability": false
+    },
+    "summary": {
+      "n_layers_tested": 11,
+      "mlp_dominant_layers": 0,
+      "attn_dominant_layers": 11,
+      "max_mlp_drop_layer": "L31",
+      "max_mlp_drop": 0.6548,
+      "max_attn_drop_layer": "L31",
+      "max_attn_drop": 0.6548,
+      "local_metric": "LL-DCF silhouette at target layer (not final DCF)"
+    }
+  },
+  "exp2_multi_layer_ablation": {
+    "L22-26_all_mlp": {
+      "window": "L22-26",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "ablation_type": "all_mlp",
+      "final_dcf_silhouette": 0.4524,
+      "n_objects": 24
+    },
+    "L22-26_all_attn": {
+      "window": "L22-26",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "ablation_type": "all_attn",
+      "final_dcf_silhouette": 0.5,
+      "n_objects": 24
+    },
+    "L22-26_both": {
+      "window": "L22-26",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "ablation_type": "both",
+      "final_dcf_silhouette": 0.6083,
+      "n_objects": 24
+    },
+    "L26-30_all_mlp": {
+      "window": "L26-30",
+      "layers": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "all_mlp",
+      "final_dcf_silhouette": 0.1593,
+      "n_objects": 24
+    },
+    "L26-30_all_attn": {
+      "window": "L26-30",
+      "layers": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "all_attn",
+      "final_dcf_silhouette": 0.5888,
+      "n_objects": 24
+    },
+    "L26-30_both": {
+      "window": "L26-30",
+      "layers": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "both",
+      "final_dcf_silhouette": 0.539,
+      "n_objects": 24
+    },
+    "L22-30_all_mlp": {
+      "window": "L22-30",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "all_mlp",
+      "final_dcf_silhouette": 0.2416,
+      "n_objects": 24
+    },
+    "L22-30_all_attn": {
+      "window": "L22-30",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "all_attn",
+      "final_dcf_silhouette": 0.4735,
+      "n_objects": 24
+    },
+    "L22-30_both": {
+      "window": "L22-30",
+      "layers": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "ablation_type": "both",
+      "final_dcf_silhouette": 0.4473,
+      "n_objects": 24
+    },
+    "L35-39_all_mlp": {
+      "window": "L35-39",
+      "layers": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "ablation_type": "all_mlp",
+      "final_dcf_silhouette": 0.606,
+      "n_objects": 24
+    },
+    "L35-39_all_attn": {
+      "window": "L35-39",
+      "layers": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "ablation_type": "all_attn",
+      "final_dcf_silhouette": 0.2657,
+      "n_objects": 24
+    },
+    "L35-39_both": {
+      "window": "L35-39",
+      "layers": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "ablation_type": "both",
+      "final_dcf_silhouette": 0.6315,
+      "n_objects": 24
+    },
+    "baseline": {
+      "final_dcf_silhouette": 0.5681
+    },
+    "summary": {
+      "baseline_sil": 0.5681,
+      "max_drop": 0.4088,
+      "max_drop_window": "L26-30_all_mlp",
+      "single_layer_drop_was_below_004": true,
+      "multi_layer_redundancy_confirmed": true
+    }
+  },
+  "exp3_all_pair_direction_stability": {
+    "fruit_vs_animal": {
+      "phase2_mean_inter_cos": 0.6695,
+      "phase3_mean_inter_cos": 0.9514,
+      "stability_increase": 0.2819,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "fruit_vs_vehicle": {
+      "phase2_mean_inter_cos": 0.0405,
+      "phase3_mean_inter_cos": 0.9205,
+      "stability_increase": 0.88,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "fruit_vs_tool": {
+      "phase2_mean_inter_cos": 0.1894,
+      "phase3_mean_inter_cos": 0.9412,
+      "stability_increase": 0.7518,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "fruit_vs_furniture": {
+      "phase2_mean_inter_cos": 0.2374,
+      "phase3_mean_inter_cos": 0.9146,
+      "stability_increase": 0.6772,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "fruit_vs_clothing": {
+      "phase2_mean_inter_cos": 0.0937,
+      "phase3_mean_inter_cos": 0.9064,
+      "stability_increase": 0.8127,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "animal_vs_vehicle": {
+      "phase2_mean_inter_cos": 0.3411,
+      "phase3_mean_inter_cos": 0.942,
+      "stability_increase": 0.6009,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "animal_vs_tool": {
+      "phase2_mean_inter_cos": 0.4079,
+      "phase3_mean_inter_cos": 0.9616,
+      "stability_increase": 0.5537,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "animal_vs_furniture": {
+      "phase2_mean_inter_cos": 0.3669,
+      "phase3_mean_inter_cos": 0.93,
+      "stability_increase": 0.5631,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "animal_vs_clothing": {
+      "phase2_mean_inter_cos": 0.4415,
+      "phase3_mean_inter_cos": 0.9153,
+      "stability_increase": 0.4737,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "vehicle_vs_tool": {
+      "phase2_mean_inter_cos": 0.4274,
+      "phase3_mean_inter_cos": 0.953,
+      "stability_increase": 0.5256,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "vehicle_vs_furniture": {
+      "phase2_mean_inter_cos": 0.2127,
+      "phase3_mean_inter_cos": 0.9487,
+      "stability_increase": 0.736,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "vehicle_vs_clothing": {
+      "phase2_mean_inter_cos": 0.282,
+      "phase3_mean_inter_cos": 0.964,
+      "stability_increase": 0.682,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "tool_vs_furniture": {
+      "phase2_mean_inter_cos": 0.4868,
+      "phase3_mean_inter_cos": 0.9077,
+      "stability_increase": 0.4209,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "tool_vs_clothing": {
+      "phase2_mean_inter_cos": 0.6709,
+      "phase3_mean_inter_cos": 0.9162,
+      "stability_increase": 0.2453,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "furniture_vs_clothing": {
+      "phase2_mean_inter_cos": 0.4227,
+      "phase3_mean_inter_cos": 0.9164,
+      "stability_increase": 0.4937,
+      "crystallized": true,
+      "n_phase2_pairs": 7,
+      "n_phase3_pairs": 5
+    },
+    "summary": {
+      "total_pairs": 15,
+      "phase2_mean_stability": 0.3527,
+      "phase3_mean_stability": 0.9326,
+      "n_crystallized_pairs": 15,
+      "crystallization_ratio": 1.0,
+      "all_pairs_crystallization_confirmed": true
+    }
+  },
+  "exp4_perturbation_recovery": {
+    "random": {
+      "recovery_per_layer": {
+        "L24": 0.114,
+        "L25": 0.0965,
+        "L26": 0.0816,
+        "L27": 0.103,
+        "L28": 0.0926,
+        "L29": 0.0646,
+        "L30": 0.0825,
+        "L31": 0.1101,
+        "L32": 0.1183,
+        "L33": 0.1495,
+        "L34": 0.1583,
+        "L35": 0.1548,
+        "L36": 0.2505,
+        "L37": 0.3332,
+        "L38": 0.4896,
+        "L39": 0.2308
+      },
+      "early_mean_recovery": 0.0975,
+      "late_mean_recovery": 0.2695,
+      "attractor_likely": false
+    },
+    "anti_dcf": {
+      "recovery_per_layer": {
+        "L24": 0.0205,
+        "L25": 0.0206,
+        "L26": 0.053,
+        "L27": 0.0589,
+        "L28": 0.0514,
+        "L29": 0.0175,
+        "L30": 0.023,
+        "L31": 0.0448,
+        "L32": 0.0196,
+        "L33": 0.1312,
+        "L34": 0.1401,
+        "L35": 0.1988,
+        "L36": 0.2085,
+        "L37": 0.2917,
+        "L38": 0.4378,
+        "L39": 0.307
+      },
+      "early_mean_recovery": 0.0409,
+      "late_mean_recovery": 0.264,
+      "attractor_likely": false
+    },
+    "cross_category": {
+      "recovery_per_layer": {
+        "L24": 0.2415,
+        "L25": 0.2319,
+        "L26": 0.2329,
+        "L27": 0.2081,
+        "L28": 0.1818,
+        "L29": 0.2248,
+        "L30": 0.2257,
+        "L31": 0.2307,
+        "L32": 0.2094,
+        "L33": 0.2083,
+        "L34": 0.2219,
+        "L35": 0.2146,
+        "L36": 0.2724,
+        "L37": 0.3901,
+        "L38": 0.5633,
+        "L39": 0.3028
+      },
+      "early_mean_recovery": 0.2192,
+      "late_mean_recovery": 0.3275,
+      "attractor_likely": false
+    },
+    "summary": {
+      "n_perturbation_types": 3,
+      "n_attractor_types": 0,
+      "attractor_hypothesis_supported": false
+    }
+  },
+  "exp5_last_layer_topk": {
+    "L38_mlp": {
+      "top_tokens_by_freq": [
+        [
+          "compag",
+          10
+        ],
+        [
+          "fruit",
+          6
+        ],
+        [
+          "gön",
+          6
+        ],
+        [
+          "_REGISTER",
+          6
+        ],
+        [
+          "escen",
+          6
+        ],
+        [
+          "atrak",
+          6
+        ],
+        [
+          "domest",
+          4
+        ],
+        [
+          "Juvent",
+          4
+        ],
+        [
+          "carniv",
+          4
+        ],
+        [
+          "animal",
+          4
+        ]
+      ],
+      "top_tokens_by_logit": [
+        [
+          "compag",
+          55.1
+        ],
+        [
+          "escen",
+          37.21
+        ],
+        [
+          "atrak",
+          33.33
+        ],
+        [
+          "gön",
+          30.81
+        ],
+        [
+          "_REGISTER",
+          27.22
+        ],
+        [
+          "fruit",
+          25.3
+        ],
+        [
+          "mechanical",
+          24.78
+        ],
+        [
+          "transpor",
+          24.73
+        ],
+        [
+          "araç",
+          24.42
+        ],
+        [
+          "carniv",
+          21.53
+        ]
+      ],
+      "category_distribution": {
+        "semantic": 10,
+        "math": 0,
+        "number": 0,
+        "format": 0,
+        "reasoning": 0,
+        "other": 82
+      },
+      "dominant_category": "other"
+    },
+    "L38_attn": {
+      "top_tokens_by_freq": [
+        [
+          "_MAGIC",
+          16
+        ],
+        [
+          "habitu",
+          16
+        ],
+        [
+          "cześniej",
+          16
+        ],
+        [
+          "compag",
+          16
+        ],
+        [
+          "corrup",
+          16
+        ],
+        [
+          "escen",
+          16
+        ],
+        [
+          "conquista",
+          16
+        ],
+        [
+          "FUNC",
+          16
+        ],
+        [
+          "preoc",
+          16
+        ],
+        [
+          "sacrific",
+          16
+        ]
+      ],
+      "top_tokens_by_logit": [
+        [
+          "habitu",
+          184.89
+        ],
+        [
+          "_MAGIC",
+          184.81
+        ],
+        [
+          "cześniej",
+          182.84
+        ],
+        [
+          "compag",
+          181.61
+        ],
+        [
+          "escen",
+          177.6
+        ],
+        [
+          "corrup",
+          176.78
+        ],
+        [
+          "FUNC",
+          175.97
+        ],
+        [
+          "conquista",
+          175.54
+        ],
+        [
+          "preoc",
+          173.4
+        ],
+        [
+          "sacrific",
+          171.61
+        ]
+      ],
+      "category_distribution": {
+        "semantic": 0,
+        "math": 0,
+        "number": 0,
+        "format": 0,
+        "reasoning": 0,
+        "other": 315
+      },
+      "dominant_category": "other"
+    },
+    "L39_mlp": {
+      "top_tokens_by_freq": [
+        [
+          "…",
+          32
+        ],
+        [
+          "(",
+          32
+        ],
+        [
+          ".",
+          32
+        ],
+        [
+          "",
+          32
+        ],
+        [
+          "...",
+          32
+        ],
+        [
+          "-",
+          23
+        ],
+        [
+          "<|endoftext|>",
+          16
+        ],
+        [
+          ",",
+          16
+        ],
+        [
+          "­",
+          16
+        ],
+        [
+          "\"",
+          16
+        ]
+      ],
+      "top_tokens_by_logit": [
+        [
+          "…",
+          573.36
+        ],
+        [
+          "",
+          548.59
+        ],
+        [
+          "(",
+          493.27
+        ],
+        [
+          ".",
+          479.69
+        ],
+        [
+          "...",
+          432.49
+        ],
+        [
+          "<|endoftext|>",
+          306.81
+        ],
+        [
+          "-",
+          285.51
+        ],
+        [
+          ",",
+          245.07
+        ],
+        [
+          "­",
+          222.73
+        ],
+        [
+          "\"",
+          210.49
+        ]
+      ],
+      "category_distribution": {
+        "semantic": 0,
+        "math": 23,
+        "number": 0,
+        "format": 0,
+        "reasoning": 0,
+        "other": 289
+      },
+      "dominant_category": "other"
+    },
+    "L39_attn": {
+      "top_tokens_by_freq": [
+        [
+          "…",
+          36
+        ],
+        [
+          ".",
+          31
+        ],
+        [
+          "",
+          22
+        ],
+        [
+          "(",
+          22
+        ],
+        [
+          "-",
+          21
+        ],
+        [
+          ",",
+          16
+        ],
+        [
+          "“",
+          16
+        ],
+        [
+          "in",
+          16
+        ],
+        [
+          "and",
+          16
+        ],
+        [
+          "a",
+          16
+        ]
+      ],
+      "top_tokens_by_logit": [
+        [
+          "…",
+          62.62
+        ],
+        [
+          ".",
+          54.68
+        ],
+        [
+          "",
+          40.62
+        ],
+        [
+          "(",
+          40.23
+        ],
+        [
+          "-",
+          34.42
+        ],
+        [
+          "“",
+          32.8
+        ],
+        [
+          ",",
+          32.31
+        ],
+        [
+          "a",
+          24.95
+        ],
+        [
+          "and",
+          24.34
+        ],
+        [
+          "in",
+          23.61
+        ]
+      ],
+      "category_distribution": {
+        "semantic": 0,
+        "math": 32,
+        "number": 0,
+        "format": 53,
+        "reasoning": 0,
+        "other": 218
+      },
+      "dominant_category": "other"
+    },
+    "summary": {
+      "model": "glm4",
+      "last_layer_writes_behavior_pattern": true,
+      "last_mlp_non_semantic_ratio": 0.0737
+    }
+  }
+}
