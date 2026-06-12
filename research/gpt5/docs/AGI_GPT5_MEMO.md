@@ -32136,3 +32136,811 @@ DeepSeek7B:
 语言机制越来越不像固定概念方向，
 越来越像由通用主轴、关系因子、接口因子、输出因子组成的条件化动态路径系统。
 ```
+## Phase 95: Factor Subspace Closure 全量测试 [2026-06-12 11:15]
+
+### 本轮目标
+
+根据 Phase94 总方案，本轮把 Phase92/93 的整组件输出移植推进到：
+
+```text
+factor subspace destroy / transplant
+```
+
+不再替换整个 component output，而是在 hook 中只操作某个低秩子空间的投影：
+
+```text
+destroy:
+  output' = output - P_factor(output)
+
+transplant:
+  output' = output - P_factor(output) + P_factor(donor_output)
+```
+
+目标是初步拆分：
+
+```text
+pc1 / base
+slot / interface
+target / value
+object / context
+choice / output
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase94_factor_subspace_closure.py
+tests/gpt5/phase94_factor_subspace_closure_summary.py
+tests/gpt5/run_phase94_factor_subspace_closure_full.sh
+```
+
+### 运行命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase94_factor_subspace_closure.py qwen3 \
+  --nodes 6:mlp \
+  --max-items 6 \
+  --rank 2 \
+  --output-dir results/gpt5_phase94_smoke \
+  --progress-every 3 \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+tests/gpt5/run_phase94_factor_subspace_closure_full.sh
+```
+
+### 输出目录
+
+```text
+results/gpt5_phase94_factor_subspace_closure_full_20260612_091612
+```
+
+### 测试设置
+
+```text
+模型顺序：
+qwen3 → GLM4 → DeepSeek7B
+
+每模型测试完成后：
+--hard-exit-after-model
+
+attention implementation：
+flash_attention_2,sdpa,eager
+
+实际加载：
+flash_attention_2 未安装，三模型均回退到 sdpa。
+
+数据范围：
+420 个 object-slot-template items
+slots = category,color,function,material,location
+
+rank:
+4
+
+pool_mode:
+tail
+
+copy_mode:
+both
+
+节点：
+qwen3: L6 MLP, L24 attention
+GLM4: L39 MLP
+DeepSeek7B: L26 MLP, L27 attention
+```
+
+### 总体结果
+
+```text
+total_rows = 21000
+total_bad_numeric_rows = 0
+
+qwen3 rows = 8400
+GLM4 rows = 4200
+DeepSeek7B rows = 8400
+```
+
+所有节点的 basis 维度：
+
+```text
+pc1 = 1
+slot = 4
+target = 4
+object = 4
+choice = 4
+```
+
+### qwen3 结果
+
+#### L6 MLP
+
+关键 destroy：
+
+```text
+destroy_object:
+  value_delta = -0.1526
+  letter_delta = -2.4289
+  letter_top1_delta = -0.1286
+
+destroy_target:
+  value_delta = -0.0989
+  letter_delta = -0.6116
+  letter_top1_delta = -0.0405
+
+destroy_pc1:
+  value_delta = +0.0179
+  letter_delta = -0.1417
+
+destroy_slot:
+  value_delta = +0.0786
+  letter_delta = +0.1137
+
+destroy_choice:
+  value_delta = +0.0874
+  letter_delta = +1.2187
+```
+
+观察：
+
+```text
+1. L6 MLP 中 object/context 子空间对 letter interface 最关键。
+2. target 子空间也有负向必要性，但弱于 object。
+3. slot 子空间破坏后不降反升，说明当前 slot basis 不是必要槽位程序。
+4. choice 子空间破坏后 letter_delta 大幅上升，说明该 basis 可能包含抑制/竞争成分，而不是纯 output support。
+```
+
+这修正了 Phase93 的理解：
+
+```text
+Qwen3 L6 MLP 的 slot/interface support
+可能并不在当前用 diff_slot_same_object 构造的 slot basis 中，
+而更强地混入 object/context 与 target 因子。
+```
+
+#### L24 attention
+
+```text
+destroy_object:
+  value_delta = -0.0216
+  letter_delta = +0.5149
+
+destroy_choice:
+  value_delta = +0.0036
+  letter_delta = +0.1798
+
+destroy_pc1:
+  value_delta = -0.0056
+  letter_delta = +0.0131
+
+destroy_target:
+  value_delta = -0.0206
+  letter_delta = +0.0533
+```
+
+观察：
+
+```text
+L24 attention 的当前低秩子空间破坏没有复现 Phase92/93 的强 letter interface 必要性。
+```
+
+这说明：
+
+```text
+L24 attention 的 target-sensitive choice interface
+可能不是由简单 tail-pooled rank-4 差分子空间承载，
+而是更依赖 token-level pattern 或更高秩结构。
+```
+
+### GLM4 结果
+
+#### L39 MLP
+
+```text
+destroy_choice:
+  value_delta = -0.5485
+  letter_delta = -0.1582
+
+destroy_target:
+  value_delta = -0.4653
+  letter_delta = -0.0640
+
+destroy_object:
+  value_delta = -0.4592
+  letter_delta = -0.0071
+
+destroy_slot:
+  value_delta = -0.3918
+  letter_delta = +0.0037
+
+destroy_pc1:
+  value_delta = +0.0073
+  letter_delta = -0.0314
+```
+
+观察：
+
+```text
+1. GLM4 L39 MLP 的 value margin 明确依赖 choice、target、object、slot 等子空间。
+2. letter margin 仍然几乎不受这些子空间正向支持。
+3. PC1 对该节点 value scoring 几乎不是必要项。
+```
+
+这进一步确认：
+
+```text
+GLM4 L39 MLP 是 candidate scoring component，
+不是 choice decision component。
+```
+
+而且 candidate scoring 不是单一 target/value 子空间，而是多个因子共同构成。
+
+### DeepSeek7B 结果
+
+#### L26 MLP
+
+```text
+destroy_object:
+  value_delta = +0.2780
+  letter_delta = +0.5397
+
+destroy_target:
+  value_delta = +0.1313
+  letter_delta = -0.2308
+
+destroy_pc1:
+  value_delta = -0.1490
+  letter_delta = +0.0263
+
+destroy_slot:
+  value_delta = +0.0268
+  letter_delta = -0.3647
+```
+
+观察：
+
+```text
+1. destroy_pc1 会降低 value margin，说明 DS7B L26 MLP 的 candidate value 支持依赖 PC1/base 方向。
+2. destroy_object 反而提升 value/letter，说明当前 object basis 可能包含竞争或干扰成分。
+3. slot/target 对 letter 有负向影响，但 value 必要性不强。
+```
+
+#### L27 attention
+
+```text
+destroy_pc1:
+  value_delta = +0.5296
+  letter_delta = -0.1574
+
+destroy_target:
+  value_delta = +0.4525
+  letter_delta = -0.2068
+
+destroy_object:
+  value_delta = +0.4007
+  letter_delta = -0.4074
+
+destroy_choice:
+  value_delta = +0.4999
+  letter_delta = -0.1716
+```
+
+观察：
+
+```text
+1. L27 attention 中多个子空间破坏都会提高 value margin，但降低 letter margin。
+2. 这与 Phase93 的判断一致：L27 attention 是 letter/output interface，而不是 value semantic interface。
+3. 该 output interface 与 PC1/base、object、target、choice 子空间都有耦合。
+```
+
+### 对前面理论的修正
+
+Phase95 的关键结果不是“成功拆出干净变量”，而是证明：
+
+```text
+当前简单低秩差分子空间还不能干净分离 slot / target / object / choice。
+```
+
+但它带来重要结构信息：
+
+```text
+1. GLM4 L39 MLP 的 candidate scoring 可以被低秩因子子空间明显破坏。
+2. Qwen3 L6 MLP 的强接口支持更依赖 object/context 与 target 混合子空间。
+3. Qwen3 L24 attention 的强 choice interface 不容易被 tail-pooled rank-4 子空间捕捉。
+4. DeepSeek7B L27 attention 的 letter/output interface 与多个因子混合耦合。
+```
+
+### 当前最稳结论
+
+可以说：
+
+```text
+component-level transferable state
+确实可以进一步投影到 factor-like subspaces，
+但这些子空间不是干净变量轴。
+```
+
+不能说：
+
+```text
+slot / target / object / choice 已经被完全分离；
+rank-4 tail-pooled 子空间就是语言变量；
+当前子空间闭包已经完成抽象机制证明。
+```
+
+### 硬伤
+
+1. 子空间构造仍是简单差分 + SVD，变量定义粗。
+2. pool_mode = tail，虽然 transplant 用 both，但 basis 本身来自 tail pooling。
+3. rank = 4 可能过低，尤其 Qwen3 L24 attention 的接口可能更高秩或 token-pattern 化。
+4. destroy 子空间后指标上升，说明很多 basis 包含竞争/抑制成分，不能简单解释为“该因子必要”。
+5. 没有做 token-level 子空间，也没有做 generation。
+
+### 下一步
+
+Phase96 应做：
+
+```text
+Rank and Token Subspace Sweep
+```
+
+目标：
+
+```text
+验证 Phase95 的失败是因为：
+1. rank 太低；
+2. tail pooling 太粗；
+3. 子空间定义混叠；
+4. 还是这些变量本来就不是线性子空间。
+```
+
+测试：
+
+```text
+rank = 1,2,4,8,16
+pool = tail, prefix, mean, token-aligned
+factor = object,target,choice,pc1
+nodes = Qwen3 L6 MLP, Qwen3 L24 attention, GLM4 L39 MLP, DS7B L27 attention
+```
+
+判据：
+
+```text
+如果高 rank / token-aligned 后 Qwen3 L24 attention 的 choice interface 被捕捉，
+说明接口是高秩或 token-pattern。
+
+如果仍然捕捉不到，
+说明它可能是 attention route / relational pattern，而非简单输出子空间。
+```
+
+## Phase 96: Rank-Pool Subspace Sweep 全量诊断 [2026-06-12 13:51]
+
+### 背景
+
+Phase95 发现：用 `rank=4`、`tail pooling` 构造的 factor subspace 不能干净分离 `slot / target / object / choice`。本阶段不继续做新理论，而是直接诊断失败来源：
+
+```text
+1. 是否 rank 太低；
+2. 是否 tail pooling 太粗；
+3. 是否 Qwen3 L24 attention / DS7B L27 attention 的接口不是普通 component-output 子空间；
+4. 是否 GLM4 L39 MLP 的 candidate scoring 仍能被更高 rank 子空间稳定破坏。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase96_rank_pool_subspace_sweep.py
+tests/gpt5/phase96_rank_pool_subspace_sweep_summary.py
+tests/gpt5/run_phase96_rank_pool_subspace_sweep_full.sh
+```
+
+### 运行命令
+
+Smoke:
+
+```bash
+python tests/gpt5/phase96_rank_pool_subspace_sweep.py qwen3 \
+  --nodes 6:mlp \
+  --max-items 4 \
+  --ranks 1 \
+  --pool-modes tail \
+  --factors pc1,object \
+  --output-dir results/gpt5_phase96_smoke \
+  --progress-every 2 \
+  --hard-exit-after-model
+```
+
+Full:
+
+```bash
+chmod +x tests/gpt5/run_phase96_rank_pool_subspace_sweep_full.sh
+tests/gpt5/run_phase96_rank_pool_subspace_sweep_full.sh
+```
+
+### 测试设置
+
+```text
+output_dir = results/gpt5_phase96_rank_pool_subspace_sweep_full_20260612_113529
+models = qwen3 -> GLM4 -> deepseek7b
+hard_exit_after_model = true
+attention implementation = flash_attention_2,sdpa,eager
+实际加载 = sdpa (本地未安装 FlashAttention2)
+items = 210
+slots = category,color,function,material,location
+ranks = 1,4,16
+pool_modes = tail,prefix,mean
+factors = pc1,object,target,slot,choice
+intervention = destroy only
+```
+
+节点：
+
+```text
+Qwen3: L6 MLP, L24 attention
+GLM4: L39 MLP
+DeepSeek7B: L27 attention
+```
+
+本阶段没有加入 transplant，是为了把诊断维度控制在 rank × pool × factor，不让 donor 维度混入。
+
+### 数据规模
+
+```text
+Qwen3 rows = 18900
+GLM4 rows = 9450
+DeepSeek7B rows = 9450
+total_rows = 37800
+bad_numeric_rows = 0
+```
+
+### 核心原理
+
+对每个 node / pool / rank / factor，先用 `max_rank=16` 构造 basis，再按 `rank=1/4/16` 截断：
+
+```text
+destroy:
+  h' = h - P_factor(h)
+```
+
+然后比较：
+
+```text
+value_delta = patched_value_margin - clean_value_margin
+letter_delta = patched_letter_margin - clean_letter_margin
+```
+
+如果提高 rank 或改变 pool 后破坏效应明显增强，说明 Phase95 的失败可能来自 rank/pooling 不足。
+
+如果仍然没有捕捉到强接口，说明该接口可能不是简单 component-output 子空间，而更像 attention route / token pattern / relational pattern。
+
+### 客观结果
+
+#### 1. Qwen3 L6 MLP：rank/pool 极大改变破坏效应
+
+整体：
+
+```text
+L6 MLP:
+  value_delta = -1.7485
+  letter_delta = -2.4877
+  value_top1_delta = -0.1180
+  letter_top1_delta = -0.2904
+```
+
+代表性结果：
+
+```text
+tail rank1:
+  choice letter_delta = -0.1869
+  object letter_delta = -0.4054
+  slot letter_delta = +0.2982
+  pc1 letter_delta = -0.0673
+
+tail rank4:
+  choice letter_delta = +0.9592
+  slot letter_delta = +0.7982
+  object letter_delta = -1.3161
+  target letter_delta = -0.6429
+
+tail rank16:
+  choice letter_delta = -3.9408
+  target letter_delta = -3.9167
+  object letter_delta = -1.7893
+
+prefix rank4:
+  target letter_delta = -3.7214
+
+mean rank4:
+  target letter_delta = -3.6995
+```
+
+判断：
+
+```text
+Qwen3 L6 MLP 的 factor effect 强烈依赖 rank 和 pool。
+Phase95 中 rank4-tail 的“slot/choice 破坏后反而上升”不是稳定变量结论，而是低秩/位置截取下的竞争-抑制混合现象。
+rank16 后 choice/target 对 letter interface 的必要性大幅显现。
+```
+
+这修正 Phase95：
+
+```text
+Qwen3 L6 MLP 不是“无子空间结构”，而是存在高秩、位置敏感的混合子空间。
+```
+
+#### 2. Qwen3 L24 attention：仍没有被 rank/pool sweep 捕捉为强必要子空间
+
+整体：
+
+```text
+L24 attention:
+  value_delta = -0.0241
+  letter_delta = +0.0346
+  value_top1_delta = +0.0007
+  letter_top1_delta = -0.0075
+```
+
+代表性结果：
+
+```text
+tail rank4 object:
+  letter_delta = +0.3827
+
+tail rank16 object:
+  letter_delta = +0.3274
+
+prefix rank4 choice:
+  letter_delta = +0.2173
+
+mean rank16 object:
+  letter_delta = -0.2655
+```
+
+判断：
+
+```text
+即使 rank 提高到 16，pool 从 tail 扩展到 prefix/mean，Qwen3 L24 attention 的强 choice interface 仍没有表现为可被 destroy 的普通低秩输出子空间。
+```
+
+这支持：
+
+```text
+Qwen3 L24 attention 的 Phase92/93 强现象更可能是 attention route / target-sensitive token pattern / downstream readout alignment，
+而不是简单 attn_out 向量子空间。
+```
+
+#### 3. GLM4 L39 MLP：candidate scoring 的低秩子空间证据更稳定
+
+整体：
+
+```text
+L39 MLP:
+  value_delta = -0.3503
+  letter_delta = +0.0055
+  value_top1_delta = +0.0032
+  letter_top1_delta = +0.0104
+```
+
+按 factor：
+
+```text
+choice:
+  value_delta = -0.4349
+  letter_delta = -0.0248
+
+target:
+  value_delta = -0.4372
+  letter_delta = -0.0262
+
+object:
+  value_delta = -0.3213
+  letter_delta = +0.0099
+
+slot:
+  value_delta = -0.3346
+  letter_delta = +0.0943
+
+pc1:
+  value_delta = -0.2233
+  letter_delta = -0.0259
+```
+
+rank 影响：
+
+```text
+rank1 choice value_delta = -0.2500
+rank4 choice value_delta = -0.5582
+rank16 choice value_delta = -0.4966
+
+rank1 target value_delta = -0.2685
+rank4 target value_delta = -0.4992
+rank16 target value_delta = -0.5439
+```
+
+判断：
+
+```text
+GLM4 L39 MLP 的 value/candidate scoring 确实能被 choice/target/object/slot 子空间稳定破坏。
+letter margin 基本不随之下降。
+```
+
+这进一步确认：
+
+```text
+GLM4 L39 MLP 是 candidate scoring component，不是 choice decision component。
+```
+
+#### 4. DeepSeek7B L27 attention：value 与 letter 接口方向相反
+
+整体：
+
+```text
+L27 attention:
+  value_delta = +0.3830
+  letter_delta = -0.2346
+  value_top1_delta = -0.0174
+  letter_top1_delta = -0.0048
+```
+
+按 factor：
+
+```text
+pc1:
+  value_delta = +0.4156
+  letter_delta = -0.1431
+
+choice:
+  value_delta = +0.3949
+  letter_delta = -0.2769
+
+target:
+  value_delta = +0.3866
+  letter_delta = -0.2376
+
+object:
+  value_delta = +0.3589
+  letter_delta = -0.2614
+
+slot:
+  value_delta = +0.3590
+  letter_delta = -0.2540
+```
+
+rank 影响：
+
+```text
+rank1 letter_delta 大约 -0.14 到 -0.15
+rank4 letter_delta 约 -0.17 到 -0.29
+rank16 letter_delta 约 -0.33 到 -0.46
+```
+
+代表性：
+
+```text
+tail rank16 object:
+  value_delta = +0.2891
+  letter_delta = -0.5077
+
+prefix rank16 choice:
+  value_delta = +0.3774
+  letter_delta = -0.5286
+
+mean rank16 slot:
+  value_delta = +0.2984
+  letter_delta = -0.5098
+```
+
+判断：
+
+```text
+DeepSeek7B L27 attention 的输出接口更清楚地表现为 value/letter 分离：
+destroy 子空间会提高 value margin，却降低 letter margin。
+```
+
+这说明：
+
+```text
+L27 attention 更像 output-letter interface / readout router，
+不是 value candidate builder。
+```
+
+### 对 Phase95 的修正
+
+Phase95 说“rank4-tail 子空间不能干净解释变量”，Phase96 进一步拆开：
+
+```text
+1. 对 Qwen3 L6 MLP，rank 和 pool 是关键；提高 rank 后破坏效应非常强。
+2. 对 Qwen3 L24 attention，rank/pool 仍不能解释强 choice interface，说明可能不是输出子空间问题。
+3. 对 GLM4 L39 MLP，低秩子空间稳定破坏 value scoring，模型画像更稳。
+4. 对 DeepSeek7B L27 attention，高 rank 更明显破坏 letter interface，但 value margin 反而上升，说明它不是普通语义值通道。
+```
+
+### 当前最稳结论
+
+可以说：
+
+```text
+深度网络内部存在 factor-like subspace structure，
+但它不是单变量、低秩、全位置共享的干净轴。
+```
+
+更准确的结构是：
+
+```text
+factor effect = rank-sensitive + position-sensitive + interface-specific + competition-mixed
+```
+
+### 硬伤
+
+1. 本阶段只做 destroy，没有做 transplant / restore。
+2. pool 仍是 tail/prefix/mean，没有真正 token-aligned。
+3. factor basis 仍来自差分 + SVD，没有做监督子空间或因果筛选。
+4. `destroy` 后指标可能上升，说明 basis 仍混入竞争和抑制成分。
+5. 没有做 generation，只评估 value/letter margin。
+6. Qwen3 L24 attention 的关键接口仍未定位到可解释子空间。
+
+### 理论进展
+
+条件化关系因子动力学公式继续保留，但需要加入 rank/position/interface 三个约束：
+
+```text
+h_l(x) =
+  Base_l(x)
+  + Σ_r Gate_{l,r}(x, position, interface)
+      · F_{l,r}^{rank,position}(x)
+  + U_l(x)
+```
+
+其中：
+
+```text
+Base_l:
+  位置、熵、格式、全局状态等基础成分。
+
+F_{l,r}^{rank,position}:
+  某一关系因子在特定 rank / token position / component interface 中的子空间表达。
+
+Gate_{l,r}:
+  条件化门控，不仅依赖输入内容，也依赖当前读出接口和后续任务格式。
+
+U_l:
+  尚未解释的非线性、路由、注意力路径和高阶关系残差。
+```
+
+### 下一步
+
+Phase97 应优先做：
+
+```text
+Token-Aligned Subspace and Route Test
+```
+
+目标：
+
+```text
+解释 Qwen3 L24 attention 为什么整组件 transplant 很强，但 rank/pool destroy 不强。
+```
+
+测试设计：
+
+```text
+1. 对 prompt 中 object token、slot token、target continuation token、choice letter position 分别对齐建 basis。
+2. 对 Qwen3 L24 attention 做 token-aligned destroy / transplant。
+3. 对 attention route 做更细干预：attn_out token copy、head-level copy、last-token readout copy。
+4. 对 DS7B L27 attention 同步测试，比较 output-letter router 是否同构。
+5. 对 GLM4 L39 MLP 做 restore，确认 candidate scoring 子空间是否可恢复。
+```
+
+判据：
+
+```text
+如果 token-aligned / head-level 后 Qwen3 L24 attention 的 choice interface 被捕捉，
+说明它是 token route / attention pattern。
+
+如果仍捕捉不到，
+说明它可能是 downstream readout compatibility，而不是当前层局部状态本身。
+```
