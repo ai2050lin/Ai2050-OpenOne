@@ -30801,6 +30801,7 @@ GLM4:
 如果跨 object 仍有效，
 说明开始接近抽象变量级机制。
 ```
+
 ## Phase 92: Cross-item Component Transplant 跨样本组件输出移植 [2026-06-11 23:35]
 
 ### 本轮目标
@@ -31265,6 +31266,7 @@ coreference
 ```
 
 但必须先通过 Phase93/94，把当前对象-槽位任务的路径拆干净，否则继续扩功能库只会增加行为图谱，不会进入编码机制。
+
 ## Phase 93: Component Transplant Alignment Audit 组件移植对齐方式审计 [2026-06-12 04:37]
 
 ### 本轮目标
@@ -31785,6 +31787,7 @@ factor-level transferable subspace
 ```
 
 这一步才真正接近语言编码机制中的“条件化关系因子”。
+
 ## Phase 94: 因子子空间闭包总方案 [2026-06-12 09:09]
 
 ### 背景
@@ -32136,6 +32139,7 @@ DeepSeek7B:
 语言机制越来越不像固定概念方向，
 越来越像由通用主轴、关系因子、接口因子、输出因子组成的条件化动态路径系统。
 ```
+
 ## Phase 95: Factor Subspace Closure 全量测试 [2026-06-12 11:15]
 
 ### 本轮目标
@@ -32943,4 +32947,1348 @@ Token-Aligned Subspace and Route Test
 
 如果仍捕捉不到，
 说明它可能是 downstream readout compatibility，而不是当前层局部状态本身。
+```
+
+## Phase 97: Token Route Local Patch 全量测试 [2026-06-12 16:28]
+
+### 背景
+
+用户提供的 Phase96 分析是正确的：Phase96 没有证明干净因子轴，但把失败拆成不同机制类型：
+
+```text
+Qwen3 L6 MLP:
+  rank / pool 不足是主要问题，高 rank 后因子破坏效应显现。
+
+Qwen3 L24 attention:
+  rank / pool 仍不能捕捉整组件 transplant 强效，必须转向 token route。
+
+GLM4 L39 MLP:
+  candidate scoring 子空间稳定，但不控制 choice decision。
+
+DeepSeek7B L27 attention:
+  value / letter separation 更清楚。
+```
+
+结合 GLM5 Phase470 的 DCF 进展：
+
+```text
+Meaning(x) = ΔP(future | x)
+```
+
+当前更合理的方向不是继续找概念方向，而是测试某个组件如何改变未来分布约束，尤其是读出位置和局部路由。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase97_token_route_local_patch.py
+tests/gpt5/phase97_token_route_local_patch_summary.py
+tests/gpt5/run_phase97_token_route_local_patch_full.sh
+```
+
+### 运行命令
+
+Smoke:
+
+```bash
+python tests/gpt5/phase97_token_route_local_patch.py qwen3 \
+  --nodes 24:attn \
+  --max-items 3 \
+  --positions object_span,prompt_tail \
+  --donor-kinds same_slot_same_target \
+  --output-dir results/gpt5_phase97_smoke \
+  --progress-every 1 \
+  --hard-exit-after-model
+```
+
+Full:
+
+```bash
+chmod +x tests/gpt5/run_phase97_token_route_local_patch_full.sh
+tests/gpt5/run_phase97_token_route_local_patch_full.sh
+```
+
+第一次 qwen3 在 L6 MLP prompt_tail 附近出现一次 Python segmentation fault，已用同一输出目录 resume：
+
+```bash
+PHASE97_OUTPUT_DIR=results/gpt5_phase97_token_route_local_patch_full_20260612_151434 \
+  tests/gpt5/run_phase97_token_route_local_patch_full.sh
+```
+
+resume 从 partial checkpoint 继续，最终三模型完整完成。
+
+### 测试设置
+
+```text
+output_dir = results/gpt5_phase97_token_route_local_patch_full_20260612_151434
+models = qwen3 -> GLM4 -> DeepSeek7B
+hard_exit_after_model = true
+实际 attention implementation = sdpa
+items = 210
+slots = category,color,function,material,location
+positions = object_span, relation_span, prompt_tail, last4, prefix8
+donor_kinds = same_slot_same_target, same_slot_diff_target
+interventions = zero, local token transplant
+```
+
+节点：
+
+```text
+Qwen3: L24 attention, L6 MLP
+GLM4: L39 MLP
+DeepSeek7B: L27 attention
+```
+
+### 数据规模
+
+```text
+Qwen3 rows = 5940
+GLM4 rows = 2970
+DeepSeek7B rows = 2970
+total_rows = 11880
+bad_numeric_rows = 0
+```
+
+### 核心原理
+
+Phase96 做的是 pooled subspace destroy：
+
+```text
+h' = h - P_factor(h)
+```
+
+Phase97 改为 token-local route patch：
+
+```text
+zero:
+  h'[:, token_positions, :] = 0
+
+transplant:
+  h'[:, target_positions, :] = donor_h[:, donor_positions, :]
+```
+
+测试位置：
+
+```text
+object_span:
+  对象名词对应 token。
+
+relation_span:
+  对象之后到 prompt 结尾的关系/槽位提示 token。
+
+prompt_tail:
+  最后一个 prompt token，也就是预测下一个 token 的直接读出位置。
+
+last4:
+  prompt 末尾四个 token。
+
+prefix8:
+  prompt 前八个 token。
+```
+
+判据：
+
+```text
+如果 Qwen3 L24 attention 的强 choice interface 来自读出 token route，
+那么 prompt_tail / last4 局部 patch 应该强烈影响 letter margin。
+
+如果来自对象语义本身，
+object_span 局部 patch 应该强。
+```
+
+### 客观结果
+
+#### 1. Qwen3 L24 attention：强接口定位到 prompt_tail / last4
+
+整体：
+
+```text
+L24 attention:
+  value_delta = -0.1583
+  letter_delta = -2.0296
+  value_top1_delta = -0.0054
+  letter_top1_delta = -0.1993
+```
+
+按位置：
+
+```text
+last4:
+  value_delta = -0.2237
+  letter_delta = -5.1242
+  letter_top1_delta = -0.5101
+
+prompt_tail:
+  value_delta = -0.1954
+  letter_delta = -4.9895
+  letter_top1_delta = -0.4798
+
+object_span:
+  value_delta = +0.0022
+  letter_delta = -0.0078
+
+relation_span:
+  value_delta = -0.1811
+  letter_delta = -0.0114
+
+prefix8:
+  value_delta = -0.1936
+  letter_delta = -0.0154
+```
+
+关键局部条件：
+
+```text
+L24 attention / last4 / transplant same_slot_diff_target:
+  value_delta = -0.6271
+  letter_delta = -10.2530
+  letter_top1_delta = -0.8286
+
+L24 attention / prompt_tail / transplant same_slot_diff_target:
+  value_delta = -0.4896
+  letter_delta = -10.1827
+  letter_top1_delta = -0.8238
+
+L24 attention / last4 / zero:
+  value_delta = -0.1266
+  letter_delta = -4.4708
+  letter_top1_delta = -0.6524
+
+L24 attention / prompt_tail / zero:
+  value_delta = -0.1435
+  letter_delta = -4.1548
+  letter_top1_delta = -0.5714
+```
+
+而 object_span 基本无效：
+
+```text
+L24 attention / object_span / zero:
+  value_delta = +0.0120
+  letter_delta = -0.0101
+  letter_top1_delta = -0.0048
+```
+
+判断：
+
+```text
+Phase92/93 中 Qwen3 L24 attention 的强 choice interface，
+不是 object token 语义局部状态，
+而是 prompt_tail / last4 读出位置上的强路由接口。
+```
+
+这解释 Phase96：
+
+```text
+tail/prefix/mean pooled subspace 抓不到强接口，
+是因为接口高度集中在 readout token route，
+不是全局平均子空间。
+```
+
+#### 2. Qwen3 L6 MLP：prefix8 是更强的全局/早段状态
+
+整体：
+
+```text
+L6 MLP:
+  value_delta = -0.5257
+  letter_delta = -0.3966
+  value_top1_delta = -0.0418
+  letter_top1_delta = -0.0539
+```
+
+按位置：
+
+```text
+prefix8:
+  value_delta = -1.7410
+  letter_delta = -1.5348
+  value_top1_delta = -0.1700
+  letter_top1_delta = -0.2424
+
+object_span:
+  value_delta = -0.2025
+  letter_delta = -0.1178
+
+relation_span:
+  value_delta = -0.1830
+  letter_delta = -0.1204
+
+prompt_tail:
+  value_delta = -0.1351
+  letter_delta = -0.0547
+
+last4:
+  value_delta = -0.3668
+  letter_delta = -0.1553
+```
+
+关键条件：
+
+```text
+L6 MLP / prefix8 / zero:
+  value_delta = -2.9812
+  letter_delta = -3.8371
+  value_top1_delta = -0.2333
+  letter_top1_delta = -0.5762
+
+L6 MLP / prefix8 / transplant same_slot_diff_target:
+  value_delta = -1.3550
+  letter_delta = -0.3815
+```
+
+判断：
+
+```text
+Qwen3 L6 MLP 的作用更像早段上下文/格式/候选准备状态，
+不是只在 prompt_tail 的读出接口。
+```
+
+这与 Phase96 的高秩、位置敏感子空间结论一致。
+
+#### 3. GLM4 L39 MLP：value scoring 由 prefix/relation/tail 局部状态控制，letter 仍不是主目标
+
+整体：
+
+```text
+L39 MLP:
+  value_delta = -0.3435
+  letter_delta = +0.0877
+  value_top1_delta = +0.0088
+  letter_top1_delta = +0.0034
+```
+
+按位置：
+
+```text
+prefix8:
+  value_delta = -0.4543
+  letter_delta = 0.0000
+
+relation_span:
+  value_delta = -0.4252
+  letter_delta = 0.0000
+
+prompt_tail:
+  value_delta = -0.4191
+  letter_delta = +0.2193
+
+last4:
+  value_delta = -0.4191
+  letter_delta = +0.2193
+
+object_span:
+  value_delta = 0.0000
+  letter_delta = 0.0000
+```
+
+关键条件：
+
+```text
+L39 MLP / prefix8 / zero:
+  value_delta = -0.6559
+
+L39 MLP / prefix8 / transplant same_slot_diff_target:
+  value_delta = -0.7101
+
+L39 MLP / prompt_tail / zero:
+  value_delta = -0.6559
+  letter_delta = +0.6417
+```
+
+判断：
+
+```text
+GLM4 L39 MLP 仍稳定表现为 candidate scoring component。
+局部破坏主要影响 value margin，不稳定降低 letter margin。
+```
+
+这与 Phase90/91/95/96 一致。
+
+#### 4. DeepSeek7B L27 attention：final readout / letter router 特征更清楚
+
+整体：
+
+```text
+L27 attention:
+  value_delta = -0.1880
+  letter_delta = -0.1286
+  value_top1_delta = -0.0357
+  letter_top1_delta = +0.0121
+```
+
+按位置：
+
+```text
+prompt_tail:
+  value_delta = -0.2552
+  letter_delta = -0.3216
+
+last4:
+  value_delta = -0.2552
+  letter_delta = -0.3216
+
+relation_span:
+  value_delta = -0.2100
+  letter_delta = 0.0000
+
+prefix8:
+  value_delta = -0.2198
+  letter_delta = 0.0000
+
+object_span:
+  value_delta = 0.0000
+  letter_delta = 0.0000
+```
+
+关键条件：
+
+```text
+L27 attention / prompt_tail / zero:
+  value_delta = -0.1007
+  letter_delta = -0.8132
+
+L27 attention / prompt_tail / transplant same_slot_diff_target:
+  value_delta = -0.4594
+  letter_delta = -0.0997
+
+L27 attention / prefix8 / transplant same_slot_diff_target:
+  value_delta = -0.3625
+  letter_delta = 0.0000
+```
+
+判断：
+
+```text
+DeepSeek7B L27 attention 的 letter effect 主要在 prompt_tail / last4。
+prefix/relation 局部状态影响 value margin，但不影响 letter margin。
+```
+
+这与 Phase96 的 value/letter separation 一致。
+
+### 重要结构解释
+
+为什么很多模型的 object_span 是 0：
+
+```text
+在靠近末层的组件中，object token 的局部状态已经很难再影响 prompt_tail 的下一个 token logits。
+因为 causal transformer 的最终读出主要来自最后读出位置。
+如果 object position 在最后层被改动，但没有足够后续层让信息重新传播到 prompt_tail，
+它对最终读出可以接近 0。
+```
+
+这不是说明对象信息不存在，而是说明：
+
+```text
+对象信息若要影响答案，必须已经通过前面层的 attention route 聚合到读出位置。
+```
+
+这正是 Phase97 的核心发现。
+
+### 对 Phase96 的修正
+
+Phase96 说：
+
+```text
+Qwen3 L24 attention 可能是 attention route / token pattern，而非普通输出子空间。
+```
+
+Phase97 进一步证实：
+
+```text
+Qwen3 L24 attention 的关键接口集中在 prompt_tail / last4 readout token。
+same_slot_diff_target transplant 在这些位置造成极强 letter collapse。
+```
+
+所以 Qwen3 L24 attention 的机制不应继续用：
+
+```text
+全序列 pooled factor subspace
+```
+
+解释，而应改为：
+
+```text
+readout-token route interface
+```
+
+### 当前最稳结论
+
+```text
+1. Qwen3 L24 attention 是强 readout-token choice interface。
+2. Qwen3 L6 MLP 是更早段的上下文/候选准备状态。
+3. GLM4 L39 MLP 是 candidate scoring component。
+4. DeepSeek7B L27 attention 是 final readout / letter router，并与 value margin 分离。
+```
+
+### 硬伤
+
+1. 本阶段只做 token-local whole-vector patch，没有做 head-level patch。
+2. donor transplant 仍是整 token hidden state，不是子空间级 transplant。
+3. object_span 在末层无效，不能说明对象变量不存在，只能说明末层局部对象状态不能重新传播。
+4. qwen3 第一次运行中发生一次 segmentation fault，虽然 resume 后完整完成，但工程稳定性仍需关注。
+5. 没有 generation 验证，只看 value/letter margin。
+6. 没有把 DCF 约束指纹直接接入 token route 测试。
+
+### 理论进展
+
+条件化关系因子动力学公式需要进一步加入 `readout-token route`：
+
+```text
+h_l(t_readout, x) =
+  Base_l(t_readout, x)
+  + Σ_r Gate_{l,r}(x, t_source -> t_readout, interface)
+      · Route_{l,r}(t_source -> t_readout)
+      · F_{l,r}(t_source, x)
+  + U_l(t_readout, x)
+```
+
+更通俗地说：
+
+```text
+语言变量不是只存在于某个对象 token。
+它必须被路由到当前任务的读出 token，
+并在读出 token 上改变未来分布约束。
+```
+
+这与 GLM5 Phase470 的 DCF 原理一致：
+
+```text
+Meaning(x) = ΔP(future | x)
+```
+
+在 GPT5 当前路径中，更具体地说：
+
+```text
+Mechanism(x, task) =
+  how factors from source tokens are routed into readout token
+  and how that readout token changes future distribution.
+```
+
+中文：
+
+```text
+机制不是对象 token 本身有什么向量，
+而是对象/关系/选择因子如何被路由到读出位置，
+并改变未来输出分布。
+```
+
+### 下一步
+
+Phase98 应做：
+
+```text
+Head-Level Readout Route Mapping
+```
+
+目标：
+
+```text
+在 Qwen3 L24 attention 和 DeepSeek7B L27 attention 中，
+定位哪些 attention heads 负责把 source token 信息写入 prompt_tail / last4。
+```
+
+测试：
+
+```text
+1. 对 Qwen3 L24 attention 做 head-level zero / transplant。
+2. 只在 prompt_tail / last4 读出位置 patch 每个 head 输出。
+3. 比较 same_slot_same_target 与 same_slot_diff_target。
+4. 对 DeepSeek7B L27 attention 做同样测试。
+5. 保留 GLM4 L39 MLP 作为 MLP scoring 对照，不做 head-level 主测试。
+```
+
+判据：
+
+```text
+如果少数 head 的 prompt_tail patch 能复现 L24 attention 的 letter collapse，
+说明 choice interface 有可定位的 route head。
+
+如果必须多个 head 或全 attention 输出才有效，
+说明接口是分布式 route ensemble。
+```
+
+## Phase 98: Head-Level Readout Route Mapping 全量测试 [2026-06-12 19:14]
+
+### 本轮任务
+
+继续 Phase97 的 `readout-token route` 结论，进一步把 Qwen3 L24 attention、GLM4 L39 attention、DeepSeek7B L27 attention 拆到 head 级别，测试：
+
+```text
+1. 哪些 attention head 负责 prompt_tail / last4 读出位置的 letter 接口。
+2. 是少数 head 可定位，还是必须整个 attention 输出共同工作。
+3. Qwen3 / GLM4 / DS7B 在 head-level route 上是否存在同构结构。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase98_head_readout_route_mapping.py
+tests/gpt5/phase98_head_readout_route_mapping_summary.py
+tests/gpt5/run_phase98_head_readout_route_mapping_full.sh
+```
+
+核心实现：
+
+```text
+1. hook self_attn.o_proj 的 forward_pre_hook。
+2. 按 o_proj 输入维度和 num_attention_heads 切分每个 head 的输出块。
+3. 对单个 head 在 prompt_tail / last4 位置做 zero 或 transplant。
+4. donor 使用 same_slot_diff_target，直接测试 choice/letter route 是否被错误目标状态劫持。
+5. scoring 只保留 letter margin，避免 head 全扫描数据量过大。
+6. 每个模型结束使用 --hard-exit-after-model，三模型顺序运行。
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+python tests/gpt5/phase98_head_readout_route_mapping.py qwen3 \
+  --layers 24 --heads 0,1 --max-items 4 \
+  --positions prompt_tail \
+  --donor-kinds same_slot_diff_target \
+  --output-dir results/gpt5_phase98_smoke \
+  --progress-every 2 \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+chmod +x tests/gpt5/run_phase98_head_readout_route_mapping_full.sh
+tests/gpt5/run_phase98_head_readout_route_mapping_full.sh
+```
+
+Qwen3 首轮在中途发生一次 segmentation fault，使用 partial checkpoint 续跑完成：
+
+```bash
+PHASE98_OUTPUT_DIR=results/gpt5_phase98_head_readout_route_mapping_full_20260612_165924 \
+  tests/gpt5/run_phase98_head_readout_route_mapping_full.sh
+```
+
+DeepSeek7B 初始全量运行在每 head 重复 clean cache 设计下崩溃；随后修正为每个 item 只计算一次 clean cache，再对所有 head 复用 clean cache，单独完成 DS7B：
+
+```bash
+python tests/gpt5/phase98_head_readout_route_mapping.py deepseek7b \
+  --layers 27 \
+  --heads all \
+  --slots category,color,function,material,location \
+  --max-items 105 \
+  --positions prompt_tail,last4 \
+  --donor-kinds same_slot_diff_target \
+  --choice-template choice_json_letter \
+  --output-dir results/gpt5_phase98_head_readout_route_mapping_full_20260612_165924 \
+  --progress-every 35 \
+  --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase98_head_readout_route_mapping_summary.py \
+  --output-dir results/gpt5_phase98_head_readout_route_mapping_full_20260612_165924
+```
+
+### 数据规模
+
+结果目录：
+
+```text
+results/gpt5_phase98_head_readout_route_mapping_full_20260612_165924
+```
+
+总量：
+
+```text
+total_rows = 38640
+total_bad_numeric_rows = 0
+```
+
+分模型：
+
+```text
+Qwen3:
+  layer = L24
+  heads = 32
+  rows = 13440
+  bad_numeric_rows = 0
+
+GLM4:
+  layer = L39
+  heads = 32
+  rows = 13440
+  bad_numeric_rows = 0
+
+DeepSeek7B:
+  layer = L27
+  heads = 28
+  rows = 11760
+  bad_numeric_rows = 0
+```
+
+每个 head 测试：
+
+```text
+items = 105
+positions = prompt_tail, last4
+conditions = zero, transplant:same_slot_diff_target
+```
+
+### 客观结果
+
+#### 1. Qwen3：L24 attention 的 letter route 高度集中在少数 head
+
+整体：
+
+```text
+L24 all heads:
+  letter_delta = -0.2038
+  letter_top1_delta = -0.0183
+
+condition:
+  transplant:same_slot_diff_target:
+    letter_delta = -0.3062
+    letter_top1_delta = -0.0359
+  zero:
+    letter_delta = -0.1014
+    letter_top1_delta = -0.0007
+```
+
+最强 head：
+
+```text
+L24:29:
+  letter_delta = -3.0116
+  letter_top1_delta = -0.3238
+
+L24:31:
+  letter_delta = -2.5554
+  letter_top1_delta = -0.2571
+
+L24:28:
+  letter_delta = -0.6440
+  letter_top1_delta = -0.0048
+```
+
+最强具体条件：
+
+```text
+L24:29:last4:transplant:same_slot_diff_target:
+  letter_delta = -5.1619
+  letter_top1_delta = -0.6286
+
+L24:29:prompt_tail:transplant:same_slot_diff_target:
+  letter_delta = -5.1595
+  letter_top1_delta = -0.6381
+
+L24:31:last4:transplant:same_slot_diff_target:
+  letter_delta = -4.5131
+  letter_top1_delta = -0.5143
+
+L24:31:prompt_tail:transplant:same_slot_diff_target:
+  letter_delta = -4.5012
+  letter_top1_delta = -0.5143
+```
+
+这说明 Phase97 中 Qwen3 L24 attention 的读出位置 letter collapse 不是均匀分布在所有 head，而是主要集中在 L24 head 29 / 31，head 28 也有明显 zero 破坏效应。
+
+#### 2. GLM4：L39 attention 几乎不是 letter route 接口
+
+整体：
+
+```text
+L39 all heads:
+  letter_delta = -0.0009
+  letter_top1_delta = -0.0077
+
+condition:
+  transplant:same_slot_diff_target:
+    letter_delta = -0.0009
+    letter_top1_delta = -0.0074
+  zero:
+    letter_delta = -0.0010
+    letter_top1_delta = -0.0080
+```
+
+最强 head 也很弱：
+
+```text
+L39:31:
+  letter_delta = -0.0366
+  letter_top1_delta = -0.0143
+
+L39:17:
+  letter_delta = -0.0265
+  letter_top1_delta = -0.0143
+
+L39:20:
+  letter_delta = -0.0199
+  letter_top1_delta = -0.0143
+```
+
+这和 Phase96 / Phase97 一致：GLM4 的强信号主要不是末层 attention 的 letter route，而更像 MLP/candidate scoring 或其他非 head-local 的输出接口。
+
+#### 3. DeepSeek7B：L27 attention 单 head 效应弱，zero 比 transplant 更明显
+
+整体：
+
+```text
+L27 all heads:
+  letter_delta = -0.0215
+  letter_top1_delta = +0.0058
+
+condition:
+  zero:
+    letter_delta = -0.0383
+    letter_top1_delta = +0.0051
+  transplant:same_slot_diff_target:
+    letter_delta = -0.0047
+    letter_top1_delta = +0.0065
+```
+
+相对最强 head：
+
+```text
+L27:21:
+  letter_delta = -0.1295
+  letter_top1_delta = 0.0000
+
+L27:26:
+  letter_delta = -0.0997
+  letter_top1_delta = +0.0048
+
+L27:9:
+  letter_delta = -0.0935
+  letter_top1_delta = +0.0048
+```
+
+最强具体条件：
+
+```text
+L27:21:prompt_tail:zero:
+  letter_delta = -0.2518
+  letter_top1_delta = -0.0095
+
+L27:21:last4:zero:
+  letter_delta = -0.2518
+  letter_top1_delta = -0.0095
+
+L27:26:prompt_tail:zero:
+  letter_delta = -0.1845
+  letter_top1_delta = 0.0000
+
+L27:9:prompt_tail:zero:
+  letter_delta = -0.1815
+  letter_top1_delta = +0.0095
+```
+
+DeepSeek7B 的 L27 attention 存在若干弱 head 贡献，但没有出现 Qwen3 那种 `same_slot_diff_target transplant` 强烈劫持 letter 输出的 head。它更像输出释放附近的弱分布式接口，而不是可由单一 head transplant 强控制的 choice route。
+
+### 本轮关键进展
+
+1. Phase97 的 Qwen3 L24 readout-token route 被定位到 head 级：主要是 L24 head 29 和 head 31。
+2. Qwen3 的强效来自 transplant:same_slot_diff_target，而不只是 zero ablation，说明这些 head 不只是“重要”，而是携带可被错误目标劫持的 letter/choice route 内容。
+3. GLM4 的末层 attention head 几乎不控制 letter 输出，继续支持 GLM4 与 Qwen3 的路径组织差异。
+4. DeepSeek7B 的 L27 attention head 有弱破坏效应，但 transplant 不强，说明它不像 Qwen3 一样有清晰单 head choice route。
+
+### 问题和硬伤
+
+1. 本轮只测试了一个候选层：Qwen3 L24、GLM4 L39、DeepSeek7B L27；还没有做跨层 head map。
+2. 只测 letter margin，没有同时测 value margin，因此不能判断这些 head 是否也影响候选值语义。
+3. Qwen3 head 29/31 很强，但还没有做 head combination / restore，不能证明最小充分 head set。
+4. 还没有做 attention pattern 分析，因此不知道 head 29/31 具体从哪些 source token 读取。
+5. DeepSeek7B 仍可能依赖 L20-L27 多层连续轨迹，本轮单层 head map 不足以解释它的深层机制。
+6. Qwen3 与 DS7B 测试过程中都发生过工程崩溃，虽然 partial/resume 和 cache 优化后完成，但后续重要结论仍建议复测一次。
+
+### 理论进展
+
+条件化关系因子动力学公式需要继续细化，把 `readout-token route` 拆成 head 级路由项：
+
+```text
+h_l(t_readout, x)
+= Base_l(t_readout, x)
+ Σ_h RouteHead_{l,h}(t_source -> t_readout, x)
+ Σ_m MLPFactor_{l,m}(t_readout, x)
+ U_l(t_readout, x)
+```
+
+更具体到本轮结果：
+
+```text
+Qwen3:
+  choice/letter route 主要经过 L24 attention head 29/31。
+
+GLM4:
+  letter route 不在 L39 attention head，可能在 MLP scoring / residual 输出接口。
+
+DeepSeek7B:
+  L27 attention 有弱释放效应，但不是单 head transplant 可控接口。
+```
+
+因此当前不能再只说：
+
+```text
+attention 负责路由。
+```
+
+而要更精确地说：
+
+```text
+某些模型中，少数 attention head 在特定读出 token 上承担 choice/letter route；
+另一些模型中，同样功能可能由 MLP scoring、残差输出接口或多层轨迹完成。
+```
+
+### 下一步
+
+Phase99 应做：
+
+```text
+Qwen3 L24 head 29/31 route source analysis and restore
+```
+
+目标：
+
+```text
+1. 对 Qwen3 L24 head 29/31 做 attention pattern source token 分析。
+2. 测试它们主要读取 object_span、relation_span、candidate block、还是 prompt_tail 自身。
+3. 做 head 29/31 组合 ablation，比较 single-head 与 pair-head 的必要性。
+4. 做 restore：先破坏全 L24 attention 或 head 29/31，再只恢复 head 29/31，测试 letter/top1 是否恢复。
+5. 同时补测 value margin，判断 head 29/31 是纯 letter route、choice route，还是 value+letter 共同接口。
+```
+
+如果 restore 成立，Qwen3 将获得第一个比较接近“读出路由最小电路”的证据；如果 restore 不成立，则说明 head 29/31 是强必要节点，但不是充分闭包。
+
+## Phase 99: Head-Set Route Closure 必要性/充分性测试 [2026-06-12 20:51]
+
+### 本轮任务
+
+基于 Phase98 的 head-level 定位结果，继续测试：
+
+```text
+1. Qwen3 L24 head 29/31 是否构成接近最小的 letter readout route。
+2. zero_heads 是否显示必要性。
+3. keep_heads 是否显示充分性。
+4. transplant_heads 是否能复现 transplant_all 的错误目标劫持。
+5. value margin 与 letter margin 是否同向变化。
+```
+
+对照模型：
+
+```text
+Qwen3:
+  L24 heads 29, 31, 28
+
+GLM4:
+  L39 heads 31, 17, 20
+
+DeepSeek7B:
+  L27 heads 21, 26, 9
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase99_head_set_route_closure.py
+tests/gpt5/phase99_head_set_route_closure_summary.py
+tests/gpt5/run_phase99_head_set_route_closure_full.sh
+```
+
+### 测试原理
+
+Phase98 只测单个 head 的 zero / transplant。Phase99 改成 head-set 级对照：
+
+```text
+zero_all:
+  清除读出位置所有 head 输出。
+
+transplant_all:
+  把 donor 的所有 head 输出移植到读出位置。
+
+zero_heads:
+  只清除候选 head set。
+
+keep_heads:
+  保留候选 head set，清除其他所有 head。
+
+transplant_heads:
+  只移植候选 head set。
+```
+
+判断逻辑：
+
+```text
+zero_heads 强：
+  候选 head set 对当前输出有必要性。
+
+keep_heads 接近 clean：
+  候选 head set 可能充分。
+
+keep_heads 仍明显下降：
+  候选 head set 不充分，需要其他 head / residual / MLP 协同。
+
+transplant_heads 接近 transplant_all：
+  候选 head set 携带主要可劫持的 route 内容。
+```
+
+本轮同时测：
+
+```text
+value_margin
+letter_margin
+value_top1
+letter_top1
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+python tests/gpt5/phase99_head_set_route_closure.py qwen3 \
+  --layer 24 \
+  --head-sets 'single29=29;pair2931=29,31' \
+  --max-items 2 \
+  --positions prompt_tail \
+  --output-dir results/gpt5_phase99_smoke \
+  --progress-every 1 \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+chmod +x tests/gpt5/run_phase99_head_set_route_closure_full.sh
+tests/gpt5/run_phase99_head_set_route_closure_full.sh
+```
+
+Qwen3 在最后阶段出现一次 segmentation fault，已从 partial checkpoint 恢复，继续完成三模型：
+
+```bash
+PHASE99_OUTPUT_DIR=results/gpt5_phase99_head_set_route_closure_full_20260612_191927 \
+  tests/gpt5/run_phase99_head_set_route_closure_full.sh
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase99_head_set_route_closure_summary.py \
+  --output-dir results/gpt5_phase99_head_set_route_closure_full_20260612_191927
+```
+
+### 数据规模
+
+结果目录：
+
+```text
+results/gpt5_phase99_head_set_route_closure_full_20260612_191927
+```
+
+总量：
+
+```text
+total_rows = 17640
+total_bad_numeric_rows = 0
+```
+
+分模型：
+
+```text
+Qwen3:
+  rows = 5880
+  bad_numeric_rows = 0
+
+GLM4:
+  rows = 5880
+  bad_numeric_rows = 0
+
+DeepSeek7B:
+  rows = 5880
+  bad_numeric_rows = 0
+```
+
+每模型：
+
+```text
+items = 210
+positions = prompt_tail, last4
+conditions = 14
+```
+
+### 客观结果
+
+#### 1. Qwen3：L24 head 29/31 是强必要和强可劫持 route，但不是完整充分闭包
+
+核心结果：
+
+```text
+zero_all:
+  value_delta = -0.1182
+  letter_delta = -4.3128
+  letter_top1_delta = -0.6119
+
+transplant_all:
+  value_delta = -0.4243
+  letter_delta = -10.2179
+  letter_top1_delta = -0.8262
+```
+
+单 head：
+
+```text
+transplant_heads:single29:
+  value_delta = -0.0040
+  letter_delta = -5.1042
+  letter_top1_delta = -0.6048
+
+transplant_heads:single31:
+  value_delta = -0.0059
+  letter_delta = -4.3655
+  letter_top1_delta = -0.5381
+```
+
+组合 head：
+
+```text
+zero_heads:pair2931:
+  value_delta = +0.0013
+  letter_delta = -3.5652
+  letter_top1_delta = -0.4643
+
+transplant_heads:pair2931:
+  value_delta = -0.0128
+  letter_delta = -9.6869
+  letter_top1_delta = -0.8024
+
+transplant_heads:wide282931:
+  value_delta = +0.0266
+  letter_delta = -9.8193
+  letter_top1_delta = -0.8048
+```
+
+充分性测试：
+
+```text
+keep_heads:pair2931:
+  value_delta = -0.1172
+  letter_delta = -1.7494
+  letter_top1_delta = -0.0643
+
+keep_heads:wide282931:
+  value_delta = -0.1203
+  letter_delta = -0.8241
+  letter_top1_delta = -0.0357
+```
+
+解释限定：
+
+```text
+1. head 29/31 组合几乎复现 transplant_all 的 letter 劫持：
+   -9.6869 vs -10.2179。
+
+2. 加入 head 28 后，transplant 仍接近 transplant_all：
+   -9.8193 vs -10.2179。
+
+3. zero head 29/31 会造成强 letter 下降：
+   -3.5652。
+
+4. keep head 29/31 或 28/29/31 不能完全保持 clean：
+   keep 仍有 letter_delta = -1.7494 / -0.8241。
+```
+
+因此 Qwen3 L24 head 29/31 是强必要节点，也是主要可劫持 route；但它们不是完整充分电路，至少还需要其他 head、residual 状态或后续输出接口协同。
+
+最关键的新发现：
+
+```text
+Qwen3 的 letter route 与 value route 分离。
+```
+
+因为 head 29/31 transplant 对 letter 非常强：
+
+```text
+letter_delta ≈ -9.69
+```
+
+但 value 影响很小：
+
+```text
+value_delta ≈ -0.013
+```
+
+这说明 head 29/31 更像 `choice/letter interface`，不是完整语义 value 表征。
+
+#### 2. GLM4：L39 attention head-set 仍然很弱
+
+核心结果：
+
+```text
+zero_all:
+  value_delta = +0.0177
+  letter_delta = -0.0390
+
+transplant_all:
+  value_delta = -0.0755
+  letter_delta = -0.0357
+
+zero_heads:wide311720:
+  value_delta = +0.0039
+  letter_delta = -0.1063
+
+transplant_heads:wide311720:
+  value_delta = -0.0220
+  letter_delta = -0.0476
+```
+
+GLM4 的 L39 attention 即使取 Phase98 最强 heads，也没有形成 Qwen3 那种强 letter route。GLM4 的可解释路径仍应优先看 MLP scoring / residual output，而不是末层 attention head route。
+
+#### 3. DeepSeek7B：L27 attention 有破坏效应，但没有 transplant 劫持效应
+
+核心结果：
+
+```text
+zero_all:
+  value_delta = -0.0612
+  letter_delta = -0.8132
+  letter_top1_delta = +0.0714
+
+transplant_all:
+  value_delta = -0.0121
+  letter_delta = -0.0997
+  letter_top1_delta = +0.0095
+```
+
+候选 head set：
+
+```text
+zero_heads:single21:
+  letter_delta = -0.2536
+
+zero_heads:single26:
+  letter_delta = -0.1905
+
+zero_heads:pair2126:
+  letter_delta = -0.3985
+
+zero_heads:wide212609:
+  letter_delta = -0.4884
+```
+
+transplant 很弱：
+
+```text
+transplant_heads:single21:
+  letter_delta = -0.0101
+
+transplant_heads:pair2126:
+  letter_delta = -0.0155
+
+transplant_heads:wide212609:
+  letter_delta = -0.0179
+```
+
+DeepSeek7B 的 L27 attention heads 有一定破坏效应，但不能被 same_slot_diff_target donor 强劫持。这与前面“DeepSeek7B 更像深层连续轨迹/输出释放型，而不是单点可控 route head”一致。
+
+### 本轮关键进展
+
+1. Qwen3 L24 head 29/31 被确认为主要 letter/choice route head。
+2. Qwen3 的 head 29/31 pair transplant 几乎复现 transplant_all，说明错误目标劫持主要经过这组 head。
+3. Qwen3 的 value 与 letter 明显分离：head 29/31 强烈影响 letter，但几乎不改变 value margin。
+4. GLM4 L39 attention head route 基本被排除为主要机制。
+5. DeepSeek7B L27 attention 有弱必要性但无 transplant 可控性，继续支持多层轨迹解释。
+
+### 问题和硬伤
+
+1. Qwen3 的 keep_heads 不充分，说明 head 29/31 不是完整电路。
+2. 还没有做真正 restore：例如先 zero_all，再恢复 head 29/31 的 clean donor 状态。
+3. 还没有分析 head 29/31 的 attention source token，因此不知道它从 object、target、candidate option、还是格式 token 读入。
+4. 只在一个层做 head-set closure，还没有做跨层 head relay。
+5. Qwen3 运行中仍发生 segmentation fault，虽然恢复后完成，但关键结果建议之后独立复测。
+6. 本轮仍是 margin 实验，没有 generation 或行为输出验证。
+
+### 理论进展
+
+条件化关系因子动力学需要区分：
+
+```text
+value factor:
+  候选内容本身的语义/属性分数。
+
+choice interface:
+  把候选内容映射到 A/B/C/D 或输出格式的读出接口。
+```
+
+本轮最重要的结构证据是：
+
+```text
+Qwen3 L24 head 29/31 主要控制 choice/letter interface，
+而不是完整 value factor。
+```
+
+因此公式应从：
+
+```text
+h_l(t_readout)
+= Base + RouteHead + MLPFactor + U
+```
+
+细化为：
+
+```text
+h_l(t_readout)
+= Base_l
++ ValueFactors_l(object, relation, target)
++ ChoiceRouteHeads_l(candidate -> letter)
++ FormatInterface_l(task, template)
++ ResidualCarry_l
++ U_l
+```
+
+中文解释：
+
+```text
+语言输出不是只由“目标值”决定，
+还要经过一个把目标值映射到当前任务输出格式的接口。
+
+Qwen3 的 L24 head 29/31 更像这个接口的一部分。
+```
+
+这解释了为什么：
+
+```text
+1. head 29/31 transplant 能强烈打掉 letter；
+2. value margin 几乎不变；
+3. GLM4 和 DS7B 没有同样的 head-local choice interface。
+```
+
+### 下一步
+
+Phase100 应做：
+
+```text
+Qwen3 L24 head 29/31 Source Token Attribution and Restore
+```
+
+目标：
+
+```text
+1. 分析 head 29/31 的 attention source token。
+2. 区分它读取的是 object/relation/target，还是 candidate option / letter format。
+3. 做真正 restore：
+   zero_all L24 attention at readout token
+   + restore head 29/31 clean state
+   测试是否恢复 letter margin/top1。
+4. 做 value/letter 双读出：
+   判断 restore 是否只恢复 letter，不恢复 value。
+```
+
+如果 restore 成立：
+
+```text
+Qwen3 将得到第一个 choice interface 层面的闭包证据。
+```
+
+如果 restore 不成立：
+
+```text
+head 29/31 是强 route 节点，但必须与其他 head/residual/MLP 共同构成闭包。
 ```
