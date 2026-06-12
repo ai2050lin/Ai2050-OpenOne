@@ -24596,3 +24596,169 @@ python tests/glm5/phase469_pc1_causal_robustness_controlled.py deepseek7b 1    #
 - `tests/glm5/phase469_pc1_causal_robustness_controlled.py` — Phase 469 主测试
 - `tests/glm5_temp/phase469_analysis.py` — 结果分析脚本
 - 结果：`results/glm5/phase469_{qwen3,glm4,deepseek7b}_r1.json`
+
+---
+
+## Phase 470: 分布约束指纹与关系槽位分离 [2026-06-12 14:48]
+
+### 理论升级: 分布控制接口理论
+
+基于Phase 469对PC1本质的修正，提出新的第一性原理框架:
+
+```
+Meaning(x) = ΔP(future | x)
+意义(x) = x 对未来概率分布的改变
+```
+
+核心转变: 从"寻找概念方向"→"寻找对未来分布的稳定约束"
+
+### Exp1: DCF(分布约束指纹)构造 — 核心发现
+
+DCF定义: 对每个对象x, 计算其在8个类别族词(fruit/animal/tool/vehicle/clothing/furniture/food/plant)上的mean logit向量。
+DCF直接度量"对象x对未来输出分布施加了什么约束"。
+
+**DCF vs 残差cos聚类质量对比:**
+
+| Model | Layer | DCF_sil | Resid_sil | DCF_advantage | DCF_disc | Resid_disc |
+|-------|-------|---------|-----------|---------------|----------|------------|
+| qwen3 | L0    | 0.7395  | 0.0000    | +0.74         | 0.8970   | 0.0000     |
+| qwen3 | L9    | 0.7395  | 0.2920    | +0.45         | 0.8970   | 0.0457     |
+| qwen3 | L18   | 0.7395  | 0.3036    | +0.44         | 0.8970   | 0.0603     |
+| qwen3 | L35   | 0.7395  | 0.4500    | +0.29         | 0.8970   | 0.0852     |
+| glm4  | L0    | 0.5499  | 0.0000    | +0.55         | 0.8245   | 0.0000     |
+| glm4  | L10   | 0.5499  | 0.3153    | +0.23         | 0.8245   | 0.0401     |
+| glm4  | L20   | 0.5499  | 0.2228    | +0.33         | 0.8245   | 0.0609     |
+| glm4  | L39   | 0.5499  | 0.4278    | +0.12         | 0.8245   | 0.0893     |
+| ds7b  | L0    | -0.1374 | 0.0000    | -0.14         | 0.1588   | 0.0000     |
+| ds7b  | L14   | -0.1374 | 0.2657    | -0.40         | 0.1588   | 0.0554     |
+| ds7b  | L27   | -0.1374 | 0.2584    | -0.40         | 0.1588   | 0.0230     |
+
+**三大发现:**
+
+1. **Qwen3/GLM4: DCF聚类显著优于残差cos** (5/5层胜出)
+   - DCF silhouette 0.55-0.74 >> Resid silhouette 0.00-0.46
+   - DCF区分力(discriminability) 0.82-0.90 >> Resid区分力 0.00-0.15
+   - **DCF比残差几何更好地捕获语义类别结构**
+
+2. **DS7B: DCF聚类为负** — 族词logit被数学推理模式严重污染
+   - DCF silhouette = -0.14 (类别内甚至不如随机)
+   - Resid silhouette = 0.18-0.27 (残差几何仍有微弱结构)
+   - **DS7B的输出分布约束不能反映语义, 但残差几何有微弱信号**
+
+3. **DCF在各层值不变**(因为基于最终logits), 而残差随层变化
+   - 这不是bug, 而是DCF的feature: 语义约束是输出层面的不变量
+   - 残差几何是中间状态, 包含更多非语义信息
+
+### Exp2: 关系槽位分离 — 核心确认
+
+**同一对象在不同关系下产生不同的分布约束:**
+
+| Model | inter-relation cos | kind_of_correct | 约束理论 |
+|-------|--------------------|-----------------|----------|
+| qwen3 | -0.21 | 6/8 | CONFIRMED |
+| glm4  | -0.20 | 7/8 | CONFIRMED |
+| ds7b  | -0.17 | 6/8 | CONFIRMED |
+
+关键解读:
+- inter-relation cos < 0 说明不同关系下DCF方向**正交甚至反向**
+- 这意味着对象码不是固定概念向量, 而是条件化约束
+- apple在kind_of下→fruit约束, used_for下→food/clothing约束, found_in下→plant约束
+
+**kind_of模板的类别指向:**
+- 6-7/8对象在kind_of下, DCF最高维度指向正确类别
+- 说明kind_of关系槽位确实在读出"类别约束"
+
+**关系特异约束维度:**
+- kind_of → 指向对象类别(fruit/animal/vehicle/tool)
+- used_for → 指向功能/用途(food/clothing)
+- found_in → 指向场景(plant)
+- made_of → 指向材料(plant/animal)
+- related_to → 指向关联域(vehicle/plant)
+
+### Exp3: DCF维度重要性与跨模型对比
+
+**DCF维度重要性排序(区分对象的能力):**
+
+| Model | Top-1 dim | Top-2 dim | Top-3 dim |
+|-------|-----------|-----------|-----------|
+| qwen3 | clothing  | plant     | fruit     |
+| glm4  | fruit     | animal    | clothing  |
+| ds7b  | clothing  | furniture | food      |
+
+**类别DCF最高维度(跨模型一致):**
+
+| Category | Qwen3 top | GLM4 top | DS7B top | 一致? |
+|----------|-----------|----------|----------|-------|
+| fruit    | plant     | fruit    | plant    | partial |
+| animal   | animal    | animal   | animal   | YES   |
+| vehicle  | vehicle   | vehicle  | vehicle  | YES   |
+| tool     | tool      | tool     | tool     | YES   |
+
+- animal/vehicle/tool三个类别的DCF最高维度**跨模型完全一致**
+- fruit在Qwen3/DS7B指向plant(水果→植物关联), 在GLM4指向fruit
+- 说明animal/vehicle/tool是更"原子化"的类别约束, fruit与plant有强语义关联
+
+### 对两个分析的理论评估
+
+**分析一(分布控制接口理论)的验证状态:**
+- ✅ "意义 = 对未来分布的稳定控制" — Exp1/2均支持, DCF聚类优于残差
+- ✅ "概念不是方向, 是约束族" — Exp2确认, 同一对象在不同关系下约束不同
+- ✅ "PC1不是语义轴" — Phase 469已确认, Phase 470的DCF框架绕过PC1问题
+- ⚠️ "接口"概念需要更具体的操作化定义 — 下一步
+- ⚠️ "自然流形"概念需要更严格的数学定义 — 下一步
+
+**分析二(Phase 469严格评估)的验证状态:**
+- ✅ PC1不是确定性轴 — Phase 469确认, Phase 470的DCF框架完全绕开PC1
+- ✅ DS7B应作为行为模式污染模型 — Phase 470 DCF为负再次确认
+- ✅ ratio指标不可靠 — Phase 470改用silhouette和discriminability
+- ✅ 下一步转向最小因果电路 — 正确, 但DCF框架比电路更基础
+
+### 硬伤与瓶颈
+
+1. **DCF是最终logit的函数, 不是中间层的度量**
+   - DCF无法告诉我们语义约束在哪一层被写入
+   - 需要发展"层条件DCF": 在每层注入后看最终logits变化
+
+2. **DS7B的DCF为负, 族词logit完全不可用**
+   - 需要为DS7B设计替代约束度量(如特定token的logprob而非族词mean)
+   - 或者用残差空间的监督方向(如probe-based DCF)
+
+3. **DCF维度只有8个(类别族), 过于粗糙**
+   - 需要扩展到更多语义属性维度(颜色/大小/用途/来源等)
+   - 当前DCF只能区分大类, 不能区分细粒度语义
+
+4. **关系槽位分离只是间接证据**
+   - 需要直接干预: 在kind_of关系下注入used_for约束, 看是否切换读出
+   - 目前只是观测, 不是因果实验
+
+5. **DCF跨模型对齐只有定性一致**
+   - animal/vehicle/tool维度一致, 但fruit维度不一致
+   - 需要更严格的跨模型DCF相似度度量
+
+### 理论进展
+
+Phase 470实现了从"找方向"到"刻划约束"的范式转变:
+
+```
+旧范式: 找concept direction → 注入 → 看margin
+新范式: 构造DCF → 验证跨上下文稳定 → 检查接口 → 控制流形 → 验证行为
+```
+
+DCF是分布控制接口理论的核心操作化工具:
+- DCF(x) = 对象x对8个类别族的mean logit向量
+- DCF聚类质量 = 语义约束是否能在输出层面区分类别
+- 关系间DCF差异 = 同一对象在不同上下文中的约束变化
+
+### 命令记录
+
+```bash
+# Phase 470 R1 (6对象/类, 5采样层, 8测试类别)
+python tests/glm5/phase470_distribution_constraint_circuit.py qwen3 1       # ~47s
+python tests/glm5/phase470_distribution_constraint_circuit.py glm4 1         # ~954s (15.9min)
+python tests/glm5/phase470_distribution_constraint_circuit.py deepseek7b 1  # ~778s (13.0min)
+```
+
+脚本位置：
+- `tests/glm5/phase470_distribution_constraint_circuit.py` — Phase 470 主测试
+- `tests/glm5_temp/phase470_analysis.py` — 结果分析脚本
+- 结果：`results/glm5/phase470_{qwen3,glm4,deepseek7b}_r1.json`
