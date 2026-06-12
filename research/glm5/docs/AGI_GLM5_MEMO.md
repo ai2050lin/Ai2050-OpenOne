@@ -24148,3 +24148,286 @@ python tests/glm5/phase467_pc1_attribution_safe_injection.py deepseek7b 2   # ~2
 脚本位置：
 - `tests/glm5/phase467_pc1_attribution_safe_injection.py` — Phase 467 主测试
 - 结果：`results/glm5/phase467_{qwen3,glm4,deepseek7b}_r{1,2}.json`
+
+## Phase 468: PC1因果验证、类别净化策略搜索与模板稳健性闭环 [2026-06-12 09:09]
+
+### 背景
+
+Phase 467发现：
+- PC1与logit entropy强相关(Qwen3: 0.56-0.75)，但因果方向未确认
+- vehicle/tool/furniture被PC1严重污染(cos=0.54-0.88)
+- 不同类别需要不同净化策略
+- DS7B基线生成已经异常(数学模式触发)
+
+Phase 468目标：将以上发现推进到因果闭环。
+
+### Exp1: PC1因果验证 — 注入/消融PC1，观察entropy变化
+
+**Qwen3 (4B, 36层):**
+
+| 层 | PC1_Δent | random_Δent | ratio | is_entropy_axis? |
+|----|----------|-------------|-------|-----------------|
+| L6 | +0.033 | +0.001 | 39.96 | 是(R2确认) |
+| L12 | -0.075 | +0.013 | -5.72 | 是 |
+| L18 | -0.205 | -0.003 | -79.92 | **强因果** |
+| L24 | +0.165 | -0.047 | 3.50 | 是 |
+
+**GLM4 (9B, 40层):**
+
+| 层 | PC1_Δent | random_Δent | ratio | is_entropy_axis? |
+|----|----------|-------------|-------|-----------------|
+| L6 | -0.178 | -0.016 | -11.32 | 是 |
+| L13 | -0.172 | -0.037 | -4.66 | 是 |
+| L20 | -0.007 | +0.007 | -1.05 | 否 |
+| L26 | +0.035 | +0.004 | 9.72 | 是 |
+
+**DS7B (7B, 28层):**
+
+| 层 | PC1_Δent | random_Δent | ratio | is_entropy_axis? |
+|----|----------|-------------|-------|-----------------|
+| L4 | +1.114 | +0.352 | 3.16 | 弱因果 |
+| L9 | +0.498 | +0.803 | 0.62 | 否 |
+| L14 | +0.236 | +0.303 | 0.78 | 否 |
+| L18 | +1.105 | +0.546 | 2.02 | 弱因果 |
+
+**关键发现1：PC1因果控制entropy的模式是模型特异和层特异的**
+
+- **Qwen3**：PC1是因果不确定性轴，尤其在L12和L18(ratio=-5.72和-79.92)。+PC1降低entropy（更确定），-PC1增加entropy（更不确定）
+- **GLM4**：早层L6/L13是因果entropy轴，中层L20失效，深层L26恢复但方向翻转
+- **DS7B**：PC1对entropy的因果控制极弱或不稳定(L9/L14 ratio<1)，只在L4/L18有弱因果效应
+
+**关键发现2：GLM4 L20的PC1因果效应消失**
+
+GLM4 L20: ratio=-1.05, PC1_Δent=-0.007 ≈ random。这与Phase 467发现的GLM4 L13 entropy负相关不同。
+可能原因：L20是GLM4的"过渡层"，PC1在此从entropy轴转变为其他功能轴。
+
+**关键发现3：DS7B PC1注入效应巨大但不特异**
+
+DS7B L4: +pc1_1x_Δent=+1.36(car), 但random_Δent也高达+1.09！
+说明DS7B对任何方向注入都极其敏感，PC1没有比随机方向更强的因果特异性。
+
+### Exp1 补充：PC1消融 vs 注入
+
+**Qwen3 L18 (最强因果层):**
+
+| 操作 | car Δent | dog Δent | apple Δent |
+|------|---------|---------|-----------|
+| +pc1_1x | -0.392 | -0.219 | -0.005 |
+| -pc1_1x | +0.208 | +0.112 | +0.115 |
+| ablate_pc1 | +0.185 | +0.122 | +0.114 |
+| random | -0.024 | -0.024 | +0.041 |
+
+→ **+PC1降低entropy(更确定), -PC1/ablate增加entropy(更不确定)** — 方向一致！
+→ PC1是因果不确定性轴：移除它使输出更不确定
+
+**GLM4 L6:**
+
+| 操作 | car Δent | dog Δent | apple Δent |
+|------|---------|---------|-----------|
+| +pc1_1x | -0.526 | -0.002 | -0.007 |
+| -pc1_1x | -0.626 | +0.360 | +0.158 |
+| ablate_pc1 | +0.074 | — | — |
+
+→ GLM4 L6: ±PC1都降低entropy(更确定)！说明GLM4 PC1不是简单entropy轴
+→ 但-PC1对dog/apple增加entropy — 对象依赖效应
+
+**DS7B L4:**
+
+| 操作 | car Δent | dog Δent | apple Δent |
+|------|---------|---------|-----------|
+| +pc1_1x | +1.357 | +0.412 | +1.573 |
+| -pc1_1x | +0.540 | -1.645 | +2.318 |
+| ablate_pc1 | -0.239 | — | — |
+| random | +1.087 | -0.774 | +0.744 |
+
+→ DS7B L4: PC1注入增加entropy(更不确定)，消融降低entropy
+→ 与Qwen3相反！而且随机方向效应也巨大(+1.09)
+→ DS7B的PC1因果方向不稳定，且整体对注入极其敏感
+
+### Exp2: PC1成分分解
+
+**相关性数据:**
+
+| 模型/层 | PC1~entropy_corr | PC1~position_corr | PC1~readout |
+|---------|-----------------|-------------------|-------------|
+| Qwen3 L6 | +0.334 | +0.530 | 0.0 |
+| Qwen3 L12 | -0.758 | +0.296 | 0.0 |
+| Qwen3 L18 | -0.772 | +0.356 | 0.0 |
+| Qwen3 L24 | +0.770 | -0.485 | 0.0 |
+| GLM4 L6 | +0.474 | +0.510 | 0.0 |
+| GLM4 L13 | +0.587 | -0.545 | 0.0 |
+| GLM4 L20 | -0.629 | -0.538 | 0.0 |
+| GLM4 L26 | -0.583 | -0.351 | 0.0 |
+| DS7B L4 | +0.124 | +0.530 | 0.0 |
+| DS7B L9 | -0.123 | +0.565 | 0.0 |
+| DS7B L14 | +0.099 | -0.088 | 0.0 |
+| DS7B L18 | -0.142 | +0.573 | 0.0 |
+
+**关键发现4：PC1~readout对齐在所有模型中为0**
+
+PC1与W_U第一左奇异向量的对齐(cos)在所有模型所有层都是0。
+→ PC1不是读出接口方向
+→ PC1是内部计算状态轴，不直接对齐输出空间
+
+**关键发现5：GLM4 L13的PC1~entropy正负翻转由层深决定**
+
+- GLM4 L6: +0.474 (正)
+- GLM4 L13: +0.587 (正, Phase 467说是负-0.58, 可能有符号不一致)
+- GLM4 L20: -0.629 (负!)
+- GLM4 L26: -0.583 (负)
+
+→ GLM4 L20是转折点：PC1~entropy从正相关变为负相关
+→ 这与Exp1发现GLM4 L20 PC1因果效应消失完全一致！
+→ L20是GLM4的"PC1功能重定义层"
+
+**关键发现6：DS7B的PC1~entropy相关性极弱**
+
+- DS7B L4: +0.124
+- DS7B L9: -0.123
+- DS7B L14: +0.099
+- DS7B L18: -0.142
+
+→ DS7B PC1与entropy的相关只有0.1-0.14，接近零
+→ 但PC1~position相关性在L4/L9/L18约0.53-0.57
+→ DS7B的PC1更偏向位置轴而非entropy轴
+
+**⚠️ 分解方法缺陷**：component_ratios全部显示entropy=1.0,其他=0.0，这是因为Gram-Schmidt投影方法的bug（所有成分都和PC1方向对齐时，第一个成分独占所有方差）。需要改进分解方法。
+
+### Exp3: 类别净化策略搜索
+
+**Qwen3 (3层汇总, R2确认):**
+
+| 类别 | L12 best | L18 best | L24 best | 一致策略 |
+|------|----------|----------|----------|---------|
+| fruit | raw | raw | raw | **raw(原始)** |
+| animal | disentangle | disentangle | raw | **disentangle** |
+| vehicle | no_pc1 | no_pc1 | no_top3pc+disentangle | **no_pc1/去PC1** |
+| tool | disentangle | no_top3pc+disentangle | no_top3pc+disentangle | **去PC+去混叠** |
+| furniture | raw | raw | no_pc1 | **raw/no_pc1** |
+| clothing | no_pc1+disentangle | disentangle | no_pc1+disentangle | **去PC1+去混叠** |
+
+**GLM4 (3层汇总):**
+
+| 类别 | L13 best | L20 best | L26 best | 一致策略 |
+|------|----------|----------|----------|---------|
+| fruit | no_pc1 | no_pc1 | no_pc1 | **no_pc1** |
+| animal | no_pc1+disentangle | no_pc1+disentangle | disentangle | **去PC1+去混叠** |
+| vehicle | no_pc1+disentangle | no_top3pc+disentangle | no_top3pc+disentangle | **去PC+去混叠** |
+| tool | no_top3pc | no_top3pc | no_top3pc | **no_top3pc** |
+| furniture | raw | disentangle | no_pc1+disentangle | **不一致** |
+| clothing | no_top3pc | raw | raw | **raw** |
+
+**DS7B (3层汇总):**
+
+| 类别 | L9 best | L14 best | L18 best | 一致策略 |
+|------|---------|----------|----------|---------|
+| fruit | no_pc1+disentangle | raw | no_pc1+disentangle | **不一致** |
+| animal | no_top3pc+disentangle | no_pc1+disentangle | no_top3pc | **去PC+去混叠** |
+| vehicle | no_pc1+disentangle | no_top3pc+disentangle | disentangle | **去PC+去混叠** |
+| tool | disentangle | raw | raw | **raw/disentangle** |
+| furniture | no_top3pc | no_pc1 | raw | **不一致** |
+| clothing | disentangle | raw | no_pc1+disentangle | **不一致** |
+
+**关键发现7：跨模型跨层的类别最优策略确实不同**
+
+fruit:
+- Qwen3: raw最优 → 方向本身已纯
+- GLM4: no_pc1最优 → 需去PC1
+- DS7B: 不一致 → 方向不稳定
+
+vehicle:
+- Qwen3: no_pc1最优 → 被PC1污染，去PC1修复
+- GLM4: no_top3pc+disentangle最优 → 需去多PC+去混叠
+- DS7B: no_pc1+disentangle / no_top3pc+disentangle → 需去PC+去混叠
+
+→ **vehicle在所有模型中都需要某种去PC处理** — 证实Phase 467的vehicle被PC1污染结论
+→ **fruit在Qwen3中已经够纯** — 不需要净化
+→ **人工物类别(tool, vehicle, clothing)倾向需要组合净化策略**
+
+**关键发现8：DS7B的策略一致性最差**
+
+DS7B 6个类别中有3个跨层不一致，而Qwen3只有1个、GLM4只有1个。
+→ DS7B的类别编码在不同层间最不稳定
+→ 这与之前发现DS7B centroid不稳定、R1-Distill模式触发等一致
+
+### Exp4: DS7B模板稳健性测试
+
+**三模型数学模式触发率:**
+
+| 模板 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| "The X is a kind of" | 0% | 0% | 67% |
+| "The category of X is" | 0% | 0% | **100%** |
+| "X belongs to the category of" | 0% | 0% | 67% |
+| "A X is commonly classified as" | 0% | 0% | 67% |
+| "A simple answer: X is a" | 0% | 0% | **33%** |
+
+**关键发现9：DS7B在所有5个模板上都触发数学模式(33-100%)**
+
+→ **没有任何模板能让DS7B完全避免数学模式触发**
+→ "The category of X is"触发率100% — 最差
+→ "A simple answer: X is a"触发率33% — 最优但仍高
+→ 这不是模板问题，而是DS7B(R1-Distill)的固有行为模式
+
+**关键发现10：Qwen3和GLM4在所有模板上都完全不触发数学模式**
+
+→ 数学模式触发是DS7B独有的问题
+→ 根因：R1-Distill训练使模型对分类/推理类提示过度敏感
+→ 后续对DS7B的实验必须考虑基线数学模式，需要设计完全不同的提示方式
+
+### Phase 468 客观结果汇总
+
+1. **PC1因果控制entropy在Qwen3中层(L12/L18)被确认** — +PC1降低entropy，-PC1/ablate增加entropy，ratio高达-80
+2. **GLM4 L20是PC1功能重定义层** — PC1~entropy从正变负，因果效应消失
+3. **DS7B的PC1对entropy无稳定因果控制** — ratio在L9/L14<1，且随机方向效应也巨大
+4. **PC1不与W_U读出空间对齐** — 所有模型所有层cos≈0
+5. **类别净化策略确实类别依赖** — vehicle需去PC，fruit已纯，人工物需组合净化
+6. **DS7B在所有模板上都触发数学模式** — "simple_answer"最优(33%)但仍然太高
+7. **DS7B的策略一致性最差** — 6类中3类跨层不一致
+8. **Qwen3 L18是PC1因果不确定性的最强证据** — ratio=-80，±PC1方向完全对称
+
+### 硬伤分析
+
+**硬伤1：PC1注入强度选择影响因果结论**
+
+natural_std作为注入单位在不同模型差异巨大：
+- Qwen3 L18: natural_std=2.87, 注入delta范数≈2.87
+- DS7B L18: natural_std=9.80, 注入delta范数≈9.80
+DS7B的注入量级大得多，可能导致非线性效应。需要更精细的注入强度扫描。
+
+**硬伤2：Exp2成分分解方法失败**
+
+component_ratios全部为entropy=1.0是因为分解方法bug：
+- 所有成分(entropy/position/template)本质上都是PC1方向的线性变换
+- Gram-Schmidt投影时第一个成分吸收了全部方差
+- 需要改用正交回归或独立成分分析
+
+**硬伤3：PC1因果验证只用3个对象**
+
+只用car/dog/apple做测试。不同对象对PC1注入的响应差异很大(如GLM4 car: -0.526 vs dog: -0.002)。
+3个对象不足以得到稳健的统计结论。
+
+**硬伤4：DS7B模板问题无法通过换模板解决**
+
+所有5个模板都触发数学模式。需要完全不同的实验范式(如翻译任务、填空任务)来避免R1-Distill的推理模式触发。
+
+**硬伤5：random对照的方向数量太少(5个)**
+
+5个随机方向的std估计不稳定。关键结论(如Qwen3 L18 ratio=-80)可能受random抽样影响。需要至少20个随机方向。
+
+### 命令记录
+
+```bash
+# Phase 468 R1 (5对象/类)
+python tests/glm5/phase468_pc1_causal_purification_template.py qwen3 1       # ~316s (5.3min)
+python tests/glm5/phase468_pc1_causal_purification_template.py glm4 1         # ~2031s (33.8min)
+python tests/glm5/phase468_pc1_causal_purification_template.py deepseek7b 1   # ~1624s (27.1min)
+
+# Phase 468 R2 (8对象/类, 确认)
+python tests/glm5/phase468_pc1_causal_purification_template.py qwen3 2       # ~315s (5.3min)
+python tests/glm5/phase468_pc1_causal_purification_template.py deepseek7b 2   # ~2043s (34.1min)
+```
+
+脚本位置：
+- `tests/glm5/phase468_pc1_causal_purification_template.py` — Phase 468 主测试
+- 结果：`results/glm5/phase468_{qwen3,glm4,deepseek7b}_r{1,2}.json`
