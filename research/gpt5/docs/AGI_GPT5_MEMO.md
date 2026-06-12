@@ -31785,3 +31785,354 @@ factor-level transferable subspace
 ```
 
 这一步才真正接近语言编码机制中的“条件化关系因子”。
+## Phase 94: 因子子空间闭包总方案 [2026-06-12 09:09]
+
+### 背景
+
+综合 GLM5 Phase467 与 GPT5 Phase93：
+
+```text
+GLM5 线：
+已经发现 PC1 与 logit entropy / position 有强关系，
+并且 vehicle/tool/furniture 等类别方向会被 PC1 严重污染。
+去 PC1、去混叠、去 top PCs 对不同类别有不同效果。
+
+GPT5 线：
+已经从 reader calibration 推进到 component restore、
+cross-item transplant 和 alignment audit。
+Qwen3 L6 MLP、Qwen3 L24 attention、GLM4 L39 MLP、
+DeepSeek7B L26 MLP / L27 attention 已经形成稳定组件分工图。
+```
+
+当前共同硬伤：
+
+```text
+1. GLM5 的方向净化还停留在残差方向 / 类别方向层面。
+2. GPT5 的 transplant 还是整组件输出移植，不是因子子空间移植。
+3. 两条线都还没有证明抽象变量闭包。
+```
+
+因此下一步不能只是继续扩功能库，也不能只做更多整组件移植。
+
+### 当前判断
+
+附件中对 Phase93 的分析基本正确：
+
+```text
+Phase93 排除了 tail-only artifact，
+证明组件输出迁移不是单纯后缀读出接口复制。
+```
+
+但结论必须收缩：
+
+```text
+这仍然不是抽象语义变量，
+而是 component-level transferable state。
+```
+
+更准确的对象应命名为：
+
+```text
+条件化关系因子状态
+```
+
+即：
+
+```text
+某个组件输出中可迁移的部分，
+受 slot、target、object/context、reader interface、position、entropy 主轴共同条件化。
+```
+
+### 条件化关系因子动力学公式更新
+
+旧表达：
+
+```text
+h_l(x) = Σ_k Code_k(l,x) + ε_l
+```
+
+需要改成：
+
+```text
+h_l(x) =
+  Base_l(x)
+  + Σ_r Gate_{l,r}(x) · F_{l,r}(x)
+  + U_l(x)
+```
+
+其中：
+
+```text
+Base_l(x):
+  模型通用路径状态，包括位置、输出不确定性、格式、推理模板等。
+
+F_{l,r}(x):
+  条件化关系因子，例如 object、slot、target value、choice interface、
+  language axis、category direction。
+
+Gate_{l,r}(x):
+  当前上下文对关系因子的调用权重。
+  它决定某个因子是否进入读出路径。
+
+U_l(x):
+  未分解残差，包括噪声、未建模变量、模型特有结构。
+```
+
+GLM5 Phase467 表明：
+
+```text
+Base_l(x) 中至少包含 PC1 entropy/position axis。
+```
+
+GPT5 Phase93 表明：
+
+```text
+F_{l,r}(x) 不是单一 target vector，
+而是 slot/interface/target/object 混合因子。
+```
+
+因此更具体：
+
+```text
+h_l(x) =
+  EntropyPositionAxis_l(x)
+  + ObjectContext_l(x)
+  + SlotInterface_l(x)
+  + TargetValue_l(x)
+  + ChoiceOutput_l(x)
+  + Remainder_l(x)
+```
+
+但这些项不是固定正交向量，而是条件化、模型依赖、层依赖的可迁移子空间。
+
+### 对深度神经网络内部结构的进展
+
+当前已经从：
+
+```text
+找概念方向
+```
+
+推进到：
+
+```text
+组件级路径分工
+主轴污染识别
+跨样本可迁移状态
+对齐方式审计
+候选/选择接口分离
+```
+
+较稳的模型分型：
+
+```text
+Qwen3:
+  L6 MLP 是跨位置可迁移的 slot/interface computation support。
+  L24 attention 是 target-sensitive choice interface。
+  PC1 与 entropy 强相关，vehicle/tool/furniture 等类别方向受 PC1 污染。
+
+GLM4:
+  L39 MLP 更像 candidate scoring component。
+  choice decision interface 与 candidate scoring 分离。
+  类别方向可写性更强，但不同类别对 PC1 / 正交化敏感性不同。
+
+DeepSeek7B:
+  L26 MLP 更像 value/object-target support。
+  L27 attention 是稳定 letter/output interface。
+  PC1 不稳定，生成模板容易崩坏，R1-Distill 模式可能导致默认数学化输出。
+```
+
+### 关键硬伤
+
+```text
+1. 整组件移植仍太粗，不能证明变量。
+2. PC1 去除有效，但 PC1 的因果作用还没证明。
+3. no_pc1、disentangle、no_top PCs 不是通用净化方法，类别和层强相关。
+4. reader 任务仍集中在 object-slot，不足以代表完整语言机制。
+5. DS7B 的生成基线不可靠，必须先做模板安全校准。
+6. candidate value margin、choice letter margin、generation 三者仍未完全统一。
+```
+
+### Phase94 总任务
+
+Phase94 不拆成很多小任务，而作为一个大任务：
+
+```text
+Factor Subspace Closure Map
+因子子空间闭包图谱
+```
+
+目标：
+
+```text
+把 component-level transferable state
+拆成 factor-level transferable subspace。
+```
+
+### Phase94 实验对象
+
+优先节点：
+
+```text
+Qwen3:
+  L6 MLP
+  L24 attention
+
+GLM4:
+  L39 MLP
+  可补 L13/L20 residual category directions
+
+DeepSeek7B:
+  L26 MLP
+  L27 attention
+```
+
+优先因子：
+
+```text
+slot/interface
+target/value
+object/context
+choice-letter/output
+entropy/position PC1
+category direction
+remainder
+```
+
+### Phase94 测试设计
+
+1. 子空间构造：
+
+```text
+从组件输出中构造若干差分方向或低秩子空间：
+
+slot subspace:
+  同 object、不同 slot
+
+target/value subspace:
+  同 slot、不同 target
+
+object/context subspace:
+  同 slot/target、不同 object
+
+choice-output subspace:
+  value prompt 与 choice prompt 的组件差分
+
+PC1 base subspace:
+  从自然激活 PCA 取 PC1 / top PCs
+```
+
+2. 子空间净化：
+
+```text
+raw
+no_pc1
+disentangle
+no_top3pc
+no_pc1 + controlled disentangle
+```
+
+但不假设某种方法普适，必须按模型、层、类别分别记录。
+
+3. 子空间移植：
+
+```text
+只移植 slot subspace
+只移植 target/value subspace
+只移植 object/context subspace
+只移植 choice-output subspace
+移植 remainder
+组合移植
+```
+
+4. 闭包判据：
+
+```text
+destroy:
+  去掉某个子空间后，对应 reader 指标下降。
+
+restore:
+  只恢复该子空间后，对应 reader 指标恢复。
+
+specificity:
+  slot 子空间主要影响 slot/interface；
+  target 子空间主要影响 target/value；
+  choice 子空间主要影响 letter/output；
+  PC1 子空间主要影响 entropy/format，而不是具体语义。
+
+transfer:
+  同槽位/同目标/同对象条件下迁移效果符合预测。
+```
+
+### Phase94 输出
+
+每个模型输出：
+
+```text
+factor_subspace_summary
+destroy_restore_score
+transfer_specificity_matrix
+pc1_contamination_matrix
+candidate_choice_separation_matrix
+model_strategy_table
+```
+
+### Phase94 成功标准
+
+最低成功：
+
+```text
+在 Qwen3 L6 MLP 中分离出 slot/interface subspace，
+且该子空间移植比 target/value 子空间更能解释 same_slot_diff_target 强恢复。
+```
+
+中等成功：
+
+```text
+Qwen3 L24 attention 可分离 target-sensitive choice-output subspace，
+same_slot_same_target 恢复强，same_slot_diff_target 破坏强。
+```
+
+强成功：
+
+```text
+三模型都能形成：
+
+Qwen3:
+  slot/interface → target choice interface 的连续路径
+
+GLM4:
+  candidate scoring 与 choice decision 的分离路径
+
+DeepSeek7B:
+  value/object-target support 与 output interface 的深层分工
+```
+
+### 阶段性理论判断
+
+如果 Phase94 成功，则可以把当前理论从：
+
+```text
+组件级路径图谱
+```
+
+推进到：
+
+```text
+条件化关系因子子空间图谱
+```
+
+这才是接近语言编码机制的关键中间层。
+
+目前不应宣称：
+
+```text
+已经破解语言数学结构。
+```
+
+但可以说：
+
+```text
+语言机制越来越不像固定概念方向，
+越来越像由通用主轴、关系因子、接口因子、输出因子组成的条件化动态路径系统。
+```
