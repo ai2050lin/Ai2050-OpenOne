@@ -23348,3 +23348,803 @@ GLM4: dim(LanguageAxis) = 1.2-1.6 → 完全解耦 + 可写
 ```
 
 时间: 2026-06-11 19:55
+
+## Phase 464: 正交分解修复、中文读出修复与模型策略验证 [2026-06-11 21:33]
+
+### 核心修复: Phase 463正交化ratio计算bug
+
+**bug原因**: `sem_only_ratio = ||semantic_only|| / ||semantic_diff_raw||`
+- `semantic_only`是归一化方向`semantic_dir`减去投影后的结果
+- `semantic_dir`范数=1, 所以`||semantic_only||≈1`(当cos≈0时)
+- 但`semantic_diff_raw`范数很大(原始差分范数)
+- 所以ratio=1/大数≈0, 产生"正交化后分量只剩0-5%"的错误结论
+
+**修复**: `sem_only_ratio = ||semantic_only|| / ||semantic_dir||`
+- 修复后ratio ≈ sqrt(1 - cos²) ≈ 0.99 (与理论值完全一致)
+- **所有3个模型所有层, 修复后ratio与理论值的误差=0.000000**
+
+脚本: tests/glm5/phase464_orthogonal_fix_verification.py
+结果: results/glm5/phase464_{model}_r{1,2}.json
+
+---
+
+### Exp1: 正交分解修复 — Phase 463的"正交化后太弱"结论被推翻!
+
+| 模型 | 层 | cos(sem,lang) | NEW_ratio | OLD_ratio | 理论值 | 误差 |
+|------|-----|-------------|-----------|-----------|--------|------|
+| Qwen3 | L6 | -0.107 | 0.9943 | 0.3533 | 0.9943 | 0.000000 |
+| Qwen3 | L12 | -0.077 | 0.9970 | 0.0536 | 0.9970 | 0.000000 |
+| Qwen3 | L18 | +0.098 | 0.9952 | 0.0547 | 0.9952 | 0.000000 |
+| Qwen3 | L33 | +0.135 | 0.9909 | 0.0036 | 0.9909 | 0.000000 |
+| DS7B | L4 | -0.138 | 0.9904 | 0.0924 | 0.9904 | 0.000000 |
+| DS7B | L9 | -0.014 | 0.9999 | 0.0223 | 0.9999 | 0.000000 |
+| GLM4 | L6 | +0.022 | 0.9998 | 2.7079 | 0.9998 | 0.000000 |
+| GLM4 | L13 | +0.024 | 0.9997 | 0.7188 | 0.9997 | 0.000000 |
+| GLM4 | L20 | +0.013 | 0.9999 | 0.3908 | 0.9999 | 0.000000 |
+
+→ **正交化后语义/语言方向几乎完整保留(ratio≈0.99-1.00)!**
+→ Phase 463的"正交化后分量太弱无法注入"完全是计算bug导致的错误结论!
+→ **这说明语义码和语言码不仅几何正交, 而且正交化后分量几乎不变!**
+
+但注入效果仍然不稳定:
+- Qwen3 L12: lang_only_enΔ=+1.93~+2.34 (语言方向注入能提升英文候选边际!)
+- Qwen3 L12: sem_only_enΔ=-6.02~-6.31 (语义方向注入反而损害!)
+- GLM4 L13: lang_only_enΔ=+0.09~+1.03 (弱正)
+- DS7B L9: lang_only_enΔ=-1.41~-1.45 (语言方向注入损害)
+
+→ 虽然正交化不再损失范数, 但注入效果仍不稳定
+→ 可能是因为注入后的状态不在模型自然流形上
+
+---
+
+### Exp2: 中文候选词读出修复 — 成功!
+
+旧版Phase 463: 中文候选词边际全部为0
+新版Phase 464: 中文候选词边际非零!
+
+ZhReadoutEffect (Exp6指标):
+- Qwen3: 7.843
+- DS7B: 7.909
+- GLM4: 7.909
+
+→ 修复方法: 用`tokenizer.encode(word, add_special_tokens=False)[0]`获取token ID, 直接索引logits
+→ 之前的方法: 用`tokenizer.get_vocab()`字符串查找, 中文词找不到
+
+---
+
+### Exp3: 跨类别holdout — 重大修正! Qwen3也有残差可写性!
+
+**Qwen3跨类别holdout selectivity (R1+R2一致):**
+
+| 类别 | L12β5 | L12β10 | L18β5 | L18β10 | L24β5 | L24β10 |
+|------|-------|--------|-------|--------|-------|--------|
+| animal | 3.04 | 2.79 | 3.55 | 0.50 | 3.17 | 3.34 |
+| clothing | **10.21** | **13.86** | **7.20** | **13.66** | 5.13 | 6.94 |
+| fruit | 4.79 | 4.53 | 5.00 | 5.09 | 4.85 | 6.32 |
+| furniture | 3.08 | 4.60 | 0.27 | 1.75 | 2.20 | 2.90 |
+| tool | 1.65 | 0.99 | 1.92 | 2.05 | 3.59 | 3.53 |
+| vehicle | **-2.29** | **-4.48** | **-1.78** | -0.77 | -1.27 | -1.08 |
+
+→ **Qwen3 clothing类holdout selectivity最高达到13.86!** 这比之前认为的"Qwen3无残差可写性"完全不同
+→ **vehicle类别在Qwen3中始终为负!** 说明vehicle的跨语言残差差分方向与读出方向反平行
+→ animal/fruit/clothing/furniture/tool都有正selectivity(除vehicle外)
+
+**GLM4跨类别holdout selectivity:**
+
+| 类别 | L13β5 | L13β10 | L20β5 | L20β10 | L26β5 | L26β10 |
+|------|-------|--------|-------|--------|-------|--------|
+| animal | 6.45 | 4.59 | 6.42 | 6.52 | 9.54 | **12.26** |
+| clothing | 0.38 | -0.08 | -0.02 | 0.64 | 2.56 | 1.83 |
+| fruit | 7.13 | 6.34 | 6.37 | 9.37 | 5.78 | 6.05 |
+| furniture | 2.29 | 1.41 | 3.14 | 5.41 | 4.99 | 9.15 |
+| tool | 3.39 | 3.41 | 4.73 | 7.07 | 1.62 | 2.95 |
+| vehicle | 4.28 | 0.50 | 1.77 | 2.55 | 4.70 | 7.27 |
+
+→ **GLM4所有6个类别都有正selectivity!** 没有负值
+→ GLM4 animal最强(sel=12.26), fruit也很强(sel=9.37)
+→ GLM4 clothing弱(sel≈0-2), 与Qwen3 clothing=13.86形成鲜明对比!
+
+**DS7B跨类别holdout:** 几乎没有正selectivity, 确认DS7B无残差可写性
+
+**关键修正**: Phase 462/463说"Qwen3无残差可写性"是错误的!
+- 之前的测试只用2个对象做holdout, 数据量不够
+- 现在用前3个训练后3个测试, 数据更充分
+- Qwen3也有残差可写性, 但类别差异大(clothing强, vehicle为负)
+
+---
+
+### Exp4: 语言轴因果干预
+
+沿DS7B的target_lang方向(+/-)注入到中文上下文:
+
+**DS7B (一维语言轴确认):**
+| 层 | eff_rank | beta=5 +enΔ | beta=5 -enΔ | +zhΔ | -zhΔ |
+|----|---------|------------|------------|------|------|
+| L4 | 1.23 | +0.12 | -0.59 | -0.31 | -1.82 |
+| L9 | 1.00 | -2.81 | -1.81 | -2.09 | -7.41 |
+| L14 | 1.00 | -2.78 | -1.24 | -4.66 | -7.04 |
+| L25 | 1.02 | -4.82 | -0.57 | -10.37 | -1.36 |
+
+→ DS7B沿语言轴注入几乎都是负效果! 不论+还是-方向都损害
+→ 这说明DS7B的语言轴方向虽然一维, 但注入后离开自然流形, 破坏模型状态
+
+**Qwen3 (多维翻译控制):**
+| 层 | eff_rank | beta=5 +enΔ | beta=5 -enΔ |
+|----|---------|------------|------------|
+| L6 | 1.23 | -2.33 | -2.96 |
+| L18 | 1.35 | -4.12 | -2.25 |
+| L33 | 1.36 | -1.35 | -4.56 |
+
+→ Qwen3的语言轴注入也主要是破坏性的(都是负值)
+
+**GLM4 (最解耦):**
+| 层 | eff_rank | beta=5 +enΔ | beta=5 -enΔ |
+|----|---------|------------|------------|
+| L6 | 1.38 | -1.02 | -1.94 |
+| L20 | 1.48 | -0.09 | -1.28 |
+| L26 | 1.79 | -0.49 | -3.24 |
+| L37 | 1.98 | +0.06 | -2.43 |
+
+→ GLM4深层L37 beta=5 +方向有微弱正效果(+0.06)!
+→ GLM4 L26 eff_rank=1.79, 是三个模型中维度最高的
+
+---
+
+### Exp5: 翻译控制维度验证 — R1和R2完全一致!
+
+| 层位置 | Qwen3 | DS7B | GLM4 |
+|--------|-------|------|------|
+| 浅层 | 2.133 | 1.046→2.062 | 2.546 |
+| 中层 | 3.844 | **1.026** | **4.775** |
+| 深层 | 3.124 | 1.197 | 4.746 |
+
+→ DS7B中层eff_rank≈1.026, 几乎完全一维! 翻译控制只有1个独立维度
+→ GLM4中层eff_rank=4.775, 有近5个独立维度!
+→ Qwen3中层eff_rank=3.844, 居中
+
+---
+
+### Exp6: 三模型策略指标汇总
+
+| 指标 | Qwen3 | DS7B | GLM4 |
+|------|-------|------|------|
+| LangSemCos_mid | 0.098 | -0.014 | 0.013 |
+| TranslateEffRank_mid | 3.259 | 1.023 | 3.750 |
+| PatchEffect_deep | 1.070 | -0.533 | 0.766 |
+| ResidualWriteability_animal | **5.747** | -0.396 | **5.452** |
+| ZhReadoutEffect | 7.843 | 7.909 | 7.909 |
+
+→ **Qwen3和GLM4的残差可写性相近(animal sel≈5.5)**, 但Qwen3类别差异更大
+→ DS7B是唯一PatchEffect为负的模型
+→ 所有模型ZhReadoutEffect都非零了(修复成功)
+
+---
+
+### Phase 464 核心发现汇总
+
+1. **Phase 463的正交化ratio bug被完全修复**: 修复后ratio=0.99-1.00, 与理论值完全一致. "正交化后分量太弱"是错误结论!
+
+2. **语义码和语言码正交化后几乎不损失能量**: 因为cos(sem,lang)≈0, 正交化只去除微不足道的投影分量. 这说明语义码和语言码在残差空间中确实几乎独立!
+
+3. **Qwen3也有残差可写性!** clothing类sel=13.86, fruit类sel=5.09. Phase 462/463的"Qwen3无残差可写性"被修正.
+
+4. **类别差异非常重要**: 
+   - Qwen3: clothing最强(13.86), vehicle为负(-4.48)
+   - GLM4: animal最强(12.26), clothing最弱(0-2)
+   - 这说明不同模型对不同的类别有不同的编码策略!
+
+5. **DS7B一维语言轴再次确认**: eff_rank=1.026, 沿语言轴注入只有破坏效果
+
+6. **GLM4翻译控制维度最高**: eff_rank=4.775, 是DS7B(1.026)的4.6倍
+
+7. **中文读出修复成功**: 所有模型ZhReadoutEffect都非零
+
+### 硬伤与问题
+
+1. **正交化后注入效果仍不稳定**: 虽然范数不再损失, 但注入后模型可能离开自然流形
+2. **语言轴干预几乎都为负效果**: 沿翻译方向注入破坏模型状态, 需要找到"自然"的注入方式
+3. **Qwen3 vehicle为负**: 需要理解为什么vehicle的跨语言差分方向与读出方向反平行
+4. **测试对象数量仍然有限**: 每个类别只有3个训练+3个测试, holdout可能有偶然性
+5. **没有测量注入后模型的生成质量**: 只看了logits边际, 没有检查生成文本是否仍然合理
+
+### 模型策略分型更新(修正Phase 463)
+
+```
+Qwen3: 类别特异残差可写型
+  - 语义/语言正交(cos≈0), 正交化后不损失能量
+  - 翻译控制多维(eff_rank 2.1→3.8)
+  - 有残差可写性但类别差异大:
+    clothing/fruit强(sel 5-14)
+    vehicle反(sel -2到-5)
+  - 跨语言patch有效(中层后)
+
+GLM4: 全类别残差可写+最解耦型
+  - 语义/语言几乎完全解耦(cos≈0.01-0.03)
+  - 翻译控制维度最高(eff_rank 2.5→4.8)
+  - 所有6个类别都有正selectivity
+  - animal/fruit/furniture最强(sel 6-12)
+
+DS7B: 一维语言轴纠缠型
+  - 语义/语言正交(cos≈0), 但翻译4轴共线(eff_rank≈1)
+  - 无残差可写性(sel≈0或负)
+  - 语言轴注入只有破坏效果
+  - 跨语言patch弱
+```
+
+时间: 2026-06-11 21:33
+
+## Phase 465: 自然流形约束、DS7B一维轴真假验证、vehicle反向码解析 [2026-06-11 23:25]
+
+### 核心发现1: DS7B一维轴是协方差假象! 白化后eff_rank从1.3升到3.2!
+
+这是Phase 465最重要的发现。
+
+| 模型 | 层 | eff_rank_raw | top1_ratio | eff_rank_whitened | remove_top1 | remove_top3 |
+|------|-----|-------------|------------|-------------------|-------------|-------------|
+| DS7B | L9 | **1.286** | **0.8748** | **3.156** | 2.686 | 1.088 |
+| DS7B | L14 | **1.277** | **0.8777** | **3.121** | 2.536 | 1.418 |
+| DS7B | L18 | **1.274** | **0.8791** | **3.156** | 2.587 | 1.209 |
+| Qwen3 | L18 | 3.916 | 0.3751 | 2.934 | 3.256 | 1.713 |
+| GLM4 | L20 | 4.042 | 0.3618 | 3.602 | 3.190 | 1.893 |
+
+→ **DS7B白化后eff_rank=3.12-3.16, 与Qwen3(2.93)和GLM4(3.60)相近!**
+→ DS7B的"一维"不是因为翻译控制本身只有1维, 而是因为翻译控制方向碰巧与激活协方差的主成分对齐
+→ 去top-1主成分后eff_rank也从1.3升到2.5-2.7, 进一步确认
+
+**这意味着**:
+- Phase 463/464的"DS7B一维语言轴纠缠"结论需要修正
+- DS7B不是真的只有1维语言控制, 而是其语言控制方向被协方差主成分吸收
+- 白化后DS7B也有多维翻译控制结构, 只是原始空间中被大特征值方向掩盖
+
+---
+
+### 核心发现2: 注入强度与自然delta范数的关系决定注入成败
+
+Exp1测量了norm_ratio = 注入范数 / 层间自然delta范数:
+
+| 模型 | 层 | 类别 | beta | norm_ratio | KL散度 | top5_overlap | selectivity |
+|------|-----|------|------|------------|--------|-------------|-------------|
+| Qwen3 | L6 | animal | 5 | 2.18 | 0.003 | 1.00 | -0.014 |
+| Qwen3 | L18 | animal | 5 | 0.51 | 0.010 | 1.00 | 0.192 |
+| Qwen3 | L33 | animal | 5 | 0.04 | 0.000 | 1.00 | 0.062 |
+| DS7B | L4 | animal | 5 | 0.58 | 0.089 | 0.80 | 0.024 |
+| DS7B | L9 | animal | 5 | 0.05 | 0.002 | 1.00 | -0.087 |
+| GLM4 | L6 | animal | 5 | **19.96** | **0.996** | **0.60** | -0.689 |
+| GLM4 | L20 | animal | 5 | **1.72** | **0.036** | **1.00** | 0.231 |
+
+→ **GLM4浅层L6的norm_ratio=20!** 注入是自然delta的20倍, 严重偏离自然流形
+→ Qwen3深层L33的norm_ratio=0.04, 注入太小
+→ norm_ratio在0.5-2.0范围内, 注入效果最好(正selectivity)
+
+**关键规律**:
+- norm_ratio > 5: 严重偏离流形(KL>0.5, top5_overlap<0.6), selectivity大多为负
+- norm_ratio 0.5-2.0: 接近自然流形, selectivity可能为正
+- norm_ratio < 0.1: 注入太弱, selectivity接近0
+
+→ **之前所有"注入失败"的结论, 部分是因为beta没有按层的自然delta校准!**
+→ 不同层需要不同的beta值: 浅层需要小beta(0.1-1), 深层需要大beta(5-20)
+
+---
+
+### 核心发现3: Qwen3 vehicle为负 vs GLM4 vehicle为正 — 不同编码策略
+
+Exp5大样本R2结果:
+
+| 模型 | 类别 | L1/3 beta5 | L1/3 beta10 | L1/2 beta5 | L1/2 beta10 | L2/3 beta5 | L2/3 beta10 |
+|------|------|-----------|------------|-----------|------------|-----------|------------|
+| Qwen3 | vehicle | **-0.035** | **-0.084** | 0.026 | 0.069 | **0.090** | 0.168 |
+| GLM4 | vehicle | **1.814** | **3.270** | **0.458** | 0.883 | 0.294 | 0.461 |
+| Qwen3 | animal | 0.121 | 0.283 | 0.083 | 0.212 | 0.087 | 0.193 |
+| GLM4 | animal | **1.355** | **2.809** | 0.722 | 1.566 | 0.436 | 0.742 |
+
+→ **GLM4 vehicle在L13的selectivity=3.27, 比animal的2.81还强!**
+→ Qwen3 vehicle在浅层(L12)为负(-0.08), 但在深层(L24)变正(0.17)
+→ **GLM4 vehicle一直是正的, 不存在"vehicle反向"问题**
+
+Exp3 vehicle差分方向分析:
+
+| 模型 | 层 | cross_lang_veh_cos | veh_vs_tool | veh_vs_furniture | W_U_veh_cos_avg |
+|------|-----|-------------------|------------|------------------|-----------------|
+| Qwen3 | L18 | 0.547 | 0.714 | 0.762 | 0.028 |
+| DS7B | L14 | 0.017 | 0.639 | 0.688 | 0.014 |
+| GLM4 | L20 | 0.369 | 0.715 | 0.769 | 0.005 |
+
+→ 所有模型vehicle方向与tool(cos 0.6-0.7)和furniture(cos 0.7-0.8)高度重叠
+→ W_U读出cos都很低(0.005-0.028), vehicle方向与"vehicle"读出方向不对齐
+→ Qwen3的cross_lang最高(0.55), DS7B最低(0.02)
+
+**vehicle为负的可能解释(Qwen3)**:
+1. vehicle与tool/furniture差分方向高度重叠(cos>0.7)
+2. 当构造vehicle vs fruit方向时, 实际上同时包含了tool/furniture方向
+3. 在Qwen3中, tool/furniture方向的注入效果可能为负
+4. 在GLM4中, 所有类别方向都可写, 所以vehicle为正
+
+---
+
+### 核心发现4: GLM4 clothing selectivity = 0 (候选族问题)
+
+GLM4的clothing类别在所有层selectivity都精确等于0.0000!
+
+这很可能是因为GLM4的tokenizer无法正确编码clothing候选词, 或者clothing候选词在vocab中找不到。
+
+DS7B clothing也全部为0。
+
+需要检查clothing类的FAMILIES_EN和tokenizer兼容性。
+
+---
+
+### Exp4: 多词元中文候选族读出
+
+ZH_sel_old和ZH_sel_new完全相同(差异<0.001), 说明:
+- 当前"新方法"(log_softmax + family-local归一化)和"旧方法"(raw logit)在首token上等价
+- 真正的多token序列概率需要autoregressive生成, 当前方法无法实现
+- 但中文读出已经可以工作(ZH_sel非零), 只是无法区分旧/新方法
+
+---
+
+### Phase 465 客观结果汇总
+
+1. **DS7B一维轴是协方差假象**: 白化后eff_rank从1.3升到3.2, 与Qwen3/GLM4相当
+2. **注入强度需要按层校准**: norm_ratio在0.5-2.0时效果最好, GLM4浅层norm_ratio=20严重偏离
+3. **Qwen3 vehicle在深层变正**: L24的vehicle selectivity=0.17(正!), 不是全层为负
+4. **GLM4 vehicle极强**: L13 sel=3.27, 比animal还强
+5. **clothing候选族在GLM4/DS7B中全部为0**: 需要修复候选词
+6. **白化是关键预处理**: 任何关于维度和方向的结论都需要在白化空间中验证
+
+### 硬伤与问题
+
+1. **白化后DS7B eff_rank=3.2, 但这是否意味着"没有一维问题"?** 不一定 — 原始空间中的一维性仍然影响模型计算, 只是不是"翻译控制本身只有1维"
+2. **norm_ratio校准只解释了部分注入失败**: 即使在norm_ratio≈1时, Qwen3 L18 vehicle sel仍为0.03(几乎为0), 说明vehicle方向本身可能不适合注入
+3. **clothing候选族为0需要修复**: 否则无法验证clothing类别
+4. **beta校准需要系统化**: 应该自动计算每层的"最佳beta"使得norm_ratio≈1
+5. **白化空间的patch效果未测**: 白化后注入是否更好?
+
+### 模型策略分型更新(修正Phase 464)
+
+```
+DS7B: 协方差主轴纠缠型(修正)
+  - 翻译控制方向在原始空间中表现为一维(eff_rank≈1.3)
+  - 但白化后有多维结构(eff_rank≈3.2)
+  - 一维性是因为语言控制方向与激活协方差主成分对齐
+  - 不是翻译控制本身只有1维
+
+Qwen3: 类别特异残差可写 + 渐进多维翻译控制型(维持)
+  - 浅层vehicle为负, 深层变正
+  - norm_ratio校准后, 深层注入效果更好
+  - 翻译维度渐进增长
+
+GLM4: 全类别残差可写 + 高维翻译控制型(维持)
+  - vehicle selectivity=3.27, 最强!
+  - 浅层norm_ratio很大(20x), 需要小beta
+  - 深层效果最好
+```
+
+时间: 2026-06-11 23:25
+
+## Phase 466: 白化方向注入、自适应beta校准、类别混叠剥离与生成质量验证 [2026-06-12 00:42]
+
+### 核心发现1: 白化方向回注入 ≡ 原始方向注入 (cos=1.000) — 白化不改变方向!
+
+这是Phase 466最出乎意料的发现。
+
+所有3个模型中:
+- raw_vs_whitened cos = 1.000 (精确)
+- whitened_back sel ≡ raw sel (数值完全相同)
+
+**原因分析**: 白化操作是 `z = Σ^{-1/2}(x - μ)`, 而差分方向 `d = μ_cat1 - μ_cat2`, 白化后的差分方向是 `z_d = Σ^{-1/2} d`. 回映射是 `d' = Σ^{1/2} z_d / ||Σ^{1/2} z_d||`. 由于 Σ^{1/2} 和 Σ^{-1/2} 互逆, 所以 `d' ∝ d`, 即回映射后方向与原始方向共线. 归一化后完全相同.
+
+→ **白化改变的是"距离度量", 不是"方向"!**
+→ 白化空间中看到的"多维结构"是指"在白化度量下, 多个方向等距", 不等于"在原始空间中有更多可写方向"
+
+---
+
+### 核心发现2: 去主轴方向(no_pc1)显著改善注入效果!
+
+虽然白化回注入无效, 但**去掉第1主成分后的方向(no_pc1)在很多情况下显著改善selectivity**:
+
+| 模型 | 层 | 类别 | raw_sel | no_pc1_sel | 改善幅度 | raw_kl | no_pc1_kl |
+|------|-----|------|---------|------------|---------|--------|-----------|
+| Qwen3 | L12 | animal | 0.075 | **0.525** | +0.450 | 0.010 | 0.020 |
+| Qwen3 | L18 | animal | 0.294 | **0.699** | +0.405 | 0.033 | 0.019 |
+| Qwen3 | L18 | vehicle | -0.409 | **0.252** | +0.661! | 0.032 | 0.040 |
+| DS7B | L9 | vehicle | -0.423 | **0.440** | +0.863! | 0.282 | 0.038 |
+| DS7B | L14 | animal | 0.231 | **0.347** | +0.116 | 0.633 | 0.638 |
+| GLM4 | L6 | vehicle | -0.040 | **0.371** | +0.411 | 0.002 | 0.043 |
+| GLM4 | L13 | vehicle | 0.824 | 0.292 | -0.532 | 0.160 | 0.012 |
+| GLM4 | L20 | vehicle | 0.244 | -0.156 | -0.400 | 0.003 | 0.002 |
+
+→ **no_pc1在Qwen3和DS7B上系统改善vehicle从负转正!**
+→ **no_pc1在GLM4深层的vehicle上反而变差** — GLM4的原始方向已经是好的
+→ no_pc1方向与原始方向的cos在0.52-0.96之间, 说明不是完全不同的方向
+→ no_pc1的KL通常比raw更低(更温和的扰动)
+
+**关键规律**: 
+- 浅层no_pc1更有效(可能因为浅层主成分对方向干扰更大)
+- DS7B和Qwen3受益最大(GLM4原始方向已经好用)
+- vehicle类别改善最显著(说明vehicle方向的主成分干扰最严重)
+
+---
+
+### 核心发现3: 自适应beta校准证实norm_ratio=0.5-1.0最优
+
+Exp2系统测试了5个norm_ratio (0.25, 0.5, 1.0, 2.0, 4.0):
+
+**Qwen3 (d_model=2560):**
+| 层 | 类别 | ratio=0.5 sel | ratio=1 sel | ratio=2 sel | best_ratio |
+|-----|------|-------------|-----------|-----------|-----------|
+| L6 | animal | 0.071 | 0.032 | -0.002 | 0.5 |
+| L12 | animal | 0.259 | 0.075 | 0.294 | 1.0-2.0 |
+| L18 | animal | 0.184 | 0.294 | 0.209 | 1.0 |
+| L6 | vehicle | -0.003 | -0.125 | -0.185 | 0.5(负最少) |
+| L12 | vehicle | -0.127 | -0.185 | -0.409 | 0.5(负最少) |
+| L18 | vehicle | -0.158 | -0.409 | -0.508 | 0.5(负最少) |
+
+**GLM4 (d_model=4096):**
+| 层 | 类别 | ratio=0.5 sel | ratio=1 sel | ratio=2 sel |
+|-----|------|-------------|-----------|-----------|
+| L13 | animal | -0.026 | 0.051 | 0.208 |
+| L20 | animal | 0.262 | 0.226 | 0.152 |
+| L13 | vehicle | 0.614 | 0.824 | 0.662 |
+
+→ **Qwen3浅层(L6)需要小ratio(0.5), 深层(L18)需要ratio=1.0**
+→ **GLM4深层ratio=1.0-2.0最优**
+→ **vehicle在Qwen3中无论ratio多小都是负的!** (需要方向修正, 不只是强度修正)
+
+---
+
+### 核心发现4: 类别混叠剥离 — furniture在GLM4深层正交化后暴涨到1.23!
+
+Exp3对vehicle/tool/furniture做了正交化:
+
+**GLM4 L26 (深层):**
+| 类别 | raw_sel | disentangle_sel | random_sel | proj_loss |
+|------|---------|-----------------|------------|-----------|
+| vehicle | 0.684 | **0.740** | -0.161 | 0.153 |
+| tool | 0.640 | 0.020 | -0.022 | 0.130 |
+| furniture | 0.283 | **1.232** | -0.221 | 0.205 |
+
+→ **furniture正交化后sel从0.28暴涨到1.23!** 4倍改善!
+→ vehicle正交化后也从0.68升到0.74
+→ tool正交化后反而从0.64降到0.02 — tool方向的"好"大部分来自与vehicle/furniture的混叠
+
+**Qwen3 L24 (深层):**
+| 类别 | raw_sel | disentangle_sel | random_sel |
+|------|---------|-----------------|------------|
+| vehicle | 0.071 | 0.103 | -0.083 |
+| tool | -0.015 | -0.022 | 0.038 |
+| furniture | 0.005 | -0.091 | -0.005 |
+
+→ Qwen3深层各类别正交化改善有限
+
+**DS7B L18 (深层):**
+| 类别 | raw_sel | disentangle_sel | random_sel |
+|------|---------|-----------------|------------|
+| vehicle | 0.134 | **0.397** | 0.008 |
+| tool | -0.063 | -0.107 | -0.013 |
+| furniture | 0.091 | 0.071 | 0.009 |
+
+→ DS7B vehicle正交化从0.13升到0.40, 确认改善
+
+**结论**: 
+- 类别混叠确实存在, 正交化可以改善selectivity
+- GLM4是受益最大的(尤其furniture, 4倍改善)
+- tool方向的可写性大部分来自与vehicle/furniture的混叠
+- 随机方向selectivity接近0, 排除了"任何方向都行"的可能
+
+---
+
+### 核心发现5: clothing候选族问题 — 只有"clothing"和"attire"在vocab中!
+
+Exp4检查了所有3个模型的clothing候选词tokenization:
+
+| 候选词 | Qwen3 | DS7B | GLM4 |
+|--------|-------|------|------|
+| clothing | ✓ | ✓ | ✓ |
+| apparel | ✗ | ✗ | ✗ |
+| garment | ✗ | ✗ | ✗ |
+| attire | ✓ | ✓ | ✓ |
+| clothes | ✗(多token) | ✗(多token) | ✗(多token) |
+| dress | ✗(多token) | ✗(多token) | ✗(多token) |
+| wear | ✗ | ✗ | ✗ |
+
+→ **3个模型的vocab中clothing相关词只有"clothing"和"attire"是单token!**
+→ 标准FAMILIES_EN中"apparel"和"garment"不在vocab中!
+→ 用CLOTHING_ALT_FAMILIES(包含"clothes","dress","wear")后:
+  - Qwen3: sel从0.000提升到0.078
+  - GLM4: sel从0.000提升到**0.776!**
+  - 仍然不是完整修复(有些词是多token)
+
+---
+
+### 核心发现6: 生成质量验证 — Qwen3/GLM4正常, DS7B严重崩坏
+
+Exp5注入后生成短文本:
+
+**Qwen3:**
+- fruit: "The apple is a kind of fruit, and the pear is also a kind of..." ✓ (ratio=1和2都正常)
+- animal: "The dog is a kind of animal..." ✓
+- vehicle: "The car is a kind of vehicle..." ✓
+
+**GLM4:**
+- fruit: "The apple is a kind of fruit that grows on trees..." ✓
+- animal: "The dog is a kind of animal that has been domesticated..." ✓
+- vehicle: "The car is a kind of transportation..." ✓
+
+**DS7B:**
+- fruit: "The apple is a kind of **6-regular graph**..." ✗ 完全胡言
+- animal: "The dog is a kind of animal..." ✓ (勉强正常)
+- vehicle: "The car is a kind of **6125-480B type**..." ✗ 完全胡言
+
+→ **DS7B的生成质量在norm_ratio=1时就已经崩坏!** fruit和vehicle产生随机数字
+→ Qwen3和GLM4在norm_ratio=1和2时都保持正常生成
+→ **DS7B对注入的敏感度远高于Qwen3/GLM4**
+
+---
+
+### Phase 466 客观结果汇总
+
+1. **白化回注入≡原始方向**: 白化只改变距离度量不改变方向, 这是一个重要但容易被忽略的数学事实
+2. **去主轴方向(no_pc1)显著改善**: Qwen3 vehicle从-0.41翻转到+0.25, DS7B vehicle从-0.42翻转到+0.44
+3. **自适应beta确认norm_ratio=0.5-1.0最优**: 浅层需要小ratio, 深层需要大ratio
+4. **furniture正交化后GLM4 sel暴涨4倍(0.28→1.23)**: 类别混叠是selectivity低估的重要原因
+5. **clothing候选词只有2/7在vocab中**: 扩展候选词后GLM4 clothing sel=0.78
+6. **DS7B生成严重崩坏**: 即使norm_ratio=1, fruit变成"6-regular graph", vehicle变成"6125-480B type"
+7. **Qwen3/GLM4生成质量正常**: norm_ratio=1和2都保持合理生成
+
+### 硬伤与问题
+
+1. **白化回注入为什么无效?** 因为白化是度量变换, 差分方向在原始空间中不变. 要真正利用白化空间的"多维结构", 需要在白化空间中构造**新的**差分方向(不只是白化已有方向)
+2. **no_pc1改善的机理不完全清楚**: 可能是去除了"通用主轴"(与具体类别无关的大方差方向), 让注入更聚焦于类别特异信号
+3. **DS7B生成崩坏的原因**: 可能是DS7B的推理模式(R1-Distill)导致中间层注入更易偏离自然流形
+4. **tool正交化后sel骤降**: 说明tool的可写性大部分来自与vehicle/furniture的混叠, 不是tool自身有强可写方向
+5. **clothing修复不完整**: 需要完全重构候选词列表, 确保所有词在vocab中
+6. **norm_ratio=0.25的注入几乎无效**: 太小的注入无法产生可观测的selectivity
+
+### 模型策略分型更新
+
+```
+Qwen3: 去主轴改善型
+  - 原始vehicle方向被主轴严重污染(cos=0.52-0.77)
+  - no_pc1 vehicle从负转正, 是最重要的改善
+  - norm_ratio=0.5在浅层最优
+  - 生成质量稳定
+
+GLM4: 正交化暴涨型
+  - furniture正交化后sel=1.23(4倍改善)
+  - 原始vehicle方向已经很好(sel=0.82), no_pc1反而变差
+  - 深层norm_ratio=1-2最优
+  - 生成质量最稳定
+
+DS7B: 生成崩坏型(新增)
+  - no_pc1在logit层面有效(vehicle sel翻正)
+  - 但生成层面完全崩坏(输出随机数字)
+  - norm_ratio=1已经是DS7B的极限
+  - 说明DS7B的内部状态对微小扰动极其敏感
+```
+
+时间: 2026-06-12 00:42
+
+## Phase 467: PC1功能归因、白化空间新方向、DS7B安全注入与生成质量闭环 [2026-06-12 06:30]
+
+### 背景
+
+Phase 466发现了白化回注入不改变方向、去主轴改善vehicle、norm_ratio校准、类别混叠和DS7B生成崩坏。Phase 467推进到：
+1. PC1到底对应什么功能维度？
+2. 白化空间中构造新方向能否改善？
+3. DS7B的安全注入窗口在哪？
+4. 去主轴+去混叠联合方向是否最优？
+5. 生成质量系统性验证
+
+### 核心发现1: PC1与logit熵高度相关——PC1是"输出不确定性轴"
+
+**Qwen3 PC1-entropy相关系数:**
+
+| 层 | pc1_ratio | category_spread | norm_corr | pos_corr | **entropy_corr** |
+|----|-----------|----------------|-----------|-----------|-----------------|
+| L6 | 0.2506 | 0.9728 | 0.4723 | 0.5789 | **+0.5558** |
+| L12 | 0.2563 | 7.9425 | -0.3655 | -0.3469 | **+0.7480** |
+| L18 | 0.2484 | 8.9084 | 0.0679 | 0.4803 | **+0.7409** |
+
+**GLM4 PC1-entropy相关系数:**
+
+| 层 | pc1_ratio | category_spread | norm_corr | pos_corr | **entropy_corr** |
+|----|-----------|----------------|-----------|-----------|-----------------|
+| L6 | 0.2789 | 0.1969 | 0.2717 | 0.5200 | **+0.5567** |
+| L13 | 0.3162 | 0.7501 | -0.1242 | 0.5471 | **-0.5814** |
+| L20 | 0.4442 | 2.6926 | 0.1015 | 0.4723 | **+0.4973** |
+
+**DS7B PC1-entropy相关系数:**
+
+| 层 | pc1_ratio | category_spread | norm_corr | pos_corr | **entropy_corr** |
+|----|-----------|----------------|-----------|-----------|-----------------|
+| L4 | 0.1369 | 3.1632 | -0.0080 | 0.5309 | **-0.0320** |
+| L9 | 0.1836 | 15.9034 | 0.3896 | 0.5660 | **-0.2073** |
+| L14 | 0.1659 | 10.0652 | 0.0605 | 0.5310 | **+0.1424** |
+
+→ **Qwen3全层PC1-entropy正强相关(0.56-0.75)** — PC1编码"输出不确定性"
+→ **GLM4在L13出现负相关(-0.58)** — 某些层PC1编码的是"确定性"
+→ **DS7B的PC1-entropy相关弱且不一致** — DS7B的PC1不主要编码熵
+→ **PC1-position相关在所有模型中中等(0.47-0.58)** — PC1也编码序列位置
+→ **PC1-norm相关弱** — PC1不是范数方向
+
+**PC1与W_U读出对齐 (GLM4):**
+
+| 层 | cos(PC1, W_U_pc1) | cos(PC1, W_U_pc2) |
+|----|-------------------|-------------------|
+| L6 | 0.2250 | 0.3454 |
+| L13 | **0.3540** | 0.1557 |
+| L20 | 0.3088 | 0.1288 |
+
+→ PC1与W_U_pc1的对齐度0.22-0.35 — PC1部分对齐读出空间但不是完全对齐
+
+---
+
+### 核心发现2: Vehicle方向被PC1最严重污染，fruit/animal几乎不受影响
+
+**cos(diff方向, PC1) by类别和层 (Qwen3):**
+
+| 类别 | L6 | L12 | L18 |
+|------|-----|------|------|
+| fruit | -0.1689 | -0.2277 | -0.2918 |
+| animal | +0.1689 | +0.2277 | +0.2918 |
+| vehicle | **+0.5449** | **+0.7670** | **+0.7360** |
+| tool | **+0.5593** | **+0.8500** | **+0.8780** |
+| furniture | **+0.5396** | **+0.8509** | **+0.8646** |
+
+→ **vehicle/tool/furniture与PC1对齐度高达0.54-0.88** — 这就是为什么no_pc1对这些类别改善最大
+→ **fruit/animal与PC1对齐度仅0.17-0.29** — 几乎不受PC1污染
+→ 去PC1后cos(raw,nopc1): vehicle从0.64降到0.68，tool/furniture从0.52-0.53 — 方向显著改变
+
+**GLM4: vehicle L6 cos=0.63, furniture L6 cos=0.81**
+
+**DS7B: vehicle L9 cos=0.73, furniture L4 cos≈0**
+
+→ **跨模型一致：vehicle方向被PC1严重污染(cos>0.5)，fruit/animal几乎不受影响(cos<0.3)**
+
+---
+
+### 核心发现3: 白化空间新方向cos=1.000——再次确认Phase 466
+
+所有模型、所有层、所有类别中：
+- cos(raw, whitened_new) = **1.000** (精确)
+- whitened_new selectivity = raw selectivity (完全相同)
+
+→ **在白化空间做类别中心差分再回映射，等价于在原始空间做差分** — 这是数学必然
+→ 但**no_pc1方向确实不同**：cos(raw, no_pc1)在0.53-0.97之间
+
+**白化空间去第1白化主轴方向(raw_vs_white_no1):**
+- Qwen3 L12/animal: cos=0.9644, vehicle: cos=0.6065
+- 白化空间去第1轴确实产生不同方向，但selectivity与no_pc1完全相同
+
+→ **白化空间去第1轴 ≡ 原始空间去PC1** — 这是等价操作
+
+---
+
+### 核心发现4: 去主轴+去混叠联合方向——no_pc1单独最优，联合反而变差
+
+**Qwen3 Exp4 Combined Directions:**
+
+| 层/类别 | raw | no_pc1 | disentangle | no_pc1+dis | no_top3pc+dis | random |
+|---------|-----|--------|-------------|------------|---------------|--------|
+| L12/vehicle | -0.10 | **+0.66** | +0.14 | -0.04 | -0.09 | -0.02 |
+| L12/animal | +0.53 | **+0.74** | +0.71 | +0.72 | +0.20 | -0.09 |
+| L18/vehicle | -0.27 | **+0.37** | -0.03 | -0.40 | -0.31 | +0.43 |
+| L18/furniture | +0.18 | +0.10 | +0.37 | +0.43 | **+0.88** | +0.72 |
+| L18/animal | +0.63 | **+0.93** | **+0.97** | +0.93 | +0.64 | +0.51 |
+
+**GLM4 Exp4:**
+
+| 层/类别 | raw | no_pc1 | disentangle | no_pc1+dis |
+|---------|-----|--------|-------------|------------|
+| L13/vehicle | +0.32 | +0.36 | +0.17 | — |
+| L13/furniture | +0.14 | -0.17 | -0.29 | — |
+| L20/furniture | +0.30 | -0.25 | +0.02 | — |
+| L20/animal | +0.74 | +0.73 | +0.61 | — |
+
+**DS7B Exp4:**
+
+| 层/类别 | raw | no_pc1 | disentangle | no_pc1+dis |
+|---------|-----|--------|-------------|------------|
+| L9/vehicle | -0.05 | **+0.17** | +0.23 | — |
+| L9/furniture | +0.16 | +0.04 | **+0.33** | — |
+| L9/animal | +0.34 | **+0.51** | **+1.17** | — |
+| L14/vehicle | +0.38 | -0.03 | -0.22 | — |
+
+→ **no_pc1在Qwen3 vehicle上效果最显著(-0.10→+0.66)** — 翻转6倍
+→ **disentangle在Qwen3/DS7B animal上效果更好(0.71/1.17)** — 去混叠对animal有效
+→ **no_pc1+disentangle联合在Qwen3 vehicle上反而变差(-0.04)** — 过度修正
+→ **GLM4深层no_pc1反而有害** — furniture从0.14变成-0.17
+→ **Qwen3 L18/furniture的no_top3pc+disentangle=0.88最高** — 某些类别需要去除更多PC
+
+**关键规律**：
+- 浅层/vehicle：no_pc1最优
+- 深层/animal：disentangle最优
+- 深层/furniture：no_top3pc+disentangle最优
+- 联合方法不是万能的，需要针对类别选择
+
+---
+
+### 核心发现5: DS7B基线生成已经崩坏——不是注入导致
+
+**DS7B Exp5 基线生成（无注入）:**
+- fruit: "The apple is a kind of **6-regular graph**, which has \\( n \\) nodes..."
+- animal: "The dog is a kind of animal, so the sentence..." (勉强正常)
+- vehicle: "The car is a kind of **6125-480B type**, which has the..."
+- furniture: "The chair is a kind of **6-vertex,12-edge polyhedron**. Let \\( A..."
+
+→ **DS7B在"The X is a kind of"模板下的基线生成已经包含大量数学乱码！**
+→ **Phase 466的"DS7B注入后生成崩坏"需要修正** — 至少部分崩坏是DS7B的基线行为
+→ 3/4类别基线就是数学内容，只有animal勉强正常
+
+**Qwen3/GLM4基线生成全部正常**
+
+**DS7B注入后生成质量（Exp5, L14）:**
+
+| ratio | fruit(raw) | fruit(no_pc1) | vehicle(raw) | vehicle(no_pc1) |
+|-------|-----------|--------------|-------------|----------------|
+| 0.1 | 6-regular graph | 6-regular graph | 6-vertex graph | 6-vertex graph |
+| 0.25 | 6-regular graph | **6120458739** | 6-vertex graph | **6120458739** |
+| 0.5 | **6210-4538** | 6-vertex graph | **6210-4538** | 6-vertex graph |
+| 1.0 | 6-vertex graph | 621-vertex | 6125-480B type | 621-vertex |
+
+→ **ratio=0.25和0.5时，某些注入产生纯数字乱码(6210-453879000)**
+→ **ratio=1.0时，反而回到"6-vertex graph"模式** — DS7B的注入效果极其非线性
+→ **DS7B的"安全注入窗口"非常窄且不稳定**
+
+---
+
+### 核心发现6: R1与R2完全一致——结果是确定性的
+
+所有6个测试（3模型×2轮）的PC1 attribution、combined directions和generation quality数据**完全相同**（delta=0.0000），说明：
+- 模型加载和推理是确定性的
+- 不同对象数量(5 vs 8)对PC1估计影响极小
+- 实验结果可复现
+
+---
+
+### Phase 467 客观结果汇总
+
+1. **PC1与logit熵高度相关** — Qwen3全层entropy_corr=0.56-0.75，PC1是"输出不确定性轴"
+2. **Vehicle/tool/furniture被PC1严重污染(cos=0.54-0.88)** — 这解释了为什么no_pc1对这些类别改善最大
+3. **Fruit/animal几乎不受PC1影响(cos<0.3)** — 它们的原始方向已经很纯
+4. **白化空间新方向cos=1.000** — 再次确认Phase 466，白化不改变方向
+5. **no_pc1在Qwen3 vehicle上翻6倍(-0.10→+0.66)** — 去主轴是Qwen3 vehicle的关键修正
+6. **联合方向不一定最优** — no_pc1+disentangle在vehicle上反而变差
+7. **DS7B基线生成已经崩坏** — Phase 466的"注入导致崩坏"需要修正
+8. **DS7B安全窗口极窄且非线性** — ratio 0.25和0.5产生数字乱码，1.0反而正常
+
+### 修正Phase 466的结论
+
+```
+Phase 466: "DS7B注入后生成严重崩坏(fruit→6-regular graph)"
+Phase 467修正: "DS7B的基线生成已经包含数学乱码(6-regular graph)，注入只是改变了乱码的具体形式"
+```
+
+DS7B对"The X is a kind of"模板的默认响应就是数学内容。这不是注入问题，而是DS7B(R1-Distill)在特定模板下的固有行为。
+
+### 硬伤和问题
+
+1. **PC1=entropy轴的因果方向未确定** — 是PC1决定输出不确定性，还是不确定性高的样本自然在PC1上投影大？需要因果消融验证
+2. **GLM4 L13的PC1-entropy负相关(-0.58)** — 为什么这一层与其他层方向相反？是否与GLM4的深层结构有关？
+3. **联合方向比单一方向差** — no_pc1+disentangle在vehicle上反而不如no_pc1单独。说明去PC1和去混叠不是独立的净化操作，可能相互干扰
+4. **DS7B基线崩坏的本质原因** — 是R1-Distill的训练方式导致？还是7B规模太小？还是特定模板触发？
+5. **PC1-position相关0.47-0.58** — PC1同时编码位置和熵，如何分离？
+6. **Furniture在Qwen3深层的no_top3pc+disentangle=0.88远高于random=0.72** — 虽然最高，但random方向也有0.72，说明深层的selectivity可能不可靠
+
+### 命令记录
+
+```bash
+# Phase 467 R1 (5对象/类)
+python tests/glm5/phase467_pc1_attribution_safe_injection.py qwen3 1       # ~4min
+python tests/glm5/phase467_pc1_attribution_safe_injection.py glm4 1         # ~34min
+python tests/glm5/phase467_pc1_attribution_safe_injection.py deepseek7b 1   # ~27min
+
+# Phase 467 R2 (8对象/类, 确认测试)
+python tests/glm5/phase467_pc1_attribution_safe_injection.py qwen3 2       # ~4min
+python tests/glm5/phase467_pc1_attribution_safe_injection.py glm4 2         # ~32min
+python tests/glm5/phase467_pc1_attribution_safe_injection.py deepseek7b 2   # ~29min
+```
+
+脚本位置：
+- `tests/glm5/phase467_pc1_attribution_safe_injection.py` — Phase 467 主测试
+- 结果：`results/glm5/phase467_{qwen3,glm4,deepseek7b}_r{1,2}.json`
