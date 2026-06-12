@@ -1,0 +1,1165 @@
+{
+  "phase": 93,
+  "output_dir": "results/gpt5_phase93_transplant_alignment_audit_full_20260612_001114",
+  "models": [
+    {
+      "model": "deepseek7b",
+      "phase": 93,
+      "num_rows": 12600,
+      "bad_numeric_rows": 0,
+      "nodes": [
+        "26:mlp",
+        "27:attn"
+      ],
+      "num_items": 420,
+      "copy_modes": [
+        "tail",
+        "prefix",
+        "both"
+      ],
+      "donor_kinds": [
+        "diff_slot_diff_object",
+        "diff_slot_same_object",
+        "same_slot_diff_target",
+        "same_slot_same_target",
+        "self_restore"
+      ],
+      "by_copy_mode": {
+        "both": {
+          "n": 4200,
+          "value_patch_gain": 0.012137530976462932,
+          "letter_patch_gain": 0.01574403825703831,
+          "value_patch_gap": 0.19238572480822247,
+          "letter_patch_gap": -0.01968750424417002,
+          "value_top1_patch_gain": 0.004523809523809524,
+          "letter_top1_patch_gain": -0.03833333333333333
+        },
+        "prefix": {
+          "n": 4200,
+          "value_patch_gain": 0.031046960646109213,
+          "letter_patch_gain": -0.030815414309146857,
+          "value_patch_gap": 0.1734762951385762,
+          "letter_patch_gap": 0.02687194832201515,
+          "value_top1_patch_gain": 0.0004761904761904762,
+          "letter_top1_patch_gain": -0.04404761904761905
+        },
+        "tail": {
+          "n": 4200,
+          "value_patch_gain": -0.03561480801242093,
+          "letter_patch_gain": -0.007894357418020565,
+          "value_patch_gap": 0.24013806379710634,
+          "letter_patch_gap": 0.003950891430888857,
+          "value_top1_patch_gain": -0.0038095238095238095,
+          "letter_top1_patch_gain": -0.03595238095238095
+        }
+      },
+      "by_node_copy_mode": {
+        "L26:mlp:both": {
+          "n": 2100,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.2319,
+          "value_patch_gap": 0.2232,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.7704,
+          "letter_patch_gap": -0.0912,
+          "value_top1_patch_gain": 0.029,
+          "letter_top1_patch_gain": -0.02
+        },
+        "L26:mlp:prefix": {
+          "n": 2100,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.3046,
+          "value_patch_gap": 0.1505,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.7961,
+          "letter_patch_gap": -0.0655,
+          "value_top1_patch_gain": 0.03,
+          "letter_top1_patch_gain": -0.0181
+        },
+        "L26:mlp:tail": {
+          "n": 2100,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.1364,
+          "value_patch_gap": 0.3187,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8177,
+          "letter_patch_gap": -0.0439,
+          "value_top1_patch_gain": 0.0124,
+          "letter_top1_patch_gain": -0.0152
+        },
+        "L27:attn:both": {
+          "n": 2100,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2077,
+          "value_patch_gap": 0.1616,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8019,
+          "letter_patch_gap": 0.0518,
+          "value_top1_patch_gain": -0.02,
+          "letter_top1_patch_gain": -0.0567
+        },
+        "L27:attn:prefix": {
+          "n": 2100,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2425,
+          "value_patch_gap": 0.1964,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7345,
+          "letter_patch_gap": 0.1192,
+          "value_top1_patch_gain": -0.029,
+          "letter_top1_patch_gain": -0.07
+        },
+        "L27:attn:tail": {
+          "n": 2100,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2077,
+          "value_patch_gap": 0.1616,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8019,
+          "letter_patch_gap": 0.0518,
+          "value_top1_patch_gain": -0.02,
+          "letter_top1_patch_gain": -0.0567
+        }
+      },
+      "by_node_copy_mode_donor_kind": {
+        "L26:mlp:both:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": -0.0546,
+          "value_patch_gap": 0.5097,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.6868,
+          "letter_patch_gap": -0.1749,
+          "value_top1_patch_gain": -0.0024,
+          "letter_top1_patch_gain": -0.0119
+        },
+        "L26:mlp:both:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.3973,
+          "value_patch_gap": 0.0578,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8705,
+          "letter_patch_gap": 0.0089,
+          "value_top1_patch_gain": 0.0333,
+          "letter_top1_patch_gain": -0.0333
+        },
+        "L26:mlp:both:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": -0.1937,
+          "value_patch_gap": 0.6487,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.629,
+          "letter_patch_gap": -0.2326,
+          "value_top1_patch_gain": -0.0024,
+          "letter_top1_patch_gain": -0.0048
+        },
+        "L26:mlp:both:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.5555,
+          "value_patch_gap": -0.1004,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8042,
+          "letter_patch_gap": -0.0574,
+          "value_top1_patch_gain": 0.0643,
+          "letter_top1_patch_gain": -0.0238
+        },
+        "L26:mlp:both:self_restore": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.4551,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8616,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0524,
+          "letter_top1_patch_gain": -0.0262
+        },
+        "L26:mlp:prefix:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.0847,
+          "value_patch_gap": 0.3704,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.5733,
+          "letter_patch_gap": -0.2883,
+          "value_top1_patch_gain": 0.0,
+          "letter_top1_patch_gain": -0.0119
+        },
+        "L26:mlp:prefix:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.2975,
+          "value_patch_gap": 0.1576,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.7505,
+          "letter_patch_gap": -0.1111,
+          "value_top1_patch_gain": 0.0286,
+          "letter_top1_patch_gain": -0.0143
+        },
+        "L26:mlp:prefix:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.0725,
+          "value_patch_gap": 0.3826,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8136,
+          "letter_patch_gap": -0.048,
+          "value_top1_patch_gain": 0.0071,
+          "letter_top1_patch_gain": -0.0095
+        },
+        "L26:mlp:prefix:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.6131,
+          "value_patch_gap": -0.158,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.9817,
+          "letter_patch_gap": 0.1201,
+          "value_top1_patch_gain": 0.0619,
+          "letter_top1_patch_gain": -0.0286
+        },
+        "L26:mlp:prefix:self_restore": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.4551,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8616,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0524,
+          "letter_top1_patch_gain": -0.0262
+        },
+        "L26:mlp:tail:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": -0.0512,
+          "value_patch_gap": 0.5063,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.7289,
+          "letter_patch_gap": -0.1327,
+          "value_top1_patch_gain": -0.0048,
+          "letter_top1_patch_gain": -0.0071
+        },
+        "L26:mlp:tail:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.4227,
+          "value_patch_gap": 0.0324,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.9088,
+          "letter_patch_gap": 0.0472,
+          "value_top1_patch_gain": 0.05,
+          "letter_top1_patch_gain": -0.0238
+        },
+        "L26:mlp:tail:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": -0.4715,
+          "value_patch_gap": 0.9266,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.702,
+          "letter_patch_gap": -0.1596,
+          "value_top1_patch_gain": -0.069,
+          "letter_top1_patch_gain": -0.0024
+        },
+        "L26:mlp:tail:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.327,
+          "value_patch_gap": 0.1281,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8872,
+          "letter_patch_gap": 0.0256,
+          "value_top1_patch_gain": 0.0333,
+          "letter_top1_patch_gain": -0.0167
+        },
+        "L26:mlp:tail:self_restore": {
+          "n": 420,
+          "value_drop": 0.4551,
+          "value_patch_gain": 0.4551,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.8616,
+          "letter_patch_gain": -0.8616,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0524,
+          "letter_top1_patch_gain": -0.0262
+        },
+        "L27:attn:both:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2432,
+          "value_patch_gap": 0.1972,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7917,
+          "letter_patch_gap": 0.0621,
+          "value_top1_patch_gain": -0.031,
+          "letter_top1_patch_gain": -0.0548
+        },
+        "L27:attn:both:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.1573,
+          "value_patch_gap": 0.1113,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7685,
+          "letter_patch_gap": 0.0853,
+          "value_top1_patch_gain": -0.0286,
+          "letter_top1_patch_gain": -0.0667
+        },
+        "L27:attn:both:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.3843,
+          "value_patch_gap": 0.3383,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7484,
+          "letter_patch_gap": 0.1054,
+          "value_top1_patch_gain": -0.0262,
+          "letter_top1_patch_gain": -0.0524
+        },
+        "L27:attn:both:same_slot_same_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2073,
+          "value_patch_gap": 0.1613,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8473,
+          "letter_patch_gap": 0.0064,
+          "value_top1_patch_gain": -0.0095,
+          "letter_top1_patch_gain": -0.05
+        },
+        "L27:attn:both:self_restore": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.046,
+          "value_patch_gap": 0.0,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8537,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": -0.0048,
+          "letter_top1_patch_gain": -0.0595
+        },
+        "L27:attn:prefix:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.0466,
+          "value_patch_gap": 0.0005,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.5819,
+          "letter_patch_gap": 0.2719,
+          "value_top1_patch_gain": 0.0048,
+          "letter_top1_patch_gain": -0.081
+        },
+        "L27:attn:prefix:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.147,
+          "value_patch_gap": 0.1009,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.6149,
+          "letter_patch_gap": 0.2389,
+          "value_top1_patch_gain": -0.0333,
+          "letter_top1_patch_gain": -0.0786
+        },
+        "L27:attn:prefix:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.4852,
+          "value_patch_gap": 0.4391,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7862,
+          "letter_patch_gap": 0.0675,
+          "value_top1_patch_gain": -0.0476,
+          "letter_top1_patch_gain": -0.0643
+        },
+        "L27:attn:prefix:same_slot_same_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.4876,
+          "value_patch_gap": 0.4416,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8358,
+          "letter_patch_gap": 0.0179,
+          "value_top1_patch_gain": -0.0643,
+          "letter_top1_patch_gain": -0.0667
+        },
+        "L27:attn:prefix:self_restore": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.046,
+          "value_patch_gap": 0.0,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8537,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": -0.0048,
+          "letter_top1_patch_gain": -0.0595
+        },
+        "L27:attn:tail:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2432,
+          "value_patch_gap": 0.1972,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7917,
+          "letter_patch_gap": 0.0621,
+          "value_top1_patch_gain": -0.031,
+          "letter_top1_patch_gain": -0.0548
+        },
+        "L27:attn:tail:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.1573,
+          "value_patch_gap": 0.1113,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7685,
+          "letter_patch_gap": 0.0853,
+          "value_top1_patch_gain": -0.0286,
+          "letter_top1_patch_gain": -0.0667
+        },
+        "L27:attn:tail:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.3843,
+          "value_patch_gap": 0.3383,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.7484,
+          "letter_patch_gap": 0.1054,
+          "value_top1_patch_gain": -0.0262,
+          "letter_top1_patch_gain": -0.0524
+        },
+        "L27:attn:tail:same_slot_same_target": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.2073,
+          "value_patch_gap": 0.1613,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8473,
+          "letter_patch_gap": 0.0064,
+          "value_top1_patch_gain": -0.0095,
+          "letter_top1_patch_gain": -0.05
+        },
+        "L27:attn:tail:self_restore": {
+          "n": 420,
+          "value_drop": -0.046,
+          "value_patch_gain": -0.046,
+          "value_patch_gap": 0.0,
+          "letter_drop": 0.8537,
+          "letter_patch_gain": 0.8537,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": -0.0048,
+          "letter_top1_patch_gain": -0.0595
+        }
+      }
+    },
+    {
+      "model": "glm4",
+      "phase": 93,
+      "num_rows": 6300,
+      "bad_numeric_rows": 0,
+      "nodes": [
+        "39:mlp"
+      ],
+      "num_items": 420,
+      "copy_modes": [
+        "tail",
+        "prefix",
+        "both"
+      ],
+      "donor_kinds": [
+        "diff_slot_diff_object",
+        "diff_slot_same_object",
+        "same_slot_diff_target",
+        "same_slot_same_target",
+        "self_restore"
+      ],
+      "by_copy_mode": {
+        "both": {
+          "n": 2100,
+          "value_patch_gain": 0.3465910881154594,
+          "letter_patch_gain": -0.6108631004180227,
+          "value_patch_gap": 0.3098101934400343,
+          "letter_patch_gap": -0.06979166155769712,
+          "value_top1_patch_gain": -0.009047619047619047,
+          "letter_top1_patch_gain": -0.04428571428571428
+        },
+        "prefix": {
+          "n": 2100,
+          "value_patch_gain": 0.463125193562536,
+          "letter_patch_gain": -0.11501714263909629,
+          "value_patch_gap": 0.19327608799295767,
+          "letter_patch_gap": -0.5656376193366235,
+          "value_top1_patch_gain": 0.005714285714285714,
+          "letter_top1_patch_gain": 0.0
+        },
+        "tail": {
+          "n": 2100,
+          "value_patch_gain": 0.3465910881154594,
+          "letter_patch_gain": -0.6108631004180227,
+          "value_patch_gap": 0.3098101934400343,
+          "letter_patch_gap": -0.06979166155769712,
+          "value_top1_patch_gain": -0.009047619047619047,
+          "letter_top1_patch_gain": -0.04428571428571428
+        }
+      },
+      "by_node_copy_mode": {
+        "L39:mlp:both": {
+          "n": 2100,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.3466,
+          "value_patch_gap": 0.3098,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.6109,
+          "letter_patch_gap": -0.0698,
+          "value_top1_patch_gain": -0.009,
+          "letter_top1_patch_gain": -0.0443
+        },
+        "L39:mlp:prefix": {
+          "n": 2100,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.4631,
+          "value_patch_gap": 0.1933,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.115,
+          "letter_patch_gap": -0.5656,
+          "value_top1_patch_gain": 0.0057,
+          "letter_top1_patch_gain": 0.0
+        },
+        "L39:mlp:tail": {
+          "n": 2100,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.3466,
+          "value_patch_gap": 0.3098,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.6109,
+          "letter_patch_gap": -0.0698,
+          "value_top1_patch_gain": -0.009,
+          "letter_top1_patch_gain": -0.0443
+        }
+      },
+      "by_node_copy_mode_donor_kind": {
+        "L39:mlp:both:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": -0.2486,
+          "value_patch_gap": 0.905,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.4766,
+          "letter_patch_gap": -0.204,
+          "value_top1_patch_gain": -0.0476,
+          "letter_top1_patch_gain": -0.031
+        },
+        "L39:mlp:both:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.5157,
+          "value_patch_gap": 0.1407,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.5643,
+          "letter_patch_gap": -0.1164,
+          "value_top1_patch_gain": 0.0119,
+          "letter_top1_patch_gain": -0.0405
+        },
+        "L39:mlp:both:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.0988,
+          "value_patch_gap": 0.5576,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.5283,
+          "letter_patch_gap": -0.1524,
+          "value_top1_patch_gain": -0.0452,
+          "letter_top1_patch_gain": -0.0429
+        },
+        "L39:mlp:both:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.7107,
+          "value_patch_gap": -0.0542,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.8045,
+          "letter_patch_gap": 0.1238,
+          "value_top1_patch_gain": 0.0333,
+          "letter_top1_patch_gain": -0.0714
+        },
+        "L39:mlp:both:self_restore": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.6564,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.6807,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0024,
+          "letter_top1_patch_gain": -0.0357
+        },
+        "L39:mlp:prefix:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.1541,
+          "value_patch_gap": 0.5023,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": 0.4218,
+          "letter_patch_gap": -1.1025,
+          "value_top1_patch_gain": -0.0143,
+          "letter_top1_patch_gain": 0.0333
+        },
+        "L39:mlp:prefix:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.5952,
+          "value_patch_gap": 0.0612,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": 0.351,
+          "letter_patch_gap": -1.0317,
+          "value_top1_patch_gain": 0.0167,
+          "letter_top1_patch_gain": 0.0286
+        },
+        "L39:mlp:prefix:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.2523,
+          "value_patch_gap": 0.4041,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.3778,
+          "letter_patch_gap": -0.3029,
+          "value_top1_patch_gain": -0.0024,
+          "letter_top1_patch_gain": -0.0214
+        },
+        "L39:mlp:prefix:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.6576,
+          "value_patch_gap": -0.0012,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.2895,
+          "letter_patch_gap": -0.3912,
+          "value_top1_patch_gain": 0.0262,
+          "letter_top1_patch_gain": -0.0048
+        },
+        "L39:mlp:prefix:self_restore": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.6564,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.6807,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0024,
+          "letter_top1_patch_gain": -0.0357
+        },
+        "L39:mlp:tail:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": -0.2486,
+          "value_patch_gap": 0.905,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.4766,
+          "letter_patch_gap": -0.204,
+          "value_top1_patch_gain": -0.0476,
+          "letter_top1_patch_gain": -0.031
+        },
+        "L39:mlp:tail:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.5157,
+          "value_patch_gap": 0.1407,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.5643,
+          "letter_patch_gap": -0.1164,
+          "value_top1_patch_gain": 0.0119,
+          "letter_top1_patch_gain": -0.0405
+        },
+        "L39:mlp:tail:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.0988,
+          "value_patch_gap": 0.5576,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.5283,
+          "letter_patch_gap": -0.1524,
+          "value_top1_patch_gain": -0.0452,
+          "letter_top1_patch_gain": -0.0429
+        },
+        "L39:mlp:tail:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.7107,
+          "value_patch_gap": -0.0542,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.8045,
+          "letter_patch_gap": 0.1238,
+          "value_top1_patch_gain": 0.0333,
+          "letter_top1_patch_gain": -0.0714
+        },
+        "L39:mlp:tail:self_restore": {
+          "n": 420,
+          "value_drop": 0.6564,
+          "value_patch_gain": 0.6564,
+          "value_patch_gap": 0.0,
+          "letter_drop": -0.6807,
+          "letter_patch_gain": -0.6807,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0024,
+          "letter_top1_patch_gain": -0.0357
+        }
+      }
+    },
+    {
+      "model": "qwen3",
+      "phase": 93,
+      "num_rows": 12600,
+      "bad_numeric_rows": 0,
+      "nodes": [
+        "6:mlp",
+        "24:attn"
+      ],
+      "num_items": 420,
+      "copy_modes": [
+        "tail",
+        "prefix",
+        "both"
+      ],
+      "donor_kinds": [
+        "diff_slot_diff_object",
+        "diff_slot_same_object",
+        "same_slot_diff_target",
+        "same_slot_same_target",
+        "self_restore"
+      ],
+      "by_copy_mode": {
+        "both": {
+          "n": 4200,
+          "value_patch_gain": 1.2568942731971453,
+          "letter_patch_gain": 1.841980096588758,
+          "value_patch_gap": 0.31725394687504466,
+          "letter_patch_gap": 2.0969940496232136,
+          "value_top1_patch_gain": 0.11714285714285715,
+          "letter_top1_patch_gain": 0.29428571428571426
+        },
+        "prefix": {
+          "n": 4200,
+          "value_patch_gain": 1.2314629836140998,
+          "letter_patch_gain": 1.9726747462510865,
+          "value_patch_gap": 0.34268523645809007,
+          "letter_patch_gap": 1.966299399960885,
+          "value_top1_patch_gain": 0.11,
+          "letter_top1_patch_gain": 0.2557142857142857
+        },
+        "tail": {
+          "n": 4200,
+          "value_patch_gain": 0.7825364976464992,
+          "letter_patch_gain": 1.4473539809676828,
+          "value_patch_gap": 0.7916117224256907,
+          "letter_patch_gap": 2.491620165244289,
+          "value_top1_patch_gain": 0.0680952380952381,
+          "letter_top1_patch_gain": 0.25452380952380954
+        }
+      },
+      "by_node_copy_mode": {
+        "L24:attn:both": {
+          "n": 2100,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.157,
+          "value_patch_gap": 0.258,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 0.6898,
+          "letter_patch_gap": 3.6254,
+          "value_top1_patch_gain": -0.0133,
+          "letter_top1_patch_gain": 0.271
+        },
+        "L24:attn:prefix": {
+          "n": 2100,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.1439,
+          "value_patch_gap": 0.2449,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 0.7433,
+          "letter_patch_gap": 3.5719,
+          "value_top1_patch_gain": -0.009,
+          "letter_top1_patch_gain": 0.1971
+        },
+        "L24:attn:tail": {
+          "n": 2100,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.1578,
+          "value_patch_gap": 0.2589,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 0.7214,
+          "letter_patch_gap": 3.5938,
+          "value_top1_patch_gain": -0.0138,
+          "letter_top1_patch_gain": 0.2729
+        },
+        "L6:mlp:both": {
+          "n": 2100,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.6708,
+          "value_patch_gap": 0.3765,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.9941,
+          "letter_patch_gap": 0.5686,
+          "value_top1_patch_gain": 0.2476,
+          "letter_top1_patch_gain": 0.3176
+        },
+        "L6:mlp:prefix": {
+          "n": 2100,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.6068,
+          "value_patch_gap": 0.4404,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.2021,
+          "letter_patch_gap": 0.3607,
+          "value_top1_patch_gain": 0.229,
+          "letter_top1_patch_gain": 0.3143
+        },
+        "L6:mlp:tail": {
+          "n": 2100,
+          "value_drop": 3.0473,
+          "value_patch_gain": 1.7229,
+          "value_patch_gap": 1.3244,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.1733,
+          "letter_patch_gap": 1.3895,
+          "value_top1_patch_gain": 0.15,
+          "letter_top1_patch_gain": 0.2362
+        }
+      },
+      "by_node_copy_mode_donor_kind": {
+        "L24:attn:both:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.5177,
+          "value_patch_gap": 0.6187,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -1.2402,
+          "letter_patch_gap": 5.5554,
+          "value_top1_patch_gain": -0.0571,
+          "letter_top1_patch_gain": -0.1071
+        },
+        "L24:attn:both:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.0304,
+          "value_patch_gap": 0.0706,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 2.1077,
+          "letter_patch_gap": 2.2074,
+          "value_top1_patch_gain": 0.0238,
+          "letter_top1_patch_gain": 0.469
+        },
+        "L24:attn:both:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.6449,
+          "value_patch_gap": 0.7459,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -6.2369,
+          "letter_patch_gap": 10.5521,
+          "value_top1_patch_gain": -0.0619,
+          "letter_top1_patch_gain": -0.2452
+        },
+        "L24:attn:both:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.2462,
+          "value_patch_gap": -0.1452,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 4.5033,
+          "letter_patch_gap": -0.1881,
+          "value_top1_patch_gain": 0.019,
+          "letter_top1_patch_gain": 0.6286
+        },
+        "L24:attn:both:self_restore": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.101,
+          "value_patch_gap": 0.0,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 4.3152,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0095,
+          "letter_top1_patch_gain": 0.6095
+        },
+        "L24:attn:prefix:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.3735,
+          "value_patch_gap": 0.4745,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -0.17,
+          "letter_patch_gap": 4.4852,
+          "value_top1_patch_gain": -0.0405,
+          "letter_top1_patch_gain": 0.0048
+        },
+        "L24:attn:prefix:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.062,
+          "value_patch_gap": 0.1631,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 0.4149,
+          "letter_patch_gap": 3.9003,
+          "value_top1_patch_gain": 0.0238,
+          "letter_top1_patch_gain": 0.0833
+        },
+        "L24:attn:prefix:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.5442,
+          "value_patch_gap": 0.6452,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -3.5527,
+          "letter_patch_gap": 7.8678,
+          "value_top1_patch_gain": -0.0643,
+          "letter_top1_patch_gain": -0.0571
+        },
+        "L24:attn:prefix:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.1592,
+          "value_patch_gap": -0.0581,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 2.709,
+          "letter_patch_gap": 1.6061,
+          "value_top1_patch_gain": 0.0262,
+          "letter_top1_patch_gain": 0.3452
+        },
+        "L24:attn:prefix:self_restore": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.101,
+          "value_patch_gap": 0.0,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 4.3152,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0095,
+          "letter_top1_patch_gain": 0.6095
+        },
+        "L24:attn:tail:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.5287,
+          "value_patch_gap": 0.6297,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -1.1286,
+          "letter_patch_gap": 5.4438,
+          "value_top1_patch_gain": -0.0571,
+          "letter_top1_patch_gain": -0.0952
+        },
+        "L24:attn:tail:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.0264,
+          "value_patch_gap": 0.0747,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 2.1098,
+          "letter_patch_gap": 2.2054,
+          "value_top1_patch_gain": 0.0214,
+          "letter_top1_patch_gain": 0.45
+        },
+        "L24:attn:tail:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": -0.6354,
+          "value_patch_gap": 0.7365,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": -6.1327,
+          "letter_patch_gap": 10.4479,
+          "value_top1_patch_gain": -0.0595,
+          "letter_top1_patch_gain": -0.2286
+        },
+        "L24:attn:tail:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.2476,
+          "value_patch_gap": -0.1466,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 4.4435,
+          "letter_patch_gap": -0.1283,
+          "value_top1_patch_gain": 0.0167,
+          "letter_top1_patch_gain": 0.6286
+        },
+        "L24:attn:tail:self_restore": {
+          "n": 420,
+          "value_drop": 0.101,
+          "value_patch_gain": 0.101,
+          "value_patch_gap": 0.0,
+          "letter_drop": 4.3152,
+          "letter_patch_gain": 4.3152,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.0095,
+          "letter_top1_patch_gain": 0.6095
+        },
+        "L6:mlp:both:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.4425,
+          "value_patch_gap": 0.6048,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.8157,
+          "letter_patch_gap": 0.747,
+          "value_top1_patch_gain": 0.2286,
+          "letter_top1_patch_gain": 0.3024
+        },
+        "L6:mlp:both:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.6999,
+          "value_patch_gap": 0.3474,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.8196,
+          "letter_patch_gap": 0.7432,
+          "value_top1_patch_gain": 0.269,
+          "letter_top1_patch_gain": 0.3048
+        },
+        "L6:mlp:both:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.4109,
+          "value_patch_gap": 0.6363,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.8497,
+          "letter_patch_gap": 0.7131,
+          "value_top1_patch_gain": 0.219,
+          "letter_top1_patch_gain": 0.3048
+        },
+        "L6:mlp:both:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.7532,
+          "value_patch_gap": 0.2941,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.9229,
+          "letter_patch_gap": 0.6399,
+          "value_top1_patch_gain": 0.25,
+          "letter_top1_patch_gain": 0.3071
+        },
+        "L6:mlp:both:self_restore": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 3.0473,
+          "value_patch_gap": 0.0,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.5628,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.2714,
+          "letter_top1_patch_gain": 0.369
+        },
+        "L6:mlp:prefix:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.2716,
+          "value_patch_gap": 0.7757,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.167,
+          "letter_patch_gap": 0.3958,
+          "value_top1_patch_gain": 0.2024,
+          "letter_top1_patch_gain": 0.3119
+        },
+        "L6:mlp:prefix:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.53,
+          "value_patch_gap": 0.5173,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.1596,
+          "letter_patch_gap": 0.4031,
+          "value_top1_patch_gain": 0.2071,
+          "letter_top1_patch_gain": 0.3119
+        },
+        "L6:mlp:prefix:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.511,
+          "value_patch_gap": 0.5363,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.985,
+          "letter_patch_gap": 0.5777,
+          "value_top1_patch_gain": 0.2333,
+          "letter_top1_patch_gain": 0.2929
+        },
+        "L6:mlp:prefix:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.6743,
+          "value_patch_gap": 0.373,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.1359,
+          "letter_patch_gap": 0.4269,
+          "value_top1_patch_gain": 0.231,
+          "letter_top1_patch_gain": 0.2857
+        },
+        "L6:mlp:prefix:self_restore": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 3.0473,
+          "value_patch_gap": 0.0,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.5628,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.2714,
+          "letter_top1_patch_gain": 0.369
+        },
+        "L6:mlp:tail:diff_slot_diff_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 0.6514,
+          "value_patch_gap": 2.3958,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 0.9609,
+          "letter_patch_gap": 2.6018,
+          "value_top1_patch_gain": 0.0524,
+          "letter_top1_patch_gain": 0.0738
+        },
+        "L6:mlp:tail:diff_slot_same_object": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 0.7879,
+          "value_patch_gap": 2.2594,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 1.1192,
+          "letter_patch_gap": 2.4436,
+          "value_top1_patch_gain": 0.0881,
+          "letter_top1_patch_gain": 0.1143
+        },
+        "L6:mlp:tail:same_slot_diff_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 2.1686,
+          "value_patch_gap": 0.8787,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.7589,
+          "letter_patch_gap": 0.8039,
+          "value_top1_patch_gain": 0.2024,
+          "letter_top1_patch_gain": 0.3429
+        },
+        "L6:mlp:tail:same_slot_same_target": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 1.9593,
+          "value_patch_gap": 1.0879,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 2.4646,
+          "letter_patch_gap": 1.0982,
+          "value_top1_patch_gain": 0.1357,
+          "letter_top1_patch_gain": 0.281
+        },
+        "L6:mlp:tail:self_restore": {
+          "n": 420,
+          "value_drop": 3.0473,
+          "value_patch_gain": 3.0473,
+          "value_patch_gap": 0.0,
+          "letter_drop": 3.5628,
+          "letter_patch_gain": 3.5628,
+          "letter_patch_gap": 0.0,
+          "value_top1_patch_gain": 0.2714,
+          "letter_top1_patch_gain": 0.369
+        }
+      }
+    }
+  ],
+  "total_rows": 31500,
+  "total_bad_numeric_rows": 0
+}

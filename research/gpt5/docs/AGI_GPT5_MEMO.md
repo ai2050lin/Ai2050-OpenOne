@@ -30801,3 +30801,987 @@ GLM4:
 如果跨 object 仍有效，
 说明开始接近抽象变量级机制。
 ```
+## Phase 92: Cross-item Component Transplant 跨样本组件输出移植 [2026-06-11 23:35]
+
+### 本轮目标
+
+根据 Phase 91 的结果，同输入 clean component output restore 已经证明：
+
+```text
+某些组件输出对当前样本的 reader interface 是必要且可恢复的。
+```
+
+但 Phase 91 不能证明：
+
+```text
+组件输出中存在跨样本可迁移的抽象关系变量。
+```
+
+因此本轮推进到 cross-item component transplant（跨样本组件输出移植）：
+
+```text
+target input 的指定组件输出
+← donor input 的同层同组件输出
+```
+
+并比较 donor 类型：
+
+```text
+self_restore：同输入恢复
+same_slot_same_target：同槽位、同目标值、不同对象
+same_slot_diff_target：同槽位、不同目标值
+diff_slot_same_object：同对象、不同槽位
+diff_slot_diff_object：不同对象、不同槽位
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase92_cross_item_component_transplant.py
+tests/gpt5/phase92_cross_item_component_transplant_summary.py
+tests/gpt5/run_phase92_cross_item_component_transplant_full.sh
+```
+
+### 运行命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase92_cross_item_component_transplant.py qwen3 \
+  --nodes 6:mlp \
+  --max-items 4 \
+  --output-dir results/gpt5_phase92_smoke \
+  --progress-every 2 \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+tests/gpt5/run_phase92_cross_item_component_transplant_full.sh
+```
+
+实际输出目录：
+
+```text
+results/gpt5_phase92_cross_item_component_transplant_full_20260611_220707
+```
+
+### 测试设置
+
+```text
+模型顺序：
+qwen3 → GLM4 → DeepSeek7B
+
+每模型测试完成后：
+--hard-exit-after-model
+
+attention implementation：
+flash_attention_2,sdpa,eager
+
+实际加载：
+flash_attention_2 未安装，三模型均回退到 sdpa。
+
+数据范围：
+420 个 object-slot-template items
+slots = category,color,function,material,location
+
+copy_mode：
+tail
+
+节点：
+qwen3: L6 MLP, L24 attention
+GLM4: L39 MLP
+DeepSeek7B: L26 MLP, L27 attention
+```
+
+### 总体结果
+
+```text
+total_rows = 10500
+total_bad_numeric_rows = 0
+
+qwen3 rows = 4200
+GLM4 rows = 2100
+DeepSeek7B rows = 4200
+```
+
+本轮没有跑 open generation，优先使用：
+
+```text
+candidate value full-sequence margin
+choice letter full-sequence margin
+```
+
+原因是本轮目标是判断组件输出是否跨样本可迁移，过多 generation 格式噪声会污染判断。
+
+### qwen3 结果
+
+#### L6 MLP
+
+```text
+self_restore:
+  value_patch_gain = 3.0473
+  letter_patch_gain = 3.5628
+
+same_slot_same_target:
+  value_patch_gain = 1.9593
+  letter_patch_gain = 2.4646
+
+same_slot_diff_target:
+  value_patch_gain = 2.1686
+  letter_patch_gain = 2.7589
+
+diff_slot_same_object:
+  value_patch_gain = 0.7879
+  letter_patch_gain = 1.1192
+
+diff_slot_diff_object:
+  value_patch_gain = 0.6514
+  letter_patch_gain = 0.9609
+```
+
+观察：
+
+```text
+1. L6 MLP 的跨样本移植不是只在 same-target 时有效。
+2. same_slot_diff_target 反而比 same_slot_same_target 更强。
+3. diff_slot 条件仍有一定恢复，但明显弱于 same_slot。
+```
+
+这说明 Qwen3 L6 MLP 更像：
+
+```text
+slot/interface computation support
+```
+
+而不是简单：
+
+```text
+target value memory vector
+```
+
+它承载的可能是同一读出任务格式或槽位相关计算状态，而不是单个答案值。
+
+#### L24 attention
+
+```text
+self_restore:
+  value_patch_gain = 0.1010
+  letter_patch_gain = 4.3152
+
+same_slot_same_target:
+  value_patch_gain = 0.2476
+  letter_patch_gain = 4.4435
+
+same_slot_diff_target:
+  value_patch_gain = -0.6354
+  letter_patch_gain = -6.1327
+
+diff_slot_same_object:
+  value_patch_gain = 0.0264
+  letter_patch_gain = 2.1098
+
+diff_slot_diff_object:
+  value_patch_gain = -0.5287
+  letter_patch_gain = -1.1286
+```
+
+观察：
+
+```text
+1. L24 attention 对 choice letter interface 极强。
+2. same_slot_same_target 几乎可以完全恢复甚至略超 self_restore。
+3. same_slot_diff_target 强烈反向，说明 wrong target donor 会破坏 letter decision。
+4. diff_slot_same_object 仍有中等 letter 恢复，说明 object/context 也贡献一部分接口状态。
+```
+
+这比 L6 MLP 更接近：
+
+```text
+target-specific choice/generation interface
+```
+
+### GLM4 结果
+
+#### L39 MLP
+
+```text
+self_restore:
+  value_patch_gain = 0.6564
+  letter_patch_gain = -0.6807
+
+same_slot_same_target:
+  value_patch_gain = 0.7107
+  letter_patch_gain = -0.8045
+
+same_slot_diff_target:
+  value_patch_gain = 0.0988
+  letter_patch_gain = -0.5283
+
+diff_slot_same_object:
+  value_patch_gain = 0.5157
+  letter_patch_gain = -0.5643
+
+diff_slot_diff_object:
+  value_patch_gain = -0.2486
+  letter_patch_gain = -0.4766
+```
+
+观察：
+
+```text
+1. GLM4 L39 MLP 对 candidate value margin 有明显条件迁移。
+2. same_slot_same_target 的 value_patch_gain 高于 self_restore。
+3. diff_slot_same_object 也保留较强 value 恢复。
+4. 但所有条件下 letter_patch_gain 仍为负。
+```
+
+这延续 Phase90/91 的结论：
+
+```text
+GLM4 的 candidate value interface 与 choice letter interface 分离。
+```
+
+GLM4 L39 MLP 更像：
+
+```text
+candidate scoring component
+```
+
+而不是：
+
+```text
+choice decision component
+```
+
+### DeepSeek7B 结果
+
+#### L26 MLP
+
+```text
+self_restore:
+  value_patch_gain = 0.4551
+  letter_patch_gain = -0.8616
+
+same_slot_same_target:
+  value_patch_gain = 0.3270
+  letter_patch_gain = -0.8872
+
+same_slot_diff_target:
+  value_patch_gain = -0.4715
+  letter_patch_gain = -0.7020
+
+diff_slot_same_object:
+  value_patch_gain = 0.4227
+  letter_patch_gain = -0.9088
+
+diff_slot_diff_object:
+  value_patch_gain = -0.0512
+  letter_patch_gain = -0.7289
+```
+
+观察：
+
+```text
+1. L26 MLP 对 candidate value margin 有迁移，但主要依赖 same target 或 same object。
+2. same_slot_diff_target 变成负向，说明 wrong target donor 会破坏 value scoring。
+3. letter_patch_gain 一直为负，说明它不是 letter interface。
+```
+
+#### L27 attention
+
+```text
+self_restore:
+  value_patch_gain = -0.0460
+  letter_patch_gain = 0.8537
+
+same_slot_same_target:
+  value_patch_gain = -0.2073
+  letter_patch_gain = 0.8473
+
+same_slot_diff_target:
+  value_patch_gain = -0.3843
+  letter_patch_gain = 0.7484
+
+diff_slot_same_object:
+  value_patch_gain = -0.1573
+  letter_patch_gain = 0.7685
+
+diff_slot_diff_object:
+  value_patch_gain = -0.2432
+  letter_patch_gain = 0.7917
+```
+
+观察：
+
+```text
+1. L27 attention 几乎完全是 letter interface。
+2. same_slot_same_target 的 letter_patch_gap = 0.0064，几乎复现 self_restore。
+3. 但其他 donor 条件也保持很高 letter_patch_gain。
+4. 这说明 L27 attention 可能承载的是输出选项接口格式，而不一定是语义目标本身。
+```
+
+### 对附件分析的判断
+
+附件对 Phase91 的判断基本正确：
+
+```text
+Phase91 是组件级闭包推进，
+但同输入 restore 不能证明抽象变量。
+```
+
+本轮 Phase92 正是对这个硬伤的补充：
+
+```text
+把同输入 restore 改成跨样本 donor transplant，
+观察组件输出是否可以跨 object / slot / target 迁移。
+```
+
+### 本轮关键进展
+
+1. **Qwen3 L6 MLP 不是单纯答案值存储。**
+
+```text
+same_slot_diff_target 迁移强于 same_slot_same_target，
+说明它更像 slot/interface 计算状态，而非 target-value vector。
+```
+
+2. **Qwen3 L24 attention 更接近 target-specific choice interface。**
+
+```text
+same_slot_same_target 强恢复；
+same_slot_diff_target 强破坏。
+```
+
+3. **GLM4 L39 MLP 继续显示 candidate/choice 分离。**
+
+```text
+value margin 可迁移；
+letter margin 不支持，甚至为负。
+```
+
+4. **DeepSeek7B L26 MLP 和 L27 attention 分工清楚。**
+
+```text
+L26 MLP 更接近 candidate value / object-target support；
+L27 attention 更接近 letter/output interface。
+```
+
+5. **组件输出迁移存在明显条件性。**
+
+```text
+不是所有 donor 都能恢复；
+slot、target、object 三者都会改变迁移效果。
+```
+
+### 当前最稳结论
+
+可以较稳地说：
+
+```text
+对象-槽位 reader 任务中，
+三模型都不是一个统一读出路径。
+
+Qwen3:
+  L6 MLP = slot/interface computation support
+  L24 attention = target-sensitive choice interface
+
+GLM4:
+  L39 MLP = candidate scoring component
+  choice decision interface 与 candidate scoring 分离
+
+DeepSeek7B:
+  L26 MLP = candidate value/object-target support
+  L27 attention = letter/output interface
+```
+
+不能说：
+
+```text
+已经找到抽象语义变量；
+跨样本 transplant 已经完成变量闭包；
+tail 对齐一定是最正确的移植方式；
+这些结论可直接推广到逻辑、语法、指代。
+```
+
+### 硬伤
+
+1. 本轮使用 tail 对齐，不同长度 prompt 的 token 级对应关系仍然粗糙。
+2. 本轮没有 generation，只测 full-sequence margin。
+3. donor transplant 是整组件输出移植，不是子空间变量移植。
+4. Qwen3 L6 MLP 的 same_slot_diff_target 强恢复说明它不是纯 target 变量，仍需拆 slot/interface 和 target/value。
+5. DeepSeek7B L27 attention 对多种 donor 都有高 letter 恢复，可能主要是输出格式接口，不一定是语义内容。
+
+### 下一步
+
+Phase93 应做：
+
+```text
+component transplant alignment audit
+```
+
+核心问题：
+
+```text
+tail 对齐、prefix 对齐、both 对齐结果是否一致？
+```
+
+如果只有 tail 对齐有效，说明当前发现主要在后缀读出接口。
+如果 prefix/both 也有效，说明更可能是全序列路径状态。
+
+Phase94 应做：
+
+```text
+subspace transplant
+```
+
+不要继续整组件移植，而是把组件输出拆成：
+
+```text
+slot subspace
+target/value subspace
+object/context subspace
+choice-interface subspace
+residual remainder
+```
+
+然后分别移植，判断：
+
+```text
+哪个子空间控制 value margin；
+哪个子空间控制 letter margin；
+哪个子空间只是输出格式接口。
+```
+
+Phase95 应把对象-槽位 reader 的结论扩展到：
+
+```text
+translation
+logical relation
+temporal order
+active/passive
+coreference
+```
+
+但必须先通过 Phase93/94，把当前对象-槽位任务的路径拆干净，否则继续扩功能库只会增加行为图谱，不会进入编码机制。
+## Phase 93: Component Transplant Alignment Audit 组件移植对齐方式审计 [2026-06-12 04:37]
+
+### 本轮目标
+
+Phase92 发现跨样本组件输出移植存在条件性，但硬伤是：
+
+```text
+只使用 tail 对齐。
+```
+
+不同长度 prompt / continuation 的 token 位置并不完全一致，因此需要验证：
+
+```text
+tail 对齐、prefix 对齐、both 对齐
+是否产生一致结论。
+```
+
+如果只有 tail 有效，说明当前发现主要是后缀读出接口。
+如果 prefix/both 也有效，说明组件输出中可能存在更全局的路径状态。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase93_transplant_alignment_audit.py
+tests/gpt5/phase93_transplant_alignment_audit_summary.py
+tests/gpt5/run_phase93_transplant_alignment_audit_full.sh
+```
+
+### 运行命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase93_transplant_alignment_audit.py qwen3 \
+  --nodes 6:mlp \
+  --max-items 4 \
+  --output-dir results/gpt5_phase93_smoke \
+  --progress-every 2 \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+tests/gpt5/run_phase93_transplant_alignment_audit_full.sh
+```
+
+DS7B 中途在 tail/L27 attention 约 2800 行处出现一次 segmentation fault：
+
+```text
+Segmentation fault (core dumped)
+```
+
+已从 partial checkpoint 恢复：
+
+```bash
+python tests/gpt5/phase93_transplant_alignment_audit.py deepseek7b \
+  --nodes 26:mlp,27:attn \
+  --slots category,color,function,material,location \
+  --max-items 420 \
+  --choice-template choice_json_letter \
+  --copy-modes tail,prefix,both \
+  --donor-kinds self_restore,same_slot_same_target,same_slot_diff_target,diff_slot_same_object,diff_slot_diff_object \
+  --output-dir results/gpt5_phase93_transplant_alignment_audit_full_20260612_001114 \
+  --progress-every 70 \
+  --hard-exit-after-model
+```
+
+### 输出目录
+
+```text
+results/gpt5_phase93_transplant_alignment_audit_full_20260612_001114
+```
+
+### 测试设置
+
+```text
+模型顺序：
+qwen3 → GLM4 → DeepSeek7B
+
+每模型测试完成后：
+--hard-exit-after-model
+
+attention implementation：
+flash_attention_2,sdpa,eager
+
+实际加载：
+flash_attention_2 未安装，三模型均回退到 sdpa。
+
+数据范围：
+420 个 object-slot-template items
+slots = category,color,function,material,location
+
+copy_modes:
+tail,prefix,both
+
+donor_kinds:
+self_restore
+same_slot_same_target
+same_slot_diff_target
+diff_slot_same_object
+diff_slot_diff_object
+
+节点：
+qwen3: L6 MLP, L24 attention
+GLM4: L39 MLP
+DeepSeek7B: L26 MLP, L27 attention
+```
+
+### 总体结果
+
+```text
+total_rows = 31500
+total_bad_numeric_rows = 0
+
+qwen3 rows = 12600
+GLM4 rows = 6300
+DeepSeek7B rows = 12600
+```
+
+本轮仍然只使用：
+
+```text
+candidate value full-sequence margin
+choice letter full-sequence margin
+```
+
+不引入 generation，以避免格式化生成噪声污染 alignment audit。
+
+### qwen3 结果
+
+#### copy mode 总体
+
+```text
+tail:
+  value_patch_gain = 0.7825
+  letter_patch_gain = 1.4474
+
+prefix:
+  value_patch_gain = 1.2315
+  letter_patch_gain = 1.9727
+
+both:
+  value_patch_gain = 1.2569
+  letter_patch_gain = 1.8420
+```
+
+观察：
+
+```text
+prefix/both 强于 tail。
+```
+
+这说明 Phase92 的结论不是 tail-only artifact。Qwen3 的可迁移组件输出不只存在于答案后缀接口，也存在于前缀/全序列路径状态中。
+
+#### L6 MLP
+
+```text
+tail:
+  value_patch_gain = 1.7229
+  letter_patch_gain = 2.1733
+
+prefix:
+  value_patch_gain = 2.6068
+  letter_patch_gain = 3.2021
+
+both:
+  value_patch_gain = 2.6708
+  letter_patch_gain = 2.9941
+```
+
+donor 条件：
+
+```text
+tail/same_slot_diff_target:
+  value_patch_gain = 2.1686
+  letter_patch_gain = 2.7589
+
+prefix/same_slot_diff_target:
+  value_patch_gain = 2.5110
+  letter_patch_gain = 2.9850
+
+both/same_slot_diff_target:
+  value_patch_gain = 2.4109
+  letter_patch_gain = 2.8497
+```
+
+观察：
+
+```text
+L6 MLP 的 same_slot_diff_target 强恢复在三种对齐方式下都存在。
+```
+
+因此 Phase92 的判断更稳：
+
+```text
+Qwen3 L6 MLP 不是单纯 target value vector，
+更像 slot/interface computation support。
+```
+
+并且这个支持不是后缀特异的，而是前缀/全序列状态也能承载。
+
+#### L24 attention
+
+```text
+tail:
+  value_patch_gain = -0.1578
+  letter_patch_gain = 0.7214
+
+prefix:
+  value_patch_gain = -0.1439
+  letter_patch_gain = 0.7433
+
+both:
+  value_patch_gain = -0.1570
+  letter_patch_gain = 0.6898
+```
+
+关键 donor 条件：
+
+```text
+tail/same_slot_same_target:
+  letter_patch_gain = 4.4435
+
+prefix/same_slot_same_target:
+  letter_patch_gain = 2.7090
+
+both/same_slot_same_target:
+  letter_patch_gain = 4.5033
+
+tail/same_slot_diff_target:
+  letter_patch_gain = -6.1327
+
+prefix/same_slot_diff_target:
+  letter_patch_gain = -3.5527
+
+both/same_slot_diff_target:
+  letter_patch_gain = -6.2369
+```
+
+观察：
+
+```text
+same_slot_same_target 强恢复、same_slot_diff_target 强破坏的模式在三种对齐中都成立。
+```
+
+但 prefix 的强度较弱，说明：
+
+```text
+L24 attention 的 target-sensitive choice interface 更偏后缀/全序列输出接口，
+但不是纯 tail artifact。
+```
+
+### GLM4 结果
+
+#### L39 MLP
+
+```text
+tail:
+  value_patch_gain = 0.3466
+  letter_patch_gain = -0.6109
+
+prefix:
+  value_patch_gain = 0.4631
+  letter_patch_gain = -0.1150
+
+both:
+  value_patch_gain = 0.3466
+  letter_patch_gain = -0.6109
+```
+
+观察：
+
+```text
+1. prefix 对 value margin 更强。
+2. prefix 下 letter 负向程度变弱，但仍没有成为稳定正向 choice interface。
+3. tail 和 both 结果几乎一致。
+```
+
+关键 donor 条件：
+
+```text
+prefix/same_slot_same_target:
+  value_patch_gain = 0.6576
+  letter_patch_gain = -0.2895
+
+prefix/diff_slot_same_object:
+  value_patch_gain = 0.5952
+  letter_patch_gain = 0.3510
+
+tail/same_slot_same_target:
+  value_patch_gain = 0.7107
+  letter_patch_gain = -0.8045
+```
+
+GLM4 的 Phase92 结论仍然成立：
+
+```text
+L39 MLP 更像 candidate scoring component，
+不是稳定 choice decision component。
+```
+
+但新增信息是：
+
+```text
+GLM4 的 candidate scoring 更偏 prefix / 上下文侧，
+choice letter 的负向现象受对齐方式影响。
+```
+
+### DeepSeek7B 结果
+
+#### L26 MLP
+
+```text
+tail:
+  value_patch_gain = 0.1364
+  letter_patch_gain = -0.8177
+
+prefix:
+  value_patch_gain = 0.3046
+  letter_patch_gain = -0.7961
+
+both:
+  value_patch_gain = 0.2319
+  letter_patch_gain = -0.7704
+```
+
+关键 donor 条件：
+
+```text
+tail/same_slot_same_target:
+  value_patch_gain = 0.3270
+
+prefix/same_slot_same_target:
+  value_patch_gain = 0.6131
+
+both/same_slot_same_target:
+  value_patch_gain = 0.5555
+
+tail/same_slot_diff_target:
+  value_patch_gain = -0.4715
+
+prefix/same_slot_diff_target:
+  value_patch_gain = 0.0725
+
+both/same_slot_diff_target:
+  value_patch_gain = -0.1937
+```
+
+观察：
+
+```text
+L26 MLP 对 value margin 的支持在 prefix/both 下更强。
+same_slot_same_target 稳定有效。
+same_slot_diff_target 的负向破坏在 tail 最强，prefix 下被削弱。
+```
+
+这说明：
+
+```text
+DS7B L26 MLP 的 value/object-target support 不是纯后缀接口，
+但 wrong target 破坏效应对对齐方式敏感。
+```
+
+#### L27 attention
+
+```text
+tail:
+  value_patch_gain = -0.2077
+  letter_patch_gain = 0.8019
+
+prefix:
+  value_patch_gain = -0.2425
+  letter_patch_gain = 0.7345
+
+both:
+  value_patch_gain = -0.2077
+  letter_patch_gain = 0.8019
+```
+
+关键 donor 条件：
+
+```text
+tail/same_slot_same_target:
+  letter_patch_gain = 0.8473
+
+prefix/same_slot_same_target:
+  letter_patch_gain = 0.8358
+
+both/same_slot_same_target:
+  letter_patch_gain = 0.8473
+```
+
+观察：
+
+```text
+L27 attention 的 letter/output interface 在三种对齐中都稳定。
+```
+
+这比 Phase92 更稳：
+
+```text
+DS7B L27 attention 确实是强 letter/output interface，
+不是 tail 对齐造成的假象。
+```
+
+### 对附件分析的判断
+
+附件对 Phase92 的分析基本正确：
+
+```text
+Phase92 证明部分组件输出可跨样本迁移，
+但迁移内容不是纯 target value，
+而是 slot/interface/target/object 混合的条件化组件状态。
+```
+
+附件指出的硬伤也正确：
+
+```text
+tail 对齐可能导致后缀接口假象。
+```
+
+Phase93 的结果表明：
+
+```text
+这个硬伤被部分排除。
+```
+
+因为关键现象在 prefix/both 下仍然存在，尤其是：
+
+```text
+Qwen3 L6 MLP 的 slot/interface 支持；
+Qwen3 L24 attention 的 target-sensitive letter interface；
+DS7B L27 attention 的 letter/output interface。
+```
+
+### 当前最稳结论
+
+可以进一步稳定地说：
+
+```text
+1. Qwen3 L6 MLP 是跨位置可迁移的 slot/interface computation support。
+2. Qwen3 L24 attention 是 target-sensitive choice interface，且不是 tail-only。
+3. GLM4 L39 MLP 是 candidate scoring component，choice interface 分离仍成立。
+4. DeepSeek7B L26 MLP 是 value/object-target support，prefix/both 更强。
+5. DeepSeek7B L27 attention 是稳定 letter/output interface。
+```
+
+不能说：
+
+```text
+已经完成抽象变量闭包；
+整组件移植等于变量移植；
+prefix/both 有效就说明找到了数学结构本体；
+这些对象-槽位 reader 结果可以直接推广到全部语言能力。
+```
+
+### 硬伤
+
+1. 本轮仍是整组件输出移植，不是子空间移植。
+2. prefix/both 虽然排除了 tail-only，但仍没有 token-level 精细对齐。
+3. self_restore 是同输入恢复，跨样本 donor 仍混入 object、slot、target、template 多因素。
+4. DS7B 首次运行中出现一次 segmentation fault，虽已恢复完成，但工程稳定性仍需记录。
+5. 本轮仍没有 generation，只是 full-sequence margin。
+
+### 下一步
+
+Phase94 必须进入 subspace transplant：
+
+```text
+不再移植整个 component output，
+而是学习/构造若干低维子空间：
+
+slot/interface subspace
+target/value subspace
+object/context subspace
+choice-letter/output subspace
+remainder
+```
+
+优先节点：
+
+```text
+Qwen3 L6 MLP：
+拆 slot/interface 与 target/value。
+
+Qwen3 L24 attention：
+拆 target-specific letter interface。
+
+DeepSeek7B L27 attention：
+拆 output-format 与 target semantic。
+
+GLM4 L39 MLP：
+拆 candidate scoring 与 choice decision 分离。
+```
+
+Phase95 再考虑跨功能迁移：
+
+```text
+object-slot reader
+translation
+logical relation
+temporal order
+active/passive
+coreference
+```
+
+目前最重要的突破口不是再扩大功能库，而是把当前 reader 任务中的：
+
+```text
+component-level transferable state
+```
+
+拆成：
+
+```text
+factor-level transferable subspace
+```
+
+这一步才真正接近语言编码机制中的“条件化关系因子”。
