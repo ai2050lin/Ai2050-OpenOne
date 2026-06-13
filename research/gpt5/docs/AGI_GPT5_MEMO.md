@@ -34292,3 +34292,500 @@ Qwen3 将得到第一个 choice interface 层面的闭包证据。
 ```text
 head 29/31 是强 route 节点，但必须与其他 head/residual/MLP 共同构成闭包。
 ```
+
+## Phase 100: Head Route Restore and Source Attribution [2026-06-13 01:49]
+
+### 本轮任务
+
+根据 Phase98/99 的结论继续完成：
+
+```text
+1. 对 Qwen3 L24 head 29/31 做真正 restore 测试。
+2. 对 GLM4 L39 和 DS7B L27 做同样 head-set restore 对照。
+3. 对候选 head 做 source attention attribution。
+4. 同时观察 value margin 和 letter margin，继续验证 value route 与 choice/letter route 是否分离。
+```
+
+核心问题：
+
+```text
+Qwen3 head 29/31 是否只是强可劫持节点，
+还是能在 transplant_all 破坏后恢复 letter 接口？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase100_head_route_restore_source.py
+tests/gpt5/phase100_head_route_restore_source_summary.py
+tests/gpt5/run_phase100_head_route_restore_source_full.sh
+```
+
+### 测试设计
+
+本轮区分两类测试：
+
+```text
+主干 restore 测试：
+  使用 sdpa，210 items，三模型顺序运行。
+
+source attention attribution：
+  使用 eager，60 items，三模型顺序补写 source_attention。
+```
+
+之所以拆开：
+
+```text
+sdpa 不返回 output_attentions。
+eager 可以返回 attention，但全量 restore 若都用 eager 会非常慢。
+```
+
+主干条件：
+
+```text
+zero_all:
+  清零读出位置所有 head。
+
+transplant_all:
+  把错误目标 donor 的所有 head 移植到读出位置。
+
+zero_heads:
+  只清零候选 head set。
+
+transplant_heads:
+  只移植候选 head set。
+
+zero_all_restore_clean_heads:
+  先清零所有 head，再恢复候选 head 的 clean 状态。
+
+transplant_all_restore_clean_heads:
+  先把所有 head 替换成错误目标 donor，
+  再只恢复候选 head 的 clean 状态。
+```
+
+最关键条件：
+
+```text
+transplant_all_restore_clean_heads
+```
+
+判据：
+
+```text
+如果 transplant_all 使 letter 崩溃，
+而 transplant_all_restore_clean_heads 能恢复 letter，
+说明候选 head set 不只是可劫持节点，
+而是对 choice/letter interface 有恢复能力。
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+python tests/gpt5/phase100_head_route_restore_source.py qwen3 \
+  --layer 24 \
+  --head-sets 'single29=29;pair2931=29,31' \
+  --max-items 2 \
+  --source-attn-items 1 \
+  --positions prompt_tail \
+  --output-dir results/gpt5_phase100_smoke \
+  --progress-every 1 \
+  --hard-exit-after-model
+
+python tests/gpt5/phase100_head_route_restore_source.py qwen3 \
+  --layer 24 \
+  --head-sets 'single29=29;pair2931=29,31' \
+  --max-items 2 \
+  --source-attn-items 1 \
+  --positions prompt_tail \
+  --output-dir results/gpt5_phase100_smoke \
+  --attn-implementations eager \
+  --source-only \
+  --hard-exit-after-model
+```
+
+全量：
+
+```bash
+chmod +x tests/gpt5/run_phase100_head_route_restore_source_full.sh
+tests/gpt5/run_phase100_head_route_restore_source_full.sh
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase100_head_route_restore_source_summary.py \
+  --output-dir results/gpt5_phase100_head_route_restore_source_full_20260612_221206
+```
+
+### 数据规模
+
+结果目录：
+
+```text
+results/gpt5_phase100_head_route_restore_source_full_20260612_221206
+```
+
+总量：
+
+```text
+total_rows = 22680
+total_bad_numeric_rows = 0
+```
+
+分模型：
+
+```text
+Qwen3:
+  rows = 7560
+  source_attention_items = 60
+  bad_numeric_rows = 0
+
+GLM4:
+  rows = 7560
+  source_attention_items = 60
+  bad_numeric_rows = 0
+
+DeepSeek7B:
+  rows = 7560
+  source_attention_items = 60
+  bad_numeric_rows = 0
+```
+
+### 客观结果
+
+#### 1. Qwen3：head 29/31 restore 几乎救回 transplant_all 的 letter 崩溃
+
+破坏条件：
+
+```text
+transplant_all:
+  value_delta = -0.4243
+  letter_delta = -10.2179
+  letter_top1_delta = -0.8262
+```
+
+只移植 head 29/31：
+
+```text
+transplant_heads:pair2931:
+  value_delta = -0.0128
+  letter_delta = -9.6869
+  letter_top1_delta = -0.8024
+```
+
+这复现 Phase99：错误目标劫持主要经过 head 29/31。
+
+关键 restore：
+
+```text
+transplant_all_restore_clean_heads:pair2931:
+  value_delta = -0.4099
+  letter_delta = -0.3054
+  letter_top1_delta = -0.0357
+```
+
+加入 head 28：
+
+```text
+transplant_all_restore_clean_heads:wide282931:
+  value_delta = -0.4449
+  letter_delta = -0.1765
+  letter_top1_delta = -0.0238
+```
+
+对比：
+
+```text
+transplant_all letter_delta:
+  -10.2179
+
+restore head 29/31 后:
+  -0.3054
+
+restore head 28/29/31 后:
+  -0.1765
+```
+
+这说明：
+
+```text
+Qwen3 L24 head 29/31 不只是强必要和强可劫持节点，
+而且在 all-head wrong-target corruption 后，
+能恢复绝大多数 letter interface。
+```
+
+但 value 没有恢复：
+
+```text
+transplant_all_restore_clean_heads:pair2931:
+  value_delta = -0.4099
+```
+
+也就是说：
+
+```text
+head 29/31 restore 主要恢复 letter/choice interface，
+不恢复 value factor。
+```
+
+这进一步证实：
+
+```text
+value route 和 choice/letter route 是分离结构。
+```
+
+zero_all restore：
+
+```text
+zero_all:
+  letter_delta = -4.3128
+
+zero_all_restore_clean_heads:pair2931:
+  letter_delta = -1.7494
+
+zero_all_restore_clean_heads:wide282931:
+  letter_delta = -0.8241
+```
+
+这说明在完全清零所有 head 后，恢复 head 29/31 只能部分救回；加入 head 28 更好，但仍不等于 clean。也就是说 head 29/31 是 choice interface 的核心，但不是完整 attention 输出充分条件。
+
+#### 2. Qwen3 source attention：head 29/31 主要读 letter label，不是 object/relation
+
+source attribution 结果：
+
+```text
+H29 -> letter_label:
+  attention = 0.690976
+
+H31 -> letter_label:
+  attention = 0.453401
+
+H31 -> readout_tail:
+  attention = 0.186336
+
+H31 -> distractor_option:
+  attention = 0.184171
+
+H28 -> distractor_option:
+  attention = 0.260342
+
+H28 -> letter_label:
+  attention = 0.251471
+```
+
+这说明 Qwen3 L24 head 29/31 主要不是直接读取 object / relation，而是强烈读取选项字母标签和输出格式区域。
+
+因此它们更准确的定位是：
+
+```text
+letter-label / choice-format interface heads
+```
+
+而不是：
+
+```text
+semantic value heads
+```
+
+#### 3. GLM4：attention restore 不构成主要机制
+
+核心条件：
+
+```text
+transplant_all:
+  value_delta = -0.0755
+  letter_delta = -0.0357
+
+transplant_all_restore_clean_heads:pair3117:
+  value_delta = -0.0661
+  letter_delta = -0.0071
+
+transplant_all_restore_clean_heads:wide311720:
+  value_delta = -0.0565
+  letter_delta = +0.0083
+```
+
+GLM4 的 attention 本身破坏很小，restore 也很小。source attention 显示：
+
+```text
+H17 -> readout_tail:
+  attention = 0.999561
+
+H31 -> readout_tail:
+  attention = 0.993748
+
+H20 -> readout_tail:
+  attention = 0.986995
+```
+
+这说明 GLM4 L39 attention heads 几乎是读出位置自环或局部保持，不是 Qwen3 那种读取 letter label 的 choice interface。
+
+#### 4. DeepSeek7B：restore 不强，source 分散在 option/tail
+
+核心条件：
+
+```text
+transplant_all:
+  value_delta = -0.0121
+  letter_delta = -0.0997
+
+transplant_all_restore_clean_heads:pair2126:
+  value_delta = -0.0361
+  letter_delta = -0.0902
+
+transplant_all_restore_clean_heads:wide212609:
+  value_delta = -0.0543
+  letter_delta = -0.0929
+```
+
+因为 DS7B 的 transplant_all 本身就很弱，所以 restore 不能证明强 choice interface。
+
+source attention：
+
+```text
+H21 -> distractor_option:
+  attention = 0.336774
+
+H21 -> letter_label:
+  attention = 0.268165
+
+H26 -> readout_tail:
+  attention = 0.317012
+
+H9 -> readout_tail:
+  attention = 0.300458
+
+H9 -> distractor_option:
+  attention = 0.284884
+```
+
+DS7B 存在 option/tail 相关读取，但没有形成 Qwen3 那样可由 head restore 闭合的 letter interface。
+
+### 本轮关键进展
+
+1. Qwen3 L24 head 29/31 获得了真正的 restore 证据：
+
+```text
+transplant_all:
+  letter_delta = -10.2179
+
+restore head 29/31:
+  letter_delta = -0.3054
+```
+
+2. Qwen3 head 29/31 restore 不恢复 value：
+
+```text
+value_delta = -0.4099
+```
+
+这证明它们更像 choice/letter interface，而不是 semantic value factor。
+
+3. Qwen3 source attribution 显示 head 29/31 主要读取 letter_label，说明它们是输出格式接口头。
+
+4. GLM4 的 L39 heads 主要 readout_tail self-loop，不是 choice interface。
+
+5. DS7B 的 L27 heads 有 option/tail 注意力，但缺少可恢复的强 letter route。
+
+### 问题和硬伤
+
+1. Qwen3 restore 是 scoring-level closure，还不是 generation-level closure。
+2. source attribution 的标签是规则化粗分类，尚未逐 token 人工审查。
+3. Qwen3 的 value route 仍未定位；head 29/31 只解释 letter/choice。
+4. zero_all_restore_clean_heads 仍不能完全恢复，说明完整 attention 输出还有其他辅助 head。
+5. 还没有把上游 value factor 如何进入 choice interface 串起来。
+6. GLM4 / DS7B 的机制仍未闭合，只排除了同构的 Qwen3-style head-local choice interface。
+
+### 理论进展
+
+本轮把输出机制进一步拆成三层：
+
+```text
+1. semantic value factor:
+   决定候选内容是否正确。
+
+2. choice/letter interface:
+   把当前候选映射到 A/B/C/D 或格式标签。
+
+3. generation/output policy:
+   把格式标签实际生成出来。
+```
+
+Qwen3 L24 head 29/31 属于第 2 层：
+
+```text
+choice/letter interface
+```
+
+而不是第 1 层：
+
+```text
+semantic value factor
+```
+
+条件化关系因子动力学公式继续细化为：
+
+```text
+h_l(t_readout, x)
+= Base_l
++ ValuePath_l(object, relation, target)
++ ChoiceFormatHeads_l(letter_label, option_block, task_format)
++ Bridge_l(value -> choice)
++ ResidualCarry_l
++ U_l
+```
+
+本轮已经较强确认：
+
+```text
+ChoiceFormatHeads_l
+```
+
+在 Qwen3 中具体包含：
+
+```text
+L24 head 29/31
+```
+
+但仍未定位：
+
+```text
+ValuePath_l
+Bridge_l(value -> choice)
+```
+
+中文解释：
+
+```text
+模型不是直接从语义值生成字母答案。
+它先有候选值评分路径，再通过格式接口路径映射到字母输出。
+Qwen3 的 L24 head 29/31 主要负责后者。
+```
+
+### 下一步
+
+Phase101 应做：
+
+```text
+Value-to-Choice Bridge Mapping
+```
+
+目标：
+
+```text
+1. 在 Qwen3 中追踪 value factor 如何进入 L24 head 29/31 的 choice interface。
+2. 重点连接 Phase96 的 L6 MLP rank/pool value factor 与 Phase100 的 L24 head 29/31 letter interface。
+3. 做 L6 MLP value destroy + L24 head 29/31 restore，测试是否能救 letter。
+4. 做 L6 clean restore + L24 wrong head transplant，测试 value 正确但 choice 错误是否分离。
+5. 对 GLM4 和 DS7B 做同样对照，判断它们是否缺少显式 Bridge_l，或桥接发生在 MLP/residual 输出接口。
+```
+
+如果成功，将得到：
+
+```text
+value path -> choice interface
+```
+
+之间的第一条跨层桥接证据。
