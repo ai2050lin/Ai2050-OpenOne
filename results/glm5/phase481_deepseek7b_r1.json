@@ -1,0 +1,3393 @@
+{
+  "phase": 481,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-13 14:11:30",
+  "core_question": "Can auto-neighbor selection, holdout validation, and DS7B layer scan improve category boundary residuals?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp3_ds7b_layer_scan": {
+    "layer_results": {
+      "L16_fruit_s1.0": {
+        "layer": 16,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.7017171253911447,
+        "target_dcf_delta": -0.9623916149139404,
+        "dcf_delta": {
+          "fruit": -0.9623916149139404,
+          "animal": -1.070396214723587,
+          "tool": -0.5173262357711792,
+          "vehicle": -0.2700755198796587,
+          "clothing": -0.5059161186218262,
+          "furniture": 0.03091299533843994,
+          "food": -1.3614808718363443,
+          "plant": -0.12116831541061401
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 59.94602966308594,
+        "raw_norm": 210.54214477539062,
+        "norm_ratio": 0.284722238779068
+      },
+      "L16_fruit_s0.5": {
+        "layer": 16,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.6935524856919748,
+        "target_dcf_delta": -0.48236411809921265,
+        "dcf_delta": {
+          "fruit": -0.48236411809921265,
+          "animal": -0.5370489358901978,
+          "tool": -0.2638411521911621,
+          "vehicle": -0.1320629119873047,
+          "clothing": -0.25928616523742676,
+          "furniture": 0.007326245307922363,
+          "food": -0.6854976415634151,
+          "plant": -0.06478750705718994
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 59.94602966308594,
+        "raw_norm": 210.54214477539062,
+        "norm_ratio": 0.284722238779068
+      },
+      "L16_fruit_s0.3": {
+        "layer": 16,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.6818592149536312,
+        "target_dcf_delta": -0.27492669224739075,
+        "dcf_delta": {
+          "fruit": -0.27492669224739075,
+          "animal": -0.3037069837252302,
+          "tool": -0.1432584524154663,
+          "vehicle": -0.06252447764078761,
+          "clothing": -0.13847041130065918,
+          "furniture": 0.027063608169555664,
+          "food": -0.3932015498479209,
+          "plant": -0.02669888734817505
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 59.94602966308594,
+        "raw_norm": 210.54214477539062,
+        "norm_ratio": 0.284722238779068
+      },
+      "L16_clothing_s1.0": {
+        "layer": 16,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.7745139519817238,
+        "target_dcf_delta": 0.5034723281860352,
+        "dcf_delta": {
+          "fruit": 0.640049397945404,
+          "animal": 0.4717538754145303,
+          "tool": 0.40919196605682373,
+          "vehicle": 0.5031793117523193,
+          "clothing": 0.5034723281860352,
+          "furniture": 0.37807464599609375,
+          "food": 0.6058351198832188,
+          "plant": 0.16258645057678223
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 54.72046661376953,
+        "raw_norm": 207.86878967285156,
+        "norm_ratio": 0.26324522495269775
+      },
+      "L16_clothing_s0.5": {
+        "layer": 16,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.7170887908180401,
+        "target_dcf_delta": 0.20902252197265625,
+        "dcf_delta": {
+          "fruit": 0.2814876437187195,
+          "animal": 0.19529473781585782,
+          "tool": 0.16628599166870117,
+          "vehicle": 0.22007918357849077,
+          "clothing": 0.20902252197265625,
+          "furniture": 0.13482093811035156,
+          "food": 0.26675430933634425,
+          "plant": 0.05374705791473389
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 54.72046661376953,
+        "raw_norm": 207.86878967285156,
+        "norm_ratio": 0.26324522495269775
+      },
+      "L16_clothing_s0.3": {
+        "layer": 16,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.7387349313217253,
+        "target_dcf_delta": 0.12389135360717773,
+        "dcf_delta": {
+          "fruit": 0.15770745277404785,
+          "animal": 0.10246872901916504,
+          "tool": 0.08826464414596558,
+          "vehicle": 0.12334847450256348,
+          "clothing": 0.12389135360717773,
+          "furniture": 0.06819891929626465,
+          "food": 0.15068483352661088,
+          "plant": 0.022236347198486328
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 54.72046661376953,
+        "raw_norm": 207.86878967285156,
+        "norm_ratio": 0.26324522495269775
+      },
+      "L16_vehicle_s1.0": {
+        "layer": 16,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.2704071513101496,
+        "target_dcf_delta": 1.3269197146097818,
+        "dcf_delta": {
+          "fruit": -1.0344838201999664,
+          "animal": -0.5962759653727217,
+          "tool": -0.12832534313201904,
+          "vehicle": 1.3269197146097818,
+          "clothing": -0.02724289894104004,
+          "furniture": -0.557178258895874,
+          "food": -0.6147694985071821,
+          "plant": 0.06635743379592896
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 63.54157257080078,
+        "raw_norm": 205.50106811523438,
+        "norm_ratio": 0.3092031180858612
+      },
+      "L16_vehicle_s0.5": {
+        "layer": 16,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.2633716840274174,
+        "target_dcf_delta": 0.6655677556991577,
+        "dcf_delta": {
+          "fruit": -0.516818642616272,
+          "animal": -0.29620442787806134,
+          "tool": -0.06514927744865417,
+          "vehicle": 0.6655677556991577,
+          "clothing": -0.024918317794799805,
+          "furniture": -0.28491294384002686,
+          "food": -0.3099634647369385,
+          "plant": 0.03174424171447754
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 63.54157257080078,
+        "raw_norm": 205.50106811523438,
+        "norm_ratio": 0.3092031180858612
+      },
+      "L16_vehicle_s0.3": {
+        "layer": 16,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.2719922030438169,
+        "target_dcf_delta": 0.40419745445251465,
+        "dcf_delta": {
+          "fruit": -0.30776724219322205,
+          "animal": -0.173027952512105,
+          "tool": -0.03561696410179138,
+          "vehicle": 0.40419745445251465,
+          "clothing": -0.0039327144622802734,
+          "furniture": -0.16153132915496826,
+          "food": -0.17933102448781346,
+          "plant": 0.02556753158569336
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 63.54157257080078,
+        "raw_norm": 205.50106811523438,
+        "norm_ratio": 0.3092031180858612
+      },
+      "L17_fruit_s1.0": {
+        "layer": 17,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.47391163691669347,
+        "target_dcf_delta": -0.739803671836853,
+        "dcf_delta": {
+          "fruit": -0.739803671836853,
+          "animal": -0.7502066195011134,
+          "tool": -0.6985875368118286,
+          "vehicle": -0.13704268137613917,
+          "clothing": 0.25113868713378906,
+          "furniture": 0.6661698818206787,
+          "food": -1.5510582526524863,
+          "plant": -0.7398086190223694
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 62.76204299926758,
+        "raw_norm": 230.6559600830078,
+        "norm_ratio": 0.272102415561676
+      },
+      "L17_fruit_s0.5": {
+        "layer": 17,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.46620001166202346,
+        "target_dcf_delta": -0.3617205023765564,
+        "dcf_delta": {
+          "fruit": -0.3617205023765564,
+          "animal": -0.3747362295786534,
+          "tool": -0.3485279083251953,
+          "vehicle": -0.07102080186208104,
+          "clothing": 0.13579845428466797,
+          "furniture": 0.3354921340942383,
+          "food": -0.765891234079997,
+          "plant": -0.36381834745407104
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 62.76204299926758,
+        "raw_norm": 230.6559600830078,
+        "norm_ratio": 0.272102415561676
+      },
+      "L17_fruit_s0.3": {
+        "layer": 17,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.4853647547045467,
+        "target_dcf_delta": -0.2413666844367981,
+        "dcf_delta": {
+          "fruit": -0.2413666844367981,
+          "animal": -0.25390472014745047,
+          "tool": -0.23492306470870972,
+          "vehicle": -0.0640177726745601,
+          "clothing": 0.06284713745117188,
+          "furniture": 0.1673142910003662,
+          "food": -0.4872892697652178,
+          "plant": -0.2354390025138855
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 62.76204299926758,
+        "raw_norm": 230.6559600830078,
+        "norm_ratio": 0.272102415561676
+      },
+      "L17_clothing_s1.0": {
+        "layer": 17,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.05404639902547651,
+        "target_dcf_delta": -0.05076026916503906,
+        "dcf_delta": {
+          "fruit": 0.48641639947891235,
+          "animal": 0.17182091871897365,
+          "tool": 0.23984795808792114,
+          "vehicle": 0.9291979869206748,
+          "clothing": -0.05076026916503906,
+          "furniture": 0.10743474960327148,
+          "food": 0.35207430521647165,
+          "plant": -0.17129117250442505
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 57.9852294921875,
+        "raw_norm": 228.2620849609375,
+        "norm_ratio": 0.25402918457984924
+      },
+      "L17_clothing_s0.5": {
+        "layer": 17,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.02377654077849415,
+        "target_dcf_delta": -0.0119171142578125,
+        "dcf_delta": {
+          "fruit": 0.27693480253219604,
+          "animal": 0.12170771757761623,
+          "tool": 0.15295350551605225,
+          "vehicle": 0.49121312300364206,
+          "clothing": -0.0119171142578125,
+          "furniture": 0.10270047187805176,
+          "food": 0.19971768061319972,
+          "plant": -0.05228906869888306
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 57.9852294921875,
+        "raw_norm": 228.2620849609375,
+        "norm_ratio": 0.25402918457984924
+      },
+      "L17_clothing_s0.3": {
+        "layer": 17,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.03896603908316036,
+        "target_dcf_delta": -0.011265754699707031,
+        "dcf_delta": {
+          "fruit": 0.14799898862838745,
+          "animal": 0.05854682127634625,
+          "tool": 0.07199710607528687,
+          "vehicle": 0.2791172663370771,
+          "clothing": -0.011265754699707031,
+          "furniture": 0.03528618812561035,
+          "food": 0.10579601923624615,
+          "plant": -0.049671709537506104
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 57.9852294921875,
+        "raw_norm": 228.2620849609375,
+        "norm_ratio": 0.25402918457984924
+      },
+      "L17_vehicle_s1.0": {
+        "layer": 17,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 0.78866425256336,
+        "target_dcf_delta": 1.1945165793100996,
+        "dcf_delta": {
+          "fruit": -1.504607230424881,
+          "animal": -0.9337228536605826,
+          "tool": -0.19053810834884644,
+          "vehicle": 1.1945165793100996,
+          "clothing": 0.1661081314086914,
+          "furniture": -0.046853065490722656,
+          "food": -1.2883083820343018,
+          "plant": -0.6065750122070312
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.05323791503906,
+        "raw_norm": 225.03662109375,
+        "norm_ratio": 0.2979658842086792
+      },
+      "L17_vehicle_s0.5": {
+        "layer": 17,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 0.7977805156678899,
+        "target_dcf_delta": 0.6015494664510088,
+        "dcf_delta": {
+          "fruit": -0.744028776884079,
+          "animal": -0.46131678422291955,
+          "tool": -0.0881795883178711,
+          "vehicle": 0.6015494664510088,
+          "clothing": 0.10035514831542969,
+          "furniture": -0.016632556915283203,
+          "food": -0.6414031982421875,
+          "plant": -0.2982257604598999
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.05323791503906,
+        "raw_norm": 225.03662109375,
+        "norm_ratio": 0.2979658842086792
+      },
+      "L17_vehicle_s0.3": {
+        "layer": 17,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 0.8831723151466022,
+        "target_dcf_delta": 0.38406813144683793,
+        "dcf_delta": {
+          "fruit": -0.42487338185310364,
+          "animal": -0.24990884462992247,
+          "tool": -0.02585679292678833,
+          "vehicle": 0.38406813144683793,
+          "clothing": 0.08291101455688477,
+          "furniture": 0.030034542083740234,
+          "food": -0.35544323921203613,
+          "plant": -0.15685385465621948
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.05323791503906,
+        "raw_norm": 225.03662109375,
+        "norm_ratio": 0.2979658842086792
+      },
+      "L18_fruit_s1.0": {
+        "layer": 18,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.49581688453122624,
+        "target_dcf_delta": -0.6701489090919495,
+        "dcf_delta": {
+          "fruit": -0.6701489090919495,
+          "animal": -0.9993685086568194,
+          "tool": -0.9918091297149658,
+          "vehicle": 0.06199026107788086,
+          "clothing": 0.3330559730529785,
+          "furniture": 0.8612799644470215,
+          "food": -1.34160566329956,
+          "plant": -0.7962332963943481
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 63.82901382446289,
+        "raw_norm": 258.4249267578125,
+        "norm_ratio": 0.24699248373508453
+      },
+      "L18_fruit_s0.5": {
+        "layer": 18,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.43940191666786343,
+        "target_dcf_delta": -0.26566922664642334,
+        "dcf_delta": {
+          "fruit": -0.26566922664642334,
+          "animal": -0.42272416750590036,
+          "tool": -0.42724496126174927,
+          "vehicle": 0.09400383631388376,
+          "clothing": 0.2418069839477539,
+          "furniture": 0.5265102386474609,
+          "food": -0.5946155389149981,
+          "plant": -0.3353726863861084
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 63.82901382446289,
+        "raw_norm": 258.4249267578125,
+        "norm_ratio": 0.24699248373508453
+      },
+      "L18_fruit_s0.3": {
+        "layer": 18,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.44170661786272075,
+        "target_dcf_delta": -0.16558164358139038,
+        "dcf_delta": {
+          "fruit": -0.16558164358139038,
+          "animal": -0.25847901900609305,
+          "tool": -0.25571149587631226,
+          "vehicle": 0.05646268526713083,
+          "clothing": 0.1333332061767578,
+          "furniture": 0.3126058578491211,
+          "food": -0.36486792564392134,
+          "plant": -0.20724880695343018
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 63.82901382446289,
+        "raw_norm": 258.4249267578125,
+        "norm_ratio": 0.24699248373508453
+      },
+      "L18_clothing_s1.0": {
+        "layer": 18,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.029944543692753862,
+        "target_dcf_delta": 0.026253700256347656,
+        "dcf_delta": {
+          "fruit": 0.6306096315383911,
+          "animal": 0.25822138786316007,
+          "tool": -0.17521989345550537,
+          "vehicle": 0.8667440414428711,
+          "clothing": 0.026253700256347656,
+          "furniture": -0.19075345993041992,
+          "food": 0.3932934602101641,
+          "plant": -0.15238821506500244
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 58.87400817871094,
+        "raw_norm": 256.5303955078125,
+        "norm_ratio": 0.22950109839439392
+      },
+      "L18_clothing_s0.5": {
+        "layer": 18,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.10657261751058714,
+        "target_dcf_delta": -0.041167259216308594,
+        "dcf_delta": {
+          "fruit": 0.24769926071166992,
+          "animal": 0.06005795796712299,
+          "tool": -0.1569528579711914,
+          "vehicle": 0.3762836456298819,
+          "clothing": -0.041167259216308594,
+          "furniture": -0.19212079048156738,
+          "food": 0.13807026545206735,
+          "plant": -0.12675726413726807
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 58.87400817871094,
+        "raw_norm": 256.5303955078125,
+        "norm_ratio": 0.22950109839439392
+      },
+      "L18_clothing_s0.3": {
+        "layer": 18,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.118341978909237,
+        "target_dcf_delta": -0.027194976806640625,
+        "dcf_delta": {
+          "fruit": 0.14694106578826904,
+          "animal": 0.031109491984049775,
+          "tool": -0.09865808486938477,
+          "vehicle": 0.21979991594950388,
+          "clothing": -0.027194976806640625,
+          "furniture": -0.1171731948852539,
+          "food": 0.07367356618245413,
+          "plant": -0.07832765579223633
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 58.87400817871094,
+        "raw_norm": 256.5303955078125,
+        "norm_ratio": 0.22950109839439392
+      },
+      "L18_vehicle_s1.0": {
+        "layer": 18,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.1554102332887188,
+        "target_dcf_delta": 1.4890094598134347,
+        "dcf_delta": {
+          "fruit": -1.278727948665619,
+          "animal": -0.8254460493723546,
+          "tool": -0.22396159172058105,
+          "vehicle": 1.4890094598134347,
+          "clothing": 0.3570127487182617,
+          "furniture": 0.24314451217651367,
+          "food": -1.263710260391235,
+          "plant": -0.04523301124572754
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 68.25890350341797,
+        "raw_norm": 254.2579345703125,
+        "norm_ratio": 0.26846322417259216
+      },
+      "L18_vehicle_s0.5": {
+        "layer": 18,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 0.9622406901637782,
+        "target_dcf_delta": 0.6883298556009914,
+        "dcf_delta": {
+          "fruit": -0.7053406238555908,
+          "animal": -0.4820876121521005,
+          "tool": -0.17948728799819946,
+          "vehicle": 0.6883298556009914,
+          "clothing": 0.107330322265625,
+          "furniture": 0.01745748519897461,
+          "food": -0.695506413777669,
+          "plant": -0.07281970977783203
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 68.25890350341797,
+        "raw_norm": 254.2579345703125,
+        "norm_ratio": 0.26846322417259216
+      },
+      "L18_vehicle_s0.3": {
+        "layer": 18,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 0.9479633780675356,
+        "target_dcf_delta": 0.4131913979848223,
+        "dcf_delta": {
+          "fruit": -0.4258727431297302,
+          "animal": -0.2914251486460362,
+          "tool": -0.1088988184928894,
+          "vehicle": 0.4131913979848223,
+          "clothing": 0.07339620590209961,
+          "furniture": 0.018874406814575195,
+          "food": -0.41580096880594875,
+          "plant": -0.04142880439758301
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 68.25890350341797,
+        "raw_norm": 254.2579345703125,
+        "norm_ratio": 0.26846322417259216
+      },
+      "L19_fruit_s1.0": {
+        "layer": 19,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.30254549591268326,
+        "target_dcf_delta": -0.4046803116798401,
+        "dcf_delta": {
+          "fruit": -0.4046803116798401,
+          "animal": -0.818874915440877,
+          "tool": -1.2653778791427612,
+          "vehicle": -0.0015045801798496683,
+          "clothing": 0.28475093841552734,
+          "furniture": 0.6406154632568359,
+          "food": -1.327584981918335,
+          "plant": -0.3096785545349121
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 65.61333465576172,
+        "raw_norm": 274.40948486328125,
+        "norm_ratio": 0.2391073852777481
+      },
+      "L19_fruit_s0.5": {
+        "layer": 19,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.30343130196025664,
+        "target_dcf_delta": -0.20468413829803467,
+        "dcf_delta": {
+          "fruit": -0.20468413829803467,
+          "animal": -0.40808876355488977,
+          "tool": -0.6307796239852905,
+          "vehicle": -0.003875414530436494,
+          "clothing": 0.14332151412963867,
+          "furniture": 0.31775665283203125,
+          "food": -0.6645650068918867,
+          "plant": -0.15596961975097656
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 65.61333465576172,
+        "raw_norm": 274.40948486328125,
+        "norm_ratio": 0.2391073852777481
+      },
+      "L19_fruit_s0.3": {
+        "layer": 19,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.3785790180372414,
+        "target_dcf_delta": -0.17376679182052612,
+        "dcf_delta": {
+          "fruit": -0.17376679182052612,
+          "animal": -0.3031642834345494,
+          "tool": -0.43417465686798096,
+          "vehicle": -0.05101402600606253,
+          "clothing": 0.0382685661315918,
+          "furniture": 0.11925625801086426,
+          "food": -0.44899741808573346,
+          "plant": -0.13848376274108887
+        },
+        "auto_neighbors": [
+          "plant",
+          "animal"
+        ],
+        "spec_norm": 65.61333465576172,
+        "raw_norm": 274.40948486328125,
+        "norm_ratio": 0.2391073852777481
+      },
+      "L19_clothing_s1.0": {
+        "layer": 19,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.27861198977051876,
+        "target_dcf_delta": 0.20238733291625977,
+        "dcf_delta": {
+          "fruit": 0.3098188638687134,
+          "animal": 0.2988395690917969,
+          "tool": -0.35981154441833496,
+          "vehicle": 0.7164128621419268,
+          "clothing": 0.20238733291625977,
+          "furniture": -0.23288464546203613,
+          "food": 0.4406309127807617,
+          "plant": -0.008482694625854492
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 60.66735076904297,
+        "raw_norm": 275.81622314453125,
+        "norm_ratio": 0.2199556976556778
+      },
+      "L19_clothing_s0.5": {
+        "layer": 19,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.23577199290294729,
+        "target_dcf_delta": 0.08621931076049805,
+        "dcf_delta": {
+          "fruit": 0.14928066730499268,
+          "animal": 0.14963642756144147,
+          "tool": -0.18621349334716797,
+          "vehicle": 0.35568936665852924,
+          "clothing": 0.08621931076049805,
+          "furniture": -0.11824750900268555,
+          "food": 0.2188421885172529,
+          "plant": -0.007468461990356445
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 60.66735076904297,
+        "raw_norm": 275.81622314453125,
+        "norm_ratio": 0.2199556976556778
+      },
+      "L19_clothing_s0.3": {
+        "layer": 19,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.04445052277791953,
+        "target_dcf_delta": 0.007823467254638672,
+        "dcf_delta": {
+          "fruit": 0.039687275886535645,
+          "animal": 0.030704895655313535,
+          "tool": -0.16600394248962402,
+          "vehicle": 0.16507689158121686,
+          "clothing": 0.007823467254638672,
+          "furniture": -0.14803481101989746,
+          "food": 0.08171860376993845,
+          "plant": -0.0399019718170166
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 60.66735076904297,
+        "raw_norm": 275.81622314453125,
+        "norm_ratio": 0.2199556976556778
+      },
+      "L19_vehicle_s1.0": {
+        "layer": 19,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.6779380617252493,
+        "target_dcf_delta": 1.7589657306671143,
+        "dcf_delta": {
+          "fruit": -0.722854733467102,
+          "animal": 0.08574549357096384,
+          "tool": 0.45374178886413574,
+          "vehicle": 1.7589657306671143,
+          "clothing": 0.7874698638916016,
+          "furniture": 1.038290023803711,
+          "food": -0.5241785049438468,
+          "plant": 0.13780808448791504
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 69.14214324951172,
+        "raw_norm": 276.7707214355469,
+        "norm_ratio": 0.2498174011707306
+      },
+      "L19_vehicle_s0.5": {
+        "layer": 19,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.8395245177378339,
+        "target_dcf_delta": 0.8152209122975673,
+        "dcf_delta": {
+          "fruit": -0.42719072103500366,
+          "animal": -0.03646198908487985,
+          "tool": 0.153961181640625,
+          "vehicle": 0.8152209122975673,
+          "clothing": 0.33961963653564453,
+          "furniture": 0.4331693649291992,
+          "food": -0.3232717514038086,
+          "plant": 0.012488842010498047
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 69.14214324951172,
+        "raw_norm": 276.7707214355469,
+        "norm_ratio": 0.2498174011707306
+      },
+      "L19_vehicle_s0.3": {
+        "layer": 19,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.6170902540546839,
+        "target_dcf_delta": 0.5448254744211836,
+        "dcf_delta": {
+          "fruit": -0.20418161153793335,
+          "animal": 0.04390517870585242,
+          "tool": 0.14722728729248047,
+          "vehicle": 0.5448254744211836,
+          "clothing": 0.23081541061401367,
+          "furniture": 0.3269171714782715,
+          "food": -0.14247798919677734,
+          "plant": 0.05565166473388672
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 69.14214324951172,
+        "raw_norm": 276.7707214355469,
+        "norm_ratio": 0.2498174011707306
+      },
+      "L20_fruit_s1.0": {
+        "layer": 20,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.07092785500202846,
+        "target_dcf_delta": -0.08812499046325684,
+        "dcf_delta": {
+          "fruit": -0.08812499046325684,
+          "animal": -0.6578595638275146,
+          "tool": -0.9510596990585327,
+          "vehicle": -0.4030002752939845,
+          "clothing": -0.10851192474365234,
+          "furniture": 1.232459545135498,
+          "food": -0.7759952545166025,
+          "plant": 0.5851621627807617
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 74.18834686279297,
+        "raw_norm": 344.43853759765625,
+        "norm_ratio": 0.215389221906662
+      },
+      "L20_fruit_s0.5": {
+        "layer": 20,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.06026813064289795,
+        "target_dcf_delta": -0.038221120834350586,
+        "dcf_delta": {
+          "fruit": -0.038221120834350586,
+          "animal": -0.3306101163228359,
+          "tool": -0.47199296951293945,
+          "vehicle": -0.2065591017405186,
+          "clothing": -0.03146076202392578,
+          "furniture": 0.6241846084594727,
+          "food": -0.3750451405843096,
+          "plant": 0.2999110221862793
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 74.18834686279297,
+        "raw_norm": 344.43853759765625,
+        "norm_ratio": 0.215389221906662
+      },
+      "L20_fruit_s0.3": {
+        "layer": 20,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.05703383360337271,
+        "target_dcf_delta": -0.021727323532104492,
+        "dcf_delta": {
+          "fruit": -0.021727323532104492,
+          "animal": -0.19367202123006244,
+          "tool": -0.2834376096725464,
+          "vehicle": -0.1168816884358721,
+          "clothing": -0.027131080627441406,
+          "furniture": 0.3709549903869629,
+          "food": -0.22565841674804776,
+          "plant": 0.18197059631347656
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 74.18834686279297,
+        "raw_norm": 344.43853759765625,
+        "norm_ratio": 0.215389221906662
+      },
+      "L20_clothing_s1.0": {
+        "layer": 20,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.3069794429087868,
+        "target_dcf_delta": 0.4305610656738281,
+        "dcf_delta": {
+          "fruit": -0.04677081108093262,
+          "animal": 0.31853278477986535,
+          "tool": -0.610592246055603,
+          "vehicle": 1.39257295926412,
+          "clothing": 0.4305610656738281,
+          "furniture": -0.11978435516357422,
+          "food": -0.2642474174499503,
+          "plant": -0.513617753982544
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.38653564453125,
+        "raw_norm": 343.77874755859375,
+        "norm_ratio": 0.19601716101169586
+      },
+      "L20_clothing_s0.5": {
+        "layer": 20,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.3185537168990372,
+        "target_dcf_delta": 0.2257099151611328,
+        "dcf_delta": {
+          "fruit": -0.020853161811828613,
+          "animal": 0.161434014638262,
+          "tool": -0.30617427825927734,
+          "vehicle": 0.6985458532969169,
+          "clothing": 0.2257099151611328,
+          "furniture": -0.0570073127746582,
+          "food": -0.13290055592854788,
+          "plant": -0.2487468719482422
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.38653564453125,
+        "raw_norm": 343.77874755859375,
+        "norm_ratio": 0.19601716101169586
+      },
+      "L20_clothing_s0.3": {
+        "layer": 20,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.22727880909414824,
+        "target_dcf_delta": 0.08766651153564453,
+        "dcf_delta": {
+          "fruit": -0.06457388401031494,
+          "animal": 0.03586451212564867,
+          "tool": -0.23575174808502197,
+          "vehicle": 0.3757223288218192,
+          "clothing": 0.08766651153564453,
+          "furniture": -0.09820270538330078,
+          "food": -0.13089386622110943,
+          "plant": -0.19910764694213867
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 67.38653564453125,
+        "raw_norm": 343.77874755859375,
+        "norm_ratio": 0.19601716101169586
+      },
+      "L20_vehicle_s1.0": {
+        "layer": 20,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.5276549396302457,
+        "target_dcf_delta": 2.1261636416117344,
+        "dcf_delta": {
+          "fruit": -0.6425981521606445,
+          "animal": 0.47036409378051935,
+          "tool": 1.3817826509475708,
+          "vehicle": 2.1261636416117344,
+          "clothing": 0.3910646438598633,
+          "furniture": 1.3456177711486816,
+          "food": -0.9202028910319004,
+          "plant": -0.1267528533935547
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 77.68041229248047,
+        "raw_norm": 348.175048828125,
+        "norm_ratio": 0.22310735285282135
+      },
+      "L20_vehicle_s0.5": {
+        "layer": 20,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.5863505599478538,
+        "target_dcf_delta": 1.001601696014406,
+        "dcf_delta": {
+          "fruit": -0.39187777042388916,
+          "animal": 0.16053740183512488,
+          "tool": 0.6213873624801636,
+          "vehicle": 1.001601696014406,
+          "clothing": 0.12913227081298828,
+          "furniture": 0.5782761573791504,
+          "food": -0.5233893394470215,
+          "plant": -0.1237800121307373
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 77.68041229248047,
+        "raw_norm": 348.175048828125,
+        "norm_ratio": 0.22310735285282135
+      },
+      "L20_vehicle_s0.3": {
+        "layer": 20,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.6161673443773286,
+        "target_dcf_delta": 0.5799976984659825,
+        "dcf_delta": {
+          "fruit": -0.25773680210113525,
+          "animal": 0.06587394078572473,
+          "tool": 0.3488723039627075,
+          "vehicle": 0.5799976984659825,
+          "clothing": 0.05087566375732422,
+          "furniture": 0.32018041610717773,
+          "food": -0.33962059020996005,
+          "plant": -0.09084606170654297
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 77.68041229248047,
+        "raw_norm": 348.175048828125,
+        "norm_ratio": 0.22310735285282135
+      },
+      "L21_fruit_s1.0": {
+        "layer": 21,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 0.8683769000188719,
+        "target_dcf_delta": 1.5207972526550293,
+        "dcf_delta": {
+          "fruit": 1.5207972526550293,
+          "animal": 0.08717052141825476,
+          "tool": -0.7160567045211792,
+          "vehicle": -0.2532441616058332,
+          "clothing": 1.3300294876098633,
+          "furniture": 1.7413101196289062,
+          "food": -0.5931755701700832,
+          "plant": 1.1385602951049805
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 84.91714477539062,
+        "raw_norm": 383.523193359375,
+        "norm_ratio": 0.22141332924365997
+      },
+      "L21_fruit_s0.5": {
+        "layer": 21,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 0.8585278470440577,
+        "target_dcf_delta": 0.7971160411834717,
+        "dcf_delta": {
+          "fruit": 0.7971160411834717,
+          "animal": 0.0798002084096261,
+          "tool": -0.32701945304870605,
+          "vehicle": -0.10069163640339873,
+          "clothing": 0.6926116943359375,
+          "furniture": 0.9184684753417969,
+          "food": -0.2634147008260097,
+          "plant": 0.6053609848022461
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 84.91714477539062,
+        "raw_norm": 383.523193359375,
+        "norm_ratio": 0.22141332924365997
+      },
+      "L21_fruit_s0.3": {
+        "layer": 21,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 0.8522433495853661,
+        "target_dcf_delta": 0.4781813621520996,
+        "dcf_delta": {
+          "fruit": 0.4781813621520996,
+          "animal": 0.05563672383626361,
+          "tool": -0.19176065921783447,
+          "vehicle": -0.05744099617004217,
+          "clothing": 0.4176473617553711,
+          "furniture": 0.5510854721069336,
+          "food": -0.15606991449991803,
+          "plant": 0.3551502227783203
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 84.91714477539062,
+        "raw_norm": 383.523193359375,
+        "norm_ratio": 0.22141332924365997
+      },
+      "L21_clothing_s1.0": {
+        "layer": 21,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.7537712612818916,
+        "target_dcf_delta": 1.0655860900878906,
+        "dcf_delta": {
+          "fruit": 0.6511685848236084,
+          "animal": 0.9760209719340036,
+          "tool": -0.2567650079727173,
+          "vehicle": 1.4036730130513533,
+          "clothing": 1.0655860900878906,
+          "furniture": -1.1718802452087402,
+          "food": 0.5741370519002285,
+          "plant": -0.9402105808258057
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 78.30826568603516,
+        "raw_norm": 384.9471130371094,
+        "norm_ratio": 0.2034260332584381
+      },
+      "L21_clothing_s0.5": {
+        "layer": 21,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.7698380003567885,
+        "target_dcf_delta": 0.5935583114624023,
+        "dcf_delta": {
+          "fruit": 0.3946540355682373,
+          "animal": 0.555390357971195,
+          "tool": -0.0603179931640625,
+          "vehicle": 0.7610171635945644,
+          "clothing": 0.5935583114624023,
+          "furniture": -0.49812936782836914,
+          "food": 0.34073416392008404,
+          "plant": -0.41849851608276367
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 78.30826568603516,
+        "raw_norm": 384.9471130371094,
+        "norm_ratio": 0.2034260332584381
+      },
+      "L21_clothing_s0.3": {
+        "layer": 21,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.7449298109249872,
+        "target_dcf_delta": 0.3779582977294922,
+        "dcf_delta": {
+          "fruit": 0.2791252136230469,
+          "animal": 0.3804699579874704,
+          "tool": 0.008874177932739258,
+          "vehicle": 0.4973743756612148,
+          "clothing": 0.3779582977294922,
+          "furniture": -0.24040985107421875,
+          "food": 0.24453385670979877,
+          "plant": -0.21316790580749512
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 78.30826568603516,
+        "raw_norm": 384.9471130371094,
+        "norm_ratio": 0.2034260332584381
+      },
+      "L21_vehicle_s1.0": {
+        "layer": 21,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.5221378044278961,
+        "target_dcf_delta": 2.2315481503804513,
+        "dcf_delta": {
+          "fruit": -0.29170453548431396,
+          "animal": 0.9233471552530919,
+          "tool": 1.456061840057373,
+          "vehicle": 2.2315481503804513,
+          "clothing": 0.2379932403564453,
+          "furniture": 0.5474052429199219,
+          "food": -0.6176204681396484,
+          "plant": -0.4452664852142334
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 86.19406127929688,
+        "raw_norm": 387.1461181640625,
+        "norm_ratio": 0.22263960540294647
+      },
+      "L21_vehicle_s0.5": {
+        "layer": 21,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.4133199060297676,
+        "target_dcf_delta": 1.2300828297932949,
+        "dcf_delta": {
+          "fruit": -0.021920442581176758,
+          "animal": 0.5996149381001761,
+          "tool": 0.8603498935699463,
+          "vehicle": 1.2300828297932949,
+          "clothing": 0.23122501373291016,
+          "furniture": 0.4558296203613281,
+          "food": -0.19414186477661133,
+          "plant": -0.11995267868041992
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 86.19406127929688,
+        "raw_norm": 387.1461181640625,
+        "norm_ratio": 0.22263960540294647
+      },
+      "L21_vehicle_s0.3": {
+        "layer": 21,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.4625212698467562,
+        "target_dcf_delta": 0.6927692095438651,
+        "dcf_delta": {
+          "fruit": -0.06542098522186279,
+          "animal": 0.3009498914082833,
+          "tool": 0.4636814594268799,
+          "vehicle": 0.6927692095438651,
+          "clothing": 0.12109565734863281,
+          "furniture": 0.2044053077697754,
+          "food": -0.15960248311360736,
+          "plant": -0.11261796951293945
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 86.19406127929688,
+        "raw_norm": 387.1461181640625,
+        "norm_ratio": 0.22263960540294647
+      },
+      "L22_fruit_s1.0": {
+        "layer": 22,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 1.127181566768653,
+        "target_dcf_delta": 2.4166340827941895,
+        "dcf_delta": {
+          "fruit": 2.4166340827941895,
+          "animal": -0.24668169021606445,
+          "tool": -0.7358191013336182,
+          "vehicle": -1.4341893990834542,
+          "clothing": 2.1339616775512695,
+          "furniture": 0.7351493835449219,
+          "food": -1.8784008026123047,
+          "plant": 1.122330665588379
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 105.9295654296875,
+        "raw_norm": 490.0771789550781,
+        "norm_ratio": 0.2161487340927124
+      },
+      "L22_fruit_s0.5": {
+        "layer": 22,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 1.1283358047515835,
+        "target_dcf_delta": 1.2085938453674316,
+        "dcf_delta": {
+          "fruit": 1.2085938453674316,
+          "animal": -0.12861855824788293,
+          "tool": -0.3778061866760254,
+          "vehicle": -0.7152794202168771,
+          "clothing": 1.0611295700073242,
+          "furniture": 0.35947656631469727,
+          "food": -0.9573818842569999,
+          "plant": 0.5635600090026855
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 105.9295654296875,
+        "raw_norm": 490.0771789550781,
+        "norm_ratio": 0.2161487340927124
+      },
+      "L22_fruit_s0.3": {
+        "layer": 22,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 1.0962337290853668,
+        "target_dcf_delta": 0.7242498397827148,
+        "dcf_delta": {
+          "fruit": 0.7242498397827148,
+          "animal": -0.08020416895548621,
+          "tool": -0.22979307174682617,
+          "vehicle": -0.42993831634521484,
+          "clothing": 0.6506710052490234,
+          "furniture": 0.2212376594543457,
+          "food": -0.5652837753295916,
+          "plant": 0.3374204635620117
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 105.9295654296875,
+        "raw_norm": 490.0771789550781,
+        "norm_ratio": 0.2161487340927124
+      },
+      "L22_clothing_s1.0": {
+        "layer": 22,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.05896108763023293,
+        "target_dcf_delta": -0.1212301254272461,
+        "dcf_delta": {
+          "fruit": -0.019804000854492188,
+          "animal": 0.4657169977823905,
+          "tool": -0.08381080627441406,
+          "vehicle": 1.1951888402303048,
+          "clothing": -0.1212301254272461,
+          "furniture": -2.0461039543151855,
+          "food": -0.46610546112060547,
+          "plant": -1.390380859375
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 96.27367401123047,
+        "raw_norm": 487.8837585449219,
+        "norm_ratio": 0.19732911884784698
+      },
+      "L22_clothing_s0.5": {
+        "layer": 22,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.13647140472331518,
+        "target_dcf_delta": -0.1661224365234375,
+        "dcf_delta": {
+          "fruit": -0.14188432693481445,
+          "animal": 0.0968770980834961,
+          "tool": -0.17889833450317383,
+          "vehicle": 0.4729455312093087,
+          "clothing": -0.1661224365234375,
+          "furniture": -1.2072691917419434,
+          "food": -0.35536670684814453,
+          "plant": -0.80322265625
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 96.27367401123047,
+        "raw_norm": 487.8837585449219,
+        "norm_ratio": 0.19732911884784698
+      },
+      "L22_clothing_s0.3": {
+        "layer": 22,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.0896924388669251,
+        "target_dcf_delta": 0.046390533447265625,
+        "dcf_delta": {
+          "fruit": 0.06627178192138672,
+          "animal": 0.2271289825439471,
+          "tool": 0.05665421485900879,
+          "vehicle": 0.42706203460693537,
+          "clothing": 0.046390533447265625,
+          "furniture": -0.5072178840637207,
+          "food": -0.06755510965983191,
+          "plant": -0.36009740829467773
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 96.27367401123047,
+        "raw_norm": 487.8837585449219,
+        "norm_ratio": 0.19732911884784698
+      },
+      "L22_vehicle_s1.0": {
+        "layer": 22,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.2685078346263337,
+        "target_dcf_delta": 2.568083604176838,
+        "dcf_delta": {
+          "fruit": -1.3256926536560059,
+          "animal": 0.30371665954589844,
+          "tool": 1.6218626499176025,
+          "vehicle": 2.568083604176838,
+          "clothing": 0.869938850402832,
+          "furniture": -0.2599949836730957,
+          "food": -2.01449171702067,
+          "plant": -1.4297547340393066
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 103.74992370605469,
+        "raw_norm": 492.1197509765625,
+        "norm_ratio": 0.21082252264022827
+      },
+      "L22_vehicle_s0.5": {
+        "layer": 22,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 0.9991028524670033,
+        "target_dcf_delta": 1.1465859413146955,
+        "dcf_delta": {
+          "fruit": -0.8023936748504639,
+          "animal": 0.0009870529174804688,
+          "tool": 0.6707730293273926,
+          "vehicle": 1.1465859413146955,
+          "clothing": 0.3144063949584961,
+          "furniture": -0.32656097412109375,
+          "food": -1.1376155217488613,
+          "plant": -0.8285040855407715
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 103.74992370605469,
+        "raw_norm": 492.1197509765625,
+        "norm_ratio": 0.21082252264022827
+      },
+      "L22_vehicle_s0.3": {
+        "layer": 22,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.3495023440107843,
+        "target_dcf_delta": 0.7946880658467599,
+        "dcf_delta": {
+          "fruit": -0.36975598335266113,
+          "animal": 0.1244967778523769,
+          "tool": 0.5153481960296631,
+          "vehicle": 0.7946880658467599,
+          "clothing": 0.2935209274291992,
+          "furniture": -0.02812051773071289,
+          "food": -0.5788749059041347,
+          "plant": -0.3985166549682617
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 103.74992370605469,
+        "raw_norm": 492.1197509765625,
+        "norm_ratio": 0.21082252264022827
+      },
+      "L23_fruit_s1.0": {
+        "layer": 23,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 1.5502165334226978,
+        "target_dcf_delta": 4.918405532836914,
+        "dcf_delta": {
+          "fruit": 4.918405532836914,
+          "animal": -0.9784564971923793,
+          "tool": -0.20777559280395508,
+          "vehicle": -0.7344202995300293,
+          "clothing": 3.162721633911133,
+          "furniture": 1.1020145416259766,
+          "food": -1.9847558339436855,
+          "plant": 1.4396514892578125
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 131.78256225585938,
+        "raw_norm": 665.2316284179688,
+        "norm_ratio": 0.1981002688407898
+      },
+      "L23_fruit_s0.5": {
+        "layer": 23,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 1.5143206466540207,
+        "target_dcf_delta": 2.669762134552002,
+        "dcf_delta": {
+          "fruit": 2.669762134552002,
+          "animal": -0.26681677500406664,
+          "tool": 0.11627626419067383,
+          "vehicle": -0.1781915028889962,
+          "clothing": 1.7530097961425781,
+          "furniture": 0.8352947235107422,
+          "food": -0.7943283716837559,
+          "plant": 0.8912420272827148
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 131.78256225585938,
+        "raw_norm": 665.2316284179688,
+        "norm_ratio": 0.1981002688407898
+      },
+      "L23_fruit_s0.3": {
+        "layer": 23,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 1.5365176905736595,
+        "target_dcf_delta": 1.5707974433898926,
+        "dcf_delta": {
+          "fruit": 1.5707974433898926,
+          "animal": -0.19438203175862512,
+          "tool": 0.037950992584228516,
+          "vehicle": -0.13631200790405273,
+          "clothing": 1.0123100280761719,
+          "furniture": 0.4463844299316406,
+          "food": -0.5085849761962908,
+          "plant": 0.5040311813354492
+        },
+        "auto_neighbors": [
+          "plant",
+          "food"
+        ],
+        "spec_norm": 131.78256225585938,
+        "raw_norm": 665.2316284179688,
+        "norm_ratio": 0.1981002688407898
+      },
+      "L23_clothing_s1.0": {
+        "layer": 23,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 1.0793949291771767,
+        "target_dcf_delta": 2.595907211303711,
+        "dcf_delta": {
+          "fruit": 1.5093231201171875,
+          "animal": 1.1960198084513358,
+          "tool": -0.3890647888183594,
+          "vehicle": 0.9780023892720493,
+          "clothing": 2.595907211303711,
+          "furniture": -1.935190200805664,
+          "food": -0.4682795206705723,
+          "plant": -2.394965171813965
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 122.8384017944336,
+        "raw_norm": 676.1480102539062,
+        "norm_ratio": 0.1816738396883011
+      },
+      "L23_clothing_s0.5": {
+        "layer": 23,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 1.0814736664477673,
+        "target_dcf_delta": 1.2972068786621094,
+        "dcf_delta": {
+          "fruit": 0.7614264488220215,
+          "animal": 0.6001431147257499,
+          "tool": -0.18315362930297852,
+          "vehicle": 0.485292752583824,
+          "clothing": 1.2972068786621094,
+          "furniture": -0.9514322280883789,
+          "food": -0.22822920481364406,
+          "plant": -1.1894807815551758
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 122.8384017944336,
+        "raw_norm": 676.1480102539062,
+        "norm_ratio": 0.1816738396883011
+      },
+      "L23_clothing_s0.3": {
+        "layer": 23,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 1.0805917260064082,
+        "target_dcf_delta": 0.7835311889648438,
+        "dcf_delta": {
+          "fruit": 0.457791805267334,
+          "animal": 0.36198361714681226,
+          "tool": -0.11530351638793945,
+          "vehicle": 0.2954867680867501,
+          "clothing": 0.7835311889648438,
+          "furniture": -0.5690364837646484,
+          "food": -0.12897459665934718,
+          "plant": -0.7150945663452148
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 122.8384017944336,
+        "raw_norm": 676.1480102539062,
+        "norm_ratio": 0.1816738396883011
+      },
+      "L23_vehicle_s1.0": {
+        "layer": 23,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.4467911432081408,
+        "target_dcf_delta": 4.151764392852787,
+        "dcf_delta": {
+          "fruit": -1.7251794338226318,
+          "animal": 1.0328715642293282,
+          "tool": 1.7581439018249512,
+          "vehicle": 4.151764392852787,
+          "clothing": -1.4300308227539062,
+          "furniture": 0.2194986343383789,
+          "food": -2.071240743001299,
+          "plant": -2.8596363067626953
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 123.90753173828125,
+        "raw_norm": 688.1423950195312,
+        "norm_ratio": 0.18006089329719543
+      },
+      "L23_vehicle_s0.5": {
+        "layer": 23,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.4364967148244165,
+        "target_dcf_delta": 2.077850818634033,
+        "dcf_delta": {
+          "fruit": -0.8675148487091064,
+          "animal": 0.5131642023722378,
+          "tool": 0.8832368850708008,
+          "vehicle": 2.077850818634033,
+          "clothing": -0.7080078125,
+          "furniture": 0.10873126983642578,
+          "food": -1.0320790608723982,
+          "plant": -1.4364709854125977
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 123.90753173828125,
+        "raw_norm": 688.1423950195312,
+        "norm_ratio": 0.18006089329719543
+      },
+      "L23_vehicle_s0.3": {
+        "layer": 23,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.3199718079514502,
+        "target_dcf_delta": 1.201273918151859,
+        "dcf_delta": {
+          "fruit": -0.5706868171691895,
+          "animal": 0.2534192403157576,
+          "tool": 0.47586536407470703,
+          "vehicle": 1.201273918151859,
+          "clothing": -0.474517822265625,
+          "furniture": -0.010909080505371094,
+          "food": -0.6637093226114921,
+          "plant": -0.9000754356384277
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 123.90753173828125,
+        "raw_norm": 688.1423950195312,
+        "norm_ratio": 0.18006089329719543
+      },
+      "L24_fruit_s1.0": {
+        "layer": 24,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 2.0978450817981624,
+        "target_dcf_delta": 8.623404502868652,
+        "dcf_delta": {
+          "fruit": 8.623404502868652,
+          "animal": -0.7900845209757463,
+          "tool": 0.9070000648498535,
+          "vehicle": -0.5938045183817557,
+          "clothing": 4.1006011962890625,
+          "furniture": 2.5976314544677734,
+          "food": -2.1705849965413435,
+          "plant": 2.2676897048950195
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 160.7926025390625,
+        "raw_norm": 793.4114379882812,
+        "norm_ratio": 0.20265980064868927
+      },
+      "L24_fruit_s0.5": {
+        "layer": 24,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 2.249044197946947,
+        "target_dcf_delta": 4.043665885925293,
+        "dcf_delta": {
+          "fruit": 4.043665885925293,
+          "animal": -0.6929502487182617,
+          "tool": 0.1751246452331543,
+          "vehicle": -0.5344591140747035,
+          "clothing": 1.7879486083984375,
+          "furniture": 0.9177265167236328,
+          "food": -1.3401082356770821,
+          "plant": 0.9151754379272461
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 160.7926025390625,
+        "raw_norm": 793.4114379882812,
+        "norm_ratio": 0.20265980064868927
+      },
+      "L24_fruit_s0.3": {
+        "layer": 24,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 1.9895981159152134,
+        "target_dcf_delta": 2.743389129638672,
+        "dcf_delta": {
+          "fruit": 2.743389129638672,
+          "animal": -0.061968803405758166,
+          "tool": 0.43872785568237305,
+          "vehicle": -0.041743914286293204,
+          "clothing": 1.368865966796875,
+          "furniture": 1.0080041885375977,
+          "food": -0.49791367848714074,
+          "plant": 0.8072223663330078
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 160.7926025390625,
+        "raw_norm": 793.4114379882812,
+        "norm_ratio": 0.20265980064868927
+      },
+      "L24_clothing_s1.0": {
+        "layer": 24,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 1.0674759235385611,
+        "target_dcf_delta": 4.109537124633789,
+        "dcf_delta": {
+          "fruit": 0.283050537109375,
+          "animal": 0.6699797312418596,
+          "tool": 0.5975103378295898,
+          "vehicle": -0.034587860107421875,
+          "clothing": 4.109537124633789,
+          "furniture": -3.8397703170776367,
+          "food": -0.6675834655761719,
+          "plant": -3.7388916015625
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 158.28256225585938,
+        "raw_norm": 808.9152221679688,
+        "norm_ratio": 0.19567261636257172
+      },
+      "L24_clothing_s0.5": {
+        "layer": 24,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 1.063196961382276,
+        "target_dcf_delta": 2.061922073364258,
+        "dcf_delta": {
+          "fruit": 0.14103078842163086,
+          "animal": 0.34137789408365293,
+          "tool": 0.30054759979248047,
+          "vehicle": -0.02299181620279711,
+          "clothing": 2.061922073364258,
+          "furniture": -1.9293603897094727,
+          "food": -0.33531188964844105,
+          "plant": -1.867121696472168
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 158.28256225585938,
+        "raw_norm": 808.9152221679688,
+        "norm_ratio": 0.19567261636257172
+      },
+      "L24_clothing_s0.3": {
+        "layer": 24,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 1.067618370611101,
+        "target_dcf_delta": 1.2317180633544922,
+        "dcf_delta": {
+          "fruit": 0.08866310119628906,
+          "animal": 0.18854586283365649,
+          "tool": 0.17146873474121094,
+          "vehicle": -0.018190383911132812,
+          "clothing": 1.2317180633544922,
+          "furniture": -1.1437063217163086,
+          "food": -0.2067616780598982,
+          "plant": -1.137303352355957
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 158.28256225585938,
+        "raw_norm": 808.9152221679688,
+        "norm_ratio": 0.19567261636257172
+      },
+      "L24_vehicle_s1.0": {
+        "layer": 24,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.0800719921564879,
+        "target_dcf_delta": 6.229815483093262,
+        "dcf_delta": {
+          "fruit": -2.5636215209960938,
+          "animal": -0.19918918609618785,
+          "tool": 2.453604221343994,
+          "vehicle": 6.229815483093262,
+          "clothing": -2.8954010009765625,
+          "furniture": 0.0839548110961914,
+          "food": -2.764970779418949,
+          "plant": -5.757963180541992
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 159.81405639648438,
+        "raw_norm": 817.325927734375,
+        "norm_ratio": 0.19553282856941223
+      },
+      "L24_vehicle_s0.5": {
+        "layer": 24,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.0786170919395957,
+        "target_dcf_delta": 3.1148509979248082,
+        "dcf_delta": {
+          "fruit": -1.283348560333252,
+          "animal": -0.10204474131266039,
+          "tool": 1.2269225120544434,
+          "vehicle": 3.1148509979248082,
+          "clothing": -1.4504356384277344,
+          "furniture": 0.04292869567871094,
+          "food": -1.3804448445638045,
+          "plant": -2.877819061279297
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 159.81405639648438,
+        "raw_norm": 817.325927734375,
+        "norm_ratio": 0.19553282856941223
+      },
+      "L24_vehicle_s0.3": {
+        "layer": 24,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.3112858412442525,
+        "target_dcf_delta": 2.0712547302246094,
+        "dcf_delta": {
+          "fruit": -0.5656764507293701,
+          "animal": 0.16578324635823805,
+          "tool": 0.9536194801330566,
+          "vehicle": 2.0712547302246094,
+          "clothing": -0.6828117370605469,
+          "furniture": 0.31357288360595703,
+          "food": -0.6283442179361991,
+          "plant": -1.5695600509643555
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 159.81405639648438,
+        "raw_norm": 817.325927734375,
+        "norm_ratio": 0.19553282856941223
+      },
+      "L25_fruit_s1.0": {
+        "layer": 25,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 2.676112905306223,
+        "target_dcf_delta": 11.487080097198486,
+        "dcf_delta": {
+          "fruit": 11.487080097198486,
+          "animal": -0.7660140991211009,
+          "tool": 2.0010738372802734,
+          "vehicle": -2.1705419222513846,
+          "clothing": 4.282449722290039,
+          "furniture": 2.446396827697754,
+          "food": -2.5261357625325545,
+          "plant": 1.7438602447509766
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 187.638916015625,
+        "raw_norm": 976.584228515625,
+        "norm_ratio": 0.1921379715204239
+      },
+      "L25_fruit_s0.5": {
+        "layer": 25,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 2.660347013744377,
+        "target_dcf_delta": 5.7432684898376465,
+        "dcf_delta": {
+          "fruit": 5.7432684898376465,
+          "animal": -0.39926560719807824,
+          "tool": 0.9913420677185059,
+          "vehicle": -1.0906613667805978,
+          "clothing": 2.1488418579101562,
+          "furniture": 1.2295856475830078,
+          "food": -1.2705643971761091,
+          "plant": 0.8658046722412109
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 187.638916015625,
+        "raw_norm": 976.584228515625,
+        "norm_ratio": 0.1921379715204239
+      },
+      "L25_fruit_s0.3": {
+        "layer": 25,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 2.642397513750698,
+        "target_dcf_delta": 3.4325790405273438,
+        "dcf_delta": {
+          "fruit": 3.4325790405273438,
+          "animal": -0.24370129903158144,
+          "tool": 0.5855231285095215,
+          "vehicle": -0.6579701105753593,
+          "clothing": 1.2890396118164062,
+          "furniture": 0.736480712890625,
+          "food": -0.7633260091145821,
+          "plant": 0.5166482925415039
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 187.638916015625,
+        "raw_norm": 976.584228515625,
+        "norm_ratio": 0.1921379715204239
+      },
+      "L25_clothing_s1.0": {
+        "layer": 25,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.25179620361427063,
+        "target_dcf_delta": 2.7696304321289062,
+        "dcf_delta": {
+          "fruit": -0.42046260833740234,
+          "animal": 1.6678517659505268,
+          "tool": 0.8699731826782227,
+          "vehicle": -0.1654850641886405,
+          "clothing": 2.7696304321289062,
+          "furniture": -1.9167404174804688,
+          "food": -1.3841590881347656,
+          "plant": -10.989492416381836
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 205.70321655273438,
+        "raw_norm": 991.6578979492188,
+        "norm_ratio": 0.20743365585803986
+      },
+      "L25_clothing_s0.5": {
+        "layer": 25,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.254479692496586,
+        "target_dcf_delta": 1.4022750854492188,
+        "dcf_delta": {
+          "fruit": -0.20333623886108398,
+          "animal": 0.830233256022133,
+          "tool": 0.4346480369567871,
+          "vehicle": -0.08296140034993726,
+          "clothing": 1.4022750854492188,
+          "furniture": -0.9659252166748047,
+          "food": -0.6927350362141986,
+          "plant": -5.500361442565918
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 205.70321655273438,
+        "raw_norm": 991.6578979492188,
+        "norm_ratio": 0.20743365585803986
+      },
+      "L25_clothing_s0.3": {
+        "layer": 25,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.3336758913285409,
+        "target_dcf_delta": 1.044210433959961,
+        "dcf_delta": {
+          "fruit": 0.08366584777832031,
+          "animal": 0.7340342203776089,
+          "tool": 0.47916603088378906,
+          "vehicle": 0.14928404490152758,
+          "clothing": 1.044210433959961,
+          "furniture": -0.2801017761230469,
+          "food": -0.22078323364257812,
+          "plant": -3.119415283203125
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 205.70321655273438,
+        "raw_norm": 991.6578979492188,
+        "norm_ratio": 0.20743365585803986
+      },
+      "L25_vehicle_s1.0": {
+        "layer": 25,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.1287111543179515,
+        "target_dcf_delta": 9.685208956400558,
+        "dcf_delta": {
+          "fruit": -2.7268524169921875,
+          "animal": 1.1502679189046248,
+          "tool": 2.8162965774536133,
+          "vehicle": 9.685208956400558,
+          "clothing": -5.28577995300293,
+          "furniture": 0.5352516174316406,
+          "food": -3.5995114644368513,
+          "plant": -8.570768356323242
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 191.04046630859375,
+        "raw_norm": 988.1854248046875,
+        "norm_ratio": 0.1933245062828064
+      },
+      "L25_vehicle_s0.5": {
+        "layer": 25,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.1288832977315266,
+        "target_dcf_delta": 4.842924118041989,
+        "dcf_delta": {
+          "fruit": -1.3635368347167969,
+          "animal": 0.5776481628418004,
+          "tool": 1.4179835319519043,
+          "vehicle": 4.842924118041989,
+          "clothing": -2.628641128540039,
+          "furniture": 0.2654743194580078,
+          "food": -1.7982209523518904,
+          "plant": -4.280013084411621
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 191.04046630859375,
+        "raw_norm": 988.1854248046875,
+        "norm_ratio": 0.1933245062828064
+      },
+      "L25_vehicle_s0.3": {
+        "layer": 25,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 0.9218237470332078,
+        "target_dcf_delta": 2.606074333190918,
+        "dcf_delta": {
+          "fruit": -1.132819652557373,
+          "animal": -0.0029652913411410964,
+          "tool": 0.5169715881347656,
+          "vehicle": 2.606074333190918,
+          "clothing": -1.8525161743164062,
+          "furniture": -0.2852182388305664,
+          "food": -1.3685785929362027,
+          "plant": -2.8170852661132812
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 191.04046630859375,
+        "raw_norm": 988.1854248046875,
+        "norm_ratio": 0.1933245062828064
+      },
+      "L26_fruit_s1.0": {
+        "layer": 26,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 2.838082363048761,
+        "target_dcf_delta": 13.933613777160645,
+        "dcf_delta": {
+          "fruit": 13.933613777160645,
+          "animal": -1.9360294342041016,
+          "tool": 0.5593109130859375,
+          "vehicle": -3.8498611450195206,
+          "clothing": -0.5219497680664062,
+          "furniture": -0.4410238265991211,
+          "food": -4.899517059326179,
+          "plant": 2.3539199829101562
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 221.20223999023438,
+        "raw_norm": 1293.6204833984375,
+        "norm_ratio": 0.17099469900131226
+      },
+      "L26_fruit_s0.5": {
+        "layer": 26,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 2.8243168501197915,
+        "target_dcf_delta": 6.966372489929199,
+        "dcf_delta": {
+          "fruit": 6.966372489929199,
+          "animal": -0.9766737620035784,
+          "tool": 0.2681159973144531,
+          "vehicle": -1.9362071355183907,
+          "clothing": -0.28582191467285156,
+          "furniture": -0.23962020874023438,
+          "food": -2.4565690358479877,
+          "plant": 1.1710319519042969
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 221.20223999023438,
+        "raw_norm": 1293.6204833984375,
+        "norm_ratio": 0.17099469900131226
+      },
+      "L26_fruit_s0.3": {
+        "layer": 26,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 2.8478685299960107,
+        "target_dcf_delta": 4.193825721740723,
+        "dcf_delta": {
+          "fruit": 4.193825721740723,
+          "animal": -0.5820471445719306,
+          "tool": 0.17919063568115234,
+          "vehicle": -1.1558984120686802,
+          "clothing": -0.12606239318847656,
+          "furniture": -0.1208038330078125,
+          "food": -1.4626191457112654,
+          "plant": 0.7095851898193359
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 221.20223999023438,
+        "raw_norm": 1293.6204833984375,
+        "norm_ratio": 0.17099469900131226
+      },
+      "L26_clothing_s1.0": {
+        "layer": 26,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.7262011016744788,
+        "target_dcf_delta": 10.613048553466797,
+        "dcf_delta": {
+          "fruit": -2.790672779083252,
+          "animal": 0.7222379048665317,
+          "tool": 2.201352119445801,
+          "vehicle": -0.8172003428141323,
+          "clothing": 10.613048553466797,
+          "furniture": -2.550413131713867,
+          "food": -1.0556729634602853,
+          "plant": -14.604475975036621
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 248.4070587158203,
+        "raw_norm": 1311.1502685546875,
+        "norm_ratio": 0.18945735692977905
+      },
+      "L26_clothing_s0.5": {
+        "layer": 26,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.8420333292442513,
+        "target_dcf_delta": 5.795650482177734,
+        "dcf_delta": {
+          "fruit": -0.8580513000488281,
+          "animal": 0.9529883066813127,
+          "tool": 1.669198989868164,
+          "vehicle": 0.0766398111979143,
+          "clothing": 5.795650482177734,
+          "furniture": -0.5176010131835938,
+          "food": -0.013823191324870976,
+          "plant": -6.872922897338867
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 248.4070587158203,
+        "raw_norm": 1311.1502685546875,
+        "norm_ratio": 0.18945735692977905
+      },
+      "L26_clothing_s0.3": {
+        "layer": 26,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.6230338151690284,
+        "target_dcf_delta": 2.9060134887695312,
+        "dcf_delta": {
+          "fruit": -1.16046142578125,
+          "animal": -0.13032404581705492,
+          "tool": 0.32552146911621094,
+          "vehicle": -0.5408433278401716,
+          "clothing": 2.9060134887695312,
+          "furniture": -1.2121391296386719,
+          "food": -0.6152884165445904,
+          "plant": -4.654294967651367
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 248.4070587158203,
+        "raw_norm": 1311.1502685546875,
+        "norm_ratio": 0.18945735692977905
+      },
+      "L26_vehicle_s1.0": {
+        "layer": 26,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.467331158525082,
+        "target_dcf_delta": 15.407253901163742,
+        "dcf_delta": {
+          "fruit": -1.9167771339416504,
+          "animal": 1.735478083292648,
+          "tool": 4.153286933898926,
+          "vehicle": 15.407253901163742,
+          "clothing": -1.6302413940429688,
+          "furniture": 2.3623905181884766,
+          "food": -4.119305928548176,
+          "plant": -10.490188598632812
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 232.40574645996094,
+        "raw_norm": 1312.1700439453125,
+        "norm_ratio": 0.1771155744791031
+      },
+      "L26_vehicle_s0.5": {
+        "layer": 26,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.364887781597827,
+        "target_dcf_delta": 7.456522623697921,
+        "dcf_delta": {
+          "fruit": -1.225985050201416,
+          "animal": 0.5741411844889441,
+          "tool": 1.7855825424194336,
+          "vehicle": 7.456522623697921,
+          "clothing": -1.049367904663086,
+          "furniture": 0.8130531311035156,
+          "food": -2.315266927083332,
+          "plant": -5.453103065490723
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 232.40574645996094,
+        "raw_norm": 1312.1700439453125,
+        "norm_ratio": 0.1771155744791031
+      },
+      "L26_vehicle_s0.3": {
+        "layer": 26,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.2721670077179716,
+        "target_dcf_delta": 4.342863082885749,
+        "dcf_delta": {
+          "fruit": -0.8869924545288086,
+          "animal": 0.18563969930012547,
+          "tool": 0.9096965789794922,
+          "vehicle": 4.342863082885749,
+          "clothing": -0.7385940551757812,
+          "furniture": 0.2579498291015625,
+          "food": -1.5275014241536446,
+          "plant": -3.403752326965332
+        },
+        "auto_neighbors": [
+          "plant",
+          "furniture"
+        ],
+        "spec_norm": 232.40574645996094,
+        "raw_norm": 1312.1700439453125,
+        "norm_ratio": 0.1771155744791031
+      },
+      "L27_fruit_s1.0": {
+        "layer": 27,
+        "category": "fruit",
+        "scale": 1.0,
+        "selectivity": 1.1086575578011408,
+        "target_dcf_delta": 15.898476660251617,
+        "dcf_delta": {
+          "fruit": 15.898476660251617,
+          "animal": 1.3869361877441406,
+          "tool": 1.0809530317783356,
+          "vehicle": -2.873409827550253,
+          "clothing": -4.176531791687012,
+          "furniture": 2.349759817123413,
+          "food": -7.180855711301165,
+          "plant": 14.330295205116272
+        },
+        "auto_neighbors": [
+          "food",
+          "clothing"
+        ],
+        "spec_norm": 379.47918701171875,
+        "raw_norm": 1903.4246826171875,
+        "norm_ratio": 0.19936653971672058
+      },
+      "L27_fruit_s0.5": {
+        "layer": 27,
+        "category": "fruit",
+        "scale": 0.5,
+        "selectivity": 1.1065982210969976,
+        "target_dcf_delta": 7.865733981132507,
+        "dcf_delta": {
+          "fruit": 7.865733981132507,
+          "animal": 0.6020086208979292,
+          "tool": 0.4545345902442932,
+          "vehicle": -1.48631493250529,
+          "clothing": -2.1347780227661133,
+          "furniture": 1.0716267824172974,
+          "food": -3.651682813962301,
+          "plant": 7.0980305671691895
+        },
+        "auto_neighbors": [
+          "food",
+          "clothing"
+        ],
+        "spec_norm": 379.47918701171875,
+        "raw_norm": 1903.4246826171875,
+        "norm_ratio": 0.19936653971672058
+      },
+      "L27_fruit_s0.3": {
+        "layer": 27,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 1.100649818116943,
+        "target_dcf_delta": 4.707163870334625,
+        "dcf_delta": {
+          "fruit": 4.707163870334625,
+          "animal": 0.4218768278757734,
+          "tool": 0.3142721652984619,
+          "vehicle": -0.8419349590937308,
+          "clothing": -1.2854843139648438,
+          "furniture": 0.6567898988723755,
+          "food": -2.1873852809270224,
+          "plant": 4.266713440418243
+        },
+        "auto_neighbors": [
+          "food",
+          "clothing"
+        ],
+        "spec_norm": 379.47918701171875,
+        "raw_norm": 1903.4246826171875,
+        "norm_ratio": 0.19936653971672058
+      },
+      "L27_clothing_s1.0": {
+        "layer": 27,
+        "category": "clothing",
+        "scale": 1.0,
+        "selectivity": 0.0030852999257462224,
+        "target_dcf_delta": -0.04438209533691406,
+        "dcf_delta": {
+          "fruit": -5.852718830108643,
+          "animal": 1.7525219917297363,
+          "tool": -3.3568620681762695,
+          "vehicle": -8.534494598706562,
+          "clothing": -0.04438209533691406,
+          "furniture": -14.375018119812012,
+          "food": -9.692011117935179,
+          "plant": -13.993496179580688
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 414.2037353515625,
+        "raw_norm": 1983.746337890625,
+        "norm_ratio": 0.20879873633384705
+      },
+      "L27_clothing_s0.5": {
+        "layer": 27,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 0.01612703208395976,
+        "target_dcf_delta": -0.11803817749023438,
+        "dcf_delta": {
+          "fruit": -3.0012945532798767,
+          "animal": 0.777296980222066,
+          "tool": -1.7592005133628845,
+          "vehicle": -4.352542440096537,
+          "clothing": -0.11803817749023438,
+          "furniture": -7.309274673461914,
+          "food": -4.918615261713665,
+          "plant": -7.090379238128662
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 414.2037353515625,
+        "raw_norm": 1983.746337890625,
+        "norm_ratio": 0.20879873633384705
+      },
+      "L27_clothing_s0.3": {
+        "layer": 27,
+        "category": "clothing",
+        "scale": 0.3,
+        "selectivity": 0.022911570011773876,
+        "target_dcf_delta": -0.10123825073242188,
+        "dcf_delta": {
+          "fruit": -1.8154188394546509,
+          "animal": 0.4685213565826407,
+          "tool": -1.0589720010757446,
+          "vehicle": -2.5897979736328134,
+          "clothing": -0.10123825073242188,
+          "furniture": -4.408651828765869,
+          "food": -2.957238753636675,
+          "plant": -4.255703926086426
+        },
+        "auto_neighbors": [
+          "furniture",
+          "food"
+        ],
+        "spec_norm": 414.2037353515625,
+        "raw_norm": 1983.746337890625,
+        "norm_ratio": 0.20879873633384705
+      },
+      "L27_vehicle_s1.0": {
+        "layer": 27,
+        "category": "vehicle",
+        "scale": 1.0,
+        "selectivity": 1.8894774994863934,
+        "target_dcf_delta": 29.108853061993916,
+        "dcf_delta": {
+          "fruit": 9.565359748899937,
+          "animal": 15.395768562952679,
+          "tool": 8.349327862262726,
+          "vehicle": 29.108853061993916,
+          "clothing": 6.171175956726074,
+          "furniture": 13.676172375679016,
+          "food": 4.206770579020185,
+          "plant": 3.565378427505493
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 350.2810363769531,
+        "raw_norm": 1688.2926025390625,
+        "norm_ratio": 0.20747649669647217
+      },
+      "L27_vehicle_s0.5": {
+        "layer": 27,
+        "category": "vehicle",
+        "scale": 0.5,
+        "selectivity": 1.8882967513478164,
+        "target_dcf_delta": 14.59378468990326,
+        "dcf_delta": {
+          "fruit": 4.808723896741867,
+          "animal": 7.718544085820516,
+          "tool": 4.19121327996254,
+          "vehicle": 14.59378468990326,
+          "clothing": 3.1855387687683105,
+          "furniture": 6.834399938583374,
+          "food": 2.1685219208399467,
+          "plant": 1.8246169090270996
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 350.2810363769531,
+        "raw_norm": 1688.2926025390625,
+        "norm_ratio": 0.20747649669647217
+      },
+      "L27_vehicle_s0.3": {
+        "layer": 27,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.8901908046733387,
+        "target_dcf_delta": 8.725032925605774,
+        "dcf_delta": {
+          "fruit": 2.848508834838867,
+          "animal": 4.605953534444174,
+          "tool": 2.474601238965988,
+          "vehicle": 8.725032925605774,
+          "clothing": 1.8346099853515625,
+          "furniture": 4.023570775985718,
+          "food": 1.2303419510523508,
+          "plant": 1.0689921975135803
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 350.2810363769531,
+        "raw_norm": 1688.2926025390625,
+        "norm_ratio": 0.20747649669647217
+      }
+    },
+    "best_results": {
+      "fruit": {
+        "layer": 26,
+        "category": "fruit",
+        "scale": 0.3,
+        "selectivity": 2.8478685299960107,
+        "target_dcf_delta": 4.193825721740723,
+        "dcf_delta": {
+          "fruit": 4.193825721740723,
+          "animal": -0.5820471445719306,
+          "tool": 0.17919063568115234,
+          "vehicle": -1.1558984120686802,
+          "clothing": -0.12606239318847656,
+          "furniture": -0.1208038330078125,
+          "food": -1.4626191457112654,
+          "plant": 0.7095851898193359
+        },
+        "auto_neighbors": [
+          "food",
+          "plant"
+        ],
+        "spec_norm": 221.20223999023438,
+        "raw_norm": 1293.6204833984375,
+        "norm_ratio": 0.17099469900131226
+      },
+      "clothing": {
+        "layer": 23,
+        "category": "clothing",
+        "scale": 0.5,
+        "selectivity": 1.0814736664477673,
+        "target_dcf_delta": 1.2972068786621094,
+        "dcf_delta": {
+          "fruit": 0.7614264488220215,
+          "animal": 0.6001431147257499,
+          "tool": -0.18315362930297852,
+          "vehicle": 0.485292752583824,
+          "clothing": 1.2972068786621094,
+          "furniture": -0.9514322280883789,
+          "food": -0.22822920481364406,
+          "plant": -1.1894807815551758
+        },
+        "auto_neighbors": [
+          "furniture",
+          "plant"
+        ],
+        "spec_norm": 122.8384017944336,
+        "raw_norm": 676.1480102539062,
+        "norm_ratio": 0.1816738396883011
+      },
+      "vehicle": {
+        "layer": 27,
+        "category": "vehicle",
+        "scale": 0.3,
+        "selectivity": 1.8901908046733387,
+        "target_dcf_delta": 8.725032925605774,
+        "dcf_delta": {
+          "fruit": 2.848508834838867,
+          "animal": 4.605953534444174,
+          "tool": 2.474601238965988,
+          "vehicle": 8.725032925605774,
+          "clothing": 1.8346099853515625,
+          "furniture": 4.023570775985718,
+          "food": 1.2303419510523508,
+          "plant": 1.0689921975135803
+        },
+        "auto_neighbors": [
+          "furniture",
+          "tool"
+        ],
+        "spec_norm": 350.2810363769531,
+        "raw_norm": 1688.2926025390625,
+        "norm_ratio": 0.20747649669647217
+      }
+    }
+  },
+  "exp1_auto_neighbor": {
+    "auto_neighbors": {
+      "fruit": [
+        "food",
+        "plant"
+      ],
+      "animal": [
+        "plant",
+        "vehicle"
+      ],
+      "tool": [
+        "vehicle",
+        "furniture"
+      ],
+      "vehicle": [
+        "furniture",
+        "plant"
+      ],
+      "clothing": [
+        "furniture",
+        "food"
+      ],
+      "furniture": [
+        "vehicle",
+        "plant"
+      ],
+      "food": [
+        "plant",
+        "fruit"
+      ],
+      "plant": [
+        "food",
+        "fruit"
+      ]
+    },
+    "raw_cosine_matrix": {
+      "fruit_vs_animal": 0.9617135524749756,
+      "fruit_vs_tool": 0.943690836429596,
+      "fruit_vs_vehicle": 0.9617531895637512,
+      "fruit_vs_clothing": 0.966130256652832,
+      "fruit_vs_furniture": 0.9608922004699707,
+      "fruit_vs_food": 0.9756428599357605,
+      "fruit_vs_plant": 0.9747061729431152,
+      "animal_vs_tool": 0.9356570243835449,
+      "animal_vs_vehicle": 0.9672063589096069,
+      "animal_vs_clothing": 0.9568278193473816,
+      "animal_vs_furniture": 0.9575644731521606,
+      "animal_vs_food": 0.9621391892433167,
+      "animal_vs_plant": 0.9678505659103394,
+      "tool_vs_vehicle": 0.954160213470459,
+      "tool_vs_clothing": 0.9474828839302063,
+      "tool_vs_furniture": 0.951352596282959,
+      "tool_vs_food": 0.9385272860527039,
+      "tool_vs_plant": 0.943720817565918,
+      "vehicle_vs_clothing": 0.9680628776550293,
+      "vehicle_vs_furniture": 0.9751893877983093,
+      "vehicle_vs_food": 0.9701529145240784,
+      "vehicle_vs_plant": 0.9736853241920471,
+      "clothing_vs_furniture": 0.9744071364402771,
+      "clothing_vs_food": 0.9723861813545227,
+      "clothing_vs_plant": 0.9720040559768677,
+      "furniture_vs_food": 0.9705891609191895,
+      "furniture_vs_plant": 0.9746414422988892,
+      "food_vs_plant": 0.9834451079368591
+    },
+    "results_auto": {
+      "fruit": {
+        "dcf_delta": {
+          "fruit": 8.623404502868652,
+          "animal": -0.7900845209757463,
+          "tool": 0.9070000648498535,
+          "vehicle": -0.5938045183817557,
+          "clothing": 4.1006011962890625,
+          "furniture": 2.5976314544677734,
+          "food": -2.1705849965413435,
+          "plant": 2.2676897048950195
+        },
+        "attr_delta": {
+          "edible": -1.2958591461181648,
+          "plant_grown": 2.768938446044924,
+          "seed_bearing": 1.7066955566406214,
+          "sweet": 8.346172332763672,
+          "natural": 0.2577180862426758,
+          "objectness": 1.1878434181213358,
+          "movable": -1.0598316192626953,
+          "human_made": -1.8578567504882812,
+          "tool_use": 0.9753505706787102,
+          "indoor": 0.33189430236816264,
+          "living_being": -1.0486824035644489,
+          "solid": 2.426516056060791,
+          "juicy": 2.1666526794433594,
+          "dessert_like": 7.234060287475586,
+          "metallic": -0.7258116404215507,
+          "mechanical": 2.1204734802246072,
+          "fabric": 2.7742462158203125,
+          "seat_like": -0.062015151977544036,
+          "locomotion": 0.8722645441691093,
+          "has_legs": 0.7748868465423584
+        },
+        "selectivity": 2.0978450817981624,
+        "target_dcf_delta": 8.623404502868652,
+        "neighbors_used": [
+          "food",
+          "plant"
+        ]
+      },
+      "animal": {
+        "dcf_delta": {
+          "fruit": 4.575292110443115,
+          "animal": 3.366525332132973,
+          "tool": 0.7735080718994141,
+          "vehicle": -0.02762381235758582,
+          "clothing": 1.6129779815673828,
+          "furniture": 0.13941574096679688,
+          "food": 5.062334060668938,
+          "plant": 0.542963981628418
+        },
+        "attr_delta": {
+          "edible": 4.091622924804689,
+          "plant_grown": 2.8112358093261705,
+          "seed_bearing": 2.569031556447346,
+          "sweet": 0.7407646179199219,
+          "natural": 1.0582977022443494,
+          "objectness": 3.745674800872802,
+          "movable": -0.4102907180786133,
+          "human_made": -1.3634872436523438,
+          "tool_use": 1.4419044494628892,
+          "indoor": 2.8422479629516566,
+          "living_being": 4.80721817016601,
+          "solid": 2.1104464530944824,
+          "juicy": 4.1618499755859375,
+          "dessert_like": 6.8175048828125,
+          "metallic": 0.32672087351480883,
+          "mechanical": 0.6958740234375007,
+          "fabric": 3.8505659103393555,
+          "seat_like": 1.7797330856323264,
+          "locomotion": 1.259176095326744,
+          "has_legs": 3.9638261795043945
+        },
+        "selectivity": 0.6637033941114273,
+        "target_dcf_delta": 3.366525332132973,
+        "neighbors_used": [
+          "plant",
+          "vehicle"
+        ]
+      },
+      "tool": {
+        "dcf_delta": {
+          "fruit": 4.732583999633789,
+          "animal": 1.629477818806965,
+          "tool": 12.783624649047852,
+          "vehicle": -3.3537756601969377,
+          "clothing": 8.371204376220703,
+          "furniture": 0.013653755187988281,
+          "food": -1.0218696594238317,
+          "plant": 3.972566604614258
+        },
+        "attr_delta": {
+          "edible": -1.798720932006841,
+          "plant_grown": 1.864448165893556,
+          "seed_bearing": 0.3082935810089076,
+          "sweet": 5.230772018432617,
+          "natural": 2.4338269233703613,
+          "objectness": 0.004047679901123757,
+          "movable": -0.5080299377441406,
+          "human_made": -1.5273675918579102,
+          "tool_use": 11.464774322509765,
+          "indoor": -0.49158172607421946,
+          "living_being": 2.531726455688478,
+          "solid": 3.8730101585388184,
+          "juicy": 7.5699920654296875,
+          "dessert_like": 2.2986202239990234,
+          "metallic": 5.416681925455727,
+          "mechanical": 2.597056198120118,
+          "fabric": -4.439633369445801,
+          "seat_like": -1.8625296592712353,
+          "locomotion": 0.6000541051228829,
+          "has_legs": -2.5579460859298706
+        },
+        "selectivity": 1.5252729888460625,
+        "target_dcf_delta": 12.783624649047852,
+        "neighbors_used": [
+          "vehicle",
+          "furniture"
+        ]
+      },
+      "vehicle": {
+        "dcf_delta": {
+          "fruit": -2.5636215209960938,
+          "animal": -0.19918918609618785,
+          "tool": 2.453604221343994,
+          "vehicle": 6.229815483093262,
+          "clothing": -2.8954010009765625,
+          "furniture": 0.0839548110961914,
+          "food": -2.764970779418949,
+          "plant": -5.757963180541992
+        },
+        "attr_delta": {
+          "edible": -2.714180755615235,
+          "plant_grown": -2.9307659149169893,
+          "seed_bearing": -1.2870710690816267,
+          "sweet": 1.9756536483764648,
+          "natural": -2.8474560124533532,
+          "objectness": -0.11215276718139577,
+          "movable": 4.465765953063965,
+          "human_made": 2.291937828063965,
+          "tool_use": 3.2437641143798857,
+          "indoor": -1.5959497451782259,
+          "living_being": -1.0129352569580021,
+          "solid": -1.6102581024169922,
+          "juicy": -2.195751190185547,
+          "dessert_like": -1.217519760131836,
+          "metallic": -0.6426664988199882,
+          "mechanical": 4.720537185668945,
+          "fabric": -5.372983932495117,
+          "seat_like": -2.670005130767823,
+          "locomotion": 2.720369338989258,
+          "has_legs": 0.8354637622833252
+        },
+        "selectivity": 1.0800719921564879,
+        "target_dcf_delta": 6.229815483093262,
+        "neighbors_used": [
+          "furniture",
+          "plant"
+        ]
+      },
+      "clothing": {
+        "dcf_delta": {
+          "fruit": 0.283050537109375,
+          "animal": 0.6699797312418596,
+          "tool": 0.5975103378295898,
+          "vehicle": -0.034587860107421875,
+          "clothing": 4.109537124633789,
+          "furniture": -3.8397703170776367,
+          "food": -0.6675834655761719,
+          "plant": -3.7388916015625
+        },
+        "attr_delta": {
+          "edible": -2.5117568969726562,
+          "plant_grown": -1.0291656494140646,
+          "seed_bearing": -1.7434503237406425,
+          "sweet": -2.060636520385742,
+          "natural": -0.5003980909075096,
+          "objectness": 2.326877784729003,
+          "movable": 0.6077260971069336,
+          "human_made": -0.9299077987670898,
+          "tool_use": 0.22553100585937358,
+          "indoor": -1.7921083450317372,
+          "living_being": -1.0417453765869098,
+          "solid": -0.20692038536071777,
+          "juicy": 4.648313522338867,
+          "dessert_like": 2.9922542572021484,
+          "metallic": 0.08075714111328125,
+          "mechanical": -0.9412841796875,
+          "fabric": 0.7513704299926758,
+          "seat_like": -1.3421479225158706,
+          "locomotion": 0.592674732208252,
+          "has_legs": -0.12200427055358887
+        },
+        "selectivity": 1.0674759235385611,
+        "target_dcf_delta": 4.109537124633789,
+        "neighbors_used": [
+          "furniture",
+          "food"
+        ]
+      },
+      "furniture": {
+        "dcf_delta": {
+          "fruit": 1.5015959739685059,
+          "animal": 0.9163567225138358,
+          "tool": -0.08202934265136719,
+          "vehicle": -1.824907938639324,
+          "clothing": 2.8028602600097656,
+          "furniture": 6.4466047286987305,
+          "food": 2.326435089111328,
+          "plant": -2.2872352600097656
+        },
+        "attr_delta": {
+          "edible": 2.609431076049809,
+          "plant_grown": 0.4327941894531264,
+          "seed_bearing": 4.282627741495769,
+          "sweet": 1.1199264526367188,
+          "natural": 0.3374065671648303,
+          "objectness": 2.0718587875366197,
+          "movable": 1.8693523406982422,
+          "human_made": 0.7897281646728516,
+          "tool_use": 0.40716018676758026,
+          "indoor": 3.510447883605952,
+          "living_being": 1.4349090576171868,
+          "solid": 0.9018635749816895,
+          "juicy": 5.650175094604492,
+          "dessert_like": 1.8941650390625,
+          "metallic": 3.421650568644207,
+          "mechanical": -0.3902370452880852,
+          "fabric": 4.781665802001953,
+          "seat_like": 7.244057655334469,
+          "locomotion": -0.5460712114969901,
+          "has_legs": 1.7217997312545776
+        },
+        "selectivity": 2.291832559316811,
+        "target_dcf_delta": 6.4466047286987305,
+        "neighbors_used": [
+          "vehicle",
+          "plant"
+        ]
+      },
+      "food": {
+        "dcf_delta": {
+          "fruit": -0.4149012565612793,
+          "animal": 0.43814500172932824,
+          "tool": -2.655228614807129,
+          "vehicle": 1.0994857152303084,
+          "clothing": 0.1479816436767578,
+          "furniture": 0.0007390975952148438,
+          "food": 1.4221846262613944,
+          "plant": -3.238187789916992
+        },
+        "attr_delta": {
+          "edible": 1.8713771820068388,
+          "plant_grown": -1.2393795013427749,
+          "seed_bearing": 1.7212904294331821,
+          "sweet": -2.650650978088379,
+          "natural": 1.137730189732146,
+          "objectness": 1.2921063423156767,
+          "movable": 2.065866470336914,
+          "human_made": 0.6660938262939453,
+          "tool_use": -1.0859565734863281,
+          "indoor": 1.0242664337158196,
+          "living_being": 1.4534606933593714,
+          "solid": 0.38303589820861816,
+          "juicy": 1.6097583770751953,
+          "dessert_like": -1.7079906463623047,
+          "metallic": 1.2744954427083321,
+          "mechanical": -0.12281646728515483,
+          "fabric": -1.6606206893920898,
+          "seat_like": 0.7637102127075224,
+          "locomotion": 0.5448808670043945,
+          "has_legs": 1.0762404203414917
+        },
+        "selectivity": 0.4378394102324172,
+        "target_dcf_delta": 1.4221846262613944,
+        "neighbors_used": [
+          "plant",
+          "fruit"
+        ]
+      },
+      "plant": {
+        "dcf_delta": {
+          "fruit": -2.4803757667541504,
+          "animal": 3.4673897425333635,
+          "tool": 5.365935325622559,
+          "vehicle": 2.176280339558918,
+          "clothing": -0.18857383728027344,
+          "furniture": 2.599130630493164,
+          "food": 2.8296165466308594,
+          "plant": 4.545574188232422
+        },
+        "attr_delta": {
+          "edible": 2.0957214355468743,
+          "plant_grown": 2.427396392822267,
+          "seed_bearing": -0.5668376286824532,
+          "sweet": 1.179849624633789,
+          "natural": 1.817896706717356,
+          "objectness": 0.45319862365722585,
+          "movable": 1.6372489929199219,
+          "human_made": 3.2936697006225586,
+          "tool_use": 4.025041961669924,
+          "indoor": 0.8619462966918938,
+          "living_being": 3.162468719482426,
+          "solid": 0.7107737064361572,
+          "juicy": 0.10188865661621094,
+          "dessert_like": -0.3862419128417969,
+          "metallic": 1.9975929260253906,
+          "mechanical": 1.9831100463867166,
+          "fabric": 3.286189079284668,
+          "seat_like": 2.152544784545899,
+          "locomotion": 1.56182861328125,
+          "has_legs": 0.30933666229248047
+        },
+        "selectivity": 0.845541085021521,
+        "target_dcf_delta": 4.545574188232422,
+        "neighbors_used": [
+          "food",
+          "fruit"
+        ]
+      }
+    },
+    "results_manual": {
+      "fruit": {
+        "dcf_delta": {
+          "fruit": 8.62343692779541,
+          "animal": -0.790036837259926,
+          "tool": 0.9070744514465332,
+          "vehicle": -0.5936671892801932,
+          "clothing": 4.100612640380859,
+          "furniture": 2.597829818725586,
+          "food": -2.170995076497391,
+          "plant": 2.2667856216430664
+        },
+        "attr_delta": {
+          "edible": -1.2957443237304709,
+          "plant_grown": 2.7685569763183615,
+          "seed_bearing": 1.706579208374027,
+          "sweet": 8.346248626708984,
+          "natural": 0.25744724273681285,
+          "objectness": 1.1877556800842264,
+          "movable": -1.0596256256103516,
+          "human_made": -1.8578758239746094,
+          "tool_use": 0.9754116058349602,
+          "indoor": 0.3319217681884741,
+          "living_being": -1.048823547363277,
+          "solid": 2.426330089569092,
+          "juicy": 2.165935516357422,
+          "dessert_like": 7.23466682434082,
+          "metallic": -0.7256285349528007,
+          "mechanical": 2.120729064941404,
+          "fabric": 2.7742443084716797,
+          "seat_like": -0.06187095642090057,
+          "locomotion": 0.8725519180297852,
+          "has_legs": 0.774794340133667
+        },
+        "selectivity": 2.0978471294236147,
+        "target_dcf_delta": 8.62343692779541,
+        "neighbors_used": [
+          "plant",
+          "food"
+        ]
+      },
+      "animal": {
+        "dcf_delta": {
+          "fruit": 2.876089096069336,
+          "animal": 5.066657066345215,
+          "tool": 5.92704963684082,
+          "vehicle": 3.990359942118328,
+          "clothing": -0.8811130523681641,
+          "furniture": 4.018401145935059,
+          "food": 5.279039382934563,
+          "plant": 2.914443016052246
+        },
+        "attr_delta": {
+          "edible": 4.590378189086916,
+          "plant_grown": 3.9629516601562464,
+          "seed_bearing": 2.2993090947469064,
+          "sweet": 4.997646331787109,
+          "natural": 0.76282671519688,
+          "objectness": 3.029494476318355,
+          "movable": 2.101594924926758,
+          "human_made": 1.8908700942993164,
+          "tool_use": 5.931402587890624,
+          "indoor": 3.2846145629882812,
+          "living_being": 6.319725799560544,
+          "solid": 2.1077723503112793,
+          "juicy": 1.5808238983154297,
+          "dessert_like": 6.213462829589844,
+          "metallic": 1.0380792617797816,
+          "mechanical": 4.928114318847655,
+          "fabric": 4.03748893737793,
+          "seat_like": 2.5790491104125977,
+          "locomotion": 3.3228942553202288,
+          "has_legs": 4.567351579666138
+        },
+        "selectivity": 0.8533964471015014,
+        "target_dcf_delta": 5.066657066345215,
+        "neighbors_used": [
+          "food",
+          "clothing"
+        ]
+      },
+      "tool": {
+        "dcf_delta": {
+          "fruit": 4.732600212097168,
+          "animal": 1.6294898986816406,
+          "tool": 12.78367805480957,
+          "vehicle": -3.353666305541992,
+          "clothing": 8.371124267578125,
+          "furniture": 0.013777732849121094,
+          "food": -1.0218315124511754,
+          "plant": 3.972524642944336
+        },
+        "attr_delta": {
+          "edible": -1.7987064361572251,
+          "plant_grown": 1.864368057250978,
+          "seed_bearing": 0.3083527088165212,
+          "sweet": 5.231019973754883,
+          "natural": 2.4338618006025072,
+          "objectness": 0.004098033905027165,
+          "movable": -0.5080032348632812,
+          "human_made": -1.5273199081420898,
+          "tool_use": 11.464842987060539,
+          "indoor": -0.49151916503906357,
+          "living_being": 2.5317844390869126,
+          "solid": 3.8730154037475586,
+          "juicy": 7.569980621337891,
+          "dessert_like": 2.298818588256836,
+          "metallic": 5.416652679443359,
+          "mechanical": 2.5972385406494105,
+          "fabric": -4.43953800201416,
+          "seat_like": -1.862521839141845,
+          "locomotion": 0.6001081466674805,
+          "has_legs": -2.5578869581222534
+        },
+        "selectivity": 1.5252939398909118,
+        "target_dcf_delta": 12.78367805480957,
+        "neighbors_used": [
+          "furniture",
+          "vehicle"
+        ]
+      },
+      "vehicle": {
+        "dcf_delta": {
+          "fruit": -1.8762385845184326,
+          "animal": 0.8769995371500663,
+          "tool": -0.31203174591064453,
+          "vehicle": 7.2823174794515,
+          "clothing": -3.9901504516601562,
+          "furniture": -0.8174943923950195,
+          "food": -0.9775791168212891,
+          "plant": -1.653925895690918
+        },
+        "attr_delta": {
+          "edible": -0.6792259216308594,
+          "plant_grown": -0.6912929534912102,
+          "seed_bearing": -1.7763635317484514,
+          "sweet": 1.5129470825195312,
+          "natural": -0.7284893648965003,
+          "objectness": 0.375204181671144,
+          "movable": 3.508713722229004,
+          "human_made": 2.935166358947754,
+          "tool_use": 0.45062332153320384,
+          "indoor": -1.4276044845581062,
+          "living_being": 0.18865470886230895,
+          "solid": -0.933690071105957,
+          "juicy": -4.630146026611328,
+          "dessert_like": -0.6831989288330078,
+          "metallic": -2.1368916829427107,
+          "mechanical": 4.159830474853518,
+          "fabric": -2.369349479675293,
+          "seat_like": -3.200439929962158,
+          "locomotion": 3.2886848449706996,
+          "has_legs": 1.4313225746154785
+        },
+        "selectivity": 1.8205108951412483,
+        "target_dcf_delta": 7.2823174794515,
+        "neighbors_used": [
+          "tool",
+          "furniture"
+        ]
+      },
+      "clothing": {
+        "dcf_delta": {
+          "fruit": 2.146455764770508,
+          "animal": 1.3515539169311488,
+          "tool": -3.045823097229004,
+          "vehicle": 1.002802848815918,
+          "clothing": 3.8879337310791016,
+          "furniture": -5.027858734130859,
+          "food": 0.8536421457926409,
+          "plant": -1.321664810180664
+        },
+        "attr_delta": {
+          "edible": -0.43009681701660085,
+          "plant_grown": 0.5800643920898381,
+          "seed_bearing": -1.4043909708658902,
+          "sweet": -2.665414810180664,
+          "natural": 1.836394309997555,
+          "objectness": 3.2950479507446246,
+          "movable": 0.13796615600585938,
+          "human_made": -0.7685022354125977,
+          "tool_use": -2.692719268798829,
+          "indoor": -1.4636426925659194,
+          "living_being": 0.21468696594238423,
+          "solid": 0.8923146724700928,
+          "juicy": 3.407064437866211,
+          "dessert_like": 3.5699424743652344,
+          "metallic": -0.9925963083903007,
+          "mechanical": -1.3820316314697294,
+          "fabric": 2.2597122192382812,
+          "seat_like": -2.2218481063842788,
+          "locomotion": 1.2901285489400252,
+          "has_legs": 0.7427551746368408
+        },
+        "selectivity": 0.7717433013234054,
+        "target_dcf_delta": 3.8879337310791016,
+        "neighbors_used": [
+          "furniture",
+          "tool"
+        ]
+      },
+      "furniture": {
+        "dcf_delta": {
+          "fruit": 0.5441999435424805,
+          "animal": 2.331017176310219,
+          "tool": -0.051810264587402344,
+          "vehicle": 2.877012252807617,
+          "clothing": -2.2881240844726562,
+          "furniture": 9.832174301147461,
+          "food": 3.783917744954426,
+          "plant": 2.6778650283813477
+        },
+        "attr_delta": {
+          "edible": 5.470132827758789,
+          "plant_grown": 2.7260375976562514,
+          "seed_bearing": 4.535521348317463,
+          "sweet": 4.358976364135742,
+          "natural": 1.635661329541886,
+          "objectness": 1.0661821365356445,
+          "movable": 3.3110761642456055,
+          "human_made": 4.139418601989746,
+          "tool_use": 0.6161682128906278,
+          "indoor": 4.561823463439936,
+          "living_being": 3.5795654296874986,
+          "solid": 1.2150371074676514,
+          "juicy": -0.6591987609863281,
+          "dessert_like": 0.27593994140625,
+          "metallic": 2.260135014851887,
+          "mechanical": 2.9175365447998054,
+          "fabric": 5.979363441467285,
+          "seat_like": 7.451502799987793,
+          "locomotion": 1.4469866752624512,
+          "has_legs": 3.0250312089920044
+        },
+        "selectivity": 2.5915623274182424,
+        "target_dcf_delta": 9.832174301147461,
+        "neighbors_used": [
+          "tool",
+          "clothing"
+        ]
+      },
+      "food": {
+        "dcf_delta": {
+          "fruit": -0.4149012565612793,
+          "animal": 0.43814500172932824,
+          "tool": -2.655228614807129,
+          "vehicle": 1.0994857152303084,
+          "clothing": 0.1479816436767578,
+          "furniture": 0.0007390975952148438,
+          "food": 1.4221846262613944,
+          "plant": -3.238187789916992
+        },
+        "attr_delta": {
+          "edible": 1.8713771820068388,
+          "plant_grown": -1.2393795013427749,
+          "seed_bearing": 1.7212904294331821,
+          "sweet": -2.650650978088379,
+          "natural": 1.137730189732146,
+          "objectness": 1.2921063423156767,
+          "movable": 2.065866470336914,
+          "human_made": 0.6660938262939453,
+          "tool_use": -1.0859565734863281,
+          "indoor": 1.0242664337158196,
+          "living_being": 1.4534606933593714,
+          "solid": 0.38303589820861816,
+          "juicy": 1.6097583770751953,
+          "dessert_like": -1.7079906463623047,
+          "metallic": 1.2744954427083321,
+          "mechanical": -0.12281646728515483,
+          "fabric": -1.6606206893920898,
+          "seat_like": 0.7637102127075224,
+          "locomotion": 0.5448808670043945,
+          "has_legs": 1.0762404203414917
+        },
+        "selectivity": 0.4378394102324172,
+        "target_dcf_delta": 1.4221846262613944,
+        "neighbors_used": [
+          "plant",
+          "fruit"
+        ]
+      },
+      "plant": {
+        "dcf_delta": {
+          "fruit": -2.4803757667541504,
+          "animal": 3.4673897425333635,
+          "tool": 5.365935325622559,
+          "vehicle": 2.176280339558918,
+          "clothing": -0.18857383728027344,
+          "furniture": 2.599130630493164,
+          "food": 2.8296165466308594,
+          "plant": 4.545574188232422
+        },
+        "attr_delta": {
+          "edible": 2.0957214355468743,
+          "plant_grown": 2.427396392822267,
+          "seed_bearing": -0.5668376286824532,
+          "sweet": 1.179849624633789,
+          "natural": 1.817896706717356,
+          "objectness": 0.45319862365722585,
+          "movable": 1.6372489929199219,
+          "human_made": 3.2936697006225586,
+          "tool_use": 4.025041961669924,
+          "indoor": 0.8619462966918938,
+          "living_being": 3.162468719482426,
+          "solid": 0.7107737064361572,
+          "juicy": 0.10188865661621094,
+          "dessert_like": -0.3862419128417969,
+          "metallic": 1.9975929260253906,
+          "mechanical": 1.9831100463867166,
+          "fabric": 3.286189079284668,
+          "seat_like": 2.152544784545899,
+          "locomotion": 1.56182861328125,
+          "has_legs": 0.30933666229248047
+        },
+        "selectivity": 0.845541085021521,
+        "target_dcf_delta": 4.545574188232422,
+        "neighbors_used": [
+          "food",
+          "fruit"
+        ]
+      }
+    }
+  },
+  "elapsed_seconds": 3111.6
+}

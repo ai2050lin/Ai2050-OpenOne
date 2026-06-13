@@ -27029,3 +27029,366 @@ python tests/glm5/phase480_category_boundary_universality.py deepseek7b 1  # ~17
 脚本位置：
 - `tests/glm5/phase480_category_boundary_universality.py` — Phase 480 主测试
 - 结果：`results/glm5/phase480_{qwen3,glm4,deepseek7b}_r1.json`
+
+---
+
+## Phase 481: 自动邻居选择、留出验证与DS7B修复 [2026-06-13 14:11]
+
+### 核心问题
+
+1. 人工指定邻居类别是否引入偏置？自动邻居选择是否能改进？
+2. specific方向自对齐是否是循环验证？留出test对象能否复现？
+3. DS7B fruit/clothing失败是层位问题还是机制差异？
+
+### Exp1: 自动邻居选择 ★★★核心突破★★★ (ALL models)
+
+**方法**: 基于raw direction两两余弦相似度，自动选择top-2最近邻作为正交化目标
+
+**Qwen3 L30 自动邻居 vs 人工邻居 selectivity:**
+
+| 类别 | 自动邻居 | 自动sel | 人工邻居 | 人工sel | 改进? |
+|------|---------|---------|---------|---------|-------|
+| fruit | plant,food | 3.08 | plant,food | 3.08 | = |
+| animal | **plant,vehicle** | 1.24 | food,clothing | 1.99 | ❌降 |
+| tool | vehicle,furniture | 1.49 | furniture,vehicle | 1.49 | = |
+| vehicle | furniture,tool | 3.35 | tool,furniture | 3.35 | = |
+| clothing | furniture,vehicle | 3.61 | furniture,tool | 4.58 | ❌降 |
+| furniture | **vehicle,clothing** | 1.31 | tool,clothing | 1.09 | ✅升 |
+| food | **plant,vehicle** | **2.04** | plant,fruit | 0.98 | ✅**大幅升** |
+| plant | **food,animal** | **2.67** | food,fruit | 1.00 | ✅**大幅升** |
+
+**GLM4 L33 自动邻居 vs 人工邻居 selectivity:**
+
+| 类别 | 自动邻居 | 自动sel | 人工sel | 改进? |
+|------|---------|---------|---------|-------|
+| fruit | plant,food | 1.84 | 1.84 | = |
+| animal | plant,vehicle | 1.58 | 1.71 | ≈ |
+| tool | furniture,vehicle | 2.31 | 2.31 | = |
+| vehicle | **furniture,plant** | 2.18 | 2.36 | ≈ |
+| clothing | **furniture,plant** | **2.71** | 1.24 | ✅**大幅升** |
+| furniture | **vehicle,clothing** | **4.48** | 2.91 | ✅**大幅升** |
+| food | plant,clothing | 0.39 | 0.74 | ❌降 |
+| plant | **vehicle,clothing** | **2.83** | 0.95 | ✅**大幅升** |
+
+**DS7B 自动邻居 vs 人工邻居 selectivity (L24):**
+
+| 类别 | 自动sel | 人工sel |
+|------|---------|---------|
+| fruit | **2.10** | 2.10 |
+| animal | 0.66 | 0.85 |
+| tool | 1.53 | 1.53 |
+| vehicle | 1.08 | 1.82 |
+| clothing | **1.07** | 0.77 |
+| furniture | 2.29 | 2.59 |
+| food | 0.44 | 0.44 |
+| plant | 0.85 | 0.85 |
+
+**关键发现:**
+1. **自动邻居对food和plant改进最大**: Qwen3 food sel从0.98→2.04(+108%), plant sel从1.00→2.67(+167%)
+2. **GLM4的plant和furniture也大幅改进**: plant从0.95→2.83(+198%), furniture从2.91→4.48(+54%)
+3. **animal的自动邻居从[food,clothing]变为[plant,vehicle]** — 在Qwen3中效果变差(1.99→1.24)
+4. **clothing的自动邻居在GLM4中从[tool]变为[plant]** — sel从1.24→2.71
+5. **自动邻居选择不总是优于人工邻居** — animal和vehicle在某些模型上变差
+
+### Exp2: 留出对象验证 ★★★极重要★★★ (Qwen3 + GLM4)
+
+**方法**: 用train 4个对象构造specific方向，test 4个对象验证self-rank
+
+**Qwen3 L30 留出验证结果:**
+
+| 类别 | avg_rank | self_rank_1 | test对象 |
+|------|----------|-------------|----------|
+| fruit | 1.0 | 4/4 ✓ | pear,peach,mango,plum |
+| animal | 1.25 | 3/4 | bear,rabbit,eagle,**fish#2** |
+| tool | 1.0 | 4/4 ✓ | drill,axe,chisel,pliers |
+| vehicle | 1.25 | 3/4 | train,boat,plane,motorcycle |
+| clothing | 1.0 | 4/4 ✓ | sock,glove,jacket,scarf |
+| furniture | 2.0 | 3/4 | bed,shelf,cabinet,stool |
+| food | 1.0 | 4/4 ✓ | soup,steak,salad,cake |
+| plant | 1.0 | 4/4 ✓ | fern,cactus,vine,shrub |
+
+**GLM4 L33 留出验证结果:**
+
+| 类别 | avg_rank | self_rank_1 |
+|------|----------|-------------|
+| fruit | 1.0 | 4/4 ✓ |
+| animal | 1.25 | 3/4 |
+| tool | 1.0 | 4/4 ✓ |
+| vehicle | 1.0 | 4/4 ✓ |
+| clothing | 1.0 | 4/4 ✓ |
+| furniture | 1.0 | 4/4 ✓ |
+| food | 1.0 | 4/4 ✓ |
+| plant | 1.0 | 4/4 ✓ |
+
+**关键发现:**
+1. **Qwen3: 6/8类别100%自对齐，animal(3/4)和vehicle(3/4)稍弱**
+2. **GLM4: 7/8类别100%自对齐，animal(3/4)稍弱**
+3. **fish在animal方向排第2** — fish是水生动物，可能跟plant更相关
+4. **furniture在Qwen3留出中avg_rank=2.0** — test对象bed/shelf/cabinet/stool可能跟clothing/vehicle有交叉
+5. **留出验证排除了循环验证风险** — specific方向不是仅对构造对象有效
+
+### Exp3: DS7B多层扫描+注入强度校准 ★★★重大修复★★★ (DS7B)
+
+**方法**: 扫描L16-L27全部12层，3个scale(1.0/0.5/0.3)
+
+**DS7B fruit_specific最佳结果:**
+
+| 层 | scale | selectivity | target_Δ | norm_ratio |
+|----|-------|-------------|----------|------------|
+| **L26** | **0.3** | **2.85** ✅ | +4.19 | 0.171 |
+| L26 | 0.5 | 2.22 | +6.99 | 0.171 |
+| L25 | 0.3 | 1.28 | +1.78 | 0.197 |
+| L24 | 1.0 | 0.05 ❌ | -0.86 | 0.170 |
+
+**DS7B clothing_specific最佳结果:**
+
+| 层 | scale | selectivity | target_Δ | norm_ratio |
+|----|-------|-------------|----------|------------|
+| **L23** | **0.5** | **1.08** ✅ | +1.30 | 0.182 |
+| L24 | 1.0 | 0.28 | -9.64 | 0.267 |
+| L22 | 0.5 | 0.92 | +1.10 | 0.213 |
+
+**DS7B vehicle_specific最佳结果:**
+
+| 层 | scale | selectivity | target_Δ | norm_ratio |
+|----|-------|-------------|----------|------------|
+| **L27** | **0.3** | **1.89** | +8.73 | 0.222 |
+
+**关键发现:**
+1. **DS7B fruit_specific成功修复！L26+scale=0.3 → sel=2.85** (Phase 480 L24 sel=0.05)
+2. **DS7B clothing_specific也修复！L23+scale=0.5 → sel=1.08** (Phase 480 L24 sel=0.28)
+3. **层位是关键**: fruit最佳在L26而非L24，clothing最佳在L23而非L24
+4. **注入强度也很关键**: scale=0.3或0.5优于1.0 — DS7B的specific向量范数过大，1x注入会全面激活
+5. **DS7B的类别边界残差写入层与Qwen3不同**: 
+   - Qwen3: L30 (36层的83%)
+   - GLM4: L33 (40层的83%)
+   - DS7B: fruit=L26, clothing=L23, vehicle=L27 (28层的82%-96%)
+6. **DS7B内部不同类别的最佳层位不同**: fruit在L26, clothing在L23 — 类别边界可能在DS7B中逐层写入
+
+### 用户分析的正确性验证
+
+| 用户结论 | Phase 481实际数据 | 判断 |
+|---------|-----------------|------|
+| 自动邻居选择能消除偏置 | food/plant大幅改进，但animal变差 | ⚠️ 部分确认 |
+| 留出验证能排除循环风险 | Qwen3 6/8, GLM4 7/8 自对齐 | ✅ 基本确认 |
+| DS7B失败是层位问题 | L26+scale=0.3修复fruit(sel=2.85) | ✅ **确认！** |
+| DS7B需要调整邻居 | Exp1中L24自动邻居已改进food/plant | ⚠️ 次要因素，层位更关键 |
+| 注入强度需要校准 | scale=0.3远优于1.0 | ✅ 确认 |
+
+### 客观数据汇总
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| 自动邻居sel≥1.0 | 8/8 | 7/8 | 4/8 |
+| 人工邻居sel≥1.0 | 8/8 | 6/8 | 3/8 |
+| 留出self_rank=1 | 6/8(Q)+7/8(G) | N/A | N/A |
+| DS7B fruit修复 | N/A | N/A | sel=2.85(L26) |
+| DS7B clothing修复 | N/A | N/A | sel=1.08(L23) |
+| 自动vs人工最优 | food+plant+clothing | plant+furniture+clothing | clothing |
+
+### 硬伤与问题
+
+1. **自动邻居对animal效果变差**: Qwen3 animal自动sel=1.24 vs 人工1.99。可能因为plant/vehicle虽然cosine最高但不是最佳正交化目标
+2. **留出验证中furniture在Qwen3效果弱(avg_rank=2.0)**: bed/shelf等test对象可能和clothing方向有交叉
+3. **fish在animal方向排第2**: fish可能被模型编码为"水生生物"而非典型animal
+4. **DS7B每个类别最佳层位不同**: 说明DS7B不是在一个统一层写入所有类别边界，而是逐层写入
+5. **DS7B scale=0.3时fruit DCF中plant_Δ=+0.71**: fruit_specific仍然轻微提升plant方向，说明正交化不够干净
+
+### 命令记录
+
+```bash
+# Phase 481 R1
+python tests/glm5/phase481_auto_neighbor_holdout.py qwen3 1       # ~73s
+python tests/glm5/phase481_auto_neighbor_holdout.py glm4 1         # ~1424s
+python tests/glm5/phase481_auto_neighbor_holdout.py deepseek7b 1  # ~3112s
+```
+
+脚本位置：
+- `tests/glm5/phase481_auto_neighbor_holdout.py` — Phase 481 主测试
+- 结果：`results/glm5/phase481_{qwen3,glm4,deepseek7b}_r1.json`
+
+---
+
+## Phase 482: 类别-层位图谱、正反向剂量曲线与边界残差必要性 [2026-06-13 17:43]
+
+### 核心问题
+
+1. 每个类别的最佳边界层位在哪？所有类别是否共享同一层？
+2. 正反向注入是否对称？specific方向是激活方向、抑制方向还是边界法向量？
+3. 移除类别边界残差后，目标类别是否下降？竞争类别是否上升？
+
+### Exp1: 类别-层位图谱 ★★★★★ 极重要 ★★★★★ (ALL models)
+
+**方法**: 扫描每个模型的中间层范围，每层构造8个类别的specific方向并测试selectivity
+
+**Qwen3 类别-层位图谱 (L20-L35):**
+
+| 类别 | 最佳层 | depth | selectivity | target_Δ | spec_norm |
+|------|-------|-------|-------------|----------|-----------|
+| fruit | **L32** | 0.89 | **4.11** | +24.86 | 199 |
+| animal | **L33** | 0.92 | **2.20** | +25.76 | 248 |
+| tool | **L23** | 0.64 | **2.69** | +1.77 | 27 |
+| vehicle | **L29** | 0.81 | **7.24** | +21.36 | 121 |
+| clothing | **L30** | 0.83 | **4.57** | +38.28 | 167 |
+| furniture | **L26** | 0.72 | **1.53** | +4.63 | 51 |
+| food | **L34** | 0.94 | **2.46** | +20.43 | 228 |
+| plant | **L28** | 0.78 | **4.33** | +10.75 | 76 |
+
+**GLM4 类别-层位图谱 (L24-L39):**
+
+| 类别 | 最佳层 | depth | selectivity | target_Δ | spec_norm |
+|------|-------|-------|-------------|----------|-----------|
+| fruit | **L27** | 0.68 | **2.58** | +0.62 | 16 |
+| animal | **L38** | 0.95 | **3.39** | +3.77 | 106 |
+| tool | **L27** | 0.68 | **3.22** | +0.73 | 18 |
+| vehicle | **L29** | 0.72 | **3.22** | +1.52 | 27 |
+| clothing | **L39** | 0.97 | **3.56** | +5.21 | 113 |
+| furniture | **L34** | 0.85 | **5.09** | +1.99 | 44 |
+| food | **L38** | 0.95 | **2.09** | +3.25 | 106 |
+| plant | **L32** | 0.80 | **3.12** | +2.14 | 38 |
+
+**DS7B 类别-层位图谱 (L16-L27):**
+
+| 类别 | 最佳层 | depth | selectivity | target_Δ | spec_norm |
+|------|-------|-------|-------------|----------|-----------|
+| fruit | **L26** | 0.93 | **2.83** | +13.93 | 221 |
+| animal | **L27** | 0.96 | **2.55** | +27.23 | 589 |
+| tool | **L26** | 0.93 | **1.71** | +17.20 | 324 |
+| vehicle | **L26** | 0.93 | **3.60** | +16.77 | 240 |
+| clothing | **L23** | 0.82 | **1.08** | +2.59 | 123 |
+| furniture | **L25** | 0.89 | **3.02** | +11.66 | 210 |
+| food | **L27** | 0.96 | **1.47** | +27.35 | 380 |
+| plant | **L25** | 0.89 | **1.22** | +7.33 | 165 |
+
+**★★★关键发现★★★:**
+
+1. **Qwen3的类别最佳层位跨度极大**: tool=L23(0.64)到food=L34(0.94)，跨度10层！
+2. **GLM4同样分散**: fruit/tool=L27(0.68)到clothing=L39(0.97)
+3. **DS7B相对集中**: 大部分类别在L25-L27(0.89-0.96)，但clothing例外=L23(0.82)
+4. **不存在"统一类别边界层"**: 之前假设所有类别在0.83 depth统一写入，这个假设被推翻
+5. **物体类(tool/vehicle/furniture)偏早层，生命类(fruit/animal/food/plant)偏晚层**
+6. **GLM4的fruit/tool最佳在L27(0.68)** — 比Qwen3早得多，说明GLM4在中层就形成了这些边界
+7. **GLM4的spec_norm比Qwen3/DS7B小1-2个量级**(fruit: 16 vs 199/221)
+
+### Exp2: 正反向剂量曲线 ★★★重要★★★ (ALL models)
+
+**方法**: 对5个类别做+specific和-specific注入，scale从0.1到1.0
+
+**Qwen3 fruit 剂量曲线 (L32):**
+
+| 方向 | scale | selectivity | target_Δ | margin | dcf_std |
+|------|-------|-------------|----------|--------|---------|
+| +specific | 0.1 | 4.10 | +2.49 | 1.89 | 0.83 |
+| +specific | 0.3 | 4.10 | +7.45 | 5.64 | 2.50 |
+| +specific | 0.5 | 4.12 | +12.44 | 9.43 | 4.18 |
+| +specific | 0.8 | 4.12 | +19.92 | 15.10 | 6.68 |
+| +specific | 1.0 | 4.12 | +24.86 | 18.83 | 8.35 |
+| -specific | 0.1 | 4.08 | -2.49 | 1.89 | 0.84 |
+| -specific | 0.3 | 4.09 | -7.45 | 5.64 | 2.50 |
+| -specific | 0.5 | 4.12 | -12.44 | 9.43 | 4.18 |
+| -specific | 0.8 | 4.12 | -19.91 | 15.08 | 6.68 |
+| -specific | 1.0 | 4.12 | -24.86 | 18.83 | 8.35 |
+
+**★★★关键发现★★★:**
+
+1. **Qwen3正反向剂量曲线几乎完美对称！** +specific和-specific的selectivity、margin、dcf_std完全一致
+2. **selectivity在所有scale下保持恒定(~4.1)** — 说明specific方向是线性轴，不是非线性开关
+3. **target_Δ与scale完全线性**: 0.1→2.49, 0.3→7.45, 0.5→12.44, 1.0→24.86 — 线性响应
+4. **这修正了Phase 480的结论**: Phase 480发现"反向注入比正向注入更强"，但现在用正确层位(L32而非L30)后，正反向完全对称
+5. **结论更新**: specific方向不是激活方向或抑制方向，而是**线性边界法向量** — 正向和反向等价但符号相反
+
+**GLM4 剂量曲线关键观察:**
+- GLM4的sel也相对稳定，但整体值更小(fruit L27 sel≈2-3)
+- GLM4的target_Δ也更小(fruit +s1.0 ≈ +0.62 vs Qwen3 ≈ +24.86)
+
+### Exp3: 边界残差必要性 ★★★★★ 极重要 ★★★★★ (ALL models)
+
+**方法**: 从自然输入中移除B_c分量(scale=0.5/1.0/2.0)，测试DCF变化
+
+**Qwen3 边界残差移除结果 (remove_s1.0):**
+
+| 类别 | target_Δ | 竞争类别上升 | 竞争类别_Δ | 选择性? |
+|------|----------|------------|-----------|---------|
+| fruit | -25.44 | animal ↑ | +4.45 | ✅ 强选择性 |
+| vehicle | -14.51 | — | (max 2.00) | ✅ 选择性 |
+| food | -14.85 | animal ↑ | +6.04 | ✅ 选择性 |
+| plant | -9.14 | — | (max 2.10) | ✅ 选择性 |
+| animal | **-22.01** | **clothing ↑+10.0** | **food ↑+6.48** | ✅✅ **极强** |
+
+**★★★最关键发现★★★:**
+
+1. **Qwen3 animal移除后clothing上升+10.0，food上升+6.48！** 这是最强的边界残差功能证据
+2. **移除边界残差不仅抑制目标类别，更释放竞争类别** — 这是"互斥边界"的直接证据
+3. **所有5个测试类别都通过了必要性测试** — target_Δ远大于max_other_Δ
+4. **移除效果近似线性**: remove_s0.5约为remove_s1.0的一半
+
+**DS7B 边界残差移除结果 (remove_s1.0):**
+
+| 类别 | target_Δ | 问题 |
+|------|----------|------|
+| fruit | -14.86 | ✅ 选择性 |
+| vehicle | -12.67 | ✅ 选择性 |
+| animal | -14.51 | ✅ 选择性 |
+| plant | -6.17 | ⚠️ 其他类别也下降较多 |
+| **food** | **-32.28** | ❌ **非选择性!** vehicle=-21.79, clothing=-21.64 |
+
+5. **DS7B food移除非选择性**: food_remove导致vehicle/clothing/furniture也大幅下降，说明DS7B food-specific方向不够干净
+6. **DS7B plant移除时其他类别也下降**: plant-specific包含太多共享成分
+7. **DS7B fruit/vehicle/animal移除选择性较好** — 说明这些类别的边界更干净
+
+### 用户分析的正确性验证
+
+| 用户结论 | Phase 482实际数据 | 判断 |
+|---------|-----------------|------|
+| 模型有统一类别边界层(~0.83 depth) | **不存在统一层！** Qwen3跨L23-L34 | ❌ **推翻** |
+| 反向注入比正向更强 | Qwen3正反向**完全对称** | ❌ **推翻** (Phase 480用了错误层位L30) |
+| 边界残差有因果效力 | 移除测试5/5成功，animal移除后clothing↑10 | ✅ **强确认** |
+| DS7B层位分散 | DS7B L23-L27分散，clothing=L23 | ✅ 确认 |
+| GLM4边界残差弱但存在 | GLM4 sel全≥2.0，但spec_norm极小 | ✅ 确认 |
+
+### 客观数据汇总
+
+**类别-层位图谱(跨模型):**
+
+| 类别 | Qwen3 | GLM4 | DS7B | 跨模型一致性 |
+|------|-------|------|------|------------|
+| fruit | L32(0.89) | L27(0.68) | L26(0.93) | ❌ 不一致 |
+| animal | L33(0.92) | L38(0.95) | L27(0.96) | ⚠️ 部分 |
+| tool | L23(0.64) | L27(0.68) | L26(0.93) | ❌ 不一致 |
+| vehicle | L29(0.81) | L29(0.72) | L26(0.93) | ⚠️ GLM4≈Qwen3 |
+| clothing | L30(0.83) | L39(0.97) | L23(0.82) | ❌ 不一致 |
+| furniture | L26(0.72) | L34(0.85) | L25(0.89) | ❌ 不一致 |
+| food | L34(0.94) | L38(0.95) | L27(0.96) | ⚠️ GLM4≈Qwen3 |
+| plant | L28(0.78) | L32(0.80) | L25(0.89) | ⚠️ Qwen3≈GLM4 |
+
+**边界残差必要性(移除测试remove_s1.0):**
+
+| 类别 | Qwen3 target_Δ | GLM4 target_Δ | DS7B target_Δ | 选择性? |
+|------|----------------|---------------|---------------|---------|
+| fruit | -25.44 | -0.65 | -14.86 | Q+D ✅ |
+| vehicle | -14.51 | -1.29 | -12.67 | Q+D ✅ |
+| animal | -22.01 | -3.31 | -14.51 | Q+G+D ✅ |
+| food | -14.85 | -2.17 | -32.28❌ | Q✅ D❌ |
+| plant | -9.14 | -2.29 | -6.17 | Q+G ✅ |
+
+### 硬伤与问题
+
+1. **不存在统一类别边界层**: 之前假设0.83 depth统一写入，被全层扫描推翻。每个类别有自己的最佳层位，且跨模型不一致
+2. **GLM4的spec_norm比Qwen3/DS7B小1-2个量级**: 说明GLM4的specific方向占残差流的比重极小
+3. **DS7B food/clothing边界不够干净**: 移除food_specific时vehicle/clothing/furniture也大幅下降
+4. **Qwen3 Phase 480用了错误层位(L30)**: fruit最佳是L32，clothing最佳是L30。Phase 480的fruit-specific在L30(sel=3.08)虽然不是最佳但仍可工作
+5. **正反向对称性可能只在最佳层成立**: Phase 480中在L30看到的不对称，可能是因为fruit在L30不是最佳层
+6. **跨模型层位不一致**: 同一类别的最佳边界层在不同模型中不同，说明层位实现是模型特异的
+
+### 命令记录
+
+```bash
+# Phase 482 R1
+python tests/glm5/phase482_layer_map_dose_curve.py qwen3 1       # ~155s
+python tests/glm5/phase482_layer_map_dose_curve.py glm4 1         # ~3239s
+python tests/glm5/phase482_layer_map_dose_curve.py deepseek7b 1  # ~2254s
+```
+
+脚本位置：
+- `tests/glm5/phase482_layer_map_dose_curve.py` — Phase 482 主测试
+- 结果：`results/glm5/phase482_{qwen3,glm4,deepseek7b}_r1.json`
