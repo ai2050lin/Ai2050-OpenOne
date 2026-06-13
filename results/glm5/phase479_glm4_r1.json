@@ -1,0 +1,166 @@
+{
+  "phase": 479,
+  "model": "glm4",
+  "round": 1,
+  "timestamp": "2026-06-13 11:37:25",
+  "theory": "Attribute Atom Decomposition, fruit-specific Verification & Cross-Language Readout",
+  "core_question": "Is fruit-specific equivalent to sweet-specific? How do relation slots read out from semantic clusters?",
+  "model_info": {
+    "class": "GlmForCausalLM",
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "exp1_sweet_specific": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp2_gs_robustness": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp3_attribute_neurons": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp4_relation_readout": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp5_glm4_fruit_specific": {
+    "direction_cosines": {
+      "fruit_specific_vs_fruit": 0.45394009351730347,
+      "fruit_specific_vs_plant": -0.12631987035274506,
+      "fruit_specific_vs_food": 1.0704399144856325e-08,
+      "fruit_specific_vs_animal": -0.010445959866046906,
+      "fruit_vs_plant": 0.8250030279159546,
+      "fruit_vs_food": 0.7457261681556702
+    },
+    "injection_results": {
+      "fruit_cluster": {
+        "dcf_delta": {
+          "fruit": 4.318038841088613,
+          "animal": 0.47738631566365797,
+          "tool": 1.378616889317831,
+          "vehicle": 1.1436965200636129,
+          "clothing": 0.41336770852406834,
+          "furniture": 1.0261406103769932,
+          "food": 1.7302331394619408,
+          "plant": 2.6934735774993896
+        },
+        "attr_delta": {
+          "edible": 1.6383311907450357,
+          "plant_grown": 1.882399082183838,
+          "seed_bearing": 1.385572009616428,
+          "sweet": 2.399088164170583,
+          "natural": 1.147119067964101,
+          "objectness": 0.60989286104838,
+          "movable": 0.6495019197463989,
+          "human_made": 0.8626842896143594,
+          "tool_use": 1.4718421300252276,
+          "indoor": 0.16292663812637276,
+          "living_being": 0.7583297093709316,
+          "solid": 1.2059510648250584,
+          "juicy": 1.2030421495437622,
+          "dessert_like": 0.8890920877456666
+        },
+        "selectivity": 1.597218806585354,
+        "fruit_dcf_delta": 4.318038841088613
+      },
+      "fruit_specific_v2": {
+        "dcf_delta": {
+          "fruit": 3.4457436601320905,
+          "animal": -0.953507184982298,
+          "tool": -0.7919582525889073,
+          "vehicle": -0.3793281184302426,
+          "clothing": 0.7567159732182822,
+          "furniture": -0.7705583175023403,
+          "food": 0.8130177656809492,
+          "plant": 0.17099483807881732
+        },
+        "attr_delta": {
+          "edible": 0.8814833720525108,
+          "plant_grown": 0.19517680009206195,
+          "seed_bearing": 0.5158754024240708,
+          "sweet": 2.391218761603038,
+          "natural": -0.8759619111106502,
+          "objectness": -0.05992498497168253,
+          "movable": 0.0870430072148638,
+          "human_made": -0.3911344806353254,
+          "tool_use": -1.1400825182596837,
+          "indoor": -0.2002811074256905,
+          "living_being": -1.649563407897948,
+          "solid": -0.04330604275067618,
+          "juicy": -0.4136475721995039,
+          "dessert_like": 0.31992646058400476
+        },
+        "selectivity": 3.576251131116783,
+        "fruit_dcf_delta": 3.4457436601320905
+      },
+      "plant_resid": {
+        "dcf_delta": {
+          "fruit": 2.2768623431523647,
+          "animal": 0.9225487444135894,
+          "tool": 1.815024971961976,
+          "vehicle": 1.2986788219875756,
+          "clothing": -0.054977933565775405,
+          "furniture": 1.6774184703826904,
+          "food": 1.1702014605204267,
+          "plant": 3.0476079781850185
+        },
+        "attr_delta": {
+          "edible": 1.1259831587473554,
+          "plant_grown": 1.9770135243733726,
+          "seed_bearing": 1.2893842226929126,
+          "sweet": 0.9785336256027222,
+          "natural": 1.5726168673662917,
+          "objectness": 0.6271259546279904,
+          "movable": 0.6413621107737217,
+          "human_made": 1.4819257259368892,
+          "tool_use": 2.11469399134318,
+          "indoor": 0.18593530952930415,
+          "living_being": 1.6489733378092453,
+          "solid": 1.4288487335046134,
+          "juicy": 1.3364448944727574,
+          "dessert_like": 0.3562014500300089
+        },
+        "selectivity": 0.7446547626108365,
+        "fruit_dcf_delta": 2.2768623431523647
+      },
+      "food_resid": {
+        "dcf_delta": {
+          "fruit": 2.0585027138392133,
+          "animal": 1.253670427534317,
+          "tool": 1.9956841866175337,
+          "vehicle": 1.7229591475592718,
+          "clothing": -0.06128668785095215,
+          "furniture": 1.7178758780161534,
+          "food": 3.1667524973551435,
+          "plant": 1.2438331445058193
+        },
+        "attr_delta": {
+          "edible": 2.859991137186686,
+          "plant_grown": 1.3701544602712001,
+          "seed_bearing": 1.174380239513185,
+          "sweet": 0.9969546596209211,
+          "natural": 1.4094075965029864,
+          "objectness": 0.6708500544230138,
+          "movable": 1.3307156562805176,
+          "human_made": 0.8003983100255327,
+          "tool_use": 2.1376058260599793,
+          "indoor": 0.0024971547226098068,
+          "living_being": 1.6657973607381198,
+          "solid": 2.013559232155482,
+          "juicy": 2.71816885471344,
+          "dessert_like": 2.561315377553304
+        },
+        "selectivity": 0.6479896421118904,
+        "fruit_dcf_delta": 2.0585027138392133
+      }
+    }
+  },
+  "exp6_cross_language": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "elapsed_seconds": 198.8
+}

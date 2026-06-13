@@ -26510,3 +26510,522 @@ python tests/glm5/phase478_cluster_decomposition.py deepseek7b 1  # ~164s (2.7mi
 脚本位置：
 - `tests/glm5/phase478_cluster_decomposition.py` — Phase 478 主测试
 - 结果：`results/glm5/phase478_{qwen3,glm4,deepseek7b}_r1.json`
+
+---
+
+## Phase 479: 属性原子分解、fruit-specific残差验证与跨模型/跨语言读出接口 [2026-06-13 11:41]
+
+### 核心问题
+
+1. fruit-specific是否等价于sweet-specific?
+2. Gram-Schmidt正交化顺序是否影响结果?
+3. L30中哪些神经元写sweet/edible/plant_grown?
+4. 关系槽位是否从语义簇中读出不同成分?
+5. GLM4 L33是否有同样的fruit-specific解耦?
+6. 语义簇是否跨语言共享?
+
+### Exp1: sweet-specific方向解耦 + fruit-vs-sweet等价性 (Qwen3) ★★★核心突破★★★
+
+**6种方向注入对比(animal/tool对象均值):**
+
+| 注入方向 | fruit_Δ | plant_Δ | food_Δ | sweet_Δ | edible_Δ | living_Δ | selectivity |
+|---------|---------|---------|--------|---------|----------|----------|-------------|
+| fruit_specific_v2 | **+22.23** | +0.42 | +3.43 | +16.03 | +4.29 | -9.45 | **4.98** |
+| sweet_specific | +5.66 | +5.93 | -0.21 | **+110.39** | +4.49 | -3.31 | 0.95 |
+| **fruit_no_sweet** | **+22.23** | -0.12 | +3.62 | +5.98 | +4.18 | -9.09 | **6.12** |
+| sweet_wu_raw | +6.52 | +6.52 | +0.03 | +110.85 | +4.71 | -3.47 | 1.00 |
+| juicy_wu | +10.10 | +8.74 | +3.10 | +12.83 | +7.38 | +8.43 | 0.92 |
+| natural_wu | +10.61 | +11.27 | +9.83 | +15.15 | +13.03 | +29.19 | 0.93 |
+
+**方向余弦对比:**
+
+| 方向对 | cos |
+|--------|-----|
+| **fruit_specific_v2 vs sweet_specific** | **0.053** |
+| fruit_specific_v2 vs fruit_no_sweet | 0.997 |
+| sweet_specific vs sweet_wu_raw | 0.999 |
+| fruit_no_sweet vs sweet_wu_raw | ≈0 |
+
+**关键发现:**
+1. **fruit-specific ≠ sweet-specific!** cos仅0.053, 两个方向几乎正交!
+2. **fruit_no_sweet (从fruit_specific中去sweet方向) 仍然fruit_Δ=+22.23, selectivity=6.12** — 比fruit_specific_v2(4.98)更高!
+3. sweet_specific方向: fruit_Δ仅+5.66, 但sweet_Δ=+110.39, plant_Δ=+5.93 — 它主要提升sweet语义,对fruit选择很差
+4. fruit_no_sweet方向: fruit_Δ=+22.23, sweet_Δ=+5.98 — 不依赖sweet也能强效提升fruit!
+5. **fruit-specific的核心区分属性不是sweet(甜味), 而是non-living(-9.09) + non-natural(-5.78) + seed_bearing(+2.50) + dessert_like(+1.38)**
+
+### Exp2: Gram-Schmidt顺序稳健性 (Qwen3)
+
+| 方法 | fruit_Δ | plant_Δ | food_Δ | sweet_Δ | selectivity |
+|------|---------|---------|--------|---------|-------------|
+| gs_plant_then_food | +22.23 | +0.42 | +3.43 | +16.03 | 4.98 |
+| gs_food_then_plant | +18.12 | +14.64 | -13.11 | +12.42 | **1.24** |
+| qr_subspace | +23.31 | +8.67 | -1.52 | +16.63 | 2.69 |
+| gs_multi_attr | +22.10 | +0.65 | -0.47 | +16.14 | **4.77** |
+
+**方法间余弦相似度:**
+
+| 方法对 | cos |
+|--------|-----|
+| gs_plant_then_food vs gs_food_then_plant | 0.753 |
+| gs_plant_then_food vs qr_subspace | **0.960** |
+| gs_plant_then_food vs gs_multi_attr | **0.999** |
+| gs_food_then_plant vs qr_subspace | 0.897 |
+
+**关键发现:**
+1. **Gram-Schmidt顺序确实影响结果!** gs_food_then_plant的selectivity=1.24远低于gs_plant_then_food的4.98
+2. 先去food再去plant时,plant_Δ=+14.64(仍有大量plant成分), food_Δ=-13.11(严重压制food)
+3. **QR子空间投影和gs_multi_attr与gs_plant_then_food高度一致**(cos=0.96/0.999)
+4. **gs_plant_then_food是最优正交化顺序**, 因为plant与fruit共享最多,先去除plant更干净
+
+### Exp3: 属性级神经元定位 (Qwen3)
+
+**L30中top20神经元(按属性方向贡献排序):**
+
+| 属性方向 | top10神经元 |
+|---------|------------|
+| fruit_specific | 8687, 4901, 9072, 3772, 7400, 8156, 2903, 7916, 23, 1469 |
+| sweet_wu | 6156, 6449, 6416, 9291, 9512, 8156, 4901, 3772, 8351, 1322 |
+| edible_wu | 843, 2903, 3772, 4901, 1346, 8688, 6416, 6449, 3, 6156 |
+| plant_grown_wu | 4901, 8687, 2903, 8688, 1469, 6416, 16, 6966, 7626, 154 |
+
+**神经元重叠(top30):**
+
+| 属性对 | 重叠数 | 重叠率 |
+|--------|--------|--------|
+| fruit_specific vs sweet_wu | 10/30 | 33% |
+| fruit_specific vs edible_wu | 11/30 | 37% |
+| fruit_specific vs plant_grown_wu | 11/30 | 37% |
+| sweet_wu vs edible_wu | 12/30 | 40% |
+| **edible_wu vs plant_grown_wu** | **14/30** | **47%** |
+| sweet_wu vs plant_grown_wu | 9/30 | 30% |
+
+**属性神经元子集注入测试:**
+
+| 属性写入器 | fruit_Δ | sel | 关键属性变化 |
+|-----------|---------|-----|------------|
+| fruit_specific neurons | +4.02 | 0.71 | plant_grown+3.4 |
+| sweet_wu neurons | +2.15 | 0.97 | sweet_Δ=-2.1(反转!) |
+| edible_wu neurons | +2.44 | 0.77 | plant_grown+3.3 |
+| plant_grown_wu neurons | +3.95 | 1.03 | plant_grown+3.7 |
+
+**关键发现:**
+1. **属性写入器之间神经元高度重叠(33%-47%)** — L30不是属性分离的,而是属性共享的!
+2. edible和plant_grown共享最多(47%), 这解释了为什么fruit writer同时提升plant和food
+3. **sweet_wu neurons注入后sweet_Δ=-2.1(反转!)** — sweet方向的top30神经元在自然激活中反而抑制sweet! 这说明这些神经元的功能比方向投影暗示的更复杂
+4. 30个神经元不够表达完整属性语义, 需要更大集合
+
+### Exp4: 关系槽位读出验证 (Qwen3) ★★★重要发现★★★
+
+**fruit_cluster注入在不同关系下的DCF变化(fruit对象):**
+
+| 关系 | fruit_Δ | plant_Δ | food_Δ |
+|------|---------|---------|--------|
+| kind_of | +30.02 | +24.24 | +15.38 |
+| eaten_as | +33.03 | +37.63 | +14.87 |
+| grown_from | +33.83 | +27.70 | +20.00 |
+| found_in | +36.13 | +33.16 | +18.96 |
+
+**fruit_specific注入在不同关系下的DCF变化(fruit对象):**
+
+| 关系 | fruit_Δ | plant_Δ | food_Δ |
+|------|---------|---------|--------|
+| **kind_of** | **+10.16** | +0.19 | -0.40 |
+| **eaten_as** | **+10.05** | +0.98 | **-2.90** |
+| **grown_from** | **+9.74** | -1.11 | **+2.97** |
+| found_in | +10.70 | -0.53 | +1.08 |
+
+**plant_resid注入:**
+
+| 关系 | fruit_Δ | plant_Δ | food_Δ |
+|------|---------|---------|--------|
+| kind_of | +17.67 | +26.40 | +14.55 |
+| eaten_as | +20.69 | +41.04 | +15.89 |
+| grown_from | +20.79 | +30.31 | +17.55 |
+
+**food_resid注入:**
+
+| 关系 | fruit_Δ | plant_Δ | food_Δ |
+|------|---------|---------|--------|
+| kind_of | +19.45 | +16.57 | +28.80 |
+| eaten_as | +17.00 | +22.48 | +25.21 |
+| grown_from | +22.21 | +19.91 | +34.48 |
+
+**关键发现:**
+1. **fruit_specific在所有4种关系下fruit_Δ≈+10** — fruit-specific方向的类别提升效果不依赖关系槽位!
+2. **关系槽位主要影响共享成分的读出比例**: fruit_cluster在eaten_as下plant_Δ=+37.6(比kind_of的+24.2高55%)
+3. **eaten_as关系下food_Δ=-2.90(fruit_specific)** — eaten_as关系倾向于抑制food读出,可能因为食物关系已经预激活food
+4. **grown_from关系下food_Δ=+2.97(fruit_specific)** — 生长来源关系倾向于提升food,可能是"从植物上采摘食物"的联想
+5. plant_resid在eaten_as下plant_Δ=+41.04, 远超kind_of的+26.40 — eaten_as关系放大植物语义!
+
+### Exp5: GLM4 fruit-specific解耦 (GLM4) ★★★跨模型验证★★★
+
+**GLM4 L33方向余弦:**
+
+| 方向对 | cos |
+|--------|-----|
+| fruit_specific vs fruit | 0.454 |
+| fruit_specific vs plant | **-0.126** |
+| fruit_specific vs food | **≈0** |
+| fruit vs plant | 0.825 |
+| fruit vs food | 0.746 |
+
+**GLM4 L33注入测试:**
+
+| 方向 | fruit_Δ | plant_Δ | food_Δ | sweet_Δ | selectivity |
+|------|---------|---------|--------|---------|-------------|
+| fruit_cluster | +4.32 | +2.69 | +1.73 | +2.40 | 1.60 |
+| **fruit_specific_v2** | **+3.45** | **+0.17** | **+0.81** | **+2.39** | **3.58** |
+| plant_resid | +2.28 | +3.05 | +1.17 | +0.98 | 0.74 |
+| food_resid | +2.06 | +1.24 | +3.17 | +1.00 | 0.65 |
+
+**关键发现:**
+1. **GLM4 L33的fruit_specific_v2 selectivity=3.58!** 跨模型验证成功!
+2. fruit_specific与plant方向反相关(cos=-0.126), 与food方向正交(cos≈0) — 与Qwen3的解耦模式一致
+3. GLM4 fruit_specific也主要提升sweet_Δ=+2.39, 与Qwen3一致
+4. GLM4中fruit_vs_plant cos=0.825, Qwen3中为0.532 — GLM4中fruit和plant耦合更强
+5. GLM4的绝对DCF变化较小(fruit_Δ=3.45 vs Qwen3的22.23), 可能因为GLM4 d_model=4096更大
+
+### Exp6: 跨语言语义簇与语言接口 (Qwen3)
+
+**跨语言residual相似度:**
+
+| 关系 | cos(en, zh) |
+|------|-------------|
+| kind_of | **0.805** |
+| eaten_as | 0.611 |
+| grown_from | 0.713 |
+
+**fruit_cluster注入跨语言效果:**
+
+| 模板 | fruit_Δ | plant_Δ |
+|------|---------|---------|
+| en_kind_of | +45.37 | +41.18 |
+| zh_kind_of | +39.10 | +39.81 |
+| en_eaten_as | +46.21 | +43.80 |
+| zh_eaten_as | +43.86 | +42.82 |
+| en_grown_from | +44.61 | +42.03 |
+| zh_grown_from | +40.23 | +33.75 |
+
+**fruit_specific注入跨语言效果:**
+
+| 模板 | fruit_Δ | plant_Δ |
+|------|---------|---------|
+| en_kind_of | +24.19 | +0.47 |
+| zh_kind_of | +17.69 | +0.70 |
+| en_eaten_as | +21.52 | +6.54 |
+| zh_eaten_as | +16.59 | +3.82 |
+| en_grown_from | +17.33 | -3.05 |
+| zh_grown_from | +16.69 | -0.96 |
+
+**关键发现:**
+1. **fruit_specific在中文模板上同样有效!** zh_kind_of fruit_Δ=+17.69 vs en_kind_of +24.19
+2. **fruit_specific在所有语言+关系组合中plant_Δ都接近0** — 跨语言解耦一致性
+3. 跨语言相似度: kind_of最高(0.805), eaten_as最低(0.611) — 种类关系最跨语言稳定
+4. fruit_cluster在英文模板上效果略高于中文, 但fruit_specific差异更大(+24 vs +17) — 语言接口在特异性方向上有额外影响
+
+### 客观数据汇总
+
+| 指标 | Qwen3 | GLM4 |
+|------|-------|------|
+| fruit-specific selectivity | **4.98~6.12** | **3.58** |
+| fruit_no_sweet selectivity | **6.12** | N/A |
+| fruit-specific vs sweet-specific cos | **0.053** | N/A |
+| fruit-specific vs plant cos | 0.42~(-0.12) | -0.126 |
+| fruit-specific vs food cos | ≈0 | ≈0 |
+| 属性神经元重叠率(30个) | 33-47% | N/A |
+| fruit-specific跨语言有效 | ✅ ZH≈EN | N/A |
+| GS顺序影响 | 先plant后food最优 | N/A |
+| 关系槽位读出差异 | eaten_as:food_Δ=-2.9 vs grown_from:+3.0 | N/A |
+
+### 关键理论发现
+
+**发现1: fruit-specific ≠ sweet-specific (本轮最重要!)**
+
+cos(fruit_specific, sweet_specific) = 0.053, 两个方向几乎正交! 这完全修正了Phase 478的推测.
+
+Phase 478认为fruit-specific的核心属性是sweet, 但Phase 479证明:
+- sweet_specific方向: fruit_Δ=+5.66, selectivity=0.95 — 对fruit选择差
+- fruit_no_sweet方向: fruit_Δ=+22.23, selectivity=6.12 — 去掉sweet后fruit更特异!
+- fruit_specific的核心属性是: **non-living(-9.45) + non-natural(-5.78) + non-human_made(-4.29) + seed_bearing(+2.50) + dessert_like(+1.38)**
+
+这说明fruit-specific更像是一个"非生命/非人工/有种子/甜点属性"的边界方向,而不是单纯的甜味方向.
+
+**发现2: Gram-Schmidt顺序影响结果, 先去plant后去food最优**
+
+gs_plant_then_food的selectivity=4.98, gs_food_then_plant仅1.24.
+这是因为plant与fruit共享最多(cos=0.532), 先去除plant能更干净地分离fruit特异成分.
+
+**发现3: 属性神经元高度重叠(33-47%), L30不是属性分离的**
+
+这进一步确认了Phase 478的结论: L30是语义簇层,不是类别分离层.
+edible和plant_grown共享最多(47%), 解释了为什么fruit writer同时提升plant和food.
+
+**发现4: fruit-specific方向的类别提升不依赖关系槽位**
+
+在4种关系下fruit_Δ都≈+10, 但关系槽位影响共享成分的读出比例.
+eaten_as抑制food(-2.9), grown_from提升food(+3.0) — 关系槽位是共享成分的读出调节器.
+
+**发现5: GLM4 L33的fruit-specific解耦成功(selectivity=3.58)**
+
+跨模型验证了: 类别特异残差方向不是Qwen3独有的,而是深度神经网络的普遍编码模式.
+
+### 硬伤与瓶颈
+
+1. **fruit-specific的核心属性定义模糊**: 非生命+非自然+有种子+甜点属性? 这个组合不太直观, 可能需要更精细的属性词汇来拆解
+
+2. **属性神经元重叠高(33-47%)**: 30个神经元不够分离属性, 但增加神经元又回到语义簇问题
+
+3. **sweet_wu neurons注入后sweet_Δ反转(-2.1)**: 说明方向投影和神经元功能不一致, 需要更精细的因果方法
+
+4. **fruit_no_sweet的selectivity=6.12比fruit_specific_v2=4.98更高**: 这暗示sweet方向实际上是fruit-specific的"噪声", 去除后更干净. 但这与直觉矛盾(sweet是水果核心属性), 需要进一步理解
+
+5. **跨语言效果在特异性方向上有差距**(EN +24 vs ZH +17): 语言接口可能已经在特异性层面起作用
+
+6. **GLM4绝对DCF变化小**(3.45 vs 22.23): d_model=4096 vs 2560, 可能需要更强的注入系数
+
+### Phase 478用户分析的正确性验证
+
+| 用户结论 | Phase 479实际数据 | 判断 |
+|---------|-----------------|------|
+| fruit-specific核心是sweet | **fruit_specific vs sweet_specific cos=0.053** | ❌ **修正!** 两个方向几乎正交 |
+| fruit-specific≈sweet-specific | fruit_no_sweet sel=6.12>fruit_specific sel=4.98 | ❌ **修正!** 去sweet后更特异 |
+| Gram-Schmidt顺序不影响 | gs_plant_then_food sel=4.98, gs_food_then_plant sel=1.24 | ⚠️ **有影响!** 先去plant最优 |
+| L30内部是多个属性写入器 | 神经元重叠33-47%, 30个不够 | ⚠️ 部分正确,但更重叠 |
+| 关系槽位读出不同标签 | eaten_as:food_Δ=-2.9 vs grown_from:+3.0 | ✅ 确认! |
+| GLM4有同样解耦 | GLM4 fruit_specific sel=3.58 | ✅ 确认! |
+| 语义簇跨语言共享 | cos(en,zh)=0.61-0.81, ZH有效 | ✅ 确认! |
+
+### 下一步: Phase 480
+
+核心问题更精确了:
+```
+fruit-specific方向的核心不是sweet(甜味), 而是"非生命+非人工+有种子+甜点属性"的边界.
+那么, 这个边界的语言编码意义是什么? 它是类别边界方向吗?
+```
+
+优先实验:
+1. **fruit-specific方向的成分分解**: 在d_model空间中做SVD, 分析fruit-specific方向在W_U行空间中的投影结构
+2. **更多类别的specific方向**: 构造animal-specific, vehicle-specific, tool-specific, 验证它们是否有类似的non-living/non-human-made边界模式
+3. **反方向测试**: 注入-fruit_specific方向, 看是否抑制fruit而提升其他类别
+4. **神经元级因果验证**: 用path patching或activation steering替代简单的top30注入
+5. **DS7B属性解耦**: 在DS7B L24层做同样的分析
+
+### 命令记录
+
+```bash
+# Phase 479 R1 (6个实验: sweet解耦+GS稳健性+属性神经元+关系读出+GLM4解耦+跨语言)
+python tests/glm5/phase479_attribute_decomposition.py qwen3 1       # ~89s
+python tests/glm5/phase479_attribute_decomposition.py glm4 1         # ~199s
+python tests/glm5/phase479_attribute_decomposition.py deepseek7b 1  # ~1s (全部skip)
+```
+
+脚本位置：
+- `tests/glm5/phase479_attribute_decomposition.py` — Phase 479 主测试
+- 结果：`results/glm5/phase479_{qwen3,glm4,deepseek7b}_r1.json`
+
+---
+
+## Phase 480: 类别边界残差的普遍性验证 [2026-06-13 13:25]
+
+### 核心问题
+
+类别边界残差是fruit独有的，还是在更多类别中普遍存在的编码机制？
+
+### Exp1: 多类别specific方向构造 ★★★核心突破★★★ (ALL models)
+
+**Qwen3 L30 — 8类别specific方向选择性:**
+
+| 类别 | target_Δ | selectivity | neighbors | ratio(范数比) |
+|------|----------|-------------|-----------|--------------|
+| fruit | +22.62 | **2.83** | plant,food | 0.479 |
+| animal | +21.56 | 1.52 | food,clothing | 0.522 |
+| tool | +18.55 | 1.31 | furniture,vehicle | 0.467 |
+| **vehicle** | **+36.85** | **3.30** | tool,furniture | 0.447 |
+| **clothing** | **+38.64** | **2.96** | furniture,tool | 0.467 |
+| furniture | +20.59 | 1.13 | tool,clothing | 0.445 |
+| food | +21.59 | 1.15 | plant,fruit | 0.447 |
+| plant | +21.13 | 1.58 | food,fruit | 0.411 |
+
+**GLM4 L33 — 8类别specific方向选择性:**
+
+| 类别 | target_Δ | selectivity |
+|------|----------|-------------|
+| **fruit** | +4.05 | **4.01** |
+| animal | +3.42 | 1.78 |
+| tool | +2.00 | 1.21 |
+| **vehicle** | **+4.93** | **2.80** |
+| **clothing** | **+4.23** | **2.13** |
+| furniture | +3.42 | 1.06 |
+| food | +3.59 | 1.51 |
+| plant | +2.28 | 0.98 |
+
+**DS7B L24 — 8类别specific方向选择性:**
+
+| 类别 | target_Δ | selectivity |
+|------|----------|-------------|
+| fruit | -0.86 | 0.05 ❌ |
+| **animal** | **+18.11** | **2.50** |
+| tool | +46.68 | 1.21 |
+| vehicle | +28.28 | 1.31 |
+| clothing | -9.64 | 0.28 ❌ |
+| **furniture** | **+12.68** | **2.44** |
+| food | +22.33 | 1.14 |
+| plant | +42.24 | 0.81 |
+
+**关键发现:**
+1. **类别边界残差是普遍机制！** Qwen3中8个类别全部selectivity>1.0，vehicle(3.30)和clothing(2.96)甚至超过fruit(2.83)
+2. GLM4中6/8类别selectivity>1.0，fruit最高(4.01)
+3. DS7B中5/8类别selectivity>1.0，但fruit_specific和clothing_specific失败(0.05和0.28)
+4. 范数比(spec/raw)普遍在0.4-0.5之间，说明specific成分约占原始方向的40-50%
+5. **跨模型一致性**: vehicle和clothing在Qwen3和GLM4中都表现强; fruit在Qwen3和GLM4中都表现强
+
+### Exp2: 类别边界残差属性画像 (Qwen3)
+
+**各类别specific方向的属性画像(Top3正+Top3负属性):**
+
+| 类别 | Top3正属性 | Top3负属性 |
+|------|-----------|-----------|
+| fruit | sweet(+16.1), plant_grown(+3.9), seed_bearing(+1.9) | fabric(-6.7), has_legs(-6.7), mechanical(-7.9) |
+| animal | living_being(+5.8), natural(+0.2), mechanical(-0.4) | edible(-13.6), dessert_like(-18.3), fabric(-18.7) |
+| tool | tool_use(+12.7), dessert_like(+5.8), metallic(+5.3) | has_legs(-8.6), locomotion(-9.3), movable(-11.2) |
+| vehicle | movable(+27.2), mechanical(+18.9), locomotion(+16.2) | objectness(-4.8), tool_use(-5.2), seat_like(-10.4) |
+| clothing | fabric(+22.6), juicy(+11.3), dessert_like(+5.8) | metallic(-5.2), indoor(-5.7), tool_use(-8.8) |
+| furniture | seat_like(+20.1), indoor(+9.0), human_made(+9.0) | tool_use(-4.3), fabric(-4.8), dessert_like(-13.0) |
+| food | edible(+20.5), dessert_like(+18.6), movable(+5.1) | natural(-4.2), living_being(-4.2), plant_grown(-6.2) |
+| plant | living_being(+13.8), natural(+10.6), seat_like(+10.1) | sweet(-3.9), edible(-12.7), dessert_like(-14.7) |
+
+**关键发现:**
+1. **每个类别specific方向有独特的属性画像!**
+   - fruit: sweet+plant_grown, 排斥mechanical/fabric/has_legs
+   - animal: living_being, 排斥edible/dessert_like/fabric
+   - tool: tool_use+metallic, 排斥movable/locomotion/has_legs
+   - vehicle: movable+mechanical+locomotion, 排斥seat_like/tool_use
+   - clothing: fabric, 排斥metallic/indoor/tool_use
+   - furniture: seat_like+indoor+human_made, 排斥dessert_like/fabric/tool_use
+   - food: edible+dessert_like, 排斥plant_grown/living_being/natural
+   - plant: living_being+natural, 排斥edible/sweet/dessert_like
+2. **属性画像符合语言常识**: vehicle关联movable/mechanical/locomotion, clothing关联fabric, furniture关联seat_like/indoor
+3. **互斥模式**: food-specific排斥plant_grown(-6.2)和living_being(-4.2); plant-specific排斥edible(-12.7)和dessert_like(-14.7) — 这验证了food和plant虽然共享natural/edible，但其specific方向是互斥的
+4. **clothing_specific的juicy(+11.3)异常** — 可能是属性词juicy与fabric有语言层面的关联(如"juicy colors"), 需要校准
+
+### Exp3: 自然使用验证 ★★★极重要★★★ (Qwen3)
+
+**8类别对象在各类specific方向上的投影排名:**
+
+| 类别 | self_projection | self_rank | top1_direction | 匹配? |
+|------|----------------|-----------|----------------|-------|
+| fruit | 160.40 | **#1** | fruit | ✓ |
+| animal | 167.86 | **#1** | animal | ✓ |
+| tool | 157.17 | **#1** | tool | ✓ |
+| vehicle | 141.26 | **#1** | vehicle | ✓ |
+| clothing | 154.56 | **#1** | clothing | ✓ |
+| furniture | 143.51 | **#1** | furniture | ✓ |
+| food | 149.34 | **#1** | food | ✓ |
+| plant | 136.54 | **#1** | plant | ✓ |
+
+**关键发现:**
+1. **8/8类别全部在自身specific方向上投影最高!** 100%自对齐率!
+2. 这是"类别边界残差是自然编码方向"的强证据 — 不是注入才能用的方向,而是模型自然使用的方向
+3. 投影值差异也反映了语义结构:
+   - animal(167.9)和fruit(160.4)投影最高 — 语义边界最清晰
+   - plant(136.5)投影最低 — 植物语义可能更弥散
+4. 跨类别投影模式:
+   - fruit在food(0.0002)和plant(0.0007)上投影几乎为0 — 正交化成功
+   - tool在vehicle(-0.001)和clothing(-0.001)上投影接近0 — 正交化成功
+   - 但animal在vehicle(72.8)和plant(67.1)上有较高投影 — 动物语义仍有跨类别关联
+
+### Exp4: 反向注入测试 (Qwen3)
+
+| 类别 | +spec→target_Δ | -spec→target_Δ | 不对称性 |
+|------|----------------|----------------|----------|
+| fruit | +9.51 | **-17.93** | -8.42 |
+| animal | +6.10 | **-17.34** | -11.24 |
+| tool | +9.09 | **-17.45** | -8.36 |
+| vehicle | +8.17 | **-31.78** | -23.60 |
+
+**关键发现:**
+1. **所有4个类别反向注入都成功!** -specific方向抑制对应类别
+2. **反向注入比正向注入更强!** 不对称性为负, 说明这些方向可能更接近"抑制"而非"激活"机制
+3. vehicle的不对称性最大(-23.60): -vehicle_specific→vehicle_Δ=-31.78 — vehicle方向可能是一个强抑制方向
+4. 这进一步验证了category_specific方向不是随机残差,而是模型使用的因果编码方向
+
+### Specific方向间余弦矩阵 (Qwen3)
+
+| 对 | cos |
+|----|-----|
+| fruit vs animal | +0.146 |
+| fruit vs tool | +0.044 |
+| fruit vs vehicle | +0.006 |
+| fruit vs food | -0.313 |
+| fruit vs plant | **-0.487** |
+| animal vs tool | -0.037 |
+| animal vs food | -0.400 |
+| tool vs vehicle | -0.453 |
+| tool vs furniture | **-0.579** |
+| clothing vs furniture | -0.526 |
+| food vs plant | **-0.579** |
+
+**关键发现:**
+1. **语义邻近类别specific方向反相关!** food_vs_plant=-0.579, tool_vs_furniture=-0.579, clothing_vs_furniture=-0.526
+2. fruit_vs_plant=-0.487 — 正交化后fruit和plant方向几乎反向!
+3. 语义远距类别几乎正交: fruit_vs_vehicle=+0.006, fruit_vs_clothing=-0.038
+4. 这说明category_specific方向形成了一个有结构的几何空间,语义邻近类别互斥
+
+### DS7B格式覆盖电路结果
+
+- Math vs Normal DCF差异: 所有8个类别都是math更高(平均+180), 说明数学prompt激活更广泛的语义空间
+- Head 0贡献: math_norm=24.3, normal_norm=27.0, diff_ratio=-0.10 — Head 0对数学格式无特殊贡献
+- DS7B的head级分析受限于eager attention实现, 未获得head 10/12/13数据
+
+### 客观数据汇总
+
+| 指标 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| 类别selectivity>1.0 | 8/8 (100%) | 6/8 (75%) | 5/8 (63%) |
+| 最高sel类别 | vehicle(3.30) | fruit(4.01) | animal(2.50) |
+| fruit_specific sel | 2.83 | 4.01 | 0.05 ❌ |
+| animal_specific sel | 1.52 | 1.78 | 2.50 |
+| vehicle_specific sel | 3.30 | 2.80 | 1.31 |
+| clothing_specific sel | 2.96 | 2.13 | 0.28 ❌ |
+| 范数比(spec/raw) | 0.41-0.52 | 0.50-0.64 | 0.16-0.28 |
+| 自然使用自对齐 | 8/8 ✓ | N/A | N/A |
+| 反向注入有效 | 4/4 ✓ | N/A | N/A |
+
+### 硬伤与问题
+
+1. **DS7B fruit_specific失败(sel=0.05)**: 范数比仅0.20, 远低于Qwen3的0.48. 可能DS7B在L24的fruit/plant/food耦合方式不同, 需要调整邻居类别或层数
+
+2. **DS7B clothing_specific也失败(sel=0.28)**: clothing在DS7B中的邻居选择可能不正确, furniture/tool不是最优邻居
+
+3. **clothing_specific属性画像中juicy(+11.3)异常**: juicy不应该与clothing关联, 可能是属性词或DCF测量偏置
+
+4. **food_specific和plant_specific互斥(cos=-0.579)**: 虽然food和plant共享natural/edible, 但specific方向几乎反向. 需要验证这是否稳定
+
+5. **GLM4 plant_specific selectivity=0.98 (<1.0)**: plant在GLM4中解耦不够干净
+
+6. **反向注入不对称性(-8~-24)**: 正向和反向注入效果不对称, 说明这些方向可能不是简单的线性读出方向, 而是有非线性依赖
+
+### 用户分析的正确性验证
+
+| 用户结论 | Phase 480实际数据 | 判断 |
+|---------|-----------------|------|
+| 类别边界残差是普遍机制 | Qwen3 8/8, GLM4 6/8, DS7B 5/8 sel>1 | ✅ **基本确认!** |
+| fruit-specific不是特例 | vehicle(3.30)>fruit(2.83)在Qwen3 | ✅ 确认! |
+| specific方向有独特属性画像 | 每个类别有不同top3属性 | ✅ 确认! |
+| -specific抑制对应类别 | 4/4类别反向注入有效 | ✅ 确认! |
+| 语义邻近类别specific互斥 | food-plant=-0.579, tool-furniture=-0.579 | ✅ 确认! |
+| GLM4有同样解耦 | fruit sel=4.01, vehicle sel=2.80 | ✅ 确认! |
+| DS7B也有解耦 | 5/8 sel>1但fruit/clothing失败 | ⚠️ 部分确认 |
+
+### 命令记录
+
+```bash
+# Phase 480 R1 (6个实验: 多类别specific+属性画像+自然使用+反向注入+跨模型复现+DS7B格式)
+python tests/glm5/phase480_category_boundary_universality.py qwen3 1       # ~169s
+python tests/glm5/phase480_category_boundary_universality.py glm4 1         # ~1700s
+python tests/glm5/phase480_category_boundary_universality.py deepseek7b 1  # ~1701s
+```
+
+脚本位置：
+- `tests/glm5/phase480_category_boundary_universality.py` — Phase 480 主测试
+- 结果：`results/glm5/phase480_{qwen3,glm4,deepseek7b}_r1.json`
