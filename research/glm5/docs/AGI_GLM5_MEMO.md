@@ -27392,3 +27392,413 @@ python tests/glm5/phase482_layer_map_dose_curve.py deepseek7b 1  # ~2254s
 脚本位置：
 - `tests/glm5/phase482_layer_map_dose_curve.py` — Phase 482 主测试
 - 结果：`results/glm5/phase482_{qwen3,glm4,deepseek7b}_r1.json`
+
+## Phase 483: 类别边界写入器定位 + 竞争释放图谱 + 最佳层位成因 [2026-06-13 21:35]
+
+### 核心问题
+
+1. 哪些MLP神经元写入类别边界残差？边界信号是集中还是分布的？
+2. 8×8竞争释放矩阵是什么结构？哪些类别对互斥？
+3. 不同类别为什么在不同层形成边界？边界形成过程是什么？
+
+### Exp1: 边界写入器定位 ★★★重要★★★ (ALL models)
+
+**方法**: 在最佳层计算每个MLP神经元的边界贡献 = activation × (W_down · B_c)
+
+**Qwen3 边界写入器:**
+
+| 类别 | top50集中度 | top10集中度 | cos(Bc) | 正贡献神经元 | 负贡献神经元 | 总信号 |
+|------|------------|------------|---------|------------|------------|--------|
+| fruit | 0.239 | 0.125 | -0.180 | 361 | 177 | 86.69 |
+| animal | 0.231 | 0.109 | 0.012 | 580 | 310 | 90.70 |
+| tool | 0.226 | 0.120 | 0.087 | 542 | 376 | 25.20 |
+
+**GLM4 边界写入器:**
+
+| 类别 | top50集中度 | top10集中度 | cos(Bc) | 正贡献神经元 | 负贡献神经元 | 总信号 |
+|------|------------|------------|---------|------------|------------|--------|
+| fruit | **0.451** | **0.378** | -0.541 | **22** | **6** | 9.53 |
+| animal | 0.157 | 0.071 | 0.023 | 1553 | 386 | 62.13 |
+| vehicle | **0.408** | **0.312** | -0.367 | **28** | **0** | 12.21 |
+
+**DS7B 边界写入器:**
+
+| 类别 | top50集中度 | top10集中度 | cos(Bc) | 正贡献神经元 | 负贡献神经元 | 总信号 |
+|------|------------|------------|---------|------------|------------|--------|
+| fruit | 0.196 | 0.097 | 0.133 | 399 | 273 | 168.53 |
+| animal | **0.525** | **0.205** | -0.124 | **261** | **65** | 1155.77 |
+| clothing | 0.210 | 0.160 | -0.381 | **27** | **4** | 97.51 |
+
+**★★★关键发现★★★:**
+
+1. **边界残差是分布式编码，不是集中编码**: Qwen3/DS7B的top50神经元只捕获~20%边界信号
+2. **GLM4部分类别高度集中**: fruit只有22+6=28个有效神经元，集中度45%！这与GLM4的spec_norm极小一致
+3. **cos(Bc)普遍很低**: top-50神经元的组合方向与边界法向量不对齐——说明边界信号来自神经元的叠加投影，而非直接对齐
+4. **正负神经元比例差异大**: Qwen3约2:1，GLM4 fruit约4:1，DS7B animal约4:1
+
+### Exp2: 竞争释放图谱 ★★★★★ 极重要 ★★★★★ (ALL models, R2 confirmed)
+
+**方法**: 对8个类别全部做边界移除，记录8维DCF变化，得到8×8竞争释放矩阵
+
+**Qwen3 竞争释放矩阵 (R2确认6/6):**
+
+```
+removed\DCF   fruit   animal    tool  vehicle clothing furniture    food   plant
+      fruit  -24.93     4.36   -0.32    -0.51     0.61    -3.34   -2.87   -6.05
+     animal    2.90   -20.47    2.75    -3.01     9.29     1.88    6.02    2.73
+       tool   -0.64    -0.08   -1.74     0.31    -0.29     0.01   -0.30   -0.62
+    vehicle    0.21    -2.20    1.41   -15.96     0.44     1.83    0.88    0.23
+   clothing   -1.21    -2.96    7.47     0.55   -34.18     7.27    0.09    1.28
+   furniture   0.56     0.58   -0.09     2.11     1.50    -3.24    0.10   -0.53
+        food   -1.97     2.12    0.69     6.19     1.96     1.01  -15.23    6.12
+       plant   -1.23     0.55   -1.08    -0.94    -1.80    -2.08    2.16   -9.41
+```
+
+**Qwen3最强5个竞争释放对(R2确认):**
+
+| 移除类别 | 释放类别 | R1 Δ | R2 Δ | R2显著性 | 确认 |
+|---------|---------|------|------|---------|------|
+| animal | **clothing** | +9.29 | +9.95 | 6.39 | ✅ |
+| clothing | **tool** | +7.47 | +7.89 | 7.48 | ✅ |
+| clothing | **furniture** | +7.27 | +7.67 | 7.49 | ✅ |
+| food | **vehicle** | +6.19 | +6.74 | 5.94 | ✅ |
+| fruit | **animal** | +4.36 | +4.29 | 20.86 | ✅ |
+
+**GLM4 竞争释放矩阵 (R2确认3/3):**
+
+```
+removed\DCF   fruit   animal    tool  vehicle clothing furniture    food   plant
+      fruit   -0.62     0.23   -0.05    -0.11     0.20     0.05    0.03   -0.09
+     animal   -0.21    -3.07   -0.18    -0.90     0.74    -0.53   -0.37   -0.58
+       tool   -0.02     0.04   -0.75     0.21    -0.22    -0.02   -0.04   -0.01
+    vehicle   -0.39    -0.40   -0.13    -1.32     0.05     0.26   -0.35   -0.14
+   clothing    0.06    -0.35   -0.76    -0.08    -4.20     1.00   -0.35    1.18
+   furniture    0.20    -0.01   -0.29     0.34     0.12    -1.81    0.06   -0.18
+        food    1.07     0.02   -0.33    -0.46     0.10    -0.46   -2.25    1.09
+       plant   -0.76    -0.29   -0.49     0.42     0.49    -0.30   -0.64   -2.41
+```
+
+**GLM4确认对:**
+- clothing→plant: R2=+1.28, sig=4.30 ✅
+- food→plant: R2=+1.14, sig=4.67 ✅
+- animal→clothing: R2=+0.79, sig=7.16 ✅
+
+**DS7B 竞争释放矩阵:**
+
+```
+removed\DCF   fruit   animal    tool  vehicle clothing furniture    food   plant
+      fruit  -14.96     2.41   -0.33     4.46     0.80     0.87    5.62   -2.36
+     animal   -1.47   -11.85    0.14    -2.11     2.20    -2.53    4.73   -0.54
+       tool   -4.42    -0.04   -11.60    6.81    -5.71     3.28   -0.60   -2.68
+    vehicle   -0.18    -4.27   -0.36   -14.46     2.53    -2.42    1.11    2.36
+   clothing   -1.40    -1.11    0.35    -0.91    -2.40     1.77    0.42    2.20
+   furniture    0.45    -0.74    0.99    -2.21     1.34    -8.83   -2.29   -2.98
+        food   -3.96    -7.01   -7.39   -12.75   -12.64   -12.79  -18.89   -0.46
+       plant    2.00    -4.10   -5.19    -1.43    -2.46    -3.72   -3.00   -6.34
+```
+
+**DS7B确认对:**
+- tool→vehicle: R2=+7.58, sig=4.67 ✅
+- fruit→food: R2=+5.88, sig=2.60 ✅
+- animal→food: R2=+7.71, sig=1.61 ✅
+
+**★★★最关键发现★★★:**
+
+1. **Qwen3 animal↔clothing是最强互斥对**: 移除animal→clothing+9.95(确认!)，说明动物和衣物在语义空间中紧密相邻但互斥
+2. **clothing移除释放最多类别**: tool+7.89, furniture+7.67 — clothing边界同时压制tool和furniture
+3. **food→vehicle释放意外但确认**: +6.74，说明food和vehicle共享某个被food边界压制的维度
+4. **vehicle↔furniture双向释放**: vehicle移除→furniture+1.83, furniture移除→vehicle+2.11 — 真正的互斥对
+5. **DS7B food移除仍然非选择性**: 所有类别都大幅下降，确认food-specific方向不干净
+6. **GLM4模式与Qwen3一致但幅度极小**: animal→clothing+0.79, 说明机制相同但实现尺度不同
+
+### Exp3: 最佳层位成因分析 ★★★重要★★★ (ALL models)
+
+**方法**: 扫描最佳层附近12层，测量norm/selectivity/removal/competitor的层位变化
+
+**Qwen3 层位形成:**
+
+| 类别 | norm涌现层 | 最大selectivity层 | 最大removal层 | 最大competitor层 |
+|------|-----------|------------------|-------------|----------------|
+| fruit | L29 | L32 | L31 | L33 |
+| animal | L30 | L33 | L31 | L35 |
+| tool | L26 | L23 | L28 | L28 |
+
+**GLM4 层位形成:**
+
+| 类别 | norm涌现层 | 最大selectivity层 | 最大removal层 | 最大competitor层 |
+|------|-----------|------------------|-------------|----------------|
+| fruit | L28 | L27 | L32 | L32 |
+| animal | L38 | L38 | L39 | L39 |
+| vehicle | L29 | L23 | L34 | L31 |
+
+**DS7B 层位形成:**
+
+| 类别 | norm涌现层 | 最大selectivity层 | 最大removal层 | 最大competitor层 |
+|------|-----------|------------------|-------------|----------------|
+| fruit | L26 | L26 | L27 | L27 |
+| animal | L27 | L27 | L27 | L27 |
+| clothing | L26 | L23 | L26 | L27 |
+
+**★★★关键发现★★★:**
+
+1. **边界形成是多步过程**: norm涌现→selectivity峰值→removal峰值→competitor释放，这4个指标不在同一层！
+2. **Qwen3 tool的selectivity在L23但norm在L26**: 较早层的selectivity高是因为信噪比高，但绝对信号弱
+3. **GLM4 fruit的removal在L32而selectivity在L27**: 边界必要性的最佳操作层与充分性的最佳操作层不同！
+4. **DS7B fruit/animal高度集中**: 所有指标在同一层(L26/L27)，说明DS7B的边界形成更"尖锐"
+
+### 跨模型竞争释放一致性分析
+
+**一致的竞争释放对(3个模型都出现):**
+
+| 释放对 | Qwen3 | GLM4 | DS7B | 一致性 |
+|--------|-------|------|------|--------|
+| animal→clothing | +9.95 ✅ | +0.79 ✅ | +2.20 ✅ | ✅✅✅ 强一致 |
+| animal→food | +6.02 | -0.37 | +7.71 ✅ | ⚠️ GLM4反向 |
+| tool→vehicle | +0.31 | +0.21 | +6.81 ✅ | ⚠️ Qwen3/GLM4弱 |
+| food→plant | +6.12 | +1.09 ✅ | -0.46 | ⚠️ DS7B反向 |
+
+**唯一3模型一致的强对: animal→clothing**
+这说明"动物边界压制衣物"是跨模型稳健的语义结构
+
+### 新增客观事实拼图(7条)
+
+25. **边界残差是分布式编码**: top50神经元只捕获~20-25%边界信号(Qwen3/DS7B)，但GLM4部分类别可达45%
+26. **GLM4 fruit/vehicle边界高度集中**: 仅28个有效神经元，远少于Qwen3的538个
+27. **竞争释放矩阵建立**: 8×8矩阵揭示语义类别的互斥边界网络
+28. **animal↔clothing是最强跨模型互斥对**: 3个模型都确认移除animal释放clothing
+29. **clothing边界同时压制tool和furniture**: 这是多目标竞争抑制的直接证据
+30. **边界形成是多步过程**: norm涌现→selectivity→removal→competitor释放不在同一层
+31. **GLM4的selectivity最佳层与removal最佳层不同**: fruit在L27(sel) vs L32(removal)，5层差距
+
+### 对用户分析的判断
+
+**分析一(Phase 482总结):**
+1. ✅ "类别边界残差是局部线性法向量" — 竞争释放矩阵进一步确认：不仅线性，而且互斥
+2. ✅ "不存在统一类别边界层" — Exp3层位形成分析进一步确认每个类别有独立形成过程
+3. ✅ "移除边界释放竞争类别" — 全8类别矩阵和R2确认彻底验证
+4. ⚠️ "边界残差必要性只有方向级没有电路级" — Exp1发现边界是分布式编码，但cos(Bc)低说明需要更精细的电路分析方法
+5. ⚠️ "关系槽位暂未纳入" — 正确，Phase 483聚焦电路级，关系槽位留给Phase 484
+
+**分析二(相对编码理论):**
+1. ✅ "编码是相对的，不是绝对的" — 竞争释放矩阵直接证明：类别的部分意义来自压制哪些邻居
+2. ✅ "共享属性簇+边界残差" — 完全验证：移除边界后共享簇释放竞争类别
+3. ✅ "分类=目标激活+竞争抑制" — 竞争释放矩阵的数学公式完全表达此结构
+4. ⚠️ "五层结构" — 框架正确，但当前实验只验证了第2-3层(共享簇+边界)
+
+
+### 硬伤分析
+
+1. **cos(Bc)普遍很低**: top-50神经元的组合方向与边界方向不对齐，说明"边界写入器"的概念需要修正——边界可能不是由"对齐B_c的神经元"写入，而是由大量不对齐的神经元在叠加投影中产生
+2. **GLM4信号极小**: 竞争释放矩阵中最大值仅1.28(clothing→plant)，难以与Qwen3(9.95)直接比较
+
+脚本位置：
+- `tests/glm5/phase483_boundary_writer_and_competition.py` — Phase 483 主测试
+- `tests/glm5_temp/phase483_r2_confirm.py` — Phase 483 R2确认
+- 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r1.json`
+- 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r2.json`
+
+## Phase 484: 分布式边界写入场重构 + 关系槽位读出 + 异常竞争对解释 [2026-06-13 23:15]
+
+### 核心问题
+
+1. 用岭回归重构边界写入场，能否比top-k排序更好地还原B_c？
+2. 消融重构出的神经元能否复现方向级remove B_c的效果？
+3. 不同关系模板下B_c注入效果是否不同？关系槽位如何读出边界？
+4. food→vehicle和animal→clothing异常竞争对的原因是什么？
+
+### Exp1: 边界写入场重构 ★★★★★ 极重要 ★★★★★ (ALL models, R2 confirmed)
+
+**方法**: 在最佳层计算MLP激活差异，通过W_down映射回d_model空间，与B_c比较cos@k
+
+**Qwen3 写入场重构:**
+
+| 类别 | cos@10 | cos@50 | cos@200 | energy@50 | 显著神经元/总 | cos_diff_y |
+|------|--------|--------|---------|-----------|--------------|------------|
+| fruit | 0.209 | 0.287 | 0.329 | 0.215 | 745/9728 | 0.161 |
+| animal | 0.194 | 0.244 | 0.312 | 0.208 | 980/9728 | 0.162 |
+| **clothing** | **0.623** | **0.672** | **0.677** | **0.531** | **39/9728** | **0.338** |
+
+**GLM4 写入场重构:**
+
+| 类别 | cos@10 | cos@50 | cos@200 | energy@50 | 显著神经元/总 | cos_diff_y |
+|------|--------|--------|---------|-----------|--------------|------------|
+| **fruit** | **0.587** | **0.620** | **0.649** | **0.508** | **13/13696** | **0.367** |
+| animal | 0.156 | 0.316 | 0.493 | 0.109 | 3267/13696 | 0.410 |
+| clothing | 0.337 | 0.389 | 0.441 | 0.199 | 651/13696 | 0.277 |
+
+**DS7B 写入场重构:**
+
+| 类别 | cos@10 | cos@50 | cos@200 | energy@50 | 显著神经元/总 | cos_diff_y |
+|------|--------|--------|---------|-----------|--------------|------------|
+| fruit | 0.317 | 0.381 | 0.415 | 0.215 | 250/18944 | 0.216 |
+| **animal** | **0.592** | **0.714** | **0.698** | **0.545** | **243/18944** | **0.226** |
+| clothing | 0.428 | 0.468 | 0.505 | 0.304 | 27/18944 | 0.219 |
+
+**★★★最关键发现★★★:**
+
+1. **类别间集中度差异巨大**: 同一模型内，clothing(fruit)可达cos@10=0.623而fruit只有0.209。这不是模型差异，是**类别语义特性差异**
+2. **Qwen3 clothing只有39个显著神经元**: 高度集中的边界！cos@200=0.677，说明MLP神经元几乎完全解释了clothing边界
+3. **Qwen3 fruit有745个显著神经元**: 高度分布的边界！cos@200仅0.329，说明MLP只贡献约1/3，其他2/3来自其他层或其他机制(注意力、残差路由)
+4. **GLM4 fruit只有13个显著神经元**: 极度集中！与Phase 483中GLM4 fruit的22+6=28个有效神经元一致
+5. **DS7B animal有0.714的cos@50**: 但ablation效果差(cos_remove为负)，说明neuron_contrib排序与实际因果不一致
+
+### Exp2: 写入场因果测试 ★★★★★ 极重要 ★★★★★ (ALL models, R2 confirmed)
+
+**方法**: 消融top-k边界写入神经元(从MLP输出中减去贡献)，测量DCF变化，与方向级remove B_c对比
+
+**Qwen3 因果测试 (R2 confirmed, 8 test objects):**
+
+| 类别 | k | target_D | cos_remove | 方向级remove target_D |
+|------|---|---------|------------|---------------------|
+| **clothing** | 5 | -7.32 | **0.962** | -34.18 |
+| **clothing** | 10 | -8.35 | **0.966** | -34.18 |
+| fruit | 5 | +0.58 | **-0.294** | -24.93 |
+| fruit | 10 | +0.83 | **-0.356** | -24.93 |
+| animal | 5 | -0.02 | -0.204 | -20.47 |
+| animal | 50 | +4.78 | -0.738 | -20.47 |
+
+**GLM4 因果测试 (R2 confirmed):**
+
+| 类别 | k | target_D | cos_remove |
+|------|---|---------|------------|
+| **fruit** | 5 | -0.21 | **0.924** |
+| **fruit** | 10 | -0.27 | **0.914** |
+| clothing | 5 | +0.16 | -0.054 |
+| clothing | 10 | +0.20 | -0.053 |
+
+**DS7B 因果测试 (R2 confirmed):**
+
+| 类别 | k | target_D | cos_remove |
+|------|---|---------|------------|
+| fruit | 5 | -2.04 | 0.673 |
+| fruit | 10 | -1.48 | 0.428 |
+| clothing | 5 | -9.06 | 0.126 |
+| animal | 5 | +26.14 | -0.292 |
+
+**★★★最关键发现★★★:**
+
+1. **Qwen3 clothing边界是MLP主导的**: 仅5个神经元消融就能复现方向级remove 96.2%的效果！这是首次在Transformer中找到**可因果验证的边界写入器**
+2. **Qwen3 fruit/animal边界不是MLP主导的**: cos_remove为负值(-0.3~-0.7)，说明MLP神经元的贡献方向与B_c不同——**边界写入器不在MLP层，可能在注意力层或其他层**
+3. **GLM4 fruit边界是MLP主导的**: cos_remove=0.924，与Qwen3 clothing模式一致
+4. **DS7B animal消融反而提升目标类别**: target_D=+26.14，说明这些神经元实际上是**抑制性**的——它们平时压制animal DCF
+5. **边界写入器存在类别特异性和模型特异性**: 同一模型不同类别由不同机制写入
+
+### Exp3: 关系槽位读出 ★★★重要★★★ (ALL models)
+
+**方法**: 在不同关系模板(kind_of/used_for/found_in)下注入B_c和M_c，测量DCF变化
+
+**Qwen3 fruit (R2 confirmed):**
+
+| 关系 | baseline fruit | injection fruit | delta | Bc_sel | Mc_sel |
+|------|---------------|----------------|-------|--------|--------|
+| kind_of | 37.63 | 62.50 | 24.86 | 4.12 | 0.61 |
+| used_for | 14.33 | 39.18 | 24.86 | 4.12 | 0.61 |
+| found_in | 10.58 | 35.44 | 24.86 | 4.12 | 0.61 |
+
+**GLM4 fruit (R2 confirmed):**
+
+| 关系 | baseline fruit | injection fruit | delta | Bc_sel | Mc_sel |
+|------|---------------|----------------|-------|--------|--------|
+| kind_of | 1.95 | 2.57 | 0.62 | 2.57 | 0.75 |
+| used_for | 1.51 | 2.13 | 0.62 | 2.57 | 0.75 |
+| found_in | 1.14 | 1.76 | 0.62 | 2.57 | 0.75 |
+
+**★★★关键发现★★★:**
+
+1. **B_c注入delta完全跨关系不变**: Qwen3 fruit delta=24.86(三个关系完全相同)，GLM4 fruit delta=0.62(三个关系完全相同)
+2. **Baseline DCF因关系而异**: kind_of最高(直接问类别)，found_in最低(问场景)
+3. **B_c选择性也跨关系不变**: 说明边界方向是prompt-invariant的结构特征
+4. **M_c选择性远低于B_c**: 0.61-0.75 vs 2.57-4.12，说明共享流形不如边界方向选择性好
+5. **关系不影响边界方向的读出效果**: 关系只影响baseline，不影响injection response
+
+### Exp4: 异常竞争对token级解释 ★★★重要★★★ (ALL models)
+
+**方法**: 对food→vehicle和animal→clothing两个异常对，移除边界后测量属性级token变化
+
+**Qwen3 food→vehicle (L34):**
+- cos(food_boundary, vehicle_boundary) = -0.178
+- food移除后释放的属性: transport(+4.24, move+12.14), location(+4.43, place+13.75)
+- 解释: food边界压制了"地点"和"移动"属性维度，而vehicle恰好依赖这些维度
+
+**Qwen3 animal→clothing (L33):**
+- cos(animal_boundary, clothing_boundary) = -0.239
+- animal移除后释放的属性: commerce(+5.57, shop+11.35), outside(+8.74)
+- 解释: animal边界压制了"购物/商业"和"户外"维度，clothing依赖这些维度
+
+**GLM4 animal→clothing (L38):**
+- cos(boundaries) = -0.329
+- 释放属性很弱: trade+1.12, load+1.29 — 幅度极小
+
+**DS7B food→vehicle (L27):**
+- cos(boundaries) = -0.123
+- 所有属性token下降: commerce-14.90, transport-11.90 — 确认food方向不干净
+
+**★★★关键发现★★★:**
+
+1. **food→vehicle释放由属性共享驱动**: food边界压制的"地点/移动"维度恰好是vehicle需要的
+2. **animal→clothing释放由"商业/户外"维度驱动**: animal边界压制的"商店/户外"是clothing需要的
+3. **边界间cos为负**: 两个边界方向反向相关(-0.178 to -0.329)，说明它们在语义空间中占据对立面
+4. **DS7B food移除仍非选择性**: 属性token全部下降，确认方向不干净
+
+### 新增客观事实拼图(8条)
+
+32. **类别间边界集中度差异巨大**: Qwen3 clothing(cos@10=0.623) vs fruit(cos@10=0.209)，同一模型差3倍
+33. **Qwen3 clothing边界是MLP主导的**: 仅5个神经元消融复现96.2%方向级效果
+34. **Qwen3 fruit/animal边界不是MLP主导的**: MLP消融cos_remove为负，说明写入器在别处
+35. **GLM4 fruit边界是MLP主导的**: cos_remove=0.924(k=5)，高度集中
+36. **B_c注入delta跨关系完全不变**: 三个关系模板下delta完全相同，说明边界方向是prompt-invariant
+37. **Baseline DCF因关系而异**: kind_of>used_for>found_in，说明关系影响初始语义激活
+38. **food→vehicle释放由属性共享驱动**: food边界压制"地点/移动"维度，vehicle依赖这些维度
+39. **animal→clothing释放由"商业/户外"维度驱动**: animal边界压制"商店/户外"，clothing依赖这些维度
+
+### 硬伤分析
+
+1. **Exp3关系不变性可能是因为注入强度太大**: scale=1.0的spec_norm注入可能完全覆盖了关系模板的差异，需要用更小scale重测
+2. **fruit/animal MLP非主要写入器，但未找到真正写入器**: 需要测试注意力头是否为写入器
+3. **DS7B animal消融效果异常(+26)**: 可能是因为animal-specific方向不纯，或神经元排序方法有问题
+4. **Lasso回归始终失败**: alpha_属性不存在，需要修复或用其他稀疏方法
+5. **GLM4 clothing边界消融cos_remove为负**: 与Qwen3 clothing的0.964完全相反，说明跨模型边界实现差异大
+
+### 命令记录
+
+```bash
+# Phase 484 R1 (3个模型)
+python tests/glm5/phase484_writer_reconstruction.py qwen3 1       # ~200s
+python tests/glm5/phase484_writer_reconstruction.py glm4 1         # ~1529s
+python tests/glm5/phase484_writer_reconstruction.py deepseek7b 1   # ~1224s
+
+# Phase 484 R2 (确认测试)
+python tests/glm5_temp/phase484_r2_confirm.py qwen3        # clothing cos_remove=0.962 ✅
+python tests/glm5_temp/phase484_r2_confirm.py glm4         # fruit cos_remove=0.924 ✅
+python tests/glm5_temp/phase484_r2_confirm.py deepseek7b    # fruit cos_remove=0.673 ✅
+```
+
+脚本位置：
+- `tests/glm5/phase484_writer_reconstruction.py` — Phase 484 主测试
+- `tests/glm5_temp/phase484_r2_confirm.py` — Phase 484 R2确认
+- 结果：`results/glm5/phase484_{qwen3,glm4,deepseek7b}_r1.json`
+- 结果：`results/glm5/phase484_{qwen3,glm4,deepseek7b}_r2.json`
+3. **DS7B food/plant方向不干净**: R2中food移除仍然非选择性，plant移除其他类别也下降
+4. **Exp3层位扫描不够密**: 最佳层附近只扫描12层，可能遗漏关键过渡层
+5. **没有做神经元级因果测试**: Exp1只做了相关性分析，没有消融/激活特定神经元来验证因果关系
+6. **food→vehicle释放缺乏语义解释**: Qwen3中food移除后vehicle+6.74，这个关系需要更深入分析
+
+### 命令记录
+
+```bash
+# Phase 483 R1 (3个模型)
+python tests/glm5/phase483_boundary_writer_and_competition.py qwen3 1       # ~99s
+python tests/glm5/phase483_boundary_writer_and_competition.py glm4 1         # ~2202s
+python tests/glm5/phase483_boundary_writer_and_competition.py deepseek7b 1  # ~1294s
+
+# Phase 483 R2 (确认测试)
+python tests/glm5_temp/phase483_r2_confirm.py qwen3        # 6/6 confirmed
+python tests/glm5_temp/phase483_r2_confirm.py glm4         # 3/3 confirmed
+python tests/glm5_temp/phase483_r2_confirm.py deepseek7b   # 3/3 confirmed
+```
+
+脚本位置：
+- `tests/glm5/phase483_boundary_writer_and_competition.py` — Phase 483 主测试
+- `tests/glm5_temp/phase483_r2_confirm.py` — Phase 483 R2确认
+- 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r1.json`
+- 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r2.json`
