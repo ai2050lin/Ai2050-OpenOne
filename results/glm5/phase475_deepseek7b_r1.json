@@ -1,0 +1,182 @@
+{
+  "phase": 475,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-13 01:30:20",
+  "theory": "DCF Projection Robustness & Subspace Decomposition",
+  "core_question": "If delta grows, why does DCF direction stay robust? Where does perturbation growth happen?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_perturbation_projection_decomposition": {
+    "random": {
+      "total_delta_per_layer": {
+        "L24": 297.3339,
+        "L25": 321.281,
+        "L26": 344.9677,
+        "L27": 884.2705
+      },
+      "dcf_delta_per_layer": {
+        "L24": 13.9164,
+        "L25": 16.8406,
+        "L26": 19.7245,
+        "L27": 112.8875
+      },
+      "null_delta_per_layer": {
+        "L24": 296.9796,
+        "L25": 320.8026,
+        "L26": 344.3706,
+        "L27": 875.131
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.046803,
+        "L25": 0.052344,
+        "L26": 0.056938,
+        "L27": 0.122891
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.7883,
+        "L26": 0.6628,
+        "L27": 0.1522
+      },
+      "recovery_per_layer": {
+        "L24": 0.9864,
+        "L25": 0.9896,
+        "L26": 0.9929,
+        "L27": 0.8892
+      },
+      "early_dcf_fraction": 0.046803,
+      "late_dcf_fraction": 0.089915,
+      "dcf_delta_ratio": 4.7646,
+      "null_delta_ratio": 2.0532,
+      "perturbation_norm": 299.33
+    },
+    "anti_fruit": {
+      "total_delta_per_layer": {
+        "L24": 299.3658,
+        "L25": 350.7939,
+        "L26": 409.8992,
+        "L27": 1231.2299
+      },
+      "dcf_delta_per_layer": {
+        "L24": 40.4835,
+        "L25": 42.1677,
+        "L26": 52.4412,
+        "L27": 137.885
+      },
+      "null_delta_per_layer": {
+        "L24": 296.6159,
+        "L25": 348.2373,
+        "L26": 406.483,
+        "L27": 1222.4841
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.135231,
+        "L25": 0.120218,
+        "L26": 0.12792,
+        "L27": 0.119754
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.9454,
+        "L26": 0.8226,
+        "L27": 0.4072
+      },
+      "recovery_per_layer": {
+        "L24": 0.9294,
+        "L25": 0.9372,
+        "L26": 0.9458,
+        "L27": 0.7997
+      },
+      "early_dcf_fraction": 0.135231,
+      "late_dcf_fraction": 0.123837,
+      "dcf_delta_ratio": 2.3507,
+      "null_delta_ratio": 2.7459,
+      "perturbation_norm": 299.33
+    },
+    "toward_vehicle": {
+      "total_delta_per_layer": {
+        "L24": 299.3154,
+        "L25": 349.2306,
+        "L26": 393.0682,
+        "L27": 1125.1183
+      },
+      "dcf_delta_per_layer": {
+        "L24": 38.796,
+        "L25": 43.8441,
+        "L26": 51.3486,
+        "L27": 134.3572
+      },
+      "null_delta_per_layer": {
+        "L24": 296.7905,
+        "L25": 346.4472,
+        "L26": 389.621,
+        "L27": 1116.2405
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.129616,
+        "L25": 0.125505,
+        "L26": 0.130075,
+        "L27": 0.125706
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.9584,
+        "L26": 0.9148,
+        "L27": 0.3717
+      },
+      "recovery_per_layer": {
+        "L24": 0.946,
+        "L25": 0.9408,
+        "L26": 0.9555,
+        "L27": 0.8041
+      },
+      "early_dcf_fraction": 0.129616,
+      "late_dcf_fraction": 0.127891,
+      "dcf_delta_ratio": 2.3934,
+      "null_delta_ratio": 2.5369,
+      "perturbation_norm": 299.33
+    },
+    "summary": {
+      "n_perturbation_types": 3,
+      "dcf_component_shrinks": false,
+      "null_grows_faster_than_dcf": false,
+      "dcf_fraction_decreases_late": false,
+      "n_dcf_subspace_dims": 8,
+      "perturb_beta": 5.0,
+      "perturb_target_norm": 299.33
+    }
+  },
+  "exp2_correction_layer_localization": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp3_glm4_repeat_write_verification": {
+    "skipped": true,
+    "reason": "only for glm4"
+  },
+  "exp4_ds7b_l27_precise_mechanism": {
+    "L26_format_score": -54.3597,
+    "L26_semantic_score": 139.9342,
+    "L27_format_score": 88.4723,
+    "L27_semantic_score": -23.1553,
+    "L27_attn_format_score": 70.7138,
+    "L27_attn_semantic_score": -171.8026,
+    "L27_mlp_format_score": 72.1333,
+    "L27_mlp_semantic_score": 8.7504,
+    "summary": {
+      "attn_format_dominant": true,
+      "mlp_format_dominant": true,
+      "attn_fmt_minus_sem": 242.5164,
+      "mlp_fmt_minus_sem": 63.3829,
+      "format_overlay_source": "attn"
+    }
+  },
+  "exp5_neuron_causal_test": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  }
+}

@@ -1,0 +1,480 @@
+{
+  "phase": 475,
+  "model": "qwen3",
+  "round": 1,
+  "timestamp": "2026-06-13 00:08:18",
+  "theory": "DCF Projection Robustness & Subspace Decomposition",
+  "core_question": "If delta grows, why does DCF direction stay robust? Where does perturbation growth happen?",
+  "model_info": {
+    "class": "Qwen3ForCausalLM",
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "exp1_perturbation_projection_decomposition": {
+    "random": {
+      "total_delta_per_layer": {
+        "L24": 255.067,
+        "L25": 264.2055,
+        "L26": 274.902,
+        "L27": 285.5781,
+        "L28": 302.8497,
+        "L29": 333.9257,
+        "L30": 367.2773,
+        "L31": 402.82,
+        "L32": 436.2981,
+        "L33": 462.0503,
+        "L34": 507.9472,
+        "L35": 522.1293
+      },
+      "dcf_delta_per_layer": {
+        "L24": 13.7938,
+        "L25": 14.3437,
+        "L26": 14.678,
+        "L27": 15.6557,
+        "L28": 17.9244,
+        "L29": 26.0113,
+        "L30": 32.1713,
+        "L31": 41.655,
+        "L32": 42.0865,
+        "L33": 38.1916,
+        "L34": 40.0215,
+        "L35": 42.0971
+      },
+      "null_delta_per_layer": {
+        "L24": 254.6764,
+        "L25": 263.7987,
+        "L26": 274.491,
+        "L27": 285.1276,
+        "L28": 302.2937,
+        "L29": 332.8683,
+        "L30": 365.8092,
+        "L31": 400.5497,
+        "L32": 434.1705,
+        "L33": 460.3681,
+        "L34": 506.2975,
+        "L35": 520.3285
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.054091,
+        "L25": 0.054281,
+        "L26": 0.053324,
+        "L27": 0.054739,
+        "L28": 0.059102,
+        "L29": 0.078046,
+        "L30": 0.087893,
+        "L31": 0.103747,
+        "L32": 0.097013,
+        "L33": 0.083053,
+        "L34": 0.078981,
+        "L35": 0.080474
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.954,
+        "L26": 0.8735,
+        "L27": 0.7974,
+        "L28": 0.6539,
+        "L29": 0.4391,
+        "L30": 0.3649,
+        "L31": 0.3024,
+        "L32": 0.2784,
+        "L33": 0.2645,
+        "L34": 0.2911,
+        "L35": 0.2482
+      },
+      "recovery_per_layer": {
+        "L24": 0.3843,
+        "L25": 0.3656,
+        "L26": 0.4596,
+        "L27": 0.5397,
+        "L28": 0.5348,
+        "L29": 0.5953,
+        "L30": 0.6079,
+        "L31": 0.6373,
+        "L32": 0.6448,
+        "L33": 0.6678,
+        "L34": 0.6703,
+        "L35": 0.7372
+      },
+      "early_dcf_fraction": 0.054109,
+      "late_dcf_fraction": 0.08488,
+      "dcf_delta_ratio": 2.7774,
+      "null_delta_ratio": 1.782,
+      "perturbation_norm": 252.98
+    },
+    "anti_fruit": {
+      "total_delta_per_layer": {
+        "L24": 252.9508,
+        "L25": 268.6517,
+        "L26": 269.1938,
+        "L27": 278.728,
+        "L28": 289.4177,
+        "L29": 315.013,
+        "L30": 337.7552,
+        "L31": 367.7576,
+        "L32": 394.6517,
+        "L33": 419.598,
+        "L34": 464.674,
+        "L35": 490.5913
+      },
+      "dcf_delta_per_layer": {
+        "L24": 58.4739,
+        "L25": 58.0683,
+        "L26": 45.6389,
+        "L27": 44.4563,
+        "L28": 41.1373,
+        "L29": 43.6819,
+        "L30": 51.7234,
+        "L31": 59.96,
+        "L32": 61.0679,
+        "L33": 60.8706,
+        "L34": 66.3638,
+        "L35": 66.7762
+      },
+      "null_delta_per_layer": {
+        "L24": 246.0994,
+        "L25": 262.3002,
+        "L26": 265.288,
+        "L27": 275.1324,
+        "L28": 286.4268,
+        "L29": 311.8,
+        "L30": 333.5287,
+        "L31": 362.5421,
+        "L32": 389.6756,
+        "L33": 414.8945,
+        "L34": 459.6452,
+        "L35": 485.7207
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.231167,
+        "L25": 0.216149,
+        "L26": 0.169456,
+        "L27": 0.15924,
+        "L28": 0.141645,
+        "L29": 0.136932,
+        "L30": 0.150832,
+        "L31": 0.160316,
+        "L32": 0.152736,
+        "L33": 0.142952,
+        "L34": 0.140815,
+        "L35": 0.133633
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.9905,
+        "L26": 0.955,
+        "L27": 0.9426,
+        "L28": 0.8908,
+        "L29": 0.7226,
+        "L30": 0.6648,
+        "L31": 0.6071,
+        "L32": 0.6256,
+        "L33": 0.7115,
+        "L34": 0.7446,
+        "L35": 0.8057
+      },
+      "recovery_per_layer": {
+        "L24": 0.2488,
+        "L25": 0.25,
+        "L26": 0.3209,
+        "L27": 0.3544,
+        "L28": 0.3423,
+        "L29": 0.3266,
+        "L30": 0.3064,
+        "L31": 0.284,
+        "L32": 0.2872,
+        "L33": 0.2736,
+        "L34": 0.2718,
+        "L35": 0.3195
+      },
+      "early_dcf_fraction": 0.194003,
+      "late_dcf_fraction": 0.142534,
+      "dcf_delta_ratio": 1.2344,
+      "null_delta_ratio": 1.6685,
+      "perturbation_norm": 252.98
+    },
+    "toward_vehicle": {
+      "total_delta_per_layer": {
+        "L24": 252.9819,
+        "L25": 277.0941,
+        "L26": 276.6484,
+        "L27": 285.494,
+        "L28": 300.1303,
+        "L29": 330.1507,
+        "L30": 359.6452,
+        "L31": 397.9577,
+        "L32": 428.1888,
+        "L33": 458.0148,
+        "L34": 509.8681,
+        "L35": 532.2042
+      },
+      "dcf_delta_per_layer": {
+        "L24": 53.3166,
+        "L25": 55.5537,
+        "L26": 45.6864,
+        "L27": 45.6211,
+        "L28": 41.8421,
+        "L29": 42.9022,
+        "L30": 47.5841,
+        "L31": 57.833,
+        "L32": 61.5658,
+        "L33": 61.4345,
+        "L34": 66.3108,
+        "L35": 72.8074
+      },
+      "null_delta_per_layer": {
+        "L24": 247.2999,
+        "L25": 271.4671,
+        "L26": 272.8418,
+        "L27": 281.7935,
+        "L28": 297.1532,
+        "L29": 327.1556,
+        "L30": 356.2077,
+        "L31": 393.3213,
+        "L32": 423.3394,
+        "L33": 453.5039,
+        "L34": 505.1321,
+        "L35": 526.7674
+      },
+      "dcf_fraction_per_layer": {
+        "L24": 0.210753,
+        "L25": 0.200483,
+        "L26": 0.165077,
+        "L27": 0.159525,
+        "L28": 0.138976,
+        "L29": 0.128263,
+        "L30": 0.130108,
+        "L31": 0.14248,
+        "L32": 0.141542,
+        "L33": 0.132027,
+        "L34": 0.128177,
+        "L35": 0.134162
+      },
+      "dcf_cos_alignment_per_layer": {
+        "L24": 1.0,
+        "L25": 0.9931,
+        "L26": 0.9666,
+        "L27": 0.9575,
+        "L28": 0.9233,
+        "L29": 0.7733,
+        "L30": 0.6621,
+        "L31": 0.6146,
+        "L32": 0.6605,
+        "L33": 0.7216,
+        "L34": 0.7493,
+        "L35": 0.8703
+      },
+      "recovery_per_layer": {
+        "L24": 0.1865,
+        "L25": 0.1989,
+        "L26": 0.2792,
+        "L27": 0.29,
+        "L28": 0.3109,
+        "L29": 0.3153,
+        "L30": 0.3124,
+        "L31": 0.2672,
+        "L32": 0.2671,
+        "L33": 0.234,
+        "L34": 0.2473,
+        "L35": 0.3451
+      },
+      "early_dcf_fraction": 0.183959,
+      "late_dcf_fraction": 0.133977,
+      "dcf_delta_ratio": 1.3094,
+      "null_delta_ratio": 1.7782,
+      "perturbation_norm": 252.98
+    },
+    "summary": {
+      "n_perturbation_types": 3,
+      "dcf_component_shrinks": false,
+      "null_grows_faster_than_dcf": false,
+      "dcf_fraction_decreases_late": false,
+      "n_dcf_subspace_dims": 8,
+      "perturb_beta": 5.0,
+      "perturb_target_norm": 252.98
+    }
+  },
+  "exp2_correction_layer_localization": {
+    "baseline_recovery": -0.0949,
+    "L25": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L26": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L27": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L28": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L29": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L30": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L31": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L32": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L33": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L34": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "L35": {
+      "recovery_with_ablation": 0.0,
+      "recovery_drop_from_baseline": -0.0949,
+      "is_correction_layer": false
+    },
+    "summary": {
+      "baseline_recovery": -0.0949,
+      "correction_layers": [],
+      "n_correction_layers": 0,
+      "max_drop_layer": "L25",
+      "max_drop_value": -0.0949
+    }
+  },
+  "exp3_glm4_repeat_write_verification": {
+    "skipped": true,
+    "reason": "only for glm4"
+  },
+  "exp4_ds7b_l27_precise_mechanism": {
+    "skipped": true,
+    "reason": "only for deepseek7b"
+  },
+  "exp5_neuron_causal_test": {
+    "L30": {
+      "top_positive_neurons": [
+        4901,
+        7626,
+        6156,
+        9291,
+        8687,
+        3772,
+        7400,
+        1469,
+        7916,
+        2903
+      ],
+      "top_negative_neurons": [
+        4479,
+        1624,
+        6416,
+        1322,
+        5963,
+        7901,
+        8156,
+        7402,
+        4946,
+        664
+      ],
+      "dcf_change_after_ablation": {
+        "fruit": -6.473771,
+        "animal": -0.586141,
+        "vehicle": -0.226261,
+        "tool": -0.163455
+      },
+      "fruit_specific": true
+    },
+    "L33": {
+      "top_positive_neurons": [
+        519,
+        5924,
+        8005,
+        1212,
+        32,
+        8975,
+        6585,
+        6472,
+        510,
+        173
+      ],
+      "top_negative_neurons": [
+        4276,
+        5567,
+        53,
+        6900,
+        4797,
+        143,
+        7236,
+        3201,
+        8452,
+        5218
+      ],
+      "dcf_change_after_ablation": {
+        "fruit": -3.538561,
+        "animal": -0.892651,
+        "vehicle": -0.877252,
+        "tool": -1.075891
+      },
+      "fruit_specific": true
+    },
+    "L35": {
+      "top_positive_neurons": [
+        188,
+        36,
+        16,
+        6,
+        1593,
+        105,
+        123,
+        443,
+        128,
+        249
+      ],
+      "top_negative_neurons": [
+        284,
+        18,
+        885,
+        2932,
+        3421,
+        235,
+        3665,
+        197,
+        3682,
+        6053
+      ],
+      "dcf_change_after_ablation": {
+        "fruit": -11.735328,
+        "animal": -9.630017,
+        "vehicle": -11.871809,
+        "tool": -12.250713
+      },
+      "fruit_specific": true
+    },
+    "summary": {
+      "model": "qwen3",
+      "key_layers": [
+        30,
+        33,
+        35
+      ],
+      "method": "ablate top-k fruit-positive neurons, check DCF change per category"
+    }
+  }
+}

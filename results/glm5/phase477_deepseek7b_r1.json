@@ -1,0 +1,263 @@
+{
+  "phase": 477,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-13 09:21:53",
+  "theory": "Manifold Boundary, Writer 8D Closure & Format Head Verification",
+  "core_question": "Can we close the loop on manifold boundary, fruit writer specificity, and format head causality?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_fine_beta_scan": {
+    "beta_0.25": {
+      "mid_recovery": 0.9999793565935912,
+      "last_recovery": 0.9999890574556131,
+      "target_norm": 14.966629547095765,
+      "dcf_fraction_mean": 0.008102496327814226,
+      "norm_ratio_mean": 0.03579899800636314,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 1.4347576830312883e-10
+    },
+    "beta_0.5": {
+      "mid_recovery": 0.9999057302024011,
+      "last_recovery": 0.9999571880881947,
+      "target_norm": 29.93325909419153,
+      "dcf_fraction_mean": 0.010816259411489225,
+      "norm_ratio_mean": 0.07270970911652257,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 2.6442468469463815e-10
+    },
+    "beta_0.75": {
+      "mid_recovery": 0.9996322651954564,
+      "last_recovery": 0.9998725887527181,
+      "target_norm": 44.8998886412873,
+      "dcf_fraction_mean": 0.008431612920047472,
+      "norm_ratio_mean": 0.1264574406595194,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 4.656739484761493e-10
+    },
+    "beta_1.0": {
+      "mid_recovery": 0.9994780138804779,
+      "last_recovery": 0.9997912610968354,
+      "target_norm": 59.86651818838306,
+      "dcf_fraction_mean": 0.01410919915929651,
+      "norm_ratio_mean": 0.23592772779425975,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 2.238232590009067e-09
+    },
+    "beta_1.25": {
+      "mid_recovery": 0.9992304639844668,
+      "last_recovery": 0.9994174767970293,
+      "target_norm": 74.83314773547883,
+      "dcf_fraction_mean": 0.022216727627178617,
+      "norm_ratio_mean": 0.3887943197838064,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 3.868759294404593e-10
+    },
+    "beta_1.5": {
+      "mid_recovery": 0.9989229362558447,
+      "last_recovery": 0.9985634853649179,
+      "target_norm": 89.7997772825746,
+      "dcf_fraction_mean": 0.022047988075181744,
+      "norm_ratio_mean": 0.49552335233153744,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 3.016880032828221e-11
+    },
+    "beta_2.0": {
+      "mid_recovery": 0.9987559676703168,
+      "last_recovery": 0.9986500415785344,
+      "target_norm": 119.73303637676612,
+      "dcf_fraction_mean": 0.02192677938921121,
+      "norm_ratio_mean": 0.49126163274706397,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 8.156292308214574e-11
+    },
+    "beta_3.0": {
+      "mid_recovery": -0.9951789029767512,
+      "last_recovery": -0.9958846474567121,
+      "target_norm": 179.5995545651492,
+      "dcf_fraction_mean": 0.05785088015187659,
+      "norm_ratio_mean": 1.8401335869061566,
+      "entropy_clean_mean": 1.540846431928126e-10,
+      "entropy_pert_mean": 0.0
+    }
+  },
+  "exp2_fruit_writer_full_8d": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp3_cross_object_template": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp4_scaled_ablation": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp5_dose_response_manifold": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp6_ds7b_head12_necessity": {
+    "head_12": {
+      "fruit": {
+        "format_score_change": -10.959793090820312,
+        "semantic_score_change": -123.68261210123698,
+        "math_score_change": -107.95410346984863,
+        "dcf_delta": {
+          "fruit": 130.37196040153503,
+          "animal": 139.0108963648478,
+          "tool": 135.34011228879294,
+          "vehicle": 124.37644969092476,
+          "clothing": 118.11469650268555,
+          "furniture": 176.10274251302081,
+          "food": 124.09824546178183,
+          "plant": 112.75353654225667
+        }
+      },
+      "animal": {
+        "format_score_change": 35.268513997395836,
+        "semantic_score_change": -45.457618713378906,
+        "math_score_change": -30.523971398671467,
+        "dcf_delta": {
+          "fruit": 46.55694715181986,
+          "animal": 49.02134164174397,
+          "tool": 48.982087771097824,
+          "vehicle": 41.05857912699381,
+          "clothing": 54.08779398600261,
+          "furniture": 70.73083782196045,
+          "food": 50.44793997870551,
+          "plant": 38.59571917851766
+        }
+      }
+    },
+    "head_13": {
+      "fruit": {
+        "format_score_change": -7.089602152506511,
+        "semantic_score_change": -48.146384278933205,
+        "math_score_change": -44.48919868469238,
+        "dcf_delta": {
+          "fruit": 50.44308198491732,
+          "animal": 53.11141630013784,
+          "tool": 53.477081735928856,
+          "vehicle": 49.94377422332764,
+          "clothing": 43.452043533325195,
+          "furniture": 74.1145989894867,
+          "food": 46.8249847094218,
+          "plant": 43.4901274840037
+        }
+      },
+      "animal": {
+        "format_score_change": 21.756907145182293,
+        "semantic_score_change": -5.487092812856038,
+        "math_score_change": -0.6966705719629923,
+        "dcf_delta": {
+          "fruit": 4.334660053253174,
+          "animal": 3.0025325351291228,
+          "tool": 6.139747937520347,
+          "vehicle": 2.23667441474067,
+          "clothing": 9.677326202392578,
+          "furniture": 13.885052998860687,
+          "food": 9.142322646247017,
+          "plant": 3.6154715220133475
+        }
+      }
+    },
+    "head_0": {
+      "fruit": {
+        "format_score_change": -0.41801706949869794,
+        "semantic_score_change": 0.14566930135091147,
+        "math_score_change": -0.025686899820963543,
+        "dcf_delta": {
+          "fruit": -0.6771971384684221,
+          "animal": -0.14398352305094164,
+          "tool": -0.09702277183532715,
+          "vehicle": -0.11916393703884864,
+          "clothing": -0.5326970418294223,
+          "furniture": -0.06496620178222656,
+          "food": -0.6758099132113955,
+          "plant": -0.5674727757771834
+        }
+      },
+      "animal": {
+        "format_score_change": -0.6014022827148438,
+        "semantic_score_change": 1.0601959228515625,
+        "math_score_change": 1.1322353680928547,
+        "dcf_delta": {
+          "fruit": -1.2326622009277344,
+          "animal": -0.6674133936564131,
+          "tool": -1.3858741919199602,
+          "vehicle": -1.0329426659478074,
+          "clothing": -1.9379361470540317,
+          "furniture": -1.9542058308919223,
+          "food": -1.3469374974568709,
+          "plant": -1.4290579160054513
+        }
+      }
+    },
+    "head_21": {
+      "fruit": {
+        "format_score_change": 0.02869415283203125,
+        "semantic_score_change": 1.845319112141927,
+        "math_score_change": 1.6154212951660156,
+        "dcf_delta": {
+          "fruit": -1.8956895669301375,
+          "animal": -2.303448783026795,
+          "tool": -2.1025573412577288,
+          "vehicle": -1.9958072768317372,
+          "clothing": -1.45391845703125,
+          "furniture": -2.340972264607757,
+          "food": -1.7404245270623164,
+          "plant": -1.582263310750328
+        }
+      },
+      "animal": {
+        "format_score_change": -1.3111852010091145,
+        "semantic_score_change": 3.8468500773111978,
+        "math_score_change": 3.045145829518636,
+        "dcf_delta": {
+          "fruit": -4.213683128356934,
+          "animal": -4.407927089267306,
+          "tool": -4.352198282877602,
+          "vehicle": -3.778392261928982,
+          "clothing": -3.595806121826172,
+          "furniture": -5.585990269978836,
+          "food": -3.5418212148878396,
+          "plant": -3.4814594586690255
+        }
+      }
+    }
+  },
+  "exp7_ds7b_head12_sufficiency": {
+    "isolation_fruit": {
+      "format_change": 20.715476989746094,
+      "semantic_change": 21.512897491455078,
+      "dcf_delta": {
+        "fruit": 13.482373595237732,
+        "animal": 27.709938844045006,
+        "tool": 26.68383288383484,
+        "vehicle": 19.826362927754715,
+        "clothing": 22.2586727142334,
+        "furniture": 41.26363754272461,
+        "food": 26.38974722226461,
+        "plant": 11.000994682312012
+      }
+    },
+    "isolation_animal": {
+      "format_change": -17.80978012084961,
+      "semantic_change": -10.25333309173584,
+      "dcf_delta": {
+        "fruit": -14.929603576660156,
+        "animal": -19.234979788462322,
+        "tool": -13.739853620529175,
+        "vehicle": -13.66103967030843,
+        "clothing": -2.685609817504883,
+        "furniture": -4.678645133972168,
+        "food": -1.8866980870564731,
+        "plant": -16.9065043926239
+      }
+    }
+  }
+}

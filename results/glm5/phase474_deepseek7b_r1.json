@@ -1,0 +1,236 @@
+{
+  "phase": 474,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-12 22:49:57",
+  "theory": "Attractor Mechanism Decomposition & Neuron-Level Writers",
+  "core_question": "Is Phase3 an attractor or repeated writes? Which layers correct perturbation?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_precise_directional_perturbation": {
+    "random": {
+      "recovery_per_layer": {
+        "L24": 0.9874,
+        "L25": 0.9906,
+        "L26": 0.9938,
+        "L27": 0.8831
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.0481,
+        "L25": 323.0668,
+        "L26": 348.5471,
+        "L27": 991.837
+      },
+      "early_mean_recovery": 0.9874,
+      "late_mean_recovery": 0.9385,
+      "early_mean_delta_norm": 299.0481,
+      "late_mean_delta_norm": 670.192,
+      "delta_propagation_ratio": 2.2411,
+      "delta_shrinks": false,
+      "delta_grows": true,
+      "attractor_likely": true
+    },
+    "anti_fruit": {
+      "recovery_per_layer": {
+        "L24": 0.9294,
+        "L25": 0.9372,
+        "L26": 0.9458,
+        "L27": 0.7997
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.3658,
+        "L25": 350.7939,
+        "L26": 409.8992,
+        "L27": 1231.2299
+      },
+      "early_mean_recovery": 0.9294,
+      "late_mean_recovery": 0.8727,
+      "early_mean_delta_norm": 299.3658,
+      "late_mean_delta_norm": 820.5646,
+      "delta_propagation_ratio": 2.741,
+      "delta_shrinks": false,
+      "delta_grows": true,
+      "attractor_likely": true
+    },
+    "toward_vehicle": {
+      "recovery_per_layer": {
+        "L24": 0.946,
+        "L25": 0.9408,
+        "L26": 0.9555,
+        "L27": 0.8041
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.3154,
+        "L25": 349.2306,
+        "L26": 393.0682,
+        "L27": 1125.1183
+      },
+      "early_mean_recovery": 0.946,
+      "late_mean_recovery": 0.8798,
+      "early_mean_delta_norm": 299.3154,
+      "late_mean_delta_norm": 759.0933,
+      "delta_propagation_ratio": 2.5361,
+      "delta_shrinks": false,
+      "delta_grows": true,
+      "attractor_likely": true
+    },
+    "summary": {
+      "n_perturbation_types": 3,
+      "n_attractor_types": 3,
+      "n_delta_shrink_types": 0,
+      "perturbation_beta": 5.0,
+      "perturbation_is_directional": true,
+      "attractor_hypothesis_supported": true,
+      "delta_propagation_shrinks": false
+    }
+  },
+  "exp2_attractor_correction_layers": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp3_ds7b_l27_exclusion": {
+    "normal": {
+      "recovery_per_layer": {
+        "L24": 0.8955,
+        "L25": 0.9025,
+        "L26": 0.9201,
+        "L27": 0.7856
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.3607,
+        "L25": 368.9917,
+        "L26": 423.0704,
+        "L27": 1035.5355
+      }
+    },
+    "no_l27_mlp": {
+      "recovery_per_layer": {
+        "L24": 0.8955,
+        "L25": 0.9025,
+        "L26": 0.9201,
+        "L27": 0.6604
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.3607,
+        "L25": 368.9917,
+        "L26": 423.0704,
+        "L27": 644.6076
+      }
+    },
+    "no_l27_attn": {
+      "recovery_per_layer": {
+        "L24": 0.8955,
+        "L25": 0.9025,
+        "L26": 0.9201,
+        "L27": 0.8574
+      },
+      "delta_norm_per_layer": {
+        "L24": 299.3607,
+        "L25": 368.9917,
+        "L26": 423.0704,
+        "L27": 752.0303
+      }
+    },
+    "summary": {
+      "normal_L24_recovery": 0.8955,
+      "normal_L26_recovery": 0.9201,
+      "normal_L27_recovery": 0.7856,
+      "pre_L27_attractor_exists": true,
+      "L27_degrades_recovery": true,
+      "conclusion": "attractor exists before L27"
+    }
+  },
+  "exp4_format_semantic_subspace": {
+    "L0": {
+      "format_score": -0.0345,
+      "semantic_score": 0.508,
+      "format_semantic_ratio": -0.068
+    },
+    "L2": {
+      "format_score": -0.4272,
+      "semantic_score": 1.6128,
+      "format_semantic_ratio": -0.2649
+    },
+    "L4": {
+      "format_score": -1.0587,
+      "semantic_score": 3.7153,
+      "format_semantic_ratio": -0.285
+    },
+    "L6": {
+      "format_score": -1.1273,
+      "semantic_score": 4.6878,
+      "format_semantic_ratio": -0.2405
+    },
+    "L8": {
+      "format_score": -1.1377,
+      "semantic_score": 5.5941,
+      "format_semantic_ratio": -0.2034
+    },
+    "L10": {
+      "format_score": -2.1675,
+      "semantic_score": 7.3757,
+      "format_semantic_ratio": -0.2939
+    },
+    "L12": {
+      "format_score": -2.1068,
+      "semantic_score": 7.4667,
+      "format_semantic_ratio": -0.2822
+    },
+    "L14": {
+      "format_score": -3.0026,
+      "semantic_score": 9.6246,
+      "format_semantic_ratio": -0.312
+    },
+    "L16": {
+      "format_score": -4.3983,
+      "semantic_score": 12.7699,
+      "format_semantic_ratio": -0.3444
+    },
+    "L18": {
+      "format_score": -7.3022,
+      "semantic_score": 18.9633,
+      "format_semantic_ratio": -0.3851
+    },
+    "L20": {
+      "format_score": -12.4221,
+      "semantic_score": 31.2789,
+      "format_semantic_ratio": -0.3971
+    },
+    "L22": {
+      "format_score": -19.3635,
+      "semantic_score": 50.3607,
+      "format_semantic_ratio": -0.3845
+    },
+    "L24": {
+      "format_score": -35.7815,
+      "semantic_score": 91.5492,
+      "format_semantic_ratio": -0.3908
+    },
+    "L26": {
+      "format_score": -54.3597,
+      "semantic_score": 139.9342,
+      "format_semantic_ratio": -0.3885
+    },
+    "L27": {
+      "format_score": 88.4723,
+      "semantic_score": -23.1553,
+      "format_semantic_ratio": 3.8208
+    },
+    "summary": {
+      "max_format_ratio_layer": "L27",
+      "max_format_ratio": 3.8208,
+      "max_semantic_score_layer": "L26",
+      "max_semantic_score": 139.9342,
+      "last_layer_format_spike": true,
+      "n_format_tokens": 79,
+      "n_semantic_tokens": 51
+    }
+  },
+  "exp5_neuron_dcf_contribution": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  }
+}

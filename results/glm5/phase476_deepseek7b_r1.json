@@ -1,0 +1,313 @@
+{
+  "phase": 476,
+  "model": "deepseek7b",
+  "round": 1,
+  "timestamp": "2026-06-13 07:03:51",
+  "theory": "DCF Rotation Mechanism & Neuron Causal Closure",
+  "core_question": "Why does DCF component direction deviate then recover? Do L30 fruit writers have sufficiency?",
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "exp1_dcf_direction_triple_alignment": {
+    "anti_fruit": {
+      "L24": {
+        "cos_perturb": -0.009014325216412544,
+        "cos_clean": 0.8967666476964951,
+        "cos_target_fruit": 0.24991752579808235
+      },
+      "L25": {
+        "cos_perturb": -0.00849532417487353,
+        "cos_clean": 0.8812857270240784,
+        "cos_target_fruit": 0.23552857339382172
+      },
+      "L26": {
+        "cos_perturb": -0.008553402498364449,
+        "cos_clean": 0.8743059188127518,
+        "cos_target_fruit": 0.23713883385062218
+      }
+    },
+    "toward_vehicle": {
+      "L24": {
+        "cos_perturb": 0.013822574401274323,
+        "cos_clean": -0.9113732427358627,
+        "cos_target_fruit": -0.3682186082005501
+      },
+      "L25": {
+        "cos_perturb": 0.014583679381757975,
+        "cos_clean": -0.9148880839347839,
+        "cos_target_fruit": -0.40565596520900726
+      },
+      "L26": {
+        "cos_perturb": 0.011298785917460918,
+        "cos_clean": -0.8979892581701279,
+        "cos_target_fruit": -0.433726042509079
+      }
+    },
+    "toward_animal": {
+      "L24": {
+        "cos_perturb": -0.0008766328683122993,
+        "cos_clean": -0.9609329104423523,
+        "cos_target_fruit": -0.3755713924765587
+      },
+      "L25": {
+        "cos_perturb": 0.0004604450659826398,
+        "cos_clean": -0.9649292826652527,
+        "cos_target_fruit": -0.3426322937011719
+      },
+      "L26": {
+        "cos_perturb": -0.0002901252591982484,
+        "cos_clean": -0.9713681042194366,
+        "cos_target_fruit": -0.34372657537460327
+      }
+    }
+  },
+  "exp2_perturbation_beta_scan": {
+    "beta_0.5": {
+      "mid_recovery": 0.9999057302024011,
+      "last_recovery": 0.9999571880881947,
+      "target_norm": 29.93325909419153
+    },
+    "beta_1.0": {
+      "mid_recovery": 0.9994780138804779,
+      "last_recovery": 0.9997912610968354,
+      "target_norm": 59.86651818838306
+    },
+    "beta_2.0": {
+      "mid_recovery": 0.9987559676703168,
+      "last_recovery": 0.9986500415785344,
+      "target_norm": 119.73303637676612
+    },
+    "beta_3.0": {
+      "mid_recovery": -0.9951789029767512,
+      "last_recovery": -0.9958846474567121,
+      "target_norm": 179.5995545651492
+    },
+    "beta_5.0": {
+      "mid_recovery": -0.9976776742158978,
+      "last_recovery": -0.9973011295979357,
+      "target_norm": 299.3325909419153
+    }
+  },
+  "exp3_neuron_sufficiency": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp4_positive_negative_synergy": {
+    "skipped": true,
+    "reason": "only for qwen3"
+  },
+  "exp5_ds7b_l27_head_decomposition": {
+    "head_0": {
+      "mean_format": -0.4050941467285156,
+      "mean_semantic": 0.35996437072753906,
+      "mean_fmt_minus_sem": -0.7650585174560547,
+      "format_dominant": false
+    },
+    "head_1": {
+      "mean_format": 0.01678466796875,
+      "mean_semantic": -0.262786865234375,
+      "mean_fmt_minus_sem": 0.279571533203125,
+      "format_dominant": true
+    },
+    "head_2": {
+      "mean_format": -0.5593910217285156,
+      "mean_semantic": -0.04438972473144531,
+      "mean_fmt_minus_sem": -0.5150012969970703,
+      "format_dominant": false
+    },
+    "head_3": {
+      "mean_format": 0.23467254638671875,
+      "mean_semantic": -0.6724681854248047,
+      "mean_fmt_minus_sem": 0.9071407318115234,
+      "format_dominant": true
+    },
+    "head_4": {
+      "mean_format": -0.0125732421875,
+      "mean_semantic": -0.07035446166992188,
+      "mean_fmt_minus_sem": 0.057781219482421875,
+      "format_dominant": true
+    },
+    "head_5": {
+      "mean_format": -0.1999969482421875,
+      "mean_semantic": 0.26878929138183594,
+      "mean_fmt_minus_sem": -0.46878623962402344,
+      "format_dominant": false
+    },
+    "head_6": {
+      "mean_format": -0.06443023681640625,
+      "mean_semantic": -0.5142688751220703,
+      "mean_fmt_minus_sem": 0.44983863830566406,
+      "format_dominant": true
+    },
+    "head_7": {
+      "mean_format": -2.7577152252197266,
+      "mean_semantic": -1.6834964752197266,
+      "mean_fmt_minus_sem": -1.07421875,
+      "format_dominant": false
+    },
+    "head_8": {
+      "mean_format": 1.4709205627441406,
+      "mean_semantic": -0.024072647094726562,
+      "mean_fmt_minus_sem": 1.4949932098388672,
+      "format_dominant": true
+    },
+    "head_9": {
+      "mean_format": -1.1182746887207031,
+      "mean_semantic": 4.363946914672852,
+      "mean_fmt_minus_sem": -5.482221603393555,
+      "format_dominant": false
+    },
+    "head_10": {
+      "mean_format": -6.745384216308594,
+      "mean_semantic": -40.99826383590698,
+      "mean_fmt_minus_sem": 34.25287961959839,
+      "format_dominant": true
+    },
+    "head_11": {
+      "mean_format": 2.0886077880859375,
+      "mean_semantic": -16.46836280822754,
+      "mean_fmt_minus_sem": 18.556970596313477,
+      "format_dominant": true
+    },
+    "head_12": {
+      "mean_format": -10.710391998291016,
+      "mean_semantic": -126.59146690368652,
+      "mean_fmt_minus_sem": 115.88107490539551,
+      "format_dominant": true
+    },
+    "head_13": {
+      "mean_format": -3.663175582885742,
+      "mean_semantic": -49.43535804748535,
+      "mean_fmt_minus_sem": 45.77218246459961,
+      "format_dominant": true
+    },
+    "head_14": {
+      "mean_format": -0.22350311279296875,
+      "mean_semantic": -0.05142021179199219,
+      "mean_fmt_minus_sem": -0.17208290100097656,
+      "format_dominant": false
+    },
+    "head_15": {
+      "mean_format": -0.2532196044921875,
+      "mean_semantic": -0.5082988739013672,
+      "mean_fmt_minus_sem": 0.2550792694091797,
+      "format_dominant": true
+    },
+    "head_16": {
+      "mean_format": -0.6869354248046875,
+      "mean_semantic": -0.154022216796875,
+      "mean_fmt_minus_sem": -0.5329132080078125,
+      "format_dominant": false
+    },
+    "head_17": {
+      "mean_format": -0.13407135009765625,
+      "mean_semantic": -0.019689559936523438,
+      "mean_fmt_minus_sem": -0.11438179016113281,
+      "format_dominant": false
+    },
+    "head_18": {
+      "mean_format": -0.1673736572265625,
+      "mean_semantic": 0.35967063903808594,
+      "mean_fmt_minus_sem": -0.5270442962646484,
+      "format_dominant": false
+    },
+    "head_19": {
+      "mean_format": 0.11454010009765625,
+      "mean_semantic": -1.2350082397460938,
+      "mean_fmt_minus_sem": 1.34954833984375,
+      "format_dominant": true
+    },
+    "head_20": {
+      "mean_format": -0.061130523681640625,
+      "mean_semantic": -0.08657455444335938,
+      "mean_fmt_minus_sem": 0.02544403076171875,
+      "format_dominant": true
+    },
+    "head_21": {
+      "mean_format": 0.08867263793945312,
+      "mean_semantic": 1.4522991180419922,
+      "mean_fmt_minus_sem": -1.363626480102539,
+      "format_dominant": false
+    },
+    "head_22": {
+      "mean_format": -0.5924148559570312,
+      "mean_semantic": 1.9525928497314453,
+      "mean_fmt_minus_sem": -2.5450077056884766,
+      "format_dominant": false
+    },
+    "head_23": {
+      "mean_format": -0.1175994873046875,
+      "mean_semantic": 2.0450210571289062,
+      "mean_fmt_minus_sem": -2.1626205444335938,
+      "format_dominant": false
+    },
+    "head_24": {
+      "mean_format": 0.07199859619140625,
+      "mean_semantic": 1.4803886413574219,
+      "mean_fmt_minus_sem": -1.4083900451660156,
+      "format_dominant": false
+    },
+    "head_25": {
+      "mean_format": -0.461151123046875,
+      "mean_semantic": 2.8505096435546875,
+      "mean_fmt_minus_sem": -3.3116607666015625,
+      "format_dominant": false
+    },
+    "head_26": {
+      "mean_format": -0.035614013671875,
+      "mean_semantic": 2.3287811279296875,
+      "mean_fmt_minus_sem": -2.3643951416015625,
+      "format_dominant": false
+    },
+    "head_27": {
+      "mean_format": -0.27278900146484375,
+      "mean_semantic": 1.3089332580566406,
+      "mean_fmt_minus_sem": -1.5817222595214844,
+      "format_dominant": false
+    },
+    "summary": {
+      "n_heads": 28,
+      "format_dominant_heads": [
+        "head_1",
+        "head_3",
+        "head_4",
+        "head_6",
+        "head_8",
+        "head_10",
+        "head_11",
+        "head_12",
+        "head_13",
+        "head_15",
+        "head_19",
+        "head_20"
+      ],
+      "semantic_dominant_heads": [
+        "head_0",
+        "head_2",
+        "head_5",
+        "head_7",
+        "head_9",
+        "head_14",
+        "head_16",
+        "head_17",
+        "head_18",
+        "head_21",
+        "head_22",
+        "head_23",
+        "head_24",
+        "head_25",
+        "head_26",
+        "head_27"
+      ],
+      "top5_format_overwrite": [
+        "head_12",
+        "head_13",
+        "head_10",
+        "head_11",
+        "head_8"
+      ]
+    }
+  }
+}
