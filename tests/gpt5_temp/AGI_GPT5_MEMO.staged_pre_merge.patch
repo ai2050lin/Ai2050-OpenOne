@@ -1,0 +1,2182 @@
+diff --git a/research/gpt5/docs/AGI_GPT5_MEMO.md b/research/gpt5/docs/AGI_GPT5_MEMO.md
+index e74d95da..07d50257 100644
+--- a/research/gpt5/docs/AGI_GPT5_MEMO.md
++++ b/research/gpt5/docs/AGI_GPT5_MEMO.md
+@@ -41625,6 +41625,7 @@ Phase118 的关键问题：
+ 还是：
+   多个上游混合因素到答案位置才重组为 causal axis？
+ ```
++
+ ## Phase 118: Causal Axis Transport and Source-to-Answer Closure 因果轴传输与源到答案闭合 [2026-06-14 14:27]
+ 
+ ### 本阶段目标
+@@ -42077,6 +42078,7 @@ Phase119 的关键问题：
+ 如果 local object axis 仍弱：
+   说明类别因果子空间主要在 answer-site late assembly 中形成。
+ ```
++
+ ## Phase 119: Layer-local Source Axis Discovery 层局部源轴发现 [2026-06-14 14:58]
+ 
+ ### 本阶段目标
+@@ -42572,3 +42574,2161 @@ Phase120 的关键问题：
+ 强 post_object source axis 是由 answer_last 混入造成，
+ 还是确实存在于答案前的 prompt-tail/interface tokens？
+ ```
++
++## Phase 120: Post-object Token Localization and Interface State Decomposition 对象后词元定位与接口状态分解 [2026-06-14 15:59]
++
++### 本阶段目标
++
++根据用户要求，先判断附件与 Phase119 分析是否正确，再继续完成任务。
++
++判断：
++
++```text
++附件对 Phase119 的判断基本正确：
++  object_last/object_span 弱；
++  post_object_mean 强；
++  answer_last 强；
++  说明 source/control site 不能只看对象词本身。
++
++但 Phase119 的最大硬伤也非常关键：
++  post_object_mean 包含 answer_last。
++```
++
++Phase120 目标：
++
++```text
++把 post_object_mean 拆开；
++定位强效到底来自 answer_last 混入，
++还是确实存在于答案前 prompt-tail/interface tokens。
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase120_post_object_token_localization_cuda.py`
++- 汇总脚本：`tests/gpt5/phase120_post_object_token_localization_summary.py`
++
++### 测试原理
++
++```text
++1. 延续 Phase119 的 layer-local local subspace/axis 方法。
++2. 不再只测 post_object_mean。
++3. 将对象后区域拆为：
++   - object_last
++   - after_object_first
++   - after_object_middle
++   - pre_answer_last
++   - post_object_excluding_answer
++   - answer_last
++   - post_object_including_answer
++4. 每个 layer/site 单独构造 local category contrast matrix。
++5. 对 local subspace 取 rank16。
++6. 测两类轴：
++   - local_varimax_best
++   - local_svd_subspace
++7. 对 heldout objects 测最终 DCF logits。
++```
++
++关键对照：
++
++```text
++post_object_excluding_answer:
++  对象后、答案前区域，不含 answer_last。
++
++answer_last:
++  最终答案位置。
++
++post_object_including_answer:
++  复现 Phase119 的 post_object_mean 风格，包含 answer_last。
++```
++
++### 执行命令
++
++```bash
++python -m py_compile \
++  tests/gpt5/phase120_post_object_token_localization_cuda.py \
++  tests/gpt5/phase120_post_object_token_localization_summary.py
++
++python tests/gpt5/phase120_post_object_token_localization_cuda.py qwen3 \
++  --train-objects 4 \
++  --test-objects 4 \
++  --batch-size 4 \
++  --rank 8 \
++  --layer-back 1 \
++  --sites post_object_excluding_answer,answer_last,post_object_including_answer \
++  --axis-types local_varimax_best \
++  --categories number,container \
++  --output-dir results/gpt5_phase120_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase120_post_object_token_localization_cuda.py qwen3 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase120_post_object_token_localization \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase120_post_object_token_localization_cuda.py glm4 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase120_post_object_token_localization \
++  --hard-exit-after-model
++
++python tests/gpt5/phase120_post_object_token_localization_cuda.py deepseek7b \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase120_post_object_token_localization \
++  --hard-exit-after-model
++
++python tests/gpt5/phase120_post_object_token_localization_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase120_post_object_token_localization_cuda.py \
++  tests/gpt5/phase120_post_object_token_localization_summary.py
++```
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase120_post_object_token_localization/phase120_qwen3_post_object_token_localization.json`
++- GLM4：`results/gpt5_phase120_post_object_token_localization/phase120_glm4_post_object_token_localization.json`
++- DS7B：`results/gpt5_phase120_post_object_token_localization/phase120_deepseek7b_post_object_token_localization.json`
++- 跨模型汇总：`results/gpt5_phase120_post_object_token_localization/phase120_cross_model_summary.md`
++
++### 测试范围
++
++```text
++models = qwen3, glm4, deepseek7b
++categories = number, container, plant
++train objects/category = 8
++heldout test objects/category = 16
++templates = 4
++prompts/category = 64
++rank = 16
++scale = 1.5
++layers:
++  qwen3 L32-L35
++  glm4 L15-L18
++  deepseek7b L24-L27
++sites:
++  object_last
++  after_object_first
++  after_object_middle
++  pre_answer_last
++  post_object_excluding_answer
++  answer_last
++  post_object_including_answer
++axis_types:
++  local_varimax_best
++  local_svd_subspace
++```
++
++### 客观结果
++
++#### Qwen3
++
++```text
++number:
++  post_object_excluding_answer best = -0.22, release +0.43
++  answer_last = -1.41 / -1.82, release +2.53 / +2.76
++  post_object_including_answer = -4.43 / -4.41, release +1.93 / +2.30
++
++container:
++  post_object_excluding_answer best = -0.14, release +0.40
++  answer_last = -2.64 / -2.53, release +1.33 / +1.90
++  post_object_including_answer = -1.23 / -1.73, release +1.86 / +3.61
++
++plant:
++  post_object_excluding_answer best = -0.22, release +0.29
++  answer_last = -0.94 / -1.28, release +1.36 / +1.00
++  post_object_including_answer = -5.29 / -4.66, release +1.37 / +1.83
++```
++
++Qwen3 结论：
++
++```text
++Phase119 的 post_object_mean 强效主要依赖 answer_last 混入；
++纯答案前 tokens 效果弱；
++Qwen3 的强 release/interface 仍集中在 answer_last 或 including_answer。
++```
++
++#### GLM4 bf16
++
++```text
++number:
++  post_object_excluding_answer = -0.12 / -0.26
++  answer_last = -0.38 / -0.90
++  post_object_including_answer = -0.38 / -1.11
++
++container:
++  post_object_excluding_answer = -0.29 / -0.01
++  answer_last = -0.15 / -0.22
++  including_answer = -0.48 / -0.01
++
++plant:
++  post_object_excluding_answer = -0.24 / -0.02
++  answer_last = -0.04 / -0.13
++  including_answer = -0.29 / -0.06
++```
++
++GLM4 结论：
++
++```text
++整体继续弱；
++没有强 post-object pre-answer source。
++```
++
++#### DS7B
++
++```text
++number:
++  object_last = -0.78 / -0.76
++  after_object_first = -1.14 / -1.24
++  after_object_middle = -1.02 / -0.83
++  pre_answer_last = -1.18 / -1.44
++  post_object_excluding_answer = -2.35 / -2.51, release +0.57 / +0.54
++  answer_last = -12.24 / -12.58, release 0
++  post_object_including_answer = -11.74 / -12.03, release 0
++
++container:
++  object_last = -0.90 / -0.93
++  after_object_first = -0.95 / -1.15
++  after_object_middle = -0.61 / -0.50
++  pre_answer_last = -0.62 / -0.87
++  post_object_excluding_answer = -2.79 / -2.66, release +0.78 / +0.88
++  answer_last = -11.53 / -12.52, release 0
++  post_object_including_answer = -13.24 / -12.74, release 0
++
++plant:
++  object_last = -0.97 / -0.72
++  after_object_first = -0.75 / -0.76
++  after_object_middle = -0.73 / -0.46
++  pre_answer_last = -1.41 / -1.62
++  post_object_excluding_answer = -2.64 / -2.42, release +1.45 / +1.56
++  answer_last = -8.63 / -7.87, release 0
++  post_object_including_answer = -10.58 / -9.57, release 0
++```
++
++DS7B 结论：
++
++```text
++1. Phase119 的巨大 post_object_mean 强效主要来自 answer_last 被包含进去。
++2. post_object_excluding_answer 仍有中等强度 target_down，大约 -2.3 到 -2.8。
++3. 单个 after/pre-answer token 只有弱到中弱效应，大约 -0.6 到 -1.6。
++4. answer_last 仍是主因果读出点。
++5. including_answer 与 answer_last 同量级，说明 answer_last 是 post_object_mean 强效的主要来源。
++```
++
++### 当前最可靠客观事实
++
++1. **answer_last 是 Phase119 post_object_mean 强效的主要来源**
++
++DS7B：
++
++```text
++number:
++  excluding_answer -2.35 / -2.51
++  answer_last -12.24 / -12.58
++  including_answer -11.74 / -12.03
++
++container:
++  excluding_answer -2.79 / -2.66
++  answer_last -11.53 / -12.52
++  including_answer -13.24 / -12.74
++
++plant:
++  excluding_answer -2.64 / -2.42
++  answer_last -8.63 / -7.87
++  including_answer -10.58 / -9.57
++```
++
++2. **答案前 prompt-tail/interface tokens 并非完全无效**
++
++DS7B post_object_excluding_answer 稳定为：
++
++```text
++number: -2.35 / -2.51
++container: -2.79 / -2.66
++plant: -2.64 / -2.42
++```
++
++这比 object_last/object_span 强，但远低于 answer_last。
++
++3. **单个 pre-answer token 不足以解释强效**
++
++DS7B 单 token site：
++
++```text
++after_object_first: about -0.75 to -1.24
++after_object_middle: about -0.46 to -1.02
++pre_answer_last: about -0.62 to -1.62
++```
++
++说明答案前区域的中等效应更像分布式小效应，而不是某个单 token 独自形成强控制轴。
++
++4. **Qwen3 的 pre-answer excluding effect 很弱**
++
++Qwen3 excluding_answer 最大只有约：
++
++```text
++-0.22
++```
++
++其 including_answer 强效基本也来自 answer_last 混入与竞争读出场。
++
++5. **GLM4 仍弱**
++
++没有稳定强源点。
++
++### 对 Phase119 的修正
++
++Phase119 正确部分：
++
++```text
++object_last/object_span 不是主要控制点；
++post_object_mean 包含强因果信号；
++answer_last 强。
++```
++
++Phase120 修正部分：
++
++```text
++post_object_mean 不能直接解释为答案前 source/control state；
++因为它包含 answer_last。
++拆开后，答案前区域只有中等信号，主强效来自 answer_last。
++```
++
++更严格表述：
++
++```text
++类别因果控制主轴在 answer_last；
++答案前 prompt-tail/interface 区域存在中等辅助控制场；
++object token 本身弱。
++```
++
++### 理论进展
++
++当前三段式理论需要细化为：
++
++```text
++object lexical material:
++  weak direct causal control
++
++pre-answer interface field:
++  moderate distributed control
++
++answer-site readout field:
++  dominant causal support subspace
++```
++
++公式改写：
++
++```text
++h_L(answer)
++=
++ReadoutField_c(answer)
+++
++Influence(
++  InterfaceField_c(pre-answer),
++  template/context
++)
+++
++ObjectMaterial_c(object_span)
++```
++
++更稳健地说：
++
++```text
++Output logits 主要由 answer-site readout field 控制；
++pre-answer interface field 是辅助控制场；
++object lexical state 是材料来源，不是强直接控制点。
++```
++
++### 对破解语言编码机制的关键洞察
++
++1. **不要把 post_object_mean 当成纯源位置**
++
++它包含 answer_last，所以会放大答案位置强效。
++
++2. **answer_last 仍是主战场**
++
++Phase114-120 共同支持：
++
++```text
++answer-site causal subspace 是当前最稳定、最强的类别输出控制结构。
++```
++
++3. **答案前区域是辅助接口场**
++
++DS7B excluding_answer 的 -2.3 到 -2.8 不是噪声，说明答案前 tokens 有真实辅助因果作用。
++
++4. **对象词不是控制点，而是材料点**
++
++object_last/object_span 反复弱，说明对象词更像语义材料存放点，真正读出控制发生在后续 interface/readout 区。
++
++### 硬伤分析
++
++1. **post_object_excluding_answer 是多 token mean**
++
++仍未定位这些中等效应是分散在多个 token，还是某些 token 小幅共同作用。
++
++2. **没有做 combined pre-answer + answer patch**
++
++还不知道 pre-answer interface field 与 answer readout field 是否加和、冗余或相互补偿。
++
++3. **没有显式 attention/MLP 路由闭合**
++
++目前只是在 residual stream site 上定位，没有追踪由哪些 head 或 MLP 写入。
++
++4. **仍是 DCF logits**
++
++尚未做开放生成验证。
++
++5. **类别范围仍窄**
++
++只测了 number/container/plant。
++
++### 下一阶段任务
++
++Phase121 应进入：
++
++```text
++Pre-answer Interface Additivity and Routing Closure
++```
++
++目标：
++
++```text
++测试 pre-answer interface field 与 answer-site readout field 是独立加和、冗余，还是前者通过路由写入后者。
++```
++
++建议测试：
++
++```text
++1. 对 DS7B number/container/plant 做：
++   - pre-answer excluding only
++   - answer_last only
++   - pre-answer excluding + answer_last
++2. 分别测试 local_varimax_best 与 local_svd_subspace。
++3. 记录 target_delta 是否加和：
++   - 如果 combined ≈ answer_last：
++     pre-answer 与 answer 冗余或上游已被 answer 包含。
++   - 如果 combined << answer_last：
++     pre-answer 与 answer 有独立贡献。
++4. 对 Qwen3 number/container/plant 做同样对照，观察 release 是否在 combined 中增强。
++5. 后续再接 attention head / MLP 写入闭合。
++```
++
++Phase121 的关键问题：
++
++```text
++pre-answer interface field 是 answer readout field 的上游写入者，
++还是与 answer readout field 并列但较弱的辅助控制场？
++```
++
++## Phase 121: Pre-answer Interface Additivity and Routing Closure 答案前接口加和性与路由闭合 [2026-06-14 16:14]
++
++### 本阶段目标
++
++根据用户要求，先判断附件与 Phase120 分析是否正确，再继续完成任务。
++
++判断：
++
++```text
++附件对 Phase120 的判断正确。
++Phase120 将 Phase119 的 post_object_mean 强效收缩为：
++  answer_last 是主因果读出点；
++  pre-answer / prompt-tail tokens 存在中等辅助控制场；
++  object token 本身仍弱。
++```
++
++Phase121 目标：
++
++```text
++测试 pre-answer interface field 与 answer-site readout field 是独立加和、冗余，
++还是 pre-answer 已被 answer field 吸收。
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py`
++- 汇总脚本：`tests/gpt5/phase121_pre_answer_answer_additivity_summary.py`
++
++### 测试原理
++
++```text
++1. 对每个 layer 分别构造：
++   - post_object_excluding_answer local subspace
++   - answer_last local subspace
++2. 分别选择 local_varimax_best axis，并保留 local_svd_subspace。
++3. 在同一 layer 做三种 causal patch：
++   - pre_only
++   - answer_only
++   - pre_plus_answer
++4. 比较 target_delta：
++   combined-answer < -1:
++     pre-answer 与 answer 有额外加和/独立贡献。
++   combined ≈ answer:
++     answer field 吸收 pre-answer，pre-answer 冗余或很弱。
++```
++
++### 执行命令
++
++```bash
++python -m py_compile \
++  tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py \
++  tests/gpt5/phase121_pre_answer_answer_additivity_summary.py
++
++python tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py qwen3 \
++  --train-objects 4 \
++  --test-objects 4 \
++  --batch-size 4 \
++  --rank 8 \
++  --layer-back 1 \
++  --axis-types local_varimax_best \
++  --categories number,container \
++  --output-dir results/gpt5_phase121_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py qwen3 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase121_pre_answer_answer_additivity \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py glm4 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase121_pre_answer_answer_additivity \
++  --hard-exit-after-model
++
++python tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py deepseek7b \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase121_pre_answer_answer_additivity \
++  --hard-exit-after-model
++
++python tests/gpt5/phase121_pre_answer_answer_additivity_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase121_pre_answer_answer_additivity_cuda.py \
++  tests/gpt5/phase121_pre_answer_answer_additivity_summary.py
++```
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase121_pre_answer_answer_additivity/phase121_qwen3_pre_answer_answer_additivity.json`
++- GLM4：`results/gpt5_phase121_pre_answer_answer_additivity/phase121_glm4_pre_answer_answer_additivity.json`
++- DS7B：`results/gpt5_phase121_pre_answer_answer_additivity/phase121_deepseek7b_pre_answer_answer_additivity.json`
++- 跨模型汇总：`results/gpt5_phase121_pre_answer_answer_additivity/phase121_cross_model_summary.md`
++
++### 测试范围
++
++```text
++models = qwen3, glm4, deepseek7b
++categories = number, container, plant
++train objects/category = 8
++heldout test objects/category = 16
++templates = 4
++prompts/category = 64
++rank = 16
++scale = 1.5
++layers:
++  qwen3 L32-L35
++  glm4 L15-L18
++  deepseek7b L24-L27
++sites:
++  post_object_excluding_answer
++  answer_last
++patch_modes:
++  pre_only
++  answer_only
++  pre_plus_answer
++axis_types:
++  local_varimax_best
++  local_svd_subspace
++```
++
++### 客观结果
++
++#### Qwen3
++
++```text
++number:
++  varimax:
++    pre_only -0.22, release +0.43
++    answer_only -1.41, release +2.53
++    combined -1.58, release +2.20
++    combined-answer -0.17
++  svd:
++    pre_only -0.13, release +0.45
++    answer_only -1.82, release +2.76
++    combined -2.00, release +2.49
++    combined-answer -0.18
++
++container:
++  varimax:
++    pre_only -0.14, release +0.40
++    answer_only -2.64, release +1.33
++    combined -2.64, release +1.31
++    combined-answer 0.00
++  svd:
++    pre_only -0.04, release +0.26
++    answer_only -2.53, release +1.90
++    combined -2.29, release +1.27
++    combined-answer +0.24
++
++plant:
++  varimax:
++    pre_only -0.15, release +0.48
++    answer_only -0.94, release +1.36
++    combined -0.98, release +0.46
++    combined-answer -0.04
++  svd:
++    pre_only -0.22, release +0.29
++    answer_only -1.28, release +1.00
++    combined -2.02, release +0.37
++    combined-answer -0.74
++```
++
++Qwen3 结论：
++
++```text
++整体上 combined 接近 answer_only；
++pre-answer 基本被 answer field 吸收；
++少数 svd plant 有中等增强，但不稳定。
++```
++
++#### GLM4 bf16
++
++```text
++number:
++  varimax combined-answer -0.06
++  svd combined-answer +0.03
++
++container:
++  varimax combined-answer -0.28
++  svd combined-answer +0.05
++
++plant:
++  varimax combined-answer -0.22
++  svd combined-answer -0.16
++```
++
++GLM4 结论：
++
++```text
++整体弱；
++没有形成强加和性结论。
++```
++
++#### DS7B
++
++```text
++number:
++  varimax:
++    pre_only -2.35, release +0.57
++    answer_only -12.24, release 0
++    combined -13.51, release 0
++    combined-answer -1.27
++  svd:
++    pre_only -2.51, release +0.54
++    answer_only -12.58, release 0
++    combined -13.71, release 0
++    combined-answer -1.13
++
++container:
++  varimax:
++    pre_only -2.79, release +0.78
++    answer_only -11.53, release 0
++    combined -12.85, release 0
++    combined-answer -1.33
++  svd:
++    pre_only -2.66, release +0.88
++    answer_only -12.52, release 0
++    combined -13.69, release 0
++    combined-answer -1.17
++
++plant:
++  varimax:
++    pre_only -2.64, release +1.45
++    answer_only -8.63, release 0
++    combined -10.15, release 0
++    combined-answer -1.52
++  svd:
++    pre_only -2.42, release +1.56
++    answer_only -7.87, release 0
++    combined -9.32, release 0
++    combined-answer -1.45
++```
++
++DS7B 结论：
++
++```text
++pre-answer interface field 不是完全冗余；
++它与 answer-site readout field 有稳定额外贡献；
++combined 比 answer_only 强约 1.1 到 1.5 logits；
++但 answer_last 仍是主因果场。
++```
++
++### 当前最可靠客观事实
++
++1. **DS7B pre-answer 有独立辅助贡献**
++
++```text
++number combined-answer: -1.27 / -1.13
++container combined-answer: -1.33 / -1.17
++plant combined-answer: -1.52 / -1.45
++```
++
++这说明 Phase120 中的 pre-answer 中等场不是纯噪声，也不是完全被 answer_last 吸收。
++
++2. **DS7B answer_last 仍是主控制点**
++
++```text
++pre_only: about -2.4 to -2.8
++answer_only: about -7.9 to -12.6
++combined: about -9.3 to -13.7
++```
++
++pre-answer 是辅助，不是主读出。
++
++3. **DS7B combined 会消除 pre_only 的 release**
++
++pre_only 对 plant/container 有 release：
++
++```text
++plant pre_only release +1.45 / +1.56
++container pre_only release +0.78 / +0.88
++```
++
++combined release 变为 0，说明 answer_last clean support field 可以压住 pre-answer interface 的竞争释放。
++
++4. **Qwen3 pre-answer 基本被 answer field 吸收**
++
++Qwen3 combined-answer 多数在：
++
++```text
++-0.18 到 +0.24
++```
++
++没有稳定独立加和。
++
++5. **GLM4 继续弱**
++
++没有强结论。
++
++### 对 Phase120 的推进
++
++Phase120 正确部分：
++
++```text
++answer_last 是主因果读出点；
++pre-answer excluding 有中等辅助作用；
++object token 本身弱。
++```
++
++Phase121 新增：
++
++```text
++在 DS7B 中，pre-answer auxiliary field 与 answer readout field 有稳定额外贡献；
++不是完全冗余。
++在 Qwen3 中，pre-answer 基本被 answer field 吸收。
++```
++
++更严格表述：
++
++```text
++DS7B:
++  pre-answer interface field = independent auxiliary support/interface field
++  answer_last readout field = dominant clean support field
++
++Qwen3:
++  pre-answer field weak
++  answer-site competition/readout field dominates
++```
++
++### 理论进展
++
++当前公式可更新为：
++
++```text
++LogitControl_c
++=
++ReadoutField_c(answer)
+++
++AuxInterfaceField_c(pre-answer)
+++
++WeakObjectMaterial_c(object)
++```
++
++在 DS7B 中：
++
++```text
++Effect(ReadoutField) >> Effect(AuxInterfaceField)
++Effect(ReadoutField + AuxInterfaceField)
++  =
++Effect(ReadoutField) + small extra support
++```
++
++在 Qwen3 中：
++
++```text
++Effect(ReadoutField + AuxInterfaceField)
++≈
++Effect(ReadoutField)
++```
++
++这说明不同模型的语言编码路径不同：
++
++```text
++DS7B 更像 answer readout + auxiliary interface 双场；
++Qwen3 更像 answer-site competition/readout 单主场。
++```
++
++### 硬伤分析
++
++1. **还没有证明 pre-answer 写入 answer**
++
++加和性只能说明存在额外贡献，不等于 pre-answer 是 answer field 的上游 writer。
++
++2. **没有定位 writer module**
++
++还不知道是 attention head、MLP，还是 residual stream 直接保留造成 combined 增强。
++
++3. **combined 使用同层 patch**
++
++没有做跨层 pre-answer -> later answer 的时序闭合。
++
++4. **仍是 DCF logits**
++
++没有开放生成验证。
++
++5. **类别范围仍窄**
++
++只测了 number/container/plant。
++
++### 下一阶段任务
++
++Phase122 应进入：
++
++```text
++Pre-answer-to-Answer Writer Path Closure
++```
++
++目标：
++
++```text
++测试 pre-answer interface field 是否通过 attention/MLP 写入 answer-site readout field。
++```
++
++建议测试：
++
++```text
++1. 以 DS7B number/container/plant 为主。
++2. 选 L27 的 pre-answer local_varimax/local_svd 与 answer local_varimax/local_svd。
++3. 做 pre-answer remove 后，监控 answer_last projection on answer axis 是否下降。
++4. 做 attention head ablation：
++   - answer token attending to pre-answer span 的 head
++   - 对比 object span head
++5. 做 MLP ablation：
++   - answer-layer MLP
++   - pre-answer-layer MLP
++6. 判断：
++   - pre-answer removal 是否降低 answer-axis projection
++   - head/MLP ablation 是否同时降低 answer projection 和 logits
++```
++
++Phase122 的关键问题：
++
++```text
++pre-answer interface field 是通过具体 attention/MLP writer 写入 answer readout field，
++还是只是与 answer field 并列存在的辅助控制场？
++```
++
++## Phase 122: Pre-answer-to-Answer Projection Closure 答案前到答案投影闭合 [2026-06-14 16:44]
++
++### 本阶段目标
++
++根据用户要求，先判断附件与 Phase121 分析是否正确，再继续完成任务。
++
++判断：
++
++```text
++附件对 Phase121 的判断正确。
++DS7B:
++  pre-answer interface field 有稳定额外贡献；
++  answer_last 仍是主因果读出场。
++Qwen3:
++  pre-answer 基本被 answer field 吸收。
++GLM4:
++  继续弱。
++```
++
++Phase122 目标：
++
++```text
++测试 pre-answer interface field 是否会写入 answer-site readout field。
++做法：
++  移除不同层的 pre-answer field；
++  监控 peak-layer answer_last 在 answer causal axis/subspace 上的投影是否下降；
++  同时记录最终 DCF logits。
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py`
++- 汇总脚本：`tests/gpt5/phase122_pre_answer_to_answer_projection_closure_summary.py`
++
++### 测试原理
++
++```text
++1. 对每个模型、类别、层位，分别构造：
++   - post_object_excluding_answer local subspace
++   - answer_last local subspace
++2. 在 peak layer 构造 answer monitor axis/subspace。
++3. 对 patch layers 做：
++   - pre_remove
++   - answer_remove
++   - pre_plus_answer
++4. 记录：
++   - target_delta
++   - max_other_delta
++   - answer_proj_delta
++5. 如果 pre_remove 降低 answer_proj 且 combined 强于 answer_only：
++   支持 pre-answer 写入 answer projection。
++```
++
++### 执行命令
++
++```bash
++python -m py_compile \
++  tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py \
++  tests/gpt5/phase122_pre_answer_to_answer_projection_closure_summary.py
++
++python tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py qwen3 \
++  --train-objects 4 \
++  --test-objects 4 \
++  --batch-size 4 \
++  --rank 8 \
++  --layer-back 1 \
++  --axis-types local_varimax_best \
++  --categories number,container \
++  --output-dir results/gpt5_phase122_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py qwen3 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase122_pre_answer_to_answer_projection_closure \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py glm4 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase122_pre_answer_to_answer_projection_closure \
++  --hard-exit-after-model
++
++python tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py deepseek7b \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --axis-types local_varimax_best,local_svd_subspace \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase122_pre_answer_to_answer_projection_closure \
++  --hard-exit-after-model
++
++python tests/gpt5/phase122_pre_answer_to_answer_projection_closure_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase122_pre_answer_to_answer_projection_closure_cuda.py \
++  tests/gpt5/phase122_pre_answer_to_answer_projection_closure_summary.py
++```
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase122_pre_answer_to_answer_projection_closure/phase122_qwen3_pre_answer_to_answer_projection_closure.json`
++- GLM4：`results/gpt5_phase122_pre_answer_to_answer_projection_closure/phase122_glm4_pre_answer_to_answer_projection_closure.json`
++- DS7B：`results/gpt5_phase122_pre_answer_to_answer_projection_closure/phase122_deepseek7b_pre_answer_to_answer_projection_closure.json`
++- 跨模型汇总：`results/gpt5_phase122_pre_answer_to_answer_projection_closure/phase122_cross_model_summary.md`
++
++### 测试范围
++
++```text
++models = qwen3, glm4, deepseek7b
++categories = number, container, plant
++train objects/category = 8
++heldout test objects/category = 16
++templates = 4
++prompts/category = 64
++rank = 16
++scale = 1.5
++patch layers:
++  qwen3 L32-L35
++  glm4 L15-L18
++  deepseek7b L24-L27
++monitor layer:
++  qwen3 L35
++  glm4 L18
++  deepseek7b L27
++patch modes:
++  pre_remove
++  answer_remove
++  pre_plus_answer
++axis types:
++  local_varimax_best
++  local_svd_subspace
++```
++
++### 客观结果
++
++#### Qwen3
++
++```text
++number:
++  pre_remove target weak: -0.22 / -0.13
++  answer_remove: -1.41 / -1.82
++  combined: -1.58 / -2.00
++  combined-answer: -0.17 / -0.18
++
++container:
++  pre_remove target weak: -0.14 / -0.04
++  answer_remove: -2.64 / -2.53
++  combined: -2.64 / -2.29
++  combined-answer: 0.00 / +0.24
++
++plant:
++  pre_remove target weak: -0.15 / -0.22
++  answer_remove: -0.94 / -1.28
++  combined: -0.98 / -2.02
++  combined-answer: -0.04 / -0.74
++```
++
++Qwen3 结论：
++
++```text
++pre-answer 没有稳定额外 target effect；
++projection 有大幅变化的条件多与 answer/site patch 或 subspace norm 监控有关，
++但没有形成稳定 pre -> answer 写入闭合。
++```
++
++#### GLM4 bf16
++
++```text
++整体 target_delta 很弱。
++combined-answer:
++  number -0.06 / +0.03
++  container -0.28 / +0.05
++  plant -0.22 / -0.16
++```
++
++GLM4 结论：
++
++```text
++继续弱；
++没有强 writer path 结论。
++```
++
++#### DS7B
++
++target additivity 复现 Phase121：
++
++```text
++number:
++  pre_remove best target:
++    L27 -2.35 / -2.51
++  answer_remove:
++    L27 -12.24 / -12.58
++  combined:
++    L27 -13.51 / -13.71
++  combined-answer:
++    -1.27 / -1.13
++
++container:
++  pre_remove best target:
++    L27 -2.79 / -2.66
++  answer_remove:
++    L27 -11.53 / -12.52
++  combined:
++    L27 -12.85 / -13.69
++  combined-answer:
++    -1.33 / -1.17
++
++plant:
++  pre_remove best target:
++    L27 -2.64 / -2.42
++  answer_remove:
++    L27 -8.63 / -7.87
++  combined:
++    L27 -10.15 / -9.32
++  combined-answer:
++    -1.52 / -1.45
++```
++
++answer projection closure:
++
++```text
++number:
++  L24 pre_remove:
++    target -2.06 / -2.05
++    answer_proj_delta -55.89 / -51.27
++
++container:
++  L24 pre_remove:
++    svd target -1.19
++    answer_proj_delta -44.30
++  varimax strongest target at L27:
++    target -2.79
++    answer_proj_delta 0.00
++
++plant:
++  L24 pre_remove:
++    target -2.36 / -2.28
++    answer_proj_delta -49.09 / -44.10
++```
++
++DS7B 结论：
++
++```text
++1. pre-answer field 的额外 logits 贡献稳定复现。
++2. 早层 L24 pre_remove 会降低 peak answer projection，同时产生 target_down。
++3. 最强 pre_only logits 常在 L27，同层 patch 不降低 peak answer projection，
++   更像局部并列贡献或同层输出接口贡献。
++4. 因此存在部分 pre -> answer projection closure，
++   但 pre-answer 的全部贡献不能只解释为 answer-axis mean projection 下降。
++```
++
++### 当前最可靠客观事实
++
++1. **DS7B 早层 pre-answer 有写入 answer projection 的证据**
++
++```text
++number L24 pre_remove:
++  answer_proj_delta about -51 to -56
++  target_delta about -2.05
++
++plant L24 pre_remove:
++  answer_proj_delta about -44 to -49
++  target_delta about -2.3
++```
++
++2. **DS7B L27 pre-answer 有同层局部贡献**
++
++```text
++L27 pre_remove:
++  target_delta about -2.4 to -2.8
++  answer_proj_delta 0
++```
++
++这符合 hook 时序：同层 residual output 上 patch pre-answer token，不一定改变同层 answer token hidden state。
++
++3. **combined 强于 answer-only 的现象稳定**
++
++```text
++DS7B combined-answer:
++  -1.1 to -1.5
++```
++
++说明 pre-answer 辅助场不是完全冗余。
++
++4. **Qwen3/GLM4 没有稳定 pre -> answer closure**
++
++Qwen3 是 answer-site 主导吸收；GLM4 弱。
++
++### 对 Phase121 的推进
++
++Phase121 正确部分：
++
++```text
++DS7B pre-answer 与 answer 有稳定加和；
++Qwen3 基本被 answer field 吸收；
++GLM4 弱。
++```
++
++Phase122 新增：
++
++```text
++DS7B 的 pre-answer 辅助贡献分成两种：
++  早层 pre-answer: 有 answer projection 写入证据；
++  峰层 pre-answer: 有局部 logits 贡献，但不表现为同层 answer projection 下降。
++```
++
++更严格表述：
++
++```text
++pre-answer interface field partly writes into answer readout field across layers,
++and partly contributes as a parallel/local interface field near the readout layer.
++```
++
++中文：
++
++```text
++答案前接口场一部分跨层写入答案读出场；
++另一部分在读出层附近作为并列/局部接口场贡献 logits。
++```
++
++### 理论进展
++
++当前 DS7B 类别读出链条可写为：
++
++```text
++EarlyPreAnswerField_l
++  -> contributes to AnswerReadoutProjection_L
++
++LatePreAnswerField_L
++  -> local auxiliary logits control
++
++AnswerReadoutField_L
++  -> dominant clean support logits control
++```
++
++公式：
++
++```text
++LogitControl_c
++=
++ReadoutField_c(answer_L)
+++
++AuxInterfaceField_c(pre_L)
+++
++WritePath(
++  EarlyInterfaceField_c(pre_l -> answer_L)
++)
+++
++WeakObjectMaterial_c(object)
++```
++
++这比 Phase121 更细：
++
++```text
++pre-answer 不是单一场；
++它至少包含 early writer component 与 late local component。
++```
++
++### 硬伤分析
++
++1. **answer_proj_delta 是均值投影**
++
++没有测样本级排序、方差、非线性投影变化。
++
++2. **投影数值尺度很大**
++
++尤其 subspace norm 监控下数值较大，需后续做标准化投影 delta。
++
++3. **未定位具体 attention head / MLP**
++
++Phase122 只证明 residual stream 层位上的部分闭合，没有找 writer module。
++
++4. **同层 patch 的解释受 hook 时序影响**
++
++L27 pre patch 不改变 L27 answer hidden 是预期现象，不能解释为无关系。
++
++5. **仍是 DCF logits**
++
++未做开放生成验证。
++
++### 下一阶段任务
++
++Phase123 应进入：
++
++```text
++Attention/MLP Writer Localization for Pre-answer-to-Answer Path
++```
++
++目标：
++
++```text
++定位 DS7B 中 early pre-answer field 写入 answer readout projection 的具体模块。
++```
++
++建议测试：
++
++```text
++1. 只先做 DS7B number/container/plant。
++2. 重点层：
++   - L24/L25 pre-answer writer candidate
++   - L26/L27 answer readout candidate
++3. 扫描 attention heads：
++   - answer token attending to pre-answer span
++   - answer token attending to object span
++4. 对高 attention-mass heads 做 ablation。
++5. 监控：
++   - final target_delta
++   - answer_proj_delta on answer axis
++6. 再测 MLP ablation：
++   - pre-answer positions at L24/L25
++   - answer_last at L26/L27
++```
++
++Phase123 关键问题：
++
++```text
++pre-answer -> answer projection closure 是由少数 attention heads 写入，
++还是由 MLP/residual 多模块共同形成？
++```
++
++## Phase 123: Attention MLP Writer Localization 注意力与 MLP 写入者定位 [2026-06-14 17:26]
++
++### 本阶段目标
++
++根据附加分析，Phase122 的正确结论应保持为：
++
++```text
++DS7B 的 pre-answer -> answer projection closure 只是部分闭合。
++早层 pre-answer remove 会降低 peak answer projection 并伴随 target_down；
++峰层 pre-answer remove 有 logits 贡献但不降低同层 answer projection。
++```
++
++因此 Phase123 继续测试：
++
++```text
++1. pre-answer -> answer 的写入是否能定位到少数 attention heads。
++2. pre-answer 或 answer_last 位置的 MLP output 是否能解释 Phase122 的辅助贡献。
++3. 单模块扰动是否同时满足：
++   - target_delta 明显下降；
++   - answer_proj_delta 明显下降；
++   - 强于 object/random control。
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py`
++- 汇总脚本：`tests/gpt5/phase123_attention_mlp_writer_localization_summary.py`
++
++### 执行命令
++
++```bash
++python tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py qwen3 \
++  --train-objects 2 \
++  --test-objects 2 \
++  --batch-size 4 \
++  --rank 4 \
++  --layer-back 1 \
++  --top-k-heads 1 \
++  --categories number \
++  --output-dir results/gpt5_phase123_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py qwen3 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --top-k-heads 4 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase123_attention_mlp_writer_localization \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py glm4 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --top-k-heads 4 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase123_attention_mlp_writer_localization \
++  --hard-exit-after-model
++
++python tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py deepseek7b \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --top-k-heads 4 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase123_attention_mlp_writer_localization \
++  --hard-exit-after-model
++
++python tests/gpt5/phase123_attention_mlp_writer_localization_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase123_attention_mlp_writer_localization_cuda.py \
++  tests/gpt5/phase123_attention_mlp_writer_localization_summary.py
++```
++
++### 测试范围
++
++```text
++models = qwen3, glm4, deepseek7b
++categories = number, container, plant
++train objects/category = 8
++heldout test objects/category = 16
++templates = 4
++prompts/category = 64
++rank = 16
++top heads/group = 4
++
++Qwen3 layers = L32-L35, monitor L35
++GLM4 layers = L15-L18, monitor L18
++DS7B layers = L24-L27, monitor L27
++```
++
++### 测试原理
++
++1. 在 peak answer_last 层构造类别 answer-site monitor axis。
++2. 扫描 answer token 对各 source group 的 attention mass：
++
++```text
++post_object / pre-answer
++object_span / object_last
++self
++```
++
++3. 选择 top pre-answer heads、top object heads、top self heads 和 random heads。
++4. 在 answer token 的 attention output projection 输入处，按 head slice 做单头 ablation。
++5. 同时测试 MLP output ablation：
++
++```text
++pre_answer positions
++answer_last position
++```
++
++6. 监控：
++
++```text
++final DCF target_delta
++peak answer_last answer_proj_delta
++max_other_delta
++```
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase123_attention_mlp_writer_localization/phase123_qwen3_attention_mlp_writer_localization.json`
++- GLM4：`results/gpt5_phase123_attention_mlp_writer_localization/phase123_glm4_attention_mlp_writer_localization.json`
++- DS7B：`results/gpt5_phase123_attention_mlp_writer_localization/phase123_deepseek7b_attention_mlp_writer_localization.json`
++- 跨模型汇总：`results/gpt5_phase123_attention_mlp_writer_localization/phase123_cross_model_summary.md`
++
++### 客观结果
++
++#### Qwen3
++
++```text
++number:
++  best pre-head = L33 H24, target_delta -0.30, answer_proj_delta -1.15
++  best object-head = -0.01
++  best pre-MLP = -0.06
++  best answer-MLP = -0.31, answer_proj_delta +31.25
++
++container:
++  best pre-head = -0.08
++  best pre-MLP = -0.08
++  best answer-MLP = -0.12
++
++plant:
++  best pre-head = -0.55, answer_proj_delta -1.77
++  best pre-MLP = -0.00
++  best answer-MLP = -0.24
++```
++
++Qwen3 没有出现强 writer localization。
++
++#### GLM4 bf16
++
++```text
++number/container/plant:
++  pre-head target_delta around -0.01 to -0.03
++  object/random controls also around same level
++  pre-MLP around -0.03 to -0.06
++  answer-MLP around -0.03 to -0.07
++```
++
++GLM4 仍然弱。
++
++#### DS7B
++
++```text
++number:
++  best pre-head = L26 H17, target_delta -0.05, answer_proj_delta -11.14
++  best object-head = L24 H22, target_delta -0.09, answer_proj_delta -14.81
++  best random-head = -0.05
++  best pre-MLP = L26, target_delta -0.33, answer_proj_delta -0.61
++  best answer-MLP = L27, target_delta -1.16, answer_proj_delta -183.18
++
++container:
++  best pre-head = L25 H20, target_delta -0.09, answer_proj_delta -1.66
++  best object-head = -0.14
++  best random-head = -0.18
++  best pre-MLP = L24, target_delta -0.34, answer_proj_delta -0.10
++  best answer-MLP = -0.11
++
++plant:
++  best pre-head = L26 H17, target_delta -0.16, answer_proj_delta -11.85
++  best object-head = -0.03
++  best random-head = -0.06
++  best pre-MLP = L26, target_delta -0.39, answer_proj_delta +0.31
++  best answer-MLP = -0.15
++```
++
++### 当前最可靠客观事实
++
++1. **DS7B 单个 pre-answer attention head 可以显著改变 answer projection，但 logits 因果效应很小**
++
++```text
++number L26 H17:
++  answer_proj_delta -11.14
++  target_delta only -0.05
++
++plant L26 H17:
++  answer_proj_delta -11.85
++  target_delta only -0.16
++```
++
++这说明：
++
++```text
++answer projection drop 不是充分的 writer 判据；
++必须同时要求 target_delta 明显下降。
++```
++
++2. **object/self heads 也能降低 answer projection**
++
++```text
++DS7B number object-head L24 H22:
++  answer_proj_delta -14.81
++  target_delta -0.09
++
++DS7B number self-head L24 H25:
++  answer_proj_delta -12.21
++  target_delta -0.06
++```
++
++因此不能把 projection drop 简单解释为 pre-answer 专属写入。
++
++3. **单点 pre-answer MLP ablation 只产生弱到中等 target_down**
++
++```text
++DS7B pre-MLP:
++  number -0.33
++  container -0.34
++  plant -0.39
++```
++
++这小于 Phase122 中 residual subspace pre_remove 的约 -2 级别效果。
++
++4. **DS7B number 的 answer_last MLP L27 有相对明显 readout effect**
++
++```text
++DS7B number answer-MLP L27:
++  target_delta -1.16
++  answer_proj_delta -183.18
++```
++
++这更像 answer-site readout module，而不是 pre-answer writer module。
++
++5. **Phase123 没有找到单个模块能复现 Phase122 的强 pre-answer subspace effect**
++
++尤其 DS7B：
++
++```text
++Phase122 pre_remove:
++  target_delta about -2.0 to -2.8
++
++Phase123 single pre-head:
++  target_delta about -0.05 to -0.16
++
++Phase123 single pre-MLP:
++  target_delta about -0.33 to -0.39
++```
++
++### 对 Phase122 的判定更新
++
++Phase122 的正确部分保留：
++
++```text
++DS7B 早层 pre-answer field 会影响后续 answer projection；
++pre-answer 辅助贡献真实存在；
++pre-answer 与 answer field 在 DS7B 上有稳定加和。
++```
++
++Phase123 对其增加限制：
++
++```text
++这个写入/辅助效应不是由单个高 pre-answer attention head 或单点 pre-answer MLP output 主导。
++它更可能是 distributed multi-head + MLP + residual subspace 的组合效应。
++```
++
++更严格表述：
++
++```text
++Phase122 证明了 site/subspace level 的部分闭合；
++Phase123 尚未证明 module-level 单点闭合。
++```
++
++### 硬伤分析
++
++1. **只测了 single-head ablation**
++
++如果真实 writer 是多个弱 head 共同形成，单头测试会低估。
++
++2. **MLP ablation 是 whole-output zero，不是 category subspace removal**
++
++这会混入非类别信息，也可能因为 LayerNorm/残差补偿导致效果变弱。
++
++3. **head selection 只按 attention mass**
++
++高 attention mass 不等于高 value-vector 类别写入。下一步需要按 value/output projection 与 answer axis 的对齐度选头。
++
++4. **answer_proj_delta 标尺仍不稳定**
++
++有些 answer-MLP 条件出现极大 projection delta，但 logits 不按比例变化，说明投影值需要标准化或样本级解释。
++
++5. **没有测 head set cumulative ablation**
++
++Phase113 做过 head set，但不是针对 Phase122 的 pre-answer writer path。Phase123 还没有做 pre-head set 累积测试。
++
++### 理论进展
++
++当前更可信的结构图是：
++
++```text
++DS7B:
++  pre-answer residual subspace
++    -> weak distributed attention/value/MLP contributions
++    -> partly changes answer readout projection
++    -> plus late local auxiliary contribution
++
++  answer_last field
++    -> dominant readout control
++    -> answer MLP can affect number readout
++```
++
++不能再把 pre-answer writer 简化成：
++
++```text
++one head writes category to answer
++```
++
++更合理的假设是：
++
++```text
++category control is stored as a distributed residual subspace,
++and modules expose only small slices of that subspace when ablated individually.
++```
++
++中文表述：
++
++```text
++类别控制更像残差流中的分布式子空间；
++单个注意力头或单个 MLP 输出只暴露其中一小段。
++```
++
++### 下一阶段任务
++
++Phase124 应做：
++
++```text
++Pre-answer Writer Set and Value-alignment Sweep
++```
++
++核心目标：
++
++```text
++从 single module 进入 module set；
++从 attention mass selection 进入 value/readout alignment selection。
++```
++
++测试方案：
++
++```text
++1. DS7B 优先，Qwen3/GLM4 做对照。
++2. 仍使用 number/container/plant。
++3. 对每个 attention head 计算：
++   - answer token attends to pre-answer mass
++   - head output delta 与 answer monitor axis 的对齐
++   - head ablation 的 target_delta
++4. 选择三类 head set：
++   - top attention-mass heads
++   - top value-aligned heads
++   - top ablation-discovered heads
++5. 做 cumulative head-set ablation：
++   - k = 1, 2, 4, 8, 16
++6. 与 pre-answer subspace removal 做同层对照：
++   - head set 是否接近 Phase122 的 -2 级别 target_down
++7. 再做 MLP category-subspace removal：
++   - 不再 zero whole MLP output
++   - 只移除 MLP output 中与 pre-answer local category basis 对齐的部分
++```
++
++Phase124 的关键判据：
++
++```text
++如果 cumulative value-aligned head set 明显接近 Phase122 pre_remove，
++则 pre-answer writer 主要在 attention value path。
++
++如果 head set 仍弱，而 MLP category-subspace removal 强，
++则 writer 更偏 MLP/residual transformation。
++
++如果两者单独弱、合并强，
++则 pre-answer writer 是多模块协同闭合。
++```
++
++## Phase 124: Pre-answer Writer Set and Value-alignment Sweep 写入集合与值对齐扫描 [2026-06-14 17:44]
++
++### 本阶段目标
++
++根据附加分析和 Phase123，当前正确判断是：
++
++```text
++Phase122 证明的是 site/subspace level 的部分闭合；
++Phase123 证明这个闭合不是单个 attention head 或单点 MLP output 主导。
++```
++
++因此 Phase124 继续测试：
++
++```text
++1. 多个 attention heads 累积消融能否接近 Phase122 的 pre-answer subspace effect。
++2. 按 attention mass 选头是否不如按 value/readout alignment 选头。
++3. pre-answer MLP category-subspace removal 是否强于 whole-output zero ablation。
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase124_writer_set_value_alignment_cuda.py`
++- 汇总脚本：`tests/gpt5/phase124_writer_set_value_alignment_summary.py`
++
++### 执行命令
++
++```bash
++python tests/gpt5/phase124_writer_set_value_alignment_cuda.py qwen3 \
++  --train-objects 2 \
++  --test-objects 2 \
++  --batch-size 4 \
++  --rank 4 \
++  --layer-back 1 \
++  --set-sizes 1,2 \
++  --candidate-pool 4 \
++  --categories number \
++  --output-dir results/gpt5_phase124_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase124_writer_set_value_alignment_cuda.py qwen3 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 1,2,4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase124_writer_set_value_alignment \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase124_writer_set_value_alignment_cuda.py glm4 \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 1,2,4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase124_writer_set_value_alignment \
++  --hard-exit-after-model
++
++python tests/gpt5/phase124_writer_set_value_alignment_cuda.py deepseek7b \
++  --train-objects 8 \
++  --test-objects 16 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 1,2,4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase124_writer_set_value_alignment \
++  --hard-exit-after-model
++
++python tests/gpt5/phase124_writer_set_value_alignment_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase124_writer_set_value_alignment_cuda.py \
++  tests/gpt5/phase124_writer_set_value_alignment_summary.py
++```
++
++### 测试范围
++
++```text
++models = qwen3, glm4, deepseek7b
++categories = number, container, plant
++train objects/category = 8
++heldout test objects/category = 16
++templates = 4
++prompts/category = 64
++rank = 16
++candidate pool = 24
++head set sizes = 1, 2, 4, 8, 16
++
++Qwen3 layers = L32-L35, monitor L35
++GLM4 layers = L15-L18, monitor L18
++DS7B layers = L24-L27, monitor L27
++```
++
++### 测试原理
++
++本轮不再只测单个 head，而是构造 head set：
++
++```text
++attention_mass:
++  按 answer token 对 pre-answer tokens 的 attention mass 排序。
++
++value_aligned:
++  捕获 o_proj input 中每个 head 的 answer-position slice，
++  乘以该 head 对应的 o_proj weight block，
++  得到 head output contribution，
++  再计算其与 answer monitor axis 的投影对齐。
++
++target_discovered:
++  在候选池内做 single-head ablation，
++  按 target_delta 排序。
++
++projection_discovered:
++  在候选池内按 answer_proj_delta 排序。
++
++object_control/random_control:
++  对照组。
++```
++
++同时测试：
++
++```text
++pre-answer MLP category-subspace removal
++```
++
++即不再 zero whole MLP output，而是只移除 MLP output 中与 pre-answer local category basis 对齐的部分。
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase124_writer_set_value_alignment/phase124_qwen3_writer_set_value_alignment.json`
++- GLM4：`results/gpt5_phase124_writer_set_value_alignment/phase124_glm4_writer_set_value_alignment.json`
++- DS7B：`results/gpt5_phase124_writer_set_value_alignment/phase124_deepseek7b_writer_set_value_alignment.json`
++- 跨模型汇总：`results/gpt5_phase124_writer_set_value_alignment/phase124_cross_model_summary.md`
++
++### 客观结果
++
++#### Qwen3
++
++```text
++number:
++  attention set best = -0.28
++  target-discovered set best = -0.64
++  object control = -0.19
++  random control = +0.04
++  pre-MLP subspace = -0.00
++
++container:
++  target-discovered set best = -0.34
++  value_aligned projection drop can be large, but target_delta not down
++  pre-MLP subspace = -0.05
++
++plant:
++  attention set best = -0.49
++  target-discovered set best = -0.93
++  random control = -0.61
++  pre-MLP subspace = -0.01
++```
++
++Qwen3 有 head-set target_down，但 control 也不弱，不能判为清洁写入闭合。
++
++#### GLM4 bf16
++
++```text
++number:
++  target-discovered set best = -0.39
++  pre-MLP subspace = -0.06
++
++container:
++  target-discovered set best = -0.09
++  pre-MLP subspace = -0.06
++
++plant:
++  target-discovered set best = -0.08
++  pre-MLP subspace = -0.01
++```
++
++GLM4 仍弱。
++
++#### DS7B
++
++```text
++number:
++  attention_mass k16 = target_delta -0.16, answer_proj_delta -71.98
++  value_aligned k16 = target_delta -0.64, answer_proj_delta -132.77
++  target_discovered k16 = target_delta -0.67, answer_proj_delta -102.78
++  projection_discovered k16 = target_delta -0.75, answer_proj_delta -192.08
++  object_control k16 = target_delta -0.32
++  random_control best = -0.04
++  pre-MLP subspace L24 = target_delta -0.54, answer_proj_delta -19.50
++
++container:
++  attention_mass best = -0.03
++  value/abs_value best = -0.25
++  target_discovered k16 = -0.44
++  object_control best = -0.15
++  random_control best = -0.09
++  pre-MLP subspace best = -0.40
++
++plant:
++  attention_mass k16 = -0.60
++  value_aligned k16 = -0.67
++  target_discovered k16 = -1.25
++  projection_discovered k16 = -0.96
++  object_control best = -0.03
++  random_control k16 = -0.32
++  pre-MLP subspace L24 = -0.67
++```
++
++### 当前最可靠客观事实
++
++1. **DS7B plant 出现目前最强的模块集合证据**
++
++```text
++target_discovered head set k16:
++  target_delta -1.25
++  answer_proj_delta -132.29
++
++object_control:
++  target_delta -0.03
++
++random_control:
++  target_delta -0.32
++```
++
++这说明 plant 的 pre-answer/answer writer path 至少有一部分可以由 head set 捕获。
++
++2. **DS7B number 有中等 head-set 效应，但仍不到 Phase122 强度**
++
++```text
++number projection_discovered k16:
++  target_delta -0.75
++
++Phase122 number pre_remove:
++  about -2.0 to -2.8
++```
++
++所以 number 的 writer set 仍未闭合。
++
++3. **DS7B container 仍弱**
++
++```text
++target_discovered k16:
++  target_delta -0.44
++
++pre-MLP subspace:
++  target_delta -0.40
++```
++
++这说明 container 的 Phase122/Phase121 辅助贡献可能更分散，或当前 head/value/MLP 选择仍未命中。
++
++4. **value alignment 通常强于纯 attention mass**
++
++DS7B number：
++
++```text
++attention_mass k16 = -0.16
++value_aligned k16 = -0.64
++```
++
++DS7B plant：
++
++```text
++attention_mass k16 = -0.60
++value_aligned k16 = -0.67
++target_discovered k16 = -1.25
++```
++
++这支持 Phase123 的硬伤判断：
++
++```text
++attention mass 不是 writer 的充分排序信号。
++```
++
++5. **pre-MLP category-subspace removal 明显强于 Phase123 whole-output zero 的解释力，但仍不够**
++
++DS7B：
++
++```text
++number pre-MLP subspace L24 = -0.54
++container pre-MLP subspace = -0.40
++plant pre-MLP subspace L24 = -0.67
++```
++
++它比 Phase123 单点 whole-output MLP zero 更有结构意义，但仍不能单独复现 Phase122 的 -2 级别。
++
++### 对 Phase123 的判定更新
++
++Phase123 正确：
++
++```text
++单头/单点 MLP 不能解释 pre-answer writer。
++```
++
++Phase124 新增：
++
++```text
++head set 确实比 single head 更接近真实 effect；
++value/readout alignment 比 attention mass 更有效；
++但除 DS7B plant 外，仍未达到接近 Phase122 的闭合强度。
++```
++
++因此当前结论应写成：
++
++```text
++pre-answer writer 是 distributed module-set mechanism；
++目前只有 plant 在 DS7B 上出现较强 head-set partial closure。
++number/container 仍是 residual-subspace > module-set。
++```
++
++### 硬伤分析
++
++1. **candidate pool 仍有限**
++
++本轮候选池为 24，不是全头 exhaustive set search。
++
++2. **head set 是简单累积 ablation**
++
++没有测试 head 之间的非线性组合、补偿、冗余和顺序依赖。
++
++3. **target_discovered 有选择偏差**
++
++它用同一批 heldout prompts 做单头筛选和集合测试，可能高估。但 object/random controls 可以部分约束这个问题。
++
++4. **value alignment 是 answer-position output alignment**
++
++它没有直接证明这些 head 从 pre-answer tokens 读取 category value，只证明 head output 与 answer monitor axis 对齐。
++
++5. **MLP subspace basis 来自 residual local centers，不是 MLP output centers**
++
++更严格的 MLP 测试应直接采集 MLP output 的 category basis。
++
++6. **仍未复现 Phase122 的强 residual subspace effect**
++
++尤其 number/container：
++
++```text
++head set + pre-MLP subspace 仍未组合测试；
++单独都不足以闭合。
++```
++
++### 理论进展
++
++当前结构图更新为：
++
++```text
++DS7B plant:
++  pre-answer/answer writer path
++    -> detectable head-set partial closure
++    -> value/readout aligned heads matter
++    -> pre-MLP subspace contributes moderately
++
++DS7B number:
++  answer readout field strong
++  pre-answer residual subspace strong
++  module-set only captures part of it
++
++DS7B container:
++  residual-level effect remains more visible than module-level effect
++```
++
++更一般的机制判断：
++
++```text
++language/category control is not stored as a single writer module;
++it appears as a residual subspace whose causal effect is only partially exposed
++through identifiable attention/MLP module sets.
++```
++
++中文：
++
++```text
++语言类别控制不像单个写入模块；
++更像残差流子空间，模块集合只能暴露其中一部分因果结构。
++```
++
++### 下一阶段任务
++
++Phase125 应做：
++
++```text
++Joint Head-set + MLP-subspace Closure and Cross-heldout Validation
++```
++
++核心目标：
++
++```text
++验证 Phase124 的 head-set partial closure 是否真实泛化，
++并测试 head set 与 MLP subspace 合并后能否接近 Phase122。
++```
++
++测试方案：
++
++```text
++1. 分离 selection prompts 与 evaluation prompts：
++   - selection objects/category = 8
++   - evaluation objects/category = 16 or 24
++
++2. DS7B 为主，Qwen3/GLM4 对照。
++
++3. 对 DS7B plant/number/container 分别测试：
++   - best head set only
++   - best pre-MLP subspace only
++   - head set + pre-MLP subspace
++   - head set + answer-side MLP/readout-side control
++
++4. 加强 controls：
++   - object head set
++   - random head set
++   - value-aligned but low-pre-attention set
++   - same-size shuffled set
++
++5. 直接对照 Phase122 residual pre_remove：
++   - module combo / residual pre_remove 的 effect ratio
++```
++
++Phase125 关键判据：
++
++```text
++如果 head set + MLP subspace 在 independent evaluation prompts 上接近 residual pre_remove，
++则 writer path 从 residual-level 推进到 module-set closure。
++
++如果仍显著小于 residual pre_remove，
++则说明当前模块级观测仍遗漏了关键 residual transformation，
++下一步应进入 residual update decomposition / layernorm-mediated path。
++```

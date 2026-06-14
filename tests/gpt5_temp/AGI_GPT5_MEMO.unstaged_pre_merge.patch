@@ -1,0 +1,455 @@
+diff --git a/research/gpt5/docs/AGI_GPT5_MEMO.md b/research/gpt5/docs/AGI_GPT5_MEMO.md
+index 07d50257..8dca801f 100644
+--- a/research/gpt5/docs/AGI_GPT5_MEMO.md
++++ b/research/gpt5/docs/AGI_GPT5_MEMO.md
+@@ -44732,3 +44732,450 @@ Phase125 关键判据：
+ 则说明当前模块级观测仍遗漏了关键 residual transformation，
+ 下一步应进入 residual update decomposition / layernorm-mediated path。
+ ```
++
++## Phase 125: Joint Head-set MLP-subspace Cross-heldout Closure 联合模块集合独立验证 [2026-06-14 19:14]
++
++### 本阶段目标
++
++根据附加分析，Phase124 的结论基本正确，但存在一个关键硬伤：
++
++```text
++target_discovered head set 在同一批 heldout prompts 上选择和评估，
++可能高估 head set closure。
++```
++
++因此 Phase125 做两件事：
++
++```text
++1. 将对象严格切成 train / selection / evaluation 三个不重叠集合。
++2. 在 selection split 上选择 head set、pre-MLP layer、residual reference layer，
++   只在 disjoint evaluation split 上报告效果。
++```
++
++核心问题：
++
++```text
++Phase124 的 DS7B plant head-set partial closure 是否真实泛化？
++head set + pre-MLP subspace 是否能接近 Phase122 residual pre_remove？
++```
++
++### 生成脚本
++
++- 主测试脚本：`tests/gpt5/phase125_joint_closure_crossheldout_cuda.py`
++- 汇总脚本：`tests/gpt5/phase125_joint_closure_crossheldout_summary.py`
++
++### 执行命令
++
++```bash
++python tests/gpt5/phase125_joint_closure_crossheldout_cuda.py qwen3 \
++  --train-objects 2 \
++  --selection-objects 2 \
++  --eval-objects 2 \
++  --batch-size 4 \
++  --rank 4 \
++  --layer-back 1 \
++  --set-sizes 1,2 \
++  --candidate-pool 4 \
++  --categories number \
++  --output-dir results/gpt5_phase125_smoke \
++  --hard-exit-after-model
++
++python tests/gpt5/phase125_joint_closure_crossheldout_cuda.py qwen3 \
++  --train-objects 8 \
++  --selection-objects 8 \
++  --eval-objects 8 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase125_joint_closure_crossheldout \
++  --hard-exit-after-model
++
++PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase125_joint_closure_crossheldout_cuda.py glm4 \
++  --train-objects 8 \
++  --selection-objects 8 \
++  --eval-objects 8 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase125_joint_closure_crossheldout \
++  --hard-exit-after-model
++
++python tests/gpt5/phase125_joint_closure_crossheldout_cuda.py deepseek7b \
++  --train-objects 8 \
++  --selection-objects 8 \
++  --eval-objects 8 \
++  --batch-size 24 \
++  --rank 16 \
++  --layer-back 3 \
++  --set-sizes 4,8,16 \
++  --candidate-pool 24 \
++  --categories number,container,plant \
++  --output-dir results/gpt5_phase125_joint_closure_crossheldout \
++  --hard-exit-after-model
++
++python tests/gpt5/phase125_joint_closure_crossheldout_summary.py
++
++python -m py_compile \
++  tests/gpt5/phase125_joint_closure_crossheldout_cuda.py \
++  tests/gpt5/phase125_joint_closure_crossheldout_summary.py
++```
++
++### 测试范围
++
++每个类别当前只有 24 个对象，因此严格对象不重叠时最大稳定切分为：
++
++```text
++train objects/category = 8
++selection objects/category = 8
++evaluation objects/category = 8
++templates = 4
++evaluation prompts/category = 32
++```
++
++模型层位：
++
++```text
++Qwen3: L32-L35, monitor L35
++GLM4: L15-L18, monitor L18
++DS7B: L24-L27, monitor L27
++```
++
++评估条件：
++
++```text
++residual_pre_reference
++pre_mlp_subspace_only
++head_set_only
++head_set_plus_pre_mlp
++object_control
++random_control
++low_pre_value_control
++```
++
++### 测试原理
++
++1. train split 用来构造：
++
++```text
++answer monitor axis
++pre-answer local category basis
++```
++
++2. selection split 用来选择：
++
++```text
++best head set
++best pre-MLP subspace layer
++best residual pre-remove reference layer
++```
++
++3. evaluation split 才报告最终效果。
++
++4. 关键比例：
++
++```text
++effect_ratio_vs_residual_ref
++= module_condition_target_delta / residual_pre_reference_target_delta
++```
++
++注意：
++
++```text
++只有 residual_pre_reference 本身足够强时，
++ratio 才有解释意义。
++```
++
++Qwen3/GLM4 本轮 residual reference 很弱，因此它们的 ratio 不作为闭合比例解释。
++
++### 结果文件
++
++- Qwen3：`results/gpt5_phase125_joint_closure_crossheldout/phase125_qwen3_joint_closure_crossheldout.json`
++- GLM4：`results/gpt5_phase125_joint_closure_crossheldout/phase125_glm4_joint_closure_crossheldout.json`
++- DS7B：`results/gpt5_phase125_joint_closure_crossheldout/phase125_deepseek7b_joint_closure_crossheldout.json`
++- 跨模型汇总：`results/gpt5_phase125_joint_closure_crossheldout/phase125_cross_model_summary.md`
++
++### 客观结果
++
++#### Qwen3
++
++```text
++residual reference weak:
++  number -0.12
++  container -0.02
++  plant -0.19
++```
++
++因此 Qwen3 的 ratio 不解释为 closure ratio。
++
++评估集上 head set 有 target_down：
++
++```text
++number head_set target_discovered k16 = -0.66
++container head_set target_discovered k16 = -0.29
++plant head_set target_discovered k16 = -0.89
++```
++
++但由于 pre-answer residual reference 本身弱，不能说明 pre-answer writer path closure。
++
++#### GLM4 bf16
++
++```text
++residual reference weak or opposite:
++  number +0.14
++  container +0.05
++  plant -0.02
++```
++
++GLM4 不形成可解释的 pre-answer residual closure。
++
++#### DS7B
++
++```text
++number:
++  residual reference = -2.55
++  best head only = projection_discovered k16, -0.85, ratio 0.33
++  best head+MLP = projection_discovered k16 + pre-MLP L24, -1.10, ratio 0.43
++  best control = object_control k16, -0.47, ratio 0.18
++  pre-MLP only = -0.43, ratio 0.17
++
++container:
++  residual reference = -2.71
++  best head only = target_discovered k16, -0.11, ratio 0.04
++  best head+MLP = -0.37, ratio 0.14
++  best control = -0.17, ratio 0.06
++  pre-MLP only = -0.32, ratio 0.12
++
++plant:
++  residual reference = -2.42
++  best head only = target_discovered k16, -1.33, ratio 0.55
++  best head+MLP = target_discovered k16 + pre-MLP L24, -1.80, ratio 0.74
++  best control = low_pre_value_control k4, -0.19, ratio 0.08
++  pre-MLP only = -0.69, ratio 0.28
++```
++
++DS7B evaluation objects：
++
++```text
++number:
++  pair, triple, zero, first, second, third, many, few
++
++container:
++  carton, crate, vase, pot, pan, bowl, plate, tray
++
++plant:
++  ivy, weed, herb, lily, orchid, clover, palm, sapling
++```
++
++### 当前最可靠客观事实
++
++1. **DS7B plant 的 Phase124 head-set 结果真实泛化**
++
++selection split 选择，evaluation split 测试后：
++
++```text
++head only:
++  target_delta -1.33
++  ratio 0.55
++
++head + pre-MLP:
++  target_delta -1.80
++  ratio 0.74
++
++control:
++  target_delta -0.19
++  ratio 0.08
++```
++
++这是目前最强的 module-set closure 证据。
++
++2. **DS7B number 有弱到中等泛化，但未闭合**
++
++```text
++head + pre-MLP:
++  target_delta -1.10
++  ratio 0.43
++
++residual reference:
++  -2.55
++```
++
++说明 number 的 residual subspace effect 仍有一半以上未被当前 head/MLP 组合解释。
++
++3. **DS7B container 基本没有模块集合闭合**
++
++```text
++head + pre-MLP:
++  target_delta -0.37
++  ratio 0.14
++
++residual reference:
++  -2.71
++```
++
++container 仍是 residual-level effect 明显强于 module-level observable effect。
++
++4. **pre-MLP subspace 与 head set 有加和**
++
++DS7B plant：
++
++```text
++head only -1.33
++pre-MLP only -0.69
++head + pre-MLP -1.80
++```
++
++组合强于任一单项，但不是线性完全相加。
++
++DS7B number：
++
++```text
++head only -0.85
++pre-MLP only -0.43
++combo -1.10
++```
++
++也有加和，但仍不足。
++
++5. **Qwen3/GLM4 的 pre-answer residual reference 不稳定**
++
++因此本轮不能用它们判断 module/residual closure ratio。
++
++### 对 Phase124 的判定更新
++
++Phase124 正确部分：
++
++```text
++head set 比 single head 更接近真实 effect；
++value/readout alignment 比 attention mass 更有效；
++DS7B plant 是最强 partial closure。
++```
++
++Phase125 新增：
++
++```text
++DS7B plant 的 head-set partial closure 经独立对象验证后仍成立；
++head + pre-MLP 可以解释约 74% residual pre-answer reference。
++```
++
++但也要限制：
++
++```text
++number 只到约 43%；
++container 只到约 14%；
++所以不能说 pre-answer writer path 已整体模块闭合。
++```
++
++### 硬伤分析
++
++1. **evaluation prompts/category 只有 32**
++
++这是对象不重叠的代价。当前类别对象池只有 24 个，无法同时做到 train/selection/evaluation 都很大。
++
++2. **selection split 仍参与选择**
++
++虽然 evaluation 独立，但 head set 与 MLP layer 仍由 selection 决定，需要未来做多 seed/object split 复现。
++
++3. **residual reference 使用同一 pre-answer basis**
++
++它是合理 reference，但不是 Phase122 完全同构复刻，因为本轮做了 split 和 layer selection。
++
++4. **head + MLP combo 仍未加入 LayerNorm / residual update 分解**
++
++number/container 的缺口可能来自这些未测机制。
++
++5. **Qwen3/GLM4 ratio 不可解释**
++
++因为 residual reference 太弱，小分母会放大 ratio。
++
++### 理论进展
++
++当前可以更严格地写成：
++
++```text
++DS7B plant:
++  pre-answer residual causal effect
++    -> 约 55% 可由 selected head set 泛化解释
++    -> 约 74% 可由 head set + pre-MLP subspace 泛化解释
++
++DS7B number:
++  module-set captures about 43%
++  residual-level mechanism still contains unlocalized component
++
++DS7B container:
++  module-set captures little
++  likely needs residual update / normalization / broader ensemble explanation
++```
++
++这说明：
++
++```text
++语言类别机制不是统一形态。
++不同类别在同一模型中有不同程度的 module-level exposure。
++```
++
++中文：
++
++```text
++有些类别的因果子空间较容易被注意力头集合和 MLP 子空间暴露；
++有些类别主要表现为残差流层面的结构，模块定位仍困难。
++```
++
++### 下一阶段任务
++
++Phase126 应做：
++
++```text
++Residual Gap Decomposition for Number/Container
++```
++
++核心目标：
++
++```text
++解释为什么 number/container 的 residual pre-answer effect 远强于 head+MLP module combo。
++```
++
++测试方案：
++
++```text
++1. DS7B 优先，Qwen3/GLM4 只做轻量对照。
++
++2. 对 number/container/plant 做 residual update 分解：
++   - layer input residual
++   - attention output
++   - MLP output
++   - layer output residual
++
++3. 在 pre-answer positions 上分别移除 category subspace：
++   - residual input subspace
++   - attention output subspace
++   - MLP output subspace
++   - residual output subspace
++
++4. 监控：
++   - final target_delta
++   - answer projection delta
++   - module combo / residual output 的 ratio
++
++5. 对 plant 作为正对照：
++   - 验证 head+MLP 已接近 residual output；
++   - 看残余 26% 来自哪里。
++```
++
++Phase126 关键判据：
++
++```text
++如果 residual output 强而 attention/MLP output 都弱，
++则说明类别信息主要存在于 residual carry / normalization-mediated geometry。
++
++如果 attention output + MLP output 合并接近 residual output，
++则说明 Phase125 缺口来自模块组合不完整。
++
++如果 layer input already strong，
++则说明 writer 在更早层，需要回溯 upstream source。
++```
