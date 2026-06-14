@@ -45179,3 +45179,2867 @@ Phase126 关键判据：
 如果 layer input already strong，
 则说明 writer 在更早层，需要回溯 upstream source。
 ```
+
+## Phase 126: Residual Gap Decomposition 残差缺口分解 [2026-06-14 19:36]
+
+### 本阶段目标
+
+根据附加分析，Phase125 的结论正确：
+
+```text
+DS7B plant:
+  head set + pre-MLP subspace 在独立 evaluation split 上解释约 74% residual reference。
+
+DS7B number:
+  约 43%，仍有明显 residual gap。
+
+DS7B container:
+  约 14%，基本未模块闭合。
+```
+
+Phase126 目标：
+
+```text
+解释 number/container 的 residual pre-answer effect 为什么远强于当前 head+MLP module combo。
+```
+
+具体做 residual update decomposition：
+
+```text
+layer_input residual
+attention_output
+MLP output
+layer_output residual
+attention_output + MLP output
+```
+
+### 生成脚本
+
+- 主测试脚本：`tests/gpt5/phase126_residual_gap_decomposition_cuda.py`
+- 汇总脚本：`tests/gpt5/phase126_residual_gap_decomposition_summary.py`
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase126_residual_gap_decomposition_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --rank 4 \
+  --layer-back 1 \
+  --categories number \
+  --output-dir results/gpt5_phase126_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase126_residual_gap_decomposition_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase126_residual_gap_decomposition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase126_residual_gap_decomposition_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase126_residual_gap_decomposition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase126_residual_gap_decomposition_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase126_residual_gap_decomposition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase126_residual_gap_decomposition_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase126_residual_gap_decomposition_cuda.py \
+  tests/gpt5/phase126_residual_gap_decomposition_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+
+Qwen3 layers = L32-L35, monitor L35
+GLM4 layers = L15-L18, monitor L18
+DS7B layers = L24-L27, monitor L27
+```
+
+组件：
+
+```text
+layer_input
+attention_output
+mlp_output
+layer_output
+attention_plus_mlp
+```
+
+### 测试原理
+
+对每个 model/category/layer/component：
+
+```text
+1. 在 train objects 上捕获 pre-answer positions 的 component activation。
+2. 用 category contrast matrix 构造该 component 的 local category subspace。
+3. 在 heldout prompts 上从对应 component 的 pre-answer positions 中移除该 subspace。
+4. 监控 final target_delta 与 peak answer projection delta。
+```
+
+hook 位置：
+
+```text
+layer_input:
+  transformer block forward_pre_hook，patch 输入 residual。
+
+attention_output:
+  self-attention module forward_hook，patch attention output。
+
+mlp_output:
+  MLP module forward_hook，patch MLP output。
+
+layer_output:
+  transformer block forward_hook，patch block output residual。
+```
+
+### 结果文件
+
+- Qwen3：`results/gpt5_phase126_residual_gap_decomposition/phase126_qwen3_residual_gap_decomposition.json`
+- GLM4：`results/gpt5_phase126_residual_gap_decomposition/phase126_glm4_residual_gap_decomposition.json`
+- DS7B：`results/gpt5_phase126_residual_gap_decomposition/phase126_deepseek7b_residual_gap_decomposition.json`
+- 跨模型汇总：`results/gpt5_phase126_residual_gap_decomposition/phase126_cross_model_summary.md`
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  layer_input best = -0.13
+  attention_output best = -0.06
+  mlp_output best = -0.00
+  layer_output best = -0.13
+
+container:
+  layer_input best = -0.09
+  attention_output best = -0.01
+  mlp_output best = -0.07
+  layer_output best = -0.04
+
+plant:
+  layer_input best = -0.22
+  attention_output best = +0.00
+  mlp_output best = +0.04
+  layer_output best = -0.22
+```
+
+Qwen3 的 pre-answer residual path 仍弱。
+
+#### GLM4 bf16
+
+```text
+number:
+  layer_input best = -0.26
+  attention_output best = -0.08
+  mlp_output best = -0.09
+  layer_output best = -0.26
+
+container:
+  layer_input best = -0.01
+  attention_output best = -0.02
+  mlp_output best = -0.04
+  layer_output best = -0.01
+
+plant:
+  layer_input best = -0.02
+  attention_output best = +0.01
+  mlp_output best = -0.04
+  layer_output best = -0.02
+```
+
+GLM4 仍弱。
+
+#### DS7B
+
+总体 best：
+
+```text
+number:
+  layer_input best = L25, target_delta -2.05, answer_proj_delta -50.06
+  attention_output best = L27, target_delta -0.03
+  mlp_output best = L24, target_delta -0.28
+  layer_output best = L27, target_delta -2.51
+  attention_plus_mlp best = L24, target_delta -0.25
+
+container:
+  layer_input best = L26, target_delta -1.22
+  attention_output best = L24, target_delta -0.07
+  mlp_output best = L24, target_delta -0.32
+  layer_output best = L27, target_delta -2.66
+  attention_plus_mlp best = L24, target_delta -0.25
+
+plant:
+  layer_input best = L25, target_delta -2.28
+  attention_output best = L24, target_delta -0.09
+  mlp_output best = L25, target_delta -0.18
+  layer_output best = L27, target_delta -2.42
+  attention_plus_mlp best = L26, target_delta -0.13
+```
+
+DS7B 逐层关键值：
+
+```text
+number:
+  L24 layer_input -1.45 -> layer_output -2.05
+  L25 layer_input -2.05 -> layer_output -1.33
+  L26 layer_input -1.33 -> layer_output -0.96
+  L27 layer_input -0.96 -> layer_output -2.51
+  attention_output all about 0
+  mlp_output max about -0.28
+
+container:
+  L24 layer_input -1.05 -> layer_output -1.19
+  L25 layer_input -1.19 -> layer_output -1.22
+  L26 layer_input -1.22 -> layer_output -0.98
+  L27 layer_input -0.98 -> layer_output -2.66
+  attention_output all about 0
+  mlp_output max about -0.32
+
+plant:
+  L24 layer_input -0.93 -> layer_output -2.28
+  L25 layer_input -2.28 -> layer_output -2.25
+  L26 layer_input -2.25 -> layer_output -1.21
+  L27 layer_input -1.21 -> layer_output -2.42
+  attention_output all about 0
+  mlp_output max about -0.18
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 的 pre-answer residual effect 在 layer_input 已经很强**
+
+```text
+number L25 layer_input -2.05
+container L26 layer_input -1.22
+plant L25 layer_input -2.28
+```
+
+这说明强残差场不是当前层 attention/MLP output 刚写出来的，而是已经进入该层。
+
+2. **DS7B attention_output category subspace 几乎不能解释 residual effect**
+
+```text
+number best attention_output -0.03
+container best attention_output -0.07
+plant best attention_output -0.09
+```
+
+这说明 Phase125 的 head-set effect 不等价于单层 attention_output category subspace removal。
+
+3. **DS7B MLP output category subspace 只有弱效应**
+
+```text
+number best mlp_output -0.28
+container best mlp_output -0.32
+plant best mlp_output -0.18
+```
+
+比 layer_output 的 -2 级别弱很多。
+
+4. **attention_output + MLP output 仍然不能接近 layer_output**
+
+```text
+number attention_plus_mlp -0.25 vs layer_output -2.51
+container attention_plus_mlp -0.25 vs layer_output -2.66
+plant attention_plus_mlp -0.13 vs layer_output -2.42
+```
+
+因此 Phase125 缺口不是简单“同层 attention output + MLP output 子空间未合并”造成的。
+
+5. **L27 layer_output 有 hook 时序特殊性**
+
+L27 layer_output patch 直接改变同层最终 hidden state，因此 answer_proj_delta 为 0 是预期：
+
+```text
+patch 与 monitor 位于同一 hidden_state 输出边界，
+不能用 answer_proj_delta=0 解释为无关系。
+```
+
+### 对 Phase125 的判定更新
+
+Phase125 正确部分保留：
+
+```text
+plant 的 module-set partial closure 可泛化；
+number 中等；
+container 弱。
+```
+
+Phase126 增加限制：
+
+```text
+同层 attention_output / MLP_output 的 category subspace removal
+不能解释 residual output 强效。
+```
+
+更准确说：
+
+```text
+Phase125 的 head-set 效应可能是对 residual stream 中已存在因果子空间的局部扰动，
+而不是当前层 raw attention_output category subspace 的直接完整写入。
+```
+
+### 硬伤分析
+
+1. **attention_output / MLP_output basis 是各自 raw output basis**
+
+如果真实写入经过 residual addition、LayerNorm 或后续几何变换才成形，raw output basis 会低估模块贡献。
+
+2. **layer_input 强说明需要回溯更早层**
+
+本轮只扫 peak-3 到 peak，没有向更早层寻找最初写入点。
+
+3. **layer_output patch 与 monitor 层重合时 answer_proj_delta 不可直接解释**
+
+尤其 L27。
+
+4. **attention head set 与 attention_output subspace 不是同一干预**
+
+head set zero 是按 head slice 切断贡献；
+attention_output subspace removal 是按 category basis 移除 raw attention output 中的低秩方向。
+二者不能简单等价。
+
+5. **没有直接分解 residual carry 与 LayerNorm**
+
+当前结果提示这些机制重要，但尚未直接测。
+
+### 理论进展
+
+当前 DS7B pre-answer 机制要从：
+
+```text
+attention/MLP writer writes category subspace in current layer
+```
+
+修正为：
+
+```text
+category subspace is already present in residual input;
+current layer modules expose or perturb it only weakly;
+strong causal control is carried by residual stream and transformed near layer output/readout boundary.
+```
+
+中文：
+
+```text
+类别因果子空间已经在层输入残差中存在；
+当前层注意力和 MLP 原始输出只暴露很小一部分；
+强因果效应主要沿残差流携带，并在层输出或读出边界附近重新显现。
+```
+
+这解释了为什么：
+
+```text
+Phase125 plant head+MLP 有 74% closure，
+但 Phase126 raw attention_output + raw MLP_output 很弱。
+```
+
+二者测的不是同一层面：
+
+```text
+head set ablation:
+  切断模块对后续残差流的贡献，可能扰动累积路径。
+
+raw output subspace removal:
+  只移除当前输出张量中的线性类别方向，不能覆盖残差携带几何。
+```
+
+### 下一阶段任务
+
+Phase127 应做：
+
+```text
+Upstream Residual Carry Backtrace
+```
+
+核心目标：
+
+```text
+沿更早层回溯 pre-answer layer_input causal subspace，
+找到 DS7B number/container/plant 的 residual causal field 首次形成层。
+```
+
+测试方案：
+
+```text
+1. DS7B 为主，Qwen3/GLM4 轻量对照。
+2. 扫描更宽层位：
+   - DS7B L12-L27
+   - Qwen3 L20-L35
+   - GLM4 L8-L18
+3. 只测 layer_input 与 layer_output 两个 residual sites。
+4. 对 number/container/plant 构造 pre-answer local category subspace。
+5. 记录每层 target_delta 曲线：
+   - onset layer
+   - peak layer
+   - decay/re-emergence layer
+6. 对 DS7B L27 特殊重显现做细查：
+   - L26 output -> L27 input -> L27 output
+   - 是否存在 final block normalization/readout gateway。
+```
+
+Phase127 关键判据：
+
+```text
+如果 layer_input effect 在早层已经出现并逐层携带，
+说明 pre-answer field 是长期 residual memory。
+
+如果中晚层突然出现，
+说明有明确 upstream writer layer。
+
+如果 L27 output 大幅强于 L27 input，
+说明 final block / normalization / readout gateway 重新放大 residual category field。
+```
+
+## Phase 127: Upstream Residual Carry Backtrace 上游残差携带回溯 [2026-06-14 20:42]
+
+### 本阶段目标
+
+根据附加分析，Phase126 的判断正确：
+
+```text
+DS7B number/container/plant 的强 pre-answer causal field
+不是当前层 attention_output 或 MLP_output 直接写出；
+它已经存在于 layer_input residual，并沿 residual stream 携带。
+```
+
+Phase127 继续做宽层回溯：
+
+```text
+沿更早层扫描 pre-answer layer_input / layer_output category subspace，
+寻找 residual causal field 的 onset layer、peak layer、衰减和 final re-emergence。
+```
+
+### 生成脚本
+
+- 主测试脚本：`tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py`
+- 汇总脚本：`tests/gpt5/phase127_upstream_residual_carry_backtrace_summary.py`
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --rank 4 \
+  --layer-from 34 \
+  --layer-to 35 \
+  --categories number \
+  --output-dir results/gpt5_phase127_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-from 20 \
+  --layer-to 35 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase127_upstream_residual_carry_backtrace \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-from 8 \
+  --layer-to 18 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase127_upstream_residual_carry_backtrace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-from 12 \
+  --layer-to 27 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase127_upstream_residual_carry_backtrace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase127_upstream_residual_carry_backtrace_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase127_upstream_residual_carry_backtrace_cuda.py \
+  tests/gpt5/phase127_upstream_residual_carry_backtrace_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+onset threshold = target_delta <= -0.5
+```
+
+层位：
+
+```text
+Qwen3: L20-L35, monitor L35
+GLM4: L8-L18, monitor L18
+DS7B: L12-L27, monitor L27
+```
+
+只测 residual sites：
+
+```text
+layer_input
+layer_output
+```
+
+### 测试原理
+
+1. 在 peak answer layer 构造 answer monitor axis。
+2. 对每个扫描层：
+
+```text
+capture pre-answer layer_input residual centers
+capture pre-answer layer_output residual centers
+```
+
+3. 对每个 category 构造 local category subspace。
+4. 在 heldout prompts 上从对应 residual site 移除 category subspace。
+5. 记录每层 target_delta 曲线。
+
+关键指标：
+
+```text
+onset layer:
+  第一个 target_delta <= -0.5 的层。
+
+best layer:
+  target_delta 最低的层。
+
+final input/output:
+  最后扫描层的输入/输出差异，用于判断 final re-emergence。
+```
+
+### 结果文件
+
+- Qwen3：`results/gpt5_phase127_upstream_residual_carry_backtrace/phase127_qwen3_upstream_residual_carry_backtrace.json`
+- GLM4：`results/gpt5_phase127_upstream_residual_carry_backtrace/phase127_glm4_upstream_residual_carry_backtrace.json`
+- DS7B：`results/gpt5_phase127_upstream_residual_carry_backtrace/phase127_deepseek7b_upstream_residual_carry_backtrace.json`
+- 跨模型汇总：`results/gpt5_phase127_upstream_residual_carry_backtrace/phase127_cross_model_summary.md`
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  input onset L21
+  output onset L20
+  best input L30 target_delta -0.92
+  best output L29 target_delta -0.92
+  final input L35 -0.05
+  final output L35 -0.07
+
+container:
+  input onset L21
+  output onset L20
+  best input L21 target_delta -0.79
+  best output L20 target_delta -0.79
+  final input L35 -0.04
+  final output L35 +0.07
+
+plant:
+  input onset L20
+  output onset L20
+  best input L26 target_delta -0.88
+  best output L25 target_delta -0.88
+  final input L35 +0.27
+  final output L35 +0.24
+```
+
+Qwen3 有中层 residual effects，但 final pre-answer residual path 不稳定，与前几阶段一致。
+
+#### GLM4 bf16
+
+```text
+number:
+  no onset by -0.5 threshold
+  best input L18 -0.26
+  best output L17 -0.26
+
+container:
+  no onset
+  best input L13 -0.08
+  best output L12 -0.08
+
+plant:
+  no onset
+  best input L13 -0.08
+  best output L12 -0.08
+```
+
+GLM4 继续弱。
+
+#### DS7B
+
+汇总：
+
+```text
+number:
+  input onset L21
+  output onset L20
+  best input L25 -2.05
+  best output L27 -2.51
+  final input L27 -0.96
+  final output L27 -2.51
+
+container:
+  input onset L20
+  output onset L19
+  best input L26 -1.22
+  best output L27 -2.66
+  final input L27 -0.98
+  final output L27 -2.66
+
+plant:
+  input onset L23
+  output onset L22
+  best input L25 -2.28
+  best output L27 -2.42
+  final input L27 -1.21
+  final output L27 -2.42
+```
+
+DS7B 逐层曲线：
+
+```text
+number layer_input:
+  L12 +0.02, L13 +0.10, L14 +0.03, L15 +0.15,
+  L16 +0.07, L17 +0.04, L18 -0.14, L19 +0.08,
+  L20 -0.45, L21 -0.56, L22 -0.74, L23 -1.02,
+  L24 -1.45, L25 -2.05, L26 -1.33, L27 -0.96
+
+number layer_output:
+  L12 +0.10, L13 +0.03, L14 +0.15, L15 +0.07,
+  L16 +0.04, L17 -0.14, L18 +0.08, L19 -0.45,
+  L20 -0.56, L21 -0.74, L22 -1.02, L23 -1.45,
+  L24 -2.05, L25 -1.33, L26 -0.96, L27 -2.51
+
+container layer_input:
+  L12 +0.02, L13 +0.33, L14 +0.01, L15 +0.08,
+  L16 +0.14, L17 -0.09, L18 -0.26, L19 -0.28,
+  L20 -0.60, L21 -0.80, L22 -0.86, L23 -0.88,
+  L24 -1.05, L25 -1.19, L26 -1.22, L27 -0.98
+
+container layer_output:
+  L12 +0.33, L13 +0.01, L14 +0.08, L15 +0.14,
+  L16 -0.09, L17 -0.26, L18 -0.28, L19 -0.60,
+  L20 -0.80, L21 -0.86, L22 -0.88, L23 -1.05,
+  L24 -1.19, L25 -1.22, L26 -0.98, L27 -2.66
+
+plant layer_input:
+  L12 +0.19, L13 +0.70, L14 +0.47, L15 +0.52,
+  L16 +0.64, L17 +0.47, L18 +0.16, L19 +0.16,
+  L20 -0.23, L21 -0.34, L22 -0.31, L23 -0.67,
+  L24 -0.93, L25 -2.28, L26 -2.25, L27 -1.21
+
+plant layer_output:
+  L12 +0.70, L13 +0.47, L14 +0.52, L15 +0.64,
+  L16 +0.47, L17 +0.16, L18 +0.16, L19 -0.23,
+  L20 -0.34, L21 -0.31, L22 -0.67, L23 -0.93,
+  L24 -2.28, L25 -2.25, L26 -1.21, L27 -2.42
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B pre-answer residual field 不是从很早层开始**
+
+L12-L18 基本无效或弱：
+
+```text
+number L12-L18 mostly around 0
+container L12-L18 mostly weak
+plant L12-L18 positive/weak
+```
+
+说明它不是全程长期 memory，而是在中后层逐渐形成。
+
+2. **onset 出现在中后层**
+
+```text
+number input onset L21, output onset L20
+container input onset L20, output onset L19
+plant input onset L23, output onset L22
+```
+
+3. **layer_output Lk 基本传递为 layer_input L(k+1)**
+
+例如 number：
+
+```text
+L23 output -1.45 ≈ L24 input -1.45
+L24 output -2.05 ≈ L25 input -2.05
+L25 output -1.33 ≈ L26 input -1.33
+L26 output -0.96 ≈ L27 input -0.96
+```
+
+这直接支持：
+
+```text
+pre-answer causal field 沿 residual stream carry。
+```
+
+4. **L27 output 出现 final re-emergence / readout-boundary amplification**
+
+DS7B：
+
+```text
+number:
+  L27 input -0.96 -> L27 output -2.51
+
+container:
+  L27 input -0.98 -> L27 output -2.66
+
+plant:
+  L27 input -1.21 -> L27 output -2.42
+```
+
+这是 Phase127 的最大新发现。
+
+5. **DS7B 三类的形成曲线不同**
+
+```text
+number:
+  L20-L25 逐步增强，L26-L27 input 衰减，L27 output 重显现。
+
+container:
+  L19-L26 缓慢增强，L27 output 突然大幅增强。
+
+plant:
+  L22-L24 开始，L25-L26 强峰，L27 input 衰减，L27 output 重显现。
+```
+
+### 对 Phase126 的判定更新
+
+Phase126 正确部分：
+
+```text
+强效在 layer_input 已经存在；
+当前层 raw attention/MLP output 很弱；
+机制应转向 residual carry。
+```
+
+Phase127 新增：
+
+```text
+这个 residual carry 不是从很早层就存在；
+它在 DS7B 中后层形成，并在 L27 output/readout boundary 重新放大。
+```
+
+更严格表述：
+
+```text
+DS7B pre-answer causal field has a mid-late onset, residual carry phase, and final output re-emergence.
+```
+
+中文：
+
+```text
+DS7B 的答案前因果场有中后层起点、残差携带阶段、末层输出重显现三个阶段。
+```
+
+### 硬伤分析
+
+1. **只测 L12 起**
+
+虽然 L12-L18 基本弱，但仍未证明 L1-L11 绝对无关。
+
+2. **onset threshold 是经验阈值 -0.5**
+
+不同阈值会改变 onset layer 的精确位置，但不改变中后层增强趋势。
+
+3. **仍是 residual site patch**
+
+没有直接定位导致 onset 的具体模块或 LayerNorm 操作。
+
+4. **L27 output 与 monitor 边界重合**
+
+final re-emergence 很强，但需要进一步确认是否来自 final block residual output、final norm、或 readout coupling。
+
+5. **Qwen3 中层有 residual effects 但 final 弱**
+
+这可能说明它有中层临时 residual field，但没有 DS7B 式 final carry/readout closure。
+
+### 理论进展
+
+当前可以把 DS7B pre-answer causal pathway 分为三段：
+
+```text
+1. Mid-late formation:
+   number/container around L19-L21;
+   plant around L22-L23.
+
+2. Residual carry:
+   layer_output Lk -> layer_input L(k+1)
+   causal field 被残差流携带、增强或衰减。
+
+3. Final re-emergence:
+   L27 input 较弱；
+   L27 output 强烈重新放大并接近 Phase120/122 的 pre-answer residual effect。
+```
+
+这对破解语言编码机制的意义：
+
+```text
+类别信息不是简单由某层某模块一次写入；
+它在中后层形成为 residual causal field，
+沿残差流传递，
+并在读出边界附近被重新对齐/放大。
+```
+
+### 下一阶段任务
+
+Phase128 应做：
+
+```text
+Final Block Re-emergence and Norm/Readout Gateway Test
+```
+
+核心目标：
+
+```text
+解释 L27 output 为什么比 L27 input 强很多。
+```
+
+测试方案：
+
+```text
+1. DS7B 优先，number/container/plant。
+2. 精细拆 L27：
+   - L27 input
+   - L27 attention output
+   - L27 post-attention residual
+   - L27 MLP input
+   - L27 MLP output
+   - L27 block output
+   - final norm output if accessible
+3. 构造 pre-answer category subspace 并 patch。
+4. 监控 final logits 和 answer projection。
+5. 对比：
+   - L26 output
+   - L27 input
+   - L27 output
+   - final norm
+```
+
+Phase128 关键判据：
+
+```text
+如果 L27 block output 强但 final norm 不改变结构，
+则 re-emergence 来自 final block 内部。
+
+如果 final norm output 才强，
+则 normalization/readout gateway 是关键。
+
+如果 L27 MLP output 或 post-MLP residual 是转折点，
+则 final MLP/residual addition 是放大器。
+```
+
+## Phase 128: Boundary Peak Gateway Split 边界峰值层门控拆分 [2026-06-14 21:11]
+
+### 本阶段目标
+
+根据附件分析，Phase127 的判断基本正确：DS7B 的 pre-answer causal field 不是早层长期静态存储，而是中后层形成、沿 residual stream 携带，并在输出边界附近增强。
+
+本阶段先按附件建议拆分所谓 final block / final norm / readout gateway。执行后发现一个关键修正：
+
+```text
+Qwen3 boundary peak = L35, true last = L36
+GLM4 boundary peak = L18, true last = L40
+DS7B boundary peak = L27, true last = L28
+```
+
+因此 Phase127 中的 L27 output 对 DS7B 来说不是模型真实最后一层输出，而是 true last layer L28 的输入。这一点非常关键，不能把 L27 output 直接解释成 final norm/readout 后状态。
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase128_final_block_gateway_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --output-dir results/gpt5_phase128_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase128_final_block_gateway_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase128_final_block_gateway \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase128_final_block_gateway_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase128_final_block_gateway \
+  --hard-exit-after-model
+
+python tests/gpt5/phase128_final_block_gateway_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase128_final_block_gateway \
+  --hard-exit-after-model
+
+python tests/gpt5/phase128_final_block_gateway_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase128_final_block_gateway_cuda.py \
+  tests/gpt5/phase128_final_block_gateway_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase128_final_block_gateway_cuda.py`
+- 汇总脚本：`tests/gpt5/phase128_final_block_gateway_summary.py`
+- Qwen3 结果：`results/gpt5_phase128_final_block_gateway/phase128_qwen3_final_block_gateway.json`
+- GLM4 结果：`results/gpt5_phase128_final_block_gateway/phase128_glm4_final_block_gateway.json`
+- DS7B 结果：`results/gpt5_phase128_final_block_gateway/phase128_deepseek7b_final_block_gateway.json`
+- 跨模型汇总：`results/gpt5_phase128_final_block_gateway/phase128_cross_model_summary.md`
+
+### 测试原理
+
+在 boundary peak layer 上，对 pre-answer tokens 的类别子空间做 subspace removal，比较以下 site：
+
+```text
+block_input
+attention_output
+post_attention_norm_input
+mlp_input
+mlp_output
+block_output
+final_norm_input
+final_norm_output
+```
+
+同时记录 position audit，检查 pre-answer positions 是否包含 answer token。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  block_input target Δ -0.05
+  block_output target Δ -0.07
+  final_norm_input/output target Δ 0.00
+
+container:
+  block_input target Δ -0.04
+  block_output target Δ +0.07
+  final_norm_input/output target Δ 0.00
+
+plant:
+  block_input target Δ +0.27
+  block_output target Δ +0.24
+  final_norm_input/output target Δ 0.00
+```
+
+Qwen3 在 boundary peak 后段没有 DS7B 式强 pre-answer causal field。
+
+#### GLM4
+
+```text
+number:
+  block_input target Δ -0.26
+  block_output target Δ -0.23
+  final_norm_input/output target Δ 0.00
+
+container:
+  block_input target Δ -0.01
+  block_output target Δ +0.00
+  final_norm_input/output target Δ 0.00
+
+plant:
+  block_input target Δ -0.02
+  block_output target Δ -0.01
+  final_norm_input/output target Δ 0.00
+```
+
+Phase128 原始 GLM4 结果较弱，但随后 Phase129 发现 GLM4 旧 answer position 口径存在 left padding mismatch，因此 GLM4 旧结果只能作为低可信参考。
+
+#### DS7B
+
+```text
+number:
+  block_input target Δ -0.96
+  block_output target Δ -2.51
+  final_norm_input/output target Δ 0.00
+
+container:
+  block_input target Δ -0.98
+  block_output target Δ -2.66
+  final_norm_input/output target Δ 0.00
+
+plant:
+  block_input target Δ -1.21
+  block_output target Δ -2.42
+  final_norm_input/output target Δ 0.00
+```
+
+DS7B 的强效应仍然稳定，但 Phase128 暴露了一个解释硬伤：L27 不是 true last layer，不能把 L27 output 直接叫 final block output。
+
+### 阶段判断
+
+Phase128 的正确部分：
+
+```text
+1. DS7B L27 block_output 强效应复现。
+2. pre-answer positions 没有直接包含 answer token。
+3. final_norm_input/output patch 为 0，说明 final norm 后没有跨位置传播。
+```
+
+Phase128 的硬伤：
+
+```text
+1. boundary peak layer 被误称为 final block。
+2. GLM4 使用旧 answer_pos = sum(mask)-1 口径，在 left padding 下不可靠。
+3. 必须用真实最后非 pad token 和真实 batched token grid 重做审计。
+```
+
+因此继续执行 Phase129。
+
+## Phase 129: Position-corrected True Last Gateway Audit 位置修正版真实末层门控审计 [2026-06-14 21:11]
+
+### 本阶段目标
+
+修正 Phase128 暴露的两个问题：
+
+```text
+1. 用真实最后一个非 pad token 作为 answer position。
+2. 在 actual batched token grid 中重新定位 object 后 pre-answer tokens。
+3. 区分 boundary peak layer 与 true last layer。
+```
+
+核心判据：
+
+```text
+如果 peak_block_output == last_block_input 且 last_block_output/final_norm 为 0，
+说明 pre-answer causal field 在 true last layer 输入前有效，
+但通过 true last layer 后不再能以 pre-answer 位置直接影响 answer logits。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --output-dir results/gpt5_phase129_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase129_position_corrected_gateway_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase129_position_corrected_gateway_audit \
+  --hard-exit-after-model
+
+python tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase129_position_corrected_gateway_audit \
+  --hard-exit-after-model
+
+python tests/gpt5/phase129_position_corrected_gateway_audit_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase128_final_block_gateway_cuda.py \
+  tests/gpt5/phase128_final_block_gateway_summary.py \
+  tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py \
+  tests/gpt5/phase129_position_corrected_gateway_audit_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase129_position_corrected_gateway_audit_cuda.py`
+- 汇总脚本：`tests/gpt5/phase129_position_corrected_gateway_audit_summary.py`
+- Qwen3 结果：`results/gpt5_phase129_position_corrected_gateway_audit/phase129_qwen3_position_corrected_gateway_audit.json`
+- GLM4 结果：`results/gpt5_phase129_position_corrected_gateway_audit/phase129_glm4_position_corrected_gateway_audit.json`
+- DS7B 结果：`results/gpt5_phase129_position_corrected_gateway_audit/phase129_deepseek7b_position_corrected_gateway_audit.json`
+- 跨模型汇总：`results/gpt5_phase129_position_corrected_gateway_audit/phase129_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+sites = peak_block_input, peak_block_output, last_block_input, last_block_output, final_norm_input, final_norm_output
+```
+
+真实层位：
+
+```text
+Qwen3: peak L35, true last L36
+GLM4: peak L18, true last L40
+DS7B: peak L27, true last L28
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+position audit:
+  answer_in_pre = 0
+  old_answer_pos_mismatch = 0
+
+number:
+  peak input -0.05
+  peak output -0.07
+  last input -0.07
+  last output 0.00
+  final norm 0.00
+
+container:
+  peak input -0.04
+  peak output +0.07
+  last input +0.07
+  last output 0.00
+  final norm 0.00
+
+plant:
+  peak input +0.27
+  peak output +0.24
+  last input +0.24
+  last output 0.00
+  final norm 0.00
+```
+
+Qwen3 的 boundary peak output 与 true last input 对齐，但效应很弱或为 target-up，不构成强 pre-answer causal pathway。
+
+#### GLM4 bf16
+
+```text
+position audit:
+  number old_answer_pos_mismatch = 32 / 64
+  container old_answer_pos_mismatch = 62 / 64
+  plant old_answer_pos_mismatch = 52 / 64
+```
+
+这说明 GLM4 早前使用旧位置口径的 pre-answer / answer-site 结果存在明显索引风险。
+
+修正后：
+
+```text
+number:
+  peak input -0.47
+  peak output -0.61
+  last input -0.05
+  last output 0.00
+  final norm 0.00
+
+container:
+  peak input -0.26
+  peak output -0.32
+  last input +0.02
+  last output 0.00
+  final norm 0.00
+
+plant:
+  peak input -0.17
+  peak output -0.25
+  last input -0.15
+  last output 0.00
+  final norm 0.00
+```
+
+GLM4 修正后出现比旧结果更清楚的 peak-layer 弱中等效应，尤其 number。但 true last output 与 final norm 仍为 0。
+
+#### DS7B
+
+```text
+position audit:
+  answer_in_pre = 0
+  old_answer_pos_mismatch = 0
+```
+
+核心曲线：
+
+```text
+number:
+  peak input -0.96
+  peak output -2.51
+  last input -2.51
+  last output 0.00
+  final norm 0.00
+
+container:
+  peak input -0.98
+  peak output -2.66
+  last input -2.66
+  last output 0.00
+  final norm 0.00
+
+plant:
+  peak input -1.21
+  peak output -2.42
+  last input -2.42
+  last output 0.00
+  final norm 0.00
+```
+
+这是本轮最关键的客观结果。
+
+### 当前最可靠客观事实
+
+1. **DS7B 的强 pre-answer causal field 位于 true last layer 输入之前**
+
+```text
+peak_block_output L27 == last_block_input L28
+number: -2.51 == -2.51
+container: -2.66 == -2.66
+plant: -2.42 == -2.42
+```
+
+这说明 Phase127 的 L27 output 重显现，准确说是：
+
+```text
+boundary-peak residual field becomes the input consumed by the true last layer.
+```
+
+不是 final norm 后状态。
+
+2. **true last layer output 的 pre-answer patch 为 0**
+
+```text
+DS7B last_block_output:
+  number 0.00
+  container 0.00
+  plant 0.00
+```
+
+这符合 causal transformer 结构：最后一层输出后，pre-answer token 不再通过后续 attention 影响 answer token。
+
+3. **final_norm_input/output 的 pre-answer patch 为 0**
+
+```text
+所有模型所有类别 final norm patch 均为 0.00
+```
+
+这排除了“final norm 自身让 pre-answer 位置继续跨位置影响 answer logits”的解释。
+
+4. **GLM4 旧位置口径存在硬伤**
+
+GLM4 left padding 和特殊 token 使旧口径错位：
+
+```text
+old_answer_pos_mismatch:
+number 32/64
+container 62/64
+plant 52/64
+```
+
+因此 GLM4 之前所有依赖 answer_pos = sum(mask)-1 的绝对结论，需要用 Phase129 的 corrected position 口径复核。
+
+5. **Qwen3/DS7B 旧位置口径在本测试中没有 mismatch**
+
+```text
+Qwen3 mismatch = 0
+DS7B mismatch = 0
+```
+
+因此 DS7B Phase126/127 的核心曲线不是 padding 错位造成的。
+
+### 对 Phase127 附件分析的判定
+
+正确部分：
+
+```text
+1. DS7B 确实存在 mid-late formation、residual carry、boundary re-emergence。
+2. L27 output 强于 L27 input 的现象真实复现。
+3. 需要拆 final block / final norm / readout gateway 的方向正确。
+```
+
+需要修正部分：
+
+```text
+1. DS7B L27 不是 true final block，而是 true last L28 的输入前一层。
+2. final re-emergence 应改称 boundary-peak re-emergence 或 pre-last-layer gateway。
+3. final norm/readout gateway 不是 pre-answer 跨位置因果效应来源。
+```
+
+### 理论进展
+
+当前更准确的结构是：
+
+```text
+1. 中后层形成 category residual causal field。
+2. 该 field 沿 residual stream 携带。
+3. 在 true last layer 前的 boundary peak layer 输出处变强。
+4. true last layer 的 answer token 可以通过 attention 读取这些 pre-answer residual states。
+5. true last layer 输出之后，pre-answer token 不再能改变 answer logits。
+```
+
+因此，Phase127 的公式应修正为：
+
+```text
+R_c^{l+1}(P)
+=
+T_l(R_c^l(P))
++ U_l^{write}(P)
++ η_l
+```
+
+并在输出端加入：
+
+```text
+A_c^{L}(answer)
+=
+ReadLastLayer(
+  h_answer^{L-1},
+  R_c^{L-1}(P)
+)
+```
+
+其中：
+
+```text
+R_c^{L-1}(P):
+  true last layer 输入前的 pre-answer residual causal field
+
+ReadLastLayer:
+  true last layer 内部把 pre-answer field 转换到 answer token / logits 的读取算子
+```
+
+这比“final norm/readout 直接放大 pre-answer field”更符合 Phase129 结果。
+
+### 硬伤和瓶颈
+
+1. **GLM4 历史结果需要重审**
+
+只要旧脚本使用 `attention_mask.sum(dim=1)-1` 并且直接用未加特殊 token 的位置索引，就可能在 GLM4 上错位。后续跨模型脚本必须统一使用 corrected token grid。
+
+2. **DS7B 的 true last layer 内部读取机制尚未定位**
+
+Phase129 说明强场在 L28 input 有效，但 L28 output pre-answer 无效。下一步必须研究：
+
+```text
+L28 attention at answer token 是否读取 L27/L28 input 的 pre-answer field。
+```
+
+3. **当前只测 subspace removal，不测生成**
+
+logits 现象已经稳定，但还没有真实 generation audit。
+
+4. **center-vs-others 子空间仍可能混入竞争方向**
+
+plant 的 release 很强，说明 target-down 之外仍有 competitor release / interface 成分。
+
+### 下一阶段大任务
+
+Phase130 应做：
+
+```text
+True Last Attention Read Gateway Mapping
+```
+
+目标不是再泛泛拆模块，而是直接验证：
+
+```text
+DS7B L28 answer token 是否通过 attention 从 pre-answer tokens 读取 L27/L28 input 的 category causal field。
+```
+
+测试方案：
+
+```text
+1. 使用 Phase129 corrected position 口径。
+2. 固定 DS7B 优先，同时保留 Qwen3/GLM4 对照。
+3. 在 true last layer 做 answer-token attention output patch，而不是 pre-answer output patch。
+4. 分 head 测：
+   - patch attention value/write at answer token
+   - patch attention output head slice at answer token
+   - mask or replace attention contribution from pre-answer tokens to answer token if implementation permits
+5. 比较：
+   - peak_block_output / last_block_input subspace
+   - true last attention output at answer token
+   - true last MLP input/output at answer token
+6. 对 DS7B number/container/plant 使用 train 8, test 16 起步；关键 head 命中后扩大到 train 12, test 24。
+```
+
+关键判据：
+
+```text
+如果 true last attention answer-site patch 能复现 L28 input 的 target-down，
+则可确认 pre-answer residual field 通过最后一层 attention 被读到 answer token。
+
+如果 attention 不强而 MLP/answer residual 强，
+则最后一层可能是 answer-site nonlinear readout，而不是跨位置读取。
+```
+
+## Phase 130: True Last Attention Read Gateway Mapping 真实末层读取门控定位 [2026-06-14 21:31]
+
+### 本阶段目标
+
+根据附件判断，Phase128/129 的修正是正确的：DS7B 的强 pre-answer causal field 不在 final norm 后继续跨位置传播，而是在 true last layer input 之前达到强状态。真正问题变成：
+
+```text
+true last layer 的 answer token 是否通过 attention / MLP / residual update
+把 pre-answer residual field 转换为 answer-site readout field。
+```
+
+本阶段测试两个对象：
+
+```text
+1. answer-site components:
+   last_attention_output_answer
+   last_mlp_input_answer
+   last_mlp_output_answer
+   last_block_output_answer
+   final_norm_output_answer
+
+2. true last layer attention heads:
+   按 answer token 对 pre-answer tokens 的 attention mass 选 top heads，
+   在 o_proj input head slice 上做 answer-position head ablation。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --top-k-heads 2 \
+  --output-dir results/gpt5_phase130_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase130_true_last_attention_read_gateway \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase130_true_last_attention_read_gateway \
+  --hard-exit-after-model
+
+python tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase130_true_last_attention_read_gateway \
+  --hard-exit-after-model
+
+python tests/gpt5/phase130_true_last_attention_read_gateway_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py \
+  tests/gpt5/phase130_true_last_attention_read_gateway_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py`
+- 汇总脚本：`tests/gpt5/phase130_true_last_attention_read_gateway_summary.py`
+- Qwen3 结果：`results/gpt5_phase130_true_last_attention_read_gateway/phase130_qwen3_true_last_attention_read_gateway.json`
+- GLM4 结果：`results/gpt5_phase130_true_last_attention_read_gateway/phase130_glm4_true_last_attention_read_gateway.json`
+- DS7B 结果：`results/gpt5_phase130_true_last_attention_read_gateway/phase130_deepseek7b_true_last_attention_read_gateway.json`
+- 跨模型汇总：`results/gpt5_phase130_true_last_attention_read_gateway/phase130_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+top heads/category = 8
+```
+
+真实层位：
+
+```text
+Qwen3: peak L35, true last L36
+GLM4: peak L18, true last L40
+DS7B: peak L27, true last L28
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+reference last_input_pre_answer:
+  number -0.07
+  container +0.07
+  plant +0.24
+
+best answer-site local component:
+  number last_mlp_output_answer -8.91
+  container last_mlp_output_answer -4.54
+  plant last_mlp_output_answer -8.35
+
+best top-head ablation:
+  number H5 pre_mass 0.408 target Δ -0.06
+  container H16 pre_mass 0.228 target Δ -0.02
+  plant H2 pre_mass 0.308 target Δ -0.01
+```
+
+Qwen3 的 pre-answer reference 很弱，但 answer-site local MLP/block/final-norm 子空间很强。这说明 Qwen3 更像 answer-site readout/local computation，而不是强 pre-answer carry。
+
+#### GLM4 bf16
+
+```text
+reference last_input_pre_answer:
+  number -0.05
+  container +0.02
+  plant -0.15
+
+best answer-site local component:
+  number last_mlp_output_answer -1.13
+  container last_mlp_input_answer -0.26
+  plant last_block_output_answer -0.53
+
+best top-head ablation:
+  number H26 pre_mass 0.724 target Δ -0.01
+  container H27 pre_mass 0.475 target Δ -0.01
+  plant H8 pre_mass 0.454 target Δ -0.02
+```
+
+GLM4 仍然有 corrected position 下的 old mismatch：
+
+```text
+number 32/64
+container 62/64
+plant 52/64
+```
+
+因此 GLM4 的旧结论必须降级；本轮修正后显示 true last answer-site component 有弱到中等信号，但 top single head ablation 仍然弱。
+
+#### DS7B
+
+```text
+reference last_input_pre_answer:
+  number -2.51
+  container -2.66
+  plant -2.42
+
+last_attention_output_answer:
+  number -5.09
+  container -4.83
+  plant -4.16
+
+last_mlp_input_answer:
+  number -2.78
+  container -8.21
+  plant -3.63
+
+last_mlp_output_answer:
+  number -9.40
+  container -11.45
+  plant -7.67
+
+last_block_output_answer:
+  number -11.98
+  container -11.33
+  plant -9.62
+
+final_norm_output_answer:
+  number -7.82
+  container -6.44
+  plant -5.63
+```
+
+DS7B answer-site local components 非常强，尤其：
+
+```text
+last_block_output_answer:
+  number -11.98
+  container -11.33
+  plant -9.62
+```
+
+但 top single head ablation 很弱：
+
+```text
+number H8 pre_mass 0.615 target Δ -0.25
+container H25 pre_mass 0.413 target Δ -0.11
+plant H8 pre_mass 0.580 target Δ -0.28
+```
+
+### 当前客观事实
+
+1. **DS7B answer-site readout field 极强**
+
+真实最后层的 answer token 上，attention output、MLP input/output、block output、final norm output 都可因果打掉类别 logits。
+
+2. **单个 high-attention-mass head 不是主因**
+
+即使 head 对 pre-answer region 有很高 attention mass：
+
+```text
+DS7B H8 pre_mass 0.615 / 0.580
+```
+
+单头 ablation 也只产生小 target-down：
+
+```text
+number -0.25
+plant -0.28
+```
+
+这说明最后读取机制不是一个简单“单头搬运器”，更可能是多头分布式读取、attention 后残差合成、或 MLP/answer-site 非线性重编码。
+
+3. **Qwen3 与 DS7B 形成对比**
+
+Qwen3 pre-answer reference 很弱，但 answer-site MLP/output patch 强，说明它更偏答案位置局部读出，而不是 DS7B 式强 pre-answer carry。
+
+### 硬伤
+
+Phase130 使用的是各 answer-site component 自己的 local category basis。因此强 target-down 只能说明：
+
+```text
+answer-site component 中存在强类别读出子空间。
+```
+
+不能直接证明：
+
+```text
+这个子空间就是 pre-answer residual field 的同一方向搬运结果。
+```
+
+因此继续做 Phase131 cross-site basis transfer。
+
+## Phase 131: Cross-site Basis Transfer 跨位点同基底转移测试 [2026-06-14 21:31]
+
+### 本阶段目标
+
+Phase130 证明 DS7B answer-site local basis 很强，但还不能证明 true last layer 把 pre-answer field 以同一坐标搬到 answer token。
+
+本阶段使用更严格判据：
+
+```text
+用 true-last input pre-answer basis，
+直接 patch answer-site components。
+```
+
+如果同一 basis 在 answer-site attention / MLP / block / final norm 上仍强 target-down，说明 pre-answer field 坐标保留较多。
+
+如果同一 basis 在 answer site 弱或反向，但 local answer basis 很强，说明最后一层读取后发生了坐标变换。
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase131_cross_site_basis_transfer_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --output-dir results/gpt5_phase131_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase131_cross_site_basis_transfer_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase131_cross_site_basis_transfer \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase131_cross_site_basis_transfer_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase131_cross_site_basis_transfer \
+  --hard-exit-after-model
+
+python tests/gpt5/phase131_cross_site_basis_transfer_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase131_cross_site_basis_transfer \
+  --hard-exit-after-model
+
+python tests/gpt5/phase131_cross_site_basis_transfer_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase130_true_last_attention_read_gateway_cuda.py \
+  tests/gpt5/phase130_true_last_attention_read_gateway_summary.py \
+  tests/gpt5/phase131_cross_site_basis_transfer_cuda.py \
+  tests/gpt5/phase131_cross_site_basis_transfer_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase131_cross_site_basis_transfer_cuda.py`
+- 汇总脚本：`tests/gpt5/phase131_cross_site_basis_transfer_summary.py`
+- Qwen3 结果：`results/gpt5_phase131_cross_site_basis_transfer/phase131_qwen3_cross_site_basis_transfer.json`
+- GLM4 结果：`results/gpt5_phase131_cross_site_basis_transfer/phase131_glm4_cross_site_basis_transfer.json`
+- DS7B 结果：`results/gpt5_phase131_cross_site_basis_transfer/phase131_deepseek7b_cross_site_basis_transfer.json`
+- 跨模型汇总：`results/gpt5_phase131_cross_site_basis_transfer/phase131_cross_model_summary.md`
+
+### 客观结果
+
+#### Qwen3 same pre-answer basis
+
+```text
+reference:
+  number -0.07
+  container +0.07
+  plant +0.24
+
+attention answer:
+  number -0.10
+  container -0.02
+  plant -0.19
+
+best same-basis answer component:
+  number last_mlp_input_answer -0.30
+  container last_attention_output_answer -0.02
+  plant last_mlp_input_answer -0.28
+```
+
+Qwen3 没有强 pre-answer basis transfer。
+
+#### GLM4 same pre-answer basis
+
+```text
+reference:
+  number -0.05
+  container +0.02
+  plant -0.15
+
+attention answer:
+  number -0.10
+  container -0.17
+  plant -0.08
+
+best same-basis answer component:
+  number last_mlp_output_answer -0.94
+  container last_mlp_output_answer -0.34
+  plant final_norm_output_answer -2.28
+```
+
+GLM4 的 same-basis 结果不稳定，且仍有 old position mismatch。不能用它作为主要理论依据。
+
+#### DS7B same pre-answer basis
+
+```text
+reference last_input_pre_answer:
+  number -2.51
+  container -2.66
+  plant -2.42
+
+attention answer with same pre-answer basis:
+  number +1.26
+  container +0.26
+  plant +1.44
+
+mlp input answer:
+  number -0.43
+  container -0.03
+  plant +1.72
+
+mlp output answer:
+  number +0.14
+  container +0.38
+  plant -0.24
+
+block output answer:
+  number -0.48
+  container +0.85
+  plant -0.69
+
+final norm answer:
+  number +1.59
+  container -0.05
+  plant +1.06
+```
+
+这是本阶段最关键结果：
+
+```text
+DS7B pre-answer basis 在 last_input_pre_answer 上强 target-down；
+但同一 basis 到 answer-site attention output 后不但不 target-down，反而 target-up。
+```
+
+与 Phase130 对比：
+
+```text
+Phase130 local answer basis:
+  DS7B attention answer number -5.09
+  DS7B block output answer number -11.98
+
+Phase131 same pre-answer basis:
+  DS7B attention answer number +1.26
+  DS7B block output answer number -0.48
+```
+
+因此，answer-site 强类别场不是 pre-answer basis 的简单同方向搬运。
+
+### 当前最可靠客观事实
+
+1. **DS7B pre-answer field 与 answer-site field 坐标不同**
+
+同一个 pre-answer basis：
+
+```text
+pre-answer site 强 target-down
+answer-site attention output 弱或反向
+```
+
+说明 true last layer 的读取不是简单复制方向，而是发生了显著 coordinate transform。
+
+2. **DS7B true last answer-site local basis 非常强**
+
+Phase130 已证明：
+
+```text
+last_attention_output_answer / last_mlp_output_answer / last_block_output_answer
+都有强 target-down。
+```
+
+Phase131 则证明：
+
+```text
+这些强轴是 answer-site local axes，不是原 pre-answer basis 原样保留。
+```
+
+3. **单头 attention mass 不能解释主效应**
+
+高 pre-answer attention mass head 的 ablation 弱，说明最后读取路径可能是：
+
+```text
+multi-head distributed read
+attention mixing + MLP recoding
+residual-to-answer coordinate transform
+```
+
+而不是单个 head 的线性搬运。
+
+### 理论进展
+
+Phase129 后的理论是：
+
+```text
+R_c^{L-1}(P)
+  true-last input pre-answer residual causal field
+
+A_c^L(a)
+  true-last output answer-site readout field
+```
+
+Phase130/131 后要加入一个关键中间算子：
+
+```text
+Φ_L:
+  true-last read-and-recode operator
+```
+
+更准确公式：
+
+```text
+A_c^L(a)
+=
+Φ_L(
+  R_c^{L-1}(P),
+  h_{L-1}(a),
+  context
+)
+```
+
+并且：
+
+```text
+Basis(A_c^L(a)) ≠ Basis(R_c^{L-1}(P))
+```
+
+也就是说，最后一层不是把答案前残差场按同一方向搬到答案位置，而是读取后重编码为 answer-site local readout coordinates。
+
+### 硬伤和瓶颈
+
+1. **还没有直接做 source-token-specific attention value patch**
+
+Phase130 的 head ablation 是按 head output slice 消融，不区分该 head 从哪些 source tokens 读取。下一步需要更细：
+
+```text
+只干预 true last attention 中 answer token 从 pre-answer tokens 得到的 value contribution。
+```
+
+2. **attention 权重高不等于 value 因果强**
+
+Phase130 已说明 high attention mass head ablation 弱。下一步必须测 value contribution，而不是只看 attention mass。
+
+3. **answer-site local basis 太强，容易掩盖转移路径**
+
+Phase130 的 local answer basis 能强烈影响 logits，但它更像结果态，不是路径解释。
+
+4. **GLM4 仍需 corrected-position 专项复核**
+
+GLM4 不能作为当前理论主支撑，只能作为提示：位置口径修正后它可能有弱中等信号。
+
+### 下一阶段大任务
+
+Phase132 应做：
+
+```text
+True Last Source-specific Value Contribution Test
+```
+
+核心目标：
+
+```text
+在 true last layer 中，
+只干预 answer token 从 pre-answer tokens 读取到的 attention value contribution，
+而不是消融整个 head。
+```
+
+测试要求：
+
+```text
+1. 使用 corrected token grid。
+2. DS7B 优先，同时保留 Qwen3/GLM4 对照。
+3. 对 top attention-mass heads 和全 head aggregate 都测试。
+4. 构造 source groups:
+   - object_span
+   - post_object_pre_answer
+   - all_pre_answer
+   - self
+5. 对 answer token attention output 分解 source contribution：
+   contribution(source) = attention_weight(answer, source) * value(source)
+6. 移除或替换 source contribution，再测 logits。
+```
+
+关键判据：
+
+```text
+如果移除 all_pre_answer value contribution 能接近 reference last_input_pre_answer target-down，
+则最后读取路径主要是 attention value read。
+
+如果 source-specific value contribution 仍弱，
+则要转向 residual/MLP 的 answer-site reconstruction 或多层非局部坐标解释。
+```
+
+## Phase 132: True Last Source-specific Value Contribution 真实末层来源值贡献测试 [2026-06-14 22:01]
+
+### 本阶段目标
+
+附件对 Phase130/131 的判断基本正确：
+
+```text
+pre-answer residual field 强；
+answer-site local readout field 强；
+二者不是同一坐标；
+true last layer 中存在 read-and-recode operator。
+```
+
+Phase130 的硬伤是 head ablation 过粗：消融整个 head，不能区分该 head 从哪个 source token 读取。Phase131 的硬伤是 same-basis transfer 只能判断坐标是否保留，不能直接测 value path。
+
+本阶段直接测试：
+
+```text
+answer token 在 true last attention 中
+从不同 source group 读取的 value contribution
+是否具有因果作用。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase132_source_value_contribution_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --top-k-heads 2 \
+  --output-dir results/gpt5_phase132_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase132_source_value_contribution_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase132_source_value_contribution \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase132_source_value_contribution_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase132_source_value_contribution \
+  --hard-exit-after-model
+
+python tests/gpt5/phase132_source_value_contribution_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase132_source_value_contribution \
+  --hard-exit-after-model
+
+python tests/gpt5/phase132_source_value_contribution_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase132_source_value_contribution_cuda.py \
+  tests/gpt5/phase132_source_value_contribution_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase132_source_value_contribution_cuda.py`
+- 汇总脚本：`tests/gpt5/phase132_source_value_contribution_summary.py`
+- Qwen3 结果：`results/gpt5_phase132_source_value_contribution/phase132_qwen3_source_value_contribution.json`
+- GLM4 结果：`results/gpt5_phase132_source_value_contribution/phase132_glm4_source_value_contribution.json`
+- DS7B 结果：`results/gpt5_phase132_source_value_contribution/phase132_deepseek7b_source_value_contribution.json`
+- 跨模型汇总：`results/gpt5_phase132_source_value_contribution/phase132_cross_model_summary.md`
+
+### 测试原理
+
+对 true last layer attention 做两次 forward：
+
+```text
+1. 第一次 forward:
+   capture true last attention weights
+   capture v_proj output values
+
+2. 计算 answer token 从 source group 得到的 pre-o_proj contribution:
+   contribution(source)
+   =
+   attention_weight(answer, source) * value(source)
+
+3. 第二次 forward:
+   在 o_proj input 中，只从 answer token 的指定 head slice 减去该 source contribution。
+
+4. 测 final logits 和 answer projection。
+```
+
+source groups：
+
+```text
+object_span
+post_object_pre_answer
+all_pre_answer
+self
+```
+
+head modes：
+
+```text
+all_heads
+top_heads
+```
+
+其中 top_heads 是按 answer token 对 pre-answer tokens 的 attention mass 选出的 top 8 heads。
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+batch size = 16
+reference scale = 1.5
+contribution scale = 1.0
+top heads = 8
+```
+
+真实层位与 head 结构：
+
+```text
+Qwen3:
+  peak L35, true last L36
+  heads 32, kv_heads 8
+
+GLM4:
+  peak L18, true last L40
+  heads 32, kv_heads 2
+
+DS7B:
+  peak L27, true last L28
+  heads 28, kv_heads 4
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+reference last_input_pre_answer:
+  number -0.07
+  container +0.07
+  plant +0.24
+
+all_pre_answer all_heads:
+  number +0.24
+  container +0.13
+  plant +0.30
+
+post_object_pre_answer all_heads:
+  number +0.03
+  container +0.08
+  plant +0.23
+
+object_span all_heads:
+  number +0.02
+  container +0.02
+  plant +0.04
+
+self all_heads:
+  number +0.86
+  container +0.46
+  plant +0.14
+```
+
+Qwen3 没有 DS7B 式 pre-answer value contribution target-down；相反 all_pre/self 多为 target-up 或弱效应。
+
+#### GLM4 bf16
+
+```text
+position mismatch:
+  number 32/64
+  container 62/64
+  plant 52/64
+
+reference last_input_pre_answer:
+  number -0.05
+  container +0.02
+  plant -0.14
+
+all_pre_answer all_heads:
+  number -0.05
+  container +0.21
+  plant +0.22
+```
+
+GLM4 在 corrected position 下仍没有稳定强 source-value path。由于 left padding mismatch 历史问题，GLM4 暂不作为主要理论依据。
+
+#### DS7B
+
+```text
+reference last_input_pre_answer:
+  number -2.36
+  container -2.44
+  plant -2.17
+
+all_pre_answer all_heads:
+  number -1.86
+  container -2.65
+  plant -2.01
+
+post_object_pre_answer all_heads:
+  number -0.34
+  container -0.21
+  plant -0.50
+
+object_span all_heads:
+  number -0.07
+  container -0.02
+  plant -0.05
+
+self all_heads:
+  number -0.36
+  container -0.10
+  plant -0.10
+
+all_pre_answer top_heads:
+  number -0.27
+  container -0.10
+  plant -0.38
+```
+
+这是本阶段最关键结果：
+
+```text
+DS7B all_pre_answer all_heads value contribution removal
+接近复现 reference last_input_pre_answer target-down。
+```
+
+对照：
+
+```text
+number:
+  reference -2.36
+  all_pre all_heads -1.86
+
+container:
+  reference -2.44
+  all_pre all_heads -2.65
+
+plant:
+  reference -2.17
+  all_pre all_heads -2.01
+```
+
+而更窄的 source group 明显弱：
+
+```text
+object_span all_heads:
+  around 0
+
+post_object_pre_answer all_heads:
+  weak -0.21 to -0.50
+
+self all_heads:
+  weak
+```
+
+top heads aggregate 也弱：
+
+```text
+all_pre_answer top_heads:
+  number -0.27
+  container -0.10
+  plant -0.38
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B true last layer 的关键读取路径是 all_pre_answer value contribution 的全头聚合**
+
+不是 object token 单独贡献，也不是 post-object tokens 单独贡献，也不是 self token 单独贡献。
+
+```text
+all_pre_answer all_heads ≈ reference last_input_pre_answer
+```
+
+2. **top attention-mass heads 不能解释主效应**
+
+Phase130 的单头 ablation 弱，Phase132 的 top_heads aggregate 也弱：
+
+```text
+DS7B all_pre top_heads:
+  number -0.27
+  container -0.10
+  plant -0.38
+```
+
+说明强路径不是少数 high-mass heads，而是全头分布式 value aggregation。
+
+3. **object_span 不是主读取来源**
+
+```text
+DS7B object_span all_heads:
+  number -0.07
+  container -0.02
+  plant -0.05
+```
+
+类别因果信号不是只在 object token 上被最后一层读取，而是分布在 answer 前整个上下文区域。
+
+4. **post_object_pre_answer 有弱贡献但远小于 all_pre_answer**
+
+```text
+post_object_pre_answer:
+  number -0.34
+  container -0.21
+  plant -0.50
+```
+
+说明对象后的模板词有贡献，但不能独立解释主效应。
+
+### 理论进展
+
+Phase131 的公式是：
+
+```text
+A_c^L(a)
+=
+Φ_L(
+  R_c^{L-1}(P),
+  h_{L-1}(a),
+  context
+)
+```
+
+Phase132 进一步把 Φ_L 的关键项实证化：
+
+```text
+Φ_L 主要包含 true-last attention 的 all-pre-token value aggregation。
+```
+
+更具体：
+
+```text
+A_c^L(a)
+≈
+Recode_L(
+  Σ_{h∈all heads}
+  Σ_{s∈all pre-answer}
+  α_h(a,s) V_h(s)
+)
+```
+
+其中：
+
+```text
+α_h(a,s):
+  true last layer 中 answer token 对 source token s 的 attention weight
+
+V_h(s):
+  source token s 在 head h 的 value vector
+
+Recode_L:
+  o_proj + residual + MLP + norm 形成的 answer-site 重编码过程
+```
+
+这说明语言编码机制中的类别约束不是单点向量，也不是单头搬运，而是：
+
+```text
+distributed pre-answer value field
+通过 true last attention 全头聚合
+进入 answer-site readout/recode state。
+```
+
+### 硬伤和瓶颈
+
+1. **all_pre_answer 是宽 source group**
+
+它证明了全答案前区域整体重要，但还没有分解出更细的 source 组合：
+
+```text
+pre_object tokens
+object tokens
+post_object tokens
+template structural tokens
+special tokens
+```
+
+2. **移除 contribution 是基于第一次 forward 的 attention/value**
+
+第二次 forward 中前层状态可能因 hook 变化而略有差异。不过 hook 只发生在 true last o_proj input，前面的 attention/value 计算应保持一致，因此这个近似较强。
+
+3. **没有逐 head contribution 组合搜索**
+
+top attention-mass heads 弱，但不排除因果强 head 不等于 attention-mass top head。下一步要按 contribution ablation effect 直接选 head。
+
+4. **还没有 generation audit**
+
+当前仍是 DCF logits。关键路径已经接近闭合，后续需要验证生成行为是否同步改变。
+
+### 对附件判断的修正与确认
+
+附件判断中正确部分：
+
+```text
+1. Phase130/131 正确说明 pre-answer field 和 answer-site field 坐标不同。
+2. true last read-and-recode operator 是当前核心对象。
+3. 单头搬运假说不可靠。
+4. 下一步应测 source-specific value contribution。
+```
+
+Phase132 的新增修正：
+
+```text
+1. read-and-recode operator 的关键输入不是 object token 单独贡献，
+   而是 all_pre_answer value contribution 的全头聚合。
+
+2. top attention-mass heads 仍不能解释主效应，
+   因此 attention mass 不能作为 causal head selection 的主标准。
+
+3. DS7B 的类别约束场更像分布式上下文场，
+   而不是对象词位置上的静态概念向量。
+```
+
+### 下一阶段大任务
+
+Phase133 应做：
+
+```text
+True Last Value Contribution Head Effect Ranking
+```
+
+核心目标：
+
+```text
+不用 attention mass 选 head，
+而是直接按 source-value contribution removal 的 target_delta 选 head。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B number/container/plant。
+2. 对 true last layer 每个 head 单独移除 all_pre_answer value contribution。
+3. 排名每个 head 的 target_delta、release_delta、answer_proj_delta。
+4. 再测试 top causal heads aggregate：
+   top1, top2, top4, top8, all_heads。
+5. 对 Qwen3/GLM4 做同脚本对照，但 DS7B 是主对象。
+```
+
+关键判据：
+
+```text
+如果少数 causal heads aggregate 接近 all_heads，
+说明是稀疏 head set，只是不能用 attention mass 找到。
+
+如果 top causal heads 仍需很多 head 才接近 all_heads，
+说明 true last read path 是真正分布式多头聚合。
+```
+
+## Phase 133: True Last Value Contribution Head Effect Ranking 真实末层值贡献头效应排名 [2026-06-14 22:27]
+
+### 本阶段目标
+
+附件对 Phase132 的判断基本正确：
+
+```text
+DS7B 的 true-last read path 不是 object_span 单点，
+也不是 attention-mass top heads，
+而是 all_pre_answer value contribution 的多头聚合。
+```
+
+Phase132 仍留下一个问题：
+
+```text
+all_heads 强，top attention-mass heads 弱。
+但是否存在 top causal heads？
+```
+
+本阶段不再按 attention mass 选 head，而是：
+
+```text
+对 true last layer 每个 head 单独移除 all_pre_answer value contribution，
+按 target_delta 排名，
+再测试 top1/top2/top4/top8/all_heads 聚合。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase133_value_head_effect_ranking_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number \
+  --output-dir results/gpt5_phase133_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase133_value_head_effect_ranking_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase133_value_head_effect_ranking \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase133_value_head_effect_ranking_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase133_value_head_effect_ranking \
+  --hard-exit-after-model
+
+python tests/gpt5/phase133_value_head_effect_ranking_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 16 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase133_value_head_effect_ranking \
+  --hard-exit-after-model
+
+python tests/gpt5/phase133_value_head_effect_ranking_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase133_value_head_effect_ranking_cuda.py \
+  tests/gpt5/phase133_value_head_effect_ranking_summary.py
+```
+
+### 生成脚本与结果
+
+- 主脚本：`tests/gpt5/phase133_value_head_effect_ranking_cuda.py`
+- 汇总脚本：`tests/gpt5/phase133_value_head_effect_ranking_summary.py`
+- Qwen3 结果：`results/gpt5_phase133_value_head_effect_ranking/phase133_qwen3_value_head_effect_ranking.json`
+- GLM4 结果：`results/gpt5_phase133_value_head_effect_ranking/phase133_glm4_value_head_effect_ranking.json`
+- DS7B 结果：`results/gpt5_phase133_value_head_effect_ranking/phase133_deepseek7b_value_head_effect_ranking.json`
+- 跨模型汇总：`results/gpt5_phase133_value_head_effect_ranking/phase133_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+batch size = 16
+source group = all_pre_answer
+reference scale = 1.5
+contribution scale = 1.0
+```
+
+真实层位：
+
+```text
+Qwen3: peak L35, true last L36, heads 32, kv_heads 8
+GLM4: peak L18, true last L40, heads 32, kv_heads 2
+DS7B: peak L27, true last L28, heads 28, kv_heads 4
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+reference:
+  number -0.07
+  container +0.07
+  plant +0.24
+
+best single causal head:
+  number H11 -0.08
+  container H11 -0.07
+  plant H11 -0.09
+
+top causal aggregate:
+  number top8 -0.25, all_heads +0.24
+  container top8 -0.19, all_heads +0.13
+  plant top8 -0.26, all_heads +0.30
+```
+
+Qwen3 的 causal-selected heads 与 all_heads 方向相反，说明它不是 DS7B 式 all_pre value read path。
+
+#### GLM4 bf16
+
+```text
+reference:
+  number -0.05
+  container +0.02
+  plant -0.14
+
+best single causal head:
+  number H1 -0.03
+  container H0 -0.05
+  plant H18 -0.03
+
+top causal aggregate:
+  number top8 -0.11, all_heads -0.05
+  container top8 -0.19, all_heads +0.21
+  plant top8 -0.15, all_heads +0.22
+```
+
+GLM4 仍受 left padding old-mismatch 历史问题影响，不作为主要理论依据。
+
+#### DS7B
+
+```text
+reference:
+  number -2.36
+  container -2.44
+  plant -2.17
+
+best single causal head:
+  number H13 -0.28
+  container H13 -0.41
+  plant H13 -0.29
+```
+
+H13 在三个类别中都是 best single head，这是一个非常强的稳定信号。
+
+DS7B top causal aggregate：
+
+```text
+number:
+  top1 -0.28
+  top2 -0.91
+  top4 -1.41
+  top8 -2.16
+  all_heads -1.86
+
+container:
+  top1 -0.41
+  top2 -0.74
+  top4 -1.90
+  top8 -2.31
+  all_heads -2.65
+
+plant:
+  top1 -0.29
+  top2 -0.53
+  top4 -1.15
+  top8 -1.52
+  all_heads -2.01
+```
+
+DS7B top causal head ids：
+
+```text
+number top8:
+  H13, H12, H8, H11, H7, H25, H10, H21
+
+container top8:
+  H13, H10, H12, H11, H25, H26, H8, H24
+
+plant top8:
+  H13, H8, H12, H11, H26, H24, H25, H23
+```
+
+跨类别稳定核心：
+
+```text
+H13, H12, H11, H8, H25
+```
+
+### 当前最可靠客观事实
+
+1. **attention mass 不是因果 head 排名标准**
+
+Phase132 的 attention-mass top heads 很弱；Phase133 的 causal-ranked heads 明显更强。
+
+2. **DS7B 存在稳定 causal head set**
+
+不是单头：
+
+```text
+best single head 只有 -0.28 到 -0.41。
+```
+
+但也不是完全均匀 all-head 分布：
+
+```text
+top4/top8 已经接近 all_heads。
+```
+
+尤其：
+
+```text
+number top8 -2.16, all_heads -1.86
+container top8 -2.31, all_heads -2.65
+plant top8 -1.52, all_heads -2.01
+```
+
+3. **H13 是跨类别最稳定的入口 head**
+
+三个类别 best single head 都是 H13：
+
+```text
+number H13
+container H13
+plant H13
+```
+
+这说明 true last read path 中可能存在一个稳定 gate-like head，但它单独不够强，必须与其他 heads 聚合。
+
+4. **true last read path 是中等稀疏的多头聚合**
+
+Phase132 的“全头分布式”需要修正为：
+
+```text
+不是少数 1-2 个 head；
+也不是 28 个 head 完全均匀；
+而是约 4-8 个 causal heads 形成主聚合通道。
+```
+
+### 理论进展
+
+Phase132 公式：
+
+```text
+A_c^L(a)
+≈
+Recode_L(
+  Σ_{h∈all heads}
+  Σ_{s∈all pre-answer}
+  α_h(a,s) V_h(s)
+)
+```
+
+Phase133 修正为：
+
+```text
+A_c^L(a)
+≈
+Recode_L(
+  Σ_{h∈H_causal}
+  Σ_{s∈all pre-answer}
+  α_h(a,s) V_h(s)
+  +
+  background
+)
+```
+
+其中：
+
+```text
+H_causal:
+  true-last all_pre_answer value contribution 的因果头集合
+
+DS7B H_causal 约包含:
+  H13, H12, H11, H8, H25, H10/H26/H24...
+```
+
+这比 Phase132 更精确：
+
+```text
+关键机制不是 attention-mass top heads，
+而是 causal value-contribution heads。
+```
+
+### 对附件判断的确认与修正
+
+附件正确部分：
+
+```text
+1. Phase132 正确定位 all_pre_answer value aggregation。
+2. object token 单点模型被否定。
+3. high-attention-head 模型被否定。
+4. 概念约束更像分布式上下文场。
+```
+
+Phase133 新增修正：
+
+```text
+1. all_heads 强不等于完全均匀分布。
+2. 按真实 value contribution 因果效应排名后，存在稳定 causal head set。
+3. H13 是 DS7B true last read path 的跨类别核心候选头。
+4. top causal 4/8 接近 all_heads，因此下一步要分析 causal head set 的 source composition 和 value geometry。
+```
+
+### 硬伤和瓶颈
+
+1. **仍只测试 all_pre_answer，不知道 causal heads 具体读哪些 token**
+
+Phase133 确定了 head set，但没分解每个 causal head 的 source token 结构。
+
+2. **没有测试 head interaction**
+
+top-k 聚合不等于简单相加，可能存在 head 之间的协同或抵消。
+
+3. **没有扩大数据量复验 H13**
+
+H13 跨三类稳定，但仍需更大 train/test 和更多类别验证。
+
+4. **没有 generation audit**
+
+当前还是 DCF logits。
+
+### 下一阶段大任务
+
+Phase134 应做：
+
+```text
+Causal Head Source Composition and Expansion Audit
+```
+
+核心目标：
+
+```text
+验证 H13/H12/H11/H8/H25 等 causal heads 到底读取 all_pre_answer 中哪些细分 token，
+并扩大类别与样本确认稳定性。
+```
+
+测试方案：
+
+```text
+1. 重点 DS7B，保留 Qwen3/GLM4 对照。
+2. source groups 细分：
+   - special_prefix
+   - pre_object
+   - object_span
+   - object_to_template_bridge
+   - post_object_structural_tokens
+   - answer_prompt_tail
+   - all_pre_answer
+3. 对 causal heads:
+   H13,H12,H11,H8,H25,H10,H26,H24
+   分别做 source-specific value removal。
+4. 扩大类别：
+   number, container, plant, time, clothing, furniture
+5. DS7B 关键结果加大到 train 12 / test 24。
+```
+
+关键判据：
+
+```text
+如果 causal heads 的强效应集中在某些结构 token，
+说明语言编码依赖模板/关系结构接口。
+
+如果强效应分散在多个 source group，
+说明真正的类别约束是更宽的上下文场。
+```
