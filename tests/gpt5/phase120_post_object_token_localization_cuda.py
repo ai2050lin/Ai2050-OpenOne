@@ -1,0 +1,395 @@
+#!/usr/bin/env python3
+"""
+Phase 120: post-object token localization and interface decomposition.
+
+Split the strong Phase119 post_object_mean site into finer token groups to test
+whether the effect comes from answer_last leakage or true pre-answer interface
+tokens.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import torch
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from hf_probe_env import get_layers, load_probe_model, release_loaded, vram_gb  # noqa: E402
+from phase105_global_category_atlas_cuda import CATEGORY_OBJECTS, collect_readout_rows  # noqa: E402
+from phase106_multitemplate_residual_cuda import TEMPLATES, find_subsequence, object_last_position  # noqa: E402
+from phase107_causal_boundary_removal_cuda import BOUNDARY_LAYER, score_logits, summarize_delta  # noqa: E402
+from phase114_answer_site_causal_subspace_cuda import build_category_contrast_matrix  # noqa: E402
+from phase116_subspace_basis_component_audit_cuda import build_prompts, svd_basis  # noqa: E402
+from phase117_basis_rotation_causal_axis_cuda import varimax_basis  # noqa: E402
+from phase118_causal_axis_transport_closure_cuda import random_in_subspace  # noqa: E402
+
+
+OUT_ROOT = Path("results/gpt5_phase120_post_object_token_localization")
+TEST_CATEGORIES = ["number", "container", "plant"]
+SITES = [
+    "object_last",
+    "after_object_first",
+    "after_object_middle",
+    "pre_answer_last",
+    "post_object_excluding_answer",
+    "answer_last",
+    "post_object_including_answer",
+]
+AXIS_TYPES = ["local_varimax_best", "local_svd_subspace", "random_in_local_subspace"]
+
+
+def log(msg: str = "") -> None:
+    print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
+
+
+def object_span_positions(tokenizer: Any, prompt: str, obj: str, fallback: int) -> list[int]:
+    full_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
+    obj_ids = tokenizer(obj, add_special_tokens=False)["input_ids"]
+    start = find_subsequence(full_ids, obj_ids)
+    if start is None:
+        obj_ids = tokenizer(" " + obj, add_special_tokens=False)["input_ids"]
+        start = find_subsequence(full_ids, obj_ids)
+    if start is None:
+        return [fallback]
+    end = min(start + len(obj_ids), fallback + 1)
+    return list(range(start, end)) or [fallback]
+
+
+def split_post_positions(obj_span: list[int], answer_pos: int) -> dict[str, list[int]]:
+    start = min(max(obj_span) + 1, answer_pos)
+    excluding = list(range(start, answer_pos))
+    if not excluding:
+        excluding = [max(0, answer_pos - 1)]
+    middle = excluding[len(excluding) // 2]
+    return {
+        "after_object_first": [excluding[0]],
+        "after_object_middle": [middle],
+        "pre_answer_last": [excluding[-1]],
+        "post_object_excluding_answer": excluding,
+        "answer_last": [answer_pos],
+        "post_object_including_answer": excluding + [answer_pos],
+    }
+
+
+def item_positions(tokenizer: Any, item: dict[str, Any], answer_pos: int) -> dict[str, list[int]]:
+    span = object_span_positions(tokenizer, item["prompt"], item["obj"], answer_pos)
+    obj_last = object_last_position(tokenizer, item["prompt"], item["obj"], answer_pos)
+    out = {"object_last": [obj_last]}
+    out.update(split_post_positions(span, answer_pos))
+    return out
+
+
+def make_site_subspace_hook(basis: torch.Tensor, batch_positions: list[list[int]], scale: float):
+    basis = basis / (basis.norm(dim=1, keepdim=True) + 1e-8)
+
+    def hook(_module: Any, _inputs: Any, output: Any):
+        if isinstance(output, tuple):
+            out = output[0].clone()
+            rest = output[1:]
+        else:
+            out = output.clone()
+            rest = None
+        b = basis.to(out.device).float()
+        for bi, positions in enumerate(batch_positions):
+            pos = torch.tensor(positions, device=out.device, dtype=torch.long)
+            vecs = out[bi, pos, :].float()
+            proj = (vecs @ b.T) @ b
+            out[bi, pos, :] = out[bi, pos, :] - scale * proj.to(out.dtype)
+        if rest is not None:
+            return (out,) + rest
+        return out
+
+    return hook
+
+
+def run_patch_condition(
+    model: Any,
+    tokenizer: Any,
+    device: torch.device,
+    layers: list[Any],
+    prompts: list[dict[str, Any]],
+    cat_local_ids: dict[str, list[int]],
+    categories: list[str],
+    batch_size: int,
+    max_length: int,
+    patch_layer: int | None = None,
+    patch_site: str = "answer_last",
+    patch_basis: np.ndarray | None = None,
+    scale: float = 1.5,
+) -> np.ndarray:
+    scores = []
+    module_index = None if patch_layer is None else patch_layer - 1
+    for start in range(0, len(prompts), batch_size):
+        items = prompts[start:start + batch_size]
+        texts = [x["prompt"] for x in items]
+        batch = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=max_length)
+        batch = {k: v.to(device) for k, v in batch.items()}
+        answer_pos = (batch["attention_mask"].sum(dim=1) - 1).detach().cpu().tolist()
+        batch_positions = [
+            item_positions(tokenizer, item, answer_pos[bi])[patch_site]
+            for bi, item in enumerate(items)
+        ]
+        handle = None
+        if patch_basis is not None and module_index is not None:
+            b = torch.tensor(patch_basis, device=device, dtype=torch.float32)
+            handle = layers[module_index].register_forward_hook(make_site_subspace_hook(b, batch_positions, scale))
+        with torch.no_grad():
+            out = model(**batch, use_cache=False)
+        if handle is not None:
+            handle.remove()
+        pos_gpu = torch.tensor(answer_pos, device=out.logits.device, dtype=torch.long)
+        logits = out.logits[torch.arange(out.logits.shape[0], device=out.logits.device), pos_gpu]
+        scores.append(score_logits(logits, cat_local_ids, categories))
+        del out, batch
+        torch.cuda.empty_cache()
+    return np.concatenate(scores, axis=0)
+
+
+def capture_local_centers(
+    model: Any,
+    tokenizer: Any,
+    device: torch.device,
+    categories: list[str],
+    layer_id: int,
+    site: str,
+    train_objects: int,
+    batch_size: int,
+    max_length: int,
+) -> np.ndarray:
+    d_model = int(model.get_input_embeddings().weight.shape[1])
+    centers = np.zeros((len(TEMPLATES), len(categories), d_model), dtype=np.float64)
+    counts = np.zeros((len(TEMPLATES), len(categories)), dtype=np.int64)
+    items: list[dict[str, Any]] = []
+    for ti, tpl in enumerate(TEMPLATES):
+        for ci, cat in enumerate(categories):
+            for obj in CATEGORY_OBJECTS[cat][:train_objects]:
+                items.append({"ti": ti, "ci": ci, "cat": cat, "obj": obj, "prompt": tpl["text"].format(obj=obj)})
+
+    with torch.no_grad():
+        for start in range(0, len(items), batch_size):
+            batch_items = items[start:start + batch_size]
+            texts = [x["prompt"] for x in batch_items]
+            batch = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=max_length)
+            batch = {k: v.to(device) for k, v in batch.items()}
+            out = model(**batch, output_hidden_states=True, use_cache=False)
+            hs = out.hidden_states[layer_id]
+            answer_pos = (batch["attention_mask"].sum(dim=1) - 1).detach().cpu().tolist()
+            for bi, item in enumerate(batch_items):
+                positions = item_positions(tokenizer, item, answer_pos[bi])[site]
+                pos = torch.tensor(positions, device=hs.device, dtype=torch.long)
+                vec = hs[bi, pos, :].float().mean(dim=0).detach().cpu().numpy().astype(np.float32)
+                centers[item["ti"], item["ci"]] += vec
+                counts[item["ti"], item["ci"]] += 1
+            del out, batch
+            torch.cuda.empty_cache()
+    return (centers / counts[:, :, None]).astype(np.float32)
+
+
+def select_local_varimax_axis(
+    model: Any,
+    tokenizer: Any,
+    device: torch.device,
+    layers: list[Any],
+    prompts: list[dict[str, Any]],
+    baseline: np.ndarray,
+    layer_id: int,
+    site: str,
+    cat_local_ids: dict[str, list[int]],
+    categories: list[str],
+    target_idx: int,
+    batch_size: int,
+    max_length: int,
+    scale: float,
+    basis: np.ndarray,
+) -> dict[str, Any]:
+    vbasis = varimax_basis(basis)
+    rows = []
+    for bi, vec in enumerate(vbasis):
+        patched = run_patch_condition(
+            model, tokenizer, device, layers, prompts, cat_local_ids, categories,
+            batch_size, max_length, layer_id, site, vec[None, :], scale
+        )
+        summary = summarize_delta(patched - baseline, target_idx, categories)
+        rows.append({"basis_index": bi, "axis": vec[None, :].astype(np.float32), **summary})
+    best = min(rows, key=lambda r: r["target_delta"])
+    return {
+        "basis_index": int(best["basis_index"]),
+        "axis": best["axis"],
+        "selection_target_delta": float(best["target_delta"]),
+        "selection_max_other_delta": float(best["max_other_delta"]),
+        "selection_top_releases": best.get("top_releases", []),
+    }
+
+
+def run_model(args: argparse.Namespace) -> dict[str, Any]:
+    loaded = load_probe_model(args.model)
+    try:
+        model = loaded.model
+        tokenizer = loaded.tokenizer
+        device = loaded.input_device
+        layers = get_layers(model)
+        categories = list(CATEGORY_OBJECTS.keys())
+        test_categories = args.categories.split(",") if args.categories else TEST_CATEGORIES
+        peak_layer = args.peak_layer if args.peak_layer is not None else BOUNDARY_LAYER[args.model]
+        patch_layers = list(range(max(1, peak_layer - args.layer_back), peak_layer + 1))
+        sites = [x.strip() for x in args.sites.split(",") if x.strip()]
+        axis_types = [x.strip() for x in args.axis_types.split(",") if x.strip()]
+        cat_local_ids, _readout_rows, token_labels = collect_readout_rows(model, tokenizer, categories)
+
+        alloc, reserved = vram_gb()
+        log(
+            f"{args.model}: peak=L{peak_layer}, layers={patch_layers}, sites={sites}, "
+            f"rank={args.rank}, train/test={args.train_objects}/{args.test_objects}, "
+            f"vram={alloc:.2f}/{reserved:.2f}GB"
+        )
+
+        result: dict[str, Any] = {
+            "phase": 120,
+            "model": args.model,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "peak_layer": peak_layer,
+            "patch_layers": patch_layers,
+            "sites": sites,
+            "train_objects_per_category": args.train_objects,
+            "test_objects_per_category": args.test_objects,
+            "templates": [t["name"] for t in TEMPLATES],
+            "test_categories": test_categories,
+            "rank": args.rank,
+            "scale": args.scale,
+            "axis_types": axis_types,
+            "readout_token_labels": token_labels,
+            "category_results": {},
+        }
+
+        basis_cache: dict[tuple[int, str, str], tuple[np.ndarray, list[float]]] = {}
+        for layer_id in patch_layers:
+            for site in sites:
+                log(f"Building local centers L{layer_id} {site}")
+                centers = capture_local_centers(
+                    model, tokenizer, device, categories, layer_id, site,
+                    args.train_objects, args.batch_size, args.max_length
+                )
+                for cat in test_categories:
+                    contrast = build_category_contrast_matrix(centers, categories, cat)
+                    basis, singular_values = svd_basis(contrast, args.rank)
+                    basis_cache[(layer_id, site, cat)] = (basis, [float(x) for x in singular_values])
+
+        for ci, cat in enumerate(test_categories, 1):
+            log(f"Testing {args.model} {ci}/{len(test_categories)} {cat}")
+            target_idx = categories.index(cat)
+            prompts = build_prompts(cat, args.train_objects, args.test_objects)
+            baseline = run_patch_condition(
+                model, tokenizer, device, layers, prompts, cat_local_ids, categories,
+                args.batch_size, args.max_length
+            )
+            cat_out: dict[str, Any] = {
+                "n_prompts": len(prompts),
+                "baseline_target_mean": float(baseline[:, target_idx].mean()),
+                "conditions": [],
+            }
+            for layer_id in patch_layers:
+                for site in sites:
+                    basis, singular_values = basis_cache[(layer_id, site, cat)]
+                    log(f"  {cat}: L{layer_id} {site}")
+                    local_choice = select_local_varimax_axis(
+                        model, tokenizer, device, layers, prompts, baseline,
+                        layer_id, site, cat_local_ids, categories, target_idx,
+                        args.batch_size, args.max_length, args.scale, basis
+                    )
+                    seed = 20000 + target_idx * 997 + layer_id * 31 + sites.index(site)
+                    random_axis = random_in_subspace(basis, seed)
+                    axes = {
+                        "local_varimax_best": local_choice["axis"],
+                        "local_svd_subspace": basis,
+                        "random_in_local_subspace": random_axis,
+                    }
+                    for axis_type in axis_types:
+                        patch_basis = axes[axis_type]
+                        patched = run_patch_condition(
+                            model, tokenizer, device, layers, prompts, cat_local_ids, categories,
+                            args.batch_size, args.max_length, layer_id, site, patch_basis, args.scale
+                        )
+                        summary = summarize_delta(patched - baseline, target_idx, categories)
+                        cat_out["conditions"].append({
+                            "layer": layer_id,
+                            "site": site,
+                            "axis_type": axis_type,
+                            "axis_rank": int(patch_basis.shape[0]),
+                            "varimax_basis_index": local_choice["basis_index"],
+                            "varimax_selection_target_delta": local_choice["selection_target_delta"],
+                            "varimax_selection_max_other_delta": local_choice["selection_max_other_delta"],
+                            "singular_values": singular_values,
+                            **summary,
+                        })
+            result["category_results"][cat] = cat_out
+        return result
+    finally:
+        release_loaded(loaded)
+
+
+def write_markdown(result: dict[str, Any], path: Path) -> None:
+    lines = [f"# Phase 120 Post-object Token Localization: {result['model']}", ""]
+    lines.append(f"Generated: {result['timestamp']}")
+    lines.append(f"Layers: {result['patch_layers']}; sites: {result['sites']}")
+    lines.append("")
+    lines.append("| category | axis | best pre-answer excluding answer | answer_last | including answer |")
+    lines.append("|---|---|---|---|---|")
+    pre_sites = {"after_object_first", "after_object_middle", "pre_answer_last", "post_object_excluding_answer"}
+    for cat, item in result["category_results"].items():
+        for axis in result["axis_types"]:
+            conds = [c for c in item["conditions"] if c["axis_type"] == axis]
+
+            def fmt(rows: list[dict[str, Any]]) -> str:
+                if not rows:
+                    return "NA"
+                r = min(rows, key=lambda x: x["target_delta"])
+                return f"L{r['layer']} {r['site']} T{r['target_delta']:+.2f} R{r['max_other_delta']:+.2f}"
+
+            lines.append(
+                f"| {cat} | {axis} | {fmt([c for c in conds if c['site'] in pre_sites])} | "
+                f"{fmt([c for c in conds if c['site'] == 'answer_last'])} | "
+                f"{fmt([c for c in conds if c['site'] == 'post_object_including_answer'])} |"
+            )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model", choices=["qwen3", "glm4", "deepseek7b"])
+    parser.add_argument("--train-objects", type=int, default=8)
+    parser.add_argument("--test-objects", type=int, default=16)
+    parser.add_argument("--batch-size", type=int, default=24)
+    parser.add_argument("--max-length", type=int, default=80)
+    parser.add_argument("--peak-layer", type=int, default=None)
+    parser.add_argument("--layer-back", type=int, default=3)
+    parser.add_argument("--rank", type=int, default=16)
+    parser.add_argument("--scale", type=float, default=1.5)
+    parser.add_argument("--sites", default=",".join(SITES))
+    parser.add_argument("--axis-types", default="local_varimax_best,local_svd_subspace")
+    parser.add_argument("--categories", default="")
+    parser.add_argument("--output-dir", default=str(OUT_ROOT))
+    parser.add_argument("--hard-exit-after-model", action="store_true")
+    args = parser.parse_args()
+
+    out_dir = Path(args.output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    result = run_model(args)
+    json_path = out_dir / f"phase120_{args.model}_post_object_token_localization.json"
+    md_path = out_dir / f"phase120_{args.model}_post_object_token_localization.md"
+    json_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_markdown(result, md_path)
+    log(f"Wrote {json_path}")
+    log(f"Wrote {md_path}")
+    if args.hard_exit_after_model:
+        os._exit(0)
+
+
+if __name__ == "__main__":
+    main()

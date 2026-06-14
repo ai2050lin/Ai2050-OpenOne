@@ -39878,3 +39878,2697 @@ projection-only、head-set 不闭合、MLP 粗消融反向，
 都说明当前单方向 T_c 只是强因果场的一个切片；
 破解路径前，必须先把 answer-site causal field 的维度结构拼出来。
 ```
+
+## Phase 114: Answer-Site Causal Subspace Expansion 答案位置因果子空间扩展 [2026-06-14 12:09]
+
+### 本阶段目标
+
+根据用户附加分析与 Phase113 结果，先判断：
+
+```text
+Phase113 的收缩是正确的：
+单头不够；
+top-k head set 大多不够；
+coarse MLP relay 不够；
+T_c(answer) 可能只是 answer-site causal field 的一维切片。
+```
+
+本阶段目标：
+
+```text
+构造 rank 1/2/4/8/16 的 answer-site category contrast subspace，
+测试多维子空间移除是否比单方向 T_c 更稳定或更强。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase114_answer_site_causal_subspace_cuda.py \
+  tests/gpt5/phase114_answer_site_causal_subspace_summary.py
+
+python tests/gpt5/phase114_answer_site_causal_subspace_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --ranks 1,2 \
+  --scales 1.0 \
+  --categories number,plant \
+  --output-dir results/gpt5_phase114_smoke \
+  --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase114_answer_site_causal_subspace_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --ranks 1,2,4,8,16 \
+  --scales 1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase114_answer_site_causal_subspace \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase114_answer_site_causal_subspace_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --ranks 1,2,4,8,16 \
+  --scales 1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase114_answer_site_causal_subspace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase114_answer_site_causal_subspace_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --ranks 1,2,4,8,16 \
+  --scales 1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase114_answer_site_causal_subspace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase114_answer_site_causal_subspace_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase114_answer_site_causal_subspace_cuda.py \
+  tests/gpt5/phase114_answer_site_causal_subspace_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase114_answer_site_causal_subspace_cuda.py`
+- 汇总脚本：`tests/gpt5/phase114_answer_site_causal_subspace_summary.py`
+- Qwen3 结果：`results/gpt5_phase114_answer_site_causal_subspace/phase114_qwen3_answer_site_causal_subspace.json`
+- GLM4 结果：`results/gpt5_phase114_answer_site_causal_subspace/phase114_glm4_answer_site_causal_subspace.json`
+- DS7B 结果：`results/gpt5_phase114_answer_site_causal_subspace/phase114_deepseek7b_answer_site_causal_subspace.json`
+- 跨模型汇总：`results/gpt5_phase114_answer_site_causal_subspace/phase114_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, clothing, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+ranks = 1, 2, 4, 8, 16
+scales = 1.0, 1.5
+layer = model-specific causal peak
+controls = random same-rank subspace
+```
+
+模型层位：
+
+```text
+Qwen3: L35
+GLM4: L18
+DS7B: L27
+```
+
+### 测试原理
+
+对每个类别，在 answer-site peak layer 构造 target-vs-other contrast rows：
+
+```text
+每个 template:
+  target_center - other_mean
+  target_center - each_other_category_center
+```
+
+然后对这些 contrast rows 做 SVD，取：
+
+```text
+rank = 1, 2, 4, 8, 16
+```
+
+得到 answer-site category contrast subspace。
+
+真实 forward 干预：
+
+```text
+在 answer_last 移除该子空间投影：
+  h = h - scale * proj_subspace(h)
+```
+
+对照：
+
+```text
+1. 单方向 T_c removal
+2. same-rank random subspace removal
+```
+
+指标：
+
+```text
+target_delta
+max_other_release_delta
+random control target_delta
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  T_c: r1 scale1.5 target Δ -3.43, release +0.87
+  best subspace: rank2 scale1.5 target Δ -3.12, release +0.78
+  random: rank16 scale1.5 target Δ -0.50
+
+container:
+  T_c: target Δ -1.74, release +0.12
+  best subspace: rank16 scale1.5 target Δ -2.59, release +2.03
+  random: target Δ -0.12
+
+clothing:
+  T_c: target Δ -1.42, release +1.12
+  best subspace: rank8 scale1.5 target Δ -0.47, release +0.69
+  random: target Δ -0.04
+
+plant:
+  T_c: target Δ -5.98, release +0.73
+  best subspace: rank2 scale1.5 target Δ -1.26, release +0.00
+  random: target Δ -0.21
+```
+
+Qwen3 结果是混合的：
+
+```text
+number: subspace 接近 T_c
+container: subspace 稍强但 release 很大
+clothing/plant: 单方向 T_c 更强
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  T_c -0.10
+  subspace rank16 -0.86, release +1.22
+
+container:
+  T_c -0.08
+  subspace rank16 -0.53
+
+clothing:
+  T_c -0.07
+  subspace rank8 -0.34
+
+plant:
+  T_c +0.01
+  subspace rank16 -0.13
+```
+
+GLM4 子空间有一些变化，但 T_c reference 本身弱，仍不作为强机制结论来源。
+
+#### DS7B
+
+```text
+number:
+  T_c: target Δ +1.11, release +1.22
+  best subspace: rank16 scale1.5 target Δ -11.75, release +0.00
+  random: target Δ -0.30
+
+container:
+  T_c: target Δ -5.60, release +0.00
+  best subspace: rank16 scale1.5 target Δ -12.42, release +0.00
+  random: target Δ -0.30
+
+clothing:
+  T_c: target Δ -5.22, release +0.18
+  best subspace: rank8 scale1.5 target Δ -4.99, release +0.00
+  random: target Δ -0.23
+
+plant:
+  T_c: target Δ -3.19, release +0.00
+  best subspace: rank8 scale1.5 target Δ -7.93, release +0.00
+  random: target Δ -0.43
+```
+
+DS7B 出现强正向结果：
+
+```text
+number/container/plant 的 answer-site 多维子空间显著强于单方向 T_c，
+并且远强于 random subspace。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 的 answer-site causal field 明显是多维结构**
+
+最强例子：
+
+```text
+DS7B container:
+  T_c -5.60
+  rank16 subspace -12.42
+  random -0.30
+
+DS7B plant:
+  T_c -3.19
+  rank8 subspace -7.93
+  random -0.43
+
+DS7B number:
+  T_c +1.11
+  rank16 subspace -11.75
+  random -0.30
+```
+
+这说明 DS7B 的单方向 T_c 确实只是答案位置因果场的切片。
+
+2. **Qwen3 更类别分化**
+
+```text
+Qwen3 number:
+  T_c -3.43
+  subspace -3.12
+
+Qwen3 container:
+  T_c -1.74
+  subspace -2.59 but release +2.03
+
+Qwen3 plant:
+  T_c -5.98
+  subspace -1.26
+```
+
+Qwen3 plant 仍然是强单方向模式。
+
+3. **random subspace control 很弱**
+
+典型：
+
+```text
+DS7B container random -0.30 vs subspace -12.42
+DS7B plant random -0.43 vs subspace -7.93
+Qwen3 number random -0.50 vs T_c/subspace around -3
+```
+
+说明强效不是单纯 rank 高或随机删除造成。
+
+4. **container 类子空间 release 需要谨慎**
+
+Qwen3 container：
+
+```text
+subspace target Δ -2.59
+release +2.03
+```
+
+这说明该子空间混入强竞争释放，不是纯 target support。
+
+### 对 Phase113 的校正
+
+Phase113 的排除式判断仍正确：
+
+```text
+head set / coarse MLP relay 没有解释 T_c(answer) 强效。
+```
+
+Phase114 给出新的正向方向：
+
+```text
+尤其在 DS7B，answer-site causal field 不是单方向，而是低秩多维子空间。
+```
+
+因此上游路径未闭合，不一定是因为没有路由，而可能是因为我们追踪的目标状态维度太窄：
+
+```text
+source_tokens -> A_c(answer)
+```
+
+其中 `A_c(answer)` 应从单方向 `T_c` 改为多维子空间。
+
+### 条件化关系因子动力学公式更新
+
+Phase113：
+
+```text
+source_tokens
+  -> unresolved_distributed_dynamics
+  -> A_c(answer)
+  -> output_gateway
+  -> logits
+```
+
+Phase114 后：
+
+```text
+A_c(answer) ∈ Subspace_c^k(answer)
+```
+
+更具体：
+
+```text
+source_tokens
+  -> unresolved_distributed_dynamics
+  -> Subspace_c^k(answer)
+  -> output_gateway
+  -> logits
+```
+
+其中：
+
+```text
+T_c 是 Subspace_c^k 的一个强切片；
+但在 DS7B 中，rank8/rank16 子空间比 T_c 更接近完整因果场。
+```
+
+中文解释：
+
+```text
+答案位置的类别因果状态不是一个方向，而可能是一个低秩子空间；
+不同模型和类别的有效维度不同；
+破解路径前，必须先确定要追踪的答案位置状态空间。
+```
+
+### 硬伤分析
+
+1. **子空间来自类别几何，不是自动因果发现**
+
+当前 subspace 是 target-vs-other answer center contrast 的 SVD，不等于已证明的最小因果子空间。
+
+2. **random control 没有匹配谱结构**
+
+random subspace 只匹配 rank，没有匹配奇异值谱或与 readout/transport 的夹角。
+
+3. **高 rank 可能混入竞争释放**
+
+Qwen3 container release +2.03 说明子空间会包含竞争/抑制成分。
+
+4. **仍是 DCF logits**
+
+没有 generation audit。
+
+5. **上游路径仍未闭合**
+
+本轮定位的是 answer-site field，不是 source -> answer 路径。
+
+### 当前进展评价
+
+Phase114 是关键正向进展：
+
+```text
+首次明确显示 answer-site causal field 在 DS7B 中是多维低秩结构；
+并且多维子空间远强于随机子空间。
+```
+
+当前最可靠拼图：
+
+```text
+1. answer-site causal field 是核心因果入口。
+2. DS7B 的 answer-site field 是多维结构。
+3. Qwen3 存在类别分化：number 接近多维/单向都可，plant 强单向。
+4. T_c 不是完整因果状态，只是某些模型/类别的强切片。
+5. 上游路径搜索应改为追踪 Subspace_c^k(answer)，而不是单方向 T_c。
+```
+
+### 下一步任务
+
+Phase115 应做：
+
+```text
+Causal Subspace Robustness and Release Decomposition
+```
+
+目标：
+
+```text
+验证 Phase114 的多维子空间是否稳定，并把 target support 与 competitor release 拆开。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B number/container/plant 扩大 heldout objects 复测。
+2. 对 rank8/rank16 子空间做 scale sweep: 0.25,0.5,1.0,1.5。
+3. 对子空间做 leave-template-out 验证，确认不是模板过拟合。
+4. 对 release 强的 Qwen3 container 做 target-support / release-component 分解。
+5. 加 matched-spectrum random subspace control。
+```
+
+关键判据：
+
+```text
+如果 DS7B rank8/rank16 子空间在模板留出、扩大对象、matched random control 下仍强，
+则可以把 answer-site causal field 从“单方向假设”正式升级为“低秩因果子空间”。
+```
+
+## Phase 115: Causal Subspace Robustness and Release Decomposition 因果子空间稳健性与释放分解 [2026-06-14 13:16]
+
+### 本阶段目标
+
+根据 Phase114 的结果继续验证：
+
+```text
+DS7B 的 answer-site causal field 是否真是稳健低秩子空间；
+Qwen3 的子空间 target-down 是否混入 competitor release；
+Phase114 强效是否会在扩大 heldout objects、leave-template-out、matched-spectrum random control 下保留。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase115_causal_subspace_robustness_cuda.py \
+  tests/gpt5/phase115_causal_subspace_robustness_summary.py
+
+python tests/gpt5/phase115_causal_subspace_robustness_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 4 \
+  --ranks 2 \
+  --scales 0.5 \
+  --categories number,container \
+  --output-dir results/gpt5_phase115_smoke \
+  --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase115_causal_subspace_robustness_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase115_causal_subspace_robustness \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase115_causal_subspace_robustness_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase115_causal_subspace_robustness \
+  --hard-exit-after-model
+
+python tests/gpt5/phase115_causal_subspace_robustness_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase115_causal_subspace_robustness \
+  --hard-exit-after-model
+
+python tests/gpt5/phase115_causal_subspace_robustness_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase115_causal_subspace_robustness_cuda.py \
+  tests/gpt5/phase115_causal_subspace_robustness_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase115_causal_subspace_robustness_cuda.py`
+- 汇总脚本：`tests/gpt5/phase115_causal_subspace_robustness_summary.py`
+- Qwen3 结果：`results/gpt5_phase115_causal_subspace_robustness/phase115_qwen3_causal_subspace_robustness.json`
+- GLM4 结果：`results/gpt5_phase115_causal_subspace_robustness/phase115_glm4_causal_subspace_robustness.json`
+- DS7B 结果：`results/gpt5_phase115_causal_subspace_robustness/phase115_deepseek7b_causal_subspace_robustness.json`
+- 跨模型汇总：`results/gpt5_phase115_causal_subspace_robustness/phase115_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, clothing, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+full prompts/category = 64
+ranks = 8, 16
+scales = 0.25, 0.5, 1.0, 1.5
+layer = model-specific causal peak
+controls = matched-spectrum random subspace
+robustness = leave-template-out 4 folds
+release decomposition = strongest-release-category excluded contrast
+```
+
+模型层位：
+
+```text
+Qwen3: L35
+GLM4: L18
+DS7B: L27
+```
+
+### 测试原理
+
+Phase115 在 Phase114 基础上做四类验证：
+
+```text
+1. 扩大 heldout:
+   train objects/category = 8
+   test objects/category = 16
+
+2. scale sweep:
+   0.25, 0.5, 1.0, 1.5
+
+3. leave-template-out:
+   用 3 个模板构造子空间；
+   在第 4 个模板上测试；
+   4 个模板轮换。
+
+4. matched-spectrum random:
+   用 synthetic contrast matrix 保留奇异值谱，再生成随机子空间。
+```
+
+release 分解的初步版本：
+
+```text
+先找 full subspace 的最强 release category；
+再从 contrast construction 中排除该 release category；
+测试 release-excluded subspace。
+```
+
+注意：这还不是完整 support/release factorization，只是第一层排查。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  full subspace: r8 scale1.5 target Δ -1.83, release +2.37
+  matched random: target Δ +0.05
+  release-excluded: target Δ -2.72, release +1.99
+  LTO mean: target Δ -2.18, release +2.12
+  LTO random mean: target Δ -0.19
+
+container:
+  full subspace: r16 scale1.5 target Δ -2.53, release +1.90
+  matched random: target Δ +0.03
+  release-excluded: target Δ -3.06, release +1.97
+  LTO mean: target Δ -2.54, release +1.54
+  LTO random mean: target Δ -0.07
+
+clothing:
+  full subspace: target Δ +0.22, release +0.51
+  matched random: target Δ -0.38
+  LTO mean: target Δ +0.24
+  LTO random mean: target Δ -0.30
+
+plant:
+  full subspace: r16 scale1.5 target Δ -1.24, release +1.59
+  matched random: target Δ -0.15
+  release-excluded: target Δ -1.17, release +1.77
+  LTO mean: target Δ -1.74, release +1.41
+```
+
+Qwen3 结论：
+
+```text
+number/container/plant 的子空间效应能跨模板保留，但 release 很大；
+clothing 对照敏感；
+release-excluded 没有解决 release，说明 release 不是单一类别导致。
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  full subspace Δ -0.90, release +0.68
+  LTO mean Δ -0.58
+
+container:
+  full subspace Δ -0.32
+  LTO mean Δ -0.36
+
+clothing:
+  full subspace Δ -0.28
+  LTO mean Δ -0.19
+
+plant:
+  full subspace Δ -0.13
+  LTO mean Δ -0.07
+```
+
+GLM4 仍然弱，但 number 出现小幅稳定信号。
+
+#### DS7B
+
+```text
+number:
+  full subspace: r16 scale1.5 target Δ -12.58, release +0.00
+  matched random: target Δ -0.07
+  LTO mean: target Δ -11.59, release +0.00
+  LTO random mean: target Δ -0.20
+
+container:
+  full subspace: r16 scale1.5 target Δ -12.52, release +0.00
+  matched random: target Δ -0.24
+  LTO mean: target Δ -11.45, release +0.00
+  LTO random mean: target Δ -0.37
+
+clothing:
+  full subspace: r8 scale1.0 target Δ -4.20, release +0.00
+  matched random: target Δ -0.06
+  LTO mean: target Δ -5.07, release +0.00
+  LTO random mean: target Δ -0.37
+
+plant:
+  full subspace: r8 scale1.5 target Δ -9.40, release +0.00
+  matched random: target Δ -0.29
+  LTO mean: target Δ -8.71, release +0.00
+  LTO random mean: target Δ -0.22
+```
+
+DS7B 结论：
+
+```text
+number/container/plant 是 robust_strong；
+clothing 是 robust_moderate；
+所有 matched-spectrum random controls 都很弱；
+所有 release 都为 0。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B answer-site low-rank causal subspace 已通过稳健性测试**
+
+最强证据：
+
+```text
+DS7B number:
+  full -12.58
+  LTO mean -11.59
+  random -0.07
+
+DS7B container:
+  full -12.52
+  LTO mean -11.45
+  random -0.24
+
+DS7B plant:
+  full -9.40
+  LTO mean -8.71
+  random -0.29
+```
+
+这说明 DS7B 的低秩子空间不是模板过拟合，也不是 rank/random 删除造成。
+
+2. **DS7B 子空间几乎无 competitor release**
+
+```text
+number/container/clothing/plant:
+  max_other_release = 0.00 in full and LTO mean
+```
+
+说明 DS7B 的子空间更像干净 target support removal。
+
+3. **Qwen3 子空间混有强 release**
+
+```text
+Qwen3 number release +2.37
+Qwen3 container release +1.90
+Qwen3 plant release +1.59
+```
+
+release-excluded 后仍然 release 较高：
+
+```text
+number +1.99
+container +1.97
+plant +1.77
+```
+
+这说明 Qwen3 的 release 不是一个竞争类别造成，而是多竞争/接口混合结构。
+
+4. **GLM4 仍然弱，但 number 有小信号**
+
+```text
+GLM4 number:
+  full -0.90
+  LTO -0.58
+  random -0.02
+```
+
+仍不能与 DS7B 强结论同等对待。
+
+### 理论进展
+
+Phase115 支持把 DS7B 的 answer-site 表述升级为：
+
+```text
+Subspace_c^k(answer) 是稳健因果状态。
+```
+
+更具体：
+
+```text
+source_tokens
+  -> unresolved_distributed_dynamics
+  -> robust low-rank Subspace_c^k(answer)
+  -> output_gateway
+  -> logits
+```
+
+对 DS7B：
+
+```text
+number/container/plant:
+  k ≈ 8-16
+  robust across heldout objects and heldout templates
+  target-down strong
+  competitor release near zero
+```
+
+对 Qwen3：
+
+```text
+answer-site subspace 是 mixed support/release field；
+需要进一步拆 support 与 release。
+```
+
+### 硬伤分析
+
+1. **matched-spectrum random 仍使用 orthonormal basis 干预**
+
+虽然通过 synthetic contrast matrix 匹配奇异值谱，但最终移除的是正交基投影，谱结构只影响基的生成过程。
+
+2. **release-excluded 不是完整分解**
+
+只排除最强 release category，无法分解多竞争释放。
+
+3. **仍然没有生成审计**
+
+目前仍是 DCF logits。
+
+4. **上游路径仍未闭合**
+
+Phase115 证明 answer-site 子空间稳健，但没有解释 source 如何写入该子空间。
+
+5. **Qwen3 与 DS7B 机制分型明显不同**
+
+不能把 DS7B 的干净低秩子空间结论直接套到 Qwen3。
+
+### 当前进展评价
+
+Phase115 是一次强确认：
+
+```text
+DS7B 的 answer-site low-rank causal subspace 已从“可能结构”升级为“稳健客观事实”。
+```
+
+当前最可靠拼图：
+
+```text
+1. DS7B number/container/plant 存在稳健、干净、低秩的 answer-site 因果子空间。
+2. DS7B clothing 也有中强稳健子空间。
+3. Qwen3 的 answer-site 子空间存在，但混入强 release。
+4. GLM4 仍弱，只能作为小信号参考。
+5. 下一步应从“是否有子空间”转向“子空间内部成分如何分解”。
+```
+
+### 下一步任务
+
+Phase116 应做：
+
+```text
+Subspace Basis Component Audit
+```
+
+目标：
+
+```text
+把稳健低秩子空间拆成 rank component，
+确定哪些基向量负责 target support，
+哪些基向量负责 release/interface，
+哪些是冗余或控制维度。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B number/container/plant 的 rank16 子空间逐基向量 ablation。
+2. 对 rank16 做 cumulative basis ablation: top1, top2, top4, top8, top16。
+3. 对 Qwen3 number/container/plant 做 basis-level release decomposition。
+4. 对每个 basis component 记录 target_delta、release_delta、readout cosine、transport cosine。
+5. 加 matched random basis component control。
+```
+
+关键判据：
+
+```text
+如果少数 basis components 能复现大部分 target-down，
+则子空间可以继续压缩；
+如果必须 top8/top16 累积才强，
+说明答案位置因果场确实是分布式低秩结构。
+```
+
+## Phase 116: Subspace Basis Component Audit 子空间基向量成分审计 [2026-06-14 13:28]
+
+### 本阶段目标
+
+根据用户附加分析与 Phase115 结果，继续完成：
+
+```text
+把稳健低秩 answer-site causal subspace 拆成 basis components；
+确定哪些基向量负责 target support；
+哪些负责 competitor release / interface；
+以及完整强效是否来自少数基向量或 top-k 累积。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase116_subspace_basis_component_audit_cuda.py \
+  tests/gpt5/phase116_subspace_basis_component_audit_summary.py
+
+python tests/gpt5/phase116_subspace_basis_component_audit_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 4 \
+  --ranks 4 \
+  --set-sizes 1,2,4 \
+  --categories number,container \
+  --output-dir results/gpt5_phase116_smoke \
+  --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase116_subspace_basis_component_audit_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase116_subspace_basis_component_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase116_subspace_basis_component_audit_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase116_subspace_basis_component_audit \
+  --hard-exit-after-model
+
+python tests/gpt5/phase116_subspace_basis_component_audit_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --ranks 8,16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase116_subspace_basis_component_audit \
+  --hard-exit-after-model
+
+python tests/gpt5/phase116_subspace_basis_component_audit_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase116_subspace_basis_component_audit_cuda.py \
+  tests/gpt5/phase116_subspace_basis_component_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase116_subspace_basis_component_audit_cuda.py`
+- 汇总脚本：`tests/gpt5/phase116_subspace_basis_component_audit_summary.py`
+- Qwen3 结果：`results/gpt5_phase116_subspace_basis_component_audit/phase116_qwen3_subspace_basis_component_audit.json`
+- GLM4 结果：`results/gpt5_phase116_subspace_basis_component_audit/phase116_glm4_subspace_basis_component_audit.json`
+- DS7B 结果：`results/gpt5_phase116_subspace_basis_component_audit/phase116_deepseek7b_subspace_basis_component_audit.json`
+- 跨模型汇总：`results/gpt5_phase116_subspace_basis_component_audit/phase116_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, clothing, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+ranks = 8, 16
+scale = 1.5
+cumulative set sizes = 1, 2, 4, 8, 16
+metrics = target_delta, max_release_delta, readout_cos, transport_cos, template_abs_cos
+```
+
+模型层位：
+
+```text
+Qwen3: L35
+GLM4: L18
+DS7B: L27
+```
+
+### 测试原理
+
+对每个类别构造 answer-site contrast subspace：
+
+```text
+target_center - other_mean
+target_center - each_other_category_center
+```
+
+SVD 后取 rank8/rank16 basis。
+
+测试三类干预：
+
+```text
+1. basis-wise ablation:
+   单独移除每个 basis vector。
+
+2. cumulative basis ablation:
+   按单基 target_delta 从强到弱排序，测试 top1/top2/top4/top8/top16。
+
+3. split sets:
+   根据单基效果标注 support / release / mixed / weak，
+   分别移除这些集合。
+```
+
+基向量诊断：
+
+```text
+readout_cos
+transport_cos
+template_abs_cos
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  best single: basis0 target Δ -2.90, release +1.59
+  best cumulative rank16: top4 target Δ -3.67, release +0.86
+  release set: target Δ +0.70, release +1.77
+  mixed set: target Δ -3.10, release +1.05
+  best random single: target Δ -0.28
+
+container:
+  best single: basis1 target Δ -0.66, release +0.00
+  support set rank16: target Δ -1.65, release +0.00
+  release set rank16: target Δ +0.24, release +1.88
+  mixed set: target Δ -0.46, release +2.05
+  cumulative rank16 top8: target Δ -2.66, release +0.40
+
+clothing:
+  best single: basis1 target Δ -0.72, release +0.00
+  support set: target Δ -1.03, release +0.00
+  release set rank16: target Δ +2.00, release +2.64
+  cumulative rank16 top8: target Δ -1.62, release +0.00
+
+plant:
+  best single: basis1 target Δ -1.02, release +0.00
+  support set rank16: target Δ -1.39, release +0.00
+  release set rank16: target Δ +1.09, release +1.62
+  cumulative rank16 top8: target Δ -2.85, release +0.00
+```
+
+Qwen3 关键事实：
+
+```text
+1. release basis 可以直接分离出来。
+2. support set 往往 target-down 干净。
+3. number 的最强单基是 mixed，不是干净 support。
+4. container/clothing/plant 都出现 clear support/release split。
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  best single target Δ -0.37
+  cumulative rank16 top16 target Δ -0.90
+  support set target Δ -0.60
+
+container:
+  best single target Δ -0.17
+  cumulative rank16 top8 target Δ -0.46
+
+clothing:
+  best single target Δ -0.11
+  cumulative rank16 top8 target Δ -0.44
+
+plant:
+  best single target Δ -0.07
+  cumulative rank16 top8 target Δ -0.21
+```
+
+GLM4 仍弱。
+
+#### DS7B
+
+```text
+number:
+  best single: basis1 target Δ -5.55, release +0.00
+  rank16 cumulative top16 target Δ -12.58, release +0.00
+  support set rank16: target Δ -12.49, release +0.00
+  release set rank16: target Δ +0.62, release +1.83
+  best random single: target Δ -0.13
+
+container:
+  best single: basis6 target Δ -2.92, release +0.00
+  rank16 cumulative top8 target Δ -13.55, release +0.00
+  support set rank16: target Δ -13.55, release +0.00
+  release set: target Δ -0.16, release +1.22
+  best random single: target Δ -0.17
+
+clothing:
+  best single: basis0 target Δ -3.44, release +0.00
+  rank16 cumulative top4 target Δ -5.31, release +0.00
+  support set rank16: target Δ -5.58, release +0.00
+  release set rank16: target Δ +2.07, release +1.67
+  mixed set: target Δ -0.60, release +0.70
+
+plant:
+  best single: basis0 target Δ -4.93, release +0.00
+  rank16 cumulative top8 target Δ -9.71, release +0.00
+  support set rank16: target Δ -9.66, release +0.00
+  release set: target Δ +0.17, release +0.53
+  best random single: target Δ -0.14
+```
+
+DS7B 关键事实：
+
+```text
+1. 存在强单基 support component。
+2. 完整强效仍需要多个 support basis 累积。
+3. support set 非常干净，release=0。
+4. release components 也存在，但不是 full subspace 强 target-down 的主要来源。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 是 clean distributed support subspace**
+
+例如：
+
+```text
+container:
+  single -2.92
+  support set -13.55
+
+plant:
+  single -4.93
+  support set -9.66
+
+number:
+  single -5.55
+  support set -12.49
+```
+
+这说明少数强 basis 很重要，但完整效果需要多个 support basis。
+
+2. **Qwen3 的 support/release 可在 basis level 分离**
+
+典型：
+
+```text
+Qwen3 container:
+  support set -1.65, release 0
+  release set +0.24, release +1.88
+  mixed set -0.46, release +2.05
+
+Qwen3 clothing:
+  support set -1.03, release 0
+  release set +2.00, release +2.64
+
+Qwen3 plant:
+  support set -1.39, release 0
+  release set +1.09, release +1.62
+```
+
+Phase115 中 Qwen3 的大 release，在 Phase116 被拆到了具体 basis sets。
+
+3. **随机单基对照很弱**
+
+典型：
+
+```text
+DS7B number random single -0.13 vs real single -5.55
+DS7B plant random single -0.14 vs real single -4.93
+Qwen3 number random single -0.28 vs real single -2.90
+```
+
+4. **readout/transport/template cos 都不高**
+
+许多最强单基的 cos 仍低：
+
+```text
+DS7B number best single:
+  readout_cos -0.06
+  transport_cos -0.20
+  template_abs_cos 0.35
+
+DS7B container best single:
+  readout_cos 0.00
+  transport_cos 0.15
+  template_abs_cos 0.13
+```
+
+说明强 causal basis 不是简单 readout/transport/template 方向。
+
+### 理论进展
+
+Phase115：
+
+```text
+Subspace_c^k(answer) 是稳健因果状态。
+```
+
+Phase116 后可进一步拆成：
+
+```text
+Subspace_c^k(answer)
+=
+SupportBasisSet_c
++ ReleaseBasisSet_c
++ MixedBasisSet_c
++ Weak/RedundantBasisSet_c
+```
+
+对 DS7B：
+
+```text
+SupportBasisSet_c 是主导；
+release basis 存在但不主导；
+target-down 几乎无 competitor release。
+```
+
+对 Qwen3：
+
+```text
+support 与 release basis 明显共存；
+类别意义更像相对竞争场。
+```
+
+### 硬伤分析
+
+1. **SVD basis 不是唯一基**
+
+旋转同一子空间会改变单基解释，因此 basis-level 标签不是最终机制基。
+
+2. **component labels 是启发式**
+
+support/release/mixed/weak 由 target_delta 和 release_delta 阈值判定，需要后续验证。
+
+3. **未做旋转不变审计**
+
+需要测试 varimax/ICA/causal-optimized basis 等不同基选择。
+
+4. **仍未做 generation audit**
+
+目前仍是 DCF logits。
+
+5. **上游路径仍未闭合**
+
+本轮进一步理解 answer-site 子空间内部，但未解释 source 如何写入这些 basis sets。
+
+### 当前进展评价
+
+Phase116 是一次重要分解：
+
+```text
+DS7B: clean support basis set
+Qwen3: support/release basis split
+GLM4: weak
+```
+
+当前最可靠拼图：
+
+```text
+1. answer-site low-rank causal subspace 可拆成基向量功能成分。
+2. DS7B 强效来自多个 support basis 累积。
+3. Qwen3 的 release 是 basis-level 真实成分，不是统计噪声。
+4. 强 basis 与 readout/transport/template 方向都不简单对齐。
+```
+
+### 下一步任务
+
+Phase117 应做：
+
+```text
+Basis Rotation and Causal Axis Stabilization
+```
+
+目标：
+
+```text
+验证 Phase116 的 support/release basis 是否依赖 SVD 基选择；
+寻找更稳定、更接近因果轴的 basis。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B number/container/plant 做 SVD basis vs varimax-like rotation vs random orthogonal rotation。
+2. 对 Qwen3 container/plant 做 support/release basis 在不同旋转下的稳定性。
+3. 用 causal score 对子空间内方向做贪心搜索，找 causal-optimized basis。
+4. 比较各 basis 的 target_delta、release_delta、readout_cos、transport_cos。
+5. 保留 matched random control。
+```
+
+关键判据：
+
+```text
+如果 support/release 分解在不同合理旋转下稳定，
+则 basis-level 功能分解可信度提高；
+如果不稳定，则只能保留“子空间级”结论，不能解释单基功能。
+```
+
+## Phase 117: Basis Rotation and Causal Axis Stabilization 基旋转与因果轴稳定化 [2026-06-14 14:14]
+
+### 本阶段目标
+
+根据用户要求，先分析 Phase116 和附件判断是否正确，再继续客观测试。
+
+判断：
+
+```text
+Phase116 的子空间内部 basis component 审计基本正确；
+但 SVD basis 不是唯一基，因此 basis-level support/release 解释有硬伤；
+必须测试同一 answer-site causal subspace 在正交旋转下是否保持因果效应，
+以及单基 support/release 标签是否稳定。
+```
+
+本阶段 Phase117 目标：
+
+```text
+验证 Phase116 的 support/release basis 是否依赖 SVD 基选择；
+比较 SVD、varimax-like rotation、random orthogonal rotation、causal_greedy basis；
+区分“子空间级稳定事实”和“单基级可解释标签”。
+```
+
+### 生成脚本
+
+- 主测试脚本：`tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py`
+- 汇总脚本：`tests/gpt5/phase117_basis_rotation_causal_axis_summary.py`
+
+### 测试原理
+
+```text
+1. 复用 Phase116 的 answer-site category contrast matrix。
+2. 取 rank16 SVD 子空间作为同一因果子空间。
+3. 在该子空间内部构造不同正交基：
+   - svd
+   - varimax
+   - random_rot_0
+   - random_rot_1
+   - causal_greedy
+4. 对每个基向量做 answer_last projection removal。
+5. 按 target_delta 和 max_other_delta 标注 support/release/mixed/weak。
+6. 比较 single、top4、top8、top16、support set、release set。
+```
+
+关键判据：
+
+```text
+如果 top16 在不同旋转下保持一致：
+  子空间级因果事实稳定。
+
+如果 best single / support count / release count 随旋转改变：
+  单基标签依赖基选择，不能当作最终机制轴。
+
+如果 causal_greedy 用少量方向恢复大部分效果：
+  子空间内存在更集中的 causal axis。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py \
+  tests/gpt5/phase117_basis_rotation_causal_axis_summary.py
+
+python tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 4 \
+  --rank 8 \
+  --categories number,container \
+  --random-rotations 1 \
+  --causal-candidates 8 \
+  --set-sizes 1,2,4 \
+  --output-dir results/gpt5_phase117_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --categories number,container,clothing,plant \
+  --random-rotations 2 \
+  --causal-candidates 24 \
+  --set-sizes 1,2,4,8,16 \
+  --output-dir results/gpt5_phase117_basis_rotation_causal_axis \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --categories number,container,clothing,plant \
+  --random-rotations 2 \
+  --causal-candidates 24 \
+  --set-sizes 1,2,4,8,16 \
+  --output-dir results/gpt5_phase117_basis_rotation_causal_axis \
+  --hard-exit-after-model
+
+python tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --categories number,container,clothing,plant \
+  --random-rotations 2 \
+  --causal-candidates 24 \
+  --set-sizes 1,2,4,8,16 \
+  --output-dir results/gpt5_phase117_basis_rotation_causal_axis \
+  --hard-exit-after-model
+
+python tests/gpt5/phase117_basis_rotation_causal_axis_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase117_basis_rotation_causal_axis_cuda.py \
+  tests/gpt5/phase117_basis_rotation_causal_axis_summary.py
+```
+
+### 结果文件
+
+- Qwen3：`results/gpt5_phase117_basis_rotation_causal_axis/phase117_qwen3_basis_rotation_causal_axis.json`
+- GLM4：`results/gpt5_phase117_basis_rotation_causal_axis/phase117_glm4_basis_rotation_causal_axis.json`
+- DS7B：`results/gpt5_phase117_basis_rotation_causal_axis/phase117_deepseek7b_basis_rotation_causal_axis.json`
+- 跨模型汇总：`results/gpt5_phase117_basis_rotation_causal_axis/phase117_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, clothing, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+set_sizes = 1, 2, 4, 8, 16
+rotations = svd, varimax, random_rot_0, random_rot_1, causal_greedy
+causal candidates/category = 24
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  top16 在所有旋转下固定为 target Δ -1.82, release +2.76
+  svd single = -2.90 / release +1.59
+  varimax single = -1.41 / release +2.53
+  causal_greedy support set = -1.80 / release +0.31
+
+container:
+  top16 固定为 target Δ -2.53, release +1.90
+  svd support set = -1.65 / release 0
+  varimax single = -2.64 / release +1.33
+  random_rot_0 top8 = -3.60 / release +0.15
+  causal_greedy support set = -3.17 / release 0
+
+clothing:
+  top16 固定为 target Δ +1.69, release +1.49
+  svd support set = -1.03 / release 0
+  causal_greedy support set = -1.84 / release 0
+  release set 仍强：causal_greedy +2.31 / release +2.10
+
+plant:
+  top16 固定为 target Δ -1.24, release +1.59
+  svd support set = -1.39 / release 0
+  random_rot_1 top8 = -3.07 / release 0
+  causal_greedy top8 = -3.41 / release 0
+```
+
+Qwen3 结论：
+
+```text
+子空间级效果稳定，但 full-rank top16 常带 release；
+support/release 单基标签对旋转敏感；
+causal_greedy 可以找到更干净的局部 support set，
+但完整子空间仍包含 release/interface 成分。
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  top16 约 -0.90 / release +0.68
+  varimax top8 = -1.08 / release +0.78
+
+container:
+  top16 约 -0.22 / release +0.21
+
+clothing:
+  top16 约 -0.15 / release +0.20
+
+plant:
+  top16 约 -0.12 / release 0
+```
+
+GLM4 结论：
+
+```text
+旋转和 causal_greedy 没有挖出强隐藏因果轴；
+Phase116 的“GLM4 效应弱”继续成立。
+```
+
+#### DS7B
+
+```text
+number:
+  svd top16 = -12.58 / release 0
+  varimax top16 = -12.58 / release 0
+  random_rot_0 top16 = -12.59 / release 0
+  random_rot_1 top16 = -12.58 / release 0
+  causal_greedy top16 = -12.58 / release 0
+  varimax single = -12.24 / release 0
+  causal_greedy top4 = -10.65 / release 0
+
+container:
+  svd top16 = -12.52 / release 0
+  varimax top16 = -12.52 / release 0
+  random_rot_0 top16 = -12.54 / release 0
+  random_rot_1 top16 = -12.54 / release 0
+  causal_greedy top16 = -12.53 / release 0
+  varimax single = -11.53 / release 0
+  causal_greedy support set = -14.26 / release 0
+
+clothing:
+  top16 固定约 -2.46 / release 0
+  svd support set = -5.58 / release 0
+  full-rank 效果弱于 top4/top8，说明存在抵消成分
+  release set 在多种基下仍存在
+
+plant:
+  top16 固定为 -7.87 / release 0
+  svd top8 = -9.71 / release 0
+  varimax single = -8.63 / release 0
+  causal_greedy top8 = -9.91 / release 0
+```
+
+DS7B 结论：
+
+```text
+number/container/plant 是稳定的 causal subspace；
+full-rank 因果效应对正交旋转不敏感；
+但最强单基可从 SVD 的分布式形态变成 varimax 的集中单轴形态；
+因此“强子空间存在”稳定，“SVD 单基就是机制轴”不稳定。
+```
+
+### 当前最可靠客观事实
+
+1. **子空间级因果效应稳定**
+
+同一 rank16 子空间经过正交旋转后，top16 基本不变。
+
+典型：
+
+```text
+DS7B number:
+  svd -12.58
+  varimax -12.58
+  random_rot_0 -12.59
+  random_rot_1 -12.58
+  causal_greedy -12.58
+
+DS7B container:
+  svd -12.52
+  varimax -12.52
+  random rotations -12.54
+```
+
+这说明 Phase114/115 的 answer-site causal subspace 不是 SVD 偶然产物。
+
+2. **单基级标签明显依赖旋转**
+
+例如 DS7B number：
+
+```text
+svd:
+  best single -5.55
+  support count 8
+
+varimax:
+  best single -12.24
+  support count 1
+```
+
+同一子空间从“多个 support basis 累积”变成“一个极强单轴”，说明 Phase116 的 basis component 标签不能直接当作最终机制变量。
+
+3. **DS7B 存在可集中化的强因果轴**
+
+```text
+number varimax single -12.24
+container varimax single -11.53
+plant varimax single -8.63
+```
+
+这不是随机方向，而是同一低秩子空间内部经过旋转后显露出的集中方向。
+
+4. **DS7B 的 clean support 事实仍成立**
+
+对于 number/container/plant：
+
+```text
+target_down 强；
+release 接近 0；
+top8/top16 稳定；
+support set 强。
+```
+
+所以 Phase116 的“DS7B clean support subspace”需要改写为更严格表述：
+
+```text
+DS7B has a clean causal support subspace;
+its basis-level distribution depends on the chosen orthogonal basis.
+```
+
+即：
+
+```text
+DS7B 有干净因果支持子空间；
+但该支持在具体基向量上的分布依赖基选择。
+```
+
+5. **Qwen3 的 release/interface 是子空间级真实成分**
+
+Qwen3 top16 在完整子空间下仍带明显 release：
+
+```text
+number top16: target -1.82, release +2.76
+container top16: target -2.53, release +1.90
+clothing top16: target +1.69, release +1.49
+plant top16: target -1.24, release +1.59
+```
+
+虽然 causal_greedy 可以找到较干净 support set，但完整子空间仍包含 release/interface。
+
+6. **GLM4 仍没有强因果轴**
+
+旋转和 causal_greedy 都没有把 GLM4 提升到 DS7B/Qwen3 水平。
+
+### 对 Phase116 的修正
+
+Phase116 正确部分：
+
+```text
+1. answer-site low-rank subspace 内部确实含有功能不同的成分。
+2. DS7B 的 number/container/plant 是干净支持型因果子空间。
+3. Qwen3 的 release 是真实子空间成分，不是噪声。
+4. GLM4 效应弱。
+```
+
+需要修正部分：
+
+```text
+1. “basis component” 不能直接解释成唯一机制轴。
+2. support/release count 依赖基选择。
+3. SVD 下的 distributed support 不一定表示机制本身必须分布式；
+   varimax 可把 DS7B number/container/plant 压到强单轴或少数轴。
+4. 更稳健的表述单位应从 basis component 上升到 causal subspace 和 causal axis family。
+```
+
+### 理论进展
+
+Phase114/115/116/117 后，当前更稳健理论形式应改写为：
+
+```text
+Category causal state at answer site
+=
+low-rank causal subspace
++
+rotation-dependent causal axis family
++
+support/release/interface components
+```
+
+更具体：
+
+```text
+S_c(answer)
+  是稳定对象；
+
+Basis(S_c)
+  不是稳定对象；
+
+CausalAxisFamily(S_c)
+  是下一步要寻找的对象。
+```
+
+对于 DS7B：
+
+```text
+S_c(answer) 是 clean support subspace；
+在某些旋转下可集中成强 causal axis；
+但 SVD basis 下显示为多个 support basis 累积。
+```
+
+对于 Qwen3：
+
+```text
+S_c(answer) 同时含 support 与 release/interface；
+局部 support axis 可被 causal_greedy 找到；
+但完整子空间不是干净 support。
+```
+
+### 硬伤分析
+
+1. **causal_greedy 只是有限随机搜索**
+
+```text
+24 candidates/category 不等于全局最优因果轴。
+```
+
+2. **varimax 不是因果目标优化**
+
+varimax 只是几何稀疏化旋转，不能保证就是真实机制变量。
+
+3. **仍是 answer-site 单层测试**
+
+尚未验证这些集中因果轴是否由上游层写入，或在多层路径中保持同一坐标。
+
+4. **仍使用 DCF logits**
+
+没有开放生成验证。
+
+5. **Qwen3 的 release 仍未分解来源**
+
+目前只知道 release/interface 是子空间级成分，尚不知道来自竞争类别、模板、词形、对象属性还是任务格式。
+
+### 下一阶段任务
+
+Phase118 应进入：
+
+```text
+Causal Axis Transport and Source-to-Answer Closure
+```
+
+目标：
+
+```text
+把 Phase117 找到的稳定 causal axes 从 answer site 往上游追踪，
+测试这些轴是否在 object_last、middle layers、boundary layers 中被逐步写入；
+并判断 DS7B 的强 support axis 是否是跨层同一坐标，
+还是在 answer site 才重组出来。
+```
+
+建议测试：
+
+```text
+1. 选 DS7B number/container/plant 的 varimax/causal_greedy strong axes。
+2. 在 object_last 与 answer_last 同时测：
+   - source projection strength
+   - answer causal effect
+   - layer sweep
+3. 做 axis patch：
+   - remove at source layer
+   - remove at answer layer
+   - source+answer combined remove
+4. 加 Qwen3 container/plant 对照，追踪 release/interface 是否来自上游竞争轴。
+5. 加 random in-subspace axis 与 random ambient axis 对照。
+```
+
+Phase118 的关键问题：
+
+```text
+语言类别编码是否是：
+  上游对象位置写入稳定因果轴，
+  后续层传输并在答案位置读出；
+还是：
+  多个上游混合因素到答案位置才重组为 causal axis？
+```
+## Phase 118: Causal Axis Transport and Source-to-Answer Closure 因果轴传输与源到答案闭合 [2026-06-14 14:27]
+
+### 本阶段目标
+
+根据用户要求，先判断附件和 Phase117 分析是否正确，再继续客观测试。
+
+判断：
+
+```text
+附件对 Phase117 的判断正确。
+Phase117 没有推翻 Phase116，而是把结论收缩为：
+  子空间级 causal effect 稳定；
+  单个 SVD basis 的 support/release 标签不是旋转不变机制变量。
+```
+
+Phase118 目标：
+
+```text
+把 Phase117 找到的 answer-site causal axes 往上游追踪；
+测试同一轴在 object_last、answer_last、both 三个位置的因果效果；
+判断强轴是上游对象位置已经写入并直接传输，
+还是主要在 answer_last 位置组装/读出。
+```
+
+### 生成脚本
+
+- 主测试脚本：`tests/gpt5/phase118_causal_axis_transport_closure_cuda.py`
+- 汇总脚本：`tests/gpt5/phase118_causal_axis_transport_closure_summary.py`
+
+### 测试原理
+
+```text
+1. 在模型边界峰层构造 category answer-site rank16 causal subspace。
+2. 对该子空间做 varimax rotation，选择 answer_last target-down 最强的 varimax_best axis。
+3. 同时保留 svd_subspace 与 random_in_subspace 对照。
+4. 在近峰层 sweep：
+   Qwen3: L32-L35
+   GLM4: L15-L18
+   DS7B: L24-L27
+5. 对每个 patch layer，在三个位置移除同一轴/子空间：
+   object_last
+   answer_last
+   both
+6. 记录 DCF logits target_delta、max_other_delta，并监控 answer-layer selected axis projection。
+```
+
+判据：
+
+```text
+如果 object_last removal 接近 answer_last removal：
+  支持 source-to-answer 同坐标传输闭合。
+
+如果 answer_last removal 很强而 object_last removal 很弱：
+  支持 answer-site assembly/readout dominant。
+
+如果 both 明显强于 answer_last：
+  支持分布式位置共同因果。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase118_causal_axis_transport_closure_cuda.py \
+  tests/gpt5/phase118_causal_axis_transport_closure_summary.py
+
+python tests/gpt5/phase118_causal_axis_transport_closure_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 4 \
+  --rank 8 \
+  --layer-back 1 \
+  --categories number,container \
+  --output-dir results/gpt5_phase118_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase118_causal_axis_transport_closure_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase118_causal_axis_transport_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase118_causal_axis_transport_closure_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase118_causal_axis_transport_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase118_causal_axis_transport_closure_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase118_causal_axis_transport_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase118_causal_axis_transport_closure_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase118_causal_axis_transport_closure_cuda.py \
+  tests/gpt5/phase118_causal_axis_transport_closure_summary.py
+```
+
+### 结果文件
+
+- Qwen3：`results/gpt5_phase118_causal_axis_transport_closure/phase118_qwen3_causal_axis_transport_closure.json`
+- GLM4：`results/gpt5_phase118_causal_axis_transport_closure/phase118_glm4_causal_axis_transport_closure.json`
+- DS7B：`results/gpt5_phase118_causal_axis_transport_closure/phase118_deepseek7b_causal_axis_transport_closure.json`
+- 跨模型汇总：`results/gpt5_phase118_causal_axis_transport_closure/phase118_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+axis_types = varimax_best, svd_subspace, random_in_subspace
+patch_sites = object_last, answer_last, both
+patch layers:
+  qwen3 L32-L35
+  glm4 L15-L18
+  deepseek7b L24-L27
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  varimax_best selected = target Δ -1.41, release +2.53
+  object_last best = -0.02, release +0.04
+  answer_last best = -1.41, release +2.53
+  both best = -1.41, release +2.57
+  svd_subspace answer_last = -1.82, release +2.76
+
+container:
+  varimax_best selected = target Δ -2.64, release +1.33
+  object_last best = -0.07, release +0.05
+  answer_last best = -2.64, release +1.33
+  both best = -2.73, release +1.28
+  svd_subspace answer_last = -2.53, release +1.90
+
+plant:
+  varimax_best selected = target Δ -0.94, release +1.36
+  object_last best = +0.01, release +0.08
+  answer_last best = -0.94, release +1.36
+  both best = -1.00, release +1.31
+  svd_subspace answer_last = -1.24, release +1.59
+```
+
+Qwen3 结论：
+
+```text
+answer_last 明显强于 object_last；
+both 基本不超过 answer_last；
+Qwen3 的 release/interface 仍主要出现在 answer-site 轴移除中。
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  varimax_best selected = -0.38, release +0.26
+  object_last = 0.00
+  answer_last = -0.38
+  svd_subspace answer_last = -0.90
+  svd_subspace object_last = -0.31
+
+container:
+  varimax_best selected = -0.15, release +0.09
+  object_last = -0.01
+  answer_last = -0.15
+  svd_subspace answer_last = -0.22
+
+plant:
+  varimax_best selected = -0.04
+  object_last = -0.02
+  answer_last = -0.04
+```
+
+GLM4 结论：
+
+```text
+整体仍弱；
+没有出现强 source-to-answer closure。
+```
+
+#### DS7B
+
+```text
+number:
+  varimax_best selected = target Δ -12.24, release 0
+  object_last best = -0.74, release 0
+  answer_last best = -12.24, release 0
+  both best = -12.46, release 0
+  svd_subspace:
+    object_last -0.79
+    answer_last -12.58
+    both -12.78
+
+container:
+  varimax_best selected = target Δ -11.53, release 0
+  object_last best = -0.47, release 0
+  answer_last best = -11.53, release 0
+  both best = -11.70, release 0
+  svd_subspace:
+    object_last -0.48
+    answer_last -12.52
+    both -12.68
+
+plant:
+  varimax_best selected = target Δ -8.63, release 0
+  object_last best = -0.95, release 0
+  answer_last best = -8.63, release 0
+  both best = -8.91, release 0
+  svd_subspace:
+    object_last -0.90
+    answer_last -7.87
+    both -8.16
+```
+
+DS7B 结论：
+
+```text
+强因果轴在 answer_last 极强；
+同一轴/子空间在 object_last 移除非常弱；
+both 仅比 answer_last 小幅增强；
+因此当前测试不支持“同一坐标从 object_last 直接传输到 answer_last”。
+更支持 answer-site assembly/readout dominant。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 强轴主要是 answer-site 因果**
+
+典型比例：
+
+```text
+number:
+  object_last -0.74 vs answer_last -12.24
+
+container:
+  object_last -0.47 vs answer_last -11.53
+
+plant:
+  object_last -0.95 vs answer_last -8.63
+```
+
+object_last 不是完全没有信号，但远弱于 answer_last。
+
+2. **both 不形成强加和**
+
+```text
+DS7B number:
+  answer_last -12.24
+  both -12.46
+
+DS7B container:
+  answer_last -11.53
+  both -11.70
+
+DS7B plant:
+  answer_last -8.63
+  both -8.91
+```
+
+这说明在当前同轴 patch 设计下，主要因果杠杆已经集中在 answer_last。
+
+3. **Qwen3 同样是 answer_last 主导，但带 release**
+
+```text
+container:
+  object_last -0.07
+  answer_last -2.64, release +1.33
+  both -2.73, release +1.28
+```
+
+Qwen3 的 release/interface 并没有在 object_last 同轴移除中显著出现，而是在 answer-site removal 中出现。
+
+4. **GLM4 继续弱**
+
+GLM4 没有强同轴闭合结果，延续 Phase116/117 的弱效应结论。
+
+5. **同一 answer-site axis 不能简单当作 upstream source coordinate**
+
+Phase118 的核心负结果：
+
+```text
+把 answer-site 选出的强 causal axis 直接拿到 object_last 移除，
+不能复现 answer_last 的强 target_down。
+```
+
+这不等于上游没有类别信息，而是说明：
+
+```text
+上游对象位置的编码坐标可能不同；
+answer-site 强轴可能是后续层重组/读出后的坐标。
+```
+
+### 对 Phase117 的修正和推进
+
+Phase117 正确部分：
+
+```text
+answer-site causal subspace 稳定；
+DS7B 有 clean support subspace；
+varimax 可显露强单轴；
+Qwen3 有 support/release/interface mixed subspace。
+```
+
+Phase118 新增限制：
+
+```text
+这些 answer-site strong axes 不能直接外推为 object_last source axes。
+```
+
+更严格表述：
+
+```text
+CausalAxis_c(answer)
+  是答案位置强因果轴；
+但不一定等于 CausalAxis_c(object)。
+```
+
+### 理论进展
+
+当前条件化关系因子动力学公式应继续改写：
+
+```text
+Object state:
+  O_c^l(object)
+
+Transport / transformation:
+  T_{object -> answer}^{l..L}
+
+Answer state:
+  S_c^L(answer)
+
+Observed causal axis:
+  A_c^L(answer) ∈ S_c^L(answer)
+```
+
+Phase118 表明：
+
+```text
+A_c^L(answer)
+不能简单反向复制到 O_c^l(object)。
+```
+
+因此当前更稳健公式是：
+
+```text
+S_c^L(answer)
+=
+Transform_l_to_L(
+  O_c^l(object),
+  template/context,
+  attention/MLP routing
+)
+```
+
+而不是：
+
+```text
+S_c^L(answer)
+=
+direct_copy(O_c^l along same axis)
+```
+
+这对破解语言背后编码机制很关键：
+
+```text
+语言类别编码可能不是静态方向传输，
+而是跨层坐标变换后在答案位置形成可读出的因果子空间。
+```
+
+### 硬伤分析
+
+1. **只测试了 answer-site axis 在 upstream 的同坐标移除**
+
+弱 object_last 不代表上游无类别信息，只说明同一答案轴在 object_last 不闭合。
+
+2. **轴是在 monitor layer 拟合的**
+
+每层可能有自己的局部坐标。如果要公平测试 source axis，需要在每层分别构造 local causal axis。
+
+3. **object_last 可能不是唯一 source**
+
+类别信息可能分散在 object span、post-object tokens、template tokens 或 attention output 中。
+
+4. **Aproj 是均值投影监控**
+
+投影均值变化不等于分布形状变化；target_down 可能来自方差/样本级排序变化。
+
+5. **仍是 DCF logits**
+
+尚未做开放生成和多任务验证。
+
+### 下一阶段任务
+
+Phase119 应进入：
+
+```text
+Layer-local Source Axis Discovery and Coordinate Transform Mapping
+```
+
+目标：
+
+```text
+不要再把 answer-site axis 直接搬到 object_last；
+而是在每个 layer、每个 site 上分别学习 local category causal subspace/axis，
+再测试 local source axis 是否能影响最终 answer logits。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B number/container/plant，在 L24-L27 分别构造：
+   - object_last local contrast subspace
+   - answer_last local contrast subspace
+2. 每层分别选 local varimax_best axis。
+3. 测 local object axis removal 对最终 logits 的影响。
+4. 测 local object axis 与 next-layer answer axis 的对齐和投影变化。
+5. 加 object_span、post_object、answer_last 三类 source site。
+6. 对 Qwen3 container/plant 做同样测试，追踪 release/interface 是否来自局部 source axis。
+```
+
+Phase119 的关键问题：
+
+```text
+如果 local object axis 有强因果效果：
+  说明上游有类别源轴，只是坐标随层变换。
+
+如果 local object axis 仍弱：
+  说明类别因果子空间主要在 answer-site late assembly 中形成。
+```
+## Phase 119: Layer-local Source Axis Discovery 层局部源轴发现 [2026-06-14 14:58]
+
+### 本阶段目标
+
+根据用户要求，先判断附件与 Phase118 分析是否正确，再继续完成任务。
+
+判断：
+
+```text
+附件对 Phase118 的判断正确。
+Phase118 的负结果不能解释为 object/source 没有类别信息；
+只能说明 answer-site axis 不能直接当作 object_last 的同坐标 source axis。
+```
+
+Phase119 目标：
+
+```text
+不再把 answer-site axis 直接搬到 object_last；
+而是在每个 layer、每个 site 上分别学习 local category subspace/axis；
+测试 local source axis 是否能影响最终 DCF logits。
+```
+
+### 生成脚本
+
+- 主测试脚本：`tests/gpt5/phase119_layer_local_source_axis_cuda.py`
+- 汇总脚本：`tests/gpt5/phase119_layer_local_source_axis_summary.py`
+
+### 测试原理
+
+```text
+1. 对每个模型，在边界峰层前 3 层到峰层做 layer sweep。
+2. 对每个 layer 和 site，分别捕获 train objects 的 hidden state centers。
+3. 每个 site 单独构造 category contrast matrix。
+4. 对 local contrast matrix 取 rank16 SVD subspace。
+5. 对 local subspace 做 varimax rotation，并在同 layer/site 上选择 target-down 最强 local_varimax_best axis。
+6. 同时测试：
+   - local_varimax_best
+   - local_svd_subspace
+   - random_in_local_subspace
+7. 对 heldout objects 测最终 DCF logits 的 target_delta 与 max_other_delta。
+```
+
+本阶段测试的 site：
+
+```text
+object_last
+object_span_mean
+post_object_mean
+answer_last
+```
+
+其中：
+
+```text
+post_object_mean = object span 后到 answer_last 前/含 answer_last 的提示尾部区域平均。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase119_layer_local_source_axis_cuda.py \
+  tests/gpt5/phase119_layer_local_source_axis_summary.py
+
+python tests/gpt5/phase119_layer_local_source_axis_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 4 \
+  --rank 8 \
+  --layer-back 1 \
+  --sites object_last,answer_last \
+  --categories number,container \
+  --output-dir results/gpt5_phase119_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase119_layer_local_source_axis_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --sites object_last,object_span_mean,post_object_mean,answer_last \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase119_layer_local_source_axis \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase119_layer_local_source_axis_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --sites object_last,object_span_mean,post_object_mean,answer_last \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase119_layer_local_source_axis \
+  --hard-exit-after-model
+
+python tests/gpt5/phase119_layer_local_source_axis_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 16 \
+  --batch-size 24 \
+  --rank 16 \
+  --layer-back 3 \
+  --sites object_last,object_span_mean,post_object_mean,answer_last \
+  --categories number,container,plant \
+  --output-dir results/gpt5_phase119_layer_local_source_axis \
+  --hard-exit-after-model
+
+python tests/gpt5/phase119_layer_local_source_axis_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase119_layer_local_source_axis_cuda.py \
+  tests/gpt5/phase119_layer_local_source_axis_summary.py
+```
+
+### 结果文件
+
+- Qwen3：`results/gpt5_phase119_layer_local_source_axis/phase119_qwen3_layer_local_source_axis.json`
+- GLM4：`results/gpt5_phase119_layer_local_source_axis/phase119_glm4_layer_local_source_axis.json`
+- DS7B：`results/gpt5_phase119_layer_local_source_axis/phase119_deepseek7b_layer_local_source_axis.json`
+- 跨模型汇总：`results/gpt5_phase119_layer_local_source_axis/phase119_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, plant
+train objects/category = 8
+heldout test objects/category = 16
+templates = 4
+prompts/category = 64
+rank = 16
+scale = 1.5
+layers:
+  qwen3 L32-L35
+  glm4 L15-L18
+  deepseek7b L24-L27
+sites:
+  object_last
+  object_span_mean
+  post_object_mean
+  answer_last
+axis_types:
+  local_varimax_best
+  local_svd_subspace
+  random_in_local_subspace
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  object_last ≈ 0
+  object_span_mean ≈ 0
+  post_object_mean local_varimax_best: L35 target Δ -4.43, release +1.93
+  post_object_mean local_svd_subspace: L35 target Δ -4.41, release +2.30
+  answer_last local_varimax_best: L35 target Δ -1.41, release +2.53
+
+container:
+  object_last = -0.07
+  object_span_mean = -0.07
+  post_object_mean local_varimax_best: L32 target Δ -1.23, release +1.86
+  post_object_mean local_svd_subspace: L32 target Δ -1.73, release +3.61
+  answer_last local_varimax_best: L35 target Δ -2.64, release +1.33
+
+plant:
+  object_last = -0.02
+  object_span_mean = -0.05
+  post_object_mean local_varimax_best: L35 target Δ -5.29, release +1.37
+  post_object_mean local_svd_subspace: L35 target Δ -4.66, release +1.83
+  answer_last local_varimax_best: L35 target Δ -0.94, release +1.36
+```
+
+Qwen3 结论：
+
+```text
+object token 本身仍弱；
+post_object_mean 出现强 local source axis；
+但 release 很大，说明 Qwen3 的 source 区域仍是 support/release/interface 混合场。
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  object_last local_svd_subspace: -0.27, release +0.19
+  object_span_mean local_svd_subspace: -0.20, release +0.23
+  post_object_mean local_svd_subspace: -1.11, release +0.05
+  answer_last local_svd_subspace: -0.90, release +0.68
+
+container:
+  best source weak，post_object_mean local_varimax_best -0.48, release +0.57
+  answer_last local_svd_subspace -0.22
+
+plant:
+  all weak，post_object_mean local_varimax_best -0.29, release +0.31
+```
+
+GLM4 结论：
+
+```text
+仍弱；
+只有 number 的 post_object_mean local_svd_subspace 有轻度信号。
+```
+
+#### DS7B
+
+```text
+number:
+  object_last local_varimax_best: L27 target Δ -0.78, release 0
+  object_span_mean local_varimax_best: L27 target Δ -0.81, release 0
+  post_object_mean local_varimax_best: L27 target Δ -11.74, release 0
+  post_object_mean local_svd_subspace: L27 target Δ -12.03, release 0
+  answer_last local_varimax_best: L27 target Δ -12.24, release 0
+  answer_last local_svd_subspace: L27 target Δ -12.58, release 0
+
+container:
+  object_last local_varimax_best: L27 target Δ -0.90, release 0
+  object_span_mean local_varimax_best: L27 target Δ -0.95, release 0
+  post_object_mean local_varimax_best: L27 target Δ -13.24, release 0
+  post_object_mean local_svd_subspace: L27 target Δ -12.74, release 0
+  answer_last local_varimax_best: L27 target Δ -11.53, release 0
+  answer_last local_svd_subspace: L27 target Δ -12.52, release 0
+
+plant:
+  object_last local_varimax_best: L27 target Δ -0.97, release 0
+  object_span_mean local_varimax_best: L27 target Δ -1.44, release 0
+  post_object_mean local_varimax_best: L27 target Δ -10.58, release 0
+  post_object_mean local_svd_subspace: L27 target Δ -9.57, release 0
+  answer_last local_varimax_best: L27 target Δ -8.63, release 0
+  answer_last local_svd_subspace: L27 target Δ -7.87, release 0
+```
+
+DS7B 结论：
+
+```text
+object_last/object_span 仍弱；
+post_object_mean 出现与 answer_last 同量级甚至更强的 clean support source axis；
+release = 0；
+说明 Phase118 的负结果来自 source site 选窄了，而不是源轴不存在。
+```
+
+### 当前最可靠客观事实
+
+1. **object_last 不是主要类别因果源点**
+
+跨模型看：
+
+```text
+DS7B number object_last -0.78 vs answer_last -12.24
+DS7B container object_last -0.90 vs answer_last -11.53
+DS7B plant object_last -0.97 vs answer_last -8.63
+```
+
+即使重新学习 local object axis，object_last 仍远弱于 answer_last。
+
+2. **object_span_mean 也不是主要源点**
+
+DS7B：
+
+```text
+number object_span -0.81
+container object_span -0.95
+plant object_span -1.44
+```
+
+略强于 object_last，但仍远弱于 post_object/answer。
+
+3. **post_object_mean 是强 source/control site**
+
+DS7B：
+
+```text
+number post_object_mean -11.74 / -12.03
+container post_object_mean -13.24 / -12.74
+plant post_object_mean -10.58 / -9.57
+```
+
+这是 Phase119 的最大新发现。
+
+4. **DS7B 的 post_object source axis 是 clean support**
+
+```text
+release = 0
+```
+
+对 number/container/plant 都成立。
+
+5. **Qwen3 也有 post_object source effect，但混有 release**
+
+Qwen3：
+
+```text
+number post_object -4.43, release +1.93
+plant post_object -5.29, release +1.37
+container post_object -1.23 to -1.73, release +1.86 to +3.61
+```
+
+Qwen3 的相对竞争/接口混合场不仅在 answer site，也出现在 post_object/source-control 区。
+
+6. **random_in_local_subspace 对照显示 post_object 强效不是任意随机局部方向**
+
+DS7B：
+
+```text
+number random post_object -4.07 vs local_varimax -11.74
+container random post_object -1.48 vs local_varimax -13.24
+plant random post_object -2.61 vs local_varimax -10.58
+```
+
+随机方向有时也有信号，说明局部子空间整体有因果性，但 local_varimax/local_svd 更强。
+
+### 对 Phase118 的修正
+
+Phase118 正确部分：
+
+```text
+answer-site axis 不能直接外推为 object_last axis；
+object_last 同轴和 local axis 都弱；
+answer_last 是强因果杠杆。
+```
+
+Phase119 修正部分：
+
+```text
+源位置不能只看 object_last 或 object_span；
+post_object_mean 是强 source/control site；
+在 DS7B 中 post_object_mean 与 answer_last 同量级。
+```
+
+更严格表述：
+
+```text
+类别因果源不在 object token 本身，
+而更可能在 object 后的 prompt-tail / interface / pre-answer region 中形成。
+```
+
+### 理论进展
+
+当前公式进一步改写：
+
+```text
+Object lexical state:
+  O_c^l(object_span)
+
+Prompt-tail / interface control state:
+  P_c^l(post_object)
+
+Answer readout state:
+  A_c^L(answer)
+```
+
+Phase119 表明：
+
+```text
+O_c^l(object_span) 因果弱；
+P_c^l(post_object) 因果强；
+A_c^L(answer) 因果强。
+```
+
+因此当前更稳健的关系式是：
+
+```text
+A_c^L(answer)
+=
+Transform(
+  P_c^l(post_object),
+  O_c^l(object_span),
+  template/context,
+  route
+)
+```
+
+而不是：
+
+```text
+A_c^L(answer)
+=
+Transform(O_c^l(object_span))
+```
+
+进一步：
+
+```text
+P_c^l(post_object)
+可能是类别任务接口状态：
+  它把 object lexical state 转成 category-query/readout-ready state。
+```
+
+中文解释：
+
+```text
+对象词本身更像提供语义材料；
+对象后面的模板/接口区域把这些材料变成“准备回答类别”的控制状态；
+答案位置再把控制状态读出为目标类别 logits。
+```
+
+### 对破解语言编码机制的关键洞察
+
+1. **源不等于对象词本身**
+
+当前证据显示：
+
+```text
+object token 是语义材料位置；
+post_object region 是任务化/接口化控制位置；
+answer token 是输出读出位置。
+```
+
+2. **语言编码可能是三段式**
+
+```text
+object semantic material
+→ prompt-tail/interface control state
+→ answer-site causal subspace
+→ output logits
+```
+
+3. **DS7B 给出最干净版本**
+
+```text
+post_object_mean 与 answer_last 都是 clean support；
+object_last/object_span 弱；
+release = 0。
+```
+
+4. **Qwen3 给出竞争场版本**
+
+```text
+post_object 与 answer site 都有 target_down；
+但 release 明显，说明类别状态包含竞争/接口混合。
+```
+
+### 硬伤分析
+
+1. **post_object_mean 包含 answer_last**
+
+当前 post_object_positions 定义为 object 后到 answer_last，包含最终位置。
+这可能使 post_object_mean 受 answer_last 强轴影响。
+
+2. **post_object 是 mean patch**
+
+对所有 post-object tokens 使用同一 mean-derived axis，不能定位到底是哪一个 token 最关键。
+
+3. **仍没有显式 transform mapping**
+
+本轮发现了强 local source site，但没有拟合 post_object axis 到 answer_last axis 的变换。
+
+4. **仍是 DCF logits**
+
+没有开放生成验证。
+
+5. **只测了三个类别**
+
+number/container/plant 是关键类别，但还需要扩展到 clothing/furniture/time 等混合类别。
+
+### 下一阶段任务
+
+Phase120 应进入：
+
+```text
+Post-object Token Localization and Interface State Decomposition
+```
+
+目标：
+
+```text
+把 post_object_mean 拆开，定位到底是哪个 token 或哪类 token 形成强 source/control state；
+排除“只是 answer_last 被平均进去”的可能。
+```
+
+建议测试：
+
+```text
+1. 将 post_object 区域拆为：
+   - after_object_first
+   - after_object_middle
+   - pre_answer_last
+   - answer_last
+   - post_object_excluding_answer
+2. 对每个 token/site 构造 local axis。
+3. 在 DS7B number/container/plant 上优先测试。
+4. 对 Qwen3 number/container/plant 做对照，观察 release/interface 来源。
+5. 加 full post_object_mean 与 excluding_answer 对照。
+6. 继续保留 random_in_local_subspace control。
+```
+
+Phase120 的关键问题：
+
+```text
+强 post_object source axis 是由 answer_last 混入造成，
+还是确实存在于答案前的 prompt-tail/interface tokens？
+```
