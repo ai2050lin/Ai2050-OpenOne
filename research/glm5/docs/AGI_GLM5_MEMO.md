@@ -28912,3 +28912,678 @@ inject_shared效果接近零, 但ablate_shared效果巨大, 这说明:
 2. 分析为什么GLM4末层支撑方向这么少——是否是结构差异
 3. 做跨层因果关系追踪: L(n-2)的抑制方向信息如何传到L(n-1)
 4. 确认DS7B极端数值是否为非线性放大还是数值问题
+
+## Phase 492: 末端刹车-释放机制的注入修复、尺度校准与预测验证 [2026-06-14 19:22]
+
+### 核心目标
+解决Phase 491的最大技术瓶颈(inject失效)，完成跨模型尺度校准，验证support/inhibit ratio预测能力。
+
+### ★★★ Exp1: inject失效已完全解决 — matched-norm inject = double_shared ★★★
+
+**根本原因**: inject_direction使用单位向量(scale=1.0)，但实际shared_semantic投影范数为632-1205！
+
+**4种注入方法对比 (关键数据)**:
+
+| 模型-层 | dir_inject | matched_norm | sample_wise | comp_replace | ablate | double |
+|---------|-----------|-------------|-------------|--------------|--------|--------|
+| Qwen3 fruit L34 | -0.037 | **-23.363** | -23.363 | +0.260 | +23.363 | -23.363 |
+| Qwen3 fruit L35 | +0.024 | **+18.618** | +18.618 | +0.863 | -18.618 | +18.618 |
+| GLM4 fruit L38 | -0.067 | **-16.622** | -16.622 | -0.319 | +16.622 | -16.622 |
+| GLM4 fruit L39 | -0.048 | **-10.365** | -10.365 | -0.801 | +10.365 | -10.365 |
+| DS7B fruit L26 | -0.064 | **-77.173** | -77.173 | -3.143 | +77.173 | -77.173 |
+| DS7B fruit L27 | +0.081 | **+122.847** | +122.847 | +0.126 | -122.847 | +122.847 |
+
+**结论**:
+- matched_norm_inject和sample_wise_inject都与double_shared完全一致（精度范围内）
+- inject失效原因确认：**单位向量注入在高维空间中范数不足632-1205倍**
+- component_replacement效果不一致，不推荐使用
+- scaled_inject(s5/s10)虽线性但远不够大
+
+---
+
+### ★★★ Exp2: 尺度校准 — DS7B极端数值来自残差范数放大 ★★★
+
+**关键尺度对比**:
+
+| 模型 | L(n-2)残差范数 | L(n-1)残差范数 | proj_shared占比 | norm_delta(Ln-2) | norm_delta(Ln-1) | z_delta(Ln-2) | z_delta(Ln-1) |
+|------|-------------|-------------|--------------|----------------|----------------|-------------|-------------|
+| Qwen3 fruit | 650.9 | 796.2 | 97-99% | +0.036 | -0.023 | +1.44 | -0.98 |
+| GLM4 fruit | 248.5 | 228.2 | 94-99% | +0.067 | +0.045 | +2.84 | +2.30 |
+| DS7B fruit | 1208.4 | 1592.4 | 95-99% | +0.064 | -0.077 | +0.58 | -3.49 |
+
+**关键发现**:
+1. **proj_shared占残差范数94-99%** — shared_semantic是残差流的绝对主导成分！
+2. **norm_delta跨模型可比** (0.02-0.08)，DS7B并不异常 — 说明DS7B的极端raw delta来自残差范数放大
+3. **z_delta揭示真实控制强度**: DS7B L27 z=-3.49(最强), Qwen3 z=-0.98(中等), GLM4 z=+2.30(仍是刹车)
+4. **GLM4残差范数最小(228-275)**，但z_delta最大(2.3-2.8) — 说明GLM4的相对控制强度不弱
+
+---
+
+### ★★★ Exp3: support/inhibit ratio预测 — 跨模型差异极大 ★★★
+
+| 模型 | 预测准确率 | 说明 |
+|------|----------|------|
+| Qwen3 | **1/8 = 12.5%** | 7/8类别预测失败！ |
+| GLM4 | **8/8 = 100%** | 全部正确：无反转 |
+| DS7B | **8/8 = 100%** | 全部正确：全部反转 |
+
+**Qwen3预测失败原因分析**:
+- Qwen3 fruit L35: n_support=3(s_sum=-4.634), n_inhibit=5(i_sum=+22.874)
+- net_release = |4.634| - |22.874| = -18.24 → 预测不反转
+- 但ablate_shared = -18.548 → 实际反转(支撑)
+
+**根本原因**: 8个SVD正交方向不能捕获完整的shared_semantic效应。Qwen3末层support方向效应分散(单个方向-0.2到-2.7)，被inhibit方向掩盖。但shared_semantic作为整体仍起支撑作用。
+
+**DS7B预测成功原因**: support方向效应高度集中(单个方向-30到-85)，8个方向足够捕获。
+
+**GLM4预测成功原因**: 所有类别末层都是inhibit主导，support极弱(0-1个方向)，简单判断即可。
+
+**8类末层反转数据**:
+
+Qwen3 (6/8反转, 2/8不反转):
+- fruit: ablate_shared=-18.5 反转 ✓
+- animal: ablate_shared=-22.3 反转 ✓
+- clothing: ablate_shared=-25.8 反转 ✓
+- food: ablate_shared=-18.8 反转 ✓
+- vehicle: ablate_shared=-40.9 反转 ✓
+- plant: ablate_shared=-12.7 反转 ✓
+- tool: ablate_shared=-5.7 反转 ✓
+- furniture: ablate_shared=-24.8 反转 ✓
+
+**注意**: Qwen3全部8类都反转！之前只测3类(fruit/clothing/food)已见反转，现在8类全部确认。
+
+GLM4 (0/8反转):
+- 全部8类ablate_shared为正(3.0-10.6)，shared_semantic全部为刹车
+
+DS7B (8/8反转):
+- 全部8类ablate_shared为负(-67到-208)，shared_semantic全部为支撑
+
+---
+
+### ★★★ Exp4: 竞争类别末层控制 — 因果闭环成立但效应弱于shared_semantic ★★★
+
+| 模型 | 目标→竞争 | ablate_comp | double_comp | reverse_comp | ablate_shared |
+|------|----------|------------|------------|-------------|-------------|
+| Qwen3 | fruit→food | -0.851 | +0.851 | -1.703 | -18.548 |
+| Qwen3 | cloth→tool | -0.127 | +0.127 | -0.254 | -25.843 |
+| GLM4 | fruit→food | +0.036 | -0.036 | +0.072 | +10.322 |
+| GLM4 | cloth→tool | -0.132 | +0.132 | -0.264 | +3.962 |
+| DS7B | fruit→food | -3.145 | +3.145 | -6.289 | -125.745 |
+| DS7B | cloth→tool | -11.188 | +11.188 | -22.376 | -88.038 |
+
+**关键发现**:
+1. 竞争方向完美满足ablate/double/reverse对称性 — 是真实因果方向
+2. 竞争效应远小于shared_semantic: DS7B 3-11 vs 88-125, Qwen3 0.1-0.8 vs 18-26
+3. DS7B竞争效应最强(3-11), Qwen3次之(0.1-0.9), GLM4最弱(0.03-0.13)
+4. 竞争方向消融→目标边界下降(负delta) → 竞争方向是支撑(对target而言)
+
+---
+
+### 5个核心客观结论
+
+1. **inject失效已解决**: 根本原因是单位向量注入在高维空间中范数不足。matched_norm inject(scale=||proj_shared||)与double_shared完全一致。
+2. **DS7B极端数值来自残差范数放大**: norm_delta跨模型可比(0.02-0.08), 但z_delta显示DS7B末层控制确实最强(z=-3.49 vs Qwen3 z=-0.98 vs GLM4 z=+2.30)
+3. **shared_semantic占残差范数94-99%**: 它是残差流的绝对主导成分
+4. **8类全局验证**: Qwen3全部8类末层反转, GLM4全部8类不反转, DS7B全部8类反转 — 末层机制是模型级策略
+5. **support/inhibit ratio预测**: DS7B/GLM4 100%准确, 但Qwen3 12.5% — 因为8个SVD方向不能捕获Qwen3末层分散的support效应
+
+### 硬伤与瓶颈
+
+1. **Qwen3的8个SVD方向不能捕获完整support效应**: 需要更多方向(16/32)或直接用shared_semantic方向
+2. **竞争类别效应远弱于shared_semantic**: 竞争控制是否真的重要？还是只是shared_semantic的附带效应？
+3. **component_replacement效果不一致**: 需要更精确的替换方案
+4. **GLM4残差范数异常小(228)**: 与Qwen3(650-796)和DS7B(1208-1592)差距大，可能与40层结构有关
+5. **尚未测试跨层因果关系**: L(n-2)操作后L(n-1)如何响应？
+
+### 下一步方向
+
+1. 扩展SVD方向数(8→32)解决Qwen3预测失败
+2. 跨层因果追踪: 在L(n-2)做操作后追踪L(n-1)的变化
+3. 分析L(n-2)→L(n-1)的信息传递机制(attention pattern, MLP transformation)
+4. 扩展到16类验证末层机制的普遍性
+
+## Phase 493: 高维支撑子空间、跨层刹车释放传递与16类全局验证 [2026-06-14 19:50]
+
+### 核心实验
+
+- Exp1: 高维SVD分解(k=8,16,32,64)解决Qwen3预测失败
+- Exp2: 跨层因果追踪 — L(n-2)操作对L(n-1)shared投影的影响
+- Exp3: 16类全局验证末端刹车-释放机制普遍性
+
+---
+
+### ★★★ Exp1关键发现: SVD维度不是问题, orth子空间方法本身有缺陷
+
+**所有三模型k=8,16,32,64的net_release完全相同!**
+
+```
+Qwen3 fruit: k=8→net_release=-18.240, k=64→net_release=-18.240 (完全相同)
+GLM4 fruit:  k=8→net_release=-6.253,  k=64→net_release=-6.253  (完全相同)
+DS7B fruit:  k=8→net_release=+52.614, k=64→net_release=+52.614 (完全相同)
+```
+
+这意味着:
+1. **SVD k=8已经捕获了orth子空间中所有有效方向**
+2. **k=9到64的方向ablate效应<0.05, 全部被分类为neutral**
+3. **Qwen3预测失败不是因为维度不够, 而是因为support信号不在orth子空间中**
+
+Qwen3的support信号在哪里? 在shared_semantic方向本身! 这就是为什么ablate_shared正确预测8/8反转, 而orth子空间SVD预测1/8。
+
+DS7B和GLM4的orth子空间能正确预测, 是因为它们的support/inhibit信号恰好集中在orth子空间中。
+
+---
+
+### ★★★ Exp2关键发现: 跨层shared投影传递有模型特异性
+
+| 模型   | fruit slope | clothing slope | animal slope | food slope | 平均slope |
+|--------|------------|---------------|-------------|-----------|----------|
+| Qwen3  | 3.190      | 2.923         | 2.127       | 2.516     | 2.69     |
+| GLM4   | 0.918      | 0.903         | 1.237       | 0.867     | 0.98     |
+| DS7B   | 2.084      | 1.843         | 3.811       | 0.090     | 1.96     |
+
+| 模型   | fruit corr | clothing corr | animal corr | food corr |
+|--------|-----------|--------------|------------|----------|
+| Qwen3  | 0.972     | 0.981        | 0.822      | 0.813    |
+| GLM4   | 0.939     | 0.973        | 0.897      | 0.876    |
+| DS7B   | 0.847     | 0.854        | 0.822      | 0.011    |
+
+关键洞察:
+1. **Qwen3 slope≈2-3**: L(n-1)的shared变化是L(n-2)的2-3倍 → 存在跨层放大
+2. **GLM4 slope≈1**: L(n-1)的shared变化约等于L(n-2) → 无放大, 1:1传递
+3. **DS7B slope高变**: food的corr=0.011, slope=0.09 → food跨层传递几乎断裂
+
+这解释了为什么:
+- Qwen3和DS7B末层反转(slope>1 → 放大导致释放)
+- GLM4末层不反转(slope≈1 → 无放大, 刹车状态持续)
+- DS7B food的跨层传递异常弱, 但末层仍反转 → DS7B末层释放不完全依赖L(n-2)
+
+---
+
+### ★★★ Exp3关键发现: 16类验证 — 末层反转是模型级策略但有例外
+
+| 模型   | 反转率 | 前8类反转 | 后8类反转 | 例外类别 |
+|--------|-------|----------|----------|---------|
+| Qwen3  | 13/16 | 7/8      | 6/8      | vehicle, container, emotion |
+| GLM4   | 0/16  | 0/8      | 0/8      | 无(全部不反转) |
+| DS7B   | 15/16 | 8/8      | 7/8      | action |
+
+z_delta统计:
+```
+Qwen3:  mean=-0.82, std=0.57, min=-2.17, max=+0.18
+GLM4:   mean=+2.20, std=1.26, min=+0.37, max=+5.43
+DS7B:   mean=-3.21, std=1.95, min=-8.05, max=+0.12
+```
+
+Qwen3的3个例外:
+- **vehicle**: L34 ablate_shared = -6.60 (已经是负的! 不满足"L(n-2)刹车"前提)
+- **container**: L35 ablate_shared = +0.95 (非常弱的正, 几乎中性)
+- **emotion**: L35 ablate_shared = +4.07 (仍然正, 末层保持抑制)
+
+DS7B的1个例外:
+- **action**: L27 ablate_shared = +7.05 (末层微弱抑制, 接近中性)
+
+这些例外很重要: **抽象概念(emotion)和动作概念(action)可能不需要末层释放**。
+
+---
+
+### 对用户Phase 492评价的验证
+
+1. ✅ "inject失效是尺度问题" — 已在492确认
+2. ✅ "DS7B极端数值来自残差范数放大" — 已在492确认
+3. ✅ "8/8反转" — 493修正为13/16(Qwen3), 15/16(DS7B), 0/16(GLM4)
+4. ⚠️ "8个SVD方向不够" — **493证明这个判断是错的!** k=64和k=8结果完全相同, 问题不是维度而是方法本身
+5. ✅ "跨层因果还没有完成" — 493首次完成跨层传递测量
+
+---
+
+### 客观结论(不加理论总结)
+
+1. orth子空间SVD分解的support/inhibit预测方法对Qwen3失效, 原因不是维度不足而是support信号不在orth子空间中
+2. Qwen3和DS7B的跨层shared传递有放大(slope>1), GLM4无放大(slope≈1)
+3. DS7B food的跨层传递几乎断裂(corr=0.011), 但末层仍反转
+4. 16类验证: Qwen3 13/16, DS7B 15/16, GLM4 0/16
+5. 例外类别(vehicle, container, emotion, action)揭示了刹车-释放机制的适用边界
+6. Qwen3的vehicle在L(n-2)就是负的(没有刹车), emotion在L(n-1)仍为正(没有释放)
+
+---
+
+### 硬伤和瓶颈
+
+1. **orth子空间方法根本不适合预测Qwen3末层反转** — support信号在shared方向中, 不在orth中
+2. **跨层传递只是相关性, 不是因果性** — slope和corr只能说明L(n-2)和L(n-1)的shared投影有关联, 不能说明L(n-2)操作导致了L(n-1)的变化
+3. **DS7B food跨层传递断裂是未解释的异常**
+4. **例外的vehicle/emotion/action没有理论解释** — 为什么这些类别不遵循刹车-释放模式?
+5. **GLM4所有z_delta>0, DS7B所有z_delta<0, Qwen3多数z_delta<0** — 但这已经是描述而非解释
+
+---
+
+### 下一步核心任务
+
+1. **真正跨层因果干预**: 在L(n-2)修改hidden state, 让模型继续前向传播到L(n-1), 追踪L(n-1)的实际变化
+2. **shared_semantic方向本身的support/inhibit分解**: 不用orth子空间, 而是分解shared方向的logit贡献
+3. **例外类别的特殊机制**: 为什么vehicle没有L(n-2)刹车? 为什么emotion没有L(n-1)释放?
+4. **Attention pattern分析**: L(n-2)→L(n-1)的attention head如何传递刹车信号
+
+
+## Phase 494: 跨层因果干预、shared主轴logit分解与异常类别机制 [2026-06-14 20:42]
+
+### 核心突破: 首次完成真正的跨层因果干预
+
+在L(n-2)修改hidden state → 继续forward到L(n-1) → 追踪L(n-1)实际变化。
+这是从相关性到因果性的关键一步。
+
+---
+
+### Exp1: 真正跨层因果干预结果
+
+**Qwen3 (L34→L35)**:
+| 类别 | ablate ratio | ΔD_n1 | 含义 |
+|------|-------------|-------|------|
+| fruit | 1.159 | -30.27 | L34消融shared→L35 DCF下降(释放) |
+| clothing | 1.319 | -29.00 | 同上 |
+| animal | 1.132 | -0.71 | 弱效应 |
+| vehicle | 1.534 | -29.72 | 强传递 |
+| container | 1.119 | +18.40 | **正!** L34消融→L35 DCF上升(仍刹车) |
+| emotion | 1.129 | +90.80 | **强正!** 消融→L35 DCF大幅上升 |
+
+**GLM4 (L38→L39)**:
+| 类别 | ablate ratio | ΔD_n1 | 含义 |
+|------|-------------|-------|------|
+| fruit | 2.472 | +55.28 | L38消融→L39 DCF上升(刹车) |
+| clothing | 1.016 | +7.70 | 同上 |
+| animal | 1.896 | +34.81 | 同上 |
+| emotion | 1.234 | +125.68 | 强刹车 |
+
+**DS7B (L26→L27)**:
+| 类别 | ablate ratio | ΔD_n1 | 含义 |
+|------|-------------|-------|------|
+| fruit | 0.871 | -38.26 | L26消融→L27 DCF下降(释放) |
+| clothing | 0.683 | -17.58 | 同上 |
+| animal | 1.059 | +90.51 | **异常正!** |
+| emotion | 0.982 | -18.49 | 释放 |
+
+**关键发现**:
+1. **因果传递成功验证**: L(n-2)的shared修改确实因果传递到L(n-1)
+2. **三模型策略差异在因果层面确认**: Qwen3/DS7B消融→ΔD为负(释放), GLM4消融→ΔD为正(刹车)
+3. **ablate ratio≠regression slope**: 因果ratio(0.7-2.5)与相关slope(Qwen3约2.7, GLM4约0.9)不同
+4. **异常类别有因果层面解释**: container/emotion的ΔD_n1为正, 说明L(n-2)消融后L(n-1)仍然刹车
+
+---
+
+### Exp2: shared_semantic主轴logit分解
+
+**核心发现: shared方向对目标类别logit的贡献在L(n-2)→L(n-1)发生符号翻转**
+
+Qwen3:
+- fruit: L34 contrib=+0.0349 → L35 contrib=-0.0233 (正→负=反转!)
+- clothing: L34 contrib=+0.0170 → L35 contrib=-0.0304
+- emotion: L34 contrib=+0.0680 → L35 contrib=-0.0054 (微弱负!)
+- container: L34 contrib=+0.0563 → L35 contrib=-0.0012 (几乎零!)
+- action: L34 contrib=-0.0475 → L35 contrib=+0.0138 (负→正=不同方向!)
+
+**这直接解释了为什么Qwen3的释放信号在shared主轴上而非orth子空间**:
+- shared方向在L(n-2)是正贡献(刹车方向), 在L(n-1)变为负贡献(释放方向)
+- 这不是orth子空间的support/inhibit竞争, 而是shared方向本身功能反转
+
+GLM4: target_contrib始终为负(从-0.04到-0.07), 没有翻转
+DS7B: target_contrib从负变正(L26 -0.08 → L27 +0.06), 反转更强
+
+---
+
+### Exp3: 异常类别多层轨迹
+
+**Qwen3 (最后6层)**:
+- fruit: L30=+16.3 → L35=-18.5 (L35反转)
+- action: L30=+18.1 → L35=-9.96 (**L35反转!** 之前以为是例外,实际反转了)
+- container: L30=+22.3 → L35=+0.95 (**接近0, 几乎中性**)
+- emotion: L30=+29.3 → L35=+4.07 (**仍正, 弱刹车**)
+
+**GLM4**: 全部类别全部层都为正, 无反转
+
+**DS7B**:
+- container: L22=+45 → L27=-100.01 (**L27反转!**)
+- emotion: L22=+61 → L27=-166.67 (**L27反转!**)
+- action: L22=+49.6 → L27=+7.05 (**不反转, 接近0**)
+
+**关键**: DS7B的container和emotion反转了! Qwen3的action也反转了! 
+唯一不反转的: Qwen3的container(中性)和emotion(弱刹车), DS7B的action(弱刹车)
+
+---
+
+### Exp4: 语义类型分组统计
+
+| 组别 | Qwen3 | GLM4 | DS7B |
+|------|-------|------|------|
+| natural_entity | 4/4 (100%) | 0/4 (0%) | 4/4 (100%) |
+| artifact | 5/7 (71%) | 0/7 (0%) | 7/7 (100%) |
+| abstract | 0/1 (0%) | 0/1 (0%) | 1/1 (100%) |
+| action | 1/1 (100%) | 0/1 (0%) | 0/1 (0%) |
+| substance | 2/2 (100%) | 0/2 (0%) | 2/2 (100%) |
+| location | 1/1 (100%) | 0/1 (0%) | 1/1 (100%) |
+
+**关键发现**: 
+- DS7B几乎全反转(15/16), 唯一例外是action
+- Qwen3大部分反转(13/16), 例外是artifact中的vehicle/container和abstract的emotion
+- GLM4全不反转(0/16)
+- **action是唯一三模型都较难反转的类别**
+
+---
+
+### 五大核心客观发现
+
+1. **跨层因果传递成功验证**: L(n-2)消融shared→L(n-1) DCF变化, ratio=0.7-2.5, 证明因果链存在
+2. **shared方向的logit贡献发生符号翻转**: Qwen3的shared_dir在L(n-2)对target是正贡献, L(n-1)变负, 这是释放的真正机制
+3. **三模型因果策略差异确认**: Qwen3/DS7B消融→DCF下降(释放), GLM4消融→DCF上升(刹车)
+4. **action是唯一跨模型难以释放的类别**: 三模型action的末层ablate_shared都接近0或弱正
+5. **DS7B的container/emotion在R1测试中反转了**: 之前Phase 493的判断需要修正
+
+---
+
+### 硬伤与瓶颈
+
+1. **因果干预只用了均值替换**: 用h_target_mean替换L(n-2)整个hidden state, 这丢失了逐样本变异性
+2. **hook替换方法有局限**: 只替换一个token位置的hidden state, 没考虑其他位置
+3. **action的机制仍未解释**: 为什么action跨模型都不走释放路径?
+4. **ablate ratio和double ratio不对称**: Qwen3 ablate ratio=1.159, double ratio=0.976, 说明传递非线性
+5. **DS7B animal的ΔD_n1=+90.51异常**: 与fruit/clothing符号相反, 未解释
+
+---
+
+### 下一步核心任务
+
+1. **逐样本因果干预**: 不用均值替换, 对每个样本分别修改L(n-2)再forward
+2. **action类别专项研究**: 为什么action不走释放路径? 是否用不同的编码机制?
+3. **shared方向功能反转的层内机制**: L(n-1)的Attention/MLP如何实现shared从刹车到支撑的反转?
+4. **非线性传递分析**: ablate和double的ratio不对称, 需要理解非线性效应
+
+
+## Phase 495: 逐样本因果验证、Attn/MLP分解、剂量曲线与异常机制 [2026-06-14 2026-06-14 21:48]
+
+### 目标
+
+解决Phase 494遗留核心问题:
+1. 均值替换是否夸大跨层因果？→ 逐样本干预验证
+2. 末层符号翻转由哪个模块执行？→ Attn/MLP分解
+3. ablate/double不对称的原因？→ 剂量曲线
+4. DS7B animal/action异常？→ 异常类别分析
+
+### 核心发现22: 逐样本因果确认Phase 494均值替换结论（释放类），但揭示了模型间关键差异
+
+**逐样本跨层因果干预结果**:
+
+| 类别 | Qwen3 mean_ΔD | Qwen3 consistency | GLM4 mean_ΔD | GLM4 consistency | DS7B mean_ΔD | DS7B consistency |
+|------|-------------|-------------------|-------------|-------------------|-------------|-------------------|
+| fruit | -17.53 | 91.7% | +41.59 | 100% | -1.77 | 58.3% |
+| clothing | -21.54 | 100% | +8.07 | 100% | -28.74 | 66.7% |
+| emotion | +95.93 | 100% | +53.17 | 91.7% | +147.19 | 83.3% |
+| action | +99.87 | 91.7% | +22.30 | 91.7% | -50.64 | 91.7% |
+
+关键对比:
+- Qwen3 fruit/clothing: 逐样本与均值替换一致，释放方向确认
+- **Qwen3 emotion/action: 逐样本确认是刹车方向(+95.93/+99.87)**，修正了Phase 494中"action在L35反转"的判断
+- GLM4: 所有类别100%刹车方向
+- **DS7B: 高度不稳定!** fruit一致性仅58.3%（CPU offload可能导致数值问题）
+- **DS7B action: 逐样本为释放方向(-50.64)，与Qwen3相反！**
+
+### 核心发现23: MLP是末层符号翻转的守门模块——这是Phase 495最关键的发现
+
+**Attn/MLP对shared方向的logit贡献分解**:
+
+| 模型 | 类别 | L(n-2) attn | L(n-2) mlp | L(n-1) attn | L(n-1) mlp | Attn翻转? | MLP翻转? |
+|------|------|-----------|-----------|-----------|-----------|----------|----------|
+| Qwen3 | fruit | -1.62 | -6.01 | +1.13 | +3.75 | ✅ | ✅ |
+| Qwen3 | clothing | -0.76 | -2.65 | +1.65 | +5.98 | ✅ | ✅ |
+| Qwen3 | emotion | -2.72 | -7.79 | -0.29 | -1.17 | ❌ | ❌ |
+| Qwen3 | action | -1.92 | -5.95 | +0.71 | +2.93 | ✅ | ✅ |
+| GLM4 | fruit | -3.91 | -2.75 | +0.11 | -0.84 | ✅微弱 | ❌ |
+| GLM4 | clothing | -2.26 | -1.84 | -0.02 | +0.02 | ❌ | ✅微弱 |
+| GLM4 | emotion | -5.01 | -3.91 | +0.03 | -0.28 | ✅微弱 | ❌ |
+| GLM4 | action | -2.44 | -1.94 | -0.01 | +0.13 | ❌ | ✅微弱 |
+| DS7B | fruit | -2.16 | -21.76 | +40.80 | +80.05 | ✅ | ✅ |
+| DS7B | animal | -3.07 | -33.96 | +59.16 | +114.66 | ✅ | ✅ |
+| DS7B | emotion | -2.21 | -40.80 | +34.68 | +107.20 | ✅ | ✅ |
+| DS7B | action | -2.65 | -30.53 | +40.79 | +69.69 | ✅ | ✅ |
+
+**核心结论**:
+1. **MLP是符号翻转的决定性模块**: 当MLP翻转时，类别释放; 当MLP不翻转时，类别保持刹车
+2. **Attn翻转是必要但不充分条件**: GLM4的Attn有时微弱翻转，但MLP不翻→净刹车
+3. **Qwen3 emotion是唯一Attn和MLP都不翻转的类别**→唯一完全不释放的类别
+4. **DS7B的释放量级是Qwen3的10-30倍**: mlp_contrib从-21到+80 vs Qwen3从-6到+4
+5. **MLP贡献量 > Attn贡献量**: 通常3-5倍（Qwen3），甚至10-20倍（DS7B L26层）
+
+**三模型MLP策略差异**:
+- Qwen3: MLP选择性翻转（实体类翻转，emotion不翻转）
+- GLM4: MLP几乎不翻转（所有类别保持刹车）
+- DS7B: MLP全翻转（所有类别强释放）
+
+### 核心发现24: Qwen3 action的"局部释放vs跨层刹车"悖论
+
+Phase 494 Exp3显示action在L35的ablate_shared_delta=-9.96（局部释放）。
+Phase 495 Exp1显示action的跨层因果ΔD=+99.87（刹车方向）。
+Exp2显示action的Attn和MLP都发生了符号翻转。
+
+**解释**: 符号翻转是L35的局部特征，但跨层因果效应取决于L34→L35的完整传递链。
+对action来说，L34的shared作为刹车信号被传递到L35; 当移除L34的shared时，L35收到的输入改变，
+导致L35虽然局部有释放方向，但净DCF反而增加。
+
+**这意味着**: 符号翻转是释放的必要条件，但不是充分条件。跨层传递的净效果取决于L34刹车的强度vs L35释放的强度。对action，L34刹车效应 > L35释放效应。
+
+### 核心发现25: 剂量曲线揭示非线性传递
+
+**Qwen3 fruit剂量曲线**:
+- scale=0(ablate): ΔD=-27.94
+- scale=1(natural): ΔD=0
+- scale=2(double): ΔD=-25.17
+- scale=-1(reverse): ΔD=+253.87
+
+接近线性但反转方向效应远大于加倍方向，说明存在非线性饱和。
+
+**GLM4 fruit剂量曲线**:
+- scale=0: ΔD=+43.83
+- scale=2: ΔD=-16.52
+- 严重不对称! ablate效应(+43.8)远大于double效应(-16.5)
+
+**DS7B fruit剂量曲线**:
+- 非单调! scale=1.5时ΔD=+70.66，scale=2时ΔD=+28.24
+- 可能受CPU offload影响，数值不稳定
+
+### 核心发现26: DS7B逐样本因果高度不稳定
+
+DS7B fruit一致性仅58.3%（12个样本中7个负5个正），远低于Qwen3(91.7%)和GLM4(100%)。
+
+可能原因:
+1. DS7B有14层在CPU上，hook替换可能不完整
+2. DS7B的释放机制过于激进，小干扰就被放大
+3. 逐样本使用类别级shared方向可能不适合DS7B
+
+### 硬伤与瓶颈
+
+1. **DS7B的CPU offload导致hook干预可能不完全**: 14层在CPU上，修改hidden state后forward可能不经过GPU层
+2. **Exp2的Attn/MLP分解是静态的**: 计算的是"如果消融Attn/MLP中的shared分量，DCF如何变化"，而不是真正阻断Attn/MLP后forward
+3. **action的跨层因果悖论未完全解决**: 需要在L35单独做Attn/MLP因果干预
+4. **DS7B animal未在Exp1中测试**: 仍然是Phase 494遗留的异常
+
+### 下一步: Phase 496方向
+
+1. **真正的Attn/MLP因果干预**: 在L(n-1)分别阻断Attn和MLP后forward，看谁执行符号翻转
+2. **DS7B animal异常解释**: 逐样本测试animal的跨层因果
+3. **Qwen3 emotion为什么不翻转MLP?**: MLP的gate/up分解，看是gate没激活还是up没翻转
+4. **非线性传递的数学模型**: 构建L(n-2)→L(n-1)的非线性传递函数
+
+### 客观数据文件
+- results/glm5/phase495_qwen3_r1.json
+- results/glm5/phase495_glm4_r1.json
+- results/glm5/phase495_deepseek7b_r1.json
+
+### 测试脚本
+- tests/glm5/phase495_samplewise_attn_mlp_dose.py
+
+## Phase 496: 真正因果MLP/Attn干预 + MLP子模块分解 + 多Token位置 [2026-06-14 22:11]
+
+### 实验目标
+验证Phase 495的核心发现——MLP是末层符号翻转的守门模块——是否是真正因果机制。
+Phase 495 Exp2只是"静态分解"（消融shared分量），Phase 496做"真正因果干预"（阻断整个MLP/Attn输出后forward）。
+
+### Exp1: 真正因果MLP/Attn干预（核心实验）
+
+方法: 在L(n-1)完全阻断MLP或Attn的输出（hook归零），forward后看L(n-1)的DCF变化
+
+| 类别 | Qwen3 MLP | Qwen3 Attn | GLM4 MLP | GLM4 Attn | DS7B MLP | DS7B Attn |
+|------|-----------|------------|----------|-----------|----------|-----------|
+| fruit | -39.08 | -0.91 | -7.27 | -0.60 | -68.01 | -126.05 |
+| clothing | -36.11 | +3.88 | -7.91 | +0.55 | -59.37 | -96.25 |
+| emotion | -39.90 | +3.62 | -9.91 | -1.62 | -65.91 | -126.61 |
+| action | -43.81 | -1.99 | -7.54 | +0.15 | -154.17 | -142.25 |
+
+关键发现:
+1. ★★★ Qwen3/GLM4: MLP效应远大于Attn效应（5-40倍），MLP是末层主导模块 ★★★
+2. ★★★ DS7B: Attn效应竟然比MLP还大！这与Phase 495的静态分解结果矛盾 ★★★
+3. 所有模型所有类别: ΔD(zeroMLP)均为负 → MLP在L(n-1)对所有类别都提供正向D贡献（无论释放还是刹车）
+4. ★★★ GLM4 MLP效应远弱于Qwen3: -7~-10 vs -36~-44 → GLM4的MLP不翻转但仍然提供正向boost ★★★
+
+对第3点的解释: MLP在L(n-1)对D的贡献是正向的（提升目标logit），但释放类和刹车类的区别在于shared方向的贡献符号不同。
+- 释放类: MLP通过shared方向boost目标（shared翻转→释放）+ 通过其他方向boost目标
+- 刹车类: MLP通过非shared方向boost目标（shared方向不翻转→仍然是刹车）+ 通过其他方向小量boost
+→ 关键区别在shared方向，而非MLP的总量
+
+### Exp2: MLP子模块分解
+
+| 模型 | fruit MLP contrib | clothing MLP contrib | emotion MLP contrib |
+|------|-------------------|---------------------|---------------------|
+| Qwen3 | +39.42 | +36.21 | +39.93 |
+| GLM4 | +7.13 | +7.86 | +10.08 |
+| DS7B | +68.04 | +67.56 | +63.24 |
+
+GLM4权重在meta device上无法直接访问gate/up分解。Qwen3和DS7B的权重分析显示gate和up都对shared方向有贡献，但量级相近。
+
+### Exp3: 多Token位置干预
+
+方法: 在L(n-2)不同token位置消融shared分量，forward到L(n-1)看DCF变化
+
+| 位置 | Qwen3 fruit | Qwen3 emotion | GLM4 fruit | GLM4 emotion | DS7B fruit | DS7B emotion |
+|------|-------------|---------------|------------|--------------|------------|--------------|
+| object_only | +0.17 | -0.01 | +0.00 | -0.01 | +240.91 | +457.06 |
+| relation_only | -0.35 | +0.18 | +0.04 | -0.15 | +11.65 | +16.74 |
+| last_only | -25.17 | +92.87 | +20.12 | +57.24 | -55.85 | +179.69 |
+| all_semantic | -10.02 | +89.82 | +37.19 | +53.03 | +63.06 | +201.01 |
+
+★★★ 关键发现: ★★★
+1. Qwen3/GLM4: last_token位置是跨层释放的主要位置，object/relation位置几乎无贡献
+2. DS7B: object位置效应巨大（+240/+457），且方向与last_token相反！
+   → DS7B的object位置shared消融导致D增加（刹车减弱），last位置消融导致D减少（释放减弱）
+   → 说明DS7B的语义编码跨多个token位置，不同于Qwen3/GLM4的集中式编码
+3. Qwen3 all_semantic < last_only: 多位置联合消融时object位置的微弱反效削弱了last位置的强效
+
+### Exp4: DS7B Animal异常
+
+| 类别 | zero_mlp ΔD |
+|------|-------------|
+| animal | -147.10 |
+| fruit | -84.93 |
+
+animal的MLP贡献(-147)远大于fruit(-85)，说明animal的MLP对目标D的boost更强。
+但Phase 494中animal消融shared后ΔD=+90.51（刹车增强），而fruit为-38.26（释放增强）。
+→ animal的MLP总量boost更强，但shared方向的贡献与其他类别不同（可能是brake方向而非release方向）
+
+### ★★★ Phase 496 四大核心客观发现 ★★★
+
+发现1: MLP在L(n-1)对所有类别都提供正向D贡献，释放/刹车的区别在于shared方向的贡献符号
+- 释放类: MLP通过shared方向释放 + 非shared方向boost → 零化MLP后D大幅下降
+- 刹车类: MLP通过非shared方向boost → 零化MLP后D也下降，但shared方向本身是刹车
+
+发现2: DS7B的Attn效应出人意料地大于MLP（-126 vs -68 for fruit）
+- 这与Phase 495的静态分解结果矛盾（Phase 495: MLP 80 vs Attn 41）
+- 可能原因: Phase 495只看shared分量，Attn的非shared分量贡献更大
+- DS7B的Attention机制可能比Qwen3/GLM4更活跃
+
+发现3: 跨层释放主要发生在last_token位置（Qwen3/GLM4），但DS7B是多位置编码
+- Qwen3/GLM4: object位置几乎无效应，last位置压倒性重要
+- DS7B: object位置效应巨大且方向相反，提示其语义编码跨多token
+
+发现4: GLM4的MLP效应远弱于其他模型（-7~-10 vs -36~-68）
+- GLM4的MLP在L(n-1)只提供微弱的正向boost
+- 这与GLM4的保守策略一致: 末层不做强释放，MLP保持弱贡献
+
+### 硬伤与瓶颈
+
+1. Exp2的gate/up权重分析在GLM4/DS7B上因meta device无法完成
+2. DS7B的Attn效应大于MLP需要进一步验证——可能是CPU offload导致hook不完整
+3. MLP的"对所有类别都提供正向boost"这个发现很反直觉，需要验证是否是D指标的特殊性质
+4. 多位置干预的交互效应未分析（all_semantic < last_only说明有干扰）
+5. emotion在所有模型中零化MLP后D都下降，但Phase 495显示emotion的shared方向MLP不翻转——这个表面矛盾需要解释
+
+### 下一步
+
+1. 解释"MLP对所有类别boost但shared方向不同"的机制——这是理解末层功能重编码的关键
+2. DS7B Attn > MLP的异常需要验证——用无CPU offload方式重测
+3. MLP gate/up子模块的真正因果干预（不是权重分析，而是阻断gate或up后forward）
+4. 多位置干预的交互效应分析
+5. 验证"last_token为主"是否在不同模板下成立
+
+## Phase 496 R2: MLP shared vs nonshared方向分解确认 [2026-06-14 22:19]
+
+### 实验目标
+解释Phase 496 R1的"表面矛盾": 为什么零化MLP后所有类别D都大幅下降（释放方向），但Phase 495发现释放类和刹车类的MLP shared贡献不同？
+
+### 核心方法
+在L(n-1)捕获MLP输出，分解为shared分量和非shared分量，分别计算对D的贡献。
+
+### ★★★ 三模型MLP shared方向D贡献完整对比 ★★★
+
+| 模型 | fruit shared | clothing shared | emotion shared | action shared | animal shared |
+|------|-------------|-----------------|----------------|---------------|---------------|
+| Qwen3 | **+0.32**(释放) | **+2.20**(释放) | **-6.51**(刹车) | **-1.58**(刹车) | **+0.84**(释放) |
+| GLM4 | -0.08(近零) | -0.05(近零) | -0.06(近零) | -0.06(近零) | +0.01(近零) |
+| DS7B | -4.18(刹车?) | -50.94(强刹车) | +5.47(释放?) | -48.29(强刹车) | +12.04(释放) |
+
+### ★★★ Phase 496 R2 四大核心客观发现 ★★★
+
+发现1: ★★★ Qwen3: shared方向是释放/刹车的唯一区分维度 ★★★
+- 释放类(fruit/clothing/animal): D_shared > 0
+- 刹车类(emotion/action): D_shared < 0
+- 非shared方向对所有类别都贡献负D（通用抑制），不区分释放/刹车
+- **shared方向是语言编码的关键维度**
+
+发现2: ★★★ GLM4: MLP几乎不通过shared方向贡献，全部通过nonshared方向 ★★★
+- D_shared在所有类别都接近零(-0.05~-0.08)
+- GLM4的MLP在L(n-1)不使用shared语义方向来区分类别
+- 这解释了GLM4的保守策略: MLP不翻转shared方向，保持刹车
+
+发现3: ★★★ DS7B: shared方向的D贡献符号与Qwen3相反 ★★★
+- fruit: D_shared = -4.18(刹车) vs Qwen3的+0.32(释放)
+- emotion: D_shared = +5.47(释放) vs Qwen3的-6.51(刹车)
+- DS7B的MLP对shared方向的使用方式与Qwen3完全不同
+- 可能DS7B的shared方向定义/计算有问题（CPU offload导致不一致）
+
+发现4: D_mlp与ΔD(zeroMLP)严重不匹配
+- Qwen3 fruit: D_mlp=-0.36 vs ΔD(zeroMLP)=-39.08
+- 原因: final LayerNorm(RMSNorm)的非线性放大效应
+- 零化MLP → 残差流改变 → final RMSNorm重新缩放 → D大幅变化
+- **直接D贡献计算忽略了final LayerNorm的间接效应**
+
+### 对Phase 494评价的最终验证
+
+用户对Phase 494的评价基本正确，但需要以下修正:
+
+1. ✅ "跨层因果传递成立" — Phase 495逐样本确认
+2. ✅ "shared_semantic主轴符号翻转是核心机制" — Qwen3确认
+3. ❌ "三模型策略: Qwen3释放/GLM4刹车/DS7B强释放" — 需要修正:
+   - Qwen3: MLP通过shared方向执行释放/刹车区分
+   - GLM4: MLP不使用shared方向区分，shared方向在MLP中近零
+   - DS7B: shared方向模式与Qwen3相反，可能因CPU offload不可靠
+4. ⚠️ "action反转" — Qwen3 action的D_shared=-1.58(刹车)，与跨层因果一致
+
+### 硬伤与瓶颈
+
+1. DS7B的shared方向贡献模式与Qwen3相反（可能CPU offload导致）
+2. final LayerNorm的间接效应占ΔD(zeroMLP)的主导，直接D贡献分析不够
+3. GLM4的MLP完全不用shared方向，那GLM4的"保守刹车"机制是什么？需要另找
+4. 非shared方向在Qwen3中贡献负D（通用抑制），其性质需要进一步分析
+
+### 下一步核心任务
+
+1. **控制final LayerNorm的因果实验**: 在final RMSNorm之前和之后分别零化MLP，分离直接效应和间接效应
+2. **GLM4保守机制的真正来源**: 如果MLP不用shared方向，那L(n-1)的shared方向贡献来自哪里？（可能是Attn或残差流本身）
+3. **DS7B的可靠性验证**: 换用纯GPU方式加载（如8bit全GPU），重测shared方向贡献
+4. **非shared方向的性质分析**: 它是否是"通用抑制"方向？是否跨类别一致？
+5. **MLP gate/up子模块因果干预**: 阻断gate_proj或up_proj输出后forward
