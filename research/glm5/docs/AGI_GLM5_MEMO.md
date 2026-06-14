@@ -28336,3 +28336,225 @@ python tests/glm5/phase487_orthogonal_propagation.py qwen3 2
 
 脚本: tests/glm5/phase487_orthogonal_propagation.py
 结果: results/glm5/phase487_{qwen3,glm4,deepseek7b}_r1.json, phase487_qwen3_r2.json
+
+
+## Phase 488: 边界前体传播算子与正交空间细分 [2026-06-14 13:50]
+
+### 核心发现: 正交成分主要不是边界前体,而是反对/调节成分
+
+Phase 487的结论需要重大修正。Phase 488通过4个独立实验证明: 中间层的orth_bc不是"通过后续层旋转变成B_c的前体",而是"反对/调节边界形成的抑制成分"。
+
+### Exp1: 扰动传播追踪
+
+orth_bc传播后alignment大多为负(反B_c), proj_bc传播后始终为正:
+- Qwen3 clothing L34->L35: orth=-0.379, proj=+0.093
+- Qwen3 fruit L27->L35: orth=+0.020, proj=+0.105
+- GLM4 fruit L22->L39: orth=-0.117, proj=+0.269
+- GLM4 fruit L27->L39: orth=-0.102, proj=+0.575
+- DS7B fruit L21->L27: orth=-0.195, proj=-0.105
+- Qwen3 fruit L35->L35: orth=+0.462 (唯一正对齐,同层效果)
+
+R2确认: clothing L34->L35 alignment=-0.0915, fruit L32->L35 alignment=-0.0067
+
+### Exp2: 正交空间细分
+
+orth_bc中最大成分是共享语义方向:
+- DS7B fruit L26: shared_semantic amp=82.2%, cos=-0.987 (反对!)
+- DS7B food L27: shared_semantic amp=945.7%, competitor_bc amp=349.5%
+- shared_semantic的cos为负表示反对边界(抑制类别化)
+
+### Exp4: 前体注入测试
+
+中间层orth_bc注入后削弱B_c,只有最后1-2层orth_bc注入后增强B_c:
+- Qwen3 fruit L32 orth inject: bc_increase=-1.1911 (强反对!)
+- Qwen3 fruit L35 orth inject: bc_increase=+0.3772 (前体!)
+- GLM4 fruit L22/L27/L32 orth inject: 均为负(反对!)
+- GLM4 clothing L39 orth inject: bc_increase=+0.2086 (前体!)
+
+### 3个核心客观发现
+
+1. 中间层orth_bc是反对/调节成分,不是边界前体
+2. orth_bc中最大成分是共享语义方向(维持共享语义,抑制过早类别化)
+3. 只有最后1-2层的orth_bc是真正的边界前体
+
+### 对Phase 487结论的修正
+
+Phase 487说: "正交成分是边界因果的主要路径"
+Phase 488修正为: "正交成分主要不是边界前体,而是反对/调节成分; 消融orth_bc效果大是因为移除了对边界的抑制(松刹车),不是因为orth_bc变成了B_c(踩油门)"
+
+正确公式: 类别边界 = 投影写入 - 正交抑制 + 末层读出
+
+### 新增客观事实(8条)
+
+64. orth_bc传播后alignment大多为负(反B_c)
+65. Qwen3 fruit L35->L35: orth_bc alignment=+0.462 (唯一正对齐)
+66. Qwen3 fruit L32 orth_bc注入 bc_increase=-1.1911 (强反对)
+67. GLM4 fruit所有中间层orth_bc注入均削弱边界
+68. GLM4 clothing L39 orth_bc注入 bc_increase=+0.2086 (前体)
+69. shared_semantic在DS7B中达82-946%,是orth_bc最大子成分
+70. shared_semantic的cos为负表示反对边界(抑制类别化)
+71. 类别边界=投影写入-正交抑制+末层读出,移除抑制>移除写入
+
+### 命令记录
+
+python tests/glm5/phase488_propagation_operator.py qwen3 1
+python tests/glm5/phase488_propagation_operator.py glm4 1
+python tests/glm5/phase488_propagation_operator.py deepseek7b 1
+python tests/glm5/phase488_propagation_operator.py qwen3 2
+
+脚本: tests/glm5/phase488_propagation_operator.py
+结果: results/glm5/phase488_{qwen3,glm4,deepseek7b}_r1.json, phase488_qwen3_r2.json
+
+
+## Phase 489: 共享语义抑制机制与末层前体验证 ★★★关键模型差异★★★ [2026-06-14 15:42]
+
+### ★★★核心发现: shared_semantic的因果效应是模型特异的和层位特异的★★★
+
+Phase 488假设shared_semantic是"边界刹车",但Phase 489发现这取决于模型和层位。
+
+### Exp1: shared_semantic消融因果测试 ★★★★★ 关键
+
+**DS7B (刹车模式 — 符合Phase 488假设):**
+| 层 | 操作 | target_D变化 | 含义 |
+|----|------|-------------|------|
+| fruit L21 | ablate_shared | **+0.844** | 边界增强! 刹车! |
+| fruit L21 | reverse_shared | -0.154 | 反向→边界削弱 |
+| food L26 | ablate_shared | **+3.304** | 强刹车! |
+| food L26 | reverse_shared | -0.524 | 反向→边界削弱 |
+
+**GLM4 (刹车模式 — 符合Phase 488假设):**
+| 层 | 操作 | target_D变化 | 含义 |
+|----|------|-------------|------|
+| fruit L22 | ablate_shared | **+0.093** | 边界增强! 刹车! |
+| fruit L27 | ablate_shared | **+0.131** | 边界增强! 刹车! |
+| clothing L34 | ablate_shared | +0.004 | 弱/零 |
+
+**Qwen3 (反刹车模式 — 与Phase 488假设相反!):**
+| 层 | 操作 | target_D变化 | 含义 |
+|----|------|-------------|------|
+| clothing L25 | ablate_shared | **-0.094** | 边界削弱! 反刹车! |
+| clothing L30 | ablate_shared | **-0.336** | 边界削弱! |
+| fruit L27 | ablate_shared | **-0.147** | 边界削弱! |
+| fruit L32 | ablate_shared | +0.051 | 弱增强 |
+
+★★★关键发现1: DS7B和GLM4的shared_semantic是刹车, Qwen3的shared_semantic是支撑★★★
+
+### Exp2: 末层orth_bc消融/注入 ★★★★★ 关键
+
+**跨模型一致性: 末层orth_bc消融一致导致边界削弱**
+
+| 模型-类别 | 层 | ablate_orth_bc | inject_orth(s1.0) | 含义 |
+|-----------|-----|----------------|-------------------|------|
+| Qwen3 clothing | L35(late) | **-3.641** | -1.4311 | 消融→边界大降! |
+| Qwen3 clothing | L34(late-1) | +0.625 | -0.7905 | 消融→边界小增 |
+| Qwen3 fruit | L35(late) | **-4.660** | +0.2827 | 消融→边界大降! 注入→正! |
+| Qwen3 fruit | L34(late-1) | +2.551 | -1.1549 | 消融→边界增 |
+| GLM4 fruit | L39(late) | **-0.367** | +0.2235 | 消融→边界降! 注入→正! |
+| GLM4 fruit | L38(late-1) | -0.472 | -0.2098 | 消融→边界降 |
+| GLM4 fruit | L13(mid) | +0.091 | -0.1921 | 中间层不同! |
+| DS7B fruit | L27(late) | **-5.059** | +0.0599 | 消融→边界大降! |
+| DS7B fruit | L13(mid) | -0.067 | -0.2152 | 中间层弱效应 |
+| DS7B food | L13(mid) | -2.720 | -0.2824 | 消融→边界降 |
+
+★★★关键发现2: 末层(n_layers-1)orth_bc消融一致削弱边界, 说明末层orth_bc包含重要边界支撑成分★★★
+
+注意: 注入(注入平均方向)和消融(移除实际成分)结果不一致, 说明orth_bc不是单一方向,
+而是包含支撑边界和抑制边界的混合成分。
+
+### Exp3: 投影写入vs共享抑制剂量曲线 ★★★
+
+**DS7B fruit L13 (最清晰):**
+| 操作 | 效应 |
+|------|------|
+| shared_scale=-1.0 → target=+0.813 (松刹车→边界增) |
+| shared_scale=+1.0 → target=-0.393 (加刹车→边界降) |
+| proj_scale=-1.0 → target=+0.642 (移除写入→边界反而增?!) |
+| proj_scale=+1.0 → target=+0.090 (增加写入→边界略增) |
+
+GLM4和DS7B的剂量曲线支持"刹车"模型。Qwen3效应太弱。
+
+### Exp4: 共享语义抑制与竞争释放 ★★★
+
+| 模型-类别 | ablate_shared目标变化 | ablate_bc目标变化 | ablate_competitor目标变化 |
+|-----------|----------------------|-------------------|--------------------------|
+| Qwen3 clothing | -0.062 | +0.109 | +0.016 |
+| Qwen3 fruit | -0.030 | -0.011 | -0.068 |
+| GLM4 fruit | -0.057 | +0.030 | +0.010 |
+| GLM4 clothing | +0.055 | -0.123 | +0.002 |
+| DS7B fruit | -0.183 | +0.079 | -0.006 |
+| DS7B food | **-0.884** | -0.127 | **-1.407** |
+
+★★★关键发现3: 在早层(L13), shared_semantic消融也削弱边界(支撑模式), 不是刹车★★★
+
+这表明shared_semantic在不同层有不同功能:
+- 早层(L13): 支撑边界形成
+- 中晚层(L21-L27): 抑制过早类别化(刹车)
+
+### Exp5: 跨模型一致性 ★★★
+
+| 模型-类别 | mid_orth_effect | late_orth_alignment | n_shared |
+|-----------|----------------|---------------------|----------|
+| Qwen3 clothing | +0.024 | -0.421 | 5 |
+| Qwen3 fruit | -0.282 | -0.068 | 5 |
+| GLM4 fruit | -0.140 | -0.113 | 5 |
+| DS7B fruit | +0.062 | **+0.096** | 5 |
+| DS7B food | +0.317 | N/A | 5 |
+
+注意: 只有DS7B fruit的末层orth_bc alignment为正(与B_c对齐), 其他模型为负。
+
+### ★★★Phase 489最重要的5个客观发现★★★
+
+**发现1: shared_semantic的因果效应是模型特异的**
+- DS7B + GLM4: ablate_shared → 边界增强(刹车模式)
+- Qwen3: ablate_shared → 边界削弱(支撑模式)
+- 不能简单说shared_semantic是"刹车"
+
+**发现2: shared_semantic的因果效应是层位特异的**
+- 早层(L13): ablate_shared → 边界削弱(支撑模式, 跨模型一致)
+- 中晚层(L21-L27): 效应取决于模型
+
+**发现3: 末层orth_bc消融一致削弱边界**
+- 所有模型的最后一层(n_layers-1)orth_bc消融都导致边界下降
+- 说明末层orth_bc包含重要的边界支撑/读出成分
+- 这修正了Phase 488"末层orth_bc可能是前体"的判断: 它不仅是前体,而是包含多种功能成分
+
+**发现4: 注入和消融结果不一致, 说明orth_bc是混合成分**
+- 消融末层orth_bc → 边界降(说明含有支撑成分)
+- 但注入平均orth_bc方向 → 效应混合(因为平均方向不代表所有成分)
+- orth_bc不是一个单一功能的空间, 而是多功能混合
+
+**发现5: proj_bc消融效应在中间层很小**
+- GLM4 fruit L22: ablate_proj → -0.009 (几乎零!)
+- GLM4 fruit L27: ablate_proj → -0.160 (中等)
+- Qwen3 clothing L25: ablate_proj → -0.109 (小)
+- 相比之下, ablate_competitor有时更大(GLM4 fruit L27: +0.016 vs ablate_shared: +0.131)
+
+### 对Phase 488结论的修正
+
+Phase 488说: "中间层orth_bc主要是共享语义抑制项,消融orth_bc效果大是因为松刹车"
+
+Phase 489修正为:
+1. shared_semantic的效应是模型特异的(DS7B/GLM4是刹车, Qwen3是支撑)
+2. shared_semantic的效应是层位特异的(早层支撑, 中晚层可能刹车)
+3. orth_bc不是单一功能空间, 包含支撑+抑制+读出等多种成分
+4. 末层orth_bc消融一致削弱边界, 说明包含重要边界支撑成分
+
+### 新增客观事实(8条)
+
+72. DS7B fruit L21: ablate_shared→+0.844, food L26: ablate_shared→+3.304 (刹车模式)
+73. GLM4 fruit L22/L27: ablate_shared→+0.093/+0.131 (刹车模式)
+74. Qwen3 clothing L25/L30: ablate_shared→-0.094/-0.336 (支撑模式,与刹车相反!)
+75. Qwen3 fruit L27: ablate_shared→-0.147 (支撑模式)
+76. 所有模型末层(n_layers-1)orth_bc消融都削弱边界: Qwen3:-3.6/-4.7, GLM4:-0.37, DS7B:-5.06
+77. Qwen3 fruit L35 orth注入→bc_increase=+0.28(正,前体); GLM4 fruit L39→+0.22(正,前体)
+78. 早层(L13)shared_semantic消融削弱边界(DS7B food:-0.884), 不是刹车
+79. orth_bc是多功能混合空间,不是单一功能(支撑+抑制+读出共存)
+
+### 命令记录
+
+python tests/glm5/phase489_shared_semantic_brake.py qwen3 1        # ~2min
+python tests/glm5/phase489_shared_semantic_brake.py glm4 1          # ~50min
+python tests/glm5/phase489_shared_semantic_brake.py deepseek7b 1    # ~33min
+
+脚本: tests/glm5/phase489_shared_semantic_brake.py
+结果: results/glm5/phase489_{qwen3,glm4,deepseek7b}_r1.json
