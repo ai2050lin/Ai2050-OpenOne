@@ -34789,3 +34789,5092 @@ value path -> choice interface
 ```
 
 之间的第一条跨层桥接证据。
+
+## Phase 101: Value-to-Choice Bridge Mapping [2026-06-13 15:01]
+
+### 本轮任务
+
+结合 GPT5 Phase100 和 GLM5 Phase480 的最新进展继续推进。
+
+GLM5 Phase480 的关键进展是：
+
+```text
+类别边界残差是普遍机制：
+  Qwen3 8/8 类别 selectivity > 1
+  GLM4 6/8 类别 selectivity > 1
+  DS7B 5/8 类别 selectivity > 1
+
+category_specific 方向有自然使用证据：
+  Qwen3 8/8 类别在自身 specific 方向上投影最高。
+
+反向注入有效：
+  Qwen3 4/4 类别 -specific 方向能抑制对应类别。
+```
+
+这说明 value factor / semantic boundary path 不是虚构方向，而是模型自然使用的语义值路径之一。
+
+GPT5 Phase100 的关键进展是：
+
+```text
+Qwen3 L24 head 29/31 是 choice/letter format interface。
+它能恢复 letter，但不能恢复 value。
+```
+
+因此 Phase101 要测试：
+
+```text
+value path 与 choice interface 是否可分离？
+value path 被破坏后，choice head restore 能不能救 letter？
+choice head 被污染后，value path 是否仍保持？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase101_value_choice_bridge_mapping.py
+tests/gpt5/phase101_value_choice_bridge_mapping_summary.py
+tests/gpt5/run_phase101_value_choice_bridge_mapping_full.sh
+```
+
+### 测试设计
+
+三模型节点：
+
+```text
+Qwen3:
+  value path = L6 MLP prefix8
+  choice interface = L24 head 29/31 prompt_tail
+
+GLM4:
+  value path = L39 MLP prefix8
+  choice interface = L39 head 31/17 prompt_tail
+
+DeepSeek7B:
+  value path = L27 MLP prefix8
+  choice interface = L27 head 21/26 prompt_tail
+```
+
+主测试条件：
+
+```text
+value_zero:
+  清零 value node。
+
+value_transplant:
+  把 value node 替换为 same_slot_diff_target donor。
+
+choice_transplant_heads:
+  只替换 choice heads。
+
+value_zero + choice_restore_clean_heads:
+  value node 清零，同时把 choice heads 恢复为 clean。
+
+value_transplant + choice_restore_clean_heads:
+  value node 被 donor 替换，同时把 choice heads 恢复为 clean。
+
+value_transplant + choice_transplant_heads:
+  value node 和 choice heads 都被 donor 替换。
+
+value_transplant + choice_transplant_all_restore_clean_heads:
+  value node 被 donor 替换；
+  choice attention 全部 donor；
+  但 choice heads 恢复 clean。
+```
+
+判据：
+
+```text
+如果 value_zero 破坏 value 和 letter，
+但 choice_restore_clean_heads 只恢复 letter、不恢复 value，
+说明 choice interface 可绕过或覆盖 letter 输出格式，
+但不能恢复语义值路径。
+
+如果 choice_transplant_heads 只破坏 letter、不破坏 value，
+说明 choice interface 与 value path 分离。
+```
+
+### 运行命令
+
+Smoke：
+
+```bash
+python tests/gpt5/phase101_value_choice_bridge_mapping.py qwen3 \
+  --value-layer 6 \
+  --value-component mlp \
+  --value-position prefix8 \
+  --choice-layer 24 \
+  --choice-heads 29,31 \
+  --max-items 2 \
+  --output-dir results/gpt5_phase101_smoke \
+  --progress-every 1 \
+  --hard-exit-after-model
+```
+
+三模型主测试：
+
+```bash
+chmod +x tests/gpt5/run_phase101_value_choice_bridge_mapping_full.sh
+tests/gpt5/run_phase101_value_choice_bridge_mapping_full.sh
+```
+
+Qwen3 关键结果加大数据复测：
+
+```bash
+OUT=results/gpt5_phase101_value_choice_bridge_mapping_qwen3_validate_$(date +%Y%m%d_%H%M%S)
+mkdir -p "$OUT"
+python tests/gpt5/phase101_value_choice_bridge_mapping.py qwen3 \
+  --value-layer 6 \
+  --value-component mlp \
+  --value-position prefix8 \
+  --choice-layer 24 \
+  --choice-heads 29,31 \
+  --max-items 240 \
+  --choice-position prompt_tail \
+  --donor-kind same_slot_diff_target \
+  --choice-template choice_json_letter \
+  --progress-every 40 \
+  --output-dir "$OUT" \
+  --hard-exit-after-model 2>&1 | tee "$OUT/qwen3_validate.log"
+python tests/gpt5/phase101_value_choice_bridge_mapping_summary.py \
+  --output-dir "$OUT" | tee "$OUT/summary.log"
+```
+
+### 数据规模
+
+三模型主测试：
+
+```text
+results/gpt5_phase101_value_choice_bridge_mapping_full_20260613_141841
+
+total_rows = 2520
+total_bad_numeric_rows = 0
+
+Qwen3 = 840 rows
+GLM4 = 840 rows
+DS7B = 840 rows
+items/model = 120
+```
+
+Qwen3 复测：
+
+```text
+results/gpt5_phase101_value_choice_bridge_mapping_qwen3_validate_20260613_144631
+
+rows = 1680
+bad_numeric_rows = 0
+items = 240
+```
+
+### 客观结果
+
+#### 1. Qwen3 主测试：value path 与 choice interface 强分离
+
+```text
+value_zero:
+  value_delta = -3.2103
+  letter_delta = -4.0358
+  value_top1_delta = -0.3250
+  letter_top1_delta = -0.6333
+```
+
+L6 MLP value node 清零后，value 和 letter 都下降，说明 L6 MLP prefix8 是上游强 value path。
+
+```text
+choice_transplant_heads:
+  value_delta = -0.0093
+  letter_delta = -10.0734
+  value_top1_delta = 0.0000
+  letter_top1_delta = -0.8750
+```
+
+只污染 L24 head 29/31，value 几乎不动，但 letter 大崩。这再次说明 head 29/31 是 choice/letter interface，不是 value path。
+
+最关键桥接条件：
+
+```text
+value_zero + choice_restore_clean_heads:
+  value_delta = -3.1953
+  letter_delta = +0.3755
+  value_top1_delta = -0.3417
+  letter_top1_delta = +0.0667
+```
+
+解释：
+
+```text
+value 已经被 L6 MLP zero 严重破坏，
+但只要 L24 head 29/31 恢复 clean，
+letter 反而恢复到接近 clean，甚至略正。
+```
+
+这说明：
+
+```text
+Qwen3 的 letter choice 可以被 L24 head 29/31 clean interface 强行恢复，
+即使上游 value margin 没有恢复。
+```
+
+这不是完整语义恢复，而是输出接口恢复。
+
+另一个关键条件：
+
+```text
+value_transplant + choice_transplant_all_restore_clean_heads:
+  value_delta = -1.5215
+  letter_delta = -0.3365
+  value_top1_delta = -0.2000
+  letter_top1_delta = -0.0333
+```
+
+即使 value path 被 donor 替换、choice attention 全部被 donor 污染，只恢复 head 29/31 clean 也能大幅救回 letter。
+
+#### 2. Qwen3 240 items 复测确认
+
+```text
+value_zero:
+  value_delta = -3.2425
+  letter_delta = -4.0035
+  value_top1_delta = -0.3042
+  letter_top1_delta = -0.6208
+
+choice_transplant_heads:
+  value_delta = -0.0065
+  letter_delta = -10.2411
+  value_top1_delta = +0.0083
+  letter_top1_delta = -0.8917
+
+value_zero + choice_restore_clean_heads:
+  value_delta = -3.2351
+  letter_delta = +0.3130
+  value_top1_delta = -0.3125
+  letter_top1_delta = +0.0458
+
+value_transplant + choice_transplant_all_restore_clean_heads:
+  value_delta = -1.4074
+  letter_delta = -0.4401
+  value_top1_delta = -0.1417
+  letter_top1_delta = -0.0333
+```
+
+复测与主测试一致：
+
+```text
+1. L6 MLP prefix8 是强 value path。
+2. L24 head 29/31 是强 choice/letter interface。
+3. choice interface restore 可以恢复 letter，但不能恢复 value。
+```
+
+#### 3. GLM4：value path 有效，但 head choice interface 很弱
+
+```text
+value_zero:
+  value_delta = -0.3594
+  letter_delta = 0.0000
+
+value_transplant:
+  value_delta = -0.3126
+  letter_delta = 0.0000
+
+choice_transplant_heads:
+  value_delta = -0.0039
+  letter_delta = -0.0510
+
+value_transplant + choice_transplant_heads:
+  value_delta = -0.3099
+  letter_delta = -0.0510
+```
+
+GLM4 的 L39 MLP prefix8 对 value 有影响，但 L39 head 31/17 对 letter 几乎没有强接口作用。
+
+这继续支持：
+
+```text
+GLM4 的 choice/output interface 不在 L39 attention heads。
+```
+
+#### 4. DS7B：本轮节点不是强 bridge
+
+```text
+value_zero:
+  value_delta = -0.0666
+  letter_delta = 0.0000
+
+value_transplant:
+  value_delta = -0.0835
+  letter_delta = 0.0000
+
+choice_transplant_heads:
+  value_delta = +0.0202
+  letter_delta = -0.0182
+
+value_transplant + choice_transplant_all_restore_clean_heads:
+  value_delta = +0.0324
+  letter_delta = -0.1005
+```
+
+DS7B 的 L27 MLP prefix8 和 L27 head 21/26 没形成强 value-to-choice bridge。结合前面阶段，DS7B 仍更像深层多点轨迹/输出释放型。
+
+### 本轮关键进展
+
+1. Qwen3 中第一次得到跨层桥接分离证据：
+
+```text
+L6 MLP prefix8 = value path
+L24 head 29/31 = choice/letter interface
+```
+
+2. Qwen3 的 value 和 letter 可以被独立破坏：
+
+```text
+choice_transplant_heads:
+  value_delta ≈ 0
+  letter_delta ≈ -10
+```
+
+3. Qwen3 的 letter 可以在 value 仍坏的情况下被恢复：
+
+```text
+value_zero + choice_restore_clean_heads:
+  value_delta ≈ -3.2
+  letter_delta ≈ +0.31 to +0.38
+```
+
+4. GLM4 有 MLP value effect，但没有 Qwen3 式 attention-head choice interface。
+
+5. DS7B 在当前节点上没有明显 bridge，需要改用 segment trajectory 方法。
+
+### 问题和硬伤
+
+1. Qwen3 的 letter 恢复不等于语义正确恢复；value 仍然坏。
+2. 现在测试的是 scoring margin，不是 generation 行为。
+3. L6 MLP value path 的具体 factor 仍未拆成 category/color/function/material/location 子方向。
+4. choice interface 为什么能在 value 坏时恢复 letter，需要进一步解释：可能是 clean head 中已经含有足够的 letter-format state，而不是实时读取 value。
+5. GLM4 / DS7B 的 bridge 没找到，不等于不存在，只说明当前节点不是主桥。
+
+### 理论进展
+
+Phase101 明确支持三层结构：
+
+```text
+ValuePath:
+  语义值路径，决定候选内容评分。
+
+ChoiceInterface:
+  选择格式接口，决定输出字母/格式。
+
+Bridge:
+  把语义值路径接入选择格式接口的跨层机制。
+```
+
+Qwen3 当前结构：
+
+```text
+L6 MLP prefix8:
+  强 value path。
+
+L24 head 29/31:
+  强 choice/letter interface。
+```
+
+但本轮更微妙地说明：
+
+```text
+L24 head 29/31 clean state 本身已经携带足够强的 letter interface 信息，
+可以在上游 value path 被破坏时恢复 letter margin。
+```
+
+因此完整公式需要区分：
+
+```text
+online bridge:
+  当前 forward 中 value factor 实时进入 choice interface。
+
+cached interface state:
+  choice head 在 L24 时已经形成的格式/字母状态。
+```
+
+更新后的机制表达：
+
+```text
+h_l(t_readout, x)
+= Base_l
++ ValuePath_l(x)
++ Bridge_l(ValuePath -> ChoiceInterface)
++ ChoiceState_l(letter_label, option_block, task_format)
++ OutputPolicy_l
++ U_l
+```
+
+其中 Phase101 已经较强定位：
+
+```text
+Qwen3:
+  ValuePath ≈ L6 MLP prefix8
+  ChoiceState / ChoiceInterface ≈ L24 head 29/31
+```
+
+但尚未定位：
+
+```text
+Bridge_l(ValuePath -> ChoiceInterface)
+```
+
+### 下一步
+
+Phase102 应做：
+
+```text
+Qwen3 Value Factor Decomposition inside L6 MLP
+```
+
+目标：
+
+```text
+1. 把 L6 MLP prefix8 的 value path 拆成 slot-specific factors:
+   category / color / function / material / location。
+
+2. 对每个 slot 分别做 value subspace destroy/restore。
+
+3. 判断哪些 slot 的 value factor 会传递到 L24 choice interface。
+
+4. 与 GLM5 Phase480 的 category_specific / semantic boundary residual 对齐：
+   看 object-attribute value path 是否也是 category boundary residual 的一种下游读出形式。
+
+5. 对 Qwen3 做更细的:
+   L6 factor destroy
+   L24 head 29/31 clean restore
+   generation audit
+```
+
+如果 Phase102 成功，就可以开始把：
+
+```text
+semantic boundary factor
+object-attribute value path
+choice/letter interface
+```
+
+三块拼图接成一条更完整的语言输出机制链。
+
+## Phase 102: Value Factor Bridge Decomposition [2026-06-13 16:12]
+
+### 触发问题
+
+用户要求结合附件分析与 `research/glm5/docs/AGI_GLM5_MEMO.md` 最新记录，继续完成全局语义语法契约图谱任务。附件对 Phase100 的判断基本正确：Qwen3 L24 head 29/31 已较强定位为 `choice/letter interface`（选择/字母接口），不是 `semantic value heads`（语义值头）。GLM5 memo 最新 Phase480 进一步给出类别边界残差证据：category-specific semantic boundary direction（类别特异语义边界方向）在 Qwen3/GLM4/DS7B 上都有不同程度复现，尤其 Qwen3 最稳定。因此下一步应把 GPT5 侧的 value path（值路径）与 GLM5 侧的 category boundary residual（类别边界残差）连接起来。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase102_value_factor_bridge_decomposition.py
+tests/gpt5/phase102_value_factor_bridge_decomposition_summary.py
+tests/gpt5/run_phase102_value_factor_bridge_decomposition_full.sh
+```
+
+### 执行命令
+
+第一次运行中，Qwen3 在 40/240 后发生 Python 进程段错误：
+
+```text
+tests/gpt5/run_phase102_value_factor_bridge_decomposition_full.sh
+```
+
+失败信息：
+
+```text
+Segmentation fault (core dumped), exit code 139
+```
+
+已保存 partial：
+
+```text
+results/gpt5_phase102_value_factor_bridge_decomposition_full_20260613_150644/qwen3_phase102_value_factor_bridge_decomposition.partial.json
+```
+
+随后以同一输出目录 resume，并提高 partial 落盘频率：
+
+```text
+PHASE102_OUTPUT_DIR=results/gpt5_phase102_value_factor_bridge_decomposition_full_20260613_150644 \
+PHASE102_PROGRESS_EVERY=10 \
+tests/gpt5/run_phase102_value_factor_bridge_decomposition_full.sh
+```
+
+三模型最终全部完成。
+
+### 测试规模
+
+```text
+Qwen3:      240 items, 2850 rows, bad_numeric_rows=0
+GLM4:       240 items, 2850 rows, bad_numeric_rows=0
+DeepSeek7B: 240 items, 2850 rows, bad_numeric_rows=0
+Total:      8550 rows, bad_numeric_rows=0
+```
+
+输出目录：
+
+```text
+results/gpt5_phase102_value_factor_bridge_decomposition_full_20260613_150644
+```
+
+### 测试原理
+
+Phase101 已定位：
+
+```text
+Qwen3:
+  L6 MLP prefix8 = value path（值路径）
+  L24 head 29/31 = choice/letter interface（选择/字母接口）
+```
+
+Phase102 在 value path 内构建多个 rank-4 子空间：
+
+```text
+value_all: 全局目标值子空间
+value_category / value_color / value_function / value_material / value_location: 当前 slot 的值子空间
+relation: 关系/slot 子空间
+object: 对象子空间
+```
+
+然后测试：
+
+```text
+destroy_own_value
+transplant_own_value
+destroy_all_value
+transplant_all_value
+destroy_relation
+transplant_relation
+destroy_object
+transplant_object
+destroy_own_value + choice_restore_clean_heads
+transplant_own_value + choice_restore_clean_heads
+destroy_all_value + choice_restore_clean_heads
+transplant_all_value + choice_restore_clean_heads
+```
+
+读出同时包含：
+
+```text
+value_margin: 目标语义值候选的 full-sequence logprob margin
+letter_margin: 选择题字母候选的 full-sequence logprob margin
+```
+
+这样可以区分：
+
+```text
+值路径坏了没有；
+选择接口坏了没有；
+恢复 choice heads 是否能在 value 仍坏时恢复 letter。
+```
+
+### 核心客观结果
+
+#### 1. Qwen3：L6 MLP value factor 是强因果路径
+
+```text
+destroy_own_value:
+  value_delta = -3.6314
+  letter_delta = -3.0400
+  value_top1_delta = -0.2833
+  letter_top1_delta = -0.2833
+
+destroy_all_value:
+  value_delta = -3.7212
+  letter_delta = -3.8145
+  value_top1_delta = -0.2792
+  letter_top1_delta = -0.5958
+
+destroy_relation:
+  value_delta = -3.6696
+  letter_delta = -3.6072
+  value_top1_delta = -0.2208
+  letter_top1_delta = -0.4667
+
+destroy_object:
+  value_delta = -3.6865
+  letter_delta = -3.6449
+  value_top1_delta = -0.2625
+  letter_top1_delta = -0.4000
+```
+
+Qwen3 的 L6 MLP prefix8 中，value_all、relation、object、own_slot_value 子空间都强烈影响 value 与 letter。说明此处不是一个单一语义轴，而是对象、关系、目标值共同参与的 value factor bundle（值因子束）。
+
+#### 2. Qwen3：choice head restore 可以救 letter，但不能救 value
+
+```text
+destroy_own_value + choice_restore_clean_heads:
+  value_delta = -3.5715
+  letter_delta = +1.3842
+  value_top1_delta = -0.2875
+  letter_top1_delta = +0.0458
+
+destroy_all_value + choice_restore_clean_heads:
+  value_delta = -3.5629
+  letter_delta = -0.0177
+  value_top1_delta = -0.2333
+  letter_top1_delta = +0.0208
+```
+
+这复现并加强 Phase101 的分离结论：
+
+```text
+L24 head 29/31 clean restore 能恢复 letter interface；
+但 value path 仍然损坏。
+```
+
+因此 Qwen3 的选择输出至少分为：
+
+```text
+semantic value path（语义值路径）
+choice/letter interface（选择/字母接口）
+```
+
+二者可被分离破坏和分离恢复。
+
+#### 3. Qwen3：slot 差异明显
+
+`destroy_all_value` 下按 slot：
+
+```text
+category:
+  value_delta = -3.635
+  letter_delta = -5.645
+
+color:
+  value_delta = -0.853
+  letter_delta = -2.663
+
+function:
+  value_delta = -7.028
+  letter_delta = -3.748
+
+location:
+  value_delta = -2.997
+  letter_delta = -4.017
+
+material:
+  value_delta = -4.093
+  letter_delta = -2.999
+```
+
+function 对 value 最敏感，category/location 对 letter interface 也很强。这说明不同关系槽位不是共用一条完全相同路径，而是共享 value factor bundle 后在输出接口上有不同投影。
+
+#### 4. GLM4：同一测试中 value factor 效应弱很多
+
+```text
+destroy_own_value:
+  value_delta = -0.1904
+  letter_delta = -0.0443
+
+destroy_all_value:
+  value_delta = -0.1719
+  letter_delta = -0.0323
+
+destroy_relation:
+  value_delta = -0.2570
+  letter_delta = +0.0875
+
+destroy_object:
+  value_delta = -0.2136
+  letter_delta = +0.0102
+```
+
+GLM4 在 L39 MLP prefix8 上有弱 value effect，但没有 Qwen3 式强 value-to-letter 耦合，也没有可见 choice-head restore 差异：
+
+```text
+destroy_own_value 和 destroy_own_value+choice_restore_clean_heads 完全相同；
+destroy_all_value 和 destroy_all_value+choice_restore_clean_heads 完全相同。
+```
+
+这继续支持：GLM4 的选择接口不在当前 L39 head 31/17。
+
+#### 5. DeepSeek7B：当前节点不是 value bridge，甚至 destroy 常常提升 margin
+
+```text
+destroy_own_value:
+  value_delta = +0.1337
+  letter_delta = +0.1172
+
+destroy_all_value:
+  value_delta = +0.1308
+  letter_delta = +0.1326
+
+destroy_relation:
+  value_delta = +0.2310
+  letter_delta = +0.1271
+
+destroy_object:
+  value_delta = +0.2382
+  letter_delta = +0.1073
+```
+
+DeepSeek7B L27 MLP prefix8 与 L27 head 21/26 没有形成 Qwen3 式 value bridge。当前 destroy 子空间反而略微提升 margin，说明该位置更可能是输出竞争/噪声/压缩后接口的一部分，而不是可直接解释的语义值写入路径。
+
+### 本轮进展
+
+1. Qwen3 的 value path 不只是单一 value direction，而是可拆成 object/relation/value-slot 多因子束。
+2. Qwen3 的 L6 MLP value factors 对 value 和 letter 都有强因果影响。
+3. Qwen3 的 L24 head 29/31 restore 再次证明它们更像 choice/letter interface，而不是 semantic value restore。
+4. GLM4 和 DS7B 在当前节点没有同构结构，说明三模型的 value-to-choice bridge 位置不同。
+5. GPT5 侧结果与 GLM5 Phase480 的 category boundary residual 可以开始连接：Qwen3 的 category/value factor 不是孤立方向，而是多关系槽位 value bundle 中的一部分。
+
+### 问题和硬伤
+
+1. Qwen3 第一次运行出现 segmentation fault。虽然 resume 后三模型完成，但说明长 hook 会话仍有稳定性风险。
+2. 当前是 rank-4 子空间 destroy/transplant，不是最小充分电路。
+3. 子空间由 SVD 差分构造，仍可能混入模板、对象身份、候选分布和选项格式。
+4. Qwen3 的 choice restore 可以救 letter，但这不等于语义正确；value_delta 仍很负。
+5. GLM4/DS7B 没找到 bridge，不等于不存在，只说明当前节点不是主 bridge。
+6. 本轮没有 generation audit，只测 full-sequence scoring margin。
+
+### 理论进展
+
+当前更稳的结构应写成：
+
+```text
+Output(x)
+= Readout(
+    ValueBundle_l(object, relation, slot, target)
+    -> Bridge_l
+    -> ChoiceInterface_l(letter_label, option_format)
+  )
+```
+
+其中 Qwen3 已有较强定位：
+
+```text
+ValueBundle:
+  L6 MLP prefix8
+
+ChoiceInterface:
+  L24 head 29/31
+```
+
+但 Bridge 仍未完全定位。Phase102 说明：
+
+```text
+破坏 L6 value bundle 会同时破坏 value 和 letter；
+恢复 L24 choice heads 可以恢复 letter，但不能恢复 value。
+```
+
+因此语言输出机制不是：
+
+```text
+语义值 = 输出字母
+```
+
+而至少是：
+
+```text
+语义值因子束
+→ 跨层桥接
+→ 选择/格式接口
+→ 输出策略
+```
+
+这与“相对编码”一致：单一 binding path 信息有限，必须比较 object / relation / slot / choice interface 多条路径，才能看到全局结构。
+
+### 下一步 Phase103
+
+建议进入：
+
+```text
+Qwen3 Bridge Localization Sweep
+```
+
+目标不是继续扩大宏观数据，而是在 Qwen3 中定位 `ValueBundle -> ChoiceInterface` 的中间桥：
+
+```text
+1. 固定 value destroy at L6 MLP prefix8。
+2. 扫描 L8/L12/L16/L20/L22/L24 的 attention 与 MLP restore。
+3. 测哪些层/模块能在 value 破坏后恢复 letter，哪些能恢复 value。
+4. 对 category/function/location 三个强槽位分别跑。
+5. 最后对最强桥接节点做 generation audit。
+```
+
+关键判据：
+
+```text
+如果某中间模块 restore 能同时恢复 value 和 letter:
+  它更接近真正 Bridge。
+
+如果只能恢复 letter:
+  它仍是 ChoiceInterface / formatting state。
+
+如果只能恢复 value:
+  它是 ValuePath downstream，而不是最终接口。
+```
+
+## Phase 103: Bridge Localization Restore Sweep [2026-06-13 21:47]
+
+### 触发问题
+
+附件分析基本正确：Phase101/102 已经把 Qwen3 的机制分成三层：
+
+```text
+semantic value path（语义值路径）
+→ value-to-choice bridge（值到选择桥）
+→ choice/letter interface（选择/字母接口）
+```
+
+目前强定位为：
+
+```text
+Qwen3 L6 MLP prefix8:
+  value path / value factor bundle（值路径/值因子束）
+
+Qwen3 L24 head 29/31:
+  choice/letter interface（选择/字母接口）
+```
+
+但中间 Bridge 仍未定位。因此 Phase103 固定破坏 value bundle，再扫描后续层模块 clean restore，看哪些模块能恢复 value，哪些只能恢复 letter。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase103_bridge_localization_restore_sweep.py
+tests/gpt5/phase103_bridge_localization_restore_sweep_summary.py
+tests/gpt5/run_phase103_bridge_localization_restore_sweep_full.sh
+```
+
+### 执行命令
+
+```bash
+tests/gpt5/run_phase103_bridge_localization_restore_sweep_full.sh
+```
+
+三模型按顺序运行，并使用 `--hard-exit-after-model`：
+
+```text
+qwen3 → glm4 → deepseek7b
+```
+
+输出目录：
+
+```text
+results/gpt5_phase103_bridge_localization_restore_sweep_full_20260613_202833
+```
+
+### 测试规模
+
+```text
+Qwen3:      180 items, 5040 rows, bad_numeric_rows=0
+GLM4:       180 items, 2880 rows, bad_numeric_rows=0
+DeepSeek7B: 180 items, 2880 rows, bad_numeric_rows=0
+Total:      10800 rows, bad_numeric_rows=0
+```
+
+测试槽位：
+
+```text
+category / function / location
+```
+
+测试因子：
+
+```text
+value_all
+own slot value
+```
+
+### 测试原理
+
+对每个 item 先计算 clean value/letter margin。
+
+然后破坏指定 value basis：
+
+```text
+destroy_only:
+  在 value_layer 的 MLP 输出中删除 value factor 子空间投影。
+```
+
+再加 clean restore：
+
+```text
+destroy_restore:Lx:attn
+destroy_restore:Lx:mlp
+destroy_restore:Lx:choice_heads
+```
+
+判据：
+
+```text
+如果 restore 后 value_delta 接近 0:
+  该节点可能在 value path downstream 或 bridge 内。
+
+如果 restore 后 letter_delta 接近 0 或变正，但 value_delta 仍很负:
+  该节点更像 choice/letter interface 或 format state。
+
+如果 value 和 letter 都恢复:
+  才是强 Bridge 候选。
+```
+
+### Qwen3 结果
+
+Qwen3 设置：
+
+```text
+value destroy:
+  L6 MLP prefix8
+
+restore sweep:
+  L8/L12/L16/L20/L22/L24 attention and MLP
+  L24 choice_heads 29/31
+```
+
+#### 1. destroy baseline
+
+```text
+destroy_only:
+  value_delta = -4.3472
+  letter_delta = -4.0910
+  value_top1_delta = -0.3639
+  letter_top1_delta = -0.3500
+```
+
+这比 Phase102 更强，说明本轮在 category/function/location 强槽位上，L6 value bundle 破坏明显。
+
+#### 2. 最强 letter restore 是 L24 attention
+
+按 letter_delta 排序：
+
+```text
+L24:attn:
+  value_delta = -4.0133
+  letter_delta = +0.7901
+  value_top1_delta = -0.3139
+  letter_top1_delta = +0.0222
+
+L24:choice_heads:
+  value_delta = -4.1945
+  letter_delta = -0.2206
+  value_top1_delta = -0.3722
+  letter_top1_delta = +0.0222
+
+L8:attn:
+  value_delta = -4.4491
+  letter_delta = -3.1648
+```
+
+关键现象：
+
+```text
+恢复 L24 attention 可以把 letter_delta 从 -4.0910 拉到 +0.7901；
+但 value_delta 仍为 -4.0133。
+```
+
+这说明 L24 attention 整体比 head 29/31 更能恢复 choice/letter interface，但仍不能恢复 semantic value。
+
+#### 3. 最强 value restore 是 L22/L24 MLP，但恢复幅度有限
+
+按 value_delta 排序：
+
+```text
+L22:mlp:
+  value_delta = -3.7750
+  letter_delta = -4.6763
+
+L24:mlp:
+  value_delta = -3.8677
+  letter_delta = -3.8117
+
+L24:attn:
+  value_delta = -4.0133
+  letter_delta = +0.7901
+```
+
+L22/L24 MLP 对 value 有一定缓解，但不能恢复到接近 clean。它们也不能恢复 letter。
+
+#### 4. 中间层没有找到同时恢复 value 和 letter 的强 Bridge
+
+```text
+L24 attention:
+  restore letter, not value
+
+L22/L24 MLP:
+  slight value relief, not letter
+
+L8/L12/L16/L20:
+  no stable joint restore
+```
+
+所以本轮没有定位到强 Bridge，只定位到更清楚的分工：
+
+```text
+late attention = choice/letter interface state
+late MLP = weak downstream value relief
+```
+
+### GLM4 结果
+
+GLM4 设置：
+
+```text
+value destroy:
+  L33 MLP prefix8
+
+restore sweep:
+  L35/L37/L39 attention and MLP
+  L39 choice_heads 31/17
+```
+
+结果整体很弱：
+
+```text
+destroy_only:
+  value_delta = -0.0456
+  letter_delta = +0.0014
+
+best value restore L39:mlp:
+  value_delta = -0.0372
+  letter_delta = +0.0021
+
+best letter restore L35:attn / L37:mlp:
+  letter_delta = +0.0040
+```
+
+GLM4 在当前范式下没有明显 value destruction，也没有明显 bridge restore。说明该任务的 GLM4 value path 不在 L33 MLP prefix8，或者 GLM4 的候选评分路径不适合用本轮 Qwen3 式 value-basis destroy 捕捉。
+
+### DeepSeek7B 结果
+
+DeepSeek7B 设置：
+
+```text
+value destroy:
+  L24 MLP prefix8
+
+restore sweep:
+  L25/L26/L27 attention and MLP
+  L27 choice_heads 21/26
+```
+
+结果：
+
+```text
+destroy_only:
+  value_delta = -0.0486
+  letter_delta = -0.1387
+
+best value restore L27:mlp:
+  value_delta = -0.0034
+  letter_delta = -0.1752
+
+best letter restore L26:mlp:
+  value_delta = -0.0686
+  letter_delta = -0.0292
+```
+
+DS7B 的 L27 MLP 可以恢复 value margin 到接近 0，但 letter 更差；L26 MLP 对 letter 有一定缓解但 value 更差。没有发现 joint bridge。
+
+### 本轮关键进展
+
+1. Qwen3 的 L24 attention 是比 head 29/31 更宽的 choice/letter interface 恢复节点。
+2. Qwen3 中没有发现能同时恢复 value 和 letter 的单一中间模块。
+3. Qwen3 late MLP 对 value 有弱恢复，但和 letter interface 分离。
+4. GLM4 当前扫描没有明显 value destroy/restore 结构。
+5. DS7B 显示 value 和 letter 可能在 L26/L27 分离：L27 MLP 更接近 value relief，L26 MLP 更接近 letter relief。
+
+### 问题和硬伤
+
+1. Restore 使用 full-sequence clean state，可能包含 candidate-specific state；它能定位恢复节点，但不能直接等同自然重算机制。
+2. Qwen3 没有找到强 Bridge，说明 Bridge 可能不是单层单模块，而是多层路径。
+3. GLM4/DS7B 结果弱，不代表没有机制；可能是 value destroy 层或因子 basis 选错。
+4. 当前仍是 scoring margin，不是 open generation。
+5. 本轮只测 category/function/location 三个强槽位，不代表全部关系类型。
+
+### 当前理论更新
+
+Phase103 后，Qwen3 的结构应更谨慎地写成：
+
+```text
+L6 MLP:
+  ValueBundle(object, relation, slot, target)
+
+L22/L24 MLP:
+  downstream value relief / partial value state
+
+L24 attention:
+  broad choice/letter interface
+
+L24 head 29/31:
+  concentrated letter-label sub-interface
+```
+
+也就是说，Bridge 不是一个已经定位的单点，而更可能是：
+
+```text
+ValueBundle 从 L6 开始；
+沿多层 residual trajectory 传播；
+晚层 MLP 保留部分 value state；
+晚层 attention 将格式/选项/字母接口接入输出。
+```
+
+当前最稳结论仍然是结构分离：
+
+```text
+semantic value factor bundle
+≠
+choice/letter interface
+```
+
+### 下一步 Phase104
+
+建议进入：
+
+```text
+Qwen3 Segment Dynamic Bridge Recompute
+```
+
+目标：
+
+```text
+不要再只 restore 单层 clean state。
+改为 patch L6 value bundle 后，让 L8-L24 分段自然重算。
+```
+
+测试设计：
+
+```text
+1. destroy L6 value bundle。
+2. restore / transplant segment:
+   L8-L12
+   L12-L16
+   L16-L20
+   L20-L24
+   L8-L24
+3. 比较 value_margin 与 letter_margin。
+4. 对 L24 attention 和 L24 MLP 分别做 final restore。
+```
+
+关键问题：
+
+```text
+如果某段自然重算能同时恢复 value 与 letter:
+  Bridge 是 segment-level trajectory。
+
+如果只有 L24 attention 能恢复 letter:
+  choice interface 仍是末端格式接口。
+
+如果 value 只能由 MLP segment 恢复:
+  value path 与 choice interface 的连接需要多模块组合。
+```
+
+## Phase 104: 全局类别分析与类别竞争图谱整合 [2026-06-13 23:59]
+
+### 本阶段目标
+
+读取 `research/glm5/docs/AGI_GLM5_MEMO.md` 最新 Phase 483-484 进展，并参考用户附加资料，完成第一版全局类别分析。重点不是重新运行模型，而是把已经完成的三模型实验拼成一张全局类别地图：
+
+```text
+类别 = 共享语义流形 + 类别边界残差 + 竞争释放关系
+```
+
+本轮只使用基础分析：读取 JSON、排序、正负号、简单幅度比较、人工归纳，不做复杂统计和高级数学建模。
+
+### 命令记录
+
+```bash
+python tests/gpt5/phase104_global_category_analysis.py
+python -m py_compile tests/gpt5/phase104_global_category_analysis.py
+```
+
+### 脚本与结果
+
+- 脚本：`tests/gpt5/phase104_global_category_analysis.py`
+- JSON 结果：`results/gpt5/phase104_global_category_analysis.json`
+- Markdown 摘要：`results/gpt5/phase104_global_category_analysis.md`
+- 输入结果：
+  - `results/glm5/phase483_{qwen3,glm4,deepseek7b}_r1.json`
+  - `results/glm5/phase483_{qwen3,glm4,deepseek7b}_r2.json`
+  - `results/glm5/phase484_{qwen3,glm4,deepseek7b}_r1.json`
+  - `results/glm5/phase484_{qwen3,glm4,deepseek7b}_r2.json`
+
+### 分析原理
+
+1. **Category-Layer Map**：读取 Phase 483 全 8 类最佳层位、目标类别移除幅度、选择性和边界范数，形成类别-层位图。
+2. **Competition Graph**：对每个类别移除后的 DCF 变化取正值边，形成 `removed_category -> released_category` 图谱。
+3. **Cross-model Stable Edges**：只按“几个模型中为正”做基础稳定性判断，不做统计显著性推断。
+4. **Writer Map**：读取 Phase 484 的 MLP 重构 cos@k、显著神经元数、k=5 消融与方向级移除的一致性，粗分为 MLP 因果写入器、集中候选、非 MLP/反向、弥散/缺失、混合未解。
+5. **Relation Slot Map**：读取 kind_of / used_for / found_in 下 B_c 注入 delta，判断关系槽位是否改变边界方向读出。
+6. **Anomaly Map**：读取 food->vehicle、animal->clothing 的属性释放解释，避免把异常边直接判为错误。
+
+### 核心结果
+
+1. **全局图谱支持当前主假设**：类别不是孤立方向，更像“共享语义流形 + 类别边界残差 + 竞争释放”的组合结构。
+2. **跨三模型都为正的释放边**：
+
+```text
+animal -> clothing
+clothing -> furniture
+tool -> vehicle
+fruit -> animal
+clothing -> plant
+vehicle -> clothing
+furniture -> clothing
+fruit -> clothing
+furniture -> fruit
+```
+
+这些边不都很强，但它们在 Qwen3、GLM4、DS7B 中方向一致，可能是最早显露的稳定竞争骨架。
+
+3. **模型差异很大**：
+
+```text
+Qwen3: 释放幅度最大，竞争图最清楚。
+GLM4: 释放幅度整体很小，但方向上仍有若干一致边。
+DS7B: 幅度可大，但存在方向不干净和抑制性神经元问题。
+```
+
+4. **MLP 因果写入器不是全局统一机制**：
+
+```text
+Qwen3 clothing: MLP 因果写入器最清楚，k=5 cos_remove≈0.962。
+GLM4 fruit: MLP 因果写入器最清楚，k=5 cos_remove≈0.924。
+Qwen3 fruit/animal: MLP 消融方向为负，说明真正写入器可能在 attention 或 residual route。
+DS7B animal: cos@50 高但 k=5 消融为负，说明“重构集中”不等于“因果写入”。
+```
+
+5. **类别最佳层位不是统一层**：
+
+```text
+Qwen3: fruit L32, animal L33, tool L23, vehicle L29, clothing L30, furniture L26, food L34, plant L28
+GLM4: fruit L27, animal L38, tool L27, vehicle L29, clothing L39, furniture L34, food L38, plant L32
+DS7B: fruit L26, animal L27, tool L26, vehicle L26, clothing L23, furniture L25, food L27, plant L25
+```
+
+这说明类别边界存在“类别-模型特异发育时间”，不能继续假设所有类别在同一层形成。
+
+6. **关系槽位读出支持 prompt-invariant 边界，但仍需小尺度复核**：Phase 484 中 fruit 的 B_c 注入 delta 在 kind_of / used_for / found_in 基本不变；但 scale=1.0 可能过强，下一阶段必须做 scale sweep。
+
+7. **异常边不是简单错误**：
+
+```text
+food -> vehicle: 可能来自地点/移动属性释放。
+animal -> clothing: 可能来自商业/户外属性释放。
+```
+
+但 DS7B 的 food/animal 方向不够干净，不能把它作为强证据。
+
+### 理论进展
+
+当前理论应从“局部类别边界存在”升级为：
+
+```text
+语言模型内部可能存在类别竞争网络。
+类别边界不是一个个孤立坐标轴，而是通过竞争释放关系互相定义。
+一个类别的意义，部分来自它激活什么，部分来自它压制什么。
+```
+
+更严格地说：
+
+```text
+类别 C 的内部编码至少包含三层：
+
+1. 共享属性簇 M_c：
+   与邻近类别共用的语义材料。
+
+2. 边界残差 B_c：
+   把 C 从邻近类别中分离出来的方向。
+
+3. 竞争抑制场 R_c->*：
+   C 激活时对其他类别/属性的压制关系。
+```
+
+这很接近“相对编码”的第一性原理：意义不是靠绝对位置定义，而是靠一组可复用属性和一组差异边界共同定义。
+
+### 最严格审视与硬伤
+
+1. **本轮没有新跑模型**：只整合既有 Phase 483/484 结果，因此是全局拼图，不是新增因果证据。
+2. **类别数太少**：目前只有 8 类，每类 8 个对象，只能看到雏形，不能证明完整语义大陆。
+3. **DCF 词表仍可能制造偏置**：food->vehicle、animal->clothing 等边可能受候选词集合影响，需要宽词表和开放生成复核。
+4. **关系不变性可能是假象**：scale=1.0 注入可能覆盖关系模板差异，必须用 0.05/0.1/0.2/0.5/1.0 重测。
+5. **写入器证据只覆盖三类**：Phase 484 只对 fruit/animal/clothing 做 MLP 重构，tool/vehicle/furniture/food/plant 还没有写入器级因果图。
+6. **MLP 重构与因果不等价**：DS7B animal 是关键反例，cos@50 高但消融为负。
+7. **GLM4 幅度太弱**：方向一致不代表机制强，需要更多对象和更干净读出确认。
+
+### 第一性原理判断
+
+如果语言背后存在某种基础数学结构，它现在更像是：
+
+```text
+复用材料 + 差异边界 + 竞争抑制 + 层级发育
+```
+
+而不是简单的：
+
+```text
+词向量空间中有一个类别方向
+```
+
+要破解语言背后的数学理论，第一原则应从“寻找单一语义轴”转向“寻找语义如何通过相对差异闭合”。也就是说，核心问题不是 fruit 方向在哪里，而是：
+
+```text
+fruit 如何复用 plant/food 的材料；
+fruit 如何排除 animal/tool/vehicle；
+fruit 的边界在何层形成；
+fruit 的边界由哪个模块写入；
+fruit 激活后释放/压制哪些邻接类别；
+这些关系是否跨模型稳定。
+```
+
+### 下一阶段大任务
+
+下一阶段不应只做一个小功能，而应做 **Global Category Atlas v2**：
+
+1. **扩展类别规模**：从 8 类扩展到至少 32 类，每类不少于 24 个对象，覆盖自然物、人造物、生物、身体、地点、材料、抽象概念、社会角色。
+2. **建立四张图**：
+
+```text
+Category-Layer Map: 每类在哪些层形成边界。
+Competition Graph: 每类压制/释放哪些类别。
+Writer Map: MLP/attention/residual route 谁写入边界。
+Relation Slot Map: 不同关系是否只改变 baseline，不改变 B_c 读出。
+```
+
+3. **做 scale sweep**：对 B_c 注入和移除使用 0.05/0.1/0.2/0.5/1.0，确认关系不变性不是强注入造成。
+4. **分模块找写入器**：对非 MLP 主导类别，分别测试 attention output、MLP output、residual route，找 fruit/animal 的真正写入源。
+5. **异常边宽词表审计**：对 food->vehicle、animal->clothing 做更宽属性词表和开放生成验证，区分真实属性释放与 DCF 偏置。
+6. **三模型顺序执行**：若进入模型重测，必须按 Qwen3 -> GLM4 -> DS7B 顺序单模型运行，并添加 `--hard-exit-after-model`，避免 GPU 内存溢出。
+
+## Phase 105: CUDA 全类型系统类别图谱与层位分布分析 [2026-06-14 00:12]
+
+### 本阶段目标
+
+根据用户要求，使用 CUDA 对“所有类型”做系统分析，重点回答：
+
+```text
+1. 每种类型分布在哪些层？
+2. 每种类型的读出强度、边界强度、类内凝聚是什么样？
+3. 类型之间的相对邻接关系是什么？
+4. 不同模型是否有相同的类型层位规律？
+```
+
+本轮从 8 类扩展到 32 个大类，每类 24 个对象，三模型顺序运行：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+每个模型单独运行，并添加 `--hard-exit-after-model`，避免 GPU 显存残留。
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase105_global_category_atlas_cuda.py qwen3 \
+  --max-categories 4 \
+  --objects-per-category 3 \
+  --batch-size 2 \
+  --progress-every 1 \
+  --output-dir results/gpt5_phase105_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase105_global_category_atlas_cuda.py qwen3 \
+  --objects-per-category 24 \
+  --batch-size 8 \
+  --progress-every 12 \
+  --output-dir results/gpt5_phase105_global_category_atlas \
+  --hard-exit-after-model
+
+python tests/gpt5/phase105_global_category_atlas_cuda.py glm4 \
+  --objects-per-category 24 \
+  --batch-size 8 \
+  --progress-every 12 \
+  --output-dir results/gpt5_phase105_global_category_atlas \
+  --hard-exit-after-model
+
+python tests/gpt5/phase105_global_category_atlas_cuda.py deepseek7b \
+  --objects-per-category 24 \
+  --batch-size 8 \
+  --progress-every 12 \
+  --output-dir results/gpt5_phase105_global_category_atlas \
+  --hard-exit-after-model
+
+python tests/gpt5/phase105_global_category_atlas_summary.py \
+  --input-dir results/gpt5_phase105_global_category_atlas
+
+python -m py_compile \
+  tests/gpt5/phase105_global_category_atlas_cuda.py \
+  tests/gpt5/phase105_global_category_atlas_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase105_global_category_atlas_cuda.py`
+- 汇总脚本：`tests/gpt5/phase105_global_category_atlas_summary.py`
+- Qwen3 结果：`results/gpt5_phase105_global_category_atlas/phase105_qwen3_atlas.json`
+- GLM4 结果：`results/gpt5_phase105_global_category_atlas/phase105_glm4_atlas.json`
+- DS7B 结果：`results/gpt5_phase105_global_category_atlas/phase105_deepseek7b_atlas.json`
+- 跨模型汇总：`results/gpt5_phase105_global_category_atlas/phase105_cross_model_summary.md`
+
+### 类别集合
+
+本轮共 32 类，每类 24 个对象：
+
+```text
+fruit, animal, tool, vehicle, clothing, furniture, food, plant,
+body, place, building, material, color, emotion, role, profession,
+abstract, action, event, time, number, shape, sound, light,
+weather, container, instrument, machine, communication, relation,
+property, substance
+```
+
+### 测试原理
+
+1. 对每个对象构造自然模板：
+
+```text
+The {obj} is a kind of
+```
+
+2. 使用 CUDA 前向，并设置 `output_hidden_states=True`，抓取所有层最后 token 的 hidden state。
+
+3. 对每个类别、每层计算类别中心：
+
+```text
+center(category, layer) = mean(hidden_state(objects in category, layer))
+```
+
+4. 对每层计算基础指标：
+
+```text
+target margin:
+  类别中心对自身类别 readout words 的分数
+  -
+  对其他类别 readout words 的最大分数
+
+rank:
+  自身类别 readout 在 32 类中的排名
+
+cohesion:
+  同类对象向类别中心的平均 cos
+
+boundary norm:
+  类别中心 - 其他类别中心平均值 的范数
+
+nearest neighbors:
+  类别中心与其他类别中心的 cos 排序
+
+local boundary release:
+  在最佳 margin 层做本层 logit-lens 边界移除，
+  看其他类别 readout 是否上升
+```
+
+本轮仍坚持基础分析，不使用复杂统计建模。
+
+### 三模型全局层位结果
+
+```text
+Qwen3:
+  layers = 36
+  best top1 layer = L36, 23/32 类 top1
+  best mean margin layer = L36, mean margin = 0.68
+  best mean boundary layer = L35, mean boundary norm = 161.17
+
+GLM4:
+  layers = 40
+  best top1 layer = L40, 22/32 类 top1
+  best mean margin layer = L0, mean margin ≈ 0
+  best mean boundary layer = L19, mean boundary norm = 2.48
+
+DS7B:
+  layers = 28
+  best top1 layer = L28, 8/32 类 top1
+  best mean margin layer = L0, mean margin ≈ -0.02
+  best mean boundary layer = L27, mean boundary norm = 238.80
+```
+
+### 关键类别层位图
+
+#### Qwen3
+
+Qwen3 呈现最清楚的晚层类别读出：
+
+```text
+fruit:      margin L32, boundary L35, margin 12.54
+animal:     margin L32, boundary L35, margin 11.58
+tool:       margin L35, boundary L35, margin 6.88
+vehicle:    margin L33, boundary L35, margin 12.25
+food:       margin L33, boundary L35, margin 16.44
+plant:      margin L34, boundary L35, margin 15.91
+building:   margin L35, boundary L35, margin 14.42
+profession: margin L35, boundary L35, margin 22.24
+sound:      margin L33, boundary L35, margin 23.19
+shape:      margin L34, boundary L35, margin 8.63
+```
+
+Qwen3 中较弱或弥散的类型：
+
+```text
+role, abstract, action, time, number, relation
+```
+
+这些类型不是没有结构，而是当前 readout basis 下不形成强类别标签 margin。
+
+#### GLM4
+
+GLM4 的 rank 可出现正确，但 DCF margin 幅度极小：
+
+```text
+vehicle: margin L40, margin 1.05
+body:    margin L40, margin 1.08
+emotion: margin L40, margin 2.64
+machine: margin L40, margin 1.11
+```
+
+多数类别 margin 接近 0，说明当前英文 DCF readout 对 GLM4 可能不够校准，不能简单说 GLM4 没有类别结构。
+
+#### DS7B
+
+DS7B 呈现强晚层 boundary norm，但类别标签 margin 普遍弱：
+
+```text
+boundary norm peak = L27
+profession: margin L27, margin 26.42
+animal:     margin L28, margin 0.91
+plant:      margin L28, margin 0.75
+property:   margin L12, margin 1.48
+```
+
+DS7B 的结构更像“中心和边界存在，但当前 DCF 标签读不干净”。
+
+### 类型邻接关系示例
+
+Qwen3 中一些强类别的最近邻：
+
+```text
+fruit -> plant, color, food
+animal -> relation, plant, role
+vehicle -> machine, container, building
+food -> substance, material, container
+plant -> color, fruit, relation
+building -> place, container, action
+profession -> role, relation, action
+sound -> action, communication, light
+shape -> property, number, light
+```
+
+这些邻接关系不是人类分类表的简单复制，而是模型内部类别中心的相对位置。
+
+### 重要理论发现
+
+1. **类别边界和类别读出不是同一件事**
+
+Qwen3 中 margin 和 boundary norm 都在晚层很清楚；但 GLM4/DS7B 出现“boundary 或 rank 有信号，但 margin 很弱”的情况。说明：
+
+```text
+类别结构存在
+≠
+当前 DCF readout 能干净读出
+```
+
+2. **边界层普遍偏晚**
+
+Qwen3 边界峰值在 L35，DS7B 在 L27，都是接近末层。类别差异不是只在早层产生，而是经过层级发育后在晚层变得最清楚。
+
+3. **具体名词类比抽象关系类更容易形成强读出**
+
+Qwen3 中 fruit/animal/vehicle/food/plant/building/sound/profession 很强，而 role/abstract/action/time/number/relation 较弱。这说明抽象和关系类可能更依赖上下文槽位，不适合用单一句式和类别标签 readout 直接测。
+
+4. **“类型”不是统一形态**
+
+当前可粗分：
+
+```text
+sharp_readout_cohesive:
+  读出强、类内凝聚，典型如 Qwen3 fruit/animal/food/plant/sound/profession。
+
+readout_clear:
+  有清楚读出，但没有达到最强边界，例如 Qwen3 tool/color/weather/instrument。
+
+cohesive_boundary_unclear_readout:
+  有中心/边界，但类别标签读出弱，例如 Qwen3 clothing/furniture/body/machine。
+
+diffuse_or_contextual:
+  当前模板下弥散或依赖上下文，例如 GLM4 多数类、Qwen3 role/abstract/action/time/number/relation。
+```
+
+### 最严格审视与硬伤
+
+1. **本轮是全层 logit-lens 图谱，不是下游因果干预**
+
+local boundary release 只是本层读出变化，不等同于真正 forward patch 后的输出变化。不能把释放边直接当成因果机制。
+
+2. **模板只有一个**
+
+本轮为了快速完成 32 类三模型全图，只使用：
+
+```text
+The {obj} is a kind of
+```
+
+抽象类、关系类、动作类明显可能被模板压制。下一轮必须加多模板。
+
+3. **readout words 对 GLM4/DS7B 可能严重不公平**
+
+GLM4 和 DS7B 的 margin 弱，不一定说明类别弱，可能是英文 readout token、chat model 格式或输出头标定导致。
+
+4. **cohesion 容易被共享模板抬高**
+
+所有 prompt 共享前缀，类内凝聚可能混入模板相似性。需要做模板残差扣除或对象 token 位置测试。
+
+5. **类别词表仍是人工定义**
+
+32 类比 8 类更大，但仍不是完整语义空间；一些类别互相重叠，例如 role/profession/relation、material/substance/property。
+
+6. **层位解释要谨慎**
+
+`hidden_states[k]` 表示第 k-1 个 transformer block 之后的状态，L36/L40/L28 接近最终输出接口，可能混入 readout 适配，不完全等价于“语义生成层”。
+
+### 第一性原理更新
+
+本轮把“类别边界”从局部机制推进到全局层位图。当前更合理的第一性原理表述是：
+
+```text
+类型不是一个固定向量。
+类型是对象集合在层级演化中逐步形成的相对闭合区域。
+
+这个区域至少有四个可观察量：
+1. 中心：同类对象是否聚到一起。
+2. 边界：该中心和其他类型中心如何分离。
+3. 读出：输出头是否能把它命名成类别。
+4. 竞争：移除边界后哪些相邻类型被释放。
+```
+
+这说明语言背后的数学结构可能不是传统“向量空间 + 分类面”那么简单，而更像：
+
+```text
+对象轨道 -> 类别中心 -> 相对边界 -> 竞争网络 -> 输出读出接口
+```
+
+也就是意义并非静态存放，而是在层级计算中逐步闭合。
+
+### 下一阶段大任务
+
+下一阶段应做 **Phase 106: 多模板残差扣除 + 因果释放验证**：
+
+1. **多模板重跑**
+
+```text
+The {obj} is a kind of
+A {obj} belongs to the category of
+The word {obj} refers to a type of
+People use the word {obj} when talking about
+```
+
+2. **模板残差扣除**
+
+对同一模板下所有类别中心求公共模板向量，再从对象表示中扣除，测试 cohesion 和 boundary 是否仍存在。
+
+3. **对象 token 位置测试**
+
+不要只看最后 token，也看对象 token 的首/尾位置，判断类别是在对象处形成，还是在答案槽位形成。
+
+4. **挑选稳定边做真正 CUDA patch**
+
+从 Phase 105 中选择强邻接/强释放边，例如：
+
+```text
+fruit -> plant/food
+vehicle -> machine/container/building
+food -> substance/material/container
+profession -> role/relation/action
+sound -> action/communication/light
+```
+
+在 Qwen3 先做真实 forward boundary removal，再扩展到 GLM4/DS7B。
+
+5. **改进 GLM4/DS7B readout**
+
+为 GLM4/DS7B 单独标定 readout words、中文/英文双语 readout、chat template readout，避免把读出失败误判成结构不存在。
+
+## Phase 106: 多模板残差扣除与对象位置类别图谱复核 [2026-06-14 08:06]
+
+### 本阶段目标
+
+根据用户要求，先判断附加分析是否正确，再继续完成真实客观现象拼图。
+
+对附加分析的收缩判断：
+
+```text
+正确部分：
+1. Phase105 只是 logit-lens atlas，不是完整因果图谱。
+2. 类别结构与 readout interface 需要分开。
+3. 下一步必须做多模板、模板残差扣除、对象 token 位置测试。
+
+需要谨慎部分：
+1. 不能过早理论总结。
+2. 不能把 Phase105 的 local boundary release 当成真实 forward causal edge。
+3. GLM4/DS7B 的 weak margin 不能直接解释为类别结构不存在。
+```
+
+本轮 Phase106 使用 CUDA 对三模型完整重测，不分小批次实验，不在模型测试期间插入分析。
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase106_multitemplate_residual_cuda.py qwen3 \
+  --objects-per-category 2 \
+  --templates 2 \
+  --batch-size 4 \
+  --progress-every 2 \
+  --output-dir results/gpt5_phase106_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase106_multitemplate_residual_cuda.py qwen3 \
+  --objects-per-category 24 \
+  --templates 4 \
+  --batch-size 16 \
+  --progress-every 16 \
+  --output-dir results/gpt5_phase106_multitemplate_residual \
+  --hard-exit-after-model
+
+python tests/gpt5/phase106_multitemplate_residual_cuda.py glm4 \
+  --objects-per-category 24 \
+  --templates 4 \
+  --batch-size 16 \
+  --progress-every 16 \
+  --output-dir results/gpt5_phase106_multitemplate_residual \
+  --hard-exit-after-model
+
+python tests/gpt5/phase106_multitemplate_residual_cuda.py deepseek7b \
+  --objects-per-category 24 \
+  --templates 4 \
+  --batch-size 16 \
+  --progress-every 16 \
+  --output-dir results/gpt5_phase106_multitemplate_residual \
+  --hard-exit-after-model
+
+python tests/gpt5/phase106_multitemplate_residual_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase106_multitemplate_residual_cuda.py \
+  tests/gpt5/phase106_multitemplate_residual_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase106_multitemplate_residual_cuda.py`
+- 汇总脚本：`tests/gpt5/phase106_multitemplate_residual_summary.py`
+- Qwen3 结果：`results/gpt5_phase106_multitemplate_residual/phase106_qwen3_multitemplate_residual.json`
+- GLM4 结果：`results/gpt5_phase106_multitemplate_residual/phase106_glm4_multitemplate_residual.json`
+- DS7B 结果：`results/gpt5_phase106_multitemplate_residual/phase106_deepseek7b_multitemplate_residual.json`
+- 跨模型汇总：`results/gpt5_phase106_multitemplate_residual/phase106_cross_model_summary.md`
+
+### 测试规模
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = 32
+objects/category = 24
+templates = 4
+positions = answer_last, object_last
+prompts/model = 32 * 24 * 4 = 3072
+total prompts = 9216
+```
+
+四个模板：
+
+```text
+The {obj} is a kind of
+A {obj} belongs to the category of
+The word {obj} refers to a type of
+People use the word {obj} when talking about
+```
+
+两个位置：
+
+```text
+answer_last:
+  答案槽位/类别读出槽位。
+
+object_last:
+  对象 token 最后位置。
+```
+
+两种基底：
+
+```text
+raw:
+  原始 hidden state 类别中心。
+
+template_residual:
+  每个 template、每层、每个位置上，先减去该 template 的所有类别公共均值向量。
+```
+
+### 客观结果：全局层位
+
+#### Qwen3
+
+```text
+answer_last / raw:
+  top1 L36 = 21/32
+  best mean margin L32 = 0.718
+  best boundary L35 = 155.255
+
+answer_last / template_residual:
+  best mean margin L33 = 7.587
+  best boundary L35 = 155.255
+
+object_last / raw:
+  top1 L0 = 18/32
+  best mean margin L0 ≈ 0
+  best boundary L35 = 119.261
+
+object_last / template_residual:
+  top1 L13 = 22/32
+  best mean margin L32 = 0.946
+  best boundary L35 = 119.261
+```
+
+#### GLM4
+
+```text
+answer_last / raw:
+  top1 L40 = 25/32
+  best mean margin L0 ≈ 0
+  best boundary L18 = 2.644
+
+answer_last / template_residual:
+  top1 L19 = 32/32
+  best mean margin L0 ≈ 0
+  best boundary L18 = 2.644
+
+object_last / raw:
+  top1 L24 = 24/32
+  best mean margin L0 ≈ 0
+  best boundary L19 = 70.176
+
+object_last / template_residual:
+  top1 L20 = 32/32
+  best mean margin L0 ≈ 0
+  best boundary L19 = 70.176
+```
+
+#### DS7B
+
+```text
+answer_last / raw:
+  top1 L28 = 9/32
+  best mean margin L0 = -0.017
+  best boundary L27 = 263.246
+
+answer_last / template_residual:
+  best mean margin L27 = 4.723
+  best boundary L27 = 263.246
+
+object_last / raw:
+  top1 L4 = 5/32
+  best mean margin L0 = -0.009
+  best boundary L27 = 213.556
+
+object_last / template_residual:
+  top1 L28 = 15/32
+  best mean margin L0 = -0.007
+  best boundary L27 = 213.556
+```
+
+### 客观结果：Phase105 的直接修正
+
+1. **Qwen3 的 Phase105 结论大体保留，但弱类被模板残差显著增强**
+
+Phase105 中 Qwen3 的强类仍然强，例如：
+
+```text
+fruit:   raw 12.57 -> residual 14.07
+vehicle: raw 10.10 -> residual 12.08
+food:    raw 14.77 -> residual 16.22
+plant:   raw 15.02 -> residual 11.99
+sound:   raw 25.38 -> residual 14.57
+```
+
+但一些 Phase105 中偏弱的类，在 template_residual 后明显增强：
+
+```text
+clothing:      3.41 -> 14.79
+furniture:     0.62 -> 7.67
+body:          0.43 -> 4.87
+place:         0.49 -> 7.84
+action:       -0.08 -> 4.39
+time:         -0.07 -> 8.93
+number:       -0.07 -> 7.80
+container:     0.16 -> 7.64
+communication: 0.52 -> 6.50
+property:     -0.08 -> 5.26
+```
+
+这说明 Phase105 对 Qwen3 的“弥散类”判断有一部分是模板公共向量污染造成的。
+
+2. **Qwen3 object_last 明显弱于 answer_last，但不是空信号**
+
+object_last / template_residual 中有多类仍有正 margin：
+
+```text
+weather 7.85
+light 5.13
+container 4.18
+shape 3.68
+vehicle 3.72
+relation 3.51
+color 3.25
+profession 3.10
+plant 3.05
+```
+
+说明类别信息在对象 token 位置已经存在，但在 answer_last 槽位被显著放大。
+
+3. **GLM4 的问题不是简单模板公共向量污染**
+
+GLM4 在 raw 与 template_residual 下 margin 仍接近 0：
+
+```text
+answer_last / template_residual best mean margin ≈ 0
+object_last / template_residual best mean margin ≈ 0
+```
+
+但 top1 count 可达 32/32，说明 top1 在 margin 极小时会虚高，不能作为强证据。GLM4 更可能需要重新校准 readout words、chat template 或中英文 readout。
+
+4. **DS7B 被 Phase105 明显低估**
+
+DS7B 在 answer_last 做 template_residual 后：
+
+```text
+best mean margin: -0.017 -> 4.723
+best layer: L27
+```
+
+大量类别从 raw 弱信号变成强信号：
+
+```text
+fruit:     -0.03 -> 9.18
+vehicle:    0.00 -> 9.19
+clothing:  -0.02 -> 10.21
+plant:      1.01 -> 11.07
+body:       0.44 -> 8.80
+place:     -0.02 -> 6.93
+building:  -0.03 -> 7.21
+color:      0.20 -> 9.14
+number:    -0.01 -> 9.63
+weather:    0.56 -> 14.40
+```
+
+这说明 DS7B 内部类别结构并不弱，而是被公共模板/格式方向遮蔽。
+
+5. **边界层结论稳定**
+
+template_residual 不改变类别之间的相对差值，因此 boundary layer 基本不变：
+
+```text
+Qwen3 answer_last boundary peak: L35
+Qwen3 object_last boundary peak: L35
+DS7B answer_last boundary peak: L27
+DS7B object_last boundary peak: L27
+GLM4 answer_last boundary peak: L18
+GLM4 object_last boundary peak: L19
+```
+
+### 当前最可靠客观事实
+
+1. **answer_last 是类别读出放大槽位**：Qwen3 和 DS7B 的 answer_last margin 明显强于 object_last。
+2. **模板公共向量会严重遮蔽类别方向**：尤其是 DS7B，也影响 Qwen3 弱类。
+3. **boundary layer 比 margin layer 更稳定**：扣除模板公共向量后，boundary peak 基本不变。
+4. **top1 count 不能单独作为证据**：GLM4 在 margin≈0 时也能出现 32/32 top1。
+5. **GLM4 仍未被当前 readout 正确读出**：需要专门 readout 校准。
+6. **Phase105 对 Qwen3 强类判断基本正确，但对弱类过于保守；对 DS7B 明显低估。**
+
+### 硬伤分析
+
+1. **仍不是真正因果 patch**：本轮是多模板/残差/位置图谱，不是 downstream forward intervention。
+2. **template_residual 可能引入相对化增强**：减去公共均值后 margin 变大，说明差异更清楚，但不等于模型自然输出一定使用这个差异。
+3. **object_last 定位是 token subsequence 近似**：多 token 对象或 tokenizer 差异可能影响位置定位。
+4. **GLM4 readout 仍失败**：当前英文 readout words 可能不适配 GLM4，需要双语/聊天模板校准。
+5. **没有测试跨模板一致对象轨道**：本轮只看中心，不看每个对象在多模板中的轨道是否闭合。
+
+### 下一步任务
+
+Phase107 不应做理论总结，应做真实因果验证：
+
+```text
+目标：从 Phase106 中选择最稳定、margin 高、boundary 层稳定的边，做 downstream forward boundary removal。
+```
+
+优先测试：
+
+```text
+Qwen3:
+  clothing, furniture, time, number, action, container
+  因为这些类在 template_residual 后从弱变强。
+
+DS7B:
+  fruit, vehicle, clothing, plant, body, place, building, weather
+  因为这些类从 raw 弱信号变为 residual 强信号。
+
+GLM4:
+  暂不做因果边界测试，先做 readout calibration。
+```
+
+Phase107 应输出：
+
+```text
+1. 自然 forward baseline。
+2. best boundary layer removal。
+3. template residual boundary removal。
+4. random same-norm control。
+5. target DCF 下降和 competitor release 上升。
+```
+
+## Phase 107: 真实前向类别边界移除因果验证 [2026-06-14 08:43]
+
+### 本阶段目标
+
+根据用户要求，综合 Phase106 正确部分继续任务，不做过早理论总结，优先完成真实客观现象拼图。
+
+Phase106 的正确部分：
+
+```text
+1. Phase105/106 仍是 atlas/readout 图谱，不是因果图。
+2. 模板公共向量会遮蔽类别方向，尤其 DS7B。
+3. answer_last 是类别读出放大槽位。
+4. boundary layer 比 margin layer 更稳定。
+```
+
+Phase107 的目标：
+
+```text
+从 atlas 进入真实 forward causal intervention。
+在自然前向传播中，于 boundary layer 的 answer_last 位置移除类别边界投影，
+观察最终 logits 的类别 DCF 是否改变。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase107_causal_boundary_removal_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories fruit,clothing \
+  --output-dir results/gpt5_phase107_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase107_causal_boundary_removal_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase107_causal_boundary_removal \
+  --hard-exit-after-model
+
+python tests/gpt5/phase107_causal_boundary_removal_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase107_causal_boundary_removal \
+  --hard-exit-after-model
+
+# GLM4 fp16 logits 出现 NaN，改用 bf16 重新运行并覆盖结果
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase107_causal_boundary_removal_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase107_causal_boundary_removal \
+  --hard-exit-after-model
+
+python tests/gpt5/phase107_causal_boundary_removal_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase107_causal_boundary_removal \
+  --hard-exit-after-model
+
+python tests/gpt5/phase107_causal_boundary_removal_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase107_causal_boundary_removal_cuda.py \
+  tests/gpt5/phase107_causal_boundary_removal_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase107_causal_boundary_removal_cuda.py`
+- 汇总脚本：`tests/gpt5/phase107_causal_boundary_removal_summary.py`
+- Qwen3 结果：`results/gpt5_phase107_causal_boundary_removal/phase107_qwen3_causal_boundary_removal.json`
+- GLM4 结果：`results/gpt5_phase107_causal_boundary_removal/phase107_glm4_causal_boundary_removal.json`
+- DS7B 结果：`results/gpt5_phase107_causal_boundary_removal/phase107_deepseek7b_causal_boundary_removal.json`
+- 跨模型汇总：`results/gpt5_phase107_causal_boundary_removal/phase107_cross_model_summary.md`
+
+### 测试规模
+
+```text
+models = qwen3, glm4, deepseek7b
+test categories = 12
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+conditions = baseline, remove_boundary, random_same_norm
+```
+
+测试类别：
+
+```text
+fruit, vehicle, clothing, furniture, plant, body,
+place, building, time, number, weather, container
+```
+
+模型边界层：
+
+```text
+Qwen3: L35
+GLM4: L18
+DS7B: L27
+```
+
+### 方法
+
+1. 使用前 12 个对象训练类别中心。
+2. 对每个类别在 boundary layer 估计边界：
+
+```text
+B_c = mean_template(center(c, template) - mean_other_categories(template))
+```
+
+3. 在 heldout 对象上真实 forward。
+4. 在 boundary layer 的 answer_last 位置注册 hook：
+
+```text
+h := h - projection(h, B_c)
+```
+
+5. 对照组：
+
+```text
+random_same_norm:
+  使用确定性随机单位方向，做同样 projection removal。
+```
+
+6. 测量最终 logits 的 32 类 DCF 变化。
+
+### 客观结果摘要
+
+#### Qwen3
+
+```text
+fruit:     target Δ +0.16, top release sound +0.69
+vehicle:   target Δ +0.11, top release role +0.22
+clothing:  target Δ +0.49, top release tool +0.89
+furniture: target Δ +1.37, top release building +1.49
+plant:     target Δ +0.04, top release color +0.15
+body:      target Δ +0.17, top release weather +0.73
+place:     target Δ +0.05, top release shape +0.24
+building:  target Δ +0.36, top release shape +0.59
+time:      target Δ -0.51, top release animal +0.60
+number:    target Δ -1.41, top release animal +0.23
+weather:   target Δ +0.10, top release light +0.58
+container: target Δ +0.03, top release fruit +1.12
+```
+
+Qwen3 只有 `time` 和 `number` 表现为目标下降，其中 `time` 同时有竞争释放。
+多数具体类别是 release-only 或 target-up/opposed。
+
+#### GLM4
+
+GLM4 初次 fp16 运行 logits 出现 NaN，bf16 重跑后结果有限但正常。
+
+```text
+fruit:     target Δ +0.08, top release shape +0.39
+vehicle:   target Δ -0.01, top release place +0.53
+clothing:  target Δ -0.15, top release property +0.29
+furniture: target Δ +0.01, top release material +0.07
+plant:     target Δ -0.00, top release material +0.27
+body:      target Δ +0.05, top release place +0.31
+place:     target Δ +0.03, top release action +0.14
+building:  target Δ -0.01, top release action +0.08
+time:      target Δ -0.03, top release material +0.16
+number:    target Δ +0.05, top release container +0.18
+weather:   target Δ -0.26, top release shape +0.30
+container: target Δ -0.01, top release role +0.23
+```
+
+GLM4 效应整体较小，不能作为强因果证据。
+
+#### DS7B
+
+```text
+fruit:     target Δ +0.94, top release time +1.48
+vehicle:   target Δ -0.04, top release machine +0.48
+clothing:  target Δ +1.05, top release tool +1.58
+furniture: target Δ +0.62, top release tool +1.02
+plant:     target Δ +1.04, top release animal +1.19
+body:      target Δ +0.65, top release container +1.00
+place:     target Δ +0.21, top release emotion +0.23
+building:  target Δ +0.22, top release fruit +0.55
+time:      target Δ +0.10, top release clothing +0.23
+number:    target Δ -2.58, no positive release
+weather:   target Δ +0.01, top release clothing +0.40
+container: target Δ -2.28, no positive release
+```
+
+DS7B 的 `number` 和 `container` 出现强目标下降，但没有清楚竞争释放。
+多个具体类表现为 target-up/opposed。
+
+### 当前最可靠客观事实
+
+1. **atlas boundary vectors 能真实影响最终 logits**  
+   boundary removal 的 release 幅度通常明显大于 random same-norm control。
+
+2. **边界方向不是简单正支持方向**  
+   很多类别移除边界后 target DCF 反而上升，例如 Qwen3 furniture、DS7B clothing/plant。
+
+3. **干净的 target-down + competitor-release 很少**  
+   本轮最接近的是：
+
+```text
+Qwen3 time: target Δ -0.51, animal release +0.60
+```
+
+4. **number 类跨模型更像可移除目标边界**
+
+```text
+Qwen3 number: target Δ -1.41
+DS7B number: target Δ -2.58
+```
+
+但两者都缺少强竞争释放，因此更像 target boundary removal，不是完整 competition edge。
+
+5. **GLM4 需要 bf16 才能避免 NaN**
+
+GLM4 fp16 forward logits 不稳定，后续 GLM4 CUDA 测试应默认：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16
+```
+
+6. **Phase106 的强 margin 不等于简单因果支持**
+
+Phase106 中 template_residual margin 很强的类别，在 Phase107 中不一定 target-down。
+这说明 readout margin、boundary geometry、forward causal support 三者必须分开。
+
+### 硬伤分析
+
+1. **只移除 answer_last 单点**  
+   类别边界可能分布在多 token、多层 residual trajectory 中，单点移除不一定能关闭类别。
+
+2. **边界定义仍是 center-vs-others**  
+   对 target-up/opposed 类别，说明此边界可能混入抑制方向或读出接口方向。
+
+3. **没有 scale sweep**  
+   本轮 scale=1.0，下一轮必须测试 0.25/0.5/1.0/1.5。
+
+4. **没有 layer sweep**  
+   只用了 boundary peak layer。真实因果操作层可能不是 boundary norm 最大层。
+
+5. **没有多位置 patch**  
+   object_last、answer_last、多 token 共同干预可能与单点干预不同。
+
+### 下一步任务
+
+Phase108 应继续客观测试，不做理论扩张：
+
+```text
+Boundary Causal Sweep:
+  categories = number, time, container, clothing, furniture, plant
+  models = Qwen3, DS7B
+  GLM4 = bf16 only, optional calibration branch
+```
+
+必须测试：
+
+```text
+1. scale sweep: 0.25 / 0.5 / 1.0 / 1.5
+2. layer sweep: boundary_layer-3 ... boundary_layer
+3. position sweep: object_last, answer_last, both
+4. controls: random_same_norm, neighbor_boundary_control
+```
+
+核心目标不是总结，而是判定：
+
+```text
+哪些类别的边界是正支持方向？
+哪些类别的边界是抑制/竞争方向？
+哪些类别需要多层/多位置共同移除才有因果效果？
+```
+
+## Phase 108: Boundary Causal Sweep 层位-位置-scale-对照系统扫描 [2026-06-14 09:03]
+
+### 本阶段目标
+
+根据用户要求，先判断附加分析是否正确，再继续完成客观现象拼图。
+
+附加分析中正确部分：
+
+```text
+1. 分布情况是语言编码机制的核心拼图。
+2. Phase107 已经从 atlas/readout 进入真实 forward causal intervention。
+3. Phase107 的结果不能解释成“类别边界=简单正支持方向”。
+4. 下一步必须做 scale、layer、position、control sweep。
+```
+
+本轮 Phase108 目标：
+
+```text
+判定哪些类别边界是正支持方向；
+哪些是抑制/竞争/接口混合方向；
+哪些需要多层/多位置共同移除才出现因果效果。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase108_boundary_causal_sweep_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --layer-back 1 \
+  --categories number,time \
+  --output-dir results/gpt5_phase108_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase108_boundary_causal_sweep_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase108_boundary_causal_sweep \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase108_boundary_causal_sweep_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase108_boundary_causal_sweep \
+  --hard-exit-after-model
+
+python tests/gpt5/phase108_boundary_causal_sweep_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase108_boundary_causal_sweep \
+  --hard-exit-after-model
+
+python tests/gpt5/phase108_boundary_causal_sweep_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase108_boundary_causal_sweep_cuda.py \
+  tests/gpt5/phase108_boundary_causal_sweep_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase108_boundary_causal_sweep_cuda.py`
+- 汇总脚本：`tests/gpt5/phase108_boundary_causal_sweep_summary.py`
+- Qwen3 结果：`results/gpt5_phase108_boundary_causal_sweep/phase108_qwen3_boundary_causal_sweep.json`
+- GLM4 结果：`results/gpt5_phase108_boundary_causal_sweep/phase108_glm4_boundary_causal_sweep.json`
+- DS7B 结果：`results/gpt5_phase108_boundary_causal_sweep/phase108_deepseek7b_boundary_causal_sweep.json`
+- 跨模型汇总：`results/gpt5_phase108_boundary_causal_sweep/phase108_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, time, container, clothing, furniture, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+layers = boundary_layer-3 ... boundary_layer
+positions = answer_last, object_last, both
+scales = 0.25, 0.5, 1.0, 1.5
+controls = boundary, random_same_norm, neighbor_boundary
+```
+
+模型层位：
+
+```text
+Qwen3: L32-L35
+GLM4: L15-L18
+DS7B: L24-L27
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  strongest target down = L35 both scale1.5, target Δ -3.06
+  same-setting random target Δ +0.02
+  same-setting neighbor target Δ +0.28
+  strongest release = animal +0.37
+
+time:
+  strongest target down = L35 both scale1.5, target Δ -1.35
+  random +0.05
+  neighbor +0.69
+  strongest release = animal +0.61
+
+container:
+  strongest target down = L32 answer_last scale1.5, target Δ -0.34
+  strongest release = clothing +2.03 at L34 both scale1.5
+
+clothing:
+  strongest target down = L33 answer_last scale1.5, target Δ -0.45
+  strongest target up = +0.51
+  strongest release = tool +1.08
+
+furniture:
+  no meaningful target down
+  strongest target up = +2.10
+  strongest release = clothing +2.22
+
+plant:
+  weak target down = -0.37 at L32 answer_last scale1.5
+  strongest release = color +0.25
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  strongest target down = -0.02
+  strongest target up = +0.17
+  strongest release = material +0.48
+
+time:
+  strongest target down = -0.24
+  strongest release = material +0.32
+
+container:
+  strongest target down = -0.05
+  strongest release = event +0.25
+
+clothing:
+  strongest target down = -0.13
+  strongest release = property +0.16
+
+furniture:
+  strongest target down = -0.08
+  strongest target up = +0.14
+  strongest release = material +0.22
+
+plant:
+  strongest target down = -0.06
+  strongest release = shape +0.39
+```
+
+GLM4 效应仍然弱。
+
+#### DS7B
+
+```text
+number:
+  strongest target down = L27 both scale1.5, target Δ -4.75
+  random -0.02
+  neighbor -1.51
+  strongest release = clothing +0.46
+
+time:
+  no meaningful boundary target down
+  neighbor control itself can reduce target strongly
+  strongest release = clothing +0.43
+
+container:
+  strongest target down = L27 both scale1.5, target Δ -3.21
+  random -0.02
+  neighbor +0.07
+  strongest release weak = clothing +0.09
+
+clothing:
+  weak target down only at L25 object_last scale0.25, target Δ -0.17
+  strongest target up = +1.61
+  strongest release = tool +2.17
+
+furniture:
+  no meaningful target down
+  strongest target up = +1.02
+  strongest release = tool +1.48
+
+plant:
+  no meaningful target down
+  strongest target up = +1.31
+  strongest release = animal +1.51
+```
+
+### 当前最可靠客观事实
+
+1. **number 是最稳定的可移除目标边界**
+
+```text
+Qwen3 number: L35 both scale1.5 target Δ -3.06
+DS7B number: L27 both scale1.5 target Δ -4.75
+```
+
+两者都明显强于 random control，也强于 neighbor control。
+
+2. **container 在 DS7B 是强 target-down 边界**
+
+```text
+DS7B container: L27 both scale1.5 target Δ -3.21
+```
+
+Qwen3 container 不是强 target-down，但有强 release：
+
+```text
+Qwen3 container -> clothing +2.03
+```
+
+3. **time 在 Qwen3 是 target-down + release，DS7B 不是**
+
+```text
+Qwen3 time: target Δ -1.35, animal release +0.61
+DS7B time: boundary weak，neighbor control 影响更大
+```
+
+4. **clothing/furniture/plant 更像竞争/抑制混合边界**
+
+这些类别常出现：
+
+```text
+target up
+competitor release
+缺少稳定 target down
+```
+
+例如：
+
+```text
+Qwen3 furniture: target up +2.10, clothing release +2.22
+DS7B clothing: target up +1.61, tool release +2.17
+DS7B plant: target up +1.31, animal release +1.51
+```
+
+5. **both-position 高 scale 对 target-down 很关键**
+
+最强 target-down 基本出现在：
+
+```text
+answer_last + object_last
+scale = 1.5
+boundary peak layer
+```
+
+尤其 number 和 DS7B container。
+
+6. **最佳因果层不一定是 boundary norm peak**
+
+Qwen3 container/plant 的 target-down 出现在 L32，而不是 L35。
+
+```text
+boundary norm peak ≠ best causal layer
+```
+
+### 硬伤分析
+
+1. **scale 最大只到 1.5**
+   如果类别边界分布更宽，可能需要多层小 scale 累积，而不是单层大 scale。
+
+2. **boundary vector 仍是 center-vs-others**
+   对 clothing/furniture/plant 这类 target-up 类别，说明边界混入 suppressor/interface 成分，需要拆分。
+
+3. **neighbor control 有时很强**
+   DS7B time 中 neighbor control target down 更强，说明类别边界互相缠绕。
+
+4. **没有同时做多层 patch**
+   本轮是单层 sweep，不是 multi-layer cumulative patch。
+
+5. **没有直接分解 support vs suppressor**
+   只能从 target_down、target_up、release 模式推断，尚未直接分离成分。
+
+### 下一步任务
+
+Phase109 应继续客观测试：
+
+```text
+Support/Suppressor Decomposition
+```
+
+优先对象：
+
+```text
+number:
+  作为较干净 target-support boundary。
+
+clothing/furniture/plant:
+  作为 suppressor/interface mixed boundary。
+
+container:
+  比较 Qwen3 release-only 与 DS7B target-down。
+```
+
+测试要求：
+
+```text
+1. 用 readout target direction 与 boundary vector 做分解。
+2. 分别移除 boundary 中的 target-readout aligned component 和 orthogonal component。
+3. 测 target_delta 与 release_delta。
+4. 加 random_same_norm 和 neighbor_boundary control。
+```
+
+## Phase 109: 支持/抑制成分分解方案与条件化关系因子动力学更新 [2026-06-14 09:16]
+
+### 本阶段性质
+
+本阶段没有运行模型测试，而是根据 Phase 105-108 的客观结果，完成系统分析、公式更新和下一阶段研究方案设计。
+
+### 对附加分析的判断
+
+附加分析基本正确，尤其以下判断成立：
+
+```text
+1. 分布情况是语言编码机制的核心拼图。
+2. Phase 107 已经证明 atlas boundary vector 进入真实 forward causal space。
+3. Phase 108 证明类别边界不是简单正支持方向。
+4. layer、position、scale、control 四个维度必须同时看。
+5. number 是当前最稳定的 target-support boundary。
+6. clothing/furniture/plant 更像 suppressor/interface mixed boundary。
+```
+
+需要收缩的部分：
+
+```text
+1. 不能把 CategoryCausalField 当成已被完整证明的理论对象。
+2. 目前只证明了若干类别边界具有可测因果效应。
+3. support / suppressor / interface 仍是基于干预模式的工作性分解，还不是直接电路分解。
+4. 条件化关系因子动力学公式应更新为可测试公式，而不是最终数学理论。
+```
+
+### 当前客观进展
+
+从 Phase 105 到 Phase 108，已经形成一条清楚路径：
+
+```text
+Phase 105:
+  32 类全局类别图谱，发现层位分布、邻接关系、边界峰值。
+
+Phase 106:
+  多模板、模板残差、对象位置/答案位置复核。
+  证明模板公共向量会遮蔽类别方向。
+
+Phase 107:
+  真实 forward boundary removal。
+  证明 atlas boundary vector 能影响最终 logits。
+
+Phase 108:
+  layer/position/scale/control sweep。
+  证明类别边界有不同因果类型。
+```
+
+当前最稳事实：
+
+```text
+1. number 是最稳定 target-support boundary:
+   Qwen3: target_delta = -3.06
+   DS7B:  target_delta = -4.75
+
+2. time 在 Qwen3 中接近 target-down + release:
+   target_delta = -1.35
+   animal_release = +0.61
+
+3. DS7B container 是强 target-down:
+   target_delta = -3.21
+
+4. clothing/furniture/plant 多数表现为 target-up 或 release-only。
+
+5. both-position 高 scale 对强 target-down 很关键。
+
+6. boundary norm peak 不一定是 best causal layer。
+```
+
+### 对深度神经网络内部结构研究的进展
+
+当前内部结构研究从“有没有概念方向”推进到“方向的因果功能分类”：
+
+```text
+1. 表征几何:
+   类别中心、边界、邻接关系存在。
+
+2. 读出接口:
+   answer_last 是类别读出放大槽位。
+
+3. 分布式路径:
+   object_last + answer_last 共同干预比单位置更强。
+
+4. 因果分类:
+   同样是类别边界，可能是支持、抑制、竞争、接口混合。
+
+5. 模型差异:
+   Qwen3 和 DS7B 对 number 一致，但对 container/clothing/plant 不一致。
+```
+
+这说明深度神经网络内部不是单一语义流，而至少有：
+
+```text
+object state
+template/base state
+category boundary
+readout interface
+competition/suppression field
+final logit projection
+```
+
+### 条件化关系因子动力学公式更新
+
+旧公式可以收缩为：
+
+```text
+h_{l,p} = Base_{l,p}(template)
+        + Object_{l,p}(x)
+        + Relation_{l,p}(r)
+        + Category_{l,p}(c)
+        + residual
+```
+
+但 Phase 106-108 表明这个公式不够，因为类别因子不是单一正方向。
+
+更新为可测试公式：
+
+```text
+h_{l,p}(x,r,t)
+= B_{l,p}(t)
++ O_{l,p}(x | t)
++ R_{l,p}(r | x,t)
++ C_{l,p}(c | x,r,t)
++ I_{l,p}(task | x,r,t)
++ ε
+```
+
+其中类别因子需要继续分解：
+
+```text
+C_{l,p}(c | x,r,t)
+= S_{l,p}(c)
++ U_{l,p}(c)
++ K_{l,p}(c -> neighbors)
++ G_{l,p}(c -> readout)
+```
+
+含义：
+
+```text
+B:
+  模板/基础状态。
+
+O:
+  对象状态。
+
+R:
+  关系条件状态。
+
+C:
+  类别条件状态。
+
+I:
+  任务/读出接口状态。
+
+S:
+  target-support component，支持目标类别的成分。
+
+U:
+  suppressor component，抑制或校准自身/邻居的成分。
+
+K:
+  competition component，压制或释放邻接类别的成分。
+
+G:
+  readout-interface component，连接输出词表读出的成分。
+```
+
+更直接的因果观测公式：
+
+```text
+ΔLogits_c
+= A_c · Remove(S_c)
++ B_c · Remove(U_c)
++ D_c · Remove(K_c)
++ E_c · Remove(G_c)
+```
+
+当前观测对应：
+
+```text
+number:
+  Remove(S_c) 主导，所以 target down。
+
+clothing/furniture/plant:
+  Remove(U_c 或 K_c) 主导，所以 target up 或 competitor release。
+
+container:
+  Qwen3 更像 K_c 主导，DS7B 更像 S_c 主导。
+```
+
+这不是最终理论，而是下一轮实验可直接证伪的工作公式。
+
+### 当前最大问题和硬伤
+
+1. **还没有直接分解 S/U/K/G**
+
+目前只是通过 target_delta、release_delta、control 差异间接判断。
+
+2. **边界仍由 center-vs-others 定义**
+
+这个边界可能混合多个方向，不适合直接称为类别语义方向。
+
+3. **邻居边界缠绕严重**
+
+DS7B time 中 neighbor control 很强，说明类别边界不是独立坐标轴。
+
+4. **多层累计效应未测**
+
+Phase 108 是单层扫描，没有测试多层小尺度累积移除。
+
+5. **读出词表仍可能影响结论**
+
+DCF readout 仍是人工词表，不等于完整开放生成行为。
+
+6. **GLM4 仍未解决**
+
+GLM4 需要 bf16，且 readout 效应弱，必须做单独校准，不能和 Qwen3/DS7B 直接强比较。
+
+### Phase 109 研究方案
+
+目标：
+
+```text
+Support/Suppressor Decomposition
+将类别边界拆成 target-readout aligned component 和 orthogonal component，
+判断 support、suppressor、competition、interface 的相对贡献。
+```
+
+测试对象：
+
+```text
+number:
+  稳定 target-support boundary。
+
+time:
+  Qwen3 中 target-down + animal release。
+
+container:
+  Qwen3 release-only, DS7B target-down。
+
+clothing:
+  tool release 明显，target-up/混合。
+
+furniture:
+  clothing release 明显，target-up/混合。
+
+plant:
+  animal/color release，target-up/混合。
+```
+
+核心方法：
+
+```text
+1. 计算类别边界 B_c。
+2. 计算类别 readout direction W_c。
+3. 将 B_c 分解为:
+
+   B_parallel = projection(B_c, W_c)
+   B_orth     = B_c - B_parallel
+
+4. 分别移除:
+   remove B_parallel
+   remove B_orth
+   remove full B_c
+
+5. 测最终 logits:
+   target_delta
+   top competitor release
+   random_same_norm control
+   neighbor_boundary control
+```
+
+数据范围：
+
+```text
+models:
+  qwen3, glm4, deepseek7b
+
+GLM4:
+  必须使用 PROBE_TORCH_DTYPE=bfloat16
+
+categories:
+  number, time, container, clothing, furniture, plant
+
+train objects/category:
+  12
+
+heldout test objects/category:
+  12
+
+templates:
+  4
+
+positions:
+  answer_last, both
+
+layers:
+  每个模型/类别采用 Phase 108 最强层 + boundary peak layer
+
+scales:
+  0.5, 1.0, 1.5
+```
+
+判据：
+
+```text
+如果 B_parallel 移除导致 target down:
+  target-support component 成立。
+
+如果 B_orth 移除导致 competitor release 或 target up:
+  suppressor/competition component 成立。
+
+如果 full B_c 效果大于两者单独效果:
+  support 和 suppressor 存在非线性组合或接口耦合。
+
+如果 neighbor control 接近或超过 B_c:
+  该类别边界不是独立边界，而是邻接边界缠绕。
+```
+
+预期输出：
+
+```text
+1. 每类 support/suppressor/competition 类型表。
+2. Qwen3 与 DS7B 的类别因果类型对照。
+3. GLM4 readout 是否仍弱的客观确认。
+4. 可用于 Phase 110 多层累计 patch 的候选类别。
+```
+
+## Phase 109: Support/Suppressor Decomposition 实测 [2026-06-14 09:23]
+
+### 本阶段目标
+
+根据 Phase108 的下一步任务，直接测试：
+
+```text
+类别边界 B_c 中，哪一部分是 target-readout aligned component，
+哪一部分是 orthogonal component，
+二者分别导致 target down、target up 还是 competitor release。
+```
+
+本轮重点不是理论总结，而是用真实 forward patch 继续客观拼图。
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase109_support_suppressor_decomposition_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number,time \
+  --output-dir results/gpt5_phase109_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase109_support_suppressor_decomposition_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase109_support_suppressor_decomposition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase109_support_suppressor_decomposition_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase109_support_suppressor_decomposition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase109_support_suppressor_decomposition_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase109_support_suppressor_decomposition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase109_support_suppressor_decomposition_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase109_support_suppressor_decomposition_cuda.py \
+  tests/gpt5/phase109_support_suppressor_decomposition_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase109_support_suppressor_decomposition_cuda.py`
+- 汇总脚本：`tests/gpt5/phase109_support_suppressor_decomposition_summary.py`
+- Qwen3 结果：`results/gpt5_phase109_support_suppressor_decomposition/phase109_qwen3_support_suppressor_decomposition.json`
+- GLM4 结果：`results/gpt5_phase109_support_suppressor_decomposition/phase109_glm4_support_suppressor_decomposition.json`
+- DS7B 结果：`results/gpt5_phase109_support_suppressor_decomposition/phase109_deepseek7b_support_suppressor_decomposition.json`
+- 跨模型汇总：`results/gpt5_phase109_support_suppressor_decomposition/phase109_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, time, container, clothing, furniture, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+positions = answer_last, both
+scales = 0.5, 1.0, 1.5
+kinds = full_boundary, readout_parallel, orthogonal, random_same_norm, neighbor_boundary
+```
+
+### 分解方法
+
+```text
+B_c = category boundary
+W_c = category readout direction
+
+B_parallel = projection(B_c, W_c)
+B_orth = B_c - B_parallel
+```
+
+分别移除：
+
+```text
+full_boundary
+readout_parallel
+orthogonal
+random_same_norm
+neighbor_boundary
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  cos(B,W)=0.165
+  parallel_norm_fraction=0.165
+  readout_parallel target_delta=-0.05
+  orthogonal target_delta=-3.05
+  full target_delta=-3.06
+
+time:
+  cos(B,W)=0.204
+  readout_parallel target_delta=-0.18
+  orthogonal target_delta=-0.64
+  orthogonal release animal+0.96
+  full target_delta=-1.35
+
+container:
+  readout_parallel target_delta=+0.01
+  orthogonal target_delta=-0.33
+  orthogonal release shape+2.81
+  full target_delta=-0.34
+
+clothing:
+  readout_parallel target_delta=-0.37
+  orthogonal target_delta=-0.57
+  orthogonal release tool+1.46
+  full target_delta=-0.45
+
+furniture:
+  readout_parallel target_delta=+0.02
+  orthogonal target_delta=+1.00
+  orthogonal release number+3.30
+  full target_delta=+0.72
+
+plant:
+  readout_parallel target_delta=+0.11
+  orthogonal target_delta=-0.41
+  orthogonal release color+0.13
+  full target_delta=-0.37
+```
+
+#### GLM4 bf16
+
+```text
+boundary-readout cos 接近 0。
+所有类别效应整体很弱。
+
+number:
+  orthogonal target_delta=-0.01
+  orthogonal release material+0.45
+
+time:
+  orthogonal target_delta=-0.23
+  release material+0.33
+
+container:
+  orthogonal target_delta=-0.04
+  release event+0.25
+
+clothing:
+  orthogonal target_delta=-0.13
+  release property+0.17
+
+furniture:
+  orthogonal target_delta=-0.08
+  release material+0.22
+
+plant:
+  orthogonal target_delta=-0.06
+  release shape+0.39
+```
+
+#### DS7B
+
+```text
+number:
+  cos(B,W)=0.130
+  readout_parallel target_delta=-0.08
+  orthogonal target_delta=-4.95
+  full target_delta=-4.75
+
+container:
+  cos(B,W)=0.102
+  readout_parallel target_delta=+0.06
+  orthogonal target_delta=-3.15
+  full target_delta=-3.21
+
+clothing:
+  readout_parallel target_delta=-0.87
+  orthogonal target_delta=+0.40
+  orthogonal release tool+2.24
+  full target_delta=+0.39
+
+furniture:
+  readout_parallel target_delta=-1.11
+  orthogonal target_delta=+0.16
+  orthogonal release tool+1.09
+  full target_delta=+0.31
+
+plant:
+  readout_parallel target_delta=-0.19
+  orthogonal target_delta=+0.28
+  orthogonal release animal+1.59
+  full target_delta=+0.33
+```
+
+### 当前最可靠客观事实
+
+1. **强 target-down 主要来自 orthogonal component，而不是 readout_parallel component**
+
+```text
+Qwen3 number:
+  readout_parallel -0.05
+  orthogonal -3.05
+
+DS7B number:
+  readout_parallel -0.08
+  orthogonal -4.95
+
+DS7B container:
+  readout_parallel +0.06
+  orthogonal -3.15
+```
+
+这推翻了一个简单假设：
+
+```text
+target-support boundary 不等于直接 output-readout aligned direction。
+```
+
+2. **boundary 与 readout word direction 的 cos 很低**
+
+```text
+Qwen3: 约 0.15-0.20
+DS7B: 约 0.07-0.13
+GLM4: 接近 0
+```
+
+说明类别因果边界多数不沿着输出词表 readout 方向。
+
+3. **DS7B clothing/furniture 出现成分冲突**
+
+```text
+clothing:
+  readout_parallel target down -0.87
+  orthogonal release tool +2.24
+  full boundary target up +0.39
+
+furniture:
+  readout_parallel target down -1.11
+  orthogonal release tool +1.09
+  full boundary target up +0.31
+```
+
+这说明 full boundary 是多个成分相互抵消/冲突后的结果。
+
+4. **Qwen3 furniture 是典型 competition/interface 混合边界**
+
+```text
+orthogonal target up +1.00
+orthogonal release number +3.30
+full target up +0.72
+```
+
+5. **GLM4 仍然弱**
+
+GLM4 的边界-readout cos 接近 0，效应小，仍需 readout calibration。
+
+### 对公式的修正
+
+Phase109 后，`S` 不应再简单等同于 readout_parallel。
+
+需要改为：
+
+```text
+C_c = S_c + U_c + K_c + G_c
+```
+
+但：
+
+```text
+G_c ≈ readout_parallel component
+S_c 不一定与 G_c 对齐
+S_c 很可能主要位于 readout-orthogonal causal subspace
+```
+
+也就是说：
+
+```text
+target support 不是直接输出词方向；
+它可能是通过内部因果子空间改变最终 readout。
+```
+
+这对破解编码机制非常关键。
+
+### 硬伤分析
+
+1. **readout direction 仍由 DCF 词表定义**
+
+如果 readout words 不准，parallel/orthogonal 分解会受影响。
+
+2. **orthogonal component 仍然太大**
+
+因为 boundary-readout cos 很低，orthogonal 几乎包含大部分边界，仍需进一步分解。
+
+3. **只分成两块还不够**
+
+orthogonal 中同时包含 support、suppressor、competition、interface residual。
+
+4. **未做多层累计**
+
+number/container 的 orthogonal target-down 强，但是否来自单层或多层累积仍未知。
+
+5. **GLM4 readout 问题未解决**
+
+GLM4 不能用于强机制结论。
+
+### 下一步任务
+
+Phase110 应继续客观测试：
+
+```text
+Orthogonal Subspace Split
+```
+
+目标：
+
+```text
+把 B_orth 继续分成:
+1. neighbor-aligned component
+2. target-object trajectory component
+3. residual component
+```
+
+优先测试：
+
+```text
+Qwen3 number/time/furniture
+DS7B number/container/clothing/furniture/plant
+```
+
+方法：
+
+```text
+1. 用 neighbor boundary basis 分解 B_orth。
+2. 用 object_last -> answer_last transport direction 分解 B_orth。
+3. 分别移除各子成分。
+4. 测 target_delta、release_delta、control_delta。
+```
+
+## Phase 110: Orthogonal Subspace Split 正交子空间拆分 [2026-06-14 09:34]
+
+### 本阶段目标
+
+根据 Phase109 的结果，`readout_parallel` 不是主要 target support，真正强因果成分主要位于 `readout-orthogonal` 子空间。
+
+本阶段继续把 `B_orth` 拆成三类更基础成分：
+
+```text
+1. neighbor_aligned: 与邻近类别边界空间对齐的成分
+2. transport_aligned: 与 object_last -> answer_last 平均传输方向对齐的成分
+3. residual: 去除 neighbor 和 transport 后剩余的成分
+```
+
+核心问题：
+
+```text
+强 target-down 到底来自类别竞争边界、对象到答案位置的传输通道，还是剩余未知方向。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase110_orthogonal_subspace_split_cuda.py
+
+python tests/gpt5/phase110_orthogonal_subspace_split_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --categories number,time \
+  --output-dir results/gpt5_phase110_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase110_orthogonal_subspace_split_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase110_orthogonal_subspace_split \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase110_orthogonal_subspace_split_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase110_orthogonal_subspace_split \
+  --hard-exit-after-model
+
+python tests/gpt5/phase110_orthogonal_subspace_split_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --output-dir results/gpt5_phase110_orthogonal_subspace_split \
+  --hard-exit-after-model
+
+python tests/gpt5/phase110_orthogonal_subspace_split_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase110_orthogonal_subspace_split_cuda.py \
+  tests/gpt5/phase110_orthogonal_subspace_split_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase110_orthogonal_subspace_split_cuda.py`
+- 汇总脚本：`tests/gpt5/phase110_orthogonal_subspace_split_summary.py`
+- Qwen3 结果：`results/gpt5_phase110_orthogonal_subspace_split/phase110_qwen3_orthogonal_subspace_split.json`
+- GLM4 结果：`results/gpt5_phase110_orthogonal_subspace_split/phase110_glm4_orthogonal_subspace_split.json`
+- DS7B 结果：`results/gpt5_phase110_orthogonal_subspace_split/phase110_deepseek7b_orthogonal_subspace_split.json`
+- 跨模型汇总：`results/gpt5_phase110_orthogonal_subspace_split/phase110_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, time, container, clothing, furniture, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+components = orthogonal_full, neighbor_aligned, transport_aligned, residual, random_same_norm
+positions = answer_last, both
+scales = 1.0, 1.5
+```
+
+模型层位：
+
+```text
+Qwen3: L35
+GLM4: L18
+DS7B: L27
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  norm fractions neighbor/transport/residual = 0.54/0.27/0.80
+  best neighbor target Δ -1.91
+  best transport target Δ -3.43
+  best residual target Δ -0.37
+  best orthogonal_full target Δ -3.05
+  random_same_norm target Δ -0.12
+
+time:
+  fractions = 0.57/0.15/0.81
+  neighbor target Δ -1.95
+  transport target Δ -1.84
+  residual target Δ +0.03
+  orthogonal_full target Δ -0.64
+
+container:
+  fractions = 0.46/0.28/0.84
+  neighbor target Δ +0.24
+  transport target Δ -1.75
+  residual target Δ +0.00
+  orthogonal_full target Δ +0.25
+
+clothing:
+  fractions = 0.34/0.39/0.85
+  neighbor target Δ +0.71
+  transport target Δ -1.43
+  residual target Δ +0.01
+  orthogonal_full target Δ +0.72
+
+furniture:
+  fractions = 0.54/0.33/0.78
+  neighbor target Δ +0.55
+  transport target Δ -0.56
+  residual target Δ -0.46
+  orthogonal_full target Δ +1.93
+
+plant:
+  fractions = 0.49/0.28/0.83
+  neighbor target Δ +0.10
+  transport target Δ -5.97
+  residual target Δ -0.29
+  orthogonal_full target Δ -0.02
+```
+
+#### GLM4 bf16
+
+```text
+number:
+  fractions = 0.64/0.04/0.77
+  strongest target down = neighbor Δ -0.14
+
+time:
+  fractions = 0.74/0.07/0.67
+  strongest target down = neighbor Δ -0.47
+
+container:
+  fractions = 0.84/0.06/0.53
+  strongest target down = transport Δ -0.07
+
+clothing:
+  fractions = 0.89/0.01/0.45
+  strongest target down = orthogonal_full Δ -0.08
+
+furniture:
+  fractions = 0.93/0.00/0.37
+  strongest target down = transport Δ -0.03
+
+plant:
+  fractions = 0.90/0.04/0.44
+  strongest target down = orthogonal_full Δ -0.06
+```
+
+GLM4 仍然弱，不能作为强机制结论来源。
+
+#### DS7B
+
+```text
+number:
+  fractions = 0.41/0.22/0.89
+  neighbor target Δ -0.94
+  transport target Δ +1.06
+  residual target Δ -2.76
+  orthogonal_full target Δ -4.95
+  random_same_norm target Δ +0.07
+
+time:
+  fractions = 0.46/0.18/0.87
+  neighbor target Δ -0.82
+  transport target Δ -0.61
+  residual target Δ -0.93
+  orthogonal_full target Δ +0.06
+
+container:
+  fractions = 0.30/0.31/0.90
+  neighbor target Δ -0.24
+  transport target Δ -5.68
+  residual target Δ -1.44
+  orthogonal_full target Δ -3.15
+
+clothing:
+  fractions = 0.28/0.44/0.85
+  neighbor target Δ -0.18
+  transport target Δ -5.17
+  residual target Δ -0.91
+  orthogonal_full target Δ +1.22
+
+furniture:
+  fractions = 0.44/0.35/0.83
+  neighbor target Δ +0.07
+  transport target Δ -3.85
+  residual target Δ -0.03
+  orthogonal_full target Δ +0.31
+
+plant:
+  fractions = 0.42/0.34/0.84
+  neighbor target Δ +0.66
+  transport target Δ -3.28
+  residual target Δ -0.12
+  orthogonal_full target Δ +1.05
+```
+
+### 当前最可靠客观事实
+
+1. **transport_aligned 是大量类别的强 target-down 成分**
+
+典型结果：
+
+```text
+Qwen3 number transport Δ -3.43
+Qwen3 plant transport Δ -5.97
+DS7B container transport Δ -5.68
+DS7B clothing transport Δ -5.17
+DS7B furniture transport Δ -3.85
+DS7B plant transport Δ -3.28
+```
+
+这说明 object_last 到 answer_last 的内部传输方向，是类别信息进入答案位置的重要候选通道。
+
+2. **完整 orthogonal_full 会掩盖子成分**
+
+例如：
+
+```text
+Qwen3 plant:
+  transport Δ -5.97
+  orthogonal_full Δ -0.02
+
+DS7B clothing:
+  transport Δ -5.17
+  orthogonal_full Δ +1.22
+
+DS7B plant:
+  transport Δ -3.28
+  orthogonal_full Δ +1.05
+```
+
+完整正交边界里混有方向相反的成分，直接移除整块会发生抵消甚至 target-up。
+
+3. **DS7B number 是特殊模式**
+
+```text
+DS7B number:
+  residual Δ -2.76
+  orthogonal_full Δ -4.95
+  transport Δ +1.06
+```
+
+number 在 DS7B 中不是 transport 主导，而更像剩余未知方向与完整正交边界共同形成强支撑。
+
+4. **Qwen3 time 更像 neighbor/transport 混合**
+
+```text
+Qwen3 time:
+  neighbor Δ -1.95
+  transport Δ -1.84
+  orthogonal_full Δ -0.64
+```
+
+time 与 number、event、weather 等邻近类别纠缠更强。
+
+5. **GLM4 仍然低效应**
+
+GLM4 的最大效应大多小于 0.5，继续证明当前 readout/intervention 框架下 GLM4 信号弱。
+
+### 对 Phase109 附加分析的校正
+
+Phase109 的核心判断仍然正确：
+
+```text
+target support 主要不在 readout_parallel；
+readout-orthogonal causal subspace 是关键区域。
+```
+
+但 Phase110 进一步说明：
+
+```text
+readout-orthogonal 不是一个单一语义边界；
+其中大量强因果效应来自 object_last -> answer_last transport component。
+```
+
+因此更准确的说法是：
+
+```text
+模型内部的类别信息，可能先在对象位置形成类别/对象状态，
+再通过位置传输通道进入答案位置，
+最后才改变输出词 readout。
+```
+
+### 条件化关系因子动力学公式更新
+
+上一阶段：
+
+```text
+C_c = S_c + U_c + K_c + G_c
+```
+
+Phase110 后应拆成：
+
+```text
+C_c = G_c + N_c + T_c + R_c
+```
+
+含义：
+
+```text
+C_c: 类别边界整体
+G_c: readout-parallel output gateway
+N_c: neighbor-aligned competition/interface component
+T_c: object_last -> answer_last transport component
+R_c: residual unknown causal component
+```
+
+更接近当前结果的因果链：
+
+```text
+object state at object_last
+  -> T_c transport to answer_last
+  -> answer-position category state
+  -> G_c/output gateway
+  -> next-token category logits
+```
+
+中文解释：
+
+```text
+对象位置先承载对象/类别状态；
+答案位置不是凭空生成类别，而是接收对象位置传来的类别状态；
+输出词方向只是最后的门口，不是内部语义支撑本体。
+```
+
+### 硬伤分析
+
+1. **transport direction 只是均值差分方向**
+
+当前 `object_last -> answer_last` 是平均残差差分，不等于已经证明真实路径。
+
+2. **neighbor basis 是人工邻接**
+
+邻近类别由人为指定，可能漏掉模型内部真正的竞争类别。
+
+3. **仍是单层干预**
+
+如果类别传输跨多层累积，单层移除会低估或扭曲真实机制。
+
+4. **子成分之间不是线性独立因果模块**
+
+一些子成分移除比完整 orthogonal_full 更强，说明完整边界内部存在非线性或方向抵消。
+
+5. **GLM4 仍然不能用于强结论**
+
+GLM4 在当前框架下效应弱，需要单独校准。
+
+### 下一步任务
+
+Phase111 应做一个更大的阶段任务：
+
+```text
+Transport Path Causal Mapping
+```
+
+目标：
+
+```text
+确认 transport component 是否是真正的对象位置到答案位置类别传输通道。
+```
+
+建议测试：
+
+```text
+1. 对 object_last 单独写入/移除 transport component，观察 answer_last 与 logits 是否同步变化。
+2. 对 answer_last 单独写入/移除 transport component，和 object_last 干预对照。
+3. 做 layer-to-layer transport sweep，找出类别状态从对象位置迁移到答案位置的层段。
+4. 做 multi-layer cumulative patch，确认单层结果是否低估或被抵消。
+5. 对 Qwen3 number/time/plant 与 DS7B number/container/clothing/furniture/plant 扩大 heldout objects 做复测。
+```
+
+优先级：
+
+```text
+第一优先：DS7B container/clothing/furniture/plant 的 transport-dominant 现象
+第二优先：Qwen3 plant 的 transport 强效但 orthogonal_full 近零现象
+第三优先：DS7B number 的 residual-support 特殊模式
+```
+
+## Phase 111: Transport Path Causal Mapping 传输路径因果定位 [2026-06-14 10:43]
+
+### 本阶段目标
+
+根据用户附加分析与 Phase110 结果，先判断：
+
+```text
+Phase110 的 transport_aligned 强 target-down 是否等于真实 object_last -> answer_last 传输路径？
+```
+
+附加分析中正确部分：
+
+```text
+1. Phase110 的 transport_aligned 是目前最强候选语义通道之一。
+2. readout_parallel 不是主要语义支持方向。
+3. orthogonal_full 会掩盖强子成分。
+4. transport direction 仍只是均值差分，不等于已经证明真实路径。
+5. 下一步必须做 object-site 与 answer-site 的因果对照。
+```
+
+因此本阶段不再继续理论总结，而是直接测试：
+
+```text
+在 object_last 移除/写入 T_c，answer_last 的 T_c 投影和 final logits 是否同步变化。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase111_transport_path_causal_mapping_cuda.py \
+  tests/gpt5/phase111_transport_path_causal_mapping_summary.py
+
+python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --layer-back 1 \
+  --categories number,time \
+  --scales 1.0 \
+  --output-dir results/gpt5_phase111_smoke \
+  --hard-exit-after-model
+```
+
+正式测试第一轮使用：
+
+```bash
+python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+
+python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+```
+
+第一轮发现 Phase110 的强效常在 scale=1.5，而默认范围只有 0.25/0.5/1.0。为避免错误否定，重新加入 1.5 完整复测：
+
+```bash
+python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+
+python tests/gpt5/phase111_transport_path_causal_mapping_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --scales 0.25,0.5,1.0,1.5 \
+  --output-dir results/gpt5_phase111_transport_path_causal_mapping \
+  --hard-exit-after-model
+
+python tests/gpt5/phase111_transport_path_causal_mapping_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase111_transport_path_causal_mapping_cuda.py \
+  tests/gpt5/phase111_transport_path_causal_mapping_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase111_transport_path_causal_mapping_cuda.py`
+- 汇总脚本：`tests/gpt5/phase111_transport_path_causal_mapping_summary.py`
+- Qwen3 结果：`results/gpt5_phase111_transport_path_causal_mapping/phase111_qwen3_transport_path_causal_mapping.json`
+- GLM4 结果：`results/gpt5_phase111_transport_path_causal_mapping/phase111_glm4_transport_path_causal_mapping.json`
+- DS7B 结果：`results/gpt5_phase111_transport_path_causal_mapping/phase111_deepseek7b_transport_path_causal_mapping.json`
+- 跨模型汇总：`results/gpt5_phase111_transport_path_causal_mapping/phase111_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, time, container, clothing, furniture, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+patch layers = peak-3 ... peak
+patch sites = object_last, answer_last
+patch modes = remove_target, amplify_target, wrong_inject_abs, random_remove
+scales = 0.25, 0.5, 1.0, 1.5
+monitor = answer_last transport projection at peak layer + final DCF logits
+```
+
+模型层位：
+
+```text
+Qwen3: monitor L35, patch L32-L35
+GLM4: monitor L18, patch L15-L18
+DS7B: monitor L27, patch L24-L27
+```
+
+### 测试原理
+
+Phase110 中 `T_c` 的定义：
+
+```text
+B_orth = B - proj(B, readout_direction)
+after_neighbor = B_orth - proj(B_orth, neighbor_boundary_basis)
+T_c = proj(after_neighbor, mean(answer_last - object_last))
+```
+
+Phase111 做真实 forward 干预：
+
+```text
+1. 在 object_last 移除 target T_c。
+2. 在 answer_last 移除 target T_c。
+3. 写入 wrong-category T_d。
+4. 使用 random_same_norm 作为对照。
+5. 记录 final logits target_delta。
+6. 同时记录 peak layer answer_last 的 T_c projection delta。
+```
+
+强路径闭包判据：
+
+```text
+object_last remove T_c
+  -> answer_last T_c projection 同步下降
+  -> target logits 同步下降
+  -> 明显强于 random control
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  object_last remove: target Δ -0.00, answer projection Δ -0.10
+  answer_last remove: target Δ -3.43
+  wrong inject: target Δ -3.54
+  random: target Δ -0.05
+
+time:
+  object_last remove: target Δ -0.03, answer projection Δ +0.15
+  answer_last remove: target Δ -1.84
+  wrong inject: target Δ -4.18
+  random: target Δ -0.09
+
+container:
+  object_last remove: target Δ -0.05, answer projection Δ -0.16
+  answer_last remove: target Δ -2.59
+  wrong inject: target Δ -0.76
+  random: target Δ -0.08
+
+clothing:
+  object_last remove: target Δ +0.01
+  answer_last remove: target Δ -1.43
+  wrong inject: target Δ -4.51
+
+furniture:
+  object_last remove: target Δ +0.01
+  answer_last remove: target Δ -0.55
+  wrong inject: target Δ -3.26
+
+plant:
+  object_last remove: target Δ -0.00, answer projection Δ +0.10
+  answer_last remove: target Δ -5.97
+  wrong inject: target Δ -2.52
+```
+
+#### GLM4 bf16
+
+```text
+all categories:
+  object_last remove target effect near 0
+  answer_last remove target effect near 0
+  wrong inject weak
+```
+
+最大量级仍然很小：
+
+```text
+wrong inject clothing Δ -0.22
+wrong inject furniture Δ -0.21
+```
+
+GLM4 在当前框架中仍不能支持强机制判断。
+
+#### DS7B
+
+```text
+number:
+  object_last remove: target Δ -0.07
+  answer_last remove: target Δ +0.69
+  wrong inject: target Δ -3.39
+  random: target Δ -0.12
+
+time:
+  object_last remove: target Δ -0.02
+  answer_last remove: target Δ -0.56
+  wrong inject: target Δ -1.50
+
+container:
+  object_last remove: target Δ -0.21
+  object-site strongest answer projection drop: Δ -1.70, but target Δ +0.08
+  answer_last remove: target Δ -5.50
+  random: target Δ -0.38
+
+clothing:
+  object_last remove: target Δ -0.23
+  object-site strongest answer projection drop: Δ -2.23, but target Δ +0.05
+  answer_last remove: target Δ -5.04
+
+furniture:
+  object_last remove: target Δ -0.17
+  object-site strongest answer projection drop: Δ -2.16, but target Δ +0.11
+  answer_last remove: target Δ -3.82
+
+plant:
+  object_last remove: target Δ -0.15
+  answer projection Δ -0.75
+  answer_last remove: target Δ -3.20
+  wrong inject: target Δ -2.11
+```
+
+### 当前最可靠客观事实
+
+1. **answer_last 是 transport_aligned 强 target-down 的直接作用位点**
+
+强结果与 Phase110 基本对齐：
+
+```text
+Qwen3 number answer_last remove Δ -3.43
+Qwen3 plant answer_last remove Δ -5.97
+DS7B container answer_last remove Δ -5.50
+DS7B clothing answer_last remove Δ -5.04
+DS7B furniture answer_last remove Δ -3.82
+DS7B plant answer_last remove Δ -3.20
+```
+
+2. **object_last remove 没有形成强 logits 因果闭包**
+
+所有模型/类别中，object_last remove 的 target_delta 都很弱：
+
+```text
+Qwen3: roughly 0
+GLM4: roughly 0
+DS7B: strongest only around -0.23
+```
+
+3. **DS7B object_last 干预可以改变 answer projection，但不改变 target logits**
+
+例如：
+
+```text
+DS7B container:
+  object-site answer projection Δ -1.70
+  target Δ +0.08
+
+DS7B clothing:
+  object-site answer projection Δ -2.23
+  target Δ +0.05
+
+DS7B furniture:
+  object-site answer projection Δ -2.16
+  target Δ +0.11
+```
+
+这说明“投影同步变化”本身不足以证明输出因果闭包。
+
+4. **wrong-category injection 往往很强，但更像干扰/抑制，不是清晰类别替换**
+
+例如：
+
+```text
+Qwen3 clothing wrong inject Δ -4.51
+Qwen3 time wrong inject Δ -4.18
+DS7B number wrong inject Δ -3.39
+```
+
+这些结果说明 wrong T_d 写入会强烈扰乱目标类别，但尚未证明它把输出推向指定错误类别。
+
+5. **GLM4 继续弱**
+
+GLM4 仍不能用于强结论。
+
+### 对 Phase110 理论的校正
+
+Phase110 的正确部分：
+
+```text
+T_c 是大量类别的强 target-down 成分。
+T_c 位于 readout-orthogonal 子空间。
+完整 orthogonal_full 会被其他成分抵消。
+```
+
+Phase111 的关键校正：
+
+```text
+当前还不能说 T_c 已被证明为 object_last -> answer_last 的真实传输路径。
+```
+
+更严格表述应为：
+
+```text
+T_c 是 answer_last 上非常强的类别状态/读出前状态成分；
+它与 object_last -> answer_last 的均值差分对齐；
+但 object_last 单点移除没有让 final logits 产生同步强变化。
+```
+
+因此当前理论从：
+
+```text
+object_last category state -> T_c transport -> answer_last
+```
+
+暂时回退为更谨慎的版本：
+
+```text
+object/answer positional contrast defines T_c;
+T_c at answer_last is a strong causal pre-readout state;
+object_last 单点 patch 尚未闭合到 logits。
+```
+
+### 条件化关系因子动力学公式更新
+
+Phase110 公式：
+
+```text
+C_c = G_c + N_c + T_c + R_c
+```
+
+Phase111 后应加上位点区分：
+
+```text
+C_c(answer) = G_c(answer) + N_c(answer) + T_c(answer) + R_c(answer)
+C_c(object) = O_c(object) + P_c(object)
+```
+
+当前已验证较强的是：
+
+```text
+T_c(answer) -> final logits
+```
+
+尚未验证的是：
+
+```text
+C_c(object) -> T_c(answer) -> final logits
+```
+
+因此完整链条应暂写为：
+
+```text
+object_state  --unclosed--> answer_transport_state -> output_gateway -> logits
+```
+
+中文解释：
+
+```text
+答案位置上的传输对齐状态具有强输出因果作用；
+对象位置到答案位置的上游路径仍未闭合。
+```
+
+### 硬伤分析
+
+1. **没有证明 object_last 单点移除足够打断路径**
+
+object_last 可能只是路径起点之一，真实传输可能分布在多个层、多个 token、多个 attention head 中。
+
+2. **monitor projection 不是完整 answer state**
+
+本轮只监测 peak layer 的一个 T_c 投影。即使该投影下降，也不等于完整语义状态下降。
+
+3. **patch at monitor layer 的 projection delta 记录有局限**
+
+当 patch layer 等于 monitor layer 时，final logits 已改变，但记录的 hidden projection 可能显示 0，说明 hook 返回值与 hidden_states 记录顺序存在实现细节限制。
+
+4. **wrong injection 未做目标错误类别释放分析**
+
+wrong T_d 会压低目标，但还没有证明它提升了指定 wrong category。
+
+5. **仍未做 generation audit**
+
+目前仍是 DCF logits，不是开放生成闭包。
+
+### 当前进展评价
+
+Phase111 的结果不是对 Phase110 的否定，而是把结论变严格：
+
+```text
+Phase110 证明：T_c(answer) 是强因果成分。
+Phase111 显示：object_last 单点 T_c patch 不能闭合到 final logits。
+```
+
+所以当前最可靠拼图是：
+
+```text
+读出前答案位置状态，是类别输出的关键因果位置；
+对象位置上游路径仍未找到真正入口。
+```
+
+### 下一步任务
+
+Phase112 应进入更细的路径搜索，而不是继续只做 residual stream 单点 patch：
+
+```text
+Attention Transport Head Mapping
+```
+
+目标：
+
+```text
+找出哪些 attention heads 把 object_last 信息写入 answer_last。
+```
+
+建议测试：
+
+```text
+1. 在 peak-3...peak 层记录 answer_last 对 object_last 的 attention 权重。
+2. 对高权重 head 做 head output ablation。
+3. 对高权重 head 做 object_last value patch。
+4. 观察 answer_last T_c projection 与 final logits 是否同步变化。
+5. 对 DS7B container/clothing/furniture/plant 与 Qwen3 plant/number 重点复测。
+```
+
+关键理由：
+
+```text
+如果真实路径是 attention transport，
+那么 residual stream 的 object_last 单点 T_c 移除可能打不到真正写入 answer_last 的 head/value 通道。
+```
+
+## Phase 112: Attention Transport Head Mapping 注意力传输头定位 [2026-06-14 10:58]
+
+### 本阶段目标
+
+根据用户附加分析与 Phase111 结果，先判断：
+
+```text
+Phase111 的收缩是正确的：
+T_c(answer) 是强因果读出前状态；
+object_last 单点 residual patch 没有闭合到 logits。
+```
+
+附加分析中正确部分：
+
+```text
+1. 不应继续把 T_c 直接解释成已证明的 object_last -> answer_last 真实路径。
+2. 下一步应从 residual direction 转向 attention route。
+3. 需要测 answer_last 对 object/relation source 的 attention mass。
+4. 需要做 head output ablation，而不只看注意力权重。
+5. projection change 不等于 causal closure。
+```
+
+本阶段目标：
+
+```text
+定位哪些 attention heads 在 answer_last 读取 object source；
+并测试这些 head 的单头消融是否降低 T_c(answer) 与 final logits。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase112_attention_transport_head_mapping_cuda.py \
+  tests/gpt5/phase112_attention_transport_head_mapping_summary.py
+
+python tests/gpt5/phase112_attention_transport_head_mapping_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --layer-back 1 \
+  --top-k-heads 2 \
+  --categories number,time \
+  --output-dir results/gpt5_phase112_smoke \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase112_attention_transport_head_mapping_cuda.py glm4 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --layer-back 1 \
+  --top-k-heads 2 \
+  --categories number,time \
+  --output-dir results/gpt5_phase112_smoke \
+  --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase112_attention_transport_head_mapping_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase112_attention_transport_head_mapping \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase112_attention_transport_head_mapping_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase112_attention_transport_head_mapping \
+  --hard-exit-after-model
+
+python tests/gpt5/phase112_attention_transport_head_mapping_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --top-k-heads 8 \
+  --output-dir results/gpt5_phase112_attention_transport_head_mapping \
+  --hard-exit-after-model
+
+python tests/gpt5/phase112_attention_transport_head_mapping_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase112_attention_transport_head_mapping_cuda.py \
+  tests/gpt5/phase112_attention_transport_head_mapping_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase112_attention_transport_head_mapping_cuda.py`
+- 汇总脚本：`tests/gpt5/phase112_attention_transport_head_mapping_summary.py`
+- Qwen3 结果：`results/gpt5_phase112_attention_transport_head_mapping/phase112_qwen3_attention_transport_head_mapping.json`
+- GLM4 结果：`results/gpt5_phase112_attention_transport_head_mapping/phase112_glm4_attention_transport_head_mapping.json`
+- DS7B 结果：`results/gpt5_phase112_attention_transport_head_mapping/phase112_deepseek7b_attention_transport_head_mapping.json`
+- 跨模型汇总：`results/gpt5_phase112_attention_transport_head_mapping/phase112_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, time, container, clothing, furniture, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+layers = peak-3 ... peak
+selected heads/category = top 8 by answer_last attention to object_span + object_last
+intervention = zero selected head slice at answer_last before o_proj
+metrics = target_delta, release_delta, answer_last T_c projection delta
+```
+
+模型层位：
+
+```text
+Qwen3: monitor L35, scan/patch L32-L35, heads=32
+GLM4: monitor L18, scan/patch L15-L18, heads=32
+DS7B: monitor L27, scan/patch L24-L27, heads=28
+```
+
+### 测试原理
+
+Phase112 分两步：
+
+```text
+1. attention source scan:
+   对每个 head 记录 answer_last query 对 object_span/object_last/pre_object/post_object/self 的 attention mass。
+
+2. head output ablation:
+   在 o_proj 输入前，把该 head 在 answer_last 的 head slice 置零。
+   然后测 final logits 和 answer_last T_c projection。
+```
+
+注意：
+
+```text
+attention mass 只用于候选选择；
+真正因果判据来自 head ablation 后的 logits change。
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  top source head = L35 H21 object mass 0.057
+  strongest target-down = L33 H24 target Δ -0.30, answer projection Δ -1.86
+  strongest projection-down = L35 H8 answer projection Δ -4.83, target Δ +0.01
+
+time:
+  top source head = L33 H9 object mass 0.078
+  strongest target-down = L35 H21 target Δ -0.02, answer projection Δ -2.15
+  strongest projection-down = L35 H8 answer projection Δ -5.78, target Δ +0.00
+
+container:
+  top source head = L35 H27 object mass 0.093
+  strongest target-down = L34 H21 target Δ -0.03
+  strongest projection-down = L35 H8 answer projection Δ -4.73, target Δ +0.03
+
+clothing:
+  top source head = L33 H9 object mass 0.111
+  strongest target-down = L33 H9 target Δ -0.07
+  strongest projection-down = L35 H8 answer projection Δ -5.42, target Δ -0.02
+
+furniture:
+  top source head = L35 H21 object mass 0.101
+  strongest target-down = L35 H28 target Δ -0.05
+  strongest projection-down = L35 H8 answer projection Δ -4.85, target Δ -0.03
+
+plant:
+  top source head = L34 H21 object mass 0.117
+  strongest target-down = L35 H27 target Δ -0.02
+  strongest projection-down = L35 H21 answer projection Δ -2.18, target Δ +0.03
+```
+
+#### GLM4 bf16
+
+```text
+number/time/container/clothing/furniture/plant:
+  top object-source attention heads exist, object mass roughly 0.12-0.16
+  strongest target-down all near 0
+  projection changes also near 0
+```
+
+GLM4 仍然不支持当前机制框架下的强结论。
+
+#### DS7B
+
+```text
+number:
+  top source head = L24 H17 object mass 0.174
+  strongest target-down = L24 H22 target Δ -0.08, answer projection Δ -3.64
+
+time:
+  top source head = L25 H19 object mass 0.202
+  strongest target-down = L24 H22 target Δ -0.06, answer projection Δ -6.62
+
+container:
+  top source head = L25 H19 object mass 0.228
+  strongest target-down = L25 H15 target Δ -0.27, answer projection Δ -4.97
+  strongest projection-down = L24 H22 answer projection Δ -5.84, target Δ -0.14
+
+clothing:
+  top source head = L25 H19 object mass 0.229
+  strongest target-down = L24 H17 target Δ -0.40, answer projection Δ +0.62
+  strongest projection-down = L25 H15 answer projection Δ -7.61, target Δ -0.02
+
+furniture:
+  top source head = L25 H19 object mass 0.273
+  strongest target-down = L24 H2 target Δ -0.08
+  strongest projection-down = L25 H15 answer projection Δ -6.33, target Δ +0.02
+
+plant:
+  top source head = L24 H6 object mass 0.311
+  strongest target-down = L25 H24 target Δ -0.16
+  strongest projection-down = L25 H15 answer projection Δ -6.65, target Δ +0.03
+```
+
+### 当前最可靠客观事实
+
+1. **answer_last 确实会在 late layers 读取 object source**
+
+DS7B 尤其明显：
+
+```text
+plant top object mass 0.311
+furniture top object mass 0.273
+clothing top object mass 0.229
+container top object mass 0.228
+```
+
+Qwen3 也有较弱但可见的 object-source attention：
+
+```text
+plant 0.117
+clothing 0.111
+furniture 0.101
+container 0.093
+```
+
+2. **单个高 object-source attention head 消融没有复现 Phase111 的强 target-down**
+
+最强 target-down 仍很小：
+
+```text
+Qwen3 number: -0.30
+DS7B clothing: -0.40
+DS7B container: -0.27
+```
+
+这远弱于 Phase111 的 answer_last T_c removal：
+
+```text
+Qwen3 plant: -5.97
+DS7B container: -5.50
+DS7B clothing: -5.04
+DS7B furniture: -3.82
+```
+
+3. **存在强 projection-only heads**
+
+一些 head 消融会大幅降低 answer_last T_c projection，但 logits 几乎不变。
+
+典型：
+
+```text
+Qwen3 L35 H8:
+  number projection Δ -4.83, target Δ +0.01
+  time projection Δ -5.78, target Δ +0.00
+  container projection Δ -4.73, target Δ +0.03
+  clothing projection Δ -5.42, target Δ -0.02
+  furniture projection Δ -4.85, target Δ -0.03
+
+DS7B L25 H15:
+  clothing projection Δ -7.61, target Δ -0.02
+  furniture projection Δ -6.33, target Δ +0.02
+  plant projection Δ -6.65, target Δ +0.03
+```
+
+这再次证明：
+
+```text
+T_c projection change 不等于 logits causal closure。
+```
+
+4. **attention mass 不是因果强度**
+
+高 object attention head 不一定有 target-down 效果。
+
+例如：
+
+```text
+DS7B plant top source head L24 H6 object mass 0.311
+但 strongest target-down 只有 -0.16
+```
+
+### 对 Phase111 的校正
+
+Phase111 的判断继续成立：
+
+```text
+answer-site T_c 是强因果状态；
+上游路径未闭合。
+```
+
+Phase112 进一步说明：
+
+```text
+单个 high object-attention head 不是足够的传输入口。
+```
+
+更严格说法：
+
+```text
+object source attention 存在；
+但单头 answer_last output ablation 不能解释 answer-site T_c 的强 logits 因果效应。
+```
+
+因此上游路径可能是：
+
+```text
+1. 多头集合共同写入；
+2. attention + MLP 接力；
+3. value path 而非 head output 单点；
+4. 多层 residual trajectory；
+5. object_span/relation_span/template 多源共同构成。
+```
+
+### 条件化关系因子动力学公式更新
+
+Phase111：
+
+```text
+object_state --unclosed--> answer_transport_state -> output_gateway -> logits
+```
+
+Phase112 后更细化为：
+
+```text
+source_tokens
+  -> distributed_route_set
+  -> A_c(answer)
+  -> output_gateway
+  -> logits
+```
+
+其中：
+
+```text
+distributed_route_set ≠ single high-attention head
+A_c(answer) 包含强 causal state
+projection(A_c, T_c) 不是充分因果指标
+```
+
+中文解释：
+
+```text
+对象源确实被答案位置读取；
+但强类别因果状态不是由某一个明显高注意力头单独决定；
+它更像多头、多层或注意力与 MLP 共同形成的答案位置状态。
+```
+
+### 硬伤分析
+
+1. **只消融 top 8 object-source heads**
+
+如果关键 head 不靠 object attention mass 排名，它可能被漏掉。
+
+2. **只做单头消融**
+
+强 T_c(answer) 可能由多个 head 累积写入，单头置零会低估。
+
+3. **没有拆 Q/K/V**
+
+本轮只在 o_proj 输入前置零 head slice，没有区分 attention pattern 与 value content。
+
+4. **projection-only 现象仍未解释**
+
+某些 head 强烈改变 T_c projection 但不改 logits，说明 T_c projection 本身不是完整因果状态。
+
+5. **仍未做 generation audit**
+
+尚未验证生成行为。
+
+### 当前进展评价
+
+Phase112 不是找到最终路径，而是排除了一个过于简单的假设：
+
+```text
+强 answer-site T_c 不是由单个高 object-attention head 直接控制。
+```
+
+当前最可靠拼图：
+
+```text
+1. answer_last 有强类别因果状态。
+2. answer_last 确实读取 object source。
+3. 单头 source attention 与 logits 因果之间不闭合。
+4. projection-only heads 存在，投影不是充分指标。
+```
+
+### 下一步任务
+
+Phase113 应测试：
+
+```text
+Head Set and MLP Relay Closure
+```
+
+目标：
+
+```text
+从单头转向 head set、多层累计与 MLP 接力，寻找能复现 Phase111 强 target-down 的最小路径集合。
+```
+
+建议测试：
+
+```text
+1. 对 top-k object-source heads 做 cumulative ablation。
+2. 对 projection-only heads 与 source heads 分开/联合消融。
+3. 对 attention output 与 MLP output 分别消融。
+4. 测 answer_last T_c removal 与 head-set ablation 的 overlap。
+5. 优先 DS7B container/clothing/furniture/plant 与 Qwen3 plant/number。
+```
+
+关键判据：
+
+```text
+如果 head set + MLP relay 能接近 Phase111 的 answer_last T_c remove 效果，
+则上游路径开始闭合；
+否则需要转向 residual trajectory / broader source span search。
+```
+
+## Phase 113: Head Set and MLP Relay Closure 注意力头集合与 MLP 接力闭包 [2026-06-14 11:27]
+
+### 本阶段目标
+
+根据用户附加分析与 Phase112 结果，先判断：
+
+```text
+Phase112 是正确的排除式进展：
+object-source attention 存在；
+但单个高 object-source head 不能解释 answer-site T_c 的强 logits 因果效应。
+```
+
+附加分析中正确部分：
+
+```text
+1. 单头不是基本单位，head set 可能才是基本单位。
+2. attention mass 不是因果贡献。
+3. projection-only heads 是重要现象，但不能直接解释成输出因果。
+4. 下一步应测试 cumulative head-set ablation 与 MLP relay。
+```
+
+本阶段目标：
+
+```text
+测试 head set、MLP output、head set + MLP 是否能接近 Phase111 的 answer_last T_c removal 强效。
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py \
+  tests/gpt5/phase113_head_set_mlp_relay_closure_summary.py
+
+python tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --layer-back 1 \
+  --candidate-heads 4 \
+  --set-sizes 1,2,4 \
+  --categories number,plant \
+  --output-dir results/gpt5_phase113_smoke \
+  --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --candidate-heads 16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase113_head_set_mlp_relay_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --candidate-heads 16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase113_head_set_mlp_relay_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --layer-back 3 \
+  --candidate-heads 16 \
+  --set-sizes 1,2,4,8,16 \
+  --categories number,container,clothing,plant \
+  --output-dir results/gpt5_phase113_head_set_mlp_relay_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase113_head_set_mlp_relay_closure_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py \
+  tests/gpt5/phase113_head_set_mlp_relay_closure_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase113_head_set_mlp_relay_closure_cuda.py`
+- 汇总脚本：`tests/gpt5/phase113_head_set_mlp_relay_closure_summary.py`
+- Qwen3 结果：`results/gpt5_phase113_head_set_mlp_relay_closure/phase113_qwen3_head_set_mlp_relay_closure.json`
+- GLM4 结果：`results/gpt5_phase113_head_set_mlp_relay_closure/phase113_glm4_head_set_mlp_relay_closure.json`
+- DS7B 结果：`results/gpt5_phase113_head_set_mlp_relay_closure/phase113_deepseek7b_head_set_mlp_relay_closure.json`
+- 跨模型汇总：`results/gpt5_phase113_head_set_mlp_relay_closure/phase113_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, container, clothing, plant
+train objects/category = 12
+heldout test objects/category = 12
+templates = 4
+prompts/category = 48
+layers = peak-3 ... peak
+candidate heads/category = 16
+set sizes = 1, 2, 4, 8, 16
+head sets = source, projection, target, mixed, random
+relays = heads_only, mlp_only, heads_plus_mlp
+reference = answer_last T_c removal, scale 1.5
+```
+
+模型层位：
+
+```text
+Qwen3: L32-L35
+GLM4: L15-L18
+DS7B: L24-L27
+```
+
+### 测试原理
+
+每个类别先构造：
+
+```text
+T_c(answer)
+```
+
+并用 Phase111 的方式得到参考效应：
+
+```text
+answer_last T_c removal target_delta
+```
+
+然后选择候选 head：
+
+```text
+source heads:
+  answer_last attention to object_span + object_last 最高的 heads。
+
+projection heads:
+  在候选池内，单头消融后 answer T_c projection 下降最多的 heads。
+
+target heads:
+  在候选池内，单头消融后 target logits 下降最多的 heads。
+
+mixed heads:
+  source + projection 的混合集合。
+
+random heads:
+  同规模随机对照。
+```
+
+干预：
+
+```text
+heads_only:
+  在 o_proj 输入前，把 head set 在 answer_last 的 head slice 置零。
+
+mlp_only:
+  在 peak-3...peak 层，把 MLP output 在 answer_last 置零。
+
+heads_plus_mlp:
+  同时做 head set 消融和 MLP output 消融。
+```
+
+关键指标：
+
+```text
+effect_ratio = head_set_target_delta / T_c_remove_target_delta
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+number:
+  T_c reference Δ -3.43
+  best heads_only Δ -0.33, ratio 0.10
+  best heads_plus_mlp Δ +4.00
+  best mlp_only Δ +4.18
+  random heads_only Δ -0.02
+
+container:
+  T_c reference Δ -1.75
+  best heads_only Δ -0.15, ratio 0.09
+  best heads_plus_mlp Δ +2.39
+  best mlp_only Δ +2.63
+  random heads_only Δ -0.01
+
+clothing:
+  T_c reference Δ -1.43
+  best heads_only Δ -0.72, ratio 0.50
+  best random heads_only Δ -0.35, ratio 0.25
+  best heads_plus_mlp Δ +1.58
+  best mlp_only Δ +2.49
+
+plant:
+  T_c reference Δ -5.97
+  best heads_only Δ -0.59, ratio 0.10
+  best heads_plus_mlp Δ +3.07
+  best mlp_only Δ +3.48
+  random heads_only Δ -0.02
+```
+
+Qwen3 中只有 clothing 出现局部闭合线索：
+
+```text
+heads_only ratio 0.50
+random ratio 0.25
+```
+
+但这仍不能解释多数类别。
+
+#### GLM4 bf16
+
+```text
+T_c reference 本身很弱：
+number Δ -0.09
+container Δ -0.07
+clothing Δ -0.07
+plant Δ +0.02
+```
+
+因此 GLM4 本轮不进入强机制结论。
+
+#### DS7B
+
+```text
+number:
+  T_c reference Δ +1.06
+  reference 不是 target-down，因此不适合闭合判据。
+
+container:
+  T_c reference Δ -5.50
+  best heads_only Δ -0.28, ratio 0.05
+  best heads_plus_mlp Δ +0.34
+  best mlp_only Δ +0.14
+  random heads_only Δ -0.15
+
+clothing:
+  T_c reference Δ -5.04
+  best heads_only Δ -0.78, ratio 0.16
+  best random heads_only Δ -0.45, ratio 0.09
+  best heads_plus_mlp Δ +1.39
+  best mlp_only Δ +1.44
+
+plant:
+  T_c reference Δ -3.20
+  best heads_only Δ -0.32, ratio 0.10
+  best heads_plus_mlp Δ +0.55
+  best mlp_only Δ +0.92
+  random heads_only Δ -0.28
+```
+
+DS7B 的 head set 仍不能接近 T_c reference。
+
+### 当前最可靠客观事实
+
+1. **head set 消融比单头稍强，但大多数仍不能闭合**
+
+典型：
+
+```text
+Qwen3 plant:
+  T_c reference -5.97
+  heads_only -0.59
+
+DS7B container:
+  T_c reference -5.50
+  heads_only -0.28
+
+DS7B clothing:
+  T_c reference -5.04
+  heads_only -0.78
+```
+
+2. **Qwen3 clothing 是局部例外**
+
+```text
+Qwen3 clothing:
+  T_c reference -1.43
+  target head set -0.72
+  ratio 0.50
+  random -0.35
+```
+
+这说明某些类别可能确实有 head-set 局部闭合，但不是普遍结构。
+
+3. **coarse MLP output ablation 不支持 MLP relay 闭合**
+
+MLP ablation 常常产生 target-up，而不是复现 T_c target-down：
+
+```text
+Qwen3 number mlp_only +4.18
+Qwen3 plant mlp_only +3.48
+DS7B clothing mlp_only +1.44
+DS7B plant mlp_only +0.92
+```
+
+同时 answer projection 出现巨大变化：
+
+```text
+Qwen3 mlp_only answer projection Δ around -154 to -199
+DS7B mlp_only answer projection Δ around -303 to -328
+```
+
+这说明粗 MLP 置零是强破坏，不是干净机制分解。
+
+4. **projection change 继续不是充分因果指标**
+
+很多条件 answer projection 大幅变化，但 target logits 不按 T_c reference 方向变化。
+
+5. **GLM4 继续弱参考**
+
+GLM4 的 T_c reference 太小，本轮不支持强机制结论。
+
+### 对 Phase112 的校正
+
+Phase112 的正确部分仍成立：
+
+```text
+单个高 object-source head 不是完整路径。
+```
+
+Phase113 进一步说明：
+
+```text
+top source/projection/target head set 也大多不是完整路径；
+coarse MLP output ablation 也没有形成闭合。
+```
+
+更严格说法：
+
+```text
+answer-site T_c 的强因果效应，不能由当前 tested head-set + coarse MLP relay 解释。
+```
+
+因此当前路径可能在：
+
+```text
+1. 更宽的 residual trajectory；
+2. 非 top-attention 的 value-content heads；
+3. MLP 内部子方向，而非整个 MLP output；
+4. 多层小尺度分布式累积；
+5. answer-site 子空间而非单方向 T_c。
+```
+
+### 条件化关系因子动力学公式更新
+
+Phase112：
+
+```text
+source_tokens -> distributed_route_set -> A_c(answer) -> output_gateway -> logits
+```
+
+Phase113 后应更谨慎：
+
+```text
+source_tokens
+  -> unresolved_distributed_dynamics
+  -> A_c(answer)
+  -> output_gateway
+  -> logits
+```
+
+其中：
+
+```text
+unresolved_distributed_dynamics
+  不等于 single head
+  不等于 tested top-k head set
+  不等于 coarse whole-MLP output ablation
+```
+
+当前强验证仍是：
+
+```text
+A_c(answer) / T_c(answer) -> logits
+```
+
+未闭合部分仍是：
+
+```text
+source_tokens -> A_c(answer)
+```
+
+### 硬伤分析
+
+1. **MLP ablation 太粗**
+
+把整层 MLP output 在 answer_last 置零，会破坏大量非目标功能，不能说明 MLP 子方向机制。
+
+2. **projection heads 仍来自 source candidate pool**
+
+如果真正 projection heads 不在 top source candidate 中，仍可能漏掉。
+
+3. **没有 Q/K/V value transplant**
+
+仍未测试 value content 是否是关键。
+
+4. **没有 answer-site 多维子空间**
+
+T_c 是单方向；强因果场可能是多维子空间。
+
+5. **没有 generation audit**
+
+仍未验证生成行为。
+
+### 当前进展评价
+
+Phase113 是第二次排除式进展：
+
+```text
+单头不够；
+top-k head set 大多也不够；
+coarse MLP relay 也不够。
+```
+
+当前最可靠拼图：
+
+```text
+1. answer-site T_c 是强因果入口。
+2. object-source attention 存在。
+3. 单头与 top-k head set 多数不能闭合。
+4. MLP 整体置零不是正确分解粒度。
+5. Qwen3 clothing 有局部 head-set 线索。
+```
+
+### 下一步任务
+
+Phase114 应转向：
+
+```text
+Answer-Site Causal Subspace Expansion
+```
+
+目标：
+
+```text
+不要再把 answer-site causal field 压缩成单方向 T_c；
+构造多维 answer-site causal subspace，再测试子空间移除是否比单方向更稳定、更接近真实机制。
+```
+
+建议测试：
+
+```text
+1. 从多个强类别和多个模板中提取 answer-site causal directions。
+2. 构造低秩子空间 rank 2/4/8/16。
+3. 在 answer_last 移除整个子空间，和单方向 T_c 对照。
+4. 测 target_delta、competitor release、random subspace control。
+5. 优先 Qwen3 number/plant/clothing 与 DS7B container/clothing/plant。
+```
+
+关键理由：
+
+```text
+projection-only、head-set 不闭合、MLP 粗消融反向，
+都说明当前单方向 T_c 只是强因果场的一个切片；
+破解路径前，必须先把 answer-site causal field 的维度结构拼出来。
+```

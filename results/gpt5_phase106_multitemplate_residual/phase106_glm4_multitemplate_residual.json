@@ -1,0 +1,6730 @@
+{
+  "phase": 106,
+  "model": "glm4",
+  "timestamp": "2026-06-14 08:04:39",
+  "n_layers": 40,
+  "d_model": 4096,
+  "categories": [
+    "fruit",
+    "animal",
+    "tool",
+    "vehicle",
+    "clothing",
+    "furniture",
+    "food",
+    "plant",
+    "body",
+    "place",
+    "building",
+    "material",
+    "color",
+    "emotion",
+    "role",
+    "profession",
+    "abstract",
+    "action",
+    "event",
+    "time",
+    "number",
+    "shape",
+    "sound",
+    "light",
+    "weather",
+    "container",
+    "instrument",
+    "machine",
+    "communication",
+    "relation",
+    "property",
+    "substance"
+  ],
+  "templates": [
+    "kind_of",
+    "belongs",
+    "word_refers",
+    "talk_about"
+  ],
+  "objects_per_category": 24,
+  "positions": [
+    "answer_last",
+    "object_last"
+  ],
+  "readout_token_labels": [
+    "fruit",
+    "produce",
+    "berry",
+    "crop",
+    "animal",
+    "creature",
+    "be",
+    "pet",
+    "tool",
+    "implement",
+    "device",
+    "instrument",
+    "vehicle",
+    "transport",
+    "autom",
+    "car",
+    "clo",
+    "gar",
+    "att",
+    "app",
+    "f",
+    "fixture",
+    "seat",
+    "food",
+    "meal",
+    "dish",
+    "sn",
+    "plant",
+    "tree",
+    "veget",
+    "fl",
+    "body",
+    "lim",
+    "organ",
+    "place",
+    "location",
+    "site",
+    "area",
+    "building",
+    "structure",
+    "house",
+    "facility",
+    "material",
+    "sub",
+    "matter",
+    "fabric",
+    "color",
+    "hue",
+    "shade",
+    "tone",
+    "emotion",
+    "fe",
+    "m",
+    "a",
+    "role",
+    "person",
+    "title",
+    "status",
+    "profession",
+    "occupation",
+    "career",
+    "job",
+    "concept",
+    "idea",
+    "pr",
+    "ab",
+    "action",
+    "act",
+    "verb",
+    "movement",
+    "event",
+    "occasion",
+    "h",
+    "incident",
+    "time",
+    "date",
+    "period",
+    "moment",
+    "number",
+    "amount",
+    "quantity",
+    "count",
+    "shape",
+    "form",
+    "geometry",
+    "figure",
+    "sound",
+    "noise",
+    "voice",
+    "audio",
+    "light",
+    "brightness",
+    "gl",
+    "illum",
+    "weather",
+    "climate",
+    "storm",
+    "rain",
+    "container",
+    "v",
+    "box",
+    "holder",
+    "music",
+    "machine",
+    "engine",
+    "me",
+    "communication",
+    "language",
+    "message",
+    "speech",
+    "relation",
+    "relationship",
+    "connection",
+    "association",
+    "property",
+    "attribute",
+    "feature",
+    "quality",
+    "chemical"
+  ],
+  "global": {
+    "answer_last": {
+      "raw": [
+        {
+          "layer": 0,
+          "mean_margin": -0.0006443057209253311,
+          "median_margin": -0.0006423063459806144,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.04171965271234512
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.006616575643420219,
+          "median_margin": -0.006451964378356934,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.1298379898071289
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.01243002712726593,
+          "median_margin": -0.011145336553454399,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.24675089120864868
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.021702829748392105,
+          "median_margin": -0.02104978822171688,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.3622175455093384
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.030974455177783966,
+          "median_margin": -0.028525374829769135,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.48506662249565125
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.03324199467897415,
+          "median_margin": -0.029311422258615494,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.5960936546325684
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.027808673679828644,
+          "median_margin": -0.026397474110126495,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.7026063203811646
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.02393963932991028,
+          "median_margin": -0.021121297031641006,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.8409860730171204
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.026139844208955765,
+          "median_margin": -0.0253550224006176,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.979149580001831
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.029843512922525406,
+          "median_margin": -0.02603963389992714,
+          "top1_count": 1,
+          "mean_boundary_norm": 1.1516509056091309
+        },
+        {
+          "layer": 10,
+          "mean_margin": -0.03088490292429924,
+          "median_margin": -0.03023213893175125,
+          "top1_count": 2,
+          "mean_boundary_norm": 1.319433331489563
+        },
+        {
+          "layer": 11,
+          "mean_margin": -0.032175395637750626,
+          "median_margin": -0.029503539204597473,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.3738540410995483
+        },
+        {
+          "layer": 12,
+          "mean_margin": -0.045825980603694916,
+          "median_margin": -0.04354051873087883,
+          "top1_count": 2,
+          "mean_boundary_norm": 1.5034006834030151
+        },
+        {
+          "layer": 13,
+          "mean_margin": -0.055903494358062744,
+          "median_margin": -0.05240757390856743,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.6216741800308228
+        },
+        {
+          "layer": 14,
+          "mean_margin": -0.05727358162403107,
+          "median_margin": -0.04936705902218819,
+          "top1_count": 2,
+          "mean_boundary_norm": 1.73457932472229
+        },
+        {
+          "layer": 15,
+          "mean_margin": -0.06790383160114288,
+          "median_margin": -0.06439881771802902,
+          "top1_count": 2,
+          "mean_boundary_norm": 1.8868744373321533
+        },
+        {
+          "layer": 16,
+          "mean_margin": -0.06539636850357056,
+          "median_margin": -0.055736422538757324,
+          "top1_count": 2,
+          "mean_boundary_norm": 2.092764377593994
+        },
+        {
+          "layer": 17,
+          "mean_margin": -0.06513276696205139,
+          "median_margin": -0.06106984615325928,
+          "top1_count": 3,
+          "mean_boundary_norm": 2.3268508911132812
+        },
+        {
+          "layer": 18,
+          "mean_margin": -0.09002067893743515,
+          "median_margin": -0.08163022994995117,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.6444191932678223
+        },
+        {
+          "layer": 19,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 2,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 20,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 7,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 21,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 6,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 22,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 7,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 23,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 6,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 24,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 25,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 26,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 27,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 28,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 29,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 30,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 31,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 32,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 33,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 34,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 35,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 36,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 37,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 38,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 39,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 40,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 25,
+          "mean_boundary_norm": NaN
+        }
+      ],
+      "template_residual": [
+        {
+          "layer": 0,
+          "mean_margin": -0.0003270971355959773,
+          "median_margin": -0.00023505877470597625,
+          "top1_count": 3,
+          "mean_boundary_norm": 0.04171965271234512
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.0009299707598984241,
+          "median_margin": -0.0008882245747372508,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.1298379898071289
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.0013870891416445374,
+          "median_margin": -0.0010964564280584455,
+          "top1_count": 2,
+          "mean_boundary_norm": 0.24675089120864868
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.0024341060779988766,
+          "median_margin": -0.0020419168286025524,
+          "top1_count": 3,
+          "mean_boundary_norm": 0.3622175455093384
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.003693611593917012,
+          "median_margin": -0.0031692732591181993,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.48506662249565125
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.004272439982742071,
+          "median_margin": -0.004007420968264341,
+          "top1_count": 0,
+          "mean_boundary_norm": 0.5960936546325684
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.005845615640282631,
+          "median_margin": -0.005987862125039101,
+          "top1_count": 0,
+          "mean_boundary_norm": 0.7026063203811646
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.008779439143836498,
+          "median_margin": -0.008357039652764797,
+          "top1_count": 0,
+          "mean_boundary_norm": 0.8409861326217651
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.009275538846850395,
+          "median_margin": -0.008198369294404984,
+          "top1_count": 0,
+          "mean_boundary_norm": 0.979149580001831
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.008211959153413773,
+          "median_margin": -0.006604486145079136,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.1516509056091309
+        },
+        {
+          "layer": 10,
+          "mean_margin": -0.009400486946105957,
+          "median_margin": -0.008933511562645435,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.319433331489563
+        },
+        {
+          "layer": 11,
+          "mean_margin": -0.008939728140830994,
+          "median_margin": -0.008311927318572998,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.3738540410995483
+        },
+        {
+          "layer": 12,
+          "mean_margin": -0.010754958726465702,
+          "median_margin": -0.00949799083173275,
+          "top1_count": 5,
+          "mean_boundary_norm": 1.5034006834030151
+        },
+        {
+          "layer": 13,
+          "mean_margin": -0.01157358568161726,
+          "median_margin": -0.010543703101575375,
+          "top1_count": 5,
+          "mean_boundary_norm": 1.6216741800308228
+        },
+        {
+          "layer": 14,
+          "mean_margin": -0.011671355925500393,
+          "median_margin": -0.011281166225671768,
+          "top1_count": 4,
+          "mean_boundary_norm": 1.73457932472229
+        },
+        {
+          "layer": 15,
+          "mean_margin": -0.011590560898184776,
+          "median_margin": -0.012967117130756378,
+          "top1_count": 3,
+          "mean_boundary_norm": 1.8868744373321533
+        },
+        {
+          "layer": 16,
+          "mean_margin": -0.011358032003045082,
+          "median_margin": -0.011156300082802773,
+          "top1_count": 6,
+          "mean_boundary_norm": 2.092764377593994
+        },
+        {
+          "layer": 17,
+          "mean_margin": -0.012128093279898167,
+          "median_margin": -0.011839989572763443,
+          "top1_count": 6,
+          "mean_boundary_norm": 2.3268508911132812
+        },
+        {
+          "layer": 18,
+          "mean_margin": -0.013818301260471344,
+          "median_margin": -0.012934204190969467,
+          "top1_count": 6,
+          "mean_boundary_norm": 2.6444191932678223
+        },
+        {
+          "layer": 19,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 20,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 21,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 22,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 23,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 24,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 25,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 26,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 27,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 28,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 29,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 30,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 31,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 32,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 33,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 34,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 35,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 36,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 37,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 38,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 39,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 40,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        }
+      ]
+    },
+    "object_last": {
+      "raw": [
+        {
+          "layer": 0,
+          "mean_margin": -0.00046861948794685304,
+          "median_margin": -0.0005142772570252419,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.047975338995456696
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.04055581986904144,
+          "median_margin": -0.02824576571583748,
+          "top1_count": 1,
+          "mean_boundary_norm": 1.1610654592514038
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.07427442073822021,
+          "median_margin": -0.05026468634605408,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.133234977722168
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.08462554216384888,
+          "median_margin": -0.05815350264310837,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.225731611251831
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.08771740645170212,
+          "median_margin": -0.06090126931667328,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.2315635681152344
+        },
+        {
+          "layer": 5,
+          "mean_margin": -1.1748309135437012,
+          "median_margin": -0.9435901641845703,
+          "top1_count": 1,
+          "mean_boundary_norm": 62.866153717041016
+        },
+        {
+          "layer": 6,
+          "mean_margin": -1.25691819190979,
+          "median_margin": -1.054502010345459,
+          "top1_count": 0,
+          "mean_boundary_norm": 64.04473876953125
+        },
+        {
+          "layer": 7,
+          "mean_margin": -1.327864408493042,
+          "median_margin": -1.1499580144882202,
+          "top1_count": 0,
+          "mean_boundary_norm": 64.71131134033203
+        },
+        {
+          "layer": 8,
+          "mean_margin": -1.460504174232483,
+          "median_margin": -1.2636029720306396,
+          "top1_count": 0,
+          "mean_boundary_norm": 66.92190551757812
+        },
+        {
+          "layer": 9,
+          "mean_margin": -1.6158231496810913,
+          "median_margin": -1.3870782852172852,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.16862487792969
+        },
+        {
+          "layer": 10,
+          "mean_margin": -1.6753976345062256,
+          "median_margin": -1.4197747707366943,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.36979675292969
+        },
+        {
+          "layer": 11,
+          "mean_margin": -1.7172966003417969,
+          "median_margin": -1.4641642570495605,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.50401306152344
+        },
+        {
+          "layer": 12,
+          "mean_margin": -1.7640972137451172,
+          "median_margin": -1.5051320791244507,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.67448425292969
+        },
+        {
+          "layer": 13,
+          "mean_margin": -1.7918784618377686,
+          "median_margin": -1.5271110534667969,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.8287124633789
+        },
+        {
+          "layer": 14,
+          "mean_margin": -1.819885492324829,
+          "median_margin": -1.542227029800415,
+          "top1_count": 1,
+          "mean_boundary_norm": 69.8777084350586
+        },
+        {
+          "layer": 15,
+          "mean_margin": -1.8451111316680908,
+          "median_margin": -1.5573351383209229,
+          "top1_count": 1,
+          "mean_boundary_norm": 70.0050048828125
+        },
+        {
+          "layer": 16,
+          "mean_margin": -1.8470369577407837,
+          "median_margin": -1.5612576007843018,
+          "top1_count": 1,
+          "mean_boundary_norm": 70.02902221679688
+        },
+        {
+          "layer": 17,
+          "mean_margin": -1.8407385349273682,
+          "median_margin": -1.5602877140045166,
+          "top1_count": 1,
+          "mean_boundary_norm": 70.07786560058594
+        },
+        {
+          "layer": 18,
+          "mean_margin": -1.8666691780090332,
+          "median_margin": -1.5786184072494507,
+          "top1_count": 1,
+          "mean_boundary_norm": 70.08908081054688
+        },
+        {
+          "layer": 19,
+          "mean_margin": -1.890395998954773,
+          "median_margin": -1.5990523099899292,
+          "top1_count": 1,
+          "mean_boundary_norm": 70.17559814453125
+        },
+        {
+          "layer": 20,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 6,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 21,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 6,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 22,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 6,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 23,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 9,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 24,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 25,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 26,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 27,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 28,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 29,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 30,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 31,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 32,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 33,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 34,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 35,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 36,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 37,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 38,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 39,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 40,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 24,
+          "mean_boundary_norm": NaN
+        }
+      ],
+      "template_residual": [
+        {
+          "layer": 0,
+          "mean_margin": -0.0003274929476901889,
+          "median_margin": -0.00035454286262393,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.047975338995456696
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.019937556236982346,
+          "median_margin": -0.01865105703473091,
+          "top1_count": 1,
+          "mean_boundary_norm": 1.1610654592514038
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.043934933841228485,
+          "median_margin": -0.03957967087626457,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.133234977722168
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.044969238340854645,
+          "median_margin": -0.0439450666308403,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.225731372833252
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.04450388625264168,
+          "median_margin": -0.044194720685482025,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.2315638065338135
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.4260598421096802,
+          "median_margin": -0.3623349666595459,
+          "top1_count": 0,
+          "mean_boundary_norm": 62.866153717041016
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.42195290327072144,
+          "median_margin": -0.3397597074508667,
+          "top1_count": 0,
+          "mean_boundary_norm": 64.04473876953125
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.42141133546829224,
+          "median_margin": -0.34816646575927734,
+          "top1_count": 0,
+          "mean_boundary_norm": 64.71131896972656
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.4177452325820923,
+          "median_margin": -0.3339008688926697,
+          "top1_count": 0,
+          "mean_boundary_norm": 66.92190551757812
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.41710638999938965,
+          "median_margin": -0.3089579939842224,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.16862487792969
+        },
+        {
+          "layer": 10,
+          "mean_margin": -0.4173561930656433,
+          "median_margin": -0.29896479845046997,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.36979675292969
+        },
+        {
+          "layer": 11,
+          "mean_margin": -0.4195571541786194,
+          "median_margin": -0.2935025691986084,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.50401306152344
+        },
+        {
+          "layer": 12,
+          "mean_margin": -0.4224967956542969,
+          "median_margin": -0.2900077700614929,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.67448425292969
+        },
+        {
+          "layer": 13,
+          "mean_margin": -0.42475926876068115,
+          "median_margin": -0.28637874126434326,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.8287124633789
+        },
+        {
+          "layer": 14,
+          "mean_margin": -0.42595160007476807,
+          "median_margin": -0.28431329131126404,
+          "top1_count": 0,
+          "mean_boundary_norm": 69.87770080566406
+        },
+        {
+          "layer": 15,
+          "mean_margin": -0.4278334677219391,
+          "median_margin": -0.28029865026474,
+          "top1_count": 0,
+          "mean_boundary_norm": 70.00501251220703
+        },
+        {
+          "layer": 16,
+          "mean_margin": -0.4273908734321594,
+          "median_margin": -0.28083401918411255,
+          "top1_count": 0,
+          "mean_boundary_norm": 70.02902221679688
+        },
+        {
+          "layer": 17,
+          "mean_margin": -0.4278966784477234,
+          "median_margin": -0.27790820598602295,
+          "top1_count": 0,
+          "mean_boundary_norm": 70.07786560058594
+        },
+        {
+          "layer": 18,
+          "mean_margin": -0.4275241792201996,
+          "median_margin": -0.2778025269508362,
+          "top1_count": 0,
+          "mean_boundary_norm": 70.08908081054688
+        },
+        {
+          "layer": 19,
+          "mean_margin": -0.4275285601615906,
+          "median_margin": -0.27736061811447144,
+          "top1_count": 0,
+          "mean_boundary_norm": 70.17559814453125
+        },
+        {
+          "layer": 20,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 21,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 22,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 23,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 24,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 25,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 26,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 27,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 28,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 29,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 30,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 31,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 32,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 33,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 34,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 35,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 36,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 37,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 38,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 39,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        },
+        {
+          "layer": 40,
+          "mean_margin": NaN,
+          "median_margin": NaN,
+          "top1_count": 32,
+          "mean_boundary_norm": NaN
+        }
+      ]
+    }
+  },
+  "category_summary": {
+    "answer_last": {
+      "raw": {
+        "fruit": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0008785951649770141,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006413848022930324,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005911177140660584,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006134790601208806,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005534125957638025,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0003957555745728314,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00027667931863106787,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005945747252553701,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 40,
+          "best_boundary_layer": 19,
+          "best_margin": 0.496654748916626,
+          "final_margin": 0.496654748916626,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 40,
+            "max": 0.496654748916626,
+            "final": 0.496654748916626,
+            "mean": -1.3998906280697756
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0007464602240361273,
+          "final_margin": -0.5091152191162109,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0007464602240361273,
+            "final": -0.5091152191162109,
+            "mean": -0.9624525395735939
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": 0.019334256649017334,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005991450743749738,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0008699747268110514,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0009167869575321674,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006675912882201374,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006471137166954577,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00109718122985214,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00045630510430783033,
+          "final_margin": -1.3736324310302734,
+          "best_rank": 3,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.00045630510430783033,
+            "final": -1.3736324310302734,
+            "mean": -0.7054917017741855
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.000995574169792235,
+          "final_margin": -1.2958327531814575,
+          "best_rank": 3,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.000995574169792235,
+            "final": -1.2958327531814575,
+            "mean": -1.1278537161017927
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006657338235527277,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.001209875801578164,
+          "final_margin": -0.1257706880569458,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.001209875801578164,
+            "final": -0.1257706880569458,
+            "mean": -0.5339832408978354
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0009241789812222123,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": 0.082500159740448,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": 0.006004218012094498,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006638652412220836,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0009947845246642828,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": 0.006056487560272217,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0004420052282512188,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": 7.428467506542802e-05,
+          "final_margin": -0.1088857650756836,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 7.428467506542802e-05,
+            "final": -0.1088857650756836,
+            "mean": -0.3267623892653075
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005541353020817041,
+          "final_margin": -2.484461545944214,
+          "best_rank": 10,
+          "final_rank": 11,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0005541353020817041,
+            "final": -2.484461545944214,
+            "mean": -0.8377928547958684
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0007374663255177438,
+          "final_margin": -1.3585290908813477,
+          "best_rank": 3,
+          "final_rank": 5,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0007374663255177438,
+            "final": -1.3585290908813477,
+            "mean": -0.42007453118240823
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "communication",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0004871691926382482,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        }
+      },
+      "template_residual": {
+        "fruit": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0004346715868450701,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0012794937938451767,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.005274232476949692,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 1.7700542230159044e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00010412317351438105,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -4.802632611244917e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0006723680999130011,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 4.171626642346382e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005779364728368819,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00037709804018959403,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.010629914700984955,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0007627056911587715,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0007690927013754845,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0016384718474000692,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.004979765973985195,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.008740268647670746,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0002299562911503017,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.006943562999367714,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00019463093485683203,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00018585758516564965,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0005981655558571219,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0004107197164557874,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -4.343854379840195e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0010063289664685726,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0007596477516926825,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0009200650965794921,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.0033162375912070274,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0002401612582616508,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": 0.00018904905300587416,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00012922720634378493,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.0003041026648133993,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 19,
+          "best_boundary_layer": 19,
+          "best_margin": -0.00019098226039204746,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 19,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        }
+      }
+    },
+    "object_last": {
+      "raw": {
+        "fruit": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005740438355132937,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 23,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006951966206543148,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 23,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 23,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005114668747410178,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 23,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 23,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00010813196422532201,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 23,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00029597210232168436,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00039462553104385734,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0009297333308495581,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0007874829461798072,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.000813548278529197,
+          "final_margin": -0.745438277721405,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.000813548278529197,
+            "final": -0.745438277721405,
+            "mean": -4.665264550705793
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005526405875571072,
+          "final_margin": -1.5344154834747314,
+          "best_rank": 8,
+          "final_rank": 8,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0005526405875571072,
+            "final": -1.5344154834747314,
+            "mean": -2.4177263464804217
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": 0.06002998352050781,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -3.7222838727757335e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00014772516442462802,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0003650127328000963,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00026811580755747855,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0003626063698902726,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006323057459667325,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0009323888225480914,
+          "final_margin": -2.1981234550476074,
+          "best_rank": 13,
+          "final_rank": 17,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0009323888225480914,
+            "final": -2.1981234550476074,
+            "mean": -2.3077018962599474
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005170876393094659,
+          "final_margin": -1.563096046447754,
+          "best_rank": 9,
+          "final_rank": 9,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0005170876393094659,
+            "final": -1.563096046447754,
+            "mean": -2.846185994462292
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": 4.455511225387454e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006175857270136476,
+          "final_margin": -1.9534279108047485,
+          "best_rank": 10,
+          "final_rank": 14,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0006175857270136476,
+            "final": -1.9534279108047485,
+            "mean": -1.6663269325551326
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.000532648409716785,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": 0.1600966453552246,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00016350988880731165,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.000786827236879617,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005960606504231691,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00038015207974240184,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00019524623348843306,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0001269538188353181,
+          "final_margin": -2.5613369941711426,
+          "best_rank": 3,
+          "final_rank": 22,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0001269538188353181,
+            "final": -2.5613369941711426,
+            "mean": -1.5039272761659515
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9994884133338928
+            },
+            {
+              "category": "relation",
+              "cos": 0.9994884133338928
+            },
+            {
+              "category": "action",
+              "cos": 0.9994884133338928
+            },
+            {
+              "category": "time",
+              "cos": 0.9994884133338928
+            },
+            {
+              "category": "event",
+              "cos": 0.9994884133338928
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0008174186805263162,
+          "final_margin": -3.1454129219055176,
+          "best_rank": 10,
+          "final_rank": 31,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0008174186805263162,
+            "final": -3.1454129219055176,
+            "mean": -1.6329296393598225
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006102207698859274,
+          "final_margin": -2.1671926975250244,
+          "best_rank": 4,
+          "final_rank": 16,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0006102207698859274,
+            "final": -2.1671926975250244,
+            "mean": -0.838393944873554
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "relation",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "action",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "time",
+              "cos": 0.9999990910291672
+            },
+            {
+              "category": "event",
+              "cos": 0.9999990910291672
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 24,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0003102835617028177,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 24,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        }
+      },
+      "template_residual": {
+        "fruit": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.000496586028020829,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006529673119075596,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": 0.00043765362352132797,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0002005978167289868,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0001579512027092278,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00035989040043205023,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "food",
+              "cos": NaN
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006263924296945333,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006331243785098195,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0004288048658054322,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0003491953539196402,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0007342778844758868,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -4.3999243644066155e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0002535310050006956,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": 0.0007339181611314416,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0001177177473437041,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00011111651838291436,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00043034343980252743,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0005238058511167765,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00040355860255658627,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00010213829227723181,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00040008610812947154,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00041393679566681385,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0001513675379101187,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": 3.935323911719024e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006079734885133803,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0004368585941847414,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00011638004798442125,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.00010941614164039493,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -1.643146970309317e-05,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0006379882688634098,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0004905525129288435,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 20,
+          "best_boundary_layer": 20,
+          "best_margin": -0.0002981547440867871,
+          "final_margin": NaN,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "boundary_curve": {
+            "max_layer": 20,
+            "max": NaN,
+            "final": NaN,
+            "mean": NaN
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "animal",
+              "cos": NaN
+            },
+            {
+              "category": "tool",
+              "cos": NaN
+            },
+            {
+              "category": "vehicle",
+              "cos": NaN
+            },
+            {
+              "category": "clothing",
+              "cos": NaN
+            },
+            {
+              "category": "furniture",
+              "cos": NaN
+            }
+          ]
+        }
+      }
+    }
+  },
+  "notes": [
+    "template_residual means subtracting the same-template mean vector at each layer and position.",
+    "answer_last is the category-answer slot; object_last is the object token position.",
+    "This phase is still atlas/readout evidence, not downstream causal patching."
+  ]
+}

@@ -1,0 +1,6618 @@
+{
+  "phase": 106,
+  "model": "qwen3",
+  "timestamp": "2026-06-14 08:03:44",
+  "n_layers": 36,
+  "d_model": 2560,
+  "categories": [
+    "fruit",
+    "animal",
+    "tool",
+    "vehicle",
+    "clothing",
+    "furniture",
+    "food",
+    "plant",
+    "body",
+    "place",
+    "building",
+    "material",
+    "color",
+    "emotion",
+    "role",
+    "profession",
+    "abstract",
+    "action",
+    "event",
+    "time",
+    "number",
+    "shape",
+    "sound",
+    "light",
+    "weather",
+    "container",
+    "instrument",
+    "machine",
+    "communication",
+    "relation",
+    "property",
+    "substance"
+  ],
+  "templates": [
+    "kind_of",
+    "belongs",
+    "word_refers",
+    "talk_about"
+  ],
+  "objects_per_category": 24,
+  "positions": [
+    "answer_last",
+    "object_last"
+  ],
+  "readout_token_labels": [
+    "fruit",
+    "produce",
+    "berry",
+    "crop",
+    "animal",
+    "creature",
+    "be",
+    "pet",
+    "tool",
+    "implement",
+    "device",
+    "instrument",
+    "vehicle",
+    "transport",
+    "autom",
+    "car",
+    "clo",
+    "gar",
+    "att",
+    "app",
+    "f",
+    "fixture",
+    "seat",
+    "food",
+    "meal",
+    "dish",
+    "sn",
+    "plant",
+    "tree",
+    "veget",
+    "fl",
+    "body",
+    "lim",
+    "organ",
+    "place",
+    "location",
+    "site",
+    "area",
+    "building",
+    "structure",
+    "house",
+    "facility",
+    "material",
+    "sub",
+    "matter",
+    "fabric",
+    "color",
+    "hue",
+    "shade",
+    "tone",
+    "emotion",
+    "fe",
+    "m",
+    "a",
+    "role",
+    "person",
+    "title",
+    "status",
+    "profession",
+    "occupation",
+    "career",
+    "job",
+    "concept",
+    "idea",
+    "pr",
+    "ab",
+    "action",
+    "act",
+    "verb",
+    "movement",
+    "event",
+    "occasion",
+    "h",
+    "incident",
+    "time",
+    "date",
+    "period",
+    "moment",
+    "number",
+    "amount",
+    "quantity",
+    "count",
+    "shape",
+    "form",
+    "geometry",
+    "figure",
+    "sound",
+    "noise",
+    "voice",
+    "audio",
+    "light",
+    "brightness",
+    "gl",
+    "illum",
+    "weather",
+    "climate",
+    "storm",
+    "rain",
+    "container",
+    "v",
+    "box",
+    "holder",
+    "music",
+    "machine",
+    "engine",
+    "me",
+    "communication",
+    "language",
+    "message",
+    "speech",
+    "relation",
+    "relationship",
+    "connection",
+    "association",
+    "property",
+    "attribute",
+    "feature",
+    "quality",
+    "chemical"
+  ],
+  "global": {
+    "answer_last": {
+      "raw": [
+        {
+          "layer": 0,
+          "mean_margin": -0.07687149196863174,
+          "median_margin": -0.08102533221244812,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.0
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.17468246817588806,
+          "median_margin": -0.16388171911239624,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.18389087915420532
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.17268100380897522,
+          "median_margin": -0.1493372917175293,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.32750585675239563
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.23110029101371765,
+          "median_margin": -0.19980233907699585,
+          "top1_count": 1,
+          "mean_boundary_norm": 0.6888970732688904
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.28808966279029846,
+          "median_margin": -0.25156983733177185,
+          "top1_count": 2,
+          "mean_boundary_norm": 1.0132019519805908
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.4150862693786621,
+          "median_margin": -0.3717181086540222,
+          "top1_count": 1,
+          "mean_boundary_norm": 1.3995558023452759
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.6871397495269775,
+          "median_margin": -0.6405408382415771,
+          "top1_count": 1,
+          "mean_boundary_norm": 2.152350902557373
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.894646167755127,
+          "median_margin": -0.9199779629707336,
+          "top1_count": 1,
+          "mean_boundary_norm": 4.144754409790039
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.9931181073188782,
+          "median_margin": -0.9924204349517822,
+          "top1_count": 1,
+          "mean_boundary_norm": 4.893064975738525
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.8677555322647095,
+          "median_margin": -0.8266278505325317,
+          "top1_count": 2,
+          "mean_boundary_norm": 7.683723449707031
+        },
+        {
+          "layer": 10,
+          "mean_margin": -0.7955150604248047,
+          "median_margin": -0.7535892128944397,
+          "top1_count": 2,
+          "mean_boundary_norm": 9.032430648803711
+        },
+        {
+          "layer": 11,
+          "mean_margin": -0.8367440104484558,
+          "median_margin": -0.8078707456588745,
+          "top1_count": 2,
+          "mean_boundary_norm": 8.972736358642578
+        },
+        {
+          "layer": 12,
+          "mean_margin": -0.8169180154800415,
+          "median_margin": -0.8681135177612305,
+          "top1_count": 2,
+          "mean_boundary_norm": 11.037897109985352
+        },
+        {
+          "layer": 13,
+          "mean_margin": -0.7797970771789551,
+          "median_margin": -0.8051043748855591,
+          "top1_count": 2,
+          "mean_boundary_norm": 11.694299697875977
+        },
+        {
+          "layer": 14,
+          "mean_margin": -0.8478555679321289,
+          "median_margin": -0.7859360575675964,
+          "top1_count": 2,
+          "mean_boundary_norm": 12.004166603088379
+        },
+        {
+          "layer": 15,
+          "mean_margin": -1.0301365852355957,
+          "median_margin": -0.9526853561401367,
+          "top1_count": 2,
+          "mean_boundary_norm": 12.284051895141602
+        },
+        {
+          "layer": 16,
+          "mean_margin": -1.0539779663085938,
+          "median_margin": -1.0274871587753296,
+          "top1_count": 2,
+          "mean_boundary_norm": 12.55984878540039
+        },
+        {
+          "layer": 17,
+          "mean_margin": -1.3140878677368164,
+          "median_margin": -1.3361648321151733,
+          "top1_count": 1,
+          "mean_boundary_norm": 12.731658935546875
+        },
+        {
+          "layer": 18,
+          "mean_margin": -1.2689950466156006,
+          "median_margin": -1.2471790313720703,
+          "top1_count": 2,
+          "mean_boundary_norm": 13.247188568115234
+        },
+        {
+          "layer": 19,
+          "mean_margin": -1.4093700647354126,
+          "median_margin": -1.4505505561828613,
+          "top1_count": 1,
+          "mean_boundary_norm": 13.896551132202148
+        },
+        {
+          "layer": 20,
+          "mean_margin": -1.5903807878494263,
+          "median_margin": -1.518031120300293,
+          "top1_count": 1,
+          "mean_boundary_norm": 14.90135383605957
+        },
+        {
+          "layer": 21,
+          "mean_margin": -1.656079649925232,
+          "median_margin": -1.5387003421783447,
+          "top1_count": 2,
+          "mean_boundary_norm": 15.791921615600586
+        },
+        {
+          "layer": 22,
+          "mean_margin": -1.509734869003296,
+          "median_margin": -1.5078489780426025,
+          "top1_count": 2,
+          "mean_boundary_norm": 16.9169864654541
+        },
+        {
+          "layer": 23,
+          "mean_margin": -2.0221054553985596,
+          "median_margin": -1.9718728065490723,
+          "top1_count": 1,
+          "mean_boundary_norm": 17.75560760498047
+        },
+        {
+          "layer": 24,
+          "mean_margin": -1.8003991842269897,
+          "median_margin": -1.7743784189224243,
+          "top1_count": 4,
+          "mean_boundary_norm": 24.142440795898438
+        },
+        {
+          "layer": 25,
+          "mean_margin": -2.0278828144073486,
+          "median_margin": -1.9827866554260254,
+          "top1_count": 6,
+          "mean_boundary_norm": 31.119524002075195
+        },
+        {
+          "layer": 26,
+          "mean_margin": -1.5958832502365112,
+          "median_margin": -1.4889106750488281,
+          "top1_count": 10,
+          "mean_boundary_norm": 36.80103302001953
+        },
+        {
+          "layer": 27,
+          "mean_margin": -0.9938676953315735,
+          "median_margin": -0.9433941841125488,
+          "top1_count": 12,
+          "mean_boundary_norm": 45.53535079956055
+        },
+        {
+          "layer": 28,
+          "mean_margin": -1.0020639896392822,
+          "median_margin": -0.7380681037902832,
+          "top1_count": 12,
+          "mean_boundary_norm": 54.31673049926758
+        },
+        {
+          "layer": 29,
+          "mean_margin": -0.7540168762207031,
+          "median_margin": -0.08797502517700195,
+          "top1_count": 15,
+          "mean_boundary_norm": 67.9715347290039
+        },
+        {
+          "layer": 30,
+          "mean_margin": 0.058685481548309326,
+          "median_margin": 0.4532957077026367,
+          "top1_count": 17,
+          "mean_boundary_norm": 85.9937973022461
+        },
+        {
+          "layer": 31,
+          "mean_margin": 0.4651593565940857,
+          "median_margin": 1.2907371520996094,
+          "top1_count": 17,
+          "mean_boundary_norm": 105.78646087646484
+        },
+        {
+          "layer": 32,
+          "mean_margin": 0.7177014946937561,
+          "median_margin": 1.1612119674682617,
+          "top1_count": 17,
+          "mean_boundary_norm": 121.98712921142578
+        },
+        {
+          "layer": 33,
+          "mean_margin": 0.31647682189941406,
+          "median_margin": 1.3789539337158203,
+          "top1_count": 16,
+          "mean_boundary_norm": 133.7264404296875
+        },
+        {
+          "layer": 34,
+          "mean_margin": 0.22764724493026733,
+          "median_margin": 2.2411041259765625,
+          "top1_count": 17,
+          "mean_boundary_norm": 141.91351318359375
+        },
+        {
+          "layer": 35,
+          "mean_margin": -3.417980194091797,
+          "median_margin": -1.5518264770507812,
+          "top1_count": 14,
+          "mean_boundary_norm": 155.25543212890625
+        },
+        {
+          "layer": 36,
+          "mean_margin": 0.420565128326416,
+          "median_margin": 0.4686143398284912,
+          "top1_count": 21,
+          "mean_boundary_norm": 32.023441314697266
+        }
+      ],
+      "template_residual": [
+        {
+          "layer": 0,
+          "mean_margin": 0.0,
+          "median_margin": 0.0,
+          "top1_count": 32,
+          "mean_boundary_norm": 0.0
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.0022360249422490597,
+          "median_margin": -0.001779612386599183,
+          "top1_count": 5,
+          "mean_boundary_norm": 0.18389087915420532
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.004402036778628826,
+          "median_margin": -0.003978141117841005,
+          "top1_count": 4,
+          "mean_boundary_norm": 0.32750585675239563
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.009072046726942062,
+          "median_margin": -0.007310793735086918,
+          "top1_count": 4,
+          "mean_boundary_norm": 0.6888971328735352
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.011145414784550667,
+          "median_margin": -0.009106157347559929,
+          "top1_count": 7,
+          "mean_boundary_norm": 1.0132019519805908
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.015744643285870552,
+          "median_margin": -0.013334955088794231,
+          "top1_count": 4,
+          "mean_boundary_norm": 1.3995558023452759
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.023220963776111603,
+          "median_margin": -0.015534820035099983,
+          "top1_count": 3,
+          "mean_boundary_norm": 2.152350902557373
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.034205831587314606,
+          "median_margin": -0.038096871227025986,
+          "top1_count": 6,
+          "mean_boundary_norm": 4.144754409790039
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.03613045811653137,
+          "median_margin": -0.034582093358039856,
+          "top1_count": 6,
+          "mean_boundary_norm": 4.893064975738525
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.001129843294620514,
+          "median_margin": 0.0067035481333732605,
+          "top1_count": 17,
+          "mean_boundary_norm": 7.683723449707031
+        },
+        {
+          "layer": 10,
+          "mean_margin": 0.023271311074495316,
+          "median_margin": 0.04351930320262909,
+          "top1_count": 18,
+          "mean_boundary_norm": 9.032431602478027
+        },
+        {
+          "layer": 11,
+          "mean_margin": 0.060724884271621704,
+          "median_margin": 0.06751887500286102,
+          "top1_count": 21,
+          "mean_boundary_norm": 8.972736358642578
+        },
+        {
+          "layer": 12,
+          "mean_margin": 0.10105711966753006,
+          "median_margin": 0.09384013712406158,
+          "top1_count": 24,
+          "mean_boundary_norm": 11.037897109985352
+        },
+        {
+          "layer": 13,
+          "mean_margin": 0.12828530371189117,
+          "median_margin": 0.13284432888031006,
+          "top1_count": 24,
+          "mean_boundary_norm": 11.69429874420166
+        },
+        {
+          "layer": 14,
+          "mean_margin": 0.10851126909255981,
+          "median_margin": 0.0799945816397667,
+          "top1_count": 21,
+          "mean_boundary_norm": 12.004166603088379
+        },
+        {
+          "layer": 15,
+          "mean_margin": 0.10765866935253143,
+          "median_margin": 0.11656200140714645,
+          "top1_count": 20,
+          "mean_boundary_norm": 12.284051895141602
+        },
+        {
+          "layer": 16,
+          "mean_margin": 0.11594922840595245,
+          "median_margin": 0.1167093962430954,
+          "top1_count": 23,
+          "mean_boundary_norm": 12.55984878540039
+        },
+        {
+          "layer": 17,
+          "mean_margin": 0.1237260177731514,
+          "median_margin": 0.14681661128997803,
+          "top1_count": 23,
+          "mean_boundary_norm": 12.731658935546875
+        },
+        {
+          "layer": 18,
+          "mean_margin": 0.1303548365831375,
+          "median_margin": 0.16203774511814117,
+          "top1_count": 22,
+          "mean_boundary_norm": 13.247188568115234
+        },
+        {
+          "layer": 19,
+          "mean_margin": 0.12802323698997498,
+          "median_margin": 0.13697710633277893,
+          "top1_count": 22,
+          "mean_boundary_norm": 13.896550178527832
+        },
+        {
+          "layer": 20,
+          "mean_margin": 0.1398850828409195,
+          "median_margin": 0.1808881312608719,
+          "top1_count": 22,
+          "mean_boundary_norm": 14.90135383605957
+        },
+        {
+          "layer": 21,
+          "mean_margin": 0.12216591835021973,
+          "median_margin": 0.17786729335784912,
+          "top1_count": 21,
+          "mean_boundary_norm": 15.791921615600586
+        },
+        {
+          "layer": 22,
+          "mean_margin": 0.14493951201438904,
+          "median_margin": 0.17905613780021667,
+          "top1_count": 21,
+          "mean_boundary_norm": 16.916988372802734
+        },
+        {
+          "layer": 23,
+          "mean_margin": 0.18192532658576965,
+          "median_margin": 0.1859079897403717,
+          "top1_count": 23,
+          "mean_boundary_norm": 17.75560760498047
+        },
+        {
+          "layer": 24,
+          "mean_margin": 0.46280747652053833,
+          "median_margin": 0.4925674498081207,
+          "top1_count": 26,
+          "mean_boundary_norm": 24.142440795898438
+        },
+        {
+          "layer": 25,
+          "mean_margin": 0.860378623008728,
+          "median_margin": 0.7934564352035522,
+          "top1_count": 26,
+          "mean_boundary_norm": 31.119525909423828
+        },
+        {
+          "layer": 26,
+          "mean_margin": 1.0730178356170654,
+          "median_margin": 0.952309787273407,
+          "top1_count": 28,
+          "mean_boundary_norm": 36.80103302001953
+        },
+        {
+          "layer": 27,
+          "mean_margin": 1.7049500942230225,
+          "median_margin": 1.3370025157928467,
+          "top1_count": 29,
+          "mean_boundary_norm": 45.53535079956055
+        },
+        {
+          "layer": 28,
+          "mean_margin": 2.2721381187438965,
+          "median_margin": 1.9664088487625122,
+          "top1_count": 28,
+          "mean_boundary_norm": 54.31673049926758
+        },
+        {
+          "layer": 29,
+          "mean_margin": 2.914346694946289,
+          "median_margin": 2.7065529823303223,
+          "top1_count": 29,
+          "mean_boundary_norm": 67.9715347290039
+        },
+        {
+          "layer": 30,
+          "mean_margin": 4.283465385437012,
+          "median_margin": 3.6122522354125977,
+          "top1_count": 29,
+          "mean_boundary_norm": 85.99380493164062
+        },
+        {
+          "layer": 31,
+          "mean_margin": 5.829243183135986,
+          "median_margin": 5.440296649932861,
+          "top1_count": 30,
+          "mean_boundary_norm": 105.78645324707031
+        },
+        {
+          "layer": 32,
+          "mean_margin": 7.101831436157227,
+          "median_margin": 5.967320442199707,
+          "top1_count": 29,
+          "mean_boundary_norm": 121.98713684082031
+        },
+        {
+          "layer": 33,
+          "mean_margin": 7.586836814880371,
+          "median_margin": 6.919709205627441,
+          "top1_count": 29,
+          "mean_boundary_norm": 133.7264404296875
+        },
+        {
+          "layer": 34,
+          "mean_margin": 7.299220085144043,
+          "median_margin": 7.39139461517334,
+          "top1_count": 29,
+          "mean_boundary_norm": 141.91351318359375
+        },
+        {
+          "layer": 35,
+          "mean_margin": 7.5210676193237305,
+          "median_margin": 7.088757514953613,
+          "top1_count": 30,
+          "mean_boundary_norm": 155.25543212890625
+        },
+        {
+          "layer": 36,
+          "mean_margin": 1.3529863357543945,
+          "median_margin": 1.34624445438385,
+          "top1_count": 29,
+          "mean_boundary_norm": 32.023441314697266
+        }
+      ]
+    },
+    "object_last": {
+      "raw": [
+        {
+          "layer": 0,
+          "mean_margin": -7.405714131891727e-05,
+          "median_margin": 0.002145819365978241,
+          "top1_count": 18,
+          "mean_boundary_norm": 0.35590827465057373
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.08842463791370392,
+          "median_margin": -0.11206147074699402,
+          "top1_count": 6,
+          "mean_boundary_norm": 3.462076187133789
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.12280692160129547,
+          "median_margin": -0.15043078362941742,
+          "top1_count": 5,
+          "mean_boundary_norm": 4.349981784820557
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.15766726434230804,
+          "median_margin": -0.18180221319198608,
+          "top1_count": 6,
+          "mean_boundary_norm": 5.210380554199219
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.1623445451259613,
+          "median_margin": -0.1723371297121048,
+          "top1_count": 6,
+          "mean_boundary_norm": 6.867671012878418
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.2212364375591278,
+          "median_margin": -0.20644494891166687,
+          "top1_count": 6,
+          "mean_boundary_norm": 8.571846961975098
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.3286438584327698,
+          "median_margin": -0.3223344683647156,
+          "top1_count": 8,
+          "mean_boundary_norm": 11.560827255249023
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.3474438786506653,
+          "median_margin": -0.39916419982910156,
+          "top1_count": 8,
+          "mean_boundary_norm": 12.643993377685547
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.3245658576488495,
+          "median_margin": -0.40877169370651245,
+          "top1_count": 9,
+          "mean_boundary_norm": 14.172560691833496
+        },
+        {
+          "layer": 9,
+          "mean_margin": -0.357834130525589,
+          "median_margin": -0.5046995878219604,
+          "top1_count": 7,
+          "mean_boundary_norm": 15.86808967590332
+        },
+        {
+          "layer": 10,
+          "mean_margin": -0.2940061688423157,
+          "median_margin": -0.45908117294311523,
+          "top1_count": 9,
+          "mean_boundary_norm": 16.0478515625
+        },
+        {
+          "layer": 11,
+          "mean_margin": -0.32216116786003113,
+          "median_margin": -0.43030136823654175,
+          "top1_count": 8,
+          "mean_boundary_norm": 16.71682357788086
+        },
+        {
+          "layer": 12,
+          "mean_margin": -0.42839333415031433,
+          "median_margin": -0.5319141745567322,
+          "top1_count": 9,
+          "mean_boundary_norm": 17.021400451660156
+        },
+        {
+          "layer": 13,
+          "mean_margin": -0.38776862621307373,
+          "median_margin": -0.4698637127876282,
+          "top1_count": 10,
+          "mean_boundary_norm": 17.746875762939453
+        },
+        {
+          "layer": 14,
+          "mean_margin": -0.6296433210372925,
+          "median_margin": -0.5880417823791504,
+          "top1_count": 6,
+          "mean_boundary_norm": 18.212923049926758
+        },
+        {
+          "layer": 15,
+          "mean_margin": -0.6991361975669861,
+          "median_margin": -0.6826686859130859,
+          "top1_count": 5,
+          "mean_boundary_norm": 19.133913040161133
+        },
+        {
+          "layer": 16,
+          "mean_margin": -0.7560124397277832,
+          "median_margin": -0.7839658260345459,
+          "top1_count": 4,
+          "mean_boundary_norm": 19.23360252380371
+        },
+        {
+          "layer": 17,
+          "mean_margin": -0.9163675308227539,
+          "median_margin": -0.9204251766204834,
+          "top1_count": 4,
+          "mean_boundary_norm": 19.212520599365234
+        },
+        {
+          "layer": 18,
+          "mean_margin": -0.8759729862213135,
+          "median_margin": -0.9244260787963867,
+          "top1_count": 4,
+          "mean_boundary_norm": 19.528545379638672
+        },
+        {
+          "layer": 19,
+          "mean_margin": -0.9875136613845825,
+          "median_margin": -0.9560086727142334,
+          "top1_count": 4,
+          "mean_boundary_norm": 19.294754028320312
+        },
+        {
+          "layer": 20,
+          "mean_margin": -1.3802063465118408,
+          "median_margin": -1.3504232168197632,
+          "top1_count": 3,
+          "mean_boundary_norm": 20.95162582397461
+        },
+        {
+          "layer": 21,
+          "mean_margin": -1.2000190019607544,
+          "median_margin": -1.12593674659729,
+          "top1_count": 4,
+          "mean_boundary_norm": 21.81768035888672
+        },
+        {
+          "layer": 22,
+          "mean_margin": -1.1913278102874756,
+          "median_margin": -1.1228294372558594,
+          "top1_count": 5,
+          "mean_boundary_norm": 23.315513610839844
+        },
+        {
+          "layer": 23,
+          "mean_margin": -1.1839582920074463,
+          "median_margin": -1.134371280670166,
+          "top1_count": 5,
+          "mean_boundary_norm": 27.131879806518555
+        },
+        {
+          "layer": 24,
+          "mean_margin": -1.0109801292419434,
+          "median_margin": -1.1445844173431396,
+          "top1_count": 8,
+          "mean_boundary_norm": 32.8524169921875
+        },
+        {
+          "layer": 25,
+          "mean_margin": -0.7677008509635925,
+          "median_margin": -0.8585121631622314,
+          "top1_count": 10,
+          "mean_boundary_norm": 41.667518615722656
+        },
+        {
+          "layer": 26,
+          "mean_margin": -0.9350956678390503,
+          "median_margin": -0.9925360679626465,
+          "top1_count": 10,
+          "mean_boundary_norm": 47.46874237060547
+        },
+        {
+          "layer": 27,
+          "mean_margin": -1.4157427549362183,
+          "median_margin": -1.360001802444458,
+          "top1_count": 8,
+          "mean_boundary_norm": 53.58589172363281
+        },
+        {
+          "layer": 28,
+          "mean_margin": -1.5881673097610474,
+          "median_margin": -1.9576432704925537,
+          "top1_count": 7,
+          "mean_boundary_norm": 60.67585754394531
+        },
+        {
+          "layer": 29,
+          "mean_margin": -2.0936360359191895,
+          "median_margin": -2.5166289806365967,
+          "top1_count": 7,
+          "mean_boundary_norm": 67.9338150024414
+        },
+        {
+          "layer": 30,
+          "mean_margin": -2.4548518657684326,
+          "median_margin": -3.1847853660583496,
+          "top1_count": 8,
+          "mean_boundary_norm": 76.26043701171875
+        },
+        {
+          "layer": 31,
+          "mean_margin": -3.484071731567383,
+          "median_margin": -4.493914604187012,
+          "top1_count": 8,
+          "mean_boundary_norm": 84.56938171386719
+        },
+        {
+          "layer": 32,
+          "mean_margin": -4.289552688598633,
+          "median_margin": -5.659869194030762,
+          "top1_count": 8,
+          "mean_boundary_norm": 91.8785629272461
+        },
+        {
+          "layer": 33,
+          "mean_margin": -4.911113739013672,
+          "median_margin": -6.06514310836792,
+          "top1_count": 8,
+          "mean_boundary_norm": 99.06234741210938
+        },
+        {
+          "layer": 34,
+          "mean_margin": -5.769563674926758,
+          "median_margin": -6.409221649169922,
+          "top1_count": 6,
+          "mean_boundary_norm": 107.68276977539062
+        },
+        {
+          "layer": 35,
+          "mean_margin": -8.523137092590332,
+          "median_margin": -9.326187133789062,
+          "top1_count": 6,
+          "mean_boundary_norm": 119.26129150390625
+        },
+        {
+          "layer": 36,
+          "mean_margin": -1.214962363243103,
+          "median_margin": -1.279112696647644,
+          "top1_count": 3,
+          "mean_boundary_norm": 34.772132873535156
+        }
+      ],
+      "template_residual": [
+        {
+          "layer": 0,
+          "mean_margin": 0.013594700954854488,
+          "median_margin": 0.009192795492708683,
+          "top1_count": 20,
+          "mean_boundary_norm": 0.35590827465057373
+        },
+        {
+          "layer": 1,
+          "mean_margin": -0.006099800579249859,
+          "median_margin": -0.01828853413462639,
+          "top1_count": 12,
+          "mean_boundary_norm": 3.462076187133789
+        },
+        {
+          "layer": 2,
+          "mean_margin": -0.008944216184318066,
+          "median_margin": -0.01673758402466774,
+          "top1_count": 15,
+          "mean_boundary_norm": 4.349981784820557
+        },
+        {
+          "layer": 3,
+          "mean_margin": -0.018004393205046654,
+          "median_margin": -0.03570057451725006,
+          "top1_count": 13,
+          "mean_boundary_norm": 5.210380554199219
+        },
+        {
+          "layer": 4,
+          "mean_margin": -0.014255410060286522,
+          "median_margin": -0.025377346202731133,
+          "top1_count": 15,
+          "mean_boundary_norm": 6.867671012878418
+        },
+        {
+          "layer": 5,
+          "mean_margin": -0.028452731668949127,
+          "median_margin": -0.07427304983139038,
+          "top1_count": 14,
+          "mean_boundary_norm": 8.571846961975098
+        },
+        {
+          "layer": 6,
+          "mean_margin": -0.023117169737815857,
+          "median_margin": -0.04209037125110626,
+          "top1_count": 15,
+          "mean_boundary_norm": 11.560827255249023
+        },
+        {
+          "layer": 7,
+          "mean_margin": -0.04627745971083641,
+          "median_margin": -0.031205205246806145,
+          "top1_count": 14,
+          "mean_boundary_norm": 12.643993377685547
+        },
+        {
+          "layer": 8,
+          "mean_margin": -0.002901889383792877,
+          "median_margin": 0.011533759534358978,
+          "top1_count": 16,
+          "mean_boundary_norm": 14.172560691833496
+        },
+        {
+          "layer": 9,
+          "mean_margin": 0.010889003984630108,
+          "median_margin": 0.024088367819786072,
+          "top1_count": 17,
+          "mean_boundary_norm": 15.86808967590332
+        },
+        {
+          "layer": 10,
+          "mean_margin": 0.055357687175273895,
+          "median_margin": 0.077414870262146,
+          "top1_count": 19,
+          "mean_boundary_norm": 16.0478515625
+        },
+        {
+          "layer": 11,
+          "mean_margin": 0.105527363717556,
+          "median_margin": 0.13148662447929382,
+          "top1_count": 21,
+          "mean_boundary_norm": 16.71682357788086
+        },
+        {
+          "layer": 12,
+          "mean_margin": 0.08549091964960098,
+          "median_margin": 0.13235414028167725,
+          "top1_count": 21,
+          "mean_boundary_norm": 17.021400451660156
+        },
+        {
+          "layer": 13,
+          "mean_margin": 0.09196002036333084,
+          "median_margin": 0.1072390004992485,
+          "top1_count": 22,
+          "mean_boundary_norm": 17.746875762939453
+        },
+        {
+          "layer": 14,
+          "mean_margin": 0.08688569813966751,
+          "median_margin": 0.11340537667274475,
+          "top1_count": 20,
+          "mean_boundary_norm": 18.212921142578125
+        },
+        {
+          "layer": 15,
+          "mean_margin": 0.0651768296957016,
+          "median_margin": 0.10088825225830078,
+          "top1_count": 18,
+          "mean_boundary_norm": 19.133913040161133
+        },
+        {
+          "layer": 16,
+          "mean_margin": 0.05660392716526985,
+          "median_margin": 0.084052175283432,
+          "top1_count": 19,
+          "mean_boundary_norm": 19.23360252380371
+        },
+        {
+          "layer": 17,
+          "mean_margin": 0.05959701165556908,
+          "median_margin": 0.08865401148796082,
+          "top1_count": 18,
+          "mean_boundary_norm": 19.212520599365234
+        },
+        {
+          "layer": 18,
+          "mean_margin": 0.07422187924385071,
+          "median_margin": 0.10553053021430969,
+          "top1_count": 20,
+          "mean_boundary_norm": 19.528545379638672
+        },
+        {
+          "layer": 19,
+          "mean_margin": 0.08706101775169373,
+          "median_margin": 0.09682101011276245,
+          "top1_count": 21,
+          "mean_boundary_norm": 19.294754028320312
+        },
+        {
+          "layer": 20,
+          "mean_margin": 0.07137142866849899,
+          "median_margin": 0.0939384400844574,
+          "top1_count": 20,
+          "mean_boundary_norm": 20.95162582397461
+        },
+        {
+          "layer": 21,
+          "mean_margin": 0.062303006649017334,
+          "median_margin": 0.10403966903686523,
+          "top1_count": 19,
+          "mean_boundary_norm": 21.81768035888672
+        },
+        {
+          "layer": 22,
+          "mean_margin": 0.11267264187335968,
+          "median_margin": 0.13785836100578308,
+          "top1_count": 21,
+          "mean_boundary_norm": 23.315513610839844
+        },
+        {
+          "layer": 23,
+          "mean_margin": 0.13483043015003204,
+          "median_margin": 0.1324431300163269,
+          "top1_count": 20,
+          "mean_boundary_norm": 27.131879806518555
+        },
+        {
+          "layer": 24,
+          "mean_margin": 0.2635267972946167,
+          "median_margin": 0.21090149879455566,
+          "top1_count": 21,
+          "mean_boundary_norm": 32.8524169921875
+        },
+        {
+          "layer": 25,
+          "mean_margin": 0.4088650047779083,
+          "median_margin": 0.2032650113105774,
+          "top1_count": 22,
+          "mean_boundary_norm": 41.667518615722656
+        },
+        {
+          "layer": 26,
+          "mean_margin": 0.38970279693603516,
+          "median_margin": 0.26917511224746704,
+          "top1_count": 19,
+          "mean_boundary_norm": 47.468746185302734
+        },
+        {
+          "layer": 27,
+          "mean_margin": 0.30093714594841003,
+          "median_margin": 0.33394238352775574,
+          "top1_count": 19,
+          "mean_boundary_norm": 53.58589172363281
+        },
+        {
+          "layer": 28,
+          "mean_margin": 0.4077766239643097,
+          "median_margin": 0.4509960412979126,
+          "top1_count": 19,
+          "mean_boundary_norm": 60.67585754394531
+        },
+        {
+          "layer": 29,
+          "mean_margin": 0.36855432391166687,
+          "median_margin": 0.3745603561401367,
+          "top1_count": 20,
+          "mean_boundary_norm": 67.9338150024414
+        },
+        {
+          "layer": 30,
+          "mean_margin": 0.6518718004226685,
+          "median_margin": 0.7263904809951782,
+          "top1_count": 21,
+          "mean_boundary_norm": 76.26042938232422
+        },
+        {
+          "layer": 31,
+          "mean_margin": 0.800686240196228,
+          "median_margin": 1.0757907629013062,
+          "top1_count": 21,
+          "mean_boundary_norm": 84.56938171386719
+        },
+        {
+          "layer": 32,
+          "mean_margin": 0.9462061524391174,
+          "median_margin": 1.4249169826507568,
+          "top1_count": 20,
+          "mean_boundary_norm": 91.8785629272461
+        },
+        {
+          "layer": 33,
+          "mean_margin": 0.8301039934158325,
+          "median_margin": 1.2380762100219727,
+          "top1_count": 19,
+          "mean_boundary_norm": 99.06234741210938
+        },
+        {
+          "layer": 34,
+          "mean_margin": 0.631296694278717,
+          "median_margin": 0.9388225078582764,
+          "top1_count": 20,
+          "mean_boundary_norm": 107.68276977539062
+        },
+        {
+          "layer": 35,
+          "mean_margin": 0.6801088452339172,
+          "median_margin": 0.7708945274353027,
+          "top1_count": 19,
+          "mean_boundary_norm": 119.26129150390625
+        },
+        {
+          "layer": 36,
+          "mean_margin": 0.28770703077316284,
+          "median_margin": 0.3777077794075012,
+          "top1_count": 22,
+          "mean_boundary_norm": 34.77213668823242
+        }
+      ]
+    }
+  },
+  "category_summary": {
+    "answer_last": {
+      "raw": {
+        "fruit": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 12.566646575927734,
+          "final_margin": -0.0805354118347168,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 12.566646575927734,
+            "final": -0.0805354118347168,
+            "mean": 1.1442694424374684
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 220.56139755249023,
+            "final": 45.80894088745117,
+            "mean": 46.48845175930576
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.904138058423996
+            },
+            {
+              "category": "color",
+              "cos": 0.8707544207572937
+            },
+            {
+              "category": "food",
+              "cos": 0.8623892366886139
+            },
+            {
+              "category": "substance",
+              "cos": 0.8481582403182983
+            },
+            {
+              "category": "material",
+              "cos": 0.8457538485527039
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 7.946971893310547,
+          "final_margin": 0.8861088752746582,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 7.946971893310547,
+            "final": 0.8861088752746582,
+            "mean": -0.04546522912946907
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 205.52112770080566,
+            "final": 42.8079776763916,
+            "mean": 43.413371027371774
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.8851390331983566
+            },
+            {
+              "category": "color",
+              "cos": 0.8685966432094574
+            },
+            {
+              "category": "body",
+              "cos": 0.8684864044189453
+            },
+            {
+              "category": "relation",
+              "cos": 0.8640972226858139
+            },
+            {
+              "category": "action",
+              "cos": 0.8626860976219177
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 5.327129364013672,
+          "final_margin": 0.8940403461456299,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 5.327129364013672,
+            "final": 0.8940403461456299,
+            "mean": 0.483786740013071
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 189.82786178588867,
+            "final": 38.82781982421875,
+            "mean": 37.86197436751949
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.9297165423631668
+            },
+            {
+              "category": "machine",
+              "cos": 0.92798712849617
+            },
+            {
+              "category": "action",
+              "cos": 0.9111237972974777
+            },
+            {
+              "category": "furniture",
+              "cos": 0.9106695502996445
+            },
+            {
+              "category": "light",
+              "cos": 0.9102925658226013
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 10.099660873413086,
+          "final_margin": 1.7808222770690918,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 10.099660873413086,
+            "final": 1.7808222770690918,
+            "mean": 1.015246336524551
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 175.8990478515625,
+            "final": 36.66390514373779,
+            "mean": 35.64263332197191
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "machine",
+              "cos": 0.9294354915618896
+            },
+            {
+              "category": "container",
+              "cos": 0.9168578535318375
+            },
+            {
+              "category": "place",
+              "cos": 0.914309024810791
+            },
+            {
+              "category": "building",
+              "cos": 0.9119649827480316
+            },
+            {
+              "category": "action",
+              "cos": 0.9027658402919769
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 3.4107131958007812,
+          "final_margin": 1.856637954711914,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 3.4107131958007812,
+            "final": 1.856637954711914,
+            "mean": -0.6171094523491086
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 194.5258560180664,
+            "final": 39.154579639434814,
+            "mean": 38.81800169442352
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.9225491136312485
+            },
+            {
+              "category": "furniture",
+              "cos": 0.9062340259552002
+            },
+            {
+              "category": "action",
+              "cos": 0.8957607001066208
+            },
+            {
+              "category": "material",
+              "cos": 0.8936565667390823
+            },
+            {
+              "category": "light",
+              "cos": 0.8917598277330399
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.6216409206390381,
+          "final_margin": 0.6216409206390381,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.6216409206390381,
+            "final": 0.6216409206390381,
+            "mean": -2.950367178868603
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 179.24267196655273,
+            "final": 36.864251136779785,
+            "mean": 35.53452119352044
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.9625406116247177
+            },
+            {
+              "category": "building",
+              "cos": 0.9398777335882187
+            },
+            {
+              "category": "machine",
+              "cos": 0.9359260052442551
+            },
+            {
+              "category": "clothing",
+              "cos": 0.9351776391267776
+            },
+            {
+              "category": "place",
+              "cos": 0.932204008102417
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 14.770498275756836,
+          "final_margin": 1.2949857711791992,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 14.770498275756836,
+            "final": 1.2949857711791992,
+            "mean": 1.5472916775458567
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 188.14847946166992,
+            "final": 41.67572593688965,
+            "mean": 39.472174855402194
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.9051306992769241
+            },
+            {
+              "category": "container",
+              "cos": 0.8977268636226654
+            },
+            {
+              "category": "material",
+              "cos": 0.8972275257110596
+            },
+            {
+              "category": "action",
+              "cos": 0.8868081867694855
+            },
+            {
+              "category": "light",
+              "cos": 0.8821512907743454
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 15.018783569335938,
+          "final_margin": 1.7252941131591797,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 15.018783569335938,
+            "final": 1.7252941131591797,
+            "mean": 1.5939790026561633
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 182.61423873901367,
+            "final": 37.54210042953491,
+            "mean": 38.58365287546169
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.9239505082368851
+            },
+            {
+              "category": "color",
+              "cos": 0.9178150147199631
+            },
+            {
+              "category": "material",
+              "cos": 0.9096171259880066
+            },
+            {
+              "category": "light",
+              "cos": 0.9090109765529633
+            },
+            {
+              "category": "substance",
+              "cos": 0.9087573140859604
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.43461132049560547,
+          "final_margin": 0.43461132049560547,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.43461132049560547,
+            "final": 0.43461132049560547,
+            "mean": -4.1455670622857035
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 154.0330352783203,
+            "final": 30.635403156280518,
+            "mean": 33.17295048476474
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "action",
+              "cos": 0.9576992839574814
+            },
+            {
+              "category": "light",
+              "cos": 0.956206351518631
+            },
+            {
+              "category": "property",
+              "cos": 0.9519635587930679
+            },
+            {
+              "category": "sound",
+              "cos": 0.9518690854310989
+            },
+            {
+              "category": "number",
+              "cos": 0.94817054271698
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.4907979965209961,
+          "final_margin": 0.4907979965209961,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.4907979965209961,
+            "final": 0.4907979965209961,
+            "mean": -0.9976813595842671
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 136.87229347229004,
+            "final": 27.235033988952637,
+            "mean": 30.090889831753195
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "building",
+              "cos": 0.9809576869010925
+            },
+            {
+              "category": "event",
+              "cos": 0.9653051942586899
+            },
+            {
+              "category": "action",
+              "cos": 0.9558256268501282
+            },
+            {
+              "category": "time",
+              "cos": 0.9545872509479523
+            },
+            {
+              "category": "light",
+              "cos": 0.95444256067276
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 11.100666046142578,
+          "final_margin": 1.4498825073242188,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 11.100666046142578,
+            "final": 1.4498825073242188,
+            "mean": 0.9414146268689955
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 165.4808464050293,
+            "final": 32.28406381607056,
+            "mean": 33.906130850315094
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "place",
+              "cos": 0.9696204215288162
+            },
+            {
+              "category": "container",
+              "cos": 0.922282874584198
+            },
+            {
+              "category": "event",
+              "cos": 0.9190266132354736
+            },
+            {
+              "category": "action",
+              "cos": 0.9128310978412628
+            },
+            {
+              "category": "light",
+              "cos": 0.9119509011507034
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 5.762504577636719,
+          "final_margin": -0.3712177276611328,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 5.762504577636719,
+            "final": -0.3712177276611328,
+            "mean": 0.7084545670328913
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 150.8144760131836,
+            "final": 29.981300830841064,
+            "mean": 32.610562460043944
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.9797886610031128
+            },
+            {
+              "category": "color",
+              "cos": 0.9620647579431534
+            },
+            {
+              "category": "light",
+              "cos": 0.9618557393550873
+            },
+            {
+              "category": "container",
+              "cos": 0.9558404088020325
+            },
+            {
+              "category": "property",
+              "cos": 0.9550624191761017
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 10.995294570922852,
+          "final_margin": -0.06255912780761719,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 10.995294570922852,
+            "final": -0.06255912780761719,
+            "mean": 1.9235312989031947
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 134.90872383117676,
+            "final": 28.460779190063477,
+            "mean": 31.764977433794254
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.9475745558738708
+            },
+            {
+              "category": "number",
+              "cos": 0.9458822757005692
+            },
+            {
+              "category": "action",
+              "cos": 0.9418331682682037
+            },
+            {
+              "category": "time",
+              "cos": 0.9391412138938904
+            },
+            {
+              "category": "property",
+              "cos": 0.9386454224586487
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 2.559739828109741,
+          "final_margin": 2.559739828109741,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 2.559739828109741,
+            "final": 2.559739828109741,
+            "mean": -5.6226547147474575
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 170.7564582824707,
+            "final": 35.26417112350464,
+            "mean": 37.57979409980613
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.9625333100557327
+            },
+            {
+              "category": "sound",
+              "cos": 0.9578117579221725
+            },
+            {
+              "category": "event",
+              "cos": 0.957204595208168
+            },
+            {
+              "category": "action",
+              "cos": 0.9526064395904541
+            },
+            {
+              "category": "communication",
+              "cos": 0.950432226061821
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.06940236687660217,
+          "final_margin": -1.5149683952331543,
+          "best_rank": 3,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.06940236687660217,
+            "final": -1.5149683952331543,
+            "mean": -4.894520145413038
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 147.85222625732422,
+            "final": 31.68949317932129,
+            "mean": 32.78805216542772
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 22.52334976196289,
+          "final_margin": 1.8772220611572266,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 22.52334976196289,
+            "final": 1.8772220611572266,
+            "mean": 3.4539453920883103
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 166.1489601135254,
+            "final": 34.62799119949341,
+            "mean": 36.42102378375224
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.9929328709840775
+            },
+            {
+              "category": "relation",
+              "cos": 0.9755542576313019
+            },
+            {
+              "category": "action",
+              "cos": 0.959533765912056
+            },
+            {
+              "category": "event",
+              "cos": 0.9561050981283188
+            },
+            {
+              "category": "communication",
+              "cos": 0.9554585516452789
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.04586146026849747,
+          "final_margin": -1.178184986114502,
+          "best_rank": 5,
+          "final_rank": 5,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.04586146026849747,
+            "final": -1.178184986114502,
+            "mean": -3.7079613359796033
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 129.41782188415527,
+            "final": 26.57672357559204,
+            "mean": 30.52538554360335
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.07747800648212433,
+          "final_margin": -1.120460033416748,
+          "best_rank": 4,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.07747800648212433,
+            "final": -1.120460033416748,
+            "mean": -3.759777192328427
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.9380989074707,
+            "final": 21.395252227783203,
+            "mean": 24.69132707711007
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 4.609006881713867,
+          "final_margin": -0.29348039627075195,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 4.609006881713867,
+            "final": -0.29348039627075195,
+            "mean": -0.4278669024037348
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.78064727783203,
+            "final": 25.23506784439087,
+            "mean": 28.86444757173996
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "communication",
+              "cos": 0.9816520512104034
+            },
+            {
+              "category": "action",
+              "cos": 0.9811818450689316
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9797255545854568
+            },
+            {
+              "category": "sound",
+              "cos": 0.9759908020496368
+            },
+            {
+              "category": "time",
+              "cos": 0.9753075540065765
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.06895022094249725,
+          "final_margin": -0.5445270538330078,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.06895022094249725,
+            "final": -0.5445270538330078,
+            "mean": -1.555015859168929
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 132.99430656433105,
+            "final": 27.05320644378662,
+            "mean": 31.06742716228237
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.06700360029935837,
+          "final_margin": -0.1749124526977539,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.06700360029935837,
+            "final": -0.1749124526977539,
+            "mean": -2.1077735277043805
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.69750595092773,
+            "final": 28.21238946914673,
+            "mean": 31.934869375583286
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 7.38432502746582,
+          "final_margin": 0.4552621841430664,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 7.38432502746582,
+            "final": 0.4552621841430664,
+            "mean": 0.6451973141850652
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 140.0998249053955,
+            "final": 30.188287258148193,
+            "mean": 30.624204379078503
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9574260264635086
+            },
+            {
+              "category": "number",
+              "cos": 0.9570009559392929
+            },
+            {
+              "category": "light",
+              "cos": 0.9559621065855026
+            },
+            {
+              "category": "action",
+              "cos": 0.9539428949356079
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9485516846179962
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 25.379627227783203,
+          "final_margin": 0.481966495513916,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 25.379627227783203,
+            "final": 0.481966495513916,
+            "mean": 5.0548596881531385
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 118.66140556335449,
+            "final": 23.064629077911377,
+            "mean": 25.976619872541445
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "action",
+              "cos": 0.9692786335945129
+            },
+            {
+              "category": "communication",
+              "cos": 0.9688930958509445
+            },
+            {
+              "category": "light",
+              "cos": 0.9647795706987381
+            },
+            {
+              "category": "property",
+              "cos": 0.963172972202301
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9619963616132736
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 4.982769966125488,
+          "final_margin": 0.3267030715942383,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 4.982769966125488,
+            "final": 0.3267030715942383,
+            "mean": -0.20530069961741165
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 105.26183128356934,
+            "final": 21.288548469543457,
+            "mean": 22.93317273631692
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.9635850638151169
+            },
+            {
+              "category": "action",
+              "cos": 0.9624396711587906
+            },
+            {
+              "category": "sound",
+              "cos": 0.9605724364519119
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9595357477664948
+            },
+            {
+              "category": "time",
+              "cos": 0.9583994150161743
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 30,
+          "best_boundary_layer": 35,
+          "best_margin": 7.71497917175293,
+          "final_margin": 0.7042899131774902,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 30,
+            "max": 7.71497917175293,
+            "final": 0.7042899131774902,
+            "mean": -0.2681409978383296
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 150.33401107788086,
+            "final": 29.63987970352173,
+            "mean": 32.87529808423809
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.9364998638629913
+            },
+            {
+              "category": "sound",
+              "cos": 0.9253810048103333
+            },
+            {
+              "category": "substance",
+              "cos": 0.9228842407464981
+            },
+            {
+              "category": "event",
+              "cos": 0.9214721918106079
+            },
+            {
+              "category": "property",
+              "cos": 0.9140489995479584
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.16415786743164062,
+          "final_margin": 0.16415786743164062,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.16415786743164062,
+            "final": 0.16415786743164062,
+            "mean": -4.964973639042394
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.1689796447754,
+            "final": 25.847533226013184,
+            "mean": 28.112025622278452
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.9625406414270401
+            },
+            {
+              "category": "action",
+              "cos": 0.9571252465248108
+            },
+            {
+              "category": "light",
+              "cos": 0.9566501826047897
+            },
+            {
+              "category": "machine",
+              "cos": 0.9533767253160477
+            },
+            {
+              "category": "shape",
+              "cos": 0.9520996958017349
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 31,
+          "best_boundary_layer": 35,
+          "best_margin": 3.069906234741211,
+          "final_margin": 0.06038641929626465,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 31,
+            "max": 3.069906234741211,
+            "final": 0.06038641929626465,
+            "mean": -0.6616466063502673
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 254.05381774902344,
+            "final": 54.92038059234619,
+            "mean": 51.59796485153807
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "sound",
+              "cos": 0.8433035016059875
+            },
+            {
+              "category": "tool",
+              "cos": 0.8379139602184296
+            },
+            {
+              "category": "container",
+              "cos": 0.8328005075454712
+            },
+            {
+              "category": "machine",
+              "cos": 0.8320735991001129
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.8290330320596695
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 1.1684322357177734,
+          "final_margin": 1.1684322357177734,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 1.1684322357177734,
+            "final": 1.1684322357177734,
+            "mean": -1.46336439574087
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 146.5828742980957,
+            "final": 31.781652450561523,
+            "mean": 31.061917177728706
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.9533767104148865
+            },
+            {
+              "category": "light",
+              "cos": 0.9512541890144348
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.9508314728736877
+            },
+            {
+              "category": "action",
+              "cos": 0.9461723268032074
+            },
+            {
+              "category": "sound",
+              "cos": 0.9442934691905975
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.5156936645507812,
+          "final_margin": 0.5156936645507812,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.5156936645507812,
+            "final": 0.5156936645507812,
+            "mean": -2.662879924717787
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.81010055541992,
+            "final": 27.084124088287354,
+            "mean": 29.376751098580456
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.9830416440963745
+            },
+            {
+              "category": "event",
+              "cos": 0.978470116853714
+            },
+            {
+              "category": "action",
+              "cos": 0.9781617820262909
+            },
+            {
+              "category": "sound",
+              "cos": 0.9748840928077698
+            },
+            {
+              "category": "property",
+              "cos": 0.9734603464603424
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.10387133061885834,
+          "final_margin": -1.082313060760498,
+          "best_rank": 3,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.10387133061885834,
+            "final": -1.082313060760498,
+            "mean": -2.0880836606831163
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 139.91095161437988,
+            "final": 28.763953685760498,
+            "mean": 31.958888760490996
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "property",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "instrument",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.0842314288020134,
+          "final_margin": -0.43834590911865234,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0842314288020134,
+            "final": -0.43834590911865234,
+            "mean": -1.638817068088699
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 121.33844184875488,
+            "final": 25.448002815246582,
+            "mean": 29.268507630941837
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "relation",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "communication",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "machine",
+              "cos": 0.999999612569809
+            },
+            {
+              "category": "instrument",
+              "cos": 0.999999612569809
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.5709123611450195,
+          "final_margin": 0.5709123611450195,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.5709123611450195,
+            "final": 0.5709123611450195,
+            "mean": -0.6405027732253075
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 133.91579055786133,
+            "final": 28.7269868850708,
+            "mean": 29.04600239232988
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.977335974574089
+            },
+            {
+              "category": "light",
+              "cos": 0.9605551362037659
+            },
+            {
+              "category": "weather",
+              "cos": 0.9590563774108887
+            },
+            {
+              "category": "color",
+              "cos": 0.9555779248476028
+            },
+            {
+              "category": "action",
+              "cos": 0.9514836221933365
+            }
+          ]
+        }
+      },
+      "template_residual": {
+        "fruit": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 14.065909385681152,
+          "final_margin": 1.4212632179260254,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 14.065909385681152,
+            "final": 1.4212632179260254,
+            "mean": 2.0721109765927888
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 220.5614013671875,
+            "final": 45.80894184112549,
+            "mean": 46.488452035178604
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.5258702039718628
+            },
+            {
+              "category": "food",
+              "cos": 0.3344279155135155
+            },
+            {
+              "category": "animal",
+              "cos": 0.26465051993727684
+            },
+            {
+              "category": "color",
+              "cos": 0.1995224431157112
+            },
+            {
+              "category": "instrument",
+              "cos": 0.14819669164717197
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 11.36322021484375,
+          "final_margin": 1.5792555809020996,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 11.36322021484375,
+            "final": 1.5792555809020996,
+            "mean": 1.5198892825157255
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 205.52112770080566,
+            "final": 42.80797815322876,
+            "mean": 43.413371379764094
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.3594980612397194
+            },
+            {
+              "category": "fruit",
+              "cos": 0.26465051993727684
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.1468258099630475
+            },
+            {
+              "category": "instrument",
+              "cos": 0.140935099683702
+            },
+            {
+              "category": "food",
+              "cos": 0.13901549763977528
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 5.335445404052734,
+          "final_margin": 1.1706109046936035,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 5.335445404052734,
+            "final": 1.1706109046936035,
+            "mean": 0.928041111904423
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 189.82786178588867,
+            "final": 38.827820777893066,
+            "mean": 37.861974259939146
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "machine",
+              "cos": 0.2981857843697071
+            },
+            {
+              "category": "container",
+              "cos": 0.2583213560283184
+            },
+            {
+              "category": "instrument",
+              "cos": 0.2432435117661953
+            },
+            {
+              "category": "furniture",
+              "cos": 0.22816429659724236
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.21897535026073456
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 12.081697463989258,
+          "final_margin": 2.131718397140503,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 12.081697463989258,
+            "final": 2.131718397140503,
+            "mean": 2.116533336550551
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 175.89904403686523,
+            "final": 36.66390514373779,
+            "mean": 35.64263313097527
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "machine",
+              "cos": 0.3770565614104271
+            },
+            {
+              "category": "building",
+              "cos": 0.23209437727928162
+            },
+            {
+              "category": "tool",
+              "cos": 0.21268579363822937
+            },
+            {
+              "category": "instrument",
+              "cos": 0.21181918680667877
+            },
+            {
+              "category": "furniture",
+              "cos": 0.17461592331528664
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 14.787117004394531,
+          "final_margin": 2.7522354125976562,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 14.787117004394531,
+            "final": 2.7522354125976562,
+            "mean": 1.7646740346744254
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 194.5258560180664,
+            "final": 39.15458106994629,
+            "mean": 38.81800192841203
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.31356777250766754
+            },
+            {
+              "category": "furniture",
+              "cos": 0.30307015776634216
+            },
+            {
+              "category": "tool",
+              "cos": 0.1684913318604231
+            },
+            {
+              "category": "food",
+              "cos": 0.15153204463422298
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.12241736985743046
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 7.667205810546875,
+          "final_margin": 1.2906519174575806,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 7.667205810546875,
+            "final": 1.2906519174575806,
+            "mean": 0.9084037702996284
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 179.24266815185547,
+            "final": 36.8642520904541,
+            "mean": 35.53452121979884
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.496140219271183
+            },
+            {
+              "category": "clothing",
+              "cos": 0.299984909594059
+            },
+            {
+              "category": "building",
+              "cos": 0.24134346097707748
+            },
+            {
+              "category": "tool",
+              "cos": 0.23181910067796707
+            },
+            {
+              "category": "machine",
+              "cos": 0.22109539061784744
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 16.224552154541016,
+          "final_margin": 2.6528751850128174,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 16.224552154541016,
+            "final": 2.6528751850128174,
+            "mean": 2.6812001096361593
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 188.14847946166992,
+            "final": 41.67572593688965,
+            "mean": 39.472175176381256
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.35349655896425247
+            },
+            {
+              "category": "substance",
+              "cos": 0.22842523083090782
+            },
+            {
+              "category": "material",
+              "cos": 0.20682797208428383
+            },
+            {
+              "category": "plant",
+              "cos": 0.17296877689659595
+            },
+            {
+              "category": "clothing",
+              "cos": 0.15955401584506035
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 11.985186576843262,
+          "final_margin": 1.7932714223861694,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 11.985186576843262,
+            "final": 1.7932714223861694,
+            "mean": 2.250852354100553
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 182.61424255371094,
+            "final": 37.54210042953491,
+            "mean": 38.583653379080666
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.5258702337741852
+            },
+            {
+              "category": "animal",
+              "cos": 0.3594980537891388
+            },
+            {
+              "category": "food",
+              "cos": 0.17814994417130947
+            },
+            {
+              "category": "material",
+              "cos": 0.15437956899404526
+            },
+            {
+              "category": "color",
+              "cos": 0.13419203832745552
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 4.872318267822266,
+          "final_margin": 0.9427648782730103,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 4.872318267822266,
+            "final": 0.9427648782730103,
+            "mean": 0.4696808838084139
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 154.03303909301758,
+            "final": 30.635404586791992,
+            "mean": 33.17295063941462
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "shape",
+              "cos": 0.11185912974178791
+            },
+            {
+              "category": "property",
+              "cos": 0.0686867805197835
+            },
+            {
+              "category": "tool",
+              "cos": 0.05604620455414988
+            },
+            {
+              "category": "action",
+              "cos": 0.04825420444831252
+            },
+            {
+              "category": "number",
+              "cos": 0.04776464309543371
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 7.843368053436279,
+          "final_margin": 1.3045341968536377,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 7.843368053436279,
+            "final": 1.3045341968536377,
+            "mean": 1.3471777426154428
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 136.87228965759277,
+            "final": 27.235034465789795,
+            "mean": 30.090889749897492
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "building",
+              "cos": 0.6884442269802094
+            },
+            {
+              "category": "event",
+              "cos": 0.22135038673877716
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.11992021184414625
+            },
+            {
+              "category": "role",
+              "cos": 0.09067439660429955
+            },
+            {
+              "category": "relation",
+              "cos": 0.07053574663586915
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 10.45529556274414,
+          "final_margin": 1.3960206508636475,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 10.45529556274414,
+            "final": 1.3960206508636475,
+            "mean": 1.767699084965185
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 165.48083877563477,
+            "final": 32.28406381607056,
+            "mean": 33.90613055601716
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "place",
+              "cos": 0.6921881586313248
+            },
+            {
+              "category": "furniture",
+              "cos": 0.26159297302365303
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.24076756834983826
+            },
+            {
+              "category": "container",
+              "cos": 0.14159392938017845
+            },
+            {
+              "category": "machine",
+              "cos": 0.08346689399331808
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 1.3601875305175781,
+          "final_margin": 0.0784311294555664,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 1.3601875305175781,
+            "final": 0.0784311294555664,
+            "mean": 0.161041604323514
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 150.8144760131836,
+            "final": 29.981302738189697,
+            "mean": 32.61056245672139
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.5649473294615746
+            },
+            {
+              "category": "food",
+              "cos": 0.20682797208428383
+            },
+            {
+              "category": "color",
+              "cos": 0.2035766914486885
+            },
+            {
+              "category": "plant",
+              "cos": 0.15717505477368832
+            },
+            {
+              "category": "clothing",
+              "cos": 0.12339028902351856
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 13.417922019958496,
+          "final_margin": 2.3456673622131348,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 13.417922019958496,
+            "final": 2.3456673622131348,
+            "mean": 2.7175431077595094
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 134.90872383117676,
+            "final": 28.460779666900635,
+            "mean": 31.7649775334206
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "number",
+              "cos": 0.2041321061551571
+            },
+            {
+              "category": "material",
+              "cos": 0.20099039375782013
+            },
+            {
+              "category": "light",
+              "cos": 0.19837506860494614
+            },
+            {
+              "category": "fruit",
+              "cos": 0.1911623328924179
+            },
+            {
+              "category": "substance",
+              "cos": 0.16730554029345512
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 6.67250919342041,
+          "final_margin": 0.9868829250335693,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 6.67250919342041,
+            "final": 0.9868829250335693,
+            "mean": 0.9607392624523994
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 170.75646209716797,
+            "final": 35.26417016983032,
+            "mean": 37.57979409094598
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.529231995344162
+            },
+            {
+              "category": "event",
+              "cos": 0.356198463588953
+            },
+            {
+              "category": "sound",
+              "cos": 0.3412088453769684
+            },
+            {
+              "category": "communication",
+              "cos": 0.3117069099098444
+            },
+            {
+              "category": "property",
+              "cos": 0.30536796897649765
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 10,
+          "best_boundary_layer": 35,
+          "best_margin": 0.08107706904411316,
+          "final_margin": -1.3025436401367188,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 10,
+            "max": 0.08107706904411316,
+            "final": -1.3025436401367188,
+            "mean": -1.2186955791155532
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 147.85222244262695,
+            "final": 31.689492225646973,
+            "mean": 32.78805171929904
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "profession",
+              "cos": 0.8645180314779282
+            },
+            {
+              "category": "relation",
+              "cos": 0.7507358342409134
+            },
+            {
+              "category": "place",
+              "cos": 0.2531054876744747
+            },
+            {
+              "category": "animal",
+              "cos": 0.1567740524187684
+            },
+            {
+              "category": "building",
+              "cos": 0.1297173611819744
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 14.167308807373047,
+          "final_margin": 2.518643617630005,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 14.167308807373047,
+            "final": 2.518643617630005,
+            "mean": 2.6007723943330348
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 166.14896392822266,
+            "final": 34.62799263000488,
+            "mean": 36.4210238432562
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.8752464205026627
+            },
+            {
+              "category": "relation",
+              "cos": 0.5134169012308121
+            },
+            {
+              "category": "event",
+              "cos": 0.08612806024029851
+            },
+            {
+              "category": "communication",
+              "cos": 0.08048493321985006
+            },
+            {
+              "category": "place",
+              "cos": 0.06756793987005949
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.0,
+          "final_margin": -0.2567908763885498,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.0,
+            "final": -0.2567908763885498,
+            "mean": -0.3227608242902804
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 129.41781997680664,
+            "final": 26.5767240524292,
+            "mean": 30.525385437885653
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.0
+            },
+            {
+              "category": "property",
+              "cos": 0.0
+            },
+            {
+              "category": "relation",
+              "cos": 0.0
+            },
+            {
+              "category": "communication",
+              "cos": 0.0
+            },
+            {
+              "category": "machine",
+              "cos": 0.0
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 4.388736724853516,
+          "final_margin": 0.6025861501693726,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 4.388736724853516,
+            "final": 0.6025861501693726,
+            "mean": 0.7719542175119214
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.93809509277344,
+            "final": 21.395251274108887,
+            "mean": 24.69132673398063
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.4682660549879074
+            },
+            {
+              "category": "communication",
+              "cos": 0.4237724840641022
+            },
+            {
+              "category": "property",
+              "cos": 0.41475872322916985
+            },
+            {
+              "category": "event",
+              "cos": 0.38000547140836716
+            },
+            {
+              "category": "number",
+              "cos": 0.37863194569945335
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 6.089524269104004,
+          "final_margin": 0.6814508438110352,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 6.089524269104004,
+            "final": 0.6814508438110352,
+            "mean": 1.1546449952104405
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.78064727783203,
+            "final": 25.23506784439087,
+            "mean": 28.86444724270621
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "communication",
+              "cos": 0.49421245604753494
+            },
+            {
+              "category": "abstract",
+              "cos": 0.43700481951236725
+            },
+            {
+              "category": "action",
+              "cos": 0.39331449568271637
+            },
+            {
+              "category": "emotion",
+              "cos": 0.35822244361042976
+            },
+            {
+              "category": "time",
+              "cos": 0.3252115175127983
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 8.93368148803711,
+          "final_margin": 1.4826219081878662,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 8.93368148803711,
+            "final": 1.4826219081878662,
+            "mean": 1.8847110804950666
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 132.9943084716797,
+            "final": 27.053205490112305,
+            "mean": 31.067426936348546
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "number",
+              "cos": 0.49527548253536224
+            },
+            {
+              "category": "abstract",
+              "cos": 0.4444735646247864
+            },
+            {
+              "category": "event",
+              "cos": 0.32638829946517944
+            },
+            {
+              "category": "action",
+              "cos": 0.30168541893363
+            },
+            {
+              "category": "property",
+              "cos": 0.287904953584075
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 7.798404693603516,
+          "final_margin": 1.7733182907104492,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 7.798404693603516,
+            "final": 1.7733182907104492,
+            "mean": 1.5115110134655558
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.69750022888184,
+            "final": 28.212388515472412,
+            "mean": 31.934869300674748
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "time",
+              "cos": 0.49527548998594284
+            },
+            {
+              "category": "abstract",
+              "cos": 0.47479913383722305
+            },
+            {
+              "category": "property",
+              "cos": 0.4037712439894676
+            },
+            {
+              "category": "action",
+              "cos": 0.37863196060061455
+            },
+            {
+              "category": "relation",
+              "cos": 0.31741286907345057
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 13.33523178100586,
+          "final_margin": 2.525723457336426,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 13.33523178100586,
+            "final": 2.525723457336426,
+            "mean": 2.123680759875758
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 140.0998249053955,
+            "final": 30.188287258148193,
+            "mean": 30.624204913708002
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "number",
+              "cos": 0.2741282060742378
+            },
+            {
+              "category": "property",
+              "cos": 0.2596326880156994
+            },
+            {
+              "category": "light",
+              "cos": 0.16827081702649593
+            },
+            {
+              "category": "body",
+              "cos": 0.1133135138079524
+            },
+            {
+              "category": "abstract",
+              "cos": 0.09826707188040018
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 14.571065902709961,
+          "final_margin": 2.145251512527466,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 14.571065902709961,
+            "final": 2.145251512527466,
+            "mean": 2.6852538555457786
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 118.66140174865723,
+            "final": 23.064629077911377,
+            "mean": 25.976619406326396
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "communication",
+              "cos": 0.4454648792743683
+            },
+            {
+              "category": "action",
+              "cos": 0.34895262122154236
+            },
+            {
+              "category": "emotion",
+              "cos": 0.3412088453769684
+            },
+            {
+              "category": "abstract",
+              "cos": 0.3182661309838295
+            },
+            {
+              "category": "event",
+              "cos": 0.29586311429739
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 12.248817443847656,
+          "final_margin": 2.270285129547119,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 12.248817443847656,
+            "final": 2.270285129547119,
+            "mean": 2.2502030327198774
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 105.26183128356934,
+            "final": 21.288548469543457,
+            "mean": 22.9331728867381
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "weather",
+              "cos": 0.34009622037410736
+            },
+            {
+              "category": "property",
+              "cos": 0.29252873733639717
+            },
+            {
+              "category": "sound",
+              "cos": 0.2503079902380705
+            },
+            {
+              "category": "time",
+              "cos": 0.23035772144794464
+            },
+            {
+              "category": "color",
+              "cos": 0.20758620090782642
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 18.623369216918945,
+          "final_margin": 3.2452099323272705,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 18.623369216918945,
+            "final": 3.2452099323272705,
+            "mean": 3.823149112128728
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 150.33401489257812,
+            "final": 29.639881134033203,
+            "mean": 32.87529817203412
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.30965953692793846
+            },
+            {
+              "category": "substance",
+              "cos": 0.26419978216290474
+            },
+            {
+              "category": "event",
+              "cos": 0.16881593316793442
+            },
+            {
+              "category": "sound",
+              "cos": 0.1566400621086359
+            },
+            {
+              "category": "emotion",
+              "cos": 0.14444421418011189
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 7.639073371887207,
+          "final_margin": 1.2251948118209839,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 7.639073371887207,
+            "final": 1.2251948118209839,
+            "mean": 1.1786438614866268
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.16897583007812,
+            "final": 25.847532272338867,
+            "mean": 28.112025528491753
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.4961401969194412
+            },
+            {
+              "category": "clothing",
+              "cos": 0.3060838617384434
+            },
+            {
+              "category": "tool",
+              "cos": 0.25064918398857117
+            },
+            {
+              "category": "machine",
+              "cos": 0.15930981561541557
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.13583252858370543
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 6.2621307373046875,
+          "final_margin": 0.8584287166595459,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 6.2621307373046875,
+            "final": 0.8584287166595459,
+            "mean": 0.8680853500106448
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 254.05381774902344,
+            "final": 54.92038059234619,
+            "mean": 51.59796487429255
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": 0.2710984982550144
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.21181920357048512
+            },
+            {
+              "category": "machine",
+              "cos": 0.18360986933112144
+            },
+            {
+              "category": "fruit",
+              "cos": 0.17033801414072514
+            },
+            {
+              "category": "animal",
+              "cos": 0.15873937495052814
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 5.373648643493652,
+          "final_margin": 0.9149457216262817,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 5.373648643493652,
+            "final": 0.9149457216262817,
+            "mean": 0.8108962864451412
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 146.5828742980957,
+            "final": 31.781653881072998,
+            "mean": 31.061917360670662
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "vehicle",
+              "cos": 0.3753259479999542
+            },
+            {
+              "category": "tool",
+              "cos": 0.2981857843697071
+            },
+            {
+              "category": "furniture",
+              "cos": 0.21124538779258728
+            },
+            {
+              "category": "container",
+              "cos": 0.165779372677207
+            },
+            {
+              "category": "instrument",
+              "cos": 0.14350418746471405
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 6.495185375213623,
+          "final_margin": 1.3879547119140625,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 6.495185375213623,
+            "final": 1.3879547119140625,
+            "mean": 1.3318527606630546
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.81009674072266,
+            "final": 27.084124088287354,
+            "mean": 29.37675110069481
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.5942383408546448
+            },
+            {
+              "category": "event",
+              "cos": 0.489666610956192
+            },
+            {
+              "category": "sound",
+              "cos": 0.43023647367954254
+            },
+            {
+              "category": "action",
+              "cos": 0.4237724766135216
+            },
+            {
+              "category": "property",
+              "cos": 0.3720708079636097
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 31,
+          "best_boundary_layer": 35,
+          "best_margin": 0.29449892044067383,
+          "final_margin": -0.05303454399108887,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 31,
+            "max": 0.29449892044067383,
+            "final": -0.05303454399108887,
+            "mean": -0.0505469034904161
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 139.91095352172852,
+            "final": 28.763952255249023,
+            "mean": 31.958889079859127
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.6814962923526764
+            },
+            {
+              "category": "profession",
+              "cos": 0.4816198796033859
+            },
+            {
+              "category": "abstract",
+              "cos": 0.3690246641635895
+            },
+            {
+              "category": "number",
+              "cos": 0.3418555445969105
+            },
+            {
+              "category": "communication",
+              "cos": 0.2835768535733223
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 5.255438804626465,
+          "final_margin": 0.677621603012085,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 5.255438804626465,
+            "final": 0.677621603012085,
+            "mean": 0.8863260622098539
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 121.33843421936035,
+            "final": 25.448002815246582,
+            "mean": 29.268507511833228
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.6571805030107498
+            },
+            {
+              "category": "action",
+              "cos": 0.41475873813033104
+            },
+            {
+              "category": "number",
+              "cos": 0.4037712514400482
+            },
+            {
+              "category": "communication",
+              "cos": 0.3720708079636097
+            },
+            {
+              "category": "light",
+              "cos": 0.29252874478697777
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 3.38046932220459,
+          "final_margin": 0.7525136470794678,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 3.38046932220459,
+            "final": 0.7525136470794678,
+            "mean": 0.7941207869097943
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 133.91578674316406,
+            "final": 28.72698736190796,
+            "mean": 29.04600263246008
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.5680506825447083
+            },
+            {
+              "category": "weather",
+              "cos": 0.25835514441132545
+            },
+            {
+              "category": "food",
+              "cos": 0.22798195108771324
+            },
+            {
+              "category": "color",
+              "cos": 0.18650776892900467
+            },
+            {
+              "category": "light",
+              "cos": 0.11728703696280718
+            }
+          ]
+        }
+      }
+    },
+    "object_last": {
+      "raw": {
+        "fruit": {
+          "best_margin_layer": 13,
+          "best_boundary_layer": 35,
+          "best_margin": 0.5892878770828247,
+          "final_margin": -0.4650411605834961,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 13,
+            "max": 0.5892878770828247,
+            "final": -0.4650411605834961,
+            "mean": 0.030345926212297904
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 144.97214317321777,
+            "final": 42.10576152801514,
+            "mean": 41.80059549051362
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.8388429284095764
+            },
+            {
+              "category": "food",
+              "cos": 0.8008445352315903
+            },
+            {
+              "category": "animal",
+              "cos": 0.7904088497161865
+            },
+            {
+              "category": "color",
+              "cos": 0.7760712504386902
+            },
+            {
+              "category": "material",
+              "cos": 0.7493520379066467
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.00307328999042511,
+          "final_margin": -1.480125904083252,
+          "best_rank": 1,
+          "final_rank": 6,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.00307328999042511,
+            "final": -1.480125904083252,
+            "mean": -2.3003269695752375
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 144.5497817993164,
+            "final": 43.828209400177,
+            "mean": 39.384380442065165
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "vehicle",
+              "cos": 0.44626384973526
+            },
+            {
+              "category": "food",
+              "cos": 0.3975954055786133
+            },
+            {
+              "category": "fruit",
+              "cos": 0.38577014207839966
+            },
+            {
+              "category": "building",
+              "cos": 0.3736605644226074
+            },
+            {
+              "category": "plant",
+              "cos": 0.37105923891067505
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.004420533776283264,
+          "final_margin": -2.6541671752929688,
+          "best_rank": 1,
+          "final_rank": 16,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.004420533776283264,
+            "final": -2.6541671752929688,
+            "mean": -1.631884604692459
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 100.32007217407227,
+            "final": 27.61272621154785,
+            "mean": 31.23286329652812
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "instrument",
+              "cos": 0.4324324131011963
+            },
+            {
+              "category": "machine",
+              "cos": 0.4156884551048279
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.4142060875892639
+            },
+            {
+              "category": "clothing",
+              "cos": 0.41311198472976685
+            },
+            {
+              "category": "profession",
+              "cos": 0.4119364619255066
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 13,
+          "best_boundary_layer": 35,
+          "best_margin": 0.1809757947921753,
+          "final_margin": -0.3115663528442383,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 13,
+            "max": 0.1809757947921753,
+            "final": -0.3115663528442383,
+            "mean": -0.7816904630209949
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 118.03693389892578,
+            "final": 34.723039627075195,
+            "mean": 33.29787697099351
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "machine",
+              "cos": 0.8788889944553375
+            },
+            {
+              "category": "building",
+              "cos": 0.8617915213108063
+            },
+            {
+              "category": "place",
+              "cos": 0.84662726521492
+            },
+            {
+              "category": "animal",
+              "cos": 0.8412420004606247
+            },
+            {
+              "category": "clothing",
+              "cos": 0.8283195793628693
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.03855310007929802,
+          "final_margin": -1.9778461456298828,
+          "best_rank": 6,
+          "final_rank": 7,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.03855310007929802,
+            "final": -1.9778461456298828,
+            "mean": -2.0928108002487065
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.46969032287598,
+            "final": 29.939181327819824,
+            "mean": 30.34082014496262
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.4571733772754669
+            },
+            {
+              "category": "food",
+              "cos": 0.42808085680007935
+            },
+            {
+              "category": "container",
+              "cos": 0.41511982679367065
+            },
+            {
+              "category": "tool",
+              "cos": 0.41311198472976685
+            },
+            {
+              "category": "building",
+              "cos": 0.41241350769996643
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.05653081461787224,
+          "final_margin": -0.3525838851928711,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.05653081461787224,
+            "final": -0.3525838851928711,
+            "mean": -2.6949901454956144
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 100.83038520812988,
+            "final": 29.62727117538452,
+            "mean": 31.031085947075404
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "building",
+              "cos": 0.5011236071586609
+            },
+            {
+              "category": "container",
+              "cos": 0.48951587080955505
+            },
+            {
+              "category": "clothing",
+              "cos": 0.4571733772754669
+            },
+            {
+              "category": "machine",
+              "cos": 0.4224661886692047
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.4124630093574524
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 13,
+          "best_boundary_layer": 35,
+          "best_margin": 0.3224431872367859,
+          "final_margin": -2.285047769546509,
+          "best_rank": 1,
+          "final_rank": 7,
+          "margin_curve": {
+            "max_layer": 13,
+            "max": 0.3224431872367859,
+            "final": -2.285047769546509,
+            "mean": -0.5625048370377438
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 127.26836395263672,
+            "final": 39.81145715713501,
+            "mean": 35.394949833283555
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.8177419900894165
+            },
+            {
+              "category": "clothing",
+              "cos": 0.8102354407310486
+            },
+            {
+              "category": "plant",
+              "cos": 0.801384225487709
+            },
+            {
+              "category": "fruit",
+              "cos": 0.8008445203304291
+            },
+            {
+              "category": "material",
+              "cos": 0.798388808965683
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 4.11137580871582,
+          "final_margin": 0.7547674179077148,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 4.11137580871582,
+            "final": 0.7547674179077148,
+            "mean": 0.8264448521910487
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.5470199584961,
+            "final": 32.373390197753906,
+            "mean": 32.01588559150696
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.9461995512247086
+            },
+            {
+              "category": "light",
+              "cos": 0.9410877376794815
+            },
+            {
+              "category": "tool",
+              "cos": 0.9357284158468246
+            },
+            {
+              "category": "substance",
+              "cos": 0.9332571476697922
+            },
+            {
+              "category": "sound",
+              "cos": 0.9324067980051041
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.049426622688770294,
+          "final_margin": -0.5137157440185547,
+          "best_rank": 3,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.049426622688770294,
+            "final": -0.5137157440185547,
+            "mean": -3.114388999705379
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 151.67639923095703,
+            "final": 42.69281482696533,
+            "mean": 41.120636589623786
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "clothing",
+              "cos": 0.3671428859233856
+            },
+            {
+              "category": "sound",
+              "cos": 0.32771003246307373
+            },
+            {
+              "category": "tool",
+              "cos": 0.31318190693855286
+            },
+            {
+              "category": "substance",
+              "cos": 0.3042099177837372
+            },
+            {
+              "category": "furniture",
+              "cos": 0.30335989594459534
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.021546296775341034,
+          "final_margin": -1.3122670650482178,
+          "best_rank": 4,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.021546296775341034,
+            "final": -1.3122670650482178,
+            "mean": -2.4210453260992026
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.46607780456543,
+            "final": 33.3413200378418,
+            "mean": 31.815701855195535
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "building",
+              "cos": 0.6263907551765442
+            },
+            {
+              "category": "machine",
+              "cos": 0.42605093121528625
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.41519877314567566
+            },
+            {
+              "category": "event",
+              "cos": 0.41388848423957825
+            },
+            {
+              "category": "role",
+              "cos": 0.37957584857940674
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 25,
+          "best_boundary_layer": 35,
+          "best_margin": 0.4077761173248291,
+          "final_margin": -0.0823969841003418,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 25,
+            "max": 0.4077761173248291,
+            "final": -0.0823969841003418,
+            "mean": -0.5127551821438042
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 102.8551082611084,
+            "final": 31.143794536590576,
+            "mean": 30.446072434251374
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "place",
+              "cos": 0.9477213472127914
+            },
+            {
+              "category": "furniture",
+              "cos": 0.9091462939977646
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.9057798385620117
+            },
+            {
+              "category": "machine",
+              "cos": 0.8986317813396454
+            },
+            {
+              "category": "container",
+              "cos": 0.8891004174947739
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 25,
+          "best_boundary_layer": 35,
+          "best_margin": 0.1920730471611023,
+          "final_margin": -2.0201210975646973,
+          "best_rank": 1,
+          "final_rank": 14,
+          "margin_curve": {
+            "max_layer": 25,
+            "max": 0.1920730471611023,
+            "final": -2.0201210975646973,
+            "mean": -0.7796716583338944
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.36401557922363,
+            "final": 38.11743354797363,
+            "mean": 35.47091788536793
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.9290123581886292
+            },
+            {
+              "category": "plant",
+              "cos": 0.8776228129863739
+            },
+            {
+              "category": "color",
+              "cos": 0.8756126016378403
+            },
+            {
+              "category": "light",
+              "cos": 0.8633101284503937
+            },
+            {
+              "category": "food",
+              "cos": 0.8613370060920715
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 31,
+          "best_boundary_layer": 35,
+          "best_margin": 2.937622547149658,
+          "final_margin": -0.7375612258911133,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 31,
+            "max": 2.937622547149658,
+            "final": -0.7375612258911133,
+            "mean": 0.6923118658565186
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 147.8404312133789,
+            "final": 44.26909255981445,
+            "mean": 42.079214908786724
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.8915154039859772
+            },
+            {
+              "category": "light",
+              "cos": 0.8853793293237686
+            },
+            {
+              "category": "plant",
+              "cos": 0.8788614571094513
+            },
+            {
+              "category": "substance",
+              "cos": 0.8754111230373383
+            },
+            {
+              "category": "time",
+              "cos": 0.8715993165969849
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 1.6742973327636719,
+          "final_margin": 1.6742973327636719,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 1.6742973327636719,
+            "final": 1.6742973327636719,
+            "mean": -5.063118422554957
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 131.68138313293457,
+            "final": 35.05015277862549,
+            "mean": 39.26206589308945
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.9545645415782928
+            },
+            {
+              "category": "sound",
+              "cos": 0.93785260617733
+            },
+            {
+              "category": "event",
+              "cos": 0.9377150237560272
+            },
+            {
+              "category": "time",
+              "cos": 0.9334057122468948
+            },
+            {
+              "category": "communication",
+              "cos": 0.9328418523073196
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.03796590864658356,
+          "final_margin": -1.9743428230285645,
+          "best_rank": 4,
+          "final_rank": 9,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.03796590864658356,
+            "final": -1.9743428230285645,
+            "mean": -2.694211487834518
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 127.39295196533203,
+            "final": 37.75384712219238,
+            "mean": 35.40368869175782
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "profession",
+              "cos": 0.6990521550178528
+            },
+            {
+              "category": "relation",
+              "cos": 0.5718744397163391
+            },
+            {
+              "category": "machine",
+              "cos": 0.4556376338005066
+            },
+            {
+              "category": "building",
+              "cos": 0.3804706335067749
+            },
+            {
+              "category": "place",
+              "cos": 0.37957584857940674
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 8.37777328491211,
+          "final_margin": -1.7837371826171875,
+          "best_rank": 1,
+          "final_rank": 6,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 8.37777328491211,
+            "final": -1.7837371826171875,
+            "mean": 1.1706696237261232
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.14213943481445,
+            "final": 40.261967182159424,
+            "mean": 39.14966525660979
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.9879371523857117
+            },
+            {
+              "category": "relation",
+              "cos": 0.9742797017097473
+            },
+            {
+              "category": "machine",
+              "cos": 0.9571187943220139
+            },
+            {
+              "category": "building",
+              "cos": 0.9503111392259598
+            },
+            {
+              "category": "place",
+              "cos": 0.9471829235553741
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.026972930878400803,
+          "final_margin": -1.2459583282470703,
+          "best_rank": 4,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.026972930878400803,
+            "final": -1.2459583282470703,
+            "mean": -1.6894636825733893
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 115.32920837402344,
+            "final": 31.688879013061523,
+            "mean": 33.47081424013989
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.41398435831069946
+            },
+            {
+              "category": "communication",
+              "cos": 0.35541027784347534
+            },
+            {
+              "category": "emotion",
+              "cos": 0.3542347550392151
+            },
+            {
+              "category": "event",
+              "cos": 0.29811105132102966
+            },
+            {
+              "category": "sound",
+              "cos": 0.2850876748561859
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.010688893496990204,
+          "final_margin": -3.4018826484680176,
+          "best_rank": 9,
+          "final_rank": 23,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.010688893496990204,
+            "final": -3.4018826484680176,
+            "mean": -3.7721363457070813
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 115.324462890625,
+            "final": 36.554250717163086,
+            "mean": 35.04123633697226
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "sound",
+              "cos": 0.3159472644329071
+            },
+            {
+              "category": "event",
+              "cos": 0.26893967390060425
+            },
+            {
+              "category": "substance",
+              "cos": 0.26428094506263733
+            },
+            {
+              "category": "light",
+              "cos": 0.255143940448761
+            },
+            {
+              "category": "communication",
+              "cos": 0.24924509227275848
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 1.7507762908935547,
+          "final_margin": -0.8776581287384033,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 1.7507762908935547,
+            "final": -0.8776581287384033,
+            "mean": -0.43226897696385513
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.05936050415039,
+            "final": 29.868833541870117,
+            "mean": 30.077669189588445
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "communication",
+              "cos": 0.973249152302742
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9706472456455231
+            },
+            {
+              "category": "sound",
+              "cos": 0.9699867963790894
+            },
+            {
+              "category": "time",
+              "cos": 0.9679941833019257
+            },
+            {
+              "category": "light",
+              "cos": 0.9675381183624268
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.014305703341960907,
+          "final_margin": -0.810492992401123,
+          "best_rank": 2,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.014305703341960907,
+            "final": -0.810492992401123,
+            "mean": -1.498482458293438
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 114.29989814758301,
+            "final": 31.947944164276123,
+            "mean": 34.70916195817896
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.3438379466533661
+            },
+            {
+              "category": "weather",
+              "cos": 0.33734339475631714
+            },
+            {
+              "category": "event",
+              "cos": 0.31695157289505005
+            },
+            {
+              "category": "place",
+              "cos": 0.2953663766384125
+            },
+            {
+              "category": "building",
+              "cos": 0.29237884283065796
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.008364416658878326,
+          "final_margin": -2.2718915939331055,
+          "best_rank": 1,
+          "final_rank": 8,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.008364416658878326,
+            "final": -2.2718915939331055,
+            "mean": -2.1634657370883064
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 153.28311920166016,
+            "final": 43.11717128753662,
+            "mean": 43.63877234507252
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "time",
+              "cos": 0.2536962032318115
+            },
+            {
+              "category": "shape",
+              "cos": 0.16804085671901703
+            },
+            {
+              "category": "abstract",
+              "cos": 0.16217336058616638
+            },
+            {
+              "category": "color",
+              "cos": 0.1574452519416809
+            },
+            {
+              "category": "relation",
+              "cos": 0.15402661263942719
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 28,
+          "best_boundary_layer": 35,
+          "best_margin": 2.6180741786956787,
+          "final_margin": -0.8530054092407227,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 28,
+            "max": 2.6180741786956787,
+            "final": -0.8530054092407227,
+            "mean": 0.46951454052248515
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.08261299133301,
+            "final": 36.62362289428711,
+            "mean": 32.35731574409717
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.8892546743154526
+            },
+            {
+              "category": "light",
+              "cos": 0.8889389783143997
+            },
+            {
+              "category": "machine",
+              "cos": 0.8771959841251373
+            },
+            {
+              "category": "tool",
+              "cos": 0.8720009177923203
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.8716843873262405
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 6.330981254577637,
+          "final_margin": -1.929656744003296,
+          "best_rank": 1,
+          "final_rank": 8,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 6.330981254577637,
+            "final": -1.929656744003296,
+            "mean": 1.8327152286026929
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 89.8138542175293,
+            "final": 26.797537326812744,
+            "mean": 27.522565803012334
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.9796222746372223
+            },
+            {
+              "category": "communication",
+              "cos": 0.9733497351408005
+            },
+            {
+              "category": "weather",
+              "cos": 0.9713647067546844
+            },
+            {
+              "category": "action",
+              "cos": 0.9701000452041626
+            },
+            {
+              "category": "event",
+              "cos": 0.9699868410825729
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 3.8305721282958984,
+          "final_margin": -0.4568138122558594,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 3.8305721282958984,
+            "final": -0.4568138122558594,
+            "mean": 0.7352883284156387
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 87.81639862060547,
+            "final": 24.10780143737793,
+            "mean": 26.815738378344356
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "sound",
+              "cos": 0.9600864201784134
+            },
+            {
+              "category": "weather",
+              "cos": 0.9522850215435028
+            },
+            {
+              "category": "tool",
+              "cos": 0.942317858338356
+            },
+            {
+              "category": "abstract",
+              "cos": 0.9418487399816513
+            },
+            {
+              "category": "time",
+              "cos": 0.9407142996788025
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 31,
+          "best_boundary_layer": 35,
+          "best_margin": 4.494500160217285,
+          "final_margin": -0.13558673858642578,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 31,
+            "max": 4.494500160217285,
+            "final": -0.13558673858642578,
+            "mean": 0.47749705371019
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 110.6848373413086,
+            "final": 29.83061456680298,
+            "mean": 32.651981824153175
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "light",
+              "cos": 0.9336647242307663
+            },
+            {
+              "category": "sound",
+              "cos": 0.925185963511467
+            },
+            {
+              "category": "substance",
+              "cos": 0.9205127209424973
+            },
+            {
+              "category": "event",
+              "cos": 0.9122260510921478
+            },
+            {
+              "category": "emotion",
+              "cos": 0.899530753493309
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.9716224670410156,
+          "final_margin": 0.9716224670410156,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.9716224670410156,
+            "final": 0.9716224670410156,
+            "mean": -3.1613149098246485
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 106.49028968811035,
+            "final": 32.08663988113403,
+            "mean": 30.787795207790428
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.9424993395805359
+            },
+            {
+              "category": "clothing",
+              "cos": 0.9411138147115707
+            },
+            {
+              "category": "tool",
+              "cos": 0.9390376955270767
+            },
+            {
+              "category": "light",
+              "cos": 0.9284345656633377
+            },
+            {
+              "category": "shape",
+              "cos": 0.9282077699899673
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 4,
+          "best_boundary_layer": 35,
+          "best_margin": 0.1529543399810791,
+          "final_margin": -1.5975639820098877,
+          "best_rank": 1,
+          "final_rank": 8,
+          "margin_curve": {
+            "max_layer": 4,
+            "max": 0.1529543399810791,
+            "final": -1.5975639820098877,
+            "mean": -2.2983249653432822
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 142.73638916015625,
+            "final": 39.34805393218994,
+            "mean": 42.34808692738817
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": 0.6893001347780228
+            },
+            {
+              "category": "machine",
+              "cos": 0.685935765504837
+            },
+            {
+              "category": "sound",
+              "cos": 0.682490274310112
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.6753553301095963
+            },
+            {
+              "category": "furniture",
+              "cos": 0.6732424348592758
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 2,
+          "best_boundary_layer": 35,
+          "best_margin": 0.10100099444389343,
+          "final_margin": -0.5237832069396973,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 2,
+            "max": 0.10100099444389343,
+            "final": -0.5237832069396973,
+            "mean": -1.6471338348614204
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 102.14582633972168,
+            "final": 30.600740909576416,
+            "mean": 29.53686205680306
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "vehicle",
+              "cos": 0.8861342370510101
+            },
+            {
+              "category": "role",
+              "cos": 0.8736540228128433
+            },
+            {
+              "category": "container",
+              "cos": 0.8633444607257843
+            },
+            {
+              "category": "place",
+              "cos": 0.8627588897943497
+            },
+            {
+              "category": "furniture",
+              "cos": 0.855875551700592
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.04406074434518814,
+          "final_margin": -2.7859981060028076,
+          "best_rank": 1,
+          "final_rank": 21,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.04406074434518814,
+            "final": -2.7859981060028076,
+            "mean": -3.7551130046312875
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 114.46458435058594,
+            "final": 31.99730396270752,
+            "mean": 32.70912371616106
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "sound",
+              "cos": 0.3987567722797394
+            },
+            {
+              "category": "event",
+              "cos": 0.36841171979904175
+            },
+            {
+              "category": "abstract",
+              "cos": 0.35541030764579773
+            },
+            {
+              "category": "property",
+              "cos": 0.30494895577430725
+            },
+            {
+              "category": "machine",
+              "cos": 0.2757684290409088
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.002018839120864868,
+          "final_margin": -2.4174532890319824,
+          "best_rank": 2,
+          "final_rank": 14,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.002018839120864868,
+            "final": -2.4174532890319824,
+            "mean": -1.1293079450323775
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 119.25473594665527,
+            "final": 33.07709360122681,
+            "mean": 34.34801432248708
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.5718744397163391
+            },
+            {
+              "category": "profession",
+              "cos": 0.44296470284461975
+            },
+            {
+              "category": "machine",
+              "cos": 0.3699376583099365
+            },
+            {
+              "category": "building",
+              "cos": 0.3401500880718231
+            },
+            {
+              "category": "event",
+              "cos": 0.32306107878685
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.018376260995864868,
+          "final_margin": -2.123992919921875,
+          "best_rank": 4,
+          "final_rank": 10,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.018376260995864868,
+            "final": -2.123992919921875,
+            "mean": -2.4758472869525083
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 126.24266815185547,
+            "final": 36.57363224029541,
+            "mean": 36.24646013250222
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.41398435831069946
+            },
+            {
+              "category": "light",
+              "cos": 0.30996179580688477
+            },
+            {
+              "category": "sound",
+              "cos": 0.30744805932044983
+            },
+            {
+              "category": "communication",
+              "cos": 0.30494892597198486
+            },
+            {
+              "category": "weather",
+              "cos": 0.2739711403846741
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.026857443153858185,
+          "final_margin": -2.897223949432373,
+          "best_rank": 5,
+          "final_rank": 21,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.026857443153858185,
+            "final": -2.897223949432373,
+            "mean": -2.381646781555704
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 116.92025184631348,
+            "final": 35.83673620223999,
+            "mean": 32.14638541759671
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.4795691967010498
+            },
+            {
+              "category": "weather",
+              "cos": 0.4464418888092041
+            },
+            {
+              "category": "food",
+              "cos": 0.388448566198349
+            },
+            {
+              "category": "light",
+              "cos": 0.3672630190849304
+            },
+            {
+              "category": "sound",
+              "cos": 0.3621506989002228
+            }
+          ]
+        }
+      },
+      "template_residual": {
+        "fruit": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 1.8606071472167969,
+          "final_margin": 0.4279758930206299,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 1.8606071472167969,
+            "final": 0.4279758930206299,
+            "mean": 0.34144314660413844
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 144.97214317321777,
+            "final": 42.10576152801514,
+            "mean": 41.800595626637744
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "plant",
+              "cos": 0.4731016084551811
+            },
+            {
+              "category": "food",
+              "cos": 0.35022469609975815
+            },
+            {
+              "category": "animal",
+              "cos": 0.2214154116809368
+            },
+            {
+              "category": "color",
+              "cos": 0.21530888602137566
+            },
+            {
+              "category": "material",
+              "cos": 0.09036274859681726
+            }
+          ]
+        },
+        "animal": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.02608521468937397,
+          "final_margin": -0.9147257804870605,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.02608521468937397,
+            "final": -0.9147257804870605,
+            "mean": -1.1113852340526678
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 144.54978370666504,
+            "final": 43.828208446502686,
+            "mean": 39.38438036796209
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "vehicle",
+              "cos": 0.13769273459911346
+            },
+            {
+              "category": "fruit",
+              "cos": 0.07501017302274704
+            },
+            {
+              "category": "food",
+              "cos": 0.05075303465127945
+            },
+            {
+              "category": "plant",
+              "cos": 0.048025861382484436
+            },
+            {
+              "category": "color",
+              "cos": 0.006400500424206257
+            }
+          ]
+        },
+        "tool": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 2.3917312622070312,
+          "final_margin": 0.6940393447875977,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 2.3917312622070312,
+            "final": 0.6940393447875977,
+            "mean": 0.3654786832882343
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 100.32007026672363,
+            "final": 27.61272621154785,
+            "mean": 31.23286319020632
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "instrument",
+              "cos": 0.22382773086428642
+            },
+            {
+              "category": "clothing",
+              "cos": 0.2060188241302967
+            },
+            {
+              "category": "machine",
+              "cos": 0.16012084111571312
+            },
+            {
+              "category": "furniture",
+              "cos": 0.1522301286458969
+            },
+            {
+              "category": "container",
+              "cos": 0.12421384453773499
+            }
+          ]
+        },
+        "vehicle": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 3.715231418609619,
+          "final_margin": 1.2624133825302124,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 3.715231418609619,
+            "final": 1.2624133825302124,
+            "mean": 0.9960669045512741
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 118.03693580627441,
+            "final": 34.723039627075195,
+            "mean": 33.297876884002946
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "machine",
+              "cos": 0.27841614559292793
+            },
+            {
+              "category": "building",
+              "cos": 0.20876814424991608
+            },
+            {
+              "category": "animal",
+              "cos": 0.18966097757220268
+            },
+            {
+              "category": "container",
+              "cos": 0.15835236944258213
+            },
+            {
+              "category": "instrument",
+              "cos": 0.12258078157901764
+            }
+          ]
+        },
+        "clothing": {
+          "best_margin_layer": 11,
+          "best_boundary_layer": 35,
+          "best_margin": 0.16675646603107452,
+          "final_margin": -0.9342692494392395,
+          "best_rank": 1,
+          "final_rank": 7,
+          "margin_curve": {
+            "max_layer": 11,
+            "max": 0.16675646603107452,
+            "final": -0.9342692494392395,
+            "mean": -0.6001477209800804
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.46968650817871,
+            "final": 29.939181327819824,
+            "mean": 30.340819966148686
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.2669580392539501
+            },
+            {
+              "category": "container",
+              "cos": 0.24703184887766838
+            },
+            {
+              "category": "tool",
+              "cos": 0.16553432121872902
+            },
+            {
+              "category": "food",
+              "cos": 0.16131065599620342
+            },
+            {
+              "category": "body",
+              "cos": 0.15436357632279396
+            }
+          ]
+        },
+        "furniture": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 1.6582154035568237,
+          "final_margin": 0.36968037486076355,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 1.6582154035568237,
+            "final": 0.36968037486076355,
+            "mean": 0.11144620698650141
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 100.83038520812988,
+            "final": 29.62727117538452,
+            "mean": 31.031085889081698
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "container",
+              "cos": 0.34095436334609985
+            },
+            {
+              "category": "building",
+              "cos": 0.30013345927000046
+            },
+            {
+              "category": "clothing",
+              "cos": 0.2905654311180115
+            },
+            {
+              "category": "tool",
+              "cos": 0.1371274534612894
+            },
+            {
+              "category": "machine",
+              "cos": 0.12010940164327621
+            }
+          ]
+        },
+        "food": {
+          "best_margin_layer": 26,
+          "best_boundary_layer": 35,
+          "best_margin": 0.8084042072296143,
+          "final_margin": 0.2490450143814087,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 26,
+            "max": 0.8084042072296143,
+            "final": 0.2490450143814087,
+            "mean": 0.2848001293636657
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 127.26836776733398,
+            "final": 39.81145620346069,
+            "mean": 35.39494974790393
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.37227026373147964
+            },
+            {
+              "category": "plant",
+              "cos": 0.2148490473628044
+            },
+            {
+              "category": "clothing",
+              "cos": 0.18485508859157562
+            },
+            {
+              "category": "substance",
+              "cos": 0.18410947918891907
+            },
+            {
+              "category": "material",
+              "cos": 0.16376900114119053
+            }
+          ]
+        },
+        "plant": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 3.0545878410339355,
+          "final_margin": 0.11511015892028809,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 3.0545878410339355,
+            "final": 0.11511015892028809,
+            "mean": 0.7276299966851602
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.54701614379883,
+            "final": 32.373390197753906,
+            "mean": 32.01588531281497
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "fruit",
+              "cos": 0.4777028262615204
+            },
+            {
+              "category": "animal",
+              "cos": 0.25220487266778946
+            },
+            {
+              "category": "material",
+              "cos": 0.19586294889450073
+            },
+            {
+              "category": "food",
+              "cos": 0.1695839837193489
+            },
+            {
+              "category": "color",
+              "cos": 0.15053893066942692
+            }
+          ]
+        },
+        "body": {
+          "best_margin_layer": 10,
+          "best_boundary_layer": 35,
+          "best_margin": 0.020156070590019226,
+          "final_margin": -0.6375352144241333,
+          "best_rank": 1,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 10,
+            "max": 0.020156070590019226,
+            "final": -0.6375352144241333,
+            "mean": -0.4655854715336416
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 151.67639923095703,
+            "final": 42.69281578063965,
+            "mean": 41.120636586401915
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "clothing",
+              "cos": 0.15381702966988087
+            },
+            {
+              "category": "substance",
+              "cos": 0.1095775868743658
+            },
+            {
+              "category": "action",
+              "cos": 0.0948740541934967
+            },
+            {
+              "category": "property",
+              "cos": 0.05644022286287509
+            },
+            {
+              "category": "time",
+              "cos": 0.04400567687116563
+            }
+          ]
+        },
+        "place": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 1.8561866283416748,
+          "final_margin": 0.5327061414718628,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 1.8561866283416748,
+            "final": 0.5327061414718628,
+            "mean": 0.5934614217462572
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.46607398986816,
+            "final": 33.3413200378418,
+            "mean": 31.815701859222877
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "building",
+              "cos": 0.6115279197692871
+            },
+            {
+              "category": "event",
+              "cos": 0.24882974475622177
+            },
+            {
+              "category": "role",
+              "cos": 0.21956325322389603
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.13887697644531727
+            },
+            {
+              "category": "profession",
+              "cos": 0.13755139149725437
+            }
+          ]
+        },
+        "building": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 1.7224998474121094,
+          "final_margin": 0.6374905109405518,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 1.7224998474121094,
+            "final": 0.6374905109405518,
+            "mean": 0.34123924978681514
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 102.85510635375977,
+            "final": 31.143795490264893,
+            "mean": 30.446072518020063
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "place",
+              "cos": 0.5971085727214813
+            },
+            {
+              "category": "furniture",
+              "cos": 0.2906426414847374
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.20689598098397255
+            },
+            {
+              "category": "machine",
+              "cos": 0.13575181178748608
+            },
+            {
+              "category": "profession",
+              "cos": 0.13447541929781437
+            }
+          ]
+        },
+        "material": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 1.5167298316955566,
+          "final_margin": 0.2763533592224121,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 1.5167298316955566,
+            "final": 0.2763533592224121,
+            "mean": 0.26249955347865017
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 128.3640193939209,
+            "final": 38.11743354797363,
+            "mean": 35.47091824943955
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.48253194987773895
+            },
+            {
+              "category": "color",
+              "cos": 0.36435628682374954
+            },
+            {
+              "category": "plant",
+              "cos": 0.21089649945497513
+            },
+            {
+              "category": "food",
+              "cos": 0.16689656861126423
+            },
+            {
+              "category": "body",
+              "cos": 0.1081651272252202
+            }
+          ]
+        },
+        "color": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 3.2522263526916504,
+          "final_margin": 0.9095586538314819,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 3.2522263526916504,
+            "final": 0.9095586538314819,
+            "mean": 0.8725901944562793
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 147.84043312072754,
+            "final": 44.26909255981445,
+            "mean": 42.079214802464925
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.36435628682374954
+            },
+            {
+              "category": "fruit",
+              "cos": 0.22295630536973476
+            },
+            {
+              "category": "substance",
+              "cos": 0.19447766244411469
+            },
+            {
+              "category": "plant",
+              "cos": 0.1889650709927082
+            },
+            {
+              "category": "number",
+              "cos": 0.1564916530624032
+            }
+          ]
+        },
+        "emotion": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.018074316903948784,
+          "final_margin": -0.4419946074485779,
+          "best_rank": 4,
+          "final_rank": 4,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.018074316903948784,
+            "final": -0.4419946074485779,
+            "mean": -0.6618061137662546
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 131.6813793182373,
+            "final": 35.05015277862549,
+            "mean": 39.26206580932076
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.10542023181915283
+            },
+            {
+              "category": "sound",
+              "cos": 0.0666353777050972
+            },
+            {
+              "category": "weather",
+              "cos": 0.05834279954433441
+            },
+            {
+              "category": "event",
+              "cos": 0.020411480218172073
+            },
+            {
+              "category": "profession",
+              "cos": 0.0006825199816375971
+            }
+          ]
+        },
+        "role": {
+          "best_margin_layer": 15,
+          "best_boundary_layer": 35,
+          "best_margin": 0.17219200730323792,
+          "final_margin": -0.34759533405303955,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 15,
+            "max": 0.17219200730323792,
+            "final": -0.34759533405303955,
+            "mean": -0.30753585275866696
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 127.39294624328613,
+            "final": 37.75384759902954,
+            "mean": 35.40368864826254
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "profession",
+              "cos": 0.7554701268672943
+            },
+            {
+              "category": "relation",
+              "cos": 0.6346020549535751
+            },
+            {
+              "category": "machine",
+              "cos": 0.2781311497092247
+            },
+            {
+              "category": "place",
+              "cos": 0.27749422565102577
+            },
+            {
+              "category": "event",
+              "cos": 0.1577901467680931
+            }
+          ]
+        },
+        "profession": {
+          "best_margin_layer": 34,
+          "best_boundary_layer": 35,
+          "best_margin": 3.102874517440796,
+          "final_margin": 1.0543817281723022,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 34,
+            "max": 3.102874517440796,
+            "final": 1.0543817281723022,
+            "mean": 0.6175286312763756
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 135.14213371276855,
+            "final": 40.261967182159424,
+            "mean": 39.14966525983166
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.7719348967075348
+            },
+            {
+              "category": "relation",
+              "cos": 0.49426858127117157
+            },
+            {
+              "category": "machine",
+              "cos": 0.2559538409113884
+            },
+            {
+              "category": "place",
+              "cos": 0.15326940640807152
+            },
+            {
+              "category": "building",
+              "cos": 0.13447542116045952
+            }
+          ]
+        },
+        "abstract": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.0033486969769001007,
+          "final_margin": -0.5941396355628967,
+          "best_rank": 2,
+          "final_rank": 7,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.0033486969769001007,
+            "final": -0.5941396355628967,
+            "mean": -0.5924795808622966
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 115.3292121887207,
+            "final": 31.688879013061523,
+            "mean": 33.470814367403854
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.29445433616638184
+            },
+            {
+              "category": "communication",
+              "cos": 0.21574734151363373
+            },
+            {
+              "category": "emotion",
+              "cos": 0.10542023926973343
+            },
+            {
+              "category": "number",
+              "cos": 0.10273562371730804
+            },
+            {
+              "category": "action",
+              "cos": 0.09981527924537659
+            }
+          ]
+        },
+        "action": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": -0.01786377839744091,
+          "final_margin": -0.979911208152771,
+          "best_rank": 7,
+          "final_rank": 14,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": -0.01786377839744091,
+            "final": -0.979911208152771,
+            "mean": -1.0230394790603503
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 115.324462890625,
+            "final": 36.554251194000244,
+            "mean": 35.04123626931293
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.09981527924537659
+            },
+            {
+              "category": "communication",
+              "cos": 0.0889829471707344
+            },
+            {
+              "category": "number",
+              "cos": 0.07511260360479355
+            },
+            {
+              "category": "property",
+              "cos": 0.07409404218196869
+            },
+            {
+              "category": "substance",
+              "cos": 0.04178507626056671
+            }
+          ]
+        },
+        "event": {
+          "best_margin_layer": 0,
+          "best_boundary_layer": 35,
+          "best_margin": 0.017201364040374756,
+          "final_margin": -0.3878607749938965,
+          "best_rank": 1,
+          "final_rank": 3,
+          "margin_curve": {
+            "max_layer": 0,
+            "max": 0.017201364040374756,
+            "final": -0.3878607749938965,
+            "mean": -0.5377853031496744
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 103.05936050415039,
+            "final": 29.868833541870117,
+            "mean": 30.077669126761926
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "communication",
+              "cos": 0.12568411231040955
+            },
+            {
+              "category": "place",
+              "cos": 0.08421409875154495
+            },
+            {
+              "category": "weather",
+              "cos": 0.06918130069971085
+            },
+            {
+              "category": "abstract",
+              "cos": 0.05497997999191284
+            },
+            {
+              "category": "time",
+              "cos": 0.02699504978954792
+            }
+          ]
+        },
+        "time": {
+          "best_margin_layer": 36,
+          "best_boundary_layer": 35,
+          "best_margin": 0.3857351541519165,
+          "final_margin": 0.3857351541519165,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 36,
+            "max": 0.3857351541519165,
+            "final": 0.3857351541519165,
+            "mean": -0.26979197355339657
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 114.29990005493164,
+            "final": 31.94794464111328,
+            "mean": 34.70916231258495
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "event",
+              "cos": 0.30062009766697884
+            },
+            {
+              "category": "number",
+              "cos": 0.2555811069905758
+            },
+            {
+              "category": "emotion",
+              "cos": 0.2480842974036932
+            },
+            {
+              "category": "abstract",
+              "cos": 0.22021783143281937
+            },
+            {
+              "category": "place",
+              "cos": 0.17741128196939826
+            }
+          ]
+        },
+        "number": {
+          "best_margin_layer": 14,
+          "best_boundary_layer": 35,
+          "best_margin": 0.37339624762535095,
+          "final_margin": 0.12816596031188965,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 14,
+            "max": 0.37339624762535095,
+            "final": 0.12816596031188965,
+            "mean": -0.32997404079179504
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 153.2831153869629,
+            "final": 43.117172718048096,
+            "mean": 43.63877224519446
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "time",
+              "cos": 0.34507182985544205
+            },
+            {
+              "category": "abstract",
+              "cos": 0.2970217205584049
+            },
+            {
+              "category": "action",
+              "cos": 0.25188085809350014
+            },
+            {
+              "category": "property",
+              "cos": 0.14866162277758121
+            },
+            {
+              "category": "shape",
+              "cos": 0.139640836045146
+            }
+          ]
+        },
+        "shape": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 3.675044059753418,
+          "final_margin": 1.3317698240280151,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 3.675044059753418,
+            "final": 1.3317698240280151,
+            "mean": 1.0726970978634986
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 111.08260917663574,
+            "final": 36.62362194061279,
+            "mean": 32.35731575698466
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "property",
+              "cos": 0.24561727792024612
+            },
+            {
+              "category": "container",
+              "cos": 0.1501264739781618
+            },
+            {
+              "category": "abstract",
+              "cos": 0.11720504541881382
+            },
+            {
+              "category": "tool",
+              "cos": 0.09563856292515993
+            },
+            {
+              "category": "communication",
+              "cos": 0.09288945130538195
+            }
+          ]
+        },
+        "sound": {
+          "best_margin_layer": 32,
+          "best_boundary_layer": 35,
+          "best_margin": 2.052769660949707,
+          "final_margin": 0.6813943386077881,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 32,
+            "max": 2.052769660949707,
+            "final": 0.6813943386077881,
+            "mean": 0.5360057929883132
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 89.8138542175293,
+            "final": 26.797537803649902,
+            "mean": 27.522565951218475
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "emotion",
+              "cos": 0.24130531400442123
+            },
+            {
+              "category": "light",
+              "cos": 0.23357082530856133
+            },
+            {
+              "category": "weather",
+              "cos": 0.2252078764140606
+            },
+            {
+              "category": "action",
+              "cos": 0.22483431175351143
+            },
+            {
+              "category": "communication",
+              "cos": 0.21155629120767117
+            }
+          ]
+        },
+        "light": {
+          "best_margin_layer": 33,
+          "best_boundary_layer": 35,
+          "best_margin": 5.126424789428711,
+          "final_margin": 1.2460682392120361,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 33,
+            "max": 5.126424789428711,
+            "final": 1.2460682392120361,
+            "mean": 1.317390505526517
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 87.81639862060547,
+            "final": 24.10780143737793,
+            "mean": 26.8157384025084
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "weather",
+              "cos": 0.2965238355100155
+            },
+            {
+              "category": "sound",
+              "cos": 0.2426305077970028
+            },
+            {
+              "category": "emotion",
+              "cos": 0.1479749782010913
+            },
+            {
+              "category": "time",
+              "cos": 0.1252035703510046
+            },
+            {
+              "category": "substance",
+              "cos": 0.11409542337059975
+            }
+          ]
+        },
+        "weather": {
+          "best_margin_layer": 31,
+          "best_boundary_layer": 35,
+          "best_margin": 7.850079536437988,
+          "final_margin": 1.5353548526763916,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 31,
+            "max": 7.850079536437988,
+            "final": 1.5353548526763916,
+            "mean": 2.29200515755125
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 110.68483352661133,
+            "final": 29.83061456680298,
+            "mean": 32.651981653393925
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "substance",
+              "cos": 0.29381077736616135
+            },
+            {
+              "category": "light",
+              "cos": 0.2856158949434757
+            },
+            {
+              "category": "sound",
+              "cos": 0.2183735854923725
+            },
+            {
+              "category": "emotion",
+              "cos": 0.16168525256216526
+            },
+            {
+              "category": "event",
+              "cos": 0.15949885919690132
+            }
+          ]
+        },
+        "container": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 4.179104804992676,
+          "final_margin": 0.9426652193069458,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 4.179104804992676,
+            "final": 0.9426652193069458,
+            "mean": 0.8370446028137529
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 106.49028778076172,
+            "final": 32.08664083480835,
+            "mean": 30.787795164295144
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "furniture",
+              "cos": 0.3497825413942337
+            },
+            {
+              "category": "clothing",
+              "cos": 0.2986062169075012
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.2061445564031601
+            },
+            {
+              "category": "food",
+              "cos": 0.1576097533106804
+            },
+            {
+              "category": "shape",
+              "cos": 0.15012647584080696
+            }
+          ]
+        },
+        "instrument": {
+          "best_margin_layer": 30,
+          "best_boundary_layer": 35,
+          "best_margin": 1.8657174110412598,
+          "final_margin": -0.21967267990112305,
+          "best_rank": 1,
+          "final_rank": 2,
+          "margin_curve": {
+            "max_layer": 30,
+            "max": 1.8657174110412598,
+            "final": -0.21967267990112305,
+            "mean": 0.19234373259383278
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 142.73638725280762,
+            "final": 39.34805202484131,
+            "mean": 42.34808694510846
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "tool",
+              "cos": 0.2626579627394676
+            },
+            {
+              "category": "vehicle",
+              "cos": 0.1557760201394558
+            },
+            {
+              "category": "machine",
+              "cos": 0.14379778131842613
+            },
+            {
+              "category": "sound",
+              "cos": 0.13870568573474884
+            },
+            {
+              "category": "furniture",
+              "cos": 0.09927959274500608
+            }
+          ]
+        },
+        "machine": {
+          "best_margin_layer": 30,
+          "best_boundary_layer": 35,
+          "best_margin": 1.5332541465759277,
+          "final_margin": 0.09691411256790161,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 30,
+            "max": 1.5332541465759277,
+            "final": 0.09691411256790161,
+            "mean": 0.4186518202359612
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 102.14582824707031,
+            "final": 30.600741386413574,
+            "mean": 29.536862121240514
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "vehicle",
+              "cos": 0.29594724252820015
+            },
+            {
+              "category": "profession",
+              "cos": 0.2669071964919567
+            },
+            {
+              "category": "role",
+              "cos": 0.21051855757832527
+            },
+            {
+              "category": "building",
+              "cos": 0.1448721792548895
+            },
+            {
+              "category": "instrument",
+              "cos": 0.14379778504371643
+            }
+          ]
+        },
+        "communication": {
+          "best_margin_layer": 28,
+          "best_boundary_layer": 35,
+          "best_margin": 0.6379441022872925,
+          "final_margin": 0.5083645582199097,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 28,
+            "max": 0.6379441022872925,
+            "final": 0.5083645582199097,
+            "mean": 0.15355636783548304
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 114.46459007263184,
+            "final": 31.997303009033203,
+            "mean": 32.70912380315162
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.4317598342895508
+            },
+            {
+              "category": "event",
+              "cos": 0.3377307951450348
+            },
+            {
+              "category": "property",
+              "cos": 0.31205347180366516
+            },
+            {
+              "category": "sound",
+              "cos": 0.22414308413863182
+            },
+            {
+              "category": "relation",
+              "cos": 0.17214546911418438
+            }
+          ]
+        },
+        "relation": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 3.5146260261535645,
+          "final_margin": 0.7967653274536133,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 3.5146260261535645,
+            "final": 0.7967653274536133,
+            "mean": 0.47944626828806625
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 119.2547378540039,
+            "final": 33.07709455490112,
+            "mean": 34.34801449646821
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "role",
+              "cos": 0.6799837201833725
+            },
+            {
+              "category": "profession",
+              "cos": 0.5309295728802681
+            },
+            {
+              "category": "communication",
+              "cos": 0.3009168729186058
+            },
+            {
+              "category": "abstract",
+              "cos": 0.2789484020322561
+            },
+            {
+              "category": "event",
+              "cos": 0.18662233278155327
+            }
+          ]
+        },
+        "property": {
+          "best_margin_layer": 35,
+          "best_boundary_layer": 35,
+          "best_margin": 2.384345531463623,
+          "final_margin": 0.7488900423049927,
+          "best_rank": 1,
+          "final_rank": 1,
+          "margin_curve": {
+            "max_layer": 35,
+            "max": 2.384345531463623,
+            "final": 0.7488900423049927,
+            "mean": 0.16051415877567754
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 126.24266624450684,
+            "final": 36.57363224029541,
+            "mean": 36.24646018324672
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "abstract",
+              "cos": 0.6280340254306793
+            },
+            {
+              "category": "communication",
+              "cos": 0.3834596313536167
+            },
+            {
+              "category": "shape",
+              "cos": 0.24561728909611702
+            },
+            {
+              "category": "emotion",
+              "cos": 0.19888864643871784
+            },
+            {
+              "category": "light",
+              "cos": 0.13207201240584254
+            }
+          ]
+        },
+        "substance": {
+          "best_margin_layer": 23,
+          "best_boundary_layer": 35,
+          "best_margin": 0.35537344217300415,
+          "final_margin": -0.2665133476257324,
+          "best_rank": 1,
+          "final_rank": 6,
+          "margin_curve": {
+            "max_layer": 23,
+            "max": 0.35537344217300415,
+            "final": -0.2665133476257324,
+            "mean": -0.1615877440199256
+          },
+          "boundary_curve": {
+            "max_layer": 35,
+            "max": 116.92024803161621,
+            "final": 35.836735248565674,
+            "mean": 32.14638523636638
+          },
+          "neighbors_at_best_margin_layer": [
+            {
+              "category": "material",
+              "cos": 0.5775102525949478
+            },
+            {
+              "category": "weather",
+              "cos": 0.2976481020450592
+            },
+            {
+              "category": "color",
+              "cos": 0.2233874313533306
+            },
+            {
+              "category": "body",
+              "cos": 0.21114155650138855
+            },
+            {
+              "category": "action",
+              "cos": 0.1570779886096716
+            }
+          ]
+        }
+      }
+    }
+  },
+  "notes": [
+    "template_residual means subtracting the same-template mean vector at each layer and position.",
+    "answer_last is the category-answer slot; object_last is the object token position.",
+    "This phase is still atlas/readout evidence, not downstream causal patching."
+  ]
+}

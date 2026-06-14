@@ -1,0 +1,175 @@
+{
+  "phase": 101,
+  "model": "qwen3",
+  "timestamp": "2026-06-13 14:18",
+  "task": "value_choice_bridge_mapping",
+  "value_layer": 6,
+  "value_component": "mlp",
+  "value_position": "prefix8",
+  "choice_layer": 24,
+  "choice_heads": [
+    29,
+    31
+  ],
+  "choice_position": "prompt_tail",
+  "conditions": [
+    "value_zero",
+    "value_transplant",
+    "choice_transplant_heads",
+    "value_zero+choice_restore_clean_heads",
+    "value_transplant+choice_restore_clean_heads",
+    "value_transplant+choice_transplant_heads",
+    "value_transplant+choice_transplant_all_restore_clean_heads"
+  ],
+  "num_items": 2,
+  "rows": [
+    {
+      "item_idx": 0,
+      "donor_idx": null,
+      "condition": "value_zero",
+      "slot": "category",
+      "template_key": "kind",
+      "object": "apple",
+      "target": "fruit",
+      "clean_value_margin": 5.375,
+      "patched_value_margin": -4.125,
+      "value_delta": -9.5,
+      "clean_letter_margin": 6.125000162050128,
+      "patched_letter_margin": -1.90625,
+      "letter_delta": -8.031250162050128,
+      "clean_value_top1": true,
+      "patched_value_top1": false,
+      "value_top1_delta": -1.0,
+      "clean_letter_top1": true,
+      "patched_letter_top1": false,
+      "letter_top1_delta": -1.0
+    },
+    {
+      "item_idx": 0,
+      "donor_idx": null,
+      "condition": "value_zero+choice_restore_clean_heads",
+      "slot": "category",
+      "template_key": "kind",
+      "object": "apple",
+      "target": "fruit",
+      "clean_value_margin": 5.375,
+      "patched_value_margin": -4.21875,
+      "value_delta": -9.59375,
+      "clean_letter_margin": 6.125000162050128,
+      "patched_letter_margin": 7.125000476837158,
+      "letter_delta": 1.0000003147870302,
+      "clean_value_top1": true,
+      "patched_value_top1": false,
+      "value_top1_delta": -1.0,
+      "clean_letter_top1": true,
+      "patched_letter_top1": true,
+      "letter_top1_delta": 0.0
+    },
+    {
+      "item_idx": 1,
+      "donor_idx": null,
+      "condition": "value_zero",
+      "slot": "location",
+      "template_key": "place",
+      "object": "writer",
+      "target": "desk",
+      "clean_value_margin": -0.5625,
+      "patched_value_margin": -1.77734375,
+      "value_delta": -1.21484375,
+      "clean_letter_margin": 2.3749999329447746,
+      "patched_letter_margin": -0.53125,
+      "letter_delta": -2.9062499329447746,
+      "clean_value_top1": false,
+      "patched_value_top1": false,
+      "value_top1_delta": 0.0,
+      "clean_letter_top1": true,
+      "patched_letter_top1": false,
+      "letter_top1_delta": -1.0
+    },
+    {
+      "item_idx": 1,
+      "donor_idx": null,
+      "condition": "value_zero+choice_restore_clean_heads",
+      "slot": "location",
+      "template_key": "place",
+      "object": "writer",
+      "target": "desk",
+      "clean_value_margin": -0.5625,
+      "patched_value_margin": -1.828125,
+      "value_delta": -1.265625,
+      "clean_letter_margin": 2.3749999329447746,
+      "patched_letter_margin": 3.218750476837158,
+      "letter_delta": 0.8437505438923836,
+      "clean_value_top1": false,
+      "patched_value_top1": false,
+      "value_top1_delta": 0.0,
+      "clean_letter_top1": true,
+      "patched_letter_top1": true,
+      "letter_top1_delta": 0.0
+    }
+  ],
+  "summary": {
+    "by_condition": {
+      "value_zero": {
+        "n": 2,
+        "value_delta": -5.357421875,
+        "letter_delta": -5.468750047497451,
+        "value_top1_delta": -0.5,
+        "letter_top1_delta": -1.0
+      },
+      "value_zero+choice_restore_clean_heads": {
+        "n": 2,
+        "value_delta": -5.4296875,
+        "letter_delta": 0.9218754293397069,
+        "value_top1_delta": -0.5,
+        "letter_top1_delta": 0.0
+      }
+    },
+    "by_slot": {
+      "category": {
+        "n": 2,
+        "value_delta": -9.546875,
+        "letter_delta": -3.515624923631549,
+        "value_top1_delta": -1.0,
+        "letter_top1_delta": -0.5
+      },
+      "location": {
+        "n": 2,
+        "value_delta": -1.240234375,
+        "letter_delta": -1.0312496945261955,
+        "value_top1_delta": 0.0,
+        "letter_top1_delta": -0.5
+      }
+    },
+    "by_condition_slot": {
+      "value_zero:category": {
+        "n": 1,
+        "value_delta": -9.5,
+        "letter_delta": -8.031250162050128,
+        "value_top1_delta": -1.0,
+        "letter_top1_delta": -1.0
+      },
+      "value_zero+choice_restore_clean_heads:category": {
+        "n": 1,
+        "value_delta": -9.59375,
+        "letter_delta": 1.0000003147870302,
+        "value_top1_delta": -1.0,
+        "letter_top1_delta": 0.0
+      },
+      "value_zero:location": {
+        "n": 1,
+        "value_delta": -1.21484375,
+        "letter_delta": -2.9062499329447746,
+        "value_top1_delta": 0.0,
+        "letter_top1_delta": -1.0
+      },
+      "value_zero+choice_restore_clean_heads:location": {
+        "n": 1,
+        "value_delta": -1.265625,
+        "letter_delta": 0.8437505438923836,
+        "value_top1_delta": 0.0,
+        "letter_top1_delta": 0.0
+      }
+    }
+  }
+}
