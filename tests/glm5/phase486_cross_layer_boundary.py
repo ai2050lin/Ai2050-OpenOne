@@ -1015,6 +1015,7 @@ def run_r2_confirmation(model_name):
 
     model, tokenizer, device = load_model_bf16(model_name)
     info = get_model_info(model, model_name)
+    layers_list = get_layers(model)
     W_U = get_W_U(model, model_name)
 
     r2_results = {

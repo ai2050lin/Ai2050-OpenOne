@@ -27989,6 +27989,286 @@ python tests/glm5_temp/phase485_r2_confirm.py qwen3                    # ~3min
 - 结果：`results/glm5/phase485_{qwen3,glm4,deepseek7b}_r1.json`
 - 结果：`results/glm5/phase485_{qwen3}_r2.json`
 
+## Phase 486: 跨层边界累积路径追踪 ★★★极重要★★★ [2026-06-14 09:20]
+
+### 核心问题
+
+Phase 485发现Qwen3 clothing单层MLP+Attn只覆盖39.3%边界幅度。60.7%来自哪里？
+fruit/animal边界不在单层attn+MLP中。边界信号是否跨层累积？
+
+### Exp1: 跨层边界累积剖面 ★★★★★ (ALL models, 36/40/28层全扫描)
+
+**方法**: 对每个类别，在最佳层构造B_c方向(b_hat)，逐层测量attn/MLP输出在b_hat上的投影差异(类别内-邻居)
+
+**Qwen3 clothing (B_c from L30):**
+
+| 层 | resid_diff | attn_diff | mlp_diff | 注释 |
+|---|-----------|-----------|----------|------|
+| L0-9 | +0.6→+14 | -0.1→-1.4 | +0.3→+2.7 | 早期MLP微弱正，attn微弱负 |
+| L10-19 | +17→+38 | -0.4→-5.3 | +3.7→+9.4 | ★attn反对clothing边界!★ |
+| L20-29 | +46→+281 | -3.9→+8.7 | +5.3→+47.9 | L23起attn转正，MLP渐增 |
+| L30 | +357 | +16.6 | +58.7 | best层，MLP贡献显著 |
+| L31-33 | +403→+491 | +10→+9 | +36→+31 | 后续层MLP贡献下降 |
+| L34 | +559 | +32 | +99.6 | ★MLP peak层★ |
+| L35 | +623 | +32.2 | +18.6 | 最后一层，attn主导 |
+
+★**关键发现1: Qwen3 clothing中间层(L6-L22)的attn反对B_c方向！**
+- L17: attn_diff=-5.26，说明attn在中间层抑制clothing边界
+- L23起attn转正，说明后期attn"翻墙"支持边界
+
+★**关键发现2: Qwen3 clothing MLP逐层累积**
+- L0=+0.29 → L30=+58.7 → L34=+99.6 (peak)
+- 每层MLP贡献少量B_c对齐信号，逐层叠加
+
+**Qwen3 fruit (B_c from L32):**
+
+| 层 | resid_diff | attn_diff | mlp_diff | 注释 |
+|---|-----------|-----------|----------|------|
+| L29 | +100 | +14.6 | +40.1 | attn+MLP peak |
+| L32 | +190 | +2.8 | +27.4 | best层 |
+| L33 | +178 | +0.1 | **-12.2** | ★MLP反对fruit边界!★ |
+| L34 | +176 | +4.4 | **-7.0** | ★MLP继续反对!★ |
+
+★**关键发现3: fruit边界的"后期修正"现象**
+- L29-L32: MLP支持fruit边界(+27~+40)
+- L33-L34: MLP反对fruit边界(-7~-12)
+- 说明fruit边界在高层被"修正"或"抑制"
+
+**GLM4 fruit (B_c from L27):**
+
+| 层 | resid_diff | attn_diff | mlp_diff | 注释 |
+|---|-----------|-----------|----------|------|
+| L0-22 | 0→+1.5 | ~0 | 0→+0.3 | 极微弱 |
+| L23-27 | +2.8→+15.2 | +0.8→+0.4 | +0.5→+4.7 | 突然增长 |
+| L28-32 | +16→+24 | 0→+2.6 | +0.8→+1.5 | 缓慢增长 |
+| L33 | +26.6 | 0 | +3.1 | |
+| L34 | +25.2 | 0 | **-1.4** | ★反对!★ |
+| L38 | +31.5 | +0.7 | +6.0 | MLP late peak |
+| L39 | +29.1 | 0 | **-2.3** | ★反对!★ |
+
+★**关键发现4: GLM4也存在"后期修正"——L34和L39 MLP反对fruit边界**
+
+**DS7B food (B_c from L27):**
+
+| 层 | resid_diff | attn_diff | mlp_diff |
+|---|-----------|-----------|----------|
+| L22-26 | +44→+141 | +8.5→+2.7 | +8.4→+24.5 |
+| L27 | **+294.7** | **-11.8** | **+165.6** | ★最后一层MLP爆发!★ |
+
+★**关键发现5: DS7B food在最后一层L27有巨大MLP贡献(+165.6)但attn反对(-11.8)**
+
+### Exp2: 多层联合MLP B_c投影消融 ★★★★★ 极重要 ★★★★★ (ALL models)
+
+**方法**: 在多层同时去除MLP输出中的B_c对齐投影，测量DCF变化
+
+**Qwen3 clothing:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L30) | -0.59 | 4.9% | 0.603 |
+| pm5(L25,30,35) | -0.64 | 5.4% | 0.646 |
+| pm10(L20,25,30,35) | -0.57 | 4.8% | 0.612 |
+| full_span(L0,15,20,30,35) | -0.45 | 3.8% | 0.577 |
+
+★**关键发现6: Qwen3 clothing MLP B_c投影消融几乎无效(5%)！**
+即使5层联合消融，也只达5.4%。与Phase 485的35.1%(完整MLP子层消融)形成鲜明对比。
+说明MLP对clothing边界的贡献主要通过**非线性交互**传递，而非直接的B_c对齐输出。
+
+**Qwen3 fruit:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L32) | -0.62 | 17.3% | 0.360 |
+| full_span | -0.44 | 12.2% | 0.302 |
+
+★fruit比clothing效果更好(17.3% vs 4.9%)，与Phase 485的MLP非主导结论不同。
+
+**GLM4 fruit ★★★突破★★★:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L27) | -0.82 | **81.9%** | 0.177 |
+| pm5(L22,27,32) | -0.88 | **87.9%** | 0.228 |
+| pm10(L17,22,27,32,37) | -0.98 | **97.6%** | 0.263 |
+| full_span(L0,13,17,27,32,39) | -0.68 | 68.3% | 0.178 |
+
+★★★**关键发现7: GLM4 fruit首次达到97.6%幅度闭环！**★★★
+- 5层MLP B_c投影消融复现了97.6%的方向级remove幅度
+- cos较低(0.263)说明DCF变化模式与方向级remove不完全相同
+- full_span下降到68.3%说明早期层干扰
+
+**GLM4 clothing:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L39) | -1.26 | 23.4% | 0.874 |
+| pm5 | -1.33 | 24.6% | 0.883 |
+| pm10 | -1.36 | 25.2% | 0.867 |
+| full_span | -1.36 | 25.3% | 0.873 |
+
+clothing cos很高(0.874-0.883)但幅度只25%，说明MLP B_c投影方向对但幅度不够。
+
+**GLM4 animal:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L38) | -0.10 | 2.0% | 0.047 |
+| pm5 | +0.24 | 4.9% | -0.197 |
+
+animal完全失败(cos为负)，确认animal不是MLP主导。
+
+**DS7B fruit:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L26) | -0.18 | 10.3% | 0.495 |
+| pm5(L21,26,27) | +2.03 | **114.2%** | **0.992** |
+| pm10 | +2.00 | 112.6% | 0.991 |
+
+★**关键发现8: DS7B fruit pm5消融达114.2%且cos=0.992！**
+但target_D为正(+2.03)，说明消融后目标类别反而上升——方向反转了！
+cos=0.992说明DCF变化模式与方向级remove高度对齐，但幅度过冲且符号反转。
+
+**DS7B food:**
+
+| 消融范围 | target_D | amplitude_ratio | cos_remove |
+|----------|---------|----------------|------------|
+| single(L27) | -1.27 | **104.6%** | 0.778 |
+| full_span | -1.44 | 118.7% | 0.750 |
+
+★**关键发现9: DS7B food单层MLP消融即达104.6%！**完全闭环！
+
+### Exp3: 格式子空间逐层分析 (ALL models)
+
+**方法**: 用4种模板提取格式子空间(SVD)，测量B_c与格式方向的cos
+
+**Qwen3:**
+- clothing: L0=0.094 → L25=0.403 → L30=0.297 (高层格式重叠显著)
+- fruit: L0=0.048 → L25=0.458 → L30=0.339
+- animal: L0=0.063 → L25=0.468 → L30=0.316
+
+**GLM4:**
+- fruit: L27=0.516, L31=0.473 (格式污染最重)
+- clothing: L27=0.598, L31=0.561 (格式污染极重)
+
+**DS7B:**
+- fruit: L27=0.048, L25=0.159 (格式污染最低!)
+- food: L27=0.123
+- animal L27: cos_top2=0.465 (特定格式维度对齐)
+
+★**关键发现10: GLM4格式污染最重(cos~0.5-0.6)，DS7B最轻(cos<0.16)**
+- GLM4的高格式污染可能解释为什么其MLP消融效果更好：
+  B_c方向中包含大量格式成分，MLP B_c投影消融同时去除了格式信号
+
+### Exp4: 跨层关系不变性 (ALL models)
+
+**Qwen3 clothing (scale=0.1):**
+
+| 层 | mean_delta | delta_range | relative_range |
+|---|-----------|-------------|---------------|
+| L25 | 1.57 | 0.05 | 3.39% |
+| L30 | 2.71 | 0.02 | 0.88% |
+| L35 | 2.71 | 0.01 | 0.53% |
+
+高层很稳定(0.5-3.4%)，与Phase 485一致。
+
+**GLM4 clothing (scale=0.1):**
+
+| 层 | mean_delta | delta_range | relative_range |
+|---|-----------|-------------|---------------|
+| L24 | 0.41 | 0.002 | 0.55% |
+| L29 | 1.20 | 0.008 | 0.68% |
+| L34 | 2.43 | 0.022 | 0.89% |
+| L39 | 2.61 | 0.002 | 0.06% |
+
+★GLM4所有层都很稳定(rel_range<1%)，确认关系不变性是真实结构特征。
+
+**DS7B clothing (scale=0.1):**
+
+| 层 | mean_delta | delta_range | relative_range |
+|---|-----------|-------------|---------------|
+| L13 | 1.58 | 1.76 | 110.55% |
+| L18 | 1.34 | 0.24 | 17.76% |
+| L23 | 1.01 | 0.66 | 64.39% |
+| L27 | 0.04 | 0.02 | 47.77% |
+
+★DS7B低层和中层关系不变性差(rel_range高达110%)，但高层(L27=47.77%)仍不够好。
+
+### R2确认 (GLM4, 8 objects)
+
+**Peak层确认:**
+- fruit L31 (attn peak): attn_proj_diff=+2.60, mlp_proj_diff=+0.56 (8对象确认)
+- fruit L38 (MLP peak): attn_proj_diff=+0.49, mlp_proj_diff=+6.08 (8对象确认)
+- clothing L38 (MLP peak): mlp_proj_diff=+46.06 (8对象确认，极大！)
+
+**关系不变性确认:**
+- clothing L39: rel_range=12.88% (scale=0.1, 8对象)
+- fruit L32: rel_range=28.46% (scale=0.1)
+
+### 新增客观事实拼图(8条)
+
+48. **Qwen3 clothing中间层attn反对B_c方向**: L6-L22 attn_diff为负(L17=-5.26)，说明attn在中间层抑制clothing边界
+49. **Qwen3 clothing MLP逐层累积B_c信号**: L0=+0.29 → L34=+99.6(peak)，每层贡献少量对齐信号
+50. **fruit/animal边界存在"后期修正"现象**: L33-L34 MLP反对fruit边界(-12.2, -7.0)，GLM4 L34和L39也反对fruit
+51. **GLM4 fruit首次达到97.6%幅度闭环**: 5层MLP B_c投影消融(pm10)复现97.6%方向级remove幅度
+52. **Qwen3 clothing MLP B_c投影消融几乎无效(5%)**: 与Phase 485完整MLP消融35.1%形成对比，说明MLP通过非线性交互传递
+53. **DS7B fruit pm5消融cos=0.992但方向反转**: DCF变化模式高度对齐但target_D为正(+2.03)
+54. **DS7B food单层MLP消融达104.6%**: 完全幅度闭环，且L27 MLP贡献巨大(+165.6)
+55. **GLM4格式污染最重(cos~0.5-0.6)**, DS7B最轻(cos<0.16)：格式污染程度影响MLP消融效果
+
+### ★★★Phase 486最关键的3个客观发现★★★
+
+**发现1: 边界信号是逐层累积的，而非单层写入**
+- Qwen3 clothing: L0=+0.59 → L30=+357 → L35=+623，单调递增
+- GLM4 fruit: L0=0 → L27=+15.2 → L38=+31.5
+- DS7B food: L0=0 → L27=+294.7
+- 边界方向是所有层attn+MLP贡献的总和
+
+**发现2: 存在"反对层"——某些层的MLP/attn反对边界方向**
+- Qwen3 clothing L6-L22: attn反对(-5.26 peak)
+- Qwen3 fruit L33-L34: MLP反对(-12.2, -7.0)
+- GLM4 fruit L34, L39: MLP反对(-1.4, -2.3)
+- DS7B food L27: attn反对(-11.8)
+- 说明边界是支持力与反对力的**动态平衡**，不是单向累积
+
+**发现3: GLM4 fruit首次达到97.6%幅度闭环**
+- 5层MLP B_c投影消融(L17,22,27,32,37)复现了97.6%的方向级remove幅度
+- 但cos=0.263较低，说明DCF变化模式不完全相同
+- 格式污染可能贡献了部分效果(cos(Bc,format)=0.516)
+
+### 硬伤分析
+
+1. **MLP B_c投影消融 vs 完整MLP消融是不同操作**:
+   - B_c投影消融只去除MLP输出中的B_c对齐成分
+   - 完整MLP消融去除全部MLP输出
+   - Qwen3 clothing: B_c投影消融5% vs 完整MLP消融35% → MLP通过非线性交互传递边界信号
+   - 这不是bug，而是重要发现
+
+2. **GLM4 fruit 97.6%的cos只有0.263**: DCF变化模式与方向级remove不完全对齐，可能因为B_c投影消融同时去除了格式成分
+
+3. **DS7B fruit方向反转**: pm5消融target_D=+2.03(应为负)，说明多层B_c投影消融可能导致非线性交互效应
+
+4. **关系不变性在不同层差异大**: Qwen3和GLM4高层稳定(<1%)，DS7B不够稳定(47-110%)
+
+5. **R2确认关系不变性略高**: GLM4 L39从0.06%(R1)到12.88%(R2)，可能与样本量增大有关
+
+### 命令记录
+
+```bash
+# Phase 486 R1 (3个模型)
+python tests/glm5/phase486_cross_layer_boundary.py qwen3 1       # ~2min
+python tests/glm5/phase486_cross_layer_boundary.py glm4 1         # ~38min
+python tests/glm5/phase486_cross_layer_boundary.py deepseek7b 1  # ~23min
+
+# Phase 486 R2 (GLM4确认)
+python tests/glm5/phase486_cross_layer_boundary.py glm4 2         # ~5min
+```
+
+脚本位置：
+- `tests/glm5/phase486_cross_layer_boundary.py` — Phase 486 主测试
+- 结果：`results/glm5/phase486_{qwen3,glm4,deepseek7b}_r1.json`
+- 结果：`results/glm5/phase486_glm4_r2.json`
+
 ### 命令记录
 
 ```bash
@@ -28008,3 +28288,51 @@ python tests/glm5_temp/phase483_r2_confirm.py deepseek7b   # 3/3 confirmed
 - `tests/glm5_temp/phase483_r2_confirm.py` — Phase 483 R2确认
 - 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r1.json`
 - 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r2.json`
+
+## Phase 487: 正交成分因果测试、连续段消融与反对层验证 [2026-06-14 11:25]
+
+### Exp1核心发现: 正交成分是边界因果的主要路径
+
+| 模型-类别 | 关键层 | proj_bc amp | orth_bc amp | full_mlp amp |
+|-----------|-------|------------|------------|-------------|
+| Qwen3 fruit | L35 | 4.5% | **140.1%** | 134.6% |
+| Qwen3 fruit R2 | L35 | 6.2% | **165.2%** | 157.6% |
+| GLM4 fruit | L22 | 0.9% | **29.3%** | 24.8% |
+| GLM4 fruit | L32 | 3.2% | **42.0%** | 46.9% |
+| DS7B fruit | L26 | 0.9% | **148.5%** | 136.5% |
+| DS7B food | L27 | 81.6% | **867.8%** | 1051.9% |
+
+★正交成分消融效果远超投影成分！MLP对边界的因果贡献主要通过不对齐B_c的输出传递。
+
+### Exp2核心发现: GLM4 fruit三层架构
+- L0-9: orth_bc=228%, proj_bc=1% (早层正交主导)
+- L20-26: orth_bc=205%, proj_bc=55% (中层投影增长)
+- L27-32: proj_bc=38%, orth_bc=24% (投影主导)
+- L33-end: orth_bc=171%, proj_bc=8% (晚层正交主导)
+
+### Exp3核心发现: 反对层是真实因果机制
+- Qwen3 fruit: ablate_opp_mlp(L33,34) -> target_D=+2.69(增强边界); double -> -2.91(削弱边界)
+- 消融反对层MLP释放边界信号，加倍反对层MLP抑制边界信号
+
+### Exp4核心发现: B_c语义投影比始终高于格式投影比
+- 所有模型、类别中 proj_sem > proj_fmt
+- Qwen3 clothing L35: proj_sem=0.341 >> proj_fmt=0.134
+
+### 新增客观事实(8条)
+56. Qwen3 fruit L35正交成分消融165.2%(R2确认)
+57. GLM4 fruit边界是三层架构: 早层正交+中层投影+晚层正交
+58. Qwen3 fruit反对层MLP是真实因果机制: ablate=+2.69, double=-2.91
+59. Qwen3 clothing L34-end段MLP贡献47%边界幅度
+60. DS7B food L27正交成分867.8%极端放大
+61. B_c语义投影比始终高于格式投影比
+62. GLM4 clothing L39 proj_bc cos=0.999完美对齐
+63. Qwen3 clothing反对层attn消融与预期相反(削弱而非增强边界)
+
+### 命令记录
+python tests/glm5/phase487_orthogonal_propagation.py qwen3 1
+python tests/glm5/phase487_orthogonal_propagation.py glm4 1
+python tests/glm5/phase487_orthogonal_propagation.py deepseek7b 1
+python tests/glm5/phase487_orthogonal_propagation.py qwen3 2
+
+脚本: tests/glm5/phase487_orthogonal_propagation.py
+结果: results/glm5/phase487_{qwen3,glm4,deepseek7b}_r1.json, phase487_qwen3_r2.json
