@@ -17104,3 +17104,1162 @@ empirical suppressor:
   empirical_joint 比 support-only 更低 release，且不显著牺牲 target recovery，
   才能说明 suppressor/control component 被真正捕捉。
 ```
+
+## Phase 143: Time Interface Empirical Suppressor time 接口验证与经验抑制重定义 [2026-06-15 09:28]
+
+### 本阶段目标
+
+根据用户要求，先分析附加判断是否正确，再继续完成客观测试。
+
+附加分析基本正确：
+
+```text
+1. Phase142 已经证明不能只围绕 target support restore 推进。
+2. number/plant 在 DS7B true-last attention_output 上有 low-scale clean restore window。
+3. time 不是完全失败，而是有效恢复路径在 last-1 mlp_input。
+4. naive suppressor 失败不能解释成 suppressor 不存在，只能说明人工固定 competitor basis 不可靠。
+5. container 必须补测 input_answer，因为 Phase142 没覆盖 Phase141 的成功位点。
+```
+
+本轮 Phase143 目标：
+
+```text
+1. 复测 DS7B time L27 mlp_input 是否稳定 clean。
+2. 把 input_answer 加入 container/number/plant/time 的恢复位点。
+3. 对比 support、naive_joint、empirical_joint。
+4. empirical_joint 使用 support-only 实际释放出的 top competitor 作为 suppressor source。
+5. 继续使用 hard clean criterion，不只看 recovery 最大值。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --rank 4 \
+  --categories container,time \
+  --layer-offsets 0 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.5 \
+  --modes support,naive_joint,empirical_joint \
+  --output-dir results/gpt5_phase143_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py qwen3 \
+  --train-objects 10 \
+  --test-objects 20 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories container,time \
+  --layer-offsets 0,-1 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.35,0.5 \
+  --modes support,naive_joint,empirical_joint \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase143_time_interface_empirical_suppressor \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py glm4 \
+  --train-objects 10 \
+  --test-objects 20 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories container,time \
+  --layer-offsets 0,-1 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.35,0.5 \
+  --modes support,naive_joint,empirical_joint \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase143_time_interface_empirical_suppressor \
+  --hard-exit-after-model
+
+python tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py deepseek7b \
+  --train-objects 30 \
+  --test-objects 60 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories number,container,plant,time \
+  --layer-offsets 0,-1,-2 \
+  --restore-sites input_answer,attention_output,mlp_input \
+  --restore-scales 0.2,0.25,0.3,0.35,0.4,0.45,0.5 \
+  --modes support,naive_joint,empirical_joint \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase143_time_interface_empirical_suppressor \
+  --hard-exit-after-model
+
+# 30/60 超过部分类别可用 heldout 对象范围，实际主测试改为：
+python tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py deepseek7b \
+  --train-objects 20 \
+  --test-objects 40 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories number,container,plant,time \
+  --layer-offsets 0,-1,-2 \
+  --restore-sites input_answer,attention_output,mlp_input \
+  --restore-scales 0.2,0.25,0.3,0.35,0.4,0.45,0.5 \
+  --modes support,naive_joint,empirical_joint \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase143_time_interface_empirical_suppressor \
+  --hard-exit-after-model
+
+python tests/gpt5/phase143_time_interface_empirical_suppressor_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py \
+  tests/gpt5/phase143_time_interface_empirical_suppressor_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase143_time_interface_empirical_suppressor_cuda.py`
+- 汇总脚本：`tests/gpt5/phase143_time_interface_empirical_suppressor_summary.py`
+- Qwen3 结果：`results/gpt5_phase143_time_interface_empirical_suppressor/phase143_qwen3_time_interface_empirical_suppressor.json`
+- GLM4 结果：`results/gpt5_phase143_time_interface_empirical_suppressor/phase143_glm4_time_interface_empirical_suppressor.json`
+- DS7B 结果：`results/gpt5_phase143_time_interface_empirical_suppressor/phase143_deepseek7b_time_interface_empirical_suppressor.json`
+- 跨模型汇总：`results/gpt5_phase143_time_interface_empirical_suppressor/phase143_cross_model_summary.md`
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = container,time
+  train/test objects = 10/20
+  layers = true-last,last-1
+  sites = input_answer,mlp_input
+
+GLM4:
+  categories = container,time
+  train/test objects = 10/20
+  layers = true-last,last-1
+  sites = input_answer,mlp_input
+
+DS7B:
+  categories = number,container,plant,time
+  train/test objects = 20/40
+  layers = L28,L27,L26
+  sites = input_answer,attention_output,mlp_input
+  scales = 0.2,0.25,0.3,0.35,0.4,0.45,0.5
+  modes = support,naive_joint,empirical_joint
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+container/time 均无 clean restore。
+
+container L36:
+  best support = mlp_input scale0.5
+  target +7.22, release +11.91, dirty
+
+time L36:
+  best support = mlp_input scale0.5
+  target +9.97, release +12.34, dirty
+
+container L35:
+  best empirical_joint input_answer scale0.5
+  target -0.77, release +0.14, recovery +0.46, below clean threshold
+
+time L35:
+  best empirical_joint mlp_input scale0.5
+  target -1.60, release +1.79, recovery +0.47, dirty
+```
+
+Qwen3 继续表现为高增益、强竞争释放，不能提供 clean restore 主证据。
+
+#### GLM4 bf16
+
+```text
+container/time 均无 clean restore。
+
+container L40:
+  best support = mlp_input scale0.25
+  target -0.30, release +0.26, recovery negative
+
+time L40:
+  best support = mlp_input scale0.25
+  target +0.02, release +0.48, dirty
+
+container/time 的 empirical_joint 经常带来更大 release。
+```
+
+GLM4 仍然不是本机制的强证据模型。
+
+#### DS7B
+
+```text
+number L28:
+  clean count = 4
+  best clean = support attention_output scale0.3
+  target -0.43, release +0.12, recovery +0.68
+
+plant L28:
+  clean count = 2
+  best clean = support attention_output scale0.35
+  target -0.69, release +0.11, recovery +0.62
+
+time L27:
+  clean count = 4
+  best clean = support mlp_input scale0.5
+  target -0.18, release +0.19, recovery +0.92
+
+time L28:
+  clean count = 1
+  best clean = support mlp_input scale0.2
+  target -0.98, release +0.06, recovery +0.53
+
+container L28:
+  clean count = 0
+  best input_answer support:
+    target -1.13, release +0.00, recovery +0.36
+  best support overall:
+    mlp_input scale0.5 target +3.19, release +1.90, dirty
+
+container L27/L26:
+  clean count = 0
+```
+
+### 当前最可靠客观事实
+
+1. **time L27 mlp_input clean restore 被复现**
+
+```text
+Phase142:
+  time L27 support mlp_input scale0.5
+  recovery +0.92, release +0.19
+
+Phase143:
+  time L27 support mlp_input scale0.5
+  recovery +0.92, release +0.19
+```
+
+这已经是当前最稳定的 time 路径证据。
+
+2. **time true-last L28 不是绝对失败，但窗口更弱**
+
+```text
+time L28 support mlp_input scale0.2:
+  recovery +0.53, release +0.06
+```
+
+Phase142 没有测 scale0.2，所以漏掉了这个弱 clean window。更强、更稳定的仍然是 L27 mlp_input。
+
+3. **number/plant true-last attention_output 复现**
+
+```text
+number L28 attention_output scale0.3:
+  recovery +0.68, release +0.12
+
+plant L28 attention_output scale0.35:
+  recovery +0.62, release +0.11
+```
+
+这说明 number/plant 的 clean window 不是偶然。
+
+4. **container input_answer 没有稳定复现 Phase141**
+
+```text
+container L28 input_answer best support:
+  recovery +0.36, release +0.00
+```
+
+这说明 Phase141 的 container clean restore 可能依赖：
+
+```text
+不同 restore 构造
+不同数据切分
+scale1.0 而非本轮最高0.5
+或小样本偶然性
+```
+
+当前不能继续把 container 当作已闭合 clean path。
+
+5. **empirical_joint 第一版没有成功**
+
+本轮 empirical_joint 使用 support-only 实际释放出的 top competitor 选择 suppressor basis，但多数结果：
+
+```text
+没有提升 recovery
+没有降低 release
+常造成 target recovery 下降或 negative recovery
+```
+
+因此“按实际释放类选择类别基底”仍不等于真实 suppressor。
+
+### 对当前理论的修正
+
+当前最谨慎公式应写成：
+
+```text
+conditioned relation factor =
+  category support channel
+  + layer-site routing gate
+  + scale-bounded clean window
+  + unresolved competition-control component
+```
+
+已经较可靠的映射：
+
+```text
+number:
+  DS7B L28 attention_output low-scale support channel
+
+plant:
+  DS7B L28 attention_output low-scale support channel
+
+time:
+  DS7B L27 mlp_input strong support channel
+  DS7B L28 mlp_input weak support window
+
+container:
+  unresolved
+```
+
+这里还不能把 suppressor/control 写成已被捕捉的机制项，只能说它客观存在为 release/dirty 现象，但方向没有被正确分离。
+
+### 硬伤和瓶颈
+
+1. **DS7B 30/60 不能执行**
+
+原因是部分类别 heldout 对象不足，导致测试集合为空。本轮主测试改为 20/40。后续如果要更大数据，必须先扩充 CATEGORY_OBJECTS。
+
+2. **container 结论被削弱**
+
+Phase143 补测 input_answer 后仍未 clean，因此 Phase141 的 container 需要重新审计，不能继续作为稳定通道。
+
+3. **empirical suppressor 仍然不是机制 suppressor**
+
+用 top released competitor 的类别基底做 suppressor 仍然失败，说明真实抑制方向可能不是类别方向，而是更局部的 dirty-clean 差分、logit margin 方向或 normalization gate。
+
+4. **clean window 非常窄**
+
+number/plant/time 都存在 scale-sensitive 现象，说明不能只用线性强注入解释。
+
+5. **仍未做完整生成**
+
+当前结果仍是 first-token/readout 层面的因果现象，还没有证明多 token 生成稳定。
+
+### 下一阶段任务
+
+Phase144 应做：
+
+```text
+Dirty-Clean Contrast Suppressor and Container Re-audit
+脏恢复-干净恢复对比抑制方向与 container 重审计
+```
+
+核心目标：
+
+```text
+1. 不再用类别 basis 做 suppressor。
+2. 从同一 category/site/layer 下的 dirty restore 与 clean restore 直接取差分方向。
+3. 对 number/plant/time 的 clean-vs-dirty scale pair 做 contrast。
+4. 对 container 单独重审 Phase141 条件：scale 扩到 1.0/1.5，恢复构造与 Phase141 对齐。
+5. 判断 suppressor 是否是局部差分方向，而不是类别级方向。
+```
+
+建议测试范围：
+
+```text
+DS7B main:
+  categories = number,plant,time,container
+  train/test objects = 20/40
+  number/plant:
+    layer = L28
+    site = attention_output
+    clean scale = 0.3/0.35
+    dirty scale = 0.5
+  time:
+    layer = L27
+    site = mlp_input
+    clean scale = 0.5
+    dirty candidate = higher or alternative-site restore
+  container:
+    layers = L28,L27
+    sites = input_answer,attention_output,mlp_input
+    scales = 0.25,0.5,0.75,1.0,1.25,1.5
+
+Qwen3/GLM4:
+  optional confirmation only。
+```
+
+成功判据：
+
+```text
+dirty-clean contrast suppressor:
+  joint restore 降低 release，
+  target recovery 不显著下降，
+  clean count 高于 support-only。
+
+container:
+  如果 scale1.0/1.5 仍不能复现 clean restore，
+  则 Phase141 container 应降级为 unstable finding。
+```
+
+## Phase 144: Dirty-Clean Contrast Suppressor and Container Re-audit 脏干净对比抑制与 container 重审计 [2026-06-15 09:55]
+
+### 本阶段目标
+
+根据用户要求，先分析附加判断是否正确，再综合当前进展继续完成客观测试。
+
+附加分析中正确部分：
+
+```text
+1. Phase143 的核心进展是 layer-site routing，而不是 empirical_joint 成功。
+2. time 在 DS7B L27 mlp_input 的 clean restore 已经是稳定路径证据。
+3. number/plant 在 DS7B L28 attention_output 上有 low-scale clean restore window。
+4. container 应降级为 unresolved，必须按 Phase141 条件补测 scale1.0/1.5。
+5. suppressor 不能继续用 category basis，需要 dirty-clean contrast。
+```
+
+本轮目标：
+
+```text
+1. 不再用类别基底作为 suppressor。
+2. 从 dirty support restore 与 clean support restore 的 answer state 差分中构造 contrast suppressor。
+3. 对 container 扩展 scale 到 1.5，复查 input_answer 是否能复现 clean。
+4. 对 number/plant/time/container 保持同一轮 DS7B 主测试，不拆分批次。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py qwen3 \
+  --train-objects 2 \
+  --test-objects 2 \
+  --batch-size 4 \
+  --rank 4 \
+  --categories container,time \
+  --layer-offsets 0 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.5 \
+  --contrast-suppress-scales 0.5 \
+  --output-dir results/gpt5_phase144_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py qwen3 \
+  --train-objects 10 \
+  --test-objects 20 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories container,time \
+  --layer-offsets 0,-1 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.5,1.0 \
+  --contrast-suppress-scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase144_dirty_clean_contrast_container \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py glm4 \
+  --train-objects 10 \
+  --test-objects 20 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories container,time \
+  --layer-offsets 0,-1 \
+  --restore-sites input_answer,mlp_input \
+  --restore-scales 0.25,0.5,1.0 \
+  --contrast-suppress-scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase144_dirty_clean_contrast_container \
+  --hard-exit-after-model
+
+python tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py deepseek7b \
+  --train-objects 20 \
+  --test-objects 40 \
+  --batch-size 20 \
+  --rank 8 \
+  --categories number,plant,time,container \
+  --layer-offsets 0,-1,-2 \
+  --restore-sites input_answer,attention_output,mlp_input \
+  --restore-scales 0.25,0.5,0.75,1.0,1.25,1.5 \
+  --contrast-suppress-scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase144_dirty_clean_contrast_container \
+  --hard-exit-after-model
+
+python tests/gpt5/phase144_dirty_clean_contrast_container_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py \
+  tests/gpt5/phase144_dirty_clean_contrast_container_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase144_dirty_clean_contrast_container_cuda.py`
+- 汇总脚本：`tests/gpt5/phase144_dirty_clean_contrast_container_summary.py`
+- Qwen3 结果：`results/gpt5_phase144_dirty_clean_contrast_container/phase144_qwen3_dirty_clean_contrast_container.json`
+- GLM4 结果：`results/gpt5_phase144_dirty_clean_contrast_container/phase144_glm4_dirty_clean_contrast_container.json`
+- DS7B 结果：`results/gpt5_phase144_dirty_clean_contrast_container/phase144_deepseek7b_dirty_clean_contrast_container.json`
+- 跨模型汇总：`results/gpt5_phase144_dirty_clean_contrast_container/phase144_cross_model_summary.md`
+
+### 测试范围
+
+```text
+Qwen3/GLM4:
+  categories = container,time
+  train/test objects = 10/20
+  layers = true-last,last-1
+  sites = input_answer,mlp_input
+  scales = 0.25,0.5,1.0
+
+DS7B:
+  categories = number,plant,time,container
+  train/test objects = 20/40
+  layers = L28,L27,L26
+  sites = input_answer,attention_output,mlp_input
+  support scales = 0.25,0.5,0.75,1.0,1.25,1.5
+  contrast suppress scales = 0.25,0.5,1.0
+```
+
+### 方法说明
+
+```text
+support-only:
+  移除 pre-answer target basis 后，在指定 site 恢复 W·R_pre。
+
+dirty-clean contrast:
+  在同一 category/layer/site 下，
+  找 clean support candidate 与 dirty support candidate，
+  取 dirty answer state mean - clean answer state mean，
+  作为 contrast suppressor basis。
+
+contrast_joint:
+  用 dirty scale 做 support restore，
+  同时减去 dirty-clean contrast basis 投影。
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+container/time 均无 clean restore。
+
+container L36:
+  best support = mlp_input scale0.5
+  target +7.22, release +11.91, dirty
+
+time L36:
+  best support = mlp_input scale1.0
+  target +10.72, release +12.95, dirty
+
+time L35:
+  best support = mlp_input scale1.0
+  recovery +0.92, release +1.03, dirty
+```
+
+Qwen3 仍是强 release 模型，本轮 contrast 没能降低 release。
+
+#### GLM4 bf16
+
+```text
+container/time 均无 clean restore。
+
+container L40:
+  best support = mlp_input scale0.25
+  target -0.30, release +0.26, recovery negative
+
+time L40:
+  best support = mlp_input scale0.25
+  target +0.02, release +0.48, dirty
+```
+
+GLM4 仍未形成强机制证据。
+
+#### DS7B
+
+```text
+number L28:
+  clean count = 1
+  best clean = support attention_output scale0.25
+  target -0.54, release +0.00, recovery +0.60
+  dirty support attention_output scale1.5:
+    target +0.88, release +1.16, recovery +1.65
+  contrast_joint attention_output scale1.5:
+    target +0.26, release +0.68, recovery +1.19
+
+plant L28:
+  clean count = 2
+  clean support input_answer scale0.75:
+    target -0.89, release +0.13, recovery +0.52
+  clean contrast_joint attention_output scale1.5:
+    target -0.85, release +0.00, recovery +0.54
+  dirty support attention_output scale1.5:
+    target +0.53, release +2.06
+
+time L27:
+  clean count = 1
+  support mlp_input scale0.5:
+    target -0.18, release +0.19, recovery +0.92
+  dirty support mlp_input scale1.5:
+    target +1.63, release +2.06
+  contrast_joint mlp_input scale1.5:
+    target +2.05, release +2.51, worse
+
+container L28:
+  clean count = 3
+  support input_answer scale0.75:
+    target -0.62, release +0.00, recovery +0.65
+  support input_answer scale1.0:
+    target -0.09, release +0.13, recovery +0.95
+  contrast_joint attention_output scale1.5:
+    target -0.75, release +0.19, recovery +0.58
+
+container L27/L26:
+  no clean restore
+```
+
+### 当前最可靠客观事实
+
+1. **container Phase141 结果被恢复**
+
+Phase143 因为最高 scale 只有 0.5，没有复现 container。Phase144 把 scale 扩到 1.0 后：
+
+```text
+container L28 input_answer scale1.0:
+  recovery +0.95, release +0.13
+```
+
+这说明 container 不是不稳定失败，而是依赖更高 scale 的 input_answer interface。
+
+2. **time L27 mlp_input 再次复现**
+
+```text
+time L27 support mlp_input scale0.5:
+  recovery +0.92, release +0.19
+```
+
+time 的主路径仍稳定。
+
+3. **number/plant L28 support clean window 仍存在，但最佳 scale 有漂移**
+
+```text
+number:
+  Phase143 best clean scale0.3
+  Phase144 clean scale0.25
+
+plant:
+  Phase143 attention_output scale0.35 clean
+  Phase144 input_answer scale0.75 clean
+  Phase144 contrast_joint attention_output scale1.5 clean
+```
+
+这说明 clean window 不是单点常数，而是与测试尺度集合、site、contrast 构造有关。
+
+4. **dirty-clean contrast 只有局部成功**
+
+最有意义的正例：
+
+```text
+plant L28 attention_output:
+  dirty support scale1.5 release +2.06
+  contrast_joint scale1.5 release +0.00
+  recovery +0.54
+```
+
+但 number/time/container 的 contrast 没有稳定成功，因此不能说 suppressor 机制已闭合。
+
+5. **高 scale support 常把 target 推过头并释放 competitor**
+
+例如：
+
+```text
+number L28 attention_output scale1.5:
+  target +0.88, release +1.16
+
+time L27 mlp_input scale1.5:
+  target +1.63, release +2.06
+
+container L28 mlp_input scale1.5:
+  target +3.78, release +2.59
+```
+
+这进一步支持 scale-bounded clean window。
+
+### 理论进展
+
+当前理论应从 Phase143 的版本推进为：
+
+```text
+conditioned relation factor =
+  category support channel
+  + layer-site routing gate
+  + scale-bounded clean window
+  + interface-specific gain requirement
+  + partially observed dirty-clean control direction
+```
+
+较可靠映射：
+
+```text
+number:
+  DS7B L28 attention_output low-scale support。
+
+plant:
+  DS7B L28 support clean window；
+  dirty-clean contrast 在 attention_output 上有局部成功。
+
+time:
+  DS7B L27 mlp_input stable support。
+
+container:
+  DS7B L28 input_answer high-scale support。
+```
+
+最重要修正：
+
+```text
+container 与 number/plant/time 不同：
+  它不是 low-scale attention_output 路径，
+  而是 high-scale input_answer interface 路径。
+```
+
+### 硬伤和瓶颈
+
+1. **contrast suppressor 只有单点成功**
+
+plant 的 dirty-clean contrast 成功，但 number/time/container 没有普遍成功。当前 contrast 方向仍然太粗，可能需要按 token、样本或 competitor 分组，而不是全样本均值差。
+
+2. **clean window 受 scale grid 影响**
+
+Phase143 漏掉 container，因为 scale 只到 0.5；Phase144 找回 container，因为扩到 1.0。以后重要结论必须覆盖足够 scale 范围。
+
+3. **container 依赖高 scale**
+
+高 scale 容易造成 dirty restore，因此 container 的 clean 可能更脆弱，需要在更多模板和对象上验证。
+
+4. **仍是 first-token/readout 结果**
+
+还没有完整 generation closure。
+
+5. **Qwen3/GLM4 仍未闭合**
+
+跨模型共性目前主要体现在现象类型，不体现在同样的 clean path。
+
+### 下一阶段任务
+
+Phase145 应做：
+
+```text
+Mechanism Stability Matrix and Generation Closure
+机制稳定性矩阵与生成闭合
+```
+
+核心目标：
+
+```text
+1. 把 number/plant/time/container 四类的最佳 clean path 固定下来。
+2. 不再只找最大 recovery，而是建立稳定性矩阵：
+   category × layer × site × scale × template family × object split。
+3. 对每个类别至少保留：
+   best clean path
+   nearest dirty path
+   contrast path
+4. 对最稳定路径做 small generation closure。
+5. 明确哪些机制是稳定规律，哪些只是单轮窗口。
+```
+
+建议 DS7B 主测试：
+
+```text
+categories = number,plant,time,container
+train/test objects = 20/40
+template families = long, short, neutral
+paths:
+  number: L28 attention_output scale0.25/0.3
+  plant: L28 attention_output scale0.35 and input_answer scale0.75
+  time: L27 mlp_input scale0.5
+  container: L28 input_answer scale0.75/1.0
+dirty controls:
+  number: L28 attention_output scale1.5
+  plant: L28 attention_output scale1.5
+  time: L27 mlp_input scale1.5
+  container: L28 mlp_input scale1.5
+```
+
+成功判据：
+
+```text
+稳定性：
+  clean path 在 template/object 扩展后仍满足 recovery >= 0.5, release <= 0.25。
+
+生成闭合：
+  patched generation 的 first generated token 或短输出类别偏向与 readout restore 同步。
+
+理论推进：
+  如果四类最佳 path 稳定，
+  则 layer-site-scale routing 可以作为语言编码机制的第一张结构图。
+```
+
+## Phase 145: Mechanism Stability Matrix and Token Closure 机制稳定性矩阵与词元闭合审计 [2026-06-15 10:18]
+
+### 本阶段目标
+
+根据用户要求，先分析附加判断是否正确，再继续完成客观测试。
+
+附加分析中正确部分：
+
+```text
+1. Phase144 正确恢复了 container，并进一步确认 time L27 mlp_input。
+2. number/plant/time/container 的候选路径已经形成 layer-site-scale routing 雏形。
+3. dirty-clean contrast 只有 plant 局部成功，suppressor 尚未闭合。
+4. 下一步不能继续只看单点最大值，必须做 template/object stability matrix。
+5. token-level closure 仍然缺失，需要补上类别读出和首词元审计。
+```
+
+本轮 Phase145 目标：
+
+```text
+1. 固定 Phase144 得到的候选 clean path 和 dirty path。
+2. 扩展模板类型：
+   long, short, neutral。
+3. 扩展对象切分：
+   front_back, back_front。
+4. 用 clean_rate 评估路径稳定性，而不是只看 best case。
+5. 记录 category_argmax_rate 作为轻量 token/readout closure 指标。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase145_mechanism_stability_generation_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 8 \
+  --rank 4 \
+  --categories number,time \
+  --template-families long,short \
+  --splits front_back \
+  --output-dir results/gpt5_phase145_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase145_mechanism_stability_generation_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories number,plant,time,container \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase145_mechanism_stability_generation \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase145_mechanism_stability_generation_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories number,plant,time,container \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase145_mechanism_stability_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase145_mechanism_stability_generation_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories number,plant,time,container \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase145_mechanism_stability_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase145_mechanism_stability_generation_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase145_mechanism_stability_generation_cuda.py \
+  tests/gpt5/phase145_mechanism_stability_generation_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase145_mechanism_stability_generation_cuda.py`
+- 汇总脚本：`tests/gpt5/phase145_mechanism_stability_generation_summary.py`
+- Qwen3 结果：`results/gpt5_phase145_mechanism_stability_generation/phase145_qwen3_mechanism_stability_generation.json`
+- GLM4 结果：`results/gpt5_phase145_mechanism_stability_generation/phase145_glm4_mechanism_stability_generation.json`
+- DS7B 结果：`results/gpt5_phase145_mechanism_stability_generation/phase145_deepseek7b_mechanism_stability_generation.json`
+- 跨模型汇总：`results/gpt5_phase145_mechanism_stability_generation/phase145_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = number, plant, time, container
+train/test objects = 12/12
+object splits = front_back, back_front
+template families = long, short, neutral
+paths/category = 2 clean candidates + 1 dirty control
+```
+
+候选路径：
+
+```text
+number:
+  clean_a = L28/Ltrue attention_output scale0.25
+  clean_b = L28/Ltrue attention_output scale0.30
+  dirty = L28/Ltrue attention_output scale1.50
+
+plant:
+  clean_attn = L28/Ltrue attention_output scale0.35
+  clean_input = L28/Ltrue input_answer scale0.75
+  dirty = L28/Ltrue attention_output scale1.50
+
+time:
+  clean_mlp = L27/last-1 mlp_input scale0.50
+  weak_last = L28/Ltrue mlp_input scale0.20
+  dirty = L27/last-1 mlp_input scale1.50
+
+container:
+  clean_input_a = L28/Ltrue input_answer scale0.75
+  clean_input_b = L28/Ltrue input_answer scale1.00
+  dirty = L28/Ltrue mlp_input scale1.50
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+所有主要 clean path 均未形成稳定 clean。
+container clean_input_a clean_rate = 0.17，但 mean_release +2.89。
+number/plant/time clean_rate = 0。
+category_argmax_rate 全部为 0。
+```
+
+Qwen3 继续表现为高增益和不稳定竞争释放，不能作为当前机制闭合证据。
+
+#### GLM4 bf16
+
+```text
+plant clean_attn clean_rate = 0.17。
+其他路径 clean_rate 基本为 0。
+container/time/number 没有稳定 clean。
+category_argmax_rate 全部为 0。
+```
+
+GLM4 仍没有形成稳定路径闭合。
+
+#### DS7B
+
+跨模板族和对象切分后，Phase144 的单点路径明显降稳：
+
+```text
+container:
+  clean_input_a clean_rate = 0.33
+  clean_input_b clean_rate = 0.17
+  dirty clean_rate = 0
+
+number:
+  clean_a clean_rate = 0.17
+  clean_b clean_rate = 0.17
+  dirty clean_rate = 0.17
+
+plant:
+  clean_attn clean_rate = 0.17
+  clean_input clean_rate = 0.50
+  dirty clean_rate = 0
+
+time:
+  clean_mlp clean_rate = 0
+  weak_last clean_rate = 0
+  dirty clean_rate = 0
+```
+
+分模板族结果：
+
+```text
+long family:
+  number clean_rate = 0.50
+  plant clean_rate = 0.25
+  time clean_rate = 0
+  container clean_rate = 0
+
+short family:
+  plant clean_input 有 1 个 clean
+  container clean_input_a 有 1 个 clean
+  number/time 不稳定
+
+neutral family:
+  plant clean_input clean_rate = 0.50
+  container clean_input clean_rate = 0.50
+  number/time 不稳定
+```
+
+### 当前最可靠客观事实
+
+1. **Phase144 的路径不是跨模板/切分稳定机制**
+
+单轮长模板中的 clean path，在 Phase145 扩展后明显降稳。尤其：
+
+```text
+time L27 mlp_input:
+  Phase142/143/144 长模板稳定
+  Phase145 template/split 扩展 clean_rate = 0
+```
+
+time 的路径依然是长模板局部强现象，不能说已经跨模板稳定。
+
+2. **plant input_answer 是本轮最稳定路径**
+
+```text
+DS7B plant clean_input:
+  clean_rate = 0.50
+  mean recovery +0.63
+  mean release +0.18
+```
+
+这是四类里最接近稳定机制的路径。
+
+3. **container 仍有效但更脆弱**
+
+```text
+container clean_input_a clean_rate = 0.33
+container clean_input_b clean_rate = 0.17
+```
+
+container 不是失败，但它不像 Phase144 单点结果那样稳定。
+
+4. **number 只在 long/back_front 中较好**
+
+```text
+number long family clean_rate = 0.50
+overall clean_rate = 0.17
+```
+
+number clean path 明显受模板族和对象切分影响。
+
+5. **dirty controls 没有完全干净隔离**
+
+number dirty path 也出现 clean_rate 0.17，说明当前 dirty control 不总是 dirty。dirty/clean 边界仍受模板和切分影响。
+
+6. **category_argmax_rate 基本为 0**
+
+当前 patch 能改变 readout score，但没有让类别读出成为 argmax。这说明：
+
+```text
+internal support restore != token-level output closure
+```
+
+### 对当前理论的修正
+
+Phase145 对 Phase144 理论做了重要收紧。
+
+之前可写成：
+
+```text
+category -> layer-site-scale path
+```
+
+现在必须写成：
+
+```text
+category + template family + object split
+  -> layer-site-scale path
+```
+
+更谨慎版本：
+
+```text
+conditioned relation factor =
+  context-field support channel
+  + category-specific routing prior
+  + template-conditioned routing shift
+  + object-split sensitivity
+  + scale-bounded clean window
+  + unresolved token-level selection gate
+```
+
+当前最可靠说法：
+
+```text
+模型内部确实存在可因果恢复的支持通道；
+这些通道在单一长模板条件下较清楚；
+但跨模板和对象切分后，路径稳定性显著下降；
+因此 layer-site-scale routing 还不能直接视为稳定语言编码结构图，
+只能视为候选机制图。
+```
+
+### 硬伤和瓶颈
+
+1. **token-level closure 未通过**
+
+category_argmax_rate 基本为 0，说明恢复还没有接管最终 token selection。
+
+2. **路径高度模板依赖**
+
+long/short/neutral 的结果差异很大，说明模板本身是路由变量，不是噪声。
+
+3. **对象切分敏感**
+
+front_back 与 back_front 的差异说明对象集合会改变中心、basis 和 transfer。
+
+4. **dirty path 定义仍不稳定**
+
+dirty path 有时也会 clean，说明 dirty 不是固定 scale 即可定义。
+
+5. **本轮 generation closure 仍是轻量版本**
+
+记录了 category_argmax_rate 和 first-token ids，但还未做 autoregressive multi-token generate。
+
+### 下一阶段任务
+
+Phase146 应做：
+
+```text
+Template-Conditioned Router and Token Selection Gap
+模板条件化路由与词元选择缺口
+```
+
+核心目标：
+
+```text
+1. 不再假设统一 path。
+2. 对每个 template family 单独学习最佳 layer/site/scale。
+3. 判断路径不稳定来自：
+   layer/site 错位，
+   scale 错位，
+   还是 token selection gate 未打开。
+4. 对稳定性最好的 plant input_answer 做完整 token-level audit。
+5. 将 readout restore 与 final lm_head token logits 的差距拆出来。
+```
+
+建议测试范围：
+
+```text
+DS7B main:
+  categories = number,plant,time,container
+  template families = long,short,neutral
+  objects = 12/12 with two splits
+  per family sweep:
+    layers = true-last,last-1
+    sites = input_answer,attention_output,mlp_input
+    scales = 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5
+
+重点输出：
+  best path per category per template family
+  readout recovery
+  category_argmax_rate
+  target token rank
+  top released token/category
+```
+
+成功判据：
+
+```text
+如果 per-template best path 显著提高 clean_rate，
+说明 Phase145 的不稳定主要来自 template-conditioned routing shift。
+
+如果 readout recovery 高但 token rank 不提升，
+说明 token selection gate 是独立瓶颈。
+```
