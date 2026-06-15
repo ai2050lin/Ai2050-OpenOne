@@ -8,7 +8,7 @@ import {
   Grid3x3, HelpCircle, Layers,
   Maximize2, Minimize2, Network, RefreshCw, RotateCcw,
   Scale,
-  Settings, Share2, Sparkles, Target, TrendingUp, X
+  Settings, Share2, Sparkles, Target, Terminal, TrendingUp, X
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -27,6 +27,7 @@ import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
 import { HLAIBlueprint } from './HLAIBlueprint';
+import { AIRnDOverlay } from './AIRnD/AIRnDOverlay';
 import ParameterEncoding3D from './ParameterEncoding3D';
 import ResonanceField3D from './ResonanceField3D';
 import { SimplePanel } from './SimplePanel';
@@ -2177,6 +2178,7 @@ export default function App() {
   const [showOperationHistory, setShowOperationHistory] = useState(false);
   const [showBlueprint, setShowBlueprint] = useState(false);
   const [blueprintInitialTab, setBlueprintInitialTab] = useState('roadmap');
+  const [showAIRnD, setShowAIRnD] = useState(false);
 
   useEffect(() => {
     if (!hasInfoPanelContent) {
@@ -2881,6 +2883,26 @@ export default function App() {
         title="Project Genesis: 战略层级路线图"
       >
         <Brain size={20} />
+      </button>
+
+      {/* AI R&D Button */}
+      <button
+        onClick={() => setShowAIRnD(true)}
+        style={{
+          position: 'absolute', top: 20, left: 110, zIndex: 101,
+          background: showAIRnD ? '#a78bfa' : 'rgba(20, 20, 25, 0.8)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          padding: '8px',
+          cursor: 'pointer',
+          color: '#a78bfa',
+          backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 0 10px rgba(167, 139, 250, 0.3)'
+        }}
+        title="AI 研发: 自动逆向工程研究"
+      >
+        <Terminal size={20} />
       </button>
 
       {/* Global Config Panel */}
@@ -5346,6 +5368,13 @@ export default function App() {
             }}
           />
         </div>
+      )}
+
+      {/* AI R&D Overlay */}
+      {showAIRnD && (
+        <AIRnDOverlay
+          onClose={() => setShowAIRnD(false)}
+        />
       )}
 
     </div>

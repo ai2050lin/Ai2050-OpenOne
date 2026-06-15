@@ -55,6 +55,7 @@ from server.ricci_flow_service import ricci_flow_service
 from server.runtime.run_service import RunService
 from server.vision_service import vision_service
 from server.agi_chat_service import agi_chat_engine
+from server.ai_rnd_service import router as ai_rnd_router
 
 # --- Global Model State ---
 model = None
@@ -86,7 +87,22 @@ async def lifespan(app: FastAPI):
         from transformer_lens import HookedTransformer, HookedTransformerConfig
         from transformers import AutoTokenizer
 
-        snapshot_path = "D:/develop/model/hub/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e"
+        # Resolve GPT-2 model path (try local flat dir first, then HF cache)
+        cache_base = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+        snapshot_candidates = [
+            os.path.join(cache_base, "gpt2-local"),  # flat local copy (preferred)
+            os.path.join(cache_base, "models--gpt2", "snapshots", "607a30d783dfa663caf39e06633721c8d4cfcd7e"),
+            os.path.join(cache_base, "hub", "models--gpt2", "snapshots", "607a30d783dfa663caf39e06633721c8d4cfcd7e"),
+        ]
+        snapshot_path = None
+        for cand in snapshot_candidates:
+            weights_cand = os.path.join(cand, "model.safetensors")
+            if os.path.isfile(weights_cand) and os.path.getsize(weights_cand) > 100_000_000:
+                snapshot_path = cand
+                break
+        if snapshot_path is None:
+            raise FileNotFoundError(f"GPT-2 model.safetensors not found in any of: {snapshot_candidates}")
+        
         weights_path = os.path.join(snapshot_path, "model.safetensors")
         
         # 1. Initialize strict 12-layer GPT-2 config
@@ -104,8 +120,17 @@ async def lifespan(app: FastAPI):
         })
         model = HookedTransformer(cfg).to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
         
-        # 2. Load Local Tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(snapshot_path, local_files_only=True)
+        # 2. Load Local Tokenizer (try flat local copy first, then HF cache)
+        tokenizer = None
+        tokenizer_candidates = [snapshot_path] + snapshot_candidates
+        for tokenizer_path in tokenizer_candidates:
+            try:
+                tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
+                break
+            except Exception:
+                continue
+        if tokenizer is None:
+            raise RuntimeError("Could not load tokenizer from any cache path")
         tokenizer.pad_token = tokenizer.eos_token
         model.tokenizer = tokenizer
         
@@ -175,6 +200,7 @@ run_service = RunService(
     model_provider=lambda: model,
 )
 app.include_router(create_runs_router(run_service))
+app.include_router(ai_rnd_router)
 
 
 def _resolve_workspace_relative_path(path_str: str) -> Path:

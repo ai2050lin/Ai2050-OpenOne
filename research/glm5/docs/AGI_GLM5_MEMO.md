@@ -28289,6 +28289,7 @@ python tests/glm5_temp/phase483_r2_confirm.py deepseek7b   # 3/3 confirmed
 - 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r1.json`
 - 结果：`results/glm5/phase483_{qwen3,glm4,deepseek7b}_r2.json`
 
+
 ## Phase 487: 正交成分因果测试、连续段消融与反对层验证 [2026-06-14 11:25]
 
 ### Exp1核心发现: 正交成分是边界因果的主要路径
@@ -30263,3 +30264,53 @@ Phase 499对三个模型(Qwen3, GLM4, DS7B)进行了5项实验,修正了hidden_s
 4. **高gain维度 ≠ 语义判别维度** — gain放大的是"通用信号"而非"类别判别信号"
 5. **残差是语义主载体,MLP是范数调制器** — 与Phase 497/498结论一致
 6. **三个模型共享RMSNorm读出机制** — 但具体参数(增益大小、压缩比)不同
+---
+
+## Phase AI-RND-1: AI研发系统基础骨架 [2026-06-15 10:12]
+
+### 目标
+
+在客户端主界面添加AI研发功能，实现自动深度神经网络逆向工程研究系统。
+
+### 架构设计
+
+- App.jsx: 路线图按钮 + AI研发按钮 -> 全屏覆盖层
+- AIRnDOverlay (5 Tab): 配置/控制台/分析日志/代码生成/发现
+- 后端: server/ai_rnd_service.py - 10个API端点(FastAPI + SSE + 沙箱执行)
+
+### 自动研究循环 (5阶段)
+
+1. 分析: 多个AI分析师模型独立分析当前研究结果
+2. 规划: 主模型汇总分析，制定下一步实验方案
+3. 生成: 主模型根据方案生成Python测试代码
+4. 执行: 后端沙箱执行代码，收集结果
+5. 总结: 主模型总结发现，更新研究状态
+
+循环自动迭代，直到用户暂停或停止。
+
+### 已完成功能
+
+- App.jsx添加AI研发按钮 (Terminal图标, 紫色主题)
+- AIRnDOverlay.jsx 全屏覆盖层 (同HLAIBlueprint风格)
+- 5个Tab子组件完整UI
+- aiRnDConfig.js 默认配置 (主模型GLM-4-Flash + 分析师DeepSeek/Qwen-Max)
+- 后端API完整实现 (FastAPI + SSE + 沙箱执行)
+- 模型配置持久化 (ai_rnd_config.json)
+- 代码安全检查 (禁止危险模式)
+
+### 文件清单
+
+- frontend/src/AIRnD/AIRnDOverlay.jsx - 全屏覆盖层容器
+- frontend/src/AIRnD/AIRnDConfigTab.jsx - 模型配置+提示词编辑
+- frontend/src/AIRnD/AIRnDConsoleTab.jsx - 研究控制台+实时日志
+- frontend/src/AIRnD/AIRnDLogTab.jsx - 分析日志(筛选+搜索)
+- frontend/src/AIRnD/AIRnDCodeGenTab.jsx - 代码生成预览/执行
+- frontend/src/AIRnD/AIRnDFindingsTab.jsx - 研究发现汇总
+- frontend/src/AIRnD/aiRnDConfig.js - 默认配置数据
+- server/ai_rnd_service.py - 后端服务 (API + 研究循环 + 沙箱)
+
+### 待开发 (P2-P4)
+
+- P2: 提示词变量插值测试 + 研究上下文累积优化
+- P3: 实际AI API调用测试 + SSE事件流联调
+- P4: 完整5阶段自动循环验证 + 发现质量评估

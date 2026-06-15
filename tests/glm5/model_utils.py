@@ -25,17 +25,17 @@ from typing import Dict, List, Optional, Tuple
 # ===== 模型配置 =====
 MODEL_CONFIGS = {
     "qwen3": {
-        "path": "D:/develop/model/hub/models--Qwen--Qwen3-4B/snapshots/1cfa9a7208912126459214e8b04321603b3df60c",
+        "path": "D:/develop/model/Qwen/Qwen3-4B",
         "arch": "Qwen3ForCausalLM",
         "mlp_type": "split_gate_up",  # gate_proj + up_proj 分开
     },
     "glm4": {
-        "path": "D:/develop/model/hub/modelscope_cache/ZhipuAI/glm-4-9b-chat-hf",
+        "path": "D:/develop/model/ZhipuAI/glm-4-9b-chat-hf",
         "arch": "GlmForCausalLM",  # 也可能是Glm4ForCausalLM
         "mlp_type": "merged_gate_up",  # gate_up_proj 合并
     },
     "deepseek7b": {
-        "path": "D:/develop/model/hub/modelscope_cache/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "path": "D:/develop/model/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
         "arch": "Qwen2ForCausalLM",
         "mlp_type": "split_gate_up",  # gate_proj + up_proj 分开
     },
