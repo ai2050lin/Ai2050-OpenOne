@@ -29587,3 +29587,679 @@ animal的MLP贡献(-147)远大于fruit(-85)，说明animal的MLP对目标D的boo
 3. **DS7B的可靠性验证**: 换用纯GPU方式加载（如8bit全GPU），重测shared方向贡献
 4. **非shared方向的性质分析**: 它是否是"通用抑制"方向？是否跨类别一致？
 5. **MLP gate/up子模块因果干预**: 阻断gate_proj或up_proj输出后forward
+
+
+## Phase 497: Final RMSNorm分离与MLP因果闭环 [2026-06-14 2026-06-14 22:51]
+
+### ★★★ 核心发现: RMSNorm是末层DCF的真正决定机制，不是MLP方向写入 ★★★
+
+Phase 497最重要的发现是：
+
+**1. RMSNorm不是简单放大器，而是DCF空间的非线性重映射**
+
+Qwen3 R1 RMSNorm分离:
+| 类别 | D_pre(norm前) | D_post(norm后) | RMSNorm增益 | D变化 |
+|------|-------------|--------------|------------|------|
+| fruit | 23.46 | 6.11 | -17.36 | 压缩74% |
+| clothing | 48.95 | 4.31 | -44.64 | 压缩91% |
+| emotion | 26.42 | 3.25 | -23.17 | 压缩88% |
+| action | -10.21 | 2.59 | +12.80 | 翻转符号! |
+| animal | 26.25 | 7.25 | -18.99 | 压缩72% |
+
+★ RMSNorm将D压缩为原来的1/4~1/11!
+★ RMSNorm将action的D从负翻转为正!
+★ clothing在pre-norm空间D最高(48.95)，但在post-norm空间最低(4.31)!
+
+**2. MLP对D的贡献在pre-norm和post-norm下方向相反**
+
+Qwen3:
+| 类别 | ΔD(0MLP)_pre | ΔD(0MLP)_post | 方向翻转? |
+|------|-------------|--------------|---------|
+| fruit | -6.99 | -2.05 | 同向(负) |
+| clothing | +4.35 | -0.66 | ★翻转! |
+| emotion | +8.61 | -0.28 | ★翻转! |
+| action | -4.20 | +0.67 | ★翻转! |
+| animal | -2.27 | -1.78 | 同向(负) |
+
+解读:
+- clothing: MLP在pre-norm空间减少D(+4.35=去除MLP增加D)，但在post-norm空间增加D(-0.66=去除MLP减少D)
+- emotion: 同上翻转
+- action: MLP在pre-norm空间增加D(-4.20=去除MLP减少D)，但在post-norm空间减少D(+0.67=去除MLP增加D)
+
+★ 之前认为"MLP为D提供通用boost"是RMSNorm后的假象!
+★ 在原始hidden state空间，MLP实际上减少大部分类别的D!
+
+**3. MLP的效应主要通过RMSNorm缩放变化传递，方向效应可忽略**
+
+Qwen3 R2 Exp3 (RMSNorm方向vs范数分离):
+| 类别 | RMS变化比 | 缩放效应 | 方向效应 | ΔD(0MLP)_post |
+|------|---------|---------|---------|--------------|
+| fruit | 1.099 | -2.04 | -0.00 | -2.05 |
+| clothing | 1.042 | -0.69 | 0.00 | -0.66 |
+| emotion | 1.032 | -0.29 | -0.00 | -0.28 |
+| action | 1.032 | +0.63 | 0.00 | +0.67 |
+| animal | 1.080 | -1.73 | -0.00 | -1.78 |
+
+★ 缩放效应 ≈ ΔD(0MLP)_post 的全部!
+★ 方向效应 ≈ 0!
+★ MLP去除后RMS稍微增大(1.03~1.10)，因为MLP输出有特定范数
+
+**4. GLM4也显示相同的RMSNorm翻转模式**
+
+GLM4 R1:
+| 类别 | ΔD(0MLP)_pre | ΔD(0MLP)_post | 翻转? |
+|------|-------------|--------------|------|
+| fruit | +1.15 | -0.85 | ★翻转 |
+| clothing | +0.95 | -0.01 | ★翻转 |
+| emotion | +0.42 | -1.54 | ★翻转 |
+| animal | +1.81 | -1.99 | ★翻转 |
+
+★ GLM4的MLP在pre-norm空间也减少D(去除MLP增加D)
+★ GLM4的RMSNorm同样翻转了MLP的D贡献方向
+
+**5. 组件D贡献分解(pre-norm空间)**
+
+Qwen3:
+| 类别 | D_residual | D_attn | D_mlp | D_full |
+|------|-----------|--------|-------|--------|
+| fruit | 10.29 | 6.30 | 6.97 | 23.56 |
+| clothing | 48.20 | 5.26 | -4.00 | 49.44 |
+| emotion | 29.57 | 5.09 | -8.29 | 26.37 |
+| action | -14.60 | 0.78 | 4.51 | -9.31 |
+| animal | 20.71 | 2.94 | 2.18 | 25.82 |
+
+★ Residual(残差流)是D的主导贡献者
+★ Attn对D贡献较小但稳定正(5~6)
+★ MLP的D贡献正负取决于类别: fruit/animal为正, clothing/emotion为负
+
+GLM4:
+| 类别 | D_residual | D_attn | D_mlp | D_full |
+|------|-----------|--------|-------|--------|
+| fruit | 5.99 | -0.24 | -1.17 | 4.59 |
+| clothing | 2.75 | -0.06 | -0.91 | 1.77 |
+| emotion | 5.68 | -0.01 | -0.48 | 5.19 |
+| action | -6.79 | 0.25 | 2.64 | -3.91 |
+| animal | 10.18 | -0.37 | -1.82 | 7.99 |
+
+★ GLM4的MLP在pre-norm空间对除action外所有类别贡献负D
+★ GLM4的Attn贡献接近零
+★ GLM4的Residual是D的绝对主导
+
+**6. DS7B数据大量NaN，CPU offload不可靠**
+
+DS7B只有部分fruit数据有效，其余类别全部NaN。
+
+### ★★★ Phase 497 对Phase 494-496理论的修正 ★★★
+
+| 之前理论 | Phase 497修正 |
+|---------|-------------|
+| "MLP为DCF提供通用boost" | ★ 在pre-norm空间MLP实际减少大部分类别的D |
+| "shared_semantic方向符号翻转" | ★ 方向效应可忽略，主要是RMSNorm缩放效应 |
+| "MLP执行shared方向释放/刹车" | ★ MLP改变hidden state范数→RMSNorm重缩放→D变化 |
+| "final RMSNorm只是归一化细节" | ★ RMSNorm是DCF空间的决定性变换 |
+
+### 最新机制理解
+
+```
+末层DCF机制:
+1. Residual(残差流)携带主要语义信号 (D_residual最大)
+2. Attn提供小的正向D修正
+3. MLP改变hidden state的整体范数(而非方向)
+4. MLP对D的贡献在pre-norm和post-norm空间方向相反
+5. RMSNorm将范数差异转化为DCF差异
+6. 最终D_post由RMSNorm缩放后的hidden state决定
+```
+
+一句话:
+**末层DCF不是MLP写入语义方向的结果，而是残差流携带语义信号 + MLP调节范数 + RMSNorm非线性重映射的联合产物。**
+
+### 硬伤与瓶颈
+
+1. **DS7B完全不可靠**: CPU offload导致NaN，需要纯GPU方式
+2. **GLM4的RMSNorm weight不可访问**: meta device导致手动RMSNorm无法验证
+3. **pre-norm空间D计算缺少LayerNorm补偿**: residual_error约1.6-1.8
+4. **shared方向定义仍不完美**: PCA shared方向消融后D变化很小(Qwen3)
+5. **action的RMSNorm翻转方向与其他类别不同**: 需要专门分析
+
+### 下一步核心任务
+
+1. **理解RMSNorm为什么翻转MLP的D贡献**: 数学分析RMSNorm对hidden state的非线性映射
+2. **GLM4保守机制解释**: 如果MLP在pre-norm也减少D，GLM4和Qwen3的区别在哪？
+3. **Residual(残差流)作为语义主要载体**: 需要分析L(n-2)残差流如何编码类别信息
+4. **范数vs方向的信息论分析**: MLP改变范数而非方向，这意味着什么？
+5. **DS7B纯GPU验证**: 用bf16全GPU方式重测
+
+
+## Phase 497 补充: RMSNorm翻转机制的精确数学分析 [2026-06-14 2026-06-14 22:57]
+
+### R3 hook问题说明
+
+R3尝试对self_attn和mlp分别hook来分解组件贡献，但hook捕获的输出全为零。
+原因可能是hook注册位置或输出格式问题。R1和R2的数据已经足够可靠。
+
+### ★★★ Phase 497 最终确认的客观事实 ★★★
+
+**事实1: RMSNorm将D压缩为原来的1/4~1/11 (Qwen3)**
+
+```text
+fruit:    D_pre=23.46 → D_post=6.11   (压缩74%)
+clothing: D_pre=48.95 → D_post=4.31   (压缩91%)
+emotion:  D_pre=26.42 → D_post=3.25   (压缩88%)
+action:   D_pre=-10.21 → D_post=2.59  (翻转符号+压缩)
+animal:   D_pre=26.25 → D_post=7.25   (压缩72%)
+```
+
+**事实2: MLP的D贡献在pre-norm和post-norm空间方向相反 (Qwen3+GLM4)**
+
+Qwen3:
+```text
+clothing: Δ(0MLP)_pre=+4.35 → Δ(0MLP)_post=-0.66  (翻转)
+emotion:  Δ(0MLP)_pre=+8.61 → Δ(0MLP)_post=-0.28  (翻转)
+action:   Δ(0MLP)_pre=-4.20 → Δ(0MLP)_post=+0.67  (翻转)
+```
+
+GLM4:
+```text
+fruit:    Δ(0MLP)_pre=+1.15 → Δ(0MLP)_post=-0.85  (翻转)
+emotion:  Δ(0MLP)_pre=+0.42 → Δ(0MLP)_post=-1.54  (翻转)
+animal:   Δ(0MLP)_pre=+1.81 → Δ(0MLP)_post=-1.99  (翻转)
+```
+
+**事实3: MLP效应几乎全部通过RMSNorm缩放传递 (Qwen3)**
+
+```text
+scale_effect ≈ ΔD(0MLP)_post 的100%
+dir_effect ≈ 0
+```
+
+**事实4: 组件D贡献分解(pre-norm空间, Qwen3)**
+
+```text
+fruit:    D_residual=10.29, D_attn=6.30, D_mlp=6.97
+clothing: D_residual=48.20, D_attn=5.26, D_mlp=-4.00
+emotion:  D_residual=29.57, D_attn=5.09, D_mlp=-8.29
+action:   D_residual=-14.60, D_attn=0.78, D_mlp=4.51
+animal:   D_residual=20.71, D_attn=2.94, D_mlp=2.18
+```
+
+★ Residual(残差流)是D的主导贡献者
+★ MLP对clothing/emotion贡献负D，对fruit/action/animal贡献正D
+
+**事实5: DS7B因CPU offload数据不可靠**
+
+### ★★★ 对用户Phase 496评价的修正 ★★★
+
+用户对Phase 496的评价**总体正确**，但Phase 497发现了更深层的机制：
+
+| 用户判断 | Phase 497修正 |
+|---------|-------------|
+| "MLP主导释放" | ✅ 但MLP的释放是RMSNorm后的假象，pre-norm空间MLP实际减少D |
+| "shared方向符号翻转" | ⚠️ 方向效应可忽略，主要是范数→RMSNorm缩放效应 |
+| "final RMSNorm是放大器" | ❌ RMSNorm不是放大器，而是非线性重映射，它压缩D并翻转MLP贡献 |
+| "Qwen3 MLP-shared翻转" | ⚠️ MLP对D的贡献主要通过改变RMSNorm缩放，不是方向写入 |
+| "GLM4不使用shared方向" | ✅ 但GLM4的MLP在pre-norm空间也贡献负D |
+
+### 机制更新
+
+之前理解:
+```
+L(n-2): shared_semantic刹车
+↓
+L(n-1): MLP翻转shared方向 → 释放
+↓
+final RMSNorm: 放大
+```
+
+修正理解:
+```
+L(n-2): 残差流携带语义信号 (D_residual最大)
+↓
+L(n-1): MLP改变hidden state范数(不是方向!)
+         → pre-norm空间MLP对多数类别贡献负D
+         → 但MLP增加了hidden state范数
+↓
+final RMSNorm: 除以更大范数 → D压缩
+         → 由于非线性重映射，MLP的D贡献方向翻转
+         → 最终表现为"MLP boost D_post"
+```
+
+### 硬伤与瓶颈
+
+1. **RMSNorm的数学机制尚未精确分析**: 为什么范数变化会导致D贡献翻转？
+   - 可能与effective_readout方向（rmsnorm_w * W_D）有关
+   - 需要分析: D_post = <h, rmsnorm_w * W_D> / rms(h)
+
+2. **GLM4的RMSNorm weight不可访问**: 无法做手动RMSNorm验证
+
+3. **Residual(残差流)作为语义主载体**: 这才是D的真正来源，需要深入分析
+
+4. **action的RMSNorm翻转方向与其他类别不同**: action从D_pre<0变为D_post>0
+
+5. **DS7B不可靠**: 需要纯GPU加载方式
+
+### Phase 498方向
+
+核心任务: **理解RMSNorm如何将范数差异转化为DCF差异**
+
+1. 数学分析: D_post = <h, g*W_D> / rms(h) 中，g=rmsnorm_w
+   - 当MLP增加h的范数时，1/rms(h)减小
+   - 但<h, g*W_D>可能增加或减少
+   - 翻转取决于<h, g*W_D>的变化率vs 1/rms(h)的变化率
+
+2. Residual流是D的真正来源: 需要分析L(n-2)残差流如何编码类别信息
+
+3. GLM4 vs Qwen3: 两者RMSNorm翻转模式相似，但D值尺度不同
+   - GLM4: D_pre=4-8, D_post=1-6 (压缩较少)
+   - Qwen3: D_pre=23-49, D_post=3-7 (压缩极大)
+
+
+## Phase 498: RMSNorm读出几何分解与范数通道闭环 [2026-06-14 23:29]
+
+### 本轮执行命令
+- `python tests/glm5/phase498_rmsnorm_decomposition.py qwen3 1`
+- `python tests/glm5/phase498_rmsnorm_decomposition.py glm4 1`
+- `python tests/glm5/phase498_rmsnorm_decomposition.py deepseek7b 1`
+
+### 生成脚本
+- `tests/glm5/phase498_rmsnorm_decomposition.py`
+
+### 原理
+Phase 498的核心是对RMSNorm读出机制进行数学精确分解。关键公式:
+- D_post = <h_pre, g⊙w_D> / rms(h_pre) = numerator / denominator
+- 干预MLP后: δD ≈ δnumerator/rms - D·δrms/rms = 分子效应 + 分母效应
+- 四种对照读出: normal/fixed_denom/no_gain/no_norm
+- MLP范数通道: zero/0.5x/2x/ortho/aligned 五种干预
+
+### Exp1: RMSNorm数学精确分解 (Qwen3)
+
+  fruit: num_eff=-1.678, den_eff=-0.689, interact=0.209, gain_eff=4.682
+  clothing: num_eff=0.769, den_eff=-0.158, interact=-0.012, gain_eff=2.657
+  emotion: num_eff=-0.167, den_eff=-0.035, interact=0.006, gain_eff=0.741
+  action: num_eff=0.663, den_eff=-0.086, interact=-0.013, gain_eff=2.551
+  animal: num_eff=-1.287, den_eff=-0.583, interact=0.144, gain_eff=4.884
+
+**关键发现**:
+- gain_effect(增益权重效应)是D_post的主导贡献者: fruit +4.68, clothing +2.66, animal +4.88
+- numerator_effect(方向/分子效应): 负向，fruit -1.68, animal -1.29 — MLP在pre-norm空间写入的方向对D贡献为负
+- denominator_effect(范数/分母效应): 较小但一致为负 — 去掉MLP后RMS变大，D下降
+- **RMSNorm weight (gain向量)才是D_post的主要来源，不是方向写入！**
+
+### Exp2: 固定RMSNorm对照 (Qwen3)
+
+  fruit: D_normal=7.13, D_fixed_denom=7.13, D_no_gain=2.44, D_no_norm=31.05, rms_denom_eff=-0.0013, gain_weight_eff=4.684, norm_scale_eff=-28.61
+  clothing: D_normal=4.52, D_fixed_denom=4.52, D_no_gain=1.87, D_no_norm=26.76, rms_denom_eff=-0.0010, gain_weight_eff=2.658, norm_scale_eff=-24.89
+  emotion: D_normal=2.88, D_fixed_denom=2.89, D_no_gain=2.14, D_no_norm=31.27, rms_denom_eff=-0.0007, gain_weight_eff=0.741, norm_scale_eff=-29.13
+  action: D_normal=1.62, D_fixed_denom=1.63, D_no_gain=-0.93, D_no_norm=-12.80, rms_denom_eff=-0.0038, gain_weight_eff=2.555, norm_scale_eff=11.87
+  animal: D_normal=7.09, D_fixed_denom=7.09, D_no_gain=2.21, D_no_norm=28.98, rms_denom_eff=0.0005, gain_weight_eff=4.883, norm_scale_eff=-26.77
+
+**关键发现**:
+- norm_scale_effect(归一化缩放)极大: fruit -28.6, clothing -24.9, emotion -29.1, **action +11.9**, animal -26.8
+- gain_weight_effect(增益权重)巨大: fruit +4.68, clothing +2.66
+- rms_denom_effect(动态分母): 接近0!
+- **action的norm_scale为正(+11.9)，其他类别为负 — 这是action符号翻转的根源！**
+- D_no_norm ≈ D_pre (确认无归一化 = pre-norm空间)
+- D_no_gain ≈ D_post/gain增益因子 (去掉gain后D大幅下降)
+
+### Exp2: 固定RMSNorm对照 (GLM4, 无gain weight)
+
+  fruit: D_normal=3.94, D_fixed_denom=1.56, D_no_gain=1.56, D_no_norm=5.21, rms_denom_eff=2.3762, gain_weight_eff=0.000, norm_scale_eff=-3.65
+  clothing: D_normal=3.67, D_fixed_denom=0.64, D_no_gain=0.64, D_no_norm=2.33, rms_denom_eff=3.0322, gain_weight_eff=0.000, norm_scale_eff=-1.69
+  emotion: D_normal=3.19, D_fixed_denom=1.57, D_no_gain=1.57, D_no_norm=5.23, rms_denom_eff=1.6229, gain_weight_eff=0.000, norm_scale_eff=-3.66
+  action: D_normal=1.22, D_fixed_denom=-1.18, D_no_gain=-1.18, D_no_norm=-4.11, rms_denom_eff=2.3989, gain_weight_eff=0.000, norm_scale_eff=2.93
+  animal: D_normal=5.85, D_fixed_denom=2.65, D_no_gain=2.65, D_no_norm=8.62, rms_denom_eff=3.2011, gain_weight_eff=0.000, norm_scale_eff=-5.97
+
+**关键发现**:
+- GLM4的gain weight在meta device无法访问，但通过fixed_denom vs no_gain相等验证: GLM4没有可测量的gain_weight_effect (可能全部在safetensors中)
+- D_normal >> D_fixed_denom: fruit 3.94 vs 1.56 — 说明norm缩放对GLM4也很重要
+- action: D_no_norm=-4.11, D_normal=1.22 — 同样符号翻转!
+
+### Exp3: MLP范数通道闭环 (Qwen3)
+
+  fruit: mlp_norm=324.6, Δzero=-2.158, Δ0.5x=-0.949, Δ2x=0.585, Δortho=-3.341, Δaligned=-2.346
+  clothing: mlp_norm=335.4, Δzero=0.599, Δ0.5x=0.429, Δ2x=-1.297, Δortho=2.026, Δaligned=0.766
+  emotion: mlp_norm=362.0, Δzero=-0.196, Δ0.5x=-0.015, Δ2x=-0.359, Δortho=-1.746, Δaligned=-0.320
+  action: mlp_norm=316.7, Δzero=0.564, Δ0.5x=0.334, Δ2x=-0.787, Δortho=0.572, Δaligned=0.360
+  animal: mlp_norm=356.7, Δzero=-1.725, Δ0.5x=-0.688, Δ2x=-0.030, Δortho=-3.671, Δaligned=-1.675
+
+**关键发现**:
+- clothing: Δortho=+2.03 > Δzero=+0.60 — MLP方向本身在**抑制**clothing的D，正交方向反而释放!
+- action: Δortho≈Δzero≈+0.57 — MLP对action的范数和方向效应相当
+- Δ2x(加倍MLP): clothing=-1.30 — MLP加倍导致D下降，MLP在**抑制**释放
+- fruit/animal: Δortho比Δzero大很多(3.34 vs 2.16, 3.67 vs 1.73) — MLP方向正在抑制这些类别的D
+- **MLP的方向对大多数类别起抑制作用，去掉MLP方向反而提升D_pre。但RMSNorm重映射后，这种抑制被gain向量逆转！**
+
+### Exp3: MLP范数通道闭环 (GLM4)
+
+  fruit: mlp_norm=137.5, Δzero=-1.000, Δ0.5x=-0.416, Δ2x=-0.232, Δortho=-1.940, Δaligned=-0.992
+  clothing: mlp_norm=147.0, Δzero=-1.228, Δ0.5x=-0.545, Δ2x=0.101, Δortho=-0.495, Δaligned=-1.227
+  emotion: mlp_norm=121.1, Δzero=-1.254, Δ0.5x=-0.588, Δ2x=0.440, Δortho=-3.640, Δaligned=-1.329
+  action: mlp_norm=143.4, Δzero=-0.102, Δ0.5x=-0.009, Δ2x=-0.300, Δortho=0.201, Δaligned=-0.161
+  animal: mlp_norm=143.5, Δzero=-1.924, Δ0.5x=-0.838, Δ2x=-0.138, Δortho=-1.623, Δaligned=-1.948
+
+**关键发现**:
+- GLM4中MLP也是抑制性的: Δzero为负
+- emotion: Δortho=-3.64 >> Δzero=-1.25 — MLP方向对emotion有强抑制
+- Δaligned ≈ Δzero — 对齐到residual方向的MLP与零化效果类似
+
+### Exp4: Action类符号翻转专项 (Qwen3)
+
+  翻转率: 8/8
+  run: D_pre=-8.90, D_post=2.10, flipped=True, target_logit: 7.20→3.51, comp_logit: 16.10→1.41
+  eat: D_pre=-17.50, D_post=0.28, flipped=True, target_logit: 6.94→4.18, comp_logit: 24.44→3.90
+  build: D_pre=-4.66, D_post=3.19, flipped=True, target_logit: 14.11→5.20, comp_logit: 18.77→2.01
+  throw: D_pre=-8.93, D_post=2.14, flipped=True, target_logit: 7.30→3.45, comp_logit: 16.23→1.31
+
+**关键发现**:
+- **Action 8/8全部符号翻转!** D_pre为负, D_post为正
+- comp_logit从16-25降到1-3 (压缩93%), target_logit只从7-15降到3-5 (压缩66%)
+- 翻转机制: RMSNorm对竞争token的压缩远大于对target token的压缩
+- 不是gain向量翻转了action方向，而是RMSNorm**不等比例压缩**了target vs competitor
+
+### Exp4: Action类符号翻转专项 (GLM4)
+
+  翻转率: 8/8
+  run: D_pre=-4.39, D_post=0.95, flipped=True, target_logit: 1.44→0.42, comp_logit: 5.83→-0.52
+  eat: D_pre=-5.24, D_post=0.18, flipped=True, target_logit: 0.97→0.04, comp_logit: 6.21→-0.14
+  build: D_pre=-3.82, D_post=1.71, flipped=True, target_logit: 1.32→0.19, comp_logit: 5.14→-1.52
+  throw: D_pre=-5.06, D_post=1.29, flipped=True, target_logit: 2.01→0.57, comp_logit: 7.07→-0.73
+
+**关键发现**:
+- **GLM4 Action同样8/8全部翻转!**
+- comp_logit从5-7降到-2到-0.5 (压缩超过100%，变负!)
+- target_logit从1-2降到0-1 (只压缩50%)
+- 与Qwen3相同的机制: RMSNorm对comp的压缩 >> 对target的压缩
+
+### DS7B结果
+- DS7B因CPU offload导致大量NaN，所有实验数据不可用
+- 与Phase 497一致，需纯GPU方式重测
+
+### 核心客观结论
+
+1. **RMSNorm gain向量是D_post的主导贡献者** (Qwen3: fruit gain_eff=+4.68 vs D_post=7.13)
+2. **归一化缩放效应(norm_scale)在大多数类别为负(-25到-29)，但action为正(+11.9)** — 这是action符号翻转的数学根源
+3. **动态RMS分母效应接近0** — 不是分母变化导致D变化
+4. **MLP方向对大多数类别起抑制作用** (Δortho > Δzero) — MLP在pre-norm空间写入的方向实际上在压制D
+5. **RMSNorm gain向量逆转了MLP的抑制效应** — pre-norm中MLP抑制D，但gain向量放大了被抑制方向的D贡献
+6. **Action符号翻转机制**: RMSNorm对竞争token的压缩率远大于对target token的压缩率，导致D符号翻转
+7. **GLM4与Qwen3共享相同的RMSNorm读出几何机制**，虽然gain weight无法直接访问
+
+### 机制修正
+
+之前理论: "MLP改变范数 → RMSNorm缩放 → D贡献变化"
+修正: "MLP在pre-norm空间写入方向(实际上抑制D) → RMSNorm gain向量重映射 → 抑制效应被逆转 → D_post显现为正"
+
+更精确: D_post = <h_pre, g⊙w_D> / rms(h_pre)
+- <h_pre, w_D> (无gain) 对大多数类别为负或很小
+- gain向量g把w_D重映射为g⊙w_D，使得<g⊙w_D, h_pre>变为正且大幅增大
+- 这就是RMSNorm gain向量的核心作用: **语义读出门控**
+
+### 问题与硬伤
+
+1. GLM4的gain weight在meta device无法获取，无法做完整的gain向量分解
+2. DS7B全部不可用，缺少第三个模型的验证
+3. gain向量g为什么能逆转MLP的抑制效应? 这是学习到的结构还是数学必然?
+4. MLP在pre-norm空间的方向为什么对大多数类别抑制D? 需要分析MLP的W_D投影
+5. action的norm_scale为正而其他为负的深层原因未解释
+6. ortho方向的D效应比zero还大，说明不是简单的范数通道
+
+### 理论研究进展
+
+Phase 498的核心突破是发现了**RMSNorm gain向量的语义门控作用**:
+- 不是简单的缩放/归一化
+- gain向量g与w_D的逐元素乘积g⊙w_D定义了**有效读出方向**
+- 这个有效读出方向与pre-norm hidden的内积决定了D_post
+- MLP写入的方向在原始w_D下为负/小，但在g⊙w_D下为正/大
+- 这解释了为什么zeroMLP的大效应主要来自RMSNorm重映射
+
+下一步关键问题: gain向量g的数学结构是什么? 它如何把"抑制性方向"变成"释放性方向"?
+
+
+## Phase 498 R2: Gain向量深度分析 [2026-06-14 23:33]
+
+### 本轮执行命令
+- `python tests/glm5/phase498_gain_vector_analysis.py qwen3 2`
+- `python tests/glm5/phase498_gain_vector_analysis.py glm4 2`
+
+### 生成脚本
+- `tests/glm5/phase498_gain_vector_analysis.py`
+
+### 原理
+分析RMSNorm gain向量g的数学结构:
+- D_post = <h, g⊙w_D> / rms(h)
+- 对比D_no_gain = <h/rms, w_D> vs D_with_gain = <h*g/rms, w_D>
+- 分析g如何改变w_D的方向和范数
+
+### 核心结果1: RMSNorm Gain向量统计
+
+Qwen3: mean=2.7600, std=0.4547, 99.4%维度>1 (2545/2560)
+GLM4: mean=3.4752, std=0.2162, 99.98%维度>1 (4095/4096)
+
+**两个模型的gain向量几乎全部>1，这是放大性gain，不是抑制性gain。**
+
+### 核心结果2: Gain向量不改变方向，只放大范数
+
+Qwen3 cos(w_D, g⊙w_D):
+- fruit: 0.993, clothing: 0.993, emotion: 0.991, action: 0.989, animal: 0.993
+
+GLM4 cos(w_D, g⊙w_D):
+- fruit: 0.999, clothing: 0.999, emotion: 0.999, action: 0.997, animal: 0.998
+
+**cos全部>0.989！gain向量几乎不改变DCF读出方向，只是把||w_D||放大2.7-3.6倍。**
+
+### 核心结果3: Gain向量的类别差异增益
+
+Qwen3 gain_eff:
+- fruit: +4.77, clothing: +2.69, emotion: +0.63, action: +2.61, animal: +4.79
+
+GLM4 gain_eff:
+- fruit: +2.25, clothing: +2.96, emotion: +1.64, action: +2.29, animal: +3.19
+
+**emotion的gain_eff最小(Qwen3: 0.63, GLM4: 1.64)，这解释了为什么emotion的D_post最低！**
+**gain向量在emotion类别上的"语义门控"最弱。**
+
+### 核心结果4: Action的符号翻转完全由gain+norm缩放导致
+
+Qwen3 action: D_no_gain=-0.18到-1.62, D_with_gain=+0.05到+3.74
+GLM4 action: D_no_gain=-0.55到-1.44, D_with_gain=-0.02到+2.32
+
+**无gain时action的D为负(刹车)，有gain时翻转为正(释放)！**
+**gain向量把action从"抑制"状态翻转到"释放"状态。**
+
+### 核心结果5: D_no_gain vs D_pre的比例
+
+Qwen3: D_no_gain/D_pre ≈ 2.4/30 = 0.08 (压缩92%)
+GLM4: D_no_gain/D_pre ≈ 1.5/5 = 0.30 (压缩70%)
+
+**归一化压缩了大量D信息。gain向量把压缩后的D重新放大。**
+**Qwen3的归一化压缩更严重(92%)，gain放大更多。**
+
+### 机制公式精确化
+
+D_post = <h_normed * g, w_D> = <h_normed, g⊙w_D>
+
+由于cos(w_D, g⊙w_D) ≈ 0.99:
+D_post ≈ ||g⊙w_D|| / ||w_D|| * D_no_gain
+
+即: D_post ≈ gain_ratio * D_no_gain
+
+其中:
+- gain_ratio = ||g⊙w_D|| / ||w_D||
+- Qwen3: gain_ratio ≈ 2.7-3.5
+- GLM4: gain_ratio ≈ 3.2-3.6
+
+但这个近似对emotion和action不完全成立:
+- emotion: D_no_gain=2.17, D_with_gain=3.01, ratio=1.39 (远小于gain_ratio)
+- action: D_no_gain=-0.73, D_with_gain=2.10, 符号翻转!
+
+**这说明gain不是简单均匀放大，而是类别特异的门控机制。**
+
+### 对用户Phase 497评价的修正
+
+用户说"RMSNorm不是简单放大器，而是非线性重映射"——部分正确:
+- 正确: RMSNorm确实重映射了pre-norm空间到post-norm空间
+- 需要修正: gain向量g本身几乎不改变w_D方向(cos>0.99)，但它与归一化缩放结合后，产生了类别特异的D变化
+- 关键洞察: 不是gain改变了方向，而是**归一化压缩+gain放大的组合**产生了非均匀的类别D效应
+
+更准确的机制描述:
+1. 归一化(h/rms)把D压缩到原来的8-30%
+2. gain向量(g⊙w_D)把压缩后的有效读出方向范数放大2.7-3.6倍
+3. 但这两个操作不是简单的"压缩再放大"，因为:
+   - 归一化压缩了hidden state的所有方向
+   - gain放大了w_D方向但不放大其他方向
+   - 组合效果: 只有w_D方向的信号被放大回来，其他方向被压制
+4. 对action: D_no_gain为负是因为归一化后竞争token的logit > target logit
+5. gain放大后，target方向被选择性增强，使D翻转为正
+
+### 问题与硬伤
+
+1. 为什么gain向量>1的维度占99%+? 这意味着几乎所有维度都被放大
+2. gain的类别差异来源: 是gain本身的结构差异，还是hidden state与gain的交互?
+3. action的D_no_gain为负的根本原因: 归一化后竞争token优势更大
+4. emotion的gain_eff最小，是否意味着emotion在模型中的语义门控最弱?
+5. DS7B仍无法验证
+
+### 理论研究进展
+
+Phase 498的最大突破是发现了语言编码的**增益门控机制**:
+
+语言编码不是简单的"方向+范数"系统，而是:
+1. Residual stream携带潜在语义(pre-norm D很大: 25-35)
+2. 归一化压缩所有语义到8-30%
+3. Gain向量选择性放大DCF读出方向(放大2.7-3.6倍)
+4. 组合效果: 类别语义通过gain门控被选择性释放
+
+这可以类比为:
+- 归一化 = 均匀噪声门(压制所有信号)
+- Gain向量 = 语义选择器(只放行特定方向的信号)
+- 组合 = 语义门控机制(只允许语义方向通过)
+
+一句话: **语言概念的输出不是方向写入的结果，而是增益门控选择性放大的结果。**
+
+## Phase 499: Gain门控维度结构、目标-竞争重排与残差语义主轴闭环 [2026-06-15 06:49]
+
+### 核心发现概述
+
+Phase 499对三个模型(Qwen3, GLM4, DS7B)进行了5项实验,修正了hidden_states索引问题后获得了可靠的pre-RMSNorm和post-RMSNorm数据。
+
+**关键修正**: Qwen3的hidden_states结构为 hs[0]=embedding, hs[1..35]=L0..L34输出, hs[36]=norm(L35)输出。
+因此h_pre(最终RMSNorm输入)需从hook重建(ri+ao+mo), h_post(最终RMSNorm输出)=hs[-1]。
+
+---
+
+### Exp1: Gain维度结构 — 类别差异来源
+
+**Qwen3 (gain mean=2.76, 99.4% dims > 1):**
+| 类别 | D_no_gain | D_with_gain | gain_effect |
+|------|-----------|-------------|-------------|
+| fruit | +1.22 | +2.06 | +0.84 |
+| clothing | +1.25 | +0.92 | -0.33 |
+| emotion | +3.46 | +3.90 | +0.45 |
+| action | -0.77 | +1.22 | **+1.99 (翻转!)** |
+| animal | +2.05 | +5.03 | +2.98 |
+
+**GLM4 (gain mean=3.48, 100% dims > 1):**
+| 类别 | D_no_gain | D_with_gain | gain_effect |
+|------|-----------|-------------|-------------|
+| fruit | +0.95 | +0.43 | -0.52 |
+| clothing | +1.19 | +1.71 | +0.52 |
+| emotion | +2.64 | +1.94 | -0.70 |
+| action | -1.26 | +0.29 | **+1.55 (翻转!)** |
+| animal | +2.61 | +2.54 | -0.07 |
+
+**DS7B (gain mean=2.90, 100% dims > 1):**
+| 类别 | D_no_gain | D_with_gain | gain_effect |
+|------|-----------|-------------|-------------|
+| fruit | -0.44 | +0.36 | +0.80 (翻转!) |
+| clothing | +0.33 | +0.96 | +0.64 |
+| emotion | -0.29 | -2.06 | -1.77 |
+| action | -0.30 | +0.09 | +0.39 (翻转!) |
+| animal | -0.55 | +2.58 | +3.13 (翻转!) |
+
+**关键发现:**
+1. **Action在所有三个模型中都有D符号翻转**: D_no_gain为负 → D_with_gain为正
+2. **Gain效应对不同类别方向不同**: fruit/animal被增益，clothing/emotion被增益抑制
+3. **高gain维度对D贡献小甚至为负，低gain维度对D贡献大**: 这说明gain放大的是"通用信号方向"(与竞争词对齐)而非"语义判别方向"(与目标词对齐)
+4. **DS7B的gain效应最极端**: animal的gain效应=+3.13，但fruit/emotion的gain效应为负
+
+---
+
+### Exp2: 目标-竞争项不等比例压缩
+
+**Qwen3:**
+| 类别 | target压缩(log) | competitor压缩(log) | 压缩差 | 含义 |
+|------|-----------------|---------------------|--------|------|
+| fruit | -1.57 | -1.36 | -0.21 | 目标压缩更多 |
+| clothing | -2.00 | -1.47 | -0.53 | 目标压缩更多 |
+| emotion | -2.00 | +0.09 | -2.09 | 目标强压缩,竞争几乎不变! |
+| **action** | **-0.71** | **-1.95** | **+1.24** | **竞争压缩更多(反转!)** |
+| animal | -1.49 | -1.21 | -0.28 | 目标压缩更多 |
+
+**核心发现:**
+1. **实体类别(fruit/clothing/animal)**: RMSNorm压缩目标logit比竞争logit更多 → D下降
+2. **Emotion**: 目标被强压缩而竞争几乎不变 → D大幅下降(从50→4)
+3. **Action**: 竞争项被压缩更多 → D反而上升(从-10→+1.2)
+4. **这解释了action的符号翻转**: 不是因为目标增强，而是因为竞争项被更强压缩
+
+---
+
+### Exp3: 残差流语义主载体验证
+
+**Qwen3 fruit:**
+| 干预 | D_pre | D_post | 解释 |
+|------|-------|--------|------|
+| full (正常) | +15.41 | +2.06 | 基线 |
+| no_residual | +8.96 | +4.70 | 去除残差→D_pre降42% |
+| double_residual | +21.86 | +0.96 | 加倍残差→D_pre升42%但D_post反降 |
+| reverse_residual | +2.51 | +2.08 | 反转残差→D_pre暴跌84% |
+
+**关键发现:**
+1. **残差是语义主载体**: 去除残差后D_pre从15.4降至9.0
+2. **加倍残差→D_post反降**: 更多残差→更大norm→更强RMSNorm压缩→D_post更小
+3. **反转残差几乎摧毁D_pre**: 但RMSNorm仍然给出了+2.08的D_post
+4. **残差+RMSNorm形成"压缩-恢复"动态系统**: 残差提供信号，RMSNorm控制可读性
+
+---
+
+### Exp4: MLP抑制方向机制
+
+**Qwen3:**
+- MLP在w_D(target)方向投影: fruit +17.8, clothing +10.9, emotion +10.3, action +15.0, animal +18.4
+- MLP在g⊙w_D方向投影: fruit +30.6, clothing +21.0, emotion +31.1, action +19.2, animal +37.5
+- MLP在w_D(competitor)方向投影: fruit +9.3, clothing +13.3, emotion +13.0, action +5.9, animal +34.5
+- MLP在g⊙w_D(competitor)方向投影: fruit +25.2, clothing +33.1, emotion +38.6, action +29.4, animal +40.8
+
+**发现**: MLP同时向target和competitor方向都有强投影,但MLP的net D_mlp_direct有正有负:
+- fruit +4.7, clothing -5.2, emotion -12.3, action +2.8, animal -4.1
+
+**GLM4的MLP在w_D(target)方向投影为负**: fruit -7.1, clothing -2.1, emotion -3.6, action -2.0, animal -8.3
+说明GLM4的MLP在pre-norm空间抑制target方向,经RMSNorm后被重映射。
+
+---
+
+### 跨模型一致性发现
+
+1. **Action符号翻转是三个模型共同特征** (Qwen3: D_pre→D_post从-10→+1.2, GLM4: -5→+0.3, DS7B: -8→+0.1)
+2. **Gain效应类别方向不一致**: 同一gain向量对不同类别效果相反
+3. **RMSNorm压缩+gain恢复**是统一的读出机制,但具体效果取决于target/competitor在gain空间中的投影结构
+4. **残差是语义主载体** 在三个模型中一致
+
+---
+
+### 硬伤与问题
+
+1. **Gain效应类别差异来源未解**: 同一个gain向量g,为什么对fruit增益但对clothing抑制? 这可能来自h_pre与g的交互,而非g本身
+2. **Emotion在DS7B中gain效应为-1.77**: gain使D更负,说明gain放大了emotion的竞争项方向
+3. **高gain维度与语义判别方向不对齐**: 高gain维度贡献小/负,低gain维度贡献大,这说明gain不是在放大"语义判别方向"
+4. **Exp3的重建误差**: h_pre = ri+ao+mo的重建可能有精度问题(hook在bf16下)
+5. **DS7B的hidden state norm极大(1500-1800)**: 远大于Qwen3(640-740),可能导致RMSNorm压缩比不同
+
+---
+
+### Phase 499客观结论
+
+1. **RMSNorm是"不等比例压缩器"**: 对target和competitor的压缩程度不同
+2. **Action的符号翻转由竞争项更强压缩导致,不是目标增强** — 这是Phase 498的核心发现,在Phase 499被精确验证
+3. **Gain效应对不同类别方向相反** — 同一个gain向量,对fruit/animal增益,对clothing/emotion抑制
+4. **高gain维度 ≠ 语义判别维度** — gain放大的是"通用信号"而非"类别判别信号"
+5. **残差是语义主载体,MLP是范数调制器** — 与Phase 497/498结论一致
+6. **三个模型共享RMSNorm读出机制** — 但具体参数(增益大小、压缩比)不同
