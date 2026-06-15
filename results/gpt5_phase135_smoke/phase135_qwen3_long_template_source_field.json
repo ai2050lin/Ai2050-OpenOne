@@ -1,0 +1,719 @@
+{
+  "phase": 135,
+  "model": "qwen3",
+  "timestamp": "2026-06-14 22:59:24",
+  "peak_layer": 35,
+  "true_last_layer": 36,
+  "num_heads": 32,
+  "num_kv_heads": 8,
+  "causal_heads": [
+    11,
+    10,
+    28,
+    3,
+    31,
+    2,
+    5,
+    20
+  ],
+  "train_objects_per_category": 2,
+  "test_objects_per_category": 2,
+  "test_categories": [
+    "number"
+  ],
+  "rank": 16,
+  "reference_scale": 1.5,
+  "contribution_scale": 1.0,
+  "source_groups": [
+    "prefix",
+    "object_span",
+    "relation_phrase",
+    "reasoning_bridge",
+    "answer_tail",
+    "all_pre_answer"
+  ],
+  "templates": [
+    "usual_meaning_category",
+    "word_reference_group",
+    "dictionary_style",
+    "semantic_decision",
+    "category_prompt",
+    "meaning_bridge"
+  ],
+  "readout_token_labels": [
+    "fruit",
+    "produce",
+    "berry",
+    "crop",
+    "animal",
+    "creature",
+    "be",
+    "pet",
+    "tool",
+    "implement",
+    "device",
+    "instrument",
+    "vehicle",
+    "transport",
+    "autom",
+    "car",
+    "clo",
+    "gar",
+    "att",
+    "app",
+    "f",
+    "fixture",
+    "seat",
+    "food",
+    "meal",
+    "dish",
+    "sn",
+    "plant",
+    "tree",
+    "veget",
+    "fl",
+    "body",
+    "lim",
+    "organ",
+    "place",
+    "location",
+    "site",
+    "area",
+    "building",
+    "structure",
+    "house",
+    "facility",
+    "material",
+    "sub",
+    "matter",
+    "fabric",
+    "color",
+    "hue",
+    "shade",
+    "tone",
+    "emotion",
+    "fe",
+    "m",
+    "a",
+    "role",
+    "person",
+    "title",
+    "status",
+    "profession",
+    "occupation",
+    "career",
+    "job",
+    "concept",
+    "idea",
+    "pr",
+    "ab",
+    "action",
+    "act",
+    "verb",
+    "movement",
+    "event",
+    "occasion",
+    "h",
+    "incident",
+    "time",
+    "date",
+    "period",
+    "moment",
+    "number",
+    "amount",
+    "quantity",
+    "count",
+    "shape",
+    "form",
+    "geometry",
+    "figure",
+    "sound",
+    "noise",
+    "voice",
+    "audio",
+    "light",
+    "brightness",
+    "gl",
+    "illum",
+    "weather",
+    "climate",
+    "storm",
+    "rain",
+    "container",
+    "v",
+    "box",
+    "holder",
+    "music",
+    "machine",
+    "engine",
+    "me",
+    "communication",
+    "language",
+    "message",
+    "speech",
+    "relation",
+    "relationship",
+    "connection",
+    "association",
+    "property",
+    "attribute",
+    "feature",
+    "quality",
+    "chemical"
+  ],
+  "category_results": {
+    "number": {
+      "n_prompts": 12,
+      "position_audit": {
+        "n_prompts": 12,
+        "old_answer_pos_mismatch_count": 0,
+        "mean_pre_len": 28.833333333333332
+      },
+      "source_audit": {
+        "prefix": {
+          "mean_len": 5.833333333333333,
+          "empty_count": 0
+        },
+        "object_span": {
+          "mean_len": 1.0,
+          "empty_count": 0
+        },
+        "relation_phrase": {
+          "mean_len": 9.333333333333334,
+          "empty_count": 0
+        },
+        "reasoning_bridge": {
+          "mean_len": 9.666666666666666,
+          "empty_count": 0
+        },
+        "answer_tail": {
+          "mean_len": 3.0,
+          "empty_count": 0
+        },
+        "all_pre_answer": {
+          "mean_len": 28.833333333333332,
+          "empty_count": 0
+        }
+      },
+      "baseline_target_mean": 3.57135009765625,
+      "baseline_answer_proj_mean": 52.88703536987305,
+      "monitor_singular_values": [
+        1081.107177734375,
+        780.7024536132812,
+        509.5711975097656,
+        463.9942321777344,
+        373.93756103515625,
+        347.52337646484375,
+        321.3591003417969,
+        307.52886962890625,
+        273.9061279296875,
+        269.47314453125,
+        255.90908813476562,
+        245.561767578125,
+        235.0115203857422,
+        217.51417541503906,
+        211.4187774658203,
+        207.67286682128906
+      ],
+      "reference_singular_values": [
+        237.917724609375,
+        202.8281707763672,
+        173.24481201171875,
+        159.9313201904297,
+        153.137939453125,
+        135.7670135498047,
+        129.297607421875,
+        117.29318237304688,
+        115.9148941040039,
+        108.8224105834961,
+        106.43428802490234,
+        98.65924835205078,
+        92.64909362792969,
+        90.53282928466797,
+        90.0911865234375,
+        85.28375244140625
+      ],
+      "reference_condition": {
+        "component": "last_input_pre_answer",
+        "target_delta": -3.0044755935668945,
+        "max_other_delta": 0.0,
+        "top_releases": [],
+        "mean_delta_by_category": {
+          "fruit": -0.6534016728401184,
+          "animal": -0.4496256411075592,
+          "tool": -0.6271565556526184,
+          "vehicle": -0.4531656801700592,
+          "clothing": -1.5388387441635132,
+          "furniture": -2.097076416015625,
+          "food": -0.3979288637638092,
+          "plant": -0.4728190004825592,
+          "body": -1.0999044179916382,
+          "place": -1.550689697265625,
+          "building": -1.717119812965393,
+          "material": -2.0389404296875,
+          "color": -2.417332887649536,
+          "emotion": -2.2817039489746094,
+          "role": -1.5944410562515259,
+          "profession": -1.1479085683822632,
+          "abstract": -1.3046875,
+          "action": -2.2144367694854736,
+          "event": -2.0806682109832764,
+          "time": -2.3052520751953125,
+          "number": -3.0044755935668945,
+          "shape": -2.5377578735351562,
+          "sound": -2.536665678024292,
+          "light": -0.8837890625,
+          "weather": -1.4704418182373047,
+          "container": -1.4448572397232056,
+          "instrument": -0.4961344301700592,
+          "machine": -1.1972436904907227,
+          "communication": -1.5101031064987183,
+          "relation": -1.4373875856399536,
+          "property": -0.9216992259025574,
+          "substance": -1.6145172119140625
+        },
+        "answer_proj_delta": 1.5102930068969727
+      },
+      "conditions": [
+        {
+          "source_group": "prefix",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": -0.1629842072725296,
+          "max_other_delta": 0.0,
+          "top_releases": [],
+          "mean_delta_by_category": {
+            "fruit": -0.1687825471162796,
+            "animal": -0.1787516325712204,
+            "tool": -0.2703450620174408,
+            "vehicle": -0.274658203125,
+            "clothing": -0.2643229067325592,
+            "furniture": -0.2431233674287796,
+            "food": -0.2584228515625,
+            "plant": -0.2167154997587204,
+            "body": -0.1895548552274704,
+            "place": -0.1677653044462204,
+            "building": -0.158447265625,
+            "material": -0.16552734375,
+            "color": -0.1769816130399704,
+            "emotion": -0.1756795197725296,
+            "role": -0.194091796875,
+            "profession": -0.21435546875,
+            "abstract": -0.2012125700712204,
+            "action": -0.165771484375,
+            "event": -0.1762288361787796,
+            "time": -0.181640625,
+            "number": -0.1629842072725296,
+            "shape": -0.2021484375,
+            "sound": -0.1906331330537796,
+            "light": -0.1827799528837204,
+            "weather": -0.17121124267578125,
+            "container": -0.16239070892333984,
+            "instrument": -0.2385050505399704,
+            "machine": -0.16284529864788055,
+            "communication": -0.12749354541301727,
+            "relation": -0.13864772021770477,
+            "property": -0.1721556931734085,
+            "substance": -0.1384480744600296
+          },
+          "answer_proj_delta": -0.6611620783805847
+        },
+        {
+          "source_group": "object_span",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": 0.0033365886192768812,
+          "max_other_delta": 0.0052083334885537624,
+          "top_releases": [
+            {
+              "category": "building",
+              "delta": 0.0052083334885537624
+            },
+            {
+              "category": "shape",
+              "delta": 0.0051676430739462376
+            },
+            {
+              "category": "fruit",
+              "delta": 0.0048828125
+            },
+            {
+              "category": "plant",
+              "delta": 0.0048421225510537624
+            },
+            {
+              "category": "place",
+              "delta": 0.0048014321364462376
+            },
+            {
+              "category": "tool",
+              "delta": 0.0046793618239462376
+            },
+            {
+              "category": "furniture",
+              "delta": 0.004638671875
+            },
+            {
+              "category": "role",
+              "delta": 0.0046183266676962376
+            }
+          ],
+          "mean_delta_by_category": {
+            "fruit": 0.0048828125,
+            "animal": 0.0044759116135537624,
+            "tool": 0.0046793618239462376,
+            "vehicle": 0.0026448566932231188,
+            "clothing": 0.0035807292442768812,
+            "furniture": 0.004638671875,
+            "food": 0.0038655598182231188,
+            "plant": 0.0048421225510537624,
+            "body": 0.0042928061448037624,
+            "place": 0.0048014321364462376,
+            "building": 0.0052083334885537624,
+            "material": 0.00439453125,
+            "color": 0.0041707358323037624,
+            "emotion": 0.0044352211989462376,
+            "role": 0.0046183266676962376,
+            "profession": 0.00390625,
+            "abstract": 0.002197265625,
+            "action": 0.0032552082557231188,
+            "event": 0.0044759116135537624,
+            "time": 0.00390625,
+            "number": 0.0033365886192768812,
+            "shape": 0.0051676430739462376,
+            "sound": 0.0037638347130268812,
+            "light": 0.004150390625,
+            "weather": 0.002582550048828125,
+            "container": 0.0022036235313862562,
+            "instrument": 0.0039876303635537624,
+            "machine": 0.0033178329467773438,
+            "communication": 0.00409698486328125,
+            "relation": 0.0021053950767964125,
+            "property": 0.0029478073120117188,
+            "substance": 0.0040690102614462376
+          },
+          "answer_proj_delta": 0.006494204048067331
+        },
+        {
+          "source_group": "relation_phrase",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": -0.0047607421875,
+          "max_other_delta": 0.019775390625,
+          "top_releases": [
+            {
+              "category": "light",
+              "delta": 0.019775390625
+            },
+            {
+              "category": "plant",
+              "delta": 0.01790364645421505
+            },
+            {
+              "category": "fruit",
+              "delta": 0.0166015625
+            },
+            {
+              "category": "animal",
+              "delta": 0.01603190042078495
+            },
+            {
+              "category": "profession",
+              "delta": 0.014729817397892475
+            },
+            {
+              "category": "property",
+              "delta": 0.013858477585017681
+            },
+            {
+              "category": "container",
+              "delta": 0.013691584579646587
+            },
+            {
+              "category": "communication",
+              "delta": 0.0130462646484375
+            }
+          ],
+          "mean_delta_by_category": {
+            "fruit": 0.0166015625,
+            "animal": 0.01603190042078495,
+            "tool": 0.009236653335392475,
+            "vehicle": 0.0068359375,
+            "clothing": 0.0038655598182231188,
+            "furniture": 0.0028483073692768812,
+            "food": 0.0078125,
+            "plant": 0.01790364645421505,
+            "body": 0.008036295883357525,
+            "place": 0.0067952475510537624,
+            "building": 0.0072428383864462376,
+            "material": 0.0044352211989462376,
+            "color": -0.0009562174673192203,
+            "emotion": 0.0047200522385537624,
+            "role": -0.0033976237755268812,
+            "profession": 0.014729817397892475,
+            "abstract": 0.0061848959885537624,
+            "action": -0.0034586589317768812,
+            "event": -0.00390625,
+            "time": -0.0010579427471384406,
+            "number": -0.0047607421875,
+            "shape": -0.0006917317514307797,
+            "sound": -0.0020548503380268812,
+            "light": 0.019775390625,
+            "weather": 0.010719935409724712,
+            "container": 0.013691584579646587,
+            "instrument": 0.009724934585392475,
+            "machine": 0.006022930145263672,
+            "communication": 0.0130462646484375,
+            "relation": 0.0089874267578125,
+            "property": 0.013858477585017681,
+            "substance": 0.009572346694767475
+          },
+          "answer_proj_delta": -0.04310353472828865
+        },
+        {
+          "source_group": "reasoning_bridge",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": -0.02781168557703495,
+          "max_other_delta": 0.016845703125,
+          "top_releases": [
+            {
+              "category": "fruit",
+              "delta": 0.016845703125
+            },
+            {
+              "category": "plant",
+              "delta": 0.01603190042078495
+            },
+            {
+              "category": "light",
+              "delta": 0.015380859375
+            },
+            {
+              "category": "profession",
+              "delta": 0.0062662758864462376
+            },
+            {
+              "category": "container",
+              "delta": 0.004429340362548828
+            },
+            {
+              "category": "communication",
+              "delta": 0.0032564799766987562
+            },
+            {
+              "category": "animal",
+              "delta": 0.0025634765625
+            },
+            {
+              "category": "place",
+              "delta": 0.0022786457557231188
+            }
+          ],
+          "mean_delta_by_category": {
+            "fruit": 0.016845703125,
+            "animal": 0.0025634765625,
+            "tool": -0.010904948227107525,
+            "vehicle": -0.0054117836989462376,
+            "clothing": -0.0076497397385537624,
+            "furniture": -0.008544921875,
+            "food": -0.0045166015625,
+            "plant": 0.01603190042078495,
+            "body": 0.00042724609375,
+            "place": 0.0022786457557231188,
+            "building": 0.0021565754432231188,
+            "material": -0.0067545571364462376,
+            "color": -0.010579426772892475,
+            "emotion": -0.00439453125,
+            "role": -0.009379069320857525,
+            "profession": 0.0062662758864462376,
+            "abstract": -0.0061848959885537624,
+            "action": -0.02880859375,
+            "event": -0.02457682229578495,
+            "time": -0.02689615823328495,
+            "number": -0.02781168557703495,
+            "shape": -0.02762858010828495,
+            "sound": -0.03155517578125,
+            "light": 0.015380859375,
+            "weather": -0.0034526188392192125,
+            "container": 0.004429340362548828,
+            "instrument": -0.0123291015625,
+            "machine": -0.008598010055720806,
+            "communication": 0.0032564799766987562,
+            "relation": -0.0005935032968409359,
+            "property": -0.0016819635638967156,
+            "substance": 0.0009053547983057797
+          },
+          "answer_proj_delta": -0.04459889605641365
+        },
+        {
+          "source_group": "answer_tail",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": -0.02242024801671505,
+          "max_other_delta": 0.02921549417078495,
+          "top_releases": [
+            {
+              "category": "fruit",
+              "delta": 0.02921549417078495
+            },
+            {
+              "category": "clothing",
+              "delta": 0.01717122457921505
+            },
+            {
+              "category": "animal",
+              "delta": 0.0150146484375
+            },
+            {
+              "category": "plant",
+              "delta": 0.013346354477107525
+            },
+            {
+              "category": "furniture",
+              "delta": 0.012776692397892475
+            },
+            {
+              "category": "vehicle",
+              "delta": 0.01220703125
+            },
+            {
+              "category": "food",
+              "delta": 0.009724934585392475
+            },
+            {
+              "category": "place",
+              "delta": 0.009521484375
+            }
+          ],
+          "mean_delta_by_category": {
+            "fruit": 0.02921549417078495,
+            "animal": 0.0150146484375,
+            "tool": -0.0074055991135537624,
+            "vehicle": 0.01220703125,
+            "clothing": 0.01717122457921505,
+            "furniture": 0.012776692397892475,
+            "food": 0.009724934585392475,
+            "plant": 0.013346354477107525,
+            "body": 0.00750732421875,
+            "place": 0.009521484375,
+            "building": 0.0060221352614462376,
+            "material": -0.0030924479942768812,
+            "color": -0.01670328713953495,
+            "emotion": -0.0039876303635537624,
+            "role": 0.00038655599928461015,
+            "profession": 0.0037434895057231188,
+            "abstract": -0.0039876303635537624,
+            "action": -0.02909342385828495,
+            "event": -0.013529459945857525,
+            "time": -0.0323486328125,
+            "number": -0.02242024801671505,
+            "shape": -0.029052734375,
+            "sound": -0.02911376953125,
+            "light": -0.0045166015625,
+            "weather": -0.006341616157442331,
+            "container": 0.004073063377290964,
+            "instrument": -0.0067138671875,
+            "machine": -0.007715543266385794,
+            "communication": -0.00229644775390625,
+            "relation": 0.0027586619835346937,
+            "property": -0.012210845947265625,
+            "substance": 0.0061747231520712376
+          },
+          "answer_proj_delta": 0.05016613006591797
+        },
+        {
+          "source_group": "all_pre_answer",
+          "head_ids": [
+            11,
+            10,
+            28,
+            3,
+            31,
+            2,
+            5,
+            20
+          ],
+          "target_delta": -0.1380208283662796,
+          "max_other_delta": 0.0,
+          "top_releases": [],
+          "mean_delta_by_category": {
+            "fruit": -0.0538736991584301,
+            "animal": -0.0966796875,
+            "tool": -0.23046875,
+            "vehicle": -0.2115478515625,
+            "clothing": -0.1381428986787796,
+            "furniture": -0.120361328125,
+            "food": -0.1627604216337204,
+            "plant": -0.1326497346162796,
+            "body": -0.0842692032456398,
+            "place": -0.067626953125,
+            "building": -0.0852254256606102,
+            "material": -0.1003824844956398,
+            "color": -0.1385294646024704,
+            "emotion": -0.09796142578125,
+            "role": -0.1546427458524704,
+            "profession": -0.1497395783662796,
+            "abstract": -0.1284993439912796,
+            "action": -0.1149088516831398,
+            "event": -0.1296183317899704,
+            "time": -0.1554768830537796,
+            "number": -0.1380208283662796,
+            "shape": -0.1498209685087204,
+            "sound": -0.1557413786649704,
+            "light": -0.0936686173081398,
+            "weather": -0.11600621789693832,
+            "container": -0.08936437219381332,
+            "instrument": -0.2105509489774704,
+            "machine": -0.1437419205904007,
+            "communication": -0.07459449768066406,
+            "relation": -0.08247693628072739,
+            "property": -0.13278229534626007,
+            "substance": -0.0672709122300148
+          },
+          "answer_proj_delta": -0.6354894638061523
+        }
+      ]
+    }
+  }
+}

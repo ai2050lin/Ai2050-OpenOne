@@ -1,0 +1,13 @@
+# Phase 136 Long-template Head Re-ranking: qwen3
+
+Generated: 2026-06-14 23:18:14
+Peak layer: L35; true last layer: L36; heads: 32; kv_heads: 8; short core: [11, 10, 28, 3, 31, 2, 5, 20]
+
+| category | audit | reference | best head | top1 | top2 | top4 | top8 | short core | all heads |
+|---|---|---|---|---|---|---|---|---|---|
+| number | old_mismatch=0, mean_pre=28.8 | last_input_pre_answer T-2.80 R+0.57 A+3.62 | H11 T-0.07 R+0.00 A-0.26 | long_top_1 T-0.07 R+0.00 A-0.26 | long_top_2 T-0.11 R+0.00 A-0.31 | long_top_4 [11, 3, 10, 5] T-0.16 R+0.00 A-0.41 | long_top_8 [11, 3, 10, 5, 28, 6, 4, 30] T-0.20 R+0.00 A-0.65 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.12 R+0.00 A-0.64 | all_heads T+1.76 R+2.74 A+2.92 |
+| container | old_mismatch=0, mean_pre=28.9 | last_input_pre_answer T-0.70 R+0.16 A+0.15 | H11 T-0.04 R+0.00 A-0.20 | long_top_1 T-0.04 R+0.00 A-0.20 | long_top_2 T-0.08 R+0.00 A-0.32 | long_top_4 [11, 28, 10, 6] T-0.12 R+0.00 A-0.60 | long_top_8 [11, 28, 10, 6, 12, 20, 30, 16] T-0.16 R+0.00 A-0.46 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.09 R+0.00 A-0.61 | all_heads T+2.47 R+2.61 A+3.99 |
+| plant | old_mismatch=0, mean_pre=29.2 | last_input_pre_answer T-0.41 R+0.08 A+5.56 | H11 T-0.08 R+0.00 A-0.20 | long_top_1 T-0.08 R+0.00 A-0.20 | long_top_2 T-0.12 R+0.00 A-0.30 | long_top_4 [11, 28, 2, 10] T-0.17 R+0.00 A-0.58 | long_top_8 [11, 28, 2, 10, 6, 31, 30, 22] T-0.21 R+0.00 A-0.81 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.15 R+0.00 A-0.59 | all_heads T+1.09 R+1.70 A+1.57 |
+| time | old_mismatch=0, mean_pre=28.8 | last_input_pre_answer T-1.90 R+0.28 A-0.53 | H11 T-0.05 R+0.00 A-0.20 | long_top_1 T-0.05 R+0.00 A-0.20 | long_top_2 T-0.10 R+0.00 A-0.41 | long_top_4 [11, 10, 3, 5] T-0.18 R+0.00 A-0.32 | long_top_8 [11, 10, 3, 5, 28, 16, 4, 6] T-0.22 R+0.00 A-0.39 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.14 R+0.00 A-0.55 | all_heads T+1.66 R+2.75 A+3.16 |
+| clothing | old_mismatch=0, mean_pre=29.0 | last_input_pre_answer T-1.02 R+0.00 A+2.61 | H3 T-0.08 R+0.01 A-0.04 | long_top_1 T-0.08 R+0.01 A-0.04 | long_top_2 T-0.14 R+0.00 A-0.13 | long_top_4 [3, 28, 11, 10] T-0.21 R+0.00 A-0.46 | long_top_8 [3, 28, 11, 10, 22, 20, 6, 21] T-0.25 R+0.00 A-0.46 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.13 R+0.00 A-0.46 | all_heads T+0.87 R+2.41 A+2.09 |
+| furniture | old_mismatch=0, mean_pre=29.2 | last_input_pre_answer T-2.67 R+0.00 A+5.46 | H3 T-0.08 R+0.02 A-0.03 | long_top_1 T-0.08 R+0.02 A-0.03 | long_top_2 T-0.13 R+0.00 A-0.13 | long_top_4 [3, 28, 11, 10] T-0.20 R+0.00 A-0.50 | long_top_8 [3, 28, 11, 10, 20, 6, 22, 21] T-0.25 R+0.00 A-0.44 | short_template_core [11, 10, 28, 3, 31, 2, 5, 20] T-0.14 R+0.00 A-0.51 | all_heads T+0.86 R+1.82 A+2.25 |

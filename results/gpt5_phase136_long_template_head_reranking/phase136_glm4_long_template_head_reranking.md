@@ -1,0 +1,13 @@
+# Phase 136 Long-template Head Re-ranking: glm4
+
+Generated: 2026-06-14 23:21:04
+Peak layer: L18; true last layer: L40; heads: 32; kv_heads: 2; short core: [1, 28, 0, 18, 11, 27, 23, 4]
+
+| category | audit | reference | best head | top1 | top2 | top4 | top8 | short core | all heads |
+|---|---|---|---|---|---|---|---|---|---|
+| number | old_mismatch=80, mean_pre=30.8 | last_input_pre_answer T-0.04 R+0.67 A+2.82 | H28 T-0.03 R+0.01 A-0.51 | long_top_1 T-0.03 R+0.01 A-0.51 | long_top_2 T-0.04 R+0.02 A-0.62 | long_top_4 [28, 3, 0, 4] T-0.07 R+0.02 A-0.93 | long_top_8 [28, 3, 0, 4, 11, 18, 2, 14] T-0.11 R+0.06 A-1.81 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.08 R+0.02 A-1.75 | all_heads T-0.03 R+0.39 A-2.98 |
+| container | old_mismatch=95, mean_pre=30.9 | last_input_pre_answer T+0.09 R+0.60 A+4.74 | H0 T-0.05 R+0.05 A-0.10 | long_top_1 T-0.05 R+0.05 A-0.10 | long_top_2 T-0.06 R+0.07 A+0.04 | long_top_4 [0, 15, 11, 28] T-0.07 R+0.05 A-0.84 | long_top_8 [0, 15, 11, 28, 23, 21, 4, 1] T-0.07 R+0.06 A-0.98 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.03 R+0.02 A-1.86 | all_heads T+0.34 R+0.40 A-2.30 |
+| plant | old_mismatch=90, mean_pre=31.2 | last_input_pre_answer T-0.26 R+0.58 A+4.09 | H2 T-0.06 R+0.04 A-0.34 | long_top_1 T-0.06 R+0.04 A-0.34 | long_top_2 T-0.09 R+0.08 A-0.49 | long_top_4 [2, 30, 27, 28] T-0.12 R+0.08 A-1.53 | long_top_8 [2, 30, 27, 28, 4, 14, 10, 20] T-0.17 R+0.13 A-1.99 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.00 R+0.03 A-1.70 | all_heads T-0.04 R+0.39 A-2.75 |
+| time | old_mismatch=80, mean_pre=30.8 | last_input_pre_answer T+0.11 R+0.58 A+3.73 | H28 T-0.03 R+0.01 A-0.60 | long_top_1 T-0.03 R+0.01 A-0.60 | long_top_2 T-0.05 R+0.04 A-0.72 | long_top_4 [28, 0, 4, 2] T-0.09 R+0.02 A-1.22 | long_top_8 [28, 0, 4, 2, 3, 11, 1, 8] T-0.13 R+0.05 A-1.82 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.10 R+0.02 A-1.72 | all_heads T-0.07 R+0.38 A-3.25 |
+| clothing | old_mismatch=94, mean_pre=31.0 | last_input_pre_answer T+0.33 R+0.28 A+0.37 | H28 T-0.03 R+0.01 A-0.40 | long_top_1 T-0.03 R+0.01 A-0.40 | long_top_2 T-0.07 R+0.02 A-0.67 | long_top_4 [28, 4, 2, 29] T-0.11 R+0.13 A-1.78 | long_top_8 [28, 4, 2, 29, 14, 31, 8, 1] T-0.19 R+0.21 A-2.49 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.11 R+0.02 A-1.50 | all_heads T-0.12 R+0.40 A-3.93 |
+| furniture | old_mismatch=90, mean_pre=31.2 | last_input_pre_answer T+0.42 R+0.69 A+3.56 | H31 T-0.03 R+0.04 A+0.07 | long_top_1 T-0.03 R+0.04 A+0.07 | long_top_2 T-0.05 R+0.03 A-0.32 | long_top_4 [31, 28, 2, 4] T-0.10 R+0.09 A-0.79 | long_top_8 [31, 28, 2, 4, 29, 1, 12, 14] T-0.16 R+0.21 A-0.94 | short_template_core [1, 28, 0, 18, 11, 27, 23, 4] T-0.07 R+0.02 A-1.42 | all_heads T-0.07 R+0.43 A-1.58 |
