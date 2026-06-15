@@ -18263,3 +18263,4818 @@ DS7B main:
 如果 readout recovery 高但 token rank 不提升，
 说明 token selection gate 是独立瓶颈。
 ```
+
+## Phase 146: Template-Conditioned Router and Token Selection Gap 模板条件化路由与词元选择缺口 [2026-06-15 10:58]
+
+### 本阶段目标
+
+根据用户要求，先分析附加内容是否正确，再综合当前进展继续测试。
+
+附加分析基本正确：
+
+```text
+1. Phase145 的关键价值是把单点成功降级为模板/对象条件化候选机制。
+2. template family 不是噪声，而是 routing condition。
+3. category_argmax_rate 为 0 是重大负结果，说明 token selection gate 没闭合。
+4. Phase146 应按 template family 单独搜索 layer/site/scale。
+5. 应输出 target token rank、target token delta、top tokens，而不是只看内部 readout score。
+```
+
+本轮 Phase146 目标：
+
+```text
+1. 对每个 template family 单独搜索最佳路径。
+2. 搜索范围覆盖 true-last/last-1、input_answer/attention_output/mlp_input、多 scale。
+3. 判断 Phase145 的不稳定是否来自 template-conditioned routing shift。
+4. 同时记录 target token rank、target token argmax、target token delta。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase146_template_router_token_gap_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 8 \
+  --rank 4 \
+  --categories number,time \
+  --template-families long \
+  --splits front_back \
+  --layer-offsets 0,-1 \
+  --sites input_answer,mlp_input \
+  --scales 0.25,0.5 \
+  --output-dir results/gpt5_phase146_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase146_template_router_token_gap_cuda.py qwen3 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase146_template_router_token_gap \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase146_template_router_token_gap_cuda.py glm4 \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase146_template_router_token_gap \
+  --hard-exit-after-model
+
+python tests/gpt5/phase146_template_router_token_gap_cuda.py deepseek7b \
+  --train-objects 12 \
+  --test-objects 12 \
+  --batch-size 24 \
+  --rank 8 \
+  --categories number,plant,time,container \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase146_template_router_token_gap \
+  --hard-exit-after-model
+
+python tests/gpt5/phase146_template_router_token_gap_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase146_template_router_token_gap_cuda.py \
+  tests/gpt5/phase146_template_router_token_gap_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase146_template_router_token_gap_cuda.py`
+- 汇总脚本：`tests/gpt5/phase146_template_router_token_gap_summary.py`
+- Qwen3 结果：`results/gpt5_phase146_template_router_token_gap/phase146_qwen3_template_router_token_gap.json`
+- GLM4 结果：`results/gpt5_phase146_template_router_token_gap/phase146_glm4_template_router_token_gap.json`
+- DS7B 结果：`results/gpt5_phase146_template_router_token_gap/phase146_deepseek7b_template_router_token_gap.json`
+- 跨模型汇总：`results/gpt5_phase146_template_router_token_gap/phase146_cross_model_summary.md`
+
+### 测试范围
+
+```text
+Qwen3/GLM4 confirmation:
+  categories = plant,time
+  template families = long,neutral
+  split = front_back
+  layers = true-last,last-1
+  sites = input_answer,attention_output,mlp_input
+  scales = 0.25,0.5,1.0
+
+DS7B main:
+  categories = number,plant,time,container
+  template families = long,short,neutral
+  splits = front_back,back_front
+  layers = true-last,last-1
+  sites = input_answer,attention_output,mlp_input
+  scales = 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+plant:
+  clean_rate = 0
+  mean_release +12.52
+  mean_token_rank 44062.7
+  token_argmax 0
+
+time:
+  clean_rate = 0
+  mean_release +12.81
+  mean_token_rank 73654.5
+  token_argmax 0
+```
+
+Qwen3 继续是高增益释放，不形成 clean 机制证据。
+
+#### GLM4 bf16
+
+```text
+plant:
+  clean_rate = 1.00
+  mean_release +0.22
+  mean_token_rank 1210.8
+  token_argmax 0
+
+time:
+  clean_rate = 0
+  mean_release +1.40
+  mean_token_rank 9304.6
+  token_argmax 0
+```
+
+GLM4 plant 出现 readout-clean，但 token argmax 仍为 0。
+
+#### DS7B
+
+模板条件化搜索显著提高 readout clean：
+
+```text
+container:
+  clean_rate = 1.00
+  mean recovery +1.07
+  mean release +0.16
+  mean token rank 19227.4
+  token_argmax 0
+
+plant:
+  clean_rate = 1.00
+  mean recovery +0.66
+  mean release +0.03
+  mean token rank 3178.8
+  token_argmax 0
+
+time:
+  clean_rate = 1.00
+  mean recovery +0.63
+  mean release +0.10
+  mean token rank 17927.9
+  token_argmax 0
+
+number:
+  clean_rate = 0.50
+  mean recovery +0.84
+  mean release +1.04
+  mean token rank 9589.2
+  token_argmax 0
+```
+
+DS7B 最佳路径不再是固定全局路径，而是 template/split 条件化路径：
+
+```text
+plant:
+  front_back long: L28 attention_output scale0.35
+  front_back short: L28 input_answer scale1.0
+  front_back neutral: L28 input_answer scale0.5
+  back_front long: L28 attention_output scale0.5
+  back_front short: L28 attention_output scale0.75
+  back_front neutral: L28 input_answer scale1.0
+
+time:
+  front_back long: L28 attention_output scale0.75
+  front_back short: L27 attention_output scale0.5
+  front_back neutral: L28 input_answer scale0.75
+  back_front long: L28 attention_output scale0.25
+  back_front short: L28 attention_output scale0.5
+  back_front neutral: L28 mlp_input scale1.5
+
+container:
+  front_back long: L28 mlp_input scale0.35
+  front_back short: L28 input_answer scale1.0
+  front_back neutral: L28 attention_output scale0.75
+  back_front long: L28 input_answer scale0.35
+  back_front short: L28 attention_output scale0.75
+  back_front neutral: L28 attention_output scale0.75
+```
+
+### 当前最可靠客观事实
+
+1. **Phase145 的不稳定主要来自模板条件化路由错位**
+
+固定全局 path 时：
+
+```text
+plant clean_rate = 0.50
+time clean_rate = 0
+container clean_rate = 0.33/0.17
+```
+
+per-template sweep 后：
+
+```text
+plant clean_rate = 1.00
+time clean_rate = 1.00
+container clean_rate = 1.00
+```
+
+这说明 layer/site/scale 不是全局常数，而是 template-conditioned routing 的输出。
+
+2. **number 仍没有闭合**
+
+number clean_rate 只有 0.50，且 mean_release +1.04。它常选择高 scale attention_output scale1.5，容易释放 competitor。因此 number 当前比 plant/time/container 更不稳定。
+
+3. **token selection gap 被直接确认**
+
+虽然 DS7B readout clean_rate 大幅提高：
+
+```text
+plant/time/container = 1.00
+```
+
+但：
+
+```text
+token_argmax = 0
+target token rank 仍在几千到几万
+```
+
+例如：
+
+```text
+plant mean token rank = 3178.8
+time mean token rank = 17927.9
+container mean token rank = 19227.4
+```
+
+这证明：
+
+```text
+internal readout restore != final token selection
+```
+
+4. **目标词元 logit 经常没有同步上升**
+
+DS7B 目标词元 delta：
+
+```text
+number mean +0.316
+plant mean -0.932
+time mean -1.629
+container mean -1.044
+```
+
+readout clean 并不保证目标词元 logit 上升。很多 top token 是空格、介词或格式 token。
+
+5. **time 的长模板 L27 mlp_input 不是一般最优路径**
+
+Phase142-144 的 L27 mlp_input 是长模板局部强路径。Phase146 中，time 的最佳路径随模板变化，多数转向 L28 attention_output 或 input_answer。
+
+### 对当前理论的修正
+
+Phase146 后，公式必须从：
+
+```text
+category + template family + object split
+  -> layer-site-scale path
+```
+
+进一步写成：
+
+```text
+Router(c, T, O)
+  -> (layer, site, scale)
+```
+
+并且：
+
+```text
+SupportRestore(Router(c,T,O)) -> readout clean
+Readout clean -/-> token selection
+```
+
+也就是说，当前已经分离出两个不同层级：
+
+```text
+1. readout support routing
+   内部读出支持路由
+
+2. token selection gate
+   词元选择门
+```
+
+当前理论更谨慎版本：
+
+```text
+语言编码机制至少包含：
+  context field formation
+  template-conditioned support router
+  scale-sensitive interface injection
+  competition/release control
+  format-conditioned token selection gate
+```
+
+Phase146 已经强力支持前两项，但最后一项仍未破解。
+
+### 硬伤和瓶颈
+
+1. **token-level closure 仍然失败**
+
+token_argmax 全部为 0，target token rank 仍很高。内部 readout clean 还没有转成真实输出。
+
+2. **best path 有过拟合风险**
+
+本轮 per-template sweep 在测试集上选 best path，因此它证明“存在模板条件路径”，但还没有证明 router 可以从训练数据预测到测试数据。
+
+3. **number 仍不稳定**
+
+number 常需要高 scale，且 release 大，说明 number 的 clean path 可能需要更精细 scale 或不同 token/readout 定义。
+
+4. **top token 多是格式 token**
+
+空格、介词、冒号换行等 token 常占 top，这说明 prompt format 和 generation surface 仍未对齐。
+
+5. **没有 autoregressive multi-token generation**
+
+本轮是 first-token logits/rank，不是完整生成。
+
+### 下一阶段任务
+
+Phase147 应做：
+
+```text
+Trainable Router Generalization and Format-Gated Token Closure
+可泛化路由器与格式门控词元闭合
+```
+
+核心任务：
+
+```text
+1. 将 Phase146 的 best path 选择从 test-time search 改成 train-time router。
+2. 在 train templates/objects 上选择 best layer/site/scale，
+   再迁移到 heldout templates/objects。
+3. 对 token selection gap 做格式对照：
+   原始 prompt tail
+   强制 category-token tail
+   multiple-choice tail
+   JSON/label tail
+4. 判断 token gap 是否主要来自 format gate。
+5. 对 plant/time/container 做 first-token + 2-token generation closure。
+```
+
+建议测试：
+
+```text
+DS7B main:
+  categories = plant,time,container,number
+  train templates vs heldout templates
+  train objects vs heldout objects
+  router candidates:
+    layers = true-last,last-1
+    sites = input_answer,attention_output,mlp_input
+    scales = 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5
+  format tails:
+    plain
+    label_colon
+    answer_is_one_word
+    multiple_choice
+
+Qwen3/GLM4:
+  smaller confirmation。
+```
+
+成功判据：
+
+```text
+Router generalization:
+  train-selected path 在 heldout templates/objects 上仍保持 clean_rate 高。
+
+Token closure:
+  如果格式 tail 改变后 target token rank 大幅下降或 argmax 出现，
+  说明 token selection gap 主要来自 format gate。
+
+如果 readout clean 保持但 token rank 仍不动，
+  说明 LM-head/token selection 是独立机制层。
+```
+
+## Phase 147: Trainable Router Generalization and Format-Gated Token Closure 可泛化路由器与格式门控词元闭合 [2026-06-15 11:39]
+
+### 本阶段目标
+
+根据用户要求，先分析附加内容是否正确，再继续完成客观测试。
+
+附加分析基本正确：
+
+```text
+1. Phase146 证明 template-conditioned routing 可以恢复内部 readout。
+2. Phase146 同时证明 internal readout restore 与 token selection 之间有断层。
+3. Phase146 的 per-template best path 是 test-time search，有过拟合风险。
+4. 下一步必须做 train-time router selection -> heldout template/object generalization。
+5. token selection gap 需要用 format tail 对照测试。
+```
+
+本轮目标：
+
+```text
+1. 在 train templates/objects 上选择 best layer/site/scale。
+2. 把 train-selected router 迁移到 heldout template/object。
+3. 测四种 format tail：
+   plain
+   label_colon
+   answer_one_word
+   multiple_choice
+4. 同时记录 readout clean、target token rank、target token argmax。
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase147_train_router_format_token_cuda.py qwen3 \
+  --train-objects 4 \
+  --test-objects 4 \
+  --batch-size 8 \
+  --rank 4 \
+  --categories plant,time \
+  --template-families long \
+  --splits front_back \
+  --formats plain,label_colon \
+  --layer-offsets 0,-1 \
+  --sites input_answer,mlp_input \
+  --scales 0.25,0.5 \
+  --output-dir results/gpt5_phase147_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase147_train_router_format_token_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats plain,label_colon \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase147_train_router_format_token \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase147_train_router_format_token_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats plain,label_colon \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.25,0.5,1.0 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase147_train_router_format_token \
+  --hard-exit-after-model
+
+python tests/gpt5/phase147_train_router_format_token_cuda.py deepseek7b \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats plain,label_colon,answer_one_word,multiple_choice \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5 \
+  --release-threshold 0.25 \
+  --output-dir results/gpt5_phase147_train_router_format_token \
+  --hard-exit-after-model
+
+python tests/gpt5/phase147_train_router_format_token_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase147_train_router_format_token_cuda.py \
+  tests/gpt5/phase147_train_router_format_token_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase147_train_router_format_token_cuda.py`
+- 汇总脚本：`tests/gpt5/phase147_train_router_format_token_summary.py`
+- Qwen3 结果：`results/gpt5_phase147_train_router_format_token/phase147_qwen3_train_router_format_token.json`
+- GLM4 结果：`results/gpt5_phase147_train_router_format_token/phase147_glm4_train_router_format_token.json`
+- DS7B 结果：`results/gpt5_phase147_train_router_format_token/phase147_deepseek7b_train_router_format_token.json`
+- 跨模型汇总：`results/gpt5_phase147_train_router_format_token/phase147_cross_model_summary.md`
+
+### 测试设计
+
+```text
+train router:
+  train templates = template 0,1
+  heldout template = template 2
+  train objects = 8
+  heldout objects = 8
+
+candidate router:
+  layers = true-last,last-1
+  sites = input_answer,attention_output,mlp_input
+  scales = 0.2,0.25,0.3,0.35,0.5,0.75,1.0,1.25,1.5
+
+format tails:
+  plain
+  label_colon
+  answer_one_word
+  multiple_choice
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+plant:
+  held_clean_rate = 0
+  mean_release +12.57
+  mean_token_rank 48998.9
+  token_argmax 0
+
+time:
+  held_clean_rate = 0
+  mean_release +13.20
+  mean_token_rank 85218.6
+  token_argmax 0
+```
+
+Qwen3 继续没有 clean 泛化。
+
+#### GLM4 bf16
+
+```text
+plant:
+  held_clean_rate = 0
+  mean_release +1.80
+  mean_token_rank 1956.5
+  token_argmax 0
+
+time:
+  held_clean_rate = 0
+  mean_release +1.35
+  mean_token_rank 4942.8
+  token_argmax 0
+```
+
+GLM4 的 label_colon 显著降低 token rank，但 readout clean 与 token argmax 都没有闭合。
+
+#### DS7B
+
+按类别：
+
+```text
+container:
+  train_clean_rate = 0.75
+  held_clean_rate = 0.17
+  mean_recovery +1.18
+  mean_release +1.49
+  mean_token_rank 10498.3
+  token_argmax 0
+
+number:
+  train_clean_rate = 0.67
+  held_clean_rate = 0.17
+  mean_recovery +0.88
+  mean_release +1.36
+  mean_token_rank 13163.3
+  token_argmax 0
+
+plant:
+  train_clean_rate = 0.62
+  held_clean_rate = 0.08
+  mean_recovery +1.45
+  mean_release +2.38
+  mean_token_rank 2426.9
+  token_argmax 0
+
+time:
+  train_clean_rate = 0.83
+  held_clean_rate = 0.25
+  mean_recovery +4.39
+  mean_release +1.74
+  mean_token_rank 17019.6
+  token_argmax 0
+```
+
+按 format tail：
+
+```text
+answer_one_word:
+  train_clean_rate = 0.50
+  held_clean_rate = 0.29
+  mean_token_rank 16506.2
+  token_argmax 0
+
+label_colon:
+  train_clean_rate = 0.83
+  held_clean_rate = 0.21
+  mean_token_rank 6165.5
+  token_argmax 0
+
+multiple_choice:
+  train_clean_rate = 0.67
+  held_clean_rate = 0.08
+  mean_token_rank 10654.8
+  token_argmax 0
+
+plain:
+  train_clean_rate = 0.88
+  held_clean_rate = 0.08
+  mean_token_rank 9781.6
+  token_argmax 0
+```
+
+### 当前最可靠客观事实
+
+1. **train-time router 泛化明显不足**
+
+训练侧经常能选到 clean path：
+
+```text
+plain train_clean_rate = 0.88
+label_colon train_clean_rate = 0.83
+```
+
+但迁移到 heldout template/object 后：
+
+```text
+plain held_clean_rate = 0.08
+label_colon held_clean_rate = 0.21
+```
+
+这说明 Phase146 的 test-time router 存在明显过拟合风险。
+
+2. **格式尾部可以降低 token rank，但不能打开 argmax**
+
+部分 case 中，target token rank 降到很低：
+
+```text
+plant multiple_choice: min rank 9.9
+number label_colon: min rank 14.9
+container multiple_choice: min rank 19.5
+```
+
+但：
+
+```text
+token_argmax = 0
+```
+
+所以 format gate 有影响，但不是充分条件。
+
+3. **heldout readout clean 与 token rank 都未闭合**
+
+DS7B heldout clean_rate 最高是：
+
+```text
+time 0.25
+container 0.17
+number 0.17
+plant 0.08
+```
+
+这说明当前 train-selected router 还不能泛化到 heldout 模板/对象。
+
+4. **类别差异明显**
+
+```text
+time:
+  held_clean_rate 最高，但 mean_release 仍高。
+
+plant:
+  token rank 最低，但 held_clean_rate 最低。
+
+container/number:
+  readout 和 token 都不稳定。
+```
+
+这说明“读出泛化”和“词元接近”是两个不同轴。
+
+5. **multiple_choice 不是万能格式**
+
+multiple_choice 在若干 case 中显著降低 rank，但 held_clean_rate 只有 0.08，并且 release 不稳定。它更多改变 token surface，而不是稳定内部 readout。
+
+### 对当前理论的修正
+
+Phase147 后，理论必须进一步拆成三层：
+
+```text
+1. local support path existence
+   局部支持路径存在
+
+2. router generalization
+   路由泛化
+
+3. token selection gate
+   词元选择门
+```
+
+Phase146 证明第 1 层在 test-time search 下很强。
+
+Phase147 证明：
+
+```text
+第 2 层尚未解决：
+  train-selected router 不能稳定泛化。
+
+第 3 层也尚未解决：
+  format tail 能降低 rank，但不能产生 argmax。
+```
+
+因此当前不能说已经破解语言输出机制。更准确说：
+
+```text
+已经观察到可恢复支持通道；
+已经确认模板条件化路由存在；
+但尚未找到可泛化路由规则；
+也尚未打开词元选择门。
+```
+
+### 硬伤和瓶颈
+
+1. **训练侧 router 过拟合**
+
+train clean 高，heldout clean 低，说明 path 选择对模板和对象非常敏感。
+
+2. **format tail 只改善 rank，不产生 argmax**
+
+格式影响强，但仍不能把目标类别词元推到第一。
+
+3. **token rank 和 readout clean 不同步**
+
+plant token rank 较低但 clean_rate 低；time clean_rate 较高但 rank 高。
+
+4. **对象数量仍有限**
+
+8/8 是为了容纳模板和格式扩展，后续需要更平衡对象采样或交叉验证。
+
+5. **仍未做完整 autoregressive generation**
+
+当前是 first-token logits/rank；多 token 生成仍未闭合。
+
+### 下一阶段任务
+
+Phase148 应做：
+
+```text
+Router Feature Audit and LM-Head Alignment
+路由特征审计与语言模型头对齐
+```
+
+核心目标：
+
+```text
+1. 不再只选 best path，而要分析 best path 的可预测特征。
+2. 比较 train-success 与 heldout-fail 的差异：
+   pre-answer basis shift
+   answer-state norm shift
+   transfer prediction error
+   readout/token alignment
+3. 直接测 LM-head category token direction 与 DCF readout direction 的夹角/投影。
+4. 对 low-rank support restore 后，再加 LM-head aligned token steering 小尺度项。
+5. 判断 token gap 是方向错配还是格式门控。
+```
+
+建议测试：
+
+```text
+DS7B main:
+  categories = plant,time,container,number
+  formats = label_colon,multiple_choice,answer_one_word
+  splits = front_back,back_front
+  template families = long,short,neutral
+
+measure:
+  train vs heldout basis cosine
+  transfer R2 train/heldout
+  answer norm delta
+  DCF direction vs LM-head target token direction cosine
+  token-rank before/after LM-head aligned small steering
+
+Qwen3/GLM4:
+  smaller confirmation。
+```
+
+成功判据：
+
+```text
+如果 heldout failure 与 basis/transfer drift 对齐，
+  说明 router generalization 是主要瓶颈。
+
+如果 LM-head aligned steering 显著降低 token rank，
+  说明 token gap 主要是 DCF readout 与 LM-head direction 错配。
+
+如果 steering 也无效，
+  说明 token selection gate 还包含更深的格式/生成动力学。
+```
+
+## Phase 148: Router Feature and LM-Head Alignment Audit 路由特征与词元头对齐审计 [2026-06-15 11:56]
+
+### 本阶段目标
+
+根据 Phase147 的失败性进展，验证两个关键瓶颈：
+
+```text
+1. train-selected router 是否因为 train/heldout feature drift 而不能泛化。
+2. readout restore 与最终 token selection 之间的 gap 是否来自 DCF support direction 与 LM-head target token direction 不对齐。
+```
+
+附件分析中正确部分：
+
+```text
+Phase147 的核心结论不是“没有找到机制”，而是把瓶颈拆成了两层：
+  router generalization 未解决；
+  token selection gate 未打开。
+
+下一步不应继续只找更强 target_delta，而应同时审计：
+  train-success vs heldout-fail 的特征漂移；
+  DCF/readout direction 与 LM-head token direction 的对齐程度；
+  简单 LM-head aligned steering 是否能改善 token rank 或 argmax。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py
+tests/gpt5/phase148_router_feature_lmhead_alignment_summary.py
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long \
+  --splits front_back \
+  --formats label_colon \
+  --lm-scales 0.0,0.1 \
+  --train-objects 4 --test-objects 4 --batch-size 8 --rank 4 \
+  --output-dir results/gpt5_phase148_smoke \
+  --hard-exit-after-model
+
+python tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --lm-scales 0.0,0.05,0.1,0.2 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase148_router_feature_lmhead_alignment \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py glm4 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --lm-scales 0.0,0.05,0.1,0.2 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase148_router_feature_lmhead_alignment \
+  --hard-exit-after-model
+
+python tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word \
+  --lm-scales 0.0,0.05,0.1,0.2,0.5 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase148_router_feature_lmhead_alignment \
+  --hard-exit-after-model
+
+python tests/gpt5/phase148_router_feature_lmhead_alignment_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase148_router_feature_lmhead_alignment_cuda.py \
+  tests/gpt5/phase148_router_feature_lmhead_alignment_summary.py
+```
+
+### 结果文件
+
+```text
+results/gpt5_phase148_router_feature_lmhead_alignment/phase148_qwen3_router_feature_lmhead_alignment.json
+results/gpt5_phase148_router_feature_lmhead_alignment/phase148_glm4_router_feature_lmhead_alignment.json
+results/gpt5_phase148_router_feature_lmhead_alignment/phase148_deepseek7b_router_feature_lmhead_alignment.json
+results/gpt5_phase148_router_feature_lmhead_alignment/phase148_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+
+GLM4:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  dtype = bf16
+
+DS7B main:
+  categories = plant,time,container,number
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  formats = label_colon,multiple_choice,answer_one_word
+  train/test objects = 8/8
+  lm_scales = 0.0,0.05,0.1,0.2,0.5
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+plant:
+  prev_clean 0.00
+  best_clean 0.00
+  pre_basis_overlap 0.53
+  ans_basis_overlap 0.59
+  heldout_transfer_R2 -4.28
+  support_lm_cosine +0.11
+  target_rank 68741.5 -> 68740.1
+  argmax 0.00
+
+time:
+  prev_clean 0.00
+  best_clean 0.00
+  pre_basis_overlap 0.54
+  ans_basis_overlap 0.59
+  heldout_transfer_R2 -11.43
+  support_lm_cosine +0.06
+  target_rank 111794.3 -> 111794.3
+  argmax 0.00
+```
+
+Qwen3 中 LM-head aligned steering 基本无效。
+
+#### GLM4
+
+```text
+plant:
+  prev_clean 0.00
+  best_clean 0.00
+  heldout_transfer_R2 -3.77
+  support_lm_cosine +0.02
+  target_rank 281.9 -> 276.1
+  argmax 0.00
+
+time:
+  prev_clean 0.00
+  best_clean 0.00
+  heldout_transfer_R2 -4.98
+  support_lm_cosine +0.03
+  target_rank 363.1 -> 358.4
+  argmax 0.00
+```
+
+GLM4 的 target token rank 本身较低，但 steering 只带来很小改善，没有 argmax closure。
+
+#### DS7B by category
+
+```text
+container:
+  n 18
+  prev_clean 0.22
+  best_clean 0.22
+  pre_basis_overlap 0.47
+  ans_basis_overlap 0.61
+  heldout_transfer_R2 -4.92
+  support_lm_cosine +0.06
+  target_rank 11990.6 -> 11954.2
+  argmax 0.00
+
+number:
+  n 18
+  prev_clean 0.17
+  best_clean 0.17
+  pre_basis_overlap 0.48
+  ans_basis_overlap 0.60
+  heldout_transfer_R2 -27.03
+  support_lm_cosine +0.08
+  target_rank 13895.8 -> 13871.0
+  argmax 0.00
+
+plant:
+  n 18
+  prev_clean 0.11
+  best_clean 0.11
+  pre_basis_overlap 0.46
+  ans_basis_overlap 0.60
+  heldout_transfer_R2 -9.98
+  support_lm_cosine +0.08
+  target_rank 798.1 -> 785.0
+  argmax 0.00
+
+time:
+  n 18
+  prev_clean 0.28
+  best_clean 0.28
+  pre_basis_overlap 0.46
+  ans_basis_overlap 0.59
+  heldout_transfer_R2 -11.16
+  support_lm_cosine +0.06
+  target_rank 17750.8 -> 17703.2
+  argmax 0.00
+```
+
+#### DS7B by format
+
+```text
+answer_one_word:
+  n 24
+  prev_clean 0.29
+  best_clean 0.29
+  pre_basis_overlap 0.44
+  ans_basis_overlap 0.66
+  heldout_transfer_R2 -9.03
+  support_lm_cosine +0.06
+  target_rank 16506.2 -> 16448.0
+  argmax 0.00
+
+label_colon:
+  n 24
+  prev_clean 0.21
+  best_clean 0.21
+  pre_basis_overlap 0.46
+  ans_basis_overlap 0.59
+  heldout_transfer_R2 -12.55
+  support_lm_cosine +0.07
+  target_rank 6165.5 -> 6141.2
+  argmax 0.00
+
+multiple_choice:
+  n 24
+  prev_clean 0.08
+  best_clean 0.08
+  pre_basis_overlap 0.50
+  ans_basis_overlap 0.55
+  heldout_transfer_R2 -18.24
+  support_lm_cosine +0.08
+  target_rank 10654.8 -> 10645.9
+  argmax 0.00
+```
+
+### 关键现象
+
+1. **train-selected router 的 heldout 泛化失败与特征漂移一致**
+
+```text
+heldout_transfer_R2 在三模型中大多为负。
+DS7B number 平均 -27.03，time -11.16，plant -9.98，container -4.92。
+```
+
+这说明训练模板/训练对象上选出的 restore path，不能稳定预测保留模板/保留对象的状态变化。
+
+2. **pre/answer basis overlap 只有中等强度**
+
+```text
+DS7B pre_basis_overlap 约 0.46-0.48
+DS7B ans_basis_overlap 约 0.59-0.61
+```
+
+answer state 比 pre-answer state 稳一些，但仍不足以支撑稳定的跨模板泛化。
+
+3. **DCF support direction 与 LM-head target token direction 对齐很弱**
+
+```text
+DS7B support_lm_cosine 约 +0.06 到 +0.08
+Qwen3 约 +0.06 到 +0.11
+GLM4 约 +0.02 到 +0.03
+```
+
+这说明 readout restore 的方向并不等于最终目标词元的直接上升方向。
+
+4. **简单 LM-head aligned steering 不能打开 token gate**
+
+```text
+DS7B target rank 有轻微改善，但 argmax 始终 0.00。
+Qwen3 基本无改善。
+GLM4 rank 小幅下降，但 argmax 仍为 0.00。
+```
+
+例如：
+
+```text
+DS7B plant: 798.1 -> 785.0
+DS7B number: 13895.8 -> 13871.0
+GLM4 plant: 281.9 -> 276.1
+```
+
+这些改善不足以解释最终选择机制。
+
+5. **低 rank 个案已经出现，但仍不是 argmax**
+
+```text
+DS7B plant multiple_choice 个别条件 rank 约 9-15。
+DS7B number label_colon 个别条件 rank 约 14-20。
+DS7B container multiple_choice 个别条件 rank 约 19。
+```
+
+这说明问题不只是“目标词元完全不可见”，而是候选竞争、格式约束、最终归一化或生成步骤仍未闭合。
+
+### 对 Phase147 附件分析的判断
+
+附件分析基本正确。
+
+正确部分：
+
+```text
+Phase147 是失败性进展，不是无效进展。
+router generalization 和 token selection gate 是两个独立瓶颈。
+继续只追逐 readout recovery 会陷入局部结构堆叠。
+需要审计 train/heldout feature drift 和 LM-head alignment。
+```
+
+需要修正的部分：
+
+```text
+LM-head aligned steering 并没有显著降低 target token rank，更没有产生 argmax closure。
+因此 token gap 不能简单解释为“DCF/readout 方向与 LM-head 方向错配后，加一个 LM-head 方向即可解决”。
+当前更像是：
+  DCF support restore 负责内部语义状态的一部分；
+  final token selection 还受 format、candidate competition、final norm、generation dynamics 共同控制。
+```
+
+### 理论进展
+
+当前最稳妥的结构图应更新为：
+
+```text
+object/template condition
+  -> route selection
+  -> local support restore
+  -> answer-state readout improvement
+  -> final norm / LM-head / candidate competition
+  -> token selection
+```
+
+Phase146-148 共同说明：
+
+```text
+readout restore 是真实内部现象；
+template-conditioned router 是真实现象；
+train-selected router 的跨模板泛化不稳；
+最终 token selection 不是 readout restore 的直接线性后果；
+LM-head direction 与 DCF support direction 只弱相关；
+简单加 LM-head direction 不足以打开 token gate。
+```
+
+这迫使理论从单一支持路径模型，转向更严格的两级门控模型：
+
+```text
+第一级：内部语义/关系状态门控。
+第二级：最终词元选择门控。
+```
+
+### 硬伤
+
+1. **Phase148 仍依赖 Phase147 选出的路径**
+
+```text
+如果 Phase147 的 route selector 本身不稳，Phase148 审计的是“不稳定选择器的后果”，不是最优全局机制。
+```
+
+2. **LM-head target direction 仍是单词元近似**
+
+```text
+category label 可能不是模型实际生成类别的唯一 token route。
+多 token、同义词、格式 token、选项 token 都可能参与竞争。
+```
+
+3. **没有直接审计 final norm 前后**
+
+```text
+当前只在内部 path 上加 support/LM-head steering。
+如果 final norm 或最后一层 residual 重新缩放方向，内部 steering 可能被压扁。
+```
+
+4. **full-vocab argmax 过于严格但必要**
+
+```text
+argmax 0.00 说明完整生成闭合仍失败。
+但如果 candidate-set argmax 已经成功，就应把问题定位到开放词表竞争。
+Phase148 尚未完成 candidate-set audit。
+```
+
+5. **Qwen3/GLM4 只是小范围确认**
+
+```text
+主要结论来自 DS7B。
+跨模型普遍趋势存在，但 Qwen3/GLM4 的测试范围小于 DS7B。
+```
+
+### 下一步 Phase149
+
+Phase149 应进入：
+
+```text
+Final-Norm and Candidate-Set Token Gate Audit
+最终归一化与候选集词元门审计
+```
+
+目标不是再找更大的 readout delta，而是分离 token gap 的来源：
+
+```text
+1. full-vocab competition:
+   目标类别词元是否在候选集内已胜出，但被开放词表其他 token 压制。
+
+2. final norm gate:
+   support restore 在 final norm 前后是否被重缩放、旋转或压制。
+
+3. candidate token basis:
+   类别答案是否应由多个 label token、synonym token、option token 共同表示。
+
+4. generation dynamics:
+   单步 next-token rank 是否不能代表短答案生成闭合。
+```
+
+建议测试：
+
+```text
+models = qwen3, glm4, deepseek7b
+
+DS7B main:
+  categories = plant,time,container,number
+  formats = label_colon,multiple_choice,answer_one_word
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  train/test objects >= 8/8
+
+Qwen3/GLM4:
+  categories = plant,time
+  format = label_colon,multiple_choice
+  train/test objects >= 8/8
+
+measure:
+  full_vocab_rank
+  candidate_set_rank
+  candidate_set_argmax
+  final_norm_input vs final_norm_output logit lens
+  target logit delta before/after support restore
+  top competing tokens and their category relation
+  one-token vs two-token constrained generation
+
+interventions:
+  support restore only
+  final_norm_input LM-head steering
+  final hidden state LM-head steering
+  candidate competitor suppression
+```
+
+判据：
+
+```text
+如果 candidate_set_argmax 成功但 full_vocab_argmax 失败：
+  token gap 主要来自开放词表竞争。
+
+如果 final_norm 前有效、final_norm 后失效：
+  final norm 是关键压制门。
+
+如果 final hidden state steering 仍不能打开 argmax：
+  说明目标答案不是单一 label token 方向，而是生成动力学/格式路径。
+
+如果 two-token constrained generation 成功：
+  下一步转向短答案生成闭合，而不是单 token argmax。
+```
+
+## Phase 149: Final-Norm Candidate Token Gate Audit 最终归一化与候选词元门审计 [2026-06-15 12:19]
+
+### 本阶段目标
+
+结合两个附件的正确部分继续推进。
+
+附件一关于 AGI 路线和语言编码机制的判断，正确部分是：
+
+```text
+语言是理解智能编码机制的关键入口；
+深度神经网络逆向工程比直接类脑测量更容易做因果实验；
+语言能力不是单个词向量现象，而是概念、关系、语法、格式、任务模式共同形成的系统；
+当前研究应继续积累可干预、可复现的客观拼图。
+```
+
+需要谨慎修正的部分：
+
+```text
+破解语言编码机制是 AGI 理论的核心入口，但不能直接等同于完整 AGI。
+实时学习、稳定记忆更新、系统级世界模型、行动闭环仍需要额外机制。
+“人脑接近物理最优解”和“两三年临界点”可以作为猜想，不能作为当前实验结论。
+```
+
+附件二对 Phase148 的判断基本正确：
+
+```text
+Phase148 是负结果推进；
+router generalization 和 LM-head alignment 是两个独立瓶颈；
+token selection gap 不能简单归因于少加了目标 token direction；
+下一步必须分离 candidate-set gate、full-vocab competition 和 final norm gate。
+```
+
+因此 Phase149 的目标是：
+
+```text
+1. 测 candidate-set argmax 是否已经成功。
+2. 测 full-vocab argmax 是否仍失败。
+3. 比较 final_norm_input 与 final_norm_output 的候选集读出。
+4. 测 support restore 后，在 final_norm_input/output 加 LM-head direction 是否能打开词元门。
+5. 测简单 candidate competitor suppression 是否有效。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase149_final_norm_candidate_gate_cuda.py
+tests/gpt5/phase149_final_norm_candidate_gate_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase149_final_norm_candidate_gate_cuda.py \
+  tests/gpt5/phase149_final_norm_candidate_gate_summary.py
+
+python tests/gpt5/phase149_final_norm_candidate_gate_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon,multiple_choice \
+  --lm-scales 0.0,1.0,4.0 \
+  --suppress-scales 1.0 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase149_final_norm_candidate_gate \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase149_final_norm_candidate_gate_cuda.py glm4 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon,multiple_choice \
+  --lm-scales 0.0,1.0,4.0 \
+  --suppress-scales 1.0 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase149_final_norm_candidate_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase149_final_norm_candidate_gate_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word \
+  --lm-scales 0.0,1.0,4.0 \
+  --suppress-scales 1.0 \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase149_final_norm_candidate_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase149_final_norm_candidate_gate_summary.py
+```
+
+### 结果文件
+
+```text
+results/gpt5_phase149_final_norm_candidate_gate/phase149_qwen3_final_norm_candidate_gate.json
+results/gpt5_phase149_final_norm_candidate_gate/phase149_glm4_final_norm_candidate_gate.json
+results/gpt5_phase149_final_norm_candidate_gate/phase149_deepseek7b_final_norm_candidate_gate.json
+results/gpt5_phase149_final_norm_candidate_gate/phase149_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  formats = label_colon,multiple_choice
+  train/test objects = 8/8
+
+GLM4:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  formats = label_colon,multiple_choice
+  train/test objects = 8/8
+
+DS7B main:
+  categories = plant,time,container,number
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  formats = label_colon,multiple_choice,answer_one_word
+  train/test objects = 8/8
+  total cases = 72
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 4
+
+best candidate gate:
+  candidate_argmax_rate mean = 0.781
+  candidate_rank_mean = 1.219
+  full_vocab_rank_mean = 37920.4
+  full_vocab_argmax_rate = 0.000
+  final_norm_input candidate_argmax = 0.500
+  final_norm_output candidate_argmax = 0.781
+
+support_only:
+  candidate_argmax = 0.500
+  full_vocab_rank_mean = 90267.9
+  full_vocab_argmax = 0.000
+
+final_norm_output_lm scale4:
+  candidate_argmax = 0.781
+  full_vocab_rank_mean = 37920.4
+  full_vocab_argmax = 0.000
+```
+
+类别：
+
+```text
+plant:
+  candidate_argmax = 1.000
+  full_vocab_argmax = 0.000
+
+time:
+  candidate_argmax = 0.562
+  full_vocab_argmax = 0.000
+```
+
+#### GLM4 bf16
+
+```text
+cases = 4
+
+best candidate gate:
+  candidate_argmax_rate mean = 0.969
+  candidate_rank_mean = 1.031
+  full_vocab_rank_mean = 90.8
+  full_vocab_argmax_rate = 0.000
+  final_norm_input candidate_argmax = 0.969
+  final_norm_output candidate_argmax = 0.969
+
+support_only:
+  candidate_argmax = 0.906
+  full_vocab_rank_mean = 322.5
+  full_vocab_argmax = 0.000
+
+final_norm_output_lm scale4:
+  candidate_argmax = 0.969
+  full_vocab_rank_mean = 90.8
+  full_vocab_argmax = 0.000
+```
+
+GLM4 的目标类别词元已经进入较低 full-vocab rank，但仍没有 full-vocab argmax closure。
+
+#### DS7B
+
+```text
+cases = 72
+
+best candidate gate:
+  candidate_argmax_rate mean = 0.679
+  candidate_rank_mean = 1.481
+  full_vocab_rank_mean = 4339.6
+  full_vocab_argmax_rate = 0.000
+  final_norm_input candidate_argmax = 0.319
+  final_norm_output candidate_argmax = 0.679
+
+support_only:
+  candidate_argmax = 0.413
+  candidate_rank_mean = 2.122
+  full_vocab_rank_mean = 11108.8
+  full_vocab_argmax = 0.000
+  clean_rate = 0.194
+
+final_norm_input_lm scale4:
+  candidate_argmax = 0.424
+  candidate_rank_mean = 2.083
+  full_vocab_rank_mean = 10876.9
+  full_vocab_argmax = 0.000
+
+final_norm_output_lm scale4:
+  candidate_argmax = 0.679
+  candidate_rank_mean = 1.481
+  full_vocab_rank_mean = 4334.7
+  full_vocab_argmax = 0.000
+  clean_rate = 0.139
+
+final_norm_output_suppress:
+  candidate_argmax = 0.516
+  candidate_rank_mean = 1.979
+  full_vocab_rank_mean = 11079.1
+  full_vocab_argmax = 0.000
+```
+
+#### DS7B by category
+
+```text
+plant:
+  candidate_argmax = 0.99
+  candidate_rank = 1.01
+  full_vocab_rank = 101.8
+  full_vocab_argmax = 0.00
+  final_norm_input/output candidate_argmax = 0.85 / 0.99
+
+time:
+  candidate_argmax = 0.66
+  candidate_rank = 1.46
+  full_vocab_rank = 7025.0
+  full_vocab_argmax = 0.00
+  final_norm_input/output candidate_argmax = 0.12 / 0.66
+
+container:
+  candidate_argmax = 0.61
+  candidate_rank = 1.51
+  full_vocab_rank = 3736.7
+  full_vocab_argmax = 0.00
+  final_norm_input/output candidate_argmax = 0.13 / 0.61
+
+number:
+  candidate_argmax = 0.46
+  candidate_rank = 1.94
+  full_vocab_rank = 6494.7
+  full_vocab_argmax = 0.00
+  final_norm_input/output candidate_argmax = 0.18 / 0.46
+```
+
+#### DS7B by format
+
+```text
+label_colon:
+  candidate_argmax = 0.83
+  full_vocab_rank = 1742.2
+  full_vocab_argmax = 0.00
+
+answer_one_word:
+  candidate_argmax = 0.61
+  full_vocab_rank = 5550.9
+  full_vocab_argmax = 0.00
+
+multiple_choice:
+  candidate_argmax = 0.59
+  full_vocab_rank = 5725.5
+  full_vocab_argmax = 0.00
+```
+
+### 关键现象
+
+1. **candidate-set gate 可以部分打开**
+
+Phase148 只看到 full-vocab argmax 始终失败。Phase149 显示，在候选类别集合内部，目标类别经常已经成为第一：
+
+```text
+Qwen3 candidate_argmax 0.781
+GLM4 candidate_argmax 0.969
+DS7B candidate_argmax 0.679
+```
+
+这说明 token gap 不能简单说成“目标类别没有进入输出空间”。更准确是：
+
+```text
+目标类别在候选类别子空间内经常可胜出；
+但在开放词表中仍被格式词、符号词、其他普通 token 压制。
+```
+
+2. **full-vocab argmax 仍然完全没有闭合**
+
+```text
+Qwen3 full_vocab_argmax = 0.000
+GLM4 full_vocab_argmax = 0.000
+DS7B full_vocab_argmax = 0.000
+```
+
+即使 DS7B plant 的 candidate_argmax 约 0.99，full-vocab_argmax 仍是 0。
+
+这证明：
+
+```text
+候选集闭合 ≠ 真实开放生成闭合。
+```
+
+3. **final_norm_output 比 final_norm_input 更接近候选集闭合**
+
+DS7B：
+
+```text
+final_norm_input candidate_argmax = 0.319
+final_norm_output candidate_argmax = 0.679
+```
+
+类别上也一致：
+
+```text
+plant 0.85 -> 0.99
+time 0.12 -> 0.66
+container 0.13 -> 0.61
+number 0.18 -> 0.46
+```
+
+这说明 final norm 不是简单压制门。它在很多条件下反而把状态推向候选类别可读空间。
+
+4. **final_norm_output_lm 是最有效的干预，但仍不够**
+
+最佳 variant 几乎都来自：
+
+```text
+final_norm_output_lm scale4
+```
+
+DS7B 72 个 case 中 71 个最佳候选集结果来自该 variant。
+
+但即使这样：
+
+```text
+full_vocab_argmax 仍为 0。
+```
+
+说明 LM-head 方向能改善候选集竞争，但无法击穿开放词表竞争。
+
+5. **support_only 已经有一部分候选集信号**
+
+DS7B：
+
+```text
+support_only candidate_argmax = 0.413
+final_norm_output_lm candidate_argmax = 0.679
+```
+
+这说明 support restore 不是无效，它确实把一部分内部语义状态推到类别候选集；但还需要 final output 层面的词元方向才能显著增强。
+
+6. **plant 是当前最接近闭合的类别**
+
+DS7B：
+
+```text
+plant candidate_argmax = 0.99
+plant full_vocab_rank = 101.8
+plant full_vocab_argmax = 0.00
+```
+
+plant 已经不是候选集问题，而是开放词表竞争问题。
+
+number/time/container 仍同时存在候选集竞争和开放词表竞争。
+
+### 对当前理论的修正
+
+Phase149 后，结构图应更新为：
+
+```text
+object/template/format condition
+  -> route selection
+  -> support restore / internal semantic field
+  -> final norm organizes candidate-readable state
+  -> LM-head candidate category competition
+  -> open-vocab competition
+  -> actual next token
+```
+
+之前 Phase148 的判断：
+
+```text
+readout restore 不等于 token selection。
+```
+
+现在可以细化为：
+
+```text
+readout restore 有时可以进入 candidate-set selection；
+candidate-set selection 仍不等于 full-vocab generation；
+final norm output 是候选集门的重要接口；
+开放词表竞争是当前最硬的最后一道门。
+```
+
+### 对破解语言编码机制的意义
+
+这对语言背后的编码机制有一个重要启发：
+
+```text
+概念编码不是直接等于词元输出；
+概念编码先在候选语义集合中形成相对优势；
+真实语言生成还必须通过格式、词表、上下文和生成约束形成最终词元。
+```
+
+所以“语言编码机制”至少分三层：
+
+```text
+1. semantic support layer:
+   概念/关系支持层。
+
+2. candidate selection layer:
+   候选语义类别选择层。
+
+3. open generation layer:
+   开放词表生成层。
+```
+
+当前已经对第 1 层和第 2 层有较多因果证据，第 3 层仍未闭合。
+
+### 硬伤
+
+1. **final_norm_output_lm scale4 是强干预**
+
+```text
+它证明 final_norm_output 是有效接口，但不能证明模型自然使用同样强度的方向。
+```
+
+2. **candidate set 是人为定义的**
+
+```text
+candidate categories = plant,time,container,number。
+如果候选集扩大到所有 32 类，candidate_argmax 可能下降。
+```
+
+3. **full-vocab argmax 仍为 0**
+
+```text
+真实生成闭合仍未完成。
+```
+
+4. **top token 中有大量格式/符号/异常 token**
+
+```text
+说明开放词表竞争中，模型并不总是在“类别词”之间选择。
+下一步必须分析这些 top token 的来源和格式门。
+```
+
+5. **Qwen3/GLM4 范围仍小于 DS7B**
+
+```text
+跨模型趋势一致，但主证据仍来自 DS7B 的 72 cases。
+```
+
+6. **没有做生成序列闭合**
+
+```text
+单步 next-token 可能低估 answer_one_word 或 multiple_choice 下的短答案生成路径。
+```
+
+### 下一步 Phase150
+
+Phase150 应进入：
+
+```text
+Open-Vocab Competitor and Format Gate Decomposition
+开放词表竞争者与格式门分解
+```
+
+核心目标：
+
+```text
+既然 candidate-set gate 已经部分打开，而 full-vocab argmax 仍为 0，
+下一步必须找出开放词表中压制类别词元的东西是什么。
+```
+
+建议测试：
+
+```text
+models = qwen3, glm4, deepseek7b
+
+DS7B main:
+  categories = plant,time,container,number
+  formats = label_colon,multiple_choice,answer_one_word
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  train/test objects = 8/8 or larger
+
+measure:
+  top 50 full-vocab tokens after support_only
+  top 50 full-vocab tokens after final_norm_output_lm
+  competitor token type:
+    format token
+    punctuation
+    whitespace/newline
+    category token
+    object token
+    abstract/common token
+    unknown/noisy token
+  target category token rank among:
+    full vocab
+    non-format vocab
+    alphabetic tokens
+    category readout tokens
+    prompt option tokens
+
+interventions:
+  mask/suppress top format competitors
+  mask/suppress punctuation/newline competitors
+  constrain to alphabetic token subset
+  constrain to option token subset
+  run one-step and two-step generation audit
+```
+
+判据：
+
+```text
+如果移除格式/符号竞争后 full-vocab argmax 接近成功：
+  最后一门主要是 format gate。
+
+如果只在 option-token subset 成功：
+  multiple-choice 格式需要选项路径，不是类别词路径。
+
+如果 alphabetic subset 仍失败：
+  类别答案本身不是当前目标 token set。
+
+如果 two-step generation 成功但 one-step argmax 失败：
+  真实输出是短序列路径，不是单 token 闭合。
+```
+
+## Phase 150: Open-Vocab Competitor and Format Gate Decomposition 开放词表竞争者与格式门分解 [2026-06-15 13:02]
+
+### 本阶段目标
+
+根据附件对 Phase149 的分析，继续完成任务。
+
+附件判断基本正确：
+
+```text
+Phase149 是 Phase146-148 之后的关键分解；
+readout restore 已经能部分进入 candidate-set selection；
+candidate-set gate 部分打开；
+full-vocab generation 仍失败；
+final_norm_output 是候选集可读化接口；
+下一步必须分解 open-vocab gate 中到底是谁压过目标类别词元。
+```
+
+需要谨慎修正的部分：
+
+```text
+candidate-set gate 打开不等于 token gate 完全打开；
+Phase149 的 candidate set 仍偏窄；
+final_norm_output_lm scale4 是强干预；
+top token 类型必须系统分类，不能只从个例推断。
+```
+
+Phase150 目标：
+
+```text
+1. 对 support_only、final_norm_output_lm、final_norm_output_suppress 的 top50 full-vocab tokens 做类型分类。
+2. 比较目标词元在 full vocab、non-format vocab、alphabetic vocab、4类 candidate vocab、32类 semantic vocab 中的 rank/argmax。
+3. 判断 full-vocab argmax 失败主要来自格式词元、符号词元、同义词、其他类别词，还是普通字母词竞争。
+4. 保持三模型顺序 CUDA 测试，DS7B 做主范围。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase150_open_vocab_competitor_gate_cuda.py
+tests/gpt5/phase150_open_vocab_competitor_gate_summary.py
+```
+
+说明：
+
+```text
+第一次 DS7B 运行中发现脚本重复解码完整词表，效率过低。
+已中止该低效运行，改为一次性缓存词表子集和 token 分类后重新运行。
+修正后 DS7B 主测试完成。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase149_final_norm_candidate_gate_cuda.py \
+  tests/gpt5/phase150_open_vocab_competitor_gate_cuda.py \
+  tests/gpt5/phase150_open_vocab_competitor_gate_summary.py
+
+python tests/gpt5/phase150_open_vocab_competitor_gate_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 --top-k 50 \
+  --output-dir results/gpt5_phase150_open_vocab_competitor_gate \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase150_open_vocab_competitor_gate_cuda.py glm4 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 --top-k 50 \
+  --output-dir results/gpt5_phase150_open_vocab_competitor_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase150_open_vocab_competitor_gate_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 --top-k 50 \
+  --output-dir results/gpt5_phase150_open_vocab_competitor_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase150_open_vocab_competitor_gate_summary.py
+```
+
+### 结果文件
+
+```text
+results/gpt5_phase150_open_vocab_competitor_gate/phase150_qwen3_open_vocab_competitor_gate.json
+results/gpt5_phase150_open_vocab_competitor_gate/phase150_glm4_open_vocab_competitor_gate.json
+results/gpt5_phase150_open_vocab_competitor_gate/phase150_deepseek7b_open_vocab_competitor_gate.json
+results/gpt5_phase150_open_vocab_competitor_gate/phase150_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+
+GLM4:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+
+DS7B main:
+  categories = plant,time,container,number
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  formats = label_colon,multiple_choice,answer_one_word
+  train/test objects = 8/8
+  cases = 72
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+final_norm_output_lm:
+  candidate4_argmax = 0.781
+  semantic_all_categories_argmax = 0.250
+  alphabetic_rank = 17652.9
+  non_format_rank = 17654.9
+  full_rank = 37920.4
+  full_argmax = 0.000
+
+support_only:
+  candidate4_argmax = 0.500
+  semantic_all_categories_argmax = 0.000
+  full_rank = 90267.9
+  full_argmax = 0.000
+
+argmax token class:
+  non_ascii_or_fragment = 3/4
+  format_or_fragment = 1/4
+```
+
+Qwen3 的开放词表竞争主要表现为异常碎片/非 ASCII token 压制，candidate4 成功不稳定，扩展到 32 类 semantic set 后明显下降。
+
+#### GLM4 bf16
+
+```text
+final_norm_output_lm:
+  candidate4_argmax = 0.969
+  semantic_all_categories_argmax = 0.906
+  alphabetic_rank = 81.5
+  non_format_rank = 81.9
+  full_rank = 90.8
+  full_argmax = 0.000
+
+support_only:
+  candidate4_argmax = 0.906
+  semantic_all_categories_argmax = 0.438
+  full_rank = 322.5
+  full_argmax = 0.000
+
+argmax token class:
+  alphabetic_other = 3/4
+  whitespace = 1/4
+```
+
+GLM4 是最接近开放词表闭合的模型，但仍不是目标类别 argmax。
+
+#### DS7B overall
+
+```text
+support_only:
+  candidate4_argmax = 0.413
+  semantic_all_categories_argmax = 0.286
+  alphabetic_rank = 6092.7
+  non_format_rank = 7474.5
+  full_rank = 11094.3
+  full_argmax = 0.000
+
+final_norm_output_lm:
+  candidate4_argmax = 0.679
+  semantic_all_categories_argmax = 0.503
+  alphabetic_rank = 2364.4
+  non_format_rank = 2928.8
+  full_rank = 4334.0
+  full_argmax = 0.000
+
+final_norm_output_suppress:
+  candidate4_argmax = 0.516
+  semantic_all_categories_argmax = 0.311
+  alphabetic_rank = 6100.0
+  non_format_rank = 7471.5
+  full_rank = 11065.2
+  full_argmax = 0.000
+```
+
+DS7B argmax token class 分布：
+
+```text
+support_only:
+  alphabetic_other 19
+  punctuation 18
+  whitespace 15
+  target_synonym 14
+  other_category 3
+  non_ascii_or_fragment 2
+  option_label 1
+
+final_norm_output_lm:
+  alphabetic_other 21
+  target_synonym 17
+  punctuation 15
+  whitespace 13
+  other_category 2
+  non_ascii_or_fragment 2
+  generic_continuation 1
+  object_token 1
+```
+
+这说明开放词表竞争不是单一格式词元问题，而是多类竞争混合。
+
+#### DS7B by category
+
+```text
+plant:
+  candidate4_argmax = 0.99
+  semantic_all_categories_argmax = 0.97
+  alphabetic_rank = 85.4
+  non_format_rank = 86.0
+  full_rank = 101.8
+  full_argmax = 0.00
+  top_arg_class = target_synonym
+
+time:
+  candidate4_argmax = 0.66
+  semantic_all_categories_argmax = 0.37
+  alphabetic_rank = 3690.6
+  non_format_rank = 4627.6
+  full_rank = 7022.2
+  full_argmax = 0.00
+  top_arg_class = alphabetic_other
+
+container:
+  candidate4_argmax = 0.61
+  semantic_all_categories_argmax = 0.41
+  alphabetic_rank = 2286.3
+  non_format_rank = 2725.4
+  full_rank = 3717.4
+  full_argmax = 0.00
+  top_arg_class = punctuation
+
+number:
+  candidate4_argmax = 0.46
+  semantic_all_categories_argmax = 0.27
+  alphabetic_rank = 3395.2
+  non_format_rank = 4276.5
+  full_rank = 6494.7
+  full_argmax = 0.00
+  top_arg_class = alphabetic_other
+```
+
+#### DS7B by format
+
+```text
+label_colon:
+  candidate4_argmax = 0.83
+  semantic_all_categories_argmax = 0.61
+  alphabetic_rank = 1073.6
+  non_format_rank = 1261.2
+  full_rank = 1742.2
+  full_argmax = 0.00
+  top_arg_class = alphabetic_other
+
+multiple_choice:
+  candidate4_argmax = 0.59
+  semantic_all_categories_argmax = 0.51
+  alphabetic_rank = 2749.3
+  non_format_rank = 3562.8
+  full_rank = 5709.0
+  full_argmax = 0.00
+  top_arg_class = target_synonym
+
+answer_one_word:
+  candidate4_argmax = 0.61
+  semantic_all_categories_argmax = 0.39
+  alphabetic_rank = 3270.3
+  non_format_rank = 3962.5
+  full_rank = 5550.9
+  full_argmax = 0.00
+  top_arg_class = alphabetic_other
+```
+
+### 关键现象
+
+1. **4类候选集成功会被 32类 semantic set 明显削弱**
+
+DS7B：
+
+```text
+candidate4_argmax = 0.679
+semantic_all_categories_argmax = 0.503
+```
+
+Qwen3：
+
+```text
+candidate4_argmax = 0.781
+semantic_all_categories_argmax = 0.250
+```
+
+这验证附件中的硬伤：Phase149 的候选集偏窄。扩展候选空间后，候选闭合强度下降。
+
+2. **去掉格式词/限制字母词元仍不能闭合**
+
+DS7B final_norm_output_lm：
+
+```text
+alphabetic_rank = 2364.4
+non_format_rank = 2928.8
+full_rank = 4334.0
+full_argmax = 0.000
+```
+
+GLM4 虽然 rank 低：
+
+```text
+alphabetic_rank = 81.5
+full_rank = 90.8
+full_argmax = 0.000
+```
+
+但仍无法 argmax。说明最后一门不是简单移除空白/标点即可解决。
+
+3. **open-vocab gate 是混合竞争，不是单一 format gate**
+
+DS7B final_norm_output_lm 的 top arg class：
+
+```text
+alphabetic_other 21
+target_synonym 17
+punctuation 15
+whitespace 13
+```
+
+这说明开放词表中压制目标类别词元的来源至少包括：
+
+```text
+普通字母词
+目标同义词/相邻表述
+标点/空白
+其他类别词
+异常片段
+```
+
+4. **plant 是特殊近闭合类别，但仍不是 full-vocab argmax**
+
+DS7B plant：
+
+```text
+candidate4_argmax = 0.99
+semantic_argmax = 0.97
+full_rank = 101.8
+top_arg_class = target_synonym
+full_argmax = 0.00
+```
+
+这说明 plant 的真正问题不是语义类别竞争，而是：
+
+```text
+目标 label token set 与模型自然同义输出路径不完全一致；
+或者模型更倾向输出 tree/flower/Plant 等同义或大小写变体。
+```
+
+5. **final_norm_output_lm 仍显著改善 rank，但不是生成闭合**
+
+DS7B：
+
+```text
+support_only full_rank = 11094.3
+final_norm_output_lm full_rank = 4334.0
+```
+
+GLM4：
+
+```text
+support_only full_rank = 322.5
+final_norm_output_lm full_rank = 90.8
+```
+
+这说明 final_norm_output_lm 是有效接口，但距离完整生成仍有一道强竞争门。
+
+### 对 Phase149 附件分析的判断
+
+正确部分：
+
+```text
+Phase149 的分析基本正确；
+candidate-set gate 与 open-vocab gate 应拆开；
+final_norm_output 是候选可读接口；
+plant 最适合作为 open-vocab gate 的突破对象；
+必须分析 top-token ecology。
+```
+
+需要修正的部分：
+
+```text
+open-vocab gate 不只是 format token suppression 问题。
+Phase150 中去格式/字母子集仍不能让 full-vocab argmax 闭合。
+很多压制来自 alphabetic_other、target_synonym、punctuation、whitespace 的混合。
+因此下一步不能只做格式词元抑制，还要重建真实答案词元集合和同义路径。
+```
+
+### 理论进展
+
+Phase150 后，三门语言编码理论应再细化：
+
+```text
+semantic support gate:
+  内部支持路径形成。
+
+candidate semantic gate:
+  小候选集或语义候选集中的相对选择。
+
+surface realization gate:
+  在开放词表中选择具体表面 token。
+```
+
+其中第三门不是单一门，而至少包括：
+
+```text
+format prior
+punctuation/whitespace prior
+synonym surface route
+generic continuation route
+category label route
+object/context continuation route
+tokenization artifact route
+```
+
+更准确公式：
+
+```text
+token*
+=
+argmax_v [
+  y_semantic(v)
+  + y_surface(v | format, prompt_tail)
+  + y_continuation(v | local syntax)
+  + y_tokenization(v)
+]
+```
+
+当前实验说明：
+
+```text
+y_semantic 已经能让目标类在 candidate4/semantic set 中部分胜出；
+但 y_surface + y_continuation + y_tokenization 仍经常压过目标 label token。
+```
+
+### 硬伤
+
+1. **Phase150 尚未真正做 2-token/3-token 生成闭合**
+
+```text
+本轮做了真实 logits 与 top50 分类，但没有做多步生成。
+```
+
+2. **token 分类规则仍是粗粒度启发式**
+
+```text
+alphabetic_other 内部可能包含正确同义词、错误类别词、普通续写词、模板词。
+需要更细的词表语义分类。
+```
+
+3. **target token set 可能过窄**
+
+```text
+plant 的 top_arg_class 经常是 target_synonym。
+如果目标接受 tree/flower/Plant 等变体，生成闭合评价会不同。
+```
+
+4. **format suppression 简单版无效**
+
+```text
+final_norm_output_suppress 没有超过 final_norm_output_lm。
+说明不能只压一个竞争方向，需要按竞争类型成组处理。
+```
+
+5. **Qwen3/GLM4 仍是小范围确认**
+
+```text
+跨模型趋势有参考价值，但主结论来自 DS7B 72 cases。
+```
+
+### 下一步 Phase151
+
+Phase151 应进入：
+
+```text
+Surface-Answer Set and Multi-token Generation Closure
+表面答案集合与多词元生成闭合
+```
+
+目标：
+
+```text
+既然 open-vocab gate 不是单纯格式门，
+下一步必须重建模型真实可接受的答案表面集合，而不是只盯单个 category label token。
+```
+
+建议测试：
+
+```text
+models = qwen3, glm4, deepseek7b
+
+DS7B main:
+  categories = plant,time,container,number
+  formats = label_colon,multiple_choice,answer_one_word
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  train/test objects = 8/8
+
+surface answer sets:
+  canonical label:
+    plant, time, container, number
+
+  readout synonyms:
+    plant/tree/vegetation/flora
+    time/date/period/moment
+    container/vessel/box/holder
+    number/amount/quantity/count
+
+  object-near valid answers:
+    flower/tree/rose/oak
+    morning/year/hour/date
+    box/bottle/cup/bag
+    one/two/count/quantity
+
+  format variants:
+    leading space
+    capitalized token
+    article + label
+    label + punctuation
+
+measure:
+  one-token argmax within expanded answer set
+  two-token greedy generation contains answer surface
+  three-token greedy generation contains answer surface
+  target answer set rank
+  wrong semantic answer rate
+  format-first then answer-second rate
+
+interventions:
+  support_only
+  final_norm_output_lm
+  expanded-answer-set scoring
+  optional constrained generation over answer surface tokens
+```
+
+判据：
+
+```text
+如果 expanded answer set 让 plant/time/container/number 显著闭合：
+  当前瓶颈主要是 answer surface set 定义过窄。
+
+如果 2-token/3-token 成功但 1-token 失败：
+  语言生成闭合应从单 token 改为短序列路径。
+
+如果 expanded set 和多词元仍失败：
+  open-vocab gate 仍需要更深的格式/续写机制分解。
+```
+
+## Phase 151: Surface-Answer Set and Generation Closure 表面答案集合与生成闭合 [2026-06-15 14:36]
+
+### 本阶段目标
+
+根据附件对 Phase150 的分析继续推进。
+
+附件正确部分：
+
+```text
+Phase150 正确地把 token selection failure 进一步定位到 surface realization gate。
+当前失败不是模型完全没有内部语义，也不完全是候选语义类别失败。
+失败主要发生在从候选语义优势到开放词表表面答案的转换。
+target label token 过窄可能导致误判。
+下一步必须测试 surface answer set 和生成闭合。
+```
+
+需要谨慎修正：
+
+```text
+Phase151 本轮先完成 one-token expanded surface set 的真实 logits 审计。
+多词元部分只做了保守的 one-step greedy surface proxy，没有完成真正 2-token/3-token iterative generation。
+因此不能把本轮解释为完整多词元生成闭合测试。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase151_surface_answer_generation_closure_cuda.py
+tests/gpt5/phase151_surface_answer_generation_closure_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase151_surface_answer_generation_closure_cuda.py \
+  tests/gpt5/phase151_surface_answer_generation_closure_summary.py
+
+python tests/gpt5/phase151_surface_answer_generation_closure_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase151_surface_answer_generation_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase151_surface_answer_generation_closure_cuda.py glm4 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase151_surface_answer_generation_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase151_surface_answer_generation_closure_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --output-dir results/gpt5_phase151_surface_answer_generation_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase151_surface_answer_generation_closure_summary.py
+```
+
+### 重要修正
+
+第一次 Phase151 脚本中，`clean` 基线错误地调用了 remove+0 support 路径，不是真正 clean forward。
+
+已修正为：
+
+```text
+clean = 原始 forward logits；
+support_only = remove pre-answer projection + support restore；
+final_norm_output_lm = support restore + final_norm_output LM-head direction。
+```
+
+三模型均使用修正版重新运行。
+
+### 结果文件
+
+```text
+results/gpt5_phase151_surface_answer_generation_closure/phase151_qwen3_surface_answer_generation_closure.json
+results/gpt5_phase151_surface_answer_generation_closure/phase151_glm4_surface_answer_generation_closure.json
+results/gpt5_phase151_surface_answer_generation_closure/phase151_deepseek7b_surface_answer_generation_closure.json
+results/gpt5_phase151_surface_answer_generation_closure/phase151_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+
+GLM4:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+
+DS7B main:
+  categories = plant,time,container,number
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  formats = label_colon,multiple_choice,answer_one_word
+  train/test objects = 8/8
+  cases = 72
+```
+
+surface answer sets：
+
+```text
+canonical:
+  plant / time / container / number
+
+synonyms:
+  CATEGORY_READOUT_WORDS 中的 readout synonyms
+
+object_near:
+  plant: flower, tree, rose, oak, pine, flora, vegetation
+  time: morning, year, hour, date, period, moment, day
+  container: box, bottle, cup, jar, vessel, holder, bag
+  number: number, digit, amount, quantity, count, integer, one
+
+format_variants:
+  leading space
+  capitalized
+  label + punctuation
+  article + label
+
+option_like:
+  A / A. / option A 等，仅 multiple_choice 使用
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+clean:
+  expanded_argmax = 0.156
+  expanded_rank = 11.8
+  canonical_rank = 1200.2
+  synonym_rank = 1182.4
+  object_near_rank = 1935.4
+  good_greedy_proxy = 0.156
+
+support_only:
+  expanded_argmax = 0.000
+  expanded_rank = 279.0
+  canonical_rank = 140872.8
+  synonym_rank = 90267.9
+  object_near_rank = 58010.8
+
+final_norm_output_lm:
+  expanded_argmax = 0.000
+  expanded_rank = 901.4
+  canonical_rank = 101752.9
+  synonym_rank = 37920.4
+  object_near_rank = 34404.4
+```
+
+Qwen3 的 expanded surface set 没有闭合，且 intervention 后比 clean 更差。
+
+#### GLM4 bf16
+
+```text
+clean:
+  expanded_argmax = 0.062
+  expanded_rank = 17.4
+  canonical_rank = 274.6
+  synonym_rank = 269.6
+
+support_only:
+  expanded_argmax = 0.031
+  expanded_rank = 18.0
+  canonical_rank = 338.7
+  synonym_rank = 322.5
+
+final_norm_output_lm:
+  expanded_argmax = 0.094
+  expanded_rank = 12.5
+  canonical_rank = 94.4
+  synonym_rank = 90.8
+```
+
+GLM4 有小幅改善，但没有接近生成闭合。
+
+#### DS7B overall
+
+```text
+clean:
+  expanded_argmax = 0.250
+  expanded_rank = 27.5
+  canonical_rank = 6961.6
+  synonym_rank = 4363.7
+  object_near_rank = 3311.3
+  good_greedy_proxy = 0.295
+
+support_only:
+  expanded_argmax = 0.163
+  expanded_rank = 1472.7
+  canonical_rank = 25581.5
+  synonym_rank = 11108.8
+  object_near_rank = 8178.6
+  good_greedy_proxy = 0.245
+
+final_norm_output_lm:
+  expanded_argmax = 0.229
+  expanded_rank = 1090.9
+  canonical_rank = 16626.5
+  synonym_rank = 4334.7
+  object_near_rank = 3681.3
+  good_greedy_proxy = 0.300
+```
+
+关键事实：
+
+```text
+expanded surface set 让 clean baseline 已经有 0.25 argmax；
+但 support_only 和 final_norm_output_lm 没有超过 clean；
+final_norm_output_lm 比 support_only 好，但仍明显弱于 clean 的 expanded rank。
+```
+
+#### DS7B by category
+
+```text
+plant:
+  clean_exp_arg = 0.33
+  support_exp_arg = 0.28
+  final_exp_arg = 0.38
+  final_exp_rank = 6.7
+  final_canonical_rank = 178.2
+  final_synonym_rank = 101.8
+  good_greedy_proxy = 0.40
+  top_class = canonical
+
+container:
+  clean_exp_arg = 0.28
+  support_exp_arg = 0.12
+  final_exp_arg = 0.15
+  final_exp_rank = 950.6
+  final_canonical_rank = 29464.9
+  final_synonym_rank = 3717.4
+  good_greedy_proxy = 0.19
+  top_class = format_only
+
+number:
+  clean_exp_arg = 0.19
+  support_exp_arg = 0.10
+  final_exp_arg = 0.19
+  final_exp_rank = 735.6
+  final_canonical_rank = 12310.4
+  final_synonym_rank = 6494.7
+  good_greedy_proxy = 0.32
+  top_class = other
+
+time:
+  clean_exp_arg = 0.20
+  support_exp_arg = 0.15
+  final_exp_arg = 0.19
+  final_exp_rank = 2670.8
+  final_canonical_rank = 24552.4
+  final_synonym_rank = 7025.0
+  good_greedy_proxy = 0.29
+  top_class = format_only
+```
+
+#### DS7B by format
+
+```text
+multiple_choice:
+  clean_exp_arg = 0.66
+  support_exp_arg = 0.44
+  final_exp_arg = 0.56
+  final_exp_rank = 1624.4
+  good_greedy_proxy = 0.77
+  top_class = canonical
+
+label_colon:
+  clean_exp_arg = 0.05
+  support_exp_arg = 0.03
+  final_exp_arg = 0.10
+  final_exp_rank = 605.3
+  good_greedy_proxy = 0.10
+  top_class = other
+
+answer_one_word:
+  clean_exp_arg = 0.04
+  support_exp_arg = 0.02
+  final_exp_arg = 0.03
+  final_exp_rank = 1043.1
+  good_greedy_proxy = 0.03
+  top_class = format_only
+```
+
+### 关键现象
+
+1. **expanded surface set 不足以全局闭合**
+
+DS7B final_exp_arg 只有：
+
+```text
+0.229
+```
+
+即使放宽到 canonical + synonyms + object-near + format variants + option-like，整体仍未闭合。
+
+2. **clean baseline 在表面答案集合上强于 intervention**
+
+DS7B：
+
+```text
+clean_exp_arg = 0.250
+support_exp_arg = 0.163
+final_exp_arg = 0.229
+```
+
+这说明当前 support restore 路径虽然能增强候选语义门，但会破坏一部分自然 surface realization。
+
+3. **multiple_choice 是当前最强表面闭合格式**
+
+DS7B：
+
+```text
+multiple_choice clean_exp_arg = 0.66
+multiple_choice final_exp_arg = 0.56
+good_greedy_proxy = 0.77
+top_class = canonical
+```
+
+相比：
+
+```text
+label_colon final_exp_arg = 0.10
+answer_one_word final_exp_arg = 0.03
+```
+
+说明模型在 multiple_choice 下更容易进入明确表面答案路径。
+
+4. **plant 仍是最接近闭合类别**
+
+DS7B plant：
+
+```text
+final_exp_arg = 0.38
+final_exp_rank = 6.7
+good_greedy_proxy = 0.40
+top_class = canonical
+```
+
+plant 扩展表面集合后更接近真实表面闭合，但仍远非稳定闭合。
+
+5. **container/time 主要受 format_only 干扰**
+
+DS7B：
+
+```text
+container top_class = format_only
+time top_class = format_only
+```
+
+这说明不同类别的 surface gate 不同：
+
+```text
+plant 更像答案表面集合问题；
+container/time 更像格式/续写路径问题；
+number 更像抽象/普通词竞争问题。
+```
+
+### 对附件分析的判断
+
+附件正确：
+
+```text
+Phase150 的判断正确；
+surface answer set 是必要下一步；
+plant 是主突破口；
+单 canonical label token 会低估真实表面路径。
+```
+
+需要修正：
+
+```text
+expanded surface answer set 并没有让整体显著闭合。
+真实结果显示：clean 自然表面路径比当前 intervention 更好。
+因此问题不是简单“目标答案集合太窄”，而是 support restore 与自然 surface realization 没有对齐。
+```
+
+### 理论进展
+
+Phase151 后，理论需要再拆一层：
+
+```text
+semantic candidate closure
+  不等于
+surface answer closure
+
+surface answer closure
+  还依赖 format-conditioned natural realization path。
+```
+
+当前可更新为：
+
+```text
+object/template/context field
+  -> support restore
+  -> candidate semantic advantage
+  -> format-conditioned surface path
+  -> expanded answer set selection
+  -> actual generation
+```
+
+关键修正：
+
+```text
+support restore 不是越强越接近真实输出。
+它可能恢复语义候选，但同时扰乱自然表面生成路径。
+```
+
+这说明语言生成机制不是单向“语义增强 -> 输出增强”，而是：
+
+```text
+语义支持和表面实现必须相互对齐。
+```
+
+### 硬伤
+
+1. **没有完成真正 2-token/3-token iterative generation**
+
+```text
+本轮 greedy_class 是 one-step argmax 的表面分类代理。
+不能证明多词元生成是否闭合。
+```
+
+2. **expanded surface set 仍可能不完整**
+
+```text
+尤其是 time、number、container 的自然答案空间可能更宽。
+```
+
+3. **intervention 可能破坏自然生成轨迹**
+
+```text
+support_only 和 final_norm_output_lm 在 expanded surface 上常弱于 clean。
+这说明当前干预不等于自然机制。
+```
+
+4. **multiple_choice 的强结果可能来自提示格式本身**
+
+```text
+multiple_choice clean 已经很强，不能证明 support path 本身打开了生成闭合。
+```
+
+5. **Qwen3/GLM4 仍是小范围对照**
+
+```text
+主证据仍来自 DS7B 72 cases。
+```
+
+### 下一步 Phase152
+
+Phase152 应进入：
+
+```text
+Natural Surface Path Preservation and Iterative Generation Closure
+自然表面路径保持与迭代生成闭合
+```
+
+目标：
+
+```text
+既然 current support restore 会损伤自然 surface realization，
+下一步必须同时保留自然表面路径并测试真正多词元生成。
+```
+
+建议测试：
+
+```text
+1. 不做 pre-answer removal，只做 additive support steering。
+2. 对比：
+   clean
+   remove
+   remove+restore
+   additive_support_only
+   final_norm_output_lm
+   additive_support + final_norm_output_lm
+
+3. 真正 iterative generation：
+   step1 forward -> choose token -> append
+   step2 forward -> choose token -> append
+   step3 forward -> choose token -> append
+
+4. 每一步都记录：
+   surface answer set hit
+   format-first then answer-second
+   canonical/synonym/object_near/option_like
+   wrong semantic answer
+   fragment/format-only path
+
+5. 主攻：
+   DS7B plant multiple_choice / label_colon
+   DS7B time/container format-only cases
+   GLM4 plant/time label_colon
+```
+
+判据：
+
+```text
+如果 additive_support 保留 clean 的 surface path，又提升语义答案命中：
+  说明 remove+restore 破坏了自然生成轨迹。
+
+如果 iterative 2/3 token 比 one-step 明显更好：
+  生成闭合应定义为短序列路径。
+
+如果 multiple_choice 仍主要靠 clean，而干预无增益：
+  当前机制只能解释候选分类，不能解释自然生成。
+```
+
+## Phase 152: Semantic-Format Path and Iterative Surface Generation 语义-格式路径与迭代表面生成 [2026-06-15 16:45]
+
+### 本阶段目标
+
+综合两个附件继续任务。
+
+附件一关于标点/格式路径的批评基本正确：
+
+```text
+标点、空格、换行、选项字母、冒号等不应只当作噪声；
+它们可能代表 format/syntax path；
+语言生成不是单一语义路径，而是 semantic path、format-syntax path、surface realization path、tokenization path 的合流竞争。
+```
+
+需要谨慎修正：
+
+```text
+标点/格式 token 不一定完全跳过语义；
+更准确是它们主要受 format/syntax/continuation path 控制，而不是主要受 category semantic path 控制。
+```
+
+附件二对 Phase151 的判断基本正确：
+
+```text
+expanded surface answer set 是必要但不充分；
+remove+restore 可能破坏 natural surface realization；
+下一步必须测试 additive support 和真实 iterative generation。
+```
+
+本轮 Phase152 目标：
+
+```text
+1. 比较 clean、remove、remove+restore、additive_support、additive_support_lm。
+2. 测试 additive support 是否比 remove+restore 更保留自然表面路径。
+3. 做真实 3-step iterative greedy generation：
+   step1 forward -> argmax token -> append
+   step2 forward -> argmax token -> append
+   step3 forward -> argmax token -> append
+4. 记录 surface answer set hit 与 format-first-answer-later。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase152_natural_surface_iterative_generation_cuda.py
+tests/gpt5/phase152_natural_surface_iterative_generation_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase152_natural_surface_iterative_generation_cuda.py \
+  tests/gpt5/phase152_natural_surface_iterative_generation_summary.py
+
+python tests/gpt5/phase152_natural_surface_iterative_generation_cuda.py qwen3 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --add-scales 0.05,0.2 \
+  --steps 3 \
+  --output-dir results/gpt5_phase152_natural_surface_iterative_generation \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase152_natural_surface_iterative_generation_cuda.py glm4 \
+  --categories plant,time \
+  --template-families long,neutral \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --add-scales 0.05,0.2 \
+  --steps 3 \
+  --output-dir results/gpt5_phase152_natural_surface_iterative_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase152_natural_surface_iterative_generation_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word \
+  --train-objects 8 --test-objects 8 --batch-size 16 --rank 8 \
+  --add-scales 0.05,0.1,0.2,0.5 \
+  --steps 3 \
+  --output-dir results/gpt5_phase152_natural_surface_iterative_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase152_natural_surface_iterative_generation_summary.py
+```
+
+### 结果文件
+
+```text
+results/gpt5_phase152_natural_surface_iterative_generation/phase152_qwen3_natural_surface_iterative_generation.json
+results/gpt5_phase152_natural_surface_iterative_generation/phase152_glm4_natural_surface_iterative_generation.json
+results/gpt5_phase152_natural_surface_iterative_generation/phase152_deepseek7b_natural_surface_iterative_generation.json
+results/gpt5_phase152_natural_surface_iterative_generation/phase152_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+Qwen3:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+  add_scales = 0.05,0.2
+
+GLM4:
+  categories = plant,time
+  template_families = long,neutral
+  split = front_back
+  format = label_colon
+  train/test objects = 8/8
+  cases = 4
+  add_scales = 0.05,0.2
+
+DS7B main:
+  categories = plant,time,container,number
+  template_families = long,short,neutral
+  splits = front_back,back_front
+  formats = label_colon,multiple_choice,answer_one_word
+  train/test objects = 8/8
+  cases = 72
+  add_scales = 0.05,0.1,0.2,0.5
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 4
+
+clean:
+  hit_rate = 0.188
+  format_first_answer_later = 0.000
+
+remove:
+  hit_rate = 0.219
+  format_first_answer_later = 0.000
+
+remove_restore:
+  hit_rate = 0.000
+  format_first_answer_later = 0.000
+
+best_additive:
+  hit_rate = 0.406
+  format_first_answer_later = 0.000
+  dominant scale = 0.05
+```
+
+Qwen3 中 additive support 明显优于 remove+restore。
+
+#### GLM4 bf16
+
+```text
+cases = 4
+
+clean:
+  hit_rate = 0.156
+
+remove:
+  hit_rate = 0.125
+
+remove_restore:
+  hit_rate = 0.031
+
+best_additive:
+  hit_rate = 0.281
+  dominant scale = 0.05
+```
+
+GLM4 也显示 additive support 优于 remove+restore。
+
+#### DS7B overall
+
+```text
+cases = 72
+
+clean:
+  hit_rate = 0.330
+  format_first_answer_later = 0.014
+
+remove:
+  hit_rate = 0.323
+  format_first_answer_later = 0.007
+
+remove_restore:
+  hit_rate = 0.255
+  format_first_answer_later = 0.002
+
+best_additive:
+  hit_rate = 0.438
+  format_first_answer_later = 0.024
+  dominant scale = 0.05
+```
+
+核心客观事实：
+
+```text
+best_additive > clean > remove_restore
+```
+
+这支持 Phase151 的怀疑：remove+restore 会破坏一部分自然表面路径，而小尺度 additive support 更像保留自然生成轨迹的干预。
+
+#### DS7B by category
+
+```text
+container:
+  clean_hit = 0.32
+  remove_restore_hit = 0.18
+  best_add_hit = 0.39
+  best_fmt_later = 0.05
+
+number:
+  clean_hit = 0.31
+  remove_restore_hit = 0.27
+  best_add_hit = 0.43
+  best_fmt_later = 0.01
+
+plant:
+  clean_hit = 0.38
+  remove_restore_hit = 0.33
+  best_add_hit = 0.56
+  best_fmt_later = 0.01
+
+time:
+  clean_hit = 0.31
+  remove_restore_hit = 0.24
+  best_add_hit = 0.38
+  best_fmt_later = 0.03
+```
+
+plant 仍是最强类别：
+
+```text
+plant best_add_hit = 0.56
+```
+
+但 container/number/time 也有 additive 增益。
+
+#### DS7B by format
+
+```text
+multiple_choice:
+  clean_hit = 0.88
+  remove_restore_hit = 0.71
+  best_add_hit = 0.98
+  best_fmt_later = 0.02
+  clean_class = canonical
+  best_class = canonical
+
+label_colon:
+  clean_hit = 0.06
+  remove_restore_hit = 0.03
+  best_add_hit = 0.18
+  best_fmt_later = 0.01
+
+answer_one_word:
+  clean_hit = 0.06
+  remove_restore_hit = 0.03
+  best_add_hit = 0.16
+  best_fmt_later = 0.05
+```
+
+multiple_choice 的 3-step surface hit 接近闭合：
+
+```text
+best_add_hit = 0.98
+```
+
+但 clean 已经 0.88，说明格式本身是强控制变量。
+
+### 关键现象
+
+1. **additive support 明显优于 remove+restore**
+
+三模型一致：
+
+```text
+Qwen3:
+  remove_restore 0.000 -> best_additive 0.406
+
+GLM4:
+  remove_restore 0.031 -> best_additive 0.281
+
+DS7B:
+  remove_restore 0.255 -> best_additive 0.438
+```
+
+这说明：
+
+```text
+remove+restore 适合证明内部成分因果必要性；
+但不适合直接代表自然生成机制。
+```
+
+2. **小尺度 additive support 最稳定**
+
+DS7B dominant scale：
+
+```text
+0.05
+```
+
+这说明自然表面路径需要最小扰动，强注入未必更好。
+
+3. **真正 3-step generation 比 one-step proxy 更能暴露 surface closure**
+
+Phase151 DS7B final expanded argmax：
+
+```text
+0.229
+```
+
+Phase152 DS7B best additive 3-step hit：
+
+```text
+0.438
+```
+
+这说明单步指标低估了部分短生成闭合。
+
+4. **format-first answer-later 路径并不常见**
+
+DS7B：
+
+```text
+best_additive format_first_answer_later = 0.024
+```
+
+这修正了关于标点/格式路径的一个可能误读：
+
+```text
+格式路径很重要，但本轮没有证明主机制是“先格式 token，后答案 token”。
+更多情况是格式约束改变整体生成轨迹，而不是简单两步顺序。
+```
+
+5. **multiple_choice 是最强表面闭合格式**
+
+DS7B：
+
+```text
+multiple_choice best_add_hit = 0.98
+```
+
+这证明 format/syntax path 可以极大降低开放词表生成难度。
+
+但 clean 已经：
+
+```text
+multiple_choice clean_hit = 0.88
+```
+
+所以 multiple_choice 成功主要来自格式自身，而 additive support 只是进一步提升。
+
+### 对附件分析的判断
+
+正确部分：
+
+```text
+Phase151 分析正确；
+remove+restore 可能破坏自然表面路径；
+additive support 必须测试；
+真正 iterative generation 是必要的；
+标点/格式路径不是噪声，应作为独立研究对象。
+```
+
+需要修正部分：
+
+```text
+format-first answer-second 路径并不高。
+因此标点/格式路径的重要性不一定表现为“先输出标点/空格再输出答案”。
+它更可能表现为：
+  模板/格式先验整体改变可选 surface route；
+  multiple_choice 直接压缩答案空间；
+  label_colon / answer_one_word 仍容易进入解释/续写/碎片路径。
+```
+
+### 理论进展
+
+Phase152 后，理论应从：
+
+```text
+remove+restore support mechanism
+```
+
+分裂成两个实验范式：
+
+```text
+1. necessity intervention:
+   remove / remove+restore
+   用于证明某成分是否因果相关。
+
+2. natural-path steering:
+   additive_support
+   用于测试是否能在不破坏表面路径的情况下增强目标生成。
+```
+
+语言生成结构进一步更新为：
+
+```text
+context field
+  -> semantic support route
+  -> format/syntax route
+  -> natural surface realization route
+  -> iterative token trajectory
+```
+
+当前最可靠新事实：
+
+```text
+小尺度 additive support 可以提升真实 3-step surface hit；
+remove+restore 会显著损伤 surface generation；
+multiple_choice 的格式约束是最强自然表面路径控制器；
+format-first answer-later 不是主要现象。
+```
+
+### 硬伤
+
+1. **additive support 使用的仍是 Phase147 train-selected route**
+
+```text
+router generalization 问题仍未解决。
+```
+
+2. **格式路径尚未被直接定位**
+
+```text
+Phase152 证明 format 影响很大，但没有找到独立 format-syntax subspace。
+```
+
+3. **surface hit 的语义分类仍然较粗**
+
+```text
+有些 examples 包含错误类别、解释文本、混合答案。
+需要更精细地判定正确/错误 semantic hit。
+```
+
+4. **multiple_choice 可能过度简化开放生成**
+
+```text
+它接近闭合，但不是一般自然语言生成。
+```
+
+5. **Qwen3/GLM4 范围仍小**
+
+```text
+主结论来自 DS7B 72 cases。
+```
+
+### 下一步 Phase153
+
+Phase153 应进入：
+
+```text
+Format-Syntax Subspace Localization and Joint Steering
+格式句法子空间定位与联合引导
+```
+
+目标：
+
+```text
+既然 additive semantic support 有效，
+而 format/syntax path 也明显影响 surface realization，
+下一步要直接定位 format-syntax subspace，并测试 semantic + format 联合引导。
+```
+
+建议测试：
+
+```text
+1. 语义不变，格式变化：
+   same object/category, different prompt tails:
+     label_colon
+     answer_one_word
+     multiple_choice
+     quoted_answer
+     list_answer
+
+2. 格式不变，语义变化：
+   same tail, categories:
+     plant,time,container,number
+
+3. 构造 format target token groups：
+   whitespace
+   newline
+   colon
+   period
+   quote
+   option labels A/B/C/D
+
+4. 建立 format contrast basis：
+   format centers vs semantic centers
+   measure subspace overlap
+
+5. 干预：
+   semantic_additive only
+   format_additive only
+   semantic + format additive
+
+6. 输出：
+   3-step generation hit
+   format token rank
+   semantic answer hit
+   wrong semantic hit
+```
+
+判据：
+
+```text
+如果 format basis 与 semantic basis overlap 低，且 format steering 主要影响空格/标点/选项标签：
+  说明格式路径可分离。
+
+如果 semantic + format 联合引导超过 semantic only：
+  说明生成闭合需要多路径合流。
+
+如果 format basis 不可分离：
+  标点/格式可能主要是 LM-head/tokenization 层偏置，而非内部独立路径。
+```
+
+## Phase 153: Format-Syntax Subspace Localization and Joint Steering 格式句法子空间定位与联合引导 [2026-06-15 17:48]
+
+### 本阶段目标
+
+根据用户要求，分析 Phase152 附加判断是否正确，并继续完成任务，同时加入标点符号部分分析。
+
+对附件判断的结论：
+
+```text
+Phase152 的核心判断正确：
+  remove+restore 更适合证明必要性；
+  additive support 更接近自然生成轨迹；
+  真实 3-step generation 比 one-step proxy 更合理；
+  标点/空格/换行/选项标签不是噪声，应进入独立分析。
+
+需要修正的部分：
+  Phase152 没有证明主机制是“先输出标点/格式 token，再输出答案 token”。
+  format/syntax path 更像整体 surface route 约束，而不是简单顺序 token 现象。
+```
+
+因此 Phase153 直接测试：
+
+```text
+1. semantic answer basis 与 format/syntax basis 的重叠。
+2. 标点/空白/换行/引号/列表符号/选项标签 token 的 rank 与 argmax 分布。
+3. semantic-only、format-only、semantic+format joint steering 的真实 3-step generation hit。
+```
+
+### 重要修正
+
+初次运行 Phase153 后发现：
+
+```text
+DS7B 覆盖 120 cases；
+但 qwen3 和 GLM4 只有 4 cases。
+```
+
+原因是 qwen3/GLM4 依赖的 Phase147 router 文件此前不是全范围结果。为避免小样本误判，先补跑 qwen3/GLM4 的 Phase147 全范围 router，再重跑 Phase153。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py
+tests/gpt5/phase153_format_syntax_subspace_joint_steering_summary.py
+```
+
+补全依赖 router 的脚本：
+
+```text
+tests/gpt5/phase147_train_router_format_token_cuda.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py \
+  tests/gpt5/phase153_format_syntax_subspace_joint_steering_summary.py
+
+python tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py qwen3 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word,quoted_answer,list_answer \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --semantic-scale 0.05 \
+  --format-scales 0.05,0.2 \
+  --steps 3 \
+  --output-dir results/gpt5_phase153_format_syntax_subspace_joint_steering \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py glm4 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word,quoted_answer,list_answer \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --semantic-scale 0.05 \
+  --format-scales 0.05,0.2 \
+  --steps 3 \
+  --output-dir results/gpt5_phase153_format_syntax_subspace_joint_steering \
+  --hard-exit-after-model
+
+python tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,multiple_choice,answer_one_word,quoted_answer,list_answer \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --semantic-scale 0.05 \
+  --format-scales 0.05,0.2 \
+  --steps 3 \
+  --output-dir results/gpt5_phase153_format_syntax_subspace_joint_steering \
+  --hard-exit-after-model
+
+python tests/gpt5/phase147_train_router_format_token_cuda.py qwen3 \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats plain,label_colon,answer_one_word,multiple_choice \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.2,0.35,0.5,0.75,1.0 \
+  --output-dir results/gpt5_phase147_train_router_format_token \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase147_train_router_format_token_cuda.py glm4 \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats plain,label_colon,answer_one_word,multiple_choice \
+  --layer-offsets 0,-1 \
+  --sites input_answer,attention_output,mlp_input \
+  --scales 0.2,0.35,0.5,0.75,1.0 \
+  --output-dir results/gpt5_phase147_train_router_format_token \
+  --hard-exit-after-model
+
+python tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py qwen3 ...
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py glm4 ...
+
+python tests/gpt5/phase153_format_syntax_subspace_joint_steering_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase147_train_router_format_token_cuda.py \
+  tests/gpt5/phase153_format_syntax_subspace_joint_steering_cuda.py \
+  tests/gpt5/phase153_format_syntax_subspace_joint_steering_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, multiple_choice, answer_one_word, quoted_answer, list_answer
+train objects/category = 8
+heldout test objects/category = 8
+templates: train [0,1], heldout [2]
+cases/model = 120
+generation steps = 3
+semantic additive scale = 0.05
+format scales = 0.05, 0.2
+format token groups = whitespace, newline, colon, period, quote, option_label, list_marker
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase153_format_syntax_subspace_joint_steering/phase153_qwen3_format_syntax_subspace_joint_steering.json
+results/gpt5_phase153_format_syntax_subspace_joint_steering/phase153_glm4_format_syntax_subspace_joint_steering.json
+results/gpt5_phase153_format_syntax_subspace_joint_steering/phase153_deepseek7b_format_syntax_subspace_joint_steering.json
+results/gpt5_phase153_format_syntax_subspace_joint_steering/phase153_cross_model_summary.md
+```
+
+### 客观结果
+
+整体结果：
+
+```text
+Qwen3:
+  cases = 120
+  clean = 0.367
+  semantic_additive = 0.326
+  format_internal = 0.374
+  format_lm = 0.270
+  best_joint = 0.411
+  semantic-format overlap max avg = 0.495
+
+GLM4:
+  cases = 120
+  clean = 0.298
+  semantic_additive = 0.286
+  format_internal = 0.297
+  format_lm = 0.285
+  best_joint = 0.349
+  semantic-format overlap max avg = 0.264
+
+DS7B:
+  cases = 120
+  clean = 0.254
+  semantic_additive = 0.227
+  format_internal = 0.249
+  format_lm = 0.136
+  best_joint = 0.265
+  semantic-format overlap max avg = 0.436
+```
+
+按格式结果：
+
+```text
+Qwen3:
+  answer_one_word: clean 0.135, sem 0.208, joint 0.271
+  label_colon: clean 0.292, sem 0.240, joint 0.333
+  list_answer: clean 0.266, sem 0.177, joint 0.266
+  multiple_choice: clean 0.979, sem 0.870, joint 0.964
+  quoted_answer: clean 0.161, sem 0.135, joint 0.224
+
+GLM4:
+  answer_one_word: clean 0.073, sem 0.068, joint 0.156
+  label_colon: clean 0.177, sem 0.172, joint 0.266
+  list_answer: clean 0.161, sem 0.130, joint 0.229
+  multiple_choice: clean 0.979, sem 0.974, joint 0.979
+  quoted_answer: clean 0.099, sem 0.089, joint 0.115
+
+DS7B:
+  answer_one_word: clean 0.057, sem 0.031, joint 0.062
+  label_colon: clean 0.057, sem 0.089, joint 0.125
+  list_answer: clean 0.188, sem 0.115, joint 0.141
+  multiple_choice: clean 0.875, sem 0.818, joint 0.875
+  quoted_answer: clean 0.094, sem 0.083, joint 0.120
+```
+
+标点/格式词元结果：
+
+```text
+Qwen3 best_joint top format groups:
+  other 101/120
+  quote 11/120
+  whitespace 5/120
+  option_label 3/120
+
+GLM4 best_joint top format groups:
+  other 118/120
+  whitespace 2/120
+
+DS7B best_joint top format groups:
+  other 92/120
+  whitespace 26/120
+  option_label 1/120
+  list_marker 1/120
+```
+
+format rank 与 answer rank：
+
+```text
+Qwen3:
+  multiple_choice answer_rank 1.2, format_rank 3.5
+  list_answer format_rank 1.8, answer_rank 4.2
+
+GLM4:
+  multiple_choice answer_rank 1.2, format_rank 13.6
+  list_answer format_rank 6.3, answer_rank 16.9
+
+DS7B:
+  multiple_choice answer_rank 2.1, format_rank 3.3
+  label_colon answer_rank 31.0, format_rank 63.0
+  quoted_answer answer_rank 31.5, format_rank 40.3
+```
+
+### 当前最可靠事实
+
+1. **joint steering 比 semantic-only 更稳定**
+
+三模型全范围都出现：
+
+```text
+Qwen3: semantic 0.326 -> joint 0.411
+GLM4: semantic 0.286 -> joint 0.349
+DS7B: semantic 0.227 -> joint 0.265
+```
+
+这支持：
+
+```text
+surface generation closure 不是单一路径完成；
+语义支持需要与格式/表面路径合流。
+```
+
+2. **format-only internal steering 接近 clean，但单独不打开答案**
+
+```text
+Qwen3: clean 0.367, format_internal 0.374
+GLM4: clean 0.298, format_internal 0.297
+DS7B: clean 0.254, format_internal 0.249
+```
+
+这说明格式内部方向能保持或微调自然表面轨迹，但不是单独语义答案路径。
+
+3. **format LM steering 单独较弱，尤其 DS7B**
+
+```text
+Qwen3 format_lm 0.270
+GLM4 format_lm 0.285
+DS7B format_lm 0.136
+```
+
+这反驳了一个简单解释：
+
+```text
+只要推高标点/空格/选项 token，就能打开答案。
+```
+
+结果不是这样。标点符号路径不是单个 token boost。
+
+4. **multiple_choice 仍然是最强表面闭合格式**
+
+```text
+Qwen3 multiple_choice clean 0.979, joint 0.964
+GLM4 multiple_choice clean 0.979, joint 0.979
+DS7B multiple_choice clean 0.875, joint 0.875
+```
+
+这继续证明：
+
+```text
+format prior 可以大幅压缩开放词表竞争空间。
+```
+
+但 clean 已经极高，所以它不是语义机制闭合的充分证据。
+
+5. **quoted/list 格式提供了新的标点现象，但不稳定**
+
+```text
+quoted_answer 在 Qwen3/GLM4/DS7B 都低：
+  0.224 / 0.115 / 0.120
+
+list_answer:
+  Qwen3 0.266
+  GLM4 0.229
+  DS7B 0.141
+```
+
+说明引号、列表符号会改变 surface route，但没有形成稳定答案闭合。
+
+6. **semantic-format overlap 不是零**
+
+```text
+Qwen3 overlap max avg = 0.495
+GLM4 overlap max avg = 0.264
+DS7B overlap max avg = 0.436
+```
+
+这说明格式路径与语义路径不是完全独立的正交通道。更谨慎的说法是：
+
+```text
+格式/标点路径可测、可影响生成；
+但它与语义支持路径有共享接口或混合区域。
+```
+
+### 对标点符号机制的判断
+
+当前结果支持：
+
+```text
+标点、空格、引号、列表符号、选项标签不是普通噪声。
+它们是 surface route 的一部分。
+```
+
+但当前结果不支持：
+
+```text
+标点路径 = 独立于语义路径的简单格式 token 通道。
+```
+
+更符合现象的表述是：
+
+```text
+标点/格式是一类表面轨迹约束因子。
+它既影响开放词表竞争，也影响后续 token 的可达状态。
+但这种影响通常不是单步标点 token argmax，而是通过 prompt format、answer site state、LM head 竞争共同产生。
+```
+
+### 理论进展
+
+Phase153 后，当前机制图从：
+
+```text
+semantic support route
+  -> surface generation
+```
+
+推进为：
+
+```text
+context/object field
+  -> semantic support route
+  -> format/syntax constraint route
+  -> answer-site surface state
+  -> open-vocab competitor gate
+  -> iterative token trajectory
+```
+
+其中：
+
+```text
+semantic support route:
+  提供类别/对象相关支持，但单独不足以稳定开放生成。
+
+format/syntax constraint route:
+  改变输出空间、标点倾向、列表/引号/选项结构，但单独不等于答案。
+
+joint steering:
+  是目前最接近“多路径合流”的实验证据。
+```
+
+### 硬伤与问题
+
+1. **format basis 是对比中心，不是直接找到真实格式电路**
+
+当前 format basis 来自不同 prompt format 的 answer_vec center contrast。它能测“格式表征差异”，但还没有定位到具体 attention head / MLP writer。
+
+2. **format token groups 仍然粗**
+
+```text
+whitespace/newline/colon/period/quote/option_label/list_marker
+```
+
+这些是人工分组，可能遗漏 tokenizer 中大量格式碎片。
+
+3. **joint gain 不大**
+
+```text
+Qwen3 +0.085
+GLM4 +0.063
+DS7B +0.038
+```
+
+说明 joint steering 方向正确，但远没有机制闭合。
+
+4. **multiple_choice 过强，容易掩盖机制**
+
+multiple_choice clean 本身很高，应当作为格式上界或控制条件，而不是自然生成结论来源。
+
+5. **semantic-format overlap 不低**
+
+这说明不能简单宣称“语义路径和格式路径完全分离”。当前更像共享接口上的混合通道。
+
+6. **DS7B 效果弱于 Qwen3/GLM4**
+
+DS7B 的 joint 只有 0.265，说明它的开放词表竞争和表面生成缺口更深。
+
+### 下一步任务
+
+Phase154 应继续客观推进：
+
+```text
+Format Writer Localization and Surface Gate Closure
+格式写入器定位与表面门闭合
+```
+
+目标不是再扩大格式种类，而是定位：
+
+```text
+哪些 attention heads / MLP blocks 写入 format/syntax constraint；
+这些 writer 是否与 semantic support writer 合流；
+joint steering 的增益来自哪一层、哪一类 writer。
+```
+
+建议测试：
+
+```text
+1. 在 Phase153 的格式条件上，对 final 4 layers 做 attention/MLP writer ablation。
+2. 对 whitespace/quote/list_marker/option_label 的 rank 做 writer-level causal test。
+3. 比较 semantic writer、format writer、joint writer 三类集合。
+4. 对 DS7B 优先测试 label_colon、answer_one_word、quoted_answer，因为这些是瓶颈格式。
+5. multiple_choice 只作为上界控制。
+```
+
+判据：
+
+```text
+如果某些 writer ablation 明显破坏 format rank，但不破坏 semantic answer rank：
+  说明存在相对独立的格式写入器。
+
+如果 writer 同时影响 format rank 与 answer hit：
+  说明它是 surface gate 的共享接口。
+
+如果找不到稳定 writer：
+  format/syntax 更可能是分布式 LM-head/tokenization 竞争，而不是局部电路。
+```
+
+## Phase 154: Format Writer Surface Gate Localization 格式写入器与表面门定位 [2026-06-15 18:22]
+
+### 本阶段目标
+
+根据用户附加分析，Phase153 的判断基本正确，但需要继续收紧：
+
+```text
+Phase153 证明 format/syntax path 参与 surface generation；
+但没有证明它是完全独立的 format circuit。
+```
+
+因此 Phase154 不再只测试 format basis 是否有用，而是进入 writer 级别：
+
+```text
+在最后 4 层 attention_output / mlp_output 上，
+分别移除 semantic projection、format projection、joint projection，
+观察 answer rank 与 format rank 的损伤。
+```
+
+核心问题：
+
+```text
+哪些 writer 写入 semantic answer support？
+哪些 writer 写入 punctuation/format constraint？
+二者是否在同一个 surface gate writer 上合流？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase154_format_writer_surface_gate_cuda.py
+tests/gpt5/phase154_format_writer_surface_gate_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase154_format_writer_surface_gate_cuda.py \
+  tests/gpt5/phase154_format_writer_surface_gate_summary.py
+
+python tests/gpt5/phase154_format_writer_surface_gate_cuda.py qwen3 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --layer-back 4 \
+  --ablate-scale 1.0 \
+  --output-dir results/gpt5_phase154_format_writer_surface_gate \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase154_format_writer_surface_gate_cuda.py glm4 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --layer-back 4 \
+  --ablate-scale 1.0 \
+  --output-dir results/gpt5_phase154_format_writer_surface_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase154_format_writer_surface_gate_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --rank 8 \
+  --format-rank 4 \
+  --layer-back 4 \
+  --ablate-scale 1.0 \
+  --output-dir results/gpt5_phase154_format_writer_surface_gate \
+  --hard-exit-after-model
+
+python tests/gpt5/phase154_format_writer_surface_gate_summary.py
+
+python -m py_compile \
+  tests/gpt5/phase154_format_writer_surface_gate_cuda.py \
+  tests/gpt5/phase154_format_writer_surface_gate_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+cases/model = 120
+patch layers:
+  Qwen3 = L33-L36
+  GLM4 = L37-L40
+  DS7B = L25-L28
+components = attention_output, mlp_output
+ablation modes = semantic_proj, format_proj, joint_proj
+metric = first-token expanded answer rank / format token rank
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase154_format_writer_surface_gate/phase154_qwen3_format_writer_surface_gate.json
+results/gpt5_phase154_format_writer_surface_gate/phase154_glm4_format_writer_surface_gate.json
+results/gpt5_phase154_format_writer_surface_gate/phase154_deepseek7b_format_writer_surface_gate.json
+results/gpt5_phase154_format_writer_surface_gate/phase154_cross_model_summary.md
+```
+
+### 客观结果
+
+整体 writer 损伤：
+
+```text
+Qwen3:
+  semantic_proj strongest answer damage avg = +1.70
+  format_proj strongest format damage avg = +4.23
+  joint_proj strongest answer damage avg = +2.55
+  joint_proj strongest format damage avg = +4.86
+  top writers:
+    semantic answer: L36 mlp_output
+    format rank: L36/L35 mlp_output
+    joint answer: L36 mlp_output / L33 attention_output
+
+GLM4:
+  semantic_proj strongest answer damage avg = +8.21
+  format_proj strongest format damage avg = +44.72
+  joint_proj strongest answer damage avg = +13.81
+  joint_proj strongest format damage avg = +124.52
+  top writers:
+    semantic answer: L40 mlp_output
+    format rank: L39 attention_output / L40 mlp_output
+    joint answer: L39 attention_output / L39-L40 mlp_output
+
+DS7B:
+  semantic_proj strongest answer damage avg = +14.11
+  format_proj strongest format damage avg = +2078.86
+  joint_proj strongest answer damage avg = +68.20
+  joint_proj strongest format damage avg = +790.36
+  top writers:
+    semantic answer: L28 mlp_output / L28 attention_output
+    format rank: L28 attention_output / L28 mlp_output
+    joint answer: L28 mlp_output / L28 attention_output
+```
+
+按格式结果：
+
+```text
+Qwen3:
+  label_colon:
+    clean_answer_rank 11.4
+    joint_answer_damage +8.0
+    joint_format_damage +4.7
+  quoted_answer:
+    clean_format_rank 19.6
+    joint_format_damage +12.6
+  multiple_choice:
+    clean_answer_rank 1.4
+    joint_answer_damage +0.4
+
+GLM4:
+  label_colon:
+    clean_answer_rank 30.1
+    joint_answer_damage +22.0
+    joint_format_damage +66.8
+  quoted_answer:
+    clean_answer_rank 55.4
+    clean_format_rank 232.9
+    joint_answer_damage +28.8
+    joint_format_damage +334.7
+  multiple_choice:
+    clean_answer_rank 1.4
+    joint_answer_damage +0.9
+
+DS7B:
+  answer_one_word:
+    clean_answer_rank 21.7
+    joint_answer_damage +23.8
+    joint_format_damage +16.8
+  label_colon:
+    clean_answer_rank 58.4
+    clean_format_rank 102.4
+    joint_answer_damage +27.7
+    joint_format_damage +77.8
+  quoted_answer:
+    clean_answer_rank 17.6
+    clean_format_rank 669.9
+    joint_answer_damage +275.0
+    joint_format_damage +3837.8
+  multiple_choice:
+    clean_answer_rank 2.2
+    joint_answer_damage +2.7
+```
+
+### 当前最可靠事实
+
+1. **format/surface gate 有 writer 级别因果点**
+
+如果 format projection 只是抽象统计差异，移除 writer 输出中的 format projection 不应稳定损伤 format rank。
+
+但结果显示：
+
+```text
+Qwen3 format damage +4.23
+GLM4 format damage +44.72
+DS7B format damage +2078.86
+```
+
+这说明 format/syntax constraint 不是纯粹后验解释，而是在最后几层 writer 输出中有可测因果成分。
+
+2. **最后一层或倒数第二层是主要 surface gate**
+
+最稳定位置：
+
+```text
+Qwen3: L36/L35 mlp_output
+GLM4: L39 attention_output, L40 mlp_output
+DS7B: L28 attention_output, L28 mlp_output
+```
+
+说明表面路径不是早期形成后静态传递，而是在最后层附近完成强门控。
+
+3. **semantic writer 与 format writer 部分合流**
+
+DS7B 最明显：
+
+```text
+semantic answer writer:
+  L28 mlp_output / L28 attention_output
+
+format writer:
+  L28 attention_output / L28 mlp_output
+
+joint answer writer:
+  L28 mlp_output / L28 attention_output
+```
+
+这支持 Phase153 的修正判断：
+
+```text
+format path 与 semantic path 可区分，
+但在 answer-site surface gate 附近共享接口。
+```
+
+4. **multiple_choice 仍然是上界控制，不是瓶颈**
+
+三模型 multiple_choice 的 clean_answer_rank 已经接近 1：
+
+```text
+Qwen3 1.4
+GLM4 1.4
+DS7B 2.2
+```
+
+所以 writer ablation 对 multiple_choice 的 answer damage 较小，不能代表一般开放生成。
+
+5. **quoted_answer 是最强标点/格式瓶颈之一**
+
+尤其 DS7B：
+
+```text
+quoted_answer clean_format_rank = 669.9
+joint_format_damage = +3837.8
+joint_answer_damage = +275.0
+```
+
+说明引号格式在 DS7B 中不是简单 token 选择，而是强表面门问题。
+
+### 对标点/格式机制的更新
+
+Phase154 后，对标点符号的判断应进一步收紧为：
+
+```text
+标点/格式不是普通噪声；
+也不是简单的“推高标点 token”；
+它是最后层附近 writer 写入的 surface constraint；
+这个 surface constraint 与 semantic answer support 在 answer-site gate 附近合流。
+```
+
+当前更准确的结构是：
+
+```text
+semantic support writer
+  -> answer-site semantic readiness
+
+format/syntax writer
+  -> answer-site surface constraint
+
+semantic + format shared writer
+  -> surface gate
+  -> open-vocab rank
+```
+
+### 理论进展
+
+Phase153 给出“多路径合流”的行为证据；Phase154 给出 writer 级别的因果证据。
+
+当前语言生成机制应更新为：
+
+```text
+context/object field
+  -> semantic support route
+  -> format/syntax constraint route
+  -> final-layer writer gate
+  -> answer-site surface state
+  -> open-vocab competitor gate
+  -> iterative token trajectory
+```
+
+其中：
+
+```text
+semantic support:
+  更影响 answer rank。
+
+format constraint:
+  更影响 punctuation/format rank。
+
+joint projection:
+  在困难格式下同时损伤 answer rank 与 format rank，
+  是当前最接近 surface gate 的测量。
+```
+
+### 硬伤与问题
+
+1. **当前是 projection ablation，不是完整 writer replacement**
+
+移除 projection 只能证明该 writer 输出中含有该方向成分，不能证明它就是唯一来源。
+
+2. **只测 first-token rank，尚未做 3-step generation writer ablation**
+
+Phase154 为了大范围扫描只测 rank。它还没有证明这些 writer 对真实三步生成 hit 的直接影响。
+
+3. **format token groups 仍然粗**
+
+quoted/list/colon/whitespace 仍可能遗漏 tokenizer 中的复合格式词元。
+
+4. **DS7B 的 rank damage 很大，需要防止被极端 rank 放大误导**
+
+尤其 quoted_answer 中 clean_format_rank 已经很差，rank delta 会非常大。需要下一轮加入 hit/rank 双指标。
+
+5. **还没有细拆 attention head**
+
+Phase154 定位到 attention_output / mlp_output 层级，但没有定位到具体 head。
+
+### 下一步任务
+
+Phase155 应继续推进：
+
+```text
+Head-Level Surface Gate and Multi-step Causal Closure
+头级表面门与多步因果闭合
+```
+
+目标：
+
+```text
+1. 在 Phase154 定位出的关键层上，拆 attention head。
+2. 对 DS7B 的 label_colon / answer_one_word / quoted_answer 做重点验证。
+3. 不只看 rank，还要做 3-step generation hit。
+4. 比较：
+   semantic writer ablation
+   format writer ablation
+   joint writer ablation
+   random same-norm / random head control
+```
+
+优先测试对象：
+
+```text
+DS7B:
+  L28 attention_output
+  L28 mlp_output
+  formats = label_colon, answer_one_word, quoted_answer
+
+GLM4:
+  L39 attention_output
+  L40 mlp_output
+
+Qwen3:
+  L36 mlp_output
+  L35 mlp_output
+```
+
+判据：
+
+```text
+如果某些 head ablation 同时降低 answer hit 与 format hit：
+  它们是 surface gate heads。
+
+如果 head 只影响 format rank，不影响 answer hit：
+  它们是 format constraint heads。
+
+如果 MLP projection ablation 强而 head ablation 弱：
+  surface gate 更可能在 MLP writer 完成，而 attention 只是读入状态。
+```
+
+## Phase 155: Head-Level Surface Gate and Multi-step Causal Closure 头级表面门与多步因果闭合 [2026-06-15 19:29]
+
+### 本阶段目标
+
+根据用户提供的 Phase154 复核意见，继续验证以下判断：
+
+```text
+Phase154 的方向基本正确：
+  它证明 format/surface constraint 不是纯噪声，
+  而是在 final writer 附近有可测因果成分。
+
+但 Phase154 仍停留在 writer-level：
+  attention_output / mlp_output 级别，
+  还没有拆到 head-level，
+  也没有直接验证多步生成 hit。
+```
+
+本轮 Phase155 的目标：
+
+```text
+1. 在 Phase154 定位出的关键 attention 层上，逐 head 做 ablation。
+2. 用 first-token rank 选择 top_answer / top_format / top_joint head。
+3. 对这些 head 做真实 3-step greedy generation。
+4. 比较 clean、top heads、random head control 的 answer hit。
+5. 判断 surface gate 是否能被单个 attention head 闭合。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase155_head_surface_gate_generation_cuda.py \
+  tests/gpt5/phase155_head_surface_gate_generation_summary.py
+
+python tests/gpt5/phase155_head_surface_gate_generation_cuda.py qwen3 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase155_head_surface_gate_generation \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase155_head_surface_gate_generation_cuda.py glm4 \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase155_head_surface_gate_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase155_head_surface_gate_generation_cuda.py deepseek7b \
+  --categories plant,time,container,number \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase155_head_surface_gate_generation \
+  --hard-exit-after-model
+
+python tests/gpt5/phase155_head_surface_gate_generation_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase155_head_surface_gate_generation_cuda.py`
+- 汇总脚本：`tests/gpt5/phase155_head_surface_gate_generation_summary.py`
+- Qwen3 结果：`results/gpt5_phase155_head_surface_gate_generation/phase155_qwen3_head_surface_gate_generation.json`
+- GLM4 结果：`results/gpt5_phase155_head_surface_gate_generation/phase155_glm4_head_surface_gate_generation.json`
+- DS7B 结果：`results/gpt5_phase155_head_surface_gate_generation/phase155_deepseek7b_head_surface_gate_generation.json`
+- 跨模型汇总：`results/gpt5_phase155_head_surface_gate_generation/phase155_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+train objects/category = 8
+heldout test objects/category = 8
+cases/model = 120
+generation steps = 3
+```
+
+关键 attention 层：
+
+```text
+Qwen3: L36, 32 heads
+GLM4: L39, 32 heads
+DS7B: L28, 28 heads
+```
+
+测试方式：
+
+```text
+1. 对每个 case 扫描该层所有 attention head。
+2. 根据 first-token answer_rank_delta 选择 top_answer head。
+3. 根据 first-token format_rank_delta 选择 top_format head。
+4. 根据 answer_rank_delta + format_rank_delta 选择 top_joint head。
+5. 同时加入 deterministic random head control。
+6. 对 clean / top_answer / top_format / top_joint / random 做 3-step greedy generation。
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 120
+layer = L36
+heads = 32
+
+clean hit = 0.367
+top_answer hit = 0.358, delta -0.008
+top_format hit = 0.370, delta +0.003
+top_joint hit = 0.367, delta +0.000
+random hit = 0.368, delta +0.001
+```
+
+主要被选中的 head：
+
+```text
+top_answer: H0 38 cases, H24 13, H26 13, H8 9, H2 7
+top_format: H0 58 cases, H25 18, H2 14, H5 11, H24 6
+top_joint: H0 41 cases, H25 17, H24 15, H5 14, H2 10
+```
+
+按格式：
+
+```text
+answer_one_word: clean 0.14, top_answer 0.13, top_format 0.15, top_joint 0.15, random 0.14
+label_colon: clean 0.29, top_answer 0.27, top_format 0.29, top_joint 0.28, random 0.29
+list_answer: clean 0.27, top_answer 0.25, top_format 0.26, top_joint 0.26, random 0.27
+multiple_choice: clean 0.98, top_answer 0.98, top_format 0.98, top_joint 0.98, random 0.98
+quoted_answer: clean 0.16, top_answer 0.16, top_format 0.16, top_joint 0.16, random 0.16
+```
+
+#### GLM4 bf16
+
+```text
+cases = 120
+layer = L39
+heads = 32
+
+clean hit = 0.298
+top_answer hit = 0.290, delta -0.008
+top_format hit = 0.295, delta -0.003
+top_joint hit = 0.295, delta -0.003
+random hit = 0.298, delta +0.000
+```
+
+主要被选中的 head：
+
+```text
+top_answer: H0 29 cases, H19 13, H28 10, H11 9, H26 8
+top_format: H0 29 cases, H18 17, H7 16, H9 14, H19 10
+top_joint: H0 28 cases, H7 18, H18 17, H9 15, H19 14
+```
+
+按格式：
+
+```text
+answer_one_word: clean 0.07, top_answer 0.05, top_format 0.06, top_joint 0.06, random 0.07
+label_colon: clean 0.18, top_answer 0.17, top_format 0.18, top_joint 0.18, random 0.17
+list_answer: clean 0.16, top_answer 0.14, top_format 0.15, top_joint 0.15, random 0.16
+multiple_choice: clean 0.98, top_answer 0.98, top_format 0.98, top_joint 0.98, random 0.99
+quoted_answer: clean 0.10, top_answer 0.10, top_format 0.10, top_joint 0.10, random 0.10
+```
+
+#### DS7B
+
+```text
+cases = 120
+layer = L28
+heads = 28
+
+clean hit = 0.254
+top_answer hit = 0.251, delta -0.003
+top_format hit = 0.261, delta +0.007
+top_joint hit = 0.256, delta +0.002
+random hit = 0.254, delta +0.000
+```
+
+主要被选中的 head：
+
+```text
+top_answer: H13 16 cases, H12 15, H10 14, H11 14, H0 11
+top_format: H27 23 cases, H12 17, H9 16, H21 10, H10 8
+top_joint: H27 23 cases, H12 17, H13 15, H9 12, H11 12
+```
+
+按格式：
+
+```text
+answer_one_word: clean 0.06, top_answer 0.07, top_format 0.08, top_joint 0.07, random 0.06
+label_colon: clean 0.06, top_answer 0.05, top_format 0.06, top_joint 0.06, random 0.05
+list_answer: clean 0.19, top_answer 0.17, top_format 0.18, top_joint 0.18, random 0.18
+multiple_choice: clean 0.88, top_answer 0.88, top_format 0.90, top_joint 0.89, random 0.88
+quoted_answer: clean 0.09, top_answer 0.10, top_format 0.09, top_joint 0.09, random 0.10
+```
+
+### 当前最可靠客观事实
+
+1. **单个 attention head 不能闭合 surface gate**
+
+虽然 top head 是根据 rank damage 选择出来的，但真实 3-step hit 基本不变：
+
+```text
+Qwen3 top_answer delta = -0.008
+GLM4 top_answer delta = -0.008
+DS7B top_answer delta = -0.003
+```
+
+这些变化与 random head control 接近，不能证明存在单个决定性 surface gate head。
+
+2. **rank-selected head 与 generation hit 之间出现断裂**
+
+某些 head 对 first-token rank 有可见影响，但对三步生成命中率几乎无影响。
+
+这说明：
+
+```text
+rank damage != generation closure
+```
+
+Phase154 中用 rank 看到的 writer-level 效应，不能直接解释成单 head 因果机制。
+
+3. **Phase154 的 writer-level 结论没有被推翻，但被重新定位**
+
+Phase154 中 final writer 的 projection ablation 有明显效果，尤其 DS7B 和 GLM4。
+
+Phase155 说明：
+
+```text
+如果 surface gate 存在，
+它大概率不是单个 attention head，
+而是多头集合 + MLP/residual final gate 的组合。
+```
+
+4. **multiple_choice 仍是特殊 control，不代表一般语言生成**
+
+multiple_choice 的 clean hit 长期接近上限：
+
+```text
+Qwen3 multiple_choice clean = 0.98
+GLM4 multiple_choice clean = 0.98
+DS7B multiple_choice clean = 0.88
+```
+
+这类格式更像选项复制或局部选择，不应被用来代表开放格式生成。
+
+5. **DS7B 的格式路径仍然特殊，但不是单头特殊**
+
+DS7B top_format / top_joint 经常选择 H27/H12/H9，但 ablation 后 hit 反而略升或基本不变：
+
+```text
+DS7B top_format delta = +0.007
+DS7B top_joint delta = +0.002
+```
+
+这说明 DS7B 的 format rank 异常不等于单 head surface gate。
+
+### 对 Phase154 复核意见的判断
+
+复核意见中正确部分：
+
+```text
+1. Phase154 是 writer-level 进展，不是完整 circuit closure。
+2. 需要 head-level 与 generation hit 双重验证。
+3. 只看 rank 容易被极端 rank delta 误导。
+4. multiple_choice 必须作为 control，而不是核心证据。
+5. 下一步应从单点 ablation 走向多成分 cumulative closure。
+```
+
+需要修正的部分：
+
+```text
+Phase155 没有支持“存在单个 surface gate head”的强结论。
+当前证据更支持：
+  attention head 提供局部读写扰动，
+  真正控制生成闭合的门更可能在多头集合、MLP 输出或残差最终状态中。
+```
+
+### 理论进展
+
+Phase155 将当前理论从：
+
+```text
+final attention/MLP writer 中存在 surface gate component
+```
+
+推进为：
+
+```text
+surface gate 不是一个单 head 开关，
+而是 final residual stream 上由多 writer 共同塑造的生成许可状态。
+```
+
+更通俗地说：
+
+```text
+模型不是靠某一个注意力头决定“现在该输出答案词元还是格式词元”。
+它更像是在最后几层把语义支持、格式要求、候选词元竞争一起压到 residual state 中，
+然后由 LM head 读出。
+```
+
+这与前面 Phase146-154 的现象兼容：
+
+```text
+semantic support 可以被恢复，
+format/surface constraint 可以被扰动，
+但 token selection gap 仍然存在。
+```
+
+因此当前瓶颈不是“还没找到那个神奇 head”，而是：
+
+```text
+需要测多成分集合如何共同改变 final residual state。
+```
+
+### 硬伤与问题
+
+1. **本轮只测单 head**
+
+如果机制是 3-8 个 head 的集合，单 head ablation 当然可能很弱。
+
+2. **只测一个 attention 层**
+
+虽然层位来自 Phase154，但 surface gate 可能跨 L28/L29 或 L35/L36/L37 等多层累积。
+
+3. **没有拆 MLP channel**
+
+Phase154 中 MLP writer 很强，Phase155 只拆 attention head，尚未解释 MLP 贡献。
+
+4. **3-step greedy generation 仍然粗**
+
+hit 指标比 rank 更接近真实生成，但仍只看短步数。它不能覆盖后续更长格式链。
+
+5. **rank 选择 top head 可能不是 hit 最优 head**
+
+本轮用 answer_rank_delta / format_rank_delta 选头。若 hit 对另一些不显著改变 rank 的 head 更敏感，则本轮会漏掉。
+
+### 下一步任务
+
+Phase156 应继续推进：
+
+```text
+Multi-head Set and MLP Gate Cumulative Closure
+多头集合与 MLP 门的累积闭合
+```
+
+核心目标：
+
+```text
+从单 head ablation 改为 top-k head set + MLP projection 的联合干预，
+判断 surface gate 是否需要集合级移除才影响真实生成。
+```
+
+测试设计：
+
+```text
+1. 继续使用 qwen3 / GLM4 / DS7B 三模型。
+2. 保留 Phase155 的 120 cases/model 范围。
+3. 对关键层做 top-k head cumulative ablation：
+   k = 1, 2, 4, 8, all_selected
+4. 选择 head 的依据同时包含：
+   answer_rank_delta
+   format_rank_delta
+   joint_delta
+   hit-sensitive pilot
+5. 加入 MLP projection ablation：
+   semantic_proj
+   format_proj
+   joint_proj
+6. 测：
+   clean
+   top-k-heads
+   MLP-only
+   top-k-heads + MLP
+   random-k-heads
+```
+
+优先层位：
+
+```text
+DS7B:
+  L28 attention + L28 MLP
+  必测 label_colon, answer_one_word, quoted_answer, list_answer
+
+GLM4:
+  L39 attention + L40 MLP
+
+Qwen3:
+  L36 attention + L36/L35 MLP
+```
+
+判据：
+
+```text
+如果 top-k-heads + MLP 明显降低 3-step hit，
+而 random-k-heads 不降低：
+  surface gate 是集合级 causal mechanism。
+
+如果 MLP-only 强，top-k-heads 弱：
+  attention 主要负责读入/路由，MLP 负责最终写入。
+
+如果两者都弱：
+  当前 surface gate 仍不在这些局部 writer 中，
+  需要转向 final residual replacement 或 LM-head competition decomposition。
+```
