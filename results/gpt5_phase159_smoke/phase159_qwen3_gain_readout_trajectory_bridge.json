@@ -1,0 +1,87 @@
+{
+  "phase": 159,
+  "model": "qwen3",
+  "timestamp": "2026-06-16 11:58:50",
+  "categories": [
+    "number"
+  ],
+  "template_families": [
+    "short"
+  ],
+  "splits": [
+    "front_back"
+  ],
+  "formats": [
+    "label_colon"
+  ],
+  "test_objects": 1,
+  "steps": 1,
+  "readout_definition": "v_c = h_rich(answer_last) - h_neutral(answer_last); q_c = final_norm_weight * mean(W_U[target_readout_ids])",
+  "results": {
+    "front_back:short:label_colon:number": {
+      "category": "number",
+      "family": "short",
+      "format": "label_colon",
+      "split": "front_back",
+      "n_prompts": 1,
+      "target_ids": [
+        1830,
+        4082,
+        6045,
+        13523
+      ],
+      "competitor_ids_n": 0,
+      "readout": {
+        "proj_q_over_rms": 5.044050216674805,
+        "proj_q": 11.868224143981934,
+        "cos_v_q": 0.1185104250907898,
+        "cos_v_wd": 0.03375424072146416,
+        "gain_cos_boost": 0.08475618064403534,
+        "v_norm": 49.81058883666992,
+        "q_norm": 2.0105159282684326,
+        "target_mean_logit": 10.61328125,
+        "competitor_mean_logit": 0.0,
+        "target_max_logit": 12.296875,
+        "competitor_max_logit": -Infinity,
+        "dcf_mean": 10.61328125,
+        "dcf_max": Infinity,
+        "target_delta": 1.1416015625,
+        "competitor_delta": 0.0,
+        "dcf_delta": 1.1416015625,
+        "target_max_delta": 1.7578125,
+        "competitor_max_delta": NaN,
+        "dcf_max_delta": NaN,
+        "tc_mode": "target_dominant"
+      },
+      "trajectory": {
+        "hit_rate": 1.0,
+        "final_class_rates": {
+          "canonical": 1.0
+        },
+        "trajectory_rates": {
+          "correct_surface": 1.0
+        },
+        "step_margins": {
+          "step1_correct_vs_competitor": 1.4921875,
+          "step1_correct_vs_wrong": Infinity,
+          "step1_correct_vs_format": 1.4921875,
+          "step1_correct_vs_generic": 3.2109375,
+          "step1_correct_vs_object": 2.2421875
+        },
+        "examples": [
+          {
+            "generated": " Number",
+            "tokens": [
+              " Number"
+            ],
+            "labels": [
+              "correct_expanded"
+            ],
+            "final_class": "canonical",
+            "trajectory": "correct_surface"
+          }
+        ]
+      }
+    }
+  }
+}

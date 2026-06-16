@@ -1156,7 +1156,7 @@ def print_summary(results):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python tests/glm5/phase507_orthogonal_field.py <model_name>")
+        print("Usage: python tests/glm5/phase507_orthogonal_field.py <model_name> [--hard-exit-after-model]")
         sys.exit(1)
     
     mn = sys.argv[1]
@@ -1204,6 +1204,8 @@ def main():
     finally:
         release_model(model)
         print("Model released.")
+        if "--hard-exit-after-model" in sys.argv[2:]:
+            os._exit(0)
 
 
 if __name__ == "__main__":

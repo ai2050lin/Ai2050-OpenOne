@@ -25228,3 +25228,682 @@ ReadableMeaning_c(x,r,T,site,L)
 "suppressor构造"和"逐层竞争动态"四个关键机制。
 补充这四个机制后，统一理论才能真正覆盖GPT5路线的全部核心发现。
 ```
+
+---
+
+## Phase 159: Gain-Readout to Stepwise Trajectory Bridge 增益读出到逐步轨迹桥接 [2026-06-16 12:27]
+
+### 本阶段目标
+
+继续 Phase158 后的任务：不再只问某个干预是否能让答案出来，而是把 GLM5 Phase500-506 的读出链：
+
+```text
+v_c = h_rich - h_neutral
+q_c = g ⊙ w_D
+DCF = target_readout - competitor_readout
+```
+
+接到 GPT5 的三步生成轨迹上，检验：
+
+```text
+1. gain-readout 是否能预测真实生成成功；
+2. DCF 是否比 q 投影更接近 token trajectory；
+3. step1/step2/step3 哪一步才是生成闭合瓶颈；
+4. 格式/标点路径是否是独立变量，而不是语义路径的噪声。
+```
+
+### 对附加分析的判断
+
+附加分析中正确部分：
+
+```text
+1. Phase157/158 后，单看 final residual 或 first-step token 不够。
+2. GLM5 的 g⊙w_D 读出链解释的是“可读语义支持”，不等同于“可生成答案”。
+3. 必须用更宽的类别、模板、格式、对象切分来避免小数据推翻结论。
+4. 标点/格式路径必须纳入分析，因为 quoted/list/multiple_choice 改变了 trajectory。
+```
+
+需要修正的部分：
+
+```text
+不能把 g⊙w_D、DCF 或 v_c 投影直接理论化为语言生成机制闭合。
+本轮结果显示，它们最多解释一部分 readout 可读性；
+真正生成成功更接近 stepwise competition margin，尤其 step1 correct_vs_competitor。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py
+tests/gpt5/phase159_gain_readout_trajectory_bridge_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py \
+  tests/gpt5/phase159_gain_readout_trajectory_bridge_summary.py
+
+python tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py qwen3 \
+  --categories number \
+  --template-families short \
+  --splits front_back \
+  --formats label_colon \
+  --train-objects 1 \
+  --test-objects 1 \
+  --batch-size 1 \
+  --steps 1 \
+  --top-k 5 \
+  --example-prompts 1 \
+  --output-dir results/gpt5_phase159_smoke
+
+python tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py qwen3 \
+  --output-dir results/gpt5_phase159_gain_readout_trajectory_bridge \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py glm4 \
+  --output-dir results/gpt5_phase159_gain_readout_trajectory_bridge \
+  --hard-exit-after-model
+
+python tests/gpt5/phase159_gain_readout_trajectory_bridge_cuda.py deepseek7b \
+  --output-dir results/gpt5_phase159_gain_readout_trajectory_bridge \
+  --hard-exit-after-model
+
+python tests/gpt5/phase159_gain_readout_trajectory_bridge_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = fruit, animal, clothing, emotion, action, plant, time, container, number, furniture
+template_families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+heldout templates = template id 2
+test objects/category/split = 8
+cases/model = 300
+total cases = 900
+steps = 3
+top_k = 20
+```
+
+### 结果文件
+
+```text
+results/gpt5_phase159_gain_readout_trajectory_bridge/phase159_qwen3_gain_readout_trajectory_bridge.json
+results/gpt5_phase159_gain_readout_trajectory_bridge/phase159_glm4_gain_readout_trajectory_bridge.json
+results/gpt5_phase159_gain_readout_trajectory_bridge/phase159_deepseek7b_gain_readout_trajectory_bridge.json
+results/gpt5_phase159_gain_readout_trajectory_bridge/phase159_cross_model_summary.md
+```
+
+### 跨模型总体结果
+
+```text
+total cases = 900
+mean hit = 0.2708
+
+corr(metric, hit):
+  dcf_mean = 0.4690
+  dcf_delta = 0.2553
+  proj_q_over_rms = -0.0084
+  step1_margin = 0.7369
+  step2_margin = 0.0019
+  step3_margin = 0.4516
+```
+
+最关键客观事实：
+
+```text
+step1 correct_vs_competitor margin 是最强预测量；
+g⊙w_D 投影 proj_q_over_rms 跨模型几乎没有预测力。
+```
+
+这说明：
+
+```text
+g⊙w_D 是 readout 可读性变量；
+token generation success 更接近 stepwise competition 变量。
+```
+
+### 分模型结果
+
+#### Qwen3
+
+```text
+cases = 300
+mean_hit = 0.3592
+top_traj = correct_surface:117
+
+corr_with_hit:
+  dcf_mean = 0.5689
+  dcf_delta = 0.4822
+  proj_q_over_rms = 0.1855
+  cos_v_q = 0.1865
+  step1_margin = 0.8341
+  step2_margin = -0.2791
+  step3_margin = 0.3978
+```
+
+按格式：
+
+```text
+multiple_choice hit = 0.9187
+label_colon hit = 0.3438
+list_answer hit = 0.2167
+answer_one_word hit = 0.1583
+quoted_answer hit = 0.1583
+```
+
+按模板：
+
+```text
+short hit = 0.5825
+long hit = 0.2475
+neutral hit = 0.2475
+```
+
+Qwen3 的稳定现象：
+
+```text
+1. multiple_choice 几乎闭合；
+2. short template 显著强于 long/neutral；
+3. answer_one_word/quoted_answer 中经常出现高 DCF 或高 proj 但 hit=0；
+4. action 与 number 是困难类。
+```
+
+#### GLM4 bf16
+
+```text
+cases = 300
+mean_hit = 0.2608
+top_traj = fragment_trap:144
+
+corr_with_hit:
+  dcf_mean = 0.4848
+  dcf_delta = 0.0584
+  proj_q_over_rms = -0.0622
+  cos_v_q = -0.1385
+  step1_margin = 0.7073
+  step2_margin = 0.4544
+  step3_margin = 0.4435
+```
+
+按格式：
+
+```text
+multiple_choice hit = 0.7104
+label_colon hit = 0.2458
+list_answer hit = 0.1667
+quoted_answer hit = 0.1000
+answer_one_word hit = 0.0813
+```
+
+按模板：
+
+```text
+short hit = 0.3975
+long hit = 0.1938
+neutral hit = 0.1913
+```
+
+GLM4 的稳定现象：
+
+```text
+1. 开放格式经常落入 fragment_trap；
+2. multiple_choice 仍能显著恢复；
+3. short template 明显强于 long/neutral；
+4. proj_q_over_rms 对 hit 没有正预测。
+```
+
+#### DS7B
+
+```text
+cases = 300
+mean_hit = 0.1925
+top_traj = fragment_trap:112
+
+corr_with_hit:
+  dcf_mean = 0.2059
+  dcf_delta = 0.0762
+  proj_q_over_rms = -0.1300
+  cos_v_q = -0.0746
+  step1_margin = 0.6174
+  step2_margin = -0.0867
+  step3_margin = 0.6238
+```
+
+按格式：
+
+```text
+multiple_choice hit = 0.7521
+list_answer hit = 0.0792
+quoted_answer hit = 0.0458
+label_colon hit = 0.0437
+answer_one_word hit = 0.0417
+```
+
+按模板：
+
+```text
+short hit = 0.2300
+long hit = 0.1825
+neutral hit = 0.1650
+```
+
+DS7B 的稳定现象：
+
+```text
+1. 开放格式几乎都不闭合；
+2. multiple_choice 仍然强恢复；
+3. label_colon 在 DS7B 上没有形成 Qwen3/GLM4 那样的开放答案路径；
+4. proj_q_over_rms 经常很高，但 hit 仍接近 0。
+```
+
+### 最重要反例
+
+本轮大量出现：
+
+```text
+DCF > 0 或 proj_q_over_rms 高，但 generation hit = 0
+```
+
+特别是：
+
+```text
+Qwen3 neutral answer_one_word:
+  proj_q 经常很高，但 hit 几乎为 0
+
+DS7B short/list/label_colon:
+  proj_q 可达很高，但开放格式 hit 仍低
+
+GLM4 long answer_one_word/quoted/list:
+  DCF 多数为正，但 hit 基本为 0
+```
+
+这直接否定一个简单理论：
+
+```text
+只要 v_c 与 g⊙w_D 对齐，模型就会生成目标类别词。
+```
+
+更符合数据的说法是：
+
+```text
+v_c 与 g⊙w_D 对齐提供 readout support；
+但是否生成目标 token，取决于 stepwise surface competition。
+```
+
+### 标点/格式路径分析
+
+本轮最清晰的格式结果：
+
+```text
+multiple_choice 是三模型最强格式：
+  Qwen3 0.9187
+  GLM4 0.7104
+  DS7B 0.7521
+
+开放格式明显弱：
+  answer_one_word:
+    Qwen3 0.1583
+    GLM4 0.0813
+    DS7B 0.0417
+
+  quoted_answer:
+    Qwen3 0.1583
+    GLM4 0.1000
+    DS7B 0.0458
+
+  list_answer:
+    Qwen3 0.2167
+    GLM4 0.1667
+    DS7B 0.0792
+```
+
+因此标点/格式不是噪声。它至少包含三类功能：
+
+```text
+1. candidate-space constraint:
+   multiple_choice 把答案空间限制在候选项内。
+
+2. surface-gate routing:
+   quoted/list/colon 会改变第一步 token 的合法轨迹。
+
+3. trap induction:
+   quoted_answer 常产生 fragment_trap；
+   list_answer 常产生 object_copy_trap 或 other path；
+   label_colon 在 DS7B 上不能稳定打开答案路径。
+```
+
+### 对条件化关系因子动力学公式的修正
+
+旧公式中的末层读出：
+
+```text
+ReadableMeaning_c = <v_c, g⊙w_D> / rms(h)
+```
+
+本轮结果要求把它降级为“可读性变量”，不能作为完整生成变量。
+
+新的经验形式：
+
+```text
+SemanticReadout_c(x,T,F)
+  = <v_c(x,T,F), g⊙w_D(c)> / rms(h)
+
+SurfaceCompetition_c^t(x,T,F)
+  = M_t(correct_surface, wrong_category, format_token, punctuation, object_copy, generic_continue)
+
+GenerationSuccess_c
+  ≈ Gate(
+      SemanticReadout_c,
+      DCF_c,
+      SurfaceCompetition_c^1,
+      SurfaceCompetition_c^2,
+      SurfaceCompetition_c^3,
+      TemplateFamily,
+      FormatRoute
+    )
+```
+
+其中本轮最可靠的经验判据是：
+
+```text
+SurfaceCompetition^1 correct_vs_competitor margin
+  比 SemanticReadout 更接近 generation success。
+```
+
+更具体地说：
+
+```text
+语言生成不是“语义向量直接读出为词”；
+而是“语义支持进入候选竞争场，再经过格式/标点/表面路径约束，逐步选择 token”。
+```
+
+### 当前进展
+
+对于深度神经网络内部结构研究，本轮推进了三点：
+
+```text
+1. 把 GLM5 的 gain-readout 链和 GPT5 的 stepwise trajectory 链接起来。
+2. 证明末层读出强度不是生成闭合的充分条件。
+3. 证明格式/标点路径是 token selection 的核心条件变量。
+```
+
+这意味着当前研究已经从：
+
+```text
+语义类别是否存在
+```
+
+推进到：
+
+```text
+语义支持如何通过格式条件化竞争场变成 token 序列
+```
+
+### 硬伤和瓶颈
+
+1. **本轮是 clean trace，不是因果干预**
+
+```text
+相关性显示 step1 margin 更关键，但还没有证明改变 step1 margin 就能稳定改变 generation success。
+```
+
+2. **neutral prompt 仍是人工构造**
+
+```text
+v_c = rich - neutral 依赖 neutral prompt。
+如果 neutral 本身触发了格式或语义偏置，proj_q 会被污染。
+```
+
+3. **multiple_choice 的成功可能部分来自选项复制**
+
+```text
+它证明 candidate constraint 有效，
+但不等于自然开放生成已经被破解。
+```
+
+4. **step2/step3 的作用仍未闭合**
+
+```text
+Qwen3 step1 corr 高，但 step2 corr 为负；
+DS7B step3 corr 高。
+说明不同模型的失败/恢复可能发生在不同 token 步。
+```
+
+5. **类别集合仍只有 10 类**
+
+```text
+已经比前面宽，但还没有覆盖全部 CATEGORY_OBJECTS。
+下一步若结论稳定，应继续扩到 20+ 类。
+```
+
+### 关键洞察
+
+最重要的洞察不是“哪个类别强”，而是：
+
+```text
+语言背后的编码机制至少分成两层：
+
+第一层：semantic readable support
+  隐状态中确实存在可被 g⊙w_D 读出的类别支持。
+
+第二层：surface trajectory selection
+  这个支持必须进入格式/标点/候选词竞争场，
+  经过 stepwise token margin 才能变成实际输出。
+```
+
+因此，破解语言编码机制不能只做向量读出，也不能只看最终 token。
+
+必须研究：
+
+```text
+readout support 如何转化为 token competition margin。
+```
+
+### 下一步 Phase160
+
+建议进入：
+
+```text
+Phase160: Stepwise Surface Competition Causal Repair
+```
+
+核心任务：
+
+```text
+直接干预 step1/step2/step3 的 surface competition margin，
+验证是否能把 fragment_trap/object_copy_trap/other path 改成 correct_surface。
+```
+
+测试方案：
+
+```text
+1. 选择 Phase159 中稳定失败但 readout 不低的 case：
+   Qwen3:
+     neutral answer_one_word 高 proj 低 hit
+     action/number 困难类
+
+   GLM4:
+     long answer_one_word/quoted/list fragment_trap
+     number/container 困难类
+
+   DS7B:
+     short label_colon/list 高 proj 低 hit
+     open-format 全局困难类
+
+2. 构造三类 causal repair：
+   a. correct_surface first-token boost
+   b. format-token suppression
+   c. object/generic/fragment competitor suppression
+
+3. 分别在 step1、step2、step3 做干预：
+   - 只修 step1
+   - 只修 step2
+   - 只修 step3
+   - step1+step2
+   - step1+step2+step3
+
+4. 判据：
+   - hit_rate 是否上升
+   - fragment_trap 是否下降
+   - object_copy_trap 是否下降
+   - 是否引入 wrong_category
+   - 是否只在 multiple_choice 有效，还是开放格式也有效
+
+5. 模型范围：
+   qwen3, GLM4, DS7B 顺序测试。
+```
+
+Phase160 的目标不是再证明“读出存在”，而是要证明：
+
+```text
+能否通过控制 surface competition，把可读语义支持转化为真实 token 生成。
+```
+
+
+---
+
+## Phase 160: GLM5 Phase507 Orthogonal Field Test Bridge 正交语义场测试完成 [2026-06-16 18:34]
+
+### 本阶段目标
+
+根据用户要求, 完成 `phase507_orthogonal_field.py` 的脚本测试任务, 顺序使用:
+
+```text
+qwen3, GLM4, DS7B
+```
+
+验证 Phase 506 后的核心问题:
+
+```text
+占语义差分主体的正交成分 Phi_perp 到底是不是噪声。
+```
+
+### 脚本与修复
+
+- 主脚本: `tests/glm5/phase507_orthogonal_field.py`
+- 汇总脚本: `tests/glm5/phase507_orthogonal_field_summary.py`
+- 模型工具: `tests/glm5/model_utils.py`
+
+完成修复:
+
+```text
+1. 为 phase507_orthogonal_field.py 增加 --hard-exit-after-model。
+2. 修复 GLM5 测试脚本中的旧 Windows 模型路径, 改为读取本地 model_registry。
+3. 增加跨模型 summary 脚本。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/model_utils.py \
+  tests/glm5/phase507_orthogonal_field.py \
+  tests/glm5/phase507_orthogonal_field_summary.py
+
+python tests/glm5/phase507_orthogonal_field.py glm4 --hard-exit-after-model
+python tests/glm5/phase507_orthogonal_field.py deepseek7b --hard-exit-after-model
+python tests/glm5/phase507_orthogonal_field.py qwen3 --hard-exit-after-model
+
+python tests/glm5/phase507_orthogonal_field_summary.py
+```
+
+### 结果文件
+
+- `results/glm5/phase507_qwen3.json`
+- `results/glm5/phase507_glm4.json`
+- `results/glm5/phase507_deepseek7b.json`
+- `results/glm5/phase507_cross_model_summary.md`
+
+### 关键客观结果
+
+最终层 mean perp/para ratio:
+
+```text
+Qwen3: 34.4729
+GLM4: 139.3600
+DS7B: 129.8600
+```
+
+最终层 mean abs cos(phi, q_c):
+
+```text
+Qwen3: 0.009964
+GLM4: 0.004482
+DS7B: 0.006044
+```
+
+最后探针 category accuracy:
+
+```text
+Qwen3: para 0.8254, perp 1.0000
+GLM4: para 0.7302, perp 1.0000
+DS7B: para 0.7460, perp 1.0000
+```
+
+最后探针 tc-mode accuracy:
+
+```text
+Qwen3: para 0.4921, perp 0.8571
+GLM4: para 0.5238, perp 0.8413
+DS7B: para 0.5238, perp 0.7619
+```
+
+mean rich category argmax:
+
+```text
+Qwen3: 0.0000
+GLM4: 0.0000
+DS7B: 0.0000
+```
+
+### 当前判断
+
+Phase507 的结果支持:
+
+```text
+Phi_perp 不是噪声。
+Phi_perp 含有强类别结构和任务模式结构。
+Phi_perp 对读出 D 有因果影响。
+```
+
+但同时也证明:
+
+```text
+Phi_perp 不能直接闭合到最终 token 输出。
+```
+
+因此当前拼图变成:
+
+```text
+高维正交语义场
+  -> 低维 readout D
+  -> surface/token competition
+  -> 最终输出
+```
+
+### 严格硬伤
+
+1. 探针可分不等于机制闭合。
+2. remove_perp 是粗干预, 不能区分 support/suppressor/interface。
+3. Exp6 三模型 category argmax 全为 0, token 生成机制仍未解释。
+4. DS7B action/color 出现 remove_perp 释放 D 的反向现象, 需要单独拆解。
+
+### 下一步
+
+进入 GLM5 线索中的:
+
+```text
+Phase 508: Orthogonal Field Causal Basis Decomposition
+```
+
+目标:
+
+```text
+把 Phi_perp 从整体场拆成可干预的因果基底,
+区分 support、suppressor、object identity、format/task、surface competition 成分。
+```

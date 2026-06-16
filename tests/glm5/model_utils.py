@@ -18,24 +18,30 @@
 
 import torch
 import numpy as np
+import sys
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+GPT5_TOOLS = Path(__file__).resolve().parents[1] / "gpt5"
+if str(GPT5_TOOLS) not in sys.path:
+    sys.path.insert(0, str(GPT5_TOOLS))
+from model_registry import get_model_spec  # noqa: E402
+
 # ===== 模型配置 =====
 MODEL_CONFIGS = {
     "qwen3": {
-        "path": "D:/develop/model/Qwen/Qwen3-4B",
+        "path": str(get_model_spec("qwen3").local_dir),
         "arch": "Qwen3ForCausalLM",
         "mlp_type": "split_gate_up",  # gate_proj + up_proj 分开
     },
     "glm4": {
-        "path": "D:/develop/model/ZhipuAI/glm-4-9b-chat-hf",
+        "path": str(get_model_spec("glm4").local_dir),
         "arch": "GlmForCausalLM",  # 也可能是Glm4ForCausalLM
         "mlp_type": "merged_gate_up",  # gate_up_proj 合并
     },
     "deepseek7b": {
-        "path": "D:/develop/model/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "path": str(get_model_spec("deepseek7b").local_dir),
         "arch": "Qwen2ForCausalLM",
         "mlp_type": "split_gate_up",  # gate_proj + up_proj 分开
     },

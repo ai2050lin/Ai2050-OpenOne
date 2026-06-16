@@ -31921,3 +31921,352 @@ Exp3: 正交成分功能探测 - 探针分类器
 Exp4: 跨层v_c演变 - 何时出现q_c对齐
 
 阶段大任务: 建立语言编码的"场论"框架
+
+
+---
+
+## Phase 507: Orthogonal Semantic Field 正交语义场解析与功能验证 [2026-06-16 18:34]
+
+### 本阶段目标
+
+Phase 506 已经证明:
+
+```text
+语义差分 Phi_c 的绝大部分能量位于读出方向 q_c 的正交空间。
+```
+
+Phase 507 的核心任务是继续追问:
+
+```text
+占绝大多数的 Phi_perp 到底是不是噪声；
+如果不是噪声, 它在类别、任务模式、因果读出、输出词元中分别承担什么功能。
+```
+
+### 脚本修复与测试脚本
+
+本轮完成了 Phase507 脚本测试任务:
+
+- 主脚本: `tests/glm5/phase507_orthogonal_field.py`
+- 汇总脚本: `tests/glm5/phase507_orthogonal_field_summary.py`
+- 模型工具修复: `tests/glm5/model_utils.py`
+
+关键修复:
+
+```text
+1. 给 phase507_orthogonal_field.py 增加 --hard-exit-after-model 支持。
+2. 修复 tests/glm5/model_utils.py 中旧 Windows 模型路径, 改为使用本地 model_registry。
+3. 增加跨模型汇总脚本, 对 Exp1-Exp6 结果做统一抽取。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/model_utils.py \
+  tests/glm5/phase507_orthogonal_field.py \
+  tests/glm5/phase507_orthogonal_field_summary.py
+
+python tests/glm5/phase507_orthogonal_field.py glm4 --hard-exit-after-model
+
+python tests/glm5/phase507_orthogonal_field.py deepseek7b --hard-exit-after-model
+
+python tests/glm5/phase507_orthogonal_field.py qwen3 --hard-exit-after-model
+
+python tests/glm5/phase507_orthogonal_field_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = fruit, animal, action, emotion, clothing, color, vehicle
+objects/category = 30
+experiments = Exp1-Exp6
+```
+
+六个实验:
+
+```text
+Exp1: Phi_perp 的 PCA/SVD/聚类结构
+Exp2: 移除/保留/噪声替代 Phi_perp 的因果干预
+Exp3: Phi_para 与 Phi_perp 的功能探针
+Exp4: 跨层能量轨迹
+Exp5: action 子类型分析
+Exp6: token-level 输出闭合检查
+```
+
+### 结果文件
+
+- `results/glm5/phase507_qwen3.json`
+- `results/glm5/phase507_glm4.json`
+- `results/glm5/phase507_deepseek7b.json`
+- `results/glm5/phase507_cross_model_summary.md`
+
+### 跨模型客观结果
+
+#### 1. Phi_perp 能量远大于 Phi_para
+
+最终层 mean perp/para ratio:
+
+```text
+Qwen3: 34.4729
+GLM4: 139.3600
+DS7B: 129.8600
+```
+
+最终层 mean abs cos(phi, q_c):
+
+```text
+Qwen3: 0.009964
+GLM4: 0.004482
+DS7B: 0.006044
+```
+
+这继续支持 Phase 506 的结论:
+
+```text
+可读类别方向只是高维语义场的极低维投影。
+```
+
+#### 2. Phi_perp 不是噪声, 它含有稳定类别信息
+
+最后探针 category accuracy:
+
+```text
+Qwen3:
+  para = 0.8254
+  perp = 1.0000
+
+GLM4:
+  para = 0.7302
+  perp = 1.0000
+
+DS7B:
+  para = 0.7460
+  perp = 1.0000
+```
+
+最后探针 tc-mode accuracy:
+
+```text
+Qwen3:
+  para = 0.4921
+  perp = 0.8571
+
+GLM4:
+  para = 0.5238
+  perp = 0.8413
+
+DS7B:
+  para = 0.5238
+  perp = 0.7619
+```
+
+客观判断:
+
+```text
+Phi_perp 中存在非常强的类别结构和任务模式结构。
+它不是随机残差, 也不是简单无意义能量。
+```
+
+#### 3. 移除 Phi_perp 会产生真实因果影响
+
+best remove_perp delta D:
+
+```text
+Qwen3:
+  fruit -5.8001 L18
+  animal -6.3225 L9
+  action -2.9363 L18
+  emotion -4.2313 L9
+  clothing -3.7522 L18
+  color -4.1846 L33
+  vehicle -6.3681 L18
+
+GLM4:
+  fruit -4.5439 L20
+  animal -3.4969 L20
+  action -1.7717 L10
+  emotion -2.4583 L20
+  clothing -2.0605 L10
+  color -2.9007 L35
+  vehicle -6.0391 L20
+
+DS7B:
+  fruit -6.6263 L21
+  animal -1.5047 L18
+  emotion -1.1297 L25
+  clothing -1.9097 L7
+  vehicle -1.8284 L7
+```
+
+重要例外:
+
+```text
+DS7B action: remove_perp 最小值仍为 +2.1736
+DS7B color: remove_perp 最小值仍为 +0.8135
+```
+
+说明:
+
+```text
+Phi_perp 不是单纯 support。
+它同时包含 support、suppressor、routing/interface 等混合成分。
+```
+
+#### 4. Exp6 没有完成 token 输出闭合
+
+mean rich category argmax:
+
+```text
+Qwen3: 0.0000
+GLM4: 0.0000
+DS7B: 0.0000
+```
+
+这说明:
+
+```text
+Phi_perp 能强烈编码类别和模式, 也能影响读出 D,
+但不能直接解释最终 token 生成。
+```
+
+最终输出仍然受 surface/form/token competition 控制。
+
+#### 5. action 子类型显示模型间策略差异
+
+Qwen3 与 GLM4:
+
+```text
+action subtype 的 cos 多为小正值,
+transaction/physical 等子类型 D_mean 较强。
+```
+
+DS7B:
+
+```text
+action subtype 的 a_c_mean 与 cos 多为负,
+但 D_mean 仍为正。
+```
+
+这说明 DS7B 可能更依赖:
+
+```text
+competitor suppression 或特殊归一化/读出路径,
+而不是简单正向 action support。
+```
+
+### 阶段判断
+
+Phase 507 的关键进展:
+
+```text
+1. 正交语义场不是噪声。
+2. 正交语义场含有比平行读出分量更强的类别/模式可分信息。
+3. 正交语义场对读出 D 有真实因果作用。
+4. 正交语义场仍不能直接闭合到最终 token。
+```
+
+因此当前理论应从:
+
+```text
+语义 = 读出方向上的类别分量
+```
+
+更新为:
+
+```text
+语义 = 高维正交场中的结构状态 + 低维读出投影 + 表层词元竞争闭合
+```
+
+### 公式更新
+
+暂时只做保守更新:
+
+```text
+Phi_c(l) = Phi_parallel(q_c, l) + Phi_perp(c, context, l)
+
+Readable_D_c(l) =
+  <Phi_parallel(q_c, l), q_c>
+  + G(Phi_perp(c, context, l), q_c, context)
+```
+
+其中:
+
+```text
+Phi_parallel 是直接可读投影。
+Phi_perp 是高维语义场主体。
+G 表示正交场通过归一化、残差路由、竞争抑制、后续层变换对可读 D 的间接贡献。
+```
+
+不能把 G 简化为线性投影, 因为:
+
+```text
+remove_perp 有时降低 D, 有时释放 D。
+```
+
+### 硬伤与瓶颈
+
+1. **Exp3 探针证明可分, 不等于证明机制闭合**
+
+Phi_perp 能被线性分类, 但这可能混合了类别、对象身份、模板状态和任务模式。
+
+2. **remove_perp 是粗干预**
+
+一次性移除全部正交场会造成分布外扰动, 不能直接说明哪一部分是 support, 哪一部分是 suppressor。
+
+3. **Exp6 token-level 没有闭合**
+
+三模型 rich category argmax 都为 0, 说明当前路径仍未解释最终词元选择。
+
+4. **类别覆盖仍然有限**
+
+7类 x 30对象已经比前面更稳, 但还不足以覆盖语言机制中的全部结构类型。
+
+5. **DS7B action/color 反向现象需要单独拆解**
+
+这不是小噪声, 而可能说明不同模型使用不同的 suppressor/interface 策略。
+
+### 下一步 Phase 508
+
+建议进入:
+
+```text
+Phase 508: Orthogonal Field Causal Basis Decomposition
+```
+
+核心目标:
+
+```text
+不要再整体移除 Phi_perp,
+而是把 Phi_perp 拆成更小的因果基底:
+
+support basis
+suppressor basis
+object identity basis
+format/task basis
+surface competition basis
+```
+
+测试设计:
+
+```text
+1. 对 Phi_perp 做低秩 basis 分解。
+2. 逐 basis 做 remove/keep/scale 干预。
+3. 同时记录:
+   - target D
+   - competitor D
+   - category probe
+   - token top-k
+   - format/surface token margin
+4. 对 DS7B action/color 做重点复测。
+5. 加入标点/格式模板, 区分语义场与表层格式场。
+```
+
+Phase 508 的判据:
+
+```text
+如果某些 Phi_perp basis 能稳定改变 target D 或 token margin,
+且跨模板/跨对象/跨模型复现,
+则它们才可以被称为正交场中的真实功能子结构。
+```
