@@ -1,0 +1,2636 @@
+{
+  "phase": 510,
+  "model": "deepseek7b",
+  "timestamp": "2026-06-16 21:34:13",
+  "L": 28,
+  "d_model": 3584,
+  "categories": [
+    "action",
+    "fruit",
+    "color"
+  ],
+  "train_objects": 20,
+  "test_objects": 10,
+  "templates": [
+    "category_of",
+    "taxonomy_as",
+    "classify_colon"
+  ],
+  "basis_templates": [
+    "plain",
+    "taxonomy",
+    "classify"
+  ],
+  "layers": [
+    14,
+    21,
+    25
+  ],
+  "rank": 4,
+  "steps": 3,
+  "scale": 1.0,
+  "category_results": {
+    "action": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 25,
+          "name": "svd2",
+          "delta_D": -0.31554871797561646
+        },
+        "release": {
+          "layer": 25,
+          "name": "svd3",
+          "delta_D": 0.2582513391971588
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 7.84375,
+              "competitor_mean": 8.25,
+              "punctuation_mean": 13.625,
+              "generic_mean": 10.1875,
+              "object_copy_mean": 9.5,
+              "category_vs_competitor": -0.396484375,
+              "category_vs_punctuation": -5.78125,
+              "category_vs_generic": -2.328125,
+              "category_vs_object_copy": -1.6796875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  11
+                ],
+                [
+                  " ",
+                  7
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  " the",
+                  3
+                ],
+                [
+                  " __",
+                  1
+                ],
+                [
+                  " {",
+                  1
+                ],
+                [
+                  " high",
+                  1
+                ],
+                [
+                  " oil",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.53125,
+              "competitor_mean": 5.75,
+              "punctuation_mean": 10.6875,
+              "generic_mean": 8.0,
+              "object_copy_mean": 6.84375,
+              "category_vs_competitor": -1.203125,
+              "category_vs_punctuation": -6.15625,
+              "category_vs_generic": -3.5,
+              "category_vs_object_copy": -2.296875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.06666667014360428,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  7
+                ],
+                [
+                  "(n",
+                  4
+                ],
+                [
+                  "ioneer",
+                  3
+                ],
+                [
+                  "6",
+                  2
+                ],
+                [
+                  " type",
+                  2
+                ],
+                [
+                  "-",
+                  2
+                ],
+                [
+                  "________",
+                  1
+                ],
+                [
+                  "-quality",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.375,
+              "competitor_mean": 5.71875,
+              "punctuation_mean": 13.0625,
+              "generic_mean": 7.40625,
+              "object_copy_mean": 5.96875,
+              "category_vs_competitor": -0.3359375,
+              "category_vs_punctuation": -7.6875,
+              "category_vs_generic": -2.0,
+              "category_vs_object_copy": -0.57421875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  ")",
+                  5
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "\n\n",
+                  2
+                ],
+                [
+                  "4",
+                  1
+                ],
+                [
+                  ":",
+                  1
+                ],
+                [
+                  ".\n\n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " 64",
+            " a(n)",
+            "  the:",
+            " __________.\n\n",
+            " a(n)",
+            " { the the",
+            " high-quality,",
+            " a/an:\n\n",
+            " oilioneerioneer",
+            "\nOptions:\n"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 8.1875,
+              "competitor_mean": 8.875,
+              "punctuation_mean": 12.875,
+              "generic_mean": 10.5,
+              "object_copy_mean": 9.875,
+              "category_vs_competitor": -0.73046875,
+              "category_vs_punctuation": -4.71875,
+              "category_vs_generic": -2.328125,
+              "category_vs_object_copy": -1.71875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " ",
+                  9
+                ],
+                [
+                  " \"",
+                  3
+                ],
+                [
+                  " {",
+                  2
+                ],
+                [
+                  " the",
+                  2
+                ],
+                [
+                  " water",
+                  1
+                ],
+                [
+                  " oil",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.8125,
+              "competitor_mean": 6.25,
+              "punctuation_mean": 9.6875,
+              "generic_mean": 8.875,
+              "object_copy_mean": 6.78125,
+              "category_vs_competitor": -1.4375,
+              "category_vs_punctuation": -4.875,
+              "category_vs_generic": -4.03125,
+              "category_vs_object_copy": -1.96875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.10000000894069672,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  7
+                ],
+                [
+                  "6",
+                  6
+                ],
+                [
+                  " type",
+                  3
+                ],
+                [
+                  "(n",
+                  3
+                ],
+                [
+                  "ioneer",
+                  3
+                ],
+                [
+                  " tax",
+                  2
+                ],
+                [
+                  "Math",
+                  1
+                ],
+                [
+                  "-based",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.53125,
+              "competitor_mean": 6.03125,
+              "punctuation_mean": 12.3125,
+              "generic_mean": 8.125,
+              "object_copy_mean": 6.21875,
+              "category_vs_competitor": -0.48046875,
+              "category_vs_punctuation": -6.75,
+              "category_vs_generic": -2.578125,
+              "category_vs_object_copy": -0.671875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  3
+                ],
+                [
+                  ")",
+                  3
+                ],
+                [
+                  " the",
+                  3
+                ],
+                [
+                  "-",
+                  3
+                ],
+                [
+                  "ioneer",
+                  3
+                ],
+                [
+                  "onomic",
+                  2
+                ],
+                [
+                  "\n\n",
+                  2
+                ],
+                [
+                  "4",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " 64",
+            " a type of",
+            " \" the:",
+            " \"Math and",
+            " a(n)",
+            " { the the",
+            " water-based,",
+            " a/an:\n\n",
+            " oilioneerol",
+            " 6-"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 7.40625,
+              "competitor_mean": 7.65625,
+              "punctuation_mean": 14.3125,
+              "generic_mean": 9.75,
+              "object_copy_mean": 8.9375,
+              "category_vs_competitor": -0.26171875,
+              "category_vs_punctuation": -6.90625,
+              "category_vs_generic": -2.34375,
+              "category_vs_object_copy": -1.5234375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " ",
+                  5
+                ],
+                [
+                  " the",
+                  5
+                ],
+                [
+                  ":\n\n",
+                  2
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " high",
+                  1
+                ],
+                [
+                  " whether",
+                  1
+                ],
+                [
+                  " **",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 3.90625,
+              "competitor_mean": 5.09375,
+              "punctuation_mean": 11.4375,
+              "generic_mean": 7.5,
+              "object_copy_mean": 6.25,
+              "category_vs_competitor": -1.203125,
+              "category_vs_punctuation": -7.5625,
+              "category_vs_generic": -3.59375,
+              "category_vs_object_copy": -2.359375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.13333334028720856,
+              "generic_top1_rate": 0.06666667014360428,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  7
+                ],
+                [
+                  "(n",
+                  4
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  "ioneer",
+                  3
+                ],
+                [
+                  "1",
+                  3
+                ],
+                [
+                  " type",
+                  2
+                ],
+                [
+                  "A",
+                  1
+                ],
+                [
+                  "-quality",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.15625,
+              "competitor_mean": 5.15625,
+              "punctuation_mean": 12.8125,
+              "generic_mean": 6.09375,
+              "object_copy_mean": 5.84375,
+              "category_vs_competitor": 0.00156402587890625,
+              "category_vs_punctuation": -7.6875,
+              "category_vs_generic": -0.94140625,
+              "category_vs_object_copy": -0.7109375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.1666666716337204,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  ")",
+                  5
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  ".",
+                  3
+                ],
+                [
+                  ",",
+                  2
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  "<think>",
+                  1
+                ],
+                [
+                  "expl",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " \n<think>",
+            " a(n)",
+            " a the\n\n",
+            ":\n\nA.",
+            " a(n)",
+            " the theioneer",
+            " high-quality,",
+            " a type of",
+            " whetherioneerioneer",
+            " **'expl"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 7.8125,
+              "competitor_mean": 7.96875,
+              "punctuation_mean": 13.6875,
+              "generic_mean": 10.5,
+              "object_copy_mean": 9.0625,
+              "category_vs_competitor": -0.140625,
+              "category_vs_punctuation": -5.875,
+              "category_vs_generic": -2.6875,
+              "category_vs_object_copy": -1.2578125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  15
+                ],
+                [
+                  " ",
+                  4
+                ],
+                [
+                  " **",
+                  2
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " __",
+                  1
+                ],
+                [
+                  " high",
+                  1
+                ],
+                [
+                  " A",
+                  1
+                ],
+                [
+                  " \n\n",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.3125,
+              "competitor_mean": 5.09375,
+              "punctuation_mean": 10.8125,
+              "generic_mean": 8.1875,
+              "object_copy_mean": 6.125,
+              "category_vs_competitor": -0.7890625,
+              "category_vs_punctuation": -6.46875,
+              "category_vs_generic": -3.875,
+              "category_vs_object_copy": -1.8125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.23333334922790527,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " type",
+                  7
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  "(n",
+                  3
+                ],
+                [
+                  "(",
+                  2
+                ],
+                [
+                  "-",
+                  2
+                ],
+                [
+                  "________",
+                  1
+                ],
+                [
+                  "-quality",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.40625,
+              "competitor_mean": 4.96875,
+              "punctuation_mean": 12.875,
+              "generic_mean": 6.6875,
+              "object_copy_mean": 5.59375,
+              "category_vs_competitor": 0.419921875,
+              "category_vs_punctuation": -7.46875,
+              "category_vs_generic": -1.296875,
+              "category_vs_object_copy": -0.1845703125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  7
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  "\n\n",
+                  4
+                ],
+                [
+                  ")",
+                  3
+                ],
+                [
+                  "2",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "A",
+                  1
+                ],
+                [
+                  ".\n\n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " **(A",
+            " a type of",
+            " a the\n\n",
+            " __________.\n\n",
+            " a(n)",
+            " a the the",
+            " high-quality,",
+            " a type of",
+            " Aioneerioneer",
+            " **(2"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 8.0625,
+              "competitor_mean": 8.9375,
+              "punctuation_mean": 14.0625,
+              "generic_mean": 10.4375,
+              "object_copy_mean": 10.5,
+              "category_vs_competitor": -0.84765625,
+              "category_vs_punctuation": -5.96875,
+              "category_vs_generic": -2.375,
+              "category_vs_object_copy": -2.4375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  11
+                ],
+                [
+                  " the",
+                  7
+                ],
+                [
+                  " ",
+                  5
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " paints",
+                  1
+                ],
+                [
+                  " oil",
+                  1
+                ],
+                [
+                  " \n\n",
+                  1
+                ],
+                [
+                  "\n",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.9375,
+              "competitor_mean": 6.59375,
+              "punctuation_mean": 11.8125,
+              "generic_mean": 9.0625,
+              "object_copy_mean": 7.40625,
+              "category_vs_competitor": -1.65625,
+              "category_vs_punctuation": -6.90625,
+              "category_vs_generic": -4.09375,
+              "category_vs_object_copy": -2.484375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  8
+                ],
+                [
+                  "(n",
+                  5
+                ],
+                [
+                  "ioneer",
+                  3
+                ],
+                [
+                  " ",
+                  3
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " tax",
+                  2
+                ],
+                [
+                  " __",
+                  1
+                ],
+                [
+                  "________",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.125,
+              "competitor_mean": 5.625,
+              "punctuation_mean": 11.375,
+              "generic_mean": 6.9375,
+              "object_copy_mean": 5.6875,
+              "category_vs_competitor": -0.5078125,
+              "category_vs_punctuation": -6.25,
+              "category_vs_generic": -1.8359375,
+              "category_vs_object_copy": -0.59375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  ")",
+                  5
+                ],
+                [
+                  " the",
+                  3
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  "onomic",
+                  2
+                ],
+                [
+                  " __",
+                  1
+                ],
+                [
+                  "_",
+                  1
+                ],
+                [
+                  " interior",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ __ __",
+            " a(n)",
+            "  the the",
+            " ___________",
+            " a(n)",
+            " the the the",
+            " paints for interior",
+            " a/an:\n\n",
+            " oilioneerioneer",
+            " the  the"
+          ],
+          "category_hit_rate": 0.0
+        }
+      }
+    },
+    "fruit": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 21,
+          "name": "svd1",
+          "delta_D": -0.3517577350139618
+        },
+        "release": {
+          "layer": 25,
+          "name": "svd2",
+          "delta_D": 0.4302510917186737
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 10.125,
+              "competitor_mean": 8.0,
+              "punctuation_mean": 11.5,
+              "generic_mean": 8.6875,
+              "object_copy_mean": 10.0,
+              "category_vs_competitor": 2.15625,
+              "category_vs_punctuation": -1.3671875,
+              "category_vs_generic": 1.4609375,
+              "category_vs_object_copy": 0.1298828125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  7
+                ],
+                [
+                  " ",
+                  4
+                ],
+                [
+                  " __",
+                  3
+                ],
+                [
+                  " fruits",
+                  1
+                ],
+                [
+                  " berries",
+                  1
+                ],
+                [
+                  " Is",
+                  1
+                ],
+                [
+                  " {",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.8125,
+              "competitor_mean": 4.40625,
+              "punctuation_mean": 9.4375,
+              "generic_mean": 6.21875,
+              "object_copy_mean": 7.40625,
+              "category_vs_competitor": 0.390625,
+              "category_vs_punctuation": -4.625,
+              "category_vs_generic": -1.3984375,
+              "category_vs_object_copy": -2.59375,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  "6",
+                  2
+                ],
+                [
+                  " follows",
+                  2
+                ],
+                [
+                  "/an",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.28125,
+              "competitor_mean": 5.28125,
+              "punctuation_mean": 12.125,
+              "generic_mean": 7.1875,
+              "object_copy_mean": 7.46875,
+              "category_vs_competitor": -0.01043701171875,
+              "category_vs_punctuation": -6.875,
+              "category_vs_generic": -1.90625,
+              "category_vs_object_copy": -2.171875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  "\n",
+                  4
+                ],
+                [
+                  ",",
+                  3
+                ],
+                [
+                  "2",
+                  3
+                ],
+                [
+                  "(n",
+                  2
+                ],
+                [
+                  "________",
+                  2
+                ],
+                [
+                  "/an",
+                  2
+                ],
+                [
+                  ".",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneerioneer",
+            " fruits the.",
+            " a a(n",
+            " isioneer,",
+            " berries the\n",
+            " a a\n",
+            " is ioneer",
+            " __ the________"
+          ],
+          "category_hit_rate": 0.06666666666666667
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 21,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 9.5625,
+              "competitor_mean": 7.59375,
+              "punctuation_mean": 11.3125,
+              "generic_mean": 8.1875,
+              "object_copy_mean": 9.875,
+              "category_vs_competitor": 1.953125,
+              "category_vs_punctuation": -1.75,
+              "category_vs_generic": 1.3203125,
+              "category_vs_object_copy": -0.322265625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  6
+                ],
+                [
+                  " __",
+                  3
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  " fruits",
+                  1
+                ],
+                [
+                  " strawberry",
+                  1
+                ],
+                [
+                  " berries",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.59375,
+              "competitor_mean": 4.4375,
+              "punctuation_mean": 9.3125,
+              "generic_mean": 5.875,
+              "object_copy_mean": 7.5625,
+              "category_vs_competitor": 0.1689453125,
+              "category_vs_punctuation": -4.71875,
+              "category_vs_generic": -1.2734375,
+              "category_vs_object_copy": -2.96875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  "/an",
+                  3
+                ],
+                [
+                  " follows",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  "A",
+                  1
+                ],
+                [
+                  "\n\n",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 4.71875,
+              "competitor_mean": 5.4375,
+              "punctuation_mean": 12.0,
+              "generic_mean": 6.8125,
+              "object_copy_mean": 7.46875,
+              "category_vs_competitor": -0.7265625,
+              "category_vs_punctuation": -7.3125,
+              "category_vs_generic": -2.109375,
+              "category_vs_object_copy": -2.765625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  "\n",
+                  4
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  "(n",
+                  2
+                ],
+                [
+                  ",",
+                  2
+                ],
+                [
+                  "________",
+                  2
+                ],
+                [
+                  ":\n\n",
+                  2
+                ],
+                [
+                  "/an",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneerioneer",
+            " fruits the.",
+            " a a(n",
+            " strawberryioneer,",
+            " berries the\n",
+            " a a\n",
+            " is ioneer",
+            " __ the________"
+          ],
+          "category_hit_rate": 0.03333333333333333
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 21,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 10.5625,
+              "competitor_mean": 8.125,
+              "punctuation_mean": 11.625,
+              "generic_mean": 9.0625,
+              "object_copy_mean": 10.125,
+              "category_vs_competitor": 2.421875,
+              "category_vs_punctuation": -1.0859375,
+              "category_vs_generic": 1.515625,
+              "category_vs_object_copy": 0.40234375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  15
+                ],
+                [
+                  " fruits",
+                  4
+                ],
+                [
+                  " is",
+                  4
+                ],
+                [
+                  " ",
+                  3
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " berries",
+                  1
+                ],
+                [
+                  " Is",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 5.25,
+              "competitor_mean": 4.4375,
+              "punctuation_mean": 10.25,
+              "generic_mean": 6.5625,
+              "object_copy_mean": 7.40625,
+              "category_vs_competitor": 0.81640625,
+              "category_vs_punctuation": -5.03125,
+              "category_vs_generic": -1.3203125,
+              "category_vs_object_copy": -2.15625,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  "6",
+                  2
+                ],
+                [
+                  " follows",
+                  2
+                ],
+                [
+                  "/an",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.5625,
+              "competitor_mean": 5.34375,
+              "punctuation_mean": 12.1875,
+              "generic_mean": 7.46875,
+              "object_copy_mean": 7.75,
+              "category_vs_competitor": 0.193359375,
+              "category_vs_punctuation": -6.65625,
+              "category_vs_generic": -1.921875,
+              "category_vs_object_copy": -2.203125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  "\n",
+                  4
+                ],
+                [
+                  "(n",
+                  3
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  ",",
+                  2
+                ],
+                [
+                  "2",
+                  2
+                ],
+                [
+                  " the",
+                  2
+                ],
+                [
+                  " of",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " aioneerioneer",
+            " fruits the.",
+            " a a(n",
+            " aioneer,",
+            " berries the\n",
+            " a a\n",
+            " is ioneer",
+            " fruits the,"
+          ],
+          "category_hit_rate": 0.16666666666666666
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 10.3125,
+              "competitor_mean": 7.875,
+              "punctuation_mean": 10.75,
+              "generic_mean": 8.375,
+              "object_copy_mean": 9.6875,
+              "category_vs_competitor": 2.421875,
+              "category_vs_punctuation": -0.4609375,
+              "category_vs_generic": 1.9296875,
+              "category_vs_object_copy": 0.59375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.06666667014360428,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  5
+                ],
+                [
+                  " ",
+                  4
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  " berries",
+                  2
+                ],
+                [
+                  " strawberry",
+                  2
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " Is",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 5.46875,
+              "competitor_mean": 4.65625,
+              "punctuation_mean": 10.0,
+              "generic_mean": 6.59375,
+              "object_copy_mean": 7.65625,
+              "category_vs_competitor": 0.80078125,
+              "category_vs_punctuation": -4.53125,
+              "category_vs_generic": -1.1328125,
+              "category_vs_object_copy": -2.1875,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  "/an",
+                  3
+                ],
+                [
+                  "1",
+                  2
+                ],
+                [
+                  " follows",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  "\n\n",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 6.28125,
+              "competitor_mean": 5.75,
+              "punctuation_mean": 12.0625,
+              "generic_mean": 7.5625,
+              "object_copy_mean": 7.6875,
+              "category_vs_competitor": 0.55078125,
+              "category_vs_punctuation": -5.78125,
+              "category_vs_generic": -1.28125,
+              "category_vs_object_copy": -1.3984375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.23333334922790527,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  "\n",
+                  4
+                ],
+                [
+                  "2",
+                  3
+                ],
+                [
+                  " the",
+                  3
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  "(n",
+                  2
+                ],
+                [
+                  "________",
+                  2
+                ],
+                [
+                  ":\n\n",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " fruits the\n",
+            " a a\n",
+            " isioneerioneer",
+            " berries the.",
+            " a a(n",
+            " strawberryioneer,",
+            " berries the\n",
+            " a a\n",
+            " is ioneer",
+            " __ the________"
+          ],
+          "category_hit_rate": 0.1
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 9.875,
+              "competitor_mean": 8.0,
+              "punctuation_mean": 12.1875,
+              "generic_mean": 9.0,
+              "object_copy_mean": 10.4375,
+              "category_vs_competitor": 1.8359375,
+              "category_vs_punctuation": -2.328125,
+              "category_vs_generic": 0.8671875,
+              "category_vs_object_copy": -0.5625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  13
+                ],
+                [
+                  " is",
+                  6
+                ],
+                [
+                  " ",
+                  3
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " {",
+                  2
+                ],
+                [
+                  " fruits",
+                  1
+                ],
+                [
+                  "\n",
+                  1
+                ],
+                [
+                  " the",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.1875,
+              "competitor_mean": 4.125,
+              "punctuation_mean": 9.375,
+              "generic_mean": 6.03125,
+              "object_copy_mean": 7.28125,
+              "category_vs_competitor": 0.07177734375,
+              "category_vs_punctuation": -5.1875,
+              "category_vs_generic": -1.8359375,
+              "category_vs_object_copy": -3.078125,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " and",
+                  2
+                ],
+                [
+                  " follows",
+                  2
+                ],
+                [
+                  "/an",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 4.53125,
+              "competitor_mean": 5.5,
+              "punctuation_mean": 11.5,
+              "generic_mean": 7.125,
+              "object_copy_mean": 7.9375,
+              "category_vs_competitor": -0.96484375,
+              "category_vs_punctuation": -7.0,
+              "category_vs_generic": -2.609375,
+              "category_vs_object_copy": -3.390625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  "\n",
+                  5
+                ],
+                [
+                  "(n",
+                  3
+                ],
+                [
+                  ",",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "1",
+                  2
+                ],
+                [
+                  "________",
+                  1
+                ],
+                [
+                  "A",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneerioneer",
+            " __ the________",
+            " a a(n",
+            " isioneer,",
+            " fruits the\n",
+            " a a\n",
+            " is ioneer",
+            "\n theA"
+          ],
+          "category_hit_rate": 0.06666666666666667
+        }
+      }
+    },
+    "color": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 25,
+          "name": "svd2",
+          "delta_D": -0.14575669169425964
+        },
+        "release": {
+          "layer": 25,
+          "name": "svd1",
+          "delta_D": 0.17244622111320496
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 6.59375,
+              "competitor_mean": 7.78125,
+              "punctuation_mean": 10.75,
+              "generic_mean": 8.625,
+              "object_copy_mean": 7.375,
+              "category_vs_competitor": -1.203125,
+              "category_vs_punctuation": -4.15625,
+              "category_vs_generic": -2.03125,
+              "category_vs_object_copy": -0.8046875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  5
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " {",
+                  2
+                ],
+                [
+                  " plants",
+                  1
+                ],
+                [
+                  " are",
+                  1
+                ],
+                [
+                  " \"",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.53125,
+              "competitor_mean": 4.59375,
+              "punctuation_mean": 9.6875,
+              "generic_mean": 5.84375,
+              "object_copy_mean": 7.0,
+              "category_vs_competitor": -2.0625,
+              "category_vs_punctuation": -7.125,
+              "category_vs_generic": -3.3125,
+              "category_vs_object_copy": -4.46875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  8
+                ],
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  " a",
+                  6
+                ],
+                [
+                  " follows",
+                  3
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  " as",
+                  1
+                ],
+                [
+                  "\n",
+                  1
+                ],
+                [
+                  "<think>",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 3.109375,
+              "competitor_mean": 4.6875,
+              "punctuation_mean": 11.125,
+              "generic_mean": 5.8125,
+              "object_copy_mean": 6.65625,
+              "category_vs_competitor": -1.5859375,
+              "category_vs_punctuation": -8.0,
+              "category_vs_generic": -2.71875,
+              "category_vs_object_copy": -3.546875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.4333333671092987,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "\n",
+                  12
+                ],
+                [
+                  " the",
+                  5
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  ".",
+                  1
+                ],
+                [
+                  " what",
+                  1
+                ],
+                [
+                  "________",
+                  1
+                ],
+                [
+                  "(n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneer the",
+            " plants the\n",
+            " a a\n\n",
+            " is  the",
+            " { the\n",
+            " a a\n",
+            " {ioneerioneer",
+            "\n the\n"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 6.03125,
+              "competitor_mean": 7.5625,
+              "punctuation_mean": 10.625,
+              "generic_mean": 8.375,
+              "object_copy_mean": 7.15625,
+              "category_vs_competitor": -1.515625,
+              "category_vs_punctuation": -4.5625,
+              "category_vs_generic": -2.328125,
+              "category_vs_object_copy": -1.1171875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  4
+                ],
+                [
+                  " {",
+                  3
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  " **",
+                  1
+                ],
+                [
+                  " are",
+                  1
+                ],
+                [
+                  " \"",
+                  1
+                ],
+                [
+                  " light",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.140625,
+              "competitor_mean": 4.40625,
+              "punctuation_mean": 9.75,
+              "generic_mean": 5.65625,
+              "object_copy_mean": 6.75,
+              "category_vs_competitor": -2.25,
+              "category_vs_punctuation": -7.59375,
+              "category_vs_generic": -3.5,
+              "category_vs_object_copy": -4.59375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  8
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " ",
+                  4
+                ],
+                [
+                  " follows",
+                  4
+                ],
+                [
+                  "ioneer",
+                  4
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " as",
+                  1
+                ],
+                [
+                  "<think>",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.46875,
+              "competitor_mean": 4.3125,
+              "punctuation_mean": 11.0,
+              "generic_mean": 5.46875,
+              "object_copy_mean": 6.375,
+              "category_vs_competitor": -1.859375,
+              "category_vs_punctuation": -8.5,
+              "category_vs_generic": -3.0,
+              "category_vs_object_copy": -3.90625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.4333333671092987,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "\n",
+                  12
+                ],
+                [
+                  " the",
+                  5
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  ".",
+                  1
+                ],
+                [
+                  " what",
+                  1
+                ],
+                [
+                  "6",
+                  1
+                ],
+                [
+                  "(n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " { the\n",
+            " a a\n",
+            " is  the",
+            " ** the\n",
+            " a a\n\n",
+            " is  the",
+            " { the\n",
+            " a follows\n",
+            " {ioneerioneer",
+            "\n the\n"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 7.15625,
+              "competitor_mean": 8.125,
+              "punctuation_mean": 10.8125,
+              "generic_mean": 8.875,
+              "object_copy_mean": 7.53125,
+              "category_vs_competitor": -0.953125,
+              "category_vs_punctuation": -3.671875,
+              "category_vs_generic": -1.6953125,
+              "category_vs_object_copy": -0.380859375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  6
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " plants",
+                  2
+                ],
+                [
+                  " are",
+                  1
+                ],
+                [
+                  " \"",
+                  1
+                ],
+                [
+                  " light",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.828125,
+              "competitor_mean": 4.75,
+              "punctuation_mean": 9.5625,
+              "generic_mean": 5.9375,
+              "object_copy_mean": 7.21875,
+              "category_vs_competitor": -1.9296875,
+              "category_vs_punctuation": -6.71875,
+              "category_vs_generic": -3.125,
+              "category_vs_object_copy": -4.375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  7
+                ],
+                [
+                  "ioneer",
+                  7
+                ],
+                [
+                  " a",
+                  6
+                ],
+                [
+                  " follows",
+                  3
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  " as",
+                  1
+                ],
+                [
+                  "<think>",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 3.1875,
+              "competitor_mean": 4.6875,
+              "punctuation_mean": 10.75,
+              "generic_mean": 5.65625,
+              "object_copy_mean": 6.90625,
+              "category_vs_competitor": -1.5078125,
+              "category_vs_punctuation": -7.59375,
+              "category_vs_generic": -2.46875,
+              "category_vs_object_copy": -3.71875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.40000003576278687,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  "\n",
+                  12
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " the",
+                  3
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  "?",
+                  1
+                ],
+                [
+                  " what",
+                  1
+                ],
+                [
+                  "ol",
+                  1
+                ],
+                [
+                  "Options",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneer the",
+            " plants the\n",
+            " a a\n\n",
+            " is ioneer",
+            "\n\n\n",
+            " a a\n",
+            " isioneerioneer",
+            " __ the\n"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 6.8125,
+              "competitor_mean": 7.875,
+              "punctuation_mean": 10.875,
+              "generic_mean": 7.96875,
+              "object_copy_mean": 7.46875,
+              "category_vs_competitor": -1.03125,
+              "category_vs_punctuation": -4.0625,
+              "category_vs_generic": -1.1484375,
+              "category_vs_object_copy": -0.6328125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  5
+                ],
+                [
+                  " __",
+                  3
+                ],
+                [
+                  " {",
+                  3
+                ],
+                [
+                  " \"",
+                  2
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " plants",
+                  1
+                ],
+                [
+                  " are",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.46875,
+              "competitor_mean": 4.5625,
+              "punctuation_mean": 9.625,
+              "generic_mean": 5.28125,
+              "object_copy_mean": 6.875,
+              "category_vs_competitor": -2.09375,
+              "category_vs_punctuation": -7.125,
+              "category_vs_generic": -2.828125,
+              "category_vs_object_copy": -4.40625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  7
+                ],
+                [
+                  " a",
+                  6
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  " ",
+                  3
+                ],
+                [
+                  " follows",
+                  3
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " as",
+                  1
+                ],
+                [
+                  "<think>",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 3.09375,
+              "competitor_mean": 4.78125,
+              "punctuation_mean": 10.875,
+              "generic_mean": 5.21875,
+              "object_copy_mean": 6.6875,
+              "category_vs_competitor": -1.6796875,
+              "category_vs_punctuation": -7.78125,
+              "category_vs_generic": -2.125,
+              "category_vs_object_copy": -3.578125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.4333333671092987,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "\n",
+                  12
+                ],
+                [
+                  " the",
+                  5
+                ],
+                [
+                  "ioneer",
+                  5
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  ".",
+                  1
+                ],
+                [
+                  " what",
+                  1
+                ],
+                [
+                  "eq",
+                  1
+                ],
+                [
+                  ":\n\n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a a\n",
+            " isioneer the",
+            " plants the\n",
+            " a a\n\n",
+            " is  the",
+            " {\n\n",
+            " a a\n",
+            " {ioneerioneer",
+            " __ the\n"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 25,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 6.53125,
+              "competitor_mean": 7.8125,
+              "punctuation_mean": 10.375,
+              "generic_mean": 9.1875,
+              "object_copy_mean": 7.375,
+              "category_vs_competitor": -1.2734375,
+              "category_vs_punctuation": -3.84375,
+              "category_vs_generic": -2.6875,
+              "category_vs_object_copy": -0.85546875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  12
+                ],
+                [
+                  " is",
+                  6
+                ],
+                [
+                  " __",
+                  2
+                ],
+                [
+                  " {",
+                  2
+                ],
+                [
+                  "\n",
+                  2
+                ],
+                [
+                  " plants",
+                  1
+                ],
+                [
+                  " \"",
+                  1
+                ],
+                [
+                  " light",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.578125,
+              "competitor_mean": 4.59375,
+              "punctuation_mean": 9.6875,
+              "generic_mean": 6.34375,
+              "object_copy_mean": 7.09375,
+              "category_vs_competitor": -2.0,
+              "category_vs_punctuation": -7.0625,
+              "category_vs_generic": -3.75,
+              "category_vs_object_copy": -4.5,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  8
+                ],
+                [
+                  "ioneer",
+                  8
+                ],
+                [
+                  " follows",
+                  5
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  "\n",
+                  3
+                ],
+                [
+                  " ",
+                  1
+                ],
+                [
+                  "A",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 3.046875,
+              "competitor_mean": 4.4375,
+              "punctuation_mean": 10.3125,
+              "generic_mean": 6.09375,
+              "object_copy_mean": 6.75,
+              "category_vs_competitor": -1.390625,
+              "category_vs_punctuation": -7.28125,
+              "category_vs_generic": -3.046875,
+              "category_vs_object_copy": -3.71875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.4333333671092987,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "\n",
+                  11
+                ],
+                [
+                  "ioneer",
+                  6
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  "\n\n",
+                  3
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  " what",
+                  1
+                ],
+                [
+                  "1",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " __ the\n",
+            " a follows\n",
+            " isioneer the",
+            " plants the\n",
+            " a a\n\n",
+            " is ioneer",
+            " { the\n",
+            " a follows\n",
+            " {ioneerioneer",
+            "\n the\n"
+          ],
+          "category_hit_rate": 0.0
+        }
+      }
+    }
+  }
+}

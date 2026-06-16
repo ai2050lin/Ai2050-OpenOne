@@ -1,0 +1,2628 @@
+{
+  "phase": 510,
+  "model": "glm4",
+  "timestamp": "2026-06-16 21:33:49",
+  "L": 40,
+  "d_model": 4096,
+  "categories": [
+    "emotion",
+    "color",
+    "fruit"
+  ],
+  "train_objects": 20,
+  "test_objects": 10,
+  "templates": [
+    "category_of",
+    "taxonomy_as",
+    "classify_colon"
+  ],
+  "basis_templates": [
+    "plain",
+    "taxonomy",
+    "classify"
+  ],
+  "layers": [
+    20,
+    30,
+    37
+  ],
+  "rank": 4,
+  "steps": 3,
+  "scale": 1.0,
+  "category_results": {
+    "emotion": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 37,
+          "name": "svd1",
+          "delta_D": -0.4677257835865021
+        },
+        "release": {
+          "layer": 37,
+          "name": "combo0",
+          "delta_D": 1.5018941164016724
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.15625,
+              "competitor_mean": 4.15625,
+              "punctuation_mean": 8.6875,
+              "generic_mean": 4.6875,
+              "object_copy_mean": 6.03125,
+              "category_vs_competitor": -1.0,
+              "category_vs_punctuation": -5.53125,
+              "category_vs_generic": -1.5390625,
+              "category_vs_object_copy": -2.875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  9
+                ],
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " \"",
+                  5
+                ],
+                [
+                  " emotions",
+                  2
+                ],
+                [
+                  "ical",
+                  2
+                ],
+                [
+                  " social",
+                  1
+                ],
+                [
+                  " the",
+                  1
+                ],
+                [
+                  " an",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 5.28125,
+              "competitor_mean": 4.84375,
+              "punctuation_mean": 6.625,
+              "generic_mean": 6.0,
+              "object_copy_mean": 5.65625,
+              "category_vs_competitor": 0.427734375,
+              "category_vs_punctuation": -1.375,
+              "category_vs_generic": -0.734375,
+              "category_vs_object_copy": -0.384765625,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.06666667014360428,
+              "top_tokens": [
+                [
+                  " the",
+                  10
+                ],
+                [
+                  " tax",
+                  3
+                ],
+                [
+                  " emotions",
+                  2
+                ],
+                [
+                  "the",
+                  2
+                ],
+                [
+                  " that",
+                  2
+                ],
+                [
+                  " negative",
+                  2
+                ],
+                [
+                  "nost",
+                  1
+                ],
+                [
+                  "A",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 4.0625,
+              "competitor_mean": 3.5,
+              "punctuation_mean": 9.125,
+              "generic_mean": 4.75,
+              "object_copy_mean": 6.3125,
+              "category_vs_competitor": 0.5703125,
+              "category_vs_punctuation": -5.03125,
+              "category_vs_generic": -0.6875,
+              "category_vs_object_copy": -2.234375,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.13333334028720856,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  " as",
+                  7
+                ],
+                [
+                  ".",
+                  4
+                ],
+                [
+                  "on",
+                  3
+                ],
+                [
+                  " are",
+                  2
+                ],
+                [
+                  " emotion",
+                  2
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " fatigue",
+                  1
+                ],
+                [
+                  " joy",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " social emotions.",
+            " a taxon",
+            "  the fatigue",
+            " \"the joy",
+            " a taxon",
+            "  the as",
+            " emotions that are",
+            " a negative emotion",
+            "  the as",
+            " \"nostalg"
+          ],
+          "category_hit_rate": 0.23333333333333334
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 2.109375,
+              "competitor_mean": 3.21875,
+              "punctuation_mean": 8.625,
+              "generic_mean": 6.4375,
+              "object_copy_mean": 5.6875,
+              "category_vs_competitor": -1.109375,
+              "category_vs_punctuation": -6.5,
+              "category_vs_generic": -4.34375,
+              "category_vs_object_copy": -3.5625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " ",
+                  10
+                ],
+                [
+                  " a",
+                  9
+                ],
+                [
+                  " \"",
+                  5
+                ],
+                [
+                  " positive",
+                  2
+                ],
+                [
+                  " negative",
+                  2
+                ],
+                [
+                  " crimes",
+                  1
+                ],
+                [
+                  " an",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.96875,
+              "competitor_mean": 4.3125,
+              "punctuation_mean": 6.875,
+              "generic_mean": 7.84375,
+              "object_copy_mean": 5.59375,
+              "category_vs_competitor": 0.65234375,
+              "category_vs_punctuation": -1.8984375,
+              "category_vs_generic": -2.859375,
+              "category_vs_object_copy": -0.625,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.2666666805744171,
+              "object_copy_top1_rate": 0.06666667014360428,
+              "top_tokens": [
+                [
+                  " the",
+                  10
+                ],
+                [
+                  " type",
+                  8
+                ],
+                [
+                  " emotions",
+                  4
+                ],
+                [
+                  "del",
+                  1
+                ],
+                [
+                  "a",
+                  1
+                ],
+                [
+                  "class",
+                  1
+                ],
+                [
+                  " land",
+                  1
+                ],
+                [
+                  "The",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.625,
+              "competitor_mean": 3.046875,
+              "punctuation_mean": 9.8125,
+              "generic_mean": 5.40625,
+              "object_copy_mean": 5.65625,
+              "category_vs_competitor": -0.421875,
+              "category_vs_punctuation": -7.1875,
+              "category_vs_generic": -2.765625,
+              "category_vs_object_copy": -3.015625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.1666666716337204,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  9
+                ],
+                [
+                  " as",
+                  7
+                ],
+                [
+                  ".",
+                  5
+                ],
+                [
+                  "ight",
+                  1
+                ],
+                [
+                  "ffect",
+                  1
+                ],
+                [
+                  "ical",
+                  1
+                ],
+                [
+                  "form",
+                  1
+                ],
+                [
+                  " in",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " positive emotions.",
+            " a type of",
+            "  the as",
+            " \"delight",
+            " a type of",
+            "  the as",
+            " negative emotions.",
+            " a type of",
+            "  the as",
+            " \"affect"
+          ],
+          "category_hit_rate": 0.16666666666666666
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.828125,
+              "competitor_mean": 4.78125,
+              "punctuation_mean": 8.5,
+              "generic_mean": 3.625,
+              "object_copy_mean": 5.90625,
+              "category_vs_competitor": -0.9453125,
+              "category_vs_punctuation": -4.6875,
+              "category_vs_generic": 0.208984375,
+              "category_vs_object_copy": -2.0625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  10
+                ],
+                [
+                  "ical",
+                  10
+                ],
+                [
+                  " \"",
+                  5
+                ],
+                [
+                  " emotions",
+                  3
+                ],
+                [
+                  " human",
+                  1
+                ],
+                [
+                  " mental",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.96875,
+              "competitor_mean": 4.71875,
+              "punctuation_mean": 6.84375,
+              "generic_mean": 4.40625,
+              "object_copy_mean": 5.25,
+              "category_vs_competitor": 0.251953125,
+              "category_vs_punctuation": -1.859375,
+              "category_vs_generic": 0.58203125,
+              "category_vs_object_copy": -0.271484375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.06666667014360428,
+              "top_tokens": [
+                [
+                  " the",
+                  10
+                ],
+                [
+                  " that",
+                  3
+                ],
+                [
+                  "the",
+                  2
+                ],
+                [
+                  " negative",
+                  2
+                ],
+                [
+                  " tax",
+                  2
+                ],
+                [
+                  " emotions",
+                  1
+                ],
+                [
+                  " human",
+                  1
+                ],
+                [
+                  "...",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.21875,
+              "competitor_mean": 4.09375,
+              "punctuation_mean": 8.625,
+              "generic_mean": 3.96875,
+              "object_copy_mean": 6.71875,
+              "category_vs_competitor": 1.125,
+              "category_vs_punctuation": -3.421875,
+              "category_vs_generic": 1.2421875,
+              "category_vs_object_copy": -1.5078125,
+              "category_top1_rate": 0.10000000894069672,
+              "punctuation_top1_rate": 0.10000000894069672,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " as",
+                  7
+                ],
+                [
+                  " emotion",
+                  3
+                ],
+                [
+                  " are",
+                  3
+                ],
+                [
+                  ".",
+                  2
+                ],
+                [
+                  "on",
+                  2
+                ],
+                [
+                  " fatigue",
+                  1
+                ],
+                [
+                  " joy",
+                  1
+                ],
+                [
+                  "\n",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " human emotions.",
+            " a human emotion",
+            "ical the fatigue",
+            " \"the joy",
+            " a...\n",
+            "ical the as",
+            " emotions that are",
+            " a negative emotion",
+            "ical the as",
+            " emotions that are"
+          ],
+          "category_hit_rate": 0.23333333333333334
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 4.21875,
+              "competitor_mean": 3.828125,
+              "punctuation_mean": 9.625,
+              "generic_mean": 3.40625,
+              "object_copy_mean": 6.46875,
+              "category_vs_competitor": 0.37890625,
+              "category_vs_punctuation": -5.40625,
+              "category_vs_generic": 0.796875,
+              "category_vs_object_copy": -2.265625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.3333333432674408,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "\n",
+                  10
+                ],
+                [
+                  " a",
+                  8
+                ],
+                [
+                  " \"",
+                  3
+                ],
+                [
+                  " emotions",
+                  3
+                ],
+                [
+                  " the",
+                  2
+                ],
+                [
+                  " an",
+                  2
+                ],
+                [
+                  " human",
+                  1
+                ],
+                [
+                  " negative",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 6.75,
+              "competitor_mean": 4.21875,
+              "punctuation_mean": 8.25,
+              "generic_mean": 4.5,
+              "object_copy_mean": 5.84375,
+              "category_vs_competitor": 2.5625,
+              "category_vs_punctuation": -1.4609375,
+              "category_vs_generic": 2.265625,
+              "category_vs_object_copy": 0.92578125,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  " the",
+                  10
+                ],
+                [
+                  " tax",
+                  3
+                ],
+                [
+                  " that",
+                  3
+                ],
+                [
+                  " emotions",
+                  2
+                ],
+                [
+                  "the",
+                  2
+                ],
+                [
+                  " negative",
+                  2
+                ],
+                [
+                  " emotion",
+                  2
+                ],
+                [
+                  "A",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 5.1875,
+              "competitor_mean": 2.953125,
+              "punctuation_mean": 10.3125,
+              "generic_mean": 3.75,
+              "object_copy_mean": 6.34375,
+              "category_vs_competitor": 2.234375,
+              "category_vs_punctuation": -5.15625,
+              "category_vs_generic": 1.4375,
+              "category_vs_object_copy": -1.15625,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.20000001788139343,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " as",
+                  7
+                ],
+                [
+                  ".",
+                  6
+                ],
+                [
+                  "on",
+                  3
+                ],
+                [
+                  " are",
+                  3
+                ],
+                [
+                  " more",
+                  2
+                ],
+                [
+                  " emotion",
+                  2
+                ],
+                [
+                  " fatigue",
+                  1
+                ],
+                [
+                  " Chinese",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " human emotions.",
+            " a taxon",
+            "\n the fatigue",
+            " \"the more",
+            " a taxon",
+            "\n the as",
+            " emotions that are",
+            " a negative emotion",
+            "\n the as",
+            " emotions that are"
+          ],
+          "category_hit_rate": 0.3
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 1.6015625,
+              "competitor_mean": 3.859375,
+              "punctuation_mean": 7.96875,
+              "generic_mean": 5.875,
+              "object_copy_mean": 4.96875,
+              "category_vs_competitor": -2.25,
+              "category_vs_punctuation": -6.375,
+              "category_vs_generic": -4.28125,
+              "category_vs_object_copy": -3.359375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  10
+                ],
+                [
+                  " ",
+                  10
+                ],
+                [
+                  " \"",
+                  6
+                ],
+                [
+                  " social",
+                  1
+                ],
+                [
+                  " negative",
+                  1
+                ],
+                [
+                  " positive",
+                  1
+                ],
+                [
+                  " mental",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 3.71875,
+              "competitor_mean": 5.3125,
+              "punctuation_mean": 5.1875,
+              "generic_mean": 7.03125,
+              "object_copy_mean": 5.53125,
+              "category_vs_competitor": -1.5859375,
+              "category_vs_punctuation": -1.4765625,
+              "category_vs_generic": -3.328125,
+              "category_vs_object_copy": -1.8046875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.13333334028720856,
+              "object_copy_top1_rate": 0.1666666716337204,
+              "top_tokens": [
+                [
+                  " the",
+                  10
+                ],
+                [
+                  " type",
+                  4
+                ],
+                [
+                  " emotions",
+                  3
+                ],
+                [
+                  " virtue",
+                  1
+                ],
+                [
+                  "del",
+                  1
+                ],
+                [
+                  " noun",
+                  1
+                ],
+                [
+                  " feeling",
+                  1
+                ],
+                [
+                  "nost",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.078125,
+              "competitor_mean": 3.546875,
+              "punctuation_mean": 9.0625,
+              "generic_mean": 5.125,
+              "object_copy_mean": 5.53125,
+              "category_vs_competitor": -1.4609375,
+              "category_vs_punctuation": -7.0,
+              "category_vs_generic": -3.03125,
+              "category_vs_object_copy": -3.453125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.20000001788139343,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " as",
+                  8
+                ],
+                [
+                  " of",
+                  7
+                ],
+                [
+                  ".",
+                  6
+                ],
+                [
+                  "ight",
+                  1
+                ],
+                [
+                  "alg",
+                  1
+                ],
+                [
+                  "ief",
+                  1
+                ],
+                [
+                  "form",
+                  1
+                ],
+                [
+                  " features",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " social emotions.",
+            " a virtue.",
+            "  the as",
+            " \"delight",
+            " a noun.",
+            "  the as",
+            " negative emotions.",
+            " a feeling.",
+            "  the as",
+            " \"nostalg"
+          ],
+          "category_hit_rate": 0.1
+        }
+      }
+    },
+    "color": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 37,
+          "name": "svd3",
+          "delta_D": -0.5794396996498108
+        },
+        "release": {
+          "layer": 37,
+          "name": "svd0",
+          "delta_D": 0.35977044701576233
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.5625,
+              "competitor_mean": 3.25,
+              "punctuation_mean": 7.25,
+              "generic_mean": 3.6875,
+              "object_copy_mean": 5.8125,
+              "category_vs_competitor": 0.318359375,
+              "category_vs_punctuation": -3.6875,
+              "category_vs_generic": -0.1162109375,
+              "category_vs_object_copy": -2.25,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  " ",
+                  9
+                ],
+                [
+                  " classified",
+                  4
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  " family",
+                  3
+                ],
+                [
+                  " not",
+                  2
+                ],
+                [
+                  " color",
+                  1
+                ],
+                [
+                  " mint",
+                  1
+                ],
+                [
+                  " elephant",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 3.265625,
+              "competitor_mean": 3.5625,
+              "punctuation_mean": 9.25,
+              "generic_mean": 3.875,
+              "object_copy_mean": 4.96875,
+              "category_vs_competitor": -0.298828125,
+              "category_vs_punctuation": -5.96875,
+              "category_vs_generic": -0.61328125,
+              "category_vs_object_copy": -1.703125,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.30000001192092896,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  8
+                ],
+                [
+                  " as",
+                  8
+                ],
+                [
+                  ":",
+                  8
+                ],
+                [
+                  " green",
+                  1
+                ],
+                [
+                  " a",
+                  1
+                ],
+                [
+                  " the",
+                  1
+                ],
+                [
+                  ",",
+                  1
+                ],
+                [
+                  " color",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.765625,
+              "competitor_mean": 4.5625,
+              "punctuation_mean": 8.5,
+              "generic_mean": 4.71875,
+              "object_copy_mean": 6.0,
+              "category_vs_competitor": -1.8046875,
+              "category_vs_punctuation": -5.75,
+              "category_vs_generic": -1.9609375,
+              "category_vs_object_copy": -3.25,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  8
+                ],
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " gem",
+                  1
+                ],
+                [
+                  " aromatic",
+                  1
+                ],
+                [
+                  " cn",
+                  1
+                ],
+                [
+                  " fish",
+                  1
+                ],
+                [
+                  " precious",
+                  1
+                ],
+                [
+                  " neutral",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " color of gem",
+            " a as a",
+            " : ",
+            " mint of aromatic",
+            " classified as a",
+            " : ",
+            " family of cn",
+            " classified as a",
+            " : ",
+            " family of fish"
+          ],
+          "category_hit_rate": 0.06666666666666667
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.5625,
+              "competitor_mean": 4.34375,
+              "punctuation_mean": 7.125,
+              "generic_mean": 2.453125,
+              "object_copy_mean": 5.6875,
+              "category_vs_competitor": -0.796875,
+              "category_vs_punctuation": -3.546875,
+              "category_vs_generic": 1.109375,
+              "category_vs_object_copy": -2.125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " classified",
+                  5
+                ],
+                [
+                  " of",
+                  3
+                ],
+                [
+                  " sea",
+                  1
+                ],
+                [
+                  " mint",
+                  1
+                ],
+                [
+                  " ph",
+                  1
+                ],
+                [
+                  " family",
+                  1
+                ],
+                [
+                  " elephant",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 4.03125,
+              "competitor_mean": 4.8125,
+              "punctuation_mean": 8.9375,
+              "generic_mean": 3.03125,
+              "object_copy_mean": 5.90625,
+              "category_vs_competitor": -0.7734375,
+              "category_vs_punctuation": -4.9375,
+              "category_vs_generic": 1.0078125,
+              "category_vs_object_copy": -1.859375,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  8
+                ],
+                [
+                  " as",
+                  8
+                ],
+                [
+                  " and",
+                  8
+                ],
+                [
+                  " green",
+                  1
+                ],
+                [
+                  " a",
+                  1
+                ],
+                [
+                  " the",
+                  1
+                ],
+                [
+                  ",",
+                  1
+                ],
+                [
+                  " color",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.734375,
+              "competitor_mean": 5.0625,
+              "punctuation_mean": 8.625,
+              "generic_mean": 2.953125,
+              "object_copy_mean": 6.28125,
+              "category_vs_competitor": -2.34375,
+              "category_vs_punctuation": -5.90625,
+              "category_vs_generic": -0.2255859375,
+              "category_vs_object_copy": -3.546875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  "-",
+                  8
+                ],
+                [
+                  " a",
+                  5
+                ],
+                [
+                  " gem",
+                  2
+                ],
+                [
+                  "#",
+                  2
+                ],
+                [
+                  " flowers",
+                  1
+                ],
+                [
+                  "L",
+                  1
+                ],
+                [
+                  " cn",
+                  1
+                ],
+                [
+                  " fish",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " sea of gem",
+            " of as a",
+            "  and-",
+            " mint of flowers",
+            " classified asL",
+            "  and-",
+            " ph of cn",
+            " classified as#",
+            "  and-",
+            " family of fish"
+          ],
+          "category_hit_rate": 0.03333333333333333
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 2.90625,
+              "competitor_mean": 2.140625,
+              "punctuation_mean": 7.625,
+              "generic_mean": 5.21875,
+              "object_copy_mean": 4.9375,
+              "category_vs_competitor": 0.765625,
+              "category_vs_punctuation": -4.71875,
+              "category_vs_generic": -2.296875,
+              "category_vs_object_copy": -2.03125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  10
+                ],
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " family",
+                  2
+                ],
+                [
+                  " very",
+                  2
+                ],
+                [
+                  " genus",
+                  1
+                ],
+                [
+                  " order",
+                  1
+                ],
+                [
+                  " elephant",
+                  1
+                ],
+                [
+                  " not",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.125,
+              "competitor_mean": 1.84375,
+              "punctuation_mean": 11.9375,
+              "generic_mean": 5.3125,
+              "object_copy_mean": 4.4375,
+              "category_vs_competitor": 0.2890625,
+              "category_vs_punctuation": -9.8125,
+              "category_vs_generic": -3.171875,
+              "category_vs_object_copy": -2.328125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.03333333507180214,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  8
+                ],
+                [
+                  " as",
+                  8
+                ],
+                [
+                  ":",
+                  8
+                ],
+                [
+                  " the",
+                  2
+                ],
+                [
+                  " a",
+                  1
+                ],
+                [
+                  " very",
+                  1
+                ],
+                [
+                  " type",
+                  1
+                ],
+                [
+                  "an",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.328125,
+              "competitor_mean": 3.25,
+              "punctuation_mean": 7.9375,
+              "generic_mean": 5.59375,
+              "object_copy_mean": 4.90625,
+              "category_vs_competitor": -0.91015625,
+              "category_vs_punctuation": -5.59375,
+              "category_vs_generic": -3.265625,
+              "category_vs_object_copy": -2.578125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  10
+                ],
+                [
+                  " based",
+                  8
+                ],
+                [
+                  " the",
+                  6
+                ],
+                [
+                  " essential",
+                  1
+                ],
+                [
+                  " neutral",
+                  1
+                ],
+                [
+                  " types",
+                  1
+                ],
+                [
+                  " bright",
+                  1
+                ],
+                [
+                  " of",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " a of the",
+            " a as a",
+            " : based",
+            " genus of essential",
+            " a as a",
+            " : based",
+            " order of the",
+            " a as a",
+            " : based",
+            " family of the"
+          ],
+          "category_hit_rate": 0.0
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.203125,
+              "competitor_mean": 2.53125,
+              "punctuation_mean": 7.375,
+              "generic_mean": 3.078125,
+              "object_copy_mean": 6.03125,
+              "category_vs_competitor": 0.66796875,
+              "category_vs_punctuation": -4.15625,
+              "category_vs_generic": 0.11669921875,
+              "category_vs_object_copy": -2.828125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.03333333507180214,
+              "top_tokens": [
+                [
+                  " ",
+                  9
+                ],
+                [
+                  " classified",
+                  5
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  " family",
+                  3
+                ],
+                [
+                  " category",
+                  1
+                ],
+                [
+                  " mint",
+                  1
+                ],
+                [
+                  " class",
+                  1
+                ],
+                [
+                  " elephant",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 2.53125,
+              "competitor_mean": 2.515625,
+              "punctuation_mean": 11.5,
+              "generic_mean": 3.078125,
+              "object_copy_mean": 5.34375,
+              "category_vs_competitor": 0.020751953125,
+              "category_vs_punctuation": -8.9375,
+              "category_vs_generic": -0.5546875,
+              "category_vs_object_copy": -2.8125,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.2666666805744171,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  8
+                ],
+                [
+                  " as",
+                  8
+                ],
+                [
+                  ":",
+                  8
+                ],
+                [
+                  " green",
+                  1
+                ],
+                [
+                  " a",
+                  1
+                ],
+                [
+                  " the",
+                  1
+                ],
+                [
+                  " most",
+                  1
+                ],
+                [
+                  " color",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 2.40625,
+              "competitor_mean": 3.53125,
+              "punctuation_mean": 8.875,
+              "generic_mean": 3.59375,
+              "object_copy_mean": 6.09375,
+              "category_vs_competitor": -1.1328125,
+              "category_vs_punctuation": -6.4375,
+              "category_vs_generic": -1.1953125,
+              "category_vs_object_copy": -3.703125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  8
+                ],
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " the",
+                  2
+                ],
+                [
+                  " gem",
+                  1
+                ],
+                [
+                  " aromatic",
+                  1
+                ],
+                [
+                  " cn",
+                  1
+                ],
+                [
+                  " fish",
+                  1
+                ],
+                [
+                  " precious",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " category of gem",
+            " a as a",
+            " : ",
+            " mint of aromatic",
+            " classified as a",
+            " : ",
+            " class of cn",
+            " classified as a",
+            " : ",
+            " family of fish"
+          ],
+          "category_hit_rate": 0.03333333333333333
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.921875,
+              "competitor_mean": 3.71875,
+              "punctuation_mean": 7.125,
+              "generic_mean": 4.28125,
+              "object_copy_mean": 5.375,
+              "category_vs_competitor": 0.2177734375,
+              "category_vs_punctuation": -3.203125,
+              "category_vs_generic": -0.33984375,
+              "category_vs_object_copy": -1.4375,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " ",
+                  9
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  " classified",
+                  3
+                ],
+                [
+                  " color",
+                  2
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " not",
+                  2
+                ],
+                [
+                  " ph",
+                  1
+                ],
+                [
+                  " family",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 3.953125,
+              "competitor_mean": 4.4375,
+              "punctuation_mean": 7.96875,
+              "generic_mean": 4.53125,
+              "object_copy_mean": 4.53125,
+              "category_vs_competitor": -0.48046875,
+              "category_vs_punctuation": -4.03125,
+              "category_vs_generic": -0.58203125,
+              "category_vs_object_copy": -0.578125,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.03333333507180214,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  9
+                ],
+                [
+                  " of",
+                  8
+                ],
+                [
+                  " as",
+                  8
+                ],
+                [
+                  " green",
+                  1
+                ],
+                [
+                  " a",
+                  1
+                ],
+                [
+                  ",",
+                  1
+                ],
+                [
+                  " color",
+                  1
+                ],
+                [
+                  "an",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 3.234375,
+              "competitor_mean": 5.21875,
+              "punctuation_mean": 8.3125,
+              "generic_mean": 5.75,
+              "object_copy_mean": 5.59375,
+              "category_vs_competitor": -2.0,
+              "category_vs_punctuation": -5.09375,
+              "category_vs_generic": -2.5,
+              "category_vs_object_copy": -2.375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  8
+                ],
+                [
+                  " ",
+                  8
+                ],
+                [
+                  " gem",
+                  1
+                ],
+                [
+                  " aromatic",
+                  1
+                ],
+                [
+                  " cn",
+                  1
+                ],
+                [
+                  " fish",
+                  1
+                ],
+                [
+                  " precious",
+                  1
+                ],
+                [
+                  " neutral",
+                  1
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " color of gem",
+            " a as a",
+            "  the ",
+            " genus of aromatic",
+            " classified as a",
+            "  the ",
+            " ph of cn",
+            " classified as a",
+            "  the ",
+            " family of fish"
+          ],
+          "category_hit_rate": 0.1
+        }
+      }
+    },
+    "fruit": {
+      "n_generation_prompts": 30,
+      "chosen_axes": {
+        "support": {
+          "layer": 30,
+          "name": "svd0",
+          "delta_D": -0.7750941514968872
+        },
+        "release": {
+          "layer": 37,
+          "name": "combo0",
+          "delta_D": 0.5500300526618958
+        },
+        "candidate_count": 36
+      },
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 5,
+        "generic": 6,
+        "object_copy": 20
+      },
+      "traces": {
+        "clean": {
+          "mode": "clean",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 4.25,
+              "competitor_mean": 2.703125,
+              "punctuation_mean": 7.78125,
+              "generic_mean": 3.390625,
+              "object_copy_mean": 5.625,
+              "category_vs_competitor": 1.5546875,
+              "category_vs_punctuation": -3.53125,
+              "category_vs_generic": 0.8671875,
+              "category_vs_object_copy": -1.359375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " ",
+                  6
+                ],
+                [
+                  " of",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " stone",
+                  3
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " classified",
+                  2
+                ],
+                [
+                  " citrus",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 7.1875,
+              "competitor_mean": 2.921875,
+              "punctuation_mean": 7.75,
+              "generic_mean": 4.59375,
+              "object_copy_mean": 5.8125,
+              "category_vs_competitor": 4.28125,
+              "category_vs_punctuation": -0.546875,
+              "category_vs_generic": 2.59375,
+              "category_vs_object_copy": 1.3671875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " fruits",
+                  5
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ],
+                [
+                  ":",
+                  2
+                ],
+                [
+                  " Vacc",
+                  1
+                ],
+                [
+                  " citrus",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 7.25,
+              "competitor_mean": 3.84375,
+              "punctuation_mean": 9.625,
+              "generic_mean": 4.3125,
+              "object_copy_mean": 6.25,
+              "category_vs_competitor": 3.421875,
+              "category_vs_punctuation": -2.390625,
+              "category_vs_generic": 2.953125,
+              "category_vs_object_copy": 1.03125,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.1666666716337204,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  ",",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  " berries",
+                  3
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  " a",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "olution",
+                  2
+                ],
+                [
+                  " fruit",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " genus of fruits",
+            " classified as a",
+            " : ",
+            " of Vacc berries",
+            " as aBlue",
+            "  theberries",
+            " genus of berries",
+            " classified as a",
+            " : ",
+            " of fruits berries"
+          ],
+          "category_hit_rate": 0.3
+        },
+        "remove_support": {
+          "mode": "remove_support",
+          "layer": 30,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.65625,
+              "competitor_mean": 2.578125,
+              "punctuation_mean": 8.375,
+              "generic_mean": 3.359375,
+              "object_copy_mean": 5.25,
+              "category_vs_competitor": 1.0703125,
+              "category_vs_punctuation": -4.71875,
+              "category_vs_generic": 0.30078125,
+              "category_vs_object_copy": -1.6015625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.13333334028720856,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  ":",
+                  4
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " classified",
+                  2
+                ],
+                [
+                  " most",
+                  2
+                ],
+                [
+                  " stone",
+                  2
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 5.59375,
+              "competitor_mean": 2.703125,
+              "punctuation_mean": 8.1875,
+              "generic_mean": 4.125,
+              "object_copy_mean": 5.34375,
+              "category_vs_competitor": 2.875,
+              "category_vs_punctuation": -2.640625,
+              "category_vs_generic": 1.4453125,
+              "category_vs_object_copy": 0.2490234375,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  " fruits",
+                  3
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  " Vacc",
+                  1
+                ],
+                [
+                  " berries",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 6.28125,
+              "competitor_mean": 3.703125,
+              "punctuation_mean": 9.5625,
+              "generic_mean": 3.953125,
+              "object_copy_mean": 5.9375,
+              "category_vs_competitor": 2.5625,
+              "category_vs_punctuation": -3.28125,
+              "category_vs_generic": 2.3125,
+              "category_vs_object_copy": 0.328125,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.23333334922790527,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  ",",
+                  4
+                ],
+                [
+                  " berries",
+                  3
+                ],
+                [
+                  "olution",
+                  3
+                ],
+                [
+                  " as",
+                  3
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  " a",
+                  2
+                ],
+                [
+                  ":",
+                  2
+                ],
+                [
+                  " and",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " genus of fruits",
+            " classified as a",
+            " most :",
+            " of Vacc berries",
+            " as aBlue",
+            ": the,",
+            " genus of berries",
+            " classified as a",
+            " most :",
+            " of berries berries"
+          ],
+          "category_hit_rate": 0.23333333333333334
+        },
+        "add_support": {
+          "mode": "add_support",
+          "layer": 30,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 5.28125,
+              "competitor_mean": 2.765625,
+              "punctuation_mean": 7.4375,
+              "generic_mean": 3.640625,
+              "object_copy_mean": 5.59375,
+              "category_vs_competitor": 2.515625,
+              "category_vs_punctuation": -2.15625,
+              "category_vs_generic": 1.6328125,
+              "category_vs_object_copy": -0.330078125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  " ",
+                  4
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " stone",
+                  3
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " classified",
+                  2
+                ],
+                [
+                  "ain",
+                  2
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 8.25,
+              "competitor_mean": 3.21875,
+              "punctuation_mean": 7.375,
+              "generic_mean": 4.78125,
+              "object_copy_mean": 6.15625,
+              "category_vs_competitor": 5.0,
+              "category_vs_punctuation": 0.86328125,
+              "category_vs_generic": 3.4375,
+              "category_vs_object_copy": 2.078125,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.06666667014360428,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " fruits",
+                  6
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ],
+                [
+                  ":",
+                  2
+                ],
+                [
+                  "ines",
+                  2
+                ],
+                [
+                  " stone",
+                  2
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 8.5625,
+              "competitor_mean": 4.0625,
+              "punctuation_mean": 9.3125,
+              "generic_mean": 4.15625,
+              "object_copy_mean": 6.4375,
+              "category_vs_competitor": 4.5,
+              "category_vs_punctuation": -0.70703125,
+              "category_vs_generic": 4.40625,
+              "category_vs_object_copy": 2.140625,
+              "category_top1_rate": 0.10000000894069672,
+              "punctuation_top1_rate": 0.13333334028720856,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  ",",
+                  4
+                ],
+                [
+                  " berries",
+                  3
+                ],
+                [
+                  " fruit",
+                  3
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  " a",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "cient",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " genus of fruits",
+            " classified as a",
+            "ain: ",
+            " of fruits berries",
+            " as aBlue",
+            "  theberries",
+            " genus of berries",
+            " classified as a",
+            "ain: ",
+            " of fruits berries"
+          ],
+          "category_hit_rate": 0.36666666666666664
+        },
+        "remove_release": {
+          "mode": "remove_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 4.8125,
+              "competitor_mean": 3.203125,
+              "punctuation_mean": 8.0625,
+              "generic_mean": 4.6875,
+              "object_copy_mean": 5.78125,
+              "category_vs_competitor": 1.59375,
+              "category_vs_punctuation": -3.234375,
+              "category_vs_generic": 0.10205078125,
+              "category_vs_object_copy": -0.98046875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " ",
+                  6
+                ],
+                [
+                  " of",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  " stone",
+                  3
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " classified",
+                  2
+                ],
+                [
+                  " citrus",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 7.5,
+              "competitor_mean": 3.265625,
+              "punctuation_mean": 7.625,
+              "generic_mean": 5.4375,
+              "object_copy_mean": 5.90625,
+              "category_vs_competitor": 4.25,
+              "category_vs_punctuation": -0.125,
+              "category_vs_generic": 2.0625,
+              "category_vs_object_copy": 1.6171875,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " the",
+                  6
+                ],
+                [
+                  " fruits",
+                  5
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ],
+                [
+                  " a",
+                  2
+                ],
+                [
+                  " belonging",
+                  2
+                ],
+                [
+                  " super",
+                  1
+                ],
+                [
+                  " citrus",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 7.53125,
+              "competitor_mean": 4.40625,
+              "punctuation_mean": 9.625,
+              "generic_mean": 5.625,
+              "object_copy_mean": 6.3125,
+              "category_vs_competitor": 3.140625,
+              "category_vs_punctuation": -2.078125,
+              "category_vs_generic": 1.9140625,
+              "category_vs_object_copy": 1.2421875,
+              "category_top1_rate": 0.06666667014360428,
+              "punctuation_top1_rate": 0.13333334028720856,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  ",",
+                  4
+                ],
+                [
+                  " berries",
+                  3
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  " a",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ],
+                [
+                  "olution",
+                  2
+                ],
+                [
+                  " fruit",
+                  2
+                ],
+                [
+                  " and",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " genus of fruits",
+            " classified as a",
+            "  the ",
+            " of super berries",
+            " as aBlue",
+            "  the light",
+            " genus of berries",
+            " classified as a",
+            "  the ",
+            " of fruits berries"
+          ],
+          "category_hit_rate": 0.3
+        },
+        "add_release": {
+          "mode": "add_release",
+          "layer": 37,
+          "step_metrics": [
+            {
+              "step": 1,
+              "category_mean": 3.953125,
+              "competitor_mean": 2.28125,
+              "punctuation_mean": 7.71875,
+              "generic_mean": 2.46875,
+              "object_copy_mean": 5.5625,
+              "category_vs_competitor": 1.6796875,
+              "category_vs_punctuation": -3.765625,
+              "category_vs_generic": 1.484375,
+              "category_vs_object_copy": -1.6015625,
+              "category_top1_rate": 0.0,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " of",
+                  4
+                ],
+                [
+                  " as",
+                  4
+                ],
+                [
+                  "ical",
+                  4
+                ],
+                [
+                  " a",
+                  4
+                ],
+                [
+                  " stone",
+                  3
+                ],
+                [
+                  " genus",
+                  2
+                ],
+                [
+                  " classified",
+                  2
+                ],
+                [
+                  " ",
+                  2
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "category_mean": 6.53125,
+              "competitor_mean": 2.5,
+              "punctuation_mean": 7.5625,
+              "generic_mean": 3.546875,
+              "object_copy_mean": 5.78125,
+              "category_vs_competitor": 4.0,
+              "category_vs_punctuation": -1.0625,
+              "category_vs_generic": 2.96875,
+              "category_vs_object_copy": 0.75,
+              "category_top1_rate": 0.03333333507180214,
+              "punctuation_top1_rate": 0.0,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  " a",
+                  5
+                ],
+                [
+                  " the",
+                  4
+                ],
+                [
+                  " fruits",
+                  4
+                ],
+                [
+                  " of",
+                  2
+                ],
+                [
+                  " as",
+                  2
+                ],
+                [
+                  "2",
+                  2
+                ],
+                [
+                  " stone",
+                  2
+                ],
+                [
+                  " Vacc",
+                  1
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "category_mean": 7.09375,
+              "competitor_mean": 3.28125,
+              "punctuation_mean": 9.5,
+              "generic_mean": 3.234375,
+              "object_copy_mean": 6.28125,
+              "category_vs_competitor": 3.828125,
+              "category_vs_punctuation": -2.375,
+              "category_vs_generic": 3.875,
+              "category_vs_object_copy": 0.828125,
+              "category_top1_rate": 0.10000000894069672,
+              "punctuation_top1_rate": 0.1666666716337204,
+              "generic_top1_rate": 0.0,
+              "object_copy_top1_rate": 0.0,
+              "top_tokens": [
+                [
+                  ",",
+                  5
+                ],
+                [
+                  " as",
+                  5
+                ],
+                [
+                  " a",
+                  3
+                ],
+                [
+                  " berries",
+                  3
+                ],
+                [
+                  " fruit",
+                  3
+                ],
+                [
+                  " fruits",
+                  2
+                ],
+                [
+                  "ical",
+                  2
+                ],
+                [
+                  "olution",
+                  2
+                ]
+              ]
+            }
+          ],
+          "generated_samples": [
+            " genus of fruits",
+            " classified as a",
+            " 2ical",
+            " of Vacc berries",
+            " as aBlue",
+            "ical theberries",
+            " genus of berries",
+            " classified as a",
+            " 2ical",
+            " of a berries"
+          ],
+          "category_hit_rate": 0.3333333333333333
+        }
+      }
+    }
+  }
+}

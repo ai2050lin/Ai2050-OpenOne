@@ -32270,3 +32270,1317 @@ Phase 508 的判据:
 且跨模板/跨对象/跨模型复现,
 则它们才可以被称为正交场中的真实功能子结构。
 ```
+
+
+---
+
+## Phase 508: Orthogonal Field Causal Basis Decomposition 正交场因果基底分解 [2026-06-16 19:36]
+
+### 本阶段目标
+
+根据用户提供的 Phase507 外部分析, 其核心判断基本正确:
+
+```text
+Phi_perp 不是噪声。
+Phi_perp 也不是最终 token 生成闭合机制。
+Phi_perp 更像高维语义/任务/格式/对象/接口混合场。
+```
+
+Phase508 的任务不是继续整体 remove_perp, 而是把 Phi_perp 拆成更小的可干预方向, 直接测试:
+
+```text
+哪些 basis 像 support;
+哪些 basis 像 suppressor/interface;
+哪些 basis 与 format/template 高度相关;
+随机正交方向是否也能产生同等效果。
+```
+
+### 新增脚本
+
+- 主测试脚本: `tests/glm5/phase508_orthogonal_field_basis_decomposition.py`
+- 汇总脚本: `tests/glm5/phase508_orthogonal_field_basis_summary.py`
+
+脚本设计:
+
+```text
+1. 继承 Phase507 的 7 个类别。
+2. 每类 30 个对象, 20 train + 10 heldout test。
+3. 加入 3 个模板:
+   plain
+   taxonomy
+   classify
+4. 对 train split 构造 Phi_perp。
+5. 对 Phi_perp 做 rank4 SVD basis。
+6. 对 heldout test split 做 batched CUDA causal ablation。
+7. 加 rank4 random orthogonal basis control。
+8. 记录:
+   delta_D
+   delta_T
+   delta_C
+   delta_target_prob
+   delta_argmax_rate
+   readout_cos
+   mean_perp_cos
+   format_abs_cos
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase508_orthogonal_field_basis_decomposition.py \
+  tests/glm5/phase508_orthogonal_field_basis_summary.py
+
+python tests/glm5/phase508_orthogonal_field_basis_decomposition.py qwen3 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase508_orthogonal_field_basis \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase508_orthogonal_field_basis_decomposition.py glm4 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase508_orthogonal_field_basis \
+  --hard-exit-after-model
+
+python tests/glm5/phase508_orthogonal_field_basis_decomposition.py deepseek7b \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase508_orthogonal_field_basis \
+  --hard-exit-after-model
+
+python tests/glm5/phase508_orthogonal_field_basis_summary.py
+```
+
+### 结果文件
+
+- `results/glm5_phase508_orthogonal_field_basis/phase508_qwen3_orthogonal_field_basis.json`
+- `results/glm5_phase508_orthogonal_field_basis/phase508_glm4_orthogonal_field_basis.json`
+- `results/glm5_phase508_orthogonal_field_basis/phase508_deepseek7b_orthogonal_field_basis.json`
+- `results/glm5_phase508_orthogonal_field_basis/phase508_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = fruit, animal, action, emotion, clothing, color, vehicle
+objects/category = 30
+train objects/category = 20
+test objects/category = 10
+templates = 3
+test prompts/category = 30
+basis rank = 4
+scale = 1.0
+```
+
+测试层:
+
+```text
+Qwen3: L18, L27, L33
+GLM4: L20, L30, L37
+DS7B: L14, L21, L25
+```
+
+### 跨模型汇总结果
+
+```text
+Qwen3:
+  mean perp/para ratio = 36.0854
+  mean best component delta_D = -0.1842
+  mean strongest positive delta_D = +0.2201
+  mean random best delta_D = -0.0150
+  support label rate = 0.0833
+  positive label rate = 0.1071
+
+GLM4:
+  mean perp/para ratio = 61.4361
+  mean best component delta_D = -0.4119
+  mean strongest positive delta_D = +0.3154
+  mean random best delta_D = -0.0088
+  support label rate = 0.2143
+  positive label rate = 0.1310
+
+DS7B:
+  mean perp/para ratio = 80.8626
+  mean best component delta_D = -0.0824
+  mean strongest positive delta_D = +0.4274
+  mean random best delta_D = -0.0167
+  support label rate = 0.0119
+  positive label rate = 0.1667
+```
+
+### 关键客观事实
+
+#### 1. SVD basis 明显强于 random basis
+
+随机 basis 的 mean best delta_D 很小:
+
+```text
+Qwen3 random best = -0.0150
+GLM4 random best = -0.0088
+DS7B random best = -0.0167
+```
+
+而 SVD Phi_perp basis 的 best component 明显更强:
+
+```text
+Qwen3 = -0.1842
+GLM4 = -0.4119
+DS7B = -0.0824
+```
+
+这说明:
+
+```text
+Phi_perp 的功能效应不是任意方向扰动都能得到。
+低秩正交场 basis 捕获了真实结构。
+```
+
+#### 2. GLM4 的 support basis 最清晰
+
+GLM4 support label rate 最高:
+
+```text
+GLM4 support label rate = 0.2143
+```
+
+强 support examples:
+
+```text
+emotion L20 basis1:
+  delta_D = -1.3287
+  delta_T = -1.3682
+  delta_C = -0.0395
+
+color L37 basis2:
+  delta_D = -0.6501
+  delta_T = -1.1631
+  delta_C = -0.5131
+
+fruit L20 basis2:
+  delta_D = -0.5241
+```
+
+这表明:
+
+```text
+GLM4 的 Phi_perp 中存在较干净的 target support basis。
+```
+
+#### 3. DS7B 更像 release/interface 系统
+
+DS7B support label rate 极低:
+
+```text
+DS7B support label rate = 0.0119
+```
+
+但 strongest positive delta_D 最高:
+
+```text
+DS7B mean strongest positive delta_D = +0.4274
+```
+
+强 positive examples:
+
+```text
+action L25 basis2:
+  delta_D = +1.4834
+  delta_T = +2.2145
+  delta_C = +0.7311
+
+action L21 basis0:
+  delta_D = +1.1086
+
+fruit L21 basis2:
+  delta_D = +0.6568
+  delta_T = +0.2665
+  delta_C = -0.3903
+  label = competitor_suppressor
+```
+
+这延续 Phase507 的判断:
+
+```text
+DS7B 的 action/color 等类别不是干净 support route,
+更像 release、suppressor 或 interface route。
+```
+
+#### 4. Qwen3 同时存在 support 与 release
+
+Qwen3 support examples:
+
+```text
+fruit L27 basis3:
+  delta_D = -0.5951
+
+emotion L33 basis0:
+  delta_D = -0.5273
+
+animal L27 basis2:
+  delta_D = -0.4655
+```
+
+Qwen3 positive examples:
+
+```text
+fruit L18 basis2:
+  delta_D = +0.8702
+  delta_C = -0.7160
+  label = competitor_suppressor
+
+action L27 basis2:
+  delta_D = +0.7456
+  label = target_release
+```
+
+因此 Qwen3 的 Phi_perp 是混合结构:
+
+```text
+support basis 与 suppressor/release basis 共存。
+```
+
+#### 5. format/template 成分不是噪声
+
+很多强 positive basis 与 format_abs_cos 高度相关:
+
+```text
+GLM4 clothing L20 basis0:
+  delta_D = +1.4665
+  format_abs_cos = 0.9602
+
+GLM4 action L20 basis0:
+  delta_D = +1.1453
+  format_abs_cos = 0.9570
+
+DS7B action L21 basis0:
+  delta_D = +1.1086
+  format_abs_cos = 0.7298
+
+Qwen3 action L27 basis0:
+  delta_D = -0.2940
+  format_abs_cos = 0.8990
+```
+
+说明:
+
+```text
+Phi_perp 中的格式/模板轴会真实影响类别读出 D。
+语义场和格式场不是完全分离的两条路。
+```
+
+### 对外部分析的判断
+
+外部分析中正确部分:
+
+```text
+1. Phase507 不能解释为 token 闭合。
+2. Phi_perp 是高维语义/任务/格式/接口混合场。
+3. 下一步必须拆 support/suppressor/object/task/format/interface。
+4. DS7B action/color 的反向释放不是噪声。
+```
+
+需要收紧的部分:
+
+```text
+1. 不能把 SVD basis 直接叫最终机制轴。
+2. basis label 依赖基选择, 不是旋转不变结论。
+3. support_top4 有时会从负效应变正效应, 说明 basis 之间存在抵消/非加性。
+4. format_abs_cos 高只能说明与模板方向相关, 还不能证明它就是格式生成门。
+```
+
+### 当前理论更新
+
+Phase508 后, Phi_perp 可以更精确地写成:
+
+```text
+Phi_perp =
+  S_support
+  + S_release
+  + S_suppressor
+  + S_format
+  + S_object/task
+  + residual_mixed
+```
+
+但必须加限制:
+
+```text
+这些 S_* 不是单个 SVD basis 的固定标签。
+更稳妥的单位是:
+  causal direction family
+  causal subspace
+而不是单一 basis vector。
+```
+
+### 硬伤
+
+1. **SVD basis 不是唯一基**
+
+旋转同一个子空间会改变单 basis 的解释。
+
+2. **support_top4 有时不等于更强 support**
+
+例如 Qwen3 fruit L18:
+
+```text
+best single weak
+support_top4 delta_D = +1.440
+```
+
+说明多个 basis 之间存在抵消或混合。
+
+3. **format_abs_cos 还不是 token-level format gate**
+
+本轮只证明 format/template axis 影响 D, 还没有证明它控制标点/格式 token。
+
+4. **仍未解决最终生成闭合**
+
+本轮关注 D/T/C, 没有直接完成 stepwise token trajectory repair。
+
+### 下一步 Phase 509
+
+建议进入:
+
+```text
+Phase 509: Rotation-stable Orthogonal Field Factor Audit
+```
+
+目标:
+
+```text
+验证 Phase508 的 support/release/format 结论是否依赖 SVD basis。
+```
+
+方案:
+
+```text
+1. 对同一 Phi_perp subspace 做三种 basis:
+   - SVD basis
+   - random rotation inside same subspace
+   - causal-greedy axis
+
+2. 比较:
+   - best single delta_D
+   - support/release label stability
+   - format_abs_cos stability
+   - random outside-subspace control
+
+3. 重点类别:
+   GLM4 emotion/color/fruit support
+   DS7B action/fruit/color release
+   Qwen3 fruit/action/emotion mixed
+
+4. 增加 token surface probes:
+   punctuation token
+   category token
+   generic continuation token
+   object-copy token
+```
+
+判据:
+
+```text
+如果同一功能效应在子空间旋转后仍能被 causal-greedy axis 找回,
+则说明功能位于稳定 causal subspace。
+如果只有某个 SVD basis 有效, 则不能当成真实机制轴。
+```
+
+
+---
+
+## Phase 509: Rotation-stable Orthogonal Field Factor Audit 旋转稳定正交场因子审计 [2026-06-16 21:02]
+
+### 本阶段目标
+
+根据用户提供的 Phase508 外部分析, 其核心判断正确:
+
+```text
+Phase508 证明了 Phi_perp 内部存在可干预因果方向;
+但还不能证明单个 SVD basis 就是唯一、可命名、旋转稳定的机制基底。
+```
+
+Phase509 直接测试这个硬伤:
+
+```text
+同一个 Phi_perp subspace 内部随机旋转后,
+support/release/format 效应是否仍然能被找回。
+```
+
+### 新增脚本
+
+- 主测试脚本: `tests/glm5/phase509_rotation_stable_orthogonal_field.py`
+- 汇总脚本: `tests/glm5/phase509_rotation_stable_orthogonal_field_summary.py`
+
+### 测试设计
+
+每个模型选择 Phase508 中最有诊断价值的 3 个类别:
+
+```text
+Qwen3:
+  fruit, action, emotion
+
+GLM4:
+  emotion, color, fruit
+
+DS7B:
+  action, fruit, color
+```
+
+每类:
+
+```text
+train objects = 20
+heldout test objects = 10
+templates = 3
+rank = 4
+candidate random axes inside subspace = 4
+```
+
+比较对象:
+
+```text
+1. SVD basis components
+2. random rotation inside same Phi_perp subspace
+3. causal candidate axes inside same subspace
+4. random outside-subspace controls
+5. surface token probes:
+   - category token
+   - punctuation token
+   - generic token
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase509_rotation_stable_orthogonal_field.py \
+  tests/glm5/phase509_rotation_stable_orthogonal_field_summary.py
+
+python tests/glm5/phase509_rotation_stable_orthogonal_field.py qwen3 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase509_rotation_stable_orthogonal_field \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase509_rotation_stable_orthogonal_field.py glm4 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase509_rotation_stable_orthogonal_field \
+  --hard-exit-after-model
+
+python tests/glm5/phase509_rotation_stable_orthogonal_field.py deepseek7b \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase509_rotation_stable_orthogonal_field \
+  --hard-exit-after-model
+
+python tests/glm5/phase509_rotation_stable_orthogonal_field_summary.py
+```
+
+### 结果文件
+
+- `results/glm5_phase509_rotation_stable_orthogonal_field/phase509_qwen3_rotation_stable_orthogonal_field.json`
+- `results/glm5_phase509_rotation_stable_orthogonal_field/phase509_glm4_rotation_stable_orthogonal_field.json`
+- `results/glm5_phase509_rotation_stable_orthogonal_field/phase509_deepseek7b_rotation_stable_orthogonal_field.json`
+- `results/glm5_phase509_rotation_stable_orthogonal_field/phase509_cross_model_summary.md`
+
+### 跨模型紧凑结果
+
+```text
+Qwen3:
+  mean svd best = -0.2425
+  mean rotated best = -0.1881
+  mean causal best = -0.2718
+  mean causal positive = +0.4296
+  mean outside best = -0.0236
+  support rotation match = 0.3333
+  mean surface category delta = -0.3463
+  mean surface punctuation delta = -0.0750
+
+GLM4:
+  mean svd best = -0.5836
+  mean rotated best = -0.5311
+  mean causal best = -0.5872
+  mean causal positive = +0.2921
+  mean outside best = -0.0105
+  support rotation match = 1.0000
+  mean surface category delta = -1.0393
+  mean surface punctuation delta = +0.5383
+
+DS7B:
+  mean svd best = -0.0623
+  mean rotated best = -0.0921
+  mean causal best = -0.1625
+  mean causal positive = +0.7925
+  mean outside best = -0.0325
+  support rotation match = 0.0000
+  mean surface category delta = -0.1271
+  mean surface punctuation delta = +0.0218
+```
+
+### 关键客观事实
+
+#### 1. GLM4 support subspace 旋转稳定
+
+GLM4 的 support_rotation_match_rate:
+
+```text
+1.0000
+```
+
+所有重点层都满足:
+
+```text
+SVD best 是 support;
+same-subspace random rotation 后仍能找到 support;
+outside-subspace random control 接近 0。
+```
+
+代表结果:
+
+```text
+emotion L20:
+  svd best = -1.329
+  rotated best = -1.195
+  causal best = -1.329
+  outside best = -0.009
+
+color L30:
+  svd best = -0.543
+  rotated best = -0.945
+  causal best = -0.543
+  outside best = -0.004
+
+fruit L37:
+  svd best = -0.306
+  rotated best = -0.390
+  causal best = -0.337
+  outside best = -0.001
+```
+
+这说明:
+
+```text
+GLM4 的 emotion/color/fruit support 不是单个 SVD basis 偶然现象,
+而是稳定 Phi_perp causal subspace 中的功能方向族。
+```
+
+#### 2. Qwen3 部分旋转稳定, 但混合更强
+
+Qwen3:
+
+```text
+support rotation match = 0.3333
+```
+
+稳定例子:
+
+```text
+fruit L27:
+  svd = -0.595
+  rotated = -0.487
+  causal = -0.595
+
+emotion L27:
+  svd = -0.326
+  rotated = -0.362
+  causal = -0.518
+
+emotion L33:
+  svd = -0.527
+  rotated = -0.300
+  causal = -0.527
+```
+
+但 action 等层中:
+
+```text
+positive/release 方向很强:
+action L27 causal positive = +1.526
+```
+
+说明:
+
+```text
+Qwen3 的 Phi_perp subspace 同时有 support 与 release/interface,
+方向族稳定性不如 GLM4 干净。
+```
+
+#### 3. DS7B 不是 support-stable, 而是 release-stable
+
+DS7B:
+
+```text
+support rotation match = 0.0000
+mean causal positive = +0.7925
+```
+
+强 release examples:
+
+```text
+action L25:
+  causal positive = +1.483
+
+action L21:
+  causal positive = +1.109
+
+fruit L14:
+  causal positive = +0.922
+
+fruit L21:
+  causal positive = +0.907
+
+color L25:
+  causal positive = +0.727
+```
+
+这说明 Phase507/508 中 DS7B 的反向现象不是噪声:
+
+```text
+DS7B 的 Phi_perp 主功能更像 release/interface/suppressor control,
+而不是干净 target support。
+```
+
+#### 4. outside-subspace random control 很弱
+
+跨模型 outside best:
+
+```text
+Qwen3 = -0.0236
+GLM4 = -0.0105
+DS7B = -0.0325
+```
+
+这压实了:
+
+```text
+效果来自 Phi_perp causal subspace 内部,
+不是任意扰动造成的。
+```
+
+#### 5. Surface token probe 显示读出与表面竞争仍分离
+
+GLM4 support 移除会强烈降低 category surface score:
+
+```text
+GLM4 mean surface category delta = -1.0393
+```
+
+但 punctuation 方向不一致:
+
+```text
+GLM4 mean surface punctuation delta = +0.5383
+Qwen3 mean surface punctuation delta = -0.0750
+DS7B mean surface punctuation delta = +0.0218
+```
+
+说明:
+
+```text
+Phi_perp support axis 确实影响 category surface score,
+但 punctuation/format token 仍不是简单同轴控制。
+```
+
+### 对外部分析的判断
+
+外部分析正确:
+
+```text
+1. Phase508 不能把 SVD basis 当最终机制轴。
+2. 更稳定单位应该是 causal subspace / causal direction family。
+3. 必须做旋转稳定性测试。
+4. 必须加入 surface token probe。
+```
+
+Phase509 的补充:
+
+```text
+1. GLM4 support 是旋转稳定的 subspace-level 现象。
+2. DS7B release/interface 是更稳定的模型策略。
+3. Qwen3 是 support/release 混合系统。
+4. category surface score 与 D 同向受影响, punctuation 仍未闭合。
+```
+
+### 理论更新
+
+正交场因子不能再写成固定 basis:
+
+```text
+Phi_perp = sum_i alpha_i b_i
+```
+
+更稳妥写法:
+
+```text
+Phi_perp contains causal subspaces:
+
+U_support
+U_release
+U_suppressor
+U_format
+U_surface
+U_mixed
+```
+
+可观测效应:
+
+```text
+Remove(proj_U_support(Phi_perp)) -> D down
+Remove(proj_U_release(Phi_perp)) -> D up
+Remove(proj_U_format(Phi_perp)) -> changes surface-form logits, not always category D
+```
+
+模型差异:
+
+```text
+GLM4:
+  U_support clean and rotation-stable.
+
+Qwen3:
+  U_support and U_release co-exist.
+
+DS7B:
+  U_release/interface dominates.
+```
+
+### 硬伤
+
+1. **causal candidate 仍是小候选池**
+
+本轮 candidate random axes = 4, 只能证明可找回方向, 不能完整优化 causal axis。
+
+2. **surface token probe 仍是单步 logit probe**
+
+没有做 step1/step2/step3 trajectory。
+
+3. **format token 仍未闭合**
+
+punctuation delta 不稳定, 说明 format gate 还没有被真正拆开。
+
+4. **只测重点类别**
+
+本轮为了旋转稳定性, 每模型测 3 个关键类别, 不是 7 类全扫。
+
+### 下一步 Phase 510
+
+建议进入:
+
+```text
+Phase 510: Surface-format Axis and Stepwise Token Probe
+```
+
+核心目标:
+
+```text
+把 U_support/U_release 与 punctuation/category/generic/object-copy token 的逐步生成轨迹连接起来。
+```
+
+测试方案:
+
+```text
+1. 选 Phase509 中最稳定的 subspace:
+   GLM4 emotion/color/fruit support
+   DS7B action/fruit release
+   Qwen3 fruit/emotion support + action release
+
+2. 对每个 subspace 做:
+   - remove support
+   - remove release
+   - add support
+   - add release
+
+3. 记录 step1/step2/step3:
+   - category token margin
+   - punctuation token margin
+   - generic continuation margin
+   - object-copy margin
+   - correct_surface hit
+
+4. 判据:
+   如果 D 改变但 stepwise surface margin 不变,
+   说明读出和生成仍分离。
+
+   如果 D 与 category surface margin 同变,
+   但 punctuation/generic/object-copy 仍主导,
+   说明瓶颈在 format/surface gate。
+```
+
+
+---
+
+## Phase 510: Surface-format Axis and Stepwise Token Probe 表面格式轴与逐步词元轨迹探针 [2026-06-16 21:34]
+
+### 本阶段目标
+
+根据用户提供的 Phase509 外部分析, 其判断基本正确:
+
+```text
+Phase509 证明了 GLM4 的 support 是旋转稳定 subspace-level 现象;
+DS7B 更像 release/interface-dominant system;
+Qwen3 是 support/release mixed system。
+```
+
+但 Phase509 的硬伤仍然是:
+
+```text
+surface probe 还是单步 logit probe,
+没有验证 step1/step2/step3 的真实生成轨迹。
+```
+
+Phase510 的目标:
+
+```text
+把 U_support/U_release 接到 category、punctuation、generic、object-copy 的三步 token competition 上。
+```
+
+### 新增脚本
+
+- 主测试脚本: `tests/glm5/phase510_surface_format_stepwise_probe.py`
+- 汇总脚本: `tests/glm5/phase510_surface_format_stepwise_probe_summary.py`
+
+### 关键设计
+
+本轮不再使用已经包含答案类别的 prompt, 而使用未完成类别的生成 prompt:
+
+```text
+The {obj} belongs to the category of
+In taxonomy, {obj} is classified as
+Classify {obj}:
+```
+
+每个类别:
+
+```text
+train objects = 20
+heldout test objects = 10
+generation templates = 3
+test generation prompts/category = 30
+steps = 3
+```
+
+对每个类别先自动选择:
+
+```text
+support axis:
+  在 category-completion prompt 上 remove 后 D 下降最多的 Phi_perp axis。
+
+release axis:
+  在 category-completion prompt 上 remove 后 D 上升最多的 Phi_perp axis。
+```
+
+然后测试五种条件:
+
+```text
+clean
+remove_support
+add_support
+remove_release
+add_release
+```
+
+记录:
+
+```text
+step1/step2/step3:
+  category_vs_competitor
+  category_vs_punctuation
+  category_vs_generic
+  category_vs_object_copy
+  category_top1_rate
+  punctuation_top1_rate
+  generic_top1_rate
+  object_copy_top1_rate
+  greedy top tokens
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase510_surface_format_stepwise_probe.py \
+  tests/glm5/phase510_surface_format_stepwise_probe_summary.py
+
+python tests/glm5/phase510_surface_format_stepwise_probe.py qwen3 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --steps 3 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase510_surface_format_stepwise_probe \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase510_surface_format_stepwise_probe.py glm4 \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --steps 3 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase510_surface_format_stepwise_probe \
+  --hard-exit-after-model
+
+python tests/glm5/phase510_surface_format_stepwise_probe.py deepseek7b \
+  --train-objects 20 \
+  --test-objects 10 \
+  --rank 4 \
+  --candidate-random-axes 4 \
+  --steps 3 \
+  --batch-size 12 \
+  --output-dir results/glm5_phase510_surface_format_stepwise_probe \
+  --hard-exit-after-model
+
+python tests/glm5/phase510_surface_format_stepwise_probe_summary.py
+```
+
+### 结果文件
+
+- `results/glm5_phase510_surface_format_stepwise_probe/phase510_qwen3_surface_format_stepwise_probe.json`
+- `results/glm5_phase510_surface_format_stepwise_probe/phase510_glm4_surface_format_stepwise_probe.json`
+- `results/glm5_phase510_surface_format_stepwise_probe/phase510_deepseek7b_surface_format_stepwise_probe.json`
+- `results/glm5_phase510_surface_format_stepwise_probe/phase510_cross_model_summary.md`
+
+### 选出的轴
+
+Qwen3:
+
+```text
+fruit:
+  support = L27 combo1, delta_D -0.596
+  release = L27 svd2, delta_D +1.224
+
+action:
+  support = L18 combo2, delta_D -0.089
+  release = L33 svd3, delta_D +0.723
+
+emotion:
+  support = L27 svd1, delta_D -0.970
+  release = L33 combo1, delta_D +0.410
+```
+
+GLM4:
+
+```text
+emotion:
+  support = L37 svd1, delta_D -0.468
+  release = L37 combo0, delta_D +1.502
+
+color:
+  support = L37 svd3, delta_D -0.579
+  release = L37 svd0, delta_D +0.360
+
+fruit:
+  support = L30 svd0, delta_D -0.775
+  release = L37 combo0, delta_D +0.550
+```
+
+DS7B:
+
+```text
+action:
+  support = L25 svd2, delta_D -0.316
+  release = L25 svd3, delta_D +0.258
+
+fruit:
+  support = L21 svd1, delta_D -0.352
+  release = L25 svd2, delta_D +0.430
+
+color:
+  support = L25 svd2, delta_D -0.146
+  release = L25 svd1, delta_D +0.172
+```
+
+### 跨模型紧凑结果
+
+Qwen3:
+
+```text
+remove_support:
+  hit delta = -0.0556
+  step1 category-vs-competitor delta = -0.6432
+  step2 category-vs-competitor delta = -0.3851
+  step3 category-vs-competitor delta = -0.5752
+
+add_support:
+  hit delta = +0.0556
+  step1 category-vs-competitor delta = +0.6276
+  step2 category-vs-competitor delta = +0.3949
+  step3 category-vs-competitor delta = +0.7660
+
+remove_release:
+  hit delta = +0.0556
+  step1 category-vs-competitor delta = +0.6549
+  step2 category-vs-competitor delta = +0.7803
+  step3 category-vs-competitor delta = +0.2686
+
+add_release:
+  hit delta = -0.0667
+  step1 category-vs-competitor delta = -0.4382
+```
+
+GLM4:
+
+```text
+remove_support:
+  hit delta = -0.0556
+  step1 category-vs-competitor delta = -0.5697
+  step2 category-vs-competitor delta = -0.5521
+  step3 category-vs-competitor delta = -0.7969
+
+add_support:
+  hit delta = -0.0000
+  step1 category-vs-competitor delta = +0.4876
+  step2 category-vs-competitor delta = +0.3770
+  step3 category-vs-competitor delta = +0.8424
+
+remove_release:
+  hit delta = +0.0111
+  step1 category-vs-competitor delta = +0.5892
+  step2 category-vs-competitor delta = +0.8077
+  step3 category-vs-competitor delta = +0.6849
+
+add_release:
+  hit delta = -0.0222
+  step1 category-vs-competitor delta = -0.4085
+```
+
+DS7B:
+
+```text
+remove_support:
+  hit delta = -0.0111
+  step1 category-vs-competitor delta = -0.2832
+  step2 category-vs-competitor delta = -0.2145
+  step3 category-vs-competitor delta = -0.3780
+
+add_support:
+  hit delta = +0.0333
+  step1 category-vs-competitor delta = +0.2168
+  step2 category-vs-competitor delta = +0.1862
+  step3 category-vs-competitor delta = +0.2065
+
+remove_release:
+  hit delta = +0.0111
+  step1 category-vs-competitor delta = +0.2311
+  step2 category-vs-competitor delta = +0.2643
+  step3 category-vs-competitor delta = +0.4078
+
+add_release:
+  hit delta = +0.0000
+  step1 category-vs-competitor delta = -0.2806
+```
+
+### 关键客观事实
+
+#### 1. U_support/U_release 能稳定改变三步 category-vs-competitor margin
+
+三模型都出现同向模式:
+
+```text
+remove_support -> category-vs-competitor 下降
+add_support -> category-vs-competitor 上升
+remove_release -> category-vs-competitor 上升
+add_release -> category-vs-competitor 下降
+```
+
+这说明:
+
+```text
+Phase509 的 U_support/U_release 不只是单步 D 现象,
+它们能进入 step1/step2/step3 的表面类别竞争。
+```
+
+#### 2. 但是 generation hit 变化很小
+
+hit delta 范围大多只有:
+
+```text
+-0.0667 到 +0.0556
+```
+
+同时 step1 top category delta 基本接近 0:
+
+```text
+Qwen3 add_support step1 top category delta = 0.0000
+GLM4 add_support step1 top category delta = -0.0111
+DS7B add_support step1 top category delta = 0.0000
+```
+
+说明:
+
+```text
+margin 改变不等于 greedy token 变成 category token。
+```
+
+这是当前最关键负结果。
+
+#### 3. 表面生成瓶颈仍在 format/generic/object-copy 竞争
+
+例如 Qwen3:
+
+```text
+remove_release:
+  step1 category-vs-competitor delta = +0.6549
+  hit delta = +0.0556
+```
+
+GLM4:
+
+```text
+remove_release:
+  step1 category-vs-competitor delta = +0.5892
+  step2 category-vs-competitor delta = +0.8077
+  hit delta = +0.0111
+```
+
+说明:
+
+```text
+即使 category-vs-competitor margin 明显提升,
+正确类别词也仍未成为稳定生成输出。
+```
+
+#### 4. punctuation 不是简单同步变量
+
+不同模型/条件下 category-vs-punctuation 变化不一致:
+
+```text
+Qwen3 remove_support:
+  step1 category-vs-punctuation delta = -1.2305
+
+GLM4 remove_support:
+  step1 category-vs-punctuation delta = -0.6719
+
+DS7B remove_support:
+  step1 category-vs-punctuation delta = +0.0911
+```
+
+说明:
+
+```text
+punctuation/format gate 仍未被 U_support/U_release 同轴解释。
+```
+
+### 对外部分析的判断
+
+外部分析正确部分:
+
+```text
+1. Phase509 已经把机制单位从 basis vector 推到 causal subspace。
+2. Phase509 仍未完成 token trajectory closure。
+3. 下一步必须进入 stepwise token competition。
+```
+
+Phase510 的新增事实:
+
+```text
+1. U_support/U_release 确实能进入三步 category-vs-competitor margin。
+2. margin 改变仍不能稳定转化为 hit 或 top1 category。
+3. punctuation/format gate 仍是独立瓶颈。
+```
+
+### 理论更新
+
+现在链条应写为:
+
+```text
+Phi_perp causal subspace
+  -> category-vs-competitor stepwise margin
+  -> surface gate / punctuation-generic-object competition
+  -> greedy token trajectory
+```
+
+其中 Phase510 证明了第一段:
+
+```text
+Phi_perp causal subspace -> stepwise category margin
+```
+
+但没有证明第二段:
+
+```text
+stepwise category margin -> greedy token trajectory
+```
+
+因此最新理论必须保留两个独立瓶颈:
+
+```text
+1. semantic category margin bottleneck
+2. surface gate bottleneck
+```
+
+### 硬伤
+
+1. **当前 intervention 是投影缩放, 不是完整 causal patch**
+
+remove/add 采用的是沿 axis 的投影缩放, 不是从 donor 状态复制完整自然轨迹。
+
+2. **hit rate 仍低且变化小**
+
+说明本轮没有完成 generation repair。
+
+3. **prompt 仍是英文类别补全模板**
+
+虽然比 Phase509 更接近生成, 但仍不是自然问答全覆盖。
+
+4. **只测重点类别**
+
+本轮仍聚焦每模型 3 类, 不是全类别扩展。
+
+### 下一步 Phase 511
+
+建议进入:
+
+```text
+Phase 511: Surface Gate Direct Repair after Category Margin Shift
+```
+
+核心目标:
+
+```text
+在已经提升 category-vs-competitor margin 的基础上,
+直接压制 punctuation/generic/object-copy gate,
+测试是否能把 margin 变化转化为真实 hit。
+```
+
+测试方案:
+
+```text
+1. 选择 Phase510 中 category margin 提升最大但 hit 不变的 case:
+   Qwen3 fruit remove_release / add_support
+   GLM4 emotion remove_release / add_support
+   DS7B fruit remove_release / add_support
+
+2. 干预组合:
+   A. only category support/release axis
+   B. only punctuation/generic/object-copy suppression
+   C. category axis + surface suppression
+
+3. 记录:
+   step1/step2/step3 margins
+   top1 token group
+   generated text class
+   hit rate
+   trap type
+
+4. 判据:
+   如果 C 明显提高 hit, 而 A 不行,
+   说明语义正交场已到达类别 margin,
+   最终瓶颈是 surface gate。
+```
