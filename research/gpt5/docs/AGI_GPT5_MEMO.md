@@ -23078,3 +23078,1936 @@ Qwen3:
   当前 surface gate 仍不在这些局部 writer 中，
   需要转向 final residual replacement 或 LM-head competition decomposition。
 ```
+
+## Phase 156: Set-Writer Residual Surface Gate Closure 集合写入器残差表面门闭合 [2026-06-15 23:00]
+
+### 本阶段目标
+
+根据用户提供的 Phase155 复核意见，先判断其正确部分，再继续完成测试。
+
+复核意见中正确部分：
+
+```text
+1. Phase155 是有价值的负结果。
+2. single attention head 不能解释 surface gate。
+3. rank damage 与 generation hit 出现断裂。
+4. Phase154 的 writer-level 结论没有被推翻，只是被重新定位。
+5. 下一步必须从 single head 转向 set-level writers。
+6. multiple_choice 只能作为上界 control，不能污染开放格式主结论。
+```
+
+本轮 Phase156 目标：
+
+```text
+验证如果单个 head 不够，
+那么 top-k attention head set + MLP projection 是否能改变真实 3-step generation。
+```
+
+具体问题：
+
+```text
+1. top-k attention heads 是否比 single head 更强？
+2. MLP joint projection 是否比 attention heads 更接近 surface gate？
+3. top-k heads + MLP 是否出现联合闭合？
+4. 困难格式与 multiple_choice control 是否表现不同？
+5. 增加 category 范围后，前面结论是否稳定？
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase156_set_writer_surface_gate_closure_cuda.py \
+  tests/gpt5/phase156_set_writer_surface_gate_closure_summary.py
+
+python tests/gpt5/phase156_set_writer_surface_gate_closure_cuda.py qwen3 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase156_set_writer_surface_gate_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase156_set_writer_surface_gate_closure_cuda.py glm4 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase156_set_writer_surface_gate_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase156_set_writer_surface_gate_closure_cuda.py deepseek7b \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --output-dir results/gpt5_phase156_set_writer_surface_gate_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase156_set_writer_surface_gate_closure_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase156_set_writer_surface_gate_closure_cuda.py`
+- 汇总脚本：`tests/gpt5/phase156_set_writer_surface_gate_closure_summary.py`
+- Qwen3 结果：`results/gpt5_phase156_set_writer_surface_gate_closure/phase156_qwen3_set_writer_surface_gate_closure.json`
+- GLM4 结果：`results/gpt5_phase156_set_writer_surface_gate_closure/phase156_glm4_set_writer_surface_gate_closure.json`
+- DS7B 结果：`results/gpt5_phase156_set_writer_surface_gate_closure/phase156_deepseek7b_set_writer_surface_gate_closure.json`
+- 跨模型汇总：`results/gpt5_phase156_set_writer_surface_gate_closure/phase156_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number, clothing, furniture
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+heldout prompts/case = 8
+cases/model = 180
+generation steps = 3
+```
+
+相比 Phase155：
+
+```text
+categories 从 4 个增加到 6 个：
+  增加 clothing, furniture。
+
+cases/model 从 120 增加到 180。
+```
+
+关键层位：
+
+```text
+Qwen3:
+  attention L36
+  MLP L36
+
+GLM4:
+  attention L39
+  MLP L40
+
+DS7B:
+  attention L28
+  MLP L28
+```
+
+干预条件：
+
+```text
+clean
+joint_k1
+joint_k4
+joint_k8
+answer_k4
+format_k4
+random_k4
+random_k8
+mlp_joint
+joint_k4_mlp_joint
+joint_k8_mlp_joint
+```
+
+head 选择方式：
+
+```text
+优先复用 Phase155 的 per-case head ranking。
+新增 category 没有 per-case ranking 时，
+使用 Phase155 的 model-global head ranking 作为泛化 head set。
+```
+
+### 客观结果
+
+#### Qwen3
+
+所有 case：
+
+```text
+n = 180
+clean = 0.368
+joint_k4 = 0.369, delta +0.001
+joint_k8 = 0.369, delta +0.001
+random_k4 = 0.367, delta -0.001
+random_k8 = 0.364, delta -0.004
+mlp_joint = 0.353, delta -0.015
+joint_k4_mlp_joint = 0.351, delta -0.017
+joint_k8_mlp_joint = 0.347, delta -0.022
+```
+
+困难格式，不含 multiple_choice：
+
+```text
+n = 144
+clean = 0.218
+joint_k4 = 0.217, delta -0.001
+joint_k8 = 0.219, delta +0.001
+random_k4 = 0.217, delta -0.001
+random_k8 = 0.213, delta -0.005
+mlp_joint = 0.199, delta -0.019
+joint_k4_mlp_joint = 0.195, delta -0.023
+joint_k8_mlp_joint = 0.190, delta -0.028
+```
+
+multiple_choice control：
+
+```text
+n = 36
+clean = 0.969
+joint_k4 = 0.976, delta +0.007
+joint_k8 = 0.969, delta +0.000
+mlp_joint = 0.972, delta +0.003
+joint_k8_mlp_joint = 0.972, delta +0.003
+```
+
+Qwen3 结论：
+
+```text
+top-k heads 基本不影响 3-step hit。
+MLP joint 对困难格式有小幅负向影响。
+attention + MLP 比 MLP-only 略强，但仍不是大闭合。
+```
+
+#### GLM4 bf16
+
+所有 case：
+
+```text
+n = 180
+clean = 0.297
+joint_k4 = 0.297, delta +0.000
+joint_k8 = 0.297, delta +0.000
+random_k4 = 0.300, delta +0.003
+random_k8 = 0.301, delta +0.004
+mlp_joint = 0.315, delta +0.017
+joint_k4_mlp_joint = 0.318, delta +0.021
+joint_k8_mlp_joint = 0.320, delta +0.023
+```
+
+困难格式，不含 multiple_choice：
+
+```text
+n = 144
+clean = 0.131
+joint_k4 = 0.129, delta -0.002
+joint_k8 = 0.130, delta -0.001
+random_k4 = 0.132, delta +0.001
+random_k8 = 0.132, delta +0.001
+mlp_joint = 0.204, delta +0.073
+joint_k4_mlp_joint = 0.195, delta +0.064
+joint_k8_mlp_joint = 0.200, delta +0.069
+```
+
+multiple_choice control：
+
+```text
+n = 36
+clean = 0.962
+joint_k4 = 0.969, delta +0.007
+joint_k8 = 0.965, delta +0.004
+mlp_joint = 0.757, delta -0.205
+joint_k4_mlp_joint = 0.809, delta -0.153
+joint_k8_mlp_joint = 0.802, delta -0.160
+```
+
+GLM4 结论：
+
+```text
+top-k heads 仍然几乎无效。
+MLP joint 在困难格式中明显提升 hit。
+但 MLP joint 对 multiple_choice control 强烈破坏。
+说明 GLM4 的 MLP joint projection 不是简单“支持方向”，
+更像重排 surface gate，使开放格式受益、多选复制受损。
+```
+
+#### DS7B
+
+所有 case：
+
+```text
+n = 180
+clean = 0.235
+joint_k4 = 0.240, delta +0.005
+joint_k8 = 0.231, delta -0.004
+random_k4 = 0.233, delta -0.001
+random_k8 = 0.226, delta -0.009
+mlp_joint = 0.251, delta +0.017
+joint_k4_mlp_joint = 0.236, delta +0.001
+joint_k8_mlp_joint = 0.216, delta -0.019
+```
+
+困难格式，不含 multiple_choice：
+
+```text
+n = 144
+clean = 0.076
+joint_k4 = 0.076, delta +0.000
+joint_k8 = 0.066, delta -0.010
+random_k4 = 0.073, delta -0.003
+random_k8 = 0.069, delta -0.007
+mlp_joint = 0.074, delta -0.003
+joint_k4_mlp_joint = 0.062, delta -0.015
+joint_k8_mlp_joint = 0.044, delta -0.032
+```
+
+multiple_choice control：
+
+```text
+n = 36
+clean = 0.868
+joint_k4 = 0.892, delta +0.024
+joint_k8 = 0.889, delta +0.021
+mlp_joint = 0.962, delta +0.094
+joint_k4_mlp_joint = 0.934, delta +0.066
+joint_k8_mlp_joint = 0.903, delta +0.035
+```
+
+DS7B 结论：
+
+```text
+top-k heads 单独仍弱。
+困难格式中 joint_k8_mlp_joint 出现可见负向影响：
+  delta -0.032
+这比 random_k8 的 -0.007 更强。
+但所有 case 与 multiple_choice 中 MLP joint 反而提升。
+说明 DS7B 的 surface gate 干预强烈依赖格式类型。
+```
+
+### 当前最可靠客观事实
+
+1. **top-k attention heads 仍然没有闭合 surface gate**
+
+三模型困难格式中：
+
+```text
+Qwen3 joint_k4 delta = -0.001
+GLM4 joint_k4 delta = -0.002
+DS7B joint_k4 delta = +0.000
+```
+
+这说明从 single head 到 top-k heads 后，attention head set 仍然不是主要闭合点。
+
+2. **MLP joint 是比 attention heads 更强的干预点**
+
+困难格式中：
+
+```text
+Qwen3 mlp_joint delta = -0.019
+GLM4 mlp_joint delta = +0.073
+DS7B mlp_joint delta = -0.003
+```
+
+其中 GLM4 效应最大，但方向是提升，不是破坏。
+
+3. **attention + MLP 的联合效应不是简单线性叠加**
+
+例如：
+
+```text
+DS7B difficult:
+  mlp_joint = -0.003
+  joint_k8 = -0.010
+  joint_k8_mlp_joint = -0.032
+```
+
+联合干预比单独干预更强，说明存在组合效应。
+
+但：
+
+```text
+GLM4 difficult:
+  mlp_joint = +0.073
+  joint_k8_mlp_joint = +0.069
+```
+
+top-k heads 没有增强 MLP 效果，甚至略抵消。
+
+4. **multiple_choice 与困难格式路径明显不同**
+
+GLM4：
+
+```text
+difficult mlp_joint = +0.073
+multiple_choice mlp_joint = -0.205
+```
+
+DS7B：
+
+```text
+difficult mlp_joint = -0.003
+multiple_choice mlp_joint = +0.094
+```
+
+这进一步证明：
+
+```text
+multiple_choice 不是普通语言生成机制的代表，
+它更像选项复制/局部选择路径。
+```
+
+5. **增加 clothing/furniture 后结论没有整体推翻，但类别差异更明显**
+
+Qwen3：
+
+```text
+plant 对 joint_k8_mlp_joint 最敏感，delta -0.096
+number 对 joint_k8_mlp_joint delta -0.046
+furniture 反而略提升
+```
+
+GLM4：
+
+```text
+plant joint_k4_mlp_joint delta +0.158
+container mlp_joint delta +0.096
+furniture mlp_joint delta -0.121
+```
+
+DS7B：
+
+```text
+time joint_k8_mlp_joint delta -0.029
+number mlp_joint delta +0.046
+plant random_k8 delta -0.058，需要谨慎
+```
+
+因此类别仍然是强条件变量。
+
+### 对当前理论的影响
+
+Phase156 将 Phase155 的结论进一步收紧：
+
+```text
+surface gate 不只是非单头；
+也不是简单 top-k attention head set。
+```
+
+更准确地说：
+
+```text
+attention heads:
+  多数情况下只提供弱路由/扰动。
+
+MLP joint projection:
+  更接近 surface gate 的可干预位置，
+  但方向不是统一的支持/抑制。
+
+final residual / LM head competition:
+  仍然是未闭合瓶颈。
+```
+
+当前理论应更新为：
+
+```text
+Set-Writer Residual Surface Gate Theory
+集合写入器残差表面门理论
+```
+
+但需要加一个关键限制：
+
+```text
+集合写入器不是单纯 attention head set，
+而是以 MLP/final residual 为核心、attention 参与路由的动态状态。
+```
+
+更通俗地说：
+
+```text
+注意力头像是在把信息搬到门口，
+MLP 和最终残差状态更像是在决定这扇门如何开。
+但这扇门不是只开或关，
+而是会根据格式、类别、模板把不同输出路径重新排序。
+```
+
+### 硬伤与问题
+
+1. **MLP joint ablation 方向不稳定**
+
+GLM4 困难格式中 MLP joint 反而提升 hit。
+
+这说明当前 projection ablation 不能简单解释为“移除支持成分”。
+它可能同时移除了竞争成分、格式阻塞成分或多选复制成分。
+
+2. **top-k heads 来自 Phase155 rank selection**
+
+虽然 Phase156 加入了 top-k，但 head set 仍主要由 rank delta 选择。
+如果真正的生成轨迹敏感 head 不是 rank-sensitive head，本轮仍会漏掉。
+
+3. **新增 clothing/furniture 使用 global head ranking**
+
+这提高了泛化测试范围，但也意味着新增类别没有 per-case head scan。
+因此新增类别上的 head-set 效果不能视作最优 head-set 效果。
+
+4. **没有做 final residual replacement**
+
+Phase156 已经显示 MLP/final residual 更可疑，但本轮仍未直接替换 final residual state。
+
+5. **没有分解 LM head competition**
+
+很多 hit 改善可能不是语义变好，而是竞争者被压低。
+必须进一步看正确候选、格式候选、错误语义候选、续写候选之间的 logit 生态。
+
+6. **hit 指标仍然粗**
+
+虽然比 rank 更接近真实生成，但没有细分：
+
+```text
+semantic correct but format wrong
+format correct but semantic wrong
+wrong category
+object copy
+generic continuation
+punctuation-only
+```
+
+### 下一步任务
+
+Phase157 应转向：
+
+```text
+Final Residual and LM-Head Competition Decomposition
+最终残差与语言模型头竞争分解
+```
+
+核心目标：
+
+```text
+不要继续只在 attention head set 上加码。
+要直接检查最终残差状态和输出词表竞争。
+```
+
+测试设计：
+
+```text
+1. 继续使用 qwen3 / GLM4 / DS7B。
+2. 保留 6 categories：
+   plant, time, container, number, clothing, furniture
+3. 保留困难格式：
+   label_colon, answer_one_word, quoted_answer, list_answer
+4. multiple_choice 只作为 control。
+5. 对 clean / MLP joint / joint_k8+MLP / random_k8 做 final residual capture。
+6. 分解 LM head logits：
+   correct surface answer set
+   category synonyms
+   object-near tokens
+   wrong category labels
+   format tokens
+   punctuation-only tokens
+   generic continuation tokens
+   option labels
+7. 对比：
+   hit 提升时，是 correct logit 上升，还是 competitor logit 下降？
+   hit 下降时，是 semantic support 被破坏，还是 format/continuation 竞争增强？
+```
+
+关键判据：
+
+```text
+如果 MLP joint 改变 hit 的同时，
+final residual 中 correct surface margin 明显变化：
+  surface gate 在 residual state 中。
+
+如果 residual projection 变化小，但 LM head competitor ecology 大变：
+  瓶颈在 output competition。
+
+如果 GLM4 的 MLP joint 提升来自 wrong/generic competitor 被压低：
+  当前 MLP joint 不是语义支持，而是竞争抑制。
+
+如果 DS7B 的 joint_k8+MLP 降低来自 format token 或 continuation token 增强：
+  DS7B 的 surface gate 失败是格式/续写竞争问题。
+```
+
+阶段性大任务：
+
+```text
+从“找内部组件”转向“解释输出竞争生态”。
+```
+
+这是破解语言编码机制的必要一步，因为真实生成不是内部向量单独决定，而是：
+
+```text
+残差状态 × 词表读出 × 多步反馈
+```
+
+共同形成的可执行语言轨迹。
+
+## Phase 157: Final Residual and LM-Head Competition Decomposition 最终残差与语言模型头竞争分解 [2026-06-15 23:22]
+
+### 本阶段目标
+
+根据用户提供的 Phase156 复核意见，先判断其正确部分，再继续测试。
+
+复核意见中正确部分：
+
+```text
+1. Phase156 是一次收敛实验。
+2. top-k attention head set 仍然不能闭合 surface gate。
+3. MLP joint 比 attention heads 更接近 surface gate。
+4. MLP joint 不是简单答案支持方向，更像输出竞争重排方向。
+5. multiple_choice 是特殊 control，不能代表普通开放格式生成。
+6. 下一步应直接分析 final residual 和 LM-head competition。
+```
+
+本轮 Phase157 目标：
+
+```text
+解释 Phase156 中 MLP joint / joint_k8+MLP 改变 3-step hit 时，
+到底改变了哪些词表竞争项。
+```
+
+测试问题：
+
+```text
+1. correct surface answer logit 是否上升？
+2. wrong category logit 是否下降？
+3. format / punctuation / generic continuation 是否增强？
+4. final hidden state 与 clean 的差异有多大？
+5. 三模型的 MLP joint 机制是否一致？
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase157_final_residual_lmhead_competition_cuda.py \
+  tests/gpt5/phase157_final_residual_lmhead_competition_summary.py
+
+python tests/gpt5/phase157_final_residual_lmhead_competition_cuda.py qwen3 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase157_final_residual_lmhead_competition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase157_final_residual_lmhead_competition_cuda.py glm4 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase157_final_residual_lmhead_competition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase157_final_residual_lmhead_competition_cuda.py deepseek7b \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --output-dir results/gpt5_phase157_final_residual_lmhead_competition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase157_final_residual_lmhead_competition_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase157_final_residual_lmhead_competition_cuda.py`
+- 汇总脚本：`tests/gpt5/phase157_final_residual_lmhead_competition_summary.py`
+- Qwen3 结果：`results/gpt5_phase157_final_residual_lmhead_competition/phase157_qwen3_final_residual_lmhead_competition.json`
+- GLM4 结果：`results/gpt5_phase157_final_residual_lmhead_competition/phase157_glm4_final_residual_lmhead_competition.json`
+- DS7B 结果：`results/gpt5_phase157_final_residual_lmhead_competition/phase157_deepseek7b_final_residual_lmhead_competition.json`
+- 跨模型汇总：`results/gpt5_phase157_final_residual_lmhead_competition/phase157_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number, clothing, furniture
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+cases/model = 180
+```
+
+干预条件：
+
+```text
+clean
+mlp_joint
+joint_k8_mlp_joint
+random_k8
+```
+
+分解对象：
+
+```text
+correct_expanded:
+  正确类别、同义词、对象邻近表面答案。
+
+wrong_category:
+  其他类别标签和同义词。
+
+format_target:
+  当前格式相关词元。
+
+punctuation:
+  标点/空白词元。
+
+generic_continue:
+  普通续写词元。
+
+object_copy:
+  当前对象词元。
+
+option_label:
+  选项标签词元。
+```
+
+核心指标：
+
+```text
+correct_vs_competitor margin
+correct logit delta
+wrong-category logit delta
+format logit delta
+generic-continuation logit delta
+final hidden delta norm
+semantic / format projection delta
+```
+
+### 客观结果
+
+#### Qwen3
+
+所有 case：
+
+```text
+clean margin = -0.294
+
+mlp_joint:
+  margin delta = -0.105
+  hidden delta norm = 42.04
+  correct logit delta = -1.262
+  wrong-category delta = -1.552
+  format delta = -1.017
+  generic delta = -1.271
+
+joint_k8_mlp_joint:
+  margin delta = -0.086
+  hidden delta norm = 45.62
+  correct logit delta = -1.155
+  wrong-category delta = -1.399
+  format delta = -1.312
+  generic delta = -1.310
+
+random_k8:
+  margin delta = +0.012
+  hidden delta norm = 9.71
+```
+
+困难格式：
+
+```text
+clean margin = -0.644
+
+mlp_joint:
+  margin delta = +0.017
+  correct logit delta = -0.766
+  wrong-category delta = -1.528
+  format delta = -0.672
+  generic delta = -0.565
+
+joint_k8_mlp_joint:
+  margin delta = +0.063
+  correct logit delta = -0.675
+  wrong-category delta = -1.431
+  format delta = -1.018
+  generic delta = -0.650
+
+random_k8:
+  margin delta = +0.039
+```
+
+multiple_choice control：
+
+```text
+clean margin = +1.109
+
+mlp_joint:
+  margin delta = -0.591
+  correct logit delta = -3.247
+  wrong-category delta = -1.652
+  format delta = -2.394
+  generic delta = -4.093
+```
+
+Qwen3 按格式：
+
+```text
+answer_one_word:
+  mlp margin delta +0.08
+  correct -0.62, wrong -2.27
+
+label_colon:
+  mlp margin delta +0.24
+  correct -0.61, wrong -1.52
+
+list_answer:
+  mlp margin delta -0.30
+  correct -1.08, wrong -1.51
+
+quoted_answer:
+  mlp margin delta +0.05
+  correct -0.76, wrong -0.82
+```
+
+Qwen3 结论：
+
+```text
+MLP joint 没有让 correct answer 上升。
+它在困难格式中常常同时压低 correct 与 competitors，
+但 wrong-category 或 format competitors 下降更快，
+所以 first-step margin 可以改善。
+
+这解释了为什么 Phase156 中 hit 不一定改善：
+first-step margin 改善不等于 multi-step trajectory 改善。
+```
+
+#### GLM4 bf16
+
+所有 case：
+
+```text
+clean margin = -0.359
+
+mlp_joint:
+  margin delta = +0.006
+  hidden delta norm = 73.93
+  correct logit delta = -0.113
+  wrong-category delta = +1.206
+  format delta = -0.109
+  generic delta = -0.033
+
+joint_k8_mlp_joint:
+  margin delta = -0.022
+  hidden delta norm = 72.75
+  correct logit delta = +0.054
+  wrong-category delta = +1.260
+  format delta = -0.573
+  generic delta = +0.225
+```
+
+困难格式：
+
+```text
+clean margin = -0.684
+
+mlp_joint:
+  margin delta = +0.026
+  correct logit delta = +0.191
+  wrong-category delta = +1.818
+  format delta = -0.015
+  generic delta = -0.173
+
+joint_k8_mlp_joint:
+  margin delta = +0.010
+  correct logit delta = +0.320
+  wrong-category delta = +1.790
+  format delta = -0.605
+  generic delta = +0.091
+
+random_k8:
+  margin delta = +0.044
+```
+
+multiple_choice control：
+
+```text
+clean margin = +0.940
+
+mlp_joint:
+  margin delta = -0.076
+  correct logit delta = -1.332
+  wrong-category delta = -1.243
+  format delta = -0.485
+  generic delta = +0.530
+```
+
+GLM4 按格式：
+
+```text
+answer_one_word:
+  mlp margin delta +0.18
+  correct +0.42
+  wrong +0.92
+  format -0.43
+
+label_colon:
+  mlp margin delta +0.05
+  correct +0.39
+  wrong +2.93
+  format -0.30
+
+list_answer:
+  mlp margin delta -0.08
+  correct -0.10
+  wrong +2.08
+  format -0.34
+
+quoted_answer:
+  mlp margin delta -0.05
+  correct +0.05
+  wrong +1.35
+  format +1.01
+```
+
+GLM4 结论：
+
+```text
+Phase156 中 GLM4 difficult hit 提升，
+不是简单因为 wrong category 被压低。
+
+相反，wrong-category logits 大幅上升，
+correct logits 也上升，
+format/generic competitors 在部分格式中下降。
+
+所以 GLM4 的 MLP joint 更像整体重排 surface route：
+  开放格式受益，
+  multiple_choice 复制路径受损。
+```
+
+#### DS7B
+
+所有 case：
+
+```text
+clean margin = -1.488
+
+mlp_joint:
+  margin delta = -0.826
+  hidden delta norm = 131.62
+  correct logit delta = -2.541
+  wrong-category delta = -2.569
+  format delta = -2.149
+  generic delta = -1.590
+
+joint_k8_mlp_joint:
+  margin delta = -0.586
+  hidden delta norm = 145.12
+  correct logit delta = -4.363
+  wrong-category delta = -3.447
+  format delta = -4.000
+  generic delta = -3.303
+
+random_k8:
+  margin delta = +0.207
+  hidden delta norm = 25.17
+```
+
+困难格式：
+
+```text
+clean margin = -1.611
+
+mlp_joint:
+  margin delta = -0.722
+  correct logit delta = -2.182
+  wrong-category delta = -2.509
+  format delta = -1.831
+  generic delta = -1.114
+
+joint_k8_mlp_joint:
+  margin delta = -0.393
+  correct logit delta = -3.911
+  wrong-category delta = -3.042
+  format delta = -3.757
+  generic delta = -3.005
+
+random_k8:
+  margin delta = +0.251
+```
+
+multiple_choice control：
+
+```text
+clean margin = -0.995
+
+mlp_joint:
+  margin delta = -1.242
+  correct logit delta = -3.977
+  wrong-category delta = -2.809
+  format delta = -3.420
+  generic delta = -3.496
+```
+
+DS7B 按格式：
+
+```text
+answer_one_word:
+  mlp margin delta -0.97
+  correct -4.42
+  wrong -5.05
+  format -4.74
+  generic -3.49
+
+label_colon:
+  mlp margin delta -1.45
+  correct -1.78
+  wrong -1.90
+  format -0.23
+  generic -0.48
+
+list_answer:
+  mlp margin delta -0.72
+  correct -3.65
+  wrong -3.64
+  format -4.27
+  generic -3.71
+
+quoted_answer:
+  mlp margin delta +0.25
+  correct +1.13
+  wrong +0.56
+  format +1.92
+  generic +3.23
+```
+
+DS7B 结论：
+
+```text
+多数格式中 MLP joint / joint_k8+MLP 强烈压低 correct surface answer。
+这可以解释 Phase156 中 DS7B difficult joint_k8+MLP hit 下降。
+
+但 quoted_answer 是例外：
+  correct、format、generic 都上升，
+  margin 也改善。
+
+说明 DS7B 的 format route 不是统一机制，
+quoted_answer 可能走一条独立的格式/续写路径。
+```
+
+### 当前最可靠客观事实
+
+1. **MLP joint 确实大幅改变 final hidden state**
+
+hidden delta norm：
+
+```text
+Qwen3 mlp_joint = 42.04
+GLM4 mlp_joint = 73.93
+DS7B mlp_joint = 131.62
+```
+
+random_k8 明显更小：
+
+```text
+Qwen3 random_k8 = 9.71
+GLM4 random_k8 = 16.44
+DS7B random_k8 = 25.17
+```
+
+这说明 MLP joint 是比 attention head set 更强的 final-state 改写点。
+
+2. **MLP joint 不是单纯 correct-answer support**
+
+三模型都不支持简单公式：
+
+```text
+MLP joint => correct answer logit 上升
+```
+
+Qwen3：
+
+```text
+difficult correct delta = -0.766
+但 margin delta = +0.017
+```
+
+GLM4：
+
+```text
+difficult correct delta = +0.191
+wrong-category delta = +1.818
+```
+
+DS7B：
+
+```text
+difficult correct delta = -2.182
+margin delta = -0.722
+```
+
+3. **hit 变化不能只由 first-step margin 解释**
+
+Phase156 中 Qwen3 difficult hit：
+
+```text
+mlp_joint hit delta = -0.019
+```
+
+但 Phase157 中 Qwen3 difficult first-step margin：
+
+```text
+mlp_joint margin delta = +0.017
+```
+
+这说明：
+
+```text
+first-step competition improvement
+不一定带来 multi-step trajectory improvement。
+```
+
+4. **GLM4 的 MLP joint 提升不是竞争者简单下降**
+
+GLM4 difficult：
+
+```text
+correct +0.191
+wrong-category +1.818
+format -0.015
+generic -0.173
+```
+
+这更像：
+
+```text
+开放格式路径被切换/重排，
+不是单纯压低错误类别。
+```
+
+5. **DS7B 的负效应主要来自 correct surface 被压低**
+
+DS7B difficult：
+
+```text
+mlp_joint correct delta = -2.182
+joint_k8_mlp_joint correct delta = -3.911
+```
+
+这解释了 Phase156 中 DS7B joint_k8+MLP 的 hit 下降。
+
+6. **multiple_choice 再次显示特殊路径**
+
+Qwen3 / GLM4 / DS7B 中 multiple_choice 的 margin/logit 变化都与困难格式不同。
+
+它不是普通开放生成机制，而是：
+
+```text
+选项标签 / 格式复制 / 局部选择路径
+```
+
+### 理论进展
+
+Phase157 将 Phase156 的理论从：
+
+```text
+MLP-Centered Residual Competition Gate
+```
+
+推进为更细的版本：
+
+```text
+MLP-Centered Residual Competition Rewriter
+多层感知机中心的残差竞争重写器
+```
+
+新的核心判断：
+
+```text
+MLP 不是单纯把正确答案推高，
+而是在 final residual 中重写多个候选族之间的竞争关系。
+```
+
+这个重写至少包含：
+
+```text
+correct surface answer
+wrong categories
+format tokens
+generic continuation
+object copy
+option labels
+```
+
+不同模型的重写方式不同：
+
+```text
+Qwen3:
+  更像同时压低多个族，但竞争者下降更快。
+
+GLM4:
+  更像开放格式路径重排，correct 与 wrong 都可能上升。
+
+DS7B:
+  多数格式中 correct surface 被强压低，quoted_answer 例外。
+```
+
+因此，当前语言生成理论不能再使用：
+
+```text
+正确方向 vs 错误方向
+```
+
+这种单轴解释，而必须使用：
+
+```text
+候选族竞争生态
+```
+
+### 硬伤与问题
+
+1. **Phase157 主要看 first-step logits**
+
+它解释了首步竞争生态，但还没有完全解释 3-step trajectory。
+
+Qwen3 已经出现：
+
+```text
+first-step margin 改善，
+但 3-step hit 下降。
+```
+
+所以必须进入 step-wise competition trace。
+
+2. **competitor groups 仍然粗**
+
+wrong_category、generic_continue、format_target 仍是手工词元组。
+它们能解释主要趋势，但不能覆盖全部词表生态。
+
+3. **没有记录 top competing tokens**
+
+目前记录的是 group-level max logit。
+下一步需要直接保存 top-20 tokens 及其类别归属，避免遗漏未知竞争者。
+
+4. **final hidden delta norm 很大，但缺少方向解释**
+
+hidden delta norm 证明 MLP joint 改写很强，但还没有说明改写方向落在哪些可解释子空间。
+
+5. **quoted_answer 在 DS7B 中异常**
+
+DS7B quoted_answer 的 correct/format/generic 同时上升，需要单独拆路径。
+
+### 下一步任务
+
+Phase158 应继续：
+
+```text
+Step-wise Competition Trace and Top-token Ecology
+逐步竞争轨迹与高排名词元生态
+```
+
+核心目标：
+
+```text
+把 Phase157 的 first-step decomposition 扩展到 3-step generation trajectory。
+```
+
+测试设计：
+
+```text
+1. 继续使用 qwen3 / GLM4 / DS7B。
+2. 保留 6 categories 和 5 formats。
+3. 重点分析困难格式：
+   label_colon
+   answer_one_word
+   quoted_answer
+   list_answer
+4. conditions:
+   clean
+   mlp_joint
+   joint_k8_mlp_joint
+   random_k8
+5. 对每一步 t=1,2,3 保存：
+   generated token
+   top-20 tokens
+   top-20 token group labels
+   correct group max logit
+   wrong category max logit
+   format max logit
+   generic continuation max logit
+   object copy max logit
+   correct_vs_competitor margin
+6. 对每个 case 分类：
+   first-step good but later fail
+   first-step format then answer
+   first-step wrong semantic
+   generic continuation trap
+   object copy trap
+   punctuation trap
+```
+
+关键判据：
+
+```text
+如果 first-step margin 改善但 3-step hit 下降，
+看第2/3步是否进入 generic continuation 或 punctuation trap。
+
+如果 GLM4 hit 提升，
+看 top tokens 是否从 format/generic 转向 correct surface。
+
+如果 DS7B correct 被压低但 quoted_answer 改善，
+说明 quoted_answer 的表面路径不依赖同一 correct category logit route。
+```
+
+阶段性大任务：
+
+```text
+把语言生成从“单点输出竞争”推进到“多步行动轨迹竞争”。
+```
+
+这是破解语言编码机制的关键，因为语言不是一个静态答案向量，而是连续词元行动。
+
+## Phase 158: Step-wise Competition Trace and Top-token Ecology 逐步竞争轨迹与高排名词元生态 [2026-06-16 00:13]
+
+### 本阶段目标
+
+根据用户提供的 Phase157 复核意见，先判断其正确部分，再继续完成测试。
+
+复核意见中正确部分：
+
+```text
+1. Phase157 是正确的关键转折。
+2. MLP joint 不是 correct-answer support，而是 residual competition rewriter。
+3. first-step margin 不能解释 multi-step hit。
+4. 语言生成必须作为 token trajectory 研究，而不是单步 logit。
+5. 下一步必须保存 step1/2/3 的 top-token ecology。
+```
+
+本轮 Phase158 目标：
+
+```text
+把 Phase157 的 first-step competition decomposition
+扩展成真实 3-step generation trajectory 的逐步竞争追踪。
+```
+
+核心问题：
+
+```text
+1. 正确答案在哪一步失去优势？
+2. 失败主要来自 wrong category、format、generic continuation、object copy、fragment，还是 unknown other？
+3. Qwen3 为什么 first-step margin 改善但 3-step hit 下降？
+4. GLM4 为什么困难格式 hit 提升？
+5. DS7B quoted_answer 的首步异常是否能转化成真实三步成功？
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase158_stepwise_competition_trace_cuda.py \
+  tests/gpt5/phase158_stepwise_competition_trace_summary.py
+
+python tests/gpt5/phase158_stepwise_competition_trace_cuda.py qwen3 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --top-k 20 \
+  --output-dir results/gpt5_phase158_stepwise_competition_trace \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase158_stepwise_competition_trace_cuda.py glm4 \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --top-k 20 \
+  --output-dir results/gpt5_phase158_stepwise_competition_trace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase158_stepwise_competition_trace_cuda.py deepseek7b \
+  --categories plant,time,container,number,clothing,furniture \
+  --template-families long,short,neutral \
+  --splits front_back,back_front \
+  --formats label_colon,answer_one_word,quoted_answer,list_answer,multiple_choice \
+  --train-objects 8 \
+  --test-objects 8 \
+  --batch-size 16 \
+  --steps 3 \
+  --top-k 20 \
+  --output-dir results/gpt5_phase158_stepwise_competition_trace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase158_stepwise_competition_trace_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/gpt5/phase158_stepwise_competition_trace_cuda.py`
+- 汇总脚本：`tests/gpt5/phase158_stepwise_competition_trace_summary.py`
+- Qwen3 结果：`results/gpt5_phase158_stepwise_competition_trace/phase158_qwen3_stepwise_competition_trace.json`
+- GLM4 结果：`results/gpt5_phase158_stepwise_competition_trace/phase158_glm4_stepwise_competition_trace.json`
+- DS7B 结果：`results/gpt5_phase158_stepwise_competition_trace/phase158_deepseek7b_stepwise_competition_trace.json`
+- 跨模型汇总：`results/gpt5_phase158_stepwise_competition_trace/phase158_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+categories = plant, time, container, number, clothing, furniture
+template families = long, short, neutral
+splits = front_back, back_front
+formats = label_colon, answer_one_word, quoted_answer, list_answer, multiple_choice
+cases/model = 180
+prompts/case = 8
+steps = 3
+top-k tokens/step = 20
+```
+
+干预条件：
+
+```text
+clean
+mlp_joint
+joint_k8_mlp_joint
+random_k8
+```
+
+每一步保存：
+
+```text
+generated token
+generated token group
+top-20 tokens
+top-20 token group labels
+correct group max logit
+wrong category max logit
+format max logit
+generic continuation max logit
+object copy max logit
+option label max logit
+correct_vs_competitor margin
+```
+
+轨迹分类：
+
+```text
+correct_surface
+format_then_answer
+wrong_semantic
+generic_continuation_trap
+object_copy_trap
+punctuation_trap
+fragment_trap
+option_copy_path
+quote_path_success
+quote_path_failure
+list_path_success
+list_path_failure
+first_step_good_later_fail
+other
+```
+
+### 客观结果
+
+#### Qwen3
+
+全部 case：
+
+```text
+clean hit = 0.368
+mlp_joint hit = 0.353, delta -0.015
+joint_k8_mlp_joint hit = 0.347, delta -0.022
+random_k8 hit = 0.360, delta -0.008
+
+mlp step margins:
+  step1 = -0.398
+  step2 = -6.554
+  step3 = -5.438
+
+mlp step1 top1 rates:
+  correct = 0.231
+  wrong = 0.077
+  generic = 0.000
+  format = 0.096
+```
+
+困难格式：
+
+```text
+clean hit = 0.218
+mlp_joint hit = 0.199, delta -0.019
+joint_k8_mlp_joint hit = 0.190, delta -0.028
+random_k8 hit = 0.209, delta -0.009
+
+mlp margins:
+  step1 = -0.628
+  step2 = -6.016
+  step3 = -6.143
+
+mlp step1 top1:
+  correct = 0.155
+  wrong = 0.002
+  generic = 0.000
+  format = 0.120
+
+dominant trajectory:
+  fragment_trap
+```
+
+按格式：
+
+```text
+answer_one_word:
+  clean 0.149 -> mlp 0.101, delta -0.049
+  dominant trajectory = other / fragment_trap
+
+label_colon:
+  clean 0.361 -> mlp 0.323, delta -0.038
+  step1 margin improves: 0.166 -> 0.406
+  but step2 margin = -5.330
+  dominant trajectory remains correct_surface, k8+mlp shifts toward fragment_trap
+
+list_answer:
+  clean 0.208 -> mlp 0.215, delta +0.007
+  dominant trajectory = object_copy_trap
+
+quoted_answer:
+  clean 0.153 -> mlp 0.156, delta +0.003
+  dominant trajectory = fragment_trap
+```
+
+Qwen3 解释：
+
+```text
+Phase157 中 first-step margin 改善不能带来 3-step hit 改善，
+原因是 step2/step3 的 margin 大幅崩塌。
+
+Qwen3 的主要失败不是 wrong category，
+而是 fragment_trap、other 和 object_copy_trap。
+```
+
+#### GLM4 bf16
+
+全部 case：
+
+```text
+clean hit = 0.297
+mlp_joint hit = 0.315, delta +0.017
+joint_k8_mlp_joint hit = 0.320, delta +0.023
+random_k8 hit = 0.301, delta +0.004
+
+mlp margins:
+  step1 = -0.353
+  step2 = -4.745
+  step3 = -6.261
+
+mlp step1 top1:
+  correct = 0.222
+  wrong = 0.060
+  generic = 0.001
+  format = 0.000
+```
+
+困难格式：
+
+```text
+clean hit = 0.131
+mlp_joint hit = 0.204, delta +0.073
+joint_k8_mlp_joint hit = 0.200, delta +0.069
+random_k8 hit = 0.134, delta +0.003
+
+mlp margins:
+  step1 = -0.658
+  step2 = -4.922
+  step3 = -6.779
+
+mlp step1 top1:
+  correct = 0.184
+  wrong = 0.014
+  generic = 0.001
+  format = 0.000
+```
+
+按格式：
+
+```text
+answer_one_word:
+  clean 0.056 -> mlp 0.122, delta +0.066
+  dominant trajectory = fragment_trap / other / object_copy_trap
+
+label_colon:
+  clean 0.236 -> mlp 0.441, delta +0.205
+  dominant trajectory = correct_surface
+
+list_answer:
+  clean 0.146 -> mlp 0.156, delta +0.010
+  dominant trajectory = other
+
+quoted_answer:
+  clean 0.087 -> mlp 0.097, delta +0.010
+  dominant trajectory = fragment_trap / object_copy_trap
+
+multiple_choice:
+  clean 0.962 -> mlp 0.757, delta -0.205
+```
+
+GLM4 解释：
+
+```text
+Phase156 中 GLM4 difficult hit 提升，
+主要由 label_colon 的 correct_surface trajectory 增加驱动。
+
+MLP joint 对普通开放格式有帮助，
+但明显破坏 multiple_choice 的选项复制路径。
+```
+
+#### DS7B
+
+全部 case：
+
+```text
+clean hit = 0.235
+mlp_joint hit = 0.251, delta +0.017
+joint_k8_mlp_joint hit = 0.216, delta -0.019
+random_k8 hit = 0.233, delta -0.002
+
+mlp margins:
+  step1 = -2.314
+  step2 = -7.342
+  step3 = -4.849
+
+mlp step1 top1:
+  correct = 0.108
+  wrong = 0.106
+  generic = 0.002
+  format = 0.094
+```
+
+困难格式：
+
+```text
+clean hit = 0.076
+mlp_joint hit = 0.074, delta -0.003
+joint_k8_mlp_joint hit = 0.044, delta -0.032
+random_k8 hit = 0.070, delta -0.006
+
+mlp margins:
+  step1 = -2.333
+  step2 = -6.972
+  step3 = -5.636
+
+mlp step1 top1:
+  correct = 0.062
+  wrong = 0.000
+  generic = 0.003
+  format = 0.118
+```
+
+按格式：
+
+```text
+answer_one_word:
+  clean 0.049 -> mlp 0.056, delta +0.007
+  dominant trajectory = other / fragment_trap / object_copy_trap
+
+label_colon:
+  clean 0.069 -> mlp 0.059, delta -0.010
+  joint_k8+mlp = 0.014, delta -0.056
+  dominant trajectory = other / fragment_trap / punctuation_trap
+
+list_answer:
+  clean 0.125 -> mlp 0.128, delta +0.003
+  dominant trajectory = object_copy_trap
+
+quoted_answer:
+  clean 0.062 -> mlp 0.052, delta -0.010
+  joint_k8+mlp = 0.028, delta -0.035
+  dominant trajectory = fragment_trap / object_copy_trap
+
+multiple_choice:
+  clean 0.868 -> mlp 0.962, delta +0.094
+```
+
+DS7B 解释：
+
+```text
+Phase157 中 quoted_answer 的 first-step correct/format/generic 同时上升，
+没有转化为 3-step success。
+
+Phase158 显示 quoted_answer 仍主要进入 fragment_trap 与 object_copy_trap。
+
+DS7B 的困难格式失败不是单纯首步 correct logit 问题，
+而是后续轨迹被 fragment/object-copy/punctuation 抢走。
+```
+
+### 当前最可靠客观事实
+
+1. **first-step margin 不是生成闭合条件**
+
+Qwen3 label_colon：
+
+```text
+clean step1 margin = 0.166
+mlp step1 margin = 0.406
+mlp hit delta = -0.038
+```
+
+原因：
+
+```text
+mlp step2 margin = -5.330
+mlp step3 margin = -5.163
+```
+
+这直接证明：
+
+```text
+M_correct(step1) 改善
+不等于 trajectory closure。
+```
+
+2. **step2/step3 是开放格式生成的主要崩塌点**
+
+三模型困难格式中，mlp step2/step3 margin 普遍很低：
+
+```text
+Qwen3 difficult:
+  step1 -0.628, step2 -6.016, step3 -6.143
+
+GLM4 difficult:
+  step1 -0.658, step2 -4.922, step3 -6.779
+
+DS7B difficult:
+  step1 -2.333, step2 -6.972, step3 -5.636
+```
+
+这说明多步反馈比单步 logit 更关键。
+
+3. **GLM4 的提升主要来自 label_colon**
+
+```text
+GLM4 label_colon:
+  clean 0.236
+  mlp_joint 0.441
+  delta +0.205
+```
+
+这解释了 Phase156/157 中 GLM4 difficult hit 提升。
+
+4. **Qwen3 的 MLP 干预主要制造 fragment/other 失败**
+
+Qwen3 difficult dominant trajectory：
+
+```text
+fragment_trap
+```
+
+尤其：
+
+```text
+answer_one_word:
+  clean 0.149 -> mlp 0.101
+  dominant = other / fragment_trap
+
+quoted_answer:
+  dominant = fragment_trap
+```
+
+5. **DS7B quoted_answer 首步异常不是成功路径**
+
+Phase157 中 DS7B quoted_answer first-step margin 改善。
+
+Phase158 显示：
+
+```text
+quoted_answer:
+  clean 0.062
+  mlp_joint 0.052
+  joint_k8+mlp 0.028
+  dominant = fragment_trap / object_copy_trap
+```
+
+这说明 quoted_answer 的异常是局部首步生态变化，不是完整表面轨迹闭合。
+
+6. **multiple_choice 继续是独立路径**
+
+```text
+Qwen3 multiple_choice:
+  clean 0.969 -> mlp 0.972
+
+GLM4 multiple_choice:
+  clean 0.962 -> mlp 0.757
+
+DS7B multiple_choice:
+  clean 0.868 -> mlp 0.962
+```
+
+它与困难格式差异太大，仍只能作为 control。
+
+### 理论进展
+
+Phase158 将 Phase157 的理论从：
+
+```text
+MLP-Centered Residual Competition Rewriter
+```
+
+推进为：
+
+```text
+Residual Competition Trajectory Theory
+残差竞争轨迹理论
+```
+
+核心修正：
+
+```text
+语言生成不是让正确答案在 step1 胜出，
+而是让正确表面轨迹在 step1/2/3 连续竞争中不被抢走。
+```
+
+当前公式应更新为：
+
+```text
+S_g(t) = max_{v in G_g} LMHead(R_t)_v
+
+M_correct(t) =
+S_correct(t)
+-
+max(S_wrong(t), S_format(t), S_generic(t), S_object(t), S_fragment(t))
+
+x_t = argmax_v LMHead(R_t)_v
+C_{t+1} = C_t + x_t
+R_{t+1} = Forward(C_{t+1})
+```
+
+闭合条件不是：
+
+```text
+M_correct(1) > 0
+```
+
+而是：
+
+```text
+exists t <= 3:
+  generated_prefix hits correct surface
+and trajectory not trapped by:
+  fragment
+  object_copy
+  generic_continuation
+  punctuation
+  wrong_semantic
+```
+
+### 硬伤与问题
+
+1. **top-token labels 仍有 large other group**
+
+Qwen3 / DS7B 中很多失败归为 `other`。
+这说明人工竞争族仍不够细，需要进一步拆：
+
+```text
+template residual tokens
+subword fragments
+capitalization variants
+explanation starters
+relation words
+category-adjacent words
+```
+
+2. **fragment_trap 的判定仍粗**
+
+当前用 token 形态做粗分类。不同 tokenizer 中 fragment 的语义不同，需要 tokenizer-specific 细化。
+
+3. **仍是 greedy 3-step**
+
+真实生成可能受更长轨迹影响。当前只能说明短程表面路径。
+
+4. **没有做路径修复**
+
+Phase158 解释了失败路径，但没有尝试在 step2/step3 修复。
+
+5. **知识网络仍未展开**
+
+当前主要破解生成轨迹，不是知识关系本体。
+
+### 下一步任务
+
+Phase159 应进入：
+
+```text
+Trajectory Trap Repair and Step-2/3 Intervention
+轨迹陷阱修复与第二/三步干预
+```
+
+核心目标：
+
+```text
+既然 step2/step3 是主要崩塌点，
+下一步应测试能否在 step2/step3 修复轨迹。
+```
+
+测试设计：
+
+```text
+1. 继续三模型 qwen3 / GLM4 / DS7B。
+2. 保留 6 categories。
+3. 主测困难格式：
+   answer_one_word
+   label_colon
+   quoted_answer
+   list_answer
+4. conditions:
+   clean
+   mlp_joint_step1_only
+   mlp_joint_step2_only
+   mlp_joint_step3_only
+   mlp_joint_all_steps
+   step2_correct_margin_boost
+   step2_format_suppression
+   random_control
+5. 对 step2/step3 的 top competitors 做 targeted suppression：
+   fragment tokens
+   object_copy tokens
+   generic continuation tokens
+   format-only tokens
+6. 测真实 3-step hit 和 trajectory class。
+```
+
+关键判据：
+
+```text
+如果 step2/3 修复显著提升 hit：
+  语言生成瓶颈主要是 trajectory maintenance。
+
+如果 step1 干预有效但 step2/3 干预无效：
+  说明首步选错后不可恢复。
+
+如果抑制 fragment/object/generic 可以提升 hit：
+  说明失败主要是竞争者压制问题，不是语义知识缺失。
+
+如果所有修复都无效：
+  需要转向更长序列级动力学或知识路由本体。
+```
+
+阶段性大任务：
+
+```text
+从解释轨迹失败，推进到因果修复轨迹失败。
+```
+
+这一步非常关键，因为破解语言机制不只是知道失败在哪里，
+还要证明哪些内部/输出竞争干预可以把失败轨迹改成成功轨迹。
