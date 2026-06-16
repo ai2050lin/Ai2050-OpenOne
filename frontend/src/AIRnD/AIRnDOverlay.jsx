@@ -1,20 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Brain, Target, Activity, Search, Zap, CheckCircle, Play, Pause, Square, RotateCcw } from 'lucide-react';
+import { X, Brain, Target, Activity, Search, Zap, CheckCircle, Play } from 'lucide-react';
 import { AIRnDConfigTab } from './AIRnDConfigTab';
 import { AIRnDConsoleTab } from './AIRnDConsoleTab';
-import { AIRnDLogTab } from './AIRnDLogTab';
-import { AIRnDCodeGenTab } from './AIRnDCodeGenTab';
-import { AIRnDFindingsTab } from './AIRnDFindingsTab';
 import { RESEARCH_PHASES } from './aiRnDConfig';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const TABS = [
-  { id: 'config', label: '配置', icon: Target },
   { id: 'console', label: '控制台', icon: Activity },
-  { id: 'log', label: '分析日志', icon: Search },
-  { id: 'codegen', label: '代码生成', icon: Zap },
-  { id: 'findings', label: '发现', icon: CheckCircle },
+  { id: 'config', label: '配置', icon: Target },
 ];
 
 const PHASE_ICONS = {
@@ -27,7 +21,8 @@ const PHASE_ICONS = {
 
 export const AIRnDOverlay = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('console');
-  const [sessionStatus, setSessionStatus] = useState('idle'); // idle | running | paused | stopped
+  const [sessionStatus, setSessionStatus] = useState('idle'); // idle | running | paused | stopped | waiting_step
+  const [sessionMode, setSessionMode] = useState('auto'); // auto | manual
   const [currentPhase, setCurrentPhase] = useState(null);
   const [round, setRound] = useState(0);
   const [logs, setLogs] = useState([]);
@@ -54,12 +49,12 @@ export const AIRnDOverlay = ({ onClose }) => {
       if (res.ok) {
         const data = await res.json();
         setSessionStatus(data.status || 'idle');
+        setSessionMode(data.mode || 'auto');
         setCurrentPhase(data.current_phase || null);
         setRound(data.round || 0);
         setResearchState(data.research_state || null);
       }
     } catch (e) {
-      // Backend not ready yet, that's ok
       console.warn('AI R&D backend not reachable:', e.message);
     }
   }, []);
@@ -96,11 +91,12 @@ export const AIRnDOverlay = ({ onClose }) => {
       setRound(data.round);
     } else if (data.type === 'status_change') {
       setSessionStatus(data.status);
+    } else if (data.type === 'mode_change') {
+      setSessionMode(data.mode);
     } else if (data.type === 'finding') {
       setFindings(prev => [...prev.slice(-200), data.finding]);
     } else if (data.type === 'code_generated') {
       setGeneratedCode(data.code || '');
-      setActiveTab('codegen');
     } else if (data.type === 'execution_result') {
       setExecutionResult(data.result);
     } else if (data.type === 'error') {
@@ -146,6 +142,31 @@ export const AIRnDOverlay = ({ onClose }) => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
         eventSourceRef.current = null;
+      }
+    } catch (e) { setError(e.message); }
+  }, []);
+
+  const toggleMode = useCallback(async () => {
+    const newMode = sessionMode === 'auto' ? 'manual' : 'auto';
+    try {
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/mode`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: newMode }),
+      });
+      if (res.ok) {
+        setSessionMode(newMode);
+      }
+    } catch (e) { setError(e.message); }
+  }, [sessionMode]);
+
+  const stepNext = useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/step`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.detail || 'Step failed');
       }
     } catch (e) { setError(e.message); }
   }, []);
@@ -234,7 +255,7 @@ export const AIRnDOverlay = ({ onClose }) => {
             }}>
               <Brain size={18} color="#fff" style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.75))' }} />
             </div>
-            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px', color: '#f3f4f6' }}>AI 研发</span>
+            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px', color: '#f3f4f6' }}>AI 自动研发</span>
           </div>
 
           {/* Tab Navigation */}
@@ -296,31 +317,6 @@ export const AIRnDOverlay = ({ onClose }) => {
               {sessionStatus === 'idle' ? '就绪' : sessionStatus === 'running' ? `R${round} ${phaseInfo?.label || currentPhase || ''}` : sessionStatus === 'paused' ? '已暂停' : '已停止'}
             </span>
           </div>
-
-          {/* Control buttons */}
-          {sessionStatus === 'idle' || sessionStatus === 'stopped' ? (
-            <button onClick={startSession} style={controlBtnStyle('#00ff88', '#003311')} title="启动研究循环">
-              <Play size={16} style={{ filter: 'drop-shadow(0 0 5px #00ff88)' }} />
-            </button>
-          ) : sessionStatus === 'running' ? (
-            <>
-              <button onClick={pauseSession} style={controlBtnStyle('#ffaa00', '#332200')} title="暂停">
-                <Pause size={16} style={{ filter: 'drop-shadow(0 0 5px #ffaa00)' }} />
-              </button>
-              <button onClick={stopSession} style={controlBtnStyle('#ff4444', '#330000')} title="停止">
-                <Square size={16} style={{ filter: 'drop-shadow(0 0 5px #ff4444)' }} />
-              </button>
-            </>
-          ) : sessionStatus === 'paused' ? (
-            <>
-              <button onClick={resumeSession} style={controlBtnStyle('#00ff88', '#003311')} title="继续">
-                <Play size={16} style={{ filter: 'drop-shadow(0 0 5px #00ff88)' }} />
-              </button>
-              <button onClick={stopSession} style={controlBtnStyle('#ff4444', '#330000')} title="停止">
-                <Square size={16} style={{ filter: 'drop-shadow(0 0 5px #ff4444)' }} />
-              </button>
-            </>
-          ) : null}
 
           {/* Close button */}
           <button onClick={onClose} style={{
@@ -399,23 +395,21 @@ export const AIRnDOverlay = ({ onClose }) => {
         {activeTab === 'console' && (
           <AIRnDConsoleTab
             sessionStatus={sessionStatus}
+            sessionMode={sessionMode}
             currentPhase={currentPhase}
             round={round}
             logs={logs}
+            generatedCode={generatedCode}
+            executionResult={executionResult}
+            findings={findings}
             onStart={startSession}
             onPause={pauseSession}
+            onResume={resumeSession}
             onStop={stopSession}
+            onToggleMode={toggleMode}
+            onStep={stepNext}
             onClear={() => setLogs([])}
           />
-        )}
-        {activeTab === 'log' && (
-          <AIRnDLogTab logs={logs} />
-        )}
-        {activeTab === 'codegen' && (
-          <AIRnDCodeGenTab code={generatedCode} result={executionResult} />
-        )}
-        {activeTab === 'findings' && (
-          <AIRnDFindingsTab findings={findings} round={round} />
         )}
       </div>
 
@@ -430,8 +424,5 @@ export const AIRnDOverlay = ({ onClose }) => {
   );
 };
 
-const controlBtnStyle = (color, bg) => ({
-  width: 32, height: 32, borderRadius: '50%', border: 'none', cursor: 'pointer',
-  background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  transition: 'all 0.2s',
-});
+
+

@@ -54,17 +54,19 @@ class ResearchSession:
     """单例研究会话"""
 
     def __init__(self):
-        self.status: str = "idle"  # idle | running | paused | stopped
+        self.status: str = "idle"  # idle | running | paused | stopped | waiting_step
         self.current_phase: Optional[str] = None
         self.round: int = 0
+        self.mode: str = "auto"  # auto | manual
         self.started_at: Optional[float] = None
         self.config: Dict = {}
         self.findings: List[Dict] = []
         self.research_state: Dict = {}
-        self.event_queue: asyncio.Queue = asyncio.Queue()
+        self.event_queue: asyncio.Queue = asyncio.Queue(maxsize=500)
         self._loop_task: Optional[asyncio.Task] = None
         self._stop_requested = False
         self._pause_requested = False
+        self._step_event: asyncio.Event = asyncio.Event()
 
         # 加载保存的配置
         self._load_config()
@@ -102,6 +104,7 @@ class ResearchSession:
     def get_status(self) -> Dict:
         return {
             "status": self.status,
+            "mode": self.mode,
             "current_phase": self.current_phase,
             "round": self.round,
             "started_at": self.started_at,
@@ -249,8 +252,21 @@ def execute_code_sandbox(code: str, timeout: int = 120) -> Dict:
 
 # ==================== 研究循环 ====================
 
+async def _wait_for_step(session: ResearchSession, after_phase: str = ""):
+    """手动模式: 等待用户点击下一步"""
+    if session.mode != "manual":
+        return
+    session.status = "waiting_step"
+    session.push_event("status_change", status="waiting_step", waiting_after=after_phase)
+    session._step_event.clear()
+    await session._step_event.wait()  # Wait until user clicks "step"
+    session.status = "running"
+    session.push_event("status_change", status="running")
+    session._step_event.clear()
+
+
 async def run_research_loop(session: ResearchSession):
-    """5阶段自动研究循环"""
+    """5阶段自动研究循环(支持自动/手动模式)"""
     session.status = "running"
     session.started_at = time.time()
     session.push_event("status_change", status="running")
@@ -284,13 +300,12 @@ async def run_research_loop(session: ResearchSession):
 
         session.round += 1
         session.push_event("round_change", round=session.round)
-        session.push_event("phase_change", phase="analyze")
 
         # ===== Phase 1: 分析 =====
         session.current_phase = "analyze"
+        session.push_event("phase_change", phase="analyze")
         analyst_reports = []
 
-        # Build context for analysts
         findings_summary = "\n".join(
             f"- [{f.get('round', '?')}] {f.get('title', f.get('content', '')[:80])}"
             for f in session.findings[-20:]
@@ -310,6 +325,12 @@ async def run_research_loop(session: ResearchSession):
             analyst_reports.append({"model": am.name, "analysis": result})
             session.push_event("analysis", content=f"✓ {am.name} 分析完成")
 
+        session.research_state["last_analyst_reports"] = analyst_reports
+        if session._stop_requested:
+            break
+
+        # Manual: wait after analysis
+        await _wait_for_step(session, "analyze")
         if session._stop_requested:
             break
 
@@ -337,6 +358,11 @@ async def run_research_loop(session: ResearchSession):
         if session._stop_requested:
             break
 
+        # Manual: wait after planning
+        await _wait_for_step(session, "plan")
+        if session._stop_requested:
+            break
+
         # ===== Phase 3: 代码生成 =====
         session.current_phase = "generate"
         session.push_event("phase_change", phase="generate")
@@ -345,7 +371,6 @@ async def run_research_loop(session: ResearchSession):
         session.push_event("generation", content="⚡ 主模型生成代码中...")
         generated_code = await call_ai_model(master_model, code_prompt, system_msg="你只输出Python代码，不要任何解释或markdown标记")
 
-        # Clean up markdown code blocks if present
         if generated_code.startswith("```"):
             lines = generated_code.split("\n")
             generated_code = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
@@ -361,7 +386,6 @@ async def run_research_loop(session: ResearchSession):
         session.push_event("phase_change", phase="execute")
         session.push_event("execution", content="🚀 执行代码中...")
 
-        # Run in thread to not block event loop
         loop = asyncio.get_event_loop()
         exec_result = await loop.run_in_executor(None, execute_code_sandbox, generated_code)
 
@@ -369,6 +393,11 @@ async def run_research_loop(session: ResearchSession):
         session.research_state["last_test_output"] = exec_result.get("output", "")[:5000]
         session.research_state["last_execution_status"] = exec_result.get("status", "unknown")
 
+        if session._stop_requested:
+            break
+
+        # Manual: wait after execution (user reviews test results)
+        await _wait_for_step(session, "execute")
         if session._stop_requested:
             break
 
@@ -383,25 +412,27 @@ async def run_research_loop(session: ResearchSession):
         session.push_event("summary", content="📝 总结中...")
         summary = await call_ai_model(master_model, summary_prompt, system_msg="你是研究总结专家")
 
-        # Extract findings from summary
         finding = {
             "round": session.round,
             "title": f"Round {session.round} 研究发现",
             "content": summary,
             "source": master_model.name,
             "timestamp": datetime.now().isoformat(),
-            "tags": ["auto"],
+            "tags": [session.mode],
         }
         session.findings.append(finding)
         session.push_event("finding", finding=finding)
         session.push_event("summary", content=f"✓ Round {session.round} 完成")
 
-        # Update research state
         session.research_state["rounds_completed"] = session.round
         session.research_state["last_summary"] = summary[:2000]
 
-        # Brief pause between rounds
-        await asyncio.sleep(2)
+        # Manual: wait at end of round
+        await _wait_for_step(session, "summarize")
+
+        # Brief pause between rounds (auto mode only)
+        if session.mode == "auto":
+            await asyncio.sleep(2)
 
     # Loop ended
     session.status = "stopped"
@@ -453,6 +484,33 @@ async def pause_session():
         raise HTTPException(400, "Session not running")
     session._pause_requested = True
     return {"status": "pausing"}
+
+
+class ModePayload(BaseModel):
+    mode: str  # auto | manual
+
+
+@router.put("/session/mode")
+async def set_mode(payload: ModePayload):
+    session = get_session()
+    if payload.mode not in ("auto", "manual"):
+        raise HTTPException(400, "mode must be 'auto' or 'manual'")
+    session.mode = payload.mode
+    session.push_event("mode_change", mode=payload.mode)
+    return {"status": "ok", "mode": payload.mode}
+
+
+@router.post("/session/step")
+async def step_session():
+    """手动模式: 推进到下一个阶段"""
+    session = get_session()
+    if session.mode != "manual":
+        raise HTTPException(400, "Not in manual mode")
+    if session.status != "waiting_step":
+        raise HTTPException(400, f"Session not waiting for step (status: {session.status})")
+    session._step_event.set()
+    session.push_event("step_triggered")
+    return {"status": "stepping", "next_phase": session.current_phase}
 
 
 @router.post("/session/stop")

@@ -2900,7 +2900,7 @@ export default function App() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 0 10px rgba(167, 139, 250, 0.3)'
         }}
-        title="AI 研发: 自动逆向工程研究"
+        title="AI 自动研发: 自动逆向工程研究"
       >
         <Terminal size={20} />
       </button>
