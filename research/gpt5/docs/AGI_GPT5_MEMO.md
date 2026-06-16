@@ -25011,3 +25011,220 @@ Trajectory Trap Repair and Step-2/3 Intervention
 
 这一步非常关键，因为破解语言机制不只是知道失败在哪里，
 还要证明哪些内部/输出竞争干预可以把失败轨迹改成成功轨迹。
+
+
+---
+
+## GPT5 双 MEMO 完整审查与统一理论缺口分析 [2026-06-16 10:12]
+
+### 一、GPT5 路线全貌
+
+GPT5 路线共 **158 个 Phase**，分布在两个文件中：
+- `AGI_GPT5_MEMO_20260615.md` (Phase 1-141, 约51533行): 主档案，从零开始
+- `AGI_GPT5_MEMO.md` (Phase 101-158, 约25013行): 续集，Phase 156-158 为全新
+
+核心演化轨迹：
+```
+基础环境(1-20) → 契约图谱(21-36) → 被动语态闭包(37-52)
+→ GLM5对齐与Binding(53-60) → 对象-关系-值闭包(61-100)
+→ 头路由复原(101-136) → 机制变量闭合(137-145) → Set Writer门控(146-158)
+```
+
+---
+
+### 二、GPT5 路线独有的关键数学公式
+
+#### 2.1 条件化关系因子动力学（Phase 137，四段式）
+
+```
+(1) 上游对象触发:    R_c^l(P,T) = F_l(object, template, context)
+(2) 上下文字段形成:  C_c^l(P,T) = G_l(R_c^l, T_frame, competitors)
+(3) 头集合读取:      V_c^L(a) = Σ Σ α_h(a,s|c,T) · V_h(s)    [H = H_core + H_aux]
+(4) 答案位点重编码:  A_c^L(a) = Φ_L(C_c^{L-k}, V_c^L, MLP_L, Norm_L)
+```
+
+#### 2.2 低秩转移映射 W·R_pre（Phase 122-145 核心）
+
+```
+A_answer ≈ W_{c,T} · R_pre
+
+W 通过 ridge regression 拟合:
+W = A_answer @ R_pre^T @ (R_pre @ R_pre^T + λI)^(-1)
+```
+
+#### 2.3 Clean Restore 硬约束判据（Phase 140-145）
+
+```
+recovery_ratio = (logit_restore - logit_remove) / (logit_original - logit_remove) >= 0.5
+max_other_delta <= 0.25
+
+干净恢复 ≠ 最优恢复。最优恢复(dirty) 会释放竞争类别。
+```
+
+#### 2.4 Support/Suppress 分解（Phase 140-144）
+
+```
+三种 suppressor 构造:
+1. 类别基底 suppressor: 用 competitor 的 W_comp·R_pre
+2. Empirical competitor suppressor: 用释放最多的竞争类别的真实状态
+3. Dirty-clean contrast suppressor: state_dirty - state_clean
+```
+
+#### 2.5 位点/层位路由特异性（Phase 141-145）
+
+```
+不同类别使用不同的 layer-site-scale 窗口:
+
+number: L28 attention_output low-scale (0.25-0.3)
+plant: L28 input_answer scale 0.75 或 attention_output scale 0.35
+time: L27 (last-1) mlp_input scale 0.5 (仅长模板有效)
+container: L28 input_answer high-scale (0.75-1.0)
+```
+
+#### 2.6 模板条件化路由（Phase 145）
+
+```
+clean_rate = 满足 hard constraint 的 (template, split) 组合比例
+category_argmax_rate = first-token 为类别词的比例
+
+→ template family 和 object split 是路由变量，不是噪声
+→ readout restore ≠ token-level output closure (category_argmax_rate 基本为0)
+```
+
+#### 2.7 Set Writer Surface Gate Closure（Phase 156-158，最新）
+
+```
+Phase 156: set writer surface gate 闭合 — 多token set 的写入者定位
+Phase 157: final residual lmhead competition — 末层残差与词表头的竞争关系
+Phase 158: stepwise competition trace — 逐层竞争关系追踪
+```
+
+---
+
+### 三、GPT5 路线在 GLM5 统一理论中的覆盖情况
+
+| GPT5 发现 | Phase | 在 GLM5 统一理论中？ | 状态 |
+|-----------|-------|---------------------|------|
+| v_cat 差分语义方向 | 122-145 | ✅ v_c = h_rich - h_neutral | 已整合 |
+| g⊙w_D 作为读出方向 | 498-503(GLM5) | ✅ 统一公式核心 | 已整合 |
+| T/C 双模分解 | 503(GLM5) | ✅ ΔD = ΔT - ΔC | 已整合 |
+| **W·R_pre 转移映射** | 122-145 | ❌ 未出现在统一公式中 | **严重遗漏** |
+| **Clean Restore 判据** | 140-145 | ❌ 仅部分覆盖 | **遗漏** |
+| **Support/Suppress 分解** | 142-144 | ❌ 仅 C-dominant 部分覆盖 | **遗漏** |
+| **位点/层位特异性** | 141-145 | ❌ 公式中没有 layer/site 参数 | **遗漏** |
+| **模板条件化路由** | 145 | ❌ 公式中没有 template 参数 | **遗漏** |
+| **Token级闭合缺口** | 145 | ❌ category_argmax_rate=0 未建模 | **遗漏** |
+| **Set Writer Surface Gate** | 156-158 | ❌ 全新发现，未涉及 | **遗漏** |
+| **Stepwise competition trace** | 158 | ❌ 全新发现，未涉及 | **遗漏** |
+| 契约图谱/GFCM | 21-36 | ❌ 属于上游机制，未整合 | 未整合 |
+| 被动语态变量闭包 | 37-52 | ❌ 属于上游机制，未整合 | 未整合 |
+| 对象-属性 Binding | 53-60 | 部分覆盖(Binding第二层) | 部分 |
+| destroy-restore 闭包 | 69-74 | ❌ 未整合 | 未整合 |
+
+---
+
+### 四、最严重遗漏详细分析
+
+#### 遗漏1：W·R_pre 转移映射（Phase 122-145，⭐⭐⭐严重）
+
+这是 GPT5 路线的核心发现——从 pre-answer 到 answer 位置存在一个可学习的线性转移映射 W。当前统一公式 `ReadableMeaning = <v_c, g⊙w_D>/rms` 完全缺失了这个映射。
+
+**缺失的具体内容**:
+- `A_answer ≈ W_{c,T} · R_pre` 是一条独立于 g⊙w_D 读出的语义支撑通道
+- Phase 145 验证了 plant 的 clean_rate=0.50，说明 W·R_pre 确实存在
+- 当前 v_c = h_rich - h_neutral 只在 answer 位置做差分，没有利用 pre-answer 信息
+- 如果 `cos(W·R_pre, g⊙w_D)` 高，则两条路线完全合一；如果低，则存在第二条独立通道
+
+#### 遗漏2：位点/层位/尺度三维路由（Phase 141-145，⭐⭐严重）
+
+不同类别使用完全不同的 layer-site-scale 组合。统一公式中的 q_c = g⊙w_D 是一个全局读出方向，没有 layer 参数。
+
+**具体差异**:
+- number 需要 L28 attention_output, scale=0.25
+- container 需要 L28 input_answer, scale=1.0
+- time 需要 L27 mlp_input, scale=0.5
+
+这些不是噪声——它们是真正的机制差异。统一公式需要条件化参数：
+```
+q_c(L, site, scale) = g_L ⊙ W_D, 受 L, site, scale 条件化
+```
+
+#### 遗漏3：Suppressor 未闭合（Phase 142-144，⭐⭐）
+
+GPT5 路线反复尝试但未能找到通用的 suppressor。三种 suppressor 构造（类别基底、empirical competitor、dirty-clean contrast）均只有局部成功。
+
+当前 GLM5 统一理论中的 C-主导机制（competitor suppression）确实捕捉到了 suppression 的存在，但没有提供 suppressor 的**构造方法**。GPT5 路线的大量失败实验表明 suppressor 的构造是关键难题。
+
+#### 遗漏4：模板条件化路由（Phase 145，⭐⭐）
+
+Phase 145 发现 time L27 mlp_input path 只在长模板下有效（clean_rate=0.50），跨模板扩展后 clean_rate=0。这说明路径本身是模板条件化的。
+
+当前统一公式中的 v_c = h_rich - h_neutral 使用了固定模板 "is a type of"，没有测试跨模板泛化。如果统一公式只在特定模板上成立，那它不完整。
+
+#### 遗漏5：Token 级闭合缺口（Phase 145，⭐）
+
+`category_argmax_rate = 0` — readout 恢复不等于 token 级选择。这意味着从 DCF 恢复到实际生成第一个 token 之间还有一层 gap。当前统一公式只到达 DCF 层面。
+
+#### 遗漏6：Stepwise Competition Trace（Phase 158，⭐⭐★全新）
+
+这是最新的 GPT5 发现——竞争关系是逐层演化的，不是只在最后一层决定。统一公式 `<v_c, g⊙w_D>/rms` 只描述了末层的一张快照，完全丢失了逐层竞争动态。
+
+---
+
+### 五、补全后的统一理论公式
+
+将 GPT5 路线遗漏的关键要素补回：
+
+```
+完整形式:
+ReadableMeaning_c(x,r,T,site,L)
+  = ┌─────────────────────────────────────────────────────────────┐
+    │ 第一层补充: 条件化关系因子动力学                               │
+    │ v_c_pre(x,r) = R_pre 的上下文语义方向                         │
+    │ v_c_transfer = W_{c,T} · v_c_pre(x,r)    ← GPT5 W·R_pre    │
+    ├─────────────────────────────────────────────────────────────┤
+    │ 第二层补充: 位点/层位/尺度路由                                 │
+    │ v_c_site(L,site) = extract(hidden, L, site)                  │
+    │ scale_window(L,site,c) = 类别特定的干净窗口                   │
+    ├─────────────────────────────────────────────────────────────┤
+    │ 第三层补充: Suppressor 分解                                   │
+    │ support_c = v_c ∥ q_c                                        │
+    │ suppress_c = - max(0, competitor_projection)                 │
+    │ v_c_clean = support_c - suppress_c                           │
+    ├─────────────────────────────────────────────────────────────┤
+    │ 第四层: Gain 门控读出（保持不变）                              │
+    │ D_c = <v_c_clean(L,site), g⊙w_D> / rms(h)                   │
+    ├─────────────────────────────────────────────────────────────┤
+    │ 第五层补充: Stepwise competition trace                        │
+    │ ΔD_L = contribution of layer L to final D                   │
+    │ D = Σ_L ΔD_L                                                 │
+    └─────────────────────────────────────────────────────────────┘
+
+约束:
+1. recovery_ratio >= 0.5, max_other_delta <= 0.25 (Clean Restore)
+2. template_family 是路由变量 (跨模板 clean_rate > 0)
+3. category_argmax_rate > 0 (Token 级闭合)
+```
+
+---
+
+### 六、整体评估
+
+| 维度 | 当前GLM5统一理论 | 补入GPT5后 |
+|------|:---:|:---:|
+| 末层读出机制 | ✅ 完整 | ✅ 完整 |
+| W·R_pre 转移映射 | ❌ | ✅ 补充 |
+| 位点/层位/尺度路由 | ❌ | ✅ 补充 |
+| Suppressor 机制 | 部分(C-主导) | ✅ 补充 |
+| 模板条件化 | ❌ | ✅ 补充 |
+| Token 级闭合 | ❌ | ✅ 补充 |
+| Stepwise 逐层竞争 | ❌ | ✅ 补充 |
+
+### 七、一句话总结
+
+```
+当前GLM5统一理论捕获了GPT5路线的"语义方向"部分(v_cat),
+但遗漏了GPT5更核心的"转移映射"(W·R_pre)、"三维路由"(layer/site/scale)、
+"suppressor构造"和"逐层竞争动态"四个关键机制。
+补充这四个机制后，统一理论才能真正覆盖GPT5路线的全部核心发现。
+```
