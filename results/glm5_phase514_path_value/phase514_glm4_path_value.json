@@ -1,0 +1,1231 @@
+{
+  "phase": 514,
+  "model": "glm4",
+  "timestamp": "2026-06-17 09:04:30",
+  "L": 40,
+  "d_model": 4096,
+  "categories": [
+    "emotion",
+    "color",
+    "fruit"
+  ],
+  "train_objects": 20,
+  "test_objects": 5,
+  "steps": 6,
+  "category_results": {
+    "emotion": {
+      "n_generation_prompts": 15,
+      "is_action": false,
+      "templates": [
+        "category_of",
+        "taxonomy_as",
+        "classify_colon"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.0667,
+            "V_c_natural": 0.0667,
+            "V_c_semantic": 0.0667,
+            "avg_logit_rank": 28818.9,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 14,
+              "semantic_answer": 1
+            }
+          },
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.0667,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 108.7,
+            "avg_logit": 12.825,
+            "avg_prob": 0.69537,
+            "quality_dist": {
+              "miss": 14,
+              "lexical": 1
+            }
+          },
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.0667,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 284.9,
+            "avg_logit": 9.128,
+            "avg_prob": 0.07551,
+            "quality_dist": {
+              "lexical": 1,
+              "miss": 14
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 1520.8,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "emotion": {
+            "token_id": 72783,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 48829.1,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.0,
+          "generic": 0.0333,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.0,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 3590,
+              "greedy_text": "social",
+              "greedy_group": "other(social)",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 330,
+              "greedy_text": "\"",
+              "greedy_group": "other(\")",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 21213,
+              "greedy_text": "emotions",
+              "greedy_group": "other(emotions)",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 330,
+              "greedy_text": "\"",
+              "greedy_group": "other(\")",
+              "best_value_id": 3093,
+              "best_value_score": 0.0667
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 2.746,
+            "cat_logit_after_hub": 3.533,
+            "cat_logit_delta": 0.787,
+            "cat_logit_delta_std": 2.247
+          },
+          "the": {
+            "cat_logit_base": 2.746,
+            "cat_logit_after_hub": 4.614,
+            "cat_logit_delta": 1.868,
+            "cat_logit_delta_std": 1.386
+          },
+          "of": {
+            "cat_logit_base": 2.746,
+            "cat_logit_after_hub": 3.558,
+            "cat_logit_delta": 0.811,
+            "cat_logit_delta_std": 1.757
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.2667,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 4,
+            "miss": 11
+          },
+          "step1_top_tokens": {
+            " a": 5,
+            " ": 4,
+            " \"": 3,
+            " social": 1,
+            " emotions": 1,
+            "ical": 1
+          },
+          "examples": [
+            {
+              "path": " social emotions. Social emotions are",
+              "quality": "lexical"
+            },
+            {
+              "path": " a taxon. In this",
+              "quality": "miss"
+            },
+            {
+              "path": "  the fatigueCom\n act",
+              "quality": "miss"
+            },
+            {
+              "path": " \"delight\" in the",
+              "quality": "miss"
+            },
+            {
+              "path": " a taxon.Solution:\n\n",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              3590,
+              21213,
+              13,
+              9779,
+              21213,
+              525
+            ],
+            [
+              264,
+              3742,
+              263,
+              13,
+              758,
+              419
+            ],
+            [
+              220,
+              279,
+              35431,
+              1092,
+              198,
+              1160
+            ],
+            [
+              330,
+              9584,
+              491,
+              1,
+              304,
+              279
+            ],
+            [
+              264,
+              3742,
+              263,
+              13,
+              36651,
+              1447
+            ],
+            [
+              220,
+              279,
+              438,
+              9584,
+              198,
+              19735
+            ],
+            [
+              21213,
+              13,
+              5748,
+              40035,
+              525,
+              264
+            ],
+            [
+              264,
+              8224,
+              19735,
+              13,
+              4354,
+              11
+            ],
+            [
+              220,
+              279,
+              438,
+              37,
+              37,
+              8265
+            ],
+            [
+              330,
+              31326,
+              23814,
+              685,
+              497,
+              892
+            ],
+            [
+              264,
+              32,
+              8,
+              362,
+              8265,
+              315
+            ],
+            [
+              220,
+              279,
+              438,
+              45,
+              45,
+              8265
+            ],
+            [
+              330,
+              785,
+              13314,
+              8512,
+              2823,
+              11751
+            ],
+            [
+              264,
+              4268,
+              627,
+              13,
+              6740,
+              4738
+            ],
+            [
+              938,
+              279,
+              4419,
+              10058,
+              1437,
+              15944
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.4,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 6,
+            "miss": 9
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "natural_phrase": 15
+          }
+        }
+      }
+    },
+    "color": {
+      "n_generation_prompts": 15,
+      "is_action": false,
+      "templates": [
+        "category_of",
+        "taxonomy_as",
+        "classify_colon"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.0667,
+            "V_c_natural": 0.0667,
+            "V_c_semantic": 0.0667,
+            "avg_logit_rank": 114.3,
+            "avg_logit": 13.0,
+            "avg_prob": 0.73164,
+            "quality_dist": {
+              "miss": 14,
+              "semantic_answer": 1
+            }
+          },
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.1333,
+            "V_c_natural": 0.0667,
+            "V_c_semantic": 0.0667,
+            "avg_logit_rank": 287.1,
+            "avg_logit": 8.951,
+            "avg_prob": 0.04755,
+            "quality_dist": {
+              "lexical": 1,
+              "semantic_answer": 1,
+              "miss": 13
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 1536.6,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "color": {
+            "token_id": 3423,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 31953.9,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          },
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 30045.9,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.0667,
+          "generic": 0.0,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.3333,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 18714,
+              "greedy_text": "gem",
+              "greedy_group": "other(gem)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 80924,
+              "greedy_text": "aromatic",
+              "greedy_group": "other(aromatic)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 13656,
+              "greedy_text": "cn",
+              "greedy_group": "other(cn)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 938,
+              "greedy_text": "ical",
+              "greedy_group": "other(ical)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 7640,
+              "greedy_text": "fish",
+              "greedy_group": "other(fish)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 1.563,
+            "cat_logit_after_hub": 3.84,
+            "cat_logit_delta": 2.276,
+            "cat_logit_delta_std": 1.058
+          },
+          "the": {
+            "cat_logit_base": 1.563,
+            "cat_logit_after_hub": 4.264,
+            "cat_logit_delta": 2.7,
+            "cat_logit_delta_std": 1.98
+          },
+          "of": {
+            "cat_logit_base": 1.563,
+            "cat_logit_after_hub": 3.522,
+            "cat_logit_delta": 1.959,
+            "cat_logit_delta_std": 1.073
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.1333,
+          "natural_hit_rate": 0.0667,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "miss": 13,
+            "semantic_answer": 1,
+            "lexical": 1
+          },
+          "step1_top_tokens": {
+            " a": 5,
+            " ": 4,
+            " gem": 1,
+            " aromatic": 1,
+            " cn": 1,
+            " fish": 1,
+            " precious": 1,
+            "ical": 1
+          },
+          "examples": [
+            {
+              "path": " gemstones, which are naturally",
+              "quality": "miss"
+            },
+            {
+              "path": " a color. Turquoise is",
+              "quality": "semantic_answer"
+            },
+            {
+              "path": "  the asTurSolution color",
+              "quality": "lexical"
+            },
+            {
+              "path": " aromatic plants, which is a",
+              "quality": "miss"
+            },
+            {
+              "path": " a herb. Lavender is",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              18714,
+              32363,
+              11,
+              892,
+              525,
+              17687
+            ],
+            [
+              264,
+              1894,
+              13,
+              8704,
+              58266,
+              374
+            ],
+            [
+              220,
+              279,
+              438,
+              36770,
+              36651,
+              1894
+            ],
+            [
+              80924,
+              10774,
+              11,
+              892,
+              374,
+              264
+            ],
+            [
+              264,
+              38691,
+              13,
+              42606,
+              1659,
+              374
+            ],
+            [
+              220,
+              279,
+              7565,
+              43,
+              43,
+              6008
+            ],
+            [
+              13656,
+              307,
+              29415,
+              11,
+              892,
+              525
+            ],
+            [
+              264,
+              13656,
+              307,
+              8820,
+              13,
+              356
+            ],
+            [
+              220,
+              279,
+              90952,
+              34,
+              36651,
+              51662
+            ],
+            [
+              7640,
+              429,
+              525,
+              3881,
+              369,
+              862
+            ],
+            [
+              264,
+              7640,
+              13,
+              1096,
+              23783,
+              374
+            ],
+            [
+              220,
+              279,
+              6842,
+              17225,
+              198,
+              7640
+            ],
+            [
+              26315,
+              26129,
+              11,
+              892,
+              374,
+              264
+            ],
+            [
+              264,
+              3684,
+              11,
+              537,
+              438,
+              264
+            ],
+            [
+              938,
+              279,
+              438,
+              36651,
+              41116,
+              2701
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.2,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "lexical": 2,
+            "semantic_answer": 1,
+            "miss": 12
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 1.0,
+          "quality_dist": {
+            "semantic_answer": 15
+          }
+        }
+      }
+    },
+    "fruit": {
+      "n_generation_prompts": 15,
+      "is_action": false,
+      "templates": [
+        "category_of",
+        "taxonomy_as",
+        "classify_colon"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.4,
+            "V_c_natural": 0.2,
+            "V_c_semantic": 0.2,
+            "avg_logit_rank": 200.6,
+            "avg_logit": 8.875,
+            "avg_prob": 0.00619,
+            "quality_dist": {
+              "lexical": 3,
+              "semantic_answer": 3,
+              "miss": 9
+            }
+          },
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.4667,
+            "V_c_natural": 0.1333,
+            "V_c_semantic": 0.1333,
+            "avg_logit_rank": 204.1,
+            "avg_logit": 12.854,
+            "avg_prob": 0.35587,
+            "quality_dist": {
+              "lexical": 5,
+              "semantic_answer": 2,
+              "miss": 8
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.2,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 2118.0,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 3,
+              "miss": 12
+            }
+          },
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.2667,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 18899.4,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 4,
+              "miss": 11
+            }
+          },
+          "fruit": {
+            "token_id": 35420,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 26165.6,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.1667,
+          "generic": 0.0,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.0,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 63124,
+              "greedy_text": "genus",
+              "greedy_group": "other(genus)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 21044,
+              "greedy_text": "classified",
+              "greedy_group": "other(classified)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 220,
+              "greedy_text": "",
+              "greedy_group": "other(id=220)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 315,
+              "greedy_text": "of",
+              "greedy_group": "hub",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 438,
+              "greedy_text": "as",
+              "greedy_group": "structure",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 220,
+              "greedy_text": "",
+              "greedy_group": "other(id=220)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 63124,
+              "greedy_text": "genus",
+              "greedy_group": "other(genus)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 21044,
+              "greedy_text": "classified",
+              "greedy_group": "other(classified)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 220,
+              "greedy_text": "",
+              "greedy_group": "other(id=220)",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            },
+            {
+              "greedy_id": 315,
+              "greedy_text": "of",
+              "greedy_group": "hub",
+              "best_value_id": 279,
+              "best_value_score": 0.2
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 3.782,
+            "cat_logit_after_hub": 5.417,
+            "cat_logit_delta": 1.635,
+            "cat_logit_delta_std": 3.696
+          },
+          "the": {
+            "cat_logit_base": 3.782,
+            "cat_logit_after_hub": 5.401,
+            "cat_logit_delta": 1.619,
+            "cat_logit_delta_std": 3.805
+          },
+          "of": {
+            "cat_logit_base": 3.782,
+            "cat_logit_after_hub": 5.209,
+            "cat_logit_delta": 1.427,
+            "cat_logit_delta_std": 3.601
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.3333,
+          "natural_hit_rate": 0.0667,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "lexical": 4,
+            "semantic_answer": 1,
+            "miss": 10
+          },
+          "step1_top_tokens": {
+            " ": 4,
+            " genus": 2,
+            " classified": 2,
+            " of": 2,
+            " as": 2,
+            " citrus": 1,
+            " a": 1,
+            "ect": 1
+          },
+          "examples": [
+            {
+              "path": " genus of fruits, the.",
+              "quality": "lexical"
+            },
+            {
+              "path": " classified as a as a fruit",
+              "quality": "semantic_answer"
+            },
+            {
+              "path": " :  the plantsStr",
+              "quality": "miss"
+            },
+            {
+              "path": " of Vacc berriesinium.,",
+              "quality": "miss"
+            },
+            {
+              "path": " as aBlueEricberryace",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              63124,
+              315,
+              25244,
+              11,
+              279,
+              13
+            ],
+            [
+              21044,
+              438,
+              264,
+              438,
+              264,
+              13770
+            ],
+            [
+              220,
+              25,
+              220,
+              279,
+              10774,
+              2580
+            ],
+            [
+              315,
+              58284,
+              61954,
+              63433,
+              13,
+              11
+            ],
+            [
+              438,
+              264,
+              10326,
+              49137,
+              15345,
+              578
+            ],
+            [
+              220,
+              279,
+              35710,
+              76589,
+              10326,
+              10326
+            ],
+            [
+              63124,
+              315,
+              61954,
+              12833,
+              12833,
+              13
+            ],
+            [
+              21044,
+              438,
+              264,
+              438,
+              264,
+              23129
+            ],
+            [
+              220,
+              25,
+              220,
+              279,
+              8935,
+              49
+            ],
+            [
+              315,
+              25244,
+              61954,
+              429,
+              13,
+              3063
+            ],
+            [
+              438,
+              264,
+              3214,
+              9,
+              658,
+              36651
+            ],
+            [
+              220,
+              279,
+              19729,
+              76589,
+              8303,
+              36651
+            ],
+            [
+              58780,
+              25244,
+              11,
+              892,
+              525,
+              3881
+            ],
+            [
+              264,
+              58780,
+              13770,
+              13,
+              350,
+              4003
+            ],
+            [
+              439,
+              482,
+              438,
+              51,
+              54709,
+              476
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.3333,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "lexical": 4,
+            "semantic_answer": 1,
+            "miss": 10
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        }
+      }
+    }
+  }
+}

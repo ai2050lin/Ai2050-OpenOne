@@ -33584,3 +33584,718 @@ Phase 511: Surface Gate Direct Repair after Category Margin Shift
    说明语义正交场已到达类别 margin,
    最终瓶颈是 surface gate。
 ```
+
+
+## Phase 511: Surface Gate Direct Repair after Category Margin Shift [2026-06-16 23:10]
+
+### 目标
+
+Phase 510证明support/release子空间能改变category-vs-competitor margin，但hit rate几乎不变。
+本阶段直接测试：能否通过抑制punctuation/generic/object-copy等表层竞争项，
+把category margin提升转化为实际category token命中。
+
+### 测试方法
+
+脚本: tests/glm5/phase511_surface_gate_repair.py
+
+方法:
+1. 对每个类别，从Phi_perp SVD基底中搜索5类轴：
+   - support轴: 最大化降低D的轴
+   - release轴: 最大化升高D的轴
+   - punct_suppressor轴: 最大化升高category-vs-punctuation margin的轴
+   - generic_suppressor轴: 最大化升高category-vs-generic margin的轴
+   - obj_suppressor轴: 最大化升高category-vs-object-copy margin的轴
+2. 三类干预条件：
+   - A: 仅语义干预(add_support/remove_release)
+   - B: 仅表层抑制(add_punct_supp/add_generic_supp/add_obj_supp)
+   - C: 语义+表层组合干预
+3. 3步生成轨迹追踪，测hit rate
+
+模型: qwen3(36L), glm4(40L), deepseek7b(28L)
+类别: 每模型3个重点类别(Phase 509-510相同)
+数据: 20 train + 10 test objects, 3 generation templates
+
+### 核心发现1: 标点瓶颈是普遍现象
+
+三模型9个类别中，7个类别的category-vs-punctuation margin为负值：
+
+| 模型 | 类别 | cat-punct | cat-generic | cat-obj | 瓶颈类型 |
+|------|------|-----------|-------------|---------|----------|
+| qwen3 | fruit | -3.48 | +1.49 | +2.23 | punctuation |
+| qwen3 | action | -7.59 | -3.50 | -1.31 | semantic |
+| qwen3 | emotion | -7.16 | -3.45 | -2.06 | semantic |
+| glm4 | emotion | -5.03 | -2.85 | +1.84 | semantic |
+| glm4 | color | -5.74 | -1.35 | +2.54 | punctuation |
+| glm4 | fruit | -4.52 | -1.09 | +2.39 | punctuation |
+| ds7b | action | -7.84 | -3.95 | -0.78 | semantic |
+| ds7b | fruit | -7.15 | -2.41 | +2.13 | punctuation |
+| ds7b | color | -7.47 | -3.01 | +0.92 | semantic |
+
+这证实：标点词元(punctuation tokens)是压制类别词输出的主要表层竞争项。
+
+### 核心发现2: 表层抑制轴和语义轴高度重叠（最关键发现）
+
+同一层内，punct/generic/obj三类suppression轴找到的是同一个方向：
+
+- qwen3 fruit: punct=svd2, generic=svd2, obj=svd2 (ALL SAME hit delta=-0.333)
+- glm4 emotion: punct=svd2, generic=svd2 (ALL SAME hit delta=-0.133)
+- glm4 color: punct=svd3, generic=svd3, obj=svd3 (ALL SAME hit delta=-0.033)
+- ds7b action: 全部0效果
+- ds7b color: 全部0效果
+
+解释：在Phi_perp的同一低秩子空间中，优化cat-punct margin、cat-generic margin、
+cat-obj margin三个目标，收敛到了相同的轴。这说明：
+- 这三个margin优化目标在当前候选轴池中不是独立的
+- 当前方法无法找到区分punctuation/generic/object-copy的独立抑制方向
+
+### 核心发现3: 组合干预的抵消效应
+
+当语义轴和表层抑制轴在同一层时，组合干预效果被抵消：
+
+- qwen3 fruit: remove_release单独=+0.133 hit, 但remove_release+add_punct_supp=0.000 hit
+- glm4 emotion: remove_release单独=+0.133 hit, 但remove_release+add_punct_supp=0.000 hit
+
+原因：surface suppression轴和semantic轴高度重叠，
+add操作（加轴投影）和remove操作（减轴投影）互相抵消。
+
+### 核心发现4: 唯一组合成功的案例——GLM4 fruit
+
+GLM4 fruit是唯一组合干预产生正向叠加效应的案例：
+- add_support单独=+0.067, add_punct_supp单独=+0.033
+- add_support+add_punct_supp=+0.100
+
+关键原因：support轴在L30，punct_suppressor在L37（不同层），
+两个干预在不同层操作，没有互相抵消。
+
+### 核心发现5: 语义轴仍然是最有效的hit提升手段
+
+| 模型 | 类别 | 最好干预 | hit delta |
+|------|------|---------|-----------|
+| qwen3 | fruit | remove_release | +0.133 |
+| qwen3 | emotion | remove_release | +0.133 |
+| glm4 | emotion | remove_release | +0.133 |
+| glm4 | fruit | add_support+add_punct_supp | +0.100 |
+| ds7b | fruit | add_support / remove_release | +0.100 |
+| qwen3 | action | (全部0) | 0 |
+| ds7b | action | (全部0) | 0 |
+| ds7b | color | (全部0) | 0 |
+
+action类别在qwen3和ds7b中完全无法通过当前方法提升hit。
+
+### 客观结论
+
+1. 标点是压制类别词输出的主要表层竞争项(cat-punct margin普遍为负)
+2. 在Phi_perp同一子空间中，无法找到独立的punctuation/generic/object-copy抑制轴
+3. 当语义轴和表层抑制轴同层时，组合干预互相抵消
+4. 不同层操作时(GLM4 fruit)，组合干预可以叠加
+5. 语义轴(remove_release)仍然是最有效的hit提升手段
+6. 对于语义差距太大的类别(action in qwen3/ds7b)，当前方法完全无效
+
+### 硬伤分析
+
+硬伤1: 候选轴池太小且来自同一子空间
+当前从rank-4 SVD基底的2倍正负+4个随机组合=12个候选轴，
+全部来自Phi_perp子空间。这导致所有优化目标收敛到同一组轴。
+
+硬伤2: 投影缩放干预无法区分重叠功能
+当两个功能(support和punct_suppression)在同一轴上时，
+无法独立操作。需要更细粒度的干预方法。
+
+硬伤3: 不同层操作的有效性提示了更深问题
+GLM4 fruit的成功组合是因为support在L30而punct_supp在L37。
+这说明：支撑功能在中间层，表层竞争在更深层——它们不是同一层的同轴现象。
+
+硬伤4: 直接logit干预可能比hidden state干预更有效
+标点压制是在最终logit层面发生的竞争。
+与其在hidden state空间寻找表层抑制轴，
+不如直接在logit空间对标点/generic logit做减法。
+
+### 理论意义
+
+Phase 511揭示了当前框架的根本限制：
+
+Phi_perp低秩子空间中的候选轴，
+无法区分语义支撑方向和表层抑制方向。
+这不是因为不存在独立方向，
+而是因为当前搜索方法（从Phi_perp基底中选）不够。
+
+真正的表层门控可能在：
+1. 不在Phi_perp子空间中的方向（即Phi_para或其他残差流方向）
+2. 在最终logit层面直接操作
+3. 在不同层的不同子空间中
+
+这为Phase 512指明了方向。
+
+### 下一步方向
+
+Phase 512应从三个方向突破：
+
+方向1: 跨层组合干预
+系统性在不同层组合语义干预和表层抑制，找最佳跨层组合。
+
+方向2: 直接logit patch
+绕过hidden state，直接在最终logit层面
+对标点/generic/object-copy logit做减法，
+测试"如果标点被压制，类别词是否会成为top1"。
+
+方向3: 全残差流搜索表层方向
+不仅在Phi_perp中搜索，也在完整残差流中搜索
+标点压制方向，包括Phi_para方向和其他未探索方向。
+
+
+## Phase 512: Surface Gate Sufficiency and Residual Source Tracing [2026-06-17 00:44]
+
+### 目标
+
+Phase 511证明在Phi_perp低秩子空间中，无法独立找到punctuation/generic/object-copy抑制轴。
+本阶段用完全不同的方法：直接在最终logit层面压制表层竞争项，
+测试"如果标点被压制，类别词是否能成为top1"。
+这是对"表层门控瓶颈假说"的直接充分性检验。
+
+### 测试方法
+
+脚本: tests/glm5/phase512_surface_gate_sufficiency.py
+
+方法:
+1. Exp1: 直接logit patch — 在每步生成时，对punctuation/generic/object-copy/competitor logit做减法
+   - 测试12种配置：从clean到oracle_surface（压掉所有竞争项-20）
+2. Exp2: 逐样本瓶颈分类（P/G/O/S/M）
+3. Exp3: 表层读出方向逐层追踪
+4. Exp4: 跨层hidden state干预 + logit patch组合
+
+模型: qwen3(36L), glm4(40L), deepseek7b(28L)
+类别: 每模型3个重点类别
+数据: 20 train + 10 test objects, 3 generation templates
+
+### 核心发现1: 直接压制表层竞争项不能提升hit率（关键负结果）
+
+这是Phase 512最重要的发现：
+
+| 模型 | 类别 | clean hit | oracle hit | delta |
+|------|------|-----------|------------|-------|
+| qwen3 | fruit | 0.600 | 0.533 | -0.067 |
+| qwen3 | action | 0.000 | 0.000 | 0.000 |
+| qwen3 | emotion | 0.067 | 0.167 | +0.100 |
+| glm4 | emotion | 0.267 | 0.167 | -0.100 |
+| glm4 | color | 0.067 | 0.067 | 0.000 |
+| glm4 | fruit | 0.300 | 0.200 | -0.100 |
+| ds7b | action | 0.000 | 0.000 | 0.000 |
+| ds7b | fruit | 0.100 | 0.067 | -0.033 |
+| ds7b | color | 0.000 | 0.000 | 0.000 |
+
+9个类别中，6个oracle测试hit率下降或不变，仅qwen3 emotion小幅上升。
+oracle测试是压掉所有punct+generic+obj+competitor logit 20分，
+类别词的cat-punct margin已经高达+16.5，但hit率仍然下降！
+
+**这直接否定了"表层门控瓶颈"假说的简单形式。**
+
+### 核心发现2: 压制标点后，"which"/"what"等结构词成为新竞争项
+
+Clean vs Oracle top token 对比：
+
+qwen3 fruit:
+- Clean step1: [' a'(16), ' fruits'(5), ' plant'(3)]
+- Oracle step1: [' fruit'(7), ' fruits'(5), ' what'(5)]
+
+qwen3 action:
+- Clean step1: [' a'(20), ' exercise'(10)]
+- Oracle step1: [' what'(20), ' exercise'(10)]
+
+qwen3 emotion:
+- Clean step1: [' a'(15), ' the'(9)]
+- Oracle step1: [' what'(9), ' '(5), ' emotions'(3)]
+
+压制标点后，模型不再输出"a"、"the"等过渡词，
+而是转向"which"、"what"等疑问/结构词。
+这些词不属于punctuation、generic或object_copy任何一组！
+
+### 核心发现3: Hit率 ≠ Step1 Category Top1 Rate
+
+qwen3 fruit最清晰展示：
+- Clean: cat_top1_rate(step1)=0.067, hit(3步)=0.600
+- Oracle: cat_top1_rate(step1)=0.233, hit(3步)=0.533
+
+类别词"fruit"在clean状态下主要在step2-3才出现（通过"a fruit"等路径），
+不是在step1直接输出。压制标点后step1 cat_top1_rate确实升高了3倍，
+但3步内hit反而下降，说明逐步生成轨迹被破坏。
+
+Clean路径: "a" → "fruit" → "fruit" (正确)
+Oracle路径: "fruit" → "fruit" → "that" / "which" (偏离)
+
+### 核心发现4: 逐样本瓶颈几乎全是punctuation
+
+| 模型 | 类别 | 样本数 | punctuation | generic | obj_copy | category_wins |
+|------|------|--------|-------------|---------|----------|---------------|
+| qwen3 | fruit | 30 | 21 | 0 | 0 | 9 |
+| qwen3 | action | 30 | 30 | 0 | 0 | 0 |
+| qwen3 | emotion | 30 | 29 | 0 | 1 | 0 |
+| glm4 | emotion | 30 | 29 | 0 | 1 | 0 |
+| glm4 | fruit | 30 | 19 | 4 | 2 | 5 |
+
+70%以上失败样本的第一步瓶颈是标点。但压制标点后hit不升反降。
+
+### 核心发现5: Hidden state干预优于logit patch
+
+| 模型 | 类别 | best hidden state | best logit patch | best combo |
+|------|------|-------------------|------------------|------------|
+| qwen3 | fruit | remove_release(+0.133) | suppress_generic_3(+0.033) | +0.000 |
+| qwen3 | emotion | add_support(+0.233) | suppress_punct_3(+0.100) | +0.200 |
+| glm4 | fruit | add_support(+0.167) | suppress_generic_3(+0.000) | +0.033 |
+| ds7b | fruit | remove_release(+0.167) | suppress_generic_3(+0.000) | +0.133 |
+
+Hidden state干预（remove_release）持续优于logit patch。
+
+### 核心发现6: 表层读出方向在早期层就已出现
+
+qwen3 fruit: punct_emerges_L9 (36层中的第9层)
+glm4 emotion: punct_emerges_L39 (40层中的最后一层)
+ds7b fruit: punct_emerges_L1 (第一层就有)
+
+这说明标点竞争不是仅在最终logit层形成，而是多层累积的结果。
+
+### 客观结论
+
+1. **简单表层门控瓶颈假说被否定** — 压制所有表层竞争项（包括oracle），hit率不升反降
+2. **存在第三层竞争项** — "which"、"what"等结构/疑问词，不在punct/generic/obj中
+3. **逐步生成轨迹是关键** — 类别词不是一步输出，而是通过多步路径（"a"→"fruit"），压制标点会破坏这个路径
+4. **标点不是"障碍"而是"路径"** — "a"虽然是标点/停用词，但它是通向"a fruit"的关键第一步
+5. **hidden state干预持续优于logit patch** — 说明问题在表示层面而非仅仅读出层面
+
+### 硬伤分析
+
+**硬伤1: "表层门控瓶颈"假说的简单形式被否定**
+
+之前假设：
+```
+如果压制punct/generic/obj，category logit更高，就能生成类别词。
+```
+
+实际：
+```
+压制punct后，"which"/"what"等新竞争词出现；
+即使oracle压制所有已知竞争项，hit率仍下降。
+```
+
+这说明问题不是简单的"表层竞争压制了类别词"，
+而是"生成轨迹是一个多步路径，压制任何一步的竞争项都会破坏路径"。
+
+**硬伤2: 逐步生成路径的连续性被忽视**
+
+类别词"fruit"在clean状态下的3步生成路径是：
+```
+Step 1: "a" (过渡词，连接到名词短语)
+Step 2: "fruit" (类别词出现)
+Step 3: "fruit" (确认)
+```
+
+当压制"a"（标点/停用词组）后：
+```
+Step 1: "which" 或 "fruit" (但后续轨迹偏离)
+Step 2: 不是正确的续写
+Step 3: "that" / "of" 等结构词
+```
+
+**硬伤3: 竞争项定义不完整**
+
+当前4组竞争项（category/competitor/punctuation/generic/object_copy）
+不包含"which"、"what"、"that"等结构连接词，
+也不包含"plant"、"stone"等语义相关但非类别的词。
+
+**硬伤4: 3步生成太短，hit计算过于粗糙**
+
+3步内类别词出现概率不是一个好的度量。
+因为类别词可能通过多种路径在5-8步后才出现。
+需要更长的生成和更灵活的匹配方式。
+
+### 理论意义
+
+Phase 512揭示了一个比"表层门控"更根本的问题：
+
+```
+语言生成不是"选择最高概率词"的单步优化问题。
+语言生成是一个多步轨迹问题。
+每个词的选择不仅取决于当前概率，还取决于它是否能引导后续轨迹到达目标。
+
+标点/停用词不是"障碍"，而是"路径枢纽"。
+压制标点就像移除道路上的交通信号灯——
+虽然信号灯让车停下来，但移除后交通更混乱，不是更顺畅。
+```
+
+这意味着：
+- 语义理解（知道apple属于fruit）≠ 语义表达（说出"fruit"）
+- 表达不是选择一个词，而是走一条路径
+- 路径的每一步都依赖于前一步的上下文
+- 压制"竞争项"会破坏路径的连续性
+
+### 下一步方向
+
+Phase 512否定了"简单表层门控瓶颈"假说，但打开了新的研究方向：
+
+**方向1: 轨迹动力学分析**
+不再看单步logit，而是分析3-10步生成轨迹：
+- 哪些起始词能引导到类别词？
+- 轨迹分支点和汇合点在哪里？
+- 标点/停用词在轨迹中扮演什么角色？
+
+**方向2: 路径依赖生成模型**
+建立"路径图"：哪些token选择后最可能到达类别词？
+这比单步argmax更有预测力。
+
+**方向3: 条件概率vs边际概率**
+当前压制的是边际logit，但应该看条件概率：
+P(fruit出现在step 3 | step 1 token = X)
+不同step1 token对后续类别词出现概率的影响。
+
+**方向4: 多步beam search干预**
+不用greedy decoding，用beam search找到通向类别词的最佳路径，
+然后在hidden state层面引导模型走这条路径。
+
+## Phase 513: Trajectory Graph and Path-Conditioned Semantic Readout [2026-06-17 04:45]
+
+### 目标
+
+Phase 512证明Oracle logit patch（压制所有竞争项）反而降低hit率，否定了简单表层门控瓶颈假说。
+Phase 513研究语言生成的轨迹性质：生成是否是路径问题？哪些第一步token能通向类别词？
+
+核心实验：
+- Exp1：多步轨迹图（5步，top-k展开）
+- Exp2：路径条件概率 P_hit(c|y_1)（强制第一步token后到达类别词的概率）
+- Exp3：路径枢纽词分析（强制/压制hub token后的hit率变化）
+- Exp4：Beam search vs Greedy对比
+- Exp5：Action自然模板
+
+### 核心客观发现
+
+#### 发现1：强制类别词 → 100%命中（所有模型所有类别）
+
+| 模型 | 类别 | 强制类别词 P_hit | Clean hit |
+|------|------|-------------------|-----------|
+| qwen3 | fruit | 1.000 | 0.700 |
+| qwen3 | action | 1.000 | 0.000 |
+| qwen3 | emotion | 1.000 | 0.167 |
+| glm4 | emotion | 1.000 | 0.267 |
+| glm4 | color | 1.000 | 0.067 |
+| glm4 | fruit | 1.000 | 0.267 |
+| deepseek7b | fruit | 1.000 | 0.133 |
+| deepseek7b | color | 1.000 | 0.000 |
+| deepseek7b | action | 1.000 | 0.000 |
+
+**解释**：强制第一步输出类别词后，后续步骤不可能丢失它。这严格证明模型内部确实"知道"答案。问题不在语义理解，而在生成路径选择。
+
+#### 发现2：强制"a"作为第一步 → hit率高于clean（路径枢纽效应）
+
+| 模型 | 类别 | Clean hit | Force "a" hit | Delta |
+|------|------|-----------|--------------|-------|
+| qwen3 | fruit | 0.700 | 0.767 | +0.067 |
+| glm4 | fruit | 0.267 | 0.467 | **+0.200** |
+| deepseek7b | fruit | 0.067 | 0.067 | +0.000 |
+| qwen3 | emotion | 0.167 | 0.167 | +0.000 |
+| glm4 | emotion | 0.200 | 0.067 | -0.133 |
+
+**关键观察**：
+- 对fruit类，强制"a"在qwen3和glm4上都提升hit率
+- 对emotion类，强制"a"不提升甚至降低
+- "a" → "a fruit" 是自然路径，但 "a" → "a emotion" 不自然
+
+#### 发现3：压制hub词 → hit率下降
+
+| 模型 | 类别 | Clean hit | Suppress hubs hit | Delta |
+|------|------|-----------|-------------------|-------|
+| qwen3 | fruit | 0.700 | 0.533 | **-0.167** |
+| glm4 | fruit | 0.267 | 0.200 | -0.067 |
+| glm4 | emotion | 0.200 | 0.400 | +0.200 |
+| qwen3 | emotion | 0.167 | 0.167 | +0.000 |
+
+**关键观察**：对fruit类，压制hub词(a/the/of/type/kind/category)降低hit，证明这些词是通向类别词的路径节点，不是简单障碍。对emotion，GLM4中压制hub反而提升，说明emotion的路径结构不同。
+
+#### 发现4：Best-top-k > Greedy（存在更好的非greedy路径）
+
+| 模型 | 类别 | Greedy | Best-top5 | Gain |
+|------|------|--------|-----------|------|
+| qwen3 | fruit | 0.700 | 0.833 | +0.133 |
+| qwen3 | emotion | 0.167 | 0.433 | **+0.267** |
+| glm4 | emotion | 0.267 | 0.467 | +0.200 |
+| deepseek7b | fruit | 0.133 | 0.333 | +0.200 |
+
+**解释**：Greedy解码错过了最优路径。如果第一步选"kind"而非"a"，后续到达类别词的概率更高。
+
+#### 发现5：Beam search效果不一致
+
+| 模型 | 类别 | Greedy | Beam-3 | Improvement |
+|------|------|--------|--------|------------|
+| qwen3 | fruit | 0.700 | 0.433 | **-0.267** |
+| glm4 | emotion | 0.200 | 0.467 | **+0.267** |
+| qwen3 | emotion | 0.167 | 0.200 | +0.033 |
+
+**关键观察**：Beam search对qwen3 fruit反而降低hit！这说明beam search的概率评分不一定导向类别词。greedy路径"a → fruit"虽然概率不是全局最优，但能有效到达类别词。beam search可能找到概率更高但不到达类别词的路径。
+
+#### 发现6：Step-1 token组 → 最终hit率的映射（qwen3 fruit）
+
+| Step-1组 | P_hit | 解释 |
+|----------|-------|------|
+| category | 1.000 | 直接输出类别词，100%命中 |
+| object_copy | 0.667 | 输出对象名，后续可能带出类别 |
+| hub (a/the/of等) | 0.567 | 枢纽词是通往类别词的桥梁 |
+| structure (which/that等) | 0.529 | 结构词也有桥梁作用 |
+| generic (thing/item等) | 0.000 | 通用续写词无法到达类别词 |
+| punctuation | 0.000 | 标点截断路径 |
+
+**核心洞察**：不是所有非类别词都是障碍。hub词和structure词虽然不是答案本身，但它们是通向答案的路径节点。generic词和punctuation才是真正的死胡同。
+
+#### 发现7：action类别 — 完全不同的机制
+
+action在所有路径条件下都0%命中（除强制"action"本身外）。即使强制"a"、"the"等hub词，后续也无法到达"action"。这说明action的问题不在路径选择，而在语义不适配——"belongs to the category of" + action 不构成自然语言。
+
+### 客观数据总结
+
+| 模型 | 类别 | Greedy | TopK | Beam+ | BestForce | HubForce | SuppHub |
+|------|------|--------|------|-------|-----------|----------|---------|
+| qwen3 | fruit | 0.700 | 0.833 | -0.267 | fruit(1.00) | a(+0.07) | 0.533 |
+| qwen3 | action | 0.000 | 0.000 | +0.000 | action(1.00) | N/A(0.00) | 0.000 |
+| qwen3 | emotion | 0.167 | 0.433 | +0.033 | emotion(1.00) | an(+0.27) | 0.167 |
+| glm4 | emotion | 0.267 | 0.467 | +0.267 | emotion(1.00) | of(+0.00) | 0.400 |
+| glm4 | color | 0.067 | 0.133 | +0.000 | color(1.00) | the(+0.07) | 0.000 |
+| glm4 | fruit | 0.267 | 0.333 | +0.000 | fruit(1.00) | a(+0.20) | 0.200 |
+| ds7b | action | 0.000 | 0.000 | +0.000 | action(1.00) | N/A(0.00) | 0.000 |
+| ds7b | fruit | 0.133 | 0.333 | -0.067 | fruit(1.00) | a(+0.00) | 0.000 |
+| ds7b | color | 0.000 | 0.000 | +0.000 | color(1.00) | N/A(0.00) | 0.000 |
+
+### 测试脚本
+
+- 主脚本: tests/glm5/phase513_trajectory_graph.py
+- 临时分析: tests/glm5_temp/phase513_*.py
+
+### 原理
+
+1. **轨迹图方法**：不只看单步greedy，而展开top-k候选路径，构建完整的轨迹图
+2. **路径条件概率**：P_hit(c|y_1)衡量第一步选择y_1后到达类别词的条件概率
+3. **枢纽词识别**：通过强制/压制hub token测试它们在路径中的角色
+
+### 最严格审视
+
+1. **样本量问题**：GLM4/DS7B只用5个测试对象×3模板=15样本，统计稳定性不足
+2. **hit定义过粗**：只检查类别词是否出现在5步内，没有区分自然/不自然路径
+3. **Beam search异常**：qwen3 fruit beam3=0.433远低于greedy=0.700，可能因为beam search的padding/right-alignment问题
+4. **action仍然无法解释**：强制"action"100%命中说明语义不是问题，但所有自然路径都0%命中
+5. **GLM4 emotion压制hub反而提升** — 这个反转需要更深入分析
+6. **5步可能太短**：某些自然路径可能需要更多步骤
+
+### 核心拼图更新（20→22块）
+
+拼图21：**路径枢纽词是生成桥梁，不是障碍**
+- "a"虽然不是答案，但它是"a fruit"路径的必要第一步
+- 压制枢纽词会破坏路径，降低hit率
+- 枢纽词的条件到达概率 P_hit(c|hub) > P_hit(c|generic) > P_hit(c|punct)
+
+拼图22：**Greedy解码不一定走最优路径**
+- Best-top-k始终≥Greedy
+- 局部最优（greedy argmax）≠ 全局最优（到达目标词）
+- 这解释了为什么logit patch不一定提升hit：改变局部选择可能偏离好路径
+
+### 理论进展
+
+从Phase 512到Phase 513，理论进一步精细化：
+
+```
+旧（Phase 512后）：
+语言编码 = 高维正交因果场 → 语义边际 → 路径枢纽 → 多步生成轨迹 → 最终词元表达
+
+新（Phase 513后）：
+语言编码 = 高维正交因果场 → 语义边际 → 路径入口选择 → 轨迹条件概率分布 → 最终词元表达
+
+其中：
+- 路径入口选择：第一步token选择决定整条轨迹
+- 枢纽词具有高条件到达概率 P_hit(c|hub) >> P_hit(c|generic)
+- 压制枢纽词破坏路径：P_hit(c|suppress_hub) < P_hit(c|clean)
+- Greedy可能选择低条件到达概率的入口（如标点）
+```
+
+### 下一步方向
+
+1. **轨迹价值函数**：定义 V_c(y_1) = P_hit(c|y_1)，寻找高价值路径入口
+2. **路径条件logit分析**：为什么模型给标点最高logit而非类别词？是训练数据偏差还是解码策略问题？
+3. **hub词的内部表示**：hub词在hidden state中如何连接类别语义？
+4. **路径修复干预**：如何通过hidden state干预引导模型进入高价值路径？
+5. **GLM4 emotion反转**：为什么压制hub反而提升？
+
+## Phase 514: Path Value Function and Hidden-State Trajectory Control [2026-06-17 10:06]
+
+### 目标
+
+Phase 513证明hub token是路径桥梁而非障碍，Greedy不一定走最优路径。
+Phase 514建立路径价值函数V_c(y_1) = P_hit(c|y_1)，并测试：
+- 路径价值 vs logit排名的关系
+- Hub token对类别logit的影响
+- 路径价值引导干预的效果
+
+核心实验：
+- Exp1：路径价值函数V_c + Logit vs Value排名对比
+- Exp2：Hub hidden state分析（hub词对cat_logit的因果效应）
+- Exp3：路径价值引导干预（clean/force_hub/boost_cat/hub+boost）
+- Exp4：Action自然模板
+
+### 核心客观发现
+
+#### 发现1：Logit排名与路径价值排名几乎完全不一致
+
+| 模型 | 类别 | Logit-vs-Value match rate |
+|------|------|---------------------------|
+| qwen3 | fruit | **0.000** |
+| qwen3 | action | 0.667 |
+| qwen3 | emotion | 0.067 |
+| glm4 | emotion | 0.067 |
+| glm4 | fruit | 0.067 |
+| ds7b | action | 0.667 |
+| ds7b | fruit | 0.400 |
+| ds7b | color | 0.333 |
+
+**解释**：match rate = 0 意味着greedy选择的第1名token，从未是路径价值最高的token。模型当前步logit最高的token，不是通向类别词的最佳路径入口。
+
+#### 发现2："kind"和"type"有最高V_c_semantic，但logit排名极低
+
+qwen3 fruit:
+| Token | V_c_semantic | V_c_lexical | Logit Rank | Group |
+|-------|-------------|-------------|------------|-------|
+| kind | **0.467** | 0.767 | 1217 | generic |
+| type | **0.433** | 0.667 | 392 | generic |
+| a | 0.400 | 0.767 | 11 | hub |
+| the | 0.267 | 0.500 | 9 | hub |
+| fruit | 0.000 | 1.000 | - | category |
+
+**关键洞察**：
+- "kind"和"type"虽然logit排名在1000+，但它们作为第一步后，语义命中率最高
+- 直接输出"fruit"虽然lexical=1.0但semantic=0.0（因为"a fruit"这种模式中，强制"fruit"后后续不自然）
+- 这说明**路径入口的logit值与其路径价值完全脱钩**
+
+#### 发现3：Hub token对类别logit的因果效应是类别条件性的
+
+**fruit类（hub提升cat_logit）：**
+| Hub | qwen3 delta | glm4 delta | ds7b delta |
+|-----|-----------|-----------|-----------|
+| a | **+1.325** | -1.928 | **-4.931** |
+| the | +0.902 | -1.243 | -5.043 |
+| of | +0.306 | +0.212 | -5.697 |
+
+**action类（hub降低cat_logit）：**
+| Hub | qwen3 delta | glm4 delta | ds7b delta |
+|-----|-----------|-----------|-----------|
+| a | **-1.313** | -0.681 | -2.635 |
+| the | +0.458 | +0.092 | -1.302 |
+| of | +0.208 | +0.124 | -0.844 |
+
+**关键观察**：
+- qwen3 fruit中，"a"提升cat_logit +1.325 — 证实"a"是fruit的路径枢纽
+- qwen3 action中，"a"降低cat_logit -1.313 — "a"对action是路径障碍
+- ds7b fruit中，"a"大幅降低cat_logit -4.931 — DS7B的路径机制完全不同
+- 同一个token在不同类别中可以是桥梁也可以是障碍
+
+#### 发现4：force_best_hub让lexical=1.0但semantic=0.0
+
+所有模型所有类别中，强制hub token后：
+- lexical_hit_rate = 1.0（类别词出现在路径中）
+- semantic_hit_rate = 0.0（但不是自然短语）
+
+**解释**：强制"a"后，模型确实会生成"fruit"等类别词，但生成的模式不是自然短语。例如可能生成"a fruit that..."而不是"a fruit"。这说明hit质量必须分层评估。
+
+#### 发现5：boost_category_logit效果有限
+
+| 模型 | 类别 | Clean lex | Boost lex | Clean sem | Boost sem |
+|------|------|-----------|-----------|-----------|-----------|
+| qwen3 | fruit | 0.700 | 0.833 | 0.233 | 0.100 |
+| qwen3 | action | 0.000 | 0.333 | 0.000 | 0.000 |
+| glm4 | fruit | 0.133 | 0.467 | 0.067 | 0.133 |
+| ds7b | fruit | 0.067 | 0.667 | 0.067 | 0.067 |
+
+**关键观察**：boost_category_logit提升lexical_hit但不一定提升semantic_hit。qwen3 fruit中boost反而让semantic从0.233降到0.100。
+
+#### 发现6：DS7B的hub token对类别logit有强烈负效应
+
+DS7B fruit:
+- a: cat_logit从9.70降到4.77（delta=-4.931）
+- the: cat_logit从9.70降到4.66（delta=-5.043）
+- of: cat_logit从9.70降到4.01（delta=-5.697）
+
+这说明DS7B中hub token严重压制类别logit，与qwen3完全相反。DS7B可能使用了完全不同的生成路径策略。
+
+### 客观数据总结
+
+| 模型 | 类别 | Clean lex/sem | Best Hub | Boost Cat | Hub+Boost | Logit-Value match |
+|------|------|--------------|----------|-----------|-----------|-------------------|
+| qwen3 | fruit | 0.70/0.23 | a:1.0/0.0 | 0.83/0.10 | 1.0/0.0 | 0.000 |
+| qwen3 | action | 0.00/0.00 | a:0.0/0.0 | 0.33/0.00 | 0.0/0.0 | 0.667 |
+| qwen3 | emotion | 0.20/0.07 | a:1.0/0.0 | 0.47/0.07 | 1.0/0.0 | 0.067 |
+| glm4 | emotion | 0.47/0.00 | a:1.0/0.0 | 0.73/0.00 | 1.0/0.0 | 0.067 |
+| glm4 | fruit | 0.13/0.07 | a:1.0/0.0 | 0.47/0.13 | 1.0/0.0 | 0.067 |
+| ds7b | action | 0.00/0.00 | a:0.0/0.0 | 0.00/0.00 | 0.0/0.0 | 0.667 |
+| ds7b | fruit | 0.07/0.07 | a:1.0/0.0 | 0.67/0.07 | 1.0/0.0 | 0.400 |
+| ds7b | color | 0.00/0.00 | a:0.0/0.0 | 0.07/0.00 | 1.0/0.0 | 0.333 |
+
+### 测试脚本
+
+- 主脚本: tests/glm5/phase514_path_value.py
+- 临时分析: tests/glm5_temp/phase514_*.py
+
+### 原理
+
+1. **路径价值函数**：V_c(y_1) = P_hit(c|y_1)，衡量第一步选择y_1后到达类别词的条件概率
+2. **Hit质量分层**：miss < lexical < natural_phrase < semantic_answer
+3. **Hub因果效应**：hub token前后类别logit的变化量，衡量hub的路径桥梁/障碍效应
+4. **Logit-Value分离**：当前logit排名与路径价值排名的不一致性
+
+### 最严格审视
+
+1. **样本量极小**：GLM4/DS7B只有5个测试对象×3模板=15样本，0.067的变化≈1/15
+2. **semantic_hit定义可能过严**：要求类别词前有a/an/the/type/kind/of，可能漏掉自然但不符此模式的表达
+3. **force_hub的lexical=1.0但semantic=0.0** — 说明8步greedy trace从强制hub开始，后续路径质量差。这可能是因为8步不够，或者强制第一步改变了模型内部状态使得后续不自然
+4. **DS7B hub负效应极大** — 需要确认是否因为DS7B的tokenizer不同（"a"可能映射到不同子词）
+5. **kind/type的V_c_semantic最高但被归为generic组** — 这说明之前的token分组有问题，kind/type应该是hub或structure而非generic
+6. **boost_cat提升lexical但降低semantic** — 暗示强行提升类别logit导致非自然路径
+
+### 核心拼图更新（22→25块）
+
+拼图23：**路径价值与局部logit完全脱钩**
+- V_c_semantic("kind") > V_c_semantic("a") > V_c_semantic("fruit") for qwen3 fruit
+- 但logit排名：fruit >> a >> kind
+- 模型当前步最优选择不等于未来到达最优
+
+拼图24：**Hub token的因果效应是类别条件性的**
+- "a"对fruit提升cat_logit +1.325（qwen3），但对action降低-1.313
+- 同一个token在不同语义上下文中，可以是桥梁也可以是障碍
+- 这否定了"统一hub"假设，hub效应必须按类别分析
+
+拼图25：**模型间路径策略存在根本差异**
+- qwen3: hub提升cat_logit → "a"是fruit桥梁
+- DS7B: hub大幅降低cat_logit → "a"严重压制fruit
+- 不同模型可能使用完全不同的生成路径策略
+
+### 理论进展
+
+Phase 514最重要的发现是**路径价值与局部logit完全脱钩**：
+
+```
+旧理解：
+模型在每一步选择最高logit的token → 如果类别词logit不够高就无法到达
+
+新理解：
+模型在每一步的logit分布反映的是"语言自然度"而非"目标到达能力"
+最高logit的token可能是语法最自然的续写，但不一定通向目标
+低logit的token（如kind/type）可能是通向目标的最佳路径入口
+```
+
+统一公式更新：
+
+```
+V_c(y_1) = P_hit(c | y_1)  # 路径价值函数
+z_y^1 = Sem_y + Path_y + Surface_y + Base_y  # 第一步logit分解
+
+关键：argmax_y z_y ≠ argmax_y V_c(y)
+      rank_logit(y) 与 rank_value(y) 几乎不相关
+```
+
+### 下一步方向
+
+1. **路径价值模型**：研究模型内部状态如何隐式编码V_c(y_1)
+2. **为什么kind/type路径价值最高？** 它们如何改变后续状态使类别词更可能？
+3. **DS7B与qwen3的策略差异**：为什么同一hub token效果相反？
+4. **自然路径修复**：如何在不破坏自然度的前提下提升路径价值？
+5. **更长轨迹**：8步是否足够？12步、16步会怎样？

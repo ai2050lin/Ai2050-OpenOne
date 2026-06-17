@@ -1,0 +1,1262 @@
+{
+  "phase": 514,
+  "model": "deepseek7b",
+  "timestamp": "2026-06-17 09:39:58",
+  "L": 28,
+  "d_model": 3584,
+  "categories": [
+    "action",
+    "fruit",
+    "color"
+  ],
+  "train_objects": 20,
+  "test_objects": 5,
+  "steps": 6,
+  "category_results": {
+    "action": {
+      "n_generation_prompts": 15,
+      "is_action": true,
+      "templates": [
+        "doing_what",
+        "activity_type",
+        "action_type"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 108.7,
+            "avg_logit": 17.5,
+            "avg_prob": 0.67414,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 1673.7,
+            "avg_logit": 15.844,
+            "avg_prob": 0.1299,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 408.7,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "action": {
+            "token_id": 1917,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 165.7,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          },
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 759.7,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.0,
+          "generic": 0.0,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.6667,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 1124,
+              "greedy_text": "\\",
+              "greedy_group": "other(\\)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 1124,
+              "greedy_text": "\\",
+              "greedy_group": "other(\\)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 1124,
+              "greedy_text": "\\",
+              "greedy_group": "other(\\)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 9.729,
+            "cat_logit_after_hub": 7.094,
+            "cat_logit_delta": -2.635,
+            "cat_logit_delta_std": 0.385
+          },
+          "the": {
+            "cat_logit_base": 9.729,
+            "cat_logit_after_hub": 8.427,
+            "cat_logit_delta": -1.302,
+            "cat_logit_delta_std": 2.327
+          },
+          "of": {
+            "cat_logit_base": 9.729,
+            "cat_logit_after_hub": 8.885,
+            "cat_logit_delta": -0.844,
+            "cat_logit_delta_std": 2.998
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          },
+          "step1_top_tokens": {
+            " a": 10,
+            " \\": 5
+          },
+          "examples": [
+            {
+              "path": " a theioneerioneerioneer a",
+              "quality": "miss"
+            },
+            {
+              "path": " aioneerioneerioneer a\n\n",
+              "quality": "miss"
+            },
+            {
+              "path": " \\_\\_\\_\\_\\_\\",
+              "quality": "miss"
+            },
+            {
+              "path": " a theioneerioneerioneer a",
+              "quality": "miss"
+            },
+            {
+              "path": " aioneerioneerioneer a\n\n",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              264,
+              279,
+              55398,
+              55398,
+              55398,
+              264
+            ],
+            [
+              264,
+              55398,
+              55398,
+              55398,
+              264,
+              271
+            ],
+            [
+              1124,
+              56014,
+              56014,
+              56014,
+              56014,
+              56014
+            ],
+            [
+              264,
+              279,
+              55398,
+              55398,
+              55398,
+              264
+            ],
+            [
+              264,
+              55398,
+              55398,
+              55398,
+              264,
+              271
+            ],
+            [
+              1124,
+              56014,
+              56014,
+              56014,
+              56014,
+              56014
+            ],
+            [
+              264,
+              279,
+              55398,
+              55398,
+              55398,
+              264
+            ],
+            [
+              264,
+              55398,
+              55398,
+              55398,
+              264,
+              271
+            ],
+            [
+              1124,
+              56014,
+              56014,
+              56014,
+              56014,
+              56014
+            ],
+            [
+              264,
+              279,
+              55398,
+              55398,
+              55398,
+              264
+            ],
+            [
+              264,
+              55398,
+              55398,
+              55398,
+              264,
+              271
+            ],
+            [
+              1124,
+              56014,
+              56014,
+              56014,
+              56014,
+              56014
+            ],
+            [
+              264,
+              279,
+              55398,
+              55398,
+              55398,
+              264
+            ],
+            [
+              264,
+              55398,
+              55398,
+              55398,
+              264,
+              271
+            ],
+            [
+              1124,
+              56014,
+              56014,
+              56014,
+              56014,
+              56014
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        }
+      },
+      "action_templates": {
+        "standard": {
+          "lexical_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "examples": [
+            {
+              "path": " a theioneerioneerioneer a",
+              "quality": "miss"
+            },
+            {
+              "path": " aioneerioneerioneer a\n\n",
+              "quality": "miss"
+            },
+            {
+              "path": " \\_\\_\\_\\_\\_\\",
+              "quality": "miss"
+            },
+            {
+              "path": " a theioneerioneerioneer a",
+              "quality": "miss"
+            },
+            {
+              "path": " aioneerioneerioneer a\n\n",
+              "quality": "miss"
+            }
+          ]
+        },
+        "verb_templates": {
+          "lexical_hit_rate": 0.0667,
+          "semantic_hit_rate": 0.0,
+          "verb_hit_rate": 0.0,
+          "action_word_hit_rate": 0.0667,
+          "examples": [
+            {
+              "path": " __ __.\n\nA. ",
+              "quality": "miss"
+            },
+            {
+              "path": " function\n.1 So.",
+              "quality": "miss"
+            },
+            {
+              "path": " process\n\nioneerioneer.\n\nWait",
+              "quality": "miss"
+            },
+            {
+              "path": " __ __.\n\nA. ",
+              "quality": "miss"
+            },
+            {
+              "path": " function\n.1 So.",
+              "quality": "miss"
+            }
+          ]
+        }
+      }
+    },
+    "fruit": {
+      "n_generation_prompts": 15,
+      "is_action": false,
+      "templates": [
+        "category_of",
+        "taxonomy_as",
+        "classify_colon"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.0667,
+            "V_c_natural": 0.0667,
+            "V_c_semantic": 0.0667,
+            "avg_logit_rank": 45.0,
+            "avg_logit": 14.494,
+            "avg_prob": 0.35809,
+            "quality_dist": {
+              "miss": 14,
+              "semantic_answer": 1
+            }
+          },
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 60.5,
+            "avg_logit": 15.562,
+            "avg_prob": 0.07623,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 959.1,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 5883.5,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "fruit": {
+            "token_id": 35598,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 11079.4,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.0333,
+          "generic": 0.0,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.4,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 1304,
+              "greedy_text": "__",
+              "greedy_group": "other(__)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 374,
+              "greedy_text": "is",
+              "greedy_group": "structure",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 25322,
+              "greedy_text": "fruits",
+              "greedy_group": "other(fruits)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 374,
+              "greedy_text": "is",
+              "greedy_group": "structure",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 25322,
+              "greedy_text": "fruits",
+              "greedy_group": "other(fruits)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 374,
+              "greedy_text": "is",
+              "greedy_group": "structure",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            },
+            {
+              "greedy_id": 1304,
+              "greedy_text": "__",
+              "greedy_group": "other(__)",
+              "best_value_id": 264,
+              "best_value_score": 0.0667
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 9.703,
+            "cat_logit_after_hub": 4.772,
+            "cat_logit_delta": -4.931,
+            "cat_logit_delta_std": 4.811
+          },
+          "the": {
+            "cat_logit_base": 9.703,
+            "cat_logit_after_hub": 4.66,
+            "cat_logit_delta": -5.043,
+            "cat_logit_delta_std": 4.78
+          },
+          "of": {
+            "cat_logit_base": 9.703,
+            "cat_logit_after_hub": 4.006,
+            "cat_logit_delta": -5.697,
+            "cat_logit_delta_std": 4.1
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.0667,
+          "natural_hit_rate": 0.0667,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "miss": 14,
+            "semantic_answer": 1
+          },
+          "step1_top_tokens": {
+            " a": 6,
+            " is": 4,
+            " __": 3,
+            " berries": 1,
+            " ": 1
+          },
+          "examples": [
+            {
+              "path": " __ the\n________ __The",
+              "quality": "miss"
+            },
+            {
+              "path": " a a\n. aIn",
+              "quality": "miss"
+            },
+            {
+              "path": " isioneerioneerioneer the the",
+              "quality": "miss"
+            },
+            {
+              "path": " __ the________ ____.\n\n",
+              "quality": "miss"
+            },
+            {
+              "path": " a a(n.) )",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              1304,
+              279,
+              198,
+              3979,
+              1304,
+              785
+            ],
+            [
+              264,
+              264,
+              198,
+              13,
+              264,
+              641
+            ],
+            [
+              374,
+              55398,
+              55398,
+              55398,
+              279,
+              279
+            ],
+            [
+              1304,
+              279,
+              3979,
+              1304,
+              563,
+              382
+            ],
+            [
+              264,
+              264,
+              1445,
+              13,
+              8,
+              873
+            ],
+            [
+              374,
+              55398,
+              11,
+              279,
+              279,
+              436
+            ],
+            [
+              62394,
+              279,
+              198,
+              11,
+              1379,
+              49
+            ],
+            [
+              264,
+              264,
+              198,
+              13,
+              264,
+              641
+            ],
+            [
+              374,
+              220,
+              55398,
+              55398,
+              271,
+              198
+            ],
+            [
+              1304,
+              279,
+              3979,
+              1304,
+              563,
+              382
+            ],
+            [
+              264,
+              264,
+              1445,
+              13,
+              8,
+              220
+            ],
+            [
+              374,
+              55398,
+              55398,
+              279,
+              279,
+              436
+            ],
+            [
+              220,
+              21,
+              17,
+              13,
+              20,
+              59
+            ],
+            [
+              264,
+              943,
+              315,
+              13779,
+              13,
+              21
+            ],
+            [
+              264,
+              271,
+              279,
+              279,
+              264,
+              16
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 1.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.6667,
+          "semantic_hit_rate": 0.0667,
+          "quality_dist": {
+            "lexical": 9,
+            "miss": 5,
+            "semantic_answer": 1
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "natural_phrase": 15
+          }
+        }
+      }
+    },
+    "color": {
+      "n_generation_prompts": 15,
+      "is_action": false,
+      "templates": [
+        "category_of",
+        "taxonomy_as",
+        "classify_colon"
+      ],
+      "token_group_sizes": {
+        "category": 2,
+        "competitor_category": 12,
+        "punctuation": 7,
+        "generic": 10,
+        "object_copy": 10,
+        "hub": 5,
+        "structure": 10
+      },
+      "path_value": {
+        "path_values": {
+          "a": {
+            "token_id": 264,
+            "group": "hub",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 62.3,
+            "avg_logit": 13.528,
+            "avg_prob": 0.25687,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "the": {
+            "token_id": 279,
+            "group": "hub",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 35.4,
+            "avg_logit": 14.5,
+            "avg_prob": 0.07128,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "type": {
+            "token_id": 943,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 231.8,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          },
+          "color": {
+            "token_id": 3423,
+            "group": "category",
+            "V_c_lexical": 1.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 17455.2,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "lexical": 15
+            }
+          },
+          "kind": {
+            "token_id": 3093,
+            "group": "generic",
+            "V_c_lexical": 0.0,
+            "V_c_natural": 0.0,
+            "V_c_semantic": 0.0,
+            "avg_logit_rank": 5230.3,
+            "avg_logit": 0.0,
+            "avg_prob": 0.0,
+            "quality_dist": {
+              "miss": 15
+            }
+          }
+        },
+        "group_summary": {
+          "hub": 0.0,
+          "generic": 0.0,
+          "category": 0.0
+        },
+        "logit_vs_value": {
+          "match_rate": 0.3333,
+          "per_prompt_summary": [
+            {
+              "greedy_id": 1304,
+              "greedy_text": "__",
+              "greedy_group": "other(__)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 374,
+              "greedy_text": "is",
+              "greedy_group": "structure",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 10779,
+              "greedy_text": "plants",
+              "greedy_group": "other(plants)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 374,
+              "greedy_text": "is",
+              "greedy_group": "structure",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 314,
+              "greedy_text": "{",
+              "greedy_group": "other({)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 264,
+              "greedy_text": "a",
+              "greedy_group": "hub",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 314,
+              "greedy_text": "{",
+              "greedy_group": "other({)",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            },
+            {
+              "greedy_id": 198,
+              "greedy_text": "",
+              "greedy_group": "punctuation",
+              "best_value_id": 264,
+              "best_value_score": 0.0
+            }
+          ]
+        },
+        "steps": 6,
+        "n_prompts": 15
+      },
+      "hub_hidden_state": {
+        "hub_effects": {
+          "a": {
+            "cat_logit_base": 5.702,
+            "cat_logit_after_hub": 4.872,
+            "cat_logit_delta": -0.83,
+            "cat_logit_delta_std": 4.063
+          },
+          "the": {
+            "cat_logit_base": 5.702,
+            "cat_logit_after_hub": 6.194,
+            "cat_logit_delta": 0.491,
+            "cat_logit_delta_std": 4.876
+          },
+          "of": {
+            "cat_logit_base": 5.702,
+            "cat_logit_after_hub": 4.772,
+            "cat_logit_delta": -0.93,
+            "cat_logit_delta_std": 4.404
+          }
+        }
+      },
+      "intervention": {
+        "clean": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          },
+          "step1_top_tokens": {
+            " a": 5,
+            " is": 4,
+            " {": 2,
+            " __": 1,
+            " plants": 1,
+            "\n": 1,
+            " \"": 1
+          },
+          "examples": [
+            {
+              "path": " ___________.\n\nA)",
+              "quality": "miss"
+            },
+            {
+              "path": " a/an _____________.\n\n",
+              "quality": "miss"
+            },
+            {
+              "path": " isioneer the\notope,",
+              "quality": "miss"
+            },
+            {
+              "path": " plants called \"perennials",
+              "quality": "miss"
+            },
+            {
+              "path": " a genus within the family.",
+              "quality": "miss"
+            }
+          ],
+          "path_tokens_list": [
+            [
+              1304,
+              3979,
+              62,
+              382,
+              32,
+              8
+            ],
+            [
+              264,
+              55492,
+              1304,
+              3979,
+              5973,
+              382
+            ],
+            [
+              374,
+              55398,
+              279,
+              198,
+              50682,
+              11
+            ],
+            [
+              10779,
+              2598,
+              330,
+              712,
+              2667,
+              10309
+            ],
+            [
+              264,
+              63577,
+              2878,
+              279,
+              2997,
+              13
+            ],
+            [
+              374,
+              220,
+              279,
+              72,
+              453,
+              21
+            ],
+            [
+              314,
+              4074,
+              92,
+              314,
+              5471,
+              92
+            ],
+            [
+              264,
+              55492,
+              1304,
+              3979,
+              382,
+              641
+            ],
+            [
+              314,
+              55398,
+              55398,
+              55398,
+              314,
+              11
+            ],
+            [
+              198,
+              32,
+              13,
+              16608,
+              198,
+              33
+            ],
+            [
+              264,
+              1304,
+              3979,
+              382,
+              641,
+              71806
+            ],
+            [
+              374,
+              55398,
+              55398,
+              55398,
+              374,
+              11
+            ],
+            [
+              330,
+              5782,
+              1,
+              69816,
+              11,
+              892
+            ],
+            [
+              264,
+              5080,
+              3742,
+              263,
+              13,
+              17
+            ],
+            [
+              374,
+              55398,
+              55398,
+              55398,
+              264,
+              11
+            ]
+          ]
+        },
+        "force_a": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "force_the": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "force_of": {
+          "lexical_hit_rate": 0.0,
+          "natural_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "miss": 15
+          }
+        },
+        "best_hub": {
+          "name": "a",
+          "lexical_hit_rate": 0.0,
+          "semantic_hit_rate": 0.0
+        },
+        "boost_cat_logit": {
+          "lexical_hit_rate": 0.0667,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 1,
+            "miss": 14
+          }
+        },
+        "best_hub_plus_boost": {
+          "lexical_hit_rate": 1.0,
+          "semantic_hit_rate": 0.0,
+          "quality_dist": {
+            "lexical": 15
+          }
+        }
+      }
+    }
+  }
+}
