@@ -1,0 +1,80 @@
+[06:03:18] SMOKE TEST MODE: reduced parameters
+[06:03:21] Loading qwen3 (bfloat16 + device_map=auto, sdpa)...
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:00<01:56,  3.40it/s]Loading weights:   4%|¨…         | 15/398 [00:00<00:08, 46.96it/s]Loading weights:   9%|¨         | 36/398 [00:00<00:03, 94.39it/s]Loading weights:  13%|¨€¨†        | 53/398 [00:00<00:02, 115.11it/s]Loading weights:  18%|¨€¨‚        | 70/398 [00:00<00:02, 128.94it/s]Loading weights:  22%|¨€¨€¨‡       | 89/398 [00:00<00:02, 146.40it/s]Loading weights:  27%|¨€¨€¨ƒ       | 106/398 [00:00<00:01, 148.47it/s]Loading weights:  31%|¨€¨€¨€¨‡      | 125/398 [00:01<00:01, 154.15it/s]Loading weights:  36%|¨€¨€¨€¨„      | 143/398 [00:01<00:01, 158.25it/s]Loading weights:  40%|¨€¨€¨€¨€      | 160/398 [00:01<00:01, 152.15it/s]Loading weights:  45%|¨€¨€¨€¨€¨…     | 179/398 [00:01<00:01, 161.04it/s]Loading weights:  49%|¨€¨€¨€¨€¨     | 196/398 [00:01<00:01, 158.64it/s]Loading weights:  54%|¨€¨€¨€¨€¨€¨†    | 213/398 [00:01<00:01, 156.75it/s]Loading weights:  58%|¨€¨€¨€¨€¨€¨‚    | 230/398 [00:01<00:01, 159.89it/s]Loading weights:  62%|¨€¨€¨€¨€¨€¨€¨‡   | 247/398 [00:01<00:00, 154.35it/s]Loading weights:  67%|¨€¨€¨€¨€¨€¨€¨ƒ   | 266/398 [00:01<00:00, 162.77it/s]Loading weights:  71%|¨€¨€¨€¨€¨€¨€¨€   | 283/398 [00:02<00:00, 161.80it/s]Loading weights:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 300/398 [00:02<00:00, 163.83it/s]Loading weights:  80%|¨€¨€¨€¨€¨€¨€¨€¨  | 317/398 [00:02<00:00, 158.13it/s]Loading weights:  84%|¨€¨€¨€¨€¨€¨€¨€¨€¨… | 334/398 [00:02<00:00, 157.08it/s]Loading weights:  88%|¨€¨€¨€¨€¨€¨€¨€¨€¨‚ | 352/398 [00:02<00:00, 163.09it/s]Loading weights:  93%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨†| 369/398 [00:02<00:00, 155.62it/s]Loading weights:  97%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ| 388/398 [00:02<00:00, 163.29it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:02<00:00, 145.07it/s]
+[06:03:25] qwen3 loaded: class=Qwen3ForCausalLM, GPU=8.05GB
+[06:03:25]   n_layers=36, d_model=2560
+[06:03:25]   Test layers: [0, 18, 35]
+[06:03:25] ============================================================
+[06:03:25] Step 1: Collecting minimal contrast data (for d_category)
+[06:03:25] ============================================================
+[06:03:26]     [contrast] apple: fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] banana: fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] orange: fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] car: non-fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] truck: non-fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] bus: non-fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] rose: non-fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] lily: non-fruit, h shape=(37, 2560)
+[06:03:26]     [contrast] tulip: non-fruit, h shape=(37, 2560)
+[06:03:26] ============================================================
+[06:03:26] Step 2: Collecting fruit success/failure data (for d_traj)
+[06:03:26] ============================================================
+[06:03:29]     [fruit-collect] 10/28: suc=4 fail=2
+[06:03:32]     [fruit-collect] 20/28: suc=10 fail=4
+[06:03:34]     [fruit-collect] 28/28: suc=12 fail=7
+[06:03:34]   Success: 12, Fail: 7
+[06:03:34]   Failure types: {'non_answer': 6, 'wrong_category': 1}
+[06:03:34] ============================================================
+[06:03:34] Step 3: Extracting directions at each test layer
+[06:03:34] ============================================================
+[06:03:34]   Layer  0: |d_cat|=0.58, |d_traj|=4.48, cos(d_cat,d_traj)=-0.0441
+[06:03:34]   Layer 18: |d_cat|=12.77, |d_traj|=24.54, cos(d_cat,d_traj)=0.0565
+[06:03:34]   Layer 35: |d_cat|=31.52, |d_traj|=41.55, cos(d_cat,d_traj)=0.1723
+[06:03:34] ============================================================
+[06:03:34] Step 4: Mid-Layer Causality Scan
+[06:03:34] ============================================================
+[06:03:34]   Testing 3 layers Ã— 3 directions Ã— 5 samples = 45 generations
+[06:03:34] 
+  --- Layer 0/35 ---
+[06:03:35]     [L0] d_category: 5/5, s34=0
+[06:03:35]   Layer 0 d_category: 0/5 (0%)
+[06:03:36]     [L0] d_traj: 5/5, s34=0
+[06:03:36]   Layer 0 d_traj: 0/5 (0%)
+[06:03:37]     [L0] random: 5/5, s34=0
+[06:03:37]   Layer 0 random: 0/5 (0%)
+[06:03:37] 
+  --- Layer 18/35 ---
+[06:03:39]     [L18] d_category: 5/5, s34=1
+[06:03:39]   Layer 18 d_category: 1/5 (20%)
+[06:03:40]     [L18] d_traj: 5/5, s34=5
+[06:03:40]   Layer 18 d_traj: 5/5 (100%)
+[06:03:41]     [L18] random: 5/5, s34=1
+[06:03:41]   Layer 18 random: 1/5 (20%)
+[06:03:41] 
+  --- Layer 35/35 ---
+[06:03:42]     [L35] d_category: 5/5, s34=0
+[06:03:42]   Layer 35 d_category: 0/5 (0%)
+[06:03:43]     [L35] d_traj: 5/5, s34=0
+[06:03:43]   Layer 35 d_traj: 0/5 (0%)
+[06:03:45]     [L35] random: 5/5, s34=0
+[06:03:45]   Layer 35 random: 0/5 (0%)
+[06:03:45] ============================================================
+[06:03:45] Step 5: Analysis
+[06:03:45] ============================================================
+[06:03:45] 
+   Layer |   d_category |       d_traj |       random
+[06:03:45]   -------+--------------+--------------+-------------
+[06:03:45]        0 |          0%  |          0%  |          0%
+[06:03:45]       18 |         20%  |        100%  |         20%
+[06:03:45]       35 |          0%  |          0%  |          0%
+[06:03:45] 
+  Best d_category layer: 18 (20%)
+[06:03:45]   Best d_traj layer: 18 (100%)
+[06:03:45]   Verdict: d_category GAINS causal power at layer 18 (20%) â€” semantic activation found!
+[06:03:45]   Directions saved to results/glm5_phase525_mid_layer_causality/phase525_qwen3_directions.npz
+[06:03:45] 
+Saved to results/glm5_phase525_mid_layer_causality/phase525_qwen3_mid_layer_causality.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[06:03:45] 
+Total: 0.4 min

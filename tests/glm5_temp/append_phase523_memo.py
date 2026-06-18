@@ -1,8 +1,7 @@
 """Append Phase 523 results to AGI_GLM5_MEMO.md"""
-import time
-
 memo_path = "research/glm5/docs/AGI_GLM5_MEMO.md"
-timestamp = time.strftime("%Y-%m-%d %H:%M")
+# 研究完成时间：2026-06-17 15:40（DS7B测试于15:33完成，随后整理结果）
+timestamp = "2026-06-17 15:40"
 
 entry = f"""
 

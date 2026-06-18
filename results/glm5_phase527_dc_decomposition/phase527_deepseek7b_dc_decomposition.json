@@ -1,0 +1,230 @@
+{
+  "model": "deepseek7b",
+  "model_info": {
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "peak_layer": 18,
+  "scale": 5.0,
+  "n_success": 10,
+  "n_failure": 34,
+  "dc_decomposition": {
+    "d_category_norm": 39.13124084472656,
+    "d_margin_norm": 0.04095667973160744,
+    "d_semantic_norm": 39.1312255859375,
+    "margin_pct": 0.10466491430997849,
+    "semantic_pct": 99.99996185302734,
+    "cos_dcat_dc": 0.0010466491803526878
+  },
+  "exp1_dc_decomposition": {
+    "test_results": {
+      "d_category": {
+        "s34": 2,
+        "n": 15,
+        "rate": 0.13333333333333333
+      },
+      "d_margin": {
+        "s34": 1,
+        "n": 15,
+        "rate": 0.06666666666666667
+      },
+      "d_semantic": {
+        "s34": 2,
+        "n": 15,
+        "rate": 0.13333333333333333
+      },
+      "pure_random": {
+        "s34": 2,
+        "n": 15,
+        "rate": 0.13333333333333333
+      }
+    },
+    "verdict": "Neither component clearly retains effect — needs investigation"
+  },
+  "exp2_dose_response": {
+    "alphas": [
+      1,
+      2,
+      3,
+      5,
+      8,
+      10,
+      15,
+      20
+    ],
+    "results": {
+      "1": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0
+      },
+      "2": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0
+      },
+      "3": {
+        "s34": 1,
+        "n": 8,
+        "rate": 0.125
+      },
+      "5": {
+        "s34": 1,
+        "n": 8,
+        "rate": 0.125
+      },
+      "8": {
+        "s34": 2,
+        "n": 8,
+        "rate": 0.25
+      },
+      "10": {
+        "s34": 2,
+        "n": 8,
+        "rate": 0.25
+      },
+      "15": {
+        "s34": 2,
+        "n": 8,
+        "rate": 0.25
+      },
+      "20": {
+        "s34": 1,
+        "n": 8,
+        "rate": 0.125
+      }
+    },
+    "verdict": "SMOOTH response — supports CONTINUOUS accumulation hypothesis"
+  },
+  "exp3_selectivity": {
+    "test_results": {
+      "no_intervention": {
+        "color_changes": 2,
+        "n": 8,
+        "change_rate": 0.25,
+        "original_colors": [
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red"
+        ],
+        "output_colors": [
+          null,
+          "blue",
+          "green",
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "d_category": {
+        "color_changes": 1,
+        "n": 8,
+        "change_rate": 0.125,
+        "original_colors": [
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red"
+        ],
+        "output_colors": [
+          null,
+          "blue",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "d_color": {
+        "color_changes": 1,
+        "n": 8,
+        "change_rate": 0.125,
+        "original_colors": [
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red"
+        ],
+        "output_colors": [
+          null,
+          "blue",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "d_semantic": {
+        "color_changes": 1,
+        "n": 8,
+        "change_rate": 0.125,
+        "original_colors": [
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red"
+        ],
+        "output_colors": [
+          null,
+          "blue",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "pure_random": {
+        "color_changes": 2,
+        "n": 8,
+        "change_rate": 0.25,
+        "original_colors": [
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red",
+          "red"
+        ],
+        "output_colors": [
+          null,
+          "blue",
+          "green",
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "verdict": "d_category does NOT change color — SELECTIVE for category (good!)"
+  },
+  "total_time_min": 10.0
+}

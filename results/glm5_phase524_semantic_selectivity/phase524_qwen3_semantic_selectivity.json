@@ -1,0 +1,98 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "alpha": 10.0,
+  "scale": 5.0,
+  "exp1_semantic_directions": {
+    "n_colors": 3,
+    "n_objects": 9,
+    "t1_category_success": 3,
+    "t1_category_total": 27,
+    "d_color_norm": 14.327165603637695,
+    "d_object_norm": 15.872800827026367,
+    "d_category_norm": 31.52364158630371,
+    "n_color_pairs": 18,
+    "n_object_pairs": 9
+  },
+  "exp2_d_traj": {
+    "n_success": 27,
+    "n_failure": 12,
+    "d_traj_norm": 42.23979568481445
+  },
+  "exp3_correlation": {
+    "d_color_T1_vs_d_object_T1": 0.23657488822937012,
+    "d_color_T1_vs_d_category_T1": 0.13235579431056976,
+    "d_color_T1_vs_d_category_T2": 0.1711432784795761,
+    "d_color_T1_vs_d_traj": 0.05511147901415825,
+    "d_object_T1_vs_d_category_T1": -0.06754902005195618,
+    "d_object_T1_vs_d_category_T2": 0.1729186326265335,
+    "d_object_T1_vs_d_traj": -0.15690851211547852,
+    "d_category_T1_vs_d_category_T2": 0.6013715863227844,
+    "d_category_T1_vs_d_traj": 0.22102664411067963,
+    "d_category_T2_vs_d_traj": 0.14279872179031372
+  },
+  "exp4_selectivity": {
+    "test_results": {
+      "d_traj(+)": {
+        "s34": 3,
+        "n": 12,
+        "rate": 0.25
+      },
+      "d_category(+)": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "d_category(-)": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "d_color(+)": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "d_color(-)": {
+        "s34": 2,
+        "n": 12,
+        "rate": 0.16666666666666666
+      },
+      "d_object(+)": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "d_object(-)": {
+        "s34": 1,
+        "n": 12,
+        "rate": 0.08333333333333333
+      },
+      "random_ortho": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      }
+    },
+    "selectivity_ratio": 0.0,
+    "s34_traj": 0.25,
+    "s34_cat_pos": 0.0,
+    "s34_cat_neg": 0.0,
+    "s34_col_pos": 0.0,
+    "s34_col_neg": 0.16666666666666666,
+    "s34_obj_pos": 0.0,
+    "s34_obj_neg": 0.08333333333333333,
+    "s34_random": 0.0,
+    "verdict": "d_traj encodes something OTHER than color/object/category (possibly format/fluency)"
+  },
+  "exp5_cross_template": {
+    "cos_d_category": 0.6013715863227844,
+    "cos_d_color": 0.595039963722229,
+    "cos_d_object": 0.4867202341556549,
+    "verdict": "Category direction is PARTIALLY stable across templates"
+  },
+  "total_time_min": 1.0
+}

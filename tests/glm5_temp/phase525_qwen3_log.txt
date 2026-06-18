@@ -1,0 +1,143 @@
+[06:06:09] Loading qwen3 (bfloat16 + device_map=auto, sdpa)...
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:00<01:58,  3.34it/s]Loading weights:   4%|¨…         | 15/398 [00:00<00:08, 45.14it/s]Loading weights:   8%|¨‚         | 33/398 [00:00<00:04, 85.36it/s]Loading weights:  12%|¨€¨‡        | 48/398 [00:00<00:03, 102.97it/s]Loading weights:  17%|¨€¨ƒ        | 67/398 [00:00<00:02, 128.45it/s]Loading weights:  21%|¨€¨€        | 82/398 [00:00<00:02, 128.03it/s]Loading weights:  26%|¨€¨€¨„       | 103/398 [00:00<00:02, 146.44it/s]Loading weights:  31%|¨€¨€¨€       | 123/398 [00:01<00:01, 154.80it/s]Loading weights:  35%|¨€¨€¨€¨„      | 140/398 [00:01<00:01, 157.28it/s]Loading weights:  39%|¨€¨€¨€¨      | 157/398 [00:01<00:01, 159.12it/s]Loading weights:  44%|¨€¨€¨€¨€¨†     | 174/398 [00:01<00:01, 153.75it/s]Loading weights:  48%|¨€¨€¨€¨€¨‚     | 191/398 [00:01<00:01, 155.90it/s]Loading weights:  52%|¨€¨€¨€¨€¨€¨‡    | 208/398 [00:01<00:01, 158.67it/s]Loading weights:  57%|¨€¨€¨€¨€¨€¨ƒ    | 225/398 [00:01<00:01, 153.36it/s]Loading weights:  62%|¨€¨€¨€¨€¨€¨€¨‡   | 245/398 [00:01<00:00, 164.84it/s]Loading weights:  66%|¨€¨€¨€¨€¨€¨€¨„   | 262/398 [00:01<00:00, 161.62it/s]Loading weights:  70%|¨€¨€¨€¨€¨€¨€¨€   | 279/398 [00:02<00:00, 157.58it/s]Loading weights:  74%|¨€¨€¨€¨€¨€¨€¨€¨…  | 295/398 [00:02<00:00, 157.43it/s]Loading weights:  78%|¨€¨€¨€¨€¨€¨€¨€¨‚  | 312/398 [00:02<00:00, 156.74it/s]Loading weights:  83%|¨€¨€¨€¨€¨€¨€¨€¨€¨† | 330/398 [00:02<00:00, 162.00it/s]Loading weights:  87%|¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ | 347/398 [00:02<00:00, 154.57it/s]Loading weights:  92%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨‡| 366/398 [00:02<00:00, 162.10it/s]Loading weights:  96%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨„| 383/398 [00:02<00:00, 158.93it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:02<00:00, 142.77it/s]
+[06:06:13] qwen3 loaded: class=Qwen3ForCausalLM, GPU=8.05GB
+[06:06:13]   n_layers=36, d_model=2560
+[06:06:13]   Test layers: [0, 6, 12, 18, 24, 30, 35]
+[06:06:13] ============================================================
+[06:06:13] Step 1: Collecting minimal contrast data (for d_category)
+[06:06:13] ============================================================
+[06:06:14]     [contrast] apple: fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] banana: fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] orange: fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] car: non-fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] truck: non-fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] bus: non-fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] rose: non-fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] lily: non-fruit, h shape=(37, 2560)
+[06:06:14]     [contrast] tulip: non-fruit, h shape=(37, 2560)
+[06:06:14] ============================================================
+[06:06:14] Step 2: Collecting fruit success/failure data (for d_traj)
+[06:06:14] ============================================================
+[06:06:17]     [fruit-collect] 10/56: suc=4 fail=2
+[06:06:20]     [fruit-collect] 20/56: suc=10 fail=4
+[06:06:22]     [fruit-collect] 30/56: suc=12 fail=7
+[06:06:25]     [fruit-collect] 40/56: suc=19 fail=8
+[06:06:28]     [fruit-collect] 50/56: suc=25 fail=10
+[06:06:30]     [fruit-collect] 56/56: suc=27 fail=12
+[06:06:30]   Success: 27, Fail: 12
+[06:06:30]   Failure types: {'non_answer': 8, 'wrong_category': 2, 'digit_garbage': 2}
+[06:06:30] ============================================================
+[06:06:30] Step 3: Extracting directions at each test layer
+[06:06:30] ============================================================
+[06:06:30]   Layer  0: |d_cat|=0.58, |d_traj|=4.70, cos(d_cat,d_traj)=-0.0510
+[06:06:30]   Layer  6: |d_cat|=4.43, |d_traj|=16.45, cos(d_cat,d_traj)=-0.0627
+[06:06:30]   Layer 12: |d_cat|=12.72, |d_traj|=22.95, cos(d_cat,d_traj)=0.0232
+[06:06:30]   Layer 18: |d_cat|=12.77, |d_traj|=27.76, cos(d_cat,d_traj)=0.0929
+[06:06:30]   Layer 24: |d_cat|=27.99, |d_traj|=55.47, cos(d_cat,d_traj)=0.0559
+[06:06:30]   Layer 30: |d_cat|=103.92, |d_traj|=109.45, cos(d_cat,d_traj)=0.1403
+[06:06:30]   Layer 35: |d_cat|=31.52, |d_traj|=42.24, cos(d_cat,d_traj)=0.2210
+[06:06:30] ============================================================
+[06:06:30] Step 4: Mid-Layer Causality Scan
+[06:06:30] ============================================================
+[06:06:30]   Testing 7 layers Ã— 3 directions Ã— 10 samples = 210 generations
+[06:06:30] 
+  --- Layer 0/35 ---
+[06:06:31]     [L0] d_category: 5/10, s34=0
+[06:06:32]     [L0] d_category: 10/10, s34=0
+[06:06:32]   Layer 0 d_category: 0/10 (0%)
+[06:06:33]     [L0] d_traj: 5/10, s34=0
+[06:06:34]     [L0] d_traj: 10/10, s34=2
+[06:06:34]   Layer 0 d_traj: 2/10 (20%)
+[06:06:36]     [L0] random: 5/10, s34=0
+[06:06:37]     [L0] random: 10/10, s34=0
+[06:06:37]   Layer 0 random: 0/10 (0%)
+[06:06:37] 
+  --- Layer 6/35 ---
+[06:06:38]     [L6] d_category: 5/10, s34=0
+[06:06:39]     [L6] d_category: 10/10, s34=0
+[06:06:39]   Layer 6 d_category: 0/10 (0%)
+[06:06:40]     [L6] d_traj: 5/10, s34=3
+[06:06:42]     [L6] d_traj: 10/10, s34=7
+[06:06:42]   Layer 6 d_traj: 7/10 (70%)
+[06:06:43]     [L6] random: 5/10, s34=0
+[06:06:44]     [L6] random: 10/10, s34=1
+[06:06:44]   Layer 6 random: 1/10 (10%)
+[06:06:44] 
+  --- Layer 12/35 ---
+[06:06:45]     [L12] d_category: 5/10, s34=1
+[06:06:46]     [L12] d_category: 10/10, s34=4
+[06:06:46]   Layer 12 d_category: 4/10 (40%)
+[06:06:48]     [L12] d_traj: 5/10, s34=3
+[06:06:49]     [L12] d_traj: 10/10, s34=7
+[06:06:49]   Layer 12 d_traj: 7/10 (70%)
+[06:06:50]     [L12] random: 5/10, s34=0
+[06:06:51]     [L12] random: 10/10, s34=0
+[06:06:51]   Layer 12 random: 0/10 (0%)
+[06:06:51] 
+  --- Layer 18/35 ---
+[06:06:52]     [L18] d_category: 5/10, s34=1
+[06:06:53]     [L18] d_category: 10/10, s34=3
+[06:06:53]   Layer 18 d_category: 3/10 (30%)
+[06:06:55]     [L18] d_traj: 5/10, s34=5
+[06:06:56]     [L18] d_traj: 10/10, s34=10
+[06:06:56]   Layer 18 d_traj: 10/10 (100%)
+[06:06:57]     [L18] random: 5/10, s34=1
+[06:06:58]     [L18] random: 10/10, s34=2
+[06:06:58]   Layer 18 random: 2/10 (20%)
+[06:06:58] 
+  --- Layer 24/35 ---
+[06:06:59]     [L24] d_category: 5/10, s34=1
+[06:07:01]     [L24] d_category: 10/10, s34=1
+[06:07:01]   Layer 24 d_category: 1/10 (10%)
+[06:07:02]     [L24] d_traj: 5/10, s34=3
+[06:07:03]     [L24] d_traj: 10/10, s34=8
+[06:07:03]   Layer 24 d_traj: 8/10 (80%)
+[06:07:04]     [L24] random: 5/10, s34=0
+[06:07:05]     [L24] random: 10/10, s34=0
+[06:07:05]   Layer 24 random: 0/10 (0%)
+[06:07:05] 
+  --- Layer 30/35 ---
+[06:07:07]     [L30] d_category: 5/10, s34=0
+[06:07:08]     [L30] d_category: 10/10, s34=0
+[06:07:08]   Layer 30 d_category: 0/10 (0%)
+[06:07:09]     [L30] d_traj: 5/10, s34=2
+[06:07:10]     [L30] d_traj: 10/10, s34=3
+[06:07:10]   Layer 30 d_traj: 3/10 (30%)
+[06:07:11]     [L30] random: 5/10, s34=0
+[06:07:12]     [L30] random: 10/10, s34=0
+[06:07:12]   Layer 30 random: 0/10 (0%)
+[06:07:12] 
+  --- Layer 35/35 ---
+[06:07:14]     [L35] d_category: 5/10, s34=0
+[06:07:15]     [L35] d_category: 10/10, s34=0
+[06:07:15]   Layer 35 d_category: 0/10 (0%)
+[06:07:16]     [L35] d_traj: 5/10, s34=0
+[06:07:17]     [L35] d_traj: 10/10, s34=0
+[06:07:17]   Layer 35 d_traj: 0/10 (0%)
+[06:07:18]     [L35] random: 5/10, s34=0
+[06:07:19]     [L35] random: 10/10, s34=0
+[06:07:19]   Layer 35 random: 0/10 (0%)
+[06:07:19] ============================================================
+[06:07:19] Step 5: Analysis
+[06:07:19] ============================================================
+[06:07:19] 
+   Layer |   d_category |       d_traj |       random
+[06:07:19]   -------+--------------+--------------+-------------
+[06:07:19]        0 |          0%  |         20%  |          0%
+[06:07:19]        6 |          0%  |         70%  |         10%
+[06:07:19]       12 |         40%  |         70%  |          0%
+[06:07:19]       18 |         30%  |        100%  |         20%
+[06:07:19]       24 |         10%  |         80%  |          0%
+[06:07:19]       30 |          0%  |         30%  |          0%
+[06:07:19]       35 |          0%  |          0%  |          0%
+[06:07:19] 
+  Best d_category layer: 12 (40%)
+[06:07:19]   Best d_traj layer: 18 (100%)
+[06:07:19]   Verdict: d_category GAINS causal power at layer 12 (40%) â€” semantic activation found!
+[06:07:19]   Directions saved to results/glm5_phase525_mid_layer_causality/phase525_qwen3_directions.npz
+[06:07:19] 
+Saved to results/glm5_phase525_mid_layer_causality/phase525_qwen3_mid_layer_causality.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[06:07:20] 
+Total: 1.2 min

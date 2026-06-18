@@ -1,0 +1,97 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "alpha": 10.0,
+  "scale": 5.0,
+  "peak_layer": 12,
+  "fine_scan_layers": [
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "n_success": 27,
+  "n_failure": 12,
+  "cos_dcat_dc": 0.023355044424533844,
+  "exp1_same_dc_control": {
+    "layer": 12,
+    "test_results": {
+      "d_category": {
+        "s34": 4,
+        "n": 12,
+        "rate": 0.3333333333333333
+      },
+      "same_dc_random": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "same_norm_random": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      },
+      "pure_random": {
+        "s34": 0,
+        "n": 12,
+        "rate": 0.0
+      }
+    },
+    "cos_dcat_dc": 0.023355044424533844,
+    "verdict": "d_category SIGNIFICANTLY > controls — semantic effect CONFIRMED"
+  },
+  "exp2_fine_scan": {
+    "layer_10": {
+      "s34": 2,
+      "n": 12,
+      "rate": 0.16666666666666666
+    },
+    "layer_11": {
+      "s34": 2,
+      "n": 12,
+      "rate": 0.16666666666666666
+    },
+    "layer_12": {
+      "s34": 4,
+      "n": 12,
+      "rate": 0.3333333333333333
+    },
+    "layer_13": {
+      "s34": 3,
+      "n": 12,
+      "rate": 0.25
+    },
+    "layer_14": {
+      "s34": 0,
+      "n": 12,
+      "rate": 0.0
+    }
+  },
+  "exp2_fine_scan_peak": {
+    "layer": 12,
+    "rate": 0.3333333333333333
+  },
+  "exp3_sublayer": {
+    "layer": {
+      "s34": 4,
+      "n": 10,
+      "rate": 0.4
+    },
+    "attn": {
+      "s34": 5,
+      "n": 10,
+      "rate": 0.5
+    },
+    "mlp": {
+      "s34": 4,
+      "n": 10,
+      "rate": 0.4
+    }
+  },
+  "exp3_sublayer_verdict": "All positions effective — residual stream signal (additive)",
+  "total_time_min": 0.9
+}

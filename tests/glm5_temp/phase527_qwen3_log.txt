@@ -1,0 +1,94 @@
+[08:29:00] Loading qwen3 (bfloat16 + device_map=auto, sdpa)...
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:00<01:52,  3.54it/s]Loading weights:   4%|¨…         | 16/398 [00:00<00:07, 51.70it/s]Loading weights:   9%|¨         | 37/398 [00:00<00:03, 98.72it/s]Loading weights:  15%|¨€¨…        | 58/398 [00:00<00:02, 127.97it/s]Loading weights:  19%|¨€¨        | 75/398 [00:00<00:02, 139.13it/s]Loading weights:  23%|¨€¨€¨†       | 92/398 [00:00<00:02, 146.18it/s]Loading weights:  28%|¨€¨€¨‚       | 111/398 [00:00<00:01, 158.48it/s]Loading weights:  32%|¨€¨€¨€¨‡      | 128/398 [00:01<00:01, 153.96it/s]Loading weights:  37%|¨€¨€¨€¨ƒ      | 146/398 [00:01<00:01, 160.31it/s]Loading weights:  41%|¨€¨€¨€¨€      | 163/398 [00:01<00:01, 158.00it/s]Loading weights:  45%|¨€¨€¨€¨€¨„     | 180/398 [00:01<00:01, 156.83it/s]Loading weights:  50%|¨€¨€¨€¨€¨€     | 199/398 [00:01<00:01, 165.89it/s]Loading weights:  54%|¨€¨€¨€¨€¨€¨…    | 216/398 [00:01<00:01, 159.71it/s]Loading weights:  59%|¨€¨€¨€¨€¨€¨    | 235/398 [00:01<00:01, 161.64it/s]Loading weights:  64%|¨€¨€¨€¨€¨€¨€¨…   | 254/398 [00:01<00:00, 168.68it/s]Loading weights:  68%|¨€¨€¨€¨€¨€¨€¨‚   | 272/398 [00:01<00:00, 160.21it/s]Loading weights:  73%|¨€¨€¨€¨€¨€¨€¨€¨†  | 290/398 [00:02<00:00, 160.20it/s]Loading weights:  77%|¨€¨€¨€¨€¨€¨€¨€¨ƒ  | 308/398 [00:02<00:00, 164.74it/s]Loading weights:  82%|¨€¨€¨€¨€¨€¨€¨€¨€¨‡ | 325/398 [00:02<00:00, 157.80it/s]Loading weights:  86%|¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ | 344/398 [00:02<00:00, 165.40it/s]Loading weights:  91%|¨€¨€¨€¨€¨€¨€¨€¨€¨€ | 361/398 [00:02<00:00, 157.48it/s]Loading weights:  95%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨…| 378/398 [00:02<00:00, 156.10it/s]Loading weights:  99%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨| 396/398 [00:02<00:00, 162.23it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:02<00:00, 147.86it/s]
+[08:29:05] qwen3 loaded: class=Qwen3ForCausalLM, GPU=8.05GB
+[08:29:05]   n_layers=36, d_model=2560, peak_L=12
+[08:29:05] ============================================================
+[08:29:05] Step 1: Collecting data
+[08:29:05] ============================================================
+[08:29:08]     [fruit-collect] 10/56: suc=4 fail=2
+[08:29:11]     [fruit-collect] 20/56: suc=10 fail=4
+[08:29:14]     [fruit-collect] 30/56: suc=12 fail=7
+[08:29:17]     [fruit-collect] 40/56: suc=19 fail=8
+[08:29:19]     [fruit-collect] 50/56: suc=25 fail=10
+[08:29:21]     [fruit-collect] 56/56: suc=27 fail=12
+[08:29:21]   Success: 27, Fail: 12
+[08:29:21] ============================================================
+[08:29:21] Step 2: Extracting directions and Dc decomposition
+[08:29:21] ============================================================
+[08:29:21]   d_category: norm=12.72
+[08:29:21]   d_margin (Dc projection): norm=0.30 (2.3% of d_cat)
+[08:29:21]   d_semantic (orthogonal): norm=12.72 (100.0% of d_cat)
+[08:29:21]   cos(d_category, d_c) = 0.0234
+[08:29:21] ============================================================
+[08:29:21] Exp1: Dc Decomposition Test at Layer 12
+[08:29:21] ============================================================
+[08:29:22]     [d_category] 5/12, s34=1
+[08:29:23]     [d_category] 10/12, s34=4
+[08:29:24]     [d_category] 12/12, s34=4
+[08:29:24]   d_category: 4/12 (33%)
+[08:29:25]     [d_margin] 5/12, s34=1
+[08:29:26]     [d_margin] 10/12, s34=2
+[08:29:27]     [d_margin] 12/12, s34=3
+[08:29:27]   d_margin: 3/12 (25%)
+[08:29:28]     [d_semantic] 5/12, s34=1
+[08:29:29]     [d_semantic] 10/12, s34=4
+[08:29:29]     [d_semantic] 12/12, s34=4
+[08:29:29]   d_semantic: 4/12 (33%)
+[08:29:31]     [pure_random] 5/12, s34=0
+[08:29:32]     [pure_random] 10/12, s34=0
+[08:29:32]     [pure_random] 12/12, s34=0
+[08:29:32]   pure_random: 0/12 (0%)
+[08:29:32]   Verdict: d_semantic retains effect â€” causal power is in ORTHOGONAL semantic component, not Dc projection
+[08:29:32] ============================================================
+[08:29:32] Exp2: Dose-Response Curve at Layer 12
+[08:29:32] ============================================================
+[08:29:33]     [alpha=1] 4/8, s34=0
+[08:29:34]     [alpha=1] 8/8, s34=0
+[08:29:34]   alpha= 1: 0/8 (0%)
+[08:29:35]     [alpha=2] 4/8, s34=0
+[08:29:36]     [alpha=2] 8/8, s34=0
+[08:29:36]   alpha= 2: 0/8 (0%)
+[08:29:37]     [alpha=3] 4/8, s34=0
+[08:29:38]     [alpha=3] 8/8, s34=1
+[08:29:38]   alpha= 3: 1/8 (12%)
+[08:29:39]     [alpha=5] 4/8, s34=1
+[08:29:40]     [alpha=5] 8/8, s34=3
+[08:29:40]   alpha= 5: 3/8 (38%)
+[08:29:40]     [alpha=8] 4/8, s34=2
+[08:29:41]     [alpha=8] 8/8, s34=4
+[08:29:41]   alpha= 8: 4/8 (50%)
+[08:29:42]     [alpha=10] 4/8, s34=1
+[08:29:43]     [alpha=10] 8/8, s34=3
+[08:29:43]   alpha=10: 3/8 (38%)
+[08:29:44]     [alpha=15] 4/8, s34=0
+[08:29:45]     [alpha=15] 8/8, s34=0
+[08:29:45]   alpha=15: 0/8 (0%)
+[08:29:46]     [alpha=20] 4/8, s34=0
+[08:29:47]     [alpha=20] 8/8, s34=0
+[08:29:47]   alpha=20: 0/8 (0%)
+[08:29:47]   Verdict: SMOOTH response â€” supports CONTINUOUS accumulation hypothesis
+[08:29:47] ============================================================
+[08:29:47] Exp3: Semantic Selectivity Test (d_category on color task)
+[08:29:47] ============================================================
+[08:29:49]   no_intervention: color changed 2/8 (25%)
+[08:29:49]     orig: ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red']
+[08:29:49]     out:  ['green', 'blue', None, 'red', 'red', None, 'red', None]
+[08:29:51]   d_category: color changed 0/8 (0%)
+[08:29:51]     orig: ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red']
+[08:29:51]     out:  [None, 'red', None, None, None, None, None, None]
+[08:29:53]   d_color: color changed 0/8 (0%)
+[08:29:53]     orig: ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red']
+[08:29:53]     out:  [None, 'red', None, None, None, None, None, 'red']
+[08:29:54]   d_semantic: color changed 0/8 (0%)
+[08:29:54]     orig: ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red']
+[08:29:54]     out:  [None, 'red', None, None, None, None, None, None]
+[08:29:56]   pure_random: color changed 1/8 (12%)
+[08:29:56]     orig: ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red']
+[08:29:56]     out:  [None, 'red', 'red', 'black', 'red', None, None, None]
+[08:29:56]   Verdict: d_category does NOT change color â€” SELECTIVE for category (good!)
+[08:29:56] 
+Saved to results/glm5_phase527_dc_decomposition/phase527_qwen3_dc_decomposition.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[08:29:56] 
+Total: 1.0 min

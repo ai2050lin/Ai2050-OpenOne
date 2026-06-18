@@ -1,0 +1,111 @@
+[04:37:21] Loading qwen3 (bfloat16 + device_map=auto, sdpa)...
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:00<01:53,  3.50it/s]Loading weights:   4%|¨…         | 16/398 [00:00<00:07, 49.38it/s]Loading weights:   9%|¨         | 36/398 [00:00<00:03, 94.31it/s]Loading weights:  12%|¨€¨‡        | 49/398 [00:00<00:03, 104.31it/s]Loading weights:  17%|¨€¨ƒ        | 69/398 [00:00<00:02, 131.83it/s]Loading weights:  21%|¨€¨€¨‡       | 85/398 [00:00<00:02, 135.29it/s]Loading weights:  26%|¨€¨€¨„       | 103/398 [00:00<00:02, 142.57it/s]Loading weights:  30%|¨€¨€¨€       | 120/398 [00:01<00:01, 149.19it/s]Loading weights:  34%|¨€¨€¨€¨…      | 136/398 [00:01<00:01, 150.51it/s]Loading weights:  39%|¨€¨€¨€¨‚      | 154/398 [00:01<00:01, 158.51it/s]Loading weights:  43%|¨€¨€¨€¨€¨†     | 171/398 [00:01<00:01, 151.23it/s]Loading weights:  48%|¨€¨€¨€¨€¨‚     | 190/398 [00:01<00:01, 160.16it/s]Loading weights:  52%|¨€¨€¨€¨€¨€¨‡    | 207/398 [00:01<00:01, 158.44it/s]Loading weights:  56%|¨€¨€¨€¨€¨€¨ƒ    | 224/398 [00:01<00:01, 157.18it/s]Loading weights:  61%|¨€¨€¨€¨€¨€¨€    | 242/398 [00:01<00:00, 163.16it/s]Loading weights:  65%|¨€¨€¨€¨€¨€¨€¨„   | 259/398 [00:01<00:00, 155.67it/s]Loading weights:  70%|¨€¨€¨€¨€¨€¨€¨   | 278/398 [00:02<00:00, 162.34it/s]Loading weights:  74%|¨€¨€¨€¨€¨€¨€¨€¨…  | 295/398 [00:02<00:00, 159.13it/s]Loading weights:  78%|¨€¨€¨€¨€¨€¨€¨€¨‚  | 312/398 [00:02<00:00, 156.79it/s]Loading weights:  83%|¨€¨€¨€¨€¨€¨€¨€¨€¨† | 330/398 [00:02<00:00, 161.97it/s]Loading weights:  87%|¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ | 347/398 [00:02<00:00, 153.68it/s]Loading weights:  92%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨‡| 365/398 [00:02<00:00, 158.29it/s]Loading weights:  96%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨„| 381/398 [00:02<00:00, 157.35it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:02<00:00, 143.54it/s]
+[04:37:25] qwen3 loaded: class=Qwen3ForCausalLM, GPU=8.05GB
+[04:37:25]   n_layers=36, d_model=2560
+[04:37:26] ============================================================
+[04:37:26] Exp1: Semantic Direction Extraction (Minimal Contrast)
+[04:37:26] ============================================================
+[04:37:26]   Collecting T1 data...
+[04:37:29]     [color-object] 9/27: red tulip -> 'type of flower that is known f'
+[04:37:31]     [color-object] 18/27: blue tulip -> 'flower that is not a tulip.'
+[04:37:34]     [color-object] 27/27: green tulip -> 'type of tulip that is known fo'
+[04:37:34]   T1 category success: 3/27 (11%)
+[04:37:34]   Collecting T2 data...
+[04:37:36]     [color-object] 9/27: red tulip -> 'flowers, and a tulip is a'
+[04:37:38]     [color-object] 18/27: blue tulip -> 'flowers, and a tulip is a'
+[04:37:41]     [color-object] 27/27: green tulip -> 'flowers, and a flower is a typ'
+[04:37:41]   Extracting semantic directions from T1...
+[04:37:41]   d_color:   18 pairs, norm=14.3272
+[04:37:41]   d_object:  9 pairs, norm=15.8728
+[04:37:41]   d_category: fruit=3, non_fruit=6, norm=31.5236
+[04:37:41]   Extracting semantic directions from T2...
+[04:37:41]   [Intermediate save] Exp1 saved
+[04:37:41] ============================================================
+[04:37:41] Exp2: d_traj Extraction (from fruit success/failure)
+[04:37:41] ============================================================
+[04:37:41]   Collecting fruit success/failure...
+[04:37:43]     [fruit-collect] 10/56: suc=4 fail=2
+[04:37:46]     [fruit-collect] 20/56: suc=10 fail=4
+[04:37:49]     [fruit-collect] 30/56: suc=12 fail=7
+[04:37:51]     [fruit-collect] 40/56: suc=19 fail=8
+[04:37:54]     [fruit-collect] 50/56: suc=25 fail=10
+[04:37:56]     [fruit-collect] 56/56: suc=27 fail=12
+[04:37:56]   Success: 27, Fail: 12
+[04:37:56]   d_traj norm: 42.2398
+[04:37:56]   [Intermediate save] Exp2 saved
+[04:37:56] ============================================================
+[04:37:56] Exp3: Cross-Correlation Matrix
+[04:37:56] ============================================================
+[04:37:56]   Cosine similarity matrix:
+[04:37:56]     cos(d_color_T1_vs_d_object_T1) = 0.2366
+[04:37:56]     cos(d_color_T1_vs_d_category_T1) = 0.1324
+[04:37:56]     cos(d_color_T1_vs_d_category_T2) = 0.1711
+[04:37:56]     cos(d_color_T1_vs_d_traj) = 0.0551
+[04:37:56]     cos(d_object_T1_vs_d_category_T1) = -0.0675
+[04:37:56]     cos(d_object_T1_vs_d_category_T2) = 0.1729
+[04:37:56]     cos(d_object_T1_vs_d_traj) = -0.1569
+[04:37:56]     cos(d_category_T1_vs_d_category_T2) = 0.6014
+[04:37:56]     cos(d_category_T1_vs_d_traj) = 0.2210
+[04:37:56]     cos(d_category_T2_vs_d_traj) = 0.1428
+[04:37:56] ============================================================
+[04:37:56] Exp4: Selectivity Test (on fruit failures)
+[04:37:56] ============================================================
+[04:37:56]   Testing 8 directions on 12 failures...
+[04:37:57]     [selectivity] d_traj(+): 5/12, s34=1
+[04:37:58]     [selectivity] d_traj(+): 10/12, s34=3
+[04:37:58]     [selectivity] d_traj(+): 12/12, s34=3
+[04:37:58]   d_traj(+): S3+S4 = 3/12 (25%)
+[04:38:00]     [selectivity] d_category(+): 5/12, s34=0
+[04:38:01]     [selectivity] d_category(+): 10/12, s34=0
+[04:38:01]     [selectivity] d_category(+): 12/12, s34=0
+[04:38:01]   d_category(+): S3+S4 = 0/12 (0%)
+[04:38:02]     [selectivity] d_category(-): 5/12, s34=0
+[04:38:03]     [selectivity] d_category(-): 10/12, s34=0
+[04:38:04]     [selectivity] d_category(-): 12/12, s34=0
+[04:38:04]   d_category(-): S3+S4 = 0/12 (0%)
+[04:38:05]     [selectivity] d_color(+): 5/12, s34=0
+[04:38:06]     [selectivity] d_color(+): 10/12, s34=0
+[04:38:07]     [selectivity] d_color(+): 12/12, s34=0
+[04:38:07]   d_color(+): S3+S4 = 0/12 (0%)
+[04:38:08]     [selectivity] d_color(-): 5/12, s34=1
+[04:38:09]     [selectivity] d_color(-): 10/12, s34=2
+[04:38:10]     [selectivity] d_color(-): 12/12, s34=2
+[04:38:10]   d_color(-): S3+S4 = 2/12 (17%)
+[04:38:11]     [selectivity] d_object(+): 5/12, s34=0
+[04:38:12]     [selectivity] d_object(+): 10/12, s34=0
+[04:38:12]     [selectivity] d_object(+): 12/12, s34=0
+[04:38:12]   d_object(+): S3+S4 = 0/12 (0%)
+[04:38:13]     [selectivity] d_object(-): 5/12, s34=1
+[04:38:15]     [selectivity] d_object(-): 10/12, s34=1
+[04:38:15]     [selectivity] d_object(-): 12/12, s34=1
+[04:38:15]   d_object(-): S3+S4 = 1/12 (8%)
+[04:38:16]     [selectivity] random_ortho: 5/12, s34=0
+[04:38:17]     [selectivity] random_ortho: 10/12, s34=0
+[04:38:18]     [selectivity] random_ortho: 12/12, s34=0
+[04:38:18]   random_ortho: S3+S4 = 0/12 (0%)
+[04:38:18] 
+  --- Selectivity Summary ---
+[04:38:18]   d_traj(+):        25%
+[04:38:18]   d_category(+):    0%  (toward fruit)
+[04:38:18]   d_category(-):    0%  (away from fruit)
+[04:38:18]   d_color(+):       0%  (irrelevant)
+[04:38:18]   d_color(-):       17%  (irrelevant)
+[04:38:18]   d_object(+):      0%  (irrelevant)
+[04:38:18]   d_object(-):      8%  (irrelevant)
+[04:38:18]   random_ortho:     0%  (control)
+[04:38:18]   Selectivity ratio (cat_best / (col_best + obj_best)): 0.00
+[04:38:18]   Verdict: d_traj encodes something OTHER than color/object/category (possibly format/fluency)
+[04:38:18] ============================================================
+[04:38:18] Exp5: Cross-Template Invariance
+[04:38:18] ============================================================
+[04:38:18]   cos(d_category_T1, d_category_T2) = 0.6014
+[04:38:18]   Verdict: Category direction is PARTIALLY stable across templates
+[04:38:18]   cos(d_color_T1, d_color_T2) = 0.5950
+[04:38:18]   cos(d_object_T1, d_object_T2) = 0.4867
+[04:38:18]   Directions saved to results/glm5_phase524_semantic_selectivity/phase524_qwen3_directions.npz
+[04:38:18] 
+Saved to results/glm5_phase524_semantic_selectivity/phase524_qwen3_semantic_selectivity.json
+[model_utils] GPU memory released, allocated=8.05 GB
+[04:38:18] 
+Total: 1.0 min
