@@ -1,0 +1,24 @@
+[model_utils] Loading glm4... (8bit=False)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
+Model class: GlmForCausalLM
+n_layers: 40, d_model: 4096
+
+Inner model class: GlmModel
+Inner model attributes: ['T_destination', 'active_adapters', 'add_adapter', 'add_model_tags', 'add_module', 'all_tied_weights_keys', 'apply', 'base_model', 'base_model_prefix', 'bfloat16', 'buffers', 'call_super_init', 'can_generate', 'can_record_outputs', 'children', 'compile', 'config', 'config_class', 'cpu', 'create_extended_attention_mask_for_decoder', 'cuda', 'delete_adapter', 'dequantize', 'device', 'disable_adapters', 'disable_input_require_grads', 'double', 'dtype', 'dummy_inputs', 'dump_patches', 'embed_tokens', 'enable_adapters', 'enable_input_require_grads', 'enable_peft_hotswap', 'eval', 'extra_repr', 'float', 'forward', 'from_pretrained', 'generation_config_class', 'get_adapter_state_dict', 'get_buffer', 'get_compiled_call', 'get_correct_attn_implementation', 'get_correct_experts_implementation', 'get_decoder', 'get_encoder', 'get_expanded_tied_weights_keys', 'get_extended_attention_mask', 'get_extra_state', 'get_init_context', 'get_input_embeddings', 'get_memory_footprint', 'get_output_embeddings', 'get_parameter', 'get_parameter_or_buffer', 'get_position_embeddings', 'get_submodule', 'gradient_checkpointing', 'gradient_checkpointing_disable', 'gradient_checkpointing_enable', 'half', 'init_weights', 'initialize_weights', 'input_modalities', 'invert_attention_mask', 'ipu', 'is_backend_compatible', 'is_gradient_checkpointing', 'is_remote_code', 'kernel_config', 'kernelize', 'layers', 'load_adapter', 'load_state_dict', 'loss_function', 'loss_type', 'main_input_name', 'mark_tied_weights_as_initialized', 'model_tags', 'modules', 'mtia', 'name_or_path', 'named_buffers', 'named_children', 'named_modules', 'named_non_persistent_buffers', 'named_parameters', 'norm', 'num_parameters', 'padding_idx', 'parameters', 'post_init', 'pp_plan', 'push_to_hub', 'register_backward_hook', 'register_buffer', 'register_for_auto_class', 'register_forward_hook', 'register_forward_pre_hook', 'register_full_backward_hook', 'register_full_backward_pre_hook', 'register_load_state_dict_post_hook', 'register_load_state_dict_pre_hook', 'register_module', 'register_parameter', 'register_state_dict_post_hook', 'register_state_dict_pre_hook', 'requires_grad_', 'resize_position_embeddings', 'resize_token_embeddings', 'retrieve_modules_from_names', 'rotary_emb', 'save_pretrained', 'set_adapter', 'set_attn_implementation', 'set_decoder', 'set_encoder', 'set_experts_implementation', 'set_extra_state', 'set_input_embeddings', 'set_output_embeddings', 'set_submodule', 'set_use_kernels', 'share_memory', 'smart_apply', 'state_dict', 'supports_gradient_checkpointing', 'supports_pp_plan', 'supports_tp_plan', 'tie_weights', 'to', 'to_empty', 'tp_plan', 'tp_size', 'train', 'training', 'type', 'use_kernels', 'vocab_size', 'warn_if_padding_and_no_attention_mask', 'xpu', 'zero_grad']
+  inner.norm: GlmRMSNorm
+  inner.rotary_emb: GlmRotaryEmbedding
+
+Layer 0 class: GlmDecoderLayer
+Layer 0 attributes: ['T_destination', 'add_module', 'apply', 'bfloat16', 'buffers', 'call_super_init', 'children', 'compile', 'cpu', 'cuda', 'double', 'dump_patches', 'eval', 'extra_repr', 'float', 'forward', 'get_buffer', 'get_extra_state', 'get_parameter', 'get_submodule', 'gradient_checkpointing', 'half', 'hidden_size', 'input_layernorm', 'ipu', 'load_state_dict', 'mlp', 'modules', 'mtia', 'named_buffers', 'named_children', 'named_modules', 'named_parameters', 'parameters', 'post_attention_layernorm', 'register_backward_hook', 'register_buffer', 'register_forward_hook', 'register_forward_pre_hook', 'register_full_backward_hook', 'register_full_backward_pre_hook', 'register_load_state_dict_post_hook', 'register_load_state_dict_pre_hook', 'register_module', 'register_parameter', 'register_state_dict_post_hook', 'register_state_dict_pre_hook', 'requires_grad_', 'self_attn', 'set_extra_state', 'set_submodule', 'share_memory', 'smart_apply', 'state_dict', 'to', 'to_empty', 'train', 'training', 'type', 'xpu', 'zero_grad']
+
+Layer 0 forward signature: (hidden_states: torch.Tensor, attention_mask: torch.Tensor | None = None, position_ids: torch.LongTensor | None = None, past_key_values: transformers.cache_utils.Cache | None = None, use_cache: bool | None = False, position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None, **kwargs: *<class 'transformers.utils.generic.TransformersKwargs'>) -> torch.Tensor
+
+h0 shape: torch.Size([1, 3, 4096]), norm: 0.16
+h1 shape: torch.Size([1, 3, 4096]), norm: 8.16
+pos_emb type: <class 'tuple'>
+  cos shape: torch.Size([1, 3, 64]), sin shape: torch.Size([1, 3, 64])
+
+Manual vs auto h1 diff: 3.369713
+[model_utils] GPU memory released, allocated=18.85 GB
+
+Done!

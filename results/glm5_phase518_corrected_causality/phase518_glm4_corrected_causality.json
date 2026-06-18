@@ -1,0 +1,272 @@
+{
+  "model": "glm4",
+  "model_info": {
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "exp1_indexing_audit": {
+    "n_hidden_states": 41,
+    "n_layers": 40,
+    "test_A_diff_max": 44.640777587890625,
+    "test_A_verdict": "NO — hidden_states[-2] is NOT the final pre-norm state",
+    "test_B_diff_max": null,
+    "test_B_verdict": "SKIPPED — Cannot copy out of meta tensor; no data!",
+    "readout_diff_max": 0.03113079071044922,
+    "h_last_norm": 203.51763916015625,
+    "h_minus2_norm": 253.3094024658203
+  },
+  "exp2_prompt_robust": {
+    "strong": {
+      "total": 30,
+      "layers": {
+        "S0_miss": 2,
+        "S1_lexical": 0,
+        "S2_scaffold": 14,
+        "S3_cont_phrase": 6,
+        "S4_free": 8
+      },
+      "examples": [
+        {
+          "obj": "apple",
+          "tmpl": "belongs to the category of",
+          "cont": "fruits. Apples are known for their",
+          "layer": "S2_scaffold"
+        },
+        {
+          "obj": "apple",
+          "tmpl": "is classified as a type of",
+          "cont": "fruit. Therefore, an apple is a",
+          "layer": "S2_scaffold"
+        },
+        {
+          "obj": "apple",
+          "tmpl": "is a kind of",
+          "cont": "fruit, and a fruit is a kind",
+          "layer": "S3_cont_phrase"
+        },
+        {
+          "obj": "banana",
+          "tmpl": "belongs to the category of",
+          "cont": "fruits. Bananas are a type of",
+          "layer": "S2_scaffold"
+        }
+      ]
+    },
+    "weak": {
+      "total": 20,
+      "layers": {
+        "S0_miss": 7,
+        "S1_lexical": 0,
+        "S2_scaffold": 7,
+        "S3_cont_phrase": 2,
+        "S4_free": 4
+      },
+      "examples": [
+        {
+          "obj": "apple",
+          "tmpl": "is a",
+          "cont": "fruit, but not all fruits are apples",
+          "layer": "S2_scaffold"
+        },
+        {
+          "obj": "apple",
+          "tmpl": "is an",
+          "cont": "apple is an apple, but not all",
+          "layer": "S0_miss"
+        },
+        {
+          "obj": "banana",
+          "tmpl": "is a",
+          "cont": "fruit that is commonly consumed as a sna",
+          "layer": "S2_scaffold"
+        },
+        {
+          "obj": "banana",
+          "tmpl": "is an",
+          "cont": "example of a fruit that is often consume",
+          "layer": "S3_cont_phrase"
+        }
+      ]
+    },
+    "none": {
+      "total": 20,
+      "layers": {
+        "S0_miss": 10,
+        "S1_lexical": 0,
+        "S2_scaffold": 0,
+        "S3_cont_phrase": 7,
+        "S4_free": 3
+      },
+      "examples": [
+        {
+          "obj": "apple",
+          "tmpl": "is:",
+          "cont": "An apple is a fruit, typically round",
+          "layer": "S3_cont_phrase"
+        },
+        {
+          "obj": "apple",
+          "tmpl": ":",
+          "cont": "An orange\nAn apple and an orange",
+          "layer": "S0_miss"
+        },
+        {
+          "obj": "banana",
+          "tmpl": "is:",
+          "cont": "A banana is a fruit. It is",
+          "layer": "S3_cont_phrase"
+        },
+        {
+          "obj": "banana",
+          "tmpl": ":",
+          "cont": "A banana is a fruit that is typically",
+          "layer": "S3_cont_phrase"
+        }
+      ]
+    }
+  },
+  "exp3_tangential_radial": {
+    "n_samples": 8,
+    "delta_full_mean": 4.235926508903503,
+    "delta_tan_mean": 4.231862306594849,
+    "delta_rad_mean": 0.009795963764190674,
+    "details": [
+      {
+        "obj": "apple",
+        "D_c_base": -5.25,
+        "delta_full": 3.667844772338867,
+        "delta_tan": 3.663302421569824,
+        "delta_rad": -0.003223419189453125,
+        "tan_norm": 0.9993823766708374,
+        "rad_norm": 0.035143107175827026
+      },
+      {
+        "obj": "banana",
+        "D_c_base": -5.3125,
+        "delta_full": 3.7102699279785156,
+        "delta_tan": 3.705988883972168,
+        "delta_rad": 0.0389409065246582,
+        "tan_norm": 0.999418318271637,
+        "rad_norm": 0.0341070294380188
+      },
+      {
+        "obj": "orange",
+        "D_c_base": -5.125,
+        "delta_full": 4.5210113525390625,
+        "delta_tan": 4.517617225646973,
+        "delta_rad": 0.0015616416931152344,
+        "tan_norm": 0.9996242523193359,
+        "rad_norm": 0.02741401270031929
+      },
+      {
+        "obj": "grape",
+        "D_c_base": -5.8125,
+        "delta_full": 3.680583953857422,
+        "delta_tan": 3.6750926971435547,
+        "delta_rad": 0.010470390319824219,
+        "tan_norm": 0.9992526769638062,
+        "rad_norm": 0.03865598514676094
+      },
+      {
+        "obj": "strawberry",
+        "D_c_base": -4.0,
+        "delta_full": 3.7069015502929688,
+        "delta_tan": 3.704331398010254,
+        "delta_rad": 0.03386402130126953,
+        "tan_norm": 0.9996504783630371,
+        "rad_norm": 0.026440933346748352
+      },
+      {
+        "obj": "mango",
+        "D_c_base": -4.9375,
+        "delta_full": 4.825593948364258,
+        "delta_tan": 4.822666168212891,
+        "delta_rad": -0.006285190582275391,
+        "tan_norm": 0.9996970891952515,
+        "rad_norm": 0.02461782656610012
+      },
+      {
+        "obj": "pear",
+        "D_c_base": -3.9375,
+        "delta_full": 4.888803482055664,
+        "delta_tan": 4.886945724487305,
+        "delta_rad": -7.915496826171875e-05,
+        "tan_norm": 0.9998102784156799,
+        "rad_norm": 0.01948787458240986
+      },
+      {
+        "obj": "cherry",
+        "D_c_base": -7.96875,
+        "delta_full": 4.8864030838012695,
+        "delta_tan": 4.87895393371582,
+        "delta_rad": 0.0031185150146484375,
+        "tan_norm": 0.9992379546165466,
+        "rad_norm": 0.039036378264427185
+      }
+    ]
+  },
+  "exp4_corrected_dtraj": {
+    "n_success": 30,
+    "n_failure": 19,
+    "layer_distribution": {
+      "S2_scaffold": 21,
+      "S3_cont_phrase": 15,
+      "S4_free": 15,
+      "S0_miss": 19
+    },
+    "d_traj_norm": 74.63728332519531,
+    "suc_Dc_mean": -6.609858512878418,
+    "fail_Dc_mean": -7.789079189300537,
+    "cos_d_traj_w_fruit": 0.02462773770093918,
+    "intervention": [
+      {
+        "alpha": 0.5,
+        "action": "add",
+        "mean_delta_Dc": 0.044875812530517575,
+        "n": 5
+      },
+      {
+        "alpha": 0.5,
+        "action": "remove",
+        "mean_delta_Dc": -0.04487800598144531,
+        "n": 5
+      },
+      {
+        "alpha": 1.0,
+        "action": "add",
+        "mean_delta_Dc": 0.08975191116333008,
+        "n": 5
+      },
+      {
+        "alpha": 1.0,
+        "action": "remove",
+        "mean_delta_Dc": -0.08975181579589844,
+        "n": 5
+      },
+      {
+        "alpha": 2.0,
+        "action": "add",
+        "mean_delta_Dc": 0.17950267791748048,
+        "n": 5
+      },
+      {
+        "alpha": 2.0,
+        "action": "remove",
+        "mean_delta_Dc": -0.17950258255004883,
+        "n": 5
+      },
+      {
+        "alpha": 5.0,
+        "action": "add",
+        "mean_delta_Dc": 0.44875783920288087,
+        "n": 5
+      },
+      {
+        "alpha": 5.0,
+        "action": "remove",
+        "mean_delta_Dc": -0.4487588882446289,
+        "n": 5
+      }
+    ]
+  }
+}

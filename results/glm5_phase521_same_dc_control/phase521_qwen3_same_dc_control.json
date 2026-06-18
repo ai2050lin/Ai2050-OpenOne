@@ -1,0 +1,137 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "exp1_same_dc_control": {
+    "n_success": 35,
+    "n_failure": 21,
+    "n_test": 20,
+    "alpha": 10.0,
+    "d_traj_norm": 37.46670913696289,
+    "dtraj_dc_proj": 0.2894335389137268,
+    "dtraj_s34": 3,
+    "dtraj_s34_rate": 0.15,
+    "random_s34_list": [
+      0,
+      0,
+      0,
+      3,
+      0
+    ],
+    "random_mean": 0.6,
+    "random_std": 1.2,
+    "gcg": 3.9344262295081966,
+    "verdict": "d_traj better than same-Dc random (not significant)"
+  },
+  "exp2_top_token_path_value": {
+    "n_test": 10,
+    "v_improved": 3,
+    "v_same": 7,
+    "v_worse": 0,
+    "improve_rate": 0.3,
+    "results": [
+      {
+        "prompt": "An apple is an",
+        "baseline_token": "apple,",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "banana",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "An apple :",
+        "baseline_token": "100",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "day,",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "A banana :",
+        "baseline_token": "200",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "as",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "An orange is an",
+        "baseline_token": "orange,",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "grapefruit,",
+        "steered_layer": "S4_free",
+        "steered_v": 1.0,
+        "delta_v": 1.0
+      },
+      {
+        "prompt": "An orange :",
+        "baseline_token": "100g",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "s",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "A grape is an",
+        "baseline_token": "object",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "a",
+        "steered_layer": "S4_free",
+        "steered_v": 1.0,
+        "delta_v": 1.0
+      },
+      {
+        "prompt": "A grape :",
+        "baseline_token": "100g",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "as",
+        "steered_layer": "S4_free",
+        "steered_v": 1.0,
+        "delta_v": 1.0
+      },
+      {
+        "prompt": "A strawberry :",
+        "baseline_token": "100g,",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "small",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "A mango :",
+        "baseline_token": "1000000",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "t",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      },
+      {
+        "prompt": "A pear :",
+        "baseline_token": "1.5",
+        "baseline_layer": "S0_miss",
+        "baseline_v": 0.0,
+        "steered_token": "st",
+        "steered_layer": "S0_miss",
+        "steered_v": 0.0,
+        "delta_v": 0.0
+      }
+    ]
+  }
+}

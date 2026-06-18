@@ -1,0 +1,304 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "exp1_readout_audit": {
+    "prompt": "An apple belongs to the category of",
+    "lm_head_info": {
+      "has_bias": false,
+      "tied": true,
+      "rms_norm_eps": 1e-06,
+      "has_model_norm": true
+    },
+    "target_id": 35598,
+    "model_logit_fruit": 8.5,
+    "manual_nonorm_fruit": 8.520362854003906,
+    "manual_nobias_fruit": 8.863777160644531,
+    "manual_withbias_fruit": 8.863777160644531,
+    "diff_nonorm_max": 0.05223274230957031,
+    "diff_nonorm_mean": 0.003215976059436798,
+    "diff_nobias_max": 16.96263885498047,
+    "diff_nobias_mean": 2.5400772094726562,
+    "diff_withbias_max": 16.96263885498047,
+    "diff_withbias_mean": 2.5400772094726562,
+    "corr_nonorm": 0.9999976650036562,
+    "corr_nobias": 0.8724193442739052,
+    "corr_withbias": 0.8724193442739052,
+    "rms_h": 2.4785709381103516,
+    "eps": 1e-06,
+    "torch_own_fruit": 8.875,
+    "diff_torch_max": 17.0625,
+    "diff_double_norm_max": 22.791847229003906
+  },
+  "exp2_semantic_hit": {
+    "n_total": 30,
+    "phase515": {
+      "semantic_answer": 29,
+      "lexical": 0,
+      "miss": 1
+    },
+    "phase516": {
+      "semantic_answer": 11,
+      "lexical": 18,
+      "miss": 1
+    },
+    "fixed": {
+      "semantic_answer": 29,
+      "lexical": 0,
+      "miss": 1
+    },
+    "details": [
+      {
+        "object": "apple",
+        "template": "belongs to the category of",
+        "continuation": "fruits, and an apple is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "apple",
+        "template": "is classified as a type of",
+        "continuation": "fruit, and a banana is also a",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "apple",
+        "template": "is a kind of",
+        "continuation": "fruit. A fruit is a kind of",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "banana",
+        "template": "belongs to the category of",
+        "continuation": "fruits, but it's not a typical",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "banana",
+        "template": "is classified as a type of",
+        "continuation": "fruit, but it's not a citrus",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "banana",
+        "template": "is a kind of",
+        "continuation": "fruit. A fruit is a kind of",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "orange",
+        "template": "belongs to the category of",
+        "continuation": "fruits, and an apple is also a",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "orange",
+        "template": "is classified as a type of",
+        "continuation": "fruit, and a fruit is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "orange",
+        "template": "is a kind of",
+        "continuation": "fruit. A fruit is a kind of",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "grape",
+        "template": "belongs to the category of",
+        "continuation": "fruits, but it's not a typical",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "grape",
+        "template": "is classified as a type of",
+        "continuation": "fruit, but it's also a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "grape",
+        "template": "is a kind of",
+        "continuation": "fruit, and a grape is a kind",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "strawberry",
+        "template": "belongs to the category of",
+        "continuation": "fruits, but it's also a vegetable",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "strawberry",
+        "template": "is classified as a type of",
+        "continuation": "fruit, but botanically, it",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "strawberry",
+        "template": "is a kind of",
+        "continuation": "fruit, and a fruit is a kind",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "mango",
+        "template": "belongs to the category of",
+        "continuation": "fruits, and a mango is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "mango",
+        "template": "is classified as a type of",
+        "continuation": "fruit, and a fruit is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "mango",
+        "template": "is a kind of",
+        "continuation": "fruit, and a fruit is a kind",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "pear",
+        "template": "belongs to the category of",
+        "continuation": "fruits, and the fruit is a product",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "pear",
+        "template": "is classified as a type of",
+        "continuation": "fruit, and a fruit is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "pear",
+        "template": "is a kind of",
+        "continuation": "fruit. A pear tree is a kind",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "cherry",
+        "template": "belongs to the category of",
+        "continuation": "fruits, and the fruit is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "cherry",
+        "template": "is classified as a type of",
+        "continuation": "fruit, and a fruit is a type",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "semantic_answer",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "cherry",
+        "template": "is a kind of",
+        "continuation": "fruit. A cherry tree is a kind",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "watermelon",
+        "template": "belongs to the category of",
+        "continuation": "fruits, but it's not a typical",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "watermelon",
+        "template": "is classified as a type of",
+        "continuation": "fruit, but it's also a vegetable",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "watermelon",
+        "template": "is a kind of",
+        "continuation": "fruit, and it is a type of",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "pineapple",
+        "template": "belongs to the category of",
+        "continuation": "plants known as what? A. F",
+        "classify_p515": "miss",
+        "classify_p516": "miss",
+        "classify_fixed": "miss"
+      },
+      {
+        "object": "pineapple",
+        "template": "is classified as a type of",
+        "continuation": "fruit, but it's also a vegetable",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      },
+      {
+        "object": "pineapple",
+        "template": "is a kind of",
+        "continuation": "fruit that is native to South America.",
+        "classify_p515": "semantic_answer",
+        "classify_p516": "lexical",
+        "classify_fixed": "semantic_answer"
+      }
+    ]
+  },
+  "exp3_gradient_check": {
+    "target_id": 35598,
+    "competitor_id": 25322,
+    "D_c_manual": -21.366403579711914,
+    "D_c_model": -10.375,
+    "diff": -10.991403579711914,
+    "max_rel_error_manual": 0.22386259358636798,
+    "rms_h": 2.4785709381103516
+  }
+}

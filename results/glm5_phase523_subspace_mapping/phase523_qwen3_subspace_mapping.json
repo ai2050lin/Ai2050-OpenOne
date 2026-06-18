@@ -1,0 +1,183 @@
+{
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560
+  },
+  "exp1_multi_seed_ortho": {
+    "n_success": 35,
+    "n_failure": 21,
+    "n_test": 10,
+    "n_seeds": 10,
+    "cos_dtraj_dc": 0.041270431131124496,
+    "d_plan_pct": 99.91480066583361,
+    "dplan_s34": 3,
+    "dplan_rate": 0.3,
+    "random_mean": 0.06999999999999999,
+    "random_std": 0.1004987562112089,
+    "random_max": 0.3,
+    "random_min": 0.0,
+    "n_effective": 4,
+    "random_results": [
+      {
+        "seed": 0,
+        "s34": 2,
+        "n": 10,
+        "rate": 0.2
+      },
+      {
+        "seed": 1,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      },
+      {
+        "seed": 2,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      },
+      {
+        "seed": 3,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      },
+      {
+        "seed": 4,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      },
+      {
+        "seed": 5,
+        "s34": 1,
+        "n": 10,
+        "rate": 0.1
+      },
+      {
+        "seed": 6,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      },
+      {
+        "seed": 7,
+        "s34": 1,
+        "n": 10,
+        "rate": 0.1
+      },
+      {
+        "seed": 8,
+        "s34": 3,
+        "n": 10,
+        "rate": 0.3
+      },
+      {
+        "seed": 9,
+        "s34": 0,
+        "n": 10,
+        "rate": 0.0
+      }
+    ],
+    "z_score": 2.288585537482975,
+    "p_value": 0.01105172249671027,
+    "pca": {
+      "n_effective_dirs": 5,
+      "singular_values": [
+        5.122692765118057,
+        5.055491651059512,
+        4.946899295545714,
+        4.86455221491778,
+        1.5839637355424191e-15
+      ],
+      "cumulative_variance": [
+        0.2625887668067603,
+        0.5183332765556248,
+        0.7632089611366067,
+        0.99999999999999,
+        0.99999999999999
+      ],
+      "dims_for_50pct": 2,
+      "dims_for_90pct": 4
+    },
+    "verdict": "random_ortho has baseline effect but varies by seed"
+  },
+  "exp2_cross_category": {
+    "available_cats": [
+      "fruit",
+      "vehicle",
+      "flower"
+    ],
+    "transfer_matrix": {
+      "fruit->fruit": {
+        "s34": 3,
+        "n": 8,
+        "rate": 0.375,
+        "within": true
+      },
+      "fruit->vehicle": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0,
+        "within": false
+      },
+      "fruit->flower": {
+        "s34": 1,
+        "n": 8,
+        "rate": 0.125,
+        "within": false
+      },
+      "vehicle->fruit": {
+        "s34": 4,
+        "n": 8,
+        "rate": 0.5,
+        "within": false
+      },
+      "vehicle->vehicle": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0,
+        "within": true
+      },
+      "vehicle->flower": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0,
+        "within": false
+      },
+      "flower->fruit": {
+        "s34": 1,
+        "n": 8,
+        "rate": 0.125,
+        "within": false
+      },
+      "flower->vehicle": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0,
+        "within": false
+      },
+      "flower->flower": {
+        "s34": 0,
+        "n": 8,
+        "rate": 0.0,
+        "within": true
+      }
+    },
+    "cos_matrix": {
+      "fruit->fruit": 0.04347416013479233,
+      "fruit->vehicle": 0.011687061749398708,
+      "fruit->flower": -0.017528867349028587,
+      "vehicle->fruit": -0.024991827085614204,
+      "vehicle->vehicle": 0.028435008600354195,
+      "vehicle->flower": -0.006703226827085018,
+      "flower->fruit": 0.027144920080900192,
+      "flower->vehicle": 0.05841128155589104,
+      "flower->flower": 0.023606184870004654
+    },
+    "within_mean": 0.125,
+    "cross_mean": 0.125,
+    "verdict": "d_traj TRANSFERS across categories (general planning direction)"
+  }
+}

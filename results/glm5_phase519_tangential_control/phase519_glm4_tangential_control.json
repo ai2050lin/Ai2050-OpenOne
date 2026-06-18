@@ -1,0 +1,92 @@
+{
+  "model": "glm4",
+  "model_info": {
+    "n_layers": 40,
+    "d_model": 4096
+  },
+  "exp1_random_control": {
+    "d_model": 4096,
+    "expected_random_cos": 0.012466946262544772,
+    "real_readout_cos_mean": 0.032512906938791275,
+    "real_readout_cos_median": 0.03461422026157379,
+    "random_wu_cos_mean": 0.010865653865039349,
+    "random_gauss_cos_mean": 0.013002314802915239,
+    "dtraj_cos_mean": 0.3497670292854309,
+    "ratio_real_vs_rand_wu": 2.9922614097595215,
+    "ratio_real_vs_gauss": 2.5005456663797223,
+    "verdict": "RANDOM — orthogonality is just high-dimensional sparsity"
+  },
+  "exp2_spherical_vs_euclidean": {
+    "n_samples": 14,
+    "results": {
+      "euclidean": {
+        "1.0": {
+          "mean_delta_Dc": 0.8292482495307922,
+          "mean_norm": 197.26989936828613
+        },
+        "5.0": {
+          "mean_delta_Dc": 3.6389583349227905,
+          "mean_norm": 197.14872550964355
+        },
+        "10.0": {
+          "mean_delta_Dc": 6.090184509754181,
+          "mean_norm": 197.11171913146973
+        },
+        "20.0": {
+          "mean_delta_Dc": 9.03180480003357,
+          "mean_norm": 197.41922187805176
+        }
+      },
+      "spherical": {
+        "1.0": {
+          "mean_delta_Dc": 0.8275061845779419,
+          "mean_norm": 197.3128719329834
+        },
+        "5.0": {
+          "mean_delta_Dc": 3.6347705721855164,
+          "mean_norm": 197.31287574768066
+        },
+        "10.0": {
+          "mean_delta_Dc": 6.087693631649017,
+          "mean_norm": 197.31287384033203
+        },
+        "20.0": {
+          "mean_delta_Dc": 9.03127384185791,
+          "mean_norm": 197.3128719329834
+        }
+      }
+    }
+  },
+  "exp3_tangential_dtraj": {
+    "n_success": 30,
+    "n_failure": 19,
+    "d_traj_norm": 74.63728332519531,
+    "results": {
+      "1.0": {
+        "raw": 0.19252147674560546,
+        "tangential": 0.15308141708374023,
+        "radial": 0.03944120407104492,
+        "random_tangent": -0.04568878445882998
+      },
+      "5.0": {
+        "raw": 0.9626128196716308,
+        "tangential": 0.7653981208801269,
+        "radial": 0.197213077545166,
+        "random_tangent": 0.1690890977106628
+      }
+    }
+  },
+  "exp4_dvalue_vs_dtraj": {
+    "d_value": {
+      "source": "high_hub vs fail (low_hub insufficient)",
+      "norm": 45.165618896484375,
+      "1.0": 0.07833070755004883,
+      "5.0": 0.3916446685791016
+    },
+    "d_traj": {
+      "1.0": 0.19252147674560546,
+      "5.0": 0.9626128196716308
+    },
+    "cos_dvalue_dtraj": 0.7883376479148865
+  }
+}
