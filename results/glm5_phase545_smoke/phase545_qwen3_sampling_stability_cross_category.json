@@ -1,0 +1,912 @@
+{
+  "phase": 545,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 16:23:42",
+  "attn_implementation": "sdpa",
+  "pairs": [
+    "vehicle_clothing",
+    "fruit_vegetable"
+  ],
+  "conditions": [
+    "baseline",
+    "residual_parallel"
+  ],
+  "scaffolds": [
+    "natural_qa"
+  ],
+  "decode_modes": [
+    "top_p"
+  ],
+  "windows": {
+    "10-12": [
+      10,
+      12
+    ]
+  },
+  "all_layers": [
+    10,
+    12
+  ],
+  "train_n": 3,
+  "test_n": 2,
+  "max_new_tokens": 3,
+  "checkpoints": [
+    1,
+    3
+  ],
+  "alpha": 6.0,
+  "sample_seeds": [
+    101,
+    103
+  ],
+  "component_seeds": [
+    11,
+    23
+  ],
+  "temperature": 0.8,
+  "top_p": 0.9,
+  "family_terms": {
+    "vehicle": [
+      "vehicle",
+      "vehicles",
+      "transport",
+      "transportation",
+      "automobile",
+      "automobiles",
+      "car",
+      "truck",
+      "bus",
+      "train",
+      "boat",
+      "airplane"
+    ],
+    "furniture": [
+      "furniture",
+      "chair",
+      "table",
+      "sofa",
+      "bed",
+      "desk",
+      "cabinet",
+      "shelf",
+      "couch",
+      "wardrobe"
+    ],
+    "tool": [
+      "tool",
+      "tools",
+      "instrument",
+      "instruments",
+      "device",
+      "devices",
+      "equipment",
+      "hammer",
+      "wrench",
+      "drill"
+    ],
+    "clothing": [
+      "clothing",
+      "clothes",
+      "garment",
+      "garments",
+      "apparel",
+      "shirt",
+      "pants",
+      "coat",
+      "jacket",
+      "dress"
+    ],
+    "fruit": [
+      "fruit",
+      "fruits",
+      "apple",
+      "banana",
+      "orange",
+      "grape",
+      "mango",
+      "pear",
+      "peach",
+      "berry"
+    ],
+    "vegetable": [
+      "vegetable",
+      "vegetables",
+      "carrot",
+      "potato",
+      "onion",
+      "lettuce",
+      "broccoli",
+      "spinach",
+      "pepper"
+    ],
+    "animal": [
+      "animal",
+      "animals",
+      "creature",
+      "creatures",
+      "mammal",
+      "dog",
+      "cat",
+      "horse",
+      "cow",
+      "lion",
+      "tiger"
+    ]
+  },
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "audit": {
+    "10-12": {
+      "window": [
+        10,
+        12
+      ],
+      "sources": {
+        "vehicle_clothing": {
+          "natural_qa": {
+            "top_p": {
+              "baseline": {
+                "n_seeds": 2,
+                "checkpoints": [
+                  1,
+                  3
+                ],
+                "hit_at_k_mean": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 1.0
+                  },
+                  "3": {
+                    "family_target": 0.25,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.25,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.75
+                  }
+                },
+                "hit_at_k_std": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.0
+                  },
+                  "3": {
+                    "family_target": 0.25,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.25,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.25
+                  }
+                },
+                "mean_first_target_rank": 76.5,
+                "std_first_target_rank": 0.0,
+                "seed_rows": [
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.5,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.5,
+                        "family_competitor": 0.0,
+                        "other_only": 0.5
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.5,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.0,
+                      "family_target": 0.5,
+                      "family_competitor": 0.0,
+                      "other_only": 0.5
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 76.5,
+                    "mean_first_competitor_rank": 1030.0,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a sled? A sled is"
+                      },
+                      {
+                        "generated_suffix": " a vehicle,",
+                        "generated_ids": [
+                          264,
+                          7310,
+                          11
+                        ],
+                        "prompt": "What kind of thing is a wagon? A wagon is"
+                      }
+                    ]
+                  },
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.0,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.0,
+                      "family_target": 0.0,
+                      "family_competitor": 0.0,
+                      "other_only": 1.0
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 76.5,
+                    "mean_first_competitor_rank": 1030.0,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a sled? A sled is"
+                      },
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a wagon? A wagon is"
+                      }
+                    ]
+                  }
+                ],
+                "hit_rates": {
+                  "family_target": 0.25,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.25,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.75
+                },
+                "hit_stds": {
+                  "family_target": 0.25,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.25,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.25
+                }
+              },
+              "residual_parallel": {
+                "n_seeds": 2,
+                "checkpoints": [
+                  1,
+                  3
+                ],
+                "hit_at_k_mean": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 1.0
+                  },
+                  "3": {
+                    "family_target": 0.5,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.5,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.5
+                  }
+                },
+                "hit_at_k_std": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.0
+                  },
+                  "3": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.0
+                  }
+                },
+                "mean_first_target_rank": 72.5,
+                "std_first_target_rank": 0.0,
+                "seed_rows": [
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.5,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.5,
+                        "family_competitor": 0.0,
+                        "other_only": 0.5
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.5,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.0,
+                      "family_target": 0.5,
+                      "family_competitor": 0.0,
+                      "other_only": 0.5
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 72.5,
+                    "mean_first_competitor_rank": 1155.5,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a sled? A sled is"
+                      },
+                      {
+                        "generated_suffix": " a vehicle,",
+                        "generated_ids": [
+                          264,
+                          7310,
+                          11
+                        ],
+                        "prompt": "What kind of thing is a wagon? A wagon is"
+                      }
+                    ]
+                  },
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.5,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.5,
+                        "family_competitor": 0.0,
+                        "other_only": 0.5
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.5,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.0,
+                      "family_target": 0.5,
+                      "family_competitor": 0.0,
+                      "other_only": 0.5
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 72.5,
+                    "mean_first_competitor_rank": 1155.5,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a sled? A sled is"
+                      },
+                      {
+                        "generated_suffix": " a vehicle that",
+                        "generated_ids": [
+                          264,
+                          7310,
+                          429
+                        ],
+                        "prompt": "What kind of thing is a wagon? A wagon is"
+                      }
+                    ]
+                  }
+                ],
+                "hit_rates": {
+                  "family_target": 0.5,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.5,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.5
+                },
+                "hit_stds": {
+                  "family_target": 0.0,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.0,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.0
+                }
+              }
+            }
+          }
+        },
+        "fruit_vegetable": {
+          "natural_qa": {
+            "top_p": {
+              "baseline": {
+                "n_seeds": 2,
+                "checkpoints": [
+                  1,
+                  3
+                ],
+                "hit_at_k_mean": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 1.0
+                  },
+                  "3": {
+                    "family_target": 0.75,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.75,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.25
+                  }
+                },
+                "hit_at_k_std": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.0
+                  },
+                  "3": {
+                    "family_target": 0.25,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.25,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.25
+                  }
+                },
+                "mean_first_target_rank": 14.0,
+                "std_first_target_rank": 0.0,
+                "seed_rows": [
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.5,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.5,
+                        "family_target": 0.5,
+                        "family_competitor": 0.0,
+                        "other_only": 0.5
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.5,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.5,
+                      "family_target": 0.5,
+                      "family_competitor": 0.0,
+                      "other_only": 0.5
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 14.0,
+                    "mean_first_competitor_rank": 1083.0,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a persimmon? A persimmon is"
+                      },
+                      {
+                        "generated_suffix": " a fruit that",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          429
+                        ],
+                        "prompt": "What kind of thing is a pomegranate? A pomegranate is"
+                      }
+                    ]
+                  },
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 1.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 1.0,
+                        "family_target": 1.0,
+                        "family_competitor": 0.0,
+                        "other_only": 0.0
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 1.0,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 1.0,
+                      "family_target": 1.0,
+                      "family_competitor": 0.0,
+                      "other_only": 0.0
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 14.0,
+                    "mean_first_competitor_rank": 1083.0,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a fruit.",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          13
+                        ],
+                        "prompt": "What kind of thing is a persimmon? A persimmon is"
+                      },
+                      {
+                        "generated_suffix": " a fruit,",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          11
+                        ],
+                        "prompt": "What kind of thing is a pomegranate? A pomegranate is"
+                      }
+                    ]
+                  }
+                ],
+                "hit_rates": {
+                  "family_target": 0.75,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.75,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.25
+                },
+                "hit_stds": {
+                  "family_target": 0.25,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.25,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.25
+                }
+              },
+              "residual_parallel": {
+                "n_seeds": 2,
+                "checkpoints": [
+                  1,
+                  3
+                ],
+                "hit_at_k_mean": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 1.0
+                  },
+                  "3": {
+                    "family_target": 0.75,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.75,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.25
+                  }
+                },
+                "hit_at_k_std": {
+                  "1": {
+                    "family_target": 0.0,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.0,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.0
+                  },
+                  "3": {
+                    "family_target": 0.25,
+                    "family_competitor": 0.0,
+                    "exact_target": 0.25,
+                    "exact_competitor": 0.0,
+                    "other_only": 0.25
+                  }
+                },
+                "mean_first_target_rank": 15.5,
+                "std_first_target_rank": 0.0,
+                "seed_rows": [
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 0.5,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.5,
+                        "family_target": 0.5,
+                        "family_competitor": 0.0,
+                        "other_only": 0.5
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 0.5,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 0.5,
+                      "family_target": 0.5,
+                      "family_competitor": 0.0,
+                      "other_only": 0.5
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 15.5,
+                    "mean_first_competitor_rank": 1047.5,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a type of",
+                        "generated_ids": [
+                          264,
+                          943,
+                          315
+                        ],
+                        "prompt": "What kind of thing is a persimmon? A persimmon is"
+                      },
+                      {
+                        "generated_suffix": " a fruit that",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          429
+                        ],
+                        "prompt": "What kind of thing is a pomegranate? A pomegranate is"
+                      }
+                    ]
+                  },
+                  {
+                    "n": 2,
+                    "checkpoints": [
+                      1,
+                      3
+                    ],
+                    "hit_at_k": {
+                      "1": {
+                        "exact_target": 0.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 0.0,
+                        "family_target": 0.0,
+                        "family_competitor": 0.0,
+                        "other_only": 1.0
+                      },
+                      "3": {
+                        "exact_target": 1.0,
+                        "exact_competitor": 0.0,
+                        "exact_cluster_other": 0.0,
+                        "exact_off_cluster": 1.0,
+                        "family_target": 1.0,
+                        "family_competitor": 0.0,
+                        "other_only": 0.0
+                      }
+                    },
+                    "hit_rates": {
+                      "exact_target": 1.0,
+                      "exact_competitor": 0.0,
+                      "exact_cluster_other": 0.0,
+                      "exact_off_cluster": 1.0,
+                      "family_target": 1.0,
+                      "family_competitor": 0.0,
+                      "other_only": 0.0
+                    },
+                    "first_type_rates": {
+                      "target": 0.0,
+                      "competitor": 0.0,
+                      "cluster_other": 0.0,
+                      "off_cluster": 0.0,
+                      "other": 1.0
+                    },
+                    "mean_first_target_rank": 15.5,
+                    "mean_first_competitor_rank": 1047.5,
+                    "sample_outputs": [
+                      {
+                        "generated_suffix": " a fruit.",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          13
+                        ],
+                        "prompt": "What kind of thing is a persimmon? A persimmon is"
+                      },
+                      {
+                        "generated_suffix": " a fruit,",
+                        "generated_ids": [
+                          264,
+                          13779,
+                          11
+                        ],
+                        "prompt": "What kind of thing is a pomegranate? A pomegranate is"
+                      }
+                    ]
+                  }
+                ],
+                "hit_rates": {
+                  "family_target": 0.75,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.75,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.25
+                },
+                "hit_stds": {
+                  "family_target": 0.25,
+                  "family_competitor": 0.0,
+                  "exact_target": 0.25,
+                  "exact_competitor": 0.0,
+                  "other_only": 0.25
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "total_time_min": 0.07
+}

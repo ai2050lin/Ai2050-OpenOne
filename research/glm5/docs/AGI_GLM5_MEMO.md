@@ -39027,6 +39027,7 @@ Phase533: Category Template Robustness and Generation Bridge
 4. 对 GLM4 color/object perp 标记为 control/routing candidate, 继续和 qwen3 category 对照。
 5. DS7B 暂停 semantic atlas, 作为 readout-interface 对照。
 ```
+
 ## Phase 533: Category Template Robustness and Generation Bridge 类别模板稳健性与生成桥接 [2026-06-19 06:41]
 
 ### 本阶段目标
@@ -39519,6 +39520,7 @@ template/path component
 generation policy gate
 readout interface component
 ```
+
 ## Phase 534: Template-Invariant Direction Extraction and Generation Policy Gate 模板不变方向提取与生成策略门 [2026-06-19 07:56]
 
 ### 本阶段目标
@@ -40021,6 +40023,7 @@ qwen3 common cumulative:
   generation rank/margin 持续改善
   target hit 或 semantic family path 有稳定提升
 ```
+
 ## Phase 535: Multi-layer Common Direction Control Audit 多层公共方向因果对照审计 [2026-06-19 08:29]
 
 ### 本阶段目标
@@ -40417,6 +40420,7 @@ Category Pair Quality and Selectivity Factorization
 哪些 pair 只是 readout/模板/词频路径；
 哪些 pair 有可能形成 clean common cumulative field。
 ```
+
 ## Phase 536: Category Pair Quality and Selectivity Factorization 类别对质量与选择性分解 [2026-06-19 10:11]
 
 ### 本阶段目标
@@ -42604,4 +42608,2433 @@ Generation Closure Audit
    单步 target rank 改善是否转化为真实生成命中。
 
 5. 三模型同跑。
+```
+
+## Phase 542: Generation Closure Audit 生成闭合审计 [2026-06-19 14:51]
+
+### 本阶段目标
+
+根据用户附加的 Phase538-541 综合分析继续任务。
+
+附加分析中正确部分：
+
+```text
+1. 当前路线已从 clean semantic direction 转向 category interface field / response matrix。
+2. Phase541 仍是 single-step next-token 分析，不是生成闭合。
+3. rank delta 不等于 generation hit。
+4. DS7B 的巨大 rank delta 不能解释成生成成功。
+5. 下一步必须做 generation closure audit。
+```
+
+需要收紧的部分：
+
+```text
+1. category interface field 仍是工作概念，不是完整理论闭合。
+2. 当前测试仍集中在 artifact/vehicle cluster，不能推广到完整语言语义图。
+3. writer ablation 尚未完成，不能断言自然写入来源。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase542_generation_closure_audit.py \
+  tests/glm5/phase542_generation_closure_audit_summary.py
+
+python tests/glm5/phase542_generation_closure_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11 \
+  --max-new-tokens 3 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase542_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase542_generation_closure_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase542_generation_closure_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase542_generation_closure_audit.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase542_generation_closure_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase542_generation_closure_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase542_generation_closure_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase542_generation_closure_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase542_generation_closure_audit.py`
+- 汇总脚本：`tests/glm5/phase542_generation_closure_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase542_generation_closure_audit/phase542_qwen3_generation_closure_audit.json`
+- GLM4 结果：`results/glm5_phase542_generation_closure_audit/phase542_glm4_generation_closure_audit.json`
+- DS7B 结果：`results/glm5_phase542_generation_closure_audit/phase542_deepseek7b_generation_closure_audit.json`
+- 跨模型汇总：`results/glm5_phase542_generation_closure_audit/phase542_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+conditions = baseline, residual_perp, residual_parallel, residual_full
+windows = center, extended
+train_n = 12
+test_n = 8
+max_new_tokens = 5
+alpha = 6
+```
+
+指标：
+
+```text
+target hit
+competitor hit
+cluster_other hit
+off_cluster hit
+first-step target type rate
+first-step competitor type rate
+mean first target rank
+generated suffix samples
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+vehicle_furniture:
+  baseline target hit = 0.46
+  residual_perp target hit = 0.50
+  residual_parallel target hit = 0.54
+  residual_full target hit = 0.54
+  best gain = +0.08
+
+vehicle_tool:
+  baseline target hit = 0.46
+  residual_perp target hit = 0.38
+  residual_parallel target hit = 0.50
+  residual_full target hit = 0.42
+  best gain = +0.04
+
+vehicle_clothing:
+  baseline target hit = 0.46
+  residual_perp target hit = 0.50
+  residual_parallel target hit = 0.58
+  residual_full target hit = 0.50
+  best gain = +0.13
+```
+
+Qwen3 解释：
+
+```text
+1. 有弱 generation gain。
+2. 增益主要来自 residual_parallel，但幅度不大。
+3. first target rate 仍只有 0.21-0.25。
+4. Phase541 的 top-k/rank 改善没有强闭合为生成命中。
+```
+
+#### GLM4
+
+```text
+vehicle_furniture:
+  baseline target hit = 0.33
+  residual_perp target hit = 0.46
+  residual_parallel target hit = 0.75
+  residual_full target hit = 0.58
+  residual_parallel gain = +0.42
+
+vehicle_tool:
+  baseline target hit = 0.33
+  residual_perp target hit = 0.21
+  residual_parallel target hit = 0.88
+  residual_full target hit = 0.29
+  residual_parallel gain = +0.54
+
+vehicle_clothing:
+  baseline target hit = 0.33
+  residual_perp target hit = 0.46
+  residual_parallel target hit = 0.71
+  residual_full target hit = 0.50
+  residual_parallel gain = +0.38
+```
+
+GLM4 解释：
+
+```text
+1. residual_parallel 明确闭合到生成命中。
+2. vehicle_tool 最强，target hit 达到 0.88。
+3. competitor hit = 0.00，说明没有明显竞争标签泄漏。
+4. 这确认 GLM4 的 readout competition reshaping 能转化为生成结果。
+```
+
+#### DS7B
+
+```text
+vehicle_furniture:
+  baseline target hit = 0.08
+  residual_parallel target hit = 0.08
+  gain = 0.00
+
+vehicle_tool:
+  baseline target hit = 0.08
+  residual_parallel target hit = 0.08
+  gain = 0.00
+
+vehicle_clothing:
+  baseline target hit = 0.08
+  residual_parallel target hit = 0.08
+  gain = 0.00
+```
+
+DS7B 解释：
+
+```text
+1. Phase541 的巨大 target rank improvement 没有转化为生成命中。
+2. DS7B 的 weak readout-mediated trace 不构成 generation closure。
+3. 它仍然是 rank movable but generation-inactive。
+```
+
+### 当前最可靠结论
+
+```text
+1. Phase541 的 top-k trajectory 不能自动推出 generation closure。
+
+2. GLM4 是唯一在本轮出现强 generation closure 的模型：
+   residual_parallel -> target hit 明显提升。
+
+3. Qwen3 虽然有 hidden-perp geometry 和 top-k movement，
+   但生成闭合很弱。
+
+4. DS7B 虽然 target rank delta 巨大，
+   但生成完全不闭合。
+
+5. readout competition reshaping 是否能转化为生成，
+   取决于模型的 generation policy gate。
+```
+
+### 对 Phase541 的修正
+
+Phase541：
+
+```text
+readout-parallel contains a real competition-trajectory component.
+```
+
+Phase542 后修正：
+
+```text
+competition-trajectory component 只有在 GLM4 中强闭合到生成；
+Qwen3 弱闭合；
+DS7B 不闭合。
+```
+
+### 理论进展
+
+当前理论应进一步收紧：
+
+```text
+category interface field -> top-k competition trajectory -> generation closure
+```
+
+三者不是同一件事。
+
+```text
+hidden geometry 可以移动 margin；
+readout competition 可以移动 top-k rank；
+generation policy gate 决定是否真正输出目标词。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 生成仍使用 greedy decode，没有采样轨迹。
+2. max_new_tokens = 5，只是短程闭合。
+3. 当前 hit 是 label-token hit，不是完整语义表达评分。
+4. Qwen3 的弱增益可能需要不同 alpha 或 prompt scaffold。
+5. GLM4 的强闭合可能仍是 readout-heavy，不代表隐藏语义理解。
+```
+
+### 下一阶段任务
+
+Phase543 应进入：
+
+```text
+Policy Gate and Scaffold Sensitivity Audit
+```
+
+目标：
+
+```text
+解释为什么 Qwen3 有 hidden-perp geometry 和 top-k movement，
+但 generation closure 弱；
+为什么 GLM4 readout_parallel 能强闭合；
+为什么 DS7B rank movable 但 generation-inactive。
+```
+
+建议测试：
+
+```text
+1. 对三模型使用相同 source / condition：
+   residual_perp
+   residual_parallel
+   residual_full
+
+2. 添加 scaffold prompts：
+   short direct
+   answer with one category word
+   choose between A/B labels
+   category label only
+
+3. 比较不同 scaffold 下：
+   first-step target rate
+   5-token target hit
+   competitor hit
+   generated suffix
+
+4. 判断生成闭合瓶颈来自：
+   semantic geometry 不足；
+   readout competition 不足；
+   policy/scaffold gate 不匹配。
+```
+
+## Phase 543: Policy Gate and Scaffold Sensitivity Audit 生成策略门与脚手架敏感性审计 [2026-06-19 15:17]
+
+### 本阶段目标
+
+Phase542 证明 top-k competition trajectory 不能自动闭合到真实生成。本阶段继续检验：
+
+```text
+同一类别接口方向在不同 prompt scaffold 下，是否能打开 generation policy gate。
+```
+
+附件中关于 Phase542 的判断基本正确：
+
+```text
+GLM4 已出现强 generation closure；
+Qwen3 有 rank / hidden geometry 改善，但生成闭合弱；
+DS7B rank 可动但真实生成基本不变；
+必须把 generation policy gate 作为独立瓶颈。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase543_policy_gate_scaffold_audit.py \
+  tests/glm5/phase543_policy_gate_scaffold_audit_summary.py
+
+python tests/glm5/phase543_policy_gate_scaffold_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 3 \
+  --test-n 2 \
+  --scaffolds direct,choose_pair \
+  --max-new-tokens 3 \
+  --checkpoints 1,3 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase543_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase543_policy_gate_scaffold_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 12 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,choose_pair,label_only \
+  --max-new-tokens 10 \
+  --checkpoints 1,3,5,10 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase543_policy_gate_scaffold_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase543_policy_gate_scaffold_audit.py glm4 \
+  --train-n 12 \
+  --test-n 12 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,choose_pair,label_only \
+  --max-new-tokens 10 \
+  --checkpoints 1,3,5,10 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase543_policy_gate_scaffold_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase543_policy_gate_scaffold_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 12 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,choose_pair,label_only \
+  --max-new-tokens 10 \
+  --checkpoints 1,3,5,10 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase543_policy_gate_scaffold_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase543_policy_gate_scaffold_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase543_policy_gate_scaffold_audit.py`
+- 汇总脚本：`tests/glm5/phase543_policy_gate_scaffold_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase543_policy_gate_scaffold_audit/phase543_qwen3_policy_gate_scaffold_audit.json`
+- GLM4 结果：`results/glm5_phase543_policy_gate_scaffold_audit/phase543_glm4_policy_gate_scaffold_audit.json`
+- DS7B 结果：`results/glm5_phase543_policy_gate_scaffold_audit/phase543_deepseek7b_policy_gate_scaffold_audit.json`
+- 跨模型汇总：`results/glm5_phase543_policy_gate_scaffold_audit/phase543_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+core sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+train_n = 12
+test_n = 12
+scaffolds = direct, one_word, choose_pair, label_only
+conditions = baseline, residual_perp, residual_parallel, residual_full
+max_new_tokens = 10
+checkpoints = 1, 3, 5, 10
+alpha = 6
+random_seeds = 11, 23
+```
+
+层窗口：
+
+```text
+Qwen3: center L10/L12/L14, extended L10/L12/L14/L16
+GLM4: center L24/L26/L28, extended L24/L26/L28/L30
+DS7B: center L16/L18/L20, extended L16/L18/L20/L22
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+direct:
+  baseline k10 = 0.50
+  residual_parallel k10 = 0.50 或 0.42
+  主要是 rank_only。
+
+one_word:
+  baseline k10 = 0.33
+  residual_parallel 最好 k10 = 0.42
+  gain 约 +0.08。
+
+choose_pair:
+  baseline 已经 0.92-1.00
+  干预没有提供稳定额外增益。
+
+label_only:
+  baseline = 0.00
+  rank 明显改善，但 target hit 仍接近 0。
+```
+
+Qwen3 最可靠判断：
+
+```text
+scaffold 自身比 residual intervention 更能打开生成；
+当前方向多数只能移动 rank，不能稳定打开 policy gate。
+```
+
+#### GLM4
+
+GLM4 出现跨 scaffold 强闭合，且 residual_parallel 最稳定。
+
+```text
+vehicle_tool direct residual_parallel:
+  0.00 -> 0.92, gain +0.92
+
+vehicle_furniture direct residual_parallel:
+  0.00 -> 0.58, gain +0.58
+
+vehicle_clothing direct residual_parallel:
+  0.00 -> 0.58, gain +0.58
+```
+
+one_word scaffold 下：
+
+```text
+vehicle_furniture residual_parallel:
+  0.33 -> 1.00, gain +0.67
+
+vehicle_tool residual_parallel:
+  0.33 -> 1.00, gain +0.67
+
+vehicle_clothing residual_parallel:
+  0.33 -> 1.00, gain +0.67
+```
+
+label_only 也能被打开：
+
+```text
+vehicle_furniture:
+  0.00 -> 0.42
+
+vehicle_tool:
+  0.00 -> 0.50
+
+vehicle_clothing:
+  0.00 -> 0.33
+```
+
+GLM4 最可靠判断：
+
+```text
+generation policy gate 对 residual_parallel 高度敏感；
+它不是只在 choose_pair 强提示下有效。
+```
+
+#### DS7B
+
+```text
+direct:
+  baseline = 0.00
+  residual_parallel = 0.00
+  rank 改善巨大但生成不动。
+
+one_word:
+  baseline = 0.25
+  residual_parallel 最好 0.33
+  gain +0.08。
+
+choose_pair:
+  baseline = 0.75-0.83
+  residual_parallel 最好 1.00
+  vehicle_tool gain +0.17。
+
+label_only:
+  baseline = 0.00
+  residual_parallel = 0.00
+```
+
+DS7B 最可靠判断：
+
+```text
+强外部 scaffold 可以救一小部分生成；
+但 direct / label_only 下仍是 rank_only。
+```
+
+### 当前最可靠客观事实
+
+1. **scaffold 是生成门的重要变量**
+
+```text
+choose_pair 在 Qwen3 / DS7B 中可以直接把 baseline 提到 0.75-1.00。
+```
+
+因此强提示不能单独作为内部方向有效的证据。
+
+2. **GLM4 residual_parallel 是唯一跨 scaffold 强闭合成分**
+
+```text
+direct、one_word、label_only 都出现明显 target hit gain。
+```
+
+3. **Qwen3 rank improvement 不等于生成门打开**
+
+```text
+label_only 下 rank 从 718 降到约 400-500，
+但 target hit 仍为 0。
+```
+
+4. **DS7B 需要强外部约束**
+
+```text
+direct / label_only 无闭合；
+choose_pair 下 vehicle_tool 从 0.83 到 1.00。
+```
+
+5. **多 token 曲线很重要**
+
+GLM4 direct 中：
+
+```text
+k1 = 0
+k3 = 0
+k5 开始上升
+k10 更强
+```
+
+只看 first-step argmax 会漏掉真实生成闭合。
+
+### 理论进展
+
+Phase543 后，链条应更新为：
+
+```text
+category interface field
+-> readout/top-k competition trajectory
+-> scaffold-conditioned policy gate
+-> multi-token generation closure
+```
+
+策略门形式：
+
+```text
+G_policy = G(h, d, scaffold, K)
+```
+
+其中：
+
+```text
+h = 当前上下文状态
+d = 干预方向
+scaffold = 提示脚手架
+K = 生成长度
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 仍是 greedy decode，没有 sampling / beam search。
+2. scaffold 仍偏类别标签任务。
+3. choose_pair 有强外部答案集合约束，baseline 过高。
+4. label_only 可能过于不自然。
+5. 仍集中于 vehicle-centered artifact cluster。
+```
+
+### 下一阶段任务
+
+Phase544 应进入：
+
+```text
+Natural Answer and Decode-Mode Policy Gate Audit
+```
+
+目标：
+
+```text
+判断 Phase543 的策略门效应是类别标签任务特有，
+还是能推广到自然回答与不同解码模式。
+```
+
+建议测试：
+
+```text
+1. 保留 direct / one_word，新增 natural_qa / definition / sentence_completion。
+2. 加入 greedy、temperature sampling、top-p sampling、beam search。
+3. 命中指标从 label hit 扩展为 family hit / semantic paraphrase hit。
+4. 对 GLM4 检查 residual_parallel 是否只是标签读出捷径。
+5. 对 Qwen3 检查 sampling 是否能释放 hidden-perp geometry。
+6. 对 DS7B 检查强 scaffold 下的小幅闭合是否可稳定复现。
+```
+
+## Phase 544: Natural Answer and Decode-Mode Policy Gate Audit 自然回答与解码模式策略门审计 [2026-06-19 16:13]
+
+### 本阶段目标
+
+Phase543 证明 generation policy gate 是 scaffold-conditioned。本阶段继续检验：
+
+```text
+1. Phase543 的强闭合是否只是 category-label task 现象。
+2. GLM4 residual_parallel 是否只是标签读出捷径。
+3. Qwen3 hidden-perp / residual directions 是否能在 sampling 或自然回答中释放。
+4. DS7B 的 scaffold rescue 是否能在自然 scaffold 和不同 decode mode 下复现。
+```
+
+附件中关于 Phase543 的分析基本正确：
+
+```text
+scaffold 是强生成门变量；
+GLM4 residual_parallel 是唯一跨标签 scaffold 强闭合成分；
+Qwen3 多数是 rank_only；
+DS7B 依赖强外部 scaffold；
+但 Phase543 尚未证明自然问答场景中的语义生成闭合。
+```
+
+因此 Phase544 增加：
+
+```text
+natural_qa
+definition
+sentence_completion
+temperature sampling
+top_p sampling
+beam search
+family hit
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase544_natural_decode_policy_gate_audit.py \
+  tests/glm5/phase544_natural_decode_policy_gate_audit_summary.py
+
+python tests/glm5/phase544_natural_decode_policy_gate_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 3 \
+  --test-n 2 \
+  --scaffolds direct,natural_qa \
+  --decode-modes greedy,top_p,beam \
+  --max-new-tokens 3 \
+  --checkpoints 1,3 \
+  --beam-width 2 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase544_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase544_natural_decode_policy_gate_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 10 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,natural_qa,definition,sentence_completion \
+  --decode-modes greedy,temperature,top_p,beam \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --beam-width 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase544_natural_decode_policy_gate_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase544_natural_decode_policy_gate_audit.py glm4 \
+  --train-n 12 \
+  --test-n 10 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,natural_qa,definition,sentence_completion \
+  --decode-modes greedy,temperature,top_p,beam \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --beam-width 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase544_natural_decode_policy_gate_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase544_natural_decode_policy_gate_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 10 \
+  --alphas 6 \
+  --random-seeds 11,23 \
+  --scaffolds direct,one_word,natural_qa,definition,sentence_completion \
+  --decode-modes greedy,temperature,top_p,beam \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --beam-width 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase544_natural_decode_policy_gate_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase544_natural_decode_policy_gate_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase544_natural_decode_policy_gate_audit.py`
+- 汇总脚本：`tests/glm5/phase544_natural_decode_policy_gate_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase544_natural_decode_policy_gate_audit/phase544_qwen3_natural_decode_policy_gate_audit.json`
+- GLM4 结果：`results/glm5_phase544_natural_decode_policy_gate_audit/phase544_glm4_natural_decode_policy_gate_audit.json`
+- DS7B 结果：`results/glm5_phase544_natural_decode_policy_gate_audit/phase544_deepseek7b_natural_decode_policy_gate_audit.json`
+- 跨模型汇总：`results/glm5_phase544_natural_decode_policy_gate_audit/phase544_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+core sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+train_n = 12
+test_n = 10
+scaffolds = direct, one_word, natural_qa, definition, sentence_completion
+decode_modes = greedy, temperature, top_p, beam
+conditions = baseline, residual_perp, residual_parallel, residual_full
+max_new_tokens = 12
+checkpoints = 1, 3, 5, 10, 12
+alpha = 6
+beam_width = 3
+```
+
+### 客观结果
+
+#### Qwen3
+
+Qwen3 在 Phase544 中不再只是完全 rank_only。非贪婪解码和自然 family hit 下出现若干明显释放：
+
+```text
+vehicle_clothing direct top_p residual_parallel:
+  family hit 0.20 -> 0.80
+  gain +0.60
+  exact hit 0.40
+
+vehicle_clothing direct temperature residual_full:
+  family hit 0.10 -> 0.60
+  gain +0.50
+
+vehicle_tool one_word top_p residual_parallel:
+  family hit 0.50 -> 0.90
+  gain +0.40
+
+vehicle_clothing natural_qa temperature residual_parallel:
+  family hit 0.60 -> 0.90
+  gain +0.30
+```
+
+按 decode mode 最大增益：
+
+```text
+greedy: +0.20
+temperature: +0.50
+top_p: +0.60
+beam: +0.20
+```
+
+判断：
+
+```text
+Qwen3 的 hidden/interface geometry 在 greedy label task 下难闭合；
+但 top_p / temperature 能释放一部分自然 family path。
+```
+
+这修正了 Phase543 的判断：
+
+```text
+Qwen3 不是完全生成门关闭；
+而是 greedy/label scaffold 下门窄，sampling 下可释放。
+```
+
+#### GLM4
+
+GLM4 仍是最稳定强闭合模型，并且强闭合不只发生在标签任务。
+
+最强结果：
+
+```text
+vehicle_clothing sentence_completion temperature residual_parallel:
+  family hit 0.30 -> 1.00
+  gain +0.70
+  exact gain +0.90
+
+vehicle_furniture direct temperature residual_parallel:
+  family hit 0.20 -> 0.90
+  gain +0.70
+  exact gain +0.80
+
+vehicle_tool direct temperature residual_parallel:
+  family hit 0.00 -> 0.70
+  gain +0.70
+
+vehicle_tool direct greedy residual_parallel:
+  family hit 0.40 -> 1.00
+  gain +0.60
+
+vehicle_tool definition top_p residual_parallel:
+  family hit 0.40 -> 1.00
+  gain +0.60
+```
+
+按 decode mode 最大增益：
+
+```text
+greedy: +0.60
+temperature: +0.70
+top_p: +0.60
+beam: +0.60
+```
+
+判断：
+
+```text
+GLM4 residual_parallel 不是单纯 label shortcut；
+它能在 direct、definition、sentence_completion 等自然/半自然 scaffold 下稳定闭合。
+```
+
+但仍需谨慎：
+
+```text
+family hit 中有 exact hit 大幅同步上升，
+说明 GLM4 仍可能偏 readout-driven expression，
+不是纯隐藏语义场闭合。
+```
+
+#### DS7B
+
+DS7B 在自然 scaffold 和 sampling 下比 Phase543 更活跃，但稳定性弱于 GLM4。
+
+最强结果：
+
+```text
+vehicle_furniture natural_qa top_p residual_full:
+  family hit 0.40 -> 0.90
+  gain +0.50
+
+vehicle_tool sentence_completion temperature residual_parallel:
+  family hit 0.00 -> 0.40
+  gain +0.40
+
+vehicle_tool definition temperature residual_parallel:
+  family hit 0.10 -> 0.40
+  gain +0.30
+
+vehicle_furniture one_word top_p residual_parallel:
+  family hit 0.30 -> 0.60
+  gain +0.30
+```
+
+按 decode mode 最大增益：
+
+```text
+greedy: +0.30
+temperature: +0.40
+top_p: +0.50
+beam: +0.10
+```
+
+判断：
+
+```text
+DS7B 不是完全 generation-inactive；
+自然 scaffold + sampling 可以释放部分 path。
+但 beam/greedy 仍弱，闭合不稳定，且 residual_full 有时强于 residual_parallel。
+```
+
+### 当前最可靠客观事实
+
+1. **自然 family hit 改变了 Phase543 对 Qwen3/DS7B 的悲观判断**
+
+```text
+Qwen3 top_p 最大 gain +0.60
+DS7B top_p 最大 gain +0.50
+```
+
+但这些不是稳定跨 scaffold 全局强效。
+
+2. **GLM4 强闭合跨越 label task**
+
+```text
+direct、definition、sentence_completion、one_word 均有强 residual_parallel 效应。
+```
+
+因此 GLM4 的闭合不能简单归为 choose_pair 或 label_only 假象。
+
+3. **decode mode 是 policy gate 的关键变量**
+
+```text
+Qwen3 / DS7B 在 top_p 或 temperature 下明显强于 greedy/beam。
+```
+
+4. **beam search 没有普遍救 Qwen3/DS7B**
+
+```text
+Qwen3 beam 最大 gain +0.20
+DS7B beam 最大 gain +0.10
+```
+
+这说明生成门不是简单“搜索宽一点即可打开”。
+
+5. **family hit 与 exact hit 都需要保留**
+
+```text
+GLM4 family gain 常伴随 exact gain；
+Qwen3/DS7B 有些 family gain 大于 exact gain。
+```
+
+因此 label hit 会低估部分自然表达，但也不能完全代替 family hit。
+
+### 理论进展
+
+Phase543 理论：
+
+```text
+G_policy = G(h, d, scaffold, K)
+```
+
+Phase544 后应更新为：
+
+```text
+G_policy = G(h, d, scaffold, decode_mode, K, hit_family)
+```
+
+其中 decode_mode 至少包括：
+
+```text
+greedy
+temperature
+top_p
+beam
+```
+
+当前链条：
+
+```text
+category interface field
+-> readout/top-k competition trajectory
+-> scaffold-and-decode-conditioned policy gate
+-> exact/family multi-token generation closure
+```
+
+### 硬伤与瓶颈
+
+```text
+1. family hit 是字符串规则评分，仍可能有误判。
+2. sampling 每个条件只用固定采样路径，没有多 seed 采样分布。
+3. 仍集中于 vehicle-centered artifact cluster。
+4. natural scaffold 仍是短模板，不是开放问答。
+5. residual_parallel 在 GLM4 中仍可能是强读出表达通道，不等价于纯语义理解。
+6. DS7B / Qwen3 的 sampling 正结果需要多 seed 复现。
+```
+
+### 关键判断
+
+```text
+GLM4:
+  readout competition -> natural/family generation closure 链条最完整。
+
+Qwen3:
+  greedy/label gate 窄，但 top_p/temperature 能释放部分自然 family path。
+
+DS7B:
+  不是完全无闭合；自然 scaffold + sampling 下有局部恢复，但不稳定。
+```
+
+### 下一阶段任务
+
+Phase545 应进入：
+
+```text
+Multi-Seed Sampling Stability and Cross-Category Natural Closure Audit
+```
+
+目标：
+
+```text
+验证 Phase544 中 Qwen3/DS7B 的 sampling 正结果是否稳定，
+并把 vehicle-centered cluster 扩展到非 artifact 类别。
+```
+
+建议测试：
+
+```text
+1. 对 top_p / temperature 做 multi-seed sampling。
+2. 保留自然 scaffold：natural_qa、definition、sentence_completion。
+3. 对比类别：
+   vehicle-centered artifact cluster
+   fruit/vegetable
+   animal/tool 或 animal/furniture
+4. 记录 exact hit、family hit、competitor family hit、degenerate output。
+5. 判断 Qwen3/DS7B 的正结果是稳定策略门，还是采样偶然路径。
+6. 判断 GLM4 的自然闭合是否跨类别成立。
+```
+
+## Phase 545: Multi-Seed Sampling Stability and Cross-Category Natural Closure Audit 多种子采样稳定性与跨类别自然闭合审计 [2026-06-19 16:38]
+
+### 本阶段目标
+
+Phase544 发现 Qwen3 / DS7B 在 top_p / temperature 下出现局部 family-hit 正结果。两个附件的总体方向基本正确：
+
+```text
+1. Phase544 确实把生成门从 scaffold-conditioned 推进到 scaffold-and-decode-conditioned。
+2. Qwen3 / DS7B 不能再简单说成完全 generation-inactive。
+3. GLM4 的 residual_parallel 已经不只是 choose_pair / label_only 假象。
+4. 但 Phase544 的 sampling 正结果仍可能是单路径采样偶然。
+```
+
+本阶段目标：
+
+```text
+用 multi-seed sampling 验证 Phase544 的采样正结果是否稳定；
+同时把类别从 vehicle-centered artifact cluster 扩展到 fruit_vegetable、animal_tool、fruit_tool。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase545_sampling_stability_cross_category.py \
+  tests/glm5/phase545_sampling_stability_cross_category_summary.py
+
+python tests/glm5/phase545_sampling_stability_cross_category.py qwen3 \
+  --windows '10,12' \
+  --pairs vehicle_clothing,fruit_vegetable \
+  --train-n 3 \
+  --test-n 2 \
+  --sample-seeds 101,103 \
+  --scaffolds natural_qa \
+  --decode-modes top_p \
+  --conditions baseline,residual_parallel \
+  --max-new-tokens 3 \
+  --checkpoints 1,3 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase545_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase545_sampling_stability_cross_category.py qwen3 \
+  --windows '10,12,14' \
+  --pairs vehicle_clothing,vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 \
+  --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase545_sampling_stability_cross_category \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase545_sampling_stability_cross_category.py glm4 \
+  --windows '24,26,28' \
+  --pairs vehicle_clothing,vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 \
+  --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase545_sampling_stability_cross_category \
+  --hard-exit-after-model
+
+python tests/glm5/phase545_sampling_stability_cross_category.py deepseek7b \
+  --windows '16,18,20' \
+  --pairs vehicle_clothing,vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 \
+  --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --checkpoints 1,3,5,10,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase545_sampling_stability_cross_category \
+  --hard-exit-after-model
+
+python tests/glm5/phase545_sampling_stability_cross_category_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase545_sampling_stability_cross_category.py`
+- 汇总脚本：`tests/glm5/phase545_sampling_stability_cross_category_summary.py`
+- Qwen3 结果：`results/glm5_phase545_sampling_stability_cross_category/phase545_qwen3_sampling_stability_cross_category.json`
+- GLM4 结果：`results/glm5_phase545_sampling_stability_cross_category/phase545_glm4_sampling_stability_cross_category.json`
+- DS7B 结果：`results/glm5_phase545_sampling_stability_cross_category/phase545_deepseek7b_sampling_stability_cross_category.json`
+- 跨模型汇总：`results/glm5_phase545_sampling_stability_cross_category/phase545_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pairs = vehicle_clothing, vehicle_tool, fruit_vegetable, animal_tool, fruit_tool
+train_n = 12
+test_n = 8
+sample_seeds = 8
+scaffolds = natural_qa, definition, sentence_completion
+decode_modes = top_p, temperature
+conditions = baseline, residual_parallel, residual_full
+max_new_tokens = 12
+```
+
+层窗口：
+
+```text
+Qwen3: L10/L12/L14
+GLM4: L24/L26/L28
+DS7B: L16/L18/L20
+```
+
+### 客观结果
+
+#### Qwen3
+
+Phase544 中 Qwen3 的单次采样强正结果，在 8 seed 稳定性审计中明显收缩。
+
+最大正结果：
+
+```text
+vehicle_clothing definition temperature residual_full:
+  baseline 0.80
+  family mean 0.92
+  std 0.11
+  gain +0.12
+
+vehicle_tool definition temperature residual_full:
+  baseline 0.80
+  family mean 0.91
+  std 0.10
+  gain +0.11
+
+vehicle_clothing definition top_p residual_parallel:
+  baseline 0.83
+  family mean 0.92
+  std 0.06
+  gain +0.09
+
+animal_tool natural_qa temperature residual_full:
+  baseline 0.64
+  family mean 0.72
+  std 0.05
+  gain +0.08
+```
+
+各类别最大增益：
+
+```text
+vehicle_clothing: +0.125
+vehicle_tool: +0.109
+fruit_vegetable: +0.016
+animal_tool: +0.078
+fruit_tool: +0.031
+```
+
+判断：
+
+```text
+Qwen3 的 Phase544 sampling release 不是完全假象，
+但多种子后不是强稳定闭合。
+
+它更像 weak sampling-releasable geometry，
+而不是 robust natural closure。
+```
+
+#### GLM4
+
+GLM4 在多 seed 下强稳定复现，并且跨出 vehicle-centered artifact cluster。
+
+最强结果：
+
+```text
+animal_tool sentence_completion top_p residual_parallel:
+  baseline 0.11
+  family mean 1.00
+  std 0.00
+  gain +0.89
+
+animal_tool sentence_completion temperature residual_parallel:
+  baseline 0.09
+  family mean 0.98
+  std 0.04
+  gain +0.89
+
+fruit_vegetable sentence_completion top_p residual_parallel:
+  baseline 0.19
+  family mean 0.98
+  std 0.04
+  gain +0.80
+
+fruit_tool sentence_completion top_p residual_parallel:
+  baseline 0.19
+  family mean 0.97
+  std 0.05
+  gain +0.78
+
+fruit_vegetable sentence_completion temperature residual_parallel:
+  baseline 0.25
+  family mean 0.98
+  std 0.04
+  gain +0.73
+```
+
+各类别最大增益：
+
+```text
+vehicle_clothing: +0.484
+vehicle_tool: +0.484
+fruit_vegetable: +0.797
+animal_tool: +0.891
+fruit_tool: +0.781
+```
+
+判断：
+
+```text
+GLM4 residual_parallel 是稳定跨类别自然闭合成分。
+
+它不是 vehicle-centered 特例；
+也不是单 seed sampling 偶然；
+在 fruit_vegetable / animal_tool / fruit_tool 上反而更强。
+```
+
+#### DS7B
+
+DS7B 的 Phase544 单次采样局部正结果，在 multi-seed 下基本收缩为弱效应。
+
+最大正结果：
+
+```text
+vehicle_tool natural_qa top_p residual_parallel:
+  baseline 0.78
+  family mean 0.88
+  std 0.06
+  gain +0.09
+
+fruit_vegetable natural_qa temperature residual_full:
+  baseline 0.67
+  family mean 0.75
+  std 0.09
+  gain +0.08
+
+vehicle_clothing natural_qa temperature residual_parallel:
+  baseline 0.78
+  family mean 0.86
+  std 0.10
+  gain +0.08
+```
+
+各类别最大增益：
+
+```text
+vehicle_clothing: +0.078
+vehicle_tool: +0.094
+fruit_vegetable: +0.078
+animal_tool: +0.031
+fruit_tool: +0.047
+```
+
+判断：
+
+```text
+DS7B 不是完全无效，但 Phase544 的 +0.50 局部结果没有稳定复现。
+
+它更像 weak stochastic path access，
+不是 stable natural closure。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase544 的 Qwen3 / DS7B sampling 正结果需要大幅收紧**
+
+```text
+Qwen3 multi-seed 最大 gain 约 +0.12
+DS7B multi-seed 最大 gain 约 +0.09
+```
+
+这说明单次 sampling 的高 gain 不能直接解释为稳定生成门打开。
+
+2. **GLM4 的自然闭合稳定且跨类别**
+
+```text
+artifact pairs: +0.48 左右
+fruit/vegetable: +0.80
+animal/tool: +0.89
+fruit/tool: +0.78
+```
+
+这是 Phase545 最强正结果。
+
+3. **vehicle-centered cluster 不是 GLM4 的唯一机制场**
+
+GLM4 在非 artifact 类别上更强，说明：
+
+```text
+GLM4 residual_parallel 是更一般的 category-output closure mechanism。
+```
+
+4. **sentence_completion 是最能暴露 GLM4 增益的自然 scaffold**
+
+GLM4 多个最高增益都出现在：
+
+```text
+sentence_completion + top_p / temperature + residual_parallel
+```
+
+5. **Qwen3 / DS7B 的自然路径更像小幅概率偏置**
+
+多 seed 后没有稳定大幅提升，说明它们的生成门可能只是被轻微偏置，而非被因果方向稳定打开。
+
+### 理论进展
+
+Phase544 理论：
+
+```text
+G_policy = G(h, d, scaffold, decode_mode, K, hit_family)
+```
+
+Phase545 后必须加入 sampling stability：
+
+```text
+G_policy = E_seed[G(h, d, scaffold, decode_mode, K, hit_family)]
+```
+
+并区分：
+
+```text
+single-seed path access
+multi-seed stable closure
+```
+
+当前链条更新为：
+
+```text
+category interface field
+-> competition trajectory
+-> scaffold/decode-conditioned policy gate
+-> seed-stability filtered generation closure
+```
+
+### 硬伤与瓶颈
+
+```text
+1. family hit 仍是字符串规则评分，可能高估 GLM4 的 exact-label 输出。
+2. 本轮只用了中心层窗口，没有重复 extended window。
+3. sample seeds = 8，已能初步审计稳定性，但还不是完整分布估计。
+4. 只测试 category pair，尚未进入 relation / role / action / attribute。
+5. GLM4 强闭合仍可能是 readout-heavy category expression，不等于完整自然语义理解。
+```
+
+### 关键判断修正
+
+```text
+Qwen3:
+  从 sampling-releasable strong path 修正为 weak sampling-releasable geometry。
+
+GLM4:
+  从 vehicle-centered readout closure 升级为 cross-category stable readout closure。
+
+DS7B:
+  从 local recovery 修正为 weak stochastic path access。
+```
+
+### 下一阶段任务
+
+Phase546 应进入：
+
+```text
+Semantic Quality and Label-vs-Paraphrase Decomposition
+```
+
+目标：
+
+```text
+判断 GLM4 的强 family hit 是真正语义改写，
+还是主要由 exact label / category word readout 驱动。
+```
+
+建议测试：
+
+```text
+1. 对 GLM4 强闭合样本提取 generated suffix。
+2. 区分 exact label hit、family non-exact hit、generic hit、wrong-family hit。
+3. 对 fruit_vegetable / animal_tool / vehicle_tool 做人工可读样本表。
+4. 建立 paraphrase quality 分级：
+   exact_label
+   family_specific
+   family_generic
+   generic_object
+   wrong_family
+   degenerate
+5. 复查 Qwen3 / DS7B 的小幅 gain 是否主要来自 exact label 或泛化词。
+```
+
+## Phase 546: Semantic Quality and Label-vs-Paraphrase Decomposition 语义质量与标签/改写分解 [2026-06-19 17:06]
+
+### 本阶段目标
+
+用户上传的“机制闭合度百分比”分析总体框架正确：
+
+```text
+state-pair direction
+-> category interface matrix
+-> readout competition
+-> top-k trajectory
+-> scaffold/decode-conditioned policy gate
+-> natural generation closure
+```
+
+但该分析需要根据 Phase545 和本轮 Phase546 修正：
+
+```text
+1. percentages 不能解释为真理完成度，只能解释为机制闭合度，这一点正确。
+2. Phase545 后，sampling stability 不再是未完成项，而是已经有 8 seed 初步审计；但 Qwen3/DS7B 的强采样正结果被显著收缩。
+3. generation closure 必须按模型区分：
+   GLM4 强；
+   Qwen3 弱；
+   DS7B 弱。
+4. GLM4 的 high family hit 不能直接解释为 broad semantic paraphrase。
+   需要拆成 exact label 与 family non-exact。
+```
+
+因此本阶段目标是：
+
+```text
+判断 Phase545 的自然生成闭合到底来自：
+1. exact category label readout；
+2. non-exact family semantic paraphrase；
+3. generic object words；
+4. wrong-family shift；
+5. degenerate output。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase546_semantic_quality_decomposition.py \
+  tests/glm5/phase546_semantic_quality_decomposition_summary.py
+
+python tests/glm5/phase546_semantic_quality_decomposition.py qwen3 \
+  --windows '10,12,14' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase546_semantic_quality_decomposition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase546_semantic_quality_decomposition.py glm4 \
+  --windows '24,26,28' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase546_semantic_quality_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase546_semantic_quality_decomposition.py deepseek7b \
+  --windows '16,18,20' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds natural_qa,definition,sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase546_semantic_quality_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase546_semantic_quality_decomposition_summary.py
+```
+
+### 脚本与结果
+
+```text
+主脚本：
+tests/glm5/phase546_semantic_quality_decomposition.py
+
+汇总脚本：
+tests/glm5/phase546_semantic_quality_decomposition_summary.py
+
+Qwen3 结果：
+results/glm5_phase546_semantic_quality_decomposition/phase546_qwen3_semantic_quality_decomposition.json
+
+GLM4 结果：
+results/glm5_phase546_semantic_quality_decomposition/phase546_glm4_semantic_quality_decomposition.json
+
+DS7B 结果：
+results/glm5_phase546_semantic_quality_decomposition/phase546_deepseek7b_semantic_quality_decomposition.json
+
+跨模型汇总：
+results/glm5_phase546_semantic_quality_decomposition/phase546_cross_model_summary.md
+```
+
+运行时间：
+
+```text
+Qwen3: 2.18 min
+GLM4: 3.49 min
+DS7B: 2.72 min
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pairs = vehicle_tool, fruit_vegetable, animal_tool, fruit_tool
+train_n = 12
+test_n = 8
+sample_seeds = 101,103,107,109,113,127
+scaffolds = natural_qa, definition, sentence_completion
+decode_modes = top_p, temperature
+conditions = baseline, residual_parallel, residual_full
+max_new_tokens = 12
+alpha = 6
+```
+
+模型层位：
+
+```text
+Qwen3: L10,L12,L14
+GLM4: L24,L26,L28
+DS7B: L16,L18,L20
+```
+
+### 分类规则
+
+生成后缀被分成：
+
+```text
+exact_label:
+  后缀直接出现目标类别标签词，例如 vehicle / fruit / animal。
+
+family_non_exact:
+  后缀不出现目标标签词，但出现目标同族词，例如 boat / transportation / creature。
+
+mixed_family:
+  同时出现目标同族和竞争同族。
+
+wrong_family:
+  只出现竞争族词。
+
+generic_only:
+  只出现 object / thing / type / kind 等泛化词。
+
+degenerate:
+  几乎无有效字母输出。
+
+other:
+  不属于以上类别。
+```
+
+注意：
+
+```text
+这是朴素字符串审计，不是完整语义判别器。
+本阶段只用于防止把 exact label hit 误判成 semantic paraphrase。
+```
+
+### 客观结果
+
+#### Qwen3
+
+Qwen3 大部分条件为 flat。
+
+最大正结果：
+
+```text
+animal_tool natural_qa top_p residual_parallel:
+  baseline semantic 0.58
+  semantic 0.75
+  gain +0.17
+  exact gain +0.02
+  non-exact gain +0.15
+  class = weak_positive
+
+animal_tool natural_qa top_p residual_full:
+  baseline semantic 0.58
+  semantic 0.71
+  gain +0.12
+  exact gain +0.02
+  non-exact gain +0.10
+  class = weak_positive
+```
+
+其他类别：
+
+```text
+vehicle_tool max gain +0.08，主要 exact label。
+fruit_vegetable max gain +0.02。
+fruit_tool max gain +0.08，主要 exact label。
+```
+
+判断：
+
+```text
+Qwen3 不存在稳定强闭合。
+但 animal_tool 有弱 non-exact semantic 增益，比纯 exact label 更值得继续观察。
+```
+
+#### GLM4
+
+GLM4 residual_parallel 再次给出强正结果，但 Phase546 证明主要是 exact label driven。
+
+最强结果：
+
+```text
+animal_tool sentence_completion top_p residual_parallel:
+  baseline semantic 0.04
+  semantic 0.98
+  gain +0.94
+  exact gain +0.94
+  non-exact gain +0.00
+  label share 1.00
+  class = label_driven_positive
+
+animal_tool sentence_completion temperature residual_parallel:
+  baseline semantic 0.04
+  semantic 0.90
+  gain +0.85
+  exact gain +0.85
+  non-exact gain +0.00
+  class = label_driven_positive
+
+fruit_tool sentence_completion top_p residual_parallel:
+  baseline semantic 0.08
+  semantic 0.92
+  gain +0.83
+  exact gain +0.83
+  non-exact gain +0.00
+  class = label_driven_positive
+
+fruit_vegetable sentence_completion top_p residual_parallel:
+  baseline semantic 0.08
+  semantic 0.90
+  gain +0.81
+  exact gain +0.81
+  non-exact gain +0.00
+  class = label_driven_positive
+```
+
+GLM4 中少数 non-exact 正结果来自 residual_full 而不是 residual_parallel：
+
+```text
+vehicle_tool sentence_completion temperature residual_full:
+  baseline semantic 0.31
+  semantic 0.75
+  gain +0.44
+  exact gain +0.19
+  non-exact gain +0.25
+  class = semantic_paraphrase_positive
+
+vehicle_tool sentence_completion top_p residual_full:
+  baseline semantic 0.35
+  semantic 0.69
+  gain +0.33
+  exact gain +0.12
+  non-exact gain +0.21
+  class = semantic_paraphrase_positive
+```
+
+判断：
+
+```text
+GLM4 的 residual_parallel 是稳定类别标签出口门。
+它不是 broad semantic paraphrase gate。
+
+GLM4 的 residual_full 在 vehicle_tool 上保留更多 non-exact family semantic 成分，
+说明 parallel/readout component 与 full/common component 的功能不同。
+```
+
+#### DS7B
+
+DS7B 基本 flat。
+
+最大结果：
+
+```text
+fruit_vegetable natural_qa temperature residual_full:
+  baseline semantic 0.67
+  semantic 0.77
+  gain +0.10
+  exact gain +0.08
+  non-exact gain +0.02
+  class = weak_positive
+
+fruit_tool natural_qa temperature residual_parallel:
+  gain +0.08
+  exact gain +0.08
+  non-exact gain +0.00
+```
+
+判断：
+
+```text
+DS7B 仍是 weak stochastic path access。
+没有稳定的 exact label gate，也没有稳定 paraphrase gate。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase545 的 GLM4 cross-category natural closure 成立，但必须收紧解释**
+
+```text
+它主要是 exact category label generation gate。
+```
+
+不是：
+
+```text
+广泛自然语义改写能力被恢复。
+```
+
+2. **GLM4 residual_parallel 与 residual_full 功能分化**
+
+```text
+residual_parallel:
+  强 exact label gate。
+
+residual_full:
+  在 vehicle_tool sentence_completion 中保留更多 non-exact family semantic 成分。
+```
+
+3. **Qwen3 的少数正结果更偏 non-exact，但强度弱**
+
+```text
+Qwen3 animal_tool natural_qa top_p residual_parallel:
+  non-exact gain +0.15
+```
+
+这说明 Qwen3 可能存在弱 semantic paraphrase path，但尚未稳定闭合。
+
+4. **DS7B 的 Phase544/545 弱增益进一步收紧**
+
+```text
+大部分正结果只是 exact label 小幅移动；
+没有形成稳定生成门。
+```
+
+5. **sentence_completion 是 GLM4 exact label gate 的最强显影 scaffold**
+
+尤其：
+
+```text
+animal_tool / fruit_tool / fruit_vegetable
+```
+
+都从极低 baseline 直接升到高 exact label hit。
+
+### 对附件分析的修正
+
+附件中这些判断保持正确：
+
+```text
+1. 主链条从 state-pair 到 generation closure 是当前正确主线。
+2. post-norm readout 基本闭合。
+3. state-pair formalism 是比单一 category vector 更可靠的基本单位。
+4. generation gate 必须条件化到 scaffold / decode / sampling。
+```
+
+需要修正：
+
+```text
+1. natural generation closure 不能整体给单一百分比。
+   GLM4 高，Qwen3/DS7B 低。
+
+2. sampling stability 经 Phase545 已经不是 20%。
+   但稳定性提升主要支持 GLM4，不能外推到三模型。
+
+3. semantic paraphrase closure 仍然低。
+   Phase546 证明 GLM4 强闭合主要是 exact label driven。
+
+4. complete language mechanism 的 82% 过乐观。
+   如果指 category-label generation gate，可以较高；
+   如果指语言背后完整编码机制，还远未达到。
+```
+
+### 理论进展
+
+Phase545 的公式：
+
+```text
+G_policy = E_seed[G(h, d, scaffold, decode_mode, K, hit_family)]
+```
+
+Phase546 后需要拆成：
+
+```text
+G_policy =
+E_seed[
+  G_label(h, d, scaffold, decode_mode, K)
+  +
+  G_para(h, d, scaffold, decode_mode, K)
+  +
+  G_generic(h, d, scaffold, decode_mode, K)
+  -
+  G_wrong(h, d, scaffold, decode_mode, K)
+]
+```
+
+其中：
+
+```text
+G_label:
+  exact category label gate。
+
+G_para:
+  non-exact family semantic paraphrase gate。
+
+G_generic:
+  generic object/type/kind gate。
+
+G_wrong:
+  competitor / wrong-family gate。
+```
+
+当前最合理链条更新为：
+
+```text
+state-pair field
+-> category interface response matrix
+-> readout-parallel / residual-full split
+-> competition trajectory
+-> scaffold/decode/seed-conditioned policy gate
+-> label-vs-paraphrase decomposed generation closure
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 分类仍是字符串规则，不是语义判别器。
+2. exact_label 高不等于模型真的理解类别，只说明类别标签出口被打开。
+3. non-exact family terms 词表仍然有限，可能漏掉一些真实 paraphrase。
+4. 本轮只覆盖 category pairs，没有进入 relation / role / action / attribute。
+5. GLM4 residual_parallel 的强标签门可能是模型对英文 category-word 格式特别敏感。
+6. residual_full 的 non-exact 正结果目前只在 vehicle_tool 明显，需要扩展验证。
+```
+
+### 下一阶段任务
+
+Phase547 应进入：
+
+```text
+Label Gate vs Semantic Paraphrase Gate Split
+```
+
+核心目标：
+
+```text
+把 exact label gate 和 non-exact semantic paraphrase gate 分开测试。
+```
+
+建议设计：
+
+```text
+1. 构造禁止类别标签词的 prompt：
+   例如 "Do not use the words vehicle/tool/fruit/animal..."
+
+2. 构造 synonym target set：
+   vehicle -> transport / machine / vessel / craft
+   animal -> creature / mammal / living being
+   fruit -> edible plant product / produce
+
+3. 对比四种方向：
+   residual_parallel
+   residual_full
+   residual_perp
+   exact-label readout direction
+
+4. 指标拆成：
+   forbidden-label violation
+   synonym hit
+   generic hit
+   wrong-family hit
+   fluency degeneration
+
+5. 优先测试：
+   GLM4 vehicle_tool sentence_completion
+   GLM4 animal_tool sentence_completion
+   Qwen3 animal_tool natural_qa
+```
+
+阶段判断标准：
+
+```text
+如果禁用标签词后 residual_parallel 效果消失，
+而 residual_full / residual_perp 仍能提高 synonym hit，
+则说明 exact label gate 与 semantic paraphrase gate 是可分离机制。
+
+如果全部效果消失，
+则当前所谓 natural closure 主要仍是 category-word readout gate。
+```
+
+## Phase 547: Label-Forbidden Paraphrase Gate Split 标签禁用条件下的改写门分离 [2026-06-19 17:43]
+
+### 本阶段目标
+
+用户上传的 Phase546 分析总体正确：
+
+```text
+Phase546 没有推翻 Phase545；
+而是把 GLM4 的 strong natural closure 收紧为 exact label gate。
+```
+
+正确部分：
+
+```text
+1. GLM4 residual_parallel 主要打开 category-label gate。
+2. residual_full 的意义上升，因为它可能保留 non-exact semantic component。
+3. Qwen3 整体弱，但少数 non-exact path 值得追踪。
+4. DS7B 仍是 weak stochastic path access。
+5. 下一步必须做 forbidden-label experiment。
+```
+
+本阶段直接测试：
+
+```text
+如果禁止输出目标/竞争类别标签词，
+residual_parallel / readout 是否仍能提升 clean synonym；
+residual_full / residual_perp 是否能在不违反禁令的情况下提升 semantic paraphrase。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase547_label_forbidden_paraphrase_gate.py \
+  tests/glm5/phase547_label_forbidden_paraphrase_gate_summary.py
+
+python tests/glm5/phase547_label_forbidden_paraphrase_gate.py qwen3 \
+  --windows '10,12,14' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds forbidden_natural_qa,forbidden_definition,forbidden_sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full,residual_perp,readout \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase547_label_forbidden_paraphrase_gate \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase547_label_forbidden_paraphrase_gate.py glm4 \
+  --windows '24,26,28' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds forbidden_natural_qa,forbidden_definition,forbidden_sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full,residual_perp,readout \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase547_label_forbidden_paraphrase_gate \
+  --hard-exit-after-model
+
+python tests/glm5/phase547_label_forbidden_paraphrase_gate.py deepseek7b \
+  --windows '16,18,20' \
+  --pairs vehicle_tool,fruit_vegetable,animal_tool,fruit_tool \
+  --train-n 12 --test-n 8 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --scaffolds forbidden_natural_qa,forbidden_definition,forbidden_sentence_completion \
+  --decode-modes top_p,temperature \
+  --conditions baseline,residual_parallel,residual_full,residual_perp,readout \
+  --max-new-tokens 12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase547_label_forbidden_paraphrase_gate \
+  --hard-exit-after-model
+
+python tests/glm5/phase547_label_forbidden_paraphrase_gate_summary.py
+```
+
+### 脚本与结果
+
+```text
+主脚本：
+tests/glm5/phase547_label_forbidden_paraphrase_gate.py
+
+汇总脚本：
+tests/glm5/phase547_label_forbidden_paraphrase_gate_summary.py
+
+Qwen3 结果：
+results/glm5_phase547_label_forbidden_paraphrase_gate/phase547_qwen3_label_forbidden_paraphrase_gate.json
+
+GLM4 结果：
+results/glm5_phase547_label_forbidden_paraphrase_gate/phase547_glm4_label_forbidden_paraphrase_gate.json
+
+DS7B 结果：
+results/glm5_phase547_label_forbidden_paraphrase_gate/phase547_deepseek7b_label_forbidden_paraphrase_gate.json
+
+跨模型汇总：
+results/glm5_phase547_label_forbidden_paraphrase_gate/phase547_cross_model_summary.md
+```
+
+运行时间：
+
+```text
+Qwen3: 4.79 min
+GLM4: 8.19 min
+DS7B: 6.32 min
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pairs = vehicle_tool, fruit_vegetable, animal_tool, fruit_tool
+train_n = 12
+test_n = 8
+sample_seeds = 101,103,107,109,113,127
+scaffolds = forbidden_natural_qa, forbidden_definition, forbidden_sentence_completion
+decode_modes = top_p, temperature
+conditions = baseline, residual_parallel, residual_full, residual_perp, readout
+max_new_tokens = 12
+alpha = 6
+```
+
+模型层位：
+
+```text
+Qwen3: L10,L12,L14
+GLM4: L24,L26,L28
+DS7B: L16,L18,L20
+```
+
+### 指标定义
+
+```text
+clean_synonym:
+  生成后缀出现目标类别的非标签同义表达，且没有出现被禁用的目标/竞争标签词。
+
+label_violation:
+  生成后缀出现被禁用的目标/竞争标签词。
+
+wrong_synonym:
+  出现竞争类别同义表达，但没有目标同义表达。
+
+generic_only:
+  只出现 object / thing / type / kind 等泛化词。
+
+clean_paraphrase_score:
+  clean_synonym - wrong_synonym - label_violation。
+```
+
+### 客观结果
+
+#### Qwen3
+
+Qwen3 最强 clean 结果集中在 vehicle_tool。
+
+```text
+vehicle_tool forbidden_definition top_p residual_full:
+  clean 0.04 -> 0.23
+  clean gain +0.19
+  label gain +0.00
+  score gain +0.25
+  class = clean_paraphrase_positive
+
+vehicle_tool forbidden_definition top_p residual_perp:
+  clean 0.04 -> 0.21
+  clean gain +0.17
+  label gain -0.04
+  score gain +0.23
+  class = clean_paraphrase_positive
+
+vehicle_tool forbidden_sentence_completion top_p residual_full:
+  clean 0.52 -> 0.67
+  clean gain +0.15
+  label gain +0.04
+  class = weak_clean_positive
+
+fruit_tool forbidden_definition top_p residual_perp:
+  clean 0.38 -> 0.50
+  clean gain +0.12
+  label gain -0.04
+  class = weak_clean_positive
+```
+
+判断：
+
+```text
+Qwen3 存在弱 clean paraphrase trace，
+主要在 vehicle_tool / fruit_tool，
+但不是全局稳定门。
+```
+
+#### GLM4
+
+GLM4 的 Phase547 给出本轮最关键结果：
+
+```text
+residual_parallel / readout:
+  在 forbidden-label 条件下大量增加 label_violation。
+
+residual_full / residual_perp:
+  在 vehicle_tool 上提升 clean synonym，且几乎不增加 label violation。
+```
+
+最强 clean paraphrase：
+
+```text
+vehicle_tool forbidden_sentence_completion temperature residual_perp:
+  clean 0.31 -> 0.65
+  clean gain +0.33
+  label 0.00 -> 0.00
+  label gain +0.00
+  score gain +0.35
+  class = clean_paraphrase_positive
+
+vehicle_tool forbidden_definition top_p residual_perp:
+  clean 0.29 -> 0.56
+  clean gain +0.27
+  label 0.02 -> 0.02
+  label gain +0.00
+  score gain +0.33
+  class = clean_paraphrase_positive
+
+vehicle_tool forbidden_sentence_completion temperature residual_full:
+  clean 0.31 -> 0.56
+  clean gain +0.25
+  label 0.00 -> 0.00
+  score gain +0.27
+  class = clean_paraphrase_positive
+
+vehicle_tool forbidden_definition top_p residual_full:
+  clean 0.29 -> 0.54
+  clean gain +0.25
+  label 0.02 -> 0.02
+  score gain +0.29
+  class = clean_paraphrase_positive
+```
+
+GLM4 residual_parallel / readout 的标签泄漏：
+
+```text
+vehicle_tool forbidden_natural_qa top_p residual_parallel:
+  clean 0.38 -> 0.27
+  label 0.00 -> 0.46
+  class = label_gate_leak
+
+animal_tool forbidden_sentence_completion temperature residual_parallel:
+  clean 0.06 -> 0.00
+  label 0.00 -> 0.60
+  class = label_gate_leak
+
+fruit_vegetable forbidden_sentence_completion temperature residual_parallel:
+  clean 0.25 -> 0.06
+  label 0.00 -> 0.38
+  class = label_gate_leak
+
+fruit_tool forbidden_sentence_completion top_p residual_parallel:
+  clean 0.10 -> 0.02
+  label 0.02 -> 0.46
+  class = label_gate_leak
+```
+
+其他类别的 clean 结果：
+
+```text
+fruit_vegetable forbidden_natural_qa top_p residual_perp:
+  clean gain +0.19
+  label gain +0.00
+  score gain +0.21
+
+fruit_tool forbidden_natural_qa top_p residual_perp:
+  clean gain +0.19
+  label gain +0.04
+  score gain +0.15
+
+animal_tool forbidden_natural_qa top_p residual_full:
+  clean gain +0.08
+  label gain -0.10
+  score gain +0.21
+```
+
+判断：
+
+```text
+GLM4 中 label gate 与 paraphrase gate 已出现可分离证据。
+
+residual_parallel/readout = label gate。
+residual_full/residual_perp = vehicle_tool 上的 clean paraphrase gate 候选。
+
+但 clean paraphrase 不是全局稳定机制；
+vehicle_tool 最清楚，fruit/animal 仍弱或 scaffold-dependent。
+```
+
+#### DS7B
+
+DS7B 全部正结果很弱：
+
+```text
+vehicle_tool forbidden_definition top_p residual_full:
+  clean gain +0.06
+  label gain -0.02
+  score gain +0.08
+  class = flat
+
+animal_tool forbidden_natural_qa temperature residual_perp:
+  clean gain +0.06
+  label gain -0.02
+  score gain +0.06
+  class = flat
+
+fruit_tool forbidden_natural_qa top_p residual_full:
+  clean gain +0.06
+  label gain +0.04
+  score gain +0.04
+  class = flat
+```
+
+判断：
+
+```text
+DS7B 没有稳定 clean paraphrase gate。
+```
+
+### 当前最可靠客观事实
+
+1. **GLM4 residual_parallel / readout 是标签门，不是改写门**
+
+在 forbidden-label 条件下，它常常不提升 clean synonym，反而强行输出禁用标签词。
+
+2. **GLM4 residual_full / residual_perp 在 vehicle_tool 上形成 clean paraphrase 候选**
+
+最清楚结果：
+
+```text
+vehicle_tool sentence_completion temperature residual_perp:
+  clean gain +0.33
+  label gain +0.00
+```
+
+3. **Phase546 中 residual_full 的 vehicle_tool non-exact 现象被 Phase547 支持**
+
+Phase546 看到 residual_full 的 non-exact 成分；
+Phase547 在禁标签条件下证明它可以转成 clean synonym，而不是标签词绕路。
+
+4. **可分离不是全局通用**
+
+```text
+vehicle_tool 强；
+fruit_vegetable / fruit_tool 弱；
+animal_tool 很弱或受 scaffold 限制。
+```
+
+5. **Qwen3 有弱 clean trace，但强度不及 GLM4 vehicle_tool**
+
+Qwen3 主要在 vehicle_tool forbidden_definition 上有正结果。
+
+6. **DS7B 继续收紧为弱/不稳定**
+
+### 理论进展
+
+Phase546 的拆分：
+
+```text
+G_policy =
+E_seed[
+  G_label
+  +
+  G_para
+  +
+  G_generic
+  -
+  G_wrong
+]
+```
+
+Phase547 后可以进一步结构化为：
+
+```text
+d_readout_parallel -> G_label
+
+d_full = d_parallel + d_perp + d_path + d_format
+
+d_perp / d_full -> G_para_clean
+```
+
+但只在部分条件成立：
+
+```text
+G_para_clean = G_para_clean(model, pair, scaffold, decode, layer_window)
+```
+
+当前更完整表达：
+
+```text
+P(output) =
+Gate_scaffold_decode_seed(
+  G_label(d_parallel),
+  G_para_clean(d_perp, d_full),
+  G_generic,
+  G_wrong,
+  G_degenerate
+)
+```
+
+### 对 Phase546 附件分析的评估
+
+附件中这些判断被 Phase547 支持：
+
+```text
+1. residual_parallel 偏 exact label gate。
+2. residual_full 可能包含 semantic paraphrase component。
+3. 必须做禁标签实验。
+4. generation closure 必须拆成 label closure / family closure / paraphrase closure。
+```
+
+需要进一步收紧：
+
+```text
+1. residual_full 不是普遍 paraphrase gate，只在 vehicle_tool 最清楚。
+2. residual_perp 在 GLM4 vehicle_tool 上比 residual_full 更干净，是新增关键点。
+3. synonym 规则仍可能把 prompt echo / object-specific terms 计入 clean synonym，需要人工抽样复核。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. forbidden prompt 本身改变了生成分布，不能直接和普通 prompt 等价比较。
+2. clean synonym 仍是规则词表，不是完整语义判断。
+3. some clean synonym 可能来自对象本身的明显属性，而不是方向注入。
+4. GLM4 fruit 类有高 baseline label violation，说明禁词指令本身对不同类别难度不同。
+5. residual_perp 的 clean paraphrase 效果需要更大对象集和人工样本审计确认。
+6. 尚未定位自然 writer，只知道注入方向有这种效果。
+```
+
+### 下一阶段任务
+
+Phase548 应进入：
+
+```text
+Paraphrase Candidate Robustness and Human-Readable Sample Audit
+```
+
+目标：
+
+```text
+验证 Phase547 的 GLM4 vehicle_tool residual_perp/full clean paraphrase 是否真实稳健，
+排除 synonym 词表误判、对象重复、prompt echo、格式退化。
+```
+
+建议测试：
+
+```text
+1. 扩大 vehicle_tool object set：
+   train_n/test_n 加大，加入更多 heldout vehicles。
+
+2. 对 GLM4 vehicle_tool 做专门审计：
+   residual_parallel
+   residual_full
+   residual_perp
+   readout
+   random_same_norm
+
+3. 引入 object-echo control：
+   clean synonym 不能只来自 prompt object 本身。
+
+4. 保存完整样本表：
+   prompt
+   suffix
+   class
+   matched_terms
+   label_violation
+   degenerate flag
+
+5. 增加人工可读 small table：
+   每个条件至少 30 条样本。
+```
+
+阶段判据：
+
+```text
+如果 residual_perp/full 在更大样本中仍能提高 clean synonym，
+且不依赖标签违规、不依赖 object echo，
+则 GLM4 vehicle_tool paraphrase gate 可作为第一条 clean semantic generation path。
+
+如果扩大样本后消失，
+则 Phase547 只是局部 prompt/term artifact。
 ```
