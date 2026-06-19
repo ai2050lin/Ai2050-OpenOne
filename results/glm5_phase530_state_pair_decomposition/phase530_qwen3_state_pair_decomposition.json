@@ -1,0 +1,3074 @@
+{
+  "phase": 530,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 00:55:15",
+  "attn_implementation": "sdpa",
+  "layer": 12,
+  "train_n": 8,
+  "test_n": 6,
+  "alphas": [
+    4.0,
+    8.0,
+    12.0
+  ],
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "candidate_meta": {
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "color_red_blue_painted": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "color_red_blue_property": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "color_black_white_direct": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "color_black_white_painted": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "color_black_white_property": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "pos_n": 8,
+      "neg_n": 8
+    },
+    "object_desc_apple_banana": {
+      "family": "object",
+      "own_task": "object_apple_banana",
+      "pos_n": 4,
+      "neg_n": 4
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "pos_n": 4,
+      "neg_n": 4
+    }
+  },
+  "baseline": {
+    "color_red_blue": {
+      "target_margin": 4.50694465637207,
+      "target_top1_rate": 0.5,
+      "n": 18
+    },
+    "color_black_white": {
+      "target_margin": 4.138888835906982,
+      "target_top1_rate": 0.6111111111111112,
+      "n": 18
+    },
+    "object_apple_banana": {
+      "target_margin": 2.640625,
+      "target_top1_rate": 0.0,
+      "n": 4
+    },
+    "object_car_truck": {
+      "target_margin": 3.65625,
+      "target_top1_rate": 0.0,
+      "n": 4
+    }
+  },
+  "component_stats": {
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "norm": 6.233554363250732,
+      "parallel_norm_pct": 1.4848947525024414,
+      "perp_norm_pct": 99.98898315429688,
+      "cos_to_readout": 0.014848948456346989
+    },
+    "color_red_blue_painted": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "norm": 5.807533264160156,
+      "parallel_norm_pct": 0.9648318290710449,
+      "perp_norm_pct": 99.99534606933594,
+      "cos_to_readout": -0.009648318402469158
+    },
+    "color_red_blue_property": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "norm": 3.215752363204956,
+      "parallel_norm_pct": 1.7001222372055054,
+      "perp_norm_pct": 99.98554992675781,
+      "cos_to_readout": -0.01700122095644474
+    },
+    "color_black_white_direct": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "norm": 8.374055862426758,
+      "parallel_norm_pct": 0.5150017738342285,
+      "perp_norm_pct": 99.9986801147461,
+      "cos_to_readout": 0.005150017328560352
+    },
+    "color_black_white_painted": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "norm": 6.19874382019043,
+      "parallel_norm_pct": 1.435234546661377,
+      "perp_norm_pct": 99.98971557617188,
+      "cos_to_readout": 0.014352343045175076
+    },
+    "color_black_white_property": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "norm": 3.099287748336792,
+      "parallel_norm_pct": 2.571098566055298,
+      "perp_norm_pct": 99.96696472167969,
+      "cos_to_readout": 0.02571098320186138
+    },
+    "object_desc_apple_banana": {
+      "family": "object",
+      "own_task": "object_apple_banana",
+      "norm": 3.2059109210968018,
+      "parallel_norm_pct": 0.29409652948379517,
+      "perp_norm_pct": 99.99957275390625,
+      "cos_to_readout": 0.002940964885056019
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "norm": 3.162618398666382,
+      "parallel_norm_pct": 1.3954635858535767,
+      "perp_norm_pct": 99.99026489257812,
+      "cos_to_readout": 0.013954633846879005
+    }
+  },
+  "admission": {
+    "color_red_blue_direct": {
+      "full": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.37847185134887695,
+        "best_same_family_max_abs": 0.07291650772094727,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 1.6148131635231802,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.15972185134887695,
+            "same_family_max_abs": 0.04861116409301758,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.2743053436279297,
+            "same_family_max_abs": 0.07986116409301758,
+            "off_family_max_abs": 0.15625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.37847185134887695,
+            "same_family_max_abs": 0.07291650772094727,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.12847185134887695,
+        "best_same_family_max_abs": 0.010416507720947266,
+        "best_off_family_max_abs": 0.09375,
+        "best_selectivity_ratio": 1.370366268215619,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.09375,
+            "same_family_max_abs": 0.03819465637207031,
+            "off_family_max_abs": 0.078125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.10763883590698242,
+            "same_family_max_abs": 0.05555582046508789,
+            "off_family_max_abs": 0.046875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.12847185134887695,
+            "same_family_max_abs": 0.010416507720947266,
+            "off_family_max_abs": 0.09375
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.37847185134887695,
+        "best_same_family_max_abs": 0.0625,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 1.6148131635231802,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.1631941795349121,
+            "same_family_max_abs": 0.0625,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.2743053436279297,
+            "same_family_max_abs": 0.08333349227905273,
+            "off_family_max_abs": 0.15625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.37847185134887695,
+            "same_family_max_abs": 0.0625,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      }
+    },
+    "color_red_blue_painted": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": 0.006944179534912109,
+        "best_same_family_max_abs": 0.0034723281860351562,
+        "best_off_family_max_abs": 0.109375,
+        "best_selectivity_ratio": 0.06348963565728688,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.006944179534912109,
+            "same_family_max_abs": 0.0034723281860351562,
+            "off_family_max_abs": 0.109375
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.013889312744140625,
+            "same_family_max_abs": 0.03819417953491211,
+            "off_family_max_abs": 0.234375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.027778148651123047,
+            "same_family_max_abs": 0.19097208976745605,
+            "off_family_max_abs": 0.28125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.12152814865112305,
+        "best_same_family_max_abs": 0.03125,
+        "best_off_family_max_abs": 0.09375,
+        "best_selectivity_ratio": 1.2963001140066337,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.12152814865112305,
+            "same_family_max_abs": 0.03125,
+            "off_family_max_abs": 0.09375
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.3125,
+            "same_family_max_abs": 0.14236116409301758,
+            "off_family_max_abs": 0.125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.47916698455810547,
+            "same_family_max_abs": 0.27083325386047363,
+            "off_family_max_abs": 0.1875
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.0069446563720703125,
+        "best_same_family_max_abs": 0.006944179534912109,
+        "best_off_family_max_abs": 0.125,
+        "best_selectivity_ratio": 0.05555724653198278,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.0069446563720703125,
+            "same_family_max_abs": 0.006944179534912109,
+            "off_family_max_abs": 0.125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.017361164093017578,
+            "same_family_max_abs": 0.027777671813964844,
+            "off_family_max_abs": 0.1875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.034722328186035156,
+            "same_family_max_abs": 0.20486116409301758,
+            "off_family_max_abs": 0.265625
+          }
+        ]
+      }
+    },
+    "color_red_blue_property": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.14583349227905273,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.109375,
+        "best_selectivity_ratio": 1.3333346646464557,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.14583349227905273,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.109375
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.29166698455810547,
+            "same_family_max_abs": 0.027777671813964844,
+            "off_family_max_abs": 0.28125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.44791698455810547,
+            "same_family_max_abs": 0.13888883590698242,
+            "off_family_max_abs": 0.390625
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.12152814865112305,
+        "best_same_family_max_abs": 0.03125,
+        "best_off_family_max_abs": 0.09375,
+        "best_selectivity_ratio": 1.2963001140066337,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.12152814865112305,
+            "same_family_max_abs": 0.03125,
+            "off_family_max_abs": 0.09375
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.3125,
+            "same_family_max_abs": 0.14236116409301758,
+            "off_family_max_abs": 0.125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.47916698455810547,
+            "same_family_max_abs": 0.27083325386047363,
+            "off_family_max_abs": 0.1875
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.13541698455810547,
+        "best_same_family_max_abs": 0.010416507720947266,
+        "best_off_family_max_abs": 0.078125,
+        "best_selectivity_ratio": 1.733337180476591,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.13541698455810547,
+            "same_family_max_abs": 0.010416507720947266,
+            "off_family_max_abs": 0.078125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.2951393127441406,
+            "same_family_max_abs": 0.010416507720947266,
+            "off_family_max_abs": 0.234375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.4236111640930176,
+            "same_family_max_abs": 0.125,
+            "off_family_max_abs": 0.390625
+          }
+        ]
+      }
+    },
+    "color_black_white_direct": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": 0.1319446563720703,
+        "best_same_family_max_abs": 0.02083301544189453,
+        "best_off_family_max_abs": 0.03125,
+        "best_selectivity_ratio": 4.222227652793401,
+        "passes_basic_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.1319446563720703,
+            "same_family_max_abs": 0.02083301544189453,
+            "off_family_max_abs": 0.03125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.125,
+            "same_family_max_abs": 0.03125,
+            "off_family_max_abs": 0.046875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.07638883590698242,
+            "same_family_max_abs": 0.12152814865112305,
+            "off_family_max_abs": 0.015625
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.04513883590698242,
+        "best_same_family_max_abs": 0.27777814865112305,
+        "best_off_family_max_abs": 0.109375,
+        "best_selectivity_ratio": 0.16249958645479676,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.02430582046508789,
+            "same_family_max_abs": 0.10416698455810547,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.04513883590698242,
+            "same_family_max_abs": 0.27777814865112305,
+            "off_family_max_abs": 0.109375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.041666507720947266,
+            "same_family_max_abs": 0.49652814865112305,
+            "off_family_max_abs": 0.125
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": 0.125,
+        "best_same_family_max_abs": 0.024305343627929688,
+        "best_off_family_max_abs": 0.046875,
+        "best_selectivity_ratio": 2.666666097777899,
+        "passes_basic_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.125,
+            "same_family_max_abs": 0.024305343627929688,
+            "off_family_max_abs": 0.046875
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.10763883590698242,
+            "same_family_max_abs": 0.020833492279052734,
+            "off_family_max_abs": 0.03125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.052083492279052734,
+            "same_family_max_abs": 0.11458349227905273,
+            "off_family_max_abs": 0.0625
+          }
+        ]
+      }
+    },
+    "color_black_white_painted": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": 0.013888835906982422,
+        "best_same_family_max_abs": 0.10069465637207031,
+        "best_off_family_max_abs": 0.03125,
+        "best_selectivity_ratio": 0.13793020432346126,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.013888835906982422,
+            "same_family_max_abs": 0.10069465637207031,
+            "off_family_max_abs": 0.03125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.0,
+            "same_family_max_abs": 0.17361116409301758,
+            "off_family_max_abs": 0.03125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.027777671813964844,
+            "same_family_max_abs": 0.33333349227905273,
+            "off_family_max_abs": 0.078125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.04513883590698242,
+        "best_same_family_max_abs": 0.27777814865112305,
+        "best_off_family_max_abs": 0.109375,
+        "best_selectivity_ratio": 0.16249958645479676,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.02430582046508789,
+            "same_family_max_abs": 0.10416698455810547,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.04513883590698242,
+            "same_family_max_abs": 0.27777814865112305,
+            "off_family_max_abs": 0.109375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.041666507720947266,
+            "same_family_max_abs": 0.49652814865112305,
+            "off_family_max_abs": 0.125
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": 0.0034723281860351562,
+        "best_same_family_max_abs": 0.07291698455810547,
+        "best_off_family_max_abs": 0.015625,
+        "best_selectivity_ratio": 0.04762028669829716,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.0034723281860351562,
+            "same_family_max_abs": 0.07291698455810547,
+            "off_family_max_abs": 0.015625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.0034723281860351562,
+            "same_family_max_abs": 0.1944446563720703,
+            "off_family_max_abs": 0.015625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.020833492279052734,
+            "same_family_max_abs": 0.32291698455810547,
+            "off_family_max_abs": 0.09375
+          }
+        ]
+      }
+    },
+    "color_black_white_property": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.034722328186035156,
+        "best_same_family_max_abs": 0.03472185134887695,
+        "best_off_family_max_abs": 0.078125,
+        "best_selectivity_ratio": 0.4444457438921948,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.034722328186035156,
+            "same_family_max_abs": 0.03472185134887695,
+            "off_family_max_abs": 0.078125
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.14236116409301758,
+            "same_family_max_abs": 0.02430582046508789,
+            "off_family_max_abs": 0.171875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.2673611640930176,
+            "same_family_max_abs": 0.15972232818603516,
+            "off_family_max_abs": 0.265625
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.04513883590698242,
+        "best_same_family_max_abs": 0.27777814865112305,
+        "best_off_family_max_abs": 0.109375,
+        "best_selectivity_ratio": 0.16249958645479676,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.02430582046508789,
+            "same_family_max_abs": 0.10416698455810547,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.04513883590698242,
+            "same_family_max_abs": 0.27777814865112305,
+            "off_family_max_abs": 0.109375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.041666507720947266,
+            "same_family_max_abs": 0.49652814865112305,
+            "off_family_max_abs": 0.125
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.034722328186035156,
+        "best_same_family_max_abs": 0.03472185134887695,
+        "best_off_family_max_abs": 0.09375,
+        "best_selectivity_ratio": 0.3703714611447525,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.034722328186035156,
+            "same_family_max_abs": 0.03472185134887695,
+            "off_family_max_abs": 0.09375
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.09722232818603516,
+            "same_family_max_abs": 0.03125,
+            "off_family_max_abs": 0.1875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.28125,
+            "same_family_max_abs": 0.15277814865112305,
+            "off_family_max_abs": 0.25
+          }
+        ]
+      }
+    },
+    "object_desc_apple_banana": {
+      "full": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.15625,
+        "best_same_family_max_abs": 0.0625,
+        "best_off_family_max_abs": 0.06597232818603516,
+        "best_selectivity_ratio": 2.3684168895058897,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.15625,
+            "same_family_max_abs": 0.0625,
+            "off_family_max_abs": 0.06597232818603516
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.234375,
+            "same_family_max_abs": 0.09375,
+            "off_family_max_abs": 0.10069465637207031
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.375,
+            "same_family_max_abs": 0.21875,
+            "off_family_max_abs": 0.1805558204650879
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.03125,
+        "best_same_family_max_abs": 0.15625,
+        "best_off_family_max_abs": 0.28125,
+        "best_selectivity_ratio": 0.11111110716049397,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.015625,
+            "same_family_max_abs": 0.09375,
+            "off_family_max_abs": 0.10763931274414062
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.03125,
+            "same_family_max_abs": 0.15625,
+            "off_family_max_abs": 0.28125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.03125,
+            "same_family_max_abs": 0.21875,
+            "off_family_max_abs": 0.44097232818603516
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 4.0,
+        "best_own_delta": -0.109375,
+        "best_same_family_max_abs": 0.078125,
+        "best_off_family_max_abs": 0.0625,
+        "best_selectivity_ratio": 1.399999820800023,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": -0.109375,
+            "same_family_max_abs": 0.078125,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": -0.234375,
+            "same_family_max_abs": 0.140625,
+            "off_family_max_abs": 0.10069465637207031
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.359375,
+            "same_family_max_abs": 0.203125,
+            "off_family_max_abs": 0.21875
+          }
+        ]
+      }
+    },
+    "object_desc_car_truck": {
+      "full": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.328125,
+        "best_same_family_max_abs": 0.28125,
+        "best_off_family_max_abs": 0.2569446563720703,
+        "best_selectivity_ratio": 1.1666666251851867,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.15625,
+            "same_family_max_abs": 0.078125,
+            "off_family_max_abs": 0.0625
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.265625,
+            "same_family_max_abs": 0.1875,
+            "off_family_max_abs": 0.14583349227905273
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.328125,
+            "same_family_max_abs": 0.28125,
+            "off_family_max_abs": 0.2569446563720703
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.296875,
+        "best_same_family_max_abs": 0.0625,
+        "best_off_family_max_abs": 0.11458349227905273,
+        "best_selectivity_ratio": 2.5909052707867213,
+        "passes_basic_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.125,
+            "same_family_max_abs": 0.015625,
+            "off_family_max_abs": 0.052083492279052734
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.046875,
+            "off_family_max_abs": 0.052083492279052734
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.296875,
+            "same_family_max_abs": 0.0625,
+            "off_family_max_abs": 0.11458349227905273
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.328125,
+        "best_same_family_max_abs": 0.234375,
+        "best_off_family_max_abs": 0.23611116409301758,
+        "best_selectivity_ratio": 1.3897055116533068,
+        "passes_basic_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 4.0,
+            "own_delta": 0.15625,
+            "same_family_max_abs": 0.09375,
+            "off_family_max_abs": 0.05555582046508789
+          },
+          {
+            "alpha": 8.0,
+            "own_delta": 0.28125,
+            "same_family_max_abs": 0.203125,
+            "off_family_max_abs": 0.14236116409301758
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.328125,
+            "same_family_max_abs": 0.234375,
+            "off_family_max_abs": 0.23611116409301758
+          }
+        ]
+      }
+    }
+  },
+  "sweep": {
+    "color_red_blue_direct": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.666666507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.15972185134887695,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.1875,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.04861116409301758,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.6875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.78125,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.2743053436279297,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.21875,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.07986116409301758,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.15625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.885416507720947,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.37847185134887695,
+            "delta_top1": 0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.21180534362793,
+            "target_top1_rate": 0.6666666666666666,
+            "n": 18,
+            "delta_margin": 0.07291650772094727,
+            "delta_top1": 0.05555555555555547
+          },
+          "object_apple_banana": {
+            "target_margin": 2.40625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.46875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.60069465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.177083492279053,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.03819465637207031,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.614583492279053,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.10763883590698242,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.19444465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.05555582046508789,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.635416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.12847185134887695,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.128472328186035,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.010416507720947266,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.75,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.670138835906982,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.1631941795349121,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.201388835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.78125,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.2743053436279297,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.222222328186035,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.08333349227905273,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.15625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.885416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.37847185134887695,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.201388835906982,
+            "target_top1_rate": 0.6666666666666666,
+            "n": 18,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.05555555555555547
+          },
+          "object_apple_banana": {
+            "target_margin": 2.40625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.171875,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_red_blue_painted": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.513888835906982,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.006944179534912109,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.142361164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0034723281860351562,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.765625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.109375,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.49305534362793,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.013889312744140625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.10069465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.03819417953491211,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.890625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.234375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.479166507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.027778148651123047,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.9479167461395264,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.19097208976745605,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.9375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.28125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.385416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.12152814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.107638835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.19444465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.3125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.996527671813965,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.14236116409301758,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.75,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.027777671813965,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.47916698455810547,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 3.868055582046509,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.27083325386047363,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.78125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.5,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.0069446563720703125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.13194465637207,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.006944179534912109,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.78125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.489583492279053,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.017361164093017578,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.111111164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.027777671813964844,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.71875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.078125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.84375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.472222328186035,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.034722328186035156,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.934027671813965,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.20486116409301758,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.765625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.921875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.265625,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_red_blue_property": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.361111164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.14583349227905273,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.138888835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.215277671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.29166698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.111111164093018,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.027777671813964844,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.28125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.059027671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.44791698455810547,
+            "delta_top1": 0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.0,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.13888883590698242,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.390625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.385416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.12152814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.107638835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.19444465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.3125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.996527671813965,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.14236116409301758,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.75,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.027777671813965,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.47916698455810547,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 3.868055582046509,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.27083325386047363,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.78125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.371527671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.13541698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.128472328186035,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.010416507720947266,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.21180534362793,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.2951393127441406,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.128472328186035,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.010416507720947266,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.421875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.083333492279053,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.4236111640930176,
+            "delta_top1": 0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.013888835906982,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.125,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.59375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.390625,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_black_white_direct": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.527777671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.02083301544189453,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.270833492279053,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.1319446563720703,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.47569465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.263888835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.385416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.12152814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.215277671813965,
+            "target_top1_rate": 0.6666666666666666,
+            "n": 18,
+            "delta_margin": 0.07638883590698242,
+            "delta_top1": 0.05555555555555547
+          },
+          "object_apple_banana": {
+            "target_margin": 2.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.402777671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10416698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.16319465637207,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.02430582046508789,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.229166507720947,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.27777814865112305,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.184027671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.04513883590698242,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.53125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.010416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.49652814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.18055534362793,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.041666507720947266,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.53125,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.024305343627929688,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.263888835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.486111164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.020833492279052734,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.246527671813965,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.10763883590698242,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.392361164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.11458349227905273,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.190972328186035,
+            "target_top1_rate": 0.6666666666666666,
+            "n": 18,
+            "delta_margin": 0.052083492279052734,
+            "delta_top1": 0.05555555555555547
+          },
+          "object_apple_banana": {
+            "target_margin": 2.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.71875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_black_white_painted": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.40625,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10069465637207031,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.152777671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.013888835906982422,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.333333492279053,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.17361116409301758,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.138888835906982,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.173611164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.33333349227905273,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.111111164093018,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.027777671813964844,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.5625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.402777671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10416698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.16319465637207,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.02430582046508789,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.229166507720947,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.27777814865112305,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.184027671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.04513883590698242,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.53125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.010416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.49652814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.18055534362793,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.041666507720947266,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.434027671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.07291698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.142361164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0034723281860351562,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.3125,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.1944446563720703,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.142361164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0034723281860351562,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.184027671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.32291698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.11805534362793,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.020833492279052734,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_black_white_property": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.541666507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.03472185134887695,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.104166507720947,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.034722328186035156,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.5625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.59375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.482638835906982,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.02430582046508789,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.996527671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.14236116409301758,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.46875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.171875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.5,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.15625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.347222328186035,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.15972232818603516,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 3.871527671813965,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.2673611640930176,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.265625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.203125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.402777671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10416698455810547,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.16319465637207,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.02430582046508789,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.046875,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.229166507720947,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.27777814865112305,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.184027671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.04513883590698242,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.53125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.010416507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.49652814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.18055534362793,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.041666507720947266,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.541666507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.03472185134887695,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.104166507720947,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.034722328186035156,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.47569465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.041666507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.09722232818603516,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.53125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.354166507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.15277814865112305,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.8576388359069824,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.28125,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.390625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.25,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.4375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.21875,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "object_desc_apple_banana": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.472222328186035,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.034722328186035156,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.204861164093018,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.06597232818603516,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.15625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.71875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.40625,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10069465637207031,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.16319465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.02430582046508789,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.40625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.75,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.326388835906982,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.1805558204650879,
+            "delta_top1": 0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 4.083333492279053,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.05555534362792969,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.21875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.39930534362793,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10763931274414062,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.107638835906982,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": -0.03125,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.65625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.75,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.22569465637207,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.28125,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 3.9895832538604736,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.1493055820465088,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.8125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.15625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.065972328186035,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.44097232818603516,
+            "delta_top1": -0.05555555555555558
+          },
+          "color_black_white": {
+            "target_margin": 3.7916667461395264,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.34722208976745605,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.03125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.21875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.44444465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.190972328186035,
+            "target_top1_rate": 0.6111111111111112,
+            "n": 18,
+            "delta_margin": 0.052083492279052734,
+            "delta_top1": 0.0
+          },
+          "object_apple_banana": {
+            "target_margin": 2.53125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.078125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.40625,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.10069465637207031,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.166666507720947,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": 0.027777671813964844,
+            "delta_top1": -0.11111111111111116
+          },
+          "object_apple_banana": {
+            "target_margin": 2.40625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.140625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.28819465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.21875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.08680534362793,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": -0.052083492279052734,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.28125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.359375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.859375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.203125,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "object_desc_car_truck": {
+      "full": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.44444465637207,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.145833492279053,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0069446563720703125,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.5625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.078125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.8125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.15625,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.361111164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.14583349227905273,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.13194465637207,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.006944179534912109,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.921875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.265625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.25,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.2569446563720703,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.111111164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": -0.027777671813964844,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.359375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.28125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.984375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.328125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.496527671813965,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.010416984558105469,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.190972328186035,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.052083492279052734,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.78125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.46180534362793,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.045139312744140625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.190972328186035,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": 0.052083492279052734,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.59375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.84375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.392361164093018,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.11458349227905273,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.152777671813965,
+            "target_top1_rate": 0.4444444444444444,
+            "n": 18,
+            "delta_margin": 0.013888835906982422,
+            "delta_top1": -0.16666666666666674
+          },
+          "object_apple_banana": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.953125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.296875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "4.0": {
+          "color_red_blue": {
+            "target_margin": 4.451388835906982,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.05555582046508789,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.173611164093018,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.034722328186035156,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.8125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.15625,
+            "delta_top1": 0.0
+          }
+        },
+        "8.0": {
+          "color_red_blue": {
+            "target_margin": 4.364583492279053,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.14236116409301758,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.145833492279053,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.0069446563720703125,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.4375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.203125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.9375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.28125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "color_red_blue": {
+            "target_margin": 4.270833492279053,
+            "target_top1_rate": 0.5,
+            "n": 18,
+            "delta_margin": -0.23611116409301758,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 4.152777671813965,
+            "target_top1_rate": 0.5555555555555556,
+            "n": 18,
+            "delta_margin": 0.013888835906982422,
+            "delta_top1": -0.05555555555555558
+          },
+          "object_apple_banana": {
+            "target_margin": 2.40625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.984375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.328125,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    }
+  },
+  "total_time_min": 0.25
+}

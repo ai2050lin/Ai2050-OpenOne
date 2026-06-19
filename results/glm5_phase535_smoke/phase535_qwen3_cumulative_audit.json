@@ -1,0 +1,1128 @@
+{
+  "phase": 535,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 08:25:33",
+  "attn_implementation": "sdpa",
+  "windows": {
+    "10-12": [
+      10,
+      12
+    ]
+  },
+  "all_layers": [
+    10,
+    12
+  ],
+  "train_n": 4,
+  "test_n": 3,
+  "bridge_n": 3,
+  "max_new_tokens": 2,
+  "alphas": [
+    4.0
+  ],
+  "random_seeds": [
+    11,
+    23
+  ],
+  "min_abs_delta": 0.25,
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "baseline": {
+    "fruit_nonfruit_direct": {
+      "target_margin": 2.75,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "fruit_nonfruit_belongs": {
+      "target_margin": 2.2291667461395264,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "fruit_nonfruit_kind": {
+      "target_margin": 4.270833492279053,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "animal_vehicle_direct": {
+      "target_margin": 2.9479167461395264,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "animal_vehicle_belongs": {
+      "target_margin": 6.229166507720947,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "animal_vehicle_kind": {
+      "target_margin": 2.5833332538604736,
+      "target_top1_rate": 0.0,
+      "n": 3
+    }
+  },
+  "layer_stats": {
+    "10": {
+      "fruit_nonfruit": {
+        "cos_direct_belongs": 0.24472345411777496,
+        "cos_direct_kind": 0.35152286291122437,
+        "cos_belongs_kind": 0.20163372159004211
+      },
+      "animal_vehicle": {
+        "cos_direct_belongs": 0.35137107968330383,
+        "cos_direct_kind": 0.34460899233818054,
+        "cos_belongs_kind": 0.2567988634109497
+      }
+    },
+    "12": {
+      "fruit_nonfruit": {
+        "cos_direct_belongs": 0.27177584171295166,
+        "cos_direct_kind": 0.3825921416282654,
+        "cos_belongs_kind": 0.23923777043819427
+      },
+      "animal_vehicle": {
+        "cos_direct_belongs": 0.3526208996772766,
+        "cos_direct_kind": 0.33734583854675293,
+        "cos_belongs_kind": 0.2931646704673767
+      }
+    }
+  },
+  "audit": {
+    "fruit_nonfruit": {
+      "10-12": {
+        "window": [
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 3.53125,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.78125,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 3.1666667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.9375,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.208333492279053,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.0625,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.3645832538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.41666650772094727,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.541666507720947,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.3125,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.8958332538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.3125,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.0625,
+              "best_transfer_mean": 0.5520833333333334,
+              "best_off_pair_max_abs": 0.41666650772094727,
+              "best_transfer_ratio": 0.15000005362047816,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.0625,
+                  "transfer_mean": 0.5520833333333334,
+                  "own_deltas": {
+                    "fruit_nonfruit_direct": 0.78125,
+                    "fruit_nonfruit_belongs": 0.9375,
+                    "fruit_nonfruit_kind": -0.0625
+                  },
+                  "off_pair_max_abs": 0.41666650772094727
+                }
+              ]
+            }
+          },
+          "direct": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 4.177083492279053,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 1.4270834922790527,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 2.8541667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.625,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.1875,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.08333349227905273,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.1354167461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.1875,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.395833492279053,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.16666698455810547,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.8541667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.27083349227905273,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.08333349227905273,
+              "best_transfer_mean": 0.65625,
+              "best_off_pair_max_abs": 0.27083349227905273,
+              "best_transfer_ratio": 0.30769270263023163,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.08333349227905273,
+                  "transfer_mean": 0.65625,
+                  "own_deltas": {
+                    "fruit_nonfruit_direct": 1.4270834922790527,
+                    "fruit_nonfruit_belongs": 0.625,
+                    "fruit_nonfruit_kind": -0.08333349227905273
+                  },
+                  "off_pair_max_abs": 0.27083349227905273
+                }
+              ]
+            }
+          },
+          "shuffled_template": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 3.90625,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 1.15625,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 2.8958332538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.6666665077209473,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.270833492279053,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.0,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.2708332538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.32291650772094727,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.479166507720947,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.25,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.7291667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.14583349227905273,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.0,
+              "best_transfer_mean": 0.6076388359069824,
+              "best_off_pair_max_abs": 0.32291650772094727,
+              "best_transfer_ratio": 0.0,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.0,
+                  "transfer_mean": 0.6076388359069824,
+                  "own_deltas": {
+                    "fruit_nonfruit_direct": 1.15625,
+                    "fruit_nonfruit_belongs": 0.6666665077209473,
+                    "fruit_nonfruit_kind": 0.0
+                  },
+                  "off_pair_max_abs": 0.32291650772094727
+                }
+              ]
+            }
+          },
+          "random": {
+            "transfers": {
+              "11": {
+                "best_alpha": 4.0,
+                "best_transfer_min": -0.2708333730697632,
+                "best_transfer_mean": -0.1527778704961141,
+                "best_off_pair_max_abs": 0.16666650772094727,
+                "best_transfer_ratio": 1.6250016906408542,
+                "passes_transfer_gate": false,
+                "alpha_rows": [
+                  {
+                    "alpha": 4.0,
+                    "transfer_min": -0.2708333730697632,
+                    "transfer_mean": -0.1527778704961141,
+                    "own_deltas": {
+                      "fruit_nonfruit_direct": -0.04166674613952637,
+                      "fruit_nonfruit_belongs": -0.2708333730697632,
+                      "fruit_nonfruit_kind": -0.14583349227905273
+                    },
+                    "off_pair_max_abs": 0.16666650772094727
+                  }
+                ]
+              },
+              "23": {
+                "best_alpha": 4.0,
+                "best_transfer_min": -0.40625,
+                "best_transfer_mean": -0.11805566151936848,
+                "best_off_pair_max_abs": 0.0625,
+                "best_transfer_ratio": 6.499998960000167,
+                "passes_transfer_gate": false,
+                "alpha_rows": [
+                  {
+                    "alpha": 4.0,
+                    "transfer_min": -0.40625,
+                    "transfer_mean": -0.11805566151936848,
+                    "own_deltas": {
+                      "fruit_nonfruit_direct": -0.40625,
+                      "fruit_nonfruit_belongs": 0.25,
+                      "fruit_nonfruit_kind": -0.19791698455810547
+                    },
+                    "off_pair_max_abs": 0.0625
+                  }
+                ]
+              }
+            },
+            "max_transfer_min": -0.2708333730697632,
+            "pass_count": 0
+          }
+        }
+      }
+    },
+    "animal_vehicle": {
+      "10-12": {
+        "window": [
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 1.875,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.875,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 2.1458332538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.08333349227905273,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.09375,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.17708349227905273,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.1770832538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.22916650772094727,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.4375,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.20833349227905273,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.7291667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.14583349227905273,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.14583349227905273,
+              "best_transfer_mean": 0.19444449742635092,
+              "best_off_pair_max_abs": 0.875,
+              "best_transfer_ratio": 0.16666684641415344,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.14583349227905273,
+                  "transfer_mean": 0.19444449742635092,
+                  "own_deltas": {
+                    "animal_vehicle_direct": 0.22916650772094727,
+                    "animal_vehicle_belongs": 0.20833349227905273,
+                    "animal_vehicle_kind": 0.14583349227905273
+                  },
+                  "off_pair_max_abs": 0.875
+                }
+              ]
+            }
+          },
+          "direct": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 1.78125,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.96875,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 2.4375,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.20833325386047363,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.15625,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.11458349227905273,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.0729167461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.125,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.666666507720947,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.4375,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.7708332538604736,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.1875,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.125,
+              "best_transfer_mean": 0.25,
+              "best_off_pair_max_abs": 0.96875,
+              "best_transfer_ratio": 0.12903225673257024,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.125,
+                  "transfer_mean": 0.25,
+                  "own_deltas": {
+                    "animal_vehicle_direct": 0.125,
+                    "animal_vehicle_belongs": 0.4375,
+                    "animal_vehicle_kind": 0.1875
+                  },
+                  "off_pair_max_abs": 0.96875
+                }
+              ]
+            }
+          },
+          "shuffled_template": {
+            "rows": {
+              "4.0": {
+                "fruit_nonfruit_direct": {
+                  "target_margin": 2.5,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.25,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_belongs": {
+                  "target_margin": 2.2916667461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.0625,
+                  "delta_top1": 0.0
+                },
+                "fruit_nonfruit_kind": {
+                  "target_margin": 4.166666507720947,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": -0.10416698455810547,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_direct": {
+                  "target_margin": 3.2604167461395264,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.3125,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_belongs": {
+                  "target_margin": 6.5,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.27083349227905273,
+                  "delta_top1": 0.0
+                },
+                "animal_vehicle_kind": {
+                  "target_margin": 2.6875,
+                  "target_top1_rate": 0.0,
+                  "n": 3,
+                  "delta_margin": 0.10416674613952637,
+                  "delta_top1": 0.0
+                }
+              }
+            },
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.10416674613952637,
+              "best_transfer_mean": 0.22916674613952637,
+              "best_off_pair_max_abs": 0.25,
+              "best_transfer_ratio": 0.41666696789142676,
+              "passes_transfer_gate": false,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.10416674613952637,
+                  "transfer_mean": 0.22916674613952637,
+                  "own_deltas": {
+                    "animal_vehicle_direct": 0.3125,
+                    "animal_vehicle_belongs": 0.27083349227905273,
+                    "animal_vehicle_kind": 0.10416674613952637
+                  },
+                  "off_pair_max_abs": 0.25
+                }
+              ]
+            }
+          },
+          "random": {
+            "transfers": {
+              "11": {
+                "best_alpha": 4.0,
+                "best_transfer_min": -0.10416650772094727,
+                "best_transfer_mean": -0.08333325386047363,
+                "best_off_pair_max_abs": 0.2708333730697632,
+                "best_transfer_ratio": 0.3846147271073866,
+                "passes_transfer_gate": false,
+                "alpha_rows": [
+                  {
+                    "alpha": 4.0,
+                    "transfer_min": -0.10416650772094727,
+                    "transfer_mean": -0.08333325386047363,
+                    "own_deltas": {
+                      "animal_vehicle_direct": -0.04166674613952637,
+                      "animal_vehicle_belongs": -0.10416650772094727,
+                      "animal_vehicle_kind": -0.10416650772094727
+                    },
+                    "off_pair_max_abs": 0.2708333730697632
+                  }
+                ]
+              },
+              "23": {
+                "best_alpha": 4.0,
+                "best_transfer_min": 0.0,
+                "best_transfer_mean": 0.027777751286824543,
+                "best_off_pair_max_abs": 0.45833325386047363,
+                "best_transfer_ratio": 0.0,
+                "passes_transfer_gate": false,
+                "alpha_rows": [
+                  {
+                    "alpha": 4.0,
+                    "transfer_min": 0.0,
+                    "transfer_mean": 0.027777751286824543,
+                    "own_deltas": {
+                      "animal_vehicle_direct": 0.020833253860473633,
+                      "animal_vehicle_belongs": 0.0625,
+                      "animal_vehicle_kind": 0.0
+                    },
+                    "off_pair_max_abs": 0.45833325386047363
+                  }
+                ]
+              }
+            },
+            "max_transfer_min": 0.0,
+            "pass_count": 0
+          }
+        }
+      }
+    }
+  },
+  "generation": {
+    "fruit_nonfruit": {
+      "best_window": "10-12",
+      "baseline": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 90.33333333333333,
+        "mean_first_step_margin": 2.7916666666666665,
+        "sample_outputs": [
+          {
+            "prompt": "The category of tangerine is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 65.0,
+                "target_margin": 1.1875
+              },
+              {
+                "target_rank": 170.0,
+                "target_margin": -0.875
+              }
+            ]
+          },
+          {
+            "prompt": "The category of persimmon is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 136.0,
+                "target_margin": 3.125
+              },
+              {
+                "target_rank": 234.0,
+                "target_margin": 0.4375
+              }
+            ]
+          },
+          {
+            "prompt": "The category of pomegranate is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 70.0,
+                "target_margin": 4.0625
+              },
+              {
+                "target_rank": 144.0,
+                "target_margin": 0.4375
+              }
+            ]
+          }
+        ]
+      },
+      "common": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 96.66666666666667,
+        "mean_first_step_margin": 3.6770833333333335,
+        "sample_outputs": [
+          {
+            "prompt": "The category of tangerine is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 62.0,
+                "target_margin": 2.5625
+              },
+              {
+                "target_rank": 147.0,
+                "target_margin": -1.0
+              }
+            ]
+          },
+          {
+            "prompt": "The category of persimmon is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 165.0,
+                "target_margin": 3.4375
+              },
+              {
+                "target_rank": 208.0,
+                "target_margin": 0.5
+              }
+            ]
+          },
+          {
+            "prompt": "The category of pomegranate is",
+            "ids": [
+              264,
+              13779
+            ],
+            "generated_suffix": " a fruit",
+            "step_stats": [
+              {
+                "target_rank": 63.0,
+                "target_margin": 5.03125
+              },
+              {
+                "target_rank": 126.0,
+                "target_margin": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      "direct": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 68.33333333333333,
+        "mean_first_step_margin": 4.229166666666667,
+        "sample_outputs": [
+          {
+            "prompt": "The category of tangerine is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 35.0,
+                "target_margin": 3.5625
+              },
+              {
+                "target_rank": 145.0,
+                "target_margin": -1.0625
+              }
+            ]
+          },
+          {
+            "prompt": "The category of persimmon is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 119.0,
+                "target_margin": 3.9375
+              },
+              {
+                "target_rank": 200.0,
+                "target_margin": 0.5
+              }
+            ]
+          },
+          {
+            "prompt": "The category of pomegranate is",
+            "ids": [
+              264,
+              13779
+            ],
+            "generated_suffix": " a fruit",
+            "step_stats": [
+              {
+                "target_rank": 51.0,
+                "target_margin": 5.1875
+              },
+              {
+                "target_rank": 132.0,
+                "target_margin": 0.375
+              }
+            ]
+          }
+        ]
+      },
+      "random": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 103.33333333333333,
+        "mean_first_step_margin": 2.8333333333333335,
+        "sample_outputs": [
+          {
+            "prompt": "The category of tangerine is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 69.0,
+                "target_margin": 1.4375
+              },
+              {
+                "target_rank": 183.0,
+                "target_margin": -0.9375
+              }
+            ]
+          },
+          {
+            "prompt": "The category of persimmon is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 166.0,
+                "target_margin": 3.0
+              },
+              {
+                "target_rank": 253.0,
+                "target_margin": 0.375
+              }
+            ]
+          },
+          {
+            "prompt": "The category of pomegranate is",
+            "ids": [
+              264,
+              943
+            ],
+            "generated_suffix": " a type",
+            "step_stats": [
+              {
+                "target_rank": 75.0,
+                "target_margin": 4.0625
+              },
+              {
+                "target_rank": 157.0,
+                "target_margin": 0.3125
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "animal_vehicle": {
+      "best_window": "10-12",
+      "baseline": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 374.0,
+        "mean_first_step_margin": 2.9479166666666665,
+        "sample_outputs": [
+          {
+            "prompt": "The category of otter is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 329.0,
+                "target_margin": 3.4375
+              },
+              {
+                "target_rank": 2631.0,
+                "target_margin": -3.21875
+              }
+            ]
+          },
+          {
+            "prompt": "The category of whale is",
+            "ids": [
+              264,
+              25993
+            ],
+            "generated_suffix": " a subset",
+            "step_stats": [
+              {
+                "target_rank": 343.0,
+                "target_margin": 2.78125
+              },
+              {
+                "target_rank": 2349.0,
+                "target_margin": -3.3125
+              }
+            ]
+          },
+          {
+            "prompt": "The category of dolphin is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 450.0,
+                "target_margin": 2.625
+              },
+              {
+                "target_rank": 3117.0,
+                "target_margin": -3.5625
+              }
+            ]
+          }
+        ]
+      },
+      "common": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 379.0,
+        "mean_first_step_margin": 3.1145833333333335,
+        "sample_outputs": [
+          {
+            "prompt": "The category of otter is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 313.0,
+                "target_margin": 3.625
+              },
+              {
+                "target_rank": 2482.0,
+                "target_margin": -3.09375
+              }
+            ]
+          },
+          {
+            "prompt": "The category of whale is",
+            "ids": [
+              264,
+              25993
+            ],
+            "generated_suffix": " a subset",
+            "step_stats": [
+              {
+                "target_rank": 377.0,
+                "target_margin": 2.90625
+              },
+              {
+                "target_rank": 2261.0,
+                "target_margin": -3.15625
+              }
+            ]
+          },
+          {
+            "prompt": "The category of dolphin is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 447.0,
+                "target_margin": 2.8125
+              },
+              {
+                "target_rank": 3080.0,
+                "target_margin": -3.5625
+              }
+            ]
+          }
+        ]
+      },
+      "direct": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 354.0,
+        "mean_first_step_margin": 3.09375,
+        "sample_outputs": [
+          {
+            "prompt": "The category of otter is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 304.0,
+                "target_margin": 3.59375
+              },
+              {
+                "target_rank": 2530.0,
+                "target_margin": -3.0625
+              }
+            ]
+          },
+          {
+            "prompt": "The category of whale is",
+            "ids": [
+              264,
+              25993
+            ],
+            "generated_suffix": " a subset",
+            "step_stats": [
+              {
+                "target_rank": 343.0,
+                "target_margin": 2.875
+              },
+              {
+                "target_rank": 2406.0,
+                "target_margin": -3.28125
+              }
+            ]
+          },
+          {
+            "prompt": "The category of dolphin is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 415.0,
+                "target_margin": 2.8125
+              },
+              {
+                "target_rank": 3162.0,
+                "target_margin": -3.5625
+              }
+            ]
+          }
+        ]
+      },
+      "random": {
+        "n": 3,
+        "target_hit_rate": 0.0,
+        "mean_best_target_rank": 382.0,
+        "mean_first_step_margin": 2.875,
+        "sample_outputs": [
+          {
+            "prompt": "The category of otter is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 397.0,
+                "target_margin": 3.34375
+              },
+              {
+                "target_rank": 2672.0,
+                "target_margin": -3.21875
+              }
+            ]
+          },
+          {
+            "prompt": "The category of whale is",
+            "ids": [
+              264,
+              25993
+            ],
+            "generated_suffix": " a subset",
+            "step_stats": [
+              {
+                "target_rank": 336.0,
+                "target_margin": 2.5625
+              },
+              {
+                "target_rank": 2275.0,
+                "target_margin": -3.15625
+              }
+            ]
+          },
+          {
+            "prompt": "The category of dolphin is",
+            "ids": [
+              264,
+              1874
+            ],
+            "generated_suffix": " a group",
+            "step_stats": [
+              {
+                "target_rank": 413.0,
+                "target_margin": 2.71875
+              },
+              {
+                "target_rank": 3048.0,
+                "target_margin": -3.46875
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "total_time_min": 0.09
+}

@@ -1,0 +1,894 @@
+{
+  "phase": 533,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 06:37:10",
+  "attn_implementation": "sdpa",
+  "layer": 12,
+  "train_n": 3,
+  "test_n": 3,
+  "bridge_n": 2,
+  "max_new_tokens": 2,
+  "alphas": [
+    8.0
+  ],
+  "random_seeds": [
+    11,
+    23
+  ],
+  "min_abs_delta": 0.25,
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "candidate_meta": {
+    "category_direct": {
+      "family": "category",
+      "own_task": "category_direct",
+      "pos_n": 3,
+      "neg_n": 3
+    },
+    "category_belongs": {
+      "family": "category",
+      "own_task": "category_belongs",
+      "pos_n": 3,
+      "neg_n": 3
+    },
+    "category_kind": {
+      "family": "category",
+      "own_task": "category_kind",
+      "pos_n": 3,
+      "neg_n": 3
+    },
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 3,
+      "neg_n": 3
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "pos_n": 4,
+      "neg_n": 4
+    }
+  },
+  "baseline": {
+    "category_direct": {
+      "target_margin": -2.6458332538604736,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "category_belongs": {
+      "target_margin": 1.1666666269302368,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "category_kind": {
+      "target_margin": -0.8125,
+      "target_top1_rate": 0.0,
+      "n": 3
+    },
+    "color_red_blue": {
+      "target_margin": 1.7708333730697632,
+      "target_top1_rate": 0.3333333333333333,
+      "n": 3
+    },
+    "object_car_truck": {
+      "target_margin": 3.65625,
+      "target_top1_rate": 0.0,
+      "n": 4
+    }
+  },
+  "component_stats": {
+    "category_direct": {
+      "family": "category",
+      "own_task": "category_direct",
+      "parallel_norm_pct": 3.5957891941070557,
+      "perp_norm_pct": 99.93531799316406
+    },
+    "category_belongs": {
+      "family": "category",
+      "own_task": "category_belongs",
+      "parallel_norm_pct": 0.6232796907424927,
+      "perp_norm_pct": 99.99805450439453
+    },
+    "category_kind": {
+      "family": "category",
+      "own_task": "category_kind",
+      "parallel_norm_pct": 4.202345371246338,
+      "perp_norm_pct": 99.91165924072266
+    },
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "parallel_norm_pct": 2.700496196746826,
+      "perp_norm_pct": 99.9635238647461
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "parallel_norm_pct": 1.3954635858535767,
+      "perp_norm_pct": 99.99026489257812
+    }
+  },
+  "admission": {
+    "category_direct": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": 1.3958332538604736,
+        "best_same_family_max_abs": 0.5416667461395264,
+        "best_off_family_max_abs": 0.16666674613952637,
+        "best_selectivity_ratio": 2.5769225045461805,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 1.3958332538604736,
+            "same_family_max_abs": 0.5416667461395264,
+            "off_family_max_abs": 0.16666674613952637
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.26041650772094727,
+        "best_same_family_max_abs": 0.35416674613952637,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 0.7352934831025034,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.26041650772094727,
+            "same_family_max_abs": 0.35416674613952637,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": 1.3749998807907104,
+        "best_same_family_max_abs": 0.5625,
+        "best_off_family_max_abs": 0.20833337306976318,
+        "best_selectivity_ratio": 2.444444189060033,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 1.3749998807907104,
+            "same_family_max_abs": 0.5625,
+            "off_family_max_abs": 0.20833337306976318
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.26041650772094727,
+        "best_same_family_max_abs": 0.35416674613952637,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 0.7352934831025034,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.26041650772094727,
+            "same_family_max_abs": 0.35416674613952637,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.10416650772094727,
+        "best_same_family_max_abs": 0.3124999403953552,
+        "best_off_family_max_abs": 0.2916666269302368,
+        "best_selectivity_ratio": 0.33333287761858,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.10416650772094727,
+            "same_family_max_abs": 0.3124999403953552,
+            "off_family_max_abs": 0.2916666269302368
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.45833325386047363,
+        "best_same_family_max_abs": 0.3125,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 1.466666365420192,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.45833325386047363,
+            "same_family_max_abs": 0.3125,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      }
+    },
+    "category_belongs": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.47916650772094727,
+        "best_off_family_max_abs": 0.34375,
+        "best_selectivity_ratio": 0.3913044694604363,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.47916650772094727,
+            "off_family_max_abs": 0.34375
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.3749999403953552,
+        "best_same_family_max_abs": 0.3333333730697632,
+        "best_off_family_max_abs": 0.125,
+        "best_selectivity_ratio": 1.1249996533256668,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.3749999403953552,
+            "same_family_max_abs": 0.3333333730697632,
+            "off_family_max_abs": 0.125
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.47916650772094727,
+        "best_off_family_max_abs": 0.34375,
+        "best_selectivity_ratio": 0.3913044694604363,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.47916650772094727,
+            "off_family_max_abs": 0.34375
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.35416674613952637,
+        "best_same_family_max_abs": 0.3541666567325592,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 1.0000002242079074,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.35416674613952637,
+            "same_family_max_abs": 0.3541666567325592,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.2083333134651184,
+        "best_same_family_max_abs": 0.08333349227905273,
+        "best_off_family_max_abs": 0.1875,
+        "best_selectivity_ratio": 1.1111109458880477,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.2083333134651184,
+            "same_family_max_abs": 0.08333349227905273,
+            "off_family_max_abs": 0.1875
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.0625,
+        "best_same_family_max_abs": 0.34375,
+        "best_off_family_max_abs": 0.47916674613952637,
+        "best_selectivity_ratio": 0.13043475825313916,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.0625,
+            "same_family_max_abs": 0.34375,
+            "off_family_max_abs": 0.47916674613952637
+          }
+        ]
+      }
+    },
+    "category_kind": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.375,
+        "best_same_family_max_abs": 1.0416666269302368,
+        "best_off_family_max_abs": 0.4791666269302368,
+        "best_selectivity_ratio": 0.3600000102769105,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.375,
+            "same_family_max_abs": 1.0416666269302368,
+            "off_family_max_abs": 0.4791666269302368
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.3541666567325592,
+        "best_same_family_max_abs": 0.35416674613952637,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 0.9999997193215754,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.3541666567325592,
+            "same_family_max_abs": 0.35416674613952637,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.3333333432674408,
+        "best_same_family_max_abs": 0.9791666269302368,
+        "best_off_family_max_abs": 0.4583333730697632,
+        "best_selectivity_ratio": 0.34042555239878947,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.3333333432674408,
+            "same_family_max_abs": 0.9791666269302368,
+            "off_family_max_abs": 0.4583333730697632
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.3541666567325592,
+        "best_same_family_max_abs": 0.35416674613952637,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 0.9999997193215754,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.3541666567325592,
+            "same_family_max_abs": 0.35416674613952637,
+            "off_family_max_abs": 0.234375
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.25,
+        "best_same_family_max_abs": 0.29166674613952637,
+        "best_off_family_max_abs": 0.3333333730697632,
+        "best_selectivity_ratio": 0.7499998880930495,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.25,
+            "same_family_max_abs": 0.29166674613952637,
+            "off_family_max_abs": 0.3333333730697632
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1666666865348816,
+        "best_same_family_max_abs": 0.47916674613952637,
+        "best_off_family_max_abs": 0.9166666865348816,
+        "best_selectivity_ratio": 0.18181819756832354,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1666666865348816,
+            "same_family_max_abs": 0.47916674613952637,
+            "off_family_max_abs": 0.9166666865348816
+          }
+        ]
+      }
+    },
+    "color_red_blue_direct": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.3541666269302368,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.125,
+        "best_selectivity_ratio": 2.8333327887752717,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.3541666269302368,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.3958333432674408,
+        "best_selectivity_ratio": 0.473684186671651,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3958333432674408
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.22916662693023682,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.15625,
+        "best_selectivity_ratio": 1.4666663184868713,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.22916662693023682,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.15625
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.3958333432674408,
+        "best_selectivity_ratio": 0.473684186671651,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3958333432674408
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.08333337306976318,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.3333333730697632,
+        "best_selectivity_ratio": 0.25000008190695494,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.08333337306976318,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3333333730697632
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.3333333730697632,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.7291666269302368,
+        "best_selectivity_ratio": 0.45714293028145625,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.3333333730697632,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.7291666269302368
+          }
+        ]
+      }
+    },
+    "object_desc_car_truck": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.265625,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.47916650772094727,
+        "best_selectivity_ratio": 0.5543479984022847,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.265625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.47916650772094727
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.36458349227905273,
+        "best_selectivity_ratio": 0.5142854759689243,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.36458349227905273
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.28125,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.5,
+        "best_selectivity_ratio": 0.5624999887500002,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.28125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.5
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.1875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.36458349227905273,
+        "best_selectivity_ratio": 0.5142854759689243,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.36458349227905273
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.203125,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.3125,
+        "best_selectivity_ratio": 0.6499999792000006,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.203125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3125
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.234375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.7291666269302368,
+        "best_selectivity_ratio": 0.3214285845368757,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.234375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.7291666269302368
+          }
+        ]
+      }
+    }
+  },
+  "random_perp_summary": {
+    "category_direct": {
+      "max_own_delta": 0.45833325386047363,
+      "mean_own_delta": 0.28124988079071045,
+      "strict_pass_count": 0
+    },
+    "category_belongs": {
+      "max_own_delta": 0.0625,
+      "mean_own_delta": -0.0729166567325592,
+      "strict_pass_count": 0
+    },
+    "category_kind": {
+      "max_own_delta": 0.1666666865348816,
+      "mean_own_delta": -0.041666656732559204,
+      "strict_pass_count": 0
+    },
+    "color_red_blue_direct": {
+      "max_own_delta": 0.3333333730697632,
+      "mean_own_delta": 0.125,
+      "strict_pass_count": 0
+    },
+    "object_desc_car_truck": {
+      "max_own_delta": 0.234375,
+      "mean_own_delta": 0.21875,
+      "strict_pass_count": 0
+    }
+  },
+  "template_cosines": {
+    "category_direct": {
+      "category_direct": 1.0,
+      "category_belongs": 0.2635944187641144,
+      "category_kind": 0.36084532737731934
+    },
+    "category_belongs": {
+      "category_direct": 0.2635944187641144,
+      "category_belongs": 1.0000001192092896,
+      "category_kind": 0.21713145077228546
+    },
+    "category_kind": {
+      "category_direct": 0.36084532737731934,
+      "category_belongs": 0.21713145077228546,
+      "category_kind": 0.9999999403953552
+    }
+  },
+  "generation_bridge": {
+    "category_direct": {
+      "baseline": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "perp": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "random_readout": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              25993
+            ],
+            "text": "The category of kiwi is a subset"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      }
+    },
+    "category_belongs": {
+      "baseline": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "perp": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "random_readout": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              25993
+            ],
+            "text": "The category of kiwi is a subset"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      }
+    },
+    "category_kind": {
+      "baseline": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "perp": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of kiwi is a type"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      },
+      "random_readout": {
+        "hit_rate": 0.0,
+        "step_hit_rates": [
+          0.0,
+          0.0
+        ],
+        "n": 2,
+        "sample_outputs": [
+          {
+            "prompt": "The category of kiwi is",
+            "ids": [
+              264,
+              25993
+            ],
+            "text": "The category of kiwi is a subset"
+          },
+          {
+            "prompt": "The category of melon is",
+            "ids": [
+              264,
+              943
+            ],
+            "text": "The category of melon is a type"
+          }
+        ]
+      }
+    }
+  },
+  "total_time_min": 0.11
+}

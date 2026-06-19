@@ -1,0 +1,158 @@
+{
+  "phase": 528,
+  "model": "deepseek7b",
+  "timestamp": "2026-06-18 22:31:31",
+  "attn_implementation": "sdpa",
+  "layer": 18,
+  "alpha": 8.0,
+  "train_n": 10,
+  "test_n": 6,
+  "model_info": {
+    "n_layers": 28,
+    "d_model": 3584,
+    "class": "Qwen2ForCausalLM"
+  },
+  "baseline": {
+    "category": {
+      "target_margin": -0.4635416567325592,
+      "target_top1_rate": 0.0,
+      "n": 6
+    },
+    "color": {
+      "target_margin": 0.1458333283662796,
+      "target_top1_rate": 0.0,
+      "n": 6
+    },
+    "object": {
+      "target_margin": 5.34375,
+      "target_top1_rate": 0.16666666666666666,
+      "n": 6
+    }
+  },
+  "selectivity": {
+    "category": {
+      "category": {
+        "target_margin": -0.4479166567325592,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": 0.015625,
+        "delta_top1": 0.0
+      },
+      "color": {
+        "target_margin": 0.1666666716337204,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": 0.020833343267440796,
+        "delta_top1": 0.0
+      },
+      "object": {
+        "target_margin": 5.239583492279053,
+        "target_top1_rate": 0.16666666666666666,
+        "n": 6,
+        "delta_margin": -0.10416650772094727,
+        "delta_top1": 0.0
+      }
+    },
+    "color": {
+      "category": {
+        "target_margin": -0.4583333432674408,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": 0.005208313465118408,
+        "delta_top1": 0.0
+      },
+      "color": {
+        "target_margin": 0.1458333283662796,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": 0.0,
+        "delta_top1": 0.0
+      },
+      "object": {
+        "target_margin": 5.177083492279053,
+        "target_top1_rate": 0.16666666666666666,
+        "n": 6,
+        "delta_margin": -0.16666650772094727,
+        "delta_top1": 0.0
+      }
+    },
+    "object": {
+      "category": {
+        "target_margin": -0.4375,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": 0.026041656732559204,
+        "delta_top1": 0.0
+      },
+      "color": {
+        "target_margin": 0.0625,
+        "target_top1_rate": 0.0,
+        "n": 6,
+        "delta_margin": -0.0833333283662796,
+        "delta_top1": 0.0
+      },
+      "object": {
+        "target_margin": 5.333333492279053,
+        "target_top1_rate": 0.16666666666666666,
+        "n": 6,
+        "delta_margin": -0.010416507720947266,
+        "delta_top1": 0.0
+      }
+    }
+  },
+  "cos_matrix": {
+    "category": {
+      "category": 1.0,
+      "color": 0.010422262363135815,
+      "object": 0.04672357439994812
+    },
+    "color": {
+      "category": 0.010422262363135815,
+      "color": 1.0,
+      "object": 0.03619402274489403
+    },
+    "object": {
+      "category": 0.04672357439994812,
+      "color": 0.03619402274489403,
+      "object": 1.0
+    }
+  },
+  "readout_alignment": {
+    "category": {
+      "norm": 70.13822937011719,
+      "readout_norm_pct": 0.5159486532211304,
+      "semantic_norm_pct": 99.99867248535156,
+      "cos_to_readout": -0.0051594870164990425
+    },
+    "color": {
+      "norm": 46.420963287353516,
+      "readout_norm_pct": 1.7704825401306152,
+      "semantic_norm_pct": 99.98432159423828,
+      "cos_to_readout": 0.017704825848340988
+    },
+    "object": {
+      "norm": 65.09708404541016,
+      "readout_norm_pct": 0.27600809931755066,
+      "semantic_norm_pct": 99.99962615966797,
+      "cos_to_readout": -0.002760081086307764
+    }
+  },
+  "positive_control": {
+    "category": {
+      "own_task_delta_margin": 0.015625,
+      "own_task_delta_top1": 0.0,
+      "max_other_abs_delta_margin": 0.10416650772094727
+    },
+    "color": {
+      "own_task_delta_margin": 0.0,
+      "own_task_delta_top1": 0.0,
+      "max_other_abs_delta_margin": 0.16666650772094727
+    },
+    "object": {
+      "own_task_delta_margin": -0.010416507720947266,
+      "own_task_delta_top1": 0.0,
+      "max_other_abs_delta_margin": 0.0833333283662796
+    }
+  },
+  "total_time_min": 0.13
+}

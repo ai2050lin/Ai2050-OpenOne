@@ -1,0 +1,2950 @@
+{
+  "phase": 532,
+  "model": "glm4",
+  "timestamp": "2026-06-19 06:02:07",
+  "attn_implementation": "sdpa",
+  "layer": 26,
+  "train_n": 10,
+  "test_n": 8,
+  "alphas": [
+    8.0,
+    12.0
+  ],
+  "random_seeds": [
+    11,
+    23,
+    37,
+    41
+  ],
+  "min_abs_delta": 0.25,
+  "model_info": {
+    "n_layers": 40,
+    "d_model": 4096,
+    "class": "GlmForCausalLM"
+  },
+  "candidate_meta": {
+    "category_fruit": {
+      "family": "category",
+      "own_task": "category_fruit",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_black_white_direct": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "pos_n": 4,
+      "neg_n": 4
+    }
+  },
+  "baseline": {
+    "category_fruit": {
+      "target_margin": 3.236328125,
+      "target_top1_rate": 0.0,
+      "n": 8
+    },
+    "color_red_blue": {
+      "target_margin": 2.8515625,
+      "target_top1_rate": 0.875,
+      "n": 8
+    },
+    "color_black_white": {
+      "target_margin": 2.1640625,
+      "target_top1_rate": 1.0,
+      "n": 8
+    },
+    "object_car_truck": {
+      "target_margin": 4.5576171875,
+      "target_top1_rate": 0.0,
+      "n": 4
+    }
+  },
+  "component_stats": {
+    "category_fruit": {
+      "family": "category",
+      "own_task": "category_fruit",
+      "norm": 11.906465530395508,
+      "parallel_norm_pct": 4.7823381423950195,
+      "perp_norm_pct": 99.88558959960938,
+      "cos_to_readout": 0.04782337695360184
+    },
+    "color_red_blue_direct": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "norm": 9.653219223022461,
+      "parallel_norm_pct": 32.06427764892578,
+      "perp_norm_pct": 94.72002410888672,
+      "cos_to_readout": 0.32064276933670044
+    },
+    "color_black_white_direct": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "norm": 8.844358444213867,
+      "parallel_norm_pct": 30.269350051879883,
+      "perp_norm_pct": 95.30878448486328,
+      "cos_to_readout": 0.3026934564113617
+    },
+    "object_desc_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "norm": 11.516101837158203,
+      "parallel_norm_pct": 5.555938720703125,
+      "perp_norm_pct": 99.84555053710938,
+      "cos_to_readout": 0.05555938184261322
+    }
+  },
+  "admission": {
+    "category_fruit": {
+      "full": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.1982421875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.6484375,
+        "best_selectivity_ratio": 0.30572288685150245,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.1982421875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.6484375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.5361328125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.96875
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 7.2991943359375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.74609375,
+        "best_selectivity_ratio": 9.78321321965955,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.36181640625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3984375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 7.2991943359375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.74609375
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.453125,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.671875,
+        "best_selectivity_ratio": 0.6744185946133046,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.453125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.671875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.849609375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.96875
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 12.0,
+        "best_own_delta": 7.2991943359375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.74609375,
+        "best_selectivity_ratio": 9.78321321965955,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.36181640625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3984375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 7.2991943359375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.74609375
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.2021484375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.37939453125,
+        "best_selectivity_ratio": 0.5328185187746162,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.2021484375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.37939453125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.3212890625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.625
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.85009765625,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.642578125,
+        "best_selectivity_ratio": 1.3229483076793453,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.5537109375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3798828125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.85009765625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.642578125
+          }
+        ]
+      },
+      "random_perp_37": {
+        "best_alpha": 12.0,
+        "best_own_delta": 1.1009521484375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.6484375,
+        "best_selectivity_ratio": 1.6978538894788797,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.7744140625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.390625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 1.1009521484375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.6484375
+          }
+        ]
+      },
+      "random_perp_41": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.5849609375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.5478515625,
+        "best_selectivity_ratio": 1.0677361658937283,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.5849609375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.5478515625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.9501953125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.83935546875
+          }
+        ]
+      }
+    },
+    "color_red_blue_direct": {
+      "full": {
+        "best_alpha": 12.0,
+        "best_own_delta": 7.368804931640625,
+        "best_same_family_max_abs": 0.27734375,
+        "best_off_family_max_abs": 0.5986328125,
+        "best_selectivity_ratio": 12.309390088012798,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.3857421875,
+            "same_family_max_abs": 0.04296875,
+            "off_family_max_abs": 0.3603515625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 7.368804931640625,
+            "same_family_max_abs": 0.27734375,
+            "off_family_max_abs": 0.5986328125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 8.40655517578125,
+        "best_same_family_max_abs": 0.7578125,
+        "best_off_family_max_abs": 0.9892578125,
+        "best_selectivity_ratio": 8.49784048665559,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.75439453125,
+            "same_family_max_abs": 0.4140625,
+            "off_family_max_abs": 0.66796875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 8.40655517578125,
+            "same_family_max_abs": 0.7578125,
+            "off_family_max_abs": 0.9892578125
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 12.0,
+        "best_own_delta": 5.3271484375,
+        "best_same_family_max_abs": 0.05078125,
+        "best_off_family_max_abs": 0.943603515625,
+        "best_selectivity_ratio": 5.645536809510689,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 3.888671875,
+            "same_family_max_abs": 0.140625,
+            "off_family_max_abs": 0.6787109375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 5.3271484375,
+            "same_family_max_abs": 0.05078125,
+            "off_family_max_abs": 0.943603515625
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 12.0,
+        "best_own_delta": 8.40655517578125,
+        "best_same_family_max_abs": 0.7578125,
+        "best_off_family_max_abs": 0.9892578125,
+        "best_selectivity_ratio": 8.49784048665559,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.75439453125,
+            "same_family_max_abs": 0.4140625,
+            "off_family_max_abs": 0.66796875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 8.40655517578125,
+            "same_family_max_abs": 0.7578125,
+            "off_family_max_abs": 0.9892578125
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.59765625,
+        "best_same_family_max_abs": 0.0546875,
+        "best_off_family_max_abs": 0.1083984375,
+        "best_selectivity_ratio": 5.513513004879521,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.38671875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.07421875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.59765625,
+            "same_family_max_abs": 0.0546875,
+            "off_family_max_abs": 0.1083984375
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 12.0,
+        "best_own_delta": -0.0390625,
+        "best_same_family_max_abs": 0.41015625,
+        "best_off_family_max_abs": 0.54931640625,
+        "best_selectivity_ratio": 0.07111110981657286,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.0546875,
+            "same_family_max_abs": 0.2578125,
+            "off_family_max_abs": 0.3134765625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.0390625,
+            "same_family_max_abs": 0.41015625,
+            "off_family_max_abs": 0.54931640625
+          }
+        ]
+      },
+      "random_perp_37": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.00390625,
+        "best_same_family_max_abs": 0.26953125,
+        "best_off_family_max_abs": 0.42919921875,
+        "best_selectivity_ratio": 0.009101251210018629,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.0078125,
+            "same_family_max_abs": 0.1171875,
+            "off_family_max_abs": 0.2763671875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.00390625,
+            "same_family_max_abs": 0.26953125,
+            "off_family_max_abs": 0.42919921875
+          }
+        ]
+      },
+      "random_perp_41": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.28125,
+        "best_same_family_max_abs": 0.09375,
+        "best_off_family_max_abs": 0.2861328125,
+        "best_selectivity_ratio": 0.9829351192312095,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.28125,
+            "same_family_max_abs": 0.09375,
+            "off_family_max_abs": 0.2861328125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.4765625,
+            "same_family_max_abs": 0.1796875,
+            "off_family_max_abs": 0.5068359375
+          }
+        ]
+      }
+    },
+    "color_black_white_direct": {
+      "full": {
+        "best_alpha": 12.0,
+        "best_own_delta": 5.322265625,
+        "best_same_family_max_abs": 0.0625,
+        "best_off_family_max_abs": 0.1845703125,
+        "best_selectivity_ratio": 28.83597727364864,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 3.9453125,
+            "same_family_max_abs": 0.0390625,
+            "off_family_max_abs": 0.169921875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 5.322265625,
+            "same_family_max_abs": 0.0625,
+            "off_family_max_abs": 0.1845703125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 8.13525390625,
+        "best_same_family_max_abs": 0.02734375,
+        "best_off_family_max_abs": 0.4306640625,
+        "best_selectivity_ratio": 18.890022237111502,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 6.10546875,
+            "same_family_max_abs": 0.0859375,
+            "off_family_max_abs": 0.31689453125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 8.13525390625,
+            "same_family_max_abs": 0.02734375,
+            "off_family_max_abs": 0.4306640625
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 12.0,
+        "best_own_delta": 3.19921875,
+        "best_same_family_max_abs": 0.0703125,
+        "best_off_family_max_abs": 0.0888671875,
+        "best_selectivity_ratio": 35.99999594901145,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 2.25390625,
+            "same_family_max_abs": 0.04296875,
+            "off_family_max_abs": 0.0830078125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 3.19921875,
+            "same_family_max_abs": 0.0703125,
+            "off_family_max_abs": 0.0888671875
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 12.0,
+        "best_own_delta": 8.13525390625,
+        "best_same_family_max_abs": 0.02734375,
+        "best_off_family_max_abs": 0.4306640625,
+        "best_selectivity_ratio": 18.890022237111502,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 6.10546875,
+            "same_family_max_abs": 0.0859375,
+            "off_family_max_abs": 0.31689453125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 8.13525390625,
+            "same_family_max_abs": 0.02734375,
+            "off_family_max_abs": 0.4306640625
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.03515625,
+        "best_same_family_max_abs": 0.44140625,
+        "best_off_family_max_abs": 0.375,
+        "best_selectivity_ratio": 0.07964601589474513,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.015625,
+            "same_family_max_abs": 0.28125,
+            "off_family_max_abs": 0.2939453125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.03515625,
+            "same_family_max_abs": 0.44140625,
+            "off_family_max_abs": 0.375
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 12.0,
+        "best_own_delta": 1.0625,
+        "best_same_family_max_abs": 0.05078125,
+        "best_off_family_max_abs": 0.2333984375,
+        "best_selectivity_ratio": 4.55230106018593,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.6796875,
+            "same_family_max_abs": 0.01953125,
+            "off_family_max_abs": 0.1728515625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 1.0625,
+            "same_family_max_abs": 0.05078125,
+            "off_family_max_abs": 0.2333984375
+          }
+        ]
+      },
+      "random_perp_37": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.234375,
+        "best_same_family_max_abs": 0.5234375,
+        "best_off_family_max_abs": 0.8193359375,
+        "best_selectivity_ratio": 0.2860548236839077,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.1484375,
+            "same_family_max_abs": 0.34375,
+            "off_family_max_abs": 0.5146484375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.234375,
+            "same_family_max_abs": 0.5234375,
+            "off_family_max_abs": 0.8193359375
+          }
+        ]
+      },
+      "random_perp_41": {
+        "best_alpha": 12.0,
+        "best_own_delta": 0.3125,
+        "best_same_family_max_abs": 0.140625,
+        "best_off_family_max_abs": 1.185302734375,
+        "best_selectivity_ratio": 0.2636457238313226,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.171875,
+            "same_family_max_abs": 0.08984375,
+            "off_family_max_abs": 0.83056640625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.3125,
+            "same_family_max_abs": 0.140625,
+            "off_family_max_abs": 1.185302734375
+          }
+        ]
+      }
+    },
+    "object_desc_car_truck": {
+      "full": {
+        "best_alpha": 12.0,
+        "best_own_delta": 1.6979904174804688,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.48828125,
+        "best_selectivity_ratio": 3.4774843037811216,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 1.356201171875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.32421875
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 1.6979904174804688,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.48828125
+          }
+        ]
+      },
+      "parallel": {
+        "best_alpha": 12.0,
+        "best_own_delta": 7.7021484375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.6025390625,
+        "best_selectivity_ratio": 12.7828198850955,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.85308837890625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.4736328125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 7.7021484375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.6025390625
+          }
+        ]
+      },
+      "perp": {
+        "best_alpha": 12.0,
+        "best_own_delta": 1.254150390625,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.47265625,
+        "best_selectivity_ratio": 2.65340903477085,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 1.045989990234375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3203125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 1.254150390625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.47265625
+          }
+        ]
+      },
+      "random_readout": {
+        "best_alpha": 12.0,
+        "best_own_delta": 7.7021484375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.6025390625,
+        "best_selectivity_ratio": 12.7828198850955,
+        "passes_ratio_gate": true,
+        "passes_absolute_gate": true,
+        "passes_strict_gate": true,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 5.85308837890625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.4736328125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 7.7021484375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.6025390625
+          }
+        ]
+      },
+      "random_perp_11": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.013671875,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.37890625,
+        "best_selectivity_ratio": 0.036082473274524414,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.013671875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.37890625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.029296875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.6015625
+          }
+        ]
+      },
+      "random_perp_23": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.318359375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.234375,
+        "best_selectivity_ratio": 1.3583332753777804,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.318359375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.234375
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.498046875,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.41015625
+          }
+        ]
+      },
+      "random_perp_37": {
+        "best_alpha": 8.0,
+        "best_own_delta": 0.12890625,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.3056640625,
+        "best_selectivity_ratio": 0.4217252258195964,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": 0.12890625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.3056640625
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": 0.1025390625,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.46435546875
+          }
+        ]
+      },
+      "random_perp_41": {
+        "best_alpha": 8.0,
+        "best_own_delta": -0.2734375,
+        "best_same_family_max_abs": 0.0,
+        "best_off_family_max_abs": 0.30078125,
+        "best_selectivity_ratio": 0.909090878866589,
+        "passes_ratio_gate": false,
+        "passes_absolute_gate": false,
+        "passes_strict_gate": false,
+        "alpha_rows": [
+          {
+            "alpha": 8.0,
+            "own_delta": -0.2734375,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.30078125
+          },
+          {
+            "alpha": 12.0,
+            "own_delta": -0.486328125,
+            "same_family_max_abs": 0.0,
+            "off_family_max_abs": 0.435546875
+          }
+        ]
+      }
+    }
+  },
+  "random_perp_summary": {
+    "category_fruit": {
+      "seeds": [
+        11,
+        23,
+        37,
+        41
+      ],
+      "own_delta_values": [
+        -0.2021484375,
+        0.85009765625,
+        1.1009521484375,
+        -0.5849609375
+      ],
+      "mean_own_delta": 0.290985107421875,
+      "max_own_delta": 1.1009521484375,
+      "strict_pass_count": 0
+    },
+    "color_red_blue_direct": {
+      "seeds": [
+        11,
+        23,
+        37,
+        41
+      ],
+      "own_delta_values": [
+        0.59765625,
+        -0.0390625,
+        0.00390625,
+        -0.28125
+      ],
+      "mean_own_delta": 0.0703125,
+      "max_own_delta": 0.59765625,
+      "strict_pass_count": 1
+    },
+    "color_black_white_direct": {
+      "seeds": [
+        11,
+        23,
+        37,
+        41
+      ],
+      "own_delta_values": [
+        0.03515625,
+        1.0625,
+        0.234375,
+        0.3125
+      ],
+      "mean_own_delta": 0.4111328125,
+      "max_own_delta": 1.0625,
+      "strict_pass_count": 1
+    },
+    "object_desc_car_truck": {
+      "seeds": [
+        11,
+        23,
+        37,
+        41
+      ],
+      "own_delta_values": [
+        -0.013671875,
+        -0.318359375,
+        0.12890625,
+        -0.2734375
+      ],
+      "mean_own_delta": -0.119140625,
+      "max_own_delta": 0.12890625,
+      "strict_pass_count": 0
+    }
+  },
+  "sweep": {
+    "category_fruit": {
+      "full": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.0380859375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.1982421875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.38671875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.53515625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.515625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.6484375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.16796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.3896484375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.7001953125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.5361328125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.78125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.9296875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.1953125,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": -0.96875,
+            "delta_top1": -0.25
+          },
+          "object_car_truck": {
+            "target_margin": 3.8466796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.7109375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 8.59814453125,
+            "target_top1_rate": 0.25,
+            "n": 8,
+            "delta_margin": 5.36181640625,
+            "delta_top1": 0.25
+          },
+          "color_red_blue": {
+            "target_margin": 2.7421875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.5390625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.1591796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.3984375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 10.5355224609375,
+            "target_top1_rate": 0.375,
+            "n": 8,
+            "delta_margin": 7.2991943359375,
+            "delta_top1": 0.375
+          },
+          "color_red_blue": {
+            "target_margin": 2.8046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.91015625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.74609375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.87451171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.68310546875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.783203125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.453125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.40625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.5546875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.4921875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.671875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.2099609375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.34765625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.38671875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.849609375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.76953125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.91796875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.1953125,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": -0.96875,
+            "delta_top1": -0.25
+          },
+          "object_car_truck": {
+            "target_margin": 3.88671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.6708984375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_readout": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 8.59814453125,
+            "target_top1_rate": 0.25,
+            "n": 8,
+            "delta_margin": 5.36181640625,
+            "delta_top1": 0.25
+          },
+          "color_red_blue": {
+            "target_margin": 2.7421875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.109375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.5390625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.1591796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.3984375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 10.5355224609375,
+            "target_top1_rate": 0.375,
+            "n": 8,
+            "delta_margin": 7.2991943359375,
+            "delta_top1": 0.375
+          },
+          "color_red_blue": {
+            "target_margin": 2.8046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.046875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.91015625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.74609375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.87451171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.68310546875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_11": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.0341796875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.2021484375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.61328125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.23828125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.48828125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.32421875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.17822265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.37939453125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.9150390625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.3212890625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.5,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.3515625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.73046875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.56640625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.9326171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_23": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.7900390625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.5537109375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.13671875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.28515625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.3671875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.203125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.9375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.3798828125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 4.08642578125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.85009765625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.3046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.453125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.4921875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.328125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 5.2001953125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.642578125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_37": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 4.0107421875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.7744140625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.9765625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.5546875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.390625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.8397216796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.2821044921875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 4.3372802734375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 1.1009521484375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.03125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.1796875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.8125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.6484375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 5.04150390625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.48388671875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_41": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.6513671875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.5849609375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.77734375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.07421875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.921875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.2421875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.009765625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.5478515625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.2861328125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.9501953125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.75390625,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": -0.09765625,
+            "delta_top1": -0.125
+          },
+          "color_black_white": {
+            "target_margin": 1.84375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.3203125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 3.71826171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.83935546875,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_red_blue_direct": {
+      "full": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.54248046875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.30615234375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 8.2373046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 5.3857421875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.20703125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.04296875,
+            "delta_top1": -0.125
+          },
+          "object_car_truck": {
+            "target_margin": 4.91796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.3603515625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.60205078125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.36572265625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 10.220367431640625,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 7.368804931640625,
+            "delta_top1": -0.125
+          },
+          "color_black_white": {
+            "target_margin": 2.44140625,
+            "target_top1_rate": 0.25,
+            "n": 8,
+            "delta_margin": 0.27734375,
+            "delta_top1": -0.75
+          },
+          "object_car_truck": {
+            "target_margin": 5.15625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.5986328125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.568359375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.66796875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 8.60595703125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 5.75439453125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.4140625,
+            "delta_top1": -0.125
+          },
+          "object_car_truck": {
+            "target_margin": 4.6513671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.2470703125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.9892578125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 11.25811767578125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 8.40655517578125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.921875,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 0.7578125,
+            "delta_top1": -0.25
+          },
+          "object_car_truck": {
+            "target_margin": 4.6904296875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1328125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.9150390625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.6787109375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 6.740234375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 3.888671875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.0234375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.140625,
+            "delta_top1": -0.125
+          },
+          "object_car_truck": {
+            "target_margin": 4.892578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.3349609375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 4.179931640625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.943603515625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 8.1787109375,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 5.3271484375,
+            "delta_top1": -0.125
+          },
+          "color_black_white": {
+            "target_margin": 2.21484375,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 0.05078125,
+            "delta_top1": -0.25
+          },
+          "object_car_truck": {
+            "target_margin": 5.095703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.5380859375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_readout": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.568359375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.66796875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 8.60595703125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 5.75439453125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.578125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.4140625,
+            "delta_top1": -0.125
+          },
+          "object_car_truck": {
+            "target_margin": 4.6513671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.2470703125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.9892578125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 11.25811767578125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 8.40655517578125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.921875,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 0.7578125,
+            "delta_top1": -0.25
+          },
+          "object_car_truck": {
+            "target_margin": 4.6904296875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1328125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_11": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.2890625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.052734375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.23828125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.38671875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.1640625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.0,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.6318359375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.07421875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.3203125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.083984375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.44921875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.59765625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.21875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.0546875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.666015625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1083984375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_23": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.43701171875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.20068359375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.796875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.0546875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.2578125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.244140625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.3134765625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.54736328125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.31103515625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.8125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.0390625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.57421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.41015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.00830078125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.54931640625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_37": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.9599609375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.2763671875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.84375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.0078125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.28125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1171875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.828125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.2705078125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.80712890625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.42919921875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.85546875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.00390625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.43359375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.26953125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.892578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.3349609375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_41": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.966796875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.26953125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.5703125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.28125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.2578125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.271484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.2861328125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.814453125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.421875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.4765625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.34375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1796875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.05078125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.5068359375,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "color_black_white_direct": {
+      "full": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.40625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.169921875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.8125,
+            "target_top1_rate": 0.125,
+            "n": 8,
+            "delta_margin": -0.0390625,
+            "delta_top1": -0.75
+          },
+          "color_black_white": {
+            "target_margin": 6.109375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 3.9453125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.62744140625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.06982421875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.4208984375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.1845703125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.7890625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.0625,
+            "delta_top1": -0.875
+          },
+          "color_black_white": {
+            "target_margin": 7.486328125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 5.322265625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.5810546875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0234375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.55322265625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.31689453125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.765625,
+            "target_top1_rate": 0.25,
+            "n": 8,
+            "delta_margin": -0.0859375,
+            "delta_top1": -0.625
+          },
+          "color_black_white": {
+            "target_margin": 8.26953125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 6.10546875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.4697265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.087890625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.6669921875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.4306640625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.82421875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.02734375,
+            "delta_top1": -0.875
+          },
+          "color_black_white": {
+            "target_margin": 10.29931640625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 8.13525390625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.451171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1064453125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.2939453125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.0576171875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.89453125,
+            "target_top1_rate": 0.375,
+            "n": 8,
+            "delta_margin": 0.04296875,
+            "delta_top1": -0.5
+          },
+          "color_black_white": {
+            "target_margin": 4.41796875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 2.25390625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0830078125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.291748046875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.055419921875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.921875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.0703125,
+            "delta_top1": -0.875
+          },
+          "color_black_white": {
+            "target_margin": 5.36328125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 3.19921875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.646484375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0888671875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_readout": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.55322265625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.31689453125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.765625,
+            "target_top1_rate": 0.25,
+            "n": 8,
+            "delta_margin": -0.0859375,
+            "delta_top1": -0.625
+          },
+          "color_black_white": {
+            "target_margin": 8.26953125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 6.10546875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.4697265625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.087890625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.6669921875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.4306640625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.82421875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.02734375,
+            "delta_top1": -0.875
+          },
+          "color_black_white": {
+            "target_margin": 10.29931640625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 8.13525390625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.451171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.1064453125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_11": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.4130859375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.1767578125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.1328125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.28125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.1484375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.8515625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.2939453125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.41015625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.173828125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.29296875,
+            "target_top1_rate": 0.75,
+            "n": 8,
+            "delta_margin": 0.44140625,
+            "delta_top1": -0.125
+          },
+          "color_black_white": {
+            "target_margin": 2.19921875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.03515625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.9326171875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_23": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.0634765625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.1728515625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.87109375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.01953125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.84375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.6796875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0673828125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.0029296875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.2333984375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.90234375,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.05078125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 3.2265625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 1.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.61328125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.0556640625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_37": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.7216796875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.5146484375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.5078125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.34375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.3125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1484375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.79638671875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.23876953125,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.4169921875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.8193359375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.328125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.5234375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.3984375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.890625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.3330078125,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_41": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 4.06689453125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.83056640625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.94140625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.08984375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.3359375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.171875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.4921875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.0654296875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 4.421630859375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 1.185302734375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.9921875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.140625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.4765625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.3125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.47802734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.07958984375,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    },
+    "object_desc_car_truck": {
+      "full": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.4921875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.255859375,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.17578125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.32421875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.8671875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.296875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 5.913818359375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 1.356201171875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.5625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.326171875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.33984375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.48828125,
+            "delta_top1": 0.125
+          },
+          "color_black_white": {
+            "target_margin": 1.796875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.3671875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 6.255607604980469,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 1.6979904174804688,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "parallel": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.7099609375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.4736328125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.06640625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.21484375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.296875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1328125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 10.41070556640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 5.85308837890625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.8388671875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.6025390625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.1796875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.328125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.2578125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 12.259765625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 7.7021484375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "perp": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.453125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.216796875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.171875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.3203125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 1.875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.2890625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 5.603607177734375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 1.045989990234375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.50439453125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.26806640625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.32421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.47265625,
+            "delta_top1": 0.125
+          },
+          "color_black_white": {
+            "target_margin": 1.78125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": -0.3828125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 5.811767578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 1.254150390625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_readout": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.7099609375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.4736328125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.06640625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.21484375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.296875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1328125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 10.41070556640625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 5.85308837890625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.8388671875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.6025390625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.1796875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.328125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.2578125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 12.259765625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 7.7021484375,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_11": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.275390625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.0390625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.23046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.37890625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.171875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.0078125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.5439453125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.013671875,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.3115234375,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.0751953125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 3.453125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.6015625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.2265625,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.5283203125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.029296875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_23": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 3.42431640625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.18798828125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.80078125,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.05078125,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.3984375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.234375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.2392578125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.318359375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 3.54736328125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": 0.31103515625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.81640625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.03515625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.57421875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.41015625,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.0595703125,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.498046875,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_37": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.9306640625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.3056640625,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.9140625,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.0625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.296875,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1328125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.6865234375,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.12890625,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.77197265625,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.46435546875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.98046875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": 0.12890625,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.43359375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.26953125,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.66015625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": 0.1025390625,
+            "delta_top1": 0.0
+          }
+        }
+      },
+      "random_perp_41": {
+        "8.0": {
+          "category_fruit": {
+            "target_margin": 2.935546875,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.30078125,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.671875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.1796875,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.2578125,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.09375,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.2841796875,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.2734375,
+            "delta_top1": 0.0
+          }
+        },
+        "12.0": {
+          "category_fruit": {
+            "target_margin": 2.80078125,
+            "target_top1_rate": 0.0,
+            "n": 8,
+            "delta_margin": -0.435546875,
+            "delta_top1": 0.0
+          },
+          "color_red_blue": {
+            "target_margin": 2.54296875,
+            "target_top1_rate": 0.875,
+            "n": 8,
+            "delta_margin": -0.30859375,
+            "delta_top1": 0.0
+          },
+          "color_black_white": {
+            "target_margin": 2.34375,
+            "target_top1_rate": 1.0,
+            "n": 8,
+            "delta_margin": 0.1796875,
+            "delta_top1": 0.0
+          },
+          "object_car_truck": {
+            "target_margin": 4.0712890625,
+            "target_top1_rate": 0.0,
+            "n": 4,
+            "delta_margin": -0.486328125,
+            "delta_top1": 0.0
+          }
+        }
+      }
+    }
+  },
+  "total_time_min": 0.23
+}

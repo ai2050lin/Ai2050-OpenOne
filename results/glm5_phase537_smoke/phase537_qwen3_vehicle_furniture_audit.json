@@ -1,0 +1,639 @@
+{
+  "phase": 537,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 10:29:05",
+  "attn_implementation": "sdpa",
+  "source_pair": "vehicle_furniture",
+  "offpairs": [
+    "fruit_tool",
+    "animal_tool",
+    "clothing_tool",
+    "fruit_vegetable"
+  ],
+  "windows": {
+    "10-12": [
+      10,
+      12
+    ]
+  },
+  "all_layers": [
+    10,
+    12
+  ],
+  "train_n": 4,
+  "test_n": 3,
+  "bridge_n": 3,
+  "max_new_tokens": 2,
+  "alphas": [
+    4.0
+  ],
+  "random_seeds": [
+    11,
+    23
+  ],
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "baseline": {
+    "vehicle_furniture_direct": {
+      "target_margin": -0.0625,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 631.6666666666666
+    },
+    "vehicle_furniture_belongs": {
+      "target_margin": 0.3541666567325592,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 95.33333333333333
+    },
+    "vehicle_furniture_kind": {
+      "target_margin": 3.8125,
+      "target_top1_rate": 0.6666666666666666,
+      "n": 3,
+      "mean_target_rank": 1.6666666666666667
+    },
+    "fruit_tool_direct": {
+      "target_margin": 5.395833492279053,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 24.0
+    },
+    "fruit_tool_belongs": {
+      "target_margin": 4.6875,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 62.333333333333336
+    },
+    "fruit_tool_kind": {
+      "target_margin": 10.395833015441895,
+      "target_top1_rate": 0.6666666666666666,
+      "n": 3,
+      "mean_target_rank": 1.3333333333333333
+    },
+    "animal_tool_direct": {
+      "target_margin": 6.270833492279053,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 38.666666666666664
+    },
+    "animal_tool_belongs": {
+      "target_margin": 7.354166507720947,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 24.0
+    },
+    "animal_tool_kind": {
+      "target_margin": 9.979166984558105,
+      "target_top1_rate": 0.3333333333333333,
+      "n": 3,
+      "mean_target_rank": 1.6666666666666667
+    },
+    "clothing_tool_direct": {
+      "target_margin": 1.3541666269302368,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 308.0
+    },
+    "clothing_tool_belongs": {
+      "target_margin": 0.0833333358168602,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 335.6666666666667
+    },
+    "clothing_tool_kind": {
+      "target_margin": 3.0208332538604736,
+      "target_top1_rate": 0.3333333333333333,
+      "n": 3,
+      "mean_target_rank": 3.0
+    },
+    "fruit_vegetable_direct": {
+      "target_margin": 3.7083332538604736,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 24.0
+    },
+    "fruit_vegetable_belongs": {
+      "target_margin": 3.1458332538604736,
+      "target_top1_rate": 0.0,
+      "n": 3,
+      "mean_target_rank": 62.333333333333336
+    },
+    "fruit_vegetable_kind": {
+      "target_margin": 9.645833015441895,
+      "target_top1_rate": 0.6666666666666666,
+      "n": 3,
+      "mean_target_rank": 1.3333333333333333
+    }
+  },
+  "layer_stats": {
+    "10": {
+      "cos_direct_belongs": 0.26011595129966736,
+      "cos_direct_kind": 0.40845608711242676,
+      "cos_belongs_kind": 0.20628730952739716
+    },
+    "12": {
+      "cos_direct_belongs": 0.2454022318124771,
+      "cos_direct_kind": 0.3744274973869324,
+      "cos_belongs_kind": 0.19092261791229248
+    }
+  },
+  "audit": {
+    "10-12": {
+      "window": [
+        10,
+        12
+      ],
+      "conditions": {
+        "common": {
+          "transfer": {
+            "best_alpha": 4.0,
+            "best_transfer_min": 0.33333349227905273,
+            "best_transfer_mean": 0.5555556118488312,
+            "best_off_pair_max_abs": 0.22916650772094727,
+            "pair_specificity": 1.4545470935023244,
+            "best_off_by_pair": {
+              "fruit_tool": 0.22916650772094727,
+              "animal_tool": 0.125,
+              "clothing_tool": 0.10416650772094727,
+              "fruit_vegetable": 0.10416650772094727
+            },
+            "alpha_rows": [
+              {
+                "alpha": 4.0,
+                "transfer_min": 0.33333349227905273,
+                "transfer_mean": 0.5555556118488312,
+                "own_deltas": {
+                  "vehicle_furniture_direct": 0.7916666865348816,
+                  "vehicle_furniture_belongs": 0.5416666567325592,
+                  "vehicle_furniture_kind": 0.33333349227905273
+                },
+                "off_pair_max_abs": 0.22916650772094727,
+                "off_by_pair": {
+                  "fruit_tool": 0.22916650772094727,
+                  "animal_tool": 0.125,
+                  "clothing_tool": 0.10416650772094727,
+                  "fruit_vegetable": 0.10416650772094727
+                }
+              }
+            ]
+          }
+        },
+        "direct": {
+          "transfer": {
+            "best_alpha": 4.0,
+            "best_transfer_min": 0.27083349227905273,
+            "best_transfer_mean": 0.479166716337204,
+            "best_off_pair_max_abs": 0.33333301544189453,
+            "pair_specificity": 0.8125012273236739,
+            "best_off_by_pair": {
+              "fruit_tool": 0.33333301544189453,
+              "animal_tool": 0.08333396911621094,
+              "clothing_tool": 0.14583325386047363,
+              "fruit_vegetable": 0.08333349227905273
+            },
+            "alpha_rows": [
+              {
+                "alpha": 4.0,
+                "transfer_min": 0.27083349227905273,
+                "transfer_mean": 0.479166716337204,
+                "own_deltas": {
+                  "vehicle_furniture_direct": 0.7708333134651184,
+                  "vehicle_furniture_belongs": 0.3958333432674408,
+                  "vehicle_furniture_kind": 0.27083349227905273
+                },
+                "off_pair_max_abs": 0.33333301544189453,
+                "off_by_pair": {
+                  "fruit_tool": 0.33333301544189453,
+                  "animal_tool": 0.08333396911621094,
+                  "clothing_tool": 0.14583325386047363,
+                  "fruit_vegetable": 0.08333349227905273
+                }
+              }
+            ]
+          }
+        },
+        "shuffled": {
+          "transfer": {
+            "best_alpha": 4.0,
+            "best_transfer_min": 0.14583325386047363,
+            "best_transfer_mean": 0.26388885577519733,
+            "best_off_pair_max_abs": 0.1875,
+            "pair_specificity": 0.7777773124410694,
+            "best_off_by_pair": {
+              "fruit_tool": 0.1875,
+              "animal_tool": 0.15625,
+              "clothing_tool": 0.0833333358168602,
+              "fruit_vegetable": 0.10416698455810547
+            },
+            "alpha_rows": [
+              {
+                "alpha": 4.0,
+                "transfer_min": 0.14583325386047363,
+                "transfer_mean": 0.26388885577519733,
+                "own_deltas": {
+                  "vehicle_furniture_direct": 0.4166666567325592,
+                  "vehicle_furniture_belongs": 0.2291666567325592,
+                  "vehicle_furniture_kind": 0.14583325386047363
+                },
+                "off_pair_max_abs": 0.1875,
+                "off_by_pair": {
+                  "fruit_tool": 0.1875,
+                  "animal_tool": 0.15625,
+                  "clothing_tool": 0.0833333358168602,
+                  "fruit_vegetable": 0.10416698455810547
+                }
+              }
+            ]
+          }
+        },
+        "random": {
+          "transfers": {
+            "11": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.16666674613952637,
+              "best_transfer_mean": 0.02083330601453781,
+              "best_off_pair_max_abs": 0.1666666641831398,
+              "pair_specificity": 1.0000004317383,
+              "best_off_by_pair": {
+                "fruit_tool": 0.07291698455810547,
+                "animal_tool": 0.14583301544189453,
+                "clothing_tool": 0.1666666641831398,
+                "fruit_vegetable": 0.125
+              },
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.16666674613952637,
+                  "transfer_mean": 0.02083330601453781,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.1666666641831398,
+                    "vehicle_furniture_belongs": 0.0625,
+                    "vehicle_furniture_kind": -0.16666674613952637
+                  },
+                  "off_pair_max_abs": 0.1666666641831398,
+                  "off_by_pair": {
+                    "fruit_tool": 0.07291698455810547,
+                    "animal_tool": 0.14583301544189453,
+                    "clothing_tool": 0.1666666641831398,
+                    "fruit_vegetable": 0.125
+                  }
+                }
+              ]
+            },
+            "23": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.0,
+              "best_transfer_mean": 0.08333333333333333,
+              "best_off_pair_max_abs": 0.28125,
+              "pair_specificity": 0.0,
+              "best_off_by_pair": {
+                "fruit_tool": 0.27083349227905273,
+                "animal_tool": 0.28125,
+                "clothing_tool": 0.1875,
+                "fruit_vegetable": 0.20833349227905273
+              },
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.0,
+                  "transfer_mean": 0.08333333333333333,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.125,
+                    "vehicle_furniture_belongs": 0.0,
+                    "vehicle_furniture_kind": 0.125
+                  },
+                  "off_pair_max_abs": 0.28125,
+                  "off_by_pair": {
+                    "fruit_tool": 0.27083349227905273,
+                    "animal_tool": 0.28125,
+                    "clothing_tool": 0.1875,
+                    "fruit_vegetable": 0.20833349227905273
+                  }
+                }
+              ]
+            }
+          },
+          "max_transfer_min": 0.0,
+          "pass_like_count": 0
+        }
+      }
+    }
+  },
+  "generation": {
+    "best_window": "10-12",
+    "common": {
+      "n": 3,
+      "target_hit_rate": 0.0,
+      "mean_best_target_rank": 74.0,
+      "mean_first_step_margin": 0.7291666666666666,
+      "sample_outputs": [
+        {
+          "prompt": "The category of cart is",
+          "ids": [
+            264,
+            1602
+          ],
+          "generated_suffix": " a very",
+          "step_stats": [
+            {
+              "target_rank": 724.0,
+              "target_margin": -0.5625
+            },
+            {
+              "target_rank": 105.0,
+              "target_margin": -0.3125
+            }
+          ]
+        },
+        {
+          "prompt": "The category of sled is",
+          "ids": [
+            264,
+            25993
+          ],
+          "generated_suffix": " a subset",
+          "step_stats": [
+            {
+              "target_rank": 401.0,
+              "target_margin": 0.875
+            },
+            {
+              "target_rank": 87.0,
+              "target_margin": -0.3125
+            }
+          ]
+        },
+        {
+          "prompt": "The category of wagon is",
+          "ids": [
+            264,
+            943
+          ],
+          "generated_suffix": " a type",
+          "step_stats": [
+            {
+              "target_rank": 243.0,
+              "target_margin": 1.875
+            },
+            {
+              "target_rank": 30.0,
+              "target_margin": 1.75
+            }
+          ]
+        }
+      ]
+    },
+    "direct": {
+      "n": 3,
+      "target_hit_rate": 0.0,
+      "mean_best_target_rank": 88.66666666666667,
+      "mean_first_step_margin": 0.7083333333333334,
+      "sample_outputs": [
+        {
+          "prompt": "The category of cart is",
+          "ids": [
+            264,
+            1602
+          ],
+          "generated_suffix": " a very",
+          "step_stats": [
+            {
+              "target_rank": 737.0,
+              "target_margin": -0.625
+            },
+            {
+              "target_rank": 137.0,
+              "target_margin": -0.5
+            }
+          ]
+        },
+        {
+          "prompt": "The category of sled is",
+          "ids": [
+            264,
+            25993
+          ],
+          "generated_suffix": " a subset",
+          "step_stats": [
+            {
+              "target_rank": 387.0,
+              "target_margin": 0.875
+            },
+            {
+              "target_rank": 97.0,
+              "target_margin": -0.375
+            }
+          ]
+        },
+        {
+          "prompt": "The category of wagon is",
+          "ids": [
+            264,
+            943
+          ],
+          "generated_suffix": " a type",
+          "step_stats": [
+            {
+              "target_rank": 213.0,
+              "target_margin": 1.875
+            },
+            {
+              "target_rank": 32.0,
+              "target_margin": 1.6875
+            }
+          ]
+        }
+      ]
+    },
+    "shuffled": {
+      "n": 3,
+      "target_hit_rate": 0.0,
+      "mean_best_target_rank": 105.0,
+      "mean_first_step_margin": 0.3541666666666667,
+      "sample_outputs": [
+        {
+          "prompt": "The category of cart is",
+          "ids": [
+            264,
+            1602
+          ],
+          "generated_suffix": " a very",
+          "step_stats": [
+            {
+              "target_rank": 881.0,
+              "target_margin": -0.75
+            },
+            {
+              "target_rank": 171.0,
+              "target_margin": -0.9375
+            }
+          ]
+        },
+        {
+          "prompt": "The category of sled is",
+          "ids": [
+            264,
+            25993
+          ],
+          "generated_suffix": " a subset",
+          "step_stats": [
+            {
+              "target_rank": 490.0,
+              "target_margin": 0.4375
+            },
+            {
+              "target_rank": 112.0,
+              "target_margin": -0.625
+            }
+          ]
+        },
+        {
+          "prompt": "The category of wagon is",
+          "ids": [
+            264,
+            943
+          ],
+          "generated_suffix": " a type",
+          "step_stats": [
+            {
+              "target_rank": 330.0,
+              "target_margin": 1.375
+            },
+            {
+              "target_rank": 32.0,
+              "target_margin": 1.3125
+            }
+          ]
+        }
+      ]
+    },
+    "baseline": {
+      "n": 3,
+      "target_hit_rate": 0.0,
+      "mean_best_target_rank": 117.66666666666667,
+      "mean_first_step_margin": -0.0625,
+      "sample_outputs": [
+        {
+          "prompt": "The category of cart is",
+          "ids": [
+            264,
+            1602
+          ],
+          "generated_suffix": " a very",
+          "step_stats": [
+            {
+              "target_rank": 939.0,
+              "target_margin": -1.25
+            },
+            {
+              "target_rank": 197.0,
+              "target_margin": -1.0625
+            }
+          ]
+        },
+        {
+          "prompt": "The category of sled is",
+          "ids": [
+            264,
+            25993
+          ],
+          "generated_suffix": " a subset",
+          "step_stats": [
+            {
+              "target_rank": 585.0,
+              "target_margin": 0.0
+            },
+            {
+              "target_rank": 118.0,
+              "target_margin": -0.875
+            }
+          ]
+        },
+        {
+          "prompt": "The category of wagon is",
+          "ids": [
+            264,
+            5582
+          ],
+          "generated_suffix": " a category",
+          "step_stats": [
+            {
+              "target_rank": 371.0,
+              "target_margin": 1.0625
+            },
+            {
+              "target_rank": 38.0,
+              "target_margin": 1.25
+            }
+          ]
+        }
+      ]
+    },
+    "random": {
+      "n": 3,
+      "target_hit_rate": 0.0,
+      "mean_best_target_rank": 103.33333333333333,
+      "mean_first_step_margin": 0.10416666666666667,
+      "sample_outputs": [
+        {
+          "prompt": "The category of cart is",
+          "ids": [
+            264,
+            1602
+          ],
+          "generated_suffix": " a very",
+          "step_stats": [
+            {
+              "target_rank": 1085.0,
+              "target_margin": -1.1875
+            },
+            {
+              "target_rank": 158.0,
+              "target_margin": -0.6875
+            }
+          ]
+        },
+        {
+          "prompt": "The category of sled is",
+          "ids": [
+            264,
+            25993
+          ],
+          "generated_suffix": " a subset",
+          "step_stats": [
+            {
+              "target_rank": 554.0,
+              "target_margin": 0.0625
+            },
+            {
+              "target_rank": 116.0,
+              "target_margin": -0.8125
+            }
+          ]
+        },
+        {
+          "prompt": "The category of wagon is",
+          "ids": [
+            264,
+            943
+          ],
+          "generated_suffix": " a type",
+          "step_stats": [
+            {
+              "target_rank": 274.0,
+              "target_margin": 1.4375
+            },
+            {
+              "target_rank": 36.0,
+              "target_margin": 1.375
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "total_time_min": 0.09
+}

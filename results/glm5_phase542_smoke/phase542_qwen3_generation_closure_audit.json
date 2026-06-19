@@ -1,0 +1,1147 @@
+{
+  "phase": 542,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 14:47:34",
+  "attn_implementation": "sdpa",
+  "core_sources": [
+    "vehicle_furniture",
+    "vehicle_tool",
+    "vehicle_clothing"
+  ],
+  "templates": [
+    "direct",
+    "belongs",
+    "kind"
+  ],
+  "windows": {
+    "10-12": [
+      10,
+      12
+    ]
+  },
+  "all_layers": [
+    10,
+    12
+  ],
+  "train_n": 4,
+  "test_n": 3,
+  "max_new_tokens": 3,
+  "alpha": 4.0,
+  "random_seeds": [
+    11
+  ],
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "audit": {
+    "10-12": {
+      "window": [
+        10,
+        12
+      ],
+      "sources": {
+        "vehicle_furniture": {
+          "baseline": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 243.0,
+            "mean_first_competitor_rank": 1154.3333333333333,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a category of",
+                "generated_ids": [
+                  264,
+                  5582,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of ____.",
+                "generated_ids": [
+                  315,
+                  1304,
+                  18725
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_perp": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 182.11111111111111,
+            "mean_first_competitor_rank": 1602.0,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_parallel": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 165.66666666666666,
+            "mean_first_competitor_rank": 1286.6666666666667,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_full": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 174.11111111111111,
+            "mean_first_competitor_rank": 1622.111111111111,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          }
+        },
+        "vehicle_tool": {
+          "baseline": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.1111111111111111,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 243.0,
+            "mean_first_competitor_rank": 930.1111111111111,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a category of",
+                "generated_ids": [
+                  264,
+                  5582,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of ____.",
+                "generated_ids": [
+                  315,
+                  1304,
+                  18725
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_perp": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.1111111111111111,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 188.44444444444446,
+            "mean_first_competitor_rank": 1085.7777777777778,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_parallel": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.1111111111111111,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 166.11111111111111,
+            "mean_first_competitor_rank": 1166.4444444444443,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_full": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.1111111111111111,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 180.11111111111111,
+            "mean_first_competitor_rank": 1101.4444444444443,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          }
+        },
+        "vehicle_clothing": {
+          "baseline": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 243.0,
+            "mean_first_competitor_rank": 873.1111111111111,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a category of",
+                "generated_ids": [
+                  264,
+                  5582,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of ____.",
+                "generated_ids": [
+                  315,
+                  1304,
+                  18725
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_perp": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 163.22222222222223,
+            "mean_first_competitor_rank": 1278.5555555555557,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_parallel": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 156.55555555555554,
+            "mean_first_competitor_rank": 1097.6666666666667,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of ____.",
+                "generated_ids": [
+                  315,
+                  1304,
+                  18725
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          },
+          "residual_full": {
+            "n": 9,
+            "hit_rates": {
+              "target": 0.3333333333333333,
+              "competitor": 0.0,
+              "cluster_other": 0.1111111111111111,
+              "off_cluster": 0.0,
+              "other_only": 0.5555555555555556
+            },
+            "first_type_rates": {
+              "target": 0.2222222222222222,
+              "competitor": 0.0,
+              "cluster_other": 0.0,
+              "off_cluster": 0.0,
+              "other": 0.7777777777777778
+            },
+            "mean_first_target_rank": 159.77777777777777,
+            "mean_first_competitor_rank": 1299.3333333333333,
+            "sample_outputs": [
+              {
+                "prompt": "The category of cart is",
+                "generated_suffix": " a very important",
+                "generated_ids": [
+                  264,
+                  1602,
+                  2989
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of sled is",
+                "generated_suffix": " a subset of",
+                "generated_ids": [
+                  264,
+                  25993,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "The category of wagon is",
+                "generated_suffix": " a type of",
+                "generated_ids": [
+                  264,
+                  943,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 264,
+                  "token": " a",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Cart belongs to the category",
+                "generated_suffix": " of the following",
+                "generated_ids": [
+                  315,
+                  279,
+                  2701
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              },
+              {
+                "prompt": "Sled belongs to the category",
+                "generated_suffix": " of which of",
+                "generated_ids": [
+                  315,
+                  892,
+                  315
+                ],
+                "first_top": {
+                  "token_id": 315,
+                  "token": " of",
+                  "type": "other"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "total_time_min": 0.15
+}

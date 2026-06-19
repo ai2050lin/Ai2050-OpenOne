@@ -1,0 +1,1849 @@
+{
+  "phase": 529,
+  "model": "qwen3",
+  "timestamp": "2026-06-18 23:46:15",
+  "attn_implementation": "sdpa",
+  "layer": 12,
+  "train_n": 10,
+  "test_n": 8,
+  "alphas": [
+    4.0,
+    8.0,
+    12.0
+  ],
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "candidate_meta": {
+    "category_fruit": {
+      "family": "category",
+      "own_task": "category_fruit",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_red_blue": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_green_yellow": {
+      "family": "color",
+      "own_task": "color_green_yellow",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_black_white": {
+      "family": "color",
+      "own_task": "color_black_white",
+      "pos_n": 10,
+      "neg_n": 10
+    },
+    "color_all_pairs": {
+      "family": "color",
+      "own_task": "color_red_blue",
+      "pos_n": 30,
+      "neg_n": 30
+    },
+    "object_apple_banana": {
+      "family": "object",
+      "own_task": "object_apple_banana",
+      "pos_n": 4,
+      "neg_n": 4
+    },
+    "object_car_truck": {
+      "family": "object",
+      "own_task": "object_car_truck",
+      "pos_n": 4,
+      "neg_n": 4
+    },
+    "object_shirt_jacket": {
+      "family": "object",
+      "own_task": "object_shirt_jacket",
+      "pos_n": 4,
+      "neg_n": 4
+    },
+    "object_all_pairs": {
+      "family": "object",
+      "own_task": "object_apple_banana",
+      "pos_n": 12,
+      "neg_n": 12
+    }
+  },
+  "baseline": {
+    "category_fruit": {
+      "target_margin": -1.01953125,
+      "target_top1_rate": 0.0,
+      "n": 8
+    },
+    "color_red_blue": {
+      "target_margin": 3.5078125,
+      "target_top1_rate": 0.5,
+      "n": 8
+    },
+    "color_green_yellow": {
+      "target_margin": 2.1796875,
+      "target_top1_rate": 0.125,
+      "n": 8
+    },
+    "color_black_white": {
+      "target_margin": 4.0859375,
+      "target_top1_rate": 0.75,
+      "n": 8
+    },
+    "object_apple_banana": {
+      "target_margin": 6.760416507720947,
+      "target_top1_rate": 0.0,
+      "n": 6
+    },
+    "object_car_truck": {
+      "target_margin": 5.854166507720947,
+      "target_top1_rate": 0.0,
+      "n": 6
+    },
+    "object_shirt_jacket": {
+      "target_margin": 7.083333492279053,
+      "target_top1_rate": 0.0,
+      "n": 6
+    }
+  },
+  "sweep": {
+    "category_fruit": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -0.0859375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.93359375,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.5078125,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": 0.0,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 2.3828125,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.203125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.171875,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": 0.0859375,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.604166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.15625,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.708333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.14583301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.854166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.22916698455810547,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": 0.734375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 1.75390625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.5703125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.0625,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.46875,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.2890625,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.0859375,
+          "target_top1_rate": 0.625,
+          "n": 8,
+          "delta_margin": 0.0,
+          "delta_top1": -0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.416666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.34375,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.604166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.25,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.59375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.48958349227905273,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": 1.5,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 2.51953125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.6328125,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": 0.125,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 2.625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.4453125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.90625,
+          "target_top1_rate": 0.625,
+          "n": 8,
+          "delta_margin": -0.1796875,
+          "delta_top1": -0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.38541650772094727,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.489583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.36458301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.40625,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.6770834922790527,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "color_red_blue": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.19921875,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.1796875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.1171875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.515625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.3359375,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.078125,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": -0.0078125,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.614583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.14583301544189453,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.75,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.10416650772094727,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.854166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.22916698455810547,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.41015625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.390625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.8046875,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": 0.296875,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 2.78125,
+          "target_top1_rate": 0.25,
+          "n": 8,
+          "delta_margin": 0.6015625,
+          "delta_top1": 0.125
+        },
+        "color_black_white": {
+          "target_margin": 4.0546875,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": -0.03125,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.489583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.27083301544189453,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.71875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.13541650772094727,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.583333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.5,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.5234375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.50390625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.9375,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": 0.4296875,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 3.015625,
+          "target_top1_rate": 0.25,
+          "n": 8,
+          "delta_margin": 0.8359375,
+          "delta_top1": 0.125
+        },
+        "color_black_white": {
+          "target_margin": 4.0390625,
+          "target_top1_rate": 0.875,
+          "n": 8,
+          "delta_margin": -0.046875,
+          "delta_top1": 0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.385416507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.375,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.604166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.25,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.302083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.78125,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "color_green_yellow": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.08203125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.0625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.296875,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.2109375,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 2.109375,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.0703125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.7734375,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.3125,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.84375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.08333349227905273,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.895833492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.04166698455810547,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.239583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.15625,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.16015625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.140625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.1484375,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.359375,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 1.9765625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.203125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.390625,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.6953125,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.885416507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.125,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.854166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.0,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.177083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.09375,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.28515625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.265625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 2.8828125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.625,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.90625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.2734375,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.0078125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -1.078125,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.770833492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.010416984558105469,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.84375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.010416507720947266,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.114583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.03125,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "color_black_white": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.06640625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.046875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.4296875,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.078125,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.2265625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.046875,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.40625,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": 0.3203125,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.802083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.04166698455810547,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.90625,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.052083492279052734,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.114583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.03125,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.08203125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.0625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.3359375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.171875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.3046875,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.5390625,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": 0.453125,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.760416507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.0,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.90625,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.052083492279052734,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.114583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.03125,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.0859375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.06640625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.3125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.1953125,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.34375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.1640625,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 4.5234375,
+          "target_top1_rate": 0.875,
+          "n": 8,
+          "delta_margin": 0.4375,
+          "delta_top1": 0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.71875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.041666507720947266,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.895833492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.04166698455810547,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.989583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.09375,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "color_all_pairs": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.16796875,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.1484375,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.4375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.0703125,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.2890625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": 0.109375,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.15625,
+          "target_top1_rate": 0.625,
+          "n": 8,
+          "delta_margin": 0.0703125,
+          "delta_top1": -0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.729166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.03125,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.833333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.02083301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.020833492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.0625,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.3125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.29296875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.296875,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.2109375,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.3359375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.15625,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 4.03125,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.0546875,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.666666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.09375,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.84375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.010416507720947266,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.927083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.15625,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.45703125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.4375,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.2265625,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.28125,
+          "delta_top1": 0.0
+        },
+        "color_green_yellow": {
+          "target_margin": 2.3125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.1328125,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.765625,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.3203125,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.5625,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.19791650772094727,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.78125,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.07291650772094727,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.666666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.41666698455810547,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "object_apple_banana": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -0.8828125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.13671875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.5703125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.0625,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.1015625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.078125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.078125,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": -0.0078125,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.84375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.08333349227905273,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.8125,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.041666507720947266,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.03125,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.052083492279052734,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -0.71875,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.30078125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.6640625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.15625,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.9765625,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.203125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 4.03125,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.0546875,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.916666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.15625,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.020833492279052734,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.979166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.10416698455810547,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -0.6015625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.41796875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.734375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.2265625,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.8125,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.3671875,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.84375,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.2421875,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 7.052083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.29166698455810547,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.96875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.11458349227905273,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.958333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.125,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "object_car_truck": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.08984375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.0703125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.4765625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.03125,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.984375,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.1953125,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.8125,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": -0.2734375,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.552083492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.20833301544189453,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.708333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.14583301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.20833349227905273,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.0703125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.05078125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.390625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.1171875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.8203125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.359375,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.4609375,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.354166507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.40625,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.53125,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.32291650772094727,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.5625,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.5208334922790527,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.0390625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.01953125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.234375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.2734375,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.7265625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.453125,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.3203125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.765625,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.25,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.5104165077209473,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.458333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.39583301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.291666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.7916669845581055,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "object_shirt_jacket": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -1.24609375,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.2265625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.171875,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.3359375,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.0,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.1796875,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.7109375,
+          "target_top1_rate": 0.625,
+          "n": 8,
+          "delta_margin": -0.375,
+          "delta_top1": -0.125
+        },
+        "object_apple_banana": {
+          "target_margin": 6.791666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.03125,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.9375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.08333349227905273,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 7.041666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.04166698455810547,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -1.44140625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.421875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 2.8359375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.671875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.7421875,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.4375,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.34375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.7421875,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.760416507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.0,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.916666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.0625,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.864583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.21875,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -1.70703125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.6875,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 2.5703125,
+          "target_top1_rate": 0.25,
+          "n": 8,
+          "delta_margin": -0.9375,
+          "delta_top1": -0.25
+        },
+        "color_green_yellow": {
+          "target_margin": 1.53125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.6484375,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.0625,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -1.0234375,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.770833492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.010416984558105469,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.864583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.010416984558105469,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.614583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.46875,
+          "delta_top1": 0.0
+        }
+      }
+    },
+    "object_all_pairs": {
+      "4.0": {
+        "category_fruit": {
+          "target_margin": -0.98828125,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.03125,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.5078125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": 0.0,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 2.0078125,
+          "target_top1_rate": 0.125,
+          "n": 8,
+          "delta_margin": -0.171875,
+          "delta_top1": 0.0
+        },
+        "color_black_white": {
+          "target_margin": 3.859375,
+          "target_top1_rate": 0.75,
+          "n": 8,
+          "delta_margin": -0.2265625,
+          "delta_top1": 0.0
+        },
+        "object_apple_banana": {
+          "target_margin": 6.739583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.02083301544189453,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.833333492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.02083301544189453,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.9375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.14583349227905273,
+          "delta_top1": 0.0
+        }
+      },
+      "8.0": {
+        "category_fruit": {
+          "target_margin": -0.91015625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.109375,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.4609375,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.046875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.796875,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.3828125,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.53125,
+          "target_top1_rate": 0.5,
+          "n": 8,
+          "delta_margin": -0.5546875,
+          "delta_top1": -0.25
+        },
+        "object_apple_banana": {
+          "target_margin": 6.84375,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.08333349227905273,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.875,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.020833492279052734,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.791666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.29166698455810547,
+          "delta_top1": 0.0
+        }
+      },
+      "12.0": {
+        "category_fruit": {
+          "target_margin": -0.765625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": 0.25390625,
+          "delta_top1": 0.0
+        },
+        "color_red_blue": {
+          "target_margin": 3.3203125,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.1875,
+          "delta_top1": -0.125
+        },
+        "color_green_yellow": {
+          "target_margin": 1.625,
+          "target_top1_rate": 0.0,
+          "n": 8,
+          "delta_margin": -0.5546875,
+          "delta_top1": -0.125
+        },
+        "color_black_white": {
+          "target_margin": 3.2421875,
+          "target_top1_rate": 0.375,
+          "n": 8,
+          "delta_margin": -0.84375,
+          "delta_top1": -0.375
+        },
+        "object_apple_banana": {
+          "target_margin": 6.916666507720947,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.15625,
+          "delta_top1": 0.0
+        },
+        "object_car_truck": {
+          "target_margin": 5.989583492279053,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": 0.13541698455810547,
+          "delta_top1": 0.0
+        },
+        "object_shirt_jacket": {
+          "target_margin": 6.75,
+          "target_top1_rate": 0.0,
+          "n": 6,
+          "delta_margin": -0.33333349227905273,
+          "delta_top1": 0.0
+        }
+      }
+    }
+  },
+  "readout_alignment": {
+    "category_fruit": {
+      "norm": 13.048685073852539,
+      "readout_norm_pct": 6.449779987335205,
+      "semantic_norm_pct": 99.79179382324219,
+      "cos_to_own_readout": 0.06449779123067856
+    },
+    "color_red_blue": {
+      "norm": 6.351532459259033,
+      "readout_norm_pct": 2.6115455627441406,
+      "semantic_norm_pct": 99.96589660644531,
+      "cos_to_own_readout": 0.026115454733371735
+    },
+    "color_green_yellow": {
+      "norm": 5.76504373550415,
+      "readout_norm_pct": 0.9666847586631775,
+      "semantic_norm_pct": 99.99531555175781,
+      "cos_to_own_readout": 0.009666847065091133
+    },
+    "color_black_white": {
+      "norm": 7.687243461608887,
+      "readout_norm_pct": 0.5511600971221924,
+      "semantic_norm_pct": 99.99848175048828,
+      "cos_to_own_readout": 0.005511600058525801
+    },
+    "color_all_pairs": {
+      "norm": 3.8409111499786377,
+      "readout_norm_pct": 1.831168293952942,
+      "semantic_norm_pct": 99.98323822021484,
+      "cos_to_own_readout": 0.01831168495118618
+    },
+    "object_apple_banana": {
+      "norm": 4.947276592254639,
+      "readout_norm_pct": 2.3189425468444824,
+      "semantic_norm_pct": 99.97311401367188,
+      "cos_to_own_readout": 0.023189425468444824
+    },
+    "object_car_truck": {
+      "norm": 2.9525985717773438,
+      "readout_norm_pct": 2.9823238849639893,
+      "semantic_norm_pct": 99.95552825927734,
+      "cos_to_own_readout": 0.029823236167430878
+    },
+    "object_shirt_jacket": {
+      "norm": 3.1073601245880127,
+      "readout_norm_pct": 1.103215217590332,
+      "semantic_norm_pct": 99.99391174316406,
+      "cos_to_own_readout": -0.011032151989638805
+    },
+    "object_all_pairs": {
+      "norm": 2.221553087234497,
+      "readout_norm_pct": 2.287520170211792,
+      "semantic_norm_pct": 99.97383880615234,
+      "cos_to_own_readout": 0.02287520281970501
+    }
+  },
+  "admission": {
+    "category_fruit": {
+      "own_task": "category_fruit",
+      "family": "category",
+      "best_alpha": 12.0,
+      "best_own_delta": 2.51953125,
+      "best_max_same_family_other_abs": 0.0,
+      "best_max_off_family_abs": 0.6770834922790527,
+      "best_selectivity_ratio": 3.721152917652396,
+      "passes_basic_gate": true,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": 0.93359375,
+          "max_same_family_other_abs": 0.0,
+          "max_off_family_abs": 0.22916698455810547
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": 1.75390625,
+          "max_same_family_other_abs": 0.0,
+          "max_off_family_abs": 0.48958349227905273
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": 2.51953125,
+          "max_same_family_other_abs": 0.0,
+          "max_off_family_abs": 0.6770834922790527
+        }
+      ]
+    },
+    "color_red_blue": {
+      "own_task": "color_red_blue",
+      "family": "color",
+      "best_alpha": 12.0,
+      "best_own_delta": 0.4296875,
+      "best_max_same_family_other_abs": 0.8359375,
+      "best_max_off_family_abs": 0.78125,
+      "best_selectivity_ratio": 0.5140186854397765,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": 0.1171875,
+          "max_same_family_other_abs": 0.3359375,
+          "max_off_family_abs": 0.22916698455810547
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": 0.296875,
+          "max_same_family_other_abs": 0.6015625,
+          "max_off_family_abs": 0.5
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": 0.4296875,
+          "max_same_family_other_abs": 0.8359375,
+          "max_off_family_abs": 0.78125
+        }
+      ]
+    },
+    "color_green_yellow": {
+      "own_task": "color_green_yellow",
+      "family": "color",
+      "best_alpha": 4.0,
+      "best_own_delta": -0.0703125,
+      "best_max_same_family_other_abs": 0.3125,
+      "best_max_off_family_abs": 0.15625,
+      "best_selectivity_ratio": 0.22499999280000024,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": -0.0703125,
+          "max_same_family_other_abs": 0.3125,
+          "max_off_family_abs": 0.15625
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": -0.203125,
+          "max_same_family_other_abs": 0.6953125,
+          "max_off_family_abs": 0.140625
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": -0.2734375,
+          "max_same_family_other_abs": 1.078125,
+          "max_off_family_abs": 0.265625
+        }
+      ]
+    },
+    "color_black_white": {
+      "own_task": "color_black_white",
+      "family": "color",
+      "best_alpha": 8.0,
+      "best_own_delta": 0.453125,
+      "best_max_same_family_other_abs": 0.171875,
+      "best_max_off_family_abs": 0.0625,
+      "best_selectivity_ratio": 2.6363634829752156,
+      "passes_basic_gate": true,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": 0.3203125,
+          "max_same_family_other_abs": 0.078125,
+          "max_off_family_abs": 0.052083492279052734
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": 0.453125,
+          "max_same_family_other_abs": 0.171875,
+          "max_off_family_abs": 0.0625
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": 0.4375,
+          "max_same_family_other_abs": 0.1953125,
+          "max_off_family_abs": 0.09375
+        }
+      ]
+    },
+    "color_all_pairs": {
+      "own_task": "color_red_blue",
+      "family": "color",
+      "best_alpha": 4.0,
+      "best_own_delta": -0.0703125,
+      "best_max_same_family_other_abs": 0.109375,
+      "best_max_off_family_abs": 0.1484375,
+      "best_selectivity_ratio": 0.4736841786149606,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": -0.0703125,
+          "max_same_family_other_abs": 0.109375,
+          "max_off_family_abs": 0.1484375
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": -0.2109375,
+          "max_same_family_other_abs": 0.15625,
+          "max_off_family_abs": 0.29296875
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": -0.28125,
+          "max_same_family_other_abs": 0.3203125,
+          "max_off_family_abs": 0.4375
+        }
+      ]
+    },
+    "object_apple_banana": {
+      "own_task": "object_apple_banana",
+      "family": "object",
+      "best_alpha": 12.0,
+      "best_own_delta": 0.29166698455810547,
+      "best_max_same_family_other_abs": 0.125,
+      "best_max_off_family_abs": 0.41796875,
+      "best_selectivity_ratio": 0.6978200585089314,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": 0.08333349227905273,
+          "max_same_family_other_abs": 0.052083492279052734,
+          "max_off_family_abs": 0.13671875
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": 0.15625,
+          "max_same_family_other_abs": 0.10416698455810547,
+          "max_off_family_abs": 0.30078125
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": 0.29166698455810547,
+          "max_same_family_other_abs": 0.125,
+          "max_off_family_abs": 0.41796875
+        }
+      ]
+    },
+    "object_car_truck": {
+      "own_task": "object_car_truck",
+      "family": "object",
+      "best_alpha": 4.0,
+      "best_own_delta": -0.14583301544189453,
+      "best_max_same_family_other_abs": 0.20833349227905273,
+      "best_max_off_family_abs": 0.2734375,
+      "best_selectivity_ratio": 0.5333321512542099,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": -0.14583301544189453,
+          "max_same_family_other_abs": 0.20833349227905273,
+          "max_off_family_abs": 0.2734375
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": -0.32291650772094727,
+          "max_same_family_other_abs": 0.5208334922790527,
+          "max_off_family_abs": 0.4609375
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": -0.39583301544189453,
+          "max_same_family_other_abs": 0.7916669845581055,
+          "max_off_family_abs": 0.765625
+        }
+      ]
+    },
+    "object_shirt_jacket": {
+      "own_task": "object_shirt_jacket",
+      "family": "object",
+      "best_alpha": 4.0,
+      "best_own_delta": -0.04166698455810547,
+      "best_max_same_family_other_abs": 0.08333349227905273,
+      "best_max_off_family_abs": 0.375,
+      "best_selectivity_ratio": 0.1111119558586291,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": -0.04166698455810547,
+          "max_same_family_other_abs": 0.08333349227905273,
+          "max_off_family_abs": 0.375
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": -0.21875,
+          "max_same_family_other_abs": 0.0625,
+          "max_off_family_abs": 0.7421875
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": -0.46875,
+          "max_same_family_other_abs": 0.010416984558105469,
+          "max_off_family_abs": 1.0234375
+        }
+      ]
+    },
+    "object_all_pairs": {
+      "own_task": "object_apple_banana",
+      "family": "object",
+      "best_alpha": 12.0,
+      "best_own_delta": 0.15625,
+      "best_max_same_family_other_abs": 0.33333349227905273,
+      "best_max_off_family_abs": 0.84375,
+      "best_selectivity_ratio": 0.18518518299039782,
+      "passes_basic_gate": false,
+      "alpha_rows": [
+        {
+          "alpha": 4.0,
+          "own_delta": -0.02083301544189453,
+          "max_same_family_other_abs": 0.14583349227905273,
+          "max_off_family_abs": 0.2265625
+        },
+        {
+          "alpha": 8.0,
+          "own_delta": 0.08333349227905273,
+          "max_same_family_other_abs": 0.29166698455810547,
+          "max_off_family_abs": 0.5546875
+        },
+        {
+          "alpha": 12.0,
+          "own_delta": 0.15625,
+          "max_same_family_other_abs": 0.33333349227905273,
+          "max_off_family_abs": 0.84375
+        }
+      ]
+    }
+  },
+  "cos_to_category": {
+    "category_fruit": 0.9999998807907104,
+    "color_red_blue": 0.03158118948340416,
+    "color_green_yellow": -0.10016431659460068,
+    "color_black_white": -0.07249205559492111,
+    "color_all_pairs": -0.08114137500524521,
+    "object_apple_banana": -0.06438571959733963,
+    "object_car_truck": -0.029178617522120476,
+    "object_shirt_jacket": 0.03403794392943382,
+    "object_all_pairs": -0.04452761635184288
+  },
+  "total_time_min": 0.13
+}

@@ -36621,3 +36621,5987 @@ Phase 527 是一次**机制分化性实验**。它通过Dc分解、剂量响应�
 
 最重要的发现是 **qwen3的"纯语义"机制**——语义方向正交于读出方向，因果力100%来自正交分量，且具有语义选择性(不改变颜色)。这是整个研究序列中第一次用严格实验证明了"真正的语义编码"——不是通过读出logit偏置，而是通过正交子空间中的语义状态改变。
 
+## Phase 528: Semantic Subspace Atlas & Selectivity Closure 语义子空间图谱与选择性闭环 [2026-06-18 22:34]
+
+### 一、对附件分析的判定
+
+附件中关于 Phase 527 的核心判断基本正确：
+
+```text
+1. Phase 527 的主要进展不是又找到一个方向, 而是把方向拆成 readout-aligned component 与 orthogonal semantic component。
+2. qwen3 的 category 方向主要因果力来自正交分量, 不是直接提高类别词 logit 的读出偏置。
+3. GLM4 的有效成分更接近 readout/margin 驱动, 不是干净的语义变量方向。
+4. DS7B 仍然表现为语义激活失败或当前位置/层位未命中。
+5. d_color positive control 异常是 Phase 527 最大硬伤, 必须优先修复。
+```
+
+需要收紧的部分：
+
+```text
+1. 不能把 qwen3 的单一 category 成功直接扩展为完整 semantic subspace atlas。
+2. 不能把 SESI 或理论完成度量化为接近完成, 目前没有足够多语义变量的稳定闭环。
+3. d_color 正控在 Phase 527 中异常, 所以 Phase 527 的"颜色不变"只能支持 category 不明显扰动原弱方向, 不能证明完整选择性。
+4. 训练 checkpoint、SAE、稀疏因子等仍未测试, 不能作为已验证事实。
+```
+
+本阶段因此不做大理论总结, 只做多变量方向、几何正交、读出投影比例、跨任务选择性矩阵的客观测量。
+
+### 二、脚本
+
+```text
+tests/glm5/phase528_semantic_subspace_atlas.py
+tests/glm5/phase528_semantic_subspace_atlas_summary.py
+```
+
+脚本特性：
+
+```text
+models = qwen3, glm4, deepseek7b
+variables = category, color, object
+peak layers = qwen3 L12, GLM4 L26, DS7B L18
+dtype = bfloat16
+device_map = auto
+8bit/bf8 = disabled
+attention = try flash_attention_2, fallback to sdpa
+hook = residual stream intervention at peak layer
+metrics = direction cosine, readout norm ratio, semantic norm ratio, selectivity matrix, positive-control ratio
+```
+
+注意：
+
+```text
+当前环境未安装 flash_attn, flash_attention_2 加载失败后自动回退到 sdpa。
+这不改变数值目标, 但说明本轮不是 flash attention 实际运行。
+```
+
+### 三、执行命令
+
+#### 3.1 冒烟测试
+
+```bash
+python tests/glm5/phase528_semantic_subspace_atlas.py qwen3 \
+  --train-n 3 \
+  --test-n 3 \
+  --batch-size 3 \
+  --output-dir results/glm5_phase528_smoke \
+  --hard-exit-after-model
+```
+
+#### 3.2 主测试
+
+```bash
+python tests/glm5/phase528_semantic_subspace_atlas.py qwen3 \
+  --train-n 10 \
+  --test-n 6 \
+  --alpha 8 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase528_semantic_subspace_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase528_semantic_subspace_atlas.py glm4 \
+  --train-n 10 \
+  --test-n 6 \
+  --alpha 8 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase528_semantic_subspace_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase528_semantic_subspace_atlas.py deepseek7b \
+  --train-n 10 \
+  --test-n 6 \
+  --alpha 8 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase528_semantic_subspace_atlas \
+  --hard-exit-after-model
+```
+
+#### 3.3 重要结果确认测试
+
+由于 qwen3 的 color positive control 是 Phase 527 的关键硬伤, 对 qwen3 增大数据量确认：
+
+```bash
+python tests/glm5/phase528_semantic_subspace_atlas.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alpha 8 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase528_semantic_subspace_atlas_confirm \
+  --hard-exit-after-model
+```
+
+#### 3.4 汇总
+
+```bash
+python tests/glm5/phase528_semantic_subspace_atlas_summary.py
+
+python -m py_compile \
+  tests/glm5/phase528_semantic_subspace_atlas.py \
+  tests/glm5/phase528_semantic_subspace_atlas_summary.py
+```
+
+### 四、结果文件
+
+```text
+results/glm5_phase528_semantic_subspace_atlas/phase528_qwen3_semantic_subspace_atlas.json
+results/glm5_phase528_semantic_subspace_atlas/phase528_glm4_semantic_subspace_atlas.json
+results/glm5_phase528_semantic_subspace_atlas/phase528_deepseek7b_semantic_subspace_atlas.json
+results/glm5_phase528_semantic_subspace_atlas/phase528_qwen3_directions.npz
+results/glm5_phase528_semantic_subspace_atlas/phase528_glm4_directions.npz
+results/glm5_phase528_semantic_subspace_atlas/phase528_deepseek7b_directions.npz
+results/glm5_phase528_semantic_subspace_atlas/phase528_cross_model_summary.md
+results/glm5_phase528_semantic_subspace_atlas_confirm/phase528_qwen3_semantic_subspace_atlas.json
+```
+
+### 五、主测试客观结果
+
+#### 5.1 qwen3
+
+方向几何：
+
+```text
+mean abs offdiag cosine = 0.0359
+cos(category,color) = +0.0316
+cos(category,object) = +0.0739
+cos(color,object) = +0.0021
+```
+
+读出投影：
+
+```text
+category readout norm = 6.45%, semantic norm = 99.79%, cos(readout) = +0.06450
+color readout norm = 4.10%, semantic norm = 99.92%, cos(readout) = +0.04096
+object readout norm = 0.40%, semantic norm = 100.00%, cos(readout) = +0.00399
+```
+
+选择性矩阵, 行为 direction, 列为 task, 数值为 Δmargin：
+
+```text
+category -> category +1.7240, color +0.1146, object -0.2812
+color    -> category -0.3490, color +0.3021, object -0.1146
+object   -> category +0.4115, color -0.4896, object -0.1250
+```
+
+正控：
+
+```text
+category own Δ = +1.7240, max off-target abs Δ = 0.2812, selectivity ratio = 6.1296
+color own Δ = +0.3021, max off-target abs Δ = 0.3490, selectivity ratio = 0.8657
+object own Δ = -0.1250, max off-target abs Δ = 0.4896, selectivity ratio = 0.2553
+```
+
+判断：
+
+```text
+qwen3 category direction 强且相对选择性好。
+qwen3 color direction 有正控, 但弱且不够选择性。
+qwen3 object direction 失败。
+```
+
+#### 5.2 GLM4
+
+方向几何：
+
+```text
+mean abs offdiag cosine = 0.0752
+```
+
+读出投影：
+
+```text
+category readout norm = 3.71%
+color readout norm = 18.04%
+object readout norm = 6.66%
+```
+
+选择性矩阵：
+
+```text
+category -> category +0.1328, color +0.4375, object -0.2689
+color    -> category +0.4010, color +1.7135, object +0.0029
+object   -> category +0.3932, color +1.4167, object +0.0137
+```
+
+正控：
+
+```text
+category own Δ = +0.1328, selectivity ratio = 0.3036
+color own Δ = +1.7135, selectivity ratio = 4.2727
+object own Δ = +0.0137, selectivity ratio = 0.0097
+```
+
+判断：
+
+```text
+GLM4 color direction 很强, 但整体不是干净的多变量语义图谱。
+object direction 对 color 任务有 +1.4167 的强影响, 说明方向混合或任务构造混入表面读出。
+category direction 很弱, 且对 color 的影响大于对 category 的影响。
+```
+
+#### 5.3 DS7B
+
+跨变量效果：
+
+```text
+category own Δ = +0.0156
+color own Δ = +0.0000
+object own Δ = -0.0104
+mean own Δ = +0.0017
+mean off abs Δ = 0.0677
+selectivity ratio = 0.0917
+```
+
+判断：
+
+```text
+DS7B 仍没有稳定可激活的 category/color/object 因果方向。
+这延续 Phase 527 的 activation failure 判断。
+```
+
+### 六、qwen3 增量确认结果
+
+确认测试：
+
+```text
+train-n = 12
+test-n = 8
+alpha = 8
+```
+
+结果：
+
+```text
+category own Δ = +1.6211
+category max off-target abs Δ = 0.2917
+
+color own Δ = +0.1719
+color max off-target abs Δ = 0.4844
+
+object own Δ = -0.1250
+object max off-target abs Δ = 0.5469
+```
+
+方向几何仍低耦合：
+
+```text
+cos(category,color) = +0.0473
+cos(category,object) = +0.0735
+cos(color,object) = +0.0020
+```
+
+判断：
+
+```text
+qwen3 category 方向在更大数据下仍稳定。
+qwen3 color 正控仍为正, 但变弱, 且 off-target 大于 own-target。
+qwen3 object 仍失败。
+```
+
+### 七、当前最可靠事实
+
+1. qwen3 的 category 方向是当前最强的正交语义候选：
+
+```text
+readout norm only 6.45%
+semantic norm 99.79%
+main category Δ +1.7240
+confirm category Δ +1.6211
+off-target 明显更小
+```
+
+2. 几何正交不等于因果选择性：
+
+```text
+qwen3/GLM4/DS7B 的方向余弦都不高,
+但只有 qwen3 category 通过了较强选择性。
+GLM4 color 强, 但混合影响明显。
+DS7B 几何上也近正交, 但因果上基本无效。
+```
+
+3. Phase 527 的 d_color 硬伤只被部分修复：
+
+```text
+qwen3 color positive control 从异常 0% 改为正 Δmargin,
+但主测试 +0.3021、确认 +0.1719,
+仍不够强, 也不够选择性。
+```
+
+4. object 变量当前不可用：
+
+```text
+qwen3 object own Δ = -0.1250
+GLM4 object own Δ = +0.0137
+DS7B object own Δ = -0.0104
+```
+
+### 八、理论更新
+
+Phase 528 支持的理论更新很有限, 但非常重要：
+
+```text
+qwen3 中至少存在一个可被 causal intervention 调动的、主要位于 readout-orthogonal 子空间的 category semantic direction。
+```
+
+但还不能说：
+
+```text
+qwen3 已经拥有完整 orthogonal semantic subspace atlas。
+```
+
+原因：
+
+```text
+1. color 方向正控弱。
+2. object 方向失败。
+3. top1 token trajectory 仍未闭合。
+4. 这里只证明 margin-level semantic state shift, 没有证明自然生成闭环。
+```
+
+对 GLM4 的更新：
+
+```text
+GLM4 有强 color margin direction, 但方向混合严重。
+它更像 readout/margin/control mixed mechanism, 不是干净的多变量语义子空间。
+```
+
+对 DS7B 的更新：
+
+```text
+DS7B 在当前层位和构造下仍是 activation failure。
+```
+
+### 九、硬伤
+
+```text
+1. flash_attention_2 未实际启用, 当前环境回退到 sdpa。
+2. d_color 只是弱正控, 没有完成选择性闭环。
+3. d_object 失败, 说明 object 任务构造或变量定义仍不合格。
+4. top1 变化多数为 0, 当前仍是 margin 层面的机制图谱, 不是输出闭环。
+5. prompt family 仍偏少, 不能代表完整自然语言条件。
+6. GLM4 的强 color 效果可能包含表面 token 或读出偏置。
+```
+
+### 十、下一步 Phase 529
+
+建议进入：
+
+```text
+Phase 529: Robust Positive Control Direction Construction
+```
+
+目标：
+
+```text
+先修复 positive controls, 再谈完整语义图谱。
+```
+
+任务：
+
+```text
+1. 为 color 构造多组稳定对照:
+   red-vs-blue
+   green-vs-yellow
+   black-vs-white
+   color-word-vs-object-word
+
+2. 为 object 构造更严格的对象变量:
+   same category different object
+   same color different object
+   object token direct probe
+   avoid category/color leakage
+
+3. 对每个变量先要求 own Δmargin 稳定为正, 再测 off-target。
+
+4. 增加 alpha sweep:
+   alpha = 2, 4, 8, 12
+
+5. 对 qwen3 做主验证, 对 GLM4/DS7B 做跨模型对照。
+```
+
+判据：
+
+```text
+一个方向只有同时满足:
+own Δmargin > 0
+own Δmargin > 2 * max off-target abs Δ
+readout norm ratio low or explicitly decomposed
+confirm 数据仍成立
+
+才允许进入 semantic subspace atlas。
+```
+
+## Phase 529: Robust Positive Control Direction Construction 稳健正控方向构造 [2026-06-18 23:47]
+
+### 一、阶段目标
+
+根据附件分析和 Phase528 结果, 当前不能继续扩大 semantic subspace atlas, 必须先回答：
+
+```text
+color/object 失败到底是:
+1. 变量本身没有方向;
+2. 方向构造不稳定;
+3. 任务/读出污染;
+4. 模型机制差异。
+```
+
+因此本阶段不做理论扩展, 只做 robust positive-control audit：
+
+```text
+对 category/color/object 构造多个候选方向,
+做 alpha sweep,
+测 own-task 与 off-target 扰动,
+用准入规则筛掉伪方向。
+```
+
+### 二、脚本
+
+```text
+tests/glm5/phase529_robust_positive_controls.py
+tests/glm5/phase529_robust_positive_controls_summary.py
+```
+
+脚本特性：
+
+```text
+models = qwen3, glm4, deepseek7b
+layer = qwen3 L12, GLM4 L26, DS7B L18
+dtype = bfloat16
+device_map = auto
+8bit/bf8 = disabled
+attention = try flash_attention_2, fallback to sdpa
+alphas = 2,4,8,12
+candidates = category_fruit, color_red_blue, color_green_yellow, color_black_white, color_all_pairs,
+             object_apple_banana, object_car_truck, object_shirt_jacket, object_all_pairs
+metrics = own Δmargin, same-family off-target, off-family off-target, selectivity ratio, readout norm %
+```
+
+当前环境仍未安装 `flash_attn`, 所有模型均回退到 `sdpa`。
+
+### 三、执行命令
+
+#### 3.1 冒烟测试
+
+```bash
+python tests/glm5/phase529_robust_positive_controls.py qwen3 \
+  --train-n 3 \
+  --test-n 3 \
+  --alphas 2 \
+  --batch-size 3 \
+  --output-dir results/glm5_phase529_smoke \
+  --hard-exit-after-model
+```
+
+#### 3.2 三模型主测试
+
+```bash
+python tests/glm5/phase529_robust_positive_controls.py qwen3 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 2,4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase529_robust_positive_controls \
+  --hard-exit-after-model
+
+python tests/glm5/phase529_robust_positive_controls.py glm4 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 2,4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase529_robust_positive_controls \
+  --hard-exit-after-model
+
+python tests/glm5/phase529_robust_positive_controls.py deepseek7b \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 2,4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase529_robust_positive_controls \
+  --hard-exit-after-model
+```
+
+#### 3.3 重要结果确认测试
+
+对 qwen3 的 color/object 失败和 GLM4 的 color/object 强正控做更大数据确认：
+
+```bash
+python tests/glm5/phase529_robust_positive_controls.py qwen3 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase529_robust_positive_controls_confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase529_robust_positive_controls.py glm4 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase529_robust_positive_controls_confirm \
+  --hard-exit-after-model
+```
+
+#### 3.4 汇总与编译
+
+```bash
+python tests/glm5/phase529_robust_positive_controls_summary.py \
+  --root results/glm5_phase529_robust_positive_controls
+
+python tests/glm5/phase529_robust_positive_controls_summary.py \
+  --root results/glm5_phase529_robust_positive_controls_confirm
+
+python -m py_compile \
+  tests/glm5/phase529_robust_positive_controls.py \
+  tests/glm5/phase529_robust_positive_controls_summary.py
+```
+
+### 四、结果文件
+
+```text
+results/glm5_phase529_robust_positive_controls/phase529_qwen3_robust_positive_controls.json
+results/glm5_phase529_robust_positive_controls/phase529_glm4_robust_positive_controls.json
+results/glm5_phase529_robust_positive_controls/phase529_deepseek7b_robust_positive_controls.json
+results/glm5_phase529_robust_positive_controls/phase529_cross_model_summary.md
+results/glm5_phase529_robust_positive_controls_confirm/phase529_qwen3_robust_positive_controls.json
+results/glm5_phase529_robust_positive_controls_confirm/phase529_glm4_robust_positive_controls.json
+results/glm5_phase529_robust_positive_controls_confirm/phase529_cross_model_summary.md
+```
+
+### 五、准入规则
+
+本阶段使用比 Phase528 更硬的 basic gate：
+
+```text
+own Δmargin > 0
+own Δmargin > 2 * max(same-family off-target abs Δ, off-family off-target abs Δ)
+```
+
+解释：
+
+```text
+same-family off-target = 同变量家族内其他任务被误推高
+off-family off-target = 其他变量家族被误推高
+```
+
+这不是完整机制闭合, 只是进入 semantic atlas 的最低正控门槛。
+
+### 六、主测试结果
+
+#### 6.1 qwen3
+
+通过 basic gate：
+
+```text
+category_fruit:
+  own Δ = +2.6927
+  off-family max abs Δ = 0.6979
+  ratio = 3.8582
+  readout norm = 6.17%
+```
+
+未通过：
+
+```text
+color_red_blue:
+  own Δ = +0.3854
+  same-family max abs Δ = 0.9271
+  off-family max abs Δ = 0.7604
+  ratio = 0.4157
+
+color_black_white:
+  own Δ = +0.3542
+  same-family max abs Δ = 0.3750
+  off-family max abs Δ = 0.1562
+  ratio = 0.9444
+
+object_apple_banana:
+  own Δ = +0.2917
+  same-family max abs Δ = 0.1250
+  off-family max abs Δ = 0.4583
+  ratio = 0.6364
+```
+
+判断：
+
+```text
+qwen3 category 继续稳定。
+qwen3 color 有弱正效应, 但 red/blue 和 black/white 在主测试都未过门槛。
+qwen3 object 仍未过门槛。
+```
+
+#### 6.2 GLM4
+
+通过 basic gate：
+
+```text
+color_red_blue:
+  own Δ = +7.5111
+  same-family max abs Δ = 0.4167
+  off-family max abs Δ = 0.6979
+  ratio = 10.7621
+  readout norm = 31.49%
+
+color_green_yellow:
+  own Δ = +3.5156
+  same-family max abs Δ = 1.0938
+  off-family max abs Δ = 1.6719
+  ratio = 2.1028
+  readout norm = 20.47%
+
+color_black_white:
+  own Δ = +5.3594
+  same-family max abs Δ = 1.9896
+  off-family max abs Δ = 0.9062
+  ratio = 2.6937
+  readout norm = 29.82%
+
+object_car_truck:
+  own Δ = +3.0846
+  same-family max abs Δ = 0.9219
+  off-family max abs Δ = 0.7083
+  ratio = 3.3460
+  readout norm = 13.96%
+
+object_shirt_jacket:
+  own Δ = +2.8516
+  same-family max abs Δ = 0.5833
+  off-family max abs Δ = 0.7656
+  ratio = 3.7245
+  readout norm = 9.80%
+```
+
+未通过：
+
+```text
+category_fruit:
+  own Δ = +0.4310
+  off-family max abs Δ = 0.6458
+  ratio = 0.6673
+
+object_apple_banana:
+  own Δ = +2.3776
+  ratio = 1.9891
+```
+
+判断：
+
+```text
+GLM4 的 color/object positive control 强且多方向成立。
+但这些方向 readout norm 较高, 尤其 color 为 20% 到 31%, 说明它们可能更接近 readout/control direction。
+GLM4 category 在主测试未过门槛。
+```
+
+#### 6.3 DS7B
+
+无候选通过 basic gate：
+
+```text
+category_fruit own Δ = +0.0312, ratio = 0.1875
+best color = color_black_white, own Δ = +0.2500, ratio = 0.9231
+best object = object_car_truck, own Δ = +0.0521, ratio = 0.4167
+```
+
+判断：
+
+```text
+DS7B 在当前构造下仍无稳定 positive control direction。
+```
+
+### 七、确认测试结果
+
+#### 7.1 qwen3 confirm
+
+通过：
+
+```text
+category_fruit:
+  own Δ = +2.5195
+  off-family max abs Δ = 0.6771
+  ratio = 3.7212
+  readout norm = 6.45%
+
+color_black_white:
+  own Δ = +0.4531
+  same-family max abs Δ = 0.1719
+  off-family max abs Δ = 0.0625
+  ratio = 2.6364
+  readout norm = 0.55%
+```
+
+未通过：
+
+```text
+color_red_blue:
+  own Δ = +0.4297
+  same-family max abs Δ = 0.8359
+  off-family max abs Δ = 0.7812
+  ratio = 0.5140
+
+object_apple_banana:
+  own Δ = +0.2917
+  off-family max abs Δ = 0.4180
+  ratio = 0.6978
+
+object_all_pairs:
+  own Δ = +0.1562
+  off-family max abs Δ = 0.8438
+  ratio = 0.1852
+```
+
+判断：
+
+```text
+qwen3 category 继续稳。
+qwen3 black/white color direction 首次在确认数据中通过 basic gate。
+qwen3 red/blue 仍失败, 说明 color 不是统一容易方向, 颜色对可能有强烈差异。
+qwen3 object 仍失败。
+```
+
+#### 7.2 GLM4 confirm
+
+通过：
+
+```text
+color_red_blue:
+  own Δ = +7.3688
+  ratio = 11.1402
+  readout norm = 32.06%
+
+color_black_white:
+  own Δ = +5.3223
+  ratio = 2.4773
+  readout norm = 30.27%
+
+object_apple_banana:
+  own Δ = +2.3776
+  ratio = 2.0774
+  readout norm = 15.33%
+
+object_car_truck:
+  own Δ = +3.0846
+  ratio = 3.3460
+  readout norm = 13.96%
+
+object_shirt_jacket:
+  own Δ = +2.8516
+  ratio = 3.9090
+  readout norm = 9.80%
+```
+
+未通过：
+
+```text
+category_fruit:
+  own Δ = -0.0049
+  off-family max abs Δ = 0.3516
+
+color_green_yellow:
+  own Δ = +3.6934
+  off-family max abs Δ = 2.0938
+  ratio = 1.7640
+```
+
+判断：
+
+```text
+GLM4 的 color/object positive controls 在确认数据中复现。
+GLM4 category direction 反而从主测试弱正变成确认测试近零/负, 进一步说明 GLM4 不是干净 category semantic 模型。
+```
+
+### 八、当前最可靠客观事实
+
+1. qwen3 的 category 方向继续是最可靠的正交语义候选：
+
+```text
+main own Δ = +2.6927, ratio = 3.8582
+confirm own Δ = +2.5195, ratio = 3.7212
+readout norm ≈ 6%
+```
+
+2. qwen3 的 color 结果被细分：
+
+```text
+red/blue 仍失败。
+black/white 在确认数据中通过 basic gate。
+```
+
+这说明：
+
+```text
+color 不是一个当前构造下的统一稳定方向。
+不同颜色对可能走不同表面/语义/读出路径。
+```
+
+3. qwen3 的 object 仍失败：
+
+```text
+best object_apple_banana confirm own Δ = +0.2917
+off-family max abs Δ = 0.4180
+ratio = 0.6978
+```
+
+4. GLM4 的 color/object 正控强且复现：
+
+```text
+color_red_blue confirm own Δ = +7.3688, ratio = 11.1402
+object_car_truck confirm own Δ = +3.0846, ratio = 3.3460
+object_shirt_jacket confirm own Δ = +2.8516, ratio = 3.9090
+```
+
+但 GLM4 的 readout norm 高：
+
+```text
+color readout norm ≈ 30%
+object readout norm ≈ 10%-15%
+```
+
+所以这更像可控读出/边际方向, 不应直接叫正交语义方向。
+
+5. DS7B 仍没有通过任何候选：
+
+```text
+no passed candidates
+```
+
+### 九、对 Phase528 的修正
+
+Phase528 判断：
+
+```text
+qwen3 color 只部分修复, object 失败。
+GLM4 color 强但混合。
+```
+
+Phase529 修正为：
+
+```text
+qwen3 color 不是整体失败, black/white 可以形成较干净候选, red/blue 仍失败。
+qwen3 object 失败仍成立。
+GLM4 不只是 color 强, object positive controls 也强, 但 readout/control 成分明显。
+DS7B failure 继续成立。
+```
+
+### 十、理论更新
+
+本轮支持的理论更新：
+
+```text
+语义变量不是天然对应一个统一方向。
+即使同属 color, 不同 color-pair 的可控性也不同。
+```
+
+更谨慎的公式应改成：
+
+```text
+d_v^l 不是单一变量方向,
+而是 d_{v,a,b}^l = E[h_l | v=a] - E[h_l | v=b]
+```
+
+其中：
+
+```text
+v = semantic variable
+a,b = variable states
+```
+
+方向能否进入 atlas, 取决于：
+
+```text
+causal_selectivity(d_{v,a,b}^l)
+readout_ratio(d_{v,a,b}^l)
+stability_across_templates(d_{v,a,b}^l)
+```
+
+所以当前理论从：
+
+```text
+semantic variable direction
+```
+
+收紧为：
+
+```text
+conditioned semantic state-pair direction
+```
+
+### 十一、硬伤
+
+```text
+1. qwen3 black/white 只在确认测试通过, 主测试未过, 需要独立复验。
+2. qwen3 red/blue 仍然失败, 不能声明 color atlas 已建立。
+3. qwen3 object 仍失败, 对象身份编码仍未定位。
+4. GLM4 color/object 很强, 但 readout norm 高, 需要做 readout/orthogonal decomposition。
+5. DS7B 仍无法区分 absence、activation failure、binding failure、readout failure。
+6. 当前仍是 margin-level, 不是自然生成闭环。
+7. object prompt 中仍直接出现 object word, 可能引入表面复制路径。
+```
+
+### 十二、下一步 Phase 530
+
+建议进入：
+
+```text
+Phase 530: State-Pair Direction Decomposition and Template Robustness
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 color_black_white 做独立复验:
+   更换模板、对象、颜色词位置, 测是否仍过门槛。
+
+2. 对 qwen3 red_blue 失败做诊断:
+   判断是颜色词 token 化、任务基线、对象绑定还是表面竞争导致失败。
+
+3. 对 GLM4 color/object 做 readout/orthogonal decomposition:
+   拆成 d_parallel 与 d_perp,
+   测强效果来自 readout 还是 orthogonal semantic/control component。
+
+4. 对 object 变量去掉直接 object-copy:
+   使用描述性属性提示, 不在 prompt 中直接出现目标 object word,
+   测是否还能构造 object identity direction。
+
+5. DS7B 单独诊断:
+   分层 sweep 或 readout-only injection,
+   区分 activation failure 与 readout/interface failure。
+```
+
+## Phase 530: State-Pair Direction Decomposition and Template Robustness 状态对方向分解与模板稳健性 [2026-06-19 00:57]
+
+### 一、阶段目标
+
+根据附件分析和 Phase529 结果, 本阶段继续完成以下客观任务：
+
+```text
+1. 复验 qwen3 black/white 是否真的能进入 color atlas。
+2. 诊断 qwen3 red/blue 失败是否是模板问题。
+3. 对 GLM4 color/object 强方向做 readout-parallel / orthogonal-perp 分解。
+4. 对 object 使用不直接出现目标 object word 的描述提示, 检查 object identity 是否仍可构造。
+5. 对 DS7B 观察 full / parallel / perp 的差异, 初步区分 activation failure 与 readout/interface effect。
+```
+
+### 二、对附件分析的判定
+
+附件主要判断正确：
+
+```text
+1. Phase529 是 Phase528 之后必须做的正控审计。
+2. qwen3 category 仍是最可靠正交语义点。
+3. qwen3 color 应拆成 state-pair direction, 不能当统一 color vector。
+4. qwen3 object 失败仍是知识网络路线的核心硬伤。
+5. GLM4 color/object 强, 但必须分解 readout/control 与 orthogonal component。
+6. DS7B 不能简单说无语义, 需要诊断是 activation/readout/binding/interface 哪类失败。
+```
+
+需要进一步收紧：
+
+```text
+1. qwen3 black/white 不能直接进入 atlas, 必须跨模板验证。
+2. basic gate 只有 ratio, 没有 minimum absolute delta, 可能让小幅波动通过。
+3. object 描述提示虽然去掉直接 object word, 但仍可能包含强语义线索和常识模板偏置。
+```
+
+### 三、脚本
+
+```text
+tests/glm5/phase530_state_pair_decomposition.py
+tests/glm5/phase530_state_pair_decomposition_summary.py
+```
+
+脚本特性：
+
+```text
+models = qwen3, glm4, deepseek7b
+layers = qwen3 L12, GLM4 L26, DS7B L18
+dtype = bfloat16
+device_map = auto
+8bit/bf8 = disabled
+attention = try flash_attention_2, fallback to sdpa
+alphas = 4,8,12
+components = full, parallel, perp
+```
+
+候选方向：
+
+```text
+color_red_blue_direct
+color_red_blue_painted
+color_red_blue_property
+color_black_white_direct
+color_black_white_painted
+color_black_white_property
+object_desc_apple_banana
+object_desc_car_truck
+```
+
+其中 object_desc 使用描述性提示, 不直接出现目标 object word。
+
+当前环境仍未安装 `flash_attn`, 实际运行均回退到 `sdpa`。
+
+### 四、执行命令
+
+#### 4.1 冒烟测试
+
+```bash
+python tests/glm5/phase530_state_pair_decomposition.py qwen3 \
+  --train-n 3 \
+  --test-n 2 \
+  --alphas 4 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase530_smoke \
+  --hard-exit-after-model
+```
+
+#### 4.2 三模型主测试
+
+```bash
+python tests/glm5/phase530_state_pair_decomposition.py qwen3 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase530_state_pair_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase530_state_pair_decomposition.py glm4 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase530_state_pair_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase530_state_pair_decomposition.py deepseek7b \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase530_state_pair_decomposition \
+  --hard-exit-after-model
+```
+
+#### 4.3 重要结果确认测试
+
+对 qwen3 和 GLM4 做更大数据确认：
+
+```bash
+python tests/glm5/phase530_state_pair_decomposition.py qwen3 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase530_state_pair_decomposition_confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase530_state_pair_decomposition.py glm4 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase530_state_pair_decomposition_confirm \
+  --hard-exit-after-model
+```
+
+#### 4.4 汇总与编译
+
+```bash
+python tests/glm5/phase530_state_pair_decomposition_summary.py \
+  --root results/glm5_phase530_state_pair_decomposition
+
+python tests/glm5/phase530_state_pair_decomposition_summary.py \
+  --root results/glm5_phase530_state_pair_decomposition_confirm
+
+python -m py_compile \
+  tests/glm5/phase530_state_pair_decomposition.py \
+  tests/glm5/phase530_state_pair_decomposition_summary.py
+```
+
+### 五、结果文件
+
+```text
+results/glm5_phase530_state_pair_decomposition/phase530_qwen3_state_pair_decomposition.json
+results/glm5_phase530_state_pair_decomposition/phase530_glm4_state_pair_decomposition.json
+results/glm5_phase530_state_pair_decomposition/phase530_deepseek7b_state_pair_decomposition.json
+results/glm5_phase530_state_pair_decomposition/phase530_cross_model_summary.md
+results/glm5_phase530_state_pair_decomposition_confirm/phase530_qwen3_state_pair_decomposition.json
+results/glm5_phase530_state_pair_decomposition_confirm/phase530_glm4_state_pair_decomposition.json
+results/glm5_phase530_state_pair_decomposition_confirm/phase530_cross_model_summary.md
+```
+
+### 六、主测试结果
+
+#### 6.1 qwen3
+
+color_black_white：
+
+```text
+direct:
+  full own Δ = +0.1319, ratio = 4.222, pass
+  parallel own Δ = +0.0451, ratio = 0.162, fail
+  perp own Δ = +0.1250, ratio = 2.667, pass
+  parallel norm = 0.52%
+
+painted:
+  full own Δ = +0.0139, ratio = 0.138, fail
+  perp own Δ = +0.0035, ratio = 0.048, fail
+
+property:
+  full own Δ = -0.0347, ratio = 0.444, fail
+  perp own Δ = -0.0347, ratio = 0.370, fail
+```
+
+color_red_blue：
+
+```text
+direct:
+  full own Δ = +0.3785, ratio = 1.615, fail
+  perp own Δ = +0.3785, ratio = 1.615, fail
+
+painted/property:
+  not passed
+```
+
+object_desc：
+
+```text
+object_desc_apple_banana:
+  full own Δ = -0.1562, fail
+  perp own Δ = -0.1094, fail
+
+object_desc_car_truck:
+  full own Δ = +0.3281, ratio = 1.167, fail
+  parallel own Δ = +0.2969, ratio = 2.591, pass
+  perp own Δ = +0.3281, ratio = 1.390, fail
+```
+
+判断：
+
+```text
+qwen3 black/white 的有效性集中在 direct 模板和 perp 分量, 不是模板稳健方向。
+qwen3 red/blue 仍失败。
+qwen3 object 去掉直接 object word 后仍不能形成可靠 orthogonal object direction。
+```
+
+#### 6.2 GLM4
+
+color_red_blue：
+
+```text
+direct:
+  full +6.4218, ratio 3.714, pass
+  parallel +8.3403, ratio 7.741, pass
+  perp +4.3289, ratio 2.923, pass
+
+painted:
+  full +6.3704, pass
+  parallel +8.3403, pass
+  perp +4.2447, pass
+
+property:
+  full +6.6513, pass
+  parallel +8.3403, pass
+  perp +4.5582, pass
+```
+
+color_black_white：
+
+```text
+direct:
+  full +4.0415, ratio 15.457, pass
+  parallel +7.0197, ratio 16.199, pass
+  perp +2.1914, ratio 14.293, pass
+
+painted/property:
+  full, parallel, perp all pass
+```
+
+object_desc：
+
+```text
+object_desc_apple_banana:
+  full +1.5569, ratio 3.668, pass
+  parallel +12.7043, ratio 53.414, pass
+  perp +0.7777, ratio 1.778, fail
+
+object_desc_car_truck:
+  full +1.6980, ratio 3.609, pass
+  parallel +7.7021, ratio 23.248, pass
+  perp +1.2542, ratio 2.641, pass
+```
+
+判断：
+
+```text
+GLM4 的 color 强效果不仅来自 parallel readout, perp 也稳定有效。
+但 parallel 远强于 full/perp, 说明 readout/control 成分非常强。
+object 去掉直接 object word 后仍可用, 但 apple/banana 的 perp 未过, car/truck 的 perp 过。
+```
+
+#### 6.3 DS7B
+
+```text
+color full directions mostly fail.
+parallel readout components can pass:
+  red_blue direct parallel +0.5660, ratio 7.409, pass
+  black_white direct parallel +0.8403, ratio 9.778, pass
+
+perp mostly fails except red_blue_painted perp:
+  +0.1667, ratio 2.526, pass
+
+object_desc_car_truck:
+  full +0.0938, ratio 4.000, pass
+  parallel +0.8086, ratio 8.625, pass
+  perp +0.0703, ratio 0.547, fail
+```
+
+判断：
+
+```text
+DS7B 不是完全不能被 readout direction 移动。
+但 learned full direction 和 perp semantic direction 仍弱。
+部分 pass 的 absolute Δ 很小, 需要 minimum absolute delta 门槛复审。
+```
+
+### 七、确认测试结果
+
+#### 7.1 qwen3 confirm
+
+```text
+color_black_white_direct:
+  full +0.1797, ratio 1.25, fail
+  parallel +0.1120, ratio 0.36, fail
+  perp +0.1797, ratio 2.76, pass
+
+color_black_white_painted:
+  full -0.0755, fail
+  perp -0.0339, fail
+
+color_black_white_property:
+  full -0.0833, fail
+  perp -0.1042, fail
+
+color_red_blue_direct:
+  full +0.3151, ratio 1.34, fail
+  perp +0.3151, ratio 1.26, fail
+
+object_desc_apple_banana:
+  full -0.1562, fail
+  perp -0.1094, fail
+
+object_desc_car_truck:
+  full +0.3281, ratio 1.02, fail
+  parallel +0.2969, ratio 2.53, pass
+  perp +0.3281, ratio 1.05, fail
+```
+
+确认判断：
+
+```text
+qwen3 black/white direct-perp 可复现, 但 full 不过门槛, painted/property 不过门槛。
+所以 black/white 不是模板稳健 color direction, 只能作为 direct-template orthogonal candidate。
+qwen3 red/blue 仍失败。
+qwen3 object orthogonal identity direction 仍失败。
+```
+
+#### 7.2 GLM4 confirm
+
+```text
+color_red_blue:
+  all templates full/parallel/perp pass
+  parallel ≈ +8.466
+  perp ≈ +4.493 to +4.838
+
+color_black_white:
+  all templates full/parallel/perp pass
+  parallel ≈ +7.396
+  perp ≈ +2.419 to +3.023
+
+object_desc_apple_banana:
+  full +1.5569, ratio 3.89, pass
+  parallel +12.7043, ratio 85.31, pass
+  perp +0.7777, ratio 1.98, fail
+
+object_desc_car_truck:
+  full +1.6980, ratio 3.44, pass
+  parallel +7.7021, ratio 23.25, pass
+  perp +1.2542, ratio 2.50, pass
+```
+
+确认判断：
+
+```text
+GLM4 color 不是纯 readout-only, 因为 perp 也稳定有效。
+但 parallel/readout 分量更强, 是主导放大器。
+GLM4 object 在无直接复制提示下仍有效, 但 apple/banana 更依赖 readout, car/truck 有较强 perp。
+```
+
+### 八、Phase530 的关键客观结论
+
+1. qwen3 black/white 被降级：
+
+```text
+Phase529: black/white confirm pass。
+Phase530: 只有 direct-template perp pass, full 不稳定, painted/property 不通过。
+```
+
+因此不能进入完整 color atlas。
+
+2. qwen3 red/blue 继续失败：
+
+```text
+direct 有正 own Δ, 但 ratio 不够。
+painted/property 失败。
+```
+
+3. qwen3 object identity 仍未定位：
+
+```text
+去掉直接 object word 后 apple/banana 负向,
+car/truck full/perp ratio 不够,
+parallel 可过但更像读出/表面接口。
+```
+
+4. GLM4 color 是 readout-dominant but not readout-only：
+
+```text
+parallel > full > perp,
+但 perp 在所有 color templates 上都通过。
+```
+
+这说明 GLM4 有 strong readout amplifier, 同时存在一定 orthogonal/control component。
+
+5. GLM4 object 在描述提示中仍有效：
+
+```text
+car/truck full, parallel, perp 均通过。
+apple/banana full/parallel 通过, perp 不过。
+```
+
+6. DS7B 的失败被重新拆分：
+
+```text
+pure readout parallel 可以移动 margin,
+full/perp learned semantic direction 多数不稳。
+```
+
+因此 DS7B 更像：
+
+```text
+semantic direction activation failure + readout interface still movable
+```
+
+而不是完全无法被干预。
+
+### 九、理论更新
+
+Phase530 将状态对公式继续收紧：
+
+```text
+d_{v,a,b}^{l,t}
+= E[h_l | v=a, template=t] - E[h_l | v=b, template=t]
+```
+
+方向分解为：
+
+```text
+d_{v,a,b}^{l,t}
+= d_parallel + d_perp
+```
+
+其中：
+
+```text
+d_parallel = Proj_{q_{a,b}}(d)
+d_perp = d - d_parallel
+```
+
+当前更可靠的机制分类：
+
+```text
+qwen3:
+  category = stable orthogonal semantic candidate
+  black/white = direct-template orthogonal candidate only
+  red/blue = failed
+  object = failed
+
+GLM4:
+  color = readout-dominant + orthogonal/control mixed
+  object = readout-dominant, car/truck has orthogonal/control component
+
+DS7B:
+  readout interface movable, learned semantic directions not stable
+```
+
+### 十、硬伤
+
+```text
+1. basic gate 没有 minimum absolute Δ, DS7B 小 Δ pass 可能是假阳性。
+2. qwen3 black/white 只在 direct 模板 perp 上过, 不具备模板稳健性。
+3. color painted/property 模板可能和 direct 模板触发不同语法路径, 需要单独分析模板路径。
+4. object_desc 虽去掉目标词, 但描述本身仍可能强提示类别或常识。
+5. GLM4 perp 通过不等于纯语义, 可能是 orthogonal control 或 residual routing。
+6. 全部仍是 margin-level, 不是自然生成闭环。
+```
+
+### 十一、下一步 Phase531
+
+建议进入：
+
+```text
+Phase531: Absolute-Threshold Gate and Template Path Audit
+```
+
+任务：
+
+```text
+1. 给 basic gate 增加 minimum absolute Δ:
+   own Δ >= 0.25 或按 baseline std 设置阈值。
+
+2. 对 qwen3 black/white direct vs painted/property 做模板路径审计:
+   比较 hidden norm, direction cosine, off-target source。
+
+3. 对 GLM4 color perp 做随机同范数与 orthogonal random control:
+   判断 perp 是否真高于正交随机。
+
+4. 对 DS7B readout parallel pass 做 readout-only control:
+   确认是接口可动而非语义方向有效。
+
+5. 对 object_desc 增加更多对象对和无类别描述:
+   继续排除 surface/common-sense prompt shortcut。
+```
+
+## Phase 531: Absolute-Threshold Gate and Template Path Audit 绝对阈值门槛与模板路径审计 [2026-06-19 05:15]
+
+### 一、阶段目标
+
+根据附件分析和 Phase530 的硬伤, 本阶段继续完成：
+
+```text
+1. 给 basic gate 增加 minimum absolute Δ。
+2. 对 qwen3 black/white direct-template perp 的小幅 pass 做复审。
+3. 对 GLM4 color/object perp 加 random_perp same-norm control。
+4. 对 DS7B parallel pass 加 random_readout/readout-only control。
+5. 审计 color direct/painted/property 模板方向之间的 cosine。
+```
+
+### 二、对附件分析的判定
+
+附件分析基本正确：
+
+```text
+1. Phase530 正确地把 Phase529 中看似通过的方向分为模板依赖、读出驱动、正交/控制混合和失败几类。
+2. qwen3 black/white 不能进入完整 color atlas。
+3. GLM4 color 不是 readout-only, 但 readout-dominant。
+4. DS7B 不能再叫完全不可干预, 更准确是 readout interface movable, learned semantic direction unstable。
+```
+
+需要补充的严格点：
+
+```text
+1. Phase530 的 qwen3 black/white pass 幅度过小, 必须加绝对阈值。
+2. DS7B 的部分 pass 也可能只是小 Δ + ratio 假阳性。
+3. GLM4 perp 需要 random_perp 对照, 否则不能说明正交分量非随机。
+```
+
+### 三、脚本
+
+```text
+tests/glm5/phase531_absolute_gate_template_audit.py
+tests/glm5/phase531_absolute_gate_template_audit_summary.py
+```
+
+脚本特性：
+
+```text
+models = qwen3, glm4, deepseek7b
+layers = qwen3 L12, GLM4 L26, DS7B L18
+dtype = bfloat16
+device_map = auto
+8bit/bf8 = disabled
+attention = try flash_attention_2, fallback to sdpa
+alphas = 4,8,12
+min_abs_delta = 0.25
+components = full, parallel, perp, random_perp, random_readout
+```
+
+当前环境未安装 `flash_attn`, 实际运行均回退到 `sdpa`。
+
+### 四、执行命令
+
+#### 4.1 冒烟测试
+
+```bash
+python tests/glm5/phase531_absolute_gate_template_audit.py qwen3 \
+  --train-n 3 \
+  --test-n 2 \
+  --alphas 4 \
+  --min-abs-delta 0.25 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase531_smoke \
+  --hard-exit-after-model
+```
+
+#### 4.2 三模型主测试
+
+```bash
+python tests/glm5/phase531_absolute_gate_template_audit.py qwen3 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase531_absolute_gate_template_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase531_absolute_gate_template_audit.py glm4 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase531_absolute_gate_template_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase531_absolute_gate_template_audit.py deepseek7b \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 4,8,12 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase531_absolute_gate_template_audit \
+  --hard-exit-after-model
+```
+
+#### 4.3 重要结果确认测试
+
+对 qwen3 和 GLM4 做更大数据确认：
+
+```bash
+python tests/glm5/phase531_absolute_gate_template_audit.py qwen3 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase531_absolute_gate_template_audit_confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase531_absolute_gate_template_audit.py glm4 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 4,8,12 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase531_absolute_gate_template_audit_confirm \
+  --hard-exit-after-model
+```
+
+#### 4.4 汇总与编译
+
+```bash
+python tests/glm5/phase531_absolute_gate_template_audit_summary.py \
+  --root results/glm5_phase531_absolute_gate_template_audit
+
+python tests/glm5/phase531_absolute_gate_template_audit_summary.py \
+  --root results/glm5_phase531_absolute_gate_template_audit_confirm
+
+python -m py_compile \
+  tests/glm5/phase531_absolute_gate_template_audit.py \
+  tests/glm5/phase531_absolute_gate_template_audit_summary.py
+```
+
+### 五、结果文件
+
+```text
+results/glm5_phase531_absolute_gate_template_audit/phase531_qwen3_absolute_gate_template_audit.json
+results/glm5_phase531_absolute_gate_template_audit/phase531_glm4_absolute_gate_template_audit.json
+results/glm5_phase531_absolute_gate_template_audit/phase531_deepseek7b_absolute_gate_template_audit.json
+results/glm5_phase531_absolute_gate_template_audit/phase531_cross_model_summary.md
+results/glm5_phase531_absolute_gate_template_audit_confirm/phase531_qwen3_absolute_gate_template_audit.json
+results/glm5_phase531_absolute_gate_template_audit_confirm/phase531_glm4_absolute_gate_template_audit.json
+results/glm5_phase531_absolute_gate_template_audit_confirm/phase531_cross_model_summary.md
+```
+
+### 六、严格门槛
+
+本阶段使用 strict gate：
+
+```text
+passes_ratio_gate:
+  own Δ > 0
+  own Δ > 2 * max(same-family off-target, off-family off-target)
+
+passes_absolute_gate:
+  own Δ >= 0.25
+
+passes_strict_gate:
+  passes_ratio_gate AND passes_absolute_gate
+```
+
+### 七、主测试结果
+
+#### 7.1 qwen3
+
+strict gate 后：
+
+```text
+color_black_white_direct:
+  full +0.132, ratio 4.22, ratio pass but abs fail => strict fail
+  perp +0.125, ratio 2.67, ratio pass but abs fail => strict fail
+
+color_red_blue_direct:
+  full +0.378, abs pass but ratio fail => strict fail
+  perp +0.378, abs pass but ratio fail => strict fail
+
+object_desc_car_truck:
+  full +0.328, abs pass but ratio fail => strict fail
+  parallel +0.297, ratio 2.59, strict pass
+  random_readout +0.297, ratio 2.59, strict pass
+```
+
+模板方向余弦：
+
+```text
+red_blue:
+  direct-painted cos +0.1431
+  direct-property cos -0.0335
+  painted-property cos +0.0948
+
+black_white:
+  direct-painted cos +0.0750
+  direct-property cos -0.0114
+  painted-property cos +0.1335
+```
+
+判断：
+
+```text
+qwen3 color 在 strict gate 下无方向通过。
+qwen3 black/white 之前的 pass 是小幅 ratio pass, 不能进入 atlas。
+qwen3 direct/painted/property 方向几乎不对齐, 模板路径差异很大。
+qwen3 object_desc_car_truck 的 parallel pass 与 random_readout 完全等价, 是 readout/interface, 不是 learned object direction。
+```
+
+#### 7.2 GLM4
+
+color：
+
+```text
+color_red_blue_direct:
+  full +6.422, ratio 3.71, strict pass
+  parallel +8.340, ratio 7.74, strict pass
+  perp +4.329, ratio 2.92, strict pass
+  random_perp -0.069, strict fail
+  random_readout +8.340, strict pass
+
+color_black_white_direct:
+  full +4.041, ratio 15.46, strict pass
+  parallel +7.020, ratio 16.20, strict pass
+  perp +2.191, ratio 14.29, strict pass
+  random_perp +0.151, strict fail
+  random_readout +7.020, strict pass
+```
+
+object：
+
+```text
+object_desc_car_truck:
+  full +1.698, ratio 3.61, strict pass
+  parallel +7.702, ratio 23.25, strict pass
+  perp +1.254, ratio 2.64, strict pass
+  random_perp -0.050, strict fail
+  random_readout +7.702, strict pass
+
+object_desc_apple_banana:
+  full +1.557, strict pass
+  parallel +12.704, strict pass
+  perp +0.778, abs pass but ratio fail
+  random_perp +0.703, abs pass but ratio fail
+```
+
+模板方向余弦：
+
+```text
+red_blue:
+  direct-painted cos +0.7355
+  direct-property cos +0.8109
+  painted-property cos +0.7249
+
+black_white:
+  direct-painted cos +0.5517
+  direct-property cos +0.6704
+  painted-property cos +0.6523
+```
+
+判断：
+
+```text
+GLM4 color directions are template-aligned and strict-pass across full/parallel/perp.
+GLM4 color perp is far above random_perp, so it is not random orthogonal noise.
+GLM4 remains readout-dominant because parallel/random_readout is strongest, but not readout-only.
+GLM4 object car/truck perp also survives random_perp control.
+```
+
+#### 7.3 DS7B
+
+strict gate 后：
+
+```text
+color_red_blue_direct:
+  parallel +0.566, ratio 7.41, strict pass
+  random_readout +0.566, ratio 7.41, strict pass
+  full/perp/random_perp fail
+
+color_black_white_direct:
+  full +0.274, abs pass but ratio fail
+  parallel +0.840, ratio 9.78, strict pass
+  random_readout +0.840, ratio 9.78, strict pass
+  perp fail
+
+object_desc_car_truck:
+  full +0.094, ratio pass but abs fail
+  parallel +0.809, ratio 8.62, strict pass
+  random_readout +0.809, ratio 8.62, strict pass
+  perp fail
+```
+
+模板方向余弦：
+
+```text
+red_blue:
+  direct-painted cos +0.0410
+  direct-property cos +0.1872
+  painted-property cos +0.0867
+
+black_white:
+  direct-painted cos +0.1072
+  direct-property cos +0.1909
+  painted-property cos +0.1184
+```
+
+判断：
+
+```text
+DS7B 的 strict passes 基本等价于 random_readout/readout-only control。
+learned full/perp directions 不稳定。
+这支持 readout interface movable, semantic direction activation failure。
+```
+
+### 八、确认测试结果
+
+#### 8.1 qwen3 confirm
+
+```text
+color_black_white_direct:
+  full +0.180, ratio 1.25, strict fail
+  perp +0.180, ratio 2.76, ratio pass but abs fail => strict fail
+
+color_red_blue_direct:
+  full +0.315, ratio 1.34, strict fail
+  perp +0.315, ratio 1.26, strict fail
+
+object_desc_car_truck:
+  full +0.328, ratio 1.02, strict fail
+  parallel +0.297, ratio 2.53, strict pass
+  random_readout +0.297, ratio 2.53, strict pass
+```
+
+模板方向余弦：
+
+```text
+red_blue direct-painted +0.1615, direct-property -0.0686
+black_white direct-painted +0.1037, direct-property -0.0286
+```
+
+确认判断：
+
+```text
+qwen3 color 无 strict-pass direction。
+qwen3 direct color directions 与 painted/property 几乎不对齐。
+qwen3 object parallel pass 仍等价 random_readout。
+```
+
+#### 8.2 GLM4 confirm
+
+```text
+color_red_blue:
+  all templates full/parallel/perp strict pass
+  random_perp strict fail
+  random_readout strict pass
+
+color_black_white:
+  all templates full/parallel/perp strict pass
+  random_perp strict fail
+  random_readout strict pass
+
+object_desc_car_truck:
+  full +1.698, strict pass
+  parallel +7.702, strict pass
+  perp +1.254, strict pass
+  random_perp -0.050, strict fail
+  random_readout +7.702, strict pass
+```
+
+模板方向余弦：
+
+```text
+red_blue:
+  direct-painted +0.7440
+  direct-property +0.8078
+  painted-property +0.7326
+
+black_white:
+  direct-painted +0.5442
+  direct-property +0.6679
+  painted-property +0.6485
+```
+
+确认判断：
+
+```text
+GLM4 color/object perp survives absolute threshold and random_perp control.
+GLM4 color template directions are substantially aligned.
+GLM4 readout component remains dominant, but there is a non-random orthogonal/control component.
+```
+
+### 九、当前最可靠事实
+
+1. qwen3 color 被进一步降级：
+
+```text
+没有任何 color component 通过 strict gate。
+black/white direct-perp 只过 ratio, 不过 abs。
+red/blue 过 abs, 不过 ratio。
+```
+
+2. qwen3 的模板路径高度分裂：
+
+```text
+color direct vs painted/property cosine 大约 0.1 或接近 0。
+```
+
+3. GLM4 color 是当前最稳的跨模板 state-pair system：
+
+```text
+full/parallel/perp 均 strict pass。
+random_perp fail。
+template direction cosine 中高。
+```
+
+4. GLM4 color/object 的 parallel/readout 最强：
+
+```text
+random_readout 与 parallel 等价通过。
+```
+
+这说明 readout interface 是强主导通道。
+
+5. GLM4 perp 非随机：
+
+```text
+perp strict pass, random_perp strict fail。
+```
+
+6. DS7B 的可动性主要来自 readout interface：
+
+```text
+parallel strict pass 与 random_readout strict pass 等价。
+full/perp mostly fail。
+```
+
+### 十、理论更新
+
+Phase531 后, 语义图谱准入规则需要加入：
+
+```text
+absolute_effect_gate:
+  own Δ >= min_abs_delta
+
+template_alignment_gate:
+  directions across templates should have non-trivial cosine alignment
+
+random_perp_control:
+  perp effect must exceed same-norm random orthogonal direction
+
+readout_only_control:
+  parallel pass must be compared with random_readout/readout-only injection
+```
+
+当前机制分类进一步收紧：
+
+```text
+qwen3:
+  category 仍是主语义候选。
+  color 目前没有 strict-pass atlas direction。
+  object 仍未定位。
+
+GLM4:
+  color = readout-dominant + non-random orthogonal/control component。
+  object car/truck = readout-dominant + non-random orthogonal/control component。
+
+DS7B:
+  readout interface movable。
+  learned semantic full/perp direction 未激活或未命中。
+```
+
+### 十一、硬伤
+
+```text
+1. min_abs_delta = 0.25 是人为阈值, 后续应结合 baseline std。
+2. random_perp 只有一个 seed, 需要多 random seeds。
+3. GLM4 perp 非随机, 但仍不能命名为纯语义, 可能是 control/routing component。
+4. qwen3 category 没在本轮重测, 仍沿用 Phase527-529 结论。
+5. 所有结果仍是 margin-level, 不是 generation-level。
+```
+
+### 十二、下一步 Phase532
+
+建议进入：
+
+```text
+Phase532: Multi-Seed Orthogonal Control and Category Re-anchoring
+```
+
+任务：
+
+```text
+1. 对 GLM4 color/object perp 做 multi-seed random_perp control。
+2. 对 qwen3 category 做同样 strict gate + random_perp control, 重新锚定主语义点。
+3. 对 qwen3 color 只保留为失败样本, 不再进入 atlas。
+4. 对 DS7B 做 readout-only baseline, 明确其 readout interface 可动而 semantic direction 不动。
+5. 开始区分 orthogonal semantic component 与 orthogonal control/routing component。
+```
+
+## Phase 532: Multi-Seed Orthogonal Control and Category Re-anchoring 多种子正交对照与类别重锚定 [2026-06-19 06:03]
+
+### 一、阶段目标
+
+根据附件分析和 Phase531 的硬伤, 本阶段继续完成：
+
+```text
+1. 对 qwen3 category 做 strict gate + multi-seed random_perp control, 重新锚定主语义点。
+2. 对 GLM4 color/object perp 做 multi-seed random_perp control。
+3. 对 DS7B 做 readout-only baseline, 明确 readout interface 可动而 semantic direction 不动。
+4. 对 qwen3 color 只保留为失败/模板依赖样本, 不直接纳入 atlas。
+```
+
+### 二、对附件分析的判定
+
+附件判断基本正确：
+
+```text
+1. Phase531 是正确的反假阳性审计。
+2. qwen3 color 在 strict gate 下应被降级。
+3. GLM4 不是 readout-only, 但需要多 seed random_perp 继续审计。
+4. DS7B 的可动性主要来自 readout interface。
+5. 下一步必须重新锚定 qwen3 category, 否则主语义点仍沿用旧阶段结果。
+```
+
+本阶段新增一个更严格判据：
+
+```text
+nonrandom_perp 不只要求 learned perp strict pass,
+还要求 learned perp own Δ > max(random_perp own Δ over seeds)。
+```
+
+### 三、脚本
+
+```text
+tests/glm5/phase532_multi_seed_controls.py
+tests/glm5/phase532_multi_seed_controls_summary.py
+```
+
+脚本特性：
+
+```text
+models = qwen3, glm4, deepseek7b
+layers = qwen3 L12, GLM4 L26, DS7B L18
+dtype = bfloat16
+device_map = auto
+8bit/bf8 = disabled
+attention = try flash_attention_2, fallback to sdpa
+alphas = 8,12
+min_abs_delta = 0.25
+random_perp seeds = 11,23,37,41
+candidates = category_fruit, color_red_blue_direct, color_black_white_direct, object_desc_car_truck
+```
+
+当前环境未安装 `flash_attn`, 实际回退到 `sdpa`。
+
+### 四、执行命令
+
+#### 4.1 冒烟测试
+
+```bash
+python tests/glm5/phase532_multi_seed_controls.py qwen3 \
+  --train-n 3 \
+  --test-n 3 \
+  --alphas 8 \
+  --random-seeds 11,23 \
+  --min-abs-delta 0.25 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase532_smoke \
+  --hard-exit-after-model
+```
+
+#### 4.2 三模型主测试
+
+```bash
+python tests/glm5/phase532_multi_seed_controls.py qwen3 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase532_multi_seed_controls \
+  --hard-exit-after-model
+
+python tests/glm5/phase532_multi_seed_controls.py glm4 \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase532_multi_seed_controls \
+  --hard-exit-after-model
+
+python tests/glm5/phase532_multi_seed_controls.py deepseek7b \
+  --train-n 8 \
+  --test-n 6 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase532_multi_seed_controls \
+  --hard-exit-after-model
+```
+
+#### 4.3 重要结果确认测试
+
+对 qwen3 category/black-white 与 GLM4 perp 做确认：
+
+```bash
+python tests/glm5/phase532_multi_seed_controls.py qwen3 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase532_multi_seed_controls_confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase532_multi_seed_controls.py glm4 \
+  --train-n 10 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41 \
+  --min-abs-delta 0.25 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase532_multi_seed_controls_confirm \
+  --hard-exit-after-model
+```
+
+#### 4.4 汇总与编译
+
+```bash
+python tests/glm5/phase532_multi_seed_controls_summary.py \
+  --root results/glm5_phase532_multi_seed_controls
+
+python tests/glm5/phase532_multi_seed_controls_summary.py \
+  --root results/glm5_phase532_multi_seed_controls_confirm
+
+python -m py_compile \
+  tests/glm5/phase532_multi_seed_controls.py \
+  tests/glm5/phase532_multi_seed_controls_summary.py
+```
+
+### 五、结果文件
+
+```text
+results/glm5_phase532_multi_seed_controls/phase532_qwen3_multi_seed_controls.json
+results/glm5_phase532_multi_seed_controls/phase532_glm4_multi_seed_controls.json
+results/glm5_phase532_multi_seed_controls/phase532_deepseek7b_multi_seed_controls.json
+results/glm5_phase532_multi_seed_controls/phase532_cross_model_summary.md
+results/glm5_phase532_multi_seed_controls_confirm/phase532_qwen3_multi_seed_controls.json
+results/glm5_phase532_multi_seed_controls_confirm/phase532_glm4_multi_seed_controls.json
+results/glm5_phase532_multi_seed_controls_confirm/phase532_cross_model_summary.md
+```
+
+### 六、主测试结果
+
+#### 6.1 qwen3
+
+```text
+category_fruit:
+  full +2.693, strict pass
+  parallel +0.385, strict fail
+  perp +2.651, strict pass
+  random_perp max +0.589, strict pass count 0
+  random_readout +0.385, strict fail
+  verdict = nonrandom_perp
+
+color_red_blue_direct:
+  full +0.385, strict fail
+  perp +0.406, strict fail
+  random_perp max +0.354, strict pass count 0
+
+color_black_white_direct:
+  full +0.354, strict pass
+  perp +0.344, strict pass
+  random_perp max +1.115, strict pass count 0
+  random_readout -0.635, strict fail
+  verdict after corrected summary = perp_not_above_random_max
+
+object_desc_car_truck:
+  full +0.328, strict fail
+  perp +0.328, strict fail
+  random_perp max +0.297
+```
+
+判断：
+
+```text
+qwen3 category 在 strict gate + multi-seed random_perp 下重新锚定成功。
+qwen3 color_black_white direct 在只测 direct task 时可过 strict gate, 但 learned perp 不超过 random_perp max, 不能称 nonrandom semantic perp。
+qwen3 red/blue 和 object 仍失败。
+```
+
+#### 6.2 GLM4
+
+```text
+category_fruit:
+  full +0.400, strict fail
+  parallel/readout +7.790, strict pass
+  perp +0.098, strict fail
+  random_perp max +1.151
+  verdict = readout_only
+
+color_red_blue_direct:
+  full +7.511, strict pass
+  parallel +8.444, strict pass
+  perp +5.513, strict pass
+  random_perp max +0.604, strict pass count 1
+  random_readout +8.444, strict pass
+
+color_black_white_direct:
+  full +5.359, strict pass
+  parallel +8.230, strict pass
+  perp +3.250, strict pass
+  random_perp max +1.115, strict pass count 1
+  random_readout +8.230, strict pass
+
+object_desc_car_truck:
+  full +1.698, strict pass
+  parallel +7.702, strict pass
+  perp +1.254, strict pass
+  random_perp max +0.129, strict pass count 0
+  random_readout +7.702, strict pass
+```
+
+判断：
+
+```text
+GLM4 color/object learned perp 远大于 random_perp max, 但 color 的 random_perp 有个别 seed 也过 strict gate。
+这说明 GLM4 perp 是强非随机结构, 但 color 正交子空间本身存在可影响 margin 的随机方向, 后续需要更多 seed 分布。
+GLM4 category 仍是 readout-only, 不是 semantic category direction。
+```
+
+#### 6.3 DS7B
+
+```text
+category_fruit:
+  full +0.031, strict fail
+  perp +0.036, strict fail
+  random_perp max +0.104
+  random_readout +0.667, strict pass
+
+color_red_blue_direct:
+  full +0.073, strict fail
+  perp +0.031, strict fail
+  random_readout +0.656, strict pass
+
+color_black_white_direct:
+  full +0.250, strict fail
+  perp +0.229, strict fail
+  random_readout +0.854, strict pass
+
+object_desc_car_truck:
+  full +0.094, strict fail
+  perp +0.070, strict fail
+  random_readout +0.809, strict pass
+```
+
+判断：
+
+```text
+DS7B learned full/perp 全部失败。
+readout interface 在所有任务上可动。
+```
+
+### 七、确认测试结果
+
+#### 7.1 qwen3 confirm
+
+```text
+category_fruit:
+  full +2.520, ratio 13.44, strict pass
+  parallel +0.457, strict fail
+  perp +2.480, ratio 14.43, strict pass
+  random_perp max +0.605, strict pass count 0
+  random_readout +0.457, strict fail
+  verdict = nonrandom_perp
+
+color_red_blue_direct:
+  full +0.430, strict fail
+  perp +0.430, strict fail
+  random_perp max +0.422, strict pass count 0
+
+color_black_white_direct:
+  full +0.453, ratio 2.64, strict pass
+  perp +0.477, ratio 4.07, strict pass
+  random_perp max +0.773, strict pass count 0
+  verdict = perp_not_above_random_max
+
+object_desc_car_truck:
+  full +0.328, strict fail
+  perp +0.328, strict fail
+  random_perp max +0.297
+```
+
+确认判断：
+
+```text
+qwen3 category 是当前最强的 nonrandom orthogonal semantic candidate。
+qwen3 black/white direct 仍不能称 nonrandom, 因为 learned perp 小于 random_perp max。
+qwen3 red/blue 与 object 仍失败。
+```
+
+#### 7.2 GLM4 confirm
+
+```text
+category_fruit:
+  full -0.198, strict fail
+  parallel/random_readout +7.299, strict pass
+  perp -0.453, strict fail
+  random_perp max +1.101
+  verdict = readout_only
+
+color_red_blue_direct:
+  full +7.369, strict pass
+  parallel +8.407, strict pass
+  perp +5.327, strict pass
+  random_perp max +0.598, strict pass count 1
+
+color_black_white_direct:
+  full +5.322, strict pass
+  parallel +8.135, strict pass
+  perp +3.199, strict pass
+  random_perp max +1.062, strict pass count 1
+
+object_desc_car_truck:
+  full +1.698, strict pass
+  parallel +7.702, strict pass
+  perp +1.254, strict pass
+  random_perp max +0.129, strict pass count 0
+```
+
+确认判断：
+
+```text
+GLM4 color/object 的 learned perp 远大于 multi-seed random_perp max, 是非随机正交/控制成分。
+但 random_perp 在 color 上偶尔也可过 strict gate, 说明 GLM4 color 正交空间有广泛可动性。
+GLM4 category 是 readout-only。
+```
+
+### 八、当前最可靠事实
+
+1. qwen3 category 重新锚定成功：
+
+```text
+confirm full +2.520
+confirm perp +2.480
+random_perp max +0.605
+parallel/readout fail
+```
+
+这是目前最干净的：
+
+```text
+readout-light, nonrandom orthogonal semantic candidate
+```
+
+2. qwen3 color 仍不能进入 atlas：
+
+```text
+red/blue fail
+black/white direct strict pass but not above random_perp max
+previous Phase531 showed black/white not template robust
+```
+
+3. GLM4 color/object perp 是非随机强结构：
+
+```text
+color_red_blue perp +5.327 vs random_perp max +0.598
+color_black_white perp +3.199 vs random_perp max +1.062
+object_car_truck perp +1.254 vs random_perp max +0.129
+```
+
+4. GLM4 category 不是正交语义：
+
+```text
+category full/perp fail
+parallel/random_readout strong pass
+```
+
+5. DS7B 继续支持 readout interface movable：
+
+```text
+full/perp fail
+random_readout pass across tasks
+```
+
+### 九、理论更新
+
+Phase532 后, 当前可区分三类 orthogonal 现象：
+
+```text
+1. nonrandom orthogonal semantic candidate:
+   qwen3 category。
+
+2. nonrandom orthogonal control/routing component:
+   GLM4 color/object perp。
+
+3. random-sensitive or template-specific orthogonal movement:
+   qwen3 black/white direct。
+```
+
+因此不能把所有 non-readout perp 都叫 semantic。
+
+更严格的分类标准：
+
+```text
+semantic candidate:
+  strict pass
+  learned perp > multi-seed random_perp max
+  readout/random_readout not sufficient
+  template robust
+  variable-level interpretation stable
+
+control/routing component:
+  strict pass
+  learned perp > random_perp
+  readout also dominant
+  may be template/state-pair specific
+
+readout interface:
+  parallel/random_readout pass
+  full/perp fail
+```
+
+### 十、硬伤
+
+```text
+1. random_perp seeds 只有 4 个, 仍需更多 seed 估计分布。
+2. qwen3 black/white direct 在本轮 direct task 下 strict pass, 但不超过 random_perp max, 需避免误读。
+3. GLM4 color random_perp 有个别 seed strict pass, 说明正交空间本身有广泛可动方向。
+4. 当前仍是 margin-level, 不是 generation-level。
+5. qwen3 category 虽重新锚定, 但还需跨模板 category robustness。
+```
+
+### 十一、下一步 Phase533
+
+建议进入：
+
+```text
+Phase533: Category Template Robustness and Generation Bridge
+```
+
+任务：
+
+```text
+1. 对 qwen3 category 做 direct/paraphrase/property 多模板稳健性测试。
+2. 对 qwen3 category 做 multi-seed random_perp 扩展到 8-16 seeds。
+3. 对 qwen3 category 从 margin-level 推进到 stepwise generation bridge。
+4. 对 GLM4 color/object perp 标记为 control/routing candidate, 继续和 qwen3 category 对照。
+5. DS7B 暂停 semantic atlas, 作为 readout-interface 对照。
+```
+## Phase 533: Category Template Robustness and Generation Bridge 类别模板稳健性与生成桥接 [2026-06-19 06:41]
+
+### 本阶段目标
+
+根据用户上传的 Phase532 分析，继续审计以下判断是否正确：
+
+```text
+1. qwen3 category 是当前最接近非随机正交语义锚点的对象。
+2. qwen3 color 仍不能进入 atlas。
+3. GLM4 color/object 的 perp 强于随机正交，但更像 control/routing 或 readout-dominant 结构。
+4. DS7B 主要是 readout interface movable，不是 learned semantic direction 生效。
+```
+
+本轮不直接做理论总结，而是把 Phase532 的主锚点放到更严格条件下测试：
+
+```text
+1. category 是否跨模板稳定；
+2. learned perp 是否仍强于 multi-seed random_perp；
+3. margin 层面的变化是否能进入短程 greedy generation；
+4. qwen3 / GLM4 / DS7B 是否仍保持不同机制类型。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase533_category_template_generation_bridge.py
+tests/glm5/phase533_category_template_generation_bridge_summary.py
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase533_category_template_generation_bridge.py \
+  tests/glm5/phase533_category_template_generation_bridge_summary.py
+```
+
+smoke test：
+
+```bash
+python tests/glm5/phase533_category_template_generation_bridge.py qwen3 \
+  --train-n 3 \
+  --test-n 3 \
+  --alphas 8 \
+  --random-seeds 11,23 \
+  --bridge-n 2 \
+  --max-new-tokens 2 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase533_smoke \
+  --hard-exit-after-model
+```
+
+正式三模型测试。第一次正式测试发现对象池过小，`train_n=8/test_n=6` 会产生 train/test overlap，因此扩充对象池后重新执行非重叠大范围测试：
+
+```bash
+python tests/glm5/phase533_category_template_generation_bridge.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase533_category_template_generation_bridge \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase533_category_template_generation_bridge.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase533_category_template_generation_bridge \
+  --hard-exit-after-model
+
+python tests/glm5/phase533_category_template_generation_bridge.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 3 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase533_category_template_generation_bridge \
+  --hard-exit-after-model
+
+python tests/glm5/phase533_category_template_generation_bridge_summary.py \
+  --root results/glm5_phase533_category_template_generation_bridge
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+layers = qwen3 L12, GLM4 L26, DS7B L18
+train_n = 12
+test_n = 8
+category templates = direct, belongs, kind
+control tasks = color_red_blue_direct, object_desc_car_truck
+alphas = 8, 12
+random_perp seeds = 11,23,37,41,53,67,79,83
+generation bridge prompts = 6
+generation bridge max_new_tokens = 3
+attention = sdpa
+```
+
+对象池已扩充，使 category/color 的训练对象和测试对象非重叠；object 描述也扩充为前 12 条训练、后 8 条测试。
+
+### 输出文件
+
+```text
+results/glm5_phase533_category_template_generation_bridge/phase533_qwen3_category_template_generation_bridge.json
+results/glm5_phase533_category_template_generation_bridge/phase533_glm4_category_template_generation_bridge.json
+results/glm5_phase533_category_template_generation_bridge/phase533_deepseek7b_category_template_generation_bridge.json
+results/glm5_phase533_category_template_generation_bridge/phase533_cross_model_summary.md
+```
+
+### 方法原理
+
+本轮仍沿用 state-pair direction：
+
+```text
+d = mean(h_positive) - mean(h_negative)
+```
+
+然后用 readout direction 做分解：
+
+```text
+d = d_parallel + d_perp
+```
+
+测试组件：
+
+```text
+full
+parallel
+perp
+random_readout
+random_perp_8seeds
+```
+
+严格门槛：
+
+```text
+own_delta >= 0.25
+own_delta > 2 * max(same_family_abs, off_family_abs)
+```
+
+判据收紧：
+
+```text
+clean_nonrandom_perp:
+  learned perp strict pass
+  learned perp > all random_perp
+  random_perp strict pass count = 0
+
+perp_above_random_but_random_passes:
+  learned perp strict pass
+  learned perp > all random_perp
+  but some random_perp also strict pass
+```
+
+生成桥接只看短程 greedy generation 是否命中 target token，不把零结果解释成机制不存在。
+
+### 客观结果
+
+#### qwen3
+
+```text
+category_direct:
+  full +1.832 / ratio 1.97 / strict n
+  parallel +0.406 / ratio 0.57 / strict n
+  perp +1.789 / ratio 2.06 / strict Y
+  random_perp max +1.004
+  random_perp strict pass count = 2
+  random_readout +0.406 / strict n
+  verdict = perp_above_random_but_random_passes
+
+category_belongs:
+  perp +1.016 / ratio 1.38 / strict n
+  random_perp max +0.414
+
+category_kind:
+  perp +0.195 / ratio 0.12 / strict n
+  random_perp max +0.023
+
+color_red_blue_direct:
+  perp +0.602 / ratio 1.23 / strict n
+  random_perp max +1.086
+
+object_desc_car_truck:
+  perp +0.211 / ratio 0.20 / strict n
+```
+
+qwen3 category template cosine：
+
+```text
+direct vs belongs = +0.2751
+direct vs kind    = +0.4025
+belongs vs kind   = +0.2014
+```
+
+qwen3 generation bridge：
+
+```text
+category_direct baseline hit = 0.00
+category_direct perp hit = 0.00
+category_direct random_readout hit = 0.00
+```
+
+样例：
+
+```text
+The category of date is a bit tricky
+```
+
+#### GLM4
+
+```text
+category_direct:
+  full +1.156 / strict n
+  parallel +9.520 / strict n
+  perp +0.334 / strict n
+  random_perp max +0.395
+
+category_belongs:
+  full +1.685 / strict n
+  parallel +7.053 / strict n
+  perp +1.342 / strict n
+
+category_kind:
+  full +0.677 / strict n
+  parallel +6.444 / strict n
+  perp -0.026 / strict n
+  random_perp strict pass count = 1
+
+color_red_blue_direct:
+  full +7.541 / ratio 6.94 / strict Y
+  parallel +8.469 / ratio 16.77 / strict Y
+  perp +5.394 / ratio 4.23 / strict Y
+  random_perp max +0.641
+  random_perp strict pass count = 0
+  random_readout +8.469 / strict Y
+  verdict = clean_nonrandom_perp
+
+object_desc_car_truck:
+  full +1.825 / strict Y
+  parallel +8.419 / strict Y
+  perp +1.346 / ratio 1.75 / strict n
+  random_perp max +0.483
+  verdict = readout_interface
+```
+
+GLM4 generation bridge：
+
+```text
+category_direct baseline hit = 0.00
+category_direct perp hit = 0.00
+category_direct random_readout hit = 0.00
+```
+
+#### DS7B
+
+```text
+category_direct:
+  full +0.109 / strict n
+  parallel -0.449 / strict n
+  perp +0.121 / strict n
+  random_perp max +0.043
+
+category_belongs:
+  full -0.049 / strict n
+  perp -0.031 / strict n
+
+category_kind:
+  full +0.133 / strict n
+  perp +0.141 / strict n
+  random_perp max +0.133
+
+color_red_blue_direct:
+  full +0.102 / strict n
+  parallel +0.703 / strict Y
+  perp +0.102 / strict n
+  random_readout +0.703 / strict Y
+  verdict = readout_interface
+
+object_desc_car_truck:
+  full +0.125 / strict n
+  perp +0.113 / strict n
+  random_readout +0.750 / strict Y
+```
+
+DS7B generation bridge 全部为 0.00。
+
+### 对上传分析的判定
+
+上传分析的主要判断基本正确：
+
+```text
+1. qwen3 category 仍是当前最重要的 category 语义锚点候选。
+2. qwen3 color 仍不能进入 atlas。
+3. GLM4 color 的正交成分是真实非随机结构。
+4. DS7B 仍缺少 learned semantic full/perp，有 readout/interface 可动性。
+```
+
+但 Phase533 对 Phase532 做了两点重要修正：
+
+```text
+1. qwen3 category_direct 不能再写成 clean nonrandom semantic anchor。
+   因为 learned perp 虽然大于所有 random_perp，但 8 个 random_perp 里有 2 个也通过 strict gate。
+
+2. qwen3 category 还没有进入 generation bridge。
+   margin 可移动不等于短程生成会立刻输出 fruit token。
+```
+
+### 当前最可靠事实
+
+1. qwen3 category_direct 是当前最强的 category 语义锚点候选，但仍受 random_perp field 影响。
+
+```text
+qwen3 category_direct perp +1.789 strict Y
+random_perp max +1.004
+random_perp strict pass count = 2
+random_readout strict n
+```
+
+说明它不是 readout-only，但也不能证明为干净单一语义方向。
+
+2. qwen3 category 不是模板不变方向。
+
+```text
+direct / belongs / kind cosines 只有 0.20 到 0.40
+direct pass
+belongs fail
+kind fail
+```
+
+这说明 category 方向强依赖表面路径或模板条件。
+
+3. GLM4 color_red_blue_direct 是最干净的 clean nonrandom_perp。
+
+```text
+GLM4 color perp +5.394 strict Y
+random_perp max +0.641
+random_perp strict pass count = 0
+```
+
+但 parallel/readout 同时更强：
+
+```text
+parallel +8.469 strict Y
+random_readout +8.469 strict Y
+```
+
+所以 GLM4 color 更像：
+
+```text
+readout-dominant + clean orthogonal control/routing component
+```
+
+4. DS7B 仍没有 learned semantic direction。
+
+```text
+full/perp 对 category/color/object 均失败
+random_readout 对 color/object 可动
+```
+
+5. 当前所有 category generation bridge 均为 0。
+
+这不是证明方向无效，而是说明：
+
+```text
+margin-level causal movement 尚未跨过 token selection / generation policy gate。
+```
+
+### 硬伤和问题
+
+1. generation bridge 的 target token 仍很窄。
+
+模型可能生成：
+
+```text
+a type of
+a category of
+a bit tricky
+```
+
+这些路径没有立即输出 `fruit`，但可能仍走向类别解释。因此 hit rate = 0 不能直接等同于语义失败。
+
+2. category 模板方向相似度低。
+
+这说明当前 state-pair direction 仍混入模板路径，不是纯 category invariant direction。
+
+3. qwen3 random_perp 也能 strict pass。
+
+这说明局部正交空间中存在可移动场，不能只用单个随机对照排除。
+
+4. GLM4 color 虽然 clean_nonrandom_perp，但 readout 太强。
+
+它可能是格式/路由/控制成分，不应直接称为纯语义。
+
+5. 仍未测多层联合。
+
+本轮只测 peak layer。若真实语义路径是多层累积，单层方向可能只能移动 margin，不能触发 generation。
+
+### 理论进展
+
+当前理论应从：
+
+```text
+存在正交语义方向
+```
+
+改为更谨慎的：
+
+```text
+模型内部存在若干可移动正交场。
+其中一部分与语义类别对齐，一部分与 readout/interface/control/routing 对齐。
+是否是真正语义方向，必须同时满足：
+1. learned perp 强；
+2. 多种子 random_perp 不同样通过；
+3. 跨模板稳定；
+4. 能进入生成路径或至少能移动下一阶段状态；
+5. 不是 readout-only。
+```
+
+Phase533 后的机制分类：
+
+```text
+qwen3 category_direct:
+  readout-light semantic candidate,
+  but not clean invariant anchor.
+
+GLM4 color_red_blue:
+  clean nonrandom orthogonal structure,
+  but readout-dominant and probably control/routing mixed.
+
+DS7B:
+  learned semantic direction inactive,
+  readout interface movable.
+```
+
+### 下一阶段任务
+
+Phase534 不应继续只扩大类别列表，而应直接测试：
+
+```text
+Template-Invariant Direction Extraction and Generation Policy Gate
+```
+
+核心方案：
+
+```text
+1. 对 qwen3 category 做模板公共成分提取：
+   common = mean(normalized direct, belongs, kind)
+   residual_direct = direct - common
+   residual_template = each_template - common
+
+2. 分别测试：
+   common direction
+   direct residual
+   template residual
+   random common-norm control
+
+3. 生成桥接不只看 fruit token：
+   同时记录 top-k trajectory 中 fruit/fruits/Fruit 的 rank、logit、margin，
+   以及下一步是否进入 type/category/kind explanation path。
+
+4. 做多层轻量 cumulative patch：
+   qwen3 L10-L12-L14 或 around L12，
+   每层同方向小 alpha，
+   比较单层 vs 多层。
+
+5. GLM4 color 作为 clean orthogonal control/routing 正控，
+   DS7B 作为 readout-interface 对照。
+```
+
+目标不是马上证明“语义方向”，而是拆出：
+
+```text
+category invariant component
+template/path component
+generation policy gate
+readout interface component
+```
+## Phase 534: Template-Invariant Direction Extraction and Generation Policy Gate 模板不变方向提取与生成策略门 [2026-06-19 07:56]
+
+### 本阶段目标
+
+根据用户上传的 Phase533 分析，继续验证：
+
+```text
+1. qwen3 category 是否存在 template-invariant common component。
+2. Phase533 的 category_direct 强效果是否主要来自 direct-template path。
+3. 多层 common cumulative patch 是否比单层 patch 更接近跨模板语义。
+4. generation bridge 是否能从 hit 扩展到 rank、margin、semantic path。
+5. GLM4 color 是否继续作为 clean orthogonal control/routing 正控。
+6. DS7B 是否仍为 readout-interface 可动但 semantic direction inactive。
+```
+
+### 对上传分析的判定
+
+上传分析基本正确：
+
+```text
+1. qwen3 category 不能再叫 clean template-invariant anchor。
+2. category 应从单方向升级为 template-conditioned direction family。
+3. generation bridge 不能只看 fruit token hit。
+4. 下一步应测试 common/residual 和 generation policy gate。
+```
+
+需要补充的一点是：Phase534 结果显示，单层 common 仍不够，但多层 common cumulative 出现了跨模板 transfer gate 通过。这说明公共语义可能不是单层静态方向，而是多层累积场。
+
+### 脚本
+
+```text
+tests/glm5/phase534_template_invariant_gate.py
+tests/glm5/phase534_template_invariant_gate_summary.py
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase534_template_invariant_gate.py \
+  tests/glm5/phase534_template_invariant_gate_summary.py
+```
+
+smoke：
+
+```bash
+python tests/glm5/phase534_template_invariant_gate.py qwen3 \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 8 \
+  --cumulative-alphas 2 \
+  --random-seeds 11,23 \
+  --bridge-n 2 \
+  --max-new-tokens 2 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase534_smoke \
+  --hard-exit-after-model
+```
+
+正式测试。第一次正式测试后发现 semantic_path_hit 统计包含了 prompt 本身的 “category of”，导致 path 假阳性；已修正为只检查 generated_suffix，并重新完整执行三模型测试。
+
+```bash
+python tests/glm5/phase534_template_invariant_gate.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --cumulative-alphas 2,4,6 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase534_template_invariant_gate \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase534_template_invariant_gate.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --cumulative-alphas 2,4,6 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase534_template_invariant_gate \
+  --hard-exit-after-model
+
+python tests/glm5/phase534_template_invariant_gate.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 8,12 \
+  --cumulative-alphas 2,4,6 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 6 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase534_template_invariant_gate \
+  --hard-exit-after-model
+
+python tests/glm5/phase534_template_invariant_gate_summary.py \
+  --root results/glm5_phase534_template_invariant_gate
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+layers:
+  qwen3 = L10, L12, L14
+  GLM4 = L24, L26, L28
+  DS7B = L16, L18, L20
+train_n = 12
+test_n = 8
+category templates = direct, belongs, kind
+controls = color_red_blue, object_car_truck
+alphas = 8,12
+cumulative_alphas = 2,4,6
+random_common_perp seeds = 8
+generation bridge prompts = 6
+max_new_tokens = 4
+```
+
+### 方法原理
+
+先构造三个模板方向：
+
+```text
+d_direct
+d_belongs
+d_kind
+```
+
+公共方向：
+
+```text
+d_common = normalize(mean(normalize(d_direct), normalize(d_belongs), normalize(d_kind)))
+```
+
+残差：
+
+```text
+r_t = d_t - projection(d_t on d_common)
+```
+
+单层测试：
+
+```text
+category_common_perp
+category_direct_perp
+category_belongs_perp
+category_kind_perp
+category_direct_residual
+category_belongs_residual
+category_kind_residual
+```
+
+多层测试：
+
+```text
+L-2, L, L+2 同时注入 category_common_perp
+```
+
+生成桥接扩展为：
+
+```text
+target_hit_rate
+semantic_path_hit_rate
+mean_best_target_rank
+mean_first_step_margin
+generated_suffix samples
+```
+
+其中 semantic_path_hit 只检查生成后缀，避免 prompt 污染。
+
+### 输出文件
+
+```text
+results/glm5_phase534_template_invariant_gate/phase534_qwen3_template_invariant_gate.json
+results/glm5_phase534_template_invariant_gate/phase534_glm4_template_invariant_gate.json
+results/glm5_phase534_template_invariant_gate/phase534_deepseek7b_template_invariant_gate.json
+results/glm5_phase534_template_invariant_gate/phase534_cross_model_summary.md
+```
+
+### 客观结果
+
+#### qwen3
+
+单层 primary L12：
+
+```text
+category_common_perp:
+  own +1.738 / ratio 1.38 / strict n
+  transfer min +0.121 / mean +1.039 / ratio 0.15 / pass n
+
+category_direct_perp:
+  own +1.789 / ratio 2.06 / strict Y
+  transfer min +0.242 / mean +0.966 / ratio 0.94 / pass n
+
+category_direct_residual:
+  own +1.277 / ratio 2.27 / strict Y
+  transfer min +0.008 / mean +0.302 / pass n
+
+random_common max transfer-min = -0.047
+random_common strict transfer pass count = 0
+```
+
+多层 common cumulative：
+
+```text
+layers = L10 + L12 + L14
+best alpha = 6.0
+transfer min +0.398
+transfer mean +1.352
+transfer ratio 2.04
+pass = Y
+```
+
+模板关系：
+
+```text
+direct vs belongs = +0.2751
+direct vs kind = +0.4025
+belongs vs kind = +0.2014
+
+cos_to_common:
+  belongs +0.6769
+  direct +0.7691
+  kind +0.7353
+
+residual_norm_pct:
+  belongs 73.61
+  direct 63.92
+  kind 67.78
+```
+
+生成桥接：
+
+```text
+baseline:
+  hit 0.00
+  path 0.67
+  mean_best_rank 610.0
+  first_step_margin +0.266
+
+single_common_perp:
+  hit 0.17
+  path 0.83
+  mean_best_rank 398.2
+  first_step_margin +1.880
+
+single_direct_perp:
+  hit 0.17
+  path 0.83
+  mean_best_rank 490.0
+  first_step_margin +2.000
+
+cumulative_common_perp:
+  hit 0.17
+  path 0.83
+  mean_best_rank 317.8
+  first_step_margin +1.906
+```
+
+样例仍未稳定直接输出 fruit：
+
+```text
+The category of date is a bit tricky.
+```
+
+#### GLM4
+
+```text
+category_common_perp:
+  own +2.023 / strict n
+  transfer min +0.535 / mean +0.716 / pass n
+
+category_direct_perp:
+  own +0.334 / strict n
+  transfer min -0.318 / pass n
+
+color_red_blue_perp:
+  own +5.394 / ratio 4.23 / strict Y
+
+cumulative common:
+  transfer min +0.646
+  mean +1.216
+  ratio 0.24
+  pass n
+```
+
+GLM4 generation：
+
+```text
+baseline:
+  hit 0.17
+  path 0.67
+  rank 105.3
+  margin +1.126
+
+single_common_perp:
+  hit 0.17
+  path 0.33
+  rank 38.7
+  margin +2.608
+
+cumulative_common_perp:
+  hit 0.17
+  path 0.33
+  rank 40.8
+  margin +2.709
+```
+
+GLM4 的 category common 能改善 rank/margin，但没有通过 transfer gate；color 仍是强正控。
+
+#### DS7B
+
+```text
+category_common_perp:
+  own +0.121 / strict n
+  transfer min +0.062 / pass n
+
+category_direct_perp:
+  own +0.121 / strict n
+  transfer min +0.000 / pass n
+
+cumulative common:
+  transfer min +0.086
+  mean +0.172
+  ratio 1.83
+  pass n
+
+generation:
+  hit 0.00
+  path 0.00
+  rank remains around 700-780
+```
+
+DS7B 继续没有 learned category common。
+
+### 最关键进展
+
+1. qwen3 单层 direct path 确认存在。
+
+```text
+category_direct_perp own strict Y
+category_direct_residual own strict Y
+```
+
+这说明 Phase533 中的强 qwen3 category 效应确实大量来自 direct-template path。
+
+2. qwen3 单层 common 不足以跨模板。
+
+```text
+category_common_perp transfer min +0.121 pass n
+```
+
+所以不能说已经找到单层模板不变语义方向。
+
+3. qwen3 多层 common cumulative 首次通过跨模板 transfer gate。
+
+```text
+L10+L12+L14 cumulative common:
+transfer min +0.398
+transfer mean +1.352
+pass Y
+```
+
+这是本阶段最大的新发现：模板公共语义可能是多层累积场，而不是单层静态方向。
+
+4. qwen3 generation bridge 从完全 0 进步到弱命中和 rank 改善。
+
+```text
+target_hit_rate 0.00 -> 0.17
+mean_best_rank 610.0 -> 317.8
+first_step_margin +0.266 -> +1.906
+```
+
+但输出仍不稳定，不是机制闭合。
+
+5. GLM4 category 不是 template common，但 color 仍强。
+
+GLM4 category common 改善 rank/margin，但 transfer gate 不通过；color_red_blue_perp 继续强通过。
+
+6. DS7B 仍是负对照。
+
+### 当前硬伤
+
+1. qwen3 cumulative common pass 还只有一个模型和一个任务族。
+
+必须进一步确认：
+
+```text
+更多 category state pairs
+更多 templates
+更多 layer windows
+更多 random cumulative controls
+```
+
+2. generation hit 只有 0.17。
+
+说明生成策略门只是被轻微推动，没有闭合。
+
+3. semantic_path_hit 仍是字符串级粗指标。
+
+它比 token hit 宽，但仍然粗糙；下一步要转向 top-k family trajectory。
+
+4. residual_norm_pct 很高。
+
+```text
+qwen3 direct residual 63.92%
+belongs residual 73.61%
+kind residual 67.78%
+```
+
+说明模板路径仍占很大比例，common 不是主要方差方向。
+
+5. 多层 cumulative 缺少 random cumulative control。
+
+本轮 random_common 只在单层审计，多层 cumulative 还需要随机多层对照。
+
+### 理论进展
+
+Phase534 后，理论应从：
+
+```text
+Template-Decomposed Orthogonal Semantic Field
+```
+
+推进为：
+
+```text
+Multi-layer Template-Decomposed Orthogonal Semantic Field
+```
+
+更精确地说：
+
+```text
+语义公共成分不一定以单层方向存在；
+它可能分布在多个中间层，每层只贡献一部分；
+单层 direct-template direction 可以强烈移动本模板 margin；
+但跨模板语义需要多层 common cumulative 才开始出现；
+生成策略门对这种 cumulative signal 仍然很硬，只产生弱 hit 和 rank 改善。
+```
+
+当前结构分型：
+
+```text
+qwen3:
+  direct-template category path 强；
+  单层 common 弱；
+  多层 common 首次出现 transfer；
+  generation bridge 弱开启。
+
+GLM4:
+  category common 不通过；
+  color perp 仍为 clean orthogonal control/routing 正控；
+  category generation rank 可动但不形成 transfer。
+
+DS7B:
+  category common/direct/perp 均弱；
+  generation 仍无语义路径。
+```
+
+### 下一阶段任务
+
+Phase535 应专门审计 Phase534 的最大新发现：
+
+```text
+Multi-layer Common Direction Control Audit
+```
+
+核心问题：
+
+```text
+qwen3 L10+L12+L14 cumulative common pass 是否是真实多层语义累积，
+还是任意多层小扰动也能做到？
+```
+
+必须加入：
+
+```text
+1. multi-layer random_common_perp controls
+2. shuffled-layer common controls
+3. direct-only cumulative vs common cumulative
+4. layer-window sweep: L8-10-12, L10-12-14, L12-14-16
+5. generation top-k family trajectory
+6. 至少 category fruit/nonfruit 之外再加一个 category state-pair
+```
+
+成功判据：
+
+```text
+qwen3 common cumulative:
+  transfer_min 明显高于 multi-layer random controls
+  多窗口中在中层附近复现
+  generation rank/margin 持续改善
+  target hit 或 semantic family path 有稳定提升
+```
+## Phase 535: Multi-layer Common Direction Control Audit 多层公共方向因果对照审计 [2026-06-19 08:29]
+
+### 本阶段目标
+
+根据用户上传的两份 Phase534 分析，继续验证 Phase534 最大新发现：
+
+```text
+qwen3 L10+L12+L14 cumulative common pass 是否是真实多层语义累积，
+还是任意多层扰动、模板错配、direct-only 累积，或单一 fruit/nonfruit 数据集造成的假阳性。
+```
+
+两份上传分析中的正确部分：
+
+```text
+1. Phase534 确实把研究从单层静态方向推进到多层累积问题。
+2. qwen3 single-layer common 不足，direct-template path 很强。
+3. generation bridge 的 rank/margin 改善比 hit 更敏感。
+4. 最大硬伤是缺少 multi-layer random / shuffled / direct-only controls。
+5. 必须加入第二个 category state-pair。
+```
+
+需要收紧的部分：
+
+```text
+1. 不能把 Phase534 直接称为“动态场论确证”。
+2. 不能说统一理论已高比例完成。
+3. generation hit=0.17 只有弱开启，不能支持完整 generation closure。
+4. embedding-based trajectory similarity 暂未引入，本轮仍只做基础客观指标。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase535_cumulative_audit.py
+tests/glm5/phase535_cumulative_audit_summary.py
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase535_cumulative_audit.py \
+  tests/glm5/phase535_cumulative_audit_summary.py
+```
+
+smoke：
+
+```bash
+python tests/glm5/phase535_cumulative_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11,23 \
+  --bridge-n 3 \
+  --max-new-tokens 2 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase535_smoke \
+  --hard-exit-after-model
+```
+
+正式三模型测试：
+
+```bash
+python tests/glm5/phase535_cumulative_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 12 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase535_cumulative_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase535_cumulative_audit.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 12 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase535_cumulative_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase535_cumulative_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --min-abs-delta 0.25 \
+  --bridge-n 12 \
+  --max-new-tokens 4 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase535_cumulative_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase535_cumulative_audit_summary.py \
+  --root results/glm5_phase535_cumulative_audit
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+category pairs:
+  fruit_nonfruit
+  animal_vehicle
+templates:
+  direct
+  belongs
+  kind
+windows:
+  qwen3:
+    early = L8,L10,L12
+    center = L10,L12,L14
+    late = L12,L14,L16
+  GLM4:
+    early = L22,L24,L26
+    center = L24,L26,L28
+    late = L26,L28,L30
+  DS7B:
+    early = L14,L16,L18
+    center = L16,L18,L20
+    late = L18,L20,L22
+conditions:
+  common cumulative
+  direct-only cumulative
+  shuffled-template cumulative
+  random-common cumulative, 8 seeds
+alphas = 2,4,6,8
+train_n = 12
+test_n = 8
+bridge_n = 12
+max_new_tokens = 4
+```
+
+### 输出文件
+
+```text
+results/glm5_phase535_cumulative_audit/phase535_qwen3_cumulative_audit.json
+results/glm5_phase535_cumulative_audit/phase535_glm4_cumulative_audit.json
+results/glm5_phase535_cumulative_audit/phase535_deepseek7b_cumulative_audit.json
+results/glm5_phase535_cumulative_audit/phase535_cross_model_summary.md
+```
+
+### 客观结果
+
+#### qwen3
+
+fruit_nonfruit：
+
+```text
+early L8,L10,L12:
+  common +0.848 / mean +1.660 / ratio 0.66 / pass n
+  direct +0.906 / mean +1.858 / ratio 0.63 / pass n
+  shuffled +0.648 / mean +1.212 / ratio 0.60 / pass n
+  random max -0.062 / random pass 0
+
+center L10,L12,L14:
+  common +0.598 / mean +1.512 / ratio 0.55 / pass n
+  direct +0.469 / mean +1.665 / ratio 0.47 / pass n
+  shuffled +0.332 / mean +1.133 / ratio 0.30 / pass n
+  random max -0.059 / random pass 0
+
+late L12,L14,L16:
+  common +0.219 / mean +1.375 / ratio 0.21 / pass n
+  direct +0.219 / mean +1.456 / ratio 0.26 / pass n
+  shuffled +0.164 / mean +0.969 / ratio 0.22 / pass n
+```
+
+animal_vehicle：
+
+```text
+early:
+  common +0.031 / mean +0.163 / pass n
+  direct +0.133 / mean +0.452 / pass n
+  shuffled +0.148 / mean +0.309 / pass n
+  random max +0.078
+
+center:
+  common +0.070 / mean +0.118 / pass n
+  shuffled +0.141 / mean +0.453 / pass n
+  random max +0.086
+
+late:
+  common +0.008 / mean +0.130 / pass n
+```
+
+qwen3 generation：
+
+```text
+fruit_nonfruit, best_window=early:
+  baseline hit 0.00, rank 610.8, margin +0.260
+  common   hit 0.08, rank 196.8, margin +2.385
+  direct   hit 0.08, rank 183.0, margin +3.320
+  random   hit 0.00, rank 883.2, margin +0.255
+
+animal_vehicle, best_window=center:
+  baseline hit 0.08, rank 13.8, margin +2.490
+  common   hit 0.08, rank 13.3, margin +2.729
+  direct   hit 0.08, rank 13.2, margin +2.669
+  random   hit 0.08, rank 14.8, margin +2.555
+```
+
+#### GLM4
+
+fruit_nonfruit：
+
+```text
+early:
+  common +0.992 / mean +1.827 / ratio 0.70 / pass n
+  direct -0.195 / mean +0.054 / pass n
+  shuffled +0.957 / mean +1.482 / ratio 0.42 / pass n
+  random max -0.092 / pass 0
+
+center:
+  common +0.678 / mean +1.196 / pass n
+  shuffled +0.393 / mean +0.625 / pass n
+
+late:
+  common +0.442 / mean +0.619 / pass n
+```
+
+animal_vehicle：
+
+```text
+early:
+  common +0.237 / mean +1.469 / ratio 0.08 / pass n
+  random max +0.420
+
+center:
+  common -0.109 / mean +1.061 / pass n
+  random max +0.380
+
+late:
+  common -0.178 / mean +0.384 / pass n
+```
+
+generation 中 GLM4 animal_vehicle baseline 已经很强：
+
+```text
+baseline hit 0.50
+common hit 0.00
+direct hit 0.17
+random hit 0.08
+```
+
+#### DS7B
+
+全部 category pair/window 均未通过 transfer gate：
+
+```text
+fruit_nonfruit max common transfer_min = +0.078
+animal_vehicle max common transfer_min = +0.180
+all pass = n
+```
+
+generation hit 均为 0。
+
+### 核心判定
+
+Phase535 对 Phase534 做出重要降级：
+
+```text
+1. qwen3 fruit_nonfruit 多层 common 效应不是随机多层扰动。
+   因为 random cumulative max 为负或接近 0，且 random pass = 0。
+
+2. 但 qwen3 fruit_nonfruit common 不是干净 category-common。
+   因为 off-pair animal_vehicle 扰动很大，strict ratio 只有 0.66。
+
+3. qwen3 fruit_nonfruit common 也不是明显优于 direct-only。
+   early window direct min +0.906，高于 common +0.848。
+
+4. 第二类别对 animal_vehicle 未复现。
+   qwen3 animal_vehicle common transfer_min 最高只有 +0.070。
+
+5. 因此 Phase534 的“多层 common cumulative pass”应降级为：
+   fruit/nonfruit 模板族的多层正向 cumulative effect，
+   不是已验证的跨类别通用语义公共场。
+```
+
+跨模型紧凑结论：
+
+```text
+qwen3: no_clean_common
+GLM4: no_clean_common
+DS7B: no_clean_common
+```
+
+### 对两个上传分析的审计结论
+
+第一份分析基本正确，但需要加入 Phase535 的降级：
+
+```text
+Phase534 的方向正确，但多层 common 仍未通过严格多类别审计。
+```
+
+第二份分析中的“动态场论转折点”作为研究假设有启发，但作为结论过强：
+
+```text
+1. 不能说 semantic invariant 已被确认为 distributed cumulative process。
+2. 不能说 generation gate 双阈值理论已被证明。
+3. 不能把 rank 改善直接解释为门控参数标定。
+4. 当前只能说存在 fruit/nonfruit 多层累积正向效应，且需要更严格分解。
+```
+
+### 当前最可靠事实
+
+```text
+1. qwen3 fruit/nonfruit 多层累积确实能显著提高 fruit margin/rank。
+2. 该效应不是 multi-layer random_common 可以解释的。
+3. 该效应不具备干净选择性，因为对 animal_vehicle 也有大扰动。
+4. direct-only cumulative 不弱于 common，说明模板路径仍是主要动力。
+5. animal_vehicle 作为第二类别对没有复现 common 累积。
+6. GLM4 和 DS7B 没有干净 category common。
+```
+
+### 理论进展
+
+Phase535 后理论必须更谨慎：
+
+```text
+不是“多层语义公共场已成立”，
+而是“存在多层模板族 cumulative field，但其语义选择性不足”。
+```
+
+当前更准确模型：
+
+```text
+Template-family cumulative field:
+  对特定模板族/状态对有多层累积效应；
+  可以强烈改善 margin/rank；
+  但同时携带模板路径、类别任务、输出接口等混合成分。
+
+Clean semantic common field:
+  尚未被证明。
+```
+
+### 当前硬伤
+
+```text
+1. common/direct/shuffled 之间未形成足够分离。
+2. fruit_nonfruit 对 animal_vehicle 的 off-pair 扰动过大。
+3. 第二类别对 animal_vehicle 没有复现。
+4. generation hit 仍很弱。
+5. animal_vehicle baseline 本身对部分模型很强，可能不是理想第二对。
+```
+
+### 下一阶段任务
+
+Phase536 应改变策略：
+
+```text
+Category Pair Quality and Selectivity Factorization
+```
+
+目标不是继续扩大多层窗口，而是先拆清楚为什么 fruit/nonfruit 强、animal_vehicle 弱：
+
+```text
+1. 重新设计多个 category state-pairs：
+   fruit/tool
+   animal/tool
+   vehicle/furniture
+   clothing/tool
+
+2. 对每个 pair 先做 baseline difficulty audit：
+   baseline margin
+   target rank
+   template consistency
+   tokenization stability
+
+3. 再做 cumulative common/direct comparison：
+   common 是否优于 direct
+   是否优于 shuffled
+   是否低 off-pair
+
+4. 将选择性拆成两项：
+   pair_strength = own transfer mean
+   pair_specificity = own transfer min / off_pair_max
+
+5. 找到真正适合作为 clean common field 的 state-pair。
+```
+
+下一步要避免直接做大理论总结，先找出：
+
+```text
+哪些 category pair 天然可分；
+哪些 pair 只是 readout/模板/词频路径；
+哪些 pair 有可能形成 clean common cumulative field。
+```
+## Phase 536: Category Pair Quality and Selectivity Factorization 类别对质量与选择性分解 [2026-06-19 10:11]
+
+### 本阶段目标
+
+根据用户上传的两份 Phase535 分析，继续完成“理论刹车”后的基础重建：
+
+```text
+不再直接扩大多层窗口；
+先系统审计哪些 category state-pair 适合做 clean common field 测试。
+```
+
+上传分析中正确部分：
+
+```text
+1. Phase535 正确把 Phase534 的结论降级。
+2. 当前 d_common 更像 template-family cumulative task signal，不是 clean semantic common。
+3. Baseline difficulty 是隐藏变量。
+4. direct >= common 说明模板路径仍是重要载体。
+5. 下一步应做 category pair quality audit 和 selectivity factorization。
+```
+
+需要收紧部分：
+
+```text
+1. 本轮不引入 ICA/VAE 等复杂非线性方法。
+2. 先用基础指标审计 pair quality，避免用复杂方法掩盖数据问题。
+3. 不做大理论总结，只筛选更可靠的测试床。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase536_pair_quality_selectivity.py
+tests/glm5/phase536_pair_quality_selectivity_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase536_pair_quality_selectivity.py \
+  tests/glm5/phase536_pair_quality_selectivity_summary.py
+
+python tests/glm5/phase536_pair_quality_selectivity.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11,23 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase536_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase536_pair_quality_selectivity.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 4,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase536_pair_quality_selectivity \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase536_pair_quality_selectivity.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 4,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase536_pair_quality_selectivity \
+  --hard-exit-after-model
+
+python tests/glm5/phase536_pair_quality_selectivity.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 4,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase536_pair_quality_selectivity \
+  --hard-exit-after-model
+
+python tests/glm5/phase536_pair_quality_selectivity_summary.py \
+  --root results/glm5_phase536_pair_quality_selectivity
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pairs:
+  fruit_tool
+  animal_tool
+  vehicle_furniture
+  clothing_tool
+  fruit_vegetable
+templates = direct, belongs, kind
+train_n = 12
+test_n = 8
+windows:
+  qwen3 = early L8,L10,L12; center L10,L12,L14
+  GLM4 = early L22,L24,L26; center L24,L26,L28
+  DS7B = early L14,L16,L18; center L16,L18,L20
+conditions:
+  common
+  direct
+  shuffled
+  random, 4 seeds
+alphas = 4,8
+```
+
+### 输出文件
+
+```text
+results/glm5_phase536_pair_quality_selectivity/phase536_qwen3_pair_quality_selectivity.json
+results/glm5_phase536_pair_quality_selectivity/phase536_glm4_pair_quality_selectivity.json
+results/glm5_phase536_pair_quality_selectivity/phase536_deepseek7b_pair_quality_selectivity.json
+results/glm5_phase536_pair_quality_selectivity/phase536_cross_model_summary.md
+```
+
+### 客观结果
+
+#### qwen3
+
+```text
+fruit_tool:
+  baseline margin +4.307
+  baseline rank 332.0
+  common early +0.750 / mean +1.116 / specificity 0.71
+  random max -0.055
+  verdict = strong_but_not_specific
+
+animal_tool:
+  baseline margin +8.130
+  baseline rank 19.0
+  common center +0.461 / mean +0.616 / specificity 0.46
+  verdict = strong_but_not_specific
+
+vehicle_furniture:
+  baseline margin +2.909
+  baseline rank 189.6
+  common center +0.875 / mean +1.259 / specificity 1.29
+  direct +0.609 / mean +1.102 / specificity 0.72
+  shuffled +0.285 / mean +0.512 / specificity 0.40
+  random max +0.156
+  verdict = candidate_common_pair
+
+clothing_tool:
+  baseline margin +1.836
+  baseline rank 141.1
+  common center -0.094 / mean +0.221 / specificity 0.12
+  verdict = weak
+
+fruit_vegetable:
+  baseline margin +3.484
+  baseline rank 332.0
+  common early -0.188 / mean -0.039 / specificity 0.43
+  verdict = weak
+```
+
+#### GLM4
+
+```text
+fruit_tool:
+  common +0.380 / specificity 0.14
+  verdict = strong_but_not_specific
+
+animal_tool:
+  common -0.247
+  verdict = baseline_not_ideal
+
+vehicle_furniture:
+  baseline margin +1.824
+  baseline rank 996.8
+  common +1.190 / specificity 0.52
+  direct +1.621 / specificity 1.05
+  verdict = strong_but_not_specific
+
+clothing_tool:
+  common +0.647 / specificity 0.17
+  verdict = strong_but_not_specific
+
+fruit_vegetable:
+  common +1.912 / specificity 0.68
+  verdict = strong_but_not_specific
+```
+
+GLM4 有多个 strong pair，但 specificity 低，且 often direct/shuffled 干扰大，没有 clean common pair。
+
+#### DS7B
+
+```text
+fruit_tool:
+  baseline rank 1289.2
+  common +0.221 / specificity 0.53
+  verdict = baseline_not_ideal
+
+animal_tool:
+  common +0.374 / specificity 0.80
+  verdict = strong_but_not_specific
+
+vehicle_furniture:
+  baseline margin -2.127
+  rank 36657.2
+  verdict = baseline_not_ideal
+
+clothing_tool:
+  baseline margin -0.980
+  rank 8231.6
+  verdict = baseline_not_ideal
+
+fruit_vegetable:
+  baseline rank 1289.2
+  verdict = baseline_not_ideal
+```
+
+### 核心发现
+
+1. qwen3 `vehicle_furniture` 是当前唯一通过候选规则的 pair。
+
+```text
+baseline 难度适中
+common transfer_min +0.875
+specificity 1.29
+common > direct > shuffled > random
+```
+
+2. qwen3 fruit/tool 和 animal/tool 都有强度，但 specificity 不够。
+
+```text
+fruit_tool specificity 0.71
+animal_tool specificity 0.46
+```
+
+3. GLM4 多数 pair 有强度，但不是 clean common。
+
+GLM4 的问题不是不能动，而是 off-pair 太大、direct/shuffled 混入太多。
+
+4. DS7B 仍缺少适合 clean common 的 category pair。
+
+5. `animal_vehicle` 在 Phase535 中失败的确可能部分来自 pair quality；但更换多个 pair 后，只有 qwen3 vehicle_furniture 看起来适合继续。
+
+### 对上传分析的更新
+
+上传分析认为应先做 baseline difficulty audit，这是正确的。
+
+Phase536 进一步给出客观筛选：
+
+```text
+下一轮不应继续围绕 fruit/nonfruit 或 animal_vehicle。
+最值得推进的是 qwen3 vehicle_furniture。
+```
+
+同时，这也支持一个谨慎判断：
+
+```text
+clean common field 不是完全不存在，
+但它很依赖 pair quality、baseline 难度、模板一致性和模型类型。
+```
+
+### 理论进展
+
+当前理论从：
+
+```text
+Template-family cumulative field with insufficient selectivity
+```
+
+推进为：
+
+```text
+Pair-quality gated cumulative common candidate
+```
+
+更具体地说：
+
+```text
+模型内部是否出现 clean common，不只取决于模型和层窗口，
+还取决于类别对是否具有适中的基线难度、稳定模板方向、低 off-pair 干扰。
+```
+
+### 当前硬伤
+
+```text
+1. qwen3 vehicle_furniture 还只是筛选出的候选，不是已确认 clean common。
+2. random seeds 本轮为 4，比 Phase535 少，需要下一轮加回 8 seeds。
+3. windows 只有 early/center，没有 late。
+4. 没有 generation bridge。
+5. 没有针对 vehicle_furniture 做更细的 off-pair map。
+```
+
+### 下一阶段任务
+
+Phase537 应集中验证：
+
+```text
+qwen3 vehicle_furniture clean common candidate audit
+```
+
+测试要求：
+
+```text
+1. 只围绕 qwen3 vehicle_furniture 做更大确认。
+2. random seeds 提升到 8 或 16。
+3. 加 late window 和更多 alpha。
+4. 对 vehicle_furniture 做 off-pair map：
+   fruit_tool
+   animal_tool
+   clothing_tool
+   fruit_vegetable
+   optional extra pairs
+5. 加 generation bridge：
+   vehicle / furniture target rank
+   direct hit
+   top-k trajectory
+6. 同步跑 GLM4/DS7B 作为对照，但不把它们作为主锚点。
+```
+
+成功判据：
+
+```text
+qwen3 vehicle_furniture:
+  common > direct
+  common > shuffled
+  common > random max
+  specificity > 1
+  多窗口复现
+  generation rank/margin 改善
+```
+
+## Phase 537: Vehicle/Furniture Clean Common Candidate Audit 车辆-家具公共候选严格审计 [2026-06-19 10:35]
+
+### 本阶段目标
+
+分析用户附加的 Phase536 判断后继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase536 是 testbed selection / pair quality audit，不是机制闭合。
+2. qwen3 vehicle_furniture 是当前最值得继续审计的 clean common candidate。
+3. 不能把 Phase536 直接解释成 clean common 已经成立。
+4. 下一步必须增加 random seeds、late/extended windows、off-pair map 和 generation bridge。
+```
+
+需要修正的部分：
+
+```text
+“唯一符合 clean common 标准”说法偏强。
+更准确说法是：
+qwen3 vehicle_furniture 是当前最好的候选，但仍需要严格选择性审计。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase537_vehicle_furniture_audit.py \
+  tests/glm5/phase537_vehicle_furniture_audit_summary.py
+
+python tests/glm5/phase537_vehicle_furniture_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11,23 \
+  --bridge-n 3 \
+  --max-new-tokens 2 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase537_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase537_vehicle_furniture_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8,10,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --bridge-n 12 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase537_vehicle_furniture_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase537_vehicle_furniture_audit.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8,10,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --bridge-n 12 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase537_vehicle_furniture_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase537_vehicle_furniture_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8,10,12 \
+  --random-seeds 11,23,37,41,53,67,79,83 \
+  --bridge-n 12 \
+  --max-new-tokens 5 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase537_vehicle_furniture_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase537_vehicle_furniture_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase537_vehicle_furniture_audit.py`
+- 汇总脚本：`tests/glm5/phase537_vehicle_furniture_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase537_vehicle_furniture_audit/phase537_qwen3_vehicle_furniture_audit.json`
+- GLM4 结果：`results/glm5_phase537_vehicle_furniture_audit/phase537_glm4_vehicle_furniture_audit.json`
+- DS7B 结果：`results/glm5_phase537_vehicle_furniture_audit/phase537_deepseek7b_vehicle_furniture_audit.json`
+- 跨模型汇总：`results/glm5_phase537_vehicle_furniture_audit/phase537_cross_model_summary.md`
+
+### 测试范围
+
+```text
+source pair = vehicle_furniture
+off-pair map = fruit_tool, animal_tool, clothing_tool, fruit_vegetable
+models = qwen3, glm4, deepseek7b
+train_n = 12 objects/category
+test_n = 8 objects/category
+templates = direct, belongs, kind
+alphas = 2,4,6,8,10,12
+random seeds = 8
+generation bridge = 12 vehicle prompts, 5 generated tokens
+```
+
+窗口：
+
+```text
+Qwen3: early L8,L10,L12; center L10,L12,L14; late L12,L14,L16; extended L8,L10,L12,L14,L16
+GLM4: early L22,L24,L26; center L24,L26,L28; late L26,L28,L30; extended L22,L24,L26,L28,L30
+DS7B: early L14,L16,L18; center L16,L18,L20; late L18,L20,L22; extended L14,L16,L18,L20,L22
+```
+
+### 判据
+
+本轮不以最大 delta 为成功判据，而使用更严格的 clean common gate：
+
+```text
+1. source pair 所有模板的最小提升 > 0.25
+2. specificity > 1
+3. common > random max
+4. random pass-like count = 0
+5. common >= direct
+6. common >= shuffled
+7. 最好能多窗口复现
+8. generation bridge 不应与 causal audit 明显冲突
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+early:
+  common source min/mean = +0.477/+0.919
+  off-pair max abs = 0.746
+  specificity = 0.64
+  random max = +0.156
+  verdict = fail by specificity
+
+center:
+  common source min/mean = +1.172/+1.513
+  off-pair max abs = 1.168
+  specificity = 1.00
+  random max = +0.062
+  verdict = single window pass
+
+late:
+  common source min/mean = +1.285/+1.792
+  off-pair max abs = 1.922
+  specificity = 0.67
+  random max = +0.031
+  verdict = fail by off-pair expansion
+
+extended:
+  common source min/mean = +1.164/+1.517
+  off-pair max abs = 1.387
+  specificity = 0.84
+  random max = +0.094
+  verdict = fail by specificity
+```
+
+qwen3 最关键 off-pair 硬伤：
+
+```text
+late window:
+  clothing_tool max abs delta = 1.922
+```
+
+generation bridge：
+
+```text
+baseline:
+  hit 0.33, rank 15.8, margin +1.240
+
+common:
+  hit 0.50, rank 17.2, margin +2.331
+
+direct:
+  hit 0.50, rank 3.3, margin +2.531
+
+shuffled:
+  hit 0.33, rank 93.2, margin +1.370
+
+random:
+  hit 0.25, rank 14.5, margin +1.391
+```
+
+解释：
+
+```text
+common 能提高 margin 和 hit，但 rank 没有改善。
+direct 对生成 rank 更强。
+因此 qwen3 vehicle_furniture 不能升级为 clean common confirmed，只能保留 single-window candidate。
+```
+
+#### GLM4
+
+```text
+early common = +1.402/+2.154, specificity 0.47
+center common = +1.492/+1.796, specificity 0.49
+late common = +1.487/+2.028, specificity 0.75
+extended common = +1.577/+2.097, specificity 0.59
+random max <= +0.309
+```
+
+GLM4 结论：
+
+```text
+common 效应强，但 off-pair 扩散更强。
+direct 在 late/extended 中甚至强于 common。
+verdict = strong_but_not_clean
+```
+
+generation bridge：
+
+```text
+baseline hit 0.00, rank 82.4, margin -0.504
+common hit 0.00, rank 32.2, margin +0.853
+direct hit 0.00, rank 22.1, margin +2.375
+random hit 0.00, rank 81.5, margin +0.112
+```
+
+#### DS7B
+
+```text
+early common = -0.041/+0.043, specificity 0.61
+center common = -0.018/+0.308, specificity 0.05
+late common = +0.059/+0.341, specificity 0.19
+extended common = -0.005/+0.414, specificity 0.01
+```
+
+DS7B 结论：
+
+```text
+vehicle_furniture common 基本不成立。
+verdict = not_clean
+```
+
+generation bridge：
+
+```text
+baseline hit 0.00, rank 2967.2, margin -5.619
+common hit 0.00, rank 1607.6, margin -5.590
+direct hit 0.00, rank 2117.9, margin -5.219
+```
+
+### 当前最可靠结论
+
+```text
+1. Phase536 的方向基本正确：
+   qwen3 vehicle_furniture 确实是当前最好的候选 pair。
+
+2. Phase536 的乐观解释需要降级：
+   qwen3 vehicle_furniture 没有通过多窗口 clean common confirmation。
+
+3. qwen3 的 common 不是随机方向：
+   random max 很低，8 seeds 下没有 pass-like。
+
+4. 失败的主要原因不是 source pair 无效，
+   而是 off-pair 扩散，尤其 clothing_tool。
+
+5. GLM4 有强公共扰动，但不是选择性语义公共方向。
+
+6. DS7B 在这个 pair 上基本不支持 common candidate。
+```
+
+### 对当前理论的推进
+
+Phase536 理论：
+
+```text
+Pair-quality gated cumulative common candidate
+```
+
+Phase537 后应改为：
+
+```text
+Pair-quality gated but interface-leaking cumulative field
+```
+
+更具体地说：
+
+```text
+所谓 common semantic direction 可能不是一个干净的类别方向，
+而是一个沿着类别边界、模板句法、邻近接口共同形成的局部场。
+当 source pair 提升时，邻近 off-pair 也会被牵动。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. qwen3 只有 center window 通过 strict gate，不能说多窗口复现。
+2. late window 的 clothing_tool 扩散很强，说明 vehicle/furniture 与 clothing/tool 共享了某种接口轴。
+3. generation bridge 中 common 提高 margin，但 rank 不如 direct。
+4. GLM4 强但不选择性，说明跨模型 clean common 暂时不成立。
+5. DS7B 在该 pair 上弱，说明该候选不是普适结构。
+6. 当前 off-pair 仍只有 4 组，尚未覆盖更大类别图谱。
+```
+
+### 下一阶段任务
+
+Phase538 不应继续直接寻找“更大的 common direction”，而应拆解 leakage source：
+
+```text
+Interface Leakage Factorization
+```
+
+核心目标：
+
+```text
+解释 qwen3 vehicle_furniture 为什么会强烈牵动 clothing_tool。
+```
+
+建议测试：
+
+```text
+1. 构造 expanded category graph：
+   vehicle_furniture
+   clothing_tool
+   furniture_clothing
+   vehicle_tool
+   vehicle_clothing
+   furniture_tool
+
+2. 对每个 pair 提取 common/direct/shuffled/perp。
+
+3. 计算 pair-pair cosine map 和 causal transfer map。
+
+4. 不是只看 source pair target delta，
+   而是建立 direction -> all pair response matrix。
+
+5. 用 qwen3 为主模型，GLM4/DS7B 作为对照。
+
+6. 判定 clothing_tool 泄漏来自：
+   a. 类别语义邻近
+   b. artifact/toolness 接口
+   c. 模板句法路径
+   d. readout residual 竞争
+```
+
+成功判据：
+
+```text
+如果 vehicle_furniture -> clothing_tool 的泄漏可由 pair-pair response matrix 稳定预测，
+说明研究对象应从“单一公共方向”升级为“类别接口场图谱”。
+```
+
+## Phase 538: Category Interface Response Matrix 类别接口响应矩阵 [2026-06-19 11:12]
+
+### 本阶段目标
+
+根据用户附加的 Phase537 分析继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase537 不是证明 clean common，而是一次压力测试。
+2. qwen3 vehicle_furniture 应从 clean common candidate 降级为 interface-leaking candidate。
+3. 下一步不应继续追求单个更强 common direction，而应建立 pair-to-pair response matrix。
+4. off-pair leakage 不是简单噪声，可能暴露模型内部真实类别接口。
+5. margin 与 rank / competition 仍然分离，direct path 对生成排序更强。
+```
+
+需要收紧的部分：
+
+```text
+1. “语义相变临界点”“统一公式”“回归分解”等理论说法仍偏早。
+2. 当前阶段不应先做复杂统计回归，而应先做基础响应矩阵。
+3. Phase537 中 clothing_tool 被视为最大泄漏点，但这需要通过更大类别图谱重新确认。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase538_interface_response_matrix.py \
+  tests/glm5/phase538_interface_response_matrix_summary.py
+
+python tests/glm5/phase538_interface_response_matrix.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase538_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase538_interface_response_matrix.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase538_interface_response_matrix \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase538_interface_response_matrix.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase538_interface_response_matrix \
+  --hard-exit-after-model
+
+python tests/glm5/phase538_interface_response_matrix.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6,8 \
+  --random-seeds 11,23,37,41 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase538_interface_response_matrix \
+  --hard-exit-after-model
+
+python tests/glm5/phase538_interface_response_matrix_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase538_interface_response_matrix.py`
+- 汇总脚本：`tests/glm5/phase538_interface_response_matrix_summary.py`
+- Qwen3 结果：`results/glm5_phase538_interface_response_matrix/phase538_qwen3_interface_response_matrix.json`
+- GLM4 结果：`results/glm5_phase538_interface_response_matrix/phase538_glm4_interface_response_matrix.json`
+- DS7B 结果：`results/glm5_phase538_interface_response_matrix/phase538_deepseek7b_interface_response_matrix.json`
+- 跨模型汇总：`results/glm5_phase538_interface_response_matrix/phase538_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pairs = vehicle_furniture, clothing_tool, furniture_clothing, vehicle_tool, vehicle_clothing, furniture_tool
+templates = direct, belongs, kind
+train_n = 12 objects/category
+test_n = 8 objects/category
+alphas = 2,4,6,8
+random seeds = 4
+conditions = common, direct, shuffled, random controls
+```
+
+窗口：
+
+```text
+Qwen3: center L10,L12,L14; late L12,L14,L16; extended L10,L12,L14,L16
+GLM4: center L24,L26,L28; late L26,L28,L30; extended L24,L26,L28,L30
+DS7B: center L16,L18,L20; late L18,L20,L22; extended L16,L18,L20,L22
+```
+
+### 方法
+
+本轮建立基础响应矩阵：
+
+```text
+source pair direction -> target pair response
+```
+
+对每个 source pair：
+
+```text
+1. 在每个 layer 提取 direct/belongs/kind 三个模板方向。
+2. 构造 common direction。
+3. 去除 readout-parallel 成分，仅保留 readout-orthogonal 成分。
+4. 在窗口内累积 patch。
+5. 对所有 target pair 的三个模板测 delta_margin。
+6. 记录：
+   self_min_delta
+   self_mean_delta
+   off_pair_max_abs
+   specificity
+   top_off_pair
+```
+
+### 客观结果
+
+#### Qwen3
+
+最佳 common 结果：
+
+```text
+vehicle_furniture:
+  best window = extended
+  self min/mean = +1.195/+1.533
+  off max = 1.887
+  specificity = 0.63
+  top off-pair = vehicle_clothing
+  strict pass = False
+
+vehicle_tool:
+  best window = extended
+  self min/mean = +1.547/+1.612
+  off max = 1.734
+  specificity = 0.89
+  top off-pair = vehicle_furniture
+  strict pass = False
+
+vehicle_clothing:
+  best window = extended
+  self min/mean = +1.148/+1.389
+  off max = 2.055
+  specificity = 0.56
+  top off-pair = vehicle_furniture
+  strict pass = False
+
+furniture_tool:
+  best window = extended
+  self min/mean = +0.727/+0.917
+  off max = 1.184
+  top off-pair = vehicle_furniture
+```
+
+qwen3 common mean response matrix：
+
+```text
+source\target          vehicle_furniture  clothing_tool  furniture_clothing  vehicle_tool  vehicle_clothing  furniture_tool
+vehicle_furniture      +1.533             -0.255         -0.428              +1.340       +1.406            -0.421
+clothing_tool          -0.406             +0.305         -0.030              -0.172       -0.419            +0.163
+furniture_clothing     -0.284             -0.754         +0.475              -0.328       +0.016            +0.298
+vehicle_tool           +1.513             -0.064         +0.112              +1.612       +1.456            +0.203
+vehicle_clothing       +1.469             -0.701         -0.224              +0.995       +1.389            -0.477
+furniture_tool         -0.889             +0.190         +0.805              -0.332       -0.616            +0.917
+```
+
+qwen3 的关键发现：
+
+```text
+Phase537 中看到的 vehicle_furniture -> clothing_tool 泄漏不是最大主边。
+
+更强的稳定接口是：
+vehicle_furniture <-> vehicle_tool
+vehicle_furniture <-> vehicle_clothing
+vehicle_tool <-> vehicle_clothing
+```
+
+vehicle_furniture -> clothing_tool：
+
+```text
+center: mean -0.094, max_abs 0.680
+late: mean -0.215, max_abs 1.238
+extended: mean -0.255, max_abs 1.281
+```
+
+vehicle_furniture -> vehicle_clothing：
+
+```text
+center: mean +1.132, max_abs 1.523
+late: mean +1.346, max_abs 1.676
+extended: mean +1.406, max_abs 1.887
+```
+
+vehicle_furniture -> vehicle_tool：
+
+```text
+center: mean +1.095, max_abs 1.273
+late: mean +1.272, max_abs 1.391
+extended: mean +1.340, max_abs 1.602
+```
+
+因此 qwen3 的真实现象更像：
+
+```text
+vehicle-centered interface cluster
+```
+
+而不是简单：
+
+```text
+vehicle_furniture -> clothing_tool leakage
+```
+
+#### GLM4
+
+最佳 common 结果：
+
+```text
+vehicle_furniture:
+  self min/mean = +1.428/+2.028
+  off max = 3.916
+  specificity = 0.36
+  top off-pair = vehicle_tool
+
+vehicle_tool:
+  self min/mean = +2.059/+2.187
+  off max = 2.367
+  specificity = 0.87
+  top off-pair = vehicle_furniture
+
+vehicle_clothing:
+  self min/mean = +1.168/+2.268
+  off max = 4.808
+  specificity = 0.24
+  top off-pair = clothing_tool
+```
+
+GLM4 common mean response matrix：
+
+```text
+source\target          vehicle_furniture  clothing_tool  furniture_clothing  vehicle_tool  vehicle_clothing  furniture_tool
+vehicle_furniture      +2.028             -1.392         -1.031              +3.350       +2.691            -1.328
+clothing_tool          -0.367             +0.530         -1.136              -0.222       -1.401            -0.426
+furniture_clothing     -0.407             -0.856         +0.668              +0.061       +0.032            +0.367
+vehicle_tool           +1.526             -0.187         -0.496              +2.187       +1.515            -0.700
+vehicle_clothing       +2.092             -4.070         -0.251              +2.658       +2.268            -0.652
+furniture_tool         -0.652             -0.097         +0.240              +0.014       -0.393            +0.234
+```
+
+GLM4 关键发现：
+
+```text
+1. GLM4 的接口响应比 Qwen3 更强，但更不选择性。
+2. vehicle_furniture -> vehicle_tool 是最大主边。
+3. vehicle_clothing -> clothing_tool 出现极强负向响应：
+   mean -4.070, max_abs 4.808。
+4. 这说明 GLM4 的接口场更像强读出/竞争控制场，不是干净语义场。
+```
+
+#### DS7B
+
+最佳 common 结果：
+
+```text
+vehicle_furniture:
+  self min/mean = +0.034/+0.264
+  off max = 0.680
+  specificity = 0.05
+  top off-pair = vehicle_clothing
+
+vehicle_tool:
+  self min/mean = +0.430/+0.590
+  off max = 0.867
+  specificity = 0.50
+  top off-pair = vehicle_clothing
+
+vehicle_clothing:
+  self min/mean = +0.434/+0.587
+  off max = 0.734
+  specificity = 0.59
+  top off-pair = vehicle_furniture
+```
+
+DS7B common mean response matrix：
+
+```text
+source\target          vehicle_furniture  clothing_tool  furniture_clothing  vehicle_tool  vehicle_clothing  furniture_tool
+vehicle_furniture      +0.264             +0.106         +0.219              +0.425       +0.429            +0.156
+clothing_tool          -0.004             +0.042         -0.016              +0.016       -0.012            -0.007
+furniture_clothing     +0.033             -0.048         +0.020              -0.011       +0.000            +0.008
+vehicle_tool           +0.373             +0.222         +0.164              +0.590       +0.504            +0.207
+vehicle_clothing       +0.402             +0.076         +0.293              +0.537       +0.587            +0.198
+furniture_tool         +0.020             +0.005         -0.011              -0.006       -0.027            +0.012
+```
+
+DS7B 关键发现：
+
+```text
+1. DS7B 整体幅度低。
+2. vehicle_tool / vehicle_clothing 有弱正响应。
+3. vehicle_furniture 自身不成立，但仍会弱牵动 vehicle_tool / vehicle_clothing。
+4. DS7B 也存在 vehicle-centered weak interface trace。
+```
+
+### 最可靠结论
+
+```text
+1. 本轮没有任何 source pair 通过 strict clean gate。
+
+2. qwen3 vehicle_furniture 的 Phase537 泄漏判断正确，
+   但 clothing_tool 不是最大主泄漏边。
+
+3. qwen3 的真实结构更接近 vehicle-centered interface cluster：
+   vehicle_furniture
+   vehicle_tool
+   vehicle_clothing
+
+4. GLM4 具有同类 vehicle-centered cluster，
+   但幅度更大、负向竞争更强、选择性更差。
+
+5. DS7B 幅度弱，但也保留同方向的 vehicle_tool / vehicle_clothing 弱接口痕迹。
+
+6. common direction 的失败不是因为方向完全无效，
+   而是因为它激活的是接口簇，不是孤立类别轴。
+```
+
+### 对 Phase537 的修正
+
+Phase537 表述：
+
+```text
+vehicle_furniture 主要泄漏到 clothing_tool
+```
+
+Phase538 修正：
+
+```text
+vehicle_furniture 的最大稳定泄漏边是 vehicle_clothing 和 vehicle_tool。
+clothing_tool 是受影响的重要 off-pair，但不是主边。
+```
+
+更准确的图谱：
+
+```text
+vehicle_furniture <-> vehicle_tool <-> vehicle_clothing
+vehicle_furniture <-> vehicle_clothing
+
+clothing_tool 在 GLM4 中表现为强负向竞争接口，
+在 qwen3 中是次级泄漏/竞争边。
+```
+
+### 理论进展
+
+Phase537 理论：
+
+```text
+Pair-quality gated but interface-leaking cumulative field
+```
+
+Phase538 后推进为：
+
+```text
+Vehicle-centered category interface cluster
+```
+
+当前更谨慎理论：
+
+```text
+模型内部不是把 vehicle/furniture/clothing/tool 分别编码为独立纯轴，
+而是在特定层窗口形成由共享类别标签、功能属性和竞争 readout 共同组成的接口簇。
+一个 source direction 的作用会沿接口簇扩散，
+因此单 pair 的 specificity 失败不是噪声，
+而是类别接口结构本身的表现。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 本轮仍然只覆盖 artifact 相关 4 个类别：
+   vehicle, furniture, clothing, tool。
+
+2. response matrix 还没有加入 fruit/animal/vegetable 等远距离类别作为全局背景。
+
+3. 当前只测 answer-last residual patch，
+   尚未定位这种接口簇来自 attention、MLP 还是 residual stream 下游读出。
+
+4. 没有生成桥接，本轮只解决 causal response graph。
+
+5. random seeds 为 4，足够做矩阵审计，但若要确认弱边仍需加大。
+
+6. 目前只用 common mean matrix，没有做方向相似度矩阵与 causal matrix 的对应关系审计。
+```
+
+### 下一阶段任务
+
+Phase539 应进入：
+
+```text
+Interface Cluster Mechanism Decomposition
+```
+
+目标不是继续扩大 pair 数量，而是拆解 vehicle-centered cluster 的来源。
+
+建议测试：
+
+```text
+1. 对 qwen3 的 vehicle_furniture / vehicle_tool / vehicle_clothing 三个核心 pair，
+   提取 common/direct/shuffled/readout-parallel/readout-orthogonal。
+
+2. 分别测试：
+   residual-only patch
+   readout-parallel patch
+   readout-orthogonal patch
+   attention output patch
+   MLP output patch
+
+3. 建立 direction cosine matrix 与 causal response matrix：
+   如果 cosine 高且 causal 高，说明几何方向本身解释扩散；
+   如果 cosine 低但 causal 高，说明共享下游读出/竞争门解释扩散。
+
+4. 加远距离背景 pair：
+   fruit_tool
+   animal_tool
+   fruit_vegetable
+   animal_furniture
+
+5. 单独追踪 vehicle_clothing 为什么成为 qwen3 的最大泄漏边。
+```
+
+成功判据：
+
+```text
+能区分 vehicle-centered cluster 的主因是：
+1. hidden-space direction overlap
+2. readout overlap
+3. attention/MLP writer overlap
+4. downstream competition gate
+```
+
+## Phase 539: Interface Cluster Mechanism Decomposition 接口簇机制分解 [2026-06-19 12:59]
+
+### 本阶段目标
+
+根据用户附加的 Phase538 分析继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase538 的核心意义是从 single direction 转向 response matrix。
+2. vehicle_furniture 的主泄漏边应从 clothing_tool 修正为 vehicle_tool / vehicle_clothing。
+3. 当前最可靠结构是 vehicle-centered interface cluster。
+4. off-pair leakage 不应一律当作噪声，而应作为结构信号分析。
+5. 下一步应拆解接口簇来源，而不是继续扩大理论表述。
+```
+
+需要收紧的部分：
+
+```text
+1. 目前不能直接说已经发现“模型本体论”或“相变临界点”。
+2. 还不能使用复杂回归解释泄漏来源。
+3. 需要先做基础机制拆分：residual / readout-parallel / readout-orthogonal / attention / MLP。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase539_interface_cluster_mechanism.py \
+  tests/glm5/phase539_interface_cluster_mechanism_summary.py
+
+python tests/glm5/phase539_interface_cluster_mechanism.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase539_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase539_interface_cluster_mechanism.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase539_interface_cluster_mechanism \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase539_interface_cluster_mechanism.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase539_interface_cluster_mechanism \
+  --hard-exit-after-model
+
+python tests/glm5/phase539_interface_cluster_mechanism.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase539_interface_cluster_mechanism \
+  --hard-exit-after-model
+
+python tests/glm5/phase539_interface_cluster_mechanism_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase539_interface_cluster_mechanism.py`
+- 汇总脚本：`tests/glm5/phase539_interface_cluster_mechanism_summary.py`
+- Qwen3 结果：`results/glm5_phase539_interface_cluster_mechanism/phase539_qwen3_interface_cluster_mechanism.json`
+- GLM4 结果：`results/glm5_phase539_interface_cluster_mechanism/phase539_glm4_interface_cluster_mechanism.json`
+- DS7B 结果：`results/glm5_phase539_interface_cluster_mechanism/phase539_deepseek7b_interface_cluster_mechanism.json`
+- 跨模型汇总：`results/glm5_phase539_interface_cluster_mechanism/phase539_cross_model_summary.md`
+
+### 测试范围
+
+```text
+core sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+target pairs = vehicle_furniture, vehicle_tool, vehicle_clothing, clothing_tool,
+               furniture_clothing, furniture_tool, fruit_tool, animal_tool,
+               fruit_vegetable, animal_furniture
+conditions = residual_full, residual_perp, residual_parallel, attention_perp, mlp_perp
+train_n = 12
+test_n = 8
+alphas = 2,4,6
+random seeds = 2
+windows = center, extended
+```
+
+### 方法
+
+对三个核心 source pair 提取 common direction，然后拆为：
+
+```text
+residual_full:
+  原始 common direction
+
+residual_perp:
+  去除 readout-parallel 后的正交成分
+
+residual_parallel:
+  readout-parallel 成分
+
+attention_perp:
+  将 residual_perp 注入 attention output
+
+mlp_perp:
+  将 residual_perp 注入 MLP output
+```
+
+同时记录：
+
+```text
+1. source self min / mean
+2. off-pair max
+3. specificity
+4. top off-pair
+5. core common-perp cosine
+6. core readout cosine
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+vehicle_furniture:
+  residual_full     +1.016 / off 1.711 / spec 0.59 / top vehicle_clothing
+  residual_perp     +1.000 / off 1.594 / spec 0.63 / top vehicle_clothing
+  residual_parallel +0.484 / off 1.805 / spec 0.27 / top vehicle_tool
+  attention_perp    +1.000 / off 1.492 / spec 0.67 / top vehicle_clothing
+  mlp_perp          +1.000 / off 1.602 / spec 0.62 / top vehicle_clothing
+
+vehicle_tool:
+  residual_full     +1.379 / off 1.469 / spec 0.94 / top vehicle_furniture
+  residual_perp     +1.281 / off 1.367 / spec 0.94 / top vehicle_furniture
+  residual_parallel +0.719 / off 1.742 / spec 0.41 / top vehicle_furniture
+  attention_perp    +1.191 / off 1.320 / spec 0.90 / top vehicle_furniture
+  mlp_perp          +1.273 / off 1.367 / spec 0.93 / top vehicle_furniture
+
+vehicle_clothing:
+  residual_full     +0.992 / off 1.852 / spec 0.54 / top vehicle_furniture
+  residual_perp     +0.930 / off 1.711 / spec 0.54 / top vehicle_furniture
+  residual_parallel +0.547 / off 1.902 / spec 0.29 / top vehicle_furniture
+  attention_perp    +0.977 / off 1.609 / spec 0.61 / top vehicle_furniture
+  mlp_perp          +0.938 / off 1.711 / spec 0.55 / top vehicle_furniture
+```
+
+Qwen3 core cosine：
+
+```text
+common-perp cosine:
+  vehicle_furniture - vehicle_tool = 0.657
+  vehicle_furniture - vehicle_clothing = 0.755
+  vehicle_tool - vehicle_clothing = 0.608
+
+readout cosine:
+  vehicle_furniture - vehicle_tool = 0.795
+  vehicle_furniture - vehicle_clothing = 0.831
+  vehicle_tool - vehicle_clothing = 0.755
+```
+
+Qwen3 结论：
+
+```text
+1. residual_perp 已经足够复现核心接口簇。
+2. attention_perp 和 mlp_perp 与 residual_perp 接近，没有单一 writer 独占。
+3. residual_parallel 更弱且更不选择性。
+4. 这支持 hidden-space direction overlap + readout overlap 的共同解释。
+```
+
+#### GLM4
+
+```text
+vehicle_furniture:
+  residual_full     +2.301 / off 4.571
+  residual_perp     +0.989 / off 3.576
+  residual_parallel +2.934 / off 6.452
+  attention_perp    +2.065 / off 4.217
+  mlp_perp          +0.991 / off 3.568
+
+vehicle_tool:
+  residual_full     +2.898 / off 3.553
+  residual_perp     +2.059 / off 2.367
+  residual_parallel +6.687 / off 6.032 / spec 1.11
+  attention_perp    +2.189 / off 3.023
+  mlp_perp          +2.061 / off 2.355
+
+vehicle_clothing:
+  residual_full     +1.982 / off 5.858
+  residual_perp     +1.135 / off 5.429
+  residual_parallel +4.361 / off 5.497
+  attention_perp    +1.451 / off 6.086
+  mlp_perp          +1.115 / off 5.434
+```
+
+GLM4 core cosine：
+
+```text
+common-perp cosine:
+  0.413 - 0.553
+
+readout cosine:
+  0.729 - 0.801
+```
+
+GLM4 结论：
+
+```text
+1. residual_parallel 是最强条件，尤其 vehicle_tool。
+2. readout cosine 高于 common-perp cosine。
+3. attention_perp 对 vehicle_furniture / vehicle_clothing 有放大作用，但不是唯一来源。
+4. GLM4 接口簇主要受 readout-parallel / downstream competition 控制。
+```
+
+#### DS7B
+
+```text
+vehicle_furniture:
+  residual_perp     +0.016 / off 0.684
+  residual_parallel +0.713 / off 0.797
+  attention_perp    +0.030 / off 0.691
+  mlp_perp          +0.007 / off 0.660
+
+vehicle_tool:
+  residual_perp     +0.311 / off 0.633
+  residual_parallel +1.321 / off 1.473
+  attention_perp    +0.370 / off 0.609
+  mlp_perp          +0.316 / off 0.656
+
+vehicle_clothing:
+  residual_perp     +0.305 / off 0.594
+  residual_parallel +0.715 / off 0.876
+  attention_perp    +0.351 / off 0.605
+  mlp_perp          +0.318 / off 0.594
+```
+
+DS7B core cosine：
+
+```text
+common-perp cosine:
+  0.645 - 0.744
+
+readout cosine:
+  0.705 - 0.771
+```
+
+DS7B 结论：
+
+```text
+1. residual_parallel 明显强于 residual_perp。
+2. weak vehicle-centered trace 主要通过 readout-parallel 打开。
+3. attention_perp 略强于 residual_perp，但幅度仍弱。
+```
+
+### 当前最可靠结论
+
+```text
+1. Qwen3:
+   vehicle-centered cluster 主要可由 residual_perp / hidden direction overlap 解释，
+   readout overlap 参与扩散，但不是唯一主因。
+
+2. GLM4:
+   vehicle-centered cluster 主要由 readout-parallel / competition gate 放大，
+   attention 有放大作用，MLP 不独立解释。
+
+3. DS7B:
+   residual_perp 很弱，readout-parallel 才能打开接口痕迹。
+
+4. 三模型都不支持“单一 attention writer”或“单一 MLP writer”解释。
+
+5. 接口簇不是孤立类别轴，也不是纯 writer 结构，
+   更像 hidden geometry + readout competition 的组合结构。
+```
+
+### 对 Phase538 的推进
+
+Phase538：
+
+```text
+Vehicle-centered category interface cluster
+```
+
+Phase539 后更具体：
+
+```text
+Vehicle-centered interface cluster has model-specific source:
+Qwen3 = hidden-perp geometry dominant
+GLM4 = readout-parallel / competition dominant
+DS7B = weak readout-parallel trace
+```
+
+### 硬伤与瓶颈
+
+```text
+1. attention_perp / mlp_perp 是注入式测试，不等于真实 writer ablation。
+2. random seeds 只有 2，本轮重点是机制分解，不是最终确认弱边。
+3. 只拆了三个核心 source，没有覆盖所有 artifact graph。
+4. 没有直接测 attention heads / MLP neurons 的真实写入贡献。
+5. residual_parallel 很强可能包含直接 readout 推动，需要更严格的 target-token control。
+```
+
+### 下一阶段任务
+
+Phase540 应进入：
+
+```text
+Readout-Competition Control Audit
+```
+
+原因：
+
+```text
+GLM4 和 DS7B 都显示 residual_parallel/readout-parallel 能显著打开接口簇。
+Qwen3 虽然 residual_perp 更强，但 readout cosine 也高。
+```
+
+建议测试：
+
+```text
+1. 对 core sources 进行 target-token control：
+   vehicle/furniture/tool/clothing 目标 token 与 object/item/thing 对照。
+
+2. 比较 readout_parallel 对：
+   target tokens
+   competitor tokens
+   off-cluster background tokens
+   的 logit 改变量。
+
+3. 直接计算 competitor suppression ratio：
+   target_delta
+   competitor_delta
+   off_cluster_delta
+
+4. 对 qwen3/GLM4/DS7B 做同一测试。
+
+5. 判断 residual_parallel 是真正接口因子，
+   还是 readout token shortcut。
+```
+
+成功判据：
+
+```text
+如果 residual_parallel 的效果主要来自 target token logit 直推，
+它不能作为内部语义结构证据。
+
+如果它同时稳定压制 competitor 并保持 cluster-specific pattern，
+则说明 readout competition gate 是接口簇的重要组成。
+```
+
+## Phase 540: Readout-Competition Control Audit 读出竞争控制审计 [2026-06-19 13:27]
+
+### 本阶段目标
+
+根据用户附加的 Phase539 分析继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase539 的总体判断正确。
+2. Qwen3 更像 hidden-perp geometry dominant。
+3. GLM4 / DS7B 更依赖 readout-parallel。
+4. attention_perp / mlp_perp 是注入测试，不是真实 writer ablation。
+5. residual_parallel 可能是 target-token shortcut，必须进一步审计。
+```
+
+本阶段目标：
+
+```text
+判断 residual_parallel 的强效果到底是：
+1. target token 直推；
+2. competitor suppression；
+3. cluster-specific pattern；
+4. off-cluster/global spill。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase540_readout_competition_audit.py \
+  tests/glm5/phase540_readout_competition_audit_summary.py
+
+python tests/glm5/phase540_readout_competition_audit.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase540_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase540_readout_competition_audit.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase540_readout_competition_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase540_readout_competition_audit.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase540_readout_competition_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase540_readout_competition_audit.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase540_readout_competition_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase540_readout_competition_audit_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase540_readout_competition_audit.py`
+- 汇总脚本：`tests/glm5/phase540_readout_competition_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase540_readout_competition_audit/phase540_qwen3_readout_competition_audit.json`
+- GLM4 结果：`results/glm5_phase540_readout_competition_audit/phase540_glm4_readout_competition_audit.json`
+- DS7B 结果：`results/glm5_phase540_readout_competition_audit/phase540_deepseek7b_readout_competition_audit.json`
+- 跨模型汇总：`results/glm5_phase540_readout_competition_audit/phase540_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+conditions = residual_perp, residual_parallel, residual_full
+windows = center, extended
+train_n = 12
+test_n = 8
+alphas = 2,4,6
+```
+
+直接测量 token groups：
+
+```text
+target:
+  source pair 的正类标签 token
+
+competitor:
+  source pair 的负类标签 token
+
+cluster_other:
+  vehicle/furniture/tool/clothing 中除 target 和 competitor 以外的标签
+
+off_cluster:
+  fruit/animal/vegetable/object/thing/item
+```
+
+指标：
+
+```text
+margin_delta = target_max_delta - competitor_max_delta
+competitor_suppression = - competitor_max_delta
+suppression_ratio = - competitor_delta / target_delta
+cluster_selectivity = (target + cluster_other)/2 - off_cluster
+shortcut_index = target - max(suppression, cluster_other, off_cluster)
+```
+
+### 客观结果
+
+#### Qwen3 residual_parallel
+
+```text
+vehicle_furniture:
+  margin +1.115
+  target +1.071
+  competitor -0.045
+  suppression +0.045
+  suppression_ratio 0.042
+  cluster_other +0.049
+  off_cluster +0.359
+  shortcut_index +0.711
+  class = target_push_shortcut
+
+vehicle_tool:
+  margin +1.635
+  target +1.032
+  competitor -0.603
+  suppression +0.603
+  suppression_ratio 0.585
+  cluster_other +0.137
+  off_cluster +0.418
+  class = mixed
+
+vehicle_clothing:
+  margin +1.630
+  target +1.040
+  competitor -0.591
+  suppression +0.591
+  suppression_ratio 0.568
+  cluster_other +0.092
+  off_cluster +0.259
+  class = mixed
+```
+
+Qwen3 解释：
+
+```text
+vehicle_furniture 的 residual_parallel 更像 target token shortcut。
+vehicle_tool / vehicle_clothing 则同时包含 target push 和 competitor suppression。
+这解释了为什么 Phase539 中 Qwen3 residual_parallel 不如 residual_perp 干净。
+```
+
+#### GLM4 residual_parallel
+
+```text
+vehicle_furniture:
+  margin +5.900
+  target +4.551
+  competitor -1.349
+  suppression_ratio 0.296
+  off_cluster +1.326
+  shortcut_index +3.202
+  class = mixed
+
+vehicle_tool:
+  margin +12.866
+  target +5.155
+  competitor -7.711
+  suppression_ratio 1.496
+  off_cluster +1.464
+  shortcut_index -2.555
+  class = mixed
+
+vehicle_clothing:
+  margin +10.040
+  target +4.443
+  competitor -5.598
+  suppression_ratio 1.260
+  off_cluster +0.887
+  shortcut_index -1.155
+  class = mixed
+```
+
+GLM4 解释：
+
+```text
+GLM4 的 residual_parallel 不是单纯 target shortcut。
+vehicle_tool / vehicle_clothing 中 competitor suppression 极强，
+说明 readout-parallel 确实打开了竞争门。
+但 off_cluster 也明显上升，因此不是干净 cluster-specific gate。
+```
+
+#### DS7B residual_parallel
+
+```text
+vehicle_furniture:
+  margin +0.687
+  target +0.688
+  competitor +0.002
+  suppression -0.002
+  class = target_push_shortcut
+
+vehicle_tool:
+  margin +1.589
+  target +1.113
+  competitor -0.476
+  suppression_ratio 0.428
+  class = mixed
+
+vehicle_clothing:
+  margin +0.839
+  target +0.638
+  competitor -0.201
+  suppression_ratio 0.314
+  class = mixed
+```
+
+DS7B 解释：
+
+```text
+vehicle_furniture 基本是 target shortcut。
+vehicle_tool / vehicle_clothing 有一定 competitor suppression，
+但整体仍较弱。
+```
+
+### 当前最可靠结论
+
+```text
+1. residual_parallel 不能被统一解释为 target shortcut。
+
+2. vehicle_furniture 在 Qwen3 / DS7B 中更接近 target_push_shortcut。
+
+3. vehicle_tool / vehicle_clothing 在 Qwen3 / DS7B 中是 mixed：
+   target push + competitor suppression。
+
+4. GLM4 的 vehicle_tool / vehicle_clothing 出现极强 competitor suppression：
+   readout competition gate 真实存在。
+
+5. 但 GLM4 同时存在 off_cluster spill，
+   因此它不是干净的类别接口门。
+
+6. Qwen3 的 residual_perp 仍比 residual_parallel 更像内部接口几何证据；
+   residual_parallel 更多是读出竞争/shortcut 混合。
+```
+
+### 对 Phase539 的修正
+
+Phase539：
+
+```text
+GLM4/DS7B residual_parallel 强，可能是 readout competition。
+```
+
+Phase540 后更精确：
+
+```text
+residual_parallel 分成两类：
+
+vehicle_furniture:
+  多数是 target token push。
+
+vehicle_tool / vehicle_clothing:
+  包含真实 competitor suppression，
+  GLM4 特别强。
+```
+
+### 理论进展
+
+当前应从：
+
+```text
+readout-parallel / competition dominant
+```
+
+改为：
+
+```text
+readout-parallel contains mixed token-push and competition-gate components
+```
+
+更谨慎表述：
+
+```text
+readout_parallel 不是单一机制。
+它既可能直接推高目标 token，也可能压低 competitor token。
+只有后者才更接近下游竞争门。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 当前 token group 仍是类别词级别，不是完整 top-k 竞争集合。
+2. 没有逐 token 输出 top-k delta，无法看到真实生成竞争对手。
+3. classification 只是规则分类，不是最终理论。
+4. residual_parallel 仍可能被 target/competitor token 选择方式影响。
+5. 没有 generation bridge，因此仍未闭合到真实生成轨迹。
+```
+
+### 下一阶段任务
+
+Phase541 应进入：
+
+```text
+Top-K Competition Trajectory Audit
+```
+
+目标：
+
+```text
+对 residual_perp / residual_parallel / residual_full 干预后，
+直接记录 top-k token 的 logit delta 和 rank delta。
+```
+
+重点问题：
+
+```text
+1. competitor suppression 是否发生在真实 top-k 竞争 token 上？
+2. residual_parallel 是压低语义 competitor，还是压低任意高 logit token？
+3. qwen3 residual_perp 为什么能产生接口簇但生成排名未必改善？
+4. GLM4 的强 suppression 是否只是 readout 过强导致的全局 logit reshaping？
+```
+
+建议测试：
+
+```text
+1. 对每个 source prompt 保存 baseline top-20 tokens。
+2. 对 intervention 后同一 top-20 token 计算 delta。
+3. 标记 token 类型：
+   target label
+   competitor label
+   cluster label
+   object-control
+   other
+4. 输出 target rank delta、competitor rank delta、top-k churn。
+5. 三模型同跑。
+```
+
+## Phase 541: Top-K Competition Trajectory Audit 前K竞争轨迹审计 [2026-06-19 13:49]
+
+### 本阶段目标
+
+根据用户附加的 Phase540 分析继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase540 的结论基本正确。
+2. residual_parallel 不能统一解释为 target shortcut。
+3. vehicle_furniture 更偏 target push。
+4. vehicle_tool / vehicle_clothing 包含 competitor suppression。
+5. Phase540 的 token group 是人工定义，下一步必须看真实 top-k competition。
+```
+
+本阶段目标：
+
+```text
+直接记录 baseline top-k tokens，
+然后比较 residual_perp / residual_parallel / residual_full 干预后：
+1. baseline top-k token logit delta
+2. baseline top-k token rank delta
+3. target rank delta
+4. competitor rank delta
+5. top-k churn
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase541_topk_competition_trajectory.py \
+  tests/glm5/phase541_topk_competition_trajectory_summary.py
+
+python tests/glm5/phase541_topk_competition_trajectory.py qwen3 \
+  --windows '10,12' \
+  --train-n 4 \
+  --test-n 3 \
+  --alphas 4 \
+  --random-seeds 11 \
+  --top-k 10 \
+  --batch-size 4 \
+  --output-dir results/glm5_phase541_smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase541_topk_competition_trajectory.py qwen3 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --top-k 20 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase541_topk_competition_trajectory \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase541_topk_competition_trajectory.py glm4 \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --top-k 20 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase541_topk_competition_trajectory \
+  --hard-exit-after-model
+
+python tests/glm5/phase541_topk_competition_trajectory.py deepseek7b \
+  --train-n 12 \
+  --test-n 8 \
+  --alphas 2,4,6 \
+  --random-seeds 11,23 \
+  --top-k 20 \
+  --batch-size 8 \
+  --output-dir results/glm5_phase541_topk_competition_trajectory \
+  --hard-exit-after-model
+
+python tests/glm5/phase541_topk_competition_trajectory_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase541_topk_competition_trajectory.py`
+- 汇总脚本：`tests/glm5/phase541_topk_competition_trajectory_summary.py`
+- Qwen3 结果：`results/glm5_phase541_topk_competition_trajectory/phase541_qwen3_topk_competition_trajectory.json`
+- GLM4 结果：`results/glm5_phase541_topk_competition_trajectory/phase541_glm4_topk_competition_trajectory.json`
+- DS7B 结果：`results/glm5_phase541_topk_competition_trajectory/phase541_deepseek7b_topk_competition_trajectory.json`
+- 跨模型汇总：`results/glm5_phase541_topk_competition_trajectory/phase541_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+sources = vehicle_furniture, vehicle_tool, vehicle_clothing
+conditions = residual_perp, residual_parallel, residual_full
+windows = center, extended
+train_n = 12
+test_n = 8
+top_k = 20
+alphas = 2,4,6
+```
+
+### 方法
+
+对每个 source prompt：
+
+```text
+1. 保存 baseline top-20 tokens。
+2. 干预后重新计算同一位置 logits。
+3. 对 baseline top-20 中每个 token 计算：
+   logit_delta
+   rank_delta
+   token_type
+4. 额外计算：
+   target_logit_delta
+   competitor_logit_delta
+   target_rank_delta
+   competitor_rank_delta
+   top-k churn
+```
+
+token_type：
+
+```text
+target_label
+competitor_label
+cluster_label
+off_cluster_label
+other
+```
+
+### 客观结果
+
+#### Qwen3 residual_parallel
+
+```text
+vehicle_furniture:
+  target logit +0.909
+  competitor logit -0.367
+  target rank delta -111.0
+  competitor rank delta +143.3
+  churn 0.13
+  top other delta -0.150
+
+vehicle_tool:
+  target logit +0.763
+  competitor logit -0.497
+  target rank delta -106.1
+  competitor rank delta +178.1
+  churn 0.12
+  top other delta -0.169
+
+vehicle_clothing:
+  target logit +0.823
+  competitor logit -0.530
+  target rank delta -110.0
+  competitor rank delta +189.0
+  churn 0.15
+  top other delta -0.280
+```
+
+Qwen3 解释：
+
+```text
+1. residual_parallel 不只是 target push，真实 competitor rank 也下降。
+2. top-k churn 很低，说明不是全局重排。
+3. 效应是温和的局部竞争轨迹移动。
+```
+
+#### GLM4 residual_parallel
+
+```text
+vehicle_furniture:
+  target logit +2.486
+  competitor logit -2.143
+  target rank delta -967.1
+  competitor rank delta +1331.9
+  churn 0.27
+  top other delta -0.674
+
+vehicle_tool:
+  target logit +2.565
+  competitor logit -4.798
+  target rank delta -962.6
+  competitor rank delta +37699.4
+  churn 0.30
+  top other delta -0.826
+
+vehicle_clothing:
+  target logit +1.689
+  competitor logit -4.576
+  target rank delta -923.2
+  competitor rank delta +46853.2
+  churn 0.28
+  top other delta -0.758
+```
+
+GLM4 解释：
+
+```text
+1. residual_parallel 的 competitor suppression 发生在真实 top-k 轨迹上。
+2. competitor rank 大幅下降，不是人工 token group 的假象。
+3. top-k churn 只有 0.27-0.30，不是完全洗牌。
+4. top other delta 为负，说明高位其他 token 也被压低。
+5. GLM4 是强 readout competition reshaping，但不是纯 target shortcut。
+```
+
+#### DS7B residual_parallel
+
+```text
+vehicle_furniture:
+  target logit +0.625
+  competitor logit -0.158
+  target rank delta -8455.8
+  competitor rank delta +250.0
+  churn 0.05
+
+vehicle_tool:
+  target logit +1.017
+  competitor logit -0.402
+  target rank delta -14203.4
+  competitor rank delta +1362.9
+  churn 0.07
+
+vehicle_clothing:
+  target logit +0.602
+  competitor logit -0.246
+  target rank delta -9830.2
+  competitor rank delta +581.1
+  churn 0.04
+```
+
+DS7B 解释：
+
+```text
+1. target rank 改善巨大，但 top-k churn 极低。
+2. 说明 target 原本排名很低，干预把它大幅向上推，但仍未说明进入 top generation。
+3. weak readout-mediated trace 判断继续成立。
+```
+
+### 与 residual_perp 的比较
+
+Qwen3：
+
+```text
+residual_perp 的 competitor suppression 更清晰：
+vehicle_furniture compLogit -0.957
+vehicle_tool compLogit -0.908
+vehicle_clothing compLogit -0.844
+```
+
+GLM4：
+
+```text
+residual_parallel 的 suppression 远强于 residual_perp，
+但 residual_perp 也有真实 suppression。
+```
+
+DS7B：
+
+```text
+residual_parallel 明显强于 residual_perp。
+```
+
+### 当前最可靠结论
+
+```text
+1. Phase540 的人工 token group 结论通过真实 top-k trajectory 得到支持。
+
+2. residual_parallel 不是单纯 target shortcut：
+   它确实会移动真实 competitor token rank。
+
+3. Qwen3:
+   residual_parallel 是温和局部竞争移动；
+   residual_perp 仍有更清晰的 competitor suppression。
+
+4. GLM4:
+   residual_parallel 是强 readout competition reshaping；
+   competitor suppression 极强，但 top-k 不是完全洗牌。
+
+5. DS7B:
+   residual_parallel 能大幅改善 target rank，但 churn 极低，
+   说明它是弱读出轨迹移动，不是生成闭合。
+```
+
+### 对 Phase540 的修正
+
+Phase540：
+
+```text
+vehicle_furniture 在 Qwen3/DS7B 更像 target_push_shortcut。
+```
+
+Phase541 后修正为：
+
+```text
+即使 vehicle_furniture 更偏 target push，
+真实 top-k 中仍有 competitor rank 下移。
+只是 suppression 比 vehicle_tool / vehicle_clothing 弱。
+```
+
+### 理论进展
+
+当前可以更谨慎地说：
+
+```text
+readout-parallel contains a real competition-trajectory component,
+but its strength and cleanliness differ by model and pair.
+```
+
+中文解释：
+
+```text
+读出平行成分确实包含真实竞争轨迹成分，
+但它是否干净、是否能闭合到生成，取决于模型和类别边。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. top-k trajectory 仍是单步 next-token 分析，不是多步生成轨迹。
+2. DS7B 的巨大 rank delta 可能来自极低初始排名，不能解释成生成成功。
+3. GLM4 的 top-other 被压低，仍可能是较宽 readout reshaping。
+4. 没有分析 intervention top-k 新进入 token 的语义类型。
+5. 没有测试这些 rank/logit 改变是否提高实际生成命中。
+```
+
+### 下一阶段任务
+
+Phase542 应进入：
+
+```text
+Generation Closure Audit
+```
+
+目标：
+
+```text
+把 Phase541 的单步 top-k 轨迹与实际生成结果连接起来。
+```
+
+建议测试：
+
+```text
+1. 对三个 core sources 做 generation bridge：
+   residual_perp
+   residual_parallel
+   residual_full
+
+2. 每个 prompt 生成 5 tokens。
+
+3. 记录：
+   target hit
+   competitor hit
+   cluster-label hit
+   first-step top-k prediction
+   generated suffix
+
+4. 判断：
+   单步 target rank 改善是否转化为真实生成命中。
+
+5. 三模型同跑。
+```

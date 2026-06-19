@@ -1,0 +1,1333 @@
+{
+  "phase": 536,
+  "model": "qwen3",
+  "timestamp": "2026-06-19 10:08:46",
+  "attn_implementation": "sdpa",
+  "windows": {
+    "early": [
+      8,
+      10,
+      12
+    ],
+    "center": [
+      10,
+      12,
+      14
+    ]
+  },
+  "all_layers": [
+    8,
+    10,
+    12,
+    14
+  ],
+  "pairs": [
+    "fruit_tool",
+    "animal_tool",
+    "vehicle_furniture",
+    "clothing_tool",
+    "fruit_vegetable"
+  ],
+  "train_n": 12,
+  "test_n": 8,
+  "alphas": [
+    4.0,
+    8.0
+  ],
+  "random_seeds": [
+    11,
+    23,
+    37,
+    41
+  ],
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "pair_baseline": {
+    "fruit_tool": {
+      "mean_margin": 4.307291666666667,
+      "min_margin": 2.734375,
+      "mean_rank": 332.0,
+      "mean_top1": 0.25,
+      "target_token_count": 5,
+      "competitor_token_count": 8
+    },
+    "animal_tool": {
+      "mean_margin": 8.130208333333334,
+      "min_margin": 6.078125,
+      "mean_rank": 19.041666666666668,
+      "mean_top1": 0.125,
+      "target_token_count": 5,
+      "competitor_token_count": 8
+    },
+    "vehicle_furniture": {
+      "mean_margin": 2.9088541666666665,
+      "min_margin": 1.0,
+      "mean_rank": 189.625,
+      "mean_top1": 0.20833333333333334,
+      "target_token_count": 5,
+      "competitor_token_count": 7
+    },
+    "clothing_tool": {
+      "mean_margin": 1.8359375,
+      "min_margin": 1.0625,
+      "mean_rank": 141.125,
+      "mean_top1": 0.16666666666666666,
+      "target_token_count": 4,
+      "competitor_token_count": 8
+    },
+    "fruit_vegetable": {
+      "mean_margin": 3.484375,
+      "min_margin": 1.7578125,
+      "mean_rank": 332.0,
+      "mean_top1": 0.25,
+      "target_token_count": 5,
+      "competitor_token_count": 7
+    }
+  },
+  "layer_stats": {
+    "8": {
+      "fruit_tool": {
+        "cos_direct_belongs": 0.32223862409591675,
+        "cos_direct_kind": 0.4580347239971161,
+        "cos_belongs_kind": 0.249278724193573
+      },
+      "animal_tool": {
+        "cos_direct_belongs": 0.313563734292984,
+        "cos_direct_kind": 0.37294408679008484,
+        "cos_belongs_kind": 0.24218836426734924
+      },
+      "vehicle_furniture": {
+        "cos_direct_belongs": 0.2930966019630432,
+        "cos_direct_kind": 0.43118321895599365,
+        "cos_belongs_kind": 0.3330874443054199
+      },
+      "clothing_tool": {
+        "cos_direct_belongs": 0.25549864768981934,
+        "cos_direct_kind": 0.416385293006897,
+        "cos_belongs_kind": 0.23918113112449646
+      },
+      "fruit_vegetable": {
+        "cos_direct_belongs": 0.14114949107170105,
+        "cos_direct_kind": 0.18589645624160767,
+        "cos_belongs_kind": 0.1825258880853653
+      }
+    },
+    "10": {
+      "fruit_tool": {
+        "cos_direct_belongs": 0.3200248181819916,
+        "cos_direct_kind": 0.5086068511009216,
+        "cos_belongs_kind": 0.25773105025291443
+      },
+      "animal_tool": {
+        "cos_direct_belongs": 0.34147799015045166,
+        "cos_direct_kind": 0.4692135155200958,
+        "cos_belongs_kind": 0.29034605622291565
+      },
+      "vehicle_furniture": {
+        "cos_direct_belongs": 0.2973012626171112,
+        "cos_direct_kind": 0.4247153103351593,
+        "cos_belongs_kind": 0.2642557621002197
+      },
+      "clothing_tool": {
+        "cos_direct_belongs": 0.260564386844635,
+        "cos_direct_kind": 0.3919674754142761,
+        "cos_belongs_kind": 0.18563035130500793
+      },
+      "fruit_vegetable": {
+        "cos_direct_belongs": 0.22161933779716492,
+        "cos_direct_kind": 0.3357565104961395,
+        "cos_belongs_kind": 0.19370342791080475
+      }
+    },
+    "12": {
+      "fruit_tool": {
+        "cos_direct_belongs": 0.3377129137516022,
+        "cos_direct_kind": 0.4732745289802551,
+        "cos_belongs_kind": 0.30655696988105774
+      },
+      "animal_tool": {
+        "cos_direct_belongs": 0.41242364048957825,
+        "cos_direct_kind": 0.4668230712413788,
+        "cos_belongs_kind": 0.363373339176178
+      },
+      "vehicle_furniture": {
+        "cos_direct_belongs": 0.2913064658641815,
+        "cos_direct_kind": 0.42289143800735474,
+        "cos_belongs_kind": 0.26632338762283325
+      },
+      "clothing_tool": {
+        "cos_direct_belongs": 0.3728678524494171,
+        "cos_direct_kind": 0.3443716764450073,
+        "cos_belongs_kind": 0.22825855016708374
+      },
+      "fruit_vegetable": {
+        "cos_direct_belongs": 0.22596409916877747,
+        "cos_direct_kind": 0.229559525847435,
+        "cos_belongs_kind": 0.17753320932388306
+      }
+    },
+    "14": {
+      "fruit_tool": {
+        "cos_direct_belongs": 0.2522691786289215,
+        "cos_direct_kind": 0.43178877234458923,
+        "cos_belongs_kind": 0.2581669092178345
+      },
+      "animal_tool": {
+        "cos_direct_belongs": 0.3112780749797821,
+        "cos_direct_kind": 0.4111839234828949,
+        "cos_belongs_kind": 0.2943092882633209
+      },
+      "vehicle_furniture": {
+        "cos_direct_belongs": 0.22352680563926697,
+        "cos_direct_kind": 0.3959621787071228,
+        "cos_belongs_kind": 0.22073794901371002
+      },
+      "clothing_tool": {
+        "cos_direct_belongs": 0.3075371980667114,
+        "cos_direct_kind": 0.31580987572669983,
+        "cos_belongs_kind": 0.25198450684547424
+      },
+      "fruit_vegetable": {
+        "cos_direct_belongs": 0.2004082351922989,
+        "cos_direct_kind": 0.19779954850673676,
+        "cos_belongs_kind": 0.11333286762237549
+      }
+    }
+  },
+  "audit": {
+    "fruit_tool": {
+      "early": {
+        "window": [
+          8,
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.75,
+              "best_transfer_mean": 1.1158854166666667,
+              "best_off_pair_max_abs": 1.05078125,
+              "pair_specificity": 0.7137546400475395,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.2578125,
+                  "transfer_mean": 0.6184895833333334,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.01953125,
+                    "fruit_tool_belongs": 0.578125,
+                    "fruit_tool_kind": 0.2578125
+                  },
+                  "off_pair_max_abs": 0.60546875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.75,
+                  "transfer_mean": 1.1158854166666667,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.69921875,
+                    "fruit_tool_belongs": 0.8984375,
+                    "fruit_tool_kind": 0.75
+                  },
+                  "off_pair_max_abs": 1.05078125
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.5859375,
+              "best_transfer_mean": 1.2721354166666667,
+              "best_off_pair_max_abs": 1.296875,
+              "pair_specificity": 0.4518072254318479,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.265625,
+                  "transfer_mean": 0.6953125,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.1640625,
+                    "fruit_tool_belongs": 0.65625,
+                    "fruit_tool_kind": 0.265625
+                  },
+                  "off_pair_max_abs": 0.6796875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.5859375,
+                  "transfer_mean": 1.2721354166666667,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.98046875,
+                    "fruit_tool_belongs": 1.25,
+                    "fruit_tool_kind": 0.5859375
+                  },
+                  "off_pair_max_abs": 1.296875
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.09375,
+              "best_transfer_mean": 0.09505208333333333,
+              "best_off_pair_max_abs": 0.203125,
+              "pair_specificity": 0.4615384388165692,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.09375,
+                  "transfer_mean": 0.09505208333333333,
+                  "own_deltas": {
+                    "fruit_tool_direct": 0.36328125,
+                    "fruit_tool_belongs": 0.015625,
+                    "fruit_tool_kind": -0.09375
+                  },
+                  "off_pair_max_abs": 0.203125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.3125,
+                  "transfer_mean": 0.018229166666666668,
+                  "own_deltas": {
+                    "fruit_tool_direct": 0.5625,
+                    "fruit_tool_belongs": -0.1953125,
+                    "fruit_tool_kind": -0.3125
+                  },
+                  "off_pair_max_abs": 0.515625
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": -0.1015625,
+            "pass_like_count": 0
+          }
+        }
+      },
+      "center": {
+        "window": [
+          10,
+          12,
+          14
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.515625,
+              "best_transfer_mean": 1.01953125,
+              "best_off_pair_max_abs": 1.09375,
+              "pair_specificity": 0.4714285671183674,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.1953125,
+                  "transfer_mean": 0.5924479166666666,
+                  "own_deltas": {
+                    "fruit_tool_direct": 0.83203125,
+                    "fruit_tool_belongs": 0.75,
+                    "fruit_tool_kind": 0.1953125
+                  },
+                  "off_pair_max_abs": 0.625
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.515625,
+                  "transfer_mean": 1.01953125,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.40234375,
+                    "fruit_tool_belongs": 1.140625,
+                    "fruit_tool_kind": 0.515625
+                  },
+                  "off_pair_max_abs": 1.09375
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.40625,
+              "best_transfer_mean": 1.2122395833333333,
+              "best_off_pair_max_abs": 1.2421875,
+              "pair_specificity": 0.3270440225244255,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.1953125,
+                  "transfer_mean": 0.6380208333333334,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.0078125,
+                    "fruit_tool_belongs": 0.7109375,
+                    "fruit_tool_kind": 0.1953125
+                  },
+                  "off_pair_max_abs": 0.53125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.40625,
+                  "transfer_mean": 1.2122395833333333,
+                  "own_deltas": {
+                    "fruit_tool_direct": 1.87109375,
+                    "fruit_tool_belongs": 1.359375,
+                    "fruit_tool_kind": 0.40625
+                  },
+                  "off_pair_max_abs": 1.2421875
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.140625,
+              "best_transfer_mean": 0.041666666666666664,
+              "best_off_pair_max_abs": 0.3203125,
+              "pair_specificity": 0.4390243765377756,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.140625,
+                  "transfer_mean": 0.041666666666666664,
+                  "own_deltas": {
+                    "fruit_tool_direct": 0.0625,
+                    "fruit_tool_belongs": 0.203125,
+                    "fruit_tool_kind": -0.140625
+                  },
+                  "off_pair_max_abs": 0.3203125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.3828125,
+                  "transfer_mean": -0.029947916666666668,
+                  "own_deltas": {
+                    "fruit_tool_direct": 0.12109375,
+                    "fruit_tool_belongs": 0.171875,
+                    "fruit_tool_kind": -0.3828125
+                  },
+                  "off_pair_max_abs": 0.453125
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": -0.0546875,
+            "pass_like_count": 0
+          }
+        }
+      }
+    },
+    "animal_tool": {
+      "early": {
+        "window": [
+          8,
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.171875,
+              "best_transfer_mean": 0.4596354166666667,
+              "best_off_pair_max_abs": 1.04296875,
+              "pair_specificity": 0.16479400591058932,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.12890625,
+                  "transfer_mean": 0.3502604166666667,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.12890625,
+                    "animal_tool_belongs": 0.55859375,
+                    "animal_tool_kind": 0.36328125
+                  },
+                  "off_pair_max_abs": 0.578125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.171875,
+                  "transfer_mean": 0.4596354166666667,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.171875,
+                    "animal_tool_belongs": 0.82421875,
+                    "animal_tool_kind": 0.3828125
+                  },
+                  "off_pair_max_abs": 1.04296875
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.15625,
+              "best_transfer_mean": 0.59765625,
+              "best_off_pair_max_abs": 1.2109375,
+              "pair_specificity": 0.12903225699895943,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.08984375,
+                  "transfer_mean": 0.4348958333333333,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.08984375,
+                    "animal_tool_belongs": 0.765625,
+                    "animal_tool_kind": 0.44921875
+                  },
+                  "off_pair_max_abs": 0.6171875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.15625,
+                  "transfer_mean": 0.59765625,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.15625,
+                    "animal_tool_belongs": 0.98046875,
+                    "animal_tool_kind": 0.65625
+                  },
+                  "off_pair_max_abs": 1.2109375
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.17578125,
+              "best_transfer_mean": -0.040364583333333336,
+              "best_off_pair_max_abs": 0.3203125,
+              "pair_specificity": 0.5487804706722195,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.17578125,
+                  "transfer_mean": -0.040364583333333336,
+                  "own_deltas": {
+                    "animal_tool_direct": -0.17578125,
+                    "animal_tool_belongs": 0.0078125,
+                    "animal_tool_kind": 0.046875
+                  },
+                  "off_pair_max_abs": 0.3203125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.3125,
+                  "transfer_mean": -0.13020833333333334,
+                  "own_deltas": {
+                    "animal_tool_direct": -0.2421875,
+                    "animal_tool_belongs": 0.1640625,
+                    "animal_tool_kind": -0.3125
+                  },
+                  "off_pair_max_abs": 0.7265625
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.18359375,
+            "pass_like_count": 0
+          }
+        }
+      },
+      "center": {
+        "window": [
+          10,
+          12,
+          14
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.4609375,
+              "best_transfer_mean": 0.6158854166666666,
+              "best_off_pair_max_abs": 0.99609375,
+              "pair_specificity": 0.46274509339361786,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.2890625,
+                  "transfer_mean": 0.3802083333333333,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.2890625,
+                    "animal_tool_belongs": 0.39453125,
+                    "animal_tool_kind": 0.45703125
+                  },
+                  "off_pair_max_abs": 0.6953125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.4609375,
+                  "transfer_mean": 0.6158854166666666,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.4609375,
+                    "animal_tool_belongs": 0.73828125,
+                    "animal_tool_kind": 0.6484375
+                  },
+                  "off_pair_max_abs": 0.99609375
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.15234375,
+              "best_transfer_mean": 0.38671875,
+              "best_off_pair_max_abs": 0.6171875,
+              "pair_specificity": 0.24683543903861566,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.15234375,
+                  "transfer_mean": 0.38671875,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.15234375,
+                    "animal_tool_belongs": 0.55859375,
+                    "animal_tool_kind": 0.44921875
+                  },
+                  "off_pair_max_abs": 0.6171875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.12109375,
+                  "transfer_mean": 0.6341145833333334,
+                  "own_deltas": {
+                    "animal_tool_direct": 0.12109375,
+                    "animal_tool_belongs": 1.1328125,
+                    "animal_tool_kind": 0.6484375
+                  },
+                  "off_pair_max_abs": 1.0
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.03515625,
+              "best_transfer_mean": 0.018229166666666668,
+              "best_off_pair_max_abs": 0.4296875,
+              "pair_specificity": 0.08181817991404963,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.03515625,
+                  "transfer_mean": 0.018229166666666668,
+                  "own_deltas": {
+                    "animal_tool_direct": -0.03515625,
+                    "animal_tool_belongs": 0.015625,
+                    "animal_tool_kind": 0.07421875
+                  },
+                  "off_pair_max_abs": 0.4296875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.19140625,
+                  "transfer_mean": -0.10026041666666667,
+                  "own_deltas": {
+                    "animal_tool_direct": -0.19140625,
+                    "animal_tool_belongs": 0.00390625,
+                    "animal_tool_kind": -0.11328125
+                  },
+                  "off_pair_max_abs": 0.7109375
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.15625,
+            "pass_like_count": 0
+          }
+        }
+      }
+    },
+    "vehicle_furniture": {
+      "early": {
+        "window": [
+          8,
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.40625,
+              "best_transfer_mean": 0.8463541666666666,
+              "best_off_pair_max_abs": 0.51171875,
+              "pair_specificity": 0.7938931142567451,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.3046875,
+                  "transfer_mean": 0.5390625,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.5625,
+                    "vehicle_furniture_belongs": 0.75,
+                    "vehicle_furniture_kind": 0.3046875
+                  },
+                  "off_pair_max_abs": 0.2734375
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.40625,
+                  "transfer_mean": 0.8463541666666666,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.7734375,
+                    "vehicle_furniture_belongs": 1.359375,
+                    "vehicle_furniture_kind": 0.40625
+                  },
+                  "off_pair_max_abs": 0.51171875
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.2109375,
+              "best_transfer_mean": 0.7317708333333334,
+              "best_off_pair_max_abs": 0.625,
+              "pair_specificity": 0.3374999946000001,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.1875,
+                  "transfer_mean": 0.4869791666666667,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.59375,
+                    "vehicle_furniture_belongs": 0.6796875,
+                    "vehicle_furniture_kind": 0.1875
+                  },
+                  "off_pair_max_abs": 0.4375
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.2109375,
+                  "transfer_mean": 0.7317708333333334,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.734375,
+                    "vehicle_furniture_belongs": 1.25,
+                    "vehicle_furniture_kind": 0.2109375
+                  },
+                  "off_pair_max_abs": 0.625
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.28515625,
+              "best_transfer_mean": 0.51171875,
+              "best_off_pair_max_abs": 0.70703125,
+              "pair_specificity": 0.4033149114227283,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.21875,
+                  "transfer_mean": 0.2760416666666667,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.21875,
+                    "vehicle_furniture_belongs": 0.390625,
+                    "vehicle_furniture_kind": 0.21875
+                  },
+                  "off_pair_max_abs": 0.39453125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.28515625,
+                  "transfer_mean": 0.51171875,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.28515625,
+                    "vehicle_furniture_belongs": 0.921875,
+                    "vehicle_furniture_kind": 0.328125
+                  },
+                  "off_pair_max_abs": 0.70703125
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.15625,
+            "pass_like_count": 0
+          }
+        }
+      },
+      "center": {
+        "window": [
+          10,
+          12,
+          14
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.875,
+              "best_transfer_mean": 1.2591145833333333,
+              "best_off_pair_max_abs": 0.6796875,
+              "pair_specificity": 1.2873563028986659,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.5859375,
+                  "transfer_mean": 0.7682291666666666,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.75,
+                    "vehicle_furniture_belongs": 0.96875,
+                    "vehicle_furniture_kind": 0.5859375
+                  },
+                  "off_pair_max_abs": 0.296875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.875,
+                  "transfer_mean": 1.2591145833333333,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 1.08984375,
+                    "vehicle_furniture_belongs": 1.8125,
+                    "vehicle_furniture_kind": 0.875
+                  },
+                  "off_pair_max_abs": 0.6796875
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 8.0,
+              "best_transfer_min": 0.609375,
+              "best_transfer_mean": 1.1015625,
+              "best_off_pair_max_abs": 0.84375,
+              "pair_specificity": 0.7222222136625515,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.4453125,
+                  "transfer_mean": 0.6692708333333334,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.7734375,
+                    "vehicle_furniture_belongs": 0.7890625,
+                    "vehicle_furniture_kind": 0.4453125
+                  },
+                  "off_pair_max_abs": 0.40625
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.609375,
+                  "transfer_mean": 1.1015625,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 1.15625,
+                    "vehicle_furniture_belongs": 1.5390625,
+                    "vehicle_furniture_kind": 0.609375
+                  },
+                  "off_pair_max_abs": 0.84375
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": 0.2109375,
+              "best_transfer_mean": 0.3541666666666667,
+              "best_off_pair_max_abs": 0.53125,
+              "pair_specificity": 0.3970588160553634,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": 0.2109375,
+                  "transfer_mean": 0.3541666666666667,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.2109375,
+                    "vehicle_furniture_belongs": 0.53125,
+                    "vehicle_furniture_kind": 0.3203125
+                  },
+                  "off_pair_max_abs": 0.53125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": 0.203125,
+                  "transfer_mean": 0.59375,
+                  "own_deltas": {
+                    "vehicle_furniture_direct": 0.203125,
+                    "vehicle_furniture_belongs": 1.078125,
+                    "vehicle_furniture_kind": 0.5
+                  },
+                  "off_pair_max_abs": 1.0546875
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.0390625,
+            "pass_like_count": 0
+          }
+        }
+      }
+    },
+    "clothing_tool": {
+      "early": {
+        "window": [
+          8,
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.28125,
+              "best_transfer_mean": 0.140625,
+              "best_off_pair_max_abs": 0.7109375,
+              "pair_specificity": 0.3956043900398503,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.28125,
+                  "transfer_mean": 0.140625,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.28125,
+                    "clothing_tool_belongs": 0.359375,
+                    "clothing_tool_kind": 0.34375
+                  },
+                  "off_pair_max_abs": 0.7109375
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.8671875,
+                  "transfer_mean": 0.17447916666666666,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.8671875,
+                    "clothing_tool_belongs": 0.5625,
+                    "clothing_tool_kind": 0.828125
+                  },
+                  "off_pair_max_abs": 2.09375
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.3046875,
+              "best_transfer_mean": 0.13020833333333334,
+              "best_off_pair_max_abs": 0.9140625,
+              "pair_specificity": 0.3333333296866097,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.3046875,
+                  "transfer_mean": 0.13020833333333334,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.3046875,
+                    "clothing_tool_belongs": 0.2265625,
+                    "clothing_tool_kind": 0.46875
+                  },
+                  "off_pair_max_abs": 0.9140625
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.78125,
+                  "transfer_mean": 0.23958333333333334,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.78125,
+                    "clothing_tool_belongs": 0.390625,
+                    "clothing_tool_kind": 1.109375
+                  },
+                  "off_pair_max_abs": 2.16015625
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.453125,
+              "best_transfer_mean": -0.08333333333333333,
+              "best_off_pair_max_abs": 0.4453125,
+              "pair_specificity": 1.0175438367990155,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.453125,
+                  "transfer_mean": -0.08333333333333333,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.453125,
+                    "clothing_tool_belongs": 0.1796875,
+                    "clothing_tool_kind": 0.0234375
+                  },
+                  "off_pair_max_abs": 0.4453125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -1.0078125,
+                  "transfer_mean": -0.2552083333333333,
+                  "own_deltas": {
+                    "clothing_tool_direct": -1.0078125,
+                    "clothing_tool_belongs": 0.2421875,
+                    "clothing_tool_kind": 0.0
+                  },
+                  "off_pair_max_abs": 1.57421875
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.2109375,
+            "pass_like_count": 0
+          }
+        }
+      },
+      "center": {
+        "window": [
+          10,
+          12,
+          14
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.09375,
+              "best_transfer_mean": 0.22135416666666666,
+              "best_off_pair_max_abs": 0.8046875,
+              "pair_specificity": 0.11650485292110473,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.09375,
+                  "transfer_mean": 0.22135416666666666,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.09375,
+                    "clothing_tool_belongs": 0.4453125,
+                    "clothing_tool_kind": 0.3125
+                  },
+                  "off_pair_max_abs": 0.8046875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.53125,
+                  "transfer_mean": 0.3046875,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.53125,
+                    "clothing_tool_belongs": 0.8671875,
+                    "clothing_tool_kind": 0.578125
+                  },
+                  "off_pair_max_abs": 2.20703125
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.125,
+              "best_transfer_mean": 0.171875,
+              "best_off_pair_max_abs": 0.96875,
+              "pair_specificity": 0.12903225673257024,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.125,
+                  "transfer_mean": 0.171875,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.125,
+                    "clothing_tool_belongs": 0.15625,
+                    "clothing_tool_kind": 0.484375
+                  },
+                  "off_pair_max_abs": 0.96875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.4375,
+                  "transfer_mean": 0.2838541666666667,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.4375,
+                    "clothing_tool_belongs": 0.3984375,
+                    "clothing_tool_kind": 0.890625
+                  },
+                  "off_pair_max_abs": 2.265625
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.3359375,
+              "best_transfer_mean": -0.028645833333333332,
+              "best_off_pair_max_abs": 0.53125,
+              "pair_specificity": 0.6323529292733565,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.3359375,
+                  "transfer_mean": -0.028645833333333332,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.3359375,
+                    "clothing_tool_belongs": 0.2578125,
+                    "clothing_tool_kind": -0.0078125
+                  },
+                  "off_pair_max_abs": 0.53125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.7890625,
+                  "transfer_mean": -0.15625,
+                  "own_deltas": {
+                    "clothing_tool_direct": -0.7890625,
+                    "clothing_tool_belongs": 0.4140625,
+                    "clothing_tool_kind": -0.09375
+                  },
+                  "off_pair_max_abs": 1.671875
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": 0.1328125,
+            "pass_like_count": 0
+          }
+        }
+      }
+    },
+    "fruit_vegetable": {
+      "early": {
+        "window": [
+          8,
+          10,
+          12
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.1875,
+              "best_transfer_mean": -0.0390625,
+              "best_off_pair_max_abs": 0.4375,
+              "pair_specificity": 0.4285714187755104,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.1875,
+                  "transfer_mean": -0.0390625,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.1875,
+                    "fruit_vegetable_belongs": 0.1953125,
+                    "fruit_vegetable_kind": -0.125
+                  },
+                  "off_pair_max_abs": 0.4375
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.3671875,
+                  "transfer_mean": -0.07291666666666667,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.3671875,
+                    "fruit_vegetable_belongs": 0.3671875,
+                    "fruit_vegetable_kind": -0.21875
+                  },
+                  "off_pair_max_abs": 0.7890625
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.04296875,
+              "best_transfer_mean": 0.061197916666666664,
+              "best_off_pair_max_abs": 0.48046875,
+              "pair_specificity": 0.0894308924476172,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.04296875,
+                  "transfer_mean": 0.061197916666666664,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.04296875,
+                    "fruit_vegetable_belongs": 0.25,
+                    "fruit_vegetable_kind": -0.0234375
+                  },
+                  "off_pair_max_abs": 0.48046875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.0625,
+                  "transfer_mean": 0.4270833333333333,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": 0.125,
+                    "fruit_vegetable_belongs": 1.21875,
+                    "fruit_vegetable_kind": -0.0625
+                  },
+                  "off_pair_max_abs": 0.6953125
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.34375,
+              "best_transfer_mean": -0.171875,
+              "best_off_pair_max_abs": 0.4296875,
+              "pair_specificity": 0.7999999813818186,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.34375,
+                  "transfer_mean": -0.171875,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.171875,
+                    "fruit_vegetable_belongs": 0.0,
+                    "fruit_vegetable_kind": -0.34375
+                  },
+                  "off_pair_max_abs": 0.4296875
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.625,
+                  "transfer_mean": -0.3372395833333333,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.33984375,
+                    "fruit_vegetable_belongs": -0.046875,
+                    "fruit_vegetable_kind": -0.625
+                  },
+                  "off_pair_max_abs": 0.8515625
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": -0.015625,
+            "pass_like_count": 0
+          }
+        }
+      },
+      "center": {
+        "window": [
+          10,
+          12,
+          14
+        ],
+        "conditions": {
+          "common": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.31640625,
+              "best_transfer_mean": -0.06380208333333333,
+              "best_off_pair_max_abs": 0.80078125,
+              "pair_specificity": 0.3951219462853064,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.31640625,
+                  "transfer_mean": -0.06380208333333333,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.31640625,
+                    "fruit_vegetable_belongs": 0.2265625,
+                    "fruit_vegetable_kind": -0.1015625
+                  },
+                  "off_pair_max_abs": 0.80078125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.6953125,
+                  "transfer_mean": -0.20833333333333334,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.6953125,
+                    "fruit_vegetable_belongs": 0.40625,
+                    "fruit_vegetable_kind": -0.3359375
+                  },
+                  "off_pair_max_abs": 1.5234375
+                }
+              ]
+            }
+          },
+          "direct": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.1796875,
+              "best_transfer_mean": 0.013020833333333334,
+              "best_off_pair_max_abs": 0.6640625,
+              "pair_specificity": 0.2705882312193772,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.1796875,
+                  "transfer_mean": 0.013020833333333334,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.1796875,
+                    "fruit_vegetable_belongs": 0.2890625,
+                    "fruit_vegetable_kind": -0.0703125
+                  },
+                  "off_pair_max_abs": 0.6640625
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.25,
+                  "transfer_mean": 0.2877604166666667,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.05859375,
+                    "fruit_vegetable_belongs": 1.171875,
+                    "fruit_vegetable_kind": -0.25
+                  },
+                  "off_pair_max_abs": 0.7734375
+                }
+              ]
+            }
+          },
+          "shuffled": {
+            "transfer": {
+              "best_alpha": 4.0,
+              "best_transfer_min": -0.3359375,
+              "best_transfer_mean": -0.21614583333333334,
+              "best_off_pair_max_abs": 0.53125,
+              "pair_specificity": 0.6323529292733565,
+              "alpha_rows": [
+                {
+                  "alpha": 4.0,
+                  "transfer_min": -0.3359375,
+                  "transfer_mean": -0.21614583333333334,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.3359375,
+                    "fruit_vegetable_belongs": -0.015625,
+                    "fruit_vegetable_kind": -0.296875
+                  },
+                  "off_pair_max_abs": 0.53125
+                },
+                {
+                  "alpha": 8.0,
+                  "transfer_min": -0.72265625,
+                  "transfer_mean": -0.46484375,
+                  "own_deltas": {
+                    "fruit_vegetable_direct": -0.72265625,
+                    "fruit_vegetable_belongs": -0.0703125,
+                    "fruit_vegetable_kind": -0.6015625
+                  },
+                  "off_pair_max_abs": 1.22265625
+                }
+              ]
+            }
+          },
+          "random": {
+            "max_transfer_min": -0.03125,
+            "pass_like_count": 0
+          }
+        }
+      }
+    }
+  },
+  "total_time_min": 0.86
+}
