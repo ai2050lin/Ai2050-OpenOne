@@ -47750,3 +47750,1611 @@ category-level route candidate
 推进到
 category-specific causal carrier candidate。
 ```
+
+## Phase 555: Wrong-Donor Specificity Audit 错误供体特异性审计 [2026-06-20 09:00]
+
+### 本阶段目标
+
+根据用户上传的两份 Phase554 分析，判断其核心方向基本正确：
+
+```text
+Phase554 已经证明 GLM4 vehicle_tool 路径不是简单 same-object echo。
+cross-object donor 可以在 remove 后恢复输出质量，说明供体激活至少携带跨对象可迁移的类别/路径状态。
+```
+
+但 Phase554 仍有一个关键硬伤：
+
+```text
+cross-object donor 仍来自同一 vehicle 类。
+因此它不能区分：
+1. 真正 vehicle 类语义状态恢复；
+2. 任意强 donor activation 对生成门/策略门的非特异打开；
+3. 竞争类别或无关类别也能恢复的通用动态 overwrite。
+```
+
+Phase555 因此做 wrong-donor specificity audit：
+
+```text
+recipient = vehicle_tool
+正确供体 = vehicle donor
+错误供体 = tool / furniture / clothing donor
+判据 = remove 后，vehicle donor 的 restore_gain 是否稳定高于错误供体。
+```
+
+### 新增脚本
+
+```text
+tests/glm5/phase555_wrong_donor_specificity.py
+tests/glm5/phase555_wrong_donor_specificity_summary.py
+```
+
+### 执行命令
+
+```bash
+python tests/glm5/phase555_wrong_donor_specificity.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_base,resid_donor_vehicle_add,resid_donor_tool_base,resid_donor_tool_add,resid_donor_furniture_base,resid_donor_furniture_add,resid_donor_clothing_base,resid_donor_clothing_add \
+  --layer-sets L14,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase555_wrong_donor_specificity \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase555_wrong_donor_specificity.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_base,resid_donor_vehicle_add,resid_donor_tool_base,resid_donor_tool_add,resid_donor_furniture_base,resid_donor_furniture_add,resid_donor_clothing_base,resid_donor_clothing_add \
+  --layer-sets L24,L24+L28,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase555_wrong_donor_specificity \
+  --hard-exit-after-model
+
+python tests/glm5/phase555_wrong_donor_specificity.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_base,resid_donor_vehicle_add,resid_donor_tool_base,resid_donor_tool_add,resid_donor_furniture_base,resid_donor_furniture_add,resid_donor_clothing_base,resid_donor_clothing_add \
+  --layer-sets L16+L20,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase555_wrong_donor_specificity \
+  --hard-exit-after-model
+
+python tests/glm5/phase555_wrong_donor_specificity_summary.py
+
+python -m py_compile \
+  tests/glm5/phase555_wrong_donor_specificity.py \
+  tests/glm5/phase555_wrong_donor_specificity_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+recipient scaffolds = forbidden_sentence_completion, forbidden_definition
+donor scaffolds = same as recipient scaffold
+donor categories = vehicle, tool, furniture, clothing
+test objects/category = 12
+sample seeds = 8
+generated tokens/sample = 12
+Qwen3 layers = L14, all(L10,L12,L14)
+GLM4 layers = L24, L24+L28, all(L24,L26,L28)
+DS7B layers = L16+L20, all(L16,L18,L20)
+conditions = baseline, add_perp, remove_perp, random_remove, vehicle/tool/furniture/clothing donor base/add restore
+```
+
+### 结果文件
+
+```text
+results/glm5_phase555_wrong_donor_specificity/phase555_qwen3_wrong_donor_specificity.json
+results/glm5_phase555_wrong_donor_specificity/phase555_glm4_wrong_donor_specificity.json
+results/glm5_phase555_wrong_donor_specificity/phase555_deepseek7b_wrong_donor_specificity.json
+results/glm5_phase555_wrong_donor_specificity/phase555_cross_model_summary.md
+```
+
+### 核心客观结果
+
+#### Qwen3
+
+```text
+Qwen3 没有形成 remove drop。
+
+L14 definition:
+  baseline clean_non_object = 0.22
+  resid_remove_perp = 0.24
+  vehicle_add donor = 0.35
+  restore_gain = +0.11
+  class = restore_without_drop_or_leaky
+
+sentence_completion:
+  baseline = 0.54
+  resid_remove_perp = 0.58 / 0.60
+  vehicle_add donor = 0.62
+```
+
+解释：
+
+```text
+Qwen3 中 vehicle donor 有时能提高输出质量，但因为 remove 没有造成必要性下降，
+不能解释为“移除必要路径后由同类供体恢复”。
+更像 positive add/release 或动态扰动。
+```
+
+#### GLM4
+
+GLM4 是本阶段唯一满足：
+
+```text
+remove drop + same-category donor restore + wrong-donor gap
+```
+
+的模型。
+
+最强结果：
+
+```text
+all L24,L26,L28 sentence_completion:
+  baseline = 0.29
+  resid_remove_perp = 0.19
+  vehicle_add donor = 0.59
+  restore_gain = +0.41
+  label_delta = +0.01
+  class = restore_success
+
+L24+L28 sentence_completion:
+  baseline = 0.29
+  resid_remove_perp = 0.18
+  vehicle_add donor = 0.53
+  restore_gain = +0.35
+  label_delta = +0.00
+  class = restore_success
+
+L24 sentence_completion:
+  baseline = 0.29
+  resid_remove_perp = 0.09
+  vehicle_add donor = 0.41
+  restore_gain = +0.31
+  label_delta = +0.01
+  class = restore_success
+```
+
+definition route 也有正结果：
+
+```text
+all L24,L26,L28 definition:
+  baseline = 0.39
+  resid_remove_perp = 0.29
+  vehicle_add donor = 0.55
+  restore_gain = +0.26
+  label_delta = +0.00
+  class = restore_success
+
+L24+L28 definition:
+  vehicle_add restore_gain = +0.20
+```
+
+同类供体相对错误供体差距：
+
+```text
+L24 definition add:
+  vehicle gain +0.11
+  best wrong = clothing -0.16
+  gap +0.27
+
+L24 sentence_completion add:
+  vehicle gain +0.31
+  best wrong = clothing +0.11
+  gap +0.20
+
+L24+L28 definition add:
+  vehicle gain +0.20
+  best wrong = tool -0.22
+  gap +0.42
+
+L24+L28 sentence_completion add:
+  vehicle gain +0.35
+  best wrong = tool +0.11
+  gap +0.24
+
+all definition add:
+  vehicle gain +0.26
+  best wrong = tool -0.13
+  gap +0.39
+
+all sentence_completion add:
+  vehicle gain +0.41
+  best wrong = tool +0.30
+  gap +0.10
+```
+
+最重要硬伤：
+
+```text
+GLM4 all-layer sentence_completion 中 tool donor 也能恢复：
+  vehicle_add restore_gain = +0.41
+  tool_add restore_gain = +0.30
+```
+
+这说明 all-layer dynamic overwrite 中仍有一部分不是纯 vehicle 语义特异成分，
+可能包含生成策略门、工具功能联想、vehicle_tool 任务公共接口或竞争类共同激活。
+
+#### DS7B
+
+```text
+DS7B 没有形成 remove drop。
+
+L16+L20 sentence_completion:
+  baseline = 0.18
+  resid_remove_perp = 0.22
+  vehicle_add donor = 0.31
+  restore_gain = +0.09
+  class = restore_without_drop_or_leaky
+
+definition:
+  vehicle donor 基本无恢复。
+```
+
+解释：
+
+```text
+DS7B 与 Qwen3 类似，存在 donor perturbation 或 release，
+但不满足“必要路径被移除后恢复”的机制闭合判据。
+```
+
+### 本阶段结论
+
+1. Phase554 的两个上传分析基本正确，但需要收紧：
+
+```text
+Phase554 可以说证明了 cross-object route restore。
+Phase555 进一步证明 GLM4 中存在同类供体特异性恢复。
+但还不能说已经证明“纯抽象 vehicle 语义向量”。
+```
+
+2. GLM4 vehicle_tool 路径的机制闭合度显著提高：
+
+```text
+remove residual_perp causes clean_non_object drop；
+vehicle donor dynamic activation restores；
+wrong donor 大多不能恢复；
+sentence_completion 和 definition 两个脚手架都成立；
+label violation 基本不增加。
+```
+
+3. 但 GLM4 all-layer sentence_completion 的 tool donor 强恢复是核心硬伤：
+
+```text
+这说明恢复路径不是单一“vehicle 抽象语义字段”，而是至少混有：
+vehicle 类别场；
+vehicle_tool 任务公共接口；
+生成策略门；
+功能性/用途性邻近路径；
+竞争类共同激活。
+```
+
+4. Qwen3 和 DS7B 没有复现 GLM4 的必要性链路：
+
+```text
+它们可能有可加性正向扰动，但 remove 不造成下降。
+所以不能把 donor 提升解释成同一机制。
+```
+
+### 理论进展
+
+Phase555 对当前动态场理论的修正：
+
+```text
+原来：
+  route restore = 语义状态恢复
+
+现在：
+  route restore 必须拆成：
+    necessity-backed restore
+    category-specific restore
+    wrong-donor leakage
+    generic gate opening
+```
+
+新的判据：
+
+```text
+一个内部状态 S 只有同时满足以下条件，才可以称为类别特异动态语义状态：
+
+1. remove(S) 造成目标生成质量下降；
+2. same-category donor restore(S) 能恢复；
+3. wrong-category donor restore(S) 显著弱于 same-category；
+4. label violation 不上升；
+5. 跨 scaffold 仍存在；
+6. 不能只在 all-layer overwrite 中成立，必须能定位到较小层组。
+```
+
+当前 GLM4 vehicle_tool 满足 1、2、3、4 的主要部分，部分满足 5，仍需要进一步验证 6。
+
+### 下一步
+
+Phase556 应做：
+
+```text
+Donor Specificity Decomposition
+```
+
+任务：
+
+```text
+1. 对 GLM4 all-layer sentence_completion 的 tool donor restore 做拆解。
+2. 判断 tool donor 的 +0.30 restore_gain 来自：
+   a. vehicle_tool 公共任务接口；
+   b. tool 竞争类语义；
+   c. generic generation gate；
+   d. 用途/功能联想路径。
+3. 加入更多错误供体：
+   animal, fruit, vegetable
+4. 加入 shuffled donor：
+   vehicle prompts 与 object 错配；
+   donor scaffold 与 donor object 错配；
+   donor activation batch permutation。
+5. 分别测试：
+   same_category_same_task
+   competitor_same_task
+   unrelated_same_task
+   same_category_wrong_prompt
+   wrong_category_wrong_prompt
+   random_activation_same_norm
+```
+
+关键目标：
+
+```text
+把 restore_gain 分解为：
+
+restore_gain =
+  category_specific_gain
+  + task_interface_gain
+  + generic_gate_gain
+  + noise_or_release_gain
+```
+
+只有 category_specific_gain 保留下来，才是破解语言编码机制中的高价值结构。
+
+## Phase 556: Donor Specificity Decomposition 供体特异性分解 [2026-06-20 10:34]
+
+### 本阶段目标
+
+继续 Phase555 的结论，正面拆解：
+
+```text
+GLM4 all-layer sentence_completion 中 tool donor 也能恢复的问题。
+```
+
+Phase555 已经证明：
+
+```text
+vehicle donor 通常强于错误供体；
+但 all-layer sentence_completion 中：
+  vehicle restore_gain = +0.41
+  tool restore_gain = +0.30
+```
+
+Phase556 的目标不是再证明 restore 有效，而是分解 restore_gain 来源：
+
+```text
+restore_gain =
+  category_specific_gain
+  + task_interface_gain
+  + generic_gate_gain
+  + noise_or_release_gain
+```
+
+### 新增脚本
+
+```text
+tests/glm5/phase556_donor_specificity_decomposition.py
+tests/glm5/phase556_donor_specificity_decomposition_summary.py
+```
+
+### 执行命令
+
+```bash
+python tests/glm5/phase556_donor_specificity_decomposition.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --layer-sets L14,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase556_donor_specificity_decomposition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase556_donor_specificity_decomposition.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --layer-sets L24,L24+L28,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase556_donor_specificity_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase556_donor_specificity_decomposition.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --layer-sets L16+L20,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase556_donor_specificity_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase556_donor_specificity_decomposition_summary.py
+
+python -m py_compile \
+  tests/glm5/phase556_donor_specificity_decomposition.py \
+  tests/glm5/phase556_donor_specificity_decomposition_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+routes =
+  forbidden_sentence_completion:temperature<-forbidden_sentence_completion
+  forbidden_sentence_completion:temperature<-forbidden_definition
+  forbidden_definition:top_p<-forbidden_definition
+
+donors =
+  vehicle aligned
+  tool aligned
+  furniture aligned
+  animal aligned
+  fruit aligned
+  vehicle shuffled
+  tool shuffled
+  furniture shuffled
+
+test objects/category = 12
+sample seeds = 8
+generated tokens/sample = 12
+```
+
+### 结果文件
+
+```text
+results/glm5_phase556_donor_specificity_decomposition/phase556_qwen3_donor_specificity_decomposition.json
+results/glm5_phase556_donor_specificity_decomposition/phase556_glm4_donor_specificity_decomposition.json
+results/glm5_phase556_donor_specificity_decomposition/phase556_deepseek7b_donor_specificity_decomposition.json
+results/glm5_phase556_donor_specificity_decomposition/phase556_cross_model_summary.md
+```
+
+### 核心客观结果
+
+#### Qwen3
+
+```text
+Qwen3 仍然没有 remove drop。
+
+L14 sentence_completion:
+  baseline = 0.54
+  remove = 0.58
+  vehicle = 0.62
+  vehicle restore_gain = +0.04
+
+all definition:
+  vehicle shuffled gain = +0.14
+  class = restore_without_drop_or_leaky
+```
+
+解释：
+
+```text
+Qwen3 的 donor 增益不具备必要性支撑。
+不能作为 route restore 机制解释。
+```
+
+#### GLM4
+
+GLM4 继续是唯一形成稳定必要性链的模型。
+
+关键结果一：同脚手架 sentence_completion 中 tool donor 仍强。
+
+```text
+GLM4 all sentence_completion<-sentence_completion:
+  baseline = 0.29
+  remove = 0.19
+  vehicle gain = +0.41
+  tool gain = +0.30
+  unrelated best gain = +0.14
+  vehicle shuffled gain = +0.23
+  tool shuffled gain = +0.20
+  category gap = +0.10
+  task/shared gap = +0.17
+  shuffle loss = +0.18
+```
+
+解释：
+
+```text
+all-layer sentence_completion 中存在三部分：
+1. vehicle 特异成分，约 +0.10；
+2. tool/task shared 成分，约 +0.17；
+3. shuffled/generic 成分，约 +0.20 到 +0.23。
+```
+
+关键结果二：跨脚手架 donor 明显降低 tool 共享恢复。
+
+```text
+GLM4 all sentence_completion<-definition:
+  vehicle gain = +0.29
+  tool gain = +0.03
+  unrelated best gain = +0.03
+  vehicle shuffled gain = +0.29
+  tool shuffled gain = +0.09
+  category gap = +0.26
+  task/shared gap = +0.00
+  shuffle loss = +0.00
+```
+
+解释：
+
+```text
+把 donor scaffold 从 sentence_completion 换成 definition 后，
+tool donor 的强恢复基本消失。
+这说明 Phase555 中 tool +0.30 主要不是纯 tool 语义，
+更像 sentence_completion 同模板/同任务接口造成的共享生成门。
+```
+
+关键结果三：definition route 更干净。
+
+```text
+GLM4 all definition<-definition:
+  vehicle gain = +0.26
+  tool gain = -0.13
+  unrelated best gain = -0.07
+  vehicle shuffled gain = +0.19
+  category gap = +0.33
+  shuffle loss = +0.07
+```
+
+解释：
+
+```text
+definition route 中 vehicle donor 明显强于 tool 和 unrelated donor。
+这比 sentence_completion 更接近类别语义恢复。
+```
+
+关键结果四：L24 和 L24+L28 的对象绑定较弱。
+
+```text
+L24 definition:
+  vehicle gain = +0.11
+  vehicle shuffled gain = +0.26
+
+L24 sentence_completion<-definition:
+  vehicle gain = +0.34
+  vehicle shuffled gain = +0.38
+
+L24+L28 sentence_completion<-definition:
+  vehicle gain = +0.33
+  vehicle shuffled gain = +0.40
+```
+
+解释：
+
+```text
+shuffled vehicle donor 不弱，甚至更强。
+这说明当前恢复主要是 category/route state，不是严格 object-aligned binding。
+```
+
+#### DS7B
+
+```text
+DS7B 没有 remove drop。
+
+L16+L20 sentence_completion:
+  vehicle gain = +0.09
+  class = restore_without_drop_or_leaky
+
+其他 route 基本 restore_fail。
+```
+
+解释：
+
+```text
+DS7B 与 Qwen3 一样，仍不能解释成必要路径恢复。
+```
+
+### 本阶段结论
+
+Phase556 对 Phase555 的硬伤给出更清晰拆解：
+
+```text
+tool donor 在 GLM4 all-layer sentence_completion 中强恢复，
+主要来自 sentence_completion 同脚手架/同任务接口，
+不是稳定的纯 tool 语义恢复。
+```
+
+当前最可靠判断：
+
+```text
+GLM4 vehicle_tool 中存在类别级动态状态；
+但这个状态不是 object-specific；
+也不是纯 semantic vector；
+而是 category-route-gate mixed state。
+```
+
+更精确地说：
+
+```text
+vehicle donor 恢复中包含：
+1. category_specific component；
+2. route/scaffold component；
+3. generic generation gate component；
+4. weak object binding component。
+```
+
+### 理论进展
+
+Phase556 后，恢复增益公式应修正为：
+
+```text
+R = C + T + G + B + E
+
+C = category component
+T = task/scaffold interface component
+G = generic generation gate component
+B = object binding component
+E = noise/release component
+```
+
+对于当前 GLM4 all-layer sentence_completion：
+
+```text
+C 相对较小但存在；
+T 明显存在；
+G 明显存在；
+B 较弱；
+E 需要 random activation 进一步确认。
+```
+
+### 下一步任务
+
+Phase557 应做：
+
+```text
+Object-Binding and Generic-Gate Split Audit
+```
+
+目标：
+
+```text
+1. 区分 category state 和 object binding。
+2. 区分 generic gate 和真实 donor state。
+3. 检查 shuffled vehicle 为什么仍强。
+```
+
+测试设计：
+
+```text
+1. vehicle donor object 与 recipient object 做多种距离关系：
+   same object
+   near vehicle
+   far vehicle
+   shuffled vehicle
+   repeated single vehicle donor
+
+2. 加 random activation cache：
+   same norm
+   same layer norm distribution
+   donor activation PCA rank-1 random replacement
+
+3. 加 object token restore：
+   donor object token position
+   answer last position
+   both positions
+
+4. 加 route:
+   sentence_completion<-sentence_completion
+   sentence_completion<-definition
+   definition<-definition
+```
+
+核心判据：
+
+```text
+如果 random activation 也恢复，则 generic gate 比例高。
+如果 same/far/shuffled vehicle 差别很小，则 object binding 弱。
+如果 definition route 中 vehicle 仍强于 random 和 wrong donor，则类别状态更可信。
+```
+
+## Phase 557: Object-Binding and Generic-Gate Split Audit 对象绑定与通用生成门分离审计 [2026-06-20 11:53]
+
+### 本阶段目标
+
+分析附件中对 Phase556 的判断是否正确，并继续拆分 GLM4 vehicle_tool 恢复现象中：
+
+```text
+1. object binding 成分是否真实存在；
+2. random same-norm activation 是否也能打开 generic gate；
+3. vehicle donor 的恢复到底来自对象绑定、类别原型，还是任务/路径状态。
+```
+
+附件判断基本正确：
+
+```text
+Phase556 确实不是简单证明 restore 有效，
+而是把 restore_gain 拆成 category、route/scaffold、generic gate、object binding、noise 多个成分。
+```
+
+但 Phase556 仍有硬伤：
+
+```text
+1. shuffled vehicle 仍强，object binding 证据不足。
+2. tool donor 在同脚手架路径中过强，说明 generic/task route 成分没有排干净。
+3. 缺少 random activation cache，不能判定是不是任意同范数写入都能恢复。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase557_object_binding_gate_split.py
+tests/glm5/phase557_object_binding_gate_split_summary.py
+```
+
+### 执行命令
+
+Qwen3：
+
+```bash
+python tests/glm5/phase557_object_binding_gate_split.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_near_add,resid_donor_vehicle_far_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add,resid_donor_furniture_same_add,resid_donor_animal_same_add \
+  --layer-sets L14,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase557_object_binding_gate_split \
+  --hard-exit-after-model
+```
+
+GLM4：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase557_object_binding_gate_split.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_near_add,resid_donor_vehicle_far_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add,resid_donor_furniture_same_add,resid_donor_animal_same_add \
+  --layer-sets L24,L24+L28,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase557_object_binding_gate_split \
+  --hard-exit-after-model
+```
+
+DS7B：
+
+```bash
+python tests/glm5/phase557_object_binding_gate_split.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_sentence_completion,forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_near_add,resid_donor_vehicle_far_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add,resid_donor_furniture_same_add,resid_donor_animal_same_add \
+  --layer-sets L16+L20,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 8 \
+  --max-length 192 \
+  --output-dir results/glm5_phase557_object_binding_gate_split \
+  --hard-exit-after-model
+```
+
+汇总与语法检查：
+
+```bash
+python tests/glm5/phase557_object_binding_gate_split_summary.py
+
+python -m py_compile \
+  tests/glm5/phase557_object_binding_gate_split.py \
+  tests/glm5/phase557_object_binding_gate_split_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+train_n = 12
+test_n = 12
+sample_seeds = 8
+routes =
+  sentence_completion <- sentence_completion
+  sentence_completion <- definition
+  definition <- definition
+donor variants =
+  same, near, far, shuffle, repeat, random_cache
+wrong donors =
+  tool, furniture, animal
+```
+
+其中 random_cache 是关键对照：
+
+```text
+先收集真实 vehicle donor cache，
+再用同 row norm 的随机向量替换 cache，
+检查是否任意同范数激活都能恢复输出。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase557_object_binding_gate_split/phase557_qwen3_object_binding_gate_split.json
+results/glm5_phase557_object_binding_gate_split/phase557_glm4_object_binding_gate_split.json
+results/glm5_phase557_object_binding_gate_split/phase557_deepseek7b_object_binding_gate_split.json
+results/glm5_phase557_object_binding_gate_split/phase557_cross_model_summary.md
+```
+
+### 客观结果
+
+#### Qwen3
+
+Qwen3 仍缺少必要性下降，因此 donor gain 不能解释为必要链恢复。
+
+```text
+all sentence_completion<-sentence_completion:
+  vehicle same restore_gain = +0.01
+  vehicle near restore_gain = +0.02
+  vehicle far restore_gain = +0.01
+  vehicle shuffle restore_gain = +0.01
+  vehicle repeat restore_gain = +0.10
+  vehicle random_cache restore_gain = -0.54
+
+all definition<-definition:
+  vehicle same restore_gain = +0.04
+  vehicle far/shuffle restore_gain = +0.14
+  vehicle repeat restore_gain = +0.18
+  vehicle random_cache restore_gain = -0.23
+```
+
+#### GLM4
+
+GLM4 是本轮唯一保留必要性链条的模型。
+
+```text
+L24 sentence_completion<-sentence_completion:
+  same +0.33
+  near +0.31
+  far +0.31
+  shuffle +0.31
+  repeat +0.47
+  random_cache -0.08
+
+L24 sentence_completion<-definition:
+  same +0.34
+  near +0.34
+  far +0.38
+  shuffle +0.38
+  repeat +0.62
+  random_cache -0.08
+
+L24 definition<-definition:
+  same +0.10
+  near +0.11
+  far/shuffle +0.26
+  repeat +0.37
+  random_cache -0.27
+
+L24+L28 sentence_completion<-sentence_completion:
+  same +0.24
+  near +0.35
+  far/shuffle +0.29
+  repeat +0.50
+  random_cache -0.15
+
+L24+L28 sentence_completion<-definition:
+  same +0.35
+  near +0.33
+  far/shuffle +0.40
+  repeat +0.57
+  random_cache -0.12
+
+all sentence_completion<-sentence_completion:
+  same +0.26
+  near +0.41
+  far/shuffle +0.23
+  repeat +0.55
+  random_cache -0.15
+
+all sentence_completion<-definition:
+  same +0.39
+  near +0.29
+  far/shuffle +0.29
+  repeat +0.51
+  random_cache -0.12
+
+all definition<-definition:
+  same +0.21
+  near +0.26
+  far/shuffle +0.19
+  repeat +0.52
+  random_cache -0.24
+```
+
+关键事实：
+
+```text
+1. random_cache 在 GLM4 所有关键路径中均失败或显著负向。
+2. same object 并不稳定强于 near/far/shuffle。
+3. repeat donor 在多个路径中最强。
+```
+
+#### DS7B
+
+DS7B 没有形成可靠必要性下降。
+
+```text
+all definition<-definition:
+  vehicle repeat restore_gain = +0.28
+  remove_delta = +0.05
+  random_cache restore_gain = -0.21
+```
+
+因此 DS7B 的 repeat 增益不能视为必要路径恢复。
+
+### 本阶段结论
+
+```text
+Phase556 的核心判断成立：
+GLM4 vehicle_tool 的恢复不是单一语义向量恢复，
+而是 category-route-gate mixed state。
+```
+
+Phase557 新增的客观事实：
+
+```text
+1. GLM4 的真实 donor state 不是任意同范数 random cache。
+2. random_cache 不能打开通用生成门，反而破坏输出。
+3. object binding 很弱，因为 same object 没有稳定超过 near/far/shuffle。
+4. repeat donor 最强，说明可能存在 category prototype / high-confidence route state。
+5. Qwen3 和 DS7B 仍没有必要性下降，不能纳入主机制链闭合。
+```
+
+### 理论进展
+
+Phase556 的公式：
+
+```text
+R = C + T + G + B + E
+```
+
+Phase557 后应修正为：
+
+```text
+R = C + P + T + B + E
+
+C = category component
+P = category prototype / high-confidence route state
+T = task/scaffold interface component
+B = object binding component
+E = noise/release component
+```
+
+其中：
+
+```text
+G_random ≈ 0 或负向
+```
+
+因为：
+
+```text
+R(real donor) - R(random_cache) > 0
+```
+
+这说明真实 donor cache 至少包含结构化状态，不是任意同范数激活。
+
+当前最谨慎的理论表述：
+
+```text
+GLM4 的 vehicle_tool 恢复状态不是纯语义、不是纯对象绑定、也不是纯通用门；
+它更像类别原型状态、任务路径状态、弱对象绑定和输出门控共同形成的动态场。
+```
+
+### 硬伤和问题
+
+```text
+1. repeat donor 最强可能是 category prototype，也可能是重复单一对象造成的高置信度 artifact。
+2. same/near/far 的语义距离定义仍较粗，没有精细对象相似度矩阵。
+3. random_cache 只验证了同范数随机替换，没有验证 PCA rank-1 或 donor manifold 内随机点。
+4. 仍然只在 vehicle_tool 上形成强证据，跨类别泛化不足。
+5. Qwen3/DS7B 没有必要性下降，跨模型统一机制仍未完成。
+```
+
+### 下一步任务
+
+Phase558 应进入：
+
+```text
+Prototype Versus Object Binding Audit
+```
+
+核心目标：
+
+```text
+区分 repeat donor 的强恢复到底是类别原型，
+还是单对象重复造成的脚手架/解码偏置。
+```
+
+测试设计：
+
+```text
+1. 多个 vehicle object 分别作为 repeat donor，形成 repeat-object matrix。
+2. recipient object 与 donor object 做 same / close / medium / far 分层。
+3. 计算每个 donor object 的恢复强度是否稳定，寻找 prototype donor。
+4. 增加 donor average cache、single-object repeat cache、multi-object mean cache。
+5. 加 PCA rank-1 / rank-k donor cache 对照。
+6. 保留 random_cache 与 wrong-category donor。
+```
+
+关键判据：
+
+```text
+如果 multi-object mean cache 强，说明 category prototype 更强。
+如果 same object 明显强于 far object，说明 object binding 真实存在。
+如果某几个 repeat object 异常强，说明存在 prototype exemplar 或 lexical artifact。
+如果 PCA rank-k 恢复强于 random_cache，说明 donor manifold 是结构化状态空间。
+```
+
+## Phase 558: Prototype Versus Object Binding Fast Audit 原型状态与对象绑定快速审计 [2026-06-20 13:50]
+
+### 本阶段目标
+
+分析附件中对 Phase557 的判断是否正确，并继续完成任务。
+
+附件判断基本正确：
+
+```text
+Phase557 同时排除了两个过强解释：
+1. 任意同范数 random activation 可以恢复。
+2. restore 是严格 object binding。
+```
+
+当前最稳妥判断是：
+
+```text
+GLM4 vehicle_tool 的恢复状态更像 category-prototype route state with weak object binding。
+```
+
+本阶段继续审计：
+
+```text
+repeat donor 最强到底是 category prototype，
+还是某个单对象 lexical/scaffold artifact。
+```
+
+### 异常排查
+
+最初使用生成版脚本：
+
+```text
+tests/glm5/phase558_prototype_object_binding_audit.py
+```
+
+发现 Qwen3 单个 donor 条件耗时约 7 分钟。脚本没有死循环，问题是：
+
+```text
+17 conditions * 2 routes * 8 seeds * 8 autoregressive tokens
+```
+
+且 donor restore 条件需要 donor + recipient 双 forward，计算量过大。
+
+处理：
+
+```text
+1. 中止过慢的 Qwen3 生成版运行。
+2. 在生成版脚本中加入 condition 级进度输出和 checkpoint 写盘。
+3. 新增 fast next-token rank/margin 审计脚本，先完成跨模型结构拼图。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase558_prototype_object_binding_audit.py
+tests/glm5/phase558_prototype_object_binding_audit_summary.py
+tests/glm5/phase558_prototype_object_binding_fast.py
+tests/glm5/phase558_prototype_object_binding_fast_summary.py
+```
+
+### 测试原理
+
+生成版太慢，因此快速版只做 next-token logits 审计：
+
+```text
+对每个 prompt 只做一次 forward。
+在 answer position 写入 donor cache。
+比较 target token group 与 competitor token group 的 margin 和 rank。
+```
+
+核心指标：
+
+```text
+target_margin = max(logit_target_tokens) - max(logit_competitor_tokens)
+restore_gain = margin(condition) - margin(remove_perp)
+```
+
+这不是最终 generation closure，但可以快速判断：
+
+```text
+1. same object 是否强于 shuffle；
+2. repeat donor 是否有单对象异常；
+3. mean cache 是否接近或超过 repeat；
+4. PCA cache 是否保留 donor manifold 的有效结构；
+5. random cache 是否仍失败。
+```
+
+### 执行命令
+
+Qwen3：
+
+```bash
+python tests/glm5/phase558_prototype_object_binding_fast.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat1_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat3_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat5_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_pca3_cache_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add \
+  --layer-sets all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase558_prototype_object_binding_fast \
+  --hard-exit-after-model
+```
+
+GLM4：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase558_prototype_object_binding_fast.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat1_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat3_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat5_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_pca3_cache_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add \
+  --layer-sets L24,L24+L28,all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase558_prototype_object_binding_fast \
+  --hard-exit-after-model
+```
+
+DS7B：
+
+```bash
+python tests/glm5/phase558_prototype_object_binding_fast.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,add_perp,resid_remove_perp,resid_remove_random_perp,resid_donor_vehicle_same_add,resid_donor_vehicle_shuffle_add,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat1_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat3_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat5_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_pca3_cache_add,resid_donor_vehicle_random_cache_add,resid_donor_tool_same_add \
+  --layer-sets all \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase558_prototype_object_binding_fast \
+  --hard-exit-after-model
+```
+
+汇总与检查：
+
+```bash
+python tests/glm5/phase558_prototype_object_binding_fast_summary.py
+
+python -m py_compile \
+  tests/glm5/phase558_prototype_object_binding_fast.py \
+  tests/glm5/phase558_prototype_object_binding_fast_summary.py \
+  tests/glm5/phase558_prototype_object_binding_audit.py \
+  tests/glm5/phase558_prototype_object_binding_audit_summary.py
+```
+
+### 结果文件
+
+```text
+results/glm5_phase558_prototype_object_binding_fast/phase558_qwen3_prototype_object_binding_fast.json
+results/glm5_phase558_prototype_object_binding_fast/phase558_glm4_prototype_object_binding_fast.json
+results/glm5_phase558_prototype_object_binding_fast/phase558_deepseek7b_prototype_object_binding_fast.json
+results/glm5_phase558_prototype_object_binding_fast/phase558_fast_cross_model_summary.md
+```
+
+### 运行时间
+
+```text
+Qwen3: 2.59 min
+GLM4: 12.46 min
+DS7B: 3.34 min
+```
+
+### 客观结果
+
+#### Qwen3
+
+Qwen3 仍没有必要性下降：
+
+```text
+sentence_completion<-definition:
+  baseline margin +0.448
+  remove_perp margin +0.724
+```
+
+因此只能作为 rank movement，不构成必要链恢复。
+
+```text
+sentence_completion<-definition:
+  same +0.677
+  shuffle +0.651
+  best repeat repeat0 +0.740
+  mean_cache +0.635
+  pca1_cache +0.667
+  pca3_cache +0.646
+  random_cache +0.525
+
+definition<-definition:
+  same +0.474
+  shuffle +0.448
+  best repeat repeat0 +0.672
+  mean_cache +0.487
+  pca1_cache +0.495
+  pca3_cache +0.451
+  random_cache -0.753
+```
+
+#### GLM4
+
+GLM4 是核心模型，存在 margin necessity drop：
+
+```text
+all sentence_completion<-definition:
+  baseline margin -1.276
+  remove_perp margin -1.587
+  remove_delta -0.311
+
+all definition<-definition:
+  baseline margin +0.288
+  remove_perp margin -0.384
+  remove_delta -0.673
+```
+
+关键结果：
+
+```text
+all sentence_completion<-definition:
+  same +4.541
+  shuffle +4.579
+  repeat2 +5.232
+  repeat4 +5.192
+  mean_cache +5.646
+  pca1_cache +4.734
+  pca3_cache +4.632
+  random_cache +0.150
+
+all definition<-definition:
+  same +3.548
+  shuffle +3.669
+  repeat2 +4.762
+  repeat4 +4.308
+  mean_cache +4.757
+  pca1_cache +3.836
+  pca3_cache +3.723
+  random_cache -1.057
+```
+
+repeat matrix：
+
+```text
+all sentence_completion<-definition:
+  repeat0 +3.906
+  repeat1 +3.842
+  repeat2 +5.232
+  repeat3 +3.414
+  repeat4 +5.192
+  repeat5 +4.740
+  spread +1.818
+
+all definition<-definition:
+  repeat0 +3.453
+  repeat1 +3.357
+  repeat2 +4.762
+  repeat3 +2.334
+  repeat4 +4.308
+  repeat5 +4.033
+  spread +2.428
+```
+
+#### DS7B
+
+DS7B 没有必要性下降，remove_perp 反而增强 margin：
+
+```text
+sentence_completion<-definition:
+  baseline +0.807
+  remove_perp +1.757
+
+definition<-definition:
+  baseline +0.559
+  remove_perp +2.706
+```
+
+因此 DS7B 不能解释为恢复链。
+
+```text
+definition<-definition:
+  same -1.544
+  shuffle -1.395
+  best repeat repeat0 -0.081
+  mean_cache -1.579
+  pca1_cache -1.639
+  pca3_cache -1.620
+  random_cache -2.671
+```
+
+### 本阶段结论
+
+1. Phase557 附件判断正确：
+
+```text
+当前不是严格 object binding。
+same 不稳定强于 shuffle。
+```
+
+GLM4：
+
+```text
+all sentence_completion<-definition:
+  same - shuffle = -0.038
+
+all definition<-definition:
+  same - shuffle = -0.121
+```
+
+2. repeat donor 的强恢复不应解释为单一对象绑定。
+
+GLM4 repeat2 与 repeat4 强，但 mean_cache 在 all sentence_completion<-definition 中更强：
+
+```text
+mean_cache +5.646 > repeat2 +5.232
+```
+
+在 all definition<-definition 中：
+
+```text
+mean_cache +4.757 ≈ repeat2 +4.762
+```
+
+这说明 category prototype / multi-object mean state 是真实候选，不只是单个对象重复伪影。
+
+3. 但 repeat object spread 很大，说明存在 exemplar/object lexical bias。
+
+```text
+GLM4 all definition repeat spread = +2.428
+GLM4 all sentence repeat spread = +1.818
+```
+
+因此不能说模型只有抽象 prototype，也存在对象样例强弱差异。
+
+4. PCA cache 有效，但弱于 mean_cache。
+
+```text
+GLM4 all sentence:
+  pca1 +4.734
+  pca3 +4.632
+  mean +5.646
+
+GLM4 all definition:
+  pca1 +3.836
+  pca3 +3.723
+  mean +4.757
+```
+
+这说明 donor manifold 有结构，但在本测试里均值/原型比低秩重构更强。
+
+5. random_cache 在关键 GLM4 all 组合中失败。
+
+```text
+all sentence random_cache +0.150
+all definition random_cache -1.057
+```
+
+对比：
+
+```text
+all sentence mean_cache +5.646
+all definition mean_cache +4.757
+```
+
+所以真实 donor cache 不是任意同范数激活。
+
+### 理论进展
+
+Phase557 后公式为：
+
+```text
+R = C + P + T + B + E
+```
+
+Phase558 后进一步细化：
+
+```text
+R = P_mean + P_exemplar + T + B_weak + E
+```
+
+其中：
+
+```text
+P_mean = multi-object category prototype state
+P_exemplar = object exemplar / lexical-biased prototype state
+T = task/scaffold route state
+B_weak = weak object binding
+E = noise/release
+```
+
+当前 GLM4 更接近：
+
+```text
+P_mean 强；
+P_exemplar 存在；
+B_weak 弱；
+random gate 不成立。
+```
+
+更明确的判据：
+
+```text
+mean_cache ≈ best_repeat 或 mean_cache > best_repeat
+```
+
+说明类别原型不是伪概念，而是可干预的内部状态。
+
+```text
+repeat spread > 0
+```
+
+说明类别原型不是完美抽象，仍受到具体对象词汇/样例影响。
+
+```text
+same - shuffle ≈ 0 或 < 0
+```
+
+说明当前路径不是强对象绑定。
+
+### 硬伤和问题
+
+```text
+1. 本轮是 next-token margin/rank 审计，不是最终自然生成闭环。
+2. top1 target rate 仍为 0，说明 margin 改善尚未推到贪婪首词直接命中。
+3. PCA cache 的构造基于当前 batch，尚未做跨 batch 稳定 PCA。
+4. repeat2/repeat4 具体对应哪些对象还需要对象名级分析。
+5. Qwen3/DS7B 没有必要性下降，跨模型机制仍未统一。
+```
+
+### 下一步任务
+
+Phase559 应做：
+
+```text
+Prototype Generation Closure and Object Exemplar Audit
+```
+
+目标：
+
+```text
+只在 GLM4 all 层组合上，把 Phase558 找到的少数关键条件带回生成闭环。
+```
+
+条件应压缩为：
+
+```text
+baseline
+remove_perp
+same
+shuffle
+repeat2
+repeat4
+mean_cache
+pca1_cache
+random_cache
+tool_same
+```
+
+路径：
+
+```text
+sentence_completion<-definition
+definition<-definition
+```
+
+同时记录 repeat2/repeat4 对应对象名，验证：
+
+```text
+1. mean_cache 是否在生成层面也超过或接近 repeat2。
+2. repeat2/repeat4 是否只是词汇伪影。
+3. random_cache 是否继续在生成层面失败。
+4. same/shuffle 是否仍无显著差异。
+```
