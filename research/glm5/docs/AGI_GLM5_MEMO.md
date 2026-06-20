@@ -49358,3 +49358,362 @@ definition<-definition
 3. random_cache 是否继续在生成层面失败。
 4. same/shuffle 是否仍无显著差异。
 ```
+
+
+## Phase 559: Prototype Generation Closure and Object Exemplar Audit 原型生成闭合与对象样例审计 [2026-06-20 02:50]
+
+### 本阶段目标
+
+Phase558 在 next-token margin 层面确认：
+- mean_cache 最强 → 类别原型路径状态候选
+- random_cache 最弱 → 结构化供体状态
+- same - shuffle ≈ 0 → 弱对象绑定
+
+Phase559 将关键条件带回 **生成闭合**（多步自回归生成），验证：
+1. mean_cache 在生成层面是否仍然最强；
+2. repeat2/repeat4 是否只是词汇伪影；
+3. random_cache 是否继续失败；
+4. same/shuffle 是否仍无显著差异。
+
+### 生成脚本
+
+```text
+tests/glm5/phase559_prototype_generation_closure.py
+tests/glm5/phase559_prototype_generation_closure_summary.py
+```
+
+### 测试原理
+
+**One-shot surgery + KV cache 设计：**
+
+```text
+Step 0: 在 answer position 应用 remove_perp + restore donor cache（hook 注入）
+Step 1+: 自由生成，使用 KV cache，不再注入
+```
+
+这与 Phase558 的 continuous surgery（每步重新注入）不同：
+- Phase558 每步重新编码完整文本，每步注入 donor cache
+- Phase559 只在首步注入一次，之后自由生成
+
+这是更严格的测试：**单次恢复 answer-position 状态是否足以导致生成闭合？**
+
+KV cache 加速：首步完整 forward，后续每步只处理 1 个 token。GLM4 22 个条件单元（11 条件 × 2 路径，每单元含 6 种子）耗时 24.44 分钟。
+
+### 执行命令
+
+三模型依次运行（qwen3 → glm4 → deepseek7b），三论测试：
+
+```text
+第一轮冒烟：3 条件 × 1 路径 × 1 种子 × 4 token × test_n=4
+第二轮主测：11 条件 × 2 路径 × 6 种子 × 12 token × test_n=12
+第三轮确认：GLM4 6 条件 × 2 路径 × 2 种子（131,137）× 12 token × test_n=12
+```
+
+### 对象名审计（关键）
+
+test_n=12 时 vehicle 对象列表：
+
+```text
+repeat0 = tram        (1 token, 4 chars)
+repeat1 = subway      (2 tokens, 6 chars)
+repeat2 = helicopter  (2 tokens, 10 chars)  ← Phase558 最强
+repeat3 = tractor     (1 token, 7 chars)
+repeat4 = rocket      (1 token, 6 chars)    ← Phase558 最强
+repeat5 = canoe       (2 tokens, 5 chars)
+repeat6 = ferry       (2 tokens, 5 chars)
+repeat7 = jeep        (2 tokens, 4 chars)
+repeat8 = ambulance   (2 tokens, 9 chars)
+repeat9 = cart        (1 token, 4 chars)
+repeat10 = sled       (1 token, 4 chars)
+repeat11 = wagon      (1 token, 5 chars)
+```
+
+**repeat2 = helicopter**（2 词元，10 字符，高频高显著性车辆）
+**repeat4 = rocket**（1 词元，6 字符，高频高显著性车辆）
+
+### 客观结果
+
+#### GLM4 主测试（6 种子，L24/26/28）
+
+Route: sentence_completion<-definition
+
+```text
+条件              clean_no  label  echo  score  c_delta  r_gain
+baseline            0.26    0.00   0.74   0.24   +0.00    +0.01
+add_perp            0.35    0.01   0.74   0.33   +0.08    +0.10
+remove_perp         0.25    0.00   0.72   0.25   -0.01    +0.00
+same                0.25    0.01   0.65   0.21   -0.01    +0.00
+shuffle             0.22    0.00   0.75   0.22   -0.04    -0.03
+repeat2(heli)       0.39    0.00   0.69   0.35   +0.12    +0.14
+repeat4(rocket)     0.42    0.00   0.51   0.35   +0.15    +0.17
+mean_cache          0.25    0.00   0.68   0.22   -0.01    +0.00
+pca1_cache          0.29    0.00   0.71   0.26   +0.03    +0.04
+random_cache        0.32    0.00   0.54   0.26   +0.06    +0.07
+tool_same           0.26    0.00   0.71   0.21   +0.00    +0.01
+```
+
+Route: definition<-definition
+
+```text
+条件              clean_no  label  echo  score  c_delta  r_gain
+baseline            0.38    0.00   0.07   0.26   +0.00    -0.01
+add_perp            0.43    0.03   0.10   0.28   +0.06    +0.04
+remove_perp         0.39    0.00   0.04   0.26   +0.01    +0.00
+same                0.42    0.00   0.11   0.29   +0.04    +0.03
+shuffle             0.43    0.03   0.06   0.28   +0.06    +0.04
+repeat2(heli)       0.46    0.01   0.06   0.31   +0.08    +0.07
+repeat4(rocket)     0.46    0.00   0.10   0.38   +0.08    +0.07
+mean_cache          0.35    0.01   0.01   0.15   -0.03    -0.04
+pca1_cache          0.46    0.03   0.07   0.32   +0.08    +0.07
+random_cache        0.35    0.00   0.18   0.26   -0.03    -0.04
+tool_same           0.43    0.03   0.10   0.31   +0.06    +0.04
+```
+
+#### GLM4 确认测试（2 种子 131,137）
+
+Route: sentence_completion<-definition
+
+```text
+baseline            0.21
+remove_perp         0.21
+repeat2(heli)       0.42  ← 稳定强势
+repeat4(rocket)     0.46  ← 稳定强势
+mean_cache          0.46  ← 与主测试 0.25 差异大！高方差
+random_cache        0.29
+```
+
+Route: definition<-definition
+
+```text
+baseline            0.42
+remove_perp         0.50
+repeat2(heli)       0.50  ← 稳定强势
+repeat4(rocket)     0.46  ← 稳定强势
+mean_cache          0.33  ← 与主测试 0.35 一致，弱
+random_cache        0.21
+```
+
+#### Qwen3 主测试
+
+```text
+sent_comp<-def: base=0.57, rm=0.62(无必要性下降), r2=0.47, r4=0.39, mean=0.51, rand=0.49
+def<-def:       base=0.18, rm=0.22(无必要性下降), r2=0.26, r4=0.22, mean=0.26, rand=0.28
+```
+
+Qwen3 无必要性下降，random_cache 不弱，确认不在恢复链上。
+
+#### DS7B 主测试
+
+```text
+sent_comp<-def: base=0.19, rm=0.19(无必要性下降), r2=0.19, r4=0.15, mean=0.14, rand=0.15
+def<-def:       base=0.15, rm=0.25(反而增强!), r2=0.18, r4=0.11, mean=0.17, rand=0.14
+```
+
+DS7B remove_perp 反而增强 margin，确认不在恢复链上。
+
+### Phase558 vs Phase559 关键对比（GLM4 all L24/26/28）
+
+```text
+条件            P558 margin(sent)  P559 clean_no(sent)  P558 margin(def)  P559 clean_no(def)
+baseline          -1.28              0.26                 +0.29              0.38
+add_perp          +0.92              0.35                 +3.16              0.43
+remove_perp       -1.59              0.25                 -0.38              0.39
+same              +2.95              0.25                 +3.16              0.42
+shuffle           +2.99              0.22                 +3.28              0.43
+repeat2(heli)     +3.64              0.39                 +4.38              0.46
+repeat4(rocket)   +3.61              0.42                 +3.92              0.46
+mean_cache        +4.06              0.25                 +4.37              0.35
+pca1_cache        +3.15              0.29                 +3.45              0.46
+random_cache      -1.44              0.32                 -1.44              0.35
+tool_same         +2.74              0.26                 +3.09              0.43
+```
+
+### 核心发现
+
+#### 发现1：next-token margin 不能预测生成闭合
+
+```text
+mean_cache:
+  P558 margin 最强 (+4.06, +4.37)
+  P559 生成最弱或负 (0.25, 0.35)
+
+random_cache:
+  P558 margin 最弱 (-1.44, -1.44)
+  P559 生成中等 (0.32, 0.35)
+```
+
+**mean_cache 在 next-token margin 最强，但在生成闭合中不强。**
+**random_cache 在 next-token margin 最弱，但在生成闭合中不弱。**
+
+这说明 next-token margin 测量的是首词元方向偏移，不是多步生成的语义维持能力。
+
+#### 发现2：样例状态（helicopter, rocket）在生成中最强且最稳定
+
+```text
+repeat2(helicopter): P559 sent=0.39/0.42, def=0.46/0.50 ← 两个种子集都强
+repeat4(rocket):     P559 sent=0.42/0.46, def=0.46/0.46 ← 两个种子集都强
+```
+
+repeat2 和 repeat4 是唯一在 next-token margin 和生成闭合中都强的条件。
+
+helicopter 和 rocket 都是高频、高显著性的车辆词，部分解释了它们的强度可能是词汇/样例伪影。
+
+#### 发现3：mean_cache 高种子方差
+
+```text
+主测试(6种子): mean_cache sent=0.25
+确认测试(2种子): mean_cache sent=0.46
+```
+
+mean_cache 的 clean_no 在不同种子下从 0.25 到 0.46，方差很大。
+
+相比之下，repeat2/repeat4 在两个种子集下保持稳定（0.39→0.42, 0.42→0.46）。
+
+这说明类别原型状态（mean_cache）是真实但不稳定的，样例状态是稳定的。
+
+#### 发现4：生成层面必要性下降消失
+
+```text
+P558 sent: baseline=-1.28 → remove_perp=-1.59 (下降 -0.31)
+P559 sent: baseline=0.26  → remove_perp=0.25  (下降 -0.01)
+
+P558 def:  baseline=+0.29 → remove_perp=-0.38 (下降 -0.67)
+P559 def:  baseline=0.38  → remove_perp=0.39  (上升 +0.01)
+```
+
+在 next-token margin 中清晰的必要性下降，在生成闭合中消失。
+
+这说明 perp 方向对首词元 margin 是必要的，但对多步生成 clean paraphrase 不是必要的。生成过程更加鲁棒。
+
+#### 发现5：same - shuffle 仍无显著差异
+
+```text
+GLM4 sent: same=0.25, shuffle=0.22, diff=-0.03
+GLM4 def:  same=0.42, shuffle=0.43, diff=+0.01
+```
+
+与 Phase558 一致：对象绑定弱。
+
+#### 发现6：生成样本分析
+
+repeat2(helicopter) 生成样本：
+```text
+"a transportation method for conveying passengers along a fi"
+"a mode of public transportation."
+"an urban conveyance system that moves along tracks"
+"An urban transit system that uses tracks and tunnels"
+```
+→ 干净的类别级改写，无对象回声
+
+mean_cache 生成样本：
+```text
+"A tram is commonly used as a means of local transportation"  ← 对象回声(tram)
+"a mode ofA subway is commonly used as a means of"           ← 对象回声(subway)
+"A form of transportation that operates on tracks"            ← 干净
+"A network of underground tunnels connected by platforms"     ← 干净
+```
+→ 混合：有时对象回声，有时干净
+
+repeat2/repeat4 产生更多类别级泛化表达（transportation method, transit system），
+mean_cache 有时产生具体对象名（tram, subway），降低 clean_non_object 率。
+
+### 运行时间
+
+```text
+Qwen3:   1.33 min (smoke 0.32 min)
+GLM4:   24.44 min (smoke 0.99 min, confirm 4.92 min)
+DS7B:   10.50 min (smoke 0.67 min)
+```
+
+### 本阶段结论
+
+1. **next-token margin 不能预测生成闭合。**
+   Phase558 的 "category prototype route state" 结论需要修正：mean_cache 在 next-token margin 最强，但在生成闭合中不强且高方差。
+
+2. **样例状态在生成中最强且最稳定。**
+   repeat2(helicopter) 和 repeat4(rocket) 在 next-token margin 和生成闭合中都强，且跨种子稳定。这更支持 exemplar/scaffold route hypothesis 而非 pure category prototype hypothesis。
+
+3. **类别原型状态真实但不稳定。**
+   mean_cache 有时能导致生成闭合（0.46），有时不能（0.25），高种子方差。这不是测量噪声，而是原型状态本身的不确定性。
+
+4. **生成层面必要性下降消失。**
+   perp 方向对首词元 margin 必要，但对多步生成 clean paraphrase 不必要。生成过程更加鲁棒，可以不依赖 perp 方向产生干净改写。
+
+5. **random_cache 在生成中不弱。**
+   与 Phase558 不同，random_cache 在生成闭合中不失败。这说明 next-token margin 的 "structured donor state" 排除在生成层面不成立——随机激活也能通过多步生成产生中等水平的 clean paraphrase。
+
+6. **对象绑定仍然弱。**
+   same - shuffle ≈ 0，与 Phase558 一致。
+
+### 硬伤和问题
+
+```text
+1. One-shot surgery 设计：只在 step 0 注入，之后自由生成。mean_cache 弱可能是因为它需要持续注入才能维持原型状态。需要 continuous surgery 对照。
+
+2. 确认测试只有 2 个种子，mean_cache 方差结论需要更多种子验证。
+
+3. 生成层面的必要性下降消失，导致 "restore_gain" 框架在生成中不太适用——没有东西需要 restore。
+
+4. repeat2=helicopter, repeat4=rocket 的高频/高显著性可能解释它们的强势，但需要对照低频对象确认。
+
+5. top1 target rate 仍为 0（首词元未直接命中目标词组），说明 margin/rank 改善仍未推到贪婪首词命中。
+
+6. KV cache 与 hook 的交互：hooked 层的 KV cache 存储的是未修改的 keys/values，这可能影响后续 token 的注意力模式。
+```
+
+### 理论修正
+
+Phase558 后公式：
+```text
+R = P_mean + P_exemplar + T + B_weak + E
+```
+
+Phase559 后修正：
+```text
+R_generation ≠ R_next_token
+
+R_next_token  = P_mean(strong) + P_exemplar(medium) + T + B_weak + E
+R_generation  = P_mean(unstable) + P_exemplar(strong,stable) + T + B_weak + E
+```
+
+其中：
+```text
+P_mean = 多对象类别原型状态（next-token 强，生成不稳定）
+P_exemplar = 对象样例/词汇偏置状态（next-token 中等，生成强且稳定）
+T = 任务/脚手架路径
+B_weak = 弱对象绑定
+E = 噪声/释放
+```
+
+### 下一步任务
+
+Phase560 应做：
+
+```text
+1. Continuous surgery 对照：在每步注入 donor cache，验证 mean_cache 是否因持续注入而变强。
+2. 增加种子数到 12-16，确认 mean_cache 方差。
+3. 对低频/低显著性对象（如 tram, sled）做 repeat donor 测试，验证 repeat2/repeat4 强势是否是词汇伪影。
+4. 测试 different alpha/scale 组合，验证 one-shot 注入强度是否影响结果。
+5. 如果 continuous surgery 下 mean_cache 变强，则需要区分：
+   - "one-shot prototype" 不够
+   - "continuous prototype" 够
+   这将说明类别原型需要持续维护，不是一次性注入。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase559_smoke/
+  phase559_qwen3_prototype_generation_closure.json
+  phase559_glm4_prototype_generation_closure.json
+  phase559_deepseek7b_prototype_generation_closure.json
+
+results/glm5_phase559_prototype_generation_closure/
+  phase559_qwen3_prototype_generation_closure.json
+  phase559_glm4_prototype_generation_closure.json
+  phase559_deepseek7b_prototype_generation_closure.json
+  phase559_cross_model_summary.md
+
+results/glm5_phase559_confirm/
+  phase559_glm4_prototype_generation_closure.json
+```
