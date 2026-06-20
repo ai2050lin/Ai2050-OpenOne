@@ -50017,3 +50017,476 @@ results/glm5_phase560_continuous_prototype_surgery/
   phase560_deepseek7b_continuous_static_prototype_surgery.json
   phase560_continuous_static_cross_model_summary.md
 ```
+
+
+## Phase 561: Gated Continuous Injection Beta Sweep (Three-Model Complete) 门控连续注入贝塔扫描三模型完整 [2026-06-20 07:45]
+
+### 本阶段目标
+
+Phase560 证明 continuous static（连续静态全覆盖）破坏生成。Phase561 测试：
+```text
+是否存在低强度 beta 混合窗口，使 donor cache（供体缓存）能持续注入而不破坏生成？
+```
+
+公式：
+```text
+h' = (1 - beta) * h_current + beta * donor_cache
+```
+
+beta 扫描：0.05, 0.10, 0.25, 0.50
+donor：repeat2(helicopter), repeat4(rocket), mean_cache, random_cache
+三模型全部完成：qwen3, glm4, deepseek7b
+8 seeds, 12 tokens, test_n=12
+
+### 客观结果
+
+#### Route: sentence_completion <- definition
+
+```text
+clean_non_object_rate（关键指标）
+
+beta=0.05（最低强度）:
+  qwen3:    repeat2=0.55  repeat4=0.60  mean=0.61  random=0.58  (baseline=0.48)
+  glm4:     repeat2=0.15  repeat4=0.20  mean=0.21  random=0.16  (baseline=0.25)
+  deepseek7b: repeat2=0.20  repeat4=0.19  mean=0.15  random=0.14  (baseline=0.22)
+
+beta=0.10:
+  qwen3:    repeat2=0.53  repeat4=0.50  mean=0.50  random=0.57
+  glm4:     repeat2=0.29  repeat4=0.34  mean=0.20  random=0.23
+  deepseek7b: repeat2=0.26  repeat4=0.21  mean=0.20  random=0.29
+
+beta=0.25:
+  qwen3:    repeat2=0.47  repeat4=0.51  mean=0.51  random=0.67
+  glm4:     repeat2=0.28  repeat4=0.19  mean=0.45  random=0.21
+  deepseek7b: repeat2=0.06  repeat4=0.08  mean=0.12  random=0.25
+
+beta=0.50:
+  qwen3:    全部归零（0.00-0.04）
+  glm4:     全部归零（0.01-0.03）
+  deepseek7b: 全部归零（0.00-0.02）
+```
+
+#### Route: definition <- definition
+
+```text
+beta=0.05:
+  qwen3:    repeat2=0.31  repeat4=0.29  mean=0.32  random=0.23  (baseline=0.26)
+  glm4:     repeat2=0.38  repeat4=0.39  mean=0.28  random=0.29  (baseline=0.41)
+  deepseek7b: repeat2=0.27  repeat4=0.23  mean=0.24  random=0.21  (baseline=0.17)
+
+beta=0.10:
+  qwen3:    repeat2=0.39  repeat4=0.35  mean=0.38  random=0.20
+  glm4:     repeat2=0.32  repeat4=0.31  mean=0.35  random=0.25
+  deepseek7b: repeat2=0.30  repeat4=0.25  mean=0.25  random=0.22
+
+beta=0.25:
+  qwen3:    repeat2=0.31  repeat4=0.33  mean=0.29  random=0.24
+  glm4:     repeat2=0.16  repeat4=0.20  mean=0.31  random=0.27
+  deepseek7b: repeat2=0.06  repeat4=0.09  mean=0.12  random=0.25
+
+beta=0.50:
+  全部归零
+```
+
+### 核心发现
+
+#### 发现1：低强度窗口存在，但跨模型不一致
+
+```text
+qwen3:   beta=0.05 全部有效（gain +0.07 ~ +0.14）
+glm4:    beta=0.05 全部负向（gain -0.04 ~ -0.10）
+ds7b:    beta=0.05 接近 baseline（gain -0.02 ~ -0.08）
+```
+
+qwen3 对低强度连续注入耐受且有益；GLM4 和 DS7B 即使最低强度也开始下降。
+
+#### 发现2：GLM4 在 beta=0.25 有 mean_cache 异常峰
+
+```text
+glm4 sent<-def beta=0.25:
+  mean_cache = 0.45（远高于 baseline 0.25 和其他 beta）
+  repeat2 = 0.28
+  repeat4 = 0.19
+```
+
+但 object_echo 同时降到 0.35，说明这个峰可能是 mean_cache 在特定强度下压制了对象回声但不破坏生成。这个点需要更多种子验证。
+
+#### 发现3：beta=0.50 是普遍崩溃点
+
+三模型、两路径、所有 donor 在 beta=0.50 时 clean_no 全部归零。这是硬性破坏阈值。
+
+#### 发现4：qwen3 的 random_cache 在 beta=0.25 反而最强
+
+```text
+qwen3 sent<-def beta=0.25:
+  random_cache = 0.67（最高！）
+  mean_cache = 0.51
+  repeat2 = 0.47
+```
+
+这说明 qwen3 的低 beta 行为更像是通用噪声注入打开生成门，而非语义调制。
+
+#### 发现5：GLM4 definition 路径 beta=0.05-0.10 有效
+
+```text
+glm4 def<-def:
+  beta=0.05: repeat2=0.38, repeat4=0.39（接近 baseline 0.41）
+  beta=0.10: repeat2=0.32, repeat4=0.31, mean=0.35
+```
+
+虽然 gain 为负（因为 baseline 高），但 clean_no 绝对值仍接近 baseline。这说明 definition 路径比 sentence_completion 路径更耐受连续注入。
+
+### 跨 Phase 558→559→560→561 趋势
+
+```text
+Phase 558 (next-token margin): mean_cache 最强 (+4.06)
+Phase 559 (one-shot gen):       repeat2/4 最强 (0.39/0.42), mean_cache 弱 (0.25)
+Phase 560 (continuous full):    全部归零
+Phase 561 (gated low beta):     qwen3 低 beta 有效，glm4/ds7b 边缘
+```
+
+这四阶段清晰地展示了：
+1. next-token margin 与生成闭合脱钩
+2. one-shot 与 continuous 截然不同
+3. 全强度 continuous 破坏生成
+4. 低强度 continuous 有窗口但不稳定
+
+### 运行时间
+
+```text
+qwen3: 38.84 min
+glm4:  68.83 min
+ds7b:  52.71 min
+```
+
+### 本阶段结论
+
+1. **低强度门控窗口存在，但跨模型不一致。**
+   qwen3 有清晰窗口，GLM4 和 DS7B 窗口窄或不存在。
+
+2. **Phase 560 的全归零部分来自剂量毒性。**
+   beta=0.50 全归零，但 beta=0.05 在 qwen3 仍有效。所以 Phase 560 的失败不能完全归因于"静态注入本质不兼容"，部分是 alpha=6.0 + 全覆盖强度过大。
+
+3. **但 GLM4/DS7B 即使低 beta 也下降，说明静态 donor 不适配这两个模型。**
+   这支持"动态错配"而非"主动排斥"的解释。
+
+4. **mean_cache 的 GLM4 beta=0.25 异常峰需要验证。**
+   可能是特定强度下压制对象回声的效应，需要更多种子。
+
+5. **random_cache 在 qwen3 beta=0.25 最强，说明低 beta 行为含通用门成分。**
+   这不是纯语义调制。
+
+### 理论修正
+
+Phase560 后公式：
+```text
+R_generation != StaticContinuous(P)
+R_generation = D_t(P, T, B, C_t) + G_t + E_t
+```
+
+Phase561 后进一步：
+```text
+R_generation(beta, donor) 跨模型不一致
+  qwen3:  低 beta 有通用门增益窗口
+  glm4:   低 beta 边缘，特定 beta/donor 组合有异常峰
+  ds7b:   低 beta 接近 baseline，无清晰增益
+```
+
+这说明不存在统一的"低强度连续调制理论"。不同模型的动力学区间不同。
+
+### 硬伤
+
+```text
+1. beta 扫描只有 4 个点，分辨率不足
+2. GLM4 mean_cache beta=0.25 异常峰只有 8 种子，需验证
+3. alpha=6.0 固定，未做 alpha sweep
+4. donor cache 仍是静态的（不随上下文更新）
+5. 未测切向/法向分解
+6. 未测弛豫长度
+7. qwen3 的 random_cache 强势说明"低 beta 有效"不等于"语义调制有效"
+```
+
+### 下一步任务
+
+Phase562 应做动力学测量（基于 20260620_02 文件回答二的设计）：
+
+```text
+1. 弛豫长度测量：step t0 注入后撤除，测 clean_rate 回到 baseline 的 token 数
+2. 切向 vs 法向扰动：分解 donor 方向为切向和法向，分别测试
+3. 动态 donor 对照：donor cache 随生成上下文更新
+4. 有限时间李雅普诺夫指数：量化扰动放大/收敛
+5. 轨迹距离测量：baseline/one-shot/continuous/dynamic donor 的轨迹距离
+```
+
+### 结果文件
+
+```text
+results/glm5_phase561_gated_continuous_injection/
+  phase561_qwen3_continuous_blend_gated_injection.json
+  phase561_glm4_continuous_blend_gated_injection.json
+  phase561_deepseek7b_continuous_blend_gated_injection.json
+  phase561_cross_model_summary.md
+```
+
+
+## Phase 562: Trajectory Response and Covariant Donor Audit 轨迹响应与协变供体审计 [2026-06-20 08:55]
+
+### 本阶段目标
+
+从 Phase561 的 beta sweep（强度扫描）进入 dynamical response measurement（动力学响应测量）：
+1. 弛豫长度：one-shot 注入后 target token 维持多少步
+2. 切向 vs 法向：donor 方向分解为切向（沿轨迹）和法向（垂直轨迹），分别注入
+3. 退化分类：repetition/garbage/syntax_collapse/short/normal
+4. 逐步 target rate：记录每步的 target token 出现率
+
+### 生成脚本
+
+```text
+tests/glm5/phase562_trajectory_response_audit.py
+tests/glm5/phase562_trajectory_response_summary.py
+```
+
+### 测试原理
+
+**One-shot surgery + KV cache + 逐步记录：**
+- step 0：注入（remove+restore 或 add direction），记录 hidden state（baseline 条件）
+- step 1-15：自由生成，每步记录 token_type 和 target_rank
+
+**切向/法向分解：**
+- v = h_baseline_step1 - h_baseline_step0（自然轨迹切向）
+- u = a_donor - h_baseline_step0（donor 方向）
+- u_tangent = proj_v(u)（切向分量）
+- u_normal = u - u_tangent（法向分量）
+- 分别注入 u_tangent 和 u_normal
+
+### 执行参数
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool, train-n=12, test-n=12
+seeds = 101,103,107,109,113,127 (6 seeds)
+max_new_tokens = 16
+routes = sent<-def, def<-def
+conditions = baseline, one_shot_repeat2, one_shot_repeat4, one_shot_mean, one_shot_random, add_tangent_repeat2, add_normal_repeat2
+layer-sets = all
+```
+
+### 客观结果
+
+#### Route: sentence_completion <- definition
+
+```text
+clean_non_object_rate:
+
+条件              qwen3    glm4     ds7b
+baseline          0.58     0.33     0.22
+repeat2(heli)     0.56     0.39     0.25
+repeat4(rocket)   0.51     0.54     0.24
+mean_cache        0.60     0.29     0.17
+random_cache      0.49     0.38     0.18
+tangent_r2        0.53     0.44     0.21
+normal_r2         0.56     0.38     0.29
+
+semantic_specificity (condition - random_cache):
+
+条件              qwen3    glm4     ds7b
+baseline          +0.10    -0.04    +0.04
+repeat2(heli)     +0.07    +0.01    +0.07
+repeat4(rocket)   +0.03    +0.17    +0.06
+mean_cache        +0.11    -0.08    -0.01
+tangent_r2        +0.04    +0.07    +0.03
+normal_r2         +0.07    +0.00    +0.11
+
+tangent vs normal:
+  qwen3:  tangent 0.53, normal 0.56, tangent-normal = -0.03
+  glm4:   tangent 0.44, normal 0.38, tangent-normal = +0.07
+  ds7b:   tangent 0.21, normal 0.29, tangent-normal = -0.08
+```
+
+#### Route: definition <- definition
+
+```text
+clean_non_object_rate:
+
+条件              qwen3    glm4     ds7b
+baseline          0.26     0.42     0.15
+repeat2(heli)     0.36     0.44     0.17
+repeat4(rocket)   0.31     0.44     0.11
+mean_cache        0.31     0.35     0.15
+random_cache      0.35     0.36     0.15
+tangent_r2        0.25     0.42     0.22
+normal_r2         0.33     0.43     0.19
+
+tangent vs normal:
+  qwen3:  tangent 0.25, normal 0.33, tangent-normal = -0.08
+  glm4:   tangent 0.42, normal 0.43, tangent-normal = -0.01
+  ds7b:   tangent 0.22, normal 0.19, tangent-normal = +0.03
+```
+
+#### 方向分解统计
+
+```text
+GLM4 sent<-def:
+  L24: |u|=24.94, |tangent|=5.66, |normal|=21.41
+  L26: |u|=39.17, |tangent|=7.12, |normal|=29.41
+  L28: |u|=52.67, |tangent|=9.18, |normal|=38.67
+  → donor 方向主要是法向（normal 占 80-85%）
+
+GLM4 def<-def:
+  L24: |tangent|=0.47, |normal|=12.40
+  → 切向几乎为零，donor 方向几乎完全法向
+
+DS7B:
+  |u|=215-356 (远大于 GLM4), |tangent|=7-9, |normal|=69-111
+  → 同样法向主导
+```
+
+#### 退化分类
+
+三模型所有条件 normal rate ≥ 0.92，repetition ≤ 0.08，garbage ≤ 0.01。
+one-shot 注入没有导致明显退化。
+
+### 核心发现
+
+#### 发现1：GLM4 切向 > 法向 > baseline（sent route）
+
+```text
+glm4 sent<-def:
+  baseline = 0.33
+  tangent_r2 = 0.44 (+0.11 vs baseline)
+  normal_r2 = 0.38 (+0.04 vs baseline)
+  tangent - normal = +0.07
+```
+
+切向注入强于法向注入，且两者都强于 baseline。这**部分支持**"共振式干预"假说：顺着自然轨迹的干预更有效。
+
+但在 def route 中，切向和法向几乎相同（0.42 vs 0.43），说明这个效应是路径依赖的。
+
+#### 发现2：donor 方向主要是法向（垂直于轨迹）
+
+```text
+GLM4: |normal| / |u| ≈ 80-85%
+DS7B: |normal| / |u| ≈ 80-85%
+```
+
+尽管 donor 方向主要是法向，但切向分量（仅 15-20%）的注入效果在 GLM4 sent route 中反而更强。这说明：小切向分量可能更有效地调制生成轨迹。
+
+#### 发现3：repeat4(rocket) 在 GLM4 sent route 最强
+
+```text
+glm4 sent<-def:
+  repeat4(rocket) = 0.54（最高）
+  semantic_specificity = +0.17（最高）
+```
+
+rocket 的语义特异性最高，不是通用门效应。
+
+#### 发现4：弛豫长度普遍很短
+
+```text
+所有模型所有条件 mean_relaxation_length ≤ 2.2
+GLM4 所有条件 = 0.0
+```
+
+target token 在 one-shot 注入后几乎不持续——注入效果在第一步就消失。这说明 one-shot 注入是"点火"而非"持续驱动"。
+
+#### 发现5：qwen3 baseline 弛豫长但 repeat2 短
+
+```text
+qwen3 sent<-def:
+  baseline relax = 0.97
+  repeat2 relax = 0.60
+  random relax = 0.15
+```
+
+baseline 的弛豫比 repeat2 长，说明注入实际上缩短了 target 持续性。random 最短。
+
+#### 发现6：DS7B normal > tangent
+
+```text
+ds7b sent<-def:
+  tangent = 0.21, normal = 0.29
+  tangent - normal = -0.08
+```
+
+DS7B 法向强于切向，与 GLM4 相反。这说明不同模型的动力学区间不同。
+
+### 运行时间
+
+```text
+qwen3: 1.03 min
+glm4:  19.9 min
+ds7b:  8.58 min
+```
+
+### 本阶段结论
+
+1. **切向 vs 法向效应是模型和路径依赖的。**
+   GLM4 sent route 支持切向 > 法向；DS7B 和 def route 不支持。不能笼统说"切向干预更好"。
+
+2. **donor 方向主要是法向（80-85%）。**
+   但小切向分量在 GLM4 中反而更有效。这可能是因为法向分量容易把轨迹推离流形，而切向分量顺着流形调制。
+
+3. **弛豫长度极短（0-2 步）。**
+   one-shot 注入是"点火"不是"持续驱动"。target token 在注入后几乎立即消失。这与 Phase 560 的"连续注入破坏生成"一致——如果效果不能持续，连续注入反而干扰。
+
+4. **repeat4(rocket) 语义特异性最高（GLM4 sent = +0.17）。**
+   rocket 的恢复效应不是通用门，而是语义特异的。
+
+5. **退化分类显示 one-shot 注入不破坏生成质量。**
+   所有条件 normal rate ≥ 0.92，没有明显退化。
+
+6. **GLM4 是唯一显示清晰切向优势的模型。**
+   这与 Phase 558-561 一致：GLM4 是语义恢复链最清晰的模型。
+
+### 硬伤
+
+```text
+1. 弛豫长度定义粗（基于 token_type 而非 hidden state 距离）
+2. 切向只用 step 0→1 的 hidden state 差，不是完整轨迹切向
+3. 未测动态 donor（donor cache 随上下文更新）
+4. 未测有限时间李雅普诺夫指数
+5. alpha=6.0 固定，未做 alpha sweep
+6. 6 个种子可能不足以确认切向/法向差异的稳定性
+7. def route 的切向几乎为零（|tangent|≈0.5），分解可能不稳定
+```
+
+### 理论修正
+
+Phase561 后公式：
+```text
+R_generation(beta, donor) 跨模型不一致
+```
+
+Phase562 后进一步：
+```text
+R_generation(direction_type, route, model) 跨模型和路径不一致
+
+GLM4 sent route: tangent > normal > baseline → 支持共振式干预
+DS7B sent route: normal > tangent → 不支持
+def route: tangent ≈ normal → 无差异
+
+donor direction 主要法向（80-85%），但小切向分量可能更有效（GLM4）
+弛豫长度极短（0-2步）→ one-shot 是点火不是持续驱动
+```
+
+### 下一步任务
+
+Phase563 应做：
+```text
+1. 动态 donor 对照：donor cache 随生成上下文更新，比较 R_dynamic vs R_static
+2. 更精细的弛豫测量：用 hidden state 距离而非 token_type
+3. 有限时间李雅普诺夫指数：测扰动放大/收敛率
+4. alpha sweep：不同注入强度下的切向/法向效应
+5. 轨迹距离：完整轨迹的 D_traj 度量
+```
+
+### 结果文件
+
+```text
+results/glm5_phase562_trajectory_response/
+  phase562_qwen3_trajectory_response.json
+  phase562_glm4_trajectory_response.json
+  phase562_deepseek7b_trajectory_response.json
+  phase562_cross_model_summary.md
+```
