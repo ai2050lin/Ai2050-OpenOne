@@ -49717,3 +49717,303 @@ results/glm5_phase559_prototype_generation_closure/
 results/glm5_phase559_confirm/
   phase559_glm4_prototype_generation_closure.json
 ```
+
+## Phase 560: Continuous Static Prototype Surgery Audit [2026-06-20 17:33]
+
+### 判断与目标
+
+附件对 Phase559 的核心判断基本正确：Phase559 把结论从 next-token margin 推进到 generation closure；mean_cache 在 next-token 层面强，但自然生成中不稳定；repeat2=helicopter 与 repeat4=rocket 在 Phase559 生成层面更稳定；random_cache 不是稳定弱对照。Phase560 因此测试一个直接问题：
+
+```text
+如果 prototype 失败只是因为 one-shot 注入不够，那么每一步连续注入同一个 donor cache 是否能提高生成闭合？
+```
+
+本轮实现 continuous_static surgery：在每个生成 token 上重新注入同一个 donor cache。
+
+### 新增脚本
+
+```text
+tests/glm5/phase560_continuous_prototype_surgery.py
+tests/glm5/phase560_continuous_prototype_surgery_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+train-n = 12
+test-n = 12
+sample-seeds = 101,103,107,109,113,127,131,137
+routes =
+  forbidden_sentence_completion:temperature<-forbidden_definition
+  forbidden_definition:top_p<-forbidden_definition
+conditions =
+  baseline
+  resid_remove_perp
+  resid_donor_vehicle_repeat0_add
+  resid_donor_vehicle_repeat2_add
+  resid_donor_vehicle_repeat4_add
+  resid_donor_vehicle_repeat10_add
+  resid_donor_vehicle_mean_cache_add
+  resid_donor_vehicle_pca1_cache_add
+  resid_donor_vehicle_random_cache_add
+surgery_mode = continuous_static
+max-new-tokens = 12
+batch-size = 12
+```
+
+层位：
+
+```text
+Qwen3: L10,L12,L14
+GLM4: L24,L26,L28
+DS7B: L16,L18,L20
+```
+
+### 执行命令
+
+```bash
+python tests/glm5/phase560_continuous_prototype_surgery.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,resid_remove_perp,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat10_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_random_cache_add \
+  --layer-sets all \
+  --surgery-mode continuous_static \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase560_continuous_prototype_surgery \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase560_continuous_prototype_surgery.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,resid_remove_perp,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat10_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_random_cache_add \
+  --layer-sets all \
+  --surgery-mode continuous_static \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase560_continuous_prototype_surgery \
+  --hard-exit-after-model
+
+python tests/glm5/phase560_continuous_prototype_surgery.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127,131,137 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,resid_remove_perp,resid_donor_vehicle_repeat0_add,resid_donor_vehicle_repeat2_add,resid_donor_vehicle_repeat4_add,resid_donor_vehicle_repeat10_add,resid_donor_vehicle_mean_cache_add,resid_donor_vehicle_pca1_cache_add,resid_donor_vehicle_random_cache_add \
+  --layer-sets all \
+  --surgery-mode continuous_static \
+  --remove-scale 1.0 \
+  --add-alpha 6.0 \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase560_continuous_prototype_surgery \
+  --hard-exit-after-model
+
+python tests/glm5/phase560_continuous_prototype_surgery_summary.py
+
+python -m py_compile \
+  tests/glm5/phase560_continuous_prototype_surgery.py \
+  tests/glm5/phase560_continuous_prototype_surgery_summary.py
+```
+
+### 客观结果
+
+对象审计：
+
+```text
+repeat0 = tram
+repeat2 = helicopter
+repeat4 = rocket
+repeat10 = sled
+```
+
+Route 1:
+
+```text
+forbidden_sentence_completion:temperature<-forbidden_definition
+
+Qwen3:
+  baseline 0.48
+  remove 0.61
+  repeat2 0.00
+  repeat4 0.01
+  mean_cache 0.02
+  random_cache 0.00
+
+GLM4:
+  baseline 0.25
+  remove 0.22
+  repeat2 0.01
+  repeat4 0.00
+  mean_cache 0.00
+  random_cache 0.01
+
+DS7B:
+  baseline 0.22
+  remove 0.25
+  repeat2 0.00
+  repeat4 0.00
+  mean_cache 0.00
+  random_cache 0.00
+```
+
+Route 2:
+
+```text
+forbidden_definition:top_p<-forbidden_definition
+
+Qwen3:
+  baseline 0.26
+  remove 0.28
+  repeat2 0.00
+  repeat4 0.00
+  mean_cache 0.00
+  random_cache 0.00
+
+GLM4:
+  baseline 0.41
+  remove 0.29
+  repeat2 0.00
+  repeat4 0.00
+  mean_cache 0.00
+  random_cache 0.00
+
+DS7B:
+  baseline 0.17
+  remove 0.21
+  repeat2 0.00
+  repeat4 0.00
+  mean_cache 0.00
+  random_cache 0.01
+```
+
+运行时间：
+
+```text
+Qwen3: 18.80 min
+GLM4: 33.74 min
+DS7B: 25.62 min
+```
+
+### 结论
+
+1. continuous_static 没有让 mean_cache 变强。
+
+```text
+三模型、两条 route 中，mean_cache 连续静态注入基本为 0。
+```
+
+2. Phase559 中 repeat2/repeat4 的生成效果，不能通过“每步重复同一 donor cache”维持。
+
+3. continuous_static 是破坏性干预。
+
+```text
+repeat0/repeat2/repeat4/repeat10/mean/pca1/random 几乎全部归零。
+```
+
+这说明生成支持不是把同一个向量持续覆盖到每个 token；有效路径更可能是动态门控、低强度调制、或随上下文更新的 route-specific state。
+
+4. resid_remove_perp 的必要性仍然模型和 route 相关：
+
+```text
+GLM4 definition route: baseline 0.41 -> remove 0.29
+Qwen3 与 DS7B: remove 不稳定，甚至反升
+```
+
+### 硬伤
+
+```text
+1. continuous_static 使用同一个 donor cache 反复注入，不是 donor prompt 随生成动态演化的 cache。
+2. add-alpha=6.0 可能过强。
+3. hooked 层 KV cache 可能仍保留未修改 keys/values。
+4. DS7B definition route baseline score 偏低。
+5. 当前缺少语法破坏、标点破坏、生成长度异常的细分指标。
+```
+
+### 理论修正
+
+Phase559 后：
+
+```text
+R_generation = P_mean(unstable) + P_exemplar(strong,stable) + T + B_weak + E
+```
+
+Phase560 后：
+
+```text
+R_generation != StaticContinuous(P)
+
+R_generation = D_t(P, T, B, C_t) + G_t + E_t
+```
+
+其中：
+
+```text
+P = 原型/样例状态
+T = 任务与脚手架路径
+B = 对象绑定
+C_t = 当前生成上下文状态
+G_t = 生成门/解码门
+E_t = 噪声与释放项
+D_t = 随 token 步动态变化的调制函数
+```
+
+### 下一步任务
+
+Phase561 应做 gated continuous injection：
+
+```text
+1. one-shot 与 continuous 在同一脚本中对照。
+2. 低强度 beta 混合：
+   h' = (1 - beta) h_current + beta h_donor
+   beta = 0.05, 0.10, 0.25, 0.50, 1.00
+3. add-alpha sweep:
+   alpha = 0.5, 1.0, 2.0, 4.0, 6.0
+4. donor:
+   repeat2, repeat4, mean_cache, random_cache
+5. 指标：
+   clean_non_object_rate
+   object_echo_rate
+   label_rate
+   punctuation/format break rate
+   average generated length
+6. 判断是否存在非破坏性的低强度连续调制区间。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase560_smoke/
+  phase560_qwen3_continuous_static_prototype_surgery.json
+
+results/glm5_phase560_continuous_prototype_surgery/
+  phase560_qwen3_continuous_static_prototype_surgery.json
+  phase560_glm4_continuous_static_prototype_surgery.json
+  phase560_deepseek7b_continuous_static_prototype_surgery.json
+  phase560_continuous_static_cross_model_summary.md
+```

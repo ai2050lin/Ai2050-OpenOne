@@ -31474,3 +31474,152 @@ definition<-definition
 3. random_cache 是否继续在生成层面失败。
 4. same/shuffle 是否仍无显著差异。
 ```
+
+## Phase 560: Continuous Static Prototype Surgery Audit [2026-06-20 17:33]
+
+### 判断与目标
+
+附件对 Phase559 的核心判断基本正确：Phase559 把结论从 next-token margin 推进到 generation closure；mean_cache 在 next-token 层面强，但自然生成中不稳定；repeat2=helicopter 与 repeat4=rocket 在 Phase559 生成层面更稳定；random_cache 不是稳定弱对照。Phase560 因此测试：
+
+```text
+如果 prototype 失败只是因为 one-shot 注入不够，那么每一步连续注入同一个 donor cache 是否能提高生成闭合？
+```
+
+本轮实现 continuous_static surgery：在每个生成 token 上重新注入同一个 donor cache。
+
+### 脚本
+
+```text
+tests/glm5/phase560_continuous_prototype_surgery.py
+tests/glm5/phase560_continuous_prototype_surgery_summary.py
+```
+
+### 范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+train-n = 12
+test-n = 12
+sample-seeds = 101,103,107,109,113,127,131,137
+routes =
+  forbidden_sentence_completion:temperature<-forbidden_definition
+  forbidden_definition:top_p<-forbidden_definition
+conditions =
+  baseline
+  resid_remove_perp
+  repeat0/repeat2/repeat4/repeat10 donor add
+  mean_cache
+  pca1_cache
+  random_cache
+surgery_mode = continuous_static
+```
+
+层位：
+
+```text
+Qwen3: L10,L12,L14
+GLM4: L24,L26,L28
+DS7B: L16,L18,L20
+```
+
+### 客观结果
+
+```text
+Route 1: forbidden_sentence_completion:temperature<-forbidden_definition
+
+Qwen3:
+  baseline 0.48, remove 0.61, repeat2 0.00, repeat4 0.01, mean 0.02, random 0.00
+GLM4:
+  baseline 0.25, remove 0.22, repeat2 0.01, repeat4 0.00, mean 0.00, random 0.01
+DS7B:
+  baseline 0.22, remove 0.25, repeat2 0.00, repeat4 0.00, mean 0.00, random 0.00
+
+Route 2: forbidden_definition:top_p<-forbidden_definition
+
+Qwen3:
+  baseline 0.26, remove 0.28, repeat2 0.00, repeat4 0.00, mean 0.00, random 0.00
+GLM4:
+  baseline 0.41, remove 0.29, repeat2 0.00, repeat4 0.00, mean 0.00, random 0.00
+DS7B:
+  baseline 0.17, remove 0.21, repeat2 0.00, repeat4 0.00, mean 0.00, random 0.01
+```
+
+运行时间：
+
+```text
+Qwen3: 18.80 min
+GLM4: 33.74 min
+DS7B: 25.62 min
+```
+
+### 结论
+
+```text
+continuous_static 没有让 mean_cache 变强。
+repeat2/repeat4 的 Phase559 one-shot generation 效果无法通过每步重复同一 donor cache 维持。
+三模型两条 route 中 donor 连续静态注入几乎全部把 clean_non_object_rate 压到 0。
+```
+
+这说明类别支持不是把同一个向量持续覆盖到每个 token。有效路径更可能是动态门控、低强度调制、或随生成上下文更新的 route-specific state。
+
+### 硬伤
+
+```text
+1. continuous_static 使用同一个 donor cache 反复注入，不是 donor prompt 随生成动态演化的 cache。
+2. add-alpha=6.0 可能过强。
+3. hooked 层 KV cache 可能仍保留未修改 keys/values。
+4. DS7B definition route baseline score 偏低。
+5. 缺少生成文本语法破坏、标点破坏、长度异常的细分。
+```
+
+### 理论修正
+
+```text
+R_generation != StaticContinuous(P)
+
+R_generation = D_t(P, T, B, C_t) + G_t + E_t
+```
+
+其中：
+
+```text
+P = 原型/样例状态
+T = 任务与脚手架路径
+B = 对象绑定
+C_t = 当前生成上下文状态
+G_t = 生成门/解码门
+E_t = 噪声与释放项
+D_t = 随 token 步动态变化的调制函数
+```
+
+### 下一步任务
+
+Phase561 应做 gated continuous injection：
+
+```text
+1. one-shot 与 continuous 在同一脚本中对照。
+2. 低强度 beta 混合：
+   h' = (1 - beta) h_current + beta h_donor
+   beta = 0.05, 0.10, 0.25, 0.50, 1.00
+3. add-alpha sweep:
+   alpha = 0.5, 1.0, 2.0, 4.0, 6.0
+4. donor:
+   repeat2, repeat4, mean_cache, random_cache
+5. 指标：
+   clean_non_object_rate
+   object_echo_rate
+   label_rate
+   punctuation/format break rate
+   average generated length
+```
+
+### 结果文件
+
+```text
+results/glm5_phase560_continuous_prototype_surgery/
+  phase560_qwen3_continuous_static_prototype_surgery.json
+  phase560_glm4_continuous_static_prototype_surgery.json
+  phase560_deepseek7b_continuous_static_prototype_surgery.json
+  phase560_continuous_static_cross_model_summary.md
+```
