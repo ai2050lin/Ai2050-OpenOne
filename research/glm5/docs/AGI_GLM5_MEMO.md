@@ -50490,3 +50490,1933 @@ results/glm5_phase562_trajectory_response/
   phase562_deepseek7b_trajectory_response.json
   phase562_cross_model_summary.md
 ```
+
+## Phase 563: Hidden Trajectory Distance and Finite-Time Response Audit [2026-06-20 23:05]
+
+### 本阶段目标
+
+根据 Phase562 的结果和外部分析，Phase562 的总体判断基本正确：
+
+```text
+1. 研究已经从强度扫描进入轨迹动力学测量。
+2. one-shot 注入在 token 层面弛豫很短，不能解释为持续驱动。
+3. tangent/normal 的效果是模型、路径和任务依赖的，不是普遍规律。
+4. donor 方向大部分在 normal 分量上，但有效成分不一定来自最大分量。
+```
+
+但 Phase562 最大硬伤是：
+
+```text
+token_type 弛豫不是 hidden state 弛豫。
+```
+
+所以 Phase563 不继续做理论扩展，而是补一个关键客观测量：
+
+```text
+对同一 seed 的 baseline hidden trajectory 做参照，
+测量干预后每一步 hidden state 与 baseline 的距离、
+距离比例、hidden relaxation step、finite-time log growth 和完整 trajectory distance。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase563_hidden_trajectory_distance.py
+tests/glm5/phase563_hidden_trajectory_distance_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+routes =
+  forbidden_sentence_completion:temperature <- forbidden_definition
+  forbidden_definition:top_p <- forbidden_definition
+
+qwen3 windows = 10,12,14
+glm4 windows = 24,26,28
+deepseek7b windows = 16,18,20
+
+train-n = 12
+test-n = 12
+sample seeds = 101,103,107,109,113,127
+max_new_tokens = 12
+batch_size = 12
+
+conditions =
+  baseline
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_mean
+  one_shot_random
+  add_tangent_repeat2
+  add_normal_repeat2
+
+hidden_relax_step epsilon_ratio = 0.25
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase563_hidden_trajectory_distance.py \
+  tests/glm5/phase563_hidden_trajectory_distance_summary.py
+
+python tests/glm5/phase563_hidden_trajectory_distance.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_mean,one_shot_random,add_tangent_repeat2,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase563_hidden_trajectory_distance \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase563_hidden_trajectory_distance.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_mean,one_shot_random,add_tangent_repeat2,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase563_hidden_trajectory_distance \
+  --hard-exit-after-model
+
+python tests/glm5/phase563_hidden_trajectory_distance.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_mean,one_shot_random,add_tangent_repeat2,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase563_hidden_trajectory_distance \
+  --hard-exit-after-model
+
+python tests/glm5/phase563_hidden_trajectory_distance_summary.py
+
+python -m py_compile \
+  tests/glm5/phase563_hidden_trajectory_distance.py \
+  tests/glm5/phase563_hidden_trajectory_distance_summary.py
+```
+
+### 运行时间
+
+```text
+qwen3:      9.00 min
+glm4:      16.08 min
+deepseek7b:12.38 min
+```
+
+DS7B 运行较长但没有脚本异常，进度持续推进，最终正常释放 GPU memory。
+
+### 客观结果一：sentence completion <- definition
+
+clean_non_object_rate：
+
+```text
+qwen3:
+  baseline 0.54
+  repeat2 0.47
+  repeat4 0.40
+  mean    0.44
+  random  0.49
+  tangent 0.49
+  normal  0.53
+
+glm4:
+  baseline 0.25
+  repeat2 0.39
+  repeat4 0.46
+  mean    0.32
+  random  0.31
+  tangent 0.36
+  normal  0.39
+
+deepseek7b:
+  baseline 0.22
+  repeat2 0.22
+  repeat4 0.17
+  mean    0.18
+  random  0.14
+  tangent 0.14
+  normal  0.18
+```
+
+hidden_relax_step：
+
+```text
+qwen3:
+  repeat2 1.00
+  repeat4 2.83
+  random  12.00
+  tangent 6.50
+  normal  2.83
+
+glm4:
+  repeat2 12.00
+  repeat4 12.00
+  mean    10.17
+  random  12.00
+  tangent 12.00
+  normal  8.33
+
+deepseek7b:
+  repeat2 12.00
+  repeat4 12.00
+  mean    10.17
+  random  12.00
+  tangent 10.17
+  normal  8.33
+```
+
+finite_time_log_growth：
+
+```text
+qwen3:
+  repeat2 -0.00
+  repeat4 -0.01
+  tangent +0.09
+  normal  +0.09
+
+glm4:
+  repeat2 +0.02
+  repeat4 +0.01
+  tangent +0.08
+  normal  +0.06
+
+deepseek7b:
+  repeat2 +0.01
+  repeat4 +0.01
+  tangent +0.24
+  normal  +0.24
+```
+
+trajectory_distance：
+
+```text
+qwen3:
+  repeat2 411.15
+  repeat4 383.98
+  random  556.53
+  tangent 325.45
+  normal  283.20
+
+glm4:
+  repeat2 390.81
+  repeat4 377.78
+  random  449.90
+  tangent 377.82
+  normal  287.96
+
+deepseek7b:
+  repeat2 2817.47
+  repeat4 2889.80
+  random  3400.50
+  tangent 1488.60
+  normal  1406.53
+```
+
+### 客观结果二：definition <- definition
+
+clean_non_object_rate：
+
+```text
+qwen3:
+  baseline 0.28
+  repeat2 0.24
+  repeat4 0.31
+  mean    0.24
+  random  0.32
+  tangent 0.28
+  normal  0.28
+
+glm4:
+  baseline 0.39
+  repeat2 0.36
+  repeat4 0.35
+  mean    0.36
+  random  0.38
+  tangent 0.33
+  normal  0.42
+
+deepseek7b:
+  baseline 0.17
+  repeat2 0.17
+  repeat4 0.19
+  mean    0.21
+  random  0.14
+  tangent 0.17
+  normal  0.17
+```
+
+hidden_relax_step：
+
+```text
+qwen3:
+  repeat2 4.67
+  repeat4 4.67
+  mean    4.67
+  random  12.00
+  tangent 12.00
+  normal  6.50
+
+glm4:
+  repeat2 12.00
+  repeat4 12.00
+  mean    12.00
+  random  12.00
+  tangent 12.00
+  normal  12.00
+
+deepseek7b:
+  repeat2 12.00
+  repeat4 12.00
+  mean    12.00
+  random  12.00
+  tangent 12.00
+  normal  6.50
+```
+
+trajectory_distance：
+
+```text
+qwen3:
+  repeat2 264.85
+  repeat4 282.99
+  random  573.78
+  tangent 338.74
+  normal  267.06
+
+glm4:
+  repeat2 334.60
+  repeat4 349.67
+  random  473.29
+  tangent 324.10
+  normal  299.24
+
+deepseek7b:
+  repeat2 1826.77
+  repeat4 2021.58
+  random  3418.92
+  tangent 1152.61
+  normal  1068.71
+```
+
+### 当前最可靠现象
+
+1. **Phase562 的 token-level 短弛豫不等于 hidden-level 短弛豫。**
+
+Phase562 看到 token_type 常在 0-2 步内消失；Phase563 看到 hidden_relax_step 经常达到 12，即在 12 token 窗口内仍未回到 baseline trajectory 附近。
+
+2. **hidden trajectory perturbation 可以持续存在，但不一定带来更好生成。**
+
+GLM4 sentence route 中 repeat4 clean_non_object_rate 从 baseline 0.25 提高到 0.46，同时 hidden_relax_step = 12。  
+但 DS7B tangent/normal 的 finite_time_log_growth 高达 +0.24，clean_non_object_rate 反而下降到 0.14/0.18。
+
+3. **random hidden trajectory distance 最大，说明距离大不等于语义好。**
+
+例如 sentence route：
+
+```text
+qwen3 random trajectory_distance = 556.53
+glm4 random trajectory_distance = 449.90
+deepseek7b random trajectory_distance = 3400.50
+```
+
+random 通常不是最佳 clean_non_object_rate，因此 trajectory_distance 只能表示偏离强度，不能表示语义方向正确。
+
+4. **normal 的 hidden trajectory distance 通常小于 tangent。**
+
+sentence route：
+
+```text
+qwen3 tangent 325.45 > normal 283.20
+glm4 tangent 377.82 > normal 287.96
+deepseek7b tangent 1488.60 > normal 1406.53
+```
+
+definition route 也同向：
+
+```text
+qwen3 tangent 338.74 > normal 267.06
+glm4 tangent 324.10 > normal 299.24
+deepseek7b tangent 1152.61 > normal 1068.71
+```
+
+这说明当前 step0->step1 tangent 不是稳定的低扰动流形方向。它可能包含“生成启动方向”，但不是完整轨迹切线。
+
+5. **GLM4 仍是最清晰的语义恢复模型。**
+
+sentence route：
+
+```text
+baseline 0.25
+repeat2 0.39
+repeat4 0.46
+normal  0.39
+tangent 0.36
+```
+
+这延续 Phase558-562 的主线：GLM4 的 vehicle_tool 路径更适合做机制闭合。
+
+6. **DS7B 对 perturbation 更敏感。**
+
+DS7B hidden trajectory_distance 远大于 Qwen3/GLM4，尤其 random 和 tangent/normal：
+
+```text
+DS7B sentence random = 3400.50
+DS7B sentence tangent = 1488.60
+DS7B sentence normal  = 1406.53
+```
+
+但 clean_non_object_rate 没有同步提高。DS7B 更像高敏感但低可控。
+
+### 对 Phase562 外部分析的判定
+
+外部分析正确部分：
+
+```text
+1. Phase562 是从强度扫描进入轨迹动力学测量的关键节点。
+2. token-level relaxation 不能直接等价为机制闭合。
+3. 必须测 hidden trajectory、有限时间增长率、trajectory distance。
+4. dynamic donor 应作为下一阶段关键任务。
+```
+
+需要修正部分：
+
+```text
+1. 不能把 tangent advantage 当成通用规律。
+   Phase563 中 normal 多数情况下 trajectory_distance 更小，clean rate 也常不差。
+
+2. 不能把 hidden distance persistence 当成成功。
+   random 也能产生大距离，但不产生语义改善。
+
+3. 不能把 one-shot 解释成“完全消失”。
+   token 层面消失很快，但 hidden 层面扰动可持续到 12 token。
+```
+
+### 理论进展
+
+Phase562 后的简化公式：
+
+```text
+R_generation = f(model, route, direction_type, one_shot)
+```
+
+Phase563 后必须加入 hidden trajectory：
+
+```text
+R_generation != g(D_hidden) alone
+```
+
+更准确地说：
+
+```text
+R_generation = f(
+  semantic_alignment,
+  hidden_trajectory_distance,
+  finite_time_growth,
+  route_gate,
+  model_stability,
+  decoder_selection
+)
+```
+
+其中：
+
+```text
+hidden_trajectory_distance 大只说明轨迹偏离 baseline；
+semantic_alignment 决定偏离是否朝正确语义方向；
+finite_time_growth 决定扰动是否被模型放大；
+route_gate 决定该偏离能否进入输出路径；
+model_stability 决定偏离是可控调制还是失控漂移；
+decoder_selection 决定内部改善是否转化为 token。
+```
+
+当前阶段最重要的公式修正：
+
+```text
+语义恢复 = 方向正确性 × 轨迹可控性 × 生成门通过率
+```
+
+也就是：
+
+```text
+R_semantic ≈ A_semantic · C_trajectory · G_generation
+```
+
+其中：
+
+```text
+A_semantic: donor/intervention 是否包含目标语义结构
+C_trajectory: hidden trajectory 是否可控、不过度发散
+G_generation: 生成门是否允许该内部结构进入输出 token
+```
+
+Phase563 证明：
+
+```text
+D_trajectory alone 不足以解释 R_semantic。
+```
+
+### 硬伤
+
+```text
+1. baseline 与 intervention 后续 token 可能不同，后期 hidden distance 混合了“内部扰动”和“内容分叉”。
+2. tangent 仍然只用 step0->step1，不是全轨迹 tangent。
+3. 没有做 dynamic donor，donor cache 仍来自固定 prompt。
+4. alpha 固定为 6，没有测强度曲线。
+5. 只测 vehicle_tool pair，不能推广到其它类别接口。
+6. 只测 6 个 seed，足够看趋势，但不足以做最终稳定性判断。
+7. hidden_relax_step 的 epsilon_ratio=0.25 是人为阈值，需要阈值敏感性分析。
+```
+
+### 下一步任务：Phase564
+
+Phase564 不应继续盲目增加静态注入条件，而应做：
+
+```text
+Dynamic Donor Trajectory and Matched-Token Hidden Audit
+```
+
+核心目标：
+
+```text
+把“hidden trajectory persistence”拆成两部分：
+1. 真正的内部扰动持续
+2. 生成 token 分叉导致的后续状态差异
+```
+
+建议方案：
+
+```text
+1. matched-token teacher forcing:
+   baseline 和 intervention 使用相同 generated token 序列重新 forward，
+   测 hidden distance，隔离 token 分叉影响。
+
+2. free-generation trajectory:
+   保留当前 Phase563 方法，测真实输出链路。
+
+3. dynamic donor cache:
+   donor 也按当前生成上下文逐步更新，而不是固定 repeat2/repeat4 cache。
+
+4. 对 GLM4 sentence route 做主测试：
+   因为 GLM4 是目前最清晰的语义恢复链。
+
+5. qwen3/deepseek7b 做对照：
+   不必扩大条件，但必须保留跨模型验证。
+```
+
+Phase564 判据：
+
+```text
+如果 matched-token 下 hidden distance 仍持续：
+  说明 one-shot 注入确实改变内部动力学轨道。
+
+如果 matched-token 下 hidden distance 快速消失，但 free-generation 下持续：
+  说明 Phase563 的持续距离主要来自 token 分叉。
+
+如果 dynamic donor 提升 GLM4 sentence route，且 random/dynamic control 不提升：
+  说明语义路径需要随上下文协变更新，而不是静态原型注入。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase563_hidden_trajectory_distance/
+  phase563_qwen3_hidden_trajectory_distance.json
+  phase563_glm4_hidden_trajectory_distance.json
+  phase563_deepseek7b_hidden_trajectory_distance.json
+  phase563_cross_model_summary.md
+```
+
+## Phase 564: Matched-Token Hidden Trajectory Audit [2026-06-21 00:35]
+
+### 本阶段目标
+
+根据 Phase563 的结果和外部分析，Phase563 的总体判断基本正确：
+
+```text
+1. token-level relaxation 不等于 hidden-level relaxation。
+2. hidden trajectory distance 大不等于语义成功。
+3. GLM4 仍然是 vehicle_tool 路径中最清晰的语义恢复模型。
+4. DS7B 是高敏感但低可控模型。
+```
+
+但 Phase563 的最大硬伤是：
+
+```text
+free generation 中 baseline 与 intervention 后续 token 可能分叉，
+所以 hidden trajectory distance 混入了 token divergence。
+```
+
+因此 Phase564 直接做 matched-token teacher forcing：
+
+```text
+free:
+  baseline free generation vs intervention free generation
+
+matched_base:
+  baseline 和 intervention 都强制走 baseline generated tokens
+
+matched_condition:
+  baseline 和 intervention 都强制走 intervention generated tokens
+```
+
+核心判据：
+
+```text
+如果 matched-token 下 hidden distance 仍持续：
+  one-shot 注入确实改变内部动力学轨道。
+
+如果 matched-token 下 hidden distance 快速消失：
+  Phase563 free hidden distance 的持续主要来自 token 分叉。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase564_matched_token_hidden_audit.py
+tests/glm5/phase564_matched_token_hidden_audit_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+
+routes =
+  forbidden_sentence_completion:temperature <- forbidden_definition
+  forbidden_definition:top_p <- forbidden_definition
+
+qwen3 windows = 10,12,14
+glm4 windows = 24,26,28
+deepseek7b windows = 16,18,20
+
+train-n = 12
+test-n = 12
+sample seeds = 101,103,107,109,113,127
+max_new_tokens = 12
+batch_size = 12
+
+conditions =
+  baseline
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_random
+  add_normal_repeat2
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase564_matched_token_hidden_audit.py \
+  tests/glm5/phase564_matched_token_hidden_audit_summary.py
+
+python tests/glm5/phase564_matched_token_hidden_audit.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase564_matched_token_hidden_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase564_matched_token_hidden_audit.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase564_matched_token_hidden_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase564_matched_token_hidden_audit.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --conditions baseline,one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase564_matched_token_hidden_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase564_matched_token_hidden_audit_summary.py
+
+python -m py_compile \
+  tests/glm5/phase564_matched_token_hidden_audit.py \
+  tests/glm5/phase564_matched_token_hidden_audit_summary.py
+```
+
+### 运行时间
+
+```text
+qwen3:      16.03 min
+glm4:      28.85 min
+deepseek7b:22.18 min
+```
+
+### 客观结果一：sentence completion <- definition
+
+clean_non_object_rate：
+
+```text
+qwen3:
+  baseline 0.54
+  repeat2 0.47
+  repeat4 0.40
+  random  0.49
+  normal  0.53
+
+glm4:
+  baseline 0.25
+  repeat2 0.39
+  repeat4 0.46
+  random  0.31
+  normal  0.39
+
+deepseek7b:
+  baseline 0.22
+  repeat2 0.22
+  repeat4 0.17
+  random  0.14
+  normal  0.18
+```
+
+token divergence：
+
+```text
+qwen3:
+  repeat2 exact_match 0.04, first_div 2.29
+  repeat4 exact_match 0.08, first_div 2.90
+  random  exact_match 0.00, first_div 0.01
+  normal  exact_match 0.22, first_div 4.71
+
+glm4:
+  repeat2 exact_match 0.01, first_div 0.76
+  repeat4 exact_match 0.01, first_div 0.89
+  random  exact_match 0.00, first_div 0.00
+  normal  exact_match 0.15, first_div 2.81
+
+deepseek7b:
+  repeat2 exact_match 0.01, first_div 1.44
+  repeat4 exact_match 0.01, first_div 1.31
+  random  exact_match 0.00, first_div 0.17
+  normal  exact_match 0.28, first_div 5.79
+```
+
+free vs matched_base trajectory_distance：
+
+```text
+qwen3:
+  repeat2 free 411.15 -> matched_base 55.76, retention 0.14
+  repeat4 free 383.98 -> matched_base 55.94, retention 0.15
+  random  free 556.53 -> matched_base 75.89, retention 0.14
+  normal  free 283.20 -> matched_base 16.25, retention 0.06
+
+glm4:
+  repeat2 free 390.81 -> matched_base 43.00, retention 0.11
+  repeat4 free 377.78 -> matched_base 45.90, retention 0.12
+  random  free 449.90 -> matched_base 69.71, retention 0.15
+  normal  free 287.96 -> matched_base 17.85, retention 0.06
+
+deepseek7b:
+  repeat2 free 2817.47 -> matched_base 353.23, retention 0.13
+  repeat4 free 2889.80 -> matched_base 358.69, retention 0.12
+  random  free 3400.50 -> matched_base 527.61, retention 0.16
+  normal  free 1406.53 -> matched_base 24.24, retention 0.02
+```
+
+hidden_relax_step：
+
+```text
+free:
+  qwen3 repeat2 1.00, repeat4 2.83, random 12.00, normal 2.83
+  glm4  repeat2 12.00, repeat4 12.00, random 12.00, normal 8.33
+  ds7b  repeat2 12.00, repeat4 12.00, random 12.00, normal 8.33
+
+matched_base:
+  all models, all non-baseline conditions = 1.00
+
+matched_condition:
+  all models, all non-baseline conditions = 1.00
+```
+
+matched finite_time_growth：
+
+```text
+matched_base:
+  qwen3 about -0.33 to -0.39
+  glm4  about -0.30 to -0.33
+  ds7b  about -0.23 to -0.36
+
+matched_condition:
+  qwen3 about -0.31 to -0.41
+  glm4  about -0.33 to -0.35
+  ds7b  about -0.23 to -0.36
+```
+
+### 客观结果二：definition <- definition
+
+clean_non_object_rate：
+
+```text
+qwen3:
+  baseline 0.28
+  repeat2 0.24
+  repeat4 0.31
+  random  0.32
+  normal  0.28
+
+glm4:
+  baseline 0.39
+  repeat2 0.36
+  repeat4 0.35
+  random  0.38
+  normal  0.42
+
+deepseek7b:
+  baseline 0.17
+  repeat2 0.17
+  repeat4 0.19
+  random  0.14
+  normal  0.17
+```
+
+free vs matched_base trajectory_distance：
+
+```text
+qwen3:
+  repeat2 free 264.85 -> matched_base 18.90, retention 0.07
+  repeat4 free 282.99 -> matched_base 19.73, retention 0.07
+  random  free 573.78 -> matched_base 75.83, retention 0.13
+  normal  free 267.06 -> matched_base 14.88, retention 0.06
+
+glm4:
+  repeat2 free 334.60 -> matched_base 25.31, retention 0.08
+  repeat4 free 349.67 -> matched_base 26.03, retention 0.07
+  random  free 473.29 -> matched_base 64.13, retention 0.14
+  normal  free 299.24 -> matched_base 17.46, retention 0.06
+
+deepseek7b:
+  repeat2 free 1826.77 -> matched_base 133.02, retention 0.07
+  repeat4 free 2021.58 -> matched_base 134.89, retention 0.07
+  random  free 3418.92 -> matched_base 512.76, retention 0.15
+  normal  free 1068.71 -> matched_base 24.68, retention 0.02
+```
+
+hidden_relax_step：
+
+```text
+free:
+  qwen3 repeat2 4.67, repeat4 4.67, random 12.00, normal 6.50
+  glm4  repeat2 12.00, repeat4 12.00, random 12.00, normal 12.00
+  ds7b  repeat2 12.00, repeat4 12.00, random 12.00, normal 6.50
+
+matched_base:
+  all models, all non-baseline conditions = 1.00
+
+matched_condition:
+  all models, all non-baseline conditions = 1.00
+```
+
+### 当前最可靠现象
+
+1. **Phase563 中 free hidden trajectory 的大部分持续距离来自 token divergence。**
+
+matched_base 后 trajectory_distance 只保留 free 的约 2%-16%，并且 hidden_relax_step 全部变为 1。
+
+2. **one-shot 注入本身的 hidden perturbation 在相同 token 驱动下快速衰减。**
+
+matched_base 和 matched_condition 中 finite_time_growth 全部为负，约 -0.23 到 -0.43。
+
+3. **free generation 的长距离不是纯内部动力学持续，而是输出分叉后的上下文重写。**
+
+这修正了 Phase563 中“hidden perturbation 可持续到 12 token”的解释。更准确说：
+
+```text
+one-shot perturbation 可以导致早期 token 分叉；
+一旦 token 分叉，后续上下文不同会制造长程 hidden trajectory distance。
+```
+
+4. **GLM4 repeat4 的语义恢复仍然成立，但它不是靠长程隐藏扰动维持。**
+
+GLM4 sentence route：
+
+```text
+baseline 0.25 -> repeat4 0.46
+free_traj 377.78 -> matched_base_traj 45.90
+matched_base_relax = 1
+```
+
+说明 repeat4 的作用更像：
+
+```text
+早期 token selection / route gate shift
+```
+
+而不是：
+
+```text
+持续 hidden-state semantic carrier
+```
+
+5. **normal condition 的 matched retention 最小。**
+
+sentence route：
+
+```text
+qwen3 normal retention 0.06
+glm4 normal retention 0.06
+deepseek7b normal retention 0.02
+```
+
+这说明 normal 对 free trajectory 的影响更多来自改变输出路径，而非持续内部扰动。
+
+6. **random 的 matched retention 相对更高，但语义效果差。**
+
+random retention 经常约 0.13-0.16，但 clean_non_object_rate 不稳定或下降。这再次证明：
+
+```text
+持续扰动不等于语义正确。
+```
+
+### 对 Phase563 外部分析的判定
+
+外部分析正确部分：
+
+```text
+1. Phase563 确实完成了从行为指标到 hidden trajectory 指标的升级。
+2. hidden trajectory distance 大不等于语义成功。
+3. 必须使用 matched-token teacher forcing 拆分 token divergence。
+4. finite-time log growth 不能直接叫 Lyapunov exponent。
+```
+
+需要修正部分：
+
+```text
+1. Phase563 的 hidden_relax_step=12 不能解释为内部扰动持续 12 token。
+   Phase564 显示 matched-token 下基本 1 步弛豫。
+
+2. 当前语义恢复重点不是长程 hidden carrier，而是早期 token/route gate 改变。
+
+3. dynamic donor 仍然重要，但优先级要重新定位：
+   不是为了维持静态隐藏状态，而是为了控制逐步生成门和 token path。
+```
+
+### 理论修正
+
+Phase563 公式：
+
+```text
+R_semantic ≈ A_semantic · C_trajectory · G_generation
+```
+
+Phase564 后需要拆分 C_trajectory：
+
+```text
+C_trajectory = C_internal · C_token_path
+```
+
+其中：
+
+```text
+C_internal:
+  在 matched-token 下的内部扰动持续性。
+
+C_token_path:
+  干预导致 token path 分叉后，新的上下文轨迹是否形成有效输出路径。
+```
+
+Phase564 结果显示：
+
+```text
+C_internal 很短，通常 1 step 弛豫。
+C_token_path 才是 free trajectory 长距离和语义变化的主要来源。
+```
+
+所以最新公式应改为：
+
+```text
+R_semantic ≈ A_semantic · G_early · P_token_path · G_late
+```
+
+解释：
+
+```text
+A_semantic:
+  donor/intervention 是否有正确语义对齐。
+
+G_early:
+  早期生成门是否被推到正确分叉。
+
+P_token_path:
+  分叉后的 token context path 是否稳定承载目标语义。
+
+G_late:
+  后续解码门是否继续允许目标语义输出。
+```
+
+这比 Phase563 的轨迹可控公式更接近语言生成机制：
+
+```text
+语言生成不是隐藏状态单独连续流动；
+而是 hidden state 与已生成 token path 相互递归锁定。
+```
+
+### 硬伤
+
+```text
+1. Phase564 没有实现 dynamic donor，只完成 matched-token audit。
+2. matched-token 使用模型自身生成 token，不是人工统一标准 token。
+3. 只测 vehicle_tool pair。
+4. 只保留 normal，没有继续测 tangent，原因是 Phase563 已显示 tangent 不是稳定低扰动方向。
+5. max_new_tokens=12，不能覆盖更长输出。
+6. teacher forcing 只隔离 token path，不能完全还原自由生成中的概率分布变化。
+```
+
+### 下一步任务：Phase565
+
+Phase565 应从“hidden trajectory persistence”转向“early gate / token path fork”：
+
+```text
+Early Gate and Token Fork Causality Audit
+```
+
+核心目标：
+
+```text
+测量 one-shot intervention 到底在哪一步、通过哪些 logits margin 和 token family gate 改变了后续 token path。
+```
+
+建议方案：
+
+```text
+1. 记录 step0/step1/step2 的 target/competitor/family logits margin。
+2. 对 free generation 的 first divergence step 做分组：
+   early fork: 0-1
+   middle fork: 2-5
+   late/no fork: >=6
+3. 分别统计 clean_non_object_rate。
+4. 做 forced-first-token patch：
+   a. baseline prompt 强制使用 intervention 的第一个 token
+   b. intervention prompt 强制使用 baseline 的第一个 token
+   看语义恢复是否随 first token path 转移。
+5. 优先 GLM4 sentence route，qwen3/deepseek7b 做对照。
+```
+
+Phase565 判据：
+
+```text
+如果 forced first token 能转移大部分 clean_non_object_rate：
+  说明关键机制主要是早期 token path fork。
+
+如果不能转移：
+  说明 first token 只是表面分叉，仍需寻找更深的 route gate。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase564_matched_token_hidden_audit/
+  phase564_qwen3_matched_token_hidden_audit.json
+  phase564_glm4_matched_token_hidden_audit.json
+  phase564_deepseek7b_matched_token_hidden_audit.json
+  phase564_cross_model_summary.md
+```
+
+## Phase 565: Early Gate and Token Fork Causality Audit [2026-06-21 07:57]
+
+### 本阶段目标
+
+根据 Phase564 结果和外部分析，Phase564 的总体判断基本正确：
+
+```text
+1. free hidden trajectory 长距离主要来自 token path divergence。
+2. matched-token 下 hidden perturbation 通常 1 step 弛豫。
+3. GLM4 repeat4 的语义恢复仍成立，但不是靠长程 hidden carrier。
+4. 机制重心应从 hidden carrier 转向 early gate / token path recursive lock。
+```
+
+Phase565 继续追问：
+
+```text
+如果早期 token path fork 是关键，那么强制交换第一个 token 是否能转移语义恢复效果？
+```
+
+核心设计：
+
+```text
+baseline_free:
+  baseline 自由生成。
+
+intervention_free:
+  one-shot intervention 自由生成。
+
+baseline_force_intervention_first:
+  baseline prompt 强制使用 intervention 的第一个生成 token，然后继续自由生成。
+
+intervention_force_baseline_first:
+  intervention prompt 强制使用 baseline 的第一个生成 token，然后继续自由生成。
+```
+
+如果 first token 是主要因果载体：
+
+```text
+baseline_force_intervention_first 应接近 intervention_free。
+intervention_force_baseline_first 应接近 baseline_free。
+```
+
+同时记录：
+
+```text
+step0/step1/step2 target-competitor logits margin
+first_divergence_step
+fork bucket:
+  early_0_1
+  middle_2_5
+  late_or_none_6p
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase565_early_gate_token_fork.py
+tests/glm5/phase565_early_gate_token_fork_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+
+routes =
+  forbidden_sentence_completion:temperature <- forbidden_definition
+  forbidden_definition:top_p <- forbidden_definition
+
+qwen3 windows = 10,12,14
+glm4 windows = 24,26,28
+deepseek7b windows = 16,18,20
+
+train-n = 12
+test-n = 12
+sample seeds = 101,103,107,109,113,127
+max_new_tokens = 12
+batch_size = 12
+
+interventions =
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_random
+  add_normal_repeat2
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase565_early_gate_token_fork.py \
+  tests/glm5/phase565_early_gate_token_fork_summary.py
+
+python tests/glm5/phase565_early_gate_token_fork.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase565_early_gate_token_fork \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase565_early_gate_token_fork.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase565_early_gate_token_fork \
+  --hard-exit-after-model
+
+python tests/glm5/phase565_early_gate_token_fork.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition,forbidden_definition:top_p<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase565_early_gate_token_fork \
+  --hard-exit-after-model
+
+python tests/glm5/phase565_early_gate_token_fork_summary.py
+
+python -m py_compile \
+  tests/glm5/phase565_early_gate_token_fork.py \
+  tests/glm5/phase565_early_gate_token_fork_summary.py
+```
+
+### 运行时间
+
+```text
+qwen3:      16.63 min
+glm4:      29.73 min
+deepseek7b:22.84 min
+```
+
+### 客观结果一：sentence completion <- definition
+
+clean_non_object_rate 与 forced-first-token：
+
+```text
+qwen3:
+  baseline 0.54
+  repeat2 free 0.47, baseline_force_intervention_first 0.56, intervention_force_baseline_first 0.40, first_div 2.29
+  repeat4 free 0.40, baseline_force_intervention_first 0.57, intervention_force_baseline_first 0.39, first_div 2.90
+  random  free 0.49, baseline_force_intervention_first 0.56, intervention_force_baseline_first 0.51, first_div 0.01
+  normal  free 0.53, baseline_force_intervention_first 0.57, intervention_force_baseline_first 0.36, first_div 4.71
+
+glm4:
+  baseline 0.25
+  repeat2 free 0.39, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.35, first_div 0.76
+  repeat4 free 0.46, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.44, first_div 0.89
+  random  free 0.31, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.33, first_div 0.00
+  normal  free 0.39, baseline_force_intervention_first 0.35, intervention_force_baseline_first 0.39, first_div 2.81
+
+deepseek7b:
+  baseline 0.22
+  repeat2 free 0.22, baseline_force_intervention_first 0.15, intervention_force_baseline_first 0.17, first_div 1.44
+  repeat4 free 0.17, baseline_force_intervention_first 0.14, intervention_force_baseline_first 0.18, first_div 1.31
+  random  free 0.14, baseline_force_intervention_first 0.15, intervention_force_baseline_first 0.25, first_div 0.17
+  normal  free 0.18, baseline_force_intervention_first 0.15, intervention_force_baseline_first 0.18, first_div 5.79
+```
+
+step0 target-competitor margin：
+
+```text
+qwen3:
+  baseline 0.45
+  repeat2 1.39
+  repeat4 1.35
+  random  1.25
+  normal  0.61
+
+glm4:
+  baseline -1.28
+  repeat2 3.64
+  repeat4 3.61
+  random -1.44
+  normal  2.09
+
+deepseek7b:
+  baseline 0.81
+  repeat2 -1.76
+  repeat4 -1.29
+  random  0.46
+  normal  0.53
+```
+
+fork bucket：
+
+```text
+qwen3:
+  repeat2 early_rate 0.67, early_clean 0.44, middle_clean 0.33, late_clean 0.89
+  repeat4 early_rate 0.57, early_clean 0.34, middle_clean 0.32, late_clean 0.75
+  normal  early_rate 0.44, early_clean 0.41, middle_clean 0.46, late_clean 0.70
+
+glm4:
+  repeat2 early_rate 0.90, early_clean 0.43, middle_clean 0.00, late_clean 0.00
+  repeat4 early_rate 0.93, early_clean 0.49, middle_clean 0.00, late_clean 0.00
+  normal  early_rate 0.74, early_clean 0.42, middle_clean 0.43, late_clean 0.25
+
+deepseek7b:
+  repeat2 early_rate 0.76, early_clean 0.22, middle_clean 0.29, late_clean 0.00
+  repeat4 early_rate 0.76, early_clean 0.15, middle_clean 0.27, late_clean 0.00
+  normal  early_rate 0.29, early_clean 0.10, middle_clean 0.24, late_clean 0.21
+```
+
+### 客观结果二：definition <- definition
+
+clean_non_object_rate 与 forced-first-token：
+
+```text
+qwen3:
+  baseline 0.28
+  repeat2 free 0.24, bfi 0.18, ifb 0.25, first_div 5.83
+  repeat4 free 0.31, bfi 0.19, ifb 0.25, first_div 5.26
+  random  free 0.32, bfi 0.22, ifb 0.15, first_div 0.24
+  normal  free 0.28, bfi 0.18, ifb 0.25, first_div 5.79
+
+glm4:
+  baseline 0.39
+  repeat2 free 0.36, bfi 0.35, ifb 0.35, first_div 2.36
+  repeat4 free 0.35, bfi 0.42, ifb 0.36, first_div 2.21
+  random  free 0.38, bfi 0.31, ifb 0.42, first_div 0.00
+  normal  free 0.42, bfi 0.33, ifb 0.29, first_div 3.39
+
+deepseek7b:
+  baseline 0.17
+  repeat2 free 0.17, bfi 0.14, ifb 0.19, first_div 4.89
+  repeat4 free 0.19, bfi 0.15, ifb 0.12, first_div 4.04
+  random  free 0.14, bfi 0.18, ifb 0.19, first_div 0.61
+  normal  free 0.17, bfi 0.14, ifb 0.17, first_div 7.69
+```
+
+### 当前最可靠现象
+
+1. **GLM4 sentence route 的早期门控信号非常强。**
+
+```text
+baseline step0 margin = -1.28
+repeat2 step0 margin = +3.64
+repeat4 step0 margin = +3.61
+normal  step0 margin = +2.09
+random  step0 margin = -1.44
+```
+
+这说明 GLM4 的语义恢复不是随机 token drift，而是在 step0 已经发生目标/竞争边界的强翻转。
+
+2. **first token fork 不是完整因果载体。**
+
+GLM4 sentence repeat4：
+
+```text
+baseline 0.25
+repeat4 free 0.46
+baseline_force_intervention_first 0.31
+intervention_force_baseline_first 0.44
+```
+
+如果第一个 token 是主要因果载体，baseline_force_intervention_first 应接近 0.46，intervention_force_baseline_first 应接近 0.25。  
+实际只出现弱转移，说明：
+
+```text
+first token fork 参与机制，但不能解释大部分语义恢复。
+```
+
+3. **GLM4 的 repeat4 恢复更像 step0 hidden/logit gate 仍在干预 prompt-side route。**
+
+强制 intervention 使用 baseline first token 后，repeat4 仍有 0.44，接近 free 0.46。  
+这说明 intervention 的内部早期状态在选择第一个 token 之外，仍影响后续路径。
+
+4. **qwen3 的 late/no-fork clean 反而更高，说明 qwen3 不符合简单 early-fork 模型。**
+
+qwen3 sentence repeat4：
+
+```text
+early_clean 0.34
+late_clean 0.75
+```
+
+这说明 qwen3 的 clean 输出更可能来自 baseline 自身稳定性，而不是 intervention 早期分叉。
+
+5. **DS7B 没有形成可控语义门。**
+
+DS7B sentence repeat2/repeat4 step0 margin 反而下降：
+
+```text
+baseline +0.81
+repeat2 -1.76
+repeat4 -1.29
+```
+
+这与 DS7B 高敏感但低可控的判断一致。
+
+6. **random 可以强制早分叉，但不产生语义恢复。**
+
+random first_div 通常接近 0，但 clean 不稳定或下降。说明：
+
+```text
+早分叉不是充分条件；
+必须是语义对齐的 gate shift。
+```
+
+### 对 Phase564 外部分析的判定
+
+外部分析正确部分：
+
+```text
+1. Phase564 正确把机制从 long hidden carrier 收紧到 token path recursive lock。
+2. matched-token 证明长距离主要来自 token divergence。
+3. 下一步应该做 early gate / token fork 因果验证。
+```
+
+需要修正部分：
+
+```text
+1. first token path fork 不是主要完整因果载体。
+   Phase565 中 forced-first-token 只能弱转移效果。
+
+2. early gate 不能简化为 first token。
+   GLM4 repeat4 在强制 baseline first token 后仍保持大部分效果。
+
+3. 更合理的机制是：
+   prompt-side early gate / logits field 改写多个后续步骤，而不是只改写第一个 token。
+```
+
+### 理论修正
+
+Phase564 公式：
+
+```text
+R_semantic ≈ A_semantic · G_early · P_token_path · G_late
+```
+
+Phase565 后必须把 G_early 拆开：
+
+```text
+G_early = G_logit_field · G_first_token · G_prompt_route
+```
+
+其中：
+
+```text
+G_logit_field:
+  step0/step1/step2 的 target-competitor logits field 改写。
+
+G_first_token:
+  第一个 token 具体取值造成的路径分叉。
+
+G_prompt_route:
+  prompt 侧残差/注意力/MLP 状态对后续生成路径的持续约束。
+```
+
+Phase565 结果显示：
+
+```text
+G_first_token 不是主导项。
+G_logit_field 和 G_prompt_route 更可能是 GLM4 repeat4 恢复的主要载体。
+```
+
+最新公式：
+
+```text
+R_semantic ≈ A_semantic · (G_logit_field + G_prompt_route + G_first_token) · P_token_path · G_late
+```
+
+更通俗地说：
+
+```text
+语言生成不是“第一个词决定一切”；
+更像是 prompt-side 内部状态先把局部词表场整体改写，
+第一个词只是其中一个出口。
+```
+
+### 硬伤
+
+```text
+1. forced-first-token 只测第一个 token，没有测 forced first 2/3 tokens。
+2. 没有直接干预 logits field，只观察 margin。
+3. 没有拆 prompt_route 中 attention/MLP/residual 的贡献。
+4. 仍只测 vehicle_tool pair。
+5. GLM4 是最强阳性模型，跨模型机制不统一。
+6. transfer_ratio 在 free 与 baseline 差很小时不稳定，不能过度解释。
+```
+
+### 下一步任务：Phase566
+
+Phase566 应做：
+
+```text
+Multi-Step Prefix Fork and Logit Field Intervention Audit
+```
+
+核心目标：
+
+```text
+判断语义恢复到底依赖：
+1. first token
+2. first 2-3 token prefix
+3. prompt-side logit field / route state
+```
+
+建议方案：
+
+```text
+1. forced-prefix patch:
+   baseline 强制使用 intervention 前 1/2/3 个 token。
+   intervention 强制使用 baseline 前 1/2/3 个 token。
+
+2. logit-field audit:
+   记录 step0-step5 的 target/competitor/best_non_target margin。
+
+3. GLM4 sentence repeat4 做主测试：
+   因为这是最强阳性链。
+
+4. 保留 repeat2/random/normal 对照。
+
+5. qwen3/deepseek7b 做缩小范围对照：
+   只测 sentence route，避免无效成本。
+```
+
+Phase566 判据：
+
+```text
+如果 forced prefix length 增加后 baseline clean 接近 intervention clean：
+  说明 token prefix 是主要载体。
+
+如果 forced prefix length 增加仍不能转移效果：
+  说明 prompt-side route state / logit field 是主要载体。
+
+如果 random prefix 也能转移：
+  说明是通用格式/采样路径效应，不是语义机制。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase565_early_gate_token_fork/
+  phase565_qwen3_early_gate_token_fork.json
+  phase565_glm4_early_gate_token_fork.json
+  phase565_deepseek7b_early_gate_token_fork.json
+  phase565_cross_model_summary.md
+```
+
+## Phase 566: Multi-Step Prefix Fork and Logit Field Audit [2026-06-21 09:57]
+
+### 本阶段目标
+
+根据 Phase565 结果和外部分析，Phase565 的判断基本正确：
+
+```text
+1. first token fork 参与语义恢复，但不是完整因果载体。
+2. GLM4 sentence route 的 step0 logit field 出现强目标/竞争边界翻转。
+3. random 可以早分叉但不产生语义恢复，早分叉不是充分条件。
+4. 下一步必须测试 first 2/3 token prefix 是否才是路径锁定单位。
+```
+
+Phase566 直接测试：
+
+```text
+forced prefix length = 1,2,3
+```
+
+测试对象聚焦最强阳性链：
+
+```text
+route = forbidden_sentence_completion:temperature <- forbidden_definition
+pair = vehicle_tool
+```
+
+保留跨模型：
+
+```text
+qwen3, glm4, deepseek7b
+```
+
+核心判据：
+
+```text
+如果 baseline_force_intervention_prefix_k 随 k 增大接近 intervention_free：
+  token prefix 是主要载体。
+
+如果 intervention_force_baseline_prefix_k 随 k 增大接近 baseline_free：
+  prefix 是必要载体。
+
+如果 random prefix 也能转移：
+  可能是格式/采样路径效应，不是语义机制。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase566_prefix_fork_logit_field.py
+tests/glm5/phase566_prefix_fork_logit_field_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+route = forbidden_sentence_completion:temperature <- forbidden_definition
+
+qwen3 windows = 10,12,14
+glm4 windows = 24,26,28
+deepseek7b windows = 16,18,20
+
+train-n = 12
+test-n = 12
+sample seeds = 101,103,107,109,113,127
+max_new_tokens = 12
+logit_steps = 6
+prefix_lengths = 1,2,3
+
+interventions =
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_random
+  add_normal_repeat2
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase566_prefix_fork_logit_field.py \
+  tests/glm5/phase566_prefix_fork_logit_field_summary.py
+
+python tests/glm5/phase566_prefix_fork_logit_field.py qwen3 \
+  --windows 10,12,14 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --prefix-lengths 1,2,3 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --logit-steps 6 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase566_prefix_fork_logit_field \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase566_prefix_fork_logit_field.py glm4 \
+  --windows 24,26,28 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --prefix-lengths 1,2,3 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --logit-steps 6 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase566_prefix_fork_logit_field \
+  --hard-exit-after-model
+
+python tests/glm5/phase566_prefix_fork_logit_field.py deepseek7b \
+  --windows 16,18,20 \
+  --pair vehicle_tool \
+  --train-n 12 \
+  --test-n 12 \
+  --sample-seeds 101,103,107,109,113,127 \
+  --routes 'forbidden_sentence_completion:temperature<-forbidden_definition' \
+  --interventions one_shot_repeat2,one_shot_repeat4,one_shot_random,add_normal_repeat2 \
+  --prefix-lengths 1,2,3 \
+  --layer-sets all \
+  --max-new-tokens 12 \
+  --logit-steps 6 \
+  --temperature 0.8 \
+  --top-p 0.9 \
+  --batch-size 12 \
+  --max-length 192 \
+  --output-dir results/glm5_phase566_prefix_fork_logit_field \
+  --hard-exit-after-model
+
+python tests/glm5/phase566_prefix_fork_logit_field_summary.py
+
+python -m py_compile \
+  tests/glm5/phase566_prefix_fork_logit_field.py \
+  tests/glm5/phase566_prefix_fork_logit_field_summary.py
+```
+
+### 运行时间
+
+```text
+qwen3:      18.65 min
+glm4:      33.19 min
+deepseek7b:25.39 min
+```
+
+### 客观结果一：free clean 与 step0-step5 margin
+
+```text
+qwen3:
+  baseline clean 0.54, margins 0.45, -0.25, 1.15, 1.39, 1.73, 2.00
+  repeat2 clean 0.47, margins 1.39, 0.97, 1.60, 2.19, 1.77, 2.46
+  repeat4 clean 0.40, margins 1.35, 1.01, 1.68, 2.02, 1.31, 2.47
+  random  clean 0.49, margins 1.25, 1.62, 2.11, 2.04, 1.32, 1.50
+  normal  clean 0.53, margins 0.61, 0.06, 0.96, 1.38, 2.03, 2.12
+
+glm4:
+  baseline clean 0.25, margins -1.28, -2.29, -1.28, -0.22, 0.16, 0.01
+  repeat2 clean 0.39, margins 3.64, 0.07, 0.12, 0.12, -0.59, 0.49
+  repeat4 clean 0.46, margins 3.61, -0.26, -0.23, -0.17, -0.12, 0.22
+  random  clean 0.31, margins -1.44, -0.73, -0.48, -0.16, -0.14, 0.68
+  normal  clean 0.39, margins 2.09, -1.64, -0.69, -0.25, 0.13, 0.26
+
+deepseek7b:
+  baseline clean 0.22, margins 0.81, 0.96, 1.59, 2.85, 2.94, 2.31
+  repeat2 clean 0.22, margins -1.76, 1.39, 1.69, 2.79, 2.74, 2.53
+  repeat4 clean 0.17, margins -1.29, 1.15, 1.80, 2.86, 2.70, 2.26
+  random  clean 0.14, margins 0.46, 2.43, 1.60, 1.60, 1.62, 1.96
+  normal  clean 0.18, margins 0.53, 0.83, 1.68, 2.56, 2.91, 2.93
+```
+
+### 客观结果二：prefix transfer
+
+```text
+qwen3:
+  repeat2 free 0.47, bfi p1/p2/p3 = 0.56/0.50/0.47, ifb p1/p2/p3 = 0.40/0.50/0.53
+  repeat4 free 0.40, bfi p1/p2/p3 = 0.57/0.49/0.50, ifb p1/p2/p3 = 0.39/0.46/0.58
+  random  free 0.49, bfi p1/p2/p3 = 0.56/0.50/0.49, ifb p1/p2/p3 = 0.51/0.51/0.53
+  normal  free 0.53, bfi p1/p2/p3 = 0.57/0.51/0.57, ifb p1/p2/p3 = 0.36/0.51/0.56
+
+glm4:
+  repeat2 free 0.39, bfi p1/p2/p3 = 0.31/0.40/0.36, ifb p1/p2/p3 = 0.35/0.22/0.17
+  repeat4 free 0.46, bfi p1/p2/p3 = 0.31/0.49/0.43, ifb p1/p2/p3 = 0.44/0.21/0.15
+  random  free 0.31, bfi p1/p2/p3 = 0.31/0.26/0.33, ifb p1/p2/p3 = 0.33/0.25/0.18
+  normal  free 0.39, bfi p1/p2/p3 = 0.35/0.25/0.29, ifb p1/p2/p3 = 0.39/0.24/0.19
+
+deepseek7b:
+  repeat2 free 0.22, bfi p1/p2/p3 = 0.15/0.18/0.25, ifb p1/p2/p3 = 0.17/0.19/0.24
+  repeat4 free 0.17, bfi p1/p2/p3 = 0.14/0.14/0.18, ifb p1/p2/p3 = 0.18/0.19/0.25
+  random  free 0.14, bfi p1/p2/p3 = 0.15/0.11/0.15, ifb p1/p2/p3 = 0.25/0.21/0.25
+  normal  free 0.18, bfi p1/p2/p3 = 0.15/0.14/0.26, ifb p1/p2/p3 = 0.18/0.18/0.26
+```
+
+### 当前最可靠现象
+
+1. **GLM4 repeat4 的 prefix length=2 几乎能完整转移语义恢复。**
+
+```text
+baseline = 0.25
+repeat4 free = 0.46
+baseline_force_repeat4_prefix1 = 0.31
+baseline_force_repeat4_prefix2 = 0.49
+baseline_force_repeat4_prefix3 = 0.43
+```
+
+这说明 first token 不是完整载体，但 first 2-token prefix 已经足以把 baseline 推到 intervention 水平。
+
+2. **GLM4 repeat4 的必要性也出现在 prefix length>=2。**
+
+```text
+repeat4_force_baseline_prefix1 = 0.44
+repeat4_force_baseline_prefix2 = 0.21
+repeat4_force_baseline_prefix3 = 0.15
+```
+
+强制 intervention 使用 baseline 前 2/3 token 后，clean 低于 baseline。这说明 GLM4 repeat4 的生成路径确实依赖早期 prefix，不只是 prompt-side 状态单独决定。
+
+3. **GLM4 的 prefix 载体有窗口效应。**
+
+```text
+prefix1 不足
+prefix2 最强
+prefix3 略回落
+```
+
+这说明路径锁定单位可能是短 prefix，不是越长越好。过长 prefix 可能把后续采样空间锁到另一路径。
+
+4. **GLM4 repeat2 与 repeat4 都支持 prefix2 载体，但 repeat4 更强。**
+
+```text
+repeat2 bfi p2 = 0.40, free = 0.39
+repeat4 bfi p2 = 0.49, free = 0.46
+```
+
+这延续 repeat4 是最强阳性 donor 的判断。
+
+5. **random 不是干净语义机制。**
+
+GLM4 random：
+
+```text
+free = 0.31
+bfi p2 = 0.26
+```
+
+random prefix 没有像 repeat4 一样形成强语义转移。
+
+6. **qwen3 的 prefix transfer 受 baseline 高 clean 干扰。**
+
+qwen3 baseline 已经 0.54，repeat donor 反而降低 free clean，所以 qwen3 不能作为此机制的正例。
+
+7. **DS7B 仍不形成可控门。**
+
+DS7B repeat2/repeat4 free 没有提升，prefix transfer 的数值不稳定，不能支持 GLM4 式机制。
+
+### 对 Phase565 外部分析的判定
+
+外部分析正确部分：
+
+```text
+1. Phase565 是重要否定性推进。
+2. first token 不是完整因果载体。
+3. early gate 应拆成 logit field、first token、prompt route。
+4. 必须测试 forced prefix length 1/2/3。
+```
+
+需要修正部分：
+
+```text
+1. Phase566 显示 token prefix 不是弱因素，而是 GLM4 repeat4 的核心载体之一。
+2. prompt-side route state 不能单独解释 repeat4，因为强制 baseline prefix2 会打掉 intervention 效果。
+3. 更准确机制是 prompt-side gate 先改写 early logit field，然后通过 2-token prefix 进入递归锁定。
+```
+
+### 理论修正
+
+Phase565 公式：
+
+```text
+R_semantic ≈ A_semantic · (G_logit_field + G_prompt_route + G_first_token) · P_token_path · G_late
+```
+
+Phase566 后应改为：
+
+```text
+R_semantic ≈ A_semantic · G_logit_field(0) · P_prefix(1:2) · L_recursive · G_late
+```
+
+其中：
+
+```text
+G_logit_field(0):
+  step0 目标/竞争词表场翻转。
+
+P_prefix(1:2):
+  前两个生成 token 形成路径锁定入口。
+
+L_recursive:
+  自回归递归锁定，使后续内容沿新路径展开。
+
+G_late:
+  后续生成门维持或破坏 clean paraphrase。
+```
+
+更通俗地说：
+
+```text
+GLM4 repeat4 的机制不是“第一个词决定一切”，
+也不是“隐藏状态单独长期携带语义”，
+而是“早期词表场翻转 + 两词前缀锁门 + 后续自回归展开”。
+```
+
+### 硬伤
+
+```text
+1. 只测 sentence route，没有重复 definition route。
+2. prefix3 回落原因未知，可能是采样路径、语法格式或前缀过约束。
+3. 没有直接做 logit field patch，只做 prefix patch 和 margin 观测。
+4. 没有拆 residual/attention/MLP 对 step0 logit field 的贡献。
+5. 仍只测 vehicle_tool pair。
+6. qwen3/ds7b 不支持同一机制，跨模型统一性仍不足。
+```
+
+### 下一步任务：Phase567
+
+Phase567 应做：
+
+```text
+GLM4 Step0 Logit Field Source Decomposition
+```
+
+核心目标：
+
+```text
+找到 GLM4 repeat4 step0 target-competitor margin 翻转来自哪里：
+residual route、attention route、MLP route，还是组合。
+```
+
+建议方案：
+
+```text
+1. 只用 GLM4 sentence route 做主测试，qwen3/ds7b 作为小对照。
+2. conditions:
+   repeat4 residual restore/add
+   repeat4 attention restore/add
+   repeat4 MLP restore/add
+   residual+attention
+   residual+MLP
+   attention+MLP
+   all
+   random controls
+3. 指标：
+   step0 target-competitor margin
+   step0 target rank
+   free clean_non_object_rate
+   prefix2 transfer clean
+4. 判据：
+   若某个 component 同时恢复 step0 margin 和 prefix2 transfer，
+   它就是 early logit field source 的主候选。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase566_prefix_fork_logit_field/
+  phase566_qwen3_prefix_fork_logit_field.json
+  phase566_glm4_prefix_fork_logit_field.json
+  phase566_deepseek7b_prefix_fork_logit_field.json
+  phase566_cross_model_summary.md
+```

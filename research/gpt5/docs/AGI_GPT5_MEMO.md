@@ -31623,3 +31623,596 @@ results/glm5_phase560_continuous_prototype_surgery/
   phase560_deepseek7b_continuous_static_prototype_surgery.json
   phase560_continuous_static_cross_model_summary.md
 ```
+
+## Phase 563: Hidden Trajectory Distance and Finite-Time Response Audit [2026-06-20 23:05]
+
+### 本阶段目标
+
+根据 Phase562 的外部分析和当前进展，本阶段补测 hidden state 层面的轨迹弛豫：
+
+```text
+Phase562: token_type 弛豫很短
+Phase563: 直接测 hidden trajectory distance、hidden_relax_step、finite_time_log_growth
+```
+
+核心问题：
+
+```text
+token 层面短弛豫是否等于 hidden 层面短弛豫？
+```
+
+### 脚本
+
+```text
+tests/glm5/phase563_hidden_trajectory_distance.py
+tests/glm5/phase563_hidden_trajectory_distance_summary.py
+```
+
+### 执行范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+routes =
+  forbidden_sentence_completion:temperature <- forbidden_definition
+  forbidden_definition:top_p <- forbidden_definition
+seeds = 101,103,107,109,113,127
+train-n = 12
+test-n = 12
+max_new_tokens = 12
+conditions =
+  baseline
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_mean
+  one_shot_random
+  add_tangent_repeat2
+  add_normal_repeat2
+```
+
+### 关键结果
+
+sentence completion <- definition：
+
+```text
+qwen3 clean:
+  baseline 0.54, repeat2 0.47, repeat4 0.40, tangent 0.49, normal 0.53
+
+glm4 clean:
+  baseline 0.25, repeat2 0.39, repeat4 0.46, tangent 0.36, normal 0.39
+
+deepseek7b clean:
+  baseline 0.22, repeat2 0.22, repeat4 0.17, tangent 0.14, normal 0.18
+```
+
+hidden_relax_step：
+
+```text
+qwen3:
+  repeat2 1.00, repeat4 2.83, tangent 6.50, normal 2.83
+
+glm4:
+  repeat2 12.00, repeat4 12.00, tangent 12.00, normal 8.33
+
+deepseek7b:
+  repeat2 12.00, repeat4 12.00, tangent 10.17, normal 8.33
+```
+
+trajectory_distance：
+
+```text
+qwen3:
+  repeat2 411.15, repeat4 383.98, random 556.53, tangent 325.45, normal 283.20
+
+glm4:
+  repeat2 390.81, repeat4 377.78, random 449.90, tangent 377.82, normal 287.96
+
+deepseek7b:
+  repeat2 2817.47, repeat4 2889.80, random 3400.50, tangent 1488.60, normal 1406.53
+```
+
+### 结论
+
+1. **Phase562 的 token-level 短弛豫不等于 hidden-level 短弛豫。**
+   多数条件 hidden_relax_step 可以持续到 12 token 窗口末端。
+
+2. **hidden trajectory distance 大不等于语义成功。**
+   random 通常有最大 trajectory_distance，但不是最佳 clean_non_object_rate。
+
+3. **GLM4 仍是最清晰的语义恢复模型。**
+   sentence route 中 repeat4 从 baseline 0.25 提升到 0.46。
+
+4. **DS7B 对扰动高度敏感但低可控。**
+   DS7B hidden distance 远高于 Qwen3/GLM4，但 clean rate 没有同步改善。
+
+5. **当前 step0->step1 tangent 不是完整轨迹切线。**
+   tangent 的 trajectory_distance 常大于 normal，说明它不是稳定的低扰动流形方向。
+
+### 理论修正
+
+Phase563 后不能用单一 trajectory distance 解释语义恢复：
+
+```text
+R_semantic ≈ A_semantic · C_trajectory · G_generation
+```
+
+其中：
+
+```text
+A_semantic = 方向是否包含目标语义结构
+C_trajectory = hidden trajectory 是否可控
+G_generation = 生成门是否允许内部结构进入输出 token
+```
+
+### 硬伤
+
+```text
+1. 后续 token 可能分叉，hidden distance 混合了内部扰动和内容差异。
+2. tangent 只基于 step0->step1。
+3. 没有 dynamic donor。
+4. alpha 固定为 6。
+5. 只测 vehicle_tool。
+6. epsilon_ratio=0.25 需要阈值敏感性分析。
+```
+
+### 下一步
+
+Phase564 应做：
+
+```text
+Dynamic Donor Trajectory and Matched-Token Hidden Audit
+```
+
+核心判据：
+
+```text
+1. matched-token teacher forcing 下 hidden distance 是否仍持续？
+2. free-generation 下的持续距离有多少来自 token 分叉？
+3. dynamic donor 是否比 static donor 更能恢复 GLM4 sentence route？
+```
+
+### 结果文件
+
+```text
+results/glm5_phase563_hidden_trajectory_distance/
+  phase563_qwen3_hidden_trajectory_distance.json
+  phase563_glm4_hidden_trajectory_distance.json
+  phase563_deepseek7b_hidden_trajectory_distance.json
+  phase563_cross_model_summary.md
+```
+
+## Phase 564: Matched-Token Hidden Trajectory Audit [2026-06-21 00:35]
+
+### 目标
+
+Phase563 发现 free generation 中 hidden trajectory distance 可以持续到 12 token，但外部分析指出最大硬伤：
+
+```text
+baseline 与 intervention 后续 token 可能分叉，
+hidden distance 混入 token divergence。
+```
+
+Phase564 使用 matched-token teacher forcing 拆分：
+
+```text
+free:
+  baseline free generation vs intervention free generation
+
+matched_base:
+  两者都强制走 baseline generated tokens
+
+matched_condition:
+  两者都强制走 intervention generated tokens
+```
+
+### 脚本
+
+```text
+tests/glm5/phase564_matched_token_hidden_audit.py
+tests/glm5/phase564_matched_token_hidden_audit_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+routes =
+  forbidden_sentence_completion:temperature <- forbidden_definition
+  forbidden_definition:top_p <- forbidden_definition
+seeds = 101,103,107,109,113,127
+conditions =
+  baseline
+  one_shot_repeat2
+  one_shot_repeat4
+  one_shot_random
+  add_normal_repeat2
+```
+
+### 关键结果
+
+sentence completion <- definition：
+
+```text
+GLM4 clean:
+  baseline 0.25
+  repeat2 0.39
+  repeat4 0.46
+  random  0.31
+  normal  0.39
+```
+
+free vs matched_base trajectory retention：
+
+```text
+qwen3:
+  repeat2 0.14
+  repeat4 0.15
+  random  0.14
+  normal  0.06
+
+glm4:
+  repeat2 0.11
+  repeat4 0.12
+  random  0.15
+  normal  0.06
+
+deepseek7b:
+  repeat2 0.13
+  repeat4 0.12
+  random  0.16
+  normal  0.02
+```
+
+matched-token hidden_relax_step：
+
+```text
+matched_base:
+  all models, all non-baseline conditions = 1.00
+
+matched_condition:
+  all models, all non-baseline conditions = 1.00
+```
+
+### 结论
+
+1. **Phase563 的 free hidden trajectory 长距离主要来自 token path divergence。**
+   matched-token 后 trajectory distance 只保留 free 的约 2%-16%。
+
+2. **one-shot 内部扰动在相同 token 驱动下快速弛豫。**
+   matched-token finite-time growth 全部为负，hidden_relax_step 基本为 1。
+
+3. **GLM4 repeat4 语义恢复仍成立，但不是靠长程 hidden carrier。**
+   更像 early token/route gate shift。
+
+4. **语义生成机制从 hidden continuous carrier 转向 token-path recursive lock。**
+
+### 理论修正
+
+Phase563：
+
+```text
+R_semantic ≈ A_semantic · C_trajectory · G_generation
+```
+
+Phase564 后：
+
+```text
+C_trajectory = C_internal · C_token_path
+```
+
+结果显示：
+
+```text
+C_internal 很短，通常 1 step 弛豫。
+C_token_path 是 free trajectory 长距离和语义变化的主要来源。
+```
+
+最新公式：
+
+```text
+R_semantic ≈ A_semantic · G_early · P_token_path · G_late
+```
+
+### 硬伤
+
+```text
+1. 没有实现 dynamic donor。
+2. 只测 vehicle_tool。
+3. 只保留 normal，没有继续测 tangent。
+4. max_new_tokens=12。
+5. teacher forcing 只能隔离 token path，不能完全还原自由生成概率分布。
+```
+
+### 下一步
+
+Phase565：
+
+```text
+Early Gate and Token Fork Causality Audit
+```
+
+重点：
+
+```text
+1. 记录 step0/step1/step2 logits margin。
+2. 按 first divergence step 分组 clean_non_object_rate。
+3. 做 forced-first-token patch：
+   baseline 强制使用 intervention 第一个 token；
+   intervention 强制使用 baseline 第一个 token。
+4. 判断语义恢复是否随 first token path 转移。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase564_matched_token_hidden_audit/
+  phase564_qwen3_matched_token_hidden_audit.json
+  phase564_glm4_matched_token_hidden_audit.json
+  phase564_deepseek7b_matched_token_hidden_audit.json
+  phase564_cross_model_summary.md
+```
+
+## Phase 565: Early Gate and Token Fork Causality Audit [2026-06-21 07:57]
+
+### 目标
+
+Phase564 显示 free hidden trajectory 长距离主要来自 token path divergence。Phase565 进一步测试：
+
+```text
+第一个 token fork 是否是语义恢复的主要因果载体？
+```
+
+测试方式：
+
+```text
+baseline_free
+intervention_free
+baseline_force_intervention_first
+intervention_force_baseline_first
+```
+
+并记录：
+
+```text
+step0/step1/step2 target-competitor margin
+first_divergence_step
+fork bucket
+```
+
+### 脚本
+
+```text
+tests/glm5/phase565_early_gate_token_fork.py
+tests/glm5/phase565_early_gate_token_fork_summary.py
+```
+
+### 关键结果
+
+GLM4 sentence completion <- definition：
+
+```text
+baseline 0.25
+repeat2 free 0.39, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.35
+repeat4 free 0.46, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.44
+random  free 0.31, baseline_force_intervention_first 0.31, intervention_force_baseline_first 0.33
+normal  free 0.39, baseline_force_intervention_first 0.35, intervention_force_baseline_first 0.39
+```
+
+GLM4 step0 target-competitor margin：
+
+```text
+baseline -1.28
+repeat2 +3.64
+repeat4 +3.61
+random  -1.44
+normal  +2.09
+```
+
+### 结论
+
+1. **GLM4 的 early logit gate 极强。**
+   repeat2/repeat4 在 step0 把 target-competitor margin 从负值强推到正值。
+
+2. **first token fork 不是完整因果载体。**
+   GLM4 repeat4 中，baseline_force_intervention_first 只到 0.31，远低于 repeat4 free 0.46；intervention_force_baseline_first 仍有 0.44，接近 intervention free。
+
+3. **GLM4 repeat4 恢复更像 prompt-side route/logit-field 改写。**
+   第一个 token 只是出口之一，不是全部机制。
+
+4. **random 可以早分叉，但不产生语义恢复。**
+   早分叉不是充分条件，必须有语义对齐的 logit field shift。
+
+### 理论修正
+
+Phase564：
+
+```text
+R_semantic ≈ A_semantic · G_early · P_token_path · G_late
+```
+
+Phase565 后：
+
+```text
+G_early = G_logit_field · G_first_token · G_prompt_route
+```
+
+更准确公式：
+
+```text
+R_semantic ≈ A_semantic · (G_logit_field + G_prompt_route + G_first_token) · P_token_path · G_late
+```
+
+其中 first token 不是主导项，GLM4 repeat4 更可能依赖 prompt-side route state 和 early logit field。
+
+### 硬伤
+
+```text
+1. 只强制第一个 token，没有测试 first 2/3 token prefix。
+2. 没有直接干预 logits field。
+3. 没有拆 prompt_route 的 attention/MLP/residual 来源。
+4. 仍只测 vehicle_tool。
+```
+
+### 下一步
+
+Phase566：
+
+```text
+Multi-Step Prefix Fork and Logit Field Intervention Audit
+```
+
+重点：
+
+```text
+1. forced-prefix length = 1/2/3。
+2. 记录 step0-step5 logits margin。
+3. GLM4 sentence repeat4 做主测试。
+4. qwen3/deepseek7b 做缩小对照。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase565_early_gate_token_fork/
+  phase565_qwen3_early_gate_token_fork.json
+  phase565_glm4_early_gate_token_fork.json
+  phase565_deepseek7b_early_gate_token_fork.json
+  phase565_cross_model_summary.md
+```
+
+## Phase 566: Multi-Step Prefix Fork and Logit Field Audit [2026-06-21 09:57]
+
+### 目标
+
+Phase565 证明 first token fork 不是完整因果载体。Phase566 测试：
+
+```text
+forced prefix length = 1,2,3
+```
+
+核心问题：
+
+```text
+语义恢复是否由 first 2/3 token prefix 承载？
+```
+
+### 脚本
+
+```text
+tests/glm5/phase566_prefix_fork_logit_field.py
+tests/glm5/phase566_prefix_fork_logit_field_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+pair = vehicle_tool
+route = forbidden_sentence_completion:temperature <- forbidden_definition
+seeds = 101,103,107,109,113,127
+prefix_lengths = 1,2,3
+interventions = repeat2, repeat4, random, normal
+```
+
+### 关键结果
+
+GLM4 prefix transfer：
+
+```text
+baseline = 0.25
+
+repeat4 free = 0.46
+baseline_force_repeat4_prefix1 = 0.31
+baseline_force_repeat4_prefix2 = 0.49
+baseline_force_repeat4_prefix3 = 0.43
+
+repeat4_force_baseline_prefix1 = 0.44
+repeat4_force_baseline_prefix2 = 0.21
+repeat4_force_baseline_prefix3 = 0.15
+```
+
+GLM4 step margins：
+
+```text
+baseline margins:
+  -1.28, -2.29, -1.28, -0.22, 0.16, 0.01
+
+repeat4 margins:
+  3.61, -0.26, -0.23, -0.17, -0.12, 0.22
+
+random margins:
+  -1.44, -0.73, -0.48, -0.16, -0.14, 0.68
+```
+
+### 结论
+
+1. **GLM4 repeat4 的 prefix length=2 几乎完整转移语义恢复。**
+   baseline 强制使用 repeat4 前两个 token 后，clean 从 0.25 到 0.49，超过 repeat4 free 0.46。
+
+2. **repeat4 的必要性也在 prefix length>=2 出现。**
+   intervention 强制 baseline 前两个 token 后，clean 从 0.46 降到 0.21。
+
+3. **路径锁定单位不是 first token，而更像 two-token prefix。**
+
+4. **prompt-side route 不能单独解释 repeat4。**
+   因为 baseline prefix2 可以复制效果，intervention baseline prefix2 可以打掉效果。
+
+5. **random 不形成同等语义转移。**
+
+### 理论修正
+
+Phase565：
+
+```text
+R_semantic ≈ A_semantic · (G_logit_field + G_prompt_route + G_first_token) · P_token_path · G_late
+```
+
+Phase566 后：
+
+```text
+R_semantic ≈ A_semantic · G_logit_field(0) · P_prefix(1:2) · L_recursive · G_late
+```
+
+通俗结论：
+
+```text
+GLM4 repeat4 的机制不是第一个词决定一切，
+也不是 hidden state 长期携带语义，
+而是早期词表场翻转 + 两词前缀锁门 + 自回归展开。
+```
+
+### 硬伤
+
+```text
+1. 只测 sentence route。
+2. prefix3 回落原因未知。
+3. 没有直接做 logit field patch。
+4. 没有拆 residual/attention/MLP 来源。
+5. 仍只测 vehicle_tool。
+```
+
+### 下一步
+
+Phase567：
+
+```text
+GLM4 Step0 Logit Field Source Decomposition
+```
+
+重点：
+
+```text
+拆 repeat4 的 step0 margin 翻转来自 residual、attention、MLP，还是组合。
+同时测 step0 margin、free clean、prefix2 transfer。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase566_prefix_fork_logit_field/
+  phase566_qwen3_prefix_fork_logit_field.json
+  phase566_glm4_prefix_fork_logit_field.json
+  phase566_deepseek7b_prefix_fork_logit_field.json
+  phase566_cross_model_summary.md
+```
