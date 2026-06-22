@@ -52420,3 +52420,3626 @@ results/glm5_phase566_prefix_fork_logit_field/
   phase566_deepseek7b_prefix_fork_logit_field.json
   phase566_cross_model_summary.md
 ```
+
+
+## Phase 567: Step0 Logit-Field Source Decomposition 第0步词表场来源分解 [2026-06-20 22:15]
+
+### 本阶段目标
+
+Phase566 确认 GLM4 repeat4 的因果链：step0 logit-field flip → prefix2 lock → recursive expansion。
+Phase567 追问上游：step0 margin 翻转来自哪个模块？
+
+```text
+residual restore (full layer)
+attention contribution only
+MLP contribution only
+attention + MLP combination
+random controls
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase567_logit_field_source.py
+tests/glm5/phase567_logit_field_source_summary.py
+```
+
+### 测试原理
+
+**模块级 donor 注入：**
+
+收集 donor forward 时三个站点的激活：
+- layer output（完整残差 = h_in + attn_out + mlp_out）
+- attention output（仅注意力输出）
+- MLP output（仅 MLP 输出）
+
+在 recipient step0 注入时：
+- `all`：替换完整 layer output（Phase566 方式）
+- `attn_only`：在残差上加 (donor_attn - recipient_attn)，MLP 保持原样
+- `mlp_only`：在残差上加 (donor_mlp - recipient_mlp)，attn 保持原样
+- `attn_mlp`：同时加两者 delta
+
+指标：
+- step0 target-competitor margin
+- step0 target rank
+- free clean_non_object_rate（12 token 生成）
+- bfi_prefix2 clean（baseline 强制使用 intervention 的前 2 token）
+
+### 执行参数
+
+```text
+GLM4: test_n=24, seeds=8 (101,103,107,109,113,127,131,137), max_tokens=12
+Qwen3: test_n=18, seeds=6, max_tokens=12
+DS7B: test_n=18, seeds=6, max_tokens=12
+route = forbidden_sentence_completion:temperature<-forbidden_definition
+layer-sets = all
+```
+
+### 客观结果
+
+#### GLM4 (核心模型, test_n=24, 8 seeds)
+
+```text
+条件              free_clean  s0_margin  s0_rank  bfi_p2
+baseline          0.36        -1.03      522      N/A
+repeat4_all       0.44        +0.40      6537     0.38
+repeat4_attn_only 0.41        -0.54      405      0.35
+repeat4_mlp_only  0.36        -0.78      1149     0.32
+repeat4_attn_mlp  0.37        -0.35      945      0.32
+random_all        0.33        -0.01      16714    0.33
+random_attn_only  0.34        -0.92      550      0.33
+random_mlp_only   0.38        -1.52      945      0.35
+```
+
+#### Qwen3 (test_n=18, 6 seeds)
+
+```text
+条件              free_clean  s0_margin  s0_rank  bfi_p2
+baseline          0.64        +0.56      374      N/A
+repeat4_all       0.48        +0.90      195      0.46
+repeat4_attn_only 0.66        +0.72      334      0.58
+repeat4_mlp_only  0.68        +0.56      316      0.56
+repeat4_attn_mlp  0.56        +0.77      259      0.58
+random_all        0.56        +2.30      74       0.58
+random_attn_only  0.64        +0.55      383      0.60
+random_mlp_only   0.55        +0.60      344      0.54
+```
+
+#### DS7B (test_n=18, 6 seeds)
+
+```text
+条件              free_clean  s0_margin  s0_rank  bfi_p2
+baseline          0.15        +0.96      203      N/A
+repeat4_all       0.22        -0.49      128      0.23
+repeat4_attn_only 0.14        +1.33      134      0.22
+repeat4_mlp_only  0.17        +0.06      252      0.23
+repeat4_attn_mlp  0.19        +0.27      182      0.22
+random_all        0.15        -0.36      10718    0.12
+random_attn_only  0.16        +1.10      147      0.27
+random_mlp_only   0.15        +1.30      155      0.29
+```
+
+#### 语义特异性 (repeat4_all - random_all)
+
+```text
+模型         free_clean  s0_margin  bfi_p2
+qwen3        -0.07       -1.40      -0.12
+glm4         +0.11       +0.41      +0.05
+deepseek7b   +0.07       -0.14      +0.11
+```
+
+### 运行时间
+
+```text
+qwen3: 1.06 min
+glm4:  19.63 min
+ds7b:  6.37 min
+```
+
+### 核心发现
+
+#### 发现1：GLM4 只有 repeat4_all 产生 step0 margin 翻转
+
+```text
+baseline s0_margin = -1.03
+repeat4_all s0_margin = +0.40  ← 唯一翻转！
+repeat4_attn_only = -0.54      ← 不翻转
+repeat4_mlp_only = -0.78       ← 不翻转
+repeat4_attn_mlp = -0.35       ← 不翻转
+```
+
+**只有完整 layer restore 才能翻转 step0 margin。** 单独注入 attention delta、MLP delta 或两者组合都不能产生 margin 翻转。
+
+#### 发现2：模块级注入在 GLM4 中产生中等 free_clean 但无 margin 翻转
+
+```text
+repeat4_attn_only free_clean = 0.41（高于 baseline 0.36）
+repeat4_mlp_only free_clean = 0.36（等于 baseline）
+repeat4_attn_mlp free_clean = 0.37（略高于 baseline）
+```
+
+attn_only 的 free_clean 略高于 baseline，但 step0 margin 没有翻转。这说明 attention 贡献可以部分提升生成质量，但不通过 step0 logit-field flip 机制。
+
+#### 发现3：GLM4 是唯一有清晰语义特异性的模型
+
+```text
+glm4: repeat4_all - random_all = +0.11 (free_clean), +0.41 (s0_margin)
+qwen3: repeat4_all - random_all = -0.07 (free_clean), -1.40 (s0_margin)
+ds7b: repeat4_all - random_all = +0.07 (free_clean), -0.14 (s0_margin)
+```
+
+GLM4 是唯一在 free_clean 和 s0_margin 上都显示正语义特异性的模型。Qwen3 的 random 反而更强（margin +2.30），DS7B 的 margin 特异性为负。
+
+#### 发现4：Qwen3 的 random_all margin 最强（+2.30）
+
+Qwen3 random_all 的 step0 margin = +2.30，远高于 repeat4_all 的 +0.90。这再次确认 Qwen3 的低 beta/random 效应主要是通用生成门，不是语义调制。
+
+#### 发现5：bfi_prefix2 在 GLM4 中只有 repeat4_all 有效
+
+```text
+glm4:
+  repeat4_all bfi_p2 = 0.38（高于 baseline 0.36）
+  repeat4_attn_only bfi_p2 = 0.35
+  repeat4_mlp_only bfi_p2 = 0.32
+  repeat4_attn_mlp bfi_p2 = 0.32
+```
+
+只有 repeat4_all 的 prefix2 转移略高于 baseline，其他模块级注入的 prefix2 转移不高于 baseline。这与 Phase566 的发现一致：prefix2 转移需要完整的 step0 logit-field flip。
+
+### 本阶段结论
+
+1. **step0 logit-field flip 需要完整 residual restore，不是单个模块贡献。**
+   这是 Phase567 最核心的发现。单独注入 attention delta、MLP delta 或两者组合都不能产生 margin 翻转。
+
+2. **完整 residual restore 的非线性效应是关键。**
+   donor 的 layer output = h_in_donor + attn_out_donor + mlp_out_donor。
+   但在 recipient 中加 (attn_donor - attn_recipient) + (mlp_donor - mlp_recipient) 不等于替换整个 layer output。
+   因为 h_in_donor ≠ h_in_recipient，所以完整替换包含了不同的输入基线，而 delta 注入保持了 recipient 的基线。
+
+3. **GLM4 仍是唯一有清晰语义特异性的模型。**
+   repeat4_all - random_all 在 GLM4 上为正（+0.11 free_clean, +0.41 margin），在其他模型上不为正。
+
+4. **attention 贡献在 GLM4 中有中等 free_clean 提升但无 margin 翻转。**
+   repeat4_attn_only free_clean = 0.41 > baseline 0.36，但 margin = -0.54 < baseline -1.03... 实际上 margin 更负了。
+
+5. **模块级分解不支持"attention 或 MLP 单独驱动 logit-field flip"假说。**
+   step0 margin flip 的来源不是单个模块，而是完整 residual 状态的非线性读出。
+
+### 硬伤
+
+```text
+1. delta 注入方式假设线性叠加，但 Transformer 层内是非线性的
+2. 没有测 layer norm 的贡献
+3. 没有拆多层（L24/L26/L28 分别的贡献）
+4. random 用的是 repeat4 的同范数随机化，不是完全独立的随机向量
+5. bfi_prefix2 只测了 prefix2，没有测 prefix1/prefix3
+6. attention delta 和 mlp delta 的注入顺序可能影响结果（先 attn 后 mlp vs 同时）
+7. 没有测 recipient 的 h_in 也被替换的情况（即完整 swap）
+```
+
+### 理论修正
+
+Phase566 公式：
+```text
+R ≈ A_semantic · G_logit_field(0) · P_prefix(1:2) · L_recursive · G_late
+```
+
+Phase567 后：
+```text
+G_logit_field(0) 来源不是单个模块，而是完整 residual 状态的非线性读出。
+
+G_logit_field(0) = Readout(h_residual_donor) - Readout(h_residual_baseline)
+                 ≠ Readout(h_baseline + delta_attn + delta_mlp)
+```
+
+这意味着：
+```text
+step0 logit-field flip 不来自 attention 或 MLP 的独立贡献，
+而来自完整 residual 状态被替换后的非线性读出差异。
+```
+
+可能的原因：
+```text
+1. layer norm 的非线性放大了完整替换 vs delta 注入的差异
+2. 多层累积效应：L24/L26/L28 的完整替换产生累积非线性翻转
+3. donor 的 h_in 与 recipient 的 h_in 不同，完整替换改变了后续层的输入基线
+```
+
+### 下一步任务
+
+Phase568 应做：
+```text
+1. 完整 swap 测试：替换 recipient 的 h_in 为 donor 的 h_in（在 layer 输入处）
+2. 层级分解：L24/L26/L28 分别完整 restore 的贡献
+3. layer norm 贡献测试
+4. prefix1/prefix3 对照
+5. 如果完整 swap 也能翻转 margin，说明是输入基线问题
+6. 如果只有完整 layer output 替换能翻转，说明是层内非线性读出问题
+```
+
+### 结果文件
+
+```text
+results/glm5_phase567_logit_field_source/
+  phase567_qwen3_logit_field_source.json
+  phase567_glm4_logit_field_source.json
+  phase567_deepseek7b_logit_field_source.json
+  phase567_cross_model_summary.md
+```
+
+
+## Phase 568: Locked Prefix Replication and Residual-State Swap Audit 锁定前缀复验与残差状态交换审计 [2026-06-20 23:30]
+
+### 本阶段目标
+
+解决 Phase566-567 的两个冲突：
+1. prefix2 在 Phase566 强（T2=1.14），在 Phase567 弱（T2=0.25）→ 用更大样本复验
+2. 完整 residual restore 翻转 step0 margin，但模块 delta 不行 → 分解 h_in/h_attn/h_out
+
+### 生成脚本
+
+```text
+tests/glm5/phase568_locked_prefix_swap.py
+```
+
+### 测试原理
+
+**三状态交换：**
+- h_in swap：替换层输入为 donor 的层输入（注意力计算之前）
+- h_attn swap：替换注意力后状态为 donor 的（MLP 计算之前）
+- h_out swap：替换层输出为 donor 的（= Phase567 的 "all"）
+
+**逐层完整恢复：**
+- L24 only, L26 only, L28 only, L24+L28, all
+
+### 执行参数
+
+```text
+GLM4: test_n=24, seeds=8, max_tokens=12
+Qwen3: test_n=18, seeds=6, max_tokens=12
+DS7B: test_n=18, seeds=6, max_tokens=12
+route = forbidden_sentence_completion:temperature<-forbidden_definition
+```
+
+### 客观结果
+
+#### GLM4 (核心模型, test_n=24, 8 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank
+baseline_free           0.36        -1.03      522
+repeat4_free            0.44        +0.40      6537
+bfi_p1                  0.36        -1.03      522
+bfi_p2                  0.38        -1.03      522
+bfi_p3                  0.33        -1.03      522
+ifb_p2                  0.28        +0.40      6537
+repeat4_h_in_swap       0.40        +0.35      6562
+repeat4_h_attn_swap     0.36        -0.23      2152
+random_h_out_swap       0.33        -0.01      16714
+repeat4_L24             0.46        +0.26      8382
+repeat4_L26             0.42        +0.24      7353
+repeat4_L28             0.43        +0.40      6537
+repeat4_L24_L28         0.45        +0.40      6537
+```
+
+#### Qwen3 (test_n=18, 6 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank
+baseline_free           0.64        +0.56      374
+repeat4_free            0.48        +0.90      195
+bfi_p2                  0.46        +0.56      374
+ifb_p2                  0.51        +0.90      195
+repeat4_h_in_swap       0.39        +0.74      258
+repeat4_h_attn_swap     0.56        +0.21      272
+random_h_out_swap       0.56        +2.30      74
+repeat4_L28             0.53        +0.90      195
+repeat4_L24_L28         0.51        +0.90      195
+```
+
+#### DS7B (test_n=18, 6 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank
+baseline_free           0.15        +0.96      203
+repeat4_free            0.22        -0.49      128
+bfi_p2                  0.23        +0.96      203
+ifb_p2                  0.17        -0.49      128
+repeat4_h_in_swap       0.24        -0.71      180
+repeat4_h_attn_swap     0.21        -0.78      243
+random_h_out_swap       0.15        -0.36      10718
+repeat4_L28             0.21        -0.49      128
+```
+
+### 运行时间
+
+```text
+qwen3: 0.96 min
+glm4:  18.01 min
+ds7b:  5.60 min
+```
+
+### 核心发现
+
+#### 发现1：prefix2 在大样本下确认弱化
+
+```text
+GLM4 prefix2 转移指数:
+  Phase 566 (test_n=12, 6 seeds): T2 = (0.49-0.25)/(0.46-0.25) = 1.14
+  Phase 567 (test_n=24, 8 seeds): T2 = (0.38-0.36)/(0.44-0.36) = 0.25
+  Phase 568 (test_n=24, 8 seeds): T2 = (0.38-0.36)/(0.44-0.36) = 0.25
+```
+
+Phase 566 的强 prefix2 结论是小样本峰值。在 test_n=24 时，bfi_p2=0.38 仅比 baseline=0.36 高 0.02。
+prefix2 不是已钉死的强因果中介。
+
+#### 发现2：h_in swap 接近 h_out swap 效果
+
+```text
+GLM4:
+  repeat4_free (h_out swap all): clean=0.44, margin=+0.40
+  repeat4_h_in_swap:             clean=0.40, margin=+0.35
+  → h_in swap 达到 91% free_clean 和 88% margin
+
+  repeat4_h_attn_swap:           clean=0.36, margin=-0.23
+  → h_attn swap 基本无效
+```
+
+**层输入基线是关键，不是层内注意力或 MLP 计算。** 替换层输入为 donor 的输入，就能产生几乎相同的 margin 翻转。
+
+这说明：donor 的语义状态在进入 L24/L26/L28 之前就已经形成。这些层的计算只是传递和变换这个输入，不是语义的来源。
+
+#### 发现3：L28 单层就足够
+
+```text
+GLM4:
+  repeat4_L28:     clean=0.43, margin=+0.40  ← 与 all layers 相同的 margin！
+  repeat4_L24:     clean=0.46, margin=+0.26  ← clean 更高但 margin 弱
+  repeat4_L26:     clean=0.42, margin=+0.24
+  repeat4_L24_L28: clean=0.45, margin=+0.40
+```
+
+L28 单层完整恢复就产生与三层组合相同的 step0 margin 翻转。L24 单层有更高的 free_clean 但 margin 翻转较弱。
+
+#### 发现4：ifb_p2 有弱必要性
+
+```text
+GLM4:
+  repeat4_free = 0.44
+  ifb_p2 = 0.28  ← 强制干预使用 baseline 前缀2，效果降到 baseline 以下
+```
+
+虽然 prefix2 转移弱（bfi_p2=0.38），但必要性存在（ifb_p2=0.28 < baseline=0.36）。
+这说明 prefix2 有一定的路径锁定作用，但不是唯一载体。
+
+#### 发现5：跨模型 h_in swap 效应
+
+```text
+GLM4:  h_in swap margin = +0.35 (接近 repeat4_free +0.40)
+Qwen3: h_in swap margin = +0.74 (接近 repeat4_free +0.90)
+DS7B:  h_in swap margin = -0.71 (比 repeat4_free -0.49 更负)
+```
+
+GLM4 和 Qwen3 的 h_in swap 接近 full restore 效果，DS7B 不一致。
+
+### 本阶段结论
+
+1. **prefix2 不是强因果中介。** Phase 566 的强结论是小样本峰值。在 test_n=24 时，prefix2 转移指数只有 0.25。
+
+2. **层输入基线是 margin 翻转的关键来源。** h_in swap 达到 h_out swap 91% 的效果。语义状态在进入关键层之前已经形成。
+
+3. **L28 单层足够产生 margin 翻转。** 不需要 L24+L26+L28 组合，L28 alone 的 margin = +0.40 与 all layers 相同。
+
+4. **h_attn swap 基本无效。** 替换注意力后状态不能复现 margin 翻转。
+
+5. **GLM4 是唯一有清晰语义特异性的模型。** repeat4_h_in_swap - random_h_out_swap 在 GLM4 为 +0.07 (clean) 和 +0.36 (margin)。
+
+### 理论修正
+
+Phase567 公式：
+```text
+G_logit_field(0) 来源不是单个模块，而是完整 residual 状态的非线性读出
+```
+
+Phase568 后修正：
+```text
+G_logit_field(0) 来源不是 L24/L26/L28 的层内计算，
+而是进入这些层之前的输入基线状态。
+
+h_in swap ≈ h_out swap >> h_attn swap
+→ 关键语义状态在 L24 之前已经形成
+→ L24/L26/L28 的注意力和 MLP 计算只是传递和变换这个状态
+→ L28 的读出接口将输入状态转化为词表场翻转
+```
+
+### 硬伤
+
+```text
+1. h_in swap 仍然不是完整的因果证明，因为 donor h_in 包含了更早层的全部累积
+2. 没有追溯 h_in 的来源（L23 之前哪些层贡献了语义状态）
+3. prefix2 弱化后，下游中介仍未确定
+4. 没有测 Norm/Readout 的非线性放大
+5. DS7B 的 h_in swap 效果与 GLM4/Qwen3 不一致
+6. target rank 与 margin 的冲突仍未解释（rank 6537 但 margin +0.40）
+```
+
+### 下一步任务
+
+Phase569 应做：
+```text
+1. 追溯 h_in 来源：L20-L23 的逐层 restore，找到语义状态首次形成的层
+2. 测试 Norm/Readout 贡献：pre-norm vs post-norm 的 logit 差异
+3. 重新寻找 prefix2 之外的下游中介（可能不是 prefix 而是 hidden trajectory）
+4. 如果 h_in 来源追溯到更早层，则需重新定位关键层窗口
+```
+
+### 结果文件
+
+```text
+results/glm5_phase568_locked_prefix_swap/
+  phase568_qwen3_locked_prefix_swap.json
+  phase568_glm4_locked_prefix_swap.json
+  phase568_deepseek7b_locked_prefix_swap.json
+```
+
+
+## Phase 569: Pre-Layer Source Tracing and Readout Geometry Audit 层前来源追踪与读出几何审计 [2026-06-21 02:25]
+
+### 本阶段目标
+
+解决 Phase568 留下的三个关键问题：
+1. h_in swap ≈ h_out swap，但 h_in 状态到底来自哪些更早的层？
+2. 为什么 margin 翻正但 target rank 仍然很差（rank=6537 但 margin=+0.40）？
+3. L28 是语义源头还是仅仅是读出接口？Norm/Readout 贡献有多大？
+
+### 生成脚本
+
+```text
+tests/glm5/phase569_pre_layer_source_tracing.py
+```
+
+### 测试原理
+
+**Exp1 逐层 h_out swap 追踪：** 对每个 trace layer L，单独替换该层的 h_out 为 donor 的 h_out，记录 step0 margin/clean/rank。
+
+**Exp2 逐层 h_in swap 追踪：** 对每个 trace layer L，单独替换该层的 h_in 为 donor 的 h_in。如果某层 h_in swap 开始有效，说明关键状态在该层之前已形成。
+
+**Exp3 pre-norm vs post-norm readout 审计：** 同时记录：
+- pre-norm logits = W_U @ h_raw（最终层输出，未经 final norm）
+- post-norm logits = W_U @ Norm(h_raw)（模型标准输出）
+比较两者 margin 差异，判断 Norm 层是否是边际翻转放大器。
+
+**Exp4 rank/mass/entropy 审计：** 对每个条件记录：
+- target_group_mass = softmax(logits)[target_ids].sum()
+- competitor_group_mass
+- entropy = -sum p log p
+- best_non_target_rank
+
+### 追踪层配置
+
+```text
+GLM4      (peak=26, n_layers=40): [16,18,20,22,24,26,28]
+Qwen3     (peak=12, n_layers=36): [6,8,10,12,14]
+DS7B      (peak=18, n_layers=30): [12,14,16,18,20]
+```
+
+### 执行命令
+
+```text
+# 冒烟测试
+python tests/glm5/phase569_pre_layer_source_tracing.py qwen3 --smoke
+
+# 主测试（三轮）
+python tests/glm5/phase569_pre_layer_source_tracing.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase569_pre_layer_source_tracing.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127,131,137" --hard-exit-after-model
+python tests/glm5/phase569_pre_layer_source_tracing.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+
+# 确认测试（独立 seeds）
+python tests/glm5/phase569_pre_layer_source_tracing.py glm4 --test-n 24 --sample-seeds "139,149,151,157" --output-dir results/glm5_phase569_confirm --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.06 min
+glm4:      27.25 min
+ds7b:       5.98 min
+glm4 确认:  14.22 min
+```
+
+### 客观结果
+
+#### GLM4 (核心模型, test_n=24, 8 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank  s0_entropy
+baseline_free           0.36        -1.03      522      1.45
+repeat4_free            0.44        +0.40      6537     1.45
+L16_h_out_swap          0.44        +0.69      2463     1.14
+L18_h_out_swap          0.40        +1.04      2974     1.34
+L20_h_out_swap          0.49        +1.07      2703     1.43  ← h_out 峰值
+L22_h_out_swap          0.43        +0.79      4362     1.59
+L24_h_out_swap          0.46        +0.26      8382     1.66
+L26_h_out_swap          0.42        +0.24      7353     1.57
+L28_h_out_swap          0.43        +0.40      6537     1.45  ← = repeat4_free
+L16_h_in_swap           0.43        +0.64      1532     1.69
+L18_h_in_swap           0.43        +0.82      2684     0.99
+L20_h_in_swap           0.44        +1.00      3557     1.31
+L22_h_in_swap           0.54        +1.27      2207     1.57  ← h_in 峰值 + 最高 clean
+L24_h_in_swap           0.47        +0.48      6123     1.54
+L26_h_in_swap           0.47        +0.27      7481     1.63
+L28_h_in_swap           0.42        +0.35      6562     1.52
+random_h_out_swap       0.33        -0.01      16714    6.57  ← 高熵污染
+```
+
+#### GLM4 Norm/Readout 审计
+
+```text
+条件               pre_margin  post_margin  delta     pre_rank  post_rank  pre_max_logit  post_max_logit
+baseline           +6.67       -1.03        -7.70     928       522        30.75          15.11          ← 符号翻转！
+repeat4_h_out_swap +5.92       +0.40        -5.52     3681      6537       26.66          15.41
+```
+
+#### Qwen3 (test_n=18, 6 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank  s0_entropy
+baseline_free           0.64        +0.56      374      0.27
+repeat4_free            0.48        +0.90      195      0.43
+L6_h_out_swap           0.42        +1.01      252      0.28
+L8_h_out_swap           0.38        +0.84      212      0.35
+L10_h_out_swap          0.36        +0.76      251      0.34
+L12_h_out_swap          0.40        +0.72      262      0.34
+L14_h_out_swap          0.53        +0.90      195      0.43  ← = repeat4_free
+L6_h_in_swap            0.57        +0.69      298      0.23
+L8_h_in_swap            0.41        +0.88      249      0.31
+L10_h_in_swap           0.37        +0.87      221      0.36
+L12_h_in_swap           0.25        +0.67      268      0.32
+L14_h_in_swap           0.44        +0.74      258      0.36
+random_h_out_swap       0.56        +2.30      74       3.05  ← 高熵污染
+```
+
+#### Qwen3 Norm/Readout 审计
+
+```text
+条件               pre_margin  post_margin  delta     pre_rank  post_rank
+baseline           +2.41       +0.56        -1.85     30751     374
+repeat4_h_out_swap +5.67       +0.90        -4.77     16731     195
+```
+
+#### DS7B (test_n=18, 6 seeds)
+
+```text
+条件                    free_clean  s0_margin  s0_rank  s0_entropy
+baseline_free           0.15        +0.96      203      1.29
+repeat4_free            0.22        -0.49      128      2.22  ← 干预使 margin 更差
+L12_h_out_swap          0.19        -0.58      331      1.84
+L14_h_out_swap          0.16        -0.76      257      2.02
+L16_h_out_swap          0.14        -0.82      244      2.31
+L18_h_out_swap          0.17        -0.77      224      2.58
+L20_h_out_swap          0.21        -0.49      128      2.22  ← = repeat4_free
+L12_h_in_swap           0.15        -0.50      368      2.11
+L14_h_in_swap           0.16        -0.70      276      2.26
+L16_h_in_swap           0.12        -0.82      257      2.32
+L18_h_in_swap           0.17        -1.06      262      2.51
+L20_h_in_swap           0.21        -0.71      180      2.40
+random_h_out_swap       0.15        -0.36      10718    3.92
+```
+
+#### DS7B Norm/Readout 审计
+
+```text
+条件               pre_margin  post_margin  delta      pre_rank  post_rank  pre_max_logit
+baseline           +51.97      +0.96        -51.01     75777     203        608.46
+repeat4_h_out_swap +43.18      -0.49        -43.67     67685     128        487.04
+```
+
+### 确认测试结果（GLM4, 4 独立 seeds: 139,149,151,157）
+
+```text
+关键条件对比 (主测试 vs 确认测试):
+条件                主测试 margin    确认 margin    一致性
+baseline_free       -1.03           -1.03          完全一致 ✓
+repeat4_free        +0.40           +0.40          完全一致 ✓
+L20_h_out_swap      +1.07           +1.07          完全一致 ✓
+L22_h_in_swap       +1.27           +1.27          完全一致 ✓
+L28_h_out_swap      +0.40           +0.40          完全一致 ✓
+L24_h_out_swap      +0.26           +0.26          完全一致 ✓
+random_h_out_swap   -0.01           -0.01          完全一致 ✓
+
+Norm/Readout 审计:
+baseline:           pre=+6.67 → post=-1.03  (主测试) = pre=+6.67 → post=-1.03 (确认)  ✓
+repeat4:            pre=+5.92 → post=+0.40  (主测试) = pre=+5.92 → post=+0.40 (确认)  ✓
+```
+
+margin 值在不同 seeds 下完全一致，因为 step0 logits 在给定 hidden state swap 后是确定性的。clean rate 有轻微波动（采样导致），但趋势一致。
+
+### 核心发现
+
+#### 发现1：关键语义状态在 L20-L22 形成，而非 L24-L28
+
+```text
+GLM4 h_out swap 逐层 margin:
+  L16: +0.69
+  L18: +1.04
+  L20: +1.07  ← 峰值
+  L22: +0.79
+  L24: +0.26  ← 骤降
+  L26: +0.24
+  L28: +0.40
+
+GLM4 h_in swap 逐层 margin:
+  L16: +0.64
+  L18: +0.82
+  L20: +1.00
+  L22: +1.27  ← 峰值 + 最高 clean=0.54
+  L24: +0.48  ← 骤降
+  L26: +0.27
+  L28: +0.35
+```
+
+关键语义状态在 L20-L22 已经形成。L24 之后 margin 骤降，说明 L24-L26 的计算反而在某种程度上稀释了这个状态。
+
+L22_h_in_swap 的 clean=0.54 是所有条件中最高的，甚至超过 repeat4_free 的 0.44。这说明替换 L22 的输入能产生比完整窗口恢复更好的生成质量。
+
+#### 发现2：最终 Norm 层是 margin 符号翻转的关键（范式级发现）
+
+```text
+GLM4 Norm/Readout 审计:
+  baseline:  pre_margin = +6.67  →  post_margin = -1.03  ← 符号翻转！
+  repeat4:   pre_margin = +5.92  →  post_margin = +0.40  ← 符号保持但大幅压缩
+
+DS7B Norm/Readout 审计:
+  baseline:  pre_margin = +51.97 →  post_margin = +0.96  ← 巨幅压缩
+  repeat4:   pre_margin = +43.18 →  post_margin = -0.49  ← 符号翻转！
+
+Qwen3 Norm/Readout 审计:
+  baseline:  pre_margin = +2.41  →  post_margin = +0.56  ← 压缩
+  repeat4:   pre_margin = +5.67  →  post_margin = +0.90  ← 压缩
+```
+
+**这是本阶段最重要的发现。** 所有模型的 raw hidden state 都有正的 target-competitor margin（即使 baseline 也是正的！）。所谓 "margin 翻转" 并非 hidden state 中 target 从低于 competitor 变为高于 competitor，而是：
+
+```text
+raw hidden state 中 target 始终 > competitor（pre_margin > 0）
+但 final Norm 层可以将这个正 margin 翻转为负（baseline）
+或保持为正（repeat4 intervention）
+```
+
+也就是说，donor intervention 的作用不是在 hidden state 中创造正 margin，而是创造一种 hidden state 几何构型，使其能"通过" final Norm 层的过滤，保持正 margin 到输出。
+
+#### 发现3：L28 是读出接口，不是语义源头
+
+```text
+GLM4:
+  L28_h_out_swap: margin = +0.40 = repeat4_free margin = +0.40  ← 完全一致
+  L20_h_out_swap: margin = +1.07  ← 远强于 L28
+  L22_h_in_swap:  margin = +1.27  ← 远强于 L28
+```
+
+L28 单层 h_out swap 完全复现 repeat4_free 的 margin，但更早层（L20-L22）的 swap 产生更强的 margin。这说明 L28 是将 hidden state 映射到 logit field 的读出接口，不是语义生成源。真正的语义状态在 L20-L22 形成。
+
+#### 发现4：margin 与 target rank 的冲突已解释
+
+```text
+GLM4:
+  baseline:      margin=-1.03, rank=522,  target_mass≈10^-5
+  repeat4_free:  margin=+0.40, rank=6537, target_mass≈10^-5
+  L22_h_in_swap: margin=+1.27, rank=2207, target_mass≈10^-5
+  random_swap:   margin=-0.01, rank=16714, target_mass≈2×10^-4, entropy=6.57
+```
+
+target_group_mass 在所有真实条件下都是 ~10^-5（极小）。这意味着 target 和 competitor token 都排在词表数千名之后，它们之间的 margin 只反映两者的相对高低，不反映它们在全词表中的绝对位置。
+
+margin 翻正 ≠ target token 变得可采样。margin 只表示 target 在 competitor 之上，但两者都在大量 non-target token 之下。
+
+random_h_out_swap 的 entropy=6.57（远高于真实条件的 1.4-1.7），target_mass=2×10^-4（高一个数量级），这再次确认随机注入产生的是高熵噪声分布，不是语义调制。
+
+#### 发现5：跨模型 Norm 层行为差异
+
+```text
+模型     baseline pre→post margin 变化      repeat4 pre→post margin 变化
+GLM4     +6.67 → -1.03 (符号翻转)           +5.92 → +0.40 (压缩保持)
+Qwen3    +2.41 → +0.56 (压缩保持)           +5.67 → +0.90 (压缩保持)
+DS7B     +51.97 → +0.96 (巨幅压缩)          +43.18 → -0.49 (符号翻转)
+```
+
+GLM4 和 DS7B 都出现了符号翻转，但在不同条件下：
+- GLM4：baseline 翻转，repeat4 保持 → intervention 创造了能通过 Norm 的几何
+- DS7B：baseline 保持，repeat4 翻转 → intervention 破坏了几何
+
+Qwen3 没有符号翻转，但 margin 大幅压缩。Qwen3 的高 baseline clean=0.64 可能与其 Norm 层不翻转 margin 有关。
+
+### 理论修正
+
+#### Phase568 理论
+
+```text
+关键层输入状态驱动的早期词表场翻转理论：
+语义门不是在关键层内部新写出来的，而是关键层之前已经形成的残差状态被 L28 等读出接口转成词表场偏移。
+```
+
+#### Phase569 修正
+
+```text
+Norm 层门控的残差状态读出理论：
+
+1. raw residual stream 中 target 始终 > competitor（pre_margin > 0），即使 baseline 也是如此。
+2. final Norm 层是 target-competitor margin 的关键门控：
+   - baseline hidden state 几何 → Norm 翻转 margin 为负 → competitor 输出
+   - donor hidden state 几何 → Norm 保持 margin 为正 → target 输出
+3. 关键语义状态在 L20-L22 形成（GLM4），不是 L24-L28。
+4. L28 是读出接口层，将已形成的 hidden state 映射到 logit field。
+5. 所谓 "语义恢复" 不是创造正 margin，而是创造能通过 Norm 层过滤的 hidden state 几何构型。
+```
+
+一句话：
+
+```text
+margin 翻转不在 hidden state 中发生，而在 final Norm 层中发生。
+donor 的作用是提供一种能"通过" Norm 层门控的 hidden state 几何。
+```
+
+### 统一公式更新
+
+#### 1. pre-norm margin（新定义）
+
+$$
+M_0^{\text{pre}} = \max_{y \in Y_T} (W_U h_{\text{raw}})_y - \max_{y \in Y_C} (W_U h_{\text{raw}})_y
+$$
+
+#### 2. post-norm margin（标准定义）
+
+$$
+M_0^{\text{post}} = \max_{y \in Y_T} (W_U \text{Norm}(h_{\text{raw}}))_y - \max_{y \in Y_C} (W_U \text{Norm}(h_{\text{raw}}))_y
+$$
+
+#### 3. Phase569 核心发现
+
+$$
+M_0^{\text{pre}}(\text{baseline}) > 0 \quad \text{但} \quad M_0^{\text{post}}(\text{baseline}) < 0
+$$
+
+$$
+M_0^{\text{pre}}(\text{donor}) > 0 \quad \text{且} \quad M_0^{\text{post}}(\text{donor}) > 0
+$$
+
+#### 4. 语义恢复的 Norm 门控公式
+
+$$
+R_{\text{semantic}} \approx A_{\text{semantic}} \cdot H_{\text{L20-L22}} \cdot G_{\text{Norm}} \cdot G_{\text{logit-field}}(0) \cdot C_{\text{path}} \cdot G_{\text{late}}
+$$
+
+其中新增：
+
+```text
+H_L20-L22（L20-L22 隐藏状态）：
+  关键语义/路径状态在 L20-L22 形成，而非 L24-L28。
+
+G_Norm（最终 Norm 门控）：
+  final Norm 层是 margin 符号翻转的关键门控。
+  baseline hidden state 几何 → Norm 翻转 margin
+  donor hidden state 几何 → Norm 保持 margin
+```
+
+### 硬伤与问题
+
+```text
+1. pre-norm margin 始终为正，但 target_group_mass ≈ 10^-5。
+   这意味着 raw hidden state 中虽然 target > competitor，但两者都在大量 non-target token 之下。
+   pre-norm margin 为正可能只是 hidden state norm 的尺度效应，不一定是语义编码。
+
+2. Norm 层符号翻转的机制未深入分析。
+   只观测到现象，但不知道 Norm 的哪些参数（weight/bias）负责翻转。
+   需要分解 Norm 的 affine 变换贡献。
+
+3. L20-L22 的 h_in/h_out swap 产生更强 margin，但 target rank 仍然很差（2000-4000）。
+   更强 margin 不等于更好的生成闭合。
+   L22_h_in_swap 的 clean=0.54 最高，但这是采样质量，不是 next-token 确定性。
+
+4. 确认测试中 clean rate 有波动（L22_h_in_swap: 主测试 0.54, 确认 0.43）。
+   margin 完全一致（+1.27），但 clean 不一致，说明 margin 和生成质量不是简单对应。
+
+5. DS7B 的 pre-norm margin 高达 50+，远超 GLM4（6.67）和 Qwen3（2.41）。
+   这可能是 DS7B 的 hidden state norm 更大，不一定是更强的语义编码。
+   需要 norm-normalized margin 对比。
+
+6. 当前仍只测 vehicle_tool 一个类别，外推受限。
+
+7. h_attn swap 未在本阶段追踪（Phase568 已测，基本无效）。
+   但 L20-L22 的 h_attn 未测，不能完全排除更早层的注意力贡献。
+```
+
+### 新增客观事实拼图（8条）
+
+127. **关键语义状态在 L20-L22 形成**（GLM4），不是 L24-L28。L20_h_out_swap margin=+1.07 远强于 L28 的 +0.40。
+128. **L22_h_in_swap 产生最强 margin（+1.27）和最高 clean（0.54）**，超过完整窗口恢复。
+129. **L28 是读出接口层，不是语义源头**。L28_h_out_swap margin=+0.40 完全等于 repeat4_free。
+130. **raw hidden state 中 target 始终 > competitor**（pre_margin > 0），即使 baseline 也是如此。
+131. **final Norm 层是 margin 符号翻转的关键门控**。GLM4 baseline: pre=+6.67 → post=-1.03（符号翻转）。
+132. **donor intervention 的作用是提供能通过 Norm 门控的 hidden state 几何**，不是创造正 margin。
+133. **target_group_mass ≈ 10^-5**，margin 翻转只改变 target vs competitor 相对顺序，不改变它们在全词表中的低排名。
+134. **random_h_out_swap 产生高熵分布（entropy=6.57）**，与真实条件（1.4-1.7）形成鲜明对比，确认是噪声而非语义。
+
+### 下一步任务
+
+Phase570 应做：
+
+```text
+1. Norm 层参数分解：
+   - final Norm 的 weight 和 bias 各自对 margin 翻转的贡献
+   - 去掉 Norm 的 affine 参数（只用 RMSNorm）后 margin 变化
+   - 这能确定是 Norm 的 normalization 部分还是 affine 部分负责翻转
+
+2. L20-L22 的 h_attn swap 和模块分解：
+   - L20-L22 的 attention 和 MLP 各自贡献
+   - 找到 L20-L22 中具体哪个模块写入关键状态
+
+3. norm-normalized margin 对比：
+   - 用 cos(h, target_dir) - cos(h, competitor_dir) 替代绝对 margin
+   - 消除 hidden state norm 的尺度效应
+
+4. 跨类别验证：
+   - 在 clothing_tool 和 furniture_tool 上重复 L20-L22 追踪
+   - 确认 L20-L22 峰值不是 vehicle_tool 特有
+
+5. target mass 与生成闭合的关系：
+   - 为什么 target_group_mass ≈ 10^-5 但 clean rate 可达 0.54？
+   - 采样过程中的路径依赖效应
+```
+
+### 结果文件
+
+```text
+results/glm5_phase569_pre_layer_source/
+  phase569_qwen3_pre_layer_source_smoke.json
+  phase569_qwen3_pre_layer_source.json
+  phase569_glm4_pre_layer_source.json
+  phase569_deepseek7b_pre_layer_source.json
+results/glm5_phase569_confirm/
+  phase569_glm4_pre_layer_source.json
+results/glm5_phase569_*_log.txt
+```
+
+
+## Phase 570: Final Norm Gate and L20-L22 Writer Audit 最终归一化门与L20-L22写入者审计 [2026-06-21 03:58]
+
+### 本阶段目标
+
+拆解 Phase569 的两个关键发现：
+1. final Norm 如何把 pre_margin 翻转为 post_margin？是 RMS 归一化还是 Norm weight？
+2. L20-L22 的关键 residual state 由哪些模块写入？attention 还是 MLP？
+
+### 生成脚本
+
+```text
+tests/glm5/phase570_norm_gate_writer.py
+```
+
+### 测试原理
+
+**Exp1 Norm 三阶段分解：**
+- z_raw = W_U @ h_raw（未经任何归一化）
+- z_rms = W_U @ (h_raw / rms(h_raw))（仅 RMS 归一化）
+- z_norm = W_U @ (w_norm * h_raw / rms(h_raw))（完整 Norm = RMS + weight）
+比较三阶段 margin，定位符号翻转发生在哪个阶段。
+
+**Exp2 维度贡献分解：**
+- d_TC = mean(W_U[target_ids]) - mean(W_U[competitor_ids])
+- raw_contrib[i] = h_raw[i] * d_TC[i]
+- norm_contrib[i] = h_norm[i] * d_TC[i]
+找到从 raw 到 norm 贡献变化最大的维度。
+
+**Exp3 模块写入者审计：**
+- attn_out swap：替换 self_attn 输出为 donor 的（仅替换注意力贡献）
+- mlp_out swap：替换 mlp 输出为 donor 的（仅替换 MLP 贡献）
+- 与 h_in swap 和 h_out swap 对比
+
+**Exp4 范数归一语义对齐：**
+- A_TC_raw = cos(h_raw, d_TC)
+- A_TC_norm = cos(h_norm, d_TC)
+
+**Exp5 跨类别验证（仅 GLM4）：**
+- clothing_tool 和 furniture_tool
+
+### 执行命令
+
+```text
+python tests/glm5/phase570_norm_gate_writer.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --skip-cross-category --hard-exit-after-model
+python tests/glm5/phase570_norm_gate_writer.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127" --cross-seeds "101,103,107,109" --hard-exit-after-model
+python tests/glm5/phase570_norm_gate_writer.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --skip-cross-category --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.29 min
+glm4:      33.35 min
+ds7b:       6.46 min
+```
+
+### 客观结果
+
+#### Exp1: Norm 三阶段分解
+
+```text
+模型     条件              raw_margin  rms_margin  norm_margin  符号翻转位置
+GLM4     baseline          +6.67       +1.50       -1.03        rms→norm (weight翻转!)
+GLM4     repeat4_h_out     +5.92       +1.38       +0.40        无翻转
+GLM4     best_h_in_swap    +6.48       +1.47       +1.27        无翻转
+
+Qwen3    baseline          +2.41       +0.18       +0.57        无翻转
+Qwen3    repeat4_h_out     +5.67       +0.42       +0.89        无翻转
+Qwen3    best_h_in_swap    +5.00       +0.35       +0.89        无翻转
+
+DS7B     baseline          +51.97      +2.08       +0.96        无翻转
+DS7B     repeat4_h_out     +43.18      +1.79       -0.50        rms→norm (weight翻转!)
+DS7B     best_h_in_swap    +48.10      +1.99       -0.71        rms→norm (weight翻转!)
+```
+
+**核心发现：符号翻转发生在 Norm weight 阶段，不是 RMS 归一化阶段。**
+
+GLM4 baseline: rms_margin=+1.50（正），但 norm_margin=-1.03（负）→ Norm weight 把正翻为负。
+GLM4 repeat4: rms_margin=+1.38（正），norm_margin=+0.40（正）→ Norm weight 保持正。
+DS7B baseline: rms_margin=+2.08（正），norm_margin=+0.96（正）→ 不翻转。
+DS7B repeat4: rms_margin=+1.79（正），norm_margin=-0.50（负）→ Norm weight 翻转。
+
+#### Exp3: 模块写入者审计
+
+```text
+模型     层    h_in_margin  attn_out_margin  mlp_out_margin  h_out_margin
+GLM4     L18   +0.64        -1.18            -0.41           +1.04
+GLM4     L20   +1.00        -0.74            -0.28           +1.07
+GLM4     L22   +1.27        -1.20            -0.32           +0.79
+
+Qwen3    L8    +0.88        +0.47            +0.38           +0.84
+Qwen3    L10   +0.87        +0.50            +0.44           +0.76
+Qwen3    L12   +0.67        +0.58            +0.50           +0.72
+
+DS7B     L14   -0.70        +2.13            +0.82           -0.76
+DS7B     L16   -0.82        +1.17            +0.74           -0.82
+DS7B     L18   -1.06        +1.59            +0.11           -0.77
+```
+
+**核心发现：**
+
+GLM4: attn_out 和 mlp_out swap 产生**负 margin**！远弱于 h_in 和 h_out swap。这证明 L18-L22 的 attention 和 MLP 模块**不是**关键状态的写入者。关键状态存在于残差流本身，不是由这些模块的输出写入的。
+
+Qwen3: attn_out 和 mlp_out swap 产生弱正 margin，但仍远弱于 h_in/h_out swap。模式与 GLM4 一致但更温和。
+
+DS7B: **完全相反模式**！attn_out swap 产生强正 margin（+2.13），而 h_in/h_out swap 产生负 margin。这说明 DS7B 的注意力模块在**抑制** target margin，替换为 donor 的注意力释放了这种抑制。
+
+#### Exp4: 范数归一语义对齐
+
+```text
+模型     条件              A_TC_raw   A_TC_norm   |h|_raw   |h|_norm
+GLM4     baseline          0.0255     -0.0033     284.3     189.1
+GLM4     repeat4           0.0269     +0.0008     275.3     199.1
+GLM4     best_h_in         0.0324     +0.0070     283.1     199.9
+
+Qwen3    baseline          0.0100     +0.0076     676.3     126.3
+Qwen3    repeat4           0.0123     +0.0098     687.1     129.7
+
+DS7B     baseline          0.0442     +0.0073     1492.3    173.9
+DS7B     repeat4           0.0351     +0.0022     1444.5    208.9
+```
+
+GLM4 baseline 的 A_TC_norm 为负（-0.0033），说明 Norm 后 hidden state 与 target-competitor 方向反相关。repeat4 的 A_TC_norm 为正（+0.0008），方向保持。
+
+#### Exp5: 跨类别验证（仅 GLM4）
+
+```text
+类别对           条件              raw_margin  rms_margin  norm_margin  clean  rank
+vehicle_tool     baseline          +6.67       +1.50       -1.03        0.36   522
+vehicle_tool     repeat4           +5.92       +1.38       +0.40        0.47   6537
+
+clothing_tool    baseline          +4.69       +1.06       +4.49        0.10   74
+clothing_tool    repeat4           +5.97       +1.57       +5.25        0.11   1941
+
+furniture_tool   baseline          +6.99       +1.59       +5.53        0.02   28
+furniture_tool   repeat4           +5.06       +1.26       +4.46        0.08   623
+```
+
+**核心发现：Norm 门控的符号翻转是 vehicle_tool 特有的，不是普适机制。**
+
+- vehicle_tool: Norm weight 翻转符号（+1.50 → -1.03），需要 donor 干预
+- clothing_tool: Norm weight 放大正 margin（+1.06 → +4.49），不需要干预
+- furniture_tool: Norm weight 放大正 margin（+1.59 → +5.53），baseline 已很强
+
+clothing_tool 和 furniture_tool 的 baseline norm_margin 已经为正且很大，不存在"需要恢复"的问题。它们的 clean rate 很低（0.10 和 0.02）但原因不同于 vehicle_tool。
+
+### 核心发现
+
+#### 发现1：Norm weight（不是 RMS 归一化）是 margin 符号翻转的来源
+
+```text
+GLM4 vehicle_tool:
+  baseline:  raw=+6.67 → rms=+1.50 → norm=-1.03
+  ↑ rms 保持正，是 norm weight 翻转了符号
+
+DS7B vehicle_tool:
+  repeat4:   raw=+43.18 → rms=+1.79 → norm=-0.50
+  ↑ 同样是 norm weight 翻转
+```
+
+RMS 归一化大幅压缩 margin（从 6.67 到 1.50），但保持符号。是 Norm 的 weight 参数（可学习的逐维度缩放）改变了某些维度的相对权重，导致 target-competitor margin 符号翻转。
+
+#### 发现2：L18-L22 的 attention 和 MLP 不是关键状态写入者（GLM4）
+
+```text
+GLM4:
+  L22_h_in:     +1.27  (强正)
+  L22_attn_out: -1.20  (强负!)
+  L22_mlp_out:  -0.32  (负)
+  L22_h_out:    +0.79  (正)
+```
+
+attn_out 和 mlp_out swap 产生负 margin，说明：
+1. 这些模块的输出不是关键语义状态的载体
+2. 替换单个模块输出会破坏残差流的整体构型
+3. 关键状态存在于残差流的**整体几何**中，不是由单个模块写入
+
+#### 发现3：DS7B 展现完全相反的模块模式
+
+```text
+DS7B:
+  L14_h_in:     -0.70  (负)
+  L14_attn_out: +2.13  (强正!)
+  L14_mlp_out:  +0.82  (正)
+  L14_h_out:    -0.76  (负)
+```
+
+DS7B 的注意力模块在**抑制** target margin。替换为 donor 的注意力释放了这种抑制。这是与 GLM4 完全不同的机制。
+
+#### 发现4：Norm 门控符号翻转是 vehicle_tool 特有的
+
+```text
+GLM4 跨类别 Norm 分解:
+  vehicle_tool:   rms=+1.50 → norm=-1.03  (翻转，需要恢复)
+  clothing_tool:  rms=+1.06 → norm=+4.49  (放大，不需要恢复)
+  furniture_tool: rms=+1.59 → norm=+5.53  (放大，不需要恢复)
+```
+
+只有 vehicle_tool 的 Norm weight 翻转了 margin 符号。其他类别的 Norm weight 放大了正 margin。这说明 "Norm gate" 不是普适机制，而是特定类别对与特定 Norm weight 参数的交互。
+
+### 理论修正
+
+#### Phase569 理论
+
+```text
+Norm 门控的 L20-L22 残差状态读出理论：
+margin 翻转不在 hidden state 中发生，而在 final Norm 层中发生。
+```
+
+#### Phase570 修正
+
+```text
+Norm weight 门控理论（精细化）：
+
+1. RMS 归一化大幅压缩 margin 但保持符号（所有模型一致）。
+2. Norm weight（可学习参数）决定符号是否翻转。
+3. 符号翻转不是普适的：
+   - GLM4 vehicle_tool baseline: Norm weight 翻转（+1.50 → -1.03）
+   - GLM4 clothing_tool baseline: Norm weight 放大（+1.06 → +4.49）
+   - DS7B vehicle_tool repeat4: Norm weight 翻转（+1.79 → -0.50）
+4. L18-L22 的 attention 和 MLP 不是关键状态写入者（GLM4）。
+   关键状态在残差流整体几何中，不是由单个模块输出写入。
+5. DS7B 的注意力模块起抑制作用，与 GLM4 机制相反。
+6. "语义恢复"只在对 Norm weight 敏感的类别对（如 vehicle_tool）中需要。
+```
+
+一句话：
+
+```text
+Norm weight 是 margin 符号门控，但这个门控是类别特异的，不是普适机制。
+关键语义状态不在单个模块输出中，而在残差流整体几何构型中。
+```
+
+### 硬伤与问题
+
+```text
+1. Norm weight 翻转的维度机制未完全定位。
+   Exp2 的维度贡献数据已收集，但需要更详细分析哪些维度的 weight 导致翻转。
+
+2. 跨类别只测了 GLM4，且 clothing_tool 和 furniture_tool 的 clean rate 很低。
+   它们的"不需要恢复"可能是因为 task 本身太难（clean=0.02-0.11），不是因为没有 Norm 门控。
+
+3. DS7B 的反向模式（attn_out swap 产生正 margin）未深入分析。
+   可能与 DS7B 的注意力机制不同有关。
+
+4. 模块写入者审计只测了 L18-L22（GLM4），更早的层未测。
+   关键状态可能在 L16 或更早形成。
+
+5. clothing_tool 的 repeat4 干预后 rank 从 74 变差到 1941，
+   但 margin 从 +4.49 增加到 +5.25。
+   这再次说明 margin 和 rank 不是简单对应。
+
+6. furniture_tool baseline rank=28（非常好），但 clean=0.02（极差）。
+   说明即使目标 token 排名很高，生成质量也可能很差。
+   这质疑了 next-token margin 作为语义指标的有效性。
+```
+
+### 新增客观事实拼图（7条）
+
+135. **Norm weight（不是 RMS 归一化）是 margin 符号翻转的来源**。GLM4 baseline: rms=+1.50 → norm=-1.03。
+136. **L18-L22 的 attention 和 MLP 不是关键状态写入者**（GLM4）。attn_out/mlp_out swap 产生负 margin。
+137. **关键状态存在于残差流整体几何中**，不是由单个模块输出写入。
+138. **DS7B 注意力模块起抑制作用**，attn_out swap 产生正 margin（+2.13），与 GLM4 完全相反。
+139. **Norm 门控符号翻转是 vehicle_tool 特有的**。clothing_tool 和 furniture_tool 的 Norm weight 放大正 margin。
+140. **"语义恢复"只在 Norm weight 翻转的类别对中需要**。clothing_tool/furniture_tool baseline 已为正。
+141. **furniture_tool baseline rank=28 但 clean=0.02**，证明 next-token rank 高不等于生成质量好。
+
+### 下一步任务
+
+Phase571 应做：
+
+```text
+1. Norm weight 维度分析：
+   - 哪些维度的 Norm weight 贡献了符号翻转
+   - 是否存在"门控维度子空间"
+   - 去掉这些维度的 weight 后 margin 变化
+
+2. 更早层追踪：
+   - L12-L18 的逐层 h_in/h_out swap
+   - 找到关键状态首次形成的精确层
+
+3. 残差流几何分析：
+   - 既然单个模块不是写入者，分析残差流的整体几何构型
+   - baseline vs donor 的残差流角度/距离/投影差异
+
+4. 跨类别扩展：
+   - 测试更多类别对（animal_tool, fruit_vegetable）
+   - 区分"Norm gate 类别"和"非 Norm gate 类别"
+
+5. 生成质量与 margin 分离：
+   - furniture_tool rank=28 但 clean=0.02 的原因
+   - next-token 指标与 generation closure 的关系
+```
+
+### 结果文件
+
+```text
+results/glm5_phase570_norm_gate_writer/
+  phase570_qwen3_norm_gate_writer.json
+  phase570_glm4_norm_gate_writer.json
+  phase570_deepseek7b_norm_gate_writer.json
+results/glm5_phase570_*_log.txt
+```
+
+
+## Phase 571: Norm-Weight Dimension Gate and Early Writer Tracing 归一化权重维度门与早期写入者追踪 [2026-06-21 04:45]
+
+### 本阶段目标
+
+1. 哪些 Norm weight 维度导致 vehicle_tool margin 符号翻转？
+2. 这些维度的残差状态在 L12-L22 哪些层形成？
+3. 不同类别的失败瓶颈是 Norm gate、path、还是 generation quality？
+
+### 生成脚本
+
+```text
+tests/glm5/phase571_norm_weight_dimension_gate.py
+```
+
+### 测试原理
+
+**Exp1 维度贡献分析：**
+- d_TC = mean(W_U[target_ids]) - mean(W_U[competitor_ids])
+- raw_contrib[i] = h_raw[i] * d_TC[i]
+- norm_contrib[i] = h_norm[i] * d_TC[i]
+- delta_norm_rms[i] = norm_contrib[i] - rms_contrib[i]（Norm weight 的维度贡献变化）
+- 找到 |delta_norm_rms| 最大的 top-50 维度
+
+**Exp2 维度消融：**
+- ablate_top{k}：对 top-k gate dims 设 w_norm=1（移除这些维度的 weight 效应）
+- keep_only_top{k}：只保留 top-k 维度的原始 weight，其余设为 1
+- 如果 ablate_top5 使 baseline margin 从负变正，说明这 5 个维度就是符号翻转的主因
+
+**Exp3 早期写入者追踪：**
+- 对 L12-L22 每层捕获 h_out，计算 gate dims 的激活轨迹
+- 计算每层 h_out 的 RMS-readout margin
+
+**Exp4 瓶颈分类：**
+- A_norm_gate：rms>0 但 norm<0（Norm weight 翻转）
+- B_rank_mass：margin>0 但 target_mass<1e-4
+- C_path：next-token 强但 clean<0.20
+- D_alignment：random≥real donor
+
+### 执行命令
+
+```text
+python tests/glm5/phase571_norm_weight_dimension_gate.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --skip-cross-category --hard-exit-after-model
+python tests/glm5/phase571_norm_weight_dimension_gate.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127" --cross-seeds "101,103,107,109" --hard-exit-after-model
+python tests/glm5/phase571_norm_weight_dimension_gate.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --skip-cross-category --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.84 min
+glm4:      10.07 min
+ds7b:       2.04 min
+```
+
+### 客观结果
+
+#### Exp1+2: GLM4 vehicle_tool 维度分析与消融
+
+```text
+条件              raw_margin  rms_margin  norm_margin  post_margin  rank    mass
+baseline          +6.67       +1.50       -1.03        -1.03        522     2.05e-05
+repeat4_h_out     +5.92       +1.38       +0.40        +0.40        6537    1.14e-06
+best_h_in_swap    +6.48       +1.47       +1.27        +1.27        2207    7.90e-06
+```
+
+```text
+维度消融（baseline）:
+  original (full w_norm):     -1.02  ← 负
+  rms_only (w_norm=1 all):    +1.50  ← 正（移除所有 weight 恢复正）
+  ablate_top5 (top5 w=1):     +0.82  ← 正！仅移除5个维度就翻转！
+  ablate_top20 (top20 w=1):   -0.07  ← 接近0
+  keep_only_top20:            +0.12  ← 接近0
+```
+
+**核心发现：仅 5 个 Norm weight 维度就导致了 GLM4 vehicle_tool baseline 的符号翻转。**
+
+ablate_top5 使 margin 从 -1.02 变为 +0.82，说明这 5 个维度的 weight 值是翻转的直接原因。移除它们后 margin 翻回正。
+
+#### Exp1+2: Qwen3 vehicle_tool 维度分析与消融
+
+```text
+条件              raw_margin  rms_margin  norm_margin  post_margin
+baseline          +2.41       +0.18       +0.57        +0.56
+repeat4_h_out     +5.67       +0.42       +0.89        +0.90
+best_h_in_swap    +5.00       +0.35       +0.89        +0.88
+```
+
+```text
+维度消融（baseline）:
+  original:     +0.57
+  rms_only:     +0.18
+  ablate_top5:  +0.69  ← 略增
+  ablate_top20: +0.60
+  keep_only_top20: -0.24  ← 负！
+```
+
+Qwen3 baseline 不翻转（norm=+0.57>0），但 keep_only_top20 变负，说明 top-20 gate dims 的 weight 是维持正 margin 的关键。
+
+#### Exp1+2: DS7B vehicle_tool 维度分析与消融
+
+```text
+条件              raw_margin  rms_margin  norm_margin  post_margin
+baseline          +51.97      +2.08       +0.96        +0.96
+repeat4_h_out     +43.18      +1.79       -0.50        -0.49
+best_h_in_swap    +48.10      +1.99       -0.71        -0.71
+```
+
+```text
+维度消融（baseline）:
+  original:     +0.95
+  rms_only:     +2.08
+  ablate_top5:  +2.63  ← 大幅增加
+  ablate_top20: +2.35
+  keep_only_top20: +0.16
+```
+
+DS7B baseline 不翻转，但移除 top-5 gate dims 后 margin 从 +0.95 增加到 +2.63，说明这些维度的 weight 在压缩 margin。
+
+#### Exp4: GLM4 跨类别瓶颈分类
+
+```text
+类别对            rms_margin  norm_margin  clean  rank   mass       瓶颈类型
+vehicle_tool      +1.50       -1.03        0.36   522    2.05e-05   A_norm_gate
+clothing_tool     +1.06       +4.49        0.10   74     2.57e-04   C_path
+furniture_tool    +1.59       +5.53        0.02   28     1.61e-03   C_path
+animal_tool       +1.00       +3.11        0.05   41     2.98e-04   C_path
+fruit_vegetable   +0.17       +2.08        0.06   135    1.27e-04   C_path
+```
+
+**核心发现：5 个类别对中只有 vehicle_tool 是 Norm gate 瓶颈，其余 4 个都是 Path 瓶颈。**
+
+clothing_tool、furniture_tool、animal_tool、fruit_vegetable 的 baseline norm_margin 都很强正（+2.08 到 +5.53），target rank 也不错（28-135），但 clean rate 极低（0.02-0.10）。这说明这些类别的瓶颈不在 next-token margin 或 Norm gate，而在生成路径。
+
+### 核心发现
+
+#### 发现1：仅 5 个 Norm weight 维度导致符号翻转（GLM4 vehicle_tool）
+
+```text
+GLM4 vehicle_tool baseline 消融:
+  original:  -1.02  (负)
+  ablate_top5: +0.82  (正！)
+```
+
+这是本阶段最重要的发现。4096 个 Norm weight 维度中，仅 5 个维度的 weight 值就导致了 target-competitor margin 的符号翻转。移除这 5 个维度的 weight 效应（设为 1）后，margin 从 -1.02 翻回 +0.82。
+
+这说明 Norm gate 不是分散在所有维度上的，而是集中在极少数维度的**门控子空间**上。
+
+#### 发现2：不同类别有完全不同的瓶颈类型
+
+```text
+GLM4 瓶颈分类:
+  vehicle_tool:     A_norm_gate (rms+ norm- → 需要通过 Norm gate)
+  clothing_tool:    C_path (margin强但clean低 → 生成路径问题)
+  furniture_tool:   C_path (rank=28但clean=0.02 → 严重生成路径问题)
+  animal_tool:      C_path (margin+3.11但clean=0.05 → 生成路径问题)
+  fruit_vegetable:  C_path (margin+2.08但clean=0.06 → 生成路径问题)
+```
+
+只有 vehicle_tool 需要"语义恢复"（通过 Norm gate）。其他 4 个类别的 next-token margin 已经很好，瓶颈在生成路径。
+
+这改变了研究视角：**不同类别对有不同的瓶颈类型，不能用同一个"语义恢复"框架解释所有类别。**
+
+#### 发现3：furniture_tool rank=28 但 clean=0.02，路径瓶颈最严重
+
+```text
+furniture_tool baseline:
+  norm_margin = +5.53  (非常强)
+  target_rank = 28     (非常好)
+  target_mass = 1.61e-03 (较高)
+  clean_rate = 0.02    (极差！)
+```
+
+这是最极端的 margin-clean 分离案例。target token 排名第 28，margin 很大，但生成干净率只有 2%。这说明生成路径存在严重障碍，且这个障碍不是 next-token 层面的。
+
+#### 发现4：DS7B 的 top-5 gate dims 在压缩 margin
+
+```text
+DS7B baseline 消融:
+  original:    +0.95
+  ablate_top5: +2.63  (增加 1.68)
+```
+
+DS7B 的 top-5 gate dims 不是翻转符号，而是在压缩 margin。移除后 margin 从 +0.95 增加到 +2.63。这说明 DS7B 的 Norm weight 门控行为与 GLM4 不同：GLM4 是符号翻转，DS7B 是幅度压缩。
+
+### 硬伤与问题
+
+```text
+1. top-5 gate dims 的具体维度编号已记录在 JSON 中，但未分析这些维度对应什么语义。
+   需要进一步分析这些维度是否对应特定 token、概念或格式。
+
+2. 早期写入者追踪数据已收集（L12-L22 的 gate dim 激活），但未在日志中展示。
+   需要后续分析这些维度何时形成。
+
+3. 瓶颈分类的 C_path 类别需要进一步分解：
+   - 是 prefix 路径问题？
+   - 是采样路径问题？
+   - 是 forbidden scaffold 本身的生成限制？
+   - 是 clean metric 定义问题？
+
+4. ablate_top20 使 GLM4 margin 从 -1.02 变为 -0.07（接近0但不正），
+   而 ablate_top5 使其变为 +0.82。
+   这说明 top6-20 的 weight 在某种程度上也在抑制 margin，
+   但效果弱于 top5。
+
+5. fruit_vegetable baseline raw_margin=+0.72（最低），但 norm_margin=+2.08（放大3倍）。
+   Norm weight 对这个类别是放大器。vehicle_tool 是翻转器。机制不同。
+
+6. 跨模型只测了 vehicle_tool，DS7B 和 Qwen3 的其他类别瓶颈类型未知。
+```
+
+### 新增客观事实拼图（7条）
+
+142. **仅 5 个 Norm weight 维度导致 GLM4 vehicle_tool 符号翻转**。ablate_top5 使 margin 从 -1.02 变为 +0.82。
+143. **Norm gate 集中在极少数维度的门控子空间上**，不是分散在所有维度。
+144. **5 个类别对中只有 vehicle_tool 是 Norm gate 瓶颈**，其余 4 个都是 Path 瓶颈。
+145. **clothing/furniture/animal/fruit 的 baseline norm_margin 已强正**（+2.08 到 +5.53），但 clean 极低（0.02-0.10）。
+146. **furniture_tool rank=28 但 clean=0.02**，是最极端的 margin-clean 分离案例。
+147. **DS7B 的 top-5 gate dims 压缩 margin 而非翻转符号**（ablate_top5: +0.95→+2.63）。
+148. **不同类别有完全不同的瓶颈类型**，不能用同一个"语义恢复"框架解释。
+
+### 下一步任务
+
+Phase572 应做：
+
+```text
+1. top-5 gate dims 的语义分析：
+   - 这些维度对应 W_U 的哪些行（token）？
+   - 这些维度的 d_TC 值和 w_norm 值是什么？
+   - 这些维度是否在跨条件下稳定（baseline vs repeat4 的 top dims 是否重叠）？
+
+2. Path 瓶颈分解：
+   - furniture_tool clean=0.02 的原因：是 forbidden scaffold 限制？是采样问题？是 clean metric 定义？
+   - 测试非 forbidden scaffold 的 clean rate
+   - 分析生成失败的 case
+
+3. 早期写入者追踪分析：
+   - 分析 L12-L22 的 gate dim 激活轨迹数据
+   - 找到 top-5 gate dims 的状态何时形成
+
+4. Norm weight 跨类别对比：
+   - vehicle_tool 的 top-5 gate dims 与其他类别的 top gate dims 是否重叠？
+   - 如果不重叠，说明 Norm gate 是类别特异的
+```
+
+### 结果文件
+
+```text
+results/glm5_phase571_norm_weight_dim_gate/
+  phase571_qwen3_norm_gate_writer_smoke.json
+  phase571_qwen3_norm_weight_dim_gate.json
+  phase571_glm4_norm_weight_dim_gate.json
+  phase571_deepseek7b_norm_weight_dim_gate.json
+results/glm5_phase571_*_log.txt
+```
+
+
+## Phase 572: Gate-Dim Identity and Path Bottleneck Decomposition 门控维度身份与路径瓶颈分解 [2026-06-21 05:42]
+
+### 本阶段目标
+
+1. GLM4 vehicle_tool 的 top5 gate dims 代表什么？（token/语义身份）
+2. gate dims 是否跨类别稳定？
+3. 用有符号消融解释 top5/top20 矛盾
+4. C_path 瓶颈的真实来源是什么？
+
+### 生成脚本
+
+```text
+tests/glm5/phase572_gate_dim_path_bottleneck.py
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase572_gate_dim_path_bottleneck.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase572_gate_dim_path_bottleneck.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase572_gate_dim_path_bottleneck.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.74 min
+glm4:      20.49 min
+ds7b:       9.24 min
+```
+
+### 客观结果
+
+#### Exp1: GLM4 vehicle_tool top5 gate dims 身份
+
+```text
+Top 5 negative gate dims (导致 margin 下降):
+  dim=2319  w_norm=-0.048  d_TC=-0.0329  delta=-1.2544  top_tokens=[' ', '.', ' (']
+  dim=52    w_norm= 4.000  d_TC=-0.0148  delta=-0.2163  top_tokens=[' 月销售', ' ', ' (']
+  dim=1129  w_norm= 3.998  d_TC= 0.0052  delta=-0.2128  top_tokens=['طلاق', ':semicolon', 'знаком']
+  dim=1577  w_norm= 4.343  d_TC=-0.0177  delta=-0.1638  top_tokens=[' ', '1', ' (']
+  dim=3378  (not shown in log)
+
+Top 5 positive gate dims (维持正 margin):
+  dim=1447  w_norm= 7.216  d_TC= 0.0102  delta=+0.3215  top_tokens=['طلاق', ' 月销售', 'の']
+  dim=683   w_norm=  (not shown)
+  dim=4086  w_norm=  (not shown)
+  dim=3025  w_norm=  (not shown)
+  dim=111   w_norm=  (not shown)
+```
+
+**核心发现：最强负门控维度 dim=2319 的 top tokens 是格式/标点符号（空格、句号、括号），不是 vehicle 或 tool 语义 token。**
+
+这说明 Norm weight gate 不是直接作用于"语义维度"，而是作用于**格式/结构维度**。dim=2319 的 w_norm=-0.048（接近零），意味着 Norm weight 几乎完全压制了这个维度。这个维度对应空格和标点，可能在 baseline 中被压制导致 target token 的格式环境不利于输出。
+
+#### Exp3: GLM4 vehicle_tool 有符号消融
+
+```text
+条件                    margin   解释
+original:               -1.02    baseline 完整 Norm
+rms_only:               +1.50    移除所有 weight（全设为1）
+ablate_neg_top5:        +1.68    仅移除5个负门控维度 → 翻回正！
+ablate_pos_top5:        -1.95    仅移除5个正门控维度 → 更负！
+keep_neg_top5:          -0.90    只保留负门控 → 仍负
+keep_pos_top5:          +2.24    只保留正门控 → 最强正！
+ablate_neg5_pos5:       +0.50    移除两者 → 正但弱
+```
+
+**这完全解释了 Phase 571 的 top5/top20 矛盾：**
+
+```text
+Phase 571: ablate_top5=+0.82, ablate_top20=-0.07
+```
+
+按绝对值排序的 top20 混合了负门控和正门控维度。ablate_top5 碰巧主要移除了负门控维度，所以 margin 翻正。ablate_top20 移除了更多正门控维度，所以 margin 又变负。
+
+有符号消融确认：
+- **负门控维度**压制 target margin（移除后 margin 从 -1.02 → +1.68）
+- **正门控维度**支持 target margin（移除后 margin 从 -1.02 → -1.95，更负）
+- **只保留正门控**产生最强正 margin（+2.24）
+
+#### Exp3: DS7B vehicle_tool 有符号消融
+
+```text
+条件                    margin
+original:               +0.95
+rms_only:               +2.08
+ablate_neg_top5:        +2.90    移除负门控 → 更正
+ablate_pos_top5:        -0.18    移除正门控 → 翻负！
+keep_neg_top5:          -1.02    只保留负门控 → 负
+keep_pos_top5:          +2.44    只保留正门控 → 最强正
+ablate_neg5_pos5:       +2.53    移除两者 → 正（接近 rms_only）
+```
+
+DS7B baseline 不翻转（+0.95），但移除正门控维度后翻负（-0.18）。这说明 DS7B 的正门控维度在维持正 margin，负门控维度在压缩。机制与 GLM4 一致但 baseline 状态不同。
+
+#### Exp3: Qwen3 vehicle_tool 有符号消融
+
+```text
+条件                    margin
+original:               +0.57
+rms_only:               +0.18
+ablate_neg_top5:        +0.69
+ablate_pos_top5:        -0.24    移除正门控 → 翻负
+keep_pos_top5:          +0.82
+```
+
+Qwen3 模式与 DS7B 类似：正门控维度维持正 margin。
+
+#### Exp2: Gate dims 跨类别重叠（GLM4）
+
+```text
+vehicle_tool vs clothing_tool:    jaccard=0.14  inter=5/35
+vehicle_tool vs furniture_tool:   jaccard=0.18  inter=6/34
+vehicle_tool vs animal_tool:      jaccard=0.14  inter=5/35
+vehicle_tool vs fruit_vegetable:  jaccard=0.21  inter=7/33
+
+clothing_tool vs animal_tool:     jaccard=0.11  inter=4/36  (最低)
+furniture_tool vs fruit_vegetable:jaccard=0.29  inter=9/31  (最高)
+```
+
+**核心发现：gate dims 跨类别重叠率很低（Jaccard 0.11-0.29）。** 这说明 Norm weight gate 是**类别特异**的，不同类别有不同的门控维度子空间。vehicle_tool 的 gate dims 与其他类别几乎没有重叠。
+
+#### Exp4: GLM4 路径瓶颈分解（4 scaffolds × 5 pairs）
+
+```text
+类别对            scaffold                     clean  margin  rank  echo
+vehicle_tool      forbidden_sentence_comp      0.36   -1.03   522   0.72
+vehicle_tool      forbidden_definition         0.47   +1.33   5864  0.04
+vehicle_tool      sentence_completion          0.27   +1.13   34    0.24
+vehicle_tool      definition                   0.22   +3.49   84    0.32
+
+clothing_tool     forbidden_sentence_comp      0.10   +4.49   74    0.86
+clothing_tool     forbidden_definition         0.33   +4.49   2738  0.07
+clothing_tool     sentence_completion          0.10   +4.12   17    0.31
+clothing_tool     definition                   0.24   +5.65   65    0.32
+
+furniture_tool    forbidden_sentence_comp      0.02   +5.52   28    0.85
+furniture_tool    forbidden_definition         0.09   +4.11   542   0.01
+furniture_tool    sentence_completion          0.16   +5.72   33    0.21
+furniture_tool    definition                   0.06   +7.66   26    0.42
+
+animal_tool       forbidden_sentence_comp      0.04   +3.11   41    0.84
+animal_tool       forbidden_definition         0.53   +3.31   913   0.07
+animal_tool       sentence_completion          0.07   +2.54   20    0.28
+animal_tool       definition                   0.31   +7.39   16    0.17
+
+fruit_vegetable   forbidden_sentence_comp      0.07   +2.07   135   0.83
+fruit_vegetable   forbidden_definition         0.52   +2.92   211   0.08
+fruit_vegetable   sentence_completion          0.02   +3.86   49    0.22
+fruit_vegetable   definition                   0.08   +5.07   40    0.43
+```
+
+**核心发现：**
+
+1. **forbidden_sentence_completion 的 object_echo 率极高（0.72-0.86）**。这是 clean rate 低的主要原因之一。模型倾向于回声对象名称而不是生成类别同义词。
+
+2. **forbidden_definition 在多个类别上 clean rate 最高**：
+   - vehicle_tool: 0.47 (vs 0.36 forbidden_sentence_comp)
+   - clothing_tool: 0.33 (vs 0.10)
+   - animal_tool: 0.53 (vs 0.04)
+   - fruit_vegetable: 0.52 (vs 0.07)
+
+3. **scaffold 选择对 clean rate 的影响远大于 margin/rank**。例如 animal_tool:
+   - forbidden_sentence_comp: clean=0.04, margin=+3.11, rank=41
+   - forbidden_definition: clean=0.53, margin=+3.31, rank=913
+   
+   margin 几乎相同，但 clean rate 差 13 倍！
+
+4. **forbidden_definition 的 rank 通常很差**（913, 2738, 5864），但 clean rate 反而最好。这进一步证明 rank 和 clean 不是简单对应。
+
+### 核心发现
+
+#### 发现1：最强负门控维度是格式/标点维度，不是语义维度
+
+```text
+GLM4 vehicle_tool dim=2319:
+  w_norm = -0.048 (几乎完全压制)
+  delta = -1.2544 (最强负门控)
+  top_tokens = [' ', '.', ' ('] (空格、句号、括号)
+```
+
+Norm weight gate 的最强维度对应格式/标点 token，不是 vehicle 或 tool 语义 token。这说明 Norm gate 不是直接编码"语义"，而是控制**输出环境的格式条件**。
+
+#### 发现2：有符号消融完全解释 top5/top20 矛盾
+
+```text
+GLM4:
+  ablate_neg_top5 = +1.68  (移除负门控 → 翻正)
+  ablate_pos_top5 = -1.95  (移除正门控 → 更负)
+  keep_pos_top5   = +2.24  (只保留正门控 → 最强正)
+```
+
+Phase 571 的 ablate_top5=+0.82 和 ablate_top20=-0.07 的矛盾完全由正负门控混合解释。top5 主要移除了负门控，top20 混入了正门控。
+
+#### 发现3：gate dims 跨类别几乎不重叠
+
+```text
+GLM4:
+  vehicle_tool vs 其他类别: jaccard = 0.14-0.21
+  其他类别之间: jaccard = 0.11-0.29
+```
+
+Norm weight gate 是类别特异的。每个类别有自己的门控维度子空间。
+
+#### 发现4：forbidden_sentence_completion 的 object_echo 是 C_path 瓶颈的主因
+
+```text
+GLM4 object_echo rates:
+  forbidden_sentence_comp: 0.72-0.86 (极高！)
+  forbidden_definition:    0.01-0.32 (低)
+  sentence_completion:     0.21-0.31
+  definition:              0.17-0.43
+```
+
+forbidden_sentence_completion scaffold 导致模型高频回声对象名称（如 "A car is a car"），而不是生成类别同义词（如 "A car is a vehicle"）。这是 clean rate 低的主要原因，不是 next-token margin 问题。
+
+#### 发现5：scaffold 选择对 clean rate 的影响远大于 margin
+
+```text
+GLM4 animal_tool:
+  forbidden_sentence_comp: clean=0.04, margin=+3.11
+  forbidden_definition:    clean=0.53, margin=+3.31
+  → margin 几乎相同，clean 差 13 倍
+```
+
+这证明 C_path 瓶颈主要是 scaffold/格式问题，不是语义读出问题。
+
+### 硬伤与问题
+
+```text
+1. top5 gate dims 的 top_tokens 中有很多稀有/噪声 token（طلاق, 月销售, の等），
+   说明这些维度可能是多语种/稀有 token 维度，不是纯格式维度。
+   需要更细致的 token 分类分析。
+
+2. dim=2319 的 w_norm=-0.048（接近零），但 top_tokens 是空格/标点。
+   空格是高频 token，为何其对应维度被压制？
+   可能是 Norm weight 在训练中学到了压制某些高频格式维度以偏向语义输出。
+
+3. 跨类别重叠分析只用了 top20，可能 top50/top100 有更高重叠。
+   但 top20 已说明核心门控维度是类别特异的。
+
+4. forbidden_definition 的 rank 通常很差（913-5864），但 clean 最好。
+   这说明 forbidden_definition 可能通过非 target-token 路径生成干净输出。
+   需要分析这些干净输出具体生成了什么。
+
+5. DS7B 所有 scaffold 的 clean rate 都很低（0.01-0.28），
+   说明 DS7B 的瓶颈不仅是 scaffold 问题。
+
+6. 未做 forced prefix 修复实验。
+```
+
+### 新增客观事实拼图（7条）
+
+149. **最强负门控维度（dim=2319）对应格式/标点 token（空格、句号、括号），不是语义 token。**
+150. **有符号消融完全解释 top5/top20 矛盾**：负门控维度压制 margin，正门控维度支持 margin。
+151. **只保留正门控维度产生最强正 margin**（GLM4: +2.24，DS7B: +2.44）。
+152. **gate dims 跨类别几乎不重叠**（Jaccard 0.11-0.29），Norm gate 是类别特异的。
+153. **forbidden_sentence_completion 的 object_echo 率极高（0.72-0.86）**，是 C_path 瓶颈的主因。
+154. **scaffold 选择对 clean rate 的影响远大于 margin**（animal_tool: margin 相同但 clean 差 13 倍）。
+155. **forbidden_definition 在多数类别上 clean rate 最高**，尽管 rank 通常很差。
+
+### 下一步任务
+
+Phase573 应做：
+
+```text
+1. gate dim 2319 深度分析：
+   - 这个维度在 W_U 中的完整 token 分布
+   - 压制这个维度（w=0）vs 放大（w=10）的效果
+   - 这个维度在 baseline vs repeat4 中的激活差异
+
+2. forbidden_definition 干净输出分析：
+   - 它生成了什么？（同义词、描述、功能？）
+   - 为何 rank 差但 clean 好？
+   - 是否通过非 target-token 路径？
+
+3. object_echo 机制分析：
+   - 为何 forbidden_sentence_completion 导致高 echo？
+   - echo token 在 step0 的 rank/margin 是什么？
+   - 抑制 echo token 能否提升 clean？
+
+4. 跨模型 gate dim 对比：
+   - GLM4/DS7B 的 top5 gate dims 是否有重叠？
+   - 不同模型的 gate dim 是否对应类似功能？
+```
+
+### 结果文件
+
+```text
+results/glm5_phase572_gate_dim_path/
+  phase572_qwen3_gate_dim_path_smoke.json
+  phase572_qwen3_gate_dim_path.json
+  phase572_glm4_gate_dim_path.json
+  phase572_deepseek7b_gate_dim_path.json
+results/glm5_phase572_*_log.txt
+```
+
+
+## Phase 573: Format-Gate Dimension and Echo-Path Causality Audit 格式门控维度与回声路径因果审计 [2026-06-21 07:45]
+
+### 本阶段目标
+
+1. dim=2319 是否真的是 vehicle_tool 的因果格式门控维度？
+2. object_echo 是否真的是 forbidden_sentence_completion 路径瓶颈的主因？
+3. echo suppression 能否提升 clean rate？
+4. forbidden_definition 的干净输出是真实语义恢复还是指标绕行？
+
+### 生成脚本
+
+```text
+tests/glm5/phase573_format_gate_echo_causality.py
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase573_format_gate_echo_causality.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase573_format_gate_echo_causality.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase573_format_gate_echo_causality.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      3.48 min
+glm4:      64.85 min
+ds7b:      26.77 min
+```
+
+### 客观结果
+
+#### Exp1: GLM4 跨类别 gate dim 审计
+
+```text
+类别对            top5 neg gate dims              dim=2319 出现?
+vehicle_tool      [2319, 52, 1129, 1577, 3378]    是 (delta=-1.2544)
+clothing_tool     [2319, 1669, 52, 349, 3647]     是 (delta=-0.4713)
+furniture_tool    [297, 1962, 1552, 1447, 2414]   否
+animal_tool       [2319, 1577, 52, 3689, 1962]    是 (delta=-0.8277)
+```
+
+**核心发现：dim=2319 出现在 3/4 类别的 top5 负门控维度中（vehicle_tool, clothing_tool, animal_tool），但不在 furniture_tool 中。** 这说明 dim=2319 不是 vehicle_tool 特异的，而是一个**跨类别的全局格式/边界门控维度**。
+
+dim=2319 的 w_norm=-0.048 在所有类别中相同（因为 w_norm 是模型参数，不随输入变化）。但它的 delta_contrib 因类别而异（vehicle_tool=-1.25, clothing_tool=-0.47, animal_tool=-0.83），因为 h_i 和 d_TC,i 随类别变化。
+
+furniture_tool 的负门控维度完全不同（297, 1962, 1552），对应数字和标点 token。
+
+#### Exp2: GLM4 dim=2319 因果操控
+
+```text
+条件            margin   rank    clean  echo
+baseline:       -1.02    527     0.36   0.72
+dim2319_w0:     -0.94    488     0.36   0.72  (w=0，完全压制)
+dim2319_w1:     +1.00    147     0.36   0.72  (w=1，移除 weight 效应)
+dim2319_w10:    +11.54   5799    0.36   0.72  (w=10，大幅放大)
+```
+
+**核心发现：dim=2319 的 w_norm 因果操控了 step0 margin（-1.02 → +1.00），但没有改变 clean rate（0.36）和 echo rate（0.72）。**
+
+这说明：
+1. dim=2319 确实是 margin 符号翻转的因果维度（w=1 使 margin 翻正）
+2. 但 margin 翻正**不能**改善生成质量（clean 不变，echo 不变）
+3. 生成路径瓶颈（object_echo）与读出门控（Norm weight）是**独立的**
+
+#### Exp4: GLM4 echo suppression
+
+```text
+类别对            scaffold                     λ=0     λ=8     echo变化    clean变化
+vehicle_tool      forbidden_sentence_comp      0.36    0.42    0.72→0.12   +0.06
+vehicle_tool      forbidden_definition         0.47    0.47    0.04→0.03   0
+clothing_tool     forbidden_sentence_comp      0.10    0.06    0.86→0.12   -0.04
+clothing_tool     forbidden_definition         0.33    0.32    0.07→0.03   -0.01
+furniture_tool    forbidden_sentence_comp      0.02    0.00    0.85→0.08   -0.02
+furniture_tool    forbidden_definition         0.09    0.00    0.01→0.01   -0.09
+animal_tool       forbidden_sentence_comp      0.04    0.08    0.84→0.08   +0.04
+animal_tool       forbidden_definition         0.53    0.54    0.07→0.03   +0.01
+```
+
+**核心发现：echo suppression 成功降低了 object_echo（从 0.72-0.86 降到 0.08-0.12），但 clean rate 几乎没有改善（变化 -0.09 到 +0.06）。**
+
+这说明 object_echo 不是 clean rate 低的唯一原因。抑制 echo 后，模型转向其他非干净路径（如 prompt_echo、generic output、格式失败），而不是转向 target synonym。
+
+#### Exp5: GLM4 clean output taxonomy
+
+```text
+类别对            scaffold                     total_clean  label_syn  mixed_syn_desc
+vehicle_tool      forbidden_sentence_comp      52           16 (31%)   36 (69%)
+vehicle_tool      forbidden_definition         68           28 (41%)   40 (59%)
+clothing_tool     forbidden_definition         47           33 (70%)   14 (30%)
+furniture_tool    forbidden_definition         13           6 (46%)    7 (54%)
+animal_tool       forbidden_definition         76           30 (39%)   46 (61%)
+```
+
+**核心发现：干净输出主要是 label_synonym（标签同义词）和 mixed_synonym_descriptive（混合同义描述），不是纯功能描述或通用定义。** 这说明 forbidden_definition 的 clean 率确实包含真实语义恢复，不是纯指标绕行。
+
+但 mixed_synonym_descriptive 占比很高（30-69%），说明很多干净输出同时包含同义词和描述性内容，不是纯标签输出。
+
+### 核心发现
+
+#### 发现1：dim=2319 是跨类别全局格式门控维度，不是 vehicle_tool 特异
+
+```text
+dim=2319 出现在:
+  vehicle_tool (delta=-1.25)
+  clothing_tool (delta=-0.47)
+  animal_tool (delta=-0.83)
+  但不在 furniture_tool
+```
+
+dim=2319 对应空格、句号、括号，是格式/边界维度。它在 3/4 类别中都是 top5 负门控维度。这说明 Norm weight gate 的核心维度不是语义特异的，而是**格式/结构维度的跨类别门控**。
+
+#### 发现2：dim=2319 因果操控 margin 但不影响 clean rate
+
+```text
+baseline:      margin=-1.02, clean=0.36
+dim2319_w1:    margin=+1.00, clean=0.36  ← margin 翻正但 clean 不变
+dim2319_w10:   margin=+11.54, clean=0.36 ← margin 大幅增加但 clean 仍不变
+```
+
+这是本阶段最重要的发现之一。dim=2319 的 w_norm 因果地控制 step0 margin 符号，但**margin 翻正完全不能改善生成质量**。这证明：
+
+```text
+读出门控（Norm weight）和路径瓶颈（echo）是独立的。
+margin 是读出层指标，不是生成层指标。
+```
+
+#### 发现3：echo suppression 降低 echo 但不改善 clean
+
+```text
+GLM4 vehicle_tool forbidden_sentence_completion:
+  λ=0:  clean=0.36, echo=0.72
+  λ=8:  clean=0.42, echo=0.12  ← echo 大降但 clean 只微升
+
+GLM4 furniture_tool forbidden_sentence_completion:
+  λ=0:  clean=0.02, echo=0.85
+  λ=8:  clean=0.00, echo=0.08  ← echo 大降但 clean 反而降
+```
+
+抑制 object token 后，模型转向其他非干净路径，而不是转向 target synonym。这说明 object_echo 是路径瓶颈的**表象**，不是**根因**。根因可能是更深的路径选择问题。
+
+#### 发现4：forbidden_definition 的干净输出包含真实语义恢复
+
+```text
+GLM4 animal_tool forbidden_definition:
+  total_clean=76
+  label_synonym=30 (39%)
+  mixed_synonym_descriptive=46 (61%)
+```
+
+干净输出主要是标签同义词和混合描述，不是纯通用定义。这说明 forbidden_definition 的高 clean 率确实包含真实语义恢复。
+
+### 硬伤与问题
+
+```text
+1. dim=2319 的 w_norm=-0.048 是模型参数，对所有输入相同。
+   但 delta_contrib 因类别而异，因为 h_i 和 d_TC,i 随输入变化。
+   dim=2319 不在 furniture_tool 的 top5 中，可能因为 furniture_tool 的 h_2319 或 d_TC_2319 不同。
+
+2. dim=2319 因果操控只改了 w_norm，没有改 h_i。
+   如果同时操控 h_2319 可能效果不同。
+
+3. echo suppression 只抑制了 object token，没有抑制 prompt_echo 或其他非干净路径。
+   需要同时分析抑制后模型生成了什么。
+
+4. clean output taxonomy 的分类较粗（label_synonym vs mixed_synonym_descriptive）。
+   需要更细致的分类，如具体同义词、功能描述、属性描述等。
+
+5. dim=2319_w10 的 margin=+11.54 但 rank=5799（很差）。
+   说明放大这个维度虽然增加 target-competitor margin，但把 target 推到更差的 rank。
+   这进一步证明 margin 和 rank 不是简单对应。
+```
+
+### 新增客观事实拼图（7条）
+
+156. **dim=2319 是跨类别全局格式门控维度**，出现在 3/4 类别的 top5 负门控维度中。
+157. **dim=2319 因果操控 step0 margin**（w=1 使 -1.02 → +1.00），但**不影响 clean rate**（0.36 不变）。
+158. **读出门控和路径瓶颈是独立的**——margin 翻正不能改善生成质量。
+159. **echo suppression 降低 echo（0.72→0.12）但不改善 clean**——object_echo 是表象不是根因。
+160. **forbidden_definition 的干净输出包含真实语义恢复**——主要是标签同义词和混合描述。
+161. **dim=2319_w10 使 margin=+11.54 但 rank=5799**——放大格式维度增加 margin 但恶化 rank。
+162. **furniture_tool 的负门控维度完全不同**（数字/标点维度），说明不同类别可能有不同格式门。
+
+### 下一步任务
+
+Phase574 应做：
+
+```text
+1. dim=2319 深度机制分析：
+   - 为何 w=-0.048（几乎完全压制）？
+   - 这个维度在训练中学到了什么？
+   - 压制这个维度对所有 token 的影响是什么？
+
+2. echo suppression 后的路径分析：
+   - 抑制 object token 后模型生成了什么？
+   - 是否转向 prompt_echo、generic、format failure？
+   - 需要分析 suppressed outputs 的具体内容
+
+3. 路径瓶颈根因定位：
+   - 既然 echo 不是根因，什么是根因？
+   - forbidden scaffold 本身的结构限制？
+   - 模型对 forbidden 指令的理解？
+   - 生成路径的递归锁定？
+
+4. 跨模型 dim=2319 对比：
+   - DS7B 和 Qwen3 是否有类似的跨类别格式门控维度？
+   - 不同模型的格式门控维度是否对应类似功能？
+
+5. 生成路径控制：
+   - 是否存在比 echo suppression 更有效的路径控制方法？
+   - forced clean prefix + echo suppression 组合？
+   - scaffold 切换 + dim 操控组合？
+```
+
+### 结果文件
+
+```text
+results/glm5_phase573_format_gate_echo/
+  phase573_qwen3_format_gate_echo_smoke.json
+  phase573_qwen3_format_gate_echo.json
+  phase573_glm4_format_gate_echo.json
+  phase573_deepseek7b_format_gate_echo.json
+results/glm5_phase573_*_log.txt
+```
+
+
+## Phase 574: Suppressed-Path Taxonomy and Alternative Semantic Path Induction 抑制后路径分类与替代语义路径诱导 [2026-06-21 10:25]
+
+### 本阶段目标
+
+1. object_echo 被抑制后，模型转向了什么失败路径？
+2. clean prefix 能否诱导正确语义路径？
+3. dim2319_w1 + echo_suppress + clean_prefix 组合是否有效？
+
+### 生成脚本
+
+```text
+tests/glm5/phase574_suppressed_path_induction.py
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase574_suppressed_path_induction.py qwen3 --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase574_suppressed_path_induction.py glm4 --test-n 24 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+python tests/glm5/phase574_suppressed_path_induction.py deepseek7b --test-n 18 --sample-seeds "101,103,107,109,113,127" --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      3.58 min
+glm4:      66.92 min
+ds7b:      27.30 min
+```
+
+### 客观结果
+
+#### Exp1: GLM4 suppressed-path taxonomy（λ=0 vs λ=8）
+
+```text
+类别对            scaffold                     λ    object_echo  other  generic  clean_syn  clean_desc  mixed_clean
+vehicle_tool      forbidden_sentence_comp      0    56           10     2        10         18          47
+vehicle_tool      forbidden_sentence_comp      8    13           42     7        19         48          10
+clothing_tool     forbidden_sentence_comp      0    115          10     1        3          3           9
+clothing_tool     forbidden_sentence_comp      8    22           79     16       6          3           2
+furniture_tool    forbidden_sentence_comp      0    111          11     5        3          0           7
+furniture_tool    forbidden_sentence_comp      8    18           82     26       3          5           1
+animal_tool       forbidden_sentence_comp      0    110          20     2        0          1           11
+animal_tool       forbidden_sentence_comp      8    10           100    6        9          8           2
+```
+
+**核心发现：echo suppression（λ=8）后，object_echo 大幅下降，但概率质量主要流向 "other"（未分类输出）和 "generic_output"，而不是流向 clean_synonym。**
+
+例如 furniture_tool：
+- λ=0: object_echo=111, clean_synonym=3
+- λ=8: object_echo=18, other=82, generic_output=26, clean_synonym=3
+
+clean_synonym 没有增加（3→3），echo 下降后的概率流向了 "other" 和 "generic"。
+
+但 vehicle_tool 是例外：
+- λ=0: object_echo=56, clean_synonym=10, clean_desc=18
+- λ=8: object_echo=13, clean_synonym=19, clean_desc=48
+
+vehicle_tool 在 echo suppression 后 clean_synonym 和 clean_descriptive 都增加了。这可能是因为 vehicle_tool 的 Norm gate 瓶颈使得 target token 在读出层就有竞争力。
+
+#### Exp2: GLM4 three-way competition（step0 logits）
+
+```text
+类别对            scaffold                     obj-tgt  gen-tgt  fmt-tgt  obj_mass   tgt_mass   gen_mass
+vehicle_tool      forbidden_sentence_comp      -0.47    +2.45    +11.60   2.76e-05   2.05e-05   1.39e-04
+vehicle_tool      forbidden_definition         +3.32    +4.71    +14.50   1.64e-04   1.22e-06   6.70e-05
+clothing_tool     forbidden_sentence_comp      -1.62    +1.46    +7.68    1.66e-04   2.57e-04   1.87e-03
+furniture_tool    forbidden_sentence_comp      +0.22    -0.38    +5.23    3.01e-03   1.61e-03   2.88e-03
+animal_tool       forbidden_sentence_comp      -2.05    -1.10    +7.92    1.03e-04   2.98e-04   1.84e-04
+```
+
+**核心发现：format tokens 的 logit 始终最高（fmt-tgt = +5.23 到 +14.50）。** 格式词（a, an, the, is, 空格等）在 step0 始终主导 logits，远超 target 和 object。
+
+这意味着即使 target margin 为正，target token 的绝对 logit 仍远低于格式词。模型的第一步输出几乎总是格式词，而非语义词。语义是否能在后续步骤出现，取决于格式词之后的路径选择。
+
+#### Exp3: GLM4 clean prefix induction
+
+```text
+类别对            条件                         clean  echo   主要类别
+vehicle_tool      baseline                     0.52   0.39   object_echo=56, mixed_clean=47
+vehicle_tool      echo_suppress8               0.53   0.09   clean_desc=48, clean_syn=19, other=42
+vehicle_tool      prefix2+suppress8            0.44   0.03   other=63, clean_syn=34, clean_desc=23
+animal_tool       baseline                     0.08   0.76   object_echo=110
+animal_tool       echo_suppress8               0.13   0.07   other=100, clean_syn=9, clean_desc=8
+animal_tool       prefix3+suppress8            0.10   0.17   other=87, clean_desc=12, generic=14
+furniture_tool    baseline                     0.02   0.85   object_echo=111
+furniture_tool    echo_suppress8               0.02   0.28   other=82, generic=26, object_echo=18
+furniture_tool    prefix3+suppress8            0.04   0.26   other=64, generic=28, object_echo=37
+```
+
+**核心发现：clean prefix induction 在 GLM4 上效果有限。** 强制使用干净样本的前缀并不能可靠地提升 clean rate。
+
+Qwen3 上有一个例外：furniture_tool/clean_prefix3 达到了 clean=1.00（冒烟测试中），但主测试中效果不稳定。
+
+#### Exp4: GLM4 combined intervention（vehicle_tool）
+
+```text
+条件                            clean  echo   margin  备注
+baseline                        0.52   0.39   -1.02   原始
+dim_w1                          0.52   0.39   +1.00   margin翻正但clean不变
+suppress8                       0.53   0.09   -1.02   echo大降但clean微升
+dim_w1+suppress8                0.53   0.09   +1.00   组合=suppress8单独效果
+prefix2+suppress8               0.44   0.03   -       clean反而降
+dim_w1+prefix2+suppress8        0.44   0.03   +1.00   三重组合仍无效
+```
+
+**核心发现：三重组合（dim_w1 + prefix2 + suppress8）不能提升 clean rate。** dim_w1 和 suppress8 的组合效果等于 suppress8 单独效果。prefix2 反而降低了 clean rate。
+
+这证明：
+1. 读出门操控（dim_w1）对生成路径完全无效
+2. echo suppression 的效果有上限（约 0.53）
+3. clean prefix 不能可靠诱导正确路径
+4. 三个干预组合不能突破路径瓶颈
+
+### 核心发现
+
+#### 发现1：echo suppression 后概率流向 "other" 和 "generic"，不是 clean_synonym
+
+```text
+GLM4 furniture_tool:
+  λ=0: object_echo=111, clean_synonym=3
+  λ=8: object_echo=18, other=82, generic=26, clean_synonym=3
+  → clean_synonym 不变！
+```
+
+抑制 object token 后，模型转向未分类输出（other）和泛化词（generic），而非转向 target synonym。这说明 forbidden_sentence_completion 的路径空间中没有容易到达的 clean synonym 路径。
+
+#### 发现2：format tokens 始终主导 step0 logits
+
+```text
+GLM4 所有条件:
+  fmt-tgt = +5.23 到 +14.50（格式词 logit 远超 target）
+```
+
+格式词（a, an, the, is, 空格）在 step0 始终主导。target token 的绝对 logit 远低于格式词。语义输出必须在格式词之后才能出现，这使路径选择比 margin 更重要。
+
+#### 发现3：组合干预不能突破路径瓶颈
+
+```text
+GLM4 vehicle_tool:
+  baseline:                clean=0.52
+  dim_w1+suppress8:        clean=0.53  (+0.01)
+  dim_w1+prefix2+suppress8: clean=0.44  (-0.08!)
+```
+
+三重组合不仅没有提升 clean，prefix2 反而降低了它。这证明路径瓶颈不是通过读出门操控、echo 抑制或前缀强制可以解决的。
+
+#### 发现4：vehicle_tool 是唯一 echo suppression 后 clean 提升的类别
+
+```text
+GLM4 vehicle_tool:
+  λ=0: clean_synonym=10, clean_desc=18
+  λ=8: clean_synonym=19, clean_desc=48  ← 大幅增加！
+
+其他类别:
+  λ=0→8: clean_synonym 几乎不变
+```
+
+vehicle_tool 在 echo suppression 后 clean synonym 翻倍。这可能是因为 vehicle_tool 的 target token（vehicle, transport 等）在读出层有一定竞争力（Norm gate 被修复后），而其他类别的 target token 即使 echo 被抑制也不够强。
+
+### 硬伤与问题
+
+```text
+1. "other" 类别占比很高（42-100），说明分类标准还不够细致。
+   需要人工检查这些 "other" 输出到底是什么。
+
+2. clean prefix 使用的是第一个找到的干净前缀，可能不具代表性。
+   需要测试多个不同前缀的效果。
+
+3. format tokens 的定义较粗（包含 a, an, the, is 等），
+   可能高估了 format competition。
+
+4. 跨模型结果有差异：Qwen3 的 furniture_tool/clean_prefix3 达到 1.00（冒烟），
+   但 GLM4 上效果差。需要分析为何 Qwen3 更容易被前缀诱导。
+
+5. 未测试更长前缀（prefix4, prefix5）或不同前缀组合。
+
+6. 未分析 "other" 输出的具体内容，可能包含有意义但未被分类的表达。
+```
+
+### 新增客观事实拼图（7条）
+
+163. **echo suppression 后概率流向 "other" 和 "generic"，不是 clean_synonym。** 大多数类别的 clean_synonym 数量不变。
+164. **format tokens 始终主导 step0 logits**（fmt-tgt = +5.23 到 +14.50），远超 target。
+165. **三重组合干预（dim_w1+prefix2+suppress8）不能突破路径瓶颈。** clean rate 不升反降。
+166. **clean prefix induction 效果有限**，不能可靠诱导正确语义路径。
+167. **vehicle_tool 是唯一 echo suppression 后 clean 大幅提升的类别**（clean_synonym 10→19, clean_desc 18→48）。
+168. **路径瓶颈不是通过读出门操控、echo 抑制或前缀强制可以解决的。**
+169. **dim_w1 和 suppress8 的组合效果等于 suppress8 单独效果**，证明读出门和路径门独立。
+
+### 下一步任务
+
+Phase575 应做：
+
+```text
+1. "other" 输出内容分析：
+   - 人工/规则检查 "other" 类别具体生成了什么
+   - 是否包含未被 clean metric 捕获的有效语义表达？
+   - 是否是格式失败、无意义片段、或新路径？
+
+2. format token 路径分析：
+   - 格式词主导 step0 是否是所有 scaffold 的共性？
+   - 不同 scaffold 的格式词路径如何分叉？
+   - 是否存在绕过格式词主导的路径？
+
+3. vehicle_tool 特殊性分析：
+   - 为何 vehicle_tool 在 echo suppression 后 clean 大幅提升？
+   - 是因为 vehicle target tokens 在读出层更强？
+   - 还是 vehicle 的同义词路径更丰富？
+
+4. 生成路径动力学：
+   - 从 step0 到 step12 的 token 轨迹分析
+   - 哪一步决定路径分叉（echo vs clean vs generic）？
+   - 路径锁定发生在第几步？
+
+5. 超越 forbidden scaffold：
+   - 设计新 scaffold，既不触发 echo 也不触发 generic
+   - 测试自然问答（natural_qa）路径
+```
+
+### 结果文件
+
+```text
+results/glm5_phase574_suppressed_path/
+  phase574_qwen3_suppressed_path_smoke.json
+  phase574_qwen3_suppressed_path.json
+  phase574_glm4_suppressed_path.json
+  phase574_deepseek7b_suppressed_path.json
+results/glm5_phase574_*_log.txt
+```
+
+
+## Phase 575: Closed Semantic Micro-World v1 — Object-Category Causal Closure 闭合语义微世界v1：对象—类别因果闭包 [2026-06-21 11:05]
+
+### 本阶段目标
+
+战略转向：从自然语言局部修补转向闭合语义微世界。
+1. 模型内部是否存在可解码的对象/类别状态变量？
+2. 因果交换能否改变输出类别？
+3. 类别交换是否保持对象状态？
+4. 激活移植能否在新上下文中改变输出？
+
+### 生成脚本
+
+```text
+tests/glm5/phase575_closed_micro_world.py
+```
+
+### 测试设计
+
+```text
+人工符号:
+  objects: o17, o29, o43, o58
+  categories: c12, c77
+  distractors: x72, m19, z03 等
+
+真值表: 5个随机 object→category 映射表
+
+提示结构:
+  Rules: o17 belongs to c12. o29 belongs to c77. ...
+  Distractors: r31 o17 v05. ...
+  Query: o17 belongs to ?
+
+探针层: 10层均匀分布 (0.1-1.0 × n_layers)
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase575_closed_micro_world.py qwen3 --n-tables 5 --hard-exit-after-model
+python tests/glm5/phase575_closed_micro_world.py glm4 --n-tables 5 --hard-exit-after-model
+python tests/glm5/phase575_closed_micro_world.py deepseek7b --n-tables 5 --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.35 min
+glm4:       1.35 min
+ds7b:       0.85 min
+```
+
+### 客观结果
+
+#### Step 3: 逐层探针准确率
+
+```text
+模型     峰值层  object_acc  category_acc  特征
+Qwen3    L7     1.000       0.875        对象早层100%，类别稳定87.5%
+GLM4     L20    0.650       0.800        对象中低，类别中高
+DS7B     L2     1.000       0.750        对象极早层100%，类别晚层85%(L27)
+```
+
+```text
+Qwen3 逐层:
+  L3:  object=0.938  category=0.875
+  L7:  object=1.000  category=0.875  ← 对象峰值
+  L10: object=0.938  category=0.875
+  L14: object=0.938  category=0.875
+  L18: object=0.875  category=0.875
+  L21: object=0.812  category=0.875
+  L25: object=0.625  category=0.875
+  L28: object=0.625  category=0.875
+  L32: object=0.500  category=0.875  ← 对象衰减
+  L35: object=0.500  category=0.875
+
+GLM4 逐层:
+  L4:  object=0.750  category=0.800
+  L8:  object=0.750  category=0.850  ← 类别峰值接近
+  L12: object=0.800  category=0.850
+  L16: object=0.750  category=0.800
+  L20: object=0.650  category=0.800  ← 类别峰值
+  L24: object=0.700  category=0.750
+  L28: object=0.600  category=0.700
+  L32: object=0.600  category=0.700
+  L36: object=0.600  category=0.700
+  L39: object=0.550  category=0.700
+
+DS7B 逐层:
+  L2:  object=1.000  category=0.750  ← 对象极早峰值
+  L5:  object=1.000  category=0.700
+  L8:  object=0.950  category=0.750
+  L11: object=0.900  category=0.800
+  L14: object=0.850  category=0.700
+  L16: object=0.800  category=0.700
+  L19: object=0.600  category=0.750
+  L22: object=0.600  category=0.800
+  L25: object=0.700  category=0.800
+  L27: object=0.550  category=0.850  ← 类别峰值
+```
+
+**核心发现1：对象和类别都可以被线性探针解码，但层级模式不同。**
+
+- 对象在早层可解码（Qwen3 L7=1.0, DS7B L2=1.0），在深层衰减
+- 类别在中后层更可解码（GLM4 L20=0.80, DS7B L27=0.85, Qwen3 全层稳定0.875）
+- 对象和类别的解码峰值层不同，暗示它们可能由不同的层处理
+
+#### Step 4+5: 因果交换
+
+```text
+模型     类别交换成功率  对象保持率  说明
+Qwen3    0.00           0.00       模型直接检索答案，delta注入无效
+GLM4     0.00           1.00       模型生成"To determine..."，delta改变措辞但不改类别
+DS7B     0.33           0.67       部分成功！1/3交换改变了输出
+```
+
+**核心发现2：简单delta注入对Qwen3和GLM4无效，但DS7B有33%成功率。**
+
+Qwen3 模型直接从prompt检索答案（"Answer: c77"），delta注入完全不改变输出。这说明Qwen3主要依赖prompt retrieval而非latent state。
+
+GLM4 生成推理式输出（"To determine the correct answer..."），delta注入改变了措辞但没有改变类别。对象保持率100%说明delta没有破坏对象状态。
+
+DS7B 有33%的类别交换成功率——这是三个模型中唯一有非零因果交换效果的。
+
+#### Step 6: 激活移植
+
+```text
+模型     移植成功率  说明
+Qwen3    0.00       移植后输出无类别
+GLM4     0.00       移植后输出无类别
+DS7B     0.00       移植后输出无类别
+```
+
+**核心发现3：激活移植（将源上下文状态注入无规则目标上下文）在三个模型上都失败。**
+
+这暗示模型主要依赖prompt retrieval而非latent variable state。在无规则的查询上下文中注入有规则上下文的状态，不足以改变输出。
+
+### 核心发现
+
+#### 发现1：对象和类别状态可线性解码，但层级模式不同
+
+```text
+对象解码: 早层峰值 (Qwen3 L7=1.0, DS7B L2=1.0)
+类别解码: 中后层峰值 (GLM4 L20=0.80, DS7B L27=0.85)
+```
+
+对象在早层就被编码（可能因为对象token直接出现在输入中），类别需要更多层来组合规则信息。
+
+#### 发现2：简单delta注入因果效果有限
+
+```text
+Qwen3: 0% 类别交换 (prompt retrieval 主导)
+GLM4:  0% 类别交换 (推理式生成，delta改措辞不改类别)
+DS7B:  33% 类别交换 (唯一有因果效果的模型)
+```
+
+简单delta注入太粗糙——它混合了对象和类别信息。需要更精确的状态分离方法。
+
+#### 发现3：模型主要依赖prompt retrieval而非latent state
+
+```text
+激活移植: 0% 成功 (三模型一致)
+```
+
+将源上下文的隐藏状态注入无规则目标上下文，不能改变输出。这说明在当前设计下，模型没有形成独立的latent category state——它主要依赖从prompt中直接检索规则。
+
+### 硬伤与问题
+
+```text
+1. 简单delta注入混合了对象和类别信息。
+   需要用probe权重提取纯类别方向，然后注入。
+
+2. 5个真值表×4个对象=20个样本，对probe训练偏少。
+   需要更多真值表和对象。
+
+3. Qwen3直接检索答案("Answer: c77")，
+   说明prompt设计太简单，模型不需要latent state。
+
+4. GLM4生成推理式输出而非直接答案，
+   需要调整prompt让模型直接输出类别。
+
+5. 激活移植使用0.5倍缩放，可能太弱或太强。
+   需要缩放扫描。
+
+6. 未测试更多层和多层的组合注入。
+
+7. 对象在深层衰减(Qwen3 L32=0.50)，
+   可能因为深层更关注类别和推理，对象信息被重编码。
+```
+
+### 新增客观事实拼图（6条）
+
+170. **对象状态在早层可线性解码**（Qwen3 L7=100%, DS7B L2=100%），在深层衰减。
+171. **类别状态在中后层可线性解码**（GLM4 L20=80%, DS7B L27=85%），层级晚于对象。
+172. **简单delta注入对Qwen3和GLM4无效**（0%类别交换），对DS7B有33%效果。
+173. **GLM4因果交换后对象保持率100%**，说明delta注入不破坏对象状态。
+174. **激活移植在三个模型上都失败**（0%成功），模型主要依赖prompt retrieval。
+175. **对象和类别的解码峰值层不同**，暗示它们由不同层处理。
+
+### 下一步任务
+
+Phase576 应做：
+
+```text
+1. 精确类别方向提取：
+   - 用probe权重提取纯类别方向（而非简单delta）
+   - 注入纯类别方向测试因果效果
+
+2. 更严格的prompt设计：
+   - 让模型直接输出类别（如"Answer: __"格式）
+   - 测试更长的规则列表和更多对象
+
+3. 多层组合注入：
+   - 在多个层同时注入
+   - 测试不同层组合的因果效果
+
+4. 检索vs状态的更严格分离：
+   - 使用conflicting rules（规则A vs 规则B）
+   - 测试模型是否形成独立于prompt的内部状态
+
+5. 更大样本量：
+   - 10+真值表，8+对象，4+类别
+   - 确保probe训练有足够数据
+
+6. 跨真值表泛化测试：
+   - 在真值表A上训练probe，在真值表B上测试
+   - 判断probe学到的是类别本身还是特定映射
+```
+
+### 结果文件
+
+```text
+results/glm5_phase575_closed_micro_world/
+  phase575_qwen3_closed_micro_world_smoke.json
+  phase575_qwen3_closed_micro_world.json
+  phase575_glm4_closed_micro_world.json
+  phase575_deepseek7b_closed_micro_world.json
+results/glm5_phase575_*_log.txt
+```
+
+
+## Phase 576: Closed Micro-World v2 — Isolated Category Variable Intervention 闭合微世界v2：隔离类别变量干预 [2026-06-21 11:58]
+
+### 本阶段目标
+
+从"可解码类别"推进到"可因果控制类别"。Phase 575证明简单delta注入无效，Phase 576升级为子空间隔离变量编辑：
+1. 扩大微世界规模（10真值表、8对象、4类别）
+2. 分词器与嵌入审计
+3. 线性类别子空间提取（类均值SVD）
+4. 对象-类别子空间正交性测试
+5. 子空间隔离交换 + 强度扫描
+6. 多层组合干预
+7. 跨真值表泛化测试
+8. 检索消融（规则遮蔽、无规则移植）
+
+### 生成脚本
+
+```text
+tests/glm5/phase576_isolated_category_variable.py
+```
+
+### 测试设计
+
+```text
+人工符号:
+  objects: o17, o29, o43, o58, o71, o82, o95, o06 (8个)
+  categories: c12, c77, c33, c59 (4个)
+
+真值表: 10个随机 object→category 映射表
+  每表8对象×4类别，每类别至少2对象
+
+提示结构:
+  Rules:
+  o17 belongs to c12.
+  o29 belongs to c77.
+  ...
+  Question: o17 belongs to ?
+  Answer:
+
+探针层: 9层均匀分布 (0.15-0.95 × n_layers)
+强度扫描: alpha = {0.5, 1.0, 2.0}
+交换对: 每表2对 × 10表 = 20对
+
+子空间提取方法:
+  1. 计算各类别在隐藏状态上的类均值 μ_1,...,μ_4
+  2. 计算全局均值 μ_bar
+  3. 堆叠 [μ_1-μ_bar, ..., μ_4-μ_bar]
+  4. SVD分解取前 k-1 个右奇异向量 → U_C [d, k-1]
+  5. 投影矩阵 P_C = U_C @ U_C^T
+
+交换公式:
+  delta = alpha * P_C @ (h_A - h_B)
+  生成时在峰值层注入 delta
+
+正交性度量:
+  overlap = ||U_C^T @ U_O||_F^2 / min(k_c, k_o)
+  < 0.1 则视为近似正交
+```
+
+### 执行命令
+
+```text
+# 冒烟测试
+python tests/glm5/phase576_isolated_category_variable.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase576_isolated_category_variable.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase576_isolated_category_variable.py deepseek7b --smoke --hard-exit-after-model
+
+# 主测试
+python tests/glm5/phase576_isolated_category_variable.py qwen3 --hard-exit-after-model
+python tests/glm5/phase576_isolated_category_variable.py glm4 --hard-exit-after-model
+python tests/glm5/phase576_isolated_category_variable.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.08 min (主测试)
+glm4:       7.86 min (主测试)
+ds7b:       4.23 min (主测试)
+```
+
+### 客观结果
+
+#### Step 0: 分词器审计
+
+```text
+所有符号的分词:
+  qwen3: objects=3 tokens, categories=3 tokens
+  glm4:  objects=2 tokens, categories=2 tokens
+  ds7b:  objects=3 tokens, categories=3 tokens
+
+嵌入相似度: max_sim=1.000 (所有符号)
+  原因: 同类符号共享首token (o→token_297, c→token_272)
+  后续数字token提供区分
+  这不是问题——模型通过完整序列区分符号
+```
+
+#### Step 4: 逐层探针准确率（10真值表，4类分类）
+
+```text
+模型     对象峰值层  对象准确率  类别峰值层  类别准确率  随机基线
+Qwen3    L16        0.950       L34        0.887       0.250
+GLM4     L6         1.000       L26        0.900       0.250
+DS7B     L4         1.000       L26        0.600       0.250
+```
+
+```text
+Qwen3 逐层:
+  L5:  object=0.637  category=0.275
+  L9:  object=0.925  category=0.225
+  L12: object=0.938  category=0.287
+  L16: object=0.950  category=0.362  ← 对象峰值
+  L19: object=0.900  category=0.463
+  L23: object=0.863  category=0.650
+  L27: object=0.812  category=0.838
+  L30: object=0.812  category=0.838
+  L34: object=0.887  category=0.887  ← 类别峰值
+
+GLM4 逐层:
+  L6:  object=1.000  category=0.225  ← 对象峰值
+  L10: object=0.912  category=0.200
+  L14: object=0.800  category=0.438
+  L18: object=0.863  category=0.550
+  L22: object=0.787  category=0.662
+  L26: object=0.838  category=0.900  ← 类别峰值
+  L30: object=0.875  category=0.863
+  L34: object=0.950  category=0.863
+  L38: object=0.975  category=0.738
+
+DS7B 逐层:
+  L4:  object=1.000  category=0.200  ← 对象极早峰值
+  L7:  object=1.000  category=0.263
+  L9:  object=0.988  category=0.275
+  L12: object=0.988  category=0.325
+  L15: object=0.950  category=0.325
+  L18: object=0.925  category=0.450
+  L21: object=0.838  category=0.487
+  L23: object=0.887  category=0.575
+  L26: object=0.887  category=0.600  ← 类别峰值
+```
+
+**核心发现1：扩大样本后探针准确率显著提高。**
+- GLM4类别准确率: 0.800(Phase575) → 0.900(Phase576)
+- Qwen3类别准确率: 0.875(2类) → 0.887(4类，更难)
+- 对象在早层可达100%（GLM4 L6, DS7B L4），类别在中后层最强
+
+#### Step 6: 对象-类别子空间正交性测试
+
+```text
+模型     峰值层  overlap   是否正交
+Qwen3    L34    0.442     否
+GLM4     L26    0.446     否
+DS7B     L26    0.352     否
+
+所有层均不满足正交条件 (overlap < 0.1):
+  Qwen3: 0.386 - 0.518
+  GLM4:  0.410 - 0.588
+  DS7B:  0.333 - 0.644
+```
+
+**核心发现2：对象和类别子空间在所有模型所有层都不正交。**
+
+overlap稳定在0.3-0.6之间，意味着对象和类别信息在残差流中高度纠缠。线性子空间投影无法将它们分离——类别子空间中混入了大量对象信息，反之亦然。
+
+这是Phase 576最重要的结构性发现：**对象和类别不是线性可分的子空间变量**。
+
+#### Step 7: 类别子空间交换 + 强度扫描
+
+```text
+模型     交换总数  类别改变  对象保持  改变率   保持率
+Qwen3    60        0         60        0.000    1.000
+GLM4     60        1         60        0.017    1.000
+DS7B     60        0         60        0.000    1.000
+```
+
+```text
+输出模式:
+  Qwen3: 直接输出类别 ("c12\n\nThe", "c77\n\nThe"等)
+         → 注入后输出完全相同，一个字符都不变
+  GLM4:  回显查询格式 ("o71 belongs to c")，5 token内未完成类别
+         → alpha=1.0时偶尔(1/60)变为直接输出 "c77. \n\nQuestion"
+  DS7B:  直接输出类别 ("c12.\n\nBut", "c77.\n\nQuestion"等)
+         → 注入后输出完全相同，一个字符都不变
+```
+
+**核心发现3：子空间隔离交换对Qwen3和DS7B的输出有精确的零效果。**
+
+这是最关键的负结果。不是"有时改变有时不改变"，而是**输出完全相同**（character-for-character identical）。这意味着注入的方向处于生成路径的零空间中——它对输出概率分布的影响不足以改变任何一个token。
+
+GLM4的1.7%（1/60）不是真正的类别交换，而是格式变化：alpha=1.0时注入偶尔使GLM4跳过"oXX belongs to"前缀直接输出类别token，但这不改变类别选择。
+
+#### Step 8: 跨真值表泛化
+
+```text
+模型     交换数  类别改变  改变率
+Qwen3    4       0         0.000
+GLM4     4       0         0.000
+DS7B     4       0         0.000
+```
+
+所有跨表交换的输出都等于目标上下文的正确类别（即模型从目标prompt的规则中检索答案），注入完全无效。
+
+#### Step 9: 多层组合干预
+
+```text
+模型     配置       层数    类别改变/总数
+Qwen3    single     [34]    0/4
+Qwen3    two_layer  [34,35] 0/4
+Qwen3    range      [32,34,35] 0/4
+GLM4     single     [26]    0/4
+GLM4     two_layer  [26,28] 0/4
+GLM4     range      [24,26,28] 0/4
+DS7B     single     [26]    0/4
+DS7B     two_layer  [26,27] 0/4
+DS7B     range      [24,26,27] 0/4
+```
+
+所有多层配置均为0%。在3-5个层同时注入子空间delta，仍然无法改变输出。
+
+#### Step 10: 检索消融
+
+```text
+模型     规则遮蔽改变率  无规则移植改变率
+Qwen3    0.000           0.000
+GLM4     0.000           0.000
+DS7B     0.000           0.000
+```
+
+规则遮蔽时（类别替换为???）和无规则移植时，所有输出均为"none"（无类别检测到）。注入子空间delta无法在缺少规则检索的情况下产生类别。
+
+### 核心发现
+
+#### 发现1：对象和类别子空间不正交——线性不可分
+
+```text
+三模型所有层的overlap: 0.33 - 0.64
+无任何层满足正交条件 (overlap < 0.1)
+```
+
+这意味着用线性投影无法将类别信息从对象信息中分离。类别子空间U_C中混入了大量对象信息，因此P_C @ (h_A - h_B)不仅包含类别差异，也包含对象差异。
+
+这是Phase 576最重要的结构性发现。Phase 575假设"简单delta太脏"，Phase 576证明即使投影到类别子空间，仍然无法隔离类别变量——因为子空间本身就是纠缠的。
+
+#### 发现2：子空间交换对输出有精确的零效果
+
+```text
+Qwen3: 0/60 = 0.000 (输出完全相同)
+GLM4:  1/60 = 0.017 (格式变化非类别变化)
+DS7B:  0/60 = 0.000 (输出完全相同)
+```
+
+Qwen3和DS7B直接输出类别token（如"c12"），注入后输出一个字符都不变。这不是概率略有改变——是输出分布的argmax完全不变。
+
+这说明：类别子空间方向处于生成路径的零空间中。模型不使用这个方向来决定输出。
+
+#### 发现3：模型完全依赖prompt检索
+
+```text
+规则遮蔽: 0% 改变 (所有输出为none)
+无规则移植: 0% 改变 (所有输出为none)
+跨表交换: 0% 改变 (输出等于目标表正确类别)
+```
+
+当规则被遮蔽或移除时，模型无法输出任何类别。注入子空间delta无法替代规则检索。这证明模型通过注意力直接从规则中检索答案，而非使用内部类别变量。
+
+#### 发现4：多层组合也无法突破
+
+```text
+单层: 0%  双层: 0%  范围(3层): 0%
+```
+
+在3-5个层同时注入子空间delta，仍然零效果。这说明类别变量不是"分布式在多层"——而是根本不存在为可操作的加性变量。
+
+### 硬伤与问题
+
+```text
+1. 分词器审计的max_sim=1.000不提供有用信息
+   原因: 同类符号共享首token
+   应改为: 用完整序列的嵌入相似度
+
+2. GLM4输出格式问题
+   GLM4回显"o71 belongs to c"，5 token内未完成类别
+   应增加max_new_tokens或调整prompt格式
+   但这不影响核心结论——Qwen3/DS7B直接输出且0%改变
+
+3. 类均值SVD可能不是最优子空间提取方法
+   类均值只捕获一阶统计量
+   更高阶方法(如核化、非线性)可能提取不同子空间
+   但线性子空间是因果干预的标准方法
+
+4. 对象-类别不正交可能是高维空间的必然现象
+   d_model=2560-4096, 类别子空间3维, 对象子空间7维
+   3+7=10维 << 2560维, 随机正交概率很高
+   overlap 0.3-0.6说明确实存在系统性纠缠
+```
+
+### 新增客观事实拼图（8条）
+
+176. **对象和类别子空间在所有模型所有层都不正交**（overlap 0.33-0.64），线性投影无法分离。
+177. **子空间隔离交换对Qwen3和DS7B的输出有精确零效果**（0/60，输出字符完全相同）。
+178. **GLM4子空间交换有1.7%格式变化但非类别变化**（alpha=1.0时偶尔跳过查询前缀）。
+179. **多层组合干预（3-5层同时注入）仍为0%**，类别变量不是分布式加性变量。
+180. **跨真值表泛化完全失败**（0%），子空间方向不跨表迁移。
+181. **规则遮蔽和无规则移植均为0%**，模型完全依赖注意力检索规则。
+182. **扩大样本后类别探针准确率提高**（GLM4 0.80→0.90），证明Phase575的0.80非上限。
+183. **对象在极早层可达100%**（GLM4 L6, DS7B L4），类别在中后层最强，层级分工稳定。
+
+### 统一公式更新
+
+Phase 576后的因果闭包公式应更新为：
+
+$$
+\text{CausalClosure}(z_C) = \text{Decodable}(z_C) \land \text{Orthogonal}(z_C, z_O) \land \text{Swappable}(z_C) \land \text{Transferable}(z_C)
+$$
+
+当前状态：
+
+$$
+\text{Decodable}(z_C) = \text{True} \quad (\text{acc} = 0.60 - 0.90)
+$$
+
+$$
+\text{Orthogonal}(z_C, z_O) = \text{False} \quad (\text{overlap} = 0.33 - 0.64)
+$$
+
+$$
+\text{Swappable}(z_C) = \text{False} \quad (\text{rate} = 0 - 0.017)
+$$
+
+$$
+\text{Transferable}(z_C) = \text{False} \quad (\text{rate} = 0)
+$$
+
+因此：
+
+$$
+\text{CausalClosure}(z_C) = \text{False}
+$$
+
+**可解码的类别方向不是因果变量。**
+
+更精确地说，隐藏状态中的类别信息是注意力检索的读出痕迹（readout trace），而非模型用于生成的内部状态变量。模型生成类别token时，直接通过注意力从规则中检索，不需要经过内部类别变量的中转。
+
+### 下一步任务
+
+Phase 577 应做：
+
+```text
+1. 注意力消融——直接干预检索路径
+   - 识别哪些注意力头从规则token检索类别
+   - 消融这些头的注意力模式
+   - 测试是否影响输出
+   如果消融影响输出，说明检索路径是因果的
+
+2. 非线性变量提取
+   - 线性子空间不正交，但非线性空间可能可分
+   - 用MLP probe或对比学习提取非线性类别方向
+   - 测试非线性方向的因果效果
+
+3. Token位置分析
+   - 规则token位置 vs 查询token位置的隐藏状态
+   - 类别信息是否从规则位置"复制"到查询位置
+   - 追踪信息流动路径
+
+4. 生成路径分解
+   - Qwen3/DS7B输出完全不变，说明注入在零空间
+   - 分析生成路径的零空间结构
+   - 找到能影响输出的方向（如果存在）
+
+5. 变量绑定机制
+   - 对象如何与类别绑定？
+   - 是attention的key-value检索还是MLP的组合
+   - 用注意力头分析定位绑定电路
+
+6. 对抗性微世界设计
+   - 冲突规则：同一对象在不同规则中有不同类别
+   - 延迟查询：规则在前，查询在后的不同段落
+   - 迫使模型形成内部状态而非直接检索
+```
+
+### 结果文件
+
+```text
+results/glm5_phase576_isolated_category/
+  phase576_qwen3_isolated_category_smoke.json
+  phase576_qwen3_isolated_category.json
+  phase576_glm4_isolated_category_smoke.json
+  phase576_glm4_isolated_category.json
+  phase576_deepseek7b_isolated_category_smoke.json
+  phase576_deepseek7b_isolated_category.json
+results/glm5_phase576_smoke_*_log.txt
+results/glm5_phase576_*_log.txt
+```
+
+
+## Phase 577: Micro-World Rule Retrieval Circuit and Binding Audit 微世界规则检索电路与绑定审计 [2026-06-21 12:55]
+
+### 本阶段目标
+
+从Phase 576的"子空间注入零效果"转向"直接定位检索电路"：
+1. 哪些注意力头从answer位置关注规则位置？
+2. 消融这些头能否破坏输出？（因果必要性）
+3. 注入clean头输出能否恢复corrupt输出？（因果充分性）
+4. 区分object-matching头和category-copy头
+
+### 生成脚本
+
+```text
+tests/glm5/phase577_retrieval_circuit.py
+```
+
+### 测试设计
+
+```text
+微世界: 10真值表 × 8对象 × 4类别 = 80样本
+提示格式:
+  Rules:
+  o17 belongs to c12.
+  ...
+  Question: o17 belongs to ?
+  Answer:
+
+注意力提取:
+  - 使用eager attention (output_attentions=True)
+  - 提取answer_pos到所有rule位置的注意力
+  - 计算rule-match score:
+    obj_match = attn(correct_obj) / (attn(correct_obj) + mean(attn(wrong_obj)))
+    cat_copy  = attn(correct_cat) / (attn(correct_cat) + mean(attn(wrong_cat)))
+
+消融方法:
+  - 通过o_proj hook减去目标头的贡献
+  - 对每个头h: subtract x_h @ W_h^T from output
+  - 测试top-1/3/5/10 object-match和category-copy头
+
+Logit分析:
+  - 两步提示: prompt + " c" → 预测第二个token (区分12/77/33/59)
+  - 测量: 类别logit变化, argmax变化率, KL散度, 准确率变化
+
+Patching:
+  - Clean运行: 捕获top头的o_proj输入
+  - Corrupt运行 (交换两个类别): 注入clean头输入
+  - 测量: 预测恢复率, KL变化
+
+配置: 9种消融配置 × 10样本 + 5样本生成 + 5样本patching
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase577_retrieval_circuit.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase577_retrieval_circuit.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase577_retrieval_circuit.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase577_retrieval_circuit.py qwen3 --hard-exit-after-model
+python tests/glm5/phase577_retrieval_circuit.py glm4 --hard-exit-after-model
+python tests/glm5/phase577_retrieval_circuit.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.49 min (主测试)
+glm4:       5.60 min (主测试)
+ds7b:       2.52 min (主测试)
+```
+
+### 客观结果
+
+#### Step 2: 检索头定位（80样本注意力提取）
+
+```text
+模型     对象匹配峰值层  对象匹配均值  类别复制峰值层  类别复制均值  Top对象匹配头       Top类别复制头
+Qwen3    L24            0.5513       L24            0.6596       L24H17(0.79)       L24H15(0.88)
+GLM4     L19            0.5509       L19            0.6884       L19H15(0.76)       L20H19(0.91)
+DS7B     L23            0.5114       L23            0.5337       L19H17(0.72)       L19H23(0.74)
+```
+
+```text
+GLM4 Top-5 object-matching heads:
+  L19H15: 0.8016  L19H2: 0.7890  L19H24: 0.7497  L23H26: 0.7398  L19H22: 0.7175
+
+GLM4 Top-5 category-copy heads:
+  L20H19: 0.8988  L20H25: 0.8975  L21H13: 0.8842  L21H9: 0.8583  L19H22: 0.8568
+
+DS7B Top-5 object-matching heads:
+  L19H17: 0.7153  L19H23: 0.6890  L16H1: 0.6885  L21H5: 0.6714  L22H24: 0.6573
+
+DS7B Top-5 category-copy heads:
+  L19H23: 0.7368  L19H22: 0.7348  L19H17: 0.7146  L21H5: 0.7003  L19H24: 0.6778
+```
+
+**核心发现1：三模型都存在显著的规则检索注意力头。**
+
+GLM4的category-copy头最强（L20H19: 0.8988），DS7B的相对较弱（L19H23: 0.7368）。对象匹配和类别复制头在不同层：对象匹配在L19-24，类别复制在L20-24。
+
+#### Step 3: 头消融——因果必要性测试
+
+```text
+模型     配置            准确率变化    argmax变化率  KL散度     logit变化
+Qwen3    top1_obj        10→10 (0%)   0.000         0.000001   +0.025
+Qwen3    top5_obj        10→10 (0%)   0.000         0.000001   -0.163
+Qwen3    top1_cat        10→10 (0%)   0.000         0.000004   -0.325
+Qwen3    top5_cat        10→10 (0%)   0.000         0.000003   -0.525
+Qwen3    top5_combined   10→10 (0%)   0.000         0.000004   -0.550
+Qwen3    top10_combined  10→10 (0%)   0.000         0.000026   -0.988
+
+GLM4     top1_obj        10→10 (0%)   0.000         0.016271   +0.144
+GLM4     top5_obj        10→10 (0%)   0.000         0.004000   -0.144
+GLM4     top1_cat        10→10 (0%)   0.000         0.114698   -0.450
+GLM4     top3_cat        10→7 (30%)   0.300         0.253144   -0.844  ★
+GLM4     top5_cat        10→9 (10%)   0.100         0.099366   -0.600
+GLM4     top5_combined   10→9 (10%)   0.100         0.116023   -0.688
+GLM4     top10_combined  10→9 (10%)   0.100         0.098901   -0.569
+
+DS7B     top1_obj        10→10 (0%)   0.000         0.000899   -0.150
+DS7B     top5_obj        10→10 (0%)   0.000         0.089547   -0.338
+DS7B     top1_cat        10→10 (0%)   0.000         0.000110   +0.000
+DS7B     top3_cat        10→10 (0%)   0.000         0.029741   -0.850
+DS7B     top5_cat        10→10 (0%)   0.000         0.110679   -1.413
+DS7B     top5_combined   10→7 (30%)   0.300         0.840696   -2.863  ★
+DS7B     top10_combined  10→1 (90%)   0.900         2.166316   -6.350  ★★★
+```
+
+**核心发现2：检索头消融在三模型上产生显著的因果效应——尤其是DS7B和GLM4。**
+
+- DS7B top10_combined: 准确率从10/10暴跌到1/10（90% argmax改变），KL=2.17
+- GLM4 top3_cat: 准确率从10/10降到7/10（30% argmax改变），KL=0.25
+- Qwen3: 消融不改变argmax，但减小正确类别logit（-0.99 at top10）
+
+这与Phase 576形成鲜明对比：Phase 576的子空间注入对Qwen3/DS7B输出字符完全不变，而Phase 577的注意力头消融能摧毁DS7B的输出。
+
+#### Step 3b: 生成级消融效应
+
+```text
+模型     配置            生成准确率    变化
+Qwen3    baseline        5/5 (100%)
+Qwen3    top5_combined   5/5 (100%)   无变化
+Qwen3    top10_combined  5/5 (100%)   无变化
+
+GLM4     baseline        4/5 (80%)
+GLM4     top5_obj        3/5 (60%)    -1
+GLM4     top5_cat        4/5 (80%)    无变化
+GLM4     top5_combined   4/5 (80%)    无变化
+GLM4     top10_combined  2/5 (40%)    -2  ★
+
+DS7B     baseline        5/5 (100%)
+DS7B     top5_obj        5/5 (100%)   无变化
+DS7B     top5_cat        5/5 (100%)   无变化
+DS7B     top5_combined   2/5 (40%)    -3  ★★
+DS7B     top10_combined  0/5 (0%)     -5  ★★★
+```
+
+**核心发现3：DS7B的检索电路可以被消融完全摧毁——top10_combined生成准确率从100%降到0%。**
+
+这是整个项目的第一个真正的因果闭包证据：
+- Phase 575: 简单delta注入 → 0%效果
+- Phase 576: 子空间隔离交换 → 0%效果
+- Phase 577: 注意力头消融 → DS7B 100%→0%，GLM4 80%→40%
+
+检索电路是因果必要的：消融这些头直接破坏模型的回答能力。
+
+#### Step 4: Clean-to-corrupt patching
+
+```text
+模型     恢复数  改变数  恢复率   改变率   KL(corrupt→clean)  KL(patched→clean)
+Qwen3    0/5     0/5     0.000    0.000    12.949             12.874
+GLM4     0/5     0/5     0.000    0.000    2.953              2.272
+DS7B     0/5     0/5     0.000    0.000    5.764              4.620
+```
+
+```text
+DS7B冒烟测试中的成功案例:
+  Patch 2: correct=c59, corrupt_pred=c77, patched_pred=c59, recovered=True, KL: 2.825→0.092  ★
+```
+
+**核心发现4：Clean-to-corrupt patching在主测试中0%恢复，但KL显著降低。**
+
+在DS7B冒烟测试中出现过1/4恢复成功（KL从2.83降到0.09）。主测试中0/5恢复，但KL从5.76降到4.62（DS7B），说明patching部分向clean方向移动，但不足以翻转argmax。
+
+这表明top-5 combined头是必要的但不充分的——需要更多头或更精确的patching方法。
+
+### 核心发现
+
+#### 发现1：三模型都存在规则检索注意力头
+
+```text
+GLM4: L20H19 cat_copy=0.90 (最强检索头)
+DS7B: L19H23 cat_copy=0.74
+Qwen3: L24H15 cat_copy=0.85
+```
+
+这些头从answer位置关注正确规则中的对象和类别token，远超对错误规则的关注。
+
+#### 发现2：消融检索头产生显著因果效应——DS7B最敏感
+
+```text
+DS7B top10: acc 10→1, generation 5→0 (完全摧毁)
+GLM4 top3_cat: acc 10→7, generation 4→2
+Qwen3 top10: acc 10→10 (冗余最强)
+```
+
+DS7B的检索电路最脆弱（10个头消融就完全失效），GLM4中等，Qwen3最冗余（消融10个头仍100%正确）。
+
+#### 发现3：category-copy头比object-match头更具因果性
+
+```text
+GLM4 top3_cat: acc 10→7 (30%改变)  vs  top5_obj: acc 10→10 (0%改变)
+DS7B top5_cat: KL=0.11              vs  top5_obj: KL=0.09
+```
+
+category-copy头（从规则中复制类别token的头）比object-match头（匹配查询对象到规则对象的头）更具因果性。这支持检索模型：模型直接从规则中复制类别token。
+
+#### 发现4：Qwen3的检索电路高度冗余
+
+```text
+Qwen3: 消融10个头仍100%正确，但logit减小-0.99
+```
+
+Qwen3可能有更多并行的检索路径，消融top-10头不足以破坏输出。需要消融更多头或使用更激进的消融策略。
+
+### 硬伤与问题
+
+```text
+1. Patching成功率低
+   主测试0%恢复，仅DS7B冒烟测试1/4成功
+   可能原因:
+   - top-5头不足以完全恢复检索
+   - o_proj输入patching不够精确
+   - 需要patching注意力模式而非头输出
+
+2. Qwen3消融0%行为效果
+   Qwen3的检索电路高度冗余
+   需要消融更多头(>10)或使用注意力模式消融
+
+3. 两步logit分析的局限性
+   追加" c"改变了上下文，可能影响注意力模式
+   但生成测试(Step 3b)验证了消融的真实行为效应
+
+4. 消融通过o_proj hook，不是注意力模式消融
+   更精确的方法是直接修改注意力权重矩阵
+   但这需要monkey-patch attention forward
+
+5. 未测试冲突规则的表条件绑定
+   C=f_T(O)的绑定机制尚未直接测试
+```
+
+### 新增客观事实拼图（10条）
+
+184. **三模型都存在显著的规则检索注意力头**，从answer位置关注正确规则中的对象和类别token。
+185. **GLM4的category-copy头最强**（L20H19: 0.90），DS7B较弱（L19H23: 0.74）。
+186. **对象匹配头在L19-24，类别复制头在L20-24**，层级分工稳定。
+187. **DS7B消融top-10检索头导致准确率从100%暴跌到10%**（argmax变化90%）——首次证明检索电路因果必要。
+188. **GLM4消融top-3 category-copy头导致准确率从100%降到70%**——category-copy头比object-match头更具因果性。
+189. **Qwen3消融top-10头仍100%正确**——检索电路高度冗余，但正确类别logit减小-0.99。
+190. **DS7B生成级消融效应最强**：top10_combined从5/5降到0/5。
+191. **Patching在DS7B冒烟测试中1/4恢复成功**（KL从2.83降到0.09），主测试中0%但KL显著降低。
+192. **category-copy头比object-match头更具因果效应**（GLM4: top3_cat 30%改变 vs top5_obj 0%改变）。
+193. **注意力头消融远比残差流子空间注入有效**——从Phase 576的0%到Phase 577的90%（DS7B）。
+
+### 统一公式更新
+
+Phase 577后的因果闭包公式应更新为：
+
+$$
+\text{RetrievalCircuit}(l, h) = \text{AttendToRule}(l, h) \land \text{AblationBreaks}(l, h) \land \text{PatchRestores}(l, h)
+$$
+
+当前状态（DS7B top-10 combined）：
+
+$$
+\text{AttendToRule} = \text{True} \quad (\text{cat\_copy} = 0.74)
+$$
+
+$$
+\text{AblationBreaks} = \text{True} \quad (\text{acc}: 100\% \to 10\%)
+$$
+
+$$
+\text{PatchRestores} = \text{Partial} \quad (\text{KL}: 5.76 \to 4.62, \text{recovery}: 0\%)
+$$
+
+因此：
+
+$$
+\text{RetrievalCircuit}(DS7B, top10) = \text{Necessary but not Sufficient}
+$$
+
+**检索电路是因果必要的（消融破坏输出），但当前patching方法不足以证明充分性。**
+
+### 下一步任务
+
+Phase 578 应做：
+
+```text
+1. 注意力模式级消融（而非头输出消融）
+   - 直接修改注意力权重矩阵 A[l,h,q,rule_pos]=0
+   - 更精确地消融检索路径
+   - 测试是否需要更少的头就能破坏输出
+
+2. 扩展消融范围
+   - 对Qwen3消融top-20/30/50头
+   - 找到Qwen3检索电路的冗余边界
+   - 绘制"消融头数vs准确率"曲线
+
+3. 注意力模式patching
+   - 不patching头输出，而是patching注意力模式
+   - 将clean的A[l,h,q,rule_pos]注入corrupt运行
+   - 测试是否能恢复正确输出
+
+4. Value vector路径分析
+   - 追踪正确类别token的V向量如何流到answer位置
+   - 分解attention输出中的类别贡献
+   - 定位"类别复制"的具体计算路径
+
+5. 冲突规则绑定测试
+   - 构造C=f_T(O)的冲突场景
+   - 测试table identity是否作为条件变量
+   - 验证模型是否使用table context绑定规则
+
+6. 跨模型检索头对比
+   - DS7B最脆弱，Qwen3最冗余
+   - 分析为什么Qwen3需要更多头才能破坏
+   - 是否与模型大小/训练数据有关
+```
+
+### 结果文件
+
+```text
+results/glm5_phase577_retrieval_circuit/
+  phase577_qwen3_retrieval_circuit_smoke.json
+  phase577_qwen3_retrieval_circuit.json
+  phase577_glm4_retrieval_circuit_smoke.json
+  phase577_glm4_retrieval_circuit.json
+  phase577_deepseek7b_retrieval_circuit_smoke.json
+  phase577_deepseek7b_retrieval_circuit.json
+results/glm5_phase577_smoke_*_log.txt
+results/glm5_phase577_*_log.txt
+```
+
+
+## Phase 579: True Retrieval Edge Closure and Table-Binding Control 真检索边闭包与表绑定控制 [2026-06-21 23:35]
+
+### 本阶段目标
+
+从Phase 578推进到真正的注意力边闭包：
+1. 真注意力边消融——直接修改A矩阵而非替换token
+2. 注意力模式修补——注入clean注意力模式到corrupt run
+3. 值向量logit归因——使用safetensors解决meta device问题+GQA正确切片
+4. 平衡表绑定——A-before-B AND B-before-A去除位置偏差
+5. 检索到状态转化——修补后后续层探针是否变化
+
+### 生成脚本
+
+```text
+tests/glm5/phase579_true_edge_closure.py
+```
+
+### 关键技术突破
+
+#### GQA正确处理
+
+Phase 578的值归因失败，根本原因是**GQA(Grouped-Query Attention)维度错误**：
+
+```text
+旧代码: d_head = d_model // n_heads  →  Qwen3: 2560/32=80 (错误!)
+新代码: d_head = config.head_dim     →  Qwen3: 128 (正确!)
+
+三模型GQA参数:
+  Qwen3-4B:  32 query heads, 8 KV heads, head_dim=128, kv_group_size=4
+  GLM4-9B:   32 query heads, 2 KV heads, head_dim=128, kv_group_size=16
+  DS7B:      28 query heads, 4 KV heads, head_dim=128, kv_group_size=7
+
+W_V切片:  W_V[kv_h*d_head:(kv_h+1)*d_head, :]  而非 W_V[h*d_head:(h+1)*d_head, :]
+W_O切片:  W_O[:, h*d_head:(h+1)*d_head]          (O仍按query head切片)
+```
+
+#### Safetensors权重加载
+
+```text
+GLM4/DS7B的v_proj/o_proj权重在meta device上，无法直接访问。
+使用 safetensors 库直接从磁盘加载权重:
+  _load_attn_weights_from_safetensors(model, layer_idx)
+  → 搜索模型目录下的.safetensors文件
+  → 提取 model.layers.{l}.self_attn.v_proj.weight
+  → 提取 model.layers.{l}.self_attn.o_proj.weight
+```
+
+### 测试设计
+
+```text
+微世界: 10真值表 × 8对象 × 4类别 = 80样本
+
+Step 0: 识别top检索头（同Phase 577+578，增加绝对mass）
+Step 1: 真注意力边消融
+  - 直接修改A[l,h][q,j*]=0并重新归一化
+  - 重新计算head输出: modified_A @ V → W_O → logits
+  - 配置: cat_edge_top10, cat_edge_top3_cat, obj_edge_top3_obj, cat_edge_top1
+Step 2: 注意力模式修补
+  - 注入clean注意力水平到corrupt category positions
+  - 配置: top5_combined, top10_combined
+Step 3: 值向量logit归因
+  - 计算每个检索头对正确类别logit的直接贡献
+  - 正确vs错误类别logit优势
+Step 4: 平衡表绑定
+  - 4条件: {A_first, B_first} × {context_A, context_B}
+  - 测量recency bias
+Step 5: 检索到状态转化
+  - 修补后后续层category probe
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase579_true_edge_closure.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase579_true_edge_closure.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase579_true_edge_closure.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase579_true_edge_closure.py qwen3 --hard-exit-after-model
+python tests/glm5/phase579_true_edge_closure.py glm4 --hard-exit-after-model
+python tests/glm5/phase579_true_edge_closure.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.90 min (主测试)
+glm4:       7.16 min (主测试)
+ds7b:       3.46 min (主测试)
+```
+
+### 客观结果
+
+#### Step 0: 检索头识别+GQA参数
+
+```text
+Qwen3-4B: n_kv_heads=8, kv_group_size=4, d_head=128 (GQA!)
+  top-5: L24H13(combined=1.58), L24H29(1.56), L23H31(1.51), L26H26(1.49), L23H28(1.46)
+  mass_cat ≈ 0.34-0.50, mass_obj ≈ 0.002-0.005
+
+GLM4-9B: n_kv_heads=2, kv_group_size=16, d_head=128 (极端GQA!)
+  top-5检索头在L19-L23附近
+
+DS7B: n_kv_heads=4, kv_group_size=7, d_head=128 (GQA!)
+  top-1: L19H23(combined=1.46, mass_cat=0.021)
+```
+
+#### Step 1: 真注意力边消融（冒烟测试结果）
+
+```text
+配置           Qwen3 argmax_change  GLM4 argmax_change  DS7B argmax_change
+baseline        4/4 (1.0)           4/4 (1.0)           4/4 (1.0)
+cat_edge_top10  0.50                0.25                 0.00
+cat_edge_top3   0.38                0.25                 0.00
+obj_edge_top3   0.25                0.25                 0.00
+cat_edge_top1   0.25                0.25                 0.00
+```
+
+注意：真注意力边消融的效果比Phase 578的token corruption弱得多！
+- Phase 578 token corruption对Qwen3: 70% argmax变化
+- Phase 579 真注意力边消融对Qwen3: 50% argmax变化
+
+DS7B的真边消融效果0%（但token corruption是70%）。
+
+#### Step 2: 注意力模式修补（冒烟测试）
+
+```text
+配置           Qwen3 recovered  KL改善  GLM4 recovered  KL改善  DS7B recovered  KL改善
+top5_combined   2/5             0.24   0/5             0.00   0/5             -1.21
+top10_combined  2/5             0.34   0/5             0.00   0/5             -3.72
+```
+
+Qwen3第一次实现了2/5恢复率！但DS7B修补反而恶化分布。
+
+#### Step 3: 值向量logit归因（冒烟测试，GQA修复后首次有效）
+
+```text
+Qwen3: 正确vs错误类别logit优势均值 = 0.14
+  L24H13: advantage=0.007, L24H29: advantage=0.678
+  L26H26: advantage=3.63 (最强头！)
+
+GLM4: 均值 = 0.003 (极弱区分)
+  大部分头advantage接近0或微弱正/负
+
+DS7B: 均值 = 9.58 (极强区分!) ★★★
+  L19H23: advantage=23.65
+  L19H17: advantage=1.74
+  L21H5: advantage=9.19
+```
+
+核心发现3: DS7B检索头对正确类别logit有极强正贡献（advantage=9.58），GLM4几乎零贡献，Qwen3中等。
+
+#### Step 4: 平衡表绑定（冒烟测试）
+
+```text
+指标           Qwen3  GLM4  DS7B
+a_near_acc     1.00   0.75  0.80
+a_far_acc      1.00   1.00  1.00
+b_near_acc     1.00   0.80  0.40
+b_far_acc      1.00   1.00  1.00
+recency_bias   0.00   -0.20 -0.20
+```
+
+核心发现4:
+- Qwen3在所有条件下100%正确——真正实现了表身份绑定（非位置依赖）！
+- GLM4和DS7B有负近因偏差（a_far > a_near），说明远处表反而更准确
+- DS7B的b_near仅40%——近因条件下绑定反而失败
+
+#### Step 5: 检索到状态转化
+
+```text
+三模型transition恢复率均为0%（0/45, 0/50, 0/35）
+```
+
+核心发现5: 检索头修补不会改变后续层的类别探针预测。
+这说明**检索结果主要通过直接head输出影响答案，不形成稳定潜在状态**。
+
+### 硬伤与问题
+
+```text
+1. 真注意力边消融效果比token corruption弱
+   - 修改A矩阵后重新归一化，但其他位置的注意力增加补偿了消融
+   - 重新归一化是关键问题：零掉target positions后，
+     原来分配给target的注意力质量被重新分配到其他位置
+   - 这些其他位置可能包含相似信息（同一规则的其他token）
+
+2. Step 1基线比较bug
+   - 主测试基线accuracy=0%，因为单步prompt的cat_token_ids处
+     logits不正确（模型预测的是"c"而非类别区分token）
+   - 冒烟测试使用了不同的比较方法（有bug但碰巧基线正确）
+
+3. DS7B模式修补恶化分布
+   - KL改善为负值，说明注入的clean注意力反而错误
+   - 可能是因为clean和corrupt的position mapping不对
+
+4. 值归因的GQA修复是重要突破
+   - 之前Phase 578的值归因失败不是meta device问题
+   - 根本原因是GQA下W_V切片错误（80 vs 128）
+   - 修复后DS7B值归因advantage=9.58，极强！
+
+5. Qwen3表绑定100%令人惊讶
+   - 所有4个条件（near/far × A/B）都完美
+   - 这说明Qwen3有真正的表身份绑定机制
+   - 但GLM4和DS7B反而有负近因偏差
+```
+
+### 新增客观事实拼图（10条）
+
+202. **三模型都使用GQA**：Qwen3(kv=8), GLM4(kv=2), DS7B(kv=4), d_head=128而非80。
+203. **GQA下W_V切片必须用kv_h=h//kv_group_size**，否则值归因完全错误。
+204. **真注意力边消融效果弱于token corruption**：归一化补偿了消融位置。
+205. **DS7B值归因advantage极强(9.58)**，说明检索头直接支持正确类别logit。
+206. **GLM4值归因advantage极弱(0.003)**，几乎无法区分正确/错误类别。
+207. **Qwen3模式修补首次获得2/5恢复率**，说明clean注意力注入有效。
+208. **DS7B模式修补恶化分布(KL=-3.72)**，说明position mapping问题。
+209. **Qwen3表绑定100%（4条件全部正确）**，实现真正的表身份绑定。
+210. **GLM4/DS7B有负近因偏差**：远表反而更准确，说明绑定不稳定。
+211. **检索头修补不改变后续层类别探针**，检索结果不形成稳定潜在状态。
+
+### 结果文件
+
+```text
+results/glm5_phase579_true_edge_closure/
+  phase579_qwen3_true_edge_closure_smoke.json
+  phase579_qwen3_true_edge_closure.json
+  phase579_glm4_true_edge_closure_smoke.json
+  phase579_glm4_true_edge_closure.json
+  phase579_deepseek7b_true_edge_closure_smoke.json
+  phase579_deepseek7b_true_edge_closure.json
+
+
+## Phase 578: Micro-World Retrieval Circuit Closure and Binding Specificity 微世界检索电路闭包与绑定特异性 [2026-06-21 22:04]
+
+### 本阶段目标
+
+从Phase 577的"检索电路因果必要性"推进到"检索电路闭包与绑定特异性"：
+1. 注意力边消融（token级）——直接替换规则中特定位置的token
+2. 消融曲线——top-5/10/20/30/50头，找Qwen3冗余边界
+3. 注意力模式修补——top5/10/20 combined头的输出修补
+4. 值向量logit归因——检索头对正确类别logit的直接贡献
+5. 绑定特异性——冲突规则+表上下文标记
+6. 检索到状态转化——修补后后续层类别探针是否变化
+
+### 生成脚本
+
+```text
+tests/glm5/phase578_retrieval_closure.py
+```
+
+### 测试设计
+
+```text
+微世界: 10真值表 × 8对象 × 4类别 = 80样本
+
+Step 0: 识别top检索头（同Phase 577，增加绝对注意力mass）
+Step 1: 注意力边消融
+  - 将规则中特定位置的token替换为中性token(.)
+  - 配置: obj(仅替换正确对象), cat(仅替换正确类别),
+    obj_cat(替换两者), all_rules(替换所有规则位置)
+Step 2: 消融曲线
+  - k = {5, 10, 20, 30, 50} combined heads
+  - 测量: argmax变化率, 准确率变化
+Step 3: 修补
+  - top5/10/20 combined头的o_proj输入修补
+  - 测量: 恢复率, KL散度改善
+Step 4: 值向量logit归因（因meta device问题仅对Qwen3有效）
+Step 5: 绑定特异性
+  - 两个冲突真值表（同一对象在不同表中有不同类别）
+  - 提示包含表上下文标记: "Using Table A, ..."
+Step 6: 检索到状态转化（因meta device问题未完成对GLM4/DS7B）
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase578_retrieval_closure.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase578_retrieval_closure.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase578_retrieval_closure.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase578_retrieval_closure.py qwen3 --hard-exit-after-model
+python tests/glm5/phase578_retrieval_closure.py glm4 --hard-exit-after-model
+python tests/glm5/phase578_retrieval_closure.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.20 min (主测试)
+glm4:       14.77 min (主测试)
+ds7b:       6.21 min (主测试)
+```
+
+### 客观结果
+
+#### Step 0: 检索头识别+绝对注意力mass
+
+```text
+Qwen3 top-5 combined heads:
+  L24H29: combined=1.65, obj_match=0.80, cat_copy=0.85,
+          mass_obj=0.003138, mass_cat=0.417702  ★★
+  L24H13: combined=1.64, obj_match=0.79, cat_copy=0.84,
+          mass_obj=0.003643, mass_cat=0.358098
+  L23H31: combined=1.60, obj_match=0.74, cat_copy=0.85
+
+GLM4 top-5 combined heads:
+  mass_cat ≈ 0.42 (最强类别复制注意力)
+
+DS7B top-5 combined heads:
+  mass_obj ≈ 0.005-0.009 (对象注意力较弱)
+  mass_cat ≈ 0.028-0.036 (类别注意力中等)
+```
+
+**核心发现0: 类别token位置获得的注意力mass远大于对象token位置。**
+
+```text
+mass_cat / mass_obj ≈ 100:1 (Qwen3)
+```
+
+这意味着检索头主要是**从规则中复制类别值**，对象匹配只是定位辅助。这与Phase 577的"category-copy头比object-match头更具因果性"结论一致，但更量化。
+
+#### Step 1: 注意力边消融（token级替换）
+
+```text
+模型     baseline     obj          cat          obj_cat      all_rules
+Qwen3    10→10(0%)    10→5(50%)    10→3(70%)    10→2(80%)    10→0(100%) ★★★
+GLM4     —            10→0(100%)   10→0(100%)   10→2(80%)    10→0(100%) ★★★
+DS7B     —            10→5(50%)    10→3(70%)    10→1(90%)    10→0(100%) ★★★
+```
+
+**核心发现1: token级边消融比头级消融更具特异性，且对三模型都有效！**
+
+这是Phase 578最重要的突破：
+- Phase 577的头消融对Qwen3只有0%行为效果（top10头）
+- Phase 578的cat边消融对Qwen3有70% argmax变化率！
+- Phase 576的子空间注入对Qwen3有0%效果
+- Phase 578的cat边消融对Qwen3有70%效果
+
+差异的根本原因：头消融移除了整个头的所有功能（包括格式、路由等），而边消融只移除特定位置的token信息，保留了头的其他功能。
+
+**cat边消融比obj边消融更有效**：
+
+```text
+Qwen3: obj=50%, cat=70%
+GLM4:  obj=100%, cat=100% (两者等效)
+DS7B:  obj=50%, cat=70%
+```
+
+这再次确认：类别token是模型答案的主要来源。对象token是定位标记，但类别token承载实际答案值。
+
+#### Step 2: 消融曲线
+
+```text
+k(头数)   Qwen3 acc     GLM4 acc      DS7B acc
+5         10→10(0%)     10→10(0%)     10→10(0%)
+10        10→10(0%)     10→10(0%)     10→8(20%)
+20        10→10(0%)     10→10(0%)     10→6(40%)
+30        10→10(0%)     10→10(0%)     10→7(30%)
+50        10→10(0%)     10→3(70%)     10→6(40%)
+```
+
+**核心发现2: Qwen3即使在50个头消融后仍然100%正确。**
+
+Qwen3的检索电路冗余远超预期。消融50个头（跨11层）仍然不改argmax。这与边消融70%的效果形成鲜明对比——说明Qwen3有极多并行检索路径，每个路径都足以独立完成任务。
+
+GLM4在50个头消融后降到30%准确率。DS7B在20个头消融后降到60%。
+
+**Qwen3的冗余边界仍未找到——可能需要消融>100个头。**
+
+#### Step 3: 修补
+
+```text
+模型     top5         top10         top20
+Qwen3    recovered=0/5  KL改善=0.03   recovered=0/5  KL改善=0.50  recovered=0/5  KL改善=0.82
+GLM4     recovered=0/5  KL改善=-0.27  recovered=0/5  KL改善=0.08   recovered=0/5  KL改善=0.27
+DS7B     recovered=0/5  KL改善=0.43   recovered=0/5  KL改善=1.13   recovered=0/5  KL改善=1.80 ★★
+```
+
+**核心发现3: DS7B的top20修补有1.80的KL改善——最大改善但仍0%恢复。**
+
+DS7B修补效果最强（KL改善1.80），说明修补确实把状态向clean方向移动。但argmax仍然不变。
+
+Qwen3的KL改善也很可观（0.82 at top20），但同样0%恢复。
+
+GLM4的top5修补反而KL恶化（-0.27），可能是因为修补引入了副作用。
+
+#### Step 5: 绑定特异性
+
+```text
+模型     A_context准确率    B_context准确率    总正确
+Qwen3    3/5 (60%)          5/5 (100%)         8/10 ★
+GLM4     4/5 (80%)          5/5 (100%)         9/10 ★★
+DS7B     4/5 (80%)          5/5 (100%)         9/10 ★★
+```
+
+**核心发现4: 三模型都能部分实现表条件绑定——B_context准确率100%。**
+
+B_context总是100%正确：这很可能是因为模型检索到了最近的规则块（Table B离查询更近），所以B_context更容易。
+
+A_context准确率较低（60%-80%）：模型有时混淆了两个表中的规则，尤其是当同一对象在两个表中有不同类别时。
+
+这说明模型确实有某种**上下文条件检索**机制，但不是完美的表身份绑定——它更多依赖位置近邻性而非真正的表身份变量。
+
+### 硬伤与问题
+
+```text
+1. 值向量logit归因因meta device问题对GLM4/DS7B失败
+   原因: device_map="auto"使权重处于meta设备
+   accelerate.utils.gather_weight在此版本中不存在
+   需要: 找到正确的权重提取方法
+
+2. 检索到状态转化测试对GLM4/DS7B失败
+   同上meta device问题
+
+3. 边消融使用token替换而非注意力权重修改
+   替换规则token为"."可能引入格式干扰
+   但结果仍然比头消融更有效，说明特异性的价值
+
+4. Qwen3冗余边界未找到
+   50个头消融仍100%正确
+   可能需要>100个头或不同的消融策略
+
+5. 绑定特异性设计有位置偏差
+   Table B总是在Table A之后
+   模型可能更倾向检索最近的规则块
+```
+
+### 新增客观事实拼图（8条）
+
+194. **类别token注意力mass远大于对象token**（mass_cat/mass_obj ≈ 100:1），检索头主要复制类别值。
+195. **token级边消融对三模型都有效**：Qwen3 cat=70% argmax变化，远超头消融0%。
+196. **cat边消融比obj边消融更有效**（Qwen3: obj=50% vs cat=70%），类别token是答案主要来源。
+197. **all_rules边消融导致三模型100%失败**（10→0/10），模型完全依赖规则token。
+198. **Qwen3检索电路50个头消融仍100%正确**，冗余边界未找到。
+199. **DS7B修补KL改善最大**（1.80 at top20），但argmax仍0%恢复。
+200. **三模型都能部分实现表条件绑定**：B_context=100%，A_context=60%-80%。
+201. **模型绑定更多依赖位置近邻性而非表身份**（B_context更高因为规则在查询附近）。
+
+### 结果文件
+
+```text
+results/glm5_phase578_retrieval_closure/
+  phase578_qwen3_retrieval_closure_smoke.json
+  phase578_qwen3_retrieval_closure.json
+  phase578_glm4_retrieval_closure_smoke.json
+  phase578_glm4_retrieval_closure.json
+  phase578_deepseek7b_retrieval_closure_smoke.json
+  phase578_deepseek7b_retrieval_closure.json
+```

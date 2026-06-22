@@ -1,0 +1,1050 @@
+{
+  "phase": 574,
+  "model": "qwen3",
+  "timestamp": "2026-06-21 08:33:20",
+  "attn_implementation": "sdpa",
+  "window": [
+    10,
+    12,
+    14
+  ],
+  "eps": 1e-06,
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "class": "Qwen3ForCausalLM"
+  },
+  "exp1_taxonomy": {
+    "vehicle_tool": {
+      "forbidden_sentence_completion": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 1,
+            "mixed_clean": 1,
+            "clean_synonym": 3,
+            "clean_synonym_descriptive": 2,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.125,
+            "mixed_clean": 0.125,
+            "clean_synonym": 0.375,
+            "clean_synonym_descriptive": 0.25,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a __. \n\nOkay, so the",
+            " a...\nA cart is commonly used as",
+            " a _____ to travel on snow.\n\nA",
+            " a ______ for transporting goods.\nAnswer:",
+            " a\nA ambulance is commonly used as",
+            " a means of transporting goods from one place",
+            " a means of transportation over snow-covered areas",
+            " a transportation for goods, but it is"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 1,
+            "mixed_clean": 1,
+            "clean_synonym": 3,
+            "clean_synonym_descriptive": 2,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.125,
+            "mixed_clean": 0.125,
+            "clean_synonym": 0.375,
+            "clean_synonym_descriptive": 0.25,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a __. \n\nOkay, let me",
+            " a...\nA cart is commonly used as",
+            " a _____ to travel on snow.\n\nA",
+            " a ______ for transporting goods.\nAnswer:",
+            " a\nA ambulance is commonly used as",
+            " a means of transporting goods from one place",
+            " a means of transportation over snow-covered areas",
+            " a transportation for carrying goods from one place"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 1,
+            "mixed_clean": 1,
+            "clean_synonym": 3,
+            "clean_synonym_descriptive": 2,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.125,
+            "mixed_clean": 0.125,
+            "clean_synonym": 0.375,
+            "clean_synonym_descriptive": 0.25,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a __.\n\nA. hospital\nB",
+            " a...\nA cart is commonly used as",
+            " a _____ to travel on snow.\n\nA",
+            " a ______ for transporting goods.\nAnswer:",
+            " a\nA ambulance is commonly used as",
+            " a means of transporting goods from one place",
+            " a means of transportation over snow-covered areas",
+            " a transportation for carrying goods from one place"
+          ]
+        }
+      },
+      "forbidden_definition": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "object_echo": 2,
+            "other": 3,
+            "clean_synonym": 1,
+            "generic_output": 1,
+            "format_failure": 1
+          },
+          "category_rates": {
+            "object_echo": 0.25,
+            "other": 0.375,
+            "clean_synonym": 0.125,
+            "generic_output": 0.125,
+            "format_failure": 0.125
+          },
+          "sample_suffixes": [
+            "...? An ambulance is a service provided",
+            " a two-wheeled or four-w",
+            " a. A slide for snow. B",
+            " a type of transport that is pulled by",
+            " a type of mobile medical facility that is",
+            " a flat, wheeled platform used for",
+            " a type of... Also, a sled",
+            "...?\n\nA. A large, open"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "label_violation": 1,
+            "other": 4,
+            "generic_output": 2,
+            "format_failure": 1
+          },
+          "category_rates": {
+            "label_violation": 0.125,
+            "other": 0.5,
+            "generic_output": 0.25,
+            "format_failure": 0.125
+          },
+          "sample_suffixes": [
+            "...? An emergency medical service vehicle is",
+            " a two-wheeled or four-w",
+            " a. A rigid, flat board that",
+            " a type of __________ that is used",
+            " a service that provides immediate medical assistance to",
+            " a flat, wheeled platform used for",
+            " a type of... | IELTS",
+            "...?\n\nA. A large, open"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "clean_synonym": 1,
+            "other": 3,
+            "generic_output": 3,
+            "format_failure": 1
+          },
+          "category_rates": {
+            "clean_synonym": 0.125,
+            "other": 0.375,
+            "generic_output": 0.375,
+            "format_failure": 0.125
+          },
+          "sample_suffixes": [
+            "...? Use the words: carry,",
+            " a two-wheeled or four-w",
+            " a. A rigid, flat board that",
+            " a type of __________ that is used",
+            " a type of mobile medical facility that is",
+            " a flat, wheeled platform used for",
+            " a type of... Suggest a definition",
+            "...?\n\nA. A large, open"
+          ]
+        }
+      }
+    },
+    "clothing_tool": {
+      "forbidden_sentence_completion": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 7,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.875,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a ______ in a firefighter's gear.",
+            " a(n) ______ for a funeral.\n\n",
+            " a____.\n\nA uniform is commonly used",
+            " a ______ to protect the head from the",
+            " a _____ to protect the body from the",
+            " a _______ to cover the body.\n",
+            " a ______ for identifying job titles.\nAnswer",
+            " a ___ for the head.\nAnswer:"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 5,
+            "object_echo": 3
+          },
+          "category_rates": {
+            "other": 0.625,
+            "object_echo": 0.375
+          },
+          "sample_suffixes": [
+            " a ______ in a variety of scenarios,",
+            " a what? A robe is commonly used",
+            " a____.\n\nA uniform is commonly used",
+            " a ______ to protect the head from the",
+            " a _____ to protect the body from the",
+            " a ______ for someone who is ill.\n",
+            " a ______ for identifying job titles.\nAnswer",
+            " a piece of ______. \n\nA cap"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 6,
+            "object_echo": 1,
+            "generic_output": 1
+          },
+          "category_rates": {
+            "other": 0.75,
+            "object_echo": 0.125,
+            "generic_output": 0.125
+          },
+          "sample_suffixes": [
+            " a ______ in a firefighter's outfit.",
+            " a what? A rope is commonly used",
+            " a____.\n\nA uniform is commonly used",
+            " a ______ to protect the head from the",
+            " a _____ to protect the body from the",
+            " a ______ for body covering.\nAnswer:",
+            " a ______ for identifying job titles.\nAnswer",
+            " a piece of ______. \n\nA."
+          ]
+        }
+      },
+      "forbidden_definition": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "label_violation": 2,
+            "object_echo": 1,
+            "generic_output": 5
+          },
+          "category_rates": {
+            "label_violation": 0.25,
+            "object_echo": 0.125,
+            "generic_output": 0.625
+          },
+          "sample_suffixes": [
+            ":\n\nA) A piece of clothing that",
+            " a _______.\n\nRobe is best",
+            ": something that all people in a group",
+            " a piece of headwear. It is",
+            " a type of clothing. But I can",
+            " a piece of textile that is worn on",
+            " a set of items worn by a group",
+            " a piece of headwear. It is"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "label_violation": 1,
+            "object_echo": 2,
+            "generic_output": 5
+          },
+          "category_rates": {
+            "label_violation": 0.125,
+            "object_echo": 0.25,
+            "generic_output": 0.625
+          },
+          "sample_suffixes": [
+            ":\n\nA) A piece of clothing that",
+            " a...\n\nRobe is best described as",
+            ": something that all people in a group",
+            " a piece of headwear. It is",
+            " a type of...? \n\nVest",
+            " a piece of textile that is worn on",
+            " a set of items worn by a group",
+            " a piece of headwear. It is"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "label_violation": 1,
+            "object_echo": 3,
+            "generic_output": 4
+          },
+          "category_rates": {
+            "label_violation": 0.125,
+            "object_echo": 0.375,
+            "generic_output": 0.5
+          },
+          "sample_suffixes": [
+            ":\n\nA) A piece of clothing that",
+            " a...\n\nRobe is best described as",
+            " something that is always the same. So",
+            " a piece of headwear. It is",
+            " a type of...? \n\nVest",
+            " a piece of?\n\nRobe is best",
+            " a set of items worn by a group",
+            " a piece of headwear. It is"
+          ]
+        }
+      }
+    },
+    "furniture_tool": {
+      "forbidden_sentence_completion": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "generic_output": 3,
+            "clean_synonym": 1,
+            "object_echo": 3,
+            "other": 1
+          },
+          "category_rates": {
+            "generic_output": 0.375,
+            "clean_synonym": 0.125,
+            "object_echo": 0.375,
+            "other": 0.125
+          },
+          "sample_suffixes": [
+            " a piece of __________ for relaxing on",
+            " a ____ for storing items.\nAnswer:",
+            " a versatile bed or a seating area in",
+            " a storage container for small items like __",
+            " a ____.\nAnswer: A recliner",
+            " a storage unit. A sideboard is",
+            " a replacement for a what?\nA fut",
+            " a ______.\nAnswer: A hutch"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "generic_output": 2,
+            "other": 3,
+            "object_echo": 3
+          },
+          "category_rates": {
+            "generic_output": 0.25,
+            "other": 0.375,
+            "object_echo": 0.375
+          },
+          "sample_suffixes": [
+            " a piece of __________ for relaxing on",
+            " a ____ for storing items.\nAnswer:",
+            " a ____ in a home.\nAnswer:",
+            " a storage area for what? A h",
+            " a ____.\nAnswer: A recliner",
+            " a storage unit. A sideboard is",
+            " a replacement for a what?\nA fut",
+            " a ______.\nAnswer: A hutch"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "generic_output": 2,
+            "other": 4,
+            "clean_synonym": 1,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "generic_output": 0.25,
+            "other": 0.5,
+            "clean_synonym": 0.125,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a piece of __________ for relaxing on",
+            " a ____ for storing items.\nAnswer:",
+            " a mattress, and it is often used",
+            " a storage unit for what? A\n\n",
+            " a form of ___________.\nAnswer",
+            " a storage unit. A table is a",
+            " a replacement for a what?\nA fut",
+            " a ______.\nAnswer: A hutch"
+          ]
+        }
+      },
+      "forbidden_definition": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "generic_output": 5,
+            "clean_synonym": 1,
+            "other": 1,
+            "label_violation": 1
+          },
+          "category_rates": {
+            "generic_output": 0.625,
+            "clean_synonym": 0.125,
+            "other": 0.125,
+            "label_violation": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nA type of seating that is designed",
+            " a type of __________ that is used",
+            " a versatile piece of bedding that serves as",
+            " a small storage space. It is usually",
+            " a piece of furniture. But I can",
+            " a piece of |. \n\nOkay,",
+            " a type of mattress or sleeping pad that",
+            " a type of storage. It is a"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "clean_synonym": 2,
+            "generic_output": 4,
+            "other": 1,
+            "label_violation": 1
+          },
+          "category_rates": {
+            "clean_synonym": 0.25,
+            "generic_output": 0.5,
+            "other": 0.125,
+            "label_violation": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nA chair that can be adjusted to",
+            " a type of __________ that is used",
+            " a versatile piece of bedding that serves as",
+            " a small storage space, often used in",
+            " a piece of furniture. But I can",
+            " a piece of **storage** that is",
+            " a type of mattress or sleeping pad that",
+            " a type of storage. It is a"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "clean_synonym": 2,
+            "generic_output": 4,
+            "other": 1,
+            "label_violation": 1
+          },
+          "category_rates": {
+            "clean_synonym": 0.25,
+            "generic_output": 0.5,
+            "other": 0.125,
+            "label_violation": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nA chair that can be adjusted to",
+            " a type of __________ that is used",
+            " a versatile piece of bedding that combines the",
+            " a small storage space. It is usually",
+            " a piece of furniture. But I can",
+            " a piece of |. \n\nOkay,",
+            " a type of mattress or sleeping pad that",
+            " a type of storage. It is a"
+          ]
+        }
+      }
+    },
+    "animal_tool": {
+      "forbidden_sentence_completion": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 7,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.875,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a symbol in many countries because of its",
+            " a companion by people who are\n\nA",
+            " a _____ in different ways.\nAnswer:",
+            " a ______ to study the effects of pollution",
+            " a symbol of China, but it is",
+            " a symbol of ______________________.\nA ot",
+            " a ______ for transportation across oceans.\nAnswer",
+            " a ____.\nA dolphin is commonly used"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 6,
+            "object_echo": 2
+          },
+          "category_rates": {
+            "other": 0.75,
+            "object_echo": 0.25
+          },
+          "sample_suffixes": [
+            " a symbol in many countries because of its",
+            " a .\nA otter is commonly used",
+            " a _____ in different ways.\nAnswer:",
+            " a ______ to study the effects of pollution",
+            " a symbol of China, but it is",
+            " a symbol of ______________________.\nA ot",
+            " a ______ for transportation across oceans.\nAnswer",
+            " a ____.\nA dolphin is commonly used"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "other": 7,
+            "object_echo": 1
+          },
+          "category_rates": {
+            "other": 0.875,
+            "object_echo": 0.125
+          },
+          "sample_suffixes": [
+            " a symbol in many countries because of its",
+            " a .\nA otter is commonly used",
+            " a _____ in different ways.\nAnswer:",
+            " a ______ to study human behavior.\nAnswer",
+            " a symbol for the Chinese people. The",
+            " a symbol of ______________________.\nA ot",
+            " a ______ for a family.\n\nA.",
+            " a ____.\nA. guide\nB"
+          ]
+        }
+      },
+      "forbidden_definition": {
+        "lambda_0.0": {
+          "total": 8,
+          "category_counts": {
+            "object_echo": 4,
+            "clean_synonym": 3,
+            "generic_output": 1
+          },
+          "category_rates": {
+            "object_echo": 0.5,
+            "clean_synonym": 0.375,
+            "generic_output": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nPanda is best described as a",
+            " a mammal that lives in the water",
+            " a...\n\nWhale is best described as",
+            " a __________.\nDolphin is",
+            " a kind of _______ that is native",
+            " a type of creature that lives in water",
+            " a large, aquatic creature that lives in",
+            " a...?\nDolphin is best"
+          ]
+        },
+        "lambda_4.0": {
+          "total": 8,
+          "category_counts": {
+            "object_echo": 3,
+            "clean_synonym": 4,
+            "generic_output": 1
+          },
+          "category_rates": {
+            "object_echo": 0.375,
+            "clean_synonym": 0.5,
+            "generic_output": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nPanda is best described as a",
+            " a _____.\n\nOtter is best described",
+            " a massive aquatic creature that lives in the",
+            " a mammal that lives in the ocean",
+            " a kind of _______ that is native",
+            " a type of creature that lives in water",
+            " a large, aquatic creature that lives in",
+            " a...?\nDolphin is best"
+          ]
+        },
+        "lambda_8.0": {
+          "total": 8,
+          "category_counts": {
+            "object_echo": 4,
+            "clean_synonym": 3,
+            "generic_output": 1
+          },
+          "category_rates": {
+            "object_echo": 0.5,
+            "clean_synonym": 0.375,
+            "generic_output": 0.125
+          },
+          "sample_suffixes": [
+            "...\n\nPandas are best described as black",
+            " a _____.\n\nOtter is best described",
+            " a...\n\nWhale is best described as",
+            " a mammal that lives in the ocean",
+            " a kind of _______ that is native",
+            " a type of creature that lives in water",
+            " a large, aquatic creature that lives in",
+            " a...?\nDolphin is best"
+          ]
+        }
+      }
+    }
+  },
+  "exp2_competition": {
+    "vehicle_tool": {
+      "forbidden_sentence_completion": {
+        "object_best_logit": 11.515625,
+        "target_best_logit": 10.765625,
+        "generic_best_logit": 16.0,
+        "format_best_logit": 24.375,
+        "object_target_margin": 0.75,
+        "generic_target_margin": 5.234375,
+        "format_target_margin": 13.609375,
+        "object_mass": 4.778868969879113e-06,
+        "target_mass": 3.140533863188466e-06,
+        "generic_mass": 0.0003745972062461078,
+        "format_mass": 0.9660981297492981
+      },
+      "forbidden_definition": {
+        "object_best_logit": 12.15625,
+        "target_best_logit": 11.578125,
+        "generic_best_logit": 17.90625,
+        "format_best_logit": 24.0,
+        "object_target_margin": 0.578125,
+        "generic_target_margin": 6.328125,
+        "format_target_margin": 12.421875,
+        "object_mass": 1.2464950486901216e-05,
+        "target_mass": 5.340345978765981e-06,
+        "generic_mass": 0.002639796817675233,
+        "format_mass": 0.7573625445365906
+      }
+    },
+    "clothing_tool": {
+      "forbidden_sentence_completion": {
+        "object_best_logit": 10.46875,
+        "target_best_logit": 16.046875,
+        "generic_best_logit": 17.046875,
+        "format_best_logit": 23.3125,
+        "object_target_margin": -5.578125,
+        "generic_target_margin": 1.0,
+        "format_target_margin": 7.265625,
+        "object_mass": 8.907700248528272e-06,
+        "target_mass": 0.0012439503334462643,
+        "generic_mass": 0.0028169704601168633,
+        "format_mass": 0.8797367215156555
+      },
+      "forbidden_definition": {
+        "object_best_logit": 11.6875,
+        "target_best_logit": 14.921875,
+        "generic_best_logit": 18.9375,
+        "format_best_logit": 22.78125,
+        "object_target_margin": -3.234375,
+        "generic_target_margin": 4.015625,
+        "format_target_margin": 7.859375,
+        "object_mass": 5.751911157858558e-05,
+        "target_mass": 0.0005298400647006929,
+        "generic_mass": 0.023775791749358177,
+        "format_mass": 0.5684306621551514
+      }
+    },
+    "furniture_tool": {
+      "forbidden_sentence_completion": {
+        "object_best_logit": 11.359375,
+        "target_best_logit": 14.734375,
+        "generic_best_logit": 16.828125,
+        "format_best_logit": 23.65625,
+        "object_target_margin": -3.375,
+        "generic_target_margin": 2.09375,
+        "format_target_margin": 8.921875,
+        "object_mass": 7.206910595414229e-06,
+        "target_mass": 0.00012601535127032548,
+        "generic_mass": 0.0015540728345513344,
+        "format_mass": 0.9468482732772827
+      },
+      "forbidden_definition": {
+        "object_best_logit": 12.71875,
+        "target_best_logit": 14.453125,
+        "generic_best_logit": 17.9375,
+        "format_best_logit": 23.8125,
+        "object_target_margin": -1.734375,
+        "generic_target_margin": 3.484375,
+        "format_target_margin": 9.359375,
+        "object_mass": 7.522521627834067e-05,
+        "target_mass": 0.00022269344481173903,
+        "generic_mass": 0.004936961457133293,
+        "format_mass": 0.8390948176383972
+      }
+    },
+    "animal_tool": {
+      "forbidden_sentence_completion": {
+        "object_best_logit": 10.125,
+        "target_best_logit": 11.546875,
+        "generic_best_logit": 16.078125,
+        "format_best_logit": 24.21875,
+        "object_target_margin": -1.421875,
+        "generic_target_margin": 4.53125,
+        "format_target_margin": 12.671875,
+        "object_mass": 1.5969396827131277e-06,
+        "target_mass": 5.355063876777422e-06,
+        "generic_mass": 0.0004764615441672504,
+        "format_mass": 0.9733665585517883
+      },
+      "forbidden_definition": {
+        "object_best_logit": 10.421875,
+        "target_best_logit": 12.84375,
+        "generic_best_logit": 16.96875,
+        "format_best_logit": 24.09375,
+        "object_target_margin": -2.421875,
+        "generic_target_margin": 4.125,
+        "format_target_margin": 11.25,
+        "object_mass": 1.3192525329941418e-06,
+        "target_mass": 1.6969788703136146e-05,
+        "generic_mass": 0.0007454424048773944,
+        "format_mass": 0.7988260388374329
+      }
+    }
+  },
+  "exp3_prefix_induction": {
+    "vehicle_tool": {
+      "baseline": {
+        "clean_rate": 0.75,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 1,
+          "mixed_clean": 1,
+          "clean_synonym": 3,
+          "clean_synonym_descriptive": 2,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      },
+      "echo_suppress8": {
+        "clean_rate": 0.75,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 1,
+          "mixed_clean": 1,
+          "clean_synonym": 3,
+          "clean_synonym_descriptive": 2,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      },
+      "clean_prefix1": {
+        "clean_rate": 0.625,
+        "echo_rate": 0.25,
+        "category_counts": {
+          "object_echo": 2,
+          "mixed_clean": 1,
+          "clean_synonym_descriptive": 3,
+          "clean_synonym": 1,
+          "other": 1
+        },
+        "forced_prefix": [
+          264
+        ]
+      },
+      "prefix1+suppress8": {
+        "clean_rate": 0.75,
+        "echo_rate": 0.0,
+        "category_counts": {
+          "clean_synonym_descriptive": 4,
+          "mixed_clean": 1,
+          "clean_synonym": 1,
+          "other": 2
+        },
+        "forced_prefix": [
+          264
+        ]
+      },
+      "clean_prefix2": {
+        "clean_rate": 0.25,
+        "echo_rate": 0.75,
+        "category_counts": {
+          "object_echo": 6,
+          "mixed_clean": 2
+        },
+        "forced_prefix": [
+          264,
+          9338
+        ]
+      },
+      "prefix2+suppress8": {
+        "clean_rate": 0.25,
+        "echo_rate": 0.5,
+        "category_counts": {
+          "format_failure": 2,
+          "mixed_clean": 2,
+          "object_echo": 4
+        },
+        "forced_prefix": [
+          264,
+          9338
+        ]
+      },
+      "clean_prefix3": {
+        "clean_rate": 0.25,
+        "echo_rate": 0.75,
+        "category_counts": {
+          "object_echo": 6,
+          "mixed_clean": 2
+        },
+        "forced_prefix": [
+          264,
+          9338,
+          32
+        ]
+      },
+      "prefix3+suppress8": {
+        "clean_rate": 0.25,
+        "echo_rate": 0.75,
+        "category_counts": {
+          "object_echo": 6,
+          "mixed_clean": 2
+        },
+        "forced_prefix": [
+          264,
+          9338,
+          32
+        ]
+      }
+    },
+    "clothing_tool": {
+      "baseline": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 7,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      },
+      "echo_suppress8": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 6,
+          "object_echo": 1,
+          "generic_output": 1
+        },
+        "forced_prefix": null
+      }
+    },
+    "furniture_tool": {
+      "baseline": {
+        "clean_rate": 0.125,
+        "echo_rate": 0.375,
+        "category_counts": {
+          "generic_output": 3,
+          "clean_synonym": 1,
+          "object_echo": 3,
+          "other": 1
+        },
+        "forced_prefix": null
+      },
+      "echo_suppress8": {
+        "clean_rate": 0.125,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "generic_output": 2,
+          "other": 4,
+          "clean_synonym": 1,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      },
+      "clean_prefix1": {
+        "clean_rate": 0.125,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 3,
+          "generic_output": 3,
+          "object_echo": 1,
+          "clean_synonym": 1
+        },
+        "forced_prefix": [
+          264
+        ]
+      },
+      "prefix1+suppress8": {
+        "clean_rate": 0.125,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 3,
+          "generic_output": 3,
+          "object_echo": 1,
+          "clean_synonym": 1
+        },
+        "forced_prefix": [
+          264
+        ]
+      },
+      "clean_prefix2": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.0,
+        "category_counts": {
+          "format_failure": 1,
+          "generic_output": 3,
+          "other": 4
+        },
+        "forced_prefix": [
+          264,
+          31945
+        ]
+      },
+      "prefix2+suppress8": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.0,
+        "category_counts": {
+          "format_failure": 1,
+          "generic_output": 3,
+          "other": 4
+        },
+        "forced_prefix": [
+          264,
+          31945
+        ]
+      },
+      "clean_prefix3": {
+        "clean_rate": 1.0,
+        "echo_rate": 0.0,
+        "category_counts": {
+          "clean_synonym": 5,
+          "clean_synonym_descriptive": 3
+        },
+        "forced_prefix": [
+          264,
+          31945,
+          4845
+        ]
+      },
+      "prefix3+suppress8": {
+        "clean_rate": 1.0,
+        "echo_rate": 0.0,
+        "category_counts": {
+          "clean_synonym": 5,
+          "clean_synonym_descriptive": 3
+        },
+        "forced_prefix": [
+          264,
+          31945,
+          4845
+        ]
+      }
+    },
+    "animal_tool": {
+      "baseline": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 7,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      },
+      "echo_suppress8": {
+        "clean_rate": 0.0,
+        "echo_rate": 0.125,
+        "category_counts": {
+          "other": 7,
+          "object_echo": 1
+        },
+        "forced_prefix": null
+      }
+    }
+  },
+  "exp4_combined": {
+    "baseline": {
+      "clean_rate": 0.75,
+      "echo_rate": 0.125,
+      "category_counts": {
+        "other": 1,
+        "mixed_clean": 1,
+        "clean_synonym": 3,
+        "clean_synonym_descriptive": 2,
+        "object_echo": 1
+      }
+    },
+    "dim_w1": {
+      "clean_rate": 0.625,
+      "echo_rate": 0.25,
+      "category_counts": {
+        "object_echo": 2,
+        "mixed_clean": 3,
+        "clean_synonym": 1,
+        "generic_output": 1,
+        "clean_synonym_descriptive": 1
+      }
+    },
+    "suppress8": {
+      "clean_rate": 0.75,
+      "echo_rate": 0.125,
+      "category_counts": {
+        "other": 1,
+        "mixed_clean": 1,
+        "clean_synonym": 3,
+        "clean_synonym_descriptive": 2,
+        "object_echo": 1
+      }
+    },
+    "dim_w1+suppress8": {
+      "clean_rate": 0.75,
+      "echo_rate": 0.125,
+      "category_counts": {
+        "object_echo": 1,
+        "mixed_clean": 4,
+        "clean_synonym": 1,
+        "label_violation": 1,
+        "clean_synonym_descriptive": 1
+      }
+    },
+    "prefix2": {
+      "clean_rate": 0.25,
+      "echo_rate": 0.75,
+      "category_counts": {
+        "object_echo": 6,
+        "mixed_clean": 2
+      }
+    },
+    "prefix2+suppress8": {
+      "clean_rate": 0.25,
+      "echo_rate": 0.5,
+      "category_counts": {
+        "format_failure": 2,
+        "mixed_clean": 2,
+        "object_echo": 4
+      }
+    },
+    "dim_w1+prefix2+suppress8": {
+      "clean_rate": 0.25,
+      "echo_rate": 0.75,
+      "category_counts": {
+        "object_echo": 6,
+        "mixed_clean": 2
+      }
+    }
+  },
+  "total_time_min": 0.69
+}
