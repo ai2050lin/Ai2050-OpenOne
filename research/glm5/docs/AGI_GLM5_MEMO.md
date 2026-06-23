@@ -56043,3 +56043,51 @@ results/glm5_phase578_retrieval_closure/
   phase578_deepseek7b_retrieval_closure_smoke.json
   phase578_deepseek7b_retrieval_closure.json
 ```
+
+
+## Phase 580: Micro-World ORV Retrieval-to-Reasoning Closure [2026-06-22 02:35]
+
+### Key Results
+
+OC Full-string Logprob: Qwen3=1.0/0.9, GLM4=1.0/0.9, DS7B=1.0/1.0
+
+OC True Edge Ablation (Dual Mode):
+  Qwen3: top10 renorm=1.0/norenorm=1.0, logit: -0.218/-1.326 (6x gap)
+  GLM4: top10 renorm=1.0/norenorm=1.0, logit: ~0.001
+  DS7B: top10 renorm=1.0/norenorm=1.0, logit: +5.255/-4.127
+
+ORV Token Corruption:
+  Qwen3: val=1.0, obj=0.8, rel=0.6, all=1.0
+  GLM4: val=1.0, obj=0.6, rel=0.2, all=1.0
+  DS7B: val=0.6, obj=0.0, rel=-0.2, all=0.6
+
+ORV True Edge Ablation:
+  Qwen3: val_top10_renorm=0.8, norenorm=0.8
+  GLM4: val_top10_renorm=0.0, norenorm=0.0
+  DS7B: val_top10_renorm=0.6, norenorm=0.8
+
+Compositional Reasoning: All 0%
+Syntax Templates: All 100%
+ORV Binding: A_near/far: Qwen3=0.20/0.60, GLM4=0.40/0.80, DS7B=0.60/0.80
+ORV Value Attribution: DS7B=2.46, Qwen3=1.17, GLM4=0.002
+
+### New Facts (10)
+
+212. Full-string logprob fixes Phase 579 eval bug.
+213. norenorm edge ablation logit changes >> renorm (6x for Qwen3).
+214. In ORV, value token is primary answer source.
+215. ORV value attribution: DS7B=2.46, Qwen3=1.17, GLM4=0.002.
+216. GLM4 ORV edge ablation 0% but token corruption 100%.
+217. All models fail two-hop composition (0%).
+218. Syntax templates all 100%: syntax is path control.
+219. ORV binding: negative recency bias (far > near).
+220. rel_only corruption weakest.
+221. DS7B ORV baseline only 60%.
+
+### Key Issues
+
+1. Compositional reasoning 0% is the critical bottleneck
+2. ORV binding worse than OC binding
+3. GLM4 ORV edge ablation 0% needs explanation
+4. norenorm vs renorm logit direction inconsistent
+5. DS7B ORV baseline only 60%
