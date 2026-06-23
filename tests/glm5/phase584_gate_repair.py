@@ -220,7 +220,7 @@ def build_proof_prompt(tokenizer, oc_table, crv_table, query_object, query_relat
 # ============================================================================
 
 def run_choice_gate_repair(model, tokenizer, device, n_tables, objects, relations,
-                            categories, values):
+                            categories, values, max_samples):
     """Repair C_wrong_cat by providing gold category and proof scaffold."""
     log("--- Part A: Choice gate repair ---")
 
@@ -287,11 +287,11 @@ def run_choice_gate_repair(model, tokenizer, device, n_tables, objects, relation
                     "is_repair_target": is_target,
                 })
 
-                if len(results) >= 40:
+                if len(results) >= max_samples:
                     break
-            if len(results) >= 40:
+            if len(results) >= max_samples:
                 break
-        if len(results) >= 40:
+        if len(results) >= max_samples:
             break
 
     n_direct = sum(1 for r in results if r["direct_correct"])
@@ -327,7 +327,7 @@ def run_choice_gate_repair(model, tokenizer, device, n_tables, objects, relation
 # ============================================================================
 
 def run_value_retrieval_repair(model, tokenizer, device, n_tables, objects, relations,
-                                categories, values):
+                                categories, values, max_samples):
     """Repair Val_fail by providing relation context and structured prompts."""
     log("--- Part B: Value retrieval gate repair ---")
 
@@ -396,11 +396,11 @@ def run_value_retrieval_repair(model, tokenizer, device, n_tables, objects, rela
                     "is_repair_target": is_target,
                 })
 
-                if len(results) >= 40:
+                if len(results) >= max_samples:
                     break
-            if len(results) >= 40:
+            if len(results) >= max_samples:
                 break
-        if len(results) >= 40:
+        if len(results) >= max_samples:
             break
 
     n_gold = sum(1 for r in results if r["gold_correct"])
@@ -437,13 +437,13 @@ def crv_table_to_list(crv_table):
 # Part C: Polarity gate repair
 # ============================================================================
 
-def run_polarity_gate_repair(model, tokenizer, device):
+def run_polarity_gate_repair(model, tokenizer, device, model_name):
     """Repair yes-bias using multiple interventions."""
     log("--- Part C: Polarity gate repair ---")
 
     test_cases = []
-    for cat in ["水果", "动物", "天体", "工具"]:
-        for obj in CATEGORY_OBJECTS[cat][:2] + CATEGORY_NEGATIVES[cat][:2]:
+    for cat in CATEGORY_OBJECTS:
+        for obj in CATEGORY_OBJECTS[cat] + CATEGORY_NEGATIVES[cat]:
             is_positive = obj in CATEGORY_OBJECTS[cat]
             test_cases.append((obj, cat, is_positive))
 
@@ -460,9 +460,8 @@ def run_polarity_gate_repair(model, tokenizer, device):
         base_correct = (base_pred == "是") == expected_pos
         base_margin = base_lps["是"][0] - base_lps["否"][0]
 
-        # Repair 1: Best format from Phase 583
-        # For Qwen3 use english, for GLM4 use double, for DS7B use english
-        best_fmt = "english"  # Will be overridden per model externally
+        # Repair 1: Best format from Phase 583.
+        best_fmt = {"qwen3": "english", "glm4": "double", "deepseek7b": "english"}.get(model_name, "english")
         best_pos, best_neg = ANSWER_FORMATS[best_fmt]
         r1_lps = compute_full_string_logprob_batch(
             model, tokenizer, device, base_prompt, [best_pos, best_neg])
@@ -500,6 +499,7 @@ def run_polarity_gate_repair(model, tokenizer, device):
 
         results.append({
             "object": obj, "category": cat, "is_positive": is_positive,
+            "best_format": best_fmt,
             "base_correct": base_correct, "base_margin": base_margin,
             "r1_correct": r1_correct, "r1_margin": r1_margin,  # best format
             "r2_correct": r2_correct, "r2_margin": r2_margin,  # system instruction
@@ -546,7 +546,7 @@ def run_polarity_gate_repair(model, tokenizer, device):
 # ============================================================================
 
 def run_bypass_mechanism_test(model, tokenizer, device, n_tables, objects, relations,
-                               categories, values):
+                               categories, values, max_samples):
     """Test if model uses direct O→V bypass vs O→C→V chain."""
     log("--- Part D: Bypass mechanism test ---")
 
@@ -625,11 +625,11 @@ def run_bypass_mechanism_test(model, tokenizer, device, n_tables, objects, relat
                     "bypass_matches_correct": bypass_matches_correct,
                 })
 
-                if len(results) >= 40:
+                if len(results) >= max_samples:
                     break
-            if len(results) >= 40:
+            if len(results) >= max_samples:
                 break
-        if len(results) >= 40:
+        if len(results) >= max_samples:
             break
 
     n_full = sum(1 for r in results if r["full_correct"])
@@ -678,16 +678,16 @@ def run_model(args):
         }
 
         result["partA_choice_gate_repair"] = run_choice_gate_repair(
-            model, tokenizer, device, n_tables, objects, relations, categories, values)
+            model, tokenizer, device, n_tables, objects, relations, categories, values, args.max_samples)
 
         result["partB_value_retrieval_repair"] = run_value_retrieval_repair(
-            model, tokenizer, device, n_tables, objects, relations, categories, values)
+            model, tokenizer, device, n_tables, objects, relations, categories, values, args.max_samples)
 
         result["partC_polarity_gate_repair"] = run_polarity_gate_repair(
-            model, tokenizer, device)
+            model, tokenizer, device, args.model)
 
         result["partD_bypass_mechanism"] = run_bypass_mechanism_test(
-            model, tokenizer, device, n_tables, objects, relations, categories, values)
+            model, tokenizer, device, n_tables, objects, relations, categories, values, args.max_samples)
 
         return result
 
@@ -702,6 +702,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("model", choices=["qwen3", "glm4", "deepseek7b"])
     parser.add_argument("--n-tables", type=int, default=10)
+    parser.add_argument("--max-samples", type=int, default=120)
     parser.add_argument("--output-dir", default=str(OUT_ROOT))
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--confirm", action="store_true")
@@ -710,9 +711,11 @@ def main():
 
     if args.smoke:
         args.n_tables = 4
+        args.max_samples = min(args.max_samples, 40)
         log("SMOKE TEST MODE: n_tables=4")
     elif args.confirm:
         args.n_tables = 15
+        args.max_samples = max(args.max_samples, 160)
         log("CONFIRMATION TEST MODE: n_tables=15")
 
     t0 = time.time()

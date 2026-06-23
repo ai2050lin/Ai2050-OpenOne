@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/server/server.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Frontend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "C:\\Users\\Admin\\.workbuddy\\binaries\\node\\versions\\22.21.0\\npm.cmd",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "PATH": "C:\\Users\\Admin\\.workbuddy\\binaries\\node\\versions\\22.21.0;${env:PATH}"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Local:.*(http://localhost:\\d+)",
+        "uriFormat": "%s"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (Backend + Frontend)",
+      "configurations": [
+        "Backend",
+        "Frontend"
+      ],
+      "stopAll": true
+    }
+  ]
+}

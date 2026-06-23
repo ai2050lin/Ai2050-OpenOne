@@ -57027,3 +57027,3764 @@ results/glm5_phase583_choice_polarity/
   phase583_deepseek7b_choice_polarity_smoke.json
   phase583_deepseek7b_choice_polarity.json
 ```
+
+## Phase 584: State-Conditioned Gate Repair 固定网络的条件化状态门修复 [2026-06-23 17:04]
+
+### 本阶段目标
+
+根据附件中的分析，先判断“同一神经网络参与所有自回归计算，因此内部必须存在不同状态，否则语言会混乱”这一判断是否成立，再继续用客观实验推进。
+
+附件中正确部分：
+
+```text
+1. 固定参数并不意味着固定计算结果；同一网络在不同token、上下文、任务和答案格式下会进入不同条件化状态。
+2. 当前研究不应只寻找单一语义向量，而应测量 object/category/relation/value/polarity/format 等状态门如何切换。
+3. 如果要破解语言背后的编码机制，关键不是抽象命名“状态”，而是把状态拆成可观测、可干预、可修复的计算门。
+```
+
+需要修正的部分：
+
+```text
+1. “内部一定存在完整状态算法”目前仍是研究假设，不是已证明结论。
+2. 不能直接使用复杂统计或高级数学结构包装；本阶段继续使用最基础的logprob、accuracy、margin和因果修复。
+3. Phase583 的一个结论需要复查：GLM4/DS7B 的显式否定规则无效，可能混入了答案格式门问题。
+```
+
+本阶段目标：
+
+```text
+在 Phase583 的三个门控失败基础上，测试能否通过外部可解释条件修复：
+1. choice gate：中间类别选择门。
+2. value retrieval gate：类别-关系到值的检索门。
+3. polarity gate：正/负极性读出门。
+4. bypass path：错误中间类别是否必然导致错误值，用于审计是否存在 O→V 旁路。
+```
+
+### 脚本修正
+
+原 `tests/glm5/phase584_gate_repair.py` 已存在，但只有 qwen3/glm4 smoke 结果，且有两个硬伤：
+
+```text
+1. Part C 注释说按模型使用 Phase583 最佳答案格式，但代码固定为 english，低估 GLM4 的 double 格式。
+2. 正式样本仍被 40 样本上限限制，不能满足当前阶段对稳定性的要求。
+```
+
+本轮修正：
+
+```text
+1. Part C 按模型选择最佳格式：
+   qwen3 -> english yes/no
+   glm4 -> double 是的/不是
+   deepseek7b -> english yes/no
+
+2. polarity样本从16扩展到60：
+   6个类别 * 每类5正例+5负例。
+
+3. 添加 --max-samples。
+   默认120，--confirm时至少160。
+   本轮受对象/关系组合限制，two-hop每模型实际80样本。
+
+4. 添加汇总脚本：
+   tests/glm5/phase584_gate_repair_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase584_gate_repair.py
+
+python tests/glm5/phase584_gate_repair.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase584_gate_repair.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase584_gate_repair.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase584_gate_repair_summary.py
+
+python -m py_compile \
+  tests/glm5/phase584_gate_repair.py \
+  tests/glm5/phase584_gate_repair_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+n_tables = 15
+two-hop samples/model = 80
+polarity samples/model = 60
+polarity negatives/model = 30
+values = v05, v91, v22, v48
+relations = r31, r64
+categories = c12, c77, c33, c59
+polarity categories = 水果, 动物, 天体, 工具, 家具, 交通工具
+```
+
+### 客观结果汇总
+
+```text
+model       direct   gold-cat   rel-emphasis   rel-filter   polarity base   polarity rule+fmt   neg base   neg rule+fmt
+qwen3       73.8%    93.8%      95.0%          100.0%       90.0%           100.0%              80.0%      100.0%
+glm4        70.0%    78.8%      96.2%          92.5%        50.0%           100.0%              0.0%       100.0%
+deepseek7b  53.8%    60.0%      92.5%          97.5%        50.0%           98.3%               0.0%       96.7%
+```
+
+旁路审计：
+
+```text
+model       no-CRV   force wrong cat -> wrong val   force wrong cat -> correct val
+qwen3       27.5%    61.3%                          48.8%
+glm4        27.5%    62.5%                          41.2%
+deepseek7b  26.3%    41.2%                          51.2%
+```
+
+### 关键客观事实
+
+1. **relation-filter 是最强 value retrieval 修复**
+
+```text
+qwen3:      gold 93.8% -> relation-filter 100.0%
+glm4:       gold 78.8% -> relation-filter 92.5%
+deepseek7b: gold 60.0% -> relation-filter 97.5%
+```
+
+这说明 Phase583 中 DS7B 的主要失败确实不在中间类别选择，而在第二步 `(category, relation) -> value` 检索门。
+
+2. **polarity gate 不是单纯知识问题，而是 rule + format 联合门**
+
+```text
+negative only:
+qwen3:      base 80.0% -> rule+fmt 100.0%
+glm4:       base 0.0%  -> rule+fmt 100.0%
+deepseek7b: base 0.0%  -> rule+fmt 96.7%
+```
+
+这修正了 Phase583 的过强结论：GLM4/DS7B 并不是“显式否定规则完全无效”，而是**显式否定规则必须和合适答案格式一起进入读出门**。
+
+3. **system instruction 单独很弱**
+
+```text
+negative only:
+glm4 system = 10.0%
+deepseek7b system = 0.0%
+```
+
+单纯告诉模型“不要默认 yes”不能解决极性读出问题，说明状态门不是普通自然语言指令可以稳定控制的。
+
+4. **错误中间类别会强烈影响值，但不是单一路径闭合**
+
+```text
+force wrong cat -> wrong val:
+qwen3 61.3%
+glm4 62.5%
+deepseek7b 41.2%
+
+force wrong cat -> correct val:
+qwen3 48.8%
+glm4 41.2%
+deepseek7b 51.2%
+```
+
+错误类别会改变输出值选择，但错误值和正确值同时有较高比例，说明当前 two-hop 任务中不是干净的单条 `O -> C -> V` 路径，而是存在竞争/旁路/格式读出混合。
+
+5. **No-CRV 接近四选一机会水平**
+
+```text
+qwen3 27.5%
+glm4 27.5%
+deepseek7b 26.3%
+```
+
+这说明值不是在无关系规则时简单凭对象记忆生成，CRV规则确实参与了 value retrieval。
+
+### 对深度神经网络内部结构研究的推进
+
+本阶段把“固定网络具有不同状态”的理论说法压成了可测试版本：
+
+```text
+state = 当前上下文下被激活的 gate configuration
+```
+
+其中至少能分出：
+
+```text
+1. category state：对象到中间类别的选择状态。
+2. relation-filter state：关系条件对候选值集合的过滤状态。
+3. polarity-format state：正负判断与答案格式共同决定读出方向。
+4. bypass/competition state：中间路径和旁路路径同时竞争。
+```
+
+更谨慎地说，本阶段没有证明“完整内部状态算法”，但证明了：
+
+```text
+同一固定网络在不同条件下确实可以通过可解释外部条件切换可测门控状态。
+这些状态不是任意噪声，而会系统性改变下一步 token/value/polarity 的竞争结果。
+```
+
+### 硬伤与瓶颈
+
+```text
+1. 本阶段仍是prompt-level repair，不是hidden-state causal patch。
+   还没有直接证明对应内部层/头/残差方向就是这些门。
+
+2. two-hop实际样本为80/模型。
+   虽然比Phase583更稳，但对象、关系、值仍偏少。
+
+3. wrong-cat审计不闭合。
+   wrong_val和correct_val比例可同时较高，说明当前指标不能唯一分离O-C-V链路和旁路。
+
+4. polarity repair依赖答案格式。
+   这说明“语义极性”与“读出格式”没有分离，需要后续做格式等价类审计。
+
+5. 本阶段仍未处理自然生成。
+   logprob四选一成功不等于开放生成中稳定输出正确答案。
+```
+
+### 当前理论修正
+
+旧表述：
+
+```text
+固定神经网络内部存在某种不同状态。
+```
+
+修正为更可测的表述：
+
+```text
+固定参数网络在上下文条件下形成一组可切换的门控状态；
+这些门控状态改变候选类别、候选关系、候选值和极性格式之间的竞争边界；
+语言输出不是单一语义向量读出，而是多门控状态叠加后的竞争结果。
+```
+
+当前最小公式：
+
+```text
+h_{t+1} = F_\theta(h_t, x_t, s_t)
+```
+
+```text
+s_t = G(C_t, R_t, P_t, M_t, A_t)
+```
+
+```text
+\Delta \ell(y) =
+W_U(y)^\top
+\left[
+\alpha_C g_C
++ \alpha_R g_R
++ \alpha_V g_V
++ \alpha_P g_P
++ \alpha_F g_F
++ \epsilon
+\right]
+```
+
+其中：
+
+```text
+C = category state
+R = relation state
+V = value retrieval state
+P = polarity state
+F = format/readout state
+M = memory/rule table state
+A = attention/path state
+```
+
+本阶段真正新增的是：
+
+```text
+g_P 不能单独看 polarity rule，必须包含 format/readout component。
+g_V 不能只看 category，relation-filter component 对 DS7B/GLM4 尤其关键。
+```
+
+### 新增客观事实拼图
+
+252. **固定网络状态假说被压缩为可测 gate configuration**，不再只是抽象理论判断。
+253. **Qwen3 gold-category 修复最强**：direct 73.8% -> gold-cat 93.8%。
+254. **DS7B 的 value retrieval 可被 relation-filter 大幅修复**：60.0% -> 97.5%。
+255. **GLM4 的 relation-emphasis 修复最强**：78.8% -> 96.2%。
+256. **GLM4/DS7B 的负例 yes-bias 可被 rule+format 基本修复**：0.0% -> 100.0% / 96.7%。
+257. **system instruction 不能稳定修复极性门**，说明状态门不是普通指令层面的问题。
+258. **No-CRV 约等于机会水平**，说明规则表确实参与值检索。
+259. **错误类别对值输出有强影响但不闭合**，说明存在竞争/旁路/格式混合。
+260. **Phase583 的“显式否定规则对GLM4/DS7B完全无效”需要修正为“显式否定规则单独不够，必须进入合适格式读出门”。**
+
+### 结果文件
+
+```text
+tests/glm5/phase584_gate_repair.py
+tests/glm5/phase584_gate_repair_summary.py
+
+results/glm5_phase584_gate_repair/
+  phase584_qwen3_gate_repair_confirm.json
+  phase584_glm4_gate_repair_confirm.json
+  phase584_deepseek7b_gate_repair_confirm.json
+  phase584_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase585 应进入更直接的状态机制测试：
+
+```text
+State Gate Localization and Hidden Causal Repair
+```
+
+核心目标：
+
+```text
+1. 不再只用prompt repair，而是定位 hidden state 中的 category/relation/value/polarity/format gate。
+2. 对同一prompt做：
+   - base
+   - rule+format repair
+   - relation-filter repair
+   - wrong-category forcing
+   并记录各层 answer_last/object_last/rule_last 的 hidden trajectory。
+3. 用最基础的差分向量：
+   d_repair = h_repaired - h_base
+   d_fail = h_failed - h_success
+   比较它们是否在特定层/位置对目标logit有一致投影。
+4. 做因果patch：
+   将 repair 状态的局部hidden patch到base失败样本中，
+   测试是否能恢复 value/polarity。
+5. 三模型都测，但重点对象：
+   - Qwen3: category gate
+   - GLM4: polarity format gate
+   - DS7B: relation-filter/value retrieval gate
+```
+
+成功判据：
+
+```text
+1. patch后目标正确率提升。
+2. random same-norm patch无同等提升。
+3. patch只在对应gate任务上有效，而不是所有输出普遍上升。
+4. 层位/位置分布能解释 Phase584 的 prompt-level repair。
+```
+
+## Phase 585: State Gate Hidden Patch 状态门隐藏因果修复 [2026-06-23 17:26]
+
+### 本阶段目标
+
+根据附件对 Phase584 的分析，Phase584 的结论基本正确：
+
+```text
+state = 当前上下文下被激活的 gate configuration
+```
+
+但是 Phase584 最大硬伤是：
+
+```text
+prompt condition -> gate behavior change
+```
+
+尚未推进到：
+
+```text
+specific hidden vector -> gate causal repair
+```
+
+因此 Phase585 的目标是：
+
+```text
+把 Phase584 的 prompt-level repair 推进为 hidden-state causal patch。
+```
+
+本轮优先测试两个最有信息量的门：
+
+```text
+1. value_relation_filter_gate:
+   base = gold-category prompt
+   repair = relation-filter prompt
+   测试 repair-base 的 hidden delta 是否能修复 value retrieval。
+
+2. polarity_format_gate:
+   base = 负例问题 + 最佳答案格式
+   repair = 显式否定规则 + 最佳答案格式
+   测试 repair-base 的 hidden delta 是否能修复 negative polarity readout。
+```
+
+### 附件判断的正确部分
+
+```text
+1. Phase584 没有证明完整状态算法，只证明了外部条件可以切换可测门控行为。
+2. 下一步必须进入 hidden-state causal repair。
+3. relation-filter gate 是 DS7B value retrieval 的关键瓶颈。
+4. polarity-format gate 不是知识缺失，而是规则、极性和答案格式共同进入读出门。
+5. wrong-cat 审计不闭合，说明 two-hop 是多路径竞争，不是单链条。
+```
+
+需要继续谨慎的部分：
+
+```text
+1. “完整语言编码机制 88%-93%”偏乐观。
+   prompt修复很强，但hidden因果修复才刚开始。
+
+2. “语法路径机制 85%-90%”也偏乐观。
+   polarity-format有强结果，但开放生成、格式等价类、跨任务泛化仍不足。
+
+3. 当前不应把 gate configuration 解释成已知数学结构。
+   本阶段继续使用基础差分、patch、random same-norm control。
+```
+
+### 测试原理
+
+对每个样本构造：
+
+```text
+base prompt
+repair prompt
+```
+
+记录两者在同一层、prompt最后位置的 hidden state：
+
+```text
+h_base(l)
+h_repair(l)
+```
+
+构造修复差分：
+
+```text
+d_repair(l) = h_repair(l) - h_base(l)
+```
+
+在 base prompt 的同一层同一位置注入：
+
+```text
+h_base(l) <- h_base(l) + d_repair(l)
+```
+
+同时做 random same-norm control：
+
+```text
+h_base(l) <- h_base(l) + d_random(l)
+```
+
+判据：
+
+```text
+1. repair prompt 本身能修复。
+2. hidden patch 能修复 base 失败样本。
+3. random same-norm patch 不能同等修复。
+4. 修复集中在特定层位。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase585_state_gate_hidden_patch.py
+tests/glm5/phase585_state_gate_hidden_patch_summary.py
+```
+
+重要修正：
+
+```text
+最初 smoke 后发现 patch 位置不能使用完整 prompt+answer 的最后位。
+因为候选首 token 的 logit 由 prompt 最后一位产生。
+已修正为在 full sequence 中 patch prompt_last position。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase585_state_gate_hidden_patch.py
+
+python tests/glm5/phase585_state_gate_hidden_patch.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase585_state_gate_hidden_patch.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase585_state_gate_hidden_patch.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase585_state_gate_hidden_patch.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase585_state_gate_hidden_patch_summary.py
+
+python -m py_compile \
+  tests/glm5/phase585_state_gate_hidden_patch.py \
+  tests/glm5/phase585_state_gate_hidden_patch_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+value samples/model = 32
+polarity negative samples/model = 30
+probe layers/model = 4
+alpha = 1.0
+
+Qwen3 layers = L9, L18, L27, L34
+GLM4 layers = L10, L20, L30, L38
+DS7B layers = L7, L14, L21, L26
+```
+
+### 跨模型汇总
+
+```text
+model       gate                    best layer  base   repair prompt  hidden patch  random control  target patch  target random  target n
+qwen3       value_relation_filter   L9          87.5%  100.0%         90.6%         87.5%           25.0%         0.0%           4
+qwen3       polarity_format         L34         90.0%  100.0%         100.0%        83.3%           100.0%        0.0%           3
+glm4        value_relation_filter   L38         90.6%  100.0%         90.6%         90.6%           0.0%          0.0%           3
+glm4        polarity_format         L30         76.7%  100.0%         100.0%        80.0%           100.0%        14.3%          7
+deepseek7b  value_relation_filter   L7          62.5%  100.0%         62.5%         62.5%           0.0%          0.0%           12
+deepseek7b  polarity_format         L21         53.3%  100.0%         96.7%         53.3%           92.9%         7.1%           14
+```
+
+### 关键客观结果
+
+#### 1. polarity-format gate 出现明确 hidden causal repair
+
+Qwen3:
+
+```text
+L27: target patch 3/3, random 0/3
+L34: target patch 3/3, random 0/3
+```
+
+GLM4:
+
+```text
+L20: target patch 7/7, random 4/7
+L30: target patch 7/7, random 1/7
+L38: target patch 7/7, random 3/7
+```
+
+DS7B:
+
+```text
+L21: target patch 13/14, random 1/14
+L26: target patch 14/14, random 5/14
+```
+
+这说明：
+
+```text
+polarity-format gate 不只是 prompt-level repair；
+repair-base hidden delta 在中后层可以因果修复 base 失败样本。
+```
+
+#### 2. relation-filter/value gate 没有完成 hidden causal repair
+
+Qwen3:
+
+```text
+base 87.5%, repair prompt 100.0%
+best hidden patch 90.6%
+target patch 1/4 或 2/4，random 0/4 或 1/4
+```
+
+GLM4:
+
+```text
+base 90.6%, repair prompt 100.0%
+hidden patch 90.6%
+target patch 0/3
+```
+
+DS7B:
+
+```text
+base 62.5%, repair prompt 100.0%
+hidden patch 62.5%
+target patch 0/12
+```
+
+这说明：
+
+```text
+relation-filter prompt repair 很强，
+但简单 answer_last hidden delta 不能把 relation-filter/value 状态迁移到 base prompt。
+```
+
+#### 3. 层位结果
+
+polarity-format gate 的有效层集中在中后层：
+
+```text
+Qwen3: L27/L34
+GLM4: L20/L30/L38
+DS7B: L21/L26
+```
+
+早层弱：
+
+```text
+Qwen3 L9 target patch 0/3
+DS7B L7 target patch 1/14
+```
+
+这符合“读出门在中后层形成”的判断。
+
+### 对 Phase584 的修正
+
+Phase584 结论中：
+
+```text
+rule+format 可以修复 polarity gate
+```
+
+现在升级为：
+
+```text
+rule+format 修复会在中后层形成可迁移的 hidden repair delta。
+```
+
+但是 Phase584 中：
+
+```text
+relation-filter 可以修复 value retrieval
+```
+
+不能升级为：
+
+```text
+relation-filter 已经形成 answer_last 单点可迁移 hidden delta。
+```
+
+更严谨的说法是：
+
+```text
+relation-filter/value gate 可能分布在 rule token、relation token、attention path 或多层轨迹中；
+不是 answer_last 单点残差差分能够捕获的简单状态。
+```
+
+### 对深度神经网络内部结构研究的推进
+
+本阶段第一次在当前 gate configuration 理论中拿到明确 hidden causal repair 正结果：
+
+```text
+polarity-format state 是可被隐藏层差分向量局部修复的状态。
+```
+
+但同时得到一个重要负结果：
+
+```text
+value relation-filter state 不是简单 answer_last delta。
+```
+
+这让当前结构图更清楚：
+
+```text
+1. polarity-format gate:
+   中后层 answer_last 读出状态较集中，可局部patch。
+
+2. relation-filter/value gate:
+   更像路径/规则表/注意力过滤过程，不能用 answer_last 单点替代。
+```
+
+### 硬伤与问题
+
+```text
+1. 只测试了 answer_last。
+   value gate 失败可能是因为正确位置在 relation_last/rule_last/value_rule_span。
+
+2. 只测试了 additive delta。
+   value gate 可能需要 replace patch、multi-position patch 或 attention output patch。
+
+3. polarity gate 虽有强正结果，但 target n 仍不大：
+   Qwen3 3, GLM4 7, DS7B 14。
+
+4. GLM4 random control 有时不低：
+   L20 random 4/7，L38 random 3/7。
+   说明部分修复可能来自范数/扰动打开读出边界，不是完全方向特异。
+
+5. 还没有开放生成测试。
+```
+
+### 当前理论更新
+
+旧公式：
+
+```text
+s_t = G(C_t, R_t, V_t, P_t, F_t, M_t, A_t)
+```
+
+现在需要区分两类门：
+
+```text
+1. local readout gate:
+   可在 answer_last 中后层局部修复。
+
+2. distributed path gate:
+   需要跨位置、跨规则span或attention path修复。
+```
+
+公式更新为：
+
+```text
+s_t =
+G_local(P_t, F_t)
++ G_path(C_t, R_t, V_t, M_t, A_t)
+```
+
+读出公式更新：
+
+```text
+\Delta \ell(y)
+=
+W_U(y)^\top
+\left[
+\alpha_{PF} g_{PF}^{answer}
++ \alpha_{CRV} g_{CRV}^{path}
++ \epsilon
+\right]
+```
+
+其中：
+
+```text
+g_{PF}^{answer}: polarity-format 在 answer_last 中后层形成的局部读出状态。
+g_{CRV}^{path}: category/relation/value 在规则表、关系token、注意力路径中形成的分布式检索状态。
+```
+
+### 新增客观事实拼图
+
+261. **polarity-format gate 已出现 hidden causal repair 正结果。**
+262. **Qwen3 polarity L27/L34 可以 3/3 修复失败目标，random 0/3。**
+263. **GLM4 polarity L30 可以 7/7 修复失败目标，random 1/7。**
+264. **DS7B polarity L21/L26 可以 13/14、14/14 修复失败目标，random 1/14、5/14。**
+265. **polarity-format gate 有明显中后层分布。**
+266. **relation-filter/value prompt repair 强，但 answer_last hidden delta 迁移失败。**
+267. **DS7B value gate 的失败最明确：prompt repair 100%，hidden patch 仍 62.5%，target patch 0/12。**
+268. **value retrieval gate 更可能是 distributed path gate，而不是 local readout gate。**
+269. **当前 gate configuration 理论需要区分 local readout gate 与 distributed path gate。**
+
+### 结果文件
+
+```text
+tests/glm5/phase585_state_gate_hidden_patch.py
+tests/glm5/phase585_state_gate_hidden_patch_summary.py
+
+results/glm5_phase585_state_gate_hidden_patch/
+  phase585_qwen3_state_gate_hidden_patch_confirm.json
+  phase585_glm4_state_gate_hidden_patch_confirm.json
+  phase585_deepseek7b_state_gate_hidden_patch_confirm.json
+  phase585_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase586 应专门处理 value gate 的失败：
+
+```text
+Distributed Relation-Filter Path Patch
+```
+
+核心目标：
+
+```text
+定位 relation-filter/value gate 到底在什么位置和路径中：
+1. answer_last
+2. relation_last
+3. category_last
+4. relevant_rule_value_last
+5. relevant_rule_relation_last
+6. full relevant CRV rule span
+```
+
+测试方案：
+
+```text
+1. donor = relation-filter repair prompt
+2. recipient = gold-category base prompt
+3. patch类型：
+   - single position replace
+   - single position additive delta
+   - CRV rule span patch
+   - multi-layer cumulative patch
+4. control：
+   - random same-norm
+   - irrelevant relation rule span
+   - wrong relation rule span
+```
+
+优先模型：
+
+```text
+DS7B:
+  因为 value prompt repair 100%，answer_last hidden patch 0/12，是最干净的失败对象。
+
+GLM4:
+  作为第二对象。
+
+Qwen3:
+  只作为对照，因为失败目标较少。
+```
+
+成功判据：
+
+```text
+1. DS7B value target patch 从 0/12 提升到显著高于 random。
+2. 有明确位置/层位分布。
+3. wrong relation span 不能同等修复。
+4. 能解释为什么 answer_last 单点失败。
+```
+
+## Phase 586: Distributed Relation-Filter Path Patch 分布式关系过滤路径修补 [2026-06-23 18:53]
+
+### 本阶段目标
+
+根据附件对 Phase585 的分析，Phase585 的核心判断基本正确：
+
+```text
+polarity-format gate 已经出现 hidden causal repair。
+relation-filter/value gate 不是 answer_last 单点残差差分能捕获的局部门。
+```
+
+本阶段继续处理 Phase585 最大负结果：
+
+```text
+DS7B 的 relation-filter prompt repair 能把 value task 修到 100%，
+但 answer_last hidden patch 对失败样本 0/12。
+```
+
+本阶段目标：
+
+```text
+测试 value gate 是否位于：
+1. prompt_last
+2. query_relation
+3. query_category
+4. rule_relation
+5. rule_value
+```
+
+并比较：
+
+```text
+1. add repair delta
+2. replace repair hidden
+3. add wrong-relation delta
+4. add random same-norm
+```
+
+### 脚本
+
+```text
+tests/glm5/phase586_distributed_value_path_patch.py
+tests/glm5/phase586_distributed_value_path_patch_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase586_distributed_value_path_patch.py
+
+python tests/glm5/phase586_distributed_value_path_patch.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase586_distributed_value_path_patch.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase586_distributed_value_path_patch.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase586_distributed_value_path_patch.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase586_distributed_value_path_patch_summary.py
+
+python -m py_compile \
+  tests/glm5/phase586_distributed_value_path_patch.py \
+  tests/glm5/phase586_distributed_value_path_patch_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+value cases/model = 24
+positions = prompt_last, query_relation, query_category, rule_relation, rule_value
+layers/model = 4
+patch modes = add_repair, replace_repair, add_wrong_relation, add_random
+alpha = 1.0
+```
+
+层位：
+
+```text
+Qwen3: L9, L18, L27, L34
+GLM4: L10, L20, L30, L38
+DS7B: L7, L14, L21, L26
+```
+
+### 跨模型结果
+
+```text
+model       target cases  best position   layer  mode            patch acc  target patch   mean correct-logprob gain  best wrong-rel gain
+qwen3       2             prompt_last     L34    replace_repair  95.8%      1/2  50.0%     +1.075                    +0.010
+glm4        1             query_relation  L10    add_repair      100.0%     1/1 100.0%     +0.193                    +0.116
+deepseek7b  9             prompt_last     L26    replace_repair  62.5%      0/9   0.0%     +5.385                    +2.105
+```
+
+### 客观事实
+
+1. **Qwen3/GLM4 的失败目标太少**
+
+```text
+Qwen3 target cases = 2
+GLM4 target cases = 1
+```
+
+因此这两个模型在本阶段只能作为弱对照，不能用来判断 value gate 层位。
+
+2. **DS7B 是本阶段主诊断模型**
+
+```text
+DS7B target cases = 9
+best patch = prompt_last L26 replace_repair
+target patch = 0/9
+```
+
+这说明：
+
+```text
+即使扩展到 query_relation、query_category、rule_relation、rule_value，
+单位置 residual patch 仍然不能修复 DS7B 的 value gate 失败。
+```
+
+3. **DS7B 正确值 logprob 大幅上升但仍不翻转**
+
+```text
+DS7B prompt_last L26 replace_repair:
+mean correct-logprob gain = +5.385
+target patch = 0/9
+```
+
+这是一条关键负结果：
+
+```text
+repair hidden 确实能增强正确值；
+但增强正确值还不足以改变最终候选胜出者。
+```
+
+4. **wrong-relation control 也能产生部分提升**
+
+```text
+DS7B best wrong-relation gain = +2.105
+```
+
+说明：
+
+```text
+一部分 logprob gain 可能来自规则压缩/上下文简化/范数扰动，
+而不是完全方向特异的 relation-filter 信号。
+```
+
+5. **Phase586 没有找到 value gate 的隐藏位置**
+
+本阶段最严格结论是：
+
+```text
+value relation-filter gate 不能由单位置 residual add/replace patch 闭合。
+```
+
+### 对 Phase585 的修正
+
+Phase585 推断：
+
+```text
+value gate 可能是 distributed path gate。
+```
+
+Phase586 进一步压实为：
+
+```text
+value gate 至少不是单个 prompt_last/query_relation/query_category/rule_relation/rule_value 位置的 residual state。
+```
+
+但仍不能排除：
+
+```text
+1. multi-position joint patch
+2. multi-layer cumulative patch
+3. attention output patch
+4. MLP/value-copy component patch
+5. candidate competitor suppression
+```
+
+### 对内部结构研究的进展
+
+当前结构图进一步分化：
+
+```text
+polarity-format gate:
+  局部读出态，answer/prompt-last 中后层 patch 可修复。
+
+value relation-filter gate:
+  不是单点局部态。
+  它可能需要同时：
+    1. 提升正确值路径；
+    2. 抑制错误竞争值路径；
+    3. 绑定 relation 与 rule span；
+    4. 在多层累计到 readout。
+```
+
+这解释了 DS7B 的现象：
+
+```text
+correct logprob gain 很大，
+但 winner 不变。
+```
+
+这意味着 value gate 不是简单“提高正确答案”，而是：
+
+```text
+correct value support + competitor suppression + relation binding
+```
+
+三者共同决定最终输出。
+
+### 理论更新
+
+Phase585 公式：
+
+```text
+s_t =
+G_local(P_t, F_t)
++ G_path(C_t, R_t, V_t, M_t, A_t)
+```
+
+Phase586 后需要把 path gate 再拆：
+
+```text
+G_path =
+G_{support}(C,R,V)
++ G_{suppress}(V_{\neg correct})
++ G_{bind}(R, rule\_span)
++ G_{accumulate}(layers)
+```
+
+读出竞争公式：
+
+```text
+\ell(V_i)
+=
+S(V_i \mid C,R,M)
+-
+Q(V_i \mid competitors)
++
+B(V_i \mid format, prior)
+```
+
+其中：
+
+```text
+S = correct value support
+Q = competitor suppression
+B = format/prior bias
+```
+
+Phase586 的 DS7B 结果说明：
+
+```text
+提高 S(correct) 不足以完成修复；
+还必须处理 Q(competing values)。
+```
+
+### 硬伤与问题
+
+```text
+1. 本阶段仍是 single-position patch。
+   虽然位置变多，但每次只patch一个位置。
+
+2. 没有直接测 competitor logits 的变化。
+   目前只看 correct logprob gain 和最终正确率。
+
+3. 没有做 multi-layer cumulative patch。
+   value gate 很可能需要多层累计。
+
+4. 没有拆 MLP/attention。
+   relation-filter 可能在 attention path，而不是 residual stream。
+
+5. Qwen3/GLM4 失败样本太少。
+   后续 value gate 主线应优先 DS7B。
+```
+
+### 新增客观事实拼图
+
+270. **Phase586 没有找到 value gate 的单位置 residual patch 闭合点。**
+271. **DS7B 是 value gate 最干净诊断模型：target cases = 9。**
+272. **DS7B 最强 repair patch 仍 target 0/9。**
+273. **DS7B 正确值 logprob 可提升 +5.385 但 winner 不翻转。**
+274. **wrong-relation control 也可提升 +2.105，说明部分提升不是纯 relation-filter 特异。**
+275. **value gate 需要从 support-only 研究转向 support + competitor suppression。**
+276. **relation-filter/value gate 比 polarity-format gate 更分布式、更接近路径竞争机制。**
+
+### 结果文件
+
+```text
+tests/glm5/phase586_distributed_value_path_patch.py
+tests/glm5/phase586_distributed_value_path_patch_summary.py
+
+results/glm5_phase586_distributed_value_path_patch/
+  phase586_qwen3_distributed_value_path_patch_confirm.json
+  phase586_glm4_distributed_value_path_patch_confirm.json
+  phase586_deepseek7b_distributed_value_path_patch_confirm.json
+  phase586_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase587 应直接测试：
+
+```text
+Value Winner Competition Audit
+```
+
+核心目标：
+
+```text
+解释为什么 DS7B correct logprob 大幅上升，但 target 仍 0/9。
+```
+
+测试方案：
+
+```text
+1. 对 DS7B target failure cases，记录所有 candidate values 的 logprob。
+2. 对每种 patch 计算：
+   - correct gain
+   - top competitor gain
+   - margin change
+   - winner switch rate
+3. 区分三类失败：
+   - correct up, competitor also up
+   - correct up, margin still negative
+   - wrong prior too strong
+4. 做 competitor suppression patch：
+   从 successful repair prompt 中提取 correct-wrong margin direction，
+   不只加 correct support，也尝试降低 top wrong value。
+```
+
+成功判据：
+
+```text
+1. 能解释 DS7B target 0/9 的直接原因。
+2. 找到 correct support 与 competitor suppression 的相对贡献。
+3. 如果 suppression patch 能提升 winner switch，则 value gate 进入下一步因果闭合。
+```
+
+## Phase 587: Value Winner Competition Audit 值候选胜出竞争审计 [2026-06-23 19:49]
+
+### 本阶段目标
+
+根据附件对 Phase586 的分析，Phase586 是关键负结果阶段，判断基本正确：
+
+```text
+value relation-filter gate 不是单个 residual position 的局部状态；
+它更像 winner competition mechanism。
+```
+
+Phase586 中最重要的现象是：
+
+```text
+DS7B 正确值 logprob 大幅上升，但 winner 不翻转。
+```
+
+因此 Phase587 不再继续泛化找位置，而是直接审计：
+
+```text
+1. correct value gain
+2. top wrong value gain
+3. margin change
+4. winner switch
+```
+
+核心问题：
+
+```text
+为什么正确值上升很大，但仍然不能超过最高错误竞争值？
+```
+
+### 脚本
+
+```text
+tests/glm5/phase587_value_winner_competition.py
+tests/glm5/phase587_value_winner_competition_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase587_value_winner_competition.py
+
+python tests/glm5/phase587_value_winner_competition.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase587_value_winner_competition.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase587_value_winner_competition.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase587_value_winner_competition.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase587_value_winner_competition_summary.py
+
+python -m py_compile \
+  tests/glm5/phase587_value_winner_competition.py \
+  tests/glm5/phase587_value_winner_competition_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+value cases/model = 32
+target case = base wrong 且 repair prompt correct
+patch positions = prompt_last, query_relation
+layers = middle-late and late
+patch modes = add_repair, replace_repair, wrong_relation, random, readout_margin
+candidate values = v05, v91, v22, v48
+```
+
+### 跨模型结果
+
+```text
+model       target cases  best patch                         target switch  correct gain  top-wrong gain  margin gain  correct-up & competitor-up  correct-up but margin<0
+qwen3       4             prompt_last|L27|add_repair          2/4  50.0%     +0.588        +0.400          +0.188       3/4                         2/4
+glm4        3             query_relation|L38|replace_repair   0/3   0.0%     +0.014        +0.014          +0.000       2/3                         2/3
+deepseek7b  12            prompt_last|L21|wrong_relation      0/12  0.0%     +1.223        +1.153          +0.069       7/12                        7/12
+```
+
+注意：
+
+```text
+DS7B 表中自动 best patch 是按 margin gain 排序得到的 wrong_relation。
+这不代表 wrong_relation 是正确机制，只说明非特异性路径也能微弱抬高 margin。
+真正主诊断 patch 是 prompt_last|L21|add_repair。
+```
+
+### DS7B 主诊断结果
+
+```text
+patch = prompt_last|L21|add_repair
+target switch = 0/12
+mean correct gain = +4.782
+mean old-top-wrong gain = +4.718
+mean margin gain = +0.063
+correct-up and competitor-up = 12/12
+correct-up but final margin negative = 12/12
+```
+
+这直接解释 Phase586 的矛盾：
+
+```text
+repair patch 强烈提高 correct value；
+但几乎同等提高旧 top wrong value；
+所以 margin 只增加 +0.063；
+最终 12/12 仍 margin negative，winner 不翻转。
+```
+
+### 关键客观事实
+
+1. **DS7B 的 value gate 失败不是 support-only 问题**
+
+```text
+correct gain = +4.782
+top-wrong gain = +4.718
+margin gain = +0.063
+target switch = 0/12
+```
+
+这说明：
+
+```text
+只提高正确值支持不足以完成 value retrieval 修复。
+```
+
+2. **DS7B 的错误竞争值被同步抬高**
+
+```text
+correct-up and competitor-up = 12/12
+```
+
+这说明 repair delta 带来的不是干净的：
+
+```text
+correct-specific support
+```
+
+而更像：
+
+```text
+candidate-value manifold activation
+```
+
+也就是候选值集合整体被激活，正确值和错误值一起上升。
+
+3. **winner 不翻转的直接原因是 margin 没有过零**
+
+```text
+correct-up but final margin negative = 12/12
+```
+
+这是当前最清楚的诊断结果。
+
+4. **Qwen3 可部分翻转**
+
+```text
+qwen3 target switch = 2/4
+margin gain = +0.188
+```
+
+Qwen3 的目标样本较少，但结果说明当 margin gain 足够相对有效时，winner 可以翻转。
+
+5. **GLM4 在本任务中仍不是强诊断模型**
+
+```text
+target cases = 3
+target switch = 0/3
+correct gain ≈ top-wrong gain
+margin gain ≈ 0
+```
+
+GLM4 不能给出稳定 value gate 结论。
+
+6. **readout_margin patch 基本无效**
+
+本阶段尝试了简单 unembedding margin direction：
+
+```text
+W(correct) - W(top_wrong)
+```
+
+但在中间层 residual patch 中基本无效：
+
+```text
+DS7B readout_margin gain ≈ 0
+```
+
+说明 value gate 不能靠简单 lm_head 方向在中间层直接解决。
+
+### 对 Phase586 的修正
+
+Phase586 说：
+
+```text
+correct logprob 大幅上升但 winner 不翻转。
+```
+
+Phase587 给出直接原因：
+
+```text
+top wrong logprob 也同步大幅上升，margin 几乎没有改善。
+```
+
+因此 value gate 的问题从：
+
+```text
+support不足
+```
+
+修正为：
+
+```text
+support不特异 + competitor suppression缺失
+```
+
+### 对内部结构研究的推进
+
+当前 value gate 的结构应理解为：
+
+```text
+relation-filter prompt 打开了 value candidate space；
+但没有只打开 correct value；
+它同时打开多个候选值，最终还需要 winner selection / competitor suppression。
+```
+
+这和 polarity-format gate 形成鲜明对比：
+
+```text
+polarity-format gate:
+  local readout gate，可通过 answer/prompt_last 中后层 hidden delta 修复。
+
+value relation-filter gate:
+  candidate manifold activation + winner competition。
+  修复必须同时提高 correct value 和抑制 top competitor。
+```
+
+### 理论更新
+
+Phase586 公式：
+
+```text
+\ell(V_i)
+=
+S(V_i \mid C,R,M)
+-
+Q(V_i \mid competitors)
++
+B(V_i \mid format, prior)
+```
+
+Phase587 后应进一步拆成：
+
+```text
+\Delta \ell(V_i)
+=
+\Delta A_{value\_space}(V_i)
++
+\Delta S_{specific}(V_i \mid C,R)
+-
+\Delta Q_{competitor}(V_i)
+```
+
+其中：
+
+```text
+A_value_space = 候选值空间整体激活
+S_specific = 正确值特异支持
+Q_competitor = 对错误竞争值的抑制
+```
+
+DS7B 当前现象是：
+
+```text
+\Delta A_{value\_space} 很强
+\Delta S_{specific} 不足
+\Delta Q_{competitor} 近似缺失
+```
+
+所以：
+
+```text
+\Delta margin ≈ 0
+```
+
+### 硬伤与问题
+
+```text
+1. 仍未做真正 competitor suppression patch。
+   本轮只是审计了竞争结构，并测试了简单 readout_margin direction。
+
+2. readout_margin direction 是粗糙对照。
+   它在中间层无效，不代表最终层或经过模型norm后的方向无效。
+
+3. 没有拆 value candidate space 的共同方向。
+   目前只能看到 correct/top-wrong 同涨，尚未直接分解公共候选值激活与特异支持。
+
+4. 仍未做 attention/MLP component patch。
+   winner selection 可能在 MLP 或 attention output 中完成。
+
+5. Qwen3/GLM4 target cases 较少。
+   主线仍应以 DS7B 为诊断模型。
+```
+
+### 新增客观事实拼图
+
+277. **DS7B value repair patch 会同时提高 correct 和 top wrong。**
+278. **DS7B prompt_last L21 add_repair: correct +4.782, top wrong +4.718。**
+279. **DS7B margin gain 只有 +0.063，因此 target switch 0/12。**
+280. **DS7B 12/12 target cases 都是 correct up 但 margin 仍 negative。**
+281. **value gate 的失败机制被定位为 winner competition failure。**
+282. **value repair delta 更像 value candidate space activation，而不是 correct-specific support。**
+283. **简单 readout_margin direction 在中间层无效。**
+284. **Qwen3 出现 2/4 winner switch，说明 margin gain 足够时可以翻转。**
+
+### 结果文件
+
+```text
+tests/glm5/phase587_value_winner_competition.py
+tests/glm5/phase587_value_winner_competition_summary.py
+
+results/glm5_phase587_value_winner_competition/
+  phase587_qwen3_value_winner_competition_confirm.json
+  phase587_glm4_value_winner_competition_confirm.json
+  phase587_deepseek7b_value_winner_competition_confirm.json
+  phase587_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase588 应做：
+
+```text
+Value Candidate Space Decomposition
+```
+
+核心目标：
+
+```text
+把 value repair delta 分解成：
+1. common value-space activation
+2. correct-specific support
+3. top-wrong competitor suppression
+```
+
+测试方案：
+
+```text
+1. 构造 value candidate common direction:
+   所有 value token 平均上升方向。
+
+2. 构造 correct-vs-wrong contrast:
+   correct value 与 top wrong value 的差分方向。
+
+3. 做三种 patch:
+   - remove common value-space component
+   - add correct-specific component
+   - suppress top-wrong component
+
+4. 记录：
+   - correct gain
+   - top wrong gain
+   - margin gain
+   - winner switch
+```
+
+成功判据：
+
+```text
+1. 如果去掉 common component 后 correct/top-wrong 不再同步上升，说明候选值空间方向存在。
+2. 如果 correct-specific 或 suppression patch 能提高 margin，说明 value gate 开始进入可控分解。
+3. 如果仍然不能提高 margin，则下一步必须拆 attention/MLP component。
+```
+
+## Phase 588: Value Candidate Space Decomposition 值候选空间分解 [2026-06-23 20:31]
+
+### 本阶段目标
+
+根据附件对 Phase587 的分析，Phase587 的判断基本正确：
+
+```text
+DS7B 的 value gate 失败不是 support-only 问题；
+repair patch 同时提高 correct value 和 top wrong value；
+winner 不翻转的直接原因是 margin 几乎没有改善。
+```
+
+Phase588 继续测试：
+
+```text
+能否把 value repair delta 分解为：
+1. common value-space activation
+2. correct-specific support
+3. top-wrong competitor suppression
+```
+
+### 测试原理
+
+对每个 target case：
+
+```text
+base wrong
+repair prompt correct
+```
+
+提取：
+
+```text
+d_full = h_repair - h_base
+```
+
+然后构造几类基础分解：
+
+```text
+full_delta: 原始 repair delta
+common_only: d_full 在所有 value token 平均 unembedding 方向上的投影
+remove_common: d_full 去掉 common 投影
+contrast_only: d_full 在 W(correct)-W(top_wrong) 上的投影
+remove_contrast: d_full 去掉 contrast 投影
+boost_correct: 加 correct value unembedding 方向
+suppress_top_wrong: 加 -W(top_wrong)
+boost_minus_suppress: 加 W(correct)-W(top_wrong)
+random_same_norm: 同范数随机对照
+```
+
+记录：
+
+```text
+1. winner switch
+2. correct gain
+3. top wrong gain
+4. margin gain
+```
+
+### 脚本
+
+```text
+tests/glm5/phase588_value_candidate_space_decomposition.py
+tests/glm5/phase588_value_candidate_space_decomposition_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase588_value_candidate_space_decomposition.py
+
+python tests/glm5/phase588_value_candidate_space_decomposition.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase588_value_candidate_space_decomposition.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase588_value_candidate_space_decomposition.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase588_value_candidate_space_decomposition.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase588_value_candidate_space_decomposition_summary.py
+
+python -m py_compile \
+  tests/glm5/phase588_value_candidate_space_decomposition.py \
+  tests/glm5/phase588_value_candidate_space_decomposition_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+value cases/model = 32
+positions = prompt_last, query_relation
+layers = middle-late and late
+components = full_delta, common_only, remove_common, contrast_only, remove_contrast,
+             boost_correct, suppress_top_wrong, boost_minus_suppress, random_same_norm
+```
+
+### 跨模型结果
+
+```text
+model       target cases  diagnostic key              switch       correct gain  top-wrong gain  margin gain
+qwen3       4             prompt_last|L27|full_delta  2/4  50.0%   +0.588        +0.400          +0.188
+glm4        3             query_relation|L38|full     0/3   0.0%   +0.021        +0.021          +0.000
+deepseek7b  12            prompt_last|L21|full_delta  0/12  0.0%   +4.782        +4.718          +0.063
+```
+
+### DS7B component audit
+
+```text
+component                         switch      correct gain  top-wrong gain  margin gain
+prompt_last|L21|full_delta        0/12 0.0%   +4.782        +4.718          +0.063
+prompt_last|L21|remove_common     0/12 0.0%   +4.782        +4.766          +0.017
+prompt_last|L21|common_only       0/12 0.0%   -0.078        -0.076          -0.003
+prompt_last|L21|remove_contrast   0/12 0.0%   +4.782        +4.718          +0.063
+prompt_last|L21|contrast_only     0/12 0.0%   +0.000        +0.000          +0.000
+prompt_last|L21|suppress_wrong    0/12 0.0%   -13.780       -13.807         +0.027
+prompt_last|L21|boost_minus_sup   0/12 0.0%   +0.000        +0.000          +0.000
+```
+
+另一个观测：
+
+```text
+DS7B prompt_last|L26|common_only:
+correct gain ≈ +4.318
+top-wrong gain ≈ +4.313
+margin gain ≈ +0.005
+```
+
+说明 late layer 的 common-like 分量可以复现大量“候选值一起涨”的现象，但不能改善 winner。
+
+### 关键客观事实
+
+1. **DS7B full_delta 结果复现 Phase587**
+
+```text
+correct +4.782
+top wrong +4.718
+margin +0.063
+switch 0/12
+```
+
+这再次确认：
+
+```text
+repair delta 主要不是 correct-specific support。
+```
+
+2. **remove_contrast 完全不改变 DS7B 主结果**
+
+```text
+full_delta:      correct +4.782, wrong +4.718, margin +0.063
+remove_contrast: correct +4.782, wrong +4.718, margin +0.063
+```
+
+说明：
+
+```text
+W(correct)-W(top_wrong) 方向几乎没有解释 repair delta 的有效部分。
+```
+
+3. **contrast_only 基本无效**
+
+```text
+contrast_only:
+correct +0.000
+wrong +0.000
+margin +0.000
+```
+
+这说明：
+
+```text
+简单 lm_head contrast 方向不能在中间 residual 层产生 value winner control。
+```
+
+4. **suppress_top_wrong 不是有效抑制**
+
+```text
+suppress_top_wrong:
+correct -13.780
+wrong -13.807
+margin +0.027
+switch 0/12
+```
+
+它同时压低 correct 和 wrong，不能产生特异性竞争者抑制。
+
+5. **common_only 的结果依赖层位**
+
+```text
+L21 common_only 近似无效。
+L26 common_only 可复现 correct/top-wrong 同涨。
+```
+
+这说明 value candidate space 的共同激活不是简单固定方向，而可能是：
+
+```text
+layer-conditioned value-space activation
+```
+
+### 对 Phase587 的修正
+
+Phase587 推断：
+
+```text
+repair delta 更像 value candidate space activation。
+```
+
+Phase588 更谨慎地修正为：
+
+```text
+repair delta 的确造成 value candidates 同步上升；
+但这个共同激活不能被简单 unembedding mean direction 或 correct-vs-wrong direction 干净分解。
+```
+
+也就是说，当前还不能说已经找到了：
+
+```text
+common value-space vector
+```
+
+只能说：
+
+```text
+存在 value candidates co-activation behavior。
+```
+
+### 对内部结构研究的推进
+
+本阶段推进点不是正向修复，而是排除了一个简单解释：
+
+```text
+value gate 不是 lm_head unembedding 几何中的简单方向控制。
+```
+
+它更可能是：
+
+```text
+1. 模型内部 value-token manifold 的非线性子空间；
+2. attention/MLP component 共同形成的候选集激活；
+3. layer-conditioned representation；
+4. 需要在最终 norm/readout 前后重新测量的竞争机制。
+```
+
+这进一步区分了两类机制：
+
+```text
+polarity-format gate:
+  local hidden delta 可控。
+
+value winner gate:
+  不是 residual 中简单 unembedding direction 可控。
+```
+
+### 理论更新
+
+Phase587 公式：
+
+```text
+\Delta \ell(V_i)
+=
+\Delta A_{value\_space}(V_i)
++
+\Delta S_{specific}(V_i \mid C,R)
+-
+\Delta Q_{competitor}(V_i)
+```
+
+Phase588 后应收紧：
+
+```text
+\Delta A_{value\_space}
+\neq
+\operatorname{Proj}_{mean(W_V)}(d)
+```
+
+```text
+\Delta S_{specific} - \Delta Q_{competitor}
+\neq
+\operatorname{Proj}_{W_{correct}-W_{wrong}}(d)
+```
+
+也就是说：
+
+```text
+value-space activation 和 competitor suppression 不是直接由 lm_head unembedding 方向给出的。
+```
+
+新的工作公式：
+
+```text
+\Delta \ell(V_i)
+=
+R_{\theta}^{readout}
+\left(
+H_{\theta}^{path}(C,R,M)
+\right)_i
+```
+
+其中：
+
+```text
+H_path = 内部路径/组件形成的候选值状态
+R_readout = 最终读出几何
+```
+
+这意味着下一步必须从：
+
+```text
+residual vector direction
+```
+
+推进到：
+
+```text
+component-level path contribution
+```
+
+### 硬伤与问题
+
+```text
+1. 分解方向仍然来自 lm_head unembedding。
+   这可能不适合中间层 residual state。
+
+2. 没有做 final norm / final layer patch。
+   readout_margin 可能只在最终层附近有效。
+
+3. 没有拆 attention 和 MLP。
+   value candidate co-activation 可能来自 attention读取规则表，或 MLP映射到候选值簇。
+
+4. 没有使用 activation-derived candidate-space basis。
+   目前 common direction 不是从隐藏激活中学习出来，而是从输出头近似。
+
+5. 运行成本较高。
+   Phase588 每模型耗时明显增加，后续需要聚焦 DS7B。
+```
+
+### 新增客观事实拼图
+
+285. **DS7B full_delta 再次复现 correct/top-wrong 同涨。**
+286. **DS7B remove_contrast 与 full_delta 几乎完全相同。**
+287. **DS7B contrast_only 无效。**
+288. **DS7B suppress_top_wrong 同时压低 correct 和 wrong，不能改善 winner。**
+289. **DS7B L26 common_only 可复现大量候选值同步上升，但 margin 仍约0。**
+290. **value-space co-activation 不能被简单 lm_head mean/contrast 分解。**
+291. **value gate 需要从 residual direction 研究转向 component-level path contribution。**
+
+### 结果文件
+
+```text
+tests/glm5/phase588_value_candidate_space_decomposition.py
+tests/glm5/phase588_value_candidate_space_decomposition_summary.py
+
+results/glm5_phase588_value_candidate_space_decomposition/
+  phase588_qwen3_value_candidate_space_decomposition_confirm.json
+  phase588_glm4_value_candidate_space_decomposition_confirm.json
+  phase588_deepseek7b_value_candidate_space_decomposition_confirm.json
+  phase588_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase589 应进入：
+
+```text
+Component-Level Value Path Attribution
+```
+
+核心目标：
+
+```text
+定位 DS7B value candidate co-activation 来自 attention 还是 MLP。
+```
+
+测试方案：
+
+```text
+1. 只跑 DS7B 为主，qwen3/glm4 用小规模对照。
+2. 对 target cases 记录：
+   - residual stream
+   - attention output
+   - MLP output
+   在 L21/L26 的 contribution。
+3. 分别 patch：
+   - attention output repair delta
+   - MLP output repair delta
+   - residual delta
+4. 记录 correct/top-wrong/margin。
+5. 如果 attention output 同时提高 correct/top-wrong，说明它负责 candidate-space activation。
+6. 如果 MLP 或后层能改变 margin，说明 winner selection 在该组件。
+```
+
+成功判据：
+
+```text
+1. 找到造成 candidate co-activation 的组件。
+2. 找到能改善 margin 的组件，哪怕 winner switch 仍未完成。
+3. 如果组件级仍失败，则必须进入 multi-layer cumulative patch。
+```
+
+## Phase 589: Component-Level Value Path Attribution 组件级值路径归因 [2026-06-23 20:49]
+
+### 本阶段目标
+
+根据附件对 Phase588 的分析，Phase588 的结论基本正确：
+
+```text
+value repair delta 会造成候选值同步上升；
+但这种同步上升不能被简单 lm_head unembedding mean/contrast 解释。
+```
+
+因此 Phase589 进入组件级归因：
+
+```text
+定位 DS7B value candidate co-activation 来自 residual、attention 还是 MLP。
+```
+
+测试组件：
+
+```text
+1. residual/layer output
+2. attention output
+3. MLP output
+```
+
+每个组件在中后层做：
+
+```text
+base component output + repair_delta
+```
+
+并记录：
+
+```text
+correct gain
+top-wrong gain
+margin gain
+winner switch
+```
+
+### 脚本
+
+```text
+tests/glm5/phase589_component_value_path_attribution.py
+tests/glm5/phase589_component_value_path_attribution_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase589_component_value_path_attribution.py
+
+python tests/glm5/phase589_component_value_path_attribution.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase589_component_value_path_attribution.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase589_component_value_path_attribution.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase589_component_value_path_attribution.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase589_component_value_path_attribution_summary.py
+
+python -m py_compile \
+  tests/glm5/phase589_component_value_path_attribution.py \
+  tests/glm5/phase589_component_value_path_attribution_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+value cases/model = 24
+patch position = prompt_last
+components = residual, attention, mlp
+layers = middle-late and late
+control = random same-norm
+```
+
+层位：
+
+```text
+Qwen3: L27, L34
+GLM4: L30, L38
+DS7B: L21, L26
+```
+
+### 跨模型结果
+
+```text
+model       target cases  best component  layer  switch      correct gain  top-wrong gain  margin gain
+qwen3       2             residual        L27    1/2 50.0%   +0.587        +0.400          +0.188
+glm4        1             residual        L30    0/1  0.0%   -0.316        -0.379          +0.063
+deepseek7b  9             residual        L21    0/9  0.0%   +4.442        +4.434          +0.008
+```
+
+Qwen3/GLM4 target cases 仍然太少，只作为弱对照。
+
+### DS7B 组件细节
+
+```text
+component  layer  switch      correct gain  top-wrong gain  margin gain
+attn       L21    0/9 0.0%    +0.203        +0.223          -0.020
+attn       L26    0/9 0.0%    +1.835        +1.863          -0.027
+mlp        L21    0/9 0.0%    -0.234        -0.193          -0.041
+mlp        L26    0/9 0.0%    +0.060        +0.094          -0.034
+residual   L21    0/9 0.0%    +4.442        +4.434          +0.008
+residual   L26    0/9 0.0%    +6.205        +6.254          -0.049
+```
+
+### 关键客观事实
+
+1. **DS7B residual output 承载最强候选值共同激活**
+
+```text
+residual L26:
+correct +6.205
+top-wrong +6.254
+margin -0.049
+switch 0/9
+```
+
+这说明：
+
+```text
+candidate co-activation 在 residual stream 中非常明显。
+```
+
+2. **DS7B attention output 也有候选共同激活，但弱于 residual**
+
+```text
+attention L26:
+correct +1.835
+top-wrong +1.863
+margin -0.027
+switch 0/9
+```
+
+这说明：
+
+```text
+attention 可能参与读取或激活候选值集合，
+但单独 attention delta 不足以改善 winner margin。
+```
+
+3. **DS7B MLP output 没有提供 margin 修复**
+
+```text
+mlp L21: correct -0.234, wrong -0.193, margin -0.041
+mlp L26: correct +0.060, wrong +0.094, margin -0.034
+```
+
+本轮没有看到 MLP 负责 winner selection 的证据。
+
+4. **没有任何组件完成 DS7B winner switch**
+
+```text
+all DS7B component patches:
+target switch = 0/9
+```
+
+这意味着：
+
+```text
+component-level single-layer patch 仍不能闭合 value gate。
+```
+
+5. **margin 控制仍然缺失**
+
+即使 residual/attention 提升 correct，也同步提升 top-wrong：
+
+```text
+residual L21: margin +0.008
+residual L26: margin -0.049
+attention L26: margin -0.027
+```
+
+### 对 Phase588 的修正
+
+Phase588 推断：
+
+```text
+value co-activation 可能来自 attention/MLP component。
+```
+
+Phase589 更具体地说明：
+
+```text
+1. residual stream 中 co-activation 最强；
+2. attention output 中也有 co-activation；
+3. MLP output 本轮未显示有效 margin control；
+4. winner selection 不是单层单组件 patch 可以解决。
+```
+
+### 对内部结构研究的推进
+
+当前结构进一步清晰：
+
+```text
+value repair prompt 通过某些路径激活 candidate value set；
+attention 可能负责部分候选集合读取；
+residual stream 累积并放大候选值共同激活；
+但 winner selection / competitor suppression 仍未定位。
+```
+
+这意味着 value gate 至少包含两个阶段：
+
+```text
+1. candidate set activation:
+   正确值和错误候选值一起被拉高。
+
+2. winner selection:
+   正确值必须相对 top-wrong 获得 margin。
+```
+
+Phase589 找到了第一阶段的组件表征，但没有找到第二阶段。
+
+### 理论更新
+
+旧工作公式：
+
+```text
+\Delta \ell(V_i)
+=
+R_{\theta}^{readout}
+\left(
+H_{\theta}^{path}(C,R,M)
+\right)_i
+```
+
+Phase589 后细化为：
+
+```text
+H_{\theta}^{path}
+=
+H_{attn}^{candidate}
++
+H_{resid}^{accumulate}
++
+H_{select}^{winner}
+```
+
+其中：
+
+```text
+H_attn_candidate:
+  attention output 中较弱的候选值共同激活。
+
+H_resid_accumulate:
+  residual stream 中强候选值共同激活。
+
+H_select_winner:
+  尚未定位的 winner margin 控制机制。
+```
+
+当前最重要公式：
+
+```text
+\Delta margin
+=
+\Delta S_{correct}
+-
+\Delta S_{topwrong}
+```
+
+Phase589 显示：
+
+```text
+\Delta S_{correct} \approx \Delta S_{topwrong}
+```
+
+因此：
+
+```text
+\Delta margin \approx 0
+```
+
+### 硬伤与问题
+
+```text
+1. 仍是单层单组件 patch。
+   winner selection 可能需要多层累计。
+
+2. 只 patch prompt_last。
+   attention 的真实路径可能在 rule span 或 value token positions。
+
+3. 组件 patch 使用整体 attention/MLP output。
+   没有拆 attention head 和 MLP neuron/channel。
+
+4. target cases 对 Qwen3/GLM4 仍少。
+   后续主线应聚焦 DS7B。
+
+5. 没有做 multi-component combination。
+   winner selection 可能需要 attention + MLP 或 residual + MLP 联合。
+```
+
+### 新增客观事实拼图
+
+292. **DS7B residual stream 承载最强 value candidate co-activation。**
+293. **DS7B residual L26: correct +6.205, top-wrong +6.254。**
+294. **DS7B attention L26 也有共同激活: correct +1.835, top-wrong +1.863。**
+295. **DS7B MLP output 本轮没有提供 margin 修复。**
+296. **DS7B 没有任何单组件 patch 产生 winner switch。**
+297. **value gate 可分为 candidate set activation 与 winner selection 两阶段。**
+298. **Phase589 定位了 candidate activation 的表征位置，但 winner selection 仍未定位。**
+
+### 结果文件
+
+```text
+tests/glm5/phase589_component_value_path_attribution.py
+tests/glm5/phase589_component_value_path_attribution_summary.py
+
+results/glm5_phase589_component_value_path_attribution/
+  phase589_qwen3_component_value_path_attribution_confirm.json
+  phase589_glm4_component_value_path_attribution_confirm.json
+  phase589_deepseek7b_component_value_path_attribution_confirm.json
+  phase589_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase590 应进入：
+
+```text
+Value Winner Selection Multi-Layer Patch
+```
+
+核心目标：
+
+```text
+测试 winner selection 是否需要多层累计或多组件组合。
+```
+
+优先只以 DS7B 为主，qwen3/glm4 做小规模对照。
+
+测试方案：
+
+```text
+1. 在 DS7B target cases 上做 cumulative patch：
+   - residual L21+L26
+   - attention L21+L26
+   - residual+attention L21/L26
+   - residual+MLP L21/L26
+
+2. 增加 rule_span / query_relation 位置：
+   不只 patch prompt_last。
+
+3. 记录：
+   - correct gain
+   - top-wrong gain
+   - margin gain
+   - winner switch
+
+4. 控制：
+   - random same-norm cumulative
+   - wrong-relation cumulative
+```
+
+成功判据：
+
+```text
+1. margin gain 明显超过 Phase589。
+2. target switch > 0/9。
+3. random/wrong-relation 不能达到同等效果。
+```
+
+## Phase 590: Value Winner Selection Multi-Layer Patch 多层多组件获胜者选择修补 [2026-06-23 21:13]
+
+### 本阶段目标
+
+根据用户要求，先分析 Phase589 附加判断是否正确，再综合当前进展继续完成任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase589 是组件级归因阶段，而不是修复成功阶段。
+2. value gate 失败已经拆成两个层次：
+   - candidate set activation 候选集合激活
+   - winner selection 获胜者选择
+3. DS7B residual/attention patch 主要共同抬升 correct 与 top-wrong。
+4. MLP 单组件没有提供明确 margin repair。
+5. 下一步应测试 multi-layer / multi-component cumulative patch。
+```
+
+需要收紧的部分：
+
+```text
+不能把 Phase589 的 residual/attention 共同激活解释为 winner selection 机制已经定位。
+它只说明候选集合激活路径被定位得更清楚。
+```
+
+本阶段问题：
+
+```text
+如果单层/单组件 patch 不能让 correct 超过 top-wrong，
+多层、多组件累计 patch 是否能让 winner switch 出现？
+```
+
+### 测试脚本
+
+```text
+tests/glm5/phase590_value_winner_multilayer_patch.py
+tests/glm5/phase590_value_winner_multilayer_patch_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase590_value_winner_multilayer_patch.py
+
+python tests/glm5/phase590_value_winner_multilayer_patch.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase590_value_winner_multilayer_patch.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase590_value_winner_multilayer_patch.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase590_value_winner_multilayer_patch.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase590_value_winner_multilayer_patch_summary.py
+
+python -m py_compile \
+  tests/glm5/phase590_value_winner_multilayer_patch.py \
+  tests/glm5/phase590_value_winner_multilayer_patch_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 24
+alpha = 1.0
+
+Qwen3 layers = [27, 34]
+GLM4 layers = [30, 38]
+DS7B layers = [21, 26]
+
+positions:
+  prompt_last
+  query_relation
+
+component combinations:
+  residual_both
+  attn_both
+  mlp_both
+  residual_attn_both
+  residual_mlp_both
+  all_both
+
+controls:
+  repair_cumulative
+  wrong_relation_cumulative
+  random_cumulative
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+target cases = 2
+
+repair prompt_last all_both:
+  switch = 1/2
+  correct gain = +0.852
+  top-wrong gain = +0.539
+  margin gain = +0.313
+
+repair prompt_last residual_attn_both:
+  switch = 1/2
+  correct gain = +0.830
+  top-wrong gain = +0.580
+  margin gain = +0.250
+
+但 wrong_relation 和 random control 也出现 1/2 switch：
+  wrong_relation all_both switch = 1/2
+  random residual_both switch = 1/2
+```
+
+Qwen3 不能作为本轮强证据，因为 target cases 太少，而且对照也能切换。
+
+#### GLM4
+
+```text
+target cases = 1
+
+repair prompt_last residual_attn_both:
+  switch = 0/1
+  correct gain = -1.615
+  top-wrong gain = -1.740
+  margin gain = +0.125
+
+repair prompt_last all_both:
+  switch = 0/1
+  correct gain = -2.018
+  top-wrong gain = -2.143
+  margin gain = +0.125
+```
+
+GLM4 仍然不是稳定 value gate testbed，本轮没有 winner switch。
+
+#### DS7B
+
+DS7B 是本轮主证据。
+
+```text
+target cases = 9
+```
+
+prompt_last repair:
+
+```text
+residual_both:
+  switch = 0/9
+  correct gain = +6.471
+  top-wrong gain = +6.485
+  margin gain = -0.014
+
+residual_attn_both:
+  switch = 0/9
+  correct gain = +6.559
+  top-wrong gain = +6.551
+  margin gain = +0.007
+
+all_both:
+  switch = 0/9
+  correct gain = +6.307
+  top-wrong gain = +6.307
+  margin gain = +0.000
+
+attn_both:
+  switch = 0/9
+  correct gain = +2.061
+  top-wrong gain = +2.060
+  margin gain = +0.000
+
+mlp_both:
+  switch = 0/9
+  correct gain = -0.190
+  top-wrong gain = -0.150
+  margin gain = -0.040
+```
+
+query_relation repair:
+
+```text
+residual_attn_both:
+  switch = 0/9
+  correct gain = +0.056
+  top-wrong gain = +0.020
+  margin gain = +0.035
+
+all_both:
+  switch = 0/9
+  correct gain = +0.054
+  top-wrong gain = +0.032
+  margin gain = +0.021
+
+residual_mlp_both:
+  switch = 0/9
+  correct gain = +0.032
+  top-wrong gain = +0.016
+  margin gain = +0.016
+```
+
+DS7B wrong_relation control:
+
+```text
+prompt_last residual_both:
+  switch = 0/9
+  correct gain = +2.530
+  top-wrong gain = +2.452
+  margin gain = +0.078
+```
+
+这个结果很关键：错误关系 donor 也能产生小 margin gain，但仍不能 winner switch。
+
+### 当前最可靠客观事实
+
+1. **DS7B 多层 residual/attention 累计 patch 可以强烈激活 value candidate set。**
+
+```text
+correct gain 约 +6.3 到 +6.6
+top-wrong gain 约 +6.3 到 +6.6
+```
+
+2. **强 candidate activation 不等于 winner selection repair。**
+
+```text
+DS7B prompt_last residual_attn_both:
+  correct +6.559
+  top-wrong +6.551
+  margin +0.007
+  switch 0/9
+```
+
+3. **多组件叠加没有解决 top-wrong 共同抬升。**
+
+```text
+residual + attention + MLP all_both:
+  correct +6.307
+  top-wrong +6.307
+  margin +0.000
+  switch 0/9
+```
+
+4. **query_relation 位置可以轻微改善 margin，但强度远不够。**
+
+```text
+best DS7B query_relation margin gain = +0.035
+switch = 0/9
+```
+
+5. **MLP 不是本轮 winner selection 的直接修复通道。**
+
+```text
+DS7B prompt_last mlp_both:
+  correct -0.190
+  top-wrong -0.150
+  margin -0.040
+```
+
+6. **Qwen3 的 1/2 switch 不可靠。**
+
+```text
+repair、wrong_relation、random control 都可以出现 1/2 switch。
+target cases 只有 2。
+```
+
+### 理论进展
+
+Phase590 将 Phase589 的两阶段判断压实：
+
+```text
+value path = candidate activation path + winner selection gate
+```
+
+更精确地说：
+
+```text
+residual/attention late-layer patch
+  可以把某个 value-candidate 子空间整体推高；
+
+但 correct 和 top-wrong 在这个子空间中仍然绑定在一起；
+
+winner selection 不是简单的 late residual/attention/MLP 多层强度叠加。
+```
+
+因此当前机制应更新为：
+
+```text
+语义修复首先恢复候选集合可达性；
+随后还需要一个竞争选择结构把 correct 从 candidate set 中分离出来；
+这个竞争选择结构目前没有被 residual/attention/MLP 的整体输出 patch 捕获。
+```
+
+### 硬伤与问题
+
+1. **target case 数量仍不均衡。**
+
+```text
+Qwen3 = 2
+GLM4 = 1
+DS7B = 9
+```
+
+跨模型结论必须以 DS7B 为主，Qwen3/GLM4 只能作为弱参考。
+
+2. **patch 粒度仍偏粗。**
+
+```text
+attention 是整层 attention output；
+MLP 是整层 MLP output；
+没有拆 head、channel、token-specific subvector。
+```
+
+3. **candidate set 与 top-wrong 绑定问题没有拆开。**
+
+本轮只能观察到 correct 与 top-wrong 同时上升，尚未找到分离它们的内部量。
+
+4. **winner selection 可能发生在更靠近 unembedding / norm / final logits 的环节。**
+
+当前 patch 主要覆盖 hidden path，没有直接拆：
+
+```text
+final norm
+lm_head direction
+candidate token embedding competition
+```
+
+5. **wrong_relation control 有小 margin gain。**
+
+说明局部 margin gain 不能直接作为机制成功判据，必须以 winner switch 和对照差异为准。
+
+### 新增客观事实拼图
+
+299. **多层多组件 cumulative patch 仍不能在 DS7B 上触发 value winner switch。**
+300. **DS7B prompt_last residual/attention 累计 patch 是 candidate set 激活器，不是 winner selector。**
+301. **DS7B correct 与 top-wrong 可以被 residual/attention 几乎等量抬升。**
+302. **DS7B all_both patch 的 correct gain 与 top-wrong gain 几乎完全相等。**
+303. **query_relation 位置包含微弱 winner margin 信息，但不足以改变输出。**
+304. **MLP 整层输出不是当前 value winner selection 的主修复通道。**
+305. **winner selection 不能用简单的多层 late hidden strength 累积解释。**
+306. **value gate 机制进一步拆成：候选集合激活、候选内排序、最终生成门三层。**
+
+### 结果文件
+
+```text
+tests/glm5/phase590_value_winner_multilayer_patch.py
+tests/glm5/phase590_value_winner_multilayer_patch_summary.py
+
+results/glm5_phase590_value_winner_multilayer_patch/
+  phase590_qwen3_value_winner_multilayer_patch_smoke.json
+  phase590_qwen3_value_winner_multilayer_patch_confirm.json
+  phase590_glm4_value_winner_multilayer_patch_confirm.json
+  phase590_deepseek7b_value_winner_multilayer_patch_confirm.json
+  phase590_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase591 应进入：
+
+```text
+Value Candidate Internal Ranking Audit
+```
+
+核心目标：
+
+```text
+不要继续加大 hidden patch 强度；
+而是直接分析 correct 与 top-wrong 为什么在同一个 candidate activation 下绑定。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B target cases，固定 value candidate set。
+2. 比较 correct value 与 top-wrong value 的 token embedding / lm_head direction。
+3. 测 repair patch 对每个 candidate value 的完整排名曲线，而不是只看 correct/top-wrong。
+4. 分析 top-wrong 是否具有 shared category bias、frequency bias、format bias 或 relation-confusion bias。
+5. 做 per-candidate delta matrix：
+   rows = cases
+   columns = all candidate values
+   value = logprob delta
+6. 查找是否存在：
+   - correct-specific component
+   - wrong-shared component
+   - candidate-common component
+```
+
+成功判据：
+
+```text
+1. 能把 repair delta 分解为 common candidate activation 与 candidate-specific ranking 两部分。
+2. 能解释 top-wrong 为什么同步上升。
+3. 能提出下一步可直接干预的 ranking factor。
+```
+
+## Phase 591: Value Candidate Internal Ranking Audit 值候选内部排序审计 [2026-06-23 21:41]
+
+### 本阶段目标
+
+根据用户要求，分析 Phase590 附加判断是否正确，并综合当前进展继续完成任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase590 的价值不是修复成功，而是确认 hidden patch search 正在重复同一失败模式。
+2. 多层、多组件、多位置 patch 仍主要是 candidate set activation。
+3. winner selection 不能继续靠加大 hidden patch 强度寻找。
+4. 下一步必须从 patch search 转向 candidate internal ranking audit。
+5. 需要记录完整 candidate delta matrix，而不是只看 correct/top-wrong。
+```
+
+需要收紧的部分：
+
+```text
+1. 不能说 MLP 完全不参与 winner selection。
+   当前只排除了整层 MLP output 的直接可见修复。
+
+2. 不能把 Qwen3 的 switch 当作强证据。
+   Qwen3 target cases 仍少，而且 random/wrong controls 也有切换。
+```
+
+本阶段核心问题：
+
+```text
+在 value candidate set 被激活后，
+correct value 与 old top-wrong value 为什么仍然绑定？
+
+prompt repair 与 hidden patch 的区别到底在 common activation，
+还是 candidate-specific ranking？
+```
+
+### 测试脚本
+
+```text
+tests/glm5/phase591_value_candidate_ranking_audit.py
+tests/glm5/phase591_value_candidate_ranking_audit_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase591_value_candidate_ranking_audit.py
+
+python tests/glm5/phase591_value_candidate_ranking_audit.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase591_value_candidate_ranking_audit.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase591_value_candidate_ranking_audit.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase591_value_candidate_ranking_audit.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase591_value_candidate_ranking_audit_summary.py
+
+python -m py_compile \
+  tests/glm5/phase591_value_candidate_ranking_audit.py \
+  tests/glm5/phase591_value_candidate_ranking_audit_summary.py
+```
+
+注意：
+
+```text
+首次运行后发现 embedding cosine 使用 first token 会使 v05/v48 等标签相似度接近 1。
+已修正为完整答案 token embedding mean 后重新顺序运行 qwen3、GLM4、DS7B。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+candidate values = v05, v91, v22, v48
+alpha = 1.0
+
+Qwen3 layers = [27, 34]
+GLM4 layers = [30, 38]
+DS7B layers = [21, 26]
+
+modes:
+  repair_prompt
+  wrong_relation_prompt
+  patch_prompt_last_residual_attn
+  patch_query_relation_residual_attn
+  random_prompt_last_residual_attn
+  random_query_relation_residual_attn
+```
+
+本阶段核心分解：
+
+```text
+D_{i,j} = score_after(i,j) - score_base(i,j)
+
+common_i = mean_j D_{i,j}
+
+specific_{i,j} = D_{i,j} - common_i
+
+margin_gain = D_{i,correct} - D_{i,old_top_wrong}
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 64
+target cases = 5
+```
+
+prompt-level repair:
+
+```text
+switch = 5/5
+common = -3.273
+correct_delta = +2.373
+old_top_wrong_delta = -5.528
+correct_specific = +5.646
+old_top_wrong_specific = -2.255
+margin_gain = +7.901
+```
+
+hidden patch:
+
+```text
+patch_prompt_last_residual_attn:
+  switch = 2/5
+  common = +0.907
+  correct_delta = +0.938
+  old_top_wrong_delta = +0.763
+  correct_specific = +0.032
+  old_top_wrong_specific = -0.143
+  margin_gain = +0.175
+
+patch_query_relation_residual_attn:
+  switch = 0/5
+  margin_gain = +0.025
+```
+
+Qwen3 说明 prompt repair 有明确 ranking 效果，但 hidden patch 的 ranking 分量很弱。
+
+#### GLM4
+
+```text
+cases = 64
+target cases = 4
+```
+
+prompt-level repair:
+
+```text
+switch = 4/4
+common = -2.388
+correct_delta = +0.459
+old_top_wrong_delta = -1.791
+correct_specific = +2.848
+old_top_wrong_specific = +0.598
+margin_gain = +2.250
+```
+
+hidden patch:
+
+```text
+patch_prompt_last_residual_attn:
+  switch = 0/4
+  common = -1.730
+  correct_delta = -1.734
+  old_top_wrong_delta = -1.734
+  correct_specific = -0.004
+  old_top_wrong_specific = -0.004
+  margin_gain = +0.000
+
+patch_query_relation_residual_attn:
+  switch = 0/4
+  margin_gain = -0.047
+```
+
+GLM4 进一步证明 hidden patch 几乎只产生共同变化，不产生有用排序差异。
+
+#### DS7B
+
+DS7B 是本轮主证据。
+
+```text
+cases = 64
+target cases = 21
+```
+
+prompt-level repair:
+
+```text
+switch = 21/21
+common = +2.517
+correct_delta = +7.902
+old_top_wrong_delta = +0.524
+correct_specific = +5.385
+old_top_wrong_specific = -1.994
+margin_gain = +7.379
+```
+
+hidden patch:
+
+```text
+patch_prompt_last_residual_attn:
+  switch = 0/21
+  common = +6.110
+  correct_delta = +6.146
+  old_top_wrong_delta = +6.104
+  correct_specific = +0.036
+  old_top_wrong_specific = -0.006
+  margin_gain = +0.042
+
+patch_query_relation_residual_attn:
+  switch = 0/21
+  common = +0.026
+  correct_delta = +0.024
+  old_top_wrong_delta = +0.023
+  correct_specific = -0.002
+  old_top_wrong_specific = -0.003
+  margin_gain = +0.001
+```
+
+controls:
+
+```text
+wrong_relation_prompt:
+  switch = 2/21
+  common = +1.091
+  correct_delta = -1.394
+  old_top_wrong_delta = +1.039
+  correct_specific = -2.485
+  old_top_wrong_specific = -0.052
+  margin_gain = -2.434
+
+random_prompt_last_residual_attn:
+  switch = 1/21
+  common = -0.124
+  margin_gain = -0.003
+```
+
+### top-wrong 来源归因
+
+#### DS7B target cases
+
+```text
+target cases = 21
+
+wrong_relation_any_category = 20/21
+same_relation_other_category = 19/21
+repeated_value = 18/21
+same_category_wrong_relation = 15/21
+value_prior_higher_than_correct = 3/21
+```
+
+top-wrong value 分布：
+
+```text
+v48 = 14/21
+v05 = 5/21
+v22 = 2/21
+```
+
+修正后 top-wrong 与 correct 的平均 embedding cosine：
+
+```text
+DS7B = 0.864
+Qwen3 = 0.857
+GLM4 = 0.646
+```
+
+### 当前最可靠客观事实
+
+1. **prompt repair 与 hidden patch 的差别不是激活强度，而是 candidate-specific ranking。**
+
+DS7B:
+
+```text
+repair_prompt:
+  common +2.517
+  correct_specific +5.385
+  old_top_wrong_specific -1.994
+  switch 21/21
+
+hidden patch:
+  common +6.110
+  correct_specific +0.036
+  old_top_wrong_specific -0.006
+  switch 0/21
+```
+
+2. **hidden patch 已经非常强，但几乎全是 common candidate activation。**
+
+```text
+DS7B hidden patch common = +6.110
+correct_delta = +6.146
+old_top_wrong_delta = +6.104
+margin_gain = +0.042
+```
+
+3. **真正缺失的是 correct-specific support。**
+
+prompt repair:
+
+```text
+correct_specific = +5.385
+```
+
+hidden patch:
+
+```text
+correct_specific = +0.036
+```
+
+两者差距约 150 倍。
+
+4. **top-wrong 多数不是纯 value prior。**
+
+DS7B target cases 中：
+
+```text
+value_prior_higher_than_correct = 3/21
+```
+
+value prior 不是主因。
+
+5. **top-wrong 通常具有规则结构重叠。**
+
+```text
+same_relation_other_category = 19/21
+wrong_relation_any_category = 20/21
+repeated_value = 18/21
+same_category_wrong_relation = 15/21
+```
+
+这说明 top-wrong 很可能来自 rule-table 内的多重路径重叠，而不是单一错误来源。
+
+6. **Qwen3/GLM4 也支持 prompt repair 产生排序特异项。**
+
+```text
+Qwen3 repair_prompt correct_specific = +5.646
+GLM4 repair_prompt correct_specific = +2.848
+```
+
+但 Qwen3/GLM4 target cases 仍少，不能替代 DS7B 主证据。
+
+### 理论进展
+
+Phase591 将 value gate 三阶段理论变得更具体：
+
+```text
+candidate set activation
+  = 提高一组候选值整体可达性
+
+candidate internal ranking
+  = 在候选集合内部给 correct value 额外特异支持，
+    并/或削弱 old top-wrong
+
+final generation gate
+  = 把已排序候选转成最终 token 输出
+```
+
+Phase591 的关键更新：
+
+```text
+hidden residual+attention patch:
+  主要改变 candidate set activation
+
+prompt relation-filter repair:
+  同时改变 candidate activation 与 candidate-specific ranking
+```
+
+更准确的公式：
+
+```text
+score_after(V_j) - score_base(V_j)
+  = common_candidate_activation
+    + candidate_specific_ranking(V_j)
+```
+
+DS7B 中：
+
+```text
+hidden patch:
+  common 很大
+  candidate_specific 很小
+
+prompt repair:
+  common 中等
+  correct_specific 极大
+  old_top_wrong_specific 为负
+```
+
+这说明真正的 winner selection 不在“候选集合是否被激活”，而在：
+
+```text
+关系约束如何转化为候选特异排序项。
+```
+
+### 硬伤与问题
+
+1. **top-wrong 来源标签不是互斥的。**
+
+同一个 top-wrong 可同时属于：
+
+```text
+same_relation_other_category
+wrong_relation_any_category
+same_category_wrong_relation
+repeated_value
+```
+
+因此这些标签说明“重叠结构”，不是单一因果归因。
+
+2. **当前 value labels 太人工。**
+
+```text
+v05, v91, v22, v48
+```
+
+它们的 tokenization 和 embedding similarity 可能影响结果。虽然已修正 cosine 计算，但仍需要自然值标签对照。
+
+3. **只测 4 个候选值。**
+
+候选集合完整度仍有限。
+
+4. **仍未拆 attention head / MLP channel。**
+
+已经知道整层 hidden patch 缺少 candidate-specific ranking，但还不知道 ranking 分量在更细组件中是否存在。
+
+5. **prompt repair 的内部路径尚未定位。**
+
+prompt repair 有强 correct-specific ranking，但当前 hidden patch 没有抓到这个路径。
+
+### 新增客观事实拼图
+
+307. **DS7B repair_prompt 可以在 64 样本中修复 21/21 target cases。**
+308. **DS7B hidden residual+attention patch 在 21 个 target cases 中仍然 0/21 switch。**
+309. **DS7B hidden patch 的主要成分是 common candidate activation。**
+310. **DS7B prompt repair 的主要成功成分是 correct-specific ranking。**
+311. **DS7B prompt repair 同时弱化 old top-wrong specific。**
+312. **DS7B correct_specific 从 hidden patch 的 +0.036 到 prompt repair 的 +5.385，是当前最大机制缺口。**
+313. **top-wrong 多数来自规则表内的重叠路径，而不是单纯 value prior。**
+314. **value candidate internal ranking 已经可以用 common/specific 分解客观测量。**
+315. **winner selection 问题转化为：如何找到 correct-specific ranking factor。**
+316. **hidden patch search 的失败不是因为激活不够强，而是因为缺少候选特异排序。**
+
+### 结果文件
+
+```text
+tests/glm5/phase591_value_candidate_ranking_audit.py
+tests/glm5/phase591_value_candidate_ranking_audit_summary.py
+
+results/glm5_phase591_value_candidate_ranking_audit/
+  phase591_qwen3_value_candidate_ranking_audit_smoke.json
+  phase591_qwen3_value_candidate_ranking_audit_confirm.json
+  phase591_glm4_value_candidate_ranking_audit_confirm.json
+  phase591_deepseek7b_value_candidate_ranking_audit_confirm.json
+  phase591_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase592 应进入：
+
+```text
+Relation-Specific Ranking Factor Localization
+```
+
+核心目标：
+
+```text
+定位 prompt repair 中产生 correct-specific ranking 的内部来源。
+```
+
+不要再扩大 patch search，而应做更有方向的分解：
+
+```text
+1. 对 DS7B target cases，只分析 repair_prompt 成功路径。
+2. 对 repair_prompt 内部做逐层 candidate-specific projection：
+   - correct_specific direction
+   - old_top_wrong_specific direction
+3. 比较 base_prompt 与 repair_prompt 在 query_relation、query_category、rule_relation、rule_value、prompt_last 的 candidate-specific score。
+4. 检查 correct-specific ranking 是否首先出现在：
+   - relation token
+   - category token
+   - correct rule value token
+   - final answer position
+5. 如果能定位候选特异项出现的层位和位置，再做最小 patch。
+```
+
+成功判据：
+
+```text
+1. 找到 correct_specific ranking 在 repair_prompt 中首次显著出现的位置/层。
+2. 该位置/层能区别 correct 与 old top-wrong，而不是共同抬升。
+3. 基于该 factor 的 patch 能让 DS7B margin_gain 明显超过 +0.042，并尽可能出现 switch。
+```
+
+## Phase 592: Relation-Specific Ranking Factor Atlas 关系特异排序因子图谱 [2026-06-23 21:56]
+
+### 本阶段目标
+
+根据用户要求，综合两个附加分析继续完成任务：
+
+```text
+1. Phase591 是 value gate 路线的重要阶段。
+2. 单个机制破解价值有限，必须进入全局机制图谱。
+```
+
+判断：
+
+```text
+这两个分析方向都正确。
+Phase591 已把 value retrieval 失败拆成 common candidate activation 与 candidate-specific ranking。
+但如果继续只追一个 gate 或一个 patch，很容易得到局部正确、整体不足的结论。
+因此 Phase592 不只做单点定位，而是输出 atlas-ready graph slice。
+```
+
+本阶段目标：
+
+```text
+定位 relation-filter prompt 中 correct-specific ranking 的层位-位置分布，
+并输出可累计到全局机制图谱的 nodes / edges / causal level。
+```
+
+### 测试脚本
+
+```text
+tests/glm5/phase592_relation_specific_ranking_atlas.py
+tests/glm5/phase592_relation_specific_ranking_atlas_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase592_relation_specific_ranking_atlas.py
+
+python tests/glm5/phase592_relation_specific_ranking_atlas.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase592_relation_specific_ranking_atlas.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase592_relation_specific_ranking_atlas.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase592_relation_specific_ranking_atlas.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase592_relation_specific_ranking_atlas_summary.py
+
+python -m py_compile \
+  tests/glm5/phase592_relation_specific_ranking_atlas.py \
+  tests/glm5/phase592_relation_specific_ranking_atlas_summary.py
+```
+
+### 测试原理
+
+本阶段不是直接因果 patch，而是 projection-level atlas scan。
+
+对 target cases：
+
+```text
+base_prompt 错误
+repair_prompt 正确
+```
+
+对每个位置、每一层计算：
+
+```text
+delta_hidden(l,p) = repair_hidden(l,p_repair) - base_hidden(l,p_base)
+```
+
+然后投影到四个 value candidate 的 output embedding mean 上：
+
+```text
+score_delta(V_j) = dot(delta_hidden, output_embedding_mean(V_j))
+```
+
+再做 Phase591 的 common/specific 分解：
+
+```text
+common = mean_j score_delta(V_j)
+
+specific(V_j) = score_delta(V_j) - common
+
+specific_margin =
+  specific(correct) - specific(old_top_wrong)
+```
+
+图谱节点：
+
+```text
+model + layer + position + residual_hidden_state projection
+```
+
+因果等级：
+
+```text
+Level 2 = decodable projection
+```
+
+注意：
+
+```text
+Phase592 不是 hidden causal repair。
+它只定位 correct-specific ranking factor 的候选图谱节点。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = v05, v91, v22, v48
+cross_threshold = 0.25
+
+positions:
+  query_relation
+  query_category
+  rule_relation
+  rule_value
+  prompt_last
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 64
+target cases = 5
+```
+
+最强节点：
+
+```text
+prompt_last L34:
+  specific_margin = +3.740
+  correct_specific = +1.292
+  old_top_wrong_specific = -2.448
+  common = +4.026
+  positive_specific_rate = 0.80
+
+prompt_last L33:
+  specific_margin = +3.169
+  correct_specific = +1.201
+  old_top_wrong_specific = -1.967
+
+prompt_last L32:
+  specific_margin = +3.001
+  correct_specific = +1.175
+  old_top_wrong_specific = -1.826
+
+query_category L32:
+  specific_margin = +1.956
+  correct_specific = +0.767
+  old_top_wrong_specific = -1.188
+```
+
+first crossing:
+
+```text
+prompt_last: L24
+query_category: L19
+rule_relation: none
+rule_value: none
+query_relation: none
+```
+
+Qwen3 的 ranking projection 主要在 late prompt_last，其次是 query_category。
+
+#### GLM4
+
+```text
+cases = 64
+target cases = 4
+```
+
+最强节点：
+
+```text
+prompt_last L38:
+  specific_margin = +0.821
+  correct_specific = +0.383
+  old_top_wrong_specific = -0.437
+  common = -0.725
+  positive_specific_rate = 0.50
+
+prompt_last L39:
+  specific_margin = +0.704
+  correct_specific = +0.364
+  old_top_wrong_specific = -0.339
+
+prompt_last L37:
+  specific_margin = +0.468
+  correct_specific = +0.253
+  old_top_wrong_specific = -0.215
+```
+
+first crossing:
+
+```text
+prompt_last: L33
+rule_value: none
+query_category: none
+query_relation: none
+rule_relation: none
+```
+
+GLM4 信号弱，并集中于 late prompt_last。
+
+#### DS7B
+
+```text
+cases = 64
+target cases = 21
+```
+
+最强节点：
+
+```text
+rule_value L26:
+  specific_margin = +1.210
+  correct_specific = +0.718
+  old_top_wrong_specific = -0.492
+  common = +0.753
+  positive_specific_rate = 0.43
+
+prompt_last L26:
+  specific_margin = +1.054
+  correct_specific = +2.296
+  old_top_wrong_specific = +1.241
+  common = +10.725
+  positive_specific_rate = 0.38
+
+rule_relation L18:
+  specific_margin = +0.774
+  correct_specific = +0.089
+  old_top_wrong_specific = -0.684
+  common = +2.871
+  positive_specific_rate = 0.76
+
+prompt_last L25:
+  specific_margin = +0.760
+  correct_specific = +1.691
+  old_top_wrong_specific = +0.931
+  common = +8.666
+  positive_specific_rate = 0.48
+
+rule_relation L20:
+  specific_margin = +0.714
+  correct_specific = +0.117
+  old_top_wrong_specific = -0.597
+  common = +3.816
+  positive_specific_rate = 0.57
+
+query_relation L16:
+  specific_margin = +0.509
+  correct_specific = +0.281
+  old_top_wrong_specific = -0.228
+  common = +1.361
+  positive_specific_rate = 0.81
+```
+
+first crossing:
+
+```text
+rule_value: L25
+prompt_last: L25
+rule_relation: L8
+query_relation: L9
+query_category: none
+```
+
+### atlas 输出
+
+```text
+Qwen3:
+  nodes = 60
+  edges = 62
+
+GLM4:
+  nodes = 60
+  edges = 61
+
+DS7B:
+  nodes = 60
+  edges = 64
+```
+
+每个 node 记录：
+
+```text
+node_id
+node_type = component_state_projection
+model
+layer
+layer_bucket
+position
+component = residual_hidden_state
+role = candidate_specific_ranking / candidate_common_or_noise
+causal_level = 2
+metrics
+```
+
+每个 edge 记录：
+
+```text
+source = relation_filter_prompt
+target = model_layer_position_projection_node
+edge_type = induces_projection_delta
+causal_level = 2
+effect:
+  mean_common
+  mean_correct_specific
+  mean_old_top_wrong_specific
+  mean_specific_margin
+```
+
+### 当前最可靠客观事实
+
+1. **Phase591 的 correct-specific ranking 不是单点现象。**
+
+DS7B 中出现于：
+
+```text
+rule_value late layer
+prompt_last late layer
+rule_relation mid/late_mid layer
+query_relation mid/late_mid layer
+```
+
+2. **DS7B 支持图谱路线，而不是单一机制路线。**
+
+多个位置越过阈值：
+
+```text
+rule_value
+prompt_last
+rule_relation
+query_relation
+```
+
+这说明 candidate-specific ranking 更像分布式路径-读出结构。
+
+3. **Qwen3/GLM4 更偏 late prompt_last。**
+
+```text
+Qwen3 peak = prompt_last L34
+GLM4 peak = prompt_last L38
+```
+
+4. **DS7B 的 prompt_last 节点 common 非常大，但 positive_specific_rate 不高。**
+
+```text
+prompt_last L26:
+  common = +10.725
+  specific_margin = +1.054
+  positive_specific_rate = 0.38
+```
+
+说明 prompt_last 仍混有强 common activation，不是最干净的 ranking 节点。
+
+5. **DS7B rule_value L26 更像干净 ranking 节点。**
+
+```text
+rule_value L26:
+  common = +0.753
+  correct_specific = +0.718
+  old_top_wrong_specific = -0.492
+  specific_margin = +1.210
+```
+
+### 理论进展
+
+Phase592 把 Phase591 的公式接入图谱：
+
+```text
+language mechanism atlas
+  = task nodes
+    + variable nodes
+    + gate nodes
+    + component projection nodes
+    + failure nodes
+    + causal-level edges
+```
+
+value gate 的图谱切片现在变成：
+
+```text
+relation_filter_prompt
+  -> candidate_common_activation nodes
+  -> candidate_specific_ranking projection nodes
+  -> winner selection candidates
+```
+
+更重要的是，本阶段确认：
+
+```text
+正确候选排序因子不是一个单独位置，
+而是一组 layer-position projection nodes。
+```
+
+因此，破解语言编码机制不能靠“找到某个唯一点”，而要累计：
+
+```text
+任务-变量-位置-层位-组件-失败类型-因果等级
+```
+
+形成可查询图谱。
+
+### 硬伤与问题
+
+1. **本阶段是 Level 2 decodable projection，不是 causal repair。**
+
+```text
+不能把 projection peak 直接解释成因果机制。
+```
+
+2. **使用 output embedding mean 作为候选方向。**
+
+这比 first token 更合理，但仍只是近似。
+
+3. **未拆 attention head / MLP channel。**
+
+当前节点是 residual hidden state projection，不是组件级微结构。
+
+4. **positive_specific_rate 与 mean peak 不完全一致。**
+
+例如 DS7B rule_value L26：
+
+```text
+specific_margin 高，但 positive_specific_rate = 0.43
+```
+
+说明均值可能由部分样本拉高，后续要看样本簇。
+
+5. **Qwen3/GLM4 target cases 仍少。**
+
+跨模型共性只能谨慎说：
+
+```text
+late prompt_last 是共同读出相关位置。
+```
+
+DS7B 的 rule/query 分布式结构不能直接外推到所有模型。
+
+### 新增客观事实拼图
+
+317. **correct-specific ranking factor 可以被层位-位置 projection atlas 捕捉。**
+318. **DS7B 的 ranking projection 是多位置分布式结构。**
+319. **DS7B rule_value L26 是当前最强且相对干净的 ranking projection 节点。**
+320. **DS7B prompt_last L26 同时包含巨大 common activation 与 ranking projection。**
+321. **DS7B rule_relation 在中层到中后层已经出现 specific_margin。**
+322. **DS7B query_relation 在中层已经出现 relation-specific ranking signal。**
+323. **Qwen3 和 GLM4 的 ranking projection 更集中在 late prompt_last。**
+324. **语言编码机制研究需要 atlas，而不是单点机制列表。**
+325. **当前 value gate 图谱已有 Level2 projection nodes，但还缺 Level5 causal repair nodes。**
+
+### 结果文件
+
+```text
+tests/glm5/phase592_relation_specific_ranking_atlas.py
+tests/glm5/phase592_relation_specific_ranking_atlas_summary.py
+
+results/glm5_phase592_relation_specific_ranking_atlas/
+  phase592_qwen3_relation_specific_ranking_atlas_smoke.json
+  phase592_qwen3_relation_specific_ranking_atlas_confirm.json
+  phase592_glm4_relation_specific_ranking_atlas_confirm.json
+  phase592_deepseek7b_relation_specific_ranking_atlas_confirm.json
+  phase592_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase593 应进入：
+
+```text
+Atlas-Guided Causal Patch Validation
+```
+
+核心目标：
+
+```text
+从 Phase592 的 Level2 projection nodes 中选候选节点，
+做最小因果 patch，验证哪些节点能真正改变 margin/winner。
+```
+
+优先 DS7B：
+
+```text
+1. rule_value L26
+2. prompt_last L26
+3. rule_relation L18/L20
+4. query_relation L16/L19
+```
+
+测试方法：
+
+```text
+1. 只对 target cases 做 patch。
+2. patch 不再用全 residual delta。
+3. 从 repair-base delta 中提取 candidate-specific direction：
+   remove common candidate direction
+   preserve correct-vs-old-topwrong direction
+4. 分别 patch：
+   - raw delta
+   - specific-only delta
+   - common-only delta
+   - random same-norm
+5. 记录：
+   common gain
+   correct_specific gain
+   old_top_wrong_specific gain
+   margin_gain
+   switch
+```
+
+成功判据：
+
+```text
+1. specific-only patch 的 margin_gain 明显超过 raw hidden patch 的 +0.042。
+2. common-only patch 只抬升候选集合，不改 winner。
+3. 至少一个 atlas node 出现 target switch。
+```
