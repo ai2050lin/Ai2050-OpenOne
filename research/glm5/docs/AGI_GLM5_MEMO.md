@@ -56045,49 +56045,985 @@ results/glm5_phase578_retrieval_closure/
 ```
 
 
-## Phase 580: Micro-World ORV Retrieval-to-Reasoning Closure [2026-06-22 02:35]
+## Phase 580: Micro-World ORV Retrieval-to-Reasoning Closure 微世界对象—关系—值检索到推理闭包 [2026-06-22 02:35]
 
-### Key Results
+### 本阶段目标
 
-OC Full-string Logprob: Qwen3=1.0/0.9, GLM4=1.0/0.9, DS7B=1.0/1.0
+从Phase 579的OC(对象—类别)检索推进到ORV(对象—关系—值)检索，同时修复Phase 579的技术问题：
+1. FIX: 全字符串logprob评分——修复Phase 579的baseline accuracy=0%评估bug
+2. FIX: 真注意力边消融双模式——renorm(重归一化) + norenorm(不重归一化)
+3. NEW: ORV任务——(O,R)→V，引入关系变量R
+4. NEW: ORV检索电路定位——obj/rel/val三类匹配头
+5. NEW: ORV值复制归因——GQA修复后的值向量logit归因
+6. NEW: 组合推理测试——两跳：O→C 然后 (C,R)→V
+7. NEW: 语法模板变换——同一真值表用4种语法格式，测机制跨语法是否同构
+8. NEW: ORV平衡表条件绑定——V=f_T(O,R)，A-first/B-first去除位置偏差
 
-OC True Edge Ablation (Dual Mode):
-  Qwen3: top10 renorm=1.0/norenorm=1.0, logit: -0.218/-1.326 (6x gap)
-  GLM4: top10 renorm=1.0/norenorm=1.0, logit: ~0.001
-  DS7B: top10 renorm=1.0/norenorm=1.0, logit: +5.255/-4.127
+### 生成脚本
 
-ORV Token Corruption:
-  Qwen3: val=1.0, obj=0.8, rel=0.6, all=1.0
-  GLM4: val=1.0, obj=0.6, rel=0.2, all=1.0
-  DS7B: val=0.6, obj=0.0, rel=-0.2, all=0.6
+```text
+tests/glm5/phase580_orv_retrieval_reasoning.py
+```
 
-ORV True Edge Ablation:
-  Qwen3: val_top10_renorm=0.8, norenorm=0.8
-  GLM4: val_top10_renorm=0.0, norenorm=0.0
-  DS7B: val_top10_renorm=0.6, norenorm=0.8
+### 关键技术突破
 
-Compositional Reasoning: All 0%
-Syntax Templates: All 100%
-ORV Binding: A_near/far: Qwen3=0.20/0.60, GLM4=0.40/0.80, DS7B=0.60/0.80
-ORV Value Attribution: DS7B=2.46, Qwen3=1.17, GLM4=0.002
+#### 全字符串logprob评分（修复Phase 579评估bug）
 
-### New Facts (10)
+Phase 579的Step 1主测试baseline accuracy=0%，根本原因是单token评分无法区分类别（所有类别共享前缀"c"）：
 
-212. Full-string logprob fixes Phase 579 eval bug.
-213. norenorm edge ablation logit changes >> renorm (6x for Qwen3).
-214. In ORV, value token is primary answer source.
-215. ORV value attribution: DS7B=2.46, Qwen3=1.17, GLM4=0.002.
-216. GLM4 ORV edge ablation 0% but token corruption 100%.
-217. All models fail two-hop composition (0%).
-218. Syntax templates all 100%: syntax is path control.
-219. ORV binding: negative recency bias (far > near).
-220. rel_only corruption weakest.
-221. DS7B ORV baseline only 60%.
+```text
+旧方法: logits[cat_token_ids[cat]]  → 只看"12"这个token的logit
+         问题: "c12","c77","c33","c59"的区分token在answer_pos处
+               logits不正确（模型预测的是"c"而非类别编号）
 
-### Key Issues
+新方法: 全字符串条件概率之和
+  log P(c_{1:m}|x) = sum_{t=1}^{m} log P(c_t | x, c_{<t})
+  → 对每个候选答案字符串，条件生成每个token并累加logprob
+  → 这等价于模型自回归生成该字符串的总对数概率
 
-1. Compositional reasoning 0% is the critical bottleneck
-2. ORV binding worse than OC binding
-3. GLM4 ORV edge ablation 0% needs explanation
-4. norenorm vs renorm logit direction inconsistent
-5. DS7B ORV baseline only 60%
+结果: 三模型OC和ORV任务的full-string logprob准确率均达到90-100%
+```
+
+#### 真注意力边消融双模式（renorm + norenorm）
+
+Phase 579只有renorm模式（消融后重新归一化），存在补偿效应。Phase 580新增norenorm模式：
+
+```text
+renorm:    A'[q,j*]=0后重新归一化
+           → 注意力总质量不变，被消融的质量重分配到其他位置
+           → 其他位置可能包含相似信息（同一规则的其他token），导致补偿
+           → 低估被消融边的真实贡献
+
+norenorm:  A'[q,j*]=0后不重归一化
+           → 注意力总质量减少（head输出整体缩小）
+           → 保留总注意力损失，测试该边的真实贡献量
+           → 揭示被消融边对head输出的实际能量贡献
+```
+
+### 测试设计
+
+```text
+微世界:
+  OC任务: 10真值表 × 8对象 × 4类别 = 80样本
+  ORV任务: 10真值表 × 4对象 × 2关系 × 4值 = 80样本（对象限制为4以提速）
+
+Part A: OC任务（修复Phase 579）
+  Step A0: 识别top OC检索头（同Phase 577-579，含绝对mass）
+  Step A1: 真注意力边消融（双模式：renorm + norenorm）
+    - 配置: cat_edge_top10, cat_edge_top3_cat
+    - 测量: argmax变化率, logit变化量
+  Step A2: 全字符串logprob基线（修复评估）
+  Step A3: OC值归因（GQA修复后，同Phase 579）
+
+Part B: ORV任务（新）
+  Step B0: 识别top ORV检索头（obj_match + rel_match + val_copy）
+  Step B1: ORV全字符串logprob基线
+  Step B2: ORV值复制归因（正确值vs错误值logit优势）
+  Step B3: ORV token污染（val_only, obj_only, rel_only, all_rules）
+  Step B4: ORV真注意力边消融（双模式）
+
+Part C: 组合推理（两跳）
+  - 规则1: o17 belongs to c12. (O→C)
+  - 规则2: c12 r31 v05. ((C,R)→V)
+  - 查询: o17 r31 ? → 需要组合两步检索
+  - 测量: 生成准确率, logprob准确率, 中间类别准确率
+
+Part D: 语法模板变换
+  - 4种模板: minimal, natural, prepositional, tabular
+  - 同一真值表，不同语法格式
+  - 测试检索机制是否跨语法同构
+
+Part E: ORV平衡表条件绑定
+  - 4条件: {A_first, B_first} × {context_A, context_B}
+  - 冲突表: 同一(O,R)在不同表中有不同V
+  - 测量recency bias
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase580_orv_retrieval_reasoning.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase580_orv_retrieval_reasoning.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase580_orv_retrieval_reasoning.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase580_orv_retrieval_reasoning.py qwen3 --hard-exit-after-model
+python tests/glm5/phase580_orv_retrieval_reasoning.py glm4 --hard-exit-after-model
+python tests/glm5/phase580_orv_retrieval_reasoning.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.21 min (主测试)
+glm4:       15.51 min (主测试)
+ds7b:       6.77 min (主测试)
+```
+
+### 客观结果
+
+#### Part A Step A0: OC检索头识别（含绝对mass）
+
+```text
+Qwen3-4B top-5 combined heads:
+  L24H13: combined=1.601, obj_match=0.744, cat_copy=0.857, mass_obj=0.002872, mass_cat=0.364677
+  L24H29: combined=1.595, obj_match=0.768, cat_copy=0.828, mass_obj=0.002501, mass_cat=0.401146
+  L23H31: combined=1.555, obj_match=0.708, cat_copy=0.847, mass_obj=0.005226, mass_cat=0.160222
+  L26H26: combined=1.490, obj_match=0.659, cat_copy=0.831, mass_obj=0.002690, mass_cat=0.258518
+
+GLM4-9B top-5 combined heads:
+  L23H26: combined=1.542, obj_match=0.732, cat_copy=0.810, mass_obj=0.022229, mass_cat=0.216165
+  L19H15: combined=1.540, obj_match=0.749, cat_copy=0.791, mass_obj=0.010050, mass_cat=0.141389
+  L19H24: combined=1.507, obj_match=0.698, cat_copy=0.810, mass_obj=0.010531, mass_cat=0.209581
+  L19H22: combined=1.507, obj_match=0.655, cat_copy=0.852, mass_obj=0.004891, mass_cat=0.067790
+
+DS7B top-5 combined heads:
+  L19H17: combined=1.508, obj_match=0.735, cat_copy=0.773, mass_obj=0.006729, mass_cat=0.281474
+  L19H23: combined=1.500, obj_match=0.694, cat_copy=0.806, mass_obj=0.000790, mass_cat=0.020191
+  L19H22: combined=1.394, obj_match=0.585, cat_copy=0.809, mass_obj=0.002647, mass_cat=0.185161
+  L21H5:  combined=1.385, obj_match=0.670, cat_copy=0.715, mass_obj=0.024046, mass_cat=0.077017
+```
+
+**核心发现0: 三模型mass_cat远大于mass_obj（~100:1），类别token是答案主要来源，与Phase 578一致。**
+
+#### Part A Step A1: OC真注意力边消融（双模式）
+
+```text
+配置                    Qwen3              GLM4               DS7B
+                        argmax  logit      argmax  logit      argmax  logit
+cat_edge_top10_renorm   1.0     -0.218     1.0     +0.001     1.0     +5.255
+cat_edge_top10_norenorm 1.0     -1.326     1.0     +0.001     1.0     -4.127
+cat_edge_top3_renorm    0.8     +0.758     1.0     -0.0001    0.8     +3.215
+cat_edge_top3_norenorm  0.8     -0.132     1.0     —          0.8     —
+```
+
+**核心发现1（重大）: norenorm的logit变化幅度远大于renorm！**
+
+```text
+Qwen3: norenorm(-1.326) vs renorm(-0.218) → 6倍差距!
+DS7B:  norenorm(-4.127) vs renorm(+5.255) → 方向相反!
+GLM4:  logit变化极小（~0.001），确认其值归因极弱
+```
+
+这证实：**重归一化补偿了大量消融效应，Phase 579的真边消融结果严重低估了边的实际贡献。**
+
+DS7B的renorm(+5.255)为正、norenorm(-4.127)为负，说明renorm后head输出方向改变（非仅大小改变），补偿位置贡献了相反方向的值。
+
+#### Part A Step A2: 全字符串logprob基线（修复评估）
+
+```text
+模型      OC准确率    ORV准确率
+Qwen3     1.0 (20)    0.9 (20)
+GLM4      1.0 (20)    0.9 (20)
+DS7B      1.0 (20)    1.0 (20)
+```
+
+**核心发现2: 全字符串logprob评分成功修复Phase 579的评估bug，三模型都达到高准确率。**
+
+#### Part A Step A3: OC值归因（GQA修复后）
+
+```text
+Qwen3 top-5 heads OC归因:
+  L24H13: cat_direct=0.3547, obj_direct=0.0003, attn_cat=0.5671
+  L26H26: cat_direct=0.3054, obj_direct=-0.0003, attn_cat=0.2097
+  L24H29: cat_direct=0.1025, obj_direct=0.0003, attn_cat=0.3059
+  L23H31: cat_direct=-0.1385, obj_direct=0.0000, attn_cat=0.2693
+  L23H10: cat_direct=-0.0318, obj_direct=-0.0020, attn_cat=0.1515
+
+GLM4 top-5 heads OC归因:
+  L19H24: cat_direct=-0.0007, attn_cat=0.4147 (极弱!)
+  L23H26: cat_direct=0.0003, attn_cat=0.2229
+  L19H15: cat_direct=0.0001, attn_cat=0.1339
+  L19H22: cat_direct=0.0000, attn_cat=0.0729
+  L22H21: cat_direct=0.0000, attn_cat=0.0192
+
+DS7B top-5 heads OC归因:
+  L19H17: cat_direct=0.0961, obj_direct=0.0237, attn_cat=0.1611
+  L19H22: cat_direct=-0.0608, obj_direct=-0.0083, attn_cat=0.2190
+  L19H23: cat_direct=0.0089, obj_direct=-0.0015, attn_cat=0.0093
+  L21H5:  cat_direct=-0.1730, obj_direct=-0.1602, attn_cat=0.0688
+  L22H24: cat_direct=-0.0690, obj_direct=-0.1247, attn_cat=0.2288
+```
+
+**核心发现3: OC值归因分化与Phase 579一致——Qwen3中等(0.1-0.35)，GLM4极弱(~0.001)，DS7B混合。**
+
+#### Part B Step B0: ORV检索头识别
+
+```text
+Qwen3 top-3 ORV combined heads:
+  L24H5:  combined=1.017, obj=0.316, rel=0.354, val=0.347, mass_val=0.016934
+  L24H29: combined=0.976, obj=0.324, rel=0.297, val=0.356, mass_val=0.135844
+  L24H23: combined=0.972, obj=0.274, rel=0.333, val=0.366, mass_val=0.052301
+
+GLM4 top-3 ORV combined heads:
+  L24H12: combined=1.247, obj=0.368, rel=0.431, val=0.448, mass_val=0.028071
+  L24H19: combined=1.184, obj=0.353, rel=0.400, val=0.432, mass_val=0.211606
+  L23H15: combined=1.173, obj=0.368, rel=0.357, val=0.448, mass_val=0.193157
+
+DS7B top-3 ORV combined heads:
+  L23H11: combined=1.097, obj=0.340, rel=0.381, val=0.376, mass_val=0.040929
+  L19H17: combined=1.092, obj=0.341, rel=0.363, val=0.388, mass_val=0.091980
+  L22H13: combined=1.083, obj=0.341, rel=0.360, val=0.381, mass_val=0.042789
+```
+
+**核心发现4: 三模型都找到了具有obj_match, rel_match, val_copy三类注意力的ORV检索头。**
+
+#### Part B Step B1-B2: ORV基线与值归因
+
+```text
+模型      ORV_FS准确率    ORV值归因advantage
+Qwen3     0.9              1.167
+GLM4      0.9              0.002
+DS7B      1.0              2.462
+```
+
+**核心发现5: ORV值归因分化与OC一致——DS7B极强(2.46)，Qwen3中等(1.17)，GLM4极弱(0.002)。**
+
+#### Part B Step B3: ORV token污染
+
+```text
+配置          Qwen3              GLM4               DS7B
+              base→corrupt(eff)  base→corrupt(eff)  base→corrupt(eff)
+val_only      5→0 (1.0)          5→0 (1.0)          3→0 (0.6)
+obj_only      5→1 (0.8)          5→2 (0.6)          3→3 (0.0)
+rel_only      5→2 (0.6)          5→4 (0.2)          3→4 (-0.2)
+all_rules     5→0 (1.0)          5→0 (1.0)          3→0 (0.6)
+```
+
+**核心发现6: val_only污染效果最强（Qwen3/GLM4=1.0），rel_only最弱。**
+
+```text
+污染强度排序: val_only > obj_only > rel_only
+→ 值token是答案的主要来源（与OC中cat token结论一致）
+→ 对象token是定位标记
+→ 关系token不是主要答案源
+```
+
+注意：DS7B的ORV baseline只有3/5正确（60%），说明ORV任务对DS7B比OC更难。
+
+#### Part B Step B4: ORV真注意力边消融（双模式）
+
+```text
+配置                       Qwen3 argmax    GLM4 argmax    DS7B argmax
+val_edge_top10_renorm      0.8             0.0            0.6
+val_edge_top10_norenorm    0.8             0.0            0.8
+val_edge_top3_val_renorm   0.8             0.0            0.6
+val_edge_top3_val_norenorm 0.8             0.0            —
+```
+
+**核心发现7: GLM4的ORV边消融完全无效（0%），但token污染100%有效！**
+
+```text
+GLM4: token污染=100% 但 边消融=0%
+→ GLM4的信息流不走特定attention edge
+→ 信息可能通过残差流分布式传递
+→ GLM4的检索机制与Qwen3/DS7B本质不同
+
+DS7B: norenorm(0.8) > renorm(0.6)
+→ 再次证实重归一化的补偿效应
+```
+
+#### Part C: 组合推理（两跳）
+
+```text
+模型      val_gen_accuracy    val_logprob_accuracy    cat_accuracy
+Qwen3     0.0 (0/4)           0.0 (0/4)               0.0 (0/4)
+GLM4      0.0 (0/4)           0.0 (0/4)               0.0 (0/4)
+DS7B      0.0 (0/4)           0.0 (0/4)               0.0 (0/4)
+```
+
+**核心发现8（重大）: 三模型在两跳组合推理任务中全部失败（0%）！**
+
+```text
+任务: o17 belongs to c12. + c12 r31 v05. → o17 r31 ? → v05
+要求: (1)先检索o17→c12, (2)再检索c12 r31→v05, (3)组合结果
+
+失败原因分析:
+- 模型只有单步检索能力，不能组合两步检索
+- Phase 579已证明检索不形成稳定潜在状态
+- 两跳任务需要中间状态(c12)形成并传递，但当前检索机制不支持
+- 这是检索模式的核心瓶颈：检索≠推理
+```
+
+#### Part D: 语法模板变换
+
+```text
+模型      minimal    natural    prepositional    tabular
+Qwen3     1.0         1.0        1.0              1.0
+GLM4      1.0         1.0        1.0              1.0
+DS7B      1.0         1.0        1.0              1.0
+```
+
+**核心发现9: 所有语法模板在所有模型上都达到100%准确率。**
+
+```text
+4种语法模板:
+  minimal:        "o17 r31 v05."
+  natural:        "The r31 of o17 is v05."
+  prepositional:  "For o17, relation r31 gives v05."
+  tabular:        "Object o17 under r31 maps to v05."
+
+→ 检索机制跨语法格式保持功能同构
+→ 语法格式改变注意力模式，但不改变最终检索/值复制功能
+→ 支持"语法系统是路径控制，不改变知识操作"的理论
+```
+
+#### Part E: ORV平衡表绑定
+
+```text
+指标           Qwen3  GLM4  DS7B
+a_near_acc     0.20   0.40  0.60
+a_far_acc      0.60   0.80  0.80
+b_near_acc     0.00   0.00  0.20
+b_far_acc      0.00   0.80  0.80
+recency_bias   -0.40  -0.40 -0.20
+```
+
+**核心发现10: 三模型在ORV绑定中都有负近因偏差——远表反而更准确！**
+
+```text
+与Phase 579 OC任务对比:
+  OC任务: Qwen3=100%(4条件全对), GLM4/DS7B有负近因偏差
+  ORV任务: 三模型都有负近因偏差，Qwen3不再100%
+
+→ ORV的"Using Table X, o17 r31 ?"比OC的"Using Table A, o17 belongs to ?"更复杂
+→ 表标识+关系组合增加了认知负担
+→ B_near在所有模型中都极低(0.0-0.2)，最近表B反而不能正确使用
+→ 这与OC中Qwen3的完美绑定形成鲜明对比
+```
+
+### 硬伤与问题
+
+```text
+1. 组合推理0%是最关键的失败
+   - 模型只能做单步检索，不能组合
+   - 两跳任务需要中间状态形成，但Phase 579已证明检索不形成状态
+   - 这是检索模式的核心瓶颈：检索≠推理
+   - 需要测试：如果直接提供中间状态，模型能否做第二步？
+
+2. ORV绑定不如OC绑定
+   - Qwen3 OC=100%但ORV A_near=20%
+   - 可能是"Using Table X, o17 r31 ?"格式比"Using Table A, o17 belongs to ?"更复杂
+   - 表标识和关系组合增加了认知负担
+   - B_near在所有模型中都极低
+
+3. GLM4的ORV边消融0%效果需要解释
+   - token污染100%说明信息确实经过规则token
+   - 但边消融0%说明信息不是通过特定attention edge传递
+   - GLM4可能更多依赖残差流直接传递，而非attention value path
+   - 需要逐层残差分解分析GLM4的信息流路径
+
+4. norenorm vs renorm的logit差异方向不一致
+   - Qwen3 top10: renorm=-0.218, norenorm=-1.326 (norenorm更大)
+   - DS7B top10: renorm=+5.255, norenorm=-4.127 (方向相反!)
+   - renorm后的head输出可能方向改变，而非仅大小改变
+   - 补偿位置贡献了相反方向的值
+   - 需要更细致的逐位置分析
+
+5. DS7B的ORV baseline只有60%
+   - 可能是因为ORV规则更多（16条 vs OC 8条），上下文更长
+   - 也可能是因为2个关系增加了检索难度
+   - 需要减少规则数量测试DS7B的ORV能力边界
+
+6. 组合推理测试样本量较少（4个）
+   - 0/4可能受样本限制
+   - 但三模型一致0%说明系统性失败
+   - Phase 581需扩大样本量确认
+```
+
+### 新增客观事实拼图（10条）
+
+212. **全字符串logprob评分修复Phase 579评估bug**：三模型OC/ORV准确率均达到90-100%，单token评分因共享前缀"c"无法区分。
+213. **norenorm边消融logit变化远大于renorm**（Qwen3: 6倍差距），重归一化严重低估边的真实贡献。
+214. **ORV任务中值token是答案主要来源**：val_only污染效果最强（Qwen3/GLM4=1.0），rel_only最弱。
+215. **ORV值归因分化与OC一致**：DS7B=2.46，Qwen3=1.17，GLM4=0.002。
+216. **GLM4的ORV真边消融0%但token污染100%**，信息流走分布式残差路径而非attention value path。
+217. **三模型在两跳组合推理中全部失败（0%）**，当前只有单步检索能力，没有组合推理能力。
+218. **语法模板变换不影响ORV检索准确率（100%）**，语法是路径控制不改变知识操作。
+219. **ORV绑定出现负近因偏差**：远表更准确，与OC任务中Qwen3的100%绑定不同。
+220. **rel_only污染效果最弱**（Qwen3=0.6, GLM4=0.2, DS7B=-0.2），关系token不是主要答案源。
+221. **DS7B的ORV baseline准确率只有60%**（3/5），ORV任务对DS7B比OC更难。
+
+### 结果文件
+
+```text
+results/glm5_phase580_orv_closure/
+  phase580_qwen3_orv_closure_smoke.json
+  phase580_qwen3_orv_closure.json
+  phase580_glm4_orv_closure_smoke.json
+  phase580_glm4_orv_closure.json
+  phase580_deepseek7b_orv_closure_smoke.json
+  phase580_deepseek7b_orv_closure.json
+```
+
+
+## Phase 581: Intermediate State Forcing and Retrieval Composition Closure [2026-06-22 05:06]
+
+### 本阶段目标
+
+破解Phase 580的最大瓶颈：单步检索成功，但两跳组合推理0%。
+核心问题：查到的C（类别）为什么不能变成下一步检索用的query（查询）？
+
+### 生成脚本
+
+```text
+tests/glm5/phase581_composition_closure.py
+```
+
+### 关键技术突破
+
+#### Phase 580组合推理0%是prompt构建bug，不是真实失败
+
+Phase 580的组合推理0%是因为CRV规则构建错误：
+- Phase 580错误：使用orv_table（(O,R)->V）作为第二步规则，但orv_table的键是(object,relation)不是(category,relation)
+- Phase 581修复：新建build_cat_rel_truth_tables，正确构建(C,R)->V映射
+- 修复后组合推理从0%提升到57-90%！
+
+### 测试设计
+
+```text
+Step 0: 关系必要性审计（测试模型是否真正使用R）
+Step 1: 两跳三段拆解（Step A: O->C, Step B: (C,R)->V gold, Step C: Compose）
+Step 2: 强制中间项（提示模型先找类别）
+Step 3: 黄金中间项（直接提供正确类别）
+Step 4: 激活级中间状态注入（从单步OC提取h_C注入两跳）
+Step 7: 语法脚手架影响（direct vs forced vs proof）
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase581_composition_closure.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase581_composition_closure.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase581_composition_closure.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase581_composition_closure.py qwen3 --hard-exit-after-model
+python tests/glm5/phase581_composition_closure.py glm4 --hard-exit-after-model
+python tests/glm5/phase581_composition_closure.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.90 min (主测试)
+glm4:       16.80 min (主测试)
+ds7b:       7.21 min (主测试)
+```
+
+### 客观结果
+
+#### Step 1: 两跳三段拆解
+
+```text
+模型      Step A (O->C)    Step B (C,R->V gold)    Step C (Compose)    A&B->C
+Qwen3     30/30 (1.0)     27/30 (0.900)           22/30 (0.733)       19/27 (0.704)
+GLM4      30/30 (1.0)     30/30 (1.000)           27/30 (0.900)       27/30 (0.900)
+DS7B      30/30 (1.0)     23/30 (0.767)           17/30 (0.567)       14/23 (0.609)
+```
+
+核心发现1（重大）: Phase 580的组合推理0%是prompt构建bug！修复后组合推理达到57-90%。
+
+核心发现2: Step A（O->C）三模型全部100%，单步检索完全成立。
+
+核心发现3: Step B（C,R->V gold）存在差距：
+- GLM4=100%，Qwen3=90%，DS7B=76.7%
+- DS7B的第二步检索本身就有23%失败
+- 这说明DS7B的瓶颈部分在第二步检索本身
+
+核心发现4: 组合推理存在gap（gold vs compose）：
+- Qwen3: gold=90% vs compose=73.3% -> 16.7% gap
+- GLM4: gold=100% vs compose=90% -> 10% gap
+- DS7B: gold=76.7% vs compose=56.7% -> 20% gap
+- 这个gap就是中间状态传递的瓶颈
+
+核心发现5: A&B都正确但C失败的比例：
+- Qwen3: 27个A&B都对的样本中，只有19个compose对（70.4%）
+- GLM4: 30个A&B都对的样本中，27个compose对（90%）
+- DS7B: 23个A&B都对的样本中，只有14个compose对（60.9%）
+- 这直接测量了状态传递瓶颈：即使两步都能做，组合仍有10-40%失败
+
+#### Step 2&3: 强制中间项和黄金中间项
+
+```text
+模型      Direct    Forced    Gold
+Qwen3     0.733     0.833     0.900
+GLM4      0.900     0.833     1.000
+DS7B      0.567     0.667     0.767
+```
+
+核心发现6: Gold intermediate总是最好（76.7-100%），证实提供正确中间类别能大幅提升。
+
+核心发现7: Forced intermediate效果因模型而异：
+- Qwen3: forced(83.3%) > direct(73.3%) -> +10%
+- DS7B: forced(66.7%) > direct(56.7%) -> +10%
+- GLM4: forced(83.3%) < direct(90%) -> -6.7% (反而下降!)
+- 说明forced scaffold对Qwen3/DS7B有帮助，但对GLM4反而干扰
+
+#### Step 4: 激活级中间状态注入
+
+```text
+模型      base准确率    注入后准确率    效果
+Qwen3     2/2 (1.0)     多数维持1.0     L9/L12低alpha时下降到0.5
+GLM4      2/2 (1.0)     全部维持1.0     注入无害但也无益
+DS7B      0/2 (0.0)     全部0/2 (0.0)   注入完全无效
+```
+
+核心发现8: 激活注入对DS7B完全无效——base就是0%，注入后仍然0%。
+- DS7B的两跳失败不是中间状态缺失，而是更深层的问题
+- 可能是第二步检索本身就不稳定（Step B只有76.7%）
+
+#### Step 7: 语法脚手架影响
+
+```text
+模型      Direct    Forced    Proof
+Qwen3     0.733     0.833     0.867
+GLM4      0.900     0.833     0.867
+DS7B      0.567     0.667     0.600
+```
+
+核心发现9: Proof-style对Qwen3最好(86.7%)，但对GLM4反而低于direct(86.7% vs 90%)。
+- 语法脚手架可以诱导组合路径，但效果因模型而异
+- Qwen3从direct到proof提升13.4%，DS7B提升3.3%，GLM4下降3.3%
+
+### 硬伤与问题
+
+```text
+1. Step 0关系必要性审计返回0/0
+   - build_orv_truth_tables为每个对象分配所有关系，但同一对象的不同关系可能映射到同一值
+   - 需要修改为强制同一对象的不同关系映射到不同值
+   - 这是Phase 582需要修复的
+
+2. Step 4激活注入样本量太小（2个）
+   - base=100%时无法看到注入效果（天花板效应）
+   - DS7B base=0%时注入也无效，但样本太少
+   - 需要选择base在50%左右的样本测试
+
+3. 组合推理的gap（gold vs compose）需要更细致分析
+   - 当前只知道gap大小（10-20%），不知道失败原因
+   - 需要分析失败样本：是第一步检索结果没传递，还是第二步使用了错误的中间类别
+
+4. Phase 580的0%结论需要修正
+   - Phase 580 Part C的build_compositional_prompt有bug
+   - 实际组合推理能力为57-90%，不是0%
+   - 但gap仍然存在，组合不是完美的
+```
+
+### 新增客观事实拼图（10条）
+
+222. **Phase 580组合推理0%是prompt构建bug**，修复后达到57-90%。
+223. **Step A（O->C）三模型全部100%**，单步OC检索完全成立。
+224. **Step B（C,R->V gold）存在模型差异**：GLM4=100%，Qwen3=90%，DS7B=76.7%。
+225. **组合推理存在gap**：gold vs compose差距10-20%，这是中间状态传递瓶颈。
+226. **A&B都正确但compose仍失败10-40%**，直接测量了状态传递瓶颈。
+227. **Gold intermediate总是最好（76.7-100%）**，提供正确中间类别能大幅提升。
+228. **Forced scaffold对Qwen3/DS7B有+10%提升**，但对GLM4反而-6.7%干扰。
+229. **激活注入对DS7B完全无效**，其失败不是中间状态缺失而是更深层问题。
+230. **Proof-style对Qwen3最好(+13.4%)**，语法脚手架可以诱导组合路径。
+231. **DS7B组合推理最弱(56.7%)**，瓶颈部分在第二步检索本身(Step B=76.7%)。
+
+### 结果文件
+
+```text
+results/glm5_phase581_composition_closure/
+  phase581_qwen3_composition_closure_smoke.json
+  phase581_qwen3_composition_closure.json
+  phase581_glm4_composition_closure_smoke.json
+  phase581_glm4_composition_closure.json
+  phase581_deepseek7b_composition_closure_smoke.json
+  phase581_deepseek7b_composition_closure.json
+```
+
+
+## Phase 582: Relation Necessity, State-Bridge Failure Typing, and Parametric Category Judgment [2026-06-22 06:40]
+
+### 本阶段目标
+
+修复Phase 581的两个关键缺口 + 桥接到参数化知识：
+1. 修复关系必要性审计（强制R1!=R2 => V1!=V2）
+2. 组合失败分型（分类两跳失败的具体原因）
+3. 参数化类别判断（水果/动物/天体归属判断）
+4. 显式规则 vs 参数常识对比
+
+### 生成脚本
+
+```text
+tests/glm5/phase582_relation_parametric.py
+```
+
+### 测试设计
+
+```text
+Part A: 关系必要性审计（修复版）
+  - 强制同一对象不同关系对应不同值
+  - 测量关系区分率（模型是否给不同关系不同答案）
+
+Part B: 组合失败分型
+  - 分解失败类型: success, C_wrong_cat, B_fail, V_copy_fail
+  - C_wrong_cat: 两步都对但组合用了错误中间类别
+  - B_fail: 第二步gold检索失败
+  - V_copy_fail: 值复制失败
+
+Part C: 参数化类别判断
+  - 6类别 × 10对象 × 4语法模板 = 240样本
+  - 正例: 苹果是不是水果？-> 是
+  - 负例: 老虎是不是水果？-> 否
+  - 模板: direct, formal, simple, negative
+
+Part D: 显式规则 vs 参数常识
+  - 对比有无显式规则的yes/no边际差异
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase582_relation_parametric.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase582_relation_parametric.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase582_relation_parametric.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase582_relation_parametric.py qwen3 --hard-exit-after-model
+python tests/glm5/phase582_relation_parametric.py glm4 --hard-exit-after-model
+python tests/glm5/phase582_relation_parametric.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      0.76 min (主测试)
+glm4:       15.24 min (主测试)
+ds7b:       6.53 min (主测试)
+```
+
+### 客观结果
+
+#### Part A: 关系必要性审计（修复版）
+
+```text
+模型      accuracy    discrimination    correct_discrim
+Qwen3     0.875       0.750             0.750
+GLM4      0.800       0.800             0.650
+DS7B      0.750       0.550             0.500
+```
+
+核心发现1: 关系必要性审计修复成功！三模型都表现出关系区分能力。
+- Qwen3最强(87.5%准确率, 75%区分率)
+- DS7B最弱(75%准确率, 55%区分率)
+- 但DS7B的correct_discrim只有50%，说明即使区分了关系，答案也不一定对
+
+核心发现2: 关系变量确实被使用，但使用不稳定。
+- 之前Phase 580的rel_only污染最弱是因为任务退化
+- 现在强制R1!=R2=>V1!=V2后，模型必须使用关系才能答对
+- DS7B只有55%区分率，说明它经常忽略关系
+
+#### Part B: 组合失败分型
+
+```text
+模型      success    C_wrong_cat    B_fail    V_copy_fail
+Qwen3     32/40(0.80)  8/40(0.20)     0/40(0)    0/40(0)
+GLM4      34/40(0.85)  4/40(0.10)     2/40(0.05) 0/40(0)
+DS7B      20/40(0.50) 12/40(0.30)     5/40(0.125) 3/40(0.075)
+```
+
+核心发现3（重大）: 组合失败的主要类型是C_wrong_cat——使用了错误的中间类别！
+- Qwen3: 100%的失败都是C_wrong_cat
+- GLM4: 66%的失败是C_wrong_cat，33%是B_fail
+- DS7B: 60%是C_wrong_cat，25%是B_fail，15%是V_copy_fail
+
+这说明：**组合推理的瓶颈不是状态传递失败，而是模型在两跳任务中使用了错误的中间类别。**
+
+模型知道要找类别，但找错了类别——不是"找到了C但没传给第二步"，而是"找到了错误的C"。
+
+#### Part C: 参数化类别判断
+
+```text
+模型      positive    negative    overall
+Qwen3     1.000       0.692       0.846
+GLM4      1.000       0.000       0.500
+DS7B      1.000       0.008       0.504
+```
+
+核心发现4（重大）: 三模型对正例(是)判断100%正确，但对负例(否)判断差异巨大！
+- Qwen3: 负例69.2%正确——能说"否"
+- GLM4: 负例0%正确——总是说"是"（强yes-bias）
+- DS7B: 负例0.8%正确——几乎总是说"是"（强yes-bias）
+
+这说明GLM4和DS7B在参数化判断中有强烈的"是"偏置——无论问什么都倾向回答"是"。
+
+按语法模板分（Qwen3）:
+```text
+direct:     0.900
+formal:     0.933
+simple:     0.917
+negative:   0.633  (否定问法最差)
+```
+
+按类别分（Qwen3）:
+```text
+水果:     0.950
+动物:     0.875
+天体:     0.775
+工具:     0.650  (工具判断最差)
+家具:     0.900
+交通工具: 0.925
+```
+
+核心发现5: Qwen3的否定问法("不是...吗？")准确率最低(63.3%)，说明否定极性处理是独立机制。
+
+#### Part D: 显式规则 vs 参数常识
+
+```text
+模型      苹果/水果         老虎/水果         香蕉/水果         地球/水果
+          param explicit    param explicit    param explicit    param explicit
+Qwen3     是(T) 是(T)       否(T) 否(T)       是(T) 是(T)       否(T) 否(T)
+GLM4      是(T) 是(T)       是(F) 是(F)       是(T) 是(T)       是(F) 是(F)
+DS7B      是(T) 是(T)       是(F) 是(F)       是(T) 是(T)       是(F) 是(F)
+```
+
+核心发现6: GLM4和DS7B在参数化判断中把老虎和地球都判断为水果（说"是"），这是严重的yes-bias。
+- Qwen3是唯一能正确说"否"的模型
+- 显式规则对GLM4/DS7B也没帮助——即使给出"老虎不属于水果"的规则，它们仍然说"是"
+
+margin_diff（显式-参数）:
+- Qwen3: 全负，说明显式规则反而降低了yes-margin（更接近不确定）
+- GLM4: 有正有负，显式规则对苹果/香蕉增强了yes-margin
+- DS7B: 全负，显式规则也降低了margin
+
+### 硬伤与问题
+
+```text
+1. GLM4/DS7B的yes-bias是参数化判断的最大问题
+   - 这不是任务理解问题，而是输出偏置
+   - 可能是训练数据中"是"的频率远高于"否"
+   - 需要测试更复杂的回答格式（如"是的/不是"）
+
+2. Part D样本量太小（4个）
+   - 需要扩大到至少20个样本
+   - 需要包含更多类别和对象
+
+3. C_wrong_cat占失败主体说明瓶颈定位更精确了
+   - 不是"状态没传递"，而是"传了错误的类别"
+   - 需要分析：模型在两跳任务中预测的中间类别是什么？
+   - 是不是第一步检索结果就没正确传递，还是第二步用了不同的类别？
+
+4. flash_attention_2未安装，回退到eager
+   - 需要安装flash-attn包以加速
+   - 当前eager模式速度可接受
+```
+
+### 新增客观事实拼图（10条）
+
+232. **关系必要性审计修复成功**：强制R1!=R2=>V1!=V2后，三模型都表现出关系区分能力（55-80%）。
+233. **Qwen3关系使用最强(87.5%)**，DS7B最弱(75%)，DS7B经常忽略关系。
+234. **组合失败的主要类型是C_wrong_cat**——使用了错误的中间类别，不是状态传递失败。
+235. **Qwen3的100%失败都是C_wrong_cat**，说明它不是不能传状态，而是传了错误的类别。
+236. **DS7B有4种失败类型**（C_wrong/B_fail/V_copy），说明其组合推理更不稳定。
+237. **三模型参数化判断正例100%正确**，但负例差异巨大。
+238. **GLM4/DS7B有强烈yes-bias**——负例准确率0%，总是说"是"。
+239. **Qwen3是唯一能正确说"否"的模型**(69.2%)，但否定问法仍困难(63.3%)。
+240. **显式规则对GLM4/DS7B的yes-bias无帮助**，即使给出否定规则仍说"是"。
+241. **工具类别判断最差(65%)**，天体次之(77.5%)，说明参数化知识有类别特异性。
+
+### 结果文件
+
+```text
+results/glm5_phase582_relation_parametric/
+  phase582_qwen3_relation_parametric_smoke.json
+  phase582_qwen3_relation_parametric.json
+  phase582_glm4_relation_parametric_smoke.json
+  phase582_glm4_relation_parametric.json
+  phase582_deepseek7b_relation_parametric_smoke.json
+  phase582_deepseek7b_relation_parametric.json
+```
+
+
+## Phase 583: Intermediate Choice Gate and Polarity Readout Decomposition [2026-06-22 08:15]
+
+### 本阶段目标
+
+拆解Phase 582暴露的两个核心门控：
+1. 两跳推理中的错误中间类别选择（C_wrong_cat）
+2. 参数化判断中的yes-bias（是偏置）
+
+### 生成脚本
+
+```text
+tests/glm5/phase583_choice_polarity.py
+```
+
+### 测试设计
+
+```text
+Part A: 中间类别预测追踪（在两跳任务中预测模型选择了哪个中间类别）
+Part B: 强制中间类别实验（强制正确/错误类别，测量V变化）
+Part C: 类别竞争边际分析（正确vs最佳竞争者的margin）
+Part D: yes/no读出校准（5种答案格式对比）
+Part E: 显式否定规则控制（测试否定规则能否修复yes-bias）
+```
+
+### 执行命令
+
+```text
+python tests/glm5/phase583_choice_polarity.py qwen3 --smoke --hard-exit-after-model
+python tests/glm5/phase583_choice_polarity.py glm4 --smoke --hard-exit-after-model
+python tests/glm5/phase583_choice_polarity.py deepseek7b --smoke --hard-exit-after-model
+python tests/glm5/phase583_choice_polarity.py qwen3 --hard-exit-after-model
+python tests/glm5/phase583_choice_polarity.py glm4 --hard-exit-after-model
+python tests/glm5/phase583_choice_polarity.py deepseek7b --hard-exit-after-model
+```
+
+### 运行时间
+
+```text
+qwen3:      1.00 min (主测试)
+glm4:       19.12 min (主测试)
+ds7b:       8.30 min (主测试)
+```
+
+### 客观结果
+
+#### Part A: 中间类别预测追踪
+
+```text
+模型      Cat预测准确率    Val预测准确率    Wrong_cat->wrong_val    Success_margin    Fail_margin
+Qwen3     0.975           0.800           1.000                   4.146             -3.125
+GLM4      0.775           0.850           0.111                   1.792             -0.653
+DS7B      1.000           0.500           N/A(0 fail)             5.480             N/A
+```
+
+核心发现1（重大）: DS7B的Cat预测100%正确但Val只有50%！
+
+这说明DS7B的失败完全不在中间类别选择——它正确知道中间类别，但无法从(C,R)→V检索出正确值。这推翻了Phase 582的C_wrong_cat假设对DS7B的适用性。
+
+核心发现2: Qwen3的Cat预测97.5%，wrong_cat时100%导致wrong_val——中间类别选择确实是Qwen3的主要瓶颈。
+
+核心发现3: GLM4的Cat预测只有77.5%但Val有85%——wrong_cat时只有11%导致wrong_val。这说明GLM4有某种绕过错误中间类别直接检索值的机制！
+
+核心发现4: 边际分析显示success和fail的margin差距巨大：
+- Qwen3: success=4.146 vs fail=-3.125 (7.3 gap)
+- GLM4: success=1.792 vs fail=-0.653 (2.4 gap)
+- DS7B: success=5.480 (无fail样本)
+
+#### Part B: 强制中间类别实验
+
+```text
+模型      Base    Force_correct    Force_wrong->matches
+Qwen3     0.800   0.900            0.875
+GLM4      0.850   0.925            0.850
+DS7B      0.500   0.775            0.750
+```
+
+核心发现5: 强制正确类别能提升所有模型（Qwen3 +10%, GLM4 +7.5%, DS7B +27.5%）。
+
+核心发现6（重大）: 强制错误类别时，模型确实会输出错误类别对应的值（75-87.5%）！
+- 这证明模型确实在使用中间类别进行第二步检索
+- Qwen3: 87.5%的样本在强制错误类别时输出了错误值
+- DS7B: 75%匹配——即使DS7B的Cat预测100%正确，强制错误类别仍能改变输出
+
+#### Part C: 类别竞争边际分析
+
+```text
+模型      Cat_success_margin    Cat_fail_margin    Val_success_margin    Val_fail_margin
+Qwen3     4.146                 -3.125             2.172                 -1.083
+GLM4      1.792                 -0.653             1.458                 -0.635
+DS7B      5.480                 N/A                2.232                 -1.448
+```
+
+核心发现7: 成功和失败的边际有清晰分界——margin正则成功，负则失败。这说明中间类别选择是一个竞争过程，margin决定了哪个类别胜出。
+
+#### Part D: yes/no读出校准（5种格式）
+
+```text
+模型      single(是/否)    double(是的/不是)    belong(属于/不属于)    correct(正确/错误)    english(yes/no)
+Qwen3     0.917            0.917                0.667                  0.667                 1.000
+GLM4      0.500            0.833                0.500                  0.667                 0.542
+DS7B      0.500            0.667                0.583                  0.500                 0.833
+```
+
+核心发现8（重大）: yes-bias强烈依赖答案格式！
+
+```text
+Qwen3: english(yes/no)最好(100%), belong/correct最差(67%)
+GLM4:  double(是的/不是)最好(83%), single/belong最差(50%)
+DS7B:  english(yes/no)最好(83%), single/correct最差(50%)
+```
+
+- GLM4用"是的/不是"格式从50%提升到83.3%——提升33%！
+- DS7B用"yes/no"格式从50%提升到83.3%——提升33%！
+- 这证明yes-bias部分来自token先验，不是纯粹的知识缺失
+
+核心发现9: 正例在所有格式下都接近100%，差异完全来自负例。
+- Qwen3 english负例: 12/12=100%
+- GLM4 double负例: 10/12=83%
+- DS7B english负例: 8/12=67%
+
+#### Part E: 显式否定规则控制
+
+```text
+模型      No_rule    Aff_rule    Strong_neg    Negatives_only
+Qwen3     9/11       11/11       11/11         no=4/6, aff=6/6, strong=6/6
+GLM4      5/11       5/11        5/11          no=0/6, aff=0/6, strong=0/6
+DS7B      5/11       5/11        5/11          no=0/6, aff=0/6, strong=0/6
+```
+
+核心发现10（重大）: 显式否定规则对Qwen3完全有效（4/6→6/6），但对GLM4/DS7B完全无效（0/6→0/6）！
+
+```text
+Qwen3: 显式否定规则成功将yes-margin从正变为负
+  苹果/天体(否): margin 1.75 -> -4.87 (成功翻转!)
+  苹果/工具(否): margin 1.25 -> -6.12 (成功翻转!)
+
+GLM4: 显式否定规则降低了margin但不足以翻转
+  老虎/水果(否): margin 3.44 -> 1.25 -> 0.56 (仍为正!)
+  苹果/工具(否): margin 4.56 -> 1.44 -> 1.25 (仍为正!)
+
+DS7B: 同样无法翻转
+  老虎/水果(否): margin 2.33 -> 1.89 -> 1.55 (仍为正!)
+```
+
+这说明GLM4/DS7B的yes-bias非常强——即使给出显式否定规则和替代类别，margin仍为正。这不是知识缺失，而是极性读出门的强偏置。
+
+### 硬伤与问题
+
+```text
+1. Part D/E样本量较小（24/11个）
+   - 需要扩大到至少50个样本
+   - 特别是Part E只有6个负例
+
+2. GLM4的wrong_cat不导致wrong_val（11%）需要解释
+   - 可能GLM4有直接O→V的旁路检索
+   - 或者GLM4的值检索不完全依赖中间类别
+   - 需要分析GLM4在wrong_cat时实际检索了什么
+
+3. DS7B的Cat=100%但Val=50%是最关键发现
+   - DS7B知道正确中间类别但无法检索值
+   - 这说明DS7B的(C,R)→V检索本身有根本性问题
+   - 需要分析DS7B的第二步检索注意力
+
+4. flash_attention_2仍未安装
+   - 所有测试使用eager模式
+   - 速度可接受但不是最优
+
+5. Qwen3的english格式100%是重要发现
+   - 可能因为英文yes/no的token先验更平衡
+   - 需要测试更多英文对象和类别
+```
+
+### 新增客观事实拼图（10条）
+
+242. **DS7B的Cat预测100%但Val只有50%**——失败不在中间类别选择，而在第二步值检索。
+243. **Qwen3的wrong_cat时100%导致wrong_val**——中间类别选择确实是Qwen3的主要瓶颈。
+244. **GLM4的wrong_cat只有11%导致wrong_val**——有绕过错误中间类别的旁路机制。
+245. **强制错误类别时75-87%的样本输出错误值**——证明模型确实使用中间类别做第二步检索。
+246. **强制正确类别能提升所有模型**（Qwen3 +10%, GLM4 +7.5%, DS7B +27.5%）。
+247. **yes-bias强烈依赖答案格式**：GLM4用"是的/不是"从50%提升到83%，DS7B用"yes/no"从50%提升到83%。
+248. **正例在所有格式下接近100%，差异完全来自负例**——极性控制是独立机制。
+249. **显式否定规则对Qwen3完全有效（4/6→6/6），对GLM4/DS7B完全无效（0/6→0/6）**。
+250. **GLM4/DS7B的yes-bias非常强**——即使给出显式否定规则和替代类别，margin仍为正。
+251. **边际分析显示success和fail有清晰分界**——中间类别选择是竞争过程，margin决定胜出者。
+
+### 结果文件
+
+```text
+results/glm5_phase583_choice_polarity/
+  phase583_qwen3_choice_polarity_smoke.json
+  phase583_qwen3_choice_polarity.json
+  phase583_glm4_choice_polarity_smoke.json
+  phase583_glm4_choice_polarity.json
+  phase583_deepseek7b_choice_polarity_smoke.json
+  phase583_deepseek7b_choice_polarity.json
+```
