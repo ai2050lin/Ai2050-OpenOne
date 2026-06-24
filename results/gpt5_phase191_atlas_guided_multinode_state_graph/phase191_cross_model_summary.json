@@ -1,0 +1,1163 @@
+{
+  "phase": 191,
+  "models": [
+    {
+      "model": "qwen3",
+      "source": "results/gpt5_phase191_atlas_guided_multinode_state_graph/phase191_qwen3_atlas_guided_multinode_state_graph_confirm.json",
+      "n_cases": 128,
+      "n_target_cases_seen": 11,
+      "n_rows": 11,
+      "total_time_min": 1.8809053262074789,
+      "atlas_target": {
+        "node_source": "Phase594 MLP update nodes",
+        "edge": "candidate-specific ranking repair",
+        "old_level": "Level3 strong transition / weak Level4 channel contribution",
+        "target_level": "Level4/5 if signal graph beats controls",
+        "stop_condition": "if multi-node signal does not beat matched controls, stop static z-patch route and move to forward dynamics"
+      },
+      "nodes": [
+        {
+          "position": "prompt_last",
+          "layer": 34,
+          "phase594": {
+            "key": "prompt_last|L34|mlp_update",
+            "position": "prompt_last",
+            "layer": 34,
+            "source": "mlp_update",
+            "n": 5,
+            "mean_common": -1.6969326734542847,
+            "mean_correct_delta": -1.5513801097869873,
+            "mean_old_top_wrong_delta": -2.219262886047363,
+            "mean_correct_specific": 0.14555256366729735,
+            "mean_old_top_wrong_specific": -0.5223302125930787,
+            "mean_specific_margin": 0.667882776260376,
+            "positive_rate": 0.8
+          }
+        },
+        {
+          "position": "query_category",
+          "layer": 32,
+          "phase594": {
+            "key": "query_category|L32|mlp_update",
+            "position": "query_category",
+            "layer": 32,
+            "source": "mlp_update",
+            "n": 5,
+            "mean_common": -0.9751201152801514,
+            "mean_correct_delta": -0.7504322767257691,
+            "mean_old_top_wrong_delta": -1.1949351668357848,
+            "mean_correct_specific": 0.22468783855438232,
+            "mean_old_top_wrong_specific": -0.21981505155563355,
+            "mean_specific_margin": 0.44450289011001587,
+            "positive_rate": 0.8
+          }
+        },
+        {
+          "position": "prompt_last",
+          "layer": 32,
+          "phase594": {
+            "key": "prompt_last|L32|mlp_update",
+            "position": "prompt_last",
+            "layer": 32,
+            "source": "mlp_update",
+            "n": 5,
+            "mean_common": 0.37036213278770447,
+            "mean_correct_delta": 0.462690132856369,
+            "mean_old_top_wrong_delta": 0.31248022317886354,
+            "mean_correct_specific": 0.09232800006866455,
+            "mean_old_top_wrong_specific": -0.057881909608840945,
+            "mean_specific_margin": 0.1502099096775055,
+            "positive_rate": 1.0
+          }
+        }
+      ],
+      "best_signal": [
+        {
+          "key": "prompt_last@L34+prompt_last@L32|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.10218481326195285,
+          "mean_common_delta": -1.1708491767868425,
+          "positive_margin_rate": 0.8181818181818182
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.06810798265558499,
+          "mean_common_delta": -0.9290843978431605,
+          "positive_margin_rate": 0.7272727272727273
+        },
+        {
+          "key": "prompt_last@L32|combo_correct_minus_old_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.05681522870674433,
+          "mean_common_delta": 0.013347721428792945,
+          "positive_margin_rate": 0.7272727272727273
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32|combo_correct_minus_old_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.05673810842431108,
+          "mean_common_delta": -0.1599629206013395,
+          "positive_margin_rate": 0.6363636363636364
+        },
+        {
+          "key": "prompt_last@L34+prompt_last@L32|combo_margin_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.05671631354859776,
+          "mean_common_delta": -0.25995761620354396,
+          "positive_margin_rate": 0.7272727272727273
+        },
+        {
+          "key": "query_category@L32+prompt_last@L32|combo_correct_minus_old_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.04549730022236789,
+          "mean_common_delta": -0.014662369278746402,
+          "positive_margin_rate": 0.7272727272727273
+        },
+        {
+          "key": "query_category@L32+prompt_last@L32|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.04542979037135162,
+          "mean_common_delta": -0.09762704538893145,
+          "positive_margin_rate": 0.45454545454545453
+        },
+        {
+          "key": "prompt_last@L32|combo_correct_minus_old_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.04539875307289714,
+          "mean_common_delta": 0.003716487569115336,
+          "positive_margin_rate": 0.5454545454545454
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32+prompt_last@L32|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 3,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.04536446052423509,
+          "mean_common_delta": -0.4080977875921896,
+          "positive_margin_rate": 0.6363636363636364
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32|combo_margin_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.034099661771589046,
+          "mean_common_delta": -0.19667736366219205,
+          "positive_margin_rate": 0.7272727272727273
+        }
+      ],
+      "best_control": [
+        {
+          "key": "query_category@L32+prompt_last@L32|shuffled_combo_margin_top128|shuffled_node_control|a2",
+          "kind": "shuffled_node_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.0682026560415662,
+          "mean_common_delta": -0.22678833308567514,
+          "positive_margin_rate": 0.7272727272727273
+        },
+        {
+          "key": "prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.06816189796716737,
+          "mean_common_delta": 0.0535655251038737,
+          "positive_margin_rate": 0.6363636363636364
+        },
+        {
+          "key": "query_category@L32+prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.06803566160405436,
+          "mean_common_delta": 0.06229509082153196,
+          "positive_margin_rate": 0.6363636363636364
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32+prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 3,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.04531697734968144,
+          "mean_common_delta": -1.6197242089944088,
+          "positive_margin_rate": 0.5454545454545454
+        },
+        {
+          "key": "query_category@L32+prompt_last@L32|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.03418376127294984,
+          "mean_common_delta": -0.10461053186901897,
+          "positive_margin_rate": 0.8181818181818182
+        },
+        {
+          "key": "query_category@L32|wrong_relation_top128|wrong_relation_control|a1",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.034055969278349286,
+          "mean_common_delta": -0.0033142459420063956,
+          "positive_margin_rate": 0.45454545454545453
+        },
+        {
+          "key": "prompt_last@L34+prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.03404839602246119,
+          "mean_common_delta": -1.6355859707341138,
+          "positive_margin_rate": 0.6363636363636364
+        },
+        {
+          "key": "query_category@L32|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.03399209972254043,
+          "mean_common_delta": -0.0004313667824052655,
+          "positive_margin_rate": 0.5454545454545454
+        },
+        {
+          "key": "prompt_last@L34|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.02270647923366844,
+          "mean_common_delta": -0.006921994947664312,
+          "positive_margin_rate": 0.5454545454545454
+        },
+        {
+          "key": "prompt_last@L34+query_category@L32|shuffled_combo_margin_top128|shuffled_node_control|a1",
+          "kind": "shuffled_node_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 11,
+          "switch_rate": 0.09090909090909091,
+          "mean_margin_gain": 0.022691329348493706,
+          "mean_common_delta": 0.033812429808180736,
+          "positive_margin_rate": 0.5454545454545454
+        }
+      ],
+      "by_size": {
+        "1": {
+          "best_signal": {
+            "key": "prompt_last@L32|combo_correct_minus_old_top128|signal|a2",
+            "kind": "signal",
+            "set_size": 1,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.05681522870674433,
+            "mean_common_delta": 0.013347721428792945,
+            "positive_margin_rate": 0.7272727272727273
+          },
+          "best_control": {
+            "key": "prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+            "kind": "wrong_relation_control",
+            "set_size": 1,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.06816189796716737,
+            "mean_common_delta": 0.0535655251038737,
+            "positive_margin_rate": 0.6363636363636364
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 1,
+          "signal_max_margin": 0.0680740590389839,
+          "control_max_margin": 0.06816189796716737
+        },
+        "2": {
+          "best_signal": {
+            "key": "prompt_last@L34+prompt_last@L32|combo_margin_top128|signal|a2",
+            "kind": "signal",
+            "set_size": 2,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.10218481326195285,
+            "mean_common_delta": -1.1708491767868425,
+            "positive_margin_rate": 0.8181818181818182
+          },
+          "best_control": {
+            "key": "query_category@L32+prompt_last@L32|shuffled_combo_margin_top128|shuffled_node_control|a2",
+            "kind": "shuffled_node_control",
+            "set_size": 2,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.0682026560415662,
+            "mean_common_delta": -0.22678833308567514,
+            "positive_margin_rate": 0.7272727272727273
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 1,
+          "signal_max_margin": 0.10218481326195285,
+          "control_max_margin": 0.0682026560415662
+        },
+        "3": {
+          "best_signal": {
+            "key": "prompt_last@L34+query_category@L32+prompt_last@L32|raw_delta|signal|a1",
+            "kind": "signal",
+            "set_size": 3,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.04536446052423509,
+            "mean_common_delta": -0.4080977875921896,
+            "positive_margin_rate": 0.6363636363636364
+          },
+          "best_control": {
+            "key": "prompt_last@L34+query_category@L32+prompt_last@L32|wrong_relation_top128|wrong_relation_control|a2",
+            "kind": "wrong_relation_control",
+            "set_size": 3,
+            "switch": 1,
+            "n": 11,
+            "switch_rate": 0.09090909090909091,
+            "mean_margin_gain": 0.04531697734968144,
+            "mean_common_delta": -1.6197242089944088,
+            "positive_margin_rate": 0.5454545454545454
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 1,
+          "signal_max_margin": 0.12491706189493099,
+          "control_max_margin": 0.04531697734968144
+        }
+      },
+      "max_signal_switch": 1,
+      "max_control_switch": 1,
+      "max_signal_margin": 0.12491706189493099,
+      "max_control_margin": 0.0682026560415662,
+      "evidence_update": "downgrade_or_hold_due_to_control_pollution"
+    },
+    {
+      "model": "glm4",
+      "source": "results/gpt5_phase191_atlas_guided_multinode_state_graph/phase191_glm4_atlas_guided_multinode_state_graph_confirm.json",
+      "n_cases": 128,
+      "n_target_cases_seen": 22,
+      "n_rows": 22,
+      "total_time_min": 5.0591671427090965,
+      "atlas_target": {
+        "node_source": "Phase594 MLP update nodes",
+        "edge": "candidate-specific ranking repair",
+        "old_level": "Level3 strong transition / weak Level4 channel contribution",
+        "target_level": "Level4/5 if signal graph beats controls",
+        "stop_condition": "if multi-node signal does not beat matched controls, stop static z-patch route and move to forward dynamics"
+      },
+      "nodes": [
+        {
+          "position": "prompt_last",
+          "layer": 38,
+          "phase594": {
+            "key": "prompt_last|L38|mlp_update",
+            "position": "prompt_last",
+            "layer": 38,
+            "source": "mlp_update",
+            "n": 4,
+            "mean_common": -0.24257372273132205,
+            "mean_correct_delta": -0.12013190984725952,
+            "mean_old_top_wrong_delta": -0.44996532052755356,
+            "mean_correct_specific": 0.12244181288406253,
+            "mean_old_top_wrong_specific": -0.2073915977962315,
+            "mean_specific_margin": 0.32983341068029404,
+            "positive_rate": 0.75
+          }
+        },
+        {
+          "position": "prompt_last",
+          "layer": 37,
+          "phase594": {
+            "key": "prompt_last|L37|mlp_update",
+            "position": "prompt_last",
+            "layer": 37,
+            "source": "mlp_update",
+            "n": 4,
+            "mean_common": 0.017222881317138672,
+            "mean_correct_delta": 0.07585980743169785,
+            "mean_old_top_wrong_delta": -0.018319327384233475,
+            "mean_correct_specific": 0.058636926114559174,
+            "mean_old_top_wrong_specific": -0.03554220870137215,
+            "mean_specific_margin": 0.09417913481593132,
+            "positive_rate": 0.75
+          }
+        },
+        {
+          "position": "prompt_last",
+          "layer": 39,
+          "phase594": {
+            "key": "prompt_last|L39|mlp_update",
+            "position": "prompt_last",
+            "layer": 39,
+            "source": "mlp_update",
+            "n": 4,
+            "mean_common": 0.010576566681265831,
+            "mean_correct_delta": -0.007089734077453613,
+            "mean_old_top_wrong_delta": -0.05367395281791687,
+            "mean_correct_specific": -0.017666300758719444,
+            "mean_old_top_wrong_specific": -0.0642505194991827,
+            "mean_specific_margin": 0.04658421874046326,
+            "positive_rate": 0.5
+          }
+        }
+      ],
+      "best_signal": [
+        {
+          "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 3,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -6.773255088112571e-10,
+          "mean_common_delta": -0.22154165448790247,
+          "positive_margin_rate": 0.4090909090909091
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -6.773255088112571e-10,
+          "mean_common_delta": -0.08676992475309155,
+          "positive_margin_rate": 0.4090909090909091
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L39|raw_delta|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -0.005681807344610041,
+          "mean_common_delta": -0.16753111237829382,
+          "positive_margin_rate": 0.5
+        },
+        {
+          "key": "prompt_last@L38|raw_delta|signal|a2",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -0.005681807344610041,
+          "mean_common_delta": 0.2728024436668916,
+          "positive_margin_rate": 0.5
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|combo_correct_minus_old_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 3,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -0.011363639750263908,
+          "mean_common_delta": -0.19158399291336536,
+          "positive_margin_rate": 0.2727272727272727
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37|combo_correct_minus_old_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 22,
+          "switch_rate": 0.045454545454545456,
+          "mean_margin_gain": -0.011363639750263908,
+          "mean_common_delta": 0.014088542115959253,
+          "positive_margin_rate": 0.2727272727272727
+        },
+        {
+          "key": "prompt_last@L39|combo_correct_minus_old_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": 0.048612540418451484,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|combo_correct_minus_old_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": -0.1686348569664088,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|combo_margin_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": 0.08675690401684154,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": -0.17121587219563397,
+          "positive_margin_rate": 0.0
+        }
+      ],
+      "best_control": [
+        {
+          "key": "prompt_last@L37+prompt_last@L39|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 1.0159882632168856e-08,
+          "mean_common_delta": -0.04655322009189562,
+          "positive_margin_rate": 0.2727272727272727
+        },
+        {
+          "key": "prompt_last@L37|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 1.0159882632168856e-08,
+          "mean_common_delta": 0.0007076603783802552,
+          "positive_margin_rate": 0.2727272727272727
+        },
+        {
+          "key": "prompt_last@L39|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": 0.0020504431291060014,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": -0.04140738465569236,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|wrong_relation_top128|wrong_relation_control|a1",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": 0.06201461770317771,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L39|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": 0.0,
+          "mean_common_delta": -0.10536937280134721,
+          "positive_margin_rate": 0.0
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 3,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": -8.127906105735085e-09,
+          "mean_common_delta": 0.016274761747230183,
+          "positive_margin_rate": 0.36363636363636365
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": -8.127906105735085e-09,
+          "mean_common_delta": 0.013427166098898108,
+          "positive_margin_rate": 0.36363636363636365
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37|shuffled_combo_margin_top128|shuffled_node_control|a2",
+          "kind": "shuffled_node_control",
+          "set_size": 2,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": -1.693313772028143e-08,
+          "mean_common_delta": -0.18346662396057087,
+          "positive_margin_rate": 0.36363636363636365
+        },
+        {
+          "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|shuffled_combo_margin_top128|shuffled_node_control|a2",
+          "kind": "shuffled_node_control",
+          "set_size": 3,
+          "switch": 0,
+          "n": 22,
+          "switch_rate": 0.0,
+          "mean_margin_gain": -0.002840895544398915,
+          "mean_common_delta": -0.5642089836976745,
+          "positive_margin_rate": 0.5
+        }
+      ],
+      "by_size": {
+        "1": {
+          "best_signal": {
+            "key": "prompt_last@L38|raw_delta|signal|a2",
+            "kind": "signal",
+            "set_size": 1,
+            "switch": 1,
+            "n": 22,
+            "switch_rate": 0.045454545454545456,
+            "mean_margin_gain": -0.005681807344610041,
+            "mean_common_delta": 0.2728024436668916,
+            "positive_margin_rate": 0.5
+          },
+          "best_control": {
+            "key": "prompt_last@L37|random_same_norm_top128|random_control|a2",
+            "kind": "random_control",
+            "set_size": 1,
+            "switch": 0,
+            "n": 22,
+            "switch_rate": 0.0,
+            "mean_margin_gain": 1.0159882632168856e-08,
+            "mean_common_delta": 0.0007076603783802552,
+            "positive_margin_rate": 0.2727272727272727
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 0,
+          "signal_max_margin": 0.0,
+          "control_max_margin": 1.0159882632168856e-08
+        },
+        "2": {
+          "best_signal": {
+            "key": "prompt_last@L38+prompt_last@L37|combo_margin_top128|signal|a2",
+            "kind": "signal",
+            "set_size": 2,
+            "switch": 1,
+            "n": 22,
+            "switch_rate": 0.045454545454545456,
+            "mean_margin_gain": -6.773255088112571e-10,
+            "mean_common_delta": -0.08676992475309155,
+            "positive_margin_rate": 0.4090909090909091
+          },
+          "best_control": {
+            "key": "prompt_last@L37+prompt_last@L39|random_same_norm_top128|random_control|a2",
+            "kind": "random_control",
+            "set_size": 2,
+            "switch": 0,
+            "n": 22,
+            "switch_rate": 0.0,
+            "mean_margin_gain": 1.0159882632168856e-08,
+            "mean_common_delta": -0.04655322009189562,
+            "positive_margin_rate": 0.2727272727272727
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 0,
+          "signal_max_margin": -6.773255088112571e-10,
+          "control_max_margin": 1.0159882632168856e-08
+        },
+        "3": {
+          "best_signal": {
+            "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|combo_margin_top128|signal|a2",
+            "kind": "signal",
+            "set_size": 3,
+            "switch": 1,
+            "n": 22,
+            "switch_rate": 0.045454545454545456,
+            "mean_margin_gain": -6.773255088112571e-10,
+            "mean_common_delta": -0.22154165448790247,
+            "positive_margin_rate": 0.4090909090909091
+          },
+          "best_control": {
+            "key": "prompt_last@L38+prompt_last@L37+prompt_last@L39|random_same_norm_top128|random_control|a1",
+            "kind": "random_control",
+            "set_size": 3,
+            "switch": 0,
+            "n": 22,
+            "switch_rate": 0.0,
+            "mean_margin_gain": -8.127906105735085e-09,
+            "mean_common_delta": 0.016274761747230183,
+            "positive_margin_rate": 0.36363636363636365
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 0,
+          "signal_max_margin": -6.773255088112571e-10,
+          "control_max_margin": -8.127906105735085e-09
+        }
+      },
+      "max_signal_switch": 1,
+      "max_control_switch": 0,
+      "max_signal_margin": 0.0,
+      "max_control_margin": 1.0159882632168856e-08,
+      "evidence_update": "hold_due_to_weak_margin"
+    },
+    {
+      "model": "deepseek7b",
+      "source": "results/gpt5_phase191_atlas_guided_multinode_state_graph/phase191_deepseek7b_atlas_guided_multinode_state_graph_confirm.json",
+      "n_cases": 128,
+      "n_target_cases_seen": 49,
+      "n_rows": 49,
+      "total_time_min": 8.095506199200948,
+      "atlas_target": {
+        "node_source": "Phase594 MLP update nodes",
+        "edge": "candidate-specific ranking repair",
+        "old_level": "Level3 strong transition / weak Level4 channel contribution",
+        "target_level": "Level4/5 if signal graph beats controls",
+        "stop_condition": "if multi-node signal does not beat matched controls, stop static z-patch route and move to forward dynamics"
+      },
+      "nodes": [
+        {
+          "position": "rule_value",
+          "layer": 26,
+          "phase594": {
+            "key": "rule_value|L26|mlp_update",
+            "position": "rule_value",
+            "layer": 26,
+            "source": "mlp_update",
+            "n": 21,
+            "mean_common": 4.552642800978252,
+            "mean_correct_delta": 4.861180180595035,
+            "mean_old_top_wrong_delta": 3.655475315593538,
+            "mean_correct_specific": 0.3085373796167828,
+            "mean_old_top_wrong_specific": -0.897167485384714,
+            "mean_specific_margin": 1.2057048650014968,
+            "positive_rate": 0.7619047619047619
+          }
+        },
+        {
+          "position": "query_relation",
+          "layer": 19,
+          "phase594": {
+            "key": "query_relation|L19|mlp_update",
+            "position": "query_relation",
+            "layer": 19,
+            "source": "mlp_update",
+            "n": 21,
+            "mean_common": 1.365333859941789,
+            "mean_correct_delta": 1.560481308471589,
+            "mean_old_top_wrong_delta": 1.0412800453958058,
+            "mean_correct_specific": 0.1951474485297998,
+            "mean_old_top_wrong_specific": -0.32405381454598337,
+            "mean_specific_margin": 0.5192012630757832,
+            "positive_rate": 0.8571428571428571
+          }
+        },
+        {
+          "position": "prompt_last",
+          "layer": 26,
+          "phase594": {
+            "key": "prompt_last|L26|mlp_update",
+            "position": "prompt_last",
+            "layer": 26,
+            "source": "mlp_update",
+            "n": 21,
+            "mean_common": -0.11717084050178528,
+            "mean_correct_delta": 0.2926928202311198,
+            "mean_old_top_wrong_delta": 0.08691977886926561,
+            "mean_correct_specific": 0.4098636607329051,
+            "mean_old_top_wrong_specific": 0.20409061937105089,
+            "mean_specific_margin": 0.2057730413618542,
+            "positive_rate": 0.42857142857142855
+          }
+        }
+      ],
+      "best_signal": [
+        {
+          "key": "rule_value@L26+query_relation@L19|combo_margin_top128|signal|a2",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.01965601405851087,
+          "mean_common_delta": -0.14346558941832308,
+          "positive_margin_rate": 0.6326530612244898
+        },
+        {
+          "key": "rule_value@L26+query_relation@L19|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.013045757229687,
+          "mean_common_delta": 0.2685391171597781,
+          "positive_margin_rate": 0.6122448979591837
+        },
+        {
+          "key": "rule_value@L26+query_relation@L19+prompt_last@L26|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 3,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.009961587647736376,
+          "mean_common_delta": 0.24090301655636795,
+          "positive_margin_rate": 0.5714285714285714
+        },
+        {
+          "key": "query_relation@L19|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.007018068715055682,
+          "mean_common_delta": 0.2685883553800819,
+          "positive_margin_rate": 0.5510204081632653
+        },
+        {
+          "key": "rule_value@L26+prompt_last@L26|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.0008507762674470337,
+          "mean_common_delta": -0.031244524825858523,
+          "positive_margin_rate": 0.4897959183673469
+        },
+        {
+          "key": "query_relation@L19+prompt_last@L26|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.0014046591716077254,
+          "mean_common_delta": 0.2388863740001843,
+          "positive_margin_rate": 0.5510204081632653
+        },
+        {
+          "key": "rule_value@L26|raw_delta|signal|a2",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.002370848676797991,
+          "mean_common_delta": -0.0021363373178209426,
+          "positive_margin_rate": 0.5510204081632653
+        },
+        {
+          "key": "prompt_last@L26|raw_delta|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.002386499661952257,
+          "mean_common_delta": -0.032951461659668356,
+          "positive_margin_rate": 0.5102040816326531
+        },
+        {
+          "key": "rule_value@L26|combo_margin_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.0036346869714254017,
+          "mean_common_delta": 0.0019042257704220864,
+          "positive_margin_rate": 0.5714285714285714
+        },
+        {
+          "key": "rule_value@L26+prompt_last@L26|combo_correct_minus_old_top128|signal|a1",
+          "kind": "signal",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.005526272470739727,
+          "mean_common_delta": 0.013981212644448161,
+          "positive_margin_rate": 0.4897959183673469
+        }
+      ],
+      "best_control": [
+        {
+          "key": "query_relation@L19|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 2,
+          "n": 49,
+          "switch_rate": 0.04081632653061224,
+          "mean_margin_gain": 0.006995761296616829,
+          "mean_common_delta": 0.02510353386739497,
+          "positive_margin_rate": 0.5306122448979592
+        },
+        {
+          "key": "query_relation@L19+prompt_last@L26|wrong_relation_top128|wrong_relation_control|a2",
+          "kind": "wrong_relation_control",
+          "set_size": 2,
+          "switch": 2,
+          "n": 49,
+          "switch_rate": 0.04081632653061224,
+          "mean_margin_gain": 0.0025761434428241787,
+          "mean_common_delta": 0.6332054447587009,
+          "positive_margin_rate": 0.46938775510204084
+        },
+        {
+          "key": "query_relation@L19|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.003545002931044722,
+          "mean_common_delta": -0.05533635420415892,
+          "positive_margin_rate": 0.4489795918367347
+        },
+        {
+          "key": "query_relation@L19|wrong_relation_top128|wrong_relation_control|a1",
+          "kind": "wrong_relation_control",
+          "set_size": 1,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.0018015882589531187,
+          "mean_common_delta": 0.02547108075743047,
+          "positive_margin_rate": 0.5510204081632653
+        },
+        {
+          "key": "rule_value@L26+query_relation@L19|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": 0.00036158772869681824,
+          "mean_common_delta": -0.05375091811375959,
+          "positive_margin_rate": 0.4489795918367347
+        },
+        {
+          "key": "query_relation@L19+prompt_last@L26|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.0015954849196179789,
+          "mean_common_delta": -0.16456457629457724,
+          "positive_margin_rate": 0.5510204081632653
+        },
+        {
+          "key": "query_relation@L19+prompt_last@L26|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.0017966979173753336,
+          "mean_common_delta": -0.05940073225005739,
+          "positive_margin_rate": 0.40816326530612246
+        },
+        {
+          "key": "rule_value@L26+query_relation@L19+prompt_last@L26|random_same_norm_top128|random_control|a1",
+          "kind": "random_control",
+          "set_size": 3,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.003891401325485536,
+          "mean_common_delta": -0.058919020279842825,
+          "positive_margin_rate": 0.4489795918367347
+        },
+        {
+          "key": "rule_value@L26+query_relation@L19+prompt_last@L26|random_same_norm_top128|random_control|a2",
+          "kind": "random_control",
+          "set_size": 3,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.004849417691061996,
+          "mean_common_delta": -0.16388781512350947,
+          "positive_margin_rate": 0.4897959183673469
+        },
+        {
+          "key": "query_relation@L19+prompt_last@L26|wrong_relation_top128|wrong_relation_control|a1",
+          "kind": "wrong_relation_control",
+          "set_size": 2,
+          "switch": 1,
+          "n": 49,
+          "switch_rate": 0.02040816326530612,
+          "mean_margin_gain": -0.005008432952383039,
+          "mean_common_delta": 0.33582933054053776,
+          "positive_margin_rate": 0.5714285714285714
+        }
+      ],
+      "by_size": {
+        "1": {
+          "best_signal": {
+            "key": "query_relation@L19|raw_delta|signal|a1",
+            "kind": "signal",
+            "set_size": 1,
+            "switch": 1,
+            "n": 49,
+            "switch_rate": 0.02040816326530612,
+            "mean_margin_gain": 0.007018068715055682,
+            "mean_common_delta": 0.2685883553800819,
+            "positive_margin_rate": 0.5510204081632653
+          },
+          "best_control": {
+            "key": "query_relation@L19|wrong_relation_top128|wrong_relation_control|a2",
+            "kind": "wrong_relation_control",
+            "set_size": 1,
+            "switch": 2,
+            "n": 49,
+            "switch_rate": 0.04081632653061224,
+            "mean_margin_gain": 0.006995761296616829,
+            "mean_common_delta": 0.02510353386739497,
+            "positive_margin_rate": 0.5306122448979592
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 2,
+          "signal_max_margin": 0.013069071265279638,
+          "control_max_margin": 0.006995761296616829
+        },
+        "2": {
+          "best_signal": {
+            "key": "rule_value@L26+query_relation@L19|combo_margin_top128|signal|a2",
+            "kind": "signal",
+            "set_size": 2,
+            "switch": 1,
+            "n": 49,
+            "switch_rate": 0.02040816326530612,
+            "mean_margin_gain": 0.01965601405851087,
+            "mean_common_delta": -0.14346558941832308,
+            "positive_margin_rate": 0.6326530612244898
+          },
+          "best_control": {
+            "key": "query_relation@L19+prompt_last@L26|wrong_relation_top128|wrong_relation_control|a2",
+            "kind": "wrong_relation_control",
+            "set_size": 2,
+            "switch": 2,
+            "n": 49,
+            "switch_rate": 0.04081632653061224,
+            "mean_margin_gain": 0.0025761434428241787,
+            "mean_common_delta": 0.6332054447587009,
+            "positive_margin_rate": 0.46938775510204084
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 2,
+          "signal_max_margin": 0.01965601405851087,
+          "control_max_margin": 0.010116624981164932
+        },
+        "3": {
+          "best_signal": {
+            "key": "rule_value@L26+query_relation@L19+prompt_last@L26|raw_delta|signal|a1",
+            "kind": "signal",
+            "set_size": 3,
+            "switch": 1,
+            "n": 49,
+            "switch_rate": 0.02040816326530612,
+            "mean_margin_gain": 0.009961587647736376,
+            "mean_common_delta": 0.24090301655636795,
+            "positive_margin_rate": 0.5714285714285714
+          },
+          "best_control": {
+            "key": "rule_value@L26+query_relation@L19+prompt_last@L26|random_same_norm_top128|random_control|a1",
+            "kind": "random_control",
+            "set_size": 3,
+            "switch": 1,
+            "n": 49,
+            "switch_rate": 0.02040816326530612,
+            "mean_margin_gain": -0.003891401325485536,
+            "mean_common_delta": -0.058919020279842825,
+            "positive_margin_rate": 0.4489795918367347
+          },
+          "signal_max_switch": 1,
+          "control_max_switch": 1,
+          "signal_max_margin": 0.009961587647736376,
+          "control_max_margin": 0.007928113201633096
+        }
+      },
+      "max_signal_switch": 1,
+      "max_control_switch": 2,
+      "max_signal_margin": 0.01965601405851087,
+      "max_control_margin": 0.010116624981164932,
+      "evidence_update": "downgrade_or_hold_due_to_control_pollution"
+    }
+  ]
+}

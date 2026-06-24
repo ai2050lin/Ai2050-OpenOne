@@ -31495,3 +31495,1185 @@ Multi-Node State Graph Intervention
 如果智能编码机制存在，它可能不是静态向量字典，而是状态图中的可重复变换规则。
 下一步要找到“状态变换规则”，而不是继续寻找单个万能通道。
 ```
+
+## Phase 191: 图谱引导的多节点状态图干预 [2026-06-24 10:50]
+
+### 任务来源
+
+用户上传内容指出：Phase190 不是“从全局图谱退回细节”，而是进入正确循环：
+
+```text
+全局图谱提出最高价值缺口
+-> 局部机制实验验证这个缺口
+-> 结果回写图谱，升级或降级证据等级
+-> 图谱重新决定下一步实验
+```
+
+本阶段判断：这个分析是正确的。
+
+更准确的研究名称应是：
+
+```text
+Atlas-guided causal drilling
+全局图谱引导下的局部因果钻探
+```
+
+因此 Phase191 不再把局部实验当作孤立细节，而是强制绑定 Atlas 目标：
+
+```text
+本实验验证的边:
+candidate-specific ranking repair
+
+旧等级:
+Level3 strong transition / weak Level4 channel contribution
+
+目标等级:
+如果多节点 signal graph 明显优于 controls，则推进到 Level4/5。
+
+停止条件:
+如果多节点静态 z-patch 仍不能优于控制组，则停止 static single-node/channel 和 static multi-node patch 路线，
+进入 forward dynamics/state-transition test。
+```
+
+### 生成脚本
+
+新增主测试脚本：
+
+```text
+tests/gpt5/phase191_atlas_guided_multinode_state_graph.py
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase191_summarize_atlas_guided_multinode_state_graph.py
+```
+
+输出目录：
+
+```text
+results/gpt5_phase191_atlas_guided_multinode_state_graph/
+```
+
+生成结果：
+
+```text
+phase191_qwen3_atlas_guided_multinode_state_graph_confirm.json
+phase191_glm4_atlas_guided_multinode_state_graph_confirm.json
+phase191_deepseek7b_atlas_guided_multinode_state_graph_confirm.json
+phase191_cross_model_summary.json
+phase191_cross_model_summary.md
+phase191_atlas_update.json
+phase191_atlas_update.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase191_atlas_guided_multinode_state_graph.py
+python -m py_compile tests/gpt5/phase191_atlas_guided_multinode_state_graph.py tests/gpt5/phase191_summarize_atlas_guided_multinode_state_graph.py
+```
+
+三模型顺序确认测试：
+
+```bash
+python tests/gpt5/phase191_atlas_guided_multinode_state_graph.py qwen3 --confirm --hard-exit-after-model && python tests/gpt5/phase191_atlas_guided_multinode_state_graph.py glm4 --confirm --hard-exit-after-model && python tests/gpt5/phase191_atlas_guided_multinode_state_graph.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase191_summarize_atlas_guided_multinode_state_graph.py
+```
+
+执行要求：
+
+```text
+按 qwen3 -> GLM4 -> DS7B 顺序执行。
+每个模型都带 --hard-exit-after-model。
+模型测试过程中没有并行做其他分析工作，只等待命令完成。
+```
+
+### 测试原理
+
+Phase190 说明单节点/channel 级干预存在弱阳性，但控制污染严重。
+
+Phase191 直接检验下一条假设：
+
+```text
+candidate-specific ranking 不是单节点完成，而是由 atlas 选出的多节点状态图共同完成。
+```
+
+节点来自 Phase594 MLP update atlas。
+
+每个模型选择 top 3 节点：
+
+```text
+qwen3:
+prompt_last/L34
+query_category/L32
+prompt_last/L32
+
+GLM4:
+prompt_last/L38
+prompt_last/L37
+prompt_last/L39
+
+DS7B:
+rule_value/L26
+query_relation/L19
+prompt_last/L26
+```
+
+每个 target case 条件：
+
+```text
+base prompt 错误
+repair prompt 正确
+```
+
+干预对象：
+
+```text
+MLP down_proj 前的 z-state
+```
+
+节点集合：
+
+```text
+single node
+two-node combinations
+three-node combination
+```
+
+signal 干预：
+
+```text
+raw_delta
+combo_margin_top128
+combo_correct_minus_old_top128
+```
+
+控制组：
+
+```text
+random_same_norm_top128
+wrong_relation_top128
+shuffled_node_control
+```
+
+alpha：
+
+```text
+1.0
+2.0
+```
+
+观测：
+
+```text
+winner switch
+correct-vs-old-top-wrong margin_gain
+common_delta
+positive_margin_rate
+signal 是否明显优于 controls
+多节点是否明显优于单节点
+```
+
+### 客观结果
+
+三模型均使用 128 confirm cases。
+
+只统计 base 错、repair 对的 target rows：
+
+```text
+model       target rows   nodes                                      time min   max signal switch   max control switch   max signal margin   max control margin
+qwen3       11            prompt_last/L34, query_category/L32, prompt_last/L32      1.88        1                   1                    0.1249              0.0682
+glm4        22            prompt_last/L38, prompt_last/L37, prompt_last/L39         5.06        1                   0                    0.0000              0.0000
+deepseek7b  49            rule_value/L26, query_relation/L19, prompt_last/L26       8.10        1                   2                    0.0197              0.0101
+```
+
+Qwen3 最强 signal：
+
+```text
+prompt_last@L34+prompt_last@L32|combo_margin_top128|signal|a2
+switch = 1/11
+mean_margin_gain = 0.1022
+mean_common_delta = -1.1708
+positive_margin_rate = 0.8182
+```
+
+Qwen3 最强 control：
+
+```text
+query_category@L32+prompt_last@L32|shuffled_combo_margin_top128|shuffled_node_control|a2
+switch = 1/11
+mean_margin_gain = 0.0682
+mean_common_delta = -0.2268
+positive_margin_rate = 0.7273
+```
+
+GLM4 最强 signal：
+
+```text
+prompt_last@L38+prompt_last@L37+prompt_last@L39|combo_margin_top128|signal|a2
+switch = 1/22
+mean_margin_gain ≈ 0.0000
+mean_common_delta = -0.2215
+positive_margin_rate = 0.4091
+```
+
+GLM4 最强 control：
+
+```text
+random/wrong controls 没有 winner switch，但 margin 也基本为 0。
+所以 GLM4 不是强阳性，而是弱且不稳定。
+```
+
+DS7B 最强 signal：
+
+```text
+rule_value@L26+query_relation@L19|combo_margin_top128|signal|a2
+switch = 1/49
+mean_margin_gain = 0.0197
+mean_common_delta = -0.1435
+positive_margin_rate = 0.6327
+```
+
+DS7B 最强 control：
+
+```text
+query_relation@L19|wrong_relation_top128|wrong_relation_control|a2
+switch = 2/49
+mean_margin_gain = 0.0070
+mean_common_delta = 0.0251
+positive_margin_rate = 0.5306
+```
+
+按 set size 看：
+
+```text
+qwen3:
+single: signal 1/11, control 1/11
+pair:   signal 1/11, control 1/11
+triple: signal 1/11, control 1/11
+
+GLM4:
+single: signal 1/22, control 0/22
+pair:   signal 1/22, control 0/22
+triple: signal 1/22, control 0/22
+但 signal margin 接近 0 或为负。
+
+DS7B:
+single: signal 1/49, control 2/49
+pair:   signal 1/49, control 2/49
+triple: signal 1/49, control 1/49
+```
+
+### 严格结论
+
+正确部分：
+
+```text
+1. 上传内容关于“图谱不是替代细节实验，而是选择高价值细节实验”的判断正确。
+2. Phase190/191 都应被理解为 atlas-guided causal drilling。
+3. 每次局部实验都必须回写 node、edge、level、failure_type、next_gap，这个规则应该固定下来。
+```
+
+Phase191 客观结论：
+
+```text
+1. 多节点 signal 没有跨模型干净胜过 controls。
+2. Qwen3 有 pair-node signal margin，但 control 也有同等 switch。
+3. GLM4 有 signal switch，但 margin 接近 0，不能作为强修复。
+4. DS7B 最强 winner switch 来自 wrong_relation control，不是 signal。
+5. 多节点静态 z-patch 没有解决 Phase190 的 control pollution。
+```
+
+不能得出的结论：
+
+```text
+1. 不能升级到 Level5 hidden causal repair。
+2. 不能说 multi-node static patch 已经闭合 candidate-specific ranking。
+3. 不能说 rule_value L26 + query_relation L19 是充分因果图。
+4. 不能继续把 winner switch 单独作为成功标准，因为 controls 也能 switch。
+```
+
+### 图谱回写
+
+已生成：
+
+```text
+results/gpt5_phase191_atlas_guided_multinode_state_graph/phase191_atlas_update.md
+results/gpt5_phase191_atlas_guided_multinode_state_graph/phase191_atlas_update.json
+```
+
+回写内容：
+
+```text
+edge:
+candidate-specific ranking repair
+
+old_level:
+Level3 strong transition / weak Level4 channel contribution
+
+new_level:
+hold at weak Level4 candidate; do not upgrade to Level5
+
+validated_nodes:
+qwen3: prompt_last/L34, query_category/L32, prompt_last/L32
+glm4: prompt_last/L38, prompt_last/L37, prompt_last/L39
+deepseek7b: rule_value/L26, query_relation/L19, prompt_last/L26
+
+failure_types:
+control_pollution
+multi_node_static_z_patch_insufficiency
+candidate_ranking_not_portable_by_static_node_set
+winner_switch_rate_too_low
+
+next_gap:
+forward_dynamics_state_transition_test
+```
+
+### 理论进展
+
+Phase191 的价值是负结果价值：
+
+```text
+它不是证明 multi-node state graph 成功，
+而是把“静态单节点/多节点 patch 路线”继续降级。
+```
+
+更严格的表达：
+
+```text
+当前证据支持：
+图谱节点中存在 candidate-ranking 相关状态。
+
+当前证据不支持：
+把这些状态作为静态 z-vector 注入 base prompt 后，可以稳定、特异、干净地修复输出。
+```
+
+这说明 candidate-specific ranking 更可能依赖：
+
+```text
+1. 前向动态过程，而不是静态向量搬运；
+2. 后续层 winner selection 的连续轨迹，而不是某个局部状态；
+3. 自回归生成中的状态条件化，而不是一次性 patch；
+4. query/relation/value/prompt_last 多位置交互，但交互方式不是简单同步相加。
+```
+
+### 下一阶段任务
+
+Phase192 应进入：
+
+```text
+Forward Dynamics State-Transition Test
+```
+
+目标：
+
+```text
+不再问“把 repair-base delta 注入 base 是否修复”，
+而是追踪 base、repair、wrong 三条前向轨迹中 candidate margin 如何逐层形成、翻转或消失。
+```
+
+关键观测：
+
+```text
+1. 每层 correct-vs-old-top-wrong margin。
+2. 每层 common_delta 与 candidate-specific margin 的分离。
+3. repair trajectory 中 winner selection 首次超过 base 的层。
+4. wrong trajectory 是否在相同层产生类似扰动。
+5. downstream 层是否放大、抵消或重写前面节点信号。
+```
+
+停止条件：
+
+```text
+如果 forward dynamics 仍不能找到稳定 state transition，
+则 candidate-specific ranking 可能不是单条局部路径，
+而是更大范围的任务格式/生成策略现象，需要转向 prompt-program/interface graph 级别研究。
+```
+
+第一性原理判断：
+
+```text
+语言编码机制可能不是静态“表示在哪里”，而是“状态如何沿自回归前向过程被更新、筛选、竞争并读出”。
+图谱的下一步应从 node atlas 升级为 trajectory atlas。
+```
+
+## Phase 192: 前向动力学状态转移轨迹测试 [2026-06-24 12:05]
+
+### 任务来源
+
+用户上传内容判断 Phase191 是高价值负结果，并指出：
+
+```text
+static single-node/channel patch 和 static multi-node z-patch 路线应正式降级；
+candidate-specific ranking 更可能是 forward dynamics 中的状态转移过程；
+图谱下一步应从 node atlas 升级为 trajectory atlas。
+```
+
+本阶段判断：该分析正确。
+
+因此 Phase192 不再继续做静态补丁，而是直接测：
+
+```text
+base trajectory
+repair trajectory
+wrong trajectory
+```
+
+三条自然前向轨迹中，correct-vs-old-top-wrong candidate margin 如何逐层形成、翻转、放大或消失。
+
+### 生成脚本
+
+新增主测试脚本：
+
+```text
+tests/gpt5/phase192_forward_dynamics_state_transition.py
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase192_summarize_forward_dynamics_state_transition.py
+```
+
+输出目录：
+
+```text
+results/gpt5_phase192_forward_dynamics_state_transition/
+```
+
+生成结果：
+
+```text
+phase192_qwen3_forward_dynamics_state_transition_confirm.json
+phase192_glm4_forward_dynamics_state_transition_confirm.json
+phase192_deepseek7b_forward_dynamics_state_transition_confirm.json
+phase192_cross_model_summary.json
+phase192_cross_model_summary.md
+phase192_atlas_update.json
+phase192_atlas_update.md
+```
+
+### 执行命令
+
+语法检查和 smoke：
+
+```bash
+python -m py_compile tests/gpt5/phase192_forward_dynamics_state_transition.py
+python tests/gpt5/phase192_forward_dynamics_state_transition.py qwen3 --smoke --hard-exit-after-model
+```
+
+三模型顺序确认测试：
+
+```bash
+python tests/gpt5/phase192_forward_dynamics_state_transition.py qwen3 --confirm --hard-exit-after-model && python tests/gpt5/phase192_forward_dynamics_state_transition.py glm4 --confirm --hard-exit-after-model && python tests/gpt5/phase192_forward_dynamics_state_transition.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python -m py_compile tests/gpt5/phase192_forward_dynamics_state_transition.py tests/gpt5/phase192_summarize_forward_dynamics_state_transition.py
+python tests/gpt5/phase192_summarize_forward_dynamics_state_transition.py
+```
+
+执行要求：
+
+```text
+按 qwen3 -> GLM4 -> DS7B 顺序执行。
+每个模型都带 --hard-exit-after-model。
+模型测试过程中没有并行做其他分析工作，只等待命令完成。
+```
+
+说明：
+
+```text
+脚本设置 max_samples=256，但 build_cases 在 n_tables=12 和当前候选组合下实际生成 192 个有效 cases。
+因此本阶段三模型均为 192 cases。
+```
+
+### 测试原理
+
+Phase190/191 的静态 patch 失败说明：
+
+```text
+candidate-specific ranking 不像是一个可直接搬运的静态向量。
+```
+
+Phase192 改为测自然前向轨迹。
+
+对每个 target case：
+
+```text
+base prompt 错误
+repair prompt 正确
+wrong prompt 作为错误关系控制
+```
+
+先用 base final string logprob 找到：
+
+```text
+old_top_wrong candidate
+```
+
+然后在每层 hidden state 上做 logit-lens 读出：
+
+```text
+M_l = score_l(correct) - score_l(old_top_wrong)
+```
+
+三条轨迹：
+
+```text
+M_l^base
+M_l^repair
+M_l^wrong
+```
+
+观察位置：
+
+```text
+prompt_last
+query_relation
+rule_value
+query_category
+rule_relation
+```
+
+核心指标：
+
+```text
+strict_flip:
+repair margin > 0 且 base margin < 0
+
+repair_over_base:
+repair margin - base margin > 0.05
+
+best_repair_minus_base:
+逐层 repair-base 的最大值
+
+best_transition_advantage:
+repair 层间增益 - max(base 层间增益, wrong 层间增益)
+
+final_control_leak:
+abs(final_wrong_minus_base) / abs(final_repair_minus_base)
+```
+
+### 客观结果
+
+三模型均为 192 cases。
+
+target rows：
+
+```text
+qwen3:      13
+GLM4:       32
+deepseek7b: 78
+```
+
+总览：
+
+```text
+model       target rows   best position   strict flip   over base   best rb   leak
+qwen3       13            query_category  13/13         13/13       1.4074    4.7206
+GLM4        32            prompt_last     31/32         32/32       1.2141    2.2762
+deepseek7b  78            query_category  72/78         78/78       1.1086    22.3664
+```
+
+Qwen3 分位置：
+
+```text
+query_category: strict 13/13, over_base 13/13, best_rb 1.4074, transition 0.2772, leak 4.7206
+prompt_last:    strict 12/13, over_base 13/13, best_rb 2.0240, transition 0.4899, leak 0.9403
+rule_relation:  strict 10/13, over_base 13/13, best_rb 0.9373, transition 0.5794, leak 2.9455
+query_relation: strict 9/13,  over_base 13/13, best_rb 0.8441, transition 0.5841, leak 124.1764
+rule_value:     strict 8/12,  over_base 12/12, best_rb 0.8266, transition 0.5639, leak 4.1927
+```
+
+GLM4 分位置：
+
+```text
+prompt_last:    strict 31/32, over_base 32/32, best_rb 1.2141, transition 0.4884, leak 2.2762
+query_category: strict 28/32, over_base 32/32, best_rb 2.0053, transition 0.3581, leak 5.4388
+query_relation: strict 24/32, over_base 32/32, best_rb 1.0418, transition 0.7792, leak 1.3636
+rule_value:     strict 17/25, over_base 25/25, best_rb 1.0409, transition 0.6921, leak 2.0621
+rule_relation:  strict 19/32, over_base 32/32, best_rb 1.3662, transition 0.6874, leak 2.6641
+```
+
+DS7B 分位置：
+
+```text
+query_category: strict 72/78, over_base 78/78, best_rb 1.1086, transition 0.2510, leak 22.3664
+rule_relation:  strict 62/78, over_base 78/78, best_rb 1.0684, transition 0.5011, leak 7.0090
+query_relation: strict 55/78, over_base 77/78, best_rb 0.7596, transition 0.4927, leak 2.4111
+rule_value:     strict 28/43, over_base 43/43, best_rb 0.8831, transition 0.5636, leak 1.1860
+prompt_last:    strict 48/78, over_base 75/78, best_rb 0.8172, transition 0.3891, leak 0.6719
+```
+
+低 final-control-leak 位置：
+
+```text
+qwen3:      prompt_last
+GLM4:       none
+deepseek7b: prompt_last
+```
+
+### 严格结论
+
+客观现象：
+
+```text
+1. Phase192 明确观察到自然 repair trajectory 相对 base trajectory 的强分离。
+2. 三个模型大部分位置 repair_over_base 接近全覆盖。
+3. strict_flip 在 query_category / prompt_last 等位置大量出现。
+4. 这说明 candidate-ranking signal 确实在前向轨迹中逐层形成。
+```
+
+不能得出的结论：
+
+```text
+1. 不能升级到 Level5 hidden causal repair。
+2. 不能说已经找到可干预的因果转移层。
+3. 不能说 repair trajectory 的分离完全候选特异。
+4. 不能忽略 wrong trajectory，因为 many positions 的 control leak 很高。
+```
+
+关键硬伤：
+
+```text
+1. wrong/control trajectory often also diverges from base。
+   query_category 虽然 strict_flip 很强，但 control leak 在 qwen3 和 DS7B 都很高。
+
+2. 当前只是自然轨迹观测，不是 causal intervention。
+   它证明“轨迹中有信号”，但还没证明“哪个 transition 因果产生修复”。
+
+3. low-leak handle 主要出现在 prompt_last。
+   这可能接近读出竞争位置，而不是上游知识/关系机制本身。
+
+4. logit-lens 是逐层读出近似。
+   它能观察候选边际，但不等于真实生成过程已经在该层完成。
+
+5. target rows 仍由 base错/repair对 条件决定。
+   虽然总 cases 增到 192，但 qwen3 target rows 只有 13。
+```
+
+### 图谱回写
+
+已生成：
+
+```text
+results/gpt5_phase192_forward_dynamics_state_transition/phase192_atlas_update.md
+results/gpt5_phase192_forward_dynamics_state_transition/phase192_atlas_update.json
+```
+
+回写内容：
+
+```text
+edge:
+candidate-specific ranking repair
+
+old_level:
+weak Level4 candidate after static patch failures
+
+new_level:
+trajectory-Level4 candidate; do not upgrade to Level5
+
+success_observation:
+natural repair trajectories separate from base across layers
+
+remaining_failure:
+wrong/control trajectories often also separate; specificity not closed
+
+failure_types:
+wrong_trajectory_control_leak
+trajectory_signal_not_causal_patch
+candidate_specificity_not_closed
+
+next_gap:
+trajectory-localized causal transition test
+```
+
+### 理论进展
+
+Phase192 支持上传内容中的核心判断：
+
+```text
+语言编码机制不是静态“表示在哪里”，而是“状态如何沿前向轨迹被更新、筛选、竞争并读出”。
+```
+
+但要谨慎：
+
+```text
+Phase192 不是机制闭合。
+它只是把 candidate-specific ranking 从 static patch failure
+推进到 trajectory signal observation。
+```
+
+更准确表述：
+
+```text
+static vector patch:
+失败或弱负。
+
+natural forward trajectory:
+有强 repair-base 分离。
+
+wrong/control trajectory:
+仍有污染。
+
+因此当前机制位置不是“静态节点向量”，而是“轨迹中的可疑转移段”。
+```
+
+### 下一阶段任务
+
+Phase193 应进入：
+
+```text
+Trajectory-Localized Causal Transition Test
+```
+
+目标：
+
+```text
+不再 patch 静态节点全集，
+而是只在 Phase192 找到的关键 layer transition 附近做最小因果测试。
+```
+
+重点位置：
+
+```text
+qwen3:
+prompt_last 作为低 leak handle；
+query_category 作为强但高 leak trajectory signal。
+
+GLM4:
+prompt_last / query_relation。
+
+DS7B:
+prompt_last 作为低 leak handle；
+rule_value / query_relation 作为上游 transition handle。
+```
+
+测试方式：
+
+```text
+1. 找出每个 case 的 best_transition_layer。
+2. 在该层前后做 localized trajectory swap：
+   base -> repair transition
+   base -> wrong transition
+   repair -> base ablation
+
+3. 只比较同一 case 的关键转移段，不再宽泛 patch 多节点。
+4. 成功标准：
+   repair transition 能提升 margin；
+   wrong transition 不能复现；
+   ablation repair transition 会降低 repair margin。
+```
+
+第一性原理判断：
+
+```text
+如果语言编码机制是状态轨迹，
+下一步就必须从“节点是否有信号”推进到“哪一个状态转移因果改变候选竞争”。
+```
+
+## Phase 193: 轨迹定位因果转移测试 [2026-06-24 14:30]
+
+### 任务来源
+
+用户上传内容判断 Phase192 方向正确：
+
+```text
+static patch 失败；
+natural repair trajectory 与 base trajectory 强分离；
+但 wrong trajectory 仍有泄漏；
+下一步必须测试关键 layer transition 是否因果有效。
+```
+
+本阶段判断：该分析正确。
+
+Phase193 因此不再做宽泛静态 patch，而是测试：
+
+```text
+h_l -> h_{l+1}
+```
+
+这个局部状态转移段是否能因果改变 correct-vs-old-top-wrong candidate margin。
+
+### 生成脚本
+
+新增主测试脚本：
+
+```text
+tests/gpt5/phase193_trajectory_localized_causal_transition.py
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase193_summarize_trajectory_localized_causal_transition.py
+```
+
+输出目录：
+
+```text
+results/gpt5_phase193_trajectory_localized_causal_transition/
+```
+
+生成结果：
+
+```text
+phase193_qwen3_trajectory_localized_causal_transition_confirm.json
+phase193_glm4_trajectory_localized_causal_transition_confirm.json
+phase193_deepseek7b_trajectory_localized_causal_transition_confirm.json
+phase193_cross_model_summary.json
+phase193_cross_model_summary.md
+phase193_atlas_update.json
+phase193_atlas_update.md
+```
+
+### 执行命令
+
+语法检查和 smoke：
+
+```bash
+python -m py_compile tests/gpt5/phase193_trajectory_localized_causal_transition.py
+python tests/gpt5/phase193_trajectory_localized_causal_transition.py qwen3 --smoke --hard-exit-after-model
+```
+
+三模型顺序确认测试：
+
+```bash
+python tests/gpt5/phase193_trajectory_localized_causal_transition.py qwen3 --confirm --hard-exit-after-model && python tests/gpt5/phase193_trajectory_localized_causal_transition.py glm4 --confirm --hard-exit-after-model && python tests/gpt5/phase193_trajectory_localized_causal_transition.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python -m py_compile tests/gpt5/phase193_trajectory_localized_causal_transition.py tests/gpt5/phase193_summarize_trajectory_localized_causal_transition.py
+python tests/gpt5/phase193_summarize_trajectory_localized_causal_transition.py
+```
+
+执行要求：
+
+```text
+按 qwen3 -> GLM4 -> DS7B 顺序执行。
+每个模型都带 --hard-exit-after-model。
+模型测试过程中没有并行做其他分析工作，只等待命令完成。
+```
+
+### 测试原理
+
+Phase192 找到自然轨迹中的 best_transition_layer：
+
+```text
+l_best = argmax_l [
+  repair_transition_gain_l - max(base_transition_gain_l, wrong_transition_gain_l)
+]
+```
+
+Phase193 在该层邻域 radius=1 内做局部因果测试。
+
+三种干预：
+
+```text
+1. base <- repair transition
+   h_{l+1}^{base<-repair} = h_l^base + (h_{l+1}^repair - h_l^repair)
+
+2. base <- wrong transition
+   h_{l+1}^{base<-wrong} = h_l^base + (h_{l+1}^wrong - h_l^wrong)
+
+3. repair <- base transition
+   h_{l+1}^{repair<-base} = h_l^repair + (h_{l+1}^base - h_l^base)
+```
+
+评估使用完整 answer string logprob，而不是只看 logit-lens。
+
+关键指标：
+
+```text
+repair_gain:
+base<-repair 后 correct-vs-old-top-wrong margin 的提升。
+
+wrong_gain:
+base<-wrong 后 margin 的提升。
+
+ablation_loss:
+repair<-base 后 repair margin 的下降量。
+
+transition_specificity:
+repair_gain / (abs(wrong_gain) + epsilon)
+
+winner_switch:
+干预后 correct candidate 是否成为 winner。
+```
+
+成功判据：
+
+```text
+repair_gain > 0
+wrong_gain 明显更小或相反
+ablation_loss > 0
+```
+
+### 测试位置
+
+按 Phase192 结果选择少量关键位置：
+
+```text
+qwen3:
+prompt_last
+query_category
+
+GLM4:
+prompt_last
+query_relation
+
+DS7B:
+prompt_last
+rule_value
+query_relation
+```
+
+理由：
+
+```text
+prompt_last 是低 leak / 读出竞争 handle；
+query_category 是强但高 leak trajectory signal；
+query_relation 和 rule_value 是上游 relation/value transition handle。
+```
+
+### 客观结果
+
+三模型均为 192 cases。
+
+target rows：
+
+```text
+qwen3:      13
+GLM4:       32
+deepseek7b: 78
+```
+
+总览：
+
+```text
+model       best position   repair_gain   wrong_gain   ablation_loss   specificity   evidence
+qwen3       prompt_last     0.0867        -0.0129      0.1377          6.7050        weak localized transition candidate
+GLM4        query_relation  0.1784         0.1328     -0.0169          1.3431        gain without ablation
+deepseek7b  prompt_last     0.0013        -0.0263      0.1545          0.0499        ablation only
+```
+
+Qwen3：
+
+```text
+prompt_last:
+repair_gain = 0.0867
+wrong_gain = -0.0129
+ablation_loss = 0.1377
+specificity = 6.7050
+repair_positive_rate = 0.7179
+wrong_positive_rate = 0.4872
+winner_switch = 3/39
+
+query_category:
+repair_gain = 0.0061
+wrong_gain = 0.0544
+ablation_loss = 0.1884
+specificity = 0.1126
+winner_switch = 2/39
+```
+
+GLM4：
+
+```text
+query_relation:
+repair_gain = 0.1784
+wrong_gain = 0.1328
+ablation_loss = -0.0169
+specificity = 1.3431
+winner_switch = 21/96
+
+prompt_last:
+repair_gain = 0.0195
+wrong_gain = 0.0078
+ablation_loss = -0.0241
+specificity = 2.4997
+winner_switch = 5/96
+```
+
+DS7B：
+
+```text
+prompt_last:
+repair_gain = 0.0013
+wrong_gain = -0.0263
+ablation_loss = 0.1545
+specificity = 0.0499
+winner_switch = 6/234
+
+query_relation:
+repair_gain = -0.0023
+wrong_gain = -0.0486
+ablation_loss = 0.0455
+specificity = -0.0469
+winner_switch = 5/234
+
+rule_value:
+repair_gain = -0.0029
+wrong_gain = 0.0133
+ablation_loss = 0.0049
+specificity = -0.2145
+winner_switch = 0/129
+```
+
+### 严格结论
+
+客观现象：
+
+```text
+1. Qwen3 prompt_last 满足当前弱局部转移候选标准：
+   repair_gain 为正；
+   wrong_gain 为负；
+   repair<-base ablation 会降低 repair margin。
+
+2. GLM4 query_relation 有很强 repair_gain，但 wrong_gain 也很强，而且 ablation_loss 为负。
+   所以 GLM4 不是闭合因果转移，只能算 gain without ablation。
+
+3. DS7B 虽然 Phase192 trajectory signal 最强、target rows 最多，
+   但 Phase193 没有把 trajectory signal 转化为 localized transition gain。
+
+4. DS7B 的结果说明：
+   自然轨迹强分离不等于局部转移可搬运。
+```
+
+不能得出的结论：
+
+```text
+1. 不能说已经跨模型找到 candidate-specific ranking 的因果 transition。
+2. 不能升级为通用 Level5 hidden causal repair。
+3. 不能说 DS7B rule_value/query_relation 局部转移闭合。
+4. 不能把 GLM4 query_relation 的大 gain 当强证据，因为 ablation 不支持。
+```
+
+最重要的新增拼图：
+
+```text
+Qwen3 prompt_last 可能是第一个满足三条件的窄域 localized transition handle。
+但 DS7B 最大样本集失败，说明这不是通用机制。
+```
+
+### 图谱回写
+
+已生成：
+
+```text
+results/gpt5_phase193_trajectory_localized_causal_transition/phase193_atlas_update.md
+results/gpt5_phase193_trajectory_localized_causal_transition/phase193_atlas_update.json
+```
+
+回写内容：
+
+```text
+edge:
+candidate-specific ranking repair
+
+old_level:
+trajectory-Level4 candidate
+
+new_level:
+weak localized transition candidate only for qwen3 prompt_last;
+no cross-model Level5 closure
+
+success_observation:
+qwen3 prompt_last base<-repair transition improves margin while wrong transition does not and repair<-base ablation lowers margin
+
+remaining_failure:
+GLM4 lacks ablation support;
+DS7B trajectory signal does not localize into causal transition gain
+
+failure_types:
+localized_transition_not_cross_model
+glm4_gain_without_ablation
+deepseek7b_trajectory_correlation_not_local_transition
+generation_winner_switch_rate_still_low
+
+next_gap:
+qwen3_prompt_last_transition_validation_and_ds7b_nonlocal_dynamics_audit
+```
+
+### 理论进展
+
+Phase193 把 Phase192 的轨迹观察推进了一步：
+
+```text
+Phase192:
+自然 repair trajectory 与 base trajectory 强分离。
+
+Phase193:
+局部 transition swap 只在 qwen3 prompt_last 上出现三条件窄域正结果；
+GLM4/DS7B 未闭合。
+```
+
+这说明：
+
+```text
+1. candidate-specific ranking 至少在某些模型/位置可以被局部 transition 部分控制。
+2. 但这种局部控制不是跨模型通用结构。
+3. DS7B 的机制可能更非局部：轨迹相关很强，但单个 transition 替换不足以搬运。
+```
+
+当前理论应继续保持：
+
+```text
+Atlas-Guided State-Conditioned Trajectory Theory
+```
+
+但补充一个约束：
+
+```text
+trajectory signal 不等于 localized causal transition；
+localized transition 也不等于 generation closure。
+```
+
+### 下一阶段任务
+
+Phase194 应分成两个明确方向，但仍可以在同一脚本中完成：
+
+```text
+1. Qwen3 prompt_last transition validation
+2. DS7B nonlocal dynamics audit
+```
+
+具体任务：
+
+```text
+Qwen3:
+扩大 prompt_last target rows 或改变数据生成条件，确认 repair_gain/wrong_gain/ablation_loss 三条件是否稳定。
+检查 winner_switch 是否能随更精确 layer selection 提升。
+
+DS7B:
+不要继续单 transition patch。
+测试多 transition segment：
+  l-1 -> l
+  l -> l+1
+  l+1 -> l+2
+是否需要连续段替换才有 gain。
+
+同时检查 prompt_last 低 leak 是否只是 readout handle，
+rule_value/query_relation 是否需要通过后续 prompt_last 才能表现。
+```
+
+第一性原理判断：
+
+```text
+如果状态轨迹是语言编码机制，
+那么单个 transition 可能只是局部微分；
+真正的候选排序修复可能需要连续状态段，而不是一个 layer step。
+```
