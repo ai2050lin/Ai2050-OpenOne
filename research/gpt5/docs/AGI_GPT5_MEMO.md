@@ -30417,6 +30417,7 @@ Minimal Closed Circuit for Clean Paraphrase Candidate
 4. 测 attention output、MLP output、residual stream 对 clean_non_object_rate 的贡献。
 5. 加 no-op、random writer、same-norm writer controls。
 ```
+
 ## Phase 186: IntelligentTheory GLM5 History and Theory Integration 智能理论总整理 [2026-06-23 22:59]
 
 ### 本阶段目标
@@ -30564,6 +30565,7 @@ Phase594 新方向：
 
 5. 在 IntelligentTheory.md 后续版本中继续把理论从公式框架推进到可验证的最小电路图谱。
 ```
+
 ## Phase 187: Global Atlas and Autoregressive State System Plan 全局图谱与自回归状态系统方案 [2026-06-24 01:04]
 
 ### 本阶段目标
@@ -30676,6 +30678,7 @@ research/gpt5/docs/AGI_GPT5_MEMO.md
 5. 优先定位 candidate-specific ranking：
    从 Level2 projection 和 Level3 transition 推进到 Level4 component causal node。
 ```
+
 ## Phase 188: Global State-Conditioned Language Mechanism Atlas v0 全局状态条件化语言机制图谱v0 [2026-06-24 01:10]
 
 ### 本阶段目标
@@ -30910,6 +30913,8 @@ Component-Level Candidate Ranking Closure
 真正开始破解编码机制的标志，不是又发现一个强投影点，
 而是每个实验结果都进入可累计图谱，并推动某条边的 causal_level 上升。
 ```
+
+
 ## Phase 189: Candidate Ranking Closure Atlas Update 候选特异排序闭合图谱更新 [2026-06-24 01:21]
 
 ### 本阶段目标
@@ -31490,73 +31495,3 @@ Multi-Node State Graph Intervention
 如果智能编码机制存在，它可能不是静态向量字典，而是状态图中的可重复变换规则。
 下一步要找到“状态变换规则”，而不是继续寻找单个万能通道。
 ```
-
-## Phase 191: README IntelligentTheory 简明总览更新 [2026-06-24 08:55]
-
-### 命令
-
-```bash
-sed -n '1,260p' research/IntelligentTheory.md
-sed -n '261,560p' research/IntelligentTheory.md
-sed -n '1,260p' README.md
-rg -n '^## |^# |^### ' README.md
-git diff -- README.md | sed -n '1,260p'
-```
-
-### 生成脚本
-
-本阶段没有生成新的测试脚本，也没有运行模型测试。
-
-### 原理
-
-本阶段任务是根据 `research/IntelligentTheory.md` 更新仓库首页说明，把长篇理论整理压缩成更容易阅读的 README 结构。
-
-压缩原则：
-
-```text
-先讲路线
-再讲语言为什么是入口
-再讲语言编码机制
-再讲智能定义
-再讲基础数学框架
-最后用阶段历史说明理论如何形成
-```
-
-### 结果
-
-已更新 `README.md`，新版包含：
-
-```text
-1. 研发路线
-2. 路线分析
-3. 语言特性分析
-4. 语言编码机制
-5. 智能理论
-6. 数学体系
-7. 研究历史九个阶段
-8. 当前最重要的下一步
-9. 主要阅读入口
-10. 谨慎结论
-```
-
-核心表述改为更简洁版本：
-
-```text
-语言智能不是一个固定语义坐标表，
-而是“相对状态 + 条件化变换 + 候选竞争 + 读出门控”的动态系统。
-```
-
-### 理论进展
-
-本阶段没有新增实验结论，主要进展是把当前理论主线整理成可公开阅读的首页版本。
-
-README 中保留了最严格的限制：
-
-```text
-projection evidence 不等于因果闭合；
-单点 residual patch 经常失败；
-候选 embedding 不正交；
-Qwen3、GLM4、DS7B 编码策略差异很大。
-```
-
-下一步仍然是从 transition evidence 推进到 component causal node，并最终追求 generation closure。
