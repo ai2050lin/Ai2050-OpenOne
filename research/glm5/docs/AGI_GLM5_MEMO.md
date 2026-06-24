@@ -63363,3 +63363,519 @@ Final Layer Washout Decomposition
 3. 如果 pre-final-norm 保留但 post-final-norm 消失，断点在 final norm。
 4. 如果 post-final-norm 保留但 logits 不变，断点在 lm_head/readout competition。
 ```
+
+## Phase 599: Final Layer Washout Decomposition 最后一层冲洗分解 [2026-06-24 09:48]
+
+### 本阶段目标
+
+根据附件中对 Phase598 的分析，先判断其是否正确，再继续推进任务。
+
+附件判断的核心正确部分：
+
+```text
+1. Phase598 的关键进展不是修复成功，而是把断点从 MLP 生成推进到 downstream trajectory acceptance / final layer washout。
+2. DS7B 中 rule_value L26 与 prompt_last L26 的强 projection 已经能进入 H27 residual stream。
+3. H27 到 H28 / final hidden 之间发生强冲洗，说明 projection 本身不是充分因果信号。
+4. 下一步必须分解最后一层 attention、MLP、final norm、lm_head/readout。
+```
+
+本轮 Phase599 因此执行：
+
+```text
+Final Layer Washout Decomposition
+```
+
+目标：
+
+```text
+把 Phase598 的“最后阶段冲洗”进一步拆开，判断 DS7B 的 L26 强信号是在最后 attention、最后 MLP、final norm，还是 lm_head/readout competition 中失效。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase599_final_layer_washout_decomposition.py
+
+python tests/glm5/phase599_final_layer_washout_decomposition.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase599_final_layer_washout_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase599_final_layer_washout_decomposition.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase599_final_layer_washout_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase599_final_layer_washout_decomposition.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase599_final_layer_washout_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase599_final_layer_washout_decomposition_summary.py
+```
+
+### 脚本与结果文件
+
+- 主脚本：`tests/glm5/phase599_final_layer_washout_decomposition.py`
+- 汇总脚本：`tests/glm5/phase599_final_layer_washout_decomposition_summary.py`
+- Qwen3 结果：`results/glm5_phase599_final_layer_washout_decomposition/phase599_qwen3_final_layer_washout_decomposition_confirm.json`
+- GLM4 结果：`results/glm5_phase599_final_layer_washout_decomposition/phase599_glm4_final_layer_washout_decomposition_confirm.json`
+- DS7B 结果：`results/glm5_phase599_final_layer_washout_decomposition/phase599_deepseek7b_final_layer_washout_decomposition_confirm.json`
+- 跨模型汇总：`results/glm5_phase599_final_layer_washout_decomposition/phase599_cross_model_summary.md`
+
+### 测试原理
+
+Phase598 发现：
+
+```text
+L26 MLP 生成的 candidate-specific projection 很强；
+这个 projection 可以进入下一层 residual stream；
+但到 final hidden / final readout 时消失。
+```
+
+Phase599 进一步 hook 最后一层组件：
+
+```text
+layer_input
+attention output
+MLP input
+MLP output
+layer output
+final_norm_input
+final_norm_output
+first-token candidate logits
+full candidate logprob
+```
+
+并比较三类注入：
+
+```text
+repair_alpha2
+random_alpha2
+wrong_alpha2
+```
+
+核心判据：
+
+```text
+如果 layer_input 保留强 projection，而 attention/MLP 输出变成反向或接近 0，
+则断点不是 MLP 生成，而是最后层内部的轨迹重写/抵消。
+
+如果 final_norm_input 保留但 final_norm_output 消失，
+则 final norm 是主要压缩点。
+
+如果 final_norm_output 保留但 full candidate margin 不变，
+则断点在 lm_head/readout competition。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+mode = confirm
+cases/model = 64
+patch alpha = 2.0
+DS7B watched nodes = rule_value L26, prompt_last L26, query_relation L19
+Qwen3 watched nodes = prompt_last L34, query_category L32, prompt_last L32
+GLM4 watched nodes = prompt_last L38, prompt_last L37, prompt_last L39
+```
+
+本轮是确认测试，不是全量大扫；目标是验证 Phase598 推出的“最后层冲洗”断点是否成立，并定位冲洗组件。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+cases = 64
+target_cases_seen = 5
+probe_layer = L35
+```
+
+最终效果：
+
+```text
+query_category L32 repair_alpha2:
+  generated_down_projection +1.211
+  switch 2/5
+  full_margin_gain +0.050
+  first_token_logit_margin_gain +0.000
+
+prompt_last L32 repair_alpha2:
+  generated_down_projection +0.371
+  switch 1/5
+  full_margin_gain +0.075
+```
+
+但对照并不干净：
+
+```text
+query_category L32 wrong_alpha2:
+  generated_down_projection +1.485
+  switch 1/5
+  full_margin_gain +0.050
+
+query_category L32 random_alpha2:
+  final_norm_input projection +1.019
+```
+
+Qwen3 的结论：
+
+```text
+存在弱生成桥接现象，但 repair/wrong/random 区分不足；
+不能作为 clean value-gate closure 证据。
+```
+
+#### GLM4
+
+```text
+cases = 64
+target_cases_seen = 4
+probe_layer = L39
+```
+
+最强 component：
+
+```text
+prompt_last L39 repair_alpha2 mlp_input:
+  projection_specific_margin +2.024
+  positive_rate 0.500
+```
+
+但最终输出：
+
+```text
+所有 key switch = 0/4
+best full_margin_gain = +0.016
+first_token_logit_margin_gain = +0.000
+```
+
+GLM4 的结论：
+
+```text
+内部 component 可以出现 projection，
+但没有进入最终候选胜出竞争；
+Phase546 以来的 GLM4 弱生成桥判断继续成立。
+```
+
+#### DS7B
+
+```text
+cases = 64
+target_cases_seen = 21
+probe_layer = L27
+```
+
+最终效果：
+
+```text
+rule_value L26 repair_alpha2:
+  generated_down_projection +3.618
+  switch 0/21
+  full_margin_gain -0.006
+  first_token_logit_margin_gain +0.000
+
+prompt_last L26 repair_alpha2:
+  generated_down_projection +4.414
+  switch 0/21
+  full_margin_gain -0.022
+  first_token_logit_margin_gain +0.000
+
+prompt_last L26 random_alpha2:
+  generated_down_projection +6.424
+  switch 0/21
+  full_margin_gain -0.012
+```
+
+关键 component path：
+
+```text
+rule_value L26 repair_alpha2:
+  layer_input +3.643
+  attn_out -2.037
+  mlp_input +0.098
+  mlp_out -1.272
+  layer_out +0.325
+  final_norm_input +0.325
+  final_norm_output +0.151
+  full_margin_gain -0.006
+
+prompt_last L26 repair_alpha2:
+  layer_input +4.402
+  attn_out -1.550
+  mlp_input +0.090
+  mlp_out -4.914
+  layer_out -2.000
+  final_norm_input -2.000
+  final_norm_output +0.151
+  full_margin_gain -0.022
+
+prompt_last L26 random_alpha2:
+  layer_input +6.382
+  attn_out -3.992
+  mlp_input +0.095
+  mlp_out -2.497
+  layer_out -0.102
+  final_norm_input -0.102
+  final_norm_output +0.091
+  full_margin_gain -0.012
+```
+
+最重要事实：
+
+```text
+DS7B L26 注入信号确实进入 L27 layer_input；
+L27 attention output 往往产生反向 projection；
+L27 MLP output 也产生反向 projection 或强抵消；
+到 layer_out / final_norm_input 时已明显衰减或反向；
+final_norm_output 只剩 +0.151 / +0.091 级别；
+最终 full candidate margin 不改善。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase598 对断点位置的判断基本正确。**
+
+```text
+断点不在 L26 MLP 是否能生成 projection，
+而在 L27/final stage 是否接受、保留并转化这个 projection。
+```
+
+2. **DS7B 的最后层不是被动传递层，而是主动重写/抵消层。**
+
+```text
+layer_input 强正 projection
+-> attn_out 反向 projection
+-> mlp_out 反向 projection
+-> layer_out / final_norm_input 衰减或反向
+```
+
+3. **final norm 也有压缩，但不是唯一断点。**
+
+例如：
+
+```text
+rule_value repair:
+  final_norm_input +0.325
+  final_norm_output +0.151
+
+prompt_last repair:
+  final_norm_input -2.000
+  final_norm_output +0.151
+```
+
+说明 final norm 会压缩/重标定，但在它之前，L27 attention/MLP 已经发生明显抵消。
+
+4. **first-token logit 指标在本轮几乎无效。**
+
+```text
+first_token_logit_margin_gain 全部接近 0。
+```
+
+原因很可能是候选值存在共享首 token 或首 token 竞争无法代表完整 candidate logprob。
+因此本轮更可靠指标是：
+
+```text
+full candidate logprob margin
+component projection_specific_margin
+```
+
+5. **Qwen3 有少量 switch，但 repair/wrong/random 不干净。**
+
+```text
+Qwen3 query_category L32 repair switch 2/5，
+但 wrong/random 也出现相近 component projection。
+```
+
+这不能解释成完整机制闭合，只能作为弱桥接现象。
+
+6. **GLM4 继续显示内部弱信号与外部生成之间断裂。**
+
+```text
+component projection 可以出现，
+final switch = 0/4。
+```
+
+### 对附件分析的判定
+
+附件中正确部分：
+
+```text
+1. Phase598 的“信号生成不是瓶颈，后续轨迹接受是瓶颈”判断正确。
+2. 下一步分解 final layer washout 是正确路线。
+3. 不能继续只看 projection 强度，必须看轨迹能否活到最终读出。
+4. random 也会被冲洗，说明后续层可能在维护自然轨迹一致性。
+```
+
+需要修正或更谨慎的部分：
+
+```text
+1. “final layer washout”不能只归因于 final norm 或 lm_head。
+   Phase599 显示 L27 attention 和 L27 MLP 已经产生反向抵消。
+
+2. “repair direction 是否正确”仍未完全证明。
+   因为 random/wrong 在部分模型和节点上也能产生强 projection 或弱 margin gain。
+
+3. 当前 component hook 是工程近似：
+   attention output / MLP output 的具体含义依赖模型结构实现；
+   需要后续做更精确的 residual add 前后、norm 前后拆解。
+
+4. Qwen3 与 GLM4 的确认样本有效 target cases 较少；
+   本轮更可靠的主结论仍来自 DS7B 的 21 个 target cases。
+```
+
+### 理论进展
+
+当前机制链应从：
+
+```text
+conditioned state -> MLP generates candidate projection -> final readout
+```
+
+修正为：
+
+```text
+conditioned state
+-> local MLP generates candidate projection
+-> projection enters next-layer residual stream
+-> final attention/MLP performs trajectory consistency filtering
+-> surviving signal passes final norm
+-> lm_head/readout competition
+```
+
+Phase599 的新增核心是：
+
+```text
+最后层不是简单读取器，而是轨迹一致性过滤器。
+```
+
+对“破解语言编码机制”的启发：
+
+```text
+语言生成不是把某个语义向量送到 lm_head 就结束；
+模型内部存在一个“轨迹合法性”结构。
+局部候选方向即使语义上看似正确，
+如果不符合最后层所接受的自然轨迹，就会被 attention/MLP 抵消。
+```
+
+因此当前研究必须从：
+
+```text
+寻找单点因果向量
+```
+
+继续转向：
+
+```text
+绘制状态轨迹图谱：
+哪些状态变化被后续层接受，
+哪些状态变化被后续层冲洗，
+哪些状态变化能跨过 final-layer consistency filter。
+```
+
+### 硬伤与瓶颈
+
+1. **仍然是 confirm 规模，不是全量扫描。**
+
+```text
+DS7B 结果较清楚；
+Qwen3 / GLM4 target cases 少，不能承担强泛化结论。
+```
+
+2. **component 边界还不够细。**
+
+当前记录：
+
+```text
+attn_out
+mlp_input
+mlp_out
+layer_out
+```
+
+但还缺：
+
+```text
+pre-attn norm
+post-attn residual add
+post-attn norm
+post-MLP residual add
+pre/post final norm exact scaling
+```
+
+3. **repair/random/wrong 的分离仍不充分。**
+
+如果 random 也能进入 layer_input 并被冲洗，说明：
+
+```text
+当前 projection 方向只描述“值候选轴”，
+没有描述“自然轨迹合法性因子”。
+```
+
+4. **最终读出仍未打开。**
+
+本轮说明：
+
+```text
+L27 attention/MLP 是主要冲洗点之一；
+但还没有找到能绕过或满足这个过滤器的 repair 方法。
+```
+
+### 下一步任务
+
+Phase600 应进入：
+
+```text
+Final-Layer Acceptance Rule Audit
+```
+
+核心问题：
+
+```text
+最后层到底接受什么样的轨迹变化？
+```
+
+测试目标：
+
+```text
+不再只问 projection 是否强，
+而是比较 accepted natural trajectory 与 rejected artificial projection 的差异。
+```
+
+建议方案：
+
+```text
+1. 以 DS7B 为主，Qwen3/GLM4 做确认对照。
+2. 对同一 query，构造 correct target 自然 prompt、wrong target 自然 prompt、repair-interpolated prompt。
+3. 记录 L27：
+   - pre-attn norm input/output
+   - attention output
+   - post-attn residual
+   - pre-MLP norm input/output
+   - MLP output
+   - post-MLP residual
+   - final norm input/output
+4. 比较三类差异：
+   - natural correct trajectory
+   - natural wrong trajectory
+   - artificial repair trajectory
+5. 测量 artificial repair 为什么不像 natural correct：
+   - norm 尺度不同
+   - attention source pattern 不同
+   - MLP gate pattern 不同
+   - residual direction 夹角不同
+   - readout rank/margin 不同
+6. 如果找到 acceptance factor，再做 targeted restore：
+   projection repair + acceptance factor repair
+```
+
+判据：
+
+```text
+如果 artificial repair 与 natural correct 在 projection 上相近，
+但在 attention pattern / norm scale / MLP gate 上系统不同，
+则 value gate 的真正缺失项是 trajectory acceptance factor。
+
+如果补上 acceptance factor 后 full candidate margin 和 switch 明显改善，
+才可以认为 value gate 进入更高层机制闭合。
+```
