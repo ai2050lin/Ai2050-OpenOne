@@ -63879,3 +63879,568 @@ Final-Layer Acceptance Rule Audit
 如果补上 acceptance factor 后 full candidate margin 和 switch 明显改善，
 才可以认为 value gate 进入更高层机制闭合。
 ```
+
+## Phase 600: Final-Layer Acceptance Rule Audit 最后一层轨迹接受规则审计 [2026-06-24 10:19]
+
+### 本阶段目标
+
+根据附件对 Phase599 的分析，先判断其是否正确，再继续推进任务。
+
+附件中正确部分：
+
+```text
+1. Phase599 把 Phase598 的 downstream washout 进一步定位到最后层内部。
+2. DS7B 中 L26 局部信号不是不能生成，也不是不能进入 residual stream，而是在 L27 attention/MLP 后被重写或抵消。
+3. final norm 不是唯一断点，L27 attention 和 L27 MLP 已经发生主动处理。
+4. 接下来必须比较 natural correct trajectory、natural wrong trajectory、artificial repair trajectory。
+```
+
+需要保持谨慎的部分：
+
+```text
+“最后层是 trajectory consistency filter”目前是工作性描述，
+不是已经闭合的完整理论。
+
+本轮必须客观测量：
+人工修复轨迹到底哪里不像自然正确轨迹。
+```
+
+本阶段因此进入：
+
+```text
+Final-Layer Acceptance Rule Audit
+```
+
+核心目标：
+
+```text
+比较自然正确轨迹、自然错误轨迹、人工修复轨迹、人工随机轨迹、人工错误轨迹，
+判断最后层接受的不是单个 projection，而是哪类完整轨迹变化。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase600_final_layer_acceptance_rule_audit.py \
+  tests/glm5/phase600_final_layer_acceptance_rule_audit_summary.py
+
+python tests/glm5/phase600_final_layer_acceptance_rule_audit.py qwen3 \
+  --smoke \
+  --output-dir results/glm5_phase600_final_layer_acceptance_rule_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase600_final_layer_acceptance_rule_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase600_final_layer_acceptance_rule_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase600_final_layer_acceptance_rule_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase600_final_layer_acceptance_rule_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase600_final_layer_acceptance_rule_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase600_final_layer_acceptance_rule_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase600_final_layer_acceptance_rule_audit_summary.py
+```
+
+### 脚本与结果文件
+
+- 主脚本：`tests/glm5/phase600_final_layer_acceptance_rule_audit.py`
+- 汇总脚本：`tests/glm5/phase600_final_layer_acceptance_rule_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase600_final_layer_acceptance_rule_audit/phase600_qwen3_final_layer_acceptance_rule_audit_confirm.json`
+- GLM4 结果：`results/glm5_phase600_final_layer_acceptance_rule_audit/phase600_glm4_final_layer_acceptance_rule_audit_confirm.json`
+- DS7B 结果：`results/glm5_phase600_final_layer_acceptance_rule_audit/phase600_deepseek7b_final_layer_acceptance_rule_audit_confirm.json`
+- 跨模型汇总：`results/glm5_phase600_final_layer_acceptance_rule_audit/phase600_cross_model_summary.md`
+
+### 测试原理
+
+Phase599 只看：
+
+```text
+人工注入信号进入最后层后如何被冲洗。
+```
+
+Phase600 进一步加入自然轨迹对照：
+
+```text
+base prompt
+natural correct prompt
+natural wrong prompt
+artificial repair patch
+artificial random patch
+artificial wrong patch
+```
+
+每条轨迹在最后层记录：
+
+```text
+layer_input
+attn_out
+mlp_input
+mlp_out
+layer_out
+final_norm_input
+final_norm_output
+attention pattern summary
+full candidate logprob margin
+```
+
+核心指标：
+
+```text
+projection_specific_margin
+effect_norm
+cos_to_natural_correct
+norm_ratio_to_natural_correct
+attn_l1_to_base
+full_margin_gain
+switch
+```
+
+判据：
+
+```text
+如果 artificial repair projection 很强，
+但 cos_to_natural_correct 很低且 full_margin 不改善，
+说明它不是自然正确轨迹，只是局部候选轴扰动。
+
+如果 natural correct 在最后层形成稳定组件组合，
+而 artificial repair 只命中其中一部分，
+说明 acceptance factor 不是单点方向，而是多组件轨迹模式。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+confirm cases/model = 96
+target_only = true
+alpha = 2.0
+capture_attn = true
+Qwen3 target cases = 7
+GLM4 target cases = 13
+DS7B target cases = 37
+```
+
+DS7B watched nodes：
+
+```text
+rule_value L26
+prompt_last L26
+query_relation L19
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+target_cases_seen = 7
+probe_layer = L35
+```
+
+人工最终效果：
+
+```text
+query_category L32 artificial_repair:
+  switch 2/7
+  generated_down_projection +1.214
+  full_margin_gain +0.036
+
+prompt_last L32 artificial_repair:
+  switch 1/7
+  generated_down_projection +0.974
+  full_margin_gain +0.071
+```
+
+但对照仍不干净：
+
+```text
+query_category L32 artificial_wrong:
+  switch 1/7
+  generated_down_projection +1.448
+  full_margin_gain +0.018
+
+prompt_last L34 artificial_random:
+  switch 1/7
+  generated_down_projection -0.951
+  full_margin_gain -0.018
+```
+
+自然轨迹和人工轨迹差异：
+
+```text
+prompt_last L32 natural_correct layer_input:
+  projection +5.321
+  cos_to_natural_correct 1.000
+
+prompt_last L32 artificial_repair layer_input:
+  projection +1.510
+  cos_to_natural_correct 0.390
+
+prompt_last L32 artificial_repair final_norm_input:
+  projection +1.655
+  cos_to_natural_correct 0.431
+```
+
+Qwen3 结论：
+
+```text
+人工 repair 可以产生少量 switch，
+但它距离 natural correct trajectory 仍很远；
+wrong/random 对照仍能接近部分效果。
+```
+
+#### GLM4
+
+```text
+target_cases_seen = 13
+probe_layer = L39
+```
+
+人工最终效果：
+
+```text
+prompt_last L38 artificial_repair:
+  switch 0/13
+  generated_down_projection +0.149
+  full_margin_gain +0.005
+
+prompt_last L38 artificial_wrong:
+  switch 1/13
+  generated_down_projection -0.148
+  full_margin_gain +0.005
+```
+
+组件结果：
+
+```text
+prompt_last L39 artificial_repair mlp_input:
+  projection +0.956
+  cos_to_natural_correct 1.000
+  norm_ratio_to_natural_correct 2.000
+
+prompt_last L38 artificial_repair final_norm_output:
+  projection +0.299
+  cos_to_natural_correct 0.864
+```
+
+GLM4 结论：
+
+```text
+部分人工轨迹与 natural correct 在几何上相近，
+但仍不能稳定转化为最终 switch；
+GLM4 的生成闭合瓶颈继续存在。
+```
+
+#### DS7B
+
+```text
+target_cases_seen = 37
+probe_layer = L27
+```
+
+人工最终效果：
+
+```text
+rule_value L26 artificial_repair:
+  switch 0/17
+  generated_down_projection -0.888
+  full_margin_gain +0.009
+
+prompt_last L26 artificial_repair:
+  switch 0/37
+  generated_down_projection +3.084
+  full_margin_gain -0.018
+
+query_relation L19 artificial_repair:
+  switch 0/37
+  generated_down_projection -0.091
+  full_margin_gain -0.013
+```
+
+DS7B natural correct 的最后层模式：
+
+```text
+rule_value L26 natural_correct:
+  layer_input +0.039
+  attn_out -11.752
+  mlp_input -0.276
+  mlp_out +19.472
+  layer_out +7.778
+  final_norm_output +0.084
+
+prompt_last L26 natural_correct:
+  layer_input +2.378
+  attn_out +0.022
+  mlp_input +0.204
+  mlp_out -0.813
+  layer_out +1.595
+  final_norm_output +0.326
+
+query_relation L19 natural_correct:
+  layer_input -0.641
+  attn_out +0.923
+  mlp_input -0.012
+  mlp_out -0.237
+  layer_out +0.043
+  final_norm_output -0.013
+```
+
+DS7B artificial repair 与 natural correct 的差异：
+
+```text
+rule_value L26 artificial_repair:
+  layer_input -0.841, cos_to_natural_correct 0.298
+  attn_out +0.775, cos_to_natural_correct -0.250
+  mlp_out -2.371, cos_to_natural_correct 0.252
+  layer_out -2.407, cos_to_natural_correct 0.288
+  final_norm_output +0.289, cos_to_natural_correct 0.457
+
+prompt_last L26 artificial_repair:
+  layer_input +3.088, cos_to_natural_correct 0.262
+  attn_out -0.577, cos_to_natural_correct 0.153
+  mlp_out -2.589, cos_to_natural_correct 0.496
+  layer_out -0.017, cos_to_natural_correct 0.439
+  final_norm_output +0.194, cos_to_natural_correct 0.530
+
+query_relation L19 artificial_repair:
+  layer_input +0.288, cos_to_natural_correct 0.311
+  attn_out +0.274, cos_to_natural_correct 0.384
+  mlp_out -0.009, cos_to_natural_correct 0.332
+  layer_out +0.537, cos_to_natural_correct 0.329
+  final_norm_output +0.008, cos_to_natural_correct 0.225
+```
+
+DS7B 最可靠事实：
+
+```text
+1. natural correct trajectory 不是单纯正 projection。
+2. rule_value L26 natural correct 出现：
+   attention 强负向 + MLP 强正向 + layer_out 强正向。
+3. artificial repair 在部分节点 projection 可强，
+   但 cos_to_natural_correct 通常只有 0.15-0.53。
+4. artificial repair / random / wrong 全部 switch 0。
+5. 因此人工修复没有进入自然正确轨迹流形。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase599 的附件分析基本正确。**
+
+```text
+最后层确实不是被动读出层；
+它会按轨迹模式重写人工信号。
+```
+
+2. **value gate 的缺失项不是“更强 projection”。**
+
+DS7B prompt_last L26：
+
+```text
+artificial_repair generated_down_projection +3.084
+full_margin_gain -0.018
+switch 0/37
+```
+
+说明：
+
+```text
+候选轴强投影不能保证候选值进入最终胜出竞争。
+```
+
+3. **natural correct trajectory 是多组件组合。**
+
+尤其 rule_value L26：
+
+```text
+attention negative
+MLP strongly positive
+layer_out positive
+final_norm compressed
+```
+
+这说明最后层的“正确轨迹”可能是组件间抵消/补偿后的整体模式，而不是单个组件方向。
+
+4. **人工 repair 和自然正确轨迹的余弦相似度偏低。**
+
+DS7B：
+
+```text
+rule_value artificial_repair layer_out cos 0.288
+prompt_last artificial_repair layer_out cos 0.439
+query_relation artificial_repair layer_out cos 0.329
+```
+
+这是 Phase600 最关键的新证据：
+
+```text
+人工 repair 只是局部投影相似，不是轨迹相似。
+```
+
+5. **attention pattern 已经显示人工轨迹与自然轨迹不同，但本轮只是粗指标。**
+
+例如 DS7B：
+
+```text
+rule_value natural_correct attn_l1_to_base 0.991
+rule_value artificial_repair attn_l1_to_base 0.344
+prompt_last natural_correct attn_l1_to_base 1.103
+prompt_last artificial_repair attn_l1_to_base 0.336
+```
+
+说明自然正确 prompt 改变了最后层注意力分布，而人工 MLP input patch 对 attention pattern 的改变较弱。
+
+### 理论进展
+
+当前机制链应进一步修正为：
+
+```text
+candidate-specific projection generation
+-> residual entry
+-> final-layer trajectory pattern
+-> component-level compensation
+-> final norm compression
+-> readout competition
+```
+
+其中 Phase600 新增：
+
+```text
+final-layer trajectory pattern
+component-level compensation
+```
+
+更具体地说：
+
+```text
+自然正确轨迹不是“每个组件都朝正确方向移动”；
+而是 attention、MLP、residual、norm 之间形成一个可被模型内部接受的组合。
+人工修复只改 MLP input，虽然能制造局部投影，
+但没有同步改变 attention pattern 和最后层组件组合，
+因此被最终竞争忽略或抵消。
+```
+
+这支持一个更严格的判断：
+
+```text
+value gate 不是单点门；
+value gate 是状态轨迹门。
+```
+
+### 硬伤与瓶颈
+
+1. **自然正确轨迹和自然错误轨迹并非只差答案值。**
+
+它们 prompt 内容不同，长度和 token 分布也可能不同，因此：
+
+```text
+natural correct trajectory 不能简单等同于“纯正确答案轨迹”。
+```
+
+2. **attention pattern 只用了粗指标。**
+
+当前只统计：
+
+```text
+attn_l1_to_base
+attn_entropy
+attn_top_mass
+```
+
+还没有定位具体 source token：
+
+```text
+rules token
+object token
+category token
+relation token
+value token
+prompt suffix token
+```
+
+3. **Qwen3 / GLM4 target cases 仍偏少。**
+
+```text
+Qwen3 = 7
+GLM4 = 13
+DS7B = 37
+```
+
+跨模型方向可参考，但强结论仍主要来自 DS7B。
+
+4. **人工 repair 方式仍然单一。**
+
+本轮只 patch MLP input；没有同时 patch：
+
+```text
+attention pattern
+pre-attn norm
+post-attn residual
+MLP gate state
+final norm scale
+```
+
+5. **仍未完成生成闭合。**
+
+最关键事实仍是：
+
+```text
+DS7B all artificial switch = 0。
+```
+
+### 下一步任务
+
+Phase601 应进入：
+
+```text
+Source-Resolved Final Attention Acceptance Atlas
+```
+
+核心目标：
+
+```text
+把 Phase600 的 attention pattern 粗差异拆成 source-token 图谱。
+```
+
+测试方案：
+
+```text
+1. 仍以 DS7B 为主，Qwen3/GLM4 做小确认。
+2. 对 natural correct、natural wrong、artificial repair、artificial random 记录 L27 attention。
+3. 将 source token 分组：
+   - rule_relation
+   - rule_value
+   - object
+   - category
+   - query_relation
+   - query_category
+   - prompt_last
+   - punctuation / newline
+4. 对每个 target position 计算 attention mass delta：
+   natural_correct - base
+   natural_wrong - base
+   artificial_repair - base
+   artificial_random - base
+5. 找出自然正确轨迹独有的 source attention shift。
+6. 若发现稳定 source shift，再做双因素 patch：
+   MLP input repair + attention source-pattern repair
+```
+
+判据：
+
+```text
+如果 natural correct 相比 artificial repair 有稳定 source attention shift，
+说明 value gate 的 missing factor 是注意力源选择。
+
+如果双因素 patch 后 full candidate margin 明显改善，
+说明 final-layer acceptance factor 可以被部分闭合。
+
+如果双因素 patch 仍失败，
+说明缺失项在 MLP gate / residual norm / multi-token trajectory，而不是单层 attention。
+```
