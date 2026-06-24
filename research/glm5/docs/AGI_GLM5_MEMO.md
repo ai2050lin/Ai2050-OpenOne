@@ -60788,3 +60788,2578 @@ Atlas-Guided Causal Patch Validation
 2. common-only patch 只抬升候选集合，不改 winner。
 3. 至少一个 atlas node 出现 target switch。
 ```
+
+## Phase 593: Atlas-Guided Causal Patch Validation 图谱引导因果修补验证 [2026-06-23 22:36]
+
+### 本阶段目标
+
+根据用户要求，分析 Phase592 附加判断是否正确，并综合当前进展继续完成任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase592 是正确转向。
+2. Phase592 的价值不是证明 causal repair，而是把 candidate-specific ranking 接入 atlas。
+3. DS7B 的 ranking projection 是多位置分布式结构。
+4. Phase592 节点只能标为 Level 2 projection，不能直接解释为 causal node。
+5. 下一步必须做 atlas-guided causal patch validation。
+```
+
+本阶段核心问题：
+
+```text
+Phase592 发现的 Level2 projection nodes，
+能否通过最小 patch 升级成可改变 margin/winner 的因果节点？
+```
+
+### 测试脚本
+
+```text
+tests/glm5/phase593_atlas_guided_causal_patch.py
+tests/glm5/phase593_atlas_guided_causal_patch_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase593_atlas_guided_causal_patch.py
+
+python tests/glm5/phase593_atlas_guided_causal_patch.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase593_atlas_guided_causal_patch.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase593_atlas_guided_causal_patch.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase593_atlas_guided_causal_patch.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase593_atlas_guided_causal_patch_summary.py
+
+python -m py_compile \
+  tests/glm5/phase593_atlas_guided_causal_patch.py \
+  tests/glm5/phase593_atlas_guided_causal_patch_summary.py
+```
+
+注意：
+
+```text
+首次 DS7B 运行后发现 top_nodes 截断导致 query_relation L16/L19 未进入测试。
+已修正节点选择逻辑，DS7B 优先包含：
+  rule_value L26
+  prompt_last L26
+  rule_relation L18
+  rule_relation L20
+  query_relation L16
+  query_relation L19
+随后重新顺序运行 qwen3、GLM4、DS7B。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+alpha = 1.0
+candidate values = v05, v91, v22, v48
+```
+
+测试节点：
+
+```text
+Qwen3:
+  prompt_last L34
+  prompt_last L33
+  prompt_last L32
+  query_category L32
+  query_category L34
+  prompt_last L30
+
+GLM4:
+  prompt_last L38
+  prompt_last L39
+  prompt_last L37
+  prompt_last L36
+  prompt_last L35
+  prompt_last L34
+
+DS7B:
+  rule_value L26
+  prompt_last L26
+  rule_relation L18
+  rule_relation L20
+  query_relation L16
+  query_relation L19
+```
+
+patch modes:
+
+```text
+raw
+common_only
+specific_only
+specific_norm_raw
+common_norm_raw
+random_same_norm
+```
+
+### 测试原理
+
+对每个 Phase592 atlas node：
+
+```text
+delta = repair_hidden(layer, repair_pos) - base_hidden(layer, base_pos)
+```
+
+用候选 value output embedding mean 构造候选方向矩阵：
+
+```text
+E = [e(v05), e(v91), e(v22), e(v48)]
+```
+
+计算：
+
+```text
+candidate_scores = E * delta
+common_scores = mean(candidate_scores)
+specific_scores = candidate_scores - common_scores
+```
+
+再用最小范数解构造：
+
+```text
+common_only vector
+specific_only vector
+```
+
+并测试：
+
+```text
+raw delta patch
+common_only patch
+specific_only patch
+specific_norm_raw patch
+common_norm_raw patch
+random_same_norm patch
+```
+
+记录：
+
+```text
+winner switch
+margin_gain
+specific_margin_gain
+common_delta
+correct_specific
+old_top_wrong_specific
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+target rows = 5
+```
+
+最佳结果：
+
+```text
+prompt_last L30 specific_norm_raw:
+  switch = 2/5
+  margin_gain = +0.250
+  specific_gain = +0.250
+  common = -0.213
+  correct_specific = +0.162
+  positive_margin_rate = 0.80
+
+prompt_last L32 specific_norm_raw:
+  switch = 2/5
+  margin_gain = +0.200
+  specific_gain = +0.200
+  common = +0.073
+  correct_specific = +0.120
+
+prompt_last L34 specific_norm_raw:
+  switch = 2/5
+  margin_gain = +0.200
+  specific_gain = +0.200
+  common = +0.240
+  correct_specific = +0.062
+
+prompt_last L32 specific_only:
+  switch = 2/5
+  margin_gain = +0.100
+  positive_margin_rate = 1.00
+```
+
+Qwen3 有一定正结果，但 target rows 只有 5，且 common/control 也有少量 switch，不能作为主证据。
+
+#### GLM4
+
+```text
+target rows = 4
+```
+
+结果：
+
+```text
+best margin_gain = +0.016
+switch = 0/4
+```
+
+GLM4 没有任何可靠 causal repair。
+
+#### DS7B
+
+```text
+target rows = 21
+```
+
+最靠前结果：
+
+```text
+rule_relation L20 specific_only:
+  switch = 1/21
+  margin_gain = -0.007
+  specific_gain = -0.007
+  common = -0.004
+  correct_specific = +0.005
+
+rule_relation L18 common_norm_raw:
+  switch = 1/21
+  margin_gain = -0.018
+  specific_gain = -0.018
+  common = -0.039
+  correct_specific = -0.002
+
+rule_relation L20 common_only:
+  switch = 1/21
+  margin_gain = -0.021
+  specific_gain = -0.021
+  common = +0.008
+  correct_specific = -0.004
+
+rule_relation L18 specific_norm_raw:
+  switch = 0/21
+  margin_gain = +0.012
+  specific_gain = +0.012
+  common = -0.024
+  correct_specific = +0.022
+
+prompt_last L26 random_same_norm:
+  switch = 0/21
+  margin_gain = +0.012
+  common = +0.104
+```
+
+DS7B 关键事实：
+
+```text
+没有任何 atlas node 产生可靠正 margin 或稳定 winner repair。
+出现 1/21 switch 的项目平均 margin_gain 反而为负，
+且 common/random controls 也可出现相近现象。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase592 Level2 projection nodes 还没有升级为可靠 causal repair nodes。**
+
+DS7B 主证据：
+
+```text
+target rows = 21
+best reliable positive margin_gain ≈ +0.012
+winner switch 不可靠
+```
+
+2. **Qwen3 specific_norm_raw 有弱正结果，但不能强推。**
+
+```text
+target rows = 5
+switch = 2/5
+```
+
+样本太少，且不是跨模型稳定。
+
+3. **GLM4 完全没有修复。**
+
+```text
+switch = 0/4
+margin_gain ≈ 0
+```
+
+4. **DS7B 的投影强节点不等于可直接 patch 的因果节点。**
+
+Phase592:
+
+```text
+rule_value L26 projection specific_margin = +1.210
+```
+
+Phase593:
+
+```text
+rule_value L26 raw:
+  switch = 0/21
+  margin_gain = -0.006
+
+rule_value L26 specific_only:
+  switch = 0/21
+  margin_gain = -0.009
+```
+
+5. **candidate-specific factor 可能不是单向量可移植对象。**
+
+从 repair_prompt 到 base_prompt 的 delta 即使投影上有 specific_margin，也不能简单分解成一个可加向量并转移到 base 状态。
+
+### 理论进展
+
+Phase593 是一个负结果，但很重要。
+
+它说明：
+
+```text
+Level2 projection atlas node
+  不等于
+Level5 hidden causal repair node
+```
+
+也就是说，图谱需要记录因果等级，不能把所有图谱节点混为一种证据。
+
+当前 value gate 图谱应区分：
+
+```text
+1. projection node:
+   能在 repair-base delta 中读出 correct-specific ranking。
+
+2. causal patch node:
+   把该节点的向量加入 base 后能改变 margin/winner。
+
+3. compositional repair node:
+   能在不同样本、不同模板、不同模型复用。
+```
+
+Phase592 找到了第 1 类。
+Phase593 尚未找到第 2 类。
+
+这进一步支持整体图谱路线：
+
+```text
+不是每个高投影节点都是因果节点；
+机制图谱必须包含证据等级和失败记录。
+```
+
+### 硬伤与问题
+
+1. **specific/common 分解依赖 output embedding mean 子空间。**
+
+由于候选 embedding 不正交：
+
+```text
+common_only 仍可能带少量 specific effect
+specific_only 也可能带 common leakage
+```
+
+因此本轮分解只是近似。
+
+2. **patch 是单点向量加法。**
+
+如果 candidate-specific ranking 需要多 token 协同或非线性门控，单点 patch 会失败。
+
+3. **projection delta 来自 repair_prompt 与 base_prompt 的不同上下文。**
+
+repair 状态中的向量未必可直接移植到 base 状态。
+
+4. **没有拆 attention head / MLP channel。**
+
+因果路径可能在更细粒度组件中，而不是残差 hidden vector 本身。
+
+5. **DS7B 的正结果太弱。**
+
+```text
+best positive margin_gain = +0.012
+```
+
+这低于 Phase590 raw hidden patch 的 +0.042，不满足成功判据。
+
+### 新增客观事实拼图
+
+326. **Phase592 projection peaks 未能直接升级为 DS7B causal repair nodes。**
+327. **DS7B rule_value L26 投影强，但 raw/specific patch 无效。**
+328. **DS7B rule_relation L18/L20 有少量 switch，但平均 margin_gain 为负，不能作为修复证据。**
+329. **Qwen3 specific_norm_raw prompt_last patch 有弱正效果，但样本少且不可泛化。**
+330. **GLM4 atlas-guided patch 基本无效。**
+331. **projection evidence 与 causal patch evidence 必须在图谱中严格分层。**
+332. **candidate-specific ranking 很可能不是单点可加向量，而是上下文条件化的状态变换。**
+
+### 结果文件
+
+```text
+tests/glm5/phase593_atlas_guided_causal_patch.py
+tests/glm5/phase593_atlas_guided_causal_patch_summary.py
+
+results/glm5_phase593_atlas_guided_causal_patch/
+  phase593_qwen3_atlas_guided_causal_patch_smoke.json
+  phase593_qwen3_atlas_guided_causal_patch_confirm.json
+  phase593_glm4_atlas_guided_causal_patch_confirm.json
+  phase593_deepseek7b_atlas_guided_causal_patch_confirm.json
+  phase593_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase594 应进入：
+
+```text
+Conditional Transformation Atlas
+```
+
+核心目标：
+
+```text
+不要再把 candidate-specific ranking 当作一个可加向量；
+改为测量 repair_prompt 如何改变“状态变换规则”。
+```
+
+具体方案：
+
+```text
+1. 对 DS7B target cases，比较 base_prompt 与 repair_prompt 的 layer-to-layer transition：
+   h_l -> h_{l+1}
+
+2. 在 Phase592 节点周围测：
+   - incoming delta
+   - outgoing delta
+   - attention output delta
+   - MLP output delta
+   - residual update delta
+
+3. 记录 candidate-specific ranking 是在：
+   - 输入状态 already present
+   - attention update 产生
+   - MLP update 产生
+   - residual carry 中累积
+
+4. 输出 atlas edges：
+   source layer-position -> component update -> target layer-position
+
+5. 只在发现 component update 明确产生 specific_margin 后，再做 component-level causal patch。
+```
+
+成功判据：
+
+```text
+1. 找到 candidate-specific ranking 从无到有的 transition edge。
+2. edge 的输出 specific_margin 明显高于输入。
+3. component-level patch 能比 Phase593 单点 residual patch 更强。
+```
+
+## Phase 594: Conditional Transformation Atlas 条件化状态变换图谱 [2026-06-23 22:52]
+
+### 本阶段目标
+
+根据用户要求，分析 Phase593 附加判断是否正确，并综合当前进展继续任务。
+
+附加分析中正确部分：
+
+```text
+1. Phase593 是关键负结果 + 方法论升级阶段。
+2. Phase592 projection node 不等于 causal node。
+3. candidate-specific ranking 可能不是单点可加 residual vector。
+4. 下一步应从状态向量转向 layer-to-layer conditional transformation。
+```
+
+本阶段核心问题：
+
+```text
+repair_prompt 中的 candidate-specific ranking
+到底是在进入某层前已经存在，
+还是由该层的 attention / MLP / residual update 生成？
+```
+
+### 测试脚本
+
+```text
+tests/glm5/phase594_conditional_transformation_atlas.py
+tests/glm5/phase594_conditional_transformation_atlas_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/glm5/phase594_conditional_transformation_atlas.py
+
+python tests/glm5/phase594_conditional_transformation_atlas.py qwen3 \
+  --smoke \
+  --hard-exit-after-model
+
+python tests/glm5/phase594_conditional_transformation_atlas.py qwen3 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase594_conditional_transformation_atlas.py glm4 \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase594_conditional_transformation_atlas.py deepseek7b \
+  --confirm \
+  --hard-exit-after-model
+
+python tests/glm5/phase594_conditional_transformation_atlas_summary.py
+
+python -m py_compile \
+  tests/glm5/phase594_conditional_transformation_atlas.py \
+  tests/glm5/phase594_conditional_transformation_atlas_summary.py
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = v05, v91, v22, v48
+```
+
+测试节点来自 Phase592 / Phase593：
+
+```text
+Qwen3:
+  prompt_last L34
+  prompt_last L33
+  prompt_last L32
+  query_category L32
+  query_category L34
+  prompt_last L30
+
+GLM4:
+  prompt_last L38
+  prompt_last L39
+  prompt_last L37
+  prompt_last L36
+  prompt_last L35
+  prompt_last L34
+
+DS7B:
+  rule_value L26
+  prompt_last L26
+  rule_relation L18
+  rule_relation L20
+  query_relation L16
+  query_relation L19
+```
+
+### 测试原理
+
+对每个 atlas node：
+
+```text
+incoming:
+  h_repair(layer, pos) - h_base(layer, pos)
+
+outgoing:
+  h_repair(layer+1, pos) - h_base(layer+1, pos)
+
+residual_update:
+  outgoing - incoming
+
+attention_update:
+  attention_output_repair(layer, pos) - attention_output_base(layer, pos)
+
+MLP_update:
+  mlp_output_repair(layer, pos) - mlp_output_base(layer, pos)
+```
+
+再投影到候选 value output embedding mean，并计算：
+
+```text
+common
+correct_specific
+old_top_wrong_specific
+specific_margin = correct_specific - old_top_wrong_specific
+```
+
+transition gain：
+
+```text
+outgoing_specific_margin - incoming_specific_margin
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+target rows = 5
+```
+
+最高信号：
+
+```text
+prompt_last L34 outgoing:
+  specific_margin = +3.740
+  correct_specific = +1.292
+  positive_rate = 0.80
+
+prompt_last L34 incoming:
+  specific_margin = +3.169
+  correct_specific = +1.201
+
+prompt_last L32 transition_gain:
+  specific_margin gain = +1.239
+  correct_specific gain = +0.460
+  positive_rate = 0.80
+
+prompt_last L32 attention_update:
+  specific_margin = +1.092
+  correct_specific = +0.369
+```
+
+Qwen3 显示 late prompt_last 的 state carry 很强，L32 有明显 transition/attention update，但 target rows 仍少。
+
+#### GLM4
+
+```text
+target rows = 4
+```
+
+最高信号：
+
+```text
+prompt_last L38 outgoing:
+  specific_margin = +0.821
+  correct_specific = +0.383
+
+prompt_last L38 transition_gain:
+  specific_margin gain = +0.353
+  correct_specific gain = +0.130
+  positive_rate = 1.00
+
+prompt_last L38 residual_update:
+  specific_margin = +0.353
+  correct_specific = +0.130
+
+prompt_last L38 mlp_update:
+  specific_margin = +0.330
+  correct_specific = +0.122
+```
+
+GLM4 有可见 prompt_last L38 transition / MLP update 信号，但 target rows 只有 4。
+
+#### DS7B
+
+```text
+target rows = 21
+```
+
+最高信号：
+
+```text
+rule_value L26 outgoing:
+  specific_margin = +1.210
+  correct_specific = +0.718
+  positive_rate = 0.43
+
+rule_value L26 mlp_update:
+  specific_margin = +1.206
+  correct_specific = +0.309
+  positive_rate = 0.76
+
+prompt_last L26 outgoing:
+  specific_margin = +1.054
+  correct_specific = +2.296
+  positive_rate = 0.38
+
+rule_relation L18 outgoing:
+  specific_margin = +0.774
+  correct_specific = +0.089
+  positive_rate = 0.76
+
+rule_value L26 incoming:
+  specific_margin = +0.616
+  correct_specific = +0.469
+  positive_rate = 0.62
+
+rule_value L26 residual_update:
+  specific_margin = +0.594
+  correct_specific = +0.249
+  positive_rate = 0.48
+
+rule_value L26 transition_gain:
+  specific_margin gain = +0.594
+  correct_specific gain = +0.249
+  positive_rate = 0.48
+
+query_relation L19 mlp_update:
+  specific_margin = +0.519
+  correct_specific = +0.195
+  positive_rate = 0.86
+
+query_relation L19 transition_gain:
+  specific_margin gain = +0.410
+  correct_specific gain = +0.190
+  positive_rate = 0.76
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B rule_value L26 是目前最强 transition point。**
+
+```text
+incoming specific_margin = +0.616
+outgoing specific_margin = +1.210
+transition_gain = +0.594
+```
+
+2. **DS7B rule_value L26 的 MLP update 几乎复现 outgoing specific_margin。**
+
+```text
+MLP_update = +1.206
+outgoing = +1.210
+```
+
+这说明 candidate-specific ranking 很可能在该层 MLP update 中被强烈生成。
+
+3. **DS7B query_relation L19 也是非最终位置的 relation-path update 节点。**
+
+```text
+MLP_update = +0.519
+transition_gain = +0.410
+positive_rate = 0.76 to 0.86
+```
+
+4. **prompt_last 并不是唯一节点。**
+
+DS7B 的强信号分布在：
+
+```text
+rule_value
+rule_relation
+query_relation
+prompt_last
+```
+
+5. **Phase594 比 Phase592/593 更接近机制生成位置。**
+
+Phase592 找 projection peak。
+Phase593 直接 patch 失败。
+Phase594 显示某些 component update 本身可能产生 candidate-specific ranking。
+
+### 理论进展
+
+Phase593 的负结果表明：
+
+```text
+candidate-specific ranking 不是静态可加向量。
+```
+
+Phase594 进一步把理论更新为：
+
+```text
+candidate-specific ranking 是条件化状态变换的产物。
+```
+
+更精确：
+
+```text
+repair_prompt 不只是让某个 hidden state 多一个 direction；
+它改变了某些层在特定 token/span 上的 update 输出，
+尤其是 MLP update / residual update。
+```
+
+对于 DS7B，目前最具体的假设是：
+
+```text
+rule_value L26 MLP update
+  生成或放大 correct-specific ranking；
+
+query_relation L19 MLP update
+  生成 relation-path ranking signal；
+
+prompt_last L26
+  汇聚强 common activation 与 ranking projection，
+  但不是最干净的生成源。
+```
+
+### 硬伤与问题
+
+1. **仍是 projection-level transition evidence。**
+
+```text
+MLP_update projection 强，不等于 MLP_update patch 一定修复。
+```
+
+2. **component output 捕获是整层 MLP/attention output。**
+
+仍未拆 MLP channel 和 attention head。
+
+3. **DS7B rule_value L26 positive_rate 只有 0.43。**
+
+均值强，但不是所有样本都正向。需要样本簇分析。
+
+4. **attention_update 在 DS7B 没有进入 top。**
+
+本轮更支持 MLP update，但不能排除 attention head 层面信号被整层平均掉。
+
+5. **Qwen3/GLM4 target rows 少。**
+
+跨模型结论只能谨慎说：
+
+```text
+candidate-specific ranking 可以表现为 late-layer transition/update signal。
+```
+
+不能强推相同位置。
+
+### 新增客观事实拼图
+
+333. **candidate-specific ranking 可以在 layer-to-layer transition 中增强。**
+334. **DS7B rule_value L26 是当前最强 transition gain 节点。**
+335. **DS7B rule_value L26 MLP update 几乎等于 outgoing ranking projection。**
+336. **DS7B query_relation L19 MLP update 是 relation-path ranking signal 候选。**
+337. **prompt_last L26 更像汇聚点，而 rule_value/query_relation 更像路径生成点。**
+338. **Phase593 的 patch 失败后，Phase594 指向 component update 而非 residual state vector。**
+339. **value gate 的 candidate-specific ranking 更像条件化变换结果，而不是静态方向。**
+
+### 结果文件
+
+```text
+tests/glm5/phase594_conditional_transformation_atlas.py
+tests/glm5/phase594_conditional_transformation_atlas_summary.py
+
+results/glm5_phase594_conditional_transformation_atlas/
+  phase594_qwen3_conditional_transformation_atlas_smoke.json
+  phase594_qwen3_conditional_transformation_atlas_confirm.json
+  phase594_glm4_conditional_transformation_atlas_confirm.json
+  phase594_deepseek7b_conditional_transformation_atlas_confirm.json
+  phase594_cross_model_summary.md
+```
+
+### 下一步任务
+
+Phase595 应进入：
+
+```text
+MLP Update Causal Validation
+```
+
+核心目标：
+
+```text
+验证 DS7B rule_value L26 MLP update 是否是真因果更新，而不仅是 projection。
+```
+
+测试方案：
+
+```text
+1. 只以 DS7B 为主，qwen3/glm4 做小对照。
+2. 对 target cases，patch MLP output 而不是 residual hidden state。
+3. 重点节点：
+   - rule_value L26 MLP update
+   - query_relation L19 MLP update
+   - prompt_last L26 MLP update
+4. 比较：
+   - raw MLP update
+   - specific-only MLP update
+   - common-only MLP update
+   - random same-norm
+5. 记录：
+   - correct gain
+   - old top-wrong gain
+   - common gain
+   - specific margin gain
+   - winner switch
+```
+
+成功判据：
+
+```text
+1. DS7B rule_value L26 MLP update patch 的 margin_gain 明显超过 Phase593 best +0.012。
+2. specific-only MLP update 优于 common-only。
+3. 至少出现稳定 target switch，而不是 1/21 偶发。
+```
+
+## Phase 595: MLP Update Causal Validation 组件更新因果验证 [2026-06-23 23:08]
+
+### 本阶段目标
+
+根据用户要求，先判断附件中对 Phase594 的分析是否正确，再综合当前进展继续完成任务。
+
+附件分析中正确部分：
+
+```text
+1. Phase594 的确是一次方法论升级：研究对象从 state vector 位置转向 transition/update 生成机制。
+2. DS7B rule_value L26 MLP update 是 Phase594 中最强的 candidate-specific projection 候选。
+3. Phase594 仍然只是 projection-level evidence，不能直接解释为 causal repair。
+4. 下一步必须直接 patch MLP output，验证 MLP update 是否有因果作用。
+```
+
+需要修正的部分：
+
+```text
+Phase594 发现的强 MLP update projection，不能预设会转化为可移植的 additive causal patch。
+本轮结果显示，至少在当前 patch 方式下，DS7B rule_value L26 MLP update 没有形成稳定 repair。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase595_mlp_update_causal_validation.py \
+  tests/glm5/phase595_mlp_update_causal_validation_summary.py
+
+python tests/glm5/phase595_mlp_update_causal_validation.py qwen3 \
+  --smoke \
+  --output-dir results/glm5_phase595_mlp_update_causal_validation \
+  --hard-exit-after-model
+
+python tests/glm5/phase595_mlp_update_causal_validation.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase595_mlp_update_causal_validation \
+  --hard-exit-after-model
+
+python tests/glm5/phase595_mlp_update_causal_validation.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase595_mlp_update_causal_validation \
+  --hard-exit-after-model
+
+python tests/glm5/phase595_mlp_update_causal_validation.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase595_mlp_update_causal_validation \
+  --hard-exit-after-model
+
+python tests/glm5/phase595_mlp_update_causal_validation_summary.py
+```
+
+### 脚本与结果文件
+
+```text
+tests/glm5/phase595_mlp_update_causal_validation.py
+tests/glm5/phase595_mlp_update_causal_validation_summary.py
+
+results/glm5_phase595_mlp_update_causal_validation/
+  phase595_qwen3_mlp_update_causal_validation_smoke.json
+  phase595_qwen3_mlp_update_causal_validation_confirm.json
+  phase595_glm4_mlp_update_causal_validation_confirm.json
+  phase595_deepseek7b_mlp_update_causal_validation_confirm.json
+  phase595_cross_model_summary.md
+```
+
+### 测试原理
+
+Phase594 只测量：
+
+```text
+repair_prompt MLP update - base_prompt MLP update
+```
+
+在候选答案 embedding 方向上的投影。
+
+Phase595 改为直接因果干预：
+
+```text
+在 base_prompt 前向传播中，选定 layer/position 的 MLP module output 加上 repair-base 的 MLP delta。
+```
+
+测试向量包括：
+
+```text
+raw
+specific_only
+common_only
+specific_norm_raw
+common_norm_raw
+random_same_norm
+```
+
+记录指标：
+
+```text
+switch
+margin_gain
+specific_margin_gain
+common_delta
+correct_specific
+old_top_wrong_specific
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = red, blue, green, yellow
+top nodes/model = 6
+alpha = 1.0
+```
+
+目标行数量：
+
+```text
+Qwen3: 5 target rows
+GLM4: 4 target rows
+DS7B: 21 target rows
+```
+
+DS7B 重点节点：
+
+```text
+rule_value L26
+query_relation L19
+prompt_last L26
+rule_relation L20
+rule_relation L18
+query_relation L16
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+best: prompt_last L33 mlp specific_norm_raw
+switch = 2/5
+margin_gain = +0.125
+specific_margin_gain = +0.125
+
+random/control 同量级：
+query_category L32 mlp random_same_norm switch = 1/5
+prompt_last L33 mlp random_same_norm switch = 1/5
+```
+
+解释：
+
+```text
+Qwen3 target rows 只有 5 个，结果弱且 control 同量级，不能作为机制闭合证据。
+```
+
+#### GLM4
+
+```text
+best switch = 0/4
+best margin_gain = 0.000
+```
+
+解释：
+
+```text
+GLM4 在当前任务中没有 MLP update causal repair。
+```
+
+#### DS7B
+
+Phase594 最强候选：
+
+```text
+rule_value L26 mlp_update projection:
+mean_specific_margin = +1.206
+positive_rate = 0.762
+```
+
+Phase595 直接 MLP output patch：
+
+```text
+rule_value L26 mlp raw:
+switch = 0/21
+margin_gain = -0.009
+specific_margin_gain = -0.009
+common_delta = +0.000
+correct_specific = -0.009
+old_top_wrong_specific = -0.000
+
+rule_value L26 mlp specific_only:
+switch = 0/21
+margin_gain = -0.012
+specific_margin_gain = -0.012
+
+rule_value L26 mlp common_only:
+switch = 0/21
+margin_gain = -0.000
+specific_margin_gain = -0.000
+
+query_relation L19 mlp raw:
+switch = 0/21
+margin_gain = -0.016
+specific_margin_gain = -0.016
+common_delta = +0.229
+
+query_relation L19 mlp specific_only:
+switch = 0/21
+margin_gain = -0.036
+specific_margin_gain = -0.036
+```
+
+本轮 DS7B 最好项：
+
+```text
+rule_relation L18 mlp raw:
+switch = 1/21
+margin_gain = +0.024
+specific_margin_gain = +0.024
+common_delta = +0.033
+```
+
+解释：
+
+```text
+1/21 switch 太弱，且不是 Phase594 最强节点，不能视为稳定 repair。
+```
+
+### 核心判断
+
+1. **附件对 Phase594 的定位基本正确，但 Phase595 给出了关键否定。**
+
+```text
+MLP update projection 强，不等于 MLP output additive patch 因果有效。
+```
+
+2. **DS7B rule_value L26 MLP update 是真实可测信号，但不是当前形式的可移植修复向量。**
+
+```text
+Phase594: +1.206 projection
+Phase595: 0/21 switch, margin_gain -0.009
+```
+
+3. **value gate 更像条件化变换，不像单点加性向量。**
+
+如果 MLP update 只是一个简单残差方向，那么 raw/specific_only patch 至少应该部分复现 Phase594 的正向特异增益。
+
+实际结果没有复现，说明：
+
+```text
+MLP update 的意义依赖当前 token 的归一化状态、上下游 residual context、attention/MLP 协同，或候选竞争门控。
+```
+
+4. **Phase593 与 Phase595 形成一致负结果链。**
+
+```text
+Phase593: residual atlas node additive patch 失败
+Phase595: MLP component update additive patch 失败
+```
+
+共同说明：
+
+```text
+candidate-specific ranking 不是一个可直接复制的静态向量。
+```
+
+### 硬伤与问题
+
+1. **patch 方式仍是 additive。**
+
+当前只是：
+
+```text
+h_new = h + delta
+```
+
+如果真实机制是条件化映射：
+
+```text
+delta = F(h, context, relation, value)
+```
+
+那么直接加 delta 可能破坏局部动力学。
+
+2. **没有 patch MLP 内部 gate/up/down activation。**
+
+本轮 patch 的是 MLP module output，不是：
+
+```text
+gate_proj activation
+up_proj activation
+down_proj activation
+activation after nonlinearity
+```
+
+如果 value gate 在 MLP 内部乘法门控中形成，输出级 patch 可能已经错过关键结构。
+
+3. **没有做 pairwise conditional patch。**
+
+当前把 repair_prompt 的 update 搬到 base_prompt，但没有保持同一 hidden state 条件。
+
+更严格的测试应比较：
+
+```text
+base hidden state + repair MLP internal gate
+base hidden state + repair MLP output
+repair hidden state + base MLP internal gate
+```
+
+4. **Qwen3/GLM4 target rows 少。**
+
+跨模型只能作为弱对照，不能支撑统一结论。
+
+### 新增客观事实拼图
+
+340. **MLP update projection 不等于 MLP output additive causality。**
+341. **DS7B rule_value L26 是 projection node，但不是当前 additive causal node。**
+342. **DS7B query_relation L19 的 MLP projection 也不能直接转化为 repair。**
+343. **value gate 的候选特异信号更像条件化变换结果，而不是可平移向量。**
+344. **Phase593/595 双负结果支持“静态向量路线已经触顶”。**
+345. **下一步应进入 MLP internal gate/path audit，而不是继续扩大外部 patch 搜索。**
+
+### 理论进展
+
+当前理论应从：
+
+```text
+语义/候选状态 = 某个 residual direction
+```
+
+修正为：
+
+```text
+语义/候选状态 = 在给定上下文条件下，由局部组件变换产生的路径响应。
+```
+
+更谨慎的表达：
+
+```text
+模型内部可能存在 candidate-specific ranking field，但它不是一个可以脱离条件直接移植的 vector。
+```
+
+### 下一步任务
+
+Phase596 应进入：
+
+```text
+MLP Internal Gate Path Audit
+```
+
+核心目标：
+
+```text
+定位 value gate 是否在 MLP 内部 gate/up/down 的乘法结构中形成。
+```
+
+测试方案：
+
+```text
+1. 以 DS7B rule_value L26 为主，query_relation L19 和 rule_relation L18 为对照。
+2. hook MLP 内部：
+   - gate_proj output
+   - up_proj output
+   - activation(gate) * up
+   - down_proj output
+3. 分别测 repair-base delta 的 candidate-specific projection。
+4. 分别做内部 activation patch，而不是只 patch MLP final output。
+5. 对比 raw/specific/common/random。
+6. 保持 64 cases，target rows 预计 21；如发现强阳性，再加大到 128 cases。
+```
+
+判据：
+
+```text
+1. 如果 internal gate patch 有稳定 switch，而 output patch 没有，说明 value gate 在 MLP 内部非线性乘法处。
+2. 如果 internal gate 也失败，说明候选特异 ranking 不是单组件可移植状态，而是跨层闭环动力学。
+3. 只有出现 switch 明显超过 random/control，才能升级为 causal evidence。
+```
+
+## Phase 596: MLP Internal Gate Path Audit 内部门控路径审计 [2026-06-23 23:53]
+
+### 本阶段目标
+
+根据用户要求，分析附件中对 Phase595 的判断是否正确，综合正确部分继续完成任务。
+
+附件分析中正确部分：
+
+```text
+1. Phase595 是关键负结果：MLP update projection 强，不等于 MLP output additive patch 因果有效。
+2. candidate-specific ranking 更像 conditional transformation，而不是静态 residual vector。
+3. Phase596 应从 MLP output 继续拆到 MLP internal gate/up/z/down 路径。
+4. 必须区分 projection evidence 和 causal patch evidence，不能把强投影直接升级为机制闭合。
+```
+
+本轮 Phase596 目标：
+
+```text
+验证 value gate 的 candidate-specific ranking 是否在 MLP internal gate/up/gated activation/down 路径中形成，
+并测试内部 activation patch 是否比 Phase595 的 MLP output patch 更接近因果修复。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase596_mlp_internal_gate_path_audit.py \
+  tests/glm5/phase596_mlp_internal_gate_path_audit_summary.py
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit.py qwen3 \
+  --smoke \
+  --output-dir results/glm5_phase596_mlp_internal_gate_path_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase596_mlp_internal_gate_path_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase596_mlp_internal_gate_path_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase596_mlp_internal_gate_path_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase596_mlp_internal_gate_path_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase596_mlp_internal_gate_path_audit_summary.py
+```
+
+说明：
+
+```text
+GLM4 第一次 confirm 暴露脚本兼容问题：
+GLM4 是 fused gate_up_proj 结构，不能生成单独 gate_raw/up_raw patch。
+已修正脚本，只对 GLM4 使用 gate_up_pair/z/down 路径，然后重跑 GLM4 confirm。
+最终记录采用修正后的 GLM4 结果。
+```
+
+### 脚本与结果文件
+
+```text
+tests/glm5/phase596_mlp_internal_gate_path_audit.py
+tests/glm5/phase596_mlp_internal_gate_path_audit_summary.py
+
+results/glm5_phase596_mlp_internal_gate_path_audit/
+  phase596_qwen3_mlp_internal_gate_path_audit_smoke.json
+  phase596_qwen3_mlp_internal_gate_path_audit_confirm.json
+  phase596_glm4_mlp_internal_gate_path_audit_confirm.json
+  phase596_deepseek7b_mlp_internal_gate_path_audit_confirm.json
+  phase596_cross_model_summary.md
+```
+
+### 测试原理
+
+对 gated MLP：
+
+```text
+g = W_gate h
+u = W_up h
+z = activation(g) * u
+m = W_down z
+```
+
+本轮分两步：
+
+```text
+1. projection audit:
+   计算 repair-base 的 gate_only、up_only、gate_up_pair、z_pair、down_out 等效输出方向，
+   测它们在候选答案 embedding 上的 candidate-specific projection。
+
+2. causal patch audit:
+   在 base prompt 前向传播中直接 patch 内部 activation：
+   gate_raw
+   up_raw
+   gate_up_pair_raw
+   z_pair_raw
+   z_pair_top32
+   z_pair_top128
+   down_out_raw
+   random_same_norm
+   wrong_relation/value controls
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = red, blue, green, yellow
+top nodes/model = 3
+top-k channels = 32, 128
+alpha = 1.0
+```
+
+目标行数量：
+
+```text
+Qwen3: 5 target rows
+GLM4: 4 target rows
+DS7B: 21 target rows
+```
+
+DS7B 重点节点：
+
+```text
+rule_value L26
+query_relation L19
+prompt_last L26
+```
+
+### 客观结果
+
+#### Qwen3
+
+内部 projection：
+
+```text
+prompt_last L34 gate_only projection_specific_margin = +0.980
+prompt_last L34 down_out projection_specific_margin = +0.668
+prompt_last L34 z_pair projection_specific_margin = +0.666
+prompt_last L34 gate_up_pair projection_specific_margin = +0.666
+```
+
+内部 patch：
+
+```text
+best switch = 1/5
+best margin_gain = +0.075
+wrong_z_pair_raw 也出现 1/5 switch
+down_out_random 也出现 1/5 switch
+```
+
+判断：
+
+```text
+Qwen3 有内部投影信号，但 target rows 太少，且 wrong/random control 同级，不能升级为因果证据。
+```
+
+#### GLM4
+
+内部 projection：
+
+```text
+prompt_last L38 z_pair projection_specific_margin = +0.330
+prompt_last L38 down_out projection_specific_margin = +0.330
+prompt_last L38 gate_up_pair projection_specific_margin = +0.329
+```
+
+内部 patch：
+
+```text
+best switch = 0/4
+best margin_gain = 0.000
+```
+
+判断：
+
+```text
+GLM4 在当前任务中没有内部 MLP patch repair。
+```
+
+#### DS7B
+
+内部 projection 最强项：
+
+```text
+rule_value L26 z_pair:
+projection_specific_margin = +1.214
+positive_projection_rate = 0.762
+
+rule_value L26 gate_up_pair:
+projection_specific_margin = +1.213
+positive_projection_rate = 0.762
+
+rule_value L26 down_out:
+projection_specific_margin = +1.206
+positive_projection_rate = 0.762
+
+rule_value L26 up_only:
+projection_specific_margin = +1.072
+positive_projection_rate = 0.810
+
+query_relation L19 z_pair:
+projection_specific_margin = +0.519
+positive_projection_rate = 0.857
+```
+
+这说明：
+
+```text
+Phase594 的强 projection 被 Phase596 在 MLP internal z/gate_up/down 路径中复现。
+```
+
+内部 patch 结果：
+
+```text
+rule_value L26 gate_raw:
+switch = 0/21
+margin_gain = -0.018
+
+rule_value L26 up_raw:
+switch = 0/21
+margin_gain = -0.009
+
+rule_value L26 gate_up_pair_raw:
+switch = 0/21
+margin_gain = -0.021
+
+rule_value L26 z_pair_raw:
+switch = 0/21
+margin_gain = -0.021
+
+rule_value L26 z_pair_top32:
+switch = 0/21
+margin_gain = -0.003
+
+rule_value L26 z_pair_top128:
+switch = 0/21
+margin_gain = -0.003
+
+query_relation L19 gate_up_pair_raw:
+switch = 0/21
+margin_gain = +0.001
+
+query_relation L19 z_pair_top128:
+switch = 0/21
+margin_gain = +0.007
+```
+
+判断：
+
+```text
+DS7B rule_value L26 内部 MLP 路径有非常强的 candidate-specific projection，
+但 gate/up/z/down 内部 activation patch 仍然不能形成因果修复。
+```
+
+### 核心结论
+
+1. **附件对 Phase595 的分析正确，但 Phase596 进一步收紧了结论。**
+
+Phase595 证明：
+
+```text
+MLP output delta 不可加性迁移。
+```
+
+Phase596 进一步证明：
+
+```text
+MLP internal gate/up/z/down delta 也不能简单跨上下文迁移。
+```
+
+2. **DS7B rule_value L26 是强 projection path，不是 additive causal patch path。**
+
+```text
+projection:
+rule_value L26 z_pair +1.214
+rule_value L26 gate_up_pair +1.213
+rule_value L26 down_out +1.206
+
+causal patch:
+rule_value L26 z_pair_raw 0/21 switch, margin_gain -0.021
+rule_value L26 gate_up_pair_raw 0/21 switch, margin_gain -0.021
+```
+
+3. **value gate 的关键不在“内部有没有信号”，而在“信号如何被当前状态合法生成”。**
+
+本轮排除了一个更强版本的静态假设：
+
+```text
+不是只有 final MLP output 不能搬运；
+连 internal gated activation 也不能直接搬运。
+```
+
+4. **candidate-specific ranking 更像状态依赖的局部动力学，而不是某个可移植对象。**
+
+当前更合理的表达：
+
+```text
+ranking signal 是 MLP 在特定 residual state、position、normalization、attention context 下生成的局部响应。
+```
+
+### 硬伤与问题
+
+1. **仍然是跨上下文 patch。**
+
+当前把 repair prompt 的 internal activation delta 搬到 base prompt。
+
+如果真实机制要求完整状态轨迹匹配，则这种搬运仍会失败。
+
+2. **没有 patch layernorm 输入/输出。**
+
+MLP 的输入不是裸 residual，而是 norm 后状态。若 gate 由 norm state 决定，必须审计：
+
+```text
+pre-MLP residual
+post-LN hidden
+gate/up/z/down
+```
+
+3. **没有做同上下文 counterfactual。**
+
+更严格的问题不是：
+
+```text
+repair activation 能不能搬到 base？
+```
+
+而是：
+
+```text
+同一个 base hidden state 下，如何改变 relation/value condition 才能让 MLP 自己生成正确 z？
+```
+
+4. **top-k channel patch 仍无效。**
+
+DS7B rule_value L26：
+
+```text
+z_pair_top32 margin_gain = -0.003
+z_pair_top128 margin_gain = -0.003
+```
+
+说明不是简单“噪声通道太多”的问题。
+
+5. **Qwen3/GLM4 target rows 仍少。**
+
+跨模型目前只能作为辅助，不足以支撑统一机制断言。
+
+### 新增客观事实拼图
+
+346. **DS7B rule_value L26 的 candidate-specific signal 在 z_pair/gate_up_pair/down_out 中都能复现。**
+347. **DS7B rule_value L26 up_only 也有很强 projection，说明 up path 承载大量候选排序差异。**
+348. **内部 MLP activation projection 强，仍不等于 internal activation patch 因果有效。**
+349. **top-k channel patch 没有解决 MLP internal patch 失败。**
+350. **value gate 不是 final-output 静态向量，也不是 internal-z 静态向量。**
+351. **下一步应从 activation 搬运转向 state-conditioned generation audit。**
+
+### 理论进展
+
+旧表述：
+
+```text
+候选排序信号在 MLP update 内部。
+```
+
+应修正为：
+
+```text
+候选排序信号可以在 MLP internal transition 中被读出，
+但它的因果有效性依赖产生该 transition 的状态条件。
+```
+
+更接近当前事实的公式：
+
+```text
+z_l = activation(W_gate LN(h_l)) * W_up LN(h_l)
+```
+
+但不是：
+
+```text
+z_l_base + (z_l_repair - z_l_base) => repair
+```
+
+而是：
+
+```text
+LN(h_l), relation context, value context, position context
+共同决定 MLP 是否生成正确 z_l。
+```
+
+### 下一步任务
+
+Phase597 应进入：
+
+```text
+State-Conditioned MLP Generation Audit
+```
+
+核心目标：
+
+```text
+不再搬运 repair activation，而是测量 base 与 repair 在 MLP 输入状态上的差异，
+判断什么状态条件使 MLP 自己生成 candidate-specific z/down_out。
+```
+
+测试方案：
+
+```text
+1. 仍以 DS7B rule_value L26 为主，query_relation L19 为对照。
+2. hook:
+   - pre-MLP residual
+   - post-input-layernorm hidden
+   - gate_proj
+   - up_proj
+   - z
+   - down_out
+3. 比较 base/repair/wrong 三类 prompt 的同位置状态。
+4. 测 post-LN hidden 的 candidate-specific predictor 是否比 raw residual 更接近 gate/up/z。
+5. 做 state interpolation：
+   h_norm = base_norm + alpha * (repair_norm - base_norm)
+   alpha = 0.25, 0.5, 1.0, 1.5
+   让 MLP 重新计算，而不是直接 patch z/down_out。
+6. 记录生成出的 z/down_out projection 与最终 candidate margin。
+```
+
+判据：
+
+```text
+1. 如果 post-LN state interpolation 能让 MLP 自动生成更强 z/down projection，
+   说明关键在 MLP 输入状态条件。
+2. 如果 interpolation 仍失败，说明还需要 attention context / KV cache / 多层轨迹共同满足。
+3. 只有 final candidate margin 和 switch 超过 random/wrong control，才能升级为因果证据。
+```
+
+## Phase 597: State-Conditioned MLP Generation Audit 状态条件化 MLP 生成审计 [2026-06-24 00:42]
+
+### 本阶段目标
+
+根据用户要求，分析附件中对 Phase596 的判断是否正确，综合正确部分继续完成任务。
+
+附件分析中正确部分：
+
+```text
+1. Phase596 是强负结果：MLP internal projection 强，但 internal activation patch 仍不能跨上下文迁移。
+2. value gate 不是可搬运的静态向量，更像状态条件化组件响应。
+3. 下一步不应继续搬运 repair activation，而应让 MLP 在修改后的输入状态上重新计算。
+4. 必须记录 projection 与 causal patch 的分层，不能把中间投影增强当成最终机制闭合。
+```
+
+本轮 Phase597 目标：
+
+```text
+测试 MLP input normalized state interpolation 是否能让 MLP 自己生成 candidate-specific down_out，
+并进一步检查这种生成出的 down_out 是否能改变最终候选 logprob margin 和 winner。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase597_state_conditioned_mlp_generation_audit.py \
+  tests/glm5/phase597_state_conditioned_mlp_generation_audit_summary.py
+
+python tests/glm5/phase597_state_conditioned_mlp_generation_audit.py qwen3 \
+  --smoke \
+  --output-dir results/glm5_phase597_state_conditioned_mlp_generation_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase597_state_conditioned_mlp_generation_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase597_state_conditioned_mlp_generation_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase597_state_conditioned_mlp_generation_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase597_state_conditioned_mlp_generation_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase597_state_conditioned_mlp_generation_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase597_state_conditioned_mlp_generation_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase597_state_conditioned_mlp_generation_audit_summary.py
+```
+
+### 脚本与结果文件
+
+```text
+tests/glm5/phase597_state_conditioned_mlp_generation_audit.py
+tests/glm5/phase597_state_conditioned_mlp_generation_audit_summary.py
+
+results/glm5_phase597_state_conditioned_mlp_generation_audit/
+  phase597_qwen3_state_conditioned_mlp_generation_audit_smoke.json
+  phase597_qwen3_state_conditioned_mlp_generation_audit_confirm.json
+  phase597_glm4_state_conditioned_mlp_generation_audit_confirm.json
+  phase597_deepseek7b_state_conditioned_mlp_generation_audit_confirm.json
+  phase597_cross_model_summary.md
+```
+
+### 测试原理
+
+Phase596 直接搬运 MLP internal activation：
+
+```text
+z_base <- z_base + (z_repair - z_base)
+```
+
+Phase597 改为 patch MLP 输入状态，让 MLP 重新计算：
+
+```text
+x_alpha = x_base + alpha * (x_repair - x_base)
+```
+
+其中：
+
+```text
+x = MLP module input = post-attention-layernorm hidden state
+alpha = 0.25, 0.5, 1.0, 1.5, 2.0
+```
+
+然后让 MLP 自动生成：
+
+```text
+gate = W_gate x_alpha
+up = W_up x_alpha
+z = activation(gate) * up
+down = W_down z
+```
+
+同时做对照：
+
+```text
+repair interpolation
+wrong interpolation
+random same-norm interpolation
+```
+
+记录两类指标：
+
+```text
+1. generated_down projection:
+   MLP 重新计算出来的 down_out 是否有 candidate-specific projection。
+
+2. causal state patch:
+   base prompt 前向传播中替换 MLP input 后，最终候选 logprob margin 是否改善。
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = red, blue, green, yellow
+top nodes/model = 3
+alphas = 0.25, 0.5, 1.0, 1.5, 2.0
+controls = repair, wrong, random_same_norm
+```
+
+目标行数量：
+
+```text
+Qwen3: 5 target rows
+GLM4: 4 target rows
+DS7B: 21 target rows
+```
+
+DS7B 重点节点：
+
+```text
+rule_value L26
+query_relation L19
+prompt_last L26
+```
+
+### 客观结果
+
+#### Qwen3
+
+state patch：
+
+```text
+query_category L32 repair alpha2:
+switch = 2/5
+margin_gain = +0.050
+
+prompt_last L34 wrong alpha2:
+switch = 1/5
+margin_gain = +0.100
+
+query_category L32 random alpha1.5:
+switch = 1/5
+margin_gain = +0.075
+```
+
+generated_down projection：
+
+```text
+query_category L32 wrong alpha2 = +1.485
+query_category L32 random alpha2 = +1.217
+query_category L32 repair alpha2 = +1.211
+```
+
+判断：
+
+```text
+Qwen3 有 state interpolation 效应，但 wrong/random control 同级甚至更强，不能作为干净因果证据。
+```
+
+#### GLM4
+
+state patch：
+
+```text
+best switch = 0/4
+best margin_gain = +0.016, 来自 random alpha2
+```
+
+generated_down projection：
+
+```text
+prompt_last L38 repair alpha1.5 = +0.336
+prompt_last L38 repair alpha1 = +0.329
+```
+
+判断：
+
+```text
+GLM4 有弱 generated_down projection，但没有最终 candidate repair。
+```
+
+#### DS7B
+
+generated_down projection 明显增强：
+
+```text
+prompt_last L26 random alpha2 = +6.424
+prompt_last L26 repair alpha2 = +4.414
+rule_value L26 random alpha2 = +4.251
+rule_value L26 repair alpha2 = +3.618
+rule_value L26 repair alpha1.5 = +2.207
+rule_value L26 repair alpha1 = +1.212
+query_relation L19 repair alpha1 = +0.518
+```
+
+但最终 causal state patch 失败：
+
+```text
+rule_value L26 repair alpha0.25:
+switch = 0/21
+margin_gain = +0.000
+
+rule_value L26 repair alpha0.5:
+switch = 0/21
+margin_gain = -0.002
+
+rule_value L26 repair alpha1:
+switch = 0/21
+margin_gain = -0.015
+
+rule_value L26 repair alpha1.5:
+switch = 0/21
+margin_gain = -0.006
+
+rule_value L26 repair alpha2:
+switch = 0/21
+margin_gain = -0.006
+
+prompt_last L26 repair alpha2:
+switch = 0/21
+margin_gain = -0.022
+
+query_relation L19 repair alpha1:
+switch = 0/21
+margin_gain = -0.002
+```
+
+唯一 switch 来自 random control：
+
+```text
+query_relation L19 random alpha1.5:
+switch = 1/21
+margin_gain = -0.050
+```
+
+判断：
+
+```text
+DS7B 的 MLP input interpolation 能让 MLP 生成很强的 candidate-specific down projection，
+但这种 generated_down projection 没有转化为最终候选竞争修复。
+```
+
+### 核心结论
+
+1. **附件对 Phase596 的判断正确，但 Phase597 进一步把瓶颈向后移动。**
+
+Phase596 说明：
+
+```text
+activation transfer 失败。
+```
+
+Phase597 说明：
+
+```text
+state-conditioned MLP recomputation 可以生成强 projection，
+但仍不能改变最终 winner。
+```
+
+2. **MLP 能生成 candidate-specific projection，但后续残差流/读出竞争没有接受它。**
+
+DS7B rule_value L26：
+
+```text
+repair alpha2 generated_down projection = +3.618
+final margin_gain = -0.006
+switch = 0/21
+```
+
+这意味着问题不再是：
+
+```text
+MLP 能不能生成 ranking-like direction？
+```
+
+而是：
+
+```text
+生成出的 ranking-like direction 是否进入了能影响最终 logits 的有效轨迹？
+```
+
+3. **random control 可以生成更强 projection，说明 projection 本身仍不是充分指标。**
+
+DS7B：
+
+```text
+prompt_last L26 random alpha2 generated_down projection = +6.424
+prompt_last L26 repair alpha2 generated_down projection = +4.414
+```
+
+但二者都没有修复最终输出。
+
+因此：
+
+```text
+candidate-specific projection 可能是局部几何现象，不等于全局计算使用。
+```
+
+4. **当前真正瓶颈是 downstream acceptance / residual trajectory integration。**
+
+更准确地说：
+
+```text
+MLP 输出中的候选排序形状，必须被后续层保留、放大、路由到读出竞争，才会影响答案。
+```
+
+Phase597 显示单层 MLP 输入状态满足后仍不够。
+
+### 硬伤与问题
+
+1. **只 patch 单层 MLP input。**
+
+如果真实机制需要多层连续轨迹，单层 interpolation 不够。
+
+2. **没有同步 patch attention/KV context。**
+
+MLP input 变了，但后续 attention 的 key/value 历史仍来自 base trajectory。
+
+3. **generated_down projection 与 final margin 脱钩。**
+
+这说明 embedding projection 仍然可能只是 readout-adjacent 几何，不是模型实际使用路径。
+
+4. **random projection 过强。**
+
+random same-norm 在高 alpha 下生成强 projection，说明高范数扰动可制造候选方向假象，必须继续收紧 causal 判据。
+
+5. **Qwen3/GLM4 target rows 少。**
+
+跨模型结论仍以 DS7B 为主，其他模型只能做弱对照。
+
+### 新增客观事实拼图
+
+352. **MLP input interpolation 能让 generated_down projection 随 alpha 增强。**
+353. **DS7B rule_value L26 repair alpha2 generated_down projection 达到 +3.618。**
+354. **DS7B prompt_last L26 repair alpha2 generated_down projection 达到 +4.414。**
+355. **random state interpolation 也能生成强 projection，说明 projection 仍不是充分因果指标。**
+356. **state-conditioned MLP recomputation 仍不能修复 candidate winner。**
+357. **瓶颈从 MLP generation 转移到 downstream trajectory integration。**
+358. **下一步应测试 MLP 生成结果是否被后续层保留、抑制或冲洗掉。**
+
+### 理论进展
+
+当前理论应从：
+
+```text
+MLP 在正确输入状态下生成候选排序即可修复。
+```
+
+修正为：
+
+```text
+MLP 生成 candidate-specific projection 只是局部条件；
+它还必须进入后续 residual trajectory，并在最终 readout competition 中保留为有效 margin。
+```
+
+更完整的表达：
+
+```text
+候选排序不是单层状态，也不是单层组件响应；
+它是多层残差轨迹中被连续保存、路由、竞争放大的路径属性。
+```
+
+### 下一步任务
+
+Phase598 应进入：
+
+```text
+Downstream Trajectory Acceptance Audit
+```
+
+核心目标：
+
+```text
+测试 Phase597 生成的强 candidate-specific down_out 在注入后，
+是否被后续层保留、削弱、反向抵消，或没有进入最终 readout 路径。
+```
+
+测试方案：
+
+```text
+1. 以 DS7B 为主，qwen3/glm4 做小对照。
+2. 在 rule_value L26 和 prompt_last L26 做 state interpolation patch。
+3. 不只记录最终 logits，还记录 patch 后 L27、L28/final hidden 的 candidate projection。
+4. 比较：
+   - repair alpha2
+   - random alpha2
+   - wrong alpha2
+   - no patch
+5. 记录每层 projection trajectory：
+   L26 MLP output
+   L27 input
+   L27 output
+   final hidden
+   logits margin
+6. 判断强 projection 是被保留、放大、削弱还是冲洗。
+```
+
+判据：
+
+```text
+1. 如果 L26 generated_down 很强，但 L27/final projection 消失，说明后续层冲洗或抑制。
+2. 如果 projection 保留到 final hidden 但 logits 不变，说明 lm_head/readout competition 不是简单 embedding projection。
+3. 如果 repair 与 random 都保留但都不修复，说明 projection 是几何假象。
+4. 只有 repair trajectory 比 wrong/random 更能提高 final margin，才可升级为 causal path evidence。
+```
+
+## Phase 598: Downstream Trajectory Acceptance Audit 下游轨迹接收审计 [2026-06-24 07:19]
+
+### 本阶段目标
+
+根据用户要求，分析附件中对 Phase597 的判断是否正确，综合正确部分继续完成任务。
+
+附件分析中正确部分：
+
+```text
+1. Phase597 是瓶颈后移阶段：MLP 能生成强 candidate-specific projection，但最终 winner 不变。
+2. projection 不是 sufficient causal signal，random control 也能制造强 projection。
+3. 下一步应追踪 generated_down 进入后续 residual trajectory 后是否被保留、削弱、冲洗或读出不接受。
+4. 必须同时记录 generated_down、downstream hidden trajectory、final logprob margin。
+```
+
+本轮 Phase598 目标：
+
+```text
+测试 Phase597 生成的强 candidate-specific down_out 在注入后，
+是否能在后续 hidden states 中保留到 final hidden，
+以及是否能进入最终 candidate logprob competition。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase598_downstream_trajectory_acceptance_audit.py \
+  tests/glm5/phase598_downstream_trajectory_acceptance_audit_summary.py
+
+python tests/glm5/phase598_downstream_trajectory_acceptance_audit.py qwen3 \
+  --smoke \
+  --output-dir results/glm5_phase598_downstream_trajectory_acceptance_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase598_downstream_trajectory_acceptance_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase598_downstream_trajectory_acceptance_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase598_downstream_trajectory_acceptance_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase598_downstream_trajectory_acceptance_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase598_downstream_trajectory_acceptance_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase598_downstream_trajectory_acceptance_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase598_downstream_trajectory_acceptance_audit_summary.py
+```
+
+### 脚本与结果文件
+
+```text
+tests/glm5/phase598_downstream_trajectory_acceptance_audit.py
+tests/glm5/phase598_downstream_trajectory_acceptance_audit_summary.py
+
+results/glm5_phase598_downstream_trajectory_acceptance_audit/
+  phase598_qwen3_downstream_trajectory_acceptance_audit_smoke.json
+  phase598_qwen3_downstream_trajectory_acceptance_audit_confirm.json
+  phase598_glm4_downstream_trajectory_acceptance_audit_confirm.json
+  phase598_deepseek7b_downstream_trajectory_acceptance_audit_confirm.json
+  phase598_cross_model_summary.md
+```
+
+### 测试原理
+
+沿用 Phase597 的 MLP input state interpolation：
+
+```text
+x_alpha = x_base + alpha * (x_repair - x_base)
+alpha = 2.0
+```
+
+但本轮不只看最终 logits，还额外记录 patch 后的 hidden trajectory：
+
+```text
+H{layer+1}
+H{layer+2}
+H{layer+3}
+H_final
+```
+
+记录三类指标：
+
+```text
+1. generated_down_projection:
+   MLP 被输入状态插值驱动后，生成的 down_out 候选特异投影。
+
+2. downstream_hidden_projection:
+   patch 后后续 hidden state 相对 base hidden state 的候选特异投影。
+
+3. final_candidate_margin:
+   最终候选 logprob margin 和 winner switch。
+```
+
+对照：
+
+```text
+repair alpha2
+wrong alpha2
+random alpha2
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+cases/model = 64
+target_only = true
+candidate values = red, blue, green, yellow
+top nodes/model = 3
+alpha = 2.0
+trajectory window = 3 layers + final hidden
+```
+
+目标行数量：
+
+```text
+Qwen3: 5 target rows
+GLM4: 4 target rows
+DS7B: 21 target rows
+```
+
+DS7B 重点节点：
+
+```text
+rule_value L26
+prompt_last L26
+query_relation L19
+```
+
+### 客观结果
+
+#### Qwen3
+
+最终 patch：
+
+```text
+query_category L32 repair alpha2:
+switch = 2/5
+generated_down_projection = +1.211
+margin_gain = +0.050
+
+query_category L32 wrong alpha2:
+switch = 1/5
+generated_down_projection = +1.485
+margin_gain = +0.050
+
+query_category L32 random alpha2:
+switch = 0/5
+generated_down_projection = +1.217
+margin_gain = -0.000
+```
+
+轨迹：
+
+```text
+query_category L32 repair alpha2 H33 projection = +1.212
+query_category L32 wrong alpha2 H33 projection = +1.487
+query_category L32 random alpha2 H33 projection = +1.220
+```
+
+判断：
+
+```text
+Qwen3 有轨迹保留和少量 switch，但 wrong/random 同级，不能作为干净因果链。
+```
+
+#### GLM4
+
+最终 patch：
+
+```text
+best switch = 0/4
+best margin_gain = +0.016, 来自 random alpha2
+```
+
+轨迹：
+
+```text
+prompt_last L38 repair alpha2 H40 projection = +0.364
+prompt_last L37 random alpha2 H40 projection = +0.283
+```
+
+判断：
+
+```text
+GLM4 有少量 final hidden projection，但没有最终 repair。
+```
+
+#### DS7B
+
+最终 patch 效果：
+
+```text
+rule_value L26 repair alpha2:
+generated_down_projection = +3.618
+switch = 0/21
+margin_gain = -0.006
+
+rule_value L26 random alpha2:
+generated_down_projection = +4.251
+switch = 0/21
+margin_gain = -0.012
+
+prompt_last L26 repair alpha2:
+generated_down_projection = +4.414
+switch = 0/21
+margin_gain = -0.022
+
+prompt_last L26 random alpha2:
+generated_down_projection = +6.424
+switch = 0/21
+margin_gain = -0.012
+```
+
+轨迹保留与冲洗：
+
+```text
+rule_value L26 repair alpha2:
+H27 projection = +3.643
+H28 projection = +0.151
+
+rule_value L26 random alpha2:
+H27 projection = +4.270
+H28 projection = +0.090
+
+prompt_last L26 repair alpha2:
+H27 projection = +4.402
+H28 projection = +0.151
+
+prompt_last L26 random alpha2:
+H27 projection = +6.382
+H28 projection = +0.091
+```
+
+query_relation L19：
+
+```text
+query_relation L19 repair alpha2:
+H20 projection = +0.354
+H21 projection = +0.923
+H22 projection = +0.650
+H23 projection = +0.599
+H28 projection = -0.065
+margin_gain = -0.026
+```
+
+判断：
+
+```text
+DS7B L26 generated_down 的强 candidate-specific projection 在 H27 仍然保留，
+但到 H28/final hidden 几乎被冲洗掉。
+```
+
+### 核心结论
+
+1. **附件对 Phase597 的判断正确，Phase598 找到了更具体的断点。**
+
+Phase597 说明：
+
+```text
+MLP 可以生成强 projection，但 final margin 不变。
+```
+
+Phase598 说明：
+
+```text
+强 projection 在下一层 hidden 仍存在，但到 final hidden 大幅衰减。
+```
+
+2. **DS7B L26 的瓶颈是 downstream washout。**
+
+关键对比：
+
+```text
+rule_value L26 repair:
+generated_down +3.618 -> H27 +3.643 -> H28 +0.151 -> final margin -0.006
+
+prompt_last L26 repair:
+generated_down +4.414 -> H27 +4.402 -> H28 +0.151 -> final margin -0.022
+```
+
+这说明：
+
+```text
+信号不是没有进入 residual stream；
+它进入了 H27，但在最后一层被大幅冲洗/抵消。
+```
+
+3. **random 与 repair 同样被冲洗，说明后续层对这种单点强投影具有通用抑制。**
+
+```text
+prompt_last random:
+generated_down +6.424 -> H27 +6.382 -> H28 +0.091
+```
+
+这支持：
+
+```text
+后续层不是选择性拒绝 repair，而是对非轨迹一致的单点强扰动进行整体归一化/冲洗。
+```
+
+4. **query_relation L19 信号能传播数层，但最终也消失。**
+
+```text
+H20 +0.354 -> H21 +0.923 -> H22 +0.650 -> H23 +0.599 -> H28 -0.065
+```
+
+说明 relation-path signal 可能能短程传播，但仍没有进入最终读出。
+
+### 硬伤与问题
+
+1. **只观察 hidden projection，没有分解最后一层是 attention 还是 MLP 在冲洗。**
+
+DS7B L26 后只有 L27 这一层到 final hidden。
+
+必须拆：
+
+```text
+L27 attention output
+L27 MLP output
+L27 residual update
+final norm
+lm_head
+```
+
+2. **没有测试 final layernorm 对 projection 的影响。**
+
+H28 projection 小，不代表 final norm 后也小；但最终 logits 无修复，说明还要测：
+
+```text
+pre-final-norm hidden
+post-final-norm hidden
+lm_head logits
+```
+
+3. **没有做多层轨迹一致 patch。**
+
+单点 L26 patch 被下游冲洗，可能因为它与 L27 attention/KV context 不一致。
+
+4. **projection 仍可能是 readout geometry artifact。**
+
+random 在 H27 很强但也被冲洗，说明后续层可能主动压制非自然轨迹方向。
+
+### 新增客观事实拼图
+
+359. **DS7B L26 generated_down projection 能进入 H27 residual stream。**
+360. **DS7B L26 强 projection 到 H28/final hidden 大幅衰减。**
+361. **rule_value L26 与 prompt_last L26 的冲洗模式一致。**
+362. **random 强 projection 也被冲洗，支持“非轨迹一致扰动被后续层压制”。**
+363. **query_relation L19 信号可短程传播到 H21-H23，但最终仍消失。**
+364. **当前断点定位到最后一层/最终读出前后，而不是 MLP 生成本身。**
+
+### 理论进展
+
+当前理论应从：
+
+```text
+MLP 生成 candidate-specific projection 后未被最终使用。
+```
+
+进一步修正为：
+
+```text
+MLP 生成的强 projection 已进入下一层 residual stream，
+但在最后阶段被冲洗或转换，无法保留到 final readout competition。
+```
+
+更具体的机制链：
+
+```text
+state-conditioned MLP generation
+-> local residual injection
+-> downstream layer acceptance / washout
+-> final norm
+-> lm_head competition
+```
+
+当前断点：
+
+```text
+downstream layer acceptance / final washout
+```
+
+### 下一步任务
+
+Phase599 应进入：
+
+```text
+Final Layer Washout Decomposition
+```
+
+核心目标：
+
+```text
+分解 DS7B L27/final layer 如何把 L26 注入的强 candidate-specific projection 冲洗掉。
+```
+
+测试方案：
+
+```text
+1. 以 DS7B 为主，qwen3/glm4 做小对照。
+2. 对 rule_value L26 repair alpha2 和 prompt_last L26 repair alpha2 做 patch。
+3. hook DS7B L27：
+   - layer input
+   - attention output
+   - post-attention residual
+   - MLP input
+   - MLP output
+   - layer output / H28
+4. 同时记录：
+   - pre-final-norm hidden
+   - post-final-norm hidden
+   - lm_head candidate logits
+5. 比较 repair/random/wrong。
+6. 判断是 attention 冲洗、MLP 冲洗、final norm 压缩，还是 lm_head competition 不接受。
+```
+
+判据：
+
+```text
+1. 如果 L27 attention 后 projection 大幅下降，断点在 final attention。
+2. 如果 L27 MLP 后下降，断点在 final MLP。
+3. 如果 pre-final-norm 保留但 post-final-norm 消失，断点在 final norm。
+4. 如果 post-final-norm 保留但 logits 不变，断点在 lm_head/readout competition。
+```

@@ -30417,3 +30417,1146 @@ Minimal Closed Circuit for Clean Paraphrase Candidate
 4. 测 attention output、MLP output、residual stream 对 clean_non_object_rate 的贡献。
 5. 加 no-op、random writer、same-norm writer controls。
 ```
+## Phase 186: IntelligentTheory GLM5 History and Theory Integration 智能理论总整理 [2026-06-23 22:59]
+
+### 本阶段目标
+
+根据用户要求，读取并分析 `research/glm5/docs/AGI_GLM5_MEMO.md` 的研究历史，完成两个整理任务：
+
+```text
+1. 把 Phase 301-594 分成若干研究阶段，说明每个阶段包含哪些 Phase、重要进展和核心成果。
+2. 整理最新完整理论体系，包括编码机制、智能理论、数学公式和关键拼图。
+```
+
+最终把整理结果更新到：
+
+```text
+research/IntelligentTheory.md
+```
+
+### 执行命令
+
+```bash
+pwd
+rg --files -g 'AGENTS.md' -g 'research/IntelligentTheory.md' -g 'research/glm5/docs/AGI_GLM5_MEMO.md' -g 'research/gpt5/docs/AGI_GPT5_MEMO.md'
+wc -l research/IntelligentTheory.md research/glm5/docs/AGI_GLM5_MEMO.md research/gpt5/docs/AGI_GPT5_MEMO.md
+rg -n "^## Phase|^#|^## " research/glm5/docs/AGI_GLM5_MEMO.md
+nl -ba research/IntelligentTheory.md
+rg -n "^## Phase" research/glm5/docs/AGI_GLM5_MEMO.md
+sed -n '1712,1799p;2396,2578p;5477,5685p;17100,17480p;25500,25980p;40100,40550p;53183,53225p;57031,61646p' research/glm5/docs/AGI_GLM5_MEMO.md
+sed -n '17202,17714p;31861,32380p;40424,41095p;45659,46150p;54624,56833p' research/glm5/docs/AGI_GLM5_MEMO.md
+sed -n '27992,30268p;30356,31880p;57031,61646p' research/glm5/docs/AGI_GLM5_MEMO.md
+date '+%Y-%m-%d %H:%M'
+tail -n 80 research/IntelligentTheory.md
+rg -n "^## Phase" research/gpt5/docs/AGI_GPT5_MEMO.md | tail -n 20
+rg -n "条件化状态变换|研究阶段历史记录|candidate-specific ranking|Phase 594|Phase 593" research/IntelligentTheory.md
+```
+
+### 生成和修改文件
+
+```text
+修改：
+research/IntelligentTheory.md
+
+追加记录：
+research/gpt5/docs/AGI_GPT5_MEMO.md
+```
+
+没有生成新测试脚本；本阶段是理论整理和文档更新，没有进行 CUDA 模型测试。
+
+### 测试原理
+
+本阶段不是模型实验，而是研究历史综合：
+
+```text
+1. 先用 Phase 标题索引建立全局时间线。
+2. 再读取关键总结段和最新 Phase 584-594。
+3. 把历史压缩为阶段结构，避免逐条堆砌。
+4. 用最新负结果修正理论：
+   projection node 不能直接等同 causal node；
+   candidate-specific ranking 更像条件化状态变换，而不是静态可加向量。
+5. 把理论写入 IntelligentTheory.md 的对应章节：
+   三，语言编码机制
+   四，数学理论
+   五，智能理论
+   六，研究阶段历史记录
+```
+
+### 更新结果
+
+`research/IntelligentTheory.md` 已更新，主要内容包括：
+
+```text
+1. 语言编码机制：
+   语言编码 = 相对编码网络 + 对象知识锚定 + 关系/规则检索
+            + 条件化状态变换 + 候选竞争 + 范数/格式/策略读出门。
+
+2. 数学理论：
+   增加隐藏状态分解公式、条件化关系重编码公式、层间变换公式、
+   候选竞争公式、类别边界公式、连续属性公式、因果证据等级。
+
+3. 智能理论：
+   把智能定义为持续输入中的相对状态网络构建、条件化重编码、
+   候选选择和反馈修正能力。
+
+4. 研究阶段历史：
+   把 GLM5 Phase 301-594 整理为九个阶段：
+   - Phase 301-312：基础方向分解与操作符机制
+   - Phase 313-321：关系网络、上下文激活与否定修正
+   - Phase 322-365：绑定机制、层归因与 MLP 主导路径
+   - Phase 366-414：范数、类别中心、连续属性与规则调制
+   - Phase 415-499：自然运输、关系槽位、类别边界和读出接口
+   - Phase 500-567：正交语义场、轨迹价值与生成策略门
+   - Phase 568-574：Norm gate、路径瓶颈与格式/echo 机制
+   - Phase 575-583：闭合语义微世界与检索-推理闭包
+   - Phase 584-594：状态门修复、值候选竞争与条件化变换图谱
+```
+
+### 理论进展
+
+本阶段最重要的理论修正：
+
+```text
+旧理论倾向：
+  找到一个 hidden direction 或 projection peak，
+  再用 residual patch 直接修复输出。
+
+最新修正：
+  高投影节点只说明那里能读出某种关系或候选排序；
+  它不一定是可移植的因果节点。
+
+Phase593 负结果：
+  Phase592 的 Level2 projection nodes 未能稳定升级为 hidden causal repair nodes。
+
+Phase594 新方向：
+  candidate-specific ranking 可能在 layer-to-layer transition 中生成，
+  尤其是某些 MLP update / residual update。
+
+当前理论：
+  语言机制图谱必须区分 projection node、transition node、
+  component causal node、hidden repair node、generation closure。
+```
+
+### 严格审视
+
+```text
+1. 本阶段没有重新跑模型，只是基于已有 GLM5 memo 做理论整理。
+2. 阶段划分是压缩总结，不替代每个 Phase 的原始实验记录。
+3. 最新理论仍停留在 Level3 transition evidence；
+   还没有完成 Level4 component causal patch 和 Level6 generation closure。
+4. Qwen3/GLM4/DS7B 差异很大，不能把单模型强结果直接当作通用结构。
+5. IntelligentTheory.md 中的公式是工作框架，不是最终数学定理。
+```
+
+### 下一步任务
+
+```text
+1. 基于 Phase594，进入 component-level causal patch：
+   优先 DS7B rule_value L26 MLP update 和 query_relation L19 MLP update。
+
+2. 把 projection/transition/component/repair/generation closure 做成统一证据表。
+
+3. 对 Phase594 的 DS7B 样本做簇分析：
+   为什么 rule_value L26 均值强但 positive_rate 只有 0.43。
+
+4. 拆 MLP channel 和 attention head：
+   整层 MLP update projection 强，不等于具体通道可因果修复。
+
+5. 在 IntelligentTheory.md 后续版本中继续把理论从公式框架推进到可验证的最小电路图谱。
+```
+## Phase 187: Global Atlas and Autoregressive State System Plan 全局图谱与自回归状态系统方案 [2026-06-24 01:04]
+
+### 本阶段目标
+
+根据用户要求，综合以下两个文件内容，给出系统方案：
+
+```text
+research/MainAnalysis/20260623_02_自回归的全局结构.md
+research/MainAnalysis/20260623_01_只有图谱才能破解破解编码机制.md
+```
+
+核心问题：
+
+```text
+1. 同一固定神经网络在所有自回归步骤中共享参数，为什么不会混乱？
+2. 是否存在不同语言任务诱导出的内部计算态？
+3. 单点机制破解价值有限，如何建立能持续累计的全局机制图谱？
+4. 如何把“自回归条件化状态”和“全局机制图谱”合成一套研究系统？
+```
+
+### 执行命令
+
+```bash
+wc -l research/MainAnalysis/20260623_02_自回归的全局结构.md \
+      research/MainAnalysis/20260623_01_只有图谱才能破解破解编码机制.md \
+      research/gpt5/docs/AGI_GPT5_MEMO.md
+
+sed -n '1,260p' research/MainAnalysis/20260623_02_自回归的全局结构.md
+sed -n '1,320p' research/MainAnalysis/20260623_01_只有图谱才能破解破解编码机制.md
+sed -n '261,620p' research/MainAnalysis/20260623_02_自回归的全局结构.md
+sed -n '321,760p' research/MainAnalysis/20260623_01_只有图谱才能破解破解编码机制.md
+sed -n '621,900p' research/MainAnalysis/20260623_02_自回归的全局结构.md
+sed -n '761,1150p' research/MainAnalysis/20260623_01_只有图谱才能破解破解编码机制.md
+date '+%Y-%m-%d %H:%M'
+rg -n "^## Phase" research/gpt5/docs/AGI_GPT5_MEMO.md | tail -n 5
+```
+
+### 生成和修改文件
+
+```text
+追加记录：
+research/gpt5/docs/AGI_GPT5_MEMO.md
+```
+
+本阶段没有生成测试脚本，没有运行 CUDA 模型测试。
+
+### 综合原理
+
+两个文件可以合并为一个统一理论：
+
+```text
+固定参数网络不是用同一种内部态处理所有句子。
+它在自回归过程中根据输入、任务、语法、规则、候选集合进入不同条件化计算态。
+
+单点机制无法破解编码机制。
+必须把这些计算态、对应电路、候选竞争、读出门、失败类型，统一写入全局机制图谱。
+```
+
+统一表述：
+
+```text
+语言编码机制 = 自回归条件化状态轨迹 + 状态条件化电路 + 候选竞争 + 读出门控 + 全局机制图谱
+```
+
+### 理论进展
+
+本阶段形成的系统方案核心：
+
+```text
+1. Global Language Mechanism Atlas 是静态累计层：
+   记录任务、变量、组件、门控、候选、失败、证据等级。
+
+2. State-Conditioned Circuit Extraction 是动态图谱层：
+   记录每个样本在自回归过程中进入什么状态，
+   哪些状态激活哪些电路，
+   哪些电路能因果改变输出。
+
+3. 两者合并后，图谱节点不只是 head / MLP / residual direction，
+   还包括 state node、trajectory node、transition node、failure node。
+```
+
+### 严格审视
+
+```text
+1. 本阶段是理论方案，没有新模型结果。
+2. 状态编码器 E_phi 不能只靠 PCA；必须结合行为预测、模板不变性、压缩和因果干预。
+3. 图谱如果没有因果等级，会把 decodable/projection/causal repair 混在一起，重复 Phase593 的错误。
+4. 自回归状态轨迹数据量会非常大，必须先从闭合微世界和少数任务族开始。
+5. candidate-specific ranking 仍是当前最大缺口，应作为 Atlas v0 后的第一优先实验。
+```
+
+### 下一步任务
+
+```text
+1. 建立 Atlas v0 schema：
+   atlas_nodes.jsonl
+   atlas_edges.jsonl
+   atlas_samples.jsonl
+   atlas_failures.jsonl
+   atlas_causal_levels.json
+
+2. 加入 state trajectory schema：
+   sample -> token -> layer -> component -> state_features -> behavior
+
+3. 导入 Phase 575-594 的关键结果作为第一批图谱数据。
+
+4. 做第一个闭合任务族：
+   OC / ORV / CRV / Two-hop / yes-no / negation / explicit rule。
+
+5. 优先定位 candidate-specific ranking：
+   从 Level2 projection 和 Level3 transition 推进到 Level4 component causal node。
+```
+## Phase 188: Global State-Conditioned Language Mechanism Atlas v0 全局状态条件化语言机制图谱v0 [2026-06-24 01:10]
+
+### 本阶段目标
+
+根据用户“开始完成以上计划”的要求，把 Phase187 的系统方案落地为第一版可运行工程：
+
+```text
+Global State-Conditioned Language Mechanism Atlas v0
+```
+
+核心目标不是重新跑模型，而是建立统一图谱骨架，把已有 GLM5 Phase575-597 结果导入同一套 schema：
+
+```text
+1. phase / module / task / gate / failure / evidence / causal level 节点
+2. phase->module、phase->gate、phase->failure、model->sample_summary 等边
+3. 样本摘要、失败类型、证据等级、状态轨迹 schema
+4. 自动生成模型汇总、任务汇总和下一阶段建议
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase188_global_state_atlas_v0.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase188_global_state_atlas_v0.py
+
+python tests/gpt5/phase188_global_state_atlas_v0.py \
+  --output-dir results/gpt5_phase188_global_state_atlas_v0
+
+find results/gpt5_phase188_global_state_atlas_v0 -maxdepth 1 -type f -printf '%f\n' | sort
+
+sed -n '1,220p' results/gpt5_phase188_global_state_atlas_v0/atlas_model_summary.md
+
+sed -n '1,240p' results/gpt5_phase188_global_state_atlas_v0/atlas_task_summary.md
+sed -n '1,220p' results/gpt5_phase188_global_state_atlas_v0/atlas_next_recommendations.md
+
+python - <<'PY'
+import json
+from pathlib import Path
+root=Path('results/gpt5_phase188_global_state_atlas_v0')
+index=json.loads((root/'atlas_index.json').read_text())
+for name,key in [('atlas_nodes.jsonl','nodes'),('atlas_edges.jsonl','edges'),('atlas_samples.jsonl','sample_summaries'),('atlas_failures.jsonl','failure_records'),('atlas_evidence.jsonl','evidence_records')]:
+    rows=[]
+    with (root/name).open(encoding='utf-8') as f:
+        for line in f:
+            rows.append(json.loads(line))
+    print(name, len(rows), 'expected', index['counts'][key])
+    assert len(rows)==index['counts'][key]
+print('ok')
+PY
+
+git diff --check -- \
+  tests/gpt5/phase188_global_state_atlas_v0.py \
+  results/gpt5_phase188_global_state_atlas_v0 \
+  research/gpt5/docs/AGI_GPT5_MEMO.md
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase188_global_state_atlas_v0/
+  atlas_index.json
+  atlas_nodes.jsonl
+  atlas_edges.jsonl
+  atlas_samples.jsonl
+  atlas_failures.jsonl
+  atlas_evidence.jsonl
+  atlas_causal_levels.json
+  atlas_state_schema.json
+  atlas_model_summary.md
+  atlas_task_summary.md
+  atlas_next_recommendations.md
+```
+
+### 测试原理
+
+本阶段是 atlas infrastructure，不是 CUDA 模型测试。
+
+原理：
+
+```text
+1. 用手工 PhaseSpec 固化 Phase575-597 的阶段含义：
+   phase, title, module, task_family, gate, causal_level, claim, failure_types, priority_gap。
+
+2. 扫描每个 phase 的 result_dir：
+   导入 confirm JSON，跳过 smoke/checkpoint。
+
+3. 从 JSON 中抽取统一样本摘要：
+   model, n_cases, target_n, rows, summary.best, total_time_min 等。
+
+4. 如果已有内部 atlas 字段，则导入为 imported_atlas_node/imported_atlas_edge_record。
+
+5. 生成 JSONL 图谱：
+   nodes / edges / samples / failures / evidence。
+
+6. 生成统一因果等级：
+   Level1 correlation
+   Level2 decodable_projection
+   Level3 transition_evidence
+   Level4 component_path_contribution
+   Level5 hidden_causal_repair
+   Level6 specific_repair
+   Level7 generation_compositional_closure
+```
+
+### 客观结果
+
+Atlas v0 成功生成：
+
+```text
+nodes = 759
+edges = 962
+sample_summaries = 69
+failure_records = 43
+evidence_records = 14
+```
+
+导入范围：
+
+```text
+Phase575-597
+每个 phase 三模型各 1 个非 smoke 结果摘要
+共 23 phases × 3 models = 69 sample summaries
+```
+
+三模型覆盖：
+
+```text
+qwen3      23
+glm4       23
+deepseek7b 23
+```
+
+因果等级覆盖：
+
+```text
+Level2 decodable_projection      9
+Level3 transition_evidence       27
+Level4 component_path_contribution 30
+Level5 hidden_causal_repair      3
+Level6 specific_repair           0
+Level7 generation_closure        0
+```
+
+失败类型高频项：
+
+```text
+candidate_common_only
+ranking_fail
+C_wrong_cat
+projection_not_causal
+prompt_retrieval_dominance
+winner_switch_fail
+yes_bias
+```
+
+### 当前理论进展
+
+本阶段把 Phase187 的方案变成工程对象：
+
+```text
+图谱不再只是理论说法，而是变成可追加、可查询、可校验的文件集合。
+```
+
+最重要的理论推进：
+
+```text
+1. 单个 Phase 的发现被降级/升级到统一 causal_level。
+2. projection node、transition evidence、component contribution、hidden repair 被分开记录。
+3. candidate-specific ranking 被图谱自动识别为下一阶段最高价值缺口。
+4. polarity-format gate 是当前最强 hidden repair 区域；
+   value/ranking gate 仍是中心瓶颈。
+```
+
+Atlas 自动给出的 Phase189 推荐：
+
+```text
+Component-Level Candidate Ranking Closure
+
+优先目标：
+1. DS7B rule_value L26 MLP update
+2. DS7B query_relation L19 MLP update
+3. Qwen3 prompt_last/query_category late-layer positive controls
+
+成功标准：
+1. 分离 common activation 与 correct-specific ranking。
+2. 找到能提升 correct-vs-old-top-wrong margin 的组件/通道干预。
+3. random/wrong-relation controls 不能复现同样修复。
+4. 证据从 Level3 transition/projection 推进到 Level4 component causal node。
+```
+
+### 严格审视
+
+```text
+1. 这是图谱基建阶段，没有新模型因果实验。
+2. PhaseSpec 中的 claim / failure_types 是人工整理，仍需后续自动抽取和人工复核。
+3. atlas_samples 目前是 phase-level summary，不是逐样本全轨迹数据。
+4. atlas_state_schema 已定义，但还没有导入真实 h_l,t 轨迹。
+5. Level6/Level7 仍为空，说明现在距离 specific repair 和 generation/compositional closure 还很远。
+6. 导入已有 atlas 节点时保留 raw 字段，后续需要把 raw 进一步正规化为稳定 schema。
+```
+
+### 下一步任务
+
+Phase189 应进入：
+
+```text
+Component-Level Candidate Ranking Closure
+```
+
+关键任务：
+
+```text
+1. 读取 Phase188 atlas_next_recommendations.md。
+2. 围绕 DS7B rule_value L26 和 query_relation L19，做更细粒度 component/channel patch。
+3. 强制记录 candidate delta matrix：
+   common activation
+   correct_specific
+   old_top_wrong_specific
+   margin_gain
+   winner_switch
+4. 每个结果直接写回 Atlas v0 schema，而不是只生成独立 phase JSON。
+```
+
+核心判断：
+
+```text
+真正开始破解编码机制的标志，不是又发现一个强投影点，
+而是每个实验结果都进入可累计图谱，并推动某条边的 causal_level 上升。
+```
+## Phase 189: Candidate Ranking Closure Atlas Update 候选特异排序闭合图谱更新 [2026-06-24 01:21]
+
+### 本阶段目标
+
+继续完成 Phase188 Atlas v0 后的下一步任务：
+
+```text
+Component-Level Candidate Ranking Closure
+```
+
+但本阶段先不重跑 CUDA 模型，而是把本地已有 Phase591-597 的候选排序、MLP update、MLP 内部路径、状态条件化重算结果进行专门聚合，形成 candidate-ranking closure atlas update。
+
+核心问题：
+
+```text
+1. prompt-level repair 是否已经证明 candidate-specific ranking 可以产生？
+2. hidden/component patch 是否能把这种 ranking 转移到 base 状态？
+3. DS7B rule_value L26 和 query_relation L19 当前到底处于什么证据等级？
+4. 下一步是否应该继续 broad residual / MLP-output patch，还是必须转向更精准的通道/状态隔离？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase189_candidate_ranking_closure_atlas.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase189_candidate_ranking_closure_atlas.py
+
+python tests/gpt5/phase189_candidate_ranking_closure_atlas.py \
+  --output-dir results/gpt5_phase189_candidate_ranking_closure_atlas
+
+python - <<'PY'
+import json
+from pathlib import Path
+root=Path('results/gpt5_phase189_candidate_ranking_closure_atlas')
+idx=json.loads((root/'candidate_ranking_closure_index.json').read_text())
+for name,key in [('candidate_ranking_evidence.jsonl','evidence_rows'),('atlas_candidate_ranking_edges.jsonl','atlas_edges')]:
+    rows=[json.loads(l) for l in (root/name).read_text().splitlines()]
+    print(name, len(rows), idx['counts'][key])
+    assert len(rows)==idx['counts'][key]
+ids=[json.loads(l)['evidence_id'] for l in (root/'candidate_ranking_evidence.jsonl').read_text().splitlines()]
+print('unique', len(set(ids)), 'total', len(ids))
+assert len(set(ids)) == len(ids)
+print('ok')
+PY
+
+sed -n '1,220p' \
+  results/gpt5_phase189_candidate_ranking_closure_atlas/candidate_ranking_closure_report.md
+
+git diff --check -- \
+  tests/gpt5/phase189_candidate_ranking_closure_atlas.py \
+  results/gpt5_phase189_candidate_ranking_closure_atlas \
+  research/gpt5/docs/AGI_GPT5_MEMO.md
+```
+
+### 输出文件
+
+```text
+results/gpt5_phase189_candidate_ranking_closure_atlas/
+  candidate_ranking_closure_index.json
+  candidate_ranking_evidence.jsonl
+  atlas_candidate_ranking_edges.jsonl
+  candidate_ranking_closure_report.md
+```
+
+### 测试原理
+
+本阶段是 atlas analysis/update，不是新模型测试。
+
+输入范围：
+
+```text
+Phase591: value_candidate_ranking_audit
+Phase592: relation_specific_ranking_atlas
+Phase593: atlas_guided_causal_patch
+Phase594: conditional_transformation_atlas
+Phase595: mlp_update_causal_validation
+Phase596: mlp_internal_gate_path_audit
+Phase597: state_conditioned_mlp_generation_audit
+```
+
+方法：
+
+```text
+1. 读取各 phase 的 confirm JSON。
+2. 从 summary.best / summary.by_key / generated projections 中抽取候选排序证据。
+3. 对每条证据分配 closure_status：
+   strong_projection_not_causal
+   strong_mlp_transition
+   patch_no_specific_effect
+   common_activation_only
+   weak_component_margin_or_switch
+   等。
+
+4. 分配 gap_type：
+   projection_not_causal
+   transition_not_component_closure
+   component_patch_no_specific_ranking
+   candidate_common_only
+   weak_component_candidate
+   ranking_unresolved
+
+5. 生成 atlas_candidate_ranking_edges.jsonl，可作为 Phase188 Atlas 的候选排序专项更新边。
+```
+
+### 客观结果
+
+去重后结果：
+
+```text
+candidate_ranking_evidence = 384
+atlas_candidate_ranking_edges = 768
+```
+
+因果等级统计：
+
+```text
+Level1 = 5
+Level2 = 247
+Level3 = 111
+Level4 = 21
+Level5 = 0
+Level6 = 0
+Level7 = 0
+```
+
+闭合状态统计：
+
+```text
+patch_no_specific_effect            136
+projection_or_weak_transition       56
+transition_candidate                49
+patch_inconclusive                  37
+strong_projection_not_causal        28
+weak_projection_not_causal          27
+common_activation_only              22
+weak_component_margin_or_switch     19
+low_projection                      5
+strong_mlp_transition               3
+weak_component_margin_no_switch     2
+```
+
+主要 gap：
+
+```text
+component_patch_no_specific_ranking 136
+transition_not_component_closure    108
+projection_not_causal               55
+ranking_unresolved                  42
+candidate_common_only               22
+weak_component_candidate            21
+```
+
+### DS7B 关键路径判断
+
+DS7B rule_value L26：
+
+```text
+Phase592:
+  strong/weak projection: specific_margin ≈ +1.21
+
+Phase594:
+  mlp_update strong transition:
+  specific_margin ≈ +1.206
+  positive_rate ≈ 0.762
+
+Phase593/595:
+  raw/specific/common/random MLP or residual-style patch 基本全部不能修复 winner，
+  多数为 patch_no_specific_effect。
+```
+
+DS7B query_relation L19：
+
+```text
+Phase592:
+  projection specific_margin ≈ +0.498
+
+Phase594:
+  mlp_update specific_margin ≈ +0.519
+  positive_rate ≈ 0.857
+
+Phase593/595:
+  patch 后 margin 多为负或接近 0，
+  未形成稳定 winner switch。
+```
+
+### 理论进展
+
+本阶段把“候选特异排序”从单个 phase 结论变成了图谱闭合状态：
+
+```text
+1. Prompt-level repair 能产生强 candidate-specific ranking。
+2. 但静态 hidden/component patch 大多不能转移这种 ranking。
+3. DS7B rule_value L26 和 query_relation L19 是最强 mechanistic handles，
+   但当前仍不是 Level5 hidden repair。
+4. 当前最可靠定位是：
+   Level3 strong_mlp_transition
+   而不是
+   Level4/5 causal repair closure。
+```
+
+关键修正：
+
+```text
+不要继续把 strong projection 或 strong transition 当作已经破解。
+它们只是提示“这里有生成排序信号的状态变换”，不说明这个信号可被静态向量 patch 移植。
+```
+
+### 硬伤与问题
+
+```text
+1. 本阶段没有新 CUDA 测试，只是整合已有结果。
+2. Level4 里很多 Qwen3 弱候选样本数很少，而且 random/control 也有相近效果，不能作为强证据。
+3. DS7B 主路径证据最有价值，但目前全是 Level2/3 到 patch fail 的组合。
+4. 现有 phase JSON 的字段格式不完全统一，脚本只能做保守抽取。
+5. closure_status 是规则分类，不是新实验结果，需要后续实验证伪。
+```
+
+### 下一步任务
+
+Phase190 应做真正 CUDA 实验：
+
+```text
+DS7B Channel-State Candidate Ranking Intervention
+```
+
+要求：
+
+```text
+1. 先只跑 DS7B，避免三模型同时扩大成本。
+2. 使用 --hard-exit-after-model。
+3. 聚焦 rule_value L26 和 query_relation L19。
+4. 不再做 broad residual / broad MLP-output delta。
+5. 直接对 MLP 内部通道按 candidate-specific contribution 分组：
+   correct-specific positive channels
+   old-top-wrong positive channels
+   common activation channels
+   neutral/random same-norm channels
+
+6. 干预方式：
+   boost correct-specific channels
+   suppress old-top-wrong channels
+   boost-minus-suppress
+   matched random controls
+   wrong-relation controls
+
+7. 成功标准：
+   correct-vs-old-top-wrong margin 明显提升；
+   common activation 不同步大幅上升；
+   random/wrong controls 不能复现；
+   至少部分 target cases 发生 winner switch。
+```
+
+核心判断：
+
+```text
+如果 Phase190 仍失败，则 candidate-specific ranking 可能不是单层/单位置/单通道可干预对象，
+而是多位置状态条件化变换，需要进入 multi-node state graph intervention。
+```
+
+## Phase 190: 通道状态候选排序干预测试 [2026-06-24 02:17]
+
+### 任务来源
+
+用户要求分析 Phase186-189 上传内容是否正确，并综合正确部分和当前进展继续完成任务。
+
+本阶段判断：
+
+```text
+Phase186-189 的主线基本正确：
+1. 它们主要是历史实验、全局图谱、理论闭包与任务设计整合，不是新的模型推理实验。
+2. Phase189 对已有结果的 Level1-Level4 分类是有价值的 atlas/闭包视图。
+3. 但是不能把 strong projection 或 strong transition 直接解释为破解编码机制。
+4. 当前真正缺口仍是 candidate-specific ranking：
+   模型如何把“正确候选”相对“旧错误候选”抬高，而不是只产生公共激活或语义邻近激活。
+```
+
+因此 Phase190 按 Phase189 的下一步建议，做一次真实 CUDA 跨模型确认测试。
+
+### 生成脚本
+
+新增测试脚本：
+
+```text
+tests/gpt5/phase190_channel_state_candidate_ranking.py
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase190_summarize_channel_state_candidate_ranking.py
+```
+
+输出目录：
+
+```text
+results/gpt5_phase190_channel_state_candidate_ranking/
+```
+
+生成结果：
+
+```text
+phase190_qwen3_channel_state_candidate_ranking_confirm.json
+phase190_glm4_channel_state_candidate_ranking_confirm.json
+phase190_deepseek7b_channel_state_candidate_ranking_confirm.json
+phase190_cross_model_summary.json
+phase190_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase190_channel_state_candidate_ranking.py
+python -m py_compile tests/gpt5/phase190_channel_state_candidate_ranking.py tests/gpt5/phase190_summarize_channel_state_candidate_ranking.py
+```
+
+三模型顺序测试命令：
+
+```bash
+python tests/gpt5/phase190_channel_state_candidate_ranking.py qwen3 --confirm --hard-exit-after-model && python tests/gpt5/phase190_channel_state_candidate_ranking.py glm4 --confirm --hard-exit-after-model && python tests/gpt5/phase190_channel_state_candidate_ranking.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总命令：
+
+```bash
+python tests/gpt5/phase190_summarize_channel_state_candidate_ranking.py
+```
+
+说明：
+
+```text
+严格按用户要求顺序执行 qwen3 -> GLM4 -> DS7B。
+每个模型都带 --hard-exit-after-model。
+模型测试过程中没有并行做其他分析工作，只等待模型命令结束。
+```
+
+### 测试原理
+
+Phase189 指出 DS7B 的 rule_value L26、query_relation L19 等 MLP-update 节点具有最强候选排序迹象，但静态 patch 失败。
+
+Phase190 不再直接 patch broad residual 或 broad MLP-output delta，而是进入 MLP down_proj 之前的 z-channel 空间。
+
+对每个目标样本：
+
+```text
+base prompt 错误
+repair prompt 正确
+```
+
+计算 repair-base 的 MLP z_delta，并用 down_proj 权重与候选答案输出向量估计每个通道的候选贡献：
+
+```text
+correct_specific_channel
+old_top_wrong_specific_channel
+margin_channel = correct_specific - old_top_wrong_specific
+common_channel
+```
+
+然后构造多类干预：
+
+```text
+boost_correct_top{k}
+suppress_old_top{k}
+boost_margin_top{k}
+remove_bad_margin_top{k}
+combo_correct_minus_old_top{k}
+combo_margin_top{k}
+common_control_top{k}
+random_margin_norm_top{k}
+wrong_relation_delta_top{k}
+```
+
+其中：
+
+```text
+k = 16, 64, 256
+alpha = 0.5, 1.0, 2.0
+```
+
+观测指标：
+
+```text
+1. correct-vs-old-top-wrong margin_gain
+2. winner switch 数量
+3. common_delta 是否同步上升
+4. random/wrong/common controls 是否复现效果
+```
+
+### 客观结果
+
+三模型均为 confirm mode，每个模型生成 128 cases，只统计 base 错、repair 对的 target subset。
+
+汇总表：
+
+```text
+model       target rows   nodes                                      time min   max non-control switch   max control switch   max non-control margin   max control margin
+qwen3       11            prompt_last/L34, query_category/L32, prompt_last/L32      4.56        1                      1                    0.1022                   0.0681
+glm4        22            prompt_last/L38, prompt_last/L37, prompt_last/L39         13.54        1                      1                    0.0085                   0.0085
+deepseek7b  49            rule_value/L26, query_relation/L19, prompt_last/L26       23.66        2                      2                    0.0307                   0.0126
+```
+
+Qwen3 最强非控制干预：
+
+```text
+prompt_last|L34|combo_margin_top256|a2
+switch = 1/11
+mean_margin_gain = 0.1022
+mean_common_delta = -0.8264
+positive_margin_rate = 0.8182
+```
+
+Qwen3 最强控制组也有 winner switch：
+
+```text
+prompt_last|L32|wrong_relation_delta_top64|a2
+switch = 1/11
+mean_margin_gain = 0.0681
+mean_common_delta = 0.0794
+positive_margin_rate = 0.6364
+```
+
+GLM4 最强非控制干预：
+
+```text
+prompt_last|L37|boost_margin_top256|a2
+switch = 1/22
+mean_margin_gain = 0.0000
+mean_common_delta = -0.0025
+positive_margin_rate = 0.3182
+```
+
+GLM4 控制组同样出现 winner switch：
+
+```text
+prompt_last|L37|wrong_relation_delta_top64|a1
+switch = 1/22
+mean_margin_gain = 0.0000
+mean_common_delta = -0.1233
+positive_margin_rate = 0.3636
+```
+
+DS7B 最强非控制干预：
+
+```text
+query_relation|L19|combo_correct_minus_old_top64|a1
+switch = 2/49
+mean_margin_gain = 0.0017
+mean_common_delta = -0.0217
+positive_margin_rate = 0.5306
+```
+
+DS7B 最强控制组同样达到 2/49：
+
+```text
+query_relation|L19|wrong_relation_delta_top16|a2
+switch = 2/49
+mean_margin_gain = 0.0126
+mean_common_delta = 0.0342
+positive_margin_rate = 0.5510
+```
+
+### 严格结论
+
+客观现象：
+
+```text
+1. 三个模型都出现了少量 winner switch。
+2. Qwen3 的 prompt_last/L34 在非控制干预上有较明显 margin_gain。
+3. DS7B 的 query_relation/L19 仍是最值得追踪的位置，因为非控制和控制都能影响候选排序。
+4. GLM4 信号最弱，winner switch 出现但 margin_gain 接近 0。
+```
+
+不能得出的结论：
+
+```text
+1. 不能说已经找到干净的 candidate-specific ranking 通道。
+2. 不能说 top-k readout channel 就是编码机制。
+3. 不能说 Phase189 的 strong transition 已经被 causal repair 证明。
+4. 不能说单层、单位置、单通道组足以解释修复。
+```
+
+关键硬伤：
+
+```text
+1. 控制组污染严重。
+   random/wrong/common controls 也能产生 winner switch。
+
+2. switch rate 很低。
+   qwen3 最高 1/11，GLM4 最高 1/22，DS7B 最高 2/49。
+
+3. margin_gain 与 switch 不稳定对应。
+   有些 switch 的平均 margin_gain 很小甚至接近 0。
+
+4. channel 分组仍然是线性读出近似。
+   它使用 down_proj 和答案向量估计通道贡献，但真实模型可能依赖后续层、注意力回流、多位置状态条件。
+
+5. target subset 数量仍受 base错/repair对 条件限制。
+   虽然每模型生成 128 cases，但真正可用于 causal repair 的样本数分别只有 11、22、49。
+```
+
+### 理论进展
+
+Phase190 把 Phase189 的判断推进了一步：
+
+```text
+Phase189:
+MLP update 节点中存在 candidate-specific ranking 的迹象，但静态 patch 不能闭环。
+
+Phase190:
+进入 MLP z-channel 后，确实可以轻微改变候选排序，说明 ranking-relevant signal 存在于这些通道方向中。
+但控制组也能产生近似效果，说明这些通道不是干净的独立编码单元。
+```
+
+更谨慎的理论表述：
+
+```text
+语言模型的修复信号不是简单的“某个答案向量被写入某层某通道”。
+更像是一个多位置、多层、条件化的状态变换：
+
+输入图谱约束
+-> relation/value/query 状态选择
+-> MLP/attention 共同改变候选排名
+-> 后续层完成稳定 winner selection
+```
+
+所以“图谱破解编码机制”的方向仍然成立，但图谱不能只看静态节点强弱。
+下一步必须把图谱从 node atlas 推进到 state-transition graph。
+
+### 下一阶段任务
+
+Phase191 应进入：
+
+```text
+Multi-Node State Graph Intervention
+```
+
+核心目标：
+
+```text
+不再问“哪个单点通道能修复”，而问：
+哪些节点组合按什么顺序共同推动 correct candidate 超过 old top wrong candidate。
+```
+
+具体任务：
+
+```text
+1. 以 DS7B 为主，继续使用 rule_value L26、query_relation L19，并加入其前后相邻强节点。
+2. 构建 multi-node intervention：
+   relation node
+   value node
+   prompt_last node
+   downstream winner node
+
+3. 测试组合方式：
+   单点 patch
+   两点同步 patch
+   三点同步 patch
+   顺序 patch
+   反序 patch
+   matched random node set
+
+4. 评价标准：
+   非控制组合的 switch rate 必须显著高于控制组合；
+   margin_gain 必须稳定为正；
+   common_delta 不能解释主要提升；
+   repair effect 应集中在 candidate-specific margin。
+```
+
+第一性原理判断：
+
+```text
+如果智能编码机制存在，它可能不是静态向量字典，而是状态图中的可重复变换规则。
+下一步要找到“状态变换规则”，而不是继续寻找单个万能通道。
+```
+
+## Phase 191: README IntelligentTheory 简明总览更新 [2026-06-24 08:55]
+
+### 命令
+
+```bash
+sed -n '1,260p' research/IntelligentTheory.md
+sed -n '261,560p' research/IntelligentTheory.md
+sed -n '1,260p' README.md
+rg -n '^## |^# |^### ' README.md
+git diff -- README.md | sed -n '1,260p'
+```
+
+### 生成脚本
+
+本阶段没有生成新的测试脚本，也没有运行模型测试。
+
+### 原理
+
+本阶段任务是根据 `research/IntelligentTheory.md` 更新仓库首页说明，把长篇理论整理压缩成更容易阅读的 README 结构。
+
+压缩原则：
+
+```text
+先讲路线
+再讲语言为什么是入口
+再讲语言编码机制
+再讲智能定义
+再讲基础数学框架
+最后用阶段历史说明理论如何形成
+```
+
+### 结果
+
+已更新 `README.md`，新版包含：
+
+```text
+1. 研发路线
+2. 路线分析
+3. 语言特性分析
+4. 语言编码机制
+5. 智能理论
+6. 数学体系
+7. 研究历史九个阶段
+8. 当前最重要的下一步
+9. 主要阅读入口
+10. 谨慎结论
+```
+
+核心表述改为更简洁版本：
+
+```text
+语言智能不是一个固定语义坐标表，
+而是“相对状态 + 条件化变换 + 候选竞争 + 读出门控”的动态系统。
+```
+
+### 理论进展
+
+本阶段没有新增实验结论，主要进展是把当前理论主线整理成可公开阅读的首页版本。
+
+README 中保留了最严格的限制：
+
+```text
+projection evidence 不等于因果闭合；
+单点 residual patch 经常失败；
+候选 embedding 不正交；
+Qwen3、GLM4、DS7B 编码策略差异很大。
+```
+
+下一步仍然是从 transition evidence 推进到 component causal node，并最终追求 generation closure。
