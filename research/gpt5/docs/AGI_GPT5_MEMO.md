@@ -32677,3 +32677,112 @@ rule_value/query_relation 是否需要通过后续 prompt_last 才能表现。
 那么单个 transition 可能只是局部微分；
 真正的候选排序修复可能需要连续状态段，而不是一个 layer step。
 ```
+## Phase 194: Client Server Local Configuration and Startup [2026-06-25 12:03]
+
+### 命令
+
+```bash
+find . -maxdepth 3 -type f \( -name 'package.json' -o -name 'vite.config.*' -o -name '.env*' -o -name 'requirements*.txt' \) -print
+sed -n '1,220p' frontend/package.json
+sed -n '1,220p' frontend/src/config/api.js
+sed -n '1,220p' frontend/vite.config.js
+rg -n "FastAPI|uvicorn|app =|CORS|5001|5173" server frontend/src
+python - <<'PY'
+import server.server as s
+print('app_import_ok', bool(s.app))
+PY
+npm install
+python -m pip install scikit-learn
+npm run build
+setsid -f env PYTHONUNBUFFERED=1 python -m uvicorn server.server:app --host 0.0.0.0 --port 5001 --log-level warning > logs/backend.log 2>&1
+setsid -f sh -c 'cd frontend && exec npx vite --host 0.0.0.0 --port 5173' > logs/frontend.log 2>&1
+curl --noproxy '*' --max-time 8 -v http://127.0.0.1:5001/health
+curl --noproxy '*' --max-time 8 -v http://127.0.0.1:5173/
+ss -ltnp '( sport = :5001 or sport = :5173 )'
+git diff --check -- server/server.py frontend/src/config/api.js frontend/vite.config.js frontend/.env.development
+```
+
+### 生成脚本与文件
+
+本阶段没有生成模型测试脚本。
+
+修改与生成文件：
+
+```text
+server/server.py
+frontend/src/config/api.js
+frontend/vite.config.js
+frontend/.env.development
+logs/backend.log
+logs/frontend.log
+logs/backend.pid
+logs/frontend.pid
+```
+
+### 原理
+
+本阶段目标是完成前后端本地开发配置：
+
+```text
+1. 后端 FastAPI 服务监听 0.0.0.0:5001。
+2. 前端 Vite 客户端监听 0.0.0.0:5173。
+3. 前端 API 地址从 Vite 环境变量读取，默认连接 http://localhost:5001。
+4. 后端 HF_HOME 改为 setdefault，避免 Linux 环境被强制写成 Windows 路径。
+5. Vite watch 改为 polling，绕开系统 fs watcher 数量上限。
+```
+
+### 结果
+
+启动结果：
+
+```text
+后端: http://127.0.0.1:5001/health -> 200 OK
+返回: {"status":"ok","model_loaded":false,"interceptor_ready":false}
+
+前端: http://127.0.0.1:5173/ -> 200 OK
+端口: 5001 和 5173 均已监听
+```
+
+注意：
+
+```text
+1. 后端服务已启动，但 GPT-2 本地权重不存在，model_loaded=false。
+2. fallback 也因 hf-mirror 当前不可连接而未加载模型。
+3. 这不影响前端页面和后端基础 API 服务启动。
+4. 若需要模型 API 完整可用，需要补齐 GPT-2 safetensors 或修改默认加载模型路径。
+```
+
+### 理论研究进展
+
+本阶段是工程启动配置，不产生新的语言编码机制结论。
+
+但对研究平台有直接支持：
+
+```text
+前端可视化界面 + 后端实验 API
+```
+
+已经能形成一个本地研究工作台，为后续展示编码机制、智能理论、实验图谱和运行记录提供基础。
+
+### 严格审视
+
+当前硬伤：
+
+```text
+1. model_loaded=false，依赖模型的分析接口不能视为完整可用。
+2. npm audit 显示 15 个依赖漏洞，尚未处理。
+3. 后端仍有较多启动时模型耦合逻辑，缺少明确的 no-model mode 配置。
+4. 前端 polling 解决了启动问题，但会增加 CPU 轮询开销。
+```
+
+### 下一步任务
+
+建议进入一个完整平台化阶段：
+
+```text
+1. 增加 BACKEND_MODEL_MODE=no-model/local/remote 配置。
+2. 将默认模型路径从写死 GPT-2 改为环境变量。
+3. 前端增加后端健康状态提示，区分 API 在线和模型在线。
+4. 整理 start/stop/status 脚本，避免人工维护 PID。
+5. 之后再接入 qwen3、GLM4、DS7B 的受控实验入口。
+```

@@ -71519,3 +71519,5471 @@ attn_all cumulative = 43/43
 如果 content 分量变强：
   说明 residual state builder 比最终 top-head routing 更依赖 value content。
 ```
+
+## Phase 617: Attention Head Cumulative Graph 多层注意力 Head 累积图谱 [2026-06-24 23:51]
+
+### 本阶段目标
+
+Phase616 证明 DS7B 的：
+
+```text
+L18-L22 attn_all cumulative = 43/43
+```
+
+这说明 answer-position residual state 可以由多层 attention accumulation 形成。附件中对 Phase616 的判断基本正确：
+
+```text
+1. value gate 主链条已经从 Q interface 上移到 multi-layer attention accumulation。
+2. 单层 attention 不足，但多层 attention 可以闭合。
+3. DS7B 结果最可靠，Qwen3/GLM4 只能作为方向性对照。
+4. 下一步应该把 attention accumulation 拆到 layer/head/source/pattern。
+```
+
+本阶段先完成其中第一步：
+
+```text
+把 multi-layer attention accumulation 拆到 layer -> head slot。
+```
+
+source position 与 pattern/content split 留到下一阶段，避免一次性测试过重导致结果不稳定。
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase617_attention_head_cumulative_graph.py \
+  tests/glm5/phase617_attention_head_cumulative_graph_summary.py
+
+python tests/glm5/phase617_attention_head_cumulative_graph.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --hard-exit-after-model
+
+python tests/glm5/phase617_attention_head_cumulative_graph.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase617_attention_head_cumulative_graph \
+  --hard-exit-after-model
+
+python tests/glm5/phase617_attention_head_cumulative_graph.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase617_attention_head_cumulative_graph \
+  --hard-exit-after-model
+
+python tests/glm5/phase617_attention_head_cumulative_graph.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase617_attention_head_cumulative_graph \
+  --hard-exit-after-model
+```
+
+首次 DS7B 84-spec 全量 head 组合运行中进程以 139 退出，没有生成有效结果。判断是过重 hook/forward 组合触发底层不稳定，不作为实验结果使用。随后收紧 patch specs，不减少 raw cases 和 target rows，执行：
+
+```bash
+python tests/glm5/phase617_attention_head_cumulative_graph.py deepseek7b \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase617_attention_head_cumulative_graph \
+  --hard-exit-after-model
+
+python tests/glm5/phase617_attention_head_cumulative_graph_summary.py
+
+python -m py_compile \
+  tests/glm5/phase617_attention_head_cumulative_graph.py \
+  tests/glm5/phase617_attention_head_cumulative_graph_summary.py
+```
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase617_attention_head_cumulative_graph.py`
+- 汇总脚本：`tests/glm5/phase617_attention_head_cumulative_graph_summary.py`
+- 输出目录：`results/glm5_phase617_attention_head_cumulative_graph/`
+- 跨模型汇总：`results/glm5_phase617_attention_head_cumulative_graph/phase617_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+prompt pairs = Phase612 source-aligned prompt pairs
+candidate values = 前 4 个候选值
+patch position = answer position
+patch site = attention o_proj input head slots
+raw cases/model = 128
+target rows = base answer 错、repair answer 对
+controls = same-norm random slot controls
+```
+
+有效 target rows：
+
+```text
+Qwen3: 9/128
+GLM4: 12/128
+DS7B: 43/128
+```
+
+扫描层位与 head 数：
+
+```text
+Qwen3: L25-L29, 32 heads/layer
+GLM4: L30-L34, 32 heads/layer
+DS7B: L18-L22, 28 heads/layer
+```
+
+测试类型：
+
+```text
+1. all_heads_all_layers
+2. all_heads_midlate
+3. all_heads_single_layer
+4. known_top{k}_all_layers
+5. known_top{k}_midlate
+6. single known heads
+7. deterministic coverage heads
+8. same-norm random controls
+```
+
+### 原理
+
+Phase616 的 `attn_out` patch 是 attention module 输出层面的整体 patch。本阶段进一步在 `o_proj input` 的 head slot 上注入：
+
+```text
+delta_o(l,h) = o_repair(l,h) - o_base(l,h)
+```
+
+对多个 layer/head slot 做累积：
+
+```text
+o_patch(l,h) = o_current(l,h) + delta_o(l,h)
+```
+
+如果 `all_heads_all_layers` 可以接近 Phase616 的 `attn_all`，说明 Phase616 的 attention cumulative effect 可以在 head-slot 层面复现。如果少数 known top heads 接近 all heads，说明存在稀疏关键 head 集合。如果 all heads 强但 top heads 不够，说明是 broad/distributed attention field。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+layers = L25-L29
+heads = 32/layer
+specs = 84
+time = 2.90 min
+```
+
+最强结果：
+
+```text
+all_heads_midlate_L27_L29: 6/9, margin +1.821
+all_heads_L29: 6/9, margin +1.640
+known_top8_midlate_L27_L29: 4/9, margin +1.238
+L29_H11: 4/9, margin +1.223
+known_top1_midlate_L27_L29: 4/9, margin +1.209
+known_top1_all_layers: 4/9, margin +1.182
+all_heads_all_layers: 3/9, margin +0.529
+```
+
+random controls：
+
+```text
+all_heads_midlate random: 2/9, margin +0.175
+all_heads_all_layers random: 1/9, margin -0.052
+```
+
+Qwen3 的客观现象：
+
+```text
+1. midlate attention head slots 有部分恢复。
+2. L29 单层 all_heads 与 L27-L29 midlate 较强。
+3. L29_H11 是最强单 head，达到 4/9。
+4. all_layers 反而弱于 midlate，说明早层 head delta 可能有干扰。
+5. 样本只有 9 行，不能强结论。
+```
+
+#### GLM4
+
+```text
+rows = 12
+layers = L30-L34
+heads = 32/layer
+specs = 84
+time = 5.73 min
+```
+
+最强结果：
+
+```text
+L32_coverage_H16: 2/12, margin +0.036
+all_heads_L32: 1/12, margin +0.094
+all_heads_midlate_L32_L34: 1/12, margin +0.089
+all_heads_all_layers: 1/12, margin -0.021
+known_top cumulative 基本 0/12 到 1/12
+```
+
+GLM4 的客观现象：
+
+```text
+1. o_proj input head-slot patch 基本不能恢复。
+2. 这与 Phase616 的 GLM4 layer_out bridge 强形成对照。
+3. GLM4 的 residual state 不是当前这种 attention head-slot path 可以解释的。
+4. 需要继续考虑 whole-residual、norm/gating、MLP internal 或更复杂 mixed path。
+```
+
+#### DS7B
+
+```text
+rows = 43
+layers = L18-L22
+heads = 28/layer
+specs = 44 compact
+time = 8.78 min
+```
+
+最强结果：
+
+```text
+all_heads_all_layers: 43/43, margin +3.901
+known_top6_all_layers: 42/43, margin +2.920
+known_top6_midlate_L20_L22: 41/43, margin +2.621
+all_heads_midlate_L20_L22: 39/43, margin +2.692
+known_top4_all_layers: 36/43, margin +2.249
+known_top4_midlate_L20_L22: 33/43, margin +1.948
+all_heads_L22: 32/43, margin +1.727
+known_top2_midlate_L20_L22: 30/43, margin +1.441
+known_top2_all_layers: 30/43, margin +1.435
+```
+
+单层 all_heads：
+
+```text
+L22 all_heads: 32/43, margin +1.727
+L18 all_heads: 21/43, margin +1.056
+L19 all_heads: 21/43, margin +0.880
+L20 all_heads: 18/43, margin +0.935
+L21 all_heads: 3/43, margin +0.121
+```
+
+强单 head：
+
+```text
+L20_H25: 12/43, margin +0.724
+L22_H1: 12/43, margin +0.714
+L18_H24: 8/43, margin +0.512
+L22_H3: 7/43, margin +0.381
+L22_H24: 7/43, margin +0.355
+L22_H7: 5/43, margin +0.370
+L20_H1: 5/43, margin +0.223
+```
+
+random controls：
+
+```text
+all_heads_all_layers random: 6/43, margin -0.100
+known_top6_all_layers random: 4/43, margin -0.159
+all_heads_midlate random: 3/43, margin -0.018
+all_heads_L22 random: 2/43, margin -0.039
+```
+
+DS7B 的客观现象：
+
+```text
+1. Phase616 的 attention cumulative effect 可以在 o_proj input head slots 复现。
+2. all_heads_all_layers 达到 43/43，margin +3.901。
+3. known_top6_all_layers 已经达到 42/43，说明存在较小 head 集合近似闭合。
+4. known_top6_midlate L20-L22 达到 41/43，说明主要有效区间集中在 L20-L22，但 L18-L19 仍有补充作用。
+5. 单 head 有效但不充分，最强单 head 只有 12/43。
+6. L21 单层 all_heads 很弱，说明 L21 在 Phase616 的 layer_out bridge 强不等价于 L21 attention head slot 强。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B attention cumulative path 已经被拆到 head-slot 层面**
+
+```text
+Phase616 attn_all: 43/43, margin +3.900
+Phase617 all_heads_all_layers o_proj input slots: 43/43, margin +3.901
+```
+
+两者几乎一致，说明 Phase616 的 attention cumulative 不是 hook 假象，而可以由 o_proj input head slots 复现。
+
+2. **DS7B 是 sparse + distributed hybrid**
+
+```text
+known_top6_all_layers: 42/43
+known_top6_midlate: 41/43
+all_heads_all_layers: 43/43
+```
+
+少数 top heads 已经接近完整恢复，但 all heads 仍更强，说明不是纯单头机制，也不是完全均匀场，而是：
+
+```text
+sparse dominant heads + distributed residual support
+```
+
+3. **L22 是最强单层，但不是完整路径**
+
+```text
+L22 all_heads: 32/43
+L18-L22 all_heads: 43/43
+```
+
+所以单层 L22 只解释局部读出/末端路由，多层路径才解释完整 repair state。
+
+4. **GLM4 明确不是这个 head-slot 路径**
+
+```text
+GLM4 all_heads_all_layers: 1/12, margin -0.021
+```
+
+这与 Phase616 的 layer_out bridge 强形成重要分歧。GLM4 需要另一条机制线。
+
+5. **Qwen3 部分支持但不闭合**
+
+```text
+Qwen3 all_heads_midlate: 6/9
+Qwen3 all_heads_all_layers: 3/9
+```
+
+这说明 Qwen3 可能有 late attention path，但早层注入会干扰；由于 target rows 少，暂不下强结论。
+
+### 理论进展
+
+当前 DS7B 局部链条可进一步细化为：
+
+```text
+prompt condition
+  -> L18-L22 multi-layer attention head-slot accumulation
+  -> answer-position residual state package
+  -> q_proj input
+  -> Q state
+  -> routing pattern
+  -> candidate readout
+  -> generation gate
+```
+
+更具体地说：
+
+```text
+不是所有 attention heads 等价；
+不是单 head 决定；
+而是少数 dominant heads 与更宽的 distributed support 一起构成状态场。
+```
+
+这对“语言背后的编码机制”有一个谨慎推进：
+
+```text
+编码不是固定语义向量，而是条件化状态场；
+状态场在 answer position 由多层 attention head slots 累积；
+query 只是读取该状态场并转成路由。
+```
+
+### 问题和硬伤
+
+1. **DS7B 首次 84-spec 运行崩溃**
+
+这说明当前 hook-based exhaustive scan 工程上仍不稳定。有效结果来自 compact specs，不是完整 head exhaustive map。
+
+2. **known_top heads 来自历史候选**
+
+本阶段没有重新全量搜索所有 head 子集，因此：
+
+```text
+known_top6 近闭合
+```
+
+不能解释为真正最小 head set，只能解释为“已有 top head 集合足够强”。
+
+3. **还没做 source position 分解**
+
+当前知道哪些 head slot 有效，但不知道它们读的是：
+
+```text
+object line
+category line
+rule/value line
+question line
+format/punctuation
+self position
+```
+
+4. **还没做 pattern/content split**
+
+Phase612 显示最终 routing pattern 很关键，但 residual state builder 的 head-slot 里到底是 pattern 主导还是 content 主导，仍未验证。
+
+5. **GLM4 路径仍未解释**
+
+GLM4 的负结果很重要，但说明跨模型统一公式还不能只写成 attention head-slot accumulation。
+
+### 下一步任务
+
+Phase618 应继续做：
+
+```text
+DS7B Attention Source and Pattern/Content Decomposition
+```
+
+目标：
+
+```text
+把 Phase617 找到的 DS7B dominant head path 拆成 source group 与 pattern/content role。
+```
+
+优先对象：
+
+```text
+DS7B:
+  L20_H25
+  L22_H1
+  L18_H24
+  L22_H3
+  L22_H24
+  known_top6_midlate_L20_L22
+```
+
+测试方案：
+
+```text
+1. 只对 DS7B 先做，因为 DS7B head-slot path 已经闭合。
+2. 使用 source-aligned target rows。
+3. 对关键 heads 做 source group mask：
+   - self / answer
+   - object statement line
+   - category statement line
+   - rule/value line
+   - question line
+   - punctuation/format
+4. 对关键 heads 做 pattern/content split：
+   - repair pattern + base value
+   - base pattern + repair value
+   - repair pattern + repair value
+5. 对 known_top6_midlate 做 cumulative source-group patch。
+6. 加 random same-norm 与 wrong-source controls。
+```
+
+判据：
+
+```text
+如果少数 source groups 复现 known_top6：
+  value gate state builder 可图谱化。
+
+如果 source groups 分散：
+  说明它是 distributed attention field。
+
+如果 repair pattern + base value 强：
+  延续 routing-pattern 主导结论。
+
+如果 base pattern + repair value 强：
+  说明 residual state builder 更依赖内容搬运。
+```
+
+## Phase 618: Attention Source and Pattern Content Decomposition 注意力 Source 与 Pattern/Content 分解 [2026-06-25 00:33]
+
+### 本阶段目标
+
+Phase617 已经把 DS7B 的 value gate repair path 拆到：
+
+```text
+L18-L22 multi-layer attention head slots
+```
+
+附件中对 Phase617 的判断总体正确：
+
+```text
+1. DS7B 的 Phase616 attention cumulative effect 可以在 head-slot 层面复现。
+2. DS7B 是 sparse dominant heads + distributed support。
+3. L22 是强 endpoint，但完整路径需要多层。
+4. GLM4 明确不走当前 head-slot path。
+5. 下一步必须拆 source group 和 pattern/content role。
+```
+
+本阶段目标：
+
+```text
+把 top attention head path 拆成 source group 与 pattern/content role。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase618_attention_source_pattern_content.py \
+  tests/glm5/phase618_attention_source_pattern_content_summary.py
+
+python tests/glm5/phase618_attention_source_pattern_content.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --compact \
+  --hard-exit-after-model
+
+python tests/glm5/phase618_attention_source_pattern_content.py qwen3 \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase618_attention_source_pattern_content \
+  --hard-exit-after-model
+
+python tests/glm5/phase618_attention_source_pattern_content.py glm4 \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase618_attention_source_pattern_content \
+  --hard-exit-after-model
+
+python tests/glm5/phase618_attention_source_pattern_content.py deepseek7b \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase618_attention_source_pattern_content \
+  --hard-exit-after-model
+
+python tests/glm5/phase618_attention_source_pattern_content_summary.py
+
+python -m py_compile \
+  tests/glm5/phase618_attention_source_pattern_content.py \
+  tests/glm5/phase618_attention_source_pattern_content_summary.py
+```
+
+仍然按 qwen3、glm4、deepseek7b 顺序执行，每个模型带 `--hard-exit-after-model`。本阶段使用 compact specs，不减少 raw cases，只减少 source/spec 组合数，避免 Phase617 中过重 hook 组合造成底层不稳定。
+
+### 脚本与结果
+
+- 主测试脚本：`tests/glm5/phase618_attention_source_pattern_content.py`
+- 汇总脚本：`tests/glm5/phase618_attention_source_pattern_content_summary.py`
+- 输出目录：`results/glm5_phase618_attention_source_pattern_content/`
+- 跨模型汇总：`results/glm5_phase618_attention_source_pattern_content/phase618_cross_model_summary.md`
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+prompt pairs = Phase612 source-aligned prompt pairs
+candidate values = 前 4 个候选值
+raw cases/model = 128
+target rows = base answer 错、repair answer 对
+patch site = attention o_proj input head slots
+```
+
+有效 target rows：
+
+```text
+Qwen3: 9/128
+GLM4: 12/128
+DS7B: 43/128
+```
+
+层位：
+
+```text
+Qwen3: L27-L29
+GLM4: L32-L34
+DS7B: L20-L22
+```
+
+top heads：
+
+```text
+Qwen3: [11, 23, 6, 14, 5, 2]
+GLM4: [12, 8, 4, 28, 6, 7]
+DS7B: [3, 1, 7, 24, 25, 13]
+```
+
+source groups：
+
+```text
+self_answer
+question_line
+final_object_category_line
+object_rule_lines
+value_rule_lines
+punct_format
+other
+all_source
+```
+
+pattern/content modes：
+
+```text
+rb_pattern = repair pattern + base value
+br_content = base pattern + repair value
+rr_pattern_content = repair pattern + repair value
+```
+
+### 原理
+
+单个 attention head 的输出写成：
+
+```text
+z(l,h,t) = sum_s alpha(l,h,t,s) * V(l,h,s)
+```
+
+本阶段按 source group 切分 source token 集合：
+
+```text
+G = {s_1, s_2, ...}
+```
+
+然后构造三种差分：
+
+```text
+rb_pattern:
+  sum_{s in G} alpha_repair(s) * V_base(s)
+  -
+  sum_{s in G} alpha_base(s) * V_base(s)
+
+br_content:
+  sum_{s in G} alpha_base(s) * V_repair(s)
+  -
+  sum_{s in G} alpha_base(s) * V_base(s)
+
+rr_pattern_content:
+  sum_{s in G} alpha_repair(s) * V_repair(s)
+  -
+  sum_{s in G} alpha_base(s) * V_base(s)
+```
+
+如果 `rb_pattern` 强，说明修复主要来自 attention pattern 改变。如果 `br_content` 强，说明修复主要来自 value content 改变。如果某个 source group 强，说明该组是关键读取来源。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+layers = L27-L29
+heads = 32/layer
+top_heads = [11, 23, 6, 14, 5, 2]
+specs = 48
+time = 3.20 min
+```
+
+最强结果：
+
+```text
+L29_H11 all_source rr: 4/9, margin +1.237
+L29_H11 value_rule_lines rr: 4/9, margin +1.210
+top6_midlate value_rule_lines rb_pattern: 3/9, margin +0.890
+top6_midlate value_rule_lines rr_pattern_content: 3/9, margin +0.890
+top6_midlate all_source rb_pattern: 3/9, margin +0.862
+top6_midlate all_source rr_pattern_content: 3/9, margin +0.848
+```
+
+Qwen3 的客观现象：
+
+```text
+1. 最强 source 是 value_rule_lines。
+2. rb_pattern 与 rr_pattern_content 几乎相同。
+3. br_content 很弱。
+4. 说明 Qwen3 的部分路径也偏 pattern 主导，但样本只有 9 行。
+```
+
+#### GLM4
+
+```text
+rows = 12
+layers = L32-L34
+heads = 32/layer
+top_heads = [12, 8, 4, 28, 6, 7]
+specs = 48
+time = 5.25 min
+```
+
+最强真实结果只有：
+
+```text
+L34_H8 all_source rr: 1/12, margin +0.026
+L34_H4 all_source rr: 1/12, margin +0.010
+L32_H12 question_line rr: 1/12, margin +0.005
+top6_midlate value_rule_lines rb_pattern: 1/12, margin -0.016
+top6_midlate all_source rr_pattern_content: 0/12, margin -0.036
+```
+
+GLM4 的客观现象：
+
+```text
+1. 当前 source/pattern-content head path 基本无效。
+2. 这继续支持 Phase617 的负结果。
+3. GLM4 的强 residual state 不是当前 DS7B-style head-slot source path。
+```
+
+#### DS7B
+
+```text
+rows = 43
+layers = L20-L22
+heads = 28/layer
+top_heads = [3, 1, 7, 24, 25, 13]
+specs = 48
+time = 15.20 min
+```
+
+最强 top path：
+
+```text
+top6_midlate all_source rr_pattern_content:
+  41/43, margin +2.624
+
+top6_midlate value_rule_lines rb_pattern:
+  33/43, margin +1.728
+
+top6_midlate value_rule_lines rr_pattern_content:
+  33/43, margin +1.728
+
+top6_midlate all_source rb_pattern:
+  32/43, margin +1.744
+
+top6_midlate all_source br_content:
+  14/43, margin +0.873
+
+top6_midlate question_line rr_pattern_content:
+  13/43, margin +0.731
+
+top6_midlate question_line br_content:
+  10/43, margin +0.618
+```
+
+强单 head：
+
+```text
+L22_H1 value_rule_lines rr: 13/43, margin +0.739
+L22_H1 all_source rr: 13/43, margin +0.730
+L22_H3 all_source rr: 7/43, margin +0.397
+L22_H7 all_source rr: 7/43, margin +0.377
+L22_H3 value_rule_lines rr: 6/43, margin +0.398
+L22_H7 value_rule_lines rr: 6/43, margin +0.363
+L20_H1 all_source rr: 5/43, margin +0.217
+```
+
+random controls：
+
+```text
+top6_midlate all_source rr random: 2/43, margin +0.014
+top6_midlate value_rule_lines rb_pattern random: 0/43, margin -0.094
+top6_midlate value_rule_lines rr random: 0/43, margin -0.046
+top6_midlate all_source br_content random: 2/43, margin -0.114
+```
+
+DS7B 的客观现象：
+
+```text
+1. all_source rr_pattern_content 复现 Phase617 known_top6_midlate：41/43。
+2. value_rule_lines alone 可恢复 33/43，是最强单 source group。
+3. value_rule_lines rb_pattern 与 rr_pattern_content 完全相同：33/43, margin +1.728。
+4. all_source rb_pattern 是 32/43，接近 value_rule_lines rb_pattern。
+5. all_source br_content 只有 14/43，明显弱于 pattern。
+6. question_line 有辅助，但弱于 value_rule_lines。
+7. final_object_category_line 在当前分组下几乎为 0。
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 的主 source 是 value_rule_lines**
+
+```text
+top6_midlate value_rule_lines rb_pattern: 33/43
+top6_midlate all_source rb_pattern: 32/43
+```
+
+说明关键头主要从规则/值行读取，而不是从最后 object-category statement 或 question line 读取。
+
+2. **DS7B 的 residual state builder 主要是 pattern 主导**
+
+```text
+rb_pattern: 32/43 to 33/43
+br_content: 14/43
+rr_pattern_content: 41/43 all_source, 33/43 value_rule_lines
+```
+
+这说明修复主要来自 attention pattern 的改变，value content 单独不足。
+
+3. **pattern + content 的全 source 最强**
+
+```text
+all_source rr_pattern_content: 41/43
+value_rule_lines rb_pattern: 33/43
+```
+
+说明 value_rule_lines 是主干，但完整效果还需要其它 source group 或 content 辅助。
+
+4. **L22_H1 是最强单 head source path**
+
+```text
+L22_H1 value_rule_lines rr: 13/43
+L22_H1 all_source rr: 13/43
+```
+
+单 head 仍远弱于 top6 cumulative，说明机制不是单头闭合。
+
+5. **GLM4 继续负结果**
+
+```text
+GLM4 top6_midlate all_source rr: 0/12, margin -0.036
+```
+
+GLM4 不走当前 head/source/pattern path。
+
+### 理论进展
+
+DS7B 的局部链条现在可以写得更具体：
+
+```text
+prompt condition
+  -> value_rule_lines attention-pattern shift
+  -> L20-L22 top attention head slots
+  -> answer-position residual state package
+  -> q_proj input
+  -> Q/routing pattern
+  -> candidate readout
+  -> generation gate
+```
+
+关键不是简单复制 value content，而是：
+
+```text
+模型改变了 answer position 对 value rule lines 的 attention pattern，
+从而把正确规则路径写入 residual state。
+```
+
+这与 Phase612 的 pattern 主导结论形成一致链条：
+
+```text
+最终 routing pattern 重要；
+上游 residual state builder 也主要由 pattern shift 驱动。
+```
+
+### 问题和硬伤
+
+1. **source group 仍是粗分组**
+
+当前 source group 基于文本行和 token offset，可能有边界误差，尤其 `punct_format` 与 line group 之间可能混入。
+
+2. **final_object_category_line 为 0 需要谨慎解释**
+
+这可能说明它确实不是当前 value gate path 的主 source，也可能是当前分组和 source-aligned prompt 设计让它没有有效 delta。
+
+3. **只测 top6 midlate**
+
+本阶段没有覆盖所有 heads/all layers，不能说已经完成全图谱。
+
+4. **pattern/content split 是 head-slot 层面的近似**
+
+它使用 `alpha * V` 重构 head slot，可能与模型内部实现存在细节差异，但 all_source rr 能复现 41/43，说明近似足够有效。
+
+5. **跨模型仍未统一**
+
+Qwen3 方向部分一致，GLM4 仍然负结果。当前理论不能直接泛化为所有模型都用 `value_rule_lines pattern shift`。
+
+### 下一步任务
+
+Phase619 应继续做：
+
+```text
+Source Position Micro-Atlas and Rule-Line Token Audit
+```
+
+目标：
+
+```text
+把 DS7B 的 value_rule_lines 继续拆成更细的 token-level source 图谱。
+```
+
+测试方案：
+
+```text
+1. 只对 DS7B 先做主线，因为 DS7B 已经闭合。
+2. 固定 top6_midlate L20-L22。
+3. 对 value_rule_lines 按 token/短 span 做 sliding source patch。
+4. 区分：
+   - category token
+   - relation token
+   - value token
+   - punctuation token
+   - line-level position
+5. 对最强 token spans 做 rb_pattern / br_content / rr split。
+6. 加 wrong value line、wrong relation line、random same-norm controls。
+```
+
+判据：
+
+```text
+如果 value token span 最强：
+  说明 residual state builder 主要读取目标值位置。
+
+如果 category/relation token span 最强：
+  说明它先定位规则条件，再间接激活值。
+
+如果整行才有效：
+  说明 head path 使用的是 line-level relation pattern，不是局部 token。
+
+如果 wrong value line 也强：
+  说明存在格式/位置路径污染，需要重新控制。
+```
+
+## Phase 619: Rule-Line Token Micro Atlas 值规则行 Token 微图谱 [2026-06-25 07:31]
+
+### 本阶段目标
+
+根据用户提供的 Phase618 分析，先判断其正确性，再继续完成客观现象拼图。
+
+附件分析中正确部分：
+
+```text
+1. Phase618 的关键进展不是简单证明 attention 有效，而是把 DS7B 的 value gate 路径拆到 source group 与 pattern/content 层面。
+2. DS7B 的主 source group 是 value_rule_lines。
+3. DS7B 的主因不是 value content copy，而是 attention pattern shift。
+4. value_rule_lines 仍然是粗分组，必须继续拆成 category/relation/value/punctuation/wrong-line controls。
+5. 下一步应做 token-level source micro-atlas。
+```
+
+本阶段目标：
+
+```text
+把 Phase618 的 value_rule_lines 继续拆成更细的 source token group：
+  all_value_rule_lines
+  correct_rule_line
+  correct_category_token
+  correct_relation_token
+  correct_value_token
+  correct_punct_token
+  wrong_same_relation_lines
+  wrong_same_category_lines
+  other_value_rule_lines
+
+继续使用 rb_pattern / br_content / rr_pattern_content 分解，
+判断 DS7B 的 value gate residual state builder 到底依赖整行、值词元、类别词元、关系词元，还是错误规则行。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase619_rule_line_token_micro_atlas.py \
+  tests/glm5/phase619_rule_line_token_micro_atlas_summary.py
+
+python tests/glm5/phase619_rule_line_token_micro_atlas.py qwen3 \
+  --smoke \
+  --compact \
+  --include-nontarget \
+  --output-dir results/glm5_phase619_rule_line_token_micro_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase619_rule_line_token_micro_atlas.py qwen3 \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase619_rule_line_token_micro_atlas \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase619_rule_line_token_micro_atlas.py glm4 \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase619_rule_line_token_micro_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase619_rule_line_token_micro_atlas.py deepseek7b \
+  --confirm \
+  --compact \
+  --output-dir results/glm5_phase619_rule_line_token_micro_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase619_rule_line_token_micro_atlas_summary.py
+```
+
+GLM4 第一次启动时出现一次 code 139，未进入脚本日志。随后做最小加载诊断：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python - <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path('tests/glm5').resolve()))
+from phase584_gate_repair import load_model_flash
+from model_utils import release_model
+m,t,d=load_model_flash('glm4')
+print('loaded', type(m).__name__, d)
+release_model(m)
+PY
+```
+
+最小加载成功，重新执行 GLM4 confirm 后完成。判断为一次底层加载瞬时崩溃，不是 Phase619 逻辑错误。
+
+### 脚本与结果
+
+- 主脚本：`tests/glm5/phase619_rule_line_token_micro_atlas.py`
+- 汇总脚本：`tests/glm5/phase619_rule_line_token_micro_atlas_summary.py`
+- Qwen3 结果：`results/glm5_phase619_rule_line_token_micro_atlas/phase619_qwen3_rule_line_token_micro_atlas_confirm.json`
+- GLM4 结果：`results/glm5_phase619_rule_line_token_micro_atlas/phase619_glm4_rule_line_token_micro_atlas_confirm.json`
+- DS7B 结果：`results/glm5_phase619_rule_line_token_micro_atlas/phase619_deepseek7b_rule_line_token_micro_atlas_confirm.json`
+- 跨模型汇总：`results/glm5_phase619_rule_line_token_micro_atlas/phase619_cross_model_summary.md`
+
+### 测试范围
+
+```text
+raw cases = 128
+target-only = true
+Qwen3 target rows = 9
+GLM4 target rows = 12
+DS7B target rows = 43
+
+Qwen3 layers = L27-L29
+GLM4 layers = L32-L34
+DS7B layers = L20-L22
+
+top_k heads = 6
+specs = 66
+real/random controls = both
+```
+
+本阶段使用 compact specs，但不减少 raw cases。compact 只减少微观 source/spec 组合，保留目标样本筛选范围，避免 Phase617 中过重 hook 组合造成底层不稳定。
+
+### 测试原理
+
+Phase618 使用：
+
+```text
+z(l,h,t) = sum_s alpha(l,h,t,s) V(l,h,s)
+```
+
+并证明 DS7B 的主 source group 是 `value_rule_lines`，且主要是 `rb_pattern`。
+
+Phase619 继续把 `value_rule_lines` 按文本位置和 token offset 拆为：
+
+```text
+correct_rule_line:
+  正确 category-relation-value 规则行整体。
+
+correct_category_token:
+  正确规则行中的 category token。
+
+correct_relation_token:
+  正确规则行中的 relation token。
+
+correct_value_token:
+  正确规则行中的 value token。
+
+wrong_same_relation_lines:
+  relation 相同但 category 不同的错误规则行。
+
+wrong_same_category_lines:
+  category 相同但 relation 不同的错误规则行。
+
+all_value_rule_lines:
+  所有 category-relation-value 规则行。
+```
+
+对每个 group 继续构造：
+
+```text
+rb_pattern = repair alpha + base V - base alpha + base V
+br_content = base alpha + repair V - base alpha + base V
+rr_pattern_content = repair alpha + repair V - base alpha + base V
+```
+
+然后把对应 head-slot delta 加到 answer position 的 o_proj input，观察 candidate answer score 是否从旧错误值切换到正确值。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+layers = L27-L29
+time = 4.14 min
+
+all_value_rule_lines rb_pattern:
+  3/9, margin +0.904
+  random 1/9, margin +0.055
+
+correct_rule_line rb_pattern:
+  2/9, margin +0.473
+  random 1/9, margin +0.099
+
+correct_value_token rb_pattern:
+  2/9, margin +0.459
+  random 0/9, margin -0.047
+
+wrong_same_relation_lines rb_pattern:
+  3/9, margin +0.389
+
+correct_category_token rb_pattern:
+  1/9, margin -0.028
+
+correct_relation_token rb_pattern:
+  1/9, margin -0.014
+```
+
+Qwen3 有弱正结果，但 wrong_same_relation_lines 也达到 3/9，说明 Qwen3 的当前路径不是干净的正确值词元定位机制。
+
+#### GLM4
+
+```text
+rows = 12
+layers = L32-L34
+time = 6.88 min
+
+all_value_rule_lines rb_pattern:
+  1/12, margin -0.021
+  random 0/12, margin -0.004
+
+correct_rule_line rb_pattern:
+  0/12, margin -0.036
+
+correct_value_token rb_pattern:
+  0/12, margin -0.036
+
+wrong_same_relation_lines rb_pattern:
+  2/12, margin +0.026
+  random 1/12, margin +0.038
+```
+
+GLM4 仍是负结果。当前 DS7B-style value_rule_line token path 不适用于 GLM4。
+
+#### DS7B
+
+```text
+rows = 43
+layers = L20-L22
+time = 20.49 min
+
+all_value_rule_lines rb_pattern:
+  32/43, margin +1.735
+  correct_delta +1.092
+  old_wrong_delta -0.643
+  random 0/43, margin +0.029
+
+all_value_rule_lines rr_pattern_content:
+  32/43, margin +1.735
+
+correct_rule_line rb_pattern:
+  24/43, margin +1.227
+  correct_delta +0.917
+  old_wrong_delta -0.309
+  random 1/43, margin -0.002
+
+correct_rule_line rr_pattern_content:
+  24/43, margin +1.227
+
+correct_value_token rb_pattern:
+  24/43, margin +1.194
+  correct_delta +0.901
+  old_wrong_delta -0.293
+  random 0/43, margin -0.049
+
+correct_value_token rr_pattern_content:
+  24/43, margin +1.194
+
+correct_category_token rb_pattern:
+  1/43, margin -0.008
+
+correct_relation_token rb_pattern:
+  1/43, margin -0.010
+
+wrong_same_relation_lines rb_pattern:
+  5/43, margin +0.302
+
+wrong_same_category_lines rb_pattern:
+  2/43, margin +0.064
+```
+
+强单 head：
+
+```text
+L22_H1 correct_value_token rr:
+  8/43, margin +0.515
+
+L22_H1 correct_rule_line rr:
+  8/43, margin +0.508
+
+L22_H7 correct_rule_line rr:
+  7/43, margin +0.302
+
+L22_H7 correct_value_token rr:
+  5/43, margin +0.290
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 的 value_rule_lines 效果可以被 correct_value_token 单独解释大半**
+
+```text
+all_value_rule_lines rb_pattern = 32/43, margin +1.735
+correct_rule_line rb_pattern = 24/43, margin +1.227
+correct_value_token rb_pattern = 24/43, margin +1.194
+```
+
+正确值词元几乎等于正确规则行整体：
+
+```text
+correct_value_token ≈ correct_rule_line
+```
+
+这说明 Phase618 的 `value_rule_lines` 主效应不是均匀来自整行，也不是主要来自 category/relation token，而是集中在正确规则行的 value token 位置。
+
+2. **category/relation token 几乎不能恢复**
+
+```text
+correct_category_token rb_pattern = 1/43, margin -0.008
+correct_relation_token rb_pattern = 1/43, margin -0.010
+```
+
+这说明当前 head path 在 answer position 的恢复不是通过直接读 category 或 relation token 完成，而是通过已经被路由到的 value token 位置产生有效 residual delta。
+
+3. **错误规则行远弱于正确值词元**
+
+```text
+wrong_same_relation_lines rb_pattern = 5/43, margin +0.302
+wrong_same_category_lines rb_pattern = 2/43, margin +0.064
+correct_value_token rb_pattern = 24/43, margin +1.194
+```
+
+错误规则行有少量作用，说明存在 relation/format/line-position 污染，但远弱于正确 value token，不能解释主效应。
+
+4. **pattern 仍然主导**
+
+```text
+correct_value_token rb_pattern = 24/43, margin +1.194
+correct_value_token rr_pattern_content = 24/43, margin +1.194
+```
+
+只换 pattern 与 pattern+content 完全一致，继续说明机制主因是 attention pattern shift，不是简单 V content copy。
+
+5. **Qwen3 有弱同向迹象，GLM4 继续负结果**
+
+```text
+Qwen3 correct_value_token rb_pattern = 2/9, margin +0.459
+GLM4 correct_value_token rb_pattern = 0/12, margin -0.036
+```
+
+Qwen3 有部分相似结构，但 wrong_same_relation_lines 也强，说明还不干净。GLM4 不走当前路径。
+
+### 理论进展
+
+DS7B 的局部链条现在可以进一步收紧为：
+
+```text
+prompt condition
+  -> attention pattern selects correct value token in value rule line
+  -> L20-L22 top attention head slots accumulate value-token-local delta
+  -> answer-position residual state package
+  -> Q/routing state
+  -> candidate readout and generation gate
+```
+
+Phase618 说的是：
+
+```text
+value_rule_lines pattern shift
+```
+
+Phase619 进一步说明：
+
+```text
+correct value token pattern shift
+```
+
+这不是完整的 value gate 闭合，因为 Phase619 仍然没有解释：
+
+```text
+为什么 attention pattern 会指向 correct value token？
+```
+
+但它把后半段路径压实了：
+
+```text
+一旦 pattern 指向正确 value token，DS7B 的 top attention heads 就能在 answer position 写入足够强的 residual state。
+```
+
+### 问题和硬伤
+
+1. **Phase619 解释的是 pattern 生效后的读取位置，不是 pattern 生成原因**
+
+当前结果说明 correct value token 是主要被读取位置，但没有解释 Q/K 如何产生这个选择。
+
+2. **all_value_rule_lines 仍强于 correct_value_token**
+
+```text
+32/43 vs 24/43
+```
+
+说明除正确值词元外，还有其它 token 或行级分布式 pattern 贡献。不能把机制简化成单 token copy。
+
+3. **wrong_same_relation_lines 有弱正效应**
+
+这说明 relation/格式/同列位置可能有污染，下一步必须把 value token 的位置结构与语义值结构分开。
+
+4. **GLM4 继续负结果**
+
+当前 DS7B 链条不能作为跨模型统一理论。GLM4 很可能使用不同的状态压缩或读出机制。
+
+5. **token offset 分组仍是文本级近似**
+
+本阶段使用 tokenizer offset mapping 拆 token group。对于特殊 tokenizer 或空白符 token，边界可能有少量误差。
+
+### 下一步任务
+
+Phase620 应继续做：
+
+```text
+Value Token Selection Cause Audit
+```
+
+核心目标：
+
+```text
+解释为什么 attention pattern 会选择 correct value token。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B L20-L22 top heads。
+2. 对 correct value token 的 attention score 分解 QK 因子。
+3. 对比：
+   - correct value token
+   - wrong same-relation value token
+   - wrong same-category value token
+   - random value token
+4. 分别 patch：
+   - Q from repair
+   - K of value token from repair
+   - QK score only
+   - softmax pattern only
+5. 观察是否能复现 Phase619 的 correct_value_token rb_pattern。
+```
+
+关键判据：
+
+```text
+如果 Q-only patch 可以使 correct value token attention 上升：
+  说明 answer-position residual state 已经携带选择条件。
+
+如果 K-only patch 有效：
+  说明规则行 token 本身被上游写入了可匹配状态。
+
+如果 Q/K 单独都弱，但 QK score patch 强：
+  说明机制是二者耦合，不可分成单边状态。
+
+如果 correct value token 与 wrong same-relation value token 差距来自 softmax competition：
+  下一步必须做 value-token competition graph。
+```
+
+阶段性大任务：
+
+```text
+从 value token 被读取，推进到 value token 为什么被选中。
+这会把当前后半段 residual state builder 图谱，连接回 Q/K routing 生成机制。
+```
+
+## Phase 620: Value Token Selection Cause Audit 正确值词元选择原因审计 [2026-06-25 07:50]
+
+### 本阶段目标
+
+根据用户提供的 Phase619 分析，先判断其正确性，再继续完成客观现象拼图。
+
+附件分析中正确部分：
+
+```text
+1. Phase619 是关键正结果，它把 Phase618 的 value_rule_lines source group 推进到 token-level source atlas。
+2. DS7B 的主 source span 是 correct_value_token，而不是 category/relation token。
+3. correct_value_token 几乎等于 correct_rule_line 整体，说明主效应集中在正确 value token 位置。
+4. wrong_same_relation_lines 有弱正效应，但远弱于 correct_value_token。
+5. Phase619 解释的是 pattern 生效后读到了哪里，还没有解释 pattern 为什么会选中 correct value token。
+```
+
+本阶段目标：
+
+```text
+解释 correct value token 为什么被 attention pattern 选中。
+
+具体拆分：
+  q_only:
+    repair Q at answer position + base K/V
+
+  k_correct_value:
+    base Q + repair K at correct value token + base V
+
+  qk_correct_value:
+    repair Q + repair K at correct value token + base V
+
+  k_all_value_rule_lines:
+    base Q + repair K at all value rule lines + base V
+
+  qk_all_value_rule_lines:
+    repair Q + repair K at all value rule lines + base V
+
+  q_random_same_norm:
+    random same-norm Q delta control
+```
+
+同时直接测 attention mass：
+
+```text
+base attention mass
+repair attention mass
+q_only patched attention mass
+q_random_same_norm attention mass
+```
+
+重点观察这些 source groups：
+
+```text
+correct_value_token
+correct_rule_line
+all_value_rule_lines
+wrong_same_relation_lines
+wrong_same_category_lines
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase620_value_token_selection_cause_audit.py \
+  tests/glm5/phase620_value_token_selection_cause_audit_summary.py
+
+python tests/glm5/phase620_value_token_selection_cause_audit.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase620_value_token_selection_cause_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase620_value_token_selection_cause_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase620_value_token_selection_cause_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase620_value_token_selection_cause_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase620_value_token_selection_cause_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase620_value_token_selection_cause_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase620_value_token_selection_cause_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase620_value_token_selection_cause_audit_summary.py
+```
+
+三模型按 qwen3、glm4、deepseek7b 顺序执行，每个模型带 `--hard-exit-after-model`。模型测试过程中没有并行加载其它模型。
+
+### 脚本与结果
+
+- 主脚本：`tests/glm5/phase620_value_token_selection_cause_audit.py`
+- 汇总脚本：`tests/glm5/phase620_value_token_selection_cause_audit_summary.py`
+- Qwen3 结果：`results/glm5_phase620_value_token_selection_cause_audit/phase620_qwen3_value_token_selection_cause_audit_confirm.json`
+- GLM4 结果：`results/glm5_phase620_value_token_selection_cause_audit/phase620_glm4_value_token_selection_cause_audit_confirm.json`
+- DS7B 结果：`results/glm5_phase620_value_token_selection_cause_audit/phase620_deepseek7b_value_token_selection_cause_audit_confirm.json`
+- 跨模型汇总：`results/glm5_phase620_value_token_selection_cause_audit/phase620_cross_model_summary.md`
+
+### 测试范围
+
+```text
+raw cases = 128
+target-only = true
+
+Qwen3 target rows = 9
+GLM4 target rows = 12
+DS7B target rows = 43
+
+Qwen3 layers = L27-L29
+GLM4 layers = L32-L34
+DS7B layers = L20-L22
+
+top_k heads = 6
+patch modes = 6
+alpha groups = 5
+```
+
+### 测试原理
+
+Phase619 已经证明：
+
+```text
+DS7B correct_value_token rb_pattern:
+  24/43, margin +1.194
+```
+
+这说明在 answer position 的 attention pattern 指向正确 value token 时，top heads 可以写入有效 residual state。
+
+Phase620 继续问：
+
+```text
+这个 pattern shift 是从 Q 来，还是从 K 来？
+```
+
+注意一个关键因果事实：
+
+```text
+base prompt 与 repair prompt 的规则行完全位于 question 之前。
+自回归模型中，前面的 rule tokens 不可能被后面的 question tokens 改变。
+```
+
+因此理论上：
+
+```text
+rule-line token 的 K/V 在 base 与 repair 之间应接近相同。
+answer-position Q 才是最可能变化的选择因子。
+```
+
+本阶段用真实 forward hook 测试：
+
+```text
+q_only:
+  在 base prompt 中，把 answer position 的 top-head Q 替换成 repair Q。
+
+k_correct_value:
+  在 base prompt 中，只替换 correct value token 的 K。
+
+qk_correct_value:
+  同时替换 answer Q 和 correct value token K。
+
+q_random_same_norm:
+  给 Q 加同范数随机 delta，作为方向对照。
+```
+
+如果：
+
+```text
+q_only ≈ qk_correct_value ≫ k_correct_value ≈ q_random
+```
+
+说明 correct value token selection 的主因是 answer-position Q，而不是 source-token K field。
+
+同时直接测 attention mass：
+
+```text
+repair_mass - base_mass
+q_only_mass - base_mass
+q_random_mass - base_mass
+```
+
+如果：
+
+```text
+q_only_mass - base_mass ≈ repair_mass - base_mass
+```
+
+说明 q_only 不只是行为上修复，还真的复现了 attention pattern 对 correct value token 的转移。
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+time = 0.58 min
+
+q_only:
+  4/9, margin +1.182
+  correct_delta +0.757
+  old_wrong_delta -0.425
+
+qk_correct_value:
+  4/9, margin +1.182
+
+qk_all_value_rule_lines:
+  4/9, margin +1.182
+
+k_correct_value:
+  0/9, margin +0.000
+
+k_all_value_rule_lines:
+  0/9, margin +0.000
+
+q_random_same_norm:
+  0/9, margin +0.000
+```
+
+attention mass：
+
+```text
+correct_value_token:
+  repair-base = +0.05108
+  q-base      = +0.05123
+  random-base = +0.00152
+
+correct_rule_line:
+  repair-base = +0.05314
+  q-base      = +0.05329
+  random-base = +0.00183
+
+wrong_same_relation_lines:
+  repair-base = -0.03511
+  q-base      = -0.03556
+```
+
+Qwen3 有清楚的 Q-driven selection 迹象，但行为闭合只有 4/9。
+
+#### GLM4
+
+```text
+rows = 12
+time = 0.94 min
+
+q_only:
+  1/12, margin +0.016
+
+qk_correct_value:
+  1/12, margin +0.016
+
+qk_all_value_rule_lines:
+  1/12, margin +0.016
+
+k_correct_value:
+  0/12, margin +0.000
+
+k_all_value_rule_lines:
+  0/12, margin +0.000
+
+q_random_same_norm:
+  0/12, margin +0.000
+```
+
+attention mass：
+
+```text
+correct_value_token:
+  repair-base = +0.02190
+  q-base      = +0.02178
+  random-base = +0.00105
+
+correct_rule_line:
+  repair-base = +0.02348
+  q-base      = +0.02331
+  random-base = +0.00103
+```
+
+GLM4 有弱 Q-driven attention shift，但行为上几乎不闭合。这继续说明 GLM4 不走当前 DS7B-style value gate path，或者后续 readout/generation gate 抑制更强。
+
+#### DS7B
+
+```text
+rows = 43
+time = 1.38 min
+
+q_only:
+  33/43, margin +1.769
+  correct_delta +1.113
+  old_wrong_delta -0.656
+
+qk_correct_value:
+  33/43, margin +1.769
+
+qk_all_value_rule_lines:
+  33/43, margin +1.769
+
+k_correct_value:
+  0/43, margin +0.000
+
+k_all_value_rule_lines:
+  0/43, margin +0.000
+
+q_random_same_norm:
+  0/43, margin +0.000
+```
+
+attention mass：
+
+```text
+correct_value_token:
+  repair-base = +0.09897
+  q-base      = +0.10177
+  random-base = -0.00236
+
+correct_rule_line:
+  repair-base = +0.11126
+  q-base      = +0.11486
+  random-base = -0.00202
+
+all_value_rule_lines:
+  repair-base = +0.08633
+  q-base      = +0.09741
+  random-base = -0.00388
+
+wrong_same_relation_lines:
+  repair-base = -0.01620
+  q-base      = -0.01321
+  random-base = +0.00050
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B correct value token selection 的主因是 answer-position Q**
+
+```text
+q_only = 33/43, margin +1.769
+qk_correct_value = 33/43, margin +1.769
+k_correct_value = 0/43, margin +0.000
+q_random_same_norm = 0/43, margin +0.000
+```
+
+这说明 K 不提供额外解释力。只替换 answer-position Q，就足以复现并略强于 Phase619 的 correct value token anchor。
+
+2. **q_only 真实复现了 attention pattern shift**
+
+```text
+correct_value_token repair-base = +0.09897
+correct_value_token q-base      = +0.10177
+correct_value_token random-base = -0.00236
+```
+
+q_only 不只是分数变好，而是真的把 attention mass 推向 correct_value_token。
+
+3. **K-only 完全无效符合因果结构**
+
+规则行在 question 之前，因此 rule-token K/V 不应被后文改变。实验结果：
+
+```text
+k_correct_value = 0/43
+k_all_value_rule_lines = 0/43
+```
+
+这与自回归因果结构一致。
+
+4. **Qwen3 有同向机制，但不如 DS7B 闭合**
+
+```text
+Qwen3 q_only = 4/9, margin +1.182
+Qwen3 correct_value_token q-base ≈ repair-base
+```
+
+Qwen3 的 Q-driven pattern shift 存在，但 target rows 少，且 Phase619 中 wrong_same_relation_lines 干扰更明显。
+
+5. **GLM4 有 attention shift，但行为不闭合**
+
+```text
+GLM4 correct_value_token q-base ≈ repair-base ≈ +0.022
+GLM4 q_only = 1/12
+```
+
+这说明 GLM4 的问题可能不在 attention selection 本身，而在 downstream residual/readout/generation gate。
+
+### 理论进展
+
+DS7B 当前链条可以进一步收紧：
+
+```text
+prompt condition
+  -> answer-position Q state changes
+  -> Q selects correct value token through attention pattern
+  -> L20-L22 top attention heads read correct value token
+  -> answer-position residual state package
+  -> candidate readout and generation gate
+```
+
+Phase619 的问题是：
+
+```text
+为什么 pattern 选中 correct value token？
+```
+
+Phase620 给出的答案是：
+
+```text
+因为 answer-position Q 已经被上游 residual state 改写；
+这个 Q 足以把 attention mass 从错误/无关规则行转到 correct value token。
+```
+
+这也把 Phase613 与 Phase619 连接起来：
+
+```text
+Phase613:
+  q_only 是充分修复因子。
+
+Phase619:
+  correct_value_token 是主要读取位置。
+
+Phase620:
+  q_only 直接造成 correct_value_token attention mass 增加。
+```
+
+### 问题和硬伤
+
+1. **Phase620 仍没有解释 Q state 从哪里来**
+
+当前证明的是：
+
+```text
+Q state 是 value token selection 的充分因子。
+```
+
+但没有解释：
+
+```text
+哪个上游模块生成了这个 Q state？
+```
+
+这仍然要回到 Phase615/616 的 residual state builder。
+
+2. **q_only 是人工替换，不是自然生成闭环**
+
+虽然 q_only 行为和 attention mass 都高度复现 repair，但它仍然是 intervention，不是自然路径的完整生成解释。
+
+3. **DS7B all_value_rule_lines q-base 稍强于 repair-base**
+
+```text
+all_value_rule_lines repair-base = +0.08633
+all_value_rule_lines q-base = +0.09741
+```
+
+说明 Q patch 可能带来略强或略粗的规则行吸引，不是完全等同于自然 repair。
+
+4. **GLM4 的 Q shift 不能转化成行为闭合**
+
+这说明跨模型统一理论仍然没有完成。GLM4 可能卡在 readout/generation gate，不是 selection gate。
+
+5. **attention mass 是 selected top heads 的均值**
+
+本阶段没有对全部 heads 做完整图谱，只测 Phase617/619 已定位的 top heads。
+
+### 下一步任务
+
+Phase621 应继续做：
+
+```text
+Q State Builder Backtrace
+```
+
+目标：
+
+```text
+解释 answer-position repair Q state 是如何由上游 residual state 生成的。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B L20-L22 top heads 作为下游 selection gate。
+2. 在 q_proj input 之前，逐层 patch residual stream：
+   - layer input
+   - attention output
+   - MLP output
+   - layer output
+3. 测两个指标：
+   - Q vector similarity / Q delta projection
+   - downstream correct_value_token attention mass
+   - candidate answer switch
+4. 对比：
+   - base residual
+   - repair residual
+   - random same-norm residual
+   - wrong-condition residual
+```
+
+关键判据：
+
+```text
+如果某个上游 residual patch 能同时恢复：
+  1. repair Q state
+  2. correct_value_token attention mass
+  3. final candidate switch
+
+则该位置就是 Q state builder 的上游候选节点。
+```
+
+阶段性大任务：
+
+```text
+从“Q 是选择原因”继续回溯到“Q 由谁生成”。
+把 value token selection gate 连接回 residual state builder 图谱。
+```
+
+## Phase 621: Q State Builder Backtrace Q 状态生成器回溯 [2026-06-25 08:53]
+
+### 本阶段目标
+
+根据用户提供的 Phase620 分析，先判断其正确性，再继续完成客观现象拼图。
+
+附件分析中正确部分：
+
+```text
+1. Phase620 是关键正结果，把 Phase619 的“读到 correct value token”推进为“answer-position Q 足以选择 correct value token”。
+2. DS7B 中 q_only = qk_correct_value = qk_all_value_rule_lines，而 K-only 完全无效。
+3. q_only 不只是行为有效，也真实复现了 correct_value_token attention mass shift。
+4. Qwen3 有同向机制但闭合较弱。
+5. GLM4 有 attention shift 但行为不闭合，说明 GLM4 可能卡在 downstream readout/generation gate。
+6. 当前瓶颈已经从“为什么读 correct value token”推进到“answer-position Q state 由谁生成”。
+```
+
+本阶段目标：
+
+```text
+回溯 answer-position repair Q state 的上游 residual builder。
+
+测试一个上游 residual component patch 是否同时恢复：
+  1. candidate answer switch
+  2. selected-head Q delta projection
+  3. correct_value_token attention mass
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase621_q_state_builder_backtrace.py \
+  tests/glm5/phase621_q_state_builder_backtrace_summary.py
+
+python tests/glm5/phase621_q_state_builder_backtrace.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase621_q_state_builder_backtrace \
+  --hard-exit-after-model
+
+python tests/glm5/phase621_q_state_builder_backtrace.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase621_q_state_builder_backtrace \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase621_q_state_builder_backtrace.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase621_q_state_builder_backtrace \
+  --hard-exit-after-model
+
+python tests/glm5/phase621_q_state_builder_backtrace.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase621_q_state_builder_backtrace \
+  --hard-exit-after-model
+
+python tests/glm5/phase621_q_state_builder_backtrace_summary.py
+```
+
+### 脚本与结果
+
+- 主脚本：`tests/glm5/phase621_q_state_builder_backtrace.py`
+- 汇总脚本：`tests/glm5/phase621_q_state_builder_backtrace_summary.py`
+- Qwen3 结果：`results/glm5_phase621_q_state_builder_backtrace/phase621_qwen3_q_state_builder_backtrace_confirm.json`
+- GLM4 结果：`results/glm5_phase621_q_state_builder_backtrace/phase621_glm4_q_state_builder_backtrace_confirm.json`
+- DS7B 结果：`results/glm5_phase621_q_state_builder_backtrace/phase621_deepseek7b_q_state_builder_backtrace_confirm.json`
+- 跨模型汇总：`results/glm5_phase621_q_state_builder_backtrace/phase621_cross_model_summary.md`
+
+### 测试范围
+
+```text
+raw cases = 128
+target-only = true
+
+Qwen3 target rows = 9
+GLM4 target rows = 12
+DS7B target rows = 43
+
+patch components:
+  layer_input
+  attn_out
+  mlp_out
+  layer_out
+
+Qwen3 patch layers = L25-L29
+Qwen3 selection layers = L27-L29
+
+GLM4 patch layers = L30-L34
+GLM4 selection layers = L32-L34
+
+DS7B patch layers = L18-L22
+DS7B selection layers = L20-L22
+```
+
+### 测试原理
+
+Phase620 已经证明：
+
+```text
+answer-position Q is sufficient for correct value token selection.
+```
+
+Phase621 继续问：
+
+```text
+哪个上游 residual component 能生成这个 Q？
+```
+
+本阶段对每个上游 layer/component 做 repair-base delta patch：
+
+```text
+patched_state = base_state + (repair_state - base_state)
+```
+
+并加 random same-norm control。
+
+每个 patch 同时测三类指标：
+
+```text
+1. candidate switch:
+   是否把候选答案从 old wrong value 切到 correct value。
+
+2. Q delta projection:
+   patched Q delta 在 repair Q delta 方向上的投影。
+
+3. correct_value_token alpha delta:
+   patched attention mass 相比 base 是否增加到 correct value token。
+```
+
+重要解释：
+
+```text
+如果 layer_out 有强 switch，但 qproj=0 且 alpha_cv=0，
+它不是 Q builder，而是下游结果态/读出态。
+
+如果 layer_input 或上一层 layer_out 同时有强 switch、qproj>0、alpha_cv>0，
+它才是 Q state builder 路径上的候选节点。
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+time = 1.16 min
+
+L29 layer_out:
+  switch 9/9, margin +4.392
+  qproj +0.000
+  alpha_cv +0.00000
+
+L28 layer_out:
+  switch 9/9, margin +4.392
+  qproj +0.333
+  alpha_cv +0.03655
+
+L29 layer_input:
+  switch 9/9, margin +4.392
+  qproj +0.333
+  alpha_cv +0.03655
+
+L25 layer_out:
+  switch 9/9, margin +4.336
+  qproj +0.976
+  alpha_cv +0.05070
+
+L26 layer_input:
+  switch 9/9, margin +4.336
+  qproj +0.976
+  alpha_cv +0.05070
+
+L26 layer_out:
+  switch 9/9, margin +4.336
+  qproj +0.988
+  alpha_cv +0.05145
+
+L27 layer_input:
+  switch 9/9, margin +4.336
+  qproj +0.988
+  alpha_cv +0.05145
+```
+
+Qwen3 显示出连续 residual carrying：
+
+```text
+上一层 layer_out ≈ 下一层 layer_input
+```
+
+但 Qwen3 target rows 只有 9，且 Phase619 中 source micro-atlas 不如 DS7B 干净，所以仍需保守。
+
+#### GLM4
+
+```text
+rows = 12
+time = 2.18 min
+
+L33 layer_out:
+  switch 11/12, margin +1.932
+  qproj +0.333
+  alpha_cv +0.00355
+
+L34 layer_input:
+  switch 11/12, margin +1.932
+  qproj +0.333
+  alpha_cv +0.00355
+
+L34 layer_out:
+  switch 11/12, margin +1.917
+  qproj +0.000
+  alpha_cv +0.00000
+
+L32 layer_out:
+  switch 11/12, margin +1.911
+  qproj +0.667
+  alpha_cv +0.01098
+
+L33 layer_input:
+  switch 11/12, margin +1.911
+  qproj +0.667
+  alpha_cv +0.01098
+
+L31 layer_out:
+  switch 10/12, margin +1.932
+  qproj +0.999
+  alpha_cv +0.02127
+
+L32 layer_input:
+  switch 10/12, margin +1.932
+  qproj +0.999
+  alpha_cv +0.02127
+```
+
+GLM4 的上游 residual patch 能强烈改变候选分数，但 alpha_cv 很弱。这继续支持：
+
+```text
+GLM4 不是当前 DS7B-style correct_value_token selection gate 主瓶颈。
+```
+
+#### DS7B
+
+```text
+rows = 43
+time = 5.00 min
+
+L21 layer_out:
+  switch 43/43, margin +3.370
+  qproj +0.333
+  alpha_cv +0.08571
+
+L22 layer_input:
+  switch 43/43, margin +3.370
+  qproj +0.333
+  alpha_cv +0.08571
+
+L22 layer_out:
+  switch 42/43, margin +3.337
+  qproj +0.000
+  alpha_cv +0.00000
+
+L20 layer_out:
+  switch 42/43, margin +3.111
+  qproj +0.646
+  alpha_cv +0.09005
+
+L21 layer_input:
+  switch 42/43, margin +3.111
+  qproj +0.646
+  alpha_cv +0.09005
+
+L22 attn_out:
+  switch 32/43, margin +1.738
+  qproj +0.000
+  alpha_cv +0.00000
+
+L19 layer_out:
+  switch 31/43, margin +1.953
+  qproj +0.779
+  alpha_cv +0.05724
+
+L20 layer_input:
+  switch 31/43, margin +1.953
+  qproj +0.779
+  alpha_cv +0.05724
+
+L18 layer_out:
+  switch 30/43, margin +1.955
+  qproj +0.736
+  alpha_cv +0.05701
+
+L19 layer_input:
+  switch 30/43, margin +1.955
+  qproj +0.736
+  alpha_cv +0.05701
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 的 Q state builder 主要是 residual stream carried state**
+
+最清楚链条：
+
+```text
+L20 layer_out -> L21 layer_input:
+  42/43, qproj +0.646, alpha_cv +0.09005
+
+L21 layer_out -> L22 layer_input:
+  43/43, qproj +0.333, alpha_cv +0.08571
+```
+
+说明 Q state 不是某个孤立组件单点生成，而是在 residual stream 中逐层携带、逐层改写。
+
+2. **L22 layer_out / L22 attn_out 是下游结果态，不是 Q builder**
+
+```text
+L22 layer_out:
+  switch 42/43
+  qproj 0
+  alpha_cv 0
+
+L22 attn_out:
+  switch 32/43
+  qproj 0
+  alpha_cv 0
+```
+
+这些位置发生在 L22 Q 生成之后，因此能改最终分数，但不能解释 correct value token selection。
+
+3. **早期 residual state 已经含有部分 Q builder 信息**
+
+```text
+L18 layer_out -> L19 layer_input:
+  30/43, qproj +0.736, alpha_cv +0.05701
+
+L19 layer_out -> L20 layer_input:
+  31/43, qproj +0.779, alpha_cv +0.05724
+```
+
+说明 repair Q state 的形成不是只在 L21/L22 突然出现，而是在 L18-L21 连续积累。
+
+4. **MLP 不是当前主 builder**
+
+DS7B：
+
+```text
+L20 mlp_out:
+  11/43, margin +0.418, qproj +0.112, alpha_cv +0.00170
+
+L21 mlp_out:
+  6/43, margin +0.344, qproj +0.048, alpha_cv +0.00821
+```
+
+MLP 有弱贡献，但远弱于 layer_input/layer_out carried state。
+
+5. **GLM4 行为强但 selection 指标弱**
+
+GLM4 的 layer patch 能强切换候选，但 alpha_cv 很弱，说明它的行为修复可能不是靠当前 correct_value_token attention path。
+
+### 理论进展
+
+DS7B 当前链条进一步收紧为：
+
+```text
+prompt condition
+  -> L18-L21 residual stream gradually carries repair state
+  -> L20/L21 layer_out -> next layer_input
+  -> answer-position Q state at L20-L22 changes
+  -> Q selects correct value token
+  -> top attention heads read correct value token
+  -> L22 attention/result state changes
+  -> candidate readout and generation gate
+```
+
+Phase620 证明：
+
+```text
+Q 是 correct value token selection 的充分因子。
+```
+
+Phase621 进一步证明：
+
+```text
+这个 Q 不是凭空出现，而是由 answer-position residual stream carried state 生成。
+```
+
+### 问题和硬伤
+
+1. **当前 patch 是整向量 residual patch**
+
+它能说明哪个位置携带 repair state，但还不能说明该 state 内部哪些维度/子方向是关键。
+
+2. **layer_out 与 layer_input 等价需要进一步分解**
+
+上一层 layer_out 与下一层 layer_input 近似等价，这是残差流自然结构，但还没有说明这个 state 是由上一层 attention 还是更早 state 累积产生。
+
+3. **attn_out 单独弱于 layer_out/layer_input**
+
+这说明单个组件输出不足以解释全部 carried state，可能需要 cumulative residual patch 或多层共同作用。
+
+4. **GLM4 机制仍未统一**
+
+GLM4 的强行为 patch 与弱 alpha_cv 指标不匹配，说明 GLM4 路线可能需要单独图谱。
+
+5. **Q projection 指标是 top-head 平均**
+
+本阶段没有把每个 head 单独拆开，可能掩盖少数强 head 与弱 head 的差异。
+
+### 下一步任务
+
+Phase622 应继续做：
+
+```text
+Residual State Direction Decomposition
+```
+
+核心目标：
+
+```text
+把 L18-L22 residual carried state 从整向量 patch 拆成：
+  Q-aligned component
+  Q-orthogonal component
+  correct-value alpha aligned component
+  random same-norm controls
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B 为主模型。
+2. 对 L18-L22 layer_input/layer_out 的 repair-base residual delta 做方向分解：
+   - project onto downstream repair Q delta
+   - remove Q-aligned component
+   - only Q-orthogonal component
+3. 测三指标：
+   - candidate switch
+   - Q delta projection
+   - correct_value_token alpha mass
+4. 加 random same-norm 与 wrong-condition residual control。
+```
+
+关键判据：
+
+```text
+如果 Q-aligned component 足以恢复：
+  residual carried state 的关键方向就是 Q builder direction。
+
+如果 Q-orthogonal component 仍强：
+  说明 residual state 中存在非 Q 但能影响后续 gate 的隐藏因子。
+
+如果两者都弱、整向量强：
+  说明当前 state 是多方向耦合，不可线性拆成单一方向。
+```
+
+阶段性大任务：
+
+```text
+从“哪一层携带 Q builder state”
+推进到“这个 state 内部是什么方向结构”。
+```
+
+## Phase 622: Residual State Direction Decomposition 残差状态方向分解 [2026-06-25 09:12]
+
+### 本阶段目标
+
+根据用户提供的 Phase620/621 分析，先判断其正确性，再继续完成客观现象拼图。
+
+附件分析中正确部分：
+
+```text
+1. Phase620 证明 answer-position Q 是 correct value token selection 的充分因子。
+2. Phase621 证明 Q 不是起点，而是 residual stream 中已经形成的状态被 q_proj 读出的接口。
+3. DS7B 的 Q state builder 主要表现为 L18-L21 residual stream carried state。
+4. L22 layer_out / L22 attn_out 能改最终输出，但 qproj=0、alpha_cv=0，因此是下游结果态，不是 Q builder。
+5. 当前硬伤是整向量 residual patch 还没拆出内部方向结构。
+```
+
+本阶段目标：
+
+```text
+把 residual carried state 从整向量 patch 拆成：
+  full_delta
+  q_backproj_aligned
+  q_backproj_orthogonal
+  random_same_norm
+
+判断强效 residual state 是否主要由 Q-builder 方向解释，还是存在强 Q-orthogonal 因果分量。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase622_residual_state_direction_decomposition.py \
+  tests/glm5/phase622_residual_state_direction_decomposition_summary.py
+
+python tests/glm5/phase622_residual_state_direction_decomposition.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase622_residual_state_direction_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase622_residual_state_direction_decomposition.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase622_residual_state_direction_decomposition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase622_residual_state_direction_decomposition.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase622_residual_state_direction_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase622_residual_state_direction_decomposition.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase622_residual_state_direction_decomposition \
+  --hard-exit-after-model
+
+python tests/glm5/phase622_residual_state_direction_decomposition_summary.py
+```
+
+### 脚本与结果
+
+- 主脚本：`tests/glm5/phase622_residual_state_direction_decomposition.py`
+- 汇总脚本：`tests/glm5/phase622_residual_state_direction_decomposition_summary.py`
+- Qwen3 结果：`results/glm5_phase622_residual_state_direction_decomposition/phase622_qwen3_residual_state_direction_decomposition_confirm.json`
+- GLM4 结果：`results/glm5_phase622_residual_state_direction_decomposition/phase622_glm4_residual_state_direction_decomposition_confirm.json`
+- DS7B 结果：`results/glm5_phase622_residual_state_direction_decomposition/phase622_deepseek7b_residual_state_direction_decomposition_confirm.json`
+- 跨模型汇总：`results/glm5_phase622_residual_state_direction_decomposition/phase622_cross_model_summary.md`
+
+### 测试范围
+
+```text
+raw cases = 128
+target-only = true
+
+Qwen3 target rows = 9
+GLM4 target rows = 12
+DS7B target rows = 43
+
+components = layer_input, layer_out
+modes = full_delta, q_backproj_aligned, q_backproj_orthogonal, random_same_norm
+
+Qwen3 patch layers = L25-L29
+Qwen3 selection layers = L27-L29
+
+GLM4 patch layers = L30-L34
+GLM4 selection layers = L32-L34
+
+DS7B patch layers = L18-L22
+DS7B selection layers = L20-L22
+```
+
+### 测试原理
+
+Phase621 使用整向量 residual patch：
+
+```text
+delta_h = h_repair - h_base
+```
+
+Phase622 构造一个 Q-backprojected direction：
+
+```text
+u_Q = sum_l W_Q(l)^T delta_Q_selected(l)
+```
+
+其中：
+
+```text
+delta_Q_selected(l)
+```
+
+只保留 Phase620/621 中的 selected top heads 的 repair-base Q delta。
+
+然后把 residual delta 分解为：
+
+```text
+delta_aligned = Proj_{u_Q}(delta_h)
+```
+
+```text
+delta_orthogonal = delta_h - delta_aligned
+```
+
+再分别 patch：
+
+```text
+full_delta:
+  base + delta_h
+
+q_backproj_aligned:
+  base + delta_aligned
+
+q_backproj_orthogonal:
+  base + delta_orthogonal
+
+random_same_norm:
+  base + random_same_norm(delta_h)
+```
+
+每个 patch 继续测：
+
+```text
+1. candidate switch
+2. q_delta_projection
+3. correct_value_token alpha delta
+4. wrong_same_relation alpha delta
+```
+
+判据：
+
+```text
+如果 q_backproj_aligned 恢复 qproj 和 alpha_cv，并产生候选切换，
+说明该 residual state 的 selection-gate 因果方向主要是 Q-builder 方向。
+
+如果 q_backproj_orthogonal 也强，
+说明 residual state 还包含非 Q selection 的下游/读出因子。
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+rows = 9
+time = 1.23 min
+
+L29 layer_input full_delta:
+  switch 9/9, margin +4.392
+  qproj +0.333
+  alpha_cv +0.03655
+
+L29 layer_input q_backproj_aligned:
+  switch 5/9, margin +1.085
+  qproj +0.244
+  alpha_cv +0.01818
+  norm_ratio +0.462
+
+L29 layer_input q_backproj_orthogonal:
+  switch 7/9, margin +3.294
+  qproj +0.093
+  alpha_cv +0.01309
+  norm_ratio +0.887
+```
+
+Qwen3 的 Q-aligned 分量能恢复部分 selection 指标，但 Q-orthogonal 分量仍有强行为效应。由于 target rows 只有 9，仍需谨慎。
+
+#### GLM4
+
+```text
+rows = 12
+time = 2.33 min
+
+L34 layer_input full_delta:
+  switch 11/12, margin +1.932
+  qproj +0.333
+  alpha_cv +0.00355
+
+L34 layer_input q_backproj_aligned:
+  switch 1/12, margin +0.089
+  qproj +0.266
+  alpha_cv +0.00511
+  norm_ratio +0.272
+
+L34 layer_input q_backproj_orthogonal:
+  switch 10/12, margin +1.625
+  qproj +0.069
+  alpha_cv -0.00101
+  norm_ratio +0.962
+```
+
+GLM4 的行为主要在 Q-orthogonal 分量，而不是 correct value token selection 分量。继续说明 GLM4 当前任务的行为修复不等于 DS7B-style selection gate 修复。
+
+#### DS7B
+
+```text
+rows = 43
+time = 5.43 min
+
+L20 layer_out full_delta:
+  switch 42/43, margin +3.111
+  qproj +0.646
+  alpha_cv +0.09005
+
+L20 layer_out q_backproj_aligned:
+  switch 36/43, margin +2.036
+  qproj +0.547
+  alpha_cv +0.07803
+  norm_ratio +0.470
+
+L20 layer_out q_backproj_orthogonal:
+  switch 16/43, margin +1.015
+  qproj +0.125
+  alpha_cv +0.01674
+  norm_ratio +0.882
+
+L21 layer_out full_delta:
+  switch 43/43, margin +3.370
+  qproj +0.333
+  alpha_cv +0.08571
+
+L21 layer_out q_backproj_aligned:
+  switch 37/43, margin +1.970
+  qproj +0.243
+  alpha_cv +0.06019
+  norm_ratio +0.455
+
+L21 layer_out q_backproj_orthogonal:
+  switch 20/43, margin +1.206
+  qproj +0.099
+  alpha_cv +0.02099
+  norm_ratio +0.890
+
+L22 layer_out full_delta:
+  switch 42/43, margin +3.337
+  qproj +0.000
+  alpha_cv +0.00000
+
+L22 layer_out q_backproj_aligned:
+  switch 10/43, margin +0.666
+  qproj +0.000
+  alpha_cv +0.00000
+  norm_ratio +0.385
+
+L22 layer_out q_backproj_orthogonal:
+  switch 38/43, margin +2.753
+  qproj +0.000
+  alpha_cv +0.00000
+  norm_ratio +0.922
+
+random controls:
+  L20 layer_out random_same_norm:
+    2/43, margin -0.089
+  L21 layer_out random_same_norm:
+    1/43, margin -0.028
+  L22 layer_out random_same_norm:
+    4/43, margin -0.014
+```
+
+### 当前最可靠客观事实
+
+1. **DS7B 上游 Q-builder 节点主要由 Q-backprojected aligned component 解释**
+
+```text
+L20 layer_out aligned:
+  36/43, qproj +0.547, alpha_cv +0.07803
+
+L21 layer_out aligned:
+  37/43, qproj +0.243, alpha_cv +0.06019
+```
+
+虽然 norm_ratio 只有 0.45 到 0.47，但已经恢复大部分 correct value token selection 指标。
+
+2. **Q-orthogonal component 仍有非零行为效应，但 selection 指标弱**
+
+```text
+L20 layer_out orthogonal:
+  16/43, qproj +0.125, alpha_cv +0.01674
+
+L21 layer_out orthogonal:
+  20/43, qproj +0.099, alpha_cv +0.02099
+```
+
+这说明 residual state 中还有非 Q selection 的因果成分，但它不是主 selection gate。
+
+3. **L22 layer_out 是下游结果态，主要在 Q-orthogonal 分量**
+
+```text
+L22 layer_out orthogonal:
+  38/43, qproj 0, alpha_cv 0
+
+L22 layer_out aligned:
+  10/43, qproj 0, alpha_cv 0
+```
+
+这非常清楚地区分了：
+
+```text
+selection-state direction:
+  L20/L21 layer_out aligned component
+
+downstream result/readout state:
+  L22 layer_out orthogonal component
+```
+
+4. **random controls 很弱**
+
+```text
+L20 random = 2/43
+L21 random = 1/43
+L22 random = 4/43
+```
+
+说明强效不是范数导致。
+
+5. **GLM4 的行为效应主要是 Q-orthogonal**
+
+GLM4：
+
+```text
+L34 layer_input aligned = 1/12
+L34 layer_input orthogonal = 10/12
+```
+
+这进一步说明 GLM4 的当前强行为 patch 不属于 DS7B-style correct value token selection gate。
+
+### 理论进展
+
+DS7B 当前链条进一步分裂成两条不同状态：
+
+```text
+1. selection state:
+   L20/L21 residual carried state
+   -> Q-backprojected aligned component
+   -> Q state
+   -> correct value token attention mass
+   -> value token read
+
+2. result/readout state:
+   L22 layer_out
+   -> Q-orthogonal component
+   -> candidate/readout/generation score change
+```
+
+这解释了 Phase621 中一个重要现象：
+
+```text
+为什么 L22 layer_out 很强，但 qproj=0、alpha_cv=0？
+```
+
+因为它不是 Q builder，而是 selection 之后的结果态。
+
+### 问题和硬伤
+
+1. **Q-backproject direction 是线性近似**
+
+它使用：
+
+```text
+W_Q^T delta_Q
+```
+
+作为 residual space 中的 Q-builder 方向，但真实路径还有 layernorm 和非线性上下文影响。
+
+2. **aligned + orthogonal 都不是完全闭合**
+
+DS7B 中 full_delta 仍强于 aligned，说明 residual state 不是单方向机制。
+
+3. **orthogonal component 仍有中等行为效应**
+
+这说明还有 readout/result/generation 方向，需要单独建图谱。
+
+4. **只做 top-head selected Q backprojection**
+
+未覆盖所有 heads，可能漏掉非 top head 的辅助方向。
+
+5. **跨模型仍不统一**
+
+Qwen3 和 GLM4 都出现强 Q-orthogonal 行为分量，不能简单套用 DS7B 的 selection-state 解释。
+
+### 下一步任务
+
+Phase623 应继续做：
+
+```text
+Selection State vs Result State Separation
+```
+
+核心目标：
+
+```text
+把 DS7B 中两类状态明确分开：
+  selection state:
+    能恢复 Q/alpha/correct_value_token selection。
+
+  result state:
+    不恢复 Q/alpha，但能改变 candidate score。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B。
+2. 选择两个代表位置：
+   - L20/L21 layer_out q_backproj_aligned = selection state
+   - L22 layer_out q_backproj_orthogonal = result state
+3. 分别测：
+   - candidate score delta vector
+   - correct/wrong candidate logit movement
+   - attention alpha movement
+   - downstream final norm/readout projection
+4. 做组合 patch：
+   - selection only
+   - result only
+   - selection + result
+   - random controls
+5. 判断两类状态是否加和、竞争或相互覆盖。
+```
+
+关键判据：
+
+```text
+如果 selection + result > max(selection, result):
+  两者是互补链条。
+
+如果 selection + result ≈ result:
+  result state 覆盖 selection state，说明后端读出更强。
+
+如果 selection + result < selection:
+  存在方向冲突或门控竞争。
+```
+
+阶段性大任务：
+
+```text
+从单一路径解释转向双状态图谱：
+  selection state 负责找值；
+  result state 负责把找到的值变成候选得分。
+```
+
+## Phase 623: Selection State vs Result State Separation 选择状态与结果状态分离 [2026-06-25 09:57]
+
+### 本阶段目标
+
+根据用户上传的 Phase622 附加分析，先判断其正确性，再继续完成任务。
+
+附加分析的核心判断基本正确：
+
+```text
+1. Phase620 已经证明 correct value token selection 主要由 answer-position Q 驱动，而不是 K-only。
+2. Phase621 把 Q state builder 回溯到 L20/L21 layer_out，L22 layer_out 更像 downstream result/readout state。
+3. Phase622 的 Q-backprojection aligned / orthogonal 分解是合理下一步。
+4. DS7B 中 L20/L21 aligned component 带来 Q/alpha 恢复，L22 orthogonal component 带来强行为恢复。
+5. 下一步不能再只问单点 patch 是否成功，而要问 selection state 与 result state 是互补、冗余还是覆盖。
+```
+
+需要修正的地方：
+
+```text
+不能把 Q-aligned component 直接等同于完整 value selection mechanism。
+它只是当前测量体系中最清楚的 selection-state 分量。
+
+不能把 Q-orthogonal component 直接叫最终 readout。
+它目前只能更谨慎地称为 result/readout-like state，因为还没有完成 logits head、unembedding、后续层洗出路径的完整闭环。
+```
+
+本阶段目标：
+
+```text
+把 selection state 和 result state 拆开测试：
+  selection state:
+    L20/L21 或对应模型近邻层的 q_backproj_aligned component。
+    预期恢复 Q projection 和 correct_value_token attention alpha。
+
+  result state:
+    下游层 q_backproj_orthogonal component。
+    预期不恢复 Q/alpha，但能直接改善 candidate score。
+
+测试两者组合：
+  selection only
+  result only
+  selection + result
+  random controls
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase623_selection_result_state_separation.py
+tests/glm5/phase623_selection_result_state_separation_summary.py
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase623_selection_result_state_separation.py \
+  tests/glm5/phase623_selection_result_state_separation_summary.py
+```
+
+烟测：
+
+```bash
+python tests/glm5/phase623_selection_result_state_separation.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase623_selection_result_state_separation \
+  --hard-exit-after-model
+```
+
+正式加大确认测试：
+
+```bash
+python tests/glm5/phase623_selection_result_state_separation.py qwen3 \
+  --confirm \
+  --n-tables 32 \
+  --max-samples 256 \
+  --output-dir results/glm5_phase623_selection_result_state_separation \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase623_selection_result_state_separation.py glm4 \
+  --confirm \
+  --n-tables 32 \
+  --max-samples 256 \
+  --output-dir results/glm5_phase623_selection_result_state_separation \
+  --hard-exit-after-model
+
+python tests/glm5/phase623_selection_result_state_separation.py deepseek7b \
+  --confirm \
+  --n-tables 32 \
+  --max-samples 256 \
+  --output-dir results/glm5_phase623_selection_result_state_separation \
+  --hard-exit-after-model
+
+python tests/glm5/phase623_selection_result_state_separation_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase623_selection_result_state_separation/phase623_qwen3_selection_result_state_separation_confirm.json
+results/glm5_phase623_selection_result_state_separation/phase623_glm4_selection_result_state_separation_confirm.json
+results/glm5_phase623_selection_result_state_separation/phase623_deepseek7b_selection_result_state_separation_confirm.json
+results/glm5_phase623_selection_result_state_separation/phase623_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+raw cases/model = 256
+candidate values = first 4 value candidates
+target cases = base wrong and repair prompt correct
+
+qwen3:
+  patch layers = L26, L27, L29
+  selection layers = L27, L28, L29
+
+GLM4:
+  patch layers = L31, L32, L34
+  selection layers = L32, L33, L34
+
+DS7B:
+  patch layers = L20, L21, L22
+  selection layers = L20, L21, L22
+```
+
+测试模式：
+
+```text
+selection_early:
+  early q_backproj_aligned component only
+
+selection_late:
+  late q_backproj_aligned component only
+
+selection_both:
+  early + late q_backproj_aligned components
+
+result_only:
+  downstream q_backproj_orthogonal component only
+
+selection_both_plus_result:
+  selection_both + result_only
+
+selection_late_plus_result:
+  selection_late + result_only
+
+selection_random_norm:
+  selection layers random same-norm control
+
+result_random_norm:
+  result layer random same-norm control
+```
+
+### 客观结果
+
+#### Qwen3
+
+有效 target cases：
+
+```text
+17 / 256
+```
+
+主要结果：
+
+```text
+selection_both_plus_result:
+  switch = 15/17
+  margin gain = +4.407
+  q projection = +0.847
+  correct_value alpha = +0.03001
+
+result_only:
+  switch = 15/17
+  margin gain = +4.407
+  q projection = 0.000
+  correct_value alpha = 0.00000
+
+selection_late_plus_result:
+  switch = 15/17
+  margin gain = +4.407
+  q projection = +0.534
+  correct_value alpha = +0.02966
+
+selection_early:
+  switch = 9/17
+  margin gain = +1.553
+  q projection = +0.803
+  correct_value alpha = +0.02526
+
+selection_both:
+  switch = 9/17
+  margin gain = +1.384
+  q projection = +0.847
+  correct_value alpha = +0.03001
+
+selection_random_norm:
+  switch = 2/17
+  margin gain = +0.131
+
+result_random_norm:
+  switch = 2/17
+  margin gain = +0.088
+```
+
+#### GLM4 bf16
+
+有效 target cases：
+
+```text
+31 / 256
+```
+
+主要结果：
+
+```text
+selection_both_plus_result:
+  switch = 29/31
+  margin gain = +2.131
+  q projection = +0.886
+  correct_value alpha = +0.03123
+
+selection_late_plus_result:
+  switch = 29/31
+  margin gain = +2.131
+  q projection = +0.588
+  correct_value alpha = +0.01520
+
+result_only:
+  switch = 29/31
+  margin gain = +2.131
+  q projection = 0.000
+  correct_value alpha = 0.00000
+
+selection_early:
+  switch = 9/31
+  margin gain = +0.476
+  q projection = +0.882
+  correct_value alpha = +0.02395
+
+selection_both:
+  switch = 7/31
+  margin gain = +0.347
+  q projection = +0.886
+  correct_value alpha = +0.03123
+
+selection_random_norm:
+  switch = 1/31
+  margin gain = -0.082
+
+result_random_norm:
+  switch = 3/31
+  margin gain = -0.069
+```
+
+#### DS7B
+
+有效 target cases：
+
+```text
+82 / 256
+```
+
+主要结果：
+
+```text
+selection_both_plus_result:
+  switch = 75/82
+  margin gain = +2.892
+  q projection = +0.538
+  correct_value alpha = +0.07563
+
+result_only:
+  switch = 75/82
+  margin gain = +2.890
+  q projection = 0.000
+  correct_value alpha = 0.00000
+
+selection_late_plus_result:
+  switch = 75/82
+  margin gain = +2.889
+  q projection = +0.242
+  correct_value alpha = +0.05826
+
+selection_early:
+  switch = 64/82
+  margin gain = +1.979
+  q projection = +0.545
+  correct_value alpha = +0.07503
+
+selection_both:
+  switch = 63/82
+  margin gain = +1.907
+  q projection = +0.538
+  correct_value alpha = +0.07563
+
+selection_late:
+  switch = 62/82
+  margin gain = +1.904
+  q projection = +0.242
+  correct_value alpha = +0.05826
+
+selection_random_norm:
+  switch = 8/82
+  margin gain = -0.031
+
+result_random_norm:
+  switch = 2/82
+  margin gain = -0.092
+```
+
+### 最可靠客观事实
+
+1. **result_only 已经几乎达到 selection + result 的行为效果**
+
+跨模型都是：
+
+```text
+Qwen3:
+  result_only = 15/17
+  selection_both_plus_result = 15/17
+
+GLM4:
+  result_only = 29/31
+  selection_both_plus_result = 29/31
+
+DS7B:
+  result_only = 75/82
+  selection_both_plus_result = 75/82
+```
+
+说明在当前 candidate-score 指标上，下游 result/readout-like state 是更接近直接行为恢复的瓶颈。
+
+2. **selection state 确实恢复 Q/attention 指标**
+
+DS7B：
+
+```text
+selection_early:
+  q projection +0.545
+  correct_value alpha +0.07503
+  switch 64/82
+
+selection_both:
+  q projection +0.538
+  correct_value alpha +0.07563
+  switch 63/82
+```
+
+GLM4：
+
+```text
+selection_both:
+  q projection +0.886
+  correct_value alpha +0.03123
+```
+
+Qwen3：
+
+```text
+selection_both:
+  q projection +0.847
+  correct_value alpha +0.03001
+```
+
+这说明 Phase620-622 的 selection-state 路径不是噪声。
+
+3. **selection + result 没有明显超过 result_only**
+
+三模型中组合 patch 的行为得分几乎等于 result_only：
+
+```text
+selection_both_plus_result ≈ result_only
+```
+
+这说明两者不是简单加和关系。更像：
+
+```text
+selection state 是上游找值状态；
+result state 是下游已读出的结果状态；
+一旦直接补上 result state，selection state 对 candidate score 的额外贡献很小。
+```
+
+4. **random same-norm controls 基本无效**
+
+DS7B：
+
+```text
+selection_random_norm = 8/82, margin -0.031
+result_random_norm = 2/82, margin -0.092
+```
+
+GLM4：
+
+```text
+selection_random_norm = 1/31
+result_random_norm = 3/31
+```
+
+Qwen3：
+
+```text
+selection_random_norm = 2/17
+result_random_norm = 2/17
+```
+
+说明效果不是同范数扰动造成的。
+
+5. **selection state 本身也有行为效果，但不是最强行为瓶颈**
+
+DS7B：
+
+```text
+selection_early = 64/82
+selection_both = 63/82
+result_only = 75/82
+```
+
+这说明 selection state 不只是监测指标，而是真有因果行为效应；但它在当前任务中不如 result state 直接。
+
+### 理论进展
+
+当前链条可以谨慎更新为：
+
+```text
+prompt condition
+  -> residual selection state
+  -> answer-position Q
+  -> correct value token attention selection
+  -> downstream result/readout-like state
+  -> candidate score / generation preference
+```
+
+Phase623 使两类状态的角色更清楚：
+
+```text
+selection state:
+  保持“去哪里读”的条件。
+  主要表现在 Q projection 和 correct value token attention alpha。
+
+result state:
+  保持“读出以后形成什么候选偏置”的结果。
+  不需要恢复 Q/alpha，也能直接移动 candidate score。
+```
+
+这对语言编码机制图谱很关键：同一个 residual stream 中不是只有一个语义向量，而是至少存在不同功能态：
+
+```text
+1. 条件化选择态
+2. 读出结果态
+3. 候选竞争态
+4. 生成门态
+```
+
+### 硬伤和问题
+
+1. **Qwen3 有效 target cases 仍偏少**
+
+```text
+Qwen3 target cases = 17 / 256
+```
+
+虽然趋势和另外两个模型一致，但 Qwen3 的样本量仍然只适合作为支持证据，不适合作为强结论核心。
+
+2. **result state 仍未证明是最终 readout**
+
+当前只证明：
+
+```text
+q_backproj_orthogonal result component 可以强烈移动 candidate score。
+```
+
+还没有证明它如何经过后续层、MLP、attention、unembedding 变成最终 token。
+
+3. **selection + result 不加和的原因尚未解释**
+
+可能原因包括：
+
+```text
+1. result state 已经包含 selection 的下游投影。
+2. candidate score 指标只对 result state 敏感。
+3. selection state 的主要作用在更早时刻，直接补 result 会绕过它。
+4. 两者存在饱和或门控覆盖。
+```
+
+4. **当前仍是 candidate-score 任务，不是完整自然生成闭环**
+
+需要回到自然语言生成下测试：
+
+```text
+result_only 能否改变实际生成 token？
+selection_only 能否改变 attention path 但不一定改变生成？
+```
+
+5. **没有做逐层 result-state 洗出图谱**
+
+Phase623 只选了一个 result layer，没有系统追踪 result state 从 L22 之后如何保留、变形或被覆盖。
+
+### 下一步任务
+
+Phase624 应进入：
+
+```text
+Result State Downstream Propagation Atlas
+结果态下游传播图谱
+```
+
+核心目标：
+
+```text
+不要继续盲目扩大 patch 搜索。
+围绕 result state 建立下游传播图谱：
+  L22 result state 被补上以后，
+  哪些后续层保留它？
+  哪些模块增强它？
+  哪些模块洗掉它？
+  哪个位置真正接近 final logits/readout？
+```
+
+测试方案：
+
+```text
+1. 以 DS7B 为主，Qwen3/GLM4 做验证。
+2. 固定 Phase623 的 result_only component。
+3. 在 patch 后逐层读取：
+   - candidate score delta
+   - correct minus old-top-wrong margin
+   - residual projection onto result direction
+   - MLP out projection
+   - attention out projection
+   - unembedding logit contribution proxy
+4. 比较：
+   - result_only
+   - selection_only
+   - selection + result
+   - random same-norm
+5. 目标不是寻找更强 patch，而是画出 result state 从内部状态到输出偏置的传播路径。
+```
+
+阶段性大任务：
+
+```text
+从“点状机制验证”升级为“状态传播图谱”：
+  先把 value gate 这条链路画完整，
+  再把同样方法扩展到 category、relation、format、punctuation 等结构。
+```
+
+## Phase 624: Result State Downstream Propagation Atlas 结果态下游传播图谱 [2026-06-25 10:24]
+
+### 本阶段目标
+
+根据用户上传的 Phase623 分析，先判断其正确性，再继续完成任务。
+
+附加分析基本正确：
+
+```text
+1. Phase623 的关键意义不是“又找到一个 patch”，而是把 residual state 拆成 selection state 和 result state 两类功能态。
+2. result_only 在 candidate-score 指标上几乎达到 selection + result 的行为效果，这是当前最重要客观事实。
+3. selection state 不是噪声，它恢复 Q projection 和 correct_value_token attention alpha。
+4. result state 不能直接叫最终 readout，只能称为 result/readout-like state。
+5. 下一步必须追踪 result state 的下游传播，而不是继续盲目扩大 patch 搜索。
+```
+
+需要补充的谨慎点：
+
+```text
+Phase623 证明 result state 可以强烈移动 candidate score，
+但没有证明它如何穿过后续层、MLP、attention、final norm、lm_head。
+
+因此 Phase624 的目标不是寻找更强补丁，
+而是画 result state 从 L22/L29/L34 一直到后续层的传播轨迹。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase624_result_state_downstream_propagation_atlas.py
+tests/glm5/phase624_result_state_downstream_propagation_summary.py
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase624_result_state_downstream_propagation_atlas.py \
+  tests/glm5/phase624_result_state_downstream_propagation_summary.py
+```
+
+烟测：
+
+```bash
+python tests/glm5/phase624_result_state_downstream_propagation_atlas.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase624_result_state_downstream_propagation_atlas \
+  --hard-exit-after-model
+```
+
+正式确认测试：
+
+```bash
+python tests/glm5/phase624_result_state_downstream_propagation_atlas.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase624_result_state_downstream_propagation_atlas \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase624_result_state_downstream_propagation_atlas.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase624_result_state_downstream_propagation_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase624_result_state_downstream_propagation_atlas.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase624_result_state_downstream_propagation_atlas \
+  --hard-exit-after-model
+
+python tests/glm5/phase624_result_state_downstream_propagation_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase624_result_state_downstream_propagation_atlas/phase624_qwen3_result_state_downstream_propagation_confirm.json
+results/glm5_phase624_result_state_downstream_propagation_atlas/phase624_glm4_result_state_downstream_propagation_confirm.json
+results/glm5_phase624_result_state_downstream_propagation_atlas/phase624_deepseek7b_result_state_downstream_propagation_confirm.json
+results/glm5_phase624_result_state_downstream_propagation_atlas/phase624_cross_model_summary.md
+```
+
+### 测试原理
+
+本阶段固定 Phase623 的 result_only component，然后在 patch 后读取后续层组件：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+```
+
+每个节点计算：
+
+```text
+repair_projection:
+  patch 后节点变化量在 repair-base 节点变化量上的投影。
+
+repair_cos:
+  patch 后节点变化量与 repair-base 节点变化量的余弦相似度。
+
+seed_projection:
+  patch 后节点变化量在原始 result seed 方向上的投影。
+```
+
+核心判据：
+
+```text
+如果 layer_out/layer_input 的 seed_projection 持续接近 1：
+  result seed 在 residual stream 中被保留。
+
+如果 mlp_out 的 repair_projection 高，但 seed_projection 低：
+  MLP 输出不是简单复制 seed，而是在把状态转换到 repair trajectory。
+
+如果后续层 repair_projection 快速下降：
+  result state 被洗出。
+```
+
+### 测试范围
+
+```text
+raw cases/model = 256
+candidate values = first 4 value candidates
+target cases = base wrong and repair prompt correct
+
+Qwen3:
+  patch layers = L26, L27, L29
+  downstream layers = L29-L35
+  target cases = 17
+
+GLM4:
+  patch layers = L31, L32, L34
+  downstream layers = L34-L39
+  target cases = 31
+
+DS7B:
+  patch layers = L20, L21, L22
+  downstream layers = L22-L27
+  target cases = 82
+```
+
+### 客观结果
+
+#### Qwen3
+
+行为结果：
+
+```text
+result_only:
+  switch = 15/17
+  margin gain = +4.407
+  correct delta = +1.814
+  wrong delta = -2.593
+
+selection_both:
+  switch = 9/17
+  margin gain = +1.384
+
+selection_both_plus_result:
+  switch = 15/17
+  margin gain = +4.407
+
+result_random_norm:
+  switch = 2/17
+  margin gain = +0.088
+```
+
+result_only 最高传播节点：
+
+```text
+L31 mlp_out:
+  repair_proj = 0.886
+  repair_cos = 0.925
+  seed_proj = 0.031
+
+L29 layer_out:
+  repair_proj = 0.865
+  repair_cos = 0.930
+  seed_proj = 1.000
+
+L30 layer_input:
+  repair_proj = 0.865
+  repair_cos = 0.930
+  seed_proj = 1.000
+
+L30 mlp_out:
+  repair_proj = 0.856
+  repair_cos = 0.844
+  seed_proj = 0.002
+
+L31 layer_out:
+  repair_proj = 0.837
+  repair_cos = 0.905
+  seed_proj = 1.059
+```
+
+#### GLM4 bf16
+
+行为结果：
+
+```text
+result_only:
+  switch = 29/31
+  margin gain = +2.131
+  correct delta = +0.974
+  wrong delta = -1.157
+
+selection_both:
+  switch = 7/31
+  margin gain = +0.347
+
+selection_both_plus_result:
+  switch = 29/31
+  margin gain = +2.131
+
+result_random_norm:
+  switch = 3/31
+  margin gain = -0.069
+```
+
+result_only 最高传播节点：
+
+```text
+L34 layer_out:
+  repair_proj = 0.939
+  repair_cos = 0.969
+  seed_proj = 1.000
+
+L35 layer_input:
+  repair_proj = 0.939
+  repair_cos = 0.969
+  seed_proj = 1.000
+
+L38 layer_out:
+  repair_proj = 0.925
+  repair_cos = 0.967
+  seed_proj = 1.310
+
+L39 layer_input:
+  repair_proj = 0.925
+  repair_cos = 0.967
+  seed_proj = 1.310
+
+L36 layer_out:
+  repair_proj = 0.922
+  repair_cos = 0.963
+  seed_proj = 1.000
+```
+
+#### DS7B
+
+行为结果：
+
+```text
+result_only:
+  switch = 75/82
+  margin gain = +2.890
+  correct delta = +1.537
+  wrong delta = -1.352
+
+selection_both:
+  switch = 63/82
+  margin gain = +1.907
+
+selection_both_plus_result:
+  switch = 75/82
+  margin gain = +2.892
+
+result_random_norm:
+  switch = 2/82
+  margin gain = -0.092
+```
+
+result_only 最高传播节点：
+
+```text
+L22 layer_out:
+  repair_proj = 0.848
+  repair_cos = 0.921
+  seed_proj = 1.000
+
+L23 layer_input:
+  repair_proj = 0.848
+  repair_cos = 0.921
+  seed_proj = 1.000
+
+L23 mlp_out:
+  repair_proj = 0.834
+  repair_cos = 0.918
+  seed_proj = -0.009
+
+L23 layer_out:
+  repair_proj = 0.817
+  repair_cos = 0.920
+  seed_proj = 1.012
+
+L24 layer_input:
+  repair_proj = 0.817
+  repair_cos = 0.920
+  seed_proj = 1.012
+
+L25 mlp_out:
+  repair_proj = 0.800
+  repair_cos = 0.913
+  seed_proj = 0.027
+
+L27 mlp_out:
+  repair_proj = 0.797
+  repair_cos = 0.938
+  seed_proj = 0.016
+```
+
+### 最可靠客观事实
+
+1. **result state 在 residual stream 中持续保留**
+
+DS7B：
+
+```text
+L22 layer_out seed_proj = 1.000
+L23 layer_input seed_proj = 1.000
+L23 layer_out seed_proj = 1.012
+L24 layer_input seed_proj = 1.012
+L24 layer_out seed_proj = 1.033
+L25 layer_input seed_proj = 1.033
+```
+
+GLM4：
+
+```text
+L34 layer_out seed_proj = 1.000
+L35 layer_input seed_proj = 1.000
+L38 layer_out seed_proj = 1.310
+L39 layer_input seed_proj = 1.310
+```
+
+Qwen3：
+
+```text
+L29 layer_out seed_proj = 1.000
+L30 layer_input seed_proj = 1.000
+L31 layer_out seed_proj = 1.059
+L32 layer_input seed_proj = 1.059
+```
+
+说明 result state 不是只在单层短暂有效，而是以 residual carrier 的形式穿过多个后续层。
+
+2. **MLP 输出高度对齐 repair trajectory，但不是简单复制 seed**
+
+DS7B：
+
+```text
+L23 mlp_out:
+  repair_proj = 0.834
+  seed_proj = -0.009
+
+L25 mlp_out:
+  repair_proj = 0.800
+  seed_proj = 0.027
+
+L27 mlp_out:
+  repair_proj = 0.797
+  seed_proj = 0.016
+```
+
+Qwen3：
+
+```text
+L31 mlp_out:
+  repair_proj = 0.886
+  seed_proj = 0.031
+```
+
+这说明 MLP 不是简单传递原始 result seed，而是在当前状态条件下生成与 repair trajectory 高度一致的新输出。
+
+3. **selection + result 仍然约等于 result_only**
+
+三模型行为结果仍稳定：
+
+```text
+Qwen3:
+  result_only = 15/17
+  selection_both_plus_result = 15/17
+
+GLM4:
+  result_only = 29/31
+  selection_both_plus_result = 29/31
+
+DS7B:
+  result_only = 75/82
+  selection_both_plus_result = 75/82
+```
+
+说明 Phase623 的机制分叉没有被传播图谱推翻。
+
+4. **random control 仍不能解释现象**
+
+DS7B：
+
+```text
+result_random_norm = 2/82
+margin gain = -0.092
+```
+
+GLM4：
+
+```text
+result_random_norm = 3/31
+margin gain = -0.069
+```
+
+Qwen3：
+
+```text
+result_random_norm = 2/17
+margin gain = +0.088
+```
+
+### 理论进展
+
+当前 value gate 路径可更新为：
+
+```text
+prompt condition
+  -> residual selection state
+  -> answer-position Q
+  -> correct value token attention selection
+  -> result seed state
+  -> residual carrier propagation
+  -> state-conditioned MLP transformation
+  -> candidate score / generation preference
+```
+
+Phase624 的关键新增是：
+
+```text
+result state 不是孤立点，而是可沿 residual stream 传播的 carrier。
+MLP 输出不是复制 carrier，而是把 carrier 和当前上下文状态结合，生成 repair-like downstream output。
+```
+
+这比“某个方向有因果效果”更接近内部编码机制，因为它显示了：
+
+```text
+同一网络在自回归计算中可以靠 residual state 的不同态来保持任务条件；
+后续层并不是重新找值，而是在已有 result carrier 上继续变换；
+MLP 可能承担“状态条件化转换器”的角色。
+```
+
+### 硬伤和问题
+
+1. **Qwen3 target cases 仍偏少**
+
+```text
+Qwen3 = 17 / 256
+```
+
+趋势一致，但不能把 Qwen3 当成强统计核心。
+
+2. **还没有接到 final norm / lm_head**
+
+Phase624 扫到后续 transformer layers，但没有直接测：
+
+```text
+final norm input/output
+lm_head logits contribution
+first token vs full answer token sequence
+```
+
+3. **MLP 的作用还只是轨迹对齐，不是因果拆分**
+
+当前证明：
+
+```text
+MLP out 与 repair trajectory 高度对齐。
+```
+
+但还没有证明：
+
+```text
+哪些 MLP 子方向负责增强 correct candidate；
+哪些子方向负责压制 old top wrong；
+MLP 是否可以单独恢复 generation。
+```
+
+4. **result state 的 seed_projection 后期可能超过 1**
+
+例如 GLM4：
+
+```text
+L38 layer_out seed_proj = 1.310
+```
+
+这可能是真增强，也可能是 residual norm/方向混合造成，不能直接解释成“语义增强 31%”。
+
+5. **仍然是 value gate testbed**
+
+还没有证明 category、relation、format、punctuation 等机制都使用同样的 result carrier 结构。
+
+### 下一步任务
+
+Phase625 应进入：
+
+```text
+Final Readout Bridge and MLP Causal Split
+最终读出桥接与 MLP 因果拆分
+```
+
+核心目标：
+
+```text
+把 Phase624 的 result carrier 接到 final norm / lm_head；
+同时拆分 MLP 输出到底是在增强 correct candidate，还是压制 old top wrong。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B 为主，Qwen3/GLM4 做验证。
+2. 使用 Phase624 的 result_only patch。
+3. 读取并干预：
+   - final norm input
+   - final norm output
+   - lm_head first-token logits
+   - full-answer logprob
+4. 对 MLP out 做方向分解：
+   - correct candidate logit direction
+   - old top wrong logit direction
+   - orthogonal residual direction
+5. 分别 patch：
+   - correct-up component
+   - wrong-down component
+   - both
+   - orthogonal
+   - random same-norm
+6. 判定 result carrier 到最终输出的桥是不是：
+   residual carrier -> MLP conversion -> final norm acceptance -> lm_head candidate margin
+```
+
+阶段性大任务：
+
+```text
+从“状态传播图谱”推进到“输出桥接图谱”：
+  不只知道状态在哪里传播，
+  还要知道它如何变成最终 token 竞争。
+```
+
+## Phase 625: Final Readout Bridge and MLP Causal Split 最终读出桥接与 MLP 因果拆分 [2026-06-25 10:54]
+
+### 本阶段目标
+
+根据用户上传的 Phase624 分析，先判断其正确性，再继续完成任务。
+
+附加分析基本正确：
+
+```text
+1. Phase624 的关键价值是把 result state 从单点有效状态推进为 residual carrier。
+2. residual stream 中的 result seed 可以跨层保留。
+3. MLP out 与 repair trajectory 高度对齐，但不是简单复制 seed。
+4. Phase625 必须把 result carrier 接到 final norm / lm_head。
+5. 同时要测试 MLP out 的作用到底是 correct-up、wrong-down、两者结合，还是更复杂的上下文状态转换。
+```
+
+需要收紧的地方：
+
+```text
+不能因为 MLP out repair_projection 高，就直接断言 MLP 是最终输出模块。
+也不能因为 result_only 能改变 candidate score，就直接断言它已经完整接到 lm_head。
+```
+
+本阶段目标：
+
+```text
+1. 继续复现 result_only 的强行为效果。
+2. 测 result_only 是否把 final norm input/output 推向 repair trajectory。
+3. 用 output embedding candidate directions 拆分 MLP out：
+   - full_delta
+   - correct_up
+   - wrong_down
+   - correct_plus_wrong
+   - margin_span
+   - orthogonal
+   - random_same_norm
+4. 判断单层 MLP 子方向能否解释 result_only 的行为效果。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py
+tests/glm5/phase625_final_readout_bridge_mlp_causal_split_summary.py
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py \
+  tests/glm5/phase625_final_readout_bridge_mlp_causal_split_summary.py
+```
+
+烟测：
+
+```bash
+python tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase625_final_readout_bridge_mlp_causal_split \
+  --hard-exit-after-model
+```
+
+正式确认测试：
+
+```bash
+python tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase625_final_readout_bridge_mlp_causal_split \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase625_final_readout_bridge_mlp_causal_split \
+  --hard-exit-after-model
+
+python tests/glm5/phase625_final_readout_bridge_mlp_causal_split.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase625_final_readout_bridge_mlp_causal_split \
+  --hard-exit-after-model
+
+python tests/glm5/phase625_final_readout_bridge_mlp_causal_split_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase625_final_readout_bridge_mlp_causal_split/phase625_qwen3_final_readout_bridge_mlp_causal_split_confirm.json
+results/glm5_phase625_final_readout_bridge_mlp_causal_split/phase625_glm4_final_readout_bridge_mlp_causal_split_confirm.json
+results/glm5_phase625_final_readout_bridge_mlp_causal_split/phase625_deepseek7b_final_readout_bridge_mlp_causal_split_confirm.json
+results/glm5_phase625_final_readout_bridge_mlp_causal_split/phase625_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+raw cases/model = 256
+candidate values = v05, v91, v22, v48
+target cases = base wrong and repair prompt correct
+
+Qwen3:
+  patch layers = L26, L27, L29
+  MLP split layer = L31
+  target cases = 17
+
+GLM4:
+  patch layers = L31, L32, L34
+  MLP split layer = L39
+  target cases = 31
+
+DS7B:
+  patch layers = L20, L21, L22
+  MLP split layer = L23
+  target cases = 82
+```
+
+### 测试原理
+
+#### Final bridge
+
+对 correct answer 的 final norm input/output 计算：
+
+```text
+patched-base 是否沿 repair-base 方向前进。
+```
+
+记录：
+
+```text
+input_repair_projection
+output_repair_projection
+output_repair_cos
+output_projection_margin
+```
+
+其中 `output_projection_margin` 是 final norm output effect 在 candidate output embedding directions 上的 margin proxy。
+
+#### MLP causal split
+
+对 MLP out delta 做候选方向分解：
+
+```text
+correct_up:
+  沿 correct candidate output embedding specific direction。
+
+wrong_down:
+  沿 old top wrong candidate 的负向 specific direction。
+
+correct_plus_wrong:
+  correct_up + wrong_down。
+
+margin_span:
+  correct_up 与 wrong_down 张成子空间中的投影。
+
+orthogonal:
+  full_delta 减去 margin_span。
+
+random_same_norm:
+  同范数随机对照。
+```
+
+### 客观结果
+
+#### Qwen3
+
+有效 target cases：
+
+```text
+17 / 256
+```
+
+行为结果：
+
+```text
+result_only:
+  switch = 15/17
+  margin gain = +4.407
+  correct delta = +1.814
+  wrong delta = -2.593
+
+mlp_full_delta:
+  switch = 4/17
+  margin gain = +0.478
+
+mlp_correct_up:
+  switch = 2/17
+  margin gain = +0.250
+
+mlp_wrong_down:
+  switch = 2/17
+  margin gain = +0.169
+
+mlp_correct_plus_wrong:
+  switch = 2/17
+  margin gain = +0.390
+
+mlp_margin_span:
+  switch = 2/17
+  margin gain = +0.280
+
+mlp_orthogonal:
+  switch = 3/17
+  margin gain = +0.162
+
+mlp_random_same_norm:
+  switch = 1/17
+  margin gain = -0.006
+```
+
+final bridge：
+
+```text
+result_only:
+  input repair projection = 0.363
+  output repair projection = 0.355
+  output repair cos = 0.667
+  output margin proxy = +0.739
+  correct proxy = +0.453
+  wrong proxy = -0.285
+```
+
+#### GLM4 bf16
+
+有效 target cases：
+
+```text
+31 / 256
+```
+
+行为结果：
+
+```text
+result_only:
+  switch = 29/31
+  margin gain = +2.131
+  correct delta = +0.974
+  wrong delta = -1.157
+
+mlp_full_delta:
+  switch = 4/31
+  margin gain = -0.212
+
+mlp_correct_up:
+  switch = 3/31
+  margin gain = -0.083
+
+mlp_wrong_down:
+  switch = 5/31
+  margin gain = -0.117
+
+mlp_correct_plus_wrong:
+  switch = 6/31
+  margin gain = -0.200
+
+mlp_margin_span:
+  switch = 4/31
+  margin gain = -0.145
+
+mlp_orthogonal:
+  switch = 0/31
+  margin gain = -0.081
+
+mlp_random_same_norm:
+  switch = 2/31
+  margin gain = -0.010
+```
+
+final bridge：
+
+```text
+result_only:
+  input repair projection = 0.320
+  output repair projection = 0.311
+  output repair cos = 0.565
+  output margin proxy = +0.533
+  correct proxy = +0.334
+  wrong proxy = -0.199
+```
+
+#### DS7B
+
+有效 target cases：
+
+```text
+82 / 256
+```
+
+行为结果：
+
+```text
+result_only:
+  switch = 75/82
+  margin gain = +2.890
+  correct delta = +1.537
+  wrong delta = -1.352
+
+mlp_full_delta:
+  switch = 14/82
+  margin gain = +0.326
+
+mlp_correct_up:
+  switch = 4/82
+  margin gain = +0.094
+
+mlp_wrong_down:
+  switch = 1/82
+  margin gain = +0.037
+
+mlp_correct_plus_wrong:
+  switch = 4/82
+  margin gain = +0.132
+
+mlp_margin_span:
+  switch = 4/82
+  margin gain = +0.101
+
+mlp_orthogonal:
+  switch = 10/82
+  margin gain = +0.229
+
+mlp_random_same_norm:
+  switch = 3/82
+  margin gain = -0.016
+```
+
+final bridge：
+
+```text
+result_only:
+  input repair projection = 0.340
+  output repair projection = 0.372
+  output repair cos = 0.667
+  output margin proxy = +0.579
+  correct proxy = +0.433
+  wrong proxy = -0.145
+```
+
+### 最可靠客观事实
+
+1. **result_only 确实桥接到 final norm / output embedding margin proxy**
+
+三模型都有正向 final bridge：
+
+```text
+Qwen3:
+  output repair projection = 0.355
+  output margin proxy = +0.739
+
+GLM4:
+  output repair projection = 0.311
+  output margin proxy = +0.533
+
+DS7B:
+  output repair projection = 0.372
+  output margin proxy = +0.579
+```
+
+说明 Phase624 的 result carrier 不是停在中间层，它能把 final norm output 推向 repair-like candidate margin。
+
+2. **final bridge 是部分桥接，不是完整闭合**
+
+output repair projection 只有约：
+
+```text
+0.31 - 0.37
+```
+
+这说明 result_only 强行为效果并不等于 final norm state 完全变成 repair state。它只把最终输出状态推向 repair trajectory 的一部分。
+
+3. **单层 MLP out 不能解释 result_only 行为效果**
+
+DS7B：
+
+```text
+result_only = 75/82, margin +2.890
+mlp_full_delta = 14/82, margin +0.326
+mlp_correct_plus_wrong = 4/82, margin +0.132
+mlp_orthogonal = 10/82, margin +0.229
+```
+
+GLM4：
+
+```text
+result_only = 29/31, margin +2.131
+mlp_full_delta = 4/31, margin -0.212
+```
+
+Qwen3：
+
+```text
+result_only = 15/17, margin +4.407
+mlp_full_delta = 4/17, margin +0.478
+```
+
+因此 Phase624 中 “MLP out repair_projection 高” 不等于 “单层 MLP out patch 可以恢复输出行为”。
+
+4. **candidate embedding 简单分解不足**
+
+correct_up、wrong_down、margin_span 都远弱于 result_only：
+
+```text
+DS7B:
+  correct_up = 4/82
+  wrong_down = 1/82
+  margin_span = 4/82
+
+Qwen3:
+  correct_up = 2/17
+  wrong_down = 2/17
+  margin_span = 2/17
+
+GLM4:
+  所有 MLP split 基本无效或负向。
+```
+
+说明 MLP 输出的作用不是简单线性 candidate logit direction。
+
+5. **orthogonal component 有时强于 candidate span**
+
+DS7B：
+
+```text
+mlp_orthogonal = 10/82, margin +0.229
+mlp_margin_span = 4/82, margin +0.101
+```
+
+Qwen3：
+
+```text
+mlp_orthogonal = 3/17
+mlp_margin_span = 2/17
+```
+
+这说明当前 output embedding span 不是完整候选竞争空间，仍有隐藏的状态/门控/归一化接受因素。
+
+### 理论进展
+
+当前链条应更新为：
+
+```text
+prompt condition
+  -> selection state
+  -> Q selects correct value token
+  -> result carrier state
+  -> residual propagation
+  -> distributed downstream transformation
+  -> partial final norm bridge
+  -> candidate margin / generation preference
+```
+
+Phase625 的关键修正是：
+
+```text
+MLP 是重要转换节点，但不是单层、单方向、候选 embedding span 可直接解释的简单读出器。
+result carrier 到 final norm 的桥接是真实存在的，但只解释了最终 repair state 的一部分。
+```
+
+这意味着 value gate 的后端不是：
+
+```text
+某个 MLP out 直接写 correct token logit direction
+```
+
+而更可能是：
+
+```text
+result carrier 在多层 residual stream 中传播，
+多层 attention/MLP/final norm 共同把它变成 candidate margin。
+```
+
+### 硬伤和问题
+
+1. **MLP split 只测了一个默认层**
+
+```text
+Qwen3 L31
+GLM4 L39
+DS7B L23
+```
+
+但 Phase624 显示多个 MLP out 都有高 repair_projection。单层失败不能排除多层 MLP 累积机制。
+
+2. **candidate embedding direction 太粗糙**
+
+使用 output embeddings 分解 correct-up/wrong-down，可能不能代表真实 lm_head + final norm 后的非线性接受边界。
+
+3. **final bridge 只看平均 answer positions**
+
+value tokens 是多 token 字符串，例如 v05。first token 可能共享，后续 token 才是区分关键。后续需要按 token position 分开。
+
+4. **没有做 final norm 直接 patch**
+
+当前是观察 result_only 对 final norm 的影响，还没有直接 patch final_norm input/output 验证 acceptance gate。
+
+5. **仍未完成自然生成闭环**
+
+结果仍主要是 candidate logprob，不是开放式 generation。
+
+### 下一步任务
+
+Phase626 应进入：
+
+```text
+Multi-Layer Final Bridge and Token-Position Readout Audit
+多层最终桥接与词元位置读出审计
+```
+
+核心目标：
+
+```text
+不要再假设单层 MLP 能解释 result carrier。
+需要做两件事：
+  1. 多层 MLP/attn/final norm 累积桥接。
+  2. 按 answer token position 拆分 final readout。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B 为主，Qwen3/GLM4 验证。
+2. 对 result carrier patch 后，分 token position 读取：
+   - token0: 通常是 shared "v"
+   - token1/token2: 真正区分 05/91/22/48 的位置
+3. 分别计算 final_norm output projection：
+   - correct token logit delta
+   - old top wrong token logit delta
+   - margin delta
+4. 做多层累计 patch：
+   - MLP out cumulative
+   - attention out cumulative
+   - layer_out carrier cumulative
+   - final_norm input/output patch
+5. 判断最终瓶颈是在：
+   - 多层 MLP 累积
+   - residual carrier 到 final norm 的接受
+   - shared-prefix token position 掩盖
+   - lm_head candidate competition
+```
+
+阶段性大任务：
+
+```text
+从“结果态传播”推进到“逐词元输出桥接”：
+  语言输出不是一个答案整体，
+  而是每个 token position 的竞争过程。
+```
+
+## Phase 626: Multi-Layer Final Bridge and Token-Position Readout Audit 多层最终桥接与词元位置读出审计 [2026-06-25 12:01]
+
+### 本阶段目标
+
+根据用户上传的 Phase625 分析，先判断其正确性，再继续完成任务。
+
+附加分析基本正确：
+
+```text
+1. Phase625 是关键修正阶段，不是简单闭合阶段。
+2. result_only 能部分桥接 final norm / output embedding margin proxy。
+3. 单层 MLP out 和简单 candidate embedding direction 不能解释 result_only。
+4. 后端更可能是多层 residual/attention/MLP/final norm 的分布式桥接。
+5. 下一步必须按 token position 拆分，因为 value strings 存在共享前缀。
+```
+
+需要继续收紧的地方：
+
+```text
+final_output_all patch 是直接把 final norm 状态替换为 repair 状态，
+它是上界测试，不等于自然机制已经完整实现。
+
+cumulative layer_out patch 也可能包含多个模块的综合结果，
+不能直接说某一个模块单独负责。
+```
+
+本阶段目标：
+
+```text
+1. 审计 v05/v91/v22/v48 的真实 tokenizer 分解。
+2. 在 result_only 下按 answer token position 统计 logprob delta。
+3. 直接 patch final norm input/output：
+   - all answer tokens
+   - token0 shared prefix
+   - last token
+   - random all control
+4. 做多层累计 patch：
+   - cumulative layer_out
+   - cumulative attn_out
+   - cumulative mlp_out
+   - cumulative layer_out random
+5. 判断最终瓶颈是在共享前缀、区分 token、final norm acceptance，还是多层累计桥接。
+```
+
+### 生成脚本
+
+```text
+tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py
+tests/glm5/phase626_multilayer_final_bridge_token_position_summary.py
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile \
+  tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py \
+  tests/glm5/phase626_multilayer_final_bridge_token_position_summary.py
+```
+
+烟测：
+
+```bash
+python tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase626_multilayer_final_bridge_token_position_audit \
+  --hard-exit-after-model
+```
+
+正式确认测试：
+
+```bash
+python tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase626_multilayer_final_bridge_token_position_audit \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase626_multilayer_final_bridge_token_position_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase626_multilayer_final_bridge_token_position_audit.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase626_multilayer_final_bridge_token_position_audit \
+  --hard-exit-after-model
+
+python tests/glm5/phase626_multilayer_final_bridge_token_position_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase626_multilayer_final_bridge_token_position_audit/phase626_qwen3_multilayer_final_bridge_token_position_audit_confirm.json
+results/glm5_phase626_multilayer_final_bridge_token_position_audit/phase626_glm4_multilayer_final_bridge_token_position_audit_confirm.json
+results/glm5_phase626_multilayer_final_bridge_token_position_audit/phase626_deepseek7b_multilayer_final_bridge_token_position_audit_confirm.json
+results/glm5_phase626_multilayer_final_bridge_token_position_audit/phase626_cross_model_summary.md
+```
+
+### Tokenization 审计
+
+Qwen3：
+
+```text
+v05 = [' v', '0', '5']
+v91 = [' v', '9', '1']
+v22 = [' v', '2', '2']
+v48 = [' v', '4', '8']
+```
+
+DS7B：
+
+```text
+v05 = [' v', '0', '5']
+v91 = [' v', '9', '1']
+v22 = [' v', '2', '2']
+v48 = [' v', '4', '8']
+```
+
+GLM4：
+
+```text
+v05 = [' v', '05']
+v91 = [' v', '91']
+v22 = [' v', '22']
+v48 = [' v', '48']
+```
+
+这说明：
+
+```text
+token0 是共享前缀 ' v'；
+真正区分类别值的位置是：
+  Qwen3/DS7B: token1 为主要区分位，token2 贡献很小。
+  GLM4: token1 是完整数字对，也是主要区分位。
+```
+
+### 测试范围
+
+```text
+raw cases/model = 256
+candidate values = v05, v91, v22, v48
+target cases = base wrong and repair prompt correct
+
+Qwen3:
+  target cases = 17
+  result patch layer = L29
+  downstream layers = L29-L35
+
+GLM4:
+  target cases = 31
+  result patch layer = L34
+  downstream layers = L34-L39
+
+DS7B:
+  target cases = 82
+  result patch layer = L22
+  downstream layers = L22-L27
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+result_only:
+  switch = 15/17
+  margin gain = +4.407
+  correct delta = +1.814
+  wrong delta = -2.593
+
+final_input_all:
+  switch = 17/17
+  margin gain = +5.377
+
+final_output_all:
+  switch = 17/17
+  margin gain = +5.377
+
+final_output_token0:
+  switch = 0/17
+  margin gain = 0.000
+
+final_output_last:
+  switch = 2/17
+  margin gain = +0.075
+
+cumulative_layer_out:
+  switch = 17/17
+  margin gain = +5.305
+
+cumulative_attn_out:
+  switch = 12/17
+  margin gain = +2.326
+
+cumulative_mlp_out:
+  switch = 12/17
+  margin gain = +2.545
+
+cumulative_layer_out_random:
+  switch = 2/17
+  margin gain = +0.020
+```
+
+result_only token-position delta：
+
+```text
+tok0:
+  margin delta = 0.000
+
+tok1:
+  correct delta = +1.812
+  wrong delta = -2.593
+  margin delta = +4.404
+
+tok2:
+  correct delta = +0.002
+  wrong delta = -0.001
+  margin delta = +0.003
+```
+
+#### GLM4 bf16
+
+```text
+result_only:
+  switch = 29/31
+  margin gain = +2.131
+  correct delta = +0.974
+  wrong delta = -1.157
+
+final_input_all:
+  switch = 31/31
+  margin gain = +2.300
+
+final_output_all:
+  switch = 31/31
+  margin gain = +2.300
+
+final_output_token0:
+  switch = 0/31
+  margin gain = 0.000
+
+final_output_last:
+  switch = 31/31
+  margin gain = +2.300
+
+cumulative_layer_out:
+  switch = 31/31
+  margin gain = +2.300
+
+cumulative_attn_out:
+  switch = 3/31
+  margin gain = -0.121
+
+cumulative_mlp_out:
+  switch = 11/31
+  margin gain = +0.518
+
+cumulative_layer_out_random:
+  switch = 4/31
+  margin gain = +0.090
+```
+
+result_only token-position delta：
+
+```text
+tok0:
+  margin delta = 0.000
+
+tok1:
+  correct delta = +0.974
+  wrong delta = -1.157
+  margin delta = +2.131
+```
+
+#### DS7B
+
+```text
+result_only:
+  switch = 75/82
+  margin gain = +2.890
+  correct delta = +1.537
+  wrong delta = -1.352
+
+final_input_all:
+  switch = 82/82
+  margin gain = +3.602
+
+final_output_all:
+  switch = 82/82
+  margin gain = +3.602
+
+final_output_token0:
+  switch = 0/82
+  margin gain = 0.000
+
+final_output_last:
+  switch = 2/82
+  margin gain = +0.053
+
+cumulative_layer_out:
+  switch = 81/82
+  margin gain = +3.561
+
+cumulative_attn_out:
+  switch = 79/82
+  margin gain = +3.114
+
+cumulative_mlp_out:
+  switch = 44/82
+  margin gain = +1.414
+
+cumulative_layer_out_random:
+  switch = 9/82
+  margin gain = +0.077
+```
+
+result_only token-position delta：
+
+```text
+tok0:
+  margin delta = 0.000
+
+tok1:
+  correct delta = +1.525
+  wrong delta = -1.354
+  margin delta = +2.879
+
+tok2:
+  correct delta = +0.012
+  wrong delta = +0.002
+  margin delta = +0.011
+```
+
+### 最可靠客观事实
+
+1. **共享前缀 token0 完全不是竞争位置**
+
+三模型：
+
+```text
+final_output_token0:
+  Qwen3 = 0/17, margin 0.000
+  GLM4 = 0/31, margin 0.000
+  DS7B = 0/82, margin 0.000
+```
+
+result_only 下 tok0：
+
+```text
+margin delta = 0.000
+```
+
+说明前面把 answer positions 平均在一起，会稀释甚至误导读出分析。
+
+2. **真正竞争集中在第一个区分 token**
+
+Qwen3：
+
+```text
+tok1 margin delta = +4.404
+tok2 margin delta = +0.003
+```
+
+DS7B：
+
+```text
+tok1 margin delta = +2.879
+tok2 margin delta = +0.011
+```
+
+GLM4：
+
+```text
+tok1 margin delta = +2.131
+```
+
+这说明 value gate 的输出竞争不是均匀分布在答案 token 序列上，而是集中在首个区分 token。
+
+3. **final norm all patch 是强上界**
+
+三模型：
+
+```text
+Qwen3:
+  final_output_all = 17/17, margin +5.377
+
+GLM4:
+  final_output_all = 31/31, margin +2.300
+
+DS7B:
+  final_output_all = 82/82, margin +3.602
+```
+
+它证明 final norm 状态足够承载正确输出竞争，但这是直接 repair patch，不等于自然路径闭合。
+
+4. **cumulative layer_out 几乎达到 final norm all 的上界**
+
+Qwen3：
+
+```text
+cumulative_layer_out = 17/17, margin +5.305
+final_output_all = 17/17, margin +5.377
+```
+
+GLM4：
+
+```text
+cumulative_layer_out = 31/31, margin +2.300
+final_output_all = 31/31, margin +2.300
+```
+
+DS7B：
+
+```text
+cumulative_layer_out = 81/82, margin +3.561
+final_output_all = 82/82, margin +3.602
+```
+
+这是本阶段最重要的新结果：多层 residual carrier 累计 patch 几乎可以接近 final norm 上界。
+
+5. **attention/MLP 的作用跨模型不同**
+
+DS7B：
+
+```text
+cumulative_attn_out = 79/82, margin +3.114
+cumulative_mlp_out = 44/82, margin +1.414
+```
+
+Qwen3：
+
+```text
+cumulative_attn_out = 12/17, margin +2.326
+cumulative_mlp_out = 12/17, margin +2.545
+```
+
+GLM4：
+
+```text
+cumulative_attn_out = 3/31, margin -0.121
+cumulative_mlp_out = 11/31, margin +0.518
+```
+
+说明不能用单一“attention 或 MLP 是主因”的理论跨模型套用。更稳妥的是：
+
+```text
+layer_out carrier 是跨模型稳定主线；
+attention/MLP 是模型特异的转换和补充路径。
+```
+
+6. **random controls 仍弱**
+
+```text
+Qwen3 cumulative_layer_out_random = 2/17, margin +0.020
+GLM4 cumulative_layer_out_random = 4/31, margin +0.090
+DS7B cumulative_layer_out_random = 9/82, margin +0.077
+```
+
+说明多层累计效果不是同范数随机扰动造成的。
+
+### 理论进展
+
+当前 value gate 路径应更新为：
+
+```text
+prompt condition
+  -> selection state
+  -> Q selects correct value token
+  -> result carrier state
+  -> multi-layer residual carrier accumulation
+  -> final norm acceptance at discriminative token position
+  -> candidate margin
+```
+
+Phase626 的关键修正是：
+
+```text
+语言输出竞争不是“整答案状态”的平均竞争，
+而是由共享前缀之后的第一个区分 token 触发。
+```
+
+对破解语言编码机制的意义：
+
+```text
+1. residual stream 是跨层状态总线。
+2. layer_out carrier 是当前 value gate 后端最稳定主线。
+3. final norm 可以接受并表达这个 carrier。
+4. 真正读出点必须按 token position 定位。
+5. MLP/attention 不能孤立解释，必须放到多层状态图谱中。
+```
+
+### 硬伤和问题
+
+1. **final_norm all patch 是上界，不是自然路径**
+
+它说明 final norm 有能力表达正确 margin，但不能证明自然模型已经完全走这条路径。
+
+2. **cumulative layer_out patch 可能过强**
+
+同时 patch 多层 layer_out 可能绕过自然动态，属于机制上界或路径容量测试，不等于真实逐层自然生成。
+
+3. **Qwen3 target cases 仍少**
+
+```text
+Qwen3 = 17 / 256
+```
+
+趋势一致，但不能作为强样本核心。
+
+4. **没有测试开放式 generation**
+
+仍然是 candidate logprob 测试。
+
+5. **只测 value gate**
+
+还未扩展到 category、relation、format、punctuation 的输出读出。
+
+### 下一步任务
+
+Phase627 应进入：
+
+```text
+Natural Generation Token-Position Closure
+自然生成逐词元闭环
+```
+
+核心目标：
+
+```text
+把 Phase626 的逐 token 位置结论从 candidate logprob 推到实际 generation。
+```
+
+测试方案：
+
+```text
+1. 固定 DS7B 为主，Qwen3/GLM4 验证。
+2. 使用相同 value gate cases。
+3. 对比自然 greedy generation：
+   - base prompt
+   - repair prompt
+   - result_only patch
+   - cumulative_layer_out patch
+   - final_output_all patch
+   - random controls
+4. 记录逐 token 生成：
+   - token0 是否总是共享 ' v'
+   - token1 是否被正确切换
+   - token2 是否跟随 token1 或仍需独立修复
+5. 不只看最终字符串是否正确，还要看每个 token position 的生成分布变化。
+```
+
+阶段性大任务：
+
+```text
+从 candidate logprob 图谱推进到真实自回归生成图谱。
+如果 Phase627 成功，value gate 将第一次形成：
+  selection -> result carrier -> final norm -> token-position generation
+的完整闭环。
+```
+
+## Phase 627: Natural Generation Token-Position Closure Audit 自然生成词元位置闭环审计 [2026-06-25 12:23]
+
+### 本阶段目标
+
+根据 Phase626 的结论，继续检查一个更严格的问题：
+
+```text
+candidate logprob 中已经能恢复正确值词元，
+但真实 autoregressive greedy generation 中是否也能生成正确答案。
+```
+
+Phase626 已经证明：
+
+```text
+1. value candidate 的真实竞争不在共享前缀 token0，而在第一个区分 token。
+2. result_only 与 cumulative_layer_out 可以强烈修复 candidate margin。
+3. final_output_all 在 teacher-forced candidate logprob 中接近上界。
+```
+
+Phase627 进一步测试：
+
+```text
+同一套 result / cumulative / final patch，
+能否在自然 greedy generation 中完成 token-position 级别闭环。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase627_natural_generation_token_position_closure.py
+tests/glm5/phase627_natural_generation_token_position_summary.py
+```
+
+脚本原则：
+
+```text
+1. 不使用 transformers generate，手写 greedy loop，保证每一步可 hook。
+2. 每个生成 step 都重新 forward，并在对应位置施加 patch。
+3. 使用 teacher-forced correct answer cache 作为 donor。
+4. 同时统计 exact string、wrong exact、prefix length、token-position hit。
+5. 添加 random same-shape control。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase627_natural_generation_token_position_closure.py \
+  tests/glm5/phase627_natural_generation_token_position_summary.py
+
+python tests/glm5/phase627_natural_generation_token_position_closure.py qwen3 \
+  --smoke --include-nontarget \
+  --output-dir results/glm5_phase627_natural_generation_token_position_closure \
+  --hard-exit-after-model
+
+python tests/glm5/phase627_natural_generation_token_position_closure.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase627_natural_generation_token_position_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase627_natural_generation_token_position_closure.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase627_natural_generation_token_position_closure \
+  --hard-exit-after-model
+
+python tests/glm5/phase627_natural_generation_token_position_closure.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase627_natural_generation_token_position_closure \
+  --hard-exit-after-model
+
+python tests/glm5/phase627_natural_generation_token_position_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase627_natural_generation_token_position_closure/phase627_qwen3_natural_generation_token_position_closure_confirm.json
+results/glm5_phase627_natural_generation_token_position_closure/phase627_glm4_natural_generation_token_position_closure_confirm.json
+results/glm5_phase627_natural_generation_token_position_closure/phase627_deepseek7b_natural_generation_token_position_closure_confirm.json
+results/glm5_phase627_natural_generation_token_position_closure/phase627_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+confirm rows after target filtering:
+  qwen3 = 17
+  glm4 = 31
+  deepseek7b = 82
+
+modes:
+  base
+  repair_prompt
+  result_only
+  result_random
+  cumulative_layer_out
+  cumulative_layer_out_random
+  final_output_all
+  final_output_random_all
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+base:
+  exact = 1/17
+  wrong_exact = 9/17
+  prefix_mean = 0.706
+  token hit = tok0 0.588, tok1 0.059, tok2 0.059
+
+repair_prompt:
+  exact = 11/17
+  wrong_exact = 3/17
+  prefix_mean = 2.118
+  token hit = tok0 0.824, tok1 0.824, tok2 0.824
+
+result_only:
+  exact = 8/17
+  wrong_exact = 2/17
+  prefix_mean = 1.529
+  token hit = tok0 0.588, tok1 0.882, tok2 0.647
+
+cumulative_layer_out:
+  exact = 10/17
+  wrong_exact = 0/17
+  prefix_mean = 1.765
+  token hit = tok0 0.588, tok1 1.000, tok2 0.824
+
+result_random:
+  exact = 0/17
+  wrong_exact = 10/17
+  token hit = tok0 0.588, tok1 0.059, tok2 0.059
+
+cumulative_layer_out_random:
+  exact = 2/17
+  wrong_exact = 8/17
+  token hit = tok0 0.588, tok1 0.235, tok2 0.176
+
+final_output_all:
+  exact = 0/17
+  wrong_exact = 0/17
+  token hit = tok0 0.588, tok1 0.000, tok2 0.235
+```
+
+Qwen3 的结果说明：
+
+```text
+result_only 与 cumulative_layer_out 在自然生成中真实推动了第一个区分词元。
+但 exact closure 仍然没有完全闭合。
+final_output_all 在生成中失败，常出现重复共享前缀或错位输出。
+```
+
+#### GLM4 bf16
+
+```text
+base:
+  exact = 2/31
+  wrong_exact = 9/31
+  prefix_mean = 0.419
+  token hit = tok0 0.355, tok1 0.065
+
+repair_prompt:
+  exact = 28/31
+  wrong_exact = 1/31
+  prefix_mean = 1.839
+  token hit = tok0 0.935, tok1 0.903
+
+result_only:
+  exact = 10/31
+  wrong_exact = 0/31
+  prefix_mean = 0.677
+  token hit = tok0 0.355, tok1 0.935
+
+cumulative_layer_out:
+  exact = 11/31
+  wrong_exact = 0/31
+  prefix_mean = 0.710
+  token hit = tok0 0.355, tok1 1.000
+
+result_random:
+  exact = 0/31
+  wrong_exact = 11/31
+  token hit = tok0 0.355, tok1 0.065
+
+cumulative_layer_out_random:
+  exact = 2/31
+  wrong_exact = 9/31
+  token hit = tok0 0.355, tok1 0.226
+
+final_output_all:
+  exact = 0/31
+  wrong_exact = 0/31
+  token hit = tok0 0.355, tok1 0.000
+```
+
+GLM4 的结果说明：
+
+```text
+result_only 与 cumulative_layer_out 几乎完全修复第一个区分词元。
+但 token0 共享前缀/格式位置仍然没有被修复，所以 exact 只到 10/31 和 11/31。
+```
+
+#### DS7B
+
+```text
+base:
+  exact = 0/82
+  wrong_exact = 0/82
+  prefix_mean = 0.000
+  token hit = tok0 0.000, tok1 0.000, tok2 0.000
+
+repair_prompt:
+  exact = 20/82
+  wrong_exact = 0/82
+  prefix_mean = 0.732
+  token hit = tok0 0.244, tok1 0.256, tok2 0.256
+
+result_only:
+  exact = 0/82
+  wrong_exact = 0/82
+  prefix_mean = 0.000
+  token hit = tok0 0.000, tok1 0.902, tok2 0.049
+
+cumulative_layer_out:
+  exact = 0/82
+  wrong_exact = 0/82
+  prefix_mean = 0.000
+  token hit = tok0 0.000, tok1 0.988, tok2 0.024
+
+result_random:
+  exact = 0/82
+  wrong_exact = 0/82
+  token hit = tok0 0.000, tok1 0.110, tok2 0.000
+
+cumulative_layer_out_random:
+  exact = 0/82
+  wrong_exact = 0/82
+  token hit = tok0 0.000, tok1 0.098, tok2 0.000
+
+final_output_all:
+  exact = 0/82
+  wrong_exact = 0/82
+  token hit = tok0 0.000, tok1 0.000, tok2 0.293
+```
+
+DS7B 的结果说明：
+
+```text
+result_only 与 cumulative_layer_out 已经能强烈修复第一个区分词元：
+  tok1: 0.000 -> 0.902 -> 0.988
+
+但 token0 格式/前缀完全失败：
+  tok0: 0.000
+
+所以 exact generation 仍然是 0/82。
+```
+
+### 当前最可靠客观事实
+
+1. **Phase626 的 candidate logprob 闭环不是假象。**
+
+在自然 greedy generation 中，result_only 与 cumulative_layer_out 仍然显著推动正确的第一个区分词元：
+
+```text
+Qwen3 tok1:
+  base 0.059
+  result_only 0.882
+  cumulative_layer_out 1.000
+
+GLM4 tok1:
+  base 0.065
+  result_only 0.935
+  cumulative_layer_out 1.000
+
+DS7B tok1:
+  base 0.000
+  result_only 0.902
+  cumulative_layer_out 0.988
+```
+
+2. **完整字符串生成没有闭合。**
+
+```text
+Qwen3:
+  base exact 1/17
+  result_only exact 8/17
+  cumulative exact 10/17
+
+GLM4:
+  base exact 2/31
+  result_only exact 10/31
+  cumulative exact 11/31
+
+DS7B:
+  base exact 0/82
+  result_only exact 0/82
+  cumulative exact 0/82
+```
+
+3. **当前机制修复的是 semantic value discriminative token，不是完整 format/prefix generation。**
+
+尤其 DS7B：
+
+```text
+result_only / cumulative_layer_out 可以让 tok1 接近正确，
+但 tok0 完全不正确。
+```
+
+这说明：
+
+```text
+value semantic path 与 format/prefix path 是可分离的。
+```
+
+4. **final_output_all 在 candidate logprob 中是上界，但在自然生成中不是上界。**
+
+Phase626 中：
+
+```text
+final_output_all 接近 full repair upper bound。
+```
+
+Phase627 中：
+
+```text
+final_output_all exact = 0
+tok1 hit 反而很低。
+```
+
+常见现象是重复共享前缀、错位输出或自回归反馈污染。
+
+因此：
+
+```text
+final norm patch 是 position-conditioned 和 prefix-conditioned 的，
+不能直接当成自然生成闭环证明。
+```
+
+5. **random control 明显弱于真实 result/cumulative patch。**
+
+```text
+result_random 与 cumulative_layer_out_random 无法稳定修复 tok1。
+```
+
+这说明主效应不是随机范数注入。
+
+### 对附件 Phase626 分析的判断
+
+附件中认为 Phase626 是关键读出桥接阶段，这个判断正确。
+
+正确部分：
+
+```text
+1. Phase626 确实把 result carrier 推进到 final norm / output margin。
+2. 第一个区分词元是 value candidate 的真实竞争位置。
+3. 需要继续测试自然生成，而不是停留在 candidate logprob。
+4. result path 与 generation path 之间可能存在缺口。
+```
+
+需要修正的部分：
+
+```text
+Phase626 不能被解释成完整 generation closure。
+Phase627 已经证明：
+  result/cumulative 可以修复语义区分词元，
+  但不能自动修复共享前缀、格式 token、自回归反馈。
+```
+
+### 理论进展
+
+当前 value gate 的结构应从：
+
+```text
+selection -> result carrier -> final readout -> generation
+```
+
+修正为：
+
+```text
+selection state
+  -> semantic result carrier
+  -> discriminative value token readout
+
+format/prefix state
+  -> shared-prefix token generation
+  -> autoregressive alignment
+
+两者共同决定完整自然生成。
+```
+
+更具体地说：
+
+```text
+result carrier 主要控制“该选哪个值”；
+format/prefix carrier 控制“答案以什么形式进入生成轨道”；
+final output state 只有在 teacher-forced prefix 对齐时才像上界，
+在自由生成中可能被自回归反馈打散。
+```
+
+### 硬伤和边界
+
+1. **donor cache 仍然来自 teacher-forced correct answer。**
+
+这证明的是 causal repair，而不是模型自发完成正确 reasoning。
+
+2. **target rows 是筛选后的 value-gate 子集。**
+
+本阶段是机制闭环审计，不是全任务准确率评估。
+
+3. **exact generation 对 prompt 格式非常敏感。**
+
+尤其 DS7B，semantic token 被修复但 prefix token 失败，导致 exact 仍为 0。
+
+4. **final_output_all 的失败说明 candidate logprob 与 natural generation 不能混用。**
+
+以后必须把：
+
+```text
+teacher-forced candidate score
+natural greedy generation
+sampled generation
+```
+
+分开记录。
+
+### 下一步 Phase628
+
+Phase628 应做：
+
+```text
+Prefix/Format Gate and Semantic Value Integration
+```
+
+核心问题：
+
+```text
+如果先修复或强制正确 token0 共享前缀，
+result_only / cumulative_layer_out 是否能把 exact generation 闭合。
+```
+
+建议测试模式：
+
+```text
+1. base
+2. prefix_forced_only
+3. result_only
+4. cumulative_layer_out
+5. prefix_forced + result_only
+6. prefix_forced + cumulative_layer_out
+7. format_patch_only
+8. semantic_patch_only
+9. format_patch + semantic_patch
+10. random controls
+```
+
+关键指标：
+
+```text
+exact generation
+wrong exact
+token0 shared-prefix hit
+first discriminative token hit
+full prefix length
+self-feeding drift examples
+```
+
+如果 Phase628 成功，当前 value gate 图谱将变成：
+
+```text
+format/prefix gate + semantic value gate -> natural generation closure
+```
+
+这比继续扩大 hidden patch 搜索更接近语言编码机制的真实结构。

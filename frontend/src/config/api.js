@@ -4,10 +4,10 @@
  */
 
 export const API_CONFIG = {
-  main: 'http://localhost:5001',
-  analysis: 'http://localhost:5001',
-  training: 'http://localhost:8000',
-  frontend: 'http://localhost:5173',
+  main: import.meta.env.VITE_API_BASE || 'http://localhost:5001',
+  analysis: import.meta.env.VITE_ANALYSIS_API_BASE || import.meta.env.VITE_API_BASE || 'http://localhost:5001',
+  training: import.meta.env.VITE_TRAINING_API_BASE || 'http://localhost:8000',
+  frontend: import.meta.env.VITE_FRONTEND_BASE || 'http://localhost:5173',
 };
 
 export const API_ENDPOINTS = {

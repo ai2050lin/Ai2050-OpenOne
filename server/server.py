@@ -1,10 +1,10 @@
 import os
 
 # Set environment variables for model loading
-os.environ["HF_HOME"] = r"D:\develop\model"
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+os.environ.setdefault("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 # 强制允许解冻加载，修复 Cannot load file containing pickled data when allow_pickle=False
-os.environ["TORCH_FORCE_WEIGHTS_ONLY_LOAD"] = "0" 
+os.environ.setdefault("TORCH_FORCE_WEIGHTS_ONLY_LOAD", "0")
 
 import json
 import os
