@@ -85524,3 +85524,1813 @@ cross-model polarity
 进入
 “机制图谱节点标准化”。
 ```
+
+## Phase 646: Global Reuse-Difference Protocol Atlas Schema and First Batch [2026-06-25 22:13]
+
+### 任务背景
+
+用户上传的 Phase 645 评价基本正确。Phase 645 的关键意义不是继续证明 L17-L20 protocol trajectory 可以修复 DS7B 目标失败样本，而是证明该轨迹有清晰边界：
+
+```text
+在 value short-answer task 中是修复器；
+在 explanation / non-value / relation_changed 中会变成副作用源。
+```
+
+因此下一步不能继续只做单点 patch，而应把已有结果整理成机制图谱节点。Phase 646 执行的是 atlas infrastructure，不重新运行 CUDA 模型。
+
+### 本阶段脚本
+
+```text
+tests/gpt5/phase646_global_reuse_difference_protocol_atlas.py
+```
+
+### 执行命令
+
+```bash
+python tests/gpt5/phase646_global_reuse_difference_protocol_atlas.py
+python -m py_compile tests/gpt5/phase646_global_reuse_difference_protocol_atlas.py
+```
+
+### 输入证据
+
+```text
+results/glm5_phase641_separator_protocol_formation_interval_audit/
+results/glm5_phase642_endpoint_dominance_vs_distributed_formation/
+results/glm5_phase643_protocol_trajectory_natural_generation_closure/
+results/glm5_phase645_protocol_trajectory_side_effect_boundary_atlas/
+```
+
+### 输出文件
+
+```text
+results/glm5_phase646_global_reuse_difference_protocol_atlas/phase646_atlas_index.json
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_nodes.jsonl
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_edges.jsonl
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_evidence.jsonl
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_boundary_profiles.jsonl
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_boundary_matrix.csv
+results/glm5_phase646_global_reuse_difference_protocol_atlas/atlas_schema.json
+results/glm5_phase646_global_reuse_difference_protocol_atlas/phase646_atlas_report.md
+```
+
+### 生成规模
+
+```text
+nodes = 54
+edges = 80
+boundary_profiles = 18
+trajectory_evidence = 41
+```
+
+### Atlas 第一批机制节点
+
+```text
+mechanism:value_short_answer_protocol
+mechanism:newline_explanation_protocol
+mechanism:non_value_answer_protocol
+```
+
+这三个节点不是最终全局图谱，只是第一批 protocol atlas nodes。它们的目的不是总结全部语言机制，而是把当前最清楚的 value / newline / non-value 协议分化先标准化。
+
+### 边界矩阵核心结果
+
+#### qwen3
+
+```text
+target_failure:
+original exact/newline = 19/0
+to_original_restore exact/newline = 2/22
+polarity = harmful_or_opposite_protocol
+
+original_correct:
+original exact/newline = 28/0
+to_original_restore exact/newline = 8/36
+polarity = harmful_or_opposite_protocol
+```
+
+qwen3 的结果再次证明：不能把 DS7B 的 separator trajectory 当作通用字符规则。对 qwen3 来说，该轨迹方向更接近反向或有害极性。
+
+#### GLM4
+
+```text
+target_failure:
+original exact/newline = 29/0
+to_original_restore exact/newline = 27/0
+polarity = weak_or_neutral
+
+explanation_needed:
+original exact/newline = 0/0
+to_original_restore exact/newline = 0/0
+polarity = boundary_respected_or_neutral
+```
+
+GLM4 没有明显 newline 竞争瓶颈，当前 atlas 中应记录为 weak / neutral polarity，而不是强行纳入 DS7B 同构机制。
+
+#### DS7B
+
+```text
+target_failure:
+original exact/newline = 12/34
+to_original_restore exact/newline = 45/0
+polarity = beneficial_value_protocol
+
+original_correct:
+original exact/newline = 8/36
+to_original_restore exact/newline = 48/0
+polarity = beneficial_value_protocol
+
+relation_changed:
+original old_exact/newline = 4/32
+to_original_restore old_exact/newline = 17/0
+polarity = side_effect_value_absorption
+
+explanation_needed:
+original old_exact/newline = 0/0
+to_original_restore old_exact/newline = 43/0
+polarity = side_effect_value_absorption
+
+non_value:
+original old_exact/newline = 0/28
+to_original_restore old_exact/newline = 23/8
+polarity = side_effect_value_absorption
+```
+
+DS7B 形成当前第一个清楚的 atlas node：
+
+```text
+value_short_answer_protocol:
+  causal unit = separator boundary
+  trajectory interval = L17-L20 / middle L18-L19
+  component = layer_out
+  generation closure = yes
+  side effect = relation_changed / explanation_needed / non_value
+  cross-model polarity = DS7B positive, qwen3 opposite, GLM4 weak-neutral
+```
+
+### 本阶段进展
+
+Phase 646 把研究从散落的 Phase 结果推进到标准化图谱结构。现在每个机制节点至少需要记录：
+
+```text
+causal_unit
+trajectory_interval
+sufficiency
+necessity
+generation_closure
+semantic_boundary
+task_boundary
+output_type_boundary
+side_effect_profile
+cross_model_polarity
+```
+
+这使得后续研究可以继续添加 evidence rows，而不是每次重新写一套孤立分析。
+
+### 理论收紧
+
+此前公式：
+
+```text
+P(c_hat = c | B,T,O,R)
+≈
+P(G_protocol(B,T,O,R))
+* P(G_prefix | G_protocol)
+* P(G_value | R,T,O)
+* P(G_confirm | context)
+```
+
+Phase 646 后应加入 atlas node 维度：
+
+```text
+G_protocol(B,T,O,R; M_i)
+```
+
+其中：
+
+```text
+M_i = mechanism node in atlas
+```
+
+因此机制不再被看成单个向量或单个 patch，而是图谱节点：
+
+```text
+M_i =
+{
+  causal_unit,
+  trajectory_interval,
+  component,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+当前理论表述应更新为：
+
+```text
+语言能力来自同一参数骨架在不同边界、任务、语义和输出类型条件下生成的状态轨迹。
+这些轨迹不是孤立正确状态，而是 atlas nodes。
+破解语言编码机制的核心不是找到单个方向，而是建立机制节点之间的条件化图谱。
+```
+
+### 问题和硬伤
+
+1. Phase 646 没有新增模型测试，只是结构化已有证据。
+2. atlas 当前只有 protocol 机制的第一批节点，知识网络、推理链路、语法系统还没有统一接入。
+3. writer graph 仍未完成，value_short_answer_protocol 目前主要停留在 layer_out trajectory 层级。
+4. relation_changed 仍只有少量关系类型，语义边界需要扩展。
+5. non_value 主要是 yes/no，输出类型边界还需要加入数字、列表、JSON、自由文本。
+6. 当前极性分类是基础阈值规则，不是最终理论判断。
+
+### 是否应该自动继续
+
+本阶段目标是完成 atlas schema 和 first batch，已经完成。接下来可以继续自动进入 Phase 647，但 Phase 647 会重新涉及模型测试和 writer graph 拆解，工作量会明显增加。
+
+### 下一阶段
+
+Phase 647 应执行：
+
+```text
+Protocol Writer Graph Audit
+```
+
+目标：
+
+```text
+把 atlas 中的 value_short_answer_protocol 节点从 layer_out trajectory 继续拆到 attention / MLP / residual update writer。
+```
+
+具体任务：
+
+```text
+1. 固定 DS7B value_short_answer_protocol 目标样本。
+2. 对 L17-L20 / L18-L19 进行 writer attribution。
+3. 拆分 attention output、MLP update、residual carried state。
+4. 测试 writer-level sufficiency / necessity。
+5. 把结果追加到 Phase646 atlas，而不是另起孤立结论。
+```
+
+阶段目标：
+
+```text
+从 protocol trajectory atlas node
+推进到
+protocol writer graph node。
+```
+
+## Phase 647: Protocol Writer Graph Audit [2026-06-25 22:53]
+
+### 任务背景
+
+用户上传的 Phase 646 评价基本正确：Phase 646 的核心意义不是新因果实验，而是把 Phase 641 到 Phase 645 的局部闭环整理为 atlas node。它的保守边界也正确：当前图谱主要是 protocol atlas，writer graph 仍缺失。
+
+因此本阶段继续执行 Phase 647：
+
+```text
+Protocol Writer Graph Audit
+```
+
+目标是把 atlas 中的：
+
+```text
+mechanism:value_short_answer_protocol
+```
+
+从：
+
+```text
+layer_out trajectory
+```
+
+进一步拆成：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+```
+
+并测试：
+
+```text
+to_original = sufficiency
+remove_from_inline = necessity
+```
+
+### 本阶段脚本
+
+```text
+tests/gpt5/phase647_protocol_writer_graph_audit.py
+tests/gpt5/phase647_protocol_writer_graph_audit_summary.py
+tests/gpt5/phase647_protocol_writer_graph_atlas_update.py
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python -m py_compile tests/gpt5/phase647_protocol_writer_graph_audit.py tests/gpt5/phase647_protocol_writer_graph_audit_summary.py
+python tests/gpt5/phase647_protocol_writer_graph_audit.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase647_protocol_writer_graph_audit.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式三模型顺序测试：
+
+```bash
+python tests/gpt5/phase647_protocol_writer_graph_audit.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase647_protocol_writer_graph_audit.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase647_protocol_writer_graph_audit.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase647_protocol_writer_graph_audit_summary.py
+python tests/gpt5/phase647_protocol_writer_graph_atlas_update.py
+python -m py_compile tests/gpt5/phase647_protocol_writer_graph_atlas_update.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase647_protocol_writer_graph_audit/phase647_qwen3_protocol_writer_graph_audit_confirm.json
+results/glm5_phase647_protocol_writer_graph_audit/phase647_glm4_protocol_writer_graph_audit_confirm.json
+results/glm5_phase647_protocol_writer_graph_audit/phase647_deepseek7b_protocol_writer_graph_audit_confirm.json
+results/glm5_phase647_protocol_writer_graph_audit/phase647_cross_model_summary.md
+results/glm5_phase647_protocol_writer_graph_audit/phase647_writer_graph_atlas_update.md
+results/glm5_phase647_protocol_writer_graph_audit/phase647_writer_graph_nodes.jsonl
+results/glm5_phase647_protocol_writer_graph_audit/phase647_writer_graph_edges.jsonl
+results/glm5_phase647_protocol_writer_graph_audit/phase647_writer_graph_evidence.jsonl
+```
+
+atlas update 规模：
+
+```text
+writer_candidate_nodes = 72
+writer_edges = 72
+writer_evidence_rows = 72
+```
+
+### 测试原理
+
+在 target failure cases 上，对 separator boundary 位置的 L17-L20 轨迹进行组件级 patch：
+
+```text
+components = layer_input, attn_out, mlp_out, layer_out
+layers = 17,18,19,20
+intervals = L17-L20, L18-L19
+```
+
+每个 patch 分两类：
+
+```text
+to_original:
+  把 inline 的组件状态写入 original。
+  如果 exact 上升、newline 降低，说明该组件/位置具有 sufficiency。
+
+remove_from_inline:
+  把 original 的组件状态写入 inline。
+  如果 exact 下降、newline 上升，说明该组件/位置具有 necessity。
+```
+
+核心观察不只是 exact，还包括：
+
+```text
+tok0_hit
+newline_top0
+mean_prefix_rank
+generation_text
+```
+
+### 三模型总体结果
+
+#### qwen3
+
+```text
+raw_cases = 320
+target_seen = 26
+cases_written = 26
+mode_rows = 2444
+```
+
+baseline：
+
+```text
+original exact = 19/26, newline = 0/26
+inline exact = 0/26, newline = 15/26
+```
+
+qwen3 再次证明它和 DS7B 极性相反：inline 本身是坏协议。
+
+主要 sufficiency：
+
+```text
+to_original_interval_L18_19_attn_out_restore:
+  exact = 21/26
+  newline = 0/26
+
+to_original_L19_mlp_out_restore:
+  exact = 20/26
+  newline = 0/26
+
+to_original_L20_attn_out_restore:
+  exact = 20/26
+  newline = 0/26
+```
+
+主要 necessity：
+
+```text
+remove_from_inline_interval_L18_19_mlp_out_restore:
+  exact = 0/26
+  newline = 26/26
+
+remove_from_inline_L19_mlp_out_restore:
+  exact = 0/26
+  newline = 26/26
+```
+
+但由于 qwen3 的 inline 本身是坏协议，所以这里不能解释为 DS7B 同构机制，只能记为：
+
+```text
+qwen3 opposite-polarity protocol writer pattern
+```
+
+#### GLM4
+
+```text
+raw_cases = 320
+target_seen = 36
+cases_written = 36
+mode_rows = 3384
+```
+
+baseline：
+
+```text
+original exact = 29/36, newline = 0/36
+inline exact = 27/36, newline = 0/36
+```
+
+GLM4 没有 newline bottleneck。
+
+主要 sufficiency：
+
+```text
+to_original_interval_L18_19_attn_out_restore:
+  exact = 30/36
+  newline = 0/36
+
+to_original_L19_attn_out_restore:
+  exact = 29/36
+  newline = 0/36
+
+to_original_L18_attn_out_restore:
+  exact = 29/36
+  newline = 0/36
+```
+
+主要 necessity：
+
+```text
+remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 10/36
+  newline = 0/36
+
+remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 17/36
+  newline = 0/36
+```
+
+GLM4 的结果说明：有 writer-level 可影响读出，但不是 DS7B 那种 newline gate。它更像 value / label ranking 改变，而不是 protocol newline switch。
+
+#### DS7B
+
+```text
+raw_cases = 320
+target_seen = 48
+cases_written = 48
+mode_rows = 4512
+```
+
+baseline：
+
+```text
+original exact = 12/48, newline = 34/48
+inline exact = 45/48, newline = 0/48
+```
+
+DS7B 的 sufficiency 最强结果：
+
+```text
+to_original_L17_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+to_original_L18_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+to_original_L19_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+to_original_L17_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+to_original_L18_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+to_original_interval_L18_19_layer_out_restore:
+  exact = 45/48
+  newline = 0/48
+
+to_original_interval_L17_20_layer_out_restore:
+  exact = 43/48
+  newline = 0/48
+```
+
+DS7B 的 necessity 最强结果：
+
+```text
+remove_from_inline_interval_L17_20_layer_out_restore:
+  exact = 12/48
+  newline = 35/48
+
+remove_from_inline_L20_layer_out_restore:
+  exact = 12/48
+  newline = 35/48
+
+remove_from_inline_interval_L18_19_layer_out_restore:
+  exact = 14/48
+  newline = 30/48
+
+remove_from_inline_L19_layer_out_restore:
+  exact = 14/48
+  newline = 30/48
+
+remove_from_inline_L20_layer_input_restore:
+  exact = 14/48
+  newline = 30/48
+```
+
+组件级结果：
+
+```text
+to_original_interval_L17_20_mlp_out_restore:
+  exact = 33/48
+  newline = 4/48
+
+to_original_interval_L17_20_attn_out_restore:
+  exact = 0/48
+  newline = 17/48
+
+remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 8/48
+  newline = 0/48
+
+remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 22/48
+  newline = 22/48
+```
+
+### 核心结论
+
+Phase 647 是一个关键正结果，但结论必须谨慎。
+
+DS7B 中最强 writer graph 证据不是：
+
+```text
+某一个 attention 或 MLP 组件单独写入完整 value short-answer protocol。
+```
+
+而是：
+
+```text
+协议态已经作为 residual carried state 在 layer_input / layer_out 之间传播。
+```
+
+特别是：
+
+```text
+L17 layer_input
+L17 layer_out
+L18 layer_input
+L18 layer_out
+L19 layer_input
+L19 layer_out
+L20 layer_input / layer_out
+```
+
+形成了一个高度连续的 residual protocol carrier chain。
+
+这说明：
+
+```text
+value_short_answer_protocol 不是单层 writer；
+它是已经成形的状态轨迹，在 L17-L20 的残差流中被携带和维护。
+```
+
+MLP 与 attention 的角色不对称：
+
+```text
+MLP 在部分 sufficiency 上有效，尤其 L17-L20 interval mlp_out 可达 33/48；
+但不能单独解释完整闭合。
+
+attention interval 在 DS7B to_original 中反而失败，说明注意力输出不是简单可移植的完整协议态；
+但 remove_from_inline L17-L20 attn_out 会把 exact 降到 8/48，说明 attention 对 inline 轨道中的 value support / pattern stability 仍有必要性影响。
+```
+
+因此最新图谱节点应更新为：
+
+```text
+mechanism:value_short_answer_protocol
+  primary carrier = residual stream layer_input/layer_out chain
+  partial writers = MLP updates and attention updates
+  strongest interval = L17-L20, especially L18-L19 / L20 readout boundary
+  natural closure = yes
+  side-effect boundary = yes
+```
+
+### 对 Phase 646 的修正
+
+Phase 646 中说：
+
+```text
+trajectory_interval = L17-L20 / L18-L19
+component = layer_out
+```
+
+Phase 647 后应收紧为：
+
+```text
+trajectory_interval = L17-L20
+carrier = residual stream chain
+observable states = layer_input and layer_out
+partial component contribution = MLP / attention
+not yet closed = exact writer decomposition
+```
+
+### 理论进展
+
+Phase 646 的机制节点公式是：
+
+```text
+M_i =
+{
+  causal_unit,
+  trajectory_interval,
+  component,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+Phase 647 后需要加入 writer graph：
+
+```text
+M_i =
+{
+  causal_unit,
+  trajectory_interval,
+  carrier_chain,
+  writer_candidates,
+  sufficiency_profile,
+  necessity_profile,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+对应到当前 DS7B：
+
+```text
+carrier_chain =
+[
+  L17.layer_input,
+  L17.layer_out,
+  L18.layer_input,
+  L18.layer_out,
+  L19.layer_input,
+  L19.layer_out,
+  L20.layer_input,
+  L20.layer_out
+]
+```
+
+```text
+writer_candidates =
+[
+  L17-L20.mlp_out,
+  L17-L20.attn_out,
+  L18-L19.layer_out,
+  L20.layer_out
+]
+```
+
+但注意：
+
+```text
+writer_candidates != fully isolated writers
+```
+
+它们目前只是 candidate graph nodes，不是完整机制闭合。
+
+### 问题和硬伤
+
+1. `layer_input` 强效说明协议态已经在进入该层前形成，不能把该层称为唯一写入源。
+2. `layer_out` 强效可能包含多个子组件和残差携带，仍不是纯 writer。
+3. `attn_out` 和 `mlp_out` 出现方向不对称，说明组件 patch 可能扰动了组合状态，不能直接线性解释。
+4. qwen3 是反向极性，GLM4 是弱/中性极性，因此跨模型统一对象仍应是功能图谱，而不是固定层号。
+5. 当前只测试 separator 位置，没有把 writer graph 扩展到 answer label、prompt_last、question tail 等多位置。
+6. 当前只在 target failure 上做 writer graph，还没有重新测试 side-effect writer 是否同源。
+
+### 是否应该继续自动完成下一步
+
+本阶段目标已经完成：
+
+```text
+从 protocol trajectory atlas node
+推进到 protocol writer graph candidate node。
+```
+
+但下一步 Phase 648 会继续扩大到 multi-position writer graph，需要较大模型测试。若继续自动完成，应把重点从“单 separator writer”扩展到：
+
+```text
+separator
+answer_label
+prompt_last
+question_mark_answer
+relation_tail
+```
+
+### 下一阶段
+
+Phase 648 应执行：
+
+```text
+Multi-Position Protocol Writer Graph Audit
+```
+
+目标：
+
+```text
+检查 DS7B 的 value_short_answer_protocol carrier chain 是否只在 separator boundary，
+还是由 separator + answer_label + prompt_last 等多个边界位置共同维持。
+```
+
+测试应覆盖：
+
+```text
+positions:
+  separator
+  answer_label
+  prompt_last
+  question_mark_answer
+  relation_tail
+
+components:
+  layer_input
+  attn_out
+  mlp_out
+  layer_out
+
+directions:
+  to_original
+  remove_from_inline
+
+metrics:
+  exact
+  newline_top0
+  prefix_rank
+  natural generation text
+```
+
+阶段目标：
+
+```text
+从 single-boundary writer candidate graph
+推进到 multi-position protocol writer graph。
+```
+
+## Phase 648: Multi-Position Protocol Writer Graph Audit [2026-06-25 23:40]
+
+### 本阶段问题
+
+本阶段分析了用户上传的 Phase 647 复核内容。复核内容基本正确，而且比 Phase 647 原始结论更严谨：
+
+```text
+Phase 647 不是找到了完整 writer，
+而是把 value_short_answer_protocol 从 layer_out trajectory
+推进到 residual carrier chain + writer candidate graph。
+```
+
+因此 Phase 648 继续完成下一步：
+
+```text
+检查 value_short_answer_protocol 是否只是 separator boundary 的局部现象，
+还是在 prompt_last、question_mark_answer、relation_tail 等多个边界位置共同出现。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py
+tests/gpt5/phase648_multi_position_protocol_writer_graph_audit_summary.py
+```
+
+结果目录：
+
+```text
+results/glm5_phase648_multi_position_protocol_writer_graph_audit/
+```
+
+主要结果文件：
+
+```text
+phase648_qwen3_multi_position_protocol_writer_graph_audit_confirm.json
+phase648_glm4_multi_position_protocol_writer_graph_audit_confirm.json
+phase648_deepseek7b_multi_position_protocol_writer_graph_audit_confirm.json
+phase648_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py tests/gpt5/phase648_multi_position_protocol_writer_graph_audit_summary.py
+```
+
+smoke test：
+
+```bash
+python tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试，三模型顺序执行：
+
+```bash
+python tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase648_multi_position_protocol_writer_graph_audit.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase648_multi_position_protocol_writer_graph_audit_summary.py
+```
+
+### 测试原理
+
+Phase 647 只在 separator boundary 做 writer candidate audit。Phase 648 加入 position 维度：
+
+```text
+separator
+answer_label
+prompt_last
+question_mark_answer
+relation_tail
+```
+
+对每个位置测试两类方向：
+
+```text
+to_original:
+  inline prompt 的状态 patch 到 original prompt，
+  测充分性。
+
+remove_from_inline:
+  original prompt 的状态 patch 到 inline prompt，
+  测必要性。
+```
+
+测试组件：
+
+```text
+single-layer components:
+  layer_input
+  layer_out
+
+interval components:
+  attn_out
+  mlp_out
+  layer_out
+```
+
+测试层区间：
+
+```text
+L17-L20
+L18-L19
+```
+
+评价指标：
+
+```text
+exact
+tok0_hit
+newline_top0
+prefix_rank
+generation_text
+```
+
+### 客观结果
+
+#### qwen3
+
+```text
+raw_cases = 320
+target_seen = 26
+cases_written = 26
+mode_rows = 2964
+total_time_min = 6.58
+```
+
+baseline：
+
+```text
+original exact = 19/26, newline = 0/26
+inline   exact = 0/26,  newline = 15/26
+```
+
+最强充分性：
+
+```text
+question_mark_answer_to_original_interval_L17_20_attn_out_restore:
+  exact = 23/26
+  newline = 0/26
+
+prompt_last_to_original_interval_L18_19_attn_out_restore:
+  exact = 23/26
+  newline = 0/26
+
+separator_to_original_interval_L18_19_attn_out_restore:
+  exact = 21/26
+  newline = 0/26
+```
+
+最强必要性：
+
+```text
+separator_remove_from_inline_interval_L18_19_mlp_out_restore:
+  exact = 0/26
+  newline = 26/26
+
+prompt_last_remove_from_inline_L17_layer_input_restore:
+  exact = 0/26
+  newline = 14/26
+```
+
+qwen3 的结果与 Phase 647 一致，仍然呈现与 DS7B 不同的极性结构：它不是 DS7B 式的 value short-answer protocol 正向修复模型，而是表现出更强的 newline / reasoning format 竞争。
+
+#### GLM4
+
+```text
+raw_cases = 320
+target_seen = 36
+cases_written = 36
+mode_rows = 4104
+total_time_min = 10.41
+```
+
+baseline：
+
+```text
+original exact = 29/36, newline = 0/36
+inline   exact = 27/36, newline = 0/36
+```
+
+最强充分性：
+
+```text
+question_mark_answer_to_original_interval_L18_19_attn_out_restore:
+  exact = 34/36
+  newline = 0/36
+
+prompt_last_to_original_interval_L18_19_attn_out_restore:
+  exact = 30/36
+  newline = 0/36
+
+separator_to_original_interval_L18_19_attn_out_restore:
+  exact = 30/36
+  newline = 0/36
+```
+
+最强必要性：
+
+```text
+relation_tail_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 0/36
+  newline = 0/36
+
+question_mark_answer_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 2/36
+  newline = 0/36
+```
+
+GLM4 仍然不是 newline gate 模型。它的变化主要体现为 value token / explanation / word 输出竞争，不是 DS7B 的换行格式门。
+
+#### DS7B
+
+```text
+raw_cases = 320
+target_seen = 49
+cases_written = 48
+mode_rows = 5472
+total_time_min = 13.09
+```
+
+baseline：
+
+```text
+original exact = 12/48, newline = 34/48
+inline   exact = 45/48, newline = 0/48
+```
+
+最强充分性：
+
+```text
+separator_to_original_L17_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+separator_to_original_L18_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+separator_to_original_L19_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+prompt_last_to_original_L17_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+question_mark_answer_to_original_interval_L18_19_layer_out_restore:
+  exact = 45/48
+  newline = 0/48
+
+relation_tail_to_original_interval_L18_19_layer_out_restore:
+  exact = 45/48
+  newline = 0/48
+```
+
+最强必要性：
+
+```text
+relation_tail_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 1/48
+  newline = 0/48
+
+relation_tail_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 4/48
+  newline = 39/48
+
+prompt_last_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 5/48
+  newline = 2/48
+
+question_mark_answer_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 5/48
+  newline = 0/48
+
+relation_tail_remove_from_inline_interval_L17_20_layer_out_restore:
+  exact = 7/48
+  newline = 34/48
+
+separator_remove_from_inline_interval_L17_20_layer_out_restore:
+  exact = 12/48
+  newline = 35/48
+```
+
+### 关键进展
+
+Phase 648 证明：
+
+```text
+DS7B 的 value_short_answer_protocol 不是 separator-only 机制。
+```
+
+更准确的结构是：
+
+```text
+separator:
+  强 residual carrier，尤其 L17 layer_input / L18 layer_out / L19 layer_input。
+
+prompt_last:
+  也能强恢复，说明最终提示边界参与协议态承载。
+
+question_mark_answer:
+  L18-L19 layer_out 强恢复，说明问号到答案标签之间的局部格式跨度参与协议态。
+
+relation_tail:
+  L18-L19 layer_out 强恢复，且 remove_from_inline 的 L17-L20 attn_out / mlp_out 非常强，
+  说明关系尾部到答案边界不是语义尾巴，而是协议场的一部分。
+```
+
+因此，Phase 647 的图谱需要从：
+
+```text
+single-boundary residual carrier chain
+```
+
+升级为：
+
+```text
+multi-position protocol field
+```
+
+### 重要硬伤
+
+1. `answer_label` 没有被有效测试。原因是 original prompt 和 inline prompt 中 `Answer:` 的 token span 长度不一致，全部进入 `position_len_mismatch`。因此本阶段不能声称 answer_label 独立位置已经被覆盖。
+
+2. qwen3 / GLM4 / DS7B 仍不能用统一层号解释。跨模型统一对象应是 functional atlas node，而不是固定 L17-L20。
+
+3. DS7B 中 `relation_tail_remove_from_inline_interval_L17_20_attn_out_restore` 使 exact 降到 1/48，但 newline 仍为 0/48。这说明它破坏的不是简单 newline gate，而可能是 value support / token choice / format-preference 的混合状态。
+
+4. `relation_tail_remove_from_inline_interval_L17_20_mlp_out_restore` 同时 exact 降到 4/48、newline 升到 39/48，说明 MLP 对格式门更直接，但仍不能单独解释所有输出竞争。
+
+5. 本阶段没有随机 / reverse control，因为 Phase 648 主要目标是 position expansion。严格因果闭合仍需要下一阶段加 control。
+
+### 理论更新
+
+Phase 647 的机制节点：
+
+```text
+M_i =
+{
+  causal_unit,
+  trajectory_interval,
+  carrier_chain,
+  writer_candidates,
+  sufficiency_profile,
+  necessity_profile,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+Phase 648 后应扩展为：
+
+```text
+M_i =
+{
+  causal_unit_set,
+  position_field,
+  trajectory_interval,
+  carrier_chain,
+  writer_candidate_graph,
+  sufficiency_profile,
+  necessity_profile,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+其中 DS7B 的当前 position_field：
+
+```text
+position_field =
+{
+  separator,
+  prompt_last,
+  question_mark_answer,
+  relation_tail
+}
+```
+
+暂时不能包含：
+
+```text
+answer_label
+```
+
+因为 answer_label 的 tokenization alignment 失败。
+
+更具体地：
+
+```text
+value_short_answer_protocol_DS7B =
+  residual_carrier(separator, L17-L20)
+  + residual_carrier(prompt_last, L17-L18)
+  + layer_out_carrier(question_mark_answer, L18-L19)
+  + layer_out_carrier(relation_tail, L18-L19)
+  + attn/mlp necessity(relation_tail, L17-L20)
+```
+
+### 当前结论
+
+Phase 648 是关键正结果，但需要收紧：
+
+```text
+正确：
+  DS7B 的 value_short_answer_protocol 是多位置协议场，
+  不是单 separator 局部机制。
+
+不能说：
+  已经完成完整 writer graph。
+
+不能说：
+  answer_label 已经独立验证。
+
+不能说：
+  attn_out / mlp_out 是纯 writer。
+```
+
+### 下一阶段
+
+Phase 649 应执行：
+
+```text
+Answer-Label Tokenization Alignment and Protocol Field Control Audit
+```
+
+目标：
+
+```text
+1. 修正 answer_label 的 token span 对齐问题。
+2. 对 Phase 648 中最强位置加入 random / reverse control。
+3. 区分 relation_tail 的 attention 破坏到底是 value support 破坏，还是 format gate 破坏。
+```
+
+建议测试对象：
+
+```text
+positions:
+  answer_word
+  colon
+  answer_colon
+  answer_label_aligned
+  separator
+  prompt_last
+  question_mark_answer
+  relation_tail
+
+components:
+  layer_input
+  layer_out
+  attn_out
+  mlp_out
+
+intervals:
+  L17-L20
+  L18-L19
+
+controls:
+  restore
+  random
+  reverse
+```
+
+阶段目标：
+
+```text
+从 multi-position protocol field
+推进到 aligned protocol field with controls。
+```
+
+## Phase 649: Answer-Label Alignment and Protocol Field Control Audit [2026-06-26 01:00]
+
+### 本阶段问题
+
+用户上传的 Phase 648 复核内容基本正确：
+
+```text
+Phase 648 的关键结论是：
+DS7B 的 value_short_answer_protocol 不是 separator-only，
+而是 prompt tail multi-position protocol field。
+```
+
+但复核内容指出三个必须修正的问题：
+
+```text
+1. answer_label 未被有效测试。
+2. Phase 648 缺少 random / reverse control。
+3. relation_tail 的 attention / MLP 作用混合，需要继续拆分。
+```
+
+因此 Phase 649 的目标是：
+
+```text
+修正 answer_label tokenization alignment，
+并对最强 protocol field 候选加入 restore / random / reverse controls。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py
+tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit_summary.py
+```
+
+结果目录：
+
+```text
+results/glm5_phase649_answer_label_alignment_protocol_field_control_audit/
+```
+
+主要结果文件：
+
+```text
+phase649_qwen3_answer_label_alignment_protocol_field_control_audit_confirm.json
+phase649_glm4_answer_label_alignment_protocol_field_control_audit_confirm.json
+phase649_deepseek7b_answer_label_alignment_protocol_field_control_audit_confirm.json
+phase649_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit_summary.py
+```
+
+smoke test：
+
+```bash
+python tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit.py deepseek7b --confirm --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase649_answer_label_alignment_protocol_field_control_audit_summary.py
+```
+
+### 测试原理
+
+Phase 648 中直接用 `"Answer:"` 做 token span，导致 original prompt 的 `"\nAnswer:"` 和 inline prompt 的 `" Answer:"` 被 tokenizer 切成不同长度，answer_label 进入 `position_len_mismatch`。
+
+Phase 649 改为以冒号为锚点：
+
+```text
+colon = final ":"
+answer_word = colon - 1
+answer_colon = answer_word + colon
+answer_label_aligned = answer_word + colon
+```
+
+这样不再让前面的 newline / space separator 影响 answer label 对齐。
+
+测试位置：
+
+```text
+answer_word
+colon
+answer_colon
+answer_label_aligned
+separator
+prompt_last
+question_mark_answer
+relation_tail
+```
+
+测试方向：
+
+```text
+to_original:
+  inline -> original，测试充分性。
+
+remove_from_inline:
+  original -> inline，测试必要性。
+```
+
+关键 interval/component：
+
+```text
+L17-L20.attn_out
+L17-L20.mlp_out
+L17-L20.layer_out
+L18-L19.layer_out
+L17.layer_input
+L17.layer_out
+```
+
+对 interval modes 加入：
+
+```text
+restore
+random
+reverse
+```
+
+### 对齐修复是否成功
+
+smoke test 后：
+
+```text
+position_len_mismatch = 0
+answer_word / colon / answer_colon / answer_label_aligned / separator / prompt_last / question_mark_answer / relation_tail
+全部产生结果。
+```
+
+正式三模型也全部为：
+
+```text
+position_missing = 0
+position_len_mismatch = 0
+empty_patch = 0
+```
+
+因此 Phase 648 最大硬伤已经修复：
+
+```text
+answer_label_aligned 可以被有效测试。
+```
+
+### 客观结果
+
+#### qwen3
+
+```text
+raw_cases = 320
+target_seen = 26
+cases_written = 26
+mode_rows = 5876
+total_time_min = 12.05
+filtered = {
+  not_target: 294,
+  position_missing: 0,
+  position_len_mismatch: 0,
+  empty_patch: 0,
+  case_cap: 0
+}
+```
+
+baseline：
+
+```text
+original exact = 19/26, newline = 0/26
+inline   exact = 0/26,  newline = 15/26
+```
+
+重要结果：
+
+```text
+answer_word_to_original_interval_L17_20_attn_out_restore:
+  exact = 25/26
+  newline = 0/26
+
+answer_label_aligned_to_original_interval_L17_20_attn_out_restore:
+  exact = 20/26
+  newline = 0/26
+
+answer_word_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 0/26
+  newline = 15/26
+
+answer_label_aligned_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 7/26
+  newline = 7/26
+```
+
+qwen3 仍然不是 DS7B 式正向协议模型，但 answer-aligned 区域确实有强影响。
+
+#### GLM4
+
+```text
+raw_cases = 320
+target_seen = 36
+cases_written = 36
+mode_rows = 8136
+total_time_min = 19.16
+filtered = {
+  not_target: 284,
+  position_missing: 0,
+  position_len_mismatch: 0,
+  empty_patch: 0,
+  case_cap: 0
+}
+```
+
+baseline：
+
+```text
+original exact = 29/36, newline = 0/36
+inline   exact = 27/36, newline = 0/36
+```
+
+重要结果：
+
+```text
+answer_word_to_original_interval_L18_19_layer_out_restore:
+  exact = 30/36
+  newline = 0/36
+
+answer_label_aligned_to_original_L17_layer_input_restore:
+  exact = 28/36
+  newline = 0/36
+
+answer_label_aligned_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 10/36
+  newline = 0/36
+
+relation_tail_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 0/36
+  newline = 0/36
+```
+
+GLM4 仍然不是 newline gate 模型，主要表现为 value / word / explanation 竞争。
+
+#### DS7B
+
+```text
+raw_cases = 320
+target_seen = 49
+cases_written = 48
+mode_rows = 10848
+total_time_min = 25.50
+filtered = {
+  not_target: 88,
+  position_missing: 0,
+  position_len_mismatch: 0,
+  empty_patch: 0,
+  case_cap: 1
+}
+```
+
+baseline 延续 Phase 648：
+
+```text
+original exact = 12/48, newline = 34/48
+inline   exact = 45/48, newline = 0/48
+```
+
+最关键充分性：
+
+```text
+answer_colon_to_original_L17_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+answer_label_aligned_to_original_L17_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+separator_to_original_L17_layer_input_restore:
+  exact = 46/48
+  newline = 0/48
+
+answer_colon_to_original_L17_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+answer_label_aligned_to_original_L17_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+
+separator_to_original_L17_layer_out_restore:
+  exact = 46/48
+  newline = 0/48
+```
+
+这说明：
+
+```text
+answer_label_aligned 与 separator 几乎同强。
+```
+
+最关键必要性：
+
+```text
+answer_label_aligned_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 8/48
+  newline = 0/48
+  top0 = word:40, correct_prefix:8
+
+answer_label_aligned_remove_from_inline_interval_L17_20_layer_out_restore:
+  exact = 12/48
+  newline = 35/48
+
+answer_label_aligned_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 22/48
+  newline = 22/48
+
+relation_tail_remove_from_inline_interval_L17_20_attn_out_restore:
+  exact = 1/48
+  newline = 0/48
+  top0 = word:44, correct_prefix:4
+
+relation_tail_remove_from_inline_interval_L17_20_mlp_out_restore:
+  exact = 4/48
+  newline = 39/48
+```
+
+random / reverse control：
+
+```text
+answer_label_aligned_remove_from_inline_interval_L18_19_layer_out_random:
+  exact = 45/48
+  newline = 0/48
+
+answer_label_aligned_remove_from_inline_interval_L18_19_layer_out_reverse:
+  exact = 45/48
+  newline = 0/48
+```
+
+这说明最强 remove_from_inline 的 collapse 不是任意随机扰动或简单反向扰动能复现的。
+
+### 关键进展
+
+Phase 649 明确补上 Phase 648 的最大缺口：
+
+```text
+answer_label_aligned 是 DS7B value_short_answer_protocol 的强因果位置。
+```
+
+当前 DS7B 的 prompt tail protocol field 应更新为：
+
+```text
+position_field =
+{
+  answer_label_aligned,
+  answer_colon,
+  separator,
+  prompt_last,
+  question_mark_answer,
+  relation_tail
+}
+```
+
+其中：
+
+```text
+answer_label_aligned / answer_colon / separator:
+  是同等级强协议承载点。
+
+question_mark_answer / relation_tail:
+  是更宽的 prompt-tail protocol field 区域。
+
+answer_word:
+  单独不稳定，不能作为完整 answer_label 的替代。
+
+colon:
+  比 answer_word 更强，但仍不等同于完整 answer_colon。
+```
+
+### relation_tail 的进一步拆分
+
+Phase 649 支持 Phase 648 的判断：
+
+```text
+relation_tail attention:
+  破坏 exact，但不主要触发 newline。
+
+relation_tail MLP:
+  破坏 exact，同时强触发 newline。
+```
+
+更准确：
+
+```text
+relation_tail.attn_out:
+  更像 value/token-choice support 或 content-selection support。
+
+relation_tail.mlp_out:
+  更像 format/newline gate support。
+```
+
+这说明 relation_tail 不是单纯语义尾部，而是语义支持与格式协议共同耦合的位置。
+
+### 理论更新
+
+Phase 648：
+
+```text
+M_i =
+{
+  causal_unit_set,
+  position_field,
+  trajectory_interval,
+  carrier_chain,
+  writer_candidate_graph,
+  sufficiency_profile,
+  necessity_profile,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+Phase 649 后加入 alignment 和 control profile：
+
+```text
+M_i =
+{
+  causal_unit_set,
+  aligned_position_field,
+  tokenization_alignment_rule,
+  trajectory_interval,
+  carrier_chain,
+  writer_candidate_graph,
+  sufficiency_profile,
+  necessity_profile,
+  control_profile,
+  task_boundary,
+  semantic_boundary,
+  output_boundary,
+  side_effect_profile,
+  model_polarity
+}
+```
+
+DS7B 当前节点：
+
+```text
+value_short_answer_protocol_DS7B =
+  aligned_carrier(answer_label_aligned, L17.layer_input/out)
+  + aligned_carrier(answer_colon, L17.layer_input/out)
+  + residual_carrier(separator, L17.layer_input/out)
+  + residual_carrier(prompt_last, L17.layer_out)
+  + layer_out_carrier(question_mark_answer, L18-L19)
+  + layer_out_carrier(relation_tail, L18-L19)
+  + attention_necessity(relation_tail, L17-L20, value/token-choice)
+  + mlp_necessity(relation_tail, L17-L20, newline/format)
+```
+
+### 问题和硬伤
+
+1. Phase 649 修复了 answer_label 对齐，但采用的是 `colon-1` 和 `colon` 的逻辑对齐，仍需要在更多模板中验证是否总是稳定。
+
+2. random / reverse control 不是完整反事实对照。它能排除“任意扰动都有效”，但不能证明唯一 causal writer。
+
+3. `answer_word` 单独在 DS7B 上不强，说明 answer label 的机制单位更接近 answer_colon / aligned answer label，而不是孤立 answer token。
+
+4. qwen3 的 control 中仍出现一些 reverse / random 的高分现象，说明 qwen3 的机制极性和 DS7B 不同，不能用 DS7B 图谱硬套。
+
+5. 仍然主要测试 target_failure 集合，还没有把 aligned answer_label 放进 side-effect boundary tasks。
+
+### 当前结论
+
+Phase 649 是关键正结果：
+
+```text
+answer_label_aligned 被重新找回，
+并且在 DS7B 中与 separator 同等级强。
+```
+
+但结论必须收紧：
+
+```text
+已经证明：
+  answer_colon / answer_label_aligned 是 protocol field 的强位置。
+
+尚未证明：
+  answer_label 是唯一 writer。
+
+已经证明：
+  relation_tail 的 attention 和 MLP 有可分离趋势。
+
+尚未证明：
+  attention = 语义，MLP = 格式。
+```
+
+### 下一阶段
+
+Phase 650 应执行：
+
+```text
+Protocol Field Side-Effect Boundary and Template Generalization Audit
+```
+
+目标：
+
+```text
+1. 把 answer_label_aligned / answer_colon / separator / relation_tail 放入 side-effect tasks。
+2. 测 explanation_needed、non_value、relation_changed 中这些位置是否同源。
+3. 增加模板变化，确认 colon-1 / colon 对齐规则不是当前模板偶然现象。
+4. 建立 protocol field 的 side-effect boundary profile。
+```
+
+阶段目标：
+
+```text
+从 aligned protocol field with controls
+推进到 template-general and side-effect-aware protocol field atlas node。
+```
