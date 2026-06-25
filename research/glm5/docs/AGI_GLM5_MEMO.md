@@ -76987,3 +76987,6700 @@ format/prefix gate + semantic value gate -> natural generation closure
 ```
 
 这比继续扩大 hidden patch 搜索更接近语言编码机制的真实结构。
+
+## Phase 628: Prefix/Format Gate and Semantic Value Integration 前缀格式门与语义值门整合 [2026-06-25 13:11]
+
+### 本阶段目标
+
+根据 Phase627 的关键反证继续推进：
+
+```text
+candidate logprob closure != natural greedy generation closure
+```
+
+Phase627 已经证明：
+
+```text
+result_only / cumulative_layer_out 可以强烈修复第一个区分 value token，
+但如果 token0 的 format/prefix 入口错误，exact generation 仍然失败。
+```
+
+Phase628 的目标是直接检验：
+
+```text
+如果人为强制正确 token0 共享前缀，
+semantic value patch 是否能把完整自然生成闭合。
+```
+
+### 对附件 Phase627 分析的判断
+
+附件中把 Phase627 判断为“关键反证 + 关键分流阶段”，这个判断正确。
+
+正确部分：
+
+```text
+1. candidate logprob 闭合不等于 natural greedy generation 闭合。
+2. semantic value gate 与 format/prefix gate 必须分离。
+3. DS7B 是最清晰证据：tok1 被修复，但 tok0 错误导致 exact=0。
+4. 下一步必须测试 prefix/format gate 与 semantic gate 的组合，而不是继续盲目扩大 hidden patch。
+```
+
+需要补充的部分：
+
+```text
+Phase627 只证明 token0 是自然生成瓶颈之一，
+还没有证明 token0 被修复后 exact generation 一定闭合。
+Phase628 正是补上这个缺口。
+```
+
+### 脚本
+
+```text
+tests/glm5/phase628_prefix_format_semantic_integration.py
+tests/glm5/phase628_prefix_format_semantic_integration_summary.py
+```
+
+脚本原则：
+
+```text
+1. 复用 Phase627 的手写 greedy loop。
+2. 新增 forced_prefix_ids，只在自然生成 step0 人工强制正确 token0。
+3. 比较 prefix_forced_only 与 prefix_forced + semantic patch。
+4. 保留 result_random / cumulative_random / final_output_random controls。
+5. 继续统计 exact、wrong_exact、prefix_len、token-position hit。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/glm5/phase628_prefix_format_semantic_integration.py \
+  tests/glm5/phase628_prefix_format_semantic_integration_summary.py
+
+python tests/glm5/phase628_prefix_format_semantic_integration.py qwen3 \
+  --smoke --include-nontarget \
+  --output-dir results/glm5_phase628_prefix_format_semantic_integration \
+  --hard-exit-after-model
+
+python tests/glm5/phase628_prefix_format_semantic_integration.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase628_prefix_format_semantic_integration \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/glm5/phase628_prefix_format_semantic_integration.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase628_prefix_format_semantic_integration \
+  --hard-exit-after-model
+
+python tests/glm5/phase628_prefix_format_semantic_integration.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase628_prefix_format_semantic_integration \
+  --hard-exit-after-model
+
+python tests/glm5/phase628_prefix_format_semantic_integration_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase628_prefix_format_semantic_integration/phase628_qwen3_prefix_format_semantic_integration_confirm.json
+results/glm5_phase628_prefix_format_semantic_integration/phase628_glm4_prefix_format_semantic_integration_confirm.json
+results/glm5_phase628_prefix_format_semantic_integration/phase628_deepseek7b_prefix_format_semantic_integration_confirm.json
+results/glm5_phase628_prefix_format_semantic_integration/phase628_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+models = qwen3, glm4, deepseek7b
+raw cases/model = 256
+target filtered rows:
+  qwen3 = 17
+  glm4 = 31
+  deepseek7b = 82
+
+modes:
+  base
+  repair_prompt
+  prefix_forced_only
+  result_only
+  result_random
+  prefix_forced_result_only
+  prefix_forced_result_random
+  cumulative_layer_out
+  cumulative_layer_out_random
+  prefix_forced_cumulative_layer_out
+  prefix_forced_cumulative_layer_out_random
+  final_output_all
+  prefix_forced_final_output_all
+  final_output_random_all
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+base:
+  exact = 1/17
+  tok0 = 0.588
+  tok1 = 0.059
+  tok2 = 0.059
+
+prefix_forced_only:
+  exact = 3/17
+  wrong_exact = 14/17
+  tok0 = 1.000
+  tok1 = 0.176
+  tok2 = 0.176
+
+result_only:
+  exact = 8/17
+  tok0 = 0.588
+  tok1 = 0.882
+  tok2 = 0.647
+
+prefix_forced_result_only:
+  exact = 15/17
+  wrong_exact = 2/17
+  tok0 = 1.000
+  tok1 = 0.882
+  tok2 = 0.882
+
+cumulative_layer_out:
+  exact = 10/17
+  tok0 = 0.588
+  tok1 = 1.000
+  tok2 = 0.824
+
+prefix_forced_cumulative_layer_out:
+  exact = 17/17
+  wrong_exact = 0/17
+  tok0 = 1.000
+  tok1 = 1.000
+  tok2 = 1.000
+
+prefix_forced_cumulative_layer_out_random:
+  exact = 4/17
+  wrong_exact = 13/17
+
+prefix_forced_final_output_all:
+  exact = 0/17
+  tok0 = 1.000
+  tok1 = 0.000
+```
+
+#### GLM4 bf16
+
+```text
+base:
+  exact = 2/31
+  tok0 = 0.355
+  tok1 = 0.065
+
+prefix_forced_only:
+  exact = 5/31
+  wrong_exact = 26/31
+  tok0 = 1.000
+  tok1 = 0.161
+
+result_only:
+  exact = 10/31
+  tok0 = 0.355
+  tok1 = 0.935
+
+prefix_forced_result_only:
+  exact = 29/31
+  wrong_exact = 1/31
+  tok0 = 1.000
+  tok1 = 0.935
+
+cumulative_layer_out:
+  exact = 11/31
+  tok0 = 0.355
+  tok1 = 1.000
+
+prefix_forced_cumulative_layer_out:
+  exact = 31/31
+  wrong_exact = 0/31
+  tok0 = 1.000
+  tok1 = 1.000
+
+prefix_forced_cumulative_layer_out_random:
+  exact = 7/31
+  wrong_exact = 24/31
+
+prefix_forced_final_output_all:
+  exact = 0/31
+  tok0 = 1.000
+  tok1 = 0.000
+```
+
+#### DS7B
+
+```text
+base:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.000
+  tok2 = 0.000
+
+prefix_forced_only:
+  exact = 3/82
+  wrong_exact = 79/82
+  tok0 = 1.000
+  tok1 = 0.037
+  tok2 = 0.037
+
+result_only:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.902
+  tok2 = 0.049
+
+prefix_forced_result_only:
+  exact = 74/82
+  wrong_exact = 7/82
+  tok0 = 1.000
+  tok1 = 0.902
+  tok2 = 0.902
+
+cumulative_layer_out:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+  tok2 = 0.024
+
+prefix_forced_cumulative_layer_out:
+  exact = 81/82
+  wrong_exact = 1/82
+  tok0 = 1.000
+  tok1 = 0.988
+  tok2 = 0.988
+
+prefix_forced_cumulative_layer_out_random:
+  exact = 8/82
+  wrong_exact = 62/82
+
+prefix_forced_final_output_all:
+  exact = 0/82
+  tok0 = 1.000
+  tok1 = 0.000
+  tok2 = 0.293
+```
+
+### 当前最可靠客观事实
+
+1. **Phase627 的 format/prefix bottleneck 判断被强力确认。**
+
+DS7B 最清楚：
+
+```text
+cumulative_layer_out:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+
+prefix_forced_cumulative_layer_out:
+  exact = 81/82
+  tok0 = 1.000
+  tok1 = 0.988
+```
+
+这说明：
+
+```text
+Phase627 exact 失败的主因不是 semantic value token 没修复，
+而是 format/prefix token 没进入正确生成轨道。
+```
+
+2. **prefix_forced_only 不能解决语义选择。**
+
+```text
+Qwen3 prefix_forced_only:
+  exact = 3/17
+  wrong_exact = 14/17
+
+GLM4 prefix_forced_only:
+  exact = 5/31
+  wrong_exact = 26/31
+
+DS7B prefix_forced_only:
+  exact = 3/82
+  wrong_exact = 79/82
+```
+
+这说明：
+
+```text
+format/prefix gate 只负责进入答案格式，
+不会自动修复 value semantic choice。
+```
+
+3. **semantic patch alone 不能解决格式入口。**
+
+```text
+DS7B result_only:
+  exact = 0/82
+  tok1 = 0.902
+
+DS7B cumulative_layer_out:
+  exact = 0/82
+  tok1 = 0.988
+```
+
+这说明：
+
+```text
+semantic value gate 只负责选择正确值，
+不会自动修复 token0 format/prefix。
+```
+
+4. **format/prefix gate + semantic value gate 可以接近完整自然生成闭合。**
+
+```text
+Qwen3:
+  prefix_forced_cumulative_layer_out exact = 17/17
+
+GLM4:
+  prefix_forced_cumulative_layer_out exact = 31/31
+
+DS7B:
+  prefix_forced_cumulative_layer_out exact = 81/82
+```
+
+5. **random controls 明显弱，排除“只要强制 prefix 就会成功”的解释。**
+
+```text
+DS7B:
+  prefix_forced_cumulative_layer_out = 81/82
+  prefix_forced_cumulative_layer_out_random = 8/82
+
+GLM4:
+  prefix_forced_cumulative_layer_out = 31/31
+  prefix_forced_cumulative_layer_out_random = 7/31
+
+Qwen3:
+  prefix_forced_cumulative_layer_out = 17/17
+  prefix_forced_cumulative_layer_out_random = 4/17
+```
+
+6. **final_output_all 即使 prefix forced 也不能闭合。**
+
+```text
+Qwen3 prefix_forced_final_output_all exact = 0/17
+GLM4 prefix_forced_final_output_all exact = 0/31
+DS7B prefix_forced_final_output_all exact = 0/82
+```
+
+这进一步证明：
+
+```text
+final norm patch 不是自然生成中的稳定可组合状态。
+真实可组合路径更像是 layer_out 累积语义 carrier，
+而不是最后 logits 前的强行输出态。
+```
+
+### 理论进展
+
+Phase628 把自然生成闭环从一个整体指标拆成了可验证的双门结构：
+
+```text
+format/prefix gate:
+  决定生成是否进入答案格式轨道。
+
+semantic value gate:
+  决定进入格式轨道后选择哪个值。
+```
+
+当前更精确的链条是：
+
+```text
+prompt / rule condition
+  -> residual state builder
+  -> attention query/value selection
+  -> semantic result carrier
+  -> downstream layer_out cumulative carrier
+  -> discriminative value token
+
+prompt / format condition
+  -> format/prefix gate
+  -> shared prefix token
+  -> generation alignment
+
+semantic value gate + format/prefix gate
+  -> exact natural generation
+```
+
+这说明语言输出至少不是单一语义向量直接读出，而是多条门控路径共同满足：
+
+```text
+正确内容 + 正确格式入口 + 正确自回归轨道
+```
+
+### 硬伤和边界
+
+1. **prefix 是人工强制的，不是自然修复。**
+
+Phase628 证明：
+
+```text
+如果 prefix gate 正确，semantic patch 足以闭合。
+```
+
+但还没有证明：
+
+```text
+模型内部哪里自然生成或修复 prefix gate。
+```
+
+2. **测试仍是 target filtered value-gate 子集。**
+
+这不是全任务准确率实验，而是机制闭环实验。
+
+3. **donor cache 仍来自 repair/correct condition。**
+
+这说明 causal path 存在，不说明模型原始推理已经正确。
+
+4. **final_output_all 的失败需要单独研究。**
+
+它在 candidate score 中强，但在 natural generation 中不可组合，说明最后读出态可能不是可迁移机制载体。
+
+### 下一步 Phase629
+
+Phase629 应该做：
+
+```text
+Format/Prefix Gate Localization
+```
+
+核心问题：
+
+```text
+自然生成中的 token0 format/prefix gate 在哪里形成？
+它是 prompt_last residual state、attention source、MLP format route，
+还是早期 lexical/scaffold route。
+```
+
+建议测试：
+
+```text
+1. 不再人工 force token0，而是 patch token0 generation 前的 prompt_last state。
+2. 对 prompt_last 做 residual / attn_out / mlp_out / layer_out 分层 patch。
+3. 测 token0 hit、exact、wrong_exact。
+4. 与 prefix_forced upper bound 对照。
+5. 保留 semantic cumulative patch，测试 format patch + semantic patch 是否自然闭合。
+```
+
+Phase629 的目标不是再证明 semantic path，而是定位：
+
+```text
+format/prefix gate 的内部写入位置和可修复路径。
+```
+
+## Phase 629: Format/Prefix Gate Localization 格式前缀门定位 [2026-06-25 13:41]
+
+### 本阶段目标
+
+根据 Phase628 的强正结果继续推进：
+
+```text
+prefix_forced + semantic cumulative 可以让 exact generation 接近闭合。
+```
+
+但 Phase628 的最大硬伤是：
+
+```text
+token0 是人工强制的，不是模型内部自然修复的。
+```
+
+Phase629 的目标：
+
+```text
+不再 force token0，
+而是 patch 生成 token0 之前的 prompt_last 状态，
+定位 format/prefix gate 是否能由 prompt_last residual components 修复。
+```
+
+### 对附件 Phase628 分析的判断
+
+附件认为 Phase628 是关键自然生成闭环阶段，这个判断基本正确，但需要严格修正：
+
+```text
+Phase628 是 conditional natural generation closure，
+不是 full natural generation closure。
+```
+
+正确部分：
+
+```text
+1. Phase628 确认 semantic value gate 与 format/prefix gate 可分离。
+2. prefix_forced_only 不能解决语义选择。
+3. semantic patch alone 不能解决格式入口。
+4. prefix_forced + cumulative_layer_out 几乎闭合三模型 exact generation。
+```
+
+必须补充的边界：
+
+```text
+1. token0 是人工强制，所以 format/prefix gate 本身还没有被定位。
+2. final_output_all 即使 prefix forced 也失败，说明最终读出态不是稳定可组合 carrier。
+3. 下一步不能继续证明 semantic path，而必须定位 format/prefix gate。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase629_format_prefix_gate_localization.py
+tests/gpt5/phase629_format_prefix_gate_localization_summary.py
+```
+
+脚本原则：
+
+```text
+1. 收集 base_prompt 与 repair_prompt 在 prompt_last 位置的 residual components。
+2. 组件包括 layer_input, attn_out, mlp_out, layer_out。
+3. 只 patch prompt_last，不人工 force token0。
+4. 同时保留 semantic_cumulative_only。
+5. 测试 format_patch_only 与 format_patch + semantic_cumulative。
+6. 加 random same-norm semantic control。
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase629_format_prefix_gate_localization.py \
+  tests/gpt5/phase629_format_prefix_gate_localization_summary.py
+
+python tests/gpt5/phase629_format_prefix_gate_localization.py qwen3 \
+  --smoke --include-nontarget \
+  --output-dir results/glm5_phase629_format_prefix_gate_localization \
+  --hard-exit-after-model
+
+python tests/gpt5/phase629_format_prefix_gate_localization.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase629_format_prefix_gate_localization \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase629_format_prefix_gate_localization.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase629_format_prefix_gate_localization \
+  --hard-exit-after-model
+
+python tests/gpt5/phase629_format_prefix_gate_localization.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase629_format_prefix_gate_localization \
+  --hard-exit-after-model
+
+python tests/gpt5/phase629_format_prefix_gate_localization_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase629_format_prefix_gate_localization/phase629_qwen3_format_prefix_gate_localization_confirm.json
+results/glm5_phase629_format_prefix_gate_localization/phase629_glm4_format_prefix_gate_localization_confirm.json
+results/glm5_phase629_format_prefix_gate_localization/phase629_deepseek7b_format_prefix_gate_localization_confirm.json
+results/glm5_phase629_format_prefix_gate_localization/phase629_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+raw cases/model = 256
+target filtered rows:
+  qwen3 = 17
+  glm4 = 31
+  deepseek7b = 82
+
+format layers:
+  qwen3 = L27-L32
+  glm4 = L32-L37
+  deepseek7b = L20-L25
+
+components:
+  layer_input
+  attn_out
+  mlp_out
+  layer_out
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+base:
+  exact = 1/17
+  tok0 = 0.588
+  tok1 = 0.059
+  tok2 = 0.059
+
+repair_prompt:
+  exact = 11/17
+  tok0 = 0.824
+  tok1 = 0.824
+  tok2 = 0.824
+
+semantic_cumulative_only:
+  exact = 10/17
+  tok0 = 0.588
+  tok1 = 1.000
+  tok2 = 0.824
+
+best prompt_last patch + semantic:
+  format_L27_layer_out_semantic
+  exact = 13/17
+  wrong_exact = 0/17
+  tok0 = 0.765
+  tok1 = 1.000
+  tok2 = 1.000
+
+same format patch only:
+  exact = 3/17
+  wrong_exact = 10/17
+  tok0 = 0.765
+  tok1 = 0.235
+  tok2 = 0.235
+
+same random_semantic control:
+  exact = 9/17
+  tok0 = 0.529
+  tok1 = 1.000
+  tok2 = 0.824
+```
+
+Qwen3 结论：
+
+```text
+prompt_last L27 layer_out / L28 layer_input 可以部分修复 format/prefix gate。
+但 random control 不低，Qwen3 的 format localization 不能过度解释。
+```
+
+#### GLM4 bf16
+
+```text
+base:
+  exact = 2/31
+  tok0 = 0.355
+  tok1 = 0.065
+
+repair_prompt:
+  exact = 28/31
+  tok0 = 0.935
+  tok1 = 0.903
+
+semantic_cumulative_only:
+  exact = 11/31
+  tok0 = 0.355
+  tok1 = 1.000
+
+best prompt_last patch + semantic:
+  format_L32_layer_out_semantic
+  exact = 30/31
+  wrong_exact = 0/31
+  tok0 = 0.968
+  tok1 = 1.000
+
+same format patch only:
+  exact = 5/31
+  wrong_exact = 25/31
+  tok0 = 0.968
+  tok1 = 0.161
+
+same random_semantic control:
+  exact = 11/31
+  tok0 = 0.355
+  tok1 = 1.000
+```
+
+GLM4 结论：
+
+```text
+GLM4 的 format/prefix gate 可以被 prompt_last layer_out / layer_input 高度修复。
+format patch 单独只打开格式入口，仍大多选择旧错误值。
+format patch + semantic cumulative 才接近 exact closure。
+```
+
+#### DS7B
+
+```text
+base:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.000
+  tok2 = 0.000
+
+repair_prompt:
+  exact = 20/82
+  tok0 = 0.244
+  tok1 = 0.256
+  tok2 = 0.256
+
+semantic_cumulative_only:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+  tok2 = 0.024
+
+best prompt_last patch + semantic:
+  format_L25_layer_out_semantic
+  exact = 21/82
+  wrong_exact = 0/82
+  tok0 = 0.256
+  tok1 = 0.988
+  tok2 = 0.305
+
+same format patch only:
+  exact = 3/82
+  wrong_exact = 17/82
+  tok0 = 0.256
+  tok1 = 0.037
+  tok2 = 0.049
+
+same random_semantic control:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+  tok2 = 0.037
+```
+
+DS7B 结论：
+
+```text
+prompt_last patch 能轻微打开 format/prefix gate，
+但远低于 Phase628 的 forced prefix upper bound。
+
+Phase628:
+  prefix_forced_cumulative_layer_out exact = 81/82
+
+Phase629:
+  best prompt_last format patch + semantic exact = 21/82
+```
+
+### 当前最可靠客观事实
+
+1. **format/prefix gate 不是纯语义 cumulative carrier。**
+
+```text
+semantic_cumulative_only:
+  Qwen3 exact = 10/17
+  GLM4 exact = 11/31
+  DS7B exact = 0/82
+```
+
+它强烈修复 tok1，但不能稳定修复 tok0。
+
+2. **prompt_last state 确实携带一部分 format/prefix gate 信息。**
+
+```text
+Qwen3 best tok0:
+  base 0.588 -> 0.765
+
+GLM4 best tok0:
+  base 0.355 -> 0.968
+
+DS7B best tok0:
+  base 0.000 -> 0.256
+```
+
+3. **GLM4 的 format/prefix gate 最容易由 prompt_last layer_out/layer_input 修复。**
+
+```text
+GLM4:
+  format_L32_layer_out_semantic exact = 30/31
+  format_L33_layer_input_semantic exact = 30/31
+```
+
+这接近 Phase628 forced-prefix 上界：
+
+```text
+prefix_forced_cumulative_layer_out exact = 31/31
+```
+
+4. **DS7B 的 format/prefix gate 仍未自然定位闭合。**
+
+DS7B 最强 prompt_last patch：
+
+```text
+format_L25_layer_out_semantic exact = 21/82
+tok0 = 0.256
+```
+
+远低于 Phase628 人工上界：
+
+```text
+prefix_forced_cumulative_layer_out exact = 81/82
+```
+
+这说明 DS7B 的 format/prefix gate 可能不在单点 prompt_last component，
+或需要多层累计 / source token / scaffold route 共同作用。
+
+5. **format patch only 与 format+semantic 的差异再次确认双门结构。**
+
+GLM4：
+
+```text
+format_L32_layer_out only:
+  exact = 5/31
+  wrong_exact = 25/31
+  tok0 = 0.968
+
+format_L32_layer_out + semantic:
+  exact = 30/31
+  wrong_exact = 0/31
+  tok0 = 0.968
+  tok1 = 1.000
+```
+
+这说明：
+
+```text
+format gate 打开答案轨道，
+semantic gate 决定轨道中写入哪个值。
+```
+
+### 理论进展
+
+Phase629 后，自然生成图谱应写成三层：
+
+```text
+1. format/prefix gate
+   负责进入答案生成轨道。
+
+2. semantic value gate
+   负责选择正确 value。
+
+3. continuation/confirmation gate
+   负责后续 token 跟随。
+```
+
+其中：
+
+```text
+GLM4:
+  format/prefix gate 主要可由 prompt_last middle-late residual layer_out/input 修复。
+
+Qwen3:
+  prompt_last format signal 存在，但有随机对照偏高，定位不够干净。
+
+DS7B:
+  prompt_last 单点 patch 只恢复少部分 format gate。
+  格式路径更可能是分布式/多层/跨 source token 的机制。
+```
+
+因此，Phase628 的完整公式需要修正为：
+
+```text
+exact generation =
+  format/prefix gate
+  AND semantic value gate
+  AND continuation gate
+```
+
+但 format/prefix gate 本身不是单一位置的简单状态：
+
+```text
+format/prefix gate =
+  prompt_last local state
+  + source/scaffold route
+  + multi-layer accumulation
+  + model-specific decoding bias
+```
+
+### 硬伤和边界
+
+1. **Phase629 只扫描 prompt_last 单点。**
+
+如果 DS7B 的 format gate 来自多个 source token 或多层共同积累，本轮会低估它。
+
+2. **Qwen3 random control 偏高。**
+
+Qwen3 的 prompt_last 定位只能视为弱正结果，不能作为独立强机制闭合。
+
+3. **repair_prompt 本身并不总是正确格式上界。**
+
+例如 DS7B repair_prompt exact 只有 20/82，所以 donor prompt_last 并不是完美 format donor。
+
+4. **format patch 与 semantic patch 使用不同 donor 条件。**
+
+这证明组合因果有效，但还不是模型原始自然推理。
+
+### 下一步 Phase630
+
+Phase630 应做：
+
+```text
+Distributed Format Route Multi-Source Sweep
+```
+
+核心目标：
+
+```text
+解释 DS7B 中 Phase628 forced prefix 上界很高，
+但 Phase629 prompt_last patch 只恢复 21/82 的差距。
+```
+
+建议测试：
+
+```text
+1. 扫描 source positions:
+   prompt_last
+   object token
+   relation token
+   rule/value line tokens
+   punctuation/colon/newline tokens
+
+2. 扫描 patch form:
+   single position
+   multi-position cumulative
+   multi-layer layer_out cumulative
+
+3. 固定 semantic_cumulative_layer_out，
+   只观察 token0 format/prefix 是否自然恢复。
+
+4. 将 Phase628 forced prefix 作为 upper bound。
+
+5. 重点 DS7B，Qwen3/GLM4 做跨模型对照。
+```
+
+Phase630 的目标不是再证明双门结构，而是找到：
+
+```text
+format/prefix gate 的分布式 source route。
+```
+
+## Phase 630: Distributed Format Route Multi-Source Sweep 分布式格式路径多源扫描 [2026-06-25 14:19]
+
+### 本阶段目标
+
+根据 Phase629 的边界继续推进：
+
+```text
+DS7B:
+  Phase628 forced prefix + semantic exact = 81/82
+  Phase629 best prompt_last patch + semantic exact = 21/82
+```
+
+Phase630 的目标：
+
+```text
+检查 DS7B 缺失的 format/prefix gate 是否来自多个 post-query source spans，
+而不是单点 prompt_last。
+```
+
+### 对附件 Phase629 分析的判断
+
+附件中认为 Phase629 是关键定位阶段，这个判断正确。
+
+正确部分：
+
+```text
+1. Phase629 不再证明 semantic value gate，而是追问 token0 format/prefix gate。
+2. Phase628 只能叫 conditional natural generation closure。
+3. GLM4 的 format gate 可由 prompt_last residual state 高度修复。
+4. Qwen3 是弱正结果，random control 偏高。
+5. DS7B 的 format gate 不是单点 prompt_last patch 可以闭合的。
+```
+
+需要继续推进的部分：
+
+```text
+Phase629 只扫描 prompt_last 单点。
+Phase630 扩展到 answer_label、question_mark_answer、relation_tail、
+question_subject、question_all 等多 source spans。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase630_distributed_format_route_multisource.py
+tests/gpt5/phase630_distributed_format_route_multisource_summary.py
+```
+
+脚本原则：
+
+```text
+1. 不人工 force token0。
+2. 固定 semantic_cumulative_layer_out，观察 token0 format/prefix 是否恢复。
+3. 扫描 source groups:
+   prompt_last
+   answer_label
+   question_mark_answer
+   relation_tail
+   question_subject
+   question_all
+4. 默认扫描 layer_out，避免搜索空间过大。
+5. 每个 source patch 同时测:
+   source_only
+   source + semantic
+   random_source + semantic
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase630_distributed_format_route_multisource.py \
+  tests/gpt5/phase630_distributed_format_route_multisource_summary.py
+
+python tests/gpt5/phase630_distributed_format_route_multisource.py qwen3 \
+  --smoke --include-nontarget \
+  --output-dir results/glm5_phase630_distributed_format_route_multisource \
+  --hard-exit-after-model
+
+python tests/gpt5/phase630_distributed_format_route_multisource.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase630_distributed_format_route_multisource \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase630_distributed_format_route_multisource.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase630_distributed_format_route_multisource \
+  --hard-exit-after-model
+
+python tests/gpt5/phase630_distributed_format_route_multisource.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase630_distributed_format_route_multisource \
+  --hard-exit-after-model
+
+python tests/gpt5/phase630_distributed_format_route_multisource_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase630_distributed_format_route_multisource/phase630_qwen3_distributed_format_route_multisource_confirm.json
+results/glm5_phase630_distributed_format_route_multisource/phase630_glm4_distributed_format_route_multisource_confirm.json
+results/glm5_phase630_distributed_format_route_multisource/phase630_deepseek7b_distributed_format_route_multisource_confirm.json
+results/glm5_phase630_distributed_format_route_multisource/phase630_cross_model_summary.md
+```
+
+### 测试范围
+
+```text
+raw cases/model = 256
+target filtered rows:
+  qwen3 = 17
+  glm4 = 31
+  deepseek7b = 82
+
+format layers:
+  qwen3 = L27-L32
+  glm4 = L32-L37
+  deepseek7b = L20-L25
+
+source groups:
+  prompt_last
+  answer_label
+  question_mark_answer
+  relation_tail
+  question_subject
+  question_all
+
+component:
+  layer_out
+```
+
+### 客观结果
+
+#### Qwen3
+
+```text
+base:
+  exact = 1/17
+  tok0 = 0.588
+  tok1 = 0.059
+  tok2 = 0.059
+
+repair_prompt:
+  exact = 11/17
+  tok0 = 0.824
+  tok1 = 0.824
+  tok2 = 0.824
+
+semantic_cumulative_only:
+  exact = 10/17
+  tok0 = 0.588
+  tok1 = 1.000
+  tok2 = 0.824
+
+best source + semantic:
+  question_all_L27_layer_out_semantic
+  exact = 14/17
+  wrong_exact = 0/17
+  tok0 = 0.824
+  tok1 = 1.000
+  tok2 = 1.000
+
+same source only:
+  question_all_L27_layer_out
+  exact = 4/17
+  wrong_exact = 10/17
+  tok0 = 0.824
+  tok1 = 0.294
+  tok2 = 0.294
+
+same random_source + semantic:
+  exact = 10/17
+  tok0 = 0.588
+  tok1 = 1.000
+  tok2 = 0.824
+```
+
+Qwen3 结论：
+
+```text
+question_all 比 prompt_last 单点略强：
+  Phase629 best = 13/17
+  Phase630 best = 14/17
+
+source_only 主要打开格式入口，但仍产生大量 wrong_exact。
+source + semantic 才能减少 wrong_exact。
+```
+
+#### GLM4 bf16
+
+```text
+base:
+  exact = 2/31
+  tok0 = 0.355
+  tok1 = 0.065
+
+repair_prompt:
+  exact = 28/31
+  tok0 = 0.935
+  tok1 = 0.903
+
+semantic_cumulative_only:
+  exact = 11/31
+  tok0 = 0.355
+  tok1 = 1.000
+
+best source + semantic:
+  answer_label_L32_layer_out_semantic
+  exact = 30/31
+  wrong_exact = 0/31
+  tok0 = 0.968
+  tok1 = 1.000
+
+same source only:
+  answer_label_L32_layer_out
+  exact = 5/31
+  wrong_exact = 25/31
+  tok0 = 0.968
+  tok1 = 0.161
+
+same random_source + semantic:
+  exact = 14/31
+  tok0 = 0.452
+  tok1 = 1.000
+```
+
+GLM4 结论：
+
+```text
+多 source 没有显著超过 Phase629 prompt_last 单点。
+answer_label / prompt_last / question_mark_answer / relation_tail 都可达到 30/31。
+GLM4 format gate 是局部后缀区间高度可修复的状态。
+```
+
+#### DS7B
+
+```text
+base:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.000
+  tok2 = 0.000
+
+repair_prompt:
+  exact = 20/82
+  tok0 = 0.244
+  tok1 = 0.256
+  tok2 = 0.256
+
+semantic_cumulative_only:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+  tok2 = 0.024
+
+best source + semantic:
+  answer_label_L21_layer_out_semantic
+  exact = 21/82
+  wrong_exact = 0/82
+  tok0 = 0.256
+  tok1 = 0.988
+  tok2 = 0.280
+
+same source only:
+  answer_label_L21_layer_out
+  exact = 3/82
+  wrong_exact = 18/82
+  tok0 = 0.256
+  tok1 = 0.037
+  tok2 = 0.037
+
+same random_source + semantic:
+  exact = 0/82
+  tok0 = 0.000
+  tok1 = 0.988
+  tok2 = 0.085
+```
+
+DS7B 结论：
+
+```text
+多 source layer_out 扫描没有突破 Phase629 的 21/82。
+
+Phase628 upper bound:
+  prefix_forced_cumulative_layer_out exact = 81/82
+
+Phase629:
+  prompt_last best exact = 21/82
+
+Phase630:
+  answer_label/question_mark_answer/relation_tail best exact = 21/82
+```
+
+### 当前最可靠客观事实
+
+1. **format/prefix gate 与 semantic gate 的双门结构再次成立。**
+
+source_only 往往打开 token0，但仍 wrong_exact 多。
+source + semantic 才能把 wrong_exact 降下来。
+
+2. **Qwen3 的 format route 有轻微分布式后缀增强。**
+
+```text
+prompt_last best from Phase629 = 13/17
+question_all best from Phase630 = 14/17
+```
+
+3. **GLM4 的 format route 是后缀区间可替代状态。**
+
+```text
+answer_label / prompt_last / question_mark_answer / relation_tail
+都能达到 30/31。
+```
+
+4. **DS7B 的 format route 不是当前扫描的单组 source layer_out 可以解释的。**
+
+DS7B 在所有 source groups 中最高仍是：
+
+```text
+exact = 21/82
+tok0 = 0.256
+```
+
+这没有接近 forced prefix 上界：
+
+```text
+81/82
+```
+
+5. **DS7B 的问题更像 final token0 readout/embedding/logit competition，而不是缺少某个简单 source carrier。**
+
+因为：
+
+```text
+semantic tok1 已接近闭合；
+source layer_out patch 可以略微改变 token0；
+但任何单组 source 都不能把 token0 推到 “ v” 轨道。
+```
+
+### 理论进展
+
+Phase630 后，当前自然生成机制应写成：
+
+```text
+semantic value gate:
+  已经能在 DS7B 中强修复 tok1。
+
+format/prefix gate:
+  GLM4 可由后缀局部状态修复；
+  Qwen3 有后缀多源弱增强；
+  DS7B 不由当前单组 source layer_out 决定。
+
+token0 readout barrier:
+  DS7B 的主要剩余瓶颈。
+```
+
+这说明对 DS7B 来说，继续扩大 source position patch 的收益可能很低。
+研究对象应从：
+
+```text
+where is the source state?
+```
+
+转向：
+
+```text
+why does token0 readout reject the desired prefix token?
+```
+
+也就是读出端竞争问题。
+
+### 硬伤和边界
+
+1. **Phase630 默认只测 layer_out。**
+
+它没有穷尽 layer_input/attn_out/mlp_out 的所有 source group 组合。
+但 Phase629 已经显示 DS7B 单点 components 也只能到 21/82 附近。
+
+2. **没有做 multi-group simultaneous patch。**
+
+本阶段扫描单组 source span；如果 DS7B 需要多个 source groups 同时修复，本轮仍会低估。
+
+3. **source spans 都在 question/answer 后缀区间。**
+
+没有扫描早期 rule/value lines 的多位置累计。
+不过这些早期 token 在 base/repair prompt 分歧之前，hidden state 理论上差异很小。
+
+4. **DS7B forced prefix 上界仍未解释。**
+
+Phase630 缩小了搜索空间，但没有闭合 DS7B format gate。
+
+### 下一步 Phase631
+
+Phase631 应做：
+
+```text
+Token0 Prefix Readout Competition Audit
+```
+
+核心问题：
+
+```text
+DS7B 为什么即使 semantic carrier 正确，
+仍然不选择 token0 = " v"？
+```
+
+建议测试：
+
+```text
+1. 直接审计 token0 logits:
+   correct prefix token " v"
+   competing tokens " ?\n\n", " c", " o", newline, space
+
+2. 比较条件:
+   base
+   repair_prompt
+   semantic_cumulative
+   best format source patch
+   best format source + semantic
+   forced prefix upper-bound reference
+
+3. 测 final_norm / unembedding 方向:
+   prefix token logit delta
+   competitor token logit delta
+   margin correct_prefix - top_competitor
+
+4. 做读出方向 patch:
+   沿 unembedding(" v") - unembedding(top_competitor) 方向小 scale 注入，
+   检查是否能把 DS7B token0 推入正确轨道。
+
+5. 若读出方向有效，再回溯哪个内部组件自然产生该读出方向。
+```
+
+Phase631 的目标：
+
+```text
+把 DS7B format/prefix bottleneck 从 source-state 搜索，
+推进到 token0 readout competition 的客观分解。
+```
+
+## Phase 631: Token0 Prefix Readout Competition Audit 词元0前缀读出竞争审计 [2026-06-25 14:45]
+
+### 本阶段目标
+
+根据用户附件对 Phase630 的分析，先判断其是否正确，再继续完成客观拼图。
+
+附件中正确部分：
+
+```text
+1. Phase630 是重要负结果 + 关键收缩阶段。
+2. DS7B 的 format/prefix gate 不是当前扫描的单组 post-query source layer_out 能解释。
+3. GLM4 的格式门更像局部后缀 residual state 可修复。
+4. Qwen3 有轻微分布式后缀增强，但不是强闭合证据。
+5. DS7B 下一步应从 source-state 搜索转向 token0 readout competition。
+```
+
+Phase631 的直接目标：
+
+```text
+直接测量第一个生成词元 token0 的 correct prefix token 与 top competitor 的 logit margin。
+在 final_norm 输出上沿 unembedding(correct_prefix) - unembedding(top_competitor) 方向注入。
+观察该 readout-direction intervention 是否能替代缺失的 format/prefix gate。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase631_token0_prefix_readout_competition.py
+tests/gpt5/phase631_token0_prefix_readout_competition_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase631_token0_prefix_readout_competition
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase631_token0_prefix_readout_competition.py \
+  tests/gpt5/phase631_token0_prefix_readout_competition_summary.py
+
+python tests/gpt5/phase631_token0_prefix_readout_competition.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase631_token0_prefix_readout_competition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase631_token0_prefix_readout_competition.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase631_token0_prefix_readout_competition \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase631_token0_prefix_readout_competition.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase631_token0_prefix_readout_competition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase631_token0_prefix_readout_competition.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase631_token0_prefix_readout_competition \
+  --hard-exit-after-model
+
+python tests/gpt5/phase631_token0_prefix_readout_competition_summary.py
+```
+
+### 测试原理
+
+此前阶段证明：
+
+```text
+semantic cumulative patch 可以修复答案值的后续语义词元。
+但自然生成仍经常失败在 token0，例如没有先生成共享前缀 " v"。
+```
+
+本轮把第一个词元当作读出竞争问题：
+
+```text
+prefix token:
+  正确答案共享前缀，例如 " v"
+
+competitor token:
+  base prompt 下 token0 的 top-1 竞争词元，例如 DS7B 常见 " ?\n\n"
+```
+
+直接计算：
+
+```text
+margin = logit(prefix_token) - logit(top_competitor)
+```
+
+然后在 final_norm 的 prompt_last 输出处注入：
+
+```text
+delta = scale * ||h_final|| * normalize(W[prefix_token] - W[top_competitor])
+```
+
+其中 W 是 lm_head/unembedding 权重。
+
+如果注入后 token0 大幅变成正确前缀，并且加 semantic cumulative 后 exact generation 接近 forced-prefix 上界，则说明：
+
+```text
+剩余瓶颈主要在 token0 readout competition，而不是语义值门缺失。
+```
+
+### 关键结果
+
+#### Qwen3
+
+```text
+target rows = 17 / raw cases = 256
+source = question_all L27 layer_out
+downstream = [29, 30, 31, 32, 33, 34, 35]
+
+base:
+  tok0 = 10/17
+  exact = 1/17
+  wrong_exact = 9/17
+  mean_prefix_margin = 0.213
+
+semantic_cumulative:
+  tok0 = 10/17
+  exact = 10/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 0.213
+
+best_source_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 1.110
+
+readout_scale0.125_semantic:
+  tok0 = 17/17
+  exact = 17/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 28.592
+
+readout_scale0.25_semantic:
+  tok0 = 17/17
+  exact = 17/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 56.974
+```
+
+Qwen3 现象：
+
+```text
+readout direction 可完全打开 token0 前缀门。
+不加 semantic cumulative 时，readout_scale 只能保证前缀，exact 仍只有 3/17。
+加 semantic cumulative 后，token0 + 后续值词元同时闭合。
+```
+
+#### GLM4
+
+```text
+target rows = 31 / raw cases = 256
+source = answer_label L32 layer_out
+downstream = [34, 35, 36, 37, 38, 39]
+
+base:
+  tok0 = 11/31
+  exact = 2/31
+  wrong_exact = 9/31
+  mean_prefix_margin = -0.226
+
+semantic_cumulative:
+  tok0 = 11/31
+  exact = 11/31
+  wrong_exact = 0/31
+  mean_prefix_margin = -0.226
+
+best_source_semantic:
+  tok0 = 30/31
+  exact = 30/31
+  wrong_exact = 0/31
+  mean_prefix_margin = 1.442
+
+readout_scale0.125_semantic:
+  tok0 = 31/31
+  exact = 31/31
+  wrong_exact = 0/31
+  mean_prefix_margin = 20.704
+
+readout_scale0.25_semantic:
+  tok0 = 31/31
+  exact = 31/31
+  wrong_exact = 0/31
+  mean_prefix_margin = 41.673
+```
+
+GLM4 现象：
+
+```text
+GLM4 的自然 source patch 已经接近闭合。
+readout direction 进一步把剩余 1/31 的前缀失败补上。
+但 readout-only exact 仍只有 5/31，说明 token0 前缀门不能替代语义值门。
+```
+
+#### DS7B
+
+```text
+target rows = 82 / raw cases = 256
+source = answer_label L21 layer_out
+downstream = [22, 23, 24, 25, 26, 27]
+
+base:
+  tok0 = 0/82
+  exact = 0/82
+  wrong_exact = 0/82
+  mean_prefix_margin = -6.356
+
+repair_prompt:
+  tok0 = 20/82
+  exact = 20/82
+  wrong_exact = 0/82
+  mean_prefix_margin = -1.699
+
+semantic_cumulative:
+  tok0 = 0/82
+  exact = 0/82
+  wrong_exact = 0/82
+  mean_prefix_margin = -6.356
+
+best_source_semantic:
+  tok0 = 21/82
+  exact = 21/82
+  wrong_exact = 0/82
+  mean_prefix_margin = -2.158
+
+readout_scale0.125_semantic:
+  tok0 = 70/82
+  exact = 70/82
+  wrong_exact = 0/82
+  mean_prefix_margin = 24.727
+
+readout_scale0.25_semantic:
+  tok0 = 82/82
+  exact = 81/82
+  wrong_exact = 1/82
+  mean_prefix_margin = 55.759
+
+readout_scale0.5_semantic:
+  tok0 = 82/82
+  exact = 81/82
+  wrong_exact = 1/82
+  mean_prefix_margin = 117.930
+```
+
+DS7B 现象：
+
+```text
+base 下 correct prefix " v" 对 top competitor 平均落后 6.356 logit。
+semantic_cumulative 完全不能改变 token0，说明语义值门不负责第一个格式前缀词元。
+best_source_semantic 只能到 21/82，与 Phase629/630 一致。
+readout_scale0.25_semantic 直接达到 81/82，几乎复现 Phase628 forced-prefix 上界。
+```
+
+典型 DS7B 样例：
+
+```text
+base:
+  token0 = " ?\n\n"
+  generation = " ?\n\nTo solve"
+
+semantic_cumulative:
+  token0 = " ?\n\n"
+  generation = " ?\n\n2\n"
+
+best_source_semantic:
+  token0 = " ?\n\n"
+  generation = " ?\n\n2\n"
+
+readout_scale1_semantic:
+  token0 = " v"
+  generation = " v22"
+```
+
+### 当前客观拼图
+
+本轮把 Phase630 的负结果推进成了正定位：
+
+```text
+Phase630:
+  DS7B 的 format/prefix gate 不在当前单组 source layer_out 中。
+
+Phase631:
+  DS7B 的 format/prefix gate 可以被 final_norm readout direction 直接打开。
+```
+
+这说明当前机制至少分成两层：
+
+```text
+1. semantic value gate:
+   后续答案值词元的语义修复。
+   对 DS7B 已经接近闭合。
+
+2. token0 prefix readout gate:
+   第一个格式/前缀词元的读出竞争。
+   DS7B 自然状态下强烈偏向 " ?\n\n" 等竞争格式词元。
+```
+
+更具体地：
+
+```text
+readout-only:
+  可以打开 " v" 前缀，但后续值仍错，wrong_exact 很多。
+
+semantic-only:
+  可以修复后续值，但 token0 仍被错误格式词元拦截。
+
+readout + semantic:
+  前缀轨道与语义值同时修复，生成接近闭合。
+```
+
+### 理论进展
+
+当前自然生成可写成更客观的双门乘积：
+
+```text
+ExactGeneration
+≈ PrefixReadoutGate(token0)
+  AND SemanticValueGate(token1/token2)
+  AND DownstreamStability
+```
+
+对 DS7B：
+
+```text
+SemanticValueGate:
+  已经可由 cumulative layer_out patch 强修复。
+
+PrefixReadoutGate:
+  不是当前 source layer_out patch 能自然修复；
+  但可以由 final_norm unembedding margin 方向直接人工打开。
+```
+
+这不是完整机制闭合，因为 readout direction 是人工构造，不是模型内部自然生成的来源。
+但它把瓶颈位置从模糊的 source search 明确推进到：
+
+```text
+哪个内部组件自然产生 W[" v"] - W[competitor] 方向的 final readout bias？
+```
+
+### 硬伤和边界
+
+1. **readout 注入是人工方向，不是自然路径**
+
+本轮证明该方向充分有效，但还没有证明模型内部哪个头、MLP、残差路径自然写入该方向。
+
+2. **scale 造成的 margin 很大**
+
+0.25 以上已经把 margin 推到几十，属于强干预。
+它证明读出竞争可以被方向性控制，但不能说明自然机制使用同等强度。
+
+3. **competitor 只取 base top-1**
+
+本轮主要比较 correct prefix 与 base top competitor。
+如果干预后出现新的竞争词元，本轮没有完整建立多竞争者动力学图。
+
+4. **target-only 样本**
+
+主结果集中在 base 错、repair 对的目标样本。
+这适合定位失败机制，但还需要对非目标样本做副作用审计，防止方向注入破坏本来正确的样本。
+
+5. **仍未解释 1/82 剩余失败**
+
+DS7B readout + semantic 达到 81/82，与 Phase628 上界一致，但没有解释最后一个样本失败原因。
+
+### 下一步任务
+
+Phase632 应从人工 readout direction 回溯到自然组件：
+
+```text
+Natural Prefix Readout Writer Backtrace
+```
+
+核心目标：
+
+```text
+寻找哪些 attention head / MLP / residual delta 在 prompt_last final_norm 前，
+自然写入 W[" v"] - W[top_competitor] 方向。
+```
+
+测试要求：
+
+```text
+1. 对每层 layer_out、attn_out、mlp_out 计算 prefix_readout_margin_delta。
+2. 分解 DS7B base vs repair_prompt 的 margin 变化。
+3. 对候选 writer 做 causal remove / restore。
+4. 同时保留 semantic cumulative patch，检查 writer restore 是否能把 exact 从 21/82 推向 81/82。
+5. 加 random_same_norm、wrong_prefix_direction、non-target side-effect control。
+```
+
+判据：
+
+```text
+如果某个自然 writer 的 restore 能提高 token0 " v" 命中，
+并在 semantic cumulative 条件下显著提高 exact，
+则它是 prefix readout gate 的自然写入器候选。
+
+如果所有单 writer 都失败，
+则下一步进入 multi-writer cumulative readout field，而不是继续单点 patch。
+```
+
+## Phase 632: Natural Prefix Readout Writer Backtrace 自然前缀读出写入器回溯 [2026-06-25 15:26]
+
+### 本阶段目标
+
+根据用户附件，当前研究应同时推进两件事：
+
+```text
+1. Phase631 的 readout direction 是人工构造，不是自然机制闭合。
+2. 语言智能更可能来自相对编码 + 复用差分机制，需要开始图谱化。
+```
+
+本阶段不做大理论总结，而是把这两个判断落到一个客观测试：
+
+```text
+从 Phase631 的人工 W[" v"] - W[top_competitor] readout direction 回溯，
+寻找哪些自然层/组件的 base->repair 差分会写入该 prefix readout 方向。
+```
+
+核心问题：
+
+```text
+自然 forward 中，哪些 layer/component 在 prompt_last 位置增加
+logit(" v") - logit(top_competitor) 的 margin？
+
+这些自然 writer 单独 restore 后，能否在 semantic cumulative 条件下把 exact generation 推向 Phase631 的人工 readout 上界？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py
+tests/gpt5/phase632_natural_prefix_readout_writer_backtrace_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase632_natural_prefix_readout_writer_backtrace
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py \
+  tests/gpt5/phase632_natural_prefix_readout_writer_backtrace_summary.py
+
+python tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase632_natural_prefix_readout_writer_backtrace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase632_natural_prefix_readout_writer_backtrace \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase632_natural_prefix_readout_writer_backtrace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase632_natural_prefix_readout_writer_backtrace.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase632_natural_prefix_readout_writer_backtrace \
+  --hard-exit-after-model
+
+python tests/gpt5/phase632_natural_prefix_readout_writer_backtrace_summary.py
+```
+
+### 测试原理
+
+Phase631 证明人工方向：
+
+```text
+u_prefix = normalize(W[" v"] - W[top_competitor])
+```
+
+可以打开 token0 prefix gate。
+
+Phase632 不再直接注入这个人工方向，而是对自然 base->repair 差分做图谱：
+
+```text
+delta_h(l, component) = h_repair(l, component, prompt_last) - h_base(l, component, prompt_last)
+```
+
+对每个层/组件计算它对前缀读出边际的自然贡献：
+
+```text
+natural_margin_delta =
+  dot(W[" v"] - W[top_competitor], delta_h)
+```
+
+如果某个节点 natural_margin_delta 大且 positive_rate 高，说明它自然朝正确前缀读出方向移动。
+
+随后对 top writer 做因果验证：
+
+```text
+restore:
+  base prompt 中把该节点替换为 repair 对应节点。
+
+restore_semantic:
+  restore + semantic cumulative patch。
+
+random_semantic:
+  同范数随机 delta + semantic cumulative。
+
+reverse_semantic:
+  反向 delta + semantic cumulative。
+
+remove_from_repair:
+  repair prompt 中把该节点替换回 base 对应节点。
+```
+
+判据：
+
+```text
+如果 restore_semantic 显著超过 semantic_cumulative，
+且 random/reverse 不能复现，则该节点是自然 prefix writer。
+
+如果 scan 很强但 restore_semantic 仍不能接近 Phase631 上界，
+说明 prefix readout gate 是多 writer / 累积场，而不是单 writer。
+```
+
+### 关键结果
+
+#### Qwen3
+
+目标样本：
+
+```text
+rows = 17 / raw_cases = 256
+scan_layers = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+top_nodes = L34_layer_out, L35_layer_input, L33_layer_out, L34_layer_input, L32_layer_out, L33_layer_input
+```
+
+自然 margin writer 扫描：
+
+```text
+L34_layer_out:
+  mean_margin_delta = 4.610
+  positive_rate = 0.941
+  mean_cos = 0.045
+
+L35_layer_input:
+  mean_margin_delta = 4.610
+  positive_rate = 0.941
+  mean_cos = 0.045
+
+L33_layer_out:
+  mean_margin_delta = 3.779
+  positive_rate = 0.765
+```
+
+因果验证：
+
+```text
+baseline base:
+  tok0 = 10/17
+  exact = 1/17
+  wrong_exact = 9/17
+
+baseline semantic_cumulative:
+  tok0 = 10/17
+  exact = 10/17
+
+baseline repair_prompt:
+  tok0 = 14/17
+  exact = 11/17
+
+L34_layer_out restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 1.044
+
+L35_layer_input restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  wrong_exact = 0/17
+  mean_prefix_margin = 1.044
+```
+
+Qwen3 结论：
+
+```text
+后层 L34/L35 的自然差分确实携带 prefix readout 修复信号。
+单节点 restore_semantic 可从 semantic_cumulative 的 10/17 提高到 14/17。
+但它没有达到 Phase631 readout_scale_semantic 的 17/17，说明单 writer 不足。
+```
+
+#### GLM4
+
+目标样本：
+
+```text
+rows = 31 / raw_cases = 256
+scan_layers = [26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+top_nodes = L38_layer_out, L39_layer_input, L37_layer_out, L38_layer_input, L36_layer_out, L37_layer_input
+```
+
+自然 margin writer 扫描：
+
+```text
+L38_layer_out:
+  mean_margin_delta = 3.842
+  positive_rate = 1.000
+  mean_cos = 0.085
+
+L39_layer_input:
+  mean_margin_delta = 3.842
+  positive_rate = 1.000
+  mean_cos = 0.085
+
+L37_layer_out:
+  mean_margin_delta = 3.068
+  positive_rate = 1.000
+```
+
+因果验证：
+
+```text
+baseline base:
+  tok0 = 11/31
+  exact = 2/31
+  wrong_exact = 9/31
+
+baseline semantic_cumulative:
+  tok0 = 11/31
+  exact = 11/31
+
+baseline repair_prompt:
+  tok0 = 29/31
+  exact = 28/31
+
+L38_layer_out restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  wrong_exact = 0/31
+  mean_prefix_margin = 1.712
+
+L39_layer_input restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  wrong_exact = 0/31
+  mean_prefix_margin = 1.712
+
+remove_from_repair:
+  多个 top writer 移除后 exact 降到 9/31 到 10/31。
+```
+
+GLM4 结论：
+
+```text
+GLM4 的自然 prefix writer 很清楚，后层 L36-L39 均稳定正向写入。
+restore_semantic 从 11/31 提高到 29/31。
+remove_from_repair 显著破坏 repair_prompt，说明这些后层 writer 对格式门是必要成分之一。
+但仍低于 Phase631 人工 readout 的 31/31，也略低于 Phase630 best_source_semantic 的 30/31。
+```
+
+#### DS7B
+
+目标样本：
+
+```text
+rows = 82 / raw_cases = 256
+scan_layers = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+top_nodes = L26_layer_out, L27_layer_input, L27_layer_out, L25_layer_out, L26_layer_input, L24_layer_out
+```
+
+自然 margin writer 扫描：
+
+```text
+L26_layer_out:
+  mean_margin_delta = 33.271
+  positive_rate = 1.000
+  mean_cos = 0.090
+
+L27_layer_input:
+  mean_margin_delta = 33.271
+  positive_rate = 1.000
+  mean_cos = 0.090
+
+L27_layer_out:
+  mean_margin_delta = 32.667
+  positive_rate = 0.988
+  mean_cos = 0.067
+
+L25_layer_out:
+  mean_margin_delta = 17.553
+  positive_rate = 0.988
+```
+
+因果验证：
+
+```text
+baseline base:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -6.356
+
+baseline semantic_cumulative:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -6.356
+
+baseline repair_prompt:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+L26_layer_out restore_semantic:
+  tok0 = 21/82
+  exact = 21/82
+  mean_prefix_margin = -1.662
+
+L27_layer_input restore_semantic:
+  tok0 = 21/82
+  exact = 21/82
+  mean_prefix_margin = -1.662
+
+L25_layer_out restore_semantic:
+  tok0 = 21/82
+  exact = 21/82
+  mean_prefix_margin = -1.755
+
+random_semantic:
+  最高仅 1/82，多数 0/82。
+
+remove_from_repair:
+  多数降到 0/82 或 1/82。
+```
+
+DS7B 结论：
+
+```text
+DS7B 的自然 prefix margin 差分非常强，集中在 L24-L27 后层残差/层输出。
+这些节点对 repair_prompt 是必要的：remove_from_repair 会几乎打回 base。
+但是单节点 restore_semantic 最高只有 21/82，与 Phase629/630 持平。
+它远低于 Phase631 人工 readout_scale0.25_semantic 的 81/82。
+```
+
+### 当前客观拼图
+
+Phase632 得到一个关键的“正扫描 + 负闭合”结果：
+
+```text
+正结果：
+  自然 prefix readout writer 确实存在，并且可被 margin_delta 指标稳定定位。
+
+负结果：
+  单个自然 writer restore 无法复现 Phase631 的人工 readout 闭合。
+```
+
+跨模型共同现象：
+
+```text
+1. prefix readout writer 集中在后层 layer_out/layer_input。
+2. layer_out 与下一层 layer_input 成对出现，说明它们主要是残差流连续状态。
+3. random_same_norm 不能复现 restore_semantic，说明不是范数扰动。
+4. remove_from_repair 会破坏 repair_prompt，说明这些 writer 对自然修复有必要性。
+5. 单 writer restore 仍不足，说明 prefix gate 更像多 writer cumulative field。
+```
+
+这正好支持“相对编码 + 复用差分”的方向：
+
+```text
+同一后层残差骨架被复用；
+不同 prompt 条件通过 base->repair 的差分状态改变 prefix token 的相对读出边际；
+但完整 gate 不是单点差分，而是跨层累积差分场。
+```
+
+### 理论进展
+
+当前 prefix gate 应从单节点模型升级为累积读出场：
+
+```text
+M_prefix =
+  dot(W[prefix] - W[competitor], h_final)
+```
+
+自然差分分解为：
+
+```text
+Delta M_prefix
+≈ sum over writers dot(W[prefix] - W[competitor], Delta h_writer)
+```
+
+其中单个 writer 可以提供局部正贡献，但完整翻转需要多 writer 累积。
+
+因此 Phase632 后，当前更合理的图谱节点不是：
+
+```text
+one writer causes prefix gate
+```
+
+而是：
+
+```text
+prefix readout field =
+  residual-layer writer chain + attention/MLP local increments + final unembedding competition
+```
+
+### 硬伤和边界
+
+1. **扫描强不等于因果闭合**
+
+DS7B 的 L26/L27 margin_delta 很强，但 restore_semantic 仍只有 21/82。
+这说明 margin_delta 能定位自然差分方向，但单节点 patch 不足以复现完整轨迹。
+
+2. **layer_out / next layer_input 重复**
+
+很多 top 节点成对出现，例如 L26_layer_out 和 L27_layer_input。
+这不是两个独立机制，而是同一残差状态跨层传递的两个观测点。
+
+3. **没有做多节点 cumulative restore**
+
+本阶段故意先做单节点审计。
+既然单节点不足，下一步必须做多节点累积，而不是继续扩大单节点搜索。
+
+4. **只扫 prompt_last**
+
+如果 prefix gate 还依赖 earlier source tokens 或 answer_label span 的多位置场，本轮没有覆盖。
+
+5. **target-only 仍可能高估机制**
+
+主样本仍是 base 错、repair 对目标子集。
+下一步多节点 patch 必须增加 non-target side-effect control。
+
+### 下一步任务
+
+Phase633 应执行：
+
+```text
+Multi-Writer Prefix Readout Field Closure
+```
+
+目标：
+
+```text
+把 Phase632 的 top natural writer 从单节点 restore 升级为多节点 cumulative restore，
+检查是否能从 21/82 接近 Phase631 人工 readout 的 81/82。
+```
+
+测试要求：
+
+```text
+1. 对 top writer chain 做 cumulative restore:
+   top1, top2, top4, top8, top12。
+
+2. 区分重复残差观测点:
+   不同时使用 L26_layer_out 与 L27_layer_input 这类等价邻接点，
+   构建去重后的 residual writer chain。
+
+3. 每个 cumulative set 测：
+   restore_only
+   restore_semantic
+   random_same_norm_semantic
+   reverse_semantic
+   remove_from_repair
+
+4. 指标：
+   tok0 hit
+   exact generation
+   wrong_exact
+   mean_prefix_margin
+   top competitor changes
+
+5. 三模型都跑，但重点看 DS7B：
+   如果 DS7B cumulative restore_semantic 接近 81/82，
+   prefix readout field 基本闭合。
+
+   如果仍停在 21/82，
+   说明 prompt_last residual writer chain 仍不是完整路径，
+   下一步必须加入多位置 source/format field。
+```
+
+阶段性判据：
+
+```text
+单 writer 不足已经成立。
+下一步不应继续寻找“唯一自然 writer”，而应测试“多 writer 累积场”。
+```
+
+## Phase 633: Multi-Writer Prefix Readout Field Closure 多写入器前缀读出场闭合 [2026-06-25 15:53]
+
+### 本阶段目标
+
+根据用户附件对 Phase632 的分析，先判断其是否正确，再继续完成客观拼图。
+
+附件中正确部分：
+
+```text
+1. Phase632 不是普通 patch，而是进入复用差分图谱方向。
+2. Phase632 完成了从人工 readout direction 到自然 writer 的回溯。
+3. 自然 prefix writer 存在，且集中在后层 residual layer_out / layer_input。
+4. 单 writer restore 无法闭合，说明 prefix gate 更像多 writer cumulative readout field。
+5. 下一步应测试多 writer 累积，而不是继续寻找唯一 writer。
+```
+
+Phase633 目标：
+
+```text
+把 Phase632 的 top natural writer 从单节点 restore 升级为多节点 cumulative restore。
+检查 prompt_last residual writer field 是否能把 DS7B 从 21/82 推近 Phase631 人工 readout 的 81/82。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py
+tests/gpt5/phase633_multi_writer_prefix_readout_field_closure_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase633_multi_writer_prefix_readout_field_closure
+```
+
+### 执行命令
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py \
+  tests/gpt5/phase633_multi_writer_prefix_readout_field_closure_summary.py
+
+python tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py qwen3 \
+  --smoke \
+  --include-nontarget \
+  --output-dir results/glm5_phase633_multi_writer_prefix_readout_field_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py qwen3 \
+  --confirm \
+  --output-dir results/glm5_phase633_multi_writer_prefix_readout_field_closure \
+  --hard-exit-after-model
+
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py glm4 \
+  --confirm \
+  --output-dir results/glm5_phase633_multi_writer_prefix_readout_field_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase633_multi_writer_prefix_readout_field_closure.py deepseek7b \
+  --confirm \
+  --output-dir results/glm5_phase633_multi_writer_prefix_readout_field_closure \
+  --hard-exit-after-model
+
+python tests/gpt5/phase633_multi_writer_prefix_readout_field_closure_summary.py
+```
+
+### 测试原理
+
+本阶段使用 Phase632 已经得到的 natural prefix writer scan_rank。
+
+为避免重复残差观测点，把下列节点视为同一 residual observation：
+
+```text
+Lx_layer_out ≈ L(x+1)_layer_input
+```
+
+然后从去重后的 writer rank 构建累积集合：
+
+```text
+top1
+top2
+top4
+top8
+top12
+```
+
+每个集合测试：
+
+```text
+restore:
+  在 base prompt 的 prompt_last 多节点注入 repair 状态。
+
+restore_semantic:
+  restore + semantic cumulative patch。
+
+random_semantic:
+  同范数随机多节点 delta + semantic cumulative。
+
+reverse_semantic:
+  反向多节点 delta + semantic cumulative。
+
+remove_from_repair:
+  在 repair prompt 中把这些节点替换回 base 状态。
+```
+
+核心判据：
+
+```text
+如果 prompt_last 多 writer field 是完整 prefix gate，
+则 topK_restore_semantic 应随 K 增加接近 Phase631 人工 readout 上界。
+
+如果 topK_restore_semantic 仍停在 Phase632 单 writer 水平，
+则 prompt_last residual writer field 不是完整路径。
+```
+
+### 关键结果
+
+#### Qwen3
+
+目标样本：
+
+```text
+rows = 17 / raw_cases = 256
+candidate_nodes =
+  L34_layer_out, L33_layer_out, L32_layer_out, L35_layer_out,
+  L34_attn_out, L32_attn_out, L30_layer_out, L31_layer_out,
+  L28_layer_out, L29_layer_out, L33_attn_out, L25_layer_out
+```
+
+结果：
+
+```text
+base:
+  tok0 = 10/17
+  exact = 1/17
+  wrong_exact = 9/17
+  mean_prefix_margin = 0.213
+
+semantic_cumulative:
+  tok0 = 10/17
+  exact = 10/17
+  mean_prefix_margin = 0.213
+
+repair_prompt:
+  tok0 = 14/17
+  exact = 11/17
+  wrong_exact = 3/17
+  mean_prefix_margin = 1.110
+
+top1_restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  mean_prefix_margin = 1.044
+
+top4_restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  mean_prefix_margin = 1.110
+
+top8_restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  mean_prefix_margin = 1.110
+
+top12_restore_semantic:
+  tok0 = 14/17
+  exact = 14/17
+  mean_prefix_margin = 1.110
+
+top12_reverse_semantic:
+  tok0 = 6/17
+  exact = 6/17
+  mean_prefix_margin = -0.537
+```
+
+Qwen3 结论：
+
+```text
+多 writer 累积没有超过 top1/top4 的 14/17。
+prompt_last writer field 只能解释一部分格式门，不能达到 Phase631 人工 readout 的 17/17。
+```
+
+#### GLM4
+
+目标样本：
+
+```text
+rows = 31 / raw_cases = 256
+candidate_nodes =
+  L38_layer_out, L37_layer_out, L36_layer_out, L39_layer_out,
+  L35_layer_out, L34_layer_out, L33_layer_out, L32_layer_out,
+  L32_attn_out, L38_mlp_out, L31_layer_out, L29_layer_out
+```
+
+结果：
+
+```text
+base:
+  tok0 = 11/31
+  exact = 2/31
+  wrong_exact = 9/31
+  mean_prefix_margin = -0.226
+
+semantic_cumulative:
+  tok0 = 11/31
+  exact = 11/31
+  mean_prefix_margin = -0.226
+
+repair_prompt:
+  tok0 = 29/31
+  exact = 28/31
+  wrong_exact = 1/31
+  mean_prefix_margin = 1.710
+
+top1_restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  mean_prefix_margin = 1.712
+
+top4_restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  mean_prefix_margin = 1.710
+
+top8_restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  mean_prefix_margin = 1.710
+
+top12_restore_semantic:
+  tok0 = 29/31
+  exact = 29/31
+  mean_prefix_margin = 1.710
+
+top12_reverse_semantic:
+  tok0 = 0/31
+  exact = 0/31
+  mean_prefix_margin = -2.064
+```
+
+GLM4 结论：
+
+```text
+GLM4 单 writer 已基本达到 prompt_last writer field 上限。
+多 writer 累积没有超过 29/31。
+remove_from_repair 会降回 11/31，说明这些 writer 对修复路径必要。
+但剩余 2/31 缺口不在去重后的 prompt_last writer 累积中。
+```
+
+#### DS7B
+
+目标样本：
+
+```text
+rows = 82 / raw_cases = 256
+candidate_nodes =
+  L26_layer_out, L27_layer_out, L25_layer_out, L24_layer_out,
+  L26_attn_out, L23_layer_out, L26_mlp_out, L25_attn_out,
+  L24_attn_out, L22_layer_out, L22_attn_out, L24_mlp_out
+```
+
+结果：
+
+```text
+base:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -6.356
+
+semantic_cumulative:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -6.356
+
+repair_prompt:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+top1_restore_semantic:
+  tok0 = 21/82
+  exact = 21/82
+  mean_prefix_margin = -1.662
+
+top2_restore_semantic:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+top4_restore_semantic:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+top8_restore_semantic:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+top12_restore_semantic:
+  tok0 = 20/82
+  exact = 20/82
+  mean_prefix_margin = -1.699
+
+top12_random_semantic:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -5.989
+
+top12_reverse_semantic:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -10.592
+
+top12_remove_from_repair:
+  tok0 = 0/82
+  exact = 0/82
+  mean_prefix_margin = -6.356
+```
+
+DS7B 结论：
+
+```text
+多 writer cumulative restore 没有提升，反而 top2/top4/top8/top12 回到 repair_prompt 的 20/82。
+top1 的 21/82 是最高值。
+prompt_last residual writer field 不是 DS7B prefix gate 的完整路径。
+```
+
+### 当前客观拼图
+
+Phase633 是一个关键负结果：
+
+```text
+Phase632:
+  单 writer 不足。
+
+Phase633:
+  去重后的 prompt_last 多 writer 累积仍不足。
+```
+
+这排除了一个自然推测：
+
+```text
+只要把 prompt_last 后层 writer chain 累积起来，
+就能复现 Phase631 人工 readout 的 81/82。
+```
+
+实际结果：
+
+```text
+Qwen3:
+  prompt_last writer field 上限约 14/17。
+
+GLM4:
+  prompt_last writer field 上限约 29/31。
+
+DS7B:
+  prompt_last writer field 上限约 20/82 到 21/82。
+```
+
+因此，DS7B 的 Phase631 人工 readout 闭合并不是 prompt_last 多 writer restore 可以自然复现的。
+
+### 理论进展
+
+当前机制应进一步拆分：
+
+```text
+1. natural prompt_last writer field:
+   可解释 repair_prompt 中一部分 prefix margin 改善。
+
+2. final readout direction:
+   人工足以打开 token0，但自然来源未闭合。
+
+3. missing format/source field:
+   可能位于多位置 source span、格式标签、answer_label、question span 或 decoder prior。
+```
+
+这对“相对编码 + 复用差分机制”的含义也更具体：
+
+```text
+差分不是只在一个位置累积；
+复用骨架可能跨多个位置、多种状态接口共同形成输出竞争条件。
+```
+
+也就是说，真正图谱不能只画 prompt_last：
+
+```text
+完整 prefix gate 图谱 =
+  prompt_last residual field
+  + multi-source format field
+  + token-level unembedding competition
+  + decode prior / formatting prior
+```
+
+### 硬伤和边界
+
+1. **Phase633 依赖 Phase632 的 scan_rank**
+
+本轮没有重新扫描所有节点，而是用 Phase632 的 top writer rank 作为候选。
+这提高效率，但如果 Phase632 漏掉多位置 source 节点，本轮不会发现。
+
+2. **只测试 prompt_last 多 writer**
+
+本轮没有测试 answer_label、question_all、relation_tail 等多位置 source span 的累积场。
+DS7B 的失败很可能说明缺口在这些位置。
+
+3. **累积 patch 可能互相覆盖轨迹**
+
+多节点同时 restore 不一定等于自然动态生成，因为后层状态可能依赖前层状态。
+这可能解释为什么 top12 没超过 top1。
+
+4. **没有测试非目标副作用**
+
+本阶段仍主要面向目标样本。
+如果之后找到强多位置 field，必须做 non-target side-effect audit。
+
+5. **仍未解释 DS7B 81/82 人工上界的自然来源**
+
+Phase633 缩小了搜索空间，但没有闭合自然机制。
+
+### 下一步任务
+
+Phase634 应执行：
+
+```text
+Multi-Position Format Source Field Closure
+```
+
+核心目标：
+
+```text
+不要再只在 prompt_last 累积 writer。
+改为测试多位置 source/format field 是否能提供 DS7B 缺失的 prefix gate。
+```
+
+测试设计：
+
+```text
+1. 使用 Phase630 的 source groups:
+   prompt_last
+   answer_label
+   question_mark_answer
+   relation_tail
+   question_subject
+   question_all
+
+2. 不再单组扫描，而是做 multi-group cumulative patch:
+   answer_label + prompt_last
+   question_mark_answer + prompt_last
+   relation_tail + answer_label + prompt_last
+   question_all + answer_label + prompt_last
+
+3. 每组测试:
+   source_cumulative_only
+   source_cumulative_semantic
+   random_same_norm_semantic
+   reverse/source_wrong_semantic
+
+4. 仍使用自然生成指标:
+   tok0 hit
+   exact generation
+   wrong_exact
+   mean_prefix_margin
+   top competitor distribution
+
+5. DS7B 是重点:
+   如果 multi-source field + semantic 接近 81/82，
+   则 prefix gate 是多位置格式源场。
+
+   如果仍停在 20/82，
+   则瓶颈进一步后移到 final readout / decoding prior 的自然来源。
+```
+
+阶段性判断：
+
+```text
+prompt_last 单点不够；
+prompt_last 多 writer 也不够；
+下一步必须进入多位置 source/format field。
+```
+
+## Phase 634: Multi-Position Format Source Field Closure 多位置格式源场闭合 [2026-06-25 16:48]
+
+### 触发背景
+
+用户上传的 Phase633 分析判断基本正确。Phase633 的核心价值是一个关键负结果：
+
+```text
+prompt_last 单点 writer 不够；
+prompt_last 多 writer 累积也不够；
+因此必须测试 multi-position source / format field。
+```
+
+本阶段直接执行这个下一步，不再继续在 prompt_last 位置叠加 writer，而是把 Phase630 中已经定义过的 source groups 引入到同一轮跨模型确认测试。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase634_multi_position_format_source_field_closure.py
+tests/gpt5/phase634_multi_position_format_source_field_closure_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase634_multi_position_format_source_field_closure/
+```
+
+核心输出：
+
+```text
+results/glm5_phase634_multi_position_format_source_field_closure/phase634_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase634_multi_position_format_source_field_closure.py tests/gpt5/phase634_multi_position_format_source_field_closure_summary.py
+```
+
+Qwen3 smoke：
+
+```bash
+python tests/gpt5/phase634_multi_position_format_source_field_closure.py qwen3 --smoke --include-nontarget --output-dir results/glm5_phase634_multi_position_format_source_field_closure --hard-exit-after-model
+```
+
+Qwen3 confirm：
+
+```bash
+python tests/gpt5/phase634_multi_position_format_source_field_closure.py qwen3 --confirm --output-dir results/glm5_phase634_multi_position_format_source_field_closure --hard-exit-after-model
+```
+
+GLM4 confirm：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase634_multi_position_format_source_field_closure.py glm4 --confirm --output-dir results/glm5_phase634_multi_position_format_source_field_closure --hard-exit-after-model
+```
+
+DS7B confirm：
+
+```bash
+python tests/gpt5/phase634_multi_position_format_source_field_closure.py deepseek7b --confirm --output-dir results/glm5_phase634_multi_position_format_source_field_closure --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase634_multi_position_format_source_field_closure_summary.py
+```
+
+### 测试原理
+
+Phase631 已经证明，人工 token0 readout direction 可以把 DS7B 从 0/82 推到 81/82。Phase632 和 Phase633 证明，自然 prompt_last writer 无论单点还是多 writer 累积，都只能到约 20/82 到 21/82。
+
+本阶段测试的是：
+
+```text
+如果 DS7B 缺失的 prefix gate 不是 prompt_last 局部状态，
+它是否来自多个 source / format 位置的共同作用？
+```
+
+测试的 source groups：
+
+```text
+prompt_last
+answer_label
+question_mark_answer
+relation_tail
+question_subject
+question_all
+```
+
+测试的组合：
+
+```text
+single_prompt_last
+single_answer_label
+single_question_mark_answer
+single_relation_tail
+single_question_all
+answer_prompt
+qma_prompt
+relation_answer_prompt
+question_all_answer_prompt
+answer_qma_relation_prompt
+all6
+```
+
+每组都包含：
+
+```text
+restore
+restore_semantic
+random
+random_semantic
+reverse
+reverse_semantic
+remove_from_repair
+```
+
+核心判据仍然是自然输出层面的：
+
+```text
+tok0 hit
+exact generation
+wrong_exact
+mean_prefix_margin
+top0_text distribution
+```
+
+### 客观结果
+
+#### Qwen3
+
+样本：
+
+```text
+rows = 17
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 10/17 tok0, 1/17 exact
+semantic_cumulative = 10/17 tok0, 10/17 exact
+repair_prompt = 14/17 tok0, 11/17 exact
+
+single_question_all_restore_semantic = 14/17 tok0, 14/17 exact
+question_all_answer_prompt_restore_semantic = 14/17 tok0, 14/17 exact
+all6_restore_semantic = 14/17 tok0, 14/17 exact
+
+single_prompt_last_restore_semantic = 13/17 tok0, 13/17 exact
+single_answer_label_restore_semantic = 13/17 tok0, 13/17 exact
+single_relation_tail_restore_semantic = 13/17 tok0, 13/17 exact
+```
+
+Qwen3 的多位置组合没有超过 single_question_all，也没有接近 Phase631 的人工 readout+semantic 17/17 上界。
+
+#### GLM4
+
+样本：
+
+```text
+rows = 31
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 11/31 tok0, 2/31 exact
+semantic_cumulative = 11/31 tok0, 11/31 exact
+repair_prompt = 29/31 tok0, 28/31 exact
+
+single_answer_label_restore_semantic = 30/31 tok0, 30/31 exact
+single_question_mark_answer_restore_semantic = 30/31 tok0, 30/31 exact
+single_relation_tail_restore_semantic = 30/31 tok0, 30/31 exact
+single_prompt_last_restore_semantic = 30/31 tok0, 30/31 exact
+
+answer_prompt_restore_semantic = 30/31 tok0, 30/31 exact
+relation_answer_prompt_restore_semantic = 30/31 tok0, 30/31 exact
+all6_restore_semantic = 29/31 tok0, 29/31 exact
+```
+
+GLM4 已经可以被多个单源位置修复到 30/31，但多位置 all6 没有超过单源，反而略低到 29/31。
+
+#### DS7B
+
+样本：
+
+```text
+rows = 82
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 0/82 tok0, 0/82 exact
+semantic_cumulative = 0/82 tok0, 0/82 exact
+repair_prompt = 20/82 tok0, 20/82 exact
+
+single_prompt_last_restore_semantic = 21/82 tok0, 21/82 exact
+single_answer_label_restore_semantic = 21/82 tok0, 21/82 exact
+single_question_mark_answer_restore_semantic = 21/82 tok0, 21/82 exact
+single_relation_tail_restore_semantic = 21/82 tok0, 21/82 exact
+single_question_all_restore_semantic = 20/82 tok0, 20/82 exact
+
+answer_prompt_restore_semantic = 21/82 tok0, 21/82 exact
+qma_prompt_restore_semantic = 21/82 tok0, 21/82 exact
+relation_answer_prompt_restore_semantic = 21/82 tok0, 21/82 exact
+question_all_answer_prompt_restore_semantic = 21/82 tok0, 21/82 exact
+answer_qma_relation_prompt_restore_semantic = 21/82 tok0, 21/82 exact
+all6_restore_semantic = 21/82 tok0, 21/82 exact
+
+all6_random_semantic = 0/82
+all6_reverse_semantic = 0/82
+all6_remove_from_repair = 0/82
+```
+
+DS7B 是本阶段最关键的证据。所有多位置组合都没有超过 21/82，和单 prompt_last 基本相同，远低于 Phase631 的 readout_scale0.25+semantic 上界 81/82。
+
+### 结论
+
+本阶段是一个关键负结果。
+
+它排除了一个强假设：
+
+```text
+DS7B 缺失的 prefix gate 来自 Phase630 source groups 的多位置 source / format field 累积。
+```
+
+实验证据不支持这个假设。
+
+跨模型比较显示：
+
+```text
+Qwen3:
+  多位置组合没有超过单个强源位置。
+
+GLM4:
+  多个单源位置都可以恢复到 30/31，
+  但 all6 没有更强，说明多位置累积不是简单加法。
+
+DS7B:
+  all6_restore_semantic = 21/82，
+  与单 prompt_last_restore_semantic = 21/82 相同。
+```
+
+因此，当前链条变成：
+
+```text
+Phase631:
+  人工 token0 readout direction 可以几乎闭合 DS7B。
+
+Phase632:
+  自然 single writer 只能恢复 21/82。
+
+Phase633:
+  prompt_last multi-writer 仍不能超过 20/82 到 21/82。
+
+Phase634:
+  multi-position source / format field 仍不能超过 21/82。
+```
+
+这说明 DS7B 的关键缺口不在已测的自然 source state restore 空间内。
+
+### 最严格的问题和硬伤
+
+1. 本阶段没有证明 prefix gate 的真实来源，只是进一步排除了一个候选空间。
+
+2. 多位置 patch 使用的是固定 layer_map，仍可能漏掉真正的跨层动态轨迹。
+
+3. 多位置 restore 是静态替换，不等价于自然生成中的连续状态演化。
+
+4. all6 不增益可能来自 patch 互相覆盖，也可能说明这些位置只是同一读出状态的重复投影。
+
+5. 当前仍未解释 DS7B 为什么人工 readout direction 能达到 81/82，而自然 source restore 只能达到 21/82。
+
+### 理论进展
+
+本阶段进一步支持“复用差分机制”判断：
+
+```text
+语言框架不是由某个固定位置保存完整控制量；
+多个位置可能共享部分状态，
+但这些状态并不能直接累积成最终 token0 读出门。
+```
+
+也就是说，当前更像：
+
+```text
+source / format positions 提供局部可读差分；
+final token0 readout gate 需要另一个后端机制把差分变成可输出词元竞争优势。
+```
+
+这将瓶颈从：
+
+```text
+source field 在哪里？
+```
+
+推进到：
+
+```text
+source field 如何被汇聚成 final readout / decoding prior？
+```
+
+### 下一步任务
+
+Phase635 应执行：
+
+```text
+Final Readout Projection Bridge Audit
+```
+
+目标不是继续扩大 source 位置，而是直接审计：
+
+```text
+Phase631 的人工 readout direction 到底对应 final hidden / final norm / lm_head 读出链条中的哪一级。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B 重点执行 final hidden pre_norm / post_norm / lm_head input 的分层替换。
+
+2. 比较三类状态：
+   semantic_cumulative
+   source_field_restore_semantic
+   readout_direction_semantic
+
+3. 测量每类状态在 final norm 前后的变化：
+   prefix margin
+   correct token rank
+   top competitor token
+   norm scale
+   cosine to readout direction
+
+4. 测试是否存在 final norm projection collapse：
+   即 hidden 中已经有语义，但经过 final norm / lm_head 后被格式竞争压制。
+
+5. 对照 Qwen3、GLM4、DS7B：
+   如果 Qwen3/GLM4 能在 final bridge 闭合而 DS7B 不能，
+   则 DS7B 的瓶颈是 final readout bridge；
+   如果三者一致，
+   则应转向更高层的 decoding prior / output protocol 图谱。
+```
+
+阶段性判断：
+
+```text
+prompt_last 单点不够；
+prompt_last 多 writer 不够；
+multi-position source / format field 也不够；
+下一步必须进入 final readout bridge。
+```
+
+## Phase 635: Final Readout Projection Bridge Audit 最终读出投影桥审计 [2026-06-25 17:10]
+
+### 触发背景
+
+用户上传的 Phase634 分析基本正确。Phase634 已经排除一个强假设：
+
+```text
+DS7B 缺失的 token0 prefix gate
+不是由已扫描的 multi-position source / format field 简单累积形成的。
+```
+
+当前链条是：
+
+```text
+Phase631:
+  artificial readout direction + semantic cumulative = DS7B 81/82
+
+Phase632:
+  natural single writer restore + semantic = DS7B 21/82
+
+Phase633:
+  prompt_last multi-writer restore + semantic = DS7B 20/82 到 21/82
+
+Phase634:
+  multi-position source / format field + semantic = DS7B 21/82
+```
+
+因此本阶段不再扩大 source 位置，而是直接审计：
+
+```text
+final_norm input -> final_norm output -> lm_head token competition
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase635_final_readout_projection_bridge_audit.py
+tests/gpt5/phase635_final_readout_projection_bridge_audit_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase635_final_readout_projection_bridge_audit/
+```
+
+核心输出：
+
+```text
+results/glm5_phase635_final_readout_projection_bridge_audit/phase635_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase635_final_readout_projection_bridge_audit.py tests/gpt5/phase635_final_readout_projection_bridge_audit_summary.py
+```
+
+Qwen3 smoke：
+
+```bash
+python tests/gpt5/phase635_final_readout_projection_bridge_audit.py qwen3 --smoke --include-nontarget --output-dir results/glm5_phase635_final_readout_projection_bridge_audit --hard-exit-after-model
+```
+
+Qwen3 confirm：
+
+```bash
+python tests/gpt5/phase635_final_readout_projection_bridge_audit.py qwen3 --confirm --output-dir results/glm5_phase635_final_readout_projection_bridge_audit --hard-exit-after-model
+```
+
+GLM4 confirm：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase635_final_readout_projection_bridge_audit.py glm4 --confirm --output-dir results/glm5_phase635_final_readout_projection_bridge_audit --hard-exit-after-model
+```
+
+DS7B confirm：
+
+```bash
+python tests/gpt5/phase635_final_readout_projection_bridge_audit.py deepseek7b --confirm --output-dir results/glm5_phase635_final_readout_projection_bridge_audit --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase635_final_readout_projection_bridge_audit_summary.py
+```
+
+### 测试原理
+
+本阶段比较三类路径：
+
+```text
+1. natural state:
+   base
+   repair_prompt
+   source_all6
+
+2. final bridge restore:
+   final_input_repair
+   final_output_repair
+   final_output_source
+
+3. artificial upper bound:
+   readout_delta
+   readout_delta_semantic
+```
+
+其中 final bridge restore 分别测试：
+
+```text
+final_input_repair:
+  把 base 的 final_norm input 替换为 repair 的 final_norm input。
+
+final_output_repair:
+  把 base 的 final_norm output 直接替换为 repair 的 final_norm output。
+
+final_output_source:
+  把 base 的 final_norm output 替换为 source_all6 后得到的 final_norm output。
+```
+
+如果问题是 final norm 把已有正确状态冲掉，那么：
+
+```text
+final_input_repair 和 final_output_repair 应明显分离。
+```
+
+如果问题是 final output 已经正确但 lm_head 不接受，那么：
+
+```text
+final_output_repair 应接近 artificial readout_delta。
+```
+
+如果两者都不成立，则说明：
+
+```text
+自然 final state 本身没有形成足够的 readout-aligned direction。
+```
+
+### 客观结果
+
+#### Qwen3
+
+样本：
+
+```text
+rows = 17
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 10/17 tok0, 1/17 exact, mean_margin = 0.213
+semantic_cumulative = 10/17 tok0, 10/17 exact
+
+repair_prompt = 14/17 tok0, 11/17 exact, out_proj = 0.581
+source_all6_semantic = 14/17 tok0, 14/17 exact, out_proj = 0.581
+final_input_repair_semantic = 14/17 tok0, 14/17 exact, out_proj = 0.581
+final_output_repair_semantic = 14/17 tok0, 14/17 exact, out_proj = 0.581
+final_output_source_semantic = 14/17 tok0, 14/17 exact, out_proj = 0.581
+
+readout_delta_semantic = 17/17 tok0, 17/17 exact, out_proj = 39.638
+```
+
+Qwen3 的 final restore 路径没有超过 source_all6，人工 readout 仍然明显更强。
+
+#### GLM4
+
+样本：
+
+```text
+rows = 31
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 11/31 tok0, 2/31 exact, mean_margin = -0.226
+semantic_cumulative = 11/31 tok0, 11/31 exact
+
+repair_prompt = 29/31 tok0, 28/31 exact, out_proj = 2.148
+source_all6_semantic = 29/31 tok0, 29/31 exact, out_proj = 2.148
+final_input_repair_semantic = 29/31 tok0, 29/31 exact, out_proj = 2.148
+final_output_repair_semantic = 29/31 tok0, 29/31 exact, out_proj = 2.148
+final_output_source_semantic = 29/31 tok0, 29/31 exact, out_proj = 2.148
+
+readout_delta_semantic = 31/31 tok0, 31/31 exact, out_proj = 46.475
+```
+
+GLM4 的 natural final state 已经能闭合大部分样本，但仍低于人工 readout 上界。
+
+#### DS7B
+
+样本：
+
+```text
+rows = 82
+raw_cases = 256
+```
+
+关键结果：
+
+```text
+base = 0/82 tok0, 0/82 exact, mean_rank = 92.8, mean_margin = -6.356
+semantic_cumulative = 0/82 tok0, 0/82 exact
+
+repair_prompt = 20/82 tok0, 20/82 exact, mean_rank = 9.4, mean_margin = -1.699, out_proj = 3.618
+source_all6_semantic = 21/82 tok0, 21/82 exact, mean_rank = 9.9, mean_margin = -1.755, out_proj = 3.578
+
+final_input_repair_semantic = 20/82 tok0, 20/82 exact, mean_rank = 9.4, mean_margin = -1.699, out_proj = 3.618
+final_output_repair_semantic = 20/82 tok0, 20/82 exact, mean_rank = 9.4, mean_margin = -1.699, out_proj = 3.618
+final_output_source_semantic = 21/82 tok0, 21/82 exact, mean_rank = 9.9, mean_margin = -1.755, out_proj = 3.578
+
+readout_delta_semantic = 82/82 tok0, 81/82 exact, mean_rank = 1.0, mean_margin = 55.759, out_proj = 48.258
+```
+
+DS7B 是核心证据：
+
+```text
+final_input_repair_semantic = 20/82
+final_output_repair_semantic = 20/82
+final_output_source_semantic = 21/82
+readout_delta_semantic = 81/82
+```
+
+final_norm input restore 和 final_norm output restore 完全没有拉近人工 readout 上界。
+
+### 结论
+
+本阶段是一个关键定位结果。
+
+它说明 DS7B 的问题不是：
+
+```text
+repair/source 状态中已经含有足够正确方向，
+但 final norm 把它冲掉。
+```
+
+因为：
+
+```text
+final_input_repair_semantic = final_output_repair_semantic = repair_prompt = 20/82
+```
+
+它也不是：
+
+```text
+source_all6 已经形成足够 final output，
+只是自然路径没有把它送到 lm_head。
+```
+
+因为：
+
+```text
+final_output_source_semantic = source_all6_semantic = 21/82
+```
+
+更严格的结论是：
+
+```text
+自然 final state 只产生了很弱的 readout-aligned projection。
+DS7B 人工 readout 上界来自直接沿 lm_head 竞争方向注入的大幅方向量。
+自然 repair/source/final restore 的方向量远远不够。
+```
+
+用本阶段数值表示：
+
+```text
+DS7B:
+  repair/source final output projection ≈ 3.6
+  artificial readout projection ≈ 48.3
+```
+
+这不是 final norm 层面的崩溃，而是：
+
+```text
+自然轨迹没有产生足够强的 prefix readout vector。
+```
+
+### 理论进展
+
+Phase635 把瓶颈进一步从：
+
+```text
+final readout bridge 是否冲掉已有状态？
+```
+
+推进为：
+
+```text
+自然轨迹为什么没有生成足够强的 readout-aligned vector？
+```
+
+当前更合适的机制表述是：
+
+```text
+source / format field 提供弱投影；
+final norm 只是保留这个弱投影；
+lm_head 只按词表方向读出；
+真正缺失的是上游把格式意图放大成强 readout vector 的机制。
+```
+
+这意味着：
+
+```text
+读出桥不是一个简单位置；
+它可能是 readout vector builder，
+也就是一个把格式/任务状态转译成 lm_head 方向的生成器。
+```
+
+### 最严格的问题和硬伤
+
+1. 本阶段没有找到 readout vector builder，只确认 final norm/input/output restore 不是闭合点。
+
+2. artificial readout_delta 的尺度很大，可能不是自然可达状态，只能作为充分上界，不能直接当自然机制。
+
+3. 当前只测了 token0 prefix gate，尚未把 token0、token1、token2 三门统一成完整读出图谱。
+
+4. final_output projection 是相对 prefix-vs-competitor 的单方向指标，可能漏掉多竞争词元结构。
+
+5. DS7B 中 prefix rank 从 92.8 改善到约 9.4，但仍不能到 1，说明存在一组强竞争词元没有被拆开。
+
+### 下一步任务
+
+Phase636 应执行：
+
+```text
+Prefix Competitor Ladder and Readout Vector Builder Audit
+```
+
+核心问题不再是：
+
+```text
+哪个位置 restore 能成功？
+```
+
+而是：
+
+```text
+DS7B token0 从 rank 92.8 到 rank 9.4 之后，
+还剩哪些 competitor tokens 压住 correct prefix？
+这些 competitor 是格式符号、解释性文本、换行、冒号，还是旧答案前缀？
+```
+
+建议测试：
+
+```text
+1. 对 DS7B 的 base / repair / source_all6 / final_output_repair / readout_delta
+   记录 top20 competitor ladder。
+
+2. 把 competitor tokens 分组：
+   punctuation / newline / explanation / value_prefix / category_prefix / other。
+
+3. 对每组 competitor 建立 group margin：
+   correct_prefix_logit - max(group_logits)
+
+4. 测试人工 readout_delta 究竟是全面抬高 correct prefix，
+   还是主要压过某一类 competitor。
+
+5. 对 Qwen3、GLM4、DS7B 比较：
+   哪些模型的 competitor ladder 已经被自然 repair/source 消除，
+   哪些模型仍停在 explanation / punctuation prior。
+```
+
+阶段性判断：
+
+```text
+source field 不够；
+final norm restore 不够；
+问题已经转向 output competitor ladder 与 readout vector builder。
+```
+
+## Phase 636: Prefix Competitor Ladder and Readout Vector Builder Audit 前缀竞争阶梯与读出向量生成器审计 [2026-06-25 17:41]
+
+### 触发背景
+
+用户上传的 Phase635 分析基本正确。Phase635 的关键定位是：
+
+```text
+DS7B 的问题不是 final norm 把已有正确方向冲掉；
+也不是 source_all6 已经形成足够 final output 但没有送入 lm_head；
+而是自然轨迹没有生成足够强的 prefix readout vector。
+```
+
+Phase635 中 DS7B 的核心数据是：
+
+```text
+repair_prompt out_proj ≈ 3.618
+final_output_repair_semantic out_proj ≈ 3.618
+readout_delta_semantic out_proj ≈ 48.258
+
+repair_prompt tok0 = 20/82
+final_output_repair_semantic tok0 = 20/82
+readout_delta_semantic tok0 = 82/82
+```
+
+因此 Phase636 不再继续问：
+
+```text
+哪个位置 restore 能成功？
+```
+
+而是问：
+
+```text
+正确 prefix token 已经从 rank 92.8 拉到 rank 9.4 后，
+到底还被哪些 competitor tokens 压住？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase636_prefix_competitor_ladder_audit.py
+tests/gpt5/phase636_prefix_competitor_ladder_audit_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase636_prefix_competitor_ladder_audit/
+```
+
+核心输出：
+
+```text
+results/glm5_phase636_prefix_competitor_ladder_audit/phase636_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase636_prefix_competitor_ladder_audit.py tests/gpt5/phase636_prefix_competitor_ladder_audit_summary.py
+```
+
+Qwen3 smoke：
+
+```bash
+python tests/gpt5/phase636_prefix_competitor_ladder_audit.py qwen3 --smoke --include-nontarget --output-dir results/glm5_phase636_prefix_competitor_ladder_audit --hard-exit-after-model
+```
+
+Qwen3 confirm：
+
+```bash
+python tests/gpt5/phase636_prefix_competitor_ladder_audit.py qwen3 --confirm --output-dir results/glm5_phase636_prefix_competitor_ladder_audit --hard-exit-after-model
+```
+
+GLM4 confirm：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase636_prefix_competitor_ladder_audit.py glm4 --confirm --output-dir results/glm5_phase636_prefix_competitor_ladder_audit --hard-exit-after-model
+```
+
+DS7B confirm：
+
+```bash
+python tests/gpt5/phase636_prefix_competitor_ladder_audit.py deepseek7b --confirm --output-dir results/glm5_phase636_prefix_competitor_ladder_audit --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase636_prefix_competitor_ladder_audit_summary.py
+```
+
+### 测试原理
+
+本阶段不做长生成，只测 token0 logits，以减少额外变量。
+
+测试模式：
+
+```text
+base
+repair_prompt
+source_all6
+final_output_repair
+final_output_source
+readout_delta
+```
+
+每个样本记录 top20 competitor ladder，并把 token 分组为：
+
+```text
+correct_prefix
+newline
+punctuation
+explanation
+old_wrong_prefix
+value_prefix
+word
+number
+space
+symbol
+other
+```
+
+每组计算：
+
+```text
+prefix_rank
+top0_category
+top0_text
+prefix_minus_group_max
+winner_rate
+mean_best_rank
+```
+
+核心判据：
+
+```text
+如果自然 repair/source 已经解决格式先验，
+则 top0_category 应从 newline / explanation 转为 correct_prefix。
+
+如果仍失败，
+则剩余 winner category 会显示真实压制来源。
+```
+
+### 客观结果
+
+#### Qwen3
+
+样本：
+
+```text
+rows = 17
+raw_cases = 256
+top_k = 20
+```
+
+mode ladder：
+
+```text
+base:
+  tok0 = 11/17
+  mean_rank = 1.9
+  top0_category = correct_prefix:11, newline:5, space:1
+
+repair_prompt:
+  tok0 = 14/17
+  mean_rank = 1.2
+  top0_category = correct_prefix:14, space:3
+
+source_all6:
+  tok0 = 14/17
+  mean_rank = 1.2
+  top0_category = correct_prefix:14, space:3
+
+final_output_repair:
+  tok0 = 14/17
+  mean_rank = 1.2
+  top0_category = correct_prefix:14, space:3
+
+readout_delta:
+  tok0 = 17/17
+  mean_rank = 1.0
+  top0_category = correct_prefix:17
+```
+
+Qwen3 的剩余竞争主要是 space 类，不是大规模 newline 类。
+
+#### GLM4
+
+样本：
+
+```text
+rows = 31
+raw_cases = 256
+top_k = 20
+```
+
+mode ladder：
+
+```text
+base:
+  tok0 = 11/31
+  mean_rank = 2.7
+  top0_category = word:17, correct_prefix:11, explanation:3
+
+repair_prompt:
+  tok0 = 29/31
+  mean_rank = 1.1
+  top0_category = correct_prefix:29, word:2
+
+source_all6:
+  tok0 = 29/31
+  mean_rank = 1.1
+  top0_category = correct_prefix:29, word:2
+
+final_output_repair:
+  tok0 = 29/31
+  mean_rank = 1.1
+  top0_category = correct_prefix:29, word:2
+
+readout_delta:
+  tok0 = 31/31
+  mean_rank = 1.0
+  top0_category = correct_prefix:31
+```
+
+GLM4 的自然 repair/source/final restore 已经清除了大部分竞争，只剩 2/31 的 word 类竞争。
+
+#### DS7B
+
+样本：
+
+```text
+rows = 82
+raw_cases = 256
+top_k = 20
+```
+
+mode ladder：
+
+```text
+base:
+  tok0 = 0/82
+  mean_rank = 92.8
+  top0_category = newline:81, word:1
+  top0_text = " ?\n\n":81, " c":1
+
+repair_prompt:
+  tok0 = 20/82
+  mean_rank = 9.4
+  top0_category = newline:57, correct_prefix:20, word:3, space:1, explanation:1
+  top0_text = " ?\n\n":57, " v":20
+
+source_all6:
+  tok0 = 20/82
+  mean_rank = 9.9
+  top0_category = newline:57, correct_prefix:20, word:2, space:2, explanation:1
+  top0_text = " ?\n\n":57, " v":20
+
+final_output_repair:
+  tok0 = 20/82
+  mean_rank = 9.4
+  top0_category = newline:57, correct_prefix:20, word:3, space:1, explanation:1
+  top0_text = " ?\n\n":57, " v":20
+
+final_output_source:
+  tok0 = 20/82
+  mean_rank = 9.9
+  top0_category = newline:57, correct_prefix:20, word:2, space:2, explanation:1
+
+readout_delta:
+  tok0 = 82/82
+  mean_rank = 1.0
+  top0_category = correct_prefix:82
+```
+
+DS7B 的 category margins 最关键：
+
+```text
+base newline:
+  winner_rate = 0.99
+  prefix_minus_group_max = -6.354
+
+repair_prompt newline:
+  winner_rate = 0.70
+  prefix_minus_group_max = -1.704
+
+source_all6 newline:
+  winner_rate = 0.70
+  prefix_minus_group_max = -1.765
+
+final_output_repair newline:
+  winner_rate = 0.70
+  prefix_minus_group_max = -1.704
+
+readout_delta newline:
+  winner_rate = 0.00
+  prefix_minus_group_max = 22.896
+```
+
+这说明 DS7B 不是被任意 competitor 压住，而是被非常明确的 newline prior 压住。
+
+### 结论
+
+Phase636 是一个关键定位结果。
+
+它把 Phase635 中的模糊问题：
+
+```text
+自然 readout vector 不够强
+```
+
+进一步压缩为：
+
+```text
+自然 readout vector 没有足够压制 newline / format continuation prior。
+```
+
+最关键的是 DS7B：
+
+```text
+base:
+  81/82 被 newline 类 token 占据 top0。
+
+repair_prompt / final_output_repair:
+  newline 仍然占据 57/82 top0。
+
+readout_delta:
+  correct_prefix 占据 82/82 top0。
+```
+
+因此，DS7B 的 token0 prefix gate 不是一般的语义值门问题，也不是 final norm 问题，而是：
+
+```text
+format continuation prior suppression 不足。
+```
+
+也就是说，模型自然轨迹虽然把正确 prefix 从 rank 92.8 拉到 9.4，但没有关闭“继续输出问题/换行/解释”的格式先验。
+
+### 理论进展
+
+当前三模型呈现清晰差异：
+
+```text
+Qwen3:
+  剩余主要是 space 竞争。
+
+GLM4:
+  剩余主要是少量 word 竞争。
+
+DS7B:
+  剩余主要是 newline 竞争。
+```
+
+这说明不同模型的 token0 prefix gate 不是同构的单机制，而是同一个功能门下的不同竞争结构：
+
+```text
+GLM4:
+  repair/source 可以基本压制 competitor ladder。
+
+Qwen3:
+  repair/source 可以压制 newline，但仍有 space。
+
+DS7B:
+  repair/source 只能削弱 newline，不能关闭 newline prior。
+```
+
+因此，“读出向量生成器”更具体地应分成两部分：
+
+```text
+1. correct prefix promotion
+   抬高正确 prefix。
+
+2. format continuation suppression
+   压制继续提问、换行、解释、符号等格式续写先验。
+```
+
+Phase631 的人工 readout_delta 可能同时完成了两件事：
+
+```text
+大幅抬高 " v"；
+相对压过 newline / punctuation / explanation / space。
+```
+
+但自然 repair/source 只完成了弱抬高，没有完成足够强的 newline suppression。
+
+### 最严格的问题和硬伤
+
+1. 本阶段只做 token0 logits，不做完整自然生成，因此它定位竞争结构，但不直接证明生成闭合。
+
+2. category 分类是规则化的基础分类，可能把部分模型特有 token 分到 word / other，后续需要人工抽查 top tokens。
+
+3. readout_delta 是人工强方向，它压过 newline prior，不代表自然网络一定存在同尺度机制。
+
+4. 当前仍主要使用 target-filtered 样本。全局图谱阶段必须加入 non-target side-effect。
+
+5. DS7B newline prior 的来源仍未定位。它可能来自 prompt 模板、训练中解释性回答习惯、chat 格式、tokenizer 组合，或更深的输出协议。
+
+### 下一步任务
+
+Phase637 应执行：
+
+```text
+Newline Prior Suppression Source Audit
+```
+
+核心目标：
+
+```text
+不要再泛泛找 prefix gate。
+直接追踪 DS7B 的 newline prior 来自哪里，以及哪个自然机制能压制它。
+```
+
+建议测试：
+
+```text
+1. 对 DS7B 的 newline token " ?\n\n" / "\n\n" / " ?\n" 建立专门 logit group。
+
+2. 对 base、repair、source_all6、final_output_repair、readout_delta 比较：
+   prefix_logit
+   newline_group_max_logit
+   prefix_minus_newline
+
+3. 做 prompt ablation:
+   去掉问号
+   改 answer label
+   去掉解释空间
+   加明确 short-answer instruction
+   加 no-explanation instruction
+
+4. 不要只测 target 样本，要加入 non-target side-effect。
+
+5. 如果某个 prompt ablation 能自然压低 newline prior，
+   再回溯它改变了哪些 residual / attention / final output 状态。
+```
+
+阶段性判断：
+
+```text
+DS7B 剩余瓶颈已经从 readout vector builder
+进一步定位为 newline / format continuation prior suppression。
+```
+
+## Phase 637: Newline Prior Suppression Source Audit 换行先验压制来源审计 [2026-06-25 18:28]
+
+### 触发背景
+
+用户上传的 Phase636 分析基本正确。Phase636 的关键定位是：
+
+```text
+DS7B 的 token0 prefix gate 失败，
+主要不是输给一般词表噪声，
+而是输给 newline / format continuation prior。
+```
+
+Phase636 中 DS7B 的关键结果：
+
+```text
+base:
+  newline top0 = 81/82
+  correct_prefix top0 = 0/82
+
+repair_prompt:
+  newline top0 = 57/82
+  correct_prefix top0 = 20/82
+
+readout_delta:
+  correct_prefix top0 = 82/82
+```
+
+因此 Phase637 不再泛泛寻找 prefix gate，而是做 prompt ablation，测试 newline prior 到底与哪些格式因素有关。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase637_newline_prior_suppression_source_audit.py
+tests/gpt5/phase637_newline_prior_suppression_source_audit_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase637_newline_prior_suppression_source_audit/
+```
+
+核心输出：
+
+```text
+results/glm5_phase637_newline_prior_suppression_source_audit/phase637_cross_model_summary.md
+```
+
+### 执行命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase637_newline_prior_suppression_source_audit.py tests/gpt5/phase637_newline_prior_suppression_source_audit_summary.py
+```
+
+Qwen3 smoke：
+
+```bash
+python tests/gpt5/phase637_newline_prior_suppression_source_audit.py qwen3 --smoke --output-dir results/glm5_phase637_newline_prior_suppression_source_audit --hard-exit-after-model
+```
+
+Qwen3 confirm：
+
+```bash
+python tests/gpt5/phase637_newline_prior_suppression_source_audit.py qwen3 --confirm --output-dir results/glm5_phase637_newline_prior_suppression_source_audit --hard-exit-after-model
+```
+
+GLM4 confirm：
+
+```bash
+PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase637_newline_prior_suppression_source_audit.py glm4 --confirm --output-dir results/glm5_phase637_newline_prior_suppression_source_audit --hard-exit-after-model
+```
+
+DS7B confirm：
+
+```bash
+python tests/gpt5/phase637_newline_prior_suppression_source_audit.py deepseek7b --confirm --output-dir results/glm5_phase637_newline_prior_suppression_source_audit --hard-exit-after-model
+```
+
+汇总：
+
+```bash
+python tests/gpt5/phase637_newline_prior_suppression_source_audit_summary.py
+```
+
+### 测试设计
+
+本阶段使用 256 raw cases，并且不只看 target subset，还把 non-target side-effect 单独统计。
+
+subject 维度：
+
+```text
+base_subject
+repair_subject
+```
+
+prompt variants：
+
+```text
+original:
+  Question: X rel ?
+  Answer:
+
+no_qmark:
+  Question: X rel
+  Answer:
+
+period:
+  Question: X rel.
+  Answer:
+
+inline_answer:
+  Question: X rel ? Answer:
+
+short_only:
+  Instruction: Answer with only the value.
+  Question: X rel ?
+  Answer:
+
+no_explain:
+  Instruction: Do not explain. Answer with only the value.
+  Question: X rel ?
+  Answer:
+
+no_qmark_short:
+  Instruction: Answer with only the value.
+  Question: X rel
+  Answer:
+
+value_label:
+  Question: X rel ?
+  Value:
+
+direct_value_label:
+  Instruction: Return only the value.
+  Question: X rel ?
+  Value:
+```
+
+核心指标：
+
+```text
+tok0 hit
+exact generation
+wrong_exact
+newline_top0
+mean_prefix_rank
+prefix_minus_newline
+top0_category
+top0_text
+```
+
+### 客观结果
+
+#### Qwen3
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 17
+rows = 4608
+```
+
+repair_subject / target：
+
+```text
+original:
+  tok0 = 14/17
+  exact = 11/17
+  newline = 0/17
+
+no_qmark:
+  tok0 = 17/17
+  exact = 16/17
+  newline = 0/17
+
+period:
+  tok0 = 16/17
+  exact = 15/17
+  newline = 0/17
+
+inline_answer:
+  tok0 = 1/17
+  exact = 0/17
+  newline = 9/17
+
+value_label:
+  tok0 = 0/17
+  exact = 0/17
+  newline = 16/17
+```
+
+Qwen3 中去掉问号最好，inline_answer 反而破坏结果。
+
+repair_subject / non_target：
+
+```text
+original:
+  exact = 140/239
+  newline = 2/239
+
+no_qmark:
+  exact = 208/239
+  newline = 0/239
+
+period:
+  exact = 192/239
+  newline = 0/239
+
+inline_answer:
+  exact = 27/239
+  newline = 123/239
+```
+
+Qwen3 的 no_qmark 同时改善 target 和 non-target。
+
+#### GLM4
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 31
+rows = 4608
+```
+
+repair_subject / target：
+
+```text
+original:
+  tok0 = 29/31
+  exact = 28/31
+  newline = 0/31
+
+no_qmark:
+  tok0 = 31/31
+  exact = 31/31
+  newline = 0/31
+
+inline_answer:
+  tok0 = 27/31
+  exact = 26/31
+  newline = 0/31
+
+value_label:
+  tok0 = 29/31
+  exact = 24/31
+  newline = 0/31
+```
+
+GLM4 中 no_qmark 也是最优。
+
+repair_subject / non_target：
+
+```text
+original:
+  exact = 183/225
+
+no_qmark:
+  exact = 199/225
+
+inline_answer:
+  exact = 177/225
+
+value_label:
+  exact = 185/225
+```
+
+GLM4 的 no_qmark 也有正向副作用，不破坏整体。
+
+#### DS7B
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 82
+rows = 4608
+```
+
+repair_subject / target：
+
+```text
+original:
+  tok0 = 20/82
+  exact = 20/82
+  newline = 57/82
+  rank = 9.4
+  prefix_minus_newline = -1.704
+
+no_qmark:
+  tok0 = 39/82
+  exact = 36/82
+  newline = 27/82
+  rank = 2.1
+  prefix_minus_newline = 0.479
+
+period:
+  tok0 = 28/82
+  exact = 27/82
+  newline = 16/82
+  rank = 2.8
+  prefix_minus_newline = 0.393
+
+inline_answer:
+  tok0 = 75/82
+  exact = 72/82
+  newline = 0/82
+  rank = 1.1
+  prefix_minus_newline = 2.236
+
+short_only:
+  tok0 = 2/82
+  exact = 2/82
+  newline = 2/82
+  top0 主要变成 space
+
+no_explain:
+  tok0 = 3/82
+  exact = 3/82
+  newline = 53/82
+
+value_label:
+  tok0 = 3/82
+  exact = 3/82
+  newline = 79/82
+
+direct_value_label:
+  tok0 = 0/82
+  exact = 0/82
+  newline = 82/82
+```
+
+DS7B 的关键结果非常清楚：
+
+```text
+inline_answer 是唯一强压制 newline prior 的 prompt 结构。
+```
+
+repair_subject / non_target：
+
+```text
+original:
+  tok0 = 38/174
+  exact = 36/174
+  newline = 118/174
+
+no_qmark:
+  tok0 = 99/174
+  exact = 95/174
+  newline = 34/174
+
+period:
+  tok0 = 63/174
+  exact = 62/174
+  newline = 20/174
+
+inline_answer:
+  tok0 = 171/174
+  exact = 159/174
+  newline = 0/174
+
+value_label:
+  tok0 = 9/174
+  exact = 10/174
+  newline = 162/174
+```
+
+DS7B 的 inline_answer 不只是 target 有效，对 non-target 也显著改善：
+
+```text
+target exact:
+  20/82 -> 72/82
+
+non_target exact:
+  36/174 -> 159/174
+
+newline:
+  target 57/82 -> 0/82
+  non_target 118/174 -> 0/174
+```
+
+### 结论
+
+Phase637 是一个关键正结果。
+
+它把 DS7B newline prior 的来源从泛泛的“解释式回答先验”进一步定位为：
+
+```text
+多行问答模板中的换行 Answer 区域触发了强 format continuation prior。
+```
+
+最强证据是：
+
+```text
+原模板:
+  Question: X rel ?
+  Answer:
+
+DS7B repair_subject target exact = 20/82
+newline = 57/82
+
+同一行模板:
+  Question: X rel ? Answer:
+
+DS7B repair_subject target exact = 72/82
+newline = 0/82
+```
+
+这说明 DS7B 不是不能输出正确 value，而是原始模板把模型推入：
+
+```text
+继续解释 / 继续换行 / 继续问题格式
+```
+
+的输出协议；inline_answer 改变了输出协议，强行关闭 newline prior。
+
+### 对 Phase636 判断的修正
+
+Phase636 说 DS7B 缺少 newline suppression，这仍然正确。
+
+Phase637 进一步说明：
+
+```text
+newline suppression 不是一定要靠内部 patch 完成；
+prompt format 本身可以切换输出协议，
+尤其是把 Answer 标签放在同一行，可以大幅改变 token0 prior。
+```
+
+也就是说：
+
+```text
+prefix gate 同时受内部语义状态和外部格式协议控制。
+```
+
+### 理论进展
+
+本阶段对“复用差分机制”的意义很大。
+
+同样的规则、同样的对象、同样的关系、同样的答案，只改一个格式结构：
+
+```text
+"\nAnswer:"
+```
+
+变为：
+
+```text
+" Answer:"
+```
+
+DS7B 的 exact 从 20/82 到 72/82。
+
+这说明语言机制里存在强烈的：
+
+```text
+output protocol state
+```
+
+也就是说，模型不是只在“语义内容空间”里竞争，还在“输出协议空间”里竞争。
+
+新的机制拆分应为：
+
+```text
+Generation =
+SemanticSelection
++ FormatProtocolSelection
++ PrefixTokenCompetition
++ ValueTokenCompetition
++ ConfirmationContinuation
+```
+
+其中 DS7B 当前失败点主要是：
+
+```text
+FormatProtocolSelection 选择了 newline / explanation protocol，
+而不是 inline value answer protocol。
+```
+
+### 最严格的问题和硬伤
+
+1. inline_answer 是 prompt-level intervention，不是内部机制 patch。
+
+2. 本阶段证明 prompt format 可以切换输出协议，但还没有定位这个协议状态在残差流中的具体位置。
+
+3. Qwen3 与 GLM4 的最佳变体是 no_qmark，而 DS7B 的最佳变体是 inline_answer，说明跨模型协议触发条件不同。
+
+4. short_only / no_explain 指令没有解决 DS7B，甚至常把 top0 推到 space，说明自然语言指令不等于输出协议切换。
+
+5. Value label 反而强化 DS7B newline prior，说明标签语义不是关键，格式布局才更关键。
+
+### 下一步任务
+
+Phase638 应执行：
+
+```text
+Inline Answer Protocol State Backtrace
+```
+
+核心问题：
+
+```text
+inline_answer 为什么能关闭 DS7B newline prior？
+它改变的是 prompt_last residual state，
+answer_label state，
+question_mark state，
+还是 final readout protocol state？
+```
+
+建议测试：
+
+```text
+1. 构造 original vs inline_answer 对照。
+
+2. 不改变 subject / relation / answer，只改变：
+   "\nAnswer:" vs " Answer:"
+
+3. 扫描 source groups:
+   prompt_last
+   answer_label
+   question_mark_answer
+   question_all
+
+4. 测量每个位置对 newline margin 的贡献：
+   prefix_logit - newline_group_max_logit
+
+5. 做 restore:
+   把 inline_answer 的某个位置状态 restore 到 original prompt，
+   看是否能压低 newline prior。
+
+6. 对 Qwen3、GLM4、DS7B 都跑，
+   因为 Qwen3 / GLM4 的 protocol switch 条件不同。
+```
+
+阶段性判断：
+
+```text
+DS7B newline prior 来源已经从抽象输出竞争
+进一步定位到 prompt format protocol；
+下一步必须回溯 inline answer protocol state 的内部承载位置。
+```
+
+## Phase 638: Inline Answer Protocol State Backtrace [2026-06-25 18:57]
+
+### 任务来源
+
+用户要求分析 Phase636 附件内容是否正确，综合当前进展继续完成任务，并在无需确认时自动推进阶段性目标。
+
+Phase637 已经证明：
+
+```text
+DS7B 的 newline / explanation prior 可以被 prompt format 强烈切换。
+original:
+Question: category relation ?
+Answer:
+
+inline_answer:
+Question: category relation ? Answer:
+```
+
+其中 DS7B repair_subject target exact 从 20/82 提升到 72/82，newline_top0 从 57/82 降到 0/82。
+
+Phase638 的核心问题是：
+
+```text
+inline_answer protocol state 到底由哪些内部位置承载？
+如果把 inline prompt 的内部状态 restore 到 original prompt，
+是否能压制 original prompt 的 newline prior？
+```
+
+### 生成脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py
+tests/gpt5/phase638_inline_answer_protocol_state_backtrace_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase638_inline_answer_protocol_state_backtrace/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase638_inline_answer_protocol_state_backtrace/phase638_cross_model_summary.md
+```
+
+### 测试命令
+
+smoke 检查：
+
+```bash
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试，按模型顺序执行，并使用 hard exit 防止显存残留：
+
+```bash
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase638_inline_answer_protocol_state_backtrace_summary.py
+```
+
+运行时间：
+
+```text
+qwen3: 6.21 min
+GLM4: 8.15 min
+DS7B: 7.77 min
+```
+
+### 测试原理
+
+Phase638 只改变一个格式差异：
+
+```text
+original: "\nAnswer:"
+inline:   " Answer:"
+```
+
+然后把 inline prompt 的候选内部状态 restore 到 original prompt 的对应位置。
+
+测试位置：
+
+```text
+prompt_last
+answer_label
+question_mark_answer
+relation_tail
+question_all
+all5
+```
+
+测试模式：
+
+```text
+original
+inline
+final_output_inline_to_original
+patch_prompt_last
+patch_answer_label
+patch_question_mark_answer
+patch_relation_tail
+patch_question_all
+patch_all5
+```
+
+其中：
+
+```text
+final_output_inline_to_original
+```
+
+表示把 inline prompt 的 final_norm output 直接替换到 original prompt，用来测量最后读出状态是否已经完整携带协议切换。
+
+```text
+patch_question_mark_answer / patch_relation_tail / patch_question_all
+```
+
+表示把 inline prompt 的相应源位置 layer_out restore 到 original prompt 的对应位置，看是否可以关闭 newline prior。
+
+### 重要过滤和硬约束
+
+三模型均使用：
+
+```text
+raw_cases = 256
+target + non_target 全部保留
+```
+
+每个模型均产生：
+
+```text
+mode_rows = 2048
+```
+
+过滤统计：
+
+```text
+qwen3: group_len_mismatch=512, empty_patch=256
+GLM4: group_len_mismatch=512, empty_patch=256
+DS7B: group_len_mismatch=512, empty_patch=256
+```
+
+原因是 original 与 inline 中部分 token span 不等长，尤其 answer_label 的 tokenizer 边界不完全一致，因此 patch_answer_label 没有形成稳定可比结果。
+
+所以本阶段不能声称 answer_label 已被排除，只能说：
+
+```text
+在当前 token-aligned restore 设置下，
+answer_label 没有可比 patch。
+```
+
+### 客观结果
+
+#### qwen3
+
+target：
+
+```text
+original:
+tok0 = 14/17
+exact = 11/17
+newline_top0 = 0/17
+mean_rank = 1.2
+
+inline:
+tok0 = 1/17
+exact = 0/17
+newline_top0 = 9/17
+mean_rank = 4.8
+
+final_output_inline_to_original:
+tok0 = 1/17
+exact = 0/17
+newline_top0 = 9/17
+
+patch_prompt_last:
+tok0 = 2/17
+exact = 1/17
+newline_top0 = 7/17
+
+patch_question_mark_answer / relation_tail / question_all / all5:
+tok0 = 1/17
+exact = 0/17
+newline_top0 = 9/17
+```
+
+non_target：
+
+```text
+original:
+tok0 = 144/239
+exact = 140/239
+newline_top0 = 2/239
+
+inline:
+tok0 = 26/239
+exact = 27/239
+newline_top0 = 123/239
+
+final_output_inline_to_original:
+tok0 = 26/239
+exact = 27/239
+newline_top0 = 123/239
+```
+
+qwen3 结论：
+
+```text
+inline_answer 对 qwen3 是坏协议。
+把 inline state restore 到 original 会复制坏协议，
+不是修复 original。
+```
+
+#### GLM4
+
+target：
+
+```text
+original:
+tok0 = 29/31
+exact = 28/31
+newline_top0 = 0/31
+
+inline:
+tok0 = 27/31
+exact = 26/31
+newline_top0 = 0/31
+
+final_output_inline_to_original:
+tok0 = 27/31
+exact = 27/31
+newline_top0 = 0/31
+
+patch_question_mark_answer / relation_tail / question_all / all5:
+tok0 = 27/31
+exact = 27/31
+newline_top0 = 0/31
+```
+
+non_target：
+
+```text
+original:
+tok0 = 209/225
+exact = 183/225
+newline_top0 = 0/225
+
+inline:
+tok0 = 203/225
+exact = 177/225
+newline_top0 = 0/225
+```
+
+GLM4 结论：
+
+```text
+GLM4 不存在 DS7B 那种强 newline prior。
+inline state 可以被复制，但没有产生关键修复，
+因为 original 本来已经接近稳定。
+```
+
+#### DS7B
+
+target：
+
+```text
+original:
+tok0 = 20/82
+exact = 20/82
+newline_top0 = 57/82
+mean_rank = 9.4
+prefix_minus_newline = -1.704
+
+inline:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+final_output_inline_to_original:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+patch_question_mark_answer:
+tok0 = 75/82
+exact = 71/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+patch_relation_tail:
+tok0 = 75/82
+exact = 71/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+patch_question_all:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+patch_prompt_last:
+tok0 = 67/82
+exact = 63/82
+newline_top0 = 0/82
+mean_rank = 1.2
+prefix_minus_newline = 2.217
+
+patch_all5:
+tok0 = 67/82
+exact = 64/82
+newline_top0 = 0/82
+```
+
+non_target：
+
+```text
+original:
+tok0 = 38/174
+exact = 36/174
+newline_top0 = 118/174
+mean_rank = 7.3
+prefix_minus_newline = -1.282
+
+inline:
+tok0 = 171/174
+exact = 159/174
+newline_top0 = 0/174
+mean_rank = 1.0
+prefix_minus_newline = 2.362
+
+final_output_inline_to_original:
+tok0 = 171/174
+exact = 154/174
+newline_top0 = 0/174
+
+patch_question_mark_answer:
+tok0 = 171/174
+exact = 154/174
+newline_top0 = 0/174
+
+patch_relation_tail:
+tok0 = 171/174
+exact = 154/174
+newline_top0 = 0/174
+
+patch_question_all:
+tok0 = 171/174
+exact = 158/174
+newline_top0 = 0/174
+
+patch_prompt_last:
+tok0 = 165/174
+exact = 148/174
+newline_top0 = 0/174
+```
+
+DS7B 结论：
+
+```text
+DS7B 的 inline answer protocol state 可以被局部 restore 到 original prompt。
+
+question_mark_answer / relation_tail / question_all 三个位置几乎复现 inline prompt 的 token0 效果。
+
+prompt_last 也能关闭 newline prior，但恢复强度略弱。
+```
+
+这说明 DS7B 的 newline prior 不是只能在最后读出端处理，而是在 prompt 源位置已经形成了可迁移的协议状态。
+
+### 对附件 Phase636 分析的评估
+
+附件中关于 Phase636 的判断基本正确：
+
+```text
+DS7B 的 token0 failure 不是 value readout 完全缺失，
+而是 newline / format continuation prior 压过了 correct prefix。
+```
+
+Phase638 对它做了关键补充：
+
+```text
+newline prior 的来源不是抽象的“模型偏好”，
+而是具体 prompt protocol state。
+
+这个 state 可以从 inline prompt 的 question_mark_answer / relation_tail / question_all 位置
+restore 到 original prompt，并关闭 newline_top0。
+```
+
+所以 Phase636 到 Phase638 的链条是：
+
+```text
+Phase636:
+定位竞争物是 newline prior。
+
+Phase637:
+证明 prompt format 可以自然关闭 newline prior。
+
+Phase638:
+证明 inline format 的内部状态可以迁移到 original，
+并在 DS7B 上几乎复现 inline 的修复效果。
+```
+
+### 理论进展
+
+本阶段把“格式协议”从外部 prompt 现象推进为内部状态对象。
+
+新的机制拼图为：
+
+```text
+FormatProtocolState(prompt)
+    -> SourcePositionState(question_mark_answer, relation_tail, question_all)
+    -> FinalReadoutState
+    -> PrefixTokenCompetition(correct_prefix vs newline)
+    -> NaturalGeneration
+```
+
+对于 DS7B：
+
+```text
+original prompt:
+FormatProtocolState = multiline_answer_protocol
+newline prior dominates
+
+inline prompt:
+FormatProtocolState = inline_value_protocol
+correct prefix dominates
+```
+
+而且：
+
+```text
+inline_value_protocol
+```
+
+不是只存在于 final output，它已经在 question tail 区域形成。
+
+这对“相对编码和差分复用机制”的意义很大：
+
+```text
+同一套参数、同一语义、同一关系、同一答案，
+仅仅由于 format protocol state 不同，
+输出路径就从 explanation/newline 切到 value-prefix。
+```
+
+也就是说，神经网络复用同一计算结构时，很可能不是通过固定模块切换，而是通过：
+
+```text
+conditioned state field
+```
+
+改变后续读出竞争。
+
+### 最严格的问题和硬伤
+
+1. answer_label 没有稳定可比结果。
+
+由于 original 与 inline 的 tokenization span 不完全等长，本阶段不能判断 answer_label 是否是协议状态核心位置。
+
+2. patch_question_all 与 patch_question_mark_answer / relation_tail 的结果非常接近。
+
+这说明当前方法还不能拆清楚到底是 question mark、Answer label、空格、还是整段尾部共同贡献。
+
+3. all5 反而弱于 question_mark_answer / question_all。
+
+这可能是多位置 patch 的干扰，也可能是 prompt_last 与上游局部状态有冲突；不能简单解释为“更多位置更好”。
+
+4. qwen3 和 GLM4 的 inline protocol 不是好协议。
+
+所以不能把 inline answer 当成跨模型通用规则，只能说它是 DS7B 的关键 protocol switch。
+
+5. 本阶段仍然是 restore 实验，不是机制生成实验。
+
+它证明 inline state 可迁移，但还没有解释 DS7B 为什么在 original 中自然生成 multiline state。
+
+### 当前阶段性结论
+
+最谨慎表述：
+
+```text
+DS7B 的 correct-prefix failure 很大程度来自 prompt protocol state。
+
+original 的 "\nAnswer:" 触发 multiline / explanation protocol，
+导致 newline token 进入 token0 竞争前列。
+
+inline 的 " Answer:" 触发 inline value protocol，
+并且这个协议状态在 question tail 相关源位置已经形成。
+
+把 inline 的 question tail state restore 到 original，
+可以几乎复制 inline 的 newline suppression 和 correct-prefix promotion。
+```
+
+这不是完整语言机制闭合，但已经把一个过去看似“最后读出失败”的问题，推进为：
+
+```text
+格式条件化状态 -> 源位置写入 -> 最终读出竞争
+```
+
+### 对破解语言编码机制的启发
+
+Phase638 支持一个更核心的方向：
+
+```text
+语言能力不是由单个语义向量决定，
+而是由多种条件化状态场共同决定。
+```
+
+至少包括：
+
+```text
+semantic state
+format protocol state
+relation state
+value candidate state
+prefix competition state
+continuation policy state
+```
+
+这些状态不是完全独立模块，而是在同一残差流和同一参数上复用。
+
+这与“相对编码 / 差分复用机制”的假设一致：
+
+```text
+模型不需要为每一种语言行为保存一套独立结构；
+它通过 prompt condition 激活不同的相对差分，
+让同一套参数在不同状态场下执行不同路径。
+```
+
+### 下一步任务
+
+Phase639 应执行：
+
+```text
+Protocol Tail Minimal Causal Unit Audit
+```
+
+目标不是继续扩大 patch 空间，而是缩小最小因果单位。
+
+核心问题：
+
+```text
+DS7B 的 inline protocol state 到底来自哪个最小 token / token pair？
+
+是 question mark token？
+是 question mark 后的 space/newline？
+是 Answer token？
+是 colon？
+还是 relation tail 与 Answer label 的组合？
+```
+
+测试方案：
+
+```text
+1. 构造 original 与 inline 的 token 对齐图。
+
+2. 不再只按 substring group patch，
+   而是按 tail token index 做最小单位 restore。
+
+3. 对每个 tail token 单独 restore：
+   question_mark
+   separator_space_or_newline
+   Answer
+   colon
+   prompt_last
+
+4. 测量：
+   correct_prefix tok0
+   newline_top0
+   prefix_minus_newline
+   exact generation
+
+5. 对 DS7B 做主测试，
+   qwen3 / GLM4 做边界对照。
+```
+
+如果 Phase639 能找到最小协议 token 单位，就可以进入：
+
+```text
+Protocol State Construction Path
+```
+
+即追踪这个最小状态由哪些 attention / MLP 写入，从而把 format protocol 从“可恢复状态”推进为“可生成机制图谱”。
+
+## Phase 639: Protocol Tail Minimal Causal Unit Audit [2026-06-25 19:26]
+
+### 任务来源
+
+Phase638 已经证明：
+
+```text
+DS7B 的 inline protocol state 可以从 question_mark_answer / relation_tail / question_all 等较大区域 restore 到 original prompt，
+并关闭 original 中的 newline prior。
+```
+
+但 Phase638 仍然存在关键硬伤：
+
+```text
+group 太大，不能判断真正因果单位。
+```
+
+Phase639 因此继续自动推进，目标是把 protocol tail 缩小到最小 token / token-pair 单位。
+
+### 生成脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit.py
+tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase639_protocol_tail_minimal_causal_unit_audit/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase639_protocol_tail_minimal_causal_unit_audit/phase639_cross_model_summary.md
+```
+
+### 测试命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase639_protocol_tail_minimal_causal_unit_audit_summary.py
+```
+
+运行时间：
+
+```text
+qwen3: 6.94 min
+GLM4: 8.91 min
+DS7B: 8.68 min
+```
+
+### 测试原理
+
+继续使用同一对 prompt：
+
+```text
+original: Question: category relation ?
+          Answer:
+
+inline:   Question: category relation ? Answer:
+```
+
+测试最小单位：
+
+```text
+qmark
+separator
+answer_word
+colon
+prompt_last
+qmark_separator
+separator_answer
+answer_colon
+tail_all
+```
+
+含义：
+
+```text
+qmark: 问号相关 token
+separator: "\nAnswer:" 或 " Answer:" 的分隔区域
+answer_word: Answer 文本
+colon: 冒号
+prompt_last: 最后 token
+qmark_separator: 问号 + 分隔区域
+separator_answer: 分隔区域 + Answer
+answer_colon: Answer + 冒号
+tail_all: 整个尾部可比区域
+```
+
+核心操作：
+
+```text
+把 inline prompt 的某个最小单位 layer_out
+restore 到 original prompt 的对应单位，
+然后观察 original prompt 的 token0 竞争是否从 newline 切换为 correct prefix。
+```
+
+### 重要过滤和边界
+
+三模型均使用：
+
+```text
+raw_cases = 256
+target + non_target 全部保留
+```
+
+mode_rows：
+
+```text
+qwen3: 2560
+GLM4: 2560
+DS7B: 2560
+```
+
+过滤统计：
+
+```text
+qwen3: unit_missing=256, unit_len_mismatch=256, empty_patch=512
+GLM4: unit_missing=256, unit_len_mismatch=256, empty_patch=512
+DS7B: unit_missing=256, unit_len_mismatch=256, empty_patch=512
+```
+
+token 长度样本显示：
+
+```text
+answer_word:
+original length = 1
+inline length = 0
+
+answer_colon:
+original length = 2
+inline length = 1
+```
+
+所以：
+
+```text
+answer_word 和 answer_colon 在当前 tokenizer 对齐方式下不可比。
+```
+
+因此 Phase639 不能判断 Answer word 本身是否有独立作用，只能判断 qmark / separator / colon / prompt_last / tail pair 的作用。
+
+### 客观结果
+
+#### qwen3
+
+target：
+
+```text
+original:
+tok0 = 14/17
+exact = 11/17
+newline_top0 = 0/17
+
+inline:
+tok0 = 1/17
+exact = 0/17
+newline_top0 = 9/17
+
+patch_qmark:
+tok0 = 13/17
+exact = 10/17
+newline_top0 = 0/17
+
+patch_separator:
+tok0 = 0/17
+exact = 0/17
+newline_top0 = 16/17
+
+patch_colon:
+tok0 = 2/17
+exact = 1/17
+newline_top0 = 7/17
+
+patch_prompt_last:
+tok0 = 2/17
+exact = 1/17
+newline_top0 = 7/17
+
+patch_qmark_separator / tail_all:
+tok0 = 1/17
+exact = 0/17
+newline_top0 = 9/17
+```
+
+non_target：
+
+```text
+original:
+tok0 = 144/239
+exact = 140/239
+newline_top0 = 2/239
+
+inline:
+tok0 = 26/239
+exact = 27/239
+newline_top0 = 123/239
+
+patch_separator:
+tok0 = 24/239
+exact = 24/239
+newline_top0 = 177/239
+```
+
+qwen3 结论：
+
+```text
+qwen3 中 inline separator 是强坏协议源。
+separator restore 会显著制造 newline prior。
+qmark 基本不破坏 original，separator 是主要破坏单位。
+```
+
+#### GLM4
+
+target：
+
+```text
+original:
+tok0 = 29/31
+exact = 28/31
+newline_top0 = 0/31
+
+inline:
+tok0 = 27/31
+exact = 26/31
+newline_top0 = 0/31
+
+patch_qmark:
+tok0 = 30/31
+exact = 29/31
+newline_top0 = 0/31
+
+patch_separator:
+tok0 = 27/31
+exact = 25/31
+newline_top0 = 0/31
+
+patch_colon / prompt_last:
+tok0 = 26/31
+exact = 25/31
+newline_top0 = 0/31
+```
+
+non_target：
+
+```text
+original:
+tok0 = 209/225
+exact = 183/225
+newline_top0 = 0/225
+
+patch_qmark:
+tok0 = 216/225
+exact = 189/225
+newline_top0 = 0/225
+
+patch_separator:
+tok0 = 184/225
+exact = 156/225
+newline_top0 = 0/225
+```
+
+GLM4 结论：
+
+```text
+GLM4 没有 DS7B 的 newline prior。
+qmark restore 甚至略微增强正确前缀。
+separator 主要带来轻微退化，但不是 newline 问题。
+```
+
+#### DS7B
+
+target：
+
+```text
+original:
+tok0 = 20/82
+exact = 20/82
+newline_top0 = 57/82
+mean_rank = 9.4
+prefix_minus_newline = -1.704
+
+inline:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+
+final_output_inline_to_original:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+
+patch_qmark:
+tok0 = 20/82
+exact = 20/82
+newline_top0 = 60/82
+mean_rank = 7.0
+prefix_minus_newline = -1.572
+
+patch_separator:
+tok0 = 72/82
+exact = 70/82
+newline_top0 = 1/82
+mean_rank = 1.1
+prefix_minus_newline = 2.280
+
+patch_colon:
+tok0 = 69/82
+exact = 68/82
+newline_top0 = 1/82
+mean_rank = 1.2
+prefix_minus_newline = 1.968
+
+patch_prompt_last:
+tok0 = 67/82
+exact = 63/82
+newline_top0 = 0/82
+
+patch_qmark_separator:
+tok0 = 75/82
+exact = 71/82
+newline_top0 = 0/82
+
+patch_separator_answer:
+tok0 = 72/82
+exact = 70/82
+newline_top0 = 1/82
+
+patch_tail_all:
+tok0 = 75/82
+exact = 72/82
+newline_top0 = 0/82
+```
+
+non_target：
+
+```text
+original:
+tok0 = 38/174
+exact = 36/174
+newline_top0 = 118/174
+
+inline:
+tok0 = 171/174
+exact = 159/174
+newline_top0 = 0/174
+
+patch_qmark:
+tok0 = 38/174
+exact = 35/174
+newline_top0 = 124/174
+
+patch_separator:
+tok0 = 168/174
+exact = 153/174
+newline_top0 = 0/174
+
+patch_colon:
+tok0 = 166/174
+exact = 150/174
+newline_top0 = 1/174
+
+patch_prompt_last:
+tok0 = 165/174
+exact = 148/174
+newline_top0 = 0/174
+
+patch_qmark_separator:
+tok0 = 171/174
+exact = 154/174
+newline_top0 = 0/174
+
+patch_tail_all:
+tok0 = 171/174
+exact = 158/174
+newline_top0 = 0/174
+```
+
+DS7B 结论：
+
+```text
+separator 是最小主因果单位。
+
+只 patch_separator 就能把 target exact 从 20/82 提升到 70/82，
+newline_top0 从 57/82 降到 1/82。
+
+qmark 单独无效，甚至略微增加 newline_top0。
+
+colon / prompt_last 有作用，但弱于 separator。
+
+qmark_separator / tail_all 可接近完整 inline 效果。
+```
+
+### Phase638 到 Phase639 的关键推进
+
+Phase638 得到：
+
+```text
+question_mark_answer / relation_tail / question_all 都能恢复 DS7B inline protocol。
+```
+
+Phase639 进一步拆解为：
+
+```text
+不是 question mark 本身。
+主要是 separator。
+```
+
+这把协议状态定位从：
+
+```text
+question tail region
+```
+
+压缩为：
+
+```text
+space/newline + Answer label boundary state
+```
+
+更准确地说：
+
+```text
+DS7B 的 format protocol switch 主要发生在 separator boundary。
+```
+
+### 对附件 Phase636 分析的最终评估
+
+附件对 Phase636 的分析是正确的，但现在可以更精确。
+
+原判断：
+
+```text
+DS7B 的 token0 failure 来自 newline / format continuation prior。
+```
+
+现在修正为：
+
+```text
+DS7B 的 newline / format continuation prior 主要由 separator boundary state 触发。
+
+"\nAnswer:" boundary 会让模型进入 multiline / explanation protocol。
+
+" Answer:" boundary 会让模型进入 inline value protocol。
+```
+
+这比“newline prior”更具体，因为它不是输出端凭空偏好 newline，而是 prompt 尾部分隔结构写入了不同协议状态。
+
+### 理论进展
+
+本阶段支持一个非常重要的语言编码机制判断：
+
+```text
+语言格式不是表层符号。
+格式边界本身会写入可迁移的内部状态。
+```
+
+同一个问题：
+
+```text
+Question: X relation ?
+Answer:
+```
+
+与：
+
+```text
+Question: X relation ? Answer:
+```
+
+不是只差一个字符排版，而是差一个内部协议态：
+
+```text
+multiline_answer_protocol
+vs
+inline_value_protocol
+```
+
+这个协议态的最小强因果单位在 DS7B 上主要是：
+
+```text
+separator boundary
+```
+
+这说明“相对编码 / 差分复用机制”可以更具体化：
+
+```text
+同一参数网络复用同一语义计算路径，
+但 separator boundary 改变 protocol state，
+protocol state 再改变下一 token 的竞争场。
+```
+
+可以写成阶段性公式：
+
+```text
+H_t = F_\theta(Tokens_{\le t}, C_{\text{semantic}}, C_{\text{protocol}})
+```
+
+其中：
+
+```text
+C_{\text{protocol}} = \Delta_{\text{boundary}}("\nAnswer:" \rightarrow " Answer:")
+```
+
+而 token0 竞争可以写成：
+
+```text
+\text{logit}(y_0)
+= W_U y_0 \cdot R_{\text{final}}
+```
+
+其中：
+
+```text
+R_{\text{final}}
+= R_{\text{semantic}}
++ R_{\text{protocol}}
++ R_{\text{residual-noise}}
+```
+
+DS7B 的关键变化是：
+
+```text
+R_{\text{protocol}}("\nAnswer:")
+    -> boosts newline / explanation continuation
+
+R_{\text{protocol}}(" Answer:")
+    -> boosts value prefix continuation
+```
+
+### 最严格的问题和硬伤
+
+1. answer_word / answer_colon 不可比。
+
+由于 tokenizer 边界问题，本阶段没有验证 Answer word 本体是否有独立贡献。
+
+2. separator 的定义仍然包含边界复合。
+
+当前 separator span 长度为 2，不能完全拆成“空格/换行本身”和“Answer 前缀交互”。
+
+3. patch_separator 有轻微 residual side effect。
+
+DS7B target patch_separator 达到 70/82，而完整 inline 是 72/82；说明 separator 是主因，但不是全部。
+
+4. qwen3 上 separator 是坏协议，DS7B 上 separator 是好协议。
+
+因此 separator 的含义依赖模型内部 learned protocol，不是跨模型同义。
+
+5. 仍然是 restore 结果。
+
+本阶段定位了可迁移协议状态，但还没解释这个状态由哪些 attention / MLP 生成。
+
+### 当前阶段性结论
+
+最谨慎结论：
+
+```text
+Phase639 基本完成了 DS7B inline protocol 的最小主因果单位定位。
+
+DS7B 的 correct-prefix failure 不是 question mark 造成的，
+也不是 final readout 单独造成的，
+而主要是 "\nAnswer:" separator boundary 写入了 multiline / explanation protocol state。
+
+把 inline 的 " Answer:" separator state restore 到 original，
+即可大幅关闭 newline prior，并恢复 value-prefix generation。
+```
+
+这使当前机制链条变成：
+
+```text
+separator boundary
+-> protocol state
+-> final residual readout state
+-> correct_prefix vs newline competition
+-> natural generation
+```
+
+### 对破解语言背后编码机制的启发
+
+这次结果非常重要，因为它说明：
+
+```text
+语言模型内部不仅编码“词义”和“关系”，
+还编码“当前应该用哪种输出协议继续”的状态。
+```
+
+而这种协议状态可以由极小的边界差分触发。
+
+这支持更一般的第一性原理：
+
+```text
+语言智能不是在固定语义空间中直接选答案，
+而是在多个条件化状态场中动态复用同一网络参数。
+```
+
+当前至少有三类状态场已经被实证支持：
+
+```text
+semantic value state
+format / protocol state
+token competition state
+```
+
+下一步如果能追踪 separator protocol state 的生成路径，就可以把“状态场”从现象变成图谱。
+
+### 下一步任务
+
+Phase640 应执行：
+
+```text
+Separator Protocol State Writer Attribution
+```
+
+目标：
+
+```text
+找到 DS7B 中谁写入 separator boundary protocol state。
+```
+
+建议测试：
+
+```text
+1. 固定 DS7B 为主模型，qwen3 / GLM4 做对照。
+
+2. 对 separator 位置扫描层和组件：
+   layer_input
+   attn_out
+   mlp_out
+   layer_out
+
+3. 从 inline separator restore 到 original separator。
+
+4. 找出最早能关闭 newline prior 的层。
+
+5. 判断协议状态由 attention 写入还是 MLP 写入。
+
+6. 对关键层做 remove / reverse / random control。
+```
+
+关键指标：
+
+```text
+newline_top0
+correct_prefix tok0
+prefix_minus_newline
+exact generation
+```
+
+阶段性目标：
+
+```text
+从 separator boundary state
+推进到 separator state writer graph。
+```
+
+## Phase 640: Separator Protocol State Writer Attribution [2026-06-25 19:56]
+
+### 任务来源
+
+用户上传的分析认为 Phase636 到 Phase639 的推进基本正确，并指出当前链条已经从：
+
+```text
+DS7B token0 prefix failure
+```
+
+推进为：
+
+```text
+separator boundary
+-> format protocol state
+-> newline / explanation prior
+-> token0 prefix competition
+-> natural generation
+```
+
+这个判断是正确的。
+
+Phase639 已经证明 DS7B 的主因果单位不是 qmark，而是 separator boundary。Phase640 因此继续自动推进，目标是：
+
+```text
+找到 separator boundary protocol state 由哪一层、哪一类组件写入。
+```
+
+### 生成脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase640_separator_protocol_state_writer_attribution.py
+tests/gpt5/phase640_separator_protocol_state_writer_attribution_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase640_separator_protocol_state_writer_attribution/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase640_separator_protocol_state_writer_attribution/phase640_cross_model_summary.md
+```
+
+### 测试命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试：
+
+```bash
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase640_separator_protocol_state_writer_attribution_summary.py
+```
+
+运行时间：
+
+```text
+qwen3: 2.34 min
+GLM4: 5.34 min
+DS7B: 8.45 min
+```
+
+### 测试原理
+
+Phase640 固定 Phase639 的最小因果单位：
+
+```text
+separator boundary
+```
+
+对 original prompt 与 inline prompt 的 separator 位置进行状态差分：
+
+```text
+original: "\nAnswer:"
+inline:   " Answer:"
+```
+
+然后在 original prompt 中按层和组件 restore inline separator state。
+
+扫描组件：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+```
+
+核心指标：
+
+```text
+correct_prefix tok0
+newline_top0
+mean_prefix_rank
+prefix_minus_newline
+```
+
+为了控制运行量，本阶段做的是 token0 attribution scan，不在每个 patch 上做完整 generation。完整 generation 已在 Phase639 对 separator patch 做过，证明 separator restore 已经能恢复 DS7B exact 到 70/82。
+
+### 数据范围
+
+三模型都使用：
+
+```text
+raw_cases = 256
+target_only = True
+```
+
+target 样本数：
+
+```text
+qwen3: 17
+GLM4: 31
+DS7B: 82
+```
+
+mode rows：
+
+```text
+qwen3: 2414
+GLM4: 4650
+DS7B: 10004
+```
+
+过滤：
+
+```text
+qwen3: not_target=239, separator_len_mismatch=0, empty_patch=0
+GLM4: not_target=225, separator_len_mismatch=0, empty_patch=0
+DS7B: not_target=174, separator_len_mismatch=0, empty_patch=0
+```
+
+说明 separator span 在三模型上可比，没有 token 长度错配问题。
+
+### 客观结果
+
+#### qwen3
+
+baseline：
+
+```text
+original:
+tok0 = 14/17
+newline_top0 = 0/17
+mean_rank = 1.2
+prefix_minus_newline = 1.272
+
+inline:
+tok0 = 1/17
+newline_top0 = 9/17
+mean_rank = 4.8
+prefix_minus_newline = -1.471
+```
+
+最佳 restore：
+
+```text
+L26 mlp_out:
+tok0 = 16/17
+newline_top0 = 0/17
+mean_rank = 1.1
+prefix_minus_newline = 1.199
+
+L04 attn_out:
+tok0 = 15/17
+newline_top0 = 0/17
+
+L16 attn_out:
+tok0 = 15/17
+newline_top0 = 0/17
+
+L20 attn_out:
+tok0 = 15/17
+newline_top0 = 0/17
+```
+
+qwen3 结论：
+
+```text
+qwen3 的 original 本来较稳，inline 是坏协议。
+restore 结果不能解释为“修复”，只能作为跨模型对照。
+```
+
+#### GLM4
+
+baseline：
+
+```text
+original:
+tok0 = 29/31
+newline_top0 = 0/31
+mean_rank = 1.1
+
+inline:
+tok0 = 27/31
+newline_top0 = 0/31
+mean_rank = 1.2
+```
+
+restore 结果中大量层/组件都接近稳定：
+
+```text
+L06 mlp_out:
+tok0 = 30/31
+newline_top0 = 0/31
+
+L39 mlp_out:
+tok0 = 30/31
+newline_top0 = 0/31
+
+L00 attn_out:
+tok0 = 30/31
+newline_top0 = 0/31
+```
+
+GLM4 结论：
+
+```text
+GLM4 没有 DS7B 的 newline prior，所以 restore 扫描主要表现为轻微扰动，不是关键机制定位。
+```
+
+#### DS7B
+
+baseline：
+
+```text
+original:
+tok0 = 20/82
+newline_top0 = 57/82
+mean_rank = 9.4
+prefix_minus_newline = -1.704
+
+inline:
+tok0 = 75/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.236
+```
+
+最佳 restore 候选：
+
+```text
+L20 layer_out:
+tok0 = 77/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.419
+
+L21 layer_input:
+tok0 = 77/82
+newline_top0 = 0/82
+mean_rank = 1.1
+prefix_minus_newline = 2.419
+
+L27 layer_out:
+tok0 = 75/82
+newline_top0 = 0/82
+prefix_minus_newline = 2.236
+
+L26 layer_out:
+tok0 = 75/82
+newline_top0 = 0/82
+prefix_minus_newline = 2.458
+
+L27 layer_input:
+tok0 = 75/82
+newline_top0 = 0/82
+prefix_minus_newline = 2.458
+
+L23 layer_out:
+tok0 = 72/82
+newline_top0 = 0/82
+prefix_minus_newline = 2.534
+
+L24 layer_input:
+tok0 = 72/82
+newline_top0 = 0/82
+prefix_minus_newline = 2.534
+```
+
+中层开始逐渐成形：
+
+```text
+L10 layer_out:
+tok0 = 64/82
+newline_top0 = 12/82
+
+L14 layer_out:
+tok0 = 76/82
+newline_top0 = 2/82
+
+L16 layer_out:
+tok0 = 76/82
+newline_top0 = 2/82
+
+L17 layer_out:
+tok0 = 76/82
+newline_top0 = 1/82
+
+L20 layer_out:
+tok0 = 77/82
+newline_top0 = 0/82
+```
+
+组件对比：
+
+```text
+layer_input / layer_out:
+强恢复，且呈连续残差轨迹。
+
+attn_out:
+大多无法关闭 newline prior。
+
+mlp_out:
+大多无法关闭 newline prior。
+```
+
+DS7B control：
+
+```text
+random controls:
+大多接近 original，newline_top0 仍然很高。
+
+reverse controls:
+显著破坏 correct_prefix，部分层 rank 变得极差。
+```
+
+例如：
+
+```text
+L21 layer_input random:
+tok0 = 19/82
+newline_top0 = 46/82
+prefix_minus_newline = -1.688
+
+L20 layer_out random:
+tok0 = 17/82
+newline_top0 = 46/82
+prefix_minus_newline = -1.710
+
+L20 layer_out reverse:
+tok0 = 1/82
+newline_top0 = 61/82
+mean_rank = 367.0
+prefix_minus_newline = -7.345
+```
+
+这说明 L20 layer_out / L21 layer_input 的效果不是随机同范数扰动造成的，而是方向性 separator protocol state。
+
+### 对附件分析的评估
+
+附件分析正确：
+
+```text
+Phase636 到 Phase639 的主链条已经成立：
+separator boundary -> protocol state -> newline prior -> token0 competition。
+```
+
+Phase640 对附件分析作出进一步修正：
+
+```text
+separator protocol state 的可恢复承载位置主要在 residual stream，
+尤其是 DS7B L14 之后逐步显现，
+L20 layer_out / L21 layer_input 达到最强。
+```
+
+但 Phase640 没有证明：
+
+```text
+某个单独 attention out 或 MLP out 就是 writer。
+```
+
+更谨慎地说：
+
+```text
+separator protocol state 是一个中后层残差状态；
+单层 isolated attn_out / mlp_out 不是充分解释。
+```
+
+### 理论进展
+
+当前机制链进一步细化为：
+
+```text
+separator boundary
+-> mid-layer residual protocol state
+-> late residual readout-ready state
+-> correct_prefix vs newline competition
+-> natural generation
+```
+
+对于 DS7B，状态轨迹可以粗略写成：
+
+```text
+R_{\text{sep}}^{0..10}: weak / partial
+R_{\text{sep}}^{14..17}: mostly formed
+R_{\text{sep}}^{20..21}: strongest carrier
+R_{\text{sep}}^{23..27}: readout-stable carrier
+```
+
+这支持“状态场”而不是“单点模块”的观点：
+
+```text
+separator protocol state 不是某个组件瞬间写出的独立向量，
+而是在 residual stream 中逐层形成和携带。
+```
+
+### 最严格的问题和硬伤
+
+1. Phase640 是 target-only。
+
+为了覆盖全层组件，正式扫描只保留 target cases。DS7B target=82 已较充分，但 non-target 副作用没有在本阶段扫描。
+
+2. 不是完整 writer graph。
+
+本阶段定位到 L20 layer_out / L21 layer_input 是强承载点，但没有证明 L20 内部谁写入。
+
+3. isolated attn_out / mlp_out 失败不等于 attention / MLP 无关。
+
+因为 layer_out 是 residual 累积状态，真正写入可能分散在多个早期组件中。
+
+4. L14 已经出现强恢复。
+
+这说明 L20 是强承载点，不一定是最早形成点。真正形成区间可能在 L10-L14 或更早。
+
+5. qwen3 / GLM4 是边界对照，不是同构机制。
+
+qwen3 的 inline 是坏协议，GLM4 没有 newline prior，所以不能把 DS7B 的 writer 结论直接外推。
+
+### 当前阶段性结论
+
+最谨慎结论：
+
+```text
+DS7B 的 separator protocol state 不是最后一层才出现。
+
+它在中层 residual stream 中逐渐形成，
+到 L14-L17 已经能大幅关闭 newline prior，
+到 L20 layer_out / L21 layer_input 达到最强承载，
+并在 L23-L27 继续保持 readout-ready 状态。
+```
+
+这一结论把 Phase639 的：
+
+```text
+separator 是最小主因果单位
+```
+
+推进为：
+
+```text
+separator protocol state 的主承载轨迹在 DS7B 中后层 residual stream。
+```
+
+### 对破解语言编码机制的启发
+
+这一步很关键，因为它说明语言的格式协议不是“末端输出规则”，而是逐层形成的内部状态。
+
+可以用更清楚的状态公式表示：
+
+```text
+R_l = R_l^{semantic} + R_l^{protocol} + R_l^{syntax} + R_l^{noise}
+```
+
+其中：
+
+```text
+R_l^{protocol}
+= f_l(separator_boundary, context)
+```
+
+DS7B 的 Phase640 结果显示：
+
+```text
+R_l^{protocol}
+```
+
+不是静态向量，而是层间轨迹：
+
+```text
+R_{10}^{protocol} < R_{14}^{protocol} < R_{20}^{protocol}
+```
+
+这进一步支持“相对编码 / 差分复用机制”：
+
+```text
+同一参数网络通过 separator boundary 这种极小差分，
+激活不同的 residual protocol trajectory，
+从而改变后续 token competition。
+```
+
+### 下一步任务
+
+Phase641 应执行：
+
+```text
+Separator Protocol Formation Interval Audit
+```
+
+目标：
+
+```text
+把 Phase640 的 residual carrier 轨迹进一步拆成形成区间。
+```
+
+核心问题：
+
+```text
+separator protocol state 是在哪个层间区间从 weak 变 strong？
+
+是 L10-L14 形成？
+是 L14-L20 累积？
+还是多个区间共同贡献？
+```
+
+建议测试：
+
+```text
+1. 固定 DS7B 为主，qwen3 / GLM4 做轻量对照。
+
+2. 用 interval restore：
+   L0-8
+   L8-12
+   L12-14
+   L14-17
+   L17-20
+   L20-23
+   L23-27
+
+3. 对每个 interval patch separator position 的 layer_out trajectory。
+
+4. 比较 restore / random / reverse。
+
+5. 记录 correct_prefix tok0、newline_top0、prefix_minus_newline。
+```
+
+阶段目标：
+
+```text
+从“L20 是强承载点”
+推进到“哪一段层间计算生成了 separator protocol state”。
+```
+
+## Phase 641: Separator Protocol Formation Interval Audit [2026-06-25 20:17]
+
+### 本阶段目标
+
+根据 Phase640 的结果，附件中对 Phase640 的判断基本正确：DS7B 的 separator protocol state 不是最后读出端的偶然现象，而是 residual stream 中可迁移、可修补、可追踪的 protocol trajectory。
+
+但 Phase640 仍有一个关键硬伤：
+
+```text
+L20 layer_out 是强 carrier，
+不等于 L20 是 formation point。
+```
+
+因此 Phase641 的目标是把单层 writer attribution 推进到 interval audit：
+
+```text
+把 inline separator 的 layer_out trajectory 按层区间 restore 到 original prompt，
+观察哪个区间能关闭 newline prior，并把 correct prefix 推到 token0。
+```
+
+### 生成脚本
+
+新增主测试脚本：
+
+```text
+tests/gpt5/phase641_separator_protocol_formation_interval_audit.py
+```
+
+新增汇总脚本：
+
+```text
+tests/gpt5/phase641_separator_protocol_formation_interval_audit_summary.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase641_separator_protocol_formation_interval_audit/
+```
+
+### 执行命令
+
+烟测命令：
+
+```bash
+python tests/gpt5/phase641_separator_protocol_formation_interval_audit.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试命令，三个模型严格顺序执行，避免 GPU 内存叠加：
+
+```bash
+python tests/gpt5/phase641_separator_protocol_formation_interval_audit.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase641_separator_protocol_formation_interval_audit.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase641_separator_protocol_formation_interval_audit.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase641_separator_protocol_formation_interval_audit_summary.py
+```
+
+汇总文件：
+
+```text
+results/glm5_phase641_separator_protocol_formation_interval_audit/phase641_cross_model_summary.md
+```
+
+### 测试原理
+
+对每个样本构造两个 prompt：
+
+```text
+original:
+Question: X relation ?
+Answer:
+
+inline:
+Question: X relation ? Answer:
+```
+
+Phase639 已证明主因果单位是 separator boundary。Phase641 固定 separator position，只 patch：
+
+```text
+component = layer_out
+```
+
+对每个区间执行：
+
+```text
+original separator position 的 residual trajectory
+<- inline separator position 的 layer_out trajectory
+```
+
+并比较三类控制：
+
+```text
+restore: 使用真实 inline state
+random: 使用随机扰动控制
+reverse: 使用反向差分控制
+```
+
+核心读出指标：
+
+```text
+correct_prefix token0 hit
+newline_top0
+mean_prefix_rank
+prefix_minus_newline
+```
+
+其中：
+
+$$
+M_{\text{newline}}
+=
+\ell_{\text{correct prefix}}
+-
+\max_{r\in G_{\text{newline}}}\ell_r
+$$
+
+如果：
+
+$$
+M_{\text{newline}}>0
+$$
+
+说明 correct prefix 已经压过 newline prior。
+
+### 客观结果
+
+#### qwen3
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 17
+cases_written = 17
+```
+
+baseline：
+
+```text
+original: tok0 = 14/17, newline = 0/17, rank = 1.2, prefix_minus_newline = 1.272
+inline:   tok0 = 1/17,  newline = 9/17, rank = 4.8, prefix_minus_newline = -1.471
+```
+
+qwen3 的现象和 DS7B 相反：original 已经强，inline 反而引入 newline/space 竞争。因此 qwen3 不是本阶段 DS7B separator protocol failure 的同构样本。
+
+restore 区间没有形成有效 inline protocol：
+
+```text
+L00_08: tok0 = 3/17, newline = 14/17
+L08_16: tok0 = 1/17, newline = 16/17
+L16_24: tok0 = 0/17, newline = 17/17
+L24_32: tok0 = 1/17, newline = 13/17
+L32_35: tok0 = 1/17, newline = 9/17
+L24_35: tok0 = 1/17, newline = 9/17
+```
+
+解释：qwen3 上不应把 inline separator 当作“修复协议态”，因为它本身在目标子集上降低了结果。
+
+#### GLM4
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 31
+cases_written = 31
+```
+
+baseline：
+
+```text
+original: tok0 = 29/31, newline = 0/31, rank = 1.1, prefix_minus_newline = 80.722
+inline:   tok0 = 27/31, newline = 0/31, rank = 1.2, prefix_minus_newline = 71.648
+```
+
+GLM4 本身几乎没有 DS7B 式 newline prior failure。所有 restore 区间都保持强 token0：
+
+```text
+L00_08: tok0 = 29/31, newline = 0/31
+L08_16: tok0 = 29/31, newline = 0/31
+L16_24: tok0 = 27/31, newline = 0/31
+L24_32: tok0 = 27/31, newline = 0/31
+L32_39: tok0 = 27/31, newline = 0/31
+L24_39: tok0 = 27/31, newline = 0/31
+```
+
+解释：GLM4 可以作为“无明显换行先验问题”的对照模型，但不能用来定位 DS7B 的 separator protocol formation。
+
+#### DS7B
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 82
+cases_written = 82
+```
+
+baseline：
+
+```text
+original: tok0 = 20/82, newline = 57/82, rank = 9.4, prefix_minus_newline = -1.704
+inline:   tok0 = 75/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.236
+```
+
+DS7B 的 restore 区间结果：
+
+```text
+L00_08: tok0 = 60/82, newline = 12/82, rank = 2.3, prefix_minus_newline = 1.042
+L08_12: tok0 = 62/82, newline = 17/82, rank = 1.9, prefix_minus_newline = 0.910
+L10_14: tok0 = 76/82, newline = 2/82,  rank = 1.2, prefix_minus_newline = 1.540
+L12_14: tok0 = 76/82, newline = 2/82,  rank = 1.2, prefix_minus_newline = 1.540
+L14_17: tok0 = 76/82, newline = 1/82,  rank = 1.2, prefix_minus_newline = 1.986
+L17_20: tok0 = 77/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.419
+L20_23: tok0 = 72/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.534
+L23_27: tok0 = 75/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.236
+L10_20: tok0 = 77/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.419
+L14_20: tok0 = 77/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.419
+L14_27: tok0 = 75/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.236
+```
+
+DS7B 控制结果：
+
+```text
+random:
+tok0 大多 13/82 到 25/82，newline 大多 37/82 到 56/82，
+接近 original 的失败结构，不能复制 restore。
+
+reverse:
+tok0 大多 0/82 到 3/82，
+newline 或 explanation/word 竞争显著增强，
+prefix rank 可恶化到数百位。
+```
+
+因此 DS7B 的 interval restore 不是普通扰动造成的，而是 inline separator trajectory 的方向性因果效应。
+
+### 阶段性结论
+
+Phase641 支持以下判断：
+
+```text
+DS7B 的 separator protocol state 在 L10-L14 已经明显成形，
+在 L14-L17 继续增强，
+在 L17-L20 达到最强可迁移闭合，
+在 L20-L27 保持 readout-ready carrier state。
+```
+
+更谨慎地说：
+
+```text
+L20 不是唯一形成点；
+L20 是强承载点和强读出就绪点。
+真正的形成区间至少要提前到 L10-L14 / L14-L17，
+完整闭合最强区间是 L17-L20。
+```
+
+这修正了 Phase640 中可能过强的解释：
+
+```text
+错误说法：
+L20 生成 separator protocol state。
+
+更准确说法：
+L10-L20 之间形成并强化 separator protocol trajectory，
+L20/L21 是最强 carrier/readout bridge。
+```
+
+### 对附件分析的评估
+
+附件对 Phase640 的总体判断正确，尤其正确指出：
+
+```text
+Phase640 是从 separator boundary 到 residual protocol trajectory 的关键推进。
+L20 是强 carrier，不一定是最早 formation point。
+下一步应该做 interval audit。
+```
+
+Phase641 已经验证了这条建议的必要性，并给出更客观的区间证据。
+
+### 对语言编码机制研究的进展
+
+当前机制链条可以更新为：
+
+```text
+separator boundary
+→ L10-L20 residual protocol trajectory formation
+→ L20/L21 strong carrier and readout-ready bridge
+→ prefix-vs-newline competition
+→ natural generation token0 behavior
+```
+
+从“相对编码 / 差分复用机制”的角度看，这个结果非常重要：
+
+```text
+同一套参数没有固定输出一种格式；
+极小 separator 差分会沿着 residual stream 激活不同 protocol trajectory；
+这个 trajectory 改变最终 token competition。
+```
+
+也就是说，模型复用同一批层和参数，但通过 prompt boundary 的差分进入不同“状态轨道”：
+
+$$
+h_l^{\text{inline}}
+-
+h_l^{\text{original}}
+=
+\Delta h_l^{\text{protocol}}
+$$
+
+而这个差分不是只在输入端存在，而是沿层传播和强化：
+
+$$
+\Delta h_{10}^{\text{protocol}}
+\rightarrow
+\Delta h_{14}^{\text{protocol}}
+\rightarrow
+\Delta h_{20}^{\text{protocol}}
+\rightarrow
+\Delta \ell_{\text{prefix-newline}}
+$$
+
+### 问题和硬伤
+
+1. Phase641 仍然是 target-only 测试。
+
+它证明了对失败样本的修复有效，但没有完整检查 non-target side effect。后续需要确认是否会破坏原本正确样本，或把本应解释型回答的任务错误压成短答。
+
+2. interval restore 仍可能被区间终点支配。
+
+例如 L17-L20 的强结果可能主要来自 L20 layer_out，而不是整个 L17-L20 的逐层形成。因此 Phase641 不能单独证明“每一层都参与形成”，只能证明该区间含有足够的 protocol trajectory carrier。
+
+3. 只 patch separator position。
+
+Phase638/639 表明 separator 是主因果单位，但 answer label、question tail、final readout position 仍可能参与辅助闭合。
+
+4. qwen3 / GLM4 不是 DS7B 的同构失败样本。
+
+qwen3 的 target 子集上 inline 反而更差，GLM4 几乎没有 newline prior failure。因此跨模型结果不是“同一机制完全复现”，而是显示不同模型在同一 prompt protocol 差分上的状态轨道不同。
+
+### 下一阶段任务
+
+Phase642 应该从 interval restore 进入 endpoint dominance audit：
+
+```text
+目标：
+区分“区间形成”与“区间终点携带”。
+```
+
+建议测试：
+
+```text
+1. 固定 DS7B 为主模型。
+2. 对 L10-L14、L14-L17、L17-L20 三个关键区间做 leave-one-layer-out。
+3. 对每个区间比较：
+   full interval restore
+   only first layer restore
+   only last layer restore
+   interval without last layer
+   interval without first layer
+4. 保持 random / reverse 控制。
+5. 指标仍然用 tok0、newline_top0、prefix_minus_newline、prefix_rank。
+```
+
+阶段目标：
+
+```text
+把“哪个区间含有 protocol state”
+推进到
+“该区间是由终点 carrier 主导，还是由多层累积形成”。
+```
