@@ -83684,3 +83684,1843 @@ Phase642 应该从 interval restore 进入 endpoint dominance audit：
 推进到
 “该区间是由终点 carrier 主导，还是由多层累积形成”。
 ```
+
+## Phase 642: Endpoint Dominance vs Distributed Formation Audit [2026-06-25 20:49]
+
+### 本阶段目标
+
+根据 Phase641，附件对当前进展的判断基本正确：
+
+```text
+separator protocol state 不是 L20 单点瞬间生成，
+而是在 L10-L20 之间形成、强化、并进入 readout-ready carrier state。
+```
+
+但 Phase641 的硬伤也很明确：
+
+```text
+interval restore 强，不等于区间内每一层都参与形成；
+也可能只是区间终点 layer_out 已经携带完整 protocol state。
+```
+
+因此 Phase642 继续完成 endpoint dominance audit：
+
+```text
+区分 endpoint carrier 主导
+和 distributed formation 多层分布式形成。
+```
+
+### 生成脚本
+
+主脚本：
+
+```text
+tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation.py
+```
+
+汇总脚本：
+
+```text
+tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation_summary.py
+```
+
+结果目录：
+
+```text
+results/glm5_phase642_endpoint_dominance_vs_distributed_formation/
+```
+
+汇总文件：
+
+```text
+results/glm5_phase642_endpoint_dominance_vs_distributed_formation/phase642_cross_model_summary.md
+```
+
+### 执行命令
+
+烟测：
+
+```bash
+python tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试，严格按模型顺序执行：
+
+```bash
+python tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase642_endpoint_dominance_vs_distributed_formation_summary.py
+```
+
+### 测试原理
+
+Phase642 对 Phase641 的关键区间做六种拆分：
+
+```text
+full
+first
+last
+without_first
+without_last
+middle
+```
+
+并测试两个方向：
+
+```text
+to_original:
+  inline separator state -> original prompt
+  测充分性。
+
+remove_from_inline:
+  original separator state -> inline prompt
+  测必要性。
+```
+
+对每个 patch 读取：
+
+```text
+tok0 correct_prefix
+newline_top0
+mean_prefix_rank
+prefix_minus_newline
+```
+
+核心判据：
+
+```text
+如果 last ≈ full：
+  终点 carrier 很强。
+
+如果 without_last / middle 仍强：
+  不能解释成只有终点携带。
+
+如果 remove_from_inline(full) 明显破坏 inline：
+  该区间对 inline protocol trajectory 有必要性。
+```
+
+本阶段没有做全量 exact generation，因为双方向 × 多区间 × 多拆分 × 三模型的生成成本会显著放大。本阶段只回答 token0 prefix-vs-newline competition 的机制问题。
+
+### 客观结果
+
+#### qwen3
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 17
+cases_written = 17
+```
+
+baseline：
+
+```text
+original: tok0 = 14/17, newline = 0/17, rank = 1.2, prefix_minus_newline = 1.272
+inline:   tok0 = 1/17,  newline = 9/17, rank = 4.8, prefix_minus_newline = -1.471
+```
+
+qwen3 延续 Phase641 边界：inline separator 对目标子集是坏协议源，因此 to_original restore 多数会把 original 拉向坏协议。
+
+代表结果：
+
+```text
+L00_08 full to_original: tok0 = 3/17, newline = 14/17
+L00_08 first to_original: tok0 = 14/17, newline = 1/17
+L16_24 full to_original: tok0 = 0/17, newline = 17/17
+```
+
+解释：
+
+```text
+qwen3 证明“同一 boundary 差分在不同模型中可能是坏协议源”，
+但不是 DS7B separator failure 的同构证据。
+```
+
+#### GLM4
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 31
+cases_written = 31
+```
+
+baseline：
+
+```text
+original: tok0 = 29/31, newline = 0/31, rank = 1.1, prefix_minus_newline = 80.722
+inline:   tok0 = 27/31, newline = 0/31, rank = 1.2, prefix_minus_newline = 71.648
+```
+
+GLM4 的所有主要 to_original / remove_from_inline 拆分都保持强 token0，几乎没有 newline 竞争：
+
+```text
+L00_08 full to_original: tok0 = 29/31, newline = 0/31
+L08_16 full to_original: tok0 = 29/31, newline = 0/31
+L16_24 full to_original: tok0 = 27/31, newline = 0/31
+L24_32 full to_original: tok0 = 27/31, newline = 0/31
+```
+
+解释：
+
+```text
+GLM4 是无明显 newline prior failure 的稳定对照。
+```
+
+#### DS7B
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 82
+cases_written = 82
+```
+
+baseline：
+
+```text
+original: tok0 = 20/82, newline = 57/82, rank = 9.4, prefix_minus_newline = -1.704
+inline:   tok0 = 75/82, newline = 0/82,  rank = 1.1, prefix_minus_newline = 2.236
+```
+
+##### 充分性方向：to_original
+
+L10-L14：
+
+```text
+full:         tok0 = 76/82, newline = 2/82, prefix_minus_newline = 1.540
+first L10:    tok0 = 64/82, newline = 12/82, prefix_minus_newline = 1.113
+last L14:     tok0 = 76/82, newline = 2/82, prefix_minus_newline = 1.540
+without_last: tok0 = 73/82, newline = 5/82, prefix_minus_newline = 1.457
+middle:       tok0 = 73/82, newline = 5/82, prefix_minus_newline = 1.457
+```
+
+L14-L17：
+
+```text
+full:         tok0 = 76/82, newline = 1/82, prefix_minus_newline = 1.986
+first L14:    tok0 = 76/82, newline = 2/82, prefix_minus_newline = 1.540
+last L17:     tok0 = 76/82, newline = 1/82, prefix_minus_newline = 1.986
+without_last: tok0 = 76/82, newline = 2/82, prefix_minus_newline = 1.664
+middle:       tok0 = 76/82, newline = 2/82, prefix_minus_newline = 1.664
+```
+
+L17-L20：
+
+```text
+full:         tok0 = 77/82, newline = 0/82, prefix_minus_newline = 2.419
+first L17:    tok0 = 76/82, newline = 1/82, prefix_minus_newline = 1.986
+last L20:     tok0 = 77/82, newline = 0/82, prefix_minus_newline = 2.419
+without_last: tok0 = 76/82, newline = 1/82, prefix_minus_newline = 2.281
+middle:       tok0 = 76/82, newline = 1/82, prefix_minus_newline = 2.281
+```
+
+L10-L20：
+
+```text
+full:         tok0 = 77/82, newline = 0/82, prefix_minus_newline = 2.419
+first L10:    tok0 = 64/82, newline = 12/82, prefix_minus_newline = 1.113
+last L20:     tok0 = 77/82, newline = 0/82, prefix_minus_newline = 2.419
+without_last: tok0 = 76/82, newline = 1/82, prefix_minus_newline = 2.281
+middle:       tok0 = 76/82, newline = 1/82, prefix_minus_newline = 2.281
+```
+
+充分性结果说明：
+
+```text
+last layer 与 full interval 几乎相同，
+说明 endpoint carrier 非常强。
+
+但 without_last / middle 仍然强，
+说明不能把机制解释成“只有终点层携带”。
+```
+
+##### 必要性方向：remove_from_inline
+
+L10-L14：
+
+```text
+full:         tok0 = 31/82, newline = 15/82, prefix_minus_newline = 0.195
+first L10:    tok0 = 48/82, newline = 3/82,  prefix_minus_newline = 1.010
+last L14:     tok0 = 31/82, newline = 15/82, prefix_minus_newline = 0.195
+without_last: tok0 = 31/82, newline = 12/82, prefix_minus_newline = 0.377
+middle:       tok0 = 31/82, newline = 12/82, prefix_minus_newline = 0.377
+```
+
+L14-L17：
+
+```text
+full:         tok0 = 25/82, newline = 32/82, prefix_minus_newline = -0.408
+first L14:    tok0 = 31/82, newline = 15/82, prefix_minus_newline = 0.195
+last L17:     tok0 = 25/82, newline = 32/82, prefix_minus_newline = -0.408
+without_last: tok0 = 25/82, newline = 23/82, prefix_minus_newline = -0.157
+middle:       tok0 = 25/82, newline = 23/82, prefix_minus_newline = -0.157
+```
+
+L17-L20：
+
+```text
+full:         tok0 = 19/82, newline = 62/82, prefix_minus_newline = -1.503
+first L17:    tok0 = 25/82, newline = 32/82, prefix_minus_newline = -0.408
+last L20:     tok0 = 19/82, newline = 62/82, prefix_minus_newline = -1.503
+without_last: tok0 = 24/82, newline = 53/82, prefix_minus_newline = -1.012
+middle:       tok0 = 24/82, newline = 53/82, prefix_minus_newline = -1.012
+```
+
+L10-L20：
+
+```text
+full:         tok0 = 19/82, newline = 62/82, prefix_minus_newline = -1.503
+first L10:    tok0 = 48/82, newline = 3/82,  prefix_minus_newline = 1.010
+last L20:     tok0 = 19/82, newline = 62/82, prefix_minus_newline = -1.503
+without_last: tok0 = 24/82, newline = 53/82, prefix_minus_newline = -1.012
+middle:       tok0 = 24/82, newline = 53/82, prefix_minus_newline = -1.012
+```
+
+必要性结果说明：
+
+```text
+从 inline 中移除 L17-L20 或 L10-L20，
+会把 inline 几乎拉回 original 的 newline failure：
+inline baseline: tok0 = 75/82, newline = 0/82
+remove L17-L20: tok0 = 19/82, newline = 62/82
+original baseline: tok0 = 20/82, newline = 57/82
+```
+
+这是本阶段最强结果。
+
+### 阶段性结论
+
+Phase642 支持以下更精确结论：
+
+```text
+1. DS7B 的 separator protocol state 有强 endpoint carrier。
+   L14、L17、L20 这些区间终点单层几乎可以复制 full interval 的充分性效果。
+
+2. 但它不是“只有终点层”。
+   without_last / middle 仍然能强恢复 original，
+   说明中间层已经携带大量 protocol trajectory。
+
+3. necessity 结果更强。
+   从 inline 中移除 L17-L20 / L10-L20 会让模型重新出现 newline failure，
+   说明这段轨迹对 inline protocol 不只是充分，而且接近必要。
+```
+
+更谨慎的机制表述：
+
+```text
+L10-L14:
+  初始 protocol formation 已经足够强，但更像早期形成 + L14 endpoint carrier。
+
+L14-L17:
+  protocol strengthening，把 prefix-newline margin 推到更稳定区间。
+
+L17-L20:
+  readout-ready closure interval，是最关键必要段。
+
+L20:
+  endpoint carrier 极强，但不是唯一机制。
+```
+
+因此 Phase641 的“L10-L20 protocol trajectory”没有被推翻，而是被细化为：
+
+```text
+distributed trajectory + endpoint readout carrier
+```
+
+### 对附件内容的评估
+
+附件对 Phase641 的整体判断正确：
+
+```text
+Phase641 是关键阶段；
+下一步应该区分 endpoint dominance 与 distributed formation；
+必须加入 remove_from_inline 方向。
+```
+
+附件中有少量公式排版错误，例如：
+
+```text
+M_newline = prefix max newline
+Delta R = inline original
+```
+
+应修正为：
+
+$$
+M_{\text{newline}}
+=
+\ell_{\text{prefix}}
+-
+\max_{r\in G_{\text{newline}}}\ell_r
+$$
+
+以及：
+
+$$
+\Delta R_l^{\text{protocol}}
+=
+R_l^{\text{inline}}
+-
+R_l^{\text{original}}
+$$
+
+公式排版错误不影响附件的机制判断。
+
+### 对语言编码机制研究的进展
+
+当前机制链条应更新为：
+
+```text
+separator boundary
+→ L10-L14 early protocol formation
+→ L14-L17 protocol strengthening
+→ L17-L20 necessary readout-ready closure
+→ L20 endpoint carrier
+→ prefix-vs-newline competition
+→ token0 natural generation tendency
+```
+
+这对“相对编码 / 复用差分机制”的意义是：
+
+```text
+同一参数骨架通过 separator boundary 差分进入不同 residual trajectory；
+该 trajectory 不是单点向量，而是分布式轨迹；
+轨迹中存在强 endpoint carrier，但 endpoint 依赖前序轨迹形成；
+最终读出表现为 prefix 与 newline 的竞争翻转。
+```
+
+可以写成：
+
+$$
+\Delta h_l^{\text{protocol}}
+=
+h_l^{\text{inline}}
+-
+h_l^{\text{original}}
+$$
+
+并且：
+
+$$
+\Delta h_{10:20}^{\text{protocol}}
+\Rightarrow
+\Delta \ell_{\text{prefix-newline}}>0
+$$
+
+从 necessity 方向看：
+
+$$
+h_{10:20}^{\text{inline}}
+\leftarrow
+h_{10:20}^{\text{original}}
+\Rightarrow
+\Delta \ell_{\text{prefix-newline}}<0
+$$
+
+这说明 protocol trajectory 不是外部格式标签，而是可因果移除、可因果恢复的内部状态轨道。
+
+### 问题和硬伤
+
+1. 仍是 target-only。
+
+本阶段回答了失败目标样本的充分性和必要性，但没有补 non-target side effect。
+
+2. 没有全量 exact generation。
+
+本阶段为了控制规模，只测 token0 competition。自然生成闭环应后续用少数关键模式补测：
+
+```text
+original
+inline
+to_original L17-L20 full
+remove_from_inline L17-L20 full
+```
+
+3. 仍未定位具体 writer。
+
+Phase642 定位了 trajectory interval 和 endpoint carrier，但还没有拆出 attention / MLP / residual feedback 的具体写入器。
+
+4. qwen3 / GLM4 仍只是边界对照。
+
+跨模型统一结论不是“相同层相同方向”，而是：
+
+```text
+boundary condition 会写入模型特异的 protocol trajectory。
+```
+
+### 下一阶段任务
+
+Phase643 应该进入最小自然生成闭环：
+
+```text
+Protocol Trajectory Natural Generation Closure
+```
+
+目标：
+
+```text
+把 Phase642 的 token0 competition 结果压到真实自然生成输出。
+```
+
+建议只测少数关键模式，避免测试规模过大：
+
+```text
+1. original
+2. inline
+3. to_original L17-L20 full
+4. to_original L17-L20 middle
+5. remove_from_inline L17-L20 full
+6. remove_from_inline L17-L20 middle
+7. random / reverse controls
+```
+
+核心指标：
+
+```text
+first token category
+exact correct generation
+newline/explanation rate
+answer string stability
+```
+
+阶段目标：
+
+```text
+证明 L17-L20 protocol trajectory 不仅改变 logits，
+还真实改变自然生成路径。
+```
+
+## Phase 643: Protocol Trajectory Natural Generation Closure [2026-06-25 21:17]
+
+### 本阶段目标
+
+根据附件分析，Phase642 的判断基本正确：
+
+```text
+DS7B 的 separator protocol state
+= distributed trajectory + endpoint readout carrier。
+```
+
+Phase642 已经证明 L17-L20 / L10-L20 的 protocol trajectory 可以强烈改变 token0 的 prefix-vs-newline competition，但仍有一个硬伤：
+
+```text
+Phase642 主要是 teacher-forced logit audit，
+还没有证明它真的改变 greedy natural generation。
+```
+
+因此 Phase643 的目标是：
+
+```text
+把 Phase642 的 L17-L20 protocol trajectory patch 压到自然生成闭环，
+检查 exact generation、newline/explanation tendency 和生成文本分布。
+```
+
+### 生成脚本
+
+主脚本：
+
+```text
+tests/gpt5/phase643_protocol_trajectory_natural_generation_closure.py
+```
+
+汇总脚本：
+
+```text
+tests/gpt5/phase643_protocol_trajectory_natural_generation_closure_summary.py
+```
+
+结果目录：
+
+```text
+results/glm5_phase643_protocol_trajectory_natural_generation_closure/
+```
+
+汇总文件：
+
+```text
+results/glm5_phase643_protocol_trajectory_natural_generation_closure/phase643_cross_model_summary.md
+```
+
+### 执行命令
+
+烟测：
+
+```bash
+python tests/gpt5/phase643_protocol_trajectory_natural_generation_closure.py qwen3 --smoke --include-nontarget --hard-exit-after-model
+```
+
+正式测试，三个模型严格顺序执行：
+
+```bash
+python tests/gpt5/phase643_protocol_trajectory_natural_generation_closure.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase643_protocol_trajectory_natural_generation_closure.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase643_protocol_trajectory_natural_generation_closure.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase643_protocol_trajectory_natural_generation_closure_summary.py
+```
+
+### 测试原理
+
+Phase643 固定 Phase642 中最关键的区间：
+
+```text
+L17-L20
+```
+
+测试少数关键模式，避免组合爆炸：
+
+```text
+original
+inline
+to_original_full_restore
+to_original_middle_restore
+to_original_full_random
+to_original_full_reverse
+remove_from_inline_full_restore
+remove_from_inline_middle_restore
+remove_from_inline_full_random
+remove_from_inline_full_reverse
+```
+
+其中：
+
+```text
+to_original:
+  把 inline 的 L17-L20 separator layer_out trajectory 恢复到 original prompt。
+
+remove_from_inline:
+  把 original 的 L17-L20 separator layer_out trajectory 写回 inline prompt。
+```
+
+生成长度沿用 Phase638/639 的精确答案口径：
+
+```text
+max_new_tokens = max(len(answer_ids(candidate_value)))
+```
+
+核心指标：
+
+```text
+tok0 correct_prefix
+exact_correct generation
+wrong_exact generation
+newline_top0
+generation_text distribution
+prefix_minus_newline
+```
+
+### 客观结果
+
+#### qwen3
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 17
+cases_written = 17
+max_new_tokens = 3
+```
+
+结果：
+
+```text
+original:
+  tok0 = 14/17
+  exact = 11/17
+  wrong_exact = 3/17
+  newline = 0/17
+
+inline:
+  tok0 = 1/17
+  exact = 0/17
+  newline = 9/17
+
+to_original_full_restore:
+  tok0 = 0/17
+  exact = 0/17
+  newline = 16/17
+
+to_original_middle_restore:
+  tok0 = 1/17
+  exact = 1/17
+  newline = 14/17
+```
+
+qwen3 延续前几阶段边界：
+
+```text
+inline separator 对 qwen3 目标子集是坏协议源。
+把 inline trajectory 恢复到 original 会把自然生成拉坏。
+```
+
+这说明跨模型不能寻找固定字符规则，而要寻找模型特异 protocol trajectory。
+
+#### GLM4
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 31
+cases_written = 31
+max_new_tokens = 2
+```
+
+结果：
+
+```text
+original:
+  tok0 = 29/31
+  exact = 28/31
+  wrong_exact = 1/31
+  newline = 0/31
+
+inline:
+  tok0 = 27/31
+  exact = 26/31
+  wrong_exact = 1/31
+  newline = 0/31
+
+to_original_full_restore:
+  tok0 = 29/31
+  exact = 26/31
+  wrong_exact = 3/31
+  newline = 0/31
+
+remove_from_inline_full_restore:
+  tok0 = 31/31
+  exact = 28/31
+  wrong_exact = 2/31
+  newline = 0/31
+```
+
+GLM4 仍然是稳定对照：
+
+```text
+几乎没有 newline prior failure，
+L17-L20 patch 主要造成 exact 小幅波动，
+不是 DS7B 式 protocol gate failure。
+```
+
+#### DS7B
+
+样本：
+
+```text
+raw_cases = 256
+target_seen = 82
+cases_written = 82
+max_new_tokens = 3
+```
+
+baseline：
+
+```text
+original:
+  tok0 = 20/82
+  exact = 20/82
+  wrong_exact = 0/82
+  newline = 57/82
+  prefix_minus_newline = -1.704
+  generation_text 主要为 "?\\n\\nTo solve" 和 "?\\n\\nI think"
+
+inline:
+  tok0 = 75/82
+  exact = 72/82
+  wrong_exact = 0/82
+  newline = 0/82
+  prefix_minus_newline = 2.236
+```
+
+充分性方向：
+
+```text
+to_original_full_restore:
+  tok0 = 77/82
+  exact = 72/82
+  wrong_exact = 3/82
+  newline = 0/82
+  prefix_minus_newline = 2.419
+
+to_original_middle_restore:
+  tok0 = 76/82
+  exact = 76/82
+  wrong_exact = 0/82
+  newline = 1/82
+  prefix_minus_newline = 2.281
+```
+
+控制：
+
+```text
+to_original_full_random:
+  tok0 = 14/82
+  exact = 13/82
+  newline = 51/82
+  prefix_minus_newline = -1.708
+
+to_original_full_reverse:
+  tok0 = 1/82
+  exact = 0/82
+  newline = 61/82
+  prefix_minus_newline = -7.345
+```
+
+必要性方向：
+
+```text
+remove_from_inline_full_restore:
+  tok0 = 19/82
+  exact = 20/82
+  wrong_exact = 0/82
+  newline = 62/82
+  prefix_minus_newline = -1.503
+
+remove_from_inline_middle_restore:
+  tok0 = 24/82
+  exact = 24/82
+  wrong_exact = 0/82
+  newline = 53/82
+  prefix_minus_newline = -1.012
+```
+
+必要性控制：
+
+```text
+remove_from_inline_full_random:
+  tok0 = 73/82
+  exact = 71/82
+  newline = 0/82
+  prefix_minus_newline = 2.225
+
+remove_from_inline_full_reverse:
+  tok0 = 75/82
+  exact = 73/82
+  newline = 0/82
+  prefix_minus_newline = 4.232
+```
+
+### 阶段性结论
+
+Phase643 证明：
+
+```text
+DS7B 的 L17-L20 separator protocol trajectory
+不仅改变 teacher-forced token0 logits，
+而且真实改变 greedy natural generation。
+```
+
+最强证据：
+
+```text
+original exact = 20/82
+inline exact = 72/82
+to_original L17-L20 full exact = 72/82
+to_original L17-L20 middle exact = 76/82
+remove_from_inline L17-L20 full exact = 20/82
+remove_from_inline L17-L20 middle exact = 24/82
+```
+
+也就是说：
+
+```text
+把 inline 的 L17-L20 trajectory 写入 original，
+可以让 original 生成表现接近甚至超过 inline。
+
+把 original 的 L17-L20 trajectory 写回 inline，
+可以让 inline 退回 original 式 newline/explanation failure。
+```
+
+这使当前链条完成了一个真正闭环：
+
+```text
+separator boundary
+→ L17-L20 protocol trajectory
+→ prefix-vs-newline competition
+→ greedy natural generation
+```
+
+### 对附件内容的评估
+
+附件对 Phase642 的总体判断正确，尤其正确指出：
+
+```text
+Phase643 必须验证 exact generation，
+不能只停留在 token0 competition。
+```
+
+Phase643 已经完成这个验证。
+
+附件中仍有少量公式排版错误，例如差分公式中缺少减号，但机制判断正确。正确写法是：
+
+$$
+\Delta h_l^{\text{protocol}}
+=
+h_l^{\text{inline}}
+-
+h_l^{\text{original}}
+$$
+
+以及：
+
+$$
+M_{\text{newline}}
+=
+\ell_{\text{prefix}}
+-
+\max_{r\in G_{\text{newline}}}\ell_r
+$$
+
+### 对语言编码机制研究的进展
+
+当前 DS7B 局部机制链条可以写成：
+
+```text
+separator boundary
+→ L10-L14 early protocol formation
+→ L14-L17 strengthening
+→ L17-L20 natural-generation-critical trajectory
+→ L20 endpoint carrier
+→ prefix-vs-newline competition
+→ exact natural generation
+```
+
+这个结果对“复用差分机制”的意义非常直接：
+
+```text
+同一语义问题、同一答案、同一参数骨架，
+只改变 separator boundary，
+就能让模型进入不同 residual protocol trajectory；
+这条 trajectory 不只是改变内部分数，
+而是决定自然生成路径。
+```
+
+可以表达为：
+
+$$
+\Delta h_{17:20}^{\text{protocol}}
+\Rightarrow
+\Delta \ell_{\text{prefix-newline}}
+\Rightarrow
+\Delta \operatorname{Generate}
+$$
+
+其中：
+
+$$
+\Delta \operatorname{Generate}
+=
+\operatorname{Generate}(h^{\text{inline-protocol}})
+-
+\operatorname{Generate}(h^{\text{original-protocol}})
+$$
+
+### 问题和硬伤
+
+1. 仍是 target-only。
+
+Phase643 证明目标失败样本的自然生成闭环，但还没有检查 non-target side effect。
+
+2. exact generation 使用短答案长度。
+
+本阶段使用候选值 token 长度作为生成长度，适合判断值答案是否精确生成，但不能判断后续长文本稳定性。
+
+3. 仍未拆出 writer。
+
+L17-L20 trajectory 已证明自然生成关键，但 attention / MLP / residual feedback 的具体写入器还没有定位。
+
+4. qwen3 / GLM4 是边界对照，不是同构复现。
+
+qwen3 上 inline 是坏协议，GLM4 没有明显 newline failure。跨模型统一仍应抽象为：
+
+```text
+boundary condition → model-specific protocol trajectory → generation behavior
+```
+
+### 下一阶段任务
+
+Phase644 应该补 non-target side effect 和任务边界：
+
+```text
+Protocol Trajectory Side-Effect and Boundary Audit
+```
+
+目标：
+
+```text
+检查 L17-L20 protocol trajectory patch 是否只修复目标失败样本，
+还是会破坏原本正确样本、非值任务、或本应解释型的任务。
+```
+
+建议测试：
+
+```text
+1. target failure cases
+2. original already-correct cases
+3. inline already-bad cases
+4. non-value relation cases
+5. explanation-needed prompts
+```
+
+关键指标：
+
+```text
+exact_correct
+wrong_exact
+newline/explanation rate
+over-short-answer rate
+semantic value stability
+```
+
+阶段目标：
+
+```text
+把“能修复目标样本”
+推进到
+“知道修复边界和副作用”。
+```
+
+## Phase 644: Global Atlas Readiness Review and Side-Effect Boundary Plan [2026-06-25 21:20]
+
+### 本阶段性质
+
+本阶段未运行新的模型测试命令，也未新增测试脚本。工作内容是基于 Phase641、Phase642、Phase643 的客观结果，完成理论综合、全局图谱可启动性评估，以及下一阶段实验方案。
+
+参考记录：
+
+```text
+Phase641: Separator Protocol Formation Interval Audit
+Phase642: Endpoint Dominance vs Distributed Formation Audit
+Phase643: Protocol Trajectory Natural Generation Closure
+```
+
+### 当前最重要的客观结果
+
+DS7B 的核心闭环已经成立：
+
+```text
+original:
+  exact = 20/82
+  newline = 57/82
+
+inline:
+  exact = 72/82
+  newline = 0/82
+
+to_original L17-L20 full:
+  exact = 72/82
+  newline = 0/82
+
+to_original L17-L20 middle:
+  exact = 76/82
+  newline = 1/82
+
+remove_from_inline L17-L20 full:
+  exact = 20/82
+  newline = 62/82
+
+remove_from_inline L17-L20 middle:
+  exact = 24/82
+  newline = 53/82
+```
+
+这说明：
+
+```text
+separator boundary
+→ L17-L20 protocol trajectory
+→ prefix-vs-newline competition
+→ greedy natural generation
+```
+
+已经完成目标样本上的因果闭环。
+
+### 测试原理的统一解释
+
+前几阶段不是在证明“格式会影响输出”这种表面结论，而是在证明：
+
+```text
+极小 boundary difference 会写入 residual protocol trajectory，
+这个 trajectory 会改变 token competition，
+最终改变 natural generation。
+```
+
+形式化写法：
+
+$$
+\Delta h_l^{\text{protocol}}
+=
+h_l^{\text{inline}}
+-
+h_l^{\text{original}}
+$$
+
+前缀对换行竞争：
+
+$$
+M_{\text{newline}}
+=
+\ell_{\text{prefix}}
+-
+\max_{r\in G_{\text{newline}}}\ell_r
+$$
+
+自然生成闭环：
+
+$$
+\Delta h_{17:20}^{\text{protocol}}
+\Rightarrow
+\Delta M_{\text{newline}}
+\Rightarrow
+\Delta \operatorname{Generate}
+$$
+
+### 以上内容是否正确
+
+总体正确，但必须保守解释。
+
+正确部分：
+
+```text
+1. DS7B 的 separator protocol state 不是单点向量。
+2. L10-L14 已出现早期协议形成。
+3. L14-L17 继续增强协议状态。
+4. L17-L20 是自然生成关键轨迹段。
+5. L20 是强 endpoint carrier，但不是唯一机制。
+6. random / reverse control 排除了普通扰动解释。
+7. remove_from_inline 证明 L17-L20 对 inline protocol 接近必要。
+```
+
+必须保守的部分：
+
+```text
+1. 当前结果仍然是 target-only。
+2. 还没有 non-target side effect audit。
+3. 还没有解释型任务和非值任务边界。
+4. 还没有拆出 L17-L20 内部具体 writer。
+5. qwen3 / GLM4 是边界对照，不是同构复现。
+```
+
+### 是否可以开始全局图谱测试
+
+可以开始，但不能直接做“全模型全任务大图谱”。更合理的启动方式是：
+
+```text
+局部闭环机制图谱
+→ 边界副作用图谱
+→ 跨任务复用图谱
+→ 跨模型抽象图谱
+```
+
+原因：
+
+```text
+当前 DS7B 已经有一个完整局部闭环：
+minimal causal unit
+trajectory interval
+sufficiency
+necessity
+natural generation closure
+```
+
+这足以作为全局图谱的第一个稳定锚点。
+
+但还不能直接宣称完整图谱已经成立，因为缺少：
+
+```text
+non-target safety boundary
+task boundary
+writer graph
+cross-model abstraction
+```
+
+### 当前核心拼图
+
+1. residual stream 是状态总线。
+2. hidden state 是动态轨迹，不是静态语义容器。
+3. prompt 是条件化状态生成器。
+4. boundary pattern 可以触发 protocol trajectory。
+5. separator boundary 是 DS7B 格式协议的最小主因果单位。
+6. protocol state 是独立机制对象。
+7. protocol state 可以被 restore。
+8. protocol state 可以被 remove。
+9. protocol state 有形成区间。
+10. protocol state 有 endpoint carrier。
+11. L10-L14 是早期 formation interval。
+12. L14-L17 是 strengthening interval。
+13. L17-L20 是 natural-generation-critical interval。
+14. L20 是强 endpoint carrier。
+15. token0 是 format / prefix token。
+16. token1 是 semantic value token。
+17. token2 是 confirmation token。
+18. correct value token attention 是语义值门核心来源。
+19. result carrier 通过 layer_out 传播。
+20. token0 失败主要是 correct prefix 输给 newline / explanation prior。
+21. competitor ladder 比单一 competitor 更准确。
+22. prefix_minus_newline 是协议门核心指标。
+23. exact generation 可以被 protocol trajectory 因果改变。
+24. qwen3 中 inline separator 是坏协议源。
+25. GLM4 当前模板下没有明显 newline prior failure。
+26. DS7B 对 separator boundary 极度敏感。
+27. 同一 boundary 在不同模型中写入不同 protocol trajectory。
+28. 跨模型统一对象不是固定字符，而是 boundary-conditioned trajectory。
+29. restore 证明充分性。
+30. remove 证明必要性。
+31. random / reverse controls 证明方向性。
+32. interval audit 定位形成区间。
+33. endpoint audit 区分终点携带和分布式形成。
+34. natural generation closure 证明真实生成效应。
+35. target-only 必须补 side-effect audit。
+
+### 统一数学公式更新
+
+输入分解：
+
+$$
+x=(F,C,R,O,G,B)
+$$
+
+其中：
+
+```text
+F = format
+C = concept
+R = relation
+O = output position
+G = generation policy
+B = boundary pattern
+```
+
+边界差分：
+
+$$
+\Delta h_l^{B}
+=
+h_l(B_{\text{inline}})
+-
+h_l(B_{\text{multi}})
+$$
+
+协议轨迹：
+
+$$
+\mathcal{T}_{\text{protocol}}
+=
+\{\Delta h_0^B,\Delta h_1^B,\dots,\Delta h_L^B\}
+$$
+
+区间分解：
+
+$$
+\Delta h_{a:b}^{\text{protocol}}
+=
+\Delta h_{a:b-1}^{\text{distributed}}
++
+\Delta h_b^{\text{endpoint}}
+$$
+
+残差状态分解：
+
+$$
+h_l
+=
+h_l^{\text{semantic}}
++
+h_l^{\text{protocol}}
++
+h_l^{\text{syntax}}
++
+h_l^{\text{competition}}
++
+h_l^{\text{noise}}
+$$
+
+读出竞争：
+
+$$
+\ell_v
+=
+W_U(v)^\top y
+$$
+
+$$
+M_{\text{newline}}
+=
+\ell_{\text{prefix}}
+-
+\max_{r\in G_{\text{newline}}}\ell_r
+$$
+
+协议门：
+
+$$
+G_{\text{protocol}}
+=
+\mathbb{1}[M_{\text{newline}}>0]
+$$
+
+完整生成近似：
+
+$$
+P(\hat{c}=c)
+\approx
+P(G_{\text{protocol}})
+\cdot
+P(G_{\text{prefix}})
+\cdot
+P(G_{\text{value}})
+\cdot
+P(G_{\text{confirm}})
+$$
+
+统一智能过程：
+
+$$
+\operatorname{Intelligence}
+=
+\operatorname{ReuseSkeleton}
+\circ
+\operatorname{BoundaryProtocolEncoder}
+\circ
+\operatorname{DistributedProtocolFormation}
+\circ
+\operatorname{EndpointCarrier}
+\circ
+\operatorname{SemanticSelector}
+\circ
+\operatorname{ReadoutCompetition}
+\circ
+\operatorname{TokenActor}
+\circ
+\operatorname{ContinuationController}
+$$
+
+### 最新完整理论
+
+当前理论可命名为：
+
+```text
+相对编码—复用差分—分布式协议轨迹理论
+```
+
+核心表述：
+
+```text
+深度神经网络的语言能力不是由孤立概念向量、孤立语法模板或单个注意力头完成，
+而是由同一参数骨架在不同输入边界和语义条件下生成不同状态轨迹。
+这些状态轨迹包含语义轨迹、协议轨迹、竞争轨迹和确认轨迹。
+语言生成不是简单读出知识，而是状态轨迹进入词表竞争后的自回归执行。
+```
+
+### 当前进度评估
+
+```text
+DS7B separator protocol natural generation closure:
+92% 到 96%
+
+DS7B protocol trajectory interval localization:
+85% 到 92%
+
+DS7B endpoint vs distributed formation:
+78% 到 86%
+
+DS7B side-effect boundary:
+15% 到 25%
+
+DS7B writer graph:
+20% 到 35%
+
+value semantic gate:
+95% 到 99%
+
+format / protocol gate:
+82% 到 90%
+
+cross-model abstraction:
+55% 到 68%
+
+global reuse-difference atlas:
+45% 到 60%
+
+language encoding mechanism:
+76% 到 88%
+
+complete intelligence theory:
+55% 到 70%
+```
+
+### 对语言三大核心特性的反思
+
+知识网络：
+
+```text
+知识不是单纯 (concept, relation) -> value。
+知识输出必须经过 protocol trajectory 和 token competition。
+```
+
+更准确写法：
+
+$$
+(C,R,B)
+\rightarrow
+h^{\text{semantic}}
++
+h^{\text{protocol}}
++
+h^{\text{competition}}
+\rightarrow
+\hat{v}
+$$
+
+推理能力：
+
+```text
+推理不是只有语义选择。
+推理还包括协议选择、状态轨迹构造、读出竞争和自回归执行。
+```
+
+语法系统：
+
+```text
+语法不是表面模板，而是边界协议轨迹系统。
+它决定是否换行、是否解释、是否短答、哪个 token 先输出。
+```
+
+### 更好的方案
+
+不要继续只做单点机制破解。应进入图谱化方案：
+
+```text
+1. 每个机制必须记录 causal unit。
+2. 每个机制必须记录 trajectory interval。
+3. 每个机制必须记录 sufficiency。
+4. 每个机制必须记录 necessity。
+5. 每个机制必须记录 generation closure。
+6. 每个机制必须记录 side-effect boundary。
+```
+
+### 下一阶段方案
+
+下一阶段应执行：
+
+```text
+Phase645: Protocol Trajectory Side-Effect and Boundary Atlas
+```
+
+目标：
+
+```text
+检查 L17-L20 protocol trajectory patch 是否只修复目标失败样本，
+还是会破坏原本正确样本、非值任务、解释型任务和跨模板任务。
+```
+
+测试集合：
+
+```text
+1. target failure cases
+2. original already-correct cases
+3. inline already-bad cases
+4. relation changed cases
+5. explanation-needed prompts
+6. non-value prompts
+```
+
+测试模式：
+
+```text
+original
+inline
+to_original L17-L20 middle restore
+remove_from_inline L17-L20 middle restore
+random control
+reverse control
+```
+
+指标：
+
+```text
+exact_correct
+wrong_exact
+newline_rate
+explanation_rate
+over_short_answer_rate
+semantic_stability
+side_effect_rate
+```
+
+阶段目标：
+
+```text
+把“能修复目标样本”
+推进到
+“知道机制边界、适用范围和副作用”。
+```
+
+## Phase 645: Protocol Trajectory Side-Effect and Boundary Atlas [2026-06-25 21:49]
+
+### 任务背景
+
+用户上传的 Phase 644 评价基本正确：Phase 644 不是新实验，而是基于 Phase 641 到 Phase 643 的阶段性综合。它把 DS7B 的 separator boundary -> protocol trajectory -> prefix-vs-newline competition -> greedy natural generation 链条整理为一个可启动全局图谱的局部闭环。
+
+但该评价中最重要的收紧也正确：不能只证明 target failure cases 可以被 L17-L20 protocol trajectory patch 修复，还必须测试副作用边界。否则当前结论可能只是“能把一批样本强行推入短答协议”，而不是完整解释语言编码机制。
+
+### 本阶段生成脚本
+
+```text
+tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas.py
+tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas_summary.py
+```
+
+### 执行命令
+
+smoke：
+
+```bash
+python tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas.py qwen3 --smoke --hard-exit-after-model
+```
+
+正式顺序测试：
+
+```bash
+python tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas.py qwen3 --confirm --hard-exit-after-model
+python tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas.py glm4 --confirm --hard-exit-after-model
+python tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas.py deepseek7b --confirm --hard-exit-after-model
+python tests/gpt5/phase645_protocol_trajectory_side_effect_boundary_atlas_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase645_protocol_trajectory_side_effect_boundary_atlas/phase645_qwen3_protocol_trajectory_side_effect_boundary_atlas_confirm.json
+results/glm5_phase645_protocol_trajectory_side_effect_boundary_atlas/phase645_glm4_protocol_trajectory_side_effect_boundary_atlas_confirm.json
+results/glm5_phase645_protocol_trajectory_side_effect_boundary_atlas/phase645_deepseek7b_protocol_trajectory_side_effect_boundary_atlas_confirm.json
+results/glm5_phase645_protocol_trajectory_side_effect_boundary_atlas/phase645_cross_model_summary.md
+```
+
+### 测试原理
+
+本阶段复用 Phase 643 的核心 causal unit：
+
+```text
+separator protocol trajectory
+component = layer_out
+layers = [18, 19]
+```
+
+测试模式：
+
+```text
+original
+inline
+to_original_middle_restore
+to_original_middle_random
+to_original_middle_reverse
+remove_from_inline_middle_restore
+remove_from_inline_middle_random
+remove_from_inline_middle_reverse
+```
+
+测试集合扩展为：
+
+```text
+target_failure
+original_correct
+inline_bad
+relation_changed
+explanation_needed
+non_value
+```
+
+注意：
+
+```text
+relation_changed / explanation_needed / non_value 中的 exact 不是正向成功率，
+而是旧 value 吸附、过短回答或协议误迁移风险指标。
+```
+
+核心问题是：
+
+```text
+同一个 L17-L20 protocol trajectory 是否只是修复 DS7B 的目标失败样本，
+还是会把其它任务也强行推入 value short-answer protocol。
+```
+
+### 核心结果
+
+#### qwen3
+
+```text
+raw_cases = 320
+selected_items = 219
+target_failure = 26
+original_correct = 48
+inline_bad = 1
+relation_changed = 48
+explanation_needed = 48
+non_value = 48
+```
+
+qwen3 和 DS7B 方向相反。qwen3 的 inline 不是稳定修复，而经常触发 newline / Okay 路径：
+
+```text
+target_failure:
+original exact = 19/26, newline_top0 = 0/26
+inline exact = 0/26, newline_top0 = 15/26
+to_original_middle_restore exact = 2/26, newline_top0 = 22/26
+```
+
+qwen3 说明：separator protocol trajectory 是模型相关状态，不是通用字符规则。不能把 DS7B 的 inline value protocol 直接推广到 qwen3。
+
+#### GLM4
+
+```text
+raw_cases = 320
+selected_items = 234
+target_failure = 36
+original_correct = 48
+inline_bad = 6
+relation_changed = 48
+explanation_needed = 48
+non_value = 48
+```
+
+GLM4 基本没有 newline 竞争问题，原始、inline 和 patch 之间差异较小：
+
+```text
+target_failure:
+original exact = 29/36
+inline exact = 27/36
+to_original_middle_restore exact = 27/36
+remove_from_inline_middle_restore exact = 31/36
+newline_top0 = 0/36 for all key modes
+```
+
+GLM4 结果说明：当前 DS7B 的 protocol trajectory 不是所有模型共享的同构瓶颈。GLM4 更像是已经默认稳定短答或其格式门不依赖同一条 L17-L20 separator trajectory。
+
+#### DS7B
+
+```text
+raw_cases = 320
+selected_items = 241
+target_failure = 48
+original_correct = 48
+inline_bad = 1
+relation_changed = 48
+explanation_needed = 48
+non_value = 48
+```
+
+目标失败样本上，Phase 643 的闭环被复现：
+
+```text
+target_failure:
+original exact = 12/48, newline_top0 = 34/48
+inline exact = 45/48, newline_top0 = 0/48
+to_original_middle_restore exact = 45/48, newline_top0 = 0/48
+remove_from_inline_middle_restore exact = 14/48, newline_top0 = 30/48
+```
+
+原本正确样本上，restore 不是破坏，而是强力压制 newline 并提升短答：
+
+```text
+original_correct:
+original exact = 8/48, newline_top0 = 36/48
+inline exact = 47/48, newline_top0 = 0/48
+to_original_middle_restore exact = 48/48, newline_top0 = 0/48
+remove_from_inline_middle_restore exact = 14/48, newline_top0 = 31/48
+```
+
+这说明 DS7B 中原始模板的 newline / explanation prior 不只影响 target failure，也广泛影响 original_correct 集合。所谓 original_correct 中仍存在大量“表面正确但协议不稳定”的样本。
+
+但是副作用边界非常明显：
+
+```text
+relation_changed:
+original old_exact = 4/48, newline_top0 = 32/48
+inline old_exact = 17/48, newline_top0 = 0/48
+to_original_middle_restore old_exact = 17/48, newline_top0 = 0/48
+```
+
+说明 relation changed 场景下，inline / restore 会把模型推入旧 value 输出。这是语义边界风险。
+
+```text
+explanation_needed:
+original old_exact = 0/48
+inline old_exact = 44/48
+to_original_middle_restore old_exact = 43/48
+remove_from_inline_middle_restore old_exact = 0/48
+```
+
+说明当任务明确要求 explanation 时，inline / restore 会强烈过度短答，直接输出旧 value。这是任务协议边界风险。
+
+```text
+non_value:
+original old_exact = 0/48, newline_top0 = 28/48
+inline old_exact = 36/48, newline_top0 = 8/48
+to_original_middle_restore old_exact = 23/48, newline_top0 = 8/48
+remove_from_inline_middle_restore old_exact = 4/48, newline_top0 = 34/48
+```
+
+说明当任务要求 yes/no 而不是 category value 时，inline / restore 会错误吸附 category value。这是输出类型边界风险。
+
+### 本阶段结论
+
+Phase 645 是 Phase 644 的关键实证收紧：
+
+```text
+DS7B 的 L17-L20 separator protocol trajectory 确实是强因果机制；
+它不仅能修复 target failure，也能修复一批 original_correct 中的隐藏协议不稳定样本。
+```
+
+但更重要的是：
+
+```text
+该 trajectory 不是纯语义恢复器，
+而是 value short-answer protocol activator。
+```
+
+它的适用边界是：
+
+```text
+当任务确实要求直接输出 category value 时，restore 有效；
+当任务要求解释、yes/no、或 relation 已改变时，restore 会产生明显副作用。
+```
+
+因此 Phase 644 中“可以启动全局图谱测试”的判断仍然成立，但必须附加边界条件：
+
+```text
+全局图谱不能只记录 effective patch。
+必须同时记录 task boundary、semantic boundary、output-type boundary 和 side-effect boundary。
+```
+
+### 理论进展
+
+原公式需要从单一 protocol gate 扩展为条件化协议门：
+
+```text
+G_protocol = 1[M_newline > 0]
+```
+
+更新为：
+
+```text
+G_protocol(B, T, O, R)
+```
+
+其中：
+
+```text
+B = boundary condition
+T = task demand
+O = output type
+R = relation semantics
+```
+
+完整近似从：
+
+```text
+P(c_hat = c)
+≈ P(G_protocol) * P(G_prefix) * P(G_value) * P(G_confirm)
+```
+
+收紧为：
+
+```text
+P(c_hat = c | B,T,O,R)
+≈
+P(G_protocol(B,T,O,R))
+* P(G_prefix | G_protocol)
+* P(G_value | R,T,O)
+* P(G_confirm | context)
+```
+
+当前最重要的新洞察：
+
+```text
+protocol trajectory 是可复用差分机制的一部分，
+但复用不是无条件复用。
+同一条状态轨迹在 value task 中是修复器，
+在 explanation / non-value / relation-changed task 中会变成副作用源。
+```
+
+这说明语言机制不是“找到一个正确方向并注入”，而是：
+
+```text
+同一参数骨架根据边界、任务、语义和输出类型选择不同协议态。
+智能的关键不只是状态生成，而是状态选择边界。
+```
+
+### 问题和硬伤
+
+1. relation_changed 目前只是在小关系集合内替换关系，尚不能证明真实语义关系的完整边界。
+2. explanation_needed 的指标把 old_exact 作为风险指标，但还没有建立解释质量评分。
+3. non_value 只测试 yes/no 型输出，输出类型边界还应覆盖数字、列表、JSON、自由文本等。
+4. inline_bad 样本数量太少，说明该分支不能作为主要统计依据。
+5. qwen3 与 DS7B 方向相反，说明跨模型统一理论还不能依赖固定层区间或固定 separator 字符。
+6. 当前仍主要测试 layer_out trajectory，还没有完整 writer graph。
+
+### 是否可以开始全局图谱测试
+
+可以开始，但不是无约束开始。
+
+全局图谱的每个机制节点必须至少记录：
+
+```text
+1. causal unit
+2. trajectory interval
+3. sufficiency
+4. necessity
+5. natural generation closure
+6. semantic boundary
+7. task boundary
+8. output-type boundary
+9. side-effect profile
+10. cross-model polarity
+```
+
+如果只记录“patch 是否有效”，会重新回到单点机制陷阱。
+
+### 下一阶段
+
+Phase 646 应进入：
+
+```text
+Global Reuse-Difference Protocol Atlas Schema and First Batch
+```
+
+核心任务：
+
+```text
+把 value short-answer protocol 作为第一个 atlas node，
+用统一表结构记录 DS7B / qwen3 / GLM4 的：
+boundary condition
+task demand
+output type
+semantic relation
+trajectory interval
+patch direction
+generation closure
+side-effect boundary
+cross-model polarity
+```
+
+第一批 atlas 不要追求所有机制，而应覆盖三个机制族：
+
+```text
+1. value short-answer protocol
+2. newline / explanation protocol
+3. non-value answer protocol
+```
+
+阶段目标：
+
+```text
+从“单机制闭环”
+进入
+“机制图谱节点标准化”。
+```
