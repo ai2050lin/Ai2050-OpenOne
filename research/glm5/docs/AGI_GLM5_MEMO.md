@@ -37545,6 +37545,7 @@ attention head、MLP、residual carry、source-token path 的组合贡献。
 ```
 
 因为 Phase 691 是新阶段的图谱拆边任务，需要更复杂脚本和更长测试，建议下一次从 Phase 691 开始。
+
 ## Phase 691: Boundary Component and Residual-Carry Decomposition [2026-06-26 14:38]
 
 ### 命令
@@ -37924,40 +37925,7 @@ python tests/gpt5/phase692_boundary_window_component_combo_audit.py --summarize-
 
 ### 测试原理
 
-Phase 691 证明：
-
-```text
-单层 attn_out / mlp_out patch 明显弱于 layer_out / carry_est。
-```
-
-但这个结论有一个潜在漏洞：
-
-```text
-如果 attention / MLP 的有效信息分布在多层，
-单层 patch 弱并不能说明 attention / MLP 路径不重要。
-```
-
-Phase 692 因此做窗口组合审计。
-
-对 Phase 690 / 691 的边界区切成：
-
-```text
-early window
-late window
-all window
-```
-
-然后一次性 patch 多层：
-
-```text
-attn_window
-mlp_window
-attn_mlp_window
-layer_window
-random_layer_window
-```
-
-同时做 restore 和 degradation。
+Phase 691 证明单层 attn_out / mlp_out patch 明显弱于 layer_out / carry_est，但单层弱不等于 attention / MLP 整体不重要。Phase 692 因此把边界层切成 early / late / all 三个窗口，一次性 patch 多层 attn_window、mlp_window、attn_mlp_window、layer_window，并同时做 restore 与 degradation。
 
 ### 客观结果
 
@@ -37966,10 +37934,9 @@ random_layer_window
 ```text
 paired cases = 72
 target = L26_layer_input
-windows:
-  early = L13-L15
-  late  = L16-L18
-  all   = L13-L18
+early = L13-L15
+late  = L16-L18
+all   = L13-L18
 rows = 2160
 ```
 
@@ -38003,17 +37970,12 @@ attn_mlp_window|early:
 
 attn_mlp_window|late:
   repair = 0.236
-  mean_patched_rank = 19.13
-  target_effect = 2.672
 
 attn_window|all:
   repair = 0.167
 
 mlp_window|all:
   repair = 0.153
-
-random_layer_window|all:
-  repair = 0.069
 ```
 
 degradation：
@@ -38026,26 +37988,15 @@ layer_window|late:
 
 layer_window|all:
   drop = 0.833
-  patched_top1 = 0.167
-  target_effect = 6.536
 
 layer_window|early:
   drop = 0.792
-  patched_top1 = 0.208
-  target_effect = 7.644
 
 attn_mlp_window|early:
   drop = 0.750
-  patched_top1 = 0.250
-  target_effect = 8.676
 
 attn_mlp_window|all:
   drop = 0.681
-  patched_top1 = 0.319
-  target_effect = 6.606
-
-attn_mlp_window|late:
-  drop = 0.472
 
 attn_window|all:
   drop = 0.306
@@ -38054,149 +38005,29 @@ mlp_window|all:
   drop = 0.500
 ```
 
-关键客观现象：
+#### GLM4 / qwen3
 
 ```text
-1. 多层 attn_mlp_window 明显强于 Phase 691 的单层 attn_mlp；
-2. 但是 attn_mlp_window|all 仍低于 layer_window|all / layer_window|late；
-3. early attn_mlp 在 degradation 中很强，说明 L13-L15 对成功路线有关键支撑；
-4. late layer_window 在 restore/degradation 中都非常强；
-5. layer_window|all 与 layer_window|late 几乎相同，说明多层 layer_out patch 主要由后部窗口主导，或者后部 patch 覆盖了前部轨迹影响。
+GLM4 paired cases = 5
+qwen3 paired cases = 3
 ```
 
-#### GLM4
+GLM4 restore 很宽，degradation 较弱；qwen3 restore/degradation 在 late 或 all window 上也很强。但两者样本过少，只能作为提示。
+
+### 判断
+
+Phase 692 对 Phase 691 做了关键修正：
 
 ```text
-paired cases = 5
-target = L38_layer_input
-windows:
-  early = L23-L26
-  late  = L27-L30
-  all   = L23-L30
+单层 attn_out / mlp_out 弱，
+但多层 attn_mlp_window 明显有效。
 ```
 
-restore 很宽：
-
-```text
-attn_mlp_window|all:
-  repair = 1.000
-
-attn_window|all:
-  repair = 1.000
-
-mlp_window|all:
-  repair = 1.000
-
-layer_window|all:
-  repair = 1.000
-```
-
-degradation 较弱：
-
-```text
-layer_window|all:
-  drop = 0.400
-
-attn_mlp_window|all:
-  drop = 0.200
-
-attn_window|all:
-  drop = 0.000
-
-mlp_window|all:
-  drop = 0.000
-```
-
-样本只有 5，仍不能强解释。
-
-#### qwen3
-
-```text
-paired cases = 3
-target = L33_layer_input
-windows:
-  early = L18-L21
-  late  = L22-L25
-  all   = L18-L25
-```
-
-restore：
-
-```text
-layer_window|all:
-  repair = 1.000
-
-attn_mlp_window|all:
-  repair = 1.000
-
-attn_window|all:
-  repair = 1.000
-
-mlp_window|all:
-  repair = 0.667
-```
-
-degradation：
-
-```text
-layer_window|all:
-  drop = 1.000
-
-attn_mlp_window|all:
-  drop = 1.000
-
-attn_window|all:
-  drop = 0.333
-
-mlp_window|all:
-  drop = 0.333
-```
-
-样本只有 3，只能作为提示。
-
-### 对 Phase 691 的修正
-
-Phase 691 中：
-
-```text
-单层 attn_out / mlp_out 弱。
-```
-
-Phase 692 修正为：
-
-```text
-DS7B 单层 attn_out / mlp_out 弱，
-但多层 attn_mlp_window 组合明显有效。
-```
-
-因此不能说：
-
-```text
-attention / MLP 不重要。
-```
-
-更准确地说：
+因此不能说 attention / MLP 不重要。更准确地说：
 
 ```text
 有效机制不是单层组件可分离写入，
-而是跨层组件组合 + residual layer state carry 的共同结果。
-```
-
-### 当前阶段判断
-
-Phase 687-692 形成的新客观拼图：
-
-```text
-1. L26/L27 不是单纯 value writer；
-2. L26/L27 是 near-readout carrier；
-3. 有效轨迹可前溯到 L18-L25；
-4. 可见边界在 L13-L18；
-5. 单层 attn_out / mlp_out 不足；
-6. 多层 attn_mlp_window 有明显因果效应；
-7. layer_out / carry_est 仍比组件组合更接近完整轨迹；
-8. DS7B 的 early boundary window 对 degradation 特别敏感；
-9. late boundary layer_window 对 restore/degradation 都非常强；
-10. 因此机制更像跨层轨迹图谱，而不是单点 writer。
+而是跨层 attention / MLP 组合与 residual state carry 的共同结果。
 ```
 
 ### 问题和硬伤
@@ -38206,58 +38037,2864 @@ Phase 687-692 形成的新客观拼图：
 2. attn_mlp_window 有效，但不能说明具体 source token；
 3. layer_window 多层 patch 中，后层可能覆盖前层效应；
 4. early / late 的 restore 与 degradation 不完全对称；
-5. 只测试 first-token readout；
-6. qwen3 / GLM4 paired cases 仍过少；
-7. 当前都是小模型，结构可能存在偏差，不能直接外推。
+5. qwen3 / GLM4 paired cases 仍过少；
+6. 当前都是小模型，结构可能存在偏差，不能直接外推。
+```
+
+### 接下来是否继续
+
+属于同一阶段。Phase 692 已经证明多层 attn_mlp 有效，但还没有拆成 head-level / source-token path，因此继续进入 Phase 693。
+
+## Phase 693: Boundary Attention Head Candidate Audit [2026-06-26 15:20]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase693_boundary_attention_head_candidate_audit.py
+python tests/gpt5/phase693_boundary_attention_head_candidate_audit.py --model qwen3 --hard-exit-after-model > results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_qwen3_run.log 2>&1
+python tests/gpt5/phase693_boundary_attention_head_candidate_audit.py --model glm4 --hard-exit-after-model > results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_glm4_run.log 2>&1
+python tests/gpt5/phase693_boundary_attention_head_candidate_audit.py --model deepseek7b --hard-exit-after-model > results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_deepseek7b_run.log 2>&1
+python tests/gpt5/phase693_boundary_attention_head_candidate_audit.py --summarize-only
+```
+
+### 生成脚本和结果
+
+```text
+脚本:
+  tests/gpt5/phase693_boundary_attention_head_candidate_audit.py
+
+结果:
+  results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_cross_model_summary.md
+  results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_cross_model_summary.json
+  results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_deepseek7b_candidate_scores.json
+  results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_deepseek7b_head_candidate_rows.jsonl
+  results/glm5_phase693_boundary_attention_head_candidate_audit/phase693_deepseek7b_head_candidate_summary.json
+```
+
+### 测试原理
+
+Phase 693 分两步。
+
+```text
+1. candidate screen:
+   捕获每个边界层 o_proj 输入中的 head slice；
+   计算 terse - short 的 head delta；
+   经过 o_proj weight 映射回 residual space；
+   再投影到 value-minus-prose direction。
+
+2. causal patch:
+   对 top head set 做真实 o_proj input head-slice transplant；
+   restore 中把 short 的 selected heads 替换为 terse heads；
+   degradation 中把 terse 的 selected heads 替换为 short heads。
+```
+
+candidate score 不是因果结果，只是候选筛选；真实结论以 causal patch 为准。
+
+### 客观结果
+
+#### DS7B
+
+```text
+paired cases = 72
+target = L26_layer_input
+scan_layers = L13-L18
+rows = 5616
+```
+
+top candidate heads：
+
+```text
+L18H6  = 0.215
+L14H17 = 0.214
+L13H20 = 0.191
+L14H15 = 0.188
+L18H19 = 0.180
+L13H13 = 0.125
+L13H4  = 0.124
+L16H27 = 0.124
+```
+
+restore：
+
+```text
+all_top16:
+  repair = 0.431
+  mean_patched_rank = 26.26
+  target_effect = 7.889
+
+L13_all_heads:
+  repair = 0.264
+  mean_patched_rank = 28.35
+  target_effect = 5.663
+
+all_top8:
+  repair = 0.264
+  mean_patched_rank = 59.74
+  target_effect = 4.157
+
+early_top8:
+  repair = 0.236
+  mean_patched_rank = 62.17
+  target_effect = 5.156
+
+late_top8:
+  repair = 0.222
+  mean_patched_rank = 54.15
+  target_effect = 3.421
+```
+
+degradation：
+
+```text
+all_top16:
+  drop = 0.625
+  patched_top1 = 0.375
+  mean_patched_rank = 20.28
+  target_effect = 6.360
+
+early_top8:
+  drop = 0.542
+  patched_top1 = 0.458
+  target_effect = 4.439
+
+all_top8:
+  drop = 0.472
+  patched_top1 = 0.528
+  target_effect = 3.028
+
+L13_all_heads:
+  drop = 0.458
+  patched_top1 = 0.542
+  target_effect = 4.996
+```
+
+#### GLM4 / qwen3
+
+```text
+GLM4 paired cases = 5
+qwen3 paired cases = 3
+```
+
+GLM4 top-head restore 可达 0.800，但 degradation 为 0；qwen3 late_top16 restore = 1.000，late_top8 degradation = 1.000。但样本极少，不能强解释。
+
+### 判断
+
+Phase 693 说明：
+
+```text
+DS7B 中存在可测的 boundary attention head candidates；
+top head set 有真实 restore / degradation 效应；
+但 top heads 还不能闭合 Phase 692 的 attn_mlp_window 效应，
+更不能闭合 layer_window / residual state 效应。
+```
+
+对比：
+
+```text
+Phase 692 DS7B:
+  attn_mlp_window|all restore = 0.625
+  layer_window|all restore = 0.806
+
+Phase 693 DS7B:
+  all_top16 restore = 0.431
+  all_top16 degradation = 0.625
+```
+
+所以不能说已经找到少数决定性 head。更准确地说：
+
+```text
+top heads 是有效边，但只是图谱的一部分；
+完整机制仍需要 source-token path 与 head/head、head/MLP、head/residual carry 的组合图谱。
+```
+
+### 问题和硬伤
+
+```text
+1. candidate score 是直接投影筛选，不是因果排序；
+2. top16 有效，但 restore 仍低于 attn_mlp_window；
+3. all_heads per layer 不等价于完整 attn_out patch；
+4. 没有定位 source token；
+5. 没有确认这些 head 是否读 value token、instruction token、relation token 或 format token；
+6. qwen3 / GLM4 样本太少；
+7. 小模型结构可能偏差明显。
+```
+
+### 接下来是否继续
+
+属于同一阶段。Phase 693 已完成 head candidate audit，但同一阶段目标还缺少 source-token path，因此继续进入 Phase 694。
+
+## Phase 694: Boundary Head Source-Token Attention Audit [2026-06-26 15:27]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase694_boundary_head_source_token_attention_audit.py
+python tests/gpt5/phase694_boundary_head_source_token_attention_audit.py --model qwen3 --hard-exit-after-model > results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_qwen3_run.log 2>&1
+python tests/gpt5/phase694_boundary_head_source_token_attention_audit.py --model glm4 --hard-exit-after-model > results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_glm4_run.log 2>&1
+python tests/gpt5/phase694_boundary_head_source_token_attention_audit.py --model deepseek7b --hard-exit-after-model > results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_deepseek7b_run.log 2>&1
+python tests/gpt5/phase694_boundary_head_source_token_attention_audit.py --summarize-only
+```
+
+### 脚本和结果
+
+```text
+script:
+  tests/gpt5/phase694_boundary_head_source_token_attention_audit.py
+
+results:
+  results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_cross_model_summary.md
+  results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_cross_model_summary.json
+  results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_qwen3_source_attention_summary.json
+  results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_glm4_source_attention_summary.json
+  results/glm5_phase694_boundary_head_source_token_attention_audit/phase694_deepseek7b_source_attention_summary.json
+```
+
+### 测试原理
+
+Phase 693 找到了 boundary attention head candidates，但还不知道这些 head 主要读什么 token。Phase 694 读取 Phase 693 的 top heads，在 short_only 与 terse_no_explain 两种条件下记录 answer-last query 的注意力分布，并把源 token 粗分成：
+
+```text
+record_line
+question_line
+instruction_line
+answer_line
+self_last
+target_value
+object_name
+relation
+```
+
+这个测试只回答：
+
+```text
+候选 head 在自然前向中主要注意哪些文本区域？
+```
+
+它不回答：
+
+```text
+把某个 source token 的 V 或 attention path patch 后是否能因果修复？
+```
+
+因此 Phase 694 是 source-token path 的观测图谱，不是因果闭环。
+
+### 客观结果
+
+#### DS7B
+
+```text
+pairs = 72
+rows = 2304
+
+short_only:
+  target_value_attention = 0.007
+  record_line_attention = 0.355
+  instruction_line_attention = 0.362
+  answer_line_attention = 0.213
+
+terse_no_explain:
+  target_value_attention = 0.008
+  record_line_attention = 0.323
+  instruction_line_attention = 0.334
+  answer_line_attention = 0.224
+```
+
+DS7B high value-mass heads：
+
+```text
+short_only|L15H25:
+  target_value = 0.050
+  record_line = 0.664
+  instruction_line = 0.139
+
+terse_no_explain|L15H25:
+  target_value = 0.038
+  record_line = 0.520
+  instruction_line = 0.331
+
+terse_no_explain|L18H19:
+  target_value = 0.035
+  record_line = 0.542
+  instruction_line = 0.190
+
+short_only|L18H19:
+  target_value = 0.029
+  record_line = 0.466
+  instruction_line = 0.349
+```
+
+DS7B high instruction-mass heads：
+
+```text
+terse_no_explain|L13H19:
+  target_value = 0.000
+  record_line = 0.021
+  instruction_line = 0.956
+
+short_only|L13H19:
+  target_value = 0.000
+  record_line = 0.029
+  instruction_line = 0.955
+
+terse_no_explain|L13H20:
+  target_value = 0.001
+  record_line = 0.055
+  instruction_line = 0.927
+
+short_only|L13H20:
+  target_value = 0.001
+  record_line = 0.054
+  instruction_line = 0.927
+```
+
+DS7B 的直接目标值 token 注意力很低。候选 heads 主要分成两类：
+
+```text
+1. instruction / format heads:
+   L13H19, L13H20, L13H4, L14H17, L14H15
+
+2. record / weak value heads:
+   L15H25, L18H19, L18H10, L16H27
+```
+
+所以 DS7B 的 boundary head path 更像：
+
+```text
+instruction / format protocol + record route + weak value token contact
+```
+
+而不是：
+
+```text
+single head directly reads correct value token
+```
+
+#### GLM4
+
+```text
+pairs = 5
+rows = 160
+
+short_only:
+  target_value_attention = 0.166
+  record_line_attention = 0.787
+  instruction_line_attention = 0.060
+  answer_line_attention = 0.062
+
+terse_no_explain:
+  target_value_attention = 0.320
+  record_line_attention = 0.802
+  instruction_line_attention = 0.039
+  answer_line_attention = 0.071
+```
+
+GLM4 top heads 更直接注意 record/value token，例如：
+
+```text
+terse_no_explain|L29H18:
+  target_value = 0.805
+  record_line = 0.972
+
+terse_no_explain|L26H15:
+  target_value = 0.693
+  record_line = 0.940
+
+terse_no_explain|L29H26:
+  target_value = 0.608
+  record_line = 0.971
+```
+
+但 GLM4 paired cases 只有 5，不能过强解释。
+
+#### qwen3
+
+```text
+pairs = 3
+rows = 96
+
+short_only:
+  target_value_attention = 0.074
+  record_line_attention = 0.503
+  instruction_line_attention = 0.176
+  answer_line_attention = 0.212
+
+terse_no_explain:
+  target_value_attention = 0.070
+  record_line_attention = 0.496
+  instruction_line_attention = 0.163
+  answer_line_attention = 0.221
+```
+
+qwen3 中也有局部 value heads：
+
+```text
+short_only|L24H23:
+  target_value = 0.519
+  record_line = 0.805
+
+terse_no_explain|L24H23:
+  target_value = 0.523
+  record_line = 0.775
+```
+
+但 qwen3 paired cases 只有 3，不能作为稳定机制结论。
+
+### 对附件判断的审视
+
+附件对 Phase 690-691 的判断基本正确：
+
+```text
+1. DS7B 的语义值门不是单层单组件能解释；
+2. L13-L18 是关键边界区；
+3. L18 之后 residual carry 开始变强；
+4. L26/L27 更接近读出端 carrier；
+5. carry_est 不是模块实体，只是 algebraic residual estimate；
+6. 不应把 attn_out / mlp_out 单层失败解释为 attention / MLP 整体无效。
+```
+
+Phase 692-694 对这个判断做了进一步修正：
+
+```text
+Phase 692:
+  多层 attn+mlp window 有明显效应，单层组件负结果不能过强解释。
+
+Phase 693:
+  top attention heads 有真实 restore/degradation 效应，但不能闭合完整 window / residual 效应。
+
+Phase 694:
+  DS7B top heads 并不主要直接读 target value token，
+  而是读 instruction / record / answer label 的混合路径。
+```
+
+因此当前更准确的判断是：
+
+```text
+DS7B value gate 的关键结构不是单个 value reader，
+而是 boundary 层中由格式协议、记录路径、弱值接触和 residual carry 共同组成的路径图谱。
+```
+
+### 问题和硬伤
+
+```text
+1. Phase 694 是观测型 attention audit，不是因果 source-token patch。
+2. attention mass 不能直接等价于 value flow。
+3. token group 依赖 offset mapping，粗粒度分组可能有误差。
+4. target_value attention 很低，不等于 value 信息不存在，可能通过 V projection、残差 carry 或非目标 token 组合表达。
+5. Phase 693 的 top heads 来自直接投影筛选，可能漏掉负向、间接、组合型 heads。
+6. GLM4 / qwen3 样本太少，只能作为弱参考。
+7. 当前模型都是小模型，内部结构可能与大模型存在偏差。
+8. 仍然只审计 answer first-token 附近，未覆盖完整多 token 生成过程。
 ```
 
 ### 理论进展
 
-当前链条进一步修正为：
+Phase 690-694 后，当前图谱从：
 
 ```text
-instruction wording
-  -> L13-L15 early boundary component interaction
-  -> L16-L18 late residual state consolidation
-  -> L18-L25 residual trajectory carry
-  -> L26_layer_input near-readout value-support state
-  -> final readout competition
+boundary layer exists
 ```
 
-关键变化：
+推进为：
 
 ```text
-从“找单点 writer”
-推进到
-“定位跨层窗口中的组件组合和残差携带关系”。
+L13-L18 boundary trajectory
+  -> multi-layer attn+mlp window
+  -> candidate attention heads
+  -> source-token attention roles
+  -> L18-L25 residual carry
+  -> L26/L27 readout carrier
 ```
 
-### 接下来是否继续自动完成
-
-Phase 691-692 已完成当前阶段性目标：
+这说明“语义值门”的真实形态更接近路径图谱：
 
 ```text
-判断 L13-L18 边界区是否能被单层组件解释，
-以及多层组件组合是否显著补足。
+format / instruction route
++ record route
++ weak value token contact
++ residual carry
++ readout direction
 ```
 
-答案是：
+而不是单点神经元、单个 head 或单个 MLP block。
+
+### 接下来是否继续
+
+Phase 690-694 已完成同一阶段的目标：从边界层、组件、窗口、head candidate 到 source-token attention map 的连续定位。
+
+下一个必要任务是 Phase 695：
 
 ```text
-单层组件不能解释；
-多层 attn_mlp 组合显著有效；
-但仍未达到 layer_window / residual state 的完整效应。
+Boundary Head Source-Token Causal Patch Audit
 ```
 
-下一步不再是同一阶段的简单延续，而是进入新阶段：
+目标是把 Phase 694 的观测图谱变成因果图谱，分别 patch：
 
 ```text
-Phase 693: Boundary Attention Head and Source-Token Path Audit
+1. instruction tokens
+2. record tokens
+3. target value tokens
+4. answer label tokens
+5. mixed source-token groups
 ```
 
-新阶段目标：
+并检查哪类 source-token path 真正能 restore / degrade。这个任务和 Phase 694 相连，但已经从观测图谱进入因果图谱，属于新的阶段性任务。
+
+## Phase 695: Source-Token Visibility Causal Audit [2026-06-26 15:39]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase695_source_token_visibility_causal_audit.py
+python tests/gpt5/phase695_source_token_visibility_causal_audit.py --model qwen3 --limit 1 --hard-exit-after-model > results/glm5_phase695_source_token_visibility_causal_audit/phase695_qwen3_smoke.log 2>&1
+python tests/gpt5/phase695_source_token_visibility_causal_audit.py --model qwen3 --hard-exit-after-model > results/glm5_phase695_source_token_visibility_causal_audit/phase695_qwen3_run.log 2>&1
+python tests/gpt5/phase695_source_token_visibility_causal_audit.py --model glm4 --hard-exit-after-model > results/glm5_phase695_source_token_visibility_causal_audit/phase695_glm4_run.log 2>&1
+python tests/gpt5/phase695_source_token_visibility_causal_audit.py --model deepseek7b --hard-exit-after-model > results/glm5_phase695_source_token_visibility_causal_audit/phase695_deepseek7b_run.log 2>&1
+python tests/gpt5/phase695_source_token_visibility_causal_audit.py --summarize-only
+```
+
+### 脚本和结果
 
 ```text
-在 DS7B L13-L18 边界区，
-把 attn_mlp_window 的有效性继续拆成 head-level / source-token path。
+script:
+  tests/gpt5/phase695_source_token_visibility_causal_audit.py
+
+results:
+  results/glm5_phase695_source_token_visibility_causal_audit/phase695_cross_model_summary.md
+  results/glm5_phase695_source_token_visibility_causal_audit/phase695_cross_model_summary.json
+  results/glm5_phase695_source_token_visibility_causal_audit/phase695_qwen3_source_visibility_summary.json
+  results/glm5_phase695_source_token_visibility_causal_audit/phase695_glm4_source_visibility_summary.json
+  results/glm5_phase695_source_token_visibility_causal_audit/phase695_deepseek7b_source_visibility_summary.json
+```
+
+### 测试原理
+
+Phase 694 只观察 top heads 在自然前向中注意哪些 source-token groups。Phase 695 做更保守的因果干预：不删除文本、不改 prompt 字符串，而是在 forward 时用 attention_mask 把某一类 source token 设为不可见，然后观察 expected value token 的 rank/top1、route margin 和 L26/L27 近读出 target projection 是否变化。
+
+测试的 source-token groups：
+
+```text
+mask_record_line
+mask_question_line
+mask_instruction_line
+mask_answer_context
+mask_target_value
+mask_object_name
+mask_relation
+mask_record_value_object_relation
+mask_record_without_target_value
+mask_record_without_value_object_relation
+keep_only_record_answer
+keep_only_instruction_answer
+keep_only_record_instruction_answer
+keep_only_question_answer
+```
+
+解释边界：
+
+```text
+这是 visibility causal audit；
+不是 V-level source patch；
+不是 head-specific source path patch；
+不是完整生成闭环。
+```
+
+它优先回答：
+
+```text
+哪类源 token 一旦不可见，会破坏 terse_no_explain 的成功？
+```
+
+也观察：
+
+```text
+遮掉 short_only 的某些 token 是否会意外修复失败？
+```
+
+### 客观结果
+
+#### DS7B
+
+```text
+pairs = 72
+rows = 2016
+target_layer = L26_layer_input
+```
+
+terse_no_explain degradation：
+
+```text
+mask_record_line:
+  drop = 1.000
+  patched_top1 = 0.000
+  mean_rank_effect = 12246.75
+  mean_target_effect = 16.685
+  mask_fraction = 0.558
+  patched_best_other_route = prose 71 / continuation 1
+
+mask_record_without_target_value:
+  drop = 1.000
+  patched_top1 = 0.000
+  mean_rank_effect = 3174.43
+  mean_target_effect = 12.092
+  mask_fraction = 0.479
+
+mask_record_value_object_relation:
+  drop = 0.958
+  patched_top1 = 0.042
+  mean_rank_effect = 3214.71
+  mean_target_effect = 11.667
+  mask_fraction = 0.268
+
+mask_relation:
+  drop = 0.917
+  patched_top1 = 0.083
+  mean_rank_effect = 612.96
+  mean_target_effect = 12.357
+  mask_fraction = 0.038
+
+mask_target_value:
+  drop = 0.903
+  patched_top1 = 0.097
+  mean_rank_effect = 2308.67
+  mean_target_effect = 18.495
+  mask_fraction = 0.079
+
+mask_instruction_line:
+  drop = 0.806
+  patched_top1 = 0.194
+  mean_rank_effect = 100.62
+  mean_target_effect = 22.596
+  mask_fraction = 0.208
+
+mask_answer_context:
+  drop = 0.722
+  patched_top1 = 0.278
+  mean_rank_effect = 240.44
+  mean_target_effect = 3.352
+  mask_fraction = 0.019
+```
+
+short_only repair：
+
+```text
+mask_instruction_line:
+  repair = 0.375
+  patched_top1 = 0.375
+  mean_rank_effect = 156.00
+  mean_target_effect = -13.011
+  mask_fraction = 0.160
+
+mask_answer_context:
+  repair = 0.083
+
+keep_only_record_answer:
+  repair = 0.083
+```
+
+DS7B 最重要的客观现象：
+
+```text
+Phase 694:
+  target_value attention 很低，大约 0.007-0.008。
+
+Phase 695:
+  mask_target_value 只遮住约 0.079 的 token，
+  却让 terse_no_explain 成功样本 90.3% 掉出 top1。
+```
+
+所以 Phase 694 不能被解释为：
+
+```text
+目标值 token 不重要。
+```
+
+更准确的解释是：
+
+```text
+目标值 token 对成功是必要的，
+但不一定由 Phase693 top heads 在 answer-last 直接高注意力读取；
+值信息可能更早进入 residual carry，或通过 record/relation 路线间接进入近读出状态。
+```
+
+#### GLM4
+
+```text
+pairs = 5
+rows = 140
+```
+
+terse_no_explain degradation 中，多数 group mask 都导致 100% drop：
+
+```text
+mask_target_value:
+  drop = 1.000
+  patched_top1 = 0.000
+  mean_rank_effect = 21.00
+  mean_target_effect = 5.896
+  mask_fraction = 0.020
+
+mask_instruction_line:
+  drop = 1.000
+  patched_top1 = 0.000
+  mean_rank_effect = 4.80
+  mean_target_effect = 4.872
+  mask_fraction = 0.224
+
+mask_record_line:
+  drop = 1.000
+  patched_top1 = 0.000
+```
+
+short_only repair 中：
+
+```text
+mask_answer_context:
+  repair = 0.600
+```
+
+但 GLM4 paired cases 只有 5，不能强解释。
+
+#### qwen3
+
+```text
+pairs = 3
+rows = 84
+```
+
+qwen3 的 terse_no_explain 对许多 mask 极敏感：
+
+```text
+mask_target_value:
+  drop = 1.000
+  patched_top1 = 0.000
+  mean_rank_effect = 54.33
+  mean_target_effect = 27.511
+
+mask_instruction_line:
+  drop = 1.000
+  patched_top1 = 0.000
+
+mask_record_line:
+  drop = 1.000
+  patched_top1 = 0.000
+```
+
+short_only 无有效 repair：
+
+```text
+best repair = 0.000
+```
+
+但 qwen3 paired cases 只有 3，不能强解释。
+
+### 对附件判断的审视
+
+附件对 Phase 692-694 的判断基本正确：
+
+```text
+1. 单层 attn_out / mlp_out 弱，不能推出 attention / MLP 不重要。
+2. 多层 attn+MLP window 有明显作用。
+3. top heads 是有效边，但不能闭合完整机制。
+4. Phase 694 只是 source-token attention map，不是因果图谱。
+5. 下一个关键缺口确实是 source-token causal patch。
+```
+
+Phase 695 对附件内容做了一个关键修正：
+
+```text
+Phase 694 中 target_value attention 很低，
+但 Phase 695 证明 target_value visibility 对 DS7B terse success 仍高度必要。
+```
+
+因此不能把“低注意力”解释为“低因果重要性”。当前更准确的判断是：
+
+```text
+DS7B 的 value token 是必要输入，
+但它的因果作用不表现为 answer-last top heads 对 target value token 的高 attention mass。
+```
+
+这进一步支持：
+
+```text
+value information 可能先进入 record/relation/residual trajectory，
+再由 boundary graph 和 readout carrier 使用。
+```
+
+### 问题和硬伤
+
+```text
+1. attention_mask 是强干预，会影响所有 query 对该 source token 的可见性，不是只干预 answer-last。
+2. mask_record_line 遮住 token 比例很高，drop = 1.0 有部分平凡性。
+3. mask_target_value / mask_relation 的 token 比例较小，因果含义更强，但仍不是 V-level patch。
+4. mask_instruction_line 在 short_only 中产生 37.5% repair，可能只是删除了有害 short instruction，不等于找到自然修复路径。
+5. group token 对齐依赖 offset mapping，仍可能有粗粒度误差。
+6. 这不是 head-specific source path，因此不能闭合 Phase 693 top heads。
+7. qwen3 / GLM4 样本太少。
+8. 当前模型都是小模型，内部结构可能与大模型有偏差。
+```
+
+### 理论进展
+
+Phase 695 把 Phase 694 的观测结论改写为因果约束：
+
+```text
+observed low target-value attention
+!=
+low target-value causal importance
+```
+
+当前图谱应更新为：
+
+```text
+source-token visibility:
+  target_value 必要
+  relation 必要
+  record_line 必要
+  instruction_line 必要但部分具有双刃性
+
+boundary heads:
+  answer-last top heads 更像 format / record / answer-label route
+
+residual trajectory:
+  value information 可能已经被早期或中层写入 residual carry
+
+readout:
+  L26/L27 读出端使用已携带的 value-support state
+```
+
+这说明语言机制的关键不是“最后一步读哪个 token”，而是：
+
+```text
+source token -> residual trajectory -> boundary protocol graph -> near-readout carrier
+```
+
+### 接下来是否继续
+
+Phase 695 完成了 source-token visibility 的因果审计，但还没有完成 head-specific source path。下一步仍属于同一大阶段的后续收紧：
+
+```text
+Phase 696: Value Token Hidden-State Time-of-Entry Audit
+```
+
+目标：
+
+```text
+检查 target value token 的信息到底在第几层进入 residual trajectory；
+比较 target_value token position、answer-last position、record-line aggregate position 的 layerwise value projection；
+验证 Phase 695 中 target_value 必要但 Phase 694 中 answer-last attention 低的矛盾是否来自“早期写入、后期携带”。
+```
+
+这个任务仍属于 source-token 因果图谱阶段，因此可以继续自动推进。
+
+## Phase 696: Value Token Hidden-State Time-of-Entry Audit [2026-06-26 15:43]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py
+python tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py --model qwen3 --limit 1 --hard-exit-after-model > results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_qwen3_smoke.log 2>&1
+python tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py --model qwen3 --hard-exit-after-model > results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_qwen3_run.log 2>&1
+python tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py --model glm4 --hard-exit-after-model > results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_glm4_run.log 2>&1
+python tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py --model deepseek7b --hard-exit-after-model > results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_deepseek7b_run.log 2>&1
+python tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py --summarize-only
+```
+
+### 脚本和结果
+
+```text
+script:
+  tests/gpt5/phase696_value_token_hidden_state_time_of_entry.py
+
+results:
+  results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_cross_model_summary.md
+  results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_cross_model_summary.json
+  results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_deepseek7b_trajectory_summary.json
+  results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_glm4_trajectory_summary.json
+  results/glm5_phase696_value_token_hidden_state_time_of_entry/phase696_qwen3_trajectory_summary.json
+```
+
+### 测试原理
+
+Phase 695 发现 target_value token 的 visibility 对 terse success 高度必要，但 Phase 694 又发现 answer-last top heads 对 target_value token 的直接 attention mass 很低。Phase 696 不再做新干预，而是测量 value information 在隐藏状态中的时间轨迹。
+
+方法：
+
+```text
+对 paired cases 中的 short_only 和 terse_no_explain prompt，
+捕获每一层 layer_out；
+在以下 token group 上取 hidden state 均值；
+投影到 case-specific value-minus-prose direction。
+```
+
+token groups：
+
+```text
+target_value
+relation
+object_name
+record_line
+record_without_target_value
+record_value_object_relation
+instruction_line
+answer_last
+```
+
+这个测试只回答：
+
+```text
+哪些位置的 hidden state 在第几层带有 value-direction signal？
+```
+
+它不是 causal patch，也不是 V-level path patch。
+
+### 客观结果
+
+#### DS7B
+
+```text
+pairs = 72
+short_only top1 = 0.000
+terse_no_explain top1 = 1.000
+short_only mean_rank = 167.69
+terse_no_explain mean_rank = 1.00
+```
+
+DS7B source-token positions：
+
+```text
+target_value:
+  first_positive_layer = L0
+  peak_layer = L26
+  short peak_projection = 50.490
+  terse peak_projection = 50.500
+  L27 short = 41.008
+  L27 terse = 41.337
+
+relation:
+  first_positive_layer = L0
+  peak_layer = L26
+  short peak_projection = 50.863
+  terse peak_projection = 50.841
+
+record_line:
+  first_positive_layer = L0
+  peak_layer = L26
+  short peak_projection = 51.776
+  terse peak_projection = 51.769
+```
+
+DS7B answer_last：
+
+```text
+answer_last:
+  peak_layer = L26
+  short peak_projection = 37.825
+  terse peak_projection = 62.187
+  L27 short = 25.644
+  L27 terse = 60.362
+```
+
+关键层差值：
+
+```text
+target_value terse-short delta:
+  L13 = -0.000
+  L18 = -0.001
+  L23 = -0.004
+  L26 =  0.010
+  L27 =  0.329
+
+record_line terse-short delta:
+  L13 =  0.002
+  L18 = -0.000
+  L23 = -0.002
+  L26 = -0.006
+  L27 =  0.048
+
+answer_last terse-short delta:
+  L13 = -0.557
+  L18 = -1.542
+  L23 =  5.511
+  L25 =  7.285
+  L26 = 24.362
+  L27 = 34.718
+```
+
+最重要的客观现象：
+
+```text
+target_value / relation / record_line 的 hidden state 投影很早就是正的，
+并且 short 与 terse 几乎相同；
+真正把成功与失败分开的不是 source-token position 自身，
+而是 answer_last position 在 L23-L27 的近读出轨迹。
+```
+
+这解释了 Phase 694 / 695 的表面矛盾：
+
+```text
+target_value token 必要，
+但 answer-last top heads 不一定在最后一步直接高注意力读取 target_value token。
+```
+
+更准确地说：
+
+```text
+source token 中的 value signal 早已存在；
+失败发生在该 signal 是否被正确路由到 answer_last near-readout carrier。
+```
+
+#### GLM4
+
+```text
+pairs = 5
+short_only top1 = 0.000
+terse_no_explain top1 = 1.000
+short_only mean_rank = 2.00
+terse_no_explain mean_rank = 1.00
+```
+
+GLM4 的 source-token 轨迹较弱，target_value peak 在 L30：
+
+```text
+target_value:
+  peak_layer = L30
+  peak_projection = 1.087
+  final L39 = 0.301
+
+answer_last:
+  short peak_layer = L34
+  short peak_projection = 2.640
+  terse peak_layer = L34
+  terse peak_projection = 4.870
+```
+
+GLM4 paired cases 只有 5，不能强解释。
+
+#### qwen3
+
+```text
+pairs = 3
+short_only top1 = 0.000
+terse_no_explain top1 = 1.000
+short_only mean_rank = 2.00
+terse_no_explain mean_rank = 1.00
+```
+
+qwen3 target_value / record_line 也有明显 late-layer peak：
+
+```text
+target_value:
+  first_positive_layer = L2
+  peak_layer = L34
+  peak_projection = 28.703
+  final L35 = -2.434
+
+answer_last:
+  short peak_layer = L34
+  short peak_projection = 27.262
+  short final L35 = 7.531
+
+  terse peak_layer = L34
+  terse peak_projection = 36.193
+  terse final L35 = 14.904
+```
+
+qwen3 样本只有 3，只能作为弱参考。
+
+### 对 Phase 692-695 的修正
+
+Phase 696 对当前图谱做了一个关键收紧：
+
+```text
+value token visibility 是必要条件；
+但 value token hidden state 本身不是 short/terse 分叉的主位置。
+```
+
+也就是说，Phase 695 的强因果结果不应解释为：
+
+```text
+target_value token 在最后一步被直接读取。
+```
+
+更准确的解释是：
+
+```text
+target_value token 提供必要值源；
+record/relation/value 源位置很早拥有 value-direction signal；
+short/terse 的核心差异出现在 answer_last 的路线汇聚和近读出状态；
+instruction/protocol 决定这个值源是否被汇聚到 answer_last。
+```
+
+### 问题和硬伤
+
+```text
+1. projection 是诊断指标，不等于模型真实使用该方向。
+2. source-token position 的高投影可能部分来自 token embedding / lexical identity。
+3. target_value / record_line 在 short 与 terse 几乎相同，说明该测试定位的是信息存在，不是信息使用。
+4. answer_last 分叉明显，但还没有分解为 attention head、MLP、residual carry 的具体路径。
+5. GLM4 / qwen3 样本太少。
+6. 小模型内部结构可能与大模型不同。
+```
+
+### 理论进展
+
+Phase 696 后，当前机制应写成：
+
+```text
+source value exists early
+  -> protocol controls routing
+  -> boundary graph determines whether value enters answer_last trajectory
+  -> residual carry amplifies / preserves the selected route
+  -> near-readout carrier converts route state into first-token output
+```
+
+这比之前的表达更准确：
+
+```text
+不是“模型找不到值”；
+而是“值存在，但是否被协议路线调度到答案位置”。
+```
+
+### 接下来是否继续
+
+Phase 695-696 已完成 source-token 因果可见性与 value hidden-state time-of-entry 的阶段目标。下一步应进入更高分辨率的路径分解：
+
+```text
+Phase 697: Answer-Last Route Transfer Path Decomposition
+```
+
+目标：
+
+```text
+在 L23-L27 answer_last 分叉区，拆解 attention / MLP / residual carry 对 short->terse 差异的贡献；
+检查 Phase 696 中 L23-L27 answer_last delta 是否能由 Phase 692/693 的 boundary heads 和 attn+MLP window 解释。
+```
+
+这已经进入 answer_last route-transfer 分解阶段，不再自动继续。
+
+## Phase 697: Answer-Last Route Transfer Path Decomposition [2026-06-26 15:59]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase697_answer_last_route_transfer_decomposition.py
+python tests/gpt5/phase697_answer_last_route_transfer_decomposition.py --model qwen3 --limit 1 --hard-exit-after-model > results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_qwen3_smoke.log 2>&1
+python tests/gpt5/phase697_answer_last_route_transfer_decomposition.py --model qwen3 --hard-exit-after-model > results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_qwen3_run.log 2>&1
+python tests/gpt5/phase697_answer_last_route_transfer_decomposition.py --model glm4 --hard-exit-after-model > results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_glm4_run.log 2>&1
+python tests/gpt5/phase697_answer_last_route_transfer_decomposition.py --model deepseek7b --hard-exit-after-model > results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_deepseek7b_run.log 2>&1
+python tests/gpt5/phase697_answer_last_route_transfer_decomposition.py --summarize-only
+```
+
+### 脚本和结果
+
+```text
+script:
+  tests/gpt5/phase697_answer_last_route_transfer_decomposition.py
+
+results:
+  results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_cross_model_summary.md
+  results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_cross_model_summary.json
+  results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_deepseek7b_route_transfer_summary.json
+  results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_glm4_route_transfer_summary.json
+  results/glm5_phase697_answer_last_route_transfer_decomposition/phase697_qwen3_route_transfer_summary.json
+```
+
+### 测试原理
+
+Phase 696 证明 short_only 和 terse_no_explain 的 source-token positions 本身差异很小，真正分叉出现在 answer_last 的近读出轨迹。Phase 697 因此直接在 answer_last 的近读出分叉区做同样本组件 transplant：
+
+```text
+DS7B:
+  L23-L27
+
+GLM4:
+  L34-L39
+
+qwen3:
+  L30-L35
+```
+
+patch 组件：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+carry_est_layerout = layer_out_delta - attn_out_delta - mlp_out_delta
+attn_window
+mlp_window
+attn_mlp_window
+layer_window
+input_window
+random_layer_same_norm
+```
+
+restore：
+
+```text
+把 terse_no_explain 的 answer-last 组件移植到 short_only。
+```
+
+degradation：
+
+```text
+把 short_only 的 answer-last 组件移植到 terse_no_explain。
+```
+
+测量：
+
+```text
+expected token top1 / rank
+prose_minus_value
+final_norm_input projection
+```
+
+### 客观结果
+
+#### DS7B
+
+```text
+pairs = 72
+transfer_layers = L23-L27
+rows = 5040
+```
+
+最强 restore：
+
+```text
+L25_layer_out:
+  repair = 1.000
+  patched_top1 = 1.000
+  patched_rank = 1.00
+  final_proj_effect = 35.773
+
+L26_layer_input:
+  repair = 1.000
+  patched_top1 = 1.000
+  final_proj_effect = 35.773
+
+L26_layer_out:
+  repair = 1.000
+  patched_top1 = 1.000
+  final_proj_effect = 35.757
+
+L27_layer_input:
+  repair = 1.000
+  patched_top1 = 1.000
+  final_proj_effect = 35.757
+
+L27_layer_out:
+  repair = 1.000
+  patched_top1 = 1.000
+  final_proj_effect = 34.718
+
+layer_window:
+  repair = 1.000
+  patched_top1 = 1.000
+  final_proj_effect = 34.718
+```
+
+carry_est restore：
+
+```text
+L25_carry_est_layerout:
+  repair = 0.931
+  patched_top1 = 0.931
+  final_proj_effect = 38.721
+
+L23_carry_est_layerout:
+  repair = 0.903
+  patched_top1 = 0.903
+  final_proj_effect = 28.670
+
+L24_carry_est_layerout:
+  repair = 0.889
+  patched_top1 = 0.889
+  final_proj_effect = 34.608
+
+L27_carry_est_layerout:
+  repair = 0.597
+
+L26_carry_est_layerout:
+  repair = 0.514
+```
+
+window restore：
+
+```text
+attn_mlp_window:
+  repair = 0.819
+  patched_top1 = 0.819
+  patched_rank = 1.24
+  final_proj_effect = 34.684
+
+attn_window:
+  repair = 0.653
+  patched_top1 = 0.653
+  final_proj_effect = 26.700
+
+mlp_window:
+  repair = 0.014
+  patched_top1 = 0.014
+  patched_rank = 54.93
+  final_proj_effect = 10.002
+```
+
+最强 degradation：
+
+```text
+L23_layer_out:
+  drop = 1.000
+  patched_top1 = 0.000
+  patched_rank = 145.42
+  final_proj_effect = 35.924
+
+L24_layer_input:
+  drop = 1.000
+
+L26_layer_out:
+  drop = 1.000
+
+L27_layer_input:
+  drop = 1.000
+
+L27_layer_out:
+  drop = 1.000
+
+layer_window:
+  drop = 1.000
+```
+
+window degradation：
+
+```text
+attn_mlp_window:
+  drop = 0.958
+  patched_top1 = 0.042
+  patched_rank = 99.79
+  final_proj_effect = 34.695
+
+attn_window:
+  drop = 0.833
+  patched_top1 = 0.167
+  patched_rank = 87.14
+  final_proj_effect = 31.503
+
+mlp_window:
+  drop = 0.333
+  patched_top1 = 0.667
+  patched_rank = 2.57
+  final_proj_effect = 10.414
+```
+
+single component：
+
+```text
+L26_attn_out:
+  restore = 0.069
+  degradation = 0.431
+
+single mlp_out:
+  generally weak
+```
+
+DS7B 最重要的客观结果：
+
+```text
+1. L23-L27 answer-last layer_out / layer_input 可以完全 restore/degrade。
+2. attn_mlp_window 很强：restore = 0.819, degradation = 0.958。
+3. attn_window 单独中等偏强：restore = 0.653, degradation = 0.833。
+4. mlp_window 单独弱：restore = 0.014, degradation = 0.333。
+5. carry_est 很强，尤其 L23-L25。
+6. 单层 attn_out / mlp_out 不能闭合。
+```
+
+这说明 Phase 696 中的 L23-L27 answer_last 分叉主要是：
+
+```text
+整层 residual state + 多层 attention window + carry_est
+```
+
+而不是：
+
+```text
+单层 attention output 或单层 MLP output。
+```
+
+#### GLM4
+
+```text
+pairs = 5
+transfer_layers = L34-L39
+```
+
+GLM4 多数 layer/carry restore 都达到 1.000，但样本只有 5。比较有参考价值的是：
+
+```text
+attn_mlp_window:
+  restore = 1.000
+  degradation = 0.000
+
+mlp_window:
+  restore = 1.000
+  degradation = 0.000
+```
+
+GLM4 的 degradation 对 window 组合不敏感，不能强解释。
+
+#### qwen3
+
+```text
+pairs = 3
+transfer_layers = L30-L35
+```
+
+qwen3 layer/carry restore 很强：
+
+```text
+layer_window restore = 1.000
+attn_mlp_window restore = 0.667
+attn_window restore = 0.667
+mlp_window restore = 0.333
+```
+
+但样本只有 3，只能弱参考。
+
+### 对附件判断的审视
+
+附件对 Phase 695-696 的判断基本正确：
+
+```text
+1. 低 attention mass 不等于低因果重要性；
+2. target_value / relation / record_line 是必要源；
+3. source-token hidden state 很早有 value signal；
+4. short/terse 的主要差异在 answer_last 近读出轨迹；
+5. 下一步应分解 L23-L27 answer_last route-transfer。
+```
+
+Phase 697 对这个判断做了实证补充：
+
+```text
+answer_last route-transfer 不是单层单组件；
+它可以被 layer_input / layer_out 完全转移；
+attn_mlp_window 可以解释大部分；
+attn_window 比 mlp_window 更强；
+carry_est 提供强证据，说明残差携带仍是关键。
+```
+
+### 问题和硬伤
+
+```text
+1. layer_out / layer_input patch 是粗粒度状态替换，可能同时复制 value、format、route、position、scale。
+2. carry_est 仍是代数估计，不是独立模块。
+3. attn_mlp_window 很强，但还没拆到 head-specific source path。
+4. attn_window 强于 mlp_window，不等于 MLP 不重要；MLP 可能通过前层或 carry 间接参与。
+5. random_layer_same_norm 有非零影响，说明近读出状态很敏感，但远弱于真实 layer/carry/window。
+6. GLM4 / qwen3 样本太少。
+7. 小模型结构可能与大模型不同。
+```
+
+### 理论进展
+
+Phase 697 后，当前路径可以更具体地写成：
+
+```text
+source value exists early
+  -> protocol controls route
+  -> answer_last L23-L27 receives route-transfer
+  -> multi-layer attention window contributes most of component-level transfer
+  -> residual carry / layer state closes the remaining gap
+  -> L26/L27 near-readout carrier determines first-token output
+```
+
+这把 Phase 696 的结论：
+
+```text
+值存在，但没有被正确调度到 answer_last
+```
+
+进一步压实为：
+
+```text
+调度发生在 answer_last L23-L27 的整层残差状态中；
+attention window 是主要可分解边；
+carry_est / layer state 是仍未拆开的主载体。
+```
+
+### 接下来是否继续
+
+Phase 697 已完成 answer-last route-transfer 的组件级分解。下一步若继续同一大路线，应进入更细的 head/source path：
+
+```text
+Phase 698: Answer-Last Attention Source Path and Head-Window Causal Audit
+```
+
+目标：
+
+```text
+在 L23-L27 answer_last 中，把 attn_window 的 0.653 restore / 0.833 degradation
+继续拆成 head set 与 source token groups；
+验证哪些 head 从 record / relation / instruction / answer_context 路径把 value-support state 转移到 answer_last。
+```
+
+这已经是 head/source 联合路径阶段，属于新的高分辨率阶段，不自动继续。
+
+## Phase 698: Answer-Last Attention Head and Source-Token Path Audit [2026-06-26 17:01]
+
+### 任务
+
+继续 Phase 697 的 answer_last route-transfer 分解，把 DS7B L23-L27 的 attention window 从组件级推进到：
+
+```text
+head-slot causal patch
++ source-token attention map
+```
+
+也就是不再只问：
+
+```text
+attn_window 是否有效？
+```
+
+而是问：
+
+```text
+哪些 attention head slot 承载 answer_last value-support transfer？
+这些候选 head 在自然 forward 中主要看哪些 source token group？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase698_answer_last_attention_head_source_audit.py
+```
+
+结果目录：
+
+```text
+results/glm5_phase698_answer_last_attention_head_source_audit/
+```
+
+核心输出：
+
+```text
+phase698_qwen3_head_source_summary.json
+phase698_glm4_head_source_summary.json
+phase698_deepseek7b_head_source_summary.json
+phase698_cross_model_summary.json
+phase698_cross_model_summary.md
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase698_answer_last_attention_head_source_audit.py
+
+python tests/gpt5/phase698_answer_last_attention_head_source_audit.py \
+  --model qwen3 \
+  --limit 1 \
+  --hard-exit-after-model \
+  > results/glm5_phase698_answer_last_attention_head_source_audit/phase698_qwen3_smoke.log 2>&1
+
+python tests/gpt5/phase698_answer_last_attention_head_source_audit.py \
+  --model qwen3 \
+  --hard-exit-after-model \
+  > results/glm5_phase698_answer_last_attention_head_source_audit/phase698_qwen3_run.log 2>&1
+
+python tests/gpt5/phase698_answer_last_attention_head_source_audit.py \
+  --model glm4 \
+  --hard-exit-after-model \
+  > results/glm5_phase698_answer_last_attention_head_source_audit/phase698_glm4_run.log 2>&1
+
+python tests/gpt5/phase698_answer_last_attention_head_source_audit.py \
+  --model deepseek7b \
+  --hard-exit-after-model \
+  > results/glm5_phase698_answer_last_attention_head_source_audit/phase698_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase698_answer_last_attention_head_source_audit.py \
+  --summarize-only
+```
+
+三模型按 qwen3 -> GLM4 -> DS7B 顺序执行，每个模型均使用 `--hard-exit-after-model`，避免显存残留。
+
+### 测试原理
+
+Phase 697 证明：
+
+```text
+DS7B L23-L27 answer_last attn_window restore = 0.653
+DS7B L23-L27 answer_last attn_window degradation = 0.833
+```
+
+但 `attn_window` 是整层 attention output 级别，不知道具体由哪些 head 构成。
+
+Phase 698 的方法：
+
+1. 对每个 paired case 同时运行 short_only 与 terse_no_explain。
+2. 捕获 L23-L27 answer_last 的 o_proj input。
+3. 对每个 head slot 计算：
+
+```text
+delta_head = terse_head_slot - short_head_slot
+```
+
+再通过该层 o_proj 对应 head 的权重映射到 residual 空间：
+
+```text
+head_contribution = W_o_head · delta_head
+```
+
+然后投影到当前 case 的 value-minus-prose readout direction：
+
+```text
+score(head) = <head_contribution, d_value_minus_prose>
+```
+
+这个 score 只是候选排序，不是因果证明。
+
+4. 按候选排序构造 head set：
+
+```text
+global_top8
+global_top16
+global_top32
+early_top16
+late_top16
+per-layer top1/top4
+global_random_window
+window_all_heads
+```
+
+5. 做因果 transplant：
+
+```text
+restore: short prompt 中替换 terse 的 head slots
+degradation: terse prompt 中替换 short 的 head slots
+```
+
+6. 对 top candidate heads 运行 output_attentions，统计 answer_last 对 source token groups 的 attention mass：
+
+```text
+record_line
+question_line
+instruction_line
+answer_line
+self_last
+target_value
+object_name
+relation
+```
+
+注意：source-token 部分仍是 observational map，不是 source-token causal patch。
+
+### DS7B 结果
+
+```text
+pairs = 72
+transfer_layers = L23-L27
+```
+
+#### head-set causal restore
+
+```text
+global_top32:
+  restore = 0.736
+  patched_top1 = 0.736
+  patched_rank = 1.53
+  final_proj_effect = 30.117
+
+window_all_heads:
+  restore = 0.653
+  patched_top1 = 0.653
+  patched_rank = 1.58
+  final_proj_effect = 26.700
+
+global_top16:
+  restore = 0.556
+  patched_rank = 2.92
+  final_proj_effect = 25.845
+
+late_top16:
+  restore = 0.472
+  patched_rank = 2.90
+  final_proj_effect = 22.560
+
+global_top8:
+  restore = 0.389
+  patched_rank = 6.68
+  final_proj_effect = 22.009
+
+early_top16:
+  restore = 0.111
+
+global_random_window:
+  restore = 0.000
+```
+
+关键现象：
+
+```text
+global_top32 restore = 0.736
+window_all_heads restore = 0.653
+```
+
+top32 head slots 不仅复现了 all-head attn_window，而且略高于 all-head window。
+这说明 DS7B answer_last attention transfer 不是均匀全头场，而是存在稀疏有效 head-slot 子集。
+
+#### head-set degradation
+
+```text
+global_top32:
+  drop = 0.875
+  patched_top1 = 0.125
+  patched_rank = 66.32
+  final_proj_effect = 32.464
+
+window_all_heads:
+  drop = 0.833
+  patched_top1 = 0.167
+  patched_rank = 87.14
+  final_proj_effect = 31.503
+
+late_top16:
+  drop = 0.694
+  patched_rank = 17.90
+  final_proj_effect = 22.322
+
+global_top16:
+  drop = 0.681
+  patched_rank = 13.57
+  final_proj_effect = 23.131
+
+global_top8:
+  drop = 0.611
+```
+
+degradation 也说明：
+
+```text
+top ranked head slots 是必要成分之一；
+只替换这些 slots 就能破坏 terse_no_explain 的大部分正确输出。
+```
+
+#### DS7B top candidate heads
+
+```text
+L26H15: direct = 4.493, norm = 29.249
+L26H19: direct = 4.218, norm = 19.068
+L23H11: direct = 2.974, norm = 23.178
+L27H2:  direct = 2.539, norm = 11.189
+L23H19: direct = 1.436, norm = 10.125
+L26H0:  direct = 1.223, norm = 7.610
+L27H3:  direct = 0.981, norm = 7.117
+L26H14: direct = 0.873, norm = 12.313
+L26H24: direct = 0.775, norm = 9.492
+L27H17: direct = 0.769, norm = 14.574
+L27H19: direct = 0.763, norm = 10.153
+L23H18: direct = 0.738, norm = 5.079
+```
+
+最强候选集中在：
+
+```text
+L26
+L27
+L23
+```
+
+这与 Phase 697 中 L26/L27 近读出承载、L23-L27 attention window 共同有效的结果一致。
+
+#### DS7B source attention map
+
+整体平均：
+
+```text
+short_only:
+  target_value_in_record_mass = 0.066
+  record_line = 0.463
+  question_line = 0.190
+  instruction_line = 0.156
+  answer_line = 0.190
+  self_last = 0.118
+  object_name = 0.059
+  relation = 0.042
+
+terse_no_explain:
+  target_value_in_record_mass = 0.152
+  record_line = 0.561
+  question_line = 0.180
+  instruction_line = 0.089
+  answer_line = 0.170
+  self_last = 0.101
+  object_name = 0.081
+  relation = 0.058
+```
+
+最强 high-value heads：
+
+```text
+terse_no_explain | L23H11:
+  target_value_in_record_mass = 0.624
+  record_line = 0.951
+
+terse_no_explain | L26H19:
+  target_value_in_record_mass = 0.433
+  record_line = 0.812
+
+terse_no_explain | L26H15:
+  target_value_in_record_mass = 0.412
+  record_line = 0.856
+
+terse_no_explain | L27H2:
+  target_value_in_record_mass = 0.404
+  record_line = 0.745
+
+terse_no_explain | L23H19:
+  target_value_in_record_mass = 0.347
+  record_line = 0.738
+```
+
+最重要的客观现象：
+
+```text
+terse_no_explain 的 top causal heads 更强地看向 record_line 中的 target_value。
+short_only 也看 record_line，但 value-specific mass 明显低。
+```
+
+因此 Phase 698 把 Phase 697 的组件级 `attn_window` 进一步压实为：
+
+```text
+answer_last top head slots
+  -> strongly attend to record-line target_value
+  -> carry value-support state into final readout trajectory
+```
+
+### qwen3 结果
+
+```text
+pairs = 3
+transfer_layers = L30-L35
+```
+
+```text
+global_top32 restore = 1.000
+global_top16 restore = 1.000
+window_all_heads restore = 0.667
+global_top8 restore = 0.667
+
+global_top32 degradation = 0.333
+window_all_heads degradation = 0.333
+```
+
+qwen3 top heads：
+
+```text
+L31H14 direct = 1.134
+L32H8  direct = 1.037
+L33H20 direct = 0.671
+L34H1  direct = 0.474
+```
+
+source map：
+
+```text
+short_only target_value_in_record_mass = 0.125
+terse_no_explain target_value_in_record_mass = 0.139
+```
+
+qwen3 的现象方向与 DS7B 有弱一致性，但样本只有 3，不能强解释。
+
+### GLM4 结果
+
+```text
+pairs = 5
+transfer_layers = L34-L39
+```
+
+```text
+window_all_heads restore = 0.200
+global_top32 restore = 0.000
+global_top32 degradation = 0.000
+window_all_heads degradation = 0.000
+```
+
+GLM4 在本阶段没有形成稳定 head-set 因果闭合。其 source map 中 record_line/value 有一定质量，但没有转化为强 causal restore/degrade。
+
+### 对附件内容的判断
+
+附件中对 Phase 695-697 的主判断基本正确：
+
+```text
+1. 低 attention mass 不等于低因果重要性。
+2. source token 是否必要，比表面 attention mass 更关键。
+3. correct value hidden state 很早存在。
+4. short/terse 的主要分叉在 answer_last 近读出轨迹。
+5. Phase 697 应继续拆到 head/source path。
+```
+
+Phase 698 的新证据进一步支持其中最关键的部分：
+
+```text
+DS7B answer_last L23-L27 的 attention transfer
+可以由 top32 head slots 复现并超过 all-head window。
+```
+
+但附件若把 Phase 697 说成已经完整证明自然路径闭合，需要收紧。
+Phase 698 之后更准确的说法是：
+
+```text
+已经定位到 answer_last attention head-slot 层面的强因果子集，
+并观察到这些强候选 head 在 terse 模式下更集中读取 record-line target_value；
+但还没有完成 token-level source causal patch。
+```
+
+### 理论进展
+
+Phase 698 后，当前路径从：
+
+```text
+source value exists early
+  -> answer_last L23-L27 attention window transfers support
+  -> residual carrier reaches final readout
+```
+
+更新为：
+
+```text
+record-line target_value
+  -> selected answer_last heads read value-bearing source tokens
+  -> top head-slot mixture enters o_proj
+  -> L23-L27 residual/carry trajectory amplifies and preserves value support
+  -> final norm / lm_head readout selects correct first token
+```
+
+用最保守的语言：
+
+```text
+DS7B 的 answer_last value-support transfer 存在稀疏多头路由结构。
+```
+
+还不能说：
+
+```text
+完整 value gate 已被破解。
+```
+
+### 问题和硬伤
+
+1. head ranking 使用 direct o_proj projection，只是候选排序，存在选择偏差。
+2. source attention map 是 observational，不是 source-token causal patch。
+3. target_value_in_record_mass 的 token group 基于字符串 offset，可能受 tokenizer 切分影响。
+4. top32 超过 window_all_heads 可能说明去掉了负向/干扰 heads，也可能是 ranking 对同一数据过拟合。
+5. global_random_window restore 为 0，但 final_proj_effect 不为 0，说明 final projection 和 top1 success 不是一回事。
+6. GLM4 与 qwen3 样本太少，不能证明跨模型稳定结构。
+7. 当前模型都是小模型，内部结构可能存在偏差；尤其 DS7B 的稀疏 head 结构不能直接外推到大模型。
+8. L23/L26/L27 head 有效，不等于这些 head 是机制起点；它们可能只是近读出 route-transfer 的最后中继。
+
+### 当前客观拼图
+
+```text
+Phase 695:
+  source token masking 证明 target_value / relation / record_line 是必要源；
+  low attention mass 不能否定因果重要性。
+
+Phase 696:
+  source-token hidden state 很早已有 value signal；
+  short/terse 分叉主要发生在 answer_last near-readout trajectory。
+
+Phase 697:
+  L23-L27 answer_last layer/carry/attn_window 可强 restore/degrade；
+  attn_window 强于 mlp_window。
+
+Phase 698:
+  attn_window 可进一步拆成 top head-slot 子集；
+  DS7B global_top32 restore=0.736, degradation=0.875；
+  top heads 在 terse 中强看 record-line target_value。
+```
+
+### 下一步
+
+Phase 698 已经完成 head-slot 与 source attention map，但仍缺 token-level causal source patch。
+
+下一阶段应做：
+
+```text
+Phase 699: Answer-Last Head Source-Token Causal Patch Audit
+```
+
+目标：
+
+```text
+在 DS7B top heads 上，对 attention source 进行因果替换/遮断：
+
+1. 只保留 top heads 的 target_value source contribution。
+2. 只替换 top heads 对 target_value positions 的 V-mixture。
+3. 遮断 target_value positions，观察 global_top32 restore/degradation 是否消失。
+4. 对 record_line non-value tokens、relation tokens、instruction tokens 做对照。
+```
+
+关键判据：
+
+```text
+如果 target_value-position patch 可以复现 global_top32 的主要效果，
+则 answer_last value route 从 source token 到 head-slot 的路径基本闭合。
+
+如果不能复现，
+说明 top heads 读取的是更复杂的 record-line field，而不是单个 value token。
+```
+
+## Phase 699: Answer-Last Head Source-Token Causal Patch Audit [2026-06-26 17:23]
+
+### 本阶段问题
+
+Phase 698 已经证明：
+
+```text
+DS7B L23-L27 answer_last top head-slot 子集有强 restore/degradation 效果，
+并且这些 top heads 在 terse_no_explain 条件下明显看向 record-line target_value。
+```
+
+但 Phase 698 的核心硬伤是：
+
+```text
+source attention map 仍然是观察性证据，不是 source-token causal patch。
+```
+
+因此本阶段直接追问：
+
+```text
+target_value source contribution 本身是否对 answer_last top head-slot 的正确值读出具有因果作用？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py
+
+python tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py \
+  --model qwen3 \
+  --limit 1 \
+  --hard-exit-after-model \
+  > results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_qwen3_smoke.log 2>&1
+
+python tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py \
+  --model qwen3 \
+  --hard-exit-after-model \
+  > results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_qwen3_run.log 2>&1
+
+python tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py \
+  --model glm4 \
+  --hard-exit-after-model \
+  > results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_glm4_run.log 2>&1
+
+python tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py \
+  --model deepseek7b \
+  --hard-exit-after-model \
+  > results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase699_answer_last_head_source_token_causal_patch.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_cross_model_summary.md
+results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_cross_model_summary.json
+results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_deepseek7b_results.json
+results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_qwen3_results.json
+results/glm5_phase699_answer_last_head_source_token_causal_patch/phase699_glm4_results.json
+```
+
+### 测试原理
+
+本阶段沿用 Phase 698 的 top candidate heads，只在 answer_last 位置对这些 head-slot 做局部因果替换。
+
+核心计算不是直接替换整层 hidden state，而是把每个 source group 对 top heads 的 V-mixture contribution 拆出来：
+
+```text
+source contribution
+  = attention weight from answer_last to source tokens
+    × source tokens' value vectors
+    × selected head slots
+```
+
+然后分别测试：
+
+```text
+restore:
+  short_only + (terse source contribution - short source contribution)
+
+degradation:
+  terse_no_explain + (short source contribution - terse source contribution)
+
+erase:
+  terse_no_explain - terse source contribution
+```
+
+测试 source groups：
+
+```text
+target_value
+record_line
+record_non_value
+relation
+object_name
+instruction_line
+question_line
+answer_line
+self_last
+```
+
+这里的 causal patch 是局部 head-slot contribution patch，而不是完整重新运行 attention pattern，因此结论只能定位到：
+
+```text
+answer_last top heads 的 source-token contribution 是否足以改变输出读出。
+```
+
+不能直接说完整自然 attention 机制已经闭合。
+
+### 结果总览
+
+#### DS7B
+
+```text
+pairs = 72
+transfer_layers = [23, 24, 25, 26, 27]
+top_heads = 32
+```
+
+restore 结果：
+
+```text
+full_top32_head_slot:
+  restore = 0.736
+  patched_top1 = 0.736
+  patched_rank = 1.53
+  rank_effect = 166.17
+  final_effect = 30.117
+
+delta_record_line:
+  restore = 0.375
+  patched_top1 = 0.375
+  patched_rank = 3.35
+  rank_effect = 164.35
+  final_effect = 22.612
+  source_len = 29.76
+
+delta_target_value:
+  restore = 0.306
+  patched_top1 = 0.306
+  patched_rank = 3.42
+  rank_effect = 164.28
+  final_effect = 21.795
+  source_len = 4.32
+
+delta_answer_line:
+  restore = 0.097
+  final_effect = 4.900
+
+delta_self_last:
+  restore = 0.042
+  final_effect = 4.080
+
+delta_relation / delta_question_line / delta_instruction_line:
+  restore = 0.000
+```
+
+degradation 结果：
+
+```text
+full_top32_head_slot:
+  drop = 0.875
+  patched_top1 = 0.125
+  patched_rank = 66.32
+  final_effect = 32.464
+
+delta_target_value:
+  drop = 0.625
+  patched_top1 = 0.375
+  patched_rank = 8.56
+  final_effect = 18.553
+  source_len = 4.32
+
+delta_record_line:
+  drop = 0.597
+  patched_top1 = 0.403
+  patched_rank = 5.50
+  final_effect = 18.170
+  source_len = 29.76
+
+delta_answer_line:
+  drop = 0.250
+  final_effect = 3.353
+
+delta_self_last:
+  drop = 0.181
+  final_effect = 2.066
+
+delta_relation / delta_question_line:
+  drop = 0.000
+```
+
+erase 结果：
+
+```text
+erase_record_line:
+  drop = 0.931
+  patched_top1 = 0.069
+  patched_rank = 94.83
+  final_effect = 43.697
+
+erase_target_value:
+  drop = 0.819
+  patched_top1 = 0.181
+  patched_rank = 161.85
+  final_effect = 44.054
+
+erase_self_last:
+  drop = 0.403
+
+erase_answer_line:
+  drop = 0.333
+
+erase_record_non_value:
+  drop = 0.153
+
+erase_relation / erase_instruction_line:
+  drop = 0.000
+```
+
+#### qwen3
+
+```text
+pairs = 3
+transfer_layers = [30, 31, 32, 33, 34, 35]
+
+full_top32_head_slot:
+  restore = 1.000
+  degradation drop = 0.333
+
+delta_target_value:
+  restore = 0.667
+  degradation drop = 0.000
+
+erase_target_value:
+  drop = 1.000
+```
+
+qwen3 样本过少，只能作为弱参照，不能作为跨模型稳定结论。
+
+#### GLM4
+
+```text
+pairs = 5
+transfer_layers = [34, 35, 36, 37, 38, 39]
+
+full_top32_head_slot:
+  restore = 0.000
+  degradation drop = 0.000
+
+source-delta / erase:
+  top1 层面均无有效因果闭合。
+```
+
+GLM4 在当前 testbed 上没有复现 DS7B 的 top-head source contribution 机制，不能强行解释。
+
+### 对附件 Phase 698 判断的审视
+
+附件对 Phase 698 的总体判断基本正确：
+
+```text
+Phase 698 确实把 L23-L27 attn_window 进一步拆成了稀疏 head-slot 子集，
+并且 DS7B global_top32 强于 window_all_heads，说明有效 route 不是所有 heads 的平均作用。
+```
+
+附件指出的关键限制也正确：
+
+```text
+Phase 698 没有证明 target_value source contribution 本身是因果源。
+```
+
+Phase 699 正是对这个硬伤的正面测试。
+
+### 本阶段谨慎结论
+
+DS7B 上可以得到一个较强但仍需限定的结论：
+
+```text
+在 DS7B 的 L23-L27 answer_last top heads 中，
+target_value source contribution 是 correct value 读出的关键因果成分。
+```
+
+证据：
+
+```text
+delta_target_value:
+  restore = 0.306
+  degradation drop = 0.625
+
+erase_target_value:
+  drop = 0.819
+```
+
+这说明 target_value contribution 同时满足：
+
+```text
+部分充分性：
+  把 terse 的 target_value contribution 加到 short 上，可以恢复一部分正确输出。
+
+必要性：
+  从 terse 中移除 target_value contribution，会大幅破坏正确输出。
+```
+
+但它没有完全满足：
+
+```text
+完整充分性：
+  delta_target_value restore = 0.306
+  full_top32_head_slot restore = 0.736
+```
+
+因此不能说单个 target_value contribution 已经解释了完整 value gate。
+
+更准确的表述是：
+
+```text
+target_value source contribution 是 DS7B answer_last top-head route 的核心必要成分，
+但完整 restore 还需要 record-line field / answer-line / self-last / 多头混合状态共同配合。
+```
+
+### 当前拼图推进
+
+Phase 699 把前面的链条推进了一格：
+
+```text
+Phase 695:
+  source token masking 证明 target_value / relation / record_line 是必要源。
+
+Phase 696:
+  source-token hidden state 很早已有 value signal；
+  分叉主要发生在 answer_last near-readout trajectory。
+
+Phase 697:
+  L23-L27 answer_last attn_window 是强 transfer route。
+
+Phase 698:
+  transfer route 可拆成稀疏 top head-slot 子集；
+  top heads 观察上看向 record-line target_value。
+
+Phase 699:
+  target_value source contribution 本身在 DS7B top heads 中具有强因果必要性和部分充分性。
+```
+
+当前更稳妥的机制图：
+
+```text
+prompt / record-line context
+  -> early source-token value state already exists
+  -> answer_last residual state activates route condition
+  -> L23-L27 sparse top heads read value-bearing source contribution
+  -> top head-slot mixture enters o_proj
+  -> near-readout residual/carry trajectory accumulates correct value support
+  -> final_norm / lm_head selects first answer token
+```
+
+### 问题、硬伤和瓶颈
+
+1. 当前 causal patch 只替换 answer_last top head-slot contribution，不是重新运行完整 attention。
+2. target_value restore 只有 0.306，明显低于 full_top32 restore 0.736，说明单源贡献不完整。
+3. erase_target_value 很强，但 erase_record_line 更强，说明 record-line field 仍可能存在整体结构作用。
+4. record_non_value 单独很弱，说明 record_line 的强作用并不是普通上下文长度效应，但还不能排除 field-boundary / value-neighborhood 的组合效应。
+5. qwen3 / GLM4 样本太少或未闭合，不能把 DS7B 结果直接上升为跨模型普遍机制。
+6. 当前模型都是小模型，内部结构可能有偏差，尤其 DS7B 的 sparse-head route 不一定等价于大模型中的语言机制。
+7. head ranking 来自 Phase 698 的 candidate score，存在选择偏差，需要在后续用 holdout cases 或 cross-template cases 审计。
+8. source group 依赖字符串 offset 和 tokenizer 对齐，target_value 多 token 情况下仍可能有边界误差。
+
+### 理论进展
+
+本阶段进一步支持：
+
+```text
+语言生成不是单个静态语义向量被直接读出，
+而是 source-token contribution、route condition、sparse head-slot transfer、near-readout accumulation 的条件化轨迹。
+```
+
+更接近当前证据的统一表达是：
+
+```text
+correct token support
+  = readout(
+      base residual state
+      + route-conditioned sparse attention contribution
+      + downstream carry accumulation
+    )
+```
+
+其中本阶段定位的是：
+
+```text
+sparse attention contribution
+  contains causal target_value source contribution,
+  but is not reducible to target_value alone.
+```
+
+### 下一阶段任务
+
+当前任务仍属于同一阶段性目标：
+
+```text
+从 source-token 到 answer_last readout 的 value route 因果闭合。
+```
+
+但 Phase 699 已经完成本阶段要求的 source-token causal patch。下一步不应继续盲目扩大 patch，而应进入组合结构审计：
+
+```text
+Phase 700: Target-Value Source Contribution Composition and Interaction Audit
+```
+
+目标：
+
+```text
+1. 测试 target_value + answer_line。
+2. 测试 target_value + self_last。
+3. 测试 target_value + record_non_value。
+4. 测试 target_value + answer_line + self_last。
+5. 对比 record_line 与 target_value + record_non_value 的差异。
+6. 对 target_value contribution 做 alpha scaling：
+   alpha = 0.5 / 1.0 / 1.5 / 2.0
+```
+
+关键判据：
+
+```text
+如果 target_value 的组合补丁接近 full_top32 restore，
+说明完整 route 是多个 source contribution 的组合结构。
+
+如果 alpha scaling 能接近 full_top32 restore，
+说明 Phase 699 的问题主要是贡献强度不足。
+
+如果组合和 scaling 都不能闭合，
+说明 full_top32 head-slot 中存在 source contribution 以外的 head-internal route state。
+```
+
+## Phase 700: Source Contribution Composition and Scaling Audit [2026-06-26 17:30]
+
+### 本阶段问题
+
+Phase 699 证明了 DS7B 中：
+
+```text
+target_value source contribution 具有强必要性和部分充分性。
+```
+
+但 Phase 699 也留下一个关键缺口：
+
+```text
+delta_target_value restore = 0.306
+full_top32_head_slot restore = 0.736
+```
+
+因此本阶段测试：
+
+```text
+Phase 699 的缺口到底来自：
+1. target_value contribution 强度不足；
+2. target_value 必须与 answer_line / self_last / record_non_value 组合；
+3. 还是存在 source contribution 以外的 head-internal route state。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase700_source_contribution_composition_audit.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase700_source_contribution_composition_audit.py
+
+mkdir -p results/glm5_phase700_source_contribution_composition_audit
+
+python tests/gpt5/phase700_source_contribution_composition_audit.py \
+  --model qwen3 \
+  --limit 1 \
+  --hard-exit-after-model \
+  > results/glm5_phase700_source_contribution_composition_audit/phase700_qwen3_smoke.log 2>&1
+
+python tests/gpt5/phase700_source_contribution_composition_audit.py \
+  --model qwen3 \
+  --hard-exit-after-model \
+  > results/glm5_phase700_source_contribution_composition_audit/phase700_qwen3_run.log 2>&1
+
+python tests/gpt5/phase700_source_contribution_composition_audit.py \
+  --model glm4 \
+  --hard-exit-after-model \
+  > results/glm5_phase700_source_contribution_composition_audit/phase700_glm4_run.log 2>&1
+
+python tests/gpt5/phase700_source_contribution_composition_audit.py \
+  --model deepseek7b \
+  --hard-exit-after-model \
+  > results/glm5_phase700_source_contribution_composition_audit/phase700_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase700_source_contribution_composition_audit.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase700_source_contribution_composition_audit/phase700_cross_model_summary.md
+results/glm5_phase700_source_contribution_composition_audit/phase700_cross_model_summary.json
+results/glm5_phase700_source_contribution_composition_audit/phase700_deepseek7b_composition_summary.json
+results/glm5_phase700_source_contribution_composition_audit/phase700_qwen3_composition_summary.json
+results/glm5_phase700_source_contribution_composition_audit/phase700_glm4_composition_summary.json
+```
+
+### 测试原理
+
+本阶段沿用 Phase 699 的局部 source contribution patch 公式，但不再只测试单一 source group。
+
+组合 patch：
+
+```text
+combo source contribution
+  = contribution(target_value)
+    + contribution(answer_line)
+    + contribution(self_last)
+    + ...
+```
+
+restore：
+
+```text
+short_only
+  + [terse combo contribution - short combo contribution]
+```
+
+degradation：
+
+```text
+terse_no_explain
+  + [short combo contribution - terse combo contribution]
+```
+
+erase：
+
+```text
+terse_no_explain
+  - terse combo contribution
+```
+
+alpha scaling：
+
+```text
+short_only
+  + alpha * [terse target_value contribution - short target_value contribution]
+
+alpha = 0.5 / 1.0 / 1.5 / 2.0
+```
+
+测试组合：
+
+```text
+target_value + answer_line
+target_value + self_last
+target_value + record_non_value
+target_value + answer_line + self_last
+record_line
+```
+
+### 结果总览
+
+#### DS7B
+
+```text
+pairs = 72
+transfer_layers = [23, 24, 25, 26, 27]
+top_heads = 32
+```
+
+restore：
+
+```text
+combo_delta_target_value+answer_line+self_last:
+  restore = 0.764
+  patched_top1 = 0.764
+  patched_rank = 1.31
+  rank_effect = 166.39
+  final_effect = 27.221
+  source_len = 7.32
+
+alpha_target_value_2:
+  restore = 0.750
+  patched_top1 = 0.750
+  patched_rank = 1.69
+  rank_effect = 166.00
+  final_effect = 38.273
+  source_len = 4.32
+
+full_top32_head_slot:
+  restore = 0.736
+  patched_top1 = 0.736
+  patched_rank = 1.53
+  rank_effect = 166.17
+  final_effect = 30.117
+
+combo_delta_target_value+answer_line:
+  restore = 0.597
+  final_effect = 24.902
+
+combo_delta_target_value+self_last:
+  restore = 0.528
+  final_effect = 24.201
+
+combo_delta_record_line:
+  restore = 0.375
+
+alpha_target_value_1:
+  restore = 0.306
+```
+
+degradation：
+
+```text
+full_top32_head_slot:
+  drop = 0.875
+  patched_top1 = 0.125
+  final_effect = 32.464
+
+combo_delta_target_value+answer_line+self_last:
+  drop = 0.833
+  patched_top1 = 0.167
+  patched_rank = 81.15
+  final_effect = 25.947
+
+alpha_target_value_2:
+  drop = 0.806
+  patched_top1 = 0.194
+  patched_rank = 427.86
+  final_effect = 44.766
+
+alpha_target_value_1.5:
+  drop = 0.750
+
+combo_delta_target_value+answer_line:
+  drop = 0.681
+
+combo_delta_target_value+self_last:
+  drop = 0.681
+
+alpha_target_value_1:
+  drop = 0.625
+```
+
+erase：
+
+```text
+combo_erase_target_value+answer_line+self_last:
+  drop = 1.000
+  patched_top1 = 0.000
+  patched_rank = 1102.65
+  final_effect = 61.573
+
+alpha_erase_target_value_2:
+  drop = 0.958
+  patched_top1 = 0.042
+  patched_rank = 1557.46
+  final_effect = 101.953
+
+combo_erase_target_value+record_non_value:
+  drop = 0.931
+
+combo_erase_record_line:
+  drop = 0.931
+
+combo_erase_target_value+self_last:
+  drop = 0.903
+
+combo_erase_target_value+answer_line:
+  drop = 0.847
+
+alpha_erase_target_value_1:
+  drop = 0.819
+```
+
+#### qwen3
+
+```text
+pairs = 3
+
+full_top32_head_slot restore = 1.000
+combo_delta_target_value+answer_line+self_last restore = 1.000
+full_top32_head_slot degradation drop = 0.333
+combo_delta_target_value+answer_line+self_last degradation drop = 0.333
+```
+
+qwen3 样本过少，只能说明这个组合方向没有与已有结果冲突，不能作为稳定跨模型结论。
+
+#### GLM4
+
+```text
+pairs = 5
+
+restore / degradation / erase 的 success_change_rate 均为 0.000。
+```
+
+GLM4 当前 testbed 未闭合，不能强行纳入同一机制结论。
+
+### 客观结论
+
+Phase 700 给出一个比 Phase 699 更强的 DS7B 结论：
+
+```text
+target_value contribution 的缺口主要不是完全未知的新通路，
+而是 target_value 强度和 target_value + answer_line + self_last 组合不足。
+```
+
+证据：
+
+```text
+Phase 699:
+  target_value restore = 0.306
+
+Phase 700:
+  target_value alpha=2 restore = 0.750
+  target_value+answer_line+self_last restore = 0.764
+  full_top32_head_slot restore = 0.736
+```
+
+这说明：
+
+```text
+在 DS7B 当前 testbed 中，
+answer_last top-head route 的主要可恢复成分可以被少数 source contribution 的组合近似复现。
+```
+
+但要保持谨慎：
+
+```text
+alpha=2 虽然 restore 高，但属于人为放大贡献，不是自然机制本身。
+target_value+answer_line+self_last 虽然 restore 略高于 full_top32，但仍是局部线性 contribution patch，不是完整 attention rerun。
+```
+
+### 新增拼图
+
+当前 DS7B 拼图从：
+
+```text
+target_value 是必要且部分充分的 source contribution
+```
+
+推进为：
+
+```text
+target_value 是核心 source contribution；
+answer_line 和 self_last 提供 readout / position / local answer-state 配合；
+三者组合可以近似复现 full_top32 head-slot transplant。
+```
+
+更精确的局部机制图：
+
+```text
+record target_value source state
+  + answer line local state
+  + self-last readout position state
+    -> sparse top-head contribution mixture
+    -> answer_last near-readout trajectory
+    -> correct first-token support
+```
+
+### 问题和硬伤
+
+1. alpha scaling 是人为放大，不能说明模型自然地用 alpha=2。
+2. 组合 patch 是线性相加，真实 attention 中可能存在 softmax pattern、head interaction、layernorm interaction。
+3. combo restore 略高于 full_top32，不一定说明组合比 full_top32 更真实，可能说明 patch 过量或去掉了负向 head 成分。
+4. GLM4 没有复现，qwen3 样本太少，因此跨模型普遍性仍未建立。
+5. 当前模型都是小模型，内部结构可能偏向特殊局部捷径；不能直接外推到大模型智能机制。
+6. 组合补丁只在 answer_last top heads 上做，尚未证明这些 source contribution 如何自然写入这些 heads。
+7. 仍未解释为什么 answer_line / self_last 能与 target_value 协同，是位置协议、格式协议，还是读出门控。
+
+### 理论进展
+
+Phase 700 强化了当前理论中的一个重要分解：
+
+```text
+语言生成的 value route 不是单 source-token 直接读出，
+而是 content source、format/readout source、position/self source 的组合轨迹。
+```
+
+一个更贴近证据的公式是：
+
+```text
+R_{answer}^{L23:L27}
+  = R_{base}
+    + A_{top}(
+        C_{value}
+        + C_{answer\_line}
+        + C_{self\_last}
+      )
+    + \epsilon
+```
+
+其中：
+
+```text
+C_{value}:
+  目标值内容贡献。
+
+C_{answer_line}:
+  答案格式 / 读出局部上下文贡献。
+
+C_{self_last}:
+  当前生成位置 / answer_last 自身状态贡献。
+
+\epsilon:
+  未解释的 head interaction / layernorm / downstream carry 项。
+```
+
+### 下一阶段任务
+
+Phase 700 已经把 source contribution 组合推进到接近 full_top32 的程度。接下来仍属于同一大阶段，但问题应从“source contribution 是否足够”转为：
+
+```text
+这些 contribution 是如何自然写入 answer_last top heads 的？
+```
+
+建议进入：
+
+```text
+Phase 701: Natural Write-In Path of Target-Value / Answer-Line / Self-Last Contributions
+```
+
+核心目标：
+
+```text
+1. 不再只在 o_proj input 做 contribution patch。
+2. 追踪 target_value、answer_line、self_last 三类 contribution 在 L23-L27 前后的自然写入过程。
+3. 比较 patch v_proj output、attention pattern、q/k scores、o_proj input、post-attn residual 的效果。
+4. 判断组合贡献来自：
+   - V 内容本身；
+   - Q/K attention pattern；
+   - head-slot 内部混合；
+   - residual route condition。
+```
+
+关键判据：
+
+```text
+如果 patch V contribution 即可复现组合效果，
+说明主要瓶颈是 value content routing。
+
+如果必须 patch Q/K attention pattern，
+说明机制核心是选择/寻址协议。
+
+如果必须 patch post-attn residual，
+说明 top heads 只是中继，真正门控在 residual carry。
 ```
