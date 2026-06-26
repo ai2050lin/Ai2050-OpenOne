@@ -37545,3 +37545,719 @@ attention head、MLP、residual carry、source-token path 的组合贡献。
 ```
 
 因为 Phase 691 是新阶段的图谱拆边任务，需要更复杂脚本和更长测试，建议下一次从 Phase 691 开始。
+## Phase 691: Boundary Component and Residual-Carry Decomposition [2026-06-26 14:38]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py
+python tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py --model qwen3 --hard-exit-after-model > results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_qwen3_run.log 2>&1
+python tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py --model glm4 --hard-exit-after-model > results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_glm4_run.log 2>&1
+python tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py --model deepseek7b --hard-exit-after-model > results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_deepseek7b_run.log 2>&1
+python tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py --summarize-only
+```
+
+### 生成脚本和结果
+
+```text
+脚本:
+  tests/gpt5/phase691_boundary_component_residual_carry_decomposition.py
+
+结果:
+  results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_cross_model_summary.md
+  results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_cross_model_summary.json
+  results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_deepseek7b_boundary_component_rows.jsonl
+  results/glm5_phase691_boundary_component_residual_carry_decomposition/phase691_deepseek7b_boundary_component_summary.json
+```
+
+### 测试原理
+
+Phase 687-690 的正确部分是：
+
+```text
+不能把 L26/L27 layer_out restore 解释为单纯 value writer；
+更保守的说法是：
+short_only 与 terse_no_explain 在较早层形成 residual trajectory divergence，
+然后经 L18-L25 携带到 L26/L27 near-readout carrier。
+```
+
+Phase 691 对 Phase 690 找到的边界层做组件拆分。
+
+对每个 paired case，在同一个 case 内计算：
+
+```text
+delta_layer = terse_layer_out - short_layer_out
+delta_attn  = terse_attn_out  - short_attn_out
+delta_mlp   = terse_mlp_out   - short_mlp_out
+delta_carry_est = delta_layer - delta_attn - delta_mlp
+```
+
+然后分别测试：
+
+```text
+restore:
+  full_layer_delta
+  attn_delta
+  mlp_delta
+  attn_mlp_delta
+  carry_est_layerout
+  layer_minus_attn_delta
+  layer_minus_mlp_delta
+  random_layer_same_norm
+
+degradation:
+  full_layer_replace_short
+  attn_replace_short
+  mlp_replace_short
+  attn_mlp_replace_short
+  remove_carry_est_layerout
+  remove_attn_est_layerout
+  remove_mlp_est_layerout
+  random_layer_same_norm
+```
+
+注意：
+
+```text
+carry_est_layerout 是代数估计，不是证明存在一个独立 carry module。
+它只回答：
+如果从 layer_out 总差分中扣除本层 attn_out / mlp_out 差分，
+剩余差分是否仍然携带主要修复信息。
+```
+
+### 客观结果
+
+#### DS7B
+
+```text
+paired cases = 72
+target = L26_layer_input
+scan_layers = L13-L18
+rows = 6912
+```
+
+按 mode 平均：
+
+```text
+restore|full_layer_delta:
+  repair = 0.544
+  mean_patched_rank = 6.85
+  target_effect = 5.896
+
+restore|carry_est_layerout:
+  repair = 0.417
+  mean_patched_rank = 31.35
+  target_effect = 4.893
+
+restore|layer_minus_mlp_delta:
+  repair = 0.521
+  mean_patched_rank = 11.87
+  target_effect = 5.734
+
+restore|layer_minus_attn_delta:
+  repair = 0.421
+  mean_patched_rank = 25.75
+  target_effect = 5.147
+
+restore|attn_delta:
+  repair = 0.081
+  mean_patched_rank = 158.78
+  target_effect = 1.112
+
+restore|mlp_delta:
+  repair = 0.037
+  mean_patched_rank = 211.79
+  target_effect = 0.123
+
+restore|attn_mlp_delta:
+  repair = 0.111
+  mean_patched_rank = 199.20
+  target_effect = 1.038
+
+restore|random_layer_same_norm:
+  repair = 0.037
+```
+
+最强单层 restore：
+
+```text
+L18 full_layer_delta:
+  repair = 0.792
+  mean_patched_rank = 1.60
+  target_effect = 6.682
+
+L16 layer_minus_mlp_delta:
+  repair = 0.778
+  mean_patched_rank = 2.99
+  target_effect = 10.315
+
+L15 layer_minus_mlp_delta:
+  repair = 0.750
+  mean_patched_rank = 2.79
+  target_effect = 8.333
+
+L17 layer_minus_attn_delta:
+  repair = 0.722
+  mean_patched_rank = 2.88
+  target_effect = 5.443
+
+L15 carry_est_layerout:
+  repair = 0.708
+  mean_patched_rank = 3.21
+  target_effect = 7.619
+```
+
+degradation 结果：
+
+```text
+degradation|full_layer_replace_short:
+  drop = 0.796
+  patched_top1 = 0.204
+  target_effect = 6.314
+
+degradation|remove_carry_est_layerout:
+  drop = 0.683
+  patched_top1 = 0.317
+  target_effect = 4.358
+
+degradation|attn_mlp_replace_short:
+  drop = 0.315
+
+degradation|attn_replace_short:
+  drop = 0.120
+
+degradation|mlp_replace_short:
+  drop = 0.199
+```
+
+最强 degradation：
+
+```text
+L15 remove_carry_est_layerout:
+  drop = 0.889
+
+L17 remove_carry_est_layerout:
+  drop = 0.875
+
+L13 full_layer_replace_short:
+  drop = 0.875
+
+L16 remove_carry_est_layerout:
+  drop = 0.861
+
+L14 full_layer_replace_short:
+  drop = 0.847
+```
+
+#### GLM4
+
+```text
+paired cases = 5
+target = L38_layer_input
+scan_layers = L23-L30
+```
+
+结果很宽，但样本太少：
+
+```text
+restore|full_layer_delta:
+  repair = 1.000
+
+restore|layer_minus_attn_delta:
+  repair = 1.000
+
+restore|carry_est_layerout:
+  repair = 0.975
+
+restore|attn_mlp_delta:
+  repair = 0.850
+
+degradation|full_layer_replace_short:
+  drop = 0.375
+
+degradation|remove_carry_est_layerout:
+  drop = 0.100
+```
+
+#### qwen3
+
+```text
+paired cases = 3
+target = L33_layer_input
+scan_layers = L18-L25
+```
+
+样本更少，不能强解释：
+
+```text
+restore|full_layer_delta:
+  repair = 1.000
+
+restore|carry_est_layerout:
+  repair = 1.000
+
+restore|layer_minus_mlp_delta:
+  repair = 1.000
+
+restore|attn_delta:
+  repair = 0.292
+
+restore|mlp_delta:
+  repair = 0.208
+
+degradation|full_layer_replace_short:
+  drop = 0.625
+
+degradation|remove_carry_est_layerout:
+  drop = 0.583
+```
+
+### 对附件判断的评估
+
+附件对 Phase 687-690 的主判断基本正确：
+
+```text
+1. L26/L27 有效状态不能解释为纯 value writer；
+2. 更合理的描述是 residual trajectory divergence；
+3. DS7B 的可见边界在 L13-L18；
+4. L18-L25 是强 carry / accumulation 区；
+5. L26/L27 是 near-readout carrier；
+6. qwen3 / GLM4 样本太少，不能做强跨模型结论；
+7. 小模型结果可能存在内部结构偏差。
+```
+
+Phase 691 对附件的补充是：
+
+```text
+DS7B L13-L18 边界区中，本层 attn_out 和 mlp_out 单独不足以解释 layer_out 效应；
+attn_out + mlp_out 单层组合仍明显不足；
+layer_out 中扣除 attn / mlp 后的 carry_est 仍保留大量修复和破坏能力。
+```
+
+因此当前更保守的结论是：
+
+```text
+有效信息主要表现为 residual state carry / accumulated trajectory，
+不是单层 attention output 或单层 MLP output 的可分离写入。
+```
+
+### 理论进展
+
+当前链条更新为：
+
+```text
+instruction wording
+  -> early route seed
+  -> L13-L18 residual trajectory bifurcation
+  -> nonlocal residual carry / accumulated state
+  -> L18-L25 strong carry
+  -> L26_layer_input value-support state
+  -> L26/L27 near-readout carrier
+  -> final readout competition
+```
+
+Phase 691 使图谱从：
+
+```text
+L13-L18 是边界区
+```
+
+推进到：
+
+```text
+L13-L18 的有效差异主要不在单层 attn_out / mlp_out，
+而在 layer_out 总状态与 carry_est 中。
+```
+
+### 问题和硬伤
+
+```text
+1. carry_est 是代数残差估计，不是独立模块定位；
+2. layer_out patch 仍然可能复制格式、位置、路线、续写偏置和值选择等多种变量；
+3. 单层 attn_out / mlp_out 弱，不等于多层 attention / MLP 组合弱；
+4. 没有 head-level source-token path；
+5. 没有证明 carry_est 对自然生成的长程稳定性；
+6. qwen3 / GLM4 paired cases 太少；
+7. 当前模型是小模型，内部结构可能与更大模型不同。
+```
+
+### 接下来是否属于同一阶段
+
+属于。
+
+Phase 691 已经完成单层组件拆分，但还没有排除：
+
+```text
+多层 attention / MLP 组合是否可以共同重构 residual trajectory。
+```
+
+因此继续自动进入同一阶段的下一步：
+
+```text
+Phase 692: Boundary Window Component Combo Audit
+```
+
+## Phase 692: Boundary Window Component Combo Audit [2026-06-26 14:43]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase692_boundary_window_component_combo_audit.py
+python tests/gpt5/phase692_boundary_window_component_combo_audit.py --model qwen3 --hard-exit-after-model > results/glm5_phase692_boundary_window_component_combo_audit/phase692_qwen3_run.log 2>&1
+python tests/gpt5/phase692_boundary_window_component_combo_audit.py --model glm4 --hard-exit-after-model > results/glm5_phase692_boundary_window_component_combo_audit/phase692_glm4_run.log 2>&1
+python tests/gpt5/phase692_boundary_window_component_combo_audit.py --model deepseek7b --hard-exit-after-model > results/glm5_phase692_boundary_window_component_combo_audit/phase692_deepseek7b_run.log 2>&1
+python tests/gpt5/phase692_boundary_window_component_combo_audit.py --summarize-only
+```
+
+### 生成脚本和结果
+
+```text
+脚本:
+  tests/gpt5/phase692_boundary_window_component_combo_audit.py
+
+结果:
+  results/glm5_phase692_boundary_window_component_combo_audit/phase692_cross_model_summary.md
+  results/glm5_phase692_boundary_window_component_combo_audit/phase692_cross_model_summary.json
+  results/glm5_phase692_boundary_window_component_combo_audit/phase692_deepseek7b_window_combo_rows.jsonl
+  results/glm5_phase692_boundary_window_component_combo_audit/phase692_deepseek7b_window_combo_summary.json
+```
+
+### 测试原理
+
+Phase 691 证明：
+
+```text
+单层 attn_out / mlp_out patch 明显弱于 layer_out / carry_est。
+```
+
+但这个结论有一个潜在漏洞：
+
+```text
+如果 attention / MLP 的有效信息分布在多层，
+单层 patch 弱并不能说明 attention / MLP 路径不重要。
+```
+
+Phase 692 因此做窗口组合审计。
+
+对 Phase 690 / 691 的边界区切成：
+
+```text
+early window
+late window
+all window
+```
+
+然后一次性 patch 多层：
+
+```text
+attn_window
+mlp_window
+attn_mlp_window
+layer_window
+random_layer_window
+```
+
+同时做 restore 和 degradation。
+
+### 客观结果
+
+#### DS7B
+
+```text
+paired cases = 72
+target = L26_layer_input
+windows:
+  early = L13-L15
+  late  = L16-L18
+  all   = L13-L18
+rows = 2160
+```
+
+restore：
+
+```text
+layer_window|late:
+  repair = 0.806
+  mean_patched_rank = 1.61
+  target_effect = 6.643
+
+layer_window|all:
+  repair = 0.806
+  mean_patched_rank = 1.61
+  target_effect = 6.643
+
+layer_window|early:
+  repair = 0.597
+  mean_patched_rank = 6.31
+  target_effect = 6.250
+
+attn_mlp_window|all:
+  repair = 0.625
+  mean_patched_rank = 3.31
+  target_effect = 6.844
+
+attn_mlp_window|early:
+  repair = 0.444
+  mean_patched_rank = 10.21
+  target_effect = 8.201
+
+attn_mlp_window|late:
+  repair = 0.236
+  mean_patched_rank = 19.13
+  target_effect = 2.672
+
+attn_window|all:
+  repair = 0.167
+
+mlp_window|all:
+  repair = 0.153
+
+random_layer_window|all:
+  repair = 0.069
+```
+
+degradation：
+
+```text
+layer_window|late:
+  drop = 0.833
+  patched_top1 = 0.167
+  target_effect = 6.536
+
+layer_window|all:
+  drop = 0.833
+  patched_top1 = 0.167
+  target_effect = 6.536
+
+layer_window|early:
+  drop = 0.792
+  patched_top1 = 0.208
+  target_effect = 7.644
+
+attn_mlp_window|early:
+  drop = 0.750
+  patched_top1 = 0.250
+  target_effect = 8.676
+
+attn_mlp_window|all:
+  drop = 0.681
+  patched_top1 = 0.319
+  target_effect = 6.606
+
+attn_mlp_window|late:
+  drop = 0.472
+
+attn_window|all:
+  drop = 0.306
+
+mlp_window|all:
+  drop = 0.500
+```
+
+关键客观现象：
+
+```text
+1. 多层 attn_mlp_window 明显强于 Phase 691 的单层 attn_mlp；
+2. 但是 attn_mlp_window|all 仍低于 layer_window|all / layer_window|late；
+3. early attn_mlp 在 degradation 中很强，说明 L13-L15 对成功路线有关键支撑；
+4. late layer_window 在 restore/degradation 中都非常强；
+5. layer_window|all 与 layer_window|late 几乎相同，说明多层 layer_out patch 主要由后部窗口主导，或者后部 patch 覆盖了前部轨迹影响。
+```
+
+#### GLM4
+
+```text
+paired cases = 5
+target = L38_layer_input
+windows:
+  early = L23-L26
+  late  = L27-L30
+  all   = L23-L30
+```
+
+restore 很宽：
+
+```text
+attn_mlp_window|all:
+  repair = 1.000
+
+attn_window|all:
+  repair = 1.000
+
+mlp_window|all:
+  repair = 1.000
+
+layer_window|all:
+  repair = 1.000
+```
+
+degradation 较弱：
+
+```text
+layer_window|all:
+  drop = 0.400
+
+attn_mlp_window|all:
+  drop = 0.200
+
+attn_window|all:
+  drop = 0.000
+
+mlp_window|all:
+  drop = 0.000
+```
+
+样本只有 5，仍不能强解释。
+
+#### qwen3
+
+```text
+paired cases = 3
+target = L33_layer_input
+windows:
+  early = L18-L21
+  late  = L22-L25
+  all   = L18-L25
+```
+
+restore：
+
+```text
+layer_window|all:
+  repair = 1.000
+
+attn_mlp_window|all:
+  repair = 1.000
+
+attn_window|all:
+  repair = 1.000
+
+mlp_window|all:
+  repair = 0.667
+```
+
+degradation：
+
+```text
+layer_window|all:
+  drop = 1.000
+
+attn_mlp_window|all:
+  drop = 1.000
+
+attn_window|all:
+  drop = 0.333
+
+mlp_window|all:
+  drop = 0.333
+```
+
+样本只有 3，只能作为提示。
+
+### 对 Phase 691 的修正
+
+Phase 691 中：
+
+```text
+单层 attn_out / mlp_out 弱。
+```
+
+Phase 692 修正为：
+
+```text
+DS7B 单层 attn_out / mlp_out 弱，
+但多层 attn_mlp_window 组合明显有效。
+```
+
+因此不能说：
+
+```text
+attention / MLP 不重要。
+```
+
+更准确地说：
+
+```text
+有效机制不是单层组件可分离写入，
+而是跨层组件组合 + residual layer state carry 的共同结果。
+```
+
+### 当前阶段判断
+
+Phase 687-692 形成的新客观拼图：
+
+```text
+1. L26/L27 不是单纯 value writer；
+2. L26/L27 是 near-readout carrier；
+3. 有效轨迹可前溯到 L18-L25；
+4. 可见边界在 L13-L18；
+5. 单层 attn_out / mlp_out 不足；
+6. 多层 attn_mlp_window 有明显因果效应；
+7. layer_out / carry_est 仍比组件组合更接近完整轨迹；
+8. DS7B 的 early boundary window 对 degradation 特别敏感；
+9. late boundary layer_window 对 restore/degradation 都非常强；
+10. 因此机制更像跨层轨迹图谱，而不是单点 writer。
+```
+
+### 问题和硬伤
+
+```text
+1. window patch 是粗粒度组合，仍没有定位 head；
+2. attn_mlp_window 有效，但不能说明具体 source token；
+3. layer_window 多层 patch 中，后层可能覆盖前层效应；
+4. early / late 的 restore 与 degradation 不完全对称；
+5. 只测试 first-token readout；
+6. qwen3 / GLM4 paired cases 仍过少；
+7. 当前都是小模型，结构可能存在偏差，不能直接外推。
+```
+
+### 理论进展
+
+当前链条进一步修正为：
+
+```text
+instruction wording
+  -> L13-L15 early boundary component interaction
+  -> L16-L18 late residual state consolidation
+  -> L18-L25 residual trajectory carry
+  -> L26_layer_input near-readout value-support state
+  -> final readout competition
+```
+
+关键变化：
+
+```text
+从“找单点 writer”
+推进到
+“定位跨层窗口中的组件组合和残差携带关系”。
+```
+
+### 接下来是否继续自动完成
+
+Phase 691-692 已完成当前阶段性目标：
+
+```text
+判断 L13-L18 边界区是否能被单层组件解释，
+以及多层组件组合是否显著补足。
+```
+
+答案是：
+
+```text
+单层组件不能解释；
+多层 attn_mlp 组合显著有效；
+但仍未达到 layer_window / residual state 的完整效应。
+```
+
+下一步不再是同一阶段的简单延续，而是进入新阶段：
+
+```text
+Phase 693: Boundary Attention Head and Source-Token Path Audit
+```
+
+新阶段目标：
+
+```text
+在 DS7B L13-L18 边界区，
+把 attn_mlp_window 的有效性继续拆成 head-level / source-token path。
+```
