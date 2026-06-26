@@ -162,12 +162,53 @@
 				query_relation L19 的 MLP update 是 relation-path ranking signal 候选；
 				prompt_last L26 有强 common activation，但不是最干净的生成源。
 
+		Phase 595-707 后的最新更新：
+			这之后的研究把问题从“哪个 residual 位置能修复 value gate”推进到“answer-start 读出端、源词元贡献、注意力头、输出通道、完整短语似然之间如何共同决定生成路线”。
+			最新最严格的判断是：
+				语言编码仍然不是固定语义向量，但也不能简单说某个 source channel ensemble 携带了可迁移的 donor value identity。
+				更准确地说，当前观察到的是：
+					目标 prompt residual / local context 负责锁定 target identity；
+					answer-start 附近的注意力和通道集合负责改变 value/prose route competition；
+					format / terse / answer_line / self_last 等协议状态决定答案能不能以短值形式被读出；
+					完整短语层面仍有 prose explanation 与 value phrase 的竞争。
+
+			因此，当前语言编码机制应写成：
+				语言输出 = 目标上下文身份锚定 + 源贡献路线增益 + 格式协议状态 + 候选短语竞争 + 读出/生成门。
+
+			对原有“候选竞争 + 读出门控”理论的修正：
+				1，winner 不只是在单个 next-token logit 上产生，还要经过完整 phrase likelihood 和自然生成路线筛选。
+				2，attention head 不是语义神经元本身，更像源路径聚合器；channel / neuron 才更接近局部编码颗粒度，但仍需要因果验证。
+				3，source-restricted channel ensemble 可以稳定改变 value 路线，但目前不能证明它携带跨样本可迁移的 donor identity。
+				4，完整短语审计显示 donor phrase 很少成为 winner，说明 cross-case donor patch 通常不是在注入 donor value phrase。
+				5，prose phrase 经常获胜，说明 readout likelihood 到自然短答案生成之间仍有 generation gate。
+
+			最新机制图更新为：
+				target prompt residual / local context
+					-> answer_start 的源词元组合 target_value + answer_line + self_last
+					-> L23-L27 附近的关键 attention heads
+					-> source-restricted positive channels
+					-> W_O / readout route gain
+					-> value phrase / prose phrase / continuation 的竞争
+					-> final generation gate。
+
+			其中 source-restricted channel ensemble 当前应分解为：
+				G_route：值回答路线增益；
+				P_format：短答格式/协议状态；
+				E_target_context：目标上下文身份锁定；
+				V_identity_local：尚未完全定位的局部身份项。
+
+			这意味着：
+				当前已经找到“路线/读出底座”的强因果证据；
+				还没有完全找到“可迁移语义身份代码”的最小因果单元。
+
 		当前最严格的限制：
 			1，很多结果仍是 projection-level evidence，不等于因果修复。
 			2，单点 residual patch 往往失败，说明状态不是可简单加法移植对象。
 			3，候选 embedding 不正交，common/specific 分解会泄漏。
 			4，样本簇差异很大，均值强不代表所有样本都正向。
 			5，三模型编码策略差异极大，不能把 Qwen3、GLM4、DS7B 的某个现象轻易提升为通用理论。
+			6，当前最强链条主要来自小模型，尤其 DS7B；小模型内部结构可能存在偏差，不能直接等同于大模型或人脑机制。
+			7，Phase 707 仍是 teacher-forced phrase scoring，不是自然生成闭环；必须用 patched natural generation 验证。
 
 
 
@@ -345,6 +386,129 @@
 				候选词语义特异性会强烈影响测量；
 				非对称反转不能简单由 W_U 范数解释，根源更可能在内部对象锚定深度。
 
+		源词元贡献和通道集合公式：
+			Phase 699-707 后，需要把注意力头和通道贡献分开写。对第 l 层、第 h 个注意力头、第 c 个输出通道，源词元集合 g 对 answer-start 的贡献可以近似写成：
+
+				C_g(l,h,c | x)
+					=
+					Σ_{t∈g}
+						α_{l,h}(answer_start,t | x)
+						· V_{l,h,c}(t | x)
+
+			其中：
+				α 是 answer-start 对源词元 t 的注意力权重；
+				V 是该源词元在对应 head/channel 上写入的 value contribution；
+				g 可以是 target_value、answer_line、self_last、all_source 等源词元组。
+
+			如果要找“促进短值答案而不是解释性 prose 的通道”，可以定义差分贡献：
+
+				D(l,h,c)
+					=
+					[
+						C_{combo}^{terse}(l,h,c)
+						-
+						C_{combo}^{short}(l,h,c)
+					]
+					·
+					⟨ W_O(l,h,c), d_{value-prose} ⟩
+
+			正向源限制通道集合为：
+
+				U_{source}^{+}
+					=
+					{
+						(l,h,c)
+						|
+						D(l,h,c) > 0
+						且通过 random / holdout / degradation 对照
+					}
+
+			当前最谨慎的解释是：
+
+				U_{source}^{+}
+					≈
+					G_route
+					+
+					P_format
+					+
+					E_target_context
+					+
+					V_identity_local
+
+			其中 V_identity_local 目前还没有被单独剥离出来。
+
+		完整短语似然公式：
+			只看第一个 token 容易被 first-token overlap 误导，所以 Phase 707 使用完整短语似然：
+
+				L(y | x, P)
+					=
+					1
+					/
+					m
+					·
+					Σ_{i=1}^{m}
+						log p(
+							y_i
+							|
+							x,
+							y_{<i},
+							P_{answer_start}
+						)
+
+			其中：
+				y 是 target phrase、donor phrase 或 prose phrase；
+				P 是 patch 方案；
+				m 是短语长度；
+				使用 mean logprob 是为了降低长短短语造成的不公平。
+
+			短语竞争 winner 为：
+
+				winner
+					=
+					argmax
+					{
+						L(y_target | x,P),
+						L(y_donor | x,P),
+						L(y_prose | x,P)
+					}
+
+		完整数学例子：
+			假设目标问题是：
+				对象 o = cerulean_fox；
+				关系 r = color；
+				目标值 v_target = blue；
+				无关 donor 值 v_donor = market；
+				模型需要短答而不是解释。
+
+			在 answer-start patch 后，对三个候选短语做 teacher-forced scoring，假设得到 Phase 707 中 DS7B unrelated restore source_top_channel_512 的平均型结果：
+
+				L(y_target | x,P) = -2.500
+				L(y_donor | x,P) = -6.262
+				L(y_prose | x,P) = -0.559
+
+			则：
+
+				L(y_target | x,P)
+				-
+				L(y_donor | x,P)
+				=
+				3.762
+
+			说明 donor value phrase 没有被注入，target phrase 明显强于 donor phrase。
+
+			但同时：
+
+				L(y_target | x,P)
+				-
+				L(y_prose | x,P)
+				=
+				-1.941
+
+			说明解释性 prose 仍强于短值答案。这个例子直接说明：
+				当前 patch 更像增强了 target route / value route 的部分成分；
+				但没有完全关闭 prose generation gate；
+				也没有证明 donor identity 可以通过 source channel ensemble 被完整迁移。
+
 		因果证据等级：
 			Level 1：相关/距离/聚类证据。
 			Level 2：projection node，能读出目标方向或候选排序。
@@ -357,7 +521,9 @@
 				Phase 592 找到的是 Level 2 projection nodes；
 				Phase 593 未能升级为 Level 5；
 				Phase 594 把方向推进到 Level 3 transition evidence；
-				下一步必须寻找 Level 4 component causal node。
+				Phase 703 的 holdout 结果给出了 DS7B source-restricted channel ensemble 的 Level 4 component causal evidence；
+				Phase 707 给出了完整短语似然层面的读出审计，但仍不是 Level 6 generation closure；
+				下一步必须验证 patched natural generation 是否能稳定改变真实输出。
 
 
 
@@ -467,8 +633,95 @@
 			核心成果：
 				最新理论从“静态方向 patch”升级为“条件化状态变换图谱”：正确值排序更像某些层/位置/组件根据上下文生成的 update，而不是可直接移植的向量。
 
+		阶段十：读出位置纠错、源贡献通道图谱与短语竞争闭环（Phase 595-707）
+			核心任务：
+				把 value gate 修复失败的问题继续拆开，依次定位：
+					answer-start 读出位置；
+					target_value / answer_line / self_last 等源词元贡献；
+					L23-L27 附近 attention heads；
+					source-restricted positive channels；
+					完整 value phrase / donor phrase / prose phrase 竞争。
+			重要进展：
+				1，Phase 604-620 纠正了 prompt_last 与 answer_last 混用的问题，确认正确值读出更接近 answer-start / answer-side path。
+				2，Phase 623-631 说明 result-only、format/protocol、short-answer scaffold 等路线状态可以显著改变 value/prose 竞争，但不能直接等同于语义身份代码。
+				3，Phase 636-649 将 DS7B 的 token0 prefix / format protocol / value_short_answer 路线定位到更清晰的协议轨迹。
+				4，Phase 650-668 把复用机制推进到语言框架差分层面，说明同一套参数可以在不同格式、不同概念、不同答案路线之间复用，但复用依赖上下文协议。
+				5，Phase 669-681 把局部机制整理成 graph atlas，并开始用因果图谱而不是单点 patch 解释语言编码。
+				6，Phase 698-704 从 head 统计推进到 source contribution 与 channel ensemble，Phase 703 的 holdout 结果说明 source-restricted positive channels 具有跨样本稳定的 route/readout 因果作用。
+				7，Phase 705-707 修正 first-token overlap 问题，用完整短语似然证明 unrelated donor 通常不会成为 donor phrase winner；但 prose phrase 经常获胜。
+			核心成果：
+				当前最可靠的新公式是：
+					source_channel_ensemble = G_route + P_format + E_target_context + V_identity_local。
+				其中 G_route 和 P_format 证据较强，E_target_context 证据增强，V_identity_local 尚未被最小因果定位。
+				这说明已经找到“路线/读出底座”的关键因果结构，但还没有找到完整可迁移的语义身份代码。
+
 		总阶段性结论：
 			目前最可靠的完整理论体系是：
-				语言智能 = 相对编码网络 + 对象知识锚定 + 关系/规则检索 + 条件化状态变换 + 候选竞争 + 范数/格式/策略读出门。
+				语言智能 = 相对编码网络 + 对象知识锚定 + 关系/规则检索 + 条件化状态变换 + 源贡献路线增益 + 候选短语竞争 + 范数/格式/策略/生成读出门。
 			最关键的新瓶颈是：
-				从 Level 3 transition evidence 推进到 Level 4 component causal node，并最终达到 Level 6 generation closure。
+				从已经出现的 Level 4 source-channel component causal evidence，推进到自然生成闭环 Level 6，并进一步把 channel ensemble 拆到 neuron / MLP / residual trajectory 级别。
+
+
+七，当前整体进展和下一步
+		当前理论整体进展：
+			如果把“机制闭合度”而不是“AGI 完成度”作为评估标准，当前语言编码机制大约处于 60% 到 65%。
+			原因是：
+				1，已经从静态语义方向推进到条件化残差轨迹；
+				2，已经找到部分 component-level 因果结构；
+				3，已经明确语义状态、格式协议、读出路线、自然生成门不是同一个东西；
+				4，但还没有完成自然生成闭环；
+				5，还没有把通道级机制稳定拆到神经元/MLP 级；
+				6，跨模型结果仍受小模型结构偏差和样本规模限制。
+
+		语言编码机制的当前版本：
+			语言不是把“概念向量”直接投影成词，而是在每个自回归位置形成一个条件化状态：
+				对象身份被局部上下文锚定；
+				关系和规则决定查询路线；
+				格式协议决定答案形态；
+				源词元贡献提供路线增益；
+				候选短语在读出端竞争；
+				生成门决定最终是短值、解释、续写还是失败。
+
+		智能理论的当前版本：
+			智能不是单纯存储知识，而是一个可复用差分系统。
+			同一批参数可以在不同任务中承担不同功能，关键在于：
+				1，上下文如何激活路线；
+				2，差分状态如何选择候选；
+				3，读出门如何把内部状态变成外部语言；
+				4，反馈如何让系统更新关系图谱。
+
+		对应数学体系的当前版本：
+			最小闭环应包含四类方程：
+				1，状态分解方程：h_l(p) = I + R + F + C + O + S + K + B + Q + N + ε。
+				2，层间变换方程：h_{l+1}=h_l+A_l+M_l。
+				3，源贡献方程：C_g=Σ attention·value。
+				4，短语竞争方程：winner=argmax{L_target,L_donor,L_prose}。
+
+			当前最重要的数学问题不是再找一个更漂亮的向量，而是找出：
+				哪些维度负责身份；
+				哪些维度负责路线；
+				哪些维度负责格式；
+				哪些维度只是在读出端放大或抑制；
+				这些维度如何在层间被 attention / MLP 重新组合。
+
+		接下来应该做的阶段性大任务：
+			Phase 709 应该进入 patched natural generation identity closure audit。
+			核心目标不是继续看 teacher-forced likelihood，而是在 patch 后直接生成短输出，并分类为：
+				target value；
+				donor value；
+				prose explanation；
+				continuation failure；
+				other。
+
+			关键判据：
+				如果 patch 后自然生成稳定转向 target value，说明当前 route/readout substrate 已经能闭合到真实生成。
+				如果仍主要生成 prose，说明缺口在 generation gate。
+				如果 donor value 大量出现，才说明 source channel ensemble 可能携带可迁移 donor identity。
+				如果三者都不稳定，说明小模型路线受 prompt/protocol 偏置太强，需要扩大样本和模型对照。
+
+			再下一步的大方向：
+				1，把 source channel ensemble 拆到 neuron / MLP / residual trajectory 级别。
+				2，建立跨模型的 graph atlas，不再只追单点机制。
+				3，把知识网络、推理能力、语法系统分别映射为可测试的对象-关系-路线-读出图谱。
+				4，在更大样本和更稳定模型上验证小模型发现是否只是结构偏差。
+				5，把当前语言机制公式扩展为可学习、可编辑、可反馈更新的智能理论。
