@@ -1,0 +1,3726 @@
+{
+  "phase": 659,
+  "model": "qwen3",
+  "timestamp": "2026-06-26 07:42:40",
+  "n_layers": 36,
+  "combo_specs": [
+    {
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "phase658_delta_exact": 14,
+      "phase658_delta_tok0": 15,
+      "phase658_rank_improvement": 2.1
+    },
+    {
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "phase658_delta_exact": 11,
+      "phase658_delta_tok0": 11,
+      "phase658_rank_improvement": 3.0000000000000004
+    }
+  ],
+  "tasks": [
+    "explanation_required",
+    "yes_no_required"
+  ],
+  "top_k": 20,
+  "n_raw_cases": 12,
+  "n_selected_items": 1,
+  "n_mode_rows": 6,
+  "max_cases": 1,
+  "selection_stats": {
+    "mode_v_correct_seen": 1,
+    "repair_correct_seen": 1,
+    "target_failure_seen": 0,
+    "fallback_used": 0,
+    "scanned": 1
+  },
+  "filtered": {
+    "position_missing": 0,
+    "position_len_mismatch": 0,
+    "empty_patch": 0
+  },
+  "summary": {
+    "by_mode": [
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "mode": "baseline_task",
+        "components": [
+          {
+            "layer": 16,
+            "component": "attn_out",
+            "phase656_dtop": 1.4375,
+            "phase657_delta_exact": 8,
+            "phase657_delta_tok0": 9,
+            "phase657_rank_improvement": 1.7000000000000002
+          },
+          {
+            "layer": 20,
+            "component": "attn_out",
+            "phase656_dtop": 1.53125,
+            "phase657_delta_exact": 1,
+            "phase657_delta_tok0": 2,
+            "phase657_rank_improvement": 0.9500000000000002
+          }
+        ],
+        "n": 1,
+        "sum_rank": 2.0,
+        "sum_gap": 0.75,
+        "top1_category": {
+          "word": 1
+        },
+        "top1_text": {
+          " The": 1
+        },
+        "correct_top1": 0,
+        "mean_rank": 2.0,
+        "mean_top1_gap": 0.75,
+        "correct_top1_rate": 0.0
+      },
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "mode": "combo_ablation",
+        "components": [
+          {
+            "layer": 16,
+            "component": "attn_out",
+            "phase656_dtop": 1.4375,
+            "phase657_delta_exact": 8,
+            "phase657_delta_tok0": 9,
+            "phase657_rank_improvement": 1.7000000000000002
+          },
+          {
+            "layer": 20,
+            "component": "attn_out",
+            "phase656_dtop": 1.53125,
+            "phase657_delta_exact": 1,
+            "phase657_delta_tok0": 2,
+            "phase657_rank_improvement": 0.9500000000000002
+          }
+        ],
+        "n": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "top1_text": {
+          " v": 1
+        },
+        "correct_top1": 1,
+        "mean_rank": 1.0,
+        "mean_top1_gap": 0.0,
+        "correct_top1_rate": 1.0
+      },
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "mode": "site_restore",
+        "components": [
+          {
+            "layer": 16,
+            "component": "attn_out",
+            "phase656_dtop": 1.4375,
+            "phase657_delta_exact": 8,
+            "phase657_delta_tok0": 9,
+            "phase657_rank_improvement": 1.7000000000000002
+          },
+          {
+            "layer": 20,
+            "component": "attn_out",
+            "phase656_dtop": 1.53125,
+            "phase657_delta_exact": 1,
+            "phase657_delta_tok0": 2,
+            "phase657_rank_improvement": 0.9500000000000002
+          }
+        ],
+        "n": 1,
+        "sum_rank": 3.0,
+        "sum_gap": 1.5,
+        "top1_category": {
+          "word": 1
+        },
+        "top1_text": {
+          " The": 1
+        },
+        "correct_top1": 0,
+        "mean_rank": 3.0,
+        "mean_top1_gap": 1.5,
+        "correct_top1_rate": 0.0
+      },
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "mode": "baseline_task",
+        "components": [
+          {
+            "layer": 18,
+            "component": "attn_out",
+            "phase656_dtop": 1.5,
+            "phase657_delta_exact": 5,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 2.0000000000000004
+          },
+          {
+            "layer": 21,
+            "component": "mlp_out",
+            "phase656_dtop": 1.8916666666666666,
+            "phase657_delta_exact": 4,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 1.8500000000000005
+          }
+        ],
+        "n": 1,
+        "sum_rank": 3.0,
+        "sum_gap": 1.0,
+        "top1_category": {
+          "explanation": 1
+        },
+        "top1_text": {
+          " Yes": 1
+        },
+        "correct_top1": 0,
+        "mean_rank": 3.0,
+        "mean_top1_gap": 1.0,
+        "correct_top1_rate": 0.0
+      },
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "mode": "combo_ablation",
+        "components": [
+          {
+            "layer": 18,
+            "component": "attn_out",
+            "phase656_dtop": 1.5,
+            "phase657_delta_exact": 5,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 2.0000000000000004
+          },
+          {
+            "layer": 21,
+            "component": "mlp_out",
+            "phase656_dtop": 1.8916666666666666,
+            "phase657_delta_exact": 4,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 1.8500000000000005
+          }
+        ],
+        "n": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "top1_text": {
+          " v": 1
+        },
+        "correct_top1": 1,
+        "mean_rank": 1.0,
+        "mean_top1_gap": 0.0,
+        "correct_top1_rate": 1.0
+      },
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "mode": "site_restore",
+        "components": [
+          {
+            "layer": 18,
+            "component": "attn_out",
+            "phase656_dtop": 1.5,
+            "phase657_delta_exact": 5,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 2.0000000000000004
+          },
+          {
+            "layer": 21,
+            "component": "mlp_out",
+            "phase656_dtop": 1.8916666666666666,
+            "phase657_delta_exact": 4,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 1.8500000000000005
+          }
+        ],
+        "n": 1,
+        "sum_rank": 3.0,
+        "sum_gap": 3.25,
+        "top1_category": {
+          "space": 1
+        },
+        "top1_text": {
+          " ": 1
+        },
+        "correct_top1": 0,
+        "mean_rank": 3.0,
+        "mean_top1_gap": 3.25,
+        "correct_top1_rate": 0.0
+      }
+    ],
+    "barrier_effects": [
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "components": [
+          {
+            "layer": 18,
+            "component": "attn_out",
+            "phase656_dtop": 1.5,
+            "phase657_delta_exact": 5,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 2.0000000000000004
+          },
+          {
+            "layer": 21,
+            "component": "mlp_out",
+            "phase656_dtop": 1.8916666666666666,
+            "phase657_delta_exact": 4,
+            "phase657_delta_tok0": 5,
+            "phase657_rank_improvement": 1.8500000000000005
+          }
+        ],
+        "n": 1,
+        "site_rank": 3.0,
+        "combo_rank": 1.0,
+        "rank_improvement": 2.0,
+        "site_gap": 3.25,
+        "combo_gap": 0.0,
+        "gap_reduction": 3.25,
+        "site_correct_top1": 0,
+        "combo_correct_top1": 1,
+        "delta_correct_top1": 1,
+        "site_top1_category": {
+          "space": 1
+        },
+        "combo_top1_category": {
+          "correct_prefix": 1
+        },
+        "combo_top1_text": {
+          " v": 1
+        }
+      },
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "components": [
+          {
+            "layer": 16,
+            "component": "attn_out",
+            "phase656_dtop": 1.4375,
+            "phase657_delta_exact": 8,
+            "phase657_delta_tok0": 9,
+            "phase657_rank_improvement": 1.7000000000000002
+          },
+          {
+            "layer": 20,
+            "component": "attn_out",
+            "phase656_dtop": 1.53125,
+            "phase657_delta_exact": 1,
+            "phase657_delta_tok0": 2,
+            "phase657_rank_improvement": 0.9500000000000002
+          }
+        ],
+        "n": 1,
+        "site_rank": 3.0,
+        "combo_rank": 1.0,
+        "rank_improvement": 2.0,
+        "site_gap": 1.5,
+        "combo_gap": 0.0,
+        "gap_reduction": 1.5,
+        "site_correct_top1": 0,
+        "combo_correct_top1": 1,
+        "delta_correct_top1": 1,
+        "site_top1_category": {
+          "word": 1
+        },
+        "combo_top1_category": {
+          "correct_prefix": 1
+        },
+        "combo_top1_text": {
+          " v": 1
+        }
+      }
+    ]
+  },
+  "examples": [
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "baseline_task",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 2,
+      "top0_id": 576,
+      "top0_text": " The",
+      "top0_text_clean": " The",
+      "top0_category": "explanation",
+      "prefix_logit": 23.25,
+      "prefix_margin_vs_top": -0.75,
+      "prefix_minus_newline": 1.875,
+      "top": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 24.0,
+          "prefix_minus_token": -0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 23.25,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.0,
+          "prefix_minus_token": 1.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 297,
+          "text": " o",
+          "text_clean": " o",
+          "category": "word",
+          "logit": 21.375,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.375,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 21.125,
+          "prefix_minus_token": 2.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 272,
+          "text": " c",
+          "text_clean": " c",
+          "category": "word",
+          "logit": 21.0,
+          "prefix_minus_token": 2.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "text_clean": " According",
+          "category": "word",
+          "logit": 20.0,
+          "prefix_minus_token": 3.25,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 4,
+          "max_logit": 24.0,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 1,
+          "prefix_minus_group_max": -0.75,
+          "max_token_text_clean": " The"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 23.25,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 2,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.0,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 3,
+          "prefix_minus_group_max": 1.25,
+          "max_token_text_clean": " "
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 21.375,
+          "max_token_id": 297,
+          "max_token_text": " o",
+          "best_rank": 4,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " o"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.375,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 5,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 13,
+          "prefix_minus_group_max": 4.0,
+          "max_token_text_clean": " ?"
+        }
+      },
+      "policy_margins": {
+        "space": 1.25,
+        "newline": 1.875,
+        "explanation": -0.75,
+        "word": 1.875,
+        "punctuation": 4.0,
+        "symbol": null
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 24.0
+        },
+        {
+          "rank": 2,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.25
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.0
+        },
+        {
+          "rank": 4,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.375
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 21.125
+        },
+        {
+          "rank": 7,
+          "id": 272,
+          "text": " c",
+          "category": "word",
+          "logit": 21.0
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "category": "word",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.75
+        }
+      ],
+      "correct_logit": 23.25,
+      "top1_gap": 0.75
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "site_restore",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 576,
+      "top0_text": " The",
+      "top0_text_clean": " The",
+      "top0_category": "explanation",
+      "prefix_logit": 21.5,
+      "prefix_margin_vs_top": -1.5,
+      "prefix_minus_newline": 0.125,
+      "top": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 23.0,
+          "prefix_minus_token": -1.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.75,
+          "prefix_minus_token": -1.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 21.5,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.375,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 21.375,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 1.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 19.875,
+          "prefix_minus_token": 1.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "text_clean": " According",
+          "category": "word",
+          "logit": 19.625,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 3,
+          "max_logit": 23.0,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 1,
+          "prefix_minus_group_max": -1.5,
+          "max_token_text_clean": " The"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.75,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 2,
+          "prefix_minus_group_max": -1.25,
+          "max_token_text_clean": " "
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 21.5,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.375,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.125,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 19.625,
+          "max_token_id": 10548,
+          "max_token_text": " According",
+          "best_rank": 8,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " According"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 12,
+          "prefix_minus_group_max": 2.25,
+          "max_token_text_clean": " ?"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 18.0,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 20,
+          "prefix_minus_group_max": 3.5,
+          "max_token_text_clean": " \\"
+        }
+      },
+      "policy_margins": {
+        "space": -1.25,
+        "newline": 0.125,
+        "explanation": -1.5,
+        "word": 1.875,
+        "punctuation": 2.25,
+        "symbol": 3.5
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 23.0
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.75
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 21.5
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.375
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 7,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 9,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 10,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.5
+        }
+      ],
+      "correct_logit": 21.5,
+      "top1_gap": 1.5
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "combo_ablation",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 1,
+      "top0_id": 348,
+      "top0_text": " v",
+      "top0_text_clean": " v",
+      "top0_category": "correct_prefix",
+      "prefix_logit": 23.125,
+      "prefix_margin_vs_top": 0.0,
+      "prefix_minus_newline": 2.375,
+      "top": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 23.125,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 21.375,
+          "prefix_minus_token": 1.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 21.125,
+          "prefix_minus_token": 2.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 20.75,
+          "prefix_minus_token": 2.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 20.75,
+          "prefix_minus_token": 2.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 297,
+          "text": " o",
+          "text_clean": " o",
+          "category": "word",
+          "logit": 20.375,
+          "prefix_minus_token": 2.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.125,
+          "prefix_minus_token": 3.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 3.125,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 23.125,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 1,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 3,
+          "max_logit": 21.375,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 2,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " The"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 21.125,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 3,
+          "prefix_minus_group_max": 2.0,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 20.75,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 5,
+          "prefix_minus_group_max": 2.375,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 20.375,
+          "max_token_id": 297,
+          "max_token_text": " o",
+          "best_rank": 6,
+          "prefix_minus_group_max": 2.75,
+          "max_token_text_clean": " o"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 10,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " ?"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 17.5,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 20,
+          "prefix_minus_group_max": 5.625,
+          "max_token_text_clean": " \\"
+        }
+      },
+      "policy_margins": {
+        "space": 2.0,
+        "newline": 2.375,
+        "explanation": 1.75,
+        "word": 2.75,
+        "punctuation": 3.875,
+        "symbol": 5.625
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 21.125
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 20.75
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 20.75
+        },
+        {
+          "rank": 6,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 20.375
+        },
+        {
+          "rank": 7,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.125
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 272,
+          "text": " c",
+          "category": "word",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 20205,
+          "text": " Based",
+          "category": "word",
+          "logit": 19.25
+        }
+      ],
+      "correct_logit": 23.125,
+      "top1_gap": 0.0
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "baseline_task",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 7414,
+      "top0_text": " Yes",
+      "top0_text_clean": " Yes",
+      "top0_category": "explanation",
+      "prefix_logit": 20.75,
+      "prefix_margin_vs_top": -1.0,
+      "prefix_minus_newline": 0.5,
+      "top": [
+        {
+          "rank": 1,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 21.75,
+          "prefix_minus_token": -1.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 21.125,
+          "prefix_minus_token": -0.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 20.75,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 20.5,
+          "prefix_minus_token": 0.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 9834,
+          "text": " yes",
+          "text_clean": " yes",
+          "category": "explanation",
+          "logit": 20.375,
+          "prefix_minus_token": 0.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.25,
+          "prefix_minus_token": 0.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 20.125,
+          "prefix_minus_token": 0.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 0.75,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 8,
+          "max_logit": 21.75,
+          "max_token_id": 7414,
+          "max_token_text": " Yes",
+          "best_rank": 1,
+          "prefix_minus_group_max": -1.0,
+          "max_token_text_clean": " Yes"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 20.75,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 20.5,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.25,
+          "max_token_text_clean": " \\"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 20.25,
+          "max_token_id": 23754,
+          "max_token_text": " ?\n\n",
+          "best_rank": 6,
+          "prefix_minus_group_max": 0.5,
+          "max_token_text_clean": " ?\\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 4,
+          "max_logit": 19.125,
+          "max_token_id": 3555,
+          "max_token_text": " What",
+          "best_rank": 11,
+          "prefix_minus_group_max": 1.625,
+          "max_token_text_clean": " What"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.0,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 12,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " ?"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 19.0,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 13,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " "
+        }
+      },
+      "policy_margins": {
+        "space": 1.75,
+        "newline": 0.5,
+        "explanation": -1.0,
+        "word": 1.625,
+        "punctuation": 1.75,
+        "symbol": 0.25
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 21.75
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 21.125
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 20.75
+        },
+        {
+          "rank": 4,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 20.5
+        },
+        {
+          "rank": 5,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 20.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.25
+        },
+        {
+          "rank": 7,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 20.125
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 19.375
+        }
+      ],
+      "correct_logit": 20.75,
+      "top1_gap": 1.0
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "site_restore",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 220,
+      "top0_text": " ",
+      "top0_text_clean": " ",
+      "top0_category": "space",
+      "prefix_logit": 20.875,
+      "prefix_margin_vs_top": -3.25,
+      "prefix_minus_newline": -0.75,
+      "top": [
+        {
+          "rank": 1,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 24.125,
+          "prefix_minus_token": -3.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.625,
+          "prefix_minus_token": -0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 20.875,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 20.75,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 20.25,
+          "prefix_minus_token": 0.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 20.125,
+          "prefix_minus_token": 0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 19.875,
+          "prefix_minus_token": 1.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 9834,
+          "text": " yes",
+          "text_clean": " yes",
+          "category": "explanation",
+          "logit": 19.375,
+          "prefix_minus_token": 1.5,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 24.125,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 1,
+          "prefix_minus_group_max": -3.25,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.625,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 2,
+          "prefix_minus_group_max": -0.75,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 20.875,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 6,
+          "max_logit": 20.75,
+          "max_token_id": 7414,
+          "max_token_text": " Yes",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.125,
+          "max_token_text_clean": " Yes"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 19.875,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 7,
+          "prefix_minus_group_max": 1.0,
+          "max_token_text_clean": " \\"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 6,
+          "max_logit": 18.125,
+          "max_token_id": 10548,
+          "max_token_text": " According",
+          "best_rank": 13,
+          "prefix_minus_group_max": 2.75,
+          "max_token_text_clean": " According"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 17.75,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 15,
+          "prefix_minus_group_max": 3.125,
+          "max_token_text_clean": " ?"
+        }
+      },
+      "policy_margins": {
+        "space": -3.25,
+        "newline": -0.75,
+        "explanation": 0.125,
+        "word": 2.75,
+        "punctuation": 3.125,
+        "symbol": 1.0
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 24.125
+        },
+        {
+          "rank": 2,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.625
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 20.875
+        },
+        {
+          "rank": 4,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 20.75
+        },
+        {
+          "rank": 5,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 20.25
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 20.125
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 19.375
+        },
+        {
+          "rank": 9,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.125
+        },
+        {
+          "rank": 10,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 19.0
+        }
+      ],
+      "correct_logit": 20.875,
+      "top1_gap": 3.25
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "combo_ablation",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 1,
+      "top0_id": 348,
+      "top0_text": " v",
+      "top0_text_clean": " v",
+      "top0_category": "correct_prefix",
+      "prefix_logit": 22.5,
+      "prefix_margin_vs_top": 0.0,
+      "prefix_minus_newline": 0.875,
+      "top": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 22.5,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.25,
+          "prefix_minus_token": 0.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.625,
+          "prefix_minus_token": 0.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 20.5,
+          "prefix_minus_token": 2.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 20.375,
+          "prefix_minus_token": 2.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 2.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 19.875,
+          "prefix_minus_token": 2.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 19.625,
+          "prefix_minus_token": 2.875,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 22.5,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 1,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.25,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 2,
+          "prefix_minus_group_max": 0.25,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.625,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.875,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 6,
+          "max_logit": 20.5,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 4,
+          "prefix_minus_group_max": 2.0,
+          "max_token_text_clean": " The"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 19.875,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 7,
+          "prefix_minus_group_max": 2.625,
+          "max_token_text_clean": " \\"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 2,
+          "max_logit": 18.625,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 13,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " ?"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 5,
+          "max_logit": 18.625,
+          "max_token_id": 3555,
+          "max_token_text": " What",
+          "best_rank": 14,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " What"
+        }
+      },
+      "policy_margins": {
+        "space": 0.25,
+        "newline": 0.875,
+        "explanation": 2.0,
+        "word": 3.875,
+        "punctuation": 3.875,
+        "symbol": 2.625
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 22.5
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.25
+        },
+        {
+          "rank": 3,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.625
+        },
+        {
+          "rank": 4,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 20.5
+        },
+        {
+          "rank": 5,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 20.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 9,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.375
+        },
+        {
+          "rank": 10,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 19.25
+        }
+      ],
+      "correct_logit": 22.5,
+      "top1_gap": 0.0
+    }
+  ],
+  "rows": [
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "baseline_task",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 2,
+      "top0_id": 576,
+      "top0_text": " The",
+      "top0_text_clean": " The",
+      "top0_category": "explanation",
+      "prefix_logit": 23.25,
+      "prefix_margin_vs_top": -0.75,
+      "prefix_minus_newline": 1.875,
+      "top": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 24.0,
+          "prefix_minus_token": -0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 23.25,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.0,
+          "prefix_minus_token": 1.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 297,
+          "text": " o",
+          "text_clean": " o",
+          "category": "word",
+          "logit": 21.375,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.375,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 21.125,
+          "prefix_minus_token": 2.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 272,
+          "text": " c",
+          "text_clean": " c",
+          "category": "word",
+          "logit": 21.0,
+          "prefix_minus_token": 2.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "text_clean": " According",
+          "category": "word",
+          "logit": 20.0,
+          "prefix_minus_token": 3.25,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 4,
+          "max_logit": 24.0,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 1,
+          "prefix_minus_group_max": -0.75,
+          "max_token_text_clean": " The"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 23.25,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 2,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.0,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 3,
+          "prefix_minus_group_max": 1.25,
+          "max_token_text_clean": " "
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 21.375,
+          "max_token_id": 297,
+          "max_token_text": " o",
+          "best_rank": 4,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " o"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.375,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 5,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 13,
+          "prefix_minus_group_max": 4.0,
+          "max_token_text_clean": " ?"
+        }
+      },
+      "policy_margins": {
+        "space": 1.25,
+        "newline": 1.875,
+        "explanation": -0.75,
+        "word": 1.875,
+        "punctuation": 4.0,
+        "symbol": null
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 24.0
+        },
+        {
+          "rank": 2,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.25
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.0
+        },
+        {
+          "rank": 4,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.375
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 21.125
+        },
+        {
+          "rank": 7,
+          "id": 272,
+          "text": " c",
+          "category": "word",
+          "logit": 21.0
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "category": "word",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.75
+        }
+      ],
+      "correct_logit": 23.25,
+      "top1_gap": 0.75
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "site_restore",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 576,
+      "top0_text": " The",
+      "top0_text_clean": " The",
+      "top0_category": "explanation",
+      "prefix_logit": 21.5,
+      "prefix_margin_vs_top": -1.5,
+      "prefix_minus_newline": 0.125,
+      "top": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 23.0,
+          "prefix_minus_token": -1.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.75,
+          "prefix_minus_token": -1.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 21.5,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.375,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 21.375,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 1.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 19.875,
+          "prefix_minus_token": 1.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "text_clean": " According",
+          "category": "word",
+          "logit": 19.625,
+          "prefix_minus_token": 1.875,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 3,
+          "max_logit": 23.0,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 1,
+          "prefix_minus_group_max": -1.5,
+          "max_token_text_clean": " The"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.75,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 2,
+          "prefix_minus_group_max": -1.25,
+          "max_token_text_clean": " "
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 21.5,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.375,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.125,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 19.625,
+          "max_token_id": 10548,
+          "max_token_text": " According",
+          "best_rank": 8,
+          "prefix_minus_group_max": 1.875,
+          "max_token_text_clean": " According"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 12,
+          "prefix_minus_group_max": 2.25,
+          "max_token_text_clean": " ?"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 18.0,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 20,
+          "prefix_minus_group_max": 3.5,
+          "max_token_text_clean": " \\"
+        }
+      },
+      "policy_margins": {
+        "space": -1.25,
+        "newline": 0.125,
+        "explanation": -1.5,
+        "word": 1.875,
+        "punctuation": 2.25,
+        "symbol": 3.5
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 23.0
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.75
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 21.5
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.375
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 7,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 10548,
+          "text": " According",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 9,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 10,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.5
+        }
+      ],
+      "correct_logit": 21.5,
+      "top1_gap": 1.5
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "mode": "combo_ablation",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 1,
+      "top0_id": 348,
+      "top0_text": " v",
+      "top0_text_clean": " v",
+      "top0_category": "correct_prefix",
+      "prefix_logit": 23.125,
+      "prefix_margin_vs_top": 0.0,
+      "prefix_minus_newline": 2.375,
+      "top": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 23.125,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 21.375,
+          "prefix_minus_token": 1.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 21.125,
+          "prefix_minus_token": 2.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 20.75,
+          "prefix_minus_token": 2.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 20.75,
+          "prefix_minus_token": 2.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 297,
+          "text": " o",
+          "text_clean": " o",
+          "category": "word",
+          "logit": 20.375,
+          "prefix_minus_token": 2.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.125,
+          "prefix_minus_token": 3.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 3.125,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 23.125,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 1,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 3,
+          "max_logit": 21.375,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 2,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " The"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 21.125,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 3,
+          "prefix_minus_group_max": 2.0,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 20.75,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 5,
+          "prefix_minus_group_max": 2.375,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 9,
+          "max_logit": 20.375,
+          "max_token_id": 297,
+          "max_token_text": " o",
+          "best_rank": 6,
+          "prefix_minus_group_max": 2.75,
+          "max_token_text_clean": " o"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.25,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 10,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " ?"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 17.5,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 20,
+          "prefix_minus_group_max": 5.625,
+          "max_token_text_clean": " \\"
+        }
+      },
+      "policy_margins": {
+        "space": 2.0,
+        "newline": 2.375,
+        "explanation": 1.75,
+        "word": 2.75,
+        "punctuation": 3.875,
+        "symbol": 5.625
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 21.375
+        },
+        {
+          "rank": 3,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 21.125
+        },
+        {
+          "rank": 4,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 20.75
+        },
+        {
+          "rank": 5,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 20.75
+        },
+        {
+          "rank": 6,
+          "id": 297,
+          "text": " o",
+          "category": "word",
+          "logit": 20.375
+        },
+        {
+          "rank": 7,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.125
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 272,
+          "text": " c",
+          "category": "word",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 20205,
+          "text": " Based",
+          "category": "word",
+          "logit": 19.25
+        }
+      ],
+      "correct_logit": 23.125,
+      "top1_gap": 0.0
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "baseline_task",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 7414,
+      "top0_text": " Yes",
+      "top0_text_clean": " Yes",
+      "top0_category": "explanation",
+      "prefix_logit": 20.75,
+      "prefix_margin_vs_top": -1.0,
+      "prefix_minus_newline": 0.5,
+      "top": [
+        {
+          "rank": 1,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 21.75,
+          "prefix_minus_token": -1.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 21.125,
+          "prefix_minus_token": -0.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 20.75,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 20.5,
+          "prefix_minus_token": 0.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 9834,
+          "text": " yes",
+          "text_clean": " yes",
+          "category": "explanation",
+          "logit": 20.375,
+          "prefix_minus_token": 0.375,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.25,
+          "prefix_minus_token": 0.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 20.125,
+          "prefix_minus_token": 0.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "text_clean": " ?\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 0.75,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "explanation": {
+          "category": "explanation",
+          "top_count": 8,
+          "max_logit": 21.75,
+          "max_token_id": 7414,
+          "max_token_text": " Yes",
+          "best_rank": 1,
+          "prefix_minus_group_max": -1.0,
+          "max_token_text_clean": " Yes"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 20.75,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 20.5,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.25,
+          "max_token_text_clean": " \\"
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 20.25,
+          "max_token_id": 23754,
+          "max_token_text": " ?\n\n",
+          "best_rank": 6,
+          "prefix_minus_group_max": 0.5,
+          "max_token_text_clean": " ?\\n\\n"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 4,
+          "max_logit": 19.125,
+          "max_token_id": 3555,
+          "max_token_text": " What",
+          "best_rank": 11,
+          "prefix_minus_group_max": 1.625,
+          "max_token_text_clean": " What"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 19.0,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 12,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " ?"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 19.0,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 13,
+          "prefix_minus_group_max": 1.75,
+          "max_token_text_clean": " "
+        }
+      },
+      "policy_margins": {
+        "space": 1.75,
+        "newline": 0.5,
+        "explanation": -1.0,
+        "word": 1.625,
+        "punctuation": 1.75,
+        "symbol": 0.25
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 21.75
+        },
+        {
+          "rank": 2,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 21.125
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 20.75
+        },
+        {
+          "rank": 4,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 20.5
+        },
+        {
+          "rank": 5,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 20.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.25
+        },
+        {
+          "rank": 7,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 20.125
+        },
+        {
+          "rank": 8,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 9,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.875
+        },
+        {
+          "rank": 10,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 19.375
+        }
+      ],
+      "correct_logit": 20.75,
+      "top1_gap": 1.0
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "site_restore",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 3,
+      "top0_id": 220,
+      "top0_text": " ",
+      "top0_text_clean": " ",
+      "top0_category": "space",
+      "prefix_logit": 20.875,
+      "prefix_margin_vs_top": -3.25,
+      "prefix_minus_newline": -0.75,
+      "top": [
+        {
+          "rank": 1,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 24.125,
+          "prefix_minus_token": -3.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 2,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.625,
+          "prefix_minus_token": -0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 20.875,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 4,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 20.75,
+          "prefix_minus_token": 0.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 20.25,
+          "prefix_minus_token": 0.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 20.125,
+          "prefix_minus_token": 0.75,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 19.875,
+          "prefix_minus_token": 1.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 9834,
+          "text": " yes",
+          "text_clean": " yes",
+          "category": "explanation",
+          "logit": 19.375,
+          "prefix_minus_token": 1.5,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 24.125,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 1,
+          "prefix_minus_group_max": -3.25,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.625,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 2,
+          "prefix_minus_group_max": -0.75,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 20.875,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 6,
+          "max_logit": 20.75,
+          "max_token_id": 7414,
+          "max_token_text": " Yes",
+          "best_rank": 4,
+          "prefix_minus_group_max": 0.125,
+          "max_token_text_clean": " Yes"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 19.875,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 7,
+          "prefix_minus_group_max": 1.0,
+          "max_token_text_clean": " \\"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 6,
+          "max_logit": 18.125,
+          "max_token_id": 10548,
+          "max_token_text": " According",
+          "best_rank": 13,
+          "prefix_minus_group_max": 2.75,
+          "max_token_text_clean": " According"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 1,
+          "max_logit": 17.75,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 15,
+          "prefix_minus_group_max": 3.125,
+          "max_token_text_clean": " ?"
+        }
+      },
+      "policy_margins": {
+        "space": -3.25,
+        "newline": -0.75,
+        "explanation": 0.125,
+        "word": 2.75,
+        "punctuation": 3.125,
+        "symbol": 1.0
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 24.125
+        },
+        {
+          "rank": 2,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.625
+        },
+        {
+          "rank": 3,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 20.875
+        },
+        {
+          "rank": 4,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 20.75
+        },
+        {
+          "rank": 5,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 20.25
+        },
+        {
+          "rank": 6,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 20.125
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 19.375
+        },
+        {
+          "rank": 9,
+          "id": 2014,
+          "text": " To",
+          "category": "word",
+          "logit": 19.125
+        },
+        {
+          "rank": 10,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 19.0
+        }
+      ],
+      "correct_logit": 20.875,
+      "top1_gap": 3.25
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "mode": "combo_ablation",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "prefix_rank": 1,
+      "top0_id": 348,
+      "top0_text": " v",
+      "top0_text_clean": " v",
+      "top0_category": "correct_prefix",
+      "prefix_logit": 22.5,
+      "prefix_margin_vs_top": 0.0,
+      "prefix_minus_newline": 0.875,
+      "top": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "text_clean": " v",
+          "category": "correct_prefix",
+          "logit": 22.5,
+          "prefix_minus_token": 0.0,
+          "is_prefix": true
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "text_clean": " ",
+          "category": "space",
+          "logit": 22.25,
+          "prefix_minus_token": 0.25,
+          "is_prefix": false
+        },
+        {
+          "rank": 3,
+          "id": 4710,
+          "text": " \n\n",
+          "text_clean": " \\n\\n",
+          "category": "newline",
+          "logit": 21.625,
+          "prefix_minus_token": 0.875,
+          "is_prefix": false
+        },
+        {
+          "rank": 4,
+          "id": 576,
+          "text": " The",
+          "text_clean": " The",
+          "category": "explanation",
+          "logit": 20.5,
+          "prefix_minus_token": 2.0,
+          "is_prefix": false
+        },
+        {
+          "rank": 5,
+          "id": 7414,
+          "text": " Yes",
+          "text_clean": " Yes",
+          "category": "explanation",
+          "logit": 20.375,
+          "prefix_minus_token": 2.125,
+          "is_prefix": false
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "text_clean": " ?\\n\\n",
+          "category": "newline",
+          "logit": 20.0,
+          "prefix_minus_token": 2.5,
+          "is_prefix": false
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "text_clean": " \\",
+          "category": "symbol",
+          "logit": 19.875,
+          "prefix_minus_token": 2.625,
+          "is_prefix": false
+        },
+        {
+          "rank": 8,
+          "id": 6771,
+          "text": " Let",
+          "text_clean": " Let",
+          "category": "explanation",
+          "logit": 19.625,
+          "prefix_minus_token": 2.875,
+          "is_prefix": false
+        }
+      ],
+      "groups": {
+        "correct_prefix": {
+          "category": "correct_prefix",
+          "top_count": 1,
+          "max_logit": 22.5,
+          "max_token_id": 348,
+          "max_token_text": " v",
+          "best_rank": 1,
+          "prefix_minus_group_max": 0.0,
+          "max_token_text_clean": " v"
+        },
+        "space": {
+          "category": "space",
+          "top_count": 1,
+          "max_logit": 22.25,
+          "max_token_id": 220,
+          "max_token_text": " ",
+          "best_rank": 2,
+          "prefix_minus_group_max": 0.25,
+          "max_token_text_clean": " "
+        },
+        "newline": {
+          "category": "newline",
+          "top_count": 4,
+          "max_logit": 21.625,
+          "max_token_id": 4710,
+          "max_token_text": " \n\n",
+          "best_rank": 3,
+          "prefix_minus_group_max": 0.875,
+          "max_token_text_clean": " \\n\\n"
+        },
+        "explanation": {
+          "category": "explanation",
+          "top_count": 6,
+          "max_logit": 20.5,
+          "max_token_id": 576,
+          "max_token_text": " The",
+          "best_rank": 4,
+          "prefix_minus_group_max": 2.0,
+          "max_token_text_clean": " The"
+        },
+        "symbol": {
+          "category": "symbol",
+          "top_count": 1,
+          "max_logit": 19.875,
+          "max_token_id": 1124,
+          "max_token_text": " \\",
+          "best_rank": 7,
+          "prefix_minus_group_max": 2.625,
+          "max_token_text_clean": " \\"
+        },
+        "punctuation": {
+          "category": "punctuation",
+          "top_count": 2,
+          "max_logit": 18.625,
+          "max_token_id": 937,
+          "max_token_text": " ?",
+          "best_rank": 13,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " ?"
+        },
+        "word": {
+          "category": "word",
+          "top_count": 5,
+          "max_logit": 18.625,
+          "max_token_id": 3555,
+          "max_token_text": " What",
+          "best_rank": 14,
+          "prefix_minus_group_max": 3.875,
+          "max_token_text_clean": " What"
+        }
+      },
+      "policy_margins": {
+        "space": 0.25,
+        "newline": 0.875,
+        "explanation": 2.0,
+        "word": 3.875,
+        "punctuation": 3.875,
+        "symbol": 2.625
+      },
+      "top_tokens": [
+        {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 22.5
+        },
+        {
+          "rank": 2,
+          "id": 220,
+          "text": " ",
+          "category": "space",
+          "logit": 22.25
+        },
+        {
+          "rank": 3,
+          "id": 4710,
+          "text": " \n\n",
+          "category": "newline",
+          "logit": 21.625
+        },
+        {
+          "rank": 4,
+          "id": 576,
+          "text": " The",
+          "category": "word",
+          "logit": 20.5
+        },
+        {
+          "rank": 5,
+          "id": 7414,
+          "text": " Yes",
+          "category": "explanation",
+          "logit": 20.375
+        },
+        {
+          "rank": 6,
+          "id": 23754,
+          "text": " ?\n\n",
+          "category": "newline",
+          "logit": 20.0
+        },
+        {
+          "rank": 7,
+          "id": 1124,
+          "text": " \\",
+          "category": "symbol",
+          "logit": 19.875
+        },
+        {
+          "rank": 8,
+          "id": 6771,
+          "text": " Let",
+          "category": "word",
+          "logit": 19.625
+        },
+        {
+          "rank": 9,
+          "id": 17607,
+          "text": " ?\n",
+          "category": "newline",
+          "logit": 19.375
+        },
+        {
+          "rank": 10,
+          "id": 9834,
+          "text": " yes",
+          "category": "explanation",
+          "logit": 19.25
+        }
+      ],
+      "correct_logit": 22.5,
+      "top1_gap": 0.0
+    }
+  ],
+  "total_time_min": 0.06355934143066407
+}

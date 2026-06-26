@@ -87334,3 +87334,12717 @@ Protocol Field Side-Effect Boundary and Template Generalization Audit
 从 aligned protocol field with controls
 推进到 template-general and side-effect-aware protocol field atlas node。
 ```
+
+## Phase 650: Protocol Field Template and Side-Effect Audit [2026-06-26 02:29]
+
+### 任务来源
+
+用户要求分析 Phase 649 是否正确，并综合当前进展继续完成任务。Phase 649 已经证明 DS7B 中 `answer_label_aligned`、`answer_colon`、`separator` 是强 protocol field 位置，但仍有三个硬伤：
+
+```text
+1. 只在 Answer 模板附近验证，缺少模板泛化。
+2. 主要验证 target_failure，缺少 side-effect boundary。
+3. relation_tail / label / separator 的作用边界仍混在一起。
+```
+
+因此 Phase 650 直接执行：
+
+```text
+Protocol Field Template and Side-Effect Audit
+```
+
+### 生成脚本
+
+新增正式测试脚本：
+
+```bash
+tests/gpt5/phase650_protocol_field_template_side_effect_audit.py
+```
+
+新增汇总脚本：
+
+```bash
+tests/gpt5/phase650_protocol_field_template_side_effect_audit_summary.py
+```
+
+结果目录：
+
+```bash
+results/glm5_phase650_protocol_field_template_side_effect_audit/
+```
+
+跨模型汇总：
+
+```bash
+results/glm5_phase650_protocol_field_template_side_effect_audit/phase650_cross_model_summary.md
+```
+
+### 执行命令
+
+脚本编译检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase650_protocol_field_template_side_effect_audit.py \
+  tests/gpt5/phase650_protocol_field_template_side_effect_audit_summary.py
+```
+
+冒烟检查：
+
+```bash
+python tests/gpt5/phase650_protocol_field_template_side_effect_audit.py \
+  qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试按顺序执行，均带 `--hard-exit-after-model`：
+
+```bash
+python tests/gpt5/phase650_protocol_field_template_side_effect_audit.py \
+  qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase650_protocol_field_template_side_effect_audit.py \
+  glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase650_protocol_field_template_side_effect_audit.py \
+  deepseek7b --confirm --save-rows --hard-exit-after-model
+```
+
+生成汇总：
+
+```bash
+python tests/gpt5/phase650_protocol_field_template_side_effect_audit_summary.py
+```
+
+### 测试原理
+
+Phase 650 使用 Phase 649 的对齐位置规则：
+
+```text
+label_colon = token(colon - 1) + token(colon)
+label_aligned = label_colon
+separator = " ? Label:" 或 " ?\nLabel:"
+relation_tail = relation + separator
+```
+
+模板扩展为：
+
+```text
+Answer:
+Response:
+Value:
+```
+
+任务边界扩展为：
+
+```text
+target_failure
+original_correct
+relation_changed
+explanation_needed
+non_value
+```
+
+每个模型正式测试：
+
+```text
+raw_cases = 320
+selected_items = 40
+每类 split = 8
+templates = 3
+position_units = label_aligned, label_colon, separator, relation_tail
+components = layer_out, attn_out, mlp_out
+layers = L17-L20
+controls = restore, random, reverse
+directions = to_original, remove_from_inline
+mode_rows = 8880
+```
+
+这个设计的核心判断不是简单看 exact，而是比较同一 split / template 下 patch 相对 baseline 的变化：
+
+```text
+to_original:
+  与 original baseline 比较
+
+remove_from_inline:
+  与 inline baseline 比较
+```
+
+其中 `relation_changed`、`explanation_needed`、`non_value` 中的 exact 不代表正向成功，而代表旧 value token 吸附风险。
+
+### 客观结果
+
+三模型均完成正式测试：
+
+```text
+qwen3:
+  rows = 8880
+  time = 17.45 min
+  filtered = position_missing 0, position_len_mismatch 0, empty_patch 0
+
+GLM4:
+  rows = 8880
+  time = 20.07 min
+  filtered = position_missing 0, position_len_mismatch 0, empty_patch 0
+
+DS7B:
+  rows = 8880
+  time = 21.02 min
+  filtered = position_missing 0, position_len_mismatch 0, empty_patch 0
+```
+
+这说明 Phase 649 的 label alignment 规则在三种 label 模板上都能稳定形成可 patch 的位置，不再出现 Phase 648 的 tokenization alignment failure。
+
+### DS7B 关键结果
+
+DS7B 的 target_failure 中，Answer 和 Response 模板表现出强修复：
+
+```text
+target_failure / Answer:
+  label_aligned_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+    newline delta = -7
+
+  label_colon_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+    newline delta = -7
+
+  separator_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+    newline delta = -7
+
+target_failure / Response:
+  label_aligned_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+
+  label_colon_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+
+  separator_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 8/8
+```
+
+DS7B 中 MLP 也能强修复部分模板：
+
+```text
+target_failure / Answer:
+  label_aligned_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 7/8
+
+  label_colon_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 7/8
+
+target_failure / Response:
+  label_aligned_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 7/8
+
+  separator_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 7/8
+```
+
+但 Value 模板明显弱于 Answer / Response：
+
+```text
+target_failure / Value:
+  label_aligned_to_original_L17_20_attn_out_restore:
+    patch 3/8
+
+  separator_to_original_L17_20_attn_out_restore:
+    patch 3/8
+
+  relation_tail_to_original_L17_20_attn_out_restore:
+    patch 0/8
+```
+
+因此 DS7B 的协议场不是任意 label 完全等价，而是对 natural answer-like labels 更强，对 Value 这种语义更像字段名的标签较弱。
+
+### qwen3 关键结果
+
+qwen3 也出现模板泛化，但机制极性不同：
+
+```text
+target_failure / Response:
+  label_aligned_to_original_L17_20_layer_out_restore:
+    base 4/8 -> patch 8/8
+
+  label_colon_to_original_L17_20_layer_out_restore:
+    base 4/8 -> patch 8/8
+
+target_failure / Answer:
+  separator_to_original_L17_20_attn_out_restore:
+    base 4/8 -> patch 7/8
+```
+
+qwen3 中一个非常重要的现象是，remove_from_inline 方向有时反而把 inline baseline 拉成正确短答：
+
+```text
+target_failure / Answer:
+  label_aligned_remove_from_inline_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+  label_colon_remove_from_inline_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+  separator_remove_from_inline_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+```
+
+这说明 qwen3 的 original/inline 极性与 DS7B 不完全同向，不能把 DS7B 的协议轨迹方向直接移植到 qwen3。
+
+### GLM4 关键结果
+
+GLM4 的 target_failure 修复较温和，最高主要在 relation_tail / separator 的 layer_out：
+
+```text
+target_failure / Answer:
+  relation_tail_to_original_L17_20_layer_out_restore:
+    base 6/8 -> patch 7/8
+
+  separator_to_original_L17_20_layer_out_restore:
+    patch 6/8
+
+target_failure / Response:
+  relation_tail_to_original_L17_20_layer_out_restore:
+    patch 6/8
+
+target_failure / Value:
+  separator_to_original_L17_20_layer_out_restore:
+    patch 5/8
+
+  relation_tail_to_original_L17_20_layer_out_restore:
+    patch 5/8
+```
+
+GLM4 中 label_aligned / label_colon 有效果，但没有 DS7B 那样形成压倒性闭合。
+
+### 副作用边界结果
+
+Phase 650 最重要的新信息不是“修复更强”，而是发现 protocol field 会把一些非目标任务强行拉回 value short answer。
+
+DS7B 中：
+
+```text
+non_value / Answer:
+  separator_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+  relation_tail_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 7/8
+
+explanation_needed / Answer:
+  label_aligned_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+  label_colon_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+  separator_to_original_L17_20_mlp_out_restore:
+    base 0/8 -> patch 8/8
+
+explanation_needed / Response:
+  label_aligned_to_original_L17_20_attn_out_restore:
+    base 0/8 -> patch 8/8
+
+  separator_to_original_L17_20_attn_out_restore:
+    base 0/8 -> patch 8/8
+```
+
+这不是正向能力提升，而是强烈说明：
+
+```text
+protocol field 可以驱动“输出短值”的状态，
+但它本身不包含 task intent boundary。
+```
+
+换句话说，DS7B 的 L17-L20 protocol field 更像短答读出协议执行场，而不是完整语言任务判断器。
+
+qwen3 中也有明显副作用：
+
+```text
+explanation_needed / Answer:
+  label_aligned_remove_from_inline_L17_20_layer_out_restore:
+    base 1/8 -> patch 8/8
+
+  separator_remove_from_inline_L17_20_attn_out_restore:
+    base 1/8 -> patch 8/8
+
+non_value / Value:
+  relation_tail_to_original_L17_20_attn_out_restore:
+    base 0/8 -> patch 4/8
+```
+
+GLM4 的副作用较弱，但 relation_changed 和 explanation_needed 仍有 old-value attraction：
+
+```text
+relation_changed / Response:
+  label_aligned_remove_from_inline_L17_20_layer_out_restore:
+    base 2/8 -> patch 4/8
+
+explanation_needed / Value:
+  separator_to_original_L17_20_layer_out_restore:
+    base 0/8 -> patch 3/8
+```
+
+### 对 Phase 649 附件分析的评价
+
+附件对 Phase 649 的总体判断基本正确：
+
+```text
+1. answer_label_aligned 被重新找回，正确。
+2. answer_colon / separator 是同等级强位置，正确，尤其在 DS7B。
+3. relation_tail 中 attention / MLP 有可分离趋势，基本正确，但不能过度解释成 attention=语义、MLP=格式。
+4. 下一步应做 template generalization 和 side-effect boundary，正确。
+```
+
+Phase 650 对附件做了推进：
+
+```text
+1. label alignment 在 Answer / Response / Value 三模板中没有位置失配。
+2. DS7B 在 Answer / Response 上形成强闭合，但 Value 较弱。
+3. protocol field 的副作用边界非常明显：它能把 explanation / non-value 任务拉回短值输出。
+```
+
+### 理论进展
+
+Phase 649 后的节点是：
+
+```text
+aligned protocol field with controls
+```
+
+Phase 650 后应更新为：
+
+```text
+template-conditioned protocol field with side-effect boundary
+```
+
+当前更准确的机制表达：
+
+```text
+value_short_answer_protocol(m, template, task)
+  =
+    field_strength(label_aligned, label_colon, separator, relation_tail)
+    × template_compatibility(template)
+    × task_intent_gate(task)
+    × model_polarity(m)
+```
+
+其中 Phase 650 已经证明：
+
+```text
+field_strength 存在；
+template_compatibility 存在；
+side_effect_boundary 存在；
+task_intent_gate 尚未定位。
+```
+
+新的结构图谱节点可以写成：
+
+```text
+M_i =
+{
+  aligned_position_field,
+  template_compatibility_profile,
+  side_effect_boundary_profile,
+  target_repair_profile,
+  non_target_absorption_profile,
+  component_polarity,
+  model_polarity,
+  task_intent_gap
+}
+```
+
+对 DS7B：
+
+```text
+DS7B_protocol_field:
+  Answer / Response:
+    label_aligned + label_colon + separator at L17-L20 layer_out
+    strong target repair
+
+  Value:
+    weaker compatibility
+
+  explanation_needed / non_value:
+    strong old-value absorption risk
+
+  conclusion:
+    protocol field is execution-like, not intent-selective.
+```
+
+### 问题和硬伤
+
+1. Phase 650 的 target_failure 是按原始 Answer 模板筛选，再迁移到 Response / Value 模板。因此跨模板结果是 template transfer，不是每个模板独立筛出的失败集。
+
+2. `label_aligned = colon-1 + colon` 仍可能包含 tokenizer 的前置空白/换行痕迹，虽然本阶段没有位置失配，但还不能证明它是纯 label token。
+
+3. side-effect 中的 exact 不是统一语义含义：在 original_correct 中 exact 是保持正确，在 explanation_needed / non_value 中 exact 是旧短值吸附风险。因此必须按 split 解读。
+
+4. Phase 650 仍只测试 3 个 label 模板，尚未覆盖自然语言回答、长标签、无冒号格式、中文标签、JSON / list 等格式。
+
+5. 当前 patch 是状态替换，不是自然生成路径中的 writer 因果链完整闭合。
+
+### 当前结论
+
+Phase 650 是关键推进，但不是简单正结果。
+
+可以确认：
+
+```text
+1. Phase 649 的 aligned label protocol field 是真实可测结构，不是单模板位置偶然。
+2. DS7B 对 Answer / Response 的 L17-L20 protocol field 修复非常强。
+3. Value 模板较弱，说明协议字段有模板兼容性。
+4. protocol field 会对 explanation_needed / non_value 产生短值吸附副作用。
+```
+
+必须收紧：
+
+```text
+protocol field 不是完整语言理解机制；
+它更像短答值输出协议的执行场；
+task intent boundary 仍未破解。
+```
+
+### 下一阶段
+
+Phase 651 应执行：
+
+```text
+Task Intent Gate and Protocol Field Boundary Audit
+```
+
+目标：
+
+```text
+1. 把 explanation_needed / non_value / relation_changed 中的 intent signal 拆成可定位位置。
+2. 测试 intent instruction、question type、answer format、label field 谁决定是否允许 value_short_answer_protocol 启动。
+3. 对 DS7B 优先测试，因为 Phase 650 中 DS7B 副作用最强，最适合定位 task intent gate。
+4. 对 qwen3 / GLM4 做同脚本对照，记录模型极性差异。
+```
+
+建议测试对象：
+
+```text
+positions:
+  instruction_span
+  answer_format_span
+  question_type_span
+  label_aligned
+  separator
+  relation_tail
+
+splits:
+  short_value_allowed
+  explanation_required
+  yes_no_required
+  relation_changed
+  format_changed
+
+components:
+  layer_out
+  attn_out
+  mlp_out
+
+layers:
+  L14-L22 粗扫
+  对 DS7B 在 L17-L20 细扫
+```
+
+阶段目标：
+
+```text
+从 protocol execution field
+推进到 intent-conditioned protocol gate。
+```
+
+## Phase 651: Task Intent Gate and Protocol Field Boundary Audit [2026-06-26 05:33]
+
+### 任务来源
+
+Phase 650 已经证明：
+
+```text
+protocol field 可以驱动短答 value output，
+但会对 explanation_needed / non_value 等任务产生短值吸附副作用。
+```
+
+因此 Phase 651 不再继续扩大同类 protocol patch，而是转向定位 task intent gate：
+
+```text
+哪些内部位置决定“是否允许短答协议启动”？
+```
+
+### 生成脚本
+
+新增正式测试脚本：
+
+```bash
+tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py
+```
+
+新增汇总脚本：
+
+```bash
+tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit_summary.py
+```
+
+结果目录：
+
+```bash
+results/glm5_phase651_task_intent_gate_protocol_boundary_audit/
+```
+
+跨模型汇总：
+
+```bash
+results/glm5_phase651_task_intent_gate_protocol_boundary_audit/phase651_cross_model_summary.md
+```
+
+### 执行命令
+
+编译检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py \
+  tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit_summary.py
+```
+
+冒烟检查：
+
+```bash
+python tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py \
+  qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试按顺序执行，均带 `--hard-exit-after-model`：
+
+```bash
+python tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py \
+  qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py \
+  glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit.py \
+  deepseek7b --confirm --save-rows --hard-exit-after-model
+```
+
+生成汇总：
+
+```bash
+python tests/gpt5/phase651_task_intent_gate_protocol_boundary_audit_summary.py
+```
+
+### 测试原理
+
+Phase 651 使用等结构指令构造任务意图：
+
+```text
+Instruction: Answer with value.
+Instruction: Answer with reason.
+Instruction: Answer with yesno.
+Instruction: Answer with sentence.
+```
+
+任务类型：
+
+```text
+short_value_allowed:
+  value
+
+explanation_required:
+  reason
+
+yes_no_required:
+  yesno
+
+full_sentence_required:
+  sentence
+
+relation_changed:
+  value + changed relation
+```
+
+核心测试方向：
+
+```text
+value_to_task:
+  把 short_value_allowed 的状态写入非短答任务。
+  如果 correct value exact 或 rank 大幅提升，说明短值协议对该任务产生吸附。
+
+task_to_value:
+  把非短答任务状态写回 short_value_allowed。
+  如果 correct value exact 下降或 rank 变差，说明任务意图状态能压制短答协议。
+```
+
+测试位置：
+
+```text
+intent_word
+instruction_span
+instruction_prefix
+question_span
+relation_text
+label_aligned
+separator
+relation_tail
+```
+
+测试区间和组件：
+
+```text
+L14-L22 layer_out
+L17-L20 layer_out
+L17-L20 attn_out
+L17-L20 mlp_out
+```
+
+对照：
+
+```text
+restore
+random
+reverse
+```
+
+正式测试规模：
+
+```text
+raw_cases = 320
+selected_items = 12
+pair_tasks = 4
+mode_rows = 7872 / model
+max_new_tokens = 12
+```
+
+### 客观结果
+
+三模型均完成正式测试：
+
+```text
+qwen3:
+  rows = 7872
+  time = 43.65 min
+  filtered = position_missing 48, position_len_mismatch 12, empty_patch 0
+
+GLM4:
+  rows = 7872
+  time = 65.76 min
+  filtered = position_missing 48, position_len_mismatch 12, empty_patch 0
+
+DS7B:
+  rows = 7872
+  time = 54.14 min
+  filtered = position_missing 48, position_len_mismatch 12, empty_patch 0
+```
+
+过滤主要来自自然指令下部分 position 的 token span 缺失或长度不一致；没有 empty_patch，说明进入统计的 patch 都有效生成。
+
+### qwen3 结果
+
+qwen3 的 value_to_task 吸附很强：
+
+```text
+full_sentence_required:
+  instruction_span_value_to_task_L14_22_layer_out_restore:
+    exact 0 -> 9 / 12
+    rank 4.9 -> 1.2
+    rank_improve = +3.8
+
+yes_no_required:
+  label_aligned_value_to_task_L17_20_attn_out_restore:
+    exact 0 -> 7 / 12
+    rank 6.3 -> 1.4
+    rank_improve = +4.9
+
+full_sentence_required:
+  relation_tail_value_to_task_L17_20_attn_out_restore:
+    exact 0 -> 6 / 12
+    rank 4.9 -> 2.2
+```
+
+qwen3 的 task_to_value 在 exact 上没有下降空间，因为 value baseline exact 已经是 0，但 rank 显示明显压制：
+
+```text
+yes_no_required:
+  label_aligned_task_to_value_L17_20_mlp_out_restore:
+    rank 6.0 -> 25.0
+    rank_improve = -19.0
+
+yes_no_required:
+  separator_task_to_value_L17_20_mlp_out_restore:
+    rank 6.0 -> 18.6
+    rank_improve = -12.6
+
+relation_changed:
+  relation_tail_task_to_value_L17_20_mlp_out_restore:
+    rank 6.0 -> 17.6
+    rank_improve = -11.6
+```
+
+这说明 qwen3 中 task intent 的压制更多体现在 rank / support 层，而不一定体现在 exact generation 层。
+
+### GLM4 结果
+
+GLM4 的结果最清晰，value_to_task 和 task_to_value 都有强效果。
+
+value_to_task 吸附：
+
+```text
+explanation_required:
+  label_aligned_value_to_task_L17_20_layer_out_restore:
+    exact 0 -> 7 / 12
+    rank 74.8 -> 2.0
+    rank_improve = +72.8
+
+explanation_required:
+  label_aligned_value_to_task_L14_22_layer_out_restore:
+    exact 0 -> 5 / 12
+    rank 74.8 -> 2.0
+
+yes_no_required:
+  label_aligned_value_to_task_L14_22_layer_out_restore:
+    exact 0 -> 3 / 12
+    rank 204.2 -> 3.9
+```
+
+task_to_value 压制：
+
+```text
+yes_no_required:
+  separator_task_to_value_L14_22_layer_out_restore:
+    exact 2 -> 0 / 12
+    rank 2.1 -> 137.2
+    rank_improve = -135.1
+
+yes_no_required:
+  relation_tail_task_to_value_L14_22_layer_out_restore:
+    exact 2 -> 0 / 12
+    rank 2.1 -> 134.7
+
+yes_no_required:
+  label_aligned_task_to_value_L14_22_layer_out_restore:
+    exact 2 -> 0 / 12
+    rank 2.1 -> 93.8
+
+explanation_required:
+  relation_tail_task_to_value_L14_22_layer_out_restore:
+    exact 2 -> 0 / 12
+    rank 2.1 -> 56.6
+```
+
+GLM4 说明 task intent state 确实可以在中后层 strongly suppress value-token support。
+
+### DS7B 结果
+
+DS7B 中也出现明确吸附与压制，但 exact 闭合比 GLM4 弱，rank 变化非常强。
+
+value_to_task 吸附：
+
+```text
+full_sentence_required:
+  instruction_span_value_to_task_L14_22_layer_out_restore:
+    exact 5 -> 9 / 12
+    rank 7.6 -> 1.6
+    rank_improve = +6.0
+
+explanation_required:
+  label_aligned_value_to_task_L14_22_layer_out_restore:
+    exact 0 -> 3 / 12
+    rank 87.3 -> 8.1
+    rank_improve = +79.2
+
+explanation_required:
+  separator_value_to_task_L14_22_layer_out_restore:
+    exact 0 -> 3 / 12
+    rank 87.3 -> 8.5
+
+yes_no_required:
+  separator_value_to_task_L17_20_layer_out_restore:
+    exact 0 -> 1 / 12
+    rank 330.9 -> 22.8
+    rank_improve = +308.1
+```
+
+task_to_value 压制：
+
+```text
+yes_no_required:
+  separator_task_to_value_L14_22_layer_out_restore:
+    exact 0 -> 0 / 12
+    rank 8.0 -> 76.2
+    rank_improve = -68.2
+
+yes_no_required:
+  relation_tail_task_to_value_L14_22_layer_out_restore:
+    rank 8.0 -> 75.7
+
+yes_no_required:
+  label_aligned_task_to_value_L14_22_layer_out_restore:
+    rank 8.0 -> 73.8
+
+explanation_required:
+  relation_tail_task_to_value_L14_22_layer_out_restore:
+    rank 8.0 -> 65.2
+```
+
+DS7B 的关键现象：
+
+```text
+task intent patch 不一定直接改变 exact，
+但能显著改变 correct value token 的 rank。
+```
+
+这说明 DS7B 的 task intent gate 可能首先作用于 value-token support landscape，而不是直接决定最终生成文本。
+
+### 与 Phase 650 的关系
+
+Phase 650 证明：
+
+```text
+protocol field 是 execution-like；
+它能驱动短值输出；
+它不自动携带 task intent boundary。
+```
+
+Phase 651 进一步证明：
+
+```text
+task intent state 是真实存在的；
+它可以打开或压制 value_short_answer_protocol；
+但它与 protocol field 高度耦合，不是单独的 instruction token 开关。
+```
+
+特别是 GLM4 / DS7B 的 L14-L22 layer_out 结果表明：
+
+```text
+task intent gate 更像中后层 residual trajectory 的状态场，
+不是单个词或单个注意力头。
+```
+
+### 理论更新
+
+Phase 650 的公式：
+
+```text
+value_short_answer_protocol(m, template, task)
+  =
+    field_strength(label_aligned, label_colon, separator, relation_tail)
+    × template_compatibility(template)
+    × task_intent_gate(task)
+    × model_polarity(m)
+```
+
+Phase 651 后应改成：
+
+```text
+output_value_support(m, x, t)
+  =
+    protocol_execution_field(m, x, t)
+    ⊙ intent_permission_field(m, x, t)
+    ⊙ relation_content_field(m, x, t)
+    ⊙ readout_competition_field(m, x, t)
+```
+
+其中：
+
+```text
+protocol_execution_field:
+  label_aligned / separator / relation_tail 上的短答执行状态
+
+intent_permission_field:
+  instruction_span / intent_word / task-conditioned residual trajectory
+
+relation_content_field:
+  relation_text / relation_tail 上的内容选择状态
+
+readout_competition_field:
+  final logits / prefix rank / newline and non-value competitors
+```
+
+更完整的节点表达：
+
+```text
+M_i =
+{
+  protocol_execution_field,
+  intent_permission_field,
+  relation_content_field,
+  readout_competition_field,
+  template_compatibility_profile,
+  task_absorption_profile,
+  task_suppression_profile,
+  rank_support_profile,
+  exact_generation_profile,
+  model_polarity
+}
+```
+
+### 当前进展
+
+Phase 651 的核心进展是：
+
+```text
+从“协议场会导致副作用”
+推进到
+“任务意图状态可以调制协议场，但调制首先表现为 rank/support 改变”。
+```
+
+这为全局图谱提供了新节点：
+
+```text
+intent-conditioned protocol gate
+```
+
+它不是独立模块，而是和 label_aligned / separator / relation_tail 共用一部分中后层 residual state。
+
+### 问题和硬伤
+
+1. 自然指令模板会引入生成格式差异，因此 exact 不能单独作为判据，必须同时看 rank delta。
+
+2. 当前 instruction 只用了 `value/reason/yesno/sentence` 四个英文意图词，仍然可能带来模板偏置。
+
+3. position_missing 和 position_len_mismatch 不是 0，说明自然指令比 Phase 650 的标准模板更难做严格位置对齐。
+
+4. 当前还没有把 task intent gate 细分到 attention head / MLP neuron / residual subspace。
+
+5. L14-L22 粗扫耗时很高，qwen3 43.65 分钟，GLM4 65.76 分钟，DS7B 54.14 分钟；下一阶段需要收缩到最有信息量的位置和层。
+
+### 当前结论
+
+可以确认：
+
+```text
+1. task intent state 真实存在。
+2. task intent state 能改变 correct value token 的 rank/support。
+3. value_to_task 能把非短答任务重新吸向短值输出。
+4. task_to_value 能在 rank 层压制短值输出。
+5. L14-L22 layer_out 是强候选区间，L17-L20 是局部执行区间。
+```
+
+必须谨慎：
+
+```text
+尚未证明 task intent gate 是单一门控；
+尚未证明它能单独决定最终自然生成；
+当前更像多位置 residual state field。
+```
+
+### 下一阶段
+
+Phase 652 应执行：
+
+```text
+Intent Gate Layer Localization and Component Narrowing Audit
+```
+
+目标：
+
+```text
+1. 放弃全量 L14-L22 粗扫，改为单层/小区间定位。
+2. 优先围绕 GLM4 和 DS7B 的强结果：
+   - label_aligned
+   - separator
+   - relation_tail
+   - instruction_span
+3. 将 layer_out 拆为 attn_out / mlp_out / layer_input。
+4. 用 rank delta 作为主要指标，exact 作为辅助指标。
+5. 保留 qwen3 / GLM4 / DS7B 三模型，但减少生成长度和模式数量。
+```
+
+建议测试范围：
+
+```text
+layers:
+  L14, L15, L16, L17, L18, L19, L20, L21, L22 单层
+
+positions:
+  instruction_span
+  label_aligned
+  separator
+  relation_tail
+
+directions:
+  value_to_task
+  task_to_value
+
+tasks:
+  explanation_required
+  yes_no_required
+
+metrics:
+  rank_delta
+  exact_delta
+  top0_category
+  generation_text_shortness
+```
+
+阶段目标：
+
+```text
+从 intent-conditioned protocol gate
+推进到 localized intent-gate carrier map。
+```
+
+## Phase 652: Intent Gate Layer Localization and Component Narrowing Audit [2026-06-26 06:30]
+
+### 任务来源
+
+用户上传的 Phase 650 / Phase 651 分析总体正确。核心判断是：
+
+```text
+Phase 650:
+  protocol field 不是单模板偶然结构，
+  但它是 execution-like short-value field，
+  会在非目标任务中产生副作用。
+
+Phase 651:
+  task intent state 真实存在，
+  能调制 value_short_answer_protocol，
+  但首先表现为 rank/support 变化，
+  不一定直接闭合 exact generation。
+```
+
+因此继续执行 Phase 652：
+
+```text
+Intent Gate Layer Localization and Component Narrowing Audit
+```
+
+目标是把 Phase 651 的 L14-L22 粗区间结果压缩到：
+
+```text
+单层
+单位置
+单组件
+rank delta 主指标
+```
+
+### 生成脚本
+
+新增正式测试脚本：
+
+```bash
+tests/gpt5/phase652_intent_gate_layer_localization_audit.py
+```
+
+新增汇总脚本：
+
+```bash
+tests/gpt5/phase652_intent_gate_layer_localization_audit_summary.py
+```
+
+结果目录：
+
+```bash
+results/glm5_phase652_intent_gate_layer_localization_audit/
+```
+
+跨模型汇总：
+
+```bash
+results/glm5_phase652_intent_gate_layer_localization_audit/phase652_cross_model_summary.md
+```
+
+### 执行命令
+
+编译检查：
+
+```bash
+python -m py_compile \
+  tests/gpt5/phase652_intent_gate_layer_localization_audit.py \
+  tests/gpt5/phase652_intent_gate_layer_localization_audit_summary.py
+```
+
+冒烟检查：
+
+```bash
+python tests/gpt5/phase652_intent_gate_layer_localization_audit.py \
+  qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试按顺序执行，均带 `--hard-exit-after-model`：
+
+```bash
+python tests/gpt5/phase652_intent_gate_layer_localization_audit.py \
+  qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase652_intent_gate_layer_localization_audit.py \
+  glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase652_intent_gate_layer_localization_audit.py \
+  deepseek7b --confirm --save-rows --hard-exit-after-model
+```
+
+生成汇总：
+
+```bash
+python tests/gpt5/phase652_intent_gate_layer_localization_audit_summary.py
+```
+
+### 测试原理
+
+Phase 652 没有对每个 patch 都做长生成，而是只测最终 readout 前的 correct value prefix rank：
+
+```text
+rank_improvement = baseline_rank - patched_rank
+```
+
+其中：
+
+```text
+rank_improvement > 0:
+  value token 支持增强
+
+rank_improvement < 0:
+  value token 支持被压制
+```
+
+测试任务：
+
+```text
+explanation_required
+yes_no_required
+```
+
+测试方向：
+
+```text
+value_to_task:
+  把 short_value_allowed 的状态写入非短答任务，
+  测短值吸附增强。
+
+task_to_value:
+  把非短答任务状态写回 short_value_allowed，
+  测短值支持压制。
+```
+
+测试位置：
+
+```text
+intent_word
+instruction_span
+label_aligned
+separator
+relation_tail
+```
+
+测试层：
+
+```text
+L14, L15, L16, L17, L18, L19, L20, L21, L22
+```
+
+测试组件：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+```
+
+正式测试规模：
+
+```text
+selected_items = 20
+tasks = 2
+positions = 5
+directions = 2
+layers = 9
+components = 4
+rows = 10160 / model
+```
+
+### 客观结果
+
+三模型均完成正式测试：
+
+```text
+qwen3:
+  rows = 10160
+  time = 6.65 min
+  filtered = position_missing 40, position_len_mismatch 20, empty_patch 0
+
+GLM4:
+  rows = 10160
+  time = 9.20 min
+  filtered = position_missing 40, position_len_mismatch 20, empty_patch 0
+
+DS7B:
+  rows = 10160
+  time = 7.86 min
+  filtered = position_missing 40, position_len_mismatch 20, empty_patch 0
+```
+
+Phase 651 的耗时：
+
+```text
+qwen3 43.65 min
+GLM4 65.76 min
+DS7B 54.14 min
+```
+
+Phase 652 的耗时显著下降，同时样本数增加到 20。说明把指标从 generation exact 转为 logits/rank，可以更高效地做图谱定位。
+
+### qwen3 结果
+
+qwen3 的 value_to_task 吸附主要集中在较前层：
+
+```text
+yes_no_required:
+  label_aligned L16 layer_out:
+    rank 12.9 -> 1.6
+    rank_improvement = +11.3
+    tok0 0 -> 10 / 20
+
+  label_aligned L17 layer_input:
+    rank 12.9 -> 1.6
+    tok0 0 -> 10 / 20
+
+  relation_tail L15 layer_out:
+    rank 12.9 -> 1.9
+    rank_improvement = +11.1
+    tok0 0 -> 12 / 20
+
+  separator L14 layer_input:
+    rank 12.9 -> 1.9
+    tok0 0 -> 11 / 20
+```
+
+qwen3 的 task_to_value 压制较弱，主要在 L16-L18 的 attention / MLP：
+
+```text
+yes_no_required:
+  label_aligned L18 mlp_out:
+    rank 9.2 -> 16.1
+    rank_improvement = -6.9
+
+explanation_required:
+  label_aligned L16 attn_out:
+    rank 9.2 -> 14.2
+    rank_improvement = -5.0
+
+  separator L16 attn_out:
+    rank 9.2 -> 14.2
+    rank_improvement = -5.0
+```
+
+qwen3 的定位特征：
+
+```text
+吸附峰更靠前、更分散；
+压制峰较弱；
+与 DS7B / GLM4 的后层强门控不同。
+```
+
+### GLM4 结果
+
+GLM4 的 value_to_task 吸附峰非常集中，主要在 L20-L22 的 layer_out：
+
+```text
+yes_no_required:
+  separator L22 layer_out:
+    rank 188.1 -> 3.4
+    rank_improvement = +184.8
+    tok0 0 -> 3 / 20
+
+  relation_tail L22 layer_out:
+    rank 188.1 -> 3.5
+    rank_improvement = +184.7
+
+  label_aligned L22 layer_out:
+    rank 188.1 -> 3.9
+    rank_improvement = +184.2
+
+  relation_tail L21 layer_out:
+    rank 188.1 -> 4.1
+    rank_improvement = +184.0
+```
+
+GLM4 的 task_to_value 压制也集中在同一后层区域：
+
+```text
+yes_no_required:
+  relation_tail L21 layer_out:
+    rank 2.2 -> 136.0
+    rank_improvement = -133.8
+    tok0 3 -> 0 / 20
+
+  separator L22 layer_out:
+    rank 2.2 -> 135.7
+    rank_improvement = -133.5
+
+  relation_tail L22 layer_out:
+    rank 2.2 -> 135.2
+    rank_improvement = -133.1
+
+  separator L21 layer_out:
+    rank 2.2 -> 132.3
+    rank_improvement = -130.1
+```
+
+GLM4 的定位特征：
+
+```text
+后层 L21-L22 layer_out 是强门控区；
+separator / relation_tail / label_aligned 三个位置共同承载 yes_no intent 对 value token 的开关。
+```
+
+### DS7B 结果
+
+DS7B 的 value_to_task 吸附同样集中在后层 L20-L22：
+
+```text
+yes_no_required:
+  relation_tail L22 layer_out:
+    rank 295.6 -> 13.8
+    rank_improvement = +281.7
+
+  separator L22 layer_out:
+    rank 295.6 -> 14.1
+    rank_improvement = +281.4
+
+  label_aligned L22 layer_out:
+    rank 295.6 -> 14.7
+    rank_improvement = +280.9
+
+  relation_tail L21 layer_out:
+    rank 295.6 -> 19.4
+    rank_improvement = +276.2
+```
+
+DS7B 的 task_to_value 压制也在后层：
+
+```text
+yes_no_required:
+  separator L22 layer_out:
+    rank 8.0 -> 61.8
+    rank_improvement = -53.8
+
+  relation_tail L22 layer_out:
+    rank 8.0 -> 61.8
+    rank_improvement = -53.8
+
+  label_aligned L22 layer_out:
+    rank 8.0 -> 60.4
+    rank_improvement = -52.4
+
+  relation_tail L19 layer_out:
+    rank 8.0 -> 58.2
+    rank_improvement = -50.2
+```
+
+DS7B 的定位特征：
+
+```text
+rank delta 极大，但 tok0 exact 不一定同步闭合；
+这与 Phase 651 一致：DS7B 的 intent gate 首先改变 support landscape。
+```
+
+### 对上传分析的评价
+
+上传分析对 Phase 650 / 651 的判断基本正确：
+
+```text
+1. Phase 650 确认 protocol field 是 execution-like，而不是完整任务理解器。
+2. Phase 651 确认 task intent state 存在，并能调制短答协议。
+3. 必须把 exact 与 rank/support 分开看，正确。
+4. 下一步应从 L14-L22 粗扫转向层定位，正确。
+```
+
+Phase 652 对上传分析做了实证推进：
+
+```text
+1. GLM4 / DS7B 的 intent-conditioned protocol gate 主要集中在后层 L20-L22。
+2. qwen3 的吸附更靠前，主要在 L14-L17，压制较弱。
+3. separator / relation_tail / label_aligned 是比 intent_word 更稳定的门控载体。
+4. layer_out 是主载体，layer_input 的强结果多半反映下一层输入等价关系。
+```
+
+### 理论进展
+
+Phase 651 的节点：
+
+```text
+intent-conditioned protocol gate
+```
+
+Phase 652 后应更新为：
+
+```text
+localized intent-gate carrier map
+```
+
+新的分层结构：
+
+```text
+intent_gate_carrier(m)
+  =
+    {layer, position, component, direction, task}
+```
+
+目前三模型可写成：
+
+```text
+qwen3:
+  absorption:
+    L14-L17, label_aligned / separator / relation_tail, layer_input/layer_out
+  suppression:
+    L16-L18, label_aligned / separator / relation_tail, attn_out/mlp_out
+
+GLM4:
+  absorption:
+    L20-L22, separator / relation_tail / label_aligned, layer_out
+  suppression:
+    L21-L22, separator / relation_tail / label_aligned, layer_out
+
+DS7B:
+  absorption:
+    L20-L22, separator / relation_tail / label_aligned, layer_out
+  suppression:
+    L19-L22, separator / relation_tail / label_aligned, layer_out
+```
+
+### 统一公式更新
+
+Phase 651：
+
+```text
+output_value_support(m, x, t)
+  =
+    protocol_execution_field(m, x, t)
+    ⊙ intent_permission_field(m, x, t)
+    ⊙ relation_content_field(m, x, t)
+    ⊙ readout_competition_field(m, x, t)
+```
+
+Phase 652 后应加入局部载体图：
+
+```text
+intent_permission_field(m, x, t)
+  =
+    Σ_{l,p,c}
+      G_m(l,p,c,t)
+      · h_m(l,p,c,x)
+```
+
+其中：
+
+```text
+l = layer
+p = position
+c = component
+G_m(l,p,c,t) = 该模型、该任务下的意图门载体强度
+h_m(l,p,c,x) = 对应隐藏状态
+```
+
+更完整的当前公式：
+
+```text
+support_value(m, x, t)
+  =
+    R_m(
+      Σ_{l,p,c}
+        [
+          P_m(l,p,c,x)
+          ⊙ I_m(l,p,c,t)
+          ⊙ C_m(l,p,c,x)
+        ]
+    )
+```
+
+其中：
+
+```text
+P_m = protocol execution carrier
+I_m = intent permission carrier
+C_m = relation/content carrier
+R_m = readout competition
+```
+
+Phase 652 的贡献是开始给 `I_m` 定位：
+
+```text
+I_GLM4, I_DS7B:
+  high strength around L20-L22 layer_out
+
+I_qwen3:
+  more distributed, earlier absorption around L14-L17
+```
+
+### 问题和硬伤
+
+1. Phase 652 是 restore-only localization，没有为每个单层位置加入 random / reverse controls。Phase 651 已有区间级 controls，但单层定位还需要后续对强峰做 controls。
+
+2. 当前主要用 rank delta，不做长生成，因此它定位的是 readout support carrier，不等于完整自然生成闭环。
+
+3. position_missing 和 position_len_mismatch 仍存在，主要来自自然 instruction tokenization。虽然 empty_patch = 0，但说明自然指令模板仍需更严格的对齐规则。
+
+4. yes_no_required 的信号最强，explanation_required 相对弱，说明当前任务意图图谱仍偏向“禁止 value 输出”的 yes/no 门，而不是完整解释生成机制。
+
+5. qwen3 与 GLM4 / DS7B 差异明显，不能把一个模型的层位图谱直接套到另一个模型。
+
+### 当前结论
+
+可以确认：
+
+```text
+1. Phase 650 / 651 的方向正确。
+2. task intent gate 不是抽象假设，已有可定位载体。
+3. GLM4 / DS7B 的核心载体集中在 L20-L22 layer_out。
+4. separator / relation_tail / label_aligned 是稳定载体，比 intent_word 更强。
+5. qwen3 的机制更早、更分散。
+```
+
+必须收紧：
+
+```text
+这不是完整语言意图机制；
+这是 value-token support 层面的 task intent carrier map；
+还需要对强峰做 controls 和生成闭环验证。
+```
+
+### 下一阶段
+
+Phase 653 应执行：
+
+```text
+Localized Intent-Gate Control and Generation Closure Audit
+```
+
+目标：
+
+```text
+1. 只取 Phase 652 的强峰：
+   GLM4:
+     L21-L22 separator / relation_tail / label_aligned layer_out
+   DS7B:
+     L20-L22 separator / relation_tail / label_aligned layer_out
+   qwen3:
+     L14-L17 separator / relation_tail / label_aligned layer_out/input
+
+2. 对强峰加入 restore / random / reverse controls。
+
+3. 对强峰重新加入短生成闭环，但 max_new_tokens 控制在 4-6。
+
+4. 测试 yes_no_required 与 explanation_required 是否都能复现。
+
+5. 主指标：
+   rank_delta
+   tok0_delta
+   short value generation rate
+   yes/no or explanation signal rate
+```
+
+阶段目标：
+
+```text
+从 localized intent-gate carrier map
+推进到 controlled localized intent gate with generation evidence。
+```
+
+## Phase 653: Localized Intent-Gate Control and Generation Closure Audit [2026-06-26 06:52]
+
+### 触发问题
+
+用户要求分析 Phase 652 的评估是否正确，并继续完成任务。Phase 652 已经把 task intent gate（任务意图门）从 L14-L22 粗区间收缩到单层、单位置、单组件的 rank-support carrier map（排名支持载体图谱），但它仍有两个硬伤：
+
+```text
+1. Phase 652 是 restore-only localization。
+2. Phase 652 主要看 rank / tok0，不等于 natural generation closure。
+```
+
+因此 Phase 653 属于同一阶段性目标的必要闭环，不是另开新方向：
+
+```text
+localized intent-gate carrier map
+  ->
+controlled localized intent gate with generation evidence
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase653_localized_intent_gate_generation_closure.py
+tests/gpt5/phase653_localized_intent_gate_generation_closure_summary.py
+```
+
+### 运行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase653_localized_intent_gate_generation_closure.py tests/gpt5/phase653_localized_intent_gate_generation_closure_summary.py
+```
+
+qwen3 smoke：
+
+```bash
+python tests/gpt5/phase653_localized_intent_gate_generation_closure.py qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试，严格顺序执行：
+
+```bash
+python tests/gpt5/phase653_localized_intent_gate_generation_closure.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase653_localized_intent_gate_generation_closure.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase653_localized_intent_gate_generation_closure.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase653_localized_intent_gate_generation_closure_summary.py
+```
+
+### 结果文件
+
+```text
+results/glm5_phase653_localized_intent_gate_generation_closure/phase653_qwen3_localized_intent_gate_generation_closure_confirm.json
+results/glm5_phase653_localized_intent_gate_generation_closure/phase653_glm4_localized_intent_gate_generation_closure_confirm.json
+results/glm5_phase653_localized_intent_gate_generation_closure/phase653_deepseek7b_localized_intent_gate_generation_closure_confirm.json
+results/glm5_phase653_localized_intent_gate_generation_closure/phase653_cross_model_summary.md
+```
+
+三模型正式测试均为：
+
+```text
+selected_items = 12
+mode_rows = 480
+position_missing = 0
+position_len_mismatch = 0
+empty_patch = 0
+max_new_tokens = 6
+```
+
+运行时间：
+
+```text
+qwen3: 1.65 min
+GLM4: 2.43 min
+DS7B: 2.02 min
+```
+
+### 测试原理
+
+Phase 653 不再全层粗扫，而是只取 Phase 652 的强峰站点，加入三类对照：
+
+```text
+restore
+random
+reverse
+```
+
+每个 patch 同时测：
+
+```text
+1. correct value prefix rank
+2. tok0 hit
+3. short greedy generation exact
+4. generation text flags
+```
+
+核心判断标准：
+
+```text
+如果 restore 明显改变 rank / tok0 / generation，
+且 random / reverse 不能产生同方向、同强度、同文本形态的变化，
+则该 localized site 更接近受控 task intent gate。
+```
+
+测试站点来自 Phase 652：
+
+```text
+qwen3:
+  early_peak_layer_out:
+    L14-L17, label_aligned / separator / relation_tail, layer_out
+  separator_input_edge:
+    L14, separator, layer_input
+  mid_suppression_attn_mlp:
+    L16-L18, label_aligned / separator, attn_out / mlp_out
+
+GLM4:
+  late_peak_layer_out:
+    L21-L22, label_aligned / separator / relation_tail, layer_out
+  l22_peak_layer_out:
+    L22, label_aligned / separator / relation_tail, layer_out
+  relation_separator_l21_l22:
+    L21-L22, separator / relation_tail, layer_out
+
+DS7B:
+  late_peak_layer_out:
+    L20-L22, label_aligned / separator / relation_tail, layer_out
+  l22_peak_layer_out:
+    L22, label_aligned / separator / relation_tail, layer_out
+  relation_separator_l22:
+    L22, separator / relation_tail, layer_out
+```
+
+### 客观结果
+
+#### qwen3
+
+value_to_task absorption（值任务到其它任务吸附）：
+
+```text
+yes_no_required + separator_input_edge:
+  rank 6.3 -> 1.2
+  rank_improvement = +5.2
+  exact 0 -> 10 / 12
+  tok0 0 -> 10 / 12
+
+yes_no_required + early_peak_layer_out:
+  rank 6.3 -> 2.2
+  rank_improvement = +4.2
+  exact 0 -> 4 / 12
+  tok0 0 -> 4 / 12
+```
+
+suppression / disruption（压制 / 破坏）：
+
+```text
+mid_suppression_attn_mlp:
+  explanation_required:
+    rank 1.3 -> 38.8
+    exact 7 -> 0 / 12
+    tok0 8 -> 0 / 12
+
+  short_value_allowed under task_to_value:
+    rank 6.0 -> 58.0 / 54.2
+```
+
+qwen3 的关键现象：
+
+```text
+1. separator_input_edge 已经能把 yes/no prompt 拉成短值生成。
+2. early_peak_layer_out 有生成闭合，但弱于 separator_input_edge。
+3. mid_suppression_attn_mlp 更像破坏性 / 抑制性写入区，不是干净的意图门。
+4. qwen3 的 random / reverse 对照会产生较多异常文本，说明 qwen3 对早中层扰动非常敏感。
+```
+
+#### GLM4
+
+value_to_task absorption：
+
+```text
+yes_no_required + late_peak_layer_out:
+  rank 204.2 -> 3.8
+  rank_improvement = +200.5
+  exact 0 -> 2 / 12
+  tok0 0 -> 2 / 12
+
+explanation_required + late_peak_layer_out:
+  rank 74.8 -> 2.2
+  rank_improvement = +72.6
+  exact 0 -> 3 / 12
+  tok0 0 -> 3 / 12
+```
+
+task_to_value suppression：
+
+```text
+yes_no_required -> short_value_allowed + late_peak_layer_out:
+  rank 2.1 -> 134.7
+  rank_improvement = -132.6
+  exact 2 -> 0 / 12
+  tok0 2 -> 0 / 12
+
+explanation_required -> short_value_allowed + late_peak_layer_out:
+  rank 2.1 -> 56.6
+  rank_improvement = -54.5
+  exact 2 -> 0 / 12
+  tok0 2 -> 0 / 12
+```
+
+GLM4 的关键现象：
+
+```text
+1. L22 layer_out 已经足以复现 L21-L22 的大部分 rank effect。
+2. restore 方向与 Phase 652 完全一致。
+3. generation exact 有闭合，但比例不高。
+4. random / reverse 多数不能产生同向 value_to_task 生成闭合；但 task_to_value reverse 有时会提高 value exact，说明 reverse 不是中性对照，而是会改变输出协议极性。
+```
+
+#### DS7B
+
+value_to_task absorption：
+
+```text
+yes_no_required + late_peak_layer_out:
+  rank 330.9 -> 14.6
+  rank_improvement = +316.3
+  exact 0 -> 0 / 12
+  tok0 0 -> 0 / 12
+
+explanation_required + late_peak_layer_out:
+  rank 87.3 -> 8.5
+  rank_improvement = +78.8
+  exact 0 -> 3 / 12
+  tok0 0 -> 2 / 12
+```
+
+task_to_value suppression：
+
+```text
+yes_no_required -> short_value_allowed:
+  rank 8.0 -> 75.7
+  rank_improvement = -67.7
+  exact 0 -> 0 / 12
+  tok0 0 -> 0 / 12
+
+explanation_required -> short_value_allowed:
+  rank 8.0 -> 65.2
+  rank_improvement = -57.2
+  exact 0 -> 0 / 12
+  tok0 0 -> 0 / 12
+```
+
+DS7B 的关键现象：
+
+```text
+1. L20-L22 / L22 layer_out 对 rank 的因果效应非常强。
+2. yes_no_required 中 rank 从 330.9 拉到 14.6，但 exact / tok0 仍为 0。
+3. explanation_required 中出现 3 / 12 的 exact 闭合。
+4. DS7B 仍然存在 final generation gate / decoder preference gap。
+5. random 的 L22 yes_no value_to_task 也能产生 rank +106.9，但没有 exact / tok0，说明 rank alone 不能作为 DS7B 生成闭合证据。
+```
+
+### 当前判断
+
+Phase 652 的分析基本正确，但 Phase 653 后需要进一步收紧：
+
+```text
+Phase 652:
+  localized intent-gate carrier map 成立。
+
+Phase 653:
+  controlled localized intent gate 部分成立。
+```
+
+跨模型结论：
+
+```text
+qwen3:
+  已出现局部意图门的短生成闭合，尤其是 yes_no_required + separator_input_edge。
+
+GLM4:
+  L22 / L21-L22 layer_out 是强 task-intent protocol gate。
+  rank、tok0、短生成 exact 同向，但 exact 比例不高。
+
+DS7B:
+  rank-level intent gate 非常强。
+  generation-level closure 只在 explanation_required 中部分出现；
+  yes_no_required 仍未闭合。
+```
+
+因此当前不能说三模型都完成了完整 natural generation controller（自然生成控制器）定位。更准确说：
+
+```text
+task intent gate 已经从抽象状态推进到可控局部载体；
+但 readout / decoder preference / final generation policy 仍然是 DS7B 和部分 GLM4 的瓶颈。
+```
+
+### 理论进展
+
+统一公式从 Phase 652 的：
+
+```text
+support_value(m, x, t)
+  =
+    R_m(
+      Σ_{l,p,c}
+        [
+          P_m(l,p,c,x)
+          ⊙ I_m(l,p,c,t)
+          ⊙ C_m(l,p,c,x)
+        ]
+    )
+```
+
+推进到需要显式区分 support gate 与 generation gate：
+
+```text
+support_value(m, x, t)
+  =
+    R_m(
+      Σ_{l,p,c}
+        [
+          P_m(l,p,c,x)
+          ⊙ I_m(l,p,c,t)
+          ⊙ C_m(l,p,c,x)
+        ]
+    )
+
+generate_value(m, x, t)
+  =
+    D_m(
+      support_value(m, x, t),
+      F_m(x,t)
+    )
+```
+
+其中：
+
+```text
+P_m = protocol execution carrier
+I_m = intent permission carrier
+C_m = relation/content carrier
+R_m = readout competition
+D_m = decoder / final generation policy
+F_m = format / answer policy field
+```
+
+Phase 653 的核心贡献是证明：
+
+```text
+I_m 可以被局部控制；
+但 I_m -> generate_value 之间还有 D_m / F_m 的门。
+```
+
+这解释了为什么 DS7B 中 rank 改变极强，但 yes/no 自然生成仍不闭合。
+
+### 问题和硬伤
+
+1. confirm 样本为 12 个 selected items，比 Phase 652 的 20 个少。原因是 Phase 653 加入了 generation，计算成本显著上升。当前结果足以判断趋势，但重要结论仍需要更大样本复测。
+
+2. qwen3 的 random / reverse 对早中层扰动很敏感，会产生异常文本。这说明 qwen3 结果里有一部分是“状态破坏”而不是干净门控。
+
+3. GLM4 的 exact generation rate 只有 2-3 / 12，虽然 rank effect 很强，但生成闭合仍不充分。
+
+4. DS7B 的 yes_no_required 完全没有 exact / tok0 闭合，说明 DS7B 的 bottleneck 已经后移到 final generation gate。
+
+5. reverse control 不是纯负对照。它会改变方向极性，有时能增强 value exact，因此后续不能把 reverse 简单解释成“无效对照”。
+
+### 下一阶段
+
+Phase 654 应继续属于当前阶段性目标，因为 Phase 653 已经证明：
+
+```text
+localized intent gate -> support_value 成立；
+support_value -> generate_value 不稳定。
+```
+
+下一步应测试：
+
+```text
+Phase 654: Support-to-Generation Bridge and Final Policy Gate Audit
+```
+
+任务：
+
+```text
+1. 固定 Phase 653 的强峰，只测 restore。
+2. 在 patch 后同时记录：
+   final_norm input
+   final_norm output
+   lm_head logits
+   top-k competition
+   generated first token
+
+3. 对 DS7B yes_no_required 特别检查：
+   correct value rank 已经进入 top 15，
+   但 top0 为什么仍不是 correct value。
+
+4. 对 GLM4 检查：
+   为什么 rank 进 top 3 后只有 2-3 / 12 exact。
+
+5. 对 qwen3 检查：
+   separator_input_edge 为什么能形成 10 / 12 exact，
+   它是否绕过了后层 generation gate。
+```
+
+阶段目标：
+
+```text
+把瓶颈从 task intent carrier
+推进到 support-to-generation bridge，
+明确 D_m / F_m 的实际载体。
+```
+
+## Phase 654: Support-to-Generation Bridge and Final Policy Gate Audit [2026-06-26 07:00]
+
+### 触发问题
+
+Phase 653 已经证明 localized intent gate（局部意图门）能够强烈改变 correct value token support（正确值词元支持），并在 qwen3 / GLM4 上产生部分短生成闭合。但它同时暴露了新的瓶颈：
+
+```text
+rank 已经进入 top 15，
+但 generation 仍不输出正确值。
+```
+
+因此 Phase 654 继续同一阶段性目标，直接审计：
+
+```text
+support_value -> generate_value
+```
+
+也就是 final readout / decoder policy gate（最终读出 / 解码策略门）。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py
+tests/gpt5/phase654_support_generation_bridge_policy_gate_audit_summary.py
+```
+
+### 运行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py tests/gpt5/phase654_support_generation_bridge_policy_gate_audit_summary.py
+```
+
+qwen3 smoke：
+
+```bash
+python tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试，严格顺序执行：
+
+```bash
+python tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase654_support_generation_bridge_policy_gate_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase654_support_generation_bridge_policy_gate_audit_summary.py
+```
+
+### 结果文件
+
+```text
+results/glm5_phase654_support_generation_bridge_policy_gate_audit/phase654_qwen3_support_generation_bridge_policy_gate_audit_confirm.json
+results/glm5_phase654_support_generation_bridge_policy_gate_audit/phase654_glm4_support_generation_bridge_policy_gate_audit_confirm.json
+results/glm5_phase654_support_generation_bridge_policy_gate_audit/phase654_deepseek7b_support_generation_bridge_policy_gate_audit_confirm.json
+results/glm5_phase654_support_generation_bridge_policy_gate_audit/phase654_cross_model_summary.md
+```
+
+三模型正式测试均为：
+
+```text
+selected_items = 20
+mode_rows = 240
+position_missing = 0
+position_len_mismatch = 0
+empty_patch = 0
+max_new_tokens = 6
+```
+
+运行时间：
+
+```text
+qwen3: 0.97 min
+GLM4: 1.45 min
+DS7B: 1.24 min
+```
+
+### 测试原理
+
+Phase 654 只固定 Phase 653 的强峰 restore patch，不再测试 random / reverse：
+
+```text
+qwen3:
+  separator_input_edge
+  early_peak_layer_out
+
+GLM4:
+  l22_peak_layer_out
+  late_peak_layer_out
+
+DS7B:
+  l22_peak_layer_out
+  late_peak_layer_out
+```
+
+每个样本同时记录：
+
+```text
+1. correct value prefix rank
+2. prefix margin vs top
+3. top0 category
+4. generated first token
+5. exact generation
+6. tok0 hit
+7. final_norm output movement
+8. support_without_generation
+```
+
+其中：
+
+```text
+support_without_generation = prefix_rank <= 15 and exact_correct = false
+```
+
+这个指标直接测量：
+
+```text
+支持已经进入高排名，
+但自然生成仍然不闭合。
+```
+
+### 客观结果
+
+#### qwen3
+
+```text
+yes_no_required + separator_input_edge:
+  mean_rank = 1.9
+  exact = 11 / 20
+  tok0 = 11 / 20
+  support_without_generation = 9 / 20
+  top0 = correct_prefix:11, space:8, explanation:1
+
+yes_no_required + early_peak_layer_out:
+  mean_rank = 4.2
+  exact = 5 / 20
+  tok0 = 5 / 20
+  support_without_generation = 15 / 20
+  top0 = space:15, correct_prefix:5
+
+explanation_required + early_peak_layer_out:
+  mean_rank = 4.3
+  exact = 7 / 20
+  tok0 = 8 / 20
+  support_without_generation = 12 / 20
+  top0 = space:11, correct_prefix:8, word:1
+
+explanation_required + separator_input_edge:
+  mean_rank = 3.1
+  exact = 4 / 20
+  tok0 = 4 / 20
+  support_without_generation = 16 / 20
+  top0 = explanation:12, space:4, correct_prefix:4
+```
+
+qwen3 结论：
+
+```text
+1. separator_input_edge 对 yes_no_required 的 generation closure 最强。
+2. 但即使 mean_rank = 1.9，仍有 9 / 20 support_without_generation。
+3. qwen3 的瓶颈主要是 correct_prefix 与 space / explanation 的最终竞争。
+```
+
+#### GLM4
+
+```text
+explanation_required + l22_peak_layer_out:
+  mean_rank = 2.1
+  exact = 5 / 20
+  tok0 = 5 / 20
+  support_without_generation = 15 / 20
+  top0 = space:15, correct_prefix:5
+
+yes_no_required + l22_peak_layer_out:
+  mean_rank = 3.5
+  exact = 3 / 20
+  tok0 = 3 / 20
+  support_without_generation = 17 / 20
+  top0 = space:15, correct_prefix:3, explanation:2
+
+late_peak_layer_out 与 l22_peak_layer_out 结果相同。
+```
+
+GLM4 结论：
+
+```text
+1. L22 layer_out 已经足以代表 L21-L22 late_peak。
+2. rank 已经非常高，但大多数样本仍被 space 抢走。
+3. GLM4 的主要瓶颈不是 task intent carrier，而是 final token policy 中的 space/readout preference。
+```
+
+#### DS7B
+
+```text
+explanation_required + l22_peak_layer_out:
+  mean_rank = 8.3
+  exact = 3 / 20
+  tok0 = 2 / 20
+  support_without_generation = 14 / 20
+  top0 = space:10, newline:8, correct_prefix:2
+
+yes_no_required + l22_peak_layer_out:
+  mean_rank = 13.8
+  exact = 0 / 20
+  tok0 = 0 / 20
+  support_without_generation = 15 / 20
+  top0 = newline:11, space:9
+
+late_peak_layer_out 与 l22_peak_layer_out 结果相同。
+```
+
+DS7B 结论：
+
+```text
+1. DS7B 的 correct value support 已进入 top 15。
+2. 但 yes_no_required 完全没有 exact / tok0 闭合。
+3. top0 被 newline / space 占据。
+4. DS7B 的核心瓶颈已经明确后移到 final policy gate。
+```
+
+### 关键进展
+
+Phase 654 明确把问题从：
+
+```text
+task intent carrier 在哪里？
+```
+
+推进到：
+
+```text
+为什么 support 已经足够强，但 final generation 仍不选择它？
+```
+
+这说明当前图谱必须分成两层：
+
+```text
+1. support formation layer
+   负责把 correct value token 拉进可竞争集合。
+
+2. final policy layer
+   负责决定第一个生成词元到底是 value、space、newline、yes/no、explanation，还是其它格式词。
+```
+
+Phase 654 证明：
+
+```text
+intent gate 不是最终生成门；
+intent gate 只是把 value token 带入竞争场。
+```
+
+### 理论公式更新
+
+Phase 653 的公式：
+
+```text
+support_value(m, x, t)
+  =
+    R_m(
+      Σ_{l,p,c}
+        [
+          P_m(l,p,c,x)
+          ⊙ I_m(l,p,c,t)
+          ⊙ C_m(l,p,c,x)
+        ]
+    )
+
+generate_value(m, x, t)
+  =
+    D_m(
+      support_value(m, x, t),
+      F_m(x,t)
+    )
+```
+
+Phase 654 后要进一步拆开：
+
+```text
+candidate_set(m,x,t)
+  =
+    TopK(
+      support_value(m,x,t)
+    )
+
+first_token(m,x,t)
+  =
+    argmax_z
+      [
+        support_z(m,x,t)
+        +
+        policy_bias_z(m,x,t)
+        +
+        format_prior_z(m,x,t)
+      ]
+```
+
+其中：
+
+```text
+support_z = 语义 / 值词元支持
+policy_bias_z = 任务输出策略偏置
+format_prior_z = space / newline / explanation / yes-no 等格式先验
+```
+
+所以当前完整图景更接近：
+
+```text
+relation/content state
+  ->
+protocol / intent carrier
+  ->
+value support rank
+  ->
+format-policy competition
+  ->
+first generated token
+```
+
+### 问题和硬伤
+
+1. Phase 654 没有新增 random / reverse controls，因为 Phase 653 已经做了。本阶段只审计 restore 后的 bridge failure。
+
+2. final_norm movement 已记录，但当前总结还没有深入分析 final_norm 向量与 lm_head 各竞争 token 的投影方向，这需要下一阶段专门做。
+
+3. support_without_generation 阈值使用 prefix_rank <= 15，是实用阈值，不是理论阈值。
+
+4. 当前生成只看 max_new_tokens = 6，足以判断 first token bridge，但不足以判断长文本解释质量。
+
+5. DS7B 的 newline / space 偏置仍未被直接定位到具体层或组件。
+
+### 下一阶段
+
+Phase 655 仍属于当前阶段性目标，因为 Phase 654 已经把瓶颈明确到：
+
+```text
+format-policy competition at final token
+```
+
+下一步应执行：
+
+```text
+Phase 655: Final Token Policy Decomposition and Format Prior Gate Audit
+```
+
+任务：
+
+```text
+1. 固定 Phase 654 的 bridge failure 样本。
+2. 对 correct_prefix、space、newline、yes/no、explanation token 建立 top competitor set。
+3. 在 final_norm output 上计算各 token unembedding projection。
+4. 分解：
+   support_value
+   space_prior
+   newline_prior
+   explanation_prior
+   yes_no_prior
+
+5. 对 DS7B 重点定位 newline / space 为什么压过 correct_prefix。
+6. 对 GLM4 重点定位 space 为什么在 rank 已进 top 3 时仍占 top0。
+7. 对 qwen3 重点定位 separator_input_edge 为什么能突破 format prior。
+```
+
+阶段目标：
+
+```text
+从 support-to-generation bridge failure
+推进到 final token policy decomposition。
+```
+
+## Phase 655: Final Token Policy Decomposition and Format Prior Gate Audit [2026-06-26 07:01]
+
+### 触发问题
+
+Phase 654 已经证明：
+
+```text
+correct value support 已经进入 top 15，
+但 first generated token 仍然经常不是 correct_prefix。
+```
+
+因此 Phase 655 不再重新加载模型，而是离线分解 Phase 654 保存的 ladder / groups，分析：
+
+```text
+correct_prefix 被哪些 final-token policy groups 压过？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase655_final_token_policy_decomposition.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase655_final_token_policy_decomposition.py
+python tests/gpt5/phase655_final_token_policy_decomposition.py
+```
+
+### 结果文件
+
+```text
+results/glm5_phase655_final_token_policy_decomposition/phase655_final_token_policy_decomposition.json
+results/glm5_phase655_final_token_policy_decomposition/phase655_final_token_policy_decomposition_summary.md
+```
+
+### 测试原理
+
+Phase 654 的每行结果已经保存：
+
+```text
+top-k tokens
+top0_category
+groups
+prefix_minus_group_max
+prefix_rank
+exact_correct
+generation_text
+```
+
+Phase 655 定义：
+
+```text
+bridge_failure = prefix_rank <= 15 and exact_correct = false
+```
+
+然后按 top0_category（最终胜出类别）统计：
+
+```text
+space
+newline
+explanation
+word
+punctuation
+symbol
+correct_prefix
+```
+
+核心指标：
+
+```text
+prefix_minus_group_max < 0
+```
+
+表示该类别的最强 token logit 高于 correct_prefix。
+
+### 客观结果
+
+bridge failures 数量：
+
+```text
+qwen3: 108
+GLM4: 72
+DS7B: 68
+```
+
+#### qwen3
+
+失败类别：
+
+```text
+space:
+  n = 92
+  mean_rank = 6.74
+  mean_margin_vs_top = -3.645
+
+explanation:
+  n = 13
+  mean_rank = 3.62
+  mean_margin_vs_top = -1.135
+
+word:
+  n = 1
+```
+
+关键模式：
+
+```text
+yes_no_required + separator_input_edge:
+  mean_rank = 1.85
+  exact = 11 / 20
+  support_no_gen = 9 / 20
+  winner_vs_prefix = space:8, explanation:1
+```
+
+qwen3 结论：
+
+```text
+qwen3 的生成失败主要不是 newline，
+而是 space prior 和少量 explanation prior 压过 correct_prefix。
+separator_input_edge 能突破一半以上样本，但没有完全消除 space prior。
+```
+
+#### GLM4
+
+失败类别：
+
+```text
+space:
+  n = 60
+  mean_rank = 3.20
+  mean_margin_vs_top = -1.217
+
+explanation:
+  n = 12
+  mean_rank = 6.50
+  mean_margin_vs_top = -2.396
+```
+
+关键模式：
+
+```text
+explanation_required + l22_peak_layer_out:
+  mean_rank = 2.15
+  exact = 5 / 20
+  support_no_gen = 15 / 20
+  winner_vs_prefix = space:15
+
+yes_no_required + l22_peak_layer_out:
+  mean_rank = 3.45
+  exact = 3 / 20
+  support_no_gen = 17 / 20
+  winner_vs_prefix = space:15, explanation:2
+```
+
+GLM4 结论：
+
+```text
+GLM4 的 task intent support 已经很强，
+但 final token policy 几乎固定偏向 leading space。
+
+L22 layer_out 不是问题终点；
+它把 correct_prefix 拉入竞争集合，
+但没有压倒 space policy。
+```
+
+#### DS7B
+
+失败类别：
+
+```text
+space:
+  n = 38
+  mean_rank = 4.37
+  mean_margin_vs_top = -1.566
+
+newline:
+  n = 26
+  mean_rank = 8.54
+  mean_margin_vs_top = -2.625
+
+explanation:
+  n = 2
+
+word:
+  n = 2
+```
+
+关键模式：
+
+```text
+yes_no_required + l22_peak_layer_out:
+  mean_rank = 13.85
+  exact = 0 / 20
+  support_no_gen = 15 / 20
+  winner_vs_prefix = space:9, newline:6
+
+explanation_required + l22_peak_layer_out:
+  mean_rank = 8.30
+  exact = 3 / 20
+  support_no_gen = 14 / 20
+  winner_vs_prefix = space:10, newline:4
+```
+
+DS7B 结论：
+
+```text
+DS7B 的 final policy gate 是双重门：
+space prior + newline prior。
+
+这解释了为什么 DS7B 的 rank 被大幅拉升后仍不生成 value：
+correct_prefix 进入候选集合，但还没有压倒格式先验。
+```
+
+### 关键进展
+
+Phase 655 把 Phase 654 的 bridge failure 从现象变成了可分解结构：
+
+```text
+support_without_generation
+  =
+    correct_prefix support exists
+    but format_prior wins
+```
+
+当前三个模型的 final token policy map：
+
+```text
+qwen3:
+  main blocker = space
+  secondary blocker = explanation
+  newline 不主导
+
+GLM4:
+  main blocker = space
+  secondary blocker = explanation
+  L22 已经足够形成 support，但不能解除 space prior
+
+DS7B:
+  main blocker = space + newline
+  secondary blocker = explanation / word
+  yes_no_required 中 newline 更突出
+```
+
+### 理论公式更新
+
+Phase 654 的公式：
+
+```text
+first_token(m,x,t)
+  =
+    argmax_z
+      [
+        support_z(m,x,t)
+        +
+        policy_bias_z(m,x,t)
+        +
+        format_prior_z(m,x,t)
+      ]
+```
+
+Phase 655 后可拆成：
+
+```text
+first_token(m,x,t)
+  =
+    argmax_z
+      [
+        semantic_support_z
+        +
+        value_protocol_support_z
+        +
+        task_intent_permission_z
+        +
+        format_prior_z
+        +
+        decoder_policy_bias_z
+      ]
+```
+
+其中当前已观测到：
+
+```text
+format_prior_z =
+  space_prior_z
+  + newline_prior_z
+  + explanation_prior_z
+  + yesno_prior_z
+  + word_prior_z
+```
+
+并且：
+
+```text
+generate_value 成功
+  iff
+    correct_prefix_logit
+      >
+    max(space, newline, explanation, word, punctuation, symbol ...)
+```
+
+更直观地写：
+
+```text
+value_generation_margin
+  =
+    logit(correct_prefix)
+    -
+    max_logit(format_policy_competitors)
+```
+
+当：
+
+```text
+value_generation_margin > 0
+```
+
+才会真正生成正确值。
+
+### 对当前阶段的判断
+
+Phase 652 到 Phase 655 形成了一个闭环：
+
+```text
+Phase 652:
+  找到 intent-gate carrier map。
+
+Phase 653:
+  加入 controls 和短生成，证明局部 intent gate 可以改变生成，但不完全闭合。
+
+Phase 654:
+  定位 support-to-generation bridge failure。
+
+Phase 655:
+  分解 bridge failure 的最终竞争类别。
+```
+
+因此当前阶段性目标已经完成：
+
+```text
+task intent gate 的局部载体、生成桥接失败、最终格式竞争项已经被连成一张小图谱。
+```
+
+### 问题和硬伤
+
+1. Phase 655 是离线分解，不是新的因果 patch 实验。
+
+2. 当前只能证明 space / newline / explanation 是最终竞争胜出类别，还没有定位这些 priors 的写入层和写入组件。
+
+3. prefix_rank <= 15 是经验阈值，后续可以改成 top5 / top10 / top20 多阈值审计。
+
+4. 目前只分析 first token，不能代表完整回答文本质量。
+
+5. qwen3 / GLM4 / DS7B 的 final policy map 差异很大，不能直接合并成单一模型结构。
+
+### 下一阶段
+
+下一阶段已经不是 Phase 652-655 的同一小阶段，而是新的阶段性大任务：
+
+```text
+Format Prior Writer Localization
+```
+
+建议 Phase 656：
+
+```text
+Phase 656: Space-Newline-Explanation Prior Writer Localization Audit
+```
+
+目标：
+
+```text
+1. 以 Phase 655 的失败样本为输入。
+2. 分别定位 space_prior、newline_prior、explanation_prior 的写入层和组件。
+3. 对 qwen3 重点查 space / explanation。
+4. 对 GLM4 重点查 space。
+5. 对 DS7B 重点查 space + newline。
+6. 不再以 correct value rank 为唯一目标，而是直接测：
+   logit(correct_prefix) - logit(space/newline/explanation)
+```
+
+这将把图谱从：
+
+```text
+value support graph
+```
+
+推进到：
+
+```text
+value support + format policy competition graph
+```
+
+## Phase 656: Space-Newline-Explanation Prior Writer Localization Audit [2026-06-26 07:23]
+
+### 触发问题
+
+Phase 655 证明 final token policy failure（最终词元策略失败）主要来自：
+
+```text
+qwen3: space / explanation
+GLM4: space / explanation
+DS7B: space / newline
+```
+
+但 Phase 655 只是离线分解 top0 category，并没有定位这些 format priors（格式先验）由哪些层和组件写入。因此 Phase 656 进入新的阶段性大任务：
+
+```text
+Format Prior Writer Localization
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase656_format_prior_writer_localization_audit.py
+tests/gpt5/phase656_format_prior_writer_localization_audit_summary.py
+```
+
+### 运行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase656_format_prior_writer_localization_audit.py tests/gpt5/phase656_format_prior_writer_localization_audit_summary.py
+```
+
+qwen3 smoke：
+
+```bash
+python tests/gpt5/phase656_format_prior_writer_localization_audit.py qwen3 --smoke --hard-exit-after-model
+```
+
+正式测试，严格顺序执行：
+
+```bash
+python tests/gpt5/phase656_format_prior_writer_localization_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase656_format_prior_writer_localization_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase656_format_prior_writer_localization_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase656_format_prior_writer_localization_audit_summary.py
+```
+
+### 结果文件
+
+```text
+results/glm5_phase656_format_prior_writer_localization_audit/phase656_qwen3_format_prior_writer_localization_audit_confirm.json
+results/glm5_phase656_format_prior_writer_localization_audit/phase656_glm4_format_prior_writer_localization_audit_confirm.json
+results/glm5_phase656_format_prior_writer_localization_audit/phase656_deepseek7b_format_prior_writer_localization_audit_confirm.json
+results/glm5_phase656_format_prior_writer_localization_audit/phase656_cross_model_summary.md
+```
+
+正式测试规模：
+
+```text
+qwen3:
+  selected_items = 20
+  mode_rows = 2160
+  scan_layers = L12-L24
+  time = 1.61 min
+
+GLM4:
+  selected_items = 20
+  mode_rows = 1680
+  scan_layers = L18-L27
+  time = 1.81 min
+
+DS7B:
+  selected_items = 20
+  mode_rows = 1680
+  scan_layers = L18-L27
+  time = 1.56 min
+```
+
+三模型均为：
+
+```text
+position_missing = 0
+position_len_mismatch = 0
+empty_patch = 0
+```
+
+### 测试原理
+
+Phase 656 固定 Phase 653 / 654 的 intent-gate restore patch（意图门恢复修补），然后在 final readout position（最终读出位置）逐层消融：
+
+```text
+attn_out
+mlp_out
+```
+
+如果消融某个组件后：
+
+```text
+correct_prefix - previous_top_format_token
+```
+
+的 margin（差距）上升，说明该组件原本在支持 format prior（格式先验）或压制 correct prefix（正确前缀）。
+
+核心指标：
+
+```text
+mean_top_margin_delta
+  =
+    margin_after_ablation
+    -
+    margin_before_ablation
+```
+
+若：
+
+```text
+mean_top_margin_delta > 0
+```
+
+则该组件是 format-prior writer candidate（格式先验写入候选）。
+
+同时记录：
+
+```text
+mean_rank_improvement
+flipped_to_correct
+space / newline / explanation margin delta
+```
+
+### 客观结果
+
+#### qwen3
+
+最强候选：
+
+```text
+yes_no_required + early_peak_layer_out:
+  L21 mlp_out
+  baseline_top0 = space
+  n = 15
+  mean_top_margin_delta = +1.892
+  mean_rank_improvement = +2.47
+  flipped_to_correct = 5
+  space_delta = +2.12
+  explanation_delta = +1.40
+
+explanation_required + early_peak_layer_out:
+  L21 mlp_out
+  baseline_top0 = space
+  n = 11
+  mean_top_margin_delta = +1.750
+  mean_rank_improvement = +1.45
+  flipped_to_correct = 2
+  space_delta = +2.08
+
+yes_no_required + early_peak_layer_out:
+  L18 attn_out
+  baseline_top0 = space
+  n = 15
+  mean_top_margin_delta = +1.500
+  mean_rank_improvement = +2.67
+  flipped_to_correct = 5
+  space_delta = +1.63
+```
+
+qwen3 初步结论：
+
+```text
+qwen3 的 space prior writer 候选集中在 L18 attn_out 与 L21 mlp_out。
+L21 mlp_out 是最稳定的 space/explanation format-prior writer candidate。
+```
+
+#### GLM4
+
+最强候选：
+
+```text
+yes_no_required + l22_peak_layer_out:
+  L27 attn_out
+  baseline_top0 = space
+  n = 14
+  mean_top_margin_delta = +0.634
+  mean_rank_improvement = +1.00
+  flipped_to_correct = 1
+  space_delta = +0.66
+
+yes_no_required + l22_peak_layer_out:
+  L23 attn_out
+  baseline_top0 = space
+  n = 14
+  mean_top_margin_delta = +0.504
+  mean_rank_improvement = +0.86
+  flipped_to_correct = 1
+  space_delta = +0.51
+
+explanation_required + l22_peak_layer_out:
+  L23 attn_out
+  baseline_top0 = space
+  n = 15
+  mean_top_margin_delta = +0.487
+  mean_rank_improvement = +0.40
+  flipped_to_correct = 3
+  space_delta = +0.50
+```
+
+GLM4 初步结论：
+
+```text
+GLM4 的 space prior writer 候选主要是 late attention outputs：
+L23 attn_out 与 L27 attn_out。
+
+效应小于 qwen3，但更集中。
+```
+
+#### DS7B
+
+最强候选：
+
+```text
+explanation_required + l22_peak_layer_out:
+  L24 mlp_out
+  baseline_top0 = newline
+  n = 7
+  mean_top_margin_delta = +0.804
+  mean_rank_improvement = +7.00
+  flipped_to_correct = 0
+  newline_delta = +0.80
+  space_delta = +1.11
+
+yes_no_required + l22_peak_layer_out:
+  L24 mlp_out
+  baseline_top0 = newline
+  n = 11
+  mean_top_margin_delta = +0.551
+  mean_rank_improvement = +7.27
+  flipped_to_correct = 0
+  newline_delta = +0.55
+  space_delta = +1.01
+
+explanation_required + l22_peak_layer_out:
+  L23 mlp_out
+  baseline_top0 = newline
+  n = 7
+  mean_top_margin_delta = +0.661
+  mean_rank_improvement = +1.14
+  flipped_to_correct = 1
+  newline_delta = +1.46
+```
+
+DS7B 初步结论：
+
+```text
+DS7B 的 newline / space prior writer 候选主要集中在 L23-L24 mlp_out，
+其中 L24 mlp_out 对 newline/space 双重格式先验最明显。
+```
+
+### 关键进展
+
+Phase 655 只知道：
+
+```text
+correct_prefix 输给 space/newline/explanation。
+```
+
+Phase 656 开始定位：
+
+```text
+哪些层和组件在写入这些 format priors。
+```
+
+当前模型差异：
+
+```text
+qwen3:
+  L18 attn_out + L21 mlp_out
+  space/explanation prior
+
+GLM4:
+  L23/L27 attn_out
+  space prior
+
+DS7B:
+  L23/L24 mlp_out
+  newline + space prior
+```
+
+这说明 final policy gate（最终策略门）不是单一结构，而是模型相关的格式先验写入图谱。
+
+### 问题和硬伤
+
+1. Phase 656 是 final-position component ablation（最终位置组件消融），不是 restore-style positive construction（恢复式正向构造）。
+
+2. 消融某个组件后 margin 变好，只能说明该组件参与了格式先验或压制 correct_prefix，不能直接证明它是唯一写入者。
+
+3. GLM4 的 effect size 较小，虽然集中在 attention，但需要生成级确认。
+
+4. DS7B 的 L24 mlp_out 大幅改善 rank，但 flipped_to_correct 仍为 0，说明它降低了 newline/space prior，但还不足以让 correct_prefix 胜出。
+
+5. qwen3 的 L21 mlp_out 与 L18 attn_out 都有效，说明可能存在多组件格式先验链，而不是单点写入。
+
+### 下一阶段
+
+Phase 657 仍属于同一个 Format Prior Writer Localization 阶段，因为 Phase 656 只完成 margin-level writer localization，还没有验证这些候选是否能改变短生成。
+
+下一步：
+
+```text
+Phase 657: Format-Prior Writer Candidate Generation Confirmation
+```
+
+目标：
+
+```text
+1. 只取 Phase 656 的 top writer candidates。
+2. 固定 intent-gate restore patch。
+3. 对候选组件做 final-position ablation。
+4. 加入短生成，测试 exact / tok0 是否提升。
+5. 判断：
+   margin-level writer candidate
+   是否真的能变成 generation-level writer candidate。
+```
+
+## Phase 657: Format-Prior Writer Candidate Generation Confirmation [2026-06-26 07:38]
+
+### 任务来源
+
+用户要求分析 Phase 653-655 的判断是否正确，并在同一阶段内继续推进。附件判断基本正确：Phase 653-655 已经把问题从“intent-gate restore 能不能把 correct value token 拉进候选集”推进到“为什么最终生成仍输给 space/newline/explanation 等格式先验”。因此 Phase 657 接续 Phase 656，验证 Phase 656 的 format-prior writer candidates 是否真的能改变短生成，而不是只改变 final-position logit margin。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase657_format_prior_writer_generation_confirmation.py
+tests/gpt5/phase657_format_prior_writer_generation_confirmation_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase657_format_prior_writer_generation_confirmation.py tests/gpt5/phase657_format_prior_writer_generation_confirmation_summary.py
+python tests/gpt5/phase657_format_prior_writer_generation_confirmation.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase657_format_prior_writer_generation_confirmation.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase657_format_prior_writer_generation_confirmation.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase657_format_prior_writer_generation_confirmation.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase657_format_prior_writer_generation_confirmation_summary.py
+```
+
+### 测试原理
+
+Phase 656 的测试只说明：
+
+```text
+在 fixed intent-gate restore patch 下，
+消融某个 final-position component 后，
+correct_prefix 相对当前 top format token 的 margin 变好。
+```
+
+Phase 657 进一步加入短生成：
+
+```text
+site_restore:
+  只使用 intent-gate restore patch。
+
+candidate_ablation:
+  使用相同 intent-gate restore patch，
+  并在第一步生成时消融 Phase 656 找到的候选 format-prior writer。
+```
+
+观察指标：
+
+```text
+exact_correct 是否增加
+tok0 correct_prefix 是否增加
+correct_prefix rank 是否改善
+top0_category 是否从 space/newline/explanation 转向 correct_prefix
+```
+
+### 客观结果
+
+输出目录：
+
+```text
+results/glm5_phase657_format_prior_writer_generation_confirmation/
+results/glm5_phase657_format_prior_writer_generation_confirmation/phase657_cross_model_summary.md
+```
+
+三模型数据规模：
+
+```text
+qwen3:
+  selected = 20
+  rows = 240
+  time = 0.97 min
+  filtered = 0
+
+GLM4:
+  selected = 20
+  rows = 240
+  time = 1.42 min
+  filtered = 0
+
+DS7B:
+  selected = 20
+  rows = 240
+  time = 1.20 min
+  filtered = 0
+```
+
+qwen3 强正结果：
+
+```text
+explanation_required + separator_input_edge:
+  L16 attn_out
+  exact: 4 -> 12
+  tok0: 5 -> 14
+  rank: 3.1 -> 1.4
+  top0: explanation/correct_prefix/space -> correct_prefix/space
+
+yes_no_required + early_peak_layer_out:
+  L18 attn_out
+  exact: 5 -> 10
+  tok0: 5 -> 10
+  rank: 4.2 -> 2.1
+
+yes_no_required + early_peak_layer_out:
+  L21 mlp_out
+  exact: 5 -> 9
+  tok0: 5 -> 10
+  rank: 4.2 -> 2.3
+```
+
+GLM4 弱正结果：
+
+```text
+explanation_required:
+  L23 attn_out
+  exact: 5 -> 6
+  tok0: 5 -> 7
+  rank: 2.1 -> 1.9
+
+yes_no_required:
+  L27 attn_out
+  exact: 3 -> 4
+  tok0: 3 -> 4
+  rank: 3.5 -> 2.6
+
+yes_no_required:
+  L23 attn_out
+  exact: 3 -> 4
+  tok0: 3 -> 4
+  rank: 3.5 -> 2.6
+```
+
+DS7B 仍未生成闭合：
+
+```text
+explanation_required:
+  L23 mlp_out
+  exact: 3 -> 3
+  tok0: 2 -> 3
+  rank: 8.3 -> 7.4
+
+explanation_required:
+  L24 mlp_out
+  exact: 3 -> 3
+  tok0: 2 -> 2
+  rank: 8.3 -> 5.3
+
+yes_no_required:
+  L24 mlp_out
+  exact: 0 -> 0
+  tok0: 0 -> 0
+  rank: 13.8 -> 9.6
+```
+
+### 阶段判断
+
+Phase 657 证明：
+
+```text
+Phase 656 的 format-prior writer candidate
+不是纯 logit artifact，
+在 qwen3 和 GLM4 上能够传导到短生成。
+```
+
+但 DS7B 说明：
+
+```text
+降低 newline/space prior 或改善 rank
+不等价于完成 generation closure。
+```
+
+### 问题和硬伤
+
+1. Phase 657 使用的是 final-position ablation，不是正向构造 restore，因此只能证明“去掉该 component 会削弱格式先验”，不能证明自然机制就是靠单独该 component 写入。
+
+2. qwen3 和 GLM4 支持 generation-level writer candidate，但 DS7B 不支持单点闭合。
+
+3. DS7B 的 rank 从 13.8 到 9.6 是真实改善，但离 top1 仍很远，说明还有更强的首词元格式门或协议短路。
+
+4. GLM4 效应稳定但小，需要组合测试判断是否是多 writer 累积。
+
+### 下一阶段
+
+Phase 658 与当前任务仍处于同一阶段，因为 Phase 657 只验证了单点候选，尚未验证最终格式先验是否由多个 writer 叠加形成。
+
+下一步：
+
+```text
+Phase 658: Combined Format-Prior Suppression Generation Audit
+```
+
+目标：
+
+```text
+1. 读取 Phase 657 的 generation-level candidate。
+2. 在同一个 restore site 内组合多个候选 writer。
+3. 测试组合消融是否强于单点消融。
+4. 判断 final format prior 是否是 multi-writer summed pressure。
+5. 特别检查 DS7B 的 rank-only 改善能否被组合推进到 exact/tok0。
+```
+
+## Phase 658: Combined Format-Prior Suppression Generation Audit [2026-06-26 07:38]
+
+### 生成脚本
+
+```text
+tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py
+tests/gpt5/phase658_combined_format_prior_suppression_generation_audit_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py tests/gpt5/phase658_combined_format_prior_suppression_generation_audit_summary.py
+python tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase658_combined_format_prior_suppression_generation_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase658_combined_format_prior_suppression_generation_audit_summary.py
+```
+
+### 测试原理
+
+Phase 657 发现单点 writer 有效，但最终格式先验可能不是单点机制，而是多个 component 共同写入。
+
+Phase 658 的核心对照：
+
+```text
+site_restore:
+  只使用同一个 intent-gate restore patch。
+
+combo_ablation:
+  使用同一个 intent-gate restore patch，
+  并在第一步生成位置同时消融同 site 的 top1/top2/top3 format-prior writer candidates。
+```
+
+这能测试：
+
+```text
+single writer effect 是否可以叠加；
+组合后是否把 correct_prefix 推到 top1；
+DS7B 的 rank-only 改善是否能够被组合推进到 generation closure。
+```
+
+### 客观结果
+
+输出目录：
+
+```text
+results/glm5_phase658_combined_format_prior_suppression_generation_audit/
+results/glm5_phase658_combined_format_prior_suppression_generation_audit/phase658_cross_model_summary.md
+```
+
+三模型数据规模：
+
+```text
+qwen3:
+  selected = 20
+  rows = 240
+  time = 0.97 min
+  filtered = 0
+
+GLM4:
+  selected = 20
+  rows = 240
+  time = 1.42 min
+  filtered = 0
+
+DS7B:
+  selected = 20
+  rows = 240
+  time = 1.21 min
+  filtered = 0
+```
+
+qwen3 组合强正结果：
+
+```text
+explanation_required + separator_input_edge:
+  L16 attn_out + L20 attn_out
+  exact: 4 -> 18
+  tok0: 5 -> 20
+  rank: 3.1 -> 1.0
+  top0: explanation/correct_prefix/space -> correct_prefix 20/20
+
+yes_no_required + early_peak_layer_out:
+  L18 attn_out + L21 mlp_out
+  exact: 5 -> 16
+  tok0: 5 -> 16
+  rank: 4.2 -> 1.1
+
+yes_no_required + early_peak_layer_out:
+  L18 attn_out + L21 mlp_out + L23 mlp_out
+  exact: 5 -> 16
+  tok0: 5 -> 14
+  rank: 4.2 -> 1.6
+```
+
+qwen3 关键事实：
+
+```text
+top2 > top1
+top3 不一定优于 top2
+说明 format prior writer 是可叠加的，但不是简单越多越好。
+```
+
+GLM4 组合正结果：
+
+```text
+yes_no_required + l22_peak_layer_out:
+  L27 attn_out + L23 attn_out
+  exact: 3 -> 8
+  tok0: 3 -> 8
+  rank: 3.5 -> 2.0
+
+yes_no_required + late_peak_layer_out:
+  L27 attn_out + L23 attn_out
+  exact: 3 -> 8
+  tok0: 3 -> 8
+  rank: 3.5 -> 2.0
+```
+
+GLM4 关键事实：
+
+```text
+单点 attention writer 是弱正结果；
+L27 + L23 attention 组合后明显增强。
+```
+
+DS7B 组合仍未 exact 闭合：
+
+```text
+explanation_required:
+  L23 mlp_out + L24 mlp_out
+  exact: 3 -> 3
+  tok0: 2 -> 3
+  rank: 8.3 -> 3.6
+
+yes_no_required:
+  L24 mlp_out
+  exact: 0 -> 0
+  tok0: 0 -> 0
+  rank: 13.8 -> 9.6
+```
+
+DS7B 关键事实：
+
+```text
+组合可以大幅推进 rank，
+但仍不能把 correct_prefix 稳定推到 top1。
+```
+
+### 关键进展
+
+Phase 658 将 Phase 657 的判断收紧为：
+
+```text
+final format prior 不是单点门，
+而是多个 writer 的叠加压力。
+```
+
+跨模型分化：
+
+```text
+qwen3:
+  format writer suppression 可以直接生成闭合。
+
+GLM4:
+  单点弱，组合明显增强，说明 attention writer 叠加有效。
+
+DS7B:
+  组合只推动 rank，不推动 exact。
+  DS7B 的瓶颈不只是 L23/L24 MLP format prior。
+```
+
+### 对附件判断的修正
+
+附件认为 Phase 653-655 的方向正确，这一点成立。但现在需要补充：
+
+```text
+Phase 653-655 找到的是 task intent gate 与 final policy gate 的边界；
+Phase 656-658 进一步证明 final policy gate 内部含有可定位的 format-prior writer graph。
+```
+
+不过不能把这个结果夸大为完整机制闭合，因为 DS7B 明确显示：
+
+```text
+format-prior writer graph 被削弱后，
+correct value token 仍可能输给更深的 format/protocol/readout gate。
+```
+
+### 问题和硬伤
+
+1. Phase 658 仍是消融型实验，不是自然路径的正向构造。
+
+2. 组合测试只在同一个 restore site 内进行，没有做跨 site source patch union，因此还没有完整映射全局图谱。
+
+3. qwen3 和 GLM4 支持 multi-writer pressure，但 DS7B 只支持 rank-level pressure，不支持 generation-level closure。
+
+4. top3 不一定比 top2 好，说明 component 之间可能存在方向冲突，不能简单累加。
+
+5. DS7B 的 correct_prefix rank 被推到 3.6 但仍不生成，说明接下来不能继续只找同类 writer，而要定位 top2/top3 到 top1 的最后读出桥。
+
+### 当前理论进展
+
+当前可更新为：
+
+```text
+语言输出不是：
+  semantic support -> answer token
+
+而是：
+  semantic support
+  -> task intent gate
+  -> protocol / format prior writer graph
+  -> final token competition
+  -> generation closure
+```
+
+其中 Phase 653-658 已经把后半段拆成：
+
+```text
+intent-gate restore:
+  让 correct_prefix 进入候选区
+
+format-prior writer suppression:
+  降低 space/newline/explanation 等格式先验
+
+combined writer suppression:
+  在 qwen3/GLM4 上把候选推进到生成，
+  在 DS7B 上只推进到 rank 3-4，未完全闭合
+```
+
+### 下一阶段
+
+Phase 659 仍属于同一个大阶段的后续，因为 DS7B 的 bottleneck 已经被压缩到：
+
+```text
+correct_prefix 已经从很低 rank 被推进到 rank 3-4，
+但仍不能越过最终 top1。
+```
+
+下一阶段不应继续泛化总结，而应做更客观的最后竞争审计：
+
+```text
+Phase 659: DS7B Final Top1 Barrier and Residual Readout Bridge Audit
+```
+
+目标：
+
+```text
+1. 固定 Phase 658 的 DS7B best combo。
+2. 记录 remaining top1/top2 competitors。
+3. 在最后若干层分别测试：
+   residual add
+   ln_f / final_norm input
+   lm_head projection margin
+   top competitor category
+4. 判断 DS7B 的最后瓶颈是：
+   remaining format prior
+   candidate token projection weakness
+   readout normalization distortion
+   还是 generation policy preference。
+5. 只做客观定位，不做理论闭合。
+```
+
+## Phase 659: Final Top1 Barrier and Residual Readout Bridge Audit [2026-06-26 07:44]
+
+### 任务来源
+
+Phase 658 已经证明 format-prior writer suppression 具有组合效应：qwen3 和 GLM4 的组合明显强于单点，DS7B 也出现大幅 rank 改善。但是 DS7B 仍未完成 exact/tok0 generation closure。因此 Phase 659 不继续盲目扩大 patch 搜索，而是固定 Phase 658 的 best combo，审计最后 top1 barrier。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase659_final_top1_barrier_readout_audit.py
+tests/gpt5/phase659_final_top1_barrier_readout_audit_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase659_final_top1_barrier_readout_audit.py tests/gpt5/phase659_final_top1_barrier_readout_audit_summary.py
+python tests/gpt5/phase659_final_top1_barrier_readout_audit.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase659_final_top1_barrier_readout_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase659_final_top1_barrier_readout_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase659_final_top1_barrier_readout_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase659_final_top1_barrier_readout_audit_summary.py
+```
+
+### 测试原理
+
+Phase 659 比较三种状态：
+
+```text
+baseline_task:
+  不加 restore，不加 format writer suppression。
+
+site_restore:
+  使用 Phase 653-656 的 intent-gate restore patch。
+
+combo_ablation:
+  在 site_restore 基础上，
+  使用 Phase 658 的 best format-prior writer suppression combo。
+```
+
+核心测量：
+
+```text
+correct_prefix rank
+correct_prefix 与 top1 的 logit gap
+correct_prefix 是否成为 top1
+剩余 top1 competitor 的类别和具体词元
+```
+
+### 客观结果
+
+输出目录：
+
+```text
+results/glm5_phase659_final_top1_barrier_readout_audit/
+results/glm5_phase659_final_top1_barrier_readout_audit/phase659_cross_model_summary.md
+```
+
+三模型数据规模：
+
+```text
+qwen3:
+  selected = 20
+  rows = 240
+  time = 0.37 min
+  filtered = 0
+
+GLM4:
+  selected = 20
+  rows = 240
+  time = 0.54 min
+  filtered = 0
+
+DS7B:
+  selected = 20
+  rows = 240
+  time = 0.47 min
+  filtered = 0
+```
+
+qwen3：
+
+```text
+explanation_required + separator_input_edge top2:
+  L16 attn_out + L20 attn_out
+  rank: 3.1 -> 1.0
+  top1_gap: 1.14 -> 0.00
+  correct_top1: 4 -> 20
+  remaining top1: correct_prefix 20/20
+
+yes_no_required + early_peak_layer_out top2:
+  L18 attn_out + L21 mlp_out
+  rank: 4.2 -> 1.1
+  top1_gap: 2.22 -> 0.08
+  correct_top1: 5 -> 17
+  remaining top1: correct_prefix 17, space 2, newline 1
+```
+
+qwen3 结论：
+
+```text
+qwen3 的 final top1 barrier 基本被 Phase 658 best combo 打开。
+explanation_required 已经完全 top1 closure。
+yes_no_required 仍有少量 space/newline 残留。
+```
+
+GLM4：
+
+```text
+yes_no_required + l22_peak_layer_out top2:
+  L27 attn_out + L23 attn_out
+  rank: 3.5 -> 2.0
+  top1_gap: 1.13 -> 0.43
+  correct_top1: 3 -> 8
+  remaining top1: space 11, correct_prefix 8, word 1
+
+explanation_required + l22_peak_layer_out top1:
+  L23 attn_out
+  rank: 2.1 -> 1.9
+  top1_gap: 0.80 -> 0.45
+  correct_top1: 5 -> 7
+  remaining top1: space 11, correct_prefix 7, word 2
+```
+
+GLM4 结论：
+
+```text
+GLM4 的 final top1 barrier 被削弱但未打开。
+主要剩余竞争者仍是 space。
+```
+
+DS7B：
+
+```text
+explanation_required + l22_peak_layer_out top2:
+  L23 mlp_out + L24 mlp_out
+  rank: 8.3 -> 3.6
+  top1_gap: 2.19 -> 0.98
+  correct_top1: 2 -> 3
+  remaining top1: space 15, correct_prefix 3, newline 2
+
+yes_no_required + l22_peak_layer_out top1:
+  L24 mlp_out
+  rank: 13.8 -> 9.6
+  top1_gap: 2.81 -> 2.31
+  correct_top1: 0 -> 0
+  remaining top1: newline 15, space 5
+```
+
+DS7B 结论：
+
+```text
+DS7B 的 bottleneck 已被定位得更清楚：
+
+explanation_required:
+  剩余 top1 主要是 space。
+
+yes_no_required:
+  剩余 top1 主要是 newline。
+
+这说明 DS7B 不是没有 semantic value support，
+而是最后读出仍被强格式协议词元占据。
+```
+
+### 关键进展
+
+Phase 659 把 Phase 658 的结果压缩成一个更小的客观事实：
+
+```text
+final generation failure
+不是单纯 correct value token 不存在，
+也不是 intent gate 完全无效，
+而是 correct_prefix 与最终格式协议 token 的 top1 competition 没有完全越过。
+```
+
+模型差异：
+
+```text
+qwen3:
+  best combo 可以几乎完成 top1 closure。
+
+GLM4:
+  best combo 只能削弱 space barrier。
+
+DS7B:
+  explanation 的 rank 可以推进到 3.6，但 space 仍压住；
+  yes/no 的 newline barrier 仍很强。
+```
+
+### 对当前理论的更新
+
+当前链条应改写为：
+
+```text
+semantic value support
+-> task intent gate
+-> format-prior writer graph
+-> residual readout top1 barrier
+-> generation closure
+```
+
+其中：
+
+```text
+task intent gate:
+  负责把 correct_prefix 拉入竞争区。
+
+format-prior writer graph:
+  写入 space/newline/explanation 等格式先验。
+
+residual readout top1 barrier:
+  决定 correct_prefix 是否真正成为第一个生成 token。
+```
+
+### 问题和硬伤
+
+1. Phase 659 是 readout observation，不是新的修复构造。
+
+2. top1_gap 是 logit 层观察，不能直接等同于自然机制中的内部门控变量。
+
+3. DS7B 的 yes/no 仍有 2.31 logit gap，说明仅消融 L24 mlp_out 不够。
+
+4. GLM4 与 DS7B 的剩余 barrier 都是 format token，说明接下来不能回退到语义支持层，必须继续审计 format/protocol readout path。
+
+5. 当前还没有区分：
+   - space/newline 是由最终几层 residual 写入；
+   - 还是 lm_head 对这些 token 的 projection 过强；
+   - 或者 final norm 改变了候选 token 的相对尺度。
+
+### 阶段性判断
+
+Phase 653-659 完成了一个阶段性目标：
+
+```text
+从 intent-gate restore 失败，
+定位到 format-prior writer graph，
+再压缩到 final top1 barrier。
+```
+
+这个阶段的结论不是“语言机制已闭合”，而是：
+
+```text
+在 value-answer 任务中，
+最终失败点已经从广义语义支持层，
+移动到明确的格式协议读出竞争层。
+```
+
+### 下一阶段
+
+下一阶段仍然可以继续，但已经进入新的子阶段：
+
+```text
+Phase 660: Space/Newline Residual Readout Source Backtrace
+```
+
+目标：
+
+```text
+1. 固定 Phase 659 的 DS7B failure cases。
+2. 针对 remaining top1 = space/newline 的样本。
+3. 从最后读出向前回溯：
+   final_norm input
+   final_norm output
+   last 4 residual additions
+   lm_head projection contribution
+4. 分别判断 space/newline barrier 是：
+   residual state 强；
+   final_norm 放大；
+   unembedding projection 强；
+   还是前层格式 writer 残留未消除。
+5. 暂不做大范围搜索，先完成 top1 barrier 的局部图谱。
+```
+
+## Phase 660: Space/Newline Residual Readout Source Backtrace [2026-06-26 08:05]
+
+### 任务来源
+
+附件对 Phase 653-659 的分析基本正确：当前研究已经从 task intent gate、format-prior writer graph 推进到 residual readout top1 barrier。必须收紧的是：Phase 659 仍是 readout observation，不是完整因果闭合；DS7B 的最终读出桥仍未解决。因此 Phase 660 固定 Phase 659/658 的 best combo，回溯 space/newline top1 barrier 的来源。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase660_space_newline_readout_source_backtrace.py
+tests/gpt5/phase660_space_newline_readout_source_backtrace_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase660_space_newline_readout_source_backtrace.py tests/gpt5/phase660_space_newline_readout_source_backtrace_summary.py
+python tests/gpt5/phase660_space_newline_readout_source_backtrace.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase660_space_newline_readout_source_backtrace.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase660_space_newline_readout_source_backtrace.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase660_space_newline_readout_source_backtrace.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase660_space_newline_readout_source_backtrace_summary.py
+```
+
+### 测试原理
+
+Phase 660 比较：
+
+```text
+site_restore:
+  只使用 intent-gate restore patch。
+
+combo_ablation:
+  使用 Phase 658 best format-prior suppression combo。
+
+last4_L{layer}_{component}:
+  在 combo_ablation 基础上，
+  继续消融最后 4 层的 attn_out / mlp_out。
+```
+
+同时记录：
+
+```text
+pre-final-norm projection gap
+post-final-norm / lm_head gap
+norm_gap_shift = post_gap - pre_gap
+remaining top1 category
+```
+
+注意：pre-final-norm projection 是诊断指标，不是模型真实生成路径，因为真实路径必须经过 final_norm。
+
+### 客观结果
+
+输出目录：
+
+```text
+results/glm5_phase660_space_newline_readout_source_backtrace/
+results/glm5_phase660_space_newline_readout_source_backtrace/phase660_cross_model_summary.md
+```
+
+数据规模：
+
+```text
+qwen3:
+  selected = 20
+  rows = 880
+  time = 0.93 min
+  last_layers = [32, 33, 34, 35]
+  filtered = 0
+
+GLM4:
+  selected = 20
+  rows = 880
+  time = 1.22 min
+  last_layers = [36, 37, 38, 39]
+  filtered = 0
+
+DS7B:
+  selected = 20
+  rows = 880
+  time = 1.11 min
+  last_layers = [24, 25, 26, 27]
+  filtered = 0
+```
+
+qwen3：
+
+```text
+yes_no_required + early_peak_layer_out top2:
+  gap: 2.22 -> 0.08
+  rank: 4.2 -> 1.1
+  top1: correct_prefix 16, space 3, newline 1
+  norm_shift: -19.92
+
+explanation_required + separator_input_edge top2:
+  gap: 1.14 -> 0.00
+  rank: 3.1 -> 1.0
+  top1: correct_prefix 20
+  norm_shift: -12.31
+```
+
+qwen3 last-writer 影响较小：
+
+```text
+L35 mlp_out / L32 mlp_out:
+  对少量残留 space/newline 有改善，
+  但整体已经接近闭合。
+```
+
+GLM4：
+
+```text
+yes_no_required + l22_peak_layer_out top2:
+  gap: 1.13 -> 0.43
+  rank: 3.5 -> 2.0
+  top1: space 11, correct_prefix 8, word 1
+  norm_shift: -36.40
+
+explanation_required + l22_peak_layer_out top1:
+  gap: 0.80 -> 0.45
+  rank: 2.1 -> 1.9
+  top1: space 12, correct_prefix 6, word 2
+  norm_shift: -32.71
+```
+
+GLM4 strongest last-writer：
+
+```text
+L36 attn_out:
+  explanation gap_delta = +0.18
+  yes_no gap_delta = +0.14
+
+L36 mlp_out:
+  explanation gap_delta = +0.13
+  yes_no gap_delta = +0.12
+```
+
+DS7B：
+
+```text
+explanation_required + top2:
+  gap: 2.19 -> 0.98
+  rank: 8.3 -> 3.6
+  top1: space 15, correct_prefix 3, newline 2
+  norm_shift: -394.97
+
+yes_no_required + top1:
+  gap: 2.81 -> 2.31
+  rank: 13.8 -> 9.6
+  top1: newline 17, space 3
+  norm_shift: -518.00
+```
+
+DS7B strongest last-writer：
+
+```text
+yes_no_required:
+  L25 attn_out:
+    gap_delta = +0.35
+    rank_delta = +2.50
+    top1: space 11, newline 8, correct_prefix 1
+
+  L26 mlp_out:
+    gap_delta = +0.29
+    rank_delta = +1.00
+    top1: space 10, newline 7, correct_prefix 3
+
+explanation_required:
+  L26 mlp_out:
+    gap_delta = +0.17
+    rank_delta = +0.65
+    top1: space 11, correct_prefix 9
+```
+
+### 关键进展
+
+Phase 660 把 DS7B 的剩余 top1 barrier 从：
+
+```text
+space / newline 仍然压住 correct_prefix
+```
+
+进一步定位为：
+
+```text
+yes_no_required:
+  L25 attn_out + L26 mlp_out 仍在读出端支撑 newline/space barrier。
+
+explanation_required:
+  L26 mlp_out 是最明显的剩余 space barrier contributor。
+```
+
+同时，final_norm 结论必须谨慎：
+
+```text
+pre_norm projection 与 post_norm projection 的尺度差异巨大。
+这说明 raw residual state 不能直接解释最终 lm_head 读出；
+final_norm 是真实读出链条中不可省略的强变换。
+```
+
+### 问题和硬伤
+
+1. Phase 660 的 last-writer 测试仍是消融，不是正向恢复。
+2. `norm_gap_shift` 数值很大，说明 pre_norm projection 只适合作诊断，不适合作直接理论变量。
+3. DS7B yes_no 仍有明显 gap，说明 L25/L26 可能只是剩余 barrier 的一部分。
+4. 当前尚未确认 last-writer candidates 叠加后是否能传到短生成。
+
+### 下一步
+
+Phase 661 与 Phase 660 处于同一子阶段，因为 Phase 660 只定位了 last writer candidates，还没有验证它们是否能传导到 generation closure。
+
+目标：
+
+```text
+Phase 661: Last-Writer Combo Generation Closure
+
+1. 读取 Phase 660 strongest last-writer candidates。
+2. 与 Phase 658 best combo 叠加。
+3. 测试 exact / tok0 / top1_gap 是否进一步改善。
+4. 特别检查 DS7B 的 yes_no newline barrier 是否能被 L25 attn_out + L26 mlp_out 打开。
+```
+
+## Phase 661: Last-Writer Combo Generation Closure [2026-06-26 08:05]
+
+### 生成脚本
+
+```text
+tests/gpt5/phase661_last_writer_combo_generation_closure.py
+tests/gpt5/phase661_last_writer_combo_generation_closure_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase661_last_writer_combo_generation_closure.py tests/gpt5/phase661_last_writer_combo_generation_closure_summary.py
+python tests/gpt5/phase661_last_writer_combo_generation_closure.py qwen3 --smoke --hard-exit-after-model
+python tests/gpt5/phase661_last_writer_combo_generation_closure.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase661_last_writer_combo_generation_closure.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase661_last_writer_combo_generation_closure.py deepseek7b --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase661_last_writer_combo_generation_closure_summary.py
+```
+
+### 测试原理
+
+Phase 661 比较：
+
+```text
+site_restore:
+  只使用 intent-gate restore patch。
+
+phase658_combo:
+  使用 Phase 658 best format-prior suppression combo。
+
+plus_last_writers:
+  在 phase658_combo 基础上，
+  叠加 Phase 660 strongest last-writer ablations。
+```
+
+测量：
+
+```text
+exact_correct
+tok0 correct_prefix
+prefix_rank
+top1_gap
+remaining top1 category
+short greedy generation text
+```
+
+### 客观结果
+
+输出目录：
+
+```text
+results/glm5_phase661_last_writer_combo_generation_closure/
+results/glm5_phase661_last_writer_combo_generation_closure/phase661_cross_model_summary.md
+```
+
+数据规模：
+
+```text
+qwen3:
+  selected = 20
+  rows = 240
+  time = 0.96 min
+  filtered = 0
+
+GLM4:
+  selected = 20
+  rows = 240
+  time = 1.42 min
+  filtered = 0
+
+DS7B:
+  selected = 20
+  rows = 240
+  time = 1.21 min
+  filtered = 0
+```
+
+qwen3：
+
+```text
+yes_no_required + early_peak_layer_out top2:
+  extra: L35 mlp_out + L32 mlp_out
+  exact: 16 -> 20
+  tok0: 16 -> 20
+  gap: 0.08 -> 0.00
+  top1: correct_prefix 20
+
+explanation_required + separator_input_edge top1:
+  extra: L35 mlp_out + L32 mlp_out
+  exact: 12 -> 16
+  tok0: 14 -> 19
+  gap: 0.29 -> 0.03
+```
+
+GLM4：
+
+```text
+explanation_required + l22_peak_layer_out top1:
+  extra: L36 attn_out + L36 mlp_out
+  exact: 6 -> 14
+  tok0: 7 -> 15
+  gap: 0.45 -> 0.21
+  top1: correct_prefix 15, space 5
+
+yes_no_required + l22_peak_layer_out top2:
+  extra: L36 attn_out + L36 mlp_out
+  exact: 8 -> 13
+  tok0: 8 -> 13
+  gap: 0.43 -> 0.22
+  top1: correct_prefix 13, space 5, word 2
+```
+
+DS7B：
+
+```text
+yes_no_required + l22_peak_layer_out top1:
+  extra: L25 attn_out + L26 mlp_out
+  exact: 0 -> 9
+  tok0: 0 -> 9
+  gap: 2.31 -> 1.17
+  top1: correct_prefix 9, space 7, newline 4
+
+explanation_required + l22_peak_layer_out top2:
+  extra: L26 mlp_out
+  exact: 3 -> 9
+  tok0: 3 -> 9
+  gap: 0.98 -> 0.81
+  top1: space 11, correct_prefix 9
+```
+
+### 关键进展
+
+Phase 661 是重要正结果：
+
+```text
+Phase 660 的 last-writer candidates
+不是纯 readout observation，
+叠加后可以传导到 short greedy generation。
+```
+
+尤其 DS7B：
+
+```text
+yes_no_required 从 0/20 exact 提升到 9/20 exact。
+explanation_required 从 3/20 exact 提升到 9/20 exact。
+```
+
+这说明 DS7B 的 remaining barrier 确实包含：
+
+```text
+L25 attn_out
+L26 mlp_out
+```
+
+等后段读出写入器，而不仅仅是 Phase 656 的 L23/L24 MLP。
+
+### 对附件判断的修正
+
+附件判断 Phase 653-659 已把问题推进到 final top1 barrier，这是正确的。Phase 660-661 进一步修正为：
+
+```text
+final top1 barrier 不是不可分解黑箱；
+它至少还可以拆成：
+
+1. Phase 658 format-prior writer combo。
+2. Phase 660/661 last residual writer combo。
+3. remaining projection / normalization / decoder preference。
+```
+
+### 问题和硬伤
+
+1. DS7B 仍未完全闭合：
+
+```text
+yes_no_required:
+  exact 9/20
+  remaining top1: space 7, newline 4
+
+explanation_required:
+  exact 9/20
+  remaining top1: space 11
+```
+
+2. Phase 661 仍使用消融式 suppression，不是自然正向机制构造。
+
+3. 对 qwen3 和 GLM4，继续叠加 last-writer suppression 已经接近上限，但仍可能改变自然性。
+
+4. DS7B 的剩余 gap 仍较大，说明还存在 projection-level 或更深层 policy preference。
+
+### 当前理论进展
+
+链条进一步细化为：
+
+```text
+semantic value support
+-> task intent gate
+-> format-prior writer graph
+-> late residual writer graph
+-> final_norm / lm_head readout
+-> top1 token competition
+-> generation closure
+```
+
+对于 DS7B：
+
+```text
+L23/L24 MLP:
+  早段/中段 format-prior suppression 有效，但不足。
+
+L25 attn_out + L26 mlp_out:
+  后段 residual readout writer，对 yes_no newline/space barrier 有强影响。
+
+remaining barrier:
+  仍主要是 space/newline，可能还需要 projection-level audit。
+```
+
+### 阶段性判断
+
+Phase 660-661 完成了当前子阶段目标：
+
+```text
+从 DS7B final top1 barrier
+回溯到后段 residual readout writer，
+并证明这些 writer 的组合能显著改善生成。
+```
+
+但尚未完成完整闭合：
+
+```text
+DS7B 仍不是 20/20 closure。
+```
+
+### 下一阶段
+
+下一步已经进入新的子阶段，不应继续盲目扩大 writer suppression，而应审计剩余 projection-level barrier：
+
+```text
+Phase 662: Residual-to-LMHead Projection Barrier Audit
+```
+
+目标：
+
+```text
+1. 固定 Phase 661 的 DS7B partially repaired cases。
+2. 只分析 remaining failure cases。
+3. 比较 correct_prefix、space、newline 的 unembedding direction。
+4. 测试 final_norm output 中是否已经接近 correct_prefix direction。
+5. 判断剩余失败是：
+   residual writer 未清除；
+   final_norm output 方向不够；
+还是 lm_head 对 space/newline 的 projection advantage。
+```
+
+## Phase 662: Residual-to-LMHead Projection Barrier Audit [2026-06-26 08:31]
+
+### 任务背景
+
+本阶段读取并审视了用户上传的 Phase 660-661 分析。总体判断：附件中的主判断基本正确。
+
+Phase 660-661 的正确部分是：
+
+```text
+1. Phase 660 将 DS7B 的剩余 space/newline barrier 从最终输出现象回溯到后段 writer。
+2. Phase 661 证明 last-writer combo 不是纯读出噪声，而能实质改善自然生成。
+3. 但 Phase 661 仍未完成闭合：DS7B 的 yes_no / explanation 都仍有大量 space/newline 或后续生成失败。
+4. 因此下一步不应继续盲目扩大 writer suppression，而应进入 residual-to-lm_head projection barrier audit。
+```
+
+本阶段目标是固定 Phase 661 的 partially repaired state，检查剩余失败到底来自：
+
+```text
+1. residual state 仍未对齐 correct value token；
+2. final_norm 改写或压缩了读出差距；
+3. lm_head/unembedding 对 space/newline 存在 projection advantage；
+4. 第一 token 已正确，但后续自然生成仍失败。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py
+tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit_summary.py
+
+python tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase662_residual_to_lmhead_projection_barrier_audit_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase662_residual_to_lmhead_projection_barrier_audit/
+results/glm5_phase662_residual_to_lmhead_projection_barrier_audit/phase662_cross_model_summary.md
+results/glm5_phase662_residual_to_lmhead_projection_barrier_audit/phase662_qwen3_residual_to_lmhead_projection_barrier_audit_confirm.json
+results/glm5_phase662_residual_to_lmhead_projection_barrier_audit/phase662_glm4_residual_to_lmhead_projection_barrier_audit_confirm.json
+results/glm5_phase662_residual_to_lmhead_projection_barrier_audit/phase662_deepseek7b_residual_to_lmhead_projection_barrier_audit_confirm.json
+```
+
+### 测试原理
+
+本阶段不重新寻找新的 patch，而是在 Phase 661 已经有效的 plus_last_writers 条件下，只审计剩余失败样本。
+
+核心测量对象：
+
+```text
+1. post_gap:
+   final_norm output 经 lm_head 后，competitor token 相对 correct_prefix 的真实 logit 优势。
+
+2. pre_gap:
+   final_norm input 直接接 lm_head 的诊断性 logit 差距。
+   注意：pre_gap 不是模型真实输出，只用于观察 final_norm 前后压缩/改写。
+
+3. norm_gap_change:
+   post_gap - pre_gap。
+   如果该值为巨大负数，说明 final_norm 强烈压缩了直接投影差距。
+
+4. needed_unit_delta:
+   如果想让 correct_prefix 追平 competitor，在 unembedding 差分方向上最少需要移动多少单位。
+
+5. correct_cos / competitor_cos / competitor_norm_advantage:
+   用于区分失败来自 hidden-state direction alignment，还是 competitor token unembedding norm/projection advantage。
+```
+
+### 主要结果
+
+#### Qwen3
+
+```text
+样本数：20
+
+yes_no early top2:
+  phase658_combo exact_rate = 0.80
+  plus_last_writers exact_rate = 1.00
+
+yes_no early top3:
+  phase658_combo exact_rate = 0.80
+  plus_last_writers exact_rate = 0.95
+
+explanation separator top1:
+  phase658_combo exact_rate = 0.60
+  plus_last_writers exact_rate = 0.80
+
+explanation separator top2:
+  phase658_combo exact_rate = 0.90
+  plus_last_writers exact_rate = 0.90
+```
+
+Qwen3 的 remaining failures 很少。最重要现象是：部分失败样本的 first-token top1 已经是 correct_prefix，但 exact 仍失败。
+
+```text
+explanation top1 = correct_prefix:
+  n = 5
+  post_gap = 0.00
+  pre_gap = 36.27
+  norm_gap_change = -36.27
+```
+
+这说明 Qwen3 的剩余问题已经不主要是第一 token 的 projection barrier，而是后续自然生成质量或 answer continuation 的问题。
+
+#### GLM4
+
+```text
+样本数：20
+
+explanation l22 top1:
+  phase658_combo exact_rate = 0.30
+  plus_last_writers exact_rate = 0.70
+
+yes_no l22:
+  phase658_combo exact_rate = 0.40
+  plus_last_writers exact_rate = 0.65
+```
+
+GLM4 的剩余失败仍主要是 space 和 word competitor。
+
+```text
+explanation top1 = space:
+  n = 10
+  post_gap = 0.82
+  pre_gap = 25.65
+  norm_gap_change = -24.82
+  needed_unit_delta = 0.881
+  correct_cos = 0.087
+  competitor_cos = 0.094
+  competitor_norm_advantage = -0.005
+
+yes_no top1 = space:
+  n = 10
+  post_gap = 0.79
+  pre_gap = 27.91
+  norm_gap_change = -27.12
+  needed_unit_delta = 0.841
+  correct_cos = 0.090
+  competitor_cos = 0.096
+  competitor_norm_advantage = -0.005
+```
+
+GLM4 的 space barrier 更像 hidden-state direction alignment 问题，而不是 space token 本身的 norm advantage。因为 competitor_cos 高于 correct_cos，但 competitor_norm_advantage 近似为 0 或略负。
+
+#### DS7B
+
+```text
+样本数：20
+
+explanation l22/late top2:
+  phase658_combo exact_rate = 0.15
+  plus_last_writers exact_rate = 0.45
+
+yes_no l22/late top1:
+  phase658_combo exact_rate = 0.00
+  plus_last_writers exact_rate = 0.45
+```
+
+DS7B 的剩余失败最关键，而且出现了清楚的二分：
+
+```text
+space failure:
+  explanation top1 = space:
+    n = 22
+    post_gap = 1.47
+    pre_gap = 385.67
+    norm_gap_change = -384.20
+    needed_unit_delta = 1.104
+    correct_cos = 0.086
+    competitor_cos = 0.073
+    competitor_norm_advantage = 0.260
+
+  yes_no top1 = space:
+    n = 14
+    post_gap = 1.70
+    pre_gap = 395.14
+    norm_gap_change = -393.45
+    needed_unit_delta = 1.277
+    correct_cos = 0.090
+    competitor_cos = 0.077
+    competitor_norm_advantage = 0.260
+```
+
+DS7B 的 space failure 中，correct_cos 反而高于 competitor_cos，但 space 仍赢。这说明 space 失败很可能不是 residual direction 没对齐，而是 space token 在 unembedding / projection norm 上有优势。
+
+```text
+newline failure:
+  yes_no top1 = newline:
+    n = 8
+    post_gap = 2.86
+    pre_gap = 454.56
+    norm_gap_change = -451.70
+    needed_unit_delta = 2.218
+    correct_cos = 0.083
+    competitor_cos = 0.103
+    competitor_norm_advantage = -0.041
+```
+
+DS7B 的 newline failure 与 space failure 不同。newline 的 competitor_cos 明显高于 correct_cos，norm advantage 反而不是主要来源。这说明 newline failure 更像 final hidden direction alignment 问题。
+
+### 客观进展
+
+Phase 662 把 Phase 661 之后的剩余瓶颈从一个笼统说法：
+
+```text
+space/newline 仍然竞争 correct value token
+```
+
+进一步拆成两个不同机制：
+
+```text
+1. DS7B space barrier:
+   correct direction 已不弱，但 space unembedding/projection norm advantage 仍能把它推到 top1。
+
+2. DS7B newline barrier:
+   newline 更像 hidden-state direction alignment 胜出，而不是 norm advantage 胜出。
+
+3. GLM4 space barrier:
+   主要像 hidden-state direction alignment 问题。
+
+4. Qwen3 residual failure:
+   很多已经越过 first-token barrier，剩余问题转向后续生成闭合。
+```
+
+这说明 “format/prefix/value gate” 不能再用单一机制解释。至少要拆成：
+
+```text
+semantic value path
+format prior path
+projection norm path
+continuation generation path
+```
+
+### 理论进展
+
+本阶段支持一个更细的读出公式：
+
+```text
+logit_i
+=
+W_i \cdot \mathrm{Norm}(h)
++ b_i
+```
+
+更细拆成：
+
+```text
+logit_i
+=
+\|W_i\| \cdot \|\mathrm{Norm}(h)\| \cdot \cos(\mathrm{Norm}(h), W_i)
++ b_i
+```
+
+因此 correct value token 是否胜出，不仅取决于语义方向是否存在，还取决于：
+
+```text
+1. hidden state 是否朝向 correct token；
+2. competitor token 的 unembedding norm 是否有优势；
+3. final_norm 是否压缩或改写了差距；
+4. 后续 token generation 是否保持正确轨迹。
+```
+
+当前更准确的统一链条是：
+
+```text
+prompt state
+-> value evidence path
+-> format/protocol path
+-> late writer residual repair
+-> final_norm projection geometry
+-> lm_head token competition
+-> continuation generation closure
+```
+
+### 硬伤和边界
+
+```text
+1. pre_gap 是诊断指标，不是模型真实输出。
+   它不能直接证明 final_norm “犯错”，只能证明 final_norm 前后的直接投影差距发生巨大变化。
+
+2. 本阶段没有进行 causal projection intervention。
+   因此目前只能说 DS7B space failure 显示 projection norm advantage 迹象，不能说已经因果证明。
+
+3. DS7B 的 n=22 / n=14 统计来自不同 task/site 的 failure 聚合，不是 22 个完全独立 prompt。
+   后续应按 task、site、competitor 分层验证。
+
+4. Qwen3 的 exact failure with correct_prefix top1 说明第一 token 指标不足。
+   后续必须把 first-token closure 与 continuation closure 分开。
+
+5. GLM4 和 DS7B 的失败来源不同，不能把 DS7B 结论直接推广到所有模型。
+```
+
+### 下一阶段判断
+
+Phase 662 已经完成当前 projection barrier audit 的阶段目标。
+
+接下来如果继续同一大研究链条，应该进入一个新的干预子阶段：
+
+```text
+Phase 663: Projection-Specific Causal Intervention Audit
+```
+
+核心目标：
+
+```text
+1. 对 DS7B space failure 做 norm-neutralized lm_head readout。
+2. 对 DS7B newline failure 做 direction-only correction。
+3. 对 GLM4 space failure 做 hidden-direction correction。
+4. 区分 projection norm barrier 与 hidden direction barrier 的因果贡献。
+5. 对 Qwen3 correct-prefix-but-wrong-continuation 样本做 continuation-level generation audit。
+```
+
+这已经属于新的子阶段，不应在 Phase 662 内继续扩大测试，否则会把诊断审计和因果干预混在一起。
+
+## Phase 663: Projection-Specific Causal Intervention Audit [2026-06-26 08:57]
+
+### 任务背景
+
+本阶段读取并审视了用户上传的 Phase 662 分析。总体判断：附件中的主判断基本正确，而且指出了 Phase 662 的关键硬伤：
+
+```text
+Phase 662 只是 projection barrier diagnosis，
+还没有完成 projection-specific causal intervention。
+```
+
+因此本阶段继续同一研究链条，进入新的干预子阶段：
+
+```text
+Phase 663: Projection-Specific Causal Intervention Audit
+```
+
+目标不是继续扩大 writer suppression，而是直接验证 Phase 662 的两个分叉判断：
+
+```text
+1. DS7B space failure 是否真的主要来自 unembedding / projection norm advantage。
+2. DS7B newline failure 是否真的主要来自 hidden-state direction alignment。
+3. GLM4 space failure 是否主要是 hidden direction problem，而不是 norm problem。
+4. Qwen3 是否已经进入 continuation-level failure。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase663_projection_specific_causal_intervention_audit.py
+tests/gpt5/phase663_projection_specific_causal_intervention_audit_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase663_projection_specific_causal_intervention_audit.py tests/gpt5/phase663_projection_specific_causal_intervention_audit_summary.py
+
+python tests/gpt5/phase663_projection_specific_causal_intervention_audit.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase663_projection_specific_causal_intervention_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase663_projection_specific_causal_intervention_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase663_projection_specific_causal_intervention_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase663_projection_specific_causal_intervention_audit_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase663_projection_specific_causal_intervention_audit/
+results/glm5_phase663_projection_specific_causal_intervention_audit/phase663_cross_model_summary.md
+results/glm5_phase663_projection_specific_causal_intervention_audit/phase663_qwen3_projection_specific_causal_intervention_audit_confirm.json
+results/glm5_phase663_projection_specific_causal_intervention_audit/phase663_glm4_projection_specific_causal_intervention_audit_confirm.json
+results/glm5_phase663_projection_specific_causal_intervention_audit/phase663_deepseek7b_projection_specific_causal_intervention_audit_confirm.json
+```
+
+### 测试原理
+
+本阶段使用 Phase 661 的 plus_last_writers repaired state，不再寻找新 writer。
+
+测试分两类：
+
+```text
+1. norm-neutralized pair readout:
+   对 correct_prefix 和当前 top1 competitor 做范数中和比较。
+   如果 actual logits 中 competitor 胜出，但去掉 unembedding norm 后 correct_prefix 胜出，
+   则说明 competitor 的胜出很可能依赖 projection norm advantage。
+
+2. direction correction:
+   在 final_norm output 之后，沿 W_correct - W_competitor 方向移动隐藏状态，
+   测试 correct_prefix 是否能成为 top1。
+   这只是在读出端做因果反事实干预，不等于真实生成链路已经修复。
+```
+
+核心判断量：
+
+```text
+actual_gap = logit_competitor - logit_correct
+neutral_cos_gap = cos(h, W_competitor) - cos(h, W_correct)
+
+如果 actual_gap > 0 且 neutral_cos_gap < 0：
+  competitor 实际赢，但去掉范数后 correct direction 更强。
+```
+
+### 主要结果
+
+#### Qwen3
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际 plus_last_writers 状态：
+
+```text
+yes_no top2:
+  exact_rate = 1.000
+  correct_top1_rate = 1.000
+
+yes_no top3:
+  exact_rate = 0.906
+  correct_top1_rate = 0.875
+
+explanation top1:
+  exact_rate = 0.719
+  correct_top1_rate = 0.812
+
+explanation top2:
+  exact_rate = 0.875
+  correct_top1_rate = 0.938
+```
+
+剩余失败：
+
+```text
+explanation word:
+  n = 7
+  norm_neutral_flip_rate = 0.000
+  actual_gap = 0.857
+  neutral_cos_gap = 0.0103
+
+yes_no explanation:
+  n = 2
+  norm_neutral_flip_rate = 1.000
+  actual_gap = 0.156
+  neutral_cos_gap = -0.0074
+
+explanation space:
+  n = 1
+  norm_neutral_flip_rate = 1.000
+
+yes_no newline:
+  n = 1
+  norm_neutral_flip_rate = 1.000
+```
+
+Qwen3 的主要剩余问题不是稳定的 projection norm barrier，而是两类小样本残留：
+
+```text
+1. explanation word competitor：方向仍偏向 word。
+2. correct_prefix 已经 top1 但 exact wrong：continuation failure。
+```
+
+续写失败：
+
+```text
+explanation top1:
+  correct_prefix_but_generation_wrong = 3
+
+explanation top2:
+  correct_prefix_but_generation_wrong = 2
+```
+
+这进一步支持：Qwen3 已经从 first-token barrier 转向 continuation-level audit。
+
+#### GLM4
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际 plus_last_writers 状态：
+
+```text
+explanation l22 top1:
+  exact_rate = 0.781
+  correct_top1_rate = 0.812
+
+explanation late top1:
+  exact_rate = 0.719
+  correct_top1_rate = 0.812
+
+yes_no l22 top2:
+  exact_rate = 0.688
+  correct_top1_rate = 0.688
+
+yes_no late top2:
+  exact_rate = 0.688
+  correct_top1_rate = 0.688
+```
+
+范数中和结果：
+
+```text
+explanation space:
+  n = 10
+  norm_neutral_flip_rate = 0.000
+  actual_gap = 0.825
+  neutral_cos_gap = 0.0068
+  norm_adv = -0.0045
+
+yes_no space:
+  n = 10
+  norm_neutral_flip_rate = 0.000
+  actual_gap = 0.787
+  neutral_cos_gap = 0.0067
+  norm_adv = -0.0045
+
+yes_no word:
+  n = 10
+  norm_neutral_flip_rate = 0.000
+  neutral_cos_gap = 0.0153
+```
+
+GLM4 的 space/word 失败在范数中和后完全不翻转，说明它不是 projection norm advantage 主导，而是 competitor direction alignment 主导。
+
+方向修正结果：
+
+```text
+explanation space:
+  scale 1.5 correct_top1_rate = 1.000
+
+yes_no space:
+  scale 1.5 correct_top1_rate = 0.800
+
+yes_no word:
+  scale 2.0 correct_top1_rate = 1.000
+```
+
+这说明 GLM4 的剩余问题可以通过 hidden direction correction 明显改善，和 Phase 662 的判断一致。
+
+#### DS7B
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际 plus_last_writers 状态：
+
+```text
+explanation l22 top2:
+  exact_rate = 0.500
+  correct_top1_rate = 0.500
+
+explanation late top2:
+  exact_rate = 0.500
+  correct_top1_rate = 0.500
+
+yes_no l22 top1:
+  exact_rate = 0.469
+  correct_top1_rate = 0.500
+
+yes_no late top1:
+  exact_rate = 0.469
+  correct_top1_rate = 0.500
+```
+
+DS7B 的关键结果：
+
+```text
+explanation space:
+  n = 32
+  actual_gap = 1.453
+  neutral_cos_gap = -0.0133
+  norm_neutral_flip_rate = 1.000
+  norm_adv = 0.2603
+
+yes_no space:
+  n = 24
+  actual_gap = 1.750
+  neutral_cos_gap = -0.0132
+  norm_neutral_flip_rate = 0.917
+  norm_adv = 0.2603
+
+yes_no newline:
+  n = 8
+  actual_gap = 2.859
+  neutral_cos_gap = 0.0197
+  norm_neutral_flip_rate = 0.000
+  norm_adv = -0.0408
+```
+
+这是本阶段最关键的结果。
+
+DS7B space failure 中：
+
+```text
+actual logits 里 space 胜出；
+但 norm-neutralized pair readout 后，correct_prefix 基本翻转胜出。
+```
+
+这给 Phase 662 的判断增加了更强证据：
+
+```text
+DS7B space barrier 很大部分确实来自 unembedding / projection norm advantage。
+```
+
+DS7B newline failure 中：
+
+```text
+norm-neutralized flip_rate = 0.000
+neutral_cos_gap > 0
+```
+
+这说明 newline 不是靠 norm advantage 赢，而是 final hidden direction 真的更接近 newline direction。
+
+方向修正结果：
+
+```text
+explanation space:
+  scale 1.5 correct_top1_rate = 0.625
+  scale 2.0 correct_top1_rate = 0.750
+
+yes_no space:
+  scale 1.5 correct_top1_rate = 0.417
+  scale 2.0 correct_top1_rate = 0.417
+
+yes_no newline:
+  scale 2.0 correct_top1_rate = 0.250
+```
+
+这说明 DS7B 即使做 direction correction，仍然经常被 newline 或 space 抢走，尤其 yes_no 任务中存在多竞争者结构，不是单一 competitor 修正即可解决。
+
+### 客观进展
+
+Phase 663 将 Phase 662 的诊断推进为更强的反事实证据：
+
+```text
+1. DS7B space barrier:
+   由 projection norm advantage 主导的证据很强。
+
+2. DS7B newline barrier:
+   不由 norm advantage 主导，而是 hidden direction alignment 主导。
+
+3. GLM4 space/word barrier:
+   不由 norm advantage 主导，而是 hidden direction alignment 主导。
+
+4. Qwen3:
+   first-token barrier 已明显弱化，continuation failure 开始成为主要新瓶颈。
+```
+
+因此 format prior 不能继续被视为一个单一门控，而应拆成：
+
+```text
+format writer
+hidden direction alignment
+projection norm geometry
+multi-competitor readout competition
+continuation controller
+```
+
+### 理论进展
+
+Phase 663 支持把最终读出进一步拆成两个可区分项：
+
+```text
+logit_i
+=
+\|W_i\| \cdot \|\hat{h}\| \cdot \cos(\hat{h}, W_i)
++ b_i
+```
+
+其中：
+
+```text
+hidden direction alignment:
+  \cos(\hat{h}, W_i)
+
+projection norm advantage:
+  \|W_i\|
+```
+
+这说明 token competition 至少有两种不同胜出方式：
+
+```text
+1. direction-win:
+   competitor direction 与 hidden state 更接近。
+
+2. norm-win:
+   competitor direction 不一定更接近，但 unembedding norm / projection geometry 让它胜出。
+```
+
+当前更准确的统一链条更新为：
+
+```text
+prompt conditioned residual state
+-> task / protocol state
+-> semantic value support
+-> format prior writer suppression
+-> late residual writer repair
+-> hidden direction alignment
+-> projection norm geometry
+-> multi-token competition
+-> continuation generation controller
+```
+
+### 问题和硬伤
+
+```text
+1. 本阶段是 readout-level causal intervention，不是 full generation intervention。
+   它能证明 projection geometry 对 top1 competition 有因果作用，
+   但不能证明真实自回归轨迹会自动修复。
+
+2. norm-neutralized pair readout 只比较 correct_prefix 和当前 top1 competitor。
+   它没有完整重排整个 vocabulary。
+   但对于判断当前 competitor 是否依赖 norm advantage 已经足够有信息量。
+
+3. direction correction 是 post-final_norm intervention。
+   它不是网络内部自然产生的修复路径。
+
+4. DS7B yes_no space 在 direction correction 后经常转向 newline。
+   说明 DS7B 是 multi-competitor barrier，不是 simple binary barrier。
+
+5. Qwen3 continuation failure 还没有被机制定位。
+   目前只能确认它已经不是纯 first-token projection problem。
+```
+
+### 下一阶段判断
+
+Phase 663 完成了 projection-specific causal audit 的阶段目标。
+
+接下来如果继续同一大阶段，应进入：
+
+```text
+Phase 664: Multi-Competitor Readout and Continuation Split Audit
+```
+
+核心目标：
+
+```text
+1. DS7B yes_no 中同时跟踪 correct_prefix、space、newline 三方竞争。
+2. 测试 single-competitor correction 为什么会从 space 转向 newline。
+3. 构造 multi-competitor margin：
+   correct_prefix - max(space, newline, word, explanation)
+4. 对 Qwen3 / GLM4 的 correct_prefix top1 but exact wrong 样本做 token1/token2 continuation audit。
+5. 区分 first-token readout closure 与 continuation closure。
+```
+
+这仍属于当前 “读出竞争到生成闭合” 大阶段，但已经是新的子问题：从 pairwise projection intervention 转向 multi-competitor + continuation split。
+
+## Phase 664: Multi-Competitor Readout and Continuation Split Audit [2026-06-26 09:05]
+
+### 任务背景
+
+Phase 663 已经证明：
+
+```text
+1. DS7B space failure 很大程度来自 projection norm advantage。
+2. DS7B newline failure 更像 hidden direction alignment。
+3. GLM4 space / word failure 更像 hidden direction alignment。
+4. Qwen3 已出现 correct_prefix top1 但 exact wrong 的 continuation failure。
+```
+
+但 Phase 663 仍有一个硬伤：
+
+```text
+pairwise correction 只针对当前 top1 competitor。
+```
+
+如果 correct_prefix 打败当前 competitor 后，另一个 competitor 立刻接管 top1，那么 pairwise correction 会高估机制闭合度。
+
+因此 Phase 664 的目标是：
+
+```text
+1. 构造 multi-competitor margin。
+2. 同时追踪 space / newline / word / explanation。
+3. 测试 multi-competitor correction 是否比 pairwise correction 更接近读出闭合。
+4. 对 correct_prefix top1 但 exact wrong 的样本做 token1 / token2 continuation audit。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase664_multi_competitor_continuation_split_audit.py
+tests/gpt5/phase664_multi_competitor_continuation_split_audit_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase664_multi_competitor_continuation_split_audit.py tests/gpt5/phase664_multi_competitor_continuation_split_audit_summary.py
+
+python tests/gpt5/phase664_multi_competitor_continuation_split_audit.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase664_multi_competitor_continuation_split_audit.py qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase664_multi_competitor_continuation_split_audit.py glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase664_multi_competitor_continuation_split_audit.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase664_multi_competitor_continuation_split_audit_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase664_multi_competitor_continuation_split_audit/
+results/glm5_phase664_multi_competitor_continuation_split_audit/phase664_cross_model_summary.md
+results/glm5_phase664_multi_competitor_continuation_split_audit/phase664_qwen3_multi_competitor_continuation_split_audit_confirm.json
+results/glm5_phase664_multi_competitor_continuation_split_audit/phase664_glm4_multi_competitor_continuation_split_audit_confirm.json
+results/glm5_phase664_multi_competitor_continuation_split_audit/phase664_deepseek7b_multi_competitor_continuation_split_audit_confirm.json
+```
+
+### 测试原理
+
+本阶段引入 multi-competitor margin：
+
+```text
+multi_margin
+=
+logit(correct_prefix)
+-
+max(logit(space), logit(newline), logit(word), logit(explanation))
+```
+
+如果：
+
+```text
+multi_margin > 0
+```
+
+说明 correct_prefix 不只是打败当前 top1 competitor，而是打败主要格式/词元竞争集合。
+
+同时做 multi-competitor correction：
+
+```text
+对所有当前超过 correct_prefix 的 competitor，
+沿 W_correct - W_competitor 的方向构造联合移动。
+```
+
+这可以检查：
+
+```text
+pairwise correction 后是否只是从 space 转移到 newline；
+multi correction 是否能真正清空主要 competitor set。
+```
+
+对 continuation failure，本阶段强制接上 correct_prefix 后，再检查 token1 / token2 是否命中真实正确答案的后续 token。
+
+### 主要结果
+
+#### Qwen3
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际状态：
+
+```text
+yes_no top2:
+  exact_rate = 1.000
+  correct_top1_rate = 1.000
+
+yes_no top3:
+  exact_rate = 0.906
+  correct_top1_rate = 0.906
+
+explanation top1:
+  exact_rate = 0.719
+  correct_top1_rate = 0.781
+
+explanation top2:
+  exact_rate = 0.875
+  correct_top1_rate = 0.938
+```
+
+多竞争者失败：
+
+```text
+explanation word:
+  n = 7
+  mean_multi_margin = -0.857
+  winner_sets = word:6, space+word:1
+
+yes_no explanation:
+  n = 2
+  mean_multi_margin = -0.156
+
+yes_no newline:
+  n = 1
+  mean_multi_margin = -0.188
+```
+
+multi-correction 后：
+
+```text
+explanation word:
+  scale 1.5 correct_top1_rate = 1.000
+
+yes_no explanation:
+  scale 2.0 correct_top1_rate = 1.000
+
+yes_no newline:
+  scale 1.5 correct_top1_rate = 1.000
+```
+
+续写审计：
+
+```text
+explanation top2:
+  n = 2
+  token1_match_rate = 0.000
+  token2_match_rate = 0.000
+
+explanation top1:
+  n = 2
+  token1_match_rate = 0.000
+  token2_match_rate = 0.000
+```
+
+Qwen3 的关键结论：
+
+```text
+first-token barrier 已经很弱；
+但 correct_prefix 后的 continuation token 仍不跟随正确答案轨迹。
+```
+
+#### GLM4
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际状态：
+
+```text
+explanation l22 top1:
+  exact_rate = 0.781
+  correct_top1_rate = 0.781
+
+explanation late top1:
+  exact_rate = 0.719
+  correct_top1_rate = 0.781
+
+yes_no l22 top2:
+  exact_rate = 0.688
+  correct_top1_rate = 0.719
+
+yes_no late top2:
+  exact_rate = 0.688
+  correct_top1_rate = 0.719
+```
+
+多竞争者失败：
+
+```text
+explanation space:
+  n = 10
+  mean_multi_margin = -0.825
+  winner_sets = space+word:6, space:4
+
+yes_no word:
+  n = 10
+  mean_multi_margin = -0.263
+  winner_sets = word:8, space+word:2
+
+yes_no space:
+  n = 8
+  mean_multi_margin = -0.984
+  winner_sets = space+word:6, space:2
+```
+
+multi-correction 后：
+
+```text
+explanation space:
+  scale 1.5 correct_top1_rate = 1.000
+
+yes_no space:
+  scale 1.5 correct_top1_rate = 1.000
+
+yes_no word:
+  scale 2.0 correct_top1_rate = 1.000
+```
+
+续写审计：
+
+```text
+explanation late top1:
+  n = 2
+  token1_match_rate = 0.000
+  token2_match_rate = 0.000
+
+yes_no l22 top2:
+  n = 1
+  token1_match_rate = 1.000
+  token2_match_rate = 0.000
+
+yes_no late top2:
+  n = 1
+  token1_match_rate = 1.000
+  token2_match_rate = 0.000
+```
+
+GLM4 的关键结论：
+
+```text
+readout competition 可以被 multi-direction correction 充分压低；
+但部分样本仍会在后续 token 处偏离。
+```
+
+#### DS7B
+
+```text
+selected_items = 32
+rows = 128
+```
+
+实际状态：
+
+```text
+explanation l22 top2:
+  exact_rate = 0.500
+  correct_top1_rate = 0.500
+
+explanation late top2:
+  exact_rate = 0.500
+  correct_top1_rate = 0.500
+
+yes_no l22 top1:
+  exact_rate = 0.469
+  correct_top1_rate = 0.469
+
+yes_no late top1:
+  exact_rate = 0.469
+  correct_top1_rate = 0.469
+```
+
+多竞争者失败：
+
+```text
+explanation space:
+  n = 32
+  mean_multi_margin = -1.453
+  winner_sets =
+    space:14
+    space+newline:10
+    space+newline+word:8
+
+yes_no space:
+  n = 24
+  mean_multi_margin = -1.750
+  winner_sets =
+    space+newline:16
+    space+newline+word+explanation:4
+    space:2
+    space+newline+explanation:2
+
+yes_no newline:
+  n = 8
+  mean_multi_margin = -2.859
+  winner_sets =
+    space+newline+explanation:4
+    space+newline+word+explanation:4
+```
+
+这是关键结果：DS7B 的失败几乎不是单竞争者失败，而是多竞争者集合同时压制 correct_prefix。
+
+multi-correction 后：
+
+```text
+explanation space:
+  scale 1.0 correct_top1_rate = 0.562
+  scale 1.5 correct_top1_rate = 0.938
+  scale 2.0 correct_top1_rate = 1.000
+
+yes_no space:
+  scale 1.0 correct_top1_rate = 1.000
+
+yes_no newline:
+  scale 1.0 correct_top1_rate = 1.000
+```
+
+Phase 663 中 pairwise correction 后经常出现 space -> newline 的替换，本阶段证明这是因为竞争者集合没有被同时处理。multi-competitor correction 能显著减少这种替换。
+
+### 客观进展
+
+Phase 664 完成了两个关键补洞：
+
+```text
+1. Pairwise correction 不足以描述 DS7B 的真实瓶颈。
+   DS7B 是 multi-competitor readout barrier。
+
+2. correct_prefix top1 不等于 full answer correct。
+   Qwen3 / GLM4 都出现 token1/token2 continuation failure。
+```
+
+这把当前拼图从：
+
+```text
+correct_prefix vs current top1
+```
+
+推进到：
+
+```text
+correct_prefix vs competitor set
+```
+
+并且从：
+
+```text
+first-token closure
+```
+
+推进到：
+
+```text
+first-token closure + continuation closure
+```
+
+### 理论进展
+
+读出竞争公式更新为：
+
+```text
+M_{\text{multi}}
+=
+\ell_{\text{correct}}
+-
+\max_{j \in C_{\text{format/readout}}} \ell_j
+```
+
+其中：
+
+```text
+C_{\text{format/readout}}
+=
+\{space, newline, word, explanation, punctuation, symbol, other-prefix\}
+```
+
+如果只检查：
+
+```text
+\ell_{\text{correct}} - \ell_{\text{top1}}
+```
+
+可能会漏掉 top2/top3 中随时接管的竞争者。
+
+续写闭合需要新增公式：
+
+```text
+P(\text{answer})
+=
+P(y_0=\text{correct-prefix})
+\cdot
+\prod_{t=1}^{T}
+P(y_t=\text{correct-continuation}_t \mid y_{<t}, h_t)
+```
+
+因此：
+
+```text
+first-token closure
+\neq
+continuation closure
+```
+
+当前统一链条更新为：
+
+```text
+semantic value support
+-> protocol / format writer suppression
+-> late residual readout repair
+-> projection norm / direction geometry
+-> multi-competitor token readout
+-> continuation trajectory controller
+```
+
+### 问题和硬伤
+
+```text
+1. multi-correction 仍然是 post-final_norm readout intervention。
+   它不是模型自然内部路径。
+
+2. multi-correction 只覆盖 top_k 内识别到的 target categories。
+   没有穷尽整个 vocabulary 的所有潜在竞争者。
+
+3. continuation audit 只检查 token1/token2 的局部延续。
+   尚未定位 continuation controller 的具体层、组件、位置。
+
+4. DS7B 的 multi-correction 读出闭合很强，但这不等于生成闭合。
+   下一步必须把 readout correction 和真实 autoregressive generation 区分开。
+
+5. Qwen3 / GLM4 的续写失败样本数量不大，但现象稳定：token1/token2 明显偏离。
+```
+
+### 阶段性判断
+
+Phase 660-664 组成的当前子链条已经完成阶段性目标：
+
+```text
+从 final top1 barrier
+到 late writer
+到 projection geometry
+到 multi-competitor readout
+到 continuation split
+```
+
+已经可以确认：
+
+```text
+读出端不是单一门，而是多竞争者集合；
+生成闭合不是第一词元闭合，而必须包含续写轨迹闭合。
+```
+
+### 下一阶段
+
+下一步不应继续在 post-final_norm readout 上做更多人工方向修正。新的阶段应转向真实自回归路径：
+
+```text
+Phase 665: Autoregressive Continuation Controller Localization
+```
+
+目标：
+
+```text
+1. 只选择 correct_prefix top1 but exact wrong 的样本。
+2. 定位 token1/token2 偏离发生的层、组件、位置。
+3. 比较 prompt-end state、after-token0 state、token1 generation state。
+4. 判断 continuation failure 是：
+   语义值轨迹丢失；
+   格式协议重新接管；
+   还是 answer-token sequence 没被绑定。
+```
+
+这是新的阶段：从 readout-level counterfactual 进入真实 autoregressive continuation path，因此不应与 Phase 664 混在同一测试内。
+
+## Phase 665: Autoregressive Continuation Controller Localization [2026-06-26 09:30]
+
+### 任务背景
+
+本阶段读取并审视了用户上传的 Phase 663-664 分析。总体判断：附件中的判断基本正确。
+
+正确部分：
+
+```text
+1. Phase 663-664 确认读出端不是单一门，而是多竞争者集合。
+2. Phase 664 证明 first-token closure 不等于 continuation closure。
+3. 当前最需要推进的是 correct_prefix top1 but exact wrong 的真实自回归路径定位。
+```
+
+附件指出的硬伤也成立：
+
+```text
+Phase 664 的 continuation audit 只检查 token1/token2 现象，
+尚未定位 continuation controller 的层、组件、位置。
+```
+
+因此本阶段进入：
+
+```text
+Phase 665: Autoregressive Continuation Controller Localization
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase665_autoregressive_continuation_controller_localization.py
+tests/gpt5/phase665_autoregressive_continuation_controller_localization_summary.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase665_autoregressive_continuation_controller_localization.py tests/gpt5/phase665_autoregressive_continuation_controller_localization_summary.py
+
+python tests/gpt5/phase665_autoregressive_continuation_controller_localization.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase665_autoregressive_continuation_controller_localization.py qwen3 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase665_autoregressive_continuation_controller_localization.py glm4 --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase665_autoregressive_continuation_controller_localization.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase665_autoregressive_continuation_controller_localization_summary.py
+```
+
+### 执行过程说明
+
+第一次 confirm 运行时，qwen3 已完成计算，但 JSON 写盘失败：
+
+```text
+TypeError: Object of type Tensor is not JSON serializable
+```
+
+原因：
+
+```text
+selected_failures 中误保存了 source_patches，
+其中包含 tensor。
+```
+
+处理：
+
+```text
+移除 selected_failures 中的 source_patches 字段；
+重新编译、冒烟、并重新顺序执行 qwen3、GLM4、DS7B。
+```
+
+该问题是结果保存层面的脚本问题，不是模型测试结果问题。
+
+### 输出文件
+
+```text
+results/glm5_phase665_autoregressive_continuation_controller_localization/
+results/glm5_phase665_autoregressive_continuation_controller_localization/phase665_cross_model_summary.md
+results/glm5_phase665_autoregressive_continuation_controller_localization/phase665_qwen3_autoregressive_continuation_controller_localization_confirm.json
+results/glm5_phase665_autoregressive_continuation_controller_localization/phase665_glm4_autoregressive_continuation_controller_localization_confirm.json
+results/glm5_phase665_autoregressive_continuation_controller_localization/phase665_deepseek7b_autoregressive_continuation_controller_localization_confirm.json
+```
+
+### 测试原理
+
+本阶段只选择：
+
+```text
+correct_prefix top1
+but exact generation wrong
+```
+
+然后强制模型进入真实自回归续写输入：
+
+```text
+prompt + correct_prefix
+prompt + correct_prefix + correct_token1
+```
+
+分别检查：
+
+```text
+token1 是否能成为 top1；
+token2 是否能成为 top1；
+```
+
+之后，从 short_value_allowed source path 采集 continuation position 的 hidden state，并 patch 到 task path 的同一续写位置，扫描：
+
+```text
+layer_input
+attn_out
+mlp_out
+layer_out
+```
+
+目标是定位：
+
+```text
+续写失败是 token1 轨迹丢失；
+还是 token2 轨迹丢失；
+以及哪些层/组件携带了修复 token1/token2 的状态。
+```
+
+### 主要结果
+
+#### Qwen3
+
+```text
+raw_cases = 512
+selected_items = 64
+continuation_failures = 5
+rows = 650
+scan_layers = L20-L35
+```
+
+筛到的续写失败：
+
+```text
+explanation top1:
+  n = 3
+  generation_text:
+    " v22\n\nWait,"
+    " v22\n\nOkay,"
+    " 05\n\nThe answer"
+
+explanation top2:
+  n = 2
+  generation_text:
+    " v22\n\nWait,"
+    " v22\n\nOkay,"
+```
+
+续写基线：
+
+```text
+explanation top1 step1:
+  n = 3
+  expected_top1_rate = 0.333
+  mean_expected_rank = 1.67
+  mean_expected_minus_top1 = -0.833
+
+explanation top1 step2:
+  expected_top1_rate = 1.000
+
+explanation top2 step1:
+  n = 2
+  expected_top1_rate = 0.000
+  mean_expected_rank = 2.00
+  mean_expected_minus_top1 = -1.875
+
+explanation top2 step2:
+  expected_top1_rate = 1.000
+```
+
+关键现象：
+
+```text
+Qwen3 的 continuation failure 主要发生在 token1。
+一旦 token1 被强制正确，token2 基本能跟上。
+```
+
+最强 patch 候选：
+
+```text
+explanation top2 step1:
+  L22 attn_out:
+    n = 2
+    mean_margin_delta = 1.875
+    mean_rank_improvement = 1.00
+    flip_rate = 1.00
+
+  L23 layer_out / L24 layer_input 以后大量状态也能修复。
+```
+
+保守解释：
+
+```text
+L22 attn_out 是较早出现的有效候选；
+后续 layer_input/layer_out 的广泛有效，说明修复状态一旦写入后会沿 residual stream 传播，
+不能把所有后续层都解释成独立因果源。
+```
+
+#### GLM4
+
+```text
+raw_cases = 512
+selected_items = 64
+continuation_failures = 4
+rows = 292
+scan_layers = L22-L39
+```
+
+筛到的续写失败：
+
+```text
+explanation late top1:
+  n = 3
+  generation_text:
+    " v05\n\nReason: According"
+    " 22\n\nReason: The"
+
+explanation l22 top1:
+  n = 1
+  generation_text:
+    " 22\n\nReason: The"
+```
+
+续写基线：
+
+```text
+explanation l22 top1 step1:
+  n = 1
+  expected_top1_rate = 1.000
+
+explanation late top1 step1:
+  n = 3
+  expected_top1_rate = 0.333
+  mean_expected_rank = 1.67
+  mean_expected_minus_top1 = -0.375
+```
+
+最强 patch 候选：
+
+```text
+explanation late top1 step1:
+  L22 layer_input / attn_out / mlp_out / layer_out:
+    n = 3
+    mean_margin_delta = 0.375
+    mean_rank_improvement = 0.67
+    flip_rate = 0.67
+
+  L23-L39 的 layer_input / layer_out 也表现为传播性有效。
+```
+
+保守解释：
+
+```text
+GLM4 的 continuation token1 修复入口最早出现在 L22 附近；
+但广泛 layer_out / layer_input 有效说明这更像状态轨迹修复带，
+不是一个单点 writer 已闭合。
+```
+
+#### DS7B
+
+```text
+raw_cases = 512
+selected_items = 64
+continuation_failures = 12
+rows = 696
+scan_layers = L14-L27
+```
+
+筛到的续写失败：
+
+```text
+explanation l22 top2:
+  n = 3
+  generation_text:
+    " 22\nBut why"
+    " v05.\n\nBut wait"
+    " v05 or v4"
+
+explanation late top2:
+  n = 3
+  same pattern
+
+yes_no l22 top1:
+  n = 3
+  generation_text:
+    " 48.\n\nQuestion:"
+
+yes_no late top1:
+  n = 3
+  generation_text:
+    " 48.\n\nQuestion:"
+```
+
+续写基线：
+
+```text
+explanation l22 top2 step1:
+  n = 3
+  expected_top1_rate = 0.333
+  mean_expected_rank = 2.00
+  mean_expected_minus_top1 = -1.042
+
+explanation late top2 step1:
+  n = 3
+  expected_top1_rate = 0.333
+  mean_expected_rank = 1.67
+  mean_expected_minus_top1 = -0.771
+
+yes_no l22 top1 step1:
+  n = 3
+  expected_top1_rate = 0.667
+  mean_expected_rank = 1.33
+  mean_expected_minus_top1 = -0.417
+
+yes_no late top1 step1:
+  n = 3
+  expected_top1_rate = 0.667
+  mean_expected_rank = 1.33
+  mean_expected_minus_top1 = -0.292
+
+所有 step2:
+  expected_top1_rate = 1.000
+```
+
+关键现象：
+
+```text
+DS7B 不只是第一词元/多竞争者读出问题；
+当它越过 first-token 后，也存在 token1 continuation failure。
+```
+
+最强 patch 候选：
+
+```text
+explanation l22 top2 step1:
+  L21 layer_out:
+    n = 3
+    mean_margin_delta = 1.042
+    mean_rank_improvement = 1.00
+    flip_rate = 0.67
+
+  L22 layer_input / layer_out:
+    n = 3
+    mean_margin_delta = 1.042
+    mean_rank_improvement = 1.00
+    flip_rate = 0.67
+
+  L23-L27 layer_input / layer_out:
+    同样有效。
+```
+
+保守解释：
+
+```text
+DS7B 的 continuation repair 状态最早在 L21 layer_out / L22 layer_input 附近显现。
+这很可能是 continuation state 已进入 residual stream 的边界，
+而不是证明 L21/L22 的每个 layer_out 都是独立控制器。
+```
+
+### 客观进展
+
+Phase 665 把 Phase 664 的续写现象进一步拆开：
+
+```text
+1. 三个模型的 continuation failure 主要集中在 token1。
+2. 当 token1 被强制正确后，token2 基本都能 top1。
+3. continuation controller 更像 token1 接续轨迹控制器，而不是完整多步序列全部缺失。
+4. qwen3 的较早有效候选在 L22 attn_out 附近。
+5. GLM4 的较早有效候选在 L22 附近。
+6. DS7B 的较早有效候选在 L21 layer_out / L22 layer_input 附近。
+```
+
+这说明：
+
+```text
+correct_prefix 并没有自动绑定后续 answer-token sequence；
+模型必须在 token1 位置重新进入正确答案轨迹。
+```
+
+### 理论进展
+
+续写闭合公式需要进一步拆分：
+
+```text
+P(answer)
+=
+P(y_0 = correct_prefix)
+\cdot
+P(y_1 = correct_token1 | y_0, h_1)
+\cdot
+P(y_2 = correct_token2 | y_0,y_1,h_2)
+\cdots
+```
+
+Phase 665 的结果显示：
+
+```text
+P(y_0 = correct_prefix) 高
+不推出
+P(y_1 = correct_token1 | y_0, h_1) 高
+```
+
+但在当前测试中：
+
+```text
+如果 y_1 被强制正确，
+P(y_2 = correct_token2 | y_0,y_1,h_2) 通常很高。
+```
+
+所以当前最精确的生成瓶颈是：
+
+```text
+token0 -> token1 transition gate
+```
+
+而不是泛泛的 continuation failure。
+
+统一链条更新为：
+
+```text
+semantic value support
+-> first-token readout closure
+-> token0-to-token1 transition gate
+-> later continuation stabilization
+```
+
+### 问题和硬伤
+
+```text
+1. 当前 patch 是 value-source continuation-position restore。
+   它证明 value condition 中存在能修 token1 的状态，
+   但还没有证明模型自然路径中的哪个 writer 负责写入。
+
+2. 候选层呈现宽带传播。
+   后续 layer_input / layer_out 大量有效，说明状态一旦修复会沿 residual stream 传播。
+   因此不能把每个后续层都当作独立控制器。
+
+3. 样本数仍偏少：
+   qwen3 = 5
+   GLM4 = 4
+   DS7B = 12
+   结论足以说明现象存在，但不足以精确排序所有层组件。
+
+4. step2 基本正确可能部分来自强制 token1 后语义轨迹恢复，
+   不能说明自然生成的后续全序列都已闭合。
+
+5. 本阶段只做 restore，没有做 remove / ablation necessary test。
+```
+
+### 阶段性判断
+
+Phase 665 完成了真实自回归续写路径的第一轮定位：
+
+```text
+continuation failure 主要不是 token2 后段崩溃，
+而是 token0 -> token1 transition gate 没有稳定打开。
+```
+
+最重要的新增拼图：
+
+```text
+correct_prefix 是答案轨道入口，
+但 token1 transition 才是真正进入答案序列的闸门。
+```
+
+### 下一阶段
+
+下一步应进入更窄的边界定位：
+
+```text
+Phase 666: Token0-to-Token1 Transition Boundary Audit
+```
+
+目标：
+
+```text
+1. 不再扫描宽层带。
+2. 聚焦 Phase 665 中最早有效边界：
+   qwen3: L22 attn_out / L23 boundary
+   GLM4: L22 boundary
+   DS7B: L21 layer_out / L22 layer_input
+3. 做 remove + restore 双向测试。
+4. 区分：
+   source state restoration 是否只是补足答案值；
+   还是确实打开 token1 transition gate。
+5. 进一步确认 token0 -> token1 gate 是否是独立于 first-token readout 的机制。
+```
+
+这属于新的精细边界阶段，不应继续用 Phase 665 的宽扫描方式扩大测试。
+
+## Phase 666: Token1 Transition Boundary Remove/Restore Audit [2026-06-26 09:43]
+
+### 本阶段目标
+
+Phase 665 证明 correct_prefix top1 并不等于完整答案闭合，真实续写失败主要集中在：
+
+```text
+token0 -> token1 transition
+```
+
+本阶段不再扩大扫描层数，而是只审计 Phase 665 找到的最早有效边界，测试这些边界到底携带：
+
+```text
+1. correct value transition state
+2. general continuation / format state
+3. residual stream propagation artifact
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase666_token1_transition_boundary_remove_restore.py
+tests/gpt5/phase666_token1_transition_boundary_remove_restore_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase666_token1_transition_boundary_remove_restore.py tests/gpt5/phase666_token1_transition_boundary_remove_restore_summary.py
+
+python tests/gpt5/phase666_token1_transition_boundary_remove_restore.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase666_token1_transition_boundary_remove_restore.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase666_token1_transition_boundary_remove_restore.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase666_token1_transition_boundary_remove_restore.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase666_token1_transition_boundary_remove_restore_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase666_token1_transition_boundary_remove_restore/phase666_qwen3_token1_transition_boundary_remove_restore_confirm.json
+results/glm5_phase666_token1_transition_boundary_remove_restore/phase666_glm4_token1_transition_boundary_remove_restore_confirm.json
+results/glm5_phase666_token1_transition_boundary_remove_restore/phase666_deepseek7b_token1_transition_boundary_remove_restore_confirm.json
+results/glm5_phase666_token1_transition_boundary_remove_restore/phase666_cross_model_summary.md
+```
+
+### 测试原理
+
+测试样本直接复用 Phase 665 的 continuation failure：
+
+```text
+correct_prefix 已经 top1
+但是完整生成错误
+```
+
+强制输入：
+
+```text
+task_prompt + correct_prefix
+```
+
+目标只看下一步：
+
+```text
+token1
+```
+
+对 Phase 665 的最早边界做五种干预：
+
+```text
+baseline:
+  原始任务路径。
+
+self_restore:
+  用 task 自身同位置状态恢复自身，作为 no-op control。
+
+zero_remove:
+  把边界状态置零，测试该状态是否必要。
+
+mismatch_restore:
+  用其他 failure 的 value source 状态恢复，作为错误语义源对照。
+
+correct_restore:
+  用匹配的 short_value_allowed value source 状态恢复。
+```
+
+判断标准：
+
+```text
+如果 correct_restore 明显优于 mismatch_restore，
+说明该边界更可能携带 correct value transition state。
+
+如果 correct_restore 和 mismatch_restore 同样有效，
+说明该边界更可能携带 general continuation / format state。
+
+如果 zero_remove 强烈破坏，
+说明该边界状态对 token1 读出路径是必要的，
+但不自动说明它具有语义特异性。
+```
+
+### 客观结果
+
+#### qwen3
+
+测试 failure 数：
+
+```text
+5
+```
+
+边界：
+
+```text
+L22 attn_out
+L23 layer_input
+```
+
+关键结果：
+
+```text
+L22 attn_out:
+  correct_restore 和 mismatch_restore 基本等效。
+  top1 / top2 两组 correct_minus_mismatch = 0.000。
+
+L23 layer_input:
+  出现明显 correct specificity。
+  top2:
+    correct_delta = 0.875
+    mismatch_delta = -2.688
+    zero_delta = -4.062
+    correct_minus_mismatch = 3.562
+
+  top1:
+    correct_delta = 0.208
+    mismatch_delta = -2.042
+    zero_delta = -5.146
+    correct_minus_mismatch = 2.250
+```
+
+解释：
+
+```text
+qwen3 的 L22 attn_out 更像一般续写/格式状态；
+到 L23 layer_input 时，正确值转移状态开始变得更特异。
+```
+
+#### GLM4
+
+测试 failure 数：
+
+```text
+4
+```
+
+边界：
+
+```text
+L22 layer_input
+L22 attn_out
+L22 layer_out
+```
+
+关键结果：
+
+```text
+late_peak_layer_out top1:
+  L22_attn_out:
+    correct_delta = 0.375
+    mismatch_delta = -0.125
+    zero_delta = 0.375
+    correct_minus_mismatch = 0.500
+
+  L22_layer_input:
+    correct_delta = 0.375
+    mismatch_delta = -0.042
+    zero_delta = -3.354
+    correct_minus_mismatch = 0.417
+
+  L22_layer_out:
+    correct_delta = 0.375
+    mismatch_delta = 0.375
+    zero_delta = -11.047
+    correct_minus_mismatch = 0.000
+```
+
+解释：
+
+```text
+GLM4 的 L22 attention / layer_input 有弱 correct specificity；
+L22 layer_out 已经更像共享续写轨迹，correct 和 mismatch 等效；
+zero_remove 对 layer_out 破坏极强，说明该状态必要但语义特异性弱。
+```
+
+#### DS7B
+
+测试 failure 数：
+
+```text
+12
+```
+
+边界：
+
+```text
+L21 layer_out
+L22 layer_input
+L22 layer_out
+```
+
+关键结果：
+
+```text
+explanation_required l22_peak_layer_out top2:
+  L21_layer_out:
+    correct_delta = 1.042
+    mismatch_delta = -2.271
+    zero_delta = -7.688
+    correct_minus_mismatch = 3.312
+
+  L22_layer_input:
+    correct_delta = 1.042
+    mismatch_delta = -2.271
+    zero_delta = -7.688
+    correct_minus_mismatch = 3.312
+
+  L22_layer_out:
+    correct_delta = 1.042
+    mismatch_delta = -2.042
+    zero_delta = -5.771
+    correct_minus_mismatch = 3.083
+
+explanation_required late_peak_layer_out top2:
+  L21_layer_out:
+    correct_delta = 0.771
+    mismatch_delta = -2.479
+    zero_delta = -7.833
+    correct_minus_mismatch = 3.250
+
+  L22_layer_input:
+    correct_delta = 0.771
+    mismatch_delta = -2.479
+    zero_delta = -7.833
+    correct_minus_mismatch = 3.250
+
+  L22_layer_out:
+    correct_delta = 0.771
+    mismatch_delta = -2.312
+    zero_delta = -6.042
+    correct_minus_mismatch = 3.083
+```
+
+解释：
+
+```text
+DS7B 的 L21/L22 边界有强 correct specificity；
+correct_restore 稳定提升 token1；
+mismatch_restore 明显破坏；
+zero_remove 强烈破坏。
+```
+
+这是本阶段最清晰的正结果。
+
+### 阶段性进展
+
+Phase 665 的结论是：
+
+```text
+续写失败主要集中在 token0 -> token1 transition。
+```
+
+Phase 666 进一步把这个结论拆成两层：
+
+```text
+general continuation / format state
+correct value transition state
+```
+
+跨模型结果显示：
+
+```text
+qwen3:
+  L22 attn_out 偏 general continuation / format state；
+  L23 layer_input 开始出现 correct value transition specificity。
+
+GLM4:
+  L22 attention / layer_input 只有弱 correct specificity；
+  L22 layer_out 更像共享续写轨迹。
+
+DS7B:
+  L21 layer_out / L22 layer_input / L22 layer_out 都表现出强 correct value transition specificity。
+```
+
+因此，当前不能再把 token1 transition gate 当成单一东西。更精确的结构是：
+
+```text
+token1 transition gate
+=
+format-continuation enabling state
++
+value-specific transition state
+```
+
+### 对附件判断的评估
+
+附件对 Phase 665 的判断基本正确：
+
+```text
+correct_prefix 是答案轨道入口；
+token1 transition 才是真正进入答案序列的闸门。
+```
+
+但 Phase 666 说明需要进一步收紧：
+
+```text
+token1 transition gate 不是一个单纯语义门；
+其中至少包含格式续写状态和正确值转移状态两部分。
+```
+
+### 当前硬伤
+
+```text
+1. qwen3 和 GLM4 的样本量仍偏小。
+   qwen3 = 5
+   GLM4 = 4
+   DS7B = 12
+
+2. mismatch_restore 采用其他 failure 的 value prompt 状态。
+   它是错误语义源对照，但不保证只改变语义、不改变格式。
+
+3. zero_remove 是强破坏操作。
+   它能证明边界状态必要，但可能同时破坏格式、语义、位置和残差尺度。
+
+4. GLM4 中 baseline 有一组已经 token1 top1。
+   这些样本对 restore 的增益解释能力有限。
+
+5. 当前仍然没有定位 natural writer。
+   本阶段证明边界状态携带信息，但还没有证明哪个 attention head / MLP neuron 自然写入该状态。
+```
+
+### 理论更新
+
+原链条：
+
+```text
+semantic value support
+-> first-token readout closure
+-> token0-to-token1 transition gate
+-> later continuation stabilization
+```
+
+更新为：
+
+```text
+semantic value support
+-> first-token readout closure
+-> format-continuation enabling state
+-> value-specific token1 transition state
+-> later continuation stabilization
+```
+
+更保守的数学表达：
+
+```text
+P(y_1 | y_0, h)
+由至少两个状态共同决定：
+1. format continuation state
+2. value-specific transition state
+```
+
+写成块级公式：
+
+$$
+P(y_1 = v_1 \mid y_0, h)
+=
+F_{\text{readout}}
+\left(
+h_{\text{format-cont}},
+h_{\text{value-trans}},
+h_{\text{other}}
+\right)
+$$
+
+其中：
+
+$$
+h_{\text{format-cont}}
+\neq
+h_{\text{value-trans}}
+$$
+
+Phase 666 的核心证据是：
+
+$$
+\Delta_{\text{correct}}
+-
+\Delta_{\text{mismatch}}
+> 0
+$$
+
+在 DS7B 上该差值稳定较大，在 qwen3 的 L23 layer_input 上也较明显，在 GLM4 上较弱。
+
+### 下一阶段
+
+下一步仍属于同一个阶段性目标：
+
+```text
+破解 token0 -> token1 transition gate。
+```
+
+但 Phase 667 不应继续只做边界 patch，而应定位 writer：
+
+```text
+Phase 667: Value-Specific Token1 Transition Writer Localization
+```
+
+目标：
+
+```text
+1. 只聚焦 Phase 666 证据最强的边界：
+   qwen3:
+     L23 layer_input
+   GLM4:
+     L22 attn_out / L22 layer_input
+   DS7B:
+     L21 layer_out / L22 layer_input
+
+2. 对边界前一层的 attention heads 和 MLP 输出做 writer 分解。
+
+3. 不只测试 correct_restore，
+   还必须加入 mismatch_restore 和 zero_remove。
+
+4. 如果某个 writer 的 correct_restore 有效、mismatch_restore 无效、zero_remove 破坏，
+   才能认为它是 value-specific token1 transition writer 候选。
+
+5. 如果所有 writer 都不满足三条件，
+   则说明 transition state 是分布式合成状态，不应继续寻找单一 writer。
+```
+
+阶段性目标尚未完成，应继续自动推进 Phase 667。
+
+## Phase 667: Value-Specific Token1 Transition Writer Localization [2026-06-26 09:49]
+
+### 本阶段目标
+
+Phase 666 证明 token1 transition gate 至少包含两类状态：
+
+```text
+format-continuation enabling state
+value-specific token1 transition state
+```
+
+本阶段继续同一阶段性目标，追问：
+
+```text
+value-specific token1 transition state 是由单个 writer 写入，
+还是由多个 writer 合成后在 residual stream 中形成？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py
+tests/gpt5/phase667_value_specific_token1_transition_writer_localization_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py tests/gpt5/phase667_value_specific_token1_transition_writer_localization_summary.py
+
+python tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase667_value_specific_token1_transition_writer_localization.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase667_value_specific_token1_transition_writer_localization_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase667_value_specific_token1_transition_writer_localization/phase667_qwen3_value_specific_token1_transition_writer_localization_confirm.json
+results/glm5_phase667_value_specific_token1_transition_writer_localization/phase667_glm4_value_specific_token1_transition_writer_localization_confirm.json
+results/glm5_phase667_value_specific_token1_transition_writer_localization/phase667_deepseek7b_value_specific_token1_transition_writer_localization_confirm.json
+results/glm5_phase667_value_specific_token1_transition_writer_localization/phase667_cross_model_summary.md
+```
+
+### 测试原理
+
+样本仍然复用 Phase 665 的 continuation failure。
+
+输入：
+
+```text
+task_prompt + correct_prefix
+```
+
+目标：
+
+```text
+token1
+```
+
+候选 writer 分两类：
+
+```text
+1. component writer:
+   attn_out
+   mlp_out
+   layer_out
+   layer_input
+
+2. attention head writer:
+   attention o_proj input 的单头 slice
+```
+
+干预仍然使用三类核心对照：
+
+```text
+zero_remove
+mismatch_restore
+correct_restore
+```
+
+判断标准：
+
+```text
+如果单头 correct_restore 明显优于 mismatch_restore，
+说明可能存在单头级 writer。
+
+如果整层 component 明显有效，但单头都弱，
+说明更可能是多头/MLP/残差合成状态。
+
+如果 correct_restore 和 mismatch_restore 等效，
+说明该 writer 更可能写入 general continuation / format state。
+```
+
+### 客观结果
+
+#### qwen3
+
+测试规模：
+
+```text
+failures_tested = 5
+rows = 540
+```
+
+最强 component 结果：
+
+```text
+top2:
+  L22_layer_out:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.562
+    correct_minus_zero = 4.938
+
+  L23_layer_input:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.562
+    correct_minus_zero = 4.938
+
+top1:
+  L22_layer_out:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 2.250
+    correct_minus_zero = 5.354
+
+  L23_layer_input:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 2.250
+    correct_minus_zero = 5.354
+```
+
+最强 head 结果：
+
+```text
+L22_head11_o_input:
+  top2:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 1.938
+
+  top1:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 1.417
+
+L22_head10_o_input:
+  top2:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 1.750
+
+  top1:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 0.958
+```
+
+解释：
+
+```text
+qwen3 存在少数 head 级贡献，尤其是 L22 head10 / head11；
+但整层 L22_layer_out / L23_layer_input 明显更强。
+因此更像多头混合后形成 value-specific transition state，
+而不是单头独立闭合。
+```
+
+#### GLM4
+
+测试规模：
+
+```text
+failures_tested = 4
+rows = 432
+```
+
+最强结果：
+
+```text
+L22_attn_out:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.333
+  correct_minus_mismatch = 0.500
+
+L22_head7_o_input:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.667
+  correct_minus_mismatch = 0.438
+
+L21_layer_out:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.667
+  correct_minus_mismatch = 0.417
+
+L22_mlp_out:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.667
+  correct_minus_mismatch = 0.396
+
+L22_head13_o_input:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.667
+  correct_minus_mismatch = 0.354
+```
+
+解释：
+
+```text
+GLM4 有弱 writer 候选，但特异性不强。
+许多 mismatch_restore 也能部分修复。
+这说明 GLM4 的 token1 transition writer 可能更偏共享续写状态，
+或样本量不足以稳定区分 value-specific writer。
+```
+
+#### DS7B
+
+测试规模：
+
+```text
+failures_tested = 12
+rows = 576
+```
+
+最强 component 结果：
+
+```text
+l22_peak_layer_out top2:
+  L21_layer_out:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.312
+    correct_minus_zero = 8.729
+
+  L22_layer_input:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.312
+    correct_minus_zero = 8.729
+
+late_peak_layer_out top2:
+  L21_layer_out:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.250
+    correct_minus_zero = 8.604
+
+  L22_layer_input:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.250
+    correct_minus_zero = 8.604
+```
+
+最强 head / MLP 结果：
+
+```text
+L21_head14_o_input:
+  correct_minus_mismatch = 0.188 / 0.146
+  correct_top1 = 0.333
+  mismatch_top1 = 0.333
+
+L21_mlp_out:
+  correct_minus_mismatch = 0.167 / 0.125
+  correct_top1 = 0.333
+  mismatch_top1 = 0.333
+```
+
+解释：
+
+```text
+DS7B 的 value-specific token1 transition state 在 L21_layer_out / L22_layer_input 上非常强；
+但单个 attention head 和 MLP 输出都不能单独解释该状态。
+这强烈支持分布式合成后进入 residual stream 的解释。
+```
+
+### 阶段性进展
+
+Phase 667 没有把机制闭合到单个 head，但完成了一个重要排除：
+
+```text
+value-specific token1 transition state 不是简单的 single attention head writer。
+```
+
+更准确的拼图是：
+
+```text
+qwen3:
+  少数 head 有贡献，但整层状态更强。
+
+GLM4:
+  弱 head / component 候选，但特异性不足。
+
+DS7B:
+  强状态在 layer_out / layer_input 边界；
+  单头和单 MLP 输出远弱于整层。
+```
+
+因此，当前最保守结论：
+
+```text
+token1 transition writer 更可能是 distributed writer ensemble，
+而不是单点 writer。
+```
+
+### 当前硬伤
+
+```text
+1. head slice 测的是 o_proj input 单头通道，不等价于完整 attention head 因果路径。
+   它没有拆分 Q/K/V 和 attention pattern。
+
+2. component_restore 仍是状态替换，不是自然写入过程追踪。
+
+3. DS7B 的强结论来自 explanation_required top2 样本，
+   还需要在更多任务类型中验证。
+
+4. qwen3 的 head10/head11 是候选，不是闭合机制。
+   它们只能解释部分增益。
+
+5. GLM4 样本数偏少，且部分 baseline 已经较强，
+   对 writer 排序不稳定。
+```
+
+### 理论更新
+
+Phase 666 的公式：
+
+$$
+P(y_1 = v_1 \mid y_0, h)
+=
+F_{\text{readout}}
+\left(
+h_{\text{format-cont}},
+h_{\text{value-trans}},
+h_{\text{other}}
+\right)
+$$
+
+Phase 667 进一步说明：
+
+$$
+h_{\text{value-trans}}
+\neq
+h_{\text{single-head}}
+$$
+
+更合理的表达是：
+
+$$
+h_{\text{value-trans}}
+=
+\sum_i W_i(x)
+$$
+
+其中：
+
+$$
+W_i(x)
+\in
+\{\text{attention head outputs},\ \text{MLP outputs},\ \text{residual mixing}\}
+$$
+
+并且当前证据显示：
+
+$$
+\left\|
+\sum_i W_i(x)
+\right\|
+\text{ 的因果效果}
+>
+\max_i
+\left\|
+W_i(x)
+\right\|
+\text{ 的因果效果}
+$$
+
+通俗说：
+
+```text
+真正有效的 token1 转移状态，像是多个 writer 合成后的残差态，
+不是某一个头单独写出来的简单开关。
+```
+
+### 下一阶段
+
+同一阶段性目标还没有结束。下一步不应继续盲扫更多 head，而应做 ensemble 级验证：
+
+```text
+Phase 668: Token1 Transition Writer Ensemble Closure
+```
+
+目标：
+
+```text
+1. 以 Phase 667 的强边界为目标：
+   qwen3:
+     L22_layer_out / L23_layer_input
+     L22 head10/head11 作为候选子集
+
+   GLM4:
+     L22_attn_out
+     L22 head7/head13 作为弱候选子集
+
+   DS7B:
+     L21_layer_out / L22_layer_input
+     不优先追单头，优先测 attn_out + mlp_out + layer_out 组合
+
+2. 测试 writer ensemble 是否能恢复整层边界效果。
+
+3. 加入三类组合：
+   top-head ensemble
+   component ensemble
+   residual boundary full state
+
+4. 如果 ensemble 仍不能接近 full boundary restore，
+   则说明 value-specific transition state 可能还依赖 layernorm / residual scale / downstream readout。
+
+5. 如果 ensemble 接近 full boundary restore，
+   则可以把 token1 transition gate 从边界状态推进到 writer graph。
+```
+
+阶段性目标仍未完成，应继续自动推进 Phase 668。
+
+## Phase 668: Token1 Transition Writer Ensemble Closure [2026-06-26 09:54]
+
+### 本阶段目标
+
+Phase 667 表明：
+
+```text
+value-specific token1 transition state
+不是简单 single-head writer。
+```
+
+但 Phase 667 仍留下一个关键问题：
+
+```text
+少数 writer ensemble 能否接近 full boundary restore？
+```
+
+本阶段测试：
+
+```text
+full boundary state
+top-head ensemble
+component ensemble
+```
+
+是否能闭合 token1 transition。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py
+tests/gpt5/phase668_token1_transition_writer_ensemble_closure_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py tests/gpt5/phase668_token1_transition_writer_ensemble_closure_summary.py
+
+python tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py qwen3 --smoke --hard-exit-after-model
+
+python tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py qwen3 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py glm4 --confirm --save-rows --hard-exit-after-model
+python tests/gpt5/phase668_token1_transition_writer_ensemble_closure.py deepseek7b --confirm --save-rows --hard-exit-after-model
+
+python tests/gpt5/phase668_token1_transition_writer_ensemble_closure_summary.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase668_token1_transition_writer_ensemble_closure/phase668_qwen3_token1_transition_writer_ensemble_closure_confirm.json
+results/glm5_phase668_token1_transition_writer_ensemble_closure/phase668_glm4_token1_transition_writer_ensemble_closure_confirm.json
+results/glm5_phase668_token1_transition_writer_ensemble_closure/phase668_deepseek7b_token1_transition_writer_ensemble_closure_confirm.json
+results/glm5_phase668_token1_transition_writer_ensemble_closure/phase668_cross_model_summary.md
+```
+
+### 测试原理
+
+继续使用 Phase 665 的 continuation failure。
+
+输入：
+
+```text
+task_prompt + correct_prefix
+```
+
+目标：
+
+```text
+token1
+```
+
+干预：
+
+```text
+zero_remove
+mismatch_restore
+correct_restore
+```
+
+比较：
+
+```text
+full boundary:
+  完整边界状态恢复。
+
+top-head ensemble:
+  Phase 667 中最强 head 组合恢复。
+
+component ensemble:
+  attn_out + mlp_out 或多个组件组合恢复。
+```
+
+核心判据：
+
+```text
+如果 ensemble 的 correct_minus_mismatch 接近 full boundary，
+说明 writer graph 已经接近闭合。
+
+如果 ensemble 明显弱于 full boundary，
+说明有效状态可能还依赖 residual mixing / layernorm / downstream scale。
+```
+
+### 客观结果
+
+#### qwen3
+
+测试规模：
+
+```text
+failures_tested = 5
+rows = 60
+```
+
+关键结果：
+
+```text
+L22_heads10_11:
+  top2:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 4.688
+    correct_minus_zero = 1.375
+
+  top1:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 3.000
+    correct_minus_zero = 0.792
+
+full_L22_layer_out:
+  top2:
+    correct_top1 = 0.500
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.562
+    correct_minus_zero = 4.938
+
+  top1:
+    correct_top1 = 0.667
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 2.250
+    correct_minus_zero = 5.354
+
+full_L23_layer_input:
+  与 full_L22_layer_out 基本相同。
+
+L22_attn_mlp:
+  top2:
+    correct_top1 = 0.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 1.000
+
+  top1:
+    correct_top1 = 0.333
+    mismatch_top1 = 0.333
+    correct_minus_mismatch = 0.750
+```
+
+解释：
+
+```text
+qwen3 出现了比较清晰的小 head ensemble 闭合信号。
+L22 head10 + head11 的 correct_minus_mismatch 甚至超过 full boundary。
+但 correct_minus_zero 不如 full boundary，说明它更像语义特异子通道，
+不是完整必要状态。
+```
+
+#### GLM4
+
+测试规模：
+
+```text
+failures_tested = 4
+rows = 48
+```
+
+关键结果：
+
+```text
+L22_heads7_13:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.333
+  correct_minus_mismatch = 0.604
+  correct_minus_zero = 0.292
+
+full_L22_attn_out:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.333
+  correct_minus_mismatch = 0.500
+
+full_L22_layer_input:
+  correct_top1 = 1.000
+  mismatch_top1 = 0.667
+  correct_minus_mismatch = 0.417
+
+L21_layer_out_L22_attn_mlp:
+  correct_top1 = 1.000
+  mismatch_top1 = 1.000
+  correct_minus_mismatch = 0.000
+```
+
+解释：
+
+```text
+GLM4 的 head7 + head13 组合略强于 full_L22_attn_out，
+但整体 correct_minus_mismatch 很小。
+这不是强机制闭合，只能视为弱候选。
+```
+
+#### DS7B
+
+测试规模：
+
+```text
+failures_tested = 12
+rows = 72
+```
+
+关键结果：
+
+```text
+full_L21_layer_out:
+  l22_peak_layer_out top2:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.312
+    correct_minus_zero = 8.729
+
+  late_peak_layer_out top2:
+    correct_top1 = 1.000
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 3.250
+    correct_minus_zero = 8.604
+
+full_L22_layer_input:
+  与 full_L21_layer_out 基本相同。
+
+L21_attn_mlp:
+  l22_peak_layer_out top2:
+    correct_top1 = 0.333
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 0.542
+
+  late_peak_layer_out top2:
+    correct_top1 = 0.333
+    mismatch_top1 = 0.000
+    correct_minus_mismatch = 0.479
+
+L21_heads14_17:
+  correct_top1 = 0.333
+  mismatch_top1 = 0.333
+  correct_minus_mismatch = 0.292
+```
+
+解释：
+
+```text
+DS7B 的 full boundary state 很强；
+但 head ensemble 和 attn+mlp component ensemble 都远不能接近 full boundary。
+因此 DS7B 的 token1 transition state 更像 residual-boundary integrated state，
+而不是小 head ensemble。
+```
+
+### 阶段性进展
+
+Phase 668 回答了 Phase 667 的核心问题：
+
+```text
+小 writer ensemble 是否能闭合 token1 transition？
+```
+
+答案是跨模型不一致：
+
+```text
+qwen3:
+  L22 head10 + head11 能形成较强语义特异子通道，
+  接近甚至超过 full boundary 的 correct-minus-mismatch。
+
+GLM4:
+  L22 head7 + head13 有弱闭合，
+  但强度不足，仍不稳定。
+
+DS7B:
+  小 head ensemble 和 attn+mlp ensemble 都不能闭合；
+  full layer_out / layer_input 边界远强于小组合。
+```
+
+这说明：
+
+```text
+token1 transition gate 的实现方式具有模型差异。
+```
+
+不能再假设所有模型共享同一种 writer topology。
+
+### 理论更新
+
+Phase 667 的表达：
+
+$$
+h_{\text{value-trans}}
+=
+\sum_i W_i(x)
+$$
+
+Phase 668 进一步把它拆成：
+
+$$
+h_{\text{value-trans}}
+=
+G_{\text{model}}
+\left(
+\{W_i(x)\},
+R(x),
+N(x)
+\right)
+$$
+
+其中：
+
+$$
+R(x)
+=
+\text{residual mixing}
+$$
+
+$$
+N(x)
+=
+\text{normalization / scale state}
+$$
+
+跨模型差异表现为：
+
+$$
+G_{\text{qwen3}}
+\approx
+\text{small head ensemble} + R
+$$
+
+$$
+G_{\text{glm4}}
+\approx
+\text{weak head/component ensemble} + R
+$$
+
+$$
+G_{\text{ds7b}}
+\approx
+\text{residual-boundary integrated state}
+$$
+
+通俗说：
+
+```text
+qwen3 的 token1 转移门可以下钻到少数 head 子通道；
+GLM4 有弱子通道；
+DS7B 主要要看边界整体状态，不能继续追单头。
+```
+
+### 当前硬伤
+
+```text
+1. qwen3 的 head10+head11 虽然 correct-minus-mismatch 强，
+   但 correct-minus-zero 不如 full boundary。
+   说明它不是完整必要状态。
+
+2. GLM4 的正结果很弱，且样本量只有 4。
+
+3. DS7B 的 full boundary 很强，但 ensemble 不闭合。
+   这说明当前 writer 分解粒度仍不够。
+
+4. 本阶段仍没有拆 layernorm / residual scale。
+
+5. mismatch_restore 仍可能混入格式差异，不是纯语义差异。
+```
+
+### 阶段性判断
+
+Phase 665-668 这条阶段链已经完成了一个阶段性目标：
+
+```text
+把 full-answer continuation failure 拆解为 token0 -> token1 transition gate，
+并进一步区分 format-continuation state 与 value-specific transition state，
+最后确认 writer 结构不是统一单头机制，而是跨模型差异化的 ensemble / residual-boundary 结构。
+```
+
+这已经足够作为阶段性收束。
+
+### 下一阶段
+
+下一阶段不应继续在同一个 token1 gate 内无限追小组件，而应进入更全局的图谱问题：
+
+```text
+Phase 669: Cross-Mechanism Language Encoding Graph Atlas
+```
+
+目标：
+
+```text
+1. 把已有拼图节点统一成 graph atlas：
+   semantic value support
+   first-token readout closure
+   format-continuation state
+   value-specific token1 transition state
+   residual-boundary integrated state
+   final readout competition
+
+2. 不再只追单点机制。
+
+3. 为每个节点记录：
+   position
+   layer
+   component
+   sufficiency
+   necessity
+   cross-model stability
+   failure mode
+
+4. 明确哪些机制是跨模型稳定结构，
+   哪些机制是模型特异实现。
+
+5. 为后续语言三大系统建立图谱入口：
+   knowledge network
+   reasoning route
+   grammar / format protocol
+```
+
+Phase 669 属于新的全局图谱阶段，不再是当前 token1 transition gate 的局部阶段。
+
+## Phase 669: Cross-Mechanism Language Encoding Graph Atlas [2026-06-26 10:04]
+
+### 本阶段目标
+
+分析用户上传的 Phase 666-668 阶段总结是否正确，并综合当前 Phase 626-668 的客观结果，把研究从局部 token1 transition gate 追踪收束到跨机制语言编码图谱。
+
+本阶段没有进行新的模型推理测试。原因是 Phase 665-668 已经完成当前局部阶段目标，继续盲目追更小组件容易扩大噪声；当前更需要把已有拼图组织成可审计 graph atlas，再为下一阶段设计更干净的反事实控制。
+
+### 生成脚本
+
+```bash
+tests/gpt5/phase669_cross_mechanism_language_encoding_graph_atlas.py
+```
+
+脚本输出：
+
+```bash
+results/glm5_phase669_cross_mechanism_language_encoding_graph_atlas/phase669_graph_atlas.json
+results/glm5_phase669_cross_mechanism_language_encoding_graph_atlas/phase669_graph_atlas.md
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase669_cross_mechanism_language_encoding_graph_atlas.py
+python tests/gpt5/phase669_cross_mechanism_language_encoding_graph_atlas.py
+```
+
+核对命令：
+
+```bash
+python - <<'PY'
+import json
+from pathlib import Path
+p=Path('results/glm5_phase669_cross_mechanism_language_encoding_graph_atlas/phase669_graph_atlas.json')
+d=json.loads(p.read_text(encoding='utf-8'))
+ke=d['key_evidence']
+print('nodes', len(d['nodes']))
+print('edges', len(d['edges']))
+print('available_phase_count', d['available_phase_count'])
+print('phase666_models', {k: len(v) for k,v in ke['phase666_token1_boundary_specificity'].items()})
+print('phase667_models', {k: len(v) for k,v in ke['phase667_writer_specificity'].items()})
+print('phase668_models', {k: len(v) for k,v in ke['phase668_writer_ensemble_specificity'].items()})
+print('next_phase', d['next_phase']['phase'])
+PY
+```
+
+核对结果：
+
+```text
+nodes 10
+edges 9
+available_phase_count 40
+phase666_models {'qwen3': 4, 'glm4': 6, 'deepseek7b': 6}
+phase667_models {'qwen3': 8, 'glm4': 8, 'deepseek7b': 8}
+phase668_models {'qwen3': 8, 'glm4': 8, 'deepseek7b': 8}
+next_phase 670
+```
+
+### 对上传分析的判断
+
+上传分析的主体判断基本正确：
+
+```text
+Phase 666:
+token1 transition gate 不是单一语义修复，而至少包含 format-continuation state
+和 value-specific token1 transition state。
+
+Phase 667-668:
+value-specific token1 transition state 不是统一 single-head writer。
+qwen3 存在较强 head ensemble 子通道；
+GLM4 有弱子通道；
+DS7B 更像 residual-boundary integrated state。
+```
+
+需要收紧的地方：
+
+```text
+1. 上传分析中有少量公式排版错误，不影响核心判断，但不能作为正式数学表达。
+
+2. “完成度百分比”只能作为主观机制闭合度，不是客观真理进度。
+
+3. qwen3 的 L22 head10+11 不能外推为通用机制。
+
+4. DS7B 的强结果主要在 full boundary，不支持继续用小 head ensemble 解释。
+
+5. mismatch_restore 仍然不是纯语义对照，可能混入格式、位置、尺度状态。
+```
+
+### Phase 669 图谱节点
+
+本阶段把已有拼图整理为 10 个机制节点：
+
+```text
+1. semantic_value_support
+2. task_intent_gate
+3. protocol_execution_field
+4. first_token_readout_closure
+5. multi_competitor_readout
+6. format_continuation_state
+7. value_specific_token1_transition_state
+8. writer_topology
+9. residual_boundary_integrated_state
+10. continuation_controller
+```
+
+对应跨机制边：
+
+```text
+semantic_value_support
+  -> task_intent_gate
+  -> protocol_execution_field
+  -> first_token_readout_closure
+  -> multi_competitor_readout
+  -> format_continuation_state
+  -> value_specific_token1_transition_state
+  -> writer_topology / residual_boundary_integrated_state
+  -> continuation_controller
+```
+
+### 客观进展
+
+1. 当前 token1 transition gate 局部阶段可以阶段性停止。
+
+```text
+Phase 665-668 已经证明：
+
+correct_prefix top1 不等于 full answer generation；
+失败主要前移到 token0 -> token1 transition；
+token1 transition 同时包含一般格式续写状态和具体值转移状态；
+writer 实现跨模型不同。
+```
+
+2. 当前机制图谱已经出现稳定的功能层级。
+
+```text
+semantic support:
+给出候选值支持，但不保证生成。
+
+task intent:
+决定是否允许短值答案路线。
+
+protocol field:
+决定短答、解释、换行、格式路线。
+
+readout competition:
+决定正确前缀能否击败空格、换行、解释词等竞争项。
+
+continuation gate:
+决定正确前缀之后能否继续生成正确值序列。
+```
+
+3. 实现拓扑不是跨模型统一的。
+
+```text
+qwen3:
+L22 head10+11 具有较强 value-specific 子通道。
+
+GLM4:
+有弱 head/component 信号，但边际较小。
+
+DS7B:
+full residual boundary 明显强于小组件 ensemble。
+```
+
+### 当前硬伤
+
+```text
+1. 图谱是由已有实验结果整理而来，不是新的因果测试。
+
+2. 大量节点仍基于 ORV short-value 任务，需要扩展到 JSON、代码、自然解释、长答案。
+
+3. mismatch_restore 和 zero_remove 仍然不是干净的纯语义 / 纯格式对照。
+
+4. writer topology 尚未拆开 Q/K/V、attention pattern、layernorm、residual scale。
+
+5. continuation_controller 只在 token1/token2 附近得到初步证据，尚未覆盖更长序列。
+```
+
+### 理论进展
+
+当前最稳妥的语言编码机制表达应从单点机制改为图谱表达：
+
+$$
+\text{language output}
+=
+F(
+S_{\text{semantic}},
+G_{\text{intent}},
+P_{\text{protocol}},
+R_{\text{readout}},
+C_{\text{continuation}}
+)
+$$
+
+其中：
+
+$$
+S_{\text{semantic}}
+\rightarrow
+G_{\text{intent}}
+\rightarrow
+P_{\text{protocol}}
+\rightarrow
+R_{\text{readout}}
+\rightarrow
+C_{\text{continuation}}
+$$
+
+更贴近当前实证结果的展开式是：
+
+$$
+S_{\text{value}}
+\rightarrow
+G_{\text{task}}
+\rightarrow
+P_{\text{format}}
+\rightarrow
+R_{\text{multi-competitor}}
+\rightarrow
+C_{\text{format}}
+\rightarrow
+C_{\text{value-token}}
+\rightarrow
+W_{\text{writer/topology}}
+$$
+
+这说明语言能力不是一个单独“语义方向”产生的，而是语义、任务意图、格式协议、读出竞争、续写门控共同组成的动态图谱。
+
+### 下一阶段
+
+Phase 670 应进入：
+
+```text
+Graph Atlas Counterfactual Control Set
+```
+
+核心任务不是马上跑更大模型测试，而是先构造更干净的反事实控制集：
+
+```text
+1. same-value / different-format
+   同一个值，不同格式路线。
+
+2. different-value / same-format
+   不同值，同一格式路线。
+
+3. same-prefix / different-continuation
+   相同 answer-entry token，不同后续值 token。
+
+4. same-format / random-value
+   同一格式协议，随机值内容。
+
+5. protocol-only / value-only / intent-only controls
+   分离格式协议、语义值、任务意图。
+```
+
+阶段目标：
+
+```text
+不再只问某个 patch 是否有效，
+而是问每个 graph node 对哪些控制变量敏感，
+从而建立真正的 language encoding atlas。
+```
+
+### 阶段性结论
+
+Phase 666-668 的上传分析方向正确；Phase 669 完成了从局部 token1 gate 到跨机制图谱的阶段性收束。当前不应继续在同一局部机制里追单头，而应进入以 graph atlas 为中心的反事实控制测试。
+
+## Phase 670: Graph Atlas Counterfactual Control Set [2026-06-26 10:22]
+
+### 本阶段目标
+
+分析用户给出的三份理论文档和 Phase 669 评价，并继续完成同一阶段任务：把 Phase 669 的 graph atlas 转化为可执行的反事实控制集。
+
+本阶段不做模型推理。原因是当前主要瓶颈不是缺少新的 patch，而是缺少干净控制变量：
+
+```text
+same-value / different-format
+different-value / same-format
+same-prefix / different-continuation
+same-format / random-value
+value-only / intent-only / protocol-only
+```
+
+### 输入分析文件
+
+```text
+research/MainAnalysis/20260626_02_和主流研究的比较.md
+research/MainAnalysis/20260626_03_当前理论的缺陷.md
+research/MainAnalysis/20260626_04_接下来的计划.md
+```
+
+三份文件的主体判断基本正确：
+
+```text
+1. 当前路线和主流 mechanistic interpretability 的差异，
+   是从 feature / circuit first 转向 field / gate / trajectory first。
+
+2. 当前理论的最大风险不是局部结果错误，
+   而是 ORV 微世界过拟合、patch 伪机制、自然轨迹预测不足。
+
+3. 下一步不应继续盲目追局部 patch，
+   而应进入理论验证、图谱控制集、自然轨迹预测和后续 SAE / circuit tracing 接轨。
+```
+
+需要收紧的地方：
+
+```text
+1. 文档中对主流研究的部分引用和日期应作为背景材料，不作为本阶段实验证据。
+
+2. 部分数学公式存在 markdown 排版错误，例如 ======== 被插入公式中。
+
+3. “语言机制完成度百分比”只能作为主观闭合度，不应作为客观科学进度。
+
+4. SAE / circuit tracing 现在适合作为后续接轨方向，
+   但本阶段仍应先完成 graph atlas 的干净反事实控制。
+```
+
+### 生成脚本
+
+```bash
+tests/gpt5/phase670_graph_atlas_counterfactual_control_set.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase670_graph_atlas_counterfactual_control_set.py
+python tests/gpt5/phase670_graph_atlas_counterfactual_control_set.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase670_graph_atlas_counterfactual_control_set/phase670_counterfactual_control_set.json
+results/glm5_phase670_graph_atlas_counterfactual_control_set/phase670_cases.jsonl
+results/glm5_phase670_graph_atlas_counterfactual_control_set/phase670_pairs.jsonl
+results/glm5_phase670_graph_atlas_counterfactual_control_set/phase670_counterfactual_control_set.md
+```
+
+### 客观结果
+
+```text
+n_cases = 630
+n_pairs = 462
+```
+
+样本族：
+
+```text
+same_value_different_format: 432
+different_value_same_format: 48
+same_format_random_value: 72
+same_prefix_different_continuation: 24
+factor_isolation: 54
+```
+
+控制对：
+
+```text
+same_value_different_format: 360
+different_value_same_format: 48
+same_prefix_different_continuation: 18
+factor_isolation: 36
+```
+
+覆盖的图谱节点：
+
+```text
+semantic_value_support: 570
+protocol_execution_field: 468
+format_continuation_state: 240
+task_intent_gate: 180
+value_specific_token1_transition_state: 144
+first_token_readout_closure: 96
+multi_competitor_readout: 72
+continuation_controller: 24
+```
+
+未被 prompt-level control 直接覆盖的节点：
+
+```text
+writer_topology
+residual_boundary_integrated_state
+```
+
+原因：
+
+```text
+这两个节点需要后续内部 activation / component / boundary restore 测试，
+不能只靠输入输出反事实控制验证。
+```
+
+### 测试原理
+
+Phase 670 使用合成 in-context record，避免模型真实知识记忆干扰。
+
+例如：
+
+```text
+Record: daxor color is blue; daxor tool is hammer; ...
+Question: What is the color of daxor?
+Instruction: Answer with only the value.
+Answer:
+```
+
+这样后续模型测试更接近：
+
+```text
+模型能否把上下文中的值通过正确的意图、协议、读出和续写路线输出
+```
+
+而不是：
+
+```text
+模型是否记得外部世界事实
+```
+
+### 阶段性判断
+
+Phase 670 把 Phase 669 的图谱节点转化为可执行控制矩阵，是同一 graph-atlas validation 阶段的必要步骤。它本身不证明机制因果性，但为下一阶段自然轨迹预测和后续内部干预提供了干净样本基础。
+
+## Phase 671: Graph Atlas Counterfactual Tokenizer Validation [2026-06-26 10:22]
+
+### 本阶段目标
+
+继续完成 Phase 670 的停止条件：正式模型前向测试前，必须验证控制集在 qwen3、GLM4、DS7B 三个 tokenizer 下是否有效。
+
+本阶段只加载 tokenizer，不加载模型权重，不进行生成，不占用 GPU。
+
+### 生成脚本
+
+```bash
+tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py
+```
+
+### 执行命令
+
+严格按模型顺序执行，并加入 `--hard-exit-after-model`：
+
+```bash
+python -m py_compile tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py
+python tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py --model qwen3 --hard-exit-after-model
+python tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py --model glm4 --hard-exit-after-model
+python tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py --model deepseek7b --hard-exit-after-model
+python tests/gpt5/phase671_graph_atlas_counterfactual_tokenizer_validation.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase671_graph_atlas_counterfactual_tokenizer_validation/phase671_qwen3_tokenizer_validation_confirm.json
+results/glm5_phase671_graph_atlas_counterfactual_tokenizer_validation/phase671_glm4_tokenizer_validation_confirm.json
+results/glm5_phase671_graph_atlas_counterfactual_tokenizer_validation/phase671_deepseek7b_tokenizer_validation_confirm.json
+results/glm5_phase671_graph_atlas_counterfactual_tokenizer_validation/phase671_cross_model_summary.json
+results/glm5_phase671_graph_atlas_counterfactual_tokenizer_validation/phase671_cross_model_summary.md
+```
+
+### 客观结果
+
+qwen3：
+
+```text
+n_cases = 630
+n_pairs = 462
+invalid_case_count = 0
+invalid_pair_count = 0
+same_prefix_valid_pair_count = 18 / 18
+max_prompt_tokens = 63
+max_expected_tokens = 16
+status = pass
+```
+
+GLM4：
+
+```text
+n_cases = 630
+n_pairs = 462
+invalid_case_count = 0
+invalid_pair_count = 0
+same_prefix_valid_pair_count = 18 / 18
+max_prompt_tokens = 63
+max_expected_tokens = 16
+status = pass
+```
+
+DS7B：
+
+```text
+n_cases = 630
+n_pairs = 462
+invalid_case_count = 0
+invalid_pair_count = 0
+same_prefix_valid_pair_count = 18 / 18
+max_prompt_tokens = 63
+max_expected_tokens = 16
+status = pass
+```
+
+跨模型状态：
+
+```text
+status = pass
+```
+
+### 原理解释
+
+Phase 671 验证三个条件：
+
+```text
+1. expected_output 不能在 tokenizer 下变成空 token。
+
+2. prompt 长度不能过长，本阶段最大只有 63 tokens。
+
+3. same-prefix / different-continuation 控制必须在 tokenizer 下真的共享首个 expected token，
+   且后续 token 序列不同。
+```
+
+第三点非常关键，因为 Phase 665-668 的核心发现是：
+
+```text
+correct_prefix top1 不等于 token1 / continuation 正确。
+```
+
+如果 same-prefix 控制在 tokenizer 下不共享首 token，就不能作为 token1 transition / continuation controller 的干净测试。
+
+本阶段结果显示：
+
+```text
+qwen3、GLM4、DS7B 三个模型均通过 tokenizer 验证；
+Phase 670 控制集可以进入下一阶段自然轨迹测试。
+```
+
+### 当前硬伤
+
+```text
+1. Phase 671 只验证 tokenizer，不验证模型行为。
+
+2. synthetic record 可以降低世界知识干扰，
+   但也可能降低自然语言开放任务代表性。
+
+3. writer_topology 和 residual_boundary_integrated_state 仍未被 prompt-level control 覆盖。
+
+4. Phase 672 如果进行模型前向测试，需要记录自然生成、first-token、multi-competitor margin、
+   token1/token2 continuation，而不能只看 exact match。
+```
+
+### 下一阶段
+
+Phase 672 应进入：
+
+```text
+Graph Atlas Counterfactual Natural Trajectory Audit
+```
+
+测试目标：
+
+```text
+不用 patch，只看自然 forward trajectory，
+验证 Phase 670 控制集能否区分：
+
+1. semantic value change
+2. format protocol change
+3. task intent change
+4. first-token readout competition
+5. token1 continuation failure
+```
+
+执行要求：
+
+```text
+qwen3 -> GLM4 -> DS7B
+每个模型单独运行
+必须带 --hard-exit-after-model
+```
+
+### 阶段性结论
+
+Phase 670-671 和 Phase 669 处于同一个 graph atlas validation 大阶段。当前已经完成：
+
+```text
+1. 图谱节点整理；
+2. 反事实控制集构造；
+3. 三模型 tokenizer 验证。
+```
+
+因此下一步可以进入真正的自然轨迹模型测试，但那将是新的模型前向测试阶段，需要完整记录生成、读出竞争和续写指标。
+
+## Phase 672: Graph Atlas Counterfactual Natural Trajectory Audit [2026-06-26 10:36]
+
+### 本阶段目标
+
+分析用户上传的 Phase 670-671 评价是否正确，并在 Phase 670 控制集和 Phase 671 tokenizer 验证通过的基础上，继续完成同一 graph atlas validation 阶段的自然轨迹模型测试。
+
+本阶段不做 patch，不做 restore，不做 ablation，只观察模型自然 forward / generation 轨迹。
+
+目标是验证：
+
+```text
+1. graph atlas 控制集是否能区分 value / format / intent / continuation 变量；
+2. first-token top1 是否能预测完整生成；
+3. same-prefix / different-continuation 是否暴露 token1 / token2 续写问题；
+4. 三个模型在自然轨迹中的失败模式是否不同。
+```
+
+### 对上传分析的判断
+
+上传分析主体正确：
+
+```text
+Phase 670-671 没有新增机制因果结论，
+但完成了从机制图谱到可执行反事实验证矩阵的关键准备。
+```
+
+其中最重要的判断是：
+
+```text
+如果没有 clean counterfactual controls，
+后续 patch 会继续把语义、格式、意图、前缀、续写、残差尺度混在一起。
+```
+
+需要收紧的地方：
+
+```text
+1. Phase 670-671 只是控制集和 tokenizer 准备，不是模型行为证明。
+
+2. synthetic record 能降低 world knowledge 干扰，
+   但不能代表开放式自然语言任务。
+
+3. writer_topology 和 residual_boundary_integrated_state 仍不能靠 prompt-level control 验证。
+
+4. Phase 672 的 token1 / token2 指标对单 token answer 不完全等价于续写机制，
+   因此 same-prefix / different-continuation 家族更适合解释续写指标。
+```
+
+### 生成脚本
+
+```bash
+tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py
+```
+
+### 执行命令
+
+严格按 qwen3 -> GLM4 -> DS7B 顺序执行，每个模型都加入 `--hard-exit-after-model`：
+
+```bash
+python -m py_compile tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py
+
+python tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py \
+  --model qwen3 \
+  --max-cases 630 \
+  --batch-size 8 \
+  --max-new-tokens 20 \
+  --top-k 20 \
+  --hard-exit-after-model
+
+python tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py \
+  --model glm4 \
+  --max-cases 630 \
+  --batch-size 4 \
+  --max-new-tokens 20 \
+  --top-k 20 \
+  --hard-exit-after-model
+
+python tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py \
+  --model deepseek7b \
+  --max-cases 630 \
+  --batch-size 6 \
+  --max-new-tokens 20 \
+  --top-k 20 \
+  --hard-exit-after-model
+
+python tests/gpt5/phase672_graph_atlas_counterfactual_natural_trajectory_audit.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_qwen3_natural_trajectory_confirm.json
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_qwen3_natural_trajectory_rows.jsonl
+
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_glm4_natural_trajectory_confirm.json
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_glm4_natural_trajectory_rows.jsonl
+
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_deepseek7b_natural_trajectory_confirm.json
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_deepseek7b_natural_trajectory_rows.jsonl
+
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_cross_model_summary.json
+results/glm5_phase672_graph_atlas_counterfactual_natural_trajectory_audit/phase672_cross_model_summary.md
+```
+
+### 测试指标
+
+本阶段没有只看 exact match，而是记录：
+
+```text
+normalized_exact_rate
+compact_exact_rate
+contains_value_rate
+first_expected_top1_rate
+token1_match_rate
+token2_match_rate
+mean_expected_rank
+mean_multi_margin
+top1_category
+generated_class
+```
+
+通俗解释：
+
+```text
+normalized_exact_rate:
+  去掉多余空格后是否从期望答案开始。
+
+compact_exact_rate:
+  去掉所有空格后是否从期望答案开始，适合 JSON / label 等格式。
+
+contains_value_rate:
+  生成内容是否至少包含正确值。
+
+first_expected_top1_rate:
+  第一步读出时，期望首词元是否 top1。
+
+token1 / token2:
+  生成序列前几个词元是否跟期望序列一致。
+
+mean_multi_margin:
+  期望首词元相对最佳竞争词元的平均边际。
+```
+
+### 跨模型总体结果
+
+```text
+qwen3:
+  cases = 630
+  normalized_exact = 0.568
+  compact_exact = 0.700
+  contains_value = 0.710
+  first_expected_top1 = 0.963
+  token1_match = 0.546
+  token2_match = 0.343
+  mean_expected_rank = 1.09
+  mean_multi_margin = 6.843
+
+GLM4:
+  cases = 630
+  normalized_exact = 0.543
+  compact_exact = 0.648
+  contains_value = 0.668
+  first_expected_top1 = 0.913
+  token1_match = 0.592
+  token2_match = 0.344
+  mean_expected_rank = 1.11
+  mean_multi_margin = 1.888
+
+DS7B:
+  cases = 630
+  normalized_exact = 0.175
+  compact_exact = 0.241
+  contains_value = 0.540
+  first_expected_top1 = 0.483
+  token1_match = 0.357
+  token2_match = 0.179
+  mean_expected_rank = 70.44
+  mean_multi_margin = -0.938
+```
+
+### 分家族结果
+
+qwen3：
+
+```text
+different_value_same_format:
+  normalized_exact = 1.000
+  first_expected_top1 = 1.000
+
+same_format_random_value:
+  normalized_exact = 0.931
+  first_expected_top1 = 0.931
+
+same_prefix_different_continuation:
+  normalized_exact = 1.000
+  first_expected_top1 = 1.000
+  token1_match = 1.000
+  token2_match = 0.208
+
+same_value_different_format:
+  normalized_exact = 0.465
+  first_expected_top1 = 1.000
+  token1_match = 0.544
+```
+
+GLM4：
+
+```text
+different_value_same_format:
+  normalized_exact = 0.625
+  first_expected_top1 = 0.667
+
+same_format_random_value:
+  normalized_exact = 1.000
+  first_expected_top1 = 1.000
+
+same_prefix_different_continuation:
+  normalized_exact = 0.958
+  first_expected_top1 = 1.000
+  token1_match = 0.958
+  token2_match = 0.208
+
+same_value_different_format:
+  normalized_exact = 0.442
+  first_expected_top1 = 0.928
+  token1_match = 0.602
+```
+
+DS7B：
+
+```text
+different_value_same_format:
+  normalized_exact = 0.042
+  first_expected_top1 = 0.042
+  mean_expected_rank = 120.21
+
+same_format_random_value:
+  normalized_exact = 0.111
+  first_expected_top1 = 0.111
+  mean_expected_rank = 459.96
+
+same_prefix_different_continuation:
+  normalized_exact = 0.042
+  first_expected_top1 = 0.042
+  token1_match = 0.042
+
+same_value_different_format:
+  normalized_exact = 0.204
+  first_expected_top1 = 0.618
+  token1_match = 0.458
+```
+
+### 关键客观现象
+
+#### 现象一：qwen3 和 GLM4 的 first-token readout 很强，但完整生成明显掉落
+
+```text
+qwen3 first_expected_top1 = 0.963
+qwen3 normalized_exact = 0.568
+
+GLM4 first_expected_top1 = 0.913
+GLM4 normalized_exact = 0.543
+```
+
+这说明：
+
+```text
+first-token readout closure 仍然不等于 full generation closure。
+```
+
+这个结论和 Phase 665-668 一致。
+
+#### 现象二：same_value_different_format 是最稳定暴露协议问题的家族
+
+qwen3：
+
+```text
+first_expected_top1 = 1.000
+normalized_exact = 0.465
+```
+
+GLM4：
+
+```text
+first_expected_top1 = 0.928
+normalized_exact = 0.442
+```
+
+DS7B：
+
+```text
+first_expected_top1 = 0.618
+normalized_exact = 0.204
+```
+
+这说明：
+
+```text
+同一个 value 在不同 format 下，主要瓶颈不是值是否存在，
+而是 protocol execution / format continuation / generation policy。
+```
+
+#### 现象三：same_prefix_different_continuation 对 qwen3 / GLM4 很干净，对 DS7B 很困难
+
+```text
+qwen3 normalized_exact = 1.000
+GLM4 normalized_exact = 0.958
+DS7B normalized_exact = 0.042
+```
+
+这说明：
+
+```text
+qwen3 / GLM4 在这个合成同前缀任务中能跟住短续写；
+DS7B 在自然轨迹下被 word/explanation/newline 路线强烈吸走。
+```
+
+#### 现象四：DS7B 的自然轨迹失败是全局性的
+
+DS7B 总体：
+
+```text
+first_expected_top1 = 0.483
+mean_expected_rank = 70.44
+mean_multi_margin = -0.938
+```
+
+DS7B top1 category：
+
+```text
+expected: 299
+word_or_explanation: 228
+newline: 42
+other: 37
+json_or_quote: 24
+```
+
+这说明 DS7B 的失败不是单纯 continuation failure，而是更靠前的：
+
+```text
+readout competition + protocol prior + explanation policy
+```
+
+共同压制短值答案路线。
+
+#### 现象五：random-value 控制区分出“上下文值绑定能力”的模型差异
+
+```text
+qwen3 random-value normalized_exact = 0.931
+GLM4 random-value normalized_exact = 1.000
+DS7B random-value normalized_exact = 0.111
+```
+
+这说明：
+
+```text
+qwen3 / GLM4 能较好从 synthetic record 绑定 nonce value；
+DS7B 对 nonce short-value 输出极不稳定，更倾向解释/普通词路线。
+```
+
+### 理论进展
+
+Phase 672 第一次用 graph atlas 反事实控制集完成自然轨迹测试。当前理论可以从：
+
+```text
+patch 能不能修复某个点
+```
+
+推进到：
+
+```text
+自然轨迹是否按 graph node 分解出现可预测失败模式
+```
+
+新的实证链条是：
+
+$$
+S_{\text{value}}
+\rightarrow
+G_{\text{intent}}
+\rightarrow
+P_{\text{format}}
+\rightarrow
+R_{\text{multi}}
+\rightarrow
+C_{\text{continuation}}
+\rightarrow
+\hat{y}
+$$
+
+Phase 672 支持：
+
+```text
+1. value 支持和 format 生成可以明显分离。
+2. first-token readout 和完整生成继续分离。
+3. qwen3 / GLM4 / DS7B 共享功能节点，但自然失败模式不同。
+4. DS7B 的短值失败更像全局协议/读出偏置，而不是单一 token1 writer 问题。
+```
+
+### 当前硬伤
+
+```text
+1. Phase 672 是自然前向测试，不是内部因果干预。
+
+2. token1_match / token2_match 对单 token answer 的解释有限，
+   更适合 same-prefix / different-continuation 家族。
+
+3. normalized_exact 对 explanation 格式较严格，
+   有些输出可能语义正确但措辞不同，因此 compact / contains_value 也必须保留。
+
+4. synthetic record 仍不能代表开放式自然问答、代码、数学推理。
+
+5. DS7B 的失败虽然强，但还没定位内部来源。
+```
+
+### 下一阶段
+
+Phase 673 应进入：
+
+```text
+Graph Atlas Natural Failure Taxonomy and Internal Entry Selection
+```
+
+目标：
+
+```text
+1. 从 Phase 672 rows 中抽取高质量失败样本；
+2. 按 failure class 分类：
+   readout_failure
+   protocol_failure
+   format_continuation_failure
+   value_binding_failure
+   continuation_failure
+
+3. 为每类失败选择后续内部测试入口：
+   DS7B short/random-value failure
+   DS7B same-prefix continuation failure
+   qwen3 / GLM4 same-value different-format protocol failure
+
+4. 不急着做 patch，先完成 failure taxonomy。
+```
+
+### 阶段性结论
+
+Phase 672 是 graph atlas validation 的关键正结果。它证明 Phase 670 控制集不是形式准备，而能在自然生成中产生清晰、跨模型不同的失败图谱。
+
+最重要的结论不是哪个模型准确率最高，而是：
+
+```text
+qwen3 / GLM4:
+  first-token readout 多数已经能进正确路线，
+  但 protocol / format / continuation 仍限制完整生成。
+
+DS7B:
+  自然短值路线整体被 explanation / word / newline 竞争压制，
+  需要先做 failure taxonomy，再进入内部节点定位。
+```
+
+## Phase 673: Graph Atlas Natural Failure Taxonomy and Internal Entry Selection [2026-06-26 10:39]
+
+### 本阶段目标
+
+继续完成 Phase 672 后处理：不再增加模型测试，而是把自然轨迹结果整理成 failure taxonomy，并选择下一轮内部激活测试入口。
+
+这是同一 graph atlas validation 阶段的阶段性收束。
+
+### 生成脚本
+
+```bash
+tests/gpt5/phase673_graph_atlas_natural_failure_taxonomy.py
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase673_graph_atlas_natural_failure_taxonomy.py
+python tests/gpt5/phase673_graph_atlas_natural_failure_taxonomy.py
+```
+
+### 输出文件
+
+```text
+results/glm5_phase673_graph_atlas_natural_failure_taxonomy/phase673_failure_taxonomy.json
+results/glm5_phase673_graph_atlas_natural_failure_taxonomy/phase673_failure_taxonomy.md
+```
+
+### 分类原则
+
+Phase 673 不是因果测试，而是对自然输出做启发式分类：
+
+```text
+success:
+  normalized exact 成功。
+
+readout_competitor_failure:
+  期望首词元不是 top1，且 top1 被 space / newline / word / explanation / json 等竞争项占据。
+
+readout_other_failure:
+  期望首词元不是 top1，但竞争项不属于主要已知类别。
+
+protocol_route_failure:
+  首词元进入了期望路线，但生成格式类别偏离期望格式。
+
+value_binding_failure:
+  首词元进入或接近正确路线，但生成中不包含期望值。
+
+format_surface_failure:
+  包含值但表面格式不闭合。
+
+continuation_transition_failure:
+  same-prefix 样本中，入口后续 token 没有跟上。
+```
+
+### 客观结果
+
+qwen3：
+
+```text
+success_rate = 0.568
+dominant_failure = value_binding_failure
+
+success: 358
+value_binding_failure: 166
+other_generation_failure: 83
+readout_other_failure: 22
+format_surface_failure: 1
+```
+
+GLM4：
+
+```text
+success_rate = 0.543
+dominant_failure = value_binding_failure
+
+success: 342
+value_binding_failure: 160
+other_generation_failure: 66
+readout_competitor_failure: 30
+readout_other_failure: 22
+protocol_route_failure: 7
+format_surface_failure: 2
+continuation_transition_failure: 1
+```
+
+DS7B：
+
+```text
+success_rate = 0.175
+dominant_failure = readout_competitor_failure
+
+readout_competitor_failure: 281
+value_binding_failure: 155
+success: 110
+other_generation_failure: 42
+readout_other_failure: 36
+format_surface_failure: 6
+```
+
+### 关键洞察
+
+#### 洞察一：DS7B 不应立刻继续 token1 writer patch
+
+DS7B 的主导失败是：
+
+```text
+readout_competitor_failure
+```
+
+这意味着大量样本还没有稳定进入 value route。此时直接追 token1 transition writer 会跳过更早的失败点。
+
+更合理的顺序是：
+
+```text
+先定位 DS7B 为什么被 word / explanation / newline 竞争项截走，
+再研究 token1 transition。
+```
+
+#### 洞察二：qwen3 和 GLM4 更适合做 protocol / format continuation 研究
+
+qwen3 和 GLM4 的 first-token readout 相对强：
+
+```text
+qwen3 first_expected_top1 = 0.963
+GLM4 first_expected_top1 = 0.913
+```
+
+但完整生成只有：
+
+```text
+qwen3 normalized_exact = 0.568
+GLM4 normalized_exact = 0.543
+```
+
+因此 qwen3 / GLM4 更适合研究：
+
+```text
+first token 之后的 protocol surface formation
+format continuation
+value binding into full answer
+```
+
+#### 洞察三：自然轨迹已经能分流模型
+
+Phase 672-673 的价值不是证明某个 patch 有效，而是把模型分成不同内部入口：
+
+```text
+qwen3:
+  first-token mostly closed，下一步看 protocol / format continuation。
+
+GLM4:
+  first-token mostly closed，但仍有 space/newline 竞争和 value binding 问题。
+
+DS7B:
+  first-token route 本身大面积失败，优先看 readout competitor / protocol prior。
+```
+
+### 下一轮内部测试入口
+
+优先级 1：
+
+```text
+model: DS7B
+target: same_format_random_value
+failure_class: readout_competitor_failure
+next_internal_test:
+  trace short-value first-token readout and compare word/explanation competitors at final residual.
+```
+
+优先级 2：
+
+```text
+model: DS7B
+target: same_prefix_different_continuation
+failure_class: readout_competitor_failure / continuation_transition_failure
+next_internal_test:
+  first fix or localize readout/protocol entry before token1 transition patching.
+```
+
+优先级 3：
+
+```text
+model: DS7B
+target: list format
+failure_class: protocol_route_failure
+next_internal_test:
+  compare list marker '-' against explanation word competitors at protocol field layers.
+```
+
+优先级 4：
+
+```text
+model: qwen3
+target: same_value_different_format
+failure_class: protocol_route_failure / format_surface_failure
+next_internal_test:
+  protocol surface formation after first expected token, especially explanation/list/json formatting.
+```
+
+优先级 5：
+
+```text
+model: GLM4
+target: different_value_same_format
+failure_class: readout_competitor_failure
+next_internal_test:
+  space/newline readout source under synthetic in-context value binding.
+```
+
+### 当前硬伤
+
+```text
+1. failure taxonomy 是启发式标签，不是因果归因。
+
+2. value_binding_failure 可能混入 explanation 格式的宽松语义正确输出，
+   因此后续要结合 contains_value、compact_exact 和人工抽样检查。
+
+3. protocol_route_failure 和 format_surface_failure 之间仍有边界模糊。
+
+4. DS7B 的 readout_competitor_failure 还没有定位到内部层、组件、读出几何或协议场。
+```
+
+### 阶段性结论
+
+Phase 669-673 共同完成了一个阶段性目标：
+
+```text
+1. 建立 graph atlas；
+2. 构造反事实控制集；
+3. 完成三模型 tokenizer 验证；
+4. 完成三模型自然轨迹测试；
+5. 把自然失败分流成下一轮内部测试入口。
+```
+
+下一阶段不应继续扩大 prompt-level 控制集，而应进入内部机制定位：
+
+```text
+Phase 674: DS7B Synthetic Value Readout Competitor Source Localization
+```
+
+核心目标：
+
+```text
+解释 DS7B 为什么在 synthetic record 已给出 value 的情况下，
+仍然被 word / explanation / newline 竞争项压制。
+```
+
+## Phase 674: Synthetic Value Readout Competitor Source Localization [2026-06-26 10:51]
+
+### 任务来源
+
+本阶段分析附件中关于 Phase 672-673 的判断，并继续完成下一步测试。
+
+附件判断基本正确：
+
+```text
+Phase 672-673 的关键进展不是证明 graph atlas 已经闭合，
+而是把 graph atlas 从静态图谱推进到自然生成轨迹，并通过失败分类暴露 DS7B 的主要瓶颈。
+```
+
+正确部分：
+
+```text
+1. Phase 672 已经完成三模型自然轨迹测试。
+2. Phase 673 的 failure taxonomy 虽然仍是启发式，但能给出下一轮内部机制定位入口。
+3. DS7B 的 same_format_random_value 失败主要不是 tokenizer 问题，
+   也不是简单缺少 synthetic value，而是 readout competitor 压制。
+4. qwen3 和 GLM4 在该类任务上明显更稳定，因此 DS7B 应作为 Phase 674 的主要定位对象。
+```
+
+需要收紧的部分：
+
+```text
+1. Phase 673 的 failure taxonomy 不是因果证明，只是入口定位。
+2. readout_competitor_failure 还需要拆成 logits 几何项，而不能只看输出文本。
+3. 如果只继续做 prompt 级测试，会重复确认现象，无法解释竞争项从哪里来。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py
+```
+
+脚本修正：
+
+```text
+测试中发现 top1_text 与 competitor.text 在少数行的记录含义容易混淆。
+已修正为 raw top1 与 competitor 分开记录：
+
+top1_id / top1_text / top1_category:
+  表示真实 logits argmax。
+
+competitor:
+  表示排除 expected token 后的最高竞争 token。
+
+competitor_is_top1:
+  表示 competitor 是否就是真实 top1。
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py
+
+python tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py --model qwen3 --max-cases 72 --top-k 20 --hard-exit-after-model
+
+python tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py --model glm4 --max-cases 72 --top-k 20 --hard-exit-after-model
+
+python tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py --model deepseek7b --max-cases 72 --top-k 20 --hard-exit-after-model
+
+python tests/gpt5/phase674_synthetic_value_readout_competitor_source_localization.py --summarize-only
+```
+
+三模型按顺序运行，并且都使用 `--hard-exit-after-model`，避免 GPU 显存残留。
+
+### 测试数据
+
+输入控制集：
+
+```text
+results/glm5_phase670_graph_atlas_counterfactual_control_set/phase670_counterfactual_control_set.json
+```
+
+本阶段只抽取：
+
+```text
+family = same_format_random_value
+cases = 72
+relations = color / tool / place / symbol
+```
+
+选择原因：
+
+```text
+Phase 673 显示 DS7B 在 same_format_random_value 中存在高比例 readout_competitor_failure。
+该族控制了 format 基本一致、value 被 synthetic record 明确给出，
+因此适合定位“正确 value token 为什么没有被读出”。
+```
+
+### 测试原理
+
+对每个样本，在 prompt last token 位置读取：
+
+```text
+1. final_norm_input
+2. final_norm_output
+3. lm_head logits
+4. expected token rank
+5. top competitor token
+```
+
+对 expected token 与 competitor token 进行读出几何分解：
+
+```text
+logit_i = <h, W_i> + b_i
+```
+
+近似拆成：
+
+```text
+logit_i ≈ ||h|| · ||W_i|| · cos(h, W_i) + b_i
+```
+
+比较：
+
+```text
+expected token:
+  logit_e, ||W_e||, cos(h, W_e)
+
+competitor token:
+  logit_c, ||W_c||, cos(h, W_c)
+
+gap:
+  logit_c - logit_e
+```
+
+诊断规则：
+
+```text
+1. 如果 logit_c - logit_e <= 0：
+   expected_wins
+
+2. 如果 competitor 的 unit_score 大于 expected：
+   direction_alignment
+
+3. 如果 competitor 主要靠更大的 unembedding norm 获胜：
+   projection_norm_advantage
+
+4. 其他情况：
+   bias_or_other
+```
+
+### 结果文件
+
+```text
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_cross_model_summary.md
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_cross_model_summary.json
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_qwen3_synthetic_value_readout_source_confirm.json
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_glm4_synthetic_value_readout_source_confirm.json
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_deepseek7b_synthetic_value_readout_source_confirm.json
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_*_synthetic_value_readout_source_rows.jsonl
+```
+
+### 核心结果
+
+```text
+model       cases  expected_top1_rate  mean_expected_rank  expected_minus_competitor  top1_category
+deepseek7b  72     0.125               469.79              -6.301                     word_or_explanation=40, other=17, expected=9, newline=6
+glm4        72     1.000               1.00                3.329                      expected=72
+qwen3       72     0.931               1.49                5.341                      expected=67, other=5
+```
+
+DS7B 结果：
+
+```text
+expected_top1_rate = 0.125
+mean_expected_rank = 469.79
+mean_expected_minus_competitor = -6.301
+
+top1_text:
+  " The"   = 40
+  " \"     = 12
+  " nonce" = 9
+  " ?\n\n" = 5
+  others   = 6
+
+diagnosed_source:
+  direction_alignment = 63
+  expected_wins       = 9
+```
+
+qwen3 结果：
+
+```text
+expected_top1_rate = 0.931
+mean_expected_rank = 1.49
+mean_expected_minus_competitor = 5.341
+
+主要 top1:
+  expected = 67
+  other    = 5
+```
+
+GLM4 结果：
+
+```text
+expected_top1_rate = 1.000
+mean_expected_rank = 1.00
+mean_expected_minus_competitor = 3.329
+
+主要 top1:
+  expected = 72
+```
+
+### 客观进展
+
+Phase 674 把 Phase 673 的 DS7B readout_competitor_failure 进一步拆开。
+
+最重要的客观结果：
+
+```text
+DS7B 不是没有看到 synthetic value。
+在 final_norm_input 层面，很多样本中 expected token 仍然可以强于 competitor。
+
+但是经过 final_norm_output / lm_head 读出后，
+competitor token 与最终 hidden state 的方向对齐更强，
+导致 " The"、反斜杠、换行等格式/说明类 token 压过 expected value token。
+```
+
+这说明：
+
+```text
+DS7B 的 value 失败更接近“读出方向场竞争失败”，
+而不是简单的 value memory 缺失、tokenizer 缺陷、或 unembedding norm 优势。
+```
+
+跨模型对比也支持这一点：
+
+```text
+qwen3 和 GLM4 在同一控制集上能稳定把 synthetic value 读成 top1。
+DS7B 则被 explanation / format / continuation prior 强烈压制。
+```
+
+### 对当前理论的更新
+
+原有链条：
+
+```text
+synthetic record
+→ value binding
+→ attention path
+→ protocol field
+→ final readout
+→ natural generation
+```
+
+需要补充为：
+
+```text
+synthetic record
+→ value binding
+→ attention path
+→ protocol / continuation field
+→ final_norm geometry
+→ lm_head direction competition
+→ natural generation
+```
+
+本阶段新增拼图：
+
+```text
+final readout 不是被动读出。
+它是一个方向竞争场。
+
+value token 即使存在，也必须在 final hidden state 的方向上压过
+format / explanation / continuation prior token。
+```
+
+### 严格问题和硬伤
+
+```text
+1. Phase 674 仍然不是 causal patch 实验。
+   它定位了读出几何竞争，但没有证明哪个内部组件制造了这种方向偏转。
+
+2. pre-final_norm 的 logits 只是诊断代理。
+   它不能等价于真实中间层生成结果。
+
+3. direction_alignment 是几何归因，不是组件归因。
+   还不知道是 attention output、MLP output、RMSNorm 缩放、还是 residual prior 造成最终方向偏转。
+
+4. 本阶段只测试 same_format_random_value。
+   不能直接外推到所有 format protocol 或多 token continuation。
+
+5. DS7B 中 expected_output 的首 token 有时是 newline 或无空格 nonce，
+   说明后续仍需要更严格的 token variant 选择规则。
+```
+
+### 下一阶段方案
+
+Phase 675 应继续当前阶段性目标，不需要回到 prompt-level 扩数据。
+
+推荐标题：
+
+```text
+Phase 675: DS7B Final Readout Direction Field Component Attribution
+```
+
+核心目标：
+
+```text
+定位 DS7B final_norm_output 中把 hidden state 推向 " The" / "\\" / newline 的来源。
+```
+
+测试方案：
+
+```text
+1. 继续使用 Phase 674 的 72 个 same_format_random_value 样本。
+
+2. 按 DS7B failure class 分组：
+   word_or_explanation top1
+   slash/quote top1
+   newline top1
+   expected top1
+
+3. 在最后若干层分别记录：
+   residual_pre_attn
+   attn_output
+   residual_post_attn
+   mlp_output
+   residual_post_mlp
+   final_norm_input
+   final_norm_output
+
+4. 对每个组件计算对 competitor gap 的贡献：
+   Δgap(component) = gap(after component) - gap(before component)
+
+5. 找出最常把 expected_wins 推成 competitor_wins 的组件和层。
+```
+
+核心公式：
+
+```text
+gap_l = logit_c(h_l) - logit_e(h_l)
+```
+
+```text
+Δgap_l^component = gap_l^after - gap_l^before
+```
+
+如果 Phase 675 找到稳定组件：
+
+```text
+再进入 causal patch：
+把 expected-wins 样本中的该组件状态 patch 到 competitor-wins 样本，
+观察 expected rank 是否恢复。
+```
+
+如果 Phase 675 仍找不到稳定组件：
+
+```text
+说明 DS7B 的 readout competitor 不是单层单组件产生，
+需要转向多层轨迹场，而不是继续做单点 patch。
+```
+
+## Phase 675: Final Readout Direction Field Component Attribution [2026-06-26 10:56]
+
+### 任务延续判断
+
+根据 Phase 674 的结论，下一步 Phase 675 与当前任务属于同一阶段性目标：
+
+```text
+目标不是继续扩大 prompt 测试，
+而是解释 DS7B final readout competitor 的内部来源。
+```
+
+因此继续自动完成。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase675_final_readout_direction_field_component_attribution.py
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase675_final_readout_direction_field_component_attribution.py
+
+python tests/gpt5/phase675_final_readout_direction_field_component_attribution.py --model qwen3 --max-cases 72 --last-layers 8 --hard-exit-after-model
+
+python tests/gpt5/phase675_final_readout_direction_field_component_attribution.py --model glm4 --max-cases 72 --last-layers 8 --hard-exit-after-model > results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_glm4_run.log 2>&1
+
+python tests/gpt5/phase675_final_readout_direction_field_component_attribution.py --model deepseek7b --max-cases 72 --last-layers 8 --hard-exit-after-model > results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase675_final_readout_direction_field_component_attribution.py --summarize-only
+```
+
+### 测试数据
+
+直接使用 Phase 674 的三模型 rows：
+
+```text
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/phase674_*_synthetic_value_readout_source_rows.jsonl
+```
+
+每个模型：
+
+```text
+cases = 72
+family = same_format_random_value
+last_layers = 8
+```
+
+### 测试原理
+
+Phase 674 已经确定：
+
+```text
+expected token 与 competitor token 的最终差距：
+
+gap_final = logit_competitor - logit_expected
+```
+
+Phase 675 继续沿最后 8 层自然轨迹读取：
+
+```text
+layer_input
+attn_plus_residual 后的 mlp_input
+mlp_plus_residual 后的 layer_out
+final_norm_input
+final_norm_output
+```
+
+对每个位置计算：
+
+```text
+gap(h) = logit_c(h) - logit_e(h)
+```
+
+组件贡献定义为：
+
+```text
+Δgap_component = gap_after - gap_before
+```
+
+解释规则：
+
+```text
+Δgap_component > 0:
+  该组件把状态推向 competitor。
+
+Δgap_component < 0:
+  该组件把状态拉回 expected。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_cross_model_summary.md
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_cross_model_summary.json
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_qwen3_component_attribution_summary.json
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_glm4_component_attribution_summary.json
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_deepseek7b_component_attribution_summary.json
+results/glm5_phase675_final_readout_direction_field_component_attribution/phase675_*_component_attribution_rows.jsonl
+```
+
+### 核心结果
+
+```text
+model       cases  expected_top1_rate  final_gap  strongest_overall_delta
+deepseek7b  72     0.125               6.301      L27.attn_plus_residual = +107.620
+glm4        72     1.000              -3.329      final_norm = +34.829
+qwen3       72     0.931              -5.341      L35.attn_plus_residual = +96.587
+```
+
+DS7B overall 最强正向 competitor 推动项：
+
+```text
+L27.attn_plus_residual:
+  before_gap = -103.740
+  after_gap  = 3.879
+  delta_gap  = 107.620
+  positive_rate = 0.833
+
+final_norm:
+  before_gap = -67.681
+  after_gap  = 6.301
+  delta_gap  = 73.982
+  positive_rate = 0.833
+
+L26.attn_plus_residual:
+  before_gap = -67.709
+  after_gap  = 1.437
+  delta_gap  = 69.146
+  positive_rate = 0.833
+```
+
+DS7B overall 主要拉回 expected 的项：
+
+```text
+L26.mlp_plus_residual:
+  delta_gap = -105.177
+
+L27.mlp_plus_residual:
+  delta_gap = -71.560
+
+L25.mlp_plus_residual:
+  delta_gap = -69.427
+```
+
+qwen3 对照：
+
+```text
+final_gap = -5.341
+expected_top1_rate = 0.931
+
+L35.attn_plus_residual:
+  delta_gap = +96.587
+
+final_norm:
+  delta_gap = +60.114
+
+但最终仍多数 expected top1。
+```
+
+GLM4 对照：
+
+```text
+final_gap = -3.329
+expected_top1_rate = 1.000
+
+final_norm:
+  delta_gap = +34.829
+
+L39.attn_plus_residual:
+  delta_gap = +31.440
+
+但最终全部 expected top1。
+```
+
+### 客观进展
+
+Phase 675 的关键发现不是：
+
+```text
+attention 一定是坏的，MLP 一定是好的。
+```
+
+而是更精确的轨迹事实：
+
+```text
+在三模型中，late attention+residual 和 final_norm 普遍会把 gap 推向 competitor。
+
+但是 qwen3 / GLM4 的整体轨迹仍然保留 expected 优势。
+
+DS7B 的最后层 L27 attention+residual 与 final_norm 把原本 expected 优势翻成 competitor 优势，
+因此 DS7B 的失败不是孤立 final lm_head 问题，而是 late residual trajectory + final norm readout 共同造成。
+```
+
+这把 Phase 674 的结论推进了一层：
+
+```text
+Phase 674:
+  DS7B 的失败主要是 final readout direction alignment。
+
+Phase 675:
+  该 direction alignment 的最大轨迹来源集中在 DS7B L27 attention+residual 和 final_norm。
+```
+
+### 当前理论更新
+
+现有链条应更新为：
+
+```text
+synthetic value record
+→ value binding
+→ attention path
+→ protocol / continuation field
+→ late attention residual competitor push
+→ MLP expected correction
+→ final norm direction reshaping
+→ lm_head competition
+→ natural generation
+```
+
+更通俗地说：
+
+```text
+最后阶段不是单纯“读出答案”。
+
+模型内部像在做两股力的对抗：
+
+1. attention / protocol / continuation 路线把状态推向解释、格式、续写词；
+2. MLP / value 路线把状态拉回正确值；
+3. final_norm 再改变方向和尺度，使最终 lm_head 竞争结果确定。
+```
+
+DS7B 的问题是：
+
+```text
+最后一步对抗中，解释/格式/续写方向赢了。
+```
+
+qwen3 和 GLM4 的区别是：
+
+```text
+它们也存在 competitor push，
+但 expected 方向仍足够强，最终没有被翻盘。
+```
+
+### 严格问题和硬伤
+
+```text
+1. Phase 675 仍然是 natural trajectory attribution，不是 causal patch。
+
+2. 中间层 gap 使用 lm_head 对中间状态直接投影，是诊断指标，
+   不能等同于模型真实在中间层“已经输出这个 token”。
+
+3. attn_plus_residual 包含 attention output 与 residual carry 的合成效果，
+   还没有拆成 attention heads、residual state、position/protocol prior。
+
+4. final_norm 的正向 delta 很大，但还没有拆成 RMSNorm 缩放、方向归一化和 readout coupling。
+
+5. 本阶段仍只覆盖 same_format_random_value。
+   不能直接代表所有语言机制。
+```
+
+### 下一阶段方案
+
+Phase 676 与本阶段连续，但已经从“自然轨迹归因”进入“因果干预验证”，
+应作为下一阶段启动，而不混入本轮 Phase 674-675 的定位任务。
+
+推荐标题：
+
+```text
+Phase 676: DS7B L27 Attention and Final Norm Causal Suppression Audit
+```
+
+核心目标：
+
+```text
+验证 DS7B L27 attention+residual 与 final_norm 是否真的是 readout competitor 翻盘的因果来源。
+```
+
+测试方案：
+
+```text
+1. 选择 DS7B Phase 674 中 competitor_wins 样本：
+   word_or_explanation
+   other
+   newline
+
+2. 选择 DS7B expected_wins 样本作为 donor。
+
+3. 对 L27 attention output / residual post-attn / final_norm input-output 做轻量 patch 或抑制：
+   a. replace attention output
+   b. subtract competitor direction component
+   c. interpolate final_norm output toward expected-wins direction
+
+4. 观察：
+   expected_rank 是否下降到接近 1；
+   competitor_gap 是否从正变负；
+   natural first token 是否从 " The" / "\\" / newline 变成 expected value token。
+```
+
+如果 Phase 676 成功：
+
+```text
+说明 DS7B value readout failure 已经从现象 → 几何 → 组件 → 因果链条基本闭合。
+```
+
+如果 Phase 676 失败：
+
+```text
+说明 L27 / final_norm 是轨迹表象，不是可单点修复的因果源，
+需要进入多层连续场修复，而不是继续单点 patch。
+```
+
+## Phase 676: Late Readout Competitor Causal Suppression Audit [2026-06-26 11:18]
+
+### 任务来源与附件判断
+
+本阶段分析附件中对 Phase 674-675 的判断，并继续推进。
+
+附件判断基本正确：
+
+```text
+Phase 674-675 已经把 DS7B 的失败从自然生成失败，
+推进到 final readout direction field 中 late attention / residual 与 final_norm 的共同翻盘。
+```
+
+需要加入的重要限制：
+
+```text
+当前测试模型都是小模型。
+结果适合作为小模型内部失败机制定位，
+不能直接外推到大模型，也不能把具体层号当成通用结构。
+```
+
+因此本阶段只把结论限定为：
+
+```text
+在当前三个本地小模型中，
+DS7B 的 same_format_random_value 失败可被读出方向干预部分改变。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py
+
+mkdir -p results/glm5_phase676_late_readout_competitor_causal_suppression_audit
+
+python tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py --model qwen3 --max-cases 72 --hard-exit-after-model > results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_qwen3_run.log 2>&1
+
+python tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py --model glm4 --max-cases 72 --hard-exit-after-model > results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_glm4_run.log 2>&1
+
+python tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py --model deepseek7b --max-cases 72 --hard-exit-after-model > results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase676_late_readout_competitor_causal_suppression_audit.py --summarize-only
+```
+
+### 测试原理
+
+继续使用 Phase 674 的 same_format_random_value 样本：
+
+```text
+cases = 72
+models = qwen3 / GLM4 / DS7B
+```
+
+对每个样本定义：
+
+```text
+d = W_competitor - W_expected
+```
+
+其中：
+
+```text
+W_competitor = competitor token 的 lm_head / unembedding 方向
+W_expected = expected token 的 lm_head / unembedding 方向
+```
+
+干预方式：
+
+```text
+1. final_output_remove_comp_a1:
+   在 final_norm_output 删除 hidden state 沿 d 的投影。
+
+2. final_output_remove_random_a1:
+   删除同范数 random direction，作为对照。
+
+3. final_output_cancel_gap_a1:
+   按当前 gap 直接沿 d 方向抵消 competitor gap，作为正控。
+
+4. final_input_remove_comp_a1:
+   在 final_norm_input 删除 d 投影。
+
+5. attn_last_remove_comp_a1:
+   在最后层 attention output 删除 d 投影。
+
+6. attn_prev_remove_comp_a1:
+   在倒数第二层 attention output 删除 d 投影。
+
+7. attn_last_zero_a1:
+   直接置零最后层 attention output 的当前 token 位置。
+```
+
+核心观测：
+
+```text
+expected_top1_rate
+mean_expected_rank
+mean_gap = logit_competitor - logit_expected
+switch_to_expected
+damage_success
+```
+
+### 结果文件
+
+```text
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_cross_model_summary.md
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_cross_model_summary.json
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_qwen3_causal_suppression_summary.json
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_glm4_causal_suppression_summary.json
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_deepseek7b_causal_suppression_summary.json
+results/glm5_phase676_late_readout_competitor_causal_suppression_audit/phase676_*_causal_suppression_rows.jsonl
+```
+
+### 核心结果
+
+DS7B：
+
+```text
+condition                         top1_rate  mean_rank   mean_gap  gap_delta
+baseline                          0.125      469.79      6.301     0.000
+final_output_remove_comp_a1        0.083      8.81       -0.003    -6.304
+final_output_remove_random_a1      0.125      466.06      6.289    -0.012
+final_output_cancel_gap_a1         0.472      2.90       -2.455    -8.756
+final_input_remove_comp_a1         0.000      52810.07    16.405    10.104
+attn_last_remove_comp_a1           0.000      18337.64    12.855    6.554
+attn_prev_remove_comp_a1           0.000      782.47      8.018     1.717
+attn_last_zero_a1                  0.000      10186.92    6.921     0.620
+```
+
+qwen3：
+
+```text
+baseline                    top1_rate = 0.931
+final_output_remove_random  top1_rate = 0.931
+attn_last_remove_comp       top1_rate = 0.931
+final_input_remove_comp     top1_rate = 0.000
+```
+
+GLM4：
+
+```text
+baseline                    top1_rate = 1.000
+final_output_remove_random  top1_rate = 1.000
+attn_last_remove_comp       top1_rate = 1.000
+final_input_remove_comp     top1_rate = 0.083
+```
+
+### 客观进展
+
+Phase 676 的最重要结果是：
+
+```text
+random direction 基本无效；
+final output 的 competitor direction 干预可以显著改变 gap；
+但简单删除 projection 只能把 gap 拉到接近 0，不能稳定恢复 expected top1；
+直接 gap cancel 正控能把 DS7B expected_top1_rate 从 0.125 提高到 0.472。
+```
+
+这说明：
+
+```text
+DS7B 的读出竞争确实有 readout-direction 因果成分。
+```
+
+但也说明：
+
+```text
+单点删除 L27 attention output 或 final_norm_input 的 competitor 方向并不会修复，
+反而会破坏状态。
+```
+
+因此 Phase 675 的 L27 / final_norm 轨迹归因不能被简单解释成：
+
+```text
+只要抑制最后层 attention 就能修复。
+```
+
+更准确的解释是：
+
+```text
+最终读出方向是因果敏感点；
+但上游 attention / norm / residual 是耦合系统，不能用粗暴单点删除修复。
+```
+
+### 严格问题和硬伤
+
+```text
+1. final_output_cancel_gap_a1 是强正控，使用了当前 gap 信息，
+   不能视为自然机制修复。
+
+2. final_output_remove_comp_a1 只把 competitor 和 expected 拉到接近打平，
+   但 top1 仍可能被第三方 token 抢走。
+
+3. final_input 和 attention output 的直接删除会破坏隐藏状态分布，
+   不能简单认为“attention 不是因果源”。
+
+4. qwen3 / GLM4 中同类干预会严重破坏本来正确的输出，
+   说明 readout direction 干预不是通用无害操作。
+
+5. 当前模型较小，DS7B 的失败可能包含小模型特有的不稳定读出和弱协议控制。
+```
+
+### 阶段判断
+
+Phase 676 没有完成“自然因果修复”，但完成了一个重要边界：
+
+```text
+读出方向是有效杠杆；
+但简单单点 suppression 不是正确修复形式。
+```
+
+所以不能直接进入理论闭合，应继续做 intervention strength scan。
+
+## Phase 677: Readout Intervention Strength Scan [2026-06-26 11:18]
+
+### 自动继续原因
+
+Phase 676 只有单一 alpha 强度，且结果显示：
+
+```text
+final_output_cancel_gap_a1 对 DS7B 有明显部分恢复；
+final_output_remove_comp_a1 只能打平 gap；
+random control 无效。
+```
+
+这是同一阶段的强度问题，不应停在单点 alpha 结论。因此继续 Phase 677。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase677_readout_intervention_strength_scan.py
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase677_readout_intervention_strength_scan.py
+
+mkdir -p results/glm5_phase677_readout_intervention_strength_scan
+
+python tests/gpt5/phase677_readout_intervention_strength_scan.py --model qwen3 --max-cases 72 --hard-exit-after-model > results/glm5_phase677_readout_intervention_strength_scan/phase677_qwen3_run.log 2>&1
+
+python tests/gpt5/phase677_readout_intervention_strength_scan.py --model glm4 --max-cases 72 --hard-exit-after-model > results/glm5_phase677_readout_intervention_strength_scan/phase677_glm4_run.log 2>&1
+
+python tests/gpt5/phase677_readout_intervention_strength_scan.py --model deepseek7b --max-cases 72 --hard-exit-after-model > results/glm5_phase677_readout_intervention_strength_scan/phase677_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase677_readout_intervention_strength_scan.py --summarize-only
+```
+
+### 扫描条件
+
+```text
+baseline
+
+final_cancel_gap:
+  alpha = 0.25 / 0.5 / 0.75 / 1.0 / 1.25 / 1.5 / 2.0 / 3.0
+
+final_remove_comp:
+  alpha = 0.5 / 1.0 / 1.5 / 2.0
+
+final_remove_random:
+  alpha = 1.0
+```
+
+### 结果文件
+
+```text
+results/glm5_phase677_readout_intervention_strength_scan/phase677_cross_model_summary.md
+results/glm5_phase677_readout_intervention_strength_scan/phase677_cross_model_summary.json
+results/glm5_phase677_readout_intervention_strength_scan/phase677_qwen3_strength_scan_summary.json
+results/glm5_phase677_readout_intervention_strength_scan/phase677_glm4_strength_scan_summary.json
+results/glm5_phase677_readout_intervention_strength_scan/phase677_deepseek7b_strength_scan_summary.json
+results/glm5_phase677_readout_intervention_strength_scan/phase677_*_strength_scan_rows.jsonl
+```
+
+### 核心结果
+
+DS7B gap cancel 强度曲线：
+
+```text
+condition                  top1_rate  mean_rank  mean_gap   failure_switch
+baseline                   0.125      469.79     6.301      0.000
+final_cancel_gap_a0p25      0.125      95.03      4.118      0.000
+final_cancel_gap_a0p5       0.125      26.42      1.924      0.000
+final_cancel_gap_a0p75      0.125      8.40      -0.276      0.095
+final_cancel_gap_a1p0       0.472      2.90      -2.455      0.540
+final_cancel_gap_a1p25      0.708      1.79      -4.659      0.810
+final_cancel_gap_a1p5       0.722      1.57      -6.845      0.825
+final_cancel_gap_a2p0       0.833      1.61      -11.224     0.952
+final_cancel_gap_a3p0       0.833      3.10      -19.984     0.952
+```
+
+DS7B projection removal 曲线：
+
+```text
+condition                  top1_rate  mean_rank  mean_gap   failure_switch
+final_remove_comp_a0p5      0.125      49.78      3.159      0.000
+final_remove_comp_a1p0      0.083      8.81      -0.003      0.000
+final_remove_comp_a1p5      0.569      1.92      -3.155      0.635
+final_remove_comp_a2p0      0.819      1.43      -6.300      0.937
+final_remove_random_a1p0    0.125      471.81     6.291      0.000
+```
+
+qwen3 对照：
+
+```text
+baseline top1_rate = 0.931
+
+final_cancel_gap_a0p25 / a0p5:
+  top1_rate 仍为 0.931
+
+final_cancel_gap_a0p75 之后：
+  top1_rate 降到 0.042 或更低，
+  success_damage_rate = 1.000
+```
+
+GLM4 对照：
+
+```text
+baseline top1_rate = 1.000
+
+final_cancel_gap_a0p25 / a0p5 / a0p75:
+  top1_rate 仍为 1.000
+
+final_cancel_gap_a1p0:
+  top1_rate 降到 0.292
+
+alpha >= 1.25:
+  top1_rate = 0.000
+```
+
+### 客观进展
+
+Phase 677 证明了 Phase 676 的结果不是 alpha=1 的偶然现象。
+
+DS7B 存在清晰的剂量效应：
+
+```text
+干预强度越高，
+mean_gap 越负，
+failure_switch_rate 越高，
+expected_top1_rate 越高。
+```
+
+random direction 对 DS7B 基本无效：
+
+```text
+baseline mean_gap = 6.301
+random mean_gap = 6.291
+```
+
+因此可以更严格地说：
+
+```text
+DS7B 的失败确实依赖 expected-vs-competitor readout direction。
+```
+
+但是不能说：
+
+```text
+已经找到自然修复机制。
+```
+
+因为：
+
+```text
+强读出干预会破坏原本正确样本；
+qwen3 / GLM4 在强干预下也会被破坏；
+这说明干预是读出层强制转向，不是自然协议修复。
+```
+
+### 当前最谨慎结论
+
+```text
+Phase 674:
+  DS7B 失败是 final readout direction competition。
+
+Phase 675:
+  该竞争在自然轨迹中主要由 late attention/residual 和 final_norm 推动。
+
+Phase 676:
+  读出方向干预能改变 gap，但简单单点 suppression 不稳定。
+
+Phase 677:
+  DS7B 存在稳定剂量效应，证明 readout direction 是有效因果杠杆；
+  但强干预不是自然机制修复，会损伤原本正确样本和其他模型。
+```
+
+### 小模型限制
+
+```text
+1. DS7B 的强失败可能与小模型协议控制弱有关。
+2. qwen3 / GLM4 在同一测试上更稳定，但也会被强读出干预破坏。
+3. 具体层号、强度阈值、top1 竞争词不能外推到大模型。
+4. 但“读出竞争方向可以因果控制输出”的机制层级有继续研究价值。
+```
+
+### 下一阶段方案
+
+Phase 678 不应继续做全局强干预，而应做 selective repair。
+
+推荐标题：
+
+```text
+Phase 678: Failure-Selective Readout Repair and Damage Control
+```
+
+核心目标：
+
+```text
+只对 baseline failure 样本施加读出方向修复，
+对 baseline success 样本不动，
+检查是否能得到高整体 top1_rate 且无 success damage。
+```
+
+测试方式：
+
+```text
+1. 使用 Phase 677 的 DS7B alpha curve。
+2. 选 alpha = 1.25 / 1.5 / 2.0。
+3. 只干预 baseline failure cases。
+4. baseline success cases 保持原始输出。
+5. 计算 conditional overall repair rate。
+```
+
+如果 selective repair 成功：
+
+```text
+说明 DS7B 的失败样本可以通过读出方向门控修复，
+下一步寻找自然 gate 何时决定是否施加该方向。
+```
+
+如果 selective repair 仍失败：
+
+```text
+说明即使读出方向可控，也不能形成稳定机制，
+需要回到多层协议场而不是 final readout。
+```
+
+## Phase 678: Failure-Selective Readout Repair Summary [2026-06-26 11:21]
+
+### 自动继续原因
+
+Phase 677 证明强读出干预有剂量效应，但也会损伤原本正确样本。
+
+这自然提出一个同阶段问题：
+
+```text
+如果只对 baseline failure 样本施加修复，
+baseline success 样本保持不动，
+是否可以同时获得高修复率和低损伤？
+```
+
+该问题不需要重新运行模型，只需要对 Phase 677 rows 做后处理，因此继续完成 Phase 678。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase678_failure_selective_readout_repair_summary.py
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase678_failure_selective_readout_repair_summary.py
+
+python tests/gpt5/phase678_failure_selective_readout_repair_summary.py
+```
+
+### 数据来源
+
+```text
+results/glm5_phase677_readout_intervention_strength_scan/phase677_*_strength_scan_rows.jsonl
+```
+
+### 计算原理
+
+Phase 678 不做新的模型前向，而是模拟一个 selective gate：
+
+```text
+if baseline_success:
+    keep baseline output
+
+if baseline_failure:
+    apply selected readout intervention result from Phase 677
+```
+
+观测：
+
+```text
+selective_expected_top1_rate
+failure_repair_rate
+success_damage_rate
+selective_mean_rank
+selective_mean_gap
+```
+
+这不是自然机制证明，而是回答：
+
+```text
+如果模型内部存在一个正确的 failure detector / selective gate，
+readout intervention 是否足以修复失败样本，同时不破坏成功样本？
+```
+
+### 结果文件
+
+```text
+results/glm5_phase678_failure_selective_readout_repair_summary/phase678_selective_repair_summary.md
+results/glm5_phase678_failure_selective_readout_repair_summary/phase678_selective_repair_summary.json
+```
+
+### 核心结果
+
+DS7B：
+
+```text
+condition                  selective_top1  mean_rank  mean_gap   failure_repair  success_damage
+baseline                   0.125           469.79     6.301      0.000           0.000
+final_cancel_gap_a1p0       0.597           2.79      -2.660      0.540           0.000
+final_cancel_gap_a1p25      0.833           1.61      -4.913      0.810           0.000
+final_cancel_gap_a1p5       0.847           1.26      -7.155      0.825           0.000
+final_cancel_gap_a2p0       0.958           1.04      -11.634     0.952           0.000
+final_remove_comp_a1p5      0.681           1.81      -3.372      0.635           0.000
+final_remove_comp_a2p0      0.944           1.15      -6.595      0.937           0.000
+```
+
+qwen3：
+
+```text
+baseline selective_top1 = 0.931
+final_cancel_gap_a2p0 selective_top1 = 1.000
+final_remove_comp_a2p0 selective_top1 = 1.000
+success_damage = 0.000
+```
+
+GLM4：
+
+```text
+baseline selective_top1 = 1.000
+所有 selective 条件保持 1.000
+```
+
+### 客观进展
+
+Phase 678 说明：
+
+```text
+读出方向修复本身足以修复大量 failure 样本；
+真正危险的是“对所有样本无差别施加强干预”。
+```
+
+DS7B 在 failure-selective 条件下：
+
+```text
+baseline top1_rate = 0.125
+selective final_cancel_gap_a2p0 top1_rate = 0.958
+success_damage = 0.000
+```
+
+这把瓶颈进一步后移：
+
+```text
+问题不再只是“能不能修复读出方向”；
+问题变成“模型内部是否存在或缺失一个选择门，
+能判断什么时候需要启动 readout repair”。
+```
+
+### 当前最谨慎结论
+
+```text
+1. DS7B 的失败样本可以通过 readout direction intervention 大量修复。
+2. 成功样本不应该被同类强干预触碰。
+3. 因此自然机制若存在，必须是 selective gate，而不是全局 readout shift。
+4. 当前结果仍是小模型上的人工干预，不是大模型普遍机制证明。
+```
+
+### 当前硬伤
+
+```text
+1. Phase 678 是后处理选择，不是模型自己选择。
+
+2. selective gate 是外部 oracle：
+   我们用 baseline success/failure 标签决定是否干预。
+
+3. 干预方向仍直接使用 expected-vs-competitor readout direction，
+   不是模型自然生成的内部方向。
+
+4. 结果说明“如果有选择门就能修”，
+   但还没有找到模型内部是否有这个选择门。
+
+5. 小模型中 failure detector 可能很弱，
+   大模型可能通过更强 instruction/protocol control 自然完成类似选择。
+```
+
+### 下一阶段方案
+
+Phase 679 应寻找 selective gate 的内部可测指标。
+
+推荐标题：
+
+```text
+Phase 679: Internal Failure-Gate Predictor for Selective Readout Repair
+```
+
+核心问题：
+
+```text
+在不看最终答案是否正确的情况下，
+能不能从内部状态预测当前样本是否需要 readout repair？
+```
+
+候选指标：
+
+```text
+1. final_norm_input gap
+2. final_norm_output gap
+3. L27.attn_plus_residual delta_gap
+4. L27.mlp_plus_residual correction strength
+5. competitor category
+6. expected_rank before intervention
+7. top1 entropy / margin
+```
+
+目标：
+
+```text
+建立一个不依赖人工标签的 failure-gate 指标，
+把 Phase 678 的 oracle selective repair 推进成可测内部机制。
+```
+
+## Phase 679: Internal Failure-Gate Predictor for Selective Readout Repair [2026-06-26 11:28]
+
+### 任务来源
+
+本阶段继续分析 Phase 674-675 附件判断是否正确，并综合 Phase 676-678 的后续结果继续推进。
+
+附件中对 Phase 674-675 的判断基本正确：Phase 674-675 确实把 DS7B 的错误定位到 final readout direction competition 附近，并证明 late attention/residual 与 final_norm 是主要轨迹贡献源。但附件停留在“需要因果验证”的位置；后续 Phase 676-678 已经补上因果与强度扫描：
+
+```text
+Phase 676: 粗 suppression 不能自然修复，但 cancel gap 能部分修复。
+Phase 677: readout direction intervention 存在稳定剂量效应。
+Phase 678: 如果存在 failure-selective gate，只修复失败样本，可以把 DS7B top1 从 0.125 提升到 0.958，且不损伤成功样本。
+```
+
+因此 Phase 679 的核心任务不是继续证明 readout intervention 有效，而是审计：
+
+```text
+是否存在一个可测的 failure gate，
+能决定哪些样本需要 readout repair，
+从而把 Phase 678 的 oracle selective repair 推进到可测机制。
+```
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase679_internal_failure_gate_predictor.py
+python tests/gpt5/phase679_internal_failure_gate_predictor.py
+```
+
+本阶段没有重新运行模型 forward，不占用 GPU；它复用 Phase 674、Phase 675、Phase 677 的逐样本结果，做跨模型后处理审计。
+
+### 脚本
+
+```text
+tests/gpt5/phase679_internal_failure_gate_predictor.py
+```
+
+### 输入结果
+
+```text
+results/glm5_phase674_synthetic_value_readout_competitor_source_localization/
+results/glm5_phase675_final_readout_direction_field_component_attribution/
+results/glm5_phase677_readout_intervention_strength_scan/
+```
+
+### 输出结果
+
+```text
+results/glm5_phase679_internal_failure_gate_predictor/phase679_failure_gate_predictor.json
+results/glm5_phase679_internal_failure_gate_predictor/phase679_failure_gate_predictor.md
+```
+
+### 测试原理
+
+Phase 679 不使用复杂统计模型，不训练 classifier，只枚举基础可解释 gate。
+
+每个样本先从已有结果中抽取以下可测量：
+
+```text
+1. baseline_success
+2. expected_rank
+3. final_gap
+4. pre_gap
+5. post_unit_gap
+6. post_cos_advantage
+7. final_norm_before_gap
+8. final_norm_delta
+9. last_attn_delta / prev_attn_delta / last_mlp_delta
+10. top1_category
+```
+
+然后构造简单门控：
+
+```text
+top1_category_not_expected
+top1_category_word_or_newline_or_other
+expected_rank_gt_1
+expected_rank_gt_10
+final_gap_gt_0
+若干 pre_final_gap / trajectory / readout_geometry 阈值门
+```
+
+每个 gate 与 Phase 677 中的 repair 条件组合：
+
+```text
+final_cancel_gap_a1p25
+final_cancel_gap_a1p5
+final_cancel_gap_a2p0
+final_remove_comp_a2p0
+```
+
+评估指标：
+
+```text
+pred_rate: 被 gate 选中比例
+failure_capture_rate: 失败样本捕获率
+success_false_positive_rate: 成功样本误伤预测率
+selective_top1_rate: 只对 gate 选中样本修复后的 top1
+failure_repair_rate: 失败样本修复率
+success_damage_rate: 成功样本损伤率
+```
+
+### 关键结果
+
+#### qwen3
+
+qwen3 baseline 只有少量失败样本。近读出门控能完整捕获失败，且不误伤成功样本：
+
+```text
+top1_category_not_expected + final_cancel_gap_a2p0:
+pred_rate = 0.069
+failure_capture_rate = 1.000
+success_false_positive_rate = 0.000
+selective_top1_rate = 1.000
+failure_repair_rate = 1.000
+success_damage_rate = 0.000
+
+final_gap_gt_0 + final_cancel_gap_a2p0:
+selective_top1_rate = 1.000
+failure_repair_rate = 1.000
+success_damage_rate = 0.000
+```
+
+#### GLM4
+
+GLM4 baseline 已经全对，因此多数 gate 不触发，selective_top1 保持 1.000：
+
+```text
+top1_category_not_expected:
+pred_rate = 0.000
+selective_top1_rate = 1.000
+success_damage_rate = 0.000
+```
+
+#### DS7B
+
+DS7B 是本阶段核心。最稳定结果如下：
+
+```text
+top1_category_not_expected + final_cancel_gap_a2p0:
+pred_rate = 0.875
+failure_capture_rate = 1.000
+success_false_positive_rate = 0.000
+selective_top1_rate = 0.958
+failure_repair_rate = 0.952
+success_damage_rate = 0.000
+
+final_gap_gt_0 + final_cancel_gap_a2p0:
+pred_rate = 0.875
+failure_capture_rate = 1.000
+success_false_positive_rate = 0.000
+selective_top1_rate = 0.958
+failure_repair_rate = 0.952
+success_damage_rate = 0.000
+
+top1_category_not_expected + final_remove_comp_a2p0:
+selective_top1_rate = 0.944
+failure_repair_rate = 0.937
+success_damage_rate = 0.000
+
+expected_rank_gt_10 + final_cancel_gap_a2p0:
+failure_capture_rate = 0.921
+selective_top1_rate = 0.889
+failure_repair_rate = 0.873
+success_damage_rate = 0.000
+```
+
+### 负结果
+
+更早的内部 gate 暂时没有稳定成功。
+
+```text
+pre_gap
+post_unit_gap
+post_cos_advantage
+last_attn_delta
+prev_attn_delta
+last_mlp_delta
+```
+
+这些 trajectory/readout_geometry 指标在 DS7B 上经常出现：
+
+```text
+1. 捕获失败样本不完整；
+2. 对成功样本误判较高；
+3. 与强 repair 组合后会损伤原本成功样本；
+4. 不能稳定复现 Phase 678 oracle selective repair。
+```
+
+因此目前最可靠的 gate 仍然是近读出 gate，而不是深层自然协议 gate。
+
+### 当前判断
+
+Phase 679 是一个“正结果 + 负结果”的阶段。
+
+正结果：
+
+```text
+readout-side failure gate 可以把 Phase 678 的 oracle selective repair 变成可测规则。
+```
+
+具体说，DS7B 中：
+
+```text
+如果 top1_category != expected，或 final_gap > 0，
+则对该样本执行 final_cancel_gap_a2p0；
+否则保持 baseline。
+```
+
+可以得到：
+
+```text
+baseline top1 = 0.125
+selective repair top1 = 0.958
+success_damage = 0.000
+```
+
+负结果：
+
+```text
+当前尚未找到一个稳定的 pre-readout / trajectory gate。
+```
+
+也就是说，Phase 679 暂时没有证明模型内部已经自然形成了一个更早的、可直接读出的 failure detector。它只证明在最终读出竞争层面，失败状态已经可以被清楚识别。
+
+### 对附件判断的修正
+
+附件对 Phase 674-675 的核心判断正确，但现在需要补充三点：
+
+```text
+1. Phase 674-675 已经不是最新因果状态；
+2. Phase 676-677 证明 readout direction 是因果杠杆；
+3. Phase 679 证明选择性修复可以由 near-readout gate 实现，但还没有推进到自然内部 gate。
+```
+
+因此最谨慎的结论是：
+
+```text
+DS7B 的 synthetic value readout 错误，
+很大程度上是 final readout competition 的问题；
+这个问题可以被近读出门控选择性修复；
+但自然语言系统内部更早的 gate / protocol signal 尚未被找到。
+```
+
+### 小模型限制
+
+当前 qwen3、GLM4、DS7B 都是小模型或较小规模模型，必须保守解释：
+
+```text
+1. DS7B 的失败可能来自小模型协议能力不足，不一定代表大模型内部机制；
+2. qwen3 / GLM4 的高正确率可能来自任务太简单或模板贴合，不等于机制闭合；
+3. near-readout gate 在小模型中很清楚，但在大模型中可能被更早的 planner/protocol 层吸收；
+4. 不能把 Phase 679 解释为“语言机制已破解”，只能解释为“一个局部 readout failure/recovery 拼图被测清楚”。
+```
+
+### 理论进展
+
+当前链条从 Phase 674 到 Phase 679 可以压缩成：
+
+```text
+错误输出
+  = final readout direction competition 偏向 competitor
+  ≠ token memory 缺失
+  ≠ 单纯 late attention 缺失
+  ≠ 粗 suppression 可自然修复
+  = 可以被 readout gap cancellation 选择性修复
+  = 近读出 gate 可识别需要修复的样本
+```
+
+这说明语言生成末端至少存在两个可分层次：
+
+```text
+1. value / content path:
+   正确值词元已经在内部路径中可被 attention 与 residual 支持。
+
+2. readout / selection path:
+   最终 logits 处仍会被 format / continuation / competitor direction 覆盖。
+```
+
+统一公式可暂时写成：
+
+```text
+h_t^L = S_{\text{content}}(x_t) + S_{\text{format}}(x_t) + S_{\text{continuation}}(x_t) + \epsilon_t
+```
+
+```text
+z_t(v) = W_U(v)^\top \operatorname{Norm}(h_t^L)
+```
+
+```text
+\Delta_{\text{value}} =
+z_t(v_{\text{expected}}) - z_t(v_{\text{competitor}})
+```
+
+```text
+G_{\text{fail}} =
+\mathbf{1}\left[\Delta_{\text{value}} < 0
+\lor \operatorname{Top1Category}(z_t) \ne \text{expected}\right]
+```
+
+```text
+h_t^{L,\text{repair}} =
+h_t^L - \alpha \cdot G_{\text{fail}} \cdot d_{\text{competitor-gap}}
+```
+
+其中 Phase 679 只验证了 \(G_{\text{fail}}\) 的 near-readout 版本，没有验证 pre-readout 自然版本。
+
+### 当前硬伤
+
+```text
+1. gate 仍然接近最终输出，机制深度不足；
+2. 没有证明模型内部自己使用该 gate；
+3. 没有跨任务验证到自然语言问答、推理、语法续写；
+4. gate 依赖 expected token / competitor category 的人工标注结构；
+5. 强 repair 仍是外部干预，不是模型自身计算；
+6. 当前模型较小，内部结构可能偏差明显。
+```
+
+### 是否自动继续
+
+Phase 679 已完成 Phase 678 遗留的同阶段目标：
+
+```text
+寻找 selective readout repair 的可测 failure gate。
+```
+
+但下一步不应继续在同一个小阶段内自动展开，因为下一个目标已经从：
+
+```text
+near-readout gate 是否存在
+```
+
+转为：
+
+```text
+pre-readout / natural protocol gate 是否存在，
+并且是否能跨任务族泛化。
+```
+
+这是一个新的阶段性大任务，需要重新设计数据族与脚本。
+
+### 下一阶段方案
+
+推荐 Phase 680：
+
+```text
+Phase 680: Pre-Readout Natural Gate and Cross-Family Generalization Audit
+```
+
+核心目标：
+
+```text
+把 Phase 679 的 near-readout failure gate
+向更早的 natural internal gate 推进。
+```
+
+测试族应至少包含：
+
+```text
+1. same_format_random_value
+2. same_value_different_format
+3. different_value_same_format
+4. short_answer / natural_answer 对照
+5. syntax continuation / semantic value 对照
+6. expected success 与 expected failure 混合样本
+```
+
+关键观测：
+
+```text
+1. gate 是否能在 final logits 之前预测失败；
+2. gate 是否只在 DS7B failure 样本中触发；
+3. gate 是否能避免损伤 qwen3 / GLM4 成功样本；
+4. gate 是否和 L17-L20 protocol trajectory、L22 attention bridge、L27-L31 readout branch 有稳定对应；
+5. gate 是否能在自然生成中预测 continuation 被 format/preference 覆盖的情况。
+```
+
+阶段性目标：
+
+```text
+如果 Phase 680 找不到 pre-readout gate，
+则说明当前小模型中的 failure detector 主要只在 readout 端显化；
+如果找到，
+则可以把 readout repair 从外部补丁推进成内部协议图谱的一条可测边。
+```
+
+## Phase 680: Pre-Readout Natural Gate and Cross-Family Generalization Audit [2026-06-26 11:48]
+
+### 任务来源
+
+本阶段分析 Phase 676-679 附件内容是否正确，并继续推进。
+
+附件判断基本正确：
+
+```text
+Phase 676-679 已经把 DS7B synthetic value failure
+从最终输出失败推进到 final readout direction competition 的因果调节；
+readout direction 是有效杠杆；
+selective gate 是必要条件；
+但当前只找到 near-readout gate，还没有找到自然 pre-readout gate。
+```
+
+需要补充的是：Phase 679 的 gate 仍然非常靠近最终输出，`top1_category_not_expected` 和 `final_gap_gt_0` 都是 near-readout diagnostic gate，不是模型内部更早的自然协议门。因此 Phase 680 继续做跨任务族 pre-readout gate 审计。
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py
+
+python tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py \
+  --model qwen3 \
+  --hard-exit-after-model \
+  > results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_qwen3_run.log 2>&1
+
+python tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py \
+  --model glm4 \
+  --hard-exit-after-model \
+  > results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_glm4_run.log 2>&1
+
+python tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py \
+  --model deepseek7b \
+  --hard-exit-after-model \
+  > results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py --summarize-only
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序运行，每个模型独立进程并使用 `--hard-exit-after-model`。
+
+### 脚本
+
+```text
+tests/gpt5/phase680_pre_readout_natural_gate_cross_family_audit.py
+```
+
+### 输出
+
+```text
+results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_qwen3_pre_readout_rows.jsonl
+results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_glm4_pre_readout_rows.jsonl
+results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_deepseek7b_pre_readout_rows.jsonl
+results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_cross_model_summary.md
+results/glm5_phase680_pre_readout_natural_gate_cross_family_audit/phase680_cross_model_summary.json
+```
+
+### 测试原理
+
+Phase 680 不训练 classifier，也不使用复杂统计模型。它在跨任务族样本中枚举基础阈值门。
+
+样本族：
+
+```text
+same_format_random_value: 72
+same_value_different_format: 144
+different_value_same_format: 48
+same_prefix_different_continuation: 24
+factor_isolation: 54
+总计: 每模型 342 cases
+```
+
+每个样本记录最终 expected token 是否 top1，但候选 gate 不使用最终 top1。候选 pre-readout 特征包括：
+
+```text
+final_norm_input_gap
+final_norm_input_rank
+last_layer_gap
+late_gap_shift
+mid_to_late_shift
+max_layer_gap
+min_layer_gap
+positive_layer_count
+first_positive_layer_frac
+```
+
+near-readout gate 只作为参考线：
+
+```text
+REF_final_gap_gt_0
+REF_top1_category_not_expected
+```
+
+核心指标：
+
+```text
+failure_capture_rate: 失败捕获率
+success_false_positive_rate: 成功样本误触发率
+failure_precision: 触发样本中真实失败比例
+gate_score = failure_capture_rate - success_false_positive_rate
+```
+
+### 跨模型总体结果
+
+```text
+qwen3:
+cases = 342
+top1_rate = 0.933
+failures = 23
+best pre-readout gate = final_norm_input_gap_gt_0
+pre score = 0.785
+failure_capture = 0.826
+false_pos = 0.041
+best near-readout reference score = 1.000
+
+GLM4:
+cases = 342
+top1_rate = 0.892
+failures = 37
+best pre-readout gate = final_norm_input_gap_lt_-36.05
+pre score = 0.479
+failure_capture = 0.676
+false_pos = 0.197
+best near-readout reference score = 1.000
+
+DS7B:
+cases = 342
+top1_rate = 0.395
+failures = 207
+best pre-readout gate = final_norm_input_gap_gt_-118.8
+pre score = 0.280
+failure_capture = 0.850
+false_pos = 0.570
+best near-readout reference score = 1.000
+```
+
+### 分族 baseline
+
+DS7B：
+
+```text
+different_value_same_format: top1 = 0.042, failure = 0.958
+factor_isolation: top1 = 0.537, failure = 0.463
+same_format_random_value: top1 = 0.125, failure = 0.875
+same_prefix_different_continuation: top1 = 0.042, failure = 0.958
+same_value_different_format: top1 = 0.653, failure = 0.347
+```
+
+GLM4：
+
+```text
+different_value_same_format: top1 = 0.667
+factor_isolation: top1 = 0.796
+same_format_random_value: top1 = 1.000
+same_prefix_different_continuation: top1 = 1.000
+same_value_different_format: top1 = 0.931
+```
+
+qwen3：
+
+```text
+different_value_same_format: top1 = 1.000
+factor_isolation: top1 = 0.667
+same_format_random_value: top1 = 0.931
+same_prefix_different_continuation: top1 = 1.000
+same_value_different_format: top1 = 1.000
+```
+
+### 分族 pre-readout gate 结果
+
+DS7B 中有分族局部信号：
+
+```text
+different_value_same_format:
+  final_norm_input_rank_gt_71445
+  capture = 0.913
+  false_pos = 0.000
+
+same_prefix_different_continuation:
+  final_norm_input_gap_gt_-118.8
+  capture = 0.870
+  false_pos = 0.000
+
+same_format_random_value:
+  final_norm_input_rank_gt_71445
+  capture = 0.619
+  false_pos = 0.000
+
+same_value_different_format:
+  final_norm_input_gap_gt_-118.8
+  capture = 0.960
+  false_pos = 0.628
+```
+
+这个结果说明：DS7B 不是完全没有 pre-readout 预警信号，但这些信号强烈依赖任务族；一旦跨族混合，误触发率很高。
+
+qwen3 中 `final_norm_input_gap_gt_0` 比较干净：
+
+```text
+overall:
+  capture = 0.826
+  false_pos = 0.041
+
+factor_isolation:
+  capture = 1.000
+  false_pos = 0.000
+```
+
+GLM4 中信号中等：
+
+```text
+overall:
+  capture = 0.676
+  false_pos = 0.197
+```
+
+### 当前判断
+
+Phase 680 是一个重要的收紧阶段。
+
+正结果：
+
+```text
+pre-readout diagnostic signal 并非完全不存在。
+qwen3 有相对干净的 final_norm_input_gap gate。
+DS7B 在个别任务族存在强局部门。
+```
+
+负结果：
+
+```text
+没有找到跨模型、跨任务族稳定成立的 natural pre-readout gate。
+DS7B overall best pre gate false_pos = 0.570，不能作为选择性修复触发器。
+near-readout reference 仍然完美，说明失败状态在最终读出端清楚显化，但上游预警不稳定。
+```
+
+最谨慎结论：
+
+```text
+Phase 680 没有完成自然 gate 闭合。
+它把 Phase 679 的 near-readout gate 向上游推进了一步，
+发现 qwen3/部分任务族存在 pre-readout 预警信号，
+但 DS7B 和跨族泛化仍失败。
+```
+
+### 小模型限制
+
+当前结果必须保守解释：
+
+```text
+1. DS7B 的 pre-readout gate 不稳定，可能是小模型协议监控能力弱；
+2. qwen3 的干净 gate 可能来自任务简单或模型在 final_norm_input 已经接近最终答案；
+3. 小模型中的层号和 gate 位置不能外推到大模型；
+4. 当前只是 first-token / short-value 相关任务，不代表完整自然语言生成。
+```
+
+### 是否继续
+
+Phase 680 的阈值是在同一批样本上枚举出来的，存在过拟合风险。这个问题仍属于同一个阶段目标：
+
+```text
+验证 pre-readout natural gate 是否真实存在。
+```
+
+因此继续自动完成 Phase 681：对 Phase 680 的 gate 做 deterministic holdout validation。
+
+## Phase 681: Holdout Validation for Pre-Readout Failure Gates [2026-06-26 11:48]
+
+### 任务来源
+
+Phase 680 已经发现若干 pre-readout gate 候选，但阈值门是在全量数据上枚举的，必须进一步审视：
+
+```text
+这些 gate 是否只是同批样本上的阈值拟合？
+还是在留出样本上仍然成立？
+```
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase681_pre_readout_gate_holdout_validation.py
+python tests/gpt5/phase681_pre_readout_gate_holdout_validation.py
+```
+
+本阶段不重新运行模型，只读取 Phase 680 rows 做 deterministic alternate split。
+
+### 脚本
+
+```text
+tests/gpt5/phase681_pre_readout_gate_holdout_validation.py
+```
+
+### 输出
+
+```text
+results/glm5_phase681_pre_readout_gate_holdout_validation/phase681_holdout_validation.json
+results/glm5_phase681_pre_readout_gate_holdout_validation/phase681_holdout_validation.md
+```
+
+### 测试原理
+
+每个模型、每个任务组按 `case_id` 排序后交替切分：
+
+```text
+偶数位: train
+奇数位: test
+```
+
+只在 train 中选择最优 pre-readout gate，然后把同一个 gate 直接应用到 test。
+
+near-readout reference gate 同样做留出，用作上限参照。
+
+### 留出验证结果
+
+qwen3：
+
+```text
+overall:
+  gate = final_norm_input_gap_gt_0
+  train_score = 0.714
+  test_score = 0.920
+  test_capture = 1.000
+  test_false_pos = 0.080
+  ref_test_score = 1.000
+
+factor_isolation:
+  gate = final_norm_input_gap_gt_0
+  train_score = 1.000
+  test_score = 1.000
+  test_capture = 1.000
+  test_false_pos = 0.000
+```
+
+GLM4：
+
+```text
+overall:
+  gate = max_layer_gap_lt_-0.5012
+  train_score = 0.607
+  test_score = 0.320
+  test_capture = 0.429
+  test_false_pos = 0.108
+  ref_test_score = 1.000
+
+different_value_same_format:
+  gate = mid_to_late_shift_lt_-13.3
+  train_score = 0.857
+  test_score = 0.444
+  test_capture = 0.833
+  test_false_pos = 0.389
+```
+
+DS7B：
+
+```text
+overall:
+  gate = final_norm_input_rank_gt_82560
+  train_score = 0.535
+  test_score = -0.106
+  test_capture = 0.640
+  test_false_pos = 0.746
+  ref_test_score = 1.000
+
+factor_isolation:
+  gate = final_norm_input_rank_gt_96640
+  train_score = 0.500
+  test_score = 0.544
+  test_capture = 0.615
+  test_false_pos = 0.071
+
+same_value_different_format:
+  gate = final_norm_input_gap_gt_-118.8
+  train_score = 0.684
+  test_score = 0.000
+  test_capture = 1.000
+  test_false_pos = 1.000
+```
+
+### Cross-family holdout 结果
+
+qwen3：
+
+```text
+factor_isolation -> same_format_random_value:
+  gate = final_norm_input_gap_gt_0
+  target_score = 0.200
+  target_capture = 0.200
+  target_false_pos = 0.000
+```
+
+GLM4：
+
+```text
+same_value_different_format -> different_value_same_format:
+  target_score = 0.656
+  target_capture = 0.938
+  target_false_pos = 0.281
+
+different_value_same_format -> same_value_different_format:
+  target_score = 0.487
+  target_capture = 0.800
+  target_false_pos = 0.313
+```
+
+DS7B：
+
+```text
+same_value_different_format -> same_prefix_different_continuation:
+  target_score = 0.870
+  target_capture = 0.870
+  target_false_pos = 0.000
+
+factor_isolation -> different_value_same_format:
+  target_score = 0.565
+  target_capture = 0.565
+  target_false_pos = 0.000
+
+same_value_different_format -> same_format_random_value:
+  target_score = 0.540
+  target_capture = 0.651
+  target_false_pos = 0.111
+```
+
+这些跨族结果有局部信号，但不够统一，也不能说明存在一个通用自然门。
+
+### 当前判断
+
+Phase 681 明显收紧了 Phase 680 的结论。
+
+可以保留的结果：
+
+```text
+1. qwen3 的 final_norm_input_gap_gt_0 是目前最稳定的 pre-readout gate；
+2. GLM4 存在中等强度 pre-readout 信号，但留出后明显变弱；
+3. DS7B overall pre-readout gate 在留出上失败；
+4. DS7B 只有少数 family-local / cross-family 局部信号，不能形成统一门。
+```
+
+必须删除或降级的结果：
+
+```text
+1. 不能说 DS7B 已找到自然 pre-readout gate；
+2. 不能说 Phase 680 的 DS7B 分族高分 gate 都可靠；
+3. 不能说 pre-readout gate 已经跨任务族泛化；
+4. 不能把 near-readout reference 的完美结果混同为自然内部门。
+```
+
+### 理论进展
+
+当前链条更新为：
+
+```text
+Phase 679:
+near-readout failure gate 成立。
+
+Phase 680:
+pre-readout signal 存在局部候选，但跨模型/跨族不稳定。
+
+Phase 681:
+holdout 后，qwen3 保留较干净 pre-readout gate；
+GLM4 降为中等信号；
+DS7B overall gate 失败。
+```
+
+因此理论上应把 gate 拆成三层：
+
+```text
+1. G_readout:
+   最终读出端失败诊断门，目前最强，跨模型较稳定。
+
+2. G_pre:
+   final_norm_input / late residual 读出前预警门，qwen3 强，GLM4 中等，DS7B 不稳定。
+
+3. G_protocol:
+   更早协议/规划自然门，目前尚未找到。
+```
+
+公式更新：
+
+```text
+G_{\text{fail}} =
+G_{\text{readout}}
+\;\; \text{or} \;\;
+G_{\text{pre}}
+\;\; \text{or} \;\;
+G_{\text{protocol}}
+```
+
+当前实证状态：
+
+```text
+G_readout: 已验证
+G_pre: 局部验证，未跨模型闭合
+G_protocol: 未验证
+```
+
+### 硬伤
+
+```text
+1. Phase 681 仍是阈值门审计，不是因果证明；
+2. pre-readout gate 仍依赖 expected token / competitor token 的人工定义；
+3. DS7B 作为最关键失败模型，overall gate 留出失败；
+4. cross-family 泛化只有局部结果，没有统一机制；
+5. 当前测试仍是小模型，结构可能偏差；
+6. 没有测更早层的真正 protocol monitor。
+```
+
+### 阶段性结论
+
+Phase 680-681 完成了附件提出的下一阶段任务的一半：
+
+```text
+已经审计 pre-readout natural gate 是否存在；
+结论是：存在局部 pre-readout 信号，但没有发现跨模型/跨族稳定自然门。
+```
+
+因此当前不能继续把理论推进为“自然失败门已找到”。更谨慎地说：
+
+```text
+小模型中，失败状态在 final readout 端最清晰；
+读出前信号存在但碎片化；
+DS7B 尤其缺少稳定的 pre-readout self-monitor。
+```
+
+### 下一阶段方案
+
+当前任务和下一任务仍处于同一大方向，但 Phase 681 已完成本小阶段目标：排查 pre-readout gate 是否能从 Phase 680 的同批阈值中站稳。
+
+下一步不应继续盲目扩大阈值搜索，而应进入新的大任务：
+
+```text
+Phase 682: Protocol-Level Failure Monitor Localization
+```
+
+核心问题：
+
+```text
+如果 G_pre 在 DS7B 中不稳定，
+是否存在更早的 protocol-level monitor，
+它不是 expected-vs-competitor lm_head gap，
+而是 format route / value route / continuation route 的路径分叉信号？
+```
+
+推荐测试：
+
+```text
+1. 不再只用 expected-vs-competitor logit gap；
+2. 构造 format-route 与 value-route 的方向集合；
+3. 测 L17-L22 的 route margin；
+4. 分离 short-answer、sentence、JSON、continuation 四类协议；
+5. 检查失败样本是否在协议路由阶段已经偏向错误 route。
+```
+
+如果 Phase 682 成功，说明自然 gate 可能不是“值词元预警门”，而是“协议路径分叉门”。
+
+## Phase 682: Protocol-Level Failure Monitor Localization [2026-06-26 12:01]
+
+### 任务来源
+
+本阶段分析 Phase 680-681 附件内容是否正确，并继续推进。
+
+附件判断基本正确：Phase 680-681 不是继续证明 readout direction 可以修复错误，而是把 failure gate 拆成三层：
+
+```text
+G_readout: 最终读出端门，已验证；
+G_pre: 读出前门，局部成立但跨模型/跨族不稳定；
+G_protocol: 更早协议门，尚未验证。
+```
+
+附件指出下一步不能继续盲目扩大 expected-vs-competitor gap 阈值搜索，而应构造 format route / value route / continuation route 的路径分叉信号。因此 Phase 682 测试 protocol-level route monitor。
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase682_protocol_route_monitor_localization.py
+
+python tests/gpt5/phase682_protocol_route_monitor_localization.py \
+  --model qwen3 \
+  --hard-exit-after-model \
+  > results/glm5_phase682_protocol_route_monitor_localization/phase682_qwen3_run.log 2>&1
+
+python tests/gpt5/phase682_protocol_route_monitor_localization.py \
+  --model glm4 \
+  --hard-exit-after-model \
+  > results/glm5_phase682_protocol_route_monitor_localization/phase682_glm4_run.log 2>&1
+
+python tests/gpt5/phase682_protocol_route_monitor_localization.py \
+  --model deepseek7b \
+  --hard-exit-after-model \
+  > results/glm5_phase682_protocol_route_monitor_localization/phase682_deepseek7b_run.log 2>&1
+
+python tests/gpt5/phase682_protocol_route_monitor_localization.py --summarize-only
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序运行，每个模型独立进程并使用 `--hard-exit-after-model`。
+
+### 脚本
+
+```text
+tests/gpt5/phase682_protocol_route_monitor_localization.py
+```
+
+### 输出
+
+```text
+results/glm5_phase682_protocol_route_monitor_localization/phase682_qwen3_protocol_route_rows.jsonl
+results/glm5_phase682_protocol_route_monitor_localization/phase682_glm4_protocol_route_rows.jsonl
+results/glm5_phase682_protocol_route_monitor_localization/phase682_deepseek7b_protocol_route_rows.jsonl
+results/glm5_phase682_protocol_route_monitor_localization/phase682_cross_model_summary.md
+results/glm5_phase682_protocol_route_monitor_localization/phase682_cross_model_summary.json
+```
+
+### 测试原理
+
+Phase 682 不再用单个 expected token 对 competitor token 的 gap 作为主要门控，而是为每个样本标注目标协议路线：
+
+```text
+value
+prose
+json
+label
+list
+yesno
+continuation
+```
+
+目标路线由 expected_output 和 format_name 决定：
+
+```text
+短答/随机值/异值同格式 -> value
+完整句/解释 -> prose
+JSON -> json
+Value: xxx -> label
+- xxx -> list
+yes/no -> yesno
+```
+
+每条路线由一组简单 token / phrase 的首 token 构成。对每个 L17-L22 层段和 final_norm_input 计算：
+
+```text
+route_margin =
+score(target_route) - max(score(non_target_routes))
+```
+
+候选 protocol gate 使用：
+
+```text
+protocol_min_margin
+protocol_max_margin
+protocol_last_margin
+protocol_negative_count
+protocol_first_negative_frac
+protocol_final_norm_input_margin
+protocol_final_norm_input_rank
+protocol_late_shift
+```
+
+near-readout route margin 只作为参考线。
+
+脚本同时内置 holdout validation：
+
+```text
+按 case_id 交替切分 train/test；
+只在 train 上选 protocol gate；
+再在 test 上评估同一个 gate。
+```
+
+### 跨模型总体结果
+
+```text
+qwen3:
+  cases = 342
+  top1_rate = 0.933
+  failures = 23
+  best protocol gate = protocol_min_margin_gt_0
+  score = 0.783
+  capture = 0.783
+  false_pos = 0.000
+  holdout gate = protocol_min_margin_gt_0
+  holdout score = 1.000
+  holdout capture = 1.000
+  holdout false_pos = 0.000
+  reference holdout score = 0.821
+
+GLM4:
+  cases = 342
+  top1_rate = 0.892
+  failures = 37
+  best protocol gate = protocol_late_shift_lt_16.94
+  score = 0.275
+  capture = 1.000
+  false_pos = 0.725
+  holdout gate = protocol_min_margin_gt_-0.1787
+  holdout score = 0.201
+  holdout capture = 0.500
+  holdout false_pos = 0.299
+  reference holdout score = 0.643
+
+DS7B:
+  cases = 342
+  top1_rate = 0.395
+  failures = 207
+  best protocol gate = protocol_final_norm_input_margin_gt_12.5
+  score = 0.394
+  capture = 0.720
+  false_pos = 0.326
+  holdout gate = protocol_min_margin_gt_-8.531
+  holdout score = 0.020
+  holdout capture = 0.640
+  holdout false_pos = 0.620
+  reference holdout score = 0.930
+```
+
+### 分族路线结果
+
+DS7B 失败样本的错误路线高度集中：
+
+```text
+different_value_same_format:
+  target_route = value
+  failure_best_other_route = prose: 46
+
+same_format_random_value:
+  target_route = value
+  failure_best_other_route = prose: 63
+
+same_prefix_different_continuation:
+  target_route = value
+  failure_best_other_route = prose: 23
+
+same_value_different_format:
+  failure_best_other_route = prose: 45, json: 5
+```
+
+这说明 DS7B 的很多失败不是随机路线错，而是系统性偏向 prose/explanation route。
+
+GLM4 失败更偏向 continuation：
+
+```text
+different_value_same_format:
+  failure_best_other_route = continuation: 16
+
+factor_isolation:
+  failure_best_other_route = continuation: 3, prose: 8
+
+same_value_different_format:
+  failure_best_other_route = continuation: 8, value: 2
+```
+
+qwen3 的失败主要在 factor_isolation：
+
+```text
+factor_isolation:
+  failure_best_other_route = prose: 18
+
+same_format_random_value:
+  failure_best_other_route = continuation: 4, prose: 1
+```
+
+### 分族 holdout
+
+DS7B：
+
+```text
+overall:
+  protocol_min_margin_gt_-8.531
+  test_score = 0.020
+  capture = 0.640
+  false_pos = 0.620
+
+factor_isolation:
+  protocol_late_shift_gt_-0.6875
+  test_score = 0.566
+  capture = 0.923
+  false_pos = 0.357
+
+same_value_different_format:
+  protocol_min_margin_gt_-6.188
+  test_score = -0.521
+  capture = 0.000
+  false_pos = 0.521
+```
+
+GLM4：
+
+```text
+overall:
+  test_score = 0.201
+  capture = 0.500
+  false_pos = 0.299
+
+factor_isolation:
+  test_score = 0.524
+  capture = 0.667
+  false_pos = 0.143
+```
+
+qwen3：
+
+```text
+overall:
+  protocol_min_margin_gt_0
+  test_score = 1.000
+  capture = 1.000
+  false_pos = 0.000
+
+factor_isolation:
+  protocol_min_margin_gt_-0.3984
+  test_score = 1.000
+  capture = 1.000
+  false_pos = 0.000
+```
+
+### 当前判断
+
+Phase 682 是一个“路线级正结果 + 自然门负结果”的阶段。
+
+正结果：
+
+```text
+1. route-level protocol signal 是可测的；
+2. qwen3 中存在非常干净的 protocol-level failure monitor；
+3. DS7B 的失败路线高度集中到 prose/explanation route；
+4. route-level taxonomy 比 expected-vs-competitor gap 更接近语法/协议机制。
+```
+
+负结果：
+
+```text
+1. DS7B 这个关键失败模型的 overall protocol gate 留出失败；
+2. GLM4 只有弱到中等 protocol signal；
+3. DS7B 的 protocol-level 信号只有 family-local 局部效果；
+4. 不能说 G_protocol 已经跨模型闭合。
+```
+
+最谨慎结论：
+
+```text
+G_protocol 在 qwen3 上强成立；
+在 GLM4 上弱成立；
+在 DS7B 上只表现为失败路线集中，而不是稳定可用的自然门控。
+```
+
+### 对附件判断的更新
+
+附件提出：
+
+```text
+如果 Phase 682 成功，说明自然 gate 可能不是值词元预警门，而是协议路径分叉门。
+```
+
+现在需要收紧为：
+
+```text
+协议路径分叉信号确实存在；
+但在 DS7B 中还没有形成稳定可泛化的选择门。
+```
+
+也就是说，Phase 682 成功定位了“失败偏向哪条路线”，但没有完成“自然门何时触发”的闭合。
+
+### 理论进展
+
+失败门三层继续保留，但状态更新：
+
+```text
+G_readout:
+  已验证，最稳定。
+
+G_pre:
+  局部成立，qwen3 强，GLM4 中等，DS7B 不稳定。
+
+G_protocol:
+  路线偏置可测；
+  qwen3 强；
+  DS7B 失败路线集中到 prose route；
+  但 DS7B overall gate 未闭合。
+```
+
+路线级公式：
+
+```text
+S_r(h_l) =
+\max_{v \in \mathcal{V}_r}
+W_U(v)^\top h_l
+```
+
+```text
+M_{\text{route}}(h_l) =
+S_{r^\*}(h_l)
+-
+\max_{r \ne r^\*} S_r(h_l)
+```
+
+其中：
+
+```text
+r^\*: 当前任务要求的目标协议路线
+\mathcal{V}_r: 路线 r 的词元集合
+```
+
+当前实证显示：
+
+```text
+M_route 可以解释一部分失败路线，
+但不能在 DS7B 中稳定作为 G_protocol。
+```
+
+### 硬伤
+
+```text
+1. route token set 仍是人工构造的粗粒度集合；
+2. route score 仍通过 lm_head projection 读取，不等同模型真实中间层决策；
+3. qwen3 的强结果可能来自失败样本少；
+4. DS7B 的关键 overall protocol gate 失败；
+5. 协议路线解释了“偏向 prose”，但没有找到“为什么偏向 prose”的更底层状态；
+6. 当前仍是小模型，结构偏差可能很大。
+```
+
+### 是否继续
+
+Phase 682 已完成附件提出的 protocol-level route monitor 审计目标。
+
+下一步不应继续扩大 route token set 或阈值搜索，因为这会变成盲目枚举。新的阶段性任务应该是：
+
+```text
+Phase 683: Prose-Route Bias Source Decomposition
+```
+
+核心问题：
+
+```text
+DS7B 的失败几乎总是被 prose/explanation route 截走；
+那么 prose route bias 来自哪里？
+```
+
+推荐方向：
+
+```text
+1. 区分 instruction text 中的 explanation prior 与模型自身 prose prior；
+2. 对比 Answer with only the value / one sentence / short explanation；
+3. 测 L17-L22 中 prose route score 的写入来源；
+4. 对 prose route 进行 remove/restore，观察是否能释放 value route；
+5. 不再寻找统一 gate，而是先定位 DS7B prose bias 的来源。
+```
+
+## Phase 683: Prose-Route Bias Source Decomposition [2026-06-26 12:24]
+
+### 任务来源
+
+附件对 Phase 682 的判断基本正确：
+
+```text
+Phase 682 证明了 protocol route monitor 可以测到路线偏置；
+qwen3 的 protocol gate 很强；
+DS7B 的失败高度集中到 prose/explanation route；
+但 DS7B 的 G_protocol 没有闭合。
+```
+
+这一判断需要继续收紧。关键问题不是继续扩大 route token set，也不是继续搜索统一阈值，而是定位：
+
+```text
+DS7B 的 prose route bias 到底来自 instruction wording、模型默认输出协议，还是 final readout 附近的放大机制。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase683_prose_route_bias_source_decomposition.py
+```
+
+脚本规模：
+
+```text
+495 lines
+```
+
+### 测试命令
+
+语法校验：
+
+```bash
+python -m py_compile tests/gpt5/phase683_prose_route_bias_source_decomposition.py
+```
+
+依次测试三个模型，均使用 CUDA，并添加 hard exit：
+
+```bash
+python tests/gpt5/phase683_prose_route_bias_source_decomposition.py --model qwen3 --hard-exit-after-model > results/glm5_phase683_prose_route_bias_source_decomposition/phase683_qwen3_run.log 2>&1
+python tests/gpt5/phase683_prose_route_bias_source_decomposition.py --model glm4 --hard-exit-after-model > results/glm5_phase683_prose_route_bias_source_decomposition/phase683_glm4_run.log 2>&1
+python tests/gpt5/phase683_prose_route_bias_source_decomposition.py --model deepseek7b --hard-exit-after-model > results/glm5_phase683_prose_route_bias_source_decomposition/phase683_deepseek7b_run.log 2>&1
+python tests/gpt5/phase683_prose_route_bias_source_decomposition.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase683_prose_route_bias_source_decomposition/phase683_qwen3_prose_bias_rows.jsonl
+results/glm5_phase683_prose_route_bias_source_decomposition/phase683_glm4_prose_bias_rows.jsonl
+results/glm5_phase683_prose_route_bias_source_decomposition/phase683_deepseek7b_prose_bias_rows.jsonl
+results/glm5_phase683_prose_route_bias_source_decomposition/phase683_cross_model_summary.md
+```
+
+每个模型：
+
+```text
+144 base cases
+7 protocol variants
+1008 rows
+```
+
+协议变体：
+
+```text
+short_only
+terse_no_explain
+bare_answer
+sentence
+explanation
+json
+label
+```
+
+### 测试原理
+
+固定同一批 value query case，只改变输出协议指令，观察 correct value token 是否被 prose route 截走。
+
+核心测量量：
+
+```text
+PMV_l =
+S_prose(h_l) - S_value(h_l)
+```
+
+其中：
+
+```text
+S_r(h_l) =
+\max_{v \in \mathcal{V}_r}
+W_U(v)^\top h_l
+```
+
+如果：
+
+```text
+PMV_l > 0
+```
+
+说明当前位置更偏向 prose route。
+
+如果：
+
+```text
+PMV_l < 0
+```
+
+说明当前位置更偏向 value route。
+
+本阶段重点比较：
+
+```text
+protocol_pmv:
+  L17-L22 的平均 prose_minus_value
+
+final_norm_input_pmv:
+  final norm 输入处的 prose_minus_value
+
+final_pmv:
+  lm_head final logits 上的 prose_minus_value
+```
+
+这个设计的目的，是区分：
+
+```text
+早期协议层已经写入 prose bias
+```
+
+和：
+
+```text
+final/readout 附近才把 prose bias 放大
+```
+
+### 核心结果
+
+跨模型总表：
+
+```text
+model       rows   value_top1   value_final_pmv   short_top1   short_final_pmv   terse_final_pmv   bare_final_pmv
+deepseek7b  1008   0.368        1.429             0.083        4.677             -0.930            0.540
+glm4        1008   0.597       -2.075             0.889       -5.917             -4.135            3.828
+qwen3       1008   0.650       -2.923             0.965       -6.504             -7.421            5.157
+```
+
+DS7B 的关键细节：
+
+```text
+short_only:
+  top1 = 0.083
+  protocol_pmv = -4.651
+  final_norm_input_pmv = -51.511
+  final_pmv = 4.677
+  failure_best_other = prose:132
+
+terse_no_explain:
+  top1 = 0.583
+  protocol_pmv = -5.263
+  final_norm_input_pmv = -86.988
+  final_pmv = -0.930
+  failure_best_other = prose:60
+
+bare_answer:
+  top1 = 0.438
+  protocol_pmv = -2.034
+  final_norm_input_pmv = -92.613
+  final_pmv = 0.540
+  failure_best_other = prose:81
+```
+
+qwen3 的关键细节：
+
+```text
+short_only:
+  top1 = 0.965
+  final_pmv = -6.504
+
+terse_no_explain:
+  top1 = 0.986
+  final_pmv = -7.421
+
+bare_answer:
+  top1 = 0.000
+  final_pmv = 5.157
+  failure_best_other = prose:144
+```
+
+GLM4 的关键细节：
+
+```text
+short_only:
+  top1 = 0.889
+  final_pmv = -5.917
+
+terse_no_explain:
+  top1 = 0.854
+  final_pmv = -4.135
+
+bare_answer:
+  top1 = 0.049
+  final_pmv = 3.828
+  failure_best_other = prose:137
+```
+
+### 客观进展
+
+第一，附件中关于 Phase 682 的主判断正确：
+
+```text
+DS7B 的错误确实高度集中到 prose/explanation route。
+```
+
+第二，Phase 683 修正了一个更细的机制判断：
+
+```text
+DS7B 的 prose bias 不是在 L17-L22 或 final_norm_input 已经稳定压倒 value route。
+```
+
+因为在 DS7B 的 short_only 条件下：
+
+```text
+protocol_pmv = -4.651
+final_norm_input_pmv = -51.511
+```
+
+这两个位置都更偏向 value，而不是 prose。
+
+但是 final logits 上：
+
+```text
+final_pmv = 4.677
+```
+
+说明 prose route 在 final/readout 附近被强烈放大。
+
+第三，instruction wording 不是无关因素。
+
+DS7B 从 short_only 到 terse_no_explain：
+
+```text
+top1: 0.083 -> 0.583
+final_pmv: 4.677 -> -0.930
+prose failures: 132 -> 60
+```
+
+这说明明确禁止 explanation 可以释放一部分 value route。
+
+第四，bare_answer 不是纯净 value baseline。
+
+qwen3 和 GLM4 在 bare_answer 下几乎都转向 prose：
+
+```text
+qwen3 bare_answer top1 = 0.000
+GLM4 bare_answer top1 = 0.049
+```
+
+因此缺少显式协议时，模型会默认补全自然语言回答，而不是输出孤立值。
+
+### 理论进展
+
+当前拼图从：
+
+```text
+DS7B prose route bias 存在
+```
+
+推进到：
+
+```text
+DS7B prose route bias 具有 late amplification 特征。
+```
+
+更准确的机制链条是：
+
+```text
+residual semantic state
+  -> protocol / route state
+  -> final readout amplification
+  -> output token competition
+```
+
+本阶段支持：
+
+```text
+G_protocol 不是 DS7B 的稳定统一门；
+DS7B 的失败更像 final readout 对 prose/default answer manifold 的偏置放大。
+```
+
+### 问题和硬伤
+
+```text
+1. route token set 仍是人工构造，不能等同真实内部 route basis；
+2. PMV 是 lm_head projection 读数，不等同真实 causal state；
+3. Phase 683 仍是观测性分解，不是 remove/restore 因果证明；
+4. DS7B 是小模型，内部结构可能和大模型有偏差；
+5. final_pmv 的变化可能混合了 format prior、token frequency、instruction following 和 answer prior；
+6. json/label 的 route margin 受 token set 粗糙影响，不能过度解释。
+```
+
+### 当前结论
+
+Phase 683 证明：
+
+```text
+DS7B 的 prose failure 不是简单的早期协议路线错误；
+更强证据指向 final/readout 附近的 prose/default-answer 放大。
+```
+
+同时：
+
+```text
+explicit no-explanation instruction 可以显著降低 DS7B 的 prose bias，
+但不能完全消除。
+```
+
+所以附件提出的 Phase 683 方向正确，但需要把结论收紧为：
+
+```text
+已经定位到 prose bias 的主要表现位置和 instruction sensitivity；
+还没有完成 causal source decomposition。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于同一个大阶段：
+
+```text
+Phase 684: Late Readout Prose Amplification Causal Audit
+```
+
+目标不是继续做统一 gate，而是验证：
+
+```text
+如果在 final_norm_output / lm_head 前后抑制 prose route 或增强 value route，
+DS7B 的 short_only failure 是否能被释放。
+```
+
+最低要求：
+
+```text
+1. 只在 DS7B 的 short_only failure cases 上做 causal intervention；
+2. 对比 terse_no_explain success cases；
+3. 分别测试 final_norm_input、final_norm_output、logit-level route projection；
+4. 区分 remove prose、add value、remove prose + add value；
+5. 不做跨模型大结论，只定位 DS7B 的 late amplification 是否可因果改变。
+```
+
+如果 Phase 684 成功，说明：
+
+```text
+DS7B 的 failure 是 late readout amplification 可干预问题。
+```
+
+如果 Phase 684 失败，说明：
+
+```text
+prose bias 不是简单线性 route direction，
+需要进入更完整的 graph atlas / activation subspace 分解。
+```
+
+## Phase 684: Late Readout Prose Amplification Causal Audit [2026-06-26 12:28]
+
+### 任务来源
+
+Phase 683 发现：
+
+```text
+DS7B short_only failure 在 L17-L22 和 final_norm_input 处并不是 prose-dominant；
+但到 final logits 时 prose_minus_value 变成强正值。
+```
+
+因此 Phase 684 不再继续做观测性 route monitor，而是进行读出端因果审计：
+
+```text
+如果在 final_norm_output / final_logits 附近抑制 prose 或增强 value，
+原本失败的 correct value token 能否恢复到 top1。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py
+```
+
+脚本规模：
+
+```text
+410 lines
+```
+
+### 测试命令
+
+语法校验：
+
+```bash
+python -m py_compile tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py
+```
+
+依次运行三个模型，均添加 hard exit：
+
+```bash
+python tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py --model qwen3 --hard-exit-after-model > results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_qwen3_run.log 2>&1
+python tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py --model glm4 --hard-exit-after-model > results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_glm4_run.log 2>&1
+python tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py --model deepseek7b --hard-exit-after-model > results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_deepseek7b_run.log 2>&1
+python tests/gpt5/phase684_late_readout_prose_amplification_causal_audit.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_qwen3_late_readout_rows.jsonl
+results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_glm4_late_readout_rows.jsonl
+results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_deepseek7b_late_readout_rows.jsonl
+results/glm5_phase684_late_readout_prose_amplification_causal_audit/phase684_cross_model_summary.md
+```
+
+样本数量：
+
+```text
+qwen3 short_only failures: 5
+GLM4 short_only failures: 16
+DS7B short_only failures: 132
+```
+
+DS7B 行数：
+
+```text
+1980 intervention rows
+```
+
+### 测试原理
+
+只取 Phase 683 中 short_only 且 expected_top1=false 的失败样本。
+
+测试三类干预：
+
+```text
+logit remove_prose:
+  只降低 prose route token logits
+
+logit add_value:
+  只提高 expected/value token logits
+
+logit remove_prose_add_value:
+  同时降低 prose route 并提高 value route
+```
+
+以及隐藏状态读出方向干预：
+
+```text
+d =
+\operatorname{mean}(W_U[value])
+-
+\operatorname{mean}(W_U[prose])
+```
+
+在：
+
+```text
+final_norm_input
+final_norm_output
+```
+
+上添加：
+
+```text
+h' = h + \rho \cdot \lVert h \rVert \cdot \frac{d}{\lVert d \rVert}
+```
+
+其中：
+
+```text
+\rho \in {0.02, 0.05, 0.10}
+```
+
+核心观察：
+
+```text
+repair_rate:
+  baseline 失败样本被修复为 expected_top1 的比例
+
+mean_rank_delta:
+  baseline expected_rank - patched expected_rank
+
+patched_pmv:
+  patched 后 prose_minus_value
+```
+
+### 核心结果
+
+跨模型最佳条件：
+
+```text
+model       failures  best_condition                                      repair_rate  patched_top1  rank_delta  patched_pmv
+deepseek7b  132       logit add_value alpha=2.0                           0.992        0.992         301.64      -2.400
+glm4        16        hidden final_norm_input add_value_minus_prose r=0.1  1.000        1.000         1.56        -14.148
+qwen3       5         hidden final_norm_output add_value_minus_prose r=0.1 1.000        1.000         7.00        -17.363
+```
+
+DS7B 关键结果：
+
+```text
+baseline:
+  failures = 132
+  baseline_top1 = 0.000
+  baseline_mean_rank = 302.64
+  baseline_pmv = 5.192
+  baseline_best_other_route = prose:132
+
+logit add_value alpha=2.0:
+  repair_rate = 0.992
+  patched_top1 = 0.992
+  mean_patched_rank = 1.01
+  patched_pmv = -2.400
+
+logit remove_prose_add_value alpha=2.0:
+  repair_rate = 0.992
+  patched_top1 = 0.992
+  mean_patched_rank = 1.01
+  patched_pmv = -12.785
+
+hidden final_norm_output add_value_minus_prose r=0.10:
+  repair_rate = 0.917
+  patched_top1 = 0.917
+  mean_patched_rank = 1.20
+  patched_pmv = -9.990
+
+hidden final_norm_input add_value_minus_prose r=0.10:
+  repair_rate = 0.909
+  patched_top1 = 0.909
+  mean_patched_rank = 1.27
+  patched_pmv = -9.830
+
+logit remove_prose alpha=2.0:
+  repair_rate = 0.038
+  mean_patched_rank = 535.01
+  patched_pmv = -5.195
+```
+
+### 最重要的客观现象
+
+第一，DS7B 的失败可以在读出端被大幅修复。
+
+```text
+hidden final_norm_output add_value_minus_prose r=0.10:
+  132 个失败样本中约 91.7% 修复。
+```
+
+这说明 Phase 683 定位的 late readout amplification 不是纯观察假象，而是可以被读出方向干预改变。
+
+第二，单纯 remove prose 几乎无效，并且会让 rank 变差。
+
+```text
+remove_prose alpha=2.0:
+  repair_rate = 0.038
+  mean_patched_rank = 535.01
+```
+
+这非常关键。它说明 DS7B 的错误不是简单的：
+
+```text
+prose 太强，所以压掉 prose 就能恢复 value
+```
+
+更准确是：
+
+```text
+correct value token 自身读出不足；
+只压掉 prose 后，竞争可能转移到 continuation 等其它路线，
+并不会自动释放 correct value。
+```
+
+第三，add_value 比 remove_prose 更接近关键因果因素。
+
+```text
+add_value alpha=2.0:
+  repair_rate = 0.992
+```
+
+这说明瓶颈更像：
+
+```text
+value readout activation insufficient
+```
+
+而不是单纯：
+
+```text
+prose suppression failure
+```
+
+第四，hidden direction 也有效，但需要较大比例。
+
+```text
+r=0.02:
+  DS7B repair_rate ~= 0.26-0.27
+
+r=0.05:
+  DS7B repair_rate ~= 0.57
+
+r=0.10:
+  DS7B repair_rate ~= 0.91-0.92
+```
+
+这说明 final readout space 中确实存在可操作的 value-minus-prose 方向，但这个方向是否是自然机制仍未证明。
+
+### 理论进展
+
+Phase 684 把 Phase 683 的判断从：
+
+```text
+prose bias 在 final/readout 处放大
+```
+
+推进为：
+
+```text
+final/readout 处存在可干预的 value-minus-prose 读出方向；
+但关键不是单独压 prose，而是增强 correct value 的读出。
+```
+
+当前更准确的机制链条：
+
+```text
+residual semantic state
+  -> protocol route state
+  -> final readout field
+  -> value activation / prose activation / continuation activation competition
+  -> token selection
+```
+
+旧假设：
+
+```text
+失败 = prose route 太强
+```
+
+需要修正为：
+
+```text
+失败 = correct value readout 不足 + prose/default-answer/continuation 竞争未被压制。
+```
+
+### 问题和硬伤
+
+```text
+1. Phase 684 的 add_value 使用了 expected/value token 的 lm_head direction，带有目标答案信息；
+2. 这证明读出端可修复，不证明模型自然机制真的使用同一方向；
+3. logit-level add_value 是强人工干预，不能等同内部 causal circuit；
+4. hidden r=0.10 可能偏强，需要后续做自然性审计；
+5. remove_prose 失败说明 route token set 仍然不完整，continuation 竞争也必须进入模型；
+6. qwen3 和 GLM4 失败样本太少，只能作为旁证；
+7. 当前模型是小模型，结构偏差仍必须保留。
+```
+
+### 当前结论
+
+Phase 684 支持：
+
+```text
+DS7B short_only failure 的核心瓶颈在 final readout 端；
+但不是单纯 prose route suppression 问题，
+而是 correct value readout activation 不足。
+```
+
+因此，Phase 682-684 的连续进展可以压缩成：
+
+```text
+Phase 682:
+  失败路线集中到 prose。
+
+Phase 683:
+  prose bias 在 final/readout 附近被放大。
+
+Phase 684:
+  读出端 value-minus-prose 方向可以大幅修复失败；
+  但单纯 remove prose 不够，必须增强 value。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前阶段性目标，但应该从“读出端能不能修”转向“自然机制是否真的写入 value 方向”：
+
+```text
+Phase 685: Natural Value-Readout Writer Localization
+```
+
+目标：
+
+```text
+找到哪些 layer/component 在自然成功样本中写入 value readout direction，
+并解释 DS7B short_only failure 中为什么没有足够写入。
+```
+
+最低测试要求：
+
+```text
+1. 对比 DS7B short_only failure 与 terse_no_explain success；
+2. 以 Phase 684 的 value-minus-prose direction 作为 readout probe；
+3. 分层测 layer_out、attn_out、mlp_out 对该方向的增量贡献；
+4. 不做 PCA、不做复杂统计，只记录基础投影增量和 rank 变化；
+5. 如果找到 writer，再做 remove/restore；
+6. 同时记录 continuation competitor，避免只看 prose。
+```
+
+阶段性目标：
+
+```text
+从“读出端人工可修复”
+推进到
+“自然网络中哪个组件负责写入可修复方向”。
+```
+
+## Phase 685: Natural Value-Readout Writer Localization [2026-06-26 12:32]
+
+### 任务来源
+
+Phase 684 证明：
+
+```text
+DS7B short_only failure 可以被 final/readout 处的 value-minus-prose direction 大幅修复。
+```
+
+但 Phase 684 仍是人工干预。Phase 685 追问：
+
+```text
+自然成功样本中，到底哪些 layer/component 自然写入了这个 value-minus-prose direction？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase685_natural_value_readout_writer_localization.py
+```
+
+脚本规模：
+
+```text
+371 lines
+```
+
+### 测试命令
+
+语法校验：
+
+```bash
+python -m py_compile tests/gpt5/phase685_natural_value_readout_writer_localization.py
+```
+
+依次运行三个模型，均添加 hard exit：
+
+```bash
+python tests/gpt5/phase685_natural_value_readout_writer_localization.py --model qwen3 --hard-exit-after-model > results/glm5_phase685_natural_value_readout_writer_localization/phase685_qwen3_run.log 2>&1
+python tests/gpt5/phase685_natural_value_readout_writer_localization.py --model glm4 --hard-exit-after-model > results/glm5_phase685_natural_value_readout_writer_localization/phase685_glm4_run.log 2>&1
+python tests/gpt5/phase685_natural_value_readout_writer_localization.py --model deepseek7b --hard-exit-after-model > results/glm5_phase685_natural_value_readout_writer_localization/phase685_deepseek7b_run.log 2>&1
+python tests/gpt5/phase685_natural_value_readout_writer_localization.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase685_natural_value_readout_writer_localization/phase685_qwen3_writer_projection_rows.jsonl
+results/glm5_phase685_natural_value_readout_writer_localization/phase685_glm4_writer_projection_rows.jsonl
+results/glm5_phase685_natural_value_readout_writer_localization/phase685_deepseek7b_writer_projection_rows.jsonl
+results/glm5_phase685_natural_value_readout_writer_localization/phase685_cross_model_summary.md
+```
+
+DS7B 投影行数：
+
+```text
+6048 rows
+```
+
+### 测试原理
+
+只选同一个 case 中满足以下条件的配对：
+
+```text
+short_only:
+  expected_top1 = false
+
+terse_no_explain:
+  expected_top1 = true
+```
+
+配对数：
+
+```text
+qwen3: 3
+GLM4: 5
+DS7B: 72
+```
+
+定义读出方向：
+
+```text
+d =
+\operatorname{mean}(W_U[value])
+-
+\operatorname{mean}(W_U[prose])
+```
+
+对每个 layer/component 的最后位置输出计算：
+
+```text
+P_{l,c}(x) =
+h_{l,c}(x)^\top
+\frac{d}{\lVert d \rVert}
+```
+
+比较：
+
+```text
+\Delta P_{l,c}
+=
+P_{l,c}(terse)
+-
+P_{l,c}(short)
+```
+
+如果：
+
+```text
+\Delta P_{l,c} > 0
+```
+
+说明 terse 成功样本在该 layer/component 上比 short 失败样本更强地写入 value-minus-prose direction。
+
+扫描组件：
+
+```text
+layer_out
+attn_out
+mlp_out
+```
+
+### 核心结果
+
+跨模型摘要：
+
+```text
+model       paired_cases  short_rank  terse_rank  rank_delta  top_site       top_delta  top_positive_rate
+deepseek7b  72            167.69      1.00        166.69      L27_layer_out  34.718     0.958
+glm4        5             2.00        1.00        1.00        L38_layer_out  3.443      1.000
+qwen3       3             2.00        1.00        1.00        L34_layer_out  8.932      1.000
+```
+
+DS7B top positive sites：
+
+```text
+L27 layer_out:
+  mean_delta = 34.718
+  positive_rate = 0.958
+  short_proj = 25.644
+  terse_proj = 60.362
+
+L26 layer_out:
+  mean_delta = 24.362
+  positive_rate = 0.944
+  short_proj = 37.825
+  terse_proj = 62.187
+
+L26 attn_out:
+  mean_delta = 12.838
+  positive_rate = 1.000
+  short_proj = 10.975
+  terse_proj = 23.813
+
+L24 layer_out:
+  mean_delta = 7.913
+  positive_rate = 0.944
+
+L25 layer_out:
+  mean_delta = 7.285
+  positive_rate = 0.903
+
+L23 attn_out:
+  mean_delta = 6.249
+  positive_rate = 1.000
+
+L23 layer_out:
+  mean_delta = 5.511
+  positive_rate = 0.931
+```
+
+DS7B component-level 平均：
+
+```text
+layer_out:
+  mean_delta = 2.221
+  positive_delta_rate = 0.270
+
+attn_out:
+  mean_delta = 0.898
+  positive_delta_rate = 0.468
+
+mlp_out:
+  mean_delta = 0.342
+  positive_delta_rate = 0.511
+```
+
+### 客观进展
+
+第一，DS7B 的自然成功差异高度集中在晚层。
+
+最强位置不是早层，也不是全层均匀分布，而是：
+
+```text
+L23-L27
+```
+
+其中最强：
+
+```text
+L26-L27 layer_out
+L23/L26 attn_out
+```
+
+第二，attention 输出比 MLP 更像局部 writer 候选。
+
+虽然 layer_out 的累计差异最大，但具体组件中：
+
+```text
+L26 attn_out:
+  positive_rate = 1.000
+
+L23 attn_out:
+  positive_rate = 1.000
+```
+
+这说明 terse_no_explain 成功样本中，attention 可能负责把 value-readout 方向写入或搬运到最后位置。
+
+第三，MLP 不是完全无关，但当前证据较弱。
+
+```text
+L27 mlp_out:
+  mean_delta = 5.461
+  positive_rate = 0.583
+
+L26 mlp_out:
+  mean_delta = 4.240
+  positive_rate = 0.764
+```
+
+MLP 有贡献，但稳定性不如 L23/L26 attention。
+
+第四，qwen3/GLM4 的旁证方向一致，但样本太少。
+
+```text
+qwen3 paired_cases = 3
+GLM4 paired_cases = 5
+```
+
+不能作为强跨模型结论，只能说明晚层 layer_out 也出现类似现象。
+
+### 理论进展
+
+Phase 685 把 Phase 684 的人工读出方向推进为自然 writer 候选：
+
+```text
+人工可修复方向:
+  final/readout value-minus-prose direction
+
+自然写入候选:
+  DS7B L23-L27 late layer_out / attn_out
+```
+
+当前机制链条进一步收紧为：
+
+```text
+instruction wording
+  -> late attention / residual writer
+  -> value-minus-prose readout direction
+  -> final readout competition
+  -> token selection
+```
+
+这比之前的：
+
+```text
+prose route bias
+```
+
+更精确，因为它指出：
+
+```text
+成功不是简单压 prose，
+而是在晚层写入足够强的 value-readout direction。
+```
+
+### 问题和硬伤
+
+```text
+1. Phase 685 仍是观测性定位，不是因果 restore；
+2. layer_out 是累计状态，不等于单一 writer；
+3. L26/L23 attn_out 是候选，但还没有证明 patch 后能修复；
+4. value-minus-prose direction 来自 lm_head token 集合，仍带有人造读出定义；
+5. qwen3/GLM4 配对太少，不能宣称跨模型闭合；
+6. 当前只看最后位置，未检查 attention 从哪里读取 value；
+7. 当前模型为小模型，内部结构可能有偏差。
+```
+
+### 当前结论
+
+Phase 685 支持：
+
+```text
+DS7B 的 terse_no_explain 成功样本在 L23-L27 晚层自然写入更强 value-minus-prose readout direction。
+```
+
+最可疑的 writer 候选是：
+
+```text
+L26 attn_out
+L23 attn_out
+L26-L27 layer_out
+```
+
+这不是机制闭合，但已经把搜索空间从全模型收缩到少数晚层组件。
+
+### 下一阶段任务
+
+下一阶段应进入因果确认：
+
+```text
+Phase 686: Late Attention Value-Readout Writer Restore
+```
+
+核心问题：
+
+```text
+把 terse_no_explain 成功样本中的 L23/L26 attention output 或 L26/L27 layer_out
+restore 到 short_only 失败样本中，
+是否能提高 correct value rank。
+```
+
+最低测试：
+
+```text
+1. 只在 DS7B 72 个 paired cases 上做；
+2. patch sites:
+   L23 attn_out
+   L26 attn_out
+   L26 layer_out
+   L27 layer_out
+   L23+L26 attn_out
+   L26+L27 layer_out
+3. 对比 random same-norm patch；
+4. 记录 expected_rank、top1、prose_minus_value、continuation competitor；
+5. 如果 restore 成功，再反向 ablate terse success 的同位置。
+```
+
+如果 Phase 686 成功：
+
+```text
+late attention/residual writer 是 value-readout direction 的因果来源候选。
+```
+
+如果失败：
+
+```text
+Phase 685 的投影差异只是伴随现象，
+需要进入更细的 head-level 或 source-token graph atlas。
+```
+
+## Phase 686: Late Attention Value-Readout Writer Restore [2026-06-26 12:38]
+
+### 任务来源
+
+Phase 685 找到自然 writer 候选：
+
+```text
+DS7B:
+  L26-L27 layer_out
+  L23/L26 attn_out
+```
+
+但 Phase 685 仍是观测性投影差异。Phase 686 进行因果 restore：
+
+```text
+把 terse_no_explain 成功样本中的候选组件输出，
+patch 到同一个 case 的 short_only 失败样本中，
+观察 correct value rank 是否恢复。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase686_late_attention_value_readout_writer_restore.py
+```
+
+脚本规模：
+
+```text
+386 lines
+```
+
+### 测试命令
+
+语法校验：
+
+```bash
+python -m py_compile tests/gpt5/phase686_late_attention_value_readout_writer_restore.py
+```
+
+依次运行三个模型，均添加 hard exit：
+
+```bash
+python tests/gpt5/phase686_late_attention_value_readout_writer_restore.py --model qwen3 --hard-exit-after-model > results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_qwen3_run.log 2>&1
+python tests/gpt5/phase686_late_attention_value_readout_writer_restore.py --model glm4 --hard-exit-after-model > results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_glm4_run.log 2>&1
+python tests/gpt5/phase686_late_attention_value_readout_writer_restore.py --model deepseek7b --hard-exit-after-model > results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_deepseek7b_run.log 2>&1
+python tests/gpt5/phase686_late_attention_value_readout_writer_restore.py --summarize-only
+```
+
+### 输出文件
+
+```text
+results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_qwen3_writer_restore_rows.jsonl
+results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_glm4_writer_restore_rows.jsonl
+results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_deepseek7b_writer_restore_rows.jsonl
+results/glm5_phase686_late_attention_value_readout_writer_restore/phase686_cross_model_summary.md
+```
+
+DS7B restore 行数：
+
+```text
+1512 rows
+```
+
+### 测试原理
+
+从 Phase 685 自动读取每个模型的 top positive writer sites。
+
+DS7B 候选：
+
+```text
+L26_attn_out
+L23_attn_out
+L27_layer_out
+L26_layer_out
+```
+
+对每个 paired case：
+
+```text
+short_only:
+  failure prompt
+
+terse_no_explain:
+  success prompt
+```
+
+先缓存：
+
+```text
+h_short(l,c)
+h_terse(l,c)
+```
+
+然后对 short_only 前向过程做三种 patch：
+
+```text
+add_delta:
+  h'_short = h_short + (h_terse - h_short)
+
+replace:
+  h'_short = h_terse
+
+random_delta:
+  h'_short = h_short + random_same_norm(h_terse - h_short)
+```
+
+其中 random_delta 是控制条件，用来排除“任意同范数扰动都能修复”的解释。
+
+### 核心结果
+
+跨模型最佳结果：
+
+```text
+model       pairs  best_condition             repair_rate  patched_top1  rank_delta  patched_pmv
+deepseek7b  72     L27_layer_out add_delta    1.000        1.000         166.69      -1.884
+glm4        5      L38_layer_out add_delta    1.000        1.000         1.00        -3.750
+qwen3       3      L34_layer_out add_delta    1.000        1.000         1.00        -3.875
+```
+
+DS7B 关键条件：
+
+```text
+L27_layer_out add_delta:
+  repair_rate = 1.000
+  patched_top1 = 1.000
+  mean_patched_rank = 1.00
+  mean_rank_delta = 166.69
+  patched_pmv = -1.884
+
+L27_layer_out replace:
+  repair_rate = 1.000
+  patched_top1 = 1.000
+  mean_patched_rank = 1.00
+  patched_pmv = -1.886
+
+L26_layer_out add_delta:
+  repair_rate = 1.000
+  patched_top1 = 1.000
+  mean_patched_rank = 1.00
+  patched_pmv = -1.975
+
+L26_layer_out replace:
+  repair_rate = 1.000
+  patched_top1 = 1.000
+  mean_patched_rank = 1.00
+  patched_pmv = -1.972
+```
+
+DS7B attention-only 条件：
+
+```text
+top2_attn_out add_delta:
+  repair_rate = 0.292
+  mean_patched_rank = 5.14
+  patched_pmv = 0.940
+
+L26_attn_out add_delta:
+  repair_rate = 0.069
+  mean_patched_rank = 10.71
+  patched_pmv = 1.849
+
+L23_attn_out add_delta:
+  repair_rate = 0.069
+  mean_patched_rank = 44.33
+  patched_pmv = 3.075
+```
+
+DS7B random_delta 控制：
+
+```text
+L27_layer_out random_delta:
+  repair_rate = 0.097
+  mean_patched_rank = 384.83
+  patched_pmv = 3.471
+
+L26_layer_out random_delta:
+  repair_rate = 0.028
+  mean_patched_rank = 358.79
+  patched_pmv = 4.321
+
+top2_attn_out random_delta:
+  repair_rate = 0.000
+  mean_patched_rank = 231.53
+  patched_pmv = 4.397
+```
+
+### 客观进展
+
+第一，Phase 685 的 layer_out 候选被因果确认。
+
+```text
+DS7B L26/L27 layer_out restore:
+  72/72 paired failures 修复为 correct value top1。
+```
+
+这说明 Phase 685 的投影差异不是单纯伴随现象。
+
+第二，random_same_norm 控制基本不能修复。
+
+```text
+L27 random_delta repair_rate = 0.097
+L26 random_delta repair_rate = 0.028
+```
+
+因此有效的不是任意同范数扰动，而是 terse success 中特定方向和状态内容。
+
+第三，attention-only patch 有部分效果，但不够闭合。
+
+```text
+top2_attn_out:
+  rank 从 167.69 改善到 5.14，
+  但 top1 repair_rate 只有 0.292。
+```
+
+这说明 attention 可能是上游搬运/写入来源之一，但最终闭合状态在 layer_out 中。
+
+第四，当前最强因果候选不是单个 attention output，而是晚层 residual layer_out：
+
+```text
+L26 layer_out
+L27 layer_out
+```
+
+### 理论进展
+
+当前链条从 Phase 682 到 Phase 686 已形成较强闭环：
+
+```text
+Phase 682:
+  failure route 偏向 prose。
+
+Phase 683:
+  prose/value 差异在 final/readout 处放大。
+
+Phase 684:
+  final readout 的 value-minus-prose direction 可以人工修复。
+
+Phase 685:
+  terse 成功样本在 L23-L27 自然写入更强 value-minus-prose direction。
+
+Phase 686:
+  restore L26/L27 layer_out 可以 100% 修复 DS7B paired failures。
+```
+
+更准确的机制图：
+
+```text
+instruction wording
+  -> late writer state
+  -> L26/L27 residual layer_out
+  -> value-minus-prose readout direction
+  -> final token competition
+  -> correct value selection
+```
+
+这说明：
+
+```text
+正确 value token 的选择不是只由最终 lm_head 决定；
+它依赖晚层 residual state 是否已经写入足够强的 value-readout support。
+```
+
+### 对附件内容的修正
+
+附件中 Phase 682 的判断基本正确，但现在需要补充：
+
+```text
+DS7B 的 prose route bias 不是最终答案；
+更深一层是 short_only prompt 没有在 L26/L27 形成足够的 value-support residual state。
+```
+
+所以当前最准确说法是：
+
+```text
+prose/default route 是失败表现；
+L26/L27 value-support residual state 缺失是更靠近因果机制的原因。
+```
+
+### 问题和硬伤
+
+```text
+1. paired cases 只覆盖 short_fail -> terse_success，不覆盖所有失败类型；
+2. layer_out patch 是强 restore，可能同时携带多种信息，不是纯 value direction；
+3. 还没有拆出 L26/L27 layer_out 中哪些 head/MLP/source-token 负责；
+4. attention-only patch 改善 rank 但未闭合，说明上游来源仍未定位；
+5. qwen3/GLM4 paired 样本太少，不能作为强跨模型证明；
+6. 当前模型为小模型，结构可能与大模型不同；
+7. patch 使用同 case 的 terse success 作为 donor，仍需跨 case / cross value 测试判断抽象程度。
+```
+
+### 当前结论
+
+Phase 686 给出本轮最强结论：
+
+```text
+DS7B short_only 的 correct value failure 可以通过 restore 同 case terse_no_explain 的 L26/L27 layer_out 完全修复。
+```
+
+因此当前阶段目标已经完成到：
+
+```text
+从 route-level failure
+定位到
+late residual value-support state 的因果缺失。
+```
+
+### 下一阶段任务
+
+下一阶段不应继续做宏观 restore，而应进入更细图谱：
+
+```text
+Phase 687: L26/L27 Value-Support State Decomposition
+```
+
+核心问题：
+
+```text
+L26/L27 layer_out 中真正有效的是哪一部分？
+```
+
+最低方案：
+
+```text
+1. 将 L26/L27 layer_out restore 分解为 attn_out、mlp_out、residual carry；
+2. 做 head-level attention output patch；
+3. 做 source-token patch，定位是否来自 value token、instruction token、relation token；
+4. 做 cross-case restore，判断是否是同 case 内容拷贝还是抽象 value-support state；
+5. 做 random same-norm 和 unrelated terse donor 控制；
+6. 不扩大理论，只记录哪些子图能修复 rank。
+```
+
+阶段性目标：
+
+```text
+把 L26/L27 residual layer_out 从“有效黑箱”
+拆成可解释的 writer graph。
+```

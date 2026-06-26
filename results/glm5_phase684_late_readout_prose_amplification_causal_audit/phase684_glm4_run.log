@@ -1,0 +1,415 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 5/443 [00:00<00:10, 42.36it/s]Loading weights:   8%|▊         | 36/443 [00:00<00:02, 182.09it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 246.65it/s]Loading weights:  23%|██▎       | 104/443 [00:00<00:01, 268.55it/s]Loading weights:  30%|██▉       | 132/443 [00:00<00:01, 267.99it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 263.85it/s]Loading weights:  46%|████▌     | 202/443 [00:00<00:00, 311.85it/s]Loading weights:  53%|█████▎    | 236/443 [00:00<00:00, 316.83it/s]Loading weights:  61%|██████    | 269/443 [00:00<00:00, 316.83it/s]Loading weights:  68%|██████▊   | 301/443 [00:01<00:00, 312.76it/s]Loading weights:  75%|███████▌  | 334/443 [00:01<00:00, 313.60it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 320.20it/s]Loading weights:  91%|█████████ | 401/443 [00:01<00:00, 321.68it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 318.14it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 298.70it/s]
+[12:27:33] Loaded glm4: class=GlmForCausalLM, GPU=18.80GB, attn=eager
+[12:27:35] glm4: 16/16 short_only failures audited
+[model_utils] GPU memory released, allocated=18.82 GB
+{
+  "model": "glm4",
+  "n_failure_cases": 16,
+  "n_rows": 240,
+  "phase": 684,
+  "summary": {
+    "baseline_failure_best_other_route": {
+      "continuation": 16
+    },
+    "best_conditions": [
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_input|add_value_minus_prose|r0.1",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -14.1484375,
+        "mean_patched_rank": 1.0,
+        "mean_rank_delta": 1.5625,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 1.0,
+        "repair_rate": 1.0
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_output|add_value_minus_prose|r0.1",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -12.13671875,
+        "mean_patched_rank": 1.0,
+        "mean_rank_delta": 1.5625,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 1.0,
+        "repair_rate": 1.0
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_input|add_value_minus_prose|r0.05",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -7.951171875,
+        "mean_patched_rank": 1.0625,
+        "mean_rank_delta": 1.5,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.9375,
+        "repair_rate": 0.9375
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_output|add_value_minus_prose|r0.05",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -6.9296875,
+        "mean_patched_rank": 1.0625,
+        "mean_rank_delta": 1.5,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.9375,
+        "repair_rate": 0.9375
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|add_value|a2.0",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.708984375,
+        "mean_patched_rank": 1.125,
+        "mean_rank_delta": 1.4375,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.875,
+        "repair_rate": 0.875
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|remove_prose_add_value|a2.0",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -5.708984375,
+        "mean_patched_rank": 1.125,
+        "mean_rank_delta": 1.4375,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.875,
+        "repair_rate": 0.875
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_input|add_value_minus_prose|r0.02",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -4.2109375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.8125,
+        "repair_rate": 0.8125
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "hidden_direction|final_norm_output|add_value_minus_prose|r0.02",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.80078125,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.8125,
+        "repair_rate": 0.8125
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|add_value|a1.0",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.708984375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.6875,
+        "repair_rate": 0.6875
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|remove_prose_add_value|a1.0",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.708984375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.6875,
+        "repair_rate": 0.6875
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|add_value|a0.5",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.208984375,
+        "mean_patched_rank": 1.5625,
+        "mean_rank_delta": 1.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.5625,
+        "repair_rate": 0.5625
+      },
+      {
+        "baseline_top1_rate": 0.0,
+        "condition": "logit|final_logits|remove_prose_add_value|a0.5",
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.708984375,
+        "mean_patched_rank": 1.5625,
+        "mean_rank_delta": 1.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.5625,
+        "repair_rate": 0.5625
+      }
+    ],
+    "by_condition": {
+      "hidden_direction|final_norm_input|add_value_minus_prose|r0.02": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -4.2109375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.8125,
+        "repair_rate": 0.8125
+      },
+      "hidden_direction|final_norm_input|add_value_minus_prose|r0.05": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -7.951171875,
+        "mean_patched_rank": 1.0625,
+        "mean_rank_delta": 1.5,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.9375,
+        "repair_rate": 0.9375
+      },
+      "hidden_direction|final_norm_input|add_value_minus_prose|r0.1": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -14.1484375,
+        "mean_patched_rank": 1.0,
+        "mean_rank_delta": 1.5625,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 1.0,
+        "repair_rate": 1.0
+      },
+      "hidden_direction|final_norm_output|add_value_minus_prose|r0.02": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.80078125,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.8125,
+        "repair_rate": 0.8125
+      },
+      "hidden_direction|final_norm_output|add_value_minus_prose|r0.05": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -6.9296875,
+        "mean_patched_rank": 1.0625,
+        "mean_rank_delta": 1.5,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.9375,
+        "repair_rate": 0.9375
+      },
+      "hidden_direction|final_norm_output|add_value_minus_prose|r0.1": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -12.13671875,
+        "mean_patched_rank": 1.0,
+        "mean_rank_delta": 1.5625,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 1.0,
+        "repair_rate": 1.0
+      },
+      "logit|final_logits|add_value|a0.5": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.208984375,
+        "mean_patched_rank": 1.5625,
+        "mean_rank_delta": 1.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.5625,
+        "repair_rate": 0.5625
+      },
+      "logit|final_logits|add_value|a1.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.708984375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.6875,
+        "repair_rate": 0.6875
+      },
+      "logit|final_logits|add_value|a2.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.708984375,
+        "mean_patched_rank": 1.125,
+        "mean_rank_delta": 1.4375,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.875,
+        "repair_rate": 0.875
+      },
+      "logit|final_logits|remove_prose_add_value|a0.5": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.708984375,
+        "mean_patched_rank": 1.5625,
+        "mean_rank_delta": 1.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.5625,
+        "repair_rate": 0.5625
+      },
+      "logit|final_logits|remove_prose_add_value|a1.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.708984375,
+        "mean_patched_rank": 1.3125,
+        "mean_rank_delta": 1.25,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.6875,
+        "repair_rate": 0.6875
+      },
+      "logit|final_logits|remove_prose_add_value|a2.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -5.708984375,
+        "mean_patched_rank": 1.125,
+        "mean_rank_delta": 1.4375,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.875,
+        "repair_rate": 0.875
+      },
+      "logit|final_logits|remove_prose|a0.5": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.208984375,
+        "mean_patched_rank": 2.5625,
+        "mean_rank_delta": 0.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.0,
+        "repair_rate": 0.0
+      },
+      "logit|final_logits|remove_prose|a1.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -2.708984375,
+        "mean_patched_rank": 2.5625,
+        "mean_rank_delta": 0.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.0,
+        "repair_rate": 0.0
+      },
+      "logit|final_logits|remove_prose|a2.0": {
+        "baseline_top1_rate": 0.0,
+        "mean_baseline_pmv": -1.708984375,
+        "mean_baseline_rank": 2.5625,
+        "mean_patched_pmv": -3.708984375,
+        "mean_patched_rank": 2.5625,
+        "mean_rank_delta": 0.0,
+        "n": 16,
+        "patched_best_other_route": {
+          "continuation": 16
+        },
+        "patched_top1_rate": 0.0,
+        "repair_rate": 0.0
+      }
+    },
+    "model": "glm4",
+    "n_phase683_short_failures": 16
+  },
+  "target_variant": "short_only",
+  "timestamp": "2026-06-26 12:27:35",
+  "title": "Late Readout Prose Amplification Causal Audit"
+}

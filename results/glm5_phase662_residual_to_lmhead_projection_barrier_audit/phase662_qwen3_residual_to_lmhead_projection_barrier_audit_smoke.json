@@ -1,0 +1,2332 @@
+{
+  "phase": 662,
+  "model": "qwen3",
+  "timestamp": "2026-06-26 08:27:43",
+  "n_layers": 36,
+  "combo_specs": [
+    {
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "phase658_delta_exact": 14,
+      "phase658_delta_tok0": 15,
+      "phase658_rank_improvement": 2.1
+    },
+    {
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "components": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "phase658_delta_exact": 11,
+      "phase658_delta_tok0": 11,
+      "phase658_rank_improvement": 3.0000000000000004
+    }
+  ],
+  "last_writer_map": {
+    "('explanation_required', 'separator_input_edge', 'top1')": [
+      {
+        "layer": 35,
+        "component": "mlp_out",
+        "phase660_gap_delta": 0.171875,
+        "phase660_rank_delta": 0.1499999999999999
+      }
+    ],
+    "('yes_no_required', 'early_peak_layer_out', 'top3')": [
+      {
+        "layer": 35,
+        "component": "mlp_out",
+        "phase660_gap_delta": 0.14687499999999998,
+        "phase660_rank_delta": 0.30000000000000004
+      }
+    ],
+    "('yes_no_required', 'early_peak_layer_out', 'top2')": [
+      {
+        "layer": 35,
+        "component": "mlp_out",
+        "phase660_gap_delta": 0.06875,
+        "phase660_rank_delta": 0.09999999999999987
+      }
+    ]
+  },
+  "tasks": [
+    "explanation_required",
+    "yes_no_required"
+  ],
+  "top_k": 20,
+  "max_new_tokens": 4,
+  "n_raw_cases": 12,
+  "n_selected_items": 1,
+  "n_mode_rows": 4,
+  "max_cases": 1,
+  "selection_stats": {
+    "mode_v_correct_seen": 1,
+    "repair_correct_seen": 1,
+    "target_failure_seen": 0,
+    "fallback_used": 0,
+    "scanned": 1
+  },
+  "filtered": {
+    "position_missing": 0,
+    "position_len_mismatch": 0,
+    "empty_patch": 0
+  },
+  "summary": {
+    "by_mode": [
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "mode": "phase658_combo",
+        "n": 1,
+        "exact": 1,
+        "correct_top1": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "exact_rate": 1.0,
+        "correct_top1_rate": 1.0,
+        "mean_rank": 1.0,
+        "mean_gap": 0.0
+      },
+      {
+        "pair_task": "explanation_required",
+        "site": "separator_input_edge",
+        "combo_name": "top2",
+        "mode": "plus_last_writers",
+        "n": 1,
+        "exact": 1,
+        "correct_top1": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "exact_rate": 1.0,
+        "correct_top1_rate": 1.0,
+        "mean_rank": 1.0,
+        "mean_gap": 0.0
+      },
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "mode": "phase658_combo",
+        "n": 1,
+        "exact": 1,
+        "correct_top1": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "exact_rate": 1.0,
+        "correct_top1_rate": 1.0,
+        "mean_rank": 1.0,
+        "mean_gap": 0.0
+      },
+      {
+        "pair_task": "yes_no_required",
+        "site": "early_peak_layer_out",
+        "combo_name": "top2",
+        "mode": "plus_last_writers",
+        "n": 1,
+        "exact": 1,
+        "correct_top1": 1,
+        "sum_rank": 1.0,
+        "sum_gap": 0.0,
+        "top1_category": {
+          "correct_prefix": 1
+        },
+        "exact_rate": 1.0,
+        "correct_top1_rate": 1.0,
+        "mean_rank": 1.0,
+        "mean_gap": 0.0
+      }
+    ],
+    "plus_failure_projection": []
+  },
+  "examples": [
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "last_writers": [],
+      "mode": "phase658_combo",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 23.125,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 23.125
+          },
+          {
+            "rank": 2,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 21.375
+          },
+          {
+            "rank": 3,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 21.125
+          },
+          {
+            "rank": 4,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 20.75
+          },
+          {
+            "rank": 5,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 20.75
+          },
+          {
+            "rank": 6,
+            "id": 297,
+            "text": " o",
+            "category": "word",
+            "logit": 20.375
+          },
+          {
+            "rank": 7,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.125
+          },
+          {
+            "rank": 8,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 9,
+            "id": 272,
+            "text": " c",
+            "category": "word",
+            "logit": 19.875
+          },
+          {
+            "rank": 10,
+            "id": 937,
+            "text": " ?",
+            "category": "symbol",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 9,
+        "prefix_logit": 59.0,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 71.5
+        },
+        "top1_gap": 12.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 2,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 70.5
+          },
+          {
+            "rank": 3,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 64.0
+          },
+          {
+            "rank": 4,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 62.5
+          },
+          {
+            "rank": 5,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 6,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 7,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 61.5
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 61.0
+          },
+          {
+            "rank": 9,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 59.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 58.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 155.07688903808594,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.1435927003622055,
+        "competitor_cos": 0.1435927003622055
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 494.94793701171875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11464747786521912,
+        "competitor_cos": 0.11464747786521912
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "last_writers": [],
+      "mode": "plus_last_writers",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 23.125,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 23.125
+          },
+          {
+            "rank": 2,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 21.375
+          },
+          {
+            "rank": 3,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 21.125
+          },
+          {
+            "rank": 4,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 20.75
+          },
+          {
+            "rank": 5,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 20.75
+          },
+          {
+            "rank": 6,
+            "id": 297,
+            "text": " o",
+            "category": "word",
+            "logit": 20.375
+          },
+          {
+            "rank": 7,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.125
+          },
+          {
+            "rank": 8,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 9,
+            "id": 272,
+            "text": " c",
+            "category": "word",
+            "logit": 19.875
+          },
+          {
+            "rank": 10,
+            "id": 937,
+            "text": " ?",
+            "category": "symbol",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 9,
+        "prefix_logit": 59.0,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 71.5
+        },
+        "top1_gap": 12.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 2,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 70.5
+          },
+          {
+            "rank": 3,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 64.0
+          },
+          {
+            "rank": 4,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 62.5
+          },
+          {
+            "rank": 5,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 6,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 7,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 61.5
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 61.0
+          },
+          {
+            "rank": 9,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 59.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 58.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 155.07688903808594,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.1435927003622055,
+        "competitor_cos": 0.1435927003622055
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 494.94793701171875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11464747786521912,
+        "competitor_cos": 0.11464747786521912
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "last_writers": [],
+      "mode": "phase658_combo",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 22.5,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 22.5
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 22.5
+          },
+          {
+            "rank": 2,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 22.25
+          },
+          {
+            "rank": 3,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 21.625
+          },
+          {
+            "rank": 4,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 20.5
+          },
+          {
+            "rank": 5,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 20.375
+          },
+          {
+            "rank": 6,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 7,
+            "id": 1124,
+            "text": " \\",
+            "category": "symbol",
+            "logit": 19.875
+          },
+          {
+            "rank": 8,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 19.625
+          },
+          {
+            "rank": 9,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 19.375
+          },
+          {
+            "rank": 10,
+            "id": 9834,
+            "text": " yes",
+            "category": "explanation",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 53,
+        "prefix_logit": 63.5,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 83.5
+        },
+        "top1_gap": 20.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 83.5
+          },
+          {
+            "rank": 2,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 81.0
+          },
+          {
+            "rank": 3,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 81.0
+          },
+          {
+            "rank": 4,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 80.0
+          },
+          {
+            "rank": 5,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 75.5
+          },
+          {
+            "rank": 6,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 75.0
+          },
+          {
+            "rank": 7,
+            "id": 90155,
+            "text": " \\\\\n",
+            "category": "newline",
+            "logit": 74.0
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 73.5
+          },
+          {
+            "rank": 9,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 72.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 71.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 151.56007385253906,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.14311935007572174,
+        "competitor_cos": 0.14311935007572174
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 575.992431640625,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.10618702322244644,
+        "competitor_cos": 0.10618702322244644
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "last_writers": [
+        {
+          "layer": 35,
+          "component": "mlp_out",
+          "phase660_gap_delta": 0.06875,
+          "phase660_rank_delta": 0.09999999999999987
+        }
+      ],
+      "mode": "plus_last_writers",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 11.875,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 11.875
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 11.875
+          },
+          {
+            "rank": 2,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 10.75
+          },
+          {
+            "rank": 3,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 9.5625
+          },
+          {
+            "rank": 4,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 9.25
+          },
+          {
+            "rank": 5,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 9.125
+          },
+          {
+            "rank": 6,
+            "id": 2014,
+            "text": " To",
+            "category": "word",
+            "logit": 8.9375
+          },
+          {
+            "rank": 7,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 8.8125
+          },
+          {
+            "rank": 8,
+            "id": 9834,
+            "text": " yes",
+            "category": "explanation",
+            "logit": 8.75
+          },
+          {
+            "rank": 9,
+            "id": 1124,
+            "text": " \\",
+            "category": "symbol",
+            "logit": 8.4375
+          },
+          {
+            "rank": 10,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 8.0625
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 10405,
+        "prefix_logit": 28.5,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 84.0
+        },
+        "top1_gap": 55.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 84.0
+          },
+          {
+            "rank": 2,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 78.0
+          },
+          {
+            "rank": 3,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 77.5
+          },
+          {
+            "rank": 4,
+            "id": 55342,
+            "text": "//}\n\n",
+            "category": "newline",
+            "logit": 76.5
+          },
+          {
+            "rank": 5,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 75.0
+          },
+          {
+            "rank": 6,
+            "id": 65418,
+            "text": " visto",
+            "category": "word",
+            "logit": 73.5
+          },
+          {
+            "rank": 7,
+            "id": 98640,
+            "text": " chol",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 8,
+            "id": 131272,
+            "text": " Chúng",
+            "category": "word",
+            "logit": 71.0
+          },
+          {
+            "rank": 9,
+            "id": 89366,
+            "text": " insanely",
+            "category": "word",
+            "logit": 70.5
+          },
+          {
+            "rank": 10,
+            "id": 76743,
+            "text": " contexto",
+            "category": "word",
+            "logit": 69.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 99.17889404296875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11506524682044983,
+        "competitor_cos": 0.11506524682044983
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 639.0279541015625,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.042941123247146606,
+        "competitor_cos": 0.042941123247146606
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "last_writers": [],
+      "mode": "phase658_combo",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 23.125,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 23.125
+          },
+          {
+            "rank": 2,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 21.375
+          },
+          {
+            "rank": 3,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 21.125
+          },
+          {
+            "rank": 4,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 20.75
+          },
+          {
+            "rank": 5,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 20.75
+          },
+          {
+            "rank": 6,
+            "id": 297,
+            "text": " o",
+            "category": "word",
+            "logit": 20.375
+          },
+          {
+            "rank": 7,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.125
+          },
+          {
+            "rank": 8,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 9,
+            "id": 272,
+            "text": " c",
+            "category": "word",
+            "logit": 19.875
+          },
+          {
+            "rank": 10,
+            "id": 937,
+            "text": " ?",
+            "category": "symbol",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 9,
+        "prefix_logit": 59.0,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 71.5
+        },
+        "top1_gap": 12.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 2,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 70.5
+          },
+          {
+            "rank": 3,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 64.0
+          },
+          {
+            "rank": 4,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 62.5
+          },
+          {
+            "rank": 5,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 6,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 7,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 61.5
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 61.0
+          },
+          {
+            "rank": 9,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 59.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 58.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 155.07688903808594,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.1435927003622055,
+        "competitor_cos": 0.1435927003622055
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 494.94793701171875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11464747786521912,
+        "competitor_cos": 0.11464747786521912
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "explanation_required",
+      "site": "separator_input_edge",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 16,
+          "component": "attn_out",
+          "phase656_dtop": 1.4375,
+          "phase657_delta_exact": 8,
+          "phase657_delta_tok0": 9,
+          "phase657_rank_improvement": 1.7000000000000002
+        },
+        {
+          "layer": 20,
+          "component": "attn_out",
+          "phase656_dtop": 1.53125,
+          "phase657_delta_exact": 1,
+          "phase657_delta_tok0": 2,
+          "phase657_rank_improvement": 0.9500000000000002
+        }
+      ],
+      "last_writers": [],
+      "mode": "plus_last_writers",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 23.125,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 23.125
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 23.125
+          },
+          {
+            "rank": 2,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 21.375
+          },
+          {
+            "rank": 3,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 21.125
+          },
+          {
+            "rank": 4,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 20.75
+          },
+          {
+            "rank": 5,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 20.75
+          },
+          {
+            "rank": 6,
+            "id": 297,
+            "text": " o",
+            "category": "word",
+            "logit": 20.375
+          },
+          {
+            "rank": 7,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.125
+          },
+          {
+            "rank": 8,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 9,
+            "id": 272,
+            "text": " c",
+            "category": "word",
+            "logit": 19.875
+          },
+          {
+            "rank": 10,
+            "id": 937,
+            "text": " ?",
+            "category": "symbol",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 9,
+        "prefix_logit": 59.0,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 71.5
+        },
+        "top1_gap": 12.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 2,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 70.5
+          },
+          {
+            "rank": 3,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 64.0
+          },
+          {
+            "rank": 4,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 62.5
+          },
+          {
+            "rank": 5,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 6,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 62.0
+          },
+          {
+            "rank": 7,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 61.5
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 61.0
+          },
+          {
+            "rank": 9,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 59.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 58.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 155.07688903808594,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.1435927003622055,
+        "competitor_cos": 0.1435927003622055
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 494.94793701171875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11464747786521912,
+        "competitor_cos": 0.11464747786521912
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "last_writers": [],
+      "mode": "phase658_combo",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 22.5,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 22.5
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 22.5
+          },
+          {
+            "rank": 2,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 22.25
+          },
+          {
+            "rank": 3,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 21.625
+          },
+          {
+            "rank": 4,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 20.5
+          },
+          {
+            "rank": 5,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 20.375
+          },
+          {
+            "rank": 6,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 20.0
+          },
+          {
+            "rank": 7,
+            "id": 1124,
+            "text": " \\",
+            "category": "symbol",
+            "logit": 19.875
+          },
+          {
+            "rank": 8,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 19.625
+          },
+          {
+            "rank": 9,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 19.375
+          },
+          {
+            "rank": 10,
+            "id": 9834,
+            "text": " yes",
+            "category": "explanation",
+            "logit": 19.25
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 53,
+        "prefix_logit": 63.5,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 83.5
+        },
+        "top1_gap": 20.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 83.5
+          },
+          {
+            "rank": 2,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 81.0
+          },
+          {
+            "rank": 3,
+            "id": 23754,
+            "text": " ?\n\n",
+            "category": "newline",
+            "logit": 81.0
+          },
+          {
+            "rank": 4,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 80.0
+          },
+          {
+            "rank": 5,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 75.5
+          },
+          {
+            "rank": 6,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 75.0
+          },
+          {
+            "rank": 7,
+            "id": 90155,
+            "text": " \\\\\n",
+            "category": "newline",
+            "logit": 74.0
+          },
+          {
+            "rank": 8,
+            "id": 51317,
+            "text": " ???",
+            "category": "symbol",
+            "logit": 73.5
+          },
+          {
+            "rank": 9,
+            "id": 94011,
+            "text": " Depends",
+            "category": "word",
+            "logit": 72.0
+          },
+          {
+            "rank": 10,
+            "id": 88190,
+            "text": " Hmm",
+            "category": "word",
+            "logit": 71.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 151.56007385253906,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.14311935007572174,
+        "competitor_cos": 0.14311935007572174
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 575.992431640625,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.10618702322244644,
+        "competitor_cos": 0.10618702322244644
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n"
+      ]
+    },
+    {
+      "sample_idx": 0,
+      "item_idx": 0,
+      "pair_task": "yes_no_required",
+      "site": "early_peak_layer_out",
+      "combo_name": "top2",
+      "combo": [
+        {
+          "layer": 18,
+          "component": "attn_out",
+          "phase656_dtop": 1.5,
+          "phase657_delta_exact": 5,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 2.0000000000000004
+        },
+        {
+          "layer": 21,
+          "component": "mlp_out",
+          "phase656_dtop": 1.8916666666666666,
+          "phase657_delta_exact": 4,
+          "phase657_delta_tok0": 5,
+          "phase657_rank_improvement": 1.8500000000000005
+        }
+      ],
+      "last_writers": [
+        {
+          "layer": 35,
+          "component": "mlp_out",
+          "phase660_gap_delta": 0.06875,
+          "phase660_rank_delta": 0.09999999999999987
+        }
+      ],
+      "mode": "plus_last_writers",
+      "case": {
+        "tt_idx": 0,
+        "object": "o17",
+        "relation": "r31",
+        "category": "c59",
+        "correct": "v22"
+      },
+      "prefix_id": 348,
+      "prefix_text": " v",
+      "post": {
+        "prefix_rank": 1,
+        "prefix_logit": 11.875,
+        "top1": {
+          "rank": 1,
+          "id": 348,
+          "text": " v",
+          "category": "correct_prefix",
+          "logit": 11.875
+        },
+        "top1_gap": 0.0,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 348,
+            "text": " v",
+            "category": "correct_prefix",
+            "logit": 11.875
+          },
+          {
+            "rank": 2,
+            "id": 220,
+            "text": " ",
+            "category": "space",
+            "logit": 10.75
+          },
+          {
+            "rank": 3,
+            "id": 4710,
+            "text": " \n\n",
+            "category": "newline",
+            "logit": 9.5625
+          },
+          {
+            "rank": 4,
+            "id": 7414,
+            "text": " Yes",
+            "category": "explanation",
+            "logit": 9.25
+          },
+          {
+            "rank": 5,
+            "id": 6771,
+            "text": " Let",
+            "category": "word",
+            "logit": 9.125
+          },
+          {
+            "rank": 6,
+            "id": 2014,
+            "text": " To",
+            "category": "word",
+            "logit": 8.9375
+          },
+          {
+            "rank": 7,
+            "id": 576,
+            "text": " The",
+            "category": "word",
+            "logit": 8.8125
+          },
+          {
+            "rank": 8,
+            "id": 9834,
+            "text": " yes",
+            "category": "explanation",
+            "logit": 8.75
+          },
+          {
+            "rank": 9,
+            "id": 1124,
+            "text": " \\",
+            "category": "symbol",
+            "logit": 8.4375
+          },
+          {
+            "rank": 10,
+            "id": 17607,
+            "text": " ?\n",
+            "category": "newline",
+            "logit": 8.0625
+          }
+        ]
+      },
+      "pre": {
+        "prefix_rank": 10405,
+        "prefix_logit": 28.5,
+        "top1": {
+          "rank": 1,
+          "id": 92845,
+          "text": " vX",
+          "category": "word",
+          "logit": 84.0
+        },
+        "top1_gap": 55.5,
+        "top_tokens": [
+          {
+            "rank": 1,
+            "id": 92845,
+            "text": " vX",
+            "category": "word",
+            "logit": 84.0
+          },
+          {
+            "rank": 2,
+            "id": 52366,
+            "text": " Certainly",
+            "category": "word",
+            "logit": 78.0
+          },
+          {
+            "rank": 3,
+            "id": 20758,
+            "text": " <>\n",
+            "category": "newline",
+            "logit": 77.5
+          },
+          {
+            "rank": 4,
+            "id": 55342,
+            "text": "//}\n\n",
+            "category": "newline",
+            "logit": 76.5
+          },
+          {
+            "rank": 5,
+            "id": 62939,
+            "text": " vog",
+            "category": "word",
+            "logit": 75.0
+          },
+          {
+            "rank": 6,
+            "id": 65418,
+            "text": " visto",
+            "category": "word",
+            "logit": 73.5
+          },
+          {
+            "rank": 7,
+            "id": 98640,
+            "text": " chol",
+            "category": "word",
+            "logit": 71.5
+          },
+          {
+            "rank": 8,
+            "id": 131272,
+            "text": " Chúng",
+            "category": "word",
+            "logit": 71.0
+          },
+          {
+            "rank": 9,
+            "id": 89366,
+            "text": " insanely",
+            "category": "word",
+            "logit": 70.5
+          },
+          {
+            "rank": 10,
+            "id": 76743,
+            "text": " contexto",
+            "category": "word",
+            "logit": 69.5
+          }
+        ]
+      },
+      "post_diag": {
+        "gap": 0.0,
+        "state_norm": 99.17889404296875,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.11506524682044983,
+        "competitor_cos": 0.11506524682044983
+      },
+      "pre_diag": {
+        "gap": 0.0,
+        "state_norm": 639.0279541015625,
+        "correct_w_norm": 1.039797306060791,
+        "competitor_w_norm": 1.039797306060791,
+        "competitor_norm_advantage": 0.0,
+        "diff_norm": 0.0,
+        "diff_alignment": 0.0,
+        "needed_unit_delta": 0.0,
+        "correct_cos": 0.042941123247146606,
+        "competitor_cos": 0.042941123247146606
+      },
+      "eval": {
+        "exact_correct": true,
+        "exact_wrong": false,
+        "prefix_correct_len": 3,
+        "per_pos": [
+          {
+            "pos": 0,
+            "generated_id": 348,
+            "correct_id": 348,
+            "wrong_id": 348,
+            "is_correct": true,
+            "is_wrong": true
+          },
+          {
+            "pos": 1,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 15,
+            "is_correct": true,
+            "is_wrong": false
+          },
+          {
+            "pos": 2,
+            "generated_id": 17,
+            "correct_id": 17,
+            "wrong_id": 20,
+            "is_correct": true,
+            "is_wrong": false
+          }
+        ]
+      },
+      "generation_text": " v22\n",
+      "generation_tokens": [
+        " v",
+        "2",
+        "2",
+        "\n"
+      ]
+    }
+  ],
+  "total_time_min": 0.07831360101699829
+}
