@@ -46108,3 +46108,727 @@ Phase 709: Patched Natural Generation Identity Closure Audit
 如果 donor value 大量出现：
   source channel ensemble 才可能携带可迁移 donor identity。
 ```
+
+## Phase 709: Natural Generation and Write-In Closure Audit [2026-06-27 08:40]
+
+### 任务
+
+分析附件中关于“不是完全打转，但 patch 路线进入收益递减区”的判断是否正确，并继续完成下一阶段任务。
+
+本阶段把 Phase 707 的 teacher-forced full phrase likelihood 推进到更硬的自然生成判据：
+
+```text
+在 answer-start source-channel patch 后直接自然生成短输出，
+分类输出是否为 target value / donor value / prose_target / prose_donor / continuation_failure / other。
+```
+
+同时记录保守的 write-in diagnostics：
+
+```text
+combo_delta_value:
+  选中 channel 上 pre-W_O 的 source combo contribution 差分。
+
+output_dir_proj:
+  该 channel 经 W_O 后对 value-prose direction 的读出投影。
+
+direct_effect:
+  combo_delta_value * output_dir_proj。
+```
+
+注意：
+
+```text
+这不是完整 Q/K/V/MLP 自然写入分解；
+它只是把当前 patch 所依赖的贡献拆成更可审计的低层量，
+避免把 patch 成功过度解释成完整自然机制。
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase709_natural_generation_writein_closure.py
+tests/gpt5/run_phase709_natural_generation_writein_closure_full.sh
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase709_natural_generation_writein_closure.py
+python tests/gpt5/phase709_natural_generation_writein_closure.py --summarize-only
+bash tests/gpt5/run_phase709_natural_generation_writein_closure_full.sh
+```
+
+实际顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型均由运行脚本传入：
+
+```text
+--hard-exit-after-model
+```
+
+### 输出文件
+
+```text
+results/glm5_phase709_natural_generation_writein_closure/phase709_qwen3_natural_generation_summary.json
+results/glm5_phase709_natural_generation_writein_closure/phase709_glm4_natural_generation_summary.json
+results/glm5_phase709_natural_generation_writein_closure/phase709_deepseek7b_natural_generation_summary.json
+results/glm5_phase709_natural_generation_writein_closure/phase709_cross_model_summary.md
+results/glm5_phase709_natural_generation_writein_closure/phase709_cross_model_summary.json
+```
+
+### 测试原理
+
+本阶段沿用 Phase 707 的 source-restricted channel patch 构造方式：
+
+```text
+source combo = target_value + answer_line + self_last
+```
+
+对于每个 target case 和 donor case：
+
+```text
+restore:
+  在 target short prompt 的 answer-start 位置，
+  注入 donor terse - target short 的 selected source-channel delta。
+
+degradation:
+  在 target terse prompt 的 answer-start 位置，
+  注入 donor short - target terse 的 selected source-channel delta。
+```
+
+但和 Phase 707 不同，本阶段不再只对候选短语算 likelihood，而是：
+
+```text
+1. 第一步 forward 时安装 answer-start patch。
+2. 取 greedy next token。
+3. 后续 token 不再继续 patch，直接自然续写。
+4. 生成最多 8 个新 token。
+5. 按文本分类为 target_value / donor_value / prose_target / prose_donor / continuation_failure / other。
+```
+
+这个设计检验的是：
+
+```text
+teacher-forced likelihood 中看到的 target/prose 竞争，
+是否真的能反映到自然生成输出。
+```
+
+### 客观结果
+
+#### qwen3
+
+样本数很少：
+
+```text
+paired cases = 3
+donor pairs = 3
+```
+
+unrelated restore：
+
+```text
+all_positive_source_channels:
+  target_value_rate = 1.000
+  donor_value_rate = 0.000
+  prose_target_rate = 0.000
+  other_rate = 0.000
+
+source_top_channel_512:
+  target_value_rate = 1.000
+  donor_value_rate = 0.000
+  prose_target_rate = 0.000
+  other_rate = 0.000
+
+source_random_channel_512:
+  target_value_rate = 0.333
+  donor_value_rate = 0.000
+  other_rate = 0.667
+```
+
+qwen3 表面上自然生成闭合较好，但 n=3，不能作为强结论。
+
+#### GLM4
+
+样本数也很少：
+
+```text
+paired cases = 5
+donor pairs = 5
+```
+
+unrelated restore：
+
+```text
+all_positive_source_channels:
+  target_value_rate = 0.200
+  donor_value_rate = 0.000
+  other_rate = 0.800
+
+source_top_channel_512:
+  target_value_rate = 0.000
+  donor_value_rate = 0.000
+  other_rate = 1.000
+
+source_random_channel_512:
+  target_value_rate = 0.200
+  donor_value_rate = 0.000
+  other_rate = 0.800
+```
+
+GLM4 没有自然生成闭合，restore 多数进入 other。
+
+#### DS7B
+
+样本数较完整：
+
+```text
+paired cases = 72
+donor pairs = 80
+same_value pairs = 8
+unrelated pairs = 72
+```
+
+unrelated restore：
+
+```text
+all_positive_source_channels:
+  n = 72
+  target_value_rate = 0.542
+  donor_value_rate = 0.097
+  prose_target_rate = 0.264
+  other_rate = 0.097
+  target_or_target_prose_rate = 0.806
+
+source_top_channel_512:
+  n = 72
+  target_value_rate = 0.389
+  donor_value_rate = 0.000
+  prose_target_rate = 0.417
+  other_rate = 0.194
+  target_or_target_prose_rate = 0.806
+
+source_random_channel_512:
+  n = 72
+  target_value_rate = 0.000
+  donor_value_rate = 0.000
+  prose_target_rate = 0.806
+  other_rate = 0.194
+  target_or_target_prose_rate = 0.806
+```
+
+unrelated degradation：
+
+```text
+source_top_channel_512:
+  n = 72
+  target_value_rate = 0.347
+  donor_value_rate = 0.000
+  prose_target_rate = 0.278
+  other_rate = 0.375
+
+all_positive_source_channels:
+  n = 72
+  target_value_rate = 0.042
+  donor_value_rate = 0.000
+  prose_target_rate = 0.639
+  other_rate = 0.319
+
+source_random_channel_512:
+  n = 72
+  target_value_rate = 0.736
+  donor_value_rate = 0.000
+  prose_target_rate = 0.097
+  other_rate = 0.167
+```
+
+same_value restore：
+
+```text
+all_positive_source_channels:
+  n = 8
+  target_value_rate = 0.375
+  prose_target_rate = 0.625
+
+source_top_channel_512:
+  n = 8
+  target_value_rate = 0.000
+  prose_target_rate = 0.875
+```
+
+### donor value 检查
+
+DS7B unrelated restore 的 donor value 只出现在：
+
+```text
+all_positive_source_channels:
+  donor_value_rate = 0.097
+```
+
+抽查样例显示不是分类误判：
+
+```text
+target=silver, donor=yellow, generated="yellow..."
+target=brush, donor=silver, generated="silver..."
+target=school, donor=library, generated="library..."
+target=wrench, donor=orange, generated="orange..."
+target=bucket, donor=station, generated="station..."
+target=black, donor=bucket, generated="bucket..."
+target=garden, donor=blue, generated="blue..."
+```
+
+但 source_top_channel_512 中：
+
+```text
+donor_value_rate = 0.000
+```
+
+这说明：
+
+```text
+all_positive_source_channels 更混，可能携带少量跨案 value residue；
+source_top_channel_512 更像 route/prose/value 形态控制，而不是 donor identity 注入器。
+```
+
+### 阶段性判断
+
+附件中的判断基本正确：
+
+```text
+Phase 500-707 不是原地打转；
+它确实完成了从 semantic direction 到 residual trajectory、
+从 head path 到 channel ensemble、
+从 top1 restore 到 route gain / value identity split 的推进。
+```
+
+但附件指出的风险也正确：
+
+```text
+如果继续只做更细 patch，而不换硬指标，
+研究会进入技术性打转。
+```
+
+Phase 709 的结果支持这个判断：
+
+```text
+teacher-forced phrase likelihood 到 natural generation 之间仍有明显 gap。
+```
+
+### 理论进展
+
+当前公式应继续收紧为：
+
+```text
+source_channel_ensemble
+  =
+  G_route
+  +
+  P_format
+  +
+  E_target_context
+  +
+  V_identity_residue
+  +
+  GenerationGate
+```
+
+其中：
+
+```text
+G_route:
+  证据较强。DS7B target_or_target_prose_rate 在 restore 下达到 0.806。
+
+P_format:
+  证据较强。source_top_channel_512 倾向 prose_target，而 all_positive 更容易短值输出。
+
+E_target_context:
+  仍然重要。多数自然输出指向 target 或 target prose，而不是 donor。
+
+V_identity_residue:
+  存在但不纯。all_positive_source_channels 出现 0.097 donor_value_rate。
+
+GenerationGate:
+  尚未闭合。GLM4 restore 多数 other，DS7B source_top 多数在 target_value/prose_target 之间摆动。
+```
+
+### 问题和硬伤
+
+1. 自然生成分类仍是文本启发式，不是人工逐条语义标注。
+
+2. 只 patch 第一个 answer-start step，后续 token 不继续 patch。这是有意设计，但意味着它测试的是“首步写入能否启动自然轨迹”，不是连续控制。
+
+3. qwen3 和 GLM4 样本太少，跨模型结论仍弱。
+
+4. GLM4 的 other 输出较多，说明当前 prompt / patch / classifier 对 GLM4 仍不稳定。
+
+5. DS7B all_positive 出现 donor value，说明全正通道集合不是干净 semantic identity code。
+
+6. source_random_channel_512 在 DS7B unrelated restore 中产生大量 prose_target，说明自然生成路线对随机通道扰动也敏感，不能把所有 target/prose 输出都归因于精确语义机制。
+
+7. 当前 write-in diagnostics 只分解到 contribution delta 与 W_O 投影，还没有真正完成 Q/K addressing、V content、MLP modulation、residual carry 的完整自然写入路径分解。
+
+### 下一步
+
+接下来的任务和当前任务仍处于同一个阶段性目标：
+
+```text
+从 patch 成功/失败，转向自然写入机制图谱。
+```
+
+因此应继续自动推进到下一阶段：
+
+```text
+Phase 710: Natural Write-In Factor Split Audit
+```
+
+核心目标：
+
+```text
+把 Phase 709 中仍混在一起的 source-channel effect 拆成：
+1. attention pattern / QK addressing；
+2. V content；
+3. o_proj input channel；
+4. post-attn residual；
+5. MLP modulation；
+6. final readout / generation gate。
+```
+
+优先判据：
+
+```text
+如果只替换 attention pattern 无效，而替换 V/o_proj input 有效：
+  说明主要是 value content / channel write-in。
+
+如果 attention pattern 替换有效：
+  说明 QK addressing 是关键自然写入机制。
+
+如果 post-attn 有效但 o_proj input 无效：
+  说明 head 内部或 residual 合成阶段有关键变换。
+
+如果 MLP 后才有效：
+  说明 generation gate 或 identity stabilization 在 MLP modulation 中。
+```
+
+## Phase 710: Natural Write-In Factor Split Audit [2026-06-27 08:49]
+
+### 任务
+
+继续 Phase 709 的同一阶段性目标：
+
+```text
+从 patch 成功/失败，转向自然写入机制图谱。
+```
+
+Phase 709 证明 answer-start source-channel patch 可以部分闭合到自然生成，但还没有判断这个效应是在：
+
+```text
+pre-o_proj channel input；
+post-o_proj attention output；
+post-layer residual output；
+```
+
+哪个位置最稳定。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase710_natural_writein_factor_split.py
+tests/gpt5/run_phase710_natural_writein_factor_split_full.sh
+```
+
+### 运行命令
+
+```bash
+python -m py_compile tests/gpt5/phase710_natural_writein_factor_split.py
+python tests/gpt5/phase710_natural_writein_factor_split.py --summarize-only
+bash tests/gpt5/run_phase710_natural_writein_factor_split_full.sh
+```
+
+三模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型仍使用：
+
+```text
+--hard-exit-after-model
+```
+
+### 输出文件
+
+```text
+results/glm5_phase710_natural_writein_factor_split/phase710_qwen3_factor_split_summary.json
+results/glm5_phase710_natural_writein_factor_split/phase710_glm4_factor_split_summary.json
+results/glm5_phase710_natural_writein_factor_split/phase710_deepseek7b_factor_split_summary.json
+results/glm5_phase710_natural_writein_factor_split/phase710_cross_model_summary.md
+results/glm5_phase710_natural_writein_factor_split/phase710_cross_model_summary.json
+```
+
+### 测试原理
+
+保持同一个 source_top_channel_512 / source_random_channel_512 delta，不改变样本、donor、source combo，只改变注入位置：
+
+```text
+pre_o_input:
+  在 o_proj input 的 selected channels 上加 delta。
+
+post_o_output:
+  先把 delta 乘以 W_O，变成 attention output residual delta，
+  再加到 o_proj output。
+
+post_layer_output:
+  把同一个 projected delta 加到整层输出之后，
+  让同层 MLP 不能再处理这个 delta。
+```
+
+判据：
+
+```text
+如果 pre_o_input / post_o_output 有效，而 post_layer_output 失效：
+  同层后续 residual / MLP processing 对写入闭合重要。
+
+如果 post_layer_output 更有效：
+  同层 MLP 可能不是必要正向环节，甚至可能把短值路线推向 prose。
+
+如果三者接近：
+  该 patch 更像 downstream readout-route gain，而不是局部自然写入算法。
+```
+
+### 客观结果
+
+#### qwen3
+
+```text
+paired cases = 3
+donor pairs = 3
+```
+
+unrelated restore source_top_channel_512：
+
+```text
+pre_o_input:
+  target_value_rate = 1.000
+  donor_value_rate = 0.000
+
+post_o_output:
+  target_value_rate = 1.000
+  donor_value_rate = 0.000
+
+post_layer_output:
+  target_value_rate = 1.000
+  donor_value_rate = 0.000
+```
+
+qwen3 三个位置等价，但样本太少，只能作为弱参考。
+
+#### GLM4
+
+```text
+paired cases = 5
+donor pairs = 5
+```
+
+unrelated restore source_top_channel_512：
+
+```text
+pre_o_input:
+  target_value_rate = 0.000
+  other_rate = 1.000
+
+post_o_output:
+  target_value_rate = 0.000
+  other_rate = 1.000
+
+post_layer_output:
+  target_value_rate = 0.200
+  other_rate = 0.800
+```
+
+GLM4 仍未闭合。post_layer_output 只有弱改善。
+
+#### DS7B
+
+```text
+paired cases = 72
+donor pairs = 80
+```
+
+unrelated restore source_top_channel_512：
+
+```text
+pre_o_input:
+  n = 72
+  target_value_rate = 0.347
+  prose_target_rate = 0.472
+  donor_value_rate = 0.000
+  other_rate = 0.181
+
+post_o_output:
+  n = 72
+  target_value_rate = 0.361
+  prose_target_rate = 0.458
+  donor_value_rate = 0.000
+  other_rate = 0.181
+
+post_layer_output:
+  n = 72
+  target_value_rate = 0.472
+  prose_target_rate = 0.375
+  donor_value_rate = 0.000
+  other_rate = 0.153
+```
+
+unrelated restore source_random_channel_512：
+
+```text
+pre_o_input:
+  target_value_rate = 0.014
+  prose_target_rate = 0.764
+  donor_value_rate = 0.000
+  other_rate = 0.222
+
+post_o_output:
+  target_value_rate = 0.028
+  prose_target_rate = 0.750
+  donor_value_rate = 0.000
+  other_rate = 0.222
+
+post_layer_output:
+  target_value_rate = 0.014
+  prose_target_rate = 0.736
+  donor_value_rate = 0.000
+  other_rate = 0.250
+```
+
+### 阶段性判断
+
+DS7B 的 source_top_channel_512 在三个注入位置都能把输出推向 target/prose 方向：
+
+```text
+target_or_target_prose_rate:
+  pre_o_input = 0.819
+  post_o_output = 0.819
+  post_layer_output = 0.847
+```
+
+但 post_layer_output 的 target_value_rate 最高：
+
+```text
+post_layer_output target_value_rate = 0.472
+pre_o_input target_value_rate = 0.347
+post_o_output target_value_rate = 0.361
+```
+
+这说明：
+
+```text
+同层 MLP / residual 后处理不是当前 source_top delta 变成短 target value 的必要正向环节；
+它可能会把一部分短值倾向转成 prose_target。
+```
+
+同时，random channel 主要生成 prose_target，而不是 target_value：
+
+```text
+source_random_channel_512:
+  prose_target_rate ≈ 0.736-0.764
+  target_value_rate ≈ 0.014-0.028
+```
+
+这继续说明：
+
+```text
+source_top_channel_512 更接近短值读出路线；
+random channel 更像泛化 target/prose route perturbation。
+```
+
+### 理论进展
+
+当前公式从 Phase 709 的：
+
+```text
+source_channel_ensemble
+  =
+  G_route
+  +
+  P_format
+  +
+  E_target_context
+  +
+  V_identity_residue
+  +
+  GenerationGate
+```
+
+进一步收紧为：
+
+```text
+source_top_channel_512
+  ≈
+  projected_readout_delta
+  +
+  downstream_route_gain
+```
+
+原因：
+
+```text
+post_layer_output 不弱于 pre_o_input / post_o_output；
+说明 selected source-channel delta 的一部分效应可以绕过同层 MLP，
+直接进入后续层的读出/生成竞争。
+```
+
+这不是完整自然写入闭合，但它排除了一个强假设：
+
+```text
+当前 source_top effect 必须经过同层 MLP 才能成为自然短值输出。
+```
+
+### 问题和硬伤
+
+1. post_layer_output 是人工位置注入，不是自然 forward 机制。
+
+2. 本阶段没有真正替换 Q/K attention pattern，也没有单独替换 V content。
+
+3. 分类仍是文本启发式。
+
+4. qwen3 / GLM4 样本仍少，跨模型稳定性不足。
+
+5. DS7B 是小模型，可能有特殊短答/prose 路线偏置。
+
+6. post_layer_output 更强可能来自绕过 same-layer norm/MLP 干扰，也可能来自注入位置更接近下游读出，不能直接解释为“MLP 无关”。
+
+### 下一步
+
+当前阶段性目标仍未完全结束，因为 Q/K addressing 和 V content 尚未拆开。
+
+下一阶段应该是：
+
+```text
+Phase 711: Attention Pattern vs Value Content Split Audit
+```
+
+核心目标：
+
+```text
+1. 固定 V content，只替换 attention pattern / source weights。
+2. 固定 attention pattern，只替换 V content / value projection output。
+3. 比较两者对 target_value / prose_target / donor_value 的自然生成影响。
+```
+
+关键判据：
+
+```text
+如果 attention pattern split 有效：
+  QK addressing 是自然写入关键。
+
+如果 V content split 有效：
+  语义/路线信息主要在 value content。
+
+如果二者单独都弱，组合才强：
+  当前机制是 attention addressing 与 V content 的乘积耦合，不适合继续用单点 patch 理解。
+```
