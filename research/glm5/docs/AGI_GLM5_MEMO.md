@@ -46832,3 +46832,581 @@ Phase 711: Attention Pattern vs Value Content Split Audit
 如果二者单独都弱，组合才强：
   当前机制是 attention addressing 与 V content 的乘积耦合，不适合继续用单点 patch 理解。
 ```
+
+## Phase 711: Global Mechanism Atlas v0 and Marginal-Return Pivot [2026-06-27 11:27]
+
+### 本阶段任务
+
+本阶段分析了两份新材料：
+
+```text
+1. 应该启动全局神经元图谱，但第一版不应做“大而全图谱”，而应做 language-core verifiable micro-atlas。
+2. Phase 709-710 不是理论大跃迁，但说明 patch 路线已进入边际收益递减区，需要转向 hard metric 与 atlas 工程。
+```
+
+判断：两份材料基本正确。Phase 709-710 有真实增量，但增量主要是收紧边界，不是发现新总机制。因此继续盲目扩大 patch search 会变成技术性打转；更合理的下一步是把已有证据结构化为可查询、可反证、可扩展的机制图谱 v0。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase711_global_mechanism_atlas_v0.py
+```
+
+该脚本不重新运行模型，不占用 GPU，而是整合已有阶段结果：
+
+```text
+Phase 698: answer-last attention head source audit
+Phase 707: full value phrase likelihood audit
+Phase 709: natural generation write-in closure
+Phase 710: natural write-in factor split
+```
+
+输出目录：
+
+```text
+results/glm5_phase711_global_mechanism_atlas_v0/
+```
+
+核心输出：
+
+```text
+phase711_atlas_units.jsonl
+phase711_atlas_summary.json
+phase711_atlas_summary.md
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase711_global_mechanism_atlas_v0.py
+python tests/gpt5/phase711_global_mechanism_atlas_v0.py
+```
+
+本阶段没有进行 qwen3 / GLM4 / DS7B 新模型测试，因为目标是把 Phase 698-710 的已有跨模型结果整理为图谱索引，而不是新增 patch 干预。
+
+### 测试原理
+
+Phase 711 的核心不是继续问：
+
+```text
+某个 patch 是否能让模型输出正确答案？
+```
+
+而是把已有证据转换成可查询的图谱单元：
+
+```text
+unit = model + layer + head/channel + source_group + target_position + role_scores + status
+```
+
+其中 role_scores 包括：
+
+```text
+route_gain_score
+identity_score
+format_or_prose_score
+donor_residue_score
+phrase_target_minus_donor
+phrase_target_minus_prose
+post_layer_target_value_rate
+```
+
+也就是说，本阶段开始把注意力头、注意力通道、自然生成闭环、短值输出、格式/续写倾向分开记录，避免把所有现象都压成一个“语义方向”或“单点门控”。
+
+### 客观结果
+
+生成图谱单元：
+
+```text
+n_units = 288
+```
+
+按模型：
+
+```text
+deepseek7b: 96
+glm4: 96
+qwen3: 96
+```
+
+按类型：
+
+```text
+attention_head: 96
+attention_channel: 192
+```
+
+按证据层级：
+
+```text
+level6_partial_natural_generation: 192
+level5_phrase_likelihood: 96
+```
+
+按状态：
+
+```text
+deepseek7b: prose_or_format_route_carrier = 96
+glm4: unresolved_or_weak = 96
+qwen3: short_value_route_carrier = 96
+```
+
+这说明当前图谱 v0 形成了一个清晰但保守的跨模型差异：
+
+```text
+qwen3 更像短值路线载体；
+DS7B 更像 prose / format route carrier；
+GLM4 在当前样本和当前定位下仍未形成稳定可闭合机制。
+```
+
+### 关键进展
+
+1. 研究对象从单点 patch 成功率转向了可扩展机制图谱。
+
+2. 图谱行明确区分了 attention_head 和 attention_channel，避免把 head 统计直接冒充 neuron 编码机制。
+
+3. DS7B 的证据被标为 prose_or_format_route_carrier，而不是简单标为 value identity carrier；这比 Phase 683-710 的部分强表述更谨慎。
+
+4. qwen3 的 short_value_route_carrier 结论保留，但因样本量小，只能作为弱跨模型参照。
+
+5. GLM4 被标为 unresolved_or_weak，避免把负结果强行解释成机制缺失。
+
+### 问题和硬伤
+
+1. Atlas v0 继承的是 condition-level evidence，不是 unit-local causal proof。也就是说，同一模型内很多 unit 共享同一组自然生成证据，不能认为每个 unit 都已被单独证明。
+
+2. attention_channel 仍不是 neuron。它只是 head value/output 维度或投影通道级线索，距离真正 neuron / MLP channel 还有一级。
+
+3. 当前图谱以 DS7B 为主，qwen3 / GLM4 样本稀疏，小模型内部结构偏差必须保留为解释风险。
+
+4. 还没有完成 Q/K addressing 与 V content 的拆分，因此还不能判断路线效应主要来自“看哪里”，还是来自“搬运什么内容”。
+
+5. 图谱 v0 是索引系统，不是完整语言编码机制理论。
+
+### 理论进展
+
+当前理论应从：
+
+```text
+寻找一个可修复答案的方向
+```
+
+进一步改写为：
+
+```text
+构建条件化残差轨迹上的机制图谱：
+同一语言任务由 route、identity、format、readout、continuation 多类角色共同完成；
+单个 patch 只能证明局部可干预性，不能替代全局编码机制。
+```
+
+当前更稳妥的公式是：
+
+```text
+h_{l+1,p}
+=
+h_{l,p}
++ A_{l,p}(QK_{l,p}, V_{l,p})
++ M_{l,p}(h_{l,p})
+```
+
+输出侧：
+
+```text
+P(x_{t+1}\mid x_{\le t})
+=
+softmax(W_U h_{L,t})
+```
+
+机制图谱侧：
+
+```text
+G
+=
+{u_i, r_i, s_i, e_i}
+```
+
+其中：
+
+```text
+u_i = 单元，包括 head、channel、后续 neuron / MLP channel
+r_i = 角色，包括 route、identity、format、readout、continuation
+s_i = 状态分数，包括 target_value、prose_target、donor_residue、phrase margin
+e_i = 证据层级，包括 attention、phrase likelihood、natural generation、causal patch
+```
+
+### 下一步
+
+Phase 711 完成了 atlas v0 的初始化，但阶段性目标还没有结束。下一步必须做：
+
+```text
+Phase 712: QK-V Split for Global Mechanism Atlas
+```
+
+核心任务：
+
+```text
+1. 固定 V content，只替换 Q/K attention pattern。
+2. 固定 Q/K attention pattern，只替换 V content / value output。
+3. 比较 target_value、prose_target、donor_value、other 的自然生成结果。
+4. 把结果回填到 atlas v0 中，为每个候选 head/channel 标注 addressing-role 或 content-role。
+```
+
+关键判据：
+
+```text
+如果 QK split 强：
+  路线机制主要是寻址结构。
+
+如果 V split 强：
+  路线机制主要是值内容搬运。
+
+如果二者单独弱、组合强：
+  语言编码机制更接近 addressing × content 的耦合结构，而不是单一方向或单一门控。
+```
+
+## Phase 712: QK-V Factor Atlas Audit [2026-06-27 12:23]
+
+### 本阶段任务
+
+本阶段继续 Phase 711 的 atlas v0 目标，处理当前最关键缺口：
+
+```text
+Q/K addressing（查询 / 键寻址）和 V content（值内容）尚未拆开。
+```
+
+分析最新材料后，判断其基本正确：
+
+```text
+Phase 711 是正确转向，但只是 atlas indexing（图谱索引）；
+如果不继续拆 QK/V，图谱仍然无法判断机制核心是“看哪里”还是“搬运什么”。
+```
+
+因此本阶段没有继续扩大普通 patch search，而是做 QK/V factor decomposition（QK/V 因子分解）并把结果回填到 Phase 711 atlas v0。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase712_qkv_factor_atlas_audit.py
+tests/gpt5/run_phase712_qkv_factor_atlas_audit_full.sh
+tests/gpt5/phase712_update_atlas_with_qkv.py
+```
+
+输出目录：
+
+```text
+results/glm5_phase712_qkv_factor_atlas_audit/
+```
+
+核心输出：
+
+```text
+phase712_cross_model_summary.md
+phase712_cross_model_summary.json
+phase712_atlas_units_with_qkv.jsonl
+phase712_atlas_qkv_backfill_summary.md
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase712_qkv_factor_atlas_audit.py
+tests/gpt5/run_phase712_qkv_factor_atlas_audit_full.sh
+python -m py_compile tests/gpt5/phase712_update_atlas_with_qkv.py
+python tests/gpt5/phase712_update_atlas_with_qkv.py
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型运行都使用：
+
+```text
+--hard-exit-after-model
+```
+
+### 测试原理
+
+本阶段不是严格替换 Q/K matrix（查询 / 键矩阵）的完整 causal intervention（因果干预），而是对 Phase 707-710 使用的 source contribution（源贡献）进行可计算分解。
+
+对同一 source group（源组）：
+
+```text
+target_value + answer_line + self_last
+```
+
+注意力贡献可写为：
+
+```text
+C
+=
+sum_s a_s v_s
+```
+
+其中：
+
+```text
+a_s = answer_last 对 source token s 的 attention weight（注意力权重）
+v_s = source token s 的 value output（值输出）
+```
+
+比较 terse 和 short 两种状态：
+
+```text
+Delta C
+=
+C_terse - C_short
+```
+
+分解为：
+
+```text
+Delta C
+=
+sum_s (a_terse_s - a_short_s) v_short_s
++
+sum_s a_short_s (v_terse_s - v_short_s)
++
+sum_s (a_terse_s - a_short_s)(v_terse_s - v_short_s)
+```
+
+对应：
+
+```text
+QK/addressing term: 看哪里的变化
+V/content term: 搬运内容的变化
+QK*V interaction term: 寻址与内容耦合变化
+```
+
+再用输出方向投影：
+
+```text
+direct_effect
+=
+Delta C · W_O^T d_readout
+```
+
+这样可以把 Phase 711 atlas 中的 attention_head / attention_channel 标记为：
+
+```text
+qk_addressing
+v_content
+qk_v_interaction
+mixed_coupled
+weak_or_zero
+```
+
+### 客观结果
+
+跨模型主表：
+
+```text
+DS7B source_top_channel:
+  n = 512
+  dominant = qk_addressing
+  abs_qk_share = 0.505
+  abs_v_share = 0.247
+  abs_interaction_share = 0.248
+  sum_total_direct = 34.536267
+
+GLM4 source_top_channel:
+  n = 512
+  dominant = qk_addressing
+  abs_qk_share = 0.291
+  abs_v_share = 0.356
+  abs_interaction_share = 0.353
+  sum_total_direct = 3.135055
+
+qwen3 source_top_channel:
+  n = 512
+  dominant = mixed_coupled
+  abs_qk_share = 0.310
+  abs_v_share = 0.345
+  abs_interaction_share = 0.344
+  sum_total_direct = 33.323272
+```
+
+DS7B all_positive_source_channels：
+
+```text
+n = 2647
+dominant = qk_addressing
+abs_qk_share = 0.449
+abs_v_share = 0.275
+abs_interaction_share = 0.275
+sum_total_direct = 48.043054
+```
+
+DS7B top heads：
+
+```text
+L26H15:
+  dominant = qk_addressing
+  abs_qk_share = 0.948
+  sum_total_direct = 2.099944
+
+L26H19:
+  dominant = qk_addressing
+  abs_qk_share = 0.977
+  sum_total_direct = 1.516378
+
+L23H11:
+  dominant = qk_addressing
+  abs_qk_share = 0.844
+  sum_total_direct = 0.935820
+
+L27H2:
+  dominant = qk_addressing
+  abs_qk_share = 0.900
+  sum_total_direct = 0.909941
+```
+
+Atlas 回填结果：
+
+```text
+n_units = 288
+n_units_with_qkv = 288
+
+factor_counts:
+  qk_addressing = 157
+  mixed_coupled = 131
+```
+
+按模型：
+
+```text
+deepseek7b:
+  qk_addressing = 79
+  mixed_coupled = 17
+
+glm4:
+  qk_addressing = 36
+  mixed_coupled = 60
+
+qwen3:
+  qk_addressing = 42
+  mixed_coupled = 54
+```
+
+### 关键进展
+
+1. DS7B 的主要 source_top_channel effect 明显偏向 QK/addressing，而不是纯 V/content。
+
+2. DS7B 的最强头 L26H15、L26H19、L23H11、L27H2 具有非常高的 QK share，说明前面看到的 source contribution 很大部分来自“寻址结构变化”。
+
+3. qwen3 的 source_top_channel 更像 mixed_coupled，说明短值路线可能不是单纯 attention addressing，而是 QK/V/interaction 混合。
+
+4. GLM4 虽然整体 dominant 被 sum 判为 qk_addressing，但 abs share 中 V 与 interaction 更大，且样本只有 5，因此不能强判为清晰 QK 机制。
+
+5. Phase 711 的 atlas v0 已被完整回填 QK/V 因子标签，图谱从“角色索引”前进到“因子索引”。
+
+### 问题和硬伤
+
+1. 本阶段不是严格 causal Q/K replacement。它是 contribution decomposition（贡献分解），只能说明 source contribution 的组成，不等价于直接替换 Q/K 后的自然生成闭环。
+
+2. 分解公式依赖 short-state 作为基准，因此 QK term / V term 的数值会受基准选择影响。
+
+3. V/content 与 interaction 在 qwen3、GLM4 中接近 QK，说明跨模型机制并不统一，不能过早总结为“语言机制就是 QK 寻址”。
+
+4. 本阶段仍主要覆盖 attention_head / attention_channel，不包含 MLP neuron、SAE feature、residual carry 的完整图谱。
+
+5. 当前模型是小模型，DS7B 的 QK dominance 可能放大小模型短答路线或格式路线偏置，不能直接外推到大模型。
+
+### 理论进展
+
+当前机制公式从：
+
+```text
+h_{l+1,p}
+=
+h_{l,p}
++ A_{l,p}(QK,V)
++ M_{l,p}(h_{l,p})
+```
+
+进一步细化为：
+
+```text
+Delta A_source
+=
+Delta A_QK
++ Delta A_V
++ Delta A_QKxV
+```
+
+其中：
+
+```text
+Delta A_QK:
+  寻址权重改变带来的源贡献变化。
+
+Delta A_V:
+  值内容改变带来的源贡献变化。
+
+Delta A_QKxV:
+  寻址变化和值内容变化的耦合项。
+```
+
+Atlas 公式扩展为：
+
+```text
+G_atlas
+=
+{u_i, r_i, s_i, e_i, f_i}
+```
+
+其中新增：
+
+```text
+f_i = QK/V factor label
+```
+
+即：
+
+```text
+f_i ∈ {qk_addressing, v_content, qk_v_interaction, mixed_coupled, weak_or_zero}
+```
+
+### 下一步
+
+当前阶段目标已经完成：
+
+```text
+Phase 711: atlas v0 初始化
+Phase 712: QK/V 因子回填
+```
+
+下一阶段不应该继续做同类分解，而应该进入更严格的验证：
+
+```text
+Phase 713: Causal QK Pattern Replacement vs V Content Replacement
+```
+
+核心任务：
+
+```text
+1. 只替换 attention pattern / attention weights，保持 V content 不变。
+2. 只替换 V content / value output，保持 attention pattern 不变。
+3. 对 DS7B 的 L26H15、L26H19、L23H11、L27H2 优先测试。
+4. 观察 natural generation 中 target_value、prose_target、donor_value、other 的变化。
+```
+
+关键判据：
+
+```text
+如果只替换 QK pattern 能复现大部分效果：
+  DS7B 的路线瓶颈主要是寻址结构。
+
+如果只替换 V content 能复现：
+  值内容仍是主瓶颈。
+
+如果必须 QK + V 同时替换：
+  当前语言编码机制是寻址与内容的乘积耦合。
+```
+
+
+
+123
+456
+789
