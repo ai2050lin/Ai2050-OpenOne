@@ -1,0 +1,559 @@
+[16:03:59] qwen3: cases=114, candidate_heads=['L26H26', 'L24H29', 'L28H0']
+`torch_dtype` is deprecated! Use `dtype` instead!
+[model_utils] Loading qwen3... (8bit=False)
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 25353.23it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[16:04:05] qwen3: 12/114 cases; rows=72
+[16:04:08] qwen3: 24/114 cases; rows=144
+[16:04:12] qwen3: 36/114 cases; rows=216
+[16:04:16] qwen3: 48/114 cases; rows=288
+[16:04:19] qwen3: 60/114 cases; rows=360
+[16:04:22] qwen3: 72/114 cases; rows=432
+[16:04:25] qwen3: 84/114 cases; rows=504
+[16:04:28] qwen3: 96/114 cases; rows=576
+[16:04:32] qwen3: 108/114 cases; rows=648
+[16:04:33] qwen3: 114/114 cases; rows=684
+[model_utils] GPU memory released, allocated=8.11 GB
+{
+  "model": "qwen3",
+  "most_fruit_shared_candidate_heads": [
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.011299332045018673,
+          "mean_necessity": 0.011299332045018673,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.030583154291605297,
+          "mean_necessity": 0.030583154291605297,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": 0.01080284752956062,
+          "mean_necessity": -0.01080284752956062,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.07434181372324626,
+          "mean_necessity": -0.07434181372324626,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.015453864794835681,
+          "mean_necessity": 0.015453864794835681,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.028524945202876652,
+          "mean_necessity": 0.028524945202876652,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": 0.019986574876714836,
+          "mean_necessity": -0.019986574876714836,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.036771442344285206,
+          "mean_necessity": -0.036771442344285206,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.07978061027824879,
+          "mean_necessity": 0.07978061027824879,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.04487798362970352,
+          "mean_necessity": 0.04487798362970352,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.0029662890010513365,
+          "mean_necessity": 0.0029662890010513365,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.013327927953758428,
+          "mean_necessity": 0.013327927953758428,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.017543859649122806,
+      "head": 0,
+      "head_key": "L28H0",
+      "layer": 28,
+      "logprob_worse_rate": 0.4824561403508772,
+      "mean_first_logprob_delta": -0.00950187816475559,
+      "mean_first_rank_delta": 0.017543859649122806,
+      "mean_mean_logprob_delta": -0.009531018970743358,
+      "mean_sum_logprob_delta": -0.009501845748976242,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": 0.0025224934506695718,
+      "phase722_source_focus_score": 0.8492387930552164,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.030526772296677034,
+        "apple_minus_other_fruit": 0.015664538376343747,
+        "nonfruit_explicit_necessity": 0.03957690008936273,
+        "other_fruit_explicit_necessity": 0.014862233920333286,
+        "other_fruit_minus_nonfruit": -0.024714666169029446
+      }
+    },
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.06053503475462397,
+          "mean_necessity": 0.06053503475462397,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.1083700700752388,
+          "mean_necessity": 0.1083700700752388,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": -0.01688309798163234,
+          "mean_necessity": 0.01688309798163234,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.06667027208540174,
+          "mean_necessity": -0.06667027208540174,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.06289791146749242,
+          "mean_necessity": 0.06289791146749242,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.09251863755988173,
+          "mean_necessity": 0.09251863755988173,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": -0.015854376537556,
+          "mean_necessity": 0.015854376537556,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.03919383314099501,
+          "mean_necessity": -0.03919383314099501,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.19031061977148056,
+          "mean_necessity": 0.19031061977148056,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.1460987851023674,
+          "mean_necessity": 0.1460987851023674,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.05637621314963326,
+          "mean_necessity": 0.05637621314963326,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.05453295631336501,
+          "mean_necessity": 0.05453295631336501,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.03508771929824561,
+      "head": 29,
+      "head_key": "L24H29",
+      "layer": 24,
+      "logprob_worse_rate": 0.7719298245614035,
+      "mean_first_logprob_delta": -0.06121415931582369,
+      "mean_first_rank_delta": 0.07894736842105263,
+      "mean_mean_logprob_delta": -0.06114760422801817,
+      "mean_sum_logprob_delta": -0.06121406102245505,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": 0.00041230578790418804,
+      "phase722_source_focus_score": 0.8284197139243284,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.11456750806731482,
+        "apple_minus_other_fruit": 0.058875827475761366,
+        "nonfruit_explicit_necessity": 0.11953295661558311,
+        "other_fruit_explicit_necessity": 0.05569168059155345,
+        "other_fruit_minus_nonfruit": -0.06384127602402966
+      }
+    },
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.0069076120542983215,
+          "mean_necessity": 0.0069076120542983215,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.05279616596148647,
+          "mean_necessity": 0.05279616596148647,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": 0.00192784066951158,
+          "mean_necessity": -0.00192784066951158,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.02748869525061713,
+          "mean_necessity": -0.02748869525061713,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.01160003118517731,
+          "mean_necessity": 0.01160003118517731,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.03827647276232761,
+          "mean_necessity": 0.03827647276232761,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": 0.018882455642927776,
+          "mean_necessity": -0.018882455642927776,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.01468048069033433,
+          "mean_necessity": -0.01468048069033433,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.05973526556044817,
+          "mean_necessity": 0.05973526556044817,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.09304997697472572,
+          "mean_necessity": 0.09304997697472572,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.012985989800654352,
+          "mean_necessity": 0.012985989800654352,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.028434325217238602,
+          "mean_necessity": 0.028434325217238602,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.008771929824561403,
+      "head": 26,
+      "head_key": "L26H26",
+      "layer": 26,
+      "logprob_worse_rate": 0.6491228070175439,
+      "mean_first_logprob_delta": -0.022225977938209678,
+      "mean_first_rank_delta": 0.017543859649122806,
+      "mean_mean_logprob_delta": -0.02227640590193627,
+      "mean_sum_logprob_delta": -0.022225997805898054,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": -3.573788368764023e-05,
+      "phase722_source_focus_score": 0.9458811866740385,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.01471469683262209,
+        "apple_minus_other_fruit": 0.010472926869988441,
+        "nonfruit_explicit_necessity": 0.07056568775035682,
+        "other_fruit_explicit_necessity": 0.004241769962633649,
+        "other_fruit_minus_nonfruit": -0.06632391778772317
+      }
+    }
+  ],
+  "most_harmful_candidate_heads": [
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.06053503475462397,
+          "mean_necessity": 0.06053503475462397,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.1083700700752388,
+          "mean_necessity": 0.1083700700752388,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": -0.01688309798163234,
+          "mean_necessity": 0.01688309798163234,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.06667027208540174,
+          "mean_necessity": -0.06667027208540174,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.06289791146749242,
+          "mean_necessity": 0.06289791146749242,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.09251863755988173,
+          "mean_necessity": 0.09251863755988173,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": -0.015854376537556,
+          "mean_necessity": 0.015854376537556,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.03919383314099501,
+          "mean_necessity": -0.03919383314099501,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.19031061977148056,
+          "mean_necessity": 0.19031061977148056,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.1460987851023674,
+          "mean_necessity": 0.1460987851023674,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.05637621314963326,
+          "mean_necessity": 0.05637621314963326,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.05453295631336501,
+          "mean_necessity": 0.05453295631336501,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.03508771929824561,
+      "head": 29,
+      "head_key": "L24H29",
+      "layer": 24,
+      "logprob_worse_rate": 0.7719298245614035,
+      "mean_first_logprob_delta": -0.06121415931582369,
+      "mean_first_rank_delta": 0.07894736842105263,
+      "mean_mean_logprob_delta": -0.06114760422801817,
+      "mean_sum_logprob_delta": -0.06121406102245505,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": 0.00041230578790418804,
+      "phase722_source_focus_score": 0.8284197139243284,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.11456750806731482,
+        "apple_minus_other_fruit": 0.058875827475761366,
+        "nonfruit_explicit_necessity": 0.11953295661558311,
+        "other_fruit_explicit_necessity": 0.05569168059155345,
+        "other_fruit_minus_nonfruit": -0.06384127602402966
+      }
+    },
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.0069076120542983215,
+          "mean_necessity": 0.0069076120542983215,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.05279616596148647,
+          "mean_necessity": 0.05279616596148647,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": 0.00192784066951158,
+          "mean_necessity": -0.00192784066951158,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.02748869525061713,
+          "mean_necessity": -0.02748869525061713,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.01160003118517731,
+          "mean_necessity": 0.01160003118517731,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.03827647276232761,
+          "mean_necessity": 0.03827647276232761,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": 0.018882455642927776,
+          "mean_necessity": -0.018882455642927776,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.01468048069033433,
+          "mean_necessity": -0.01468048069033433,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.05973526556044817,
+          "mean_necessity": 0.05973526556044817,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.09304997697472572,
+          "mean_necessity": 0.09304997697472572,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.012985989800654352,
+          "mean_necessity": 0.012985989800654352,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.028434325217238602,
+          "mean_necessity": 0.028434325217238602,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.008771929824561403,
+      "head": 26,
+      "head_key": "L26H26",
+      "layer": 26,
+      "logprob_worse_rate": 0.6491228070175439,
+      "mean_first_logprob_delta": -0.022225977938209678,
+      "mean_first_rank_delta": 0.017543859649122806,
+      "mean_mean_logprob_delta": -0.02227640590193627,
+      "mean_sum_logprob_delta": -0.022225997805898054,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": -3.573788368764023e-05,
+      "phase722_source_focus_score": 0.9458811866740385,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.01471469683262209,
+        "apple_minus_other_fruit": 0.010472926869988441,
+        "nonfruit_explicit_necessity": 0.07056568775035682,
+        "other_fruit_explicit_necessity": 0.004241769962633649,
+        "other_fruit_minus_nonfruit": -0.06632391778772317
+      }
+    },
+    {
+      "by_object_group": {
+        "apple": {
+          "mean_mean_logprob_delta": -0.011299332045018673,
+          "mean_necessity": 0.011299332045018673,
+          "n": 15
+        },
+        "nonfruit": {
+          "mean_mean_logprob_delta": -0.030583154291605297,
+          "mean_necessity": 0.030583154291605297,
+          "n": 48
+        },
+        "other_fruit": {
+          "mean_mean_logprob_delta": 0.01080284752956062,
+          "mean_necessity": -0.01080284752956062,
+          "n": 51
+        }
+      },
+      "by_prompt_type": {
+        "commonsense": {
+          "mean_mean_logprob_delta": 0.07434181372324626,
+          "mean_necessity": -0.07434181372324626,
+          "n": 18
+        },
+        "conflict_profile": {
+          "mean_mean_logprob_delta": -0.015453864794835681,
+          "mean_necessity": 0.015453864794835681,
+          "n": 24
+        },
+        "explicit_profile": {
+          "mean_mean_logprob_delta": -0.028524945202876652,
+          "mean_necessity": 0.028524945202876652,
+          "n": 72
+        }
+      },
+      "by_relation": {
+        "category": {
+          "mean_mean_logprob_delta": 0.019986574876714836,
+          "mean_necessity": -0.019986574876714836,
+          "n": 22
+        },
+        "color": {
+          "mean_mean_logprob_delta": 0.036771442344285206,
+          "mean_necessity": -0.036771442344285206,
+          "n": 22
+        },
+        "edible": {
+          "mean_mean_logprob_delta": -0.07978061027824879,
+          "mean_necessity": 0.07978061027824879,
+          "n": 16
+        },
+        "grows_on_tree": {
+          "mean_mean_logprob_delta": -0.04487798362970352,
+          "mean_necessity": 0.04487798362970352,
+          "n": 16
+        },
+        "shape": {
+          "mean_mean_logprob_delta": -0.0029662890010513365,
+          "mean_necessity": 0.0029662890010513365,
+          "n": 16
+        },
+        "taste": {
+          "mean_mean_logprob_delta": -0.013327927953758428,
+          "mean_necessity": 0.013327927953758428,
+          "n": 22
+        }
+      },
+      "condition_kind": "candidate",
+      "first_top1_drop_rate": 0.017543859649122806,
+      "head": 0,
+      "head_key": "L28H0",
+      "layer": 28,
+      "logprob_worse_rate": 0.4824561403508772,
+      "mean_first_logprob_delta": -0.00950187816475559,
+      "mean_first_rank_delta": 0.017543859649122806,
+      "mean_mean_logprob_delta": -0.009531018970743358,
+      "mean_sum_logprob_delta": -0.009501845748976242,
+      "model": "qwen3",
+      "n": 114,
+      "phase722_mean_logprob_delta": 0.0025224934506695718,
+      "phase722_source_focus_score": 0.8492387930552164,
+      "reuse_difference": {
+        "apple_explicit_necessity": 0.030526772296677034,
+        "apple_minus_other_fruit": 0.015664538376343747,
+        "nonfruit_explicit_necessity": 0.03957690008936273,
+        "other_fruit_explicit_necessity": 0.014862233920333286,
+        "other_fruit_minus_nonfruit": -0.024714666169029446
+      }
+    }
+  ],
+  "n_cases": 114,
+  "n_rows": 684
+}

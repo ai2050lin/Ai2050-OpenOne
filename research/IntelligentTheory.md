@@ -1117,12 +1117,220 @@
 				5，跨模型不可比（qwen3 样本稀疏，GLM4 标 unresolved）。
 
 
-七，最有效完整理论，以及问题硬伤和下一步
+七，条件化相对状态—生成场闭合理论，以及问题硬伤和下一步
+
+	7.0 对新整合理论的判断
+
+		理论名称：
+			条件化相对状态—生成场闭合理论。
+
+		简称：
+			相对状态生成闭合理论。
+
+		总体判断：
+			这套理论的方向基本正确，而且比“十模块理论”和“场理论”单独使用更合理。
+			它最重要的改进是把语言机制分成两个层级：
+
+				第一层：编码状态形成层。
+					解释词嵌入进入上下文后，如何形成身份、角色、关系、构式、格式、绑定、候选竞争、路径路由和条件化变换。
+
+				第二层：生成读出闭合层。
+					解释已经形成的内部状态，为什么有时能输出短值答案，有时却输出 prose、echo、continuation 或错误值。
+
+			因此，当前最准确的总命题可以写成：
+				语言不是固定概念向量的直接读出，而是词嵌入在上下文中形成条件化相对状态轨迹；
+				这个轨迹进入生成场后，经过源贡献、路线增益、值身份、残差传播、读出投影、多候选竞争和完整短语续写，最终完成或失败于生成闭合。
+
+		必须收紧的地方：
+			1，生成场中的各个场不是已经被证明的独立物理子空间，而是可测试的功能因子。
+			2，当前证据较强的是 G_route、P_format、U_channel、T_residual、R_readout、M_competition、C_continuation。
+			3，I_intent 和 V_identity 仍更像理论占位变量，尤其 V_identity 还没有找到跨样本、跨格式、跨候选可迁移的最小因果单元。
+			4，不能把这套理论解释成“所有内容都已经闭合”。它是当前最好的组织框架，仍需要 QK/V causal replacement、neuron/MLP 下钻和自然生成闭环验证。
+
+		与现有理论的关系：
+			十模块理论负责描述状态如何形成；
+			非线性理论负责解释为什么线性叠加经常失败；
+			QK/V 理论负责拆分 source contribution 内部的“看哪里”和“搬运什么”；
+			生成场理论负责解释为什么“知道答案”不等于“按目标格式输出答案”。
+
+		统一定义：
+			条件化相对状态—生成场闭合理论认为：
+				每个自回归位置的输出，不是由单个语义向量决定；
+				而是由上下文条件化状态轨迹和生成端竞争场共同决定。
+				只有当目标短语在完整短语似然上压过错误值、解释路线、格式路线、echo 路线和续写路线，才算真正生成闭合。
+
+		状态形成层公式：
+
+			h_0(p)
+				=
+				E(t_p)
+				+
+				P(p)
+
+			Z_l(p|x)
+				=
+				{
+					Rel,
+					I,
+					R,
+					C,
+					F,
+					O,
+					S,
+					A,
+					B,
+					Q,
+					N,
+					Path,
+					T
+				}_l
+
+			h_l(p)
+				=
+				Ψ_l(Z_l(p|x))
+				+
+				ε_l(p)
+
+			h_{l+1}(p)
+				=
+				h_l(p)
+				+
+				Attn_l(h_l,x,p)
+				+
+				MLP_l(h_l,x,p)
+
+			这里 Z_l 不是正交子空间列表，而是功能因子列表。真实 hidden state 更可能是非线性混合，只有在局部邻域中才能近似线性化。
+
+		生成场公式：
+
+			Φ_L(a|x)
+				=
+				{
+					S_{semantic},
+					I_{intent},
+					P_{protocol},
+					F_{format},
+					G_{route},
+					V_{identity},
+					U_{channel},
+					T_{residual},
+					R_{readout},
+					M_{competition},
+					C_{continuation}
+				}
+
+			其中 a 是 answer_start 或当前生成位置。
+
+			当前证据最强的解释是：
+				S_semantic 表示源词元或上下文是否提供目标语义支持；
+				P_protocol 和 F_format 控制是否进入短答、解释、换行、列表等输出协议；
+				G_route 表示 value/prose/continuation 等路线增益；
+				U_channel 表示源限制 attention channel 集合的贡献；
+				T_residual 表示残差轨迹如何保留、旋转、放大或压制候选状态；
+				R_readout 表示 final norm 和 lm_head 如何投影到词表；
+				M_competition 表示正确值、错误值、prose、echo、format token 的竞争；
+				C_continuation 表示第一个 token 之后的完整短语是否稳定。
+
+		源贡献公式：
+
+			C_{G_s}(l,h,c|x)
+				=
+				Σ_{t∈G_s}
+					α_{l,h}(a,t|x)
+					·
+					V_{l,h,c}(t|x)
+
+			其中 G_s 可以是 target_value、answer_line、self_last、record_line 或 all_source。
+			这个公式把“源词元是否有信息”转化为“某个 head/channel 是否把它写入答案位置”。
+
+		QK/V 因子拆分：
+
+			ΔC_g
+				=
+				ΔC_{QK}
+				+
+				ΔC_V
+				+
+				ΔC_{QK×V}
+
+			含义：
+				ΔC_QK 是寻址改变，也就是 answer_start 改变“看哪里”；
+				ΔC_V 是内容改变，也就是被看的源词元表示改变；
+				ΔC_QK×V 是寻址和内容同时改变导致的耦合项。
+
+		候选 token 竞争公式：
+
+			ell(v|x)
+				=
+				W_U(v)^T LN(h_L(a))
+				+
+				Σ_k
+					λ_k
+					ρ_k(v)
+					Φ_k(a|x)
+
+			P(v|x)
+				=
+				softmax(ell(v|x))
+
+			这里的 Φ_k 不是额外加在模型之外的真实模块，而是对模型内部可测功能因子的抽象归纳。
+
+		完整短语闭合公式：
+
+			L(y|x)
+				=
+				1/m
+				·
+				Σ_{i=1}^{m}
+					log P(y_i|x,y_{<i})
+
+			y^*
+				=
+				argmax_{y∈Y}
+					L(y|x)
+
+			GenerationClosure
+				⇔
+				L(y_target|x)
+				-
+				max_{y≠y_target} L(y|x)
+				>
+				δ
+
+			这条公式是新理论的关键：正确值在 first-token 上胜出不够，必须在完整短语级别压过 prose、wrong、echo、continuation。
+
+		blue 例子：
+			输入：
+				The cerulean fox is blue.
+				What color is the cerulean fox?
+				Answer:
+
+			流程：
+				1，E[cerulean]、E[fox]、E[blue]、E[color] 进入词嵌入层。
+				2，构式识别为属性问答，color 激活关系查询。
+				3，前文 blue 形成源词元语义支持。
+				4，answer_start 通过部分 head/channel 回看 target_value、answer_line、self_last。
+				5，源贡献进入残差轨迹，并被路线增益和协议状态调制。
+				6，final norm + lm_head 把状态投影到 blue、green、The、换行等候选。
+				7，如果 L("blue"|x) 高于 L("The cerulean fox is blue"|x) 和其他竞争短语，才输出短值 blue。
+
+			这解释了为什么模型可能“知道 blue”，但仍输出解释句：
+				S_semantic 和 V_identity 可能足够；
+				但 P_protocol、G_route 或 C_continuation 没有把输出推入短答闭合。
+
+		可证伪预测：
+			1，只增强 S_semantic，不一定改变自然输出。
+			2，只增强 G_route，会提高短值答案倾向，但不保证具体值正确。
+			3，只增强 P_protocol + F_format，可能导致空值、泛化值或 echo。
+			4，first-token 胜出不等于 generation closure，必须测完整短语。
+			5，真正的 V_identity 单元必须同时满足 sufficiency、necessity、transferability；否则只能称为 route gain 或 format gate。
 
 	7.1 当前最有效完整理论的明确陈述
 
 		理论名称：
-			相对编码—复用差分—条件化机制图谱理论（含非线性扩展）
+			条件化相对状态—生成场闭合理论（含非线性扩展）。
+
+			它吸收了原来的“相对编码—复用差分—条件化机制图谱理论”，但把生成端单独提升为生成场闭合层。
 
 		核心命题：
 			深度神经网络的语言能力不是由孤立概念向量、孤立语法模板或单个注意力头完成，

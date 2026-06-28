@@ -1,0 +1,922 @@
+{
+  "phase": 720,
+  "title": "Functional Atlas v1 Readiness and Head-to-Neuron Bridge",
+  "timestamp": "2026-06-28 15:07:10",
+  "input": "results/glm5_phase712_qkv_factor_atlas_audit/phase712_atlas_units_with_qkv.jsonl",
+  "n_nodes": 288,
+  "by_model": {
+    "deepseek7b": 96,
+    "glm4": 96,
+    "qwen3": 96
+  },
+  "by_unit_type": {
+    "attention_head": 96,
+    "attention_channel": 192
+  },
+  "by_graph_level": {
+    "head_route": 96,
+    "channel_bridge": 192
+  },
+  "by_route_role": {
+    "prose_or_format_route_carrier": 96,
+    "unresolved_or_weak": 96,
+    "short_value_route_carrier": 96
+  },
+  "by_qkv_dominant_factor": {
+    "qk_addressing": 157,
+    "mixed_coupled": 131
+  },
+  "by_model_qkv_dominant_factor": {
+    "deepseek7b": {
+      "qk_addressing": 79,
+      "mixed_coupled": 17
+    },
+    "glm4": {
+      "qk_addressing": 36,
+      "mixed_coupled": 60
+    },
+    "qwen3": {
+      "qk_addressing": 42,
+      "mixed_coupled": 54
+    }
+  },
+  "by_model_route_role": {
+    "deepseek7b": {
+      "prose_or_format_route_carrier": 96
+    },
+    "glm4": {
+      "unresolved_or_weak": 96
+    },
+    "qwen3": {
+      "short_value_route_carrier": 96
+    }
+  },
+  "measured_function_families": [
+    "object_relation_value_short_answer"
+  ],
+  "unmeasured_function_families": [
+    "fruit_identity_reuse_difference",
+    "color_value_reuse_difference",
+    "translation_language_route"
+  ],
+  "readiness": {
+    "head_level_global_atlas": {
+      "status": "ready_to_start_v1",
+      "reason": "cross-model head candidates, route roles, and QK/V factor labels already exist for one function family"
+    },
+    "channel_level_bridge": {
+      "status": "ready_for_targeted_drilldown",
+      "reason": "source-restricted channel units exist, but only inside selected high-value routes"
+    },
+    "neuron_level_global_atlas": {
+      "status": "not_ready_as_full_global_project",
+      "reason": "neuron/channel identity is not yet separable from head QK addressing, V content, W_O readout, and downstream MLP effects"
+    }
+  },
+  "small_model_caution": "all conclusions are local to tested small models and may contain architectural or scale-specific bias",
+  "top_attention_heads": [
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H25",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.4128169467116723,
+      "qkv_abs_v_share": 0.29400469242050464,
+      "qkv_sum_total_direct": 2.019804192180863,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H1",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.29580644844482157,
+      "qkv_abs_v_share": 0.35216179119052216,
+      "qkv_sum_total_direct": 1.8109508198876734,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H15",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.3197746169602279,
+      "qkv_abs_v_share": 0.34011594397342776,
+      "qkv_sum_total_direct": 1.7235427029712582,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L32_H25",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.38218993822478076,
+      "qkv_abs_v_share": 0.3089877634317515,
+      "qkv_sum_total_direct": 1.5744260553531388,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L34_H28",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.33723878248916717,
+      "qkv_abs_v_share": 0.33139568413373777,
+      "qkv_sum_total_direct": 1.310165545935021,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L34_H19",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.3213059756594127,
+      "qkv_abs_v_share": 0.33940532762354797,
+      "qkv_sum_total_direct": 1.1097012342078683,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L34_H9",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.34271840043344254,
+      "qkv_abs_v_share": 0.328676246343656,
+      "qkv_sum_total_direct": 1.0650180468643207,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H2",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.2574442601159886,
+      "qkv_abs_v_share": 0.3717645103912532,
+      "qkv_sum_total_direct": 1.0058660170610823,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L31_H19",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.3684252500287691,
+      "qkv_abs_v_share": 0.31776983018084387,
+      "qkv_sum_total_direct": 0.8915120051254474,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H26",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.40345419088010115,
+      "qkv_abs_v_share": 0.298266213661988,
+      "qkv_sum_total_direct": 0.8280402049762927,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L33_H7",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.35286571242539205,
+      "qkv_abs_v_share": 0.3233157157159843,
+      "qkv_sum_total_direct": 0.6293657707389541,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L34_H20",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.3917711447003827,
+      "qkv_abs_v_share": 0.3041147206421262,
+      "qkv_sum_total_direct": 0.5697284542556181,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    }
+  ],
+  "top_attention_channels": [
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H1_C102",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.6377857263202045,
+      "qkv_abs_v_share": 0.18119121473419442,
+      "qkv_sum_total_direct": -0.44067883313166095,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H25_C42",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.34347094455361354,
+      "qkv_abs_v_share": 0.3287051429805818,
+      "qkv_sum_total_direct": 0.417020157314371,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L32_H25_C19",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.45116273105754234,
+      "qkv_abs_v_share": 0.27441696043361635,
+      "qkv_sum_total_direct": -0.4017377198914455,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H26_C76",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.4015551136757983,
+      "qkv_abs_v_share": 0.2992914017387473,
+      "qkv_sum_total_direct": -0.38733316272896445,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H15_C101",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.24483996134838462,
+      "qkv_abs_v_share": 0.37758967609382266,
+      "qkv_sum_total_direct": -0.3820097508080262,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H25_C126",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.7600832469961508,
+      "qkv_abs_v_share": 0.12011628097257081,
+      "qkv_sum_total_direct": 0.35978507945806726,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H1_C118",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.43501473105431343,
+      "qkv_abs_v_share": 0.28265002584736876,
+      "qkv_sum_total_direct": -0.32843674982369464,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L34_H9_C79",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.5549689123092594,
+      "qkv_abs_v_share": 0.2224183757987807,
+      "qkv_sum_total_direct": -0.30790527782637866,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H25_C99",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.5226678123886686,
+      "qkv_abs_v_share": 0.23901876236921607,
+      "qkv_sum_total_direct": 0.29296282370942767,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H1_C26",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.29428074481124633,
+      "qkv_abs_v_share": 0.35287818641043506,
+      "qkv_sum_total_direct": -0.2905076269727491,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H25_C70",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "mixed_coupled",
+      "qkv_abs_qk_share": 0.3704860042092814,
+      "qkv_abs_v_share": 0.31524972248521255,
+      "qkv_sum_total_direct": 0.27626368348045105,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    },
+    {
+      "model": "qwen3",
+      "unit_id": "qwen3_L35_H1_C68",
+      "route_role": "short_value_route_carrier",
+      "evidence_level": "level6_partial_natural_generation",
+      "qkv_dominant_factor": "qk_addressing",
+      "qkv_abs_qk_share": 0.451763889738817,
+      "qkv_abs_v_share": 0.2741026284462386,
+      "qkv_sum_total_direct": -0.25458094741275517,
+      "route_gain_score": 1.0,
+      "identity_score": 1.0,
+      "format_or_prose_score": 0.0
+    }
+  ],
+  "top_attention_heads_by_model": {
+    "deepseek7b": [
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9476739223829139,
+        "qkv_abs_v_share": 0.02608890421290633,
+        "qkv_sum_total_direct": 2.0999442396901253,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H19",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9767448204067045,
+        "qkv_abs_v_share": 0.012143797151657894,
+        "qkv_sum_total_direct": 1.516377981704368,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L25_H14",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.3796789921659146,
+        "qkv_abs_v_share": 0.31018878374367903,
+        "qkv_sum_total_direct": 1.4282701707187802,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H25",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.41580869602774795,
+        "qkv_abs_v_share": 0.29210481668807775,
+        "qkv_sum_total_direct": 1.3827919497689138,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H26",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.37795927437526466,
+        "qkv_abs_v_share": 0.31163105993850226,
+        "qkv_sum_total_direct": 1.2142733749976888,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H11",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.39057022198952307,
+        "qkv_abs_v_share": 0.30471704812210526,
+        "qkv_sum_total_direct": 1.086769315723488,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      }
+    ],
+    "glm4": [
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H21",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.2000860511747452,
+        "qkv_abs_v_share": 0.399956974393,
+        "qkv_sum_total_direct": 0.17541949444366722,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H11",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.32881286407957877,
+        "qkv_abs_v_share": 0.33676112810879927,
+        "qkv_sum_total_direct": 0.15384288287130093,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H24",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.35142668143943795,
+        "qkv_abs_v_share": 0.3243043104990495,
+        "qkv_sum_total_direct": 0.1361200612691499,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H22",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.3127751197754841,
+        "qkv_abs_v_share": 0.34979561082567556,
+        "qkv_sum_total_direct": 0.10988678818016225,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L38_H15",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.3931665171208323,
+        "qkv_abs_v_share": 0.3042503073787326,
+        "qkv_sum_total_direct": 0.10331834399812898,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L36_H27",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.3307401354863227,
+        "qkv_abs_v_share": 0.33469786030331133,
+        "qkv_sum_total_direct": 0.10228427832403908,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      }
+    ],
+    "qwen3": [
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H25",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.4128169467116723,
+        "qkv_abs_v_share": 0.29400469242050464,
+        "qkv_sum_total_direct": 2.019804192180863,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H1",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.29580644844482157,
+        "qkv_abs_v_share": 0.35216179119052216,
+        "qkv_sum_total_direct": 1.8109508198876734,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H15",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.3197746169602279,
+        "qkv_abs_v_share": 0.34011594397342776,
+        "qkv_sum_total_direct": 1.7235427029712582,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L32_H25",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.38218993822478076,
+        "qkv_abs_v_share": 0.3089877634317515,
+        "qkv_sum_total_direct": 1.5744260553531388,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L34_H28",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.33723878248916717,
+        "qkv_abs_v_share": 0.33139568413373777,
+        "qkv_sum_total_direct": 1.310165545935021,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L34_H19",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.3213059756594127,
+        "qkv_abs_v_share": 0.33940532762354797,
+        "qkv_sum_total_direct": 1.1097012342078683,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      }
+    ]
+  },
+  "top_attention_channels_by_model": {
+    "deepseek7b": [
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15_C33",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9160854369194621,
+        "qkv_abs_v_share": 0.04204607431217453,
+        "qkv_sum_total_direct": 0.36629755620319704,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15_C106",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9529387942718858,
+        "qkv_abs_v_share": 0.02364147913038687,
+        "qkv_sum_total_direct": 0.3188372942546488,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15_C32",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9714818347015851,
+        "qkv_abs_v_share": 0.014526644436326234,
+        "qkv_sum_total_direct": 0.2883485387987129,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15_C30",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9200069488125868,
+        "qkv_abs_v_share": 0.03965505641139659,
+        "qkv_sum_total_direct": 0.2537763636353901,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H19_C9",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9634653377297518,
+        "qkv_abs_v_share": 0.018641477154568695,
+        "qkv_sum_total_direct": 0.25193929261604064,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      },
+      {
+        "model": "deepseek7b",
+        "unit_id": "deepseek7b_L26_H15_C23",
+        "route_role": "prose_or_format_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9373363492761826,
+        "qkv_abs_v_share": 0.031377903200379496,
+        "qkv_sum_total_direct": 0.2443213771914172,
+        "route_gain_score": 0.8055555555555556,
+        "identity_score": 0.3888888888888889,
+        "format_or_prose_score": 0.4166666666666667
+      }
+    ],
+    "glm4": [
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H21_C113",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.15859207639863476,
+        "qkv_abs_v_share": 0.42070396180068265,
+        "qkv_sum_total_direct": 0.050693544001586766,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H11_C58",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.35344116270331066,
+        "qkv_abs_v_share": 0.3251973110151073,
+        "qkv_sum_total_direct": 0.03378151787318654,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H21_C5",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.35439869841523447,
+        "qkv_abs_v_share": 0.3228006507923828,
+        "qkv_sum_total_direct": 0.027166524708498917,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L39_H11_C65",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.9195345720167669,
+        "qkv_abs_v_share": 0.040298815770936094,
+        "qkv_sum_total_direct": 0.025530272208574935,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L38_H5_C73",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.423764097538323,
+        "qkv_abs_v_share": 0.2885834611586031,
+        "qkv_sum_total_direct": 0.02307944122509742,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "glm4",
+        "unit_id": "glm4_L38_H15_C46",
+        "route_role": "unresolved_or_weak",
+        "evidence_level": "level5_phrase_likelihood",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.8993403526635364,
+        "qkv_abs_v_share": 0.0505690288593369,
+        "qkv_sum_total_direct": 0.02201004464255929,
+        "route_gain_score": 0.0,
+        "identity_score": 0.0,
+        "format_or_prose_score": 0.0
+      }
+    ],
+    "qwen3": [
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H1_C102",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.6377857263202045,
+        "qkv_abs_v_share": 0.18119121473419442,
+        "qkv_sum_total_direct": -0.44067883313166095,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H25_C42",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.34347094455361354,
+        "qkv_abs_v_share": 0.3287051429805818,
+        "qkv_sum_total_direct": 0.417020157314371,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L32_H25_C19",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.45116273105754234,
+        "qkv_abs_v_share": 0.27441696043361635,
+        "qkv_sum_total_direct": -0.4017377198914455,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H26_C76",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.4015551136757983,
+        "qkv_abs_v_share": 0.2992914017387473,
+        "qkv_sum_total_direct": -0.38733316272896445,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H15_C101",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "mixed_coupled",
+        "qkv_abs_qk_share": 0.24483996134838462,
+        "qkv_abs_v_share": 0.37758967609382266,
+        "qkv_sum_total_direct": -0.3820097508080262,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      },
+      {
+        "model": "qwen3",
+        "unit_id": "qwen3_L35_H25_C126",
+        "route_role": "short_value_route_carrier",
+        "evidence_level": "level6_partial_natural_generation",
+        "qkv_dominant_factor": "qk_addressing",
+        "qkv_abs_qk_share": 0.7600832469961508,
+        "qkv_abs_v_share": 0.12011628097257081,
+        "qkv_sum_total_direct": 0.35978507945806726,
+        "route_gain_score": 1.0,
+        "identity_score": 1.0,
+        "format_or_prose_score": 0.0
+      }
+    ]
+  },
+  "function_families": [
+    {
+      "function_family": "object_relation_value_short_answer",
+      "current_status": "measured_micro_atlas",
+      "current_evidence": "Phase 698-712: source contribution, channel split, phrase likelihood, partial natural generation, QK/V factor backfill",
+      "scope": "object relation value route at answer_start"
+    },
+    {
+      "function_family": "fruit_identity_reuse_difference",
+      "current_status": "not_measured_yet",
+      "current_evidence": "requires new global functional atlas run",
+      "scope": "apple/banana/orange/grape/etc. shared and differential route map"
+    },
+    {
+      "function_family": "color_value_reuse_difference",
+      "current_status": "not_measured_yet",
+      "current_evidence": "requires new global functional atlas run",
+      "scope": "red/blue/green/yellow/etc. shared and differential route map"
+    },
+    {
+      "function_family": "translation_language_route",
+      "current_status": "not_measured_yet",
+      "current_evidence": "requires new global functional atlas run",
+      "scope": "source language, target language, lexical value, grammar/format route split"
+    }
+  ],
+  "next_phase": {
+    "phase": 721,
+    "title": "Global Functional Head Atlas Data Expansion",
+    "same_stage_as_phase720": true,
+    "objective": "expand from one measured value-route family to multiple function families before neuron-level global atlas",
+    "suggested_function_sets": [
+      "fruit identity and category reuse/difference",
+      "color value reuse/difference",
+      "translation source/target language route",
+      "simple grammar protocol route"
+    ],
+    "minimum_evidence_per_unit": [
+      "observational source contribution",
+      "head/channel route score",
+      "QK/V factor split",
+      "causal patch on top units",
+      "phrase likelihood or natural generation closure check"
+    ]
+  }
+}

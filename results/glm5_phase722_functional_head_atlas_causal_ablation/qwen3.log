@@ -1,0 +1,152 @@
+[15:41:40] qwen3: cases=96, top_heads_per_family=3
+`torch_dtype` is deprecated! Use `dtype` instead!
+[model_utils] Loading qwen3... (8bit=False)
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 21101.15it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[15:41:44] qwen3: color_value_reuse_difference 8/24 cases; rows=48
+[15:41:46] qwen3: color_value_reuse_difference 16/24 cases; rows=96
+[15:41:48] qwen3: color_value_reuse_difference 24/24 cases; rows=144
+[15:41:51] qwen3: fruit_identity_reuse_difference 8/24 cases; rows=192
+[15:41:53] qwen3: fruit_identity_reuse_difference 16/24 cases; rows=240
+[15:41:55] qwen3: fruit_identity_reuse_difference 24/24 cases; rows=288
+[15:41:57] qwen3: simple_grammar_protocol_route 8/24 cases; rows=336
+[15:42:00] qwen3: simple_grammar_protocol_route 16/24 cases; rows=384
+[15:42:02] qwen3: simple_grammar_protocol_route 24/24 cases; rows=432
+[15:42:04] qwen3: translation_language_route 8/24 cases; rows=480
+[15:42:06] qwen3: translation_language_route 16/24 cases; rows=528
+[15:42:08] qwen3: translation_language_route 24/24 cases; rows=576
+[model_utils] GPU memory released, allocated=8.11 GB
+{
+  "model": "qwen3",
+  "most_harmful_candidate_heads": [
+    {
+      "condition_kind": "candidate",
+      "function_family": "simple_grammar_protocol_route",
+      "head": 0,
+      "head_key": "L28H0",
+      "layer": 28,
+      "logprob_worse_rate": 0.6666666666666666,
+      "mean_logprob_delta": -0.012987683886118854,
+      "mean_margin_delta": -0.15625,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 1.1737170815467832,
+      "top1_drop_rate": 0.041666666666666664
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "simple_grammar_protocol_route",
+      "head": 4,
+      "head_key": "L23H4",
+      "layer": 23,
+      "logprob_worse_rate": 0.625,
+      "mean_logprob_delta": -0.002370837794539208,
+      "mean_margin_delta": -0.041666666666666664,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.984827200571696,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "color_value_reuse_difference",
+      "head": 23,
+      "head_key": "L21H23",
+      "layer": 21,
+      "logprob_worse_rate": 0.8333333333333334,
+      "mean_logprob_delta": -0.002261008368805051,
+      "mean_margin_delta": -0.22395833333333334,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.7431564331054689,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 29,
+      "head_key": "L24H29",
+      "layer": 24,
+      "logprob_worse_rate": 0.6666666666666666,
+      "mean_logprob_delta": -0.002258864253235515,
+      "mean_margin_delta": -0.11979166666666667,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.8461528409970924,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 11,
+      "head_key": "L29H11",
+      "layer": 29,
+      "logprob_worse_rate": 0.4166666666666667,
+      "mean_logprob_delta": -3.703633835054158e-05,
+      "mean_margin_delta": 0.015625,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.7819308290878931,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "fruit_identity_reuse_difference",
+      "head": 26,
+      "head_key": "L26H26",
+      "layer": 26,
+      "logprob_worse_rate": 0.5833333333333334,
+      "mean_logprob_delta": -3.573788368764023e-05,
+      "mean_margin_delta": -0.005208333333333333,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9458811866740385,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 0,
+      "head_key": "L28H0",
+      "layer": 28,
+      "logprob_worse_rate": 0.25,
+      "mean_logprob_delta": 1.7263353583985008e-05,
+      "mean_margin_delta": 0.11458333333333333,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9079301878809928,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "fruit_identity_reuse_difference",
+      "head": 29,
+      "head_key": "L24H29",
+      "layer": 24,
+      "logprob_worse_rate": 0.4583333333333333,
+      "mean_logprob_delta": 0.00041230578790418804,
+      "mean_margin_delta": 0.1875,
+      "mean_rank_delta": 0.0,
+      "model": "qwen3",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.8284197139243284,
+      "top1_drop_rate": 0.0
+    }
+  ],
+  "n_rows": 576
+}

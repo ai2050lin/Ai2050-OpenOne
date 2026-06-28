@@ -1,0 +1,152 @@
+[15:42:10] glm4: cases=96, top_heads_per_family=3
+`torch_dtype` is deprecated! Use `dtype` instead!
+[model_utils] Loading glm4... (8bit=False)
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights: 100%|██████████| 443/443 [00:00<00:00, 45571.25it/s]
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
+[15:42:16] glm4: color_value_reuse_difference 8/24 cases; rows=48
+[15:42:18] glm4: color_value_reuse_difference 16/24 cases; rows=96
+[15:42:21] glm4: color_value_reuse_difference 24/24 cases; rows=144
+[15:42:24] glm4: fruit_identity_reuse_difference 8/24 cases; rows=192
+[15:42:27] glm4: fruit_identity_reuse_difference 16/24 cases; rows=240
+[15:42:30] glm4: fruit_identity_reuse_difference 24/24 cases; rows=288
+[15:42:33] glm4: simple_grammar_protocol_route 8/24 cases; rows=336
+[15:42:36] glm4: simple_grammar_protocol_route 16/24 cases; rows=384
+[15:42:39] glm4: simple_grammar_protocol_route 24/24 cases; rows=432
+[15:42:42] glm4: translation_language_route 8/24 cases; rows=480
+[15:42:45] glm4: translation_language_route 16/24 cases; rows=528
+[15:42:48] glm4: translation_language_route 24/24 cases; rows=576
+[model_utils] GPU memory released, allocated=18.85 GB
+{
+  "model": "glm4",
+  "most_harmful_candidate_heads": [
+    {
+      "condition_kind": "candidate",
+      "function_family": "fruit_identity_reuse_difference",
+      "head": 19,
+      "head_key": "L24H19",
+      "layer": 24,
+      "logprob_worse_rate": 0.875,
+      "mean_logprob_delta": -0.010591890352467695,
+      "mean_margin_delta": -0.044270833333333336,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9567797735217027,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 28,
+      "head_key": "L29H28",
+      "layer": 29,
+      "logprob_worse_rate": 0.625,
+      "mean_logprob_delta": -0.008556149822349349,
+      "mean_margin_delta": -0.0546875,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9514587190545473,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 10,
+      "head_key": "L23H10",
+      "layer": 23,
+      "logprob_worse_rate": 0.6666666666666666,
+      "mean_logprob_delta": -0.005189729117167492,
+      "mean_margin_delta": -0.08072916666666667,
+      "mean_rank_delta": -0.041666666666666664,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9484582234484453,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "fruit_identity_reuse_difference",
+      "head": 28,
+      "head_key": "L29H28",
+      "layer": 29,
+      "logprob_worse_rate": 0.4166666666666667,
+      "mean_logprob_delta": 0.0014934688806533813,
+      "mean_margin_delta": 0.005208333333333333,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9716919089357058,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "color_value_reuse_difference",
+      "head": 28,
+      "head_key": "L29H28",
+      "layer": 29,
+      "logprob_worse_rate": 0.375,
+      "mean_logprob_delta": 0.001919469020018975,
+      "mean_margin_delta": -0.026041666666666668,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.934402217467626,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "color_value_reuse_difference",
+      "head": 18,
+      "head_key": "L29H18",
+      "layer": 29,
+      "logprob_worse_rate": 0.20833333333333334,
+      "mean_logprob_delta": 0.0034882488350073495,
+      "mean_margin_delta": 0.07291666666666667,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.8739830454190571,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "translation_language_route",
+      "head": 26,
+      "head_key": "L23H26",
+      "layer": 23,
+      "logprob_worse_rate": 0.375,
+      "mean_logprob_delta": 0.0045957033095570905,
+      "mean_margin_delta": 0.078125,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9250485921899477,
+      "top1_drop_rate": 0.0
+    },
+    {
+      "condition_kind": "candidate",
+      "function_family": "fruit_identity_reuse_difference",
+      "head": 18,
+      "head_key": "L29H18",
+      "layer": 29,
+      "logprob_worse_rate": 0.2916666666666667,
+      "mean_logprob_delta": 0.006440567163129647,
+      "mean_margin_delta": 0.059895833333333336,
+      "mean_rank_delta": 0.0,
+      "model": "glm4",
+      "n": 24,
+      "rank_worse_rate": 0.0,
+      "source_focus_score": 0.9598077187935511,
+      "top1_drop_rate": 0.0
+    }
+  ],
+  "n_rows": 576
+}
