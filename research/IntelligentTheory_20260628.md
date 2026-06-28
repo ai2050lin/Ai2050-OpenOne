@@ -528,8 +528,289 @@
 
 
 
+六，非线性理论体系
 
-六，研究阶段历史记录
+	为什么需要单独的非线性理论体系：
+		早期研究（Phase 301-594）主要用线性子空间、方向投影、activation patching 分析语言编码。
+		但大量证据表明，语言编码的核心机制不能用线性叠加描述：
+			1，Phase 27 发现属性条件依赖但线性可分 —— 局部线性、全局非线性。
+			2，Phase 34 发现所有方向在 Jacobian 链中被快速旋转 —— 不存在贯穿全模型的稳定方向。
+			3，Phase 39 发现 RMSNorm 在小扰动下掩盖各向异性，存在临界值 α*。
+			4，Phase 141 发现语言算子非交换，形成非交换代数。
+			5，Phase 301-312 发现 DS7B 的 full_delta 因果效力≈0 但分量 R_only 强 —— 非线性抵消。
+			6，Phase 633 发现多 writer 线性叠加 restore 不超单 writer —— softmax 归一化墙。
+		因此，非线性理论体系是理解语言编码机制的核心，不是附属。
+
+	6.1 流形拓扑基础（Phase 20-22, 141）
+
+		核心事实1：语言流形极低维
+			dim(M_language) ≈ 65-75 << d_model ≈ 2560-4096
+			参与率 PR ≈ 2-5%
+			含义：大部分 R^d 方向是冗余的，语言只使用 2-5% 的维度。
+			这是整个微分几何框架的基础 —— 如果 hidden state 在极低维流形上运动，
+			那么 Jacobian、向量场、联络等微分几何工具才有意义。
+
+		核心事实2：语法角色是共享语义流形上的纤维结构
+			语言表示不是"语义 + 正交语法轴"，而是"共享语义流形 + 低维语法纤维"：
+				h_role(x) = M_l(x) + δ_role(x)
+			其中 M_l(x) 是共享语义流形坐标，δ_role 是角色特异纤维偏移。
+			切空间分析：
+				nsubj-poss 共享切空间（d_G ≈ 0.001）→ 同一语义角色
+				amod 切空间与 nsubj/dobj 近正交 → 修饰语是独立子空间
+			流形是弯曲的：
+				geodesic 距离 > euclidean 距离
+				amod 的 geo/eucl factor ≈ 2.0 → 流形弯曲最大
+
+		核心事实3：属性编码矩阵的列不正交
+			Phase 27 修正模型：
+				h = b + A @ v(c) + ε
+			其中 v(c) 是概念属性向量，A 是属性编码矩阵。
+			关键：A 的列不正交！
+				cos(A[:,edible], A[:,color_red]) ≈ 0.5
+			这解释了：
+				条件解耦失败：d(edible|红色) ≠ d(edible|绿色)，因为 A 的列不正交
+				线性可分：线性边界存在（h = A@v + ε）
+				局部线性/全局非线性：同类概念 v 相近，A@v 在局部线性；跨类 v 差异大，全局非线性
+			与信息论的联系：A 的列不正交 → 属性间有信息冗余 → 率失真理论 → 过完备字典
+
+	6.2 Jacobian 链与扰动传播（Phase 32-34）
+
+		这是从"找方向"到"测算子"的范式转换。
+
+		Jacobian 链定义：
+			δ_{l+k} ≈ J_{l+k-1} · J_{l+k-2} · ... · J_l · δ_l
+		其中 J_l = ∂h_{l+1}/∂h_l 是第 l 层的 Jacobian 矩阵。
+
+		核心发现1：算子一致性 —— 模型间差异
+			Qwen3/GLM4：全层 CV < 0.15 → Jacobian 近似 input-independent → 近似线性算子
+			DS7B：中间层（L6-L21）CV > 0.3 → Jacobian 显著 input-dependent → 非线性算子
+			含义：在 Qwen3/GLM4 中梯度方向接近全局因果方向；在 DS7B 中不是。
+
+		核心发现2：旋转放大器模型
+			||J · δ|| > ||δ||（放大 4-25 倍）
+			但 cos(J · δ, δ) → 0.1（方向被强烈旋转）
+			无论注入 probe 方向、lm_head 方向还是 random 方向，经过几层传播后方向都大幅旋转。
+			cos(original, delta) 从 ~0.9 降到 ~0.1。
+			结论：不存在贯穿全模型的稳定方向 —— 语义是 Jacobian 链对信号的变换结果，不是 h 中的某个方向。
+
+		核心发现3：lm_head 方向是真正的因果管道
+			lm_head_edible 方向对 edible logit 的效应远超 probe 方向（5-9 倍）。
+			即使在浅层注入，lm_head 方向也有效。
+			因果路径：h → Jacobian 链 → h_{L-1} → W_U → logit
+			W_U 定义"读出方式"（哪些维度被映射到 logit）
+			Jacobian 链定义"传播方式"（信号如何从 h_l 到 h_{L-1}）
+			两者共同决定因果。
+
+		核心发现4：组合传播的非线性
+			扰动被指数放大：ε=0.01 的扰动经过 8 层传播后范数增大 10-600 倍。
+			语法约束组合的 nl_ratio（非线性比）随层深递增：
+				早期层几乎线性（nl_ratio ≈ 0.11-0.19）
+				深层强非线性（nl_ratio ≈ 0.73-0.92）
+			不同约束类型组合机制不同：
+				否定+被动：早期近乎线性（0.99）→ 正交约束
+				否定+时态：从一开始非线性（0.65）→ 交互作用
+			约束越多，非线性越强：三重组合深层 nl_ratio ≈ 0.78-0.89。
+			结论：语法约束不是简单叠加，而是通过非线性算子交互。
+
+	6.3 RMSNorm-Jacobian 动力学（Phase 39）
+
+		理论模型：
+			δh^{l+1} = D_norm · J_l · δh^l
+		其中：
+			D_norm（归一化层）：投影 + 缩放，在 h 正交子空间中近似各向同性
+			J_l（Jacobian）：各向异性放大器，margin 方向被放大 50-75 倍
+
+		RMSNorm 的 Jacobian：
+			J_norm = g/||x|| · (I - x x^T / ||x||^2)
+		这是投影矩阵：沿 x 方向 kill 扰动，在正交子空间中等效。
+		关键：Norm 不是纯各向同性投影器，而是"方向依赖投影器"。
+
+		三个可证伪预测及验证：
+			P1: 存在 α* 临界值
+				α < α* → 各向同性（RMSNorm 掩盖各向异性）
+				α > α* → 各向异性显现
+				验证：α* ≈ 0.001-0.005，三模型一致 ✓
+			P2: 更多 RMSNorm 层 = 更强方向掩盖
+				验证：r(n_norms, DER) = -0.895, p = 0.04 ✓
+				从 L7 的 7x 到 L27 的 56x，方向效应随注入深度急剧增强。
+			P3: 绕过 norm = 更强 DER
+				验证：raw sensitivity 放大 6-11x，但 DER 比率效应不一致（部分确认）
+
+		结构对齐 vs 功能对齐：
+			结构对齐（Spectral）：Jacobian top direction 对齐 W_U[top_tok]（3-4x）—— 弱但真实
+			功能对齐（Functional）：margin 方向被强烈放大（65x）—— 强
+			为什么增益最高 ≠ 谱结构指向？
+				Jacobian top singular vector 最大化 ||Jx||（总输出范数）
+				margin 方向最大化 W_U[top]·Jx - W_U[second]·Jx（特定 1-D 投影）
+				这是不同的优化目标。
+			结论：训练产生了两种对齐，结构对齐弱，功能对齐强。
+
+	6.4 非线性算子与非交换代数（Phase 141）
+
+		核心事实1：V_not 是非线性算子
+			V_not(h) = h(not(x)) - h(x) 是否定算子。
+			方向一致性 < 0.5 → 不是平移算子
+			h 相关性 0.33-0.39 → V_not(h) 强烈依赖 h → 流形有曲率
+			结论：排除了"语言 = 向量加法"假设，证实了"语言 = 非线性算子"假设。
+
+		核心事实2：语言算子非交换
+			使用 scope 歧义句构造真正的交换子 [A,B] = AB - BA：
+				[ALL, NOT] ≠ 0："不是所有" vs "所有都不"
+				[ALWAYS, NOT] ≠ 0："不总是" vs "总是不"
+				[SOME, NOT] ≠ 0："没有一些" vs "有些不"
+			非交换比例：100%（Qwen3 27/27，GLM4 24/24）
+			SOME_NOT 相对交换子最大（≈1.0）→ 存在量词与否定最不兼容
+			结论：语言算子形成非交换代数，不是简单线性空间。
+
+		数学含义：
+			语言操作不能用简单的向量加法描述。
+			操作顺序影响结果（[A,B] ≠ 0），需要用非交换算子代数刻画。
+			这与量子力学的数学结构有形式相似性，但不应过度物理隐喻。
+
+	6.5 非线性抵消与差分读取（Phase 301-312）
+
+		核心现象：DS7B 的非线性抵消
+			full_delta 因果效力 ≈ 0（+0.008）
+			但 R_only 因果效力 = +0.177
+			→ 分量 > 整体！说明 activation patching 的非线性效应。
+			→ R 方向命中了更敏感的子空间，full_delta 中的 C 成分经后续层变换后产生反向效果。
+
+		两种编码架构的因果验证：
+			架构A（Qwen3/GLM4）：正交子空间编码
+				R ⊥ C ⊥ O，cos < 0.3
+				O_clean_R ≈ O_not，单位因果效力相近
+				直接映射：各功能方向独立影响输出
+				机制：分布式编码，各功能有独立子空间
+			架构B（DS7B）：共享主方向 + 差分读取
+				cos(O, R) ≈ -0.99（高度重叠）
+				O_clean_R/O_not 范数比 = 0.11，但单位因果效力 × 114
+				差分映射：高范数共享成分无因果，低范数差分被高增益读取
+				机制：1 维压缩 + 差分放大，功能区分依赖微小残差
+
+		完整数学模型：
+			h_l(token) = I_l(token) + R_l(role)·α_R(l) + C_l(construction)·α_C(l) + O_l(operator)·α_O(l) + interactions + U_l
+			架构A：R⊥C⊥O, α≈1, 直接因果
+			架构B：R≈-O, α_R >> α_O, 因果由 δ = O - Proj_R(O) 决定
+			因果效力 = ||W_U · δ|| / ||δ||
+				架构A：δ≈O，因果效力中等
+				架构B：δ 仅 11% 范数，但因果效力 × 114
+
+		关键洞察：
+			非线性抵消意味着"整体 ≠ 部分之和"。
+			在 DS7B 中，方向投影看到的"主成分"可能恰恰是无因果的共享成分，
+			真正起作用的是被高增益读取的微小差分。
+			这直接挑战了所有基于"方向投影强度"的因果推断。
+
+	6.6 SiLU 非线性分解（Phase 342-347）
+
+		W_down 通道投影 50/50 对称：
+			正通道比例 ≈ 50.03%，负通道 ≈ 49.97%（三模型一致）
+			投影平衡比 ≈ 1.000，范数平衡比 ≈ 1.000
+			含义：W_down 列向量对任意方向 d 呈精确 50/50 对称，
+			没有哪个方向被系统性偏好。
+			这是"平衡放大"的根本原因 —— 不是训练结果，而是 W_down 的结构性质。
+
+		SiLU 非线性只占 13-17%：
+			交互项的 ~85% 来自线性交叉效应（gate_diff × up_diff 的组合）
+			SiLU 非线性只贡献交互项的 13-17%
+			含义：交互不是来自 SiLU 的弯曲，而是 gate 和 up 同时变化时的"乘积效应"
+
+		微偏置模型：
+			微偏置 ≈ Σ_i channel_proj[i] × Δact[i]
+			其中 Δact[i] = SiLU(gate_c[i])·up_c[i] - SiLU(gate_r[i])·up_r[i]
+			因为 channel_proj 正负完美对称，微偏置完全取决于激活差异 Δact 在正负通道上的不对称性。
+
+	6.7 softmax 竞争归一化（Phase 632-713，最新）
+
+		这是当前最关键的非线性瓶颈。
+
+		线性差分场公式（Phase 632 提出）：
+			M_prefix = dot(W[prefix] - W[competitor], h_final)
+			ΔM_prefix ≈ Σ_writers dot(W[prefix] - W[competitor], Δh_writer)
+		假设：多 writer 的差分贡献可以线性叠加。
+
+		Phase 633 的失败：
+			top12 restore 没有超过 top1。
+			这强烈暗示非线性耦合使线性叠加失效。
+			多 writer 线性叠加碰到了 softmax 的归一化墙。
+
+		深层问题：
+			Transformer 的真实算子：softmax 注意力（非线性竞争）+ MLP（逐 token 非线性）+ 残差（线性）
+			理论的线性差分框架只抓住了残差的线性部分，
+			没有描述 softmax 归一化导致的竞争性相变。
+			softmax 归一化使"寻址"本质是概率竞争，不是线性加权。
+			"复用骨架"在不同条件下不是简单线性叠加，而是概率分布的重新归一化。
+
+		突破方向：从线性差分场升级为 pre-softmax 概率竞争场
+			把 ΔM ≈ Σ<·, Δh_w> 改写为以 attention logit（pre-softmax）为变量的差分，
+			验证"多 writer 在 pre-softmax 上线性叠加，经 softmax 后非线性放大"能否解释 top12 < top1。
+
+	6.8 非线性理论体系统一公式
+
+		流形约束：
+			dim(M_language) ≈ 65-75 << d_model
+			h_role(x) = M_l(x) + δ_role(x)
+			h = b + A @ v(c) + ε,  A 的列不正交
+
+		Jacobian 链传播：
+			δ_{l+k} ≈ J_{l+k-1} · ... · J_l · δ_l
+			||J·δ|| > ||δ||（放大）但 cos(J·δ, δ) → 0.1（旋转）
+			δh^{l+1} = D_norm · J_l · δh^l
+			J_norm = g/||x|| · (I - x x^T / ||x||^2)
+
+		非线性算子：
+			V_op(h) = h(op(x)) - h(x),  V_op 依赖 h（流形有曲率）
+			[A, B] = AB - BA ≠ 0（非交换代数）
+
+		非线性抵消：
+			因果效力 = ||W_U · δ|| / ||δ||
+			δ = O - Proj_R(O)（差分读取）
+			架构B：δ 仅 11% 范数，但因果效力 × 114
+
+		MLP 非线性分解：
+			微偏置 ≈ Σ_i channel_proj[i] × Δact[i]
+			Δact[i] = SiLU(gate_c[i])·up_c[i] - SiLU(gate_r[i])·up_r[i]
+			SiLU 非线性贡献 13-17%，线性交叉贡献 85%
+
+		softmax 竞争：
+			P(x_{t+1} | x_{≤t}) = softmax(W_U h_{L,t})
+			ΔM_prefix ≈ Σ_writers <W_prefix - W_competitor, Δh_w>（线性近似，在 softmax 墙前失效）
+			完整形式需要 pre-softmax logit 空间的差分（尚未建立）
+
+	6.9 非线性理论的硬伤与边界
+
+		1，Jacobian 数值不稳定（Phase 141）
+			eps=1e-4 可能太小，末层出现异常极大值（>10^6）。
+			需要改用 autograd 或增大 eps。
+
+		2，流形维数估计的上界问题
+			PR=67-75 是基于 200 个句子的估计，句子不够多样时 PR 可能被低估。
+			需要 >500 句子验证。
+
+		3，DS7B 的非线性来源不明
+			DS7B 中间层 CV > 0.3 可能是 8bit 量化的 artifact，也可能是模型架构差异。
+			需要对比 8bit vs 16bit 的 DS7B。
+
+		4，交换子实验的句子差异
+			AB 和 BA 不仅是算子顺序不同，句子本身也不同。
+			差异可能来自句子结构而非纯粹算子非交换性。
+
+		5，lm_head 方向的"强效应"可能是 trivial 的
+			W_U 直接连接 h 和 logit → 沿 W_U 方向扰动当然直接影响 logit。
+			这不是"发现了因果机制"，只是确认了模型的基本计算图。
+
+		6，线性差分场与 softmax 归一化的冲突尚未解决
+			Phase 633 的 top12 < top1 失败指向 softmax 归一化墙，
+			但 pre-softmax 概率竞争场的数学形式尚未建立。
+
+		7，跨模型非线性差异巨大
+			Qwen3/GLM4 近似线性算子，DS7B 非线性算子。
+			不能把一个模型的非线性结论直接提升为通用理论。
+
+
+
+
+七，研究阶段历史记录
 		阶段一：基础方向分解与操作符机制（Phase 301-312）
 			核心任务：
 				分解 identity、role、frame、construction、operator、scope、norm、position。
@@ -661,67 +942,329 @@
 			最关键的新瓶颈是：
 				从已经出现的 Level 4 source-channel component causal evidence，推进到自然生成闭环 Level 6，并进一步把 channel ensemble 拆到 neuron / MLP / residual trajectory 级别。
 
+		阶段十一：相对编码—复用差分—条件化机制图谱理论（Phase 708-713）
+			核心任务：
+				把 Phase 595-707 的局部读出机制整合为全局理论，系统化三段式理论：
+					相对编码（Phase 63/64）→ 复用差分（Phase 632）→ 条件化机制图谱（Phase 646/711/712）。
+			重要进展：
+				1，Phase 708-710 把自然写入机制从 source-channel 推进到 Q/K addressing、V content、o_proj input、post-attn residual、MLP modulation 的因子拆分。
+				2，Phase 711 完成机制图谱 v0 初始化，定义图谱节点 schema：G={u_i, r_i, s_i, e_i}，区分 attention_head 和 attention_channel，标注跨模型差异（qwen3=short_value_route_carrier，DS7B=prose/format route carrier，GLM4=unresolved）。
+				3，Phase 712 开始 QK-V 因子图谱审计，把寻址结构和值内容搬运分开。
+				4，Phase 713 对三段式理论做系统总结，给出统一数学公式，以词嵌入为例走完相对编码→复用差分→条件化图谱的完整计算流程。
+			核心成果：
+				理论收敛为"相对编码—复用差分—条件化机制图谱理论"：
+					深度神经网络的语言能力来自同一参数骨架在不同输入边界和语义条件下生成的状态轨迹；
+					这些轨迹不是孤立正确状态，而是 atlas 节点；
+					语言生成 = 状态轨迹进入词表竞争后的自回归执行。
+			关键硬伤：
+				1，线性叠加公式 ΔM ≈ Σ<·, Δh_w> 与非线性 Transformer 不兼容（Phase 633 的 top12 < top1 失败）。
+				2，相对编码未真正证伪点编码（Mantel 相关显著只说明距离结构被保留，不能排除绝对向量恰好诱导相似距离结构）。
+				3，条件化图谱目前是索引系统非机制理论（多数节点共享同一组自然生成证据，无单元级因果证明）。
+				4，图谱的"边"定义不清（是 Δh 内积？patch 依赖图？因果 do-calculus？三处混用）。
+				5，跨模型不可比（qwen3 样本稀疏，GLM4 标 unresolved）。
 
-七，当前整体进展和下一步
-		当前理论整体进展：
-			如果把“机制闭合度”而不是“AGI 完成度”作为评估标准，当前语言编码机制大约处于 60% 到 65%。
-			原因是：
-				1，已经从静态语义方向推进到条件化残差轨迹；
-				2，已经找到部分 component-level 因果结构；
-				3，已经明确语义状态、格式协议、读出路线、自然生成门不是同一个东西；
-				4，但还没有完成自然生成闭环；
-				5，还没有把通道级机制稳定拆到神经元/MLP 级；
-				6，跨模型结果仍受小模型结构偏差和样本规模限制。
 
-		语言编码机制的当前版本：
-			语言不是把“概念向量”直接投影成词，而是在每个自回归位置形成一个条件化状态：
-				对象身份被局部上下文锚定；
-				关系和规则决定查询路线；
-				格式协议决定答案形态；
-				源词元贡献提供路线增益；
-				候选短语在读出端竞争；
-				生成门决定最终是短值、解释、续写还是失败。
+七，最有效完整理论，以及问题硬伤和下一步
 
-		智能理论的当前版本：
-			智能不是单纯存储知识，而是一个可复用差分系统。
-			同一批参数可以在不同任务中承担不同功能，关键在于：
-				1，上下文如何激活路线；
-				2，差分状态如何选择候选；
-				3，读出门如何把内部状态变成外部语言；
-				4，反馈如何让系统更新关系图谱。
+	7.1 当前最有效完整理论的明确陈述
 
-		对应数学体系的当前版本：
-			最小闭环应包含四类方程：
-				1，状态分解方程：h_l(p) = I + R + F + C + O + S + K + B + Q + N + ε。
-				2，层间变换方程：h_{l+1}=h_l+A_l+M_l。
-				3，源贡献方程：C_g=Σ attention·value。
-				4，短语竞争方程：winner=argmax{L_target,L_donor,L_prose}。
+		理论名称：
+			相对编码—复用差分—条件化机制图谱理论（含非线性扩展）
 
-			当前最重要的数学问题不是再找一个更漂亮的向量，而是找出：
-				哪些维度负责身份；
-				哪些维度负责路线；
-				哪些维度负责格式；
-				哪些维度只是在读出端放大或抑制；
-				这些维度如何在层间被 attention / MLP 重新组合。
+		核心命题：
+			深度神经网络的语言能力不是由孤立概念向量、孤立语法模板或单个注意力头完成，
+			而是由同一参数骨架在不同输入边界和语义条件下生成不同状态轨迹。
+			这些状态轨迹在极低维流形上运动，经过非线性算子变换、Jacobian链旋转放大、
+			RMSNorm各向异性调制，最终进入softmax概率竞争，形成自回归执行。
+			语言生成不是简单读出知识，而是状态轨迹进入词表竞争后的非线性自回归执行。
 
-		接下来应该做的阶段性大任务：
-			Phase 709 应该进入 patched natural generation identity closure audit。
-			核心目标不是继续看 teacher-forced likelihood，而是在 patch 后直接生成短输出，并分类为：
-				target value；
-				donor value；
-				prose explanation；
-				continuation failure；
-				other。
+		理论的两层结构：
 
-			关键判据：
-				如果 patch 后自然生成稳定转向 target value，说明当前 route/readout substrate 已经能闭合到真实生成。
-				如果仍主要生成 prose，说明缺口在 generation gate。
-				如果 donor value 大量出现，才说明 source channel ensemble 可能携带可迁移 donor identity。
-				如果三者都不稳定，说明小模型路线受 prompt/protocol 偏置太强，需要扩大样本和模型对照。
+			第一层（线性/局部线性部分，已较成熟）：
+				相对编码：概念不是固定坐标点，而是在关系网络中的相对差异。
+				复用差分：同一残差骨架被复用，base→repair差分改变读出边际。
+				条件化图谱：机制节点G={u_i, r_i, s_i, e_i}，节点状态是条件B的函数。
+				这一层用线性叠加近似有效，但只在局部邻域和单点patch中成立。
 
-			再下一步的大方向：
-				1，把 source channel ensemble 拆到 neuron / MLP / residual trajectory 级别。
-				2，建立跨模型的 graph atlas，不再只追单点机制。
-				3，把知识网络、推理能力、语法系统分别映射为可测试的对象-关系-路线-读出图谱。
-				4，在更大样本和更稳定模型上验证小模型发现是否只是结构偏差。
-				5，把当前语言机制公式扩展为可学习、可编辑、可反馈更新的智能理论。
+			第二层（非线性部分，当前瓶颈所在）：
+				流形约束：dim(M)≈65-75 << d_model，h在低维弯曲流形上运动。
+				Jacobian链：δ_{l+k}≈J_{l+k-1}·...·J_l·δ_l，放大但旋转，无贯穿全模型的方向。
+				RMSNorm动力学：δh^{l+1}=D_norm·J_l·δh^l，存在α*临界值掩盖各向异性。
+				非交换代数：语言算子[A,B]≠0，操作顺序影响结果。
+				非线性抵消：full_delta效力≈0但分量强，"整体≠部分之和"。
+				softmax竞争：多writer线性叠加在softmax归一化墙前失效。
+				这一层解释了为什么线性patching经常失败，是当前理论的 frontier。
+
+		理论的最简形式化：
+			输入 x = (F, C, R, O, G, B)
+			状态轨迹 h_l = Φ_l(h_{l-1}, x)  其中 Φ_l 含注意力softmax + MLP非线性 + RMSNorm
+			读出 P(x_{t+1}|x_{≤t}) = softmax(W_U · LN(h_{L,t}))
+			机制图谱 G = {u_i, r_i, s_i(B), e_i}  节点状态依赖条件B
+			关键：从h_l到P的非线性变换链不能用线性差分叠加完整描述。
+
+	7.2 完整计算例子
+
+		任务设定：
+			问题："What color is the cerulean_fox?"
+			目标值 v_target = "blue"
+			竞争值 v_prose = "The cerulean fox is blue"（prose解释）
+			格式协议 B_inline（" Answer:"内联）vs B_multi（"\nAnswer:"多行）
+			模型：以DS7B为参照（28层，d_model=4096）
+
+		以下走完从输入到输出的完整计算流程，标注每步对应的方程和Phase证据。
+
+		Step 1: 输入分解与流形约束
+			x = (F="QA格式", C="cerulean_fox", R="color", O="answer_start", G="短答", B="inline")
+			嵌入后 h_0 ∈ R^4096，但实际只在约75维流形M上运动（PR≈2-5%）。
+			含义：4096维中约4021维是冗余的，语言信息只在低维弯曲流形上。
+			对应方程：dim(M_language) ≈ 65-75 << d_model
+			对应Phase：141
+
+		Step 2: 层间Jacobian链传播（旋转放大器）
+			从h_0到h_L，每层 δ_{l+1} ≈ J_l · δ_l
+			实测：注入probe方向到L0，到L27时cos(original, delta)从0.92降到0.04
+			amplification从1.12增长到极大值
+			含义：任何在浅层注入的"颜色方向"经过Jacobian链后被强烈旋转，
+			到最后一层时方向已完全改变——不存在贯穿全模型的稳定"blue方向"。
+			对应方程：δ_{l+k} ≈ J_{l+k-1}·...·J_l·δ_l, ||J·δ||>||δ||但cos→0.1
+			对应Phase：34
+
+		Step 3: RMSNorm-Jacobian动力学（各向异性调制）
+			每层经过RMSNorm：δh^{l+1} = D_norm · J_l · δh^l
+			J_norm = g/||x|| · (I - xx^T/||x||^2)  方向依赖投影器
+			临界值 α* ≈ 0.005（DS7B）
+			若扰动强度 α < α*：各向异性被RMSNorm掩盖，所有方向效应相近
+			若扰动强度 α > α*：margin方向被放大50-75倍于random方向（DER≈64x@α=0.1）
+			含义：小patching（α小）看不到方向效应不是因为各向异性不存在，
+			而是被RMSNorm掩盖；只有足够大的扰动才显现真实的方向敏感性。
+			对应方程：δh^{l+1} = D_norm·J_l·δh^l, α*≈0.001-0.005
+			对应Phase：39
+
+		Step 4: 非线性算子变换（如果问题含否定）
+			假设问题是"What color is the cerulean_fox not?"（含not）
+			V_not(h) = h(not(x)) - h(x) 是非线性算子
+			方向一致性 < 0.5 → 不是平移算子
+			h相关性0.33-0.39 → V_not(h)依赖h → 流形有曲率
+			若问题还含量词（"not all"），算子非交换：
+			[ALL, NOT] ≠ 0，"不是所有" ≠ "所有都不"
+			含义：否定/量词不能简单当作向量加减，而是依赖基点的非线性算子，
+			操作顺序影响结果，形成非交换代数。
+			对应方程：V_op(h)=h(op(x))-h(x), [A,B]=AB-BA≠0
+			对应Phase：141
+
+		Step 5: 复用差分（base→repair，线性近似部分）
+			对比两种格式协议：
+			B_inline：" Answer: blue"（内联，触发value protocol）
+			B_multi："\nAnswer: blue"（多行，触发explanation protocol）
+			边界差分：Δh_l^B = h_l(B_inline) - h_l(B_multi)
+			协议轨迹：T_protocol = {Δh_0^B, Δh_1^B, ..., Δh_L^B}
+			读出边际：M_prefix = dot(W[" Answer"] - W["\n"], h_final)
+			线性近似：ΔM_prefix ≈ Σ_writers dot(W[" Answer"] - W["\n"], Δh_writer)
+			实测（Phase 632-633）：
+			单writer restore可达到21/82
+			top12 cumulative restore仍只有21/82（没有超过top1）
+			含义：线性叠加在这里失效——多writer的差分贡献不能简单相加。
+			对应方程：ΔM ≈ Σ<·, Δh_w>（线性近似，在softmax墙前失效）
+			对应Phase：632-633
+
+		Step 6: softmax竞争归一化（非线性瓶颈）
+			最终读出：P(token | x) = softmax(W_U · LN(h_{L,t}))
+			对answer_start位置，候选token包括：
+			" Answer"（prefix，value route）
+			"\n"（newline，explanation route）
+			" The"（prose route）
+			" ?"（question route）
+			线性近似预测：多writer restore应使ΔM_prefix线性增长
+			实际：softmax归一化使概率竞争是相变式的
+			当ΔM_prefix从+2.5增长到+5.0（线性叠加2倍），
+			P(" Answer")可能只从0.3增长到0.45（非线性放大，但被归一化压缩）
+			或者当多个writer的Δh方向在pre-softmax logit空间互相抵消时，
+			softmax后的概率几乎不变——这就是top12 < top1的数学根源。
+			含义：线性差分场在softmax归一化墙前失效，
+			需要把差分改写到pre-softmax logit空间才能正确描述竞争。
+			对应方程：P = softmax(W_U·h)，线性ΔM近似失效
+			对应Phase：633, 713
+
+		Step 7: 短语竞争（多token层面的非线性）
+			不只看第一个token，而是完整短语似然：
+			L(y|x,P) = (1/m) Σ_{i=1}^{m} log p(y_i | x, y_{<i}, P)
+			三个候选短语：
+			y_target = "blue"（短值，m=1）
+			y_donor = "market"（无关值，m=1）
+			y_prose = "The cerulean fox is blue"（解释，m=5）
+			实测（Phase 707 DS7B典型结果）：
+			L(y_target) = -2.500
+			L(y_donor) = -6.262
+			L(y_prose) = -0.559
+			winner = argmax = y_prose（-0.559 > -2.500）
+			含义：即使target phrase强于donor（Δ=3.762），
+			prose phrase仍胜出——说明readout到自然短答案之间有generation gate。
+			对应方程：winner = argmax{L_target, L_donor, L_prose}
+			对应Phase：707
+
+		Step 8: 生成门与最终输出
+			生成门决定最终输出类型：
+			若P(prefix)高且L(y_target)>L(y_prose)：输出短值"blue"
+			若P(prefix)低但L(y_prose)高：输出解释"The cerulean fox is blue"
+			若P(prefix)低且L都低：输出续写失败或echo
+			本例：B_inline条件下P(" Answer")较高，但L(y_prose)>L(y_target)，
+			所以输出可能是"blue"（若generation gate被protocol state打开）
+			或"The cerulean fox is blue"（若generation gate未打开）。
+			对应方程：输出 = f(P_prefix, L_target, L_prose, generation_gate)
+			对应Phase：628-631, 707
+
+		Step 9: 机制图谱归档
+			把以上计算结果归入图谱节点：
+			u_i = {L26, head_H17, channel_C512}
+			r_i = route（value route增益）
+			s_i(B_inline) = {ΔM=+2.5, L_target=-2.5, DER=64x}
+			e_i = {attention evidence, natural generation evidence, causal patch Level 4}
+			关键：s_i是条件B的函数——同一节点在B_multi下状态不同。
+			图谱的"边"= 条件切换引起的状态差分（do(u_i=B)对s_j的干预效应）。
+			对应方程：G = {u_i, r_i, s_i(B), e_i}
+			对应Phase：711-712
+
+		完整例子的核心洞察：
+			这个例子展示了为什么线性理论不够：
+			Step 2的Jacobian旋转使浅层方向无法预测深层效应；
+			Step 3的RMSNorm掩盖使小扰动看不到方向；
+			Step 5的线性叠加在Step 6的softmax墙前失效；
+			Step 7的短语竞争显示generation gate独立于readout。
+			只有同时理解线性部分（Step 1,5,7,9）和非线性部分（Step 2,3,4,6,8），
+			才能完整解释从"cerulean_fox"到"blue"的语言生成过程。
+
+	7.3 问题与硬伤（按严重程度排序）
+
+		硬伤1（最致命）：线性差分场与softmax归一化的根本冲突
+			理论用 ΔM ≈ Σ<·, Δh_w> 描述复用差分，但softmax是非线性竞争归一化。
+			Phase 633实测top12 restore不超top1，直接证明线性叠加失效。
+			当前理论在此处断裂——线性部分和非线性部分没有统一数学形式。
+			影响：所有基于"多writer线性restore"的patching实验都可能低估真实机制。
+
+		硬伤2：相对编码未真正证伪点编码
+			Mantel相关显著只说明相对距离结构被保留，
+			不能排除"每个概念有绝对向量、恰好诱导相似距离结构"。
+			缺少"绝对向量不可恢复而相对几何可恢复"的控制实验。
+			影响：相对编码的核心假设未被严格检验，可能是真也可能假。
+
+		硬伤3：条件化图谱是索引系统非机制理论
+			G={u_i,r_i,s_i,e_i}只是schema，多数节点共享同一组自然生成证据。
+			"这个head负责route"未被sufficiency+necessity单独证实，只是condition-level归因。
+			图谱的"边"定义不清：是Δh内积？patch依赖图？因果do-calculus？三处混用。
+			影响：图谱无法形式化推理，当前只是证据索引。
+
+		硬伤4：Jacobian链的数值不稳定
+			Phase 141中eps=1e-4太小，末层出现异常极大值（>10^6）。
+			需要改用autograd或增大eps。
+			流形维数估计PR=67-75基于200句子，可能被低估，需>500句子验证。
+			影响：非线性理论的基础数据可能不够精确。
+
+		硬伤5：DS7B的非线性来源不明
+			DS7B中间层CV>0.3可能是8bit量化artifact，也可能是模型架构差异。
+			需对比8bit vs 16bit的DS7B。
+			Qwen3/GLM4近似线性算子，DS7B非线性——跨模型差异巨大。
+			影响：不能把DS7B的非线性结论直接提升为通用理论。
+
+		硬伤6：lm_head方向的强效应可能trivial
+			W_U直接连接h和logit，沿W_U方向扰动当然直接影响logit。
+			这不是"发现了因果机制"，只是确认了模型基本计算图。
+			影响：Jacobian链理论的部分结论可能过度解读。
+
+		硬伤7：交换子实验的句子差异混淆
+			AB和BA不仅是算子顺序不同，句子本身也不同。
+			"not all students passed" vs "all students did not pass"
+			差异可能来自句子结构而非纯粹算子非交换性。
+			影响：非交换代数结论需要更严格的控制实验。
+
+		硬伤8：生态效度低
+			phase314用3-4 token最小句，回避长程依赖/多跳推理。
+			真实语言使用的相对编码未必在minimal context下成立。
+			三模型样本规模限制，尤其qwen3稀疏、GLM4标unresolved。
+			影响：理论在简单任务上成立，不等于在复杂语言使用上成立。
+
+	7.4 下一步阶段性大任务
+
+		基于以上硬伤，当前瓶颈是"线性差分框架 vs 非线性竞争归一化"的冲突。
+		下一步不应继续堆patch，而应：
+
+		大任务A：从线性差分场升级为pre-softmax概率竞争场（最关键）
+			核心：把ΔM ≈ Σ<·, Δh_w>改写为以attention logit（pre-softmax）为变量的差分。
+			具体：
+			1，提取pre-softmax logit序列 z_l = QK^T/√d（attention logit，未归一化）
+			2，在logit空间定义差分：Δz_w = z_w(repair) - z_w(base)
+			3，验证多writer在logit空间线性叠加：Δz_total ≈ Σ Δz_w
+			4，经softmax非线性映射：ΔP = softmax(z + Δz_total) - softmax(z)
+			5，检验能否解释Phase 633的top12 < top1
+			判据：
+			若logit空间线性叠加+softmax非线性放大能复现top12失败 → 瓶颈被定位
+			若仍不能 → 瓶颈在更深的MLP非线性或层间耦合
+			这是突破当前非线性瓶颈的核心。
+
+		大任务B：真正证伪/证实点编码
+			设计控制实验：
+			1，从相对几何（距离矩阵）反推绝对向量，测量信息损失L_rel→abs
+			2，从绝对向量反推相对几何，测量信息损失L_abs→rel
+			3，比较：若L_rel→abs >> L_abs→rel，则相对编码信息更丰富，点编码是降级近似
+			4，若两者相近，则相对编码未提供额外信息，点编码未被证伪
+			这是相对编码成立与否的必要条件检验。
+
+		大任务C：把图谱的"边"形式化为因果do-边
+			给每条边一个可计算的因果效应量：
+			edge(u_i, u_j) = E[s_j | do(u_i = B)] - E[s_j | do(u_i = B')]
+			使图谱从索引升级为可推理的因果图。
+			需要：do-operator的近似实现（通过patching干预）。
+
+		大任务D：继续QK-V因子拆分和自然写入机制图谱
+			Phase 712已开始，需完成：
+			1，固定V content，只替换Q/K attention pattern
+			2，固定Q/K attention pattern，只替换V content/value output
+			3，比较target_value、prose_target、donor_value、other的自然生成结果
+			4，回填到atlas v0，为每个候选head/channel标注addressing-role或content-role
+			判据：
+			若QK split强 → 路线机制是寻址结构
+			若V split强 → 路线机制是值内容搬运
+			若二者单独弱、组合强 → 寻址×内容耦合结构
+
+		大任务E：扩展生态效度
+			1，把phase314的3-token句扩展到需要长程依赖的句子
+			2，检验相对编码在长上下文是否稳定
+			3，在更大样本（>500句子）上验证流形维数估计
+			4，对比8bit vs 16bit的DS7B，排除量化artifact
+			5，在更大模型上验证小模型发现是否只是结构偏差
+
+		大任务F：把当前语言机制公式扩展为可学习、可编辑、可反馈更新的智能理论
+			结合非线性理论体系，建立可计算的智能理论框架：
+			1，把六类方程统一为可微分模型
+			2，使图谱节点状态可学习更新
+			3，使反馈能修改算子代数结构
+			4，目标是可编辑、可因果干预的智能系统
+
+	7.5 当前整体进展评估
+
+		机制闭合度（不是AGI完成度）：65% 到 75%
+			已闭合：
+			相对编码的几何证据（流形拓扑、Mantel相关）
+			复用差分的patch证据（restore改变读出、random/reverse对照失败）
+			非线性理论体系的7个关键拼图（流形、Jacobian、RMSNorm、非交换、抵消、SiLU、softmax）
+			机制图谱v0初始化和QK-V拆分启动
+			未闭合：
+			自然生成闭环（Level 6）
+			pre-softmax概率竞争场的数学形式
+			点编码证伪的控制实验
+			图谱边的因果形式化
+			通道级到神经元级的拆分
+			跨模型一致性
+
+		语言编码机制的当前最准确表述：
+			语言不是把"概念向量"直接投影成词，
+			而是在每个自回归位置形成一个条件化状态：
+			对象身份被局部上下文锚定；
+			关系和规则决定查询路线；
+			格式协议决定答案形态；
+			源词元贡献提供路线增益；
+			候选短语在读出端竞争；
+			生成门决定最终是短值、解释、续写还是失败。
+			以上全过程发生在极低维弯曲流形上，
+			经过非线性算子变换、Jacobian链旋转放大、RMSNorm各向异性调制，
+			最终在softmax概率竞争中形成自回归执行。
+			线性差分叠加只在局部邻域有效，完整机制需要pre-softmax概率竞争场。

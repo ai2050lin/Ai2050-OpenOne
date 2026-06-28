@@ -47410,3 +47410,353 @@ Phase 713: Causal QK Pattern Replacement vs V Content Replacement
 123
 456
 789
+
+## Phase 713: 相对编码—复用差分—条件化机制图谱理论 系统总结与硬伤审视 [2026-06-27 07:30]
+
+### 本阶段任务
+
+对贯穿 Phase 63/64 → Phase 632 → Phase 646/711/712 的三段式理论做系统总结，给出统一数学公式，以词嵌入为例走完整计算流程，并以最严格眼光审视正确性、硬伤与瓶颈。
+
+### 理论三段对应演化
+
+```text
+1. 相对编码 (Phase 63/64): 意义 = 网络位置 + 相对路径 + 上下文差分, 非绝对点向量
+2. 复用差分 (Phase 632):   同一残差骨架被复用, base->repair 差分改变读出边际, 完整 gate = 多 writer 累积场
+3. 条件化机制图谱 (Phase 646/711/712): 核心是建立机制节点间条件化图谱 G={u_i,r_i,s_i,e_i}, 非找单方向
+```
+
+### 统一数学公式
+
+```text
+输入分解:        x = (F, C, R, O, G, B)
+边界差分:        Delta h_l^B = h_l(B_inline) - h_l(B_multi)
+协议轨迹:        T_protocol = {Delta h_0^B, ..., Delta h_L^B}
+区间分解:        Delta h_{a:b}^protocol = Delta h_{a:b-1}^distributed + Delta h_b^endpoint
+残差状态分解:    h_l = h_l^semantic + h_l^protocol + h_l^syntax + h_l^competition + h_l^noise
+残差更新:        h_{l+1,p} = h_{l,p} + A_{l,p}(QK,V) + M_{l,p}(h_{l,p})
+读出竞争:        l_v = W_U(v)^T y;  M_newline = l_prefix - max_{r in G_newline} l_r
+复用差分累积场:  Delta M_prefix ≈ Σ_writers <W_prefix - W_competitor, Delta h_w>
+簇内共享+差分:   centered = vecs - mean; SVD -> shared_pc1 = Vt[0]; delta_i = centered_i - <centered_i,s>s
+输出:            P(x_{t+1}|x_<=t) = softmax(W_U h_{L,t})
+图谱:            G = {u_i, r_i, s_i, e_i}
+```
+
+### 基于词嵌入的完整计算流程 (以 phase314 GRCM 为基准)
+
+```text
+Step1  hook 第 l 层, 取每个概念最小句最后 token 的 hidden -> h_apple, h_banana, h_pear
+Step2  相对编码: 余弦相似矩阵 int_sim, int_dist = 1 - int_sim (相对几何)
+Step3  外部语义网络: 人工定义 RELATIONS strength -> ext_dist = 1 - strength
+Step4  内外一致性: Mantel 相关(上三角 Pearson + 置换检验) + 邻域重叠(k=5)
+Step5  复用差分: 簇内 SVD, shared_pc1 吸收 shared_var, delta_i 为个体差分, delta_norm_ratio 为差分占比
+Step6  三图谱: Reuse(内部高相似) / Difference(|int-ext|) / Conflict(方向相反)
+Step7  条件化: 同概念在 B_inline vs B_multi 下取 delta_h_B, 算 dM = <W_prefix - W_comp, delta_h_B>
+Step8  汇入 atlas 节点: u_i={L,H,C}, r_i=角色, s_i={int_sim,shared_var,dM,mantel}, e_i=证据层级
+```
+
+### 是否正确
+
+```text
+描述层基本正确:
+- 相对编码: 跨轴近正交 + 差异成分可解码 + Mantel 显著 -> 最稳健
+- 复用差分: restore 改变读出 + random/reverse 失败 + layer_out/next input 成对 -> 有 patch 证据
+- 条件化图谱: 从单方向转向节点-边关系 -> 方法论收敛合理
+```
+
+### 硬伤 (按严重程度排序)
+
+```text
+硬伤1(最致命): Delta M ≈ Σ<.,Delta h_w> 与非线性 Transformer 不兼容
+  残差虽加法, 但 A_l(QK,V) 和 M_l 对输入非线性. 线性叠加只在局部线性化下成立.
+  Phase633 实测 top12 restore 没超 top1 -> 强烈暗示非线性耦合使线性叠加失效.
+  但理论仍用线性求和公式描述, 根本性张力.
+
+硬伤2: 相对编码未真正证伪点编码
+  Mantel 显著只说明相对距离结构被保留, 不能排除"绝对向量恰好诱导相似距离结构".
+  缺少"绝对坐标不可恢复而相对坐标可恢复"的控制实验 -> 逻辑缺口未闭合.
+
+硬伤3: phase314 共享-差分分解用 PCA 第一主成分, 严重过简化
+  shared_pc1 只取 SVD 第一方向, 多维簇(颜色/甜度/形状)信息混入差分 -> delta_norm_ratio 失真
+  使"复用差分"定量结论(如72%共享)不稳定不可复现.
+
+硬伤4: 外部语义网络 strength 人工拍定(0.4~1.0), 缺客观性
+  antonym=0.9, cross_category=0.4 等数值主观, Mantel 强弱直接依赖这些数字.
+  换一套 strength 结论可能改变 -> 用人工标注验证模型的循环风险.
+
+硬伤5: 条件化图谱目前是索引系统非机制理论 (memo 自述 Phase711)
+  G={u_i,r_i,s_i,e_i} 只是 schema, 多数节点共享同一组自然生成证据, 无单元级因果证明.
+  "这个 head 负责 route" 尚未被 sufficiency+necessity 单独证实, 只是 condition-level 归因.
+
+硬伤6: 图谱的"边"定义不清
+  理论说条件化是核心, 但公式没给边 e_ij 的明确数学定义.
+  是 Delta h 内积? patch 依赖图? 因果 do-calculus? 三处混用, 无法形式化推理.
+
+硬伤7: 跨模型不可比
+  Phase711 自述 qwen3 样本稀疏, GLM4 标 unresolved.
+  "复用骨架"是否同一骨架未检验, 可能只是各自不同局部解.
+
+硬伤8: 只测 prompt_last/短句, 生态效度低
+  phase314 用 the X was fresh 这种 3-4 token 句, 回避长程依赖/多跳推理.
+  真实语言使用的相对编码未必在 minimal context 下成立.
+```
+
+### 第一性原理反思
+
+```text
+深层假设: 语言背后数学结构 = (相对几何) × (线性差分叠加) × (条件图)
+
+但 Transformer 真实算子: softmax 注意力(非线性竞争) + MLP(逐token非线性) + 残差(线性)
+理论三组件分别抓了一部分, 却没统一描述 softmax 这个核心非线性的数学地位:
+- softmax 归一化使"寻址"本质是概率竞争, 非线性加权
+- "复用骨架"在不同条件下不是线性叠加, 而是概率分布的重新归一化
+- 当前 Delta h 差分框架无法捕捉竞争性归一化导致的相变
+
+这很可能就是 Phase633 "top12 不超 top1" 的数学根源:
+多 writer 线性叠加碰到了 softmax 的归一化墙.
+```
+
+### 突破瓶颈的阶段性大任务
+
+```text
+瓶颈: 线性差分框架 vs 非线性竞争归一化 的冲突. 下一步不应继续堆 patch, 而应:
+
+大任务A: 从线性差分场升级为概率竞争场
+  把 Delta M ≈ Σ<.,Delta h_w> 改写为以 attention logit(pre-softmax)为变量的差分,
+  验证"多 writer 在 pre-softmax 上线性叠加, 经 softmax 后非线性放大"能否解释 top12<top1.
+
+大任务B: 真正证伪/证实点编码
+  设计控制实验: 从相对几何反推绝对向量 vs 从绝对向量反推相对几何, 比较信息损失.
+  这是相对编码成立与否的必要条件检验, 目前缺失.
+
+大任务C: 把图谱的"边"形式化为因果 do-边
+  给每条边一个可计算的因果效应量(如 do(u_i=B) 对 s_j 的干预效应),
+  使图谱从索引升级为可推理的因果图.
+
+大任务D: 扩展生态效度
+  把 phase314 的 3-token 句扩展到需要长程依赖的句子, 检验相对编码在长上下文是否稳定.
+```
+
+### 命令与脚本
+
+```text
+(本阶段为理论总结, 无新模型测试脚本. 计算流程基准参考:)
+tests/glm5/phase314_GRCM.py                      # 相对编码 + 复用差分 + 三图谱
+tests/glm5/phase64_encoding_architecture.py      # 相对编码轴结构
+理论来源: memo Phase63/64, 632, 633, 646, 711, 712
+```
+
+### 结论
+
+```text
+理论在描述层基本正确且有证据, 但存在 8 项硬伤, 其中硬伤1(线性叠加 vs 非线性)最致命,
+直接对应 Phase633 的 top12<top1 失败. 当前最关键的第一性原理瓶颈是:
+现有 Delta h 线性差分框架无法描述 softmax 归一化导致的竞争性相变.
+突破方向 = 把图谱从线性差分场升级为 pre-softmax 概率竞争场(大任务A),
+同时补齐点编码证伪控制实验(大任务B), 否则"相对编码"始终是未证伪的假设.
+```
+
+## Phase 714: IntelligentTheory.md 非线性理论体系更新 [2026-06-27 07:44]
+
+### 本阶段任务
+
+分析三个 memo 文件（AGI_GLM5_MEMO_20260601.md, AGI_GLM5_MEMO_20260625.md, AGI_GLM5_MEMO.md）的研究历史记录，总结各阶段核心理论和数学公式，重点讲解非线性理论体系，更新 research/IntelligentTheory.md。
+
+### 三文件阶段结构
+
+```text
+1. AGI_GLM5_MEMO_20260601.md: Phase 20-300 (早期)
+   - Phase 20-22: 流形拓扑, 纤维结构, 切空间
+   - Phase 27-29: 属性非线性检测, 条件解耦, A矩阵不正交
+   - Phase 32-34: Jacobian链, 扰动传播, 旋转放大器
+   - Phase 39: RMSNorm-Jacobian动力学校准
+   - Phase 141: 非线性算子, 非交换代数
+
+2. AGI_GLM5_MEMO_20260625.md: Phase 301-594 (中期)
+   - Phase 301-312: 非线性抵消, 差分读取, 两种编码架构
+   - Phase 313-365: 关系网络, 绑定, MLP主导, W_down 50/50对称
+   - Phase 342-347: SiLU非线性分解(13-17%), 线性交叉85%
+   - Phase 366-594: 范数, 类别边界, 连续属性, 检索推理
+
+3. AGI_GLM5_MEMO.md: Phase 595-713 (近期)
+   - Phase 595-707: 读出位置, 源贡献通道, 短语竞争闭环
+   - Phase 632-633: 复用差分, 多writer累积场失败(top12<top1)
+   - Phase 646/711/712: 条件化机制图谱, atlas v0, QK-V拆分
+   - Phase 713: 三段式理论系统总结
+```
+
+### 非线性理论体系核心拼图
+
+```text
+1. 流形拓扑(Phase 20-22, 141):
+   dim(M_language)≈65-75 << d_model≈2560-4096 (PR≈2-5%)
+   h_role(x) = M_l(x) + δ_role(x) (纤维结构)
+   h = b + A@v + ε, A列不正交(cos≈0.5)
+
+2. Jacobian链(Phase 32-34):
+   δ_{l+k} ≈ J_{l+k-1}·...·J_l·δ_l
+   ||J·δ|| > ||δ||(放大4-25x) 但 cos(J·δ,δ)→0.1(旋转)
+   Qwen3/GLM4: 近似线性算子(CV<0.15)
+   DS7B: 中间层非线性算子(CV>0.3)
+
+3. RMSNorm-Jacobian动力学(Phase 39):
+   δh^{l+1} = D_norm·J_l·δh^l
+   J_norm = g/||x||·(I - xx^T/||x||^2)
+   α*≈0.001-0.005 (各向异性临界值)
+   结构对齐(3-4x) vs 功能对齐(65x)
+
+4. 非交换代数(Phase 141):
+   V_not是非线性算子(一致性<0.5, h相关性0.33-0.39)
+   [ALL,NOT]≠0, [ALWAYS,NOT]≠0, [SOME,NOT]≠0 (100%非交换)
+
+5. 非线性抵消(Phase 301-312):
+   DS7B: full_delta因果效力≈0, R_only=+0.177
+   架构A(正交子空间) vs 架构B(共享主方向+差分读取, ×114)
+
+6. SiLU分解(Phase 342-347):
+   W_down通道投影50/50对称
+   SiLU非线性13-17%, 线性交叉85%
+
+7. softmax竞争归一化(Phase 632-713):
+   ΔM ≈ Σ<·,Δh_w> 线性近似
+   Phase 633: top12<top1 → softmax归一化墙
+   突破方向: pre-softmax概率竞争场
+```
+
+### IntelligentTheory.md 更新内容
+
+```text
+1. 新增"六，非线性理论体系"章节(7个子节):
+   6.1 流形拓扑基础(Phase 20-22, 141)
+   6.2 Jacobian链与扰动传播(Phase 32-34)
+   6.3 RMSNorm-Jacobian动力学(Phase 39)
+   6.4 非线性算子与非交换代数(Phase 141)
+   6.5 非线性抵消与差分读取(Phase 301-312)
+   6.6 SiLU非线性分解(Phase 342-347)
+   6.7 softmax竞争归一化(Phase 632-713)
+   6.8 统一公式
+   6.9 硬伤与边界
+
+2. 原"六，研究阶段历史记录"改为"七", 新增阶段十一(Phase 708-713)
+
+3. 原"七，当前整体进展和下一步"改为"七"(已合并), 更新:
+   - 机制闭合度从60-65%提升到65-75%
+   - 数学体系从4类方程扩展到6类(新增Jacobian链+RMSNorm-Jacobian)
+   - 阶段性大任务从Phase 709更新为大任务A-F
+   - 大任务A(pre-softmax概率竞争场)为最关键突破方向
+```
+
+### 命令与脚本
+
+```text
+(本阶段为理论总结和文档更新, 无新模型测试脚本.)
+更新文件: research/IntelligentTheory.md
+理论来源: 三个memo文件的Phase 20-713研究历史
+```
+
+### 结论
+
+```text
+非线性理论体系是理解语言编码机制的核心, 不是附属.
+从Phase 20的流形拓扑到Phase 713的softmax竞争归一化,
+非线性理论经历了7个关键阶段的发展.
+当前最关键的非线性瓶颈是:
+线性差分场 ΔM≈Σ<·,Δh_w> 无法描述 softmax 归一化导致的竞争性相变.
+突破方向 = 大任务A: 把差分场从残差空间升级到 pre-softmax logit 空间.
+IntelligentTheory.md 已系统性更新, 新增完整的非线性理论体系章节.
+```
+
+## Phase 715: IntelligentTheory.md 最有效完整理论章节更新 [2026-06-27 08:02]
+
+### 本阶段任务
+
+更新 research/IntelligentTheory.md 的"七，最有效完整理论，以及问题硬伤和下一步"章节，
+详细说明最新的理论是什么样的，举一个完整计算的例子。
+
+### 更新内容
+
+```text
+重写"七"章节为5个子节:
+7.1 当前最有效完整理论的明确陈述
+    - 理论名称: 相对编码—复用差分—条件化机制图谱理论(含非线性扩展)
+    - 核心命题: 状态轨迹在低维流形上运动, 经非线性算子变换、Jacobian链旋转放大、
+      RMSNorm各向异性调制, 最终进入softmax概率竞争, 形成自回归执行
+    - 两层结构: 线性/局部线性部分(已成熟) + 非线性部分(当前瓶颈)
+    - 最简形式化: x=(F,C,R,O,G,B) → h_l=Φ_l(h_{l-1},x) → P=softmax(W_U·LN(h_L))
+
+7.2 完整计算例子(9步)
+    任务: "What color is the cerulean_fox?" 目标值"blue"
+    Step1: 输入分解与流形约束(dim(M)≈75 << 4096)
+    Step2: Jacobian链传播(cos从0.92降到0.04, 旋转放大器)
+    Step3: RMSNorm-Jacobian动力学(α*≈0.005, DER≈64x)
+    Step4: 非线性算子变换(V_not依赖h, [A,B]≠0)
+    Step5: 复用差分(ΔM≈Σ<·,Δh_w>, top12<top1失败)
+    Step6: softmax竞争归一化(线性叠加在归一化墙前失效)
+    Step7: 短语竞争(L_target=-2.5, L_prose=-0.559, prose胜出)
+    Step8: 生成门与最终输出
+    Step9: 机制图谱归档(G={u_i,r_i,s_i(B),e_i})
+    核心洞察: 只有同时理解线性部分(Step1,5,7,9)和非线性部分(Step2,3,4,6,8)才能完整解释
+
+7.3 问题与硬伤(8项, 按严重程度排序)
+    硬伤1(最致命): 线性差分场与softmax归一化的根本冲突
+    硬伤2: 相对编码未真正证伪点编码
+    硬伤3: 条件化图谱是索引系统非机制理论
+    硬伤4: Jacobian链数值不稳定
+    硬伤5: DS7B非线性来源不明(8bit artifact?)
+    硬伤6: lm_head方向强效应可能trivial
+    硬伤7: 交换子实验句子差异混淆
+    硬伤8: 生态效度低(3-token句, 样本稀疏)
+
+7.4 下一步阶段性大任务(6项)
+    大任务A: pre-softmax概率竞争场(最关键)
+    大任务B: 证伪/证实点编码
+    大任务C: 图谱边形式化为因果do-边
+    大任务D: QK-V因子拆分和自然写入机制图谱
+    大任务E: 扩展生态效度
+    大任务F: 可学习可编辑可反馈的智能理论
+
+7.5 当前整体进展评估
+    机制闭合度: 65%-75%
+    最准确表述: 语言生成 = 条件化状态 + 非线性流形算子变换 + softmax概率竞争 + 自回归执行
+```
+
+### 完整计算例子的关键数据
+
+```text
+Step2 Jacobian链(DS7B, apple, L0注入probe_edible):
+    L1: cos=0.92, L7: cos=0.60, L13: cos=0.46, L19: cos=0.40, L27: cos=0.04
+    → 不存在贯穿全模型的稳定方向
+
+Step3 RMSNorm-Jacobian(DS7B):
+    α*=0.005, α=0.1时 Δmargin=+2.375, Δrandom=0.037, DER≈64x
+    → margin方向被放大64倍于random
+
+Step5-6 复用差分与softmax墙(Phase 633):
+    单writer restore: 21/82
+    top12 cumulative restore: 21/82(未超top1)
+    → 线性叠加在softmax归一化墙前失效
+
+Step7 短语竞争(Phase 707 DS7B典型):
+    L(y_target="blue")=-2.500
+    L(y_donor="market")=-6.262
+    L(y_prose="The cerulean fox is blue")=-0.559
+    winner=y_prose → generation gate未打开
+```
+
+### 命令与脚本
+
+```text
+(本阶段为理论文档更新, 无新模型测试脚本.)
+更新文件: research/IntelligentTheory.md "七"章节
+理论来源: Phase 20-713研究历史 + 三段式理论总结 + 非线性理论体系
+```
+
+### 结论
+
+```text
+当前最有效完整理论 = 相对编码—复用差分—条件化机制图谱理论(含非线性扩展).
+理论分两层: 线性部分(相对编码+复用差分+条件化图谱)已较成熟,
+           非线性部分(流形+Jacobian+RMSNorm+非交换+softmax竞争)是当前瓶颈.
+完整计算例子(9步)展示了从输入到输出的全过程, 标注了每步的方程和Phase证据.
+最致命硬伤是线性差分场与softmax归一化的冲突(Phase 633的top12<top1).
+最关键突破方向是大任务A: pre-softmax概率竞争场.
+```
