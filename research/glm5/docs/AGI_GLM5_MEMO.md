@@ -47760,3 +47760,255 @@ Step7 短语竞争(Phase 707 DS7B典型):
 最致命硬伤是线性差分场与softmax归一化的冲突(Phase 633的top12<top1).
 最关键突破方向是大任务A: pre-softmax概率竞争场.
 ```
+
+## Phase 716: 本地 IntelligentTheory QK/V 理论更新记录合并保留 [2026-06-28 09:01]
+
+> 合并说明：远端已经包含 Phase 713-715 的更完整非线性理论更新；以下内容来自本地 stash 的 2026-06-28 理论更新记录，用于避免拉取合并时丢失本地研究记录。后续实验编号以合并后的最新 memo 为准。
+
+### 任务
+
+根据以下三个历史记录文件：
+
+```text
+research/glm5/docs/AGI_GLM5_MEMO_20260601.md
+research/glm5/docs/AGI_GLM5_MEMO_20260625.md
+research/glm5/docs/AGI_GLM5_MEMO.md
+```
+
+归纳各阶段核心理论和数学公式，重点整理非线性理论体系、有效理论、问题硬伤和下一步，并更新：
+
+```text
+research/IntelligentTheory.md
+```
+
+特别更新“七，最有效完整理论，以及问题硬伤和下一步”章节，并补充一个基于词嵌入的完整计算流程例子。
+
+### 命令
+
+```bash
+rg -n "七，|Phase 595|Phase 708|QK|词嵌入|当前最严格|阶段十|阶段十一|完整数学例子" research/IntelligentTheory.md
+sed -n '1,260p' research/IntelligentTheory.md
+sed -n '260,760p' research/IntelligentTheory.md
+rg -n "Phase 708-712|QK/V 因子分解|基于词嵌入|阶段十一|七，最有效完整理论|QK pattern replacement" research/IntelligentTheory.md
+git diff -- research/IntelligentTheory.md
+```
+
+### 生成和修改文件
+
+```text
+research/IntelligentTheory.md
+```
+
+本阶段未运行 qwen3、GLM4、DS7B 模型测试；这是历史记录归纳和理论文档更新阶段。
+
+### 原理
+
+本阶段把历史路线从早期的“语义方向/关系方向/非线性流形”整理到当前的“条件化残差轨迹 + 源词元贡献 + attention channel 图谱 + QK/V 因子分解”。
+
+核心更新是：
+
+```text
+语言生成 =
+  目标上下文身份锚定
+  + 格式/协议状态
+  + 源词元 QK 寻址路线
+  + 局部 V 内容
+  + QK×V 耦合
+  + 下游读出/生成竞争
+```
+
+并把源词元贡献进一步拆成：
+
+```text
+Delta C_g
+= Delta C_QK
++ Delta C_V
++ Delta C_QKxV
+```
+
+其中：
+
+```text
+Delta C_QK 代表寻址权重变化；
+Delta C_V 代表值内容变化；
+Delta C_QKxV 代表寻址和值内容同时改变时的耦合项。
+```
+
+### 结果
+
+已更新内容包括：
+
+```text
+1. 在“语言编码机制”中补充 Phase 708-712 后的最新更新。
+2. 在“数学体系”中新增 QK/V 因子分解公式。
+3. 在“数学体系”中新增基于词嵌入的完整计算流程例子。
+4. 在“研究阶段历史记录”中新增阶段十一：自然生成闭环、图谱 v0 与 QK/V 因子回填。
+5. 重写第七章为“最有效完整理论，以及问题硬伤和下一步”。
+```
+
+最新最有效理论被收束为：
+
+```text
+语言智能
+= 相对编码网络
++ 对象知识锚定
++ 关系/规则检索
++ 条件化状态变换
++ QK/V 源贡献机制
++ 候选短语竞争
++ 范数/格式/策略/生成读出门
++ 因果图谱
+```
+
+### 严格审视
+
+当前理论有效部分：
+
+```text
+1. 相对编码有效。
+2. 条件化状态变换有效。
+3. 源词元贡献理论有效。
+4. QK/V 因子分解有效。
+5. 候选短语竞争有效。
+6. 图谱化因果等级有效。
+```
+
+需要降级的部分：
+
+```text
+1. 单一全局语义方向。
+2. 单点 residual patch。
+3. attention head 统计直接等于 neuron 编码。
+4. source channel ensemble 直接等于 donor identity code。
+5. teacher-forced likelihood 直接等于自然生成。
+```
+
+核心硬伤：
+
+```text
+1. 还没有完成 QK pattern replacement 和 V content replacement 的严格因果拆分。
+2. attention channel 仍不是 neuron。
+3. 当前结果受小模型结构偏差影响。
+4. 自然生成端仍有 prose、format、continuation、policy-like route 的强竞争。
+5. 实时学习和可编辑图谱仍未解决。
+```
+
+### 下一步
+
+下一阶段应该进入：
+
+```text
+Phase 714: QK Pattern Replacement vs V Content Replacement Causal Audit
+```
+
+目标不是继续扩大普通 patch 搜索，而是明确：
+
+```text
+1. 只替换 QK pattern 是否能复现路线增益。
+2. 只替换 V content 是否能复现内容迁移。
+3. QK+V 是否必须同时替换才有效。
+4. 自然生成中的 target_value、donor_value、prose、continuation 如何变化。
+```
+
+## Phase 717: IntelligentTheory 双文件比较与合并版更新 [2026-06-28 10:11]
+
+### 任务
+
+比较以下两个文件中的理论，判断哪个更合理有效，并把比较后的最新理论更新到：
+
+```text
+research/IntelligentTheory.md
+```
+
+比较文件：
+
+```text
+research/IntelligentTheory.md
+research/IntelligentTheory_20260628.md
+```
+
+### 命令
+
+```bash
+ls -l research/IntelligentTheory.md research/IntelligentTheory_20260628.md
+wc -l research/IntelligentTheory.md research/IntelligentTheory_20260628.md
+rg -n "^六，|^七，|Phase 708-712|QK/V|非线性理论体系|pre-softmax|基于词嵌入" research/IntelligentTheory.md research/IntelligentTheory_20260628.md
+cp research/IntelligentTheory_20260628.md research/IntelligentTheory.md
+rg -n "^六，|^七，|QK/V 因子分解公式|基于词嵌入的简化计算流程补充|Phase 708-710" research/IntelligentTheory.md
+```
+
+### 比较结论
+
+`research/IntelligentTheory_20260628.md` 更适合作为主体版本，原因是：
+
+```text
+1. 它包含完整的“非线性理论体系”章节。
+2. 它已经把 Phase 713-715 的远端最新总结纳入主线。
+3. 它对 Jacobian 链、RMSNorm-Jacobian、非交换算子、softmax 竞争归一化、pre-softmax 概率竞争场做了更系统的整理。
+4. 它对问题硬伤和下一步的判断更严格，尤其指出“线性差分场 vs softmax 归一化墙”是当前最关键瓶颈。
+```
+
+但旧 `research/IntelligentTheory.md` 中仍有两个有效补充：
+
+```text
+1. QK/V 因子分解公式更直接、更适合作为第五章数学体系的补充。
+2. 基于词嵌入入口的简化计算流程，更便于说明 embedding 如何进入 QK 寻址、V 内容、MLP 重编码和候选读出。
+```
+
+### 更新结果
+
+已将 `research/IntelligentTheory.md` 更新为合并版：
+
+```text
+主体 = research/IntelligentTheory_20260628.md
+补充 = QK/V 因子分解公式 + 基于词嵌入的简化计算流程 + Phase 708-712 因果等级更新
+```
+
+新增或保留的核心公式：
+
+```text
+C_g(l,h,c | x)
+= Σ_{t∈g} α_{l,h}(p,t | x) · V_{l,h,c}(t | x)
+```
+
+```text
+Delta C_g
+= Delta C_QK
++ Delta C_V
++ Delta C_QKxV
+```
+
+```text
+h_0(t) = E[token_t] + P_t
+q_l(p) = W_Q^l h_l(p)
+k_l(t) = W_K^l h_l(t)
+v_l(t) = W_V^l h_l(t)
+A_l(p) = Σ_t α_l(p,t) v_l(t)
+h_{l+1}(p) = h_l(p) + A_l(p) + M_l(h_l(p))
+```
+
+### 严格审视
+
+最新合并版比任一单独文件更合理，但仍不能视为闭合理论：
+
+```text
+1. QK/V 分解仍需要 causal replacement 验证。
+2. pre-softmax 概率竞争场仍是下一步数学框架，不是已完成结果。
+3. attention channel 仍不是 neuron，需要继续下钻。
+4. 当前结论主要来自小模型，可能存在架构和量化偏差。
+```
+
+### 下一步
+
+下一步应继续围绕：
+
+```text
+QK Pattern Replacement vs V Content Replacement Causal Audit
+```
+
+并把结果回填到：
+
+```text
+research/IntelligentTheory.md
+research/glm5/docs/AGI_GLM5_MEMO.md
+```

@@ -395,3 +395,133 @@ L26H19
 L23H11
 L27H2
 ```
+
+## Phase 713: IntelligentTheory 历史记录归纳与 QK/V 理论更新 [2026-06-28 09:01]
+
+### 任务
+
+根据以下三个历史记录文件归纳阶段理论、数学公式、非线性理论体系和有效理论，并更新 `research/IntelligentTheory.md`：
+
+```text
+research/glm5/docs/AGI_GLM5_MEMO_20260601.md
+research/glm5/docs/AGI_GLM5_MEMO_20260625.md
+research/glm5/docs/AGI_GLM5_MEMO.md
+```
+
+### 修改文件
+
+```text
+research/IntelligentTheory.md
+```
+
+本阶段未运行模型测试；这是理论文档更新阶段。
+
+### 结果
+
+已完成：
+
+```text
+1. 补充 Phase 708-712 后的语言编码机制更新。
+2. 新增 QK/V 因子分解公式。
+3. 新增基于词嵌入的完整计算流程例子。
+4. 新增阶段十一：自然生成闭环、图谱 v0 与 QK/V 因子回填。
+5. 重写第七章：最有效完整理论，以及问题硬伤和下一步。
+```
+
+最新理论收束为：
+
+```text
+语言智能
+= 相对编码网络
++ 对象知识锚定
++ 关系/规则检索
++ 条件化状态变换
++ QK/V 源贡献机制
++ 候选短语竞争
++ 范数/格式/策略/生成读出门
++ 因果图谱
+```
+
+核心数学更新：
+
+```text
+Delta C_g
+= Delta C_QK
++ Delta C_V
++ Delta C_QKxV
+```
+
+### 严格审视
+
+有效主线：
+
+```text
+相对编码、条件化状态变换、源词元贡献、QK/V 因子分解、候选短语竞争、图谱化因果等级。
+```
+
+硬伤：
+
+```text
+1. 还没有 QK pattern replacement 与 V content replacement 的严格因果拆分。
+2. attention channel 仍不是 neuron。
+3. 小模型结构偏差仍然存在。
+4. 自然生成端仍被 prose / format / continuation route 强烈干扰。
+```
+
+下一阶段：
+
+```text
+Phase 714: QK Pattern Replacement vs V Content Replacement Causal Audit
+```
+
+## Phase 717: IntelligentTheory 双文件比较与合并版更新 [2026-06-28 10:11]
+
+### 任务
+
+比较：
+
+```text
+research/IntelligentTheory.md
+research/IntelligentTheory_20260628.md
+```
+
+并将更合理有效的最新理论更新到：
+
+```text
+research/IntelligentTheory.md
+```
+
+### 结论
+
+`research/IntelligentTheory_20260628.md` 更适合作为主体，因为它包含更完整的非线性理论体系和 Phase 713-715 的严格硬伤审视。
+
+旧 `research/IntelligentTheory.md` 中更有效的补充是：
+
+```text
+1. QK/V 因子分解公式。
+2. 基于词嵌入入口的简化计算流程。
+```
+
+### 更新结果
+
+`research/IntelligentTheory.md` 已更新为：
+
+```text
+主体 = IntelligentTheory_20260628.md
+补充 = QK/V 因子分解 + 词嵌入计算入口 + Phase 708-712 因果等级更新
+```
+
+核心公式：
+
+```text
+Delta C_g
+= Delta C_QK
++ Delta C_V
++ Delta C_QKxV
+```
+
+下一步仍是：
+
+```text
+QK Pattern Replacement vs V Content Replacement Causal Audit
+```
