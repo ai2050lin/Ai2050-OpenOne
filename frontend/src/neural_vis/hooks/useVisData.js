@@ -1,6 +1,6 @@
 /**
  * useVisData — 数据加载Hook
- * 支持 Schema v1.0 和 v2.0
+ * 支持 Schema v1.0、v2.0 和 atlas_graph_v1
  */
 import { useState, useCallback } from 'react';
 
@@ -9,6 +9,8 @@ export default function useVisData() {
   const [activeData, setActiveData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const isSupportedSchema = (version) => ['1.0', '2.0', 'atlas_graph_v1'].includes(version);
 
   const loadDataManifest = useCallback(async () => {
     try {
@@ -27,7 +29,7 @@ export default function useVisData() {
       const resp = await fetch(`/vis_data/${filepath}`);
       const data = await resp.json();
       const version = data.schema_version || '1.0';
-      if (version !== '1.0' && version !== '2.0') {
+      if (!isSupportedSchema(version)) {
         throw new Error(`Unsupported schema: ${version}`);
       }
       setActiveData(data);
@@ -44,7 +46,7 @@ export default function useVisData() {
       try {
         const data = JSON.parse(e.target.result);
         const version = data.schema_version || '1.0';
-        if (version !== '1.0' && version !== '2.0') {
+        if (!isSupportedSchema(version)) {
           throw new Error(`Unsupported schema: ${version}`);
         }
         setActiveData(data);

@@ -49283,3 +49283,1563 @@ Phase 725: DS7B L20H17 Channel 16-32 Fine Scan and Residual Propagation
 4. 区分类别词 route、格式 route、对象身份 route。
 5. 如果细 channel 稳定，再进入 neuron-level graph atlas。
 ```
+
+## Phase 725: Fine Channel Category Route Scan [2026-06-28 17:00]
+
+### 触发问题
+
+用户上传的 Phase 723-724 分析基本正确：当前路线已经从 global functional atlas（全局功能图谱）收缩到 apple-fruit-attribute（苹果-水果-属性）微世界，并从 head（注意力头）进入 channel group（通道组）。但 Phase 724 仍有硬伤：channel group 是粗切片，L20H17 channel 16-32 可能只是类别词 / 短答格式 / 高频词路线，而不一定是 category route（类别路线）。
+
+因此 Phase 725 继续同一阶段性目标：对 Phase 724 的高效通道组做 single-channel fine scan（单通道细扫），并加入 category selectivity（类别选择性）指标。
+
+### 本阶段脚本
+
+```text
+tests/gpt5/phase725_fine_channel_category_route_scan.py
+tests/gpt5/run_phase725_fine_channel_category_route_scan_full.sh
+```
+
+### 运行命令
+
+```bash
+tests/gpt5/run_phase725_fine_channel_category_route_scan_full.sh
+```
+
+按顺序运行：
+
+```bash
+python tests/gpt5/phase725_fine_channel_category_route_scan.py --model qwen3 --hard-exit-after-model
+python tests/gpt5/phase725_fine_channel_category_route_scan.py --model glm4 --hard-exit-after-model
+python tests/gpt5/phase725_fine_channel_category_route_scan.py --model deepseek7b --hard-exit-after-model
+python tests/gpt5/phase725_fine_channel_category_route_scan.py --summarize-only
+```
+
+### 测试原理
+
+本阶段读取 Phase 724 中每个模型最强的 2 个 channel group（通道组），把每个 16 维通道组拆成 16 个 single channel（单通道），逐个置零，再测 114 个 apple-fruit-attribute（苹果-水果-属性）案例的答案短语似然变化。
+
+核心指标：
+
+```text
+Need(channel) = - mean_logprob_delta
+```
+
+新增 category selectivity（类别选择性）：
+
+```text
+category_selectivity
+  = Need(category)
+    - mean(Need(color), Need(taste), Need(shape), Need(edible), Need(grows_on_tree))
+```
+
+解释：
+
+```text
+如果某个 channel 的 category_selectivity 明显为正，
+说明它更偏 category route（类别路线），
+而不是均匀影响所有短答关系。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase725_fine_channel_category_route_scan/phase725_cross_model_summary.md
+results/glm5_phase725_fine_channel_category_route_scan/phase725_cross_model_summary.json
+results/glm5_phase725_fine_channel_category_route_scan/phase725_qwen3_fine_channel_rows.jsonl
+results/glm5_phase725_fine_channel_category_route_scan/phase725_glm4_fine_channel_rows.jsonl
+results/glm5_phase725_fine_channel_category_route_scan/phase725_deepseek7b_fine_channel_rows.jsonl
+```
+
+每个模型：
+
+```text
+n_cases = 114
+n_rows = 3648
+```
+
+三模型总计：
+
+```text
+total_rows = 10944
+```
+
+### 关键客观结果
+
+qwen3：
+
+```text
+最强 harmful channel:
+  L24H29 channel 10
+  mean_logprob_delta = -0.0096
+  category_selectivity = -0.0356
+  fruit_minus_nonfruit = -0.0068
+  apple_minus_fruit = 0.0332
+```
+
+qwen3 没有找到 category-selective channel（类别选择性通道）。它的最强伤害更像 yes-no / edible（是否可食用）或格式混合效应。
+
+GLM4：
+
+```text
+最强 harmful channel:
+  L24H19 channel 73
+  mean_logprob_delta = -0.0028
+  category_selectivity = 0.0006
+  fruit_minus_nonfruit = -0.0005
+  apple_minus_fruit = 0.0004
+```
+
+GLM4 结果接近噪声级，不支持当前候选下的单通道类别路线。
+
+DS7B：
+
+```text
+L20H17 channel 25:
+  mean_logprob_delta = -0.0520
+  rank_delta = 0.98
+  top1_drop = 0.018
+  category_selectivity = 0.2176
+  category_need = 0.2271
+  fruit_minus_nonfruit = 0.0001
+  apple_minus_fruit = -0.0101
+
+L20H17 channel 30:
+  mean_logprob_delta = -0.0504
+  rank_delta = 1.58
+  top1_drop = 0.009
+  category_selectivity = 0.1732
+  category_need = 0.1901
+
+L20H17 channel 24:
+  mean_logprob_delta = -0.0430
+  rank_delta = 1.20
+  top1_drop = 0.018
+  category_selectivity = 0.1793
+  category_need = 0.1886
+  fruit_minus_nonfruit = 0.0117
+  apple_minus_fruit = 0.0231
+
+L20H17 channel 23:
+  mean_logprob_delta = -0.0275
+  category_selectivity = 0.1250
+  fruit_minus_nonfruit = 0.0193
+  apple_minus_fruit = 0.0348
+```
+
+DS7B 的关键结果：
+
+```text
+1. Phase 724 的 L20H17 channel 16-32 强效应不是均匀分布。
+2. 其中 channel 25 / 30 / 24 / 23 是最清晰的单通道候选。
+3. channel 25 / 30 / 24 对 category 明显更强，支持 category route 候选。
+4. fruit_minus_nonfruit 仍然很弱，说明这些单通道更像 category-selective route，而不是 fruit-specific shared route。
+5. apple-specific code 仍未闭合。
+```
+
+### 阶段判断
+
+Phase 725 支持以下判断：
+
+```text
+1. DS7B L20H17 channel 16-32 内部存在更细的高效单通道。
+2. 最强单通道是 L20H17 channel 25 / 30 / 24。
+3. 这些通道更像 category route（类别路线），而不是完整 fruit-shared route（水果共享路线）。
+4. qwen3 / GLM4 仍没有同等清晰结构。
+5. 当前机制从 head-level atlas 推进到 single-channel candidate，但还不是 neuron-level code。
+```
+
+### 严格问题和硬伤
+
+```text
+1. single-channel zero ablation 仍然是 off-manifold。
+2. single channel 不是神经元；它只是 attention head output 子空间的坐标。
+3. category_selectivity 仍基于模板任务，不等于自然语言类别理解。
+4. 这些通道对 fruit_minus_nonfruit 不强，说明它们更可能是一般 category route，而不是水果专属路线。
+5. 还没有测试 residual / MLP 是否放大这些单通道。
+6. 没有做自然生成闭合。
+7. 小模型偏差仍然存在，DS7B 结果不能直接推广为通用语言机制。
+```
+
+### 理论进展
+
+从 Phase 723 到 Phase 725，当前拼图变成：
+
+```text
+fruit-shared head route:
+  DS7B L27H23 / L23H0
+
+category-support head route:
+  DS7B L20H17
+
+category-selective fine channels:
+  DS7B L20H17 channel 25 / 30 / 24 / 23
+```
+
+更准确理论：
+
+```text
+苹果-水果-属性任务中，
+category route 与 fruit-shared route 不是同一个东西。
+
+L20H17 负责更一般的类别/短答候选支撑；
+L27H23 更像水果共享路线；
+苹果特异差分尚未定位，可能在词嵌入、MLP 或读出竞争中。
+```
+
+### 下一步
+
+Phase 726 与当前阶段仍相关，但已经从定位进入传播验证：
+
+```text
+Phase 726: DS7B Category Channel Residual/MLP Propagation Audit
+
+目标：
+1. 追踪 L20H17 channel 25 / 30 / 24 的写入是否在后续 residual 中保持或放大。
+2. 检查后续 MLP 是否把这些 category-selective channels 转换成最终 logits。
+3. 对 category / format / high-frequency label 做更强对照。
+4. 加入 natural generation closure，确认消融是否真的改变自然输出。
+```
+
+## Phase 726: Category Channel Natural Generation Closure [2026-06-28 17:04]
+
+### 触发问题
+
+Phase 725 找到了 DS7B L20H17 channel 25 / 30 / 24 等 category-selective channel（类别选择性通道），但仍然只是 teacher-forced likelihood（教师强制似然）层面的证据。用户上传的分析明确指出：必须验证 natural generation closure（自然生成闭合）。因此本阶段继续同一阶段目标，测试单通道消融是否真的改变自然贪婪生成输出。
+
+### 本阶段脚本
+
+```text
+tests/gpt5/phase726_category_channel_generation_closure.py
+tests/gpt5/run_phase726_category_channel_generation_closure_full.sh
+```
+
+### 运行命令
+
+```bash
+tests/gpt5/run_phase726_category_channel_generation_closure_full.sh
+```
+
+按顺序运行：
+
+```bash
+python tests/gpt5/phase726_category_channel_generation_closure.py --model qwen3 --hard-exit-after-model
+python tests/gpt5/phase726_category_channel_generation_closure.py --model glm4 --hard-exit-after-model
+python tests/gpt5/phase726_category_channel_generation_closure.py --model deepseek7b --hard-exit-after-model
+python tests/gpt5/phase726_category_channel_generation_closure.py --summarize-only
+```
+
+### 测试原理
+
+本阶段从 Phase 725 中读取每个模型 category_selectivity（类别选择性）最高的单通道：
+
+```text
+qwen3: L24H29 channel 119
+GLM4: L24H19 channel 69
+DS7B: L20H17 channel 25
+```
+
+然后只取 Phase 723 的 category（类别）问题，共 22 个案例，对 baseline（原始）和 single-channel ablation（单通道消融）分别做 greedy natural generation（贪婪自然生成），最多生成 4 个 token，比较：
+
+```text
+changed_rate：输出文本是否变化。
+baseline_hit_rate：baseline 是否命中目标类别。
+ablated_hit_rate：消融后是否命中目标类别。
+hit_drop_rate：baseline 命中但消融后不命中的比例。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase726_category_channel_generation_closure/phase726_cross_model_summary.md
+results/glm5_phase726_category_channel_generation_closure/phase726_cross_model_summary.json
+results/glm5_phase726_category_channel_generation_closure/phase726_qwen3_generation_rows.jsonl
+results/glm5_phase726_category_channel_generation_closure/phase726_glm4_generation_rows.jsonl
+results/glm5_phase726_category_channel_generation_closure/phase726_deepseek7b_generation_rows.jsonl
+```
+
+每个模型：
+
+```text
+n_cases = 22
+```
+
+三模型总计：
+
+```text
+total_rows = 66
+```
+
+### 关键客观结果
+
+```text
+qwen3 L24H29:119:
+  changed_rate = 0.000
+  baseline_hit_rate = 0.955
+  ablated_hit_rate = 0.955
+  hit_drop_rate = 0.000
+
+GLM4 L24H19:69:
+  changed_rate = 0.000
+  baseline_hit_rate = 0.955
+  ablated_hit_rate = 0.955
+  hit_drop_rate = 0.000
+
+DS7B L20H17:25:
+  changed_rate = 0.045
+  baseline_hit_rate = 0.500
+  ablated_hit_rate = 0.545
+  hit_drop_rate = 0.000
+```
+
+DS7B 只有 1/22 个案例发生生成文本变化：
+
+```text
+case: lemon commonsense category
+baseline: Fruits.
+ablated: Fruit.
+target: fruit
+```
+
+这个变化不是错误增加，而是从复数 Fruits 变成单数 Fruit。
+
+### 阶段判断
+
+Phase 726 是重要负结果：
+
+```text
+1. Phase 725 的 DS7B L20H17 channel 25 确实影响 category likelihood。
+2. 但单独消融该 channel 几乎不改变自然贪婪生成。
+3. 因此它不是单通道 generation switch（生成开关）。
+4. 它更像 category candidate likelihood support（类别候选似然支撑）的一部分。
+5. 自然生成闭合需要多个 channel / head cluster / downstream MLP / readout 共同干预。
+```
+
+### 严格问题和硬伤
+
+```text
+1. 只测 greedy decoding（贪婪解码），未测采样。
+2. 只测 category 关系，未测其他属性。
+3. 只消融单通道，可能太弱。
+4. DS7B baseline category generation 本身只有 0.500 hit rate，说明自然生成任务更难、更不稳定。
+5. 仍未完成 residual / MLP propagation（残差 / MLP 传播）验证。
+```
+
+### 理论进展
+
+最新判断需要收紧：
+
+```text
+DS7B L20H17 channel 25 / 30 / 24
+不是完整类别生成机制，
+而是类别候选似然支撑子通道。
+```
+
+更准确机制图：
+
+```text
+category likelihood support:
+  L20H17 channels 24/25/30/23
+
+fruit-shared route:
+  L27H23 / L23H0 and distributed subspace
+
+natural generation closure:
+  not closed by single channel
+```
+
+### 下一步
+
+当前 apple-fruit-attribute micro-atlas（苹果-水果-属性微图谱）阶段已经完成从：
+
+```text
+head -> channel group -> single channel -> natural generation sanity check
+```
+
+的第一轮闭合。
+
+下一步如果继续同一大方向，应进入 cluster-level intervention（簇级干预），而不是继续单通道：
+
+```text
+Phase 727: DS7B Category/Fruit Route Cluster Intervention
+
+目标：
+1. 同时消融 L20H17 channels 24/25/30/23。
+2. 同时消融 L27H23 fruit-shared channel groups。
+3. 比较 single-channel、multi-channel、full-head 的 generation closure。
+4. 观察是否只有 cluster-level 才能改变自然生成。
+```
+
+## Phase 727: Category/Fruit Route Cluster Intervention [2026-06-28 17:18]
+
+### 触发问题
+
+用户上传的 Phase 725-726 分析基本正确：单通道能影响 category likelihood（类别似然），但不能闭合 natural generation（自然生成）。因此下一步不能继续单通道，而应测试 cluster-level intervention（簇级干预）：如果多通道/多头簇仍不能改变自然生成，就说明生成闭合瓶颈更可能在 full head（整头）、downstream MLP（下游多层感知机）或 readout gate（读出门）。
+
+### 本阶段脚本
+
+```text
+tests/gpt5/phase727_category_fruit_cluster_intervention.py
+tests/gpt5/run_phase727_category_fruit_cluster_intervention_full.sh
+```
+
+### 运行命令
+
+```bash
+tests/gpt5/run_phase727_category_fruit_cluster_intervention_full.sh
+```
+
+按顺序运行：
+
+```bash
+python tests/gpt5/phase727_category_fruit_cluster_intervention.py --model qwen3 --hard-exit-after-model
+python tests/gpt5/phase727_category_fruit_cluster_intervention.py --model glm4 --hard-exit-after-model
+python tests/gpt5/phase727_category_fruit_cluster_intervention.py --model deepseek7b --hard-exit-after-model
+python tests/gpt5/phase727_category_fruit_cluster_intervention.py --summarize-only
+```
+
+### 测试原理
+
+本阶段只测试 category（类别）问题，共 22 个案例。每个模型比较以下干预：
+
+```text
+baseline：无干预。
+category_single：最高 category-selective 单通道。
+category_cluster：top category channels 簇。
+category_full_head：对应 category head 整头消融。
+fruit_cluster：fruit-shared channel groups。
+category_plus_fruit_cluster：category cluster + fruit cluster。
+```
+
+对每个干预同时记录：
+
+```text
+1. teacher-forced answer phrase likelihood delta。
+2. greedy natural generation hit rate。
+3. changed_rate_vs_baseline。
+4. hit_drop_rate_vs_baseline。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_cross_model_summary.md
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_cross_model_summary.json
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_qwen3_cluster_rows.jsonl
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_glm4_cluster_rows.jsonl
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_deepseek7b_cluster_rows.jsonl
+```
+
+每个模型：
+
+```text
+n_cases = 22
+n_rows = 132
+```
+
+三模型总计：
+
+```text
+total_rows = 396
+```
+
+### 关键客观结果
+
+qwen3：
+
+```text
+category_cluster:
+  mean_logprob_delta = +0.0184
+  hit_rate = 0.955
+  changed_rate = 0.000
+  hit_drop = 0.000
+
+category_full_head:
+  mean_logprob_delta = -0.0159
+  hit_rate = 0.955
+  changed_rate = 0.000
+  hit_drop = 0.000
+```
+
+qwen3 没有生成闭合效应。
+
+GLM4：
+
+```text
+category_cluster:
+  mean_logprob_delta = +0.0006
+  hit_rate = 0.955
+  changed_rate = 0.000
+  hit_drop = 0.000
+
+category_full_head:
+  mean_logprob_delta = +0.0016
+  hit_rate = 0.955
+  changed_rate = 0.000
+  hit_drop = 0.000
+```
+
+GLM4 仍接近噪声。
+
+DS7B：
+
+```text
+category_single:
+  mean_logprob_delta = -0.2271
+  hit_rate = 0.545
+  changed_rate = 0.045
+  hit_drop = 0.000
+  rank_delta = 3.14
+
+category_cluster:
+  mean_logprob_delta = -0.2613
+  hit_rate = 0.500
+  changed_rate = 0.000
+  hit_drop = 0.000
+  rank_delta = 0.68
+
+fruit_cluster:
+  mean_logprob_delta = -0.0582
+  hit_rate = 0.500
+  changed_rate = 0.000
+  hit_drop = 0.000
+
+category_plus_fruit_cluster:
+  mean_logprob_delta = -0.3463
+  hit_rate = 0.500
+  changed_rate = 0.000
+  hit_drop = 0.000
+  rank_delta = 1.00
+
+category_full_head:
+  mean_logprob_delta = -1.0575
+  hit_rate = 0.500
+  changed_rate = 0.409
+  hit_drop = 0.091
+  rank_delta = 4.50
+```
+
+### 阶段判断
+
+Phase 727 给出非常关键的边界：
+
+```text
+1. DS7B category_cluster 能明显降低 category likelihood。
+2. category_plus_fruit_cluster 降低似然更强。
+3. 但这些 cluster 仍没有改变 greedy natural generation。
+4. 只有 category_full_head 才明显改变生成文本，并带来少量 hit_drop。
+```
+
+因此：
+
+```text
+category likelihood support
+  可以由少数 channel cluster 承担；
+
+natural generation closure
+  不是这些 channel cluster 单独完成；
+  更接近 full head output / downstream MLP / readout gate 级别。
+```
+
+### 严格问题和硬伤
+
+```text
+1. 本阶段仍只测 category 问题。
+2. natural generation 使用 greedy decoding，不含采样。
+3. category_full_head 更强但定位更粗。
+4. DS7B baseline hit_rate 只有 0.5，说明自然生成任务本身不稳定。
+5. cluster 不改变生成，可能是下游补偿，也可能是当前 prompt / decoding 不敏感。
+6. 仍未完成 residual / MLP propagation。
+```
+
+### 理论进展
+
+从 Phase 725-727，理论进一步收紧为：
+
+```text
+likelihood support cluster
+  !=
+generation closure mechanism
+```
+
+更准确机制图：
+
+```text
+category likelihood support:
+  L20H17 channels 24/25/30/23
+
+fruit-shared support:
+  L27H23 channel groups
+
+generation-sensitive unit:
+  closer to full L20H17 head output,
+  or downstream MLP / readout gate.
+```
+
+这说明语言编码机制不是“单通道语义开关”，而是：
+
+```text
+局部候选似然支撑
+→ 通路/整头级整合
+→ 下游残差和 MLP 转换
+→ 读出竞争
+→ 自然生成闭合
+```
+
+### 下一步
+
+当前 apple-fruit-attribute micro-atlas 的 head-to-channel-to-cluster 第一轮已经完成。下一步仍处于同一大方向，但应转向 propagation（传播）：
+
+```text
+Phase 728: DS7B Full-Head vs Channel-Cluster Residual Propagation
+
+目标：
+1. 比较 category_cluster 和 category_full_head 在后续层 residual 上造成的差异。
+2. 测试 L20H17 full-head 为什么能改变生成，而 channel cluster 不能。
+3. 检查 L21-L24 MLP 是否放大或恢复 category cluster 扰动。
+4. 明确 generation closure 的瓶颈位置。
+```
+
+## Phase 728: Atlas Graph v1 3D Visualization Client [2026-06-28 17:50]
+
+### 触发问题
+
+用户要求：
+
+```text
+可视化客户端中，可以加载图谱的测试结果，在3d空间中显示出来；
+同时生成一份文件格式说明，保证后面会生成相同格式的数据，方便查看和研究。
+```
+
+### 生成和修改的文件
+
+```text
+frontend/src/neural_vis/hooks/useVisData.js
+frontend/src/neural_vis/index.jsx
+frontend/src/neural_vis/renderers/AtlasGraphRenderer.jsx
+frontend/ATLAS_GRAPH_FORMAT.md
+tests/gpt5/build_phase727_atlas_graph.py
+results/glm5_phase727_category_fruit_cluster_intervention/phase727_atlas_graph.json
+```
+
+### 命令
+
+```bash
+python tests/gpt5/build_phase727_atlas_graph.py
+npm run build
+```
+
+### 原理
+
+本阶段没有进行新模型推理，而是把已有 Phase 727 测试结果转换成统一图谱格式：
+
+```text
+atlas_graph_v1
+  graph.nodes = 机制对象
+  graph.edges = 机制关系 / 因果证据 / 失败边界
+```
+
+3D 坐标采用可解释布局：
+
+```text
+x = component offset + head/channel index
+y = layer index
+z = model lane
+```
+
+因此图谱不是普通展示图，而是可以直接观察：
+
+```text
+模型 → Phase → task → intervention → head/channel/cluster → failure boundary
+```
+
+### 客观结果
+
+生成 Phase 727 样例图谱：
+
+```text
+schema_version = atlas_graph_v1
+node_count = 54
+edge_count = 71
+source_phase = 727
+```
+
+前端构建验证：
+
+```text
+npm run build
+结果：通过
+```
+
+### 理论和工程进展
+
+本阶段把研究从文字 memo 和 JSON summary 推进到可累计的 mechanism atlas 数据层：
+
+```text
+Phase 727 原始结果
+  → atlas_graph_v1
+  → 3D client render
+  → hover 查看 role / evidence / Δlogp / generation changed
+```
+
+这使后续 apple-fruit-attribute micro-atlas 可以持续积累，不再只是每个 Phase 孤立记录。
+
+### 严格问题和硬伤
+
+```text
+1. 当前只是第一版图谱格式，不是完整全局神经元图谱。
+2. 3D 布局是可解释坐标，不是从真实激活空间降维得到。
+3. Phase 727 图谱主要来自 summary 和 Phase 724/725 component hints，仍依赖前序实验质量。
+4. 当前客户端支持 JSON 文件加载，不支持 JSONL 原始行直接加载。
+5. atlas_graph_v1 目前只覆盖 head/channel/cluster/intervention 层级，还没有接入 neuron 级别。
+```
+
+### 下一步
+
+下一阶段可以继续 Phase 728 原计划的 propagation 测试，但编号应顺延为 Phase 729：
+
+```text
+Phase 729: DS7B Full-Head vs Channel-Cluster Residual Propagation
+
+目标：
+1. 比较 category_cluster 和 category_full_head 对 L21-L24 residual 的影响。
+2. 判断 channel cluster 的扰动是在下游被冲洗、恢复，还是从未进入关键读出路径。
+3. 把传播结果继续输出为 atlas_graph_v1。
+4. 在 3D 图谱中显示 likelihood support 和 generation closure 的分叉位置。
+```
+
+## Phase 729: Full-Head vs Channel-Cluster Residual Propagation [2026-06-28 18:14]
+
+### 触发问题
+
+用户提供的 Phase 727 分析基本正确：
+
+```text
+likelihood support cluster
+  !=
+generation closure mechanism
+```
+
+Phase 727 已经证明 category_cluster 能影响 likelihood，但不能改变 natural generation；只有 category_full_head 明显改变生成文本。因此本阶段继续完成同一阶段目标中的 propagation 测量。
+
+### 脚本和结果文件
+
+```text
+tests/gpt5/phase729_full_head_vs_cluster_residual_propagation.py
+tests/gpt5/run_phase729_full_head_vs_cluster_residual_propagation_full.sh
+tests/gpt5/build_phase729_atlas_graph.py
+results/glm5_phase729_full_head_vs_cluster_residual_propagation/
+results/glm5_phase729_full_head_vs_cluster_residual_propagation/phase729_cross_model_summary.md
+results/glm5_phase729_full_head_vs_cluster_residual_propagation/phase729_cross_model_summary.json
+results/glm5_phase729_full_head_vs_cluster_residual_propagation/phase729_atlas_graph.json
+```
+
+### 命令
+
+```bash
+bash tests/gpt5/run_phase729_full_head_vs_cluster_residual_propagation_full.sh
+python tests/gpt5/build_phase729_atlas_graph.py
+```
+
+运行顺序：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+并且每个模型都使用：
+
+```text
+--hard-exit-after-model
+```
+
+### 测试原理
+
+本阶段不做新自然生成，而是对 Phase 727 的 category cases 做一次前向传播采样。
+
+对同一 prompt 分别运行：
+
+```text
+baseline
+category_cluster
+category_full_head
+category_plus_fruit_cluster
+```
+
+然后比较：
+
+```text
+delta(h_l) = h_l(intervention) - h_l(baseline)
+```
+
+核心指标：
+
+```text
+source_delta_norm:
+  干预源层后的扰动范数。
+
+delta_norm:
+  后续层 / component 的扰动范数。
+
+amplification_vs_source:
+  delta_norm / source_delta_norm
+
+component_vs_layer_input:
+  attention 或 MLP output 扰动 / 同层 input 扰动
+
+cos_with_final_delta:
+  当前扰动和最终 hidden 扰动的方向一致性。
+```
+
+### 客观结果
+
+跨模型汇总：
+
+```text
+qwen3:
+  category_cluster:
+    max_layer_amp = 7.112
+    top_site = hidden_33
+    top_delta = 5.891
+    MLP/input = 0.536
+    attn/input = 0.461
+
+  category_full_head:
+    max_layer_amp = 2.652
+    top_site = hidden_33
+    top_delta = 27.987
+    MLP/input = 0.517
+    attn/input = 0.407
+
+GLM4:
+  category_cluster:
+    max_layer_amp = 10.784
+    top_site = hidden_40
+    top_delta = 2.599
+    MLP/input = 0.465
+    attn/input = 0.389
+
+  category_full_head:
+    max_layer_amp = 3.978
+    top_site = hidden_40
+    top_delta = 5.406
+    MLP/input = 0.405
+    attn/input = 0.343
+
+DS7B:
+  category_cluster:
+    max_layer_amp = 4.105
+    top_site = hidden_27
+    top_delta = 31.437
+    MLP/input = 0.683
+    attn/input = 0.329
+
+  category_full_head:
+    max_layer_amp = 3.042
+    top_site = hidden_27
+    top_delta = 97.070
+    MLP/input = 0.626
+    attn/input = 0.255
+```
+
+Phase 729 atlas graph：
+
+```text
+schema_version = atlas_graph_v1
+node_count = 72
+edge_count = 72
+```
+
+### 阶段判断
+
+本阶段结果进一步支持 Phase 727 的边界结论。
+
+关键观察：
+
+```text
+1. category_cluster 不是没有传播。
+2. category_cluster 在 residual trajectory 中会被后续层放大。
+3. 但是 category_full_head 的绝对扰动幅度显著更大。
+4. DS7B 中 full head top_delta = 97.070，而 cluster top_delta = 31.437。
+5. MLP/input 明显高于 attention/input，特别是 DS7B: 0.683 vs 0.329。
+```
+
+因此，当前更准确的图像是：
+
+```text
+channel cluster
+  形成可传播的 likelihood-support perturbation；
+
+full head
+  形成更大、更完整的 residual trajectory perturbation；
+
+downstream MLP
+  对扰动有更强响应；
+
+generation closure
+  仍不等于 residual perturbation 本身，
+  还需要 readout competition / decoding route 级别闭合。
+```
+
+### 严格问题和硬伤
+
+```text
+1. Phase 729 是传播测量，不是自然生成闭合测试。
+2. max_layer_amp 是相对源扰动的放大比例，不能单独解释为因果强度。
+3. full_head 绝对扰动更大，但也更粗，不能说明具体 channel 已定位完整。
+4. component_vs_layer_input 是诊断指标，不是 MLP 因果证明。
+5. 小模型内部结构可能有偏差，尤其 qwen3/GLM4 的候选头未必是同构机制。
+6. DS7B category_plus_fruit_cluster 和 category_cluster 在本阶段传播指标接近，说明新增 fruit cluster 未显著改变传播主轨迹。
+```
+
+### 理论进展
+
+Phase 727 到 Phase 729 后，机制拼图更新为：
+
+```text
+category channel cluster:
+  likelihood support
+  + residual propagation
+  - generation closure
+
+category full head:
+  stronger residual perturbation
+  + visible generation sensitivity
+  - still too coarse
+
+downstream MLP:
+  stronger diagnostic response than attention output
+  but not yet causal closure
+```
+
+因此语言编码机制更像：
+
+```text
+局部通道簇支撑似然
+→ 整头输出形成完整传播轨迹
+→ MLP / residual 更新扩大或改写轨迹
+→ 读出端竞争决定自然生成
+```
+
+### 下一步
+
+下一阶段应继续同一大任务，但从“传播测量”推进到“传播节点干预”：
+
+```text
+Phase 730: DS7B Downstream MLP/Residual Bottleneck Intervention
+
+目标：
+1. 对 DS7B L22-L27 中 top propagation sites 做局部干预。
+2. 比较 hidden_27、L24_mlp_out、L22_mlp_out 等节点是否真正影响 category likelihood 和 generation。
+3. 测试 full_head trajectory 是否可以被下游 MLP/residual 单点拦截。
+4. 输出 atlas_graph_v1，把 propagation node 和 generation boundary 接起来。
+```
+
+## Phase 730: Downstream Propagation Node Cancellation [2026-06-28 18:58]
+
+### 输入内容判断
+
+本阶段分析了两份新材料：
+
+```text
+1. Phase 729 是关键分水岭实验：
+   likelihood support cluster != generation closure mechanism
+
+2. 差分方法只能看到两个条件之间的差异，
+   不能直接看到神经网络内部完整功能脉络。
+```
+
+总体判断：两份材料的方向基本正确。Phase 729 的真实增量不是证明 channel cluster 已经闭合生成，而是把机制分成了四层：
+
+```text
+likelihood support
+→ residual propagation
+→ downstream MLP / residual mediation
+→ readout / generation closure
+```
+
+第二份材料也正确指出：继续只做 pairwise difference 容易遗漏共享骨架，因此后续必须从 difference atlas 过渡到 full-path functional atlas。但在进入全路径图谱前，先做一次 downstream cancellation 是必要的，因为它可以判断 Phase 729 找到的传播节点到底是不是瓶颈。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase730_downstream_node_cancellation.py
+tests/gpt5/run_phase730_downstream_node_cancellation_full.sh
+tests/gpt5/build_phase730_atlas_graph.py
+```
+
+### 执行命令
+
+```bash
+PHASE730_MAX_CASES=1 bash tests/gpt5/run_phase730_downstream_node_cancellation_full.sh
+unset PHASE730_MAX_CASES
+bash tests/gpt5/run_phase730_downstream_node_cancellation_full.sh
+python tests/gpt5/build_phase730_atlas_graph.py
+python -m py_compile tests/gpt5/build_phase730_atlas_graph.py tests/gpt5/phase730_downstream_node_cancellation.py
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`，避免 GPU 显存残留。
+
+### 测试原理
+
+Phase 730 不是简单 ablation，而是 downstream cancellation。
+
+具体做法：
+
+```text
+1. 先运行 baseline。
+2. 再运行 upstream intervention：
+   category_cluster 或 category_full_head。
+3. 在上游扰动已经发生后，
+   把下游某个传播节点的输出替换回 baseline 对应输出。
+4. 如果目标答案 likelihood / generation 恢复，
+   说明该下游节点承载了上游扰动的因果路径。
+```
+
+本阶段测试的下游节点来自 Phase 729 的 top propagation sites：
+
+```text
+qwen3:
+  hidden_33
+  L28_mlp_out
+
+GLM4:
+  hidden_40
+  L28_mlp_out / L25_mlp_out
+
+DS7B:
+  hidden_27
+  L24_mlp_out
+```
+
+核心指标：
+
+```text
+mean_logprob_delta
+recovery_fraction_vs_upstream
+hit_rate
+changed_rate_vs_baseline
+hit_drop_rate_vs_baseline
+```
+
+### 客观结果
+
+结果目录：
+
+```text
+results/glm5_phase730_downstream_node_cancellation/
+```
+
+图谱文件：
+
+```text
+results/glm5_phase730_downstream_node_cancellation/phase730_atlas_graph.json
+schema_version = atlas_graph_v1
+node_count = 45
+edge_count = 62
+```
+
+关键汇总：
+
+```text
+qwen3:
+  category_cluster upstream_only:
+    mean_delta = +0.0184
+    generation changed = 0.000
+
+  category_cluster cancel_top_layer_out:
+    mean_delta = 0.0000
+    recovery = 1.000
+
+  category_cluster cancel_top_mlp_out:
+    mean_delta = +0.0032
+    recovery = 0.829
+
+  category_full_head upstream_only:
+    mean_delta = -0.0159
+    generation changed = 0.000
+
+  category_full_head cancel_top_mlp_out:
+    mean_delta = -0.0209
+    recovery = -0.318
+```
+
+```text
+GLM4:
+  category_cluster upstream_only:
+    mean_delta = +0.0006
+    generation changed = 0.000
+
+  category_cluster cancel_top_layer_out:
+    mean_delta = 0.0000
+    recovery = 1.000
+
+  category_cluster cancel_top_mlp_out:
+    mean_delta = +0.0047
+    recovery = -6.311
+
+  category_full_head upstream_only:
+    mean_delta = +0.0016
+    generation changed = 0.000
+
+  category_full_head cancel_top_mlp_out:
+    mean_delta = +0.0050
+    recovery = -2.051
+```
+
+```text
+DS7B:
+  category_cluster upstream_only:
+    mean_delta = -0.2613
+    generation changed = 0.000
+    hit_drop = 0.000
+
+  category_cluster cancel_top_layer_out:
+    mean_delta = 0.0000
+    recovery = 1.000
+
+  category_cluster cancel_top_mlp_out:
+    mean_delta = -0.3281
+    recovery = -0.256
+
+  category_full_head upstream_only:
+    mean_delta = -1.0575
+    generation changed = 0.409
+    hit_drop = 0.091
+
+  category_full_head cancel_top_layer_out:
+    mean_delta = 0.0000
+    recovery = 1.000
+    generation changed = 0.000
+
+  category_full_head cancel_top_mlp_out:
+    mean_delta = -0.9339
+    recovery = 0.117
+    generation changed = 0.273
+    hit_drop = 0.091
+```
+
+### 阶段结论
+
+最稳健的客观结论：
+
+```text
+1. cancel_top_layer_out 在三个模型中都能把 likelihood delta 恢复到 0。
+2. 这说明 late residual state 确实承载上游扰动后的状态。
+3. 但它不是机制起点，因为它是很靠后的 residual overwrite。
+4. top MLP cancellation 没有形成完整恢复。
+5. DS7B full_head 的 L24_mlp_out 只恢复约 11.7% likelihood drop，
+   并把 generation changed_rate 从 0.409 降到 0.273，
+   但 hit_drop 仍为 0.091。
+```
+
+因此 Phase 730 把 Phase 729 的传播结论进一步收紧为：
+
+```text
+late residual node:
+  carries downstream state
+  but too late / too coarse
+
+top MLP node:
+  partial mediator in DS7B full-head path
+  not full bottleneck
+
+category cluster:
+  supports likelihood trajectory
+  but still does not close generation
+
+full head:
+  generation-sensitive perturbation source
+  but mechanism still distributed
+```
+
+### 严格问题和硬伤
+
+```text
+1. cancel_top_layer_out 的 100% recovery 不能解释为发现核心机制。
+   它只是证明 late residual state 是扰动承载点。
+
+2. qwen3 / GLM4 的 upstream delta 很小，
+   recovery_fraction 存在小分母不稳定问题。
+
+3. DS7B 结果最有信息量，但 DS7B 也是小模型，
+   内部结构可能偏离更大模型的真实语言机制。
+
+4. top MLP 只解释一部分 full_head effect，
+   说明 generation closure 不是单个 MLP 节点能完全解释的。
+
+5. 本阶段仍然是差分 + cancellation，
+   还不是完整自然路径图谱。
+```
+
+### 理论进展
+
+当前理论更应表述为：
+
+```text
+语言生成不是单个语义向量直接被读出。
+它更像条件化 residual state 在多层中被逐步改写，
+其中注意力头提供源词元/路线选择，
+MLP 对状态进行非线性重写，
+late residual state 承载最终读出条件，
+最后由 readout competition 决定自然生成。
+```
+
+简化链条：
+
+```text
+source token / concept cue
+→ head route selection
+→ channel / subspace likelihood support
+→ full-head residual trajectory
+→ MLP partial mediation
+→ late residual state
+→ readout competition
+→ generation
+```
+
+这也支持第二份材料的关键提醒：
+
+```text
+差分方法只能看到某一条边的变化，
+不能看到共享的完整功能骨架。
+```
+
+### 下一步
+
+Phase 730 的阶段目标已经完成。下一步属于同一总研究路线，但已经不是简单传播节点取消，而是图谱范式升级：
+
+```text
+Phase 731: Full-Path Functional Atlas v0
+
+目标：
+1. 对 apple / fruit / color / attribute 任务记录自然完整路径。
+2. 同时保存 absolute trajectory 与 differential trajectory。
+3. 把 head、channel、MLP、residual、readout 统一进 atlas_graph_v1。
+4. 区分 shared skeleton、concept-specific branch、format-specific branch。
+5. 用少量关键 causal validation 验证图谱边，不再盲目扩大 patch 搜索。
+```
+
+Phase 731 的核心不是继续寻找单点开关，而是开始构建：
+
+```text
+full-path functional atlas
+```
+
+即：
+
+```text
+完整功能图谱 > 单点 patch 成功率
+```
+
+## Phase 731: Full-Path Functional Atlas v0 [2026-06-28 19:21]
+
+### 输入内容判断
+
+本阶段分析的 Phase 730 复盘材料总体正确，尤其是以下三点：
+
+```text
+1. Phase 730 的 late residual cancellation 是承载点证明，不是机制源点证明。
+2. top MLP cancellation 只说明部分中介，不说明完整瓶颈。
+3. 差分 + cancellation 已经暴露局限，下一步必须转向 full-path functional atlas。
+```
+
+材料中提出的核心修正是正确的：
+
+```text
+传播大，不等于机制瓶颈；
+能恢复，不等于机制起点；
+差分边，不等于完整功能骨架。
+```
+
+因此本阶段不继续扩大单点 patch，而是启动 full-path functional atlas v0。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase731_full_path_functional_atlas_v0.py
+tests/gpt5/run_phase731_full_path_functional_atlas_v0_full.sh
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase731_full_path_functional_atlas_v0.py
+python tests/gpt5/phase731_full_path_functional_atlas_v0.py --dry-run
+bash tests/gpt5/run_phase731_full_path_functional_atlas_v0_full.sh
+python tests/gpt5/phase731_full_path_functional_atlas_v0.py --summarize-only
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。
+
+### 测试目标
+
+Phase 731 的目标不是证明某个节点闭合生成，而是建立第一版全路径功能图谱：
+
+```text
+absolute trajectory（绝对轨迹）
++ descriptive factor effect（描述性因素效应）
++ candidate-head attention route（候选注意力头路线）
++ natural generation summary（自然生成摘要）
+```
+
+案例数量：
+
+```text
+total = 66
+category = 22
+color = 22
+taste = 22
+
+explicit_profile = 36
+conflict_profile = 12
+commonsense = 18
+```
+
+这比单一 category 测试更接近 apple-fruit-attribute 微世界。
+
+### 测试原理
+
+本阶段同时记录四类数据：
+
+```text
+1. natural generation:
+   贪婪生成文本、hit_rate、目标答案 phrase likelihood。
+
+2. absolute trajectory:
+   hidden state、attention output、MLP output、residual trajectory 的范数和相对关系。
+
+3. factor mean-difference:
+   对 object_group、relation、prompt_type 做基础均值差：
+
+   effect_norm = || mean(h | factor=level) - mean(h) ||
+
+4. candidate-head attention:
+   只记录候选 head 对 object_name、relation_name、target_value、record_line 等 token group 的注意力质量。
+```
+
+注意：这里没有使用复杂统计模型，只做基础均值差，目的是先拼出客观结构。
+
+### 输出文件
+
+结果目录：
+
+```text
+results/glm5_phase731_full_path_functional_atlas_v0/
+```
+
+核心文件：
+
+```text
+phase731_qwen3_case_summary.jsonl
+phase731_qwen3_trajectory_rows.jsonl
+phase731_qwen3_attention_rows.jsonl
+phase731_qwen3_factor_effect_rows.jsonl
+
+phase731_glm4_case_summary.jsonl
+phase731_glm4_trajectory_rows.jsonl
+phase731_glm4_attention_rows.jsonl
+phase731_glm4_factor_effect_rows.jsonl
+
+phase731_deepseek7b_case_summary.jsonl
+phase731_deepseek7b_trajectory_rows.jsonl
+phase731_deepseek7b_attention_rows.jsonl
+phase731_deepseek7b_factor_effect_rows.jsonl
+
+phase731_cross_model_summary.json
+phase731_cross_model_summary.md
+phase731_atlas_graph.json
+```
+
+图谱输出：
+
+```text
+schema_version = atlas_graph_v1
+node_count = 70
+edge_count = 78
+```
+
+### 客观结果
+
+跨模型自然生成结果：
+
+```text
+qwen3:
+  category hit = 0.955
+  color hit = 1.000
+  taste hit = 0.909
+  top factor effect = prompt_type/commonsense@hidden_35
+  effect_norm = 190.465
+
+GLM4:
+  category hit = 0.955
+  color hit = 1.000
+  taste hit = 1.000
+  top factor effect = prompt_type/commonsense@hidden_39
+  effect_norm = 89.866
+
+DS7B:
+  category hit = 0.500
+  color hit = 0.682
+  taste hit = 0.727
+  top factor effect = prompt_type/commonsense@L27_mlp_out
+  effect_norm = 394.751
+```
+
+按 prompt_type 分组：
+
+```text
+qwen3:
+  commonsense hit = 0.944
+  conflict_profile hit = 1.000
+  explicit_profile hit = 0.944
+
+GLM4:
+  commonsense hit = 0.944
+  conflict_profile hit = 1.000
+  explicit_profile hit = 1.000
+
+DS7B:
+  commonsense hit = 0.222
+  conflict_profile hit = 0.750
+  explicit_profile hit = 0.806
+```
+
+候选 head 注意力摘要中的关键现象：
+
+```text
+DS7B:
+  L20H17:
+    relation mass = 0.574
+    target_value mass = 0.024
+    object mass = 0.015
+
+  L23H0:
+    relation mass = 0.411
+    object mass = 0.356
+    target_value mass = 0.119
+
+  L24H21:
+    record_line mass = 0.839
+    target_value mass = 0.157
+
+GLM4:
+  L29H18 / L29H28 / L24H19:
+    target_value mass 高，record_line mass 接近 0.95 到 0.99。
+
+qwen3:
+  L24H29:
+    target_value mass = 0.504
+    record_line mass = 0.989。
+```
+
+### 阶段结论
+
+Phase 731 的最重要客观发现不是某个 fruit head，而是：
+
+```text
+prompt_type / knowledge source 的全路径效应非常强。
+```
+
+三模型 top factor effect 都集中在 commonsense 条件：
+
+```text
+qwen3: commonsense@hidden_35
+GLM4: commonsense@hidden_39
+DS7B: commonsense@L27_mlp_out
+```
+
+这说明在当前微世界中，模型首先强烈区分：
+
+```text
+explicit facts / conflict facts / commonsense
+```
+
+然后才在这个路径上处理：
+
+```text
+category / color / taste
+```
+
+因此此前只围绕 category channel cluster 做 patch，确实容易漏掉共享骨架。
+
+更准确的全路径图像是：
+
+```text
+prompt_type skeleton
+→ relation route
+→ object / value binding
+→ candidate head addressing
+→ MLP / residual trajectory
+→ readout
+→ generation
+```
+
+### 严格问题和硬伤
+
+```text
+1. Phase 731 是描述性 full-path atlas v0，不是因果闭合。
+2. factor effect_norm 是均值向量差，不能直接解释为因果强度。
+3. candidate-head attention 仍是 observational attention，不等价于必要性。
+4. DS7B 的 commonsense 表现很弱，可能放大了 prompt_type effect。
+5. 本阶段没有验证具体因果边，例如 L20H17 -> L24_mlp_out。
+6. 小模型结构可能偏差很大，不能外推到大模型或人脑。
+```
+
+### 理论进展
+
+Phase 731 后，理论应进一步收紧：
+
+```text
+语言编码机制不是先有单个概念向量再读出，
+而是先形成任务/知识来源/格式协议骨架，
+再在骨架中绑定对象、关系和值，
+最后通过 head route、MLP rewrite、residual carrier 和 readout competition 生成答案。
+```
+
+当前最接近真实机制的公式应是：
+
+```text
+h_l(o,r,f,k)
+= S_l
++ K_l(k)
++ P_l(f)
++ R_l(r)
++ O_l(o)
++ V_l(v)
++ B_l(o,r,v)
++ M_l
++ I_l
++ epsilon_l
+```
+
+其中本阶段最强客观项是：
+
+```text
+K_l(k) / P_l(f)
+```
+
+也就是 knowledge source / prompt protocol 对后段 residual / MLP 轨迹的影响。
+
+### 下一步
+
+Phase 731 已完成 full-path atlas v0。下一阶段仍属于同一大任务，但应从“描述性图谱”推进到“关键边因果验证”：
+
+```text
+Phase 732: Full-Path Atlas Causal Edge Validation
+
+核心边：
+1. prompt_type skeleton -> late hidden / MLP
+2. relation route -> DS7B L20H17 / L23H0
+3. DS7B L20H17 full head -> L24_mlp_out
+4. L24_mlp_out -> late residual / readout
+
+目标：
+把 Phase 731 的描述性 factor edge，
+转化为少量可验证 causal edge。
+```
+
+阶段性大任务仍然是：
+
+```text
+从局部 patch 研究，升级为全路径功能图谱工程。
+```

@@ -1,0 +1,95 @@
+=== Phase732 qwen3 start 2026-06-28 20:05:44 ===
+`torch_dtype` is deprecated! Use `dtype` instead!
+[model_utils] Loading qwen3... (8bit=False)
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 26393.87it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[20:05:47] qwen3: prompt_pairs=18, head_cases=66, sites=['hidden_35', 'hidden_33'], heads=['L24H29', 'L28H0', 'L29H11', 'L26H26']
+[20:05:59] qwen3: prompt_transfer_rows=72
+[20:06:26] qwen3: head_ablation_rows=264
+[20:06:26] qwen3: edge_mediation_rows=0
+[model_utils] GPU memory released, allocated=8.11 GB
+{
+  "model": "qwen3",
+  "prompt_transfer_summary": {
+    "commonsense<-explicit|hidden_35": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": 3.2586279313804374,
+      "changed_rate": 0.05555555555555555,
+      "recipient_hit_rate": 0.9444444444444444,
+      "patched_hit_rate": 1.0,
+      "hit_gain": 0.05555555555555555,
+      "hit_loss": 0.0
+    },
+    "explicit<-commonsense|hidden_35": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": -3.6982930891164063,
+      "changed_rate": 0.05555555555555555,
+      "recipient_hit_rate": 1.0,
+      "patched_hit_rate": 0.9444444444444444,
+      "hit_gain": 0.0,
+      "hit_loss": 0.05555555555555555
+    },
+    "commonsense<-explicit|hidden_33": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": 3.1693563884538083,
+      "changed_rate": 0.05555555555555555,
+      "recipient_hit_rate": 0.9444444444444444,
+      "patched_hit_rate": 1.0,
+      "hit_gain": 0.05555555555555555,
+      "hit_loss": 0.0
+    },
+    "explicit<-commonsense|hidden_33": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": -3.192906292853877,
+      "changed_rate": 0.05555555555555555,
+      "recipient_hit_rate": 1.0,
+      "patched_hit_rate": 0.9444444444444444,
+      "hit_gain": 0.0,
+      "hit_loss": 0.05555555555555555
+    }
+  },
+  "top_head_edges": [
+    {
+      "head_key": "L24H29",
+      "relation": "taste",
+      "prompt_type": "explicit_profile",
+      "n": 12,
+      "mean_logprob_delta": -0.09900896620805118,
+      "mean_rank_delta": 0.16666666666666666,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L26H26",
+      "relation": "taste",
+      "prompt_type": "commonsense",
+      "n": 6,
+      "mean_logprob_delta": -0.047855257987976074,
+      "mean_rank_delta": 0.0,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L28H0",
+      "relation": "taste",
+      "prompt_type": "explicit_profile",
+      "n": 12,
+      "mean_logprob_delta": -0.043228611644811586,
+      "mean_rank_delta": 0.16666666666666666,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L24H29",
+      "relation": "category",
+      "prompt_type": "conflict_profile",
+      "n": 4,
+      "mean_logprob_delta": -0.0417952302377671,
+      "mean_rank_delta": 0.0,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    }
+  ],
+  "edge_mediation_summary": {}
+}
+=== Phase732 qwen3 done 2026-06-28 20:06:26 ===

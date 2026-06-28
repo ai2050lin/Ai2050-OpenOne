@@ -1,0 +1,345 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+[model_utils] Loading qwen3... (8bit=False)
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 21822.49it/s]
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[17:17:16] qwen3: cases=22, interventions={"baseline": [], "category_single": [{"layer": 24, "head": 29, "start": 119, "end": 120}], "category_cluster": [{"layer": 24, "head": 29, "start": 119, "end": 120}, {"layer": 24, "head": 29, "start": 115, "end": 116}, {"layer": 24, "head": 29, "start": 9, "end": 10}, {"layer": 24, "head": 29, "start": 13, "end": 14}], "category_full_head": [{"layer": 24, "head": 29, "start": 0, "end": 128}], "fruit_cluster": [{"layer": 26, "head": 26, "start": 112, "end": 128}, {"layer": 26, "head": 26, "start": 96, "end": 112}], "category_plus_fruit_cluster": [{"layer": 24, "head": 29, "start": 119, "end": 120}, {"layer": 24, "head": 29, "start": 115, "end": 116}, {"layer": 24, "head": 29, "start": 9, "end": 10}, {"layer": 24, "head": 29, "start": 13, "end": 14}, {"layer": 26, "head": 26, "start": 112, "end": 128}, {"layer": 26, "head": 26, "start": 96, "end": 112}]}
+[17:17:20] qwen3: 8/22 cases; rows=48
+[17:17:23] qwen3: 16/22 cases; rows=96
+[17:17:26] qwen3: 22/22 cases; rows=132
+[model_utils] GPU memory released, allocated=8.11 GB
+{
+  "model": "qwen3",
+  "n_cases": 22,
+  "by_intervention": {
+    "baseline": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": 0.0,
+      "first_rank_delta": 0.0,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.0
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.0
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.0
+        }
+      }
+    },
+    "category_cluster": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": 0.01841989392414689,
+      "first_rank_delta": -0.045454545454545456,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.06567140420277913
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.00166995613835752
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.0003774513800938924
+        }
+      }
+    },
+    "category_full_head": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": -0.015854376537556,
+      "first_rank_delta": 0.0,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.04804861545562744
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": -0.0417952302377671
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": -0.03915892130074402
+        }
+      }
+    },
+    "category_plus_fruit_cluster": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": 0.018965992229905995,
+      "first_rank_delta": 0.0,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.0731507937113444
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.0017056893557310104
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": -0.0023729742194215455
+        }
+      }
+    },
+    "category_single": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": 0.0039274678142233324,
+      "first_rank_delta": 0.045454545454545456,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.01529081662495931
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.0004745852202177048
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": -0.000603245726476113
+        }
+      }
+    },
+    "fruit_cluster": {
+      "n": 22,
+      "hit_rate": 0.9545454545454546,
+      "changed_rate_vs_baseline": 0.0,
+      "hit_drop_rate_vs_baseline": 0.0,
+      "mean_logprob_delta": 0.016000126827169548,
+      "first_rank_delta": 0.0,
+      "outputs": [
+        [
+          "fruit",
+          13
+        ],
+        [
+          "tool",
+          3
+        ],
+        [
+          "vegetable",
+          2
+        ],
+        [
+          "object",
+          1
+        ],
+        [
+          "furniture",
+          1
+        ],
+        [
+          "vehicle",
+          1
+        ],
+        [
+          "color",
+          1
+        ]
+      ],
+      "by_prompt_type": {
+        "commonsense": {
+          "n": 6,
+          "hit_rate": 0.8333333333333334,
+          "mean_logprob_delta": 0.05873485406239828
+        },
+        "conflict_profile": {
+          "n": 4,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": -0.0006045110058039427
+        },
+        "explicit_profile": {
+          "n": 12,
+          "hit_rate": 1.0,
+          "mean_logprob_delta": 0.00016764248721301556
+        }
+      }
+    }
+  }
+}

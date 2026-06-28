@@ -25,6 +25,7 @@ import CausalChainRenderer from './renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './renderers/DarkMatterFlowRenderer';
 import NeuralNetworkRenderer from './renderers/NeuralNetworkRenderer';
 import ComponentDetailRenderer from './renderers/ComponentDetailRenderer';
+import AtlasGraphRenderer from './renderers/AtlasGraphRenderer';
 import SceneHelpers from './components/SceneHelpers';
 import HoverTooltip from './components/HoverTooltip';
 import useVisData from './hooks/useVisData';
@@ -96,6 +97,10 @@ export default function NeuralVis3DApp() {
   const visualizations = activeData?.visualizations || [];
   const schemaVersion = activeData?.schema_version || '1.0';
   const nLayers = activeData?.model_info?.n_layers || 36;
+  const isAtlasGraph = schemaVersion === 'atlas_graph_v1';
+  const atlasGraph = isAtlasGraph ? activeData?.graph : null;
+  const atlasNodeCount = atlasGraph?.nodes?.length || 0;
+  const atlasEdgeCount = atlasGraph?.edges?.length || atlasGraph?.links?.length || 0;
 
   // ---- 按类型分类可视化对象 ----
   const byType = {
@@ -516,10 +521,20 @@ export default function NeuralVis3DApp() {
           <div style={{ ...S.section, padding: 8, background: '#0f172a', borderRadius: 6, border: '1px solid #1e293b' }}>
             <h3 style={{ ...S.sectionTitle, marginBottom: 6 }}>数据摘要</h3>
             <div style={{ fontSize: 10, lineHeight: 1.6 }}>
-              <div>Schema: <span style={{ color: '#60a5fa' }}>v{schemaVersion}</span></div>
-              <div>Model: <span style={{ color: '#4ecdc4' }}>{activeData.model}</span></div>
-              <div>Layers: {activeData.model_info?.n_layers} | d_model: {activeData.model_info?.d_model}</div>
-              <div>可视化对象: <span style={{ color: '#ffe66d' }}>{visualizations.length}</span></div>
+              <div>Schema: <span style={{ color: '#60a5fa' }}>{isAtlasGraph ? schemaVersion : `v${schemaVersion}`}</span></div>
+              <div>Model: <span style={{ color: '#4ecdc4' }}>{activeData.model || activeData.model_info?.model || 'mixed'}</span></div>
+              {isAtlasGraph ? (
+                <>
+                  <div>Phase: {activeData.model_info?.phase || activeData.phase || '-'}</div>
+                  <div>图谱节点: <span style={{ color: '#ffe66d' }}>{atlasNodeCount}</span></div>
+                  <div>图谱边: <span style={{ color: '#f97316' }}>{atlasEdgeCount}</span></div>
+                </>
+              ) : (
+                <>
+                  <div>Layers: {activeData.model_info?.n_layers} | d_model: {activeData.model_info?.d_model}</div>
+                  <div>可视化对象: <span style={{ color: '#ffe66d' }}>{visualizations.length}</span></div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -608,6 +623,14 @@ export default function NeuralVis3DApp() {
 
           {/* 场景辅助 */}
           <SceneHelpers nLayers={nLayers} />
+
+          {/* ===== 机制图谱测试结果 ===== */}
+          {isAtlasGraph && (
+            <AtlasGraphRenderer
+              graph={atlasGraph}
+              onHoverNode={setHoveredInfo}
+            />
+          )}
 
           {/* ===== DNN层结构渲染器 ===== */}
           {showDNNLayers && (
@@ -727,6 +750,21 @@ export default function NeuralVis3DApp() {
                 {hoveredInfo.norm !== undefined && <div><span style={{ color: '#94a3b8' }}>norm:</span> {hoveredInfo.norm.toFixed(1)}</div>}
                 {hoveredInfo.category && (
                   <div><span style={{ color: '#94a3b8' }}>category:</span> <span style={{ color: CATEGORY_COLORS[hoveredInfo.category] || '#888' }}>{hoveredInfo.category}</span></div>
+                )}
+                {hoveredInfo.type && <div><span style={{ color: '#94a3b8' }}>type:</span> {hoveredInfo.type}</div>}
+                {hoveredInfo.model && <div><span style={{ color: '#94a3b8' }}>model:</span> {hoveredInfo.model}</div>}
+                {hoveredInfo.head !== undefined && <div><span style={{ color: '#94a3b8' }}>head:</span> H{hoveredInfo.head}</div>}
+                {hoveredInfo.channel !== undefined && <div><span style={{ color: '#94a3b8' }}>channel:</span> C{hoveredInfo.channel}</div>}
+                {hoveredInfo.role && <div><span style={{ color: '#94a3b8' }}>role:</span> {hoveredInfo.role}</div>}
+                {hoveredInfo.evidence_level && <div><span style={{ color: '#94a3b8' }}>evidence:</span> {hoveredInfo.evidence_level}</div>}
+                {hoveredInfo.mean_logprob_delta !== undefined && (
+                  <div><span style={{ color: '#94a3b8' }}>mean Δlogp:</span> {Number(hoveredInfo.mean_logprob_delta).toFixed(4)}</div>
+                )}
+                {hoveredInfo.changed_rate_vs_baseline !== undefined && (
+                  <div><span style={{ color: '#94a3b8' }}>changed:</span> {Number(hoveredInfo.changed_rate_vs_baseline).toFixed(3)}</div>
+                )}
+                {hoveredInfo.hit_drop_rate_vs_baseline !== undefined && (
+                  <div><span style={{ color: '#94a3b8' }}>hit drop:</span> {Number(hoveredInfo.hit_drop_rate_vs_baseline).toFixed(3)}</div>
                 )}
                 {hoveredInfo.subspace && (
                   <div><span style={{ color: '#94a3b8' }}>subspace:</span> <span style={{ color: SUBSPACE_COLORS[hoveredInfo.subspace] || '#888' }}>{hoveredInfo.subspace === 'w_u' ? 'W_U' : 'W_U⊥'}</span></div>
