@@ -1,0 +1,362 @@
+[14:32:28] qwen3/smoke: pairs=2 seed_candidates=1 sources=['records_all']
+[14:32:28] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   5%|▌         | 21/398 [00:00<00:01, 200.60it/s]Loading weights:  21%|██        | 84/398 [00:00<00:00, 446.56it/s]Loading weights:  38%|███▊      | 151/398 [00:00<00:00, 537.89it/s]Loading weights:  52%|█████▏    | 205/398 [00:00<00:00, 521.43it/s]Loading weights:  68%|██████▊   | 269/398 [00:00<00:00, 538.75it/s]Loading weights:  86%|████████▋ | 344/398 [00:00<00:00, 605.42it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 553.80it/s]
+[14:32:29] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[14:32:30] qwen3: expanded_candidates=2 combo_sites=['L34:attn_out', 'L34:mlp_out', 'L35:attn_out', 'L35:mlp_out']
+[14:32:31] qwen3: multisite carrier 1/2 pairs; rows=10
+[14:32:31] qwen3: multisite carrier 2/2 pairs; rows=20
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "combo_baseline": {
+    "off_path_control": {
+      "n_groups": 2,
+      "mean_effective_restore_rate": 0.25,
+      "mean_recovered": 0.0,
+      "mean_recovery_fraction": 0.16666666666666666,
+      "mean_release_reduced": 0.0625,
+      "role_counts": {
+        "off_path_control_suspicious": 1,
+        "anti_restore_or_off_path": 1
+      }
+    },
+    "same_layer_primary_pair": {
+      "n_groups": 2,
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.34375,
+      "mean_recovery_fraction": -2.0,
+      "mean_release_reduced": 0.0,
+      "role_counts": {
+        "weak_or_unclear": 1,
+        "anti_restore_or_off_path": 1
+      }
+    },
+    "single_primary_site": {
+      "n_groups": 4,
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.171875,
+      "mean_recovery_fraction": -0.41666666666666663,
+      "mean_release_reduced": 0.03125,
+      "role_counts": {
+        "weak_or_unclear": 2,
+        "anti_restore_or_off_path": 2
+      }
+    }
+  },
+  "top_writers": [
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_attention_mass_to_source": 0.199695885181427,
+      "mean_source_target_logit_contribution": 3.646709932014346,
+      "mean_source_total_route_suppression_contribution": 0.22372824419289827,
+      "mean_target_logit_drop_after_source_removal": 0.1875,
+      "support_rate_drop_gt_0_20": 0.5,
+      "mean_total_positive_route_release_after_source_removal": 0.0625,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_attention_mass_to_source": 0.1768946647644043,
+      "mean_source_target_logit_contribution": 0.01619010604918003,
+      "mean_source_total_route_suppression_contribution": 0.05263072997331619,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "route_guard_rate_release_gt_0_20": 0.5,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    }
+  ],
+  "top_multisite": [
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 2,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 4.226796627044678,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_target_logit_drop": 0.125,
+      "mean_target_logit_recovered_by_restore": 0.0625,
+      "mean_target_recovery_fraction": 0.3333333333333333,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0625,
+      "mean_route_release_reduced_by_restore": 0.0,
+      "effective_restore_rate": 0.5,
+      "combo_role_guess": "off_path_control_suspicious"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "L34:attn_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L34:attn_out"
+      ],
+      "combo_size": 1,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 3.6393707394599915,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_target_logit_drop": 0.125,
+      "mean_target_logit_recovered_by_restore": 0.0625,
+      "mean_target_recovery_fraction": 0.0,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.125,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "L34:attn_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L34:attn_out"
+      ],
+      "combo_size": 1,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 2.8799562454223633,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 1.0,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "L34:attn+mlp",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "combo_size": 2,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 2.9485726952552795,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 0.0,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0625,
+      "mean_route_release_reduced_by_restore": 0.0625,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "L34:mlp_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L34:mlp_out"
+      ],
+      "combo_size": 1,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 3.017189145088196,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_target_logit_drop": 0.0625,
+      "mean_target_logit_recovered_by_restore": -0.0625,
+      "mean_target_recovery_fraction": 1.0,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "anti_restore_or_off_path"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 2,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 3.690114974975586,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_target_logit_drop": 0.0625,
+      "mean_target_logit_recovered_by_restore": -0.0625,
+      "mean_target_recovery_fraction": 0.0,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "anti_restore_or_off_path"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "L34:mlp_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L34:mlp_out"
+      ],
+      "combo_size": 1,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 7.6659533977508545,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_target_logit_drop": 0.875,
+      "mean_target_logit_recovered_by_restore": -0.6875,
+      "mean_target_recovery_fraction": -3.6666666666666665,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.125,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "anti_restore_or_off_path"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "L34:attn+mlp",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "combo_size": 2,
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "mean_combo_delta_norm_after_removal": 5.652662068605423,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_target_logit_drop": 0.875,
+      "mean_target_logit_recovered_by_restore": -0.6875,
+      "mean_target_recovery_fraction": -4.0,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.125,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "anti_restore_or_off_path"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+[17:26:06] qwen3/smoke: cases=9 sources=['context_all', 'target_context_line', 'target_value_tokens', 'object_tokens'] relations=['category', 'color', 'edible']
+[17:26:06] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/398 [00:00<00:07, 51.54it/s]Loading weights:  26%|██▌       | 102/398 [00:00<00:00, 550.78it/s]Loading weights:  42%|████▏     | 166/398 [00:00<00:00, 545.36it/s]Loading weights:  61%|██████    | 242/398 [00:00<00:00, 621.51it/s]Loading weights:  77%|███████▋  | 306/398 [00:00<00:00, 617.13it/s]Loading weights:  93%|█████████▎| 369/398 [00:00<00:00, 613.90it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 581.72it/s]
+[17:26:07] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[17:26:09] qwen3: format fibers 3/9 cases; rows=27
+[17:26:11] qwen3: format fibers 6/9 cases; rows=54
+[17:26:12] qwen3: format fibers 9/9 cases; rows=81
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "n_cases": 9,
+  "context_pair_summaries": {
+    "key_value": {
+      "n_objects": 3,
+      "n_features": 64,
+      "pair_summary": {
+        "same_domain_mean": null,
+        "different_domain_mean": -0.3342720644715757,
+        "separation": 0.3342720644715757,
+        "same_n": 0,
+        "different_n": 3,
+        "nn_domain_accuracy": 0.0
+      }
+    },
+    "compact_sentence": {
+      "n_objects": 4,
+      "n_features": 64,
+      "pair_summary": {
+        "same_domain_mean": null,
+        "different_domain_mean": -0.014796991660886974,
+        "separation": 0.014796991660886974,
+        "same_n": 0,
+        "different_n": 6,
+        "nn_domain_accuracy": 0.0
+      }
+    },
+    "sentence_lines": {
+      "n_objects": 2,
+      "n_features": 32,
+      "pair_summary": {
+        "same_domain_mean": null,
+        "different_domain_mean": -1.0,
+        "separation": 1.0,
+        "same_n": 0,
+        "different_n": 1,
+        "nn_domain_accuracy": 0.0
+      }
+    }
+  },
+  "cross_context_stability": []
+}

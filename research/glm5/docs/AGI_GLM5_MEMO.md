@@ -57219,3 +57219,3742 @@ Cross-Domain Writer Control and Downstream Carrier Test
 4. 检查 L23-L27 哪些位置能恢复 target logit，同时压回 route release。
 5. 如果 L22:H24/H1 强于随机头，且存在可恢复的 downstream carrier，才可以把 Phase 755 的跨域 writer 结果写入 Graph Atlas v1。
 ```
+
+## Phase 756: 跨域写入器控制组与下游承载验证 [2026-06-29 14:26]
+
+### 附件判断审视
+
+附件对 Phase 755 的收紧判断基本正确：Phase 755 不是语言全图完成，而是把苹果-水果局部图谱推进到六个语义域的 route competition skeleton（路线竞争骨架）候选。最稳妥表达仍然是：
+
+```text
+DS7B 出现强跨域 writer / guard 候选；
+qwen3 和 GLM4 没有同等复现；
+因此不能称为 cross-model universal invariant。
+```
+
+附件提出 Phase 756 需要补 random / same-layer control（随机 / 同层控制）和 downstream carrier（下游承载者）验证，这一点是正确的。本轮执行了该任务。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase756_cross_domain_writer_control_downstream_carrier.py
+tests/gpt5/run_phase756_cross_domain_writer_control_downstream_carrier_round.sh
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase756_cross_domain_writer_control_downstream_carrier.py
+python tests/gpt5/phase756_cross_domain_writer_control_downstream_carrier.py --dry-run --round-name dry --max-pairs 6 --max-candidates 3 --max-source-groups 2 --max-downstream-sites 4
+
+tests/gpt5/run_phase756_cross_domain_writer_control_downstream_carrier_round.sh smoke --max-pairs 2 --max-candidates 1 --max-source-groups 1 --max-downstream-sites 2 --top-k-vocab 8 --max-topk-tokens 5 --max-route-classes 4 --log-every 1
+
+tests/gpt5/run_phase756_cross_domain_writer_control_downstream_carrier_round.sh main --max-pairs 24 --max-candidates 2 --max-source-groups 2 --max-downstream-sites 4 --top-k-vocab 14 --max-topk-tokens 10 --max-route-classes 6 --log-every 4
+
+tests/gpt5/run_phase756_cross_domain_writer_control_downstream_carrier_round.sh confirm --max-pairs 48 --max-candidates 2 --max-source-groups 2 --max-downstream-sites 4 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --log-every 8
+```
+
+### 测试原理
+
+本轮测试分两步：
+
+```text
+1. source removal + same-layer control
+   固定 Phase 755 候选头，移除 records_all / target_record_line 到 answer position 的 V/O 源贡献。
+   同时加入同层 deterministic control head，比较 target logit drop 和 route release。
+
+2. downstream component restore
+   在保持源贡献移除的条件下，把 L23-L27 或对应模型下游层的 attn_out / mlp_out 输出恢复为 base 状态。
+   如果恢复某个下游组件能显著恢复 target logit，并压回 route release，说明该组件是 coarse downstream carrier。
+```
+
+注意：downstream restore 是整组件、答案位置恢复，不是神经元级充分性证明。
+
+### 客观结果
+
+确认轮结果路径：
+
+```text
+results/glm5_phase756_cross_domain_writer_control_downstream_carrier/confirm/phase756_cross_model_summary.md
+results/glm5_phase756_cross_domain_writer_control_downstream_carrier/confirm/phase756_cross_model_summary.json
+```
+
+控制组基线：
+
+```text
+qwen3:
+  Phase755 candidates: support=0.146, mean drop=0.058, guard=0.281, release=0.131
+  same-layer controls: support=0.083, mean drop=0.034, guard=0.188, release=0.090
+  判断：候选略强，但整体弱。
+
+GLM4:
+  Phase755 candidates: support=0.042, mean drop=0.002, guard=0.062, release=0.073
+  same-layer controls: support=0.000, mean drop=0.007, guard=0.010, release=0.029
+  判断：整体弱。
+
+DS7B:
+  Phase755 candidates: support=0.771, mean drop=0.449, guard=0.339, release=0.207
+  same-layer controls: support=0.073, mean drop=0.004, guard=0.281, release=0.190
+  判断：target-support 明显强于控制；route-release 本身并不完全特异。
+```
+
+DS7B top writer / guard：
+
+```text
+L22:H24 records_all
+  n=48, domains=6
+  support=0.854, mean target drop=0.500
+  guard=0.333, mean release=0.212
+  top1 loss=0.146
+  判断：cross_domain_writer_guard_candidate
+
+L22:H24 target_record_line
+  n=48, domains=6
+  support=0.812, mean target drop=0.428
+  guard=0.333, mean release=0.224
+  top1 loss=0.146
+  判断：cross_domain_writer_guard_candidate
+
+L22:H1 records_all
+  n=48, domains=6
+  support=0.771, mean target drop=0.480
+  guard=0.333, mean release=0.188
+  top1 loss=0.104
+  判断：cross_domain_writer_guard_candidate
+
+L22:H1 target_record_line
+  n=48, domains=6
+  support=0.646, mean target drop=0.385
+  guard=0.354, mean release=0.206
+  top1 loss=0.125
+  判断：cross_domain_writer_guard_candidate
+```
+
+下游恢复结果：
+
+```text
+DS7B L22:H24 records_all -> L23:attn_out
+  effective restore rate=0.354
+  erase drop=0.500
+  recovered=0.034
+  recovery fraction=0.020
+  route release reduced=-0.010
+  判断：weak_or_unclear
+
+DS7B L22:H24 target_record_line -> L23:attn_out
+  effective restore rate=0.312
+  erase drop=0.428
+  recovered=0.046
+  recovery fraction=0.267
+  route release reduced=-0.039
+  判断：weak_or_unclear
+
+DS7B L22:H1 target_record_line -> L23:mlp_out
+  effective restore rate=0.250
+  erase drop=0.385
+  recovered=0.052
+  recovery fraction=0.197
+  route release reduced=-0.044
+  判断：weak_or_unclear
+```
+
+### 严格结论
+
+```text
+1. Phase 756 强化了 DS7B L22:H24 / L22:H1 的跨域 writer / guard 必要性证据。
+2. 同层控制头没有 target-support 效果，说明 DS7B 的 target-support 不是普通同层扰动。
+3. 但 route-release 不是完全特异：DS7B 控制头也有一定 route release，因此 suppressor / guard 结论必须更谨慎。
+4. 下游单组件 restore 不能稳定恢复 target，也经常不能压回 route release。
+5. 因此当前只完成 controlled writer evidence，没有完成 downstream carrier closure。
+```
+
+### 理论进展
+
+Phase 756 支持的链条：
+
+```text
+跨域 records
+-> DS7B L22:H24 / L22:H1 source contribution
+-> target answer logit support
+-> partial route competition shift
+```
+
+但没有完成：
+
+```text
+L22 writer
+-> L23-L27 单一 downstream carrier
+-> readout closure
+```
+
+这说明 DS7B 的跨域 writer 很可能是真实路径节点，但下游承载不是单组件线性转移，更可能是分布式、多组件、非线性闭合。
+
+### 硬伤
+
+```text
+1. 当前恢复的是整组件输出，不是神经元级恢复。
+2. 单个下游组件恢复弱，不能证明路径闭合。
+3. qwen3 / GLM4 没有同等级复现，结论仍然是 DS7B-local。
+4. 显式事实 prompt 仍然偏上下文搬运，不等于自然知识图谱。
+5. route release 在控制头上也存在，说明 suppressor 可能是更宽的竞争场现象。
+```
+
+### 下一步
+
+Phase 757 应进入同一阶段的下一个收束任务：
+
+```text
+Multi-Site Downstream Carrier Closure Test
+多组件下游承载闭合测试
+```
+
+核心任务：
+
+```text
+1. 以 DS7B L22:H24 / L22:H1 为主候选。
+2. 对 L23:attn_out、L23:mlp_out、L24:attn_out、L24:mlp_out 做 single-site 与 multi-site restore 对比。
+3. 增加 off-path downstream control。
+4. 如果多组件恢复显著强于单组件和 off-path control，说明下游承载是分布式路径。
+5. 如果多组件仍不能恢复，则说明 bottleneck 可能在 readout threshold / phrase likelihood / generation closure，而不是 L23-L27 component carrier。
+```
+
+## Phase 757: 多组件下游承载闭合测试 [2026-06-29 14:47]
+
+### 背景
+
+Phase 756 已经确认：DS7B 的 L22:H24 / L22:H1 在跨域 records source removal 中具有明显 target-support；同层控制头没有同等级 target-support。因此 Phase 757 不再继续扩大 writer 搜索，而是测试一个更靠后的闭合问题：
+
+```text
+如果 L22 writer 真的写入了正确答案支持，那么这些支持是否被 L23-L24 的 downstream components 承载？
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase757_multisite_downstream_carrier_closure.py
+tests/gpt5/run_phase757_multisite_downstream_carrier_closure_round.sh
+```
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase757_multisite_downstream_carrier_closure.py
+
+tests/gpt5/run_phase757_multisite_downstream_carrier_closure_round.sh smoke \
+  --max-pairs 2 --max-candidates 1 --max-source-groups 1 \
+  --max-combos 4 --top-k-vocab 8 --max-topk-tokens 5 \
+  --max-route-classes 4 --log-every 1
+
+tests/gpt5/run_phase757_multisite_downstream_carrier_closure_round.sh main \
+  --max-pairs 24 --max-candidates 2 --max-source-groups 2 \
+  --max-combos 8 --top-k-vocab 14 --max-topk-tokens 10 \
+  --max-route-classes 6 --log-every 4
+
+tests/gpt5/run_phase757_multisite_downstream_carrier_closure_round.sh confirm \
+  --max-pairs 48 --max-candidates 2 --max-source-groups 2 \
+  --max-combos 8 --top-k-vocab 16 --max-topk-tokens 10 \
+  --max-route-classes 6 --log-every 8
+```
+
+### 测试原理
+
+测试分三步：
+
+```text
+1. 在 candidate writer 的 source token 上移除 V/O source contribution。
+2. 观察 correct target logit drop 与 competing route release。
+3. 在移除条件下，恢复下游组件输出：
+   single primary site
+   same-layer primary pair
+   primary_all
+   off_path_same_count
+```
+
+其中 DS7B 的 primary path 设为：
+
+```text
+L23:attn_out
+L23:mlp_out
+L24:attn_out
+L24:mlp_out
+```
+
+off-path control 设为：
+
+```text
+L25:attn_out
+L25:mlp_out
+L26:attn_out
+L26:mlp_out
+```
+
+### 结果文件
+
+```text
+results/glm5_phase757_multisite_downstream_carrier_closure/smoke/
+results/glm5_phase757_multisite_downstream_carrier_closure/main/
+results/glm5_phase757_multisite_downstream_carrier_closure/confirm/
+```
+
+确认轮摘要：
+
+```text
+results/glm5_phase757_multisite_downstream_carrier_closure/confirm/phase757_cross_model_summary.md
+```
+
+### 确认轮客观结果
+
+qwen3：
+
+```text
+off_path_control restore rate=0.070, recovered=-0.033
+same_layer_primary_pair restore rate=0.055, recovered=-0.076
+single_primary_site restore rate=0.052, recovered=-0.029
+
+判断：没有 downstream carrier closure。
+```
+
+GLM4：
+
+```text
+off_path_control restore rate=0.010, recovered=-0.011
+primary_multisite_all restore rate=0.000, recovered=-0.013
+same_layer_primary_pair restore rate=0.000, recovered=-0.010
+single_primary_site restore rate=0.001, recovered=-0.006
+
+判断：没有 downstream carrier closure。
+```
+
+DS7B：
+
+```text
+off_path_control restore rate=0.297, recovered=0.104, recovery fraction=0.532
+primary_multisite_all restore rate=0.237, recovered=0.052, recovery fraction=0.387
+same_layer_primary_pair restore rate=0.148, recovered=0.027
+single_primary_site restore rate=0.128, recovered=0.014
+```
+
+DS7B top writer 仍然稳定：
+
+```text
+L22:H24 records_all
+  target drop=0.500
+  support rate=0.854
+  route release=0.212
+  top1 loss=0.146
+  role=cross_domain_writer_guard_candidate
+
+L22:H1 records_all
+  target drop=0.480
+  support rate=0.771
+  route release=0.188
+  top1 loss=0.104
+  role=cross_domain_writer_guard_candidate
+```
+
+DS7B top restore：
+
+```text
+L22:H24 records_all -> L25/L26 off_path_same_count
+  restore rate=0.604
+  erase drop=0.500
+  recovered=0.262
+  recovery fraction=0.614
+  route release reduced=-0.147
+  role=off_path_control_suspicious
+
+L22:H1 records_all -> L25/L26 off_path_same_count
+  restore rate=0.542
+  erase drop=0.480
+  recovered=0.178
+  recovery fraction=0.274
+  route release reduced=0.010
+  role=off_path_control_suspicious
+
+L22:H24 records_all -> L23/L24 primary_all
+  restore rate=0.479
+  erase drop=0.500
+  recovered=0.115
+  recovery fraction=0.139
+  route release reduced=-0.020
+  role=weak_or_unclear
+```
+
+### 严格结论
+
+```text
+1. Phase 757 没有证明 L23-L24 primary downstream components 完成闭合。
+2. DS7B 的 L22:H24 / L22:H1 writer 仍然稳定，通过 confirm 复现。
+3. L23-L24 primary_all 有弱恢复，但恢复幅度明显低于 L25-L26 组合。
+4. L25-L26 原本设计为 off-path control，但确认轮中稳定恢复更强，因此不能再当成普通对照。
+5. 更合理的解释是：L25-L26 很可能是 source writer 之后的 late carrier / rewrite / washout stage 候选。
+6. 但是 L25-L26 恢复 target logit 的同时，经常没有压回 route release，甚至增加 route release，因此它不是严格的“正确路线闭合器”。
+```
+
+### 理论进展
+
+Phase 757 把链条从：
+
+```text
+source facts
+-> L22 writer
+-> unknown downstream
+```
+
+推进为：
+
+```text
+source facts
+-> DS7B L22:H24 / L22:H1 writer
+-> L23-L24 weak partial carrier
+-> L25-L26 stronger late carrier / rewrite candidate
+-> route competition still unresolved
+```
+
+这说明当前瓶颈不是“找不到 writer”，而是：
+
+```text
+writer support 如何被后续层改写、冲洗、竞争，并最终变成 token0 readout。
+```
+
+### 硬伤
+
+```text
+1. L25-L26 是事后由 off-path control 反转出的候选，必须重新设计测试，不能直接当成机制结论。
+2. 当前 restore 是整组件恢复，不是神经元级恢复。
+3. target logit recovery 与 route release closure 分离，说明“恢复正确值”和“关闭错误路线”不是同一个机制。
+4. qwen3 / GLM4 没有复现 DS7B 的强路径，当前仍是小模型 DS7B-local 结构。
+5. 显式 facts prompt 仍然更接近上下文机制，不等于自然知识网络。
+```
+
+### 下一步
+
+Phase 758 属于同一阶段，应直接验证：
+
+```text
+Late Carrier / Rewrite Relabel Test
+晚期承载 / 重写重标定测试
+```
+
+核心任务：
+
+```text
+1. 把 L25-L26 从 off-path control 改为 late carrier candidate。
+2. 增加真正的 late off-path control，例如 L27-L28 或同数量随机组件。
+3. 比较 L23-L24、L25-L26、L27-L28 对 target recovery 与 route release closure 的作用。
+4. 如果 L25-L26 稳定强于 L23-L24 和真正对照，说明 source writer 后存在晚期重写层。
+5. 如果 L25-L26 只恢复 target 但不关闭 route release，则说明下一瓶颈是 readout competition / route suppression matrix。
+```
+
+## Phase 758: 晚期承载 / 重写重标定测试 [2026-06-29 15:12]
+
+### 背景
+
+Phase 757 中，原本作为 off-path control 的 L25-L26 在 DS7B 上稳定恢复 target logit，且强于 L23-L24 primary path。因此 Phase 758 不继续把 L25-L26 当作对照，而是重新命名为：
+
+```text
+late carrier / rewrite candidate
+晚期承载 / 重写候选
+```
+
+核心问题：
+
+```text
+L25-L26 是真正的晚期承载 / 重写阶段，还是只是普通后段扰动？
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase758_late_carrier_rewrite_relabel.py
+tests/gpt5/run_phase758_late_carrier_rewrite_relabel_round.sh
+```
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase758_late_carrier_rewrite_relabel.py
+
+python tests/gpt5/phase758_late_carrier_rewrite_relabel.py \
+  --dry-run --round-name dry --max-pairs 3 --max-combos 10
+
+tests/gpt5/run_phase758_late_carrier_rewrite_relabel_round.sh smoke \
+  --max-pairs 2 --max-candidates 1 --max-source-groups 1 \
+  --max-combos 6 --top-k-vocab 8 --max-topk-tokens 5 \
+  --max-route-classes 4 --log-every 1
+
+tests/gpt5/run_phase758_late_carrier_rewrite_relabel_round.sh main \
+  --max-pairs 24 --max-candidates 2 --max-source-groups 2 \
+  --max-combos 12 --top-k-vocab 14 --max-topk-tokens 10 \
+  --max-route-classes 6 --log-every 4
+
+tests/gpt5/run_phase758_late_carrier_rewrite_relabel_round.sh confirm \
+  --max-pairs 48 --max-candidates 2 --max-source-groups 2 \
+  --max-combos 12 --top-k-vocab 16 --max-topk-tokens 10 \
+  --max-route-classes 6 --log-every 8
+```
+
+### 测试设计
+
+Phase 758 把下游 restore 分成四类：
+
+```text
+primary path:
+  DS7B L23-L24
+
+late candidate:
+  DS7B L25-L26
+
+primary + late joint:
+  DS7B L23-L26
+
+true late control:
+  DS7B L27
+```
+
+判断标准：
+
+```text
+1. 如果 late candidate 强于 primary path，说明 Phase 757 的 off-path 不是普通对照。
+2. 如果 primary + late joint 最强，说明 L23-L24 与 L25-L26 可能组成连续重写链。
+3. 如果 target recovery 上升但 route release 没有下降，则只能叫 target rewrite，不能叫 route closure。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase758_late_carrier_rewrite_relabel/smoke/
+results/glm5_phase758_late_carrier_rewrite_relabel/main/
+results/glm5_phase758_late_carrier_rewrite_relabel/confirm/
+```
+
+确认轮摘要：
+
+```text
+results/glm5_phase758_late_carrier_rewrite_relabel/confirm/phase758_cross_model_summary.md
+```
+
+### 确认轮客观结果
+
+qwen3：
+
+```text
+late_candidate_all restore rate=0.070, recovered=-0.033
+primary_multisite_all restore rate=0.055, recovered=-0.076
+primary_plus_late_all restore rate=0.060, recovered=-0.140
+
+判断：没有稳定 late rewrite 证据。
+```
+
+GLM4：
+
+```text
+late_candidate_all restore rate=0.010, recovered=-0.011
+primary_multisite_all restore rate=0.000, recovered=-0.013
+primary_plus_late_all restore rate=0.000, recovered=-0.020
+
+判断：没有稳定 late rewrite 证据。
+```
+
+DS7B baseline：
+
+```text
+late_candidate_all restore rate=0.297, recovered=0.104, recovery fraction=0.532, release reduced=-0.012
+primary_multisite_all restore rate=0.237, recovered=0.052, recovery fraction=0.387, release reduced=0.011
+primary_plus_late_all restore rate=0.378, recovered=0.145, recovery fraction=0.666, release reduced=-0.003
+same_layer_late_candidate_pair restore rate=0.228, recovered=0.056
+same_layer_primary_pair restore rate=0.148, recovered=0.027
+true_late_control restore rate=0.193, recovered=0.022, release reduced=0.048
+```
+
+DS7B writer 仍然稳定：
+
+```text
+L22:H24 records_all
+  target drop=0.500
+  support rate=0.854
+  route release=0.212
+  role=cross_domain_writer_guard_candidate
+
+L22:H1 records_all
+  target drop=0.480
+  support rate=0.771
+  route release=0.188
+  role=cross_domain_writer_guard_candidate
+```
+
+DS7B top restore：
+
+```text
+L22:H24 records_all -> L23-L26 primary_plus_late_all
+  restore rate=0.792
+  erase drop=0.500
+  recovered=0.363
+  recovery fraction=0.739
+  release reduced=-0.107
+  role=primary_late_joint_target_candidate
+
+L22:H24 target_record_line -> L23-L26 primary_plus_late_all
+  restore rate=0.771
+  erase drop=0.428
+  recovered=0.285
+  recovery fraction=0.734
+  release reduced=-0.055
+  role=primary_late_joint_target_candidate
+
+L22:H24 records_all -> L26 late_attn+mlp
+  restore rate=0.625
+  erase drop=0.500
+  recovered=0.203
+  recovery fraction=0.419
+  release reduced=-0.036
+  role=late_target_rewrite_candidate
+
+L22:H24 records_all -> L25-L26 late_candidate_all
+  restore rate=0.604
+  erase drop=0.500
+  recovered=0.262
+  recovery fraction=0.614
+  release reduced=-0.147
+  role=late_target_rewrite_candidate
+```
+
+### 严格结论
+
+```text
+1. DS7B 上 L25-L26 的 late candidate 证据被确认，强于 L23-L24 primary path。
+2. L23-L26 joint restore 最强，说明 L23-L24 与 L25-L26 更像连续链，而不是互斥候选。
+3. 但恢复 target logit 不等于完成 route closure。
+4. 多数关键 restore 的 release reduced 为负或接近 0，说明错误路线 / 竞争路线没有被同步压回。
+5. true late control L27 也有少量 suspicious recovery，因此后段 residual / readout 区域存在宽泛扰动敏感性。
+6. 结论只能写成：DS7B 存在 late target rewrite 候选，不能写成已经找到完整 suppressor closure。
+```
+
+### 机制进展
+
+当前更稳妥的链条是：
+
+```text
+source facts
+-> DS7B L22:H24 / L22:H1 writer / guard
+-> L23-L24 weak primary carrier
+-> L25-L26 late target rewrite
+-> L23-L26 joint target recovery
+-> route competition unresolved
+-> token0 readout closure 未完成
+```
+
+这个结果对语言编码机制的意义是：
+
+```text
+正确值不是一次写入后直接读出；
+它会在后续层经历至少一次晚期重写。
+而“正确值增强”和“竞争路线关闭”是可分离机制。
+```
+
+### 硬伤
+
+```text
+1. 仍然是整组件级 restore，不是神经元级图谱。
+2. DS7B 结果强，qwen3 / GLM4 没有复现，不能说跨模型不变量。
+3. L27 control 有少量恢复，说明越靠近读出端，restore 可能混入通用 readout perturbation。
+4. 显式 facts prompt 仍然偏上下文搬运，不等于自然知识网络。
+5. route release closure 没有完成，因此 suppressor matrix 仍未真正闭合。
+```
+
+### 下一步
+
+Phase 759 仍属于同一阶段，但应该换问题：
+
+```text
+Late Rewrite vs Route Suppression Matrix Split
+晚期重写与路线抑制矩阵分离测试
+```
+
+任务：
+
+```text
+1. 固定 DS7B L22:H24 / L22:H1 与 L25-L26 late rewrite。
+2. 分别测 target recovery 与 route release closure，不再混成一个指标。
+3. 找出哪些组件只恢复 correct target，哪些组件负责关闭 format / echo / wrong-category route。
+4. 如果能找到 route release closure 组件，才进入 suppressor matrix 图谱。
+5. 如果找不到，说明最终瓶颈在 token0 readout competition / phrase likelihood。
+```
+
+## Phase 759: 晚期重写与路线抑制矩阵分离测试 [2026-06-29 15:16]
+
+### 背景
+
+Phase 758 已经确认：DS7B 的 L25-L26 是 late target rewrite 候选，L23-L26 joint restore 最强。但 Phase 758 同时显示：
+
+```text
+target recovery 上升
+不等于
+route release closure 完成
+```
+
+因此 Phase 759 不再运行新模型，而是对 Phase 758 confirm 的 JSONL 结果做离线重分析，把两个指标拆开：
+
+```text
+1. target recovery
+2. route suppression / route release closure
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase759_rewrite_vs_route_suppression_split.py
+```
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase759_rewrite_vs_route_suppression_split.py
+python tests/gpt5/phase759_rewrite_vs_route_suppression_split.py --round-name confirm
+```
+
+### 结果文件
+
+```text
+results/glm5_phase759_rewrite_vs_route_suppression_split/confirm/phase759_cross_model_summary.json
+results/glm5_phase759_rewrite_vs_route_suppression_split/confirm/phase759_cross_model_summary.md
+```
+
+### 测试原理
+
+Phase 759 对 Phase 758 的每条 restore row 重新打分：
+
+```text
+target_success:
+  erase_target_logit_drop >= 0.20
+  target_logit_recovered_by_restore >= 0.10
+  target_recovery_fraction >= 0.25
+
+route_success:
+  erase_total_positive_route_release >= 0.10
+  route_release_reduced_by_restore >= 0.05
+  restored route release 确实下降
+```
+
+然后按 combo_kind 和 writer/combo 聚合。
+
+### 客观结果
+
+qwen3：
+
+```text
+late_candidate_all:
+  target rate=0.073
+  route rate=0.268
+  recovered=-0.033
+  role=weak_split_signal
+
+primary_plus_late_all:
+  target rate=0.060
+  route rate=0.323
+  recovered=-0.140
+  role=route_suppression_only_candidate
+
+判断：没有 target rewrite，只有弱 route-side 信号。
+```
+
+GLM4：
+
+```text
+late_candidate_all:
+  target rate=0.010
+  route rate=0.159
+  recovered=-0.011
+  role=weak_split_signal
+
+primary_plus_late_all:
+  target rate=0.000
+  route rate=0.161
+  recovered=-0.020
+  role=weak_split_signal
+
+判断：没有 target rewrite，也没有强 route closure。
+```
+
+DS7B：
+
+```text
+late_candidate_all:
+  target rate=0.315
+  route rate=0.250
+  recovered=0.104
+  route reduced=-0.012
+  role=weak_split_signal
+
+primary_multisite_all:
+  target rate=0.250
+  route rate=0.289
+  recovered=0.052
+  route reduced=0.011
+  role=weak_split_signal
+
+primary_plus_late_all:
+  target rate=0.385
+  route rate=0.302
+  recovered=0.145
+  route reduced=-0.003
+  role=joint_target_and_route_candidate
+
+true_late_control:
+  target rate=0.206
+  route rate=0.323
+  recovered=0.022
+  route reduced=0.048
+  role=weak_split_signal
+```
+
+DS7B 关键单项：
+
+```text
+L22:H24 records_all -> L23-L26 primary_plus_late_all
+  target rate=0.833
+  route rate=0.208
+  recovered=0.363
+  route reduced=-0.107
+  role=target_rewrite_only_candidate
+
+L22:H24 records_all -> L25-L26 late_candidate_all
+  target rate=0.667
+  route rate=0.104
+  recovered=0.262
+  route reduced=-0.147
+  role=target_rewrite_only_candidate
+
+L22:H24 records_all -> L26 late_attn+mlp
+  target rate=0.625
+  route rate=0.208
+  recovered=0.203
+  route reduced=-0.036
+  role=target_rewrite_only_candidate
+
+L22:H1 target_record_line -> L23-L26 primary_plus_late_all
+  target rate=0.583
+  route rate=0.312
+  recovered=0.207
+  route reduced=0.009
+  role=joint_target_and_route_candidate
+```
+
+### 严格结论
+
+```text
+1. Phase 759 支持 target recovery 和 route suppression 是可分离机制。
+2. DS7B L22:H24 + L25-L26 / L23-L26 更像 target rewrite path，不是强 route suppression path。
+3. L22:H1 的部分组合有 joint signal，但 route reduced 很小，不能当成完整 suppressor matrix。
+4. qwen3 / GLM4 没有同等级 target rewrite 复现。
+5. route-side 信号在 qwen3 / GLM4 上也有一些弱出现，说明 route suppression 可能更宽、更分散，不一定跟 target writer 同构。
+```
+
+### 当前机制图谱更新
+
+更稳妥的链条应写成双路径：
+
+```text
+Path A: target rewrite path
+source facts
+-> DS7B L22:H24 / L22:H1
+-> L23-L24 weak carrier
+-> L25-L26 late rewrite
+-> target logit recovery
+
+Path B: route suppression path
+format / echo / wrong-category route
+-> distributed suppression / release field
+-> not closed by L25-L26 alone
+-> token0 competition remains unresolved
+```
+
+### 硬伤
+
+```text
+1. Phase 759 是离线重分析，不是新 causal intervention。
+2. route_success 阈值是人为设定，不能当作自然机制边界。
+3. 仍然是组件级，不是神经元级。
+4. DS7B-local 结构明显，不能上升为跨模型不变量。
+5. 显式 prompt 仍然不等于自然知识网络。
+```
+
+### 下一步
+
+阶段性目标已经从“找 late rewrite”推进到“双路径拆分”。下一阶段应转入：
+
+```text
+Route Suppression Matrix Atlas
+路线抑制矩阵图谱
+```
+
+核心任务：
+
+```text
+1. 不再只看 correct target logit。
+2. 单独构造 format / echo / wrong-category / generic-answer route tokens。
+3. 对每类 route 做 source writer、late rewrite、readout-layer restore / ablation。
+4. 寻找只压制错误路线、不增强正确值的组件。
+5. 如果找到稳定组件，才进入全局 suppressor matrix。
+```
+
+## Phase 760: 路线抑制矩阵图谱测试 [2026-06-29 16:12]
+
+### 触发问题
+
+Phase 756-759 已经把机制收紧为双路径：
+
+```text
+Path A: target rewrite path
+source facts -> DS7B L22:H24 / L22:H1 -> L23-L24 weak carrier -> L25-L26 late rewrite -> target logit recovery
+
+Path B: route suppression path
+format / echo / wrong-category / generic route -> distributed suppression field -> token0 readout competition
+```
+
+Phase 760 不再只看 correct target logit，而是把竞争路线拆成显式矩阵：
+
+```text
+contrast_answer
+object_relation_echo
+other_record_value
+format_schema
+generic_answer
+top_non_target
+top_class:* dynamic route classes
+```
+
+### 脚本与命令
+
+```bash
+tests/gpt5/phase760_route_suppression_matrix_atlas.py
+tests/gpt5/run_phase760_route_suppression_matrix_atlas_round.sh
+
+python -m py_compile tests/gpt5/phase760_route_suppression_matrix_atlas.py
+
+bash tests/gpt5/run_phase760_route_suppression_matrix_atlas_round.sh smoke \
+  --max-pairs 2 --max-candidates 1 --max-source-groups 1 --max-combos 4 \
+  --top-k-vocab 8 --max-topk-tokens 5 --max-dynamic-route-classes 3 --log-every 1
+
+bash tests/gpt5/run_phase760_route_suppression_matrix_atlas_round.sh main \
+  --max-pairs 24 --max-candidates 2 --max-source-groups 2 --max-combos 10 \
+  --top-k-vocab 14 --max-topk-tokens 8 --max-dynamic-route-classes 5 --log-every 4
+
+bash tests/gpt5/run_phase760_route_suppression_matrix_atlas_round.sh confirm \
+  --max-pairs 48 --max-candidates 2 --max-source-groups 2 --max-combos 10 \
+  --top-k-vocab 16 --max-topk-tokens 10 --max-dynamic-route-classes 5 --log-every 8
+```
+
+模型顺序为 qwen3 -> GLM4 -> DS7B，每个模型使用 `--hard-exit-after-model`，未使用量化。
+
+### 输出
+
+```text
+results/glm5_phase760_route_suppression_matrix_atlas/smoke/
+results/glm5_phase760_route_suppression_matrix_atlas/main/
+results/glm5_phase760_route_suppression_matrix_atlas/confirm/
+results/glm5_phase760_route_suppression_matrix_atlas/confirm/phase760_cross_model_summary.md
+results/glm5_phase760_route_suppression_matrix_atlas/confirm/phase760_cross_model_summary.json
+```
+
+### 测试原理
+
+对每个样本：
+
+```text
+1. 捕获 answer position 的 baseline logits。
+2. 移除候选 writer head 来自 source group 的 V/O contribution。
+3. 测量 target logit drop 和各 route group release。
+4. 在移除基础上恢复 L23-L24、L25-L26、L23-L26 或控制层组件。
+5. 分别计算：
+   target recovered = erase target drop - restored target drop
+   route reduced = erase route release - restored route release
+```
+
+### 关键结果
+
+```text
+qwen3:
+  route-only 信号集中在少量 fruit/edible wrong-answer route，n 很小，target_recovered 多为负。
+
+GLM4:
+  确认轮后 route-only 信号衰减到约 0.09，全部 weak_or_unclear。
+
+DS7B:
+  L22:H24 没有成为 route suppression matrix 顶部节点。
+  L22:H24 更多出现在 generic_answer route，role_guess 仍为 weak_or_unclear。
+  L22:H1 有部分 recipient_answer route 抑制候选：
+    route_only_success_rate ≈ 0.333
+    mean_route_reduced ≈ 0.056-0.076
+    target_recovered 为负或很弱。
+  L22:H9 / H14 同层控制头也出现类似甚至更强 route-only 信号。
+```
+
+### 严格结论
+
+```text
+1. Phase 760 支持 target rewrite 和 route suppression 分离。
+2. DS7B L22:H24 + L25-L26 的 target rewrite 证据仍强于 route suppression 证据。
+3. route suppression 不是由 L25-L26 单独闭合。
+4. route-only 信号更多表现为分布式、路线类别相关、控制头也可出现的现象。
+5. 目前不能说已经找到 global suppressor matrix。
+```
+
+### 硬伤
+
+```text
+1. route group 仍由 first token 和 top-k token 构造，不能保证覆盖真实路线全貌。
+2. 部分 route-only cell 的 target drop 为负，不能直接支持 writer-path suppressor。
+3. DS7B 的 route-only 顶部节点出现 H9/H14 控制头，削弱了 H24/H1 特异性。
+4. 仍然是 head/component 级，不是 neuron/channel 级机制。
+5. 小模型内部结构可能偏移，不能直接上升为大模型语言机制不变量。
+```
+
+### 当前理论进展
+
+当前“苹果-水果-跨域路线图谱”应更新为：
+
+```text
+source facts
+  -> target writer / rewrite path
+      DS7B L22:H24/H1 -> L23-L26 -> target/generic-answer support
+
+source facts
+  -> route competition field
+      wrong-answer / semantic-value / format / echo routes
+      -> distributed suppression / release components
+      -> not closed by L22:H24 or L25-L26 alone
+```
+
+语言编码机制更像：
+
+```text
+多路线竞争场 + 局部写入器 + 分布式抑制矩阵 + 读出端阈值闭合
+```
+
+而不是：
+
+```text
+单个 writer head -> 单个 suppressor head -> 正确输出
+```
+
+### 下一步
+
+```text
+Phase 761: Route Suppression Source-Target Disentanglement
+路线抑制的源-目标解耦测试
+```
+
+核心任务：
+
+```text
+1. 对 route-only cell 增加反向验证：
+   只移除 route token 的源贡献，看是否能复现 route release。
+2. 对 H1/H9/H14/H24 做同层控制矩阵：
+   判断 route suppression 是特异 head，还是 L22 层级场效应。
+3. 把 target drop 为负的样本单独分离：
+   不允许它们直接支持 writer-path suppressor。
+4. 如果 route suppression 仍分散，应转向 source-token route graph，而不是继续找单个 suppressor。
+```
+
+## Phase 761: 路线源贡献与目标源贡献拆分测试 [2026-06-29 16:49]
+
+### 触发问题
+
+Phase 760 已经证明 target rewrite 与 route suppression 不能简单合并，但仍有一个关键混淆：
+
+```text
+路线释放到底来自 target source removal，
+还是来自 route-token / format / echo source removal 本身？
+```
+
+如果 route-source removal 可以在不降低 target logit 的情况下稳定释放错误路线，说明路线竞争场有独立源结构；如果现象主要伴随 target boost artifact 或控制头同样出现，则不能称为全局 suppressor。
+
+### 脚本与命令
+
+```bash
+tests/gpt5/phase761_route_source_target_disentanglement.py
+tests/gpt5/run_phase761_route_source_target_disentanglement_round.sh
+
+python -m py_compile tests/gpt5/phase761_route_source_target_disentanglement.py
+
+python tests/gpt5/phase761_route_source_target_disentanglement.py \
+  --dry-run --round-name smoke --max-pairs 2 --max-candidates 1 --max-route-source-groups 3
+
+tests/gpt5/run_phase761_route_source_target_disentanglement_round.sh smoke \
+  --max-pairs 2 --max-candidates 1 --controls-per-candidate 1 \
+  --max-route-source-groups 3 --max-total-source-groups 6 --log-every 1
+
+tests/gpt5/run_phase761_route_source_target_disentanglement_round.sh main \
+  --max-pairs 24 --max-candidates 2 --controls-per-candidate 1 \
+  --max-route-source-groups 5 --max-total-source-groups 9 --log-every 4
+
+tests/gpt5/run_phase761_route_source_target_disentanglement_round.sh confirm \
+  --max-pairs 48 --max-candidates 2 --controls-per-candidate 1 \
+  --max-route-source-groups 5 --max-total-source-groups 9 --log-every 8
+```
+
+所有模型按 qwen3 -> GLM4 -> DS7B 顺序执行，均使用 BF16 eager、无量化、`--hard-exit-after-model`，每个模型结束后释放 GPU 显存。
+
+### 测试原理
+
+对同一个 candidate head，分别移除不同源位置贡献：
+
+```text
+target_record_line
+target_value_tokens
+records_all
+route_src:any_route
+route_src:contrast_answer
+route_src:recipient_answer
+route_src:other_record_value
+route_src:format_schema
+route_src:object_relation_echo
+```
+
+然后分别测量：
+
+```text
+target_logit_drop = base_target_logit - after_target_logit
+route_release = after_route_max_logit - base_route_max_logit
+margin_drop = (base_target - base_route) - (after_target - after_route)
+```
+
+解释规则：
+
+```text
+target_logit_drop > 0: 源贡献支持目标答案。
+target_logit_drop < 0: 移除后目标反而增强，属于 target boost artifact 风险。
+route_release > 0: 某类竞争路线释放。
+route_source_release_without_target_drop: 可能是路线源证据。
+negative_target_drop_route_artifact: 不能作为 suppressor 证据。
+```
+
+### 生成结果
+
+```text
+results/glm5_phase761_route_source_target_disentanglement/smoke/
+results/glm5_phase761_route_source_target_disentanglement/main/
+results/glm5_phase761_route_source_target_disentanglement/confirm/
+results/glm5_phase761_route_source_target_disentanglement/confirm/phase761_cross_model_summary.md
+results/glm5_phase761_route_source_target_disentanglement/confirm/phase761_cross_model_summary.json
+```
+
+确认轮规模：
+
+```text
+qwen3:      48 pairs, 17812 rows, 16104 route-source cells
+GLM4:       48 pairs, 18712 rows, 16988 route-source cells
+DS7B:       48 pairs, 19348 rows, 17588 route-source cells
+```
+
+### 客观结果
+
+```text
+qwen3:
+  route_token_source -> format / top_non_target 的 route_release_rate 约 0.33-0.35，
+  但 target_boost_rate 约 0.22，且 top cells 多为 n=1 或同层 control head。
+  H15 的 records_all / target_value_tokens 有较高 route release，
+  但大量属于 negative_target_drop_route_artifact。
+
+GLM4:
+  确认轮中所有 source family 的 route_release_rate 很低。
+  最高大约 0.027，全部 weak_or_unclear。
+  没有支持稳定 route-source suppressor。
+
+DS7B:
+  route_token_source -> recipient_answer 的 route_release_rate 约 0.444，
+  但 target_boost_rate 约 0.544，严重污染。
+  L22:H24 route_src:any_route -> recipient_answer 在 n=9 上 route_release_rate 0.667，
+  但 target_boost_rate 0.556，属于 artifact。
+  L22:H1 target_value_tokens -> object_relation_echo 在 n=48 上 route_release_rate 0.50，
+  target_drop_rate 0.583，说明更像 target-source writer / mixed route effect。
+  L22:H9 / H14 控制头仍出现强 route release artifact。
+```
+
+### 严格结论
+
+```text
+1. Phase 761 没有找到稳定的 route-token-source-only suppressor。
+2. qwen3 和 DS7B 的若干路线释放现象主要被 target boost artifact 和低样本强信号污染。
+3. GLM4 基本给出负结果，说明该现象不具备跨模型稳健性。
+4. DS7B L22:H24 / L22:H1 仍不能解释为全局 suppressor。
+5. 目标源贡献与路线源贡献确实可分开测量，但分开后没有出现清晰单点闭合。
+```
+
+### 理论进展
+
+Phase 761 支持以下更谨慎的结构：
+
+```text
+target rewrite path:
+  target source -> writer head -> late rewrite -> target logit
+
+route competition path:
+  route / format / echo tokens -> distributed route field -> readout competition
+```
+
+但当前结果不支持：
+
+```text
+route token source -> single head suppressor -> universal route suppression
+```
+
+更合理的解释是：
+
+```text
+路线抑制不是单个 head 的属性，
+而是 source-token group、attention transport、MLP rewrite、late readout geometry 共同形成的分布式场。
+```
+
+### 问题和硬伤
+
+```text
+1. route source group 仍然由 token id 匹配构造，存在粗粒度问题。
+2. route group 仍然是 top-k / first-token 近似，不是完整短语路线。
+3. target boost artifact 在 qwen3 和 DS7B 中非常明显。
+4. 同层控制头仍能产生相似现象，说明 head 特异性不足。
+5. 小模型结构可能有压缩偏差，不能直接推断大模型机制。
+```
+
+### 下一步
+
+Phase 762 不应继续寻找单点 global suppressor，而应转向：
+
+```text
+Source-Token Route Graph Atlas
+```
+
+具体任务：
+
+```text
+1. 把源位置从粗 source_group 拆成逐 token 节点。
+2. 对每个 source token 建立它影响的 route class 分布。
+3. 区分 target-support token、format token、echo token、competitor token。
+4. 观察是否存在稳定的 source-token -> route-class 边，而不是 head -> route-class 单点。
+5. 如果逐 token 图谱仍混杂，再进入 phrase-level route graph。
+```
+
+## Phase 762: 语义—数值接口与因果纤维图谱确认测试 [2026-06-29 17:18]
+
+### 本阶段判断
+
+用户上传内容的核心判断基本正确：当前最大瓶颈不是继续寻找单个 head（注意力头）、channel（通道）或 patch（补丁），而是要建立：
+
+```text
+语义对象 -> 可测量数值结构 -> 可定位因果结构 -> 可复用图谱节点
+```
+
+因此本阶段没有继续寻找 single global suppressor（单一全局抑制器），而是把对象转换成跨关系任务族上的 causal functional fingerprint（因果功能指纹）。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase762_semantic_numeric_fiber_atlas.py
+tests/gpt5/run_phase762_semantic_numeric_fiber_atlas_round.sh
+```
+
+### 测试命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase762_semantic_numeric_fiber_atlas.py
+```
+
+冒烟测试：
+
+```bash
+python tests/gpt5/phase762_semantic_numeric_fiber_atlas.py \
+  --dry-run --round-name smoke --max-pairs 6 --max-candidates 1 --max-source-groups 3
+
+tests/gpt5/run_phase762_semantic_numeric_fiber_atlas_round.sh smoke \
+  --max-pairs 6 --max-candidates 1 --controls-per-candidate 1 \
+  --max-source-groups 3 --top-k-vocab 8 --max-topk-tokens 5 \
+  --max-dynamic-route-classes 3 --log-every 2
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase762_semantic_numeric_fiber_atlas_round.sh main \
+  --max-pairs 54 --max-candidates 2 --controls-per-candidate 1 \
+  --max-source-groups 5 --top-k-vocab 14 --max-topk-tokens 8 \
+  --max-dynamic-route-classes 5 --log-every 9
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase762_semantic_numeric_fiber_atlas_round.sh confirm \
+  --max-pairs 108 --max-candidates 2 --controls-per-candidate 1 \
+  --max-source-groups 5 --top-k-vocab 16 --max-topk-tokens 10 \
+  --max-dynamic-route-classes 5 --log-every 18
+```
+
+脚本逐个运行 qwen3、GLM4 和 DS7B，并保留 `--hard-exit-after-model`，不使用量化方案，采用 bfloat16 eager 路径。
+
+### 测试原理
+
+对象不再被当成一个静态向量，而被定义为：
+
+```text
+object causal fiber =
+同一对象在多种 relation task 中，
+不同 head/source group removal 对 target logit、route release、margin drop、attention mass、direct score 的平均因果效应谱。
+```
+
+本阶段构造了 18 个对象、6 个语义域和 6 类关系：
+
+```text
+fruit: apple / banana / pear
+animal: cat / bird / dog
+plant: oak / rose / wheat
+object: chair / stone / cup
+tool: hammer / knife / scissors
+abstract: freedom / time / justice
+
+relations:
+category / color / taste / shape / edible / grows_on_tree
+```
+
+完整确认轮一共 108 个 object-relation task。对每个对象建立因果纤维向量，然后比较同域对象和异域对象的相似度，并与 first-token embedding baseline（首词元嵌入基线）比较。
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase762_semantic_numeric_fiber_atlas/confirm/
+```
+
+核心结果：
+
+```text
+qwen3:
+  causal NN = 0.556
+  embedding NN = 0.667
+  causal same = 0.531
+  causal diff = -0.122
+  causal separation = 0.653
+  embedding separation = 0.092
+
+GLM4:
+  causal NN = 0.611
+  embedding NN = 0.611
+  causal same = 0.411
+  causal diff = -0.090
+  causal separation = 0.501
+  embedding separation = 0.048
+
+DS7B:
+  causal NN = 0.556
+  embedding NN = 0.611
+  causal same = 0.214
+  causal diff = -0.093
+  causal separation = 0.307
+  embedding separation = 0.043
+```
+
+跨模型 centered object-topology correlation（中心化对象拓扑相关）：
+
+```text
+qwen3__GLM4 = 0.344
+qwen3__DS7B = 0.292
+GLM4__DS7B = 0.287
+```
+
+### 严格解释
+
+确认轮支持一个弱正结果：
+
+```text
+因果纤维的 same-domain / different-domain 均值分离明显强于 embedding baseline。
+```
+
+但它不支持强结论：
+
+```text
+语义—数值接口已经闭合。
+```
+
+原因是：
+
+```text
+1. 最近邻 domain accuracy 没有稳定超过 embedding baseline。
+2. 跨模型拓扑相关只有弱到中等强度。
+3. DS7B 的信号明显弱于 qwen3 和 GLM4。
+4. 当前仍是 head/source-level fingerprint，不是 neuron-level atlas。
+5. 对象、关系和答案仍由人工 profile 构造，存在任务模板偏差。
+```
+
+### 理论进展
+
+本阶段把“语义对象”的研究单位从：
+
+```text
+一个词 / 一个向量 / 一个 head
+```
+
+推进为：
+
+```text
+对象在关系任务族中的条件化因果功能纤维。
+```
+
+更谨慎的结论是：
+
+```text
+语义对象不是点，而是一束随任务条件展开的因果效应谱。
+```
+
+但这束纤维目前只能提供弱语义域结构，还没有达到全局语义动力系统的可闭合程度。
+
+## Phase 763: 语义因果纤维特征消融审计 [2026-06-29 17:18]
+
+### 生成脚本
+
+```text
+tests/gpt5/phase763_semantic_numeric_fiber_ablation.py
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase763_semantic_numeric_fiber_ablation.py
+python tests/gpt5/phase763_semantic_numeric_fiber_ablation.py --round-name confirm
+```
+
+### 测试原理
+
+本阶段不重新加载模型，只读取 Phase 762 confirm 的 jsonl 结果，按特征家族重新构造对象纤维：
+
+```text
+phase762_exact
+target_drop_only
+attention_mass_only
+direct2_scores_only
+direct4_scores_only
+route_release_only
+margin_drop_only
+records_only
+object_relation_sources_only
+all_relation_collapsed
+```
+
+目的不是新增因果干预，而是审计 Phase 762 的弱正结果到底由哪些数值成分支撑。
+
+### 结果
+
+结果目录：
+
+```text
+results/glm5_phase763_semantic_numeric_fiber_ablation/confirm/
+```
+
+关键结果：
+
+```text
+qwen3:
+  phase762_exact: NN 0.556, separation 0.653
+  attention_mass_only: NN 0.667, separation 0.583
+  direct2_scores_only: NN 0.611, separation 0.777
+  route_release_only: NN 0.333, separation 0.159
+  object_relation_sources_only: NN 0.444, separation 0.198
+
+GLM4:
+  phase762_exact: NN 0.611, separation 0.501
+  attention_mass_only: NN 0.667, separation 0.673
+  direct2_scores_only: NN 0.722, separation 0.831
+  route_release_only: NN 0.444, separation 0.316
+  object_relation_sources_only: NN 0.056, separation 0.013
+
+DS7B:
+  phase762_exact: NN 0.556, separation 0.307
+  attention_mass_only: NN 0.667, separation 0.550
+  direct2_scores_only: NN 0.667, separation 0.402
+  route_release_only: NN 0.667, separation 0.115
+  object_relation_sources_only: NN 0.278, separation 0.110
+```
+
+跨模型相关：
+
+```text
+phase762_exact:
+  DS7B__GLM4 = 0.287
+  DS7B__qwen3 = 0.292
+  GLM4__qwen3 = 0.344
+
+direct2_scores_only:
+  DS7B__GLM4 = 0.151
+  DS7B__qwen3 = 0.229
+  GLM4__qwen3 = 0.262
+```
+
+### 严格解释
+
+Phase 763 把 Phase 762 的结论进一步收紧：
+
+```text
+语义域结构主要不是由 route_release_only 单独承载。
+```
+
+更稳定的支撑来自：
+
+```text
+1. attention_mass_only
+2. direct target / route score
+3. records_only source group
+```
+
+而单独使用：
+
+```text
+object_tokens + relation_tokens
+```
+
+效果很弱，尤其 GLM4 几乎失效。这说明当前“语义对象纤维”更像是：
+
+```text
+记录侧条件化读出几何 + 注意力分配质量 + 直接 logit 几何
+```
+
+而不是已经定位到对象词元自身或 route release（路线释放）本身。
+
+### 当前硬伤
+
+```text
+1. 语义域分离仍可能来自 profile 记录格式，而不是真实自然语义。
+2. direct score 很强，但跨模型相关不强，可能是局部读出几何而非全局语义不变量。
+3. route_release 单独较弱，说明路线动力系统尚未真正被捕获。
+4. object/relation token source 单独较弱，说明“对象词元就是语义入口”的假设仍不成立。
+5. 当前仍是小模型结果，存在结构压缩和机制偏移风险。
+```
+
+### 下一步
+
+下一阶段不应继续扩大对象数量，而应先做：
+
+```text
+Phase 764:
+Record-Format Control and Natural-Context Fiber Test
+（记录格式控制与自然语境因果纤维测试）
+```
+
+核心目标：
+
+```text
+1. 保留同一对象和关系，改变 profile 格式，测试 records_only 信号是否稳定。
+2. 去掉显式 key-value records，换成自然句子上下文。
+3. 比较 causal fiber 在 explicit profile / paraphrase / natural sentence 三种上下文中的一致性。
+4. 如果一致，语义—数值接口更可信。
+5. 如果不一致，当前图谱主要是格式条件图谱，不是自然语义图谱。
+```
+
+## Phase 764: 记录格式控制与自然语境因果纤维测试 [2026-06-29 17:39]
+
+### 本阶段判断
+
+Phase 762-763 已经证明：
+
+```text
+语义对象因果纤维存在弱语义域结构；
+但最强支撑来自 records / attention / direct score，
+不是 object token 本身，也不是 route_release 单独特征。
+```
+
+因此 Phase 764 的关键问题是：
+
+```text
+这个信号是不是 key-value records 格式造成的？
+```
+
+如果只在 `apple.category = fruit` 这种显式格式中成立，那么它更像 format-conditioned atlas（格式条件图谱）；如果在句子行和紧凑自然描述中也成立，才更接近 natural semantic fiber（自然语义纤维）。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase764_record_format_natural_context_fiber_test.py
+tests/gpt5/run_phase764_record_format_natural_context_fiber_test_round.sh
+```
+
+### 测试命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase764_record_format_natural_context_fiber_test.py
+```
+
+dry-run：
+
+```bash
+python tests/gpt5/phase764_record_format_natural_context_fiber_test.py \
+  --dry-run --max-cases 9 --relations category,color,edible
+```
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase764_record_format_natural_context_fiber_test_round.sh smoke \
+  --max-cases 9 --max-candidates 1 --controls-per-candidate 1 \
+  --max-source-groups 4 --relations category,color,edible --log-every 3
+```
+
+冒烟阶段发现 `expanded_candidates` 需要 `include_controls` 和 `control_offset` 参数，已修复并重跑通过。模型路径、三种上下文格式和三模型顺序运行均正常。
+
+主测试：
+
+```bash
+tests/gpt5/run_phase764_record_format_natural_context_fiber_test_round.sh main \
+  --max-candidates 1 --controls-per-candidate 1 --max-source-groups 4 \
+  --relations category,color,edible --log-every 27
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase764_record_format_natural_context_fiber_test_round.sh confirm \
+  --max-candidates 1 --controls-per-candidate 1 --max-source-groups 6 \
+  --relations category,color,edible --log-every 27
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。本阶段不使用量化方案，采用 bfloat16 eager 路径。
+
+### 测试原理
+
+同一批对象和答案，用三种上下文格式表达：
+
+```text
+1. key_value:
+   apple.category = fruit
+   apple.color = red
+
+2. sentence_lines:
+   Apple is in the category fruit.
+   The color of apple is red.
+
+3. compact_sentence:
+   Profile for apple: category fruit; color red; ...
+```
+
+然后对同一对象构造跨格式 causal fiber（因果纤维）：
+
+```text
+source group:
+context_all
+target_context_line
+target_value_tokens
+object_tokens
+relation_tokens
+question
+
+feature:
+target_logit_drop
+attention_mass
+direct_target_boost
+direct_total_route_suppression
+```
+
+测试两件事：
+
+```text
+1. 每种上下文内部是否仍然有 same-domain > different-domain 的分离。
+2. 不同上下文之间，同一个对象 / 同一语义域 / 不同语义域的相似度关系是否稳定。
+```
+
+本阶段主测试和确认测试均使用：
+
+```text
+18 objects * 3 relations * 3 context formats = 162 cases per model
+```
+
+其中 relations 为：
+
+```text
+category / color / edible
+```
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase764_record_format_natural_context_fiber_test/confirm/
+```
+
+上下文内部语义域分离：
+
+```text
+qwen3:
+  key_value:        NN 0.722, separation 0.687
+  sentence_lines:   NN 0.833, separation 0.684
+  compact_sentence: NN 0.611, separation 0.681
+
+GLM4:
+  key_value:        NN 0.500, separation 0.331
+  sentence_lines:   NN 0.556, separation 0.453
+  compact_sentence: NN 0.667, separation 0.425
+
+DS7B:
+  key_value:        NN 0.778, separation 0.464
+  sentence_lines:   NN 0.889, separation 0.597
+  compact_sentence: NN 0.667, separation 0.515
+```
+
+跨上下文稳定性：
+
+```text
+qwen3:
+  compact_sentence__key_value:
+    same_object = 0.874
+    same_domain_other = 0.798
+    diff_domain = 0.137
+    domain_gap = 0.661
+
+  compact_sentence__sentence_lines:
+    same_object = 0.777
+    same_domain_other = 0.718
+    diff_domain = 0.087
+    domain_gap = 0.631
+
+  key_value__sentence_lines:
+    same_object = 0.882
+    same_domain_other = 0.797
+    diff_domain = 0.132
+    domain_gap = 0.665
+
+GLM4:
+  compact_sentence__key_value:
+    same_object = 0.240
+    same_domain_other = 0.002
+    diff_domain = -0.194
+    domain_gap = 0.196
+
+  compact_sentence__sentence_lines:
+    same_object = -0.066
+    same_domain_other = -0.176
+    diff_domain = -0.301
+    domain_gap = 0.125
+
+  key_value__sentence_lines:
+    same_object = 0.081
+    same_domain_other = -0.110
+    diff_domain = -0.299
+    domain_gap = 0.189
+
+DS7B:
+  compact_sentence__key_value:
+    same_object = 0.165
+    same_domain_other = 0.045
+    diff_domain = -0.201
+    domain_gap = 0.246
+
+  compact_sentence__sentence_lines:
+    same_object = 0.248
+    same_domain_other = 0.185
+    diff_domain = -0.171
+    domain_gap = 0.356
+
+  key_value__sentence_lines:
+    same_object = 0.101
+    same_domain_other = -0.000
+    diff_domain = -0.247
+    domain_gap = 0.246
+```
+
+### 客观进展
+
+Phase 764 给出一个比 Phase 762 更强、但仍需谨慎的正结果：
+
+```text
+语义域结构不是 key-value records 独有。
+```
+
+证据是：
+
+```text
+1. qwen3 / GLM4 / DS7B 三个模型在 key_value、sentence_lines、compact_sentence 三种上下文中都有正 separation。
+2. sentence_lines 往往不弱于 key_value，DS7B 中甚至更强。
+3. 跨上下文对比中，同语义域对象普遍高于异语义域对象。
+```
+
+因此 Phase 762 中的语义纤维弱信号不能简单归因于 `apple.category = fruit` 这种单一格式。
+
+### 严格解释
+
+但当前仍不能说：
+
+```text
+自然语义对象编码机制已经闭合。
+```
+
+必须收紧为：
+
+```text
+在显式给定事实的多种上下文表述中，
+模型形成了跨格式保留的语义域级因果纤维结构。
+```
+
+关键限制：
+
+```text
+1. qwen3 的跨格式 same-object 稳定性很强，但 GLM4 和 DS7B 只达到弱到中等。
+2. 当前更稳的是 domain-level structure，不是 object-level identity closure。
+3. 只测试了 category / color / edible 三种关系，还不是完整六关系图谱。
+4. 上下文仍然显式给定事实，不是纯 commonsense 自然知识。
+5. 特征仍是 head/source 级别，不是 neuron-level 或 parameter-level 图谱。
+6. 小模型可能存在结构压缩偏差，不能直接外推到大模型。
+```
+
+### 理论进展
+
+Phase 764 把语义—数值接口从：
+
+```text
+格式化记录中的因果纤维
+```
+
+推进到：
+
+```text
+跨表述格式仍部分保持的语义域因果纤维。
+```
+
+这说明当前最接近真实语言编码机制的对象不是：
+
+```text
+单个语义词元
+单个 head
+单条 route
+```
+
+而是：
+
+```text
+在上下文条件下形成的 domain-level causal fiber field
+（语义域级因果纤维场）
+```
+
+### 下一步
+
+下一阶段应继续同一大阶段，但不要盲目扩大对象数。最关键任务是：
+
+```text
+Phase 765:
+Commonsense Context and Object-Identity Closure Test
+（常识语境与对象身份闭合测试）
+```
+
+核心问题：
+
+```text
+如果不显式给定 profile，只要求模型使用常识回答，
+对象因果纤维是否仍然保持语义域结构和对象身份稳定性？
+```
+
+如果成立，说明语义—数值接口开始接近模型内部已有知识结构。
+
+如果不成立，说明当前图谱主要是 context-conditioned retrieval / readout mechanism（上下文条件检索/读出机制），还不是完整自然语义编码机制。
+
+## Phase 765: 常识语境与对象身份闭合测试 [2026-06-29 18:10]
+
+### 本阶段判断
+
+两份新附件的判断基本正确，而且与 Phase 761-764 的结果一致：
+
+```text
+静态 semantic graph（语义图谱）不是正确第一目标。
+更正确的目标是 context-route-causal-fiber-generation-closure graph
+（脉络—路线—因果纤维—生成闭合图谱）。
+```
+
+Phase 764 已经证明，在显式给定事实的多种格式中，语义域因果纤维不是 key-value records 独有。但它仍然没有回答：
+
+```text
+如果不显式给定 profile（档案事实），
+模型只依赖 commonsense（常识）回答，
+对象因果纤维是否仍然保留语义域结构和对象身份稳定性？
+```
+
+因此 Phase 765 继续同一阶段目标：从显式上下文检索机制，推进到内部常识语义机制的第一轮测试。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase765_commonsense_context_identity_closure_test.py
+tests/gpt5/run_phase765_commonsense_context_identity_closure_test_round.sh
+```
+
+### 测试命令
+
+语法检查：
+
+```bash
+python -m py_compile tests/gpt5/phase765_commonsense_context_identity_closure_test.py
+```
+
+dry-run：
+
+```bash
+python tests/gpt5/phase765_commonsense_context_identity_closure_test.py \
+  --dry-run --max-cases 8 --relations category,edible,grows_on_tree
+```
+
+第一次冒烟测试：
+
+```bash
+tests/gpt5/run_phase765_commonsense_context_identity_closure_test_round.sh smoke \
+  --max-cases 12 --max-candidates 1 --controls-per-candidate 1 \
+  --max-source-groups 4 --relations category,edible,grows_on_tree --log-every 4
+```
+
+第一次冒烟发现原始 commonsense prompt（常识提示）下 target_top1_rate 基本为 0，说明目标答案状态没有可靠形成。随后加入 allowed values（候选值列表），但不加入对象事实；这仍然是常识测试，因为只限定候选集合，没有告诉模型 `apple -> fruit`。
+
+修正后冒烟测试：
+
+```bash
+tests/gpt5/run_phase765_commonsense_context_identity_closure_test_round.sh smoke \
+  --max-cases 12 --max-candidates 1 --controls-per-candidate 1 \
+  --max-source-groups 4 --relations category,edible,grows_on_tree --log-every 4
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase765_commonsense_context_identity_closure_test_round.sh main \
+  --max-candidates 1 --controls-per-candidate 1 --max-source-groups 4 \
+  --relations category,edible,grows_on_tree --log-every 18
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase765_commonsense_context_identity_closure_test_round.sh confirm \
+  --max-candidates 1 --controls-per-candidate 1 --max-source-groups 5 \
+  --relations category,edible,grows_on_tree --log-every 18
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。本阶段不使用量化方案，采用 bfloat16 eager 路径。
+
+### 测试原理
+
+本阶段不提供显式事实记录，而只使用常识提示：
+
+```text
+commonsense_question:
+  Answer using common everyday knowledge.
+  Allowed values: ...
+  Question: What is the category of apple?
+  Answer:
+
+commonsense_statement:
+  Use common everyday knowledge.
+  Allowed values: ...
+  Task: For apple, give category.
+  Answer:
+```
+
+测试对象仍为 18 个对象、6 个语义域：
+
+```text
+fruit / animal / plant / object / tool / abstract
+```
+
+测试关系为：
+
+```text
+category / edible / grows_on_tree
+```
+
+确认轮任务量：
+
+```text
+18 objects * 3 relations * 2 commonsense prompt formats = 108 cases per model
+```
+
+source groups：
+
+```text
+instruction
+question
+object_tokens
+relation_tokens
+answer_prefix
+```
+
+特征：
+
+```text
+target_logit_drop
+attention_mass
+direct_target_boost
+direct_total_route_suppression
+```
+
+评估两件事：
+
+```text
+1. base answer reliability：
+   常识 prompt 是否真的让目标答案进入可预测状态。
+
+2. commonsense causal fiber structure：
+   不同常识 prompt 格式下，
+   对象因果纤维是否保留 same-domain separation 和 same-object stability。
+```
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase765_commonsense_context_identity_closure_test/confirm/
+```
+
+base answer reliability（基础答案可靠性）：
+
+```text
+qwen3:
+  target_top1_rate = 0.806
+  mean_target_rank = 1.324
+  mean_contrast_rank = 51.741
+
+GLM4:
+  target_top1_rate = 0.593
+  mean_target_rank = 1.657
+  mean_contrast_rank = 5.046
+
+DS7B:
+  target_top1_rate = 0.185
+  mean_target_rank = 5.833
+  mean_contrast_rank = 66.102
+```
+
+commonsense domain separation（常识语义域分离）：
+
+```text
+qwen3:
+  commonsense_question:
+    NN = 0.556
+    same = 0.801
+    diff = 0.198
+    separation = 0.603
+
+  commonsense_statement:
+    NN = 0.611
+    same = 0.832
+    diff = 0.226
+    separation = 0.606
+
+GLM4:
+  commonsense_question:
+    NN = 0.222
+    same = 0.154
+    diff = -0.053
+    separation = 0.208
+
+  commonsense_statement:
+    NN = 0.278
+    same = 0.087
+    diff = -0.070
+    separation = 0.156
+
+DS7B:
+  commonsense_question:
+    NN = 0.667
+    same = 0.258
+    diff = -0.097
+    separation = 0.355
+
+  commonsense_statement:
+    NN = 0.667
+    same = 0.301
+    diff = -0.100
+    separation = 0.401
+```
+
+cross-context stability（跨常识提示格式稳定性）：
+
+```text
+qwen3:
+  same_object = 0.877
+  same_domain_other = 0.789
+  diff_domain = 0.203
+  object_gap = 0.088
+  domain_gap = 0.585
+
+GLM4:
+  same_object = -0.261
+  same_domain_other = -0.385
+  diff_domain = -0.422
+  object_gap = 0.124
+  domain_gap = 0.037
+
+DS7B:
+  same_object = -0.115
+  same_domain_other = -0.186
+  diff_domain = -0.312
+  object_gap = 0.071
+  domain_gap = 0.126
+```
+
+### 客观进展
+
+Phase 765 给出一个“模型分化明显”的关键结果：
+
+```text
+qwen3 支持 commonsense semantic fiber closure（常识语义纤维闭合）的初步正结果。
+GLM4 只支持弱语义域分离，不支持对象级闭合。
+DS7B 虽有 domain separation，但 base answer reliability 太低，不能作为强闭合证据。
+```
+
+这说明：
+
+```text
+自然常识语义机制不是完全不存在；
+但它不是三模型稳定共享的不变量。
+```
+
+### 严格解释
+
+不能说：
+
+```text
+已经完成自然语义对象编码机制。
+```
+
+更准确的结论是：
+
+```text
+在 qwen3 中，常识语境下对象因果纤维已经表现出强 domain-level structure 和跨 prompt 的 object-level stability。
+
+在 GLM4 中，该结构很弱。
+
+在 DS7B 中，虽然对象纤维能形成语义域分离，但目标答案本身不可靠，所以结果更像弱候选集合几何，而不是稳定常识闭合。
+```
+
+### 对附件理论的判断
+
+附件中“静态语义图谱不是底层单位”的判断是正确的。Phase 765 进一步支持这一点：
+
+```text
+即使没有显式 profile，
+模型是否形成语义结构，也取决于：
+prompt 脉络
+候选集合
+目标答案可靠性
+source group
+attention/direct geometry
+跨格式闭合
+```
+
+所以真正的图谱对象不是：
+
+```text
+apple node
+fruit node
+```
+
+而是：
+
+```text
+apple-category commonsense trajectory
+apple-edible commonsense trajectory
+apple-answer candidate competition
+apple prompt-format closure
+```
+
+### 当前硬伤
+
+```text
+1. 候选值列表是必要的，否则 target_top1 基本不成立；这说明自然生成闭合仍然脆弱。
+2. DS7B 的 target_top1_rate 只有 0.185，不能把它的 domain separation 当成强语义证据。
+3. GLM4 的 domain_gap 只有 0.037，跨 prompt 稳定性很弱。
+4. 当前只做了 head/source 级别，不是 neuron-level atlas。
+5. allowed values 虽不提供对象事实，但会引入 candidate-set conditioning（候选集合条件化）。
+6. 当前只测 category / edible / grows_on_tree，尚未覆盖完整关系空间。
+```
+
+### 理论进展
+
+Phase 765 把图谱目标进一步收紧为：
+
+```text
+不是静态语义图谱；
+而是条件化常识脉络中的因果纤维闭合图谱。
+```
+
+目前最准确的机制表述是：
+
+```text
+语义对象 =
+在给定任务脉络和候选集合下，
+由 attention transport、direct readout geometry、source group effect
+共同形成的跨关系因果纤维；
+其强度取决于模型是否已经形成可靠预测充分状态。
+```
+
+### 下一步
+
+下一阶段仍属于同一个大阶段，但应从“是否有因果纤维”转向：
+
+```text
+Phase 766:
+Prediction-Sufficient State Reliability Audit
+（预测充分状态可靠性审计）
+```
+
+核心问题：
+
+```text
+为什么 qwen3 能形成可靠 commonsense prediction-sufficient state，
+而 GLM4 / DS7B 不能稳定形成？
+```
+
+具体任务：
+
+```text
+1. 按 relation 分开审计 category / edible / grows_on_tree。
+2. 找出 target_top1 成功样本和失败样本的上下文状态差异。
+3. 比较成功样本与失败样本中的 attention_mass、direct_score、source_group contribution。
+4. 判断失败来自知识缺失、候选竞争、格式协议，还是读出阈值不足。
+5. 只在 target state 已可靠形成的样本上继续做机制图谱。
+```
+
+## Phase 766: 预测充分状态可靠性审计 [2026-06-29 18:13]
+
+### 本阶段判断
+
+Phase 765 给出一个模型分化结果：
+
+```text
+qwen3 支持常识语义纤维闭合的初步正结果；
+GLM4 只有弱语义域结构；
+DS7B 虽有 domain separation，但 target_top1_rate 很低。
+```
+
+因此 Phase 766 不再加载模型，而是对 Phase 765 confirm 结果做离线审计，回答：
+
+```text
+成功形成 target_top1 的样本，
+和失败样本在 attention / direct score / source contribution 上有什么差异？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase766_prediction_sufficient_state_reliability_audit.py
+```
+
+### 测试命令
+
+```bash
+python -m py_compile tests/gpt5/phase766_prediction_sufficient_state_reliability_audit.py
+python tests/gpt5/phase766_prediction_sufficient_state_reliability_audit.py --round-name confirm
+```
+
+### 测试原理
+
+读取 Phase 765 confirm 的 jsonl：
+
+```text
+results/glm5_phase765_commonsense_context_identity_closure_test/confirm/
+```
+
+把每个 commonsense case 按 target_top1 分成：
+
+```text
+success: 目标答案是 top1
+failure: 目标答案不是 top1
+```
+
+然后比较：
+
+```text
+target_logit_drop
+attention_mass_to_source
+direct_target_boost
+direct_total_route_suppression
+direct_mean_margin_gain
+source_positions_n
+```
+
+按三个层次聚合：
+
+```text
+1. by relation
+2. by source_group
+3. by relation + source_group
+```
+
+注意：本阶段是 observational audit（观察性审计），不是新的 causal intervention（因果干预）。
+
+### 结果
+
+结果目录：
+
+```text
+results/glm5_phase766_prediction_sufficient_state_reliability_audit/confirm/
+```
+
+基础可靠性按关系：
+
+```text
+qwen3:
+  category top1 = 0.861, mean rank = 1.389
+  edible top1 = 0.694, mean rank = 1.306
+  grows_on_tree top1 = 0.861, mean rank = 1.278
+
+GLM4:
+  category top1 = 0.806, mean rank = 1.444
+  edible top1 = 0.500, mean rank = 1.667
+  grows_on_tree top1 = 0.472, mean rank = 1.861
+
+DS7B:
+  category top1 = 0.361, mean rank = 5.000
+  edible top1 = 0.111, mean rank = 7.028
+  grows_on_tree top1 = 0.083, mean rank = 5.472
+```
+
+success - failure source group gaps：
+
+```text
+qwen3:
+  instruction:
+    target_drop_gap = 0.049
+    attention_gap = 0.002
+    direct_boost_gap = 0.111
+
+  object_tokens:
+    target_drop_gap = 0.019
+    attention_gap = 0.005
+    direct_boost_gap = 0.015
+
+  question:
+    target_drop_gap = 0.032
+    attention_gap = -0.007
+    direct_boost_gap = 0.002
+
+GLM4:
+  all source groups:
+    target_drop_gap mostly negative or near zero
+    direct_boost_gap near zero
+    attention gaps small
+
+DS7B:
+  instruction:
+    attention_gap = 0.132
+    direct_boost_gap = -0.085
+
+  object_tokens:
+    target_drop_gap = 0.058
+    attention_gap = -0.039
+    direct_boost_gap = -0.090
+
+  question:
+    attention_gap = -0.094
+    direct_boost_gap = -0.132
+```
+
+### 客观解释
+
+qwen3：
+
+```text
+成功样本更像真的形成了 prediction-sufficient state（预测充分状态）：
+instruction / object_tokens / question 的移除更会造成 target_logit_drop，
+instruction direct_target_boost 明显更强。
+```
+
+GLM4：
+
+```text
+成功和失败样本在 source contribution 上差异很小。
+这说明 GLM4 的失败不一定是“没看对象”或“没看关系”，
+更可能是读出阈值、候选竞争或任务协议不稳定。
+```
+
+DS7B：
+
+```text
+DS7B 的 target_top1 很低，
+但成功样本并没有表现为 object/question direct boost 更强。
+部分 source gap 甚至为负。
+这说明 DS7B 的 commonsense 结果不能解释为稳定语义纤维闭合，
+更可能是候选集合、格式协议或 readout competition（读出竞争）造成的弱结构。
+```
+
+### 对附件理论的进一步收紧
+
+附件说“语义不是底层节点，而是脉络—路线—轨迹—竞争—闭合上的功能标签”，这个判断继续得到支持。
+
+Phase 766 说明：
+
+```text
+真正需要进入图谱的不是 apple / fruit 静态节点，
+而是：
+1. target state 是否可靠形成；
+2. 成功样本中哪些 source group 对 target 有必要贡献；
+3. 失败样本失败在 source reading、candidate competition 还是 readout threshold；
+4. 只有进入 prediction-sufficient state 的样本，才适合继续做机制图谱。
+```
+
+### 当前硬伤
+
+```text
+1. Phase 766 是离线观察性审计，不是新的因果干预。
+2. success/failure 按 target_top1 划分，可能混入 tokenizer 和候选词首词元偏差。
+3. DS7B failure 样本太多，成功样本只有 40 条 effect rows 对应的 case 较少，结论要谨慎。
+4. 目前还没有把 failure 分解成知识缺失、候选竞争、格式协议、读出阈值四类。
+5. 仍停留在 head/source 级别，未进入 neuron/channel 级。
+```
+
+### 理论进展
+
+现在“语言机制图谱”的第一层应当明确为：
+
+```text
+prediction-sufficient state reliability layer
+（预测充分状态可靠性层）
+```
+
+只有当一个样本已经形成可靠目标状态，后续的 route / causal fiber / closure 图谱才有解释意义。
+
+这把当前理论从：
+
+```text
+对象因果纤维图谱
+```
+
+进一步收紧为：
+
+```text
+预测充分状态条件下的对象因果纤维图谱。
+```
+
+### 下一步
+
+下一阶段应该是：
+
+```text
+Phase 767:
+Failure-Type Decomposition for Commonsense Closure
+（常识闭合失败类型分解）
+```
+
+具体任务：
+
+```text
+1. 对 Phase 765 的失败样本进行分类：
+   knowledge miss（知识缺失）
+   candidate competition（候选竞争）
+   format/protocol miss（格式协议失败）
+   readout threshold miss（读出阈值不足）
+
+2. 对每类失败分别做 top-k token 审计：
+   看模型到底倾向输出什么。
+
+3. 对 qwen3 成功样本建立 clean subset：
+   只在可靠预测充分状态上继续追踪 route / closure。
+
+4. 对 GLM4 / DS7B 只在 target rank <= 2 的样本上重算纤维，
+   避免把未形成目标状态的样本误当成语义机制。
+```
+
+## Phase 767: 常识闭合失败类型 top-k 审计 [2026-06-29 18:35]
+
+### 背景
+
+本阶段分析了最新附件中对 Phase 765 / Phase 766 的判断。附件的核心判断基本正确：
+
+```text
+语言机制图谱的第一层不应该是静态语义节点，
+而应该是 prediction-sufficient state reliability layer（预测充分状态可靠性层）。
+```
+
+Phase 765 证明常识 prompt（提示）下 qwen3 有较强语义域因果纤维结构，GLM4 较弱，DS7B 的基础答案可靠性不足。
+Phase 766 进一步说明，未形成 target_top1（目标第一名）的样本不应直接进入机制图谱。
+
+但 Phase 766 仍然有一个硬伤：
+
+```text
+它只知道 target rank（目标排名）和 source effect（源组效应），
+不知道失败时模型真正 top-k 倾向输出什么。
+```
+
+因此本阶段执行 Phase 767：对 Phase 765 的同一批常识 prompt 做 logits-only top-k 审计，用于失败类型分解。
+
+### 测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase767_commonsense_failure_type_topk_audit.py
+tests/glm5/run_phase767_commonsense_failure_type_topk_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase767_commonsense_failure_type_topk_audit/main/
+results/glm5_phase767_commonsense_failure_type_topk_audit/main/
+```
+
+主结果文件：
+
+```text
+tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_cross_model_summary.md
+tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_cross_model_summary.json
+```
+
+执行命令：
+
+```bash
+python -m py_compile tests/glm5/phase767_commonsense_failure_type_topk_audit.py
+
+tests/glm5/run_phase767_commonsense_failure_type_topk_audit_round.sh smoke_alias \
+  --max-cases 12 \
+  --top-k 30 \
+  --relations category,edible,grows_on_tree \
+  --log-every 6
+
+tests/glm5/run_phase767_commonsense_failure_type_topk_audit_round.sh main \
+  --top-k 80 \
+  --relations category,edible,grows_on_tree \
+  --log-every 18
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+quantization=off（无量化）；
+优先尝试 flash_attention_2；
+本机 FlashAttention2 未安装，自动降级为 sdpa；
+每个模型独立进程运行，完成后释放显存。
+```
+
+### 测试原理
+
+本阶段不做 attention hook（注意力钩子）、不做 patch（修补）、不做 source removal（源移除）。
+只对 Phase 765 的常识 prompt 做下一词 logits（分数）读取。
+
+每个样本记录：
+
+```text
+1. target answer（目标答案）首词元排名；
+2. contrast answer（对照答案）首词元排名；
+3. top-k token（前 k 个词元）；
+4. allowed value set（候选值集合）内部排名；
+5. target margin（目标相对最佳非目标的边际）；
+6. failure type（失败类型）。
+```
+
+由于测试中发现 DS7B 和 GLM4 经常输出 `Yes`，而目标答案可能写作 `yes`，
+因此本阶段新增了 semantic alias（语义别名）合并：
+
+```text
+yes / Yes / YES
+no / No / NO
+fruit / Fruit / FRUIT
+```
+
+同时保留 exact top1（精确首词元第一名）和 semantic top1（语义别名第一名）。
+这是一个重要纠偏：否则会把大小写 / 词形差异误判成语义失败。
+
+### 失败类型定义
+
+本阶段使用保守规则：
+
+```text
+success_top1:
+  语义别名 target 为 top1。
+
+readout_threshold_miss:
+  语义 target rank = 2。
+
+known_contrast_competition:
+  已知 contrast answer 排在 target 前面。
+
+allowed_value_candidate_competition:
+  target 在 allowed value set 内部不是第一，且整体排名靠前。
+
+candidate_competition_other:
+  target 在 top-k 内，但不是已知 contrast 或 allowed value 竞争。
+
+format_protocol_miss:
+  top1 是 The / Answer / 标点 / 空白 等格式或解释起手词。
+
+knowledge_or_state_formation_miss:
+  target 不在 top-k，或没有形成可解释的目标状态。
+```
+
+本轮 top-k=80，所有 target 都进入 top-k，所以没有出现强 `knowledge_or_state_formation_miss`。
+这说明本轮失败主要不是“完全不知道答案”，而是 readout / candidate / format competition（读出、候选、格式竞争）。
+
+### 数学形式
+
+预测充分状态的第一过滤仍然是：
+
+```text
+R_suf(x) = 1[rank(y_target | x) = 1]
+```
+
+本阶段修正为语义别名版本：
+
+```text
+A(y) = { token aliases of y }
+```
+
+```text
+rank_sem(y | x)
+=
+min_{a in A(y)} rank(a | x)
+```
+
+```text
+R_suf_sem(x)
+=
+1[rank_sem(y_target | x) = 1]
+```
+
+失败类型分解为：
+
+```text
+Failure(x)
+in
+{
+  readout_threshold,
+  known_contrast_competition,
+  allowed_value_candidate_competition,
+  candidate_competition_other,
+  format_protocol,
+  knowledge_or_state_formation
+}
+```
+
+目标边际为：
+
+```text
+margin_sem(x)
+=
+max_{a in A(y_target)} logit(a | x)
+-
+max_{z notin A(y_target)} logit(z | x)
+```
+
+### 客观结果
+
+主测试共：
+
+```text
+18 objects * 3 relations * 2 context formats = 108 cases / model
+```
+
+整体可靠性：
+
+| model | semantic top1 | exact top1 | semantic rank | exact rank | clean n | rank<=2 n |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 0.824 | 0.824 | 1.315 | 1.315 | 89 | 102 |
+| GLM4 | 0.750 | 0.611 | 1.380 | 1.630 | 81 | 99 |
+| DS7B | 0.352 | 0.176 | 3.806 | 6.407 | 38 | 55 |
+
+最重要的客观现象：
+
+```text
+1. qwen3 精确 top1 和语义 top1 一致，说明词形偏差较小。
+2. GLM4 语义 top1 从 exact 0.611 提升到 semantic 0.750，说明大量失败其实是大小写 / 词形读出问题。
+3. DS7B 语义 top1 从 exact 0.176 提升到 semantic 0.352，说明 DS7B 的一部分失败也是词形问题，但仍然远弱于 qwen3 / GLM4。
+4. 三个模型 target_in_topk_rate 都是 1.000，说明目标答案通常在候选空间内，不是完全消失。
+5. DS7B 的 mean semantic margin 仍为负数，说明它即使知道候选，也经常不能把正确语义候选推到第一。
+```
+
+失败类型分布：
+
+| model | success_top1 | readout_threshold | known_contrast | allowed_value_comp | other_comp | format_protocol |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 89 | 13 | 2 | 4 | 0 | 0 |
+| GLM4 | 81 | 18 | 8 | 0 | 1 | 0 |
+| DS7B | 38 | 17 | 41 | 7 | 1 | 4 |
+
+### 结果解释
+
+#### qwen3
+
+qwen3 是当前最稳定的模型：
+
+```text
+semantic top1 = 0.824
+clean subset = 89 / 108
+rank <= 2 = 102 / 108
+```
+
+这说明 qwen3 大多数常识样本已经进入 prediction-sufficient state（预测充分状态）。
+失败样本主要是：
+
+```text
+readout_threshold_miss: 13
+allowed_value_candidate_competition: 4
+known_contrast_competition: 2
+```
+
+因此 qwen3 的瓶颈不是“目标答案不存在”，而是少量候选竞争和读出阈值问题。
+
+#### GLM4
+
+GLM4 的关键发现是：
+
+```text
+exact top1 = 0.611
+semantic top1 = 0.750
+```
+
+这说明 GLM4 有相当一部分样本语义上已经闭合，但首词元大小写 / 词形不同。
+因此 Phase 765 / 766 对 GLM4 的严格首词元判断可能低估了它的语义预测能力。
+
+但 GLM4 仍有：
+
+```text
+readout_threshold_miss: 18
+known_contrast_competition: 8
+```
+
+所以它比 qwen3 更容易卡在读出阈值和候选竞争。
+
+#### DS7B
+
+DS7B 的 exact top1 很低，但 semantic top1 翻倍：
+
+```text
+exact top1 = 0.176
+semantic top1 = 0.352
+```
+
+这证明 DS7B 的一部分失败是词形 / 大小写输出问题，而不是完全语义失败。
+
+但是 DS7B 仍有大量竞争失败：
+
+```text
+known_contrast_competition: 41
+readout_threshold_miss: 17
+allowed_value_candidate_competition: 7
+format_protocol_miss: 4
+```
+
+这说明 DS7B 的核心瓶颈仍然是：
+
+```text
+候选竞争场没有稳定收敛；
+正确答案经常存在，但不能压过错误候选或格式路线。
+```
+
+### 对附件判断的修正
+
+附件说 Phase 765 / 766 的下一步应做 failure taxonomy（失败类型分类），这是正确的。
+但 Phase 767 发现一个新的关键细节：
+
+```text
+failure taxonomy 不能只看 exact first-token rank。
+必须区分：
+1. exact token closure（精确词元闭合）；
+2. semantic alias closure（语义别名闭合）；
+3. phrase-level closure（短语级闭合）。
+```
+
+否则会把 `Yes` 与 `yes`、`No` 与 `no` 的差异误判为语义机制失败。
+
+这说明语言机制图谱的第一层还要再细分：
+
+```text
+prediction-sufficient state reliability layer
+  -> semantic target state reliability
+  -> lexical realization reliability
+  -> phrase-level generation reliability
+```
+
+### 当前硬伤
+
+```text
+1. 本阶段仍然是 logits-only observation（只读分数观察），不是因果干预。
+2. semantic alias 只覆盖简单大小写 / 词形别名，未覆盖同义表达。
+3. top-k 只看首词元，不能证明 phrase-level generation closure（短语级生成闭合）。
+4. allowed values（候选值列表）仍然存在，会增强候选集合条件化。
+5. format_protocol_miss 只能识别 top1 显式格式词，不能覆盖所有协议失败。
+6. 没有新增关系类型，仍只覆盖 category / edible / grows_on_tree。
+7. 当前模型都是小模型，DS7B 等结果可能包含小模型压缩和格式捷径偏差。
+```
+
+### 理论进展
+
+本阶段把 Phase 766 的“预测充分状态”继续细化为三层：
+
+```text
+1. semantic prediction-sufficient state
+   语义目标是否已经成为第一候选。
+
+2. lexical realization state
+   语义目标是否以预期词形 / 大小写输出。
+
+3. phrase generation closure
+   首词元之后是否能完成完整短语生成。
+```
+
+因此最新机制图谱第一层应写成：
+
+```text
+State reliability layer
+=
+semantic closure
++
+lexical closure
++
+phrase closure
+```
+
+这比单纯 target_top1 更严格，也更接近真实语言生成机制。
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 768:
+Semantic-Alias Clean Subset Fiber Reanalysis and Phrase Closure
+（语义别名干净子集因果纤维重算与短语闭合测试）
+```
+
+任务：
+
+```text
+1. 用 Phase 767 的 semantic top1 重新定义 clean subset。
+2. 在 qwen3 / GLM4 的 semantic clean subset 上重算 Phase 765 的因果纤维。
+3. 对 DS7B 只保留 semantic rank <= 2 的样本，避免失败样本污染图谱。
+4. 增加 phrase likelihood（短语似然）测试，确认首词元闭合是否能延续成完整答案。
+5. 对 exact success 和 semantic-only success 分开比较：
+   如果因果纤维相似，说明大小写只是输出层词形问题；
+   如果因果纤维不同，说明词形闭合也是机制的一部分。
+```
+
+阶段性结论：
+
+```text
+Phase 767 完成了常识闭合失败类型分解。
+当前最重要的新拼图是：
+语义闭合与精确词元闭合不是同一层机制。
+
+qwen3 已经具备较强语义预测充分状态；
+GLM4 被 strict first-token metric 明显低估；
+DS7B 目标答案常在 top-k 内，但候选竞争和格式路线仍然很强。
+```
+
+## Phase 768: 语义别名干净子集短语闭合测试 [2026-06-29 19:03]
+
+### 背景
+
+本阶段继续分析最新附件。附件对 Phase 767 的判断基本正确：
+
+```text
+Phase 767 的关键进展不是又找到一个 patch（补丁），
+而是把 prediction-sufficient state（预测充分状态）拆成：
+semantic closure（语义闭合）
+lexical closure（词形闭合）
+phrase closure（短语闭合）。
+```
+
+Phase 767 已经证明：
+
+```text
+exact first-token top1（精确首词元第一名）
+不等于
+semantic top1（语义别名第一名）。
+```
+
+但它仍然只在 first-token（首词元）层面。
+因此本阶段执行 Phase 768，目标是检验：
+
+```text
+Phase 767 中已经 semantic closed（语义闭合）的样本，
+是否能继续完成 phrase-level closure（短语级闭合）和 short greedy generation（短生成闭合）。
+```
+
+### 测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase768_semantic_alias_phrase_closure.py
+tests/glm5/run_phase768_semantic_alias_phrase_closure_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase768_semantic_alias_phrase_closure/main/
+results/glm5_phase768_semantic_alias_phrase_closure/main/
+```
+
+主结果文件：
+
+```text
+tests/result/phase768_semantic_alias_phrase_closure/main/phase768_cross_model_summary.md
+tests/result/phase768_semantic_alias_phrase_closure/main/phase768_cross_model_summary.json
+```
+
+执行命令：
+
+```bash
+python -m py_compile tests/glm5/phase768_semantic_alias_phrase_closure.py
+
+tests/glm5/run_phase768_semantic_alias_phrase_closure_round.sh smoke2 \
+  --max-cases 12 \
+  --phase767-round main \
+  --max-new-tokens 6 \
+  --relations category,edible,grows_on_tree \
+  --log-every 6
+
+tests/glm5/run_phase768_semantic_alias_phrase_closure_round.sh main \
+  --phase767-round main \
+  --max-new-tokens 6 \
+  --relations category,edible,grows_on_tree \
+  --log-every 18
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+quantization=off（无量化）；
+优先尝试 flash_attention_2；
+本机 FlashAttention2 未安装，自动降级为 sdpa；
+每个模型独立进程运行，完成后释放显存。
+```
+
+### 测试原理
+
+本阶段使用 Phase 765 的同一批常识 prompt 和 Phase 767 的 clean subset 标注。
+
+每个 case 做两类测试：
+
+```text
+1. phrase likelihood（短语似然）：
+   对 allowed values（候选值集合）中的每个值构造 phrase forms（短语形式），
+   例如 yes / Yes / YES / yes. / Yes. / YES.，
+   计算完整短语的 log probability（对数概率），
+   看 target value（目标值）是否是短语级第一。
+
+2. short greedy generation（短贪婪生成）：
+   让模型生成最多 6 个新词元，
+   解析第一条非空答案片段，
+   判断是否以目标语义值开头。
+```
+
+本阶段修正了一个解析问题：
+
+```text
+生成文本经常形如：
+"fruit\nQuestion: ..."
+"no. The oak tree is ..."
+
+如果直接解析整段文本，会误把第二行或解释内容当作答案。
+现在只取第一条非空答案片段进行 generation match（生成匹配）判断。
+```
+
+### 数学形式
+
+Phase 767 的语义别名集合：
+
+```text
+A(y) = {alias tokens / alias phrases of y}
+```
+
+短语候选集合：
+
+```text
+P(y) = { phrase forms of y }
+```
+
+短语似然：
+
+```text
+L(p | x)
+=
+sum_i log P_theta(p_i | x, p_<i)
+```
+
+目标值短语分数：
+
+```text
+Score_phrase(y | x)
+=
+max_{p in P(y)} L(p | x)
+```
+
+短语闭合：
+
+```text
+R_phrase(x)
+=
+1[
+Score_phrase(y_target | x)
+>
+max_{y != y_target} Score_phrase(y | x)
+]
+```
+
+短生成闭合：
+
+```text
+R_gen(x)
+=
+1[
+first_generated_value(x) = y_target
+]
+```
+
+完整状态可靠性现在应写成：
+
+```text
+R_state(x)
+=
+R_sem(x)
+and
+R_phrase(x)
+and
+R_gen(x)
+```
+
+### 客观结果
+
+主测试共：
+
+```text
+108 cases / model
+```
+
+整体结果：
+
+| model | semantic top1 | exact top1 | phrase top1 | generation match |
+|---|---:|---:|---:|---:|
+| qwen3 | 0.824 | 0.824 | 0.806 | 0.824 |
+| GLM4 | 0.750 | 0.611 | 0.750 | 0.750 |
+| DS7B | 0.352 | 0.176 | 0.380 | 0.352 |
+
+semantic clean subset（语义干净子集）结果：
+
+| model | clean n | phrase top1 | generation match | mean phrase rank | mean phrase margin |
+|---|---:|---:|---:|---:|---:|
+| qwen3 | 89 | 0.978 | 1.000 | 1.022 | 5.709 |
+| GLM4 | 81 | 0.975 | 1.000 | 1.025 | 2.307 |
+| DS7B | 38 | 0.974 | 1.000 | 1.026 | 3.350 |
+
+semantic-only subset（语义闭合但 exact token 不闭合）结果：
+
+| model | semantic-only n | phrase top1 | generation match |
+|---|---:|---:|---:|
+| qwen3 | 0 | null | null |
+| GLM4 | 15 | 1.000 | 1.000 |
+| DS7B | 19 | 0.947 | 1.000 |
+
+semantic fail subset（语义未闭合）结果：
+
+| model | fail n | phrase top1 | generation match |
+|---|---:|---:|---:|
+| qwen3 | 19 | 0.000 | 0.000 |
+| GLM4 | 27 | 0.074 | 0.000 |
+| DS7B | 70 | 0.057 | 0.000 |
+
+### 关键客观现象
+
+```text
+1. 一旦进入 semantic clean subset，三个模型几乎都能完成短语级闭合和短生成闭合。
+
+2. GLM4 的 semantic-only 样本：
+   phrase top1 = 1.000
+   generation match = 1.000
+   说明之前 exact token 失败主要是 lexical realization（词形实现）问题，不是语义机制失败。
+
+3. DS7B 的 semantic-only 样本：
+   phrase top1 = 0.947
+   generation match = 1.000
+   说明 DS7B 只要进入语义闭合状态，也能自然生成正确答案。
+
+4. semantic fail subset 中 generation match 全部为 0。
+   说明 first-token semantic closure 是短语 / 生成闭合的强前置条件。
+
+5. qwen3 / GLM4 / DS7B 的 semantic clean subset 生成匹配均为 1.000。
+   这支持：
+   semantic closure 是 phrase generation closure 的有效前置层。
+```
+
+### 需要谨慎解释的细节
+
+有少量 semantic clean 样本的 phrase top1 为 false，但 generation match 为 true。
+检查发现它们多为 phrase likelihood 的零边际 tie（并列）或标点形式差异，例如：
+
+```text
+target = no
+best phrase value = yes
+margin = 0.0
+generated = "no. ..."
+```
+
+因此：
+
+```text
+phrase_top1 是严格短语似然指标；
+generation_match 是自然短生成指标；
+二者不完全等价。
+```
+
+这不是推翻结果，而是说明下一步要引入 tie-aware phrase closure（并列感知短语闭合）。
+
+### 对附件判断的修正
+
+附件判断“必须进入 phrase-level closure”是正确的。
+Phase 768 的结果进一步说明：
+
+```text
+真正的主要分界不是 phrase closure 是否存在，
+而是 semantic closure 是否先成立。
+```
+
+更精确地说：
+
+```text
+semantic closure 成立 -> phrase / generation closure 大概率成立；
+semantic closure 不成立 -> phrase / generation closure 基本不成立。
+```
+
+因此语言机制图谱第一层应进一步写成：
+
+```text
+semantic state formation
+  -> lexical realization
+  -> phrase continuation
+  -> generation closure
+```
+
+其中 semantic state formation 是最关键的门。
+
+### 当前硬伤
+
+```text
+1. 本阶段仍然使用 allowed values（候选值列表），不是完全自由生成。
+2. phrase forms 只覆盖简单值、大小写、句点形式，未覆盖同义短语。
+3. phrase likelihood 使用候选集合内部比较，不等于全词表自然生成概率。
+4. generation match 只解析第一条非空答案片段，不能评价后续解释是否一致。
+5. 没有做 causal intervention（因果干预），只能说明闭合层级关系，不能定位闭合原因。
+6. 仍只覆盖 category / edible / grows_on_tree 三类关系。
+7. 小模型结果不能直接外推为大模型或大脑机制。
+```
+
+### 理论进展
+
+当前理论应从：
+
+```text
+prediction-sufficient state reliability layer
+```
+
+进一步收紧为：
+
+```text
+semantic-state-first closure theory
+（语义状态优先闭合理论）
+```
+
+即：
+
+```text
+语言生成的关键第一门不是词形，也不是短语，
+而是目标语义候选是否成为当前脉络中的主导状态。
+
+一旦语义状态闭合，
+词形和短语生成多数情况下会自然跟随；
+如果语义状态未闭合，
+短语级和生成级闭合几乎不会凭空出现。
+```
+
+这说明：
+
+```text
+Phase 767 发现语义闭合与 exact token 闭合不同层；
+Phase 768 证明语义闭合是 phrase / generation closure 的强前置层。
+```
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 769:
+Semantic Clean Subset Causal Fiber Reanalysis
+（语义干净子集因果纤维重算）
+```
+
+具体任务：
+
+```text
+1. 用 Phase 767 / 768 的 semantic clean subset 重新过滤 Phase 765 因果纤维。
+2. 对比：
+   all cases
+   exact clean
+   semantic clean
+   semantic-only
+   semantic fail
+3. 检查 semantic clean subset 是否有更强 domain separation / object stability。
+4. 对 semantic-only 样本单独分析：
+   如果纤维与 exact clean 相似，说明词形只是输出层问题；
+   如果纤维不同，说明 lexical closure 有独立机制。
+5. 对 DS7B 只在 semantic clean 或 rank<=2 子集上重算，避免失败样本污染。
+```
+
+阶段性结论：
+
+```text
+Phase 768 证明：
+语义闭合不是终点，但它是短语闭合和自然生成闭合的强前置条件。
+
+GLM4 和 DS7B 被 exact first-token metric 低估；
+只要进入 semantic clean subset，它们也能完成短语与生成闭合。
+
+因此后续机制图谱必须以 semantic clean subset 为第一过滤层。
+```
+
+## Phase 769: 语义干净子集因果纤维离线重分析 [2026-06-29 19:07]
+
+### 背景
+
+Phase 768 证明：
+
+```text
+semantic clean subset（语义干净子集）
+几乎都能完成 phrase closure（短语闭合）和 generation closure（生成闭合）。
+```
+
+但这还没有回答一个更严格的问题：
+
+```text
+语义闭合样本的因果纤维图谱是否也更稳定？
+```
+
+因此本阶段执行 Phase 769：
+
+```text
+不加载模型；
+直接读取 Phase 765 的因果纤维 effect rows；
+再用 Phase 767 的 semantic / exact clean subset 标签过滤；
+比较不同子集的 domain separation（语义域分离）和 cross-context stability（跨上下文稳定性）。
+```
+
+### 测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase769_semantic_clean_fiber_reanalysis.py
+```
+
+结果目录：
+
+```text
+tests/result/phase769_semantic_clean_fiber_reanalysis/confirm_x_main/
+results/glm5_phase769_semantic_clean_fiber_reanalysis/confirm_x_main/
+```
+
+执行命令：
+
+```bash
+python -m py_compile tests/glm5/phase769_semantic_clean_fiber_reanalysis.py
+
+python tests/glm5/phase769_semantic_clean_fiber_reanalysis.py \
+  --phase765-round confirm \
+  --phase767-round main
+```
+
+### 测试原理
+
+输入：
+
+```text
+Phase 765:
+commonsense causal-fiber effect rows
+
+Phase 767:
+semantic top1 / exact top1 / semantic_only / semantic_fail 标签
+```
+
+按以下子集过滤 Phase 765 因果纤维：
+
+```text
+all
+exact_clean
+semantic_clean
+semantic_only
+semantic_fail
+rank_le2
+```
+
+然后重新计算：
+
+```text
+1. context 内 same-domain vs different-domain separation；
+2. nearest-neighbor domain accuracy；
+3. cross-context object stability gap；
+4. cross-context domain stability gap。
+```
+
+### 客观结果
+
+| model | subset | cases | mean sep | mean NN | object gap | domain gap |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | all | 108 | 0.605 | 0.583 | 0.088 | 0.585 |
+| qwen3 | semantic_clean | 89 | 0.471 | 0.500 | 0.084 | 0.437 |
+| qwen3 | semantic_fail | 19 | 0.868 | 0.436 | -0.237 | 1.126 |
+| GLM4 | all | 108 | 0.182 | 0.250 | 0.124 | 0.037 |
+| GLM4 | exact_clean | 66 | 0.163 | 0.149 | 0.482 | 0.085 |
+| GLM4 | semantic_clean | 81 | 0.258 | 0.167 | 0.389 | 0.307 |
+| GLM4 | semantic_only | 15 | 0.647 | 0.364 | null | null |
+| DS7B | all | 108 | 0.378 | 0.667 | 0.071 | 0.126 |
+| DS7B | exact_clean | 19 | 0.814 | 0.633 | 0.125 | -0.084 |
+| DS7B | semantic_clean | 38 | 0.228 | 0.300 | 0.097 | 0.124 |
+| DS7B | semantic_only | 19 | -0.061 | 0.231 | null | null |
+
+### 关键客观现象
+
+```text
+1. semantic clean subset 并没有在所有模型上单调增强因果纤维分离。
+
+2. qwen3 的 all subset 分离度高于 semantic_clean：
+   all sep = 0.605
+   semantic_clean sep = 0.471
+   说明 qwen3 的失败样本仍然可能带有强 domain-level 结构，
+   但 object stability 可能不可靠。
+
+3. GLM4 的 semantic_clean 比 all 更好：
+   all sep = 0.182
+   semantic_clean sep = 0.258
+   domain gap 从 0.037 提升到 0.307。
+   说明 GLM4 中 failed states 确实可能污染了部分机制图谱。
+
+4. DS7B 的 exact_clean 分离度最高：
+   exact_clean sep = 0.814
+   semantic_clean sep = 0.228
+   semantic_only sep = -0.061。
+   这说明 DS7B 的 semantic-only 样本虽然能短语生成正确，
+   但其因果纤维不像 exact clean 那样稳定。
+```
+
+### 最重要的收紧
+
+Phase 768 容易让人得出：
+
+```text
+只要 semantic closure 成立，就可以进入机制图谱。
+```
+
+Phase 769 纠正了这个过强结论。
+
+更准确的判断是：
+
+```text
+semantic closure 是 phrase / generation closure 的强前置条件，
+但不是因果纤维图谱稳定性的充分条件。
+```
+
+也就是说：
+
+```text
+输出闭合层
+和
+内部因果纤维层
+仍然不能完全等同。
+```
+
+### 当前硬伤
+
+```text
+1. Phase 769 是离线重分析，不是新的因果干预。
+2. 子集过滤会改变 object / relation 分布，可能造成统计偏差。
+3. semantic_only 子集样本很少，特别是 qwen3 为 0，不能泛化。
+4. DS7B exact_clean 只有 19 个 case，分离度高但样本少。
+5. 当前因果纤维仍然是 head/source 级，不是 neuron/channel 级。
+6. Phase 765 的 effect rows 来自固定候选组件，不是全模型完整图谱。
+```
+
+### 理论进展
+
+当前闭合层级必须拆成两条线：
+
+```text
+输出闭合线：
+semantic closure -> lexical closure -> phrase closure -> generation closure
+
+内部机制线：
+source contribution -> causal fiber -> route competition -> readout geometry
+```
+
+Phase 768 证明输出闭合线中：
+
+```text
+semantic closure 是 phrase / generation closure 的强前置层。
+```
+
+Phase 769 进一步证明：
+
+```text
+输出闭合线不能直接等同于内部机制线。
+```
+
+因此最新理论应继续收紧为：
+
+```text
+双层闭合理论：
+1. output closure reliability（输出闭合可靠性）
+2. causal-fiber structural reliability（因果纤维结构可靠性）
+
+只有两者同时成立，样本才适合进入更深的 neuron / channel atlas。
+```
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 770:
+Balanced Semantic-Clean Fiber Reanalysis
+（平衡语义干净子集因果纤维重分析）
+```
+
+任务：
+
+```text
+1. 按 relation / domain 对 clean 与 fail 子集做配平，避免子集分布偏差。
+2. 对 exact_clean / semantic_only / semantic_fail 做同对象同关系配对比较。
+3. 分开计算：
+   domain-level fiber structure
+   object-level identity stability
+   relation-level fiber structure
+4. 如果配平后 semantic_clean 仍不能增强纤维结构，
+   说明输出闭合与内部纤维结构存在更深分离。
+```
+
+阶段性结论：
+
+```text
+Phase 769 是一个必要负结果 / 收紧结果。
+它没有推翻 Phase 768，
+但证明 phrase / generation closure 不能直接替代 causal-fiber stability。
+
+下一步不能只按输出成功过滤，
+必须做 balanced subset（配平子集）和 paired comparison（配对比较）。
+```
+
+## Phase 770: 平衡语义干净子集因果纤维重分析 [2026-06-29 19:43]
+
+### 总体判断
+
+本阶段继续分析最新附件。附件对 Phase 768 和 Phase 769 的判断基本正确：
+
+```text
+Phase 768 证明 semantic closure 是 phrase / generation closure 的强前置条件；
+Phase 769 证明 output closure 不能直接等同于 causal-fiber stability。
+```
+
+但 Phase 769 有一个重要硬伤：
+
+```text
+semantic_clean、semantic_fail、exact_clean、semantic_only 的 object / domain / relation / context_format 分布不同。
+```
+
+因此，本阶段执行 Phase 770：不重新加载模型，只读取 Phase 765 的 causal-fiber effect rows 和 Phase 767 的 semantic / exact labels，做 balanced subset 与 paired context 的离线重分析。
+
+### 测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase770_balanced_semantic_clean_fiber_reanalysis.py
+```
+
+结果目录：
+
+```text
+tests/result/phase770_balanced_semantic_clean_fiber_reanalysis/confirm_x_main/
+results/glm5_phase770_balanced_semantic_clean_fiber_reanalysis/confirm_x_main/
+```
+
+执行命令：
+
+```bash
+python -m py_compile tests/glm5/phase770_balanced_semantic_clean_fiber_reanalysis.py
+
+python tests/glm5/phase770_balanced_semantic_clean_fiber_reanalysis.py \
+  --phase765-round confirm \
+  --phase767-round main
+```
+
+本阶段没有加载模型，没有占用 GPU。
+
+### 测试原理
+
+第一部分是分层配平。对两个待比较子集 A 和 B，在同一个 stratum 内取相同数量样本：
+
+```text
+stratum = domain + relation + context_format
+```
+
+数学形式：
+
+$$
+S_k
+=
+\{x\mid domain(x)=d_k,\ relation(x)=r_k,\ context(x)=c_k\}
+$$
+
+$$
+B_k^{A,B}
+=
+\min
+\left(
+|A\cap S_k|,
+|B\cap S_k|
+\right)
+$$
+
+$$
+A'
+=
+\bigcup_k
+sample(A\cap S_k,\ B_k^{A,B})
+$$
+
+$$
+B'
+=
+\bigcup_k
+sample(B\cap S_k,\ B_k^{A,B})
+$$
+
+然后分别计算：
+
+```text
+mean context separation
+mean nearest-neighbor domain accuracy
+object stability gap
+domain stability gap
+```
+
+第二部分是 paired context stability。对同一个 object 和同一个 relation，在两个 context_format 之间比较因果纤维向量相似度：
+
+$$
+S_{pair}(o,r)
+=
+cos
+\left(
+Fiber(o,r\mid commonsense\_question),
+Fiber(o,r\mid commonsense\_statement)
+\right)
+$$
+
+这一步比简单子集过滤更严格，因为 object 和 relation 被固定住了。
+
+### 客观结果一：标签数量
+
+| model | exact clean | semantic clean | semantic only | semantic fail |
+|---|---:|---:|---:|---:|
+| qwen3 | 89 | 89 | 0 | 19 |
+| GLM4 | 66 | 81 | 15 | 27 |
+| DS7B | 19 | 38 | 19 | 70 |
+
+### 客观结果二：配平后的 clean vs fail 差异
+
+| model | contrast | strata | cases each | delta sep | delta NN | delta object gap | delta domain gap |
+|---|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | semantic_clean - semantic_fail | 11 | 11 | +0.310 | 0.000 | -0.569 | -0.459 |
+| GLM4 | semantic_clean - semantic_fail | 16 | 16 | +0.325 | 0.000 | +0.331 | +0.045 |
+| DS7B | semantic_clean - semantic_fail | 18 | 18 | +0.064 | 0.000 | -0.069 | -0.209 |
+
+补充对比：
+
+| model | contrast | strata | cases each | delta sep | 说明 |
+|---|---|---:|---:|---:|---|
+| GLM4 | exact_clean - semantic_only | 3 | 3 | -0.005 | 样本太少，不能说明 exact_clean 更强 |
+| GLM4 | exact_clean - semantic_fail | 15 | 15 | +0.230 | exact_clean 比 fail 更好，但 domain gap 下降 |
+| DS7B | exact_clean - semantic_fail | 8 | 8 | +0.006 | 几乎没有差异 |
+| DS7B | semantic_only - semantic_fail | 10 | 10 | +0.219 | semantic_only 有一定 sep 增强，但稳定性指标不足 |
+
+### 客观结果三：同对象同关系跨上下文稳定性
+
+| model | group | pairs | mean context cosine |
+|---|---|---:|---:|
+| qwen3 | both semantic clean | 40 | 0.951 |
+| qwen3 | both semantic fail | 5 | 0.959 |
+| qwen3 | mixed | 9 | 0.944 |
+| GLM4 | both semantic clean | 38 | 0.931 |
+| GLM4 | both semantic fail | 11 | 0.918 |
+| GLM4 | mixed | 5 | 0.933 |
+| DS7B | both semantic clean | 10 | 0.636 |
+| DS7B | both semantic fail | 26 | 0.640 |
+| DS7B | mixed | 18 | 0.720 |
+
+词形层补充：
+
+```text
+GLM4 exact__exact: 0.949
+GLM4 exact__semantic_only: 0.897
+
+DS7B exact__exact: 0.738
+DS7B exact__semantic_only: 0.592
+```
+
+这说明 semantic_only 在输出层可以生成正确答案，但在内部跨上下文纤维上不一定等价于 exact_clean。
+
+### 严格分析
+
+Phase 770 对 Phase 769 做了必要纠偏。
+
+第一，GLM4 的结果支持一个较稳判断：
+
+```text
+在配平 domain / relation / context_format 后，
+semantic_clean 仍比 semantic_fail 有更高的 separation 和 object gap。
+```
+
+这说明 GLM4 的 failed states 可能确实污染了部分因果纤维图谱。
+
+第二，qwen3 的结果是混合的：
+
+```text
+semantic_clean 的 separation 高于 semantic_fail，
+但 object gap 和 domain gap 低于 semantic_fail。
+```
+
+这说明 qwen3 的语义失败样本仍可能携带强 domain-level structure。输出失败不等于内部结构完全消失。
+
+第三，DS7B 的结果最弱：
+
+```text
+semantic_clean 只带来很小的 separation 增强，
+object gap 和 domain gap 没有增强。
+```
+
+这支持前面关于小模型压缩偏差的判断：DS7B 的输出闭合和内部纤维稳定之间分离更明显。
+
+第四，paired context stability 没有证明：
+
+```text
+both semantic clean 一定比 both semantic fail 更稳定。
+```
+
+qwen3 中 both_fail 甚至略高于 both_clean；DS7B 中 mixed 最高。因此不能把 semantic closure 当作内部纤维稳定的充分条件。
+
+### 当前最新收紧
+
+Phase 768 到 Phase 770 后，当前最稳判断是：
+
+```text
+1. semantic closure 是 phrase / generation closure 的强前置条件。
+2. semantic closure 不是 causal-fiber stability 的充分条件。
+3. exact closure 也不是绝对充分条件，但在 GLM4 / DS7B 的 paired context 中比 semantic_only 更接近稳定纤维。
+4. 输出成功样本可以作为图谱入口候选，但不能直接作为神经元 / 通道图谱样本。
+5. 真正进入 atlas 的样本必须同时通过 output closure 和 balanced fiber reliability。
+```
+
+对应公式收紧为：
+
+$$
+R_{atlas}(x)
+=
+R_{output}(x)
+\land
+R_{fiber}^{balanced}(x)
+\land
+R_{paired}(x)
+$$
+
+其中：
+
+$$
+R_{output}(x)
+=
+(
+R_{sem}(x),
+R_{lex}(x),
+R_{phrase}(x),
+R_{gen}(x)
+)
+$$
+
+$$
+R_{fiber}^{balanced}(x)
+=
+f
+\left(
+Sep_{domain}^{balanced},
+Stab_{object}^{balanced},
+Stab_{relation}^{balanced}
+\right)
+$$
+
+$$
+R_{paired}(o,r)
+=
+\mathbf{1}
+\left[
+S_{pair}(o,r)>\tau_p
+\right]
+$$
+
+### 问题和硬伤
+
+```text
+1. Phase 770 仍是离线重分析，不是新 causal intervention。
+2. 配平后样本数明显变小，特别是 GLM4 exact_clean vs semantic_only 只有 3 个 stratum / 3 个样本。
+3. NN 指标在小配平子集上多为 0，说明该指标不适合解释小子集。
+4. object gap / domain gap 在小样本上容易不稳定。
+5. 当前仍是 head/source 级，不是 neuron/channel 级。
+6. paired context 只固定 object 和 relation，没有固定具体内部路线。
+7. 小模型结构可能有压缩偏差，尤其 DS7B 不能直接代表大模型。
+```
+
+### 阶段性结论
+
+```text
+Phase 770 没有推翻 Phase 768，也没有推翻 Phase 769。
+它进一步证明：
+输出闭合线和内部机制线确实必须分开审计。
+
+semantic closure 可以作为输出闭合入口；
+balanced fiber reliability 才是进入机制图谱的关键门槛。
+```
+
+下一阶段不应继续只做 semantic clean 过滤，而应进入：
+
+```text
+Phase 771:
+Matched Causal Intervention Reliability Test
+（配对因果干预可靠性测试）
+```
+
+核心任务：
+
+```text
+1. 在同 object / relation / context_format 的 matched cases 中，
+   直接做 source writer / MLP carrier / readout component 的 causal intervention。
+2. 区分 output-success-only 和 fiber-stable cases。
+3. 检查 fiber-stable cases 是否更能预测 intervention success。
+4. 只有通过这一步，才适合继续下钻 neuron / channel atlas。
+```

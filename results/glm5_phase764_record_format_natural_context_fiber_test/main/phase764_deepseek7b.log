@@ -1,0 +1,87 @@
+[17:30:32] deepseek7b/main: cases=162 sources=['context_all', 'target_context_line', 'target_value_tokens', 'object_tokens'] relations=['category', 'color', 'edible']
+[17:30:32] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/339 [00:00<00:06, 54.89it/s]Loading weights:   9%|▉         | 32/339 [00:00<00:01, 166.36it/s]Loading weights:  19%|█▉        | 65/339 [00:00<00:01, 228.47it/s]Loading weights:  26%|██▋       | 89/339 [00:00<00:01, 185.55it/s]Loading weights:  45%|████▌     | 154/339 [00:00<00:00, 300.27it/s]Loading weights:  58%|█████▊    | 196/339 [00:00<00:00, 334.07it/s]Loading weights:  68%|██████▊   | 231/339 [00:00<00:00, 294.72it/s]Loading weights:  78%|███████▊  | 263/339 [00:00<00:00, 287.05it/s]Loading weights:  86%|████████▋ | 293/339 [00:01<00:00, 288.00it/s]Loading weights:  96%|█████████▌| 324/339 [00:01<00:00, 291.47it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 277.63it/s]
+[17:30:34] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[17:30:48] deepseek7b: format fibers 27/162 cases; rows=243
+[17:31:01] deepseek7b: format fibers 54/162 cases; rows=486
+[17:31:14] deepseek7b: format fibers 81/162 cases; rows=729
+[17:31:28] deepseek7b: format fibers 108/162 cases; rows=972
+[17:31:41] deepseek7b: format fibers 135/162 cases; rows=1215
+[17:31:54] deepseek7b: format fibers 162/162 cases; rows=1458
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "n_cases": 162,
+  "context_pair_summaries": {
+    "key_value": {
+      "n_objects": 18,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": 0.3362870365541209,
+        "different_domain_mean": -0.07752223795191536,
+        "separation": 0.4138092745060363,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.6111111111111112
+      }
+    },
+    "sentence_lines": {
+      "n_objects": 18,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": 0.41650156501936414,
+        "different_domain_mean": -0.10596689208454231,
+        "separation": 0.5224684571039064,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.7222222222222222
+      }
+    },
+    "compact_sentence": {
+      "n_objects": 18,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": 0.35315803331317946,
+        "different_domain_mean": -0.10340690737843819,
+        "separation": 0.4565649406916177,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.5
+      }
+    }
+  },
+  "cross_context_stability": [
+    {
+      "context_a": "compact_sentence",
+      "context_b": "key_value",
+      "common_objects": 18,
+      "same_object_mean": 0.08750168525231322,
+      "same_domain_diff_object_mean": -0.04438270045859523,
+      "different_domain_mean": -0.18584258800279335,
+      "object_stability_gap": 0.13188438571090844,
+      "domain_stability_gap": 0.14145988754419814
+    },
+    {
+      "context_a": "compact_sentence",
+      "context_b": "sentence_lines",
+      "common_objects": 18,
+      "same_object_mean": 0.19560801157210322,
+      "same_domain_diff_object_mean": 0.09823604889026155,
+      "different_domain_mean": -0.15831833144310042,
+      "object_stability_gap": 0.09737196268184167,
+      "domain_stability_gap": 0.256554380333362
+    },
+    {
+      "context_a": "key_value",
+      "context_b": "sentence_lines",
+      "common_objects": 18,
+      "same_object_mean": 0.10713095099320796,
+      "same_domain_diff_object_mean": -0.02418942467816525,
+      "different_domain_mean": -0.1907141602246108,
+      "object_stability_gap": 0.13132037567137322,
+      "domain_stability_gap": 0.16652473554644553
+    }
+  ]
+}

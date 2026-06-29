@@ -1,0 +1,27 @@
+[18:34:24] qwen3/main: cases=108 top_k=80 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
+[18:34:24] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[18:34:24] [load] qwen3: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[18:34:24] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 257.73it/s]Loading weights:  21%|██        | 82/398 [00:00<00:00, 429.65it/s]Loading weights:  37%|███▋      | 147/398 [00:00<00:00, 526.31it/s]Loading weights:  52%|█████▏    | 206/398 [00:00<00:00, 550.50it/s]Loading weights:  68%|██████▊   | 269/398 [00:00<00:00, 560.14it/s]Loading weights:  84%|████████▍ | 335/398 [00:00<00:00, 590.44it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 560.20it/s]
+[18:34:25] [load] qwen3: loaded sdpa, device=cuda:0, gpu=8.05GB
+[18:34:26] qwen3: top-k audit 18/108 cases
+[18:34:28] qwen3: top-k audit 36/108 cases
+[18:34:29] qwen3: top-k audit 54/108 cases
+[18:34:30] qwen3: top-k audit 72/108 cases
+[18:34:31] qwen3: top-k audit 90/108 cases
+[18:34:32] qwen3: top-k audit 108/108 cases
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "summary": {
+    "target_top1_rate": 0.8240740740740741,
+    "exact_target_top1_rate": 0.8240740740740741,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 1.3148148148148149,
+    "mean_exact_target_rank": 1.3148148148148149,
+    "mean_target_allowed_rank": 1.1851851851851851,
+    "mean_target_margin_vs_best_other": 2.9363425925925926
+  }
+}

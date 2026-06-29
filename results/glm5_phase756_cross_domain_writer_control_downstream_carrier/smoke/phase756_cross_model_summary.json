@@ -1,0 +1,687 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "eager",
+      "candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "control_of": null,
+          "head": 24,
+          "selection": "phase751_752",
+          "site": "L22:attn_out",
+          "subunit_id": "L22:attn_out:H24"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "control_of": "L22:attn_out:H24",
+          "head": 9,
+          "selection": "deterministic_offset_13",
+          "site": "L22:attn_out",
+          "subunit_id": "L22:attn_out:H9"
+        }
+      ],
+      "control_baseline": {
+        "phase755_top_candidate": {
+          "mean_drop": 0.3125,
+          "mean_guard_rate": 0.0,
+          "mean_release": 0.0,
+          "mean_support_rate": 1.0,
+          "n_groups": 1,
+          "role_counts": {
+            "partial_writer_candidate": 1
+          }
+        },
+        "same_layer_control_head": {
+          "mean_drop": -0.21875,
+          "mean_guard_rate": 1.0,
+          "mean_release": 0.75,
+          "mean_support_rate": 0.0,
+          "n_groups": 1,
+          "role_counts": {
+            "route_guard_candidate": 1
+          }
+        }
+      },
+      "downstream_sites": [
+        "L23:attn_out",
+        "L23:mlp_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "deepseek7b",
+      "n_base_observations": 2,
+      "n_downstream_restores": 8,
+      "n_rows": 14,
+      "n_source_removals": 4,
+      "phase": 756,
+      "quantization": "off",
+      "round": "smoke",
+      "source_groups": [
+        "records_all"
+      ],
+      "strict_interpretation": "Control heads test specificity. Downstream component restore is coarse carrier evidence; it restores whole component output at answer position and is not neuron-level sufficiency.",
+      "timestamp": "2026-06-29 14:15:30",
+      "title": "Cross-Domain Writer Control and Downstream Carrier Test",
+      "top_controlled_writer_candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 24,
+          "mean_attention_mass_to_source": 0.4976820945739746,
+          "mean_source_target_logit_contribution": 0.040297411382198334,
+          "mean_source_total_route_suppression_contribution": 0.18282970413565636,
+          "mean_target_logit_drop_after_source_removal": 0.3125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "partial_writer_candidate",
+          "route_guard_rate_release_gt_0_20": 0.0,
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H24",
+          "support_rate_drop_gt_0_20": 1.0,
+          "top1_loss_rate": 0.0
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 9,
+          "mean_attention_mass_to_source": 0.11309480667114258,
+          "mean_source_target_logit_contribution": -0.09946607425808907,
+          "mean_source_total_route_suppression_contribution": 0.17465309239923954,
+          "mean_target_logit_drop_after_source_removal": -0.21875,
+          "mean_total_positive_route_release_after_source_removal": 0.75,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "route_guard_candidate",
+          "route_guard_rate_release_gt_0_20": 1.0,
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H9",
+          "support_rate_drop_gt_0_20": 0.0,
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "top_downstream_carrier_candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "downstream_target_carrier_candidate",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L23:attn_out",
+          "effective_restore_rate": 1.0,
+          "head": 24,
+          "mean_downstream_component_delta_norm_after_removal": 7.290952920913696,
+          "mean_erase_route_release": 0.0,
+          "mean_erase_target_logit_drop": 0.3125,
+          "mean_restored_route_release": 0.15625,
+          "mean_restored_target_logit_drop": 0.15625,
+          "mean_route_release_reduced_by_restore": -0.15625,
+          "mean_target_logit_recovered_by_restore": 0.15625,
+          "mean_target_recovery_fraction": 0.5,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H24"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L23:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 9,
+          "mean_downstream_component_delta_norm_after_removal": 2.0857762694358826,
+          "mean_erase_route_release": 0.75,
+          "mean_erase_target_logit_drop": -0.21875,
+          "mean_restored_route_release": 0.5,
+          "mean_restored_target_logit_drop": -0.1875,
+          "mean_route_release_reduced_by_restore": 0.25,
+          "mean_target_logit_recovered_by_restore": -0.03125,
+          "mean_target_recovery_fraction": null,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H9"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "anti_restore_or_off_path",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L23:attn_out",
+          "effective_restore_rate": 0.0,
+          "head": 9,
+          "mean_downstream_component_delta_norm_after_removal": 0.8743831813335419,
+          "mean_erase_route_release": 0.75,
+          "mean_erase_target_logit_drop": -0.21875,
+          "mean_restored_route_release": 0.28125,
+          "mean_restored_target_logit_drop": -0.03125,
+          "mean_route_release_reduced_by_restore": 0.46875,
+          "mean_target_logit_recovered_by_restore": -0.1875,
+          "mean_target_recovery_fraction": null,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H9"
+        },
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "anti_restore_or_off_path",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L23:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 24,
+          "mean_downstream_component_delta_norm_after_removal": 9.261905908584595,
+          "mean_erase_route_release": 0.0,
+          "mean_erase_target_logit_drop": 0.3125,
+          "mean_restored_route_release": 0.03125,
+          "mean_restored_target_logit_drop": 0.375,
+          "mean_route_release_reduced_by_restore": -0.03125,
+          "mean_target_logit_recovered_by_restore": -0.0625,
+          "mean_target_recovery_fraction": -0.25,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H24"
+        }
+      ]
+    },
+    "glm4": {
+      "attn_implementation": "eager",
+      "candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "control_of": null,
+          "head": 29,
+          "selection": "phase751_752",
+          "site": "L35:attn_out",
+          "subunit_id": "L35:attn_out:H29"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "control_of": "L35:attn_out:H29",
+          "head": 10,
+          "selection": "deterministic_offset_13",
+          "site": "L35:attn_out",
+          "subunit_id": "L35:attn_out:H10"
+        }
+      ],
+      "control_baseline": {
+        "phase755_top_candidate": {
+          "mean_drop": 0.0625,
+          "mean_guard_rate": 0.0,
+          "mean_release": 0.03125,
+          "mean_support_rate": 0.0,
+          "n_groups": 1,
+          "role_counts": {
+            "control_or_weak": 1
+          }
+        },
+        "same_layer_control_head": {
+          "mean_drop": 0.0,
+          "mean_guard_rate": 0.0,
+          "mean_release": 0.03125,
+          "mean_support_rate": 0.0,
+          "n_groups": 1,
+          "role_counts": {
+            "control_or_weak": 1
+          }
+        }
+      },
+      "downstream_sites": [
+        "L36:attn_out",
+        "L36:mlp_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "glm4",
+      "n_base_observations": 2,
+      "n_downstream_restores": 8,
+      "n_rows": 14,
+      "n_source_removals": 4,
+      "phase": 756,
+      "quantization": "off",
+      "round": "smoke",
+      "source_groups": [
+        "records_all"
+      ],
+      "strict_interpretation": "Control heads test specificity. Downstream component restore is coarse carrier evidence; it restores whole component output at answer position and is not neuron-level sufficiency.",
+      "timestamp": "2026-06-29 14:15:24",
+      "title": "Cross-Domain Writer Control and Downstream Carrier Test",
+      "top_controlled_writer_candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 29,
+          "mean_attention_mass_to_source": 0.2526034116744995,
+          "mean_source_target_logit_contribution": 0.004535512183792889,
+          "mean_source_total_route_suppression_contribution": 0.009257186437025666,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.03125,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "control_or_weak",
+          "route_guard_rate_release_gt_0_20": 0.0,
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H29",
+          "support_rate_drop_gt_0_20": 0.0,
+          "top1_loss_rate": 0.0
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 10,
+          "mean_attention_mass_to_source": 0.0022376278648152947,
+          "mean_source_target_logit_contribution": -5.610482730844524e-05,
+          "mean_source_total_route_suppression_contribution": 5.099667214381043e-05,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.03125,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "control_or_weak",
+          "route_guard_rate_release_gt_0_20": 0.0,
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H10",
+          "support_rate_drop_gt_0_20": 0.0,
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "top_downstream_carrier_candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L36:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 29,
+          "mean_downstream_component_delta_norm_after_removal": 0.1991008147597313,
+          "mean_erase_route_release": 0.03125,
+          "mean_erase_target_logit_drop": 0.0625,
+          "mean_restored_route_release": 0.0,
+          "mean_restored_target_logit_drop": 0.0,
+          "mean_route_release_reduced_by_restore": 0.03125,
+          "mean_target_logit_recovered_by_restore": 0.0625,
+          "mean_target_recovery_fraction": 1.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H29"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L36:attn_out",
+          "effective_restore_rate": 0.0,
+          "head": 10,
+          "mean_downstream_component_delta_norm_after_removal": 0.06095591560006142,
+          "mean_erase_route_release": 0.03125,
+          "mean_erase_target_logit_drop": 0.0,
+          "mean_restored_route_release": 0.0,
+          "mean_restored_target_logit_drop": 0.0,
+          "mean_route_release_reduced_by_restore": 0.03125,
+          "mean_target_logit_recovered_by_restore": 0.0,
+          "mean_target_recovery_fraction": null,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H10"
+        },
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L36:attn_out",
+          "effective_restore_rate": 0.0,
+          "head": 29,
+          "mean_downstream_component_delta_norm_after_removal": 0.0915689580142498,
+          "mean_erase_route_release": 0.03125,
+          "mean_erase_target_logit_drop": 0.0625,
+          "mean_restored_route_release": 0.03125,
+          "mean_restored_target_logit_drop": 0.0625,
+          "mean_route_release_reduced_by_restore": 0.0,
+          "mean_target_logit_recovered_by_restore": 0.0,
+          "mean_target_recovery_fraction": 0.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H29"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L36:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 10,
+          "mean_downstream_component_delta_norm_after_removal": 0.09641264751553535,
+          "mean_erase_route_release": 0.03125,
+          "mean_erase_target_logit_drop": 0.0,
+          "mean_restored_route_release": 0.09375,
+          "mean_restored_target_logit_drop": 0.03125,
+          "mean_route_release_reduced_by_restore": -0.0625,
+          "mean_target_logit_recovered_by_restore": -0.03125,
+          "mean_target_recovery_fraction": null,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L35:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L35:attn_out:H10"
+        }
+      ]
+    },
+    "qwen3": {
+      "attn_implementation": "eager",
+      "candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "control_of": null,
+          "head": 15,
+          "selection": "phase751_752",
+          "site": "L33:attn_out",
+          "subunit_id": "L33:attn_out:H15"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "control_of": "L33:attn_out:H15",
+          "head": 28,
+          "selection": "deterministic_offset_13",
+          "site": "L33:attn_out",
+          "subunit_id": "L33:attn_out:H28"
+        }
+      ],
+      "control_baseline": {
+        "phase755_top_candidate": {
+          "mean_drop": 0.1875,
+          "mean_guard_rate": 0.0,
+          "mean_release": 0.0625,
+          "mean_support_rate": 0.5,
+          "n_groups": 1,
+          "role_counts": {
+            "control_or_weak": 1
+          }
+        },
+        "same_layer_control_head": {
+          "mean_drop": 0.0,
+          "mean_guard_rate": 0.5,
+          "mean_release": 0.125,
+          "mean_support_rate": 0.0,
+          "n_groups": 1,
+          "role_counts": {
+            "control_or_weak": 1
+          }
+        }
+      },
+      "downstream_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "qwen3",
+      "n_base_observations": 2,
+      "n_downstream_restores": 8,
+      "n_rows": 14,
+      "n_source_removals": 4,
+      "phase": 756,
+      "quantization": "off",
+      "round": "smoke",
+      "source_groups": [
+        "records_all"
+      ],
+      "strict_interpretation": "Control heads test specificity. Downstream component restore is coarse carrier evidence; it restores whole component output at answer position and is not neuron-level sufficiency.",
+      "timestamp": "2026-06-29 14:15:17",
+      "title": "Cross-Domain Writer Control and Downstream Carrier Test",
+      "top_controlled_writer_candidates": [
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 15,
+          "mean_attention_mass_to_source": 0.199695885181427,
+          "mean_source_target_logit_contribution": 3.646709932014346,
+          "mean_source_total_route_suppression_contribution": 0.22372824419289827,
+          "mean_target_logit_drop_after_source_removal": 0.1875,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "control_or_weak",
+          "route_guard_rate_release_gt_0_20": 0.0,
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H15",
+          "support_rate_drop_gt_0_20": 0.5,
+          "top1_loss_rate": 0.0
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "head": 28,
+          "mean_attention_mass_to_source": 0.1768946647644043,
+          "mean_source_target_logit_contribution": 0.01619010604918003,
+          "mean_source_total_route_suppression_contribution": 0.05263072997331619,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "removal_role_guess": "control_or_weak",
+          "route_guard_rate_release_gt_0_20": 0.5,
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H28",
+          "support_rate_drop_gt_0_20": 0.0,
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "top_downstream_carrier_candidates": [
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L34:attn_out",
+          "effective_restore_rate": 0.0,
+          "head": 28,
+          "mean_downstream_component_delta_norm_after_removal": 2.8799562454223633,
+          "mean_erase_route_release": 0.125,
+          "mean_erase_target_logit_drop": 0.0,
+          "mean_restored_route_release": 0.0,
+          "mean_restored_target_logit_drop": 0.0,
+          "mean_route_release_reduced_by_restore": 0.125,
+          "mean_target_logit_recovered_by_restore": 0.0,
+          "mean_target_recovery_fraction": 1.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H28"
+        },
+        {
+          "candidate_kind": "same_layer_control_head",
+          "carrier_role_guess": "anti_restore_or_off_path",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L34:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 28,
+          "mean_downstream_component_delta_norm_after_removal": 3.017189145088196,
+          "mean_erase_route_release": 0.125,
+          "mean_erase_target_logit_drop": 0.0,
+          "mean_restored_route_release": 0.0,
+          "mean_restored_target_logit_drop": 0.0625,
+          "mean_route_release_reduced_by_restore": 0.125,
+          "mean_target_logit_recovered_by_restore": -0.0625,
+          "mean_target_recovery_fraction": 1.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H28"
+        },
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "weak_or_unclear",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L34:attn_out",
+          "effective_restore_rate": 0.0,
+          "head": 15,
+          "mean_downstream_component_delta_norm_after_removal": 3.6393707394599915,
+          "mean_erase_route_release": 0.0625,
+          "mean_erase_target_logit_drop": 0.1875,
+          "mean_restored_route_release": 0.125,
+          "mean_restored_target_logit_drop": 0.125,
+          "mean_route_release_reduced_by_restore": -0.0625,
+          "mean_target_logit_recovered_by_restore": 0.0625,
+          "mean_target_recovery_fraction": 0.0,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H15"
+        },
+        {
+          "candidate_kind": "phase755_top_candidate",
+          "carrier_role_guess": "anti_restore_or_off_path",
+          "domains": [
+            "abstract",
+            "fruit"
+          ],
+          "downstream_site": "L34:mlp_out",
+          "effective_restore_rate": 0.0,
+          "head": 15,
+          "mean_downstream_component_delta_norm_after_removal": 7.6659533977508545,
+          "mean_erase_route_release": 0.0625,
+          "mean_erase_target_logit_drop": 0.1875,
+          "mean_restored_route_release": 0.125,
+          "mean_restored_target_logit_drop": 0.875,
+          "mean_route_release_reduced_by_restore": -0.0625,
+          "mean_target_logit_recovered_by_restore": -0.6875,
+          "mean_target_recovery_fraction": -3.6666666666666665,
+          "n": 2,
+          "relations": [
+            "category",
+            "shape"
+          ],
+          "site": "L33:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L33:attn_out:H15"
+        }
+      ]
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 756,
+  "round": "smoke",
+  "status": "complete",
+  "strict_interpretation": "This phase adds same-layer controls and coarse downstream restore. It can promote a path to controlled carrier evidence, not to neuron-level language invariance.",
+  "timestamp": "2026-06-29 14:15:32",
+  "title": "Cross-Domain Writer Control and Downstream Carrier Test"
+}

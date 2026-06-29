@@ -1,0 +1,545 @@
+{
+  "all_combo_sites": [
+    "L34:attn_out",
+    "L34:mlp_out",
+    "L35:attn_out",
+    "L35:mlp_out"
+  ],
+  "attn_implementation": "eager",
+  "candidates": [
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "control_of": null,
+      "head": 15,
+      "selection": "phase751_752",
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "control_of": "L33:attn_out:H15",
+      "head": 28,
+      "selection": "deterministic_offset_13",
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H28"
+    }
+  ],
+  "combo_kind_baseline": {
+    "late_candidate_all": {
+      "mean_effective_restore_rate": 0.25,
+      "mean_recovered": 0.0,
+      "mean_recovery_fraction": 0.16666666666666666,
+      "mean_release_reduced": 0.0625,
+      "n_groups": 2,
+      "role_counts": {
+        "anti_restore_or_off_path": 1,
+        "partial_late_rewrite_candidate": 1
+      }
+    },
+    "primary_multisite_all": {
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.34375,
+      "mean_recovery_fraction": -2.0,
+      "mean_release_reduced": 0.0,
+      "n_groups": 2,
+      "role_counts": {
+        "anti_restore_or_off_path": 1,
+        "weak_or_unclear": 1
+      }
+    },
+    "primary_plus_late_all": {
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.34375,
+      "mean_recovery_fraction": -1.3333333333333333,
+      "mean_release_reduced": -0.03125,
+      "n_groups": 2,
+      "role_counts": {
+        "anti_restore_or_off_path": 1,
+        "weak_or_unclear": 1
+      }
+    },
+    "single_late_candidate_site": {
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": 0.0,
+      "mean_recovery_fraction": 0.5,
+      "mean_release_reduced": 0.03125,
+      "n_groups": 2,
+      "role_counts": {
+        "weak_or_unclear": 2
+      }
+    },
+    "single_primary_site": {
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.171875,
+      "mean_recovery_fraction": -0.41666666666666663,
+      "mean_release_reduced": 0.03125,
+      "n_groups": 4,
+      "role_counts": {
+        "anti_restore_or_off_path": 2,
+        "weak_or_unclear": 2
+      }
+    }
+  },
+  "dtype": "bfloat16",
+  "model": "qwen3",
+  "n_multisite_restores": 24,
+  "n_rows": 28,
+  "n_source_removals": 4,
+  "phase": 758,
+  "quantization": "off",
+  "round": "smoke",
+  "source_groups": [
+    "records_all"
+  ],
+  "strict_interpretation": "Relabels Phase 757 off-path recovery as a late candidate. Strong only if late candidate beats primary path and true late controls.",
+  "timestamp": "2026-06-29 14:52:52",
+  "title": "Late Carrier Rewrite Relabel Test",
+  "top_controlled_writer_candidates": [
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "head": 15,
+      "mean_attention_mass_to_source": 0.199695885181427,
+      "mean_source_target_logit_contribution": 3.646709932014346,
+      "mean_source_total_route_suppression_contribution": 0.22372824419289827,
+      "mean_target_logit_drop_after_source_removal": 0.1875,
+      "mean_total_positive_route_release_after_source_removal": 0.0625,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "removal_role_guess": "control_or_weak",
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15",
+      "support_rate_drop_gt_0_20": 0.5,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "head": 28,
+      "mean_attention_mass_to_source": 0.1768946647644043,
+      "mean_source_target_logit_contribution": 0.01619010604918003,
+      "mean_source_total_route_suppression_contribution": 0.05263072997331619,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "removal_role_guess": "control_or_weak",
+      "route_guard_rate_release_gt_0_20": 0.5,
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28",
+      "support_rate_drop_gt_0_20": 0.0,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "top_multisite_carrier_candidates": [
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_role_guess": "partial_late_rewrite_candidate",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.5,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 4.226796627044678,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.0625,
+      "mean_restored_target_logit_drop": 0.125,
+      "mean_route_release_reduced_by_restore": 0.0,
+      "mean_target_logit_recovered_by_restore": 0.0625,
+      "mean_target_recovery_fraction": 0.3333333333333333,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L34:attn_out",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L34:attn_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 3.6393707394599915,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.125,
+      "mean_restored_target_logit_drop": 0.125,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "mean_target_logit_recovered_by_restore": 0.0625,
+      "mean_target_recovery_fraction": 0.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L34:attn_out",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L34:attn_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 2.8799562454223633,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 1.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "single_late_candidate_site",
+      "combo_name": "L35:attn_out",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L35:attn_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 2.2666079998016357,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 1.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out",
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 4,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 3.3193438351154327,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0625,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_route_release_reduced_by_restore": 0.0625,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 1.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "combo_size": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 2.9485726952552795,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0625,
+      "mean_restored_target_logit_drop": 0.0,
+      "mean_route_release_reduced_by_restore": 0.0625,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 0.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "single_late_candidate_site",
+      "combo_name": "L35:attn_out",
+      "combo_role_guess": "weak_or_unclear",
+      "combo_sites": [
+        "L35:attn_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 4.008412957191467,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.125,
+      "mean_restored_target_logit_drop": 0.1875,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "mean_target_logit_recovered_by_restore": 0.0,
+      "mean_target_recovery_fraction": 0.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L34:mlp_out",
+      "combo_role_guess": "anti_restore_or_off_path",
+      "combo_sites": [
+        "L34:mlp_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 3.017189145088196,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0,
+      "mean_restored_target_logit_drop": 0.0625,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "mean_target_logit_recovered_by_restore": -0.0625,
+      "mean_target_recovery_fraction": 1.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_role_guess": "anti_restore_or_off_path",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 28,
+      "mean_combo_delta_norm_after_removal": 3.690114974975586,
+      "mean_erase_route_release": 0.125,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_restored_route_release": 0.0,
+      "mean_restored_target_logit_drop": 0.0625,
+      "mean_route_release_reduced_by_restore": 0.125,
+      "mean_target_logit_recovered_by_restore": -0.0625,
+      "mean_target_recovery_fraction": 0.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H28"
+    },
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L34:mlp_out",
+      "combo_role_guess": "anti_restore_or_off_path",
+      "combo_sites": [
+        "L34:mlp_out"
+      ],
+      "combo_size": 1,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 7.6659533977508545,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.125,
+      "mean_restored_target_logit_drop": 0.875,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "mean_target_logit_recovered_by_restore": -0.6875,
+      "mean_target_recovery_fraction": -3.6666666666666665,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_role_guess": "anti_restore_or_off_path",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out",
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "combo_size": 4,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 4.93972934782505,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.1875,
+      "mean_restored_target_logit_drop": 0.875,
+      "mean_route_release_reduced_by_restore": -0.125,
+      "mean_target_logit_recovered_by_restore": -0.6875,
+      "mean_target_recovery_fraction": -3.6666666666666665,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_role_guess": "anti_restore_or_off_path",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "combo_size": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "effective_restore_rate": 0.0,
+      "head": 15,
+      "mean_combo_delta_norm_after_removal": 5.652662068605423,
+      "mean_erase_route_release": 0.0625,
+      "mean_erase_target_logit_drop": 0.1875,
+      "mean_restored_route_release": 0.125,
+      "mean_restored_target_logit_drop": 0.875,
+      "mean_route_release_reduced_by_restore": -0.0625,
+      "mean_target_logit_recovered_by_restore": -0.6875,
+      "mean_target_recovery_fraction": -4.0,
+      "n": 2,
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "site": "L33:attn_out",
+      "source_group": "records_all",
+      "subunit_id": "L33:attn_out:H15"
+    }
+  ]
+}

@@ -1,0 +1,438 @@
+[16:01:14] glm4/smoke: pairs=2 sources=['records_all']
+[16:01:14] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<00:56,  7.76it/s]Loading weights:   5%|▍         | 22/443 [00:00<00:03, 109.17it/s]Loading weights:  13%|█▎        | 59/443 [00:00<00:01, 205.70it/s]Loading weights:  20%|█▉        | 87/443 [00:00<00:01, 227.54it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 260.53it/s]Loading weights:  38%|███▊      | 169/443 [00:00<00:00, 308.54it/s]Loading weights:  46%|████▌     | 202/443 [00:00<00:00, 308.04it/s]Loading weights:  53%|█████▎    | 235/443 [00:00<00:00, 308.89it/s]Loading weights:  60%|██████    | 267/443 [00:01<00:00, 293.79it/s]Loading weights:  68%|██████▊   | 301/443 [00:01<00:00, 306.40it/s]Loading weights:  75%|███████▍  | 332/443 [00:01<00:00, 302.02it/s]Loading weights:  83%|████████▎ | 367/443 [00:01<00:00, 310.04it/s]Loading weights:  90%|█████████ | 399/443 [00:01<00:00, 307.31it/s]Loading weights:  97%|█████████▋| 430/443 [00:01<00:00, 289.60it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 282.26it/s]
+[16:01:16] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[16:01:17] glm4: candidates=2 combo_sites=['L36:attn_out', 'L36:mlp_out', 'L37:attn_out', 'L37:mlp_out', 'L38:attn_out', 'L38:mlp_out', 'L39:attn_out', 'L39:mlp_out']
+[16:01:18] glm4: route matrix 1/2 pairs; rows=67
+[16:01:18] glm4: route matrix 2/2 pairs; rows=142
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "n_rows": 142,
+  "top_route_cells": [
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out",
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_name": "L36:attn+mlp",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "source_group": "records_all",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "source_group": "records_all",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "source_group": "records_all",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out",
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "source_group": "records_all",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_name": "L36:attn+mlp",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out"
+      ],
+      "route_group": "top_class:other_semantic_value",
+      "n": 1,
+      "domains": [
+        "abstract"
+      ],
+      "relations": [
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.0625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.0625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out"
+      ],
+      "route_group": "top_non_target",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0625,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": 0.0,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.03125,
+      "mean_margin_drop_reduced": 0.03125,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out",
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "route_group": "top_non_target",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0625,
+      "mean_target_recovered": 0.0625,
+      "mean_target_recovery_fraction": 1.0,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.03125,
+      "mean_margin_drop_reduced": 0.09375,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_name": "L36:attn+mlp",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out"
+      ],
+      "route_group": "top_non_target",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0625,
+      "mean_target_recovered": 0.0625,
+      "mean_target_recovery_fraction": 1.0,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.03125,
+      "mean_margin_drop_reduced": 0.09375,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      }
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "source_group": "records_all",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out"
+      ],
+      "route_group": "top_non_target",
+      "n": 2,
+      "domains": [
+        "abstract",
+        "fruit"
+      ],
+      "relations": [
+        "category",
+        "shape"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 0.0,
+      "route_only_success_rate": 0.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": 0.0,
+      "mean_target_recovered": 0.0,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.03125,
+      "mean_margin_drop_reduced": 0.03125,
+      "role_guess": "weak_or_unclear",
+      "erase_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      },
+      "restored_route_token_counts": {
+        " Fruit": 1,
+        " None": 1
+      }
+    }
+  ]
+}

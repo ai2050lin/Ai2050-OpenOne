@@ -1,0 +1,70 @@
+[19:00:01] glm4/smoke2: cases=12 relations=['category', 'edible', 'grows_on_tree'] phase767_round=main max_new_tokens=6
+[19:00:01] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[19:00:02] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[19:00:02] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:48,  9.11it/s]Loading weights:   5%|▍         | 21/443 [00:00<00:05, 78.33it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 184.15it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 223.16it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 253.01it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 266.39it/s]Loading weights:  43%|████▎     | 189/443 [00:00<00:00, 273.20it/s]Loading weights:  50%|█████     | 222/443 [00:00<00:00, 286.83it/s]Loading weights:  58%|█████▊    | 256/443 [00:01<00:00, 296.40it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 304.77it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 310.03it/s]Loading weights:  80%|████████  | 356/443 [00:01<00:00, 308.66it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 306.10it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 309.09it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 268.73it/s]
+[19:00:04] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
+[19:00:07] glm4: phrase closure 6/12 cases
+[19:00:10] glm4: phrase closure 12/12 cases
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke2",
+  "by_subset": {
+    "all": {
+      "n": 12,
+      "semantic_top1_rate": 0.6666666666666666,
+      "exact_top1_rate": 0.5,
+      "phrase_top1_rate": 0.6666666666666666,
+      "generation_match_rate": 0.6666666666666666,
+      "mean_phrase_rank": 1.3333333333333333,
+      "mean_phrase_margin": 1.0468750409781933
+    },
+    "exact_clean": {
+      "n": 6,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 1.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 2.6770834053556123
+    },
+    "semantic_clean": {
+      "n": 8,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.75,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 2.2968750689178705
+    },
+    "semantic_only": {
+      "n": 2,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 1.1562500596046448
+    },
+    "semantic_fail": {
+      "n": 4,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -1.4531250149011612
+    },
+    "rank_le2": {
+      "n": 11,
+      "semantic_top1_rate": 0.7272727272727273,
+      "exact_top1_rate": 0.5454545454545454,
+      "phrase_top1_rate": 0.7272727272727273,
+      "generation_match_rate": 0.7272727272727273,
+      "mean_phrase_rank": 1.2727272727272727,
+      "mean_phrase_margin": 1.44318187372251
+    }
+  }
+}

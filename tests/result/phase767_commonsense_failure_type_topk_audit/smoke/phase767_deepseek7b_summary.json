@@ -1,0 +1,277 @@
+{
+  "phase": 767,
+  "title": "Commonsense Failure-Type Top-k Audit",
+  "model": "deepseek7b",
+  "round": "smoke",
+  "timestamp": "2026-06-29 18:29:25",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_cases": 12,
+  "top_k": 30,
+  "failure_type_counts": {
+    "allowed_value_candidate_competition": 2,
+    "known_contrast_competition": 7,
+    "success_top1": 3
+  },
+  "target_rank_bands": {
+    "rank_1": 3,
+    "rank_11_20": 3,
+    "rank_3_5": 3,
+    "rank_6_10": 3
+  },
+  "clean_subset_n": 3,
+  "rank_le2_subset_n": 3,
+  "overall": {
+    "target_top1_rate": 0.25,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 6.083333333333333,
+    "mean_target_allowed_rank": 1.8333333333333333,
+    "mean_target_margin_vs_best_other": -2.0729166666666665
+  },
+  "by_failure_type": [
+    {
+      "failure_type": "allowed_value_candidate_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 9.0,
+      "mean_target_margin_vs_best_other": -3.03125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "failure_type": "known_contrast_competition",
+      "n": 7,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 7.428571428571429,
+      "mean_target_margin_vs_best_other": -3.0714285714285716,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.142857142857143
+    },
+    {
+      "failure_type": "success_top1",
+      "n": 3,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 0.8958333333333334,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    }
+  ],
+  "by_relation_failure_type": [
+    {
+      "relation": "category",
+      "failure_type": "known_contrast_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 5.0,
+      "mean_target_margin_vs_best_other": -1.0,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.5
+    },
+    {
+      "relation": "category",
+      "failure_type": "success_top1",
+      "n": 3,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 0.8958333333333334,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    },
+    {
+      "relation": "edible",
+      "failure_type": "known_contrast_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 11.0,
+      "mean_target_margin_vs_best_other": -4.34375,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "relation": "grows_on_tree",
+      "failure_type": "allowed_value_candidate_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 9.0,
+      "mean_target_margin_vs_best_other": -3.03125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "relation": "grows_on_tree",
+      "failure_type": "known_contrast_competition",
+      "n": 3,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 6.666666666666667,
+      "mean_target_margin_vs_best_other": -3.6041666666666665,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    }
+  ],
+  "by_context_failure_type": [
+    {
+      "context_format": "commonsense_question",
+      "failure_type": "allowed_value_candidate_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 9.0,
+      "mean_target_margin_vs_best_other": -3.03125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "context_format": "commonsense_question",
+      "failure_type": "known_contrast_competition",
+      "n": 3,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 11.0,
+      "mean_target_margin_vs_best_other": -3.8958333333333335,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "context_format": "commonsense_question",
+      "failure_type": "success_top1",
+      "n": 1,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 1.0,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    },
+    {
+      "context_format": "commonsense_statement",
+      "failure_type": "known_contrast_competition",
+      "n": 4,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 4.75,
+      "mean_target_margin_vs_best_other": -2.453125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.25
+    },
+    {
+      "context_format": "commonsense_statement",
+      "failure_type": "success_top1",
+      "n": 2,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 0.84375,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    }
+  ],
+  "by_domain_failure_type": [
+    {
+      "domain": "abstract",
+      "failure_type": "known_contrast_competition",
+      "n": 2,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 5.0,
+      "mean_target_margin_vs_best_other": -2.0625,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.5
+    },
+    {
+      "domain": "animal",
+      "failure_type": "known_contrast_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 6.0,
+      "mean_target_margin_vs_best_other": -3.8125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "animal",
+      "failure_type": "success_top1",
+      "n": 1,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 0.5625,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    },
+    {
+      "domain": "fruit",
+      "failure_type": "known_contrast_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 11.0,
+      "mean_target_margin_vs_best_other": -4.5,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "fruit",
+      "failure_type": "success_top1",
+      "n": 1,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 1.0,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    },
+    {
+      "domain": "object",
+      "failure_type": "allowed_value_candidate_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 7.0,
+      "mean_target_margin_vs_best_other": -2.5625,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "object",
+      "failure_type": "known_contrast_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 19.0,
+      "mean_target_margin_vs_best_other": -6.8125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "plant",
+      "failure_type": "known_contrast_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 3.0,
+      "mean_target_margin_vs_best_other": -1.875,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "plant",
+      "failure_type": "success_top1",
+      "n": 1,
+      "target_top1_rate": 1.0,
+      "mean_target_rank": 1.0,
+      "mean_target_margin_vs_best_other": 1.125,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 1.0
+    },
+    {
+      "domain": "tool",
+      "failure_type": "allowed_value_candidate_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 11.0,
+      "mean_target_margin_vs_best_other": -3.5,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    },
+    {
+      "domain": "tool",
+      "failure_type": "known_contrast_competition",
+      "n": 1,
+      "target_top1_rate": 0.0,
+      "mean_target_rank": 3.0,
+      "mean_target_margin_vs_best_other": -0.375,
+      "target_in_topk_rate": 1.0,
+      "mean_target_allowed_rank": 2.0
+    }
+  ]
+}

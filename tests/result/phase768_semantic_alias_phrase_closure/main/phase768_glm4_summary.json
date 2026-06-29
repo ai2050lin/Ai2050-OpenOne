@@ -1,0 +1,136 @@
+{
+  "phase": 768,
+  "title": "Semantic-Alias Phrase Closure",
+  "model": "glm4",
+  "round": "main",
+  "timestamp": "2026-06-29 19:02:16",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_cases": 108,
+  "by_subset": {
+    "all": {
+      "n": 108,
+      "semantic_top1_rate": 0.75,
+      "exact_top1_rate": 0.6111111111111112,
+      "phrase_top1_rate": 0.75,
+      "generation_match_rate": 0.75,
+      "mean_phrase_rank": 1.3055555555555556,
+      "mean_phrase_margin": 1.5179398194369342
+    },
+    "exact_clean": {
+      "n": 66,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 1.0,
+      "phrase_top1_rate": 0.9696969696969697,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0303030303030303,
+      "mean_phrase_margin": 2.510416677390987
+    },
+    "semantic_clean": {
+      "n": 81,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.8148148148148148,
+      "phrase_top1_rate": 0.9753086419753086,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0246913580246915,
+      "mean_phrase_margin": 2.307098774170434
+    },
+    "semantic_only": {
+      "n": 15,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 1.4125
+    },
+    "semantic_fail": {
+      "n": 27,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.07407407407407407,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.1481481481481484,
+      "mean_phrase_margin": -0.8495370447635651
+    },
+    "rank_le2": {
+      "n": 99,
+      "semantic_top1_rate": 0.8181818181818182,
+      "exact_top1_rate": 0.6666666666666666,
+      "phrase_top1_rate": 0.8080808080808081,
+      "generation_match_rate": 0.8181818181818182,
+      "mean_phrase_rank": 1.1919191919191918,
+      "mean_phrase_margin": 1.7998737442222508
+    }
+  },
+  "by_relation_subset": [
+    {
+      "relation": "category",
+      "subset": "semantic_clean",
+      "n": 30,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 1.0,
+      "phrase_top1_rate": 0.9666666666666667,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0333333333333334,
+      "mean_phrase_margin": 3.6645833569268387
+    },
+    {
+      "relation": "category",
+      "subset": "semantic_fail",
+      "n": 6,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.3333333333333333,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.6666666666666665,
+      "mean_phrase_margin": -0.718750019868215
+    },
+    {
+      "relation": "edible",
+      "subset": "semantic_clean",
+      "n": 22,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.8181818181818182,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 1.9715909016403286
+    },
+    {
+      "relation": "edible",
+      "subset": "semantic_fail",
+      "n": 14,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -0.6696428592715945
+    },
+    {
+      "relation": "grows_on_tree",
+      "subset": "semantic_clean",
+      "n": 29,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.6206896551724138,
+      "phrase_top1_rate": 0.9655172413793104,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0344827586206897,
+      "mean_phrase_margin": 1.157327591859061
+    },
+    {
+      "relation": "grows_on_tree",
+      "subset": "semantic_fail",
+      "n": 7,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -1.3214285799435206
+    }
+  ],
+  "strict_interpretation": "Phrase likelihood and short greedy generation test whether semantic alias closure survives beyond first-token ranking."
+}

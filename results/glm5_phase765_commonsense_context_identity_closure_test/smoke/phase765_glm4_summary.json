@@ -1,0 +1,111 @@
+{
+  "attn_implementation": "eager",
+  "candidates": [
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "control_of": null,
+      "head": 29,
+      "selection": "phase751_752",
+      "site": "L35:attn_out",
+      "subunit_id": "L35:attn_out:H29"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "control_of": "L35:attn_out:H29",
+      "head": 0,
+      "selection": "deterministic_offset_3",
+      "site": "L35:attn_out",
+      "subunit_id": "L35:attn_out:H0"
+    }
+  ],
+  "context_formats": [
+    "commonsense_question",
+    "commonsense_statement"
+  ],
+  "context_pair_summaries": {
+    "commonsense_question": {
+      "n_features": 96,
+      "n_objects": 6,
+      "pair_summary": {
+        "different_domain_mean": -0.07026955048123329,
+        "different_n": 12,
+        "nn_domain_accuracy": 0.0,
+        "same_domain_mean": -0.6207001481417223,
+        "same_n": 3,
+        "separation": -0.550430597660489
+      }
+    },
+    "commonsense_statement": {
+      "n_features": 96,
+      "n_objects": 6,
+      "pair_summary": {
+        "different_domain_mean": -0.040797995237322617,
+        "different_n": 12,
+        "nn_domain_accuracy": 0.0,
+        "same_domain_mean": -0.7269555442306473,
+        "same_n": 3,
+        "separation": -0.6861575489933247
+      }
+    }
+  },
+  "cross_context_stability": [],
+  "dtype": "bfloat16",
+  "model": "glm4",
+  "n_cases": 12,
+  "n_effect_rows": 96,
+  "n_rows": 108,
+  "observation_summary": {
+    "by_context": {
+      "commonsense_question": {
+        "mean_contrast_rank": 6.166666666666667,
+        "mean_target_rank": 2.0,
+        "n": 6,
+        "target_top1_rate": 0.3333333333333333
+      },
+      "commonsense_statement": {
+        "mean_contrast_rank": 3.8333333333333335,
+        "mean_target_rank": 1.3333333333333333,
+        "n": 6,
+        "target_top1_rate": 0.6666666666666666
+      }
+    },
+    "by_relation": {
+      "category": {
+        "mean_contrast_rank": 9.4,
+        "mean_target_rank": 1.0,
+        "n": 5,
+        "target_top1_rate": 1.0
+      },
+      "edible": {
+        "mean_contrast_rank": 1.0,
+        "mean_target_rank": 2.0,
+        "n": 2,
+        "target_top1_rate": 0.0
+      },
+      "grows_on_tree": {
+        "mean_contrast_rank": 2.2,
+        "mean_target_rank": 2.2,
+        "n": 5,
+        "target_top1_rate": 0.2
+      }
+    },
+    "overall": {
+      "mean_contrast_rank": 5.0,
+      "mean_target_rank": 1.6666666666666667,
+      "n": 12,
+      "target_top1_rate": 0.5
+    }
+  },
+  "phase": 765,
+  "quantization": "off",
+  "round": "smoke",
+  "source_groups": [
+    "instruction",
+    "question",
+    "object_tokens",
+    "relation_tokens"
+  ],
+  "strict_interpretation": "Commonsense fibers test internal knowledge without explicit fact profiles. Low target-top1 rates or weak object stability mean no natural semantic closure.",
+  "timestamp": "2026-06-29 18:02:00",
+  "title": "Commonsense Context and Object Identity Closure Test"
+}

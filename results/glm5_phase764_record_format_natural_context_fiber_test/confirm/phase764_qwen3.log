@@ -1,0 +1,87 @@
+[17:32:32] qwen3/confirm: cases=162 sources=['context_all', 'target_context_line', 'target_value_tokens', 'object_tokens', 'relation_tokens', 'question'] relations=['category', 'color', 'edible']
+[17:32:33] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 253.14it/s]Loading weights:  23%|██▎       | 91/398 [00:00<00:00, 474.49it/s]Loading weights:  37%|███▋      | 148/398 [00:00<00:00, 498.17it/s]Loading weights:  53%|█████▎    | 209/398 [00:00<00:00, 529.21it/s]Loading weights:  73%|███████▎  | 290/398 [00:00<00:00, 611.00it/s]Loading weights:  89%|████████▉ | 356/398 [00:00<00:00, 623.58it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 575.74it/s]
+[17:32:34] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[17:32:51] qwen3: format fibers 27/162 cases; rows=351
+[17:33:08] qwen3: format fibers 54/162 cases; rows=702
+[17:33:24] qwen3: format fibers 81/162 cases; rows=1053
+[17:33:41] qwen3: format fibers 108/162 cases; rows=1404
+[17:33:57] qwen3: format fibers 135/162 cases; rows=1755
+[17:34:14] qwen3: format fibers 162/162 cases; rows=2106
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "confirm",
+  "n_cases": 162,
+  "context_pair_summaries": {
+    "key_value": {
+      "n_objects": 18,
+      "n_features": 144,
+      "pair_summary": {
+        "same_domain_mean": 0.8330024967503662,
+        "different_domain_mean": 0.14638497358532568,
+        "separation": 0.6866175231650405,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.7222222222222222
+      }
+    },
+    "sentence_lines": {
+      "n_objects": 18,
+      "n_features": 144,
+      "pair_summary": {
+        "same_domain_mean": 0.8385263859041266,
+        "different_domain_mean": 0.15420777822537465,
+        "separation": 0.684318607678752,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.8333333333333334
+      }
+    },
+    "compact_sentence": {
+      "n_objects": 18,
+      "n_features": 144,
+      "pair_summary": {
+        "same_domain_mean": 0.8631041104237195,
+        "different_domain_mean": 0.1824720292547204,
+        "separation": 0.6806320811689991,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.6111111111111112
+      }
+    }
+  },
+  "cross_context_stability": [
+    {
+      "context_a": "compact_sentence",
+      "context_b": "key_value",
+      "common_objects": 18,
+      "same_object_mean": 0.8735800753265445,
+      "same_domain_diff_object_mean": 0.7977339127714226,
+      "different_domain_mean": 0.1372174625847465,
+      "object_stability_gap": 0.07584616255512189,
+      "domain_stability_gap": 0.660516450186676
+    },
+    {
+      "context_a": "compact_sentence",
+      "context_b": "sentence_lines",
+      "common_objects": 18,
+      "same_object_mean": 0.7770952841173,
+      "same_domain_diff_object_mean": 0.7180160470238489,
+      "different_domain_mean": 0.08748550978233409,
+      "object_stability_gap": 0.05907923709345109,
+      "domain_stability_gap": 0.6305305372415149
+    },
+    {
+      "context_a": "key_value",
+      "context_b": "sentence_lines",
+      "common_objects": 18,
+      "same_object_mean": 0.8818354151635428,
+      "same_domain_diff_object_mean": 0.7965733837592663,
+      "different_domain_mean": 0.13160529524577846,
+      "object_stability_gap": 0.08526203140427646,
+      "domain_stability_gap": 0.6649680885134879
+    }
+  ]
+}

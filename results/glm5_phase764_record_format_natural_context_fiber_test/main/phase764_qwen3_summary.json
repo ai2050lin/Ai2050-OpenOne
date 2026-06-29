@@ -1,0 +1,113 @@
+{
+  "attn_implementation": "eager",
+  "candidates": [
+    {
+      "candidate_kind": "phase755_top_candidate",
+      "control_of": null,
+      "head": 15,
+      "selection": "phase751_752",
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H15"
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "control_of": "L33:attn_out:H15",
+      "head": 18,
+      "selection": "deterministic_offset_3",
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H18"
+    }
+  ],
+  "context_formats": [
+    "key_value",
+    "sentence_lines",
+    "compact_sentence"
+  ],
+  "context_pair_summaries": {
+    "compact_sentence": {
+      "n_features": 96,
+      "n_objects": 18,
+      "pair_summary": {
+        "different_domain_mean": 0.19376215001006822,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.5555555555555556,
+        "same_domain_mean": 0.884783380670062,
+        "same_n": 18,
+        "separation": 0.6910212306599938
+      }
+    },
+    "key_value": {
+      "n_features": 96,
+      "n_objects": 18,
+      "pair_summary": {
+        "different_domain_mean": 0.1530352799914941,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.7222222222222222,
+        "same_domain_mean": 0.8475516138583319,
+        "same_n": 18,
+        "separation": 0.6945163338668378
+      }
+    },
+    "sentence_lines": {
+      "n_features": 96,
+      "n_objects": 18,
+      "pair_summary": {
+        "different_domain_mean": 0.16176647181083137,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.8333333333333334,
+        "same_domain_mean": 0.8522252939669224,
+        "same_n": 18,
+        "separation": 0.690458822156091
+      }
+    }
+  },
+  "cross_context_stability": [
+    {
+      "common_objects": 18,
+      "context_a": "compact_sentence",
+      "context_b": "key_value",
+      "different_domain_mean": 0.14651073448181137,
+      "domain_stability_gap": 0.6699595342275156,
+      "object_stability_gap": 0.07413639030666674,
+      "same_domain_diff_object_mean": 0.816470268709327,
+      "same_object_mean": 0.8906066590159938
+    },
+    {
+      "common_objects": 18,
+      "context_a": "compact_sentence",
+      "context_b": "sentence_lines",
+      "different_domain_mean": 0.094050845494431,
+      "domain_stability_gap": 0.637460883206484,
+      "object_stability_gap": 0.05981601189426233,
+      "same_domain_diff_object_mean": 0.731511728700915,
+      "same_object_mean": 0.7913277405951773
+    },
+    {
+      "common_objects": 18,
+      "context_a": "key_value",
+      "context_b": "sentence_lines",
+      "different_domain_mean": 0.13844562779404335,
+      "domain_stability_gap": 0.6711636336459923,
+      "object_stability_gap": 0.08770147889521995,
+      "same_domain_diff_object_mean": 0.8096092614400356,
+      "same_object_mean": 0.8973107403352556
+    }
+  ],
+  "dtype": "bfloat16",
+  "model": "qwen3",
+  "n_cases": 162,
+  "n_effect_rows": 1296,
+  "n_rows": 1458,
+  "phase": 764,
+  "quantization": "off",
+  "round": "main",
+  "source_groups": [
+    "context_all",
+    "target_context_line",
+    "target_value_tokens",
+    "object_tokens"
+  ],
+  "strict_interpretation": "If semantic fibers are natural rather than format-bound, same-object and same-domain structure should persist across key-value, sentence, and compact contexts.",
+  "timestamp": "2026-06-29 17:28:37",
+  "title": "Record Format and Natural Context Fiber Test"
+}

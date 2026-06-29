@@ -1,0 +1,27 @@
+[18:34:54] deepseek7b/main: cases=108 top_k=80 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
+[18:34:55] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[18:34:55] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[18:34:55] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:30, 10.87it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 118.22it/s]Loading weights:  16%|█▌        | 54/339 [00:00<00:01, 166.68it/s]Loading weights:  26%|██▋       | 89/339 [00:00<00:01, 222.99it/s]Loading weights:  35%|███▍      | 118/339 [00:00<00:00, 243.33it/s]Loading weights:  43%|████▎     | 145/339 [00:00<00:00, 248.11it/s]Loading weights:  51%|█████     | 173/339 [00:00<00:00, 250.99it/s]Loading weights:  60%|█████▉    | 202/339 [00:00<00:00, 258.45it/s]Loading weights:  68%|██████▊   | 232/339 [00:01<00:00, 263.27it/s]Loading weights:  76%|███████▋  | 259/339 [00:01<00:00, 244.39it/s]Loading weights:  84%|████████▍ | 284/339 [00:01<00:00, 240.56it/s]Loading weights:  94%|█████████▎| 317/339 [00:01<00:00, 261.45it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 235.02it/s]
+[18:34:56] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
+[18:34:58] deepseek7b: top-k audit 18/108 cases
+[18:34:59] deepseek7b: top-k audit 36/108 cases
+[18:35:00] deepseek7b: top-k audit 54/108 cases
+[18:35:01] deepseek7b: top-k audit 72/108 cases
+[18:35:02] deepseek7b: top-k audit 90/108 cases
+[18:35:03] deepseek7b: top-k audit 108/108 cases
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "summary": {
+    "target_top1_rate": 0.35185185185185186,
+    "exact_target_top1_rate": 0.17592592592592593,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 3.8055555555555554,
+    "mean_exact_target_rank": 6.407407407407407,
+    "mean_target_allowed_rank": 1.6666666666666667,
+    "mean_target_margin_vs_best_other": -0.7638888888888888
+  }
+}

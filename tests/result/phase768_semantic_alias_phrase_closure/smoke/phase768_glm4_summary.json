@@ -1,0 +1,114 @@
+{
+  "phase": 768,
+  "title": "Semantic-Alias Phrase Closure",
+  "model": "glm4",
+  "round": "smoke",
+  "timestamp": "2026-06-29 18:58:39",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_cases": 12,
+  "by_subset": {
+    "all": {
+      "n": 12,
+      "semantic_top1_rate": 0.6666666666666666,
+      "exact_top1_rate": 0.5,
+      "phrase_top1_rate": 0.6666666666666666,
+      "generation_match_rate": 0.16666666666666666,
+      "mean_phrase_rank": 1.3333333333333333,
+      "mean_phrase_margin": 1.0468750409781933
+    },
+    "exact_clean": {
+      "n": 6,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 1.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 2.6770834053556123
+    },
+    "semantic_clean": {
+      "n": 8,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.75,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 0.25,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 2.2968750689178705
+    },
+    "semantic_only": {
+      "n": 2,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 1.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 1.1562500596046448
+    },
+    "semantic_fail": {
+      "n": 4,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -1.4531250149011612
+    },
+    "rank_le2": {
+      "n": 11,
+      "semantic_top1_rate": 0.7272727272727273,
+      "exact_top1_rate": 0.5454545454545454,
+      "phrase_top1_rate": 0.7272727272727273,
+      "generation_match_rate": 0.18181818181818182,
+      "mean_phrase_rank": 1.2727272727272727,
+      "mean_phrase_margin": 1.44318187372251
+    }
+  },
+  "by_relation_subset": [
+    {
+      "relation": "category",
+      "subset": "semantic_clean",
+      "n": 5,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 1.0,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 3.1625000864267347
+    },
+    {
+      "relation": "edible",
+      "subset": "semantic_fail",
+      "n": 2,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -0.8749999701976776
+    },
+    {
+      "relation": "grows_on_tree",
+      "subset": "semantic_clean",
+      "n": 3,
+      "semantic_top1_rate": 1.0,
+      "exact_top1_rate": 0.3333333333333333,
+      "phrase_top1_rate": 1.0,
+      "generation_match_rate": 0.6666666666666666,
+      "mean_phrase_rank": 1.0,
+      "mean_phrase_margin": 0.8541667064030966
+    },
+    {
+      "relation": "grows_on_tree",
+      "subset": "semantic_fail",
+      "n": 2,
+      "semantic_top1_rate": 0.0,
+      "exact_top1_rate": 0.0,
+      "phrase_top1_rate": 0.0,
+      "generation_match_rate": 0.0,
+      "mean_phrase_rank": 2.0,
+      "mean_phrase_margin": -2.0312500596046448
+    }
+  ],
+  "strict_interpretation": "Phrase likelihood and short greedy generation test whether semantic alias closure survives beyond first-token ranking."
+}

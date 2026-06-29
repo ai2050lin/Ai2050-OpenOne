@@ -1,0 +1,3986 @@
+{
+  "phase": 770,
+  "title": "Balanced Semantic-Clean Fiber Reanalysis",
+  "timestamp": "2026-06-29 19:43:08",
+  "phase765_round": "confirm",
+  "phase767_round": "main",
+  "strata_keys": [
+    "domain",
+    "relation",
+    "context_format"
+  ],
+  "max_per_stratum": null,
+  "by_model": {
+    "qwen3": {
+      "model": "qwen3",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_qwen3_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_qwen3_rows.jsonl",
+      "label_counts": {
+        "exact_clean": 89,
+        "semantic_clean": 89,
+        "semantic_only": 0,
+        "semantic_fail": 19
+      },
+      "balanced_contrasts": {
+        "semantic_clean_vs_semantic_fail": {
+          "label_a": "semantic_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 11,
+          "label_a_balanced_ids": [
+            "p765_0002_commonsense_statement_fruit:apple:category",
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0058_commonsense_statement_object:chair:edible",
+            "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "p765_0098_commonsense_statement_abstract:time:category",
+            "p765_0102_commonsense_statement_abstract:time:grows_on_tree"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0014_commonsense_statement_fruit:pear:category",
+            "p765_0045_commonsense_question_plant:rose:edible",
+            "p765_0046_commonsense_statement_plant:rose:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0070_commonsense_statement_object:cup:edible",
+            "p765_0092_commonsense_statement_abstract:freedom:category",
+            "p765_0096_commonsense_statement_abstract:freedom:grows_on_tree",
+            "p765_0100_commonsense_statement_abstract:time:edible"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 89,
+          "label_b_available": 19,
+          "arm_a": {
+            "n_cases": 11,
+            "n_effect_rows": 110,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": 0.208725113452295,
+                "different_domain_mean": -0.018888015242042564,
+                "separation": 0.22761312869433756
+              }
+            ],
+            "mean_context_separation": 0.6138065643471687,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 2,
+                "same_object_mean": -0.07031942672053648,
+                "same_domain_diff_object_mean": null,
+                "different_domain_mean": -0.22177539630137932,
+                "object_stability_gap": -0.07031942672053648,
+                "domain_stability_gap": 0.22177539630137932
+              }
+            ],
+            "mean_object_stability_gap": -0.07031942672053648,
+            "mean_domain_stability_gap": 0.22177539630137932
+          },
+          "arm_b": {
+            "n_cases": 11,
+            "n_effect_rows": 110,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 7,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.36059923686360634,
+                "different_domain_mean": 0.03174181882306639,
+                "separation": -0.3923410556866727
+              }
+            ],
+            "mean_context_separation": 0.30382947215666367,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 2,
+                "same_object_mean": 0.49894845345428723,
+                "same_domain_diff_object_mean": null,
+                "different_domain_mean": -0.6809896338311077,
+                "object_stability_gap": 0.49894845345428723,
+                "domain_stability_gap": 0.6809896338311077
+              }
+            ],
+            "mean_object_stability_gap": 0.49894845345428723,
+            "mean_domain_stability_gap": 0.6809896338311077
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.30997709219050507,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": -0.5692678801748237,
+            "mean_domain_stability_gap": -0.45921423752972834
+          }
+        },
+        "exact_clean_vs_semantic_only": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_only",
+          "n_strata": 0,
+          "label_a_balanced_ids": [],
+          "label_b_balanced_ids": [],
+          "skipped": "missing_one_side"
+        },
+        "exact_clean_vs_semantic_fail": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 11,
+          "label_a_balanced_ids": [
+            "p765_0002_commonsense_statement_fruit:apple:category",
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0058_commonsense_statement_object:chair:edible",
+            "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "p765_0098_commonsense_statement_abstract:time:category",
+            "p765_0102_commonsense_statement_abstract:time:grows_on_tree"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0014_commonsense_statement_fruit:pear:category",
+            "p765_0045_commonsense_question_plant:rose:edible",
+            "p765_0046_commonsense_statement_plant:rose:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0070_commonsense_statement_object:cup:edible",
+            "p765_0092_commonsense_statement_abstract:freedom:category",
+            "p765_0096_commonsense_statement_abstract:freedom:grows_on_tree",
+            "p765_0100_commonsense_statement_abstract:time:edible"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 89,
+          "label_b_available": 19,
+          "arm_a": {
+            "n_cases": 11,
+            "n_effect_rows": 110,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": 0.208725113452295,
+                "different_domain_mean": -0.018888015242042564,
+                "separation": 0.22761312869433756
+              }
+            ],
+            "mean_context_separation": 0.6138065643471687,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 2,
+                "same_object_mean": -0.07031942672053648,
+                "same_domain_diff_object_mean": null,
+                "different_domain_mean": -0.22177539630137932,
+                "object_stability_gap": -0.07031942672053648,
+                "domain_stability_gap": 0.22177539630137932
+              }
+            ],
+            "mean_object_stability_gap": -0.07031942672053648,
+            "mean_domain_stability_gap": 0.22177539630137932
+          },
+          "arm_b": {
+            "n_cases": 11,
+            "n_effect_rows": 110,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 7,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.36059923686360634,
+                "different_domain_mean": 0.03174181882306639,
+                "separation": -0.3923410556866727
+              }
+            ],
+            "mean_context_separation": 0.30382947215666367,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 2,
+                "same_object_mean": 0.49894845345428723,
+                "same_domain_diff_object_mean": null,
+                "different_domain_mean": -0.6809896338311077,
+                "object_stability_gap": 0.49894845345428723,
+                "domain_stability_gap": 0.6809896338311077
+              }
+            ],
+            "mean_object_stability_gap": 0.49894845345428723,
+            "mean_domain_stability_gap": 0.6809896338311077
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.30997709219050507,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": -0.5692678801748237,
+            "mean_domain_stability_gap": -0.45921423752972834
+          }
+        },
+        "semantic_only_vs_semantic_fail": {
+          "label_a": "semantic_only",
+          "label_b": "semantic_fail",
+          "n_strata": 0,
+          "label_a_balanced_ids": [],
+          "label_b_balanced_ids": [],
+          "skipped": "missing_one_side"
+        }
+      },
+      "paired_context_stability": {
+        "n_pairs": 54,
+        "mean_context_cosine": 0.9502842618706014,
+        "by_semantic_pair": {
+          "both_clean": {
+            "n_pairs": 40,
+            "mean_context_cosine": 0.9505725050356764
+          },
+          "both_fail": {
+            "n_pairs": 5,
+            "mean_context_cosine": 0.9592373346075391
+          },
+          "mixed": {
+            "n_pairs": 9,
+            "mean_context_cosine": 0.944029251838637
+          }
+        },
+        "by_exact_pair": {
+          "both_clean": {
+            "n_pairs": 40,
+            "mean_context_cosine": 0.9505725050356764
+          },
+          "both_fail": {
+            "n_pairs": 5,
+            "mean_context_cosine": 0.9592373346075391
+          },
+          "mixed": {
+            "n_pairs": 9,
+            "mean_context_cosine": 0.944029251838637
+          }
+        },
+        "by_lexical_pair": {
+          "exact__exact": {
+            "n_pairs": 40,
+            "mean_context_cosine": 0.9505725050356764
+          },
+          "exact__semantic_fail": {
+            "n_pairs": 9,
+            "mean_context_cosine": 0.944029251838637
+          },
+          "semantic_fail__semantic_fail": {
+            "n_pairs": 5,
+            "mean_context_cosine": 0.9592373346075391
+          }
+        },
+        "rows": [
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0001_commonsense_question_fruit:apple:category",
+            "statement_case_id": "p765_0002_commonsense_statement_fruit:apple:category",
+            "context_cosine": 0.9976303331726328,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0003_commonsense_question_fruit:apple:edible",
+            "statement_case_id": "p765_0004_commonsense_statement_fruit:apple:edible",
+            "context_cosine": 0.9009465917007654,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "statement_case_id": "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "context_cosine": 0.9570100636912149,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0007_commonsense_question_fruit:banana:category",
+            "statement_case_id": "p765_0008_commonsense_statement_fruit:banana:category",
+            "context_cosine": 0.9969515544565426,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0009_commonsense_question_fruit:banana:edible",
+            "statement_case_id": "p765_0010_commonsense_statement_fruit:banana:edible",
+            "context_cosine": 0.9793594590366816,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "statement_case_id": "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "context_cosine": 0.9827607989405124,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0025_commonsense_question_animal:bird:category",
+            "statement_case_id": "p765_0026_commonsense_statement_animal:bird:category",
+            "context_cosine": 0.8943387501495031,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0027_commonsense_question_animal:bird:edible",
+            "statement_case_id": "p765_0028_commonsense_statement_animal:bird:edible",
+            "context_cosine": 0.9590928058910708,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0029_commonsense_question_animal:bird:grows_on_tree",
+            "statement_case_id": "p765_0030_commonsense_statement_animal:bird:grows_on_tree",
+            "context_cosine": 0.8975095737310221,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0019_commonsense_question_animal:cat:category",
+            "statement_case_id": "p765_0020_commonsense_statement_animal:cat:category",
+            "context_cosine": 0.9655365734866284,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0021_commonsense_question_animal:cat:edible",
+            "statement_case_id": "p765_0022_commonsense_statement_animal:cat:edible",
+            "context_cosine": 0.9581409987996022,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0023_commonsense_question_animal:cat:grows_on_tree",
+            "statement_case_id": "p765_0024_commonsense_statement_animal:cat:grows_on_tree",
+            "context_cosine": 0.9481180694293572,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0055_commonsense_question_object:chair:category",
+            "statement_case_id": "p765_0056_commonsense_statement_object:chair:category",
+            "context_cosine": 0.9700259534149562,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0057_commonsense_question_object:chair:edible",
+            "statement_case_id": "p765_0058_commonsense_statement_object:chair:edible",
+            "context_cosine": 0.9759318904440519,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "statement_case_id": "p765_0060_commonsense_statement_object:chair:grows_on_tree",
+            "context_cosine": 0.9654644110018993,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0067_commonsense_question_object:cup:category",
+            "statement_case_id": "p765_0068_commonsense_statement_object:cup:category",
+            "context_cosine": 0.9307885140137727,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0069_commonsense_question_object:cup:edible",
+            "statement_case_id": "p765_0070_commonsense_statement_object:cup:edible",
+            "context_cosine": 0.9055535377216987,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0071_commonsense_question_object:cup:grows_on_tree",
+            "statement_case_id": "p765_0072_commonsense_statement_object:cup:grows_on_tree",
+            "context_cosine": 0.9446265066479044,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0031_commonsense_question_animal:dog:category",
+            "statement_case_id": "p765_0032_commonsense_statement_animal:dog:category",
+            "context_cosine": 0.9632392771816971,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0033_commonsense_question_animal:dog:edible",
+            "statement_case_id": "p765_0034_commonsense_statement_animal:dog:edible",
+            "context_cosine": 0.9377947517105416,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0035_commonsense_question_animal:dog:grows_on_tree",
+            "statement_case_id": "p765_0036_commonsense_statement_animal:dog:grows_on_tree",
+            "context_cosine": 0.9435708779000206,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0091_commonsense_question_abstract:freedom:category",
+            "statement_case_id": "p765_0092_commonsense_statement_abstract:freedom:category",
+            "context_cosine": 0.9371784337239575,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0093_commonsense_question_abstract:freedom:edible",
+            "statement_case_id": "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "context_cosine": 0.8292320048016111,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0095_commonsense_question_abstract:freedom:grows_on_tree",
+            "statement_case_id": "p765_0096_commonsense_statement_abstract:freedom:grows_on_tree",
+            "context_cosine": 0.9785467678500362,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0073_commonsense_question_tool:hammer:category",
+            "statement_case_id": "p765_0074_commonsense_statement_tool:hammer:category",
+            "context_cosine": 0.9698217862182825,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0075_commonsense_question_tool:hammer:edible",
+            "statement_case_id": "p765_0076_commonsense_statement_tool:hammer:edible",
+            "context_cosine": 0.9315197692017223,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0077_commonsense_question_tool:hammer:grows_on_tree",
+            "statement_case_id": "p765_0078_commonsense_statement_tool:hammer:grows_on_tree",
+            "context_cosine": 0.9543462163452714,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0103_commonsense_question_abstract:justice:category",
+            "statement_case_id": "p765_0104_commonsense_statement_abstract:justice:category",
+            "context_cosine": 0.9714314152340445,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0105_commonsense_question_abstract:justice:edible",
+            "statement_case_id": "p765_0106_commonsense_statement_abstract:justice:edible",
+            "context_cosine": 0.9055771145798654,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0107_commonsense_question_abstract:justice:grows_on_tree",
+            "statement_case_id": "p765_0108_commonsense_statement_abstract:justice:grows_on_tree",
+            "context_cosine": 0.8723092099133996,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0079_commonsense_question_tool:knife:category",
+            "statement_case_id": "p765_0080_commonsense_statement_tool:knife:category",
+            "context_cosine": 0.9876076962721991,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0081_commonsense_question_tool:knife:edible",
+            "statement_case_id": "p765_0082_commonsense_statement_tool:knife:edible",
+            "context_cosine": 0.9339919537367705,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0083_commonsense_question_tool:knife:grows_on_tree",
+            "statement_case_id": "p765_0084_commonsense_statement_tool:knife:grows_on_tree",
+            "context_cosine": 0.957605262708274,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0037_commonsense_question_plant:oak:category",
+            "statement_case_id": "p765_0038_commonsense_statement_plant:oak:category",
+            "context_cosine": 0.9375580880716892,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0039_commonsense_question_plant:oak:edible",
+            "statement_case_id": "p765_0040_commonsense_statement_plant:oak:edible",
+            "context_cosine": 0.8941354310079902,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "statement_case_id": "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "context_cosine": 0.9789363775157852,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0013_commonsense_question_fruit:pear:category",
+            "statement_case_id": "p765_0014_commonsense_statement_fruit:pear:category",
+            "context_cosine": 0.9976149189078336,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0015_commonsense_question_fruit:pear:edible",
+            "statement_case_id": "p765_0016_commonsense_statement_fruit:pear:edible",
+            "context_cosine": 0.979220421361602,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0017_commonsense_question_fruit:pear:grows_on_tree",
+            "statement_case_id": "p765_0018_commonsense_statement_fruit:pear:grows_on_tree",
+            "context_cosine": 0.9674717628052983,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0043_commonsense_question_plant:rose:category",
+            "statement_case_id": "p765_0044_commonsense_statement_plant:rose:category",
+            "context_cosine": 0.9777342426313385,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0045_commonsense_question_plant:rose:edible",
+            "statement_case_id": "p765_0046_commonsense_statement_plant:rose:edible",
+            "context_cosine": 0.9583973176959686,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "statement_case_id": "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "context_cosine": 0.8769198245396119,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0085_commonsense_question_tool:scissors:category",
+            "statement_case_id": "p765_0086_commonsense_statement_tool:scissors:category",
+            "context_cosine": 0.9780897501678761,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0087_commonsense_question_tool:scissors:edible",
+            "statement_case_id": "p765_0088_commonsense_statement_tool:scissors:edible",
+            "context_cosine": 0.9426488380160157,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0089_commonsense_question_tool:scissors:grows_on_tree",
+            "statement_case_id": "p765_0090_commonsense_statement_tool:scissors:grows_on_tree",
+            "context_cosine": 0.9693113066599197,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0061_commonsense_question_object:stone:category",
+            "statement_case_id": "p765_0062_commonsense_statement_object:stone:category",
+            "context_cosine": 0.9567464115679374,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0063_commonsense_question_object:stone:edible",
+            "statement_case_id": "p765_0064_commonsense_statement_object:stone:edible",
+            "context_cosine": 0.9826160731732747,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0065_commonsense_question_object:stone:grows_on_tree",
+            "statement_case_id": "p765_0066_commonsense_statement_object:stone:grows_on_tree",
+            "context_cosine": 0.9757133768274701,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0097_commonsense_question_abstract:time:category",
+            "statement_case_id": "p765_0098_commonsense_statement_abstract:time:category",
+            "context_cosine": 0.9528297928832778,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0099_commonsense_question_abstract:time:edible",
+            "statement_case_id": "p765_0100_commonsense_statement_abstract:time:edible",
+            "context_cosine": 0.94148344298884,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0101_commonsense_question_abstract:time:grows_on_tree",
+            "statement_case_id": "p765_0102_commonsense_statement_abstract:time:grows_on_tree",
+            "context_cosine": 0.9465915036762369,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0049_commonsense_question_plant:wheat:category",
+            "statement_case_id": "p765_0050_commonsense_statement_plant:wheat:category",
+            "context_cosine": 0.97156517508666,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0051_commonsense_question_plant:wheat:edible",
+            "statement_case_id": "p765_0052_commonsense_statement_plant:wheat:edible",
+            "context_cosine": 0.9677705710743884,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0053_commonsense_question_plant:wheat:grows_on_tree",
+            "statement_case_id": "p765_0054_commonsense_statement_plant:wheat:grows_on_tree",
+            "context_cosine": 0.9584365912459579,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          }
+        ]
+      }
+    },
+    "glm4": {
+      "model": "glm4",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_glm4_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_glm4_rows.jsonl",
+      "label_counts": {
+        "exact_clean": 66,
+        "semantic_clean": 81,
+        "semantic_only": 15,
+        "semantic_fail": 27
+      },
+      "balanced_contrasts": {
+        "semantic_clean_vs_semantic_fail": {
+          "label_a": "semantic_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 16,
+          "label_a_balanced_ids": [
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0024_commonsense_statement_animal:cat:grows_on_tree",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "p765_0051_commonsense_question_plant:wheat:edible",
+            "p765_0052_commonsense_statement_plant:wheat:edible",
+            "p765_0055_commonsense_question_object:chair:category",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0057_commonsense_question_object:chair:edible",
+            "p765_0058_commonsense_statement_object:chair:edible",
+            "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "p765_0060_commonsense_statement_object:chair:grows_on_tree",
+            "p765_0091_commonsense_question_abstract:freedom:category",
+            "p765_0098_commonsense_statement_abstract:time:category",
+            "p765_0100_commonsense_statement_abstract:time:edible"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0030_commonsense_statement_animal:bird:grows_on_tree",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "p765_0061_commonsense_question_object:stone:category",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0064_commonsense_statement_object:stone:edible",
+            "p765_0069_commonsense_question_object:cup:edible",
+            "p765_0071_commonsense_question_object:cup:grows_on_tree",
+            "p765_0072_commonsense_statement_object:cup:grows_on_tree",
+            "p765_0092_commonsense_statement_abstract:freedom:category",
+            "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "p765_0097_commonsense_question_abstract:time:category"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "animal",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 81,
+          "label_b_available": 27,
+          "arm_a": {
+            "n_cases": 16,
+            "n_effect_rows": 160,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.5120941720036422,
+                "different_domain_mean": -0.21034779977989485,
+                "separation": -0.30174637222374734
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 6,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.4995139925638752,
+                "different_domain_mean": -0.1537948830921318,
+                "separation": -0.3457191094717434
+              }
+            ],
+            "mean_context_separation": -0.3237327408477454,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 4,
+                "same_object_mean": 0.775737150328416,
+                "same_domain_diff_object_mean": -0.5986128339527343,
+                "different_domain_mean": -0.2693178068432799,
+                "object_stability_gap": 1.3743499842811504,
+                "domain_stability_gap": -0.32929502710945446
+              }
+            ],
+            "mean_object_stability_gap": 1.3743499842811504,
+            "mean_domain_stability_gap": -0.32929502710945446
+          },
+          "arm_b": {
+            "n_cases": 16,
+            "n_effect_rows": 160,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 6,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6997175253934399,
+                "different_domain_mean": -0.11454835955642917,
+                "separation": -0.5851691658370107
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 7,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.7624905824816206,
+                "different_domain_mean": -0.04933839788324869,
+                "separation": -0.7131521845983719
+              }
+            ],
+            "mean_context_separation": -0.6491606752176913,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 5,
+                "same_object_mean": 0.5757166024524168,
+                "same_domain_diff_object_mean": -0.4672026431270302,
+                "different_domain_mean": -0.09304671034449105,
+                "object_stability_gap": 1.042919245579447,
+                "domain_stability_gap": -0.3741559327825391
+              }
+            ],
+            "mean_object_stability_gap": 1.042919245579447,
+            "mean_domain_stability_gap": -0.3741559327825391
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.3254279343699459,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": 0.3314307387017035,
+            "mean_domain_stability_gap": 0.04486090567308465
+          }
+        },
+        "exact_clean_vs_semantic_only": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_only",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 3,
+          "label_a_balanced_ids": [
+            "p765_0023_commonsense_question_animal:cat:grows_on_tree",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0075_commonsense_question_tool:hammer:edible"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0029_commonsense_question_animal:bird:grows_on_tree",
+            "p765_0053_commonsense_question_plant:wheat:grows_on_tree",
+            "p765_0087_commonsense_question_tool:scissors:edible"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "animal",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 66,
+          "label_b_available": 15,
+          "arm_a": {
+            "n_cases": 3,
+            "n_effect_rows": 30,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 3,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -0.34886532924260605,
+                "separation": 0.34886532924260605
+              }
+            ],
+            "mean_context_separation": 0.34886532924260605,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "arm_b": {
+            "n_cases": 3,
+            "n_effect_rows": 30,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 3,
+                "n_features": 80,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -0.3533672867652406,
+                "separation": 0.3533672867652406
+              }
+            ],
+            "mean_context_separation": 0.3533672867652406,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": -0.004501957522634548,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          }
+        },
+        "exact_clean_vs_semantic_fail": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 15,
+          "label_a_balanced_ids": [
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0024_commonsense_statement_animal:cat:grows_on_tree",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "p765_0051_commonsense_question_plant:wheat:edible",
+            "p765_0052_commonsense_statement_plant:wheat:edible",
+            "p765_0055_commonsense_question_object:chair:category",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0057_commonsense_question_object:chair:edible",
+            "p765_0058_commonsense_statement_object:chair:edible",
+            "p765_0060_commonsense_statement_object:chair:grows_on_tree",
+            "p765_0091_commonsense_question_abstract:freedom:category",
+            "p765_0098_commonsense_statement_abstract:time:category",
+            "p765_0100_commonsense_statement_abstract:time:edible"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0030_commonsense_statement_animal:bird:grows_on_tree",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "p765_0061_commonsense_question_object:stone:category",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0064_commonsense_statement_object:stone:edible",
+            "p765_0069_commonsense_question_object:cup:edible",
+            "p765_0072_commonsense_statement_object:cup:grows_on_tree",
+            "p765_0092_commonsense_statement_abstract:freedom:category",
+            "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "p765_0097_commonsense_question_abstract:time:category"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "animal",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 66,
+          "label_b_available": 27,
+          "arm_a": {
+            "n_cases": 15,
+            "n_effect_rows": 150,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.47798423102765214,
+                "different_domain_mean": -0.2241010442075525,
+                "separation": -0.25388318682009964
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 6,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.4995139925638752,
+                "different_domain_mean": -0.1537948830921318,
+                "separation": -0.3457191094717434
+              }
+            ],
+            "mean_context_separation": -0.2998011481459215,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 4,
+                "same_object_mean": 0.724887958835488,
+                "same_domain_diff_object_mean": -0.6633311543367976,
+                "different_domain_mean": -0.22328795119293227,
+                "object_stability_gap": 1.3882191131722856,
+                "domain_stability_gap": -0.4400432031438653
+              }
+            ],
+            "mean_object_stability_gap": 1.3882191131722856,
+            "mean_domain_stability_gap": -0.4400432031438653
+          },
+          "arm_b": {
+            "n_cases": 15,
+            "n_effect_rows": 150,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 6,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.5006476070807829,
+                "different_domain_mean": -0.1536701065360966,
+                "separation": -0.34697750054468635
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 7,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.7624905824816206,
+                "different_domain_mean": -0.04933839788324869,
+                "separation": -0.7131521845983719
+              }
+            ],
+            "mean_context_separation": -0.5300648425715291,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 5,
+                "same_object_mean": 0.4776949750812315,
+                "same_domain_diff_object_mean": -0.3624258645667316,
+                "different_domain_mean": -0.10535321548931513,
+                "object_stability_gap": 0.8401208396479631,
+                "domain_stability_gap": -0.25707264907741645
+              }
+            ],
+            "mean_object_stability_gap": 0.8401208396479631,
+            "mean_domain_stability_gap": -0.25707264907741645
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.23026369442560757,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": 0.5480982735243225,
+            "mean_domain_stability_gap": -0.18297055406644885
+          }
+        },
+        "semantic_only_vs_semantic_fail": {
+          "label_a": "semantic_only",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 2,
+          "label_a_balanced_ids": [
+            "p765_0053_commonsense_question_plant:wheat:grows_on_tree",
+            "p765_0059_commonsense_question_object:chair:grows_on_tree"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0071_commonsense_question_object:cup:grows_on_tree"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 1,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 15,
+          "label_b_available": 27,
+          "arm_a": {
+            "n_cases": 2,
+            "n_effect_rows": 20,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 40,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              }
+            ],
+            "mean_context_separation": 1.0,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "arm_b": {
+            "n_cases": 2,
+            "n_effect_rows": 20,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 40,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              }
+            ],
+            "mean_context_separation": 1.0,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.0,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          }
+        }
+      },
+      "paired_context_stability": {
+        "n_pairs": 54,
+        "mean_context_cosine": 0.9286471946108174,
+        "by_semantic_pair": {
+          "both_clean": {
+            "n_pairs": 38,
+            "mean_context_cosine": 0.9310826972448855
+          },
+          "both_fail": {
+            "n_pairs": 11,
+            "mean_context_cosine": 0.9181267739334686
+          },
+          "mixed": {
+            "n_pairs": 5,
+            "mean_context_cosine": 0.9332823000820675
+          }
+        },
+        "by_exact_pair": {
+          "both_clean": {
+            "n_pairs": 25,
+            "mean_context_cosine": 0.948741829707088
+          },
+          "both_fail": {
+            "n_pairs": 13,
+            "mean_context_cosine": 0.9178221777520291
+          },
+          "mixed": {
+            "n_pairs": 16,
+            "mean_context_cosine": 0.9060446534706599
+          }
+        },
+        "by_lexical_pair": {
+          "exact__exact": {
+            "n_pairs": 25,
+            "mean_context_cosine": 0.948741829707088
+          },
+          "exact__semantic_fail": {
+            "n_pairs": 3,
+            "mean_context_cosine": 0.9447059009673714
+          },
+          "exact__semantic_only": {
+            "n_pairs": 13,
+            "mean_context_cosine": 0.8971228271252649
+          },
+          "semantic_fail__semantic_fail": {
+            "n_pairs": 11,
+            "mean_context_cosine": 0.9181267739334686
+          },
+          "semantic_fail__semantic_only": {
+            "n_pairs": 2,
+            "mean_context_cosine": 0.9161468987541116
+          }
+        },
+        "rows": [
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0001_commonsense_question_fruit:apple:category",
+            "statement_case_id": "p765_0002_commonsense_statement_fruit:apple:category",
+            "context_cosine": 0.9258412573391083,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0003_commonsense_question_fruit:apple:edible",
+            "statement_case_id": "p765_0004_commonsense_statement_fruit:apple:edible",
+            "context_cosine": 0.9440705829181785,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "statement_case_id": "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "context_cosine": 0.6975301311014765,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0007_commonsense_question_fruit:banana:category",
+            "statement_case_id": "p765_0008_commonsense_statement_fruit:banana:category",
+            "context_cosine": 0.9903858253522377,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0009_commonsense_question_fruit:banana:edible",
+            "statement_case_id": "p765_0010_commonsense_statement_fruit:banana:edible",
+            "context_cosine": 0.980989799215437,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "statement_case_id": "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "context_cosine": 0.8981270234378966,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0025_commonsense_question_animal:bird:category",
+            "statement_case_id": "p765_0026_commonsense_statement_animal:bird:category",
+            "context_cosine": 0.9493681498335583,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0027_commonsense_question_animal:bird:edible",
+            "statement_case_id": "p765_0028_commonsense_statement_animal:bird:edible",
+            "context_cosine": 0.9404585124043341,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0029_commonsense_question_animal:bird:grows_on_tree",
+            "statement_case_id": "p765_0030_commonsense_statement_animal:bird:grows_on_tree",
+            "context_cosine": 0.9240018400281726,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0019_commonsense_question_animal:cat:category",
+            "statement_case_id": "p765_0020_commonsense_statement_animal:cat:category",
+            "context_cosine": 0.9745189613002885,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0021_commonsense_question_animal:cat:edible",
+            "statement_case_id": "p765_0022_commonsense_statement_animal:cat:edible",
+            "context_cosine": 0.9678633635195514,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0023_commonsense_question_animal:cat:grows_on_tree",
+            "statement_case_id": "p765_0024_commonsense_statement_animal:cat:grows_on_tree",
+            "context_cosine": 0.9668794172673598,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0055_commonsense_question_object:chair:category",
+            "statement_case_id": "p765_0056_commonsense_statement_object:chair:category",
+            "context_cosine": 0.9569052806284027,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0057_commonsense_question_object:chair:edible",
+            "statement_case_id": "p765_0058_commonsense_statement_object:chair:edible",
+            "context_cosine": 0.9639583108289258,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "statement_case_id": "p765_0060_commonsense_statement_object:chair:grows_on_tree",
+            "context_cosine": 0.841307664540711,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0067_commonsense_question_object:cup:category",
+            "statement_case_id": "p765_0068_commonsense_statement_object:cup:category",
+            "context_cosine": 0.9830165834964039,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0069_commonsense_question_object:cup:edible",
+            "statement_case_id": "p765_0070_commonsense_statement_object:cup:edible",
+            "context_cosine": 0.9262958638994236,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0071_commonsense_question_object:cup:grows_on_tree",
+            "statement_case_id": "p765_0072_commonsense_statement_object:cup:grows_on_tree",
+            "context_cosine": 0.883973649491821,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0031_commonsense_question_animal:dog:category",
+            "statement_case_id": "p765_0032_commonsense_statement_animal:dog:category",
+            "context_cosine": 0.9465499981510168,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0033_commonsense_question_animal:dog:edible",
+            "statement_case_id": "p765_0034_commonsense_statement_animal:dog:edible",
+            "context_cosine": 0.9229821828211893,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0035_commonsense_question_animal:dog:grows_on_tree",
+            "statement_case_id": "p765_0036_commonsense_statement_animal:dog:grows_on_tree",
+            "context_cosine": 0.9648559377829535,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0091_commonsense_question_abstract:freedom:category",
+            "statement_case_id": "p765_0092_commonsense_statement_abstract:freedom:category",
+            "context_cosine": 0.9344916889524615,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0093_commonsense_question_abstract:freedom:edible",
+            "statement_case_id": "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "context_cosine": 0.9082919574800505,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0095_commonsense_question_abstract:freedom:grows_on_tree",
+            "statement_case_id": "p765_0096_commonsense_statement_abstract:freedom:grows_on_tree",
+            "context_cosine": 0.9173966708396265,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0073_commonsense_question_tool:hammer:category",
+            "statement_case_id": "p765_0074_commonsense_statement_tool:hammer:category",
+            "context_cosine": 0.9757136474720021,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0075_commonsense_question_tool:hammer:edible",
+            "statement_case_id": "p765_0076_commonsense_statement_tool:hammer:edible",
+            "context_cosine": 0.9673238249131976,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0077_commonsense_question_tool:hammer:grows_on_tree",
+            "statement_case_id": "p765_0078_commonsense_statement_tool:hammer:grows_on_tree",
+            "context_cosine": 0.9009332494770955,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0103_commonsense_question_abstract:justice:category",
+            "statement_case_id": "p765_0104_commonsense_statement_abstract:justice:category",
+            "context_cosine": 0.9540331319340246,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0105_commonsense_question_abstract:justice:edible",
+            "statement_case_id": "p765_0106_commonsense_statement_abstract:justice:edible",
+            "context_cosine": 0.9594734250031381,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0107_commonsense_question_abstract:justice:grows_on_tree",
+            "statement_case_id": "p765_0108_commonsense_statement_abstract:justice:grows_on_tree",
+            "context_cosine": 0.927666498422595,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0079_commonsense_question_tool:knife:category",
+            "statement_case_id": "p765_0080_commonsense_statement_tool:knife:category",
+            "context_cosine": 0.9930123668686981,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0081_commonsense_question_tool:knife:edible",
+            "statement_case_id": "p765_0082_commonsense_statement_tool:knife:edible",
+            "context_cosine": 0.9760737529808773,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0083_commonsense_question_tool:knife:grows_on_tree",
+            "statement_case_id": "p765_0084_commonsense_statement_tool:knife:grows_on_tree",
+            "context_cosine": 0.9001447550543829,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0037_commonsense_question_plant:oak:category",
+            "statement_case_id": "p765_0038_commonsense_statement_plant:oak:category",
+            "context_cosine": 0.9754691742998094,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0039_commonsense_question_plant:oak:edible",
+            "statement_case_id": "p765_0040_commonsense_statement_plant:oak:edible",
+            "context_cosine": 0.9730231987950453,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "statement_case_id": "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "context_cosine": 0.8658494231272027,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0013_commonsense_question_fruit:pear:category",
+            "statement_case_id": "p765_0014_commonsense_statement_fruit:pear:category",
+            "context_cosine": 0.9876544134790236,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0015_commonsense_question_fruit:pear:edible",
+            "statement_case_id": "p765_0016_commonsense_statement_fruit:pear:edible",
+            "context_cosine": 0.921235995590591,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0017_commonsense_question_fruit:pear:grows_on_tree",
+            "statement_case_id": "p765_0018_commonsense_statement_fruit:pear:grows_on_tree",
+            "context_cosine": 0.8743003754028005,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0043_commonsense_question_plant:rose:category",
+            "statement_case_id": "p765_0044_commonsense_statement_plant:rose:category",
+            "context_cosine": 0.9812488972114357,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0045_commonsense_question_plant:rose:edible",
+            "statement_case_id": "p765_0046_commonsense_statement_plant:rose:edible",
+            "context_cosine": 0.8908541562527253,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "statement_case_id": "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "context_cosine": 0.7566073824520407,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0085_commonsense_question_tool:scissors:category",
+            "statement_case_id": "p765_0086_commonsense_statement_tool:scissors:category",
+            "context_cosine": 0.9909154998562957,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0087_commonsense_question_tool:scissors:edible",
+            "statement_case_id": "p765_0088_commonsense_statement_tool:scissors:edible",
+            "context_cosine": 0.8481087031712323,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0089_commonsense_question_tool:scissors:grows_on_tree",
+            "statement_case_id": "p765_0090_commonsense_statement_tool:scissors:grows_on_tree",
+            "context_cosine": 0.8368746547132916,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0061_commonsense_question_object:stone:category",
+            "statement_case_id": "p765_0062_commonsense_statement_object:stone:category",
+            "context_cosine": 0.9851760482601039,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0063_commonsense_question_object:stone:edible",
+            "statement_case_id": "p765_0064_commonsense_statement_object:stone:edible",
+            "context_cosine": 0.9355682773548426,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0065_commonsense_question_object:stone:grows_on_tree",
+            "statement_case_id": "p765_0066_commonsense_statement_object:stone:grows_on_tree",
+            "context_cosine": 0.8613290515050667,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0097_commonsense_question_abstract:time:category",
+            "statement_case_id": "p765_0098_commonsense_statement_abstract:time:category",
+            "context_cosine": 0.96405773659481,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0099_commonsense_question_abstract:time:edible",
+            "statement_case_id": "p765_0100_commonsense_statement_abstract:time:edible",
+            "context_cosine": 0.9871158862165523,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0101_commonsense_question_abstract:time:grows_on_tree",
+            "statement_case_id": "p765_0102_commonsense_statement_abstract:time:grows_on_tree",
+            "context_cosine": 0.9199102493085057,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0049_commonsense_question_plant:wheat:category",
+            "statement_case_id": "p765_0050_commonsense_statement_plant:wheat:category",
+            "context_cosine": 0.9866241331428692,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0051_commonsense_question_plant:wheat:edible",
+            "statement_case_id": "p765_0052_commonsense_statement_plant:wheat:edible",
+            "context_cosine": 0.9431099409000032,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0053_commonsense_question_plant:wheat:grows_on_tree",
+            "statement_case_id": "p765_0054_commonsense_statement_plant:wheat:grows_on_tree",
+            "context_cosine": 0.7974800065932924,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          }
+        ]
+      }
+    },
+    "deepseek7b": {
+      "model": "deepseek7b",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_deepseek7b_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_deepseek7b_rows.jsonl",
+      "label_counts": {
+        "exact_clean": 19,
+        "semantic_clean": 38,
+        "semantic_only": 19,
+        "semantic_fail": 70
+      },
+      "balanced_contrasts": {
+        "semantic_clean_vs_semantic_fail": {
+          "label_a": "semantic_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 18,
+          "label_a_balanced_ids": [
+            "p765_0001_commonsense_question_fruit:apple:category",
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0020_commonsense_statement_animal:cat:category",
+            "p765_0033_commonsense_question_animal:dog:edible",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "p765_0050_commonsense_statement_plant:wheat:category",
+            "p765_0051_commonsense_question_plant:wheat:edible",
+            "p765_0052_commonsense_statement_plant:wheat:edible",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0057_commonsense_question_object:chair:edible",
+            "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "p765_0073_commonsense_question_tool:hammer:category",
+            "p765_0075_commonsense_question_tool:hammer:edible",
+            "p765_0083_commonsense_question_tool:knife:grows_on_tree",
+            "p765_0101_commonsense_question_abstract:time:grows_on_tree",
+            "p765_0103_commonsense_question_abstract:justice:category"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0013_commonsense_question_fruit:pear:category",
+            "p765_0021_commonsense_question_animal:cat:edible",
+            "p765_0026_commonsense_statement_animal:bird:category",
+            "p765_0038_commonsense_statement_plant:oak:category",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0063_commonsense_question_object:stone:edible",
+            "p765_0065_commonsense_question_object:stone:grows_on_tree",
+            "p765_0077_commonsense_question_tool:hammer:grows_on_tree",
+            "p765_0079_commonsense_question_tool:knife:category",
+            "p765_0081_commonsense_question_tool:knife:edible",
+            "p765_0091_commonsense_question_abstract:freedom:category",
+            "p765_0095_commonsense_question_abstract:freedom:grows_on_tree"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "animal",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "animal",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 38,
+          "label_b_available": 70,
+          "arm_a": {
+            "n_cases": 18,
+            "n_effect_rows": 180,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 9,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.5134671656867048,
+                "different_domain_mean": -0.08402962336031969,
+                "separation": -0.4294375423263851
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6649027413669595,
+                "different_domain_mean": -0.19306578021620502,
+                "separation": -0.47183696115075446
+              }
+            ],
+            "mean_context_separation": -0.4506372517385698,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 4,
+                "same_object_mean": -0.08482597625861389,
+                "same_domain_diff_object_mean": -0.41804153577952685,
+                "different_domain_mean": -0.05896181052909692,
+                "object_stability_gap": 0.333215559520913,
+                "domain_stability_gap": -0.3590797252504299
+              }
+            ],
+            "mean_object_stability_gap": 0.333215559520913,
+            "mean_domain_stability_gap": -0.3590797252504299
+          },
+          "arm_b": {
+            "n_cases": 18,
+            "n_effect_rows": 180,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 9,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6232458869646805,
+                "different_domain_mean": -0.0769550917107625,
+                "separation": -0.546290795253918
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6800097013239709,
+                "different_domain_mean": -0.196969710061468,
+                "separation": -0.48303999126250285
+              }
+            ],
+            "mean_context_separation": -0.5146653932582104,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 4,
+                "same_object_mean": -0.033879803902666525,
+                "same_domain_diff_object_mean": -0.43633356976071636,
+                "different_domain_mean": -0.2862739902385456,
+                "object_stability_gap": 0.4024537658580498,
+                "domain_stability_gap": -0.15005957952217075
+              }
+            ],
+            "mean_object_stability_gap": 0.4024537658580498,
+            "mean_domain_stability_gap": -0.15005957952217075
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.06402814151964059,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": -0.06923820633713684,
+            "mean_domain_stability_gap": -0.20902014572825917
+          }
+        },
+        "exact_clean_vs_semantic_only": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_only",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 0,
+          "label_a_balanced_ids": [],
+          "label_b_balanced_ids": [],
+          "strata": [],
+          "label_a_available": 19,
+          "label_b_available": 19,
+          "arm_a": {
+            "n_cases": 0,
+            "n_effect_rows": 0,
+            "contexts": [],
+            "mean_context_separation": null,
+            "mean_context_nn_domain_accuracy": null,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "arm_b": {
+            "n_cases": 0,
+            "n_effect_rows": 0,
+            "contexts": [],
+            "mean_context_separation": null,
+            "mean_context_nn_domain_accuracy": null,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": null,
+            "mean_context_nn_domain_accuracy": null,
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          }
+        },
+        "exact_clean_vs_semantic_fail": {
+          "label_a": "exact_clean",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 8,
+          "label_a_balanced_ids": [
+            "p765_0001_commonsense_question_fruit:apple:category",
+            "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "p765_0020_commonsense_statement_animal:cat:category",
+            "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "p765_0050_commonsense_statement_plant:wheat:category",
+            "p765_0052_commonsense_statement_plant:wheat:edible",
+            "p765_0056_commonsense_statement_object:chair:category",
+            "p765_0073_commonsense_question_tool:hammer:category"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "p765_0013_commonsense_question_fruit:pear:category",
+            "p765_0026_commonsense_statement_animal:bird:category",
+            "p765_0038_commonsense_statement_plant:oak:category",
+            "p765_0040_commonsense_statement_plant:oak:edible",
+            "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "p765_0062_commonsense_statement_object:stone:category",
+            "p765_0079_commonsense_question_tool:knife:category"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "animal",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "category",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_statement"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 19,
+          "label_b_available": 70,
+          "arm_a": {
+            "n_cases": 8,
+            "n_effect_rows": 80,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 40,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6649027413669595,
+                "different_domain_mean": -0.19306578021620502,
+                "separation": -0.47183696115075446
+              }
+            ],
+            "mean_context_separation": 0.26408151942462277,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [
+              {
+                "context_a": "commonsense_question",
+                "context_b": "commonsense_statement",
+                "common_objects": 1,
+                "same_object_mean": -1.0,
+                "same_domain_diff_object_mean": null,
+                "different_domain_mean": null,
+                "object_stability_gap": -1.0,
+                "domain_stability_gap": 0.0
+              }
+            ],
+            "mean_object_stability_gap": -1.0,
+            "mean_domain_stability_gap": 0.0
+          },
+          "arm_b": {
+            "n_cases": 8,
+            "n_effect_rows": 80,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 2,
+                "n_features": 40,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": null,
+                "different_domain_mean": -1.0,
+                "separation": 1.0
+              },
+              {
+                "context": "commonsense_statement",
+                "n_objects": 5,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.6800097013239709,
+                "different_domain_mean": -0.196969710061468,
+                "separation": -0.48303999126250285
+              }
+            ],
+            "mean_context_separation": 0.2584800043687486,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.0056015150558741955,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          }
+        },
+        "semantic_only_vs_semantic_fail": {
+          "label_a": "semantic_only",
+          "label_b": "semantic_fail",
+          "strata_keys": [
+            "domain",
+            "relation",
+            "context_format"
+          ],
+          "n_strata": 10,
+          "label_a_balanced_ids": [
+            "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "p765_0033_commonsense_question_animal:dog:edible",
+            "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "p765_0051_commonsense_question_plant:wheat:edible",
+            "p765_0057_commonsense_question_object:chair:edible",
+            "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "p765_0075_commonsense_question_tool:hammer:edible",
+            "p765_0083_commonsense_question_tool:knife:grows_on_tree",
+            "p765_0101_commonsense_question_abstract:time:grows_on_tree",
+            "p765_0103_commonsense_question_abstract:justice:category"
+          ],
+          "label_b_balanced_ids": [
+            "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "p765_0021_commonsense_question_animal:cat:edible",
+            "p765_0039_commonsense_question_plant:oak:edible",
+            "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "p765_0063_commonsense_question_object:stone:edible",
+            "p765_0065_commonsense_question_object:stone:grows_on_tree",
+            "p765_0077_commonsense_question_tool:hammer:grows_on_tree",
+            "p765_0081_commonsense_question_tool:knife:edible",
+            "p765_0091_commonsense_question_abstract:freedom:category",
+            "p765_0095_commonsense_question_abstract:freedom:grows_on_tree"
+          ],
+          "strata": [
+            {
+              "stratum": [
+                "abstract",
+                "category",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "abstract",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "animal",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "fruit",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "object",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "plant",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "edible",
+                "commonsense_question"
+              ],
+              "label_a_available": 2,
+              "label_b_available": 1,
+              "taken_each": 1
+            },
+            {
+              "stratum": [
+                "tool",
+                "grows_on_tree",
+                "commonsense_question"
+              ],
+              "label_a_available": 1,
+              "label_b_available": 2,
+              "taken_each": 1
+            }
+          ],
+          "label_a_available": 19,
+          "label_b_available": 70,
+          "arm_a": {
+            "n_cases": 10,
+            "n_effect_rows": 100,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 9,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.5501387458951273,
+                "different_domain_mean": -0.08283602765701199,
+                "separation": -0.46730271823811537
+              }
+            ],
+            "mean_context_separation": -0.46730271823811537,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "arm_b": {
+            "n_cases": 10,
+            "n_effect_rows": 100,
+            "contexts": [
+              {
+                "context": "commonsense_question",
+                "n_objects": 8,
+                "n_features": 120,
+                "nn_domain_accuracy": 0.0,
+                "same_domain_mean": -0.7783146477505313,
+                "different_domain_mean": -0.09151631454176254,
+                "separation": -0.6867983332087687
+              }
+            ],
+            "mean_context_separation": -0.6867983332087687,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "cross_context_stability": [],
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          },
+          "delta_a_minus_b": {
+            "mean_context_separation": 0.21949561497065334,
+            "mean_context_nn_domain_accuracy": 0.0,
+            "mean_object_stability_gap": null,
+            "mean_domain_stability_gap": null
+          }
+        }
+      },
+      "paired_context_stability": {
+        "n_pairs": 54,
+        "mean_context_cosine": 0.6658276279569769,
+        "by_semantic_pair": {
+          "both_clean": {
+            "n_pairs": 10,
+            "mean_context_cosine": 0.6359383804492869
+          },
+          "both_fail": {
+            "n_pairs": 26,
+            "mean_context_cosine": 0.6398555704574019
+          },
+          "mixed": {
+            "n_pairs": 18,
+            "mean_context_cosine": 0.7199479596273021
+          }
+        },
+        "by_exact_pair": {
+          "both_clean": {
+            "n_pairs": 3,
+            "mean_context_cosine": 0.7382226525917557
+          },
+          "both_fail": {
+            "n_pairs": 38,
+            "mean_context_cosine": 0.6613991215625364
+          },
+          "mixed": {
+            "n_pairs": 13,
+            "mean_context_cosine": 0.6620659486557771
+          }
+        },
+        "by_lexical_pair": {
+          "exact__exact": {
+            "n_pairs": 3,
+            "mean_context_cosine": 0.7382226525917557
+          },
+          "exact__semantic_fail": {
+            "n_pairs": 6,
+            "mean_context_cosine": 0.7436902476345836
+          },
+          "exact__semantic_only": {
+            "n_pairs": 7,
+            "mean_context_cosine": 0.5921022638168001
+          },
+          "semantic_fail__semantic_fail": {
+            "n_pairs": 26,
+            "mean_context_cosine": 0.6398555704574019
+          },
+          "semantic_fail__semantic_only": {
+            "n_pairs": 12,
+            "mean_context_cosine": 0.7080768156236613
+          }
+        },
+        "rows": [
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0001_commonsense_question_fruit:apple:category",
+            "statement_case_id": "p765_0002_commonsense_statement_fruit:apple:category",
+            "context_cosine": 0.9151613914534935,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0003_commonsense_question_fruit:apple:edible",
+            "statement_case_id": "p765_0004_commonsense_statement_fruit:apple:edible",
+            "context_cosine": 0.5732609222114743,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "apple",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0005_commonsense_question_fruit:apple:grows_on_tree",
+            "statement_case_id": "p765_0006_commonsense_statement_fruit:apple:grows_on_tree",
+            "context_cosine": 0.7107065744833454,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0007_commonsense_question_fruit:banana:category",
+            "statement_case_id": "p765_0008_commonsense_statement_fruit:banana:category",
+            "context_cosine": 0.8892017749377693,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0009_commonsense_question_fruit:banana:edible",
+            "statement_case_id": "p765_0010_commonsense_statement_fruit:banana:edible",
+            "context_cosine": 0.4406673513647235,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "banana",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0011_commonsense_question_fruit:banana:grows_on_tree",
+            "statement_case_id": "p765_0012_commonsense_statement_fruit:banana:grows_on_tree",
+            "context_cosine": 0.4938364498291314,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0025_commonsense_question_animal:bird:category",
+            "statement_case_id": "p765_0026_commonsense_statement_animal:bird:category",
+            "context_cosine": 0.851114671094619,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0027_commonsense_question_animal:bird:edible",
+            "statement_case_id": "p765_0028_commonsense_statement_animal:bird:edible",
+            "context_cosine": 0.6866127676333121,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "bird",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0029_commonsense_question_animal:bird:grows_on_tree",
+            "statement_case_id": "p765_0030_commonsense_statement_animal:bird:grows_on_tree",
+            "context_cosine": 0.5260553583213582,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0019_commonsense_question_animal:cat:category",
+            "statement_case_id": "p765_0020_commonsense_statement_animal:cat:category",
+            "context_cosine": 0.8153638996866907,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0021_commonsense_question_animal:cat:edible",
+            "statement_case_id": "p765_0022_commonsense_statement_animal:cat:edible",
+            "context_cosine": 0.6383998766818128,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cat",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0023_commonsense_question_animal:cat:grows_on_tree",
+            "statement_case_id": "p765_0024_commonsense_statement_animal:cat:grows_on_tree",
+            "context_cosine": 0.4812944819503298,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0055_commonsense_question_object:chair:category",
+            "statement_case_id": "p765_0056_commonsense_statement_object:chair:category",
+            "context_cosine": 0.8381775257738866,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0057_commonsense_question_object:chair:edible",
+            "statement_case_id": "p765_0058_commonsense_statement_object:chair:edible",
+            "context_cosine": 0.45027183786418185,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "chair",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0059_commonsense_question_object:chair:grows_on_tree",
+            "statement_case_id": "p765_0060_commonsense_statement_object:chair:grows_on_tree",
+            "context_cosine": 0.5786666380563568,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0067_commonsense_question_object:cup:category",
+            "statement_case_id": "p765_0068_commonsense_statement_object:cup:category",
+            "context_cosine": 0.8824392505195562,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0069_commonsense_question_object:cup:edible",
+            "statement_case_id": "p765_0070_commonsense_statement_object:cup:edible",
+            "context_cosine": 0.6480886582198455,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "cup",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0071_commonsense_question_object:cup:grows_on_tree",
+            "statement_case_id": "p765_0072_commonsense_statement_object:cup:grows_on_tree",
+            "context_cosine": 0.6935613202768282,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "category",
+            "question_case_id": "p765_0031_commonsense_question_animal:dog:category",
+            "statement_case_id": "p765_0032_commonsense_statement_animal:dog:category",
+            "context_cosine": 0.7931110054122993,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "edible",
+            "question_case_id": "p765_0033_commonsense_question_animal:dog:edible",
+            "statement_case_id": "p765_0034_commonsense_statement_animal:dog:edible",
+            "context_cosine": 0.7484995538318627,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "dog",
+            "domain": "animal",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0035_commonsense_question_animal:dog:grows_on_tree",
+            "statement_case_id": "p765_0036_commonsense_statement_animal:dog:grows_on_tree",
+            "context_cosine": 0.6322849335257993,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0091_commonsense_question_abstract:freedom:category",
+            "statement_case_id": "p765_0092_commonsense_statement_abstract:freedom:category",
+            "context_cosine": 0.6920740175097889,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0093_commonsense_question_abstract:freedom:edible",
+            "statement_case_id": "p765_0094_commonsense_statement_abstract:freedom:edible",
+            "context_cosine": 0.7000920698401162,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "freedom",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0095_commonsense_question_abstract:freedom:grows_on_tree",
+            "statement_case_id": "p765_0096_commonsense_statement_abstract:freedom:grows_on_tree",
+            "context_cosine": 0.9171056797032213,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0073_commonsense_question_tool:hammer:category",
+            "statement_case_id": "p765_0074_commonsense_statement_tool:hammer:category",
+            "context_cosine": 0.4103047913840042,
+            "semantic_pair": "both_clean",
+            "exact_pair": "both_clean",
+            "lexical_pair": "exact__exact"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0075_commonsense_question_tool:hammer:edible",
+            "statement_case_id": "p765_0076_commonsense_statement_tool:hammer:edible",
+            "context_cosine": 0.7812633110721869,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "hammer",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0077_commonsense_question_tool:hammer:grows_on_tree",
+            "statement_case_id": "p765_0078_commonsense_statement_tool:hammer:grows_on_tree",
+            "context_cosine": 0.39605519269103623,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0103_commonsense_question_abstract:justice:category",
+            "statement_case_id": "p765_0104_commonsense_statement_abstract:justice:category",
+            "context_cosine": 0.7250596801385584,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0105_commonsense_question_abstract:justice:edible",
+            "statement_case_id": "p765_0106_commonsense_statement_abstract:justice:edible",
+            "context_cosine": 0.7638285446744617,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "justice",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0107_commonsense_question_abstract:justice:grows_on_tree",
+            "statement_case_id": "p765_0108_commonsense_statement_abstract:justice:grows_on_tree",
+            "context_cosine": 0.8751153736857894,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0079_commonsense_question_tool:knife:category",
+            "statement_case_id": "p765_0080_commonsense_statement_tool:knife:category",
+            "context_cosine": 0.6273530582065397,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0081_commonsense_question_tool:knife:edible",
+            "statement_case_id": "p765_0082_commonsense_statement_tool:knife:edible",
+            "context_cosine": 0.5905373746682282,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "knife",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0083_commonsense_question_tool:knife:grows_on_tree",
+            "statement_case_id": "p765_0084_commonsense_statement_tool:knife:grows_on_tree",
+            "context_cosine": 0.6537599306155615,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0037_commonsense_question_plant:oak:category",
+            "statement_case_id": "p765_0038_commonsense_statement_plant:oak:category",
+            "context_cosine": 0.8569934960144938,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0039_commonsense_question_plant:oak:edible",
+            "statement_case_id": "p765_0040_commonsense_statement_plant:oak:edible",
+            "context_cosine": 0.6805185109919201,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "oak",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0041_commonsense_question_plant:oak:grows_on_tree",
+            "statement_case_id": "p765_0042_commonsense_statement_plant:oak:grows_on_tree",
+            "context_cosine": 0.502852202122976,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "category",
+            "question_case_id": "p765_0013_commonsense_question_fruit:pear:category",
+            "statement_case_id": "p765_0014_commonsense_statement_fruit:pear:category",
+            "context_cosine": 0.7010386173832918,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "edible",
+            "question_case_id": "p765_0015_commonsense_question_fruit:pear:edible",
+            "statement_case_id": "p765_0016_commonsense_statement_fruit:pear:edible",
+            "context_cosine": 0.61114420147132,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "pear",
+            "domain": "fruit",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0017_commonsense_question_fruit:pear:grows_on_tree",
+            "statement_case_id": "p765_0018_commonsense_statement_fruit:pear:grows_on_tree",
+            "context_cosine": 0.5917218143611386,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0043_commonsense_question_plant:rose:category",
+            "statement_case_id": "p765_0044_commonsense_statement_plant:rose:category",
+            "context_cosine": 0.8576254951265663,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0045_commonsense_question_plant:rose:edible",
+            "statement_case_id": "p765_0046_commonsense_statement_plant:rose:edible",
+            "context_cosine": 0.4984036851812824,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "rose",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0047_commonsense_question_plant:rose:grows_on_tree",
+            "statement_case_id": "p765_0048_commonsense_statement_plant:rose:grows_on_tree",
+            "context_cosine": 0.480892874439295,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "category",
+            "question_case_id": "p765_0085_commonsense_question_tool:scissors:category",
+            "statement_case_id": "p765_0086_commonsense_statement_tool:scissors:category",
+            "context_cosine": 0.6107083777970346,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "edible",
+            "question_case_id": "p765_0087_commonsense_question_tool:scissors:edible",
+            "statement_case_id": "p765_0088_commonsense_statement_tool:scissors:edible",
+            "context_cosine": 0.676669718251237,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "scissors",
+            "domain": "tool",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0089_commonsense_question_tool:scissors:grows_on_tree",
+            "statement_case_id": "p765_0090_commonsense_statement_tool:scissors:grows_on_tree",
+            "context_cosine": 0.6492089469069819,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "category",
+            "question_case_id": "p765_0061_commonsense_question_object:stone:category",
+            "statement_case_id": "p765_0062_commonsense_statement_object:stone:category",
+            "context_cosine": 0.6891433969310656,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "edible",
+            "question_case_id": "p765_0063_commonsense_question_object:stone:edible",
+            "statement_case_id": "p765_0064_commonsense_statement_object:stone:edible",
+            "context_cosine": 0.4377008243962435,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "stone",
+            "domain": "object",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0065_commonsense_question_object:stone:grows_on_tree",
+            "statement_case_id": "p765_0066_commonsense_statement_object:stone:grows_on_tree",
+            "context_cosine": 0.311760932207122,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "category",
+            "question_case_id": "p765_0097_commonsense_question_abstract:time:category",
+            "statement_case_id": "p765_0098_commonsense_statement_abstract:time:category",
+            "context_cosine": 0.7121119138413133,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "edible",
+            "question_case_id": "p765_0099_commonsense_question_abstract:time:edible",
+            "statement_case_id": "p765_0100_commonsense_statement_abstract:time:edible",
+            "context_cosine": 0.8416712335637793,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "time",
+            "domain": "abstract",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0101_commonsense_question_abstract:time:grows_on_tree",
+            "statement_case_id": "p765_0102_commonsense_statement_abstract:time:grows_on_tree",
+            "context_cosine": 0.7020238958898437,
+            "semantic_pair": "mixed",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_only"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "category",
+            "question_case_id": "p765_0049_commonsense_question_plant:wheat:category",
+            "statement_case_id": "p765_0050_commonsense_statement_plant:wheat:category",
+            "context_cosine": 0.8695000069600585,
+            "semantic_pair": "mixed",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_fail"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "edible",
+            "question_case_id": "p765_0051_commonsense_question_plant:wheat:edible",
+            "statement_case_id": "p765_0052_commonsense_statement_plant:wheat:edible",
+            "context_cosine": 0.7143627807026229,
+            "semantic_pair": "both_clean",
+            "exact_pair": "mixed",
+            "lexical_pair": "exact__semantic_only"
+          },
+          {
+            "object": "wheat",
+            "domain": "plant",
+            "relation": "grows_on_tree",
+            "question_case_id": "p765_0053_commonsense_question_plant:wheat:grows_on_tree",
+            "statement_case_id": "p765_0054_commonsense_statement_plant:wheat:grows_on_tree",
+            "context_cosine": 0.5393137178189993,
+            "semantic_pair": "both_fail",
+            "exact_pair": "both_fail",
+            "lexical_pair": "semantic_fail__semantic_fail"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,748 @@
+[14:39:57] glm4/confirm: pairs=48 seed_candidates=2 sources=['records_all', 'target_record_line']
+[14:39:58] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<00:48,  9.20it/s]Loading weights:   6%|▌         | 26/443 [00:00<00:03, 135.77it/s]Loading weights:  13%|█▎        | 57/443 [00:00<00:01, 201.33it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 250.81it/s]Loading weights:  28%|██▊       | 124/443 [00:00<00:01, 259.81it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:00, 284.15it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 283.98it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 292.69it/s]Loading weights:  58%|█████▊    | 258/443 [00:00<00:00, 294.70it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 302.70it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 297.74it/s]Loading weights:  80%|████████  | 356/443 [00:01<00:00, 304.10it/s]Loading weights:  88%|████████▊ | 388/443 [00:01<00:00, 304.71it/s]Loading weights:  95%|█████████▌| 422/443 [00:01<00:00, 309.66it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 284.19it/s]
+[14:40:00] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[14:40:00] glm4: expanded_candidates=4 combo_sites=['L36:attn_out', 'L36:mlp_out', 'L37:attn_out', 'L37:mlp_out', 'L38:attn_out', 'L38:mlp_out', 'L39:attn_out', 'L39:mlp_out']
+[14:40:37] glm4: multisite carrier 8/48 pairs; rows=576
+[14:41:15] glm4: multisite carrier 16/48 pairs; rows=1152
+[14:41:51] glm4: multisite carrier 24/48 pairs; rows=1728
+[14:42:27] glm4: multisite carrier 32/48 pairs; rows=2304
+[14:43:04] glm4: multisite carrier 40/48 pairs; rows=2880
+[14:43:42] glm4: multisite carrier 48/48 pairs; rows=3456
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "combo_baseline": {
+    "off_path_control": {
+      "n_groups": 8,
+      "mean_effective_restore_rate": 0.010416666666666666,
+      "mean_recovered": -0.011067708333333334,
+      "mean_recovery_fraction": 0.792987012987013,
+      "mean_release_reduced": 0.031901041666666664,
+      "role_counts": {
+        "weak_or_unclear": 6,
+        "anti_restore_or_off_path": 2
+      }
+    },
+    "primary_multisite_all": {
+      "n_groups": 8,
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.013020833333333334,
+      "mean_recovery_fraction": 0.22952922077922078,
+      "mean_release_reduced": 0.009602864583333334,
+      "role_counts": {
+        "weak_or_unclear": 8
+      }
+    },
+    "same_layer_primary_pair": {
+      "n_groups": 16,
+      "mean_effective_restore_rate": 0.0,
+      "mean_recovered": -0.010172526041666666,
+      "mean_recovery_fraction": 0.29253652597402596,
+      "mean_release_reduced": 0.003092447916666667,
+      "role_counts": {
+        "weak_or_unclear": 15,
+        "anti_restore_or_off_path": 1
+      }
+    },
+    "single_primary_site": {
+      "n_groups": 32,
+      "mean_effective_restore_rate": 0.0006510416666666666,
+      "mean_recovered": -0.005533854166666667,
+      "mean_recovery_fraction": 0.2922725018037518,
+      "mean_release_reduced": 0.0022786458333333335,
+      "role_counts": {
+        "weak_or_unclear": 32
+      }
+    }
+  },
+  "top_writers": [
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.2989046474297841,
+      "mean_source_target_logit_contribution": 0.03636738273416995,
+      "mean_source_total_route_suppression_contribution": 0.01947421388861888,
+      "mean_target_logit_drop_after_source_removal": 0.024739583333333332,
+      "support_rate_drop_gt_0_20": 0.041666666666666664,
+      "mean_total_positive_route_release_after_source_removal": 0.047526041666666664,
+      "route_guard_rate_release_gt_0_20": 0.041666666666666664,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "target_record_line",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.12210591634114583,
+      "mean_source_target_logit_contribution": 0.03655832915471061,
+      "mean_source_total_route_suppression_contribution": 0.011517768148223695,
+      "mean_target_logit_drop_after_source_removal": 0.015625,
+      "support_rate_drop_gt_0_20": 0.041666666666666664,
+      "mean_total_positive_route_release_after_source_removal": 0.041015625,
+      "route_guard_rate_release_gt_0_20": 0.041666666666666664,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.3574251631895701,
+      "mean_source_target_logit_contribution": 0.132527190396407,
+      "mean_source_total_route_suppression_contribution": 0.04721667786846714,
+      "mean_target_logit_drop_after_source_removal": -0.015625,
+      "support_rate_drop_gt_0_20": 0.041666666666666664,
+      "mean_total_positive_route_release_after_source_removal": 0.109375,
+      "route_guard_rate_release_gt_0_20": 0.08333333333333333,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "target_record_line",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.17946656420826912,
+      "mean_source_target_logit_contribution": 0.1320879024642636,
+      "mean_source_total_route_suppression_contribution": 0.026834232256078394,
+      "mean_target_logit_drop_after_source_removal": -0.016927083333333332,
+      "support_rate_drop_gt_0_20": 0.041666666666666664,
+      "mean_total_positive_route_release_after_source_removal": 0.09375,
+      "route_guard_rate_release_gt_0_20": 0.08333333333333333,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.006547220051288605,
+      "mean_source_target_logit_contribution": -0.00018014685645084683,
+      "mean_source_total_route_suppression_contribution": 0.000527096693247131,
+      "mean_target_logit_drop_after_source_removal": 0.013020833333333334,
+      "support_rate_drop_gt_0_20": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.031901041666666664,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "target_record_line",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.0015187735358874004,
+      "mean_source_target_logit_contribution": -0.00018720879107784563,
+      "mean_source_total_route_suppression_contribution": 0.0002845895146397955,
+      "mean_target_logit_drop_after_source_removal": 0.010416666666666666,
+      "support_rate_drop_gt_0_20": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.03125,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "target_record_line",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.0020350737492359863,
+      "mean_source_target_logit_contribution": -6.116594421593884e-05,
+      "mean_source_total_route_suppression_contribution": 0.00033134802037200944,
+      "mean_target_logit_drop_after_source_removal": 0.0026041666666666665,
+      "support_rate_drop_gt_0_20": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.026041666666666668,
+      "route_guard_rate_release_gt_0_20": 0.020833333333333332,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 10,
+      "subunit_id": "L35:attn_out:H10",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.004436286528895532,
+      "mean_source_target_logit_contribution": -9.71305985710084e-05,
+      "mean_source_total_route_suppression_contribution": 0.0006807282012080881,
+      "mean_target_logit_drop_after_source_removal": 0.0013020833333333333,
+      "support_rate_drop_gt_0_20": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.02734375,
+      "route_guard_rate_release_gt_0_20": 0.020833333333333332,
+      "top1_loss_rate": 0.0,
+      "removal_role_guess": "control_or_weak"
+    }
+  ],
+  "top_multisite": [
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.8522235333609084,
+      "mean_erase_target_logit_drop": 0.024739583333333332,
+      "mean_restored_target_logit_drop": 0.0078125,
+      "mean_target_logit_recovered_by_restore": 0.016927083333333332,
+      "mean_target_recovery_fraction": 0.8288888888888889,
+      "mean_erase_route_release": 0.047526041666666664,
+      "mean_restored_route_release": 0.022786458333333332,
+      "mean_route_release_reduced_by_restore": 0.024739583333333332,
+      "effective_restore_rate": 0.041666666666666664,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "target_record_line",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.6868468462101495,
+      "mean_erase_target_logit_drop": 0.015625,
+      "mean_restored_target_logit_drop": 0.009114583333333334,
+      "mean_target_logit_recovered_by_restore": 0.006510416666666667,
+      "mean_target_recovery_fraction": 0.6181818181818182,
+      "mean_erase_route_release": 0.041015625,
+      "mean_restored_route_release": 0.013020833333333334,
+      "mean_route_release_reduced_by_restore": 0.027994791666666668,
+      "effective_restore_rate": 0.020833333333333332,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "L36:attn_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L36:attn_out"
+      ],
+      "combo_size": 1,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.15997149872904023,
+      "mean_erase_target_logit_drop": -0.015625,
+      "mean_restored_target_logit_drop": -0.010416666666666666,
+      "mean_target_logit_recovered_by_restore": -0.005208333333333333,
+      "mean_target_recovery_fraction": 0.19047619047619047,
+      "mean_erase_route_release": 0.109375,
+      "mean_restored_route_release": 0.10611979166666667,
+      "mean_route_release_reduced_by_restore": 0.0032552083333333335,
+      "effective_restore_rate": 0.020833333333333332,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "records_all",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 1.1639209456043318,
+      "mean_erase_target_logit_drop": -0.015625,
+      "mean_restored_target_logit_drop": 0.053385416666666664,
+      "mean_target_logit_recovered_by_restore": -0.06901041666666667,
+      "mean_target_recovery_fraction": 0.719047619047619,
+      "mean_erase_route_release": 0.109375,
+      "mean_restored_route_release": 0.033854166666666664,
+      "mean_route_release_reduced_by_restore": 0.07552083333333333,
+      "effective_restore_rate": 0.020833333333333332,
+      "combo_role_guess": "anti_restore_or_off_path"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "L37:attn_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L37:attn_out"
+      ],
+      "combo_size": 1,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.20079848325500885,
+      "mean_erase_target_logit_drop": 0.013020833333333334,
+      "mean_restored_target_logit_drop": -0.005208333333333333,
+      "mean_target_logit_recovered_by_restore": 0.018229166666666668,
+      "mean_target_recovery_fraction": 0.3333333333333333,
+      "mean_erase_route_release": 0.031901041666666664,
+      "mean_restored_route_release": 0.046875,
+      "mean_route_release_reduced_by_restore": -0.014973958333333334,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "target_record_line",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.5718712456291541,
+      "mean_erase_target_logit_drop": 0.010416666666666666,
+      "mean_restored_target_logit_drop": -0.0013020833333333333,
+      "mean_target_logit_recovered_by_restore": 0.01171875,
+      "mean_target_recovery_fraction": 1.0,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.013671875,
+      "mean_route_release_reduced_by_restore": 0.017578125,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "off_path_same_count",
+      "combo_kind": "off_path_control",
+      "combo_sites": [
+        "L38:attn_out",
+        "L38:mlp_out",
+        "L39:attn_out",
+        "L39:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.571905293482511,
+      "mean_erase_target_logit_drop": 0.013020833333333334,
+      "mean_restored_target_logit_drop": 0.0026041666666666665,
+      "mean_target_logit_recovered_by_restore": 0.010416666666666666,
+      "mean_target_recovery_fraction": 0.6666666666666666,
+      "mean_erase_route_release": 0.031901041666666664,
+      "mean_restored_route_release": 0.014973958333333334,
+      "mean_route_release_reduced_by_restore": 0.016927083333333332,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "primary_all",
+      "combo_kind": "primary_multisite_all",
+      "combo_sites": [
+        "L36:attn_out",
+        "L36:mlp_out",
+        "L37:attn_out",
+        "L37:mlp_out"
+      ],
+      "combo_size": 4,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.15596224317171922,
+      "mean_erase_target_logit_drop": 0.013020833333333334,
+      "mean_restored_target_logit_drop": 0.0026041666666666665,
+      "mean_target_logit_recovered_by_restore": 0.010416666666666666,
+      "mean_target_recovery_fraction": 0.4444444444444444,
+      "mean_erase_route_release": 0.031901041666666664,
+      "mean_restored_route_release": 0.026041666666666668,
+      "mean_route_release_reduced_by_restore": 0.005859375,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "records_all",
+      "combo_name": "L37:attn+mlp",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_sites": [
+        "L37:attn_out",
+        "L37:mlp_out"
+      ],
+      "combo_size": 2,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.20478032591442266,
+      "mean_erase_target_logit_drop": 0.013020833333333334,
+      "mean_restored_target_logit_drop": 0.00390625,
+      "mean_target_logit_recovered_by_restore": 0.009114583333333334,
+      "mean_target_recovery_fraction": 0.7777777777777778,
+      "mean_erase_route_release": 0.031901041666666664,
+      "mean_restored_route_release": 0.03515625,
+      "mean_route_release_reduced_by_restore": -0.0032552083333333335,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    },
+    {
+      "site": "L34:attn_out",
+      "head": 17,
+      "subunit_id": "L34:attn_out:H17",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "target_record_line",
+      "combo_name": "L36:mlp_out",
+      "combo_kind": "single_primary_site",
+      "combo_sites": [
+        "L36:mlp_out"
+      ],
+      "combo_size": 1,
+      "n": 48,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_combo_delta_norm_after_removal": 0.11838430011024077,
+      "mean_erase_target_logit_drop": 0.010416666666666666,
+      "mean_restored_target_logit_drop": 0.0013020833333333333,
+      "mean_target_logit_recovered_by_restore": 0.009114583333333334,
+      "mean_target_recovery_fraction": 0.625,
+      "mean_erase_route_release": 0.03125,
+      "mean_restored_route_release": 0.038411458333333336,
+      "mean_route_release_reduced_by_restore": -0.007161458333333333,
+      "effective_restore_rate": 0.0,
+      "combo_role_guess": "weak_or_unclear"
+    }
+  ]
+}

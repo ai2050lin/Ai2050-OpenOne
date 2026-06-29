@@ -1,0 +1,368 @@
+[16:41:50] deepseek7b/main: pairs=24 base_sources=['target_record_line', 'target_value_tokens', 'records_all']
+[16:41:50] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   5%|▌         | 17/339 [00:00<00:01, 161.81it/s]Loading weights:  11%|█         | 38/339 [00:00<00:01, 169.18it/s]Loading weights:  23%|██▎       | 79/339 [00:00<00:00, 262.72it/s]Loading weights:  34%|███▎      | 114/339 [00:00<00:00, 288.99it/s]Loading weights:  44%|████▎     | 148/339 [00:00<00:00, 285.51it/s]Loading weights:  55%|█████▍    | 185/339 [00:00<00:00, 301.96it/s]Loading weights:  64%|██████▎   | 216/339 [00:00<00:00, 294.56it/s]Loading weights:  73%|███████▎  | 246/339 [00:00<00:00, 280.62it/s]Loading weights:  83%|████████▎ | 280/339 [00:01<00:00, 278.93it/s]Loading weights:  91%|█████████ | 308/339 [00:01<00:00, 275.36it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 278.05it/s]
+[16:41:52] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[16:41:53] deepseek7b: candidates=4 max_route_sources=5
+[16:42:01] deepseek7b: source-target disentangle 4/24 pairs; rows=1624
+[16:42:10] deepseek7b: source-target disentangle 8/24 pairs; rows=3248
+[16:42:18] deepseek7b: source-target disentangle 12/24 pairs; rows=4828
+[16:42:27] deepseek7b: source-target disentangle 16/24 pairs; rows=6488
+[16:42:35] deepseek7b: source-target disentangle 20/24 pairs; rows=8032
+[16:42:43] deepseek7b: source-target disentangle 24/24 pairs; rows=9692
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "n_rows": 9692,
+  "top_route_source_cells": [
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:contrast_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.4375,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "contrast_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.4375,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "generic_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.4375,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.4375,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:other_vocab",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.375,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " __": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "route_src:contrast_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.0008697509765625,
+      "mean_source_target_logit_contribution": 0.0002179919247282669,
+      "mean_source_total_route_suppression_contribution": 0.011881133817951195,
+      "mean_target_logit_drop": -0.3125,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "contrast_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.0008697509765625,
+      "mean_source_target_logit_contribution": 0.0002179919247282669,
+      "mean_source_total_route_suppression_contribution": 0.011881133817951195,
+      "mean_target_logit_drop": -0.3125,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "generic_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.0008697509765625,
+      "mean_source_target_logit_contribution": 0.0002179919247282669,
+      "mean_source_total_route_suppression_contribution": 0.011881133817951195,
+      "mean_target_logit_drop": -0.3125,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:other_vocab",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.0008697509765625,
+      "mean_source_target_logit_contribution": 0.0002179919247282669,
+      "mean_source_total_route_suppression_contribution": 0.011881133817951195,
+      "mean_target_logit_drop": -0.3125,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " __": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "candidate_kind": "phase755_top_candidate",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.0008697509765625,
+      "mean_source_target_logit_contribution": 0.0002179919247282669,
+      "mean_source_total_route_suppression_contribution": 0.011881133817951195,
+      "mean_target_logit_drop": -0.3125,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": 0.0,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " yes": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_class:format_or_schema",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": -0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " No": 1
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 14,
+      "subunit_id": "L22:attn_out:H14",
+      "candidate_kind": "same_layer_control_head",
+      "source_group": "route_src:top_class:recipient_answer",
+      "source_family": "route_token_source",
+      "route_group": "top_non_target",
+      "n": 1,
+      "domains": [
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "mean_attention_mass_to_source": 0.000606536865234375,
+      "mean_source_target_logit_contribution": 0.00015433460066560656,
+      "mean_source_total_route_suppression_contribution": 0.0020916191351716407,
+      "mean_target_logit_drop": -0.375,
+      "target_drop_rate": 0.0,
+      "target_boost_rate": 1.0,
+      "mean_route_release": 0.3125,
+      "route_release_rate": 1.0,
+      "mean_margin_drop_target_vs_route": -0.0625,
+      "role_guess": "negative_target_drop_route_artifact",
+      "after_route_token_counts": {
+        " No": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+[18:01:35] qwen3/smoke: cases=12 sources=['instruction', 'question', 'object_tokens', 'relation_tokens'] relations=['category', 'edible', 'grows_on_tree']
+[18:01:36] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   4%|▍         | 17/398 [00:00<00:02, 157.46it/s]Loading weights:  22%|██▏       | 86/398 [00:00<00:00, 432.33it/s]Loading weights:  37%|███▋      | 149/398 [00:00<00:00, 496.93it/s]Loading weights:  56%|█████▌    | 223/398 [00:00<00:00, 587.44it/s]Loading weights:  71%|███████   | 283/398 [00:00<00:00, 590.68it/s]Loading weights:  86%|████████▋ | 344/398 [00:00<00:00, 595.34it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 555.95it/s]
+[18:01:37] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[18:01:39] qwen3: commonsense fibers 4/12 cases; rows=36
+[18:01:41] qwen3: commonsense fibers 8/12 cases; rows=72
+[18:01:42] qwen3: commonsense fibers 12/12 cases; rows=108
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "n_cases": 12,
+  "observation_summary": {
+    "overall": {
+      "n": 12,
+      "target_top1_rate": 0.8333333333333334,
+      "mean_target_rank": 1.5,
+      "mean_contrast_rank": 80.08333333333333
+    },
+    "by_context": {
+      "commonsense_question": {
+        "n": 6,
+        "target_top1_rate": 0.8333333333333334,
+        "mean_target_rank": 1.8333333333333333,
+        "mean_contrast_rank": 80.66666666666667
+      },
+      "commonsense_statement": {
+        "n": 6,
+        "target_top1_rate": 0.8333333333333334,
+        "mean_target_rank": 1.1666666666666667,
+        "mean_contrast_rank": 79.5
+      }
+    },
+    "by_relation": {
+      "category": {
+        "n": 5,
+        "target_top1_rate": 1.0,
+        "mean_target_rank": 1.0,
+        "mean_contrast_rank": 188.8
+      },
+      "edible": {
+        "n": 2,
+        "target_top1_rate": 0.5,
+        "mean_target_rank": 1.5,
+        "mean_contrast_rank": 1.5
+      },
+      "grows_on_tree": {
+        "n": 5,
+        "target_top1_rate": 0.8,
+        "mean_target_rank": 2.0,
+        "mean_contrast_rank": 2.8
+      }
+    }
+  },
+  "context_pair_summaries": {
+    "commonsense_question": {
+      "n_objects": 6,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": -0.10564501982418578,
+        "different_domain_mean": 0.1264105839699956,
+        "separation": -0.2320556037941814,
+        "same_n": 3,
+        "different_n": 12,
+        "nn_domain_accuracy": 0.0
+      }
+    },
+    "commonsense_statement": {
+      "n_objects": 6,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": -0.633296073251406,
+        "different_domain_mean": -0.05691873783530744,
+        "separation": -0.5763773354160986,
+        "same_n": 3,
+        "different_n": 12,
+        "nn_domain_accuracy": 0.0
+      }
+    }
+  },
+  "cross_context_stability": []
+}

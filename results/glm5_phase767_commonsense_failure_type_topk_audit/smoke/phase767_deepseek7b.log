@@ -1,0 +1,22 @@
+[18:29:21] deepseek7b/smoke: cases=12 top_k=30 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
+[18:29:22] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[18:29:22] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[18:29:22] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:30, 11.08it/s]Loading weights:   5%|▌         | 17/339 [00:00<00:04, 66.95it/s]Loading weights:  17%|█▋        | 59/339 [00:00<00:01, 184.88it/s]Loading weights:  29%|██▉       | 100/339 [00:00<00:00, 259.18it/s]Loading weights:  38%|███▊      | 129/339 [00:00<00:00, 261.20it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 273.76it/s]Loading weights:  56%|█████▌    | 190/339 [00:00<00:00, 277.82it/s]Loading weights:  65%|██████▍   | 219/339 [00:00<00:00, 257.24it/s]Loading weights:  75%|███████▌  | 255/339 [00:01<00:00, 275.14it/s]Loading weights:  84%|████████▍ | 284/339 [00:01<00:00, 272.72it/s]Loading weights:  92%|█████████▏| 312/339 [00:01<00:00, 274.71it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 247.03it/s]
+[18:29:23] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
+[18:29:24] deepseek7b: top-k audit 4/12 cases
+[18:29:24] deepseek7b: top-k audit 8/12 cases
+[18:29:24] deepseek7b: top-k audit 12/12 cases
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "summary": {
+    "target_top1_rate": 0.25,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 6.083333333333333,
+    "mean_target_allowed_rank": 1.8333333333333333,
+    "mean_target_margin_vs_best_other": -2.0729166666666665
+  }
+}

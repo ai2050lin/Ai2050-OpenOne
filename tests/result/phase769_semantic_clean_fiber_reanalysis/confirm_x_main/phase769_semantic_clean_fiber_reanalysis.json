@@ -1,0 +1,686 @@
+{
+  "phase": 769,
+  "title": "Semantic Clean Fiber Reanalysis",
+  "timestamp": "2026-06-29 19:07:03",
+  "phase765_round": "confirm",
+  "phase767_round": "main",
+  "by_model": {
+    "qwen3": {
+      "model": "qwen3",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_qwen3_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_qwen3_rows.jsonl",
+      "phase765_round": "confirm",
+      "phase767_round": "main",
+      "subsets": {
+        "all": {
+          "n_cases": 108,
+          "n_effect_rows": 1080,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.5555555555555556,
+              "same_domain_mean": 0.8010524466276567,
+              "different_domain_mean": 0.19769717491231642,
+              "separation": 0.6033552717153403
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6111111111111112,
+              "same_domain_mean": 0.8316278828939385,
+              "different_domain_mean": 0.22552492944048122,
+              "separation": 0.6061029534534573
+            }
+          ],
+          "mean_context_separation": 0.6047291125843988,
+          "mean_context_nn_domain_accuracy": 0.5833333333333334,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.8769796946196114,
+              "same_domain_diff_object_mean": 0.7885340916650324,
+              "different_domain_mean": 0.2032658176233311,
+              "object_stability_gap": 0.08844560295457904,
+              "domain_stability_gap": 0.5852682740417013
+            }
+          ],
+          "mean_object_stability_gap": 0.08844560295457904,
+          "mean_domain_stability_gap": 0.5852682740417013
+        },
+        "exact_clean": {
+          "n_cases": 89,
+          "n_effect_rows": 890,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6666666666666666,
+              "same_domain_mean": 0.7503372823483736,
+              "different_domain_mean": 0.12764982178860654,
+              "separation": 0.6226874605597671
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.3333333333333333,
+              "same_domain_mean": 0.43387454409659715,
+              "different_domain_mean": 0.11496582802332815,
+              "separation": 0.318908716073269
+            }
+          ],
+          "mean_context_separation": 0.47079808831651804,
+          "mean_context_nn_domain_accuracy": 0.5,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.6435985062268272,
+              "same_domain_diff_object_mean": 0.5591101527191573,
+              "different_domain_mean": 0.12205889736451878,
+              "object_stability_gap": 0.08448835350766992,
+              "domain_stability_gap": 0.4370512553546385
+            }
+          ],
+          "mean_object_stability_gap": 0.08448835350766992,
+          "mean_domain_stability_gap": 0.4370512553546385
+        },
+        "semantic_clean": {
+          "n_cases": 89,
+          "n_effect_rows": 890,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6666666666666666,
+              "same_domain_mean": 0.7503372823483736,
+              "different_domain_mean": 0.12764982178860654,
+              "separation": 0.6226874605597671
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.3333333333333333,
+              "same_domain_mean": 0.43387454409659715,
+              "different_domain_mean": 0.11496582802332815,
+              "separation": 0.318908716073269
+            }
+          ],
+          "mean_context_separation": 0.47079808831651804,
+          "mean_context_nn_domain_accuracy": 0.5,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.6435985062268272,
+              "same_domain_diff_object_mean": 0.5591101527191573,
+              "different_domain_mean": 0.12205889736451878,
+              "object_stability_gap": 0.08448835350766992,
+              "domain_stability_gap": 0.4370512553546385
+            }
+          ],
+          "mean_object_stability_gap": 0.08448835350766992,
+          "mean_domain_stability_gap": 0.4370512553546385
+        },
+        "semantic_only": {
+          "n_cases": 0,
+          "n_effect_rows": 0,
+          "contexts": [],
+          "mean_context_separation": null,
+          "mean_context_nn_domain_accuracy": null,
+          "cross_context_stability": [],
+          "mean_object_stability_gap": null,
+          "mean_domain_stability_gap": null
+        },
+        "semantic_fail": {
+          "n_cases": 19,
+          "n_effect_rows": 190,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 5,
+              "n_features": 80,
+              "nn_domain_accuracy": 0.6,
+              "same_domain_mean": 0.8482223728206516,
+              "different_domain_mean": -0.5957244269220919,
+              "separation": 1.4439467997427435
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 11,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2727272727272727,
+              "same_domain_mean": 0.2608621218355627,
+              "different_domain_mean": -0.03104194007312381,
+              "separation": 0.2919040619086865
+            }
+          ],
+          "mean_context_separation": 0.867925430825715,
+          "mean_context_nn_domain_accuracy": 0.43636363636363634,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 5,
+              "same_object_mean": 0.5333722609264232,
+              "same_domain_diff_object_mean": 0.7703356191638607,
+              "different_domain_mean": -0.35572766417865037,
+              "object_stability_gap": -0.23696335823743753,
+              "domain_stability_gap": 1.126063283342511
+            }
+          ],
+          "mean_object_stability_gap": -0.23696335823743753,
+          "mean_domain_stability_gap": 1.126063283342511
+        },
+        "rank_le2": {
+          "n_cases": 102,
+          "n_effect_rows": 1020,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.5555555555555556,
+              "same_domain_mean": 0.7984421989030851,
+              "different_domain_mean": 0.19947223154644517,
+              "separation": 0.59896996735664
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.5555555555555556,
+              "same_domain_mean": 0.8008037968696904,
+              "different_domain_mean": 0.18272815858246289,
+              "separation": 0.6180756382872274
+            }
+          ],
+          "mean_context_separation": 0.6085228028219337,
+          "mean_context_nn_domain_accuracy": 0.5555555555555556,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.7848569057560446,
+              "same_domain_diff_object_mean": 0.7506269324274456,
+              "different_domain_mean": 0.18004181537056202,
+              "object_stability_gap": 0.034229973328599006,
+              "domain_stability_gap": 0.5705851170568836
+            }
+          ],
+          "mean_object_stability_gap": 0.034229973328599006,
+          "mean_domain_stability_gap": 0.5705851170568836
+        }
+      }
+    },
+    "glm4": {
+      "model": "glm4",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_glm4_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_glm4_rows.jsonl",
+      "phase765_round": "confirm",
+      "phase767_round": "main",
+      "subsets": {
+        "all": {
+          "n_cases": 108,
+          "n_effect_rows": 1080,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2222222222222222,
+              "same_domain_mean": 0.15449217529060325,
+              "different_domain_mean": -0.053240365272819994,
+              "separation": 0.20773254056342325
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2777777777777778,
+              "same_domain_mean": 0.08661433918922078,
+              "different_domain_mean": -0.06957757314131804,
+              "separation": 0.1561919123305388
+            }
+          ],
+          "mean_context_separation": 0.181962226446981,
+          "mean_context_nn_domain_accuracy": 0.25,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": -0.26123346909735196,
+              "same_domain_diff_object_mean": -0.38475914033203973,
+              "different_domain_mean": -0.42194288292622906,
+              "object_stability_gap": 0.12352567123468777,
+              "domain_stability_gap": 0.03718374259418933
+            }
+          ],
+          "mean_object_stability_gap": 0.12352567123468777,
+          "mean_domain_stability_gap": 0.03718374259418933
+        },
+        "exact_clean": {
+          "n_cases": 66,
+          "n_effect_rows": 660,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 16,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.1875,
+              "same_domain_mean": 0.04112001679489659,
+              "different_domain_mean": -0.06375986074667202,
+              "separation": 0.1048798775415686
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.1111111111111111,
+              "same_domain_mean": 0.15948388960863855,
+              "different_domain_mean": -0.06129047713384451,
+              "separation": 0.22077436674248305
+            }
+          ],
+          "mean_context_separation": 0.16282712214202583,
+          "mean_context_nn_domain_accuracy": 0.14930555555555555,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 16,
+              "same_object_mean": 0.4186641303814031,
+              "same_domain_diff_object_mean": -0.06323214447098861,
+              "different_domain_mean": -0.1486923944591487,
+              "object_stability_gap": 0.4818962748523917,
+              "domain_stability_gap": 0.08546024998816008
+            }
+          ],
+          "mean_object_stability_gap": 0.4818962748523917,
+          "mean_domain_stability_gap": 0.08546024998816008
+        },
+        "semantic_clean": {
+          "n_cases": 81,
+          "n_effect_rows": 810,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2222222222222222,
+              "same_domain_mean": 0.22500135746134925,
+              "different_domain_mean": -0.07028798917645368,
+              "separation": 0.29528934663780293
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.1111111111111111,
+              "same_domain_mean": 0.15948388960863855,
+              "different_domain_mean": -0.06129047713384451,
+              "separation": 0.22077436674248305
+            }
+          ],
+          "mean_context_separation": 0.258031856690143,
+          "mean_context_nn_domain_accuracy": 0.16666666666666666,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.577526006589046,
+              "same_domain_diff_object_mean": 0.18884084899226916,
+              "different_domain_mean": -0.11796728507982872,
+              "object_stability_gap": 0.3886851575967768,
+              "domain_stability_gap": 0.3068081340720979
+            }
+          ],
+          "mean_object_stability_gap": 0.3886851575967768,
+          "mean_domain_stability_gap": 0.3068081340720979
+        },
+        "semantic_only": {
+          "n_cases": 15,
+          "n_effect_rows": 150,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 11,
+              "n_features": 80,
+              "nn_domain_accuracy": 0.36363636363636365,
+              "same_domain_mean": 0.5357646276144604,
+              "different_domain_mean": -0.11133223806075647,
+              "separation": 0.6470968656752168
+            }
+          ],
+          "mean_context_separation": 0.6470968656752168,
+          "mean_context_nn_domain_accuracy": 0.36363636363636365,
+          "cross_context_stability": [],
+          "mean_object_stability_gap": null,
+          "mean_domain_stability_gap": null
+        },
+        "semantic_fail": {
+          "n_cases": 27,
+          "n_effect_rows": 270,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 10,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.4,
+              "same_domain_mean": 0.5417347568265706,
+              "different_domain_mean": -0.17784859649079202,
+              "separation": 0.7195833533173626
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 10,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2,
+              "same_domain_mean": 0.06460924472433115,
+              "different_domain_mean": -0.11097037513232082,
+              "separation": 0.17557961985665196
+            }
+          ],
+          "mean_context_separation": 0.44758148658700725,
+          "mean_context_nn_domain_accuracy": 0.30000000000000004,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 9,
+              "same_object_mean": 0.6976902284916031,
+              "same_domain_diff_object_mean": 0.1412155471404773,
+              "different_domain_mean": -0.12260770834407704,
+              "object_stability_gap": 0.5564746813511259,
+              "domain_stability_gap": 0.2638232554845543
+            }
+          ],
+          "mean_object_stability_gap": 0.5564746813511259,
+          "mean_domain_stability_gap": 0.2638232554845543
+        },
+        "rank_le2": {
+          "n_cases": 99,
+          "n_effect_rows": 990,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.16666666666666666,
+              "same_domain_mean": 0.11423786462881111,
+              "different_domain_mean": 0.044435077867675005,
+              "separation": 0.0698027867611361
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.2222222222222222,
+              "same_domain_mean": 0.16470369767476237,
+              "different_domain_mean": 0.0273820171256767,
+              "separation": 0.13732168054908567
+            }
+          ],
+          "mean_context_separation": 0.10356223365511089,
+          "mean_context_nn_domain_accuracy": 0.19444444444444442,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": 0.02227202686762643,
+              "same_domain_diff_object_mean": -0.13104979505380843,
+              "different_domain_mean": -0.17451319130763554,
+              "object_stability_gap": 0.15332182192143484,
+              "domain_stability_gap": 0.04346339625382711
+            }
+          ],
+          "mean_object_stability_gap": 0.15332182192143484,
+          "mean_domain_stability_gap": 0.04346339625382711
+        }
+      }
+    },
+    "deepseek7b": {
+      "model": "deepseek7b",
+      "phase765_rows": "results/glm5_phase765_commonsense_context_identity_closure_test/confirm/phase765_deepseek7b_rows.jsonl",
+      "phase767_rows": "tests/result/phase767_commonsense_failure_type_topk_audit/main/phase767_deepseek7b_rows.jsonl",
+      "phase765_round": "confirm",
+      "phase767_round": "main",
+      "subsets": {
+        "all": {
+          "n_cases": 108,
+          "n_effect_rows": 1080,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6666666666666666,
+              "same_domain_mean": 0.257781503000818,
+              "different_domain_mean": -0.09687813264157323,
+              "separation": 0.3546596356423912
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 18,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6666666666666666,
+              "same_domain_mean": 0.3011885080893821,
+              "different_domain_mean": -0.09991242895341154,
+              "separation": 0.4011009370427936
+            }
+          ],
+          "mean_context_separation": 0.3778802863425924,
+          "mean_context_nn_domain_accuracy": 0.6666666666666666,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 18,
+              "same_object_mean": -0.11517808924102368,
+              "same_domain_diff_object_mean": -0.18594703202269625,
+              "different_domain_mean": -0.3120410800917178,
+              "object_stability_gap": 0.07076894278167256,
+              "domain_stability_gap": 0.12609404806902158
+            }
+          ],
+          "mean_object_stability_gap": 0.07076894278167256,
+          "mean_domain_stability_gap": 0.12609404806902158
+        },
+        "exact_clean": {
+          "n_cases": 19,
+          "n_effect_rows": 190,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 3,
+              "n_features": 40,
+              "nn_domain_accuracy": 0.6666666666666666,
+              "same_domain_mean": 0.26389727292228765,
+              "different_domain_mean": -0.7925617123011698,
+              "separation": 1.0564589852234574
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 10,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6,
+              "same_domain_mean": 0.3801220937034763,
+              "different_domain_mean": -0.19225512426724656,
+              "separation": 0.5723772179707229
+            }
+          ],
+          "mean_context_separation": 0.8144181015970902,
+          "mean_context_nn_domain_accuracy": 0.6333333333333333,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 3,
+              "same_object_mean": -0.34100869081356583,
+              "same_domain_diff_object_mean": -0.4658950006479609,
+              "different_domain_mean": -0.38175411341252347,
+              "object_stability_gap": 0.12488630983439508,
+              "domain_stability_gap": -0.08414088723543744
+            }
+          ],
+          "mean_object_stability_gap": 0.12488630983439508,
+          "mean_domain_stability_gap": -0.08414088723543744
+        },
+        "semantic_clean": {
+          "n_cases": 38,
+          "n_effect_rows": 380,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 13,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.0,
+              "same_domain_mean": -0.1747656551473953,
+              "different_domain_mean": -0.05852768356962472,
+              "separation": -0.11623797157777059
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 10,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6,
+              "same_domain_mean": 0.3801220937034763,
+              "different_domain_mean": -0.19225512426724656,
+              "separation": 0.5723772179707229
+            }
+          ],
+          "mean_context_separation": 0.22806962319647617,
+          "mean_context_nn_domain_accuracy": 0.3,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 9,
+              "same_object_mean": -0.03108659496998958,
+              "same_domain_diff_object_mean": -0.12848820066299974,
+              "different_domain_mean": -0.2525408470525082,
+              "object_stability_gap": 0.09740160569301015,
+              "domain_stability_gap": 0.12405264638950844
+            }
+          ],
+          "mean_object_stability_gap": 0.09740160569301015,
+          "mean_domain_stability_gap": 0.12405264638950844
+        },
+        "semantic_only": {
+          "n_cases": 19,
+          "n_effect_rows": 190,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 13,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.23076923076923078,
+              "same_domain_mean": -0.11981549444094977,
+              "different_domain_mean": -0.058427334820130426,
+              "separation": -0.061388159620819345
+            }
+          ],
+          "mean_context_separation": -0.061388159620819345,
+          "mean_context_nn_domain_accuracy": 0.23076923076923078,
+          "cross_context_stability": [],
+          "mean_object_stability_gap": null,
+          "mean_domain_stability_gap": null
+        },
+        "semantic_fail": {
+          "n_cases": 70,
+          "n_effect_rows": 700,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 16,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.125,
+              "same_domain_mean": -0.07377005896414206,
+              "different_domain_mean": -0.06342434019501082,
+              "separation": -0.010345718769131235
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 16,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.4375,
+              "same_domain_mean": 0.19781944085895803,
+              "different_domain_mean": -0.10104642971912417,
+              "separation": 0.2988658705780822
+            }
+          ],
+          "mean_context_separation": 0.14426007590447548,
+          "mean_context_nn_domain_accuracy": 0.28125,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 15,
+              "same_object_mean": -0.019343535427462644,
+              "same_domain_diff_object_mean": -0.14818848008130955,
+              "different_domain_mean": -0.20993035991823997,
+              "object_stability_gap": 0.1288449446538469,
+              "domain_stability_gap": 0.06174187983693041
+            }
+          ],
+          "mean_object_stability_gap": 0.1288449446538469,
+          "mean_domain_stability_gap": 0.06174187983693041
+        },
+        "rank_le2": {
+          "n_cases": 55,
+          "n_effect_rows": 550,
+          "contexts": [
+            {
+              "context": "commonsense_question",
+              "n_objects": 17,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.23529411764705882,
+              "same_domain_mean": 0.034209999137370196,
+              "different_domain_mean": -0.058278397905127295,
+              "separation": 0.09248839704249749
+            },
+            {
+              "context": "commonsense_statement",
+              "n_objects": 15,
+              "n_features": 120,
+              "nn_domain_accuracy": 0.6,
+              "same_domain_mean": 0.4128164925523306,
+              "different_domain_mean": -0.11423116216857201,
+              "separation": 0.5270476547209026
+            }
+          ],
+          "mean_context_separation": 0.30976802588170005,
+          "mean_context_nn_domain_accuracy": 0.41764705882352937,
+          "cross_context_stability": [
+            {
+              "context_a": "commonsense_question",
+              "context_b": "commonsense_statement",
+              "common_objects": 15,
+              "same_object_mean": -0.17645462652208538,
+              "same_domain_diff_object_mean": -0.2850641015205627,
+              "different_domain_mean": -0.2861133216541544,
+              "object_stability_gap": 0.10860947499847734,
+              "domain_stability_gap": 0.0010492201335916551
+            }
+          ],
+          "mean_object_stability_gap": 0.10860947499847734,
+          "mean_domain_stability_gap": 0.0010492201335916551
+        }
+      }
+    }
+  }
+}

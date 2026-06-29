@@ -1,0 +1,97 @@
+[18:02:36] qwen3/main: cases=108 sources=['instruction', 'question', 'object_tokens', 'relation_tokens'] relations=['category', 'edible', 'grows_on_tree']
+[18:02:36] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 252.77it/s]Loading weights:  20%|██        | 81/398 [00:00<00:00, 400.45it/s]Loading weights:  39%|███▉      | 155/398 [00:00<00:00, 548.92it/s]Loading weights:  53%|█████▎    | 211/398 [00:00<00:00, 547.57it/s]Loading weights:  68%|██████▊   | 269/398 [00:00<00:00, 537.54it/s]Loading weights:  84%|████████▍ | 336/398 [00:00<00:00, 547.54it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 553.13it/s]
+[18:02:37] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[18:02:46] qwen3: commonsense fibers 18/108 cases; rows=162
+[18:02:54] qwen3: commonsense fibers 36/108 cases; rows=324
+[18:03:01] qwen3: commonsense fibers 54/108 cases; rows=486
+[18:03:09] qwen3: commonsense fibers 72/108 cases; rows=648
+[18:03:17] qwen3: commonsense fibers 90/108 cases; rows=810
+[18:03:24] qwen3: commonsense fibers 108/108 cases; rows=972
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "n_cases": 108,
+  "observation_summary": {
+    "overall": {
+      "n": 108,
+      "target_top1_rate": 0.8055555555555556,
+      "mean_target_rank": 1.3240740740740742,
+      "mean_contrast_rank": 51.74074074074074
+    },
+    "by_context": {
+      "commonsense_question": {
+        "n": 54,
+        "target_top1_rate": 0.8888888888888888,
+        "mean_target_rank": 1.1851851851851851,
+        "mean_contrast_rank": 71.35185185185185
+      },
+      "commonsense_statement": {
+        "n": 54,
+        "target_top1_rate": 0.7222222222222222,
+        "mean_target_rank": 1.462962962962963,
+        "mean_contrast_rank": 32.129629629629626
+      }
+    },
+    "by_relation": {
+      "category": {
+        "n": 36,
+        "target_top1_rate": 0.8611111111111112,
+        "mean_target_rank": 1.3888888888888888,
+        "mean_contrast_rank": 149.36111111111111
+      },
+      "edible": {
+        "n": 36,
+        "target_top1_rate": 0.6944444444444444,
+        "mean_target_rank": 1.3055555555555556,
+        "mean_contrast_rank": 2.5833333333333335
+      },
+      "grows_on_tree": {
+        "n": 36,
+        "target_top1_rate": 0.8611111111111112,
+        "mean_target_rank": 1.2777777777777777,
+        "mean_contrast_rank": 3.2777777777777777
+      }
+    }
+  },
+  "context_pair_summaries": {
+    "commonsense_question": {
+      "n_objects": 18,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": 0.8136573232887425,
+        "different_domain_mean": 0.20698726079677793,
+        "separation": 0.6066700624919645,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.4444444444444444
+      }
+    },
+    "commonsense_statement": {
+      "n_objects": 18,
+      "n_features": 96,
+      "pair_summary": {
+        "same_domain_mean": 0.8461161981649358,
+        "different_domain_mean": 0.2334990932609361,
+        "separation": 0.6126171049039997,
+        "same_n": 18,
+        "different_n": 135,
+        "nn_domain_accuracy": 0.6111111111111112
+      }
+    }
+  },
+  "cross_context_stability": [
+    {
+      "context_a": "commonsense_question",
+      "context_b": "commonsense_statement",
+      "common_objects": 18,
+      "same_object_mean": 0.8937169859958723,
+      "same_domain_diff_object_mean": 0.8029912073777243,
+      "different_domain_mean": 0.21209446821347483,
+      "object_stability_gap": 0.09072577861814801,
+      "domain_stability_gap": 0.5908967391642495
+    }
+  ]
+}

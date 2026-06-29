@@ -1,0 +1,23 @@
+[18:32:36] deepseek7b/smoke_alias: cases=12 top_k=30 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
+[18:32:36] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[18:32:36] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[18:32:36] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:29, 11.27it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 122.16it/s]Loading weights:  17%|█▋        | 58/339 [00:00<00:01, 170.75it/s]Loading weights:  27%|██▋       | 90/339 [00:00<00:01, 208.69it/s]Loading weights:  40%|███▉      | 134/339 [00:00<00:00, 263.86it/s]Loading weights:  48%|████▊     | 162/339 [00:00<00:00, 267.87it/s]Loading weights:  58%|█████▊    | 197/339 [00:00<00:00, 278.85it/s]Loading weights:  67%|██████▋   | 226/339 [00:00<00:00, 260.91it/s]Loading weights:  76%|███████▌  | 258/339 [00:01<00:00, 276.07it/s]Loading weights:  85%|████████▍ | 287/339 [00:01<00:00, 261.96it/s]Loading weights:  94%|█████████▍| 319/339 [00:01<00:00, 275.50it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 247.93it/s]
+[18:32:38] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
+[18:32:39] deepseek7b: top-k audit 6/12 cases
+[18:32:39] deepseek7b: top-k audit 12/12 cases
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke_alias",
+  "summary": {
+    "target_top1_rate": 0.3333333333333333,
+    "exact_target_top1_rate": 0.25,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 3.0833333333333335,
+    "mean_exact_target_rank": 6.083333333333333,
+    "mean_target_allowed_rank": 1.8333333333333333,
+    "mean_target_margin_vs_best_other": -1.125
+  }
+}

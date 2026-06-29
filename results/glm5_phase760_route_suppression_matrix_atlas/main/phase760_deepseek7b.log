@@ -1,0 +1,421 @@
+[16:03:55] deepseek7b/main: pairs=24 sources=['records_all', 'target_record_line']
+[16:03:56] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|▏         | 5/339 [00:00<00:08, 38.38it/s]Loading weights:  15%|█▌        | 51/339 [00:00<00:01, 194.47it/s]Loading weights:  28%|██▊       | 96/339 [00:00<00:00, 285.75it/s]Loading weights:  37%|███▋      | 127/339 [00:00<00:00, 268.64it/s]Loading weights:  46%|████▌     | 155/339 [00:00<00:00, 271.94it/s]Loading weights:  55%|█████▍    | 186/339 [00:00<00:00, 275.06it/s]Loading weights:  65%|██████▍   | 219/339 [00:00<00:00, 272.57it/s]Loading weights:  74%|███████▍  | 252/339 [00:00<00:00, 288.16it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 264.56it/s]Loading weights:  91%|█████████▏| 310/339 [00:01<00:00, 242.79it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 265.78it/s]
+[16:03:58] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[16:03:58] deepseek7b: candidates=4 combo_sites=['L23:attn_out', 'L23:mlp_out', 'L24:attn_out', 'L24:mlp_out', 'L25:attn_out', 'L25:mlp_out', 'L26:attn_out', 'L26:mlp_out', 'L27:attn_out', 'L27:mlp_out']
+[16:04:09] deepseek7b: route matrix 4/24 pairs; rows=3316
+[16:04:20] deepseek7b: route matrix 8/24 pairs; rows=6552
+[16:04:31] deepseek7b: route matrix 12/24 pairs; rows=9788
+[16:04:41] deepseek7b: route matrix 16/24 pairs; rows=13024
+[16:04:52] deepseek7b: route matrix 20/24 pairs; rows=16180
+[16:05:03] deepseek7b: route matrix 24/24 pairs; rows=19576
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "n_rows": 19576,
+  "top_route_cells": [
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_sites": [
+        "L25:attn_out",
+        "L25:mlp_out",
+        "L26:attn_out",
+        "L26:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.21875,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": -0.03125,
+      "mean_route_reduced": 0.21875,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "source_group": "target_record_line",
+      "combo_kind": "same_layer_late_candidate_pair",
+      "combo_name": "L25:late_attn+mlp",
+      "combo_sites": [
+        "L25:attn_out",
+        "L25:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.09375,
+      "mean_target_recovered": -0.15625,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.15625,
+      "mean_restored_route_release": -0.03125,
+      "mean_route_reduced": 0.1875,
+      "mean_margin_drop_reduced": 0.03125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "same_layer_primary_pair",
+      "combo_name": "L23:attn+mlp",
+      "combo_sites": [
+        "L23:attn_out",
+        "L23:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.15625,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.1875,
+      "mean_margin_drop_reduced": 0.03125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L23:attn_out",
+        "L23:mlp_out",
+        "L24:attn_out",
+        "L24:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.09375,
+      "mean_target_recovered": -0.09375,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.15625,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.15625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L23:attn_out",
+        "L23:mlp_out",
+        "L24:attn_out",
+        "L24:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.15625,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.03125,
+      "mean_route_reduced": 0.15625,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "true_late_control",
+      "combo_name": "late_control_same_count",
+      "combo_sites": [
+        "L27:attn_out",
+        "L27:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.09375,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.03125,
+      "mean_route_reduced": 0.15625,
+      "mean_margin_drop_reduced": 0.0625,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "same_layer_late_candidate_pair",
+      "combo_name": "L26:late_attn+mlp",
+      "combo_sites": [
+        "L26:attn_out",
+        "L26:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.1875,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.03125,
+      "mean_route_reduced": 0.15625,
+      "mean_margin_drop_reduced": -0.03125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 1,
+      "subunit_id": "L22:attn_out:H1",
+      "source_group": "target_record_line",
+      "combo_kind": "true_late_control",
+      "combo_name": "late_control_same_count",
+      "combo_sites": [
+        "L27:attn_out",
+        "L27:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.09375,
+      "mean_target_recovered": -0.21875,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.15625,
+      "mean_restored_route_release": 0.03125,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.09375,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L23:attn_out",
+        "L23:mlp_out",
+        "L24:attn_out",
+        "L24:mlp_out",
+        "L25:attn_out",
+        "L25:mlp_out",
+        "L26:attn_out",
+        "L26:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.15625,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.0625,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.03125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    },
+    {
+      "site": "L22:attn_out",
+      "head": 9,
+      "subunit_id": "L22:attn_out:H9",
+      "source_group": "target_record_line",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L23:attn_out",
+      "combo_sites": [
+        "L23:attn_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 2,
+      "domains": [
+        "animal",
+        "plant"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.21875,
+      "mean_target_recovered": -0.09375,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.1875,
+      "mean_restored_route_release": 0.09375,
+      "mean_route_reduced": 0.09375,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " yes": 2
+      },
+      "restored_route_token_counts": {
+        " yes": 2
+      }
+    }
+  ]
+}

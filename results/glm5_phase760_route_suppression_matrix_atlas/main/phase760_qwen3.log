@@ -1,0 +1,401 @@
+[16:01:42] qwen3/main: pairs=24 sources=['records_all', 'target_record_line']
+[16:01:42] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   4%|▍         | 16/398 [00:00<00:02, 156.05it/s]Loading weights:  18%|█▊        | 71/398 [00:00<00:00, 385.26it/s]Loading weights:  34%|███▍      | 136/398 [00:00<00:00, 502.76it/s]Loading weights:  50%|█████     | 200/398 [00:00<00:00, 553.67it/s]Loading weights:  65%|██████▍   | 257/398 [00:00<00:00, 558.21it/s]Loading weights:  80%|███████▉  | 318/398 [00:00<00:00, 575.19it/s]Loading weights:  95%|█████████▍| 378/398 [00:00<00:00, 580.44it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 541.70it/s]
+[16:01:43] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[16:01:44] qwen3: candidates=4 combo_sites=['L34:attn_out', 'L34:mlp_out', 'L35:attn_out', 'L35:mlp_out']
+[16:01:50] qwen3: route matrix 4/24 pairs; rows=2052
+[16:01:57] qwen3: route matrix 8/24 pairs; rows=4216
+[16:02:04] qwen3: route matrix 12/24 pairs; rows=6380
+[16:02:11] qwen3: route matrix 16/24 pairs; rows=8544
+[16:02:17] qwen3: route matrix 20/24 pairs; rows=10708
+[16:02:24] qwen3: route matrix 24/24 pairs; rows=12872
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "n_rows": 12872,
+  "top_route_cells": [
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "records_all",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out",
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.25,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.25,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.25,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "records_all",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.125,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.25,
+      "mean_restored_route_release": 0.125,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "records_all",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.125,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.25,
+      "mean_restored_route_release": 0.125,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "records_all",
+      "combo_kind": "single_late_candidate_site",
+      "combo_name": "L35:mlp_out",
+      "combo_sites": [
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.125,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.25,
+      "mean_restored_route_release": 0.125,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.25,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "combo_kind": "late_candidate_all",
+      "combo_name": "late_candidate_all",
+      "combo_sites": [
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.25,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_plus_late_all",
+      "combo_name": "primary_plus_late_all",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out",
+        "L35:attn_out",
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.375,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.25,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "combo_kind": "single_primary_site",
+      "combo_name": "L34:attn_out",
+      "combo_sites": [
+        "L34:attn_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.125,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "combo_kind": "single_late_candidate_site",
+      "combo_name": "L35:mlp_out",
+      "combo_sites": [
+        "L35:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.125,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": 0.0,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 28,
+      "subunit_id": "L33:attn_out:H28",
+      "source_group": "target_record_line",
+      "combo_kind": "primary_multisite_all",
+      "combo_name": "primary_all",
+      "combo_sites": [
+        "L34:attn_out",
+        "L34:mlp_out"
+      ],
+      "route_group": "top_class:recipient_answer",
+      "n": 1,
+      "domains": [
+        "fruit"
+      ],
+      "relations": [
+        "edible"
+      ],
+      "target_success_rate": 0.0,
+      "route_success_rate": 1.0,
+      "route_only_success_rate": 1.0,
+      "joint_success_rate": 0.0,
+      "mean_erase_target_logit_drop": -0.125,
+      "mean_target_recovered": -0.25,
+      "mean_target_recovery_fraction": null,
+      "mean_erase_route_release": 0.125,
+      "mean_restored_route_release": 0.0,
+      "mean_route_reduced": 0.125,
+      "mean_margin_drop_reduced": -0.125,
+      "role_guess": "route_only_suppressor_candidate",
+      "erase_route_token_counts": {
+        " no": 1
+      },
+      "restored_route_token_counts": {
+        " no": 1
+      }
+    }
+  ]
+}

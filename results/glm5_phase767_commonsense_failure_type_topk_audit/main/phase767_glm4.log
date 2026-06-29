@@ -1,0 +1,27 @@
+[18:34:38] glm4/main: cases=108 top_k=80 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
+[18:34:38] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[18:34:38] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[18:34:39] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:46,  9.49it/s]Loading weights:   5%|▌         | 24/443 [00:00<00:04, 92.04it/s]Loading weights:  13%|█▎        | 57/443 [00:00<00:02, 177.03it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 222.49it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 247.81it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 268.18it/s]Loading weights:  42%|████▏     | 188/443 [00:00<00:00, 270.43it/s]Loading weights:  50%|█████     | 222/443 [00:00<00:00, 285.30it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 298.76it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 302.41it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 304.93it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 305.94it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 306.18it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 311.63it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.12it/s]
+[18:34:40] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
+[18:34:42] glm4: top-k audit 18/108 cases
+[18:34:44] glm4: top-k audit 36/108 cases
+[18:34:45] glm4: top-k audit 54/108 cases
+[18:34:46] glm4: top-k audit 72/108 cases
+[18:34:47] glm4: top-k audit 90/108 cases
+[18:34:48] glm4: top-k audit 108/108 cases
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "main",
+  "summary": {
+    "target_top1_rate": 0.75,
+    "exact_target_top1_rate": 0.6111111111111112,
+    "target_in_topk_rate": 1.0,
+    "mean_target_rank": 1.3796296296296295,
+    "mean_exact_target_rank": 1.6296296296296295,
+    "mean_target_allowed_rank": 1.287037037037037,
+    "mean_target_margin_vs_best_other": 1.2366898148148149
+  }
+}
