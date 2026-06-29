@@ -1,0 +1,603 @@
+[11:19:40] glm4/smoke: pairs=1 candidates=2 sources=['target_record_line', 'target_value_tokens', 'records_all'] audits=1
+[11:19:41] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:26, 16.74it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:02, 140.93it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:01, 211.83it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 233.95it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 262.61it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 269.13it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 276.64it/s]Loading weights:  51%|█████     | 224/443 [00:00<00:00, 288.22it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 297.52it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 301.95it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 296.40it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 304.82it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 311.58it/s]Loading weights:  95%|█████████▌| 422/443 [00:01<00:00, 309.39it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 281.99it/s]
+[11:19:43] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[11:19:45] glm4: stability path chain 1/1 pairs; rows=12
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "top": [
+    {
+      "context_name": "natural_donor",
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "records_all",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.327711820602417,
+      "mean_source_target_logit_contribution": 0.002918620826676488,
+      "mean_source_total_route_suppression_contribution": 0.012581158429384232,
+      "mean_target_logit_drop_after_source_removal": 0.125,
+      "mean_total_positive_route_release_after_source_removal": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.125,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.490132451057434,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.125,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.125,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.125,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_recipient",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "target_value_tokens",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "tool"
+      ],
+      "mean_attention_mass_to_source": 0.00860595703125,
+      "mean_source_target_logit_contribution": -0.001673443941399455,
+      "mean_source_total_route_suppression_contribution": 0.004136273026233539,
+      "mean_target_logit_drop_after_source_removal": 0.0625,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "mean_route_release_coverage": 2.0,
+      "mean_margin_drop_target_vs_routes": 0.09375,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.3270615339279175,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "tool": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_recipient",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "records_all",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "tool"
+      ],
+      "mean_attention_mass_to_source": 0.624774694442749,
+      "mean_source_target_logit_contribution": 0.03619132190942764,
+      "mean_source_total_route_suppression_contribution": 0.1534433662891388,
+      "mean_target_logit_drop_after_source_removal": 0.0625,
+      "mean_total_positive_route_release_after_source_removal": 0.0625,
+      "mean_route_release_coverage": 1.0,
+      "mean_margin_drop_target_vs_routes": 0.078125,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 5.746603488922119,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "tool": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_recipient",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "target_record_line",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "tool"
+      ],
+      "mean_attention_mass_to_source": 0.1420745849609375,
+      "mean_source_target_logit_contribution": -0.006660685874521732,
+      "mean_source_total_route_suppression_contribution": 0.020480139879509807,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "mean_route_release_coverage": 2.0,
+      "mean_margin_drop_target_vs_routes": 0.03125,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.5544029474258423,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "tool": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.125,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_donor",
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "target_value_tokens",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.007049560546875,
+      "mean_source_target_logit_contribution": -0.000649680383503437,
+      "mean_source_total_route_suppression_contribution": 0.0007148461882025003,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0625,
+      "mean_route_release_coverage": 1.0,
+      "mean_margin_drop_target_vs_routes": 0.03125,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.034109354019165,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_recipient",
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "target_record_line",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "tool"
+      ],
+      "mean_attention_mass_to_source": 0.10433197021484375,
+      "mean_source_target_logit_contribution": 0.0037851424422115088,
+      "mean_source_total_route_suppression_contribution": 0.0,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0625,
+      "mean_route_release_coverage": 1.0,
+      "mean_margin_drop_target_vs_routes": 0.015625,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.3507976531982422,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "tool": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0625,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_donor",
+      "site": "L35:attn_out",
+      "head": 29,
+      "subunit_id": "L35:attn_out:H29",
+      "source_group": "target_record_line",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.0838470458984375,
+      "mean_source_target_logit_contribution": 0.0004350484814494848,
+      "mean_source_total_route_suppression_contribution": 0.0,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.2523568868637085,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_donor",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "target_record_line",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.1461048126220703,
+      "mean_source_target_logit_contribution": -0.0038233594968914986,
+      "mean_source_total_route_suppression_contribution": 0.0024628046667203307,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.0299361944198608,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_donor",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "target_value_tokens",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.0111083984375,
+      "mean_source_target_logit_contribution": -0.0034757363609969616,
+      "mean_source_total_route_suppression_contribution": 0.0026798806502483785,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 0.9550212025642395,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    },
+    {
+      "context_name": "natural_donor",
+      "site": "L34:attn_out",
+      "head": 4,
+      "subunit_id": "L34:attn_out:H4",
+      "source_group": "records_all",
+      "n": 1,
+      "objects": [
+        "apple"
+      ],
+      "relations": [
+        "category"
+      ],
+      "answers": [
+        "fruit"
+      ],
+      "mean_attention_mass_to_source": 0.30434632301330566,
+      "mean_source_target_logit_contribution": -0.0031433093827217817,
+      "mean_source_total_route_suppression_contribution": 0.00522606004960835,
+      "mean_target_logit_drop_after_source_removal": 0.0,
+      "mean_total_positive_route_release_after_source_removal": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "top1_loss_rate": 0.0,
+      "support_rate_drop_gt_0_20": 0.0,
+      "route_guard_rate_release_gt_0_20": 0.0,
+      "mean_final_hidden_delta_norm_after_removal": 1.3704074621200562,
+      "stability_guess": "weak_or_unstable",
+      "relation_breakdown": {
+        "category": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "answer_breakdown_top": {
+        "fruit": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      },
+      "object_group_breakdown": {
+        "apple": {
+          "n": 1,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.0,
+          "top1_loss_rate": 0.0,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0
+        }
+      }
+    }
+  ]
+}

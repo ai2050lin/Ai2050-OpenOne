@@ -54756,3 +54756,2466 @@ DS7B:
 4. 对 GLM4，区分 boost-dominant closure 与 true suppression closure。
 5. 对 DS7B，验证 L23/L22 attention 是否是 format+echo mixed suppressor。
 ```
+
+## Phase 745: 路线级多竞争者抑制验证 [2026-06-29 09:18]
+
+### 任务来源
+
+用户提供的 Phase 744 复盘判断基本正确：
+
+```text
+Phase 744 证明了 donor answer 增强之后仍可能失败，
+因为 recipient / format / echo / punctuation / other_vocab 等竞争路线会接管。
+```
+
+因此本阶段继续同一大阶段目标，进入：
+
+```text
+Route-Level Multi-Competitor Suppression Validation
+路线级多竞争者抑制验证
+```
+
+核心问题：
+
+```text
+单独压制 current top competitor 是否足够？
+还是必须同时压制多个 route class，donor answer 才能稳定 token0 top1？
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase745_route_level_multi_competitor_suppression.py
+tests/gpt5/run_phase745_route_level_multi_competitor_suppression_round.sh
+```
+
+### 输出目录
+
+```text
+results/glm5_phase745_route_level_multi_competitor_suppression/
+```
+
+确认轮核心文件：
+
+```text
+results/glm5_phase745_route_level_multi_competitor_suppression/confirm/phase745_cross_model_summary.md
+results/glm5_phase745_route_level_multi_competitor_suppression/confirm/phase745_cross_model_summary.json
+results/glm5_phase745_route_level_multi_competitor_suppression/confirm/phase745_atlas_graph.json
+```
+
+### 执行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase745_route_level_multi_competitor_suppression_round.sh smoke --max-pairs 1 --top-audits 1 --top-candidates 2 --top-k-vocab 8 --max-route-classes 3 --max-topk-tokens 5 --suppress-scales 1.0 1.25 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase745_route_level_multi_competitor_suppression_round.sh main --max-pairs 8 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --max-route-classes 5 --max-topk-tokens 8 --suppress-scales 1.0 1.25 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase745_route_level_multi_competitor_suppression_round.sh confirm --max-pairs 10 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --max-route-classes 5 --max-topk-tokens 8 --suppress-scales 1.0 1.25 --log-every 2
+```
+
+三模型均按顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型命令均带：
+
+```text
+--hard-exit-after-model
+```
+
+加载方式：
+
+```text
+BF16
+quantization = off
+attn_implementation = eager
+```
+
+### 测试原理
+
+Phase 745 复用 Phase 743 / Phase 744 的 near-closure state：
+
+```text
+h_combo = h_joint + topK threshold component deltas
+```
+
+然后读取 top-k vocab，将非 donor token 分类为：
+
+```text
+recipient_answer
+format_or_schema
+echo_object_or_relation
+punctuation_or_stop
+prose_prefix
+other_semantic_value
+other_vocab
+```
+
+本阶段不只压当前最高竞争 token，而是比较五类条件：
+
+```text
+1. joint_add_topK
+   不额外抑制，作为基线。
+
+2. suppress_current_top
+   只压当前 top competitor。
+
+3. suppress_current_top_class
+   压当前 top competitor 所在类。
+
+4. suppress_route_representatives
+   每个竞争 route class 取一个代表 token 同时压制。
+
+5. suppress_route_centroids
+   每个 route class 构造 centroid direction，同时压制。
+
+6. suppress_all_topk_competitors
+   压 top-k 内全部非 donor 竞争 token。
+```
+
+单 token 抑制方向：
+
+```text
+d_c = normalize(W_U(c) - W_U(y_donor))
+```
+
+需要抑制量：
+
+```text
+alpha_c = (logit(c) - logit(y_donor)) / dot(W_U(c) - W_U(y_donor), d_c)
+```
+
+路线 centroid 方向：
+
+```text
+d_R = normalize(mean_{c in R} W_U(c) - W_U(y_donor))
+```
+
+最终测试：
+
+```text
+h_final' = h_final - scale * sum(alpha_i * d_i)
+```
+
+观测：
+
+```text
+donor_top1_rate
+mean_donor_rank
+top_token_class_counts
+route_shift_rate
+margin_gain_vs_base_top
+```
+
+### 确认轮结果
+
+#### qwen3
+
+基线：
+
+```text
+joint_add_topK donor_top1_rate = 0.000
+base top class = recipient_answer: 20/20
+```
+
+单 top 压制：
+
+```text
+suppress_current_top scale=1.00:
+  donor_top1_rate = 0.100
+  new top classes = donor 1, format 16, recipient 3
+
+suppress_current_top scale=1.25:
+  donor_top1_rate = 0.300
+  new top classes = donor 7, format 13
+```
+
+多路线压制：
+
+```text
+suppress_route_representatives scale=1.00:
+  donor_top1_rate = 1.000
+
+suppress_route_centroids scale=1.00:
+  donor_top1_rate = 1.000
+
+suppress_all_topk_competitors scale=1.00:
+  donor_top1_rate = 1.000
+```
+
+解释：
+
+```text
+qwen3 明确不是单 recipient_answer 竞争。
+压掉 recipient 后 format route 接管。
+同时压 route representatives / route centroids 后 donor 才稳定闭合。
+```
+
+#### GLM4
+
+基线：
+
+```text
+joint_add_topK donor_top1_rate = 0.500
+base top classes = donor 10, echo 6, other_vocab 4
+```
+
+单 top 压制：
+
+```text
+suppress_current_top scale=1.00:
+  donor_top1_rate = 0.500
+
+suppress_current_top scale=1.25:
+  donor_top1_rate = 0.800
+```
+
+多路线压制：
+
+```text
+suppress_route_representatives scale=1.00:
+  donor_top1_rate = 0.800
+
+suppress_route_representatives scale=1.25:
+  donor_top1_rate = 0.900
+
+suppress_route_centroids scale=1.25:
+  donor_top1_rate = 0.900
+
+suppress_all_topk_competitors scale=1.25:
+  donor_top1_rate = 0.900
+```
+
+解释：
+
+```text
+GLM4 本来已经半闭合。
+路线级抑制能把 donor_top1_rate 从 0.5 推到 0.9。
+剩余 other_vocab 需要更细分类。
+```
+
+#### DS7B
+
+基线：
+
+```text
+joint_add_topK donor_top1_rate = 0.050
+base top classes = format 9, echo 7, donor 1, punctuation 1, recipient 1, other_vocab 1
+```
+
+单 top 压制：
+
+```text
+suppress_current_top scale=1.00:
+  donor_top1_rate = 0.150
+
+suppress_current_top scale=1.25:
+  donor_top1_rate = 0.500
+```
+
+多路线压制：
+
+```text
+suppress_route_representatives scale=1.00:
+  donor_top1_rate = 0.850
+
+suppress_route_representatives scale=1.25:
+  donor_top1_rate = 0.900
+
+suppress_route_centroids scale=1.25:
+  donor_top1_rate = 0.900
+
+suppress_all_topk_competitors scale=1.25:
+  donor_top1_rate = 0.900
+```
+
+解释：
+
+```text
+DS7B 是典型多路线竞争场。
+单 top 压制只能达到 0.5，压掉一个路线后 echo / format / punctuation 会接管。
+路线级压制后能达到 0.9，说明 DS7B 的失败主要来自多个竞争 route 同时占优。
+```
+
+### 核心客观结论
+
+1. Phase 745 强力支持 Phase 744 的判断：
+
+```text
+token0 closure 不是单 donor boost 问题，
+也不是单 top competitor suppression 问题，
+而是 route-level competition field reordering。
+```
+
+2. qwen3：
+
+```text
+recipient_answer 是第一阻塞项，
+format_or_schema 是第二阻塞项。
+单压 recipient 会让 format 接管。
+```
+
+3. GLM4：
+
+```text
+已经接近闭合；
+路线级抑制从 0.5 提升到 0.9；
+剩余 other_vocab 需要更细分类。
+```
+
+4. DS7B：
+
+```text
+format + echo 是主竞争场；
+单 top 压制不足；
+路线级压制大幅提升到 0.85-0.90。
+```
+
+5. route centroid 和 route representative 的效果非常接近：
+
+```text
+说明 top-k 内每类 route 的代表 token 已经能近似该路线的读出竞争方向。
+```
+
+### 理论进展
+
+Phase 744 的公式：
+
+```text
+component_effect(u)
+= donor_boost(u)
++ competitor_suppression(u)
++ route_shift(u)
+```
+
+Phase 745 将闭合条件收紧为：
+
+```text
+Closure =
+logit(y_donor)
+- max_R max_{c in R} logit(c)
+> 0
+```
+
+其中：
+
+```text
+R in {recipient, format, echo, punctuation, prose, other}
+```
+
+因此完整 token0 闭合不是：
+
+```text
+donor > current_top
+```
+
+而是：
+
+```text
+for every dominant route R:
+  donor > max competitor in R
+```
+
+更接近当前现象的公式：
+
+```text
+ClosureForce =
+DonorBoost
++ MultiRouteSuppression
+- RouteTakeoverRisk
+```
+
+其中：
+
+```text
+MultiRouteSuppression =
+sum_R Suppress(R)
+
+RouteTakeoverRisk =
+max_{R not suppressed} max_{c in R} logit(c)
+```
+
+### 问题和硬伤
+
+1. Phase 745 仍然是 final-norm readout geometry intervention（最终读出几何干预），不是 natural circuit proof（自然回路证明）。
+
+2. route classifier 仍较粗：
+
+```text
+other_vocab 可能混合 option marker / label route / tokenizer artifact。
+format_or_schema 也可能包含多种格式子路线。
+```
+
+3. 压制 top-k 内的路线不等于压制完整词表路线。若 top-k 之外存在潜在竞争路线，本阶段无法看到。
+
+4. 当前只测 token0，尚未把 continuation closure（续写闭合）纳入 route-level suppression。
+
+5. 小模型可能有更强格式/回声吸引子，不能把具体层号或具体 token 竞争模式外推到大模型。
+
+### 下一步
+
+Phase 746 应进入：
+
+```text
+Natural Route Suppressor Localization
+自然路线级抑制器定位
+```
+
+目标不是继续人工压 route，而是找到自然组件是否能分别降低：
+
+```text
+recipient route max
+format route max
+echo route max
+other_vocab route max
+```
+
+建议做法：
+
+```text
+1. 复用 Phase 744 的 late attn/mlp component scan。
+2. 不再只记录 current top competitor delta。
+3. 对每个组件 u，计算：
+
+   boost_donor(u)
+   suppress_recipient_route(u)
+   suppress_format_route(u)
+   suppress_echo_route(u)
+   suppress_other_route(u)
+
+4. 找到自然 route suppressor set。
+5. 再下钻到 head/channel/neuron。
+```
+
+## Phase 746: 自回归训练—条件化相对状态—生成场闭合理论整合 [2026-06-29 09:46]
+
+### 任务
+
+用户提供附件理论，要求比较它与：
+
+```text
+research/IntelligentTheory.md
+```
+
+中的现有理论差异，并综合为最新理论，更新：
+
+```text
+research/IntelligentTheory.md
+```
+
+### 使用材料
+
+```text
+/home/rankrank/.codex/attachments/00c38cef-400f-48c0-9252-e7d85b8b32b0/pasted-text.txt
+research/IntelligentTheory.md
+```
+
+### 执行命令
+
+```bash
+sed -n '1,260p' /home/rankrank/.codex/attachments/00c38cef-400f-48c0-9252-e7d85b8b32b0/pasted-text.txt
+sed -n '260,760p' /home/rankrank/.codex/attachments/00c38cef-400f-48c0-9252-e7d85b8b32b0/pasted-text.txt
+sed -n '760,1200p' /home/rankrank/.codex/attachments/00c38cef-400f-48c0-9252-e7d85b8b32b0/pasted-text.txt
+sed -n '1120,1635p' research/IntelligentTheory.md
+rg -n "^七|^\\s*7\\.[0-9]|自回归训练|route-level|自然路线级|机制闭合度" research/IntelligentTheory.md
+```
+
+本阶段没有进行模型测试。
+
+### 理论差异判断
+
+附件理论的核心价值：
+
+```text
+把机制图谱接回自回归训练闭环。
+它解释为什么 attention / MLP / residual / lm_head 会在训练中形成关系寻址、内容搬运、竞争抑制和生成闭合路径。
+```
+
+原 IntelligentTheory.md 的核心价值：
+
+```text
+把推理时的机制现象整理为：
+相对编码、复用差分、条件化状态变换、QK/V 分解、源贡献路线增益、候选竞争、生成场闭合。
+```
+
+两者关系：
+
+```text
+附件理论解释机制为什么被训练出来；
+原理论解释机制推理时如何运行和如何失败。
+```
+
+### 文档更新
+
+已将第七章标题从：
+
+```text
+条件化相对状态—生成场闭合理论
+```
+
+升级为：
+
+```text
+自回归训练—条件化相对状态—生成场闭合理论
+```
+
+新增 7.0：
+
+```text
+2026-06-29 最新整合：从训练闭环到生成闭合
+```
+
+并将后续小节顺延：
+
+```text
+7.1 对前一版整合理论的保留与修正
+7.2 当前最有效完整理论的明确陈述
+7.3 完整计算例子
+7.4 问题与硬伤
+7.5 下一步阶段性大任务
+7.6 当前整体进展评估
+```
+
+### 最新理论
+
+理论名称：
+
+```text
+自回归训练—条件化相对状态—生成场闭合理论
+```
+
+简称：
+
+```text
+自回归相对状态闭合理论
+```
+
+三层结构：
+
+```text
+1. 自回归训练塑形层
+   真实下一个 token 作为监督信号，通过 cross entropy 同时增强正确 token、压制高概率错误 token。
+
+2. 条件化相对状态形成层
+   词嵌入进入上下文后，经 attention / MLP / residual 形成对象、关系、格式、绑定、路线和候选竞争状态。
+
+3. 生成场竞争闭合层
+   目标 token / phrase 必须压过 recipient、format、echo、prose、punctuation、other_vocab 等多路线竞争者。
+```
+
+核心公式：
+
+```text
+P_theta(x_{t+1}|x_{<=t})
+= softmax(W_U · LN(h_t^L))
+
+L_t = -log P_theta(x_{t+1}|x_{<=t})
+
+dL_t / d logit(y)
+= P_theta(y|x_{<=t}) - 1[y=x_{t+1}]
+```
+
+含义：
+
+```text
+正确 token 被推高；
+高概率错误竞争 token 被压低；
+梯度沿 lm_head、final norm、residual、MLP、attention、Q/K/V、embedding 反传；
+长期训练后形成 source -> writer -> rewriter -> route competition -> generation closure。
+```
+
+Phase 745 后的路线级闭合公式：
+
+```text
+Token0Closure
+⇔
+logit(y_target)
+- max_R max_{c in R} logit(c)
+> 0
+
+R ∈ {recipient, format, echo, prose, punctuation, other}
+```
+
+短语闭合公式：
+
+```text
+L(y|x)
+=
+(1/m) * Σ_i log P(y_i | x, y_<i)
+
+GenerationClosure
+⇔
+L(y_target|x)
+- max_{y != y_target} L(y|x)
+> δ
+```
+
+### 关键更新
+
+1. 自回归训练不是简单记忆下一个词，而是在海量文本中塑造关系寻址、内容搬运、状态重写、竞争抑制和生成闭合路径。
+
+2. 注意力更准确地说是“对当前预测有用的关系性寻址”，不是完整理解本身。
+
+3. MLP 是 rewriter，把 attention 搬运来的信息变成读出可用状态，并参与路线增强或压制。
+
+4. 残差流是 carrier，承载跨层状态累积。
+
+5. lm_head / unembedding 是读出竞争接口。
+
+6. Phase 745 后必须把 candidate competition 升级为 route-level competition field。
+
+7. 当前机制闭合度从 65%-75% 更新为 70%-78%。
+
+### 新增硬伤
+
+1. 训练塑形解释仍是机制合理性推断，不是直接证明某个自然组件由该训练压力形成。
+
+2. Phase 745 的 route-level suppression 仍是 final-norm readout geometry intervention，不是 natural circuit proof。
+
+3. route classifier 仍粗，other_vocab 和 format_or_schema 可能混合多个子路线。
+
+### 下一步
+
+新增两个优先任务：
+
+```text
+大任务0：自然路线级抑制器定位
+  对每个自然组件 u 测：
+    boost_target(u)
+    suppress_recipient_route(u)
+    suppress_format_route(u)
+    suppress_echo_route(u)
+    suppress_other_route(u)
+
+大任务00：训练塑形证据回溯
+  比较 target-vs-competitor gradient 与已发现 writer / rewriter / suppressor 组件方向是否对齐，
+  通过小规模可控训练或微调观察 route suppressor 是否随 loss pressure 形成。
+```
+
+### 最严格结论
+
+本阶段没有新增模型证据，但完成了理论结构上的关键补环：
+
+```text
+训练解释机制来源；
+推理解释机制运行；
+生成场解释机制为何失败或闭合；
+路线级竞争解释为什么单 top competitor suppression 不足。
+```
+
+当前理论仍不能宣称已经破解语言编码机制。最关键的未闭合点仍是：
+
+```text
+自然 route suppressor 的组件级来源；
+训练塑形层与推理图谱节点的直接因果连接；
+神经元级/通道级全局图谱。
+```
+
+## Phase 747: 预测充分状态不变量与生命闭合数学整合 [2026-06-29 09:54]
+
+### 任务
+
+用户提供三份附件理论，要求比较它们与：
+
+```text
+research/IntelligentTheory.md
+```
+
+中的现有理论差异，并综合为最新理论，更新：
+
+```text
+research/IntelligentTheory.md
+```
+
+### 使用材料
+
+```text
+/home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+/home/rankrank/.codex/attachments/257aab2e-6353-4120-aec8-866a44e89c8b/pasted-text.txt
+/home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt
+research/IntelligentTheory.md
+```
+
+### 执行命令
+
+```bash
+wc -l /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt /home/rankrank/.codex/attachments/257aab2e-6353-4120-aec8-866a44e89c8b/pasted-text.txt /home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt research/IntelligentTheory.md
+sed -n '1,240p' /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+sed -n '241,520p' /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+sed -n '521,980p' /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+sed -n '981,1460p' /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+sed -n '1461,2170p' /home/rankrank/.codex/attachments/b84c33d0-1cdb-489f-86a7-63a49faa60f3/pasted-text.txt
+sed -n '1,260p' /home/rankrank/.codex/attachments/257aab2e-6353-4120-aec8-866a44e89c8b/pasted-text.txt
+sed -n '261,620p' /home/rankrank/.codex/attachments/257aab2e-6353-4120-aec8-866a44e89c8b/pasted-text.txt
+sed -n '621,980p' /home/rankrank/.codex/attachments/257aab2e-6353-4120-aec8-866a44e89c8b/pasted-text.txt
+sed -n '1,300p' /home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt
+sed -n '301,760p' /home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt
+sed -n '761,1120p' /home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt
+sed -n '1121,1400p' /home/rankrank/.codex/attachments/1d34c39f-3ab7-4d52-8542-f94baf0f598f/pasted-text.txt
+rg -n "I_\\{|I_\\w|Id_|Int_|identity|intent|预测充分|生命闭合|理论组织完整度" research/IntelligentTheory.md
+```
+
+本阶段没有进行模型测试。
+
+### 理论差异判断
+
+第一份附件的价值：
+
+```text
+把“条件化相对状态—生成场闭合理论”的公式逐条拆开；
+明确这些变量是机制分解变量，不是模型内部显式存储变量；
+修正 Id(identity，身份) 与 Int(intent，意图许可) 的符号冲突；
+补充 source contribution、route gain、identity binding、readout、softmax、phrase likelihood、generation closure 的完整计算链。
+```
+
+第二份附件的价值：
+
+```text
+提出最接近全局不变量的对象不是固定神经元、固定 head 或固定语义向量，
+而是“预测闭合不变量”：
+任意前缀状态都必须形成足以预测下一个 token 的读出分布。
+```
+
+第三份附件的价值：
+
+```text
+把预测闭合推广到生命系统的上位框架：
+生命系统不是由单一守恒量定义，而是由边界维持、可生存域、功能闭合、修复和生成能力定义。
+这对智能理论有启发，但仍是外推，不是语言模型机制实验证据。
+```
+
+原 IntelligentTheory.md 的核心价值：
+
+```text
+已有文件主要整理了自回归训练塑形、条件化相对状态、复用差分、机制图谱、QK/V 拆分、生成场竞争闭合和非线性理论。
+它更偏向“语言模型推理机制如何运行和失败”。
+```
+
+### 文档更新
+
+已将第七章标题升级为：
+
+```text
+预测充分状态—自回归训练—条件化相对状态—生成场闭合理论，以及问题硬伤和下一步
+```
+
+新增小节：
+
+```text
+7.0.1 2026-06-29 再整合：预测充分状态不变量与生命闭合数学
+```
+
+新增理论名称：
+
+```text
+预测充分状态—自回归训练—条件化相对状态—生成场闭合理论
+```
+
+简称：
+
+```text
+预测充分相对状态闭合理论
+```
+
+### 最新核心公式
+
+预测误差势能：
+
+```text
+Q(x_{<=t})
+=
+-log P_theta(x_{t+1}|x_{<=t})
+```
+
+统一词表读出坐标系：
+
+```text
+ell_t
+=
+W_U Norm(h_t)
+in R^{|V|}
+```
+
+读出等价类：
+
+```text
+h ~_readout h'
+iff
+softmax(W_U Norm(h))
+approx
+softmax(W_U Norm(h'))
+```
+
+预测充分状态：
+
+```text
+P(x_{t+1}|h_t)
+approx
+P(x_{t+1}|x_{<=t})
+```
+
+预测充分等价类：
+
+```text
+H_suf(x_{<=t})
+=
+{
+  h:
+  D(
+    P_theta(.|h),
+    P_theta(.|x_{<=t})
+  )
+  < epsilon
+}
+```
+
+生成闭合：
+
+```text
+GenerationClosure
+iff
+L(y_target|x)
+-
+max_{y != y_target} L(y|x)
+>
+delta
+```
+
+生命闭合不变量：
+
+```text
+I_life
+=
+(
+  B,
+  V,
+  F,
+  R,
+  G
+)
+```
+
+其中：
+
+```text
+B = boundary，边界；
+V = viability domain，可生存域；
+F = functional closure，功能闭合；
+R = repairability，可修复性；
+G = generation / reproduction，生成 / 复制性。
+```
+
+生命作用量：
+
+```text
+A_life
+=
+integral [
+  D_V
+  +
+  D_B
+  +
+  E_closure
+  +
+  E_prediction
+  +
+  E_repair
+  +
+  E_generation
+  +
+  E_cost
+] dt
+```
+
+语言模型是退化特例：
+
+```text
+A_LM
+=
+sum_t -log P_theta(x_{t+1}|x_{<=t})
+```
+
+### 关键结论
+
+1. 当前语言模型理论最接近不变量的对象，是给定前缀后的读出分布，以及能够产生该分布的预测充分状态等价类。
+
+2. 条件化相对状态轨迹仍然重要，但它现在应被理解为“进入某个预测充分等价类的路径”。
+
+3. 生成场闭合仍然重要，因为预测充分不等于自然生成成功；目标路线还必须压过 format、echo、recipient、prose、punctuation、other_vocab 等竞争路线。
+
+4. 生命闭合数学提供上位启发，但不能直接替代语言模型内部机制测试。
+
+### 新增硬伤
+
+1. 预测充分状态不变量是全局等价类，不是局部机制定位。它不能直接告诉我们哪个 head、channel、MLP 神经元负责预测充分。
+
+2. 生命闭合数学是上位类比，不是语言模型实验结论。当前模型实验证据只支持预测闭合、生成闭合、路线竞争和局部机制图谱。
+
+3. 预测充分等价类目前尚未组件级测量，需要把读出分布距离、top-k logit margin distance 和 generation closure 联动起来。
+
+### 下一步
+
+新增大任务：
+
+```text
+大任务-1：预测充分等价类测量
+```
+
+目标：
+
+```text
+把“预测充分状态不变量”从理论概念变成可测对象。
+```
+
+核心做法：
+
+```text
+1. 对每个样本记录完整 top-k 读出分布 P_theta(.|x_{<=t})。
+2. 对每个候选组件 u 做干预，得到 P_theta(.|do(u))。
+3. 计算读出分布距离 D_readout(u)。
+4. 计算目标预测充分增益 G_suf(u)。
+5. 区分：
+   只改变 hidden state 的组件；
+   改变读出分布但不闭合的组件；
+   真正把状态推入目标预测充分等价类并提升生成闭合的组件。
+```
+
+成功判据：
+
+```text
+若某类 head / channel / MLP 组件能跨样本稳定降低 target distribution distance，
+并同时提升 token0 closure 与 phrase closure，
+则“预测充分状态”从全局不变量进入组件级图谱。
+```
+
+### 最严格结论
+
+本阶段没有新增模型实验，但完成了理论上位层的关键收紧：
+
+```text
+局部机制图谱
+不再只是解释某个 head 或 channel 的功能；
+而是要解释这些局部机制如何共同维持预测充分状态，
+并如何在生成场中完成或失败于闭合。
+```
+
+当前仍不能宣称已经建立新的完整数学体系。
+更准确地说：
+
+```text
+预测充分状态不变量
+是语言模型方向最可操作的候选全局不变量；
+生命闭合不变量
+是生物学和智能理论方向的上位候选框架；
+二者之间还缺少直接实验桥梁。
+```
+
+## Phase 748: Natural Route Suppressor Matrix（自然路线抑制器矩阵） [2026-06-29 10:20]
+
+### 本阶段问题
+
+前面 Phase 745 已经证明：只压制单个 top competitor（最高竞争者）不足以完成 token0 closure（首词元闭合），需要 route-level multi-competitor suppression（路线级多竞争者抑制）。
+
+本阶段继续问：
+
+```text
+是否能把 suppressor（抑制器）从“某个 patch 是否成功”
+推进为可测量的 route suppressor matrix（路线抑制矩阵）？
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase748_natural_route_suppressor_matrix.py
+tests/gpt5/run_phase748_natural_route_suppressor_matrix_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase748_natural_route_suppressor_matrix/
+```
+
+### 运行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase748_natural_route_suppressor_matrix_round.sh smoke --max-pairs 1 --top-audits 1 --top-candidates 1 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --max-scan-candidates 4 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase748_natural_route_suppressor_matrix_round.sh main --max-pairs 6 --top-audits 2 --top-candidates 3 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase748_natural_route_suppressor_matrix_round.sh confirm --max-pairs 8 --top-audits 2 --top-candidates 3 --top-k-vocab 20 --max-topk-tokens 12 --max-route-classes 7 --log-every 2
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序运行；每个模型结束后释放 GPU，并通过 `--hard-exit-after-model` 避免显存残留。
+
+### 测试原理
+
+对每个候选 whole component（整体组件）做 donor-recipient delta（供体-受体差分）干预，并测量它对不同 route（路线）的读出最大值影响。
+
+路线读出分数：
+
+```text
+S_R(h)=max_{y in V_R} W_U(y)^T Norm(h)
+```
+
+组件对路线的抑制：
+
+```text
+Suppress_u(R)=S_R(h_base)-S_R(h_do(u))
+```
+
+组件对目标答案的增强：
+
+```text
+Boost_u=logit_target(h_do(u))-logit_target(h_base)
+```
+
+路线抑制矩阵：
+
+```text
+M_{u,R}=Suppress_u(R)
+```
+
+测量路线包括：
+
+```text
+recipient_answer
+format_or_schema
+echo_object_or_relation
+punctuation_or_stop
+other_vocab
+other_semantic_value
+```
+
+### 确认轮核心结果
+
+qwen3：
+
+```text
+L32:mlp_out
+  target boost = -0.047
+  route suppression = 2.961
+  route coverage = 3.875
+  donor top1 = 0.000
+
+L33:attn_out
+  target boost = 2.547
+  route suppression = 2.531
+  route coverage = 2.188
+  donor top1 = 0.000
+
+L32:attn_out
+  target boost = 3.066
+  route suppression = 1.180
+  route coverage = 1.938
+  donor top1 = 0.000
+```
+
+qwen3 的 L32:mlp_out 更像纯路线 suppressor：目标答案没有被增强，但 format、other_vocab、punctuation、recipient、echo 等路线被稳定压低。L32/L33 attention output 更像 booster + suppressor 混合组件。
+
+GLM4：
+
+```text
+L34:attn_out
+  target boost = 1.504
+  route suppression = 0.525
+  route coverage = 2.500
+  donor top1 = 0.875
+
+L35:attn_out
+  target boost = 0.543
+  route suppression = 0.611
+  route coverage = 2.812
+  donor top1 = 0.625
+
+L36:mlp_out
+  target boost = -0.441
+  route suppression = 1.332
+  route coverage = 3.125
+  donor top1 = 0.312
+```
+
+GLM4 的 donor answer 基线较强，所以更多表现为 maintenance candidate（维持候选），而不是从错误状态修复到正确状态的 closure candidate（闭合候选）。
+
+DS7B：
+
+```text
+L23:attn_out
+  target boost = 1.762
+  route suppression = 1.637
+  route coverage = 2.875
+  donor top1 = 0.250
+
+L22:attn_out
+  target boost = 1.531
+  route suppression = 2.809
+  route coverage = 2.688
+  donor top1 = 0.188
+
+L26:mlp_out
+  target boost = 0.586
+  route suppression = 2.215
+  route coverage = 3.438
+  donor top1 = 0.000
+
+L25:mlp_out
+  target boost = 0.414
+  route suppression = 2.055
+  route coverage = 3.125
+  donor top1 = 0.000
+```
+
+DS7B 最支持“路线级 suppressor matrix 可测”：L22-L23 attention output 同时有目标增强和 recipient_answer 抑制，L25-L26 MLP output 更像广域路线抑制器。
+
+### 关键结论
+
+1. 当前结果支持：suppressor 不是单点 token 压制，而是 route-level suppressor matrix（路线级抑制矩阵）。
+
+2. 全局 suppressor 不是完整语言编码机制，但它很可能是语言编码中“路线选择与生成闭合”的核心入口。
+
+3. 真实机制不是单纯抑制，而是：
+
+```text
+target boost（目标增强）
++ route suppression（路线抑制）
++ readout field reordering（读出场重排）
+```
+
+4. qwen3、GLM4、DS7B 都出现了可测路线抑制，但三者形态不同：qwen3 抑制强但闭合弱，GLM4 维护强，DS7B 最接近 booster + suppressor 混合闭合。
+
+### 硬伤
+
+1. 当前证据仍是 whole-component donor-recipient delta，不是自然前向因果链的直接证明。
+
+2. 组件粒度仍然太粗，不能证明具体 head、channel、neuron 承担 suppressor。
+
+3. route taxonomy 基于 top-k 词元和人工分类，可能漏掉真实竞争路线。
+
+4. 当前模型是小模型，内部结构可能存在偏差，不能直接外推到大模型。
+
+5. donor top1 rate 仍然偏低，说明 suppressor alone 不足以完成 closure。
+
+### 理论进展
+
+本阶段把“全局 suppressor 就是破解语言编码机制”的说法收紧为：
+
+```text
+全局 suppressor 不是全部语言编码机制；
+但它是语言编码中路线选择、竞争压制、生成闭合的关键结构。
+```
+
+完整图谱应是：
+
+```text
+source / writer / rewriter / booster / suppressor / readout / continuation / closure
+```
+
+其中 suppressor 对应 selective mechanism（选择机制），writer/rewriter/booster 对应 constructive mechanism（构造机制）。
+
+### 下一阶段
+
+Phase 749 建议：
+
+```text
+Suppressor Component Decomposition
+抑制器组件分解
+```
+
+优先下钻：
+
+```text
+qwen3:
+  L32:mlp_out
+  L33:attn_out
+  L32:attn_out
+
+GLM4:
+  L34:attn_out
+  L35:attn_out
+  L36:mlp_out
+
+DS7B:
+  L22:attn_out
+  L23:attn_out
+  L25:mlp_out
+  L26:mlp_out
+```
+
+核心问题：
+
+```text
+1. attention output 是否能分解到 head 级 suppressor？
+2. MLP output 是否能分解到 channel / neuron 级 suppressor？
+3. booster 和 suppressor 是否能被分离？
+4. route-specific suppressor 与 broad/global suppressor 是否可区分？
+```
+
+## Phase 749: Suppressor Component Decomposition（抑制器组件分解） [2026-06-29 10:33]
+
+### 任务背景
+
+Phase 748 证明 whole-component donor-recipient delta（整体组件供体-受体差分）可以形成 route-level suppressor matrix（路线级抑制矩阵），但仍然停留在粗粒度组件层：
+
+```text
+L33:attn_out / L32:mlp_out 有 suppressor 效果，
+不等于已经知道内部哪个 head（注意力头）、channel（通道）或 neuron（神经元）承担该效果。
+```
+
+本阶段继续同一阶段目标：从 whole-component suppressor（整体组件抑制器）下钻到 subunit suppressor（子单元抑制器）。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase749_suppressor_component_decomposition.py
+tests/gpt5/run_phase749_suppressor_component_decomposition_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase749_suppressor_component_decomposition/
+```
+
+确认轮摘要：
+
+```text
+results/glm5_phase749_suppressor_component_decomposition/confirm/phase749_cross_model_summary.md
+```
+
+### 执行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase749_suppressor_component_decomposition_round.sh smoke --max-pairs 1 --top-audits 1 --top-candidates 1 --max-components 1 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --top-heads-per-component 2 --random-heads-per-component 1 --headset-sizes 1 2 --channelset-sizes 1 4 --individual-channels 2 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase749_suppressor_component_decomposition_round.sh main --max-pairs 4 --top-audits 2 --top-candidates 3 --max-components 3 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --top-heads-per-component 4 --random-heads-per-component 2 --headset-sizes 1 2 4 --channelset-sizes 1 4 16 64 --individual-channels 4 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase749_suppressor_component_decomposition_round.sh confirm --max-pairs 6 --top-audits 2 --top-candidates 3 --max-components 3 --top-k-vocab 18 --max-topk-tokens 12 --max-route-classes 7 --top-heads-per-component 4 --random-heads-per-component 2 --headset-sizes 1 2 4 --channelset-sizes 1 4 16 64 --individual-channels 4 --log-every 2
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model` 避免 GPU 显存残留。
+
+### 测试原理
+
+attention output（注意力输出）分解：
+
+```text
+1. 捕获 donor（供体）和 recipient（受体）在 attention o_proj（注意力输出投影）前的 per-head 表示。
+2. 计算每个 head 的 donor-recipient delta。
+3. 将单个 head 或 topH{1,2,4} headset（注意力头集合）的 delta 经 o_proj.weight 投影回 residual stream（残差流）。
+4. 用 route-level max-logit matrix（路线级最大 logit 矩阵）测量 target boost（目标增强）、route suppression（路线抑制）、margin gain（间隔增益）和 delta fraction（相对整体效果比例）。
+```
+
+MLP output（多层感知机输出）分解：
+
+```text
+1. 捕获 donor 和 recipient 的 MLP residual output delta（残差输出差分）。
+2. 按通道估计 route suppression / margin gain。
+3. 测试单通道和 topC{1,4,16,64} channelset（通道集合）。
+4. 与 whole-component（整体组件）效果比较。
+```
+
+注意：MLP channelset 只是 residual output channel evidence（残差输出通道证据），不是严格 neuron（神经元）证据。
+
+### 关键结果
+
+qwen3 最强 attention 子组件：
+
+```text
+L33:attn_out:topH4
+donor top1 = 0.000
+target boost = 1.589
+route suppression = 3.406
+coverage = 3.92
+margin gain = 2.261
+delta fraction = 0.856
+effect = global_suppressor_margin_candidate
+```
+
+qwen3 对照整体组件：
+
+```text
+L33:attn_out whole-component
+target boost = 2.948
+route suppression = 2.656
+margin gain = 3.343
+```
+
+解释：qwen3 的 L33 attention suppressor（第33层注意力抑制器）可以被 topH4 headset（前4个注意力头集合）复现大部分路线抑制效果，甚至在 route suppression 指标上超过整体组件，但 target boost 和最终闭合仍依赖整体组件。
+
+qwen3 MLP 结果：
+
+```text
+L32:mlp_out whole-component:
+  route suppression = 3.094
+
+L32:mlp_out:topC64:
+  route suppression = 1.979
+  coverage = 4.50
+  delta fraction = 0.365
+```
+
+GLM4 结果：
+
+```text
+L36:mlp_out whole-component:
+  donor top1 = 0.333
+  target boost = -0.344
+  route suppression = 1.086
+  margin gain = -0.359
+
+L34:attn_out:topH4:
+  donor top1 = 0.667
+  target boost = 0.729
+  route suppression = 0.659
+  delta fraction = 0.668
+
+L35:attn_out:topH4:
+  donor top1 = 0.333
+  target boost = 0.099
+  route suppression = 0.841
+  delta fraction = 0.662
+```
+
+解释：GLM4 的子组件能复现部分抑制形状，但更像 maintenance（维护）而不是强纠偏。
+
+DS7B 最强 attention 子组件：
+
+```text
+L22:attn_out whole-component:
+  donor top1 = 0.167
+  target boost = 1.208
+  route suppression = 3.323
+  margin gain = 1.739
+
+L22:attn_out:topH4:
+  donor top1 = 0.167
+  target boost = 0.958
+  route suppression = 2.768
+  margin gain = 1.432
+  delta fraction = 0.708
+```
+
+另一个 DS7B 结果：
+
+```text
+L23:attn_out whole-component:
+  donor top1 = 0.250
+  target boost = 1.620
+  route suppression = 2.057
+
+L23:attn_out:topH4:
+  donor top1 = 0.250
+  target boost = 1.266
+  route suppression = 1.911
+  delta fraction = 0.739
+```
+
+DS7B MLP 结果：
+
+```text
+L25:mlp_out whole-component:
+  donor top1 = 0.167
+  target boost = 0.354
+  route suppression = 2.292
+
+L25:mlp_out:topC64:
+  donor top1 = 0.167
+  target boost = 0.359
+  route suppression = 1.177
+  delta fraction = 0.310
+```
+
+### 客观结论
+
+1. Phase 748 的 route suppressor matrix（路线抑制矩阵）不是只能在整体组件层观察到。
+
+2. qwen3 和 DS7B 中，attention suppressor（注意力抑制器）可以明显下钻到少量 headset（注意力头集合）：
+
+```text
+qwen3:
+  L33:attn_out:topH4
+
+DS7B:
+  L22:attn_out:topH4
+  L23:attn_out:topH4
+```
+
+3. MLP suppressor（多层感知机抑制器）可以部分下钻到 residual output channelset（残差输出通道集合），但解释力弱于 attention headset。
+
+4. booster（增强器）和 suppressor（抑制器）仍然纠缠，尚未完全分离。
+
+5. donor top1 rate（供体第一名率）仍偏低，说明 suppressor 可以重排竞争路线，但不能单独保证自然生成闭合。
+
+### 理论进展
+
+Phase 749 把前一阶段的图谱从：
+
+```text
+whole-component suppressor
+```
+
+推进到：
+
+```text
+headset-level suppressor candidate
+channelset-level partial suppressor candidate
+```
+
+因此对“全局 suppressor 就是破解语言编码机制”的判断应收紧为：
+
+```text
+全局 suppressor 是破解语言编码机制的关键入口，
+但不是完整语言编码机制本身。
+```
+
+更完整的当前图谱是：
+
+```text
+source（源词元）
+  -> writer（写入器）
+  -> skeleton carrier（骨架承载器）
+  -> rewriter / booster（重写器 / 增强器）
+  -> route suppressor matrix（路线抑制矩阵）
+  -> readout competition（读出竞争）
+  -> continuation closure（续写闭合）
+```
+
+### 硬伤
+
+1. attention head evidence（注意力头证据）来自 o_proj projected delta（输出投影差分），还不是自然前向因果链证明。
+
+2. MLP channel evidence（多层感知机通道证据）不是 neuron evidence（神经元证据）。
+
+3. 路线分类仍依赖 top-k token（前 k 个词元）和人工 taxonomy（分类表）。
+
+4. 当前模型为小模型，内部结构可能偏离大模型。
+
+5. suppressor 只解释选择和闭合的一部分，不解释全部语义构造。
+
+### 下一阶段
+
+Phase 750 应继续同一阶段目标：
+
+```text
+Natural Subunit Suppressor Necessity Test
+自然子单元抑制器必要性测试
+```
+
+核心问题：
+
+```text
+1. topH4 / topC64 是否在自然 recipient forward（受体自然前向）中必要？
+2. 移除这些子单元是否会破坏目标 token、竞争路线和生成闭合？
+3. attention headset 的效果是否来自 source token attention（源词元注意力）和 value vector（值向量）？
+4. MLP channelset 是否能进一步追到中间 neuron（神经元），还是只是分布式残差投影？
+```
+
+如果 Phase 750 成立，研究可以从：
+
+```text
+差分修补图谱
+```
+
+推进到：
+
+```text
+自然前向功能图谱
+```
+
+## Phase 750: Natural Subunit Suppressor Necessity Test（自然子单元抑制器必要性测试） [2026-06-29 10:44]
+
+### 任务背景
+
+Phase 749 证明部分 attention headset（注意力头集合）和 MLP channelset（多层感知机通道集合）可以复现 donor-recipient delta（供体-受体差分）里的 route suppression（路线抑制）。但这还不能证明它们是自然前向机制的一部分。
+
+本阶段的目标是把问题从：
+
+```text
+patch candidate（修补候选）
+```
+
+推进到：
+
+```text
+natural necessity candidate（自然必要性候选）
+```
+
+因此 Phase 750 不再注入 donor delta，而是在 natural donor / natural recipient forward（自然供体/受体前向）中直接擦除子单元，观察目标答案、竞争路线和读出间隔是否退化。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase750_natural_subunit_suppressor_necessity.py
+tests/gpt5/run_phase750_natural_subunit_suppressor_necessity_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase750_natural_subunit_suppressor_necessity/
+```
+
+确认轮摘要：
+
+```text
+results/glm5_phase750_natural_subunit_suppressor_necessity/confirm/phase750_cross_model_summary.md
+```
+
+### 执行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase750_natural_subunit_suppressor_necessity_round.sh smoke --max-pairs 1 --top-audits 1 --max-components 1 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --headset-sizes 1 2 --channelset-sizes 16 --individual-heads 1 --individual-channels 1 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase750_natural_subunit_suppressor_necessity_round.sh main --max-pairs 4 --top-audits 2 --max-components 3 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --headset-sizes 1 2 4 --channelset-sizes 16 64 --individual-heads 1 --individual-channels 1 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase750_natural_subunit_suppressor_necessity_round.sh confirm --max-pairs 6 --top-audits 2 --max-components 3 --top-k-vocab 18 --max-topk-tokens 12 --max-route-classes 7 --headset-sizes 1 2 4 --channelset-sizes 16 64 --individual-heads 1 --individual-channels 1 --log-every 2
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。
+
+### 测试原理
+
+attention erase（注意力擦除）：
+
+```text
+在 o_proj（输出投影）前，把指定 head 的 final token 输入 slice 置零。
+```
+
+MLP erase（多层感知机擦除）：
+
+```text
+在 MLP output（多层感知机输出）里，把指定 residual output channels（残差输出通道）置零。
+```
+
+衡量指标：
+
+```text
+target_logit_drop_after_erase:
+  擦除后目标答案 logit 下降量。
+
+total_positive_route_release_after_erase:
+  擦除后竞争路线最大 logit 正向释放总量。
+
+mean_margin_drop_target_vs_routes:
+  目标答案相对竞争路线的平均间隔下降。
+
+top1_loss_rate:
+  原来目标答案 top1，擦除后失去 top1 的比例。
+```
+
+### 确认轮关键结果
+
+qwen3：
+
+```text
+L32:attn_out:topH4 / natural_donor
+base top1 = 1.000
+after top1 = 1.000
+top1 loss = 0.000
+target drop = -1.292
+route release = 1.979
+coverage = 3.00
+margin drop = -0.919
+effect = erase_improves_or_inverse_effect
+```
+
+解释：qwen3 出现路线释放，但 target drop 为负，margin 也不退化，说明 Phase 749 的 patch suppressor 不等于自然必要 suppressor。
+
+qwen3 MLP：
+
+```text
+L32:mlp_out:topC64 / natural_donor
+base top1 = 1.000
+after top1 = 1.000
+target drop = -0.417
+route release = 1.854
+margin drop = 0.022
+effect = small_or_no_effect
+```
+
+GLM4：
+
+```text
+L36:mlp_out:topC64 / natural_donor
+base top1 = 1.000
+after top1 = 1.000
+target drop = -0.198
+route release = 0.969
+coverage = 4.33
+margin drop = 0.023
+effect = small_or_no_effect
+```
+
+少量 GLM4 单 head 有自然必要性候选，但样本数太少：
+
+```text
+L34:attn_out:H4 / natural_donor
+n = 2
+target drop = 0.312
+route release = 0.375
+margin drop = 0.250
+effect = natural_suppressor_necessity_candidate
+```
+
+DS7B 最强自然必要性结果：
+
+```text
+L22:attn_out:topH4 / natural_donor
+base top1 = 0.750
+after top1 = 0.500
+top1 loss = 0.250
+target drop = 1.438
+route release = 0.682
+coverage = 1.58
+margin drop = 1.423
+effect = target_support_necessity_candidate
+```
+
+DS7B 单 head：
+
+```text
+L22:attn_out:H1 / natural_donor
+base top1 = 0.857
+after top1 = 0.714
+top1 loss = 0.143
+target drop = 0.518
+route release = 0.777
+coverage = 2.29
+margin drop = 0.616
+effect = natural_suppressor_necessity_candidate
+```
+
+DS7B L23：
+
+```text
+L23:attn_out:topH4 / natural_recipient
+base top1 = 0.750
+after top1 = 0.667
+top1 loss = 0.083
+target drop = 0.542
+route release = 0.740
+coverage = 2.08
+margin drop = 0.542
+effect = target_support_necessity_candidate
+```
+
+DS7B MLP 较弱：
+
+```text
+L25:mlp_out:topC64 / natural_donor
+base top1 = 0.750
+after top1 = 0.750
+target drop = -0.104
+route release = 0.578
+margin drop = -0.076
+effect = small_or_no_effect
+```
+
+### 客观结论
+
+1. Phase 750 是对 Phase 749 的重要纠偏：patch-visible suppressor（修补可见抑制器）不能直接等同 natural suppressor unit（自然抑制单元）。
+
+2. qwen3 的自然擦除多数是 erase improves / inverse effect（擦除改善或反向效果），不支持强自然必要性。
+
+3. GLM4 多数是 weak route release（弱路线释放），不破坏 top1 closure（第一名闭合）。
+
+4. DS7B 的 L22 / L23 attention subunits（第22/23层注意力子单元）出现最接近自然机制的证据：擦除后目标下降、竞争路线释放、margin 退化，并出现部分 top1 loss。
+
+5. MLP channelset（多层感知机通道集合）在自然必要性测试中明显弱于 attention headset（注意力头集合）。
+
+### 理论进展
+
+当前图谱应更新为：
+
+```text
+patch-visible suppressor（修补可见抑制器）
+  说明某个差分方向可以压制竞争路线；
+
+natural suppressor unit（自然抑制单元）
+  必须在自然前向擦除中造成目标下降、竞争释放或闭合丢失；
+
+full coding mechanism（完整编码机制）
+  还需要解释 source、writer、rewriter、booster、suppressor、readout 的自然协同。
+```
+
+最稳妥判断：
+
+```text
+suppressor 是破解语言编码机制的关键拼图；
+DS7B 的 L22/L23 attention 子单元是目前最接近自然 suppressor 的证据；
+但完整语言编码机制尚未闭合。
+```
+
+### 硬伤
+
+1. 擦除是人工干预，可能造成 off-manifold perturbation（离流形扰动）。
+
+2. qwen3 和 GLM4 未出现稳定自然必要性，说明模型结构差异很大。
+
+3. DS7B 是小模型，不能直接外推到大模型。
+
+4. attention head（注意力头）证据仍不是 neuron（神经元）证据。
+
+5. MLP channelset 不是 MLP neuron，且自然必要性弱。
+
+6. route taxonomy（路线分类）仍可能漏掉真实竞争路线。
+
+### 下一阶段
+
+Phase 751 建议：
+
+```text
+Natural Attention Head Mechanism Backtrace
+自然注意力头机制回溯
+```
+
+聚焦：
+
+```text
+L22:attn_out:H1
+L22:attn_out:topH2
+L22:attn_out:topH4
+L23:attn_out:topH4
+```
+
+核心问题：
+
+```text
+1. 这些 head 在自然前向中 attend 哪些 source token？
+2. Q/K pattern（查询/键模式）和 V/O content（值/输出内容）能否分离？
+3. 它们是 target support（目标支持）、route suppression（路线抑制），还是二者混合？
+4. L22 和 L23 是否构成连续机制链？
+```
+
+## Phase 751: 自然注意力头机制回溯 [2026-06-29 11:12]
+
+### 任务判断
+
+本阶段分析的上传内容方向基本正确：当前路线已经从普通 patch（修补）推进到 route-level suppressor（路线级抑制器）和 subunit natural necessity（子单元自然必要性）。但结论必须收紧：现在还不是完整语言编码机制，只是小模型、局部任务、head 级路径图谱。最关键的修正是：
+
+```text
+attention mass 只是 Q/K pattern（查询/键模式）观察证据；
+真正更接近因果的是 source-restricted V/O contribution removal（源限制值/输出贡献移除）。
+```
+
+因此继续 Phase751 属于同一阶段性目标，不需要另行确认。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase751_natural_attention_head_mechanism_backtrace.py
+tests/gpt5/run_phase751_natural_attention_head_mechanism_backtrace_round.sh
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase751_natural_attention_head_mechanism_backtrace.py
+```
+
+dry-run：
+
+```bash
+python tests/gpt5/phase751_natural_attention_head_mechanism_backtrace.py --dry-run --round-name smoke --max-pairs 1 --top-audits 1 --max-components 1 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --headset-sizes 1 2 --individual-heads 1 --max-focus-heads 1 --max-source-groups 4
+```
+
+smoke：
+
+```bash
+tests/gpt5/run_phase751_natural_attention_head_mechanism_backtrace_round.sh smoke --max-pairs 1 --top-audits 1 --max-components 1 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --headset-sizes 1 2 --individual-heads 1 --max-focus-heads 1 --max-source-groups 4 --log-every 1
+```
+
+main：
+
+```bash
+tests/gpt5/run_phase751_natural_attention_head_mechanism_backtrace_round.sh main --max-pairs 4 --top-audits 1 --max-components 2 --top-k-vocab 14 --max-topk-tokens 8 --max-route-classes 5 --headset-sizes 1 2 4 --individual-heads 1 --max-focus-heads 2 --max-source-groups 8 --log-every 1
+```
+
+confirm：
+
+```bash
+tests/gpt5/run_phase751_natural_attention_head_mechanism_backtrace_round.sh confirm --max-pairs 6 --top-audits 1 --max-components 2 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --headset-sizes 1 2 4 --individual-heads 1 --max-focus-heads 2 --max-source-groups 8 --log-every 2
+```
+
+说明：为了读取逐 head attention map（注意力图）并在 o_proj（输出投影）前移除 source contribution（源贡献），本阶段使用 bf16、非量化、eager attention。三模型均按 qwen3 -> GLM4 -> DS7B 顺序运行，并带 `--hard-exit-after-model`。
+
+### 测试原理
+
+本阶段把注意力头拆成两部分：
+
+```text
+Q/K pattern:
+head 在自然前向中看向哪些 source token。
+
+V/O content:
+head 从这些 source token 取出的 value 内容，经 o_proj 写入 residual 后，对 target logit 和 route competition 有什么影响。
+```
+
+核心流程：
+
+```text
+1. 捕获自然前向中的 attention weights 和 v_proj 输出。
+2. 把 prompt 切成 target_record_line、target_value_tokens、records_all、object_tokens、relation_tokens 等 source group。
+3. 对候选 head / headset 计算 source group attention mass。
+4. 计算 attention * value 得到 source contribution。
+5. 在 o_proj 输入处只移除某 head 从某 source group 带来的 contribution。
+6. 比较 target logit drop、route release、margin drop、top1 loss。
+```
+
+### 结果文件
+
+```text
+results/glm5_phase751_natural_attention_head_mechanism_backtrace/smoke/
+results/glm5_phase751_natural_attention_head_mechanism_backtrace/main/
+results/glm5_phase751_natural_attention_head_mechanism_backtrace/confirm/
+```
+
+confirm 轮行数：
+
+```text
+qwen3:      768
+GLM4:      912
+DS7B:     1040
+```
+
+### 主要结果
+
+qwen3 confirm：
+
+```text
+L33:attn_out:H15 / natural_donor / target_record_line
+attention mass = 0.307
+source target contribution = 10.700
+source route suppression contribution = 0.494
+remove target drop = 1.125
+route release = 0.125
+top1 loss = 0.000
+role = target_support_content
+```
+
+qwen3 的 L33:topH4 也出现混合机制：
+
+```text
+L33:attn_out:topH4 / natural_donor / target_record_line
+n = 6
+source target contribution = 9.563
+source route suppression contribution = 1.140
+remove target drop = 0.583
+route release = 0.625
+role = mixed_target_support_and_route_guard
+```
+
+GLM4 confirm：
+
+```text
+L35:attn_out:H29 / natural_recipient / records_all
+attention mass = 0.622
+source target contribution = 0.986
+remove target drop = 0.250
+route release = 0.000
+role = target_support_content
+```
+
+GLM4 证据弱于 qwen3 和 DS7B，并且 L34:H4 多数表现为 high Q/K attention but weak causal content（高注意力但弱因果内容）。
+
+DS7B confirm 最强单头：
+
+```text
+L22:attn_out:H24 / natural_donor / target_record_line
+attention mass = 0.817
+source target contribution = 0.281
+source route suppression contribution = 0.320
+remove target drop = 1.250
+route release = 0.000
+margin drop = 0.922
+top1 loss = 0.000
+role = target_support_content
+```
+
+DS7B confirm 最强 headset：
+
+```text
+L22:attn_out:topH4 / natural_donor / records_all
+n = 6
+attention mass = 0.427
+source target contribution = 1.918
+source route suppression contribution = 0.922
+remove target drop = 1.031
+route release = 0.177
+margin drop = 0.803
+top1 loss = 0.000
+role = target_support_content
+```
+
+Phase750 的 H1 得到延续：
+
+```text
+L22:attn_out:H1 / natural_recipient / target_record_line
+n = 6
+attention mass = 0.384
+source target contribution = 1.602
+source route suppression contribution = 0.368
+remove target drop = 0.708
+route release = 0.188
+top1 loss = 0.167
+role = target_support_content
+```
+
+出现一个 L23 候选：
+
+```text
+L23:attn_out:H6 / natural_recipient / relation_tokens
+attention mass = 0.600
+source target contribution = 3.754
+remove target drop = 0.688
+route release = 0.125
+role = target_support_content
+```
+
+### 理论进展
+
+Phase751 把图谱从：
+
+```text
+head erase proves necessity
+```
+
+推进到：
+
+```text
+source-group restricted V/O contribution removal proves source-content path
+```
+
+现在可以更具体地描述一条自然路径：
+
+```text
+source token group
+  -> attention head Q/K selects source
+  -> V vector carries content
+  -> O projection writes residual
+  -> target logit / route competition changes
+```
+
+这说明 suppressor（抑制器）不是唯一核心单元。更稳的说法是：
+
+```text
+自然语言生成中存在 source-conditioned writer / supporter / guard path；
+suppressor 是 route competition 中的关键功能，但最强自然头也可能首先表现为 target support。
+```
+
+### 严格审视
+
+1. 当前仍是 head 级和 source group 级证据，不是 neuron（神经元）级证据。
+2. source group 来自人工 token span 规则，可能不等同于模型内部真实分组。
+3. source contribution removal 仍是人工干预，可能存在 off-manifold effect（离流形效应）。
+4. qwen3 和 DS7B 的贡献值尺度不同，不能直接比较绝对值。
+5. DS7B L22:H24 是新出现的强候选，需要确认它是不是稳定 writer，而不是动态筛选偏差。
+6. L23:H6 很有价值，但当前 n=1，不能作为稳定结论。
+
+### 下一阶段
+
+Phase 752 建议：
+
+```text
+Natural Writer Stability and Path Chain Validation
+自然写入器稳定性与路径链验证
+```
+
+任务：
+
+```text
+1. 固定 DS7B L22:H24、L22:H1、L22:topH4、L23:H6。
+2. 扩展苹果—水果—属性任务中的 object、relation、answer 类型。
+3. 判断这些 head 是 object-specific、relation-specific，还是 answer-value-specific。
+4. 追踪 L22:H24 写入后，L23、MLP、readout 是否继续使用同一路径。
+5. 对比 head removal、source contribution removal、downstream residual patch 是否闭合。
+```
+
+阶段性目标是把图谱从单层 source-content path（源内容路径）推进到：
+
+```text
+source -> writer head -> downstream carrier/rewriter -> readout competition
+```
+
+## Phase 752: 自然写入器稳定性与路径链验证 [2026-06-29 11:25]
+
+### 对上传内容的判断
+
+上传内容方向基本正确：当前“苹果—水果—属性”图谱已经应该从普通 patch（修补）转向自然路径链验证。需要保守收紧的是：attention mass（注意力质量）只能说明 Q/K pattern（查询/键模式）自然看向哪里；source-restricted V/O contribution removal（源限制值/输出贡献移除）才更接近因果证据，但仍然只是 head-source path（注意力头-源路径）层级证据，不等于神经元级完整图谱。
+
+### 脚本
+
+```text
+tests/gpt5/phase752_natural_writer_stability_path_chain.py
+tests/gpt5/run_phase752_natural_writer_stability_path_chain_round.sh
+```
+
+脚本不使用量化方案；三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model` 避免显存叠加。
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase752_natural_writer_stability_path_chain.py
+```
+
+```bash
+tests/gpt5/run_phase752_natural_writer_stability_path_chain_round.sh smoke --max-pairs 1 --top-audits 1 --max-candidates 2 --max-source-groups 3 --top-k-vocab 10 --max-topk-tokens 6 --max-route-classes 4 --log-every 1
+```
+
+```bash
+tests/gpt5/run_phase752_natural_writer_stability_path_chain_round.sh main --max-pairs 8 --include-extended-relations --top-audits 1 --max-candidates 4 --max-source-groups 5 --top-k-vocab 14 --max-topk-tokens 8 --max-route-classes 5 --log-every 2
+```
+
+```bash
+tests/gpt5/run_phase752_natural_writer_stability_path_chain_round.sh confirm --max-pairs 12 --include-extended-relations --top-audits 1 --max-candidates 4 --max-source-groups 5 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --log-every 3
+```
+
+### 原理
+
+固定 Phase 751 找到的候选 head（注意力头），跨 object / relation / answer（对象/关系/答案）扩展测试。对每个 head 和 source group（源组）记录自然 attention（注意力）和 V/O contribution（值/输出贡献），然后只移除该 head 从指定源组写入的贡献，观察 target logit drop（目标词元 logit 下降）、route release（路线释放）、top1 loss（第一名丢失）和 final hidden delta（最终隐藏态扰动）。
+
+固定候选：
+
+```text
+qwen3: L33:H15, L33:H23, L32:H11, L32:H0
+GLM4: L35:H29, L34:H4, L34:H9
+DS7B: L22:H24, L22:H1, L22:H7, L23:H6
+```
+
+### 结果
+
+确认轮：
+
+```text
+qwen3: 480 rows
+GLM4: 360 rows
+DS7B: 480 rows
+```
+
+汇总文件：
+
+```text
+results/glm5_phase752_natural_writer_stability_path_chain/confirm/phase752_cross_model_summary.md
+```
+
+qwen3：
+
+```text
+natural_donor L32:H11 target_record_line
+n=12, relations=6
+support rate=0.333
+mean target drop=0.062
+route guard rate=0.250
+final delta=5.809
+判断：relation_conditioned_writer
+```
+
+GLM4：
+
+```text
+natural_donor L35:H29 records_all
+n=12, relations=6
+support rate=0.167
+mean target drop=0.094
+route guard rate=0.000
+final delta=2.775
+判断：weak_or_unstable
+```
+
+DS7B：
+
+```text
+natural_recipient L22:H24 records_all
+n=12, relations=6
+support rate=0.917
+mean target drop=0.688
+route guard rate=0.500
+mean route release=0.516
+top1 loss=0.167
+final delta=14.240
+判断：stable_mixed_writer_guard
+```
+
+```text
+natural_recipient L22:H24 target_record_line
+n=12, relations=6
+support rate=0.833
+mean target drop=0.594
+route guard rate=0.417
+mean route release=0.484
+final delta=12.786
+判断：stable_mixed_writer_guard
+```
+
+```text
+natural_recipient L22:H1 records_all
+n=12, relations=6
+support rate=0.750
+mean target drop=0.474
+route guard rate=0.667
+mean route release=0.620
+final delta=11.413
+判断：stable_mixed_writer_guard
+```
+
+```text
+natural_donor L22:H24 records_all
+n=12, relations=6
+support rate=0.750
+mean target drop=0.401
+route guard rate=0.167
+mean route release=0.104
+final delta=9.938
+判断：stable_target_writer
+```
+
+### 进展
+
+Phase 752 把 Phase 751 的自然注意力头回溯推进到稳定性验证：
+
+```text
+1. DS7B L22:H24 是当前最稳定的自然写入器候选。
+2. DS7B L22:H1 更像 target writer + route guard（目标写入器 + 路线守门器）的混合组件。
+3. qwen3 的相关 head 更多是 relation-conditioned（关系条件化）或 answer-value-specific（答案值特异）片段。
+4. GLM4 没有出现强稳定写入器。
+5. DS7B 的 final hidden delta 更大，说明 L22 写入扰动会向后层传播。
+```
+
+### 严格问题
+
+```text
+1. hidden delta 只证明扰动传播，不证明下游模块正确使用同一路径。
+2. source group 仍然是外部 token span 标签，不是模型内部自带语义单元。
+3. DS7B 是小模型，内部结构可能存在偏差。
+4. qwen3 / GLM4 没有复现 DS7B 的稳定 L22 写入器，机制可能模型特异。
+5. 当前仍然是 head-source path 图谱，不是 neuron-level graph（神经元级图谱）。
+```
+
+### 理论进展
+
+当前最稳妥的表达：
+
+```text
+语言生成不是单个语义向量被直接读出，而是由 source-conditioned writer（源条件化写入器）、route guard（路线守门器）、downstream carrier（下游承载器）和 readout competition（读出竞争）共同形成的条件化路径。
+```
+
+DS7B 局部证据已经支持：
+
+```text
+source record/value
+-> L22:H24 / L22:H1
+-> downstream residual perturbation
+-> route competition changes
+-> final answer logit changes
+```
+
+但还没有证明：
+
+```text
+source -> writer -> exact downstream carrier -> exact rewriter -> exact readout
+```
+
+### 下一步
+
+Phase 753：
+
+```text
+Downstream Carrier Closure for L22 Writer Path
+L22 写入器路径的下游承载闭合验证
+```
+
+任务：
+
+```text
+1. 固定 DS7B L22:H24 和 L22:H1。
+2. 移除它们的 source contribution 后，在 L23-L27 的 residual / attn / MLP 位置尝试恢复。
+3. 如果某个下游位置能恢复 target logit，同时压回 route release，说明它更可能是 carrier / rewriter。
+4. 对比 target_record_line、target_value_tokens、records_all 三种源组，判断下游承载是否依赖源粒度。
+5. 不扩大模型范围，先把 DS7B 的自然路径链闭合，再考虑跨模型复现。
+```
+
+## Phase 755: 跨语义域路线不变量图谱第一版 [2026-06-29 12:17]
+
+### 对上传内容的判断
+
+上传内容中“必须从苹果-水果局部图谱扩展到植物、动物、物品、工具、抽象概念”的判断正确。当前苹果-水果图谱只能说明 fruit-domain（水果域）内部的 route competition（路线竞争），无法判断 format / echo / suppression route 是否跨语义域复用，也无法判断 DS7B L22:H24 / L22:H1 是否是跨域 writer（写入器）。
+
+需要收紧的是：Graph Atlas v1.0 还不能说已经完成 language graph（语言全图）。本轮只能称为第一版 Cross-Domain Route Invariance Atlas（跨语义域路线不变量图谱）。
+
+### 脚本
+
+```text
+tests/gpt5/phase755_cross_domain_route_invariance_atlas.py
+tests/gpt5/run_phase755_cross_domain_route_invariance_atlas_round.sh
+```
+
+脚本使用 bf16，不使用量化。由于需要 `output_attentions` 和 V/O contribution hook（值/输出贡献钩子），实际使用 eager attention。
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase755_cross_domain_route_invariance_atlas.py
+```
+
+```bash
+tests/gpt5/run_phase755_cross_domain_route_invariance_atlas_round.sh smoke --max-pairs 2 --max-candidates 1 --max-source-groups 2 --top-k-vocab 8 --max-topk-tokens 5 --max-route-classes 4 --log-every 1
+```
+
+```bash
+tests/gpt5/run_phase755_cross_domain_route_invariance_atlas_round.sh main --max-pairs 30 --max-candidates 3 --max-source-groups 3 --top-k-vocab 16 --max-topk-tokens 10 --max-route-classes 6 --log-every 5
+```
+
+```bash
+tests/gpt5/run_phase755_cross_domain_route_invariance_atlas_round.sh confirm --max-pairs 60 --max-candidates 3 --max-source-groups 3 --top-k-vocab 18 --max-topk-tokens 12 --max-route-classes 6 --log-every 10
+```
+
+实际有效 pair 数为 58。
+
+### 原理
+
+测试域：
+
+```text
+fruit, animal, plant, object, tool, abstract
+```
+
+测试关系：
+
+```text
+category, color, taste, shape, edible, grows_on_tree
+```
+
+每个样本构造 explicit_profile（显式事实）和 conflict_profile（冲突事实），主要观察 explicit_profile 下的自然路线结构。
+
+测试两类现象：
+
+```text
+1. route profile（路线轮廓）
+   统计 top token class，并计算不同 domain 的 route profile JS divergence。
+
+2. fixed head/source contribution removal（固定注意力头/源贡献移除）
+   qwen3: L33:H15, L33:H23, L32:H11
+   GLM4: L35:H29, L34:H4, L34:H9
+   DS7B: L22:H24, L22:H1, L22:H7
+```
+
+### 结果
+
+确认轮：
+
+```text
+qwen3: 580 rows, 58 route observations, 522 source removals
+GLM4: 580 rows, 58 route observations, 522 source removals
+DS7B: 580 rows, 58 route observations, 522 source removals
+```
+
+结果文件：
+
+```text
+results/glm5_phase755_cross_domain_route_invariance_atlas/confirm/phase755_cross_model_summary.md
+```
+
+route profile：
+
+```text
+qwen3 mean pairwise domain JS = 0.0433
+top class counts = donor_answer 45, format_or_schema 13
+
+GLM4 mean pairwise domain JS = 0.0970
+top class counts = donor_answer 58
+
+DS7B mean pairwise domain JS = 0.0542
+top class counts = donor_answer 34, format_or_schema 18, echo_object_or_relation 3, punctuation_or_stop 2, other_vocab 1
+```
+
+qwen3：
+
+```text
+L33:H23 records_all
+n=58, domains=6
+support rate=0.224
+mean target drop=0.110
+route guard rate=0.241
+mean route release=0.108
+判断：domain_specific_or_weak
+```
+
+GLM4：
+
+```text
+L35:H29 records_all
+n=58, domains=6
+support rate=0.034
+mean target drop=0.023
+route guard rate=0.069
+mean route release=0.055
+判断：domain_specific_or_weak
+```
+
+DS7B：
+
+```text
+L22:H24 records_all
+n=58, domains=6
+support rate=0.862
+mean target drop=0.528
+route guard rate=0.310
+mean route release=0.200
+top1 loss=0.121
+判断：cross_domain_writer_candidate
+```
+
+```text
+L22:H1 records_all
+n=58, domains=6
+support rate=0.810
+mean target drop=0.554
+route guard rate=0.328
+mean route release=0.189
+top1 loss=0.121
+判断：cross_domain_writer_candidate
+```
+
+```text
+L22:H24 target_record_line
+n=58, domains=6
+support rate=0.810
+mean target drop=0.448
+route guard rate=0.328
+mean route release=0.223
+判断：cross_domain_writer_candidate
+```
+
+```text
+L22:H1 target_record_line
+n=58, domains=6
+support rate=0.672
+mean target drop=0.435
+route guard rate=0.379
+mean route release=0.204
+判断：cross_domain_mixed_writer_guard
+```
+
+```text
+L22:H24 target_value_tokens
+n=58, domains=6
+support rate=0.534
+mean target drop=0.268
+route guard rate=0.379
+mean route release=0.218
+判断：cross_domain_route_guard_candidate
+```
+
+### 进展
+
+Phase 755 将 Phase 752 的 DS7B L22:H24 / L22:H1 从 fruit-domain（水果域）推进到六个 domain 的跨域验证。结果显示：
+
+```text
+DS7B L22:H24 / L22:H1 不只是苹果-水果局部 writer。
+它们在 fruit / animal / plant / object / tool / abstract 上都有稳定 target-support effect。
+```
+
+但 qwen3 和 GLM4 没有同等复现，所以当前结论必须写成：
+
+```text
+DS7B-local cross-domain writer candidate
+```
+
+不能写成：
+
+```text
+cross-model universal invariant
+```
+
+### 严格问题
+
+```text
+1. route JS 低只能说明路线轮廓相似，不能单独证明数学不变量。
+2. DS7B 强成立，qwen3 / GLM4 不强。
+3. domain 词表仍小，abstract domain 尤其粗糙。
+4. 显式事实提示不等价于自然知识网络。
+5. 当前仍然是 head-source path 图谱，不是 neuron-level atlas。
+6. 下游 carrier / rewriter 仍未定位。
+```
+
+### 理论进展
+
+当前最稳妥表达：
+
+```text
+语言模型中可能存在跨语义域复用的 route competition skeleton（路线竞争骨架）。
+DS7B 中 L22:H24 / L22:H1 是目前最强的跨域 writer / guard 候选。
+```
+
+DS7B 支持的局部链条：
+
+```text
+domain facts
+-> records_all / target_record_line
+-> L22:H24 / L22:H1
+-> target logit support
+-> route competition changes
+```
+
+### 下一步
+
+Phase 756：
+
+```text
+Cross-Domain Writer Control and Downstream Carrier Test
+跨域写入器控制组与下游承载验证
+```
+
+任务：
+
+```text
+1. 固定 DS7B L22:H24 / L22:H1。
+2. 加入 same-layer random head、L22:H7、L23:H6 作为控制。
+3. 对 records_all / target_record_line 做 source removal + downstream residual restore。
+4. 检查 L23-L27 哪些位置能恢复 target logit，同时压回 route release。
+5. 如果 L22:H24/H1 强于随机头，且存在可恢复的 downstream carrier，才可以把 Phase 755 的跨域 writer 结果写入 Graph Atlas v1。
+```

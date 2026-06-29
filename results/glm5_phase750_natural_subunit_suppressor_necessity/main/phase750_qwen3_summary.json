@@ -1,0 +1,2694 @@
+{
+  "attn_implementation": "eager",
+  "components": [
+    "L32:mlp_out",
+    "L33:attn_out",
+    "L32:attn_out"
+  ],
+  "dtype": "bfloat16",
+  "model": "qwen3",
+  "n_rows": 176,
+  "phase": 750,
+  "quantization": "off",
+  "round": "main",
+  "strict_interpretation": "Natural erase evidence. It tests whether a subunit is needed in ordinary forward passes, but erase can create off-manifold perturbations and still does not prove neuron-level origin.",
+  "summary": [
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 2,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.296875,
+      "mean_margin_drop_target_vs_contrast": -0.734375,
+      "mean_margin_drop_target_vs_routes": -0.5375,
+      "mean_readout_jsd_on_selected_vocab": 0.00028268604361058854,
+      "mean_route_release_coverage": 3.25,
+      "mean_target_logit_drop_after_erase": -1.03125,
+      "mean_total_positive_route_release_after_erase": 2.28125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.96875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.140625,
+      "mean_margin_drop_target_vs_contrast": -0.359375,
+      "mean_margin_drop_target_vs_routes": -0.084375,
+      "mean_readout_jsd_on_selected_vocab": 3.332211299798519e-05,
+      "mean_route_release_coverage": 3.75,
+      "mean_target_logit_drop_after_erase": -0.5,
+      "mean_total_positive_route_release_after_erase": 1.84375,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.375,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": 0.53125,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.53125,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.625,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC64",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.5,
+      "mean_margin_drop_target_vs_contrast": -0.28125,
+      "mean_margin_drop_target_vs_routes": -0.671875,
+      "mean_readout_jsd_on_selected_vocab": 0.006120291663003828,
+      "mean_route_release_coverage": 2.5,
+      "mean_target_logit_drop_after_erase": -0.78125,
+      "mean_total_positive_route_release_after_erase": 1.28125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.15625,
+          "n": 8,
+          "positive_release_rate": 0.75
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "route_guard_necessity_candidate": 2,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.46875,
+      "mean_margin_drop_target_vs_routes": -0.090625,
+      "mean_readout_jsd_on_selected_vocab": 6.500812413377335e-05,
+      "mean_route_release_coverage": 2.75,
+      "mean_target_logit_drop_after_erase": -0.34375,
+      "mean_total_positive_route_release_after_erase": 1.15625,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.3125,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.5,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": 0.09375,
+      "mean_readout_jsd_on_selected_vocab": 0.0010031051986375572,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 1.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.625,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H26",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.625,
+      "mean_margin_drop_target_vs_routes": -0.28125,
+      "mean_readout_jsd_on_selected_vocab": 8.75877447902907e-06,
+      "mean_route_release_coverage": 4.0,
+      "mean_target_logit_drop_after_erase": -0.5,
+      "mean_total_positive_route_release_after_erase": 0.875,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C0",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": -0.046875,
+      "mean_margin_drop_target_vs_contrast": -0.359375,
+      "mean_margin_drop_target_vs_routes": -0.1390625,
+      "mean_readout_jsd_on_selected_vocab": 3.473410177241493e-05,
+      "mean_route_release_coverage": 3.25,
+      "mean_target_logit_drop_after_erase": -0.3125,
+      "mean_total_positive_route_release_after_erase": 0.78125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": 0.1875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC16",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.25,
+      "mean_margin_drop_target_vs_routes": -0.0625,
+      "mean_readout_jsd_on_selected_vocab": 3.056045929089932e-06,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": -0.25,
+      "mean_total_positive_route_release_after_erase": 0.75,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H26",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.109375,
+      "mean_margin_drop_target_vs_contrast": -0.171875,
+      "mean_margin_drop_target_vs_routes": -0.09375,
+      "mean_readout_jsd_on_selected_vocab": 0.0003235392245475866,
+      "mean_route_release_coverage": 2.5,
+      "mean_target_logit_drop_after_erase": -0.28125,
+      "mean_total_positive_route_release_after_erase": 0.71875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.1875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.08333333333333333,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": 0.20833333333333334,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.28125,
+          "n": 8,
+          "positive_release_rate": 0.75
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC16",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.15625,
+      "mean_margin_drop_target_vs_contrast": -0.1875,
+      "mean_margin_drop_target_vs_routes": -0.203125,
+      "mean_readout_jsd_on_selected_vocab": 0.0005987179051327595,
+      "mean_route_release_coverage": 1.75,
+      "mean_target_logit_drop_after_erase": -0.34375,
+      "mean_total_positive_route_release_after_erase": 0.71875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.16666666666666666,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.20833333333333334,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.3125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC64",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.34375,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": -0.3828125,
+      "mean_readout_jsd_on_selected_vocab": 0.004767850636538257,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": -0.28125,
+      "mean_total_positive_route_release_after_erase": 0.6875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.25,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "other_vocab": {
+          "mean_route_release": -0.375,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_margin_drop_target_vs_routes": 0.15625,
+      "mean_readout_jsd_on_selected_vocab": 0.0005873191301666546,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.625,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C0",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "natural_suppressor_necessity_candidate",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.25,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.25,
+      "mean_readout_jsd_on_selected_vocab": 8.628909546187091e-05,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": 0.25,
+      "mean_total_positive_route_release_after_erase": 0.5,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H0",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": -0.09375,
+      "mean_margin_drop_target_vs_contrast": -0.15625,
+      "mean_margin_drop_target_vs_routes": -0.0109375,
+      "mean_readout_jsd_on_selected_vocab": 2.9502870823717623e-05,
+      "mean_route_release_coverage": 2.25,
+      "mean_target_logit_drop_after_erase": -0.0625,
+      "mean_total_positive_route_release_after_erase": 0.46875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.40625,
+      "mean_margin_drop_target_vs_contrast": 0.625,
+      "mean_margin_drop_target_vs_routes": 0.1453125,
+      "mean_readout_jsd_on_selected_vocab": 6.6525163620952e-05,
+      "mean_route_release_coverage": 1.25,
+      "mean_target_logit_drop_after_erase": 0.21875,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.28125,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "route_guard_necessity_candidate": 2,
+        "small_or_no_effect": 2,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0625,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_margin_drop_target_vs_routes": 0.125,
+      "mean_readout_jsd_on_selected_vocab": 0.0017217473324674484,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": 0.3125,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.25,
+          "n": 8,
+          "positive_release_rate": 0.25
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 8
+      },
+      "mean_contrast_logit_gain_after_erase": 0.078125,
+      "mean_margin_drop_target_vs_contrast": 0.296875,
+      "mean_margin_drop_target_vs_routes": 0.015625,
+      "mean_readout_jsd_on_selected_vocab": 0.0005793955456086129,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": 0.21875,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.4583333333333333,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "other_vocab": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.09375,
+          "n": 8,
+          "positive_release_rate": 0.25
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.1875,
+      "mean_margin_drop_target_vs_routes": -0.115625,
+      "mean_readout_jsd_on_selected_vocab": 1.4333170951954825e-05,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.1875,
+          "n": 4,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.125,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H11",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": 0.0625,
+      "mean_readout_jsd_on_selected_vocab": 9.245273189735545e-07,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.25,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2464",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.625,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_margin_drop_target_vs_routes": -0.3125,
+      "mean_readout_jsd_on_selected_vocab": 9.101531018543305e-06,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.25,
+      "mean_total_positive_route_release_after_erase": 0.25,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H30",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_margin_drop_target_vs_routes": -0.140625,
+      "mean_readout_jsd_on_selected_vocab": 1.1099276618519357e-05,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.1875,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.0625,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.125,
+          "n": 4,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.1875,
+          "n": 4,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H21",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.1875,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": -0.1984375,
+      "mean_readout_jsd_on_selected_vocab": 2.62764076338343e-05,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.15625,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": -0.0625,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.1875,
+      "mean_margin_drop_target_vs_contrast": 0.1875,
+      "mean_margin_drop_target_vs_routes": 0.0625,
+      "mean_readout_jsd_on_selected_vocab": 9.679891296947169e-05,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H30",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": -0.125,
+      "mean_readout_jsd_on_selected_vocab": 6.935867417693961e-06,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2123",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.265625,
+      "mean_margin_drop_target_vs_contrast": 0.234375,
+      "mean_margin_drop_target_vs_routes": -0.140625,
+      "mean_readout_jsd_on_selected_vocab": 6.202977090756913e-05,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.03125,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.125,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.3125,
+      "mean_margin_drop_target_vs_routes": -0.1875,
+      "mean_readout_jsd_on_selected_vocab": 0.00013492820256801014,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.25,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H0",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 4,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.078125,
+      "mean_margin_drop_target_vs_contrast": 0.328125,
+      "mean_margin_drop_target_vs_routes": 0.0546875,
+      "mean_readout_jsd_on_selected_vocab": 0.0011704260521043857,
+      "mean_route_release_coverage": 0.5,
+      "mean_target_logit_drop_after_erase": 0.25,
+      "mean_total_positive_route_release_after_erase": 0.09375,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.375,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "other_vocab": {
+          "mean_route_release": -0.25,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 6,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.046875,
+      "mean_margin_drop_target_vs_contrast": 0.328125,
+      "mean_margin_drop_target_vs_routes": 0.109375,
+      "mean_readout_jsd_on_selected_vocab": 0.00019670461728960815,
+      "mean_route_release_coverage": 0.25,
+      "mean_target_logit_drop_after_erase": 0.28125,
+      "mean_total_positive_route_release_after_erase": 0.03125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.0625,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.20833333333333334,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.1875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "target_support_necessity_candidate",
+      "effect_guess_counts": {
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": 1.0,
+      "mean_margin_drop_target_vs_routes": 0.4375,
+      "mean_readout_jsd_on_selected_vocab": 0.000307423068775808,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 1.0,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -1.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H23",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.1875,
+      "mean_margin_drop_target_vs_contrast": 0.8125,
+      "mean_margin_drop_target_vs_routes": 0.078125,
+      "mean_readout_jsd_on_selected_vocab": 0.0005897743906144422,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.625,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.3125,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.875,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.5,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.5,
+          "n": 4,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H11",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.025,
+      "mean_readout_jsd_on_selected_vocab": 9.31763525013255e-06,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.125,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2123",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "mean_readout_jsd_on_selected_vocab": 0.0,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2464",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0625,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": 0.0,
+      "mean_readout_jsd_on_selected_vocab": 2.0493247689749515e-06,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2415",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": -0.03125,
+      "mean_readout_jsd_on_selected_vocab": 0.00019129824370657647,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.0625,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.0625,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.1875,
+          "n": 4,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H21",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": -0.03125,
+      "mean_readout_jsd_on_selected_vocab": 7.932377075267937e-08,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2415",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": -0.2,
+      "mean_readout_jsd_on_selected_vocab": 7.380554627975518e-05,
+      "mean_route_release_coverage": 0.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.0,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H23",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "timestamp": "2026-06-29 10:42:08",
+  "title": "Natural Subunit Suppressor Necessity Test",
+  "top_natural_necessity_candidates": [
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 2,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.296875,
+      "mean_margin_drop_target_vs_contrast": -0.734375,
+      "mean_margin_drop_target_vs_routes": -0.5375,
+      "mean_readout_jsd_on_selected_vocab": 0.00028268604361058854,
+      "mean_route_release_coverage": 3.25,
+      "mean_target_logit_drop_after_erase": -1.03125,
+      "mean_total_positive_route_release_after_erase": 2.28125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.96875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.140625,
+      "mean_margin_drop_target_vs_contrast": -0.359375,
+      "mean_margin_drop_target_vs_routes": -0.084375,
+      "mean_readout_jsd_on_selected_vocab": 3.332211299798519e-05,
+      "mean_route_release_coverage": 3.75,
+      "mean_target_logit_drop_after_erase": -0.5,
+      "mean_total_positive_route_release_after_erase": 1.84375,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.375,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": 0.53125,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.53125,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.625,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC64",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.5,
+      "mean_margin_drop_target_vs_contrast": -0.28125,
+      "mean_margin_drop_target_vs_routes": -0.671875,
+      "mean_readout_jsd_on_selected_vocab": 0.006120291663003828,
+      "mean_route_release_coverage": 2.5,
+      "mean_target_logit_drop_after_erase": -0.78125,
+      "mean_total_positive_route_release_after_erase": 1.28125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.15625,
+          "n": 8,
+          "positive_release_rate": 0.75
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "route_guard_necessity_candidate": 2,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.46875,
+      "mean_margin_drop_target_vs_routes": -0.090625,
+      "mean_readout_jsd_on_selected_vocab": 6.500812413377335e-05,
+      "mean_route_release_coverage": 2.75,
+      "mean_target_logit_drop_after_erase": -0.34375,
+      "mean_total_positive_route_release_after_erase": 1.15625,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.3125,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.5,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": 0.09375,
+      "mean_readout_jsd_on_selected_vocab": 0.0010031051986375572,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 1.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.625,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H26",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.625,
+      "mean_margin_drop_target_vs_routes": -0.28125,
+      "mean_readout_jsd_on_selected_vocab": 8.75877447902907e-06,
+      "mean_route_release_coverage": 4.0,
+      "mean_target_logit_drop_after_erase": -0.5,
+      "mean_total_positive_route_release_after_erase": 0.875,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C0",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": -0.046875,
+      "mean_margin_drop_target_vs_contrast": -0.359375,
+      "mean_margin_drop_target_vs_routes": -0.1390625,
+      "mean_readout_jsd_on_selected_vocab": 3.473410177241493e-05,
+      "mean_route_release_coverage": 3.25,
+      "mean_target_logit_drop_after_erase": -0.3125,
+      "mean_total_positive_route_release_after_erase": 0.78125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": 0.1875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 8,
+          "positive_release_rate": 1.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC16",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.25,
+      "mean_margin_drop_target_vs_routes": -0.0625,
+      "mean_readout_jsd_on_selected_vocab": 3.056045929089932e-06,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": -0.25,
+      "mean_total_positive_route_release_after_erase": 0.75,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H26",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.109375,
+      "mean_margin_drop_target_vs_contrast": -0.171875,
+      "mean_margin_drop_target_vs_routes": -0.09375,
+      "mean_readout_jsd_on_selected_vocab": 0.0003235392245475866,
+      "mean_route_release_coverage": 2.5,
+      "mean_target_logit_drop_after_erase": -0.28125,
+      "mean_total_positive_route_release_after_erase": 0.71875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.1875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.08333333333333333,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": 0.20833333333333334,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.28125,
+          "n": 8,
+          "positive_release_rate": 0.75
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC16",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.15625,
+      "mean_margin_drop_target_vs_contrast": -0.1875,
+      "mean_margin_drop_target_vs_routes": -0.203125,
+      "mean_readout_jsd_on_selected_vocab": 0.0005987179051327595,
+      "mean_route_release_coverage": 1.75,
+      "mean_target_logit_drop_after_erase": -0.34375,
+      "mean_total_positive_route_release_after_erase": 0.71875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.21875,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.16666666666666666,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.20833333333333334,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.3125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:topC64",
+      "subunit_kind": "mlp_channelset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.34375,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": -0.3828125,
+      "mean_readout_jsd_on_selected_vocab": 0.004767850636538257,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": -0.28125,
+      "mean_total_positive_route_release_after_erase": 0.6875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.25,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "other_vocab": {
+          "mean_route_release": -0.375,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH2",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_margin_drop_target_vs_routes": 0.15625,
+      "mean_readout_jsd_on_selected_vocab": 0.0005873191301666546,
+      "mean_route_release_coverage": 3.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.625,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C0",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "natural_suppressor_necessity_candidate",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.25,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_margin_drop_target_vs_routes": 0.25,
+      "mean_readout_jsd_on_selected_vocab": 8.628909546187091e-05,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": 0.25,
+      "mean_total_positive_route_release_after_erase": 0.5,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H0",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": -0.09375,
+      "mean_margin_drop_target_vs_contrast": -0.15625,
+      "mean_margin_drop_target_vs_routes": -0.0109375,
+      "mean_readout_jsd_on_selected_vocab": 2.9502870823717623e-05,
+      "mean_route_release_coverage": 2.25,
+      "mean_target_logit_drop_after_erase": -0.0625,
+      "mean_total_positive_route_release_after_erase": 0.46875,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "natural_suppressor_necessity_candidate": 2,
+        "small_or_no_effect": 6
+      },
+      "mean_contrast_logit_gain_after_erase": 0.40625,
+      "mean_margin_drop_target_vs_contrast": 0.625,
+      "mean_margin_drop_target_vs_routes": 0.1453125,
+      "mean_readout_jsd_on_selected_vocab": 6.6525163620952e-05,
+      "mean_route_release_coverage": 1.25,
+      "mean_target_logit_drop_after_erase": 0.21875,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.09375,
+          "n": 8,
+          "positive_release_rate": 0.75
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.28125,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.375,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "route_guard_necessity_candidate": 2,
+        "small_or_no_effect": 2,
+        "target_support_necessity_candidate": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0625,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_margin_drop_target_vs_routes": 0.125,
+      "mean_readout_jsd_on_selected_vocab": 0.0017217473324674484,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": 0.3125,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.6666666666666666
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.25,
+          "n": 8,
+          "positive_release_rate": 0.25
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH4",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 8
+      },
+      "mean_contrast_logit_gain_after_erase": 0.078125,
+      "mean_margin_drop_target_vs_contrast": 0.296875,
+      "mean_margin_drop_target_vs_routes": 0.015625,
+      "mean_readout_jsd_on_selected_vocab": 0.0005793955456086129,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": 0.21875,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.09375,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.4583333333333333,
+          "n": 6,
+          "positive_release_rate": 0.3333333333333333
+        },
+        "other_vocab": {
+          "mean_route_release": -0.4166666666666667,
+          "n": 6,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.09375,
+          "n": 8,
+          "positive_release_rate": 0.25
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.1875,
+      "mean_margin_drop_target_vs_routes": -0.115625,
+      "mean_readout_jsd_on_selected_vocab": 1.4333170951954825e-05,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.3125,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.1875,
+          "n": 4,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.125,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": -0.375,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:attn_out",
+      "subunit_id": "L32:attn_out:H11",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": -0.125,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": 0.0625,
+      "mean_readout_jsd_on_selected_vocab": 9.245273189735545e-07,
+      "mean_route_release_coverage": 2.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.25,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2464",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.625,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_margin_drop_target_vs_routes": -0.3125,
+      "mean_readout_jsd_on_selected_vocab": 9.101531018543305e-06,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.25,
+      "mean_total_positive_route_release_after_erase": 0.25,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.25,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.25,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H30",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 2,
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_margin_drop_target_vs_routes": -0.140625,
+      "mean_readout_jsd_on_selected_vocab": 1.1099276618519357e-05,
+      "mean_route_release_coverage": 1.5,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.1875,
+      "n": 4,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.0625,
+          "n": 4,
+          "positive_release_rate": 0.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.125,
+          "n": 4,
+          "positive_release_rate": 1.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0625,
+          "n": 4,
+          "positive_release_rate": 0.5
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.1875,
+          "n": 4,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H21",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_donor",
+      "dominant_effect_guess": "erase_improves_or_inverse_effect",
+      "effect_guess_counts": {
+        "erase_improves_or_inverse_effect": 4,
+        "small_or_no_effect": 4
+      },
+      "mean_contrast_logit_gain_after_erase": 0.1875,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_margin_drop_target_vs_routes": -0.1984375,
+      "mean_readout_jsd_on_selected_vocab": 2.62764076338343e-05,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.15625,
+      "n": 8,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "other_semantic_value": {
+          "mean_route_release": -0.03125,
+          "n": 8,
+          "positive_release_rate": 0.5
+        },
+        "other_vocab": {
+          "mean_route_release": -0.0625,
+          "n": 8,
+          "positive_release_rate": 0.25
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.21875,
+          "n": 8,
+          "positive_release_rate": 0.0
+        },
+        "recipient_answer": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:topH1",
+      "subunit_kind": "attn_headset",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.1875,
+      "mean_margin_drop_target_vs_contrast": 0.1875,
+      "mean_margin_drop_target_vs_routes": 0.0625,
+      "mean_readout_jsd_on_selected_vocab": 9.679891296947169e-05,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": 0.0,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L33:attn_out",
+      "subunit_id": "L33:attn_out:H30",
+      "subunit_kind": "attn_head",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "after_target_top1_rate": 1.0,
+      "base_target_top1_rate": 1.0,
+      "context_name": "natural_recipient",
+      "dominant_effect_guess": "small_or_no_effect",
+      "effect_guess_counts": {
+        "small_or_no_effect": 2
+      },
+      "mean_contrast_logit_gain_after_erase": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.125,
+      "mean_margin_drop_target_vs_routes": -0.125,
+      "mean_readout_jsd_on_selected_vocab": 6.935867417693961e-06,
+      "mean_route_release_coverage": 1.0,
+      "mean_target_logit_drop_after_erase": -0.125,
+      "mean_total_positive_route_release_after_erase": 0.125,
+      "n": 2,
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_release": 0.125,
+          "n": 2,
+          "positive_release_rate": 1.0
+        },
+        "other_semantic_value": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "other_vocab": {
+          "mean_route_release": 0.0,
+          "n": 2,
+          "positive_release_rate": 0.0
+        },
+        "punctuation_or_stop": {
+          "mean_route_release": -0.125,
+          "n": 2,
+          "positive_release_rate": 0.0
+        }
+      },
+      "site": "L32:mlp_out",
+      "subunit_id": "L32:mlp_out:C2123",
+      "subunit_kind": "mlp_channel",
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

@@ -1,0 +1,356 @@
+[10:16:03] qwen3/smoke: pairs=1 target=hidden_36 audits=1 combo_candidates=1
+[10:16:03] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 253.34it/s]Loading weights:  23%|██▎       | 93/398 [00:00<00:00, 484.30it/s]Loading weights:  40%|███▉      | 158/398 [00:00<00:00, 540.96it/s]Loading weights:  56%|█████▌    | 223/398 [00:00<00:00, 578.28it/s]Loading weights:  71%|███████   | 281/398 [00:00<00:00, 566.63it/s]Loading weights:  85%|████████▍ | 338/398 [00:00<00:00, 556.76it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 565.69it/s]
+[10:16:04] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[10:16:04] qwen3: scan_candidates=4 ['L28:attn_out', 'L28:mlp_out', 'L30:attn_out', 'L30:mlp_out']
+[10:16:05] qwen3: route suppressor matrix scan 1/1 pairs; rows=4
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "top_component_summary": [
+    {
+      "candidate_component_id": "L28:attn_out",
+      "candidate_layer": 28,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_boost_target_logit": 0.9375,
+      "mean_total_positive_route_suppression": 1.125,
+      "mean_route_suppression_coverage": 3.0,
+      "mean_margin_gain_donor_vs_routes": 1.3125,
+      "mean_min_margin_gain_donor_vs_routes": 1.0625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 275.0,
+      "mean_readout_jsd_on_selected_vocab": 0.0005750343905325949,
+      "mean_donor_selected_prob_gain": 3.3985402936309583e-08,
+      "base_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      },
+      "dominant_effect_guess": "global_suppressor_margin_candidate",
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_suppression": 0.5,
+          "mean_margin_gain": 1.4375,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        },
+        "punctuation_or_stop": {
+          "mean_route_suppression": 0.5,
+          "mean_margin_gain": 1.4375,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        },
+        "recipient_answer": {
+          "mean_route_suppression": 0.125,
+          "mean_margin_gain": 1.0625,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        }
+      }
+    },
+    {
+      "candidate_component_id": "L30:mlp_out",
+      "candidate_layer": 30,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_boost_target_logit": 0.4375,
+      "mean_total_positive_route_suppression": 1.125,
+      "mean_route_suppression_coverage": 3.0,
+      "mean_margin_gain_donor_vs_routes": 0.8125,
+      "mean_min_margin_gain_donor_vs_routes": 0.6875,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 350.0,
+      "mean_readout_jsd_on_selected_vocab": 0.0005879856345315107,
+      "mean_donor_selected_prob_gain": 1.7718368994223965e-08,
+      "base_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      },
+      "dominant_effect_guess": "global_suppressor_margin_candidate",
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_suppression": 0.625,
+          "mean_margin_gain": 1.0625,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        },
+        "punctuation_or_stop": {
+          "mean_route_suppression": 0.25,
+          "mean_margin_gain": 0.6875,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        },
+        "recipient_answer": {
+          "mean_route_suppression": 0.25,
+          "mean_margin_gain": 0.6875,
+          "positive_suppression_rate": 1.0,
+          "n": 1
+        }
+      }
+    },
+    {
+      "candidate_component_id": "L30:attn_out",
+      "candidate_layer": 30,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_boost_target_logit": 1.125,
+      "mean_total_positive_route_suppression": 0.0,
+      "mean_route_suppression_coverage": 0.0,
+      "mean_margin_gain_donor_vs_routes": 0.8333333333333334,
+      "mean_min_margin_gain_donor_vs_routes": 0.625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 290.0,
+      "mean_readout_jsd_on_selected_vocab": 0.0006925031335549836,
+      "mean_donor_selected_prob_gain": 2.9489894970424757e-08,
+      "base_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      },
+      "dominant_effect_guess": "booster_candidate",
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_suppression": -0.5,
+          "mean_margin_gain": 0.625,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        },
+        "punctuation_or_stop": {
+          "mean_route_suppression": -0.25,
+          "mean_margin_gain": 0.875,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        },
+        "recipient_answer": {
+          "mean_route_suppression": -0.125,
+          "mean_margin_gain": 1.0,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        }
+      }
+    },
+    {
+      "candidate_component_id": "L28:mlp_out",
+      "candidate_layer": 28,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_boost_target_logit": 0.8125,
+      "mean_total_positive_route_suppression": 0.0,
+      "mean_route_suppression_coverage": 0.0,
+      "mean_margin_gain_donor_vs_routes": 0.3958333333333333,
+      "mean_min_margin_gain_donor_vs_routes": 0.3125,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 385.0,
+      "mean_readout_jsd_on_selected_vocab": 0.0003574152280523624,
+      "mean_donor_selected_prob_gain": 1.2971446139431464e-08,
+      "base_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 1
+      },
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      },
+      "dominant_effect_guess": "booster_candidate",
+      "route_summary": {
+        "format_or_schema": {
+          "mean_route_suppression": -0.5,
+          "mean_margin_gain": 0.3125,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        },
+        "punctuation_or_stop": {
+          "mean_route_suppression": -0.5,
+          "mean_margin_gain": 0.3125,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        },
+        "recipient_answer": {
+          "mean_route_suppression": -0.25,
+          "mean_margin_gain": 0.5625,
+          "positive_suppression_rate": 0.0,
+          "n": 1
+        }
+      }
+    }
+  ],
+  "top_route_summary": [
+    {
+      "route_class": "recipient_answer",
+      "candidate_component_id": "L30:mlp_out",
+      "n": 1,
+      "mean_route_suppression": 0.25,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 0.6875,
+      "mean_boost_target_logit": 0.4375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "recipient_answer",
+      "candidate_component_id": "L28:attn_out",
+      "n": 1,
+      "mean_route_suppression": 0.125,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 1.0625,
+      "mean_boost_target_logit": 0.9375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "recipient_answer",
+      "candidate_component_id": "L30:attn_out",
+      "n": 1,
+      "mean_route_suppression": -0.125,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 1.0,
+      "mean_boost_target_logit": 1.125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    },
+    {
+      "route_class": "recipient_answer",
+      "candidate_component_id": "L28:mlp_out",
+      "n": 1,
+      "mean_route_suppression": -0.25,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 0.5625,
+      "mean_boost_target_logit": 0.8125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    },
+    {
+      "route_class": "punctuation_or_stop",
+      "candidate_component_id": "L28:attn_out",
+      "n": 1,
+      "mean_route_suppression": 0.5,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 1.4375,
+      "mean_boost_target_logit": 0.9375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "punctuation_or_stop",
+      "candidate_component_id": "L30:mlp_out",
+      "n": 1,
+      "mean_route_suppression": 0.25,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 0.6875,
+      "mean_boost_target_logit": 0.4375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "punctuation_or_stop",
+      "candidate_component_id": "L30:attn_out",
+      "n": 1,
+      "mean_route_suppression": -0.25,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 0.875,
+      "mean_boost_target_logit": 1.125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    },
+    {
+      "route_class": "punctuation_or_stop",
+      "candidate_component_id": "L28:mlp_out",
+      "n": 1,
+      "mean_route_suppression": -0.5,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 0.3125,
+      "mean_boost_target_logit": 0.8125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    },
+    {
+      "route_class": "format_or_schema",
+      "candidate_component_id": "L30:mlp_out",
+      "n": 1,
+      "mean_route_suppression": 0.625,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 1.0625,
+      "mean_boost_target_logit": 0.4375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "format_or_schema",
+      "candidate_component_id": "L28:attn_out",
+      "n": 1,
+      "mean_route_suppression": 0.5,
+      "positive_suppression_rate": 1.0,
+      "mean_margin_gain_donor_vs_route": 1.4375,
+      "mean_boost_target_logit": 0.9375,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "global_suppressor_margin_candidate": 1
+      }
+    },
+    {
+      "route_class": "format_or_schema",
+      "candidate_component_id": "L28:mlp_out",
+      "n": 1,
+      "mean_route_suppression": -0.5,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 0.3125,
+      "mean_boost_target_logit": 0.8125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    },
+    {
+      "route_class": "format_or_schema",
+      "candidate_component_id": "L30:attn_out",
+      "n": 1,
+      "mean_route_suppression": -0.5,
+      "positive_suppression_rate": 0.0,
+      "mean_margin_gain_donor_vs_route": 0.625,
+      "mean_boost_target_logit": 1.125,
+      "new_donor_top1_rate": 0.0,
+      "effect_guess_counts": {
+        "booster_candidate": 1
+      }
+    }
+  ]
+}

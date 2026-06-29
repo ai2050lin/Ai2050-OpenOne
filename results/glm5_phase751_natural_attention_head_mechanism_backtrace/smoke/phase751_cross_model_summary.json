@@ -1,0 +1,4696 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "eager",
+      "components": [
+        "L22:attn_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "deepseek7b",
+      "n_rows": 32,
+      "phase": 751,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "QK is observational attention mass only. V/O is causal source-contribution removal before o_proj. This still does not prove neuron-level coding.",
+      "summary": [
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "target_support_content",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.33300209045410156,
+          "mean_margin_drop_target_vs_routes": 0.6458333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.1970678170522053,
+          "mean_source_target_logit_contribution": 1.0361278057098389,
+          "mean_source_total_route_suppression_contribution": 0.5077581778168678,
+          "mean_target_logit_drop_after_source_removal": 0.75,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "target_support_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.31640625,
+          "mean_margin_drop_target_vs_routes": 0.7083333333333334,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 1.2056307395299275,
+          "mean_source_target_logit_contribution": 1.0445040464401245,
+          "mean_source_total_route_suppression_contribution": 0.5156006366014481,
+          "mean_target_logit_drop_after_source_removal": 0.5,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5581527948379517,
+          "mean_margin_drop_target_vs_routes": 0.6666666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 1.100207805633545,
+          "mean_source_target_logit_contribution": 0.9264198541641235,
+          "mean_source_total_route_suppression_contribution": 0.576715275645256,
+          "mean_target_logit_drop_after_source_removal": 0.5,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "target_support_content",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.41946133971214294,
+          "mean_margin_drop_target_vs_routes": 0.265625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.07905490882694721,
+          "mean_source_target_logit_contribution": 0.17221710085868835,
+          "mean_source_total_route_suppression_contribution": 0.0723370909690857,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "target_support_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.475830078125,
+          "mean_margin_drop_target_vs_routes": 0.25,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.20119755466779074,
+          "mean_source_target_logit_contribution": 0.28626373410224915,
+          "mean_source_total_route_suppression_contribution": 0.08757933229207993,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.475830078125,
+          "mean_margin_drop_target_vs_routes": 0.25,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.20119755466779074,
+          "mean_source_target_logit_contribution": 0.28626373410224915,
+          "mean_source_total_route_suppression_contribution": 0.08757933229207993,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.24830245971679688,
+          "mean_margin_drop_target_vs_routes": 0.20833333333333334,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.18419966846704483,
+          "mean_source_target_logit_contribution": 0.2685931921005249,
+          "mean_source_total_route_suppression_contribution": 0.0961146354675293,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09492111206054688,
+          "mean_margin_drop_target_vs_routes": 0.171875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.44141852110624313,
+          "mean_source_target_logit_contribution": 0.4524165987968445,
+          "mean_source_total_route_suppression_contribution": 0.05386760085821152,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3108413517475128,
+          "mean_margin_drop_target_vs_routes": 0.3125,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.12762023756901422,
+          "mean_source_target_logit_contribution": 0.22806435823440552,
+          "mean_source_total_route_suppression_contribution": 0.09690699726343155,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5739622116088867,
+          "mean_margin_drop_target_vs_routes": 0.22916666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.14987610653042793,
+          "mean_source_target_logit_contribution": 0.2457273155450821,
+          "mean_source_total_route_suppression_contribution": 0.07496626675128937,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5739622116088867,
+          "mean_margin_drop_target_vs_routes": 0.22916666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.14987610653042793,
+          "mean_source_target_logit_contribution": 0.2457273155450821,
+          "mean_source_total_route_suppression_contribution": 0.07496626675128937,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.08172035217285156,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.140197335742414,
+          "mean_source_target_logit_contribution": 0.15208563208580017,
+          "mean_source_total_route_suppression_contribution": 0.06490946933627129,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0419921875,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14045212417840958,
+          "mean_source_target_logit_contribution": 0.13594162464141846,
+          "mean_source_total_route_suppression_contribution": 0.03240747284144163,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0419921875,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14045212417840958,
+          "mean_source_target_logit_contribution": 0.13594162464141846,
+          "mean_source_total_route_suppression_contribution": 0.03240747284144163,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.02217864990234375,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.13788435980677605,
+          "mean_source_target_logit_contribution": 0.13234271109104156,
+          "mean_source_total_route_suppression_contribution": 0.037143037654459476,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09130859375,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.28501089413960773,
+          "mean_source_target_logit_contribution": 0.26096922159194946,
+          "mean_source_total_route_suppression_contribution": 0.08337585628032684,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09130859375,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.28501089413960773,
+          "mean_source_target_logit_contribution": 0.26096922159194946,
+          "mean_source_total_route_suppression_contribution": 0.08337585628032684,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.04986572265625,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.2666515459616979,
+          "mean_source_target_logit_contribution": 0.2396891862154007,
+          "mean_source_total_route_suppression_contribution": 0.08950654044747353,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0431634783744812,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.010416027856990695,
+          "mean_source_target_logit_contribution": 0.013843091204762459,
+          "mean_source_total_route_suppression_contribution": 0.012239963747560978,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0431634783744812,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.010416027856990695,
+          "mean_source_target_logit_contribution": 0.013843091204762459,
+          "mean_source_total_route_suppression_contribution": 0.012239963747560978,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.11684415489435196,
+          "mean_margin_drop_target_vs_routes": -0.0625,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.13656590785831213,
+          "mean_source_target_logit_contribution": 0.15104010701179504,
+          "mean_source_total_route_suppression_contribution": 0.08813917823135853,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.32454022765159607,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": -0.36236361041665077,
+          "mean_source_target_logit_contribution": -0.28019949793815613,
+          "mean_source_total_route_suppression_contribution": 0.07256441563367844,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1514892578125,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14593487605452538,
+          "mean_source_target_logit_contribution": 0.15788954496383667,
+          "mean_source_total_route_suppression_contribution": 0.05106556415557861,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.75,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1514892578125,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14593487605452538,
+          "mean_source_target_logit_contribution": 0.15788954496383667,
+          "mean_source_total_route_suppression_contribution": 0.05106556415557861,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.75,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.08251953125,
+          "mean_margin_drop_target_vs_routes": 0.046875,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.42872433364391327,
+          "mean_source_target_logit_contribution": 0.4408601224422455,
+          "mean_source_total_route_suppression_contribution": 0.05510291736572981,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0351238027215004,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": -0.003631412982940674,
+          "mean_source_target_logit_contribution": -0.001045510172843933,
+          "mean_source_total_route_suppression_contribution": 0.025116531178355217,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.5625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2251506745815277,
+          "mean_margin_drop_target_vs_routes": -0.020833333333333332,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.096860075990359,
+          "mean_source_target_logit_contribution": -0.10970785468816757,
+          "mean_source_total_route_suppression_contribution": 0.07528462260961533,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.06253889203071594,
+          "mean_margin_drop_target_vs_routes": -0.020833333333333332,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.05657941227157911,
+          "mean_source_target_logit_contribution": -0.04052884131669998,
+          "mean_source_total_route_suppression_contribution": 0.0007923990488052368,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09813213348388672,
+          "mean_margin_drop_target_vs_routes": -0.14583333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0513214444120725,
+          "mean_source_target_logit_contribution": -0.04053635895252228,
+          "mean_source_total_route_suppression_contribution": 0.020445454865694046,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09813213348388672,
+          "mean_margin_drop_target_vs_routes": -0.14583333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0513214444120725,
+          "mean_source_target_logit_contribution": -0.04053635895252228,
+          "mean_source_total_route_suppression_contribution": 0.020445454865694046,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1946527361869812,
+          "mean_margin_drop_target_vs_routes": -0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.15635089203715324,
+          "mean_source_target_logit_contribution": 0.17173263430595398,
+          "mean_source_total_route_suppression_contribution": 0.05629704333841801,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1946527361869812,
+          "mean_margin_drop_target_vs_routes": -0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.15635089203715324,
+          "mean_source_target_logit_contribution": 0.17173263430595398,
+          "mean_source_total_route_suppression_contribution": 0.05629704333841801,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 11:06:59",
+      "title": "Natural Attention Head Mechanism Backtrace",
+      "top_source_mechanism_candidates": [
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "target_support_content",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.33300209045410156,
+          "mean_margin_drop_target_vs_routes": 0.6458333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.1970678170522053,
+          "mean_source_target_logit_contribution": 1.0361278057098389,
+          "mean_source_total_route_suppression_contribution": 0.5077581778168678,
+          "mean_target_logit_drop_after_source_removal": 0.75,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "target_support_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.31640625,
+          "mean_margin_drop_target_vs_routes": 0.7083333333333334,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 1.2056307395299275,
+          "mean_source_target_logit_contribution": 1.0445040464401245,
+          "mean_source_total_route_suppression_contribution": 0.5156006366014481,
+          "mean_target_logit_drop_after_source_removal": 0.5,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5581527948379517,
+          "mean_margin_drop_target_vs_routes": 0.6666666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 1.100207805633545,
+          "mean_source_target_logit_contribution": 0.9264198541641235,
+          "mean_source_total_route_suppression_contribution": 0.576715275645256,
+          "mean_target_logit_drop_after_source_removal": 0.5,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "target_support_content",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.41946133971214294,
+          "mean_margin_drop_target_vs_routes": 0.265625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.07905490882694721,
+          "mean_source_target_logit_contribution": 0.17221710085868835,
+          "mean_source_total_route_suppression_contribution": 0.0723370909690857,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "target_support_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.475830078125,
+          "mean_margin_drop_target_vs_routes": 0.25,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.20119755466779074,
+          "mean_source_target_logit_contribution": 0.28626373410224915,
+          "mean_source_total_route_suppression_contribution": 0.08757933229207993,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.475830078125,
+          "mean_margin_drop_target_vs_routes": 0.25,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.20119755466779074,
+          "mean_source_target_logit_contribution": 0.28626373410224915,
+          "mean_source_total_route_suppression_contribution": 0.08757933229207993,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.24830245971679688,
+          "mean_margin_drop_target_vs_routes": 0.20833333333333334,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.18419966846704483,
+          "mean_source_target_logit_contribution": 0.2685931921005249,
+          "mean_source_total_route_suppression_contribution": 0.0961146354675293,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09492111206054688,
+          "mean_margin_drop_target_vs_routes": 0.171875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.44141852110624313,
+          "mean_source_target_logit_contribution": 0.4524165987968445,
+          "mean_source_total_route_suppression_contribution": 0.05386760085821152,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3108413517475128,
+          "mean_margin_drop_target_vs_routes": 0.3125,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.12762023756901422,
+          "mean_source_target_logit_contribution": 0.22806435823440552,
+          "mean_source_total_route_suppression_contribution": 0.09690699726343155,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5739622116088867,
+          "mean_margin_drop_target_vs_routes": 0.22916666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.14987610653042793,
+          "mean_source_target_logit_contribution": 0.2457273155450821,
+          "mean_source_total_route_suppression_contribution": 0.07496626675128937,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5739622116088867,
+          "mean_margin_drop_target_vs_routes": 0.22916666666666666,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.14987610653042793,
+          "mean_source_target_logit_contribution": 0.2457273155450821,
+          "mean_source_total_route_suppression_contribution": 0.07496626675128937,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.08172035217285156,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.140197335742414,
+          "mean_source_target_logit_contribution": 0.15208563208580017,
+          "mean_source_total_route_suppression_contribution": 0.06490946933627129,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0419921875,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14045212417840958,
+          "mean_source_target_logit_contribution": 0.13594162464141846,
+          "mean_source_total_route_suppression_contribution": 0.03240747284144163,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0419921875,
+          "mean_margin_drop_target_vs_routes": 0.109375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14045212417840958,
+          "mean_source_target_logit_contribution": 0.13594162464141846,
+          "mean_source_total_route_suppression_contribution": 0.03240747284144163,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.4375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.02217864990234375,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.13788435980677605,
+          "mean_source_target_logit_contribution": 0.13234271109104156,
+          "mean_source_total_route_suppression_contribution": 0.037143037654459476,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09130859375,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.28501089413960773,
+          "mean_source_target_logit_contribution": 0.26096922159194946,
+          "mean_source_total_route_suppression_contribution": 0.08337585628032684,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09130859375,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.28501089413960773,
+          "mean_source_target_logit_contribution": 0.26096922159194946,
+          "mean_source_total_route_suppression_contribution": 0.08337585628032684,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.04986572265625,
+          "mean_margin_drop_target_vs_routes": 0.041666666666666664,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.2666515459616979,
+          "mean_source_target_logit_contribution": 0.2396891862154007,
+          "mean_source_total_route_suppression_contribution": 0.08950654044747353,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0431634783744812,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.010416027856990695,
+          "mean_source_target_logit_contribution": 0.013843091204762459,
+          "mean_source_total_route_suppression_contribution": 0.012239963747560978,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0431634783744812,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.010416027856990695,
+          "mean_source_target_logit_contribution": 0.013843091204762459,
+          "mean_source_total_route_suppression_contribution": 0.012239963747560978,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.11684415489435196,
+          "mean_margin_drop_target_vs_routes": -0.0625,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.13656590785831213,
+          "mean_source_target_logit_contribution": 0.15104010701179504,
+          "mean_source_total_route_suppression_contribution": 0.08813917823135853,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.32454022765159607,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": -0.36236361041665077,
+          "mean_source_target_logit_contribution": -0.28019949793815613,
+          "mean_source_total_route_suppression_contribution": 0.07256441563367844,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1514892578125,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14593487605452538,
+          "mean_source_target_logit_contribution": 0.15788954496383667,
+          "mean_source_total_route_suppression_contribution": 0.05106556415557861,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.75,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1514892578125,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.14593487605452538,
+          "mean_source_target_logit_contribution": 0.15788954496383667,
+          "mean_source_total_route_suppression_contribution": 0.05106556415557861,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.75,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.08251953125,
+          "mean_margin_drop_target_vs_routes": 0.046875,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.42872433364391327,
+          "mean_source_target_logit_contribution": 0.4408601224422455,
+          "mean_source_total_route_suppression_contribution": 0.05510291736572981,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.6875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0351238027215004,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": -0.003631412982940674,
+          "mean_source_target_logit_contribution": -0.001045510172843933,
+          "mean_source_total_route_suppression_contribution": 0.025116531178355217,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.5625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              1
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2251506745815277,
+          "mean_margin_drop_target_vs_routes": -0.020833333333333332,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.096860075990359,
+          "mean_source_target_logit_contribution": -0.10970785468816757,
+          "mean_source_total_route_suppression_contribution": 0.07528462260961533,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H1",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7,
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.06253889203071594,
+          "mean_margin_drop_target_vs_routes": -0.020833333333333332,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.05657941227157911,
+          "mean_source_target_logit_contribution": -0.04052884131669998,
+          "mean_source_total_route_suppression_contribution": 0.0007923990488052368,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09813213348388672,
+          "mean_margin_drop_target_vs_routes": -0.14583333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0513214444120725,
+          "mean_source_target_logit_contribution": -0.04053635895252228,
+          "mean_source_total_route_suppression_contribution": 0.020445454865694046,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.09813213348388672,
+          "mean_margin_drop_target_vs_routes": -0.14583333333333334,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0513214444120725,
+          "mean_source_target_logit_contribution": -0.04053635895252228,
+          "mean_source_total_route_suppression_contribution": 0.020445454865694046,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1946527361869812,
+          "mean_margin_drop_target_vs_routes": -0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.15635089203715324,
+          "mean_source_target_logit_contribution": 0.17173263430595398,
+          "mean_source_total_route_suppression_contribution": 0.05629704333841801,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              7
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1946527361869812,
+          "mean_margin_drop_target_vs_routes": -0.015625,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.15635089203715324,
+          "mean_source_target_logit_contribution": 0.17173263430595398,
+          "mean_source_total_route_suppression_contribution": 0.05629704333841801,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.9375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L22:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L22:attn_out:H7",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        }
+      ]
+    },
+    "glm4": {
+      "attn_implementation": "eager",
+      "components": [
+        "L34:attn_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "glm4",
+      "n_rows": 32,
+      "phase": 751,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "QK is observational attention mass only. V/O is causal source-contribution removal before o_proj. This still does not prove neuron-level coding.",
+      "summary": [
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.00860595703125,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.0006393760268110782,
+          "mean_source_target_logit_contribution": -0.001673443941399455,
+          "mean_source_total_route_suppression_contribution": 0.004136273026233539,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.624774694442749,
+          "mean_margin_drop_target_vs_routes": 0.078125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.062467094510793686,
+          "mean_source_target_logit_contribution": 0.03619132190942764,
+          "mean_source_total_route_suppression_contribution": 0.1534433662891388,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.4827001094818115,
+          "mean_margin_drop_target_vs_routes": 0.078125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.06400774652138352,
+          "mean_source_target_logit_contribution": 0.0428520143032074,
+          "mean_source_total_route_suppression_contribution": 0.13920105807483196,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.18014860153198242,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.013916890718974173,
+          "mean_source_target_logit_contribution": 0.001283581368625164,
+          "mean_source_total_route_suppression_contribution": 0.05131514463573694,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.18014860153198242,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.013916890718974173,
+          "mean_source_target_logit_contribution": 0.001283581368625164,
+          "mean_source_total_route_suppression_contribution": 0.05131514463573694,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1420745849609375,
+          "mean_margin_drop_target_vs_routes": 0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.001540651632240042,
+          "mean_source_target_logit_contribution": -0.006660685874521732,
+          "mean_source_total_route_suppression_contribution": 0.020480139879509807,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3027762472629547,
+          "mean_margin_drop_target_vs_routes": -0.046875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.288831731537357,
+          "mean_source_target_logit_contribution": 0.0035385191440582275,
+          "mean_source_total_route_suppression_contribution": 0.07145100086927414,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12346084415912628,
+          "mean_margin_drop_target_vs_routes": 0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.02646934730000794,
+          "mean_source_target_logit_contribution": 0.033940404653549194,
+          "mean_source_total_route_suppression_contribution": 0.013362390920519829,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.30434632301330566,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0005302805220708251,
+          "mean_source_target_logit_contribution": -0.0031433093827217817,
+          "mean_source_total_route_suppression_contribution": 0.00522606004960835,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.15824151039123535,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0020616756519302726,
+          "mean_source_target_logit_contribution": 0.0006800519768148661,
+          "mean_source_total_route_suppression_contribution": 0.0027632543351501226,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1461048126220703,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.002591955359093845,
+          "mean_source_target_logit_contribution": -0.0038233594968914986,
+          "mean_source_total_route_suppression_contribution": 0.0024628046667203307,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1435546875,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.016570068895816803,
+          "mean_source_target_logit_contribution": -0.02361295185983181,
+          "mean_source_total_route_suppression_contribution": 0.041333749890327454,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1435546875,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.016570068895816803,
+          "mean_source_target_logit_contribution": -0.02361295185983181,
+          "mean_source_total_route_suppression_contribution": 0.041333749890327454,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.05260714888572693,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0001447306713089347,
+          "mean_source_target_logit_contribution": 0.0003946061187889427,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.05260714888572693,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0001447306713089347,
+          "mean_source_target_logit_contribution": 0.0003946061187889427,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0111083984375,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0021357962395995855,
+          "mean_source_target_logit_contribution": -0.0034757363609969616,
+          "mean_source_total_route_suppression_contribution": 0.0026798806502483785,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5551333427429199,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.021282328758388758,
+          "mean_source_target_logit_contribution": -0.014732914045453072,
+          "mean_source_total_route_suppression_contribution": 0.14406094327569008,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5551333427429199,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.021282328758388758,
+          "mean_source_target_logit_contribution": -0.014732914045453072,
+          "mean_source_total_route_suppression_contribution": 0.14406094327569008,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.6010589003562927,
+          "mean_margin_drop_target_vs_routes": -0.15625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.5429235547780991,
+          "mean_source_target_logit_contribution": -0.015815630555152893,
+          "mean_source_total_route_suppression_contribution": 0.11769524216651917,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3749847412109375,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.007365428609773517,
+          "mean_source_target_logit_contribution": -0.016016503795981407,
+          "mean_source_total_route_suppression_contribution": 0.09352772310376167,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3749847412109375,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.007365428609773517,
+          "mean_source_target_logit_contribution": -0.016016503795981407,
+          "mean_source_total_route_suppression_contribution": 0.09352772310376167,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2982826232910156,
+          "mean_margin_drop_target_vs_routes": -0.078125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.2540918975137174,
+          "mean_source_target_logit_contribution": -0.01935422047972679,
+          "mean_source_total_route_suppression_contribution": 0.05809541791677475,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.07236862182617188,
+          "mean_margin_drop_target_vs_routes": -0.046875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.017125187325291336,
+          "mean_source_target_logit_contribution": -0.024014919996261597,
+          "mean_source_total_route_suppression_contribution": 0.04164193198084831,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.633331835269928,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10815184656530619,
+          "mean_source_target_logit_contribution": -0.2816888689994812,
+          "mean_source_total_route_suppression_contribution": 0.34707409143447876,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.633331835269928,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10815184656530619,
+          "mean_source_target_logit_contribution": -0.2816888689994812,
+          "mean_source_total_route_suppression_contribution": 0.34707409143447876,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5807247161865234,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10829656384885311,
+          "mean_source_target_logit_contribution": -0.28208351135253906,
+          "mean_source_total_route_suppression_contribution": 0.3475738577544689,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5807247161865234,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10829656384885311,
+          "mean_source_target_logit_contribution": -0.28208351135253906,
+          "mean_source_total_route_suppression_contribution": 0.3475738577544689,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.51171875,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10725883860141039,
+          "mean_source_target_logit_contribution": -0.2805297374725342,
+          "mean_source_total_route_suppression_contribution": 0.3465418964624405,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.51171875,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10725883860141039,
+          "mean_source_target_logit_contribution": -0.2805297374725342,
+          "mean_source_total_route_suppression_contribution": 0.3465418964624405,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.38343334197998047,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.0852262806147337,
+          "mean_source_target_logit_contribution": -0.25070491433143616,
+          "mean_source_total_route_suppression_contribution": 0.3309573046863079,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2563972473144531,
+          "mean_margin_drop_target_vs_routes": -0.0625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10729821398854256,
+          "mean_source_target_logit_contribution": -0.28052276372909546,
+          "mean_source_total_route_suppression_contribution": 0.3464491553604603,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5068942308425903,
+          "mean_margin_drop_target_vs_routes": -0.15625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.05875689908862114,
+          "mean_source_target_logit_contribution": -0.21676447987556458,
+          "mean_source_total_route_suppression_contribution": 0.3160150945186615,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 11:06:52",
+      "title": "Natural Attention Head Mechanism Backtrace",
+      "top_source_mechanism_candidates": [
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.00860595703125,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.0006393760268110782,
+          "mean_source_target_logit_contribution": -0.001673443941399455,
+          "mean_source_total_route_suppression_contribution": 0.004136273026233539,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.624774694442749,
+          "mean_margin_drop_target_vs_routes": 0.078125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.062467094510793686,
+          "mean_source_target_logit_contribution": 0.03619132190942764,
+          "mean_source_total_route_suppression_contribution": 0.1534433662891388,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.4827001094818115,
+          "mean_margin_drop_target_vs_routes": 0.078125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.06400774652138352,
+          "mean_source_target_logit_contribution": 0.0428520143032074,
+          "mean_source_total_route_suppression_contribution": 0.13920105807483196,
+          "mean_target_logit_drop_after_source_removal": 0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.18014860153198242,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.013916890718974173,
+          "mean_source_target_logit_contribution": 0.001283581368625164,
+          "mean_source_total_route_suppression_contribution": 0.05131514463573694,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.18014860153198242,
+          "mean_margin_drop_target_vs_routes": 0.09375,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 0.013916890718974173,
+          "mean_source_target_logit_contribution": 0.001283581368625164,
+          "mean_source_total_route_suppression_contribution": 0.05131514463573694,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.375,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1420745849609375,
+          "mean_margin_drop_target_vs_routes": 0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.001540651632240042,
+          "mean_source_target_logit_contribution": -0.006660685874521732,
+          "mean_source_total_route_suppression_contribution": 0.020480139879509807,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3027762472629547,
+          "mean_margin_drop_target_vs_routes": -0.046875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.288831731537357,
+          "mean_source_target_logit_contribution": 0.0035385191440582275,
+          "mean_source_total_route_suppression_contribution": 0.07145100086927414,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12346084415912628,
+          "mean_margin_drop_target_vs_routes": 0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.02646934730000794,
+          "mean_source_target_logit_contribution": 0.033940404653549194,
+          "mean_source_total_route_suppression_contribution": 0.013362390920519829,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.30434632301330566,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0005302805220708251,
+          "mean_source_target_logit_contribution": -0.0031433093827217817,
+          "mean_source_total_route_suppression_contribution": 0.00522606004960835,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.15824151039123535,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0020616756519302726,
+          "mean_source_target_logit_contribution": 0.0006800519768148661,
+          "mean_source_total_route_suppression_contribution": 0.0027632543351501226,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1461048126220703,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.002591955359093845,
+          "mean_source_target_logit_contribution": -0.0038233594968914986,
+          "mean_source_total_route_suppression_contribution": 0.0024628046667203307,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1435546875,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.016570068895816803,
+          "mean_source_target_logit_contribution": -0.02361295185983181,
+          "mean_source_total_route_suppression_contribution": 0.041333749890327454,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1435546875,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.016570068895816803,
+          "mean_source_target_logit_contribution": -0.02361295185983181,
+          "mean_source_total_route_suppression_contribution": 0.041333749890327454,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.05260714888572693,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0001447306713089347,
+          "mean_source_target_logit_contribution": 0.0003946061187889427,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.05260714888572693,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0001447306713089347,
+          "mean_source_target_logit_contribution": 0.0003946061187889427,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              4
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.0111083984375,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": -0.0021357962395995855,
+          "mean_source_target_logit_contribution": -0.0034757363609969616,
+          "mean_source_total_route_suppression_contribution": 0.0026798806502483785,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H4",
+          "subunit_kind": "attn_head_focus",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5551333427429199,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.021282328758388758,
+          "mean_source_target_logit_contribution": -0.014732914045453072,
+          "mean_source_total_route_suppression_contribution": 0.14406094327569008,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5551333427429199,
+          "mean_margin_drop_target_vs_routes": 0.015625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 0.021282328758388758,
+          "mean_source_target_logit_contribution": -0.014732914045453072,
+          "mean_source_total_route_suppression_contribution": 0.14406094327569008,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.3125,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.6010589003562927,
+          "mean_margin_drop_target_vs_routes": -0.15625,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": -0.5429235547780991,
+          "mean_source_target_logit_contribution": -0.015815630555152893,
+          "mean_source_total_route_suppression_contribution": 0.11769524216651917,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3749847412109375,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.007365428609773517,
+          "mean_source_target_logit_contribution": -0.016016503795981407,
+          "mean_source_total_route_suppression_contribution": 0.09352772310376167,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.3749847412109375,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.007365428609773517,
+          "mean_source_target_logit_contribution": -0.016016503795981407,
+          "mean_source_total_route_suppression_contribution": 0.09352772310376167,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "qk_pattern_visible_content_weak",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2982826232910156,
+          "mean_margin_drop_target_vs_routes": -0.078125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": -0.2540918975137174,
+          "mean_source_target_logit_contribution": -0.01935422047972679,
+          "mean_source_total_route_suppression_contribution": 0.05809541791677475,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "qk_pattern_visible_content_weak": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.07236862182617188,
+          "mean_margin_drop_target_vs_routes": -0.046875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.017125187325291336,
+          "mean_source_target_logit_contribution": -0.024014919996261597,
+          "mean_source_total_route_suppression_contribution": 0.04164193198084831,
+          "mean_target_logit_drop_after_source_removal": -0.0625,
+          "mean_total_positive_route_release_after_source_removal": 0.0625,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.633331835269928,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10815184656530619,
+          "mean_source_target_logit_contribution": -0.2816888689994812,
+          "mean_source_total_route_suppression_contribution": 0.34707409143447876,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.633331835269928,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10815184656530619,
+          "mean_source_target_logit_contribution": -0.2816888689994812,
+          "mean_source_total_route_suppression_contribution": 0.34707409143447876,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5807247161865234,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10829656384885311,
+          "mean_source_target_logit_contribution": -0.28208351135253906,
+          "mean_source_total_route_suppression_contribution": 0.3475738577544689,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5807247161865234,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10829656384885311,
+          "mean_source_target_logit_contribution": -0.28208351135253906,
+          "mean_source_total_route_suppression_contribution": 0.3475738577544689,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.51171875,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10725883860141039,
+          "mean_source_target_logit_contribution": -0.2805297374725342,
+          "mean_source_total_route_suppression_contribution": 0.3465418964624405,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.51171875,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10725883860141039,
+          "mean_source_target_logit_contribution": -0.2805297374725342,
+          "mean_source_total_route_suppression_contribution": 0.3465418964624405,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:H2",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.38343334197998047,
+          "mean_margin_drop_target_vs_routes": -0.03125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.0852262806147337,
+          "mean_source_target_logit_contribution": -0.25070491433143616,
+          "mean_source_total_route_suppression_contribution": 0.3309573046863079,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2563972473144531,
+          "mean_margin_drop_target_vs_routes": -0.0625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.10729821398854256,
+          "mean_source_target_logit_contribution": -0.28052276372909546,
+          "mean_source_total_route_suppression_contribution": 0.3464491553604603,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              2,
+              13
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.5068942308425903,
+          "mean_margin_drop_target_vs_routes": -0.15625,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": -0.05875689908862114,
+          "mean_source_target_logit_contribution": -0.21676447987556458,
+          "mean_source_total_route_suppression_contribution": 0.3160150945186615,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.1875,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L34:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L34:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        }
+      ]
+    },
+    "qwen3": {
+      "attn_implementation": "eager",
+      "components": [
+        "L32:attn_out"
+      ],
+      "dtype": "bfloat16",
+      "model": "qwen3",
+      "n_rows": 24,
+      "phase": 751,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "QK is observational attention mass only. V/O is causal source-contribution removal before o_proj. This still does not prove neuron-level coding.",
+      "summary": [
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.25977325439453125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 5.488724768161774,
+          "mean_source_target_logit_contribution": 6.880979061126709,
+          "mean_source_total_route_suppression_contribution": 0.7217506989836693,
+          "mean_target_logit_drop_after_source_removal": 0.375,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.25977325439453125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 5.488724768161774,
+          "mean_source_target_logit_contribution": 6.880979061126709,
+          "mean_source_total_route_suppression_contribution": 0.7217506989836693,
+          "mean_target_logit_drop_after_source_removal": 0.375,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.29286009073257446,
+          "mean_margin_drop_target_vs_routes": 0.34375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.527853399515152,
+          "mean_source_target_logit_contribution": 6.923406600952148,
+          "mean_source_total_route_suppression_contribution": 0.737173043191433,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.29286009073257446,
+          "mean_margin_drop_target_vs_routes": 0.34375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.527853399515152,
+          "mean_source_target_logit_contribution": 6.923406600952148,
+          "mean_source_total_route_suppression_contribution": 0.737173043191433,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2470703125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.479481995105743,
+          "mean_source_target_logit_contribution": 6.866642475128174,
+          "mean_source_total_route_suppression_contribution": 0.722178615629673,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2470703125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.479481995105743,
+          "mean_source_target_logit_contribution": 6.866642475128174,
+          "mean_source_total_route_suppression_contribution": 0.722178615629673,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03852465748786926,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.06292840605601668,
+          "mean_source_target_logit_contribution": 0.07020242512226105,
+          "mean_source_total_route_suppression_contribution": 0.027204378973692656,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.24744418263435364,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 5.816249251365662,
+          "mean_source_target_logit_contribution": 7.180174827575684,
+          "mean_source_total_route_suppression_contribution": 1.0423188656568527,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 1.125,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1884765625,
+          "mean_margin_drop_target_vs_routes": 0.21875,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 5.702792555093765,
+          "mean_source_target_logit_contribution": 7.053362846374512,
+          "mean_source_total_route_suppression_contribution": 0.9804094135761261,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.20891952514648438,
+          "mean_margin_drop_target_vs_routes": 0.1875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.753321081399918,
+          "mean_source_target_logit_contribution": 7.1099724769592285,
+          "mean_source_total_route_suppression_contribution": 1.0159085839986801,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.024423345923423767,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0594184584915638,
+          "mean_source_target_logit_contribution": 0.06886768341064453,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.16087791323661804,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.6212917268276215,
+          "mean_source_target_logit_contribution": 0.6150848865509033,
+          "mean_source_total_route_suppression_contribution": 0.016407333314418793,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.16087791323661804,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.6212917268276215,
+          "mean_source_target_logit_contribution": 0.6150848865509033,
+          "mean_source_total_route_suppression_contribution": 0.016407333314418793,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1640625,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 1.8412271738052368,
+          "mean_source_target_logit_contribution": 1.8317699432373047,
+          "mean_source_total_route_suppression_contribution": 0.0919121652841568,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.19911931455135345,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.9764224290847778,
+          "mean_source_target_logit_contribution": 1.9712955951690674,
+          "mean_source_total_route_suppression_contribution": 0.07936717569828033,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12890625,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.5575928092002869,
+          "mean_source_target_logit_contribution": 0.5437536239624023,
+          "mean_source_total_route_suppression_contribution": 0.027678463608026505,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12890625,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.5575928092002869,
+          "mean_source_target_logit_contribution": 0.5437536239624023,
+          "mean_source_total_route_suppression_contribution": 0.027678463608026505,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03308683633804321,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.03912899526767433,
+          "mean_source_target_logit_contribution": 0.04242750257253647,
+          "mean_source_total_route_suppression_contribution": 0.025362350046634674,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03308683633804321,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.03912899526767433,
+          "mean_source_target_logit_contribution": 0.04242750257253647,
+          "mean_source_total_route_suppression_contribution": 0.025362350046634674,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1746959686279297,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.9170039892196655,
+          "mean_source_target_logit_contribution": 1.9024279117584229,
+          "mean_source_total_route_suppression_contribution": 0.09501142054796219,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.023201674222946167,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.031115617603063583,
+          "mean_source_target_logit_contribution": 0.03854971006512642,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.023201674222946167,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.031115617603063583,
+          "mean_source_target_logit_contribution": 0.03854971006512642,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.13767623901367188,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.59017613530159,
+          "mean_source_target_logit_contribution": 0.5765352249145508,
+          "mean_source_total_route_suppression_contribution": 0.027281805872917175,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.13767623901367188,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.59017613530159,
+          "mean_source_target_logit_contribution": 0.5765352249145508,
+          "mean_source_total_route_suppression_contribution": 0.027281805872917175,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 11:06:44",
+      "title": "Natural Attention Head Mechanism Backtrace",
+      "top_source_mechanism_candidates": [
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.25977325439453125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 5.488724768161774,
+          "mean_source_target_logit_contribution": 6.880979061126709,
+          "mean_source_total_route_suppression_contribution": 0.7217506989836693,
+          "mean_target_logit_drop_after_source_removal": 0.375,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.25977325439453125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 5.488724768161774,
+          "mean_source_target_logit_contribution": 6.880979061126709,
+          "mean_source_total_route_suppression_contribution": 0.7217506989836693,
+          "mean_target_logit_drop_after_source_removal": 0.375,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.29286009073257446,
+          "mean_margin_drop_target_vs_routes": 0.34375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.527853399515152,
+          "mean_source_target_logit_contribution": 6.923406600952148,
+          "mean_source_total_route_suppression_contribution": 0.737173043191433,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.29286009073257446,
+          "mean_margin_drop_target_vs_routes": 0.34375,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.527853399515152,
+          "mean_source_target_logit_contribution": 6.923406600952148,
+          "mean_source_total_route_suppression_contribution": 0.737173043191433,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.625,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2470703125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.479481995105743,
+          "mean_source_target_logit_contribution": 6.866642475128174,
+          "mean_source_total_route_suppression_contribution": 0.722178615629673,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "mixed_target_support_and_route_guard",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.2470703125,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.479481995105743,
+          "mean_source_target_logit_contribution": 6.866642475128174,
+          "mean_source_total_route_suppression_contribution": 0.722178615629673,
+          "mean_target_logit_drop_after_source_removal": 0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.5,
+          "n": 1,
+          "role_guess_counts": {
+            "mixed_target_support_and_route_guard": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03852465748786926,
+          "mean_margin_drop_target_vs_routes": 0.0625,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.06292840605601668,
+          "mean_source_target_logit_contribution": 0.07020242512226105,
+          "mean_source_total_route_suppression_contribution": 0.027204378973692656,
+          "mean_target_logit_drop_after_source_removal": 0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.24744418263435364,
+          "mean_margin_drop_target_vs_routes": 0.28125,
+          "mean_route_release_coverage": 4.0,
+          "mean_source_margin_contribution": 5.816249251365662,
+          "mean_source_target_logit_contribution": 7.180174827575684,
+          "mean_source_total_route_suppression_contribution": 1.0423188656568527,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 1.125,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "route_suppressor_content",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1884765625,
+          "mean_margin_drop_target_vs_routes": 0.21875,
+          "mean_route_release_coverage": 3.0,
+          "mean_source_margin_contribution": 5.702792555093765,
+          "mean_source_target_logit_contribution": 7.053362846374512,
+          "mean_source_total_route_suppression_contribution": 0.9804094135761261,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "route_suppressor_content": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.20891952514648438,
+          "mean_margin_drop_target_vs_routes": 0.1875,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 5.753321081399918,
+          "mean_source_target_logit_contribution": 7.1099724769592285,
+          "mean_source_total_route_suppression_contribution": 1.0159085839986801,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.875,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.024423345923423767,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.0594184584915638,
+          "mean_source_target_logit_contribution": 0.06886768341064453,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.16087791323661804,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.6212917268276215,
+          "mean_source_target_logit_contribution": 0.6150848865509033,
+          "mean_source_total_route_suppression_contribution": 0.016407333314418793,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.16087791323661804,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.6212917268276215,
+          "mean_source_target_logit_contribution": 0.6150848865509033,
+          "mean_source_total_route_suppression_contribution": 0.016407333314418793,
+          "mean_target_logit_drop_after_source_removal": 0.0,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1640625,
+          "mean_margin_drop_target_vs_routes": 0.0,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 1.8412271738052368,
+          "mean_source_target_logit_contribution": 1.8317699432373047,
+          "mean_source_total_route_suppression_contribution": 0.0919121652841568,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.19911931455135345,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.9764224290847778,
+          "mean_source_target_logit_contribution": 1.9712955951690674,
+          "mean_source_total_route_suppression_contribution": 0.07936717569828033,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_all",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12890625,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.5575928092002869,
+          "mean_source_target_logit_contribution": 0.5437536239624023,
+          "mean_source_total_route_suppression_contribution": 0.027678463608026505,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.12890625,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.5575928092002869,
+          "mean_source_target_logit_contribution": 0.5437536239624023,
+          "mean_source_total_route_suppression_contribution": 0.027678463608026505,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_value_tokens",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03308683633804321,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.03912899526767433,
+          "mean_source_target_logit_contribution": 0.04242750257253647,
+          "mean_source_total_route_suppression_contribution": 0.025362350046634674,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_donor",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.03308683633804321,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 0.03912899526767433,
+          "mean_source_target_logit_contribution": 0.04242750257253647,
+          "mean_source_total_route_suppression_contribution": 0.025362350046634674,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0,
+              8
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.1746959686279297,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 0.0,
+          "mean_source_margin_contribution": 1.9170039892196655,
+          "mean_source_target_logit_contribution": 1.9024279117584229,
+          "mean_source_total_route_suppression_contribution": 0.09501142054796219,
+          "mean_target_logit_drop_after_source_removal": -0.125,
+          "mean_total_positive_route_release_after_source_removal": 0.0,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH2",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.023201674222946167,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.031115617603063583,
+          "mean_source_target_logit_contribution": 0.03854971006512642,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "small_or_unclear",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.023201674222946167,
+          "mean_margin_drop_target_vs_routes": -0.125,
+          "mean_route_release_coverage": 2.0,
+          "mean_source_margin_contribution": 0.031115617603063583,
+          "mean_source_target_logit_contribution": 0.03854971006512642,
+          "mean_source_total_route_suppression_contribution": 0.0,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.25,
+          "n": 1,
+          "role_guess_counts": {
+            "small_or_unclear": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "records_other",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.13767623901367188,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.59017613530159,
+          "mean_source_target_logit_contribution": 0.5765352249145508,
+          "mean_source_total_route_suppression_contribution": 0.027281805872917175,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:topH1",
+          "subunit_kind": "attn_headset",
+          "top1_loss_rate": 0.0
+        },
+        {
+          "context_name": "natural_recipient",
+          "dominant_role_guess": "readout_target_aligned_observational",
+          "heads_seen": [
+            [
+              0
+            ]
+          ],
+          "mean_attention_mass_to_source": 0.13767623901367188,
+          "mean_margin_drop_target_vs_routes": -0.1875,
+          "mean_route_release_coverage": 1.0,
+          "mean_source_margin_contribution": 0.59017613530159,
+          "mean_source_target_logit_contribution": 0.5765352249145508,
+          "mean_source_total_route_suppression_contribution": 0.027281805872917175,
+          "mean_target_logit_drop_after_source_removal": -0.25,
+          "mean_total_positive_route_release_after_source_removal": 0.125,
+          "n": 1,
+          "role_guess_counts": {
+            "readout_target_aligned_observational": 1
+          },
+          "site": "L32:attn_out",
+          "source_group": "target_record_line",
+          "subunit_id": "L32:attn_out:H0",
+          "subunit_kind": "attn_head",
+          "top1_loss_rate": 0.0
+        }
+      ]
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 751,
+  "round": "smoke",
+  "status": "complete",
+  "strict_interpretation": "QK pattern is observational; V/O content is tested by source-contribution removal.",
+  "timestamp": "2026-06-29 11:07:01",
+  "title": "Natural Attention Head Mechanism Backtrace"
+}

@@ -1,0 +1,401 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 748,
+        "relation": "has_route_suppressor_matrix",
+        "source": "qwen3:model",
+        "target": "qwen3:suppressor_matrix"
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "qwen3:component:L28:attn_out",
+        "target": "qwen3:suppressor_matrix",
+        "weight": 1.125
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "qwen3:component:L30:mlp_out",
+        "target": "qwen3:suppressor_matrix",
+        "weight": 1.125
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "qwen3:component:L30:attn_out",
+        "target": "qwen3:suppressor_matrix",
+        "weight": 0.0
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "qwen3:component:L28:mlp_out",
+        "target": "qwen3:suppressor_matrix",
+        "weight": 0.0
+      },
+      {
+        "phase": 748,
+        "relation": "has_route_suppressor_matrix",
+        "source": "glm4:model",
+        "target": "glm4:suppressor_matrix"
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "glm4:component:L34:mlp_out",
+        "target": "glm4:suppressor_matrix",
+        "weight": 1.25
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "glm4:component:L34:attn_out",
+        "target": "glm4:suppressor_matrix",
+        "weight": 0.625
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "glm4:component:L35:mlp_out",
+        "target": "glm4:suppressor_matrix",
+        "weight": 0.5625
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "glm4:component:L35:attn_out",
+        "target": "glm4:suppressor_matrix",
+        "weight": 0.5
+      },
+      {
+        "phase": 748,
+        "relation": "has_route_suppressor_matrix",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:suppressor_matrix"
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "deepseek7b:component:L22:mlp_out",
+        "target": "deepseek7b:suppressor_matrix",
+        "weight": 1.0
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "deepseek7b:component:L23:attn_out",
+        "target": "deepseek7b:suppressor_matrix",
+        "weight": 0.5
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "deepseek7b:component:L23:mlp_out",
+        "target": "deepseek7b:suppressor_matrix",
+        "weight": 0.5
+      },
+      {
+        "phase": 748,
+        "relation": "contributes_to",
+        "source": "deepseek7b:component:L22:attn_out",
+        "target": "deepseek7b:suppressor_matrix",
+        "weight": 0.3125
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -26,
+          0,
+          -12.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:suppressor_matrix",
+        "label": "route suppressor matrix",
+        "model": "qwen3",
+        "position": [
+          0,
+          0,
+          -12.0
+        ],
+        "role": "suppressor_field",
+        "type": "matrix"
+      },
+      {
+        "id": "qwen3:component:L28:attn_out",
+        "label": "L28:attn_out",
+        "mean_boost_target_logit": 0.9375,
+        "mean_route_suppression_coverage": 3.0,
+        "mean_total_positive_route_suppression": 1.125,
+        "model": "qwen3",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          1.125,
+          -12.0
+        ],
+        "role": "global_suppressor_margin_candidate",
+        "type": "component"
+      },
+      {
+        "id": "qwen3:component:L30:mlp_out",
+        "label": "L30:mlp_out",
+        "mean_boost_target_logit": 0.4375,
+        "mean_route_suppression_coverage": 3.0,
+        "mean_total_positive_route_suppression": 1.125,
+        "model": "qwen3",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          1.125,
+          -12.0
+        ],
+        "role": "global_suppressor_margin_candidate",
+        "type": "component"
+      },
+      {
+        "id": "qwen3:component:L30:attn_out",
+        "label": "L30:attn_out",
+        "mean_boost_target_logit": 1.125,
+        "mean_route_suppression_coverage": 0.0,
+        "mean_total_positive_route_suppression": 0.0,
+        "model": "qwen3",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          0,
+          -12.0
+        ],
+        "role": "booster_candidate",
+        "type": "component"
+      },
+      {
+        "id": "qwen3:component:L28:mlp_out",
+        "label": "L28:mlp_out",
+        "mean_boost_target_logit": 0.8125,
+        "mean_route_suppression_coverage": 0.0,
+        "mean_total_positive_route_suppression": 0.0,
+        "model": "qwen3",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          0,
+          -12.0
+        ],
+        "role": "booster_candidate",
+        "type": "component"
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -26,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:suppressor_matrix",
+        "label": "route suppressor matrix",
+        "model": "glm4",
+        "position": [
+          0,
+          0,
+          0.0
+        ],
+        "role": "suppressor_field",
+        "type": "matrix"
+      },
+      {
+        "id": "glm4:component:L34:mlp_out",
+        "label": "L34:mlp_out",
+        "mean_boost_target_logit": -0.6875,
+        "mean_route_suppression_coverage": 3.0,
+        "mean_total_positive_route_suppression": 1.25,
+        "model": "glm4",
+        "new_donor_top1_rate": 1.0,
+        "position": [
+          22,
+          1.25,
+          0.0
+        ],
+        "role": "global_suppressor_closure_candidate",
+        "type": "component"
+      },
+      {
+        "id": "glm4:component:L34:attn_out",
+        "label": "L34:attn_out",
+        "mean_boost_target_logit": 0.5,
+        "mean_route_suppression_coverage": 3.0,
+        "mean_total_positive_route_suppression": 0.625,
+        "model": "glm4",
+        "new_donor_top1_rate": 1.0,
+        "position": [
+          22,
+          0.625,
+          0.0
+        ],
+        "role": "mixed_boost_global_suppressor_closure_candidate",
+        "type": "component"
+      },
+      {
+        "id": "glm4:component:L35:mlp_out",
+        "label": "L35:mlp_out",
+        "mean_boost_target_logit": -0.4375,
+        "mean_route_suppression_coverage": 1.0,
+        "mean_total_positive_route_suppression": 0.5625,
+        "model": "glm4",
+        "new_donor_top1_rate": 1.0,
+        "position": [
+          22,
+          0.5625,
+          0.0
+        ],
+        "role": "harmful_or_competitor_support",
+        "type": "component"
+      },
+      {
+        "id": "glm4:component:L35:attn_out",
+        "label": "L35:attn_out",
+        "mean_boost_target_logit": 0.375,
+        "mean_route_suppression_coverage": 2.0,
+        "mean_total_positive_route_suppression": 0.5,
+        "model": "glm4",
+        "new_donor_top1_rate": 1.0,
+        "position": [
+          22,
+          0.5,
+          0.0
+        ],
+        "role": "mixed_boost_global_suppressor_closure_candidate",
+        "type": "component"
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -26,
+          0,
+          12.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:suppressor_matrix",
+        "label": "route suppressor matrix",
+        "model": "deepseek7b",
+        "position": [
+          0,
+          0,
+          12.0
+        ],
+        "role": "suppressor_field",
+        "type": "matrix"
+      },
+      {
+        "id": "deepseek7b:component:L22:mlp_out",
+        "label": "L22:mlp_out",
+        "mean_boost_target_logit": 0.25,
+        "mean_route_suppression_coverage": 1.0,
+        "mean_total_positive_route_suppression": 1.0,
+        "model": "deepseek7b",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          1.0,
+          12.0
+        ],
+        "role": "route_specific_suppressor_candidate",
+        "type": "component"
+      },
+      {
+        "id": "deepseek7b:component:L23:attn_out",
+        "label": "L23:attn_out",
+        "mean_boost_target_logit": 2.8125,
+        "mean_route_suppression_coverage": 2.0,
+        "mean_total_positive_route_suppression": 0.5,
+        "model": "deepseek7b",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          0.5,
+          12.0
+        ],
+        "role": "global_suppressor_margin_candidate",
+        "type": "component"
+      },
+      {
+        "id": "deepseek7b:component:L23:mlp_out",
+        "label": "L23:mlp_out",
+        "mean_boost_target_logit": 0.1875,
+        "mean_route_suppression_coverage": 1.0,
+        "mean_total_positive_route_suppression": 0.5,
+        "model": "deepseek7b",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          0.5,
+          12.0
+        ],
+        "role": "small_or_no_effect",
+        "type": "component"
+      },
+      {
+        "id": "deepseek7b:component:L22:attn_out",
+        "label": "L22:attn_out",
+        "mean_boost_target_logit": 0.1875,
+        "mean_route_suppression_coverage": 1.0,
+        "mean_total_positive_route_suppression": 0.3125,
+        "model": "deepseek7b",
+        "new_donor_top1_rate": 0.0,
+        "position": [
+          22,
+          0.3125,
+          12.0
+        ],
+        "role": "small_or_no_effect",
+        "type": "component"
+      }
+    ]
+  },
+  "layout": {
+    "x": "model -> route suppressor matrix -> component",
+    "y": "total positive route suppression",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 15,
+    "node_count": 18,
+    "source_phase": 748
+  },
+  "model_info": {
+    "evidence_type": "whole-component donor-recipient delta add measured as route-specific max-logit suppression and target boost",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 748,
+    "round": "smoke",
+    "timestamp": "2026-06-29 10:16:17"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase748_natural_route_suppressor_matrix/smoke/phase748_cross_model_summary.json"
+  ],
+  "title": "Phase 748 Natural Route Suppressor Matrix (smoke)"
+}

@@ -1117,9 +1117,696 @@
 				5，跨模型不可比（qwen3 样本稀疏，GLM4 标 unresolved）。
 
 
-七，条件化相对状态—生成场闭合理论，以及问题硬伤和下一步
+七，预测充分状态—自回归训练—条件化相对状态—生成场闭合理论，以及问题硬伤和下一步
 
-	7.0 对新整合理论的判断
+	7.0 2026-06-29 最新整合：从训练闭环到生成闭合
+
+		与附件理论的区别：
+			附件理论的核心价值，是把当前机制图谱重新接回自回归训练的第一性流程：
+				已有序列进入模型；
+				注意力计算已有序列中的关系性寻址；
+				MLP 把注意力搬运来的信息重写为读出可用状态；
+				残差流跨层累积语义、关系、格式和生成状态；
+				lm_head 把 final hidden state 投影到词表竞争；
+				真实下一个 token 作为监督信号，通过 cross entropy 同时增强正确 token、压低错误竞争 token。
+
+			research/IntelligentTheory.md 中原有理论的核心价值，是把推理时已经观察到的机制整理为：
+				相对编码；
+				复用差分；
+				条件化状态变换；
+				QK/V 寻址-内容拆分；
+				源词元贡献；
+				候选短语竞争；
+				生成场闭合。
+
+			两者不是互相替代，而是上下游关系：
+				附件解释“这些机制为什么会被训练出来”；
+				原有理论解释“这些机制在推理时如何运行、如何失败、如何被图谱定位”。
+
+		最新理论名称：
+			自回归训练—条件化相对状态—生成场闭合理论。
+
+		简称：
+			自回归相对状态闭合理论。
+
+		最新总判断：
+			语言机制不是单个概念向量、单个注意力头、单个 MLP 神经元或单个读出方向。
+			更准确地说：
+				自回归训练用真实下一个 token 的损失，把大量可降低预测误差的关系寻址、内容搬运、非线性重写、残差承载、候选抑制和生成闭合路径固化进同一套参数；
+				推理时，当前上下文在这些参数上激活一条条件化相对状态轨迹；
+				这条轨迹进入词表读出后，不是直接输出“正确语义”，而是在 donor、recipient、format、echo、prose、punctuation、other_vocab 等多路线竞争场中完成或失败于生成闭合。
+
+		因此，当前最完整的三层结构是：
+
+			第一层：自回归训练塑形层。
+				解释为什么网络会形成关系寻址、writer、rewriter、route suppressor 和 generation gate。
+				关键是：
+					未知下一个 token 不是输入，而是训练标签；
+					损失梯度同时奖励正确读出路径、惩罚错误竞争路径。
+
+			第二层：条件化相对状态形成层。
+				解释词嵌入进入上下文后，如何形成对象身份、关系路线、源词元贡献、格式协议、残差轨迹和候选集合。
+
+			第三层：生成场竞争闭合层。
+				解释为什么模型“知道答案”仍不一定输出答案；
+				真正闭合需要目标值在 token0、短语续写、格式协议和多路线竞争中同时胜出。
+
+		与旧理论相比的关键升级：
+			1，旧理论主要描述推理过程；新理论补上训练如何塑造这些机制。
+			2，旧理论把生成场作为推理端竞争；新理论指出这种竞争本身来自 cross entropy 梯度长期塑造。
+			3，旧理论强调 donor boost；Phase 743-745 后必须加入 multi-route suppression。
+			4，旧理论中的 candidate competition 主要是候选 token 竞争；新理论升级为 route-level competition field。
+			5，旧理论中的机制图谱还是索引系统；新理论要求图谱边最终回到“损失降低路径”和“自然生成闭合路径”的因果验证。
+
+		自回归训练塑形公式：
+
+			模型只看前文：
+
+				x_{\leq t}
+
+			预测下一个 token：
+
+				P_\theta(x_{t+1}|x_{\leq t})
+					=
+					softmax(
+						W_U · LN(h^L_t)
+					)
+
+			训练目标：
+
+				\mathcal{L}_t
+					=
+					-\log P_\theta(x_{t+1}|x_{\leq t})
+
+			softmax + cross entropy 对 logit 的梯度：
+
+				\frac{\partial \mathcal{L}_t}{\partial \ell(y)}
+					=
+					P_\theta(y|x_{\leq t})
+					-
+					1[y=x_{t+1}]
+
+			含义：
+				正确 token 的 logit 被推高；
+				概率高的错误竞争 token 被压低；
+				这种梯度沿 lm_head、final norm、残差流、MLP、attention、Q/K/V 和词嵌入反传，
+				长期训练后形成 source -> writer -> rewriter -> route competition -> generation closure 的机制链。
+
+		注意力—MLP—残差状态公式：
+
+			初始词嵌入：
+
+				h_i^0
+					=
+					E(x_i)
+					+
+					P(i)
+
+			第 l 层注意力寻址：
+
+				q_i^l = W_Q^l h_i^l
+
+				k_j^l = W_K^l h_j^l
+
+				v_j^l = W_V^l h_j^l
+
+				\alpha_{ij}^l
+					=
+					softmax_j
+					(
+						q_i^l · k_j^l / \sqrt{d}
+						+
+						mask_{ij}
+					)
+
+				A_l(i)
+					=
+					W_O^l
+					\sum_{j \le i}
+						\alpha_{ij}^l v_j^l
+
+			MLP 非线性重写：
+
+				M_l(i)
+					=
+					W_{down}^l
+					(
+						\sigma(W_{gate}^l h_i^l)
+						\odot
+						W_{up}^l h_i^l
+					)
+
+			残差累积：
+
+				h_i^{l+1}
+					=
+					h_i^l
+					+
+					A_l(i)
+					+
+					M_l(i)
+
+			当前理论解释：
+				attention 更像关系寻址和 writer；
+				MLP 更像状态 rewriter；
+				residual stream 是跨层 carrier；
+				final norm + lm_head 是读出竞争接口。
+
+		条件化相对状态公式：
+
+			对当前生成位置 a：
+
+				h_a^L
+					=
+					S
+					+
+					K
+					+
+					R
+					+
+					O
+					+
+					V
+					+
+					B
+					+
+					P
+					+
+					G
+					+
+					Cmp
+					+
+					\epsilon
+
+			其中：
+				S 是 shared skeleton；
+				K 是知识或源文本锚定；
+				R 是关系路线；
+				O 是对象身份；
+				V 是值状态；
+				B 是对象-关系-值绑定；
+				P 是 prompt / format protocol；
+				G 是 generation / route state；
+				Cmp 是候选竞争状态。
+
+			这不是正交分解，而是功能因子的局部近似。
+
+		最新路线级闭合公式：
+
+			Phase 745 后，闭合条件必须从：
+
+				logit(y_target)
+				>
+				logit(current_top)
+
+			升级为：
+
+				logit(y_target)
+				-
+				\max_R
+				\max_{c \in R}
+					logit(c)
+				>
+				0
+
+			其中：
+
+				R
+				\in
+				{
+					recipient,
+					format,
+					echo,
+					prose,
+					punctuation,
+					other
+				}
+
+			也就是说：
+				压掉当前 top competitor 仍不够；
+				必须让 target 在所有主导竞争路线中同时胜出。
+
+		最新生成闭合公式：
+
+			token0 闭合：
+
+				Token0Closure
+					\Longleftrightarrow
+					\ell(y_0^{target})
+					-
+					\max_R
+					\max_{c\in R}
+					\ell(c)
+					>
+					0
+
+			短语闭合：
+
+				L(y|x)
+					=
+					\frac{1}{m}
+					\sum_{i=1}^{m}
+						\log P(y_i|x,y_{<i})
+
+				GenerationClosure
+					\Longleftrightarrow
+					L(y_{target}|x)
+					-
+					\max_{y\ne y_{target}}
+						L(y|x)
+					>
+					\delta
+
+			最终闭合需要：
+
+				Training-shaped state
+				+
+				Target route boost
+				+
+				Multi-route suppression
+				+
+				Continuation acceptance
+				>
+				Generation threshold
+
+		基于词嵌入的完整计算例子：
+
+			输入：
+
+				Record: apple category fruit.
+				Question: What is the category of apple?
+				Answer:
+
+			1，词嵌入入口：
+
+				h_i^0 = E(x_i) + P(i)
+
+				E(apple) 提供对象锚点；
+				E(category) 提供关系锚点；
+				E(fruit) 提供目标值锚点；
+				Answer 后的位置 a 是读出位置。
+
+			2，注意力关系寻址：
+
+				answer_start 的 q_a 与记录行中 apple/category/fruit 的 k_j 匹配，
+				使某些 head 在 a 位置回看目标记录行。
+
+			3，value 内容搬运：
+
+				被看的 source token 通过 v_j 和 W_O 写入答案位置：
+
+					\Delta h^{writer}_a
+						=
+						W_O
+						\sum_{j\in record}
+						\alpha(a,j)V(j)
+
+			4，MLP 重写：
+
+				MLP 把“apple + category -> fruit”的局部证据重写成更接近读出方向的状态：
+
+					\Delta h^{rewriter}_a
+						=
+						MLP(h_a+\Delta h^{writer}_a)
+						-
+						MLP(h_a)
+
+			5，残差累积：
+
+				h_a^L
+					=
+					h_a^0
+					+
+					\sum_l
+					(
+						\Delta h_{a,l}^{attn}
+						+
+						\Delta h_{a,l}^{mlp}
+					)
+
+			6，读出竞争：
+
+				ell(fruit)
+					=
+					W_U(fruit)^T LN(h_a^L)
+
+				ell(apple)
+					=
+					W_U(apple)^T LN(h_a^L)
+
+				ell(The)
+					=
+					W_U(The)^T LN(h_a^L)
+
+				ell(category)
+					=
+					W_U(category)^T LN(h_a^L)
+
+			7，多路线竞争：
+
+				fruit 是 target route；
+				apple 可能是 echo route；
+				The 可能是 prose route；
+				category 可能是 relation echo route；
+				Answer 或换行可能是 format route。
+
+			8，闭合判据：
+
+				只有当：
+
+					ell(fruit)
+					>
+					max(
+						ell(apple),
+						ell(The),
+						ell(category),
+						ell(format_tokens),
+						ell(other_vocab)
+					)
+
+				并且后续 token 不转入解释、回声或格式续写时，才算真正短答闭合。
+
+			9，训练如何形成这条路径：
+
+				如果训练文本真实下一个 token 是 fruit，
+				则 loss 会推动：
+					fruit logit 上升；
+					apple / The / category / format 等错误竞争项下降；
+					能看向目标记录行的 QK 路径增强；
+					能搬运 fruit 内容的 V/W_O 路径增强；
+					能把搬运内容重写成读出状态的 MLP 路径增强。
+
+			这说明：
+				词嵌入不是答案本身；
+				词嵌入只是进入自回归训练塑造出的关系寻址、内容搬运、状态重写、路线竞争和生成闭合机制的入口。
+
+		当前最新可靠结论：
+			1，注意力不是“理解关系”的全部，而是可微分关系寻址。
+			2，MLP 不是简单记忆库，而是把搬运来的信息重写成读出可用状态。
+			3，残差流不是静态存储，而是跨层 carrier。
+			4，自回归损失不是简单记下一个词，而是通过梯度同时塑造正确路线和竞争路线。
+			5，生成失败往往不是不知道答案，而是 target route 没有同时压过 format / echo / prose / punctuation 等路线。
+			6，Phase 745 已证明，单 top competitor suppression 不足，多路线压制才稳定提升闭合。
+			7，当前还没有完成自然 route suppressor 的机制定位，下一步必须寻找自然组件如何分别压制 recipient、format、echo、other_vocab 路线。
+
+	7.0.1 2026-06-29 再整合：预测充分状态不变量与生命闭合数学
+
+		本轮附件与当前理论的核心区别：
+
+			第一份附件：
+				主要价值是把“条件化相对状态—生成场闭合理论”的公式逐条拆开，并修正符号混淆。
+				特别重要的是：
+					Id 表示 identity（身份）；
+					Int 表示 intent（意图许可）；
+					不能再用同一个 I 同时表示身份和意图。
+				它还明确指出，S、Int、P、F、G、V、U、T、R、M、C 等不是模型显式存储的变量，而是可测、可干预、可比较的功能解释项。
+
+			第二份附件：
+				主要价值是提出“预测闭合不变量”。
+				它不是固定神经元、固定 head、固定语义向量，也不是传统物理守恒量。
+				它指向一个更高层的全局约束：
+					任意前缀状态都必须被压缩成一个足以预测下一个 token 的状态。
+
+			第三份附件：
+				主要价值是把“预测闭合”推广到生物学，提出生命系统可能不是由守恒量定义，而是由边界维持、可生存域、功能闭合、修复和生成能力定义。
+				它对智能理论有启发，但不能反向证明语言模型内部机制。
+
+		因此，最新理论需要从原来的：
+
+			自回归训练—条件化相对状态—生成场闭合理论
+
+		升级为：
+
+			预测充分状态—自回归训练—条件化相对状态—生成场闭合理论。
+
+		简称：
+
+			预测充分相对状态闭合理论。
+
+		最准确的总命题：
+
+			语言模型的核心不变量不是某个局部表示，而是“预测充分状态”等价类。
+			自回归训练把所有局部机制组织成这样的状态：
+				它在统一词表读出坐标系中，尽可能保留对下一个 token 有用的信息；
+				并通过生成场竞争，使目标 token 或目标短语压过多条竞争路线。
+
+		第一层不变量：预测误差势能
+
+			自回归训练目标：
+
+				\mathcal{Q}(x_{\leq t})
+					=
+					-\log P_\theta(x_{t+1}|x_{\leq t})
+
+			这不是守恒能量，而是训练持续降低的预测误差势能。
+			所有参数更新都被这个误差场塑形。
+
+		第二层不变量：统一词表读出坐标系
+
+			无论输入是语义、语法、标点、逻辑、代码还是格式，最终都必须进入同一个词表空间：
+
+				\ell_t
+					=
+					W_U
+					Norm(h_t)
+					\in
+					\mathbb{R}^{|\mathcal{V}|}
+
+			因此，两个内部状态即使神经激活完全不同，只要读出分布近似相同，在生成意义上就是等价的：
+
+				h
+					\sim_{readout}
+					h'
+				\quad
+				\Longleftrightarrow
+				\quad
+				softmax(W_U Norm(h))
+					\approx
+				softmax(W_U Norm(h'))
+
+			这就是“读出等价类不变量”。
+
+		第三层不变量：预测充分状态
+
+			理想情况下，最终状态 h_t 应当是前缀 x_{\leq t} 关于下一个 token 的预测充分统计量：
+
+				P(x_{t+1}|h_t)
+					\approx
+				P(x_{t+1}|x_{\leq t})
+
+			也可以写成：
+
+				x_{\leq t}
+					\rightarrow
+				h_t
+					\rightarrow
+				x_{t+1}
+
+			并近似满足：
+
+				I(x_{\leq t};x_{t+1})
+					\approx
+				I(h_t;x_{t+1})
+
+			定义预测充分等价类：
+
+				\mathcal{H}_{suf}(x_{\leq t})
+					=
+					{
+						h:
+						D(
+							P_\theta(\cdot|h),
+							P_\theta(\cdot|x_{\leq t})
+						)
+						<
+						\epsilon
+					}
+
+			其中 D 可以是 KL divergence、JS divergence 或 top-k logit margin distance。
+			当前阶段不应争论某个神经元是否是“不变量”，而应测量：
+				哪些组件把状态推入正确的预测充分等价类；
+				哪些组件把状态推向错误路线的预测充分等价类。
+
+		第四层：生成闭合不变量
+
+			预测充分还不等于自然生成成功。
+			生成端必须满足：
+
+				Token0Closure
+					\Longleftrightarrow
+					\ell(y_0^{target})
+					-
+					\max_R
+					\max_{c\in R}
+					\ell(c)
+					>
+					0
+
+			以及：
+
+				GenerationClosure
+					\Longleftrightarrow
+					L(y_{target}|x)
+					-
+					\max_{y\ne y_{target}}
+					L(y|x)
+					>
+					\delta
+
+			所以最新链条应写成：
+
+				source token
+				->
+				writer
+				->
+				rewriter
+				->
+				predictive sufficient state
+				->
+				readout competition
+				->
+				route-level suppression
+				->
+				generation closure
+
+		第五层：生命闭合数学的外推
+
+			第三份附件提出的生物学框架可以作为更高层启发：
+
+				\mathcal{I}_{life}
+					=
+					(
+						\mathcal{B},
+						\mathcal{V},
+						\mathcal{F},
+						\mathcal{R},
+						\mathcal{G}
+					)
+
+			其中：
+				\mathcal{B} 是 boundary（边界）；
+				\mathcal{V} 是 viability domain（可生存域）；
+				\mathcal{F} 是 functional closure（功能闭合）；
+				\mathcal{R} 是 repairability（可修复性）；
+				\mathcal{G} 是 generation / reproduction（生成 / 复制性）。
+
+			对应生命作用量：
+
+				\mathcal{A}_{life}
+					=
+					\int_0^T
+					[
+						D_{\mathcal{V}}
+						+
+						D_{\mathcal{B}}
+						+
+						\mathcal{E}_{closure}
+						+
+						\mathcal{E}_{prediction}
+						+
+						\mathcal{E}_{repair}
+						+
+						\mathcal{E}_{generation}
+						+
+						E_{cost}
+					]
+					dt
+
+			语言模型是其中的一个退化特例：
+
+				\mathcal{A}_{LM}
+					=
+					\sum_t
+					-\log P_\theta(x_{t+1}|x_{\leq t})
+
+			也就是说：
+				大模型主要有预测闭合和生成闭合；
+				生命系统还多了边界闭合、可生存闭合、修复闭合、行动闭合和复制闭合。
+
+			这个外推的价值：
+				它解释为什么自回归模型可能提供新数学入口：
+					高维系统如何在单一全局目标下自组织出局部机制图谱。
+
+			这个外推的边界：
+				生命闭合数学目前是理论类比，不是模型机制实验证据。
+				不能用它直接证明神经网络内部存在某个具体生物式不变量。
+
+		最新公式体系的精简版：
+
+			输入嵌入：
+
+				h_0(p)
+					=
+					Embed(t_p,p)
+
+			功能状态：
+
+				Z_l(p|x)
+					=
+					{
+						Rel_l,
+						Id_l,
+						Role_l,
+						Cstr_l,
+						Fmt_l,
+						Op_l,
+						Scp_l,
+						Attr_l,
+						Bind_l,
+						Cand_l,
+						Norm_l,
+						Route_l,
+						Trans_l
+					}
+
+			真实隐藏状态：
+
+				h_l(p)
+					=
+					\Psi_l(Z_l(p|x))
+					+
+					\epsilon_l
+
+			层间更新：
+
+				h_{l+1}(p)
+					=
+					h_l(p)
+					+
+					Attn_l(h_l,x,p)
+					+
+					MLP_l(h_l,x,p)
+
+			预测充分状态：
+
+				h_t
+					\in
+					\mathcal{H}_{suf}(x_{\leq t})
+
+			读出分布：
+
+				P_\theta(\cdot|x_{\leq t})
+					=
+					softmax(W_U Norm(h_t))
+
+			生成闭合：
+
+				L(y_{target}|x)
+				-
+				\max_{y\ne y_{target}}L(y|x)
+				>
+				\delta
+
+		和原理论相比的最重要变化：
+
+			1，原理论的核心对象是条件化状态轨迹；新理论的上位对象是预测充分状态等价类。
+			2，原理论把生成失败归因于生成场竞争；新理论把它进一步归因于状态没有进入目标路线的预测充分等价类，或进入后没有完成路线级压制。
+			3，原理论重视图谱节点；新理论要求每个图谱节点回答两个问题：
+				它是否增加预测充分性？
+				它是否推动生成闭合？
+			4，生物学外推提供“闭合结构不变量”的上位视角，但不应直接替代语言机制实验。
+
+	7.1 对前一版整合理论的保留与修正
 
 		理论名称：
 			条件化相对状态—生成场闭合理论。
@@ -1144,7 +1831,7 @@
 		必须收紧的地方：
 			1，生成场中的各个场不是已经被证明的独立物理子空间，而是可测试的功能因子。
 			2，当前证据较强的是 G_route、P_format、U_channel、T_residual、R_readout、M_competition、C_continuation。
-			3，I_intent 和 V_identity 仍更像理论占位变量，尤其 V_identity 还没有找到跨样本、跨格式、跨候选可迁移的最小因果单元。
+			3，Int_intent 和 V_identity 仍更像理论占位变量，尤其 V_identity 还没有找到跨样本、跨格式、跨候选可迁移的最小因果单元。
 			4，不能把这套理论解释成“所有内容都已经闭合”。它是当前最好的组织框架，仍需要 QK/V causal replacement、neuron/MLP 下钻和自然生成闭环验证。
 
 		与现有理论的关系：
@@ -1170,20 +1857,20 @@
 			Z_l(p|x)
 				=
 				{
-					Rel,
-					I,
-					R,
-					C,
-					F,
-					O,
-					S,
-					A,
-					B,
-					Q,
-					N,
-					Path,
-					T
-				}_l
+					Rel_l,
+					Id_l,
+					Role_l,
+					Cstr_l,
+					Fmt_l,
+					Op_l,
+					Scp_l,
+					Attr_l,
+					Bind_l,
+					Cand_l,
+					Norm_l,
+					Route_l,
+					Trans_l
+				}
 
 			h_l(p)
 				=
@@ -1207,7 +1894,7 @@
 				=
 				{
 					S_{semantic},
-					I_{intent},
+					Int_{intent},
 					P_{protocol},
 					F_{format},
 					G_{route},
@@ -1325,7 +2012,7 @@
 			4，first-token 胜出不等于 generation closure，必须测完整短语。
 			5，真正的 V_identity 单元必须同时满足 sufficiency、necessity、transferability；否则只能称为 route gain 或 format gate。
 
-	7.1 当前最有效完整理论的明确陈述
+	7.2 当前最有效完整理论的明确陈述
 
 		理论名称：
 			条件化相对状态—生成场闭合理论（含非线性扩展）。
@@ -1363,7 +2050,7 @@
 			机制图谱 G = {u_i, r_i, s_i(B), e_i}  节点状态依赖条件B
 			关键：从h_l到P的非线性变换链不能用线性差分叠加完整描述。
 
-	7.2 完整计算例子
+	7.3 完整计算例子
 
 		任务设定：
 			问题："What color is the cerulean_fox?"
@@ -1494,7 +2181,61 @@
 			只有同时理解线性部分（Step 1,5,7,9）和非线性部分（Step 2,3,4,6,8），
 			才能完整解释从"cerulean_fox"到"blue"的语言生成过程。
 
-	7.3 问题与硬伤（按严重程度排序）
+	7.4 问题与硬伤（按严重程度排序）
+
+		新增硬伤0：训练塑形解释仍是机制合理性推断，不是直接实验证据
+			附件理论正确指出 cross entropy 会同时推高正确 token、压低错误竞争 token。
+			但从“梯度形式如此”到“某个具体 head / MLP / channel 就是这样被训练成自然 route suppressor”，中间还缺少直接证据。
+			影响：
+				当前可以说自回归训练具有形成 writer / rewriter / suppressor 的压力；
+				但还不能说已经证明某个自然组件就是由该压力形成的最小机制单元。
+
+		新增硬伤1：路线级压制仍是 final-norm 几何干预
+			Phase 745 证明 multi-route suppression 可以显著提升 token0 closure：
+				qwen3: 0.00 -> 1.00
+				GLM4: 0.50 -> 0.90
+				DS7B: 0.05 -> 0.90
+			但这仍是 final-norm readout geometry intervention，不是自然 forward pass 中组件自动执行抑制的证明。
+			影响：
+				当前闭合公式已经更准确；
+				但自然 route suppressor 的来源仍未定位。
+
+		新增硬伤2：route classifier 仍然太粗
+			other_vocab 可能混合：
+				option marker；
+				label route；
+				tokenizer artifact；
+				未分类 format route；
+				真实 semantic competitor。
+			format_or_schema 也可能包含多个格式子路线。
+			影响：
+				如果 route 分类不准，route-level suppression 的解释会被混合类污染。
+
+		新增硬伤3：预测充分状态不变量仍是全局等价类，不是局部机制定位
+			本轮理论把全局不变量收紧为：
+				P_\theta(\cdot|x_{\leq t})
+				或
+				\mathcal{H}_{suf}(x_{\leq t})
+			这是正确方向，但它仍然是输出分布层或等价类层的对象。
+			它不能直接告诉我们：
+				哪个 head 负责预测充分；
+				哪个 MLP 神经元负责关系绑定；
+				哪个 channel 负责路线压制。
+			影响：
+				预测充分状态是全局理论入口，不是局部图谱的替代品。
+				下一步必须把等价类变化和具体组件干预联系起来。
+
+		新增硬伤4：生命闭合数学是上位类比，不是语言模型实验结论
+			边界维持、可生存域、功能闭合、修复、生成这些概念对智能理论有启发。
+			但当前模型实验只支持：
+				预测闭合；
+				生成闭合；
+				路线竞争；
+				局部机制图谱。
+			还不能证明语言模型具有生物意义上的边界维持、修复闭合或生命闭合不变量。
+			影响：
+				生命闭合数学可以作为未来统一理论框架；
+				但当前不能用它替代模型内部结构测试。
 
 		硬伤1（最致命）：线性差分场与softmax归一化的根本冲突
 			理论用 ΔM ≈ Σ<·, Δh_w> 描述复用差分，但softmax是非线性竞争归一化。
@@ -1543,10 +2284,111 @@
 			三模型样本规模限制，尤其qwen3稀疏、GLM4标unresolved。
 			影响：理论在简单任务上成立，不等于在复杂语言使用上成立。
 
-	7.4 下一步阶段性大任务
+	7.5 下一步阶段性大任务
 
-		基于以上硬伤，当前瓶颈是"线性差分框架 vs 非线性竞争归一化"的冲突。
-		下一步不应继续堆patch，而应：
+		基于以上硬伤，当前瓶颈已经从单纯的"线性差分框架 vs 非线性竞争归一化"，
+		升级为：
+
+			1，自回归训练如何塑造自然机制；
+			2，推理时自然机制如何形成条件化状态；
+			3，读出端多路线竞争如何闭合；
+			4，哪些自然组件负责 route-level suppression。
+			5，哪些组件真正改变预测充分等价类，而不只是改变局部投影。
+
+		下一步不应继续堆单点 patch，而应：
+
+		大任务-1：预测充分等价类测量（新增上位任务）
+			目标：
+				把“预测充分状态不变量”从理论概念变成可测对象。
+
+			具体：
+				1，给每个样本 x_{\leq t} 记录完整 top-k 读出分布：
+
+					P_\theta(\cdot|x_{\leq t})
+
+				2，对候选组件 u 做干预，得到：
+
+					P_\theta(\cdot|do(u))
+
+				3，定义读出分布距离：
+
+					D_{readout}(u)
+						=
+						D(
+							P_\theta(\cdot|x_{\leq t}),
+							P_\theta(\cdot|do(u))
+						)
+
+				4，定义目标预测充分增益：
+
+					G_{suf}(u)
+						=
+						-
+						D(
+							P_\theta(\cdot|do(u)),
+							P_{target}(\cdot|x_{\leq t})
+						)
+
+				5，把组件分成三类：
+					只改变局部 hidden state，但几乎不改变读出分布；
+					改变读出分布，但不进入目标闭合；
+					真正把状态推向目标预测充分等价类，并提升生成闭合。
+
+			成功判据：
+				若某类 head / channel / MLP 组件能跨样本稳定降低 target distribution distance，
+				并同时提升 token0 closure 与 phrase closure，
+				则“预测充分状态”从全局不变量进入组件级图谱。
+
+		大任务0：自然路线级抑制器定位（当前最紧迫）
+			目标：
+				从人工 route suppression 进入自然 route suppressor localization。
+
+			具体：
+				1，复用 Phase 744 的 late attention / MLP component scan。
+				2，对每个组件 u，不再只测 current top competitor，而是测：
+
+					boost_target(u)
+					suppress_recipient_route(u)
+					suppress_format_route(u)
+					suppress_echo_route(u)
+					suppress_other_route(u)
+
+				3，定义 route max logit：
+
+					L_R(x)
+						=
+						max_{c in R}
+							logit(c|x)
+
+				4，定义自然组件的路线抑制效应：
+
+					S_R(u)
+						=
+						L_R(base)
+						-
+						L_R(base + Δh_u)
+
+				5，寻找能同时提升 target margin、降低多个路线 max logit 的自然组件集合。
+
+			成功判据：
+				若某些自然 attn / MLP 组件能稳定降低 format / echo / recipient route max，
+				并比随机组件、反向 delta、范数匹配对照更强，
+				则可把 Phase 745 的读出几何证据升级为自然机制证据。
+
+		大任务00：训练塑形证据回溯
+			目标：
+				验证自回归损失是否真的在自然参数中形成了“正确路线增强 + 错误路线抑制”的结构。
+
+			具体：
+				1，记录同一任务下 target token 与 competitor token 的 logit gradient 方向。
+				2，比较这些梯度方向与已发现 writer / rewriter / suppressor 组件的输出方向是否对齐。
+				3，构造小规模可控训练或微调任务，观察 route suppressor 是否随 loss pressure 形成。
+				4，把训练中形成的组件与推理时的 atlas 节点对齐。
+
+			成功判据：
+				若某些组件在训练中沿 target-vs-route gradient 增强，
+				并在推理时成为自然 route suppressor，
+				则自回归训练塑形层获得实验证据。
 
 		大任务A：从线性差分场升级为pre-softmax概率竞争场（最关键）
 			核心：把ΔM ≈ Σ<·, Δh_w>改写为以attention logit（pre-softmax）为变量的差分。
@@ -1600,32 +2442,50 @@
 			3，使反馈能修改算子代数结构
 			4，目标是可编辑、可因果干预的智能系统
 
-	7.5 当前整体进展评估
+	7.6 当前整体进展评估
 
-		机制闭合度（不是AGI完成度）：65% 到 75%
+		机制闭合度（不是AGI完成度）：70% 到 78%
+		理论组织完整度（不是实验证明完成度）：75% 到 82%
 			已闭合：
 			相对编码的几何证据（流形拓扑、Mantel相关）
 			复用差分的patch证据（restore改变读出、random/reverse对照失败）
 			非线性理论体系的7个关键拼图（流形、Jacobian、RMSNorm、非交换、抵消、SiLU、softmax）
 			机制图谱v0初始化和QK-V拆分启动
+			自回归训练塑形的基本数学链条（cross entropy 同时推高目标 token、压低高概率错误 token）
+			Phase 745 的多路线竞争闭合证据（单 top suppression 不足，route-level suppression 显著提升 token0 closure）
+			预测充分状态不变量的理论形式（读出分布等价类、预测充分等价类、生成闭合条件）
+			语言模型与生命闭合数学的层级关系（大模型是预测闭合和生成闭合的特例，生命系统还包含边界、可生存域、修复和复制闭合）
 			未闭合：
+			预测充分等价类的组件级测量
+			自然 route suppressor 的组件级来源
+			训练塑形层与推理机制图谱的直接因果回溯
 			自然生成闭环（Level 6）
 			pre-softmax概率竞争场的数学形式
 			点编码证伪的控制实验
 			图谱边的因果形式化
 			通道级到神经元级的拆分
 			跨模型一致性
+			生命闭合数学与神经网络机制之间的直接实验桥梁
 
 		语言编码机制的当前最准确表述：
-			语言不是把"概念向量"直接投影成词，
-			而是在每个自回归位置形成一个条件化状态：
-			对象身份被局部上下文锚定；
-			关系和规则决定查询路线；
-			格式协议决定答案形态；
-			源词元贡献提供路线增益；
-			候选短语在读出端竞争；
-			生成门决定最终是短值、解释、续写还是失败。
+			语言不是把"概念向量"直接投影成词。
+			当前最接近不变量的对象，也不是某个固定神经元或固定 head，而是：
+				给定前缀后的预测分布；
+				以及能够产生该预测分布的预测充分状态等价类。
+			自回归训练通过下一个 token 损失，把关系寻址、内容搬运、状态重写、候选增强和竞争抑制同时塑造成可复用机制。
+			推理时，模型在每个自回归位置形成一个条件化状态：
+				对象身份被局部上下文锚定；
+				关系和规则决定查询路线；
+				格式协议决定答案形态；
+				源词元贡献提供路线增益；
+				候选 token 和候选短语在读出端竞争；
+				recipient / format / echo / prose / punctuation 等路线必须被同时压制；
+				生成门决定最终是短值、解释、续写还是失败。
 			以上全过程发生在极低维弯曲流形上，
 			经过非线性算子变换、Jacobian链旋转放大、RMSNorm各向异性调制，
 			最终在softmax概率竞争中形成自回归执行。
-			线性差分叠加只在局部邻域有效，完整机制需要pre-softmax概率竞争场。
+			线性差分叠加只在局部邻域有效，完整机制需要pre-softmax概率竞争场和 route-level competition field。
+			进一步说，机制图谱的最终目标不是列出所有局部激活，而是说明：
+				哪些局部机制把状态推入正确预测充分等价类；
+				哪些局部机制负责让目标路线在生成场中完成闭合；
+				哪些竞争路线导致预测充分但生成不闭合。

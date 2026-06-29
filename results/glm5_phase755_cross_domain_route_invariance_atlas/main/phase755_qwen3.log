@@ -1,0 +1,627 @@
+[12:12:34] qwen3/main: pairs=30 candidates=3 sources=['target_record_line', 'target_value_tokens', 'records_all']
+[12:12:34] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   6%|▌         | 24/398 [00:00<00:01, 216.72it/s]Loading weights:  22%|██▏       | 89/398 [00:00<00:00, 435.11it/s]Loading weights:  39%|███▉      | 157/398 [00:00<00:00, 540.53it/s]Loading weights:  54%|█████▍    | 214/398 [00:00<00:00, 544.14it/s]Loading weights:  70%|██████▉   | 277/398 [00:00<00:00, 565.58it/s]Loading weights:  87%|████████▋ | 345/398 [00:00<00:00, 597.24it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 558.09it/s]
+[12:12:35] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[12:12:39] qwen3: cross-domain atlas 5/30 pairs; rows=50
+[12:12:43] qwen3: cross-domain atlas 10/30 pairs; rows=100
+[12:12:46] qwen3: cross-domain atlas 15/30 pairs; rows=150
+[12:12:50] qwen3: cross-domain atlas 20/30 pairs; rows=200
+[12:12:53] qwen3: cross-domain atlas 25/30 pairs; rows=250
+[12:12:56] qwen3: cross-domain atlas 30/30 pairs; rows=300
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "route_js": 0.04093090439249567,
+  "top": [
+    {
+      "site": "L33:attn_out",
+      "head": 23,
+      "subunit_id": "L33:attn_out:H23",
+      "source_group": "records_all",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.22900384664535522,
+      "mean_source_target_logit_contribution": 3.0325078174471853,
+      "mean_source_total_route_suppression_contribution": 0.19325939938426018,
+      "mean_target_logit_drop_after_source_removal": 0.1,
+      "support_rate_drop_gt_0_20": 0.2,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "route_guard_rate_release_gt_0_20": 0.3,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.041666666666666664
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.14583333333333334
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.22916666666666666,
+          "mean_route_release": 0.041666666666666664
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.125,
+          "mean_route_release": 0.16666666666666666
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.16666666666666666
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.16666666666666666
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 23,
+      "subunit_id": "L33:attn_out:H23",
+      "source_group": "target_value_tokens",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.08171488444010416,
+      "mean_source_target_logit_contribution": 2.9287345353203516,
+      "mean_source_total_route_suppression_contribution": 0.12570795975625515,
+      "mean_target_logit_drop_after_source_removal": 0.07916666666666666,
+      "support_rate_drop_gt_0_20": 0.2,
+      "mean_total_positive_route_release_after_source_removal": 0.10833333333333334,
+      "route_guard_rate_release_gt_0_20": 0.2,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.041666666666666664
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.16666666666666666,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.10416666666666667
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.16666666666666666,
+          "mean_target_drop": 0.20833333333333334,
+          "mean_route_release": 0.041666666666666664
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.125
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.16666666666666666,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.125
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.25
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 23,
+      "subunit_id": "L33:attn_out:H23",
+      "source_group": "target_record_line",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.11608781814575195,
+      "mean_source_target_logit_contribution": 3.019225941458717,
+      "mean_source_total_route_suppression_contribution": 0.12611117893829943,
+      "mean_target_logit_drop_after_source_removal": 0.075,
+      "support_rate_drop_gt_0_20": 0.16666666666666666,
+      "mean_total_positive_route_release_after_source_removal": 0.1,
+      "route_guard_rate_release_gt_0_20": 0.16666666666666666,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.0
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.041666666666666664
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.22916666666666666,
+          "mean_route_release": 0.020833333333333332
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.14583333333333334
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.20833333333333334
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.16666666666666666
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L32:attn_out",
+      "head": 11,
+      "subunit_id": "L32:attn_out:H11",
+      "source_group": "records_all",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.161871138215065,
+      "mean_source_target_logit_contribution": 1.2234162077928583,
+      "mean_source_total_route_suppression_contribution": 0.10606757442777355,
+      "mean_target_logit_drop_after_source_removal": 0.05,
+      "support_rate_drop_gt_0_20": 0.16666666666666666,
+      "mean_total_positive_route_release_after_source_removal": 0.15416666666666667,
+      "route_guard_rate_release_gt_0_20": 0.4,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.041666666666666664
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.125
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.20833333333333334
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.20833333333333334
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.10416666666666667,
+          "mean_route_release": 0.14583333333333334
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.125
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_record_line",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.07548499902089437,
+      "mean_source_target_logit_contribution": 0.5271175073770186,
+      "mean_source_total_route_suppression_contribution": 0.20050923364857834,
+      "mean_target_logit_drop_after_source_removal": 0.0375,
+      "support_rate_drop_gt_0_20": 0.1,
+      "mean_total_positive_route_release_after_source_removal": 0.15,
+      "route_guard_rate_release_gt_0_20": 0.3,
+      "top1_loss_rate": 0.0,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.0
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.0625
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": 0.10416666666666667,
+          "mean_route_release": 0.3333333333333333
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.0,
+          "mean_route_release": 0.16666666666666666
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": -0.020833333333333332,
+          "mean_route_release": 0.14583333333333334
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.08333333333333333
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L32:attn_out",
+      "head": 11,
+      "subunit_id": "L32:attn_out:H11",
+      "source_group": "target_value_tokens",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.08321558634440104,
+      "mean_source_target_logit_contribution": 1.229506008262979,
+      "mean_source_total_route_suppression_contribution": 0.09620700323139317,
+      "mean_target_logit_drop_after_source_removal": 0.025,
+      "support_rate_drop_gt_0_20": 0.06666666666666667,
+      "mean_total_positive_route_release_after_source_removal": 0.125,
+      "route_guard_rate_release_gt_0_20": 0.3,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.16666666666666666,
+          "mean_route_release": 0.0
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.16666666666666666,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.0625
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.16666666666666666,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.08333333333333333
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": -0.020833333333333332,
+          "mean_route_release": 0.2708333333333333
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.16666666666666666,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.20833333333333334
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": -0.08333333333333333,
+          "mean_route_release": 0.0
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "records_all",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.12936030725638073,
+      "mean_source_target_logit_contribution": 0.542479170113802,
+      "mean_source_total_route_suppression_contribution": 0.20195932543526093,
+      "mean_target_logit_drop_after_source_removal": 0.016666666666666666,
+      "support_rate_drop_gt_0_20": 0.06666666666666667,
+      "mean_total_positive_route_release_after_source_removal": 0.16666666666666666,
+      "route_guard_rate_release_gt_0_20": 0.4,
+      "top1_loss_rate": 0.0,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.0
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": -0.020833333333333332,
+          "mean_route_release": 0.22916666666666666
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.5,
+          "mean_target_drop": 0.10416666666666667,
+          "mean_route_release": 0.20833333333333334
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": -0.020833333333333332,
+          "mean_route_release": 0.16666666666666666
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": -0.041666666666666664,
+          "mean_route_release": 0.16666666666666666
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.041666666666666664,
+          "mean_route_release": 0.125
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    },
+    {
+      "site": "L33:attn_out",
+      "head": 15,
+      "subunit_id": "L33:attn_out:H15",
+      "source_group": "target_value_tokens",
+      "n": 30,
+      "domains": [
+        "abstract",
+        "animal",
+        "fruit",
+        "object",
+        "plant",
+        "tool"
+      ],
+      "relations": [
+        "category",
+        "color",
+        "edible",
+        "grows_on_tree",
+        "shape",
+        "taste"
+      ],
+      "mean_attention_mass_to_source": 0.056722005208333336,
+      "mean_source_target_logit_contribution": 0.5162528441598018,
+      "mean_source_total_route_suppression_contribution": 0.19438724487554282,
+      "mean_target_logit_drop_after_source_removal": 0.004166666666666667,
+      "support_rate_drop_gt_0_20": 0.06666666666666667,
+      "mean_total_positive_route_release_after_source_removal": 0.18333333333333332,
+      "route_guard_rate_release_gt_0_20": 0.4666666666666667,
+      "top1_loss_rate": 0.03333333333333333,
+      "domain_breakdown": {
+        "abstract": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.0,
+          "mean_target_drop": 0.08333333333333333,
+          "mean_route_release": 0.0
+        },
+        "animal": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": -0.041666666666666664,
+          "mean_route_release": 0.22916666666666666
+        },
+        "fruit": {
+          "n": 6,
+          "support_rate": 0.3333333333333333,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": 0.0625,
+          "mean_route_release": 0.3541666666666667
+        },
+        "object": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": 0.020833333333333332,
+          "mean_route_release": 0.10416666666666667
+        },
+        "plant": {
+          "n": 6,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.3333333333333333,
+          "mean_target_drop": -0.041666666666666664,
+          "mean_route_release": 0.125
+        },
+        "tool": {
+          "n": 3,
+          "support_rate": 0.0,
+          "route_guard_rate": 0.6666666666666666,
+          "mean_target_drop": -0.041666666666666664,
+          "mean_route_release": 0.20833333333333334
+        }
+      },
+      "cross_domain_guess": "domain_specific_or_weak"
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+[09:13:27] glm4/smoke: pairs=1 target=hidden_40 audits=1 combo_candidates=2
+[09:13:27] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 4/443 [00:00<00:11, 36.93it/s]Loading weights:   8%|▊         | 37/443 [00:00<00:02, 195.42it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 247.37it/s]Loading weights:  23%|██▎       | 104/443 [00:00<00:01, 266.66it/s]Loading weights:  30%|██▉       | 131/443 [00:00<00:01, 265.00it/s]Loading weights:  38%|███▊      | 169/443 [00:00<00:00, 297.07it/s]Loading weights:  46%|████▌     | 202/443 [00:00<00:00, 302.10it/s]Loading weights:  53%|█████▎    | 233/443 [00:00<00:00, 275.17it/s]Loading weights:  60%|██████    | 267/443 [00:00<00:00, 291.29it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 302.70it/s]Loading weights:  75%|███████▌  | 333/443 [00:01<00:00, 300.61it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 303.29it/s]Loading weights:  91%|█████████ | 402/443 [00:01<00:00, 312.39it/s]Loading weights:  99%|█████████▊| 437/443 [00:01<00:00, 319.91it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 291.09it/s]
+[09:13:29] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[09:13:32] glm4: route-level suppression audit 1/1 pairs; rows=17
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "top_condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 0.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 1.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 1.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_current_top_class",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 3.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_current_top_class",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 3.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_route_representatives",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 3.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_route_representatives",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 3.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_route_centroids",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 0.0,
+      "mean_suppressed_route_count": 3.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_route_centroids",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 0.0,
+      "mean_suppressed_route_count": 3.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    },
+    {
+      "condition": "suppress_all_topk_competitors",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_base_margin_donor_vs_top": 0.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_delta_norm": 0.0,
+      "mean_suppressed_token_count": 5.0,
+      "mean_suppressed_route_count": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "base_top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "route_shift_rate": 0.0
+    }
+  ],
+  "top_base_class_summary": [
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_current_top_class",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_current_top_class",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_route_representatives",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_route_representatives",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_route_centroids",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_route_centroids",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_all_topk_competitors",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_all_topk_competitors",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    },
+    {
+      "base_top_token_class": "donor_answer",
+      "condition": "suppress_class:format_or_schema",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_margin_gain_vs_base_top": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      }
+    }
+  ]
+}
